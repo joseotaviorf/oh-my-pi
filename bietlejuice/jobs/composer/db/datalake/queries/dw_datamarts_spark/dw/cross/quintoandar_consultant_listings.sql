@@ -37,7 +37,7 @@ base_tempo_rent AS (
                 CASE 
                     WHEN ts_status_end <= DATE_ADD(ts_publication,30) THEN 
                         CASE 
-                            WHEN sk_status_end_date = -1 THEN GETDATE() 
+                            WHEN sk_status_end_date = -1 THEN CURRENT_TIMESTAMP() 
                             ELSE ts_status_end 
                         END 
                     ELSE DATE_ADD(ts_publication,30) 
@@ -74,7 +74,7 @@ base_tempo_sale AS (
                 CASE 
                     WHEN ts_status_ended <= DATE_ADD(dd.date,30) THEN 
                         CASE 
-                            WHEN sk_status_end_date = -1 THEN GETDATE() 
+                            WHEN sk_status_end_date = -1 THEN CURRENT_TIMESTAMP() 
                             ELSE ts_status_ended 
                         END 
                     ELSE DATE_ADD(dd.date,30) 
