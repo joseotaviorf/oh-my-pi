@@ -1205,16 +1205,10 @@ bietlejuice.enrich_customer_demand:
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.enrich_customer_support:load-enrich-email
-  - bietlejuice.enrich_heimdall:load-enrich-activity
-  - bietlejuice.enrich_heimdall:load-enrich-auditable-expenses
-  - bietlejuice.enrich_heimdall:load-enrich-expenses
   - bietlejuice.gsheets.support_and_service:load-clean-agents-control
   - bietlejuice.gsheets.support_and_service:load-clean-department-control
   - bietlejuice.gsheets:load-clean-tag-sla-target
   - bietlejuice.gsheets:load-clean-taxonomy-sla
-  - bietlejuice.terminator:load-clean-negotiation
-  - bietlejuice.terminator:load-clean-termination
-  - bietlejuice.terminator:load-clean-termination-aud
   - bietlejuice.reclameaqui:load-clean-tickets
 
 bietlejuice.enrich_docx:

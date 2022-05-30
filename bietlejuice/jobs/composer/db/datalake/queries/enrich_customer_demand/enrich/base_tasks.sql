@@ -177,38 +177,6 @@ ticket_tasks AS (
       (t.department = 'Offboarding Reparos [OFF] [POS] [BACK]' AND t.tags LIKE '%orçamentação_realizada%')
       OR t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
     )
-),
-heimdall_tasks AS (
-  WITH crm_last_task_updated AS (
-    SELECT DISTINCT
-      id,
-      LAST_VALUE(id_state) OVER(PARTITION BY id ORDER BY DATE(CONCAT(year,'-',month,'-',day)) ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS id_state
-    FROM
-      datalake_crm.tasks t
-  )
-  SELECT DISTINCT
-    a.id_external_contract AS id_task,
-    MAX(COALESCE(bca.id_agent, '-1')) AS id_agent,
-    a.type,
-    2 AS sla_target,
-    DATE_TRUNC('DAY', a.ts_requested) AS ts_started,
-    DATE_TRUNC('DAY', a.ts_transition_created) AS ts_completed
-  FROM
-    datalake_heimdall.activity a
-  LEFT JOIN
-    crm_last_task_updated crm
-        ON a.id = crm.id_state
-  LEFT JOIN
-    base_crm_analyst_info bca
-      ON crm.id = bca.id_task
-  LEFT JOIN
-    datalake_heimdall.expenses e
-      ON e.id_activity = a.id
-  WHERE
-    a.type = 'TENANT_REFUND_REPAIR'
-    AND (bca.id_task IS NULL OR bca.action_type = 'CREATE')
-    AND a.ts_requested >= '2021-01-01'
-  GROUP BY 1,3,4,5,6
 )
 SELECT
   id_task,
@@ -237,17 +205,3 @@ SELECT
   ts_csat_answer
 FROM
   ticket_tasks
-UNION ALL
-SELECT
-  id_task,
-  id_agent,
-  type,
-  sla_target,
-  NULL AS csat_score,
-  NULL AS is_solved,
-  ts_started,
-  ts_completed,
-  ts_completed AS ts_closed,
-  NULL AS ts_csat_answer
-FROM
-  heimdall_tasks

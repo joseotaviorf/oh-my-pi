@@ -4,7 +4,6 @@ table_name: base_tasks
 columns:
   id_task:
     lineage:
-      - datalake_heimdall.activity.id_external_contract
       - datalake_customer_support.email.id_ticket
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.id_task
   id_agent:
@@ -13,7 +12,6 @@ columns:
       - datalake_customer_support.email.id_agent
   type:
     lineage:
-      - datalake_heimdall.activity.type
       - datalake_customer_support.email.department
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
   sla_target:
@@ -28,18 +26,15 @@ columns:
       - datalake_customer_support.email.is_solved
   ts_started:
     lineage:
-      - datalake_heimdall.activity.ts_requested
       - datalake_customer_support.email.ts_ticket_started
       - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
   ts_completed:
     lineage:
-      - datalake_heimdall.activity.ts_transition_created
       - datalake_customer_support.email.ts_ticket_solved
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
   ts_closed:
     lineage:
-      - datalake_heimdall.activity.ts_transition_created
       - datalake_customer_support.email.ts_ticket_closed
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
   ts_csat_answer:
