@@ -17,6 +17,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `repressed_demand_sale`
 - `sale_ongoing_listings_casa_mineira`
 - `temp_autonomous_agents_listings`
+- `dim_house_listing_amenities`
 
 
 ### Responsible Data Engineering Team

@@ -634,8 +634,10 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.dw_user:load-dw-public-dim-partner-agent
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-maintenance-condition-in-data-lake
   - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-info-amenities-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
