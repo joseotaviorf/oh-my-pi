@@ -17,3 +17,5 @@ cluster_extra_libs:
                   package: "pandas==1.3.5"
         - pypi:
                   package: "openpyxl==3.0.10"
+        - pypi:
+                  package: "pyxlsb==1.0.9"

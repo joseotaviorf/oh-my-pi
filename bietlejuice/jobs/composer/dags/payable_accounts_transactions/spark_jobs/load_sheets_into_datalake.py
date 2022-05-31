@@ -87,18 +87,28 @@ def __list_files_gdrive(client, query):
     @param query: str.
     @return: list
     """
-    results = (
-        client.files()
-        .list(
-            pageSize=10,
-            fields="nextPageToken, files(id, name, mimeType)",
-            q=query,
-            includeItemsFromAllDrives=True,
-            supportsAllDrives=True,
+
+    files = []
+    page_token = None
+    while True:
+        results = (
+            client.files()
+            .list(
+                pageSize=100,
+                pageToken=page_token,
+                fields="nextPageToken, files(id, name, mimeType)",
+                q=query,
+                includeItemsFromAllDrives=True,
+                supportsAllDrives=True,
+            )
+            .execute()
         )
-        .execute()
-    )
-    return results.get("files", [])
+
+        files.extend(results.get("files", []))
+        page_token = results.get("nextPageToken")
+        if not page_token:
+            break
+    return files
 
 
 def __download_drive_file_as_bytes(drive_client, file_id):
@@ -196,6 +206,7 @@ if __name__ == "__main__":
 
     for i in infos_sheets:
         after_2021 = False if "2021" in i["name"] else True
+        engine = None if "xlsb" not in i["name"] else "pyxlsb"
         if "Terceiros" in i["name"]:
             sheetname = (
                 str(datetime.now().year)
@@ -210,6 +221,7 @@ if __name__ == "__main__":
                 header=1,
                 sheet_name=sheetname,
                 usecols=usecols,
+                engine=engine,
             )
             df = spark_client.create_dataframe(df, __generate_schema(df))
             if after_2021:
@@ -225,6 +237,7 @@ if __name__ == "__main__":
                     header=1,
                     sheet_name=sheetname,
                     usecols=usecols,
+                    engine=engine,
                 )
                 df = spark_client.create_dataframe(df, __generate_schema(df))
                 if after_2021:
