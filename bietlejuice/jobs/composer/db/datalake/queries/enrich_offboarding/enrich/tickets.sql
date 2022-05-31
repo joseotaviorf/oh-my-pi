@@ -1,20 +1,6 @@
 WITH tickets_funnel_metrics_adjusted AS (
-    WITH tenant AS (
-        SELECT DISTINCT
-            tmc_t.id_ticket,
-            ch_t.id_contract AS id_contract,
-            -- tickets will only have a valid client key according to its corresponding client type
-            CASE
-                WHEN tmc_t.client_type = 'inquilino' THEN ch_t.id_client
-            END AS id_client
-        FROM
-            datalake_zendesk_tickets.ticket_measurements tmc_t
-        LEFT JOIN
-            datalake_ebdb_contract.contract_house ch_t
-                ON tmc_t.id_contract = ch_t.id_contract
-    )
     SELECT
-        ten.id_contract,
+        tfm.id_contract,
         tfm.id_ticket,
         TO_DATE(tfm.ts_closed) AS dt_closed_date,
         TO_DATE(tfm.ts_created_local) AS dt_created_date_local,
@@ -22,9 +8,6 @@ WITH tickets_funnel_metrics_adjusted AS (
         TO_DATE(tfm.ts_solved_local) AS dt_solved_date_local
     FROM
         datalake_zendesk_ticket_funnels.tickets_funnel_metrics tfm
-    LEFT JOIN
-        tenant ten
-            ON tfm.id_ticket = ten.id_ticket
 )
 SELECT
     ong.id_contract,
