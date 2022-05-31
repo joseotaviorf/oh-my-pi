@@ -1579,6 +1579,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
   - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-inspection
