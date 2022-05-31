@@ -6,10 +6,10 @@ columns:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_ticket
   sk_house_listing:
     lineage:
-      - datalake_ebdb_contract.contract_house.id_house_listing
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_house_listing
   sk_contract:
     lineage:
-      - datalake_ebdb_contract.contract_house.id_contract
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
   sk_user:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
@@ -18,10 +18,10 @@ columns:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_personal_document
   sk_client:
     lineage:
-      - datalake_ebdb_contract.contract_house.id_client
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_client
   sk_owner:
     lineage:
-      - datalake_ebdb_contract.contract_house.id_owner
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_owner
   sk_zendesk_requester_user:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_zendesk_requester_user
