@@ -4,26 +4,12 @@ columns:
   id_ticket:
     lineage:
       - datalake_zendesk_tickets.ticket_measurements.id_ticket
-  id_house_listing:
-    lineage:
-      - datalake_ebdb_contract.contract_house.id_house_listing
-  id_contract:
-    lineage:
-      - datalake_ebdb_contract.contract_house.id_contract
   id_user:
     lineage:
       - datalake_zendesk_tickets.zendesk_users_contact.id_user
   id_personal_document:
     lineage:
       - datalake_zendesk_tickets.zendesk_users_contact.id_personal_document
-  id_client:
-    lineage:
-      - datalake_zendesk_tickets.ticket_measurements.client_type
-      - datalake_ebdb_contract.contract_house.id_client
-  id_owner:
-    lineage:
-      - datalake_zendesk_tickets.ticket_measurements.client_type
-      - datalake_ebdb_contract.contract_house.id_owner
   id_zendesk_requester_user:
     lineage:
       - datalake_zendesk_tickets.ticket_measurements.id_zendesk_requester_user
