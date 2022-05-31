@@ -1,6 +1,6 @@
 SELECT DISTINCT
     t.id_ticket,
-    t.id_contract,
+    CAST(t.id_contract AS BIGINT) AS id_contract,
     zuc.id_user,
     zuc.id_personal_document,
     t.id_zendesk_requester_user,
