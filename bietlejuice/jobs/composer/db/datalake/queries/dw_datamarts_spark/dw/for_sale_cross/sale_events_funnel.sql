@@ -61,48 +61,69 @@ agents_3p AS (
     JOIN datalake_ebdb_work_contract.work_contract AS wc
         ON ac.id_work_contract = wc.id
 ),
-monday_adjusted AS (
--- data from datalake_firestore.monday
-SELECT
-    mo.id_offer,
-    mo.id_buyer||'_'||mo.id_house AS sale_flow,
-    mo.id_house,
-    mo.id_buyer AS id_user,
-    mo.id_agent,
-    CASE
-        WHEN mo.payment_method IN ('1', '7') THEN 'Financiado'
-        WHEN mo.payment_method = '2' THEN 'À Vista'
-        WHEN mo.payment_method = '3' THEN 'À Vista + FGTS'
-        WHEN mo.payment_method = '4' THEN 'Financiado + FGTS'
-	ELSE 'Other'END AS form_of_payment,
-    mo.dt_submitted AS dt_offer_sent,
-    mo.dt_deal_qualified AS dt_deal_qualified,
-    mo.dt_accepted AS dt_offer_accepted,
-    mo.dt_sale_agreement_signed AS dt_ccv_signed,
-    mo.dt_offer_dismissed AS dt_offer_rejected,
-    mo.dt_legaut_analysis_started AS dt_diligence_started_legaut,
-    mo.dt_legaut_analysis_ended AS dt_diligence_ended_legaut,
-    mo.dt_legal_analysis_ended AS dt_diligence_ended,
-    mo.dt_legal_risk_started AS dt_diligence_started_legal,
-    mo.dt_legal_risk_ended AS dt_diligence_ended_legal,
-    mo.dt_credit_analysis_started AS dt_credit_started,
-    mo.dt_credit_analysis_ended AS dt_credit_approved,
-    mo.dt_sale_transacton_paid AS dt_payment_concluded,
-    mo.dt_notes_registry_started AS dt_notes_registry_started,
-    mo.dt_notes_registry_ended AS dt_notes_registry_ended,
-    mo.dt_house_registry_started AS dt_matricula_inicio,
-    mo.dt_house_registry_ended AS dt_matricula_atualizada,
-    mo.dt_sale_key_delivered AS dt_entrega_chaves,
-    mo.dt_financing_started AS dt_finan_started,
-    mo.dt_financing_ended AS dt_finan_ended,
-    drop_reason_before_acceptance AS offer_rejection_reason,
-    drop_reason_after_acceptance AS offer_accepted_drop_reason,
-    mo.listing_sale_price AS sale_listing_price,
-    mo.price_offered_by_buyer AS buyer_offer_price,
-    (mo.listing_sale_price - mo.price_offered_by_buyer)/mo.listing_sale_price AS offer_discount
-FROM
-	datalake_firestore.monday AS mo
+data_deal_quali AS (
+    SELECT
+        id,
+        DATE(MIN(ts_updated)) AS dt_deal_qualified
+    FROM
+        datalake_sales_flow_clean.sales_flow_aud
+    WHERE
+        mod_flow_step AND flow_step = 'PROPOSAL_ONGOING'
+    GROUP BY id
 ),
+
+sale_offers_adjusted AS (
+SELECT
+    eso.id_offer,
+    eso.id_buyer||'_'||eso.id_house AS sale_flow,
+    eso.id_house,
+    eso.id_buyer AS id_user,
+    eso.id_agent,
+    CASE
+        WHEN eso.current_payment_method = 'FINANCED' AND eso.has_used_fgts_in_payment = FALSE THEN 'Financiado'
+        WHEN eso.current_payment_method = 'CASH' AND eso.has_used_fgts_in_payment = FALSE THEN 'À Vista'
+        WHEN eso.current_payment_method = 'CASH' AND eso.has_used_fgts_in_payment = TRUE THEN 'À Vista + FGTS'
+        WHEN (eso.current_payment_method = 'FINANCED' AND eso.has_used_fgts_in_payment = TRUE) OR eso.current_payment_method = 'FINANCED_WITH_FGTS' THEN 'Financiado + FGTS'
+	ELSE 'Other'END AS form_of_payment,
+    DATE(eso.ts_offer_submitted) AS dt_offer_sent,
+    COALESCE(ddq.dt_deal_qualified, m.dt_deal_qualified) AS dt_deal_qualified,
+    eso.dt_offer_accepted AS dt_offer_accepted,
+    eso.dt_sale_agreement_signed AS dt_ccv_signed,
+    DATE(eso.dt_offer_dismissed) AS dt_offer_rejected,
+    COALESCE(sof.dt_legaut_analysis_started, m.dt_legaut_analysis_started) AS dt_diligence_started_legaut,
+    COALESCE(sof.dt_legaut_analysis_ended, m.dt_legaut_analysis_ended) AS dt_diligence_ended_legaut,
+    COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended) AS dt_diligence_ended,
+    COALESCE(sof.dt_legal_risk_started, m.dt_legal_risk_started) AS dt_diligence_started_legal,
+    COALESCE(sof.dt_legal_risk_ended, m.dt_legal_risk_ended) AS dt_diligence_ended_legal,
+    COALESCE(sof.dt_credit_analysis_started, m.dt_credit_analysis_started) AS dt_credit_started,
+    COALESCE(sof.dt_credit_analysis_ended, m.dt_credit_analysis_ended) AS dt_credit_approved,
+    eso.dt_sale_transacton_paid AS dt_payment_concluded,
+    COALESCE(sof.dt_notes_registry_started, m.dt_notes_registry_started) AS dt_notes_registry_started,
+    COALESCE(sof.dt_notes_registry_ended, m.dt_notes_registry_ended) AS dt_notes_registry_ended,
+    eso.dt_house_registry_started AS dt_matricula_inicio,
+    eso.dt_house_registry_ended AS dt_matricula_atualizada,
+    COALESCE(sof.dt_sale_key_delivered, m.dt_sale_key_delivered) AS dt_entrega_chaves,
+    COALESCE(sof.dt_financing_started, m.dt_financing_started) AS dt_finan_started,
+    COALESCE(sof.dt_financing_ended, m.dt_financing_ended) AS dt_finan_ended,
+    dl.price AS sale_listing_price,
+    eso.first_price_offered_by_buyer AS buyer_offer_price,
+    (dl.price - eso.first_price_offered_by_buyer)/dl.price AS offer_discount
+FROM
+	datalake_offer.sale_offer AS eso
+LEFT JOIN 
+    dw_sale.dim_listing AS dl 
+      ON eso.id_house = dl.sk_house
+LEFT JOIN
+    datalake_sale_offer_flows.sale_offer_flows AS sof 
+      ON eso.id_offer = sof.id_offer
+LEFT JOIN 
+    data_deal_quali AS ddq 
+      ON sof.id_sales_flow = ddq.id
+LEFT JOIN 
+    datalake_firestore.monday AS m 
+      ON eso.id_offer = m.id_offer
+)
+,
 sale_bookings_base AS (
 SELECT
     fv.sk_house AS id_property,
@@ -284,9 +305,9 @@ SELECT
     sc.ccv_date,
     sc.hub_offer
 FROM
-    monday_adjusted offers
+    sale_offers_adjusted AS offers
 FULL OUTER JOIN
-    sale_tta tta
+    sale_tta AS tta
         ON (offers.id_house = tta.house_id AND offers.id_user = tta.tenant_id)
 FULL OUTER JOIN
 	sale_closing AS sc
