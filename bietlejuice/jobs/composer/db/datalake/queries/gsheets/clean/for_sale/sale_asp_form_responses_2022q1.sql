@@ -5,7 +5,7 @@ SELECT
     endereco_de_email AS asp_assignee_email,
     asp_responsavel AS asp_assignee_name,
     INT(NULLIF(preco_do_anuncio_no_momento_do_atendimento, '')) AS sale_price_listing,
-    INT(NULLIF(preco_da_calculadora, '') AS sale_price_calculator, 
+    INT(NULLIF(preco_da_calculadora, '')) AS sale_price_calculator, 
     INT(NULLIF(preco_apos_alteracao, '')) AS sale_price_after_change,
     CASE WHEN LENGTH(acaooes_asp_agendar_nova_sessao_de_fotos) > 0 THEN TRUE ELSE FALSE END AS has_action_book_new_photo_session,
     CASE WHEN LENGTH(acaooes_asp_alterar_condicao_de_entrada) > 0 THEN TRUE ELSE FALSE END AS has_action_change_house_entrance,
