@@ -1,0 +1,52 @@
+---
+database_name: datalake_gsheets_clean
+table_name: metrics_registration
+columns:
+  metric_name:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.name
+  metric_acronym:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.acronym
+  metric_description:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.description
+  business_stage:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.business_stage
+  calculation:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.calculation
+  company_line:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.company_line
+  has_datamart:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.has_datamart
+  datamart_name:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.datamart_name
+  is_additive:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.is_additive
+  hierarchy_level:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.hierarchy_level
+  link_to_metric:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.link_to_metric
+  approved_by:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.approved_by
+  created_by:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.created_by
+  observations:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.observations
+  maturity_level:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.maturity_level
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.ts_load

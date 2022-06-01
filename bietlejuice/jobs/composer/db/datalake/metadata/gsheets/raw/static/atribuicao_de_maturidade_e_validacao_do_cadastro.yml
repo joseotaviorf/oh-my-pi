@@ -1,0 +1,3 @@
+---
+database_name: datalake_gsheets_raw
+table_name: atribuicao_de_maturidade_e_validacao_do_cadastro

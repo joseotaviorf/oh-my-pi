@@ -570,6 +570,12 @@ marketing_affiliates_targets_replanning:
     clean_table_name: marketing_affiliates_targets_replanning
     sheet_context: static
 
+atribuicao_de_maturidade_e_validacao_do_cadastro:
+    sheet_id: 1Q7nQfLRa_yTsqB0VN27AffeUES4r_urat3FA0R78MRI
+    sheet_name: FINAL
+    clean_table_name: metrics_registration
+    sheet_context: static
+
 #########################
 # GENERAL SHEETS
 ###################
