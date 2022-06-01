@@ -228,8 +228,7 @@ ongoing_listings_weekly AS (
         JOIN 
             dw_public.dim_date AS d
                 ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) 
-                AND COALESCE(CAST(DATE_FORMAT(TO_DATE(CAST(NULLIF(sk_status_end_date,-1) AS STRING),'
-                ') - 1, 'yyyyMMdd') AS BIGINT), CAST(DATE_FORMAT(CURRENT_DATE -1, 'yyyyMMdd') AS BIGINT))
+                AND COALESCE(CAST(DATE_FORMAT(TO_DATE(CAST(NULLIF(sk_status_end_date,-1) AS STRING),'yyyyMMdd') - 1, 'yyyyMMdd') AS BIGINT), CAST(DATE_FORMAT(CURRENT_DATE -1, 'yyyyMMdd') AS BIGINT))
         WHERE
             f.status_history = 'publicado' -- consider only published status
             AND SUBSTRING(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
