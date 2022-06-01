@@ -6,28 +6,28 @@
 #     dag_owner: <dag_owner>
 dags:
   support_and_service:
-    main_schedule_interval: 0 3 * * *
+    main_schedule_interval: 0 0 * * *
     dag_owner: Data S&S
   growth:
-    main_schedule_interval: 0 3 * * *
+    main_schedule_interval: 0 0 * * *
     dag_owner: Data Growth
   growth_intraday:
     main_schedule_interval: 0 10 * * *
     dag_owner: Data Growth
   for_rent:
-    main_schedule_interval: 0 3 * * *
+    main_schedule_interval: 0 0 * * *
     dag_owner: Data ForRent
   fintech:
-    main_schedule_interval: 0 3 * * *
+    main_schedule_interval: 0 0 * * *
     dag_owner: Data Fintech
   bedrock:
-    main_schedule_interval: 0 3 * * *
+    main_schedule_interval: 0 0 * * *
     dag_owner: Data Bedrock
   for_sale:
-    main_schedule_interval: 0 3 * * *
+    main_schedule_interval: 0 0 * * *
     dag_owner: Data ForSale
   static:
     dag_owner: Data Engineering
   general:
-    main_schedule_interval: 0 3 * * *
+    main_schedule_interval: 0 0 * * *
     dag_owner: Data Engineering
