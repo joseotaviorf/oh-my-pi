@@ -23,7 +23,7 @@ DAGS_CROSS_DEPENDENCIES_FILE_PATH = (
     f"{COMPOSER_DAGS_PATH}/{DAGS_CROSS_DEPENDENCIES_FILE_NAME}"
 )
 VALIDATION_LOG_SEPARATOR = "=" * 150
-
+DEPENDENCIES_PATTERN = "bietlejuice\.(\w*):(.*)"
 
 class CrossDAGDependenciesValidator:
     """
@@ -35,14 +35,12 @@ class CrossDAGDependenciesValidator:
      files follows the patterns.
     """
 
-    def __init__(self, assert_tasks_only: bool, check_duplicates: bool) -> None:
+    def __init__(self) -> None:
         self.all_tables_by_dag_from_files = {}
         self.invalid_entities = {}
         self.dags_out_of_pattern = ConfigurationService().get_config(
             "dags_out_of_pattern"
         )
-        self.assert_tasks_only = assert_tasks_only
-        self.check_duplicates = check_duplicates
 
     @staticmethod
     def log_msg(msg, force_log=False):
@@ -156,7 +154,7 @@ class CrossDAGDependenciesValidator:
         match = re.search("bietlejuice\.(.*):load-(public)?(.*)-into-redshift", task_name)
 
         if not match:
-            match_dag_name = re.search("bietlejuice\.(\w*):(.*)", task_name)
+            match_dag_name = re.search(DEPENDENCIES_PATTERN, task_name)
             dag_name = match_dag_name.group(1)
             return dag_name, None
 
@@ -186,7 +184,7 @@ class CrossDAGDependenciesValidator:
 
         match = re.search(task_name_pattern, task_name)
         if match is None:
-            match_dag_name = re.search("bietlejuice\.(\w*):(.*)", task_name)
+            match_dag_name = re.search(DEPENDENCIES_PATTERN, task_name)
             dag_name = match_dag_name.group(1)
             return dag_name, None
 
@@ -476,6 +474,46 @@ class CrossDAGDependenciesValidator:
             msg = f"There are DAGs or Tables dependencies with repeated dependencies. There must be only one declaration per DAG/Table. {self.concat_dependent_and_dependencies_to_msg(dict_dup, validation_message)}"
             self.log_msg(msg=f"msg={msg}", force_log=True)
 
+    @staticmethod
+    def get_invalid_characters(dependencies: List[str]) -> List[str]:
+        """Check if there are any non-alphanumeric characters or hyphens in a list of string
+
+        :param dependencies: Dependencies from a DAG/Table
+        :type dependencies: List[str]
+        :return: Dependencies with invalid characters in task name.
+        :rtype: List[str]
+        """
+        invalids_tasks = []
+        for dependency in dependencies:
+            match_dag_name = re.search(DEPENDENCIES_PATTERN, dependency)
+            if match_dag_name:
+                task = match_dag_name.group(2)
+                if re.search("[^a-zA-Z0-9-]", task):
+                    invalids_tasks.append(dependency)
+        return invalids_tasks
+
+    def validate_characters(self) -> None:
+        """
+        Validates if there are any task names in the dependencies file that has non-alphanumeric characters or hyphens.
+        """
+        self.log_msg(msg=f"\n{VALIDATION_LOG_SEPARATOR}", force_log=True)
+        starting_validaton_message = f"Validation to check if there are invalids characters in task_name is running..."
+        self.log_msg(msg=f"msg={starting_validaton_message}", force_log=True)
+
+        validation_message = "The DAG/Table '{dependent}' has invalid characters for dependency '{dependency}'."
+
+        for dependent in self.dependencies_raw:
+            dependencies = self.dependencies_raw[dependent]
+            if self.is_dag_out_of_pattern(dependent):
+                continue
+            invalid_tasks_names = self.get_invalid_characters(dependencies)
+            if invalid_tasks_names:
+                [self.register_into_invalid_list(dependent, task_name) for task_name in invalid_tasks_names]
+                dict_structure = {dependent: invalid_tasks_names}
+                msg = f"There are DAGs or Tables dependencies with invalid characters. There must be only alphanumeric and hyphen in task names. {self.concat_dependent_and_dependencies_to_msg(dict_structure, validation_message)}"
+                self.log_msg(msg=f"msg={msg}", force_log=True)
+
+
     def validate(self) -> int:
         """
         Main validation method.
@@ -498,10 +536,10 @@ class CrossDAGDependenciesValidator:
             tables_in_file,
         ) = self.get_tables_from_dependency_file()
 
-        if self.check_duplicates:
-            self.validate_repeated()
-        if self.assert_tasks_only:
-            self.validate_only_tasks_in_dependencies_file()
+        self.validate_repeated()
+        self.validate_only_tasks_in_dependencies_file()
+        self.validate_characters()
+
         self.validate_dags(dags_without_tasks_in_file)
         self.validate_tables(tables_in_file)
 
@@ -516,9 +554,7 @@ class CrossDAGDependenciesValidator:
         return status
 
 
-dependencies_validator = CrossDAGDependenciesValidator(
-    assert_tasks_only=True,
-    check_duplicates=True
-)
+dependencies_validator = CrossDAGDependenciesValidator()
+
 validation_status = dependencies_validator.validate()
 exit(validation_status)
