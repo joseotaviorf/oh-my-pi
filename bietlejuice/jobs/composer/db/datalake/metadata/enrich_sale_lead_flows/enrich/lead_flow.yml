@@ -142,6 +142,9 @@ columns:
   total_bookings_created_by_secretariat:
     lineage:
       - datalake_sale_lead_flows.quintoandar_lead_flow.total_bookings_created_by_secretariat
+  total_visits_completed_by_secretariat:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.total_visits_completed_by_secretariat
   ts_first_talk_to_secretariat:
     lineage:
       - datalake_sale_lead_flows.hub_services_lead_flow.ts_first_talk_to_secretariat

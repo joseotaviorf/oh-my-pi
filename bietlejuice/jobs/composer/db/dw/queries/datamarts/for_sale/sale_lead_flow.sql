@@ -39,6 +39,7 @@ SELECT
     total_bookings_created_by_secretariat,
     total_bookings_created,
     total_bookings_canceled,
+    total_visits_completed_by_secretariat,
     total_visits_completed,
     total_offer_submitted,
     total_sale_agreement_signed,

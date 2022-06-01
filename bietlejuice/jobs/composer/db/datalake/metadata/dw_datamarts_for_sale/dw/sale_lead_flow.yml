@@ -122,6 +122,9 @@ columns:
   total_bookings_canceled:
     lineage:
       - datalake_sale_lead_flows.lead_flow.total_bookings_canceled
+  total_visits_completed_by_secretariat:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.total_visits_completed_by_secretariat
   total_visits_completed:
     lineage:
       - datalake_sale_lead_flows.lead_flow.total_visits_completed

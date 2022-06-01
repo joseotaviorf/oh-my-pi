@@ -91,6 +91,8 @@ booking_statistics AS (
 visit AS (
     SELECT
         b.id_visitor AS id_user,
+        b.id AS id_booking,
+        b.user_sale_booking_creator,
         b.ts_booking_utc AS ts_visit_completed,
         h.id_region,
         b.ts_created,
@@ -129,6 +131,13 @@ last_visit AS (
 visit_statistics AS (
     SELECT
         id_user,
+        COUNT(DISTINCT
+            CASE
+                WHEN UPPER(user_sale_booking_creator) = 'SECRETARIA'
+                AND ts_visit_completed IS NOT NULL 
+                    THEN id_booking
+            END
+        ) AS total_visits_completed_by_secretariat,
         COUNT(
             CASE
                 WHEN ts_visit_completed IS NOT NULL THEN 1
@@ -464,6 +473,7 @@ SELECT
     COALESCE(bs.total_bookings_created_by_secretariat, 0) AS total_bookings_created_by_secretariat,
     COALESCE(bs.total_bookings_canceled, 0) AS total_bookings_canceled,
     COALESCE(vs.total_visits_completed, 0) AS total_visits_completed,
+    COALESCE(vs.total_visits_completed_by_secretariat, 0) AS total_visits_completed_by_secretariat,
     COALESCE(os.total_offer_submitted, 0) AS total_offer_submitted,
     COALESCE(os.total_sale_agreement_signed, 0) AS total_sale_agreement_signed,
     fvi.ts_first_visit_scheduling_event,
