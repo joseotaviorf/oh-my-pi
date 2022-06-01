@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_asp_portfolio_2022q2
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_portfolio_2022q2.id_house
+  id_owner:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_portfolio_2022q2.id_owner
+  asp_email:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_portfolio_2022q2.asp_email
+  asp_list:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_portfolio_2022q2.asp_list
+  dt_association:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_portfolio_2022q2.dt_association

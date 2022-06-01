@@ -1,0 +1,8 @@
+---
+database_name: datalake_gsheets_raw
+table_name: sale_asp_portfolio_2022q2
+columns:
+  asp_email:
+    tags:
+      - PII
+      - Confidential
