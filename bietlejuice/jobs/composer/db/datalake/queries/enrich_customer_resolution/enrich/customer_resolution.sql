@@ -120,13 +120,12 @@ tickets_by_ticket_session AS (
   GROUP BY 1,2
 ),
 ticket_recontact_list AS (
-  SELECT
+  SELECT DISTINCT
     ticket_session,
     id_user,
     COLLECT_LIST(id_ticket) OVER (PARTITION BY ticket_session ORDER BY ts_started ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ticket_recontact_list
   FROM
     ticket_sessions
-  GROUP BY 1,2
 )
 SELECT
     tts.ticket_session AS id_ticket,
