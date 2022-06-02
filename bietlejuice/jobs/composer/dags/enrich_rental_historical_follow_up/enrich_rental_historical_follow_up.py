@@ -45,7 +45,7 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 LOGS_OUTPUT_PATH = f"{spark_jobs_logs_path}{DAG_ID}"
 
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_min_general_cluster", deserialize_json=True
+    "databricks_9_1_med_general_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
