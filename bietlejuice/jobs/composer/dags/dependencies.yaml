@@ -1709,6 +1709,16 @@ bietlejuice.enrich_rent_potential_listing:
   - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
   - bietlejuice.enrich_listing_jobs:load-enrich-house-photo-job-tasks
 
+bietlejuice.enrich_rental_historical_follow_up:
+  - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-access-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-key-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+
 bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-entry

@@ -1,0 +1,25 @@
+---
+database_name: datalake_rental_historical_follow_up
+table_name: house_weekly_entrance_info
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+  house_entrance_history:
+    lineage:
+      - datalake_ebdb_clean.house_aud.doorman_type
+  key_location_history:
+    lineage:
+      - datalake_ebdb_clean.access_authorization_type.name
+  key_type_history:
+    lineage:
+      - datalake_ebdb_clean.key_type.name
+  who_is_living_history:
+    lineage:
+      - datalake_ebdb_clean.occupant_type.name
+  dt_week_start:
+    lineage:
+      - datalake_quintoandar.aux_date.week_start
+  dt_week_end:
+    lineage:
+      - datalake_quintoandar.aux_date.week_end
