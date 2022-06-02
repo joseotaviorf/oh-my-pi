@@ -194,4 +194,3 @@ columns:
   ep_user_email_md5:
     lineage:
       - datalake_amplitude_clean_staging.170698_tts_success_page_viewed_events.event_properties
-      

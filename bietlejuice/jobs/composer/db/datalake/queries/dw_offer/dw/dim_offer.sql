@@ -33,42 +33,42 @@ all_offer_submitted_events AS (
     SELECT
         CAST(id_user AS BIGINT) AS id_user,
         CAST(id_house AS BIGINT) AS id_house,
-        id_firestore,
+        ep_id_firestore AS id_firestore,
         ts_event,
-        app_type,
-        utm_source,
-        utm_medium,
-        utm_campaign,
-        utm_content,
-        utm_term
+        up_app_type AS app_type,
+        up_utm_source AS utm_source,
+        up_utm_medium AS utm_medium,
+        up_utm_campaign AS utm_campaign,
+        up_utm_content AS utm_content,
+        up_utm_term AS utm_term
     FROM
         datalake_amplitude_clean.170698_offer_submitted_events
     UNION
     SELECT
         CAST(id_user AS BIGINT) AS id_user,
         CAST(id_house AS BIGINT) AS id_house,
-        id_firestore,
+        ep_id_firestore AS id_firestore,
         ts_event,
-        app_type,
-        utm_source,
-        utm_medium,
-        utm_campaign,
-        utm_content,
-        utm_term
+        up_app_type AS app_type,
+        up_utm_source AS utm_source,
+        up_utm_medium AS utm_medium,
+        up_utm_campaign AS utm_campaign,
+        up_utm_content AS utm_content,
+        up_utm_term AS utm_term
     FROM
         datalake_amplitude_clean.170135_offer_submitted_events
     UNION
     SELECT
         CAST(id_user AS BIGINT) AS id_user,
         CAST(id_house AS BIGINT) AS id_house,
-        id_firestore,
+        ep_id_firestore AS id_firestore,
         ts_event,
-        app_type,
-        utm_source,
-        utm_medium,
-        utm_campaign,
-        utm_content,
-        utm_term
+        up_app_type AS app_type,
+        up_utm_source AS utm_source,
+        up_utm_medium AS utm_medium,
+        up_utm_campaign AS utm_campaign,
+        up_utm_content AS utm_content,
+        up_utm_term AS utm_term
     FROM datalake_amplitude_clean.183049_offer_submitted_events
 ),
 offer_submitted_events AS (

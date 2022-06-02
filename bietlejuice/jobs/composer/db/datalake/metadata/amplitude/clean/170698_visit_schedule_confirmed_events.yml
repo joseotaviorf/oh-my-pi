@@ -1,3 +1,4 @@
+---
 database_name: datalake_amplitude_clean
 table_name: 170698_visit_schedule_confirmed_events
 columns:

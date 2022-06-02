@@ -6,34 +6,34 @@ columns:
       - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.id_user
   id_house:
     lineage:
-      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.event_properties
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ep_id_house
   id_offer:
     lineage:
-      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.event_properties
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ep_id_firestore
   app_type:
     lineage:
-      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.up_app_type
   utm_source:
     lineage:
-      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.up_utm_source
   utm_medium:
     lineage:
-      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.up_utm_medium
   utm_campaign:
     lineage:
-      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.up_utm_campaign
   utm_content:
     lineage:
-      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.up_utm_content
   utm_term:
     lineage:
-      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.up_utm_term
   branded:
     lineage:
-      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.up_utm_campaign
   is_branded:
     lineage:
-      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.up_utm_campaign
   ts_event:
     lineage:
       - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ts_event

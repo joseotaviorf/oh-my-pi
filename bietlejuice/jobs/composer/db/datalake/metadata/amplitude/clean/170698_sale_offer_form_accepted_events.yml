@@ -1,0 +1,178 @@
+---
+database_name: datalake_amplitude_clean
+table_name: 170698_sale_offer_form_accepted_events
+columns:
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.id_amplitude
+  ids_amplitude_attributed:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ids_amplitude_attributed
+  adid:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.adid
+  amplitude_event_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.amplitude_event_type
+  id_app:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.id_app
+  city:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.city
+  ts_client_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ts_client_event
+  ts_client_uploaded:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ts_client_uploaded
+  country:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.country
+  data:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.data
+  ts_server_received:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ts_server_received
+  device_brand:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.device_brand
+  device_carrier:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.device_carrier
+  device_family:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.device_family
+  id_device:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.id_device
+  device_manufacturer:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.device_manufacturer
+  device_model:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.device_model
+  device_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.device_type
+  dma:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.dma
+  id_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.id_event
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ts_event
+  event_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.event_type
+  event_properties:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.event_properties
+  is_attribution_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.is_attribution_event
+  idfa:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.idfa
+  ip_address:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ip_address
+  location_lat:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.location_lat
+  location_lng:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.location_lng
+  os_name:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.os_name
+  os_version:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.os_version
+  platform:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.platform
+  library:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.library
+  is_paying:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.is_paying
+  region:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.region
+  ts_server_uploaded:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ts_server_uploaded
+  id_session:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.id_session
+  start_version:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.start_version
+  ts_user_created:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ts_user_created
+  id_user:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.id_user
+  user_properties:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+  language:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.language
+  uuid:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.uuid
+  version_name:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.version_name
+  id_schema:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.id_schema
+  ts_processed:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.ts_processed
+  id_inserted:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.id_inserted
+  sample_rate:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.sample_rate
+  year:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.year
+  month:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.month
+  day:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.day
+  ep_id_house:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.event_properties
+  ep_id_firestore:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.event_properties
+  up_app_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+  up_utm_source:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+  up_utm_medium:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+  up_utm_campaign:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+  up_utm_content:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
+  up_utm_term:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_sale_offer_form_accepted_events.user_properties
