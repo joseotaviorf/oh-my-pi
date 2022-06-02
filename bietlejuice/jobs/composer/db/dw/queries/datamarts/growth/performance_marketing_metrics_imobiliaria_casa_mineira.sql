@@ -180,7 +180,7 @@ contacts as (
         id_flow,
         order_new_contact_flow
     FROM info_contact
-        WHERE id_origin NOT IN ('12', '18', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32') AND id_origin::INT < 34
+        WHERE id_origin NOT IN ('12', '18', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '34', '35') AND id_origin::INT < 37
         AND DATE(date_add('hour', 3, ts_created)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
 ),
 -----------------------------------------------------------------------------------------------------------
