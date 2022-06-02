@@ -143,9 +143,15 @@ columns:
   days_sale_agreement_signed_to_bank_legal_analysis_started:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_bank_legal_analysis_started
+  days_sale_agreement_signed_to_legal_analysis_ended:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legal_analysis_ended
   days_sale_agreement_signed_to_financing_started:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_financing_started
+  days_sale_agreement_signed_to_financing_ended:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_financing_ended
   days_legal_risk_ended_to_legal_analysis_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_legal_risk_ended_to_legal_analysis_ended
@@ -182,6 +188,12 @@ columns:
   days_credit_analysis_ended_to_bank_legal_analysis_started:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_credit_analysis_ended_to_bank_legal_analysis_started
+  days_credit_analysis_ended_to_financing_started:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_credit_analysis_ended_to_financing_started
+  days_financing_started_to_bank_legal_analysis_started:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_financing_started_to_bank_legal_analysis_started
   days_financing_started_to_financing_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_financing_started_to_financing_ended
