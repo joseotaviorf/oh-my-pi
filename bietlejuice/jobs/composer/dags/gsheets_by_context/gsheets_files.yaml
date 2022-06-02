@@ -242,6 +242,12 @@ legal_provisioning:
     clean_table_name: legal_provisioning
     sheet_context: bedrock
 
+mova_lra_owners:
+    sheet_id: 1Df7vmUXQpUtCrU6gDkwr49bNQTdksa9T0V_XHwIc3hQ
+    sheet_name: 5A_Proprietarios_Completo
+    clean_table_name: mova_lra_owners
+    sheet_context: bedrock
+
 people_data:
     sheet_id: 1bFPTfQjfxtl97QamwKK7ofmYOz7j8_hSLjUmOawF7xg
     sheet_name: people_data

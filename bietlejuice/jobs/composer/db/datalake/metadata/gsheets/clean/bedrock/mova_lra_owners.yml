@@ -1,0 +1,97 @@
+---
+database_name: datalake_gsheets_clean
+table_name: mova_lra_owners
+columns:
+  ccb_number:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.numero_ccb
+  cccb_number:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.numero_cccb
+  compensatory_interest:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.juros_remuneratorios
+  contract_installment_interest:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.juros_parcela_contrato
+  contract_main_installment_value:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.principal_parcela_contrato
+  delay_interest:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.juros_mora
+  dt_created_at:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.created_at
+  dt_expiration:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.data_vencimento
+  dt_generated_contract:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.data_contrato_gerado
+  dt_payment:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.data_pagamento
+  dt_settle:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.data_liquidacao
+  dt_signed_contract:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.data_contrato_assinado
+  fine_value:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.multa
+  installment_number:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.numero_parcela
+  installment_status:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.status
+  installment_total_count:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.qtde_parcelas
+  installment_total_sum:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.soma_parcelas
+  installment_value:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.valor_parcela
+  interest_rate:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.taxa_juros
+  interest_value:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.valor_juros
+  investor_cnpj:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.cnpj_investidor
+  main_value:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.valor_principal
+  owner_cpf_cnpj:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.cpf_cnpj
+  owner_full_name:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.nome
+  paid_value:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.valor_pago
+  request_status:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.status_solicitacao
+  sk_base_proposal:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.id_proposta_base
+  sk_contract:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.contrato_id
+  sk_house:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.imovel_id
+  sk_installment:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.id_parcela
+  sk_product:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.produto_id

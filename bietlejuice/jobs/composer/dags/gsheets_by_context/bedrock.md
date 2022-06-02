@@ -8,7 +8,7 @@ If you need information to understand how you can add your sheet, check our [Goo
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
-  
+
 ### Execution Interval
 
 This DAG is trigged daily.
@@ -20,15 +20,18 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
-    - `agents_payments`
-    - `basic_access`
-    - `legal_provisioning`
-    - `people_data`
+
+   - `agents_payments`
+   - `basic_access`
+   - `legal_provisioning`
+   - `mova_lra_owners`
+   - `people_data`
 
 2. Data lake clean:
-    - `agents_payments`
-    - `people_basic_access`
-    - `legal_provisioning`
-    - `people_employees`
+   - `agents_payments`
+   - `people_basic_access`
+   - `legal_provisioning`
+   - `mova_lra_owners`
+   - `people_employees`
 
 </details>
