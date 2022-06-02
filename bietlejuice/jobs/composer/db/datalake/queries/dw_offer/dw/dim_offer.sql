@@ -32,7 +32,7 @@ WITH pre_proposal_aud AS (
 all_offer_submitted_events AS (
     SELECT
         CAST(id_user AS BIGINT) AS id_user,
-        CAST(id_house AS BIGINT) AS id_house,
+        CAST(ep_id_house AS BIGINT) AS id_house,
         ep_id_firestore AS id_firestore,
         ts_event,
         up_app_type AS app_type,
@@ -46,7 +46,7 @@ all_offer_submitted_events AS (
     UNION
     SELECT
         CAST(id_user AS BIGINT) AS id_user,
-        CAST(id_house AS BIGINT) AS id_house,
+        CAST(ep_id_house AS BIGINT) AS id_house,
         ep_id_firestore AS id_firestore,
         ts_event,
         up_app_type AS app_type,
@@ -60,7 +60,7 @@ all_offer_submitted_events AS (
     UNION
     SELECT
         CAST(id_user AS BIGINT) AS id_user,
-        CAST(id_house AS BIGINT) AS id_house,
+        CAST(ep_id_house AS BIGINT) AS id_house,
         ep_id_firestore AS id_firestore,
         ts_event,
         up_app_type AS app_type,
