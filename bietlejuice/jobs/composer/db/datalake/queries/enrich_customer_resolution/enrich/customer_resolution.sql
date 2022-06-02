@@ -123,7 +123,7 @@ ticket_recontact_list AS (
   SELECT
     ticket_session,
     id_user,
-    COLLECT_LIST(id_ticket) AS ticket_recontact_list
+    COLLECT_LIST(id_ticket) OVER (PARTITION BY ticket_session ORDER BY ts_started ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ticket_recontact_list
   FROM
     ticket_sessions
   GROUP BY 1,2
@@ -134,11 +134,11 @@ SELECT
     ft.ticket_channel,
     tts.total_tickets,
     team,
+    trl.ticket_recontact_list,
     CASE
       WHEN tts.total_tickets > 1 THEN FALSE
       ELSE TRUE
     END AS is_fcr,
-    trl.ticket_recontact_list,
     ft.ts_started,
     ft.ts_closed
 FROM

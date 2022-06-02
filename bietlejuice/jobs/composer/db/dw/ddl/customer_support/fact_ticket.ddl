@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_ticket (
     sk_user BIGINT,
     sk_contract BIGINT,
     sk_main_session BIGINT,
+    sk_next_ticket BIGINT,
     channel VARCHAR(5),
     csat_score INTEGER,
     status VARCHAR(20),

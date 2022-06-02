@@ -99,6 +99,9 @@ columns:
   sk_main_session:
     lineage:
       - datalake_customer_resolution.customer_resolution_static.id_ticket
+  sk_next_ticket:
+    lineage:
+      - datalake_customer_resolution.customer_resolution_static.ticket_recontact_list
   csat_score:
     lineage:
       - datalake_customer_support.call.csat_rating

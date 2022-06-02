@@ -405,12 +405,22 @@ base_tickets AS (
     historical_chat_tickets
 ),
 fcr_customer AS (
-  SELECT
-    CAST(id_ticket AS BIGINT) AS sk_main_session,
-    EXPLODE(ticket_recontact_list) AS recontact_ticket,
-    is_fcr AS is_fcr_customer
-  FROM
-    datalake_customer_resolution.customer_resolution_static
+  WITH base_fcr AS (
+    SELECT
+      CAST(id_ticket AS BIGINT) AS sk_main_session,
+      EXPLODE(ticket_recontact_list) AS recontact_ticket,
+      ticket_recontact_list,
+      is_fcr AS is_fcr_customer
+    FROM
+      datalake_customer_resolution.customer_resolution_static
+  )
+  SELECT 
+    sk_main_session,
+    ticket_recontact_list[FIND_IN_SET(recontact_ticket, CONCAT_WS(',',ticket_recontact_list))] AS sk_next_ticket,
+    recontact_ticket,
+    is_fcr_customer
+  FROM 
+    base_fcr
 )
 SELECT
     bt.sk_ticket,
@@ -424,6 +434,7 @@ SELECT
     bt.sk_user,
     bt.sk_contract,
     fc.sk_main_session,
+    fc.sk_next_ticket,
     bt.channel,
     bt.csat_score,
     bt.status,
