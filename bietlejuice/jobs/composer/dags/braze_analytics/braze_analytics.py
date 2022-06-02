@@ -10,11 +10,16 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
+)
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
 )
 
 
@@ -48,6 +53,13 @@ CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_jso
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{spark_jobs_logs_path}{DAG_ID}"
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
 CUSTOM_LIBRARIES = [
     {
         "whl": f"{artifacts_bucket}/braze-api-client-python/"
@@ -58,7 +70,7 @@ CUSTOM_LIBRARIES = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -74,6 +86,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=CUSTOM_LIBRARIES,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

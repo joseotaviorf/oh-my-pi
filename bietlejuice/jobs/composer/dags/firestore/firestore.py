@@ -12,10 +12,15 @@ from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOpe
 from airflow.utils.helpers import chain
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services import ConfigurationService
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
+)
 
 # ENV setup
 ENV = os.environ.get("ENVIRONMENT")
@@ -49,11 +54,17 @@ RAW_SPARK_JOB_FILE = (
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_firestore_cluster", deserialize_json=True
 )
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -69,6 +80,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=custom_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

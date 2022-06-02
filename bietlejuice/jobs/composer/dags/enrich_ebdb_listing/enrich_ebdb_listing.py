@@ -12,10 +12,15 @@ from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOpe
 from airflow.utils.helpers import chain
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseTaskGroup
+from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
     TaskFlowHelper,
+)
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
 )
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -41,6 +46,12 @@ CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_enrich_ebdb_listing_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
@@ -56,7 +67,7 @@ INNER_DEPENDENCIES = {
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -72,6 +83,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=LIBRARIES_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 

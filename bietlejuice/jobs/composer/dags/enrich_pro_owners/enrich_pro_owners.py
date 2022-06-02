@@ -19,6 +19,10 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
     TaskFlowHelper,
 )
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
+)
 
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -45,6 +49,12 @@ LOGS_OUTPUT_PATH = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 inner_dependencies = config_service.get_config("inner_dependencies")
 incremental_tables = config_service.get_config("incremental_tables")
@@ -65,7 +75,10 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
