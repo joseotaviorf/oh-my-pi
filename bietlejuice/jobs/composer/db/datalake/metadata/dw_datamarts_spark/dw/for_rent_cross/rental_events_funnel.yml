@@ -1,0 +1,42 @@
+---
+database_name: dw_datamarts
+table_name: rental_events_funnel
+columns:
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  supply_mkt_origin:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+  supply_mkt_origin_detailed:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_channel
+      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+  lead_context:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+  lead_processing_operation:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+  sales_company:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sales_company
+  lead_origin:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.lead_origin
+  demand_mkt_channel:
+    lineage:
+      - dw_public.dim_booking.mkt_channel
+  demand_mkt_channel_detailed:
+    lineage:
+      - dw_public.dim_booking.mkt_channel
+      - dw_public.dim_booking.mkt_medium
+  first_touchpoint:
+    lineage:
+      - dw_datamarts_cross.funnel_demand_flows.funnel_first_touchpoint
+  is_b2b_demand:
+    lineage:
+      - dw_datamarts_cross.quintoandar_consultant_listings.type_big_agent
