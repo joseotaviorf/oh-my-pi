@@ -1,0 +1,9 @@
+---
+source_root_path: "s3://5a-seubarriga/forno/report"
+consumer_extra_args:
+  format: csv
+  options:
+    header: "true"
+    escape: '"'
+    multiLine: "true"
+table_name: invoice_preview
