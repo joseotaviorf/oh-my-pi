@@ -123,17 +123,16 @@ csat AS (
 last_csat_answer AS (
   SELECT
     id_ticket,
-    LAST(csat_comment, true) AS csat_comment,
-    LAST(score_reason) AS score_reason,
-    LAST(csat_score, true) AS csat_score,
-    LAST(is_answered, true) AS is_answered,
-    LAST(is_solved, true) AS is_solved,
-    LAST(ts_first_seen, true) AS ts_first_seen,
-    LAST(ts_first_response, true) AS ts_first_response
+    csat_comment,
+    score_reason,
+    csat_score,
+    is_answered,
+    is_solved,
+    ts_first_seen,
+    ts_first_response,
+    ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_first_response DESC) AS rw_number
   FROM
     csat
-  GROUP BY 1
-  ORDER BY ts_first_response
 ),
 back_tickets AS (
   SELECT
@@ -246,6 +245,7 @@ LEFT JOIN
 LEFT JOIN
   last_csat_answer cs
     ON ze.id_ticket = cs.id_ticket
+    AND cs.rw_number = 1
 LEFT JOIN
   last_back_ticket bt
     ON bt.front_ticket = ze.id_ticket
