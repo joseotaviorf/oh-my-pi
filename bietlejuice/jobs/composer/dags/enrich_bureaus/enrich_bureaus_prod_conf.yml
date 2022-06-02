@@ -1,0 +1,20 @@
+---
+tables:
+  - table_name: serasa_bureau_analysis
+    is_incremental: false
+  - table_name: neoway_bureau_analysis
+    is_incremental: false
+  - table_name: bigdatacorp_bureau_analysis
+    is_incremental: false
+  - table_name: transunion_bureau_analysis
+    is_incremental: false
+  - table_name: all_bureau_analysis
+    is_incremental: false
+
+inner_dependencies:
+  all_bureau_analysis:
+    - serasa_bureau_analysis
+    - neoway_bureau_analysis
+    - bigdatacorp_bureau_analysis
+    - transunion_bureau_analysis
+    

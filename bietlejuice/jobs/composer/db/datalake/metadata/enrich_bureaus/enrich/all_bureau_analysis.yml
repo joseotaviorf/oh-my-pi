@@ -1,0 +1,1169 @@
+
+database_name: datalake_bureaus
+table_name: all_bureau_analysis
+columns:
+  id_proposal:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.id_proposal
+  id_proponent:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.id
+  cpf:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.cpf
+  serasa_score_hspn:
+    lineage:
+      - datalake_bureaus.serasa_bureau_analysis.serasa_score_hspn
+  neoway_estimated_income_low:
+    lineage:
+      - datalake_bureaus.neoway_bureau_analysis.neoway_estimated_income_low
+  neoway_estimated_income_midpoint:
+    lineage:
+      - datalake_bureaus.neoway_bureau_analysis.neoway_estimated_income_midpoint
+  neoway_estimated_income_upper:
+    lineage:
+      - datalake_bureaus.neoway_bureau_analysis.neoway_estimated_income_upper
+  bigdatacorp_age:
+    lineage:
+      - datalake_bureaus.bigdatacorp_bureau_analysis.bigdatacorp_age
+  bigdatacorp_total_spouses:
+    lineage:
+      - datalake_bureaus.bigdatacorp_bureau_analysis.bigdatacorp_total_spouses
+  bigdatacorp_total_partners:
+    lineage:
+      - datalake_bureaus.bigdatacorp_bureau_analysis.bigdatacorp_total_partners
+  bigdatacorp_total_household:
+    lineage:
+      - datalake_bureaus.bigdatacorp_bureau_analysis.bigdatacorp_total_household
+  bigdatacorp_total_relationships:
+    lineage:
+      - datalake_bureaus.bigdatacorp_bureau_analysis.bigdatacorp_total_relationships
+  transunion_presumed_income:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_presumed_income
+  transunion_irpf_last_decl_class:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_irpf_last_decl_class
+  transunion_index_job_stability:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_job_stability
+  transunion_index_seg_12:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_12
+  transunion_index_seg_12_charge:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_12_charge
+  transunion_index_seg_12_ecom:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_12_ecom
+  transunion_index_seg_12_fin:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_12_fin
+  transunion_index_seg_12_tele:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_12_tele
+  transunion_index_seg_24:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_24
+  transunion_index_seg_24_charge:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_24_charge
+  transunion_index_seg_24_ecom:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_24_ecom
+  transunion_index_seg_24_fin:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_24_fin
+  transunion_index_seg_24_tele:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_24_tele
+  transunion_index_seg_6:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_6
+  transunion_index_seg_6_cob:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_6_cob
+  transunion_index_seg_6_ecom:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_6_ecom
+  transunion_index_seg_6_fin:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_6_fin
+  transunion_index_seg_6_tele:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_index_seg_6_tele
+  transunion_employer_size:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_employer_size
+  transunion_sc_situation:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_sc_situation
+  transunion_percap_m_munic_cars:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percap_m_munic_cars
+  transunion_percap_m_munic_trucks:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percap_m_munic_trucks
+  transunion_percap_m_munic_pickups:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percap_m_munic_pickups
+  transunion_percap_m_munic_utilitario:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percap_m_munic_utilitario
+  transunion_percap_m_munic_others:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percap_m_munic_others
+  transunion_dist_cep_to_city_center:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_dist_cep_to_city_center
+  transunion_dist_cep_to_nearest_border:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_dist_cep_to_nearest_border
+  transunion_dist_cep_to_nearest_subnormal_aglomerate:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_dist_cep_to_nearest_subnormal_aglomerate
+  transunion_avg_cep_residents_age:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_avg_cep_residents_age
+  transunion_idhm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_idhm
+  transunion_percap_mm_munic_private_hosp_beds:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percap_mm_munic_private_hosp_beds
+  transunion_percap_mm_munic_public_hosp_beds:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percap_mm_munic_public_hosp_beds
+  transunion_percap_mm_munic_sus_hosp_beds:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percap_mm_munic_sus_hosp_beds
+  transunion_max_household_irpf_decl_10_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_max_household_irpf_decl_10_years
+  transunion_max_household_irpf_decl_3_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_max_household_irpf_decl_3_years
+  transunion_max_household_irpf_decl_6_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_max_household_irpf_decl_6_years
+  transunion_max_household_age:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_max_household_age
+  transunion_max_household_index_job_stability:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_max_household_index_job_stability
+  transunion_max_household_employer_size:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_max_household_employer_size
+  transunion_max_household_qsa_size:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_max_household_qsa_size
+  transunion_max_household_presumed_income:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_max_household_presumed_income
+  transunion_avg_household_age:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_avg_household_age
+  transunion_avg_household_presumed_income:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_avg_household_presumed_income
+  transunion_avg_cep_residents_presumed_income:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_avg_cep_residents_presumed_income
+  transunion_min_household_age:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_min_household_age
+  transunion_min_household_presumed_income:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_min_household_presumed_income
+  transunion_percap_m_munic_motorcycles:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percap_m_munic_motorcycles
+  transunion_percent_cep_residents_00_17_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_00_17_years
+  transunion_percent_cep_residents_18_29_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_18_29_years
+  transunion_percent_cep_residents_30_39_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_30_39_years
+  transunion_percent_cep_residents_40_49_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_40_49_years
+  transunion_percent_cep_residents_50_59_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_50_59_years
+  transunion_percent_cep_residents_60_69_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_60_69_years
+  transunion_percent_cep_residents_gt_70_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_gt_70_years
+  transunion_percent_cep_residents_bolsa_familia:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_bolsa_familia
+  transunion_percent_cep_residents_irpf_decl_10_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_10_00
+  transunion_percent_cep_residents_irpf_decl_10_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_10_01
+  transunion_percent_cep_residents_irpf_decl_10_02_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_10_02_04
+  transunion_percent_cep_residents_irpf_decl_10_05_09:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_10_05_09
+  transunion_percent_cep_residents_irpf_decl_10_10:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_10_10
+  transunion_percent_cep_residents_irpf_decl_pend_10_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_pend_10_00
+  transunion_percent_cep_residents_irpf_decl_pend_10_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_pend_10_01
+  transunion_percent_cep_residents_irpf_decl_pend_10_02_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_pend_10_02_04
+  transunion_percent_cep_residents_irpf_decl_pend_10_05_09:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_pend_10_05_09
+  transunion_percent_cep_residents_irpf_decl_pend_10_10:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_pend_10_10
+  transunion_percent_cep_residents_irpf_decl_rest_10_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_rest_10_00
+  transunion_percent_cep_residents_irpf_decl_rest_10_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_rest_10_01
+  transunion_percent_cep_residents_irpf_decl_rest_10_02_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_rest_10_02_04
+  transunion_percent_cep_residents_irpf_decl_rest_10_05_09:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_rest_10_05_09
+  transunion_percent_cep_residents_irpf_decl_rest_10_10:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_irpf_decl_rest_10_10
+  transunion_percent_cep_residents_escol_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_escol_00
+  transunion_percent_cep_residents_escol_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_escol_01
+  transunion_percent_cep_residents_escol_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_escol_02
+  transunion_percent_cep_residents_escol_03:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_escol_03
+  transunion_percent_cep_residents_escol_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_escol_04
+  transunion_percent_cep_residents_escol_05:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_escol_05
+  transunion_percent_cep_residents_escol_06:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_escol_06
+  transunion_percent_cep_residents_escol_07:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_escol_07
+  transunion_percent_cep_residents_escol_08:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_escol_08
+  transunion_percent_cep_residents_escol_09:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_escol_09
+  transunion_percent_cep_residents_escol_10:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_escol_10
+  transunion_percent_cep_residents_public_employee:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_public_employee
+  transunion_percent_cep_residents_registration_rules_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_registration_rules_00
+  transunion_percent_cep_residents_registration_rules_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_registration_rules_01
+  transunion_percent_cep_residents_registration_rules_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_registration_rules_02
+  transunion_percent_cep_residents_registration_rules_03:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_registration_rules_03
+  transunion_percent_cep_residents_registration_rules_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_registration_rules_04
+  transunion_percent_urban_population_munic:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_urban_population_munic
+  transunion_percent_cep_residents_presumed_income_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_presumed_income_01
+  transunion_percent_cep_residents_presumed_income_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_presumed_income_02
+  transunion_percent_cep_residents_presumed_income_03:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_presumed_income_03
+  transunion_percent_cep_residents_presumed_income_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_presumed_income_04
+  transunion_percent_cep_residents_presumed_income_05:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_presumed_income_05
+  transunion_percent_cep_residents_presumed_income_06:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_presumed_income_06
+  transunion_percent_cep_residents_presumed_income_07:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_presumed_income_07
+  transunion_percent_cep_residents_seg_high:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_high
+  transunion_percent_cep_residents_seg_low:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_low
+  transunion_percent_cep_residents_seg_mid:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_mid
+  transunion_percent_cep_residents_seg_charge_high:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_charge_high
+  transunion_percent_cep_residents_seg_charge_low:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_charge_low
+  transunion_percent_cep_residents_seg_charge_mid:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_charge_mid
+  transunion_percent_cep_residents_seg_ecom_high:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_ecom_high
+  transunion_percent_cep_residents_seg_ecom_low:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_ecom_low
+  transunion_percent_cep_residents_seg_ecom_mid:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_ecom_mid
+  transunion_percent_cep_residents_seg_fin_high:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_fin_high
+  transunion_percent_cep_residents_seg_fin_low:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_fin_low
+  transunion_percent_cep_residents_seg_fin_mid:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_fin_mid
+  transunion_percent_cep_residents_seg_very_high:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_very_high
+  transunion_percent_cep_residents_seg_very_low:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_very_low
+  transunion_percent_cep_residents_seg_tele_high:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_tele_high
+  transunion_percent_cep_residents_seg_tele_low:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_tele_low
+  transunion_percent_cep_residents_seg_tele_mid:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_tele_mid
+  transunion_percent_cep_residents_seg_tele_very_high:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_tele_very_high
+  transunion_percent_cep_residents_seg_tele_very_low:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_seg_tele_very_low
+  transunion_percent_cep_residents_female:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_female
+  transunion_percent_cep_residents_male:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_cep_residents_male
+  transunion_percap_pib_munic:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percap_pib_munic
+  transunion_percent_pib_agro_munic:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_pib_agro_munic
+  transunion_percent_pib_ind_munic:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_pib_ind_munic
+  transunion_percent_pib_serv_munic:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_pib_serv_munic
+  transunion_qtd_irpf_decl_10_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_irpf_decl_10_years
+  transunion_qtd_irpf_decl_3_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_irpf_decl_3_years
+  transunion_qtd_irpf_decl_6_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_irpf_decl_6_years
+  transunion_qtd_irpf_decl_isento:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_irpf_decl_isento
+  transunion_qtd_irpf_decl_pend_10_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_irpf_decl_pend_10_years
+  transunion_qtd_irpf_decl_pend_3_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_irpf_decl_pend_3_years
+  transunion_qtd_irpf_decl_pend_6_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_irpf_decl_pend_6_years
+  transunion_qtd_irpf_decl_rest_10_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_irpf_decl_rest_10_years
+  transunion_qtd_irpf_decl_rest_3_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_irpf_decl_rest_3_years
+  transunion_qtd_irpf_decl_rest_6_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_irpf_decl_rest_6_years
+  transunion_qtd_doc_distinct_emails:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_doc_distinct_emails
+  transunion_qtd_doc_distinct_addresses:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_doc_distinct_addresses
+  transunion_qtd_household_index_job_stability:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_household_index_job_stability
+  transunion_qtd_household_persons:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_household_persons
+  transunion_qtd_doc_distinct_tel_cel:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_doc_distinct_tel_cel
+  transunion_qtd_doc_distinct_tel_fixo:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_qtd_doc_distinct_tel_fixo
+  transunion_avg_sc_age:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_avg_sc_age
+  transunion_avg_sc_resident:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_avg_sc_resident
+  transunion_avg_sc_presumed_income:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_avg_sc_presumed_income
+  transunion_percent_sc_00_17_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_00_17_years
+  transunion_percent_sc_18_29_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_18_29_years
+  transunion_percent_sc_30_39_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_30_39_years
+  transunion_percent_sc_40_49_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_40_49_years
+  transunion_percent_sc_50_59_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_50_59_years
+  transunion_percent_sc_60_69_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_60_69_years
+  transunion_percent_sc_70_95_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_70_95_years
+  transunion_percent_sc_bolsa_familia:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_bolsa_familia
+  transunion_percent_sc_consultas_12_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_00
+  transunion_percent_sc_consultas_12_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_01
+  transunion_percent_sc_consultas_12_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_02
+  transunion_percent_sc_consultas_12_03:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_03
+  transunion_percent_sc_consultas_12_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_04
+  transunion_percent_sc_consultas_12_charge_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_charge_00
+  transunion_percent_sc_consultas_12_charge_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_charge_01
+  transunion_percent_sc_consultas_12_charge_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_charge_02
+  transunion_percent_sc_consultas_12_ecom_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_ecom_00
+  transunion_percent_sc_consultas_12_ecom_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_ecom_01
+  transunion_percent_sc_consultas_12_ecom_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_ecom_02
+  transunion_percent_sc_consultas_12_fin_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_fin_00
+  transunion_percent_sc_consultas_12_fin_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_fin_01
+  transunion_percent_sc_consultas_12_fin_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_fin_02
+  transunion_percent_sc_consultas_12_tele_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_tele_00
+  transunion_percent_sc_consultas_12_tele_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_tele_01
+  transunion_percent_sc_consultas_12_tele_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_tele_02
+  transunion_percent_sc_consultas_12_tele_03:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_tele_03
+  transunion_percent_sc_consultas_12_tele_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_consultas_12_tele_04
+  transunion_percent_sc_irpf_decl_10_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_10_00
+  transunion_percent_sc_irpf_decl_10_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_10_01
+  transunion_percent_sc_irpf_decl_10_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_10_02
+  transunion_percent_sc_irpf_decl_10_03:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_10_03
+  transunion_percent_sc_irpf_decl_10_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_10_04
+  transunion_percent_sc_irpf_decl_pend_10_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_pend_10_00
+  transunion_percent_sc_irpf_decl_pend_10_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_pend_10_01
+  transunion_percent_sc_irpf_decl_pend_10_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_pend_10_02
+  transunion_percent_sc_irpf_decl_pend_10_03:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_pend_10_03
+  transunion_percent_sc_irpf_decl_pend_10_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_pend_10_04
+  transunion_percent_sc_irpf_decl_rest_10_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_rest_10_00
+  transunion_percent_sc_irpf_decl_rest_10_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_rest_10_01
+  transunion_percent_sc_irpf_decl_rest_10_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_rest_10_02
+  transunion_percent_sc_irpf_decl_rest_10_03:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_rest_10_03
+  transunion_percent_sc_irpf_decl_rest_10_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_irpf_decl_rest_10_04
+  transunion_percent_sc_residence_1_bathroom:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_1_bathroom
+  transunion_percent_sc_residence_1_resident:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_1_resident
+  transunion_percent_sc_residence_2_bathrooms:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_2_bathrooms
+  transunion_percent_sc_residence_2_residents:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_2_residents
+  transunion_percent_sc_residence_3_residents:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_3_residents
+  transunion_percent_sc_residence_4_residents:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_4_residents
+  transunion_percent_sc_residence_other_ways:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_other_ways
+  transunion_percent_sc_residence_water_supply:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_water_supply
+  transunion_percent_sc_residence_rent:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_rent
+  transunion_percent_sc_residence_apartments:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_apartments
+  transunion_percent_sc_residence_exclusive_bathroom:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_exclusive_bathroom
+  transunion_percent_sc_residence_houses:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_houses
+  transunion_percent_sc_residence_condo_houses:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_condo_houses
+  transunion_percent_sc_residence_garbage_collection:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_garbage_collection
+  transunion_percent_sc_residence_garbage_collection_cacamba:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_garbage_collection_cacamba
+  transunion_percent_sc_residence_garbage_collection_other_ways:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_garbage_collection_other_ways
+  transunion_percent_sc_residence_garbage_collection_cleanup_service:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_garbage_collection_cleanup_service
+  transunion_percent_sc_residence_open_sewer:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_open_sewer
+  transunion_percent_sc_residence_accumulated_garbage:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_accumulated_garbage
+  transunion_percent_sc_residence_in_acquiring:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_in_acquiring
+  transunion_percent_sc_residence_electrical_supply:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_electrical_supply
+  transunion_percent_sc_residence_energy_meter_shared:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_energy_meter_shared
+  transunion_percent_sc_residence_energy_meter_exclusive:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_energy_meter_exclusive
+  transunion_percent_sc_residence_energy_meter_other_ways:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_energy_meter_other_ways
+  transunion_percent_sc_residence_power_distribution_network:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_power_distribution_network
+  transunion_percent_sc_residence_energy_meter_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_energy_meter_without
+  transunion_percent_sc_residence_sewage_too_much:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_sewage_too_much
+  transunion_percent_sc_residence_sewage_septic_tank:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_sewage_septic_tank
+  transunion_percent_sc_residence_sewage_public_network:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_sewage_public_network
+  transunion_percent_sc_residence_gt_2_bathrooms:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_gt_2_bathrooms
+  transunion_percent_sc_residence_gt_4_residents:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_gt_4_residents
+  transunion_percent_sc_residence_adequate_housing:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_adequate_housing
+  transunion_percent_sc_residence_inadequate_housing:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_inadequate_housing
+  transunion_percent_sc_residence_semi_adequate_housing:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_semi_adequate_housing
+  transunion_percent_sc_residence_permanent_residents:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_permanent_residents
+  transunion_percent_sc_residence_paid_off:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_paid_off
+  transunion_percent_sc_residence_monthly_income_gt_10sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_monthly_income_gt_10sm
+  transunion_percent_sc_residence_monthly_income_until_1s8_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_monthly_income_until_1s8_sm
+  transunion_percent_sc_residence_monthly_income_1_a_2_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_monthly_income_1_a_2_sm
+  transunion_percent_sc_residence_monthly_income_1s2_a_1_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_monthly_income_1s2_a_1_sm
+  transunion_percent_sc_residence_monthly_income_1s4_a_1s2_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_monthly_income_1s4_a_1s2_sm
+  transunion_percent_sc_residence_monthly_income_1s8_a_1s4_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_monthly_income_1s8_a_1s4_sm
+  transunion_percent_sc_residence_monthly_income_2_a_3_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_monthly_income_2_a_3_sm
+  transunion_percent_sc_residence_monthly_income_3_a_5_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_monthly_income_3_a_5_sm
+  transunion_percent_sc_residence_monthly_income_5_a_10_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_monthly_income_5_a_10_sm
+  transunion_percent_sc_residence_afforestation_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_afforestation_without
+  transunion_percent_sc_residence_manhole_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_manhole_without
+  transunion_percent_sc_residence_sidewalk_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_sidewalk_without
+  transunion_percent_sc_residence_curb_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_curb_without
+  transunion_percent_sc_residence_public_place_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_public_place_without
+  transunion_percent_sc_residence_public_energy_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_public_energy_without
+  transunion_percent_sc_residence_female_resident_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_female_resident_without
+  transunion_percent_sc_residence_male_resident_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_male_resident_without
+  transunion_percent_sc_residence_paving_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_paving_without
+  transunion_percent_sc_residence_accessibility_ramp_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_accessibility_ramp_without
+  transunion_percent_sc_residence_monthly_income_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_monthly_income_without
+  transunion_percent_sc_escol_00:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_escol_00
+  transunion_percent_sc_escol_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_escol_01
+  transunion_percent_sc_escol_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_escol_02
+  transunion_percent_sc_escol_03:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_escol_03
+  transunion_percent_sc_escol_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_escol_04
+  transunion_percent_sc_escol_05:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_escol_05
+  transunion_percent_sc_escol_06:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_escol_06
+  transunion_percent_sc_escol_07:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_escol_07
+  transunion_percent_sc_escol_08:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_escol_08
+  transunion_percent_sc_escol_09:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_escol_09
+  transunion_percent_sc_escol_10:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_escol_10
+  transunion_percent_sc_public_employee:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_public_employee
+  transunion_percent_sc_resident_water_supply:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_water_supply
+  transunion_percent_sc_resident_apartment:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_apartment
+  transunion_percent_sc_resident_house:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_house
+  transunion_percent_sc_resident_condo_house:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_condo_house
+  transunion_percent_sc_resident_garbage_collection:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_garbage_collection
+  transunion_percent_sc_resident_gargabe_collection_service:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_gargabe_collection_service
+  transunion_percent_sc_resident_residence_acquired_other_ways:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_residence_acquired_other_ways
+  transunion_percent_sc_resident_residence_rent:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_residence_rent
+  transunion_percent_sc_resident_residence_in_acquisition:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_residence_in_acquisition
+  transunion_percent_sc_resident_residence_permanent:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_residence_permanent
+  transunion_percent_sc_resident_residence_paid_off:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_residence_paid_off
+  transunion_percent_sc_resident_residence_electrical_supply:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_resident_residence_electrical_supply
+  transunion_percent_people_0_4_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_0_4_years
+  transunion_percent_people_10_14_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_10_14_years
+  transunion_percent_people_15_17_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_15_17_years
+  transunion_percent_people_18_19_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_18_19_years
+  transunion_percent_people_20_24_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_20_24_years
+  transunion_percent_people_25_29_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_25_29_years
+  transunion_percent_people_30_34_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_30_34_years
+  transunion_percent_people_35_39_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_35_39_years
+  transunion_percent_people_40_44_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_40_44_years
+  transunion_percent_people_45_49_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_45_49_years
+  transunion_percent_people_50_54_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_50_54_years
+  transunion_percent_people_55_59_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_55_59_years
+  transunion_percent_people_5_9_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_5_9_years
+  transunion_percent_people_60_69_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_60_69_years
+  transunion_percent_people_registration_birth:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_registration_birth
+  transunion_percent_people_gt_69_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_gt_69_years
+  transunion_percent_people_registration_birth_not_known:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_registration_birth_not_known
+  transunion_percent_people_monthly_income_10_a_15_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_monthly_income_10_a_15_sm
+  transunion_percent_people_monthly_income_15_a_20_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_monthly_income_15_a_20_sm
+  transunion_percent_people_monthly_income_1_a_2_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_monthly_income_1_a_2_sm
+  transunion_percent_people_monthly_income_1s2_a_1_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_monthly_income_1s2_a_1_sm
+  transunion_percent_people_monthly_income_2_a_3_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_monthly_income_2_a_3_sm
+  transunion_percent_people_monthly_income_3_a_5_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_monthly_income_3_a_5_sm
+  transunion_percent_people_monthly_income_5_a_10_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_monthly_income_5_a_10_sm
+  transunion_percent_people_monthly_income_gt_20_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_monthly_income_gt_20_sm
+  transunion_percent_people_monthly_income_until_1s2_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_monthly_income_until_1s2_sm
+  transunion_percent_people_registration_birth_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_registration_birth_without
+  transunion_percent_people_monthly_income_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_people_monthly_income_without
+  transunion_percent_sc_income_01:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_income_01
+  transunion_percent_sc_income_02:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_income_02
+  transunion_percent_sc_income_03:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_income_03
+  transunion_percent_sc_income_04:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_income_04
+  transunion_percent_sc_income_05:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_income_05
+  transunion_percent_sc_income_06:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_income_06
+  transunion_percent_sc_income_07:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_income_07
+  transunion_percent_sc_responsible_person_literate_female:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_literate_female
+  transunion_percent_sc_responsible_person_literate_male:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_literate_male
+  transunion_percent_sc_responsible_person_female:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_female
+  transunion_percent_sc_responsible_person_male:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_male
+  transunion_percent_sc_responsible_person_monthly_income_10_a_15_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_monthly_income_10_a_15_sm
+  transunion_percent_sc_responsible_person_monthly_income_15_a_20_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_monthly_income_15_a_20_sm
+  transunion_percent_sc_responsible_person_monthly_income_1_a_2_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_monthly_income_1_a_2_sm
+  transunion_percent_sc_responsible_person_monthly_income_1s2_a_1_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_monthly_income_1s2_a_1_sm
+  transunion_percent_sc_responsible_person_monthly_income_2_a_3_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_monthly_income_2_a_3_sm
+  transunion_percent_sc_responsible_person_monthly_income_3_a_5_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_monthly_income_3_a_5_sm
+  transunion_percent_sc_responsible_person_monthly_income_5_a_10_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_monthly_income_5_a_10_sm
+  transunion_percent_sc_responsible_person_monthly_income_gt_20_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_monthly_income_gt_20_sm
+  transunion_percent_sc_responsible_person_monthly_income_until_1s2_sm:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_monthly_income_until_1s2_sm
+  transunion_percent_sc_responsible_person_monthly_income_without:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_monthly_income_without
+  transunion_percent_sc_female:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_female
+  transunion_percent_sc_male:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_male
+  transunion_percent_sc_qsa:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_qsa
+  transunion_percent_sc_residence_avg_monthly_income_salario_minimo:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_residence_avg_monthly_income_salario_minimo
+  transunion_percent_sc_responsible_person_avg_monthly_income_salario_minimo:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_percent_sc_responsible_person_avg_monthly_income_salario_minimo
+  transunion_sum_sc_persons_monthly_income_gt_10_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_sum_sc_persons_monthly_income_gt_10_years
+  transunion_sum_sc_responsible_persons_monthly_income:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_sum_sc_responsible_persons_monthly_income
+  transunion_sum_household_presumed_income:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_sum_household_presumed_income
+  transunion_time_cpf_emission:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_time_cpf_emission
+  transunion_time_months_last_cel_phone:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_time_months_last_cel_phone
+  transunion_time_months_last_tel_fixo:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_time_months_last_tel_fixo
+  transunion_time_last_irpf_decl_rest:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_time_last_irpf_decl_rest
+  transunion_time_last_irpf_decl:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_time_last_irpf_decl
+  transunion_time_last_irpf_decl_pend:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_time_last_irpf_decl_pend
+  transunion_has_household_11_15_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_11_15_years
+  transunion_has_household_16_17_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_16_17_years
+  transunion_has_household_18_20_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_18_20_years
+  transunion_has_household_21_25_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_21_25_years
+  transunion_has_household_25_30_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_25_30_years
+  transunion_has_household_3_5_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_3_5_years
+  transunion_has_household_6_10_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_6_10_years
+  transunion_has_household_until_2_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_until_2_years
+  transunion_is_public_employee:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_is_public_employee
+  transunion_is_business_partner:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_is_business_partner
+  transunion_is_tel_cel_procon:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_is_tel_cel_procon
+  transunion_is_tel_fixo_assin:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_is_tel_fixo_assin
+  transunion_is_tel_fixo_procon:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_is_tel_fixo_procon
+  transunion_has_household_bolsa_familia:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_bolsa_familia
+  transunion_has_household_irpf_decl_10_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_irpf_decl_10_years
+  transunion_has_household_irpf_decl_3_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_irpf_decl_3_years
+  transunion_has_household_irpf_decl_6_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_irpf_decl_6_years
+  transunion_has_household_irpf_decl_pend_10_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_irpf_decl_pend_10_years
+  transunion_has_household_irpf_decl_pend_3_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_irpf_decl_pend_3_years
+  transunion_has_household_irpf_decl_pend_6_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_irpf_decl_pend_6_years
+  transunion_has_household_irpf_decl_rest_10_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_irpf_decl_rest_10_years
+  transunion_has_household_irpf_decl_rest_3_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_irpf_decl_rest_3_years
+  transunion_has_household_irpf_decl_rest_6_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_irpf_decl_rest_6_years
+  transunion_has_household_public_employee:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_public_employee
+  transunion_has_household_gt_35_years:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_gt_35_years
+  transunion_has_household_index_job_stability:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_job_stability
+  transunion_has_household_invalid_registration_rules:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_invalid_registration_rules
+  transunion_has_household_index_charge_1:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_charge_1
+  transunion_has_household_index_charge_2:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_charge_2
+  transunion_has_household_index_charge_3:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_charge_3
+  transunion_has_household_index_charge_4:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_charge_4
+  transunion_has_household_index_charge_5:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_charge_5
+  transunion_has_household_index_ecom_1:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_ecom_1
+  transunion_has_household_index_ecom_2:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_ecom_2
+  transunion_has_household_index_ecom_3:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_ecom_3
+  transunion_has_household_index_ecom_4:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_ecom_4
+  transunion_has_household_index_ecom_5:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_ecom_5
+  transunion_has_household_index_fin_1:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_fin_1
+  transunion_has_household_index_fin_2:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_fin_2
+  transunion_has_household_index_fin_3:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_fin_3
+  transunion_has_household_index_fin_4:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_fin_4
+  transunion_has_household_index_fin_5:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_fin_5
+  transunion_has_household_index_tele_1:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_tele_1
+  transunion_has_household_index_tele_2:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_tele_2
+  transunion_has_household_index_tele_3:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_tele_3
+  transunion_has_household_index_tele_4:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_tele_4
+  transunion_has_household_index_tele_5:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_index_tele_5
+  transunion_has_household_gt_high_school:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_gt_high_school
+  transunion_has_household_qsa:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_qsa
+  transunion_has_high_income_class:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_high_income_class
+  transunion_has_household_gt_graduate:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_household_gt_graduate
+  transunion_has_bolsa_familia:
+    lineage:
+      - datalake_bureaus.transunion_bureau_analysis.transunion_has_bolsa_familia
+  

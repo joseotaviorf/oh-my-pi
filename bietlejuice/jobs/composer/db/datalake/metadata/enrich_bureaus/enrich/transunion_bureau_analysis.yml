@@ -1,0 +1,1520 @@
+
+database_name: datalake_bureaus
+table_name: transunion_bureau_analysis
+columns:
+  id_proposal:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.id_proposal
+      - datalake_sorting_hat_clean.credit_analysis.id_proposal 
+  id_proponent:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.id_proponent
+      - datalake_sorting_hat_clean.proponent.id_proponent  
+  cpf:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.cpf
+      - datalake_arquivo_confidencial_clean.integration_report_aud.cpf
+  transunion_presumed_income:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.renda_presumida
+  transunion_irpf_last_decl_class:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.class_banc_ult_decl
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - class_banc_ult_decl
+  transunion_index_job_stability:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.ind_estab_emprego
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - ind_estab_emprego
+  transunion_index_seg_12:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_12
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_12
+  transunion_index_seg_12_charge:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_12_cob
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_12_cob
+  transunion_index_seg_12_ecom:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_12_ecom
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_12_ecom
+  transunion_index_seg_12_fin:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_12_fin
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_12_fin
+  transunion_index_seg_12_tele:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_12_tele
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_12_tele
+  transunion_index_seg_24:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_24
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_24
+  transunion_index_seg_24_charge:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_24_cob
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_24_cob
+  transunion_index_seg_24_ecom:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_24_ecom
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_24_ecom
+  transunion_index_seg_24_fin:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_24_fin
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_24_fin
+  transunion_index_seg_24_tele:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_24_tele
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_24_tele
+  transunion_index_seg_6:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_6
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_6
+  transunion_index_seg_6_cob:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_6_cob
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_6_cob
+  transunion_index_seg_6_ecom:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_6_ecom
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_6_ecom
+  transunion_index_seg_6_fin:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_6_fin
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_6_fin
+  transunion_index_seg_6_tele:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.indic_seg_6_tele
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - indic_seg_6_tele
+  transunion_employer_size:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.porte_empregador
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - porte_empregador
+  transunion_sc_situation:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_situacao
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - sc_situacao
+  transunion_percap_m_munic_cars:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.automoveis_percap_m_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - automoveis_percap_m_munic
+  transunion_percap_m_munic_trucks:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.caminhao_percap_m_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - caminhao_percap_m_munic
+  transunion_percap_m_munic_pickups:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.caminonete_percap_m_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - caminonete_percap_m_munic
+  transunion_percap_m_munic_utilitario:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.utilitario_percap_m_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - utilitario_percap_m_munic
+  transunion_percap_m_munic_others:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.veic_outros_percap_m_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - veic_outros_percap_m_munic
+  transunion_dist_cep_to_city_center:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.dist_centro_m
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - dist_centro_m
+  transunion_dist_cep_to_nearest_border:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.dist_fronteira_m
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - dist_fronteira_m
+  transunion_dist_cep_to_nearest_subnormal_aglomerate:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.dist_risco_m
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - dist_risco_m
+  transunion_avg_cep_residents_age:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.idade_media
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - idade_media
+  transunion_idhm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.idhm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - idhm
+  transunion_percap_mm_munic_private_hosp_beds:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.leito_priv_percap_mm_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - leito_priv_percap_mm_munic
+  transunion_percap_mm_munic_public_hosp_beds:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.leito_pub_percap_mm_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - leito_pub_percap_mm_munic
+  transunion_percap_mm_munic_sus_hosp_beds:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.leito_sus_percap_mm_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - leito_sus_percap_mm_munic
+  transunion_max_household_irpf_decl_10_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.max_decl_10_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - max_decl_10_hh
+  transunion_max_household_irpf_decl_3_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.max_decl_3_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - max_decl_3_hh
+  transunion_max_household_irpf_decl_6_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.max_decl_6_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - max_decl_6_hh
+  transunion_max_household_age:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.max_idade_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - max_idade_hh
+  transunion_max_household_index_job_stability:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.max_ind_estab_emprego_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - max_ind_estab_emprego_hh
+  transunion_max_household_employer_size:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.max_porte_empregador_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - max_porte_empregador_hh
+  transunion_max_household_qsa_size:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.max_porte_qsa_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - max_porte_qsa_hh
+  transunion_max_household_presumed_income:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.max_renda_pres_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - max_renda_pres_hh
+  transunion_avg_household_age:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.media_idade_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - media_idade_hh
+  transunion_avg_household_presumed_income:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.media_renda_pres_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - media_renda_pres_hh
+  transunion_avg_cep_residents_presumed_income:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.media_renda_presumida
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - media_renda_presumida
+  transunion_min_household_age:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.min_idade_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - min_idade_hh
+  transunion_min_household_presumed_income:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.min_renda_pres_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - min_renda_pres_hh
+  transunion_percap_m_munic_motorcycles:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.moto_percap_m_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - moto_percap_m_munic
+  transunion_percent_cep_residents_00_17_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_00_17
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_00_17
+  transunion_percent_cep_residents_18_29_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_18_29
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_18_29
+  transunion_percent_cep_residents_30_39_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_30_39
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_30_39
+  transunion_percent_cep_residents_40_49_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_40_49
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_40_49
+  transunion_percent_cep_residents_50_59_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_50_59
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_50_59
+  transunion_percent_cep_residents_60_69_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_60_69
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_60_69
+  transunion_percent_cep_residents_gt_70_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_70_mais
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_70_mais
+  transunion_percent_cep_residents_bolsa_familia:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_bolsa_familia
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_bolsa_familia
+  transunion_percent_cep_residents_irpf_decl_10_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_10_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_10_00
+  transunion_percent_cep_residents_irpf_decl_10_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_10_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_10_01
+  transunion_percent_cep_residents_irpf_decl_10_02_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_10_02_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_10_02_04
+  transunion_percent_cep_residents_irpf_decl_10_05_09:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_10_05_09
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_10_05_09
+  transunion_percent_cep_residents_irpf_decl_10_10:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_10_10
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_10_10
+  transunion_percent_cep_residents_irpf_decl_pend_10_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_pagar_10_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_pagar_10_00
+  transunion_percent_cep_residents_irpf_decl_pend_10_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_pagar_10_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_pagar_10_01
+  transunion_percent_cep_residents_irpf_decl_pend_10_02_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_pagar_10_02_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_pagar_10_02_04
+  transunion_percent_cep_residents_irpf_decl_pend_10_05_09:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_pagar_10_05_09
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_pagar_10_05_09
+  transunion_percent_cep_residents_irpf_decl_pend_10_10:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_pagar_10_10
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_pagar_10_10
+  transunion_percent_cep_residents_irpf_decl_rest_10_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_rest_10_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_rest_10_00
+  transunion_percent_cep_residents_irpf_decl_rest_10_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_rest_10_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_rest_10_01
+  transunion_percent_cep_residents_irpf_decl_rest_10_02_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_rest_10_02_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_rest_10_02_04
+  transunion_percent_cep_residents_irpf_decl_rest_10_05_09:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_rest_10_05_09
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_rest_10_05_09
+  transunion_percent_cep_residents_irpf_decl_rest_10_10:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_decl_rest_10_10
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_decl_rest_10_10
+  transunion_percent_cep_residents_escol_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_escol_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_escol_00
+  transunion_percent_cep_residents_escol_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_escol_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_escol_01
+  transunion_percent_cep_residents_escol_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_escol_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_escol_02
+  transunion_percent_cep_residents_escol_03:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_escol_03
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_escol_03
+  transunion_percent_cep_residents_escol_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_escol_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_escol_04
+  transunion_percent_cep_residents_escol_05:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_escol_05
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_escol_05
+  transunion_percent_cep_residents_escol_06:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_escol_06
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_escol_06
+  transunion_percent_cep_residents_escol_07:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_escol_07
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_escol_07
+  transunion_percent_cep_residents_escol_08:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_escol_08
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_escol_08
+  transunion_percent_cep_residents_escol_09:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_escol_09
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_escol_09
+  transunion_percent_cep_residents_escol_10:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_escol_10
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_escol_10
+  transunion_percent_cep_residents_public_employee:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_func_pub
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_func_pub
+  transunion_percent_cep_residents_registration_rules_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_indic_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_indic_00
+  transunion_percent_cep_residents_registration_rules_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_indic_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_indic_01
+  transunion_percent_cep_residents_registration_rules_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_indic_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_indic_02
+  transunion_percent_cep_residents_registration_rules_03:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_indic_03
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_indic_03
+  transunion_percent_cep_residents_registration_rules_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_indic_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_indic_04
+  transunion_percent_urban_population_munic:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_pop_urbana_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_pop_urbana_munic
+  transunion_percent_cep_residents_presumed_income_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_renda_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_renda_01
+  transunion_percent_cep_residents_presumed_income_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_renda_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_renda_02
+  transunion_percent_cep_residents_presumed_income_03:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_renda_03
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_renda_03
+  transunion_percent_cep_residents_presumed_income_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_renda_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_renda_04
+  transunion_percent_cep_residents_presumed_income_05:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_renda_05
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_renda_05
+  transunion_percent_cep_residents_presumed_income_06:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_renda_06
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_renda_06
+  transunion_percent_cep_residents_presumed_income_07:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_renda_07
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_renda_07
+  transunion_percent_cep_residents_seg_high:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_alto
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_alto
+  transunion_percent_cep_residents_seg_low:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_baixo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_baixo
+  transunion_percent_cep_residents_seg_mid:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_medio
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_medio
+  transunion_percent_cep_residents_seg_charge_high:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_cob_alto
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_cob_alto
+  transunion_percent_cep_residents_seg_charge_low:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_cob_baixo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_cob_baixo
+  transunion_percent_cep_residents_seg_charge_mid:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_cob_medio
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_cob_medio
+  transunion_percent_cep_residents_seg_ecom_high:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_ecom_alto
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_ecom_alto
+  transunion_percent_cep_residents_seg_ecom_low:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_ecom_baixo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_ecom_baixo
+  transunion_percent_cep_residents_seg_ecom_mid:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_ecom_medio
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_ecom_medio
+  transunion_percent_cep_residents_seg_fin_high:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_fin_alto
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_fin_alto
+  transunion_percent_cep_residents_seg_fin_low:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_fin_baixo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_fin_baixo
+  transunion_percent_cep_residents_seg_fin_mid:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_fin_medio
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_fin_medio
+  transunion_percent_cep_residents_seg_very_high:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_muito_alto
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_muito_alto
+  transunion_percent_cep_residents_seg_very_low:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_muito_baixo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_muito_baixo
+  transunion_percent_cep_residents_seg_tele_high:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_tele_alto
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_tele_alto
+  transunion_percent_cep_residents_seg_tele_low:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_tele_baixo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_tele_baixo
+  transunion_percent_cep_residents_seg_tele_mid:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_tele_medio
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_tele_medio
+  transunion_percent_cep_residents_seg_tele_very_high:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_tele_muito_alto
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_tele_muito_alto
+  transunion_percent_cep_residents_seg_tele_very_low:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_segmento_tele_muito_baixo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_segmento_tele_muito_baixo
+  transunion_percent_cep_residents_female:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_sexo_f
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_sexo_f
+  transunion_percent_cep_residents_male:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.percent_sexo_m
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - percent_sexo_m
+  transunion_percap_pib_munic:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.pib_perc_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - pib_perc_munic
+  transunion_percent_pib_agro_munic:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.pib_percent_agro_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - pib_percent_agro_munic
+  transunion_percent_pib_ind_munic:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.pib_percent_ind_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - pib_percent_ind_munic
+  transunion_percent_pib_serv_munic:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.pib_percent_serv_munic
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - pib_percent_serv_munic
+  transunion_qtd_irpf_decl_10_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_decl_10
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_decl_10
+  transunion_qtd_irpf_decl_3_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_decl_3
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_decl_3
+  transunion_qtd_irpf_decl_6_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_decl_6
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_decl_6
+  transunion_qtd_irpf_decl_isento:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_decl_isento
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_decl_isento
+  transunion_qtd_irpf_decl_pend_10_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_decl_pagar_10
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_decl_pagar_10
+  transunion_qtd_irpf_decl_pend_3_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_decl_pagar_3
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_decl_pagar_3
+  transunion_qtd_irpf_decl_pend_6_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_decl_pagar_6
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_decl_pagar_6
+  transunion_qtd_irpf_decl_rest_10_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_decl_rest_10
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_decl_rest_10
+  transunion_qtd_irpf_decl_rest_3_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_decl_rest_3
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_decl_rest_3
+  transunion_qtd_irpf_decl_rest_6_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_decl_rest_6
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_decl_rest_6
+  transunion_qtd_doc_distinct_emails:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_email
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_email
+  transunion_qtd_doc_distinct_addresses:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_endereco
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_endereco
+  transunion_qtd_household_index_job_stability:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_ind_estab_emprego_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_ind_estab_emprego_hh
+  transunion_qtd_household_persons:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_pessoas_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_pessoas_hh
+  transunion_qtd_doc_distinct_tel_cel:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_tel_cel
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_tel_cel
+  transunion_qtd_doc_distinct_tel_fixo:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.qtd_tel_fixo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - qtd_tel_fixo
+  transunion_avg_sc_age:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_idade_media
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_idade_media
+  transunion_avg_sc_resident:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_media_morador
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_media_morador
+  transunion_avg_sc_presumed_income:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_media_renda_presumida
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_media_renda_presumida
+  transunion_percent_sc_00_17_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_00_17
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_00_17
+  transunion_percent_sc_18_29_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_18_29
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_18_29
+  transunion_percent_sc_30_39_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_30_39
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_30_39
+  transunion_percent_sc_40_49_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_40_49
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_40_49
+  transunion_percent_sc_50_59_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_50_59
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_50_59
+  transunion_percent_sc_60_69_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_60_69
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_60_69
+  transunion_percent_sc_70_95_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_70_95
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_70_95
+  transunion_percent_sc_bolsa_familia:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_bolsa_familia
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_bolsa_familia
+  transunion_percent_sc_consultas_12_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_00
+  transunion_percent_sc_consultas_12_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_01
+  transunion_percent_sc_consultas_12_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_02
+  transunion_percent_sc_consultas_12_03:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_03
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_03
+  transunion_percent_sc_consultas_12_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_04
+  transunion_percent_sc_consultas_12_charge_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_cob_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_cob_00
+  transunion_percent_sc_consultas_12_charge_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_cob_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_cob_01
+  transunion_percent_sc_consultas_12_charge_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_cob_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_cob_02
+  transunion_percent_sc_consultas_12_ecom_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_ecom_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_ecom_00
+  transunion_percent_sc_consultas_12_ecom_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_ecom_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_ecom_01
+  transunion_percent_sc_consultas_12_ecom_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_ecom_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_ecom_02
+  transunion_percent_sc_consultas_12_fin_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_fin_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_fin_00
+  transunion_percent_sc_consultas_12_fin_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_fin_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_fin_01
+  transunion_percent_sc_consultas_12_fin_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_fin_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_fin_02
+  transunion_percent_sc_consultas_12_tele_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_tele_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_tele_00
+  transunion_percent_sc_consultas_12_tele_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_tele_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_tele_01
+  transunion_percent_sc_consultas_12_tele_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_tele_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_tele_02
+  transunion_percent_sc_consultas_12_tele_03:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_tele_03
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_tele_03
+  transunion_percent_sc_consultas_12_tele_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_consultas_12_tele_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_consultas_12_tele_04
+  transunion_percent_sc_irpf_decl_10_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_10_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_10_00
+  transunion_percent_sc_irpf_decl_10_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_10_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_10_01
+  transunion_percent_sc_irpf_decl_10_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_10_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_10_02
+  transunion_percent_sc_irpf_decl_10_03:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_10_03
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_10_03
+  transunion_percent_sc_irpf_decl_10_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_10_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_10_04
+  transunion_percent_sc_irpf_decl_pend_10_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_pagar_10_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_pagar_10_00
+  transunion_percent_sc_irpf_decl_pend_10_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_pagar_10_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_pagar_10_01
+  transunion_percent_sc_irpf_decl_pend_10_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_pagar_10_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_pagar_10_02
+  transunion_percent_sc_irpf_decl_pend_10_03:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_pagar_10_03
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_pagar_10_03
+  transunion_percent_sc_irpf_decl_pend_10_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_pagar_10_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_pagar_10_04
+  transunion_percent_sc_irpf_decl_rest_10_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_rest_10_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_rest_10_00
+  transunion_percent_sc_irpf_decl_rest_10_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_rest_10_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_rest_10_01
+  transunion_percent_sc_irpf_decl_rest_10_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_rest_10_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_rest_10_02
+  transunion_percent_sc_irpf_decl_rest_10_03:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_rest_10_03
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_rest_10_03
+  transunion_percent_sc_irpf_decl_rest_10_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_decl_rest_10_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_decl_rest_10_04
+  transunion_percent_sc_residence_1_bathroom:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_1_banheiro
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_1_banheiro
+  transunion_percent_sc_residence_1_resident:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_1_morador
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_1_morador
+  transunion_percent_sc_residence_2_bathrooms:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_2_banheiros
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_2_banheiros
+  transunion_percent_sc_residence_2_residents:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_2_morador
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_2_morador
+  transunion_percent_sc_residence_3_residents:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_3_morador
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_3_morador
+  transunion_percent_sc_residence_4_residents:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_4_morador
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_4_morador
+  transunion_percent_sc_residence_other_ways:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_adquiridos_outras_formas
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_adquiridos_outras_formas
+  transunion_percent_sc_residence_water_supply:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_agua_rede_geral
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_agua_rede_geral
+  transunion_percent_sc_residence_rent:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_alugados
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_alugados
+  transunion_percent_sc_residence_apartments:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_apartamento
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_apartamento
+  transunion_percent_sc_residence_exclusive_bathroom:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_banheiro_uso_exclusivo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_banheiro_uso_exclusivo
+  transunion_percent_sc_residence_houses:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_casa
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_casa
+  transunion_percent_sc_residence_condo_houses:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_casa_em_condominio_vila
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_casa_em_condominio_vila
+  transunion_percent_sc_residence_garbage_collection:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_coleta_lixo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_coleta_lixo
+  transunion_percent_sc_residence_garbage_collection_cacamba:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_coletado_cacamba
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_coletado_cacamba
+  transunion_percent_sc_residence_garbage_collection_other_ways:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_coletado_outras_formas
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_coletado_outras_formas
+  transunion_percent_sc_residence_garbage_collection_cleanup_service:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_coletado_servico_limpeza
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_coletado_servico_limpeza
+  transunion_percent_sc_residence_open_sewer:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_com_esgoto_ceu_aberto
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_com_esgoto_ceu_aberto
+  transunion_percent_sc_residence_accumulated_garbage:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_com_lixo_acumulado
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_com_lixo_acumulado
+  transunion_percent_sc_residence_in_acquiring:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_em_aquisicao
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_em_aquisicao
+  transunion_percent_sc_residence_electrical_supply:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_energia_eletrica
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_energia_eletrica
+  transunion_percent_sc_residence_energy_meter_shared:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_energia_eletrica_medidor_compartil
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_energia_eletrica_medidor_compartil
+  transunion_percent_sc_residence_energy_meter_exclusive:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_energia_eletrica_medidor_exclusivo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_energia_eletrica_medidor_exclusivo
+  transunion_percent_sc_residence_energy_meter_other_ways:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_energia_eletrica_outras_formas
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_energia_eletrica_outras_formas
+  transunion_percent_sc_residence_power_distribution_network:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_energia_eletrica_rede_distribuicao
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_energia_eletrica_rede_distribuicao
+  transunion_percent_sc_residence_energy_meter_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_energia_eletrica_sem_medidor
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_energia_eletrica_sem_medidor
+  transunion_percent_sc_residence_sewage_too_much:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_esgoto_demais
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_esgoto_demais
+  transunion_percent_sc_residence_sewage_septic_tank:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_esgoto_fossa_septica
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_esgoto_fossa_septica
+  transunion_percent_sc_residence_sewage_public_network:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_esgoto_rede_publica
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_esgoto_rede_publica
+  transunion_percent_sc_residence_gt_2_bathrooms:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_mais_2_banheiros
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_mais_2_banheiros
+  transunion_percent_sc_residence_gt_4_residents:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_mais_4_morador
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_mais_4_morador
+  transunion_percent_sc_residence_adequate_housing:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_moradia_adequada
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_moradia_adequada
+  transunion_percent_sc_residence_inadequate_housing:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_moradia_inadequada
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_moradia_inadequada
+  transunion_percent_sc_residence_semi_adequate_housing:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_moradia_semi_adequada
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_moradia_semi_adequada
+  transunion_percent_sc_residence_permanent_residents:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_permanentes
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_permanentes
+  transunion_percent_sc_residence_paid_off:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_quitados
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_quitados
+  transunion_percent_sc_residence_monthly_income_gt_10sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_rendimento_mensal_acima_10_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_rendimento_mensal_acima_10_sm
+  transunion_percent_sc_residence_monthly_income_until_1s8_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_rendimento_mensal_ate_1s8_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_rendimento_mensal_ate_1s8_sm
+  transunion_percent_sc_residence_monthly_income_1_a_2_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_rendimento_mensal_de_1_a_2_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_rendimento_mensal_de_1_a_2_sm
+  transunion_percent_sc_residence_monthly_income_1s2_a_1_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_rendimento_mensal_de_1s2_a_1_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_rendimento_mensal_de_1s2_a_1_sm
+  transunion_percent_sc_residence_monthly_income_1s4_a_1s2_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_rendimento_mensal_de_1s4_a_1s2_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_rendimento_mensal_de_1s4_a_1s2_sm
+  transunion_percent_sc_residence_monthly_income_1s8_a_1s4_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_rendimento_mensal_de_1s8_a_1s4_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_rendimento_mensal_de_1s8_a_1s4_sm
+  transunion_percent_sc_residence_monthly_income_2_a_3_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_rendimento_mensal_de_2_a_3_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_rendimento_mensal_de_2_a_3_sm
+  transunion_percent_sc_residence_monthly_income_3_a_5_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_rendimento_mensal_de_3_a_5_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_rendimento_mensal_de_3_a_5_sm
+  transunion_percent_sc_residence_monthly_income_5_a_10_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_rendimento_mensal_de_5_a_10_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_rendimento_mensal_de_5_a_10_sm
+  transunion_percent_sc_residence_afforestation_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_sem_arborizacao
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_sem_arborizacao
+  transunion_percent_sc_residence_manhole_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_sem_bueiro
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_sem_bueiro
+  transunion_percent_sc_residence_sidewalk_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_sem_calcada
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_sem_calcada
+  transunion_percent_sc_residence_curb_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_sem_guia
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_sem_guia
+  transunion_percent_sc_residence_public_place_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_sem_identificacao_logradouro
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_sem_identificacao_logradouro
+  transunion_percent_sc_residence_public_energy_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_sem_iluminacao_publica
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_sem_iluminacao_publica
+  transunion_percent_sc_residence_female_resident_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_sem_morador_feminino
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_sem_morador_feminino
+  transunion_percent_sc_residence_male_resident_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_sem_morador_masculino
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_sem_morador_masculino
+  transunion_percent_sc_residence_paving_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_sem_pavimentacao
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_sem_pavimentacao
+  transunion_percent_sc_residence_accessibility_ramp_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_sem_rampa_acessibilidade
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_sem_rampa_acessibilidade
+  transunion_percent_sc_residence_monthly_income_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_domici_sem_rendimento_mensal
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_domici_sem_rendimento_mensal
+  transunion_percent_sc_escol_00:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_escol_00
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_escol_00
+  transunion_percent_sc_escol_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_escol_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_escol_01
+  transunion_percent_sc_escol_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_escol_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_escol_02
+  transunion_percent_sc_escol_03:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_escol_03
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_escol_03
+  transunion_percent_sc_escol_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_escol_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_escol_04
+  transunion_percent_sc_escol_05:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_escol_05
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_escol_05
+  transunion_percent_sc_escol_06:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_escol_06
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_escol_06
+  transunion_percent_sc_escol_07:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_escol_07
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_escol_07
+  transunion_percent_sc_escol_08:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_escol_08
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_escol_08
+  transunion_percent_sc_escol_09:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_escol_09
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_escol_09
+  transunion_percent_sc_escol_10:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_escol_10
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_escol_10
+  transunion_percent_sc_public_employee:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_func_pub
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_func_pub
+  transunion_percent_sc_resident_water_supply:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_agua_rede_geral
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_agua_rede_geral
+  transunion_percent_sc_resident_apartment:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_apartamento
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_apartamento
+  transunion_percent_sc_resident_house:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_casa
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_casa
+  transunion_percent_sc_resident_condo_house:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_casa_condominio_vila
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_casa_condominio_vila
+  transunion_percent_sc_resident_garbage_collection:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_coleta_lixo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_coleta_lixo
+  transunion_percent_sc_resident_gargabe_collection_service:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_coleta_lixo_servico
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_coleta_lixo_servico
+  transunion_percent_sc_resident_residence_acquired_other_ways:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_domici_adquiridos_outras_formas
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_domici_adquiridos_outras_formas
+  transunion_percent_sc_resident_residence_rent:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_domici_alugado
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_domici_alugado
+  transunion_percent_sc_resident_residence_in_acquisition:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_domici_em_aquisicao
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_domici_em_aquisicao
+  transunion_percent_sc_resident_residence_permanent:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_domici_permanente
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_domici_permanente
+  transunion_percent_sc_resident_residence_paid_off:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_domici_quitado
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_domici_quitado
+  transunion_percent_sc_resident_residence_electrical_supply:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_morador_energia_eletrica
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_morador_energia_eletrica
+  transunion_percent_people_0_4_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_0_4_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_0_4_anos
+  transunion_percent_people_10_14_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_10_14_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_10_14_anos
+  transunion_percent_people_15_17_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_15_17_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_15_17_anos
+  transunion_percent_people_18_19_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_18_19_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_18_19_anos
+  transunion_percent_people_20_24_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_20_24_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_20_24_anos
+  transunion_percent_people_25_29_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_25_29_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_25_29_anos
+  transunion_percent_people_30_34_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_30_34_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_30_34_anos
+  transunion_percent_people_35_39_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_35_39_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_35_39_anos
+  transunion_percent_people_40_44_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_40_44_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_40_44_anos
+  transunion_percent_people_45_49_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_45_49_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_45_49_anos
+  transunion_percent_people_50_54_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_50_54_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_50_54_anos
+  transunion_percent_people_55_59_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_55_59_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_55_59_anos
+  transunion_percent_people_5_9_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_5_9_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_5_9_anos
+  transunion_percent_people_60_69_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_60_69_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_60_69_anos
+  transunion_percent_people_registration_birth:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_com_registro_nascimento
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_com_registro_nascimento
+  transunion_percent_people_gt_69_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_mais_69_anos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_mais_69_anos
+  transunion_percent_people_registration_birth_not_known:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_nao_sabem_registro_nascimento
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_nao_sabem_registro_nascimento
+  transunion_percent_people_monthly_income_10_a_15_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_rendimento_mensal_10_a_15_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_rendimento_mensal_10_a_15_sm
+  transunion_percent_people_monthly_income_15_a_20_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_rendimento_mensal_15_a_20_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_rendimento_mensal_15_a_20_sm
+  transunion_percent_people_monthly_income_1_a_2_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_rendimento_mensal_1_a_2_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_rendimento_mensal_1_a_2_sm
+  transunion_percent_people_monthly_income_1s2_a_1_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_rendimento_mensal_1s2_a_1_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_rendimento_mensal_1s2_a_1_sm
+  transunion_percent_people_monthly_income_2_a_3_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_rendimento_mensal_2_a_3_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_rendimento_mensal_2_a_3_sm
+  transunion_percent_people_monthly_income_3_a_5_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_rendimento_mensal_3_a_5_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_rendimento_mensal_3_a_5_sm
+  transunion_percent_people_monthly_income_5_a_10_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_rendimento_mensal_5_a_10_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_rendimento_mensal_5_a_10_sm
+  transunion_percent_people_monthly_income_gt_20_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_rendimento_mensal_acima_20_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_rendimento_mensal_acima_20_sm
+  transunion_percent_people_monthly_income_until_1s2_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_rendimento_mensal_ate_1s2_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_rendimento_mensal_ate_1s2_sm
+  transunion_percent_people_registration_birth_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_sem_registro_nascimento
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_sem_registro_nascimento
+  transunion_percent_people_monthly_income_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_pessoas_sem_rendimento_mensal
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_pessoas_sem_rendimento_mensal
+  transunion_percent_sc_income_01:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_renda_01
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_renda_01
+  transunion_percent_sc_income_02:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_renda_02
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_renda_02
+  transunion_percent_sc_income_03:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_renda_03
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_renda_03
+  transunion_percent_sc_income_04:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_renda_04
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_renda_04
+  transunion_percent_sc_income_05:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_renda_05
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_renda_05
+  transunion_percent_sc_income_06:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_renda_06
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_renda_06
+  transunion_percent_sc_income_07:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_renda_07
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_renda_07
+  transunion_percent_sc_responsible_person_literate_female:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_domici_alfabetizado_feminino
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_domici_alfabetizado_feminino
+  transunion_percent_sc_responsible_person_literate_male:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_domici_alfabetizado_masculino
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_domici_alfabetizado_masculino
+  transunion_percent_sc_responsible_person_female:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_domici_sexo_feminino
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_domici_sexo_feminino
+  transunion_percent_sc_responsible_person_male:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_domici_sexo_masculino
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_domici_sexo_masculino
+  transunion_percent_sc_responsible_person_monthly_income_10_a_15_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_rendimento_mensal_10_a_15_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_rendimento_mensal_10_a_15_sm
+  transunion_percent_sc_responsible_person_monthly_income_15_a_20_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_rendimento_mensal_15_a_20_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_rendimento_mensal_15_a_20_sm
+  transunion_percent_sc_responsible_person_monthly_income_1_a_2_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_rendimento_mensal_1_a_2_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_rendimento_mensal_1_a_2_sm
+  transunion_percent_sc_responsible_person_monthly_income_1s2_a_1_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_rendimento_mensal_1s2_a_1_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_rendimento_mensal_1s2_a_1_sm
+  transunion_percent_sc_responsible_person_monthly_income_2_a_3_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_rendimento_mensal_2_a_3_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_rendimento_mensal_2_a_3_sm
+  transunion_percent_sc_responsible_person_monthly_income_3_a_5_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_rendimento_mensal_3_a_5_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_rendimento_mensal_3_a_5_sm
+  transunion_percent_sc_responsible_person_monthly_income_5_a_10_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_rendimento_mensal_5_a_10_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_rendimento_mensal_5_a_10_sm
+  transunion_percent_sc_responsible_person_monthly_income_gt_20_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_rendimento_mensal_acima_20_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_rendimento_mensal_acima_20_sm
+  transunion_percent_sc_responsible_person_monthly_income_until_1s2_sm:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_rendimento_mensal_ate_1s2_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_rendimento_mensal_ate_1s2_sm
+  transunion_percent_sc_responsible_person_monthly_income_without:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_responsa_sem_rendimento_mensal
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_responsa_sem_rendimento_mensal
+  transunion_percent_sc_female:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_sexo_f
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_sexo_f
+  transunion_percent_sc_male:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percent_sexo_m
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percent_sexo_m
+  transunion_percent_sc_qsa:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_percentual_qsa
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_percentual_qsa
+  transunion_percent_sc_residence_avg_monthly_income_salario_minimo:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_rendimento_medio_mensal_domici_salario_minimo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_rendimento_medio_mensal_domici_salario_minimo
+  transunion_percent_sc_responsible_person_avg_monthly_income_salario_minimo:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_rendimento_medio_mensal_respons_domici_salario_minimo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_rendimento_medio_mensal_respons_domici_salario_minimo
+  transunion_sum_sc_persons_monthly_income_gt_10_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_valor_rendimento_mensal_pessoas_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_valor_rendimento_mensal_pessoas_sm
+  transunion_sum_sc_responsible_persons_monthly_income:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sc_valor_rendimento_mensal_responsa_sm
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sc_valor_rendimento_mensal_responsa_sm
+  transunion_sum_household_presumed_income:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.sum_renda_pres_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - sum_renda_pres_hh
+  transunion_time_cpf_emission:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.tempo_emissao_cpf
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - tempo_emissao_cpf
+  transunion_time_months_last_cel_phone:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.tmp_meses_ult_tel_cel
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - tmp_meses_ult_tel_cel
+  transunion_time_months_last_tel_fixo:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.tmp_meses_ult_tel_fixo
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - tmp_meses_ult_tel_fixo
+  transunion_time_last_irpf_decl_rest:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.tmp_ult_decl_a_restit
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - tmp_ult_decl_a_restit
+  transunion_time_last_irpf_decl:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.tmpo_ult_decl
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - tmpo_ult_decl
+  transunion_time_last_irpf_decl_pend:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.tmpo_ult_decl_a_pagar
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - tmpo_ult_decl_a_pagar
+  transunion_has_household_11_15_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_11_15_anos_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_11_15_anos_hh
+  transunion_has_household_16_17_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_16_17_anos_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_16_17_anos_hh
+  transunion_has_household_18_20_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_18_20_anos_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_18_20_anos_hh
+  transunion_has_household_21_25_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_21_25_anos_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_21_25_anos_hh
+  transunion_has_household_25_30_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_25_30_anos_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_25_30_anos_hh
+  transunion_has_household_3_5_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_3_5_anos_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_3_5_anos_hh
+  transunion_has_household_6_10_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_6_10_anos_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_6_10_anos_hh
+  transunion_has_household_until_2_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_ate_2_anos_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_ate_2_anos_hh
+  transunion_is_public_employee:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_func_pub
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_func_pub
+  transunion_is_business_partner:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_socio
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_socio
+  transunion_is_tel_cel_procon:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_tel_cel_procon
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_tel_cel_procon
+  transunion_is_tel_fixo_assin:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_tel_fixo_assin
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_tel_fixo_assin
+  transunion_is_tel_fixo_procon:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_tel_fixo_procon
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flag_tel_fixo_procon
+  transunion_has_household_bolsa_familia:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_bolsa_familia_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_bolsa_familia_hh
+  transunion_has_household_irpf_decl_10_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_decl_10_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_decl_10_hh
+  transunion_has_household_irpf_decl_3_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_decl_3_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_decl_3_hh
+  transunion_has_household_irpf_decl_6_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_decl_6_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_decl_6_hh
+  transunion_has_household_irpf_decl_pend_10_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_decl_pagar_10_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_decl_pagar_10_hh
+  transunion_has_household_irpf_decl_pend_3_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_decl_pagar_3_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_decl_pagar_3_hh
+  transunion_has_household_irpf_decl_pend_6_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_decl_pagar_6_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_decl_pagar_6_hh
+  transunion_has_household_irpf_decl_rest_10_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_decl_rest_10a_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_decl_rest_10a_hh
+  transunion_has_household_irpf_decl_rest_3_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_decl_rest_3a_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_decl_rest_3a_hh
+  transunion_has_household_irpf_decl_rest_6_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_decl_rest_6a_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_decl_rest_6a_hh
+  transunion_has_household_public_employee:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_func_pub_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_func_pub_hh
+  transunion_has_household_gt_35_years:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_idade_35_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_idade_35_hh
+  transunion_has_household_index_job_stability:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_ind_estab_emprego_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_ind_estab_emprego_hh
+  transunion_has_household_invalid_registration_rules:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indicador_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indicador_hh
+  transunion_has_household_index_charge_1:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_cob_1_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_cob_1_hh
+  transunion_has_household_index_charge_2:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_cob_2_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_cob_2_hh
+  transunion_has_household_index_charge_3:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_cob_3_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_cob_3_hh
+  transunion_has_household_index_charge_4:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_cob_4_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_cob_4_hh
+  transunion_has_household_index_charge_5:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_cob_5_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_cob_5_hh
+  transunion_has_household_index_ecom_1:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_ecom_1_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_ecom_1_hh
+  transunion_has_household_index_ecom_2:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_ecom_2_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_ecom_2_hh
+  transunion_has_household_index_ecom_3:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_ecom_3_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_ecom_3_hh
+  transunion_has_household_index_ecom_4:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_ecom_4_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_ecom_4_hh
+  transunion_has_household_index_ecom_5:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_ecom_5_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_ecom_5_hh
+  transunion_has_household_index_fin_1:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_fin_1_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_fin_1_hh
+  transunion_has_household_index_fin_2:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_fin_2_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_fin_2_hh
+  transunion_has_household_index_fin_3:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_fin_3_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_fin_3_hh
+  transunion_has_household_index_fin_4:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_fin_4_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_fin_4_hh
+  transunion_has_household_index_fin_5:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_fin_5_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_fin_5_hh
+  transunion_has_household_index_tele_1:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_tele_1_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_tele_1_hh
+  transunion_has_household_index_tele_2:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_tele_2_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_tele_2_hh
+  transunion_has_household_index_tele_3:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_tele_3_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_tele_3_hh
+  transunion_has_household_index_tele_4:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_tele_4_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_tele_4_hh
+  transunion_has_household_index_tele_5:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_indice_tele_5_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_indice_tele_5_hh
+  transunion_has_household_gt_high_school:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_medio_compl_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_medio_compl_hh
+  transunion_has_household_qsa:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_qsa_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_qsa_hh
+  transunion_has_high_income_class:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_rest_agencia_alta_renda
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_rest_agencia_alta_renda
+  transunion_has_household_gt_graduate:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flg_superior_compl_hh
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Discreta - flg_superior_compl_hh
+  transunion_has_bolsa_familia:
+    lineage:
+      - datalake_static_files_raw.bureaus_transunion_historical_raw.flag_bolsa_familia
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Valor - flag_bolsa_familia
+  

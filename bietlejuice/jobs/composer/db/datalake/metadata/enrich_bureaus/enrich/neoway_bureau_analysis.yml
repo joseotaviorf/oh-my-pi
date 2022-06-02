@@ -1,0 +1,25 @@
+database_name: datalake_bureaus
+table_name: neoway_bureau_analysis
+columns:
+  id_proposal:
+    lineage:
+      - datalake_static_files_raw.bureaus_neoway_historical_raw.id_proposal
+      - datalake_sorting_hat_clean.credit_analysis.id_proposal
+  id_proponent:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.id_proponent
+  cpf:
+    lineage:
+      - datalake_static_files_raw.bureaus_neoway_historical_raw.cpf
+      - datalake_arquivo_confidencial_clean.integration_report_aud.cpf 
+  neoway_estimated_income_low:
+    lineage:
+      - datalake_static_files_raw.bureaus_neoway_historical_raw.estimated_income_neoway_low
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.neoway_lower_value
+  neoway_estimated_income_midpoint:
+    lineage:
+      - datalake_static_files_raw.bureaus_neoway_historical_raw.estimated_income_neoway_midpoint
+  neoway_estimated_income_upper:
+    lineage:
+      - datalake_static_files_raw.bureaus_neoway_historical_raw.estimated_income_neoway_upper
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.neoway_upper_value

@@ -1155,6 +1155,14 @@ bietlejuice.enrich_braze_events_user_centric:
 bietlejuice.enrich_braze_events_user_centric_periodicity:
   - bietlejuice.enrich_braze_events_user_centric:load-enrich-user-events-daily
 
+bietlejuice.enrich_bureaus:
+  - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
+  - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud
+  - bietlejuice.arquivo_confidencial:load-clean-rev-info
+  - bietlejuice.sorting_hat:load-clean-credit-analysis
+  - bietlejuice.sorting_hat:load-clean-proposal
+  - bietlejuice.sorting_hat:load-clean-proponent 
+
 bietlejuice.enrich_buyer_prospect:
   - bietlejuice.ebdb:create-clean-contract-person-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake

@@ -1,0 +1,35 @@
+database_name: datalake_bureaus
+table_name: bigdatacorp_bureau_analysis
+columns:
+  id_proposal:
+    lineage:
+      - datalake_static_files_raw.bureaus_bigdatacorp_historical_raw.id_proposal
+      - datalake_sorting_hat_clean.credit_analysis.id_proposal
+  id_proponent:
+    lineage:
+      - datalake_static_files_raw.bureaus_bigdatacorp_historical_raw.id_proponent
+      - datalake_sorting_hat_clean.proponent.id_proponent
+  cpf:
+    lineage:
+      - datalake_static_files_raw.bureaus_bigdatacorp_historical_raw.cpf
+      - datalake_arquivo_confidencial_clean.integration_report_aud.cpf
+  bigdatacorp_age:
+    lineage:
+      - datalake_static_files_raw.bureaus_bigdatacorp_historical_raw.people_dados_basicos__idade
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.Age
+  bigdatacorp_total_spouses:
+    lineage:
+      - datalake_static_files_raw.bureaus_bigdatacorp_historical_raw.people_personal_relat__quantidade_de_conjuges
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.TotalSpouses
+  bigdatacorp_total_partners:
+    lineage:
+      - datalake_static_files_raw.bureaus_bigdatacorp_historical_raw.people_personal_relat__quantidade_de_socios
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.TotalPartners
+  bigdatacorp_total_household:
+    lineage:
+      - datalake_static_files_raw.bureaus_bigdatacorp_historical_raw.people_personal_relat__quantidade_de_pessoas_no_household
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.TotalCoworkers
+  bigdatacorp_total_relationships:
+    lineage:
+      - datalake_static_files_raw.bureaus_bigdatacorp_historical_raw.people_personal_relat__quantidade_de_relacionamentos
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.TotalRelationships
