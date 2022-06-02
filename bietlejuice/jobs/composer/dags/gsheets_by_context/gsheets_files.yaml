@@ -108,6 +108,12 @@ affiliate_pro_registration:
     clean_table_name: affiliate_pro_registration
     sheet_context: growth
 
+ecglobal_active_users:
+    sheet_id: 1S4QBYxMLTAfjre0xd5jS9kaT5YjL4KsE3sRKmvHFNjM
+    sheet_name: base
+    clean_table_name: ecglobal_active_users
+    sheet_context: growth
+
 historic_national_costs:
     sheet_id: 1mcTp6mmjNBpsaEiwn1ZepnhkyGozDEC5HAmVWeeArGA
     sheet_name: historic_national_costs
