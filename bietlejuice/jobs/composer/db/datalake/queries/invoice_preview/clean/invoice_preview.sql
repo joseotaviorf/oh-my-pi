@@ -20,4 +20,4 @@ SELECT
     TO_DATE(NULLIF(`landlord-invoice-created-at`, ''), 'y-M-d') AS dt_landlord_invoice_created_at,
     ts_load
 FROM
-    datalake_invoice_preview_raw.invoice_preview;
+    datalake_invoice_preview_raw.invoice_preview
