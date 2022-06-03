@@ -416,7 +416,7 @@ fcr_customer AS (
   )
   SELECT 
     sk_main_session,
-    ticket_recontact_list[FIND_IN_SET(recontact_ticket, CONCAT_WS(',',ticket_recontact_list))] AS sk_next_ticket,
+    CAST(ticket_recontact_list[FIND_IN_SET(recontact_ticket, CONCAT_WS(',',ticket_recontact_list))] AS BIGINT) AS sk_next_ticket,
     recontact_ticket,
     is_fcr_customer
   FROM 
