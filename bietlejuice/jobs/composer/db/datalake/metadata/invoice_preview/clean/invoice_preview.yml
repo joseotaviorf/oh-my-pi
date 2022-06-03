@@ -62,3 +62,12 @@ columns:
   ts_load:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.ts_load
+  year:
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.year
+  month:
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.month
+  day:
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.day

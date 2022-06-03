@@ -18,6 +18,13 @@ SELECT
     TO_DATE(NULLIF(`landlord-paid-date`, ''), 'y-M-d') AS dt_landlord_paid,
     TO_DATE(NULLIF(`tenant-invoice-created-at`, ''), 'y-M-d') AS dt_tenant_invoice_created_at,
     TO_DATE(NULLIF(`landlord-invoice-created-at`, ''), 'y-M-d') AS dt_landlord_invoice_created_at,
+    year,
+    month,
+    day,
     ts_load
 FROM
     datalake_invoice_preview_raw.invoice_preview
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
