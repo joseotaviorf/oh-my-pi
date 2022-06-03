@@ -7,3 +7,4 @@ consumer_extra_args:
     escape: '"'
     multiLine: "true"
 table_name: invoice_preview
+partition_cols: ["year", "month", "day"]

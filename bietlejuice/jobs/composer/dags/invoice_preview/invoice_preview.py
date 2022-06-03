@@ -95,12 +95,13 @@ raw_task_group = task_group.build_raw_task_group_for_single_table(
         json.dumps(CONSUMER_EXTRA_ARGS),
     ],
 )
-
+partition_columns = config_service.get_config("partition_cols")
 clean_task_group = task_group.build_clean_task_group(
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
     table_name=TABLE_NAME,
     is_incremental=True,
+    partitions=partition_columns,
 )
 
 
