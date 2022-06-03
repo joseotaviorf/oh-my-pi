@@ -102,6 +102,12 @@ costs_targets:
     clean_table_name: costs_targets
     sheet_context: growth
 
+costs_targets_mx:
+    sheet_id: 1bPwti9OY4s7k44uQof7GIyBjMs9_l1JBnuAIv8oOEFo
+    sheet_name: costs_targets_mx
+    clean_table_name: costs_targets_mx
+    sheet_context: growth
+
 affiliate_pro_registration:
     sheet_id: 196BCLJ7rwRAgb50IEdYB_b4KGnilleeCU8WMKghxddY
     sheet_name: affiliate_pro
@@ -322,6 +328,12 @@ supply_targets_2022:
     sheet_id: 1rU-ptg-ZtD0WdnbXnUVpGw8Lrf-0grc2IitwEmn2yZ0
     sheet_name: supply_targets_2022
     clean_table_name: supply_targets_2022
+    sheet_context: for_rent
+
+supply_targets_2022_mx:
+    sheet_id: 1sEl5H0PpnoRrKB4JmGGLq9WG-sWrGIfA1n4Cs4vDz1Q
+    sheet_name: supply_targets_2022_mx
+    clean_table_name: supply_targets_2022_mx
     sheet_context: for_rent
 
 #########################

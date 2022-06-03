@@ -22,6 +22,7 @@ This pipeline produces the following output tables:
 1. Data lake raw:
     - `branding_where_is_plaquinha`
     - `costs_targets`
+    - `costs_targets_mx`
     - `base_supply_souce_for_rent`
     - `ecglobal_active_users`
     - `historic_national_costs`
@@ -54,6 +55,7 @@ This pipeline produces the following output tables:
     - `mkt_cost_per_source`
     - `branding_where_is_plaquinha`
     - `costs_targets`
+    - `costs_targets_mx`
     - `daily_target_supply_sale`
     - `mta_budget_october_2020`
     - `rental_tof_daily_targets`

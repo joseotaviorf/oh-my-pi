@@ -30,6 +30,7 @@ This pipeline produces the following output tables:
     - `ongoing_listings_target`
     - `rental_budget_targets`
     - `supply_targets_2022`
+    - `supply_targets_2022_mx`
 
 2. Data lake clean:
     - `aux_agents`
@@ -42,5 +43,6 @@ This pipeline produces the following output tables:
     - `ongoing_listings_target`
     - `rental_budget_targets`
     - `supply_targets_2022`
+    - `supply_targets_2022_mx`
 
 </details>
