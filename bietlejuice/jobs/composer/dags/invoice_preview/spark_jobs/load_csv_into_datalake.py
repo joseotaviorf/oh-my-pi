@@ -8,7 +8,11 @@ import re
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat, BaseDBUtils
+from bietlejuice.jobs.composer.base.spark import (
+    SparkTableStorageFormat,
+    BaseDBUtils,
+    SparkDataFrameService,
+)
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.s3_consumer import S3Consumer
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
@@ -52,6 +56,8 @@ if __name__ == "__main__":
     date_to_ingest = args.date_to_ingest
     table_name = args.table_name
     consumer_extra_args = json.loads(args.consumer_extra_args)
+    partition_cols = ["year", "month", "day"]
+    date_ingested = datetime.strptime(date_to_ingest, "%Y-%m-%d")
 
     logger.info(
         f"""
@@ -85,6 +91,12 @@ if __name__ == "__main__":
     for csv in by_day_files[date_to_ingest]:
         dfs.append(s3_consumer.get_data_from_file(path=csv, **consumer_extra_args))
     df = reduce(DataFrame.unionAll, dfs)
+    df = (
+        SparkDataFrameService()
+        .input(df)
+        .create_year_month_day_columns_from_date(date_ingested)
+        .output()
+    )
 
     df = df.withColumn("ts_load", functions.current_timestamp())
 
@@ -100,11 +112,19 @@ if __name__ == "__main__":
 
     s3_loader = S3Loader()
 
-    date_ingested = datetime.strptime(date_to_ingest, "%Y-%m-%d")
-    s3_path = f"{database_location}year={date_ingested.year}/month={date_ingested.month}/day={date_ingested.day}/{table_name}"
+    s3_path = f"{database_location}{table_name}"
 
-    s3_loader.load_df(df=df, s3_path=s3_path, format_options=format_options)
+    s3_loader.load_df(
+        df=df, s3_path=s3_path, format_options=format_options, partitions=partition_cols
+    )
 
     spark_metastore_loader.update_metastore(
-        df, database_name, table_name, format_options, database_location
+        df, database_name, table_name, format_options, database_location, partition_cols
+    )
+
+    spark_metastore_service.create_new_partitions_from_df(
+        database_name=database_name,
+        table_name=table_name,
+        df=df,
+        partition_cols=partition_cols,
     )
