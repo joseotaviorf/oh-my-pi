@@ -1,6 +1,5 @@
 ---
 partition_cols:
-  - event_type_sanitized
   - year
   - month
   - day

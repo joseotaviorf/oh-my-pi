@@ -104,28 +104,23 @@ columns:
     lineage:
       - datalake_online_attribution.events_exploded.app_medium
       - datalake_online_attribution.events_exploded.web_medium
-  mkt_flow:
-    lineage:
-      - datalake_gsheets_clean.taxonomy_demand.Flow
-  mkt_completion:
-    lineage:
-      - datalake_gsheets_clean.taxonomy_demand.Completion
-  mkt_origin:
-    lineage:
-      - datalake_gsheets_clean.taxonomy_demand.Origin
-  mkt_channel:
-    lineage:
-      - datalake_gsheets_clean.taxonomy_demand.Channel
-  mkt_medium:
-    lineage:
-      - datalake_gsheets_clean.taxonomy_demand.Medium
-  mkt_source:
-    lineage:
-      - datalake_gsheets_clean.taxonomy_demand.Source
-  mkt_plataform:
-    lineage:
-      - datalake_gsheets_clean.taxonomy_demand.Plataform
   branded:
     lineage:
       - datalake_online_attribution.events_exploded.app_branded
       - datalake_online_attribution.events_exploded.web_branded
+  media_source:
+    lineage:
+      - datalake_online_attribution.events_exploded.web_source
+      - datalake_online_attribution.events_exploded.adjust_network
+  utm_campaign:
+    lineage:
+      - datalake_online_attribution.events_exploded.adjust_campaign
+      - datalake_online_attribution.events_exploded.web_campaign
+  utm_term:
+    lineage:
+      - datalake_online_attribution.events_exploded.adjust_creative
+      - datalake_online_attribution.events_exploded.web_term
+  utm_content:
+    lineage:
+      - datalake_online_attribution.events_exploded.adjust_adgroup
+      - datalake_online_attribution.events_exploded.web_content
