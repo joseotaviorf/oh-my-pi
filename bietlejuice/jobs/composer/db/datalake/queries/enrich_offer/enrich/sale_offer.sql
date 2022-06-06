@@ -459,9 +459,9 @@ data_sources AS (
     LEFT JOIN
         datalake_sale_offer_flows.sale_offer_flows AS vo
             ON vo.id_offer = g.id
-    LEFT JOIN 
+    LEFT JOIN
         datalake_ebdb_user.user AS du_vo
-            ON vo.id_user_agent = du_vo.id 
+            ON vo.id_user_agent = du_vo.id
             AND vo.id_user_agent IS NOT NULL
     LEFT JOIN
         datalake_firestore.monday AS mo
@@ -518,9 +518,9 @@ business_unit_by_hub_id(
         bu.hub_name,
         bu.business_context,
         ROW_NUMBER () OVER ( PARTITION BY bu.id ORDER BY bu.ts_updated DESC ) AS row
-    FROM 
+    FROM
         offer_flow AS off
-    JOIN 
+    JOIN
         datalake_hub_services_clean.business_unit AS bu
             ON off.id_hub = bu.id
 ),
@@ -529,7 +529,7 @@ business_unit AS (
   SELECT
     off.id_offer,
     off.ohc_id_offer,
-    REPLACE(UPPER(                    
+    REPLACE(UPPER(
         CASE
             WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
             WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
@@ -537,7 +537,7 @@ business_unit AS (
             WHEN offer_flow = 'CENTRAL' THEN 'CENTRAL NO INFO'
             WHEN offer_flow = 'HUB' THEN (CASE WHEN off.ohc_offer_flow_detail IS NULL AND off.vo_id_offer IS NOT NULL THEN off.wc_hub_name_ajs ELSE off.ohc_offer_flow_detail END)
             ELSE offer_flow
-        END         
+        END
     ), '  ',' ') AS business_unit,
     offer_flow
     FROM
@@ -598,13 +598,13 @@ business_rules AS (
         dr.id_owner AS id_owner,
         dr.id_region AS id_region,
         CASE
-            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01' 
+            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
                 THEN ds.vo_id_user_agent
             ELSE
                 ds.rbo_id_user_agent
         END AS id_user_agent,
         CASE
-            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01' 
+            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
                 THEN ds.du_vo_id_agent
             ELSE
                 ds.wc_id_agent
@@ -615,7 +615,7 @@ business_rules AS (
         ds.vo_id_user_team_lead AS id_user_team_lead,
         ds.id_hub AS id_hub_sales_flow,
         CASE
-            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01' 
+            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
                 THEN ds.vo_agent_name
             ELSE
                 ds.rbo_agent_name
@@ -624,19 +624,18 @@ business_rules AS (
         ds.pendency_type,
         ds.opportunities_of_the_week,
         CASE
-            WHEN COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%no-protocolo%"
-                OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%pre-analise-expansao%"
-                OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%credito-andamento%"
-                OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%credito-aprovado%"
-                OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%credito-recusado%" THEN true
+            WHEN COALESCE(ds.vo_tags_from_salesflow, ds.mo_tags_from_salesflow) LIKE "%pre-analise-expansao%"
+                OR COALESCE(ds.vo_tags_from_salesflow, ds.mo_tags_from_salesflow) LIKE "%credito-andamento%"
+                OR COALESCE(ds.vo_tags_from_salesflow, ds.mo_tags_from_salesflow) LIKE "%credito-aprovado%"
+                OR COALESCE(ds.vo_tags_from_salesflow, ds.mo_tags_from_salesflow) LIKE "%credito-recusado%" THEN true
             ELSE false
         END AS has_credit_pre_analysis,
         CASE
-            WHEN COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%no-protocolo%" THEN true
-            WHEN COALESCE(vo_dt_sale_agreement_created, mo_dt_sale_agreement_created) >= "2021-03-14"
-                AND current_payment_method = "FINANCED"
-                AND COALESCE(vo_financing_bank, mo_financing_bank) = "Itaú"
-                AND COALESCE(vo_credit_model, mo_credit_model) = "ATTA" THEN true
+            WHEN COALESCE(ds.vo_tags_from_salesflow, ds.mo_tags_from_salesflow) LIKE "%no-protocolo%" THEN true
+            WHEN COALESCE(ds.vo_dt_sale_agreement_created, ds.mo_dt_sale_agreement_created) >= "2022-03-14"
+                AND ds.current_payment_method = "FINANCED"
+                AND COALESCE(ds.vo_financing_bank, ds.mo_financing_bank) = "Itaú"
+                AND COALESCE(ds.vo_credit_model, ds.mo_credit_model) = "ATTA" THEN true
             ELSE false
         END AS has_payment_in_protocol,
         has_used_fgts_in_payment,
@@ -653,7 +652,7 @@ business_rules AS (
         earnest_value,
         brokerage_fee,
         off.offer_flow,
-        bu.business_unit,                
+        bu.business_unit,
         busf.hub_name AS hub_name_sales_flow,
         busf.business_context AS business_context_sales_flow,
         ofp.offer_portfolio_start_date,
@@ -714,7 +713,7 @@ business_rules AS (
             CASE
                 WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
                         CASE
-                            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01' 
+                            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
                                 THEN ds.vo_team_lead_name
                             ELSE
                                 CASE
@@ -727,7 +726,7 @@ business_rules AS (
                 ELSE ds.vo_team_lead_name
             END) AS team_lead_name,
         UPPER(
-            CASE 
+            CASE
                 WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
                     THEN ds.vo_id_consultant
             ELSE
@@ -736,7 +735,7 @@ business_rules AS (
                         THEN 'GSHEETS_[]'
                     ELSE COALESCE(ds.vo_id_consultant,ds.mo_id_consultant)
                 END
-            END 
+            END
         ) AS id_consultant,
         UPPER(
             CASE
