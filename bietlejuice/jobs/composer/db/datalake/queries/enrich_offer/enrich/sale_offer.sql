@@ -7,9 +7,7 @@ WITH visit_before_offer AS (
             bs.id_agent,
             du.id as id_user_agent,
             du.name AS agent_name,
-            bs.partner_3p_supply,
             bs.partner_3p_demand,
-            bs.is_3p_supply,
             bs.is_3p_demand,
             TRUE AS flg_visit_completed_before_offer,
             (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
@@ -50,9 +48,7 @@ booking_before_offer AS (
             bs.id_agent,
             du.id as id_user_agent,
             du.name AS agent_name,
-            bs.partner_3p_supply,
             bs.partner_3p_demand,
-            bs.is_3p_supply,
             bs.is_3p_demand,
             TRUE AS flg_booking_before_offer,
             (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
@@ -61,6 +57,7 @@ booking_before_offer AS (
                 PARTITION BY
                     so.id
                 ORDER BY
+                    is_canceled,
                     (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_created))
             ) AS rw_booking
         FROM
@@ -76,7 +73,6 @@ booking_before_offer AS (
             bs.visit_intent = 'SALE'
             AND bs.type = 'Visita'
             AND bs.ts_created < so.ts_created
-            AND (bs.visit_fup !='VaiNegociar' OR bs.visit_fup IS NULL)
     )
     SELECT
         bk.*
@@ -92,11 +88,12 @@ relation_booking_offer AS (
         COALESCE(vo.id_agent, bo.id_agent) AS id_agent,
         COALESCE(vo.id_user_agent, bo.id_user_agent) AS id_user_agent,
         COALESCE(vo.agent_name, bo.agent_name) AS agent_name,
-        COALESCE(vo.partner_3p_supply, bo.partner_3p_supply) AS partner_3p_supply,
-        COALESCE(vo.partner_3p_demand, bo.partner_3p_demand) AS partner_3p_demand,
+        CASE
+            WHEN vo.is_3p_demand IS NOT NULL THEN vo.partner_3p_demand
+            ELSE bo.partner_3p_demand
+        END AS partner_3p_demand,
         COALESCE(vo.hours_booking_to_offer, bo.hours_booking_to_offer) AS hours_booking_to_offer,
         COALESCE(vo.hours_visit_to_offer, bo.hours_visit_to_offer) AS hours_visit_to_offer,
-        COALESCE(vo.is_3p_supply, bo.is_3p_supply) AS is_3p_supply,
         COALESCE(vo.is_3p_demand, bo.is_3p_demand) AS is_3p_demand,
         COALESCE(bo.flg_booking_before_offer,vo.flg_visit_completed_before_offer) AS flg_booking_before_offer,
         vo.flg_visit_completed_before_offer
@@ -296,9 +293,7 @@ data_sources AS (
         rbo.id_user_agent AS rbo_id_user_agent,
         rbo.id_booking,
         UPPER(rbo.agent_name) AS rbo_agent_name,
-        partner_3p_supply,
         partner_3p_demand,
-        COALESCE(is_3p_supply, FALSE) AS is_3p_supply,
         COALESCE(is_3p_demand, FALSE) AS is_3p_demand,
         COALESCE(rbo.flg_booking_before_offer,FALSE) AS flg_booking_before_offer,
         COALESCE(rbo.flg_visit_completed_before_offer,FALSE) AS flg_visit_completed_before_offer,
@@ -772,7 +767,7 @@ business_rules AS (
                 ELSE COALESCE(ds.mo_consultant_name, ds.vo_consultant_name)
             END
         )  AS consultant_name,
-        sale_price,
+        ds.sale_price,
         COALESCE(ds.first_price_offered_by_buyer, ds.mo_price_offered_by_buyer) AS first_price_offered_by_buyer,
         CASE
             WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
@@ -821,11 +816,11 @@ business_rules AS (
         COALESCE(vo_days_offer_accepted_to_sale_agreement_signed, mo_days_offer_accepted_to_sale_agreement_signed) AS days_offer_accepted_to_sale_agreement_signed,
         COALESCE(vo_days_offer_accepted_to_sale_agreement_created, mo_days_offer_accepted_to_sale_agreement_created) AS days_offer_accepted_to_sale_agreement_created,
         COALESCE(vo_days_offer_accepted_to_offer_dismissed, mo_days_offer_accepted_to_offer_dismissed) AS days_offer_accepted_to_offer_dismissed,
-        ts_updated,
+        ds.ts_updated,
         vo_ts_last_updated_pendency AS ts_last_updated_pendency,
-        ds.partner_3p_supply,
+        h.partner_3p_supply,
         ds.partner_3p_demand,
-        ds.is_3p_supply,
+        COALESCE(h.is_3p_supply, FALSE) AS is_3p_supply,
         ds.is_3p_demand,
         ds.flg_booking_before_offer,
         ds.flg_visit_completed_before_offer,
@@ -893,6 +888,9 @@ business_rules AS (
             ON busf.id_hub = ds.id_hub
             AND busf.row = 1
             AND ds.id_hub IS NOT NULL
+    LEFT JOIN
+        datalake_ebdb_listing.house AS h
+            ON h.id = COALESCE(ds.id_house,ds.ohc_id_house)
 )
 SELECT
     id_offer,

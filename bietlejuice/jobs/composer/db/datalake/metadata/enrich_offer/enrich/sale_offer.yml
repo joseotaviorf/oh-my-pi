@@ -185,7 +185,7 @@ columns:
       - datalake_sale_offer_flows.sale_offer_flows.diligence_appointment_reason
   partner_3p_supply:
     lineage:
-      - datalake_booking.booking.partner_3p_supply
+      - datalake_ebdb_listing.house.partner_3p_supply
   partner_3p_demand:
     lineage:
       - datalake_booking.booking.partner_3p_demand
@@ -309,7 +309,7 @@ columns:
       - datalake_sale_offer_flows.sale_offer_flows.is_ccv_canceled
   is_3p_supply:
     lineage:
-      - datalake_booking.booking.is_3p_supply
+      - datalake_ebdb_listing.house.is_3p_supply
   is_3p_demand:
     lineage:
       - datalake_booking.booking.is_3p_demand
