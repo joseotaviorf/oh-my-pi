@@ -1,0 +1,32 @@
+# Merge Keys are available only in Yaml 1.1.
+redshift_template:
+  dw: &redshift_anchor
+    schema: datamarts
+    runs_on: redshift
+athena_template:
+  dw: &athena_anchor
+    schema: datamarts
+    runs_on: athena
+pipeline:
+  ##<KEEP THIS COMMENTED AS A TEMPLATE>
+  # <task-name-like-attribution-conversion-paths>:
+  #   dw:
+  #     sql_file: <query-file E.g: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql>
+  #     table: <targe-table-name>
+  #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
+  #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
+  marketplace_intelligence_metrics:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_blacklist/marketplace_intelligence_metrics.sql
+      table: marketplace_intelligence_metrics
+  listings_online_metrics:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/growth_blacklist/listings_online_metrics.sql
+      table: listings_online_metrics
+  users_online_metrics:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/growth_blacklist/users_online_metrics.sql
+      table: users_online_metrics

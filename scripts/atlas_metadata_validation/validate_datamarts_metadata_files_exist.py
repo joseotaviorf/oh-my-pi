@@ -27,7 +27,6 @@ SKIP_LIST = {
         "agents_3p",
     },
     "dw_datamarts/growth": {
-        "marketplace_intelligence_metrics",
         "performance_marketing_metrics_supply",
         "listings_online_metrics",
         "sale_performance_marketing_metrics_supply_cohort",
@@ -43,6 +42,9 @@ SKIP_LIST = {
         "unique_owners",
         "casa_mineira_top_of_funnel_volumes_weekly",
         "casa_mineira_top_of_funnel_volumes_daily",
+    },
+    "dw_datamarts/growth_blacklist": {
+        "marketplace_intelligence_metrics"
     },
     "dw_datamarts/for_rent": {
         "house_available_hours",

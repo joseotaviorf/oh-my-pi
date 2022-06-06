@@ -63,11 +63,6 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth/unique_owners.sql
       table: unique_owners
-  users_online_metrics:
-    dw:
-      <<: *athena_anchor
-      sql_file: dw/queries/datamarts/growth/users_online_metrics.sql
-      table: users_online_metrics
   sale_performance_marketing_metrics_supply_cohort:
     dw:
       <<: *redshift_anchor
@@ -96,18 +91,8 @@ pipeline:
       depends_on:
         - performance_marketing_metrics_imobiliaria_casa_mineira
         - performance_marketing_metrics_portal_casa_mineira
-  listings_online_metrics:
-    dw:
-      <<: *athena_anchor
-      sql_file: dw/queries/datamarts/growth/listings_online_metrics.sql
-      table: listings_online_metrics
   performance_marketing_metrics_imobiliaria_casa_mineira:
     dw:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_imobiliaria_casa_mineira.sql
       table: performance_marketing_metrics_imobiliaria_casa_mineira
-  marketplace_intelligence_metrics:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/marketplace_intelligence_metrics.sql
-      table: marketplace_intelligence_metrics
