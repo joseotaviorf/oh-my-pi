@@ -1566,6 +1566,14 @@ bietlejuice.enrich_listing_owners:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
   - bietlejuice.enrich_offer:load-enrich-offer
 
+bietlejuice.enrich_losses:
+  - bietlejuice.retsuko:load-clean-entry
+  - bietlejuice.retsuko:load-clean-account
+  - bietlejuice.retsuko:load-clean-invoice
+  - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-contract-aud-in-data-lake
+
 bietlejuice.enrich_marketing_automatic_daily_costs:
   - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
 

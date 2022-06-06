@@ -1,0 +1,28 @@
+---
+database_name: datalake_losses
+table_name: contract_rental_losses_npv
+columns:
+  id_contract:
+    lineage:
+      - datalake_retsuko_clean.invoice.id_contract
+  id_contract_main:
+    lineage:
+      - datalake_retsuko_clean.contract.id_external
+  id_proposal:
+    lineage:
+      - datalake_ebdb_clean.contract.id_proposal
+  paid_amount_invoice:
+    lineage:
+      - datalake_retsuko_clean.invoice.paid_amount
+  rent_price_first:
+    lineage:
+      - datalake_ebdb_clean.contract_aud.rent
+  is_terminated:
+    lineage:
+      - datalake_ebdb_clean.contract.dt_termination
+  dt_started:
+    lineage:
+      - datalake_ebdb_clean.contract.dt_started
+  dt_termination:
+    lineage:
+      - datalake_ebdb_clean.contract.dt_termination
