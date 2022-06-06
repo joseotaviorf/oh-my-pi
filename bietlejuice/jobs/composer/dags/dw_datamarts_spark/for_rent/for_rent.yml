@@ -19,4 +19,5 @@ for_rent:
       - house_available_hours
   house_weekly_entrance_info: {}
   ongoing_listed_suspended_listings: {}
+  repressed_demand: {}
   weekly_demand_metrics: {}
