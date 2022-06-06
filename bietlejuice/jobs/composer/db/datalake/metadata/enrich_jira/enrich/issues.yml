@@ -8,16 +8,55 @@ columns:
   id_parent_issue:
     lineage:
       - datalake_jira_clean.issues.fields
+  id_project:
+    lineage:
+      - datalake_jira_clean.issues.fields
   summary:
     lineage:
       - datalake_jira_clean.issues.fields
   issue_description:
     lineage:
       - datalake_jira_clean.issues.fields
+  project_name:
+    lineage:
+      - datalake_jira_clean.issues.fields
   issue_type:
     lineage:
       - datalake_jira_clean.issues.fields
   current_status:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  assignee:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  reporter:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  priority:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  resolution:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  root_cause_resolution:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  incident_category:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  incident_owner:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  last_cycle:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  labels:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  cycles:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  story_points:
     lineage:
       - datalake_jira_clean.issues.fields
   ts_created:
