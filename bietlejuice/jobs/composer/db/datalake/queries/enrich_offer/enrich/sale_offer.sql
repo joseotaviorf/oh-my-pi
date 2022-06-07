@@ -635,7 +635,8 @@ business_rules AS (
             WHEN COALESCE(ds.vo_dt_sale_agreement_created, ds.mo_dt_sale_agreement_created) >= "2022-03-14"
                 AND ds.current_payment_method = "FINANCED"
                 AND COALESCE(ds.vo_financing_bank, ds.mo_financing_bank) = "Itaú"
-                AND COALESCE(ds.vo_credit_model, ds.mo_credit_model) = "ATTA" THEN true
+                AND COALESCE(ds.vo_credit_model, ds.mo_credit_model) = "ATTA"
+                AND dr.city_group = "RMSP" THEN true
             ELSE false
         END AS has_payment_in_protocol,
         has_used_fgts_in_payment,
