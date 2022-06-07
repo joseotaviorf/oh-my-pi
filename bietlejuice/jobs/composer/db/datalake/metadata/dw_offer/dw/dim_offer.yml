@@ -126,6 +126,30 @@ columns:
     lineage:
       - datalake_offer.offer.last_rent_offered_by_owner
       - datalake_ebdb_proposal.pre_proposal_aud.rent
+  number_of_tenants:
+    lineage:
+      - datalake_offer.offer.number_of_tenants
+  number_of_kids:
+    lineage:
+      - datalake_offer.offer.number_of_kids
+  rental_reason:
+    lineage:
+      - datalake_offer.offer.rental_reason
+  rental_urgency:
+    lineage:
+      - datalake_offer.offer.rental_urgency
+  tenant_description:
+    lineage:
+      - datalake_offer.offer.tenant_description
+  tenant_pets_info:
+    lineage:
+      - datalake_offer.offer.tenant_pets_info
+  tenant_type:
+    lineage:
+      - datalake_offer.offer.tenant_type
+  has_pets:
+    lineage:
+      - datalake_offer.offer.has_pets
   last_updated_date:
     lineage:
       - datalake_offer.offer.ts_updated

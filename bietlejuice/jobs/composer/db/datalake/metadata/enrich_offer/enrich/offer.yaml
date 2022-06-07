@@ -75,6 +75,30 @@ columns:
     lineage:
       - datalake_ebdb_clean.offer_aud.rev
       - datalake_ebdb_clean.offer_aud.rent
+  number_of_tenants:
+    lineage:
+      - datalake_offer.offer.number_of_tenants
+  number_of_kids:
+    lineage:
+      - datalake_offer.offer.number_of_kids
+  rental_reason:
+    lineage:
+      - datalake_offer.offer.rental_reason
+  rental_urgency:
+    lineage:
+      - datalake_offer.offer.rental_urgency
+  tenant_description:
+    lineage:
+      - datalake_offer.offer.tenant_description
+  tenant_pets_info:
+    lineage:
+      - datalake_offer.offer.tenant_pets_info
+  tenant_type:
+    lineage:
+      - datalake_offer.offer.tenant_type
+  has_pets:
+    lineage:
+      - datalake_offer.offer.has_pets
   is_instant_offer:
     lineage:
       - datalake_firestore.rent_offer.is_instant_offer

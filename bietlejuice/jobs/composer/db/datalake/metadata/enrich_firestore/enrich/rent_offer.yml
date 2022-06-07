@@ -67,6 +67,9 @@ columns:
   type:
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
+  tenant_intent:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
   tenant_service_fee:
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message

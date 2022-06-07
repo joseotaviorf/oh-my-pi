@@ -115,8 +115,16 @@ old_pre_proposal AS (
         CAST(NULL AS DECIMAL(18,4)) AS first_rent_offered_by_owner,
         last_rent_value_tenant AS last_rent_offered_by_tenant,
         last_rent_value_landlord AS last_rent_offered_by_owner,
+        NULL AS number_of_tenants,
+        NULL AS number_of_kids,
         pp.rejection_reason,
+        NULL AS rental_reason,
+        NULL AS rental_urgency,
+        NULL AS tenant_description,
+        NULL AS tenant_pets_info,
+        NULL AS tenant_type,
         CAST('Other' AS VARCHAR(255)) AS type,
+        NULL AS has_pets,
         FALSE AS is_instant_offer
     FROM
       datalake_ebdb_proposal.pre_proposal pp
@@ -149,8 +157,16 @@ new_offer AS (
         CAST(first_rent_offered_by_owner AS DECIMAL(18,4)) AS first_rent_offered_by_owner,
         CAST(last_rent_offered_by_tenant AS DECIMAL(18,4)) AS last_rent_offered_by_tenant,
         CAST(last_rent_offered_by_owner AS DECIMAL(18,4)) AS last_rent_offered_by_owner,
+        number_of_tenants,
+        number_of_kids,
         rejection_reason,
+        rental_reason,
+        rental_urgency,
+        tenant_description,
+        tenant_pets_info,
+        tenant_type,
         type,
+        has_pets,
         is_instant_offer
     FROM
         datalake_offer.offer
@@ -283,6 +299,14 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     o.first_rent_offered_by_owner,
     o.last_rent_offered_by_tenant,
     o.last_rent_offered_by_owner,
+    CAST(o.number_of_tenants AS SMALLINT) AS number_of_tenants,
+    CAST(o.number_of_kids AS SMALLINT) AS number_of_kids,
+    o.rental_reason,
+    o.rental_urgency,
+    o.tenant_description,
+    o.tenant_pets_info,
+    o.tenant_type,
+    CAST(o.has_pets AS BOOLEAN) AS has_pets,
     o.last_updated_date,
     o.expiration_date,
     o.dt_analysis,

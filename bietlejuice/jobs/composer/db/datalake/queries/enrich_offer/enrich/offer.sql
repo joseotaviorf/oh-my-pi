@@ -77,7 +77,15 @@ firestore_offers as (
   instant_offer_firestore as (
       select distinct
         id_firestore,
+        GET_JSON_OBJECT(resident, '$.people') AS number_of_tenants,
+        GET_JSON_OBJECT(resident, '$.kids') AS number_of_kids,
+        GET_JSON_OBJECT(tenant_intent, '$.rentalReason') AS rental_reason,
+        GET_JSON_OBJECT(tenant_intent, '$.urgency') AS rental_urgency,
+        GET_JSON_OBJECT(resident, '$.description') AS tenant_description,
+        GET_JSON_OBJECT(resident, '$.petsInfo') AS tenant_pets_info,
+        GET_JSON_OBJECT(resident, '$.members') AS tenant_type,
         type,
+        GET_JSON_OBJECT(resident, '$.pets') AS has_pets,
         is_instant_offer,
         ts_first_sent,
         ts_last_sent
@@ -88,10 +96,18 @@ firestore_offers as (
     o_firestore.id_offer,
     bo_godfather.id_firestore,
     bo_godfather.id,
-    COALESCE(bo_godfather.ts_first_sent, io_firestore.ts_first_sent) AS ts_first_sent,
-    COALESCE(bo_godfather.ts_last_sent, io_firestore.ts_last_sent) AS ts_last_sent,
+    io_firestore.number_of_tenants,
+    io_firestore.number_of_kids,
+    io_firestore.rental_reason,
+    io_firestore.rental_urgency,
+    io_firestore.tenant_description,
+    io_firestore.tenant_pets_info,
+    io_firestore.tenant_type,
     io_firestore.type,
-    io_firestore.is_instant_offer
+    io_firestore.has_pets,
+    io_firestore.is_instant_offer,
+    COALESCE(bo_godfather.ts_first_sent, io_firestore.ts_first_sent) AS ts_first_sent,
+    COALESCE(bo_godfather.ts_last_sent, io_firestore.ts_last_sent) AS ts_last_sent
   from offer_firestore o_firestore
   LEFT join datalake_godfather_clean.offer bo_godfather
     on bo_godfather.id = o_firestore.id_offer_godfather
@@ -123,6 +139,14 @@ select distinct
   negotiation.first_rent_offered_by_owner,
   negotiation.last_rent_offered_by_tenant,
   negotiation.last_rent_offered_by_owner,
+  firestore.number_of_tenants,
+  firestore.number_of_kids,
+  firestore.rental_reason,
+  firestore.rental_urgency,
+  firestore.tenant_description,
+  firestore.tenant_pets_info,
+  firestore.tenant_type,
+  firestore.has_pets,
   coalesce(firestore.is_instant_offer, false) as is_instant_offer,
   coalesce(bus_offer.ts_last_sent, firestore.ts_last_sent) is not null as is_offer_submitted,
   offer.ts_expired,

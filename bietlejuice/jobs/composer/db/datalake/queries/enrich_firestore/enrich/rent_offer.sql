@@ -28,6 +28,7 @@ SELECT
     GET_JSON_OBJECT(roa.updated_message, '$.status') AS status,
     GET_JSON_OBJECT(roa.updated_message, '$.turn') AS turn,
     GET_JSON_OBJECT(roa.updated_message, '$.type') AS type,
+    GET_JSON_OBJECT(roa.updated_message, '$.tenantIntent') AS tenant_intent,
     GET_JSON_OBJECT(roa.updated_message, '$.tenantServiceFee') AS tenant_service_fee,
     BOOLEAN(GET_JSON_OBJECT(roa.updated_message, '$.hasDraftTopics')) AS has_draft_topics,
     BOOLEAN(GET_JSON_OBJECT(roa.updated_message, '$.instantOffer')) AS is_instant_offer,
