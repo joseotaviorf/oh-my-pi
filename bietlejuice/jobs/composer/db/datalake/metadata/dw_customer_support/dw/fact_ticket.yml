@@ -292,6 +292,10 @@ columns:
       - datalake_customer_support.call.total_minutes_front_to_open_back_ticket_time
       - datalake_customer_support.chat.total_minutes_front_to_open_back_ticket_time
       - datalake_customer_support.email.total_minutes_front_to_open_back_ticket_time
+  csat_comment:
+    lineage:
+      - datalake_customer_support.email.csat_comment
+      - datalake_customer_support.chat.csat_comment
   ts_started:
     lineage:
       - datalake_customer_support.call.ts_ticket_started
@@ -306,6 +310,15 @@ columns:
       - datalake_customer_support.email.ts_ticket_ended
       - datalake_customer_support.historical_call.ts_ticket_ended
       - datalake_customer_support.historical_chat.ts_ticket_ended
+  ts_csat_response:
+    lineage:
+      - datalake_customer_support.call.ts_csat_answered
+      - datalake_customer_support.chat.ts_csat_response
+      - datalake_customer_support.email.ts_csat_first_response
+  ts_survey:
+    lineage:
+      - datalake_customer_support.call.ts_csat_answered
+      - datalake_customer_support.call.ts_survey
   ts_solved:
     lineage:
       - datalake_customer_support.call.ts_ticket_ended

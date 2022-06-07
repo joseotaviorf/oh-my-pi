@@ -256,7 +256,9 @@ chat_csat AS(
             WHEN sa.is_solved = FALSE THEN FALSE
             ELSE NULL
         END AS is_solved,
-        CAST(c.ts_attended AS TIMESTAMP) AS ts_survey
+        ss.ts_created AS ts_survey,
+        sa.ts_created AS ts_csat_response,
+        ROW_NUMBER() OVER (PARTITION BY c.id_ticket ORDER BY sa.ts_created DESC) AS rw_number
   FROM
       datalake_chat_fup_clean.chats_chat c
   JOIN 
@@ -404,6 +406,7 @@ SELECT DISTINCT
   cc.csat_score,
   cc.group_name,
   cc.ts_survey,
+  cc.ts_csat_response,
   ct.dt_start AS dt_agent_start,
   ct.ts_created,
   ct.ts_updated,
@@ -428,6 +431,7 @@ LEFT JOIN
 LEFT JOIN
   chat_csat cc
     ON cc.id_ticket = zd.id_ticket
+    AND cc.rw_number = 1
 LEFT JOIN
   last_back_ticket bt
     ON bt.front_ticket = zd.id_ticket

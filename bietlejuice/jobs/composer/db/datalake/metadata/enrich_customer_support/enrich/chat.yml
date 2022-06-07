@@ -203,6 +203,9 @@ columns:
   ts_survey:
     lineage:
       - datalake_chat_fup_clean.chats_chat.ts_attended
+  ts_csat_response:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.ts_created
   ts_created:
     lineage:
       - datalake_quinto_messenger.task.ts_created

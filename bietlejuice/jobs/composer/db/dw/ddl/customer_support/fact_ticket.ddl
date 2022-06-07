@@ -40,9 +40,12 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_ticket (
     total_minutes_handling_time FLOAT,
     total_backoffice_minutes_time FLOAT,
     total_minutes_front_to_open_back_ticket_time FLOAT,
+    csat_comment VARCHAR(2000),
     ts_started TIMESTAMP,
     ts_closed TIMESTAMP,
     ts_solved TIMESTAMP,
+    ts_csat_response TIMESTAMP,
+    ts_survey TIMESTAMP,
     ts_load TIMESTAMP
 );
 ALTER TABLE customer_support.fact_ticket OWNER TO airflow;
