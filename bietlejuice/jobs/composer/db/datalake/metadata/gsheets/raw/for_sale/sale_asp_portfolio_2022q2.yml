@@ -6,3 +6,7 @@ columns:
     tags:
       - PII
       - Confidential
+  asp_name:
+    tags:
+      - PII
+      - Confidential
