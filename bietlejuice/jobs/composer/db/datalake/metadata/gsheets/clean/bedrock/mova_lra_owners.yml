@@ -20,9 +20,6 @@ columns:
   delay_interest:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.juros_mora
-  dt_created_at:
-    lineage:
-      - datalake_gsheets_raw.mova_lra_owners.created_at
   dt_expiration:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.data_vencimento
@@ -95,3 +92,6 @@ columns:
   sk_product:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.produto_id
+  ts_created_at:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.created_at
