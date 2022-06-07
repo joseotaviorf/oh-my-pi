@@ -23,6 +23,9 @@ columns:
   id_contract:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.metadata
+  id_offer:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.metadata
   cost_center_code:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.cost_center_code

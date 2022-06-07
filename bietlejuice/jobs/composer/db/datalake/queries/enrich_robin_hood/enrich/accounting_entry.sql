@@ -1,11 +1,12 @@
 SELECT
-    id, 
+    id,
     id_external,
     id_source,
     id_payee,
     GET_JSON_OBJECT(metadata, '$.lead-id') as id_lead,
     GET_JSON_OBJECT(metadata, '$.house-id') as id_house,
     GET_JSON_OBJECT(metadata, '$.contract-id') as id_contract,
+    GET_JSON_OBJECT(metadata, '$.offer-id') as id_offer,
     cost_center_code,
     source_bill_item,
     description,
