@@ -13,11 +13,12 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline creates the following full tables in the schema `dw_datamarts` of data lake:
 
 - `buyer_first_visit_intent`
+- `dim_house_listing_amenities`
 - `liquidity_by_sk_region`
+- `neighborhood_competition`
 - `repressed_demand_sale`
 - `sale_ongoing_listings_casa_mineira`
 - `temp_autonomous_agents_listings`
-- `dim_house_listing_amenities`
 
 
 ### Responsible Data Engineering Team

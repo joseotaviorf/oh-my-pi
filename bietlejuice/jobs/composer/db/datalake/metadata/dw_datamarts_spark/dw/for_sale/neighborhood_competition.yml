@@ -1,5 +1,5 @@
 ---
-database_name: dw_datamarts_for_sale
+database_name: dw_datamarts
 table_name: neighborhood_competition
 columns:
   week_start:
@@ -22,3 +22,4 @@ columns:
       - dw_public.dim_region.name
       - dw_datamarts_for_sale.em_casa_house_listing_flows.neighborhood
       - dw_datamarts_for_sale.loft_status_listing_flows.neighborhood
+ 

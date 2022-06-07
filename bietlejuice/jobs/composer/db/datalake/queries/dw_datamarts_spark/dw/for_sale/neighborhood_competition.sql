@@ -8,12 +8,12 @@ WITH quintoandar_metrics AS (
             f.status_history,
             f.is_last_status,
             ROW_NUMBER() OVER (PARTITION BY f.sk_sale_listing ORDER BY f.ts_status_started) AS order_status,
-            TO_DATE(CAST(NULLIF(sk_status_start_date, -1) AS VARCHAR), 'yyyyMMdd') AS ts_started_date,
-            TO_DATE(CAST(NULLIF(sk_status_end_date, -1) AS VARCHAR), 'yyyyMMdd') AS ts_ended_date
+            TO_DATE(CAST(sk_status_start_date AS STRING), 'yyyyMMdd') AS ts_started_date,
+            TO_DATE(CAST(sk_status_end_date AS STRING), 'yyyyMMdd') AS ts_ended_date
         FROM 
-            sale.fact_listing_status AS f
+            dw_sale.fact_listing_status AS f
         LEFT JOIN 
-            public.dim_region AS r
+            dw_public.dim_region AS r
                 USING(sk_region)
         ),
         aux_ongoing_listings AS (
@@ -49,9 +49,9 @@ WITH quintoandar_metrics AS (
             FROM 
                 base_ongoing_listings AS b
             JOIN 
-                public.dim_date AS d
+                dw_public.dim_date AS d
                     ON d.date BETWEEN b.ts_started_date
-                    AND COALESCE(b.ts_ended_date, DATEADD(day, -1, CURRENT_DATE))
+                    AND COALESCE(b.ts_ended_date, DATE_ADD(CURRENT_DATE, -1))
         ),
         ongoing_listings AS (
             SELECT 
@@ -59,18 +59,18 @@ WITH quintoandar_metrics AS (
                 sk_region, 
                 city, 
                 neighborhood,
-                SUM(0) AS property_listings,
-                SUM(0) AS uniqueness_listings,
+                NULL AS property_listings,
+                NULL AS uniqueness_listings,
                 COUNT(
                     DISTINCT 
                         CASE 
                             WHEN status_history = 'PUBLISHED' AND week_end = date THEN sk_house 
                             ELSE NULL 
                         END) AS ongoing_listings,
-                SUM(0) AS publications,
-                SUM(0) AS depublications,
-                SUM(0) AS first_listings,
-                SUM(0) AS republications
+                NULL AS publications,
+                NULL AS depublications,
+                NULL AS first_listings,
+                NULL AS republications
             FROM 
                 aux_ongoing_listings
             GROUP BY 
@@ -91,12 +91,12 @@ WITH quintoandar_metrics AS (
                 r.city_name AS city,
                 r.name AS neighborhood
             FROM
-                sale.fact_listing_status AS ls
+                dw_sale.fact_listing_status AS ls
             LEFT JOIN
-                public.dim_date AS d 
+                dw_public.dim_date AS d 
                     ON d.sk_date = ls.sk_status_start_date
             LEFT JOIN 
-                public.dim_region AS r 
+                dw_public.dim_region AS r 
                     USING(sk_region)
         ),
         publications_logic AS (
@@ -141,9 +141,9 @@ WITH quintoandar_metrics AS (
                 sk_region,
                 city,
                 neighborhood,
-                SUM(0) AS property_listings,
-                SUM(0) AS uniqueness_listings,
-                SUM(0) AS ongoing_listings,
+                SUM(NULL) AS property_listings,
+                SUM(NULL) AS uniqueness_listings,
+                SUM(NULL) AS ongoing_listings,
                 SUM(publications) AS publications,
                 SUM(depublications) AS depublications,
                 SUM(first_listings) AS first_listings,
@@ -155,34 +155,34 @@ WITH quintoandar_metrics AS (
         ),
         union_metrics AS (
             SELECT 
-                week_start::VARCHAR,
-                sk_region::VARCHAR,
-                city::VARCHAR,
-                neighborhood::VARCHAR,
-                property_listings::BIGINT,
-                uniqueness_listings::BIGINT,
-                ongoing_listings::BIGINT,
-                publications::BIGINT,
-                depublications::BIGINT,
-                first_listings::BIGINT,
-                republications::BIGINT
+                week_start,
+                sk_region,
+                city,
+                neighborhood,
+                property_listings,
+                uniqueness_listings,
+                ongoing_listings,
+                publications,
+                depublications,
+                first_listings,
+                republications
             FROM 
                 ongoing_listings
             ----------------
             UNION ALL 
             ----------------
             SELECT 
-                week_start::VARCHAR,
-                sk_region::VARCHAR,
-                city::VARCHAR,
-                neighborhood::VARCHAR,
-                property_listings::BIGINT,
-                uniqueness_listings::BIGINT,
-                ongoing_listings::BIGINT,
-                publications::BIGINT,
-                depublications::BIGINT,
-                first_listings::BIGINT,
-                republications::BIGINT
+                week_start,
+                sk_region,
+                city,
+                neighborhood,
+                property_listings,
+                uniqueness_listings,
+                ongoing_listings,
+                publications,
+                depublications,
+                first_listings,
+                republications
             FROM 
                 publications
         ) 
@@ -216,9 +216,9 @@ casa_mineira_metrics AS (
                     RANK() OVER (PARTITION BY r.id_revisionable ORDER BY r.ts_created DESC) AS rw,
                     r.ts_created AS dt_revision_created
                 FROM 
-                    datalake_casa_mineira_crm_clean_prod.revisions AS r
+                    datalake_casa_mineira_crm_clean.revisions AS r
                     INNER JOIN 
-                        datalake_casa_mineira_crm_clean_prod.house_status AS hs 
+                        datalake_casa_mineira_crm_clean.house_status AS hs 
                         ON hs.id = r.new_value
                 WHERE 
                     r.revision_key = 'status_id'
@@ -236,7 +236,7 @@ casa_mineira_metrics AS (
         FROM 
             aux
         LEFT JOIN 
-            datalake_casa_mineira_crm_clean_prod.house AS h 
+            datalake_casa_mineira_crm_clean.house AS h 
                 ON h.id = aux.id_house
         WHERE
             h.id_house_quintoandar IS NULL
@@ -249,7 +249,7 @@ casa_mineira_metrics AS (
             h.ts_published,
             h.ts_disabled
         FROM 
-            datalake_casa_mineira_crm_clean_prod.house AS h
+            datalake_casa_mineira_crm_clean.house AS h
         WHERE
             h.id_status = 3 
             AND h.id_house_quintoandar IS NULL
@@ -279,12 +279,12 @@ casa_mineira_metrics AS (
             hs_new_value.house_status_name AS status,
             r.ts_created AS dt_revision_created
         FROM 
-            datalake_casa_mineira_crm_clean_prod.revisions AS r
+            datalake_casa_mineira_crm_clean.revisions AS r
         INNER JOIN 
-            datalake_casa_mineira_crm_clean_prod.house_status AS hs_new_value 
+            datalake_casa_mineira_crm_clean.house_status AS hs_new_value 
                 ON hs_new_value.id = r.new_value
         LEFT JOIN 
-            datalake_casa_mineira_crm_clean_prod.house AS h 
+            datalake_casa_mineira_crm_clean.house AS h 
                 ON h.id = r.id_revisionable 
         WHERE
             r.revision_key = 'status_id' 
@@ -298,9 +298,9 @@ casa_mineira_metrics AS (
                 dt_revision_created AS dt_start_status_date
             FROM 
                 daily_other_status_listings
-            -----------------
+
             UNION
-            -----------------
+
             SELECT 
                 id_house,
                 status,
@@ -333,19 +333,19 @@ casa_mineira_metrics AS (
         FROM 
             range_date AS rg
         LEFT JOIN 
-            datalake_casa_mineira_crm_clean_prod.house AS h 
+            datalake_casa_mineira_crm_clean.house AS h 
                 ON  h.id = rg.id_house
         LEFT JOIN 
-            datalake_casa_mineira_crm_clean_prod.neighborhood AS nu
+            datalake_casa_mineira_crm_clean.neighborhood AS nu
                 ON nu.id = h.id_neighborhood
         LEFT JOIN 
-            datalake_casa_mineira_crm_clean_prod.city AS ctu
+            datalake_casa_mineira_crm_clean.city AS ctu
                 ON ctu.id = nu.id_city
         LEFT JOIN 
-            datalake_casa_mineira_crm_clean_prod.uf AS uf
+            datalake_casa_mineira_crm_clean.uf AS uf
                 ON uf.id = ctu.id_uf
         INNER JOIN 
-            public.dim_date AS dd 
+            dw_public.dim_date AS dd 
                 ON (dd.date BETWEEN DATE(dt_start_status_date)
                   AND COALESCE(DATE(rg.dt_end_status_date), current_date -1))
         WHERE
@@ -360,7 +360,8 @@ casa_mineira_metrics AS (
         neighborhood,
         SUM(0) AS property_listings,
         SUM(0) AS uniqueness_listings,
-        COUNT(DISTINCT 
+        COUNT(
+            DISTINCT 
                 CASE 
                     WHEN week_end = date THEN id_house 
                     ELSE NULL 
@@ -387,7 +388,7 @@ loft_metrics AS (
             DATE(ts_started_date) AS ts_started_date,
             DATE(ts_ended_date) AS ts_ended_date
         FROM 
-            datamarts.loft_status_listing_flows
+            dw_datamarts_for_sale.loft_status_listing_flows
     ), 
     ongoing_listings AS (
         SELECT 
@@ -403,9 +404,9 @@ loft_metrics AS (
         FROM 
             base AS b
         JOIN 
-            public.dim_date AS d
+            dw_public.dim_date AS d
                 ON d.date BETWEEN b.ts_started_date
-                AND COALESCE(b.ts_ended_date,  DATEADD(day, -1, CURRENT_DATE))
+                AND COALESCE(b.ts_ended_date, DATE_ADD(CURRENT_DATE, -1))
         WHERE 
             d.week_start >= TO_DATE('20210601', 'yyyyMMdd')
         GROUP BY 
@@ -462,7 +463,7 @@ loft_metrics AS (
     FROM 
         ongoing_listings AS ol 
     LEFT JOIN 
-        datamarts.loft_house_listing AS h
+        dw_datamarts_for_sale.loft_house_listing AS h
             ON ol.sk_house = h.id_house
     GROUP BY 
         1, 2, 3, 4, 5
@@ -479,7 +480,7 @@ em_casa_metrics AS (
             DATE(ts_started_date) AS ts_started_date,
             DATE(ts_ended_date) AS ts_ended_date
         FROM 
-            datamarts.em_casa_house_listing_flows
+            dw_datamarts_for_sale.em_casa_house_listing_flows
     ),
     ongoing_listings AS (
         SELECT 
@@ -495,9 +496,9 @@ em_casa_metrics AS (
         FROM 
             base AS b
         JOIN 
-            public.dim_date AS d
+            dw_public.dim_date AS d
                 ON d.date BETWEEN b.ts_started_date
-                AND COALESCE(b.ts_ended_date,  DATEADD(day, -1, CURRENT_DATE))
+                AND COALESCE(b.ts_ended_date, DATE_ADD(CURRENT_DATE, -1))
         WHERE 
             week_start >= TO_DATE('20210601', 'yyyyMMdd')
         GROUP BY 
@@ -554,81 +555,98 @@ em_casa_metrics AS (
     FROM 
         ongoing_listings AS ol 
     LEFT JOIN 
-        datamarts.em_casa_house_listing AS h
+        dw_datamarts_for_sale.em_casa_house_listing AS h
             ON ol.sk_house = h.id_house
     GROUP BY 
         1, 2, 3, 4, 5
 ),
 all_metrics AS (
     SELECT 
-        week_start::DATE,
-        player::VARCHAR, 
-        sk_region::VARCHAR,
-        city::VARCHAR,
-        neighborhood::VARCHAR,
-        property_listings::BIGINT,
-        uniqueness_listings::BIGINT,
-        ongoing_listings::BIGINT,
-        publications::BIGINT,
-        depublications::BIGINT,
-        first_listings::BIGINT,
-        republications::BIGINT
+        week_start,
+        player, 
+        sk_region,
+        city,
+        neighborhood,
+        property_listings,
+        uniqueness_listings,
+        ongoing_listings,
+        publications,
+        depublications,
+        first_listings,
+        republications 
     FROM 
         quintoandar_metrics
     ---------
     UNION ALL
     ---------
     SELECT 
-        week_start::DATE,
-        player::VARCHAR, 
-        sk_region::VARCHAR,
-        city::VARCHAR,
-        neighborhood::VARCHAR,
-        property_listings::BIGINT,
-        uniqueness_listings::BIGINT,
-        ongoing_listings::BIGINT,
-        publications::BIGINT,
-        depublications::BIGINT,
-        first_listings::BIGINT,
-        republications::BIGINT
+        week_start,
+        player, 
+        sk_region,
+        city,
+        neighborhood,
+        property_listings,
+        uniqueness_listings,
+        ongoing_listings,
+        publications,
+        depublications,
+        first_listings,
+        republications
     FROM 
         casa_mineira_metrics
     ---------
     UNION ALL
     ---------
     SELECT 
-        week_start::DATE,
-        player::VARCHAR, 
-        sk_region::VARCHAR,
-        city::VARCHAR,
-        neighborhood::VARCHAR,
-        property_listings::BIGINT,
-        uniqueness_listings::BIGINT,
-        ongoing_listings::BIGINT,
-        publications::BIGINT,
-        depublications::BIGINT,
-        first_listings::BIGINT,
-        republications::BIGINT
+        week_start,
+        player, 
+        sk_region,
+        city,
+        neighborhood,
+        property_listings,
+        uniqueness_listings,
+        ongoing_listings,
+        publications,
+        depublications,
+        first_listings,
+        republications
     FROM 
         loft_metrics
     ---------
     UNION ALL
     ---------
     SELECT 
-        week_start::DATE,
-        player::VARCHAR, 
-        sk_region::VARCHAR,
-        city::VARCHAR,
-        neighborhood::VARCHAR,
-        property_listings::BIGINT,
-        uniqueness_listings::BIGINT,
-        ongoing_listings::BIGINT,
-        publications::BIGINT,
-        depublications::BIGINT,
-        first_listings::BIGINT,
-        republications::BIGINT
+        week_start,
+        player, 
+        sk_region,
+        city,
+        neighborhood,
+        property_listings,
+        uniqueness_listings,
+        ongoing_listings,
+        publications,
+        depublications,
+        first_listings,
+        republications
     FROM 
         em_casa_metrics
+),
+enrich_metrics AS (
+    SELECT 
+        CAST(week_start AS DATE) AS week_start,
+        player, 
+        sk_region,
+        city,
+        neighborhood,
+        CAST(property_listings AS BIGINT) AS property_listings,
+        CAST(uniqueness_listings AS BIGINT) AS uniqueness_listings,
+        CAST(ongoing_listings AS BIGINT) AS ongoing_listings,
+        CAST(publications AS BIGINT) AS publications,
+        CAST(depublications AS BIGINT) AS depublications,
+        CAST(first_listings AS BIGINT) AS first_listings,
+        CAST(republications AS BIGINT) AS republications
+    FROM 
+        all_metrics
 )
 SELECT 
     week_start,
