@@ -14,6 +14,7 @@ This pipeline creates the tables in the schema `dw_datamart` of data lake and `d
 
 - buyer_activation_events_combo
 - casa_mineira_top_of_funnel_volumes_monthly
+- performance_marketing_metrics_portal_casa_mineira
 
 ### Additional Information
 
