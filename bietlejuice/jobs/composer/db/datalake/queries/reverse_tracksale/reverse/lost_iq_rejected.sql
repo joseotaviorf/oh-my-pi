@@ -1,4 +1,12 @@
-WITH distinct_offers AS (
+WITH brazil_houses AS (
+  SELECT
+    DISTINCT sk_house_listing
+  FROM
+    dw_public.dim_house_listing
+  WHERE
+    country_code = 'BR'
+),
+distinct_offers AS (
     SELECT 
         rf.sk_client, 
         rf.sk_offer,
@@ -6,6 +14,9 @@ WITH distinct_offers AS (
         rf.sk_offer_submitted_date,
         rf.sk_offer_approved_date
     FROM dw_public.fact_listing_rent_flows rf
+    INNER JOIN
+        brazil_houses h
+          ON rf.sk_house_listing = h.sk_house_listing
     WHERE sk_offer > 0
     GROUP BY 1,2,3,4,5
 ),
@@ -31,6 +42,8 @@ next_offers AS (
         ON dof.sk_offer = od.sk_offer
     LEFT JOIN dw_public.dim_proposal dp 
         ON dp.sk_proposal = od.sk_proposal 
+    WHERE
+        dof.country_code = 'BR'
  ),
 first_offer_city AS (
     SELECT 
@@ -47,7 +60,9 @@ distinct_bookings AS (
     FROM dw_public.fact_listing_rent_flows rf
     INNER JOIN dw_public.dim_region dr 
         ON dr.sk_region = rf.sk_region  
-    WHERE rf.sk_booking_created_date > 0
+    WHERE 
+        rf.sk_booking_created_date > 0
+        AND dr.id_country = 1
     GROUP BY 1,2,3
 ),
 distinct_documentations AS (
@@ -76,6 +91,7 @@ active_contracts AS (
         ON rf.sk_contract = dc.sk_contract 
     WHERE rf.sk_contract_signed_date >0
         AND dc.status = 'Ativo'
+        AND dc.country_code = 'BR'
     GROUP BY 1
 ),
 positive_credit_evaluations AS (

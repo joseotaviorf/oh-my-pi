@@ -2,56 +2,58 @@ WITH new_contracts AS (
 	SELECT
 		dc.sk_contract,
 		'Onboarding' AS step
-	FROM 
+	FROM
         dw_public.dim_contract dc
-	INNER JOIN 
-        dw_public.fact_listing_rent_flows rf 
+	INNER JOIN
+        dw_public.fact_listing_rent_flows rf
 		    ON dc.sk_contract = rf.sk_contract
-		    AND rf.sk_contract_signed_date > 0 
-	INNER JOIN 
-        dw_public.dim_house_listing dhl 
-		    ON dhl.sk_house_listing = rf.sk_house_listing	
-	LEFT JOIN 
+		    AND rf.sk_contract_signed_date > 0
+	INNER JOIN
+        dw_public.dim_house_listing dhl
+		    ON dhl.sk_house_listing = rf.sk_house_listing
+	LEFT JOIN
         dw_datamarts_for_rent.contract_termination ct
     	    ON dc.sk_contract = ct.sk_contract
 	WHERE
-        dc.dt_start = DATE_ADD(current_date,-10) 
-		AND dhl.is_b2b = false 
+        dc.dt_start = DATE_ADD(current_date,-10)
+		AND dhl.is_b2b = false
 		AND dc.status = 'Ativo'
 		AND ((ct.dt_termination > dc.dt_start) OR (ct.dt_termination IS NULL))
+		AND dhl.country_code = 'BR'
+		AND dc.country_code = 'BR'
 	GROUP BY 1,2
 ),
 crisis_users AS (
-	SELECT 
+	SELECT
 		ft.sk_contract
-	FROM 
+	FROM
         dw_tickets.dim_ticket dt
-	INNER JOIN 
-        dw_tickets.fact_tickets ft 
+	INNER JOIN
+        dw_tickets.fact_tickets ft
 		    ON dt.sk_ticket = ft.sk_ticket
-	INNER JOIN 
-        datalake_gsheets_clean.department_control dc 
+	INNER JOIN
+        datalake_gsheets_clean.department_control dc
 		    ON dt.group_name = dc.department
-	WHERE 
-        dc.team IN ('Casos Especiais','Proteção 5A','Ouvidoria','ReclameAqui') 
-	    AND ft.sk_closed_date_local = -1 
+	WHERE
+        dc.team IN ('Casos Especiais','Proteção 5A','Ouvidoria','ReclameAqui')
+	    AND ft.sk_closed_date_local = -1
 	GROUP BY 1
 ),
 onboarding_contracts AS (
-	SELECT 
+	SELECT
 		c.sk_contract,
 		'Onboarding' AS step
-	FROM 
+	FROM
         new_contracts c
-	LEFT JOIN 
-        crisis_users uc 
+	LEFT JOIN
+        crisis_users uc
 		    ON uc.sk_contract = c.sk_contract
-	WHERE 
-        uc.sk_contract IS NULL 
+	WHERE
+        uc.sk_contract IS NULL
 	GROUP BY 1,2
 ),
 owners AS (
-	SELECT 
+	SELECT
 		cp.cpf,
 		cp.id_user,
 		cp.name,
@@ -59,14 +61,14 @@ owners AS (
 		cp.phone_number,
 		ac.sk_contract,
 		ac.step
-	FROM 
-        onboarding_contracts ac 
-	INNER JOIN 
-        datalake_ebdb_clean.contract_person cp 
+	FROM
+        onboarding_contracts ac
+	INNER JOIN
+        datalake_ebdb_clean.contract_person cp
 		    ON ac.sk_contract = cp.id_contract
-		    AND cp.type in ('Proprietario') 
+		    AND cp.type in ('Proprietario')
 )
-SELECT 
+SELECT
 	name AS customer_name,
 	email AS customer_email,
 	phone_number AS customer_phone,
@@ -79,7 +81,7 @@ SELECT
 	sk_contract AS id_driver
 FROM owners
 UNION ALL
-SELECT 
+SELECT
 	'Teste Disparo' AS customer_name,
 	'testes.disparos.5a@gmail.com' AS customer_email,
 	'+5511123456789' AS customer_phone,

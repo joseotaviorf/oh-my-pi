@@ -1,32 +1,44 @@
-WITH ev AS (
-  SELECT DISTINCT
-      TO_DATE(STRING(COALESCE(NULLIF(fo.sk_offer_dismissed_date,-1),NULLIF(fo.sk_offer_submitted_date,-1))), 'yyyyMMdd') AS dt_event,
-      dof.offer_status,
-      ROW_NUMBER() OVER (PARTITION BY sf.sk_buyer ORDER BY NULLIF(fo.sk_offer_dismissed_date,-1)) AS rn,
-      sf.sk_house,
-      fo.sk_offer,
-      sf.sk_seller,
-      sf.sk_buyer
-  FROM
-      dw_sale.fact_sale_flows sf
-  JOIN 
-      dw_sale.fact_offers fo
-          ON sf.sk_sale_flow = fo.sk_sale_flow
-  JOIN 
-      dw_sale.dim_offer dof
-        ON dof.sk_offer = fo.sk_offer 
-          AND dof.offer_status IN ('Offer Rejected', 'OFFER_REJECTED')
+WITH brazil_houses AS (
+    SELECT
+        DISTINCT id_house
+    FROM
+        dw_public.dim_house_listing
+    WHERE
+        country_code = 'BR'
+),
+ev AS (
+    SELECT DISTINCT
+        TO_DATE(STRING(COALESCE(NULLIF(fo.sk_offer_dismissed_date,-1),NULLIF(fo.sk_offer_submitted_date,-1))), 'yyyyMMdd') AS dt_event,
+        dof.offer_status,
+        ROW_NUMBER() OVER (PARTITION BY sf.sk_buyer ORDER BY NULLIF(fo.sk_offer_dismissed_date,-1)) AS rn,
+        sf.sk_house,
+        fo.sk_offer,
+        sf.sk_seller,
+        sf.sk_buyer
+    FROM
+        dw_sale.fact_sale_flows sf
+    INNER JOIN
+        brazil_houses dh
+            ON sf.sk_house = dh.id_house
+    JOIN
+        dw_sale.fact_offers fo
+            ON sf.sk_sale_flow = fo.sk_sale_flow
+    JOIN
+        dw_sale.dim_offer dof
+            ON dof.sk_offer = fo.sk_offer
+            AND dof.offer_status IN ('Offer Rejected', 'OFFER_REJECTED')
 ),
 rent_visits AS (
-    SELECT 
-        id_visitor, 
+    SELECT
+        id_visitor,
         MAX(dt_scheduling) AS dt_visit_rent
-    FROM 
+    FROM
         dw_public.dim_booking
-    WHERE 
-        visit_intent = 'RENT' AND
-        type = 'Visita' AND
-        visit_follow_up = 'VaiNegociar'
+    WHERE
+        visit_intent = 'RENT'
+        AND type = 'Visita'
+        AND visit_follow_up = 'VaiNegociar'
+        AND country_code = 'BR'
     GROUP BY 1
 ),
 base AS (
@@ -36,32 +48,32 @@ base AS (
         ev.sk_offer AS id_offer,
         du.sk_user AS id_user,
         du.cpf,
-        du.nome, 
-        du.email, 
-        du.telefone_principal, 
-        du.cidade, 
+        du.nome,
+        du.email,
+        du.telefone_principal,
+        du.cidade,
         du.estado_nome
-    FROM 
-        ev 
-    JOIN 
-        dw_public.dim_user du 
+    FROM
+        ev
+    JOIN
+        dw_public.dim_user du
             ON ev.sk_buyer = du.sk_user
-    WHERE 
+    WHERE
         rn = 1
 ),
 visits AS (
-    SELECT 
+    SELECT
         vb.sk_buyer,
         MAX(sk_visit_date) AS dt_last_schedule_visit
-    FROM 
-        dw_sale.fact_visits vb 
+    FROM
+        dw_sale.fact_visits vb
     GROUP BY 1
 ),
 offers AS (
-    SELECT 
+    SELECT
         sk_buyer AS id_buyer,
         MAX(sk_offer_submitted_date) AS dt_last_offer_sent
-    FROM 
+    FROM
         dw_sale.fact_offers
     GROUP BY 1
 ),
@@ -70,7 +82,7 @@ sale_flows_events AS (
         sk_buyer,
         MAX(sk_sale_agreement_signed_date) AS dt_last_sale_agreement_signed,
         MAX(sk_house_registry_ended_date) AS dt_last_house_registry_ended
-    FROM 
+    FROM
         dw_sale.fact_sale_flows
     GROUP BY 1
 )
@@ -87,20 +99,20 @@ SELECT
     b.id_offer AS id_driver,
     CASE WHEN rv.id_visitor IS NULL THEN 'Sale' ELSE 'Híbrido' END AS business_context,
     NOW() AS ts_load
-FROM 
-    base b 
-LEFT JOIN 
-    rent_visits rv 
+FROM
+    base b
+LEFT JOIN
+    rent_visits rv
         ON rv.id_visitor = b.id_buyer AND rv.dt_visit_rent BETWEEN DATE_SUB(b.dt_event, 30) AND DATE_ADD(b.dt_event, 30)
-JOIN 
-    visits v 
+JOIN
+    visits v
         ON v.sk_buyer = b.id_buyer AND (TO_DATE(STRING(NULLIF(v.dt_last_schedule_visit,-1)), 'yyyyMMdd') <= b.dt_event OR NULLIF(v.dt_last_schedule_visit,-1) IS NULL)
-JOIN 
-    offers o 
+JOIN
+    offers o
         ON o.id_buyer = b.id_buyer AND (TO_DATE(STRING(NULLIF(o.dt_last_offer_sent, -1)), 'yyyyMMdd') <= b.dt_event OR NULLIF(o.dt_last_offer_sent, -1) IS NULL)
-JOIN 
-    sale_flows_events sf 
-        ON sf.sk_buyer = b.id_buyer 
+JOIN
+    sale_flows_events sf
+        ON sf.sk_buyer = b.id_buyer
             AND (TO_DATE(STRING(NULLIF(sf.dt_last_sale_agreement_signed,-1)), 'yyyyMMdd') <= b.dt_event OR NULLIF(sf.dt_last_sale_agreement_signed,-1) IS NULL)
             AND (TO_DATE(STRING(NULLIF(sf.dt_last_house_registry_ended,-1)), 'yyyyMMdd') <= b.dt_event OR NULLIF(sf.dt_last_house_registry_ended,-1) IS NULL)
 WHERE

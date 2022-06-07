@@ -7,7 +7,7 @@ WITH depublished_listings AS (
         dw_public.fact_house_listings fhl
 	INNER JOIN 
         dw_public.dim_house_listing dhl 
-		    ON dhl.sk_house_listing = fhl.sk_house_listing		
+			ON dhl.sk_house_listing = fhl.sk_house_listing		
 	INNER JOIN 
         dw_public.fact_house_listing_status fls 
             ON fls.sk_house_listing = fhl.sk_house_listing
@@ -18,6 +18,7 @@ WITH depublished_listings AS (
 		AND dhl.is_b2b = false
 		AND dhl.is_for_sale = false
 		AND dhl.version > 0
+        AND dhl.country_code = 'BR'
 	GROUP BY 1,2,3 
 ),
 first_depublication AS (
