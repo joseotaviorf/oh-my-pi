@@ -26,6 +26,9 @@ columns:
   current_status:
     lineage:
       - datalake_jira_clean.issues.fields
+  current_status_category:
+    lineage:
+      - datalake_jira_clean.issues.fields
   assignee:
     lineage:
       - datalake_jira_clean.issues.fields
@@ -57,6 +60,9 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
   story_points:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  dt_started:
     lineage:
       - datalake_jira_clean.issues.fields
   ts_created:
