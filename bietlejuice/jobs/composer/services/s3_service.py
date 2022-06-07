@@ -111,3 +111,23 @@ class S3Service:
         return list(
             filter(lambda x: x.endswith(".sql"), self.list_objects(s3_file_path))
         )
+
+    @logger
+    def delete_object(self, s3_object_path):
+        """
+        Delete a specific object from s3.
+        :param s3_object_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/object"
+        :return: None
+        """
+        bucket_name, key = self._split_s3_path(s3_object_path)
+        self.s3_resource.Object(bucket_name, key).delete()
+
+    @logger
+    def create_empty_object(self, s3_object_path):
+        """
+        Create a empty object in an s3 bucket.
+        :param s3_object_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/object"
+        :return: None
+        """
+        bucket_name, key = self._split_s3_path(s3_object_path)
+        self.s3_resource.Bucket(bucket_name).put_object(Key=key)

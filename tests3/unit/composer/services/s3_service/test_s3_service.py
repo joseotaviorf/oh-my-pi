@@ -85,6 +85,44 @@ def test_list_sql_files():
 
 
 @mock_s3
+def test_create_empty_object():
+    # arrange
+
+    set_up()
+    file_path = f"s3://{BUCKET}/{FOLDER}/test_file.sql"
+    folder_path = f"s3://{BUCKET}/{FOLDER}"
+    s3_service = S3Service(boto3.resource("s3", region_name="us-east-1"))
+
+    # act
+    s3_service.create_empty_object(file_path)
+    sql_files = s3_service.list_sql_files(folder_path)
+
+    # assert
+    assert file_path in sql_files
+
+    tear_down()
+
+
+@mock_s3
+def test_delete_object():
+    # arrange
+
+    set_up()
+    file_path = f"s3://{BUCKET}/{FOLDER}/test_file.sql"
+    folder_path = f"s3://{BUCKET}/{FOLDER}"
+    s3_service = S3Service(boto3.resource("s3", region_name="us-east-1"))
+
+    # act
+    s3_service.delete_object(file_path)
+    sql_files = s3_service.list_sql_files(folder_path)
+
+    # assert
+    assert file_path not in sql_files
+
+    tear_down()
+
+
+@mock_s3
 def test_upload_file():
     # arrange
 
