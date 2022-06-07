@@ -490,7 +490,7 @@ SELECT
     bt.total_minutes_handling_time,
     bt.total_backoffice_minutes_time,
     bt.total_minutes_front_to_open_back_ticket_time,
-    bt.csat_comment,
+    SUBSTR(bt.csat_comment,1,1000) AS csat_comment,
     bt.ts_started,
     bt.ts_closed,
     bt.ts_solved,
