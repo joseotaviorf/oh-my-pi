@@ -1226,6 +1226,7 @@ bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
 
 bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:
   - bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
+  - bietlejuice.gsheets:load-clean-casa-mineira-marketing-cost-taxonomy
 
 bietlejuice.enrich_casa_mineira_marketing_manual_daily_costs:
   - bietlejuice.gsheets.growth_intraday:load-clean-casa-mineira-marketing-manual-shared-costs
@@ -1601,6 +1602,7 @@ bietlejuice.enrich_losses:
 
 bietlejuice.enrich_marketing_automatic_daily_costs:
   - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
+  - bietlejuice.gsheets.growth:load-clean-marketing-cost-taxonomy
 
 bietlejuice.enrich_marketing_costs_offline:
   - bietlejuice.marketing_offline_costs:load-clean-marketing-offline-budget
@@ -1893,8 +1895,9 @@ bietlejuice.enrich_top_of_funnel_portal_cm:
 
 bietlejuice.enrich_top_of_funnel_supply:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
+  - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.gsheets.growth:load-clean-marketing-cost-taxonomy
 
 bietlejuice.enrich_tracked_events:
   - bietlejuice.casa_mineira_crm:load-clean-contact

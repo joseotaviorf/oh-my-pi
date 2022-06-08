@@ -192,6 +192,12 @@ full_taxonomy_new_test:
     clean_table_name: taxonomy_mkt_cost_new_test
     sheet_context: growth
 
+marketing_cost_taxonomy:
+    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
+    sheet_name: Oficial Taxonomy Composer
+    clean_table_name: marketing_cost_taxonomy
+    sheet_context: growth
+
 offline_manual_costs:
     sheet_id: 1gneeE6l30lv4om6FBEUe23YGfbMCCNe8IwpbCRL6vXQ
     sheet_name: offline_manual_costs

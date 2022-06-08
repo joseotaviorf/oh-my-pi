@@ -48,20 +48,20 @@ columns:
       - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_completion
   mkt_origin:
     lineage:
-      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_origin
       - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.mkt_origin
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_origin
   mkt_channel:
     lineage:
-      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_channel
       - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.mkt_channel
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_channel
   mkt_medium:
     lineage:
-      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_medium
       - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.mkt_medium
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_medium
   mkt_source:
     lineage:
-      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_source
       - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.mkt_source
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_source
   cost:
     lineage:
       - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.desktop_cost
@@ -73,8 +73,7 @@ columns:
       - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.cost_share_mobile
       - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.cost_share_other
       - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.cost_factor
-      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
   funnel_side:
     lineage:
-      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.side
       - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.side
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.side

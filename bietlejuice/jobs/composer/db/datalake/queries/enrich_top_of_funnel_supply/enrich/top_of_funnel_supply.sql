@@ -1,95 +1,110 @@
-WITH
-    events AS (
-        SELECT
-            DATE(ts_event) AS date,
-            DATE(DATE_TRUNC('WEEK', ts_event)) AS week,
-            MONTH(ts_event) AS month,
-            EXTRACT(QUARTER FROM ts_event) AS quarter,
-            CAST(GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS STRING) AS utm_campaign,
-            COUNT(distinct id_amplitude) AS unique_user
-        FROM
-            datalake_amplitude_clean.events
-        WHERE
-            event_type IN ('landing_page_viewed', 'price_suggestion_page_viewed', 'price_suggestion_sale_page_viewed') 
-            AND id_app = 183047
-            AND DATE(ts_event) = DATE('{year}-{month}-{day}')
-            AND CAST(GET_JSON_OBJECT(user_properties, '$.utm_source') AS STRING) in ('google', 'facebook')
-            AND CAST(GET_JSON_OBJECT(user_properties, '$.utm_medium') AS STRING) in ('cpc', 'display', 'performance_max')
-            AND LOWER(CAST(GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS STRING)) NOT LIKE '%branded%' 
-            AND LOWER(CAST(GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS STRING)) NOT LIKE '%demand%'
-        GROUP BY 
-            1,2,3,4,5
-    ),
-    regions AS (
-            SELECT
-                DISTINCT
-                    city_group,
-                    tier
-            FROM
-                datalake_region.region
-    ),
-    taxonomy AS (
-        SELECT
-            id_date, 
-            account_name, 
-            utm_campaign, 
-            utm_term, 
-            utm_content, 
-            city_group, 
-            campaign_origin_acquisition, 
-            mkt_category,
-            mkt_flow,
-            mkt_completion,
-            campaign_name, 
-            mkt_origin, 
-            mkt_channel, 
-            mkt_medium, 
-            mkt_source, 
-            mkt_platform, 
-            funnel_side, 
-            flow_type, 
-            ROW_NUMBER() OVER (PARTITION BY utm_campaign ORDER BY id_date DESC) AS order_l
-        FROM
-            datalake_marketing_costs.daily_costs
-        WHERE
-            mkt_origin IN ('Owner PWA', 'Price Calculator', 'Owner PWA - Sale', 'Price Calculator - Sale', 'New Channels')
-        GROUP BY
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
-    )
+WITH page_view_events AS (
+    SELECT DISTINCT
+        DATE(ts_event) AS dt_event,
+        up_utm_campaign AS utm_campaign,
+        id_amplitude
+    FROM
+        datalake_amplitude_clean.183047_price_suggestion_page_viewed_events
+    WHERE
+        DATE(ts_event) = DATE('{year}-{month}-{day}')
+        AND up_utm_source IN ('google', 'facebook')
+        AND up_utm_medium IN ('cpc', 'display', 'performance_max')
+        AND LOWER(up_utm_campaign) NOT LIKE '%branded%'
+        AND LOWER(up_utm_campaign) NOT LIKE '%demand%'
+    UNION ALL
+    SELECT DISTINCT
+        DATE(ts_event) AS dt_event,
+        up_utm_campaign AS utm_campaign,
+        id_amplitude
+    FROM
+        datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events
+    WHERE
+        DATE(ts_event) = DATE('{year}-{month}-{day}')
+        AND up_utm_source IN ('google', 'facebook')
+        AND up_utm_medium IN ('cpc', 'display', 'performance_max')
+        AND LOWER(up_utm_campaign) NOT LIKE '%branded%'
+        AND LOWER(up_utm_campaign) NOT LIKE '%demand%'
+    UNION ALL
+    SELECT DISTINCT
+        DATE(ts_event) AS dt_event,
+        up_utm_campaign AS utm_campaign,
+        id_amplitude
+    FROM
+        datalake_amplitude_clean.183047_landing_page_viewed_events
+    WHERE
+        DATE(ts_event) = DATE('{year}-{month}-{day}')
+        AND up_utm_source IN ('google', 'facebook')
+        AND up_utm_medium IN ('cpc', 'display', 'performance_max')
+        AND LOWER(up_utm_campaign) NOT LIKE '%branded%'
+        AND LOWER(up_utm_campaign) NOT LIKE '%demand%'
+),
+page_view_unique_users AS (
+    SELECT
+        dt_event,
+        utm_campaign,
+        COUNT(DISTINCT id_amplitude) AS unique_users
+    FROM
+        page_view_events
+    GROUP BY
+        1,2
+),
+taxonomy AS (
+    SELECT
+        cmm.id_date,
+        cmm.utm_campaign,
+        cmm.utm_term,
+        cmm.utm_content,
+        cmm.city_group,
+        rgn.tier,
+        txn.mkt_origin,
+        txn.mkt_channel,
+        txn.mkt_medium,
+        txn.mkt_source,
+        ROW_NUMBER() OVER (PARTITION BY cmm.utm_campaign ORDER BY id_date DESC) AS campaign_date_order
+    FROM
+        datalake_consolidated_marketing_metrics.consolidated_media_metrics cmm
+    INNER JOIN
+        datalake_gsheets_clean.marketing_cost_taxonomy AS txn
+            ON COALESCE(cmm.account_name, '') = COALESCE(txn.account_name, '')
+            AND COALESCE(cmm.report_type, '') = COALESCE(txn.report_type, '')
+            AND COALESCE(cmm.ad_type, 'other') = COALESCE(txn.ad_type, 'other')
+            AND cmm.origin = txn.origin
+            AND cmm.campaign_origin_acquisition = txn.campaign_origin_acquisition
+    LEFT JOIN
+        datalake_region.region rgn
+            ON cmm.city_group = rgn.city_group
+    WHERE
+        txn.mkt_origin IN (
+            'Owner PWA',
+            'Price Calculator',
+            'Owner PWA - Sale',
+            'Price Calculator - Sale',
+            'New Channels'
+        )
+        AND LOWER(SPLIT(cmm.campaign_name, '[.]')[0]) <> 'zebra'
+    GROUP BY
+        1,2,3,4,5,6,7,8,9,10
+)
 SELECT
-    t.campaign_name,
-    t.account_name,
-    t.utm_campaign,
-    t.utm_term,
-    t.utm_content,
-    t.city_group,
-    r.tier,
-    t.campaign_origin_acquisition,
-    t.mkt_category,
-    t.mkt_flow,
-    t.mkt_completion,
-    t.mkt_origin,
-    t.mkt_medium,
-    t.mkt_source,
-    t.mkt_channel,
-    t.mkt_platform,
-    t.funnel_side,
-    t.flow_type,
-    cte.date AS dt_event,
-    cte.week AS week_start_event,
-    cte.quarter AS quarter_event,
-    IF(cte.quarter < 3, 1, 2) AS half_year_event,
-    SUM(cte.unique_user) AS traffic,
-    year(cte.date) as year,
-    cte.month AS month,
-    day(cte.date) as day
-FROM events cte 
-LEFT JOIN taxonomy t
-    ON t.order_l = 1
-        AND t.utm_campaign = cte.utm_campaign
-LEFT JOIN regions r
-    ON t.city_group = r.city_group
-WHERE
-    t.utm_campaign IS NOT NULL
-GROUP BY 
-    1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26
+    txn.utm_campaign,
+    txn.utm_term,
+    txn.utm_content,
+    txn.city_group,
+    txn.tier,
+    txn.mkt_origin,
+    txn.mkt_channel,
+    txn.mkt_medium,
+    txn.mkt_source,
+    pve.dt_event,
+    SUM(pve.unique_users) AS traffic,
+    YEAR(pve.dt_event) AS year,
+    MONTH(pve.dt_event) AS month,
+    DAY(pve.dt_event) AS day
+FROM
+    page_view_unique_users pve
+INNER JOIN
+    taxonomy txn
+        ON txn.utm_campaign = pve.utm_campaign
+        AND txn.campaign_date_order = 1
+GROUP BY
+    1,2,3,4,5,6,7,8,9,10

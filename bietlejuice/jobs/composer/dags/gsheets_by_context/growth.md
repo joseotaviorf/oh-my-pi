@@ -20,52 +20,49 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
-    - `branding_where_is_plaquinha`
-    - `costs_targets`
-    - `costs_targets_mx`
+    - `affiliate_pro_registration`
     - `base_supply_souce_for_rent`
+    - `base_supply_souce_for_sale`
+    - `branding_where_is_plaquinha`
+    - `costs_targets_mx`
+    - `costs_targets`
     - `ecglobal_active_users`
     - `historic_national_costs`
-    - `manual_cost_engagement`
     - `manual_cost_engagement_history`
-    - `mta_budget`
-    - `rental_tof_daily_targets`
-    - `rental_tof_weekly_targets`
-    - `affiliate_pro_registration`
-    - `historic_national_costs`
     - `manual_cost_engagement`
-    - `manual_cost_engagement_history`
+    - `marketing_cost_taxonomy`
     - `mkt_cost_per_source`
-    - `base_supply_souce_for_sale`
+    - `mta_budget`
     - `offline_manual_costs`
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
-    - `tradecom_configuration`
+    - `rental_tof_daily_targets`
+    - `rental_tof_weekly_targets`
     - `taxonomy_affiliates`
     - `taxonomy_growth`
-    - `full_taxonomy_new_test`
+    - `tradecom_configuration`
 2. Data lake clean:
     - `affiliate_pro_registration`
-    - `affiliates_national_costs_history`
-    - `affiliates_manual_cost_engagement`
-    - `affiliates_manual_cost_engagement_history`
     - `affiliates_cost_tradecom_configuration`
-    - `daily_target_supply_rental`
-    - `ecglobal_active_users`
-    - `mkt_cost_per_source`
+    - `affiliates_manual_cost_engagement_history`
+    - `affiliates_manual_cost_engagement`
+    - `affiliates_national_costs_history`
     - `branding_where_is_plaquinha`
-    - `costs_targets`
     - `costs_targets_mx`
+    - `costs_targets`
+    - `daily_target_supply_rental`
     - `daily_target_supply_sale`
+    - `ecglobal_active_users`
+    - `marketing_cost_taxonomy`
+    - `mkt_cost_per_source`
     - `mta_budget_october_2020`
-    - `rental_tof_daily_targets`
-    - `rental_tof_weekly_targets`
     - `offline_manual_costs`
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
+    - `rental_tof_daily_targets`
+    - `rental_tof_weekly_targets`
+    - `targets_casa_mineira_nbp`
     - `taxonomy_affiliates`
     - `taxonomy_growth`
-    - `taxonomy_mkt_cost_new_test`
-    - `targets_casa_mineira_nbp`
 
 </details>

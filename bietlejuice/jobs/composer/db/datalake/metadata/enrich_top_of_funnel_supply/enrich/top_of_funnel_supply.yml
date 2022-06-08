@@ -1,70 +1,56 @@
+---
 database_name: datalake_top_of_funnel_supply
 table_name: top_of_funnel_supply
 columns:
-  campaign_name:
-    lineage:
-      - datalake_marketing_costs.daily_costs.campaign_name
-  account_name:
-    lineage:
-      - datalake_marketing_costs.daily_costs.account_name
   utm_campaign:
     lineage:
-      - datalake_marketing_costs.daily_costs.utm_campaign
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_campaign
   utm_term:
     lineage:
-      - datalake_marketing_costs.daily_costs.utm_term
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_term
   utm_content:
     lineage:
-      - datalake_marketing_costs.daily_costs.utm_content
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_content
   city_group:
     lineage:
-      - datalake_marketing_costs.daily_costs.city_group
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.city_group
   tier:
     lineage:
       - datalake_region.region.tier
-  campaign_origin_acquisition:
-    lineage:
-      - datalake_marketing_costs.daily_costs.campaign_origin_acquisition
-  mkt_category:
-    lineage:
-      - datalake_marketing_costs.daily_costs.mkt_category
-  mkt_flow:
-    lineage:
-      - datalake_marketing_costs.daily_costs.mkt_flow
-  mkt_completion:
-    lineage:
-      - datalake_marketing_costs.daily_costs.mkt_completion
   mkt_origin:
     lineage:
-      - datalake_marketing_costs.daily_costs.mkt_origin
-  mkt_medium:
-    lineage:
-      - datalake_marketing_costs.daily_costs.mkt_medium
-  mkt_source:
-    lineage:
-      - datalake_marketing_costs.daily_costs.mkt_source
+      - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_origin
   mkt_channel:
     lineage:
-      - datalake_marketing_costs.daily_costs.mkt_channel
-  mkt_platform:
+      - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_channel
+  mkt_medium:
     lineage:
-      - datalake_marketing_costs.daily_costs.mkt_platform
-  funnel_side:
+      - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_medium
+  mkt_source:
     lineage:
-      - datalake_marketing_costs.daily_costs.funnel_side
-  flow_type:
-    lineage:
-      - datalake_marketing_costs.daily_costs.flow_type
+      - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_source
   dt_event:
     lineage:
-      - datalake_amplitude_clean.events.ts_event
-  week_start_event:
+      - datalake_amplitude_clean.183047_landing_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events.ts_event
+  traffic:
     lineage:
-      - datalake_amplitude_clean.events.ts_event
-  month_event:
+      - datalake_amplitude_clean.183047_landing_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.183047_price_suggestion_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events.id_amplitude
+  year:
     lineage:
-      - datalake_amplitude_clean.events.ts_event
-  quarter_event:
+      - datalake_amplitude_clean.183047_landing_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events.ts_event
+  month:
     lineage:
-      - datalake_amplitude_clean.events.ts_event
-  
+      - datalake_amplitude_clean.183047_landing_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events.ts_event
+  day:
+    lineage:
+      - datalake_amplitude_clean.183047_landing_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events.ts_event

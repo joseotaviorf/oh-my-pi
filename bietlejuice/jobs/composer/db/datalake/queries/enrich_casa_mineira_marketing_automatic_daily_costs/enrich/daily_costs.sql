@@ -19,75 +19,53 @@ WITH taxonomy_by_platform AS (
         )) AS (platform_cost_factor, mkt_platform)
     FROM
         datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy
-),
-
-filtered_media_costs AS (
-    SELECT
-        id_date,
-        origin,
-        account_name,
-        campaign_name,
-        utm_campaign,
-        utm_term,
-        utm_content,
-        city_group,
-        report_type,
-        ad_type,
-        mobile_cost,
-        desktop_cost,
-        other_cost,
-        total_cost,
-        CASE
-            WHEN LOWER(campaign_name) LIKE '%branded%' THEN 'Branded'
-            ELSE 'Other'
-        END AS campaign_origin_acquisition
-    FROM
-        datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics
-    WHERE
-        total_cost > 0
-        AND LOWER(SPLIT(campaign_name, '[.]')[0]) <> 'zebra'
-        AND id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
 )
 
 SELECT
-    fmc.id_date,
+    cmm.id_date,
     'automatic' AS flow_type,
-    fmc.origin,
-    fmc.account_name,
-    fmc.campaign_name,
-    fmc.utm_campaign,
-    fmc.utm_term,
-    fmc.utm_content,
-    fmc.city_group,
-    COALESCE(tp.campaign_origin_acquisition, 'Not Mapped') AS campaign_origin_acquisition,
-    COALESCE(tp.mkt_category, 'Not Mapped') AS mkt_category,
-    COALESCE(tp.mkt_flow, 'Not Mapped') AS mkt_flow,
-    COALESCE(tp.mkt_completion, 'Not Mapped') AS mkt_completion,
-    COALESCE(tp.mkt_origin, 'Not Mapped') AS mkt_origin,
-    COALESCE(tp.mkt_channel, 'Not Mapped') AS mkt_channel,
-    COALESCE(tp.mkt_medium, 'Not Mapped') AS mkt_medium,
-    COALESCE(tp.mkt_source, 'Not Mapped') AS mkt_source,
-    COALESCE(tp.mkt_platform, 'Not Mapped') AS mkt_platform,
-    COALESCE(CASE
-        WHEN tp.mkt_source='RTB House'
-        THEN IF(fmc.utm_campaign RLIKE '^(1535|Campanha Casa Mineira Imóveis)', 'imobiliaria', 'portal')
-        ELSE tp.side
-        END, 'Not Mapped') AS funnel_side,
+    cmm.origin,
+    cmm.account_name,
+    cmm.campaign_name,
+    cmm.utm_campaign,
+    cmm.utm_term,
+    cmm.utm_content,
+    cmm.city_group,
+    COALESCE(tbp.campaign_origin_acquisition, 'Not Mapped') AS campaign_origin_acquisition,
+    COALESCE(tbp.mkt_category, 'Not Mapped') AS mkt_category,
+    COALESCE(tbp.mkt_flow, 'Not Mapped') AS mkt_flow,
+    COALESCE(tbp.mkt_completion, 'Not Mapped') AS mkt_completion,
+    COALESCE(tbp.mkt_origin, 'Not Mapped') AS mkt_origin,
+    COALESCE(tbp.mkt_channel, 'Not Mapped') AS mkt_channel,
+    COALESCE(tbp.mkt_medium, 'Not Mapped') AS mkt_medium,
+    COALESCE(tbp.mkt_source, 'Not Mapped') AS mkt_source,
+    COALESCE(tbp.mkt_platform, 'Not Mapped') AS mkt_platform,
     COALESCE(
-        fmc.total_cost * FLOAT(tp.platform_cost_factor),
         CASE
-            WHEN tp.mkt_platform = 'Mobile' THEN fmc.mobile_cost
-            WHEN tp.mkt_platform = 'Desktop' THEN fmc.desktop_cost
-            WHEN tp.mkt_platform = 'Other' THEN fmc.other_cost
-            ELSE fmc.total_cost
+            WHEN tbp.mkt_source='RTB House'
+            THEN IF(cmm.utm_campaign RLIKE '^(1535|Campanha Casa Mineira Imóveis)', 'imobiliaria', 'portal')
+            ELSE tbp.side
+        END, 'Not Mapped'
+    ) AS funnel_side,
+    COALESCE(
+        cmm.total_cost * FLOAT(tbp.platform_cost_factor),
+        CASE
+            WHEN tbp.mkt_platform = 'Mobile' THEN cmm.mobile_cost
+            WHEN tbp.mkt_platform = 'Desktop' THEN cmm.desktop_cost
+            WHEN tbp.mkt_platform = 'Other' THEN cmm.other_cost
+            ELSE cmm.total_cost
         END
     ) AS cost
 FROM
-    filtered_media_costs fmc
+    datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics cmm
 LEFT JOIN
-    taxonomy_by_platform AS tp
-        ON COALESCE(fmc.account_name, '') = COALESCE(tp.account_name, '')
-        AND COALESCE(fmc.report_type, '') = COALESCE(tp.report_type, '')
-        AND COALESCE(fmc.ad_type, 'other') = COALESCE(tp.ad_type, 'other')
-        AND fmc.origin = tp.origin
-        AND fmc.campaign_origin_acquisition = tp.campaign_origin_acquisition
+    taxonomy_by_platform AS tbp
+        ON COALESCE(cmm.account_name, '') = COALESCE(tbp.account_name, '')
+        AND COALESCE(cmm.report_type, '') = COALESCE(tbp.report_type, '')
+        AND COALESCE(cmm.ad_type, 'other') = COALESCE(tbp.ad_type, 'other')
+        AND cmm.origin = tbp.origin
+        AND cmm.campaign_origin_acquisition = tbp.campaign_origin_acquisition
+WHERE
+    cmm.id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
+    AND cmm.total_cost > 0
+    AND LOWER(SPLIT(cmm.campaign_name, '[.]')[0]) <> 'zebra'

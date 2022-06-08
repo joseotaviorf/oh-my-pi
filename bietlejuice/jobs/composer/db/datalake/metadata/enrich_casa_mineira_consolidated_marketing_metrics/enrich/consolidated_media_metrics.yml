@@ -4,36 +4,38 @@ table_name: consolidated_media_metrics
 columns:
   id_date:
     lineage:
-      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.id_date
       - datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics.id_date
-      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.id_date
-      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.id_date
-      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.id_date
       - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.id_date
+      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.id_date
+      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.id_date
+      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.id_date
+      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.id_date
   account_name:
     lineage:
-      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.account_name
       - datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics.account_name
-      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.account_name
-      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.account_name
-      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.account_name
       - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.account_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.account_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.account_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.account_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.account_name
   campaign_name:
     lineage:
-      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.campaign_name
       - datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics.campaign_name
-      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.campaign_name
-      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.campaign_name
-      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.campaign_name
       - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.campaign_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.campaign_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.campaign_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.campaign_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.campaign_name
+  campaign_origin_acquisition:
+    lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics.campaign_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.campaign_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.campaign_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.campaign_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.campaign_name
+      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.campaign_name
   city_group:
     lineage:
-      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.campaign_name
-      - datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics.campaign_name
-      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.campaign_name
-      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.campaign_name
-      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.campaign_name
-      - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.campaign_name
       - datalake_marketing_costs_sharing_rules.old_sharing_rules.city_group
       - datalake_region.region.city_group
   report_type:
@@ -44,62 +46,62 @@ columns:
       - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.ad_type
   utm_campaign:
     lineage:
-      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.utm_campaign
       - datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics.utm_campaign
-      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.utm_campaign
-      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.utm_campaign
-      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.utm_campaign
       - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.utm_campaign
+      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.utm_campaign
+      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.utm_campaign
+      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.utm_campaign
+      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.utm_campaign
   utm_term:
     lineage:
-      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.utm_term
       - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.utm_term
+      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.utm_term
   utm_content:
     lineage:
-      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.utm_content
       - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.utm_content
+      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.utm_content
   desktop_cost:
     lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.desktop_cost
       - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.desktop_cost
       - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.desktop_cost
       - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.desktop_cost
-      - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.desktop_cost
       - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
   mobile_cost:
     lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.mobile_cost
       - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.mobile_cost
       - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.mobile_cost
       - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.mobile_cost
-      - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.mobile_cost
       - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
   other_cost:
     lineage:
       - datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics.other_cost
-      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.other_cost
       - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.other_cost
+      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.other_cost
       - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
   total_cost:
     lineage:
-      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.total_cost
       - datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics.total_cost
-      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.total_cost
-      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.total_cost
-      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.total_cost
       - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.total_cost
+      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.total_cost
+      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.total_cost
+      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.total_cost
+      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.total_cost
       - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
   impressions:
     lineage:
-      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.impressions
       - datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics.impressions
-      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.impressions
       - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.impressions
+      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.impressions
+      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.impressions
       - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
   clicks:
     lineage:
-      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.clicks
       - datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics.clicks
-      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.clicks
-      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.clicks
-      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.clicks
       - datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics.clicks
+      - datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics.clicks
+      - datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics.clicks
+      - datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics.clicks
+      - datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics.clicks
       - datalake_marketing_costs_sharing_rules.old_sharing_rules.share

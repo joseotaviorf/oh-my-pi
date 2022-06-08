@@ -26,7 +26,7 @@ columns:
       - datalake_consolidated_marketing_metrics.mitula_consolidated_metrics.campaign_name
       - datalake_consolidated_marketing_metrics.rtb_consolidated_metrics.campaign_name
       - datalake_consolidated_marketing_metrics.trovit_consolidated_metrics.campaign_name
-  city_group:
+  campaign_origin_acquisition:
     lineage:
       - datalake_consolidated_marketing_metrics.criteo_consolidated_metrics.campaign_name
       - datalake_consolidated_marketing_metrics.facebook_consolidated_metrics.campaign_name
@@ -34,6 +34,8 @@ columns:
       - datalake_consolidated_marketing_metrics.mitula_consolidated_metrics.campaign_name
       - datalake_consolidated_marketing_metrics.rtb_consolidated_metrics.campaign_name
       - datalake_consolidated_marketing_metrics.trovit_consolidated_metrics.campaign_name
+  city_group:
+    lineage:
       - datalake_marketing_costs_sharing_rules.old_sharing_rules.city_group
       - datalake_region.region.city_group
   report_type:
@@ -58,3 +60,48 @@ columns:
     lineage:
       - datalake_consolidated_marketing_metrics.facebook_consolidated_metrics.utm_content
       - datalake_consolidated_marketing_metrics.google_consolidated_metrics.utm_content
+  desktop_cost:
+    lineage:
+      - datalake_consolidated_marketing_metrics.facebook_consolidated_metrics.desktop_cost
+      - datalake_consolidated_marketing_metrics.google_consolidated_metrics.desktop_cost
+      - datalake_consolidated_marketing_metrics.mitula_consolidated_metrics.desktop_cost
+      - datalake_consolidated_marketing_metrics.trovit_consolidated_metrics.desktop_cost
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
+  mobile_cost:
+    lineage:
+      - datalake_consolidated_marketing_metrics.facebook_consolidated_metrics.mobile_cost
+      - datalake_consolidated_marketing_metrics.google_consolidated_metrics.mobile_cost
+      - datalake_consolidated_marketing_metrics.mitula_consolidated_metrics.mobile_cost
+      - datalake_consolidated_marketing_metrics.trovit_consolidated_metrics.mobile_cost
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
+  other_cost:
+    lineage:
+      - datalake_consolidated_marketing_metrics.criteo_consolidated_metrics.other_cost
+      - datalake_consolidated_marketing_metrics.facebook_consolidated_metrics.other_cost
+      - datalake_consolidated_marketing_metrics.rtb_consolidated_metrics.other_cost
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
+  total_cost:
+    lineage:
+      - datalake_consolidated_marketing_metrics.criteo_consolidated_metrics.total_cost
+      - datalake_consolidated_marketing_metrics.facebook_consolidated_metrics.total_cost
+      - datalake_consolidated_marketing_metrics.google_consolidated_metrics.total_cost
+      - datalake_consolidated_marketing_metrics.mitula_consolidated_metrics.total_cost
+      - datalake_consolidated_marketing_metrics.rtb_consolidated_metrics.total_cost
+      - datalake_consolidated_marketing_metrics.trovit_consolidated_metrics.total_cost
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
+  impressions:
+    lineage:
+      - datalake_consolidated_marketing_metrics.criteo_consolidated_metrics.impressions
+      - datalake_consolidated_marketing_metrics.facebook_consolidated_metrics.impressions
+      - datalake_consolidated_marketing_metrics.google_consolidated_metrics.impressions
+      - datalake_consolidated_marketing_metrics.rtb_consolidated_metrics.impressions
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
+  clicks:
+    lineage:
+      - datalake_consolidated_marketing_metrics.criteo_consolidated_metrics.clicks
+      - datalake_consolidated_marketing_metrics.facebook_consolidated_metrics.clicks
+      - datalake_consolidated_marketing_metrics.google_consolidated_metrics.clicks
+      - datalake_consolidated_marketing_metrics.mitula_consolidated_metrics.clicks
+      - datalake_consolidated_marketing_metrics.rtb_consolidated_metrics.clicks
+      - datalake_consolidated_marketing_metrics.trovit_consolidated_metrics.clicks
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share

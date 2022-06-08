@@ -1,5 +1,4 @@
--- Union of medias
-WITH medias_consolidated AS (
+WITH consolidated_sources AS (
     -- GOOGLE
     SELECT
         id_date,
@@ -133,29 +132,34 @@ WITH medias_consolidated AS (
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
 )
 
-SELECT 
-    mc.id_date,
-    origin,
-    account_name,
-    mc.campaign_name,
+SELECT
+    cs.id_date,
+    cs.origin,
+    cs.account_name,
+    cs.campaign_name,
+    CASE
+        WHEN LOWER(cs.campaign_name) LIKE '%branded%'
+            THEN 'Branded'
+        ELSE 'Other'
+    END AS campaign_origin_acquisition,
     COALESCE(sr.city_group, dr.city_group, 'Not Mapped') AS city_group,
-    report_type,
-    ad_type,
-    utm_campaign,
-    utm_term,
-    utm_content,
-    desktop_cost * COALESCE(sr.share, 1) AS desktop_cost,
-    mobile_cost * COALESCE(sr.share, 1) AS mobile_cost,
-    other_cost * COALESCE(sr.share, 1) AS other_cost,
-    total_cost * COALESCE(sr.share, 1) AS total_cost,
-    impressions * COALESCE(sr.share, 1) AS impressions,
-    clicks * COALESCE(sr.share, 1) AS clicks
-FROM 
-    medias_consolidated mc
-LEFT JOIN 
+    cs.report_type,
+    cs.ad_type,
+    cs.utm_campaign,
+    cs.utm_term,
+    cs.utm_content,
+    cs.desktop_cost * COALESCE(sr.share, 1) AS desktop_cost,
+    cs.mobile_cost * COALESCE(sr.share, 1) AS mobile_cost,
+    cs.other_cost * COALESCE(sr.share, 1) AS other_cost,
+    cs.total_cost * COALESCE(sr.share, 1) AS total_cost,
+    cs.impressions * COALESCE(sr.share, 1) AS impressions,
+    cs.clicks * COALESCE(sr.share, 1) AS clicks
+FROM
+    consolidated_sources cs
+LEFT JOIN
     datalake_marketing_costs_sharing_rules.old_sharing_rules sr
-        ON SPLIT(mc.campaign_name, '[.]')[0] = sr.id_rule
-        AND mc.id_date = sr.id_date 
-LEFT JOIN 
+        ON SPLIT(cs.campaign_name, '[.]')[0] = sr.id_rule
+        AND cs.id_date = sr.id_date
+LEFT JOIN
     datalake_region.region dr
-        ON SPLIT(mc.campaign_name, '[.]')[0] = dr.id
+        ON SPLIT(cs.campaign_name, '[.]')[0] = dr.id
