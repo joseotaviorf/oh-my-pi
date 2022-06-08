@@ -17,7 +17,7 @@ SELECT
     CAST(REGEXP_REPLACE(unpublished_fs,'([^-0-9])','') AS INT) AS unpublished_fs,
     CAST(REGEXP_REPLACE(lost_visits_fs,'([^-0-9])','') AS INT) AS lost_visits_fs,
     CAST(REGEXP_REPLACE(lost_proposals_fs,'([^-0-9])','') AS INT) AS lost_proposals_fs,
-    NULLIF(TO_DATE(week_start, 'MM/dd/yyyy'), '') AS dt_week_start,
+    NULLIF(TO_DATE(week_start, 'M/d/y'), '') AS dt_week_start,
     NULLIF(CAST(month AS INT), '') AS month,
     NULLIF(CAST(year AS INT), '') AS year
 FROM

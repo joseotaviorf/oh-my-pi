@@ -10,6 +10,6 @@ SELECT
     NULLIF(ba_faixa_de_valor,'') AS ba_value_range,
     NULLIF(ba_categoria_do_gasto,'') AS ba_expense_category,
     NULLIF(ba_cliente_beneficiado,'') AS ba_client,
-    TO_TIMESTAMP(NULLIF(created,''),'MM/dd/yyyy HH:mm:ss') AS ts_created
+    TO_TIMESTAMP(NULLIF(created,''),'M/d/y H:m:s') AS ts_created
 FROM
     datalake_gsheets_raw.jira_extraction_ba_sf

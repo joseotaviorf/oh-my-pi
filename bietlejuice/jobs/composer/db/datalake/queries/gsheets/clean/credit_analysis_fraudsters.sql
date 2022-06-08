@@ -6,6 +6,6 @@ SELECT
     name,
     phone,
     rejection_reason,
-    TO_DATE(date_occurence, 'dd/MM/yyyy') AS dt_occurence
+    TO_DATE(date_occurence, 'd/M/y') AS dt_occurence
 FROM
     datalake_gsheets_raw.credit_analysis_fraudsters

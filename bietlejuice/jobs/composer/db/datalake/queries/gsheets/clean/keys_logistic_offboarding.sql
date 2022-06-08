@@ -10,6 +10,6 @@ SELECT
     NULLIF(cep, '') AS house_zipcode,
     NULLIF(bairro, '') AS house_neighborhood,
     NULLIF(cidade, '') AS house_city,
-    TO_TIMESTAMP(NULLIF(ts_resposta_forms,''),'MM/dd/yyyy HH:mm:ss') AS ts_answer_form
+    TO_TIMESTAMP(NULLIF(ts_resposta_forms,''),'M/d/y H:m:s') AS ts_answer_form
 FROM
     datalake_gsheets_raw.keys_logistic_offboarding
