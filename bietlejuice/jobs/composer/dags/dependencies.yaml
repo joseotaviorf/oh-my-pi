@@ -723,6 +723,13 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing:load-public-fact-house-listings
   - bietlejuice.ebdb:create-clean-house-in-data-lake
+  # attribution_conversion_paths_demand
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-home-page-viewed
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-search-results-page-viewed
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-page-viewed
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-contract-docusign-signed-events
   # performance_marketing_metrics_portal_casa_mineira
   - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
   - bietlejuice.gsheets:create-clean-taxonomy-portal-casa-mineira-external-table
