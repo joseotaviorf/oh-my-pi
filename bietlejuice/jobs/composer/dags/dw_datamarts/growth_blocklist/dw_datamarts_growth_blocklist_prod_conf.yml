@@ -18,15 +18,15 @@ pipeline:
   marketplace_intelligence_metrics:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_blacklist/marketplace_intelligence_metrics.sql
+      sql_file: dw/queries/datamarts/growth_blocklist/marketplace_intelligence_metrics.sql
       table: marketplace_intelligence_metrics
   listings_online_metrics:
     dw:
       <<: *athena_anchor
-      sql_file: dw/queries/datamarts/growth_blacklist/listings_online_metrics.sql
+      sql_file: dw/queries/datamarts/growth_blocklist/listings_online_metrics.sql
       table: listings_online_metrics
   users_online_metrics:
     dw:
       <<: *athena_anchor
-      sql_file: dw/queries/datamarts/growth_blacklist/users_online_metrics.sql
+      sql_file: dw/queries/datamarts/growth_blocklist/users_online_metrics.sql
       table: users_online_metrics

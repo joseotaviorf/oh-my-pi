@@ -401,14 +401,14 @@ bietlejuice.dw_datamarts_growth_cross:
   # unique_supply_funnel_events
   - bietlejuice.enrich_3p:create-enrich-houses-3p-external-table
 
-# bietlejuice.dw_datamarts_growth_blacklist:
+# bietlejuice.dw_datamarts_growth_blocklist:
 #   # marketplace_intelligence_metrics
 #   - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
 #   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
 #   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
 #   - bietlejuice.amplitude:create-clean-staging-events
 
-bietlejuice.dw_datamarts_growth_cross_blacklist:
+bietlejuice.dw_datamarts_growth_cross_blocklist:
   # unique_performance_marketing_metrics_supply_coincident
   - bietlejuice.dw_datamarts_growth_cross:create-performance-marketing-cluster-promotional-bonus-costs-in-datalake
   - bietlejuice.dw_datamarts_growth_cross:create-daily-target-volumes-supply-in-datalake

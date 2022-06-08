@@ -1,5 +1,5 @@
 ---
-database_name: dw_datamarts_growth
+database_name: dw_datamarts_growth_blocklist
 table_name: listings_online_metrics
 columns:
   date_period:

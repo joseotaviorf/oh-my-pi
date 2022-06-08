@@ -21,7 +21,7 @@ from bietlejuice.jobs.composer.services.file_service import FileService
 
 # DAG params
 SCHEMA = "datamarts"
-CONTEXT = "growth_cross_blacklist"
+CONTEXT = "growth_cross_blocklist"
 DAG_NAME = f"dw_{SCHEMA}_{CONTEXT}"
 DAG_ID = f"bietlejuice.dw_{SCHEMA}_{CONTEXT}"
 INTERMEDIATE_PATH = f"dw_{SCHEMA}/{CONTEXT}"

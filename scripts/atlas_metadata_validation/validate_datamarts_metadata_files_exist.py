@@ -43,7 +43,7 @@ SKIP_LIST = {
         "casa_mineira_top_of_funnel_volumes_weekly",
         "casa_mineira_top_of_funnel_volumes_daily",
     },
-    "dw_datamarts/growth_blacklist": {
+    "dw_datamarts/growth_blocklist": {
         "marketplace_intelligence_metrics"
     },
     "dw_datamarts/for_rent": {
@@ -112,7 +112,7 @@ SKIP_LIST = {
         "sale_performance_marketing_metrics_supply_coincident",
         "indicaai_costs",
     },
-    "dw_datamarts/growth_cross_blacklist": {
+    "dw_datamarts/growth_cross_blocklist": {
         "unique_performance_marketing_metrics_supply_coincident"
     },
     "dw_datamarts/support_and_service": {
