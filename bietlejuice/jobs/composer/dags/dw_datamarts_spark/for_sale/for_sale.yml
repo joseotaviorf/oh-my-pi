@@ -11,6 +11,7 @@
 
 for_sale:
   buyer_first_visit_intent: {}
+  deal_making_funnel: {}
   dim_house_listing_amenities: {}
   liquidity_by_sk_region: {}
   neighborhood_competition: {}

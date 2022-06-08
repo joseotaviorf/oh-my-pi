@@ -673,6 +673,9 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
+  - bietlejuice.enrich_firestore:load-enrich-monday
+  - bietlejuice.enrich_firestore:load-enrich-sale-offer
+  - bietlejuice.gsheets:load-clean-monday-users
 
 bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
