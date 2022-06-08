@@ -74,8 +74,7 @@ contact_prospect AS (
       ON h.id_region = r.id
   WHERE
     UPPER(lead_status) = 'SENT_TO_CASA_MINEIRA'
-    OR UPPER(lead_status) = 'PROCESSED' 
-    AND is_secretariat = true
+    OR is_secretariat = true
 ),
 
 first_contact_prospect AS (
