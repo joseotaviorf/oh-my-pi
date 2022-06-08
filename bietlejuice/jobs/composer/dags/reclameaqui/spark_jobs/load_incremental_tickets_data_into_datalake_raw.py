@@ -85,7 +85,7 @@ if __name__ == "__main__":
     database_location = datalake_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
-    response = consumer.sync(execution_date)
+    response = consumer.sync(execution_date, 50)
 
     if response:
 
