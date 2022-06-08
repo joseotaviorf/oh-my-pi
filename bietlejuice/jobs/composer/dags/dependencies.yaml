@@ -563,8 +563,8 @@ bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
-  - bietlejuice.dw_sale_listing_flow:load-dw-sale-dim-listing-flows
   - bietlejuice.dw_sale_listing_flow:load-dw-sale-fact-listing-flows
+  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
