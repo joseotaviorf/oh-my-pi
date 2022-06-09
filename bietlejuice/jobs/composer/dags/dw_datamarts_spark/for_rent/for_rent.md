@@ -20,6 +20,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `house_weekly_entrance_info`
 - `ongoing_listed_suspended_listings`
 - `repressed_demand`
+- `repressed_demand_booking_fit_in`
 - `weekly_demand_metrics`
 
 ### Responsible Data Engineering Team

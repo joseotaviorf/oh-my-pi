@@ -587,6 +587,7 @@ bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.enrich_big_agent:load-enrich-program
 
 bietlejuice.dw_datamarts_spark.for_rent:
+  - bietlejuice.amplitude:events-raw-to-clean
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-public-dim-contract
