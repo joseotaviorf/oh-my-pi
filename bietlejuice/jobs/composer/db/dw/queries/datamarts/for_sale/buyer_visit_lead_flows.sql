@@ -511,7 +511,8 @@ UNION ALL
         fo.dt_offer_submitted AS dt_first_offer_submitted,
         fc.dt_sale_agreement_signed,
         list_id_secretariat_client,
-        list_id_classified_lead
+        list_id_classified_lead,
+        CURRENT_TIMESTAMP AS ts_load
     FROM unique_users_list_ids uu
     LEFT JOIN lead_classifieds_info lci
         ON lci.user_key = uu.user_key

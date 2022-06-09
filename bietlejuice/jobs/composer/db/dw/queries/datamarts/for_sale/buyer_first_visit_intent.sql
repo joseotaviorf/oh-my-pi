@@ -24,7 +24,8 @@ SELECT
     id_user,
     sk_region,
     city_name,
-    ts_visit_intent AS ts_first_visit_intent
+    ts_visit_intent AS ts_first_visit_intent,
+    CURRENT_TIMESTAMP AS ts_load
 FROM
     base
 WHERE

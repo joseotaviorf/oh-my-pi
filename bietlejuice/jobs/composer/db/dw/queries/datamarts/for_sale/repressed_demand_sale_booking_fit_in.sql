@@ -435,7 +435,8 @@ SELECT
     enc.share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda AS sum_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
     enc.encaixes_em_imovel_sem_slot_disponivel_target_date AS sum_encaixes_em_imovel_sem_slot_disponivel_target_date,
     enc.share_encaixes_nao_realizados_por_visita_rent AS sum_encaixes_nao_realizados_por_visita_rent,
-    enc.share_encaixes_nao_realizados_por_agent AS sum_encaixes_nao_realizados_por_agent
+    enc.share_encaixes_nao_realizados_por_agent AS sum_encaixes_nao_realizados_por_agent,
+    CURRENT_TIMESTAMP AS ts_load
 FROM
     dimensions d
 LEFT JOIN encaixes_agg enc

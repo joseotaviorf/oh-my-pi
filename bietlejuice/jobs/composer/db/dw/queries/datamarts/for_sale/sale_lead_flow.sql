@@ -89,6 +89,7 @@ SELECT
     ts_first_sale_agreement_signed,
     ts_last_sale_agreement_signed,
     ts_first_combo_event_contact_prospect,
-    ts_last_combo_event_contact_prospect
+    ts_last_combo_event_contact_prospect,
+    CURRENT_TIMESTAMP AS ts_load
 FROM 
     datalake_sale_lead_flows_prod.lead_flow

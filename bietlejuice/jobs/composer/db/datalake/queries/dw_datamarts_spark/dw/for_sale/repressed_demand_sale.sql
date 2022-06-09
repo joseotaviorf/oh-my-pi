@@ -493,7 +493,8 @@ SELECT
     SUM(enc.share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda) AS sum_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
     SUM(enc.encaixes_em_imovel_sem_slot_disponivel_target_date) AS sum_encaixes_em_imovel_sem_slot_disponivel_target_date,
     SUM(enc.share_encaixes_nao_realizados_por_visita_rent) AS sum_encaixes_nao_realizados_por_visita_rent,
-    SUM(enc.share_encaixes_nao_realizados_por_agent) AS sum_encaixes_nao_realizados_por_agent
+    SUM(enc.share_encaixes_nao_realizados_por_agent) AS sum_encaixes_nao_realizados_por_agent,
+    CURRENT_TIMESTAMP AS ts_load
 FROM
     dimensions AS d
 LEFT JOIN

@@ -50,7 +50,8 @@ SELECT
 	dhl.ts_publication,
 	dhl.ts_last_de_publication,
 	dhl.listing_category_start,
-	dhl.is_last_version
+	dhl.is_last_version,
+	CURRENT_TIMESTAMP AS ts_load
 FROM
 	cr
 JOIN datalake_ebdb_clean_prod.house h ON

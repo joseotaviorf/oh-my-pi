@@ -147,7 +147,8 @@ SELECT
     date,
     weekday_name,
     week_start,
-    COUNT(DISTINCT id_house) AS ongoing_listings
+    COUNT(DISTINCT id_house) AS ongoing_listings,
+    CURRENT_TIMESTAMP AS ts_load
 FROM 
     all_houses_listings AS al 
 GROUP BY

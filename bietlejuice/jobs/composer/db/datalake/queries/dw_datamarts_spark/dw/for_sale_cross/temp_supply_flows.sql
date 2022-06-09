@@ -865,6 +865,7 @@ SELECT
     llf.prospect_discard_sale,
     llf.prospect_discard_rent,
     llf.prospect_status,
-    city_group
+    city_group,
+    CURRENT_TIMESTAMP AS ts_load
 FROM
     hybrid_qualified AS llf

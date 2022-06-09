@@ -380,7 +380,8 @@ SELECT
    step_discard,
    dt_offer_dismissed_qualified,
    dt_offer_dismissed_unqualified,
-   is_offer_dismissed
+   is_offer_dismissed,
+   CURRENT_TIMESTAMP AS ts_load
 FROM
     offer_rules AS ofu
 LEFT JOIN

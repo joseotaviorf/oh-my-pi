@@ -499,8 +499,8 @@ SELECT
     promoters_reviews,
     detractors_reviews,
     ((cpaw.promoters_reviews*1.00 - cpaw.detractors_reviews*1.00) / NULLIF(cpaw.visits_reviews*1.00,0))*100 AS nps_visit_review,
-    cpaw.does_not_want_same_agent
-
+    cpaw.does_not_want_same_agent,
+    CURRENT_TIMESTAMP AS ts_load
 FROM
     count_per_agent_week AS cpaw
 LEFT JOIN

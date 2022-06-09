@@ -76,7 +76,8 @@ SELECT
     supply_3p_partner,
     is_3p_supply,
     COUNT(DISTINCT sk_sale_listing) AS ongoing_listings,
-    COUNT(DISTINCT ciq_assignment) AS ciq_listing
+    COUNT(DISTINCT ciq_assignment) AS ciq_listing,
+    CURRENT_TIMESTAMP AS ts_load
 FROM 
     daily_published_listings_with_region 
 GROUP BY 

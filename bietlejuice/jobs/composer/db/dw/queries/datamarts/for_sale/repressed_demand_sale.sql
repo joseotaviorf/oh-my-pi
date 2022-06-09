@@ -397,7 +397,8 @@ select
     sum(enc.share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda) as sum_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
     sum(enc.encaixes_em_imovel_sem_slot_disponivel_target_date) as sum_encaixes_em_imovel_sem_slot_disponivel_target_date,
     sum(enc.share_encaixes_nao_realizados_por_visita_rent) as sum_encaixes_nao_realizados_por_visita_rent,
-	sum(enc.share_encaixes_nao_realizados_por_agent) as sum_encaixes_nao_realizados_por_agent
+    sum(enc.share_encaixes_nao_realizados_por_agent) as sum_encaixes_nao_realizados_por_agent,
+    CURRENT_TIMESTAMP AS ts_load
 from dimensions d
 left join bookings_clean bk
 	on bk.region_id = d.region_id
