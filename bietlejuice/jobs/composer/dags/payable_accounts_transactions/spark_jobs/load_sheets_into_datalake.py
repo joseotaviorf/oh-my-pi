@@ -1,5 +1,5 @@
 import ast
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import reduce
 import logging
 import json
@@ -29,6 +29,20 @@ JOB_NAME = "load_sheets_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def __convert_excel_numeric_date(excel_date):
+    if excel_date is not None and excel_date.isnumeric():
+        numeric_date = int(excel_date)
+        if numeric_date >= 60:
+            numeric_date -= 1
+        return str(
+            (datetime(1899, 12, 31) + timedelta(days=numeric_date)).replace(
+                microsecond=0
+            )
+        )
+    else:
+        return excel_date
 
 
 def __columns_to_alphanumeric_snake_case(df):
@@ -268,6 +282,13 @@ if __name__ == "__main__":
     df_citi = df_citi.withColumnRenamed("citi", "saldo_total")
 
     df = reduce(DataFrame.unionAll, [df_itau, df_bradesco, df_citi])
+
+    # Fix ordinal excel dates
+    convert_numeric_date_udf = functions.udf(__convert_excel_numeric_date, StringType())
+
+    df = df.withColumn("pagamento", convert_numeric_date_udf(df.pagamento)).withColumn(
+        "competencia", convert_numeric_date_udf(df.competencia)
+    )
 
     # Add ts_load column
 
