@@ -1,0 +1,96 @@
+---
+database_name: datalake_docato
+table_name: judicial_process_judgement
+columns:
+  judicial_process:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.judicial_process
+  judgment:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.judgment
+  judgment_second_instance:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.judgment_second_instance
+  judgment_last:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.judgment_second_instance
+      - datalake_gsheets_clean.legal_base_docato.judgment
+  agreement_in:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.agreement_in
+  no_strings_attached_agreement:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.no_strings_attached_agreement
+  county:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.county
+  judge_rapporteur:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.judge_rapporteur
+  procedural_duration:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.procedural_duration
+  procedural_duration_until_sentencing:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.procedural_duration_until_sentencing
+  judge:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.judge
+  segment:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.segment
+  verdict:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.verdict
+  status:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.status
+  time_between_dismissal_and_distribution:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.time_between_dismissal_and_distribution
+  grouped_time_between_dismissal_and_distribution:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.grouped_time_between_dismissal_and_distribution
+  trt:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.trt
+  lawsuit_value:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.lawsuit_value
+  condemnation_judgment_value:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.condemnation_judgment_value
+  final_execution:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.final_execution
+  verdict_value:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.verdict_value
+  defendant_segment:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.defendant_segment
+  position_held:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.position_held
+  is_sentence_reverted:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.is_sentence_reverted
+  is_sentence_reverted_second_instance:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.is_sentence_reverted_second_instance
+  is_sentence_reverted_last:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.is_sentence_reverted_second_instance
+      - datalake_gsheets_clean.legal_base_docato.is_sentence_reverted
+  is_active_platform_user:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.is_active_platform_user
+  dt_distribuition:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.dt_distribuition
+  dt_admission:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.dt_admission
+  dt_resignation:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.dt_resignation

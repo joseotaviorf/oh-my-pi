@@ -11,6 +11,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 This pipeline produces the following tables in enrich layer, via full load:
+- `judicial_process_judgement`
 - `judicial_process_request_status`
 - `judicial_process_argumentation_status`
 
