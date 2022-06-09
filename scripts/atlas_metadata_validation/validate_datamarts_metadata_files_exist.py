@@ -110,10 +110,8 @@ SKIP_LIST = {
         "daily_target_volumes_supply",
         "user_funnel",
         "sale_performance_marketing_metrics_supply_coincident",
+        "unique_performance_marketing_metrics_supply_coincident",
         "indicaai_costs",
-    },
-    "dw_datamarts/growth_cross_blocklist": {
-        "unique_performance_marketing_metrics_supply_coincident"
     },
     "dw_datamarts/support_and_service": {
         "house_media",

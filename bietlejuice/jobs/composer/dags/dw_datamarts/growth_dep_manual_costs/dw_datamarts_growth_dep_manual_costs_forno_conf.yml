@@ -70,7 +70,7 @@ pipeline:
   unique_performance_marketing_metrics_supply_coincident:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross_blocklist/unique_performance_marketing_metrics_supply_coincident.sql
+      sql_file: dw/queries/datamarts/growth_cross/unique_performance_marketing_metrics_supply_coincident.sql
       table: unique_performance_marketing_metrics_supply_coincident
   sale_performance_marketing_metrics_supply_cohort:
     dw:

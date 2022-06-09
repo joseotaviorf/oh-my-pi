@@ -1,5 +1,5 @@
 ---
-database_name: dw_datamarts_growth_cross_blocklist
+database_name: dw_datamarts_growth_cross
 table_name: unique_performance_marketing_metrics_supply_coincident
 columns:
   date:
