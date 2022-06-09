@@ -24,6 +24,7 @@ SELECT
 	hl.sk_user_lead_affiliate,
 	hl.sk_user_house_registrant,
 	hl.is_b2b,
+	dhl.rental_administrator,
     CASE
         WHEN ciq.businesscontext= 'RENT' AND ciq.type_big_agent = 'CIQ_FULL'
             THEN 'CIQ'
@@ -34,6 +35,8 @@ SELECT
         ELSE hl.mkt_origin
     END AS mkt_origin
 FROM fact_house_listing_flows hl
+INNER JOIN dim_house_listing dhl
+            ON hl.sk_house_listing = dhl.sk_house_listing
 LEFT JOIN datamarts.quintoandar_consultant_listings ciq
 	        ON ciq.sk_house_listing = hl.sk_house_listing AND ciq.businesscontext= 'RENT'
 ),
@@ -83,6 +86,7 @@ source_ops_rent AS (
 	            ELSE NULL END AS first_listing_context,
 	        COALESCE(du.sales_company, dl.sales_company) AS sales_company,
 	        hlf.lead_origin,
+	        hlf.rental_administrator,
 	        hlf.funnel_drop_reason,
 	        sk_first_photo_job_date
 	FROM fact_house_listing_flows_adjust hlf
@@ -176,7 +180,8 @@ source_ops_sale AS (
 	        COALESCE(du.sales_company, dl.sales_company) AS sales_company,
 	        ssf.lead_origin,
 	        ssf.funnel_drop_reason,
-	        sk_first_photo_job_date
+	        sk_first_photo_job_date,
+	        dhl.rental_administrator
 	FROM sale_fact_listing_flows_adjust ssf
 	    JOIN dim_lead dl
 	        ON dl.sk_lead = ssf.sk_lead
@@ -186,6 +191,8 @@ source_ops_sale AS (
 	        ON pj.sk_house_listing = ssf.sk_house_listing
 	    LEFT JOIN fact_house_listing_flows hlf
 	        ON hlf.sk_house_listing_flow = ssf.sk_house_listing_flow
+	    LEFT JOIN dim_house_listing dhl
+	        ON dhl.sk_house_listing = hlf.sk_house_listing
 ),
 fact_sale AS (
 	SELECT
@@ -225,7 +232,8 @@ fact_sale AS (
 	    ssf.lead_context_origin,
 	    ssf.has_isales_intervention,
 	    ssf.sk_user_lead_affiliate,
-	    'Sale' AS origin_table
+	    'Sale' AS origin_table,
+	    sor.rental_administrator
 	FROM sale_fact_listing_flows_adjust ssf
 	JOIN source_ops_sale AS sor
 	  ON sor.sk_house_listing_flow = ssf.sk_house_listing_flow
@@ -268,7 +276,8 @@ fact_rent AS (
 	    hlf.lead_context_origin,
 	    hlf.has_isales_intervention,
 	    hlf.sk_user_lead_affiliate,
-	    'Rent' AS origin_table
+	    'Rent' AS origin_table,
+	    hlf.rental_administrator
 	FROM fact_house_listing_flows_adjust hlf
 	JOIN source_ops_rent AS sor
 	  ON sor.sk_house_listing_flow = hlf.sk_house_listing_flow
