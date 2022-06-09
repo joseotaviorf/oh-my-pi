@@ -10,9 +10,10 @@
 #     # If the datamart has no inner dependency, declare it as an empty object
 
 growth_cross:
-  efficiency_monitor_rental:
-    - marketing_demand_supply_branding_costs
-  pricing_rent_categorization:
-    depends_on:
-      - performance_marketing_metrics_demand
+  efficiency_monitor_rental: {}
+    # - marketing_demand_supply_branding_costs
   inbound_attendance_leads_flows: {}
+  pricing_rent_categorization: {}
+    # depends_on:
+    # - performance_marketing_metrics_demand
+  
