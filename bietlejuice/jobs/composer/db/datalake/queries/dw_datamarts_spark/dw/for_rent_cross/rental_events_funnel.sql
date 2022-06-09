@@ -477,7 +477,7 @@ rent_flow_adjusted AS (
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN 
-    dw_datamarts_cross.funnel_demand_flows AS fdf
+    dw_datamarts.funnel_demand_flows AS fdf
       ON rf.sk_rent_flow = fdf.sk_rent_flow
   LEFT JOIN 
     dw_datamarts_cross.quintoandar_consultant_listings ciq

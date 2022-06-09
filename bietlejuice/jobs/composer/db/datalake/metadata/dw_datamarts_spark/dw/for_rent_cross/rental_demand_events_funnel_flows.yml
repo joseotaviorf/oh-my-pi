@@ -1,0 +1,34 @@
+---
+database_name: dw_datamarts
+table_name: rental_demand_events_funnel_flows
+columns:
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  funnel_flow:
+    lineage:
+      - dw_datamarts_spark.cross.funnel_demand_flows.funnel_flow
+  funnel_first_touchpoint:
+    lineage:
+      - dw_datamarts_spark.cross.funnel_demand_flows.funnel_first_touchpoint
+  had_flow_visit:
+    lineage:
+      - dw_datamarts_spark.cross.funnel_demand_flows.had_flow_visit
+  had_flow_direct:
+    lineage:
+      - dw_datamarts_spark.cross.funnel_demand_flows.had_flow_direct
+  had_flow_tta:
+    lineage:
+      - dw_datamarts_spark.cross.funnel_demand_flows.had_flow_tta
+  flow_type:
+    lineage:
+      - dw_datamarts_spark.cross.funnel_demand_flows.flow_type
+  demand_channel:
+    lineage:
+      - dw_public.dim_offer.mkt_medium
+  is_b2b_demand:
+    lineage:
+      - dw_public.dim_house_listing.is_b2b

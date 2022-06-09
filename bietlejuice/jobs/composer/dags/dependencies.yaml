@@ -618,10 +618,10 @@ bietlejuice.dw_datamarts_spark.for_rent:
 
 bietlejuice.dw_datamarts_spark.for_rent_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
-  - bietlejuice.dw_datamarts_cross:create-funnel-demand-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:create-quintoandar-consultant-listings-in-datalake
   - bietlejuice.dw_datamarts_cross:create-talk-to-agent-in-datalake
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_offer:load-dw-public-dim-offer
   - bietlejuice.dw_proposal:load-dw-public-dim-proposal
