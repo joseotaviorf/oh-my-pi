@@ -1,0 +1,7 @@
+---
+database_name: datalake_docato
+table_name: judicial_process_argumentation_status
+columns:
+  judicial_process:
+    lineage:
+      - datalake_gsheets_clean.legal_base_docato.judicial_process
