@@ -21,10 +21,10 @@ dags:
     cluster_name: databricks_9_1_med_general_cluster
   for_sale:
     owner: Data ForSale
-    cluster_name: databricks_9_1_med_general_cluster
+    cluster_name: databricks_9_1_default_datamart_cluster
   for_sale_cross:
     owner: Data ForSale
-    cluster_name: databricks_9_1_med_general_cluster
+    cluster_name: databricks_9_1_default_datamart_cluster
   fintech_cross:
     cluster_name: databricks_9_1_med_general_cluster
     owner: Data Fintech
