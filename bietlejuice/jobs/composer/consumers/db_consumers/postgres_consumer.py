@@ -68,6 +68,7 @@ class PostgresConsumer(DBConsumer):
                 AND table_name NOT IN (
                     'change_owner_control',
                     'flyway_schema_history',
+                    'pg_buffercache',
                     'pg_stat_statements',
                     'schema_migrations'
                 )
