@@ -12,7 +12,7 @@
 growth_cross:
   efficiency_monitor_rental:
     - marketing_demand_supply_branding_costs
-
   pricing_rent_categorization:
     depends_on:
       - performance_marketing_metrics_demand
+  inbound_attendance_leads_flows: {}
