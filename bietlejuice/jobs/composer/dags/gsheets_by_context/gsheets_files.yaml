@@ -272,6 +272,12 @@ people_data:
     clean_table_name: people_employees
     sheet_context: bedrock
 
+base_hierarquia:
+    sheet_id: 1b1jo5wSxIGlTobc40wBGRwsYwYm3AS5-ujtLWvSN6lA
+    sheet_name: base_hierarquia
+    clean_table_name: people_hierarchy
+    sheet_context: bedrock
+
 #########################
 # FOR RENT SHEETS
 ###################

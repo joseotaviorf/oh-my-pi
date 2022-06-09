@@ -25,6 +25,7 @@ This pipeline produces the following output tables:
    - `basic_access`
    - `legal_provisioning`
    - `mova_lra_owners`
+   - `people_hierarchy`
    - `people_data`
 
 2. Data lake clean:
@@ -33,5 +34,6 @@ This pipeline produces the following output tables:
    - `legal_provisioning`
    - `mova_lra_owners`
    - `people_employees`
+   - `people_hierarchy`
 
 </details>

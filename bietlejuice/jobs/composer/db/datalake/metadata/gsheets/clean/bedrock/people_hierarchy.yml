@@ -1,0 +1,112 @@
+---
+database_name: datalake_gsheets_clean
+table_name: people_hierarchy
+columns:
+  employee_id:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.id_colaborador
+  registration_id:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.matricula
+  manager_id:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.id_gestor
+  cost_center_id:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.numero_centro_de_custo
+  name:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.nome
+  email:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.email
+  status:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.status
+  band:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.banda
+  manager_name:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.gestor
+  role:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.cargo
+  role_class:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.classe_cargo
+  department:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.departamento
+  cost_center:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.centro_de_custo
+  sub_board:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.sub_diretoria
+  board:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.diretoria
+  line:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.vertical
+  area:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.area
+  owner:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.owner
+  head:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.head
+  c_level:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.c_level
+  vice_presidency:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.vice_presidencia
+  manager_status:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.status_gestor
+  direct_employees:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.diretos
+  indirect_employees:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.indiretos
+  layer:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.layer
+  fl_leader:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.fl_lider
+  leadership:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.lideranca
+  l0:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.l0
+  l1:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.l1
+  l2:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.l2
+  l3:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.l3
+  l4:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.l4
+  l5:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.l5
+  l6:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.l6
+  l7:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.l7
+  dt_last_update:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.dt_last_update
