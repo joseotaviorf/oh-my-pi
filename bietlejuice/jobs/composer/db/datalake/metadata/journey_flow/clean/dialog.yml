@@ -1,0 +1,52 @@
+---
+database_name: datalake_journey_flow_clean
+table_name: dialog
+columns:
+  id:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.id
+  id_journey:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.journey_id
+  id_correlation:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.correlation_id
+  id_user:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.user_id
+  id_content:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.content_id
+  message_from:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.message_from
+  message_to:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.message_to
+  message_content:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.message_content
+  step_status:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.step_status
+  step_message:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.step_message
+  journey_name:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.journey_name
+  journey_version:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.journey_version
+  journey_step_name:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.journey_step_name
+  journey_step_type:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.journey_step_type
+  elapsed_time:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.elapsed_time
+  ts_created:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.creation

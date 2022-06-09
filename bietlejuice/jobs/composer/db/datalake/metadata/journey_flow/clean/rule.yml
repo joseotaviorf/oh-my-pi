@@ -1,0 +1,34 @@
+---
+database_name: datalake_journey_flow_clean
+table_name: rule
+columns:
+  application_name:
+    lineage:
+      - datalake_journey_flow_raw.t_rule.application_name
+  application_event:
+    lineage:
+      - datalake_journey_flow_raw.t_rule.application_event
+  version:
+    lineage:
+      - datalake_journey_flow_raw.t_rule.version
+  status:
+    lineage:
+      - datalake_journey_flow_raw.t_rule.status
+  content:
+    lineage:
+      - datalake_journey_flow_raw.t_rule.content
+  created_by_user:
+    lineage:
+      - datalake_journey_flow_raw.t_rule.created_by_user
+  approved_by_user:
+    lineage:
+      - datalake_journey_flow_raw.t_rule.approved_by_user
+  ts_created:
+    lineage:
+      - datalake_journey_flow_raw.t_rule.created_at
+  ts_updated:
+    lineage:
+      - datalake_journey_flow_raw.t_rule.updated_at
+  ts_approved:
+    lineage:
+      - datalake_journey_flow_raw.t_rule.approved_at

@@ -1,0 +1,43 @@
+---
+database_name: datalake_journey_flow_clean
+table_name: journey_flow
+columns:
+  id:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.id
+  id_correlation:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.correlation_id
+  id_user:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.user_id
+  id_content:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.content_id
+  taxonomy:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.taxonomy
+  journey_name:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.journey_name
+  journey_version:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.journey_version
+  status:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.status
+  status_error_message:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.status_error_message
+  journey_state:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.journey_state
+  shared_var_expiration:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.shared_var_expiration
+  ts_created:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.created_at
+  ts_updated:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.updated_at
