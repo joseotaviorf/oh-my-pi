@@ -16,31 +16,31 @@ columns:
   channel:
     lineage:
       - datalake_casa_mineira_crm_clean.media_contact.media_contact_name
-  ts_event:
-    lineage:
-      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_ebdb_user.user.ts_event
-      - datalake_quinto_messenger.channel.ts_created
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
   year:
     lineage:
       - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_ebdb_user.user.ts_event
+      - datalake_ebdb_user.user.ts_created
       - datalake_quinto_messenger.channel.ts_created
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
       - datalake_bigfone_twilio.call_flex_events.ts_created_local
   month:
     lineage:
       - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_ebdb_user.user.ts_event
+      - datalake_ebdb_user.user.ts_created
       - datalake_quinto_messenger.channel.ts_created
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
       - datalake_bigfone_twilio.call_flex_events.ts_created_local
   day:
     lineage:
       - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_ebdb_user.user.ts_event
+      - datalake_ebdb_user.user.ts_created
+      - datalake_quinto_messenger.channel.ts_created
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+  ts_event:
+    lineage:
+      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
+      - datalake_ebdb_user.user.ts_created
       - datalake_quinto_messenger.channel.ts_created
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
       - datalake_bigfone_twilio.call_flex_events.ts_created_local

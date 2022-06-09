@@ -1,0 +1,77 @@
+---
+database_name: datalake_tracked_events
+table_name: cross_channel_full
+columns:
+  id_user:
+    lineage:
+      - datalake_online_attribution.online_attribution.id_user
+      - datalake_tracked_events.offline_attribution.id_user
+  id_amplitude:
+    lineage:
+      - datalake_online_attribution.online_attribution.id_amplitude
+  id_session:
+    lineage:
+      - datalake_online_attribution.online_attribution.id_session
+  id_house:
+    lineage:
+      - datalake_online_attribution.online_attribution.id_house
+  id_firestore:
+    lineage:
+      - datalake_online_attribution.online_attribution.id_firestore
+  id_contact:
+    lineage:
+      - datalake_tracked_events.offline_attribution.id_contact
+  event_name:
+    lineage:
+      - datalake_online_attribution.online_attribution.event_type_sanitized
+      - datalake_tracked_events.offline_attribution.event_name
+  visit_code:
+    lineage:
+      - datalake_online_attribution.online_attribution.visit_code
+  app_type:
+    lineage:
+      - datalake_online_attribution.online_attribution.platform
+  final_attribution_branded:
+    lineage:
+      - datalake_online_attribution.online_attribution.app_branded
+  final_attribution_origin:
+    lineage:
+      - datalake_online_attribution.online_attribution.ts_app_attribution
+      - datalake_online_attribution.online_attribution.ts_web_attribution
+      - datalake_tracked_events.offline_attribution.agent
+  final_attribution_source:
+    lineage:
+      - datalake_online_attribution.online_attribution.utm_source
+      - datalake_tracked_events.offline_attribution.origin
+  final_attribution_medium:
+    lineage:
+      - datalake_online_attribution.online_attribution.utm_medium
+      - datalake_tracked_events.offline_attribution.channel
+  final_attribution_campaign:
+    lineage:
+      - datalake_online_attribution.online_attribution.utm_campaign
+  final_attribution_term:
+    lineage:
+      - datalake_online_attribution.online_attribution.utm_term
+  final_attribution_content:
+    lineage:
+      - datalake_online_attribution.online_attribution.utm_content
+  final_attribution_media_source:
+    lineage:
+      - datalake_online_attribution.online_attribution.media_source
+  ts_event:
+    lineage:
+      - datalake_online_attribution.online_attribution.ts_event
+      - datalake_tracked_events.offline_attribution.ts_event
+  year:
+    lineage:
+      - datalake_online_attribution.online_attribution.ts_event
+      - datalake_tracked_events.offline_attribution.ts_event
+  month:
+    lineage:
+      - datalake_online_attribution.online_attribution.ts_event
+      - datalake_tracked_events.offline_attribution.ts_event
+  day:
+    lineage:
+      - datalake_online_attribution.online_attribution.ts_event
+      - datalake_tracked_events.offline_attribution.ts_event

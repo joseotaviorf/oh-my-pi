@@ -1,7 +1,14 @@
 ---
 partition_cols:
-  - origin
-  - channel
-  - year
-  - month
-  - day
+  offline_attribution:
+    - year
+    - month
+    - day
+  cross_channel_full:
+    - year
+    - month
+    - day
+  attribution_cross_channel:
+    - year
+    - month
+    - day

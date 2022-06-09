@@ -1,7 +1,7 @@
 WITH
 contact_secretaria AS (
   SELECT
-    COALESCE(uemail.id, uphone.id) AS id_user,
+    COALESCE(cmc.id_client,uemail.id) AS id_user,
     cmc.id AS sk_contact,
     'Contact' AS event_name,
     oc.origin_contact_name AS origem,
@@ -10,16 +10,14 @@ contact_secretaria AS (
     cmc.ts_created AS ts_event
   FROM
     datalake_casa_mineira_crm_clean.contact AS cmc
-    LEFT JOIN datalake_ebdb_clean.user AS uemail
-      ON LOWER(uemail.email) = LOWER(cmc.email)
-    LEFT JOIN datalake_ebdb_clean.user AS uphone
-      ON '+55' || cmc.phone_number = uphone.main_phone
-    LEFT JOIN datalake_casa_mineira_crm_clean.origin_contact AS oc
-      ON oc.id = cmc.id_origin
-    LEFT JOIN datalake_casa_mineira_crm_clean.media_contact AS mc
-      ON mc.id = cmc.id_media
-  WHERE
-    COALESCE(uemail.id, uphone.id) > 0
+  LEFT JOIN datalake_ebdb_clean.user AS u
+    ON cmc.id_client = u.id
+  LEFT JOIN datalake_ebdb_clean.user AS uemail
+    ON LOWER(uemail.email) = LOWER(cmc.email)
+  LEFT JOIN datalake_casa_mineira_crm_clean.origin_contact AS oc
+    ON oc.id = cmc.id_origin
+  LEFT JOIN datalake_casa_mineira_crm_clean.media_contact AS mc
+    ON mc.id = cmc.id_media
 ),
 ivr_events AS (
   SELECT

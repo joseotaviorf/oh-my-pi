@@ -12,6 +12,9 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
+    TaskFlowHelper,
+)
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
@@ -76,13 +79,45 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=ATHENA_QUERY_RESULT_BUCKET,
 )
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-    has_create_external_table_task=False,
-    partitions=PARTITION_COLS,
+tables = datalake_task_group._get_table_names_from_sql_files(layer=LayerEnum.ENRICH)
+
+enrich_task_groups = {}
+
+for table in tables:
+    partitions = PARTITION_COLS[table]
+    enrich_task_groups[table] = datalake_task_group.build_enrich_task_group(
+        table_name=table,
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        partitions=partitions,
+    )
+
+INNER_DEPENDENCIES = {
+    "cross_channel_full": ["offline_attribution"],
+    "attribution_cross_channel": ["cross_channel_full"],
+}
+
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=INNER_DEPENDENCIES,
 )
 
-chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
-chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+chain(
+    create_cluster_task,
+    datalake_task_group.all_first_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.first_tasks(inner_dependencies_task_groups_boundaries),
+)
+
+chain(
+    datalake_task_group.all_last_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
+)
