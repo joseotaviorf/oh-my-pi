@@ -329,7 +329,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_call:load-call-fact-calls-into-redshift
   - bietlejuice.dw_datamarts_cross:create-buyer-prospect-status-in-datalake
   - bietlejuice.dw_datamarts_cross:create-funnel-demand-flows-in-datalake
-  - bietlejuice.dw_datamarts_cross:load-lead-listing-flows-in-redshift
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
