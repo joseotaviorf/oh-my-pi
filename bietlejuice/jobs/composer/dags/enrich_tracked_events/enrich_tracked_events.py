@@ -41,7 +41,7 @@ DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 PARTITION_COLS = config_service.get_config("partition_cols")
 
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_min_io-general_cluster", deserialize_json=True
+    "databricks_9_1_med_io-general_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
