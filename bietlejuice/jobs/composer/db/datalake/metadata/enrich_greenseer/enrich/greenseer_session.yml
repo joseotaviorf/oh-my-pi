@@ -14,6 +14,9 @@ columns:
   id_pipeline:
     lineage:
       - datalake_greenseer_clean.session.id_pipeline
+  id_content:
+    lineage:
+      - datalake_journey_flow_clean.journey_flow.id_content
   before_reception:
     lineage:
       - datalake_greenseer_clean.session.memory

@@ -1466,6 +1466,7 @@ bietlejuice.enrich_firestore:
 bietlejuice.enrich_greenseer:
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.greenseer:load-clean-session
+  - bietlejuice.journey_flow:load-clean-journey-flow
   - bietlejuice.sauron:load-clean-session
 
 bietlejuice.enrich_heimdall:
