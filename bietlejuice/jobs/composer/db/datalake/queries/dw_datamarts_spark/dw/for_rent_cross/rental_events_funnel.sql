@@ -3,6 +3,7 @@ WITH lead_ AS (
     dd.date,
     dd.sk_date,
     dr.city_group,
+    dr.country_code,
     NULL AS is_b2b,
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
@@ -57,13 +58,14 @@ WITH lead_ AS (
   WHERE 
     origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 prospect AS (
   SELECT
     dd.date,
     dd.sk_date,
     dr.city_group,
+    dr.country_code,
     NULL AS is_b2b,
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
@@ -118,13 +120,14 @@ prospect AS (
   WHERE 
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 qualified AS (
   SELECT
     dd.date,
     dd.sk_date,
     dr.city_group,
+    dr.country_code,
     NULL AS is_b2b,
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
@@ -178,13 +181,14 @@ qualified AS (
   WHERE 
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 opportunity AS (
   SELECT
     dd.date,
     dd.sk_date,
     dr.city_group,
+    dr.country_code,
     NULL AS is_b2b,
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
@@ -238,13 +242,14 @@ opportunity AS (
   WHERE 
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,13,14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 listing AS (
   SELECT
     dd.date,
     dd.sk_date,
     dr.city_group,
+    dr.country_code,
     NULL AS is_b2b,
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
@@ -298,13 +303,14 @@ listing AS (
   WHERE 
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 messages_sent AS (
   SELECT
     dd.date,
     dd.sk_date,
     dr.city_group,
+    dr.country_code,
     CASE
       WHEN dhl.is_b2b= TRUE THEN 'B2B'
       WHEN dhl.is_b2b = FALSE THEN 'FALSE'
@@ -349,17 +355,18 @@ messages_sent AS (
     dw_public.dim_house_listing AS dhl
       ON tta.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN 
-    (SELECT distinct city_group, region_code FROM dw_public.dim_region) AS dr
+    (SELECT distinct city_group, region_code, country_code FROM dw_public.dim_region) AS dr
       ON tta.region_code = dr.region_code
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 agent_supports AS (
   SELECT
     dd.date,
     dd.sk_date,
     dr.city_group,
+    dr.country_code,
     CASE
       WHEN dhl.is_b2b= TRUE THEN 'B2B'
       WHEN dhl.is_b2b = FALSE THEN 'FALSE'
@@ -411,7 +418,7 @@ agent_supports AS (
       ON rf.sk_region = dr.sk_region
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 rent_flow_adjusted AS (
   SELECT
@@ -455,6 +462,7 @@ rent_flow_adjusted AS (
         OR ciq.sk_house_listing IS NULL THEN 'FALSE'
     END AS is_b2b,
     dr.city_group,
+    dr.country_code,
     db.mkt_channel AS demand_mkt_channel_booking,
     db.mkt_medium AS demand_mkt_medium_booking,
     dof.mkt_channel AS demand_mkt_channel_offer,
@@ -489,6 +497,7 @@ visits_booked AS (
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -529,13 +538,14 @@ visits_booked AS (
       AND rf.sk_booking_created_date > 0
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 visits_completed AS (
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -576,13 +586,14 @@ visits_completed AS (
       AND rf.sk_visit_date > 0 AND rf.flg_visit_completed = 1
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 offer_submitted AS (
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -623,13 +634,14 @@ offer_submitted AS (
       AND rf.sk_offer_submitted_date > 0
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 offer_approved AS(
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -670,13 +682,14 @@ offer_approved AS(
       AND rf.sk_offer_approved_date > 0
   WHERE 
       (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 credit_evaluation_init AS(
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -716,13 +729,14 @@ credit_evaluation_init AS(
       ON dd.sk_date = rf.sk_first_credit_evaluation_init
       AND rf.sk_first_credit_evaluation_init > 0
   WHERE (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 credit_evaluation_positive AS(
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -763,13 +777,14 @@ credit_evaluation_positive AS(
       AND rf.sk_first_credit_evaluation_positive > 0
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 guarantee_started AS(
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -810,13 +825,14 @@ guarantee_started AS(
       AND rf.sk_guarantee_date > 0
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 doc_sent AS(
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -857,13 +873,14 @@ doc_sent AS(
       AND rf.sk_tenant_first_doc_sent_date > 0
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 doc_approved AS(
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -905,13 +922,14 @@ doc_approved AS(
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
     AND sk_offer > 0 -- correcting cases with doc approved date but sk_offer = -1
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 guarantee_paid AS(
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -952,13 +970,14 @@ guarantee_paid AS(
       AND rf.sk_guarantee_paid_date > 0
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 credit_approved AS(
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -999,13 +1018,14 @@ credit_approved AS(
       AND rf.sk_credit_analysis_approved_date > 0
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 contract_created AS (
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -1046,13 +1066,14 @@ contract_created AS (
       AND rf.sk_contract_created_date > 0
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 contract_signed AS (
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -1093,13 +1114,14 @@ contract_signed AS (
       AND rf.sk_contract_signed_date > 0
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 contract_ended AS (
   SELECT
     dd.date,
     dd.sk_date,
     rf.city_group,
+    rf.country_code,
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
@@ -1141,7 +1163,7 @@ contract_ended AS (
       AND rf.sk_contract_annulment_date > 0
   WHERE 
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -1190,6 +1212,7 @@ union_all_date AS (
   SELECT
     dd.date,
     ua.city_group,
+    ua.country_code,
     ua.is_b2b,
     ua.supply_mkt_origin,
     ua.supply_mkt_channel,
@@ -1233,6 +1256,7 @@ union_all_date AS (
 SELECT
   date,
   city_group,
+  country_code,
   supply_mkt_origin,
   CASE 
     WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
@@ -1281,4 +1305,4 @@ SELECT
   current_timestamp AS ts_load
 FROM 
   union_all
-GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14

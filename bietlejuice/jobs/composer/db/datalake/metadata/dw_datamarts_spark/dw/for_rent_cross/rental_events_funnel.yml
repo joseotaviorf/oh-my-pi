@@ -8,6 +8,9 @@ columns:
   city_group:
     lineage:
       - dw_public.dim_region.city_group
+  country_code:
+    lineage:
+      - dw_public.dim_region.country_code
   supply_mkt_origin:
     lineage:
       - dw_datamarts_cross.lead_listing_flows.mkt_origin
