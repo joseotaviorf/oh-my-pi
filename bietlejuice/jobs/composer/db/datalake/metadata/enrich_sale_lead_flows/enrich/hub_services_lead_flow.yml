@@ -62,9 +62,11 @@ columns:
   first_business_unit_hub_name:
     lineage:
       - datalake_gsheets_clean.business_unit_region.business_unit
+      - datalake_hub_services_clean.business_unit_aud
   last_business_unit_hub_name:
     lineage:
       - datalake_gsheets_clean.business_unit_region.business_unit
+      - datalake_hub_services_clean.business_unit_aud
   ts_first_visit_lead_intent:
     lineage:
       - datalake_hub_services_clean.lead_aud.ts_created

@@ -103,6 +103,15 @@ last_contact_prospect AS (
     rw_desc = 1
 ),
 
+last_business_unit AS (
+  SELECT
+    id,
+    hub_name,
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS rw_hub_desc
+  FROM
+    datalake_hub_services_clean.business_unit_aud
+),
+
 -- LEADS
 leads AS (
   SELECT 
@@ -113,7 +122,7 @@ leads AS (
     l.id_business_unit,
     v.email,
     v.phone_number,
-    COALESCE(bur.business_unit, 'not_mapped') AS business_unit_hub_name, 
+    COALESCE(bu.hub_name, bur.business_unit, 'not_mapped') AS business_unit_hub_name,
     l.lead_type,
     l.lead_status,
     l.ts_created,
@@ -128,6 +137,10 @@ leads AS (
   LEFT JOIN
     house AS h
       ON l.id_house = h.id
+  LEFT JOIN
+    last_business_unit as bu
+      ON l.id_business_unit = bu.id
+      AND bu.rw_hub_desc = 1
   LEFT JOIN
     datalake_gsheets_clean.business_unit_region AS bur
       ON h.id_region = bur.id_region
