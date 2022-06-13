@@ -7,6 +7,7 @@ SELECT
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
+	lf.rental_administrator,
 	sales_company,
 	sourcing_ops,
 	context_lead AS context,
@@ -29,7 +30,7 @@ LEFT JOIN dim_region dr
 LEFT JOIN datalake_3p_prod.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 prospect AS (
 SELECT
@@ -39,6 +40,7 @@ SELECT
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
+	lf.rental_administrator,
 	sales_company,
 	sourcing_ops,
 	context_prospect AS context,
@@ -61,7 +63,7 @@ LEFT JOIN dim_region dr
 LEFT JOIN datalake_3p_prod.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE-- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 qualified AS (
 SELECT
@@ -71,6 +73,7 @@ SELECT
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
+	lf.rental_administrator,
 	sales_company,
 	sourcing_ops,
 	context_qualified AS context,
@@ -93,7 +96,7 @@ LEFT JOIN dim_region dr
 LEFT JOIN datalake_3p_prod.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 opportunity AS (
 SELECT
@@ -103,6 +106,7 @@ SELECT
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
+	lf.rental_administrator,
 	sales_company,
 	sourcing_ops,
 	context_opportunity AS context,
@@ -125,7 +129,7 @@ LEFT JOIN dim_region dr
 LEFT JOIN datalake_3p_prod.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 listing AS (
 SELECT
@@ -135,6 +139,7 @@ SELECT
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
+	lf.rental_administrator,
 	sales_company,
 	sourcing_ops,
 	context_first_listing AS context,
@@ -157,7 +162,7 @@ LEFT JOIN dim_region dr
 LEFT JOIN datalake_3p_prod.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -177,6 +182,7 @@ SELECT
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
   ua.supply_mkt_completion,
+  ua.rental_administrator,
   ua.sales_company,
   ua.sourcing_ops,
   ua.context,
@@ -216,6 +222,7 @@ SELECT
     context,
     origin_table,
     lead_origin,
+    rental_administrator,
     funnel_drop_reason,
     supply_3p_partner,
     is_3p_supply,
@@ -226,4 +233,4 @@ SELECT
     SUM(COALESCE(first_listings,0)) AS first_listings,
     current_timestamp AS ts_load
 FROM union_all_date
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15

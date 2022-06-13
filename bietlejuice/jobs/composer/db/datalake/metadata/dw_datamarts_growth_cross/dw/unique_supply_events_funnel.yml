@@ -40,6 +40,9 @@ columns:
   lead_origin:
     lineage:
       - dw_datamarts_cross.lead_listing_flows.lead_origin
+  rental_administrator:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.rental_administrator
   funnel_drop_reason:
     lineage:
       - dw_datamarts_cross.lead_listing_flows.funnel_drop_reason
