@@ -1,4 +1,5 @@
 import logging
+import re
 from argparse import ArgumentParser
 from datetime import datetime
 
@@ -19,6 +20,62 @@ JOB_NAME = "load_crawler_listings_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def replace_for_array_schema(schema_list: list, key: str) -> list:
+    """
+    Check if the given field already exists in the new_schema list as a string
+    and replace it for the key:array<string> schema.
+
+    When an element of the struct is a list this function will search inside the list for
+    any appearence of this element that is not <element_name>:array<string>. For example,
+    the field amenities can come as a single string (amenities<string>) and also as a list
+    of strings (amenities:array<string>). The funtion will delete the single string schema
+    and replace for the array schema.
+
+    :param schema_list: List with the struct elements.
+    :param key: Element name that will be searched
+    :return new_schema_list: New list with the struct element replaced or not.
+    """
+    string_to_replace = f"{key}:array<string>"
+    string_to_search = f"{key}:string"
+    r = re.compile(string_to_search)
+    has_match = list(filter(lambda item: r.search(item), (schema_list)))
+
+    if has_match != [] and string_to_replace not in schema_list:
+        string_to_remove_index = schema_list.index(has_match[0])
+        schema_list[string_to_remove_index] = string_to_replace
+
+    return schema_list
+
+
+def build_new_schema_list(df_rows: list, struct_column_name: str) -> str:
+    """
+    Returns a string that defines the schema for the given struct column.
+
+    :param df_rows: listof rows (A row is a pyspark.DataFrame.Row object)
+    :param struct_column_name: String used to indicate the column that will be accessed.
+    :return schema_string: The string that will be used to cast the Dataframe column.
+    """
+    new_schema = []
+    for row in df_rows:
+        row_as_dict = row.asDict(recursive=True)
+        house_info_column = row_as_dict[struct_column_name]
+        for key, value in house_info_column.items():
+            if type(value) == list:
+                element = f"{key}:array<string>"
+                replace_for_array_schema(new_schema, key)
+            else:
+                element = f"{key}:string"
+            r = re.compile(key)
+            has_match = list(filter(lambda item: r.search(item), new_schema))
+            if has_match == []:
+                new_schema.append(element)
+
+    str_new_schema = f"struct<{','.join(new_schema)}>"
+
+    return str_new_schema
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -76,8 +133,9 @@ if __name__ == "__main__":
         df = df.withColumn("metadata", df["metadata"].cast(str_schema))
 
     if origin == "loft":
-        str_schema = "struct<amenities:array<string>,area:string,bathrooms:string,bedrooms:string,description:string,features:array<string>,floor:string,num_floors:string,parking_spaces:string,suites:string,total_area:string,unit_type:string,usage_type:array<string>,year_built:string>"
-        df = df.withColumn("house_info", df["house_info"].cast(str_schema))
+        rows = df.collect()
+        new_schema_string = build_new_schema_list(rows, "house_info")
+        df = df.withColumn("house_info", df["house_info"].cast(new_schema_string))
 
     db_info = DatalakeMetastoreService.get_db_info(
         environment, f"{source}_{context}", datalake_bucket
