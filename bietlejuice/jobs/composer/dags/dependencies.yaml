@@ -1703,9 +1703,8 @@ bietlejuice.enrich_offer:
   - bietlejuice.gsheets:load-clean-offers-hub-central
   - bietlejuice.hub_services:load-clean-business-unit
 
-# bietlejuice.enrich_online_attribution:
-#   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-#   - bietlejuice.gsheets:create-clean-taxonomy-demand-external-table
+bietlejuice.enrich_online_attribution:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
@@ -1906,18 +1905,18 @@ bietlejuice.enrich_top_of_funnel_supply:
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets.growth:load-clean-marketing-cost-taxonomy
 
-# bietlejuice.enrich_tracked_events:
-#   - bietlejuice.casa_mineira_crm:load-clean-contact
-#   - bietlejuice.casa_mineira_crm:load-clean-origin-contact
-#   - bietlejuice.casa_mineira_crm:load-clean-media-contact
-#   - bietlejuice.ebdb:create-clean-user-in-data-lake
-#   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
-#   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
-#   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
-#   - bietlejuice.enrich_quinto_messenger:load-enrich-task
-#   - bietlejuice.enrich_quinto_messenger:load-enrich-channel
-#   - bietlejuice.enrich_ebdb_user:load-enrich-user
-#   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
+bietlejuice.enrich_tracked_events:
+  - bietlejuice.casa_mineira_crm:load-clean-contact
+  - bietlejuice.casa_mineira_crm:load-clean-origin-contact
+  - bietlejuice.casa_mineira_crm:load-clean-media-contact
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
+  - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
+  - bietlejuice.enrich_quinto_messenger:load-enrich-task
+  - bietlejuice.enrich_quinto_messenger:load-enrich-channel
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
+  - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
 
 bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:load-clean-dispatch
