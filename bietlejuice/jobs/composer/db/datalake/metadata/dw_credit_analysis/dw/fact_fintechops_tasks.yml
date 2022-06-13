@@ -1,0 +1,16 @@
+---
+database_name: dw_credit
+table_name: fact_fintechops_tasks
+columns:
+  sk_task:
+    lineage:
+      - dw_crm.fact_credit_tasks.sk_task
+  sk_proposal:
+    lineage:
+      - dw_crm.fact_credit_tasks.sk_proposal
+  action_user_name:
+    lineage: 
+      - dw_crm.fact_credit_tasks.action_user_name
+  documentation_policy:
+    lineage: 
+      - datalake_sorting_hat_clean.credit_analysis.type

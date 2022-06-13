@@ -73,7 +73,8 @@ dw_task_group = DWTaskGroup(
 )
 
 dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW_STAGING
+    layer=LayerEnum.DW_STAGING,
+    cluster_config_params={"udfs": ["FINTECHOPS_WORK_MIN_SLA"]},
 )
 
 dw_task_group = dw_task_group.build_task_group_from_sql_files(

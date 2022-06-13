@@ -281,7 +281,7 @@ class DWTaskGroup(BaseTaskGroup):
                 "spark_python_task": {
                     "python_file": f"{self.spark_jobs_path}/load_{table_load_mode}_table_to_dw_staging_schema.py",
                     "parameters": load_table_to_dw_staging_params
-                    + [str(cluster_config_params), tree_path],
+                    + [json.dumps(cluster_config_params), tree_path],
                 }
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),

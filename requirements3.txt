@@ -4,6 +4,7 @@
 # Please, keep the dependencies sorted alphabetically.
 botocore==1.12.201
 boto3==1.9.201
+businesstimedelta==1.0.1
 Click==7.0
 deepmerge==0.3.0
 dependency-injector==4.8.2
