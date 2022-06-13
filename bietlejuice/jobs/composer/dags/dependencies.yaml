@@ -574,6 +574,13 @@ bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.enrich_big_agent:load-enrich-enrollment
   - bietlejuice.enrich_big_agent:load-enrich-house
   - bietlejuice.enrich_big_agent:load-enrich-program
+    # talk_to_agent aditionals
+  - bietlejuice.gsheets:create-clean-taxonomy-demand-external-table
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.dw_user:load-dw-public-dim-user
+  - bietlejuice.ebdb:create-agent-support-clean-external-table
+  - bietlejuice.ebdb:create-listing-business-context-clean-external-table
+  - bietlejuice.ebdb:create-house-clean-external-table
 
 bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.amplitude:events-raw-to-clean

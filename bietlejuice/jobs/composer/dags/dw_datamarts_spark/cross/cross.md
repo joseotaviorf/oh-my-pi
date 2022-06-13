@@ -15,6 +15,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `buyer_prospect_status`
 - `funnel_demand_flows`
 - `quintoandar_consultant_listings`
+- `talk_to_agent`
 
 ### Responsible Data Engineering Team
 
