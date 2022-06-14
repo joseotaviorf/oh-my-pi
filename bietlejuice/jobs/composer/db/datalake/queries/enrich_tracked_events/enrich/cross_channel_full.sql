@@ -14,8 +14,15 @@ cross_channel AS (
         id_firestore,
         NULL AS id_contact,
         visit_code,
-        COALESCE(platform,'') AS app_type,
         event_type_sanitized AS event_name,
+        CASE 
+            WHEN event_type_sanitized NOT IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN COALESCE(platform,amplitude_platform,'')
+        END AS attribution_app_type,
         CASE 
             WHEN event_type_sanitized NOT IN (
                 'visit_schedule_confirmed',
@@ -116,8 +123,8 @@ cross_channel AS (
         NULL AS id_firestore,
         id_contact,
         NULL AS visit_code,
-        'offline_table' AS app_type,
         event_name,
+        'offline_table' AS attribution_app_type,
         CASE 
             WHEN origin IN (
                 'Quinto Andar Classificados Lite',
@@ -151,7 +158,8 @@ cross_channel AS (
             'Quinto Andar Inbound',
             'Quinto Andar Classificados Inbound',
             'Quinto Andar - Traz quem compra',
-            'Quinto Andar - Placas'
+            'Quinto Andar - Placas',
+            'Placas'
             )
 )
 /*
@@ -166,8 +174,10 @@ SELECT
     id_firestore,
     id_contact,
     visit_code,
-    app_type,
     event_name,
+    LAST(attribution_app_type, TRUE) OVER(
+        PARTITION BY id_user_conversion 
+        ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_app_type,
     LAST(attribution_branded, TRUE) OVER(
         PARTITION BY id_user_conversion 
         ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_branded,
