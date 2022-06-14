@@ -76,6 +76,12 @@ columns:
   mod_is_canceled:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.is_canceled_mod
+  ts_canceled:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.canceled_at
+  ts_canceled_mod:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.canceled_at_mod
   ts_created:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.created_at

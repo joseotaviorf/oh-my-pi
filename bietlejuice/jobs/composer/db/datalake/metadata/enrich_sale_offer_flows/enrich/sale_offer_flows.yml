@@ -110,16 +110,11 @@ columns:
   flow_type:
     lineage:
       - datalake_sales_flow_clean.sales_flow.flow_type
-  vendas_offer_flow:
-    lineage:
-      - datalake_sales_flow_clean.sales_flow.flow_type
   sale_agreement_cancellation_reason:
     lineage:
       - datalake_sales_flow_clean.rescission.comment
+      - datalake_sales_flow_clean.sales_flow.closing_canceled_reason
   drop_reason:
-    lineage:
-      - datalake_sales_flow_clean.offer.discard_reason
-  drop_reason_responsible:
     lineage:
       - datalake_sales_flow_clean.offer.discard_reason
   credit_model:
@@ -205,13 +200,13 @@ columns:
       - datalake_sales_flow_clean.sales_flow.status_closing
   house_dilligence_status:
     lineage:
-      - datalake_sales_flow_clean.diligence.classification
+      - datalake_sales_flow_clean.house.house_registration_status
   diligence_appointment_reason:
     lineage:
       - datalake_sales_flow_clean.diligence_appointment.appointment
   seller_dilligence_status:
     lineage:
-      - datalake_sales_flow_clean.sales_flow.status
+      - datalake_sales_flow_clean.diligence.classification
   report_dilligence_status:
     lineage:
       - datalake_sales_flow_clean.diligence.step
@@ -239,29 +234,12 @@ columns:
   sale_price_agreed:
     lineage:
       - datalake_sales_flow_clean.offer.sale_price
-  days_offer_accepted_to_offer_dismissed:
-    lineage:
-      - datalake_sales_flow_clean.offer.ts_discarded
-      - datalake_sales_flow_clean.offer.ts_accepted
-  days_offer_accepted_to_sale_agreement_created:
-    lineage:
-      - datalake_sales_flow_clean.ccv_flow.ts_confection_started
-      - datalake_sales_flow_clean.offer.ts_accepted
-  days_offer_accepted_to_sale_agreement_signed:
-    lineage:
-      - datalake_sales_flow_clean.ccv_flow.ts_signed
-      - datalake_sales_flow_clean.offer.ts_accepted
-  days_sale_agreement_created_to_sale_agreement_signed:
-    lineage:
-      - datalake_sales_flow_clean.ccv_flow.ts_signed
-      - datalake_sales_flow_clean.ccv_flow.ts_confection_started
   has_seller_debt_payments:
     lineage:
       - datalake_sales_flow_clean.house.has_seller_debt_payments
   is_ccv_canceled:
     lineage:
-      - datalake_sales_flow_clean.ccv_flow.ts_signed
-      - datalake_sales_flow_clean.sales_flow.flow_step
+      - datalake_sales_flow_clean.sales_flow.is_canceled
   dt_sale_agreement_created:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.ts_confection_started
@@ -270,7 +248,7 @@ columns:
       - datalake_sales_flow_clean.ccv_flow.ts_signed
   dt_sale_agreement_cancelled:
     lineage:
-      - datalake_sales_flow_clean.sales_flow.flow_step
+      - datalake_sales_flow_clean.sales_flow.ts_caneceled
       - datalake_sales_flow_clean.offer.ts_discarded
   dt_onboarding_ended:
     lineage:

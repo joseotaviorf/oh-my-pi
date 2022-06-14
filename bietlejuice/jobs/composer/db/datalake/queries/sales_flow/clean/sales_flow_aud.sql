@@ -25,6 +25,8 @@ SELECT
     status_mod AS mod_status,
     closing_canceled_reason_mod AS mod_closing_canceled_reason,
     is_canceled_mod AS mod_is_canceled,
+    canceled_at AS ts_canceled, 
+    canceled_at_mod AS ts_canceled_mod, 
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

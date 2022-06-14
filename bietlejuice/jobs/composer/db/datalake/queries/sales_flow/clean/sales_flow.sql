@@ -11,6 +11,7 @@ SELECT
     status,
     closing_canceled_reason,
     is_canceled,
+    canceled_at AS ts_canceled, 
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

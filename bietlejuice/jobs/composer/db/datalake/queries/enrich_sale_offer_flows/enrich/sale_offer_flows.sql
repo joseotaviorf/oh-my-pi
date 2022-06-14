@@ -71,7 +71,10 @@ sales_flow AS (
         sf.flow_type,
         sf.status,
         sf.flow_step,
-        sf.status_closing
+        sf.status_closing, 
+        sf.closing_canceled_reason, 
+        sf.is_canceled,
+        sf.ts_canceled
     FROM
         datalake_sales_flow_clean.sales_flow AS sf
     INNER JOIN
@@ -416,7 +419,8 @@ last_update_house AS (
 house AS (
     SELECT
         h.id,
-        h.has_seller_debt_payments
+        h.has_seller_debt_payments, 
+        h.house_registration_status
     FROM
         datalake_sales_flow_clean.house AS h
     INNER JOIN
@@ -568,7 +572,7 @@ SELECT
         WHEN ft.flow_type = 'DEFAULT'
         THEN 'DEAL_MAKING'
     END AS vendas_offer_flow,
-    r.comment AS sale_agreement_cancellation_reason,
+    COALESCE(sf.closing_canceled_reason, r.comment) AS sale_agreement_cancellation_reason,
     off.discard_reason AS drop_reason,
     CASE
         WHEN LOWER(off.discard_reason) LIKE '%buyer%'
@@ -604,9 +608,9 @@ SELECT
     sp.agent_name,
     sp.agent_email,
     sf.status_closing AS closing_status,
-    d.classification AS house_dilligence_status,
+    h.house_registration_status AS house_dilligence_status,
     da.appointment AS diligence_appointment_reason,
-    sf.status AS seller_dilligence_status,
+    d.classification AS seller_dilligence_status,
     d.step AS report_dilligence_status,
     mg.status AS bank_analysis_status,
     p.status AS payment_status,
@@ -633,21 +637,27 @@ SELECT
         ccvf.dt_confection_started
     ) AS days_sale_agreement_created_to_sale_agreement_signed,
     h.has_seller_debt_payments,
-    CASE
-        WHEN ccvf.dt_sale_agreement_signed IS NOT NULL
-        THEN
-            CASE
-            WHEN sf.flow_step = 'CANCELED_CCV' THEN TRUE
-            ELSE FALSE
-            END
-        ELSE NULL
-    END AS is_ccv_canceled,
+    COALESCE(
+        sf.is_canceled, 
+        CASE
+            WHEN ccvf.dt_sale_agreement_signed IS NOT NULL
+            THEN
+                CASE
+                    WHEN sf.flow_step = 'CANCELED_CCV' THEN TRUE
+                    ELSE FALSE
+                END
+            ELSE NULL
+    END
+    ) AS is_ccv_canceled,
     ccvf.dt_confection_started AS dt_sale_agreement_created,
     ccvf.dt_sale_agreement_signed AS dt_sale_agreement_signed,
-    CASE
-        WHEN sf.flow_step = 'CANCELED_CCV'
-        THEN DATE(off.ts_discarded)
-    END AS dt_sale_agreement_cancelled,
+    COALESCE(
+        DATE(sf.ts_canceled),
+        CASE
+            WHEN sf.flow_step = 'CANCELED_CCV'
+            THEN DATE(off.ts_discarded)
+        END
+    ) AS dt_sale_agreement_cancelled,
     o.dt_ended AS dt_onboarding_ended,
     DATE(d.ts_buyer_seller_ended) AS dt_legal_analysis_ended,
     DATE(d.ts_partner_started) AS dt_legaut_analysis_started,
