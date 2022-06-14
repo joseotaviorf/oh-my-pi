@@ -46,6 +46,9 @@ columns:
   funnel_drop_reason:
     lineage:
       - dw_datamarts_cross.lead_listing_flows.funnel_drop_reason
+  is_3p_supply:
+    lineage:
+      - datalake_ebdb_listing.house.is_3p_supply
   supply_3p_partner:
     lineage:
-      - datalake_3p.houses_3p.partner
+      - datalake_ebdb_listing.house.partner_3p_supply

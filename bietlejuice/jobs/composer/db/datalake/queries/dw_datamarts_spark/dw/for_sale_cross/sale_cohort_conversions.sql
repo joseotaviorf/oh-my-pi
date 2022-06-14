@@ -11,11 +11,8 @@ WITH sale_listing_flows_adjust AS (
         lf.mkt_origin,
         lf.mkt_channel,
         lf.sales_company,
-        CASE
-            WHEN hp.id_house IS NOT NULL THEN 1 
-            ELSE 0
-        END AS is_3p_supply,
-        hp.partner AS supply_3p_partner,
+        CASE WHEN dhl.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
+        dhl.partner_3p_supply AS supply_3p_partner,
         CASE
             WHEN lf.mkt_origin = 'B2B' 
             OR lf.mkt_origin = 'CIQ' 
@@ -49,25 +46,10 @@ WITH sale_listing_flows_adjust AS (
         dw_public.dim_region AS dr
             ON dr.sk_region = lf.sk_region
     LEFT JOIN
-        datalake_3p.houses_3p AS hp
-            ON hp.id_house = CAST(lf.sk_house_listing / 1000 AS INT) 
+        dw_public.dim_house_listing AS dhl
+            ON dhl.sk_house_listing = lf.sk_house_listing 
     WHERE
         lf.origin_table = 'Sale'
-),
-agents_3p AS (
-    SELECT
-        ac.id_agent,
-        ac.id_user_agent,
-        ac.id_work_contract,
-        ac.ts_work_contract_started,
-        ac.ts_work_contract_ended,
-        NULLIF(wc.`3p_partner`, '') AS demand_3p_partner,
-        wc.is_3p_contract
-    FROM
-        datalake_ebdb_agents.agent_contract AS ac
-    JOIN
-        datalake_ebdb_work_contract.work_contract AS wc
-            ON ac.id_work_contract = wc.id
 ),
 monday_adjusted AS (
 -- data from datalake_firestore.monday
@@ -121,8 +103,10 @@ sale_bookings_base AS (
         fv.is_hub_flow,
         bur.business_unit AS hub_visit,
         dr.city_group,
-        COALESCE(ap.is_3p_contract, FALSE) AS is_3p_demand,
-        ap.demand_3p_partner,
+        COALESCE(db.is_3p_demand, FALSE) AS is_3p_demand,
+        COALESCE(db.partner_3p_demand, '') AS demand_3p_partner,
+        COALESCE(db.is_3p_supply, FALSE) AS is_3p_supply,
+        COALESCE(db.partner_3p_supply, '') AS supply_3p_partner,
         TO_DATE(sk_booking_created_date::STRING, 'yyyyMMdd') AS dt_created,
         TO_DATE(sk_visit_completed_date::STRING, 'yyyyMMdd') AS dt_completed,
         ROW_NUMBER() OVER (PARTITION BY fv.sk_booking ORDER BY COALESCE(bur.dt_coverage_ended,current_date) DESC NULLS FIRST) AS order_booking
@@ -139,10 +123,6 @@ sale_bookings_base AS (
             ON bur.sk_region = fv.sk_region
             AND TO_DATE(fv.sk_booking_created_date::STRING, 'yyyyMMdd') BETWEEN DATE (bur.dt_coverage_started) 
             AND DATE(COALESCE(bur.dt_coverage_ended, CURRENT_DATE))
-    LEFT JOIN
-        agents_3p AS ap
-            ON ap.id_agent = db.id_agent
-            AND db.dt_created BETWEEN ap.ts_work_contract_started AND COALESCE(ts_work_contract_ended, db.ts_load)
 ),
 sale_bookings AS (
     SELECT 
@@ -156,6 +136,8 @@ sale_bookings AS (
         city_group,
         is_3p_demand,
         demand_3p_partner,
+        is_3p_supply,
+        supply_3p_partner,
         dt_created,
         dt_completed,
         order_booking
@@ -172,6 +154,10 @@ sale_closing AS (
             fo.sk_offer,
             fo.sk_buyer AS sk_buyer,
             fo.sk_agent AS id_agent,
+            sdo.is_3p_demand,
+            COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
+            sdo.is_3p_supply,
+            COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
             sdo.business_unit AS hub
         FROM
             dw_sale.fact_offers AS fo
@@ -191,6 +177,10 @@ sale_closing AS (
             fo.sk_offer,
             fo.sk_buyer AS sk_buyer,
             fo.sk_agent AS id_agent,
+            sdo.is_3p_demand,
+            COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
+            sdo.is_3p_supply,
+            COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
             sdo.business_unit AS hub
         FROM
             dw_sale.fact_offers AS fo
@@ -210,6 +200,10 @@ sale_closing AS (
             fo.sk_offer,
             fo.sk_buyer AS sk_buyer,
             fo.sk_agent AS id_agent,
+            sdo.is_3p_demand,
+            COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
+            sdo.is_3p_supply,
+            COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
             sdo.business_unit AS hub
         FROM
             dw_sale.fact_offers AS fo
@@ -227,6 +221,10 @@ sale_closing AS (
         COALESCE(fact_os.sk_house,fact_oa.sk_house,fact_ccv.sk_house) AS sk_house,
         COALESCE(fact_os.sk_buyer,fact_oa.sk_buyer,fact_ccv.sk_buyer) AS sk_buyer,
         COALESCE(fact_os.id_agent,fact_oa.id_agent,fact_ccv.id_agent) AS id_agent,
+        COALESCE(fact_os.is_3p_demand,fact_oa.is_3p_demand,fact_ccv.is_3p_demand) AS is_3p_demand,
+        COALESCE(fact_os.partner_3p_demand,fact_oa.partner_3p_demand,fact_ccv.partner_3p_demand) AS demand_3p_partner,
+        COALESCE(fact_os.is_3p_supply,fact_oa.is_3p_supply,fact_ccv.is_3p_supply) AS is_3p_supply,
+        COALESCE(fact_os.partner_3p_supply,fact_oa.partner_3p_supply,fact_ccv.partner_3p_supply) AS supply_3p_partner,
         COALESCE(COALESCE(fact_os.hub, fact_oa.hub), fact_ccv.hub) AS hub_offer,
         MAX(fact_os.date) AS os_date,
         MAX(fact_oa.date) AS oa_date,
@@ -240,7 +238,7 @@ sale_closing AS (
         fact_ccv
             ON fact_os.sk_offer = fact_ccv.sk_offer
     GROUP BY
-        1, 2, 3, 4, 5
+        1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 sale_demand_region AS (
     SELECT
@@ -256,7 +254,11 @@ sale_demand_events AS (
     SELECT
         COALESCE(offers.id_user, sc.sk_buyer) AS id_buyer,
         COALESCE(offers.id_house, sc.sk_house) AS id_house,
-        sc.id_agent AS id_agent, -- Using only sale_closing becaus monday's sk_agent is not trustworthy
+        sc.id_agent AS id_agent, -- Using only sale_closing because monday's sk_agent is not trustworthy
+        COALESCE(sc.is_3p_demand, False) AS is_3p_demand,
+        sc.demand_3p_partner,
+        COALESCE(sc.is_3p_supply, False) AS is_3p_supply,
+        sc.supply_3p_partner,
         sc.sk_offer AS id_offer,
         offers.form_of_payment,
         offers.dt_offer_sent,
@@ -294,8 +296,10 @@ sale_demand_events_complete AS (
         COALESCE(sde.id_buyer, db.id_visitor) AS id_buyer,
         COALESCE(sde.id_house, db.id_property) AS id_house,
         COALESCE(sde.id_agent, db.id_agent) AS id_agent,
-        COALESCE(db.is_3p_demand, FALSE) AS is_3p_demand,
-        db.demand_3p_partner,
+        COALESCE(sde.is_3p_demand, db.is_3p_demand) AS is_3p_demand,
+        COALESCE(sde.demand_3p_partner, db.demand_3p_partner) AS demand_3p_partner,
+        COALESCE(sde.is_3p_supply, db.is_3p_supply) AS is_3p_supply,
+        COALESCE(sde.supply_3p_partner, db.supply_3p_partner) AS supply_3p_partner,
         sde.form_of_payment,
         sde.os_date AS dt_offer_sent,
         sde.dt_deal_qualified,
@@ -338,10 +342,10 @@ sale_demand_classification AS (
         sdc.sk_booking,
         sdc.id_buyer,
         sdc.id_house,
-        CAST(sdc.is_3p_demand AS INT),
-        sdc.demand_3p_partner,
-        CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
-        hp.partner AS supply_3p_partner,
+        CAST(sdc.is_3p_demand AS INT) AS is_3p_demand,
+        NULLIF(sdc.demand_3p_partner, '') AS demand_3p_partner,
+        CAST(sdc.is_3p_supply AS INT) AS is_3p_supply,
+        NULLIF(sdc.supply_3p_partner, '') AS supply_3p_partner,
         CASE
             WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Porto Alegre','Campinas')
                 THEN 'Out of coverage area'

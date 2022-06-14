@@ -1,8 +1,8 @@
 WITH daily_published_listings AS (
 SELECT
         f.sk_sale_listing,
-        CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
-        hp.partner AS supply_3p_partner,
+        CASE WHEN dhl.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
+        dhl.partner_3p_supply AS supply_3p_partner,
         f.status_history,
         d.date,
         d.week_start,
@@ -18,8 +18,8 @@ JOIN
         ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) 
         AND COALESCE(NULLIF(sk_status_end_date, -1), CAST(REPLACE(CAST(current_date AS VARCHAR), '-', '') AS BIGINT) - 1)
 LEFT JOIN 
-    datalake_3p_prod.houses_3p AS hp
-        ON f.sk_sale_listing / 1000 = hp.id_house
+    public.dim_house_listing AS dhl
+        ON dhl.id_house = CAST(SUBSTRING(CAST(f.sk_sale_listing AS VARCHAR), 1, 9) AS BIGINT)
 WHERE 
     f.status_history = 'PUBLISHED'
 ), 
@@ -90,5 +90,3 @@ GROUP BY
     7,
     8,
     9
-ORDER BY 
-    1

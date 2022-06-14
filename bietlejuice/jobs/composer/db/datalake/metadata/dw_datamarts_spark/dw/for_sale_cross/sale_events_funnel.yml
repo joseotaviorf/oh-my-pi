@@ -19,7 +19,13 @@ columns:
       - dw_public.dim_region.city_group
   is_3p_demand:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.is_3p_contract
+      - dw_public.dim_booking.is_3p_demand
+      - dw_sale.dim_offer.is_3p_demand
+  is_3p_supply:
+    lineage:
+      - dw_public.dim_house_listing.is_3p_supply
+      - dw_public.dim_booking.is_3p_supply
+      - dw_sale.dim_offer.is_3p_supply
   lead_context:
     lineage:
       - dw_datamarts_cross.lead_listing_flows.mkt_origin
@@ -55,7 +61,10 @@ columns:
       - dw_sale.dim_offer.business_unit
   supply_3p_partner:
     lineage:
-      - datalake_3p.houses_3p.partner
+      - dw_public.dim_house_listing.partner_3p_supply
+      - dw_public.dim_booking.partner_3p_supply
+      - dw_sale.dim_offer.partner_3p_supply
   demand_3p_partner:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.3p_partner
+      - dw_public.dim_booking.partner_3p_demand
+      - dw_sale.dim_offer.partner_3p_demand

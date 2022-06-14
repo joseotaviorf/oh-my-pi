@@ -182,6 +182,7 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_datamarts_cross:create-quintoandar-consultant-listings-in-datalake
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
+  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-dim-listing-into-redshift
@@ -189,9 +190,6 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
-  - bietlejuice.enrich_3p:create-enrich-houses-3p-external-table
-  - bietlejuice.enrich_ebdb_agents:create-enrich-agent-contract-external-table
-  - bietlejuice.enrich_ebdb_work_contract:create-enrich-work-contract-external-table
   - bietlejuice.enrich_firestore:create-enrich-monday-external-table
   - bietlejuice.rene_descartes:create-clean-lead-rejection-external-table
   - bietlejuice.wololo:create-clean-context-discard-external-table
@@ -399,7 +397,7 @@ bietlejuice.dw_datamarts_growth_cross:
   # marketing_allocated_costs
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
   # unique_supply_funnel_events
-  - bietlejuice.enrich_3p:create-enrich-houses-3p-external-table
+  - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
   # unique_performance_marketing_metrics_supply_coincident
   - bietlejuice.enrich_top_of_funnel_supply:create-enrich-top-of-funnel-supply-external-table
   - bietlejuice.gsheets:create-clean-tof-supply-targets-external-table
@@ -682,6 +680,7 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.dw_datamarts_cross:create-quintoandar-consultant-listings-in-datalake
   - bietlejuice.dw_datamarts_cross:create-talk-to-agent-in-datalake
   - bietlejuice.dw_lead:load-dw-public-dim-lead
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
   - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
@@ -689,9 +688,6 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-  - bietlejuice.enrich_3p:load-enrich-houses-3p
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
-  - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.rene_descartes:load-clean-lead-rejection
   - bietlejuice.wololo:load-clean-context-discard
@@ -701,6 +697,7 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
 # bietlejuice.dw_datamarts_spark.growth_cross:
 #   - bietlejuice.dw_region:load-dw-public-dim-region
 #   - bietlejuice.dw_contract:load-dw-public-dim-contract
+#   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 #   - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
 
 # bietlejuice.dw_datamarts_spark.growth:

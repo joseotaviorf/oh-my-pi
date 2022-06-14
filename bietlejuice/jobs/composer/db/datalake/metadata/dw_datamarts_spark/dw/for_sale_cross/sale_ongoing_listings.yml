@@ -20,6 +20,9 @@ columns:
   city_group:
     lineage:
       - dw_public.dim_region.city_group
+  is_3p_supply:
+    lineage:
+      - dw_public.dim_house_listing.is_3p_supply
   supply_3p_partner:
     lineage:
-      - datalake_3p.houses_3p
+      - dw_public.dim_house_listing.partner_3p_supply
