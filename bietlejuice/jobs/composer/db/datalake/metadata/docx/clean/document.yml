@@ -16,6 +16,9 @@ columns:
   id_document_type:
     lineage:
       - datalake_docx_raw.document.document_type_id
+  country_code:
+    lineage:
+      - datalake_docx_raw.document.country_code
   attributes:
     lineage:
       - datalake_docx_raw.document.attributes
