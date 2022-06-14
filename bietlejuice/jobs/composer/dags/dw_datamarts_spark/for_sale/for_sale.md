@@ -18,6 +18,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `liquidity_by_sk_region`
 - `neighborhood_competition`
 - `repressed_demand_sale`
+- `sale_lead_flow`
 - `sale_ongoing_listings_casa_mineira`
 - `temp_autonomous_agents_listings`
 
