@@ -2,7 +2,7 @@ WITH backtest AS (
   SELECT
     id_proposal,
     id_proponent,
-    REPLACE(REPLACE(cpf,".",""),"-","") AS cpf,
+    CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
     renda_presumida AS transunion_presumed_income,
     class_banc_ult_decl AS transunion_irpf_last_decl_class,
     ind_estab_emprego AS transunion_index_job_stability,
@@ -386,7 +386,7 @@ WITH backtest AS (
 integration_report_aud AS (
   SELECT
     rev, 
-    cpf,
+    CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
     integration_provider,
     REPLACE(REPLACE(REPLACE(attributes, "", ""), "Quantidade - ", ""), "") AS attributes
   FROM
@@ -810,7 +810,7 @@ enriched_integration_report_data AS (
         ON pps.id = l_ca.id_proposal
     JOIN
       integration_report_data AS itr
-        ON itr.cpf = REPLACE(REPLACE(ppt.cpf,".",""),"-","")
+        ON itr.cpf = CAST(REPLACE(REPLACE(ppt.cpf,".",""),"-","") AS BIGINT)
         AND itr.timestamp < l_ca.last_ca_timestamp
 ),
 

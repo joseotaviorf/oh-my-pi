@@ -392,7 +392,7 @@ FROM
     SELECT
       p.id_proposal,
       p.id AS id_proponent,
-      REPLACE(REPLACE(p.cpf, '-', ''), '.', '') AS cpf
+      CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf
     FROM
       datalake_sorting_hat_clean.proponent AS p
   ) AS proponent

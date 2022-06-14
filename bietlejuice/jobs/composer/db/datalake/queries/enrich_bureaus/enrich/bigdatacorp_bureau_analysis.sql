@@ -2,7 +2,7 @@ WITH backtest AS (
   SELECT
     id_proposal,
     id_proponent,
-    LPAD(CAST(cpf AS STRING), 11, '0') AS cpf,
+    CAST(cpf AS BIGINT) AS cpf,
     CAST(people_personal_relat__quantidade_de_relacionamentos AS INTEGER) AS bigdatacorp_total_relationships,
     CAST(people_dados_basicos__idade AS INTEGER) AS bigdatacorp_age,
     CAST(people_personal_relat__quantidade_de_conjuges AS INTEGER) AS bigdatacorp_total_spouses,
@@ -14,7 +14,7 @@ WITH backtest AS (
 
 integration_report_data AS (
   SELECT
-    cpf,
+    CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
     CASE 
       WHEN integration_provider = 'BIGDATACORP_BASIC_DATA' THEN 'basic_data'
       WHEN integration_provider = 'BIGDATACORP_RELATED_PEOPLE' THEN 'related_people'
@@ -61,7 +61,7 @@ enriched_integration_report_data AS (
         ON pps.id = l_ca.id_proposal
     JOIN
       integration_report_data AS itr
-        ON itr.cpf = REPLACE(REPLACE(ppt.cpf,".",""),"-","")
+        ON itr.cpf = CAST(REPLACE(REPLACE(ppt.cpf,".",""),"-","") AS BIGINT)
         AND itr.timestamp < l_ca.last_ca_timestamp
 ),
 

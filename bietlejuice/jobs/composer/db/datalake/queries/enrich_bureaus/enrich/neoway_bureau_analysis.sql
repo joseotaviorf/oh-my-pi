@@ -2,7 +2,7 @@ WITH backtest AS (
   SELECT 
     CAST(id_proposal AS INTEGER) AS id_proposal,
     CAST(NULL AS INTEGER) AS id_proponent,
-    REPLACE(REPLACE(cpf,".",""),"-","") AS cpf,
+    CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
     CAST(estimated_income_neoway_low AS DOUBLE) AS neoway_estimated_income_low,
     CAST(estimated_income_neoway_midpoint AS DOUBLE) AS neoway_estimated_income_midpoint,
     CAST(estimated_income_neoway_upper AS DOUBLE) AS neoway_estimated_income_upper
@@ -14,7 +14,7 @@ WITH backtest AS (
 
 income_report_data AS (
   SELECT
-    p.cpf,
+    CAST(REPLACE(REPLACE(p.cpf,".",""),"-","") AS BIGINT) AS cpf,
     r.ts_created AS timestamp,
     MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeLowerValue")) AS neoway_lower_value,
     MAX(COALESCE(GET_JSON_OBJECT(p.attributes, "$.incomeRangeHigherValue"), 19080)) AS neoway_upper_value
@@ -26,7 +26,7 @@ income_report_data AS (
   WHERE
     source = 'NEOWAY'
   GROUP BY
-    p.cpf, r.ts_created
+    1, 2
 ),
 
 last_credit_analysis AS (
@@ -42,7 +42,7 @@ enriched_income_report_data AS (
   SELECT DISTINCT
     l_ca.id_proposal,
     ppt.id AS id_proponent,
-    ppt.cpf,
+    CAST(REPLACE(REPLACE(ppt.cpf,".",""),"-","") AS BIGINT) AS cpf,
     ir.neoway_lower_value,
     ir.neoway_upper_value,
     ir.timestamp,
@@ -58,7 +58,7 @@ enriched_income_report_data AS (
       ON pps.id = l_ca.id_proposal
   JOIN
     income_report_data AS ir
-      ON ir.cpf = REPLACE(REPLACE(ppt.cpf,".",""),"-","")
+      ON ir.cpf = CAST(REPLACE(REPLACE(ppt.cpf,".",""),"-","") AS BIGINT)
       AND ir.timestamp <= l_ca.last_ca_timestamp
 ),
 
@@ -73,8 +73,8 @@ internal_data AS (
   FROM 
     enriched_income_report_data
   WHERE 
-    timestamp = ir_last_timestamp
-    AND DATEDIFF(last_ca_timestamp, ir_last_timestamp) < 30
+    (timestamp = ir_last_timestamp AND DATEDIFF(last_ca_timestamp, ir_last_timestamp) < 30)
+    OR (ir_last_timestamp IS NULL)
 )
 
 SELECT

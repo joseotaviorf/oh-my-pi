@@ -2,7 +2,7 @@ WITH backtest AS (
   SELECT
     id_proposal,
     id_proponent, 
-    REPLACE(REPLACE(cpf, ".",""),"-","") AS cpf,
+    CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
     CAST(SCORE_HSPN AS FLOAT) AS serasa_score_hspn
   FROM
     datalake_static_files_raw.bureaus_serasa_historical_raw
@@ -10,7 +10,7 @@ WITH backtest AS (
 
 integration_report_data AS (
   SELECT
-    cpf,
+    CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
     GET_JSON_OBJECT(attributes, "$.score") AS serasa_score_hspn,
     revinfo.ts_created AS timestamp
   FROM 
@@ -49,7 +49,7 @@ enriched_integration_report_data AS (
         ON pps.id = l_ca.id_proposal
     JOIN
       integration_report_data AS itr
-        ON itr.cpf = REPLACE(REPLACE(ppt.cpf,".",""),"-","")
+        ON itr.cpf = CAST(REPLACE(REPLACE(ppt.cpf,".",""),"-","") AS BIGINT)
         AND itr.timestamp < l_ca.last_ca_timestamp
 ),
 
