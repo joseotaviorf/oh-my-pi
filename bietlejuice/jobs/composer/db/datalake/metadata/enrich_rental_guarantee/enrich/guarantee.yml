@@ -39,7 +39,7 @@ columns:
       - datalake_rental_guarantee_clean.guarantee.score
   has_accepted_terms_and_conditions:
     lineage:
-      - datalake_rental_guarantee_clean.guarantee.has_accepted_terms_and_conditions
+      - datalake_rental_guarantee_clean.guarantee.accepted_terms_and_conditions
   ts_created:
     lineage:
       - datalake_rental_guarantee_clean.guarantee.ts_created

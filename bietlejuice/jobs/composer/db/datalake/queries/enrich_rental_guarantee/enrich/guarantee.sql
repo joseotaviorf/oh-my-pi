@@ -19,7 +19,7 @@ SELECT
   base_value,
   final_value,
   score,
-  has_accepted_terms_and_conditions,
+  accepted_terms_and_conditions AS has_accepted_terms_and_conditions,
   ts_created,
   ts_updated,
   ts_billed,
