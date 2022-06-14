@@ -67,6 +67,7 @@ with house_available_hours as (
 	select distinct
 		dr.id as region_id,
 		dr.region_code,
+		dr.country_code,
 		dr.city_group,
 		dr.city_name
 	from datalake_clean.ods_dim_region dr
@@ -80,6 +81,7 @@ with house_available_hours as (
 	select
 	r.region_id,
 	r.region_code,
+	r.country_code,
 	r.city_name,
 	r.city_group as city_group,
 	ds.date,
@@ -322,6 +324,7 @@ with house_available_hours as (
 )
 select
 	CAST(d.region_code AS VARCHAR) AS region_code,
+	CAST(d.country_code AS VARCHAR) AS country_code,
     CAST(d.city_name AS VARCHAR) AS city_name,
     CAST(d.city_group AS VARCHAR) AS city_group,
     CAST(cast(d.date as timestamp) AS VARCHAR) AS date,
@@ -355,4 +358,4 @@ left join encaixes_agg enc
 where true
     and faixa is not null
     and coalesce(bk.slot, enc.slot) is not null
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9

@@ -5,6 +5,10 @@ columns:
   region_code:
     lineage:
       - dw_public.dim_region.region_code
+columns:
+  country_code:
+    lineage:
+      - dw_public.dim_region.country_code
   city_name:
     lineage:
       - dw_public.dim_region.city_name

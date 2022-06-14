@@ -57,6 +57,7 @@ date_series as (
 , regions as (
 	select distinct
 		dr.id as region_id,
+		dr.country_code,
 		dr.region_code,
 		dr.city_group,
 		dr.city_name
@@ -70,6 +71,7 @@ date_series as (
 	select
 	r.region_id,
 	r.region_code,
+	r.country_code,
 	r.city_name,
 	r.city_group,
 	ds.date,
@@ -327,6 +329,7 @@ date_series as (
 )
 select
 	CAST(d.region_code AS string) AS region_code,
+	CAST(d.country_code AS string) AS country_code,
     CAST(d.city_name AS string) AS city_name,
     CAST(d.city_group AS string) AS city_group,
     CAST(date_format(cast(d.date as timestamp), 'yyyy-MM-dd HH:mm:ss.SSS') as string) AS date,
@@ -360,4 +363,4 @@ left join encaixes_agg enc
 where true
     and faixa is not null
     and coalesce(bk.slot, enc.slot) is not null
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9
