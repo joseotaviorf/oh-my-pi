@@ -1770,6 +1770,9 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
 
+bietlejuice.enrich_rental_guarantee:
+  - bietlejuice.rental_guarantee:load-clean-guarantee
+
 bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-entry

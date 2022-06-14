@@ -1,0 +1,63 @@
+database_name: datalake_rental_guarantee
+table_name: guarantee
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.id
+  id_contract_ebdb:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.id_contract_ebdb
+  id_documentation_ebdb:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.id_documentation_ebdb
+  id_house_ebdb:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.id_house_ebdb
+  id_tenant_ebdb:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.id_tenant_ebdb
+  cancellation_reason:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.cancellation_reason
+  guarantee_source:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.guarantee_source
+  guarantee_status:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.guarantee_status
+  guarantee_type:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.guarantee_type
+  base_value:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.base_value
+  final_value:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.final_value
+  score:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.score
+  has_accepted_terms_and_conditions:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.has_accepted_terms_and_conditions
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_created
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_updated
+  ts_billed:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_billed
+  ts_cancellation_requested:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_cancellation_requested
+  ts_expired:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_expired
+  ts_paid:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_paid
+  ts_payment_expired:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_payment_expired
