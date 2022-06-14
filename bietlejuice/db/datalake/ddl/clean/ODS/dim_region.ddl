@@ -2,6 +2,8 @@ drop table if exists datalake_clean.ods_dim_region;
 create external table if not exists datalake_clean.ods_dim_region (
   sk_region bigint,
   id bigint,
+  id_country integer,
+  country_code string,
   level string,
   name string,
   macro_id bigint,
@@ -10,6 +12,7 @@ create external table if not exists datalake_clean.ods_dim_region (
   city_name string,
   city_group string,
   city_ddd string,
+  country_name string,
   region_code string,
   region_code_deprecated string,
   region_code_inspector string,
