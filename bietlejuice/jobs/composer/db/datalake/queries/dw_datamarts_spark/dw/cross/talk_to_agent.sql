@@ -190,7 +190,7 @@ events as(
         cast(get_json_object(event_properties, '$.agent_id') as integer) as agent_id,
         cast(id_user as integer) as tenant_id,
         min(nullif(substr(cast(ts_event as STRING),1,19),'')) as first_message_ts,
-        array_join(array_agg(replace(trim(substr(regexp_extract(replace(regexp_replace(get_json_object(event_properties, '$.message_content'),'\n',' '),'''',' '),'(?<=(([0-9]{{9}}))).*', 0),3)), 'omprar.', '')),' + ') as message,
+        array_join(collect_list(replace(trim(substr(regexp_extract(replace(regexp_replace(get_json_object(event_properties, '$.message_content'),'\n',' '),'''',' '),'(?<=(([0-9]{{9}}))).*', 0),3)), 'omprar.', '')),' + ') as message,
         count(*) as count_messages
 
     from datalake_amplitude_clean.events
