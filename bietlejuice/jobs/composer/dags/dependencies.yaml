@@ -580,35 +580,35 @@ bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.ebdb:create-listing-business-context-clean-external-table
   - bietlejuice.ebdb:create-house-clean-external-table
 
-bietlejuice.dw_datamarts_spark.for_rent:
-  - bietlejuice.amplitude:events-raw-to-clean
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.dw_booking:load-dw-public-dim-booking
-  - bietlejuice.dw_contract:load-dw-public-dim-contract
-  - bietlejuice.dw_lead:load-dw-public-dim-lead
-  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
-  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
-  - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
-  - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
-  - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
-  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
-  - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-access-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-agent-data-types-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-weekly-schedule-in-data-lake
-  - bietlejuice.ebdb:create-clean-key-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
-  - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+#bietlejuice.dw_datamarts_spark.for_rent:
+#  - bietlejuice.amplitude:events-raw-to-clean
+#  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+#  - bietlejuice.dw_booking:load-dw-public-dim-booking
+#  - bietlejuice.dw_contract:load-dw-public-dim-contract
+#  - bietlejuice.dw_lead:load-dw-public-dim-lead
+#  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+#  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+#  - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
+#  - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
+#  - bietlejuice.dw_region:load-dw-public-dim-region
+#  - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
+#  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
+#  - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
+#  - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
+#  - bietlejuice.ebdb:create-clean-access-type-in-data-lake
+#  - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
+#  - bietlejuice.ebdb:create-clean-agent-data-types-in-data-lake
+#  - bietlejuice.ebdb:create-clean-house-in-data-lake
+#  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+#  - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake
+#  - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
+#  - bietlejuice.ebdb:create-clean-house-weekly-schedule-in-data-lake
+#  - bietlejuice.ebdb:create-clean-key-type-in-data-lake
+#  - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
+#  - bietlejuice.ebdb:create-clean-user-in-data-lake
+#  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+#  - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
+#  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
 
 bietlejuice.dw_datamarts_spark.for_rent_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
