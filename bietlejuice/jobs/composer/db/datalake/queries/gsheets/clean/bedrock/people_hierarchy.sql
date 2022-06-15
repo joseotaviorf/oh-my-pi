@@ -34,6 +34,6 @@ SELECT
     l5,
     l6,
     l7,
-    CAST(dt_last_update AS DATE) AS dt_last_update
+    CAST(ts_load AS DATE) AS dt_last_update
 FROM
     datalake_gsheets_raw.base_hierarquia
