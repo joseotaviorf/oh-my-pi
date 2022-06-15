@@ -15,6 +15,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `efficiency_monitor_rental`
 - `pricing_rent_categorization`
 - `inbound_attendance_leads_flows`
+- `marketing_campaigns_costs_and_volumes`
 
 ### Responsible Data Engineering Team
 
