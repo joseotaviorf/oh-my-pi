@@ -399,9 +399,15 @@ sale_asp_groupsab_2022q2:
     sheet_context: for_sale
 
 sale_asp_portfolio_2022q2:
-    sheet_id: 13YBlH9GuR9hBjJKu1XEjkE7MtJg-pRmluPatIBP5Wa0
+    sheet_id: 1c7y2IbC4Hw0KwUsarqOUub8hMbpQ0Ctpt1NmVwjO_w8
     sheet_name: Portfolio
     clean_table_name: sale_asp_portfolio_2022q2
+    sheet_context: for_sale
+
+sale_asp_control_2022q2:
+    sheet_id: 1c7y2IbC4Hw0KwUsarqOUub8hMbpQ0Ctpt1NmVwjO_w8
+    sheet_name: GrupoControle
+    clean_table_name: sale_asp_control_2022q2
     sheet_context: for_sale
 
 sale_demand_targets:

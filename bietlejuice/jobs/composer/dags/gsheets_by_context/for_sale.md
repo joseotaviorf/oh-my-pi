@@ -27,6 +27,7 @@ This pipeline produces the following output tables:
     - `sale_asp_tratatives_2022q2_oldlistings`
     - `sale_asp_groupsab_2022q2`
     - `sale_asp_portfolio_2022q2`
+    - `sale_asp_control_2022q2`
     - `sale_demand_targets`
     - `sale_ongoing_listings_targets`
     - `sale_payment_concluded_targets`
@@ -45,6 +46,7 @@ This pipeline produces the following output tables:
     - `sale_asp_tratatives_2022q2_oldlistings`
     - `sale_asp_groupsab_2022q2`
     - `sale_asp_portfolio_2022q2`
+    - `sale_asp_control_2022q2`
     - `sale_demand_targets`
     - `sale_ongoing_listings_targets`
     - `sale_payment_concluded_targets`
