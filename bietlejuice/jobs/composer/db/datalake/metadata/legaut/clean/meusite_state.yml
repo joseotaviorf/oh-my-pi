@@ -1,0 +1,22 @@
+---
+database_name: datalake_legaut_clean
+table_name: meusite_state
+columns:
+  id:
+    lineage:
+      - datalake_legaut_raw.meusite_state.id
+  ibge:
+    lineage:
+      - datalake_legaut_raw.meusite_state.ibge
+  pais:
+    lineage:
+      - datalake_legaut_raw.meusite_state.pais
+  name:
+    lineage:
+      - datalake_legaut_raw.meusite_state.name
+  uf:
+    lineage:
+      - datalake_legaut_raw.meusite_state.uf
+  ddd:
+    lineage:
+      - datalake_legaut_raw.meusite_state.ddd

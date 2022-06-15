@@ -1,0 +1,21 @@
+---
+tables:
+  - table_name: crawlers_crawler
+    extraction_type: full
+  - table_name: crawlers_crawlergroup
+    extraction_type: full
+  - table_name: crawlers_crawlertype
+    extraction_type: full
+  - table_name: meuSite_city
+    extraction_type: full
+  - table_name: meuSite_document
+    extraction_type: full
+  - table_name: meuSite_project
+    extraction_type: full
+  - table_name: meuSite_state
+    extraction_type: full
+  - table_name: meuSite_unit
+    extraction_type: full
+
+partition_columns: [year, month, day]
+lineage_product_database_name: legaut

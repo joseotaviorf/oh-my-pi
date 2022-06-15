@@ -1,0 +1,37 @@
+---
+database_name: datalake_legaut_clean
+table_name: crawlers_crawler
+columns:
+  id:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.id
+  id_crawler:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.crawler_id
+  id_crawler_group:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.crawlergroup_id
+  id_unit:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.unit_id
+  id_document:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.document_id
+  storages_path:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.storages_path
+  status:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.status
+  type:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.type
+  result:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.result
+  ts_run_start:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.run_start
+  ts_run_end:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.run_end

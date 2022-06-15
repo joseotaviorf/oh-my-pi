@@ -1,0 +1,34 @@
+---
+database_name: datalake_legaut_clean
+table_name: crawlers_crawlergroup
+columns:
+  id:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlergroup.id
+  id_google_drive_folder:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlergroup.google_drive_folder_id
+  id_crawler_group:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlergroup.crawlergroup_id
+  id_unit:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlergroup.unit_id
+  id_which_crawlers:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlergroup.which_crawlers_id
+  id_which_crawlers_overwrite:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlergroup.which_crawlers_overwrite_id
+  id_city:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlergroup.city_id
+  obs:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlergroup.obs
+  status:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlergroup.status
+  type:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlergroup.type

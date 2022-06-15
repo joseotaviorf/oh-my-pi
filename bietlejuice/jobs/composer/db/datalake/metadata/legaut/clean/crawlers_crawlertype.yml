@@ -1,0 +1,46 @@
+---
+database_name: datalake_legaut_clean
+table_name: crawlers_crawlertype
+columns:
+  id:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.id
+  default:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.default
+  value:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.value
+  instant_return:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.instant_return
+  repeat:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.repeat
+  monitor:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.monitor
+  results:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.results
+  classifier:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.classifier
+  keys:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.keys
+  label:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.label
+  link:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.link
+  topic:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.topic
+  return_topic:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.return_topic
+  description:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawlertype.description

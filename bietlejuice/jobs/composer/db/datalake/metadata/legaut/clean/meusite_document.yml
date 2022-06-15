@@ -1,0 +1,58 @@
+---
+database_name: datalake_legaut_clean
+table_name: meusite_document
+columns:
+  id:
+    lineage:
+      - datalake_legaut_raw.meusite_document.id
+  id_unit:
+    lineage:
+      - datalake_legaut_raw.meusite_document.unit_id
+  id_user:
+    lineage:
+      - datalake_legaut_raw.meusite_document.user_id
+  id_crawler_group:
+    lineage:
+      - datalake_legaut_raw.meusite_document.crawlergroup_id
+  id_assignment:
+    lineage:
+      - datalake_legaut_raw.meusite_document.assignment_id
+  id_suggested_document:
+    lineage:
+      - datalake_legaut_raw.meusite_document.suggested_document_id
+  id_operation:
+    lineage:
+      - datalake_legaut_raw.meusite_document.operation_id
+  type:
+    lineage:
+      - datalake_legaut_raw.meusite_document.type
+  document_crawler_type:
+    lineage:
+      - datalake_legaut_raw.meusite_document.document_crawler_type
+  status:
+    lineage:
+      - datalake_legaut_raw.meusite_document.status
+  file_name:
+    lineage:
+      - datalake_legaut_raw.meusite_document.filename
+  document_file_path:
+    lineage:
+      - datalake_legaut_raw.meusite_document.document_filepath
+  document_file:
+    lineage:
+      - datalake_legaut_raw.meusite_document.document_file
+  obs:
+    lineage:
+      - datalake_legaut_raw.meusite_document.obs
+  description:
+    lineage:
+      - datalake_legaut_raw.meusite_document.description
+  slug:
+    lineage:
+      - datalake_legaut_raw.meusite_document.slug
+  ts_created:
+    lineage:
+      - datalake_legaut_raw.meusite_document.created_at
+  ts_delivered:
+    lineage:
+      - datalake_legaut_raw.meusite_document.delivered_at
