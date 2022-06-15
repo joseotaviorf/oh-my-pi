@@ -1,5 +1,6 @@
 SELECT
     id,
+    country_id AS id_country,
     nome AS name,
     codigo AS code,
     nomeFebraban AS febraban_name,

@@ -4,6 +4,9 @@ columns:
   id:
     lineage:
       - datalake_ebdb_raw.banco.id
+  id_country:
+    lineage:
+      - datalake_ebdb_raw.banco.country_id
   name:
     lineage:
       - datalake_ebdb_raw.banco.nome
