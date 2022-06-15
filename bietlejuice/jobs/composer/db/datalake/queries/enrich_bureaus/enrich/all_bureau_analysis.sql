@@ -1,4 +1,4 @@
-SELECT 
+SELECT DISTINCT
   proponent.id_proposal,
   proponent.id_proponent,
   proponent.cpf AS cpf,
@@ -404,7 +404,6 @@ LEFT JOIN
 LEFT JOIN
   datalake_bureaus.neoway_bureau_analysis AS neoway
     ON proponent.id_proposal = neoway.id_proposal
-    AND proponent.id_proponent = neoway.id_proponent
     AND proponent.cpf = neoway.cpf
 LEFT JOIN
   datalake_bureaus.bigdatacorp_bureau_analysis AS bigdatacorp
