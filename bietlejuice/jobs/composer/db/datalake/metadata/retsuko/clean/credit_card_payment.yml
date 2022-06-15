@@ -10,33 +10,36 @@ columns:
   id_invoice:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.invoice_id
+  id_acquirer_transaction:
+    lineage:
+      - datalake_retsuko_raw.credit_card_payment.acquirer_transaction_id
   acquirer_auth_code:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.acquirer_auth_code
+  acquirer_nsu:
+    lineage:
+      - datalake_retsuko_raw.credit_card_payment.acquirer_nsu
+  brand_name:
+    lineage:
+      - datalake_retsuko_raw.credit_card_payment.brand_name
+  status:
+    lineage:
+      - datalake_retsuko_raw.credit_card_payment.status
+  installments:
+    lineage:
+      - datalake_retsuko_raw.credit_card_payment.installments
   acquirer_fee_amount:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.acquirer_fee_amount
   advance_fee_amount:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.advance_fee_amount
-  brand_name:
-    lineage:
-      - datalake_retsuko_raw.credit_card_payment.brand_name
   charged_amount:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.charged_amount
-  installments:
+  is_recurrent:
     lineage:
-      - datalake_retsuko_raw.credit_card_payment.installments
-  status:
-    lineage:
-      - datalake_retsuko_raw.credit_card_payment.status
+      - datalake_retsuko_raw.credit_card_payment.is_recurrent
   ts_created:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.created_at
-  id_acquirer_transaction:
-    lineage:
-      - datalake_retsuko_raw.credit_card_payment.acquirer_transaction_id
-  acquirer_nsu:
-    lineage:
-      - datalake_retsuko_raw.credit_card_payment.acquirer_nsu
