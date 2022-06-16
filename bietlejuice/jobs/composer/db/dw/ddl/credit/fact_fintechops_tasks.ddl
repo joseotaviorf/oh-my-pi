@@ -4,6 +4,7 @@ CREATE TABLE credit.fact_fintechops_tasks (
     sk_proposal BIGINT,
     action_user_name VARCHAR,
     documentation_policy VARCHAR,
+    task_total_min FLOAT,
     task_working_min FLOAT,
     ts_task_started TIMESTAMP, 
     ts_task_finished TIMESTAMP

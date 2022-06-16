@@ -15,7 +15,7 @@ task_finish AS (
     sk_task,
     sk_proposal,
     action_user_name,
-    MIN(ts_action - INTERVAL '3 hours') AS ts_task_finished
+    MAX(ts_action - INTERVAL '3 hours') AS ts_task_finished
   FROM
     dw_crm.fact_credit_tasks AS crm 
   WHERE
@@ -70,6 +70,7 @@ SELECT
   sk_proposal,
   action_user_name,
   type AS documentation_policy,
+  CAST((UNIX_TIMESTAMP(ts_task_finished) - UNIX_TIMESTAMP(ts_task_started)) / 60.0 AS FLOAT) AS task_total_min,
   CAST(FINTECHOPS_WORK_MIN_SLA(ts_task_started, ts_task_finished) AS FLOAT) AS task_working_min,
   ts_task_started,
   ts_task_finished
