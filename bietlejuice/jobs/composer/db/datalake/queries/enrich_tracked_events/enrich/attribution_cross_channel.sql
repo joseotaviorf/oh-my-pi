@@ -27,7 +27,7 @@ SELECT
     event_name,
     final_attribution_app_type,
     final_attribution_branded,
-    final_attribution_origin,
+    COALESCE(final_attribution_origin,'cross_channel_attribution') AS final_attribution_origin,
     final_attribution_source,
     final_attribution_medium,
     final_attribution_campaign,

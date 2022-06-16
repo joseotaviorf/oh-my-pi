@@ -131,11 +131,11 @@ cross_channel AS (
                 'Quinto Andar Classificados Hub',
                 'Quinto Andar Inbound',
                 'Quinto Andar Classificados Inbound') 
-                THEN 'non-branded'
+                THEN 'Non-Branded'
             WHEN origin IN (
                 'Quinto Andar - Traz quem compra',
                 'Quinto Andar - Placas') 
-                THEN 'branded' 
+                THEN 'Branded' 
             ELSE ''
         END AS attribution_branded,
         COALESCE(agent,'') AS attribution_origin,
