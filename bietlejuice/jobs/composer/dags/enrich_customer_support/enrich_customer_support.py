@@ -52,6 +52,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_base_url, dag_id=DAG_ID
     ),
+    concurrency=2,
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
