@@ -1,20 +1,20 @@
 WITH payments_method_change AS (
     WITH last_method_change AS (
         SELECT 
-        soa.id AS id_offer,
-        GET_JSON_OBJECT(soa.original_message, '$.paymentOptions.paymentMethod') AS payment_method_original,
-        GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.paymentMethod') AS payment_method_updated,
-        row_number() OVER (
-            PARTITION BY
-                soa.id
-            ORDER BY
-                MAX(soa.ts_updated) DESC
-        ) AS ROW,
-        CAST(MAX(soa.ts_updated) AS DATE) AS dt_payment_method_change
+            soa.id AS id_offer,
+            GET_JSON_OBJECT(soa.original_message, '$.paymentOptions.paymentMethod') AS payment_method_original,
+            GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.paymentMethod') AS payment_method_updated,
+            row_number() OVER (
+                PARTITION BY
+                    soa.id
+                ORDER BY
+                    MAX(soa.ts_updated) DESC
+            ) AS ROW,
+            CAST(MAX(soa.ts_updated) AS DATE) AS dt_payment_method_change
         FROM
-        datalake_firestore_clean.sale_offer AS soa
+            datalake_firestore_clean.sale_offer AS soa
         WHERE 
-        GET_JSON_OBJECT(soa.original_message, '$.paymentOptions.paymentMethod')<>GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.paymentMethod')
+            GET_JSON_OBJECT(soa.original_message, '$.paymentOptions.paymentMethod')<>GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.paymentMethod')
         GROUP BY 
             1,
             2,
@@ -111,36 +111,35 @@ payment_dates AS (
 ),
 payment_rule AS (
     SELECT 
-      id_offer,
-      id_sales_flow,
-      current_payment_method,
-      dt_occurence,
-      payment_method_original,
-      payment_method_updated,
-      dt_payment_method_change,
-      dt_legal_analysis_ended,
-      dt_credit_analysis_ended,
-      CASE 
-          WHEN current_payment_method LIKE 'FINANCED%' 
-              AND CONCAT(dt_occurence,dt_legal_analysis_ended,dt_credit_analysis_ended) IS NOT NULL 
-              AND dt_payment_method_change IS NULL 
-              THEN DATE(GREATEST(dt_occurence, dt_legal_analysis_ended, dt_credit_analysis_ended))
-          WHEN current_payment_method LIKE 'CASH%' 
-              AND CONCAT(dt_occurence, dt_legal_analysis_ended) IS NOT NULL
-              THEN DATE(GREATEST(dt_occurence,dt_legal_analysis_ended))
-          WHEN current_payment_method LIKE 'FINANCED%' AND payment_method_updated LIKE 'FINANCED%'
-              AND CONCAT(dt_occurence,dt_legal_analysis_ended) IS NOT NULL 
-              AND dt_payment_method_change IS NOT NULL 
-          THEN 
-              CASE 
-                  WHEN dt_legal_analysis_ended <= dt_payment_method_change AND payment_method_original LIKE 'CASH%' 
-                      THEN DATE(GREATEST(dt_occurence,dt_legal_analysis_ended))
-                  WHEN CONCAT(dt_occurence,dt_legal_analysis_ended,dt_credit_analysis_ended) IS NOT NULL 
-                      THEN DATE(GREATEST(dt_occurence, dt_legal_analysis_ended, dt_credit_analysis_ended))
-              END
-          ELSE NULL
-      END AS dt_payment_allowed
-
+        id_offer,
+        id_sales_flow,
+        current_payment_method,
+        dt_occurence,
+        payment_method_original,
+        payment_method_updated,
+        dt_payment_method_change,
+        dt_legal_analysis_ended,
+        dt_credit_analysis_ended,
+        CASE 
+            WHEN current_payment_method LIKE 'FINANCED%' 
+                AND CONCAT(dt_occurence,dt_legal_analysis_ended,dt_credit_analysis_ended) IS NOT NULL 
+                AND dt_payment_method_change IS NULL 
+                THEN DATE(GREATEST(dt_occurence, dt_legal_analysis_ended, dt_credit_analysis_ended))
+            WHEN current_payment_method LIKE 'CASH%' 
+                AND CONCAT(dt_occurence, dt_legal_analysis_ended) IS NOT NULL
+                THEN DATE(GREATEST(dt_occurence,dt_legal_analysis_ended))
+            WHEN current_payment_method LIKE 'FINANCED%' AND payment_method_updated LIKE 'FINANCED%'
+                AND CONCAT(dt_occurence,dt_legal_analysis_ended) IS NOT NULL 
+                AND dt_payment_method_change IS NOT NULL 
+            THEN 
+                CASE 
+                    WHEN dt_legal_analysis_ended <= dt_payment_method_change AND payment_method_original LIKE 'CASH%' 
+                        THEN DATE(GREATEST(dt_occurence,dt_legal_analysis_ended))
+                    WHEN CONCAT(dt_occurence,dt_legal_analysis_ended,dt_credit_analysis_ended) IS NOT NULL 
+                        THEN DATE(GREATEST(dt_occurence, dt_legal_analysis_ended, dt_credit_analysis_ended))
+                END
+            ELSE NULL
+        END AS dt_payment_allowed
     FROM 
         payment_dates
 ),

@@ -5,6 +5,8 @@ columns:
   id_offer:
     lineage:
       - datalake_offer.sale_offer.id_offer
+      - datalake_sale_offer_flows.sale_offer_flows.id_offer
+      - datalake_firestore_clean.sale_offer.id_offer
   id_buyer:
     lineage:
       - datalake_offer.sale_offer.id_buyer
@@ -71,6 +73,7 @@ columns:
     lineage:
       - datalake_firestore.monday.dt_legal_analysis_ended
       - datalake_sale_offer_flows.sale_offer_flows.dt_legal_analysis_ended
+      - datalake_sales_flow_clean.diligence.ts_buyer_seller_ended
   dt_legaut_analysis_started:
     lineage:
       - datalake_firestore.monday.dt_legaut_analysis_started
@@ -99,6 +102,7 @@ columns:
     lineage:
       - datalake_firestore.monday.dt_credit_analysis_ended
       - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_ended
+      - datalake_sales_flow_clean.mortgage.dt_credit_ended
   dt_financing_started:
     lineage:
       - datalake_firestore.monday.dt_financing_started
