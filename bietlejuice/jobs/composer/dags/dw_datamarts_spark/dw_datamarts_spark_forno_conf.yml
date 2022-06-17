@@ -12,7 +12,7 @@
 dags:
   cross:
     owner: Data Engineering
-    cluster_name: databricks_9_1_med_general_cluster
+    cluster_name: databricks_9_1_med_memory_cluster
   for_rent:
     owner: Data ForRent
     cluster_name: databricks_9_1_med_memory_cluster
