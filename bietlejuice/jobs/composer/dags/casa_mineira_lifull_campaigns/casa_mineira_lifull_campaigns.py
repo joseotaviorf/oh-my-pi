@@ -128,6 +128,7 @@ for clean_table_name in clean_tables_list:
         table_name=clean_table_name,
         is_incremental=True,
         partitions=partition_cols,
+        has_create_external_table_task=False,
     )
 
     cross_downstream(
