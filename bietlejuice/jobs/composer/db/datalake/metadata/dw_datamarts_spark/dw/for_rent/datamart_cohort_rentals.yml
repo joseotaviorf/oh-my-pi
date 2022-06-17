@@ -1,0 +1,11 @@
+---
+database_name: dw_datamarts
+table_name: datamart_cohort_rentals
+columns:
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  contract_start_month:
+    lineage:
+      - dw_public.dim_contract.dt_start
+      - dw_public.dim_contract.dt_entrance

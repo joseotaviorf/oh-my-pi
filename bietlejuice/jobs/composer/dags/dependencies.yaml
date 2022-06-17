@@ -598,6 +598,7 @@ bietlejuice.dw_datamarts_spark.cross:
 #  - bietlejuice.ebdb:create-clean-access-type-in-data-lake
 #  - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
 #  - bietlejuice.ebdb:create-clean-agent-data-types-in-data-lake
+#  - bietlejuice.ebdb:create-clean-full-contract-in-data-lake
 #  - bietlejuice.ebdb:create-clean-house-in-data-lake
 #  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
 #  - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake

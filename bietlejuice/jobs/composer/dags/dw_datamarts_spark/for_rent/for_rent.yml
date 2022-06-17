@@ -11,6 +11,7 @@
 
 for_rent:
   agents_activations_suspensions_contracts_changes: {}
+  datamart_cohort_rentals: {}
   datamart_kpi_weekly: {}
   datamart_opportunity: {}
   house_available_hours: {}
