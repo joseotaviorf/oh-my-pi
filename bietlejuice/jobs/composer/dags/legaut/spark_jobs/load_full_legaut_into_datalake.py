@@ -56,13 +56,13 @@ if __name__ == "__main__":
     if df:
         s3_loader.load_df(
             df=df,
-            s3_path=f"{database_location}{table_name}",
+            s3_path=f"{database_location}{table_name.lower()}",
             format_options=format_options,
             database_location=database_location,
             max_records_per_file=100000,
         )
         spark_metastore_loader.update_metastore(
-            df, database_name, table_name, format_options, database_location
+            df, database_name, table_name.lower(), format_options, database_location
         )
     else:
         logger.warning(

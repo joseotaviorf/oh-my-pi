@@ -116,7 +116,7 @@ for table in tables:
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,
-        table_name=table_name,
+        table_name=table_name.lower(),
         extraction_spark_job_file=RAW_SPARK_JOB_PATH.format(
             extraction_type=extraction_type
         ),
