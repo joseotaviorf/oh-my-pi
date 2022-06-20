@@ -16,6 +16,7 @@ for_sale:
   liquidity_by_sk_region: {}
   neighborhood_competition: {}
   repressed_demand_sale: {}
+  sale_agents_weekly_performance: {}
   sale_lead_flow: {}
   sale_ongoing_listings_casa_mineira: {}
   temp_autonomous_agents_listings: {}
