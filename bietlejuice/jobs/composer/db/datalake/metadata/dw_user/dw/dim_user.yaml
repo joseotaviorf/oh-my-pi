@@ -31,6 +31,9 @@ columns:
   google_id:
     lineage:
       - datalake_ebdb_user.user.id_google
+  country_code:
+    lineage:
+      - datalake_ebdb_user.user.country_code
   active:
     lineage:
       - datalake_ebdb_user.user.is_active

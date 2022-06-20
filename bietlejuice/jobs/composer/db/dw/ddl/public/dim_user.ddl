@@ -10,6 +10,7 @@ create table public.dim_user (
   facebook_id varchar(255),
   linkedin_id varchar(255),
   google_id varchar(255),
+  country_code VARCHAR,
   active integer,
   bloqueado integer,
   dadosafiliado_ativo integer,

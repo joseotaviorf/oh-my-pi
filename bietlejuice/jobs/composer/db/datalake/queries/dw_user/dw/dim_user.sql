@@ -54,6 +54,7 @@ SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refacto
     CAST(u.id_facebook AS VARCHAR(255)) AS facebook_id,
     CAST(u.id_linkedin AS VARCHAR(255)) AS linkedin_id,
     NULLIF(CAST(u.id_google AS VARCHAR(255)), '') AS google_id,
+    u.country_code,
     CAST(u.is_active AS INTEGER) AS active,
     CAST(u.is_blocked AS INTEGER) AS bloqueado,
     CAST(ad.is_active AS INTEGER) AS dadosafiliado_ativo,
