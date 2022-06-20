@@ -1,0 +1,10 @@
+---
+database_name: datalake_marketing_costs_sharing_rules
+table_name: b016b
+columns:
+  id_date:
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
