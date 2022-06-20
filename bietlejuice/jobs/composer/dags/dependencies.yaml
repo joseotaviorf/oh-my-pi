@@ -1441,6 +1441,7 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb:create-clean-agent-data-in-data-lake
   - bietlejuice.ebdb:create-clean-agent-data-business-contexts-served-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-country-in-data-lake
   - bietlejuice.ebdb:create-clean-device-in-data-lake
   - bietlejuice.ebdb:create-clean-doorman-affiliate-data-in-data-lake
   - bietlejuice.ebdb:create-clean-doorman-affiliate-occupation-in-data-lake

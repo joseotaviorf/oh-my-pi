@@ -105,6 +105,7 @@ user_state AS (
 )
 SELECT
     u.id,
+    u.id_country,
     u.id_facebook,
     u.id_linkedin,
     u.id_google,
@@ -114,6 +115,7 @@ SELECT
     u.id_affiliates,
     u.id_bank,
     u.id_state,
+    ct.code AS country_code,
     u.cpf,
     u.rg,
     CASE
@@ -171,3 +173,6 @@ LEFT JOIN
 LEFT JOIN
     user_state AS us
         ON us.id_user = u.id
+LEFT JOIN
+    datalake_ebdb_clean.country AS ct
+        ON ct.id = u.id_country
