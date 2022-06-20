@@ -14,6 +14,8 @@ WITH anniversary_contracts AS (
 			ADD_MONTHS(current_date, -48), ADD_MONTHS(current_date, -54), ADD_MONTHS(current_date, -60))
 		AND t.id_contract IS NULL
 		AND dc.country_code = 'BR'
+		AND dc.rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
+
 ),
 recovery_contracts AS (
 	SELECT
@@ -38,6 +40,7 @@ recovery_contracts AS (
 			ADD_MONTHS(current_date, -24), ADD_MONTHS(current_date, -30), ADD_MONTHS(current_date, -36), ADD_MONTHS(current_date, -42),
 			ADD_MONTHS(current_date, -48), ADD_MONTHS(current_date, -54), ADD_MONTHS(current_date, -60))
 		AND dc_.country_code = 'BR'
+		AND dc_.rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
 	GROUP BY 1,2
 ),
 crisis_users AS (

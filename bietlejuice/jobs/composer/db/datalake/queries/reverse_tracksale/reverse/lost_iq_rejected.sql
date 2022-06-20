@@ -5,6 +5,7 @@ WITH brazil_houses AS (
     dw_public.dim_house_listing
   WHERE
     country_code = 'BR'
+    AND rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
 ),
 distinct_offers AS (
     SELECT 
@@ -143,7 +144,7 @@ proponents_rejected AS (
         'Negociação' AS step
     FROM next_steps 
     WHERE 
-        dt_offer = date_add(-10,current_date) 
+        dt_offer = date_add(current_date, -10) 
         AND NOT sk_offer_approved_date > 0 
         AND next_sk_offer IS NULL 
         AND next_sk_booking IS NULL 

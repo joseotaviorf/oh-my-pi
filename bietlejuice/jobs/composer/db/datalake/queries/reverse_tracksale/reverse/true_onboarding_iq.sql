@@ -19,7 +19,7 @@ WITH new_contracts AS (
 		AND dc.status = 'Ativo'
 		AND ((ct.dt_termination > dc.dt_start) OR (ct.dt_termination is null))
 		AND dhl.country_code = 'BR'
-		AND dc.country_code = 'BR'
+		AND dhl.rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
 	GROUP BY 1,2
 ),
 crisis_users AS (

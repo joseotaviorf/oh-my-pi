@@ -5,6 +5,7 @@ WITH brazil_houses AS (
     dw_public.dim_house_listing
   WHERE
     country_code = 'BR'
+    AND rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
 ),
 distinct_offers AS (
     SELECT

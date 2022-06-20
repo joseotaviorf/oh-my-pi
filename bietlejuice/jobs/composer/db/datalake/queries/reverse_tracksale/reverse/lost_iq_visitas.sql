@@ -5,6 +5,7 @@ WITH brazil_houses AS (
 		dw_public.dim_house_listing
 	WHERE
 		country_code = 'BR'
+    	AND rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
 ),
 distinct_bookings AS (
 	SELECT
@@ -178,6 +179,7 @@ visitors_tta AS (
 	INNER JOIN
 		dw_public.dim_house_listing  dhl
 			ON dhl.sk_house_listing = ns.sk_house_listing
+			AND dhl.rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
 	LEFT JOIN
 		datalake_ebdb_clean.house h
 			ON h.id = dhl.id_house

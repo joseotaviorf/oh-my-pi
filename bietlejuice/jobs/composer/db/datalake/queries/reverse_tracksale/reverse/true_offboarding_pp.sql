@@ -35,6 +35,7 @@ offboarding_contracts_wo_ticket as (
             AND fhl.sk_partner = -1
             AND ct.dt_termination > dc.dt_start
 			AND dc.country_code = 'BR'
+            AND dc.rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
     )
     SELECT
     	sk_contract,

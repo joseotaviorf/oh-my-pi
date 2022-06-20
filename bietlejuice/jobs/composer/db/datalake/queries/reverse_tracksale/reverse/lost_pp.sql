@@ -19,6 +19,7 @@ WITH depublished_listings AS (
 		AND dhl.is_for_sale = false
 		AND dhl.version > 0
         AND dhl.country_code = 'BR'
+		AND dhl.rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
 	GROUP BY 1,2,3 
 ),
 first_depublication AS (
