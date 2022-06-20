@@ -1,21 +1,24 @@
 database_name: datalake_robin_hood_clean
 table_name: accounting_entry_source
 columns:
-  id:
-    lineage:
-      - datalake_robin_hood_raw.accounting_entry_source.id
-  code:
-    lineage:
-      - datalake_robin_hood_raw.accounting_entry_source.code
   abbr:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_source.abbr
+  code:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry_source.code
   description:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_source.description
-  ts_created:
+  id:
     lineage:
-      - datalake_robin_hood_raw.accounting_entry_source.created_at
+      - datalake_robin_hood_raw.accounting_entry_source.id
   is_active:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_source.active
+  source_name:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry_source.name
+  ts_created:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry_source.created_at

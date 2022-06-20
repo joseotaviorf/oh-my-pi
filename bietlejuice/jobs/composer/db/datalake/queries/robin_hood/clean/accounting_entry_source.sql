@@ -1,9 +1,10 @@
-select
+SELECT
     id,
     code,
     abbr,
     description,
-    timestamp(created_at) as ts_created,
-    boolean(active) as is_active
-from
+    NULLIF(name, '') AS source_name,
+    created_at AS ts_created,
+    active AS is_active
+FROM
     datalake_robin_hood_raw.accounting_entry_source
