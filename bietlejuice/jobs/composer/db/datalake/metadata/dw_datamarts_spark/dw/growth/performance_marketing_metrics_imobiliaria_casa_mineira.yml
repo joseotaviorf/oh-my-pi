@@ -1,0 +1,94 @@
+---
+database_name: dw_datamarts_growth
+table_name: performance_marketing_metrics_imobiliaria_casa_mineira
+columns:
+  dt:
+    lineage:
+      - datalake_casa_mineira_marketing_costs.daily_costs.dt
+      - datalake_casa_mineira_crm_clean.contact.ts_created
+      - datalake_casa_mineira_crm_clean.visit.ts_created
+      - datalake_gsheets_clean.targets_casa_mineira_ncp.dt_target
+      - datalake_gsheets_clean.targets_casa_mineira_cost.dt_target
+      - datalake_gsheets_clean.targets_casa_mineira_nbp.dt_target
+  mkt_origin:
+    lineage:
+      - datalake_casa_mineira_marketing_costs.daily_costs.mkt_origin
+      - datalake_gsheets_clean.taxonomy_portal_casa_mineira.mkt_origin
+      - datalake_gsheets_clean.taxonomy_crm_casa_mineira.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_casa_mineira_marketing_costs.daily_costs.mkt_channel
+      - datalake_gsheets_clean.taxonomy_portal_casa_mineira.mkt_channel
+      - datalake_gsheets_clean.taxonomy_crm_casa_mineira.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_casa_mineira_marketing_costs.daily_costs.mkt_channel
+      - datalake_gsheets_clean.taxonomy_portal_casa_mineira.mkt_channel
+      - datalake_gsheets_clean.taxonomy_crm_casa_mineira.mkt_channel
+      - datalake_gsheets_clean.targets_casa_mineira_ncp.mkt_medium
+      - datalake_gsheets_clean.targets_casa_mineira_nbp.mkt_medium
+      - datalake_gsheets_clean.targets_casa_mineira_cost.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_casa_mineira_marketing_costs.daily_costs.mkt_source
+      - datalake_gsheets_clean.taxonomy_portal_casa_mineira.mkt_source
+      - datalake_gsheets_clean.taxonomy_crm_casa_mineira.mkt_source
+      - datalake_gsheets_clean.targets_casa_mineira_ncp.mkt_source
+      - datalake_gsheets_clean.targets_casa_mineira_nbp.mkt_source
+      - datalake_gsheets_clean.targets_casa_mineira_cost.mkt_source
+  campaign_name:
+    lineage:
+      - datalake_casa_mineira_marketing_costs.daily_costs.campaign_name
+  uf_listing:
+    lineage:
+      - datalake_casa_mineira_crm_clean.uf.uf_initials
+  city_listing:
+    lineage:
+      - datalake_casa_mineira_crm_clean.city.city_name
+  neighborhood_listing:
+    lineage:
+      - datalake_casa_mineira_crm_clean.neighborhood.neighborhood_name
+  city_group:
+    lineage:
+      - datalake_casa_mineira_marketing_costs.daily_costs.city_group
+      - datalake_casa_mineira_crm_clean.city.city_name
+      - datalake_gsheets_clean.targets_casa_mineira_ncp.city_group
+      - datalake_gsheets_clean.targets_casa_mineira_nbp.city_group
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_clean.contact.id_house
+  id_client:
+    lineage:
+      - datalake_casa_mineira_crm_clean.contact.id_client
+  id_prospect:
+    lineage:
+      - datalake_casa_mineira_crm_clean.contact.email
+      - datalake_casa_mineira_crm_clean.contact.phone_number
+      - datalake_casa_mineira_crm_clean.contact.id_client
+  id_flow:
+    lineage:
+      - datalake_casa_mineira_crm_clean.contact.email
+      - datalake_casa_mineira_crm_clean.contact.phone_number
+      - datalake_casa_mineira_crm_clean.contact.id_client
+      - datalake_casa_mineira_crm_clean.contact.id_house
+  id_visit:
+    lineage:
+      - datalake_casa_mineira_crm_clean.visit.id
+  id_house_booked:
+    lineage:
+      - datalake_casa_mineira_crm_clean.visit.id_house
+  id_client_booked:
+    lineage:
+      - datalake_casa_mineira_crm_clean.visit.id_client
+  listing_type:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house_type.house_type_name
+  uf_listing_booked:
+    lineage:
+      - datalake_casa_mineira_crm_clean.uf.uf_name
+  city_listing_booked:
+    lineage:
+      - datalake_casa_mineira_crm_clean.city.city_name
+  neighborhood_listing_booked:
+    lineage:
+      - datalake_casa_mineira_crm_clean.neighborhood.neighborhood_name

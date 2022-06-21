@@ -10,7 +10,8 @@
 #     # If the datamart has no inner dependency, declare it as an empty object
 
 growth:
+  attribution_conversion_paths_demand: {}
   buyer_activation_events_combo: {}
   casa_mineira_top_of_funnel_volumes_monthly: {}
-  attribution_conversion_paths_demand: {}
+  performance_marketing_metrics_imobiliaria_casa_mineira: {}
   performance_marketing_metrics_portal_casa_mineira: {}
