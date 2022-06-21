@@ -18,4 +18,4 @@ SELECT
 FROM
     datalake_google_ads_raw.campaigns_performance
 WHERE
-    DATE(dt_created) = DATE('{year}-{month}-{day}')
+    DATE(dt_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

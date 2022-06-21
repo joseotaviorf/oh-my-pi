@@ -85,16 +85,16 @@ if __name__ == "__main__":
         + f"database_base_name={database_base_name}, relative_query_path={relative_query_path}, "
         + f"table_name={table_name}, schema={schema}, tree_path={tree_path}, msg=Job execution started"
     )
-
-    dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
-    dt_dict = dict(
-        [
-            ("year", dt_datetime.year),
-            ("month", dt_datetime.month),
-            ("day", dt_datetime.day),
-        ]
-    )
-    query_template_params.update(dt_dict)
+    if execution_date:
+        dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
+        dt_dict = dict(
+            [
+                ("year", dt_datetime.year),
+                ("month", dt_datetime.month),
+                ("day", dt_datetime.day),
+            ]
+        )
+        query_template_params.update(dt_dict)
 
     (
         database_name,

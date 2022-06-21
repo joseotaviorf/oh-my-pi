@@ -96,7 +96,8 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket", type=str, help="target bucket")
     parser.add_argument("source")
-    parser.add_argument("execution_date")
+    parser.add_argument("load_start_date")
+    parser.add_argument("load_end_date")
     parser.add_argument("report_type")
 
     args = parser.parse_args()
@@ -104,13 +105,9 @@ if __name__ == "__main__":
     env = args.env
     datalake_bucket = args.datalake_bucket
     source = args.source
-    execution_date = args.execution_date
+    load_start_date = args.load_start_date
+    load_end_date = args.load_end_date
     report_type = args.report_type
-
-    logger.info(
-        f"""m=__main__, environment={env}, source={source}, datalake_bucket={datalake_bucket},
-        report_type={report_type}, execution_date={execution_date}, msg=Starting spark job..."""
-    )
 
     config_service = ConfigurationService(source)
     raw_partition_cols = config_service.get_config("raw_partition_cols")
@@ -135,7 +132,11 @@ if __name__ == "__main__":
     args = product(
         [googleads_client],
         customer_ids,
-        [gaql_query.format(execution_date=execution_date)],
+        [
+            gaql_query.format(
+                load_start_date=load_start_date, load_end_date=load_end_date
+            )
+        ],
     )
     results = BaseSparkContext.sc.parallelize(args).map(_issue_search_request).collect()
 
@@ -154,9 +155,9 @@ if __name__ == "__main__":
 
     if len(failures):
         for failure in failures:
-            ex, cid = failure
+            exc, cid = failure
             error_details = "\n"
-            for error in ex.failure.errors:
+            for error in exc.failure.errors:
                 error_details += f'\tError with message "{error.message}".'
                 if error.location:
                     for field_path_element in error.location.field_path_elements:
@@ -164,7 +165,8 @@ if __name__ == "__main__":
                             f"\n\t\tOn field: {field_path_element.field_name}"
                         )
             logger.error(
-                f"request_id={ex.request_id}, status={ex.error.code().name}, "
+                f"request_id={exc.request_id}, "
+                f"status={exc.error.code().name}, "
                 f"customer_id={cid}, details={error_details}"
             )
         raise GoogleAdsException
@@ -181,7 +183,7 @@ if __name__ == "__main__":
                 ),
             )
             .withColumn("report_type", lit(report_type_mapped))
-            .withColumn("dt_created", lit(execution_date))
+            .withColumn("dt_created", df["segments.date"])
         )
         s3_loader = S3Loader()
         spark_metastore_service = SparkMetastoreService(spark_client)

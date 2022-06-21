@@ -33,7 +33,7 @@ GAQL:
         customer.descriptive_name
     FROM ad_group_ad
     WHERE
-        segments.date = '{execution_date}'
+        segments.date BETWEEN '{load_start_date}' AND '{load_end_date}'
   campaigns_performance: |
     SELECT
         customer.id,
@@ -51,7 +51,7 @@ GAQL:
         segments.year
     FROM campaign
     WHERE
-        segments.date = '{execution_date}'
+        segments.date BETWEEN '{load_start_date}' AND '{load_end_date}'
   keywords_performance: |
     SELECT
         customer.id,
@@ -70,7 +70,7 @@ GAQL:
         metrics.cost_micros
     FROM keyword_view
     WHERE
-        segments.date = '{execution_date}'
+        segments.date BETWEEN '{load_start_date}' AND '{load_end_date}'
         AND ad_group_criterion.negative = 'false'
   videos_performance: |
     SELECT
@@ -88,7 +88,7 @@ GAQL:
           video.id
       FROM video
       WHERE
-        segments.date = '{execution_date}'
+        segments.date BETWEEN '{load_start_date}' AND '{load_end_date}'
 schema:
   ads_performance: |
     customer STRUCT<
