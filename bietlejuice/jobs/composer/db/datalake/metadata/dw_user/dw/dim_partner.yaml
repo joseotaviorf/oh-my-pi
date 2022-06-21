@@ -10,6 +10,9 @@ columns:
   id_amplitude_device:
     lineage:
       - datalake_ebdb_clean.partner.id_amplitude_device
+  country_code:
+    lineage:
+      - datalake_ebdb_user.user.country_code
   name:
     lineage:
       - datalake_ebdb_clean.partner.name

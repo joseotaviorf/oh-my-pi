@@ -3,6 +3,7 @@ create table public.dim_partner (
     sk_partner bigint primary key,
     id_partner bigint,
     id_amplitude_device varchar(255),
+    country_code VARCHAR,
     name varchar(255),
     trade_name varchar(255),
     phone varchar(255),
