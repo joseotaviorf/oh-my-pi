@@ -1,0 +1,36 @@
+database_name: datalake_risk_and_mortgage_clean
+table_name: offer_pre_analysis
+columns:
+  id_buyer:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.buyer_id
+  id_external_house:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.external_house_id
+  id_house:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.house_id
+  id_offer:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.offer_id
+  id_pre_analysis:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.pre_analysis_id
+  id_sales_flow:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.sales_flow_id
+  ts_created:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.created_at
+  ts_updated:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.updated_at
+  year:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.year
+  month:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.month
+  day:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.day

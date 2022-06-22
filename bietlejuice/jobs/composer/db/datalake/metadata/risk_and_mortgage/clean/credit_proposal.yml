@@ -1,0 +1,45 @@
+database_name: datalake_risk_and_mortgage_clean
+table_name: credit_proposal
+columns:
+  id:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.id
+  id_credit_proposal:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.credit_proposal_id
+  id_credit_letter_document:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.credit_letter_document_id
+  id_offer_pre_analysis:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.offer_pre_analysis_id
+  bank:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.bank
+  credit_letter_file_name:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.credit_letter_file_name
+  status:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.status
+  is_accepted:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.accepted
+  dt_credit_started:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.credit_start_date
+  ts_created:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.created_at
+  ts_updated:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.updated_at
+  year:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.year
+  month:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.month
+  day:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_proposal.day

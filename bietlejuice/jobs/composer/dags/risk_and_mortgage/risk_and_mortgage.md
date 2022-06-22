@@ -20,8 +20,10 @@ Via **incremental load**:
     - `bank_application_aud`
     - `credit_application`
     - `credit_application_aud`
+    - `credit_proposal`
     - `financing_options`
     - `financing_options_aud`
+    - `offer_pre_analysis`
 
 ### Responsible Data Teams
 For any questions or concerns about this DAG and data, please contact the Data Engineering Team or
