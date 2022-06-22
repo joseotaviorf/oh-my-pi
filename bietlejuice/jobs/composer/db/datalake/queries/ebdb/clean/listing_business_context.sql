@@ -1,15 +1,17 @@
-select
+SELECT
   id,
-  imovelId as id_house,
-  businessContext as business_context,
+  imovelId AS id_house,
+  businessContext AS business_context,
   status,
-  statusReason as status_reason,
-  closingStatus as status_closing,
-  criadoEm as ts_created,
-  atualizadoEm as ts_updated,
-  firstPublicationDate as ts_first_publication,
-  lastPublicationDate as ts_last_publication,
-  shortUrl as short_url,
-  calculatorPrice as calculator_price,
-  selectedAction as selected_action
-from datalake_ebdb_raw.listingbusinesscontext
+  statusReason AS status_reason,
+  closingStatus AS status_closing,
+  criadoEm AS ts_created,
+  atualizadoEm AS ts_updated,
+  firstPublicationDate AS ts_first_publication,
+  lastPublicationDate AS ts_last_publication,
+  shortUrl AS short_url,
+  calculatorPrice AS calculator_price,
+  selectedAction AS selected_action,
+  ownership
+FROM
+  datalake_ebdb_raw.listingbusinesscontext

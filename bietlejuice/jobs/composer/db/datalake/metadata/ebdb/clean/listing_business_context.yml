@@ -40,3 +40,6 @@ columns:
   selected_action:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.selectedaction
+  ownership:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.ownership

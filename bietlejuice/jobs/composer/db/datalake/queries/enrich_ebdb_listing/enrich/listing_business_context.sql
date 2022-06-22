@@ -1,60 +1,74 @@
-with 
-opt_out as (
-    select
+WITH opt_out AS (
+    SELECT 
         lbc_aud.id_house,
-        max(case when business_context = 'RENT' then from_unixtime(ure.ts_revision / 1000) end) as ts_opt_out_rent,
-        max(case when business_context = 'SALE' then from_unixtime(ure.ts_revision / 1000) end) as ts_opt_out_sale
-    from datalake_ebdb_clean.listing_business_context_aud lbc_aud
-    join datalake_ebdb_clean.user_revision_entity ure on
-        ure.id = lbc_aud.rev
-    where
+        MAX(CASE WHEN business_context = 'RENT' THEN from_unixtime(ure.ts_revision / 1000) END) AS ts_opt_out_rent,
+        MAX(CASE WHEN business_context = 'SALE' THEN from_unixtime(ure.ts_revision / 1000) END) AS ts_opt_out_sale
+    FROM
+        datalake_ebdb_clean.listing_business_context_aud AS lbc_aud
+    JOIN
+        datalake_ebdb_clean.user_revision_entity AS ure
+            ON ure.id = lbc_aud.rev
+    WHERE
         status = 'OPTED_OUT'
-        and mod_status = 1
-    group by 1
+        AND mod_status = 1
+    GROUP BY
+        1
 ),
-revision as (
-    select
+revision AS (
+    SELECT 
         lbc_aud.id_house,
-        min(case when business_context = 'RENT' then lbc_aud.rev end) as first_rev_rent,
-        min(case when business_context = 'SALE' then lbc_aud.rev end) as first_rev_sale
-    from datalake_ebdb_clean.listing_business_context_aud as lbc_aud
-    group by 1
+        MIN(CASE WHEN business_context = 'RENT' THEN lbc_aud.rev END) AS first_rev_rent,
+        MIN(CASE WHEN business_context = 'SALE' THEN lbc_aud.rev END) AS first_rev_sale
+    FROM
+        datalake_ebdb_clean.listing_business_context_aud AS lbc_aud
+    GROUP BY
+        1
 ),
-registrant as (
-    select
+registrant AS (
+    SELECT 
         lbc.id_house,
-        ure_rent.id_user as user_listing_registrant_rent,
-        ure_sale.id_user as user_listing_registrant_sale
-    from datalake_ebdb_clean.listing_business_context lbc
-    left join revision as rev on
-        rev.id_house = lbc.id_house
-    left join datalake_ebdb_clean.user_revision_entity as ure_rent on
-        ure_rent.id = rev.first_rev_rent
-    left join datalake_ebdb_clean.user_revision_entity as ure_sale on
-        ure_sale.id = rev.first_rev_sale
-    group by 1, 2, 3
+        ure_rent.id_user AS user_listing_registrant_rent,
+        ure_sale.id_user AS user_listing_registrant_sale
+    FROM
+        datalake_ebdb_clean.listing_business_context AS lbc
+    LEFT JOIN
+        revision AS rev
+            ON rev.id_house = lbc.id_house
+    LEFT JOIN
+        datalake_ebdb_clean.user_revision_entity AS ure_rent
+            ON ure_rent.id = rev.first_rev_rent
+    LEFT JOIN
+        datalake_ebdb_clean.user_revision_entity AS ure_sale
+            ON ure_sale.id = rev.first_rev_sale
+    GROUP BY
+        1, 2, 3
 )
-select
+SELECT 
     lbc.id,
     lbc.id_house,
     lbc.business_context,
+    lbc.ownership,
     lbc.calculator_price,
     lbc.status,
     lbc.status_reason,
     lbc.status_closing,
     lbc.short_url,
-    coalesce(lbc.business_context = 'RENT', false) as is_rent_context,
-    coalesce(lbc.business_context = 'SALE', false) as is_sale_context,
+    COALESCE(lbc.business_context = 'RENT', FALSE) AS is_rent_context,
+    COALESCE(lbc.business_context = 'SALE', FALSE) AS is_sale_context,
+    COALESCE(lbc.ownership = 'THIRD_PARTY', FALSE) AS is_3p_supply,
     registrant.user_listing_registrant_rent,
     registrant.user_listing_registrant_sale,
-    lbc.ts_first_publication as ts_first_listing,
-    lbc.ts_last_publication as ts_last_listing,
+    lbc.ts_first_publication AS ts_first_listing,
+    lbc.ts_last_publication AS ts_last_listing,
     opt_out.ts_opt_out_rent,
     opt_out.ts_opt_out_sale,
     lbc.ts_created,
     lbc.ts_updated
-from datalake_ebdb_clean.listing_business_context lbc
-left join opt_out on
-    lbc.id_house = opt_out.id_house
-left join registrant on
-    lbc.id_house = registrant.id_house
+FROM
+    datalake_ebdb_clean.listing_business_context AS lbc
+LEFT JOIN
+    opt_out
+        ON lbc.id_house = opt_out.id_house
+LEFT JOIN
+    registrant
+        ON lbc.id_house = registrant.id_hous

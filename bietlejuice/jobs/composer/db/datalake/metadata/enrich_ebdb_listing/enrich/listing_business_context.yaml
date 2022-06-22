@@ -10,6 +10,9 @@ columns:
   business_context:
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context
+  ownership:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ownership
   calculator_price:
     lineage:
       - datalake_ebdb_clean.listing_business_context.calculator_price

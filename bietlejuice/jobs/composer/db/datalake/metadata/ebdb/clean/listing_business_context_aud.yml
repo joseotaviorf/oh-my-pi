@@ -55,6 +55,12 @@ columns:
   mod_status_reason:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.statusreason_mod
+  ownership:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.ownership
+  mod_ownership:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.ownership_mod
   calculator_price:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.calculatorprice
