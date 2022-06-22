@@ -1,0 +1,31 @@
+---
+database_name: dw_datamarts
+table_name: repressed_demand_sale_booking_fit_in
+columns:
+  region_code:
+    lineage:
+      - dw_public.dim_region.region_code
+  city_name:
+    lineage:
+      - dw_public.dim_region.city_name
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  neighborhood:
+    lineage:
+      - dw_public.dim_region.name
+  event_date:
+    lineage:
+      - datalake_amplitude_clean.170698_visit_hoursalert_confirmed_events.ts_event
+  visit_date:
+    lineage:
+      - dw_public.dim_booking.dt_scheduling
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
+  user_id:
+    lineage:
+      - dw_public.dim_booking.id_visitor
+  house_id:
+    lineage:
+      - dw_public.dim_booking.id_property
