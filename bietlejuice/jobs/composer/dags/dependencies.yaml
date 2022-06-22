@@ -1928,6 +1928,16 @@ bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:load-clean-dispatch
   - bietlejuice.tracksale:load-clean-answer
 
+bietlejuice.enrich_debt_recovery:
+  - bietlejuice.retsuko:load-clean-invoice
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-bill
+  - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.trato_feito:load-clean-debtor
+  - bietlejuice.trato_feito:load-clean-installment
+  - bietlejuice.trato_feito:load-clean-negotiation
+  - bietlejuice.trato_feito:load-clean-payment
+
 bietlejuice.enrich_wololo_lead:
   - bietlejuice.wololo:load-clean-prospect-aud
   - bietlejuice.wololo:load-clean-prospect-dimension-aud

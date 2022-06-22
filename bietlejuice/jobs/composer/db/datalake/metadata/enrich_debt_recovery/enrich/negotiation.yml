@@ -1,0 +1,16 @@
+---
+database_name: datalake_debt_recovery
+table_name: negotiation
+columns:
+  id_contract:
+    lineage:
+      - datalake_trato_feito_clean.negotiation.id_debtor_external
+  id_negotiation:
+    lineage:
+      - datalake_trato_feito_clean.negotiation.id
+  status:
+    lineage:
+      - datalake_trato_feito_clean.negotiation.status
+  ts_created_at:
+    lineage:
+      - datalake_trato_feito_clean.negotiation.ts_created

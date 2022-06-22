@@ -1,0 +1,52 @@
+---
+database_name: datalake_debt_recovery
+table_name: installment
+columns:
+  adm_fee_amount:
+    lineage:
+      - datalake_trato_feito_clean.installment.adm_fee_amount
+  debts_fee_amount:
+    lineage:
+      - datalake_trato_feito_clean.installment.debts_fee_amount
+  discount_amount:
+    lineage:
+      - datalake_trato_feito_clean.installment.discount_amount
+  dt_due:
+    lineage:
+      - datalake_trato_feito_clean.installment.dt_due
+  id:
+    lineage:
+      - datalake_trato_feito_clean.installment.id
+  id_bill:
+    lineage:
+      - datalake_trato_feito_clean.installment.id_bill
+  id_external:
+    lineage:
+      - datalake_trato_feito_clean.installment.id_external
+  id_negotiation:
+    lineage:
+      - datalake_trato_feito_clean.installment.id_negotiation
+  installment_fee_amount:
+    lineage:
+      - datalake_trato_feito_clean.installment.installment_fee_amount
+  payment_type:
+    lineage:
+      - datalake_trato_feito_clean.payment.type
+  purpose:
+    lineage:
+      - datalake_retsuko_clean.invoice.purpose
+  status:
+    lineage:
+      - datalake_trato_feito_clean.installment.status
+  total_amount:
+    lineage:
+      - datalake_trato_feito_clean.installment.total_amount
+  ts_created:
+    lineage:
+      - datalake_trato_feito_clean.installment.ts_created
+  ts_paid:
+    lineage:
+      - datalake_trato_feito_clean.payment.ts_updated
+  ts_updated:
+    lineage:
+      - datalake_trato_feito_clean.installment.ts_updated
