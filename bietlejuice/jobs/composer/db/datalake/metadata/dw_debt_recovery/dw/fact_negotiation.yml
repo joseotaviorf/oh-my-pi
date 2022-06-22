@@ -1,0 +1,55 @@
+---
+database_name: dw_debt_recovery
+table_name: fact_negotiation
+columns:
+  breached_installment:
+    lineage:
+      - datalake_debt_recovery.negotiation.breached_installment
+  dt_expected_end:
+    lineage:
+      - datalake_debt_recovery.negotiation.dt_expected_end
+  has_renegotiated:
+    lineage:
+      - datalake_debt_recovery.negotiation.has_renegotiated
+  id_contract:
+    lineage:
+      - datalake_debt_recovery.negotiation.id_contract
+  id_negotiation:
+    lineage:
+      - datalake_debt_recovery.negotiation.id_negotiation
+  is_contract_recurrent_debtor:
+    lineage:
+      - datalake_debt_recovery.negotiation.is_contract_recurrent_debtor
+  negotiation_discount_amount:
+    lineage:
+      - datalake_debt_recovery.negotiation.negotiation_discount_amount
+  negotiation_fees_amount:
+    lineage:
+      - datalake_debt_recovery.negotiation.negotiation_fees_amount
+  negotiation_original_amount:
+    lineage:
+      - datalake_debt_recovery.negotiation.negotiation_original_amount
+  paid_amount:
+    lineage:
+      - datalake_debt_recovery.negotiation.paid_amount
+  qt_installments:
+    lineage:
+      - datalake_debt_recovery.negotiation.qt_installments
+  qt_installments_paid:
+    lineage:
+      - datalake_debt_recovery.negotiation.qt_installments_paid
+  status:
+    lineage:
+      - datalake_debt_recovery.negotiation.status
+  total_expected_amout:
+    lineage:
+      - datalake_debt_recovery.negotiation.total_expected_amout
+  ts_breach:
+    lineage:
+      - datalake_debt_recovery.negotiation.ts_breach
+  ts_created_at:
+    lineage:
+      - datalake_debt_recovery.negotiation.ts_created_at
+  ts_paid_all:
+    lineage:
+      - datalake_debt_recovery.negotiation.ts_paid_all

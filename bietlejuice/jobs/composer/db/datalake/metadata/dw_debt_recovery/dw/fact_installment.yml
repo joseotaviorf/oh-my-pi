@@ -1,0 +1,31 @@
+---
+database_name: dw_debt_recovery
+table_name: fact_installment
+columns:
+  days_paid_late:
+    lineage:
+      - datalake_debt_recovery.installment.ts_paid_difference
+  dt_due:
+    lineage:
+      - datalake_debt_recovery.installment.dt_due
+  id_installment:
+    lineage:
+      - datalake_debt_recovery.installment.id
+  id_negotiation:
+    lineage:
+      - datalake_debt_recovery.installment.id_negotiation
+  payment_type:
+    lineage:
+      - datalake_debt_recovery.installment.payment_type
+  purpose:
+    lineage:
+      - datalake_debt_recovery.installment.purpose
+  status:
+    lineage:
+      - datalake_debt_recovery.installment.status
+  total_amount:
+    lineage:
+      - datalake_debt_recovery.installment.total_amount
+  ts_paid:
+    lineage:
+      - datalake_debt_recovery.installment.ts_paid
