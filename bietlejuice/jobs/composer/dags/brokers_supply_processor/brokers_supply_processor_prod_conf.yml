@@ -1,0 +1,17 @@
+---
+tables:
+  - table_name: file
+    date_filter_column: updated_at
+  - table_name: file_aud
+    date_filter_column: created_at
+  - table_name: lead3p
+    clean_table_name: lead_3p
+    date_filter_column: updated_at
+  - table_name: lead3p_aud
+    clean_table_name: lead_3p_aud
+    date_filter_column: created_at
+  - table_name: revinfo
+    clean_table_name: rev_info
+    date_filter_column: revtstmp
+    unixtime_measure: milliseconds
+partition_cols: ["year", "month", "day"]

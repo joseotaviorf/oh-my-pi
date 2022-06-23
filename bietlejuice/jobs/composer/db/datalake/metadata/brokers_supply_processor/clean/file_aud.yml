@@ -1,0 +1,70 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: file_aud
+columns:
+  id:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.id
+  id_partner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.partner_id
+  hash:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.hash
+  file_name:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.name
+  type:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.type
+  url:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.url
+  file_byte:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.file_byte
+  version:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.version
+  rev:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.rev
+  rev_end:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.revend
+  rev_type:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.revtype
+  mod_id_partner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.partner_id_mod
+  mod_hash:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.hash_mod
+  mod_file_name:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.name_mod
+  mod_type:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.type_mod
+  mod_url:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.url_mod
+  mod_file_byte:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.file_byte_mod
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.updated_at
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.year
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.month
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.file_aud.day

@@ -1,0 +1,178 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: lead_3p_aud
+columns:
+  id:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.id
+  id_partner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.partner_id
+  id_file:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.file_id
+  id_listing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.listing_id
+  id_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_id
+  id_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.real_estate_id
+  id_by_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.id_by_real_estate
+  brokers:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.brokers
+  location:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.location
+  pricing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.pricing
+  owner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.owner
+  blueprint:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.blueprint
+  details:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.details
+  access:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.access
+  administrators:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.administrators
+  photos:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.photos
+  lead_hash:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_hash
+  enrichment_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.enrichment_reason
+  discard_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.discard_reason
+  eligible_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.eligible_reason
+  cnpj:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.cnpj
+  version:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.version
+  is_sent_to_bob:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.sent_to_bob
+  is_eligible:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.eligible
+  is_enriched:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.enriched
+  is_discarded:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.discard
+  rev:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.rev
+  rev_end:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.revend
+  rev_type:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.revtype
+  mod_id_partner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.partner_id_mod
+  mod_id_file:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.file_id_mod
+  mod_id_listing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.listing_id_mod
+  mod_id_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_id_mod
+  mod_id_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.real_estate_id_mod
+  mod_id_by_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.id_by_real_estate_mod
+  mod_brokers:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.brokers_mod
+  mod_location:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.location_mod
+  mod_pricing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.pricing_mod
+  mod_owner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.owner_mod
+  mod_blueprint:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.blueprint_mod
+  mod_details:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.details_mod
+  mod_access:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.access_mod
+  mod_administrators:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.administrators_mod
+  mod_photos:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.photos_mod
+  mod_lead_hash:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_hash_mod
+  mod_enrichment_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.enrichment_reason_mod
+  mod_discard_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.discard_reason_mod
+  mod_eligible_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.eligible_reason_mod
+  mod_cnpj:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.cnpj_mod
+  mod_is_sent_to_bob:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.sent_to_bob_mod
+  mod_is_enriched:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.enriched_mod
+  mod_is_eligible:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.eligible_mod
+  mod_is_discarded:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.discard_mod
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.updated_at
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.year
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.month
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.day

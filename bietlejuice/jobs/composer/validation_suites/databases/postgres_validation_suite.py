@@ -27,6 +27,12 @@ class PostgresValidationSuite(DatabaseValidationSuitesExecutor):
         )
         self._validate_connection(db_consumer)
 
+    def validate_brokers_supply_processor(self):
+        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
+            self.auth[DatabaseEnum.BROKERS_SUPPLY_PROCESSOR], SparkClient()
+        )
+        self._validate_connection(db_consumer)
+
     def validate_chat_fup(self):
         db_consumer = self.REPOSITORY_CONSUMER_CLASS(
             self.auth[DatabaseEnum.CHAT_FUP], SparkClient()

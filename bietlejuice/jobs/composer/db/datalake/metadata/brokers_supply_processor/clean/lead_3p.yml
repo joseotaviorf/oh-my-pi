@@ -1,0 +1,100 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: lead_3p
+columns:
+  id:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.id
+  id_partner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.partner_id
+  id_file:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.file_id
+  id_listing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.listing_id
+  uuid_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.lead_uuid
+  id_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.real_estate_id
+  id_by_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.id_by_real_estate
+  brokers:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.brokers
+  location:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.location
+  pricing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.pricing
+  owner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.owner
+  blueprint:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.blueprint
+  details:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.details
+  access:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.access
+  administrators:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.administrators
+  photos:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.photos
+  lead_hash:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.lead_hash
+  enrichment_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.enrichment_reason
+  discard_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.discard_reason
+  eligible_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.eligible_reason
+  cnpj:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.cnpj
+  status:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.status
+  version:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.version
+  is_eligible:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.eligible
+  is_sent_to_bob:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.sent_to_bob
+  is_enriched:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.enriched
+  is_discarded:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.discard
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.created_at
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.updated_at
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.year
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.month
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.day

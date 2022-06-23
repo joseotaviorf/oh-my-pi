@@ -1,0 +1,19 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: rev_info
+columns:
+  rev:
+    lineage:
+      - datalake_brokers_supply_processor_raw.revinfo.rev
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.revinfo.revtstmp
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.revinfo.year
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.revinfo.month
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.revinfo.day
