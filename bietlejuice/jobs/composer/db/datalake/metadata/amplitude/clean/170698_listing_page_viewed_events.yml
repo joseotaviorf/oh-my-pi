@@ -170,6 +170,9 @@ columns:
   up_utm_term:
     lineage:
       - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.user_properties
+  ep_listing_rent_model_rentaladministrator:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.event_properties
   business_context:
     lineage:
       - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.event_properties
