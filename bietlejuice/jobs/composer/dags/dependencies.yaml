@@ -986,9 +986,9 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_sale_visits:
+# Removed dependency with enrich_booking.booking since is already satisfied by enrich_offer
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-real-estate-agent-rating-in-data-lake
-  - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.insider:load-clean-review
 
@@ -1611,8 +1611,8 @@ bietlejuice.enrich_listing_jobs:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
 bietlejuice.enrich_listing_owners:
+# Removed dependency with enrich_booking.booking since is already satisfied by enrich_offer
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
-  - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
@@ -1838,6 +1838,7 @@ bietlejuice.enrich_sale_flows:
   - bietlejuice.enrich_offer:load-enrich-sale-offer
 
 bietlejuice.enrich_sale_lead_flows:
+# Removed dependency with enrich_booking.booking since enrich_offer already satisfies
   - bietlejuice.casa_mineira_crm:load-clean-city
   - bietlejuice.casa_mineira_crm:load-clean-client
   - bietlejuice.casa_mineira_crm:load-clean-contact
@@ -1856,7 +1857,6 @@ bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-user-aud-in-data-lake
   - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
-  - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_offer:load-enrich-sale-offer
