@@ -10,34 +10,43 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
+from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
+)
 
-
+# Pipeline inputs
 CONTEXT = "casa_mineira_consolidated_marketing_metrics"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-PARTITION_COLS = ["id_date"]
 MAIN_START_DATE = datetime(2021, 6, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_min_general_cluster", deserialize_json=True
-)
+PARTITION_COLS = ["id_date"]
+CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 
-config_service = ConfigurationService(CONTEXT)
+config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+default_libraries = config_service.get_config("default_libraries")
 
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 ENV = os.environ.get("ENVIRONMENT")
-BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -54,7 +63,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=Variable.get(CLUSTER_DESCRIPTION, deserialize_json=True),
+    libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -66,7 +79,7 @@ datalake_task_group = DatalakeTaskGroup(
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    spark_jobs_path=base_spark_jobs_path,
     athena_query_result_location=athena_query_results_bucket,
 )
 
@@ -75,10 +88,11 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
     is_incremental=True,
+    has_create_external_table_task=False,
     partitions=PARTITION_COLS,
 )
 
-INNER_DEPENDENCIES = {
+inner_dependencies = {
     "consolidated_media_metrics": list(
         set(enrich_task_groups.keys()).difference(set(["consolidated_media_metrics"]))
     )
@@ -90,7 +104,7 @@ INNER_DEPENDENCIES = {
 ) = datalake_task_group.set_inner_dag_dependencies(
     task_flow_helper=TaskFlowHelper(),
     task_groups_boundaries=enrich_task_groups,
-    dag_inner_dependencies=INNER_DEPENDENCIES,
+    dag_inner_dependencies=inner_dependencies,
 )
 
 chain(
