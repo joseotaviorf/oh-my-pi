@@ -8,7 +8,8 @@ from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
 from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 

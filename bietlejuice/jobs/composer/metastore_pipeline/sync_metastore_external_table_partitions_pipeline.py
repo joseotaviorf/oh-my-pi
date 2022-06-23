@@ -3,11 +3,10 @@ from typing import List, Tuple
 from hive_metastore_client import HiveMetastoreClient
 
 from bietlejuice.jobs.composer.loaders import HiveMetastoreLoader
-from bietlejuice.jobs.composer.pipeline.abstract_pipeline import AbstractPipeline
 from bietlejuice.jobs.composer.services.metastore_services import HiveMetastoreService
 
 
-class SyncMetastoreExternalTablePartitionsPipeline(AbstractPipeline):
+class SyncMetastoreExternalTablePartitionsPipeline:
     """Class to synchronize an external table partitions in Hive metastore."""
 
     def __init__(

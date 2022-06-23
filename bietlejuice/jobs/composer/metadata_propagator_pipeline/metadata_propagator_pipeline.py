@@ -3,12 +3,11 @@ from quintoandar_logger import QuintoAndarLogger
 from requests import RequestException
 
 from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
-from bietlejuice.jobs.composer.pipeline.abstract_pipeline import AbstractPipeline
 
 logger = QuintoAndarLogger("MetadataPropagatorPipeline")
 
 
-class MetadataPropagatorPipeline(AbstractPipeline):
+class MetadataPropagatorPipeline:
 
     ENDPOINT_MAP = {
         MetadataTypeEnum.FULL_CONTENT_LINEAGE.value: "/fullContentLineage",

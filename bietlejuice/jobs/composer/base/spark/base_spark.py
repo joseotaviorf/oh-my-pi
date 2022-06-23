@@ -80,7 +80,7 @@ class BaseDBUtils:
 
 
 class BaseSparkContext:
-    conf = SparkConf().set("spark.executor.allowSparkContext", "true")
+    conf = SparkConf()
     sc = SparkContext.getOrCreate(conf=conf)
     spark = session.SparkSession(sc)
     sqlContext = context.HiveContext(sc)

@@ -1,5 +1,5 @@
 from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
-from bietlejuice.jobs.composer.pipeline.metadata_propagator_pipeline import (
+from bietlejuice.jobs.composer.metadata_propagator_pipeline import (
     MetadataPropagatorPipeline,
 )
 

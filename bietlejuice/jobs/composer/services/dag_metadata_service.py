@@ -88,11 +88,11 @@ class DAGMetadataService:
         :param variable: the name of the variable
         :return: a string with the value of that variable, or None if not found
         """
-        string_attr = re.search(fr"{variable} ?= ?\"(\w+)\"", code)
+        string_attr = re.search(rf"{variable} ?= ?\"(\w+)\"", code)
         if string_attr:
             return string_attr.group(1)
         else:
-            new_var = re.search(fr"{variable} ?= ?(\w+)", code)
+            new_var = re.search(rf"{variable} ?= ?(\w+)", code)
             if new_var:
                 return self._find_var_value(code, new_var.group(1))
             else:

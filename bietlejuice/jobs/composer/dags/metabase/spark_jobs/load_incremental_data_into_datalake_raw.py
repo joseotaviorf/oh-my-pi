@@ -16,7 +16,8 @@ from bietlejuice.jobs.composer.base.db.database_enum import DatabaseEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 
 from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
 

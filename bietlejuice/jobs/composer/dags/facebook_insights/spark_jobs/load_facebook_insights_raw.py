@@ -17,7 +17,8 @@ from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
 
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 
 JOB_NAME = "load_incremental_data_into_datalake_raw"
 

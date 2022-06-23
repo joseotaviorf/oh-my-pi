@@ -2,10 +2,10 @@ from unittest.mock import Mock
 
 import pytest
 
-from bietlejuice.jobs.composer.pipeline import (
+from bietlejuice.jobs.composer.metastore_pipeline import (
     SyncMetastoreExternalTableStructurePipeline,
 )
-from bietlejuice.jobs.composer.pipeline.sync_metastore_external_table_partitions_pipeline import (
+from bietlejuice.jobs.composer.metastore_pipeline import (
     SyncMetastoreExternalTablePartitionsPipeline,
 )
 

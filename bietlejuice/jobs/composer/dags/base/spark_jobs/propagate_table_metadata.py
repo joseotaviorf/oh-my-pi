@@ -10,7 +10,9 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.jobs.composer.base.service import ServiceEnum
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
-from bietlejuice.jobs.composer.pipeline.lineage_tags_pipeline import LineageTagsPipeline
+from bietlejuice.jobs.composer.metadata_propagator_pipeline.lineage_tags_pipeline import (
+    LineageTagsPipeline,
+)
 
 JOB_NAME = "propagate_table_metadata"
 

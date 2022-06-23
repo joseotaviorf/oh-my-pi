@@ -11,8 +11,12 @@ from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.base.spark.spark_metastore_helper import (
     SparkMetastoreHelper,
 )
-from bietlejuice.jobs.composer.pipeline.lineage_tags_pipeline import LineageTagsPipeline
-from bietlejuice.jobs.composer.pipeline.raw_lineage_pipeline import RawLineagePipeline
+from bietlejuice.jobs.composer.metadata_propagator_pipeline.lineage_tags_pipeline import (
+    LineageTagsPipeline,
+)
+from bietlejuice.jobs.composer.metadata_propagator_pipeline.raw_lineage_pipeline import (
+    RawLineagePipeline,
+)
 from bietlejuice.jobs.composer.services import FileService
 
 JOB_NAME = "propagate_raw_tables_metadata"

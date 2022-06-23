@@ -17,7 +17,8 @@ from bietlejuice.jobs.composer.base.api.api_enum import APIEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"

@@ -5,11 +5,10 @@ from hive_metastore_client import HiveMetastoreClient
 
 from bietlejuice.jobs.composer.base.hive.table_format_info import TableFormatInfo
 from bietlejuice.jobs.composer.loaders import HiveMetastoreLoader
-from bietlejuice.jobs.composer.pipeline.abstract_pipeline import AbstractPipeline
 from bietlejuice.jobs.composer.services.metastore_services import HiveMetastoreService
 
 
-class SyncMetastoreExternalTableStructurePipeline(AbstractPipeline):
+class SyncMetastoreExternalTableStructurePipeline:
     """Class to create an external table in Hive metastore."""
 
     def __init__(

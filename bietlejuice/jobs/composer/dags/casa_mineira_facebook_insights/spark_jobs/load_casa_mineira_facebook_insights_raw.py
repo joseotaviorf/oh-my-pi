@@ -10,7 +10,8 @@ from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat, BaseDBUtils
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )

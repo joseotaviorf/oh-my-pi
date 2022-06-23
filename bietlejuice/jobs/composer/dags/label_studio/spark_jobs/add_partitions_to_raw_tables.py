@@ -15,7 +15,8 @@ from bietlejuice.jobs.composer.dags.label_studio.label_studio_connection_sync im
     LabelStudioConnectionSync,
 )
 from bietlejuice.jobs.composer.formatters import StringFormatter
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.services import S3Service
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,

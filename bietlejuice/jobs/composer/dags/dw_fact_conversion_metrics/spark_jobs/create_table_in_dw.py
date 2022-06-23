@@ -7,7 +7,8 @@ from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.dags.dw_fact_conversion_metrics import DW_SCHEMA
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 
 

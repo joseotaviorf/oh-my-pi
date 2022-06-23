@@ -17,7 +17,8 @@ from bietlejuice.jobs.composer.clients.db_clients import (
     PostgresClient,
 )
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.services.file_service import FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from pyspark.sql.functions import col

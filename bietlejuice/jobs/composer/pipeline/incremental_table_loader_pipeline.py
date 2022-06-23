@@ -1,5 +1,6 @@
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader, S3Loader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.pipeline.table_loader_pipeline import TableLoaderPipeline
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 

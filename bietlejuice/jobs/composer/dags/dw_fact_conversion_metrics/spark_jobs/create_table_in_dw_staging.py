@@ -10,7 +10,8 @@ from bietlejuice.jobs.composer.dags.dw_fact_conversion_metrics import (
     QUERIES_DW_FACT_CONVERSION_METRICS_PATH,
 )
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.services import FileService
 

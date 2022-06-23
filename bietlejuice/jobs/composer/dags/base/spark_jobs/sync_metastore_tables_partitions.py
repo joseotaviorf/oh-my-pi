@@ -16,7 +16,7 @@ from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.base.spark.spark_metastore_helper import (
     SparkMetastoreHelper,
 )
-from bietlejuice.jobs.composer.pipeline.sync_metastore_external_table_partitions_pipeline import (
+from bietlejuice.jobs.composer.metastore_pipeline import (
     SyncMetastoreExternalTablePartitionsPipeline,
 )
 

@@ -21,7 +21,7 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.spark.spark_metastore_helper import (
     SparkMetastoreHelper,
 )
-from bietlejuice.jobs.composer.pipeline import (
+from bietlejuice.jobs.composer.metastore_pipeline import (
     SyncMetastoreExternalTableStructurePipeline,
 )
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext

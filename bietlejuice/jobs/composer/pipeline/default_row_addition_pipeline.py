@@ -3,7 +3,7 @@ from bietlejuice.jobs.composer.base.spark.spark_table_storage_format import (
 )
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.pipeline.abstract_pipeline import AbstractPipeline
 from bietlejuice.jobs.composer.services.schema_service import SchemaService
 

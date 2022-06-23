@@ -21,7 +21,8 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from quintoandar_linkedin_client.linkedin_consumer import LinkedInConsumer
 
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"

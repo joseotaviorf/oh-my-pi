@@ -22,7 +22,8 @@ from bietlejuice.jobs.composer.dags.base.spark_jobs.sync_metastore_tables_struct
 from bietlejuice.jobs.composer.dags.base.spark_jobs.sync_metastore_tables_partitions import (
     HiveMetastoreSynchronization as HiveMetastorePartitionsSynchronization,
 )
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.pipeline.create_external_table_pipeline import (
     CreateExternalTablePipeline,
 )

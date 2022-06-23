@@ -11,7 +11,7 @@ from bietlejuice.jobs.composer.base.spark.spark_metastore_helper import (
     SparkMetastoreHelper,
 )
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.pipeline.full_content_lineage_pipeline import (
+from bietlejuice.jobs.composer.metadata_propagator_pipeline.full_content_lineage_pipeline import (
     FullContentLineagePipeline,
 )
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService

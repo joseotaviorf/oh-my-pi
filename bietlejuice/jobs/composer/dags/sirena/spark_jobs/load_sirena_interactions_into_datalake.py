@@ -11,7 +11,8 @@ from bietlejuice.jobs.composer.base.spark import (
     sc,
 )
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_sirena_api_client.consumers import CONSUMERS
