@@ -1,0 +1,26 @@
+SELECT
+    city_group,
+    demand_channel,
+    demand_channel_type,
+    funnel_origin,
+    evaluation_positive,
+    evaluation_started,
+    new_tenant_prospects,
+    contracts_signed,
+    credit_approved,
+    doc_completed,
+    doc_sent,
+    offer_accepted,
+    offer_sent,
+    visits_booked,
+    visits_completed,
+    CAST(tier AS INTEGER) AS tier,
+    CAST(halfyear AS INTEGER) AS halfyear,
+    CAST(quarter AS INTEGER) AS quarter,
+    CAST(month AS INTEGER) AS month,
+    CAST(year AS INTEGER) AS year,
+    BOOLEAN(guarantee) AS has_guarantee,
+    TO_DATE(week_start, 'yyyy-MM-dd') AS dt_week_started,
+    TO_DATE(date, 'yyyy-MM-dd') AS dt_target
+FROM
+    datalake_gsheets_raw.demand_targets_mx_2022

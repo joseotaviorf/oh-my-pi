@@ -23,6 +23,7 @@ This pipeline produces the following output tables:
     - `aux_agents`
     - `aux_regiao`
     - `demand_targets_2022`
+    - `demand_targets_mx_2022`
     - `forecast_cohort_demanda`
     - `forecast_cohort_supply`
     - `forecast_diario_demanda`
@@ -36,6 +37,7 @@ This pipeline produces the following output tables:
     - `aux_agents`
     - `auxiliary_region`
     - `demand_targets_2022`
+    - `demand_targets_mx_2022`
     - `rental_forecast_cohort_demand`
     - `rental_forecast_cohort_supply`
     - `rental_forecast_daily_demand`

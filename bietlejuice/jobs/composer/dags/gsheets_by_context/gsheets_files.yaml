@@ -300,6 +300,12 @@ demand_targets_2022:
     clean_table_name: demand_targets_2022
     sheet_context: for_rent
 
+demand_targets_mx_2022:
+    sheet_id: 1bVwi_m_x-lxrXcx--VyPmbbqDovwbiST1vnTEXBO1FQ
+    sheet_name: demand_targets_mx_2022
+    clean_table_name: demand_targets_mx_2022
+    sheet_context: for_rent
+
 forecast_cohort_demanda:
     sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
     sheet_name: forecast_cohort_demanda
