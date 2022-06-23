@@ -71,4 +71,4 @@ LEFT JOIN
         ON lbc.id_house = opt_out.id_house
 LEFT JOIN
     registrant
-        ON lbc.id_house = registrant.id_hous
+        ON lbc.id_house = registrant.id_house
