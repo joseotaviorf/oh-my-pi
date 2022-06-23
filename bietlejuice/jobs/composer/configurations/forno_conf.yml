@@ -76,5 +76,85 @@ default_libraries:
     ]
 
 ##### Clusters Configs #####
-databricks_10_4_min_general_cluster: { "autoscale": { "max_workers": 2, "min_workers": 1 }, "enable_elastic_disk": "true", "autotermination_minutes": 20, "aws_attributes": { "availability": "SPOT_WITH_FALLBACK", "ebs_volume_count": 1, "ebs_volume_size": 100, "ebs_volume_type": "GENERAL_PURPOSE_SSD", "first_on_demand": 1, "instance_profile_arn": "{{ var.value.instance_profile_arn }}", "spot_bid_price_percent": 100, "zone_id": "us-east-1a" }, "cluster_log_conf": { "s3": { "destination": "s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id }}", "region": "us-east-1" } }, "cluster_name": "{{ dag.dag_id }}_{{ run_id }}", "cluster_source": "API", "custom_tags": [ { "key": "application", "value": "airflow" }, { "key": "resource-name", "value": "databricks" }, { "key": "environment", "value": "{{ var.value.environment }}" }, { "key": "owner", "value": "analytics-engineering" }, { "key": "ecosystem", "value": "data-engineering" }, { "key": "data-classification", "value": "private" }, { "key": "sensitive-data", "value": true }, { "key": "cost-center", "value": "c052" }, { "key": "provisioner", "value": "databricks" } ], "init_scripts": [{ "s3": { "destination": "{{ var.value.artifacts_s3_bucket }}/bi-etl-ejuice/libs_install_9_1.sh", "region": "" } }], "driver_node_type_id": "m5a.large", "node_type_id": "m5a.large", "spark_conf": { "spark.rpc.message.maxSize": "2000", "spark.sql.sources.partitionOverwriteMode": "dynamic", "spark.sql.parquet.filterPushdown": "true", "spark.sql.sources.default":"parquet", "spark.sql.legacy.createHiveTableByDefault":"true", "spark.sql.legacy.parquet.datetimeRebaseModeInRead": "LEGACY", "spark.sql.legacy.parquet.datetimeRebaseModeInWrite": "LEGACY", "spark.sql.legacy.timeParserPolicy": "LEGACY" }, "spark_env_vars": { "PYSPARK_PYTHON": "/databricks/python3/bin/python3", "ENVIRONMENT": "{{ var.value.environment }}" }, "spark_version": "10.4.x-scala2.12", "ssh_public_keys": [] }
-databricks_10_4_med_general_cluster: { "driver_node_type_id":"m5a.xlarge", "node_type_id":"m5a.xlarge", "autoscale":{"max_workers":3,"min_workers":1}, "autotermination_minutes":20,"cluster_name":"{{ dag.dag_id }}_{{ run_id }}", "cluster_source":"API", "enable_elastic_disk":"true", "aws_attributes":{"availability":"SPOT_WITH_FALLBACK", "ebs_volume_count":1, "ebs_volume_size":100, "ebs_volume_type":"GENERAL_PURPOSE_SSD", "first_on_demand":1, "instance_profile_arn":"{{ var.value.instance_profile_arn }}", "spot_bid_price_percent":100, "zone_id":"us-east-1a"}, "cluster_log_conf":{"s3":{"destination":"s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id }}", "region":"us-east-1"}}, "custom_tags":[{"key":"application", "value":"airflow"}, {"key":"resource-name", "value":"databricks"}, {"key":"environment", "value":"{{ var.value.environment }}"}, {"key":"owner", "value":"analytics-engineering"}, {"key":"ecosystem", "value":"data-engineering"}, {"key":"data-classification", "value":"private"}, {"key":"sensitive-data", "value":true}, {"key":"cost-center", "value":"c052"}, {"key":"provisioner", "value":"databricks"}], "init_scripts":[{"s3":{"destination":"{{ var.value.artifacts_s3_bucket }}/bi-etl-ejuice/libs_install_9_1.sh", "region":""}}], "spark_conf":{"spark.rpc.message.maxSize":"2000", "spark.sql.sources.partitionOverwriteMode":"dynamic", "spark.sql.parquet.filterPushdown":"true", "spark.sql.sources.default":"parquet", "spark.sql.legacy.createHiveTableByDefault":"true"}, "spark_env_vars": { "PYSPARK_PYTHON": "/databricks/python3/bin/python3",  "ENVIRONMENT": "{{var.value.environment}}"}, "spark_version":"10.4.x-scala2.12", "ssh_public_keys":[]}
+cluster_template:
+    cluster: &cluster_anchor
+        enable_elastic_disk: 'true'
+        autotermination_minutes: 20
+        aws_attributes: &aws_anchor
+            availability: SPOT_WITH_FALLBACK
+            ebs_volume_count: 1
+            ebs_volume_size: 100
+            ebs_volume_type: GENERAL_PURPOSE_SSD
+            first_on_demand: 1
+            instance_profile_arn: "{{ var.value.instance_profile_arn }}"
+            spot_bid_price_percent: 100
+            zone_id: us-east-1a
+        cluster_log_conf:
+            s3:
+                destination: s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id}}
+                region: us-east-1
+        cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
+        cluster_source: API
+        custom_tags:
+            - key: application
+              value: airflow
+            - key: resource-name
+              value: databricks
+            - key: environment
+              value: "{{ var.value.environment }}"
+            - key: owner
+              value: analytics-engineering
+            - key: ecosystem
+              value: data-engineering
+            - key: data-classification
+              value: private
+            - key: sensitive-data
+              value: true
+            - key: cost-center
+              value: c052
+            - key: provisioner
+              value: databricks
+        init_scripts:
+            - s3:
+                  destination: "{{ var.value.artifacts_s3_bucket }}/bi-etl-ejuice/libs_install_9_1.sh"
+                  region: ''
+        spark_conf:
+            spark.rpc.message.maxSize: '2000'
+            spark.sql.sources.partitionOverwriteMode: dynamic
+            spark.sql.parquet.filterPushdown: 'true'
+            spark.sql.sources.default: parquet
+            spark.sql.legacy.createHiveTableByDefault: 'true'
+            spark.sql.legacy.parquet.datetimeRebaseModeInRead: LEGACY
+            spark.sql.legacy.parquet.datetimeRebaseModeInWrite: LEGACY
+            spark.sql.legacy.timeParserPolicy: LEGACY
+        spark_env_vars:
+            PYSPARK_PYTHON: "/databricks/python3/bin/python3"
+            ENVIRONMENT: "{{ var.value.environment }}"
+        ssh_public_keys: []
+        node_type_id: m5a.large
+        driver_node_type_id: m5a.large
+        autoscale:
+            max_workers: 2
+            min_workers: 1
+        spark_version: 10.4.x-scala2.12
+
+databricks_10_4_min_general_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5a.large
+    driver_node_type_id: m5a.large
+    autoscale:
+        max_workers: 2
+        min_workers: 1
+    spark_version: 10.4.x-scala2.12
+
+databricks_10_4_med_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    autoscale:
+        max_workers: 3
+        min_workers: 1
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
