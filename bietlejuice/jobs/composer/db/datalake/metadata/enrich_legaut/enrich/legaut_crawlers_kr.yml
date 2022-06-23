@@ -1,0 +1,43 @@
+---
+database_name: datalake_legaut
+table_name: legaut_crawlers_kr
+columns:
+  id_crawler:
+    lineage:
+      - datalake_legaut_clean.crawlers_crawler.id
+  link_imovel_analise:
+    lineage:
+      - datalake_legaut_clean.crawlers_crawler.id_unit
+  link_imovel_imoveis:
+    lineage:
+      - datalake_legaut_clean.meusite_unit.id_operation
+  crawler_type:
+    lineage:
+      - datalake_legaut_clean.crawlers_crawler.type
+  crawler_state:
+    lineage:
+      - datalake_legaut_clean.meusite_state.name
+  crawler_city:
+    lineage:
+      - datalake_legaut_clean.meusite_city.name
+  project:
+    lineage:
+      - datalake_legaut_clean.meusite_project.name
+  crawler_type_label:
+    lineage:
+      - datalake_legaut_clean.crawlers_crawlertype.label
+  crawler_status:
+    lineage:
+      - datalake_legaut_clean.crawlers_crawler.status
+  document:
+    lineage:
+      - datalake_legaut_clean.meusite_document.file_name
+  ts_operation_created_at:
+    lineage:
+      - datalake_legaut_clean.meusite_unit.ts_created
+  ts_crawler_run_start:
+    lineage:
+      - datalake_legaut_clean.crawlers_crawler.ts_run_start
+  ts_crawler_run_end:
+    lineage:
+      - datalake_legaut_clean.crawlers_crawler.ts_run_end

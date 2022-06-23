@@ -1559,6 +1559,16 @@ bietlejuice.enrich_lead_tracking:
   - bietlejuice.ebdb:create-clean-lead-in-data-lake
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin
 
+bietlejuice.enrich_legaut:
+  - bietlejuice.legaut:load-clean-crawlers-crawler
+  - bietlejuice.legaut:load-clean-crawlers-crawlergroup
+  - bietlejuice.legaut:load-clean-crawlers-crawlertype
+  - bietlejuice.legaut:load-clean-meusite-city
+  - bietlejuice.legaut:load-clean-meusite-document
+  - bietlejuice.legaut:load-clean-meusite-project
+  - bietlejuice.legaut:load-clean-meusite-state
+  - bietlejuice.legaut:load-clean-meusite-unit
+
 bietlejuice.enrich_lost_listings:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
