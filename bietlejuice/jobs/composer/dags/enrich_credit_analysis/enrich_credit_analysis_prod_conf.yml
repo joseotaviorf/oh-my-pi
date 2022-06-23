@@ -1,0 +1,8 @@
+---
+tables:
+  - table_name: credit_analysis
+  - table_name: credit_analysis_proposals
+
+inner_dependencies:
+  credit_analysis:
+    - credit_analysis_proposals

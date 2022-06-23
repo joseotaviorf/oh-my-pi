@@ -1,0 +1,60 @@
+database_name: datalake_credit_analysis
+table_name: credit_analysis_proposals
+columns:
+  id_proposal:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.id_proposal
+  id_proposal_from_rg:
+    lineage:
+      - datalake_rental_guarantee.guarantee.id_documentation_ebdb
+  id_first_credit_analysis:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
+  id_last_credit_analysis:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
+  id_first_variant:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.id_variant
+  id_last_variant:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.id_variant
+  first_category:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.category
+  guarantee_category:
+    lineage:
+      - datalake_rental_guarantee.guarantee.score
+  paid_guarantee_type:
+    lineage:
+      - datalake_rental_guarantee.guarantee.guarantee_type
+  guarantee_type:
+    lineage:
+      - datalake_ebdb_clean.contract.guarantee_type
+  guarantee_source:
+    lineage:
+      - datalake_rental_guarantee.guarantee.guarantee_source
+  liquidity:
+    lineage:
+      - datalake_sorting_hat_clean.screening_result.liquidity
+  risk_category:
+    lineage:
+      - datalake_sorting_hat_clean.screening_result.risk_category
+  last_category:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.category
+  last_category_not_null:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.category
+  max_bypass:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.bypass
+  internal_score:
+    lineage:
+      - datalake_sorting_hat_clean.screening_result.score
+  ts_first_credit_evaluation_positive:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.ts_updated
+  ts_last_credit_evaluation_positive:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.ts_updated
