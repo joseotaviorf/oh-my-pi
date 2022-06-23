@@ -9,6 +9,12 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.jobs.composer.base.databricks.cluster_permission_enum import (
+    ClusterPermissionEnum,
+)
+from bietlejuice.jobs.composer.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
@@ -29,22 +35,27 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 tables = config_service.get_config("tables")
 clean_partition_cols = ["year", "month", "day"]
 custom_libraries = config_service.get_config("custom_libraries")
+default_libraries = config_service.get_config("default_libraries")
 
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 12, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = (
     f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_{CONTEXT}_raw.py"
 )
 
-CLUSTER_DESCRIPTION = Variable.get(f"databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_9_1_med_general_cluster", deserialize_json=True
+)
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -64,7 +75,8 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=custom_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries + custom_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

@@ -45,6 +45,7 @@ tables:
       - phone
       - situacao_da_empresa
       - state
+      - tag_imobiliarias
       - tipo_de_parceria
       - zip
       - first_conversion_date
@@ -83,6 +84,7 @@ tables:
       - hubspot_owner_id
       - hubspot_team_id
       - quantidade_de_imoveis_a_venda
+      - hs_parent_company_id
     properties_with_history:
       - hs_lead_status
   contact:

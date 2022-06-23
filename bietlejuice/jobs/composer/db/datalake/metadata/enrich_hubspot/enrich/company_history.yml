@@ -11,6 +11,9 @@ columns:
   id_hubspot_team:
     lineage:
       - datalake_hubspot_clean.company.properties
+  id_parent_company:
+    lineage:
+      - datalake_hubspot.company.properties
   fields_of_business:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -78,6 +81,9 @@ columns:
     lineage:
       - datalake_hubspot_clean.company.properties
   name:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+  tag_real_estate_agency:
     lineage:
       - datalake_hubspot_clean.company.properties
   lead_origin:
