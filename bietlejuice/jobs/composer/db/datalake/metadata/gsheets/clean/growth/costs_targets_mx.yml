@@ -23,6 +23,9 @@ columns:
   tier:
     lineage:
       - datalake_gsheets_raw.costs_targets_mx.tier
+  budget:
+    lineage:
+      - datalake_gsheets_raw.costs_targets_mx.budget
   monthly_budget:
     lineage:
       - datalake_gsheets_raw.costs_targets_mx.budget_mensal

@@ -6,6 +6,7 @@ SELECT
   planning_mkt_level2,
   planning_mkt_level3,
   CAST(tier AS INTEGER) AS tier,
+  FLOAT(budget) AS budget,
   FLOAT(budget_mensal) AS monthly_budget,
   FLOAT(budget_quarter) AS quarterly_budget,
   CAST(year AS INTEGER) AS year,
