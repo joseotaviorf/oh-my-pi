@@ -2,7 +2,7 @@ import json
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
-from pyspark.sql import types, functions
+from pyspark.sql import functions
 
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_stilingue_api_client.clients.stilingue_client import StilingueClient
@@ -105,11 +105,9 @@ if __name__ == "__main__":
     response = consumer.sync(response_params=endpoint_details.value, params=api_params)
 
     if response:
-        schema = types.StructType.fromJson(
-            consumer.formatting_data_schema(
-                endpoint_schema_exceptions.get(endpoint_details.name)
-                or list(response[0].keys())
-            )
+        schema = consumer.formatting_data_schema(
+            endpoint_schema_exceptions.get(endpoint_details.name)
+            or list(response[0].keys())
         )
 
         df = spark_client.create_dataframe(data=response, schema=schema)
