@@ -11,10 +11,6 @@ from quintoandar_stilingue_api_client.consumers.stilingue_consumer import (
 )
 from quintoandar_stilingue_api_client.constants.endpoint_enum import EndpointEnum
 
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
-from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.base.api.api_enum import APIEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import (
@@ -22,6 +18,11 @@ from bietlejuice.jobs.composer.base.spark import (
     SparkTableStorageFormat,
     SparkDataFrameService,
 )
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_stilingue_into_datalake"
@@ -81,7 +82,7 @@ if __name__ == "__main__":
     credentials = json.loads(json_credentials)
 
     stilingue_client = StilingueClient()
-    consumer = StilingueConsumer(
+    stilingue_consumer = StilingueConsumer(
         api_token=credentials["api_token"], client=stilingue_client
     )
 
@@ -102,24 +103,34 @@ if __name__ == "__main__":
     # API response
     endpoint_details = EndpointEnum[table_details.get("api_endpoint")]
 
-    response = consumer.sync(response_params=endpoint_details.value, params=api_params)
+    response = stilingue_consumer.sync(
+        response_params=endpoint_details.value, params=api_params
+    )
 
     if response:
-        schema = consumer.formatting_data_schema(
-            endpoint_schema_exceptions.get(endpoint_details.name)
-            or list(response[0].keys())
+        if type(response) is not list:
+            response = [response]
+
+        # Checking if there are any exceptions for the data header, and getting the column names
+        column_name_list = endpoint_schema_exceptions.get(
+            endpoint_details.name
+        ) or list(response[0].keys())
+
+        # Generating a schema for the data
+        # The is_array_data_schema parameter comprises some smartcare endpoint exceptions
+        schema = stilingue_consumer.formatting_data_schema(
+            column_name_list, table_details.get("is_array_data_schema")
         )
 
         df = spark_client.create_dataframe(data=response, schema=schema)
 
         df = df.withColumn("ts_load", functions.lit(dt_execution))
-        if partition_cols:
-            df = (
-                SparkDataFrameService()
-                .input(df)
-                .create_year_month_day_columns_from_dataframe_column("ts_load")
-                .output()
-            )
+        df = (
+            SparkDataFrameService()
+            .input(df)
+            .create_year_month_day_columns_from_dataframe_column("ts_load")
+            .output()
+        )
 
         # loaders
         s3_loader = S3Loader()
@@ -148,5 +159,3 @@ if __name__ == "__main__":
                 df=df,
                 partition_cols=partition_cols,
             )
-
-        spark_metastore_service.refresh_table(database_name, table_name)

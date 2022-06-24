@@ -3,7 +3,6 @@
 # endpoint_schema_exceptions:
 #   <endpointEnum_name>: <schema>
 endpoint_schema_exceptions:
-  SMARTCARE_CONVERSAS_JSON_KEYS: ["_id", "page_id", "interacted_page_id", "post_id", "operator_id", "talk_id", "sac_call_id", "root_id", "replier", "uid", "pid", "fb_pid", "fb_uid", "reply_pid", "long_updated_at", "long_posted_at", "crawled_at", "nlp_text_hash", "channel", "primary_channel", "pages", "title", "name", "operator_name", "username", "replier_name", "authors", "groups", "gender", "image_url", "user_image_url", "user_url", "post_user_image_url", "post_url", "url_content", "text", "text_header", "text_append", "hashtags", "sac_type", "type", "status", "interests", "attachments", "themes", "group_polarity", "update_time_ago", "features", "spokesman", "order_by", "favorability", "tags", "lang", "theme_polarity", "mentions", "spam", "location", "emotion", "receiver", "shall_use_receiver", "customer_info", "anonymous_user", "videoplays", "reactions", "reaction_like", "reaction_love", "reaction_sad", "reaction_pride", "reaction_angry", "reaction_total", "reaction_wow", "reaction_haha", "reaction_thankful", "valoration", "footage", "shares", "max_shared_followers", "sentiment", "impact", "interactions", "comments", "hot", "followers", "critical_level", "fb_critical_level", "AAA_score", "dislikes", "likes", "replied", "is_dynamic_post", "hidden_by_user", "page_comment", "is_root", "verified", "hot_post", "favorite", "max_shared_show_dossier", "from_integration", "is_ads", "is_hidden", "posted_at", "metrics_updated_at"]
   LISTENING_LINECHART_JSON_KEYS: ["datetime_reference", "value"]
 
 # entry example:
@@ -14,54 +13,23 @@ endpoint_schema_exceptions:
 #     clean_table_name: <clean_table_name>
 #     partition_cols: <partition_cols> (Optional)
 tables:
-  smartcare_facebook_conversas:
-    api_endpoint: SMARTCARE_CONVERSAS_JSON_KEYS
+  report_repliers:
+    api_endpoint: SAC_REPORT_REPLIES_JSON_KEYS
     api_params: {
       channels: facebook,
       fanpages: 441491169250837,
       date_range: '{year}{month}{day}0000:{year}{month}{day}2359',
     }
-    clean_table_name: smartcare_facebook_conversations
-    partition_cols: ["year", "month", "day"]
+    clean_table_name: report_repliers
+    partitions_cols: ['year', 'month', 'day']
 
-  smartcare_instagram_conversas:
-    api_endpoint: SMARTCARE_CONVERSAS_JSON_KEYS
+  calls_report:
+    api_endpoint: CALLS_REPORT_JSON_KEYS
     api_params: {
-      channels: instagram,
-      fanpages: 2284857279,
-      date_range: '{year}{month}{day}0000:{year}{month}{day}2359',
+      format: json,
+      from_processed: True,
+      date_range: '{year}{month}{day}0000:{year}{month}{day}2359'
     }
-    clean_table_name: smartcare_instagram_conversations
-    partition_cols: ["year", "month", "day"]
-
-  smartcare_twitter_conversas:
-    api_endpoint: SMARTCARE_CONVERSAS_JSON_KEYS
-    api_params: {
-      channels: twitter,
-      fanpages: 1588634718,
-      date_range: '{year}{month}{day}0000:{year}{month}{day}2359',
-    }
-    clean_table_name: smartcare_twitter_conversations
-    partition_cols: ["year", "month", "day"]
-
-  smartcare_youtube_conversas:
-    api_endpoint: SMARTCARE_CONVERSAS_JSON_KEYS
-    api_params: {
-      channels: youtube,
-      fanpages: UCT3oZCjZudZsL1QDVwZy_OA,
-      sac_type: posts:comentarios:inbox:postvisitantes:comentariosvisitantes:reviews:comentariosreview:mentions:comentariosmentions,
-      date_range: '{year}{month}{day}0000:{year}{month}{day}2359',
-    }
-    clean_table_name: smartcare_youtube_conversations
-    partition_cols: ["year", "month", "day"]
-
-  smartcare_linkedin_conversas:
-    api_endpoint: SMARTCARE_CONVERSAS_JSON_KEYS
-    api_params: {
-      channels: linkedin,
-      fanpages: urn:li:organization:2836850,
-      sac_type: inbox:comentarios:comentariosmentions:mentions:posts:comentariosreview:postvisitantes:reviews:comentariosvisitantes,
-      date_range: '{year}{month}{day}0000:{year}{month}{day}2359',
-    }
-    clean_table_name: smartcare_linkedin_conversations
-    partition_cols: ["year", "month", "day"]
+    clean_table_name: calls_report
+    is_array_data_schema: True
+    partitions_cols: ['year', 'month', 'day']

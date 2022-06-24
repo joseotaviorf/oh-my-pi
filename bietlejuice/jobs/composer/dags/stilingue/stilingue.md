@@ -11,12 +11,8 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Currently, there is the following output table for both our raw, staging (clean) and clean layers:
 
-- `smartcare_facebook_conversations`
-- `smartcare_instagram_conversations`
-- `smartcare_twitter_conversations`
-- `smartcare_youtube_conversations`
-- `smartcare_linkedin_conversations`
-- `social_media_pages`
+- `report_repliers`
+- `calls_report`
 
 ### Responsible Data Team
 ​

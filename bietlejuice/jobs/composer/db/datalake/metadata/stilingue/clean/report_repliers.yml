@@ -1,0 +1,55 @@
+---
+database_name: datalake_stilingue_clean
+table_name: report_repliers
+columns:
+  id_agent:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.id
+  agent_name:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.respondent
+  total_opened:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.opened
+  total_waiting:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.waiting
+  total_answered:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.answered
+  total_ignored:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.ignored
+  total_closed:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.closed
+  total_status_changes:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.total
+  avg_opening_time:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.avg_opening
+  avg_waiting_time:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.avg_waiting
+  avg_answer_time:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.avg_answer
+  avg_closed_time:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.avg_closed
+  avg_status_changes_time:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.avg_total
+  ts_load:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.ts_load
+  year:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.year
+  month:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.month
+  day:
+    lineage:
+      - datalake_stilingue_raw.report_repliers.day

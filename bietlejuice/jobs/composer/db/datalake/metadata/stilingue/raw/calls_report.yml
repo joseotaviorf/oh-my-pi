@@ -1,0 +1,20 @@
+---
+database_name: datalake_stilingue_raw
+table_name: calls_report
+columns:
+  conversations:
+    tags:
+      - PII
+      - Confidential
+  cases:
+    tags:
+      - PII
+      - Confidential
+  statusesChanges:
+    tags:
+      - PII
+      - Confidential
+  interactions:
+    tags:
+      - PII
+      - Confidential

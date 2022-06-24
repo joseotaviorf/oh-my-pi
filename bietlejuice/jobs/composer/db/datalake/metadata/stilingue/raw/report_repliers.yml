@@ -1,0 +1,12 @@
+---
+database_name: datalake_stilingue_raw
+table_name: report_repliers
+columns:
+  id:
+    tags:
+      - PII
+      - Confidential
+  respondent:
+    tags:
+      - PII
+      - Confidential

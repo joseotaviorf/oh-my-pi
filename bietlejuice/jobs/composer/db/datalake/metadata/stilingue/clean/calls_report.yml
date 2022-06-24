@@ -1,0 +1,28 @@
+---
+database_name: datalake_stilingue_clean
+table_name: calls_report
+columns:
+  conversations:
+    lineage:
+      - datalake_stilingue_raw.calls_report.conversations
+  cases:
+    lineage:
+      - datalake_stilingue_raw.calls_report.cases
+  status_changes:
+    lineage:
+      - datalake_stilingue_raw.calls_report.statusesChanges
+  interactions:
+    lineage:
+      - datalake_stilingue_raw.calls_report.interactions
+  ts_load:
+    lineage:
+      - datalake_stilingue_raw.calls_report.ts_load
+  year:
+    lineage:
+      - datalake_stilingue_raw.calls_report.year
+  month:
+    lineage:
+      - datalake_stilingue_raw.calls_report.month
+  day:
+    lineage:
+      - datalake_stilingue_raw.calls_report.day
