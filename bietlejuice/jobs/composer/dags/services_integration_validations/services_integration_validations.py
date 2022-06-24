@@ -32,7 +32,12 @@ artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
 custom_libraries = [
     {
         "jar": f"{artifacts_s3_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
-    }
+    },
+    {"pypi": {"package": "hubspot-api-client==5.0.0"}},
+    {
+        "whl": f"{artifacts_s3_bucket}/pipedrive-api-client-python/"
+        f"quintoandar_pipedrive_api_client-0.1.0-py2.py3-none-any.whl"
+    },
 ]
 
 dag = DAG(
