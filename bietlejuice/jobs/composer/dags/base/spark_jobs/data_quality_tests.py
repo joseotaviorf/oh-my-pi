@@ -21,7 +21,7 @@ from bietlejuice.jobs.composer.base.service import ServiceEnum
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum, MetadataTypeEnum
 from bietlejuice.jobs.composer.base.api import APIEnum
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
-from bietlejuice.jobs.composer.pipeline.atlas_quality_metrics_pipeline import (
+from bietlejuice.jobs.composer.metadata_propagator_pipeline.atlas_quality_metrics_pipeline import (
     AtlasQualityMetricsPipeline,
 )
 
