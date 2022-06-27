@@ -30,59 +30,123 @@ credit_analysis_proposals AS (
   GROUP BY 1
 ),
 
+credit_evaluations_prev AS (
+  SELECT
+    id_proposal,
+    proposal_last_result,
+    proposal_number_evaluations,
+    ts_proposal_first_credit_evaluation_positive,
+    ts_proposal_last_credit_evaluation_positive,
+    ROW_NUMBER() OVER(PARTITION BY id_proposal ORDER BY ts_updated DESC, ts_created DESC) AS rn
+  FROM
+    datalake_docx.credit_evaluation
+),
+
 credit_evaluations AS (
   SELECT
     id_proposal,
-    COUNT(DISTINCT id) AS number_evaluations,
-    MIN(
-      CASE
-        WHEN result IN ('PRE_APPROVED', 'REGULAR') THEN ts_updated
-      END
-    ) AS ts_first_credit_evaluation_positive,
-    MAX(
-      CASE
-        WHEN result IN ('PRE_APPROVED', 'REGULAR') THEN ts_updated
-      END
-    ) AS ts_last_credit_evaluation_positive
+    proposal_last_result,
+    proposal_number_evaluations,
+    ts_proposal_first_credit_evaluation_positive,
+    ts_proposal_last_credit_evaluation_positive
   FROM
-    datalake_docx_clean.credit_evaluation
+    credit_evaluations_prev
   WHERE
-    status = 'FINISHED'
+    rn = 1
+),
+
+dti AS (
+  SELECT
+    p.id AS id_proposal,
+    NULLIF(SUM(p2.monthly_income),0) AS income,
+    MAX(p.rent_value + COALESCE(p.condo_value,0) + COALESCE(p.iptu_value,0) + COALESCE(p.home_insurance_value,0)) AS package,
+    CASE 
+      WHEN SUM(p2.monthly_income) != 0 THEN CAST(MAX(p.rent_value + COALESCE(p.condo_value,0) + COALESCE(p.iptu_value,0) + COALESCE(p.home_insurance_value,0))/SUM(p2.monthly_income) AS DECIMAL(9,2))
+      ELSE NULL 
+    END AS dti
+  FROM
+    datalake_sorting_hat_clean.proposal p 
+  LEFT JOIN 
+    datalake_sorting_hat_clean.proponent p2 
+      ON p.id = p2.id_proposal 
   GROUP BY 1
+),
+
+sorting_hat_proposals_prev AS (
+  SELECT
+    p.id,
+    p.status,
+    p.ts_analyzed,
+    p.ts_processed,
+    pv.ts_analyzed AS ts_analyzed_version,
+    ROW_NUMBER() OVER (PARTITION by p.id ORDER BY pv.ts_analyzed) AS rn
+  FROM
+    datalake_sorting_hat_clean.proposal AS p
+  LEFT JOIN
+    datalake_sorting_hat_clean.proposal_version AS pv
+      ON p.id = pv.id_proposal
+),
+
+sorting_hat_proposals AS (
+  SELECT
+    id AS id_proposal,
+    status,
+    ts_analyzed,
+    ts_processed,
+    COALESCE(ts_analyzed_version, ts_analyzed) AS ts_first_analyzed
+  FROM
+    sorting_hat_proposals_prev
+  WHERE
+    rn = 1
 )
 
 SELECT
-  cap.id_proposal,
+  shp.id_proposal,
   rg.id_documentation_ebdb AS id_proposal_from_rg,
   cap.id_first_credit_analysis,
   cap.id_last_credit_analysis,
   cap.id_first_variant,
   cap.id_last_variant,
+  dti.income,
   rg.score AS guarantee_category,
   rg.guarantee_type AS paid_guarantee_type,
   ct.guarantee_type,
   rg.guarantee_source,
   cr.liquidity,
+  ceval.proposal_last_result AS last_result,
+  dti.package,
   cr.risk_category,
+  shp.status,
+  dti.dti,
   cap.first_category,
   cap.last_category,
   cap.last_category_not_null,
   cap.max_bypass,
   cr.score AS internal_score,
-  ceval.number_evaluations,
-  ceval.ts_first_credit_evaluation_positive,
-  ceval.ts_last_credit_evaluation_positive
+  ceval.proposal_number_evaluations AS number_evaluations,
+  shp.ts_analyzed,
+  shp.ts_first_analyzed,
+  ceval.ts_proposal_first_credit_evaluation_positive AS ts_first_credit_evaluation_positive,
+  rg.ts_paid AS ts_guarantee_paid,
+  ceval.ts_proposal_last_credit_evaluation_positive AS ts_last_credit_evaluation_positive,
+  shp.ts_processed
 FROM
+  sorting_hat_proposals AS shp
+LEFT JOIN
   credit_analysis_proposals AS cap
+    ON shp.id_proposal = cap.id_proposal
 LEFT JOIN
   credit_evaluations AS ceval
-    ON cap.id_proposal = ceval.id_proposal
+    ON shp.id_proposal = ceval.id_proposal
+LEFT JOIN
+  dti
+    ON shp.id_proposal = dti.id_proposal
 LEFT JOIN
   datalake_sorting_hat_clean.screening_result AS cr
-    ON cap.id_proposal = cr.id_proposal
+    ON shp.id_proposal = cr.id_proposal
 LEFT JOIN
   datalake_rental_guarantee.guarantee AS rg
-    ON cap.id_proposal = rg.id_documentation_ebdb
+    ON shp.id_proposal = rg.id_documentation_ebdb
 LEFT JOIN
   datalake_ebdb_clean.contract AS ct
-    ON cap.id_proposal = ct.id_proposal
+    ON shp.id_proposal = ct.id_proposal

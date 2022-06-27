@@ -885,10 +885,6 @@ bietlejuice.dw_offer:
 
 bietlejuice.dw_proposal:
   - bietlejuice.enrich_proposal:load-enrich-proposal
-  - bietlejuice.enrich_docx:load-enrich-credit-evaluation
-  - bietlejuice.sorting_hat:load-clean-proponent
-  - bietlejuice.sorting_hat:load-clean-proposal
-  - bietlejuice.sorting_hat:load-clean-proposal-version
 
 bietlejuice.dw_quinto_messenger:
   - bietlejuice.enrich_ebdb_customer_contact_identification
@@ -1259,11 +1255,14 @@ bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
 
 bietlejuice.enrich_credit_analysis:
-  - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.enrich_docx:load-enrich-credit-evaluation
   - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
   - bietlejuice.rental_guarantee:load-clean-risk-category
   - bietlejuice.sorting_hat:load-clean-credit-analysis
+  - bietlejuice.sorting_hat:load-clean-proponent
+  - bietlejuice.sorting_hat:load-clean-proposal
+  - bietlejuice.sorting_hat:load-clean-proposal-version
   - bietlejuice.sorting_hat:load-clean-screening-result
 
 bietlejuice.enrich_credit_evers:
@@ -1752,11 +1751,9 @@ bietlejuice.enrich_pro_owners:
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-aud-in-data-lake
+  - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
-  - bietlejuice.sorting_hat:load-clean-proposal
-  - bietlejuice.sorting_hat:load-clean-proposal-version
-  - bietlejuice.rental_guarantee:load-clean-guarantee
 
 bietlejuice.enrich_quinto_messenger:
   - bietlejuice.quinto_messenger:load-clean-channel

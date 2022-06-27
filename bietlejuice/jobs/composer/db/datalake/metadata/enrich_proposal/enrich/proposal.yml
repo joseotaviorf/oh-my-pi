@@ -19,6 +19,12 @@ columns:
   guarantee:
     lineage:
       - datalake_ebdb_clean.proposal.guarantee
+  income:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.income
+  last_result:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.last_result
   motivation:
     lineage:
       - datalake_ebdb_clean.proposal.motivation
@@ -37,9 +43,18 @@ columns:
   owner_documentation_status:
     lineage:
       - datalake_ebdb_clean.proposal.owner_documentation_status
+  package:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.package
   rejection_reason:
     lineage:
       - datalake_ebdb_clean.proposal.rejection_reason
+  dti:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.dti
+  number_evaluations:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.number_evaluations
   has_tenant_sent_documentation:
     lineage:
       - datalake_ebdb_clean.proposal.has_tenant_sent_documentation
@@ -145,9 +160,15 @@ columns:
   ts_doc_analysis_last_rejected:
     lineage:
       - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_first_credit_evaluation_positive:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.ts_first_credit_evaluation_positive
   ts_guarantee_paid:
     lineage:
-      - datalake_rental_guarantee_clean.guarantee.ts_paid
+      - datalake_credit_analysis.credit_analysis_proposals.ts_guarantee_paid
+  ts_last_credit_evaluation_positive:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.ts_last_credit_evaluation_positive
   ts_entrance:
     lineage:
       - datalake_ebdb_clean.proposal.ts_entrance

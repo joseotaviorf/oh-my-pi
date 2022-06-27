@@ -37,9 +37,15 @@ columns:
   liquidity:
     lineage:
       - datalake_sorting_hat_clean.screening_result.liquidity
+  last_result:
+    lineage:
+      - datalake_docx.credit_evaluation.proposal_last_result
   risk_category:
     lineage:
       - datalake_sorting_hat_clean.screening_result.risk_category
+  status:
+    lineage: 
+      - datalake_sorting_hat_clean.proposal.status
   last_category:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.category
@@ -52,9 +58,21 @@ columns:
   internal_score:
     lineage:
       - datalake_sorting_hat_clean.screening_result.score
+  number_evaluations:
+    lineage: 
+     - datalake_docx.credit_evaluation.proposal_number_evaluations
+  ts_analyzed:
+    lineage: 
+      - datalake_sorting_hat_clean.proposal.ts_analyzed
   ts_first_credit_evaluation_positive:
     lineage:
-      - datalake_docx_clean.credit_evaluation.ts_updated
+      - datalake_docx.credit_evaluation.ts_proposal_first_credit_evaluation_positive
+  ts_guarantee_paid:
+    lineage:
+      - datalake_rental_guarantee.guarantee.ts_paid
   ts_last_credit_evaluation_positive:
     lineage:
-      - datalake_docx_clean.credit_evaluation.ts_updated
+      - datalake_docx.credit_evaluation.ts_last_credit_evaluation_positive
+  ts_processed:
+    lineage: 
+      - datalake_sorting_hat_clean.proposal.ts_processed

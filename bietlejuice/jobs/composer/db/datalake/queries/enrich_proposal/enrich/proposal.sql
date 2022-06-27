@@ -106,36 +106,8 @@ aud_guarantee as (
       r.mod_guarantee
       and r.guarantee = 'RentalGuarantee'
     group by 1
-),
-sortinghat_proposal as (
-    with sortinghat_proposal_prev as (
-        select
-            p.id,
-            p.ts_analyzed,
-            p.status,
-            p.ts_processed,
-            pv.ts_analyzed as ts_analyzed_version,
-            row_number() over (partition by p.id order by pv.ts_analyzed) as rn
-        from datalake_sorting_hat_clean.proposal p
-        left join datalake_sorting_hat_clean.proposal_version pv
-            on p.id = pv.id_proposal
-    )
-    select
-        id,
-        ts_analyzed,
-        status,
-        ts_processed,
-        coalesce(ts_analyzed_version, ts_analyzed) as ts_first_analyzed
-    from sortinghat_proposal_prev
-    where rn = 1
-),
-rental_guarantee_proposal AS (
-    SELECT DISTINCT
-        id_documentation_ebdb as id_proposal,
-        LAST_VALUE(ts_paid) OVER (PARTITION BY id_documentation_ebdb ORDER BY ts_updated ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ts_paid
-    FROM
-        datalake_rental_guarantee_clean.guarantee
 )
+
 SELECT
     p.id,
     p.id_pre_proposal,
@@ -143,13 +115,18 @@ SELECT
     p.id_offer,
     hl.country_code,
     p.guarantee,
+    cap.income,
+    cap.last_result,
     p.motivation,
     p.rent_proposal,
     p.status,
-    shp.status AS status_sorting_hat,
+    cap.status AS status_sorting_hat,
     p.tenant_documentation_status,
     p.owner_documentation_status,
+    cap.package,
     p.rejection_reason,
+    cap.dti,
+    cap.number_evaluations,
     aud_analysis.tenant_doc_sent_count,
     p.has_tenant_sent_documentation,
     p.has_owner_sent_documentation,
@@ -173,13 +150,13 @@ SELECT
     aud_analysis.ts_credit_analysis_first_init,
     aud_analysis.ts_credit_analysis_last_init AS dt_credit_analysis_last_init,  -- Column to match ODS rules
     CASE
-        WHEN CAST(p.ts_created AS DATE) < DATE('2020-01-02') THEN COALESCE(shp.ts_first_analyzed, aud_analysis.ts_credit_analysis_last_init)
+        WHEN CAST(p.ts_created AS DATE) < DATE('2020-01-02') THEN COALESCE(cap.ts_first_analyzed, aud_analysis.ts_credit_analysis_last_init)
         ELSE aud_analysis.ts_credit_analysis_last_init
     END AS ts_credit_analysis_last_init,
     aud_analysis.ts_credit_analysis_first_end,
     aud_analysis.ts_credit_analysis_last_end AS dt_credit_analysis_last_end,
     CASE
-        WHEN CAST(p.ts_created AS DATE) < DATE('2020-01-02') THEN COALESCE(shp.ts_processed, aud_analysis.ts_credit_analysis_last_end, shp.ts_analyzed)
+        WHEN CAST(p.ts_created AS DATE) < DATE('2020-01-02') THEN COALESCE(cap.ts_processed, aud_analysis.ts_credit_analysis_last_end, cap.ts_analyzed)
         ELSE aud_analysis.ts_credit_analysis_last_end
     END AS ts_credit_analysis_last_end,
     aud_analysis.ts_credit_approved_last,
@@ -192,7 +169,9 @@ SELECT
     aud_analysis.ts_doc_analysis_last_approved,
     aud_analysis.ts_doc_analysis_first_rejected,
     aud_analysis.ts_doc_analysis_last_rejected,
-    rg.ts_paid AS ts_guarantee_paid,
+    cap.ts_first_credit_evaluation_positive,
+    cap.ts_guarantee_paid,
+    cap.ts_last_credit_evaluation_positive,
     p.ts_entrance
 FROM
     datalake_ebdb_clean.proposal AS p
@@ -206,11 +185,8 @@ LEFT JOIN
     aud_guarantee
         ON aud_guarantee.id_aud = p.id
 LEFT JOIN
-    sortinghat_proposal AS shp
-        ON shp.id = p.id
-LEFT JOIN 
-    rental_guarantee_proposal AS rg 
-        ON p.id = rg.id_proposal
+    datalake_credit_analysis.credit_analysis_proposals AS cap
+        ON p.id = cap.id_proposal
 LEFT JOIN
     datalake_ebdb_listing.house AS hl
         ON hl.id = p.id_house
