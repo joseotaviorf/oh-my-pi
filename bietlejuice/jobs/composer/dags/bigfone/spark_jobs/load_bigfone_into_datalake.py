@@ -62,12 +62,10 @@ if __name__ == "__main__":
         if table.table_name in ALLOW_LIST_FULL:
             df = postgres_consumer.get_data_from_table(table.table_name)
             # the table names in the datalake must be lowercase
-            s3_loader.load_full_table(
+            s3_loader.load_df(
                 df=df,
-                database_name=database_name,
-                table_name=table.table_name.lower(),
+                s3_path=f"{database_location}{table.table_name.lower()}",
                 format_options=format_options,
-                database_location=database_location,
             )
             spark_metastore_loader.update_metastore(
                 df,
@@ -80,13 +78,20 @@ if __name__ == "__main__":
             df = postgres_consumer.get_incremental_data_from_table(
                 table.table_name, "event_timestamp", execution_date
             )
-            s3_loader.load_incremental_table(
+            s3_loader.load_df(
                 df=df,
-                database_name=database_name,
-                table_name=table.table_name.lower(),
+                s3_path=f"{database_location}{table.table_name.lower()}",
                 format_options=format_options,
-                database_location=database_location,
-                partition_cols=partition_cols,
+                partitions=partition_cols,
+            )
+            spark_metastore_loader.update_metastore(
+                df,
+                database_name,
+                table.table_name.lower(),
+                format_options,
+                database_location,
+                partition_cols,
+                force_recreate=False,
             )
             metastore_service.create_new_partitions_from_df(
                 database_name, table.table_name.lower(), df, partition_cols
