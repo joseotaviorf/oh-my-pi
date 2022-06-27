@@ -29,7 +29,6 @@ datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 partition_cols = config_service.get_config("partition_cols")
@@ -42,9 +41,12 @@ RAW_SPARK_JOB_FILE = (
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = spark_jobs_logs_path
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_9_1_med_general_cluster", deserialize_json=True
+)
 CUSTOM_LIBRARIES = [{"pypi": {"package": "google-ads"}}]
+
+default_libraries = config_service.get_config("default_libraries")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -64,7 +66,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=CUSTOM_LIBRARIES,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
