@@ -4,34 +4,67 @@ table_name: dim_credit_analysis
 columns:
   id_credit_analysis:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
+      - datalake_credit_analysis.credit_analysis.id_credit_analysis
+  id_proposal:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.id_proposal
   id_analyst:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_analyst
-  documentation_policy:
-    lineage:
-      - datalake_sorting_hat_clean.credit_analysis.type
+      - datalake_credit_analysis.credit_analysis.id_analyst
   bypass:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.bypass
-  risk_category:
+      - datalake_credit_analysis.credit_analysis.bypass
+  category:
     lineage:
-      - datalake_sorting_hat_clean.screening_result.risk_category
-  internal_score:
+      - datalake_credit_analysis.credit_analysis.category
+  category_within_ca:
     lineage:
-      - datalake_sorting_hat_clean.screening_result.score
-  liquidity:
+      - datalake_credit_analysis.credit_analysis.category_within_ca
+  category_within_proposal:
     lineage:
-      - datalake_sorting_hat_clean.screening_result.liquidity
-  reason:
+      - datalake_credit_analysis.credit_analysis.category_within_proposal
+  documentation_policy:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.reason
-  result:
+      - datalake_credit_analysis.credit_analysis.documentation_policy
+  guarantee_category:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.result
+      - datalake_credit_analysis.credit_analysis.guarantee_category
   level:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.level
+      - datalake_credit_analysis.credit_analysis.level
+  liquidity:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.liquidity
+  paid_guarantee_type:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.paid_guarantee_type
+  standalone_factor:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.standalone_factor
+  reason:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.reason
+  risk_category:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.risk_category
+  internal_score:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.internal_score
+  max_bypass:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.max_bypass
+  result:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.result
+  credit_decision_cluster:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.credit_decision_cluster
+  is_manual_analysis:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.is_manual_analysis
+  is_reprocessed:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.is_reprocessed
   ts_credit_analysis_created:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.ts_created
+      - datalake_credit_analysis.credit_analysis.ts_credit_analysis_created

@@ -779,10 +779,9 @@ bietlejuice.dw_contract:
 bietlejuice.dw_credit_analysis:
 # Removed dependencies with ebdb.proposal and dw_rent_flow.fact_listing_rent_flows because it's already satisfied by dw_crm (that has dependencies with ebdb.proposal -> dw_proposal -> dw_rent_flow -> dw_crm).
   - bietlejuice.dw_crm:load-dw-crm-fact-credit-tasks
-  - bietlejuice.rental_guarantee:load-clean-risk-category
-  - bietlejuice.sorting_hat:load-clean-credit-analysis
+  - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis
+  - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
   - bietlejuice.sorting_hat:load-clean-experiment
-  - bietlejuice.sorting_hat:load-clean-screening-result
   - bietlejuice.sorting_hat:load-clean-variant
 
 bietlejuice.dw_crm:

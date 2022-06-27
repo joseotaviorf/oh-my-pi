@@ -2,64 +2,66 @@
 database_name: dw_credit
 table_name: fact_proposal_credit_flows
 columns:
-  sk_proposal:
-    lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_proposal
-  sk_credit_analysis:
-    lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
   sk_client:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_client
-  sk_first_credit_analysis:
+  sk_contract_signed_date:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
-  sk_first_variant:
+      - dw_public.fact_listing_rent_flows.sk_contract_signed_date
+  sk_credit_analysis:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_first_variant
-  sk_guarantee_category:
+      - datalake_credit_analysis.credit_analysis.id_credit_analysis
+  sk_credit_analysis_approved_date:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.category
-  sk_last_credit_analysis:
-    lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
-  sk_offer:
-    lineage:
-      - dw_public.fact_listing_rent_flows.sk_offer
-  sk_region:
-    lineage:
-      - dw_public.fact_listing_rent_flows.sk_region
-  sk_offer_submitted_date:
-    lineage:
-      - dw_public.fact_listing_rent_flows.sk_offer_submitted_date
-  sk_offer_approved_date:
-    lineage:
-      - dw_public.fact_listing_rent_flows.sk_offer_approved_date
-  sk_last_credit_evaluation_init:
-    lineage:
-      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_init
-  sk_last_credit_evaluation_positive:
-    lineage:
-      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_positive
-  sk_last_credit_evaluation_negative:
-    lineage:
-      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_negative
+      - dw_public.fact_listing_rent_flows.sk_credit_analysis_approved_date
   sk_credit_evaluation_approved_date:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_negative
-      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_positive
-  sk_tenant_first_doc_sent_date:
+  sk_first_credit_analysis:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
-  sk_tenant_doc_complete_date:
+      - datalake_credit_analysis.credit_analysis_proposals.id_first_credit_analysis
+  sk_first_variant:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_tenant_doc_complete_date
-  sk_credit_analysis_approved_date:
+      - datalake_credit_analysis.credit_analysis_proposals.id_first_variant
+  sk_guarantee_category:
     lineage:
-      - datalake_proposal.proposal.ts_credit_approved_last
+      - datalake_credit_analysis.credit_analysis.category
   sk_guarantee_paid_date:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_guarantee_paid_date
+  sk_last_credit_analysis:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.id_last_credit_analysis
+  sk_last_credit_evaluation_init:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_contract_signed_date
+  sk_last_credit_evaluation_negative:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_negative
+  sk_last_credit_evaluation_positive:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_positive
+  sk_offer:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_offer
+  sk_offer_approved_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_offer_approved_date
+  sk_offer_submitted_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_offer_submitted_date
+  sk_proposal:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.id_proposal
+  sk_region:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_region
+  sk_tenant_doc_complete_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_tenant_doc_complete_date
+  sk_tenant_first_doc_sent_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
   funnel_step:
     lineage:
       - dw_public.fact_listing_rent_flows.funnel_step
