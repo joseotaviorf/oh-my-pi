@@ -32,6 +32,42 @@ house_aud as (
   where
     mod_status = 1
   group by 1
+),
+supply_context AS (
+  SELECT
+    id_house,
+    SOME(ownership = 'THIRD_PARTY') AS is_3p_supply
+  FROM
+    datalake_ebdb_clean.listing_business_context
+  GROUP BY
+    1
+),
+-- While we don't have 3P agencies included in datalake_company_clean.company, we need to find their name via HubSpot
+-- This is a temporary measure, and should be changed in 22Q3
+-- Also, the reason we are not using the enriched HubSpot tables is because they run later than this query, so we can't simplify it
+partner_agencies AS (
+  SELECT
+    NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '(?<=\\[3[P|p]\\-)(.+?)(?=\\])'), '') AS partner_3p_supply,
+    REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', '') AS cnpj,
+    ROW_NUMBER() OVER (
+      PARTITION BY
+        REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', '')
+      ORDER BY
+        ts_updated
+      DESC
+  ) AS rw
+  FROM
+    datalake_hubspot_clean.company
+),
+partner_agencies_deduplicated AS (
+    SELECT
+      partner_3p_supply,
+      cnpj
+    FROM
+        partner_agencies
+    WHERE
+      rw = 1
+      AND partner_3p_supply IS NOT NULL
 )
 SELECT
   h.id,
@@ -96,7 +132,10 @@ SELECT
   h.listing_type,
   h.admin_info,
   h.internal_admin_info,
-  NULLIF(REGEXP_EXTRACT(h.internal_admin_info, '(?<=\\[3P\\-)(.+?)(?=\\])'), '') AS partner_3p_supply,
+  COALESCE(
+    pad.partner_3p_supply, -- should be replaced by company
+    NULLIF(REGEXP_EXTRACT(h.internal_admin_info, '(?<=\\[3[P|p]\\-)(.+?)(?=\\])'), '') -- should be replaced by supply processor
+  ) AS partner_3p_supply,
   h.photo_booking_historic,
   h.default_neighborhood,
   h.condo_type,
@@ -169,7 +208,10 @@ SELECT
   h.is_visit_information_confirmed,
   h.is_for_rent,
   h.is_for_sale,
-  COALESCE(h.internal_admin_info LIKE '%[3P-%]%', FALSE) AS is_3p_supply,
+  CASE
+    WHEN sc.is_3p_supply THEN TRUE -- After supply processor is in production, the ELSE part should be discarded.
+    ELSE COALESCE(UPPER(h.internal_admin_info) LIKE '%[3P-%]%', FALSE)
+  END AS is_3p_supply,
   (COALESCE(h.announced_by, h.id_announced_by) IS NOT NULL) AS is_imovel_v3,
   COALESCE(r_type.name = 'Restriction', FALSE) AS has_visit_restriction,
   h.has_requested_professional_photos,
@@ -260,3 +302,9 @@ LEFT JOIN
 LEFT JOIN
   datalake_ebdb_clean.instant_offer AS io
     ON h.id = io.id_house
+LEFT JOIN
+  supply_context AS sc
+    ON h.id = sc.id_house
+LEFT JOIN
+  partner_agencies_deduplicated AS pad
+    ON pad.cnpj = NULLIF(REGEXP_EXTRACT(h.internal_admin_info, '(?<=\\[3[P|p]\\-)(.+?)(?=\\])'), '')

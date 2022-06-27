@@ -192,6 +192,7 @@ columns:
       - datalake_ebdb_clean.house.internal_admin_info
   partner_3p_supply:
     lineage:
+      - datalake_hubspot_clean.company.properties
       - datalake_ebdb_clean.house.internal_admin_info
   photo_booking_historic:
     lineage:

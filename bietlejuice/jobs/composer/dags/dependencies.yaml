@@ -1409,6 +1409,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:create-clean-state-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.hubspot:load-clean-company
 
 bietlejuice.enrich_ebdb_listing_jobs:
   - bietlejuice.ebdb:create-clean-house-registration-status-aud-in-data-lake
