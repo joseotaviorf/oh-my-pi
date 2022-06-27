@@ -767,12 +767,12 @@ bietlejuice.dw_invoice_entries_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
 
 bietlejuice.dw_contract:
+  # Removed dependency with enrich_ebdb_listing.house_listing in order to avoid loopings since enrich_ebdb_contract already satisfies
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_ebdb_contract:load-enrich-ongoing-contracts
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
   - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
 
@@ -1132,6 +1132,7 @@ bietlejuice.enrich_bob:
   - bietlejuice.bob:load-clean-house-draft
 
 bietlejuice.enrich_booking:
+  # Removed dependency with enrich_ebdb_listing.house in order to avoid loopings since enrich_ebdb_contract already satisfies
   - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
   - bietlejuice.ebdb:create-clean-appointment-change-reason-category-in-data-lake
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
@@ -1155,7 +1156,6 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:create-clean-visitor-in-data-lake
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
