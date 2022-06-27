@@ -1,0 +1,37 @@
+---
+database_name: datalake_stilingue
+table_name: cases
+columns:
+  id_case:
+    lineage:
+      - datalake_stilingue_clean.calls_report.cases
+  id_conversation:
+    lineage:
+      - datalake_stilingue_clean.calls_report.cases
+  channel:
+    lineage:
+      - datalake_stilingue_clean.calls_report.cases
+  page:
+    lineage:
+      - datalake_stilingue_clean.calls_report.cases
+  status:
+    lineage:
+      - datalake_stilingue_clean.calls_report.cases
+  interaction_type:
+    lineage:
+      - datalake_stilingue_clean.calls_report.cases
+  ts_initial:
+    lineage:
+      - datalake_stilingue_clean.calls_report.cases
+  ts_load:
+    lineage:
+      - datalake_stilingue_clean.calls_report.ts_load
+  year:
+    lineage:
+      - datalake_stilingue_clean.calls_report.year
+  month:
+    lineage:
+      - datalake_stilingue_clean.calls_report.month
+  day:
+    lineage:
+      - datalake_stilingue_clean.calls_report.day

@@ -1,0 +1,46 @@
+---
+database_name: datalake_stilingue
+table_name: conversations
+columns:
+  id_conversation:
+    lineage:
+      - datalake_stilingue_clean.calls_report.conversations
+  channel:
+    lineage:
+      - datalake_stilingue_clean.calls_report.conversations
+  page:
+    lineage:
+      - datalake_stilingue_clean.calls_report.conversations
+  interaction_type:
+    lineage:
+      - datalake_stilingue_clean.calls_report.conversations
+  status:
+    lineage:
+      - datalake_stilingue_clean.calls_report.conversations
+  number_of_interactions:
+    lineage:
+      - datalake_stilingue_clean.calls_report.conversations
+  predefined_sla:
+    lineage:
+      - datalake_stilingue_clean.calls_report.conversations
+  time_first_answer:
+    lineage:
+      - datalake_stilingue_clean.calls_report.conversations
+  is_first_answer_sla:
+    lineage:
+      - datalake_stilingue_clean.calls_report.conversations
+  ts_initial:
+    lineage:
+      - datalake_stilingue_clean.calls_report.conversations
+  ts_load:
+    lineage:
+      - datalake_stilingue_clean.calls_report.ts_load
+  year:
+    lineage:
+      - datalake_stilingue_clean.calls_report.year
+  month:
+    lineage:
+      - datalake_stilingue_clean.calls_report.month
+  day:
+    lineage:
+      - datalake_stilingue_clean.calls_report.day

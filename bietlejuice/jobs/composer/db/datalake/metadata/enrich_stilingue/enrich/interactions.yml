@@ -1,0 +1,91 @@
+---
+database_name: datalake_stilingue
+table_name: interactions
+columns:
+  id_conversation:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  id_post:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  id_case:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  id_root:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  pid:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  user:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  channel:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  tags:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  conversation_status:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  agent_name:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  message:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  polarity:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  original_channel:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  interaction_type:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  themes:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  post_url:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  delay:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  is_outside_date_range:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  is_promoted:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  is_proprietary:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  is_sac_call:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  is_root:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  is_duplicated:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  ts_posted:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  ts_processed:
+    lineage:
+      - datalake_stilingue_clean.calls_report.interactions
+  ts_load:
+    lineage:
+      - datalake_stilingue_clean.calls_report.ts_load
+  year:
+    lineage:
+      - datalake_stilingue_clean.calls_report.year
+  month:
+    lineage:
+      - datalake_stilingue_clean.calls_report.month
+  day:
+    lineage:
+      - datalake_stilingue_clean.calls_report.day

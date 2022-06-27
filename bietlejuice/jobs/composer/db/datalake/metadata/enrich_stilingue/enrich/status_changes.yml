@@ -1,0 +1,70 @@
+---
+database_name: datalake_stilingue
+table_name: status_changes
+columns:
+  id:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  id_conversation:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  id_comment:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  id_calendar:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  agent:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  channel:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  page:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  old_status:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  new_status:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  interaction_type:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  time_status_change:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  predefined_sla:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  is_inside_sla:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  is_ending_status:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  is_first_answer:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  ts_relative_processed:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  ts_relative_posted:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  ts_created:
+    lineage:
+      - datalake_stilingue_clean.calls_report.status_changes
+  ts_load:
+    lineage:
+      - datalake_stilingue_clean.calls_report.ts_load
+  year:
+    lineage:
+      - datalake_stilingue_clean.calls_report.year
+  month:
+    lineage:
+      - datalake_stilingue_clean.calls_report.month
+  day:
+    lineage:
+      - datalake_stilingue_clean.calls_report.day

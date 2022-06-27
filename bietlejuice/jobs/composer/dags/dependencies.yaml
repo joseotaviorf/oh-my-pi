@@ -1872,6 +1872,9 @@ bietlejuice.enrich_sirena:
 bietlejuice.enrich_sorting_hat:
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis
 
+bietlejuice.enrich_stilingue:
+  - bietlejuice.stilingue:load-clean-calls-report
+
 bietlejuice.enrich_survicate:
   - bietlejuice.gsheets:load-clean-owner-offboarding-keys-csat
   - bietlejuice.gsheets:load-clean-tenant-onboarding-keys-csat
