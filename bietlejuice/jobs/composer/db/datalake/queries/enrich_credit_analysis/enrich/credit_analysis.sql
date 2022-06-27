@@ -52,8 +52,8 @@ SELECT
   END AS credit_decision_cluster,
   IF(ca.id_analyst IS NULL, FALSE, TRUE) AS is_manual_analysis,
   CASE
-    WHEN cap.guarantee_source = 'CRM_DOCUMENTATION_ANALYSIS' THEN 'mark'
-    ELSE 'not mark'
+    WHEN cap.guarantee_source = 'CRM_DOCUMENTATION_ANALYSIS' THEN TRUE
+    ELSE FALSE
   END AS is_reprocessed,
   ca.ts_created AS ts_credit_analysis_created
 FROM
