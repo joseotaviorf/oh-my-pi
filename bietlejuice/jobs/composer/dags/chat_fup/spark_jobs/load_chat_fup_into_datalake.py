@@ -3,7 +3,6 @@ import logging
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
-
 from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
@@ -11,9 +10,10 @@ from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
 from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.dags.chat_fup import SOURCE
+
 
 JOB_NAME = "load_chat_fup_into_datalake"
+SOURCE = "chat_fup"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -40,27 +40,31 @@ if __name__ == "__main__":
     tables = postgres_consumer.get_table_names_and_sizes().collect()
     db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
-
+    s3_loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
     logger.info(
         "m=__main__, msg=Creating database in Spark Metastore if it doesn't exist..."
     )
+
+    # create database if not exists
     database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = db_info["db_raw_path"]
     metastore_service.create_database(database_name)
 
-    s3_loader = S3Loader()
-    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
-
     for table in tables:
         df = postgres_consumer.get_data_from_table(table.table_name)
-        s3_loader.load_full_table(
+
+        s3_loader.load_df(
             df=df,
-            database_name=database_name,
-            table_name=table.table_name,
+            s3_path=f"{database_location}{table.table_name.lower()}",
             format_options=format_options,
             database_location=database_location,
         )
         spark_metastore_loader.update_metastore(
-            df, database_name, table.table_name, format_options, database_location
+            df,
+            database_name,
+            table.table_name.lower(),
+            format_options,
+            database_location,
         )
