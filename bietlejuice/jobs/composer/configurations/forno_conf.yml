@@ -158,3 +158,8 @@ databricks_10_4_med_general_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
+
+databricks_10_4_min_memory_cluster:
+    <<: *cluster_anchor
+    node_type_id: "r5a.large"
+    spark_version: 10.4.x-scala2.12
