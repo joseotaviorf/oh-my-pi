@@ -697,6 +697,16 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.dw_contract:load-dw-public-dim-contract
 #   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 #   - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
+#efficiency-monitor-sale
+#   - bietlejuice.casa_mineira_crm.propagate-table-metadata-clean-house-exclusivity
+#   - bietlejuice.dw_region:load-dw-public-dim-region
+#   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
+#   - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
+#   - bietlejuice.dw_sale_listings:load-sale-fact-listings-into-redshift
+#   - bietlejuice.gsheets:create-clean-unit-economics-amortization-curve-external-table
+#   - bietlejuice.gsheets:load-clean-offers-hub-central
+#   - bietlejuice.gsheets.for_sale.propagate-table-metadata-clean-sale-demand-targets
+#   - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
 
 # bietlejuice.dw_datamarts_spark.growth:
 #   #casa_mineira_top_of_funnel_volumes_monthly

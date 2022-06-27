@@ -11,6 +11,7 @@
 
 growth_cross:
   efficiency_monitor_rental: {} # depends on: - marketing_demand_supply_branding_costs
+  efficiency_monitor_sale: {} # - marketing_demand_supply_branding_costs
   inbound_attendance_leads_flows: {}
   pricing_rent_categorization: {} # depends_on: - performance_marketing_metrics_demand
   marketing_campaigns_costs_and_volumes: {} # depends_on: - talk_to_agent

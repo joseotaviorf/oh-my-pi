@@ -13,6 +13,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline creates the following full tables in the schema `dw_datamarts` of data lake:
 
 - `efficiency_monitor_rental`
+- `efficiency_monitor_sale`
 - `pricing_rent_categorization`
 - `inbound_attendance_leads_flows`
 - `marketing_campaigns_costs_and_volumes`

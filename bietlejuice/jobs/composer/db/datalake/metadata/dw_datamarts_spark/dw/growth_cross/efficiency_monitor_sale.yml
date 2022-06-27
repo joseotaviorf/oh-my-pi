@@ -1,0 +1,17 @@
+---
+database_name: dw_datamarts
+table_name: efficiency_monitor_sale
+columns:
+  dt_month_start:
+    lineage:
+      - datalake_gsheets_clean.offers_hub_central.dt_sale_agreement_signed
+      - dw_sale.fact_offers.sk_sale_agreement_signed_date
+      - datalake_gsheets_clean.sale_demand_targets.date
+      - dw_datamarts.marketing_demand_supply_branding_costs.dt_cost
+      - datalake_gsheets_clean.costs_targets.dt_created
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+      - datalake_gsheets_clean.sale_demand_targets.cidade
+      - dw_datamarts.marketing_demand_supply_branding_costs.city_group
+      - datalake_gsheets_clean.costs_targets.city_group
