@@ -53,12 +53,8 @@ if __name__ == "__main__":
     database_location = db_info["dw_schema_path"]
     metastore_service.create_database(database_name)
 
-    s3_loader.load_full_table(
-        df=df,
-        database_name=database_name,
-        table_name=table_name,
-        format_options=format_options,
-        database_location=database_location,
+    s3_loader.load_df(
+        df=df, s3_path=f"{database_location}{table_name}", format_options=format_options
     )
 
     spark_metastore_loader.update_metastore(

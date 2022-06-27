@@ -51,23 +51,18 @@ if __name__ == "__main__":
     metastore_service.create_database(database_name)
 
     for table in tables:
-        if table.table_name not in BLOCK_LIST:
-            df = postgres_consumer.get_data_from_table(table.table_name)
+        table_name = table.table_name
+        if table_name not in BLOCK_LIST:
+            df = postgres_consumer.get_data_from_table(table_name)
             # the table names in the datalake must be lowercase
             database_name = db_info["db_raw_databricks"]
             format_options = SparkTableStorageFormat.DEFAULT_RAW
             database_location = db_info["db_raw_path"]
-            s3_loader.load_full_table(
+            s3_loader.load_df(
                 df=df,
-                database_name=database_name,
-                table_name=table.table_name.lower(),
+                s3_path=f"{database_location}{table_name.lower()}",
                 format_options=format_options,
-                database_location=database_location,
             )
             spark_metastore_loader.update_metastore(
-                df,
-                database_name,
-                table.table_name.lower(),
-                format_options,
-                database_location,
+                df, database_name, table_name.lower(), format_options, database_location
             )

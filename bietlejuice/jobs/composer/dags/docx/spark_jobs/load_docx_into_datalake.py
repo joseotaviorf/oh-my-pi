@@ -53,20 +53,15 @@ if __name__ == "__main__":
     metastore_service.create_database(database_name)
 
     for table in tables:
-        if table.table_name not in BLOCK_LIST:
-            df = consumer.get_data_from_table(table.table_name)
+        table_name = table.table_name
+        if table_name not in BLOCK_LIST:
+            df = consumer.get_data_from_table(table_name)
 
-            s3_loader.load_full_table(
+            s3_loader.load_df(
                 df=df,
-                database_name=database_name,
-                table_name=table.table_name.lower(),
+                s3_path=f"{database_location}{table_name.lower()}",
                 format_options=format_options,
-                database_location=database_location,
             )
             spark_metastore_loader.update_metastore(
-                df,
-                database_name,
-                table.table_name.lower(),
-                format_options,
-                database_location,
+                df, database_name, table_name.lower(), format_options, database_location
             )

@@ -119,12 +119,10 @@ if __name__ == "__main__":
 
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
-    s3_loader.load_full_table(
+    s3_loader.load_df(
         df=dm_table_df,
-        database_name=database_name,
-        table_name=table,
+        s3_path=f"{database_location}{table}",
         format_options=format_options,
-        database_location=database_location,
     )
 
     spark_metastore_loader.update_metastore(

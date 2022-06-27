@@ -49,19 +49,14 @@ if __name__ == "__main__":
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
     tables = postgres_consumer.get_table_names_and_sizes().collect()
     for table in tables:
-        if table.table_name not in BLOCK_LIST:
-            df = postgres_consumer.get_data_from_table(table.table_name)
-            s3_loader.load_full_table(
+        table_name = table.table_name
+        if table_name not in BLOCK_LIST:
+            df = postgres_consumer.get_data_from_table(table_name)
+            s3_loader.load_df(
                 df=df,
-                database_name=database_name,
-                table_name=table.table_name.lower(),
+                s3_path=f"{database_location}{table_name.lower()}",
                 format_options=format_options,
-                database_location=database_location,
             )
             spark_metastore_loader.update_metastore(
-                df,
-                database_name,
-                table.table_name.lower(),
-                format_options,
-                database_location,
+                df, database_name, table_name.lower(), format_options, database_location
             )
