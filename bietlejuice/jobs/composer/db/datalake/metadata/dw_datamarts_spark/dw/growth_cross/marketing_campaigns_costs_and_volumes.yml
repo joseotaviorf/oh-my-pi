@@ -1,5 +1,5 @@
 ---
-database_name: dw_datamarts_growth_cross
+database_name: dw_datamarts
 table_name: marketing_campaigns_costs_and_volumes
 columns:
   sk_date:

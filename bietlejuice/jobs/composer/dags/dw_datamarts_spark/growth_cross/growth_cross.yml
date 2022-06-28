@@ -15,3 +15,4 @@ growth_cross:
   inbound_attendance_leads_flows: {}
   pricing_rent_categorization: {} # depends_on: - performance_marketing_metrics_demand
   marketing_campaigns_costs_and_volumes: {} # depends_on: - talk_to_agent
+  performance_marketing_cluster_promotional_bonus_costs: {} # depends_on : - performance_marketing_cluster_promotional_bonus - affiliates_clusters
