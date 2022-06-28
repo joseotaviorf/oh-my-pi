@@ -46,6 +46,9 @@ columns:
   tenant_pending_tasks:
     lineage:
       - datalake_terminator_raw.termination.tenant_pending_tasks
+  category:
+    lineage:
+      - datalake_terminator_raw.termination.category
   has_exit_inspection:
     lineage:
       - datalake_terminator_raw.termination.exit_inspection_required

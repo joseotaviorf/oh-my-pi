@@ -11,6 +11,9 @@ columns:
   id_house:
     lineage:
       - datalake_offboarding.contract_termination.id_house
+  category:
+    lineage:
+      - datalake_offboarding.contract_termination.category
   status:
     lineage:
       - datalake_offboarding.contract_termination.status

@@ -2,6 +2,7 @@ SELECT
     MAX(ct.id_termination) AS id, 
     ct.id_contract,
     ct.id_house,
+    ct.category,
     ct.status,
     ct.workflow_current_step,
     ct.reason,
@@ -35,4 +36,4 @@ WHERE
     )
     OR (ct.dt_termination <= DATE_ADD(current_date(),7*10) AND ct.status NOT IN ('CANCELED', 'DONE'))
 GROUP BY 
-    2,3,4,5,6,7,8,9,10,11,12,13
+    2,3,4,5,6,7,8,9,10,11,12,13,14

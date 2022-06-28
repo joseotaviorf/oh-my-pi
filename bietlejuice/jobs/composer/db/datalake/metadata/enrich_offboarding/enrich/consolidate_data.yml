@@ -11,6 +11,9 @@ columns:
   id_house:
     lineage:
       - datalake_offboarding.ongoing.id_house
+  category:
+    lineage:
+      - datalake_offboarding.ongoing.category
   repair_resolution:
     lineage:
       - datalake_offboarding.ongoing.repair_resolution

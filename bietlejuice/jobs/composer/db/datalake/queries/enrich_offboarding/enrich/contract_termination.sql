@@ -407,6 +407,7 @@ SELECT
     cmp.customer_type,
     cmp.campaign_name,
     term.cancellation_info,
+    term.category,
     term.feedback,
     GET_JSON_OBJECT(term.feedback, '$.churnInfo.reason') AS churn_reason,
     GET_JSON_OBJECT(term.feedback, '$.nextProperty') AS next_property,

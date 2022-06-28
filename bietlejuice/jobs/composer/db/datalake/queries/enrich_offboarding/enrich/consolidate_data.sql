@@ -161,6 +161,7 @@ SELECT DISTINCT
     ong.id,
     ong.id_contract,
     ong.id_house,
+    ong.category,
     flow.flow AS flow,
     ong.repair_resolution,
     bw.client_type,

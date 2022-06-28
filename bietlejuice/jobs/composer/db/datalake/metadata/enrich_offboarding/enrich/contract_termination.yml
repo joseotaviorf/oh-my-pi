@@ -29,6 +29,9 @@ columns:
   cancellation_info:
     lineage:
       - datalake_terminator_clean.termination.source
+  category:
+    lineage:
+      - datalake_terminator_clean.termination.category
   feedback:
     lineage:
       - datalake_terminator_clean.termination.feedback

@@ -14,6 +14,7 @@ SELECT
     utility_bill_info,
     last_condominium_responsible, 
     tenant_pending_tasks,
+    category,
     exit_inspection_required AS has_exit_inspection,
     relisting_enabled AS is_relisting,
     date AS dt_termination,
