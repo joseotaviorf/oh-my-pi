@@ -1,11 +1,13 @@
 SELECT DISTINCT
     l.id,
+    rg.id_country,
     l.id_agent,
     l.id_region,
     l.id_external,
     l.id_lead_owner,
     user_affiliate.id AS id_user_has_indicated,
     l.id_affiliate_has_indicated,
+    rg.country_code,
     l.address,
     l.house_number,
     l.complement,
@@ -72,12 +74,20 @@ SELECT DISTINCT
     ad.ts_operation_start AS ts_affiliate_operation_start,
     l.ts_created,
     l.ts_updated
-FROM datalake_ebdb_clean.lead l
-LEFT JOIN datalake_ebdb_clean.ownerlead ol
-    ON ol.id = l.id_lead_owner
-LEFT JOIN datalake_ebdb_clean.affiliate_data ad
-    ON ad.id = l.id_affiliate_has_indicated
-LEFT JOIN datalake_ebdb_clean.user user_affiliate
-    ON ad.id = user_affiliate.id_affiliates
-LEFT JOIN datalake_ebdb_clean.lead_reason lead_reason
- 	ON l.reason = lead_reason.reason_detail
+FROM
+    datalake_ebdb_clean.lead AS l
+LEFT JOIN
+    datalake_ebdb_clean.ownerlead AS ol
+        ON ol.id = l.id_lead_owner
+LEFT JOIN
+    datalake_ebdb_clean.affiliate_data AS ad
+        ON ad.id = l.id_affiliate_has_indicated
+LEFT JOIN
+    datalake_ebdb_clean.user AS user_affiliate
+        ON ad.id = user_affiliate.id_affiliates
+LEFT JOIN
+    datalake_ebdb_clean.lead_reason AS lead_reason
+ 	    ON l.reason = lead_reason.reason_detail
+LEFT JOIN
+    datalake_region.region AS rg
+        ON l.id_region = rg.id

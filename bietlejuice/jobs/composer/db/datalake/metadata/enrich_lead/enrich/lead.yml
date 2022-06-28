@@ -4,6 +4,9 @@ columns:
   id:
     lineage:
       - datalake_ebdb_clean.lead.id
+  id_country:
+    lineage:
+      - datalake_region.region.id_country
   id_agent:
     lineage:
       - datalake_ebdb_clean.lead.id_agent
@@ -22,6 +25,9 @@ columns:
   id_affiliate_has_indicated:
     lineage:
       - datalake_ebdb_clean.lead.id_affiliate_has_indicated
+  country_code:
+    lineage:
+      - datalake_region.region.country_code
   address:
     lineage:
       - datalake_ebdb_clean.lead.address
