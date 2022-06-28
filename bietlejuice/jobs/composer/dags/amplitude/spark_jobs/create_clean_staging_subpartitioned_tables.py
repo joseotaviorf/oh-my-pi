@@ -1,7 +1,8 @@
 import logging
-import re
 from argparse import ArgumentParser
 from datetime import datetime
+from urllib.parse import unquote
+from functools import reduce
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -10,9 +11,10 @@ from bietlejuice.jobs.composer.base.db import (
     DatalakeMetastoreService,
     DDL_DATALAKE_PATH,
 )
-from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.spark import spark, sqlContext
 from bietlejuice.jobs.composer.clients.db_clients import AthenaClient, SparkClient
+from bietlejuice.jobs.composer.formatters import StringFormatter
+from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.metastore_services import (
     AthenaMetastoreService,
     SparkMetastoreService,
@@ -32,11 +34,8 @@ parser.add_argument("--spark", action="store_true", dest="spark_flag")
 parser.add_argument("--athena", action="store_true", dest="athena_flag")
 
 
-def is_valid_table_name(value):
-    return re.match(r"[0-9a-z_]+$", str(value))
-
-
 def create_subpartitioned_table_in_spark(subpartitioned_table_name, row):
+    replace_map = ("/", "%2F"), ("[", "%5B"), ("]", "%5D")
     ddl = ddl_template.format(
         clean_staging_db=db_info["db_clean_staging_databricks"],
         subpartitioned_table_name=subpartitioned_table_name,
@@ -45,7 +44,12 @@ def create_subpartitioned_table_in_spark(subpartitioned_table_name, row):
         clean_staging_source_path=db_info["db_clean_staging_path"],
         target_table_name=source_table_name,
         partition_values_path="/".join(
-            ["{}={}".format(key, getattr(row, key)) for key in row.asDict()]
+            [
+                "{}={}".format(
+                    k, reduce(lambda a, t: str(a).replace(*t), replace_map, v)
+                )
+                for k, v in row.asDict().items()
+            ]
         ),
     )
     spark.sql(ddl)
@@ -87,12 +91,9 @@ def create_subpartitioned_table_in_athena(subpartitioned_table_name):
 
 
 def create_subpartitioned_tables(row, subpartitioned_table_name):
-    if not is_valid_table_name(subpartitioned_table_name):
-        logger.warning(
-            "m=__main__, subpartitioned_table_name={}, msg=Not a valid table name, "
-            "table will not be created.".format(subpartitioned_table_name)
-        )
-        return
+    subpartitioned_table_name = StringFormatter.set_alphanumeric_snake_case(
+        unquote(subpartitioned_table_name.replace("-", "_"))
+    )
 
     logger.info(
         "m=__main__, subpartitioned_table_name={}, msg=Creating table...".format(
