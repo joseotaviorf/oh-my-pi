@@ -51,10 +51,10 @@ columns:
       - datalake_marketing_costs_raw.facebook_social_insights.date_stop
   year:
     lineage:
-      - datalake_marketing_costs_raw.facebook_social_insights.year
+      - datalake_marketing_costs_raw.facebook_social_insights.date_start
   month:
     lineage:
-      - datalake_marketing_costs_raw.facebook_social_insights.month
+      - datalake_marketing_costs_raw.facebook_social_insights.date_start
   day:
     lineage:
-      - datalake_marketing_costs_raw.facebook_social_insights.day
+      - datalake_marketing_costs_raw.facebook_social_insights.date_start

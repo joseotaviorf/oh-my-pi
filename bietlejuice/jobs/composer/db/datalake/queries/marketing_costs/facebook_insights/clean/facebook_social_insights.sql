@@ -15,8 +15,10 @@ SELECT
     INT(reach) AS reach,
     DATE(date_start) AS dt_start,
     DATE(date_stop) AS dt_stop,
-    SMALLINT(year) AS year,
-    TINYINT(month) AS month,
-    TINYINT(day) AS day
+    SMALLINT(YEAR(date_start)) AS year,
+    TINYINT(MONTH(date_start)) AS month,
+    TINYINT(DAY(date_start)) AS day
 FROM
     datalake_marketing_costs_raw.facebook_social_insights
+WHERE
+    date_start BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

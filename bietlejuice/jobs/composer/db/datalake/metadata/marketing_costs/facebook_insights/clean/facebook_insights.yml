@@ -16,6 +16,9 @@ columns:
   account_name:
     lineage:
       - datalake_marketing_costs_raw.facebook_insights.account_name
+  account_name_snake_case:
+    lineage:
+      - datalake_marketing_costs_raw.facebook_insights.account_name
   ad_name:
     lineage:
       - datalake_marketing_costs_raw.facebook_insights.ad_name
@@ -49,3 +52,12 @@ columns:
   dt_stop:
     lineage:
       - datalake_marketing_costs_raw.facebook_insights.date_stop
+  year:
+    lineage:
+      - datalake_marketing_costs_raw.facebook_social_insights.date_start
+  month:
+    lineage:
+      - datalake_marketing_costs_raw.facebook_social_insights.date_start
+  day:
+    lineage:
+      - datalake_marketing_costs_raw.facebook_social_insights.date_start

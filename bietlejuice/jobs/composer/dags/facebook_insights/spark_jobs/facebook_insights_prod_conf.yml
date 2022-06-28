@@ -1,5 +1,8 @@
 ---
-raw_partition_cols: [year, month, day]
+raw_partition_cols:
+  facebook_insights: [account_name_snake_case, year, month, day]
+  facebook_social_insights: [year, month, day]
+
 fields:
   facebook_insights:
     - account_id
@@ -55,5 +58,6 @@ accounts:
     - "1260820603984552"
     - "994734287259853"
     - "994644903935458"
+    - "1130906744424280"
   facebook_social_insights:
     - "994734287259853"

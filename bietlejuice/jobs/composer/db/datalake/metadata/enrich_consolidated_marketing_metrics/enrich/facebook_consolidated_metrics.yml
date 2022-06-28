@@ -7,7 +7,7 @@ columns:
       - datalake_facebook_insights_clean.facebook_insights.campaign_name
   account_name:
     lineage:
-      - datalake_facebook_insights_clean.facebook_insights.account_name
+      - datalake_facebook_insights_clean.facebook_insights.account_name_snake_case
   utm_campaign:
     lineage:
       - datalake_facebook_insights_clean.facebook_insights.campaign_name

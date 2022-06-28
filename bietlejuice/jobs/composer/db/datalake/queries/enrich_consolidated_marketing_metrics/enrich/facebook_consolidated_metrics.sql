@@ -1,7 +1,7 @@
 SELECT
     INT(year*10000 + month*100 + day) AS id_date,
     campaign_name,
-    SF_ALPHANUMERIC_SNAKE_CASE(account_name) AS account_name,
+    account_name_snake_case AS account_name,
     campaign_name AS utm_campaign,
     adset_name AS utm_term,
     ad_name AS utm_content,
