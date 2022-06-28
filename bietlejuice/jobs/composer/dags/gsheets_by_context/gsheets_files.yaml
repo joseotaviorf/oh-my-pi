@@ -102,10 +102,10 @@ costs_targets:
     clean_table_name: costs_targets
     sheet_context: growth
 
-costs_targets_mx:
+mexico_costs_targets:
     sheet_id: 1bPwti9OY4s7k44uQof7GIyBjMs9_l1JBnuAIv8oOEFo
     sheet_name: costs_targets_mx
-    clean_table_name: costs_targets_mx
+    clean_table_name: mexico_costs_targets
     sheet_context: growth
 
 affiliate_pro_registration:
@@ -300,10 +300,10 @@ demand_targets_2022:
     clean_table_name: demand_targets_2022
     sheet_context: for_rent
 
-demand_targets_mx_2022:
+mexico_demand_targets_2022:
     sheet_id: 1bVwi_m_x-lxrXcx--VyPmbbqDovwbiST1vnTEXBO1FQ
     sheet_name: demand_targets_mx_2022
-    clean_table_name: demand_targets_mx_2022
+    clean_table_name: mexico_demand_targets_2022
     sheet_context: for_rent
 
 forecast_cohort_demanda:
@@ -348,10 +348,10 @@ supply_targets_2022:
     clean_table_name: supply_targets_2022
     sheet_context: for_rent
 
-supply_targets_2022_mx:
+mexico_supply_targets_2022:
     sheet_id: 1sEl5H0PpnoRrKB4JmGGLq9WG-sWrGIfA1n4Cs4vDz1Q
     sheet_name: supply_targets_2022_mx
-    clean_table_name: supply_targets_2022_mx
+    clean_table_name: mexico_supply_targets_2022
     sheet_context: for_rent
 
 #########################

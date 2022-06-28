@@ -16,4 +16,4 @@ SELECT
     TO_DATE(week_start, 'yyyy-MM-dd') AS dt_week_started,
     TO_DATE(date, 'yyyy-MM-dd') AS dt_target
 FROM
-    datalake_gsheets_raw.supply_targets_2022_mx
+    datalake_gsheets_raw.mexico_supply_targets_2022

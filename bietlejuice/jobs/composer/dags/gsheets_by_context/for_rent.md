@@ -23,28 +23,28 @@ This pipeline produces the following output tables:
     - `aux_agents`
     - `aux_regiao`
     - `demand_targets_2022`
-    - `demand_targets_mx_2022`
     - `forecast_cohort_demanda`
     - `forecast_cohort_supply`
     - `forecast_diario_demanda`
     - `forecast_diario_supply`
+    - `mexico_demand_targets_2022`
+    - `mexico_supply_targets_2022`
     - `ongoing_listings_target`
     - `rental_budget_targets`
-    - `supply_targets_2022`
-    - `supply_targets_2022_mx`
+    - `supply_targets_2022`    
 
 2. Data lake clean:
     - `aux_agents`
     - `auxiliary_region`
     - `demand_targets_2022`
-    - `demand_targets_mx_2022`
     - `rental_forecast_cohort_demand`
     - `rental_forecast_cohort_supply`
     - `rental_forecast_daily_demand`
     - `rental_forecast_daily_supply`
+    - `mexico_demand_targets_2022`
+    - `mexico_supply_targets_2022`
     - `ongoing_listings_target`
     - `rental_budget_targets`
     - `supply_targets_2022`
-    - `supply_targets_2022_mx`
 
 </details>

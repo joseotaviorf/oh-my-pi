@@ -1,0 +1,52 @@
+---
+database_name: datalake_gsheets_clean
+table_name: mexico_costs_targets
+columns:
+  business:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.business
+  campaign:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.campaign
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.city_group
+  planning_mkt_level1:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.planning_mkt_level1
+  planning_mkt_level2:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.planning_mkt_level2
+  planning_mkt_level3:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.planning_mkt_level3
+  tier:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.tier
+  budget:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.budget
+  monthly_budget:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.budget_mensal
+  quarterly_budget:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.budget_quarter
+  dt_created:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.date
+  year:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.year
+  halfyear:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.halfyear
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.quarter
+  month:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.month
+  dt_week:
+    lineage:
+      - datalake_gsheets_raw.mexico_costs_targets.week

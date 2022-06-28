@@ -24,13 +24,13 @@ This pipeline produces the following output tables:
     - `base_supply_souce_for_rent`
     - `base_supply_souce_for_sale`
     - `branding_where_is_plaquinha`
-    - `costs_targets_mx`
     - `costs_targets`
     - `ecglobal_active_users`
     - `historic_national_costs`
     - `manual_cost_engagement_history`
     - `manual_cost_engagement`
     - `marketing_cost_taxonomy`
+    - `mexico_costs_targets`
     - `mkt_cost_per_source`
     - `mta_budget`
     - `offline_manual_costs`
@@ -48,12 +48,12 @@ This pipeline produces the following output tables:
     - `affiliates_manual_cost_engagement`
     - `affiliates_national_costs_history`
     - `branding_where_is_plaquinha`
-    - `costs_targets_mx`
     - `costs_targets`
     - `daily_target_supply_rental`
     - `daily_target_supply_sale`
     - `ecglobal_active_users`
     - `marketing_cost_taxonomy`
+    - `mexico_costs_targets`
     - `mkt_cost_per_source`
     - `mta_budget_october_2020`
     - `offline_manual_costs`

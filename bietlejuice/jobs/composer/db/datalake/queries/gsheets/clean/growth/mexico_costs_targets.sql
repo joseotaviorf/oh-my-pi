@@ -16,4 +16,4 @@ SELECT
   DATE(date) AS dt_created,
   DATE(week) AS dt_week
 FROM
-  datalake_gsheets_raw.costs_targets_mx
+  datalake_gsheets_raw.mexico_costs_targets

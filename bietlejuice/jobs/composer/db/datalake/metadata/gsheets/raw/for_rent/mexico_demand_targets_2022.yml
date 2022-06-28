@@ -1,3 +1,3 @@
 ---
 database_name: datalake_gsheets_raw
-table_name: supply_targets_2022_mx
+table_name: mexico_demand_targets_2022

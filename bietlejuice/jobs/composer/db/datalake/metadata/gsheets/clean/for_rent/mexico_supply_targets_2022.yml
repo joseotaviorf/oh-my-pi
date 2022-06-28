@@ -1,0 +1,52 @@
+---
+database_name: datalake_gsheets_clean
+table_name: mexico_supply_targets_2022
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.city_group
+  first_listings:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.first_listings
+  lead_context:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.lead_context
+  opportunities:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.opportunities
+  prospects:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.prospects
+  qualifieds:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.qualifieds
+  supply_channel:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.supply_channel
+  supply_origin:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.supply_origin
+  tier:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.tier
+  top_of_funnel:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.top_of_funnel
+  halfyear:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.halfyear
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.quarter
+  month:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.year
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.week_start
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.date
