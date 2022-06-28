@@ -48,10 +48,10 @@ affiliates AS (
         FROM
             datalake_marketing_costs_prod.daily_costs AS fc
         WHERE
-            fc.mkt_origin = 'Indica Aí - General'
+            fc.mkt_origin IN ('Indica Aí - General', 'Indica Aí - Agents', 'Doorman')
             AND flow_type <> 'historical'
             AND fc.id_date BETWEEN 20210101 AND 20210701
-            OR(fc.mkt_origin = 'Indica Aí - General'
+            OR fc.mkt_origin IN ('Indica Aí - General', 'Indica Aí - Agents', 'Doorman')
                 AND flow_type <> 'historical'
                 AND fc.id_date >= 20210701
                 AND fc.mkt_source <> 'Spinver')
