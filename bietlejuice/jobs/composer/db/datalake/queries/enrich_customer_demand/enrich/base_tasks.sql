@@ -147,23 +147,23 @@ ticket_tasks AS (
     unique_theme_detail_sla_target tds
       ON dc.journey_step = tds.journey_step
       AND t.contact_theme_detail_tag = tds.taxonomy_tag
-      AND NOT t.tags LIKE '%orçamentação_realizada%'
+      AND t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
       AND DATE(t.ts_started) = tds.dt_reference
   LEFT JOIN
     unique_theme_sla_target ts
       ON dc.journey_step = ts.journey_step
-      AND t.contact_theme_detail_tag = ts.taxonomy_tag
-      AND NOT t.tags LIKE '%orçamentação_realizada%'
+      AND t.contact_theme_tag = ts.taxonomy_tag
+      AND t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
       AND DATE(t.ts_started) = ts.dt_reference
   LEFT JOIN
     unique_journey_sla_target ujst
       ON dc.journey_step = ujst.journey_step
-      AND NOT t.tags LIKE '%orçamentação_realizada%'
+      AND t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
       AND DATE(t.ts_started) = ujst.dt_reference
   LEFT JOIN
     datalake_gsheets_clean.tag_sla_target tst
       ON dc.journey_step = tst.journey
-      AND t.tags LIKE '%orçamentação_realizada%'
+      AND t.department = 'Offboarding Reparos [OFF] [POS] [BACK]'
       AND t.tags LIKE CONCAT('%', tst.tag, '%')
       AND t.ts_started BETWEEN tst.dt_start AND COALESCE(tst.dt_end, NOW())
   WHERE
@@ -174,7 +174,7 @@ ticket_tasks AS (
       OR t.department <> 'Midias Ops [POS] [BACK]'
     )
     AND (
-      (t.department = 'Offboarding Reparos [OFF] [POS] [BACK]' AND t.tags LIKE '%orçamentação_realizada%')
+      (t.department = 'Offboarding Reparos [OFF] [POS] [BACK]' AND (t.tags LIKE '%orçamentação_realizada%' OR t.tags LIKE '%cx_sem_reparos%'))
       OR t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
     )
 )
