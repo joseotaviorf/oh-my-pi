@@ -476,6 +476,12 @@ target_sale_cohort_supply:
     clean_table_name: target_sale_cohort_supply
     sheet_context: for_sale
 
+tqc_leads_bh:
+    sheet_id: 134aaiWWqIE4P9nEOONk7dSesdRZrTZf1otcxwZGjT-g
+    sheet_name: tqc_leads_bh
+    clean_table_name: tqc_leads_bh
+    sheet_context: for_sale
+
 #########################
 # STATIC SHEETS
 ###################

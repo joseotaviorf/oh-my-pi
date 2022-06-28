@@ -1,0 +1,24 @@
+---
+database_name: datalake_gsheets_raw
+table_name: tqc_leads_bh
+columns:
+  agent_id:
+    tags:
+      - PII
+      - Confidential
+  agent_name:
+    tags:
+      - PII
+      - Confidential
+  agent_phone:
+    tags:
+      - Confidential
+  agent_email:
+    tags:
+      - Confidential
+  lead_phone:
+    tags:
+      - Confidential
+  lead_email:
+    tags:
+      - Confidential

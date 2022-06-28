@@ -38,6 +38,7 @@ This pipeline produces the following output tables:
     - `sale_tof_weekly_targets`
     - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
+    - `tqc_leads_bh`
 2. Data lake clean:
     - `sale_asp_form_responses_2022q1`
     - `sale_asp_form_responses_2022q2`
@@ -57,5 +58,6 @@ This pipeline produces the following output tables:
     - `sale_tof_weekly_targets`
     - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
+    - `tqc_leads_bh`
 
 </details>
