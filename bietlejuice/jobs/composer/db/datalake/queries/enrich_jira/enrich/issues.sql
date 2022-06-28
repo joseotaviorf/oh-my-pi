@@ -12,7 +12,16 @@ WITH record_selection AS (
         GET_JSON_OBJECT(fields, '$.assignee.displayName') AS assignee,
         GET_JSON_OBJECT(fields, '$.reporter.displayName') AS reporter,
         GET_JSON_OBJECT(fields, '$.priority.name') AS priority,
-        GET_JSON_OBJECT(fields, '$.resolution.name') AS resolution,
+        -- There was a failure with the automation of the field "resolution", which we can identify when
+        -- the issue's status category is done, but there is no resolution.
+        -- When that happens, we can set the resolution to "Done"
+        CASE
+            WHEN GET_JSON_OBJECT(fields, '$.resolution') IS NULL
+            AND GET_JSON_OBJECT(fields, '$.status.statusCategory.name') = 'Done'
+                THEN 'Done'
+            ELSE
+                GET_JSON_OBJECT(fields, '$.resolution.name')
+        END AS resolution,
         GET_JSON_OBJECT(fields, '$.customfield_11195.value') AS root_cause_resolution,
         GET_JSON_OBJECT(fields, '$.customfield_11194.value') AS incident_category,
         GET_JSON_OBJECT(fields, '$.customfield_12078.value') AS incident_owner,
@@ -35,7 +44,18 @@ WITH record_selection AS (
         CAST(GET_JSON_OBJECT(fields, '$.customfield_10503') AS TIMESTAMP) AS dt_started,
         CAST(REPLACE(GET_JSON_OBJECT(fields,'$.created'), '-0300', '') AS TIMESTAMP) AS ts_created,
         GET_JSON_OBJECT(fields,'$.updated') AS ts_updated,
-        CAST(REPLACE(GET_JSON_OBJECT(fields,'$.resolutiondate'), '-0300', '') AS TIMESTAMP) AS ts_resolved,
+        -- There was a failure with the automation of the field "resolutiondate", which we can identify when
+        -- the issue's status category is done, but there is no resulution date.
+        -- When that happens, we can use statuscategorychangedate, which was when the status category was changed to "Done"
+        CAST(REPLACE(
+            CASE
+                WHEN GET_JSON_OBJECT(fields, '$.resolutiondate') IS NULL
+                AND GET_JSON_OBJECT(fields, '$.status.statusCategory.name') = 'Done'
+                    THEN GET_JSON_OBJECT(fields, '$.statuscategorychangedate')
+                ELSE 
+                    GET_JSON_OBJECT(fields,'$.resolutiondate')
+            END, '-0300', ''
+        ) AS TIMESTAMP) AS ts_resolved,
         ROW_NUMBER() OVER (PARTITION BY key ORDER BY GET_JSON_OBJECT(fields,'$.updated') DESC) AS row_num
     FROM 
         datalake_jira_clean.issues
