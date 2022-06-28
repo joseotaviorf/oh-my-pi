@@ -1,0 +1,253 @@
+---
+database_name: datalake_brokers_supply_processor
+table_name: lead_3p
+columns:
+  id:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.id
+  id_partner:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.id_partner
+  id_file:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.id_file
+  id_listing:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.id_listing
+  uuid_lead:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.uuid_lead
+  id_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.id_real_estate
+  id_by_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.id_by_real_estate
+  id_house_partner:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  id_region:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  lead_hash:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.lead_hash
+  block:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  tower:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  info_key:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  condominium:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  house_category:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  house_type:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+  house_subtype:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  construction_year:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  front_door_type:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.details
+  house_description:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.details
+  country:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  state:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  city:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  neighborhood:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  region_slug:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  zip_code:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  address:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  number:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  floor:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  complement:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  reference_point:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  owner_email:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.owner
+  owner_name:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.owner
+  owner_phone:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.owner
+  owner_person_type:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.owner
+  access_type:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.access
+  authorization_type:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.access
+  occupant_type:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.access
+  additional_access_info:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.access
+  locker_address:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.access
+  password:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.access
+  cnpj:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.cnpj
+  status:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.status
+  installations:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.details
+  house_appliances:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.details
+  accessibility_items:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.details
+  enrichment_reason:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.enrichment_reason
+  discard_reason:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.discard_reason
+  eligible_reason:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.eligible_reason
+  photos:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.photos
+  administrators:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.administrators
+  iptu_installment_informations:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.pricing
+  special_conditions:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.pricing
+  total_area:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+  bedrooms:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+  suites:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+  bathrooms:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+  garages:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+  latitude:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  longitude:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  rent_price:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.pricing
+  sale_price:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.pricing
+  condo_price:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.pricing
+  version:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.version
+  has_opted_keys_with_agent:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.access
+  has_access_restriction:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.access
+  is_furnished:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.details
+  is_penthouse:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.details
+  is_pet_friendly:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.details
+  is_iptu_not_paid:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.pricing
+  is_out_of_area:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
+  is_habitat:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  has_balcony:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  has_agency_key:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  has_concierge:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  is_eligible:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.is_eligible
+  is_sent_to_bob:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.is_sent_to_bob
+  is_enriched:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.is_enriched
+  is_discarded:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.is_discarded
+  ts_house_created:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  ts_house_updated:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.ts_created
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.ts_updated

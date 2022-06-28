@@ -1,0 +1,34 @@
+---
+database_name: datalake_brokers_supply_processor
+table_name: file
+columns:
+  id:
+    lineage:
+      - datalake_brokers_supply_processor_clean.file.id
+  id_partner:
+    lineage:
+      - datalake_brokers_supply_processor_clean.file.id_partner
+  hash:
+    lineage:
+      - datalake_brokers_supply_processor_clean.file.hash
+  file_name:
+    lineage:
+      - datalake_brokers_supply_processor_clean.file.file_name
+  type:
+    lineage:
+      - datalake_brokers_supply_processor_clean.file.type
+  url:
+    lineage:
+      - datalake_brokers_supply_processor_clean.file.url
+  file_byte:
+    lineage:
+      - datalake_brokers_supply_processor_clean.file.file_byte
+  version:
+    lineage:
+      - datalake_brokers_supply_processor_clean.file.version
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_clean.file.ts_created
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor_clean.file.ts_updated

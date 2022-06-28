@@ -1194,6 +1194,10 @@ bietlejuice.enrich_braze_events_user_centric:
 bietlejuice.enrich_braze_events_user_centric_periodicity:
   - bietlejuice.enrich_braze_events_user_centric:load-enrich-user-events-daily
 
+bietlejuice.enrich_brokers_supply_processor:
+  - bietlejuice.brokers_supply_processor:load-clean-file
+  - bietlejuice.brokers_supply_processor:load-clean-lead-3p
+
 bietlejuice.enrich_bureaus:
   - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud
