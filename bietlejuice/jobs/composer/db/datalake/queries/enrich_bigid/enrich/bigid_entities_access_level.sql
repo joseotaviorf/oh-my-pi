@@ -1,4 +1,16 @@
 WITH
+  remove_ebdb_replica AS (
+    SELECT
+      datasource,
+      table_full_qualified_name,
+      column_name,
+      data_type,
+      classifications
+    FROM 
+      datalake_bigid_clean.data_catalog_entities
+    WHERE
+      datasource != "EBDB_REPLICA"
+  ),
   exploded_classifications AS
   (
     SELECT
@@ -7,7 +19,8 @@ WITH
       LOWER(column_name) AS column_name,
       data_type,
       explode_outer(from_json(classifications, "ARRAY<STRING>")) AS classification
-    FROM datalake_bigid_clean.data_catalog_entities
+    FROM 
+      remove_ebdb_replica
   ),
   split_names AS
   (
