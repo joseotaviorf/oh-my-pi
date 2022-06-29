@@ -200,7 +200,7 @@ listing_special_conditions as (
     join special_conditions sc
         on hl.id_house = sc.id_house
         and greatest(sc.dt_opted_in, date(hl.ts_listing_version_start)) >= date(hl.ts_listing_version_start)
-        and greatest(sc.dt_opted_in, date(hl.ts_listing_version_start)) < coalesce(date(hl.ts_listing_version_end), date(now() - interval '1' day))
+        and greatest(sc.dt_opted_in, date(hl.ts_listing_version_start)) < coalesce(date(hl.ts_listing_version_end), date(now()))
         and greatest(coalesce(sc.dt_opted_out, date(now() - interval '1' day)), coalesce(date(hl.ts_listing_version_end), date((now() - interval '1' day)))) >= coalesce(date(hl.ts_listing_version_end), date(now() - interval '1' day))
         and greatest(coalesce(sc.dt_opted_out, date(now() - interval '1' day)), coalesce(date(hl.ts_listing_version_end), date((now() - interval '1' day)))) >= date(hl.ts_listing_version_start)
     group by 1, 2
@@ -314,7 +314,7 @@ house_listing_latest_contracts AS (
       max(c.id) as id_contract,
       dense_rank() over (partition by hl.id_house order by hl.id_house_listing) as order_renting
     from house_listing hl
-    join datalake_ebdb_contract.contract c
+    join datalake_ebdb_clean.contract c
       on hl.id_house = c.id_house
       and c.ts_signed between coalesce(hl.ts_listing_version_start, '2000-01-01 00:00:00') and coalesce(hl.ts_listing_version_end, current_date)
       and c.status in ('Ativo', 'Finalizado')
@@ -428,7 +428,7 @@ select
 from house_listing hl
 left join house_listing_latest_contracts hl_c
   on hl.id_house_listing = hl_c.id_house_listing
-left join datalake_ebdb_contract.contract c
+left join datalake_ebdb_clean.contract c
   on hl_c.id_contract = c.id
 left join house_listing_stranded_date hlsd
     ON hlsd.id_house_listing = hl.id_house_listing

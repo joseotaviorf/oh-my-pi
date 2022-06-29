@@ -1386,6 +1386,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:create-clean-access-type-in-data-lake
   - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-condo-in-data-lake
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-agent-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-agent-key-tracking-aud-in-data-lake
