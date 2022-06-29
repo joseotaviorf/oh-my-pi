@@ -2,8 +2,7 @@ import os
 from datetime import datetime
 from pendulum import timezone
 
-from airflow.models import DAG, Variable
-from airflow.utils.helpers import chain
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -26,8 +25,8 @@ DAG_NAME = "enrich_casa_mineira_marketing_automatic_daily_costs"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2021, 5, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-PARTITION_COLS = ["id_date", "flow_type"]
 CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+PARTITION_COLS = ["id_date", "flow_type"]
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -37,6 +36,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+cluster_description = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
@@ -64,7 +64,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=Variable.get(CLUSTER_DESCRIPTION, deserialize_json=True),
+    cluster_configuration=cluster_description,
     libraries=default_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
@@ -90,5 +90,9 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     partitions=PARTITION_COLS,
 )
 
-chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
-chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+create_cluster_task.set_downstream(
+    DatalakeTaskGroup.all_first_tasks(enrich_task_groups)
+)
+terminate_cluster_task.set_upstream(
+    DatalakeTaskGroup.all_last_tasks(enrich_task_groups)
+)

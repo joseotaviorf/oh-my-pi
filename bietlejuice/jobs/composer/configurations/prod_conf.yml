@@ -39,7 +39,6 @@ dags_out_of_pattern:
         "dw_user_affiliate",
         "dw_user_sales_rep",
         "ebdb",
-        "enrich_amplitude_partner_taxonomy",
         "enrich_marketing_costs_offline",
         "enrich_marketing_costs_sharing_rules",
         "facebook_insights",
@@ -78,7 +77,7 @@ default_libraries:
 ##### Clusters Configs #####
 cluster_template:
     cluster: &cluster_anchor
-        enable_elastic_disk: 'true'
+        enable_elastic_disk: "true"
         autotermination_minutes: 20
         aws_attributes: &aws_anchor
             availability: SPOT_WITH_FALLBACK
@@ -117,13 +116,13 @@ cluster_template:
         init_scripts:
             - s3:
                   destination: "{{ var.value.artifacts_s3_bucket }}/bi-etl-ejuice/libs_install_9_1.sh"
-                  region: ''
+                  region: ""
         spark_conf:
-            spark.rpc.message.maxSize: '2000'
+            spark.rpc.message.maxSize: "2000"
             spark.sql.sources.partitionOverwriteMode: dynamic
-            spark.sql.parquet.filterPushdown: 'true'
+            spark.sql.parquet.filterPushdown: "true"
             spark.sql.sources.default: parquet
-            spark.sql.legacy.createHiveTableByDefault: 'true'
+            spark.sql.legacy.createHiveTableByDefault: "true"
             spark.sql.legacy.parquet.datetimeRebaseModeInRead: LEGACY
             spark.sql.legacy.parquet.datetimeRebaseModeInWrite: LEGACY
             spark.sql.legacy.timeParserPolicy: LEGACY
@@ -163,3 +162,93 @@ databricks_10_4_min_memory_cluster:
     <<: *cluster_anchor
     node_type_id: "r5a.large"
     spark_version: 10.4.x-scala2.12
+
+databricks_10_4_med_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.8xlarge
+    node_type_id: r5a.4xlarge
+    autoscale:
+        max_workers: 3
+        min_workers: 1
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_max_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.8xlarge
+    autoscale:
+        max_workers: 4
+        min_workers: 1
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_min_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5n.large
+    node_type_id: r5n.xlarge
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_med_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5n.2xlarge
+    node_type_id: r5n.4xlarge
+    autoscale:
+        max_workers: 3
+        min_workers: 1
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_max_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5n.4xlarge
+    node_type_id: r5n.8xlarge
+    autoscale:
+        max_workers: 4
+        min_workers: 1
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_min_io-general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5n.large
+    node_type_id: m5n.xlarge
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_med_io-general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5n.2xlarge
+    node_type_id: m5n.4xlarge
+    autoscale:
+        max_workers: 3
+        min_workers: 1
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_max_io-general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5n.4xlarge
+    node_type_id: m5n.8xlarge
+    autoscale:
+        max_workers: 4
+        min_workers: 1
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
