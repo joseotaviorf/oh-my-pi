@@ -51,7 +51,7 @@ affiliates AS (
             fc.mkt_origin IN ('Indica Aí - General', 'Indica Aí - Agents', 'Doorman')
             AND flow_type <> 'historical'
             AND fc.id_date BETWEEN 20210101 AND 20210701
-            OR fc.mkt_origin IN ('Indica Aí - General', 'Indica Aí - Agents', 'Doorman')
+            OR (fc.mkt_origin IN ('Indica Aí - General', 'Indica Aí - Agents', 'Doorman')
                 AND flow_type <> 'historical'
                 AND fc.id_date >= 20210701
                 AND fc.mkt_source <> 'Spinver')
@@ -1068,4 +1068,3 @@ LEFT JOIN (
 WHERE
     dt_cost < current_date
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,13
-ORDER BY 1 DESC, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 
