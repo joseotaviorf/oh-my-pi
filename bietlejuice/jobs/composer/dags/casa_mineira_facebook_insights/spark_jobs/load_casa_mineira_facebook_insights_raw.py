@@ -60,7 +60,11 @@ if __name__ == "__main__":
 
     fb_client = FacebookClient(auth["access_token"])
     client_response = fb_client.get_data(
-        date=execution_date, accounts=accounts, fields=fields, breakdowns=breakdowns
+        date_start=execution_date,
+        date_stop=execution_date,
+        accounts=accounts,
+        fields=fields,
+        breakdowns=breakdowns,
     )
 
     if len(client_response):
