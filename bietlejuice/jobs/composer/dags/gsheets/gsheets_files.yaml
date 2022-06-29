@@ -296,6 +296,7 @@ extra_invoice_expenses:
     sheet_id: 1t9_oW9mXtRuXcw2l_Xh0JVnu1S1BGdcwEWnUG1HkYTk
     sheet_name: extra_invoice_created_expenses
     clean_table_name: extra_invoice_created_expenses
+    preload_time_in_seconds: 60
 
 extra_invoice:
     sheet_id: 1i4SiSro342zfv6L0wpl9B29kY8Cyg8hwsShuIDkzkfQ
