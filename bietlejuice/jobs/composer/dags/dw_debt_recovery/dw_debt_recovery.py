@@ -93,7 +93,7 @@ for table in tables:
         is_incremental=True,
         spectrum_iam_role=SPECTRUM_IAM_ROLE,
         partitions=partitions,
-        has_load_to_redshift_task=False,
+        has_load_to_redshift_task=True,
     )
 
 dw_task_group_boundaries = {}
