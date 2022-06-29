@@ -2,7 +2,8 @@ WITH
 attribution_cross_channel AS (
     SELECT
         *,
-        ROW_NUMBER() OVER(PARTITION BY COALESCE(visit_code,id_firestore) ORDER BY ts_event) AS attribution_rn
+        -- Consider visit_schedule_confirmed over debug_visit_schedule_confirmed if they have the same visit_code
+        ROW_NUMBER() OVER(PARTITION BY COALESCE(visit_code,id_firestore) ORDER BY event_name DESC,ts_event) AS attribution_rn
     FROM
         datalake_tracked_events.cross_channel_full
     WHERE -- #TODO: ADD INCREMENTAL CLAUSE AFTER online_attribution REPROCESS

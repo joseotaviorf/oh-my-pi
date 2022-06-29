@@ -24,6 +24,14 @@ cross_channel AS (
                 THEN COALESCE(platform,amplitude_platform,'')
         END AS attribution_app_type,
         CASE 
+            WHEN event_type_sanitized IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN COALESCE(platform,amplitude_platform)
+        END AS attribution_app_type_conversion,
+        CASE 
             WHEN event_type_sanitized NOT IN (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
@@ -31,6 +39,14 @@ cross_channel AS (
                 'sale_offer_form_accepted')
                 THEN COALESCE(branded,'')
         END AS attribution_branded,
+        CASE 
+            WHEN event_type_sanitized IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN branded
+        END AS attribution_branded_conversion,
         CASE 
             WHEN event_type_sanitized NOT IN (
                 'visit_schedule_confirmed',
@@ -40,11 +56,23 @@ cross_channel AS (
                 THEN (
                     CASE
                         WHEN ts_app_attribution > ts_web_attribution THEN 'App'
-                        WHEN ts_web_attribution > ts_app_attribution THEN 'Web'
                         ELSE 'Web'
                     END
                 )
         END AS attribution_origin,
+        CASE 
+            WHEN event_type_sanitized IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN (
+                    CASE
+                        WHEN ts_app_attribution > ts_web_attribution THEN 'App'
+                        ELSE 'Web'
+                    END
+                )
+        END AS attribution_origin_conversion,
         CASE 
             WHEN event_type_sanitized NOT IN (
                 'visit_schedule_confirmed',
@@ -54,6 +82,14 @@ cross_channel AS (
                 THEN COALESCE(utm_source,'')
         END AS attribution_source,
         CASE 
+            WHEN event_type_sanitized IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN utm_source
+        END AS attribution_source_conversion,
+        CASE 
             WHEN event_type_sanitized NOT IN (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
@@ -61,6 +97,14 @@ cross_channel AS (
                 'sale_offer_form_accepted')
                 THEN COALESCE(utm_medium,'')
         END AS attribution_medium,
+        CASE 
+            WHEN event_type_sanitized IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN utm_medium
+        END AS attribution_medium_conversion,
         CASE 
             WHEN event_type_sanitized NOT IN (
                 'visit_schedule_confirmed',
@@ -70,6 +114,14 @@ cross_channel AS (
                 THEN COALESCE(utm_campaign,'')
         END AS attribution_campaign,
         CASE 
+            WHEN event_type_sanitized IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN utm_campaign
+        END AS attribution_campaign_conversion,
+        CASE 
             WHEN event_type_sanitized NOT IN (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
@@ -77,6 +129,14 @@ cross_channel AS (
                 'sale_offer_form_accepted')
                 THEN COALESCE(utm_term,'')
         END AS attribution_term,
+        CASE 
+            WHEN event_type_sanitized IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN utm_term
+        END AS attribution_term_conversion,
         CASE 
             WHEN event_type_sanitized NOT IN (
                 'visit_schedule_confirmed',
@@ -86,6 +146,14 @@ cross_channel AS (
                 THEN COALESCE(utm_content,'')
         END AS attribution_content,
         CASE 
+            WHEN event_type_sanitized IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN utm_content
+        END AS attribution_content_conversion,
+        CASE 
             WHEN event_type_sanitized NOT IN (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
@@ -93,6 +161,14 @@ cross_channel AS (
                 'sale_offer_form_accepted')
                 THEN COALESCE(media_source,'')
         END AS attribution_media_source,
+        CASE 
+            WHEN event_type_sanitized IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN media_source
+        END AS attribution_media_source_conversion,
         ts_event,
         year,
         month,
@@ -125,6 +201,7 @@ cross_channel AS (
         NULL AS visit_code,
         event_name,
         'offline_table' AS attribution_app_type,
+        'offline_table' AS attribution_app_type_conversion,
         CASE 
             WHEN origin IN (
                 'Quinto Andar Classificados Lite',
@@ -138,13 +215,21 @@ cross_channel AS (
                 THEN 'Branded' 
             ELSE ''
         END AS attribution_branded,
+        'offline_table' AS attribution_branded_conversion,
         COALESCE(agent,'') AS attribution_origin,
+        'offline_table' AS attribution_origin_conversion,
         COALESCE(origin,'') AS attribution_source,
+        'offline_table' AS attribution_source_conversion,
         COALESCE(channel,'') AS attribution_medium,
+        'offline_table' AS attribution_medium_conversion,
         'offline_table' AS attribution_campaign,
+        'offline_table' AS attribution_campaign_conversion,
         'offline_table' AS attribution_term,
+        'offline_table' AS attribution_term_conversion,
         'offline_table' AS attribution_content,
+        'offline_table' AS attribution_content_conversion,
         'offline_table' AS attribution_media_source,
+        'offline_table' AS attribution_media_source_conversion,
         ts_event,
         year,
         month,
@@ -161,10 +246,67 @@ cross_channel AS (
             'Quinto Andar - Placas',
             'Placas'
             )
+),
+apply_attribution_rule AS (
+    /*
+    Get the attribution of the event immediately preceding the conversion event.
+    The coalesces in the previous cte ensure that even making the field-by-field attribution assignment, 
+    non-existent combinations are not generated
+    */
+    SELECT
+        id_user,
+        id_amplitude,
+        id_session,
+        id_house,
+        id_firestore,
+        id_contact,
+        visit_code,
+        event_name,
+        LAST(attribution_app_type, TRUE) OVER(
+            PARTITION BY id_user_conversion 
+            ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_app_type,
+        LAST(attribution_branded, TRUE) OVER(
+            PARTITION BY id_user_conversion 
+            ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_branded,
+        LAST(attribution_origin, TRUE) OVER(
+            PARTITION BY id_user_conversion 
+            ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_origin,
+        LAST(attribution_source, TRUE) OVER(
+            PARTITION BY id_user_conversion 
+            ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_source,
+        LAST(attribution_medium, TRUE) OVER(
+            PARTITION BY id_user_conversion 
+            ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_medium,
+        LAST(attribution_campaign, TRUE) OVER(
+            PARTITION BY id_user_conversion 
+            ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_campaign,
+        LAST(attribution_term, TRUE) OVER(
+            PARTITION BY id_user_conversion 
+            ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_term,
+        LAST(attribution_content, TRUE) OVER(
+            PARTITION BY id_user_conversion 
+            ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_content,
+        LAST(attribution_media_source, TRUE) OVER(
+            PARTITION BY id_user_conversion 
+            ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_media_source,
+        attribution_app_type_conversion,
+        attribution_branded_conversion,
+        attribution_origin_conversion,
+        attribution_source_conversion,
+        attribution_medium_conversion,
+        attribution_campaign_conversion,
+        attribution_term_conversion,
+        attribution_content_conversion,
+        attribution_media_source_conversion,
+        ts_event,
+        year,
+        month,
+        day
+    FROM
+        cross_channel
 )
 /*
---- The coalesces in the previous cte ensure that even making the field-by-field attribution assignment, 
---- non-existent combinations are not generated
+if there is no event immediately preceding the conversion event, get the attribution of the conversion event
 */
 SELECT
     id_user,
@@ -175,36 +317,45 @@ SELECT
     id_contact,
     visit_code,
     event_name,
-    LAST(attribution_app_type, TRUE) OVER(
-        PARTITION BY id_user_conversion 
-        ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_app_type,
-    LAST(attribution_branded, TRUE) OVER(
-        PARTITION BY id_user_conversion 
-        ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_branded,
-    LAST(attribution_origin, TRUE) OVER(
-        PARTITION BY id_user_conversion 
-        ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_origin,
-    LAST(attribution_source, TRUE) OVER(
-        PARTITION BY id_user_conversion 
-        ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_source,
-    LAST(attribution_medium, TRUE) OVER(
-        PARTITION BY id_user_conversion 
-        ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_medium,
-    LAST(attribution_campaign, TRUE) OVER(
-        PARTITION BY id_user_conversion 
-        ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_campaign,
-    LAST(attribution_term, TRUE) OVER(
-        PARTITION BY id_user_conversion 
-        ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_term,
-    LAST(attribution_content, TRUE) OVER(
-        PARTITION BY id_user_conversion 
-        ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_content,
-    LAST(attribution_media_source, TRUE) OVER(
-        PARTITION BY id_user_conversion 
-        ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_media_source,
+    CASE
+        WHEN final_attribution_app_type IS NULL THEN attribution_app_type_conversion
+        ELSE final_attribution_app_type
+    END AS final_attribution_app_type,
+    CASE
+        WHEN final_attribution_app_type IS NULL THEN attribution_branded_conversion
+        ELSE final_attribution_branded
+    END AS final_attribution_branded,
+    CASE
+        WHEN final_attribution_app_type IS NULL THEN attribution_origin_conversion
+        ELSE final_attribution_origin
+    END AS final_attribution_origin,
+    CASE
+        WHEN final_attribution_app_type IS NULL THEN attribution_source_conversion
+        ELSE final_attribution_source
+    END AS final_attribution_source,
+    CASE
+        WHEN final_attribution_app_type IS NULL THEN attribution_medium_conversion
+        ELSE final_attribution_medium
+    END AS final_attribution_medium,
+    CASE
+        WHEN final_attribution_app_type IS NULL THEN attribution_campaign_conversion
+        ELSE final_attribution_campaign
+    END AS final_attribution_campaign,
+    CASE
+        WHEN final_attribution_app_type IS NULL THEN attribution_term_conversion
+        ELSE final_attribution_term
+    END AS final_attribution_term,
+    CASE
+        WHEN final_attribution_app_type IS NULL THEN attribution_content_conversion
+        ELSE final_attribution_content
+    END AS final_attribution_content,
+    CASE
+        WHEN final_attribution_app_type IS NULL THEN attribution_media_source_conversion
+        ELSE final_attribution_media_source
+    END AS final_attribution_media_source,
     ts_event,
     year,
     month,
     day
 FROM
-    cross_channel
+    apply_attribution_rule
