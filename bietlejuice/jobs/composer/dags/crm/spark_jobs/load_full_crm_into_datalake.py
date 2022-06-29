@@ -59,12 +59,10 @@ if __name__ == "__main__":
     df = mongo_consumer.get_data_from_table(table_name)
 
     if not df.rdd.isEmpty():
-        s3_loader.load_full_table(
+        s3_loader.load_df(
             df=df,
-            database_name=database_name,
-            table_name=table_name,
+            s3_path=f"{database_location}{table_name}",
             format_options=format_options,
-            database_location=database_location,
         )
         spark_metastore_loader.update_metastore(
             df,

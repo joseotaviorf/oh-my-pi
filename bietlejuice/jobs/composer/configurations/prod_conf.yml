@@ -163,6 +163,7 @@ databricks_10_4_min_memory_cluster:
     node_type_id: "r5a.large"
     spark_version: 10.4.x-scala2.12
 
+
 databricks_10_4_med_memory_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5a.8xlarge
