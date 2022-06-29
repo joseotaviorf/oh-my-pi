@@ -110,7 +110,6 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
-    has_create_external_table_task=False,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))

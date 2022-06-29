@@ -101,7 +101,6 @@ for table_name in tables_list:
         table_name=table_name,
         is_incremental=True,
         partitions=partition_cols,
-        has_create_external_table_task=False,
     )
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
