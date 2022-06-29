@@ -174,7 +174,7 @@ ticket_tasks AS (
       OR t.department <> 'Midias Ops [POS] [BACK]'
     )
     AND (
-      (t.department = 'Offboarding Reparos [OFF] [POS] [BACK]' AND (t.tags LIKE '%orçamentação_realizada%' OR t.tags LIKE '%cx_sem_reparos%'))
+      (t.department = 'Offboarding Reparos [OFF] [POS] [BACK]' AND (t.tags LIKE '%orçamentação_realizada%'))
       OR t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
     )
 )
