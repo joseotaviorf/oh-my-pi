@@ -4,6 +4,7 @@ SELECT
     deal_quali,
     dm_central,
     operacao,
+    fb,
     new_buyer_prospect,
     origin,
     offer_accepted,

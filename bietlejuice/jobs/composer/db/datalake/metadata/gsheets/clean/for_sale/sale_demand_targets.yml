@@ -16,6 +16,9 @@ columns:
   operacao:
     lineage:
       - datalake_gsheets_raw.sale_demand_targets.operacao
+  fb:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.fb
   new_buyer_prospect:
     lineage:
       - datalake_gsheets_raw.sale_demand_targets.new_buyer_prospect
