@@ -2,7 +2,7 @@ from datetime import datetime
 from pendulum import timezone
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -36,9 +36,7 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base"
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_dw_tracksale_cluster", deserialize_json=True
-)
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_min_general_cluster")
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
