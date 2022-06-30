@@ -16,12 +16,10 @@ growth_cross:
   inbound_attendance_leads_flows: {}
   marketing_campaigns_costs_and_volumes: {} # depends_on: - talk_to_agent
   pricing_rent_categorization: {} # depends_on: - performance_marketing_metrics_demand
+  rent_flow_interactions: {}
+  lead_listing_flows: {} # depends_on: - quintoandar_consultant_listings
   tenant_prospects_activations: {} #  depends_on: - rent_flow_interactions
   performance_marketing_cluster_promotional_bonus: {} # depends_on: - affiliates_clusters
-  unique_supply_events_funnel: {}
-    # depends_on:
-    # - lead_listing_flows
-  sale_performance_marketing_metrics_supply_coincident: {}
-  # depends_on: - performance_marketing_cluster_promotional_bonus_costs
-  performance_marketing_cluster_promotional_bonus_costs: {}
-    # depends_on : - performance_marketing_cluster_promotional_bonus - affiliates_clusters
+  performance_marketing_cluster_promotional_bonus_costs: {} # depends_on : - performance_marketing_cluster_promotional_bonus - affiliates_clusters
+  unique_supply_events_funnel: {} # depends_on: - lead_listing_flows
+  sale_performance_marketing_metrics_supply_coincident: {} # depends_on: - performance_marketing_cluster_promotional_bonus_costs

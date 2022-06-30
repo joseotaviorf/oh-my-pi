@@ -14,6 +14,10 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 
 - `affiliate_acquisition_metrics`
 - `efficiency_monitor_rental`
+- `inbound_attendance_leads_flows`
+- `marketing_campaigns_costs_and_volumes`
+- `pricing_rent_categorization`
+- `rent_flow_interactions`
 - `efficiency_monitor_sale`
 - `pricing_rent_categorization`
 - `inbound_attendance_leads_flows`
