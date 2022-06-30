@@ -712,6 +712,7 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
 
 # bietlejuice.dw_datamarts_spark.growth:
+# Removed dependency with dw_region.dim_region since dw_rent_listing_flow already satisfies
 #   #casa_mineira_top_of_funnel_volumes_monthly
 #   - bietlejuice.dw_casa_mineira_portal:load-dw-casa-mineira-portal-dim-house
 #   - bietlejuice.dw_casa_mineira_portal:load-dw-casa-mineira-portal-dim-real-estate-agency
@@ -749,6 +750,13 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.casa_mineira_portal:create-clean-uf-external-table
 #   - bietlejuice.casa_mineira_crm:load-clean-uf
 #   - bietlejuice.gsheets:create-clean-targets-portal-casa-mineira-cost-cf-external-table
+#  # sale_performance_markting_metrics_supply_cohort
+#  - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
+#  - bietlejuice.gsheets.for_sale:load-clean-sale-supply-targets
+#  - bietlejuice.gsheets.growth:load-clean-costs-targets
+#  - bietlejuice.dw_lead:load-dw-public-dim-lead
+#  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+#  - bietlejuice.dw_sale_listing_flow:load-dw-sale-fact-listing-flows
 
 # bietlejuice.dw_datamarts_spark.support_and_service:
 #   - bietlejuice.kodak:load-clean-photo-sphere

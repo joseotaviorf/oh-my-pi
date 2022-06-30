@@ -7,8 +7,8 @@ listings_rental AS (
     dd.month_start,
     SUBSTRING(f.sk_house_listing, 1, 9) AS id_house
   FROM
-    fact_house_listing_flows AS f
-      JOIN dim_date AS dd
+    dw_public.fact_house_listing_flows AS f
+      JOIN dw_public.dim_date AS dd
         ON f.sk_first_listing_date = dd.sk_date
   WHERE
     f.sk_first_listing_date >= 20200101
@@ -19,7 +19,7 @@ costs_targets_results_combined AS (
   -- Supply ForSale funnel volumes in the lead date cohort --
   -----------------------------------------------------------
   SELECT
-    DATE(NULLIF(f.sk_lead_date, -1)) AS lead_date,
+    di.date AS lead_date,
     COALESCE(dr.city_group, 'Not Mapped') AS city_group,
     f.mkt_origin,
     f.mkt_channel,
@@ -29,7 +29,7 @@ costs_targets_results_combined AS (
     dl.utm_content,
     dl.utm_term,
 	  CASE
-	      WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate in (912255, 360754, 1711931, 2257503)
+	      WHEN LOWER(dl.utm_campaign) NOT REGEXP 'sale|girafa|vender' OR f.sk_user_lead_affiliate in (912255, 360754, 1711931, 2257503)
 	          THEN 'Sale'
 	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) LIKE '%hybrid%'
 	          THEN 'Hybrid'
@@ -43,23 +43,25 @@ costs_targets_results_combined AS (
     COUNT(DISTINCT CASE WHEN sk_opportunity_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS opportunities,
     COUNT(DISTINCT CASE WHEN sk_first_listing_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS first_listings,
     COUNT(DISTINCT CASE WHEN lr.id_house IS NOT NULL THEN f.sk_house_listing_flow ELSE NULL END) AS hybrid_listings,
-    SUM(0::FLOAT) AS cost,
-    SUM(0::FLOAT) AS prospects_target,
-    SUM(0::FLOAT) AS qualifieds_target,
-    SUM(0::FLOAT) AS opportunities_target,
-    SUM(0::FLOAT) AS first_listings_target,
-    SUM(0::FLOAT) AS budget
+    SUM(0) AS cost,
+    SUM(0) AS prospects_target,
+    SUM(0) AS qualifieds_target,
+    SUM(0) AS opportunities_target,
+    SUM(0) AS first_listings_target,
+    SUM(0) AS budget
   FROM
-    sale.fact_listing_flows AS f
-    JOIN dim_lead AS dl
+    dw_sale.fact_listing_flows AS f
+    JOIN dw_public.dim_lead AS dl
       ON dl.sk_lead = f.sk_lead
-    JOIN dim_region AS dr
+    JOIN dw_public.dim_region AS dr
       ON f.sk_region = dr.sk_region
-    JOIN dim_date AS dd
+    JOIN dw_public.dim_date AS dd
       ON f.sk_first_listing_date = dd.sk_date
     LEFT JOIN listings_rental AS lr
       ON SUBSTRING(f.sk_house_listing, 1, 9) = lr.id_house
       AND dd.month_start = lr.month_start
+    LEFT JOIN dw_public.dim_date AS di
+      ON f.sk_lead_date = di.sk_date
   GROUP BY 1,2,3,4,5,6,7,8,9,10
 
   UNION ALL
@@ -68,7 +70,7 @@ costs_targets_results_combined AS (
   -- Supply ForSale Marketing Investment --
   -----------------------------------------
   SELECT
-    DATE(NULLIF(mkt.id_date, -1)) AS lead_date,
+    dd.date AS lead_date,
     COALESCE(mkt.city_group, 'Not Mapped') AS city_group,
     REPLACE(mkt.mkt_origin, ' - Sale', '') AS mkt_origin,
     mkt.mkt_channel,
@@ -78,7 +80,7 @@ costs_targets_results_combined AS (
     mkt.utm_content,
     mkt.utm_term,
     CASE
-        WHEN LOWER(mkt.utm_campaign) ~ '(sale|girafa|vender)'
+        WHEN LOWER(mkt.utm_campaign) NOT REGEXP 'sale|girafa|vender'
             THEN 'Sale'
         WHEN mkt.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(mkt.utm_campaign) LIKE '%hybrid%'
             THEN 'Hybrid'
@@ -93,13 +95,15 @@ costs_targets_results_combined AS (
     COUNT(NULL) AS first_listings,
     COUNT(NULL) AS hybrid_listings,
     SUM(COALESCE(mkt.cost, 0)) AS cost,
-    SUM(0::FLOAT) AS prospects_target,
-    SUM(0::FLOAT) AS qualifieds_target,
-    SUM(0::FLOAT) AS opportunities_target,
-    SUM(0::FLOAT) AS first_listings_target,
-    SUM(0::FLOAT) AS budget
+    SUM(0) AS prospects_target,
+    SUM(0) AS qualifieds_target,
+    SUM(0) AS opportunities_target,
+    SUM(0) AS first_listings_target,
+    SUM(0) AS budget
   FROM
-    datalake_marketing_costs_prod.daily_costs mkt
+    datalake_marketing_costs.daily_costs mkt
+  LEFT JOIN dw_public.dim_date AS dd
+      ON mkt.id_date = dd.sk_date
   WHERE
       mkt.mkt_origin IN ('Price Calculator - Sale', 'Owner PWA - Sale')
   GROUP BY 1,2,3,4,5,6,7,8,9,10
@@ -111,33 +115,33 @@ costs_targets_results_combined AS (
   -----------------------------------
   SELECT
     DATE(NULLIF(str.date, '')) AS lead_date,
-    COALESCE(NULLIF(str.city_group, ''),'Not Mapped')::TEXT AS city_group,
-    NULLIF(str.mkt_origin, '')::TEXT as mkt_origin,
+    CAST(COALESCE(NULLIF(str.city_group, ''),'Not Mapped') AS STRING) AS city_group,
+    CAST(NULLIF(str.mkt_origin, '') AS STRING) as mkt_origin,
     CASE str.mkt_origin
       WHEN 'Owner PWA'
-        THEN NULLIF(str.mkt_channel, '')::TEXT
-      ELSE NULL::TEXT
+        THEN CAST(NULLIF(str.mkt_channel, '') AS STRING)
+      ELSE CAST(NULL AS STRING)
     END AS mkt_channel,
-    NULL::TEXT AS mkt_medium,
-    NULL::TEXT AS mkt_source,
-    NULL::TEXT AS utm_campaign,
-    NULL::TEXT AS utm_content,
-    NULL::TEXT AS utm_term,
-    NULL::TEXT AS campaign_context,
+    CAST(NULL AS STRING) AS mkt_medium,
+    CAST(NULL AS STRING) AS mkt_source,
+    CAST(NULL AS STRING) AS utm_campaign,
+    CAST(NULL AS STRING) AS utm_content,
+    CAST(NULL AS STRING) AS utm_term,
+    CAST(NULL AS STRING) AS campaign_context,
     COUNT(NULL) AS leads,
     COUNT(NULL) AS prospects,
     COUNT(NULL) AS qualifieds,
     COUNT(NULL) AS opportunities,
     COUNT(NULL) AS first_listings,
     COUNT(NULL) AS hybrid_listings,
-    SUM(0::FLOAT) AS cost,
-    SUM(NULLIF(REPLACE(prospects,',',''), '')::FLOAT) AS prospects_target,
-    SUM(NULLIF(REPLACE(qualifieds,',',''), '')::FLOAT) AS qualifieds_target,
-    SUM(NULLIF(REPLACE(opportunities,',',''), '')::FLOAT) AS opportunities_target,
-    SUM(NULLIF(REPLACE(first_listings,',',''), '')::FLOAT) AS first_listings_target,
-    SUM(0::FLOAT) AS budget
+    SUM(0) AS cost,
+    SUM(CAST(NULLIF(REPLACE(prospects,',',''), '') AS FLOAT)) AS prospects_target,
+    SUM(CAST(NULLIF(REPLACE(qualifieds,',',''), '') AS FLOAT)) AS qualifieds_target,
+    SUM(CAST(NULLIF(REPLACE(opportunities,',',''), '') AS FLOAT)) AS opportunities_target,
+    SUM(CAST(NULLIF(REPLACE(first_listings,',',''), '') AS FLOAT)) AS first_listings_target,
+    SUM(0) AS budget
   FROM
-    datalake_gsheets_clean_prod.sale_supply_targets AS str
+    datalake_gsheets_clean.sale_supply_targets AS str
   WHERE
     mkt_origin != 'All'
   GROUP BY 1,2,3,4,5,6,7,8,9,10
@@ -149,32 +153,32 @@ costs_targets_results_combined AS (
   ---------------------------------
   SELECT
     ct.dt_created AS lead_date,
-    COALESCE(NULLIF(ct.city_group, ''), 'Not Mapped')::TEXT AS city_group,
+    CAST(COALESCE(NULLIF(ct.city_group, ''), 'Not Mapped') AS STRING) AS city_group,
     CASE
       WHEN ct.planning_mkt_level3 = 'PWA - Paid'
         THEN 'Owner PWA'
       ELSE ct.planning_mkt_level3
     END AS mkt_origin,
-    NULL::TEXT AS mkt_channel,
-    NULL::TEXT AS mkt_medium,
-    NULL::TEXT AS mkt_source,
-    NULL::TEXT AS utm_campaign,
-    NULL::TEXT AS utm_content,
-    NULL::TEXT AS utm_term,
-    NULL::TEXT AS campaign_context,
+    CAST(NULL AS STRING) AS mkt_channel,
+    CAST(NULL AS STRING) AS mkt_medium,
+    CAST(NULL AS STRING) AS mkt_source,
+    CAST(NULL AS STRING) AS utm_campaign,
+    CAST(NULL AS STRING) AS utm_content,
+    CAST(NULL AS STRING) AS utm_term,
+    CAST(NULL AS STRING) AS campaign_context,
     COUNT(NULL) AS leads,
     COUNT(NULL) AS prospects,
     COUNT(NULL) AS qualifieds,
     COUNT(NULL) AS opportunities,
     COUNT(NULL) AS first_listings,
     COUNT(NULL) AS hybrid_listings,
-    SUM(0::FLOAT) AS cost,
-    SUM(0::FLOAT) AS prospects_target,
-    SUM(0::FLOAT) AS qualifieds_target,
-    SUM(0::FLOAT) AS opportunities_target,
-    SUM(0::FLOAT) AS first_listings_target,
-    SUM(NULLIF(ct.monthly_budget, '')::FLOAT) AS budget
-  FROM datalake_gsheets_clean_prod.costs_targets AS ct
+    SUM(0) AS cost,
+    SUM(0) AS prospects_target,
+    SUM(0) AS qualifieds_target,
+    SUM(0) AS opportunities_target,
+    SUM(0) AS first_listings_target,
+    SUM(CAST(NULLIF(ct.monthly_budget, '') AS FLOAT)) AS budget
+  FROM datalake_gsheets_clean.costs_targets AS ct
   WHERE
     business = 'Sale'
     AND planning_mkt_level1 = 'Supply'
