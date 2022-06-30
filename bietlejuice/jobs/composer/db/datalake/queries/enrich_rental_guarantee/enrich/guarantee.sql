@@ -26,7 +26,8 @@ SELECT
   ts_cancellation_requested,
   ts_expired,
   ts_paid,
-  ts_payment_expired
+  ts_payment_expired,
+  ts_started
 FROM
   guarantee_last_updates
 WHERE

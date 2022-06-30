@@ -19,18 +19,30 @@ columns:
   rev_type:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.revtype
+  standalone_factor:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.standalone_factor
   is_guarantee_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.allow_guarantee
+  is_standalone_allowed:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.allow_standalone
   mod_category_level:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.category_level_mod
   mod_factor:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.factor_mod
+  mod_standalone_factor:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.standalone_factor_mod
   mod_is_guarantee_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.allow_guarantee_mod
+  mod_is_standalone_allowed:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.allow_standalone_mod
   mod_ts_created:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.created_at_mod

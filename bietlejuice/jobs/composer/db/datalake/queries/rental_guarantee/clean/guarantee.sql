@@ -19,6 +19,7 @@ SELECT
     expires_at AS ts_expired,
     paid_at AS ts_paid,
     payment_expires_at AS ts_payment_expired,
+    begins_at AS ts_started,
     year,
     month, 
     day

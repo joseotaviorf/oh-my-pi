@@ -37,12 +37,14 @@ SELECT
     expires_at_mod AS mod_ts_expired,
     paid_at_mod AS mod_ts_paid,
     payment_expires_at_mod AS mod_ts_payment_expired,
+    begins_at_mod AS mod_ts_started,
     created_at AS ts_created,
     updated_at AS ts_updated,
     billed_at AS ts_billed,
     cancellation_requested_at AS ts_cancellation_requested,
     expires_at AS ts_expired,
     paid_at AS ts_paid,
-    payment_expires_at AS ts_payment_expired
+    payment_expires_at AS ts_payment_expired,
+    begins_at AS ts_started
 FROM 
     datalake_rental_guarantee_raw.guarantee_aud

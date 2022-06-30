@@ -106,6 +106,9 @@ columns:
   mod_ts_payment_expired:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.payment_expires_at_mod
+  mod_ts_started:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.begins_at_mod
   ts_created:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.created_at
@@ -127,3 +130,6 @@ columns:
   ts_payment_expired:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.payment_expires_at
+  ts_started:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.begins_at

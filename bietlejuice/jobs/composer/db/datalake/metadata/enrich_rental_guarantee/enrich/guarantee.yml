@@ -61,3 +61,6 @@ columns:
   ts_payment_expired:
     lineage:
       - datalake_rental_guarantee_clean.guarantee.ts_payment_expired
+  ts_started:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_started

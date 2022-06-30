@@ -21,8 +21,10 @@ SELECT
   cap.liquidity,
   cap.paid_guarantee_type,
   CASE
-    WHEN rsc.standalone_factor = 0.96 THEN '8%'
-    WHEN rsc.standalone_factor = 1.20 THEN '10%'
+    WHEN rsc.category_level = 40 
+      AND rsc.standalone_factor = 0.96 THEN 'Standalone Low'
+    WHEN rsc.category_level = 41
+      AND rsc.standalone_factor = 1.20 THEN 'Standalone High'
   END AS standalone_factor,
   ca.reason,
   cap.risk_category,
