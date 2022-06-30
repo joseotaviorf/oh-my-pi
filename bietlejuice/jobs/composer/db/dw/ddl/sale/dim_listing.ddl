@@ -19,6 +19,11 @@ CREATE TABLE sale.dim_listing (
 	ts_last_publication TIMESTAMP,
 	ts_first_depublication TIMESTAMP,
 	ts_last_depublication TIMESTAMP,
+	ts_first_booking TIMESTAMP,
+	ts_first_visit_completed TIMESTAMP,
+	ts_first_offer_submitted TIMESTAMP,
+	dt_first_offer_accepted TIMESTAMP,
+	dt_first_sale_agreement_signed TIMESTAMP,
 	ts_updated TIMESTAMP,
 	ts_load TIMESTAMP
 );

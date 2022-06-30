@@ -79,7 +79,12 @@ FROM
      MIN(ts_first_booking_created) AS ts_first_booking,
      MIN(dt_sale_agreement_signed) AS dt_first_sale_agreement_signed,
      MIN(dt_house_registry_ended) AS dt_house_registry_ended,
-     MIN(ts_first_offer_submitted) AS ts_first_offer_submitted
+     MIN(ts_first_offer_submitted) AS ts_first_offer_submitted,
+     MIN(ts_first_visit_completed) AS ts_first_visit_completed,
+     MIN(dt_first_offer_accepted) AS dt_first_offer_accepted,
+     COUNT(ts_first_visit_completed) AS total_listings_visit_completed,
+     COUNT(ts_first_offer_submitted) AS total_listings_offer_submited,
+     COUNT(dt_first_offer_accepted) AS total_listings_offer_accepted
    FROM
      datalake_sale_flows.sale_flow
    GROUP BY 1
@@ -99,17 +104,24 @@ SELECT
   DATEDIFF(lc.ts_last_depublication, lc.ts_first_publication) AS days_first_publication_to_last_depublication,
   DATEDIFF(sf.ts_first_sale_flow, lc.ts_first_publication) AS days_first_publication_to_first_sale_flow,
   DATEDIFF(sf.ts_first_booking, lc.ts_first_publication) AS days_first_publication_to_first_booking,
+  DATEDIFF(sf.ts_first_visit_completed, lc.ts_first_publication) AS days_first_publication_to_visit_completed,     
+  DATEDIFF(sf.ts_first_offer_submitted, lc.ts_first_publication) AS days_first_publication_to_first_offer_submitted,  
+  DATEDIFF(sf.dt_first_offer_accepted, lc.ts_first_publication) AS days_first_publication_to_first_offer_accepted,
   DATEDIFF(sf.dt_first_sale_agreement_signed, lc.ts_first_publication) AS days_first_publication_to_first_sale_agreement_signed,
   DATEDIFF(sf.dt_house_registry_ended, lc.ts_first_publication) AS days_first_publication_to_house_registry_ended,
-  DATEDIFF(sf.ts_first_offer_submitted, lc.ts_first_publication) AS days_first_publication_to_first_offer_submitted,
   lc.unpublications,
+  COALESCE(sf.total_listings_visit_completed, 0) AS total_listings_visit_completed,
+  COALESCE(sf.total_listings_offer_submited, 0) AS total_listings_offer_submited,
+  COALESCE(sf.total_listings_offer_accepted, 0) AS total_listings_offer_accepted,  
   lc.ts_first_publication,
   lc.ts_last_publication,
   lc.ts_first_depublication,
   lc.ts_last_depublication,
   sf.ts_first_sale_flow,
-  sf.ts_first_offer_submitted,
   sf.ts_first_booking,
+  sf.ts_first_visit_completed,  
+  sf.ts_first_offer_submitted,
+  sf.dt_first_offer_accepted,
   sf.dt_first_sale_agreement_signed,
   sf.dt_house_registry_ended,
   IF(lc.ts_first_publication IS NULL, NULL, DATEDIFF(NOW(), lc.ts_first_publication) - COALESCE(np.days_not_published,0)) AS days_as_published

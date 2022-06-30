@@ -73,6 +73,12 @@ columns:
   ts_first_booking:
     lineage:
       - datalake_sale_flows.sale_flow.ts_first_booking_created
+  ts_first_visit_completed:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_visit_completed
+  dt_first_offer_accepted:
+    lineage:
+      - datalake_sale_flows.sale_flow.dt_first_offer_accepted
   dt_first_sale_agreement_signed:
     lineage:
       - datalake_sale_flows.sale_flow.dt_sale_agreement_signed

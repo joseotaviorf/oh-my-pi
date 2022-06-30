@@ -59,6 +59,21 @@ columns:
   ts_last_depublication:
     lineage:
       - datalake_sale_listings.sale_listing.ts_last_depublication
+  ts_first_booking:
+    lineage:
+      - datalake_sale_listings.sale_listing.ts_first_booking
+  ts_first_visit_completed:
+    lineage:
+      - datalake_sale_listings.sale_listing.ts_first_visit_completed
+  ts_first_offer_submitted:
+    lineage:
+      - datalake_sale_listings.sale_listing.ts_first_offer_submitted
+  dt_first_offer_accepted:
+    lineage:
+      - datalake_sale_listings.sale_listing.dt_first_offer_accepted
+  dt_first_sale_agreement_signed:
+    lineage:
+      - datalake_sale_listings.sale_listing.dt_first_sale_agreement_signed
   ts_updated:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_updated

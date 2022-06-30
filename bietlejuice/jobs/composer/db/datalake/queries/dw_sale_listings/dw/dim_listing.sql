@@ -18,6 +18,11 @@ SELECT
   lbc.ts_last_listing AS ts_last_publication,
   sl.ts_first_depublication,
   sl.ts_last_depublication,
+  sl.ts_first_booking,
+  sl.ts_first_visit_completed,
+  sl.ts_first_offer_submitted,
+  sl.dt_first_offer_accepted,
+  sl.dt_first_sale_agreement_signed,
   lbc.ts_updated,
   NOW() AS ts_load
 FROM

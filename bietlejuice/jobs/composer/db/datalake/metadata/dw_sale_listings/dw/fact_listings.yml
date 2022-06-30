@@ -14,6 +14,9 @@ columns:
   sk_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
+  price:
+    lineage:
+      - datalake_ebdb_clean.house.sale_price
   sk_first_publication_date:
     lineage:
       - datalake_sale_listings.sale_listing.ts_first_publication
@@ -44,6 +47,12 @@ columns:
   days_first_publication_to_first_booking:
     lineage:
       - datalake_sale_listings.sale_listing.days_first_publication_to_first_booking
+  days_first_publication_to_visit_completed:
+    lineage:
+      - datalake_sale_listings.sale_listing.days_first_publication_to_visit_completed
+  days_first_publication_to_first_offer_accepted:
+    lineage:
+      - datalake_sale_listings.sale_listing.days_first_publication_to_first_offer_accepted  
   days_first_publication_to_first_sale_agreement_signed:
     lineage:
       - datalake_sale_listings.sale_listing.days_first_publication_to_first_sale_agreement_signed
@@ -56,6 +65,15 @@ columns:
   total_depublications:
     lineage:
       - datalake_sale_listings.sale_listing.unpublications
+  total_listings_visit_completed:
+    lineage:
+      - datalake_sale_listings.sale_listing.total_listings_visit_completed
+  total_listings_offer_submited:
+    lineage:
+      - datalake_sale_listings.sale_listing.total_listings_offer_submited
+  total_listings_offer_accepted:
+    lineage:
+      - datalake_sale_listings.sale_listing.total_listings_offer_accepted
   days_as_published:
     lineage:
       - datalake_sale_listings.sale_listing.days_as_published
