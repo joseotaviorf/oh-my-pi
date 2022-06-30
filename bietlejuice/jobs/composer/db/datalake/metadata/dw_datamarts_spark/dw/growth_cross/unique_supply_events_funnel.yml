@@ -1,0 +1,51 @@
+---
+database_name: dw_datamarts
+table_name: unique_supply_events_funnel
+columns:
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  supply_mkt_origin:
+    lineage:
+      - dw_datamarts.lead_listing_flows.mkt_origin
+  supply_mkt_origin_detailed:
+    lineage:
+      - dw_datamarts.lead_listing_flows.mkt_channel
+      - dw_datamarts.lead_listing_flows.mkt_origin
+  lead_context:
+    lineage:
+      - dw_datamarts.lead_listing_flows.mkt_origin
+  sales_company:
+    lineage:
+      - dw_datamarts.lead_listing_flows.sales_company
+  sourcing_ops:
+    lineage:
+      - dw_datamarts.lead_listing_flows.sourcing_ops
+  lead_processing_operation:
+    lineage:
+      - dw_datamarts.lead_listing_flows.sourcing_ops
+  context:
+    lineage:
+      - dw_datamarts.lead_listing_flows.context_first_listing
+      - dw_datamarts.lead_listing_flows.context_lead
+      - dw_datamarts.lead_listing_flows.context_opportunity
+      - dw_datamarts.lead_listing_flows.context_prospect
+      - dw_datamarts.lead_listing_flows.context_qualified
+  origin_table:
+    lineage:
+      - dw_datamarts.lead_listing_flows.origin_table
+  lead_origin:
+    lineage:
+      - dw_datamarts.lead_listing_flows.lead_origin
+  rental_administrator:
+    lineage:
+      - dw_datamarts.lead_listing_flows.rental_administrator
+  funnel_drop_reason:
+    lineage:
+      - dw_datamarts.lead_listing_flows.funnel_drop_reason
+  supply_3p_partner:
+    lineage:
+      - datalake_3p.houses_3p.partner

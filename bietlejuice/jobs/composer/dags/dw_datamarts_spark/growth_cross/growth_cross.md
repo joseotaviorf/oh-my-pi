@@ -17,6 +17,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `efficiency_monitor_sale`
 - `pricing_rent_categorization`
 - `inbound_attendance_leads_flows`
+- `unique_supply_events_funnel`
 - `marketing_campaigns_costs_and_volumes`
 - `sale_performance_marketing_metrics_supply_coincident`
 - `tenant_prospects_activations`

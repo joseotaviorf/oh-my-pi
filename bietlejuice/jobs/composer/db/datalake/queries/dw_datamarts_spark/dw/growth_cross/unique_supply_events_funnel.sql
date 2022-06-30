@@ -1,7 +1,7 @@
 WITH
 lead_ AS (
 SELECT
-	dd."date",
+	dd.date,
 	dd.sk_date,
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
@@ -17,24 +17,24 @@ SELECT
 	h.partner_3p_supply AS supply_3p_partner,
 	CASE WHEN h.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
   	COUNT(lf.sk_lead_date) AS leads,
-	NULL::BIGINT AS prospects,
-	NULL::BIGINT AS qualifieds,
-	NULL::BIGINT AS opportunities,
-	NULL::BIGINT AS first_listings
-FROM dim_date dd
-JOIN datamarts.lead_listing_flows lf
+	CAST(NULL AS BIGINT) AS prospects,
+	CAST(NULL AS BIGINT) AS qualifieds,
+	CAST(NULL AS BIGINT) AS opportunities,
+	CAST(NULL AS BIGINT) AS first_listings
+FROM dw_public.dim_date dd
+JOIN dw_datamarts.lead_listing_flows lf
   ON dd.sk_date = lf.sk_lead_date
   AND lf.sk_lead_date > 0
-LEFT JOIN dim_region dr
+LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
-LEFT JOIN datalake_ebdb_listing_prod.house AS h
-  ON h.id = lf.sk_house_listing / 1000
-WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+LEFT JOIN datalake_3p.houses_3p AS hp
+  ON hp.id_house = lf.sk_house_listing / 1000
+WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 prospect AS (
 SELECT
-	dd."date",
+	dd.date,
 	dd.sk_date,
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
@@ -47,27 +47,27 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
-	h.partner_3p_supply AS supply_3p_partner,
-	CASE WHEN h.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
-	NULL::BIGINT AS leads,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	CAST(NULL AS BIGINT) AS leads,
 	COUNT(lf.sk_prospect_date) AS prospects, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
-	NULL::BIGINT AS qualifieds,
-	NULL::BIGINT AS opportunities,
-	NULL::BIGINT AS first_listings
-FROM dim_date dd
-JOIN datamarts.lead_listing_flows lf
+	CAST(NULL AS BIGINT) AS qualifieds,
+	CAST(NULL AS BIGINT) AS opportunities,
+	CAST(NULL AS BIGINT) AS first_listings
+FROM dw_public.dim_date dd
+JOIN dw_datamarts.lead_listing_flows lf
   ON dd.sk_date = lf.sk_prospect_date
   AND lf.sk_prospect_date > 0
-LEFT JOIN dim_region dr
+LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
-LEFT JOIN datalake_ebdb_listing_prod.house AS h
-  ON h.id = lf.sk_house_listing / 1000
-WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE-- filter data from 4 years ago
+LEFT JOIN datalake_3p.houses_3p AS hp
+  ON hp.id_house = lf.sk_house_listing / 1000
+WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE-- filter data from 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 qualified AS (
 SELECT
-	dd."date",
+	dd.date,
 	dd.sk_date,
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
@@ -80,27 +80,27 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
-	h.partner_3p_supply AS supply_3p_partner,
-	CASE WHEN h.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
-	NULL::BIGINT AS leads,
-	NULL::BIGINT AS prospects,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	CAST(NULL AS BIGINT) AS leads,
+	CAST(NULL AS BIGINT) AS prospects,
 	COUNT(lf.sk_qualified_date) AS qualifieds, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
-	NULL::BIGINT AS opportunities,
-	NULL::BIGINT AS first_listings
-FROM dim_date dd
-JOIN datamarts.lead_listing_flows lf
+	CAST(NULL AS BIGINT) AS opportunities,
+	CAST(NULL AS BIGINT) AS first_listings
+FROM dw_public.dim_date dd
+JOIN dw_datamarts.lead_listing_flows lf
   ON dd.sk_date = lf.sk_qualified_date
   AND lf.sk_qualified_date > 0
-LEFT JOIN dim_region dr
+LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
-LEFT JOIN datalake_ebdb_listing_prod.house AS h
-  ON h.id = lf.sk_house_listing / 1000
-WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+LEFT JOIN datalake_3p.houses_3p AS hp
+  ON hp.id_house = lf.sk_house_listing / 1000
+WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 opportunity AS (
 SELECT
-	dd."date",
+	dd.date,
 	dd.sk_date,
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
@@ -113,27 +113,27 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
-	h.partner_3p_supply AS supply_3p_partner,
-	CASE WHEN h.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
-	NULL::BIGINT AS leads,
-	NULL::BIGINT AS prospects,
-	NULL::BIGINT AS qualifieds,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	CAST(NULL AS BIGINT) AS leads,
+	CAST(NULL AS BIGINT) AS prospects,
+	CAST(NULL AS BIGINT) AS qualifieds,
 	COUNT(DISTINCT lf.sk_house_listing) AS opportunities,
-	NULL::BIGINT AS first_listings
-FROM dim_date dd
-JOIN datamarts.lead_listing_flows lf
+	CAST(NULL AS BIGINT) AS first_listings
+FROM dw_public.dim_date dd
+JOIN dw_datamarts.lead_listing_flows lf
   ON dd.sk_date = lf.sk_opportunity_date
   AND lf.sk_opportunity_date > 0
-LEFT JOIN dim_region dr
+LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
-LEFT JOIN datalake_ebdb_listing_prod.house AS h
-  ON h.id = lf.sk_house_listing / 1000
-WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+LEFT JOIN datalake_3p.houses_3p AS hp
+  ON hp.id_house = lf.sk_house_listing / 1000
+WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 listing AS (
 SELECT
-	dd."date",
+	dd.date,
 	dd.sk_date,
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
@@ -146,22 +146,22 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
-	h.partner_3p_supply AS supply_3p_partner,
-	CASE WHEN h.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
-  	NULL::BIGINT AS leads,
-	NULL::BIGINT AS prospects,
-	NULL::BIGINT AS qualifieds,
-	NULL::BIGINT AS opportunities,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+  	CAST(NULL AS BIGINT) AS leads,
+	CAST(NULL AS BIGINT) AS prospects,
+	CAST(NULL AS BIGINT) AS qualifieds,
+	CAST(NULL AS BIGINT) AS opportunities,
 	COUNT(DISTINCT lf.sk_house_listing) AS first_listings
-FROM dim_date dd
-JOIN datamarts.lead_listing_flows lf
+FROM dw_public.dim_date dd
+JOIN dw_datamarts.lead_listing_flows lf
   ON dd.sk_date = lf.sk_first_listing_date
   AND lf.sk_first_listing_date > 0
-LEFT JOIN dim_region dr
+LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
-LEFT JOIN datalake_ebdb_listing_prod.house AS h
-  ON h.id = lf.sk_house_listing / 1000
-WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+LEFT JOIN datalake_3p.houses_3p AS hp
+  ON hp.id_house = lf.sk_house_listing / 1000
+WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 union_all AS (
@@ -177,7 +177,7 @@ union_all AS (
 ),
 union_all_date AS (
 SELECT
-  dd."date",
+  dd.date,
   ua.city_group,
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
@@ -197,12 +197,12 @@ SELECT
   ua.opportunities,
   ua.first_listings
 FROM union_all ua
-RIGHT JOIN dim_date dd
+RIGHT JOIN dw_public.dim_date dd
   ON ua.sk_date = dd.sk_date
-WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE
+WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE
 )
 SELECT
-	"date",
+	date,
 	city_group,
 	supply_mkt_origin,
   	CASE WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
@@ -216,7 +216,7 @@ SELECT
   	sales_company,
   	sourcing_ops,
   	CASE
-    	WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
+    	WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND supply_mkt_origin NOT IN ('B2B','CIQ') THEN 'IS'
 	    ELSE sourcing_ops
     END AS lead_processing_operation,
     context,
@@ -233,4 +233,4 @@ SELECT
     SUM(COALESCE(first_listings,0)) AS first_listings,
     current_timestamp AS ts_load
 FROM union_all_date
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
