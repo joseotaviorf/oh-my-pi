@@ -18,5 +18,7 @@ growth_cross:
   pricing_rent_categorization: {} # depends_on: - performance_marketing_metrics_demand
   tenant_prospects_activations: {} #  depends_on: - rent_flow_interactions
   performance_marketing_cluster_promotional_bonus: {} # depends_on: - affiliates_clusters
+  sale_performance_marketing_metrics_supply_coincident: {}
+  # depends_on: - performance_marketing_cluster_promotional_bonus_costs
   performance_marketing_cluster_promotional_bonus_costs: {}
     # depends_on : - performance_marketing_cluster_promotional_bonus - affiliates_clusters

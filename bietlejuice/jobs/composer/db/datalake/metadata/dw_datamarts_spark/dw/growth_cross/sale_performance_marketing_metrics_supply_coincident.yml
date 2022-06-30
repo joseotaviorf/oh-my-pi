@@ -1,0 +1,133 @@
+---
+database_name: dw_datamarts
+table_name: sale_performance_marketing_metrics_supply_coincident
+columns:
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.costs_targets.city_group
+      - datalake_gsheets_clean.daily_target_supply_sale.city_group
+      - datalake_gsheets_clean.sale_supply_targets.city_group
+      - datalake_marketing_costs.daily_costs.city_group
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus_costs.city_group
+      - dw_public.dim_region.city_group
+      - dw_quintoandar.dim_affiliate_cost.city_group
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+      - datalake_gsheets_clean.daily_target_supply_sale.supply_origin
+      - datalake_gsheets_clean.sale_supply_targets.mkt_channel
+      - datalake_gsheets_clean.sale_supply_targets.mkt_origin
+      - datalake_marketing_costs.daily_costs.mkt_origin
+      - datalake_marketing_costs.daily_costs.mkt_channel
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
+      - dw_quintoandar.dim_affiliate_cost.mkt_origin
+      - dw_sale.fact_listing_flows.sk_user_lead_affiliate
+      - dw_sale.fact_listing_flows.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+      - datalake_gsheets_clean.daily_target_supply_sale.supply_channel
+      - datalake_gsheets_clean.sale_supply_targets.mkt_channel
+      - datalake_gsheets_clean.sale_supply_targets.mkt_origin
+      - datalake_marketing_costs.daily_costs.mkt_channel
+      - dw_sale.fact_listing_flows.mkt_channel
+  planning_mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+      - datalake_gsheets_clean.daily_target_supply_sale.supply_channel
+      - datalake_gsheets_clean.daily_target_supply_sale.supply_origin
+      - datalake_gsheets_clean.sale_supply_targets.mkt_channel
+      - datalake_gsheets_clean.sale_supply_targets.mkt_origin
+      - datalake_marketing_costs.daily_costs.mkt_origin
+      - datalake_marketing_costs.daily_costs.mkt_channel
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
+      - dw_quintoandar.dim_affiliate_cost.mkt_origin
+      - dw_sale.fact_listing_flows.sk_user_lead_affiliate
+      - dw_sale.fact_listing_flows.mkt_channel
+      - dw_sale.fact_listing_flows.mkt_origin
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.daily_target_supply_sale.supply_medium
+      - datalake_marketing_costs.daily_costs.mkt_medium
+      - dw_sale.fact_listing_flows.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.daily_target_supply_sale.supply_source
+      - datalake_marketing_costs.daily_costs.mkt_source
+      - dw_sale.fact_listing_flows.sk_user_lead_affiliate
+      - dw_sale.fact_listing_flows.mkt_source
+  utm_campaign:
+    lineage:
+      - datalake_marketing_costs.daily_costs.utm_campaign
+      - dw_public.dim_lead.utm_campaign
+  utm_content:
+    lineage:
+      - datalake_marketing_costs.daily_costs.utm_content
+      - dw_public.dim_lead.utm_content
+  utm_term:
+    lineage:
+      - datalake_marketing_costs.daily_costs.utm_term
+      - dw_public.dim_lead.utm_term
+  origin_phone:
+    lineage:
+      - datalake_wololo_clean.prospect.origin_phone
+  campaign_context:
+    lineage:
+      - datalake_gsheets_clean.costs_targets.campaign
+      - dw_public.dim_lead.utm_campaign
+      - dw_sale.fact_listing_flows.sk_user_lead_affiliate
+      - dw_sale.fact_listing_flows.mkt_channel
+      - dw_sale.fact_listing_flows.mkt_origin
+  business_context:
+    lineage:
+      - datalake_gsheets_clean.costs_targets.business
+  leads:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_lead_date
+      - dw_sale.fact_listing_flows.sk_house_listing_flow
+  prospects:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_prospect_date
+      - dw_sale.fact_listing_flows.sk_house_listing_flow
+  qualifieds:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_qualified_date
+      - dw_sale.fact_listing_flows.sk_house_listing_flow
+  opportunities:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_opportunity_date
+      - dw_sale.fact_listing_flows.sk_house_listing_flow
+  first_listings:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_first_listing_date
+      - dw_sale.fact_listing_flows.sk_house_listing_flow
+  hybrid_listings:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_house_listing
+      - dw_sale.fact_listing_flows.sk_house_listing_flow
+  cost:
+    lineage:
+      - datalake_marketing_costs.daily_costs.cost
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus_costs.final_bonus_sale
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus_costs.final_bonus_rent
+  prospects_target:
+    lineage:
+      - datalake_gsheets_clean.daily_target_supply_sale.prospects
+      - datalake_gsheets_clean.sale_supply_targets.prospects
+  qualifieds_target:
+    lineage:
+      - datalake_gsheets_clean.daily_target_supply_sale.qualifieds
+      - datalake_gsheets_clean.sale_supply_targets.qualifieds
+  opportunities_target:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets.opportunities
+  first_listings_target:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets.first_listings
+  budget:
+    lineage:
+      - datalake_gsheets_clean.costs_targets.budget_mensal
+      - datalake_gsheets_clean.daily_target_supply_sale.cost_per_source
