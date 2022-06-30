@@ -697,7 +697,10 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.dw_contract:load-dw-public-dim-contract
 #   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 #   - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
-#efficiency-monitor-sale
+#  #tenant_prospects_activations (ignored dim_region and dim_contract dependencies since it's above):
+#   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
+#   - bietlejuice.ebdb:load-dw-quintoandar-fact-contract-people-in-datalake
+#  #efficiency-monitor-sale
 #   - bietlejuice.casa_mineira_crm.propagate-table-metadata-clean-house-exclusivity
 #   - bietlejuice.dw_region:load-dw-public-dim-region
 #   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers

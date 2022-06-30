@@ -6,13 +6,13 @@ WITH tps_contracts AS (
         dc.sk_contract,
         'tenant prospect' AS contract_role,
         CAST(dt_annulment AS TIMESTAMP) AS ts_annulment,
-        NULL::INT AS cs_order
+        CAST(NULL AS INT) AS cs_order
     FROM
-        dim_contract AS dc
-        JOIN fact_listing_rent_flows AS flrf
-            ON dc.sk_contract = flrf.sk_contract
-        JOIN dim_region AS dr
-            ON flrf.sk_region = dr.sk_region
+        dw_public.dim_contract AS dc
+    JOIN dw_public.fact_listing_rent_flows AS flrf
+        ON dc.sk_contract = flrf.sk_contract
+    JOIN dw_public.dim_region AS dr
+        ON flrf.sk_region = dr.sk_region
 ),
 contract_person AS (
     SELECT DISTINCT
@@ -23,23 +23,21 @@ contract_person AS (
         fcp.contract_role,
         CAST(dt_annulment AS TIMESTAMP) AS ts_annulment,
         ROW_NUMBER() OVER(PARTITION BY COALESCE(NULLIF(fcp.sk_user, -1), flrf.sk_client),
-                                       dc.sk_contract,
-                                       dr.city_group,
-                                       dc.ts_signature
-                          ORDER BY fcp.contract_role DESC) as cs_order
-    FROM
-        dim_contract AS dc
-        JOIN fact_listing_rent_flows AS flrf
-            ON dc.sk_contract = flrf.sk_contract
-        JOIN dim_region AS dr
-            ON flrf.sk_region = dr.sk_region
-        JOIN quintoandar.fact_contract_people AS fcp
-            ON dc.sk_contract = fcp.sk_contract
-        FULL OUTER JOIN tps_contracts AS tc -- Anti Join with tps_contracts to get only aditional users
-            ON tc.sk_client = fcp.sk_user
-            AND tc.ts_signature = dc.ts_signature
-    WHERE
-        tc.sk_client IS NULL                -- Anti Join with tps_contracts to get only aditional users
+            dc.sk_contract,
+            dr.city_group,
+            dc.ts_signature
+        ORDER BY fcp.contract_role DESC) as cs_order
+    FROM dw_public.dim_contract AS dc
+    JOIN dw_public.fact_listing_rent_flows AS flrf
+        ON dc.sk_contract = flrf.sk_contract
+    JOIN dw_public.dim_region AS dr
+        ON flrf.sk_region = dr.sk_region
+    JOIN dw_quintoandar.fact_contract_people AS fcp
+        ON dc.sk_contract = fcp.sk_contract
+    FULL OUTER JOIN tps_contracts AS tc -- Anti Join with tps_contracts to get only aditional users
+        ON tc.sk_client = fcp.sk_user
+        AND tc.ts_signature = dc.ts_signature
+    WHERE tc.sk_client IS NULL -- Anti Join with tps_contracts to get only aditional users
         AND dc.ts_signature IS NOT NULL
         AND fcp.sk_user != -1
         AND fcp.contract_role IN ('tenant', 'dweller')
@@ -65,8 +63,8 @@ events_base AS (
         rfi.ts_event,
         'rent_flow' AS event_type
     FROM
-        datamarts.rent_flow_interactions as rfi
-        JOIN dim_region AS dr
+        dw_datamarts.rent_flow_interactions as rfi
+        JOIN dw_public.dim_region AS dr
             USING(sk_region)
     WHERE
         rfi.rent_flow_order = 1
@@ -96,12 +94,19 @@ events_base AS (
     WHERE
         ts_annulment IS NOT NULL
 ),
-drop_out_dates AS (
+pre_drop_out_dates AS (
     SELECT
         b.*,
         LAG(event_type) OVER(PARTITION BY sk_client, city_group ORDER BY ts_event) AS last_event,
         LAG(ts_event) OVER(PARTITION BY sk_client, city_group ORDER BY ts_event) AS ts_last_event,
         LEAD(ts_event) OVER(PARTITION BY sk_client, city_group ORDER BY ts_event ASC, event_type DESC) AS ts_next_event,
+        event_type
+    FROM
+        events_base AS b
+),
+drop_out_dates AS (
+    SELECT
+        b.*,
         CASE
             WHEN event_type LIKE 'contract signed%'
                 THEN ts_event
@@ -115,12 +120,12 @@ drop_out_dates AS (
                 THEN DATEADD(DAY, 196, ts_event)
         END AS ts_drop_out
     FROM
-        events_base AS b
+        pre_drop_out_dates AS b
 ),
 aux_drop_out_dates as (
     SELECT
         cd.*,
-        FIRST_VALUE(ts_drop_out IGNORE NULLS) OVER(PARTITION BY sk_client, city_group ORDER BY ts_event ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) AS ts_next_drop_out
+        FIRST_VALUE(ts_drop_out, TRUE) OVER(PARTITION BY sk_client, city_group ORDER BY ts_event ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) AS ts_next_drop_out
     FROM
         drop_out_dates AS cd
 ),
@@ -147,7 +152,7 @@ droped_out_periods AS (
             WHEN cd.event_type = 'rent_flow'
                 THEN 'Inactivity'
         END AS status_detail,
-        NULL::INT AS activation_order
+        CAST(NULL AS INT) AS activation_order
     FROM
         aux_drop_out_dates AS cd
     WHERE
@@ -160,8 +165,8 @@ active_periods AS (
         MIN(cd.ts_event) AS ts_start,
         cd.ts_next_drop_out AS ts_end,
         'ACTIVE' AS status,
-        NULL::TEXT AS status_detail,
-        ROW_NUMBER() OVER(PARTITION BY cd.sk_client, cd.city_group ORDER BY ts_start) AS activation_order -- Get first activetion by client and city group
+        CAST(NULL AS STRING) AS status_detail,
+        ROW_NUMBER() OVER(PARTITION BY cd.sk_client, cd.city_group ORDER BY MIN(cd.ts_event)) AS activation_order -- Get first activetion by client and city group
     FROM
         aux_drop_out_dates AS cd
     WHERE
@@ -185,8 +190,8 @@ SELECT
     city_group,
     ts_start,
     ts_end,
-    TO_CHAR(ts_start, 'YYYYMMDD') AS sk_start_date,
-    TO_CHAR(ts_end, 'YYYYMMDD') AS sk_end_date,
+    CAST(date_format(ts_start, 'yyyyMMdd') as STRING) AS sk_start_date,
+    CAST(date_format(ts_end, 'yyyyMMdd') as STRING) AS sk_end_date,
     status,
     CASE
         WHEN activation_order = 1

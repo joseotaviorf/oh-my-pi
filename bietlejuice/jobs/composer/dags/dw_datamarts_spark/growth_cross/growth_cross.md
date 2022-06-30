@@ -18,6 +18,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `pricing_rent_categorization`
 - `inbound_attendance_leads_flows`
 - `marketing_campaigns_costs_and_volumes`
+- `tenant_prospects_activations`
 - `lead_listing_flows`
 - `performance_marketing_cluster_promotional_bonus`
 - `performance_marketing_cluster_promotional_bonus_costs`

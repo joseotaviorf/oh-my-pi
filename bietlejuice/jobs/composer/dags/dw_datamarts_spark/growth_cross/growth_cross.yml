@@ -14,8 +14,9 @@ growth_cross:
   efficiency_monitor_rental: {} # depends on: - marketing_demand_supply_branding_costs
   efficiency_monitor_sale: {} # - marketing_demand_supply_branding_costs
   inbound_attendance_leads_flows: {}
-  pricing_rent_categorization: {} # depends_on: - performance_marketing_metrics_demand
   marketing_campaigns_costs_and_volumes: {} # depends_on: - talk_to_agent
-  lead_listing_flows: {} # depends_on: - quintoandar_consultant_listings
+  pricing_rent_categorization: {} # depends_on: - performance_marketing_metrics_demand
+  tenant_prospects_activations: {} #  depends_on: - rent_flow_interactions
   performance_marketing_cluster_promotional_bonus: {} # depends_on: - affiliates_clusters
-  performance_marketing_cluster_promotional_bonus_costs: {} # depends_on : - performance_marketing_cluster_promotional_bonus - affiliates_clusters
+  performance_marketing_cluster_promotional_bonus_costs: {}
+    # depends_on : - performance_marketing_cluster_promotional_bonus - affiliates_clusters
