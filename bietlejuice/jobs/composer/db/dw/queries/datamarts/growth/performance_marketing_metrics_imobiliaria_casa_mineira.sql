@@ -125,8 +125,8 @@ events AS (
 info_contact as (
     SELECT
         c.id_client,
-        COALESCE(MD5(c.email), c.phone_number, c.id_client) as id_prospect,
-        COALESCE(MD5(c.email), c.phone_number, c.id_client) || '_' || COALESCE(c.id_house, '') as id_flow,
+        COALESCE(c.id_client, c.phone_number, MD5(c.email)) as id_prospect,
+        COALESCE(c.id_client, c.phone_number, MD5(c.email)) || '_' || COALESCE(c.id_house, '') as id_flow,
         hp.id AS id_house_portal,
         c.id_house AS id_house_crm,
         MD5(c.email) email_md5,
@@ -138,8 +138,8 @@ info_contact as (
         n.neighborhood_name,
         o.origin_contact_name,
         m.media_contact_name,
-        ROW_NUMBER() OVER(PARTITION BY COALESCE(MD5(c.email), c.phone_number, c.id_client), c.id_house ORDER BY c.ts_created) AS order_new_contact_flow,
-        ROW_NUMBER() OVER(PARTITION BY COALESCE(MD5(c.email), c.phone_number, c.id_client) ORDER BY c.ts_created) AS order_new_contact_prospect,
+        ROW_NUMBER() OVER(PARTITION BY COALESCE(c.id_client, c.phone_number, MD5(c.email)), c.id_house ORDER BY c.ts_created) AS order_new_contact_flow,
+        ROW_NUMBER() OVER(PARTITION BY COALESCE(c.id_client, c.phone_number, MD5(c.email)) ORDER BY c.ts_created) AS order_new_contact_prospect,
         ROW_NUMBER() OVER(PARTITION BY c.id_client ORDER BY c.ts_created) AS order_new_client
     FROM
         datalake_casa_mineira_crm_clean_prod.contact AS c
