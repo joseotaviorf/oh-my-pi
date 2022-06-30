@@ -2,9 +2,6 @@
 database_name: datalake_payable_accounts_transactions_clean
 table_name: accounts_payable
 columns:
-  account_balance:
-    lineage:
-      - datalake_payable_accounts_transactions_raw.accounts_payable.saldo_total
   accrual_year_month:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.competencia
