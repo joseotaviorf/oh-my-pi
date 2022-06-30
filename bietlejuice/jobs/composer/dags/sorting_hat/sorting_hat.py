@@ -27,7 +27,7 @@ LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_minimum_resources_cluster", deserialize_json=True
+    "databricks_10_4_min_general_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 

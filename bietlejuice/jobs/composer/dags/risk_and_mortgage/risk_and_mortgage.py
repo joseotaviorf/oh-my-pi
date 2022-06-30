@@ -38,7 +38,9 @@ RAW_INCREMENTAL_LOAD_SPARK_JOB_PATH = (
     f"{RAW_SPARK_JOB_PATH}/load_incremental_risk_and_mortgage_into_datalake.py"
 )
 
-CLUSTER_DESCRIPTION = Variable.get(f"databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    f"databricks_10_4_med_general_cluster", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
