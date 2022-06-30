@@ -10,6 +10,7 @@
 #     # If the datamart has no inner dependency, declare it as an empty object
 
 growth_cross:
+  affiliate_acquisition_metrics: {} # depends on: - affiliates_clusters
   efficiency_monitor_rental: {} # depends on: - marketing_demand_supply_branding_costs
   efficiency_monitor_sale: {} # - marketing_demand_supply_branding_costs
   inbound_attendance_leads_flows: {}

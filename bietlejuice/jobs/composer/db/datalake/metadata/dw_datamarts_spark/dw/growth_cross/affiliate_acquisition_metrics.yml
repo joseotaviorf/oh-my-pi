@@ -1,0 +1,45 @@
+database_name: dw_datamarts
+table_name: affiliate_acquisition_metrics
+columns:  
+  date:
+    lineage:
+      - dw_public.dim_date.date
+      - datalake_gsheets_clean.affiliates_acquisition_targets.dt_target
+      - dw_public.dim_user_affiliate.ts_joined_program
+  city_group:
+    lineage:
+      - dw_public.dim_user_affiliate.marketing_city_group
+      - datalake_marketing_costs.daily_costs.city_group
+  mkt_origin:
+    lineage:
+      - dw_public.dim_user_affiliate.mkt_origin
+      - datalake_marketing_costs.daily_costs.mkt_origin
+      - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_origin
+      - dw_quintoandar.dim_affiliate_cost.mkt_origin
+  mkt_channel:
+    lineage:
+      - dw_public.dim_user_affiliate.mkt_channel
+      - datalake_marketing_costs.daily_costs.mkt_channel
+      - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_channel
+  mkt_medium:
+    lineage:
+      - dw_public.dim_user_affiliate.mkt_medium
+      - datalake_marketing_costs.daily_costs.mkt_medium
+      - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_medium
+  mkt_source:
+    lineage:
+      - dw_public.dim_user_affiliate.mkt_source
+      - datalake_marketing_costs.daily_costs.mkt_source
+      - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_source
+  utm_campaign:
+    lineage:
+      - dw_public.dim_user_affiliate.tracking_campaign
+      - datalake_marketing_costs.daily_costs.utm_campaign
+  utm_content:
+    lineage:
+      - dw_public.dim_user_affiliate.tracking_campaign
+      - datalake_marketing_costs.daily_costs.utm_campaign
+  utm_term:
+    lineage:
+      - dw_public.dim_user_affiliate.tracking_campaign
+      - datalake_marketing_costs.daily_costs.utm_campaign
