@@ -1,0 +1,76 @@
+---
+database_name: datalake_demand_contact_submission_clean
+table_name: contact_submissions_aud
+columns:
+  id_contact_submissions:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.id
+  id_contact_type:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.contact_type_id
+  rev:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.rev
+  revend:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.revend
+  revtype:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.revtype
+  business_context:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.business_context
+  business_context_mod:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.business_context_mod
+  origin:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.origin
+  origin_mod:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.origin_mod
+  contact_type_id_mod:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.contact_type_id_mod
+  message:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.message
+  message_mod:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.message_mod
+  user_name:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.user_name
+  user_name_mod:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.user_name_mod
+  user_email:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.user_email
+  user_email_mod:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.user_email_mod
+  phone_country_code:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.phone_country_code
+  phone_country_code_mod:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.phone_country_code_mod
+  phone_number:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.phone_number
+  phone_number_mod:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.phone_number_mod
+  metadata:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.metadata
+  metadata_mod:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.metadata_mod
+  ts_created_at:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.created_at
+  ts_updated_at:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions_aud.updated_at

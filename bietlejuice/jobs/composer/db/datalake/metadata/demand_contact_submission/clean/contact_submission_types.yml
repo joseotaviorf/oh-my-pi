@@ -1,0 +1,19 @@
+---
+database_name: datalake_demand_contact_submission_clean
+table_name: contact_submission_types
+columns:
+  id_contact_submission_types:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submission_types.id
+  type:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submission_types.type
+  version:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submission_types.version
+  ts_created_at:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submission_types.created_at
+  ts_updated_at:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submission_types.updated_at

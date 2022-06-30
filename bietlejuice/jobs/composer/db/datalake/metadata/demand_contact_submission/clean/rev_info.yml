@@ -1,0 +1,10 @@
+---
+database_name: datalake_demand_contact_submission_clean
+table_name: rev_info
+columns:
+  rev:
+    lineage:
+      - datalake_demand_contact_submission_raw.revinfo.rev
+  ts_rev:
+    lineage:
+      - datalake_demand_contact_submission_raw.revinfo.revtstmp

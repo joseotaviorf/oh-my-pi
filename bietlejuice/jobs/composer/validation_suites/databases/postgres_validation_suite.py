@@ -57,6 +57,12 @@ class PostgresValidationSuite(DatabaseValidationSuitesExecutor):
         )
         self._validate_connection(db_consumer)
 
+    def validate_demand_contact_submission(self):
+        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
+            self.auth[DatabaseEnum.DEMAND_CONTACT_SUBMISSION], SparkClient()
+        )
+        self._validate_connection(db_consumer)
+
     def validate_docx(self):
         db_consumer = self.REPOSITORY_CONSUMER_CLASS(
             self.auth[DatabaseEnum.DOCX], SparkClient()

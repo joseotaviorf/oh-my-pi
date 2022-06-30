@@ -1,0 +1,25 @@
+---
+database_name: datalake_demand_contact_submission_clean
+table_name: message
+columns:
+  id:
+    lineage:
+      - datalake_demand_contact_submission_raw.message.id
+  id_incremental:
+    lineage:
+      - datalake_demand_contact_submission_raw.message.incremental_id
+  destination:
+    lineage:
+      - datalake_demand_contact_submission_raw.message.destination
+  headers:
+    lineage:
+      - datalake_demand_contact_submission_raw.message.headers
+  payload:
+    lineage:
+      - datalake_demand_contact_submission_raw.message.payload
+  published:
+    lineage:
+      - datalake_demand_contact_submission_raw.message.published
+  ts_creation:
+    lineage:
+      - datalake_demand_contact_submission_raw.message.creation_time
