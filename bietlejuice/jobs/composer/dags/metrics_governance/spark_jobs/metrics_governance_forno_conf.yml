@@ -1,0 +1,21 @@
+---
+METRICS_BUCKET: data-documentation.s3.forno.data.quintoandar.com.br
+METRICS_PATH: metrics/
+PARTITION_COLUMNS:
+  - year
+  - month
+  - day
+METRIC_COLUMNS:
+  - name
+  - acronym
+  - description
+  - company_line
+  - business_stage
+  - hierarchy_level
+  - maturity_level
+  - created_by
+  - approved_by
+  - is_additive
+  - link_to_metric
+  - calculation
+  - observations

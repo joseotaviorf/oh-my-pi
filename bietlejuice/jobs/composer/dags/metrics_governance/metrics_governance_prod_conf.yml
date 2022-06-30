@@ -1,0 +1,7 @@
+---
+partition_cols:
+  - year
+  - month
+  - day
+table_names:
+  - metrics_registration

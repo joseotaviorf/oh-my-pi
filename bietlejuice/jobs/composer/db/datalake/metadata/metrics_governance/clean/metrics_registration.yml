@@ -1,0 +1,43 @@
+---
+database_name: datalake_metrics_governance_clean
+table_name: metrics_registration
+columns:
+    name:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.name
+    acronym:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.acronym
+    description:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.description
+    company_line:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.company_line
+    business_stage:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.business_stage
+    hierarchy_level:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.hierarchy_level
+    maturity_level:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.maturity_level
+    created_by:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.created_by
+    approved_by:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.approved_by
+    is_additive:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.is_additive
+    link_to_metric:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.link_to_metric
+    calculation:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.calculation
+    observations:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.observations

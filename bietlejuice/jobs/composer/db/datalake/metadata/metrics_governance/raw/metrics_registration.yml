@@ -1,0 +1,3 @@
+---
+database_name: datalake_metrics_governance_raw
+table_name: metrics_registration
