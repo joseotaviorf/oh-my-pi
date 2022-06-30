@@ -9,6 +9,12 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.jobs.composer.base.databricks.cluster_permission_enum import (
+    ClusterPermissionEnum,
+)
+from bietlejuice.jobs.composer.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
@@ -30,6 +36,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+default_libraries = config_service.get_config("default_libraries")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = (
@@ -37,8 +44,14 @@ RAW_SPARK_JOB_PATH = (
 )
 
 CLUSTER_DESCRIPTION = Variable.get(
-    f"databricks_9_1_min_general_cluster", deserialize_json=True
+    f"databricks_9_1_med_general_cluster", deserialize_json=True
 )
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
@@ -59,7 +72,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
