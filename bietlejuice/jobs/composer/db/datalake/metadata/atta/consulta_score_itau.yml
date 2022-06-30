@@ -1,0 +1,28 @@
+---
+database_name: datalake_atta_raw
+table_name: consulta_score_itau
+columns:
+  CPF:
+    tags:
+      - PII
+      - Confidential
+  CPF2:
+    tags:
+      - PII
+      - Confidential
+  cpf_mascara:
+    tags:
+      - PII
+      - Confidential
+  R_NOME:
+    tags:
+      - PII
+      - Confidential
+  R_IDADE:
+    tags:
+      - PII
+      - Confidential
+  EMAIL_SOLICITANTE:
+    tags:
+      - PII
+      - Confidential

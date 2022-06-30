@@ -1,0 +1,60 @@
+---
+database_name: datalake_atta_raw
+table_name: lead_dados_captura
+columns:
+  Nome:
+    tags:
+      - PII
+      - Confidential
+  Email:
+    tags:
+      - PII
+      - Confidential
+  Senha:
+    tags:
+      - PII
+      - Confidential
+  Cep:
+    tags:
+      - PII
+      - Confidential
+  Telefone:
+    tags:
+      - PII
+      - Confidential
+  Agencia:
+    tags:
+      - PII
+      - Confidential
+  Bairro:
+    tags:
+      - PII
+      - Confidential
+  Banco:
+    tags:
+      - PII
+      - Confidential
+  Celular:
+    tags:
+      - PII
+      - Confidential
+  Cidade:
+    tags:
+      - PII
+      - Confidential
+  Complemento:
+    tags:
+      - PII
+      - Confidential
+  Conta:
+    tags:
+      - PII
+      - Confidential
+  Documento:
+    tags:
+      - PII
+      - Confidential
+  Endereco:
+    tags:
+      - PII
+      - Confidential

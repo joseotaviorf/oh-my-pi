@@ -1,0 +1,100 @@
+---
+database_name: datalake_atta_raw
+table_name: max_usuarios
+columns:
+  nome:
+    tags:
+      - PII
+      - Confidential
+  sobrenome:
+    tags:
+      - PII
+      - Confidential
+  email:
+    tags:
+      - PII
+      - Confidential
+  senha:
+    tags:
+      - PII
+      - Confidential
+  cpf:
+    tags:
+      - PII
+      - Confidential
+  endereco:
+    tags:
+      - PII
+      - Confidential
+  numero:
+    tags:
+      - PII
+      - Confidential
+  complemento:
+    tags:
+      - PII
+      - Confidential
+  bairro:
+    tags:
+      - PII
+      - Confidential
+  cep:
+    tags:
+      - PII
+      - Confidential
+  telefone_celular_ddd:
+    tags:
+      - PII
+      - Confidential
+  telefone_celular_numero:
+    tags:
+      - PII
+      - Confidential
+  telefone_fixo_ddd:
+    tags:
+      - PII
+      - Confidential
+  telefone_fixo_numero:
+    tags:
+      - PII
+      - Confidential
+  data_nascimento:
+    tags:
+      - PII
+      - Confidential
+  foto:
+    tags:
+      - PII
+      - Confidential
+  sexo:
+    tags:
+      - PII
+      - Confidential
+  cargo:
+    tags:
+      - PII
+      - Confidential
+  path_avatar:
+    tags:
+      - PII
+      - Confidential
+  rg:
+    tags:
+      - PII
+      - Confidential
+  nacionalidade:
+    tags:
+      - PII
+      - Confidential
+  estado_civil:
+    tags:
+      - PII
+      - Confidential
+  rg_orgao_expedidor:
+    tags:
+      - PII
+      - Confidential
+  profissao:
+    tags:
+      - PII
+      - Confidential

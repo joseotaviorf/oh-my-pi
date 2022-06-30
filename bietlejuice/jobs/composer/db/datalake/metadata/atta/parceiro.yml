@@ -1,0 +1,119 @@
+---
+database_name: datalake_atta_raw
+table_name: parceiro
+columns:
+  nome:
+    tags:
+      - PII
+      - Confidential
+  endereco_rua:
+    tags:
+      - PII
+      - Confidential
+  endereco_numero:
+    tags:
+      - PII
+      - Confidential
+  endereco_bairro:
+    tags:
+      - PII
+      - Confidential
+  endereco_complemento:
+    tags:
+      - PII
+      - Confidential
+  endereco_cep:
+    tags:
+      - PII
+      - Confidential
+  email:
+    tags:
+      - PII
+      - Confidential
+  cnpj:
+    tags:
+      - PII
+      - Confidential
+  razaosocial:
+    tags:
+      - PII
+      - Confidential
+  nome_fantasia:
+    tags:
+      - PII
+      - Confidential
+  NomeRef1:
+    tags:
+      - PII
+      - Confidential
+  NomeRef2:
+    tags:
+      - PII
+      - Confidential
+  ddi:
+    tags:
+      - PII
+      - Confidential
+  ddd:
+    tags:
+      - PII
+      - Confidential
+  telefone:
+    tags:
+      - PII
+      - Confidential
+  Banco:
+    tags:
+      - PII
+      - Confidential
+  Agencia:
+    tags:
+      - PII
+      - Confidential
+  Conta:
+    tags:
+      - PII
+      - Confidential
+  ddi_cel:
+    tags:
+      - PII
+      - Confidential
+  ddd_cel:
+    tags:
+      - PII
+      - Confidential
+  celular:
+    tags:
+      - PII
+      - Confidential
+  email_financeiro:
+    tags:
+      - PII
+      - Confidential
+  email_processo:
+    tags:
+      - PII
+      - Confidential
+  api_key:
+    tags:
+      - Confidential
+  tipo_pessoa:
+    tags:
+      - PII
+      - Confidential
+  DtNascAbertura:
+    tags:
+      - PII
+      - Confidential
+  apelido:
+    tags:
+      - PII
+      - Confidential
+  pais:
+    tags:
+      - PII
+      - Confidential
+  sexo:
+    tags:
+      - PII
+      - Confidential

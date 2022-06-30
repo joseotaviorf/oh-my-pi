@@ -1,0 +1,100 @@
+---
+database_name: datalake_atta_raw
+table_name: cadastro_imovel
+columns:
+  nm_endereco:
+    tags:
+      - PII
+      - Confidential
+  nr_endereco:
+    tags:
+      - PII
+      - Confidential
+  ds_complemento:
+    tags:
+      - PII
+      - Confidential
+  nm_bairro:
+    tags:
+      - PII
+      - Confidential
+  nr_cep:
+    tags:
+      - PII
+      - Confidential
+  nm_contatoAvaliacao:
+    tags:
+      - PII
+      - Confidential
+  ds_condominio:
+    tags:
+      - PII
+      - Confidential
+  ds_intervenienteQuitante:
+    tags:
+      - PII
+      - Confidential
+  nr_telefone:
+    tags:
+      - PII
+      - Confidential
+  nr_celular:
+    tags:
+      - PII
+      - Confidential
+  ds_utilizaFgts:
+    tags:
+      - PII
+      - Confidential
+  vl_fgts:
+    tags:
+      - PII
+      - Confidential
+  vl_taxa:
+    tags:
+      - PII
+      - Confidential
+  dt_diaBasePrestacao:
+    tags:
+      - PII
+      - Confidential
+  ds_financiarDespesasIniciais:
+    tags:
+      - PII
+      - Confidential
+  vl_despesasIniciais:
+    tags:
+      - PII
+      - Confidential
+  vl_totalFinanciamento:
+    tags:
+      - PII
+      - Confidential
+  dt_creaditarValorDespesaInicial:
+    tags:
+      - PII
+      - Confidential
+  ds_incluiDespesa:
+    tags:
+      - PII
+      - Confidential
+  ds_adquiridoComFgts:
+    tags:
+      - PII
+      - Confidential
+  ds_mutuarioSFH:
+    tags:
+      - PII
+      - Confidential
+  nr_mesesRegistroTrabalho:
+    tags:
+      - PII
+      - Confidential
+  nr_cnpjEmpresa:
+    tags:
+      - PII
+      - Confidential
+  nm_municipio:
+    tags:
+      - PII
+      - Confidential

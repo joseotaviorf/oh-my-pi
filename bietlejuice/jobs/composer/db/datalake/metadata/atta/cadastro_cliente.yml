@@ -1,0 +1,552 @@
+---
+database_name: datalake_atta_raw
+table_name: cadastro_cliente
+columns:
+  b_nome:
+    tags:
+      - PII
+      - Confidential
+  b_sexo:
+    tags:
+      - PII
+      - Confidential
+  b_nome_da_mae:
+    tags:
+      - PII
+      - Confidential
+  b_cpf:
+    tags:
+      - PII
+      - Confidential
+  b_doc_nr:
+    tags:
+      - PII
+      - Confidential
+  b_doc_data_emissao:
+    tags:
+      - PII
+      - Confidential
+  b_data_nascimento:
+    tags:
+      - PII
+      - Confidential
+  b_regime_uniao_estavel_cartorio:
+    tags:
+      - PII
+      - Confidential
+  b_estado_civil:
+    tags:
+      - PII
+      - Confidential
+  b_endereco_residencial:
+    tags:
+      - PII
+      - Confidential
+  b_endereco_residencial_numero:
+    tags:
+      - PII
+      - Confidential
+  b_endereco_residencial_complemento:
+    tags:
+      - PII
+      - Confidential
+  b_endereco_residencial_bairro:
+    tags:
+      - PII
+      - Confidential
+  b_cep:
+    tags:
+      - PII
+      - Confidential
+  b_endereco_residencial_tempo:
+    tags:
+      - PII
+      - Confidential
+  b_telefone_ddi:
+    tags:
+      - PII
+      - Confidential
+  b_telefone_ddd:
+    tags:
+      - PII
+      - Confidential
+  b_telefone:
+    tags:
+      - PII
+      - Confidential
+  b_celular_ddi:
+    tags:
+      - PII
+      - Confidential
+  b_celular_ddd:
+    tags:
+      - PII
+      - Confidential
+  b_celular:
+    tags:
+      - PII
+      - Confidential
+  b_email:
+    tags:
+      - PII
+      - Confidential
+  c_profissao_cargo:
+    tags:
+      - PII
+      - Confidential
+  c_nome_empresa:
+    tags:
+      - PII
+      - Confidential
+  c_tipo_contratacao:
+    tags:
+      - PII
+      - Confidential
+  c_tipo_contratacao_cnpj:
+    tags:
+      - PII
+      - Confidential
+  c_admissao_inicio_atividade:
+    tags:
+      - PII
+      - Confidential
+  c_renda_mensal_a_comprovar:
+    tags:
+      - PII
+      - Confidential
+  c_outras_rendas:
+    tags:
+      - PII
+      - Confidential
+  c_outras_rendas_especifique:
+    tags:
+      - PII
+      - Confidential
+  c_divida_ou_financiamento_ativo:
+    tags:
+      - PII
+      - Confidential
+  c_divida_saldo_devedor:
+    tags:
+      - PII
+      - Confidential
+  c_divida_origem:
+    tags:
+      - PII
+      - Confidential
+  c2_nome_conjuge:
+    tags:
+      - PII
+      - Confidential
+  c2_cpf_conjuge:
+    tags:
+      - PII
+      - Confidential
+  c2_data_nascimento_conjuge:
+    tags:
+      - PII
+      - Confidential
+  c2_conjuge_compoe_renda:
+    tags:
+      - PII
+      - Confidential
+  d_2_nome:
+    tags:
+      - PII
+      - Confidential
+  d_2_sexo:
+    tags:
+      - PII
+      - Confidential
+  d_2_nacionalidade:
+    tags:
+      - PII
+      - Confidential
+  d_2_nome_da_mae:
+    tags:
+      - PII
+      - Confidential
+  d_2_cpf:
+    tags:
+      - PII
+      - Confidential
+  d_2_doc_nr:
+    tags:
+      - PII
+      - Confidential
+  d_2_doc_data_emissao:
+    tags:
+      - PII
+      - Confidential
+  d_2_data_nascimento:
+    tags:
+      - PII
+      - Confidential
+  d_2_regime_uniao_estavel_cartorio:
+    tags:
+      - PII
+      - Confidential
+  d_2_estado_civil:
+    tags:
+      - PII
+      - Confidential
+  d_2_endereco_residencial:
+    tags:
+      - PII
+      - Confidential
+  d_2_cep:
+    tags:
+      - PII
+      - Confidential
+  d_2_telefone_ddi:
+    tags:
+      - PII
+      - Confidential
+  d_2_telefone_ddd:
+    tags:
+      - PII
+      - Confidential
+  d_2_telefone:
+    tags:
+      - PII
+      - Confidential
+  d_2_celular_ddi:
+    tags:
+      - PII
+      - Confidential
+  d_2_celular_ddd:
+    tags:
+      - PII
+      - Confidential
+  d_2_celular:
+    tags:
+      - PII
+      - Confidential
+  d_2_email:
+    tags:
+      - PII
+      - Confidential
+  e_2_profissao_cargo:
+    tags:
+      - PII
+      - Confidential
+  e_2_nome_empresa:
+    tags:
+      - PII
+      - Confidential
+  e_2_tipo_contratacao:
+    tags:
+      - PII
+      - Confidential
+  e_tipo_contratacao_cnpj:
+    tags:
+      - PII
+      - Confidential
+  e_2_admissao_inicio_atividade:
+    tags:
+      - PII
+      - Confidential
+  e_2_renda_mensal_a_comprovar:
+    tags:
+      - PII
+      - Confidential
+  e_2_outras_rendas:
+    tags:
+      - PII
+      - Confidential
+  e_2_outras_rendas_especifique:
+    tags:
+      - PII
+      - Confidential
+  e_2_divida_ou_financiamento_ativo:
+    tags:
+      - PII
+      - Confidential
+  e_2_divida_saldo_devedor:
+    tags:
+      - PII
+      - Confidential
+  e_2_divida_origem:
+    tags:
+      - PII
+      - Confidential
+  ddb_Banco:
+    tags:
+      - PII
+      - Confidential
+  ddb_Agencia:
+    tags:
+      - PII
+      - Confidential
+  ddb_Conta:
+    tags:
+      - PII
+      - Confidential
+  ref1_Nome:
+    tags:
+      - PII
+      - Confidential
+  ref1_Telefone:
+    tags:
+      - PII
+      - Confidential
+  ref1_Parentesco:
+    tags:
+      - PII
+      - Confidential
+  CepTrabalho:
+    tags:
+      - PII
+      - Confidential
+  EnderecoTrabalho:
+    tags:
+      - PII
+      - Confidential
+  NumeroTrabalho:
+    tags:
+      - PII
+      - Confidential
+  CompTrabalho:
+    tags:
+      - PII
+      - Confidential
+  BairroTrabalho:
+    tags:
+      - PII
+      - Confidential
+  CidadeTrabalho:
+    tags:
+      - PII
+      - Confidential
+  EstadoTrabalho:
+    tags:
+      - PII
+      - Confidential
+  vlrPatrimonio:
+    tags:
+      - PII
+      - Confidential
+  b_tipo:
+    tags:
+      - PII
+      - Confidential
+  b_razao_social:
+    tags:
+      - PII
+      - Confidential
+  b_cnpj:
+    tags:
+      - PII
+      - Confidential
+  Atividade:
+    tags:
+      - PII
+      - Confidential
+  d_3_cpf:
+    tags:
+      - PII
+      - Confidential
+  d_3_nome:
+    tags:
+      - PII
+      - Confidential
+  d_3_data_nascimento:
+    tags:
+      - PII
+      - Confidential
+  d_3_sexo:
+    tags:
+      - PII
+      - Confidential
+  d_3_doc_nr:
+    tags:
+      - PII
+      - Confidential
+  d_3_doc_data_emissao:
+    tags:
+      - PII
+      - Confidential
+  d_3_email:
+    tags:
+      - PII
+      - Confidential
+  d_3_celular_ddi:
+    tags:
+      - PII
+      - Confidential
+  d_3_celular_ddd:
+    tags:
+      - PII
+      - Confidential
+  d_3_celular:
+    tags:
+      - PII
+      - Confidential
+  d_3_telefone_ddi:
+    tags:
+      - PII
+      - Confidential
+  d_3_telefone_ddd:
+    tags:
+      - PII
+      - Confidential
+  d_3_telefone:
+    tags:
+      - PII
+      - Confidential
+  d_4_cpf:
+    tags:
+      - PII
+      - Confidential
+  d_4_nome:
+    tags:
+      - PII
+      - Confidential
+  d_4_data_nascimento:
+    tags:
+      - PII
+      - Confidential
+  d_4_sexo:
+    tags:
+      - PII
+      - Confidential
+  d_4_nacionalidade:
+    tags:
+      - PII
+      - Confidential
+  d_4_doc_nr:
+    tags:
+      - PII
+      - Confidential
+  d_4_doc_data_emissao:
+    tags:
+      - PII
+      - Confidential
+  d_4_email:
+    tags:
+      - PII
+      - Confidential
+  d_4_celular_ddi:
+    tags:
+      - PII
+      - Confidential
+  d_4_celular_ddd:
+    tags:
+      - PII
+      - Confidential
+  d_4_celular:
+    tags:
+      - PII
+      - Confidential
+  d_4_telefone_ddi:
+    tags:
+      - PII
+      - Confidential
+  d_4_telefone_ddd:
+    tags:
+      - PII
+      - Confidential
+  d_4_telefone:
+    tags:
+      - PII
+      - Confidential
+  pessoa_politicamente_exposta:
+    tags:
+      - PII
+      - Confidential
+  cpf_ppe:
+    tags:
+      - PII
+      - Confidential
+  rg_ppe:
+    tags:
+      - PII
+      - Confidential
+  orgao_expedicao_rg_ppe:
+    tags:
+      - PII
+      - Confidential
+  data_expedicao_rg_ppe:
+    tags:
+      - PII
+      - Confidential
+  nome_ppe:
+    tags:
+      - PII
+      - Confidential
+  profissao_ppe:
+    tags:
+      - PII
+      - Confidential
+  b_data_fundacao:
+    tags:
+      - PII
+      - Confidential
+  ddb_Tipo_Conta:
+    tags:
+      - PII
+      - Confidential
+  b_nome_fantasia:
+    tags:
+      - PII
+      - Confidential
+  parentesco_ppe:
+    tags:
+      - PII
+      - Confidential
+  grau_parentesco_ppe:
+    tags:
+      - PII
+      - Confidential
+  b_inscricao_estadual:
+    tags:
+      - PII
+      - Confidential
+  d_2_endereco_residencial_numero:
+    tags:
+      - PII
+      - Confidential
+  d_2_endereco_residencial_complemento:
+    tags:
+      - PII
+      - Confidential
+  d_2_endereco_residencial_bairro:
+    tags:
+      - PII
+      - Confidential
+  d_2_endereco_residencial_cidade:
+    tags:
+      - PII
+      - Confidential
+  d_2_endereco_residencial_estado:
+    tags:
+      - PII
+      - Confidential
+  b_valor_fgts:
+    tags:
+      - PII
+      - Confidential
+  d_2_valor_fgts:
+    tags:
+      - PII
+      - Confidential
+  b_regime_casamento:
+    tags:
+      - PII
+      - Confidential
+  b_data_casamento:
+    tags:
+      - PII
+      - Confidential
+  atividadeIcatu:
+    tags:
+      - PII
+      - Confidential
+  b_tipo_telefone:
+    tags:
+      - PII
+      - Confidential
+  b_finalidade_telefone:
+    tags:
+      - PII
+      - Confidential

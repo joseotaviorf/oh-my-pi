@@ -1,0 +1,28 @@
+---
+database_name: datalake_atta_raw
+table_name: simulador_credito_imobiliario
+columns:
+  NomeTitular:
+    tags:
+      - PII
+      - Confidential
+  CPFTitular:
+    tags:
+      - PII
+      - Confidential
+  DataNascimentoTitular:
+    tags:
+      - PII
+      - Confidential
+  NomeConjuge:
+    tags:
+      - PII
+      - Confidential
+  CPFConjuge:
+    tags:
+      - PII
+      - Confidential
+  DataNascimentoConjuge:
+    tags:
+      - PII
+      - Confidential

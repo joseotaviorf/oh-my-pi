@@ -1,0 +1,131 @@
+---
+tables:
+  - table_name: analiseparametrizacoes
+    extraction_type: full
+    is_cleaned: false
+  - table_name: analisescredito
+    extraction_type: full
+    is_cleaned: false
+  - table_name: analisesenriquecimento
+    extraction_type: full
+    is_cleaned: false
+  - table_name: cadastro_cliente
+    extraction_type: full
+    is_cleaned: false
+  - table_name: cadastro_imovel
+    extraction_type: full
+    is_cleaned: false
+  - table_name: cadastro_rating
+    extraction_type: full
+    is_cleaned: false
+  - table_name: canal
+    extraction_type: full
+    is_cleaned: false
+  - table_name: cliente
+    extraction_type: full
+    is_cleaned: false
+  - table_name: cliente_vendedor
+    extraction_type: full
+    is_cleaned: false
+  - table_name: cms_fechamento_detalhe
+    extraction_type: full
+    is_cleaned: false
+  - table_name: consulta_score
+    extraction_type: full
+    is_cleaned: false
+  - table_name: consulta_score_caixa
+    extraction_type: full
+    is_cleaned: false
+  - table_name: consulta_score_cliente_ctrl
+    extraction_type: full
+    is_cleaned: false
+  - table_name: consulta_score_itau
+    extraction_type: full
+    is_cleaned: false
+  - table_name: documento_produto
+    extraction_type: full
+    is_cleaned: false
+  - table_name: documento_sub_categoria
+    extraction_type: full
+    is_cleaned: false
+  - table_name: documento_tipo
+    extraction_type: full
+    is_cleaned: false
+  - table_name: documento_tpcontratacao
+    extraction_type: full
+    is_cleaned: false
+  - table_name: entidade_log
+    extraction_type: full
+    is_cleaned: false
+  - table_name: lead_dados_captura
+    extraction_type: full
+    is_cleaned: false
+  - table_name: lead_detalhe_acompanhamento
+    extraction_type: full
+    is_cleaned: false
+  - table_name: lead_detalhe_categoria
+    extraction_type: full
+    is_cleaned: false
+  - table_name: log_contrato_assinado_parceiro
+    extraction_type: full
+    is_cleaned: false
+  - table_name: log_proposta_esteira
+    extraction_type: full
+    is_cleaned: false
+  - table_name: log_proposta_reemissao
+    extraction_type: full
+    is_cleaned: false
+  - table_name: log_vinculo_analista_proposta
+    extraction_type: full
+    is_cleaned: false
+  - table_name: max_usuarios
+    extraction_type: full
+    is_cleaned: false
+  - table_name: meta_consultor
+    extraction_type: full
+    is_cleaned: false
+  - table_name: parceiro
+    extraction_type: full
+    is_cleaned: false
+  - table_name: pre_analise_observacao
+    extraction_type: full
+    is_cleaned: false
+  - table_name: produto
+    extraction_type: full
+    is_cleaned: false
+  - table_name: produto_esteira
+    extraction_type: full
+    is_cleaned: false
+  - table_name: proposta
+    extraction_type: full
+    is_cleaned: false
+  - table_name: proposta_credimob_confval
+    extraction_type: full
+    is_cleaned: false
+  - table_name: proposta_esteira
+    extraction_type: full
+    is_cleaned: false
+  - table_name: proposta_itau
+    extraction_type: full
+    is_cleaned: false
+  - table_name: simulacao_fornecedor
+    extraction_type: full
+    is_cleaned: false
+  - table_name: simulador_credito_imobiliario
+    extraction_type: full
+    is_cleaned: false
+  - table_name: simulador_credito_imobiliario_fornecedor
+    extraction_type: full
+    is_cleaned: false
+  - table_name: sla_fornecedor
+    extraction_type: full
+    is_cleaned: false
+  - table_name: spcrepositorio
+    extraction_type: full
+    is_cleaned: false
+  - table_name: usuariospilotomultibancos
+    extraction_type: full
+    is_cleaned: false
+  
+partition_columns: [year, month, day]
+lineage_product_database_name: atta

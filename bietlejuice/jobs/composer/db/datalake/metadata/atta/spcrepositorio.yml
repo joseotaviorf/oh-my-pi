@@ -1,0 +1,12 @@
+---
+database_name: datalake_atta_raw
+table_name: spcrepositorio
+columns:
+  CPF:
+    tags:
+      - PII
+      - Confidential
+  Resultado:
+    tags:
+      - PII
+      - Confidential

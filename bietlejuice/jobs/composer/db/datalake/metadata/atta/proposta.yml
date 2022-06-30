@@ -1,0 +1,28 @@
+---
+database_name: datalake_atta_raw
+table_name: proposta
+columns:
+  CPF:
+    tags:
+      - PII
+      - Confidential
+  Nome:
+    tags:
+      - PII
+      - Confidential
+  NomeContato:
+    tags:
+      - PII
+      - Confidential
+  DDDContato:
+    tags:
+      - PII
+      - Confidential
+  TelefoneContato:
+    tags:
+      - PII
+      - Confidential
+  EmailContato:
+    tags:
+      - PII
+      - Confidential
