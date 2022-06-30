@@ -4,37 +4,37 @@ table_name: annotations
 columns:
   id_annotation:
     lineage:
-      - datalake_label_studio_raw.label_studio.id
-  project_name:
+      - datalake_label_studio_raw.annotations.id
+  id_project:
     lineage:
-      - datalake_label_studio_raw.label_studio.project_name
+      - datalake_label_studio_raw.annotations.project_id
   created_username:
     lineage:
-      - datalake_label_studio_raw.label_studio.created_username
+      - datalake_label_studio_raw.annotations.created_username
   created_ago:
     lineage:
-      - datalake_label_studio_raw.label_studio.created_ago
+      - datalake_label_studio_raw.annotations.created_ago
   completed_by:
     lineage:
-      - datalake_label_studio_raw.label_studio.completed_by
+      - datalake_label_studio_raw.annotations.completed_by
   task:
     lineage:
-      - datalake_label_studio_raw.label_studio.task
+      - datalake_label_studio_raw.annotations.task
   result:
     lineage:
-      - datalake_label_studio_raw.label_studio.result
+      - datalake_label_studio_raw.annotations.result
   is_cancelled:
     lineage:
-      - datalake_label_studio_raw.label_studio.was_cancelled
+      - datalake_label_studio_raw.annotations.was_cancelled
   is_ground_truth:
     lineage:
-      - datalake_label_studio_raw.label_studio.ground_truth
+      - datalake_label_studio_raw.annotations.ground_truth
   lead_time:
     lineage:
-      - datalake_label_studio_raw.label_studio.lead_time
+      - datalake_label_studio_raw.annotations.lead_time
   ts_created:
     lineage:
-      - datalake_label_studio_raw.label_studio.created_at
+      - datalake_label_studio_raw.annotations.created_at
   ts_updated:
     lineage:
-      - datalake_label_studio_raw.label_studio.updated_at  
+      - datalake_label_studio_raw.annotations.updated_at  

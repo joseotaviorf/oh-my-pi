@@ -1,6 +1,6 @@
 ---
 database_name: datalake_label_studio_raw
-table_name: label_studio
+table_name: annotations
 columns:
   project_name:
     tags:
