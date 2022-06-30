@@ -8,6 +8,9 @@ columns:
   id_project:
     lineage:
       - datalake_label_studio_raw.annotations.project_id
+  project_name:
+    lineage:
+      - datalake_label_studio_raw.annotations.project_name
   created_username:
     lineage:
       - datalake_label_studio_raw.annotations.created_username

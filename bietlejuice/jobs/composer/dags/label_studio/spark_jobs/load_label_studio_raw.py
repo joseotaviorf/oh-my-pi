@@ -34,7 +34,7 @@ def refresh_s3_credentials(s3_session):
     )
 
 
-def _read_project_data(file_path, project_id):
+def _read_project_data(file_path, project_id, project_name):
     """
     This method return a s3 object data.
     @param file_path: str. S3 file path.
@@ -45,6 +45,7 @@ def _read_project_data(file_path, project_id):
         s3_service = S3Service(boto3.resource("s3"))
         content = json.loads(s3_service.read_file(file_path))
         content["project_id"] = project_id
+        content["project_name"] = project_name
         return json.dumps(content)
     else:
         return {}
@@ -73,6 +74,7 @@ def _get_project_data(project_details):
     @return: json.
     """
     project_id = project_details.get("id")
+    project_name = project_details.get("title")
     s3_folder_path = f"{database_location}sync/{project_id}"
 
     s3_service = S3Service(boto3.resource("s3"))
@@ -93,7 +95,8 @@ def _get_project_data(project_details):
 
     return list(
         map(
-            lambda file_path: _read_project_data(file_path, project_id), files_path_list
+            lambda file_path: _read_project_data(file_path, project_id, project_name),
+            files_path_list,
         )
     )
 
