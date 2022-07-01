@@ -14,6 +14,7 @@ growth_cross:
   efficiency_monitor_rental: {} # depends on: - marketing_demand_supply_branding_costs
   efficiency_monitor_sale: {} # - marketing_demand_supply_branding_costs
   inbound_attendance_leads_flows: {}
+  top_of_funnel_volumes_monthly: {} # depends_on: - performance_marketing_metrics_demand - sale_performance_marketing_metrics_demand - tenant_prospect_status
   pricing_rent_categorization: {} # depends_on: - performance_marketing_metrics_demand
   marketing_campaigns_costs_and_volumes: {}
   unique_supply_cohort_conversions: {}
@@ -21,6 +22,7 @@ growth_cross:
   tenant_prospects_activations: {} #  depends_on: - rent_flow_interactions
   performance_marketing_cluster_promotional_bonus: {} # depends_on: - affiliates_clusters
   performance_marketing_cluster_promotional_bonus_costs: {} # depends_on : - performance_marketing_cluster_promotional_bonus - affiliates_clusters
-  unique_supply_events_funnel: {} # depends_on: - lead_listing_flows
+  unique_supply_events_funnel: {}
   sale_performance_marketing_metrics_supply_coincident: {} # depends_on: - performance_marketing_cluster_promotional_bonus_costs
   daily_target_volumes_supply: {}
+  
