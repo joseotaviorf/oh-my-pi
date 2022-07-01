@@ -26,7 +26,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `marketing_campaigns_costs_and_volumes`
 - `sale_performance_marketing_metrics_supply_coincident`
 - `tenant_prospects_activations`
-- `lead_listing_flows`
 - `performance_marketing_cluster_promotional_bonus`
 - `performance_marketing_cluster_promotional_bonus_costs`
 

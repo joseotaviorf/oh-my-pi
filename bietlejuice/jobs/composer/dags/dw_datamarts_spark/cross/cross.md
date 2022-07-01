@@ -16,6 +16,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `funnel_demand_flows`
 - `quintoandar_consultant_listings`
 - `talk_to_agent`
+- `lead_listing_flows`
 
 ### Responsible Data Engineering Team
 

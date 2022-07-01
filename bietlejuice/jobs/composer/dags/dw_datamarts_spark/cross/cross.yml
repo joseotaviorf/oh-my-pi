@@ -14,3 +14,4 @@ cross:
   funnel_demand_flows: {} # Add talk_to_agent dependency here when it is migrated
   quintoandar_consultant_listings: {}
   talk_to_agent: {}
+  lead_listing_flows: {}

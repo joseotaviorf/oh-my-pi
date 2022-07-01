@@ -18,7 +18,6 @@ growth_cross:
   marketing_campaigns_costs_and_volumes: {}
   unique_supply_cohort_conversions: {}
   rent_flow_interactions: {}
-  lead_listing_flows: {} # depends_on: - quintoandar_consultant_listings
   tenant_prospects_activations: {} #  depends_on: - rent_flow_interactions
   performance_marketing_cluster_promotional_bonus: {} # depends_on: - affiliates_clusters
   performance_marketing_cluster_promotional_bonus_costs: {} # depends_on : - performance_marketing_cluster_promotional_bonus - affiliates_clusters
