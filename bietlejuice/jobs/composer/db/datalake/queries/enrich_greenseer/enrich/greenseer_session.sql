@@ -45,7 +45,7 @@ greenseer_tried_retention AS (
     id_session,
     id_pipeline,
     CASE
-      WHEN menu_new_style THEN (
+      WHEN menu_new_style OR DATE_TRUNC('DD', ts_started) > '2022-06-27' THEN (
         COALESCE(NULLIF(before_reception, 'fallback'), response_key, id_content) IS NOT NULL
       )
       ELSE (
