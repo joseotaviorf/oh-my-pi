@@ -9,7 +9,6 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOperator
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
@@ -98,9 +97,3 @@ cross_downstream(
 )
 
 terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
-
-# EC2 temporary dependency
-success_logger = QuintoAndarSuccessLoggerOperator(
-    dag=dag, bucket="5a-datalake-prod", aws_conn_id="aws_prod_data"
-)
-terminate_cluster_task >> success_logger
