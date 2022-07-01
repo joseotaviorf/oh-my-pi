@@ -36,26 +36,28 @@ taxonomy_demand as (
 tta_taxonomy as (
     WITH
     tta_raw as (
-        select distinct
-	        coalesce(cast(json_extract_scalar(event_properties, '$["house_id"]') as integer), -1) as house,
-	        coalesce(cast(json_extract_scalar(event_properties, '$["agent_id"]') as integer), -1) as agent,
-        	coalesce(cast(evt.id_user as integer), -1) as tenant,
-            json_extract_scalar(user_properties, '$["utm_source"]') as utm_source,
-        	json_extract_scalar(user_properties, '$["utm_medium"]') as utm_medium,
-        	json_extract_scalar(user_properties, '$["utm_campaign"]') as utm_campaign,
-        	json_extract_scalar(user_properties, '$["utm_term"]') as utm_term,
-        	json_extract_scalar(user_properties, '$["utm_content"]') as utm_content,
-        	case when (UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) like '%BRANDED%'
-        					or UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) like '%INSTITUCIONAL%')
-        					and UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) not like '%NON-BRANDED%'
-        		 then 'Branded'
-        		 else 'Outro'
-        	end as branded,
-        	json_extract_scalar(user_properties , '$["platform"]') as app_type,
-            cast(ts_event as timestamp) as event_timestamp
-        from datalake_amplitude_clean_prod.events evt
-    	where event_type = 'piloto_cw_message_sent'
-			and ts_event > timestamp '2020-03-01 00:00'
+        SELECT DISTINCT
+            COALESCE(INTEGER(ep_id_house), -1) AS house,
+            COALESCE(INTEGER(ep_id_agent), -1) AS agent,
+            COALESCE(INTEGER(id_user), -1) AS tenant,
+            up_utm_source AS utm_source,
+            up_utm_medium AS utm_medium,
+            up_utm_campaign AS utm_campaign,
+            up_utm_term AS utm_term,
+            up_utm_content AS utm_content,
+            CASE
+                WHEN
+                    (LOWER(up_utm_campaign) LIKE '%branded%' OR LOWER(up_utm_campaign) LIKE '%institucional%')
+                    AND LOWER(up_utm_campaign) NOT LIKE '%non-branded%'
+                THEN 'Branded'
+                ELSE 'Outro'
+            END AS branded,
+            up_app_type AS app_type,
+            TIMESTAMP(ts_event) AS event_timestamp
+        FROM
+            datalake_amplitude_clean_prod.170698_piloto_cw_message_sent_events
+        WHERE
+            ts_event > TIMESTAMP('2020-03-01 00:00')
     )
     select
         tta.house,
@@ -185,20 +187,18 @@ house_properties as(
 
 -- Events (current registry for every Talk to Agent started)
 events as(
-    select
-        cast(json_extract_scalar(event_properties, '$["house_id"]') as integer) as house_id,
-        cast(json_extract_scalar(event_properties, '$["agent_id"]') as integer) as agent_id,
-        cast(id_user as integer) as tenant_id,
-        min(nullif(substr(cast(ts_event as varchar),1,19),'')) as first_message_ts,
-        array_join(array_agg(replace(trim(substr(regexp_extract(replace(regexp_replace(json_extract_scalar(event_properties, '$["message_content"]'),'\n',' '),'''',' '),'(?<=(([0-9]{9}))).*'),3)), 'omprar.', '')),' + ') as message,
-        count(*) as count_messages
-
-    from datalake_amplitude_clean_prod.events
-    where event_type = 'piloto_cw_message_sent'
-
-        and ts_event > timestamp '2020-03-01 00:00'
-
-    group by 1,2,3
+    SELECT
+        COALESCE(INTEGER(ep_id_house), -1) AS house_id,
+        COALESCE(INTEGER(ep_id_agent), -1) AS agent_id,
+        COALESCE(INTEGER(id_user), -1) AS tenant_id,
+        MIN(ts_event) as first_message_ts,
+        ARRAY_JOIN(ARRAY_AGG(REPLACE(TRIM(SUBSTR(REGEXP_EXTRACT(REPLACE(REGEXP_REPLACE(ep_message_content,'\n',' '),'''',' '),'(?<=(([0-9]{9}))).*'),3)), 'omprar.', '')),' + ') as message,
+        COUNT(*) as count_messages
+    FROM
+        datalake_amplitude_clean_prod.170698_piloto_cw_message_sent_events
+    WHERE
+        ts_event > TIMESTAMP('2020-03-01 00:00')
+    GROUP BY 1,2,3
 ),
 
 --putting everything together

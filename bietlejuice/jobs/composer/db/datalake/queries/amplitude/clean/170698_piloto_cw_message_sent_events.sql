@@ -7,7 +7,7 @@ SELECT
     id_event,
     id_session,
     idfa,
-    id_user,
+    INT(id_user) AS id_user,
     uuid,
     id_schema,
     id_inserted,
@@ -40,8 +40,8 @@ SELECT
     version_name,
     sample_rate,
     GET_JSON_OBJECT(event_properties, '$.business_context') AS ep_business_context,
-    GET_JSON_OBJECT(event_properties, '$.house_id') AS ep_id_house,
-    GET_JSON_OBJECT(event_properties, '$.agent_id') AS ep_id_agent,
+    INT(GET_JSON_OBJECT(event_properties, '$.house_id')) AS ep_id_house,
+    INT(GET_JSON_OBJECT(event_properties, '$.agent_id')) AS ep_id_agent,
     GET_JSON_OBJECT(user_properties, '$.utm_source') AS up_utm_source,
     GET_JSON_OBJECT(user_properties, '$.utm_medium') AS up_utm_medium,
     GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS up_utm_campaign,
@@ -63,4 +63,4 @@ SELECT
 FROM
     datalake_amplitude_clean_staging.170698_piloto_cw_message_sent_events
 WHERE
-    year={} and month={} and day={}
+    year={} AND month={} AND day={}
