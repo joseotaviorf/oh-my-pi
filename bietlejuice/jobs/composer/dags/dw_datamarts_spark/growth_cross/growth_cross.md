@@ -28,6 +28,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `tenant_prospects_activations`
 - `performance_marketing_cluster_promotional_bonus`
 - `performance_marketing_cluster_promotional_bonus_costs`
+- `daily_target_volumes_supply`
 
 ### Responsible Data Engineering Team
 
