@@ -7,7 +7,6 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOperator
 
 from airflow.utils.helpers import chain
 
@@ -116,9 +115,3 @@ chain(
     + BaseTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
     terminate_cluster_task,
 )
-
-# EC2 temporary dependency
-success_logger = QuintoAndarSuccessLoggerOperator(
-    dag=dag, bucket="5a-datalake-prod", aws_conn_id="aws_prod_data"
-)
-terminate_cluster_task >> success_logger
