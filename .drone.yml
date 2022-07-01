@@ -3,159 +3,7 @@ clone:
     image: plugins/git
 
 pipeline:
-#  =======================================================================
-# =============================== PYTHON 2 ===============================
-#  =======================================================================
-  check-style-python2:
-    group: ec2-tests
-    image: python:2.7.12
-    commands:
-      - apt-get update
-      - apt-get install -y git > /dev/null
-      - chmod +x scripts/execute_python2_steps.sh
-      - bash scripts/execute_python2_steps.sh "make requirements-lint-python2" "make check-style-python2"
-    when:
-      event: push
-
-  unit-tests-python2:
-    group: ec2-tests
-    image: python:2.7.12
-    commands:
-      - export AIRFLOW_GPL_UNIDECODE=yes
-      - export AWS_DEFAULT_REGION=us-east-1
-      - apt-get update
-      - apt-get install -y git > /dev/null
-      - chmod +x scripts/execute_python2_steps.sh
-      - bash scripts/execute_python2_steps.sh "make requirements-python2" "make unit-tests-python2" "make cov-badge"
-    when:
-      event: push
-
-  export-github-credentials-ec2:
-    group: ec2-export
-    image: python:2.7.12
-    commands:
-      - echo $${GITHUB_ACCESS_TOKEN} > githubcredentials.txt
-    secrets:
-      - source: github_access_token
-        target: github_access_token
-    when:
-      event: push
-      branch: [ forno, master, hotfix/* ]
-
-  # install-dependencies-ec2-forno:
-  #   group: ec2-install
-  #   image: drillster/drone-rsync
-  #   hosts: [ ssh.airflow.forno.quintoandar.com.br ]
-  #   user: airflow
-  #   source: .
-  #   target: ~/bi
-  #   include: [ 'requirements.txt', 'variables.json', 'githubcredentials.txt'  ]
-  #   exclude: [ '*' ]
-  #   args: '-vI'
-  #   script:
-  #     - git config --global credential.helper store
-  #     - export GH_TOKEN=$(cat ~/bi/githubcredentials.txt)
-  #     - echo "https://$GH_TOKEN:$GH_TOKEN@github.com" > ~/.git-credentials
-  #     - cd /var/www/airflow/
-  #     - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
-  #     - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-  #     - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
-  #     - sudo find /var/www/airflow/plugins -name \*.pyc -delete
-  #     - rm ~/bi/githubcredentials.txt
-  #   secrets:
-  #     - source: rsync_key
-  #       target: rsync_key
-  #   when:
-  #     event: push
-  #     branch: [ forno ]
-
-  # install-dependencies-ec2-prod:
-  #   group: ec2-install
-  #   image: drillster/drone-rsync
-  #   hosts: [ ssh.airflow.quintoandar.com.br ]
-  #   user: airflow
-  #   source: .
-  #   target: ~/bi
-  #   include: [ 'requirements.txt', 'variables.json', 'githubcredentials.txt'   ]
-  #   exclude: [ '*' ]
-  #   args: '-vI'
-  #   script:
-  #     - git config --global credential.helper store
-  #     - export GH_TOKEN=$(cat ~/bi/githubcredentials.txt)
-  #     - echo "https://$GH_TOKEN:$GH_TOKEN@github.com" > ~/.git-credentials
-  #     - cd /var/www/airflow/
-  #     - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
-  #     - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-  #     - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
-  #     - sudo find /var/www/airflow/plugins -name \*.pyc -delete
-  #     - rm ~/bi/githubcredentials.txt
-  #   secrets: [ rsync_key ]
-  #   when:
-  #     event: push
-  #     branch: [ master, hotfix/* ]
-
-  load-jobs-ec2-forno:
-    group: ec2-updated_jobs
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
-    user: airflow
-    source: "bietlejuice/*"
-    exclude: "jobs/composer/*"
-    target: /var/www/airflow/dags/bietlejuice
-    args: '--force -vI'
-    delete: true
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ forno ]
-
-  load-jobs-ec2-prod:
-    group: ec2-updated_jobs
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.quintoandar.com.br ]
-    user: airflow
-    source: "bietlejuice/*"
-    exclude: "jobs/composer/*"
-    target: /var/www/airflow/dags/bietlejuice
-    args: '--force -vI'
-    delete: true
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ master, hotfix/* ]
-
-  load-plugins-ec2-forno:
-    group: ec2-updated_jobs
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
-    user: airflow
-    source: plugins/*
-    target: /var/www/airflow/plugins
-    args: '--force -vI'
-    delete: true
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ forno ]
-
-  load-plugins-ec2-prod:
-    group: ec2-updated_jobs
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.quintoandar.com.br ]
-    user: airflow
-    source: plugins/*
-    target: /var/www/airflow/plugins
-    args: '--force -vI'
-    delete: true
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ master, hotfix/* ]
-
-#  =======================================================================
-# =============================== PYTHON 3 ===============================
-#  =======================================================================
-  check-style-python3:
+  check-style-python:
     group: tests
     image: python:3.7.3
     commands:
@@ -166,7 +14,7 @@ pipeline:
     when:
       event: push
 
-  files-validation-python3:
+  files-validation-python:
     group: tests
     image: python:3.7.3
     pull: true
@@ -178,7 +26,7 @@ pipeline:
     when:
       event: push
 
-  unit-tests-python3:
+  unit-tests-python:
     group: tests
     image: quintoandar/pyspark:0.2
     pull: true
@@ -255,7 +103,7 @@ pipeline:
           - forno
           - hotfix/* # excluding this branch since the process validates master's code
 
-  make-package-python3:
+  make-package-python:
     group: package
     image: python:3.7.3
     commands:
@@ -264,7 +112,7 @@ pipeline:
       event: [ push, tag ]
       branch: [ master, forno, hotfix/* ]
 
-  prepare-release-python3-forno:
+  prepare-release-forno:
     group: release
     image: alpine:3.10
     commands:
@@ -273,7 +121,7 @@ pipeline:
       event: push
       branch: forno
 
-  prepare-release-python3-prod:
+  prepare-release-prod:
     group: release
     image: alpine:3.10
     commands:
@@ -344,7 +192,7 @@ pipeline:
     group: update_jobs
     image: quintoandar/drone-gcs-sync
     pull: true
-    bucket: us-east4-airflow-prod-6fc58ef2-bucket
+    bucket: us-east4-airflow-prod2-fdaf9748-bucket
     source: bietlejuice/jobs/composer/
     target: dags/bietlejuice/jobs/composer/
     delete: true
@@ -416,9 +264,6 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
-#  =======================================================================
-# =============================== Common ===============================
-#  =======================================================================
   sonar-preview:
     group: common-sonar
     image: quintoandar/sonar-scanner
