@@ -1,90 +1,75 @@
-WITH max_video_revision_by_house AS (
-  SELECT
+with
+max_video_revision_by_house as (
+  select
     aud.external_domain,
     aud.id_external_domain,
-    MAX(CAST(ts_revised AS TIMESTAMP)) AS ts_last_revised
-  FROM
-    datalake_kodak_clean_prod.video_aud AS aud
-  JOIN
-    datalake_kodak_clean_prod.user_revision_entity AS ure
-      ON aud.rev = ure.id
-  GROUP BY 1, 2
+    max(cast(ts_revised as timestamp)) as ts_last_revised
+  from datalake_kodak_clean_prod.video_aud aud
+  join datalake_kodak_clean_prod.user_revision_entity ure on aud.rev = ure.id
+  group by 1, 2
 ),
-videos AS (
-  WITH listings_with_videos AS (
-    SELECT
-        v.id_external_domain AS id_house,
-        COUNT(*) AS number_of_videos
-    FROM
-      datalake_kodak_clean_prod.video AS v
-    WHERE
-      v.external_domain = 'HOUSE'
-      AND v.id_source IS NOT NULL
-    GROUP BY 1
+videos as (
+  with
+  listings_with_videos as (
+    select
+        v.id_external_domain as id_house,
+        count(*) as number_of_videos
+    from datalake_kodak_clean_prod.video v
+    where v.external_domain = 'HOUSE'
+      and v.id_source is not null
+    group by 1
   )
-  SELECT
+  select
       v.id_house,
       v.number_of_videos,
       r.ts_last_revised
-  FROM
-    listings_with_videos AS v
-  LEFT JOIN
-    max_video_revision_by_house AS r
-      ON v.id_house = r.id_external_domain
+  from listings_with_videos v
+  left join max_video_revision_by_house r
+      on v.id_house = r.id_external_domain
 ),
-max_photo_revision_by_house AS (
-  SELECT
+max_photo_revision_by_house as (
+  select
     aud.external_domain,
     aud.id_external_domain,
-    MAX(CAST(ts_revised AS TIMESTAMP)) AS ts_last_revised
-  FROM
-    datalake_kodak_clean_prod.photo_sphere_aud AS aud
-  JOIN
-    datalake_kodak_clean_prod.user_revision_entity AS ure
-      ON aud.rev = ure.id
-  GROUP BY 1, 2
+    max(cast(ts_revised as timestamp)) as ts_last_revised
+  from datalake_kodak_clean_prod.photo_sphere_aud aud
+  join datalake_kodak_clean_prod.user_revision_entity ure on aud.rev = ure.id
+  group by 1, 2
 ),
-photos AS (
-  WITH listings_with_photos AS (
-    SELECT
-      p.id_external_domain AS id_house,
-      FILTER(
-        ARRAY_AGG(
-          REPLACE(
-            TRIM(
-              LOWER(
-                CAST(JSON_EXTRACT(p.metadata, '$.description') AS VARCHAR)  -- extract json
+photos as (
+  with
+  listings_with_photos as (
+    select
+        p.id_external_domain as id_house,
+        filter(
+          array_agg(
+            replace(trim(lower(
+              cast(json_extract(p.metadata, '$.description') as varchar)  -- extract json
             )), ' ', '-')  -- slugify strings by trim, lower, and replace spaces for hypens
           ) -- aggregate into an array
-        , x -> x IS NOT NULL) AS description_360_photos,  -- filter out null strings
-        COUNT(*) AS number_of_360_photos
-    FROM
-      datalake_kodak_clean_prod.photo_sphere AS p
-    WHERE
-      p.external_domain = 'HOUSE'
-      AND p.path IS NOT NULL
-    GROUP BY 1
+        , x -> x IS NOT NULL) as description_360_photos,  -- filter out null strings
+        count(*) as number_of_360_photos
+    from datalake_kodak_clean_prod.photo_sphere p
+    where p.external_domain = 'HOUSE'
+      and p.path is not null
+    group by 1
   )
-  SELECT
+  select
       p.id_house,
       p.description_360_photos,
       p.number_of_360_photos,
       r.ts_last_revised
-  FROM
-    listings_with_photos AS p
-  LEFT JOIN max_photo_revision_by_house AS r
-      ON p.id_house = r.id_external_domain
+  from listings_with_photos p
+  left join max_photo_revision_by_house r
+      on p.id_house = r.id_external_domain
 )
-SELECT
-  COALESCE(v.id_house, p.id_house) AS id_house,
-  COALESCE(v.number_of_videos, 0) AS number_of_videos,
-  COALESCE(p.number_of_360_photos, 0) AS number_of_360_photos,
-  CAST(p.description_360_photos AS VARCHAR(10000)) AS description_360_photos,
-  v.ts_last_revised AS ts_video_last_updated,
-  p.ts_last_revised AS ts_360_photos_last_updated,
-  NOW() AS ts_load
-FROM
-  videos AS v
-FULL OUTER JOIN
-  photos AS p
-    ON v.id_house = p.id_house
+select
+  coalesce(v.id_house, p.id_house) as id_house,
+  coalesce(v.number_of_videos, 0) as number_of_videos,
+  coalesce(p.number_of_360_photos, 0) as number_of_360_photos,
+  cast(array_join(p.description_360_photos, '' ) as varchar(10000)),
+  v.ts_last_revised as ts_video_last_updated,
+  p.ts_last_revised as ts_360_photos_last_updated,
+  now() as ts_load
+from videos v
+full outer join photos p on v.id_house = p.id_house
