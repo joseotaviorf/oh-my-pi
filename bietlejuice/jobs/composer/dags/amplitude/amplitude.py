@@ -10,7 +10,6 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
-from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOperator
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
