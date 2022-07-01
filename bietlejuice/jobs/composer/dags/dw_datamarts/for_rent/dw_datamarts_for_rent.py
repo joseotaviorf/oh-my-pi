@@ -4,7 +4,6 @@ from datetime import datetime
 import airflow.utils.helpers as airflow_helpers
 import pendulum
 from airflow.models import DAG, Variable
-from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -275,9 +274,3 @@ if pipeline_config and pipeline_config.items():
     build_tasks_dependency(create_cluster_task, terminate_cluster_task, entities_tasks)
 else:
     create_cluster_task >> terminate_cluster_task
-
-# EC2 temporary dependency
-success_logger = QuintoAndarSuccessLoggerOperator(
-    dag=DAG, bucket="5a-datalake-prod", aws_conn_id="aws_prod_data"
-)
-terminate_cluster_task >> success_logger
