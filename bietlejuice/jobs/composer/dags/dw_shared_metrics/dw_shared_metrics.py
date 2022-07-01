@@ -8,7 +8,6 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
-from bietlejuice.jobs.composer.base.db import DatabaseEnum
 from bietlejuice.jobs.composer.services import ConfigurationService
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -60,7 +59,7 @@ ctas_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": f"{spark_jobs_path}/create_metrics_tables.py",
-            "parameters": [DW_SCHEMA, DatabaseEnum.DW, metrics_path],
+            "parameters": [DW_SCHEMA, "ENV_DW", metrics_path],
         }
     },
 )
