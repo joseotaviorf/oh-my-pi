@@ -67,7 +67,7 @@ select
   coalesce(v.id_house, p.id_house) as id_house,
   coalesce(v.number_of_videos, 0) as number_of_videos,
   coalesce(p.number_of_360_photos, 0) as number_of_360_photos,
-  slice(p.description_360_photos, 1, 900) as description_360_photos,
+  slice(p.description_360_photos, 1, 40) as description_360_photos,
   v.ts_last_revised as ts_video_last_updated,
   p.ts_last_revised as ts_360_photos_last_updated,
   now() as ts_load
