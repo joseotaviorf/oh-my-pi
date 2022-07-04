@@ -8,12 +8,12 @@ columns:
   id_external_offer:
     lineage:
       - datalake_monopoly_clean.sale.id_external_offer
-  id_outcome:
+  id_income_reference:
     lineage:
-      - datalake_monopoly_clean.outcome_status_log.id_outcome
+      - datalake_monopoly_clean.sale_transaction.id_income_reference
   dt_occurence:
     lineage:
-      - datalake_monopoly_clean.outcome_status_log.dt_occurence
+      - datalake_monopoly_clean.income_reference.dt_income
   ts_created:
     lineage:
       - datalake_monopoly_clean.sale.ts_created
