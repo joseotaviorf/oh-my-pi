@@ -176,7 +176,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.sales_flow:create-clean-specialist-external-table
 
 bietlejuice.dw_datamarts_for_sale_cross:
-# Removed dependency with dw_region in order to avoid loopings since dw_datamarts_cross already satisfies
+  # Removed dependency with dw_region in order to avoid loopings since dw_datamarts_cross already satisfies
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_business_unit_region:load-sale-fact-business-unit-region-into-redshift
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
@@ -288,7 +288,7 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.enrich_lost_listings:create-enrich-lost-listings-external-table
 
 bietlejuice.dw_datamarts_growth_cross:
-# Removed dependency with dw_region, dw_rent_listing_flow.fact_house_listing_flows and dw_sale_listing_flow.fact_listing_flows since dw_datamarts_cross already satisfies
+  # Removed dependency with dw_region, dw_rent_listing_flow.fact_house_listing_flows and dw_sale_listing_flow.fact_listing_flows since dw_datamarts_cross already satisfies
   # affiliate_acquisition_metrics
   - bietlejuice.gsheets:create-clean-provisioned-costs-import-external-table
   # affiliate_acquisition_metrics, rent_flow_interactions
@@ -697,6 +697,13 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.dw_contract:load-dw-public-dim-contract
 #   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 #   - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
+#   # top_of_funnel_volumes_weekly (ignoring dim_region since it's already setted above):
+#   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-buyer-prospect-status
+#   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
+#   - bietlejuice.ebdb:create-clean-house-in-data-lake
+#   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
+#   - bietlejuice.gsheets.for_sale:load-clean-sale-tof-weekly-targets
+#   - bietlejuice.gsheets.growth:load-clean-rental-tof-weekly-targets
 #   # rent_flow_interactions:
 #   - bietlejuice.dw_booking:load-dw-public-dim-booking
 #   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
@@ -705,7 +712,6 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
 #efficiency-monitor-sale
 #  #tenant_prospects_activations (ignored dim_region and dim_contract dependencies since it's above):
-#   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
 #   - bietlejuice.ebdb:load-dw-quintoandar-fact-contract-people-in-datalake
 #  #efficiency-monitor-sale
 #   - bietlejuice.casa_mineira_crm.propagate-table-metadata-clean-house-exclusivity
@@ -716,7 +722,6 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.gsheets:create-clean-unit-economics-amortization-curve-external-table
 #   - bietlejuice.gsheets:load-clean-offers-hub-central
 #   - bietlejuice.gsheets.for_sale.propagate-table-metadata-clean-sale-demand-targets
-#   - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
 
 # bietlejuice.dw_datamarts_spark.growth:
 # Removed dependency with dw_region.dim_region since dw_rent_listing_flow already satisfies
@@ -795,7 +800,7 @@ bietlejuice.dw_contract:
   - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
 
 bietlejuice.dw_credit_analysis:
-# Removed dependencies with ebdb.proposal and dw_rent_flow.fact_listing_rent_flows because it's already satisfied by dw_crm (that has dependencies with ebdb.proposal -> dw_proposal -> dw_rent_flow -> dw_crm).
+  # Removed dependencies with ebdb.proposal and dw_rent_flow.fact_listing_rent_flows because it's already satisfied by dw_crm (that has dependencies with ebdb.proposal -> dw_proposal -> dw_rent_flow -> dw_crm).
   - bietlejuice.dw_crm:load-dw-crm-fact-credit-tasks
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
@@ -803,8 +808,8 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.sorting_hat:load-clean-variant
 
 bietlejuice.dw_crm:
-# Removed dependencies with ebdb.contract, offer and rent_flow, dw_booking.dim_booking, dw_contract.dim_contract, dw_offer.dim_offer, dw_listing.dim_house_listing because is already satisfied by dw_rent_flow. 
-# Also, removed dependency with ebdb.house because is already satisfied by dw_listing_jobs. Also, removed dependency with enrich_crm.workflows_transitions since is already satisfied by enrich_crm_tasks_transitions. 
+  # Removed dependencies with ebdb.contract, offer and rent_flow, dw_booking.dim_booking, dw_contract.dim_contract, dw_offer.dim_offer, dw_listing.dim_house_listing because is already satisfied by dw_rent_flow.
+  # Also, removed dependency with ebdb.house because is already satisfied by dw_listing_jobs. Also, removed dependency with enrich_crm.workflows_transitions since is already satisfied by enrich_crm_tasks_transitions.
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
   - bietlejuice.dw_listing_jobs:load-dw-public-fact-photo-job
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
@@ -876,7 +881,7 @@ bietlejuice.dw_listing:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
 
 bietlejuice.dw_listing_jobs:
-# Removed dependencies with ebdb.booking and house since is already satisfied by enrich_booking. Also, removed dependency with ebdb.inspection since is already satisfied by enrich_ebdb_listing_jobs.
+  # Removed dependencies with ebdb.booking and house since is already satisfied by enrich_booking. Also, removed dependency with ebdb.inspection since is already satisfied by enrich_ebdb_listing_jobs.
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
@@ -913,7 +918,7 @@ bietlejuice.dw_rent_fact_listing_owners:
   - bietlejuice.enrich_listing_owners:load-enrich-rental-metrics
 
 bietlejuice.dw_rent_flow:
-# Removed dependency with enrich_ebdb_listing.house since is already satisfied by dw_listing. 
+  # Removed dependency with enrich_ebdb_listing.house since is already satisfied by dw_listing.
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
@@ -996,7 +1001,7 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_sale_visits:
-# Removed dependency with enrich_booking.booking since is already satisfied by enrich_offer
+  # Removed dependency with enrich_booking.booking since is already satisfied by enrich_offer
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-real-estate-agent-rating-in-data-lake
   - bietlejuice.enrich_offer:load-enrich-sale-offer
@@ -1225,8 +1230,8 @@ bietlejuice.enrich_bureaus:
   - bietlejuice.sorting_hat:load-clean-proponent
 
 bietlejuice.enrich_buyer_prospect:
-# Removed dependency with ebdb.house, enrich_ebdb_contract.contract and enrich_ebdb_listing.listing_business_context tables since enrich_booking already satisfies.
-# Also, removed dependency with enrich_offer.sale_offer since enrich_sale_flows already satisfies.
+  # Removed dependency with ebdb.house, enrich_ebdb_contract.contract and enrich_ebdb_listing.listing_business_context tables since enrich_booking already satisfies.
+  # Also, removed dependency with enrich_offer.sale_offer since enrich_sale_flows already satisfies.
   - bietlejuice.ebdb:create-clean-contract-person-in-data-lake
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_offer:load-enrich-offer
@@ -1399,7 +1404,7 @@ bietlejuice.enrich_ebdb_customer_contact_identification:
   - bietlejuice.ebdb:create-clean-proponent-proposal-aud-in-data-lake
 
 bietlejuice.enrich_ebdb_listing:
-# Removed dependency with ebdb.country and state tables, since is already satisfied by enrich_region
+  # Removed dependency with ebdb.country and state tables, since is already satisfied by enrich_region
   - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
   - bietlejuice.ebdb:create-clean-access-type-in-data-lake
   - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
@@ -1533,8 +1538,8 @@ bietlejuice.enrich_dai_report:
   - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
 
 bietlejuice.enrich_invoice:
-# Removed dependencies with ebdb.contract, conversion_lead, lead, house, partner_agent, rent_flow and user, and enrich_ebdb_listing.house_listing since it's all already satisfied by enrich_ebdb_contract.
-# Also, removed dependencies with retsuko.account, entry and invoice since it's already satisfied by enrich_retsuko. 
+  # Removed dependencies with ebdb.contract, conversion_lead, lead, house, partner_agent, rent_flow and user, and enrich_ebdb_listing.house_listing since it's all already satisfied by enrich_ebdb_contract.
+  # Also, removed dependencies with retsuko.account, entry and invoice since it's already satisfied by enrich_retsuko.
   - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
@@ -1618,7 +1623,7 @@ bietlejuice.enrich_listing_jobs:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
 bietlejuice.enrich_listing_owners:
-# Removed dependency with enrich_booking.booking since is already satisfied by enrich_offer
+  # Removed dependency with enrich_booking.booking since is already satisfied by enrich_offer
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
@@ -1646,8 +1651,8 @@ bietlejuice.enrich_marketing_costs_offline:
   - bietlejuice.marketing_offline_costs:load-clean-marketing-offline-manual-share-cost-center
 
 bietlejuice.enrich_marketing_costs_sharing_rules:
-# Removed dependency with dw_region in order to avoid loopings since dw_rent_listing_flow already satisfies.
-# Also, removed dependency with dw_booking.dim_booking and dw_offer.dim_offer, since it's already satisfied by dw_rent_flow.
+  # Removed dependency with dw_region in order to avoid loopings since dw_rent_listing_flow already satisfies.
+  # Also, removed dependency with dw_booking.dim_booking and dw_offer.dim_offer, since it's already satisfied by dw_rent_flow.
   # TO DO: migrate and add dependency to datalake_raw.gsheets_marketing_affiliates_targets_replanning
   - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
@@ -1709,7 +1714,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.terminator:load-clean-utility-bill
 
 bietlejuice.enrich_offer:
-# Removed dependency with enrich_region since enrich_booking and enrich_ebdb_listing already satisfies
+  # Removed dependency with enrich_region since enrich_booking and enrich_ebdb_listing already satisfies
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
@@ -1842,7 +1847,7 @@ bietlejuice.enrich_sale_flows:
   - bietlejuice.enrich_offer:load-enrich-sale-offer
 
 bietlejuice.enrich_sale_lead_flows:
-# Removed dependency with enrich_booking.booking since enrich_offer already satisfies
+  # Removed dependency with enrich_booking.booking since enrich_offer already satisfies
   - bietlejuice.casa_mineira_crm:load-clean-city
   - bietlejuice.casa_mineira_crm:load-clean-client
   - bietlejuice.casa_mineira_crm:load-clean-contact
@@ -1935,7 +1940,7 @@ bietlejuice.enrich_top_of_funnel_portal_cm:
   - bietlejuice.casa_mineira_portal:load-clean-uf
 
 bietlejuice.enrich_top_of_funnel_supply:
-# Removed dependency with enrich_region since enrich_consolidated_marketing_metrics (that depends on enrich_marketing_costs_sharing_rules) already satisfies
+  # Removed dependency with enrich_region since enrich_consolidated_marketing_metrics (that depends on enrich_marketing_costs_sharing_rules) already satisfies
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
   - bietlejuice.gsheets.growth:load-clean-marketing-cost-taxonomy
@@ -2023,8 +2028,8 @@ bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.sales_flow:load-clean-tag
 
 bietlejuice.reverse_tracksale:
-# Removed dependencies with dw_listing.dim_house_listing, dw_offer.dim_offer, dw_region.dim_region,
-#   dw_rent_flow.fact_listing_rent_flows and dw_user.dim_user since dw_datamarts_cross already satisfies.
+  # Removed dependencies with dw_listing.dim_house_listing, dw_offer.dim_offer, dw_region.dim_region,
+  #   dw_rent_flow.fact_listing_rent_flows and dw_user.dim_user since dw_datamarts_cross already satisfies.
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.dw_contract:load-dw-public-dim-contract
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift

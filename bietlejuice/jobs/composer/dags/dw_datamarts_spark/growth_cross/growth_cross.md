@@ -13,23 +13,21 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline creates the following full tables in the schema `dw_datamarts` of data lake:
 
 - `affiliate_acquisition_metrics`
+- `daily_target_volumes_supply`
 - `efficiency_monitor_rental`
+- `efficiency_monitor_sale`
 - `inbound_attendance_leads_flows`
 - `marketing_campaigns_costs_and_volumes`
+- `performance_marketing_cluster_promotional_bonus_costs`
+- `performance_marketing_cluster_promotional_bonus`
 - `pricing_rent_categorization`
 - `rent_flow_interactions`
-- `efficiency_monitor_sale`
-- `pricing_rent_categorization`
-- `inbound_attendance_leads_flows`
-- `unique_supply_cohort_conversions`
-- `unique_supply_events_funnel`
-- `marketing_campaigns_costs_and_volumes`
-- `top_of_funnel_volumes_monthly`
 - `sale_performance_marketing_metrics_supply_coincident`
 - `tenant_prospects_activations`
-- `performance_marketing_cluster_promotional_bonus`
-- `performance_marketing_cluster_promotional_bonus_costs`
-- `daily_target_volumes_supply`
+- `top_of_funnel_volumes_monthly`
+- `top_of_funnel_volumes_weekly`
+- `unique_supply_cohort_conversions`
+- `unique_supply_events_funnel`
 
 ### Responsible Data Engineering Team
 
