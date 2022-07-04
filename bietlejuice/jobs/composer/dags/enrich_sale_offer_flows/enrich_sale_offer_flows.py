@@ -117,3 +117,8 @@ chain(
     + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
     terminate_cluster_task,
 )
+
+# Set data quality tasks if exists
+independent_tasks = DatalakeTaskGroup.all_independent_tasks(enrich_task_groups)
+if independent_tasks:
+    terminate_cluster_task.set_upstream(independent_tasks)

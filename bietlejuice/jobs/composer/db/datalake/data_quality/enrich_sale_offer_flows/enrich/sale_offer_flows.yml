@@ -1,0 +1,13 @@
+---
+table_name: datalake_sale_offer_flows.sale_offer_flows
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 30000
+    severity_level: Error
+column_level_validations:
+  id_offer:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
