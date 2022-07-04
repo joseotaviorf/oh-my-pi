@@ -4,6 +4,7 @@ columns:
   id_task:
     lineage:
       - datalake_label_studio_clean.annotations.id_annotation
+      - datalake_label_studio_clean.annotations.id_project
       - datalake_label_studio_clean.annotations.task
       - datalake_label_studio_clean.annotations.completed_by
       - datalake_label_studio_clean.annotations.result
@@ -12,7 +13,7 @@ columns:
       - datalake_label_studio_clean.annotations.id_annotation
   id_project:
     lineage:
-      - datalake_label_studio_clean.annotations.task
+      - datalake_label_studio_clean.annotations.id_project
   id_session:
     lineage:
       - datalake_label_studio_clean.annotations.task
@@ -22,37 +23,22 @@ columns:
   id_result:
     lineage:
       - datalake_label_studio_clean.annotations.result
+  project_name:
+    lineage:
+      - datalake_label_studio_clean.annotations.project_name
   agent_email:
     lineage:
       - datalake_label_studio_clean.annotations.task
       - datalake_label_studio_clean.annotations.created_username
-  session_user:
-    lineage:
-      - datalake_label_studio_clean.annotations.task
   session_message:
     lineage:
       - datalake_label_studio_clean.annotations.task
   session_overlap:
     lineage:
       - datalake_label_studio_clean.annotations.task
-  hsm_content:
-    lineage:
-      - datalake_label_studio_clean.annotations.task
-  owner_contract_info:
-    lineage:
-      - datalake_label_studio_clean.annotations.task
-  tenant_contract_info:
-    lineage:
-      - datalake_label_studio_clean.annotations.task
-  house_info:
-    lineage:
-      - datalake_label_studio_clean.annotations.task
   result_choice:
     lineage:
       - datalake_label_studio_clean.annotations.result
-  task_lead_time:
-    lineage:
-      - datalake_label_studio_clean.annotations.lead_time
   is_labeled:
     lineage:
       - datalake_label_studio_clean.annotations.task
