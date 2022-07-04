@@ -1,0 +1,22 @@
+---
+database_name: datalake_onetrust_clean
+table_name: audit
+columns:
+  user_id:
+    lineage:
+      - datalake_onetrust_raw.audit.user_id
+  username:
+    lineage:
+      - datalake_onetrust_raw.audit.username
+  id_address:
+    lineage:
+      - datalake_onetrust_raw.audit.id_address
+  user_agent:
+    lineage:
+      - datalake_onetrust_raw.audit.user_agent
+  status:
+    lineage:
+      - datalake_onetrust_raw.audit.status
+  ts_created:
+    lineage:
+      - datalake_onetrust_raw.audit.created_date

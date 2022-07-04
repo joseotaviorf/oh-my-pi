@@ -1,0 +1,25 @@
+---
+database_name: datalake_onetrust_clean
+table_name: user_groups
+columns:
+  user_group_id:
+    lineage:
+      - datalake_onetrust_raw.user_groups.user_group_id
+  name:
+    lineage:
+      - datalake_onetrust_raw.user_groups.name
+  description:
+    lineage:
+      - datalake_onetrust_raw.user_groups.description
+  created_by:
+    lineage:
+      - datalake_onetrust_raw.user_groups.created_by
+  last_modified_by:
+    lineage:
+      - datalake_onetrust_raw.user_groups.last_modified_by
+  ts_created:
+    lineage:
+      - datalake_onetrust_raw.user_groups.created_date
+  ts_last_modified:
+    lineage:
+      - datalake_onetrust_raw.user_groups.last_modified_date

@@ -1,0 +1,12 @@
+SELECT
+    organization_id,
+    external_id,
+    parent_organization_id,
+    parent_external_id,
+    'name',
+    default_approver,
+    default_language_code,
+    'description',
+    children
+FROM
+    datalake_onetrust_raw.organizations
