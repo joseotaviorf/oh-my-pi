@@ -55,7 +55,7 @@ SELECT
     COALESCE(id_negotiation, json_metadata.negociacaoId) AS id_negotiation,
     COALESCE(id_tenant, json_metadata.inquilinoId) AS id_tenant,
     COALESCE(id_manager, json_metadata.gerenteId) AS id_manager,
-    json_metadata.workgroupId AS id_workgroup,
+    COALESCE(id_workgroup, json_metadata.workgroupId) AS id_workgroup,
     COALESCE(json_metadata.contractId,json_metadata.contract_id) AS id_contract,
     json_metadata.estadoId AS id_state,
     CAST(version AS INTEGER) AS version,

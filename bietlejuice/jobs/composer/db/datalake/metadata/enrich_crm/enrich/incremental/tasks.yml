@@ -42,6 +42,7 @@ columns:
       - datalake_crm_clean.tasks.metadata
   id_workgroup:
     lineage:
+      - datalake_crm_clean.tasks.id_workgroup
       - datalake_crm_clean.tasks.metadata
   id_contract:
     lineage:
