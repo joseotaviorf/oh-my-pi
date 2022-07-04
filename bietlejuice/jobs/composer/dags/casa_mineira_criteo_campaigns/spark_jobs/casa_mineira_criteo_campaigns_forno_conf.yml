@@ -1,5 +1,5 @@
 ---
-raw_partition_cols: ["year", "month", "day"]
+raw_partition_cols: ["AttributionDate"]
 table_name: criteo_campaigns
 request_headers:
   Content-Type: "application/json"

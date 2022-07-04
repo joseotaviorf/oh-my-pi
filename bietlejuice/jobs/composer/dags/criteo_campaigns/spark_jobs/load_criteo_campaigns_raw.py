@@ -1,20 +1,14 @@
 import json
 
 from argparse import ArgumentParser
-from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_criteo_api_client.clients import CriteoClient
 
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-
-from bietlejuice.jobs.composer.base.spark import (
-    BaseDBUtils,
-    SparkTableStorageFormat,
-    SparkDataFrameService,
-)
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.api import APIEnum
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
 from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
@@ -34,28 +28,23 @@ if __name__ == "__main__":
     parser.add_argument("environment")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
-    parser.add_argument("execution_date")
+    parser.add_argument("load_start_date")
+    parser.add_argument("load_end_date")
 
     args = parser.parse_args()
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
-    execution_date = args.execution_date
-
-    logger.info(
-        f"""
-            m={JOB_NAME}, environment={environment},
-            datalake_bucket={datalake_bucket}, source={source},
-            execution_date={execution_date}, msg=Starting spark job..."
-        """
-    )
+    load_start_date = args.load_start_date
+    load_end_date = args.load_end_date
 
     config_service = ConfigurationService(source)
     table_name = config_service.get_config("table_name")
     raw_partition_cols = config_service.get_config("raw_partition_cols")
     request_headers = config_service.get_config("request_headers")
     request_body = config_service.get_config("request_body")
-    request_body["startDate"] = request_body["endDate"] = execution_date
+    request_body["startDate"] = load_start_date
+    request_body["endDate"] = load_end_date
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -73,13 +62,6 @@ if __name__ == "__main__":
         spark_client = SparkClient()
         df = spark_client.create_dataframe(api_response)
         df = df.withColumnRenamed("Day", "AttributionDate")
-        dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
-        df = (
-            SparkDataFrameService()
-            .input(df)
-            .create_year_month_day_columns_from_date(dt_execution)
-            .output()
-        )
 
         datalake_info = DatalakeMetastoreService.get_db_info(
             environment, source, datalake_bucket

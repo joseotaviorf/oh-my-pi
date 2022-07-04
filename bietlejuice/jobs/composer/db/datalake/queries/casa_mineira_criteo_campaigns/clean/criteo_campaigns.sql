@@ -12,13 +12,8 @@ SELECT
     Currency AS currency,
     INT(Displays) AS impressions,
     DOUBLE(RevenueGeneratedPc1d) AS revenue,
-    AttributionDate AS dt_attribution,
-    year,
-    month,
-    day
+    AttributionDate AS dt_attribution
 FROM
     datalake_casa_mineira_criteo_campaigns_raw.criteo_campaigns
 WHERE
-    year={year}
-    AND month={month}
-    AND day={day}
+    AttributionDate BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

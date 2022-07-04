@@ -2,6 +2,9 @@
 database_name: datalake_consolidated_marketing_metrics
 table_name: criteo_consolidated_metrics
 columns:
+  id_date:
+    lineage:
+      - datalake_criteo_campaigns_clean.criteo_campaigns.dt_attribution
   campaign_name:
     lineage:
       - datalake_criteo_campaigns_clean.criteo_campaigns.campaign_name
