@@ -16,6 +16,10 @@ columns:
   agent_email:
     tags:
       - Confidential
+  agent_cpf:
+    tags:
+      - PII
+      - Confidential 
   lead_phone:
     tags:
       - Confidential

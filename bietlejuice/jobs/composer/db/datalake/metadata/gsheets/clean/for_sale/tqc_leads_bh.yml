@@ -10,7 +10,13 @@ columns:
       - datalake_gsheets_raw.tqc_leads_bh.agent_name
   agent_phone:
     lineage:
+      - datalake_gsheets_raw.tqc_leads_bh.agent_phone
+  agent_email:
+    lineage:
       - datalake_gsheets_raw.tqc_leads_bh.agent_email
+  agent_cpf:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads_bh.agent_cpf
   group_name:
     lineage:
       - datalake_gsheets_raw.tqc_leads_bh.group_name

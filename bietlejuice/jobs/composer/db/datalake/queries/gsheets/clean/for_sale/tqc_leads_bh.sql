@@ -3,6 +3,7 @@ SELECT
     agent_name,
     agent_phone,
     agent_email,
+    agent_cpf,
     group_name,
     lead_phone,
     lead_email,
