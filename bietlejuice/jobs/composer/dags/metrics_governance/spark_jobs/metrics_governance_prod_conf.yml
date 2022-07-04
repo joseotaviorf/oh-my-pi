@@ -15,7 +15,10 @@ METRIC_COLUMNS:
   - maturity_level
   - created_by
   - approved_by
+  - datamart_name
   - is_additive
+  - is_active
+  - has_datamart
   - link_to_metric
   - calculation
   - observations

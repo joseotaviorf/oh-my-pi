@@ -2,13 +2,13 @@
 database_name: datalake_metrics_governance_clean
 table_name: metrics_registration
 columns:
-    name:
+    metric_name:
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.name
-    acronym:
+    metric_acronym:
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.acronym
-    description:
+    metric_description:
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.description
     company_line:
@@ -32,12 +32,21 @@ columns:
     is_additive:
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.is_additive
+    is_active:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.is_active
     link_to_metric:
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.link_to_metric
-    calculation:
+    metric_calculation:
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.calculation
     observations:
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.observations
+    has_datamart:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.has_datamart
+    datamart_name:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.datamart_name
