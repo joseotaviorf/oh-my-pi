@@ -19,6 +19,6 @@ SELECT
     TINYINT(MONTH(date_start)) AS month,
     TINYINT(DAY(date_start)) AS day
 FROM
-    datalake_marketing_costs_raw.facebook_social_insights
+    datalake_facebook_insights_raw.facebook_social_insights
 WHERE
     date_start BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

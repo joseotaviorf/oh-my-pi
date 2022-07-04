@@ -12,7 +12,7 @@ SELECT
     SUM(impressions) AS impressions,
     SUM(clicks) AS clicks
 FROM
-    datalake_marketing_costs_clean.facebook_insights
+    datalake_facebook_insights_clean.facebook_insights
 WHERE
     year = {year}
     AND month = {month}

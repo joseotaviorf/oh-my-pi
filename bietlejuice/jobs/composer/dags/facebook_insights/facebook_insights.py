@@ -19,13 +19,11 @@ from bietlejuice.jobs.composer.base.databricks import (
     ClusterPermissionEnum,
 )
 
-# TODO: wrong SOURCE field value. Must be the same as CONTEXT field value and DAG name
-SOURCE = "marketing_costs"
-CONTEXT = "facebook_insights"
-DAG_ID = f"bietlejuice.{CONTEXT}"
+SOURCE = "facebook_insights"
+DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = os.environ.get("ENVIRONMENT")
 
-config_service = ConfigurationService(CONTEXT)
+config_service = ConfigurationService(SOURCE)
 ATHENA_QUERY_RESULTS_BUCKET = config_service.get_config("athena_query_results_bucket")
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
@@ -41,7 +39,7 @@ TABLES_LIST = config_service.get_config("tables_list")
 
 MAIN_START_DATE = datetime(2019, 6, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
-RAW_SPARK_JOB_FILE = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{CONTEXT}/load_facebook_insights_raw.py"
+RAW_SPARK_JOB_FILE = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{SOURCE}/load_facebook_insights_raw.py"
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 
 CLUSTER_DESCRIPTION = Variable.get(
@@ -79,7 +77,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(CONTEXT).format(
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=DOC_MD_CHART_URL, dag_id=DAG_ID
     ),
     user_defined_macros={"get_date_param": get_date_param},
@@ -101,7 +99,7 @@ task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=f"{SOURCE}/{CONTEXT}",
+    relative_query_path=SOURCE,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULTS_BUCKET,
 )
@@ -114,7 +112,6 @@ for table_name in TABLES_LIST:
         extraction_spark_job_file=RAW_SPARK_JOB_FILE,
         raw_spark_job_extra_args=[
             SOURCE,
-            CONTEXT,
             table_name,
             "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
             "{{ get_date_param(dag_run, ds, 'load_end_date') }}",

@@ -20,6 +20,6 @@ SELECT
     DATE(date_start) AS dt_start,
     DATE(date_stop) AS dt_stop
 FROM
-    datalake_marketing_costs_raw.facebook_insights
+    datalake_facebook_insights_raw.facebook_insights
 WHERE
     date_start BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

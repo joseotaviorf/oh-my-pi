@@ -33,7 +33,6 @@ if __name__ == "__main__":
     parser.add_argument("env", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
-    parser.add_argument("context", help="name of the context")
     parser.add_argument("table_name", help="granularity columns")
     parser.add_argument("load_start_date", help="time_range start date in str format")
     parser.add_argument("load_end_date", help="time_range end date in str format")
@@ -42,14 +41,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
     env = args.env
     source = args.source
-    context = args.context
     datalake_bucket = args.datalake_bucket
     table_name = args.table_name
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
     manual_accounts = args.manual_accounts
 
-    config_service = ConfigurationService(context)
+    config_service = ConfigurationService(source)
     accounts = config_service.get_config("accounts")[table_name]
     fields = config_service.get_config("fields")[table_name]
     breakdowns = config_service.get_config("breakdowns")[table_name]
@@ -83,8 +81,8 @@ if __name__ == "__main__":
                 )
 
     logger.info(
-        f"""m=__main__, env={env}, source={source}, context={context},
-        datalake_bucket={datalake_bucket}, load_start_date={load_start_date}, load_end_date={load_end_date},
+        f"""m=__main__, env={env}, source={source}, datalake_bucket={datalake_bucket},
+        load_start_date={load_start_date}, load_end_date={load_end_date},
         table_name={table_name}, accounts={accounts}, msg=Starting spark job..."""
     )
 

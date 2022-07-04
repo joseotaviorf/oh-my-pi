@@ -41,7 +41,6 @@ dags_out_of_pattern:
         "ebdb",
         "enrich_marketing_costs_offline",
         "enrich_marketing_costs_sharing_rules",
-        "facebook_insights",
         "gsheets.for_rent",
         "gsheets.for_sale",
         "gsheets.growth",
