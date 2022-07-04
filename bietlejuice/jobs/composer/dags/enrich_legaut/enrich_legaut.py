@@ -39,7 +39,7 @@ DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
+SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base"
 SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 
 CLUSTER_DESCRIPTION = Variable.get(
