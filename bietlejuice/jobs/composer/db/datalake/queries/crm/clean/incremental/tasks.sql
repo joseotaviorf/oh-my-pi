@@ -9,6 +9,7 @@ SELECT
     gerenteId AS id_manager,
     proprietarioId AS id_owner,
     destinatarioId AS id_receiver,
+    workgroupId AS id_workgroup,
     __v AS version,
     actions,
     score,

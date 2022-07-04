@@ -31,6 +31,9 @@ columns:
   id_receiver:
     lineage:
       - datalake_crm_raw.tasks.destinatarioid
+  id_workgroup:
+    lineage:
+      - datalake_crm_raw.tasks.workgroupId
   version:
     lineage:
       - datalake_crm_raw.tasks.__v
