@@ -14,6 +14,9 @@ columns:
   region_id:
     lineage:
       - datalake_lead.lead.id_region
+  country_code:
+    lineage:
+      - datalake_lead.lead.country_code
   area_total:
     lineage:
       - datalake_lead.lead.total_area

@@ -5,6 +5,7 @@ create table if not exists public.dim_lead
  id bigint,
  external_id varchar(255),
  region_id integer,
+ country_code VARCHAR,
  area_total integer,
  bairro varchar(200),
  cep varchar(9),

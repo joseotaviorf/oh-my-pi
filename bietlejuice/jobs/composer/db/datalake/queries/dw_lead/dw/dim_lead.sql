@@ -28,6 +28,7 @@ SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a futur
     l.id,
     l.id_external AS external_id,
     CAST(l.id_region AS INTEGER) AS region_id,
+    l.country_code,
     l.total_area AS area_total,
     l.neighborhood AS bairro,
     NULLIF(l.zip_code, '') AS cep,
