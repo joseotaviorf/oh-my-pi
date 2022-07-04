@@ -9,6 +9,7 @@ SELECT
     nome_completo AS user_full_name,
     email AS email,
     telefone AS phone,
+    CONCAT(SUBSTR(cpf,1,3),'.',SUBSTR(cpf,4,3),'.',SUBSTR(cpf,7,3),'-',SUBSTR(cpf,10,2)) AS cpf,
     percentual_comissao AS percentage_comission,
     CAST(interno AS BOOLEAN) AS is_intern, 
     CAST(suspenso AS BOOLEAN) AS is_suspended, 
