@@ -41,9 +41,9 @@ columns:
   status:
     lineage:
       - datalake_debt_recovery.negotiation.status
-  total_expected_amout:
+  total_expected_amount:
     lineage:
-      - datalake_debt_recovery.negotiation.total_expected_amout
+      - datalake_debt_recovery.negotiation.total_expected_amount
   ts_breach:
     lineage:
       - datalake_debt_recovery.negotiation.ts_breach

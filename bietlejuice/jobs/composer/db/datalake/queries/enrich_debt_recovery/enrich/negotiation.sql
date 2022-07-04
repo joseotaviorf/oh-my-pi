@@ -17,7 +17,7 @@ cte_installments AS (
     SELECT
         n.`id` AS id_negotiation,
         COUNT(i.`id`) AS qt_installments,
-        SUM(i.total_amount) AS total_expected_amout,
+        SUM(i.total_amount) AS total_expected_amount,
         MAX(i.dt_due) AS dt_expected_end
     FROM
         datalake_trato_feito_clean.negotiation AS n
@@ -105,7 +105,7 @@ SELECT
     n.status,
     ci.qt_installments,
     cp.qt_paid AS qt_installments_paid,
-    ci.total_expected_amout,
+    ci.total_expected_amount,
     cp.paid_amount,
     d.negotiation_original_amount,
     d.negotiation_discount_amount,

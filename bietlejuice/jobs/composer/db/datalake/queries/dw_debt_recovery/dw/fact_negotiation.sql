@@ -4,7 +4,7 @@ SELECT
     status,
     qt_installments,
     qt_installments_paid,
-    total_expected_amout,
+    total_expected_amount,
     paid_amount,
     negotiation_original_amount,
     negotiation_discount_amount,

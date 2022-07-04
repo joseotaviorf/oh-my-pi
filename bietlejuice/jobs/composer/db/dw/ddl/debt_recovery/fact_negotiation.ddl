@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS debt_recovery.fact_negotiation (
     status VARCHAR,
     qt_installments BIGINT,
     qt_installments_paid BIGINT,
-    total_expected_amout DECIMAL(22,2),
+    total_expected_amount DECIMAL(22,2),
     paid_amount DECIMAL(22,2),
     negotiation_original_amount DECIMAL(22,2),
     negotiation_discount_amount DECIMAL(22,2),
