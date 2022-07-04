@@ -114,6 +114,7 @@ for table_name in table_names:
         table_name=table_name,
         is_incremental=True,
         partitions=table_names[table_name]["clean_partition_cols"],
+        has_create_external_table_task=False,
         extra_query_template_params={
             "week_start_date": "{{ get_week_start_date(ds) }}"
         },

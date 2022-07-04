@@ -114,6 +114,7 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     target_database_base_name=SOURCE,
     is_incremental=True,
     partitions=PARTITION_COLS,
+    has_create_external_table_task=False,
     extra_query_template_params={
         "year_previous_quarter": "{{ get_date_from_previous_quarter(ds).year }}",
         "previous_quarter": "{{ get_previous_quarter(ds) }}",
