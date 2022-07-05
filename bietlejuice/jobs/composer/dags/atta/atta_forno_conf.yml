@@ -57,6 +57,12 @@ tables:
   - table_name: entidade_log
     extraction_type: full
     is_cleaned: false
+  - table_name: franquia
+    extraction_type: full
+    is_cleaned: false
+  - table_name: fornecedores
+    extraction_type: full
+    is_cleaned: false
   - table_name: lead_dados_captura
     extraction_type: full
     is_cleaned: false

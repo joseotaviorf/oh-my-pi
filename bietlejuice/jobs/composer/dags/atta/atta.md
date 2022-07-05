@@ -34,6 +34,8 @@ In datalake raw, via full load:
 - `documento_tipo`
 - `documento_tpcontratacao`
 - `entidade_log`
+- `franquia`
+- `fornecedores`
 - `lead_dados_captura`
 - `lead_detalhe_acompanhamento`
 - `lead_detalhe_categoria`
