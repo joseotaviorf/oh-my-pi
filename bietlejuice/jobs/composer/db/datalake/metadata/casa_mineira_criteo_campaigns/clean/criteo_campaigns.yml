@@ -44,12 +44,3 @@ columns:
   dt_attribution:
     lineage:
       - datalake_casa_mineira_criteo_campaigns_raw.criteo_campaigns.attributiondate
-  year:
-    lineage:
-      - datalake_casa_mineira_criteo_campaigns_raw.criteo_campaigns.year
-  month:
-    lineage:
-      - datalake_casa_mineira_criteo_campaigns_raw.criteo_campaigns.month
-  day:
-    lineage:
-      - datalake_casa_mineira_criteo_campaigns_raw.criteo_campaigns.day
