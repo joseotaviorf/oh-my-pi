@@ -176,7 +176,7 @@ pipeline:
     group: update_jobs
     image: quintoandar/drone-gcs-sync
     pull: true
-    bucket: us-east4-airflow-forno-90eedca3-bucket
+    bucket: us-east4-airflow-forno2-7f52154d-bucket
     source: bietlejuice/jobs/composer/
     target: dags/bietlejuice/jobs/composer/
     delete: true
