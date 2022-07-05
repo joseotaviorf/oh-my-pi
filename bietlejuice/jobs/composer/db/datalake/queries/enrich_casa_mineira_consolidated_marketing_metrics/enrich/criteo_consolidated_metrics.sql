@@ -10,4 +10,4 @@ SELECT
 FROM
     datalake_casa_mineira_criteo_campaigns_clean.criteo_campaigns
 WHERE
-    dt_attribution = DATE("{year}-{month}-{day}")
+    dt_attribution BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

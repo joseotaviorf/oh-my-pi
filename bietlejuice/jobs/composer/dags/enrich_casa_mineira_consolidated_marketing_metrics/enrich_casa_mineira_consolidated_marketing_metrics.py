@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime
 from pendulum import timezone
 
@@ -27,8 +28,8 @@ DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2021, 6, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 PARTITION_COLS = ["id_date"]
+CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -49,6 +50,14 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 ENV = os.environ.get("ENVIRONMENT")
 
+
+def get_date_param(dag_run, ds, date_param_name):
+    date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
+    if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
+        return date_param
+    return ds
+
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -61,6 +70,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+    user_defined_macros={"get_date_param": get_date_param},
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -91,9 +101,14 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     is_incremental=True,
     has_create_external_table_task=False,
     partitions=PARTITION_COLS,
+    execution_date="",
+    extra_query_template_params={
+        "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+        "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+    },
 )
 
-inner_dependencies = {
+INNER_DEPENDENCIES = {
     "consolidated_media_metrics": list(
         set(enrich_task_groups.keys()).difference(set(["consolidated_media_metrics"]))
     )
@@ -105,7 +120,7 @@ inner_dependencies = {
 ) = datalake_task_group.set_inner_dag_dependencies(
     task_flow_helper=TaskFlowHelper(),
     task_groups_boundaries=enrich_task_groups,
-    dag_inner_dependencies=inner_dependencies,
+    dag_inner_dependencies=INNER_DEPENDENCIES,
 )
 
 chain(

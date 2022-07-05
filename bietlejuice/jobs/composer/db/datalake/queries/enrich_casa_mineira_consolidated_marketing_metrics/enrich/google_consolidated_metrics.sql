@@ -7,7 +7,7 @@ WITH campaign_reports AS (
     FROM
         datalake_casa_mineira_google_ads_clean.ads_performance
     WHERE
-        dt_loaded = DATE('{year}-{month}-{day}')
+        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
     UNION ALL
 
@@ -19,7 +19,7 @@ WITH campaign_reports AS (
     FROM
         datalake_casa_mineira_google_ads_clean.keywords_performance
     WHERE
-        dt_loaded = DATE('{year}-{month}-{day}')
+        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
     UNION ALL
 
@@ -31,7 +31,7 @@ WITH campaign_reports AS (
     FROM
         datalake_casa_mineira_google_ads_clean.campaigns_performance
     WHERE
-        dt_loaded = DATE('{year}-{month}-{day}')
+        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
     UNION ALL
 
@@ -43,7 +43,7 @@ WITH campaign_reports AS (
     FROM
         datalake_casa_mineira_google_ads_clean.videos_performance
     WHERE
-        dt_loaded = DATE('{year}-{month}-{day}')
+        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 
 
@@ -101,7 +101,7 @@ keywords_metrics AS (
             AND rtm.ad_group_name = gkpr.ad_group_name
             AND rtm.report_type = 'KEYWORDS_PERFORMANCE_REPORT'
     WHERE
-        dt_loaded = DATE('{year}-{month}-{day}')
+        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
         1,2,3,4,5,6,7,8
 ),
@@ -155,7 +155,7 @@ ads_metrics AS (
         ad_type_flags ad_types
             ON ad_types.ad_type = gapr.ad_type
     WHERE
-        dt_loaded = DATE('{year}-{month}-{day}')
+        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
         1,2,3,4,5,6,7,8
 ),
@@ -188,7 +188,7 @@ campaigns_metrics AS (
             ON rtm.campaign_name = gcpr.campaign_name
             AND rtm.report_type = 'CAMPAIGN_PERFORMANCE_REPORT'
     WHERE
-        dt_loaded = DATE('{year}-{month}-{day}')
+        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
         1,2,3,4,5,6,7,8
 ),
@@ -222,7 +222,7 @@ videos_metrics AS (
             AND rtm.ad_group_name = gvpr.ad_group_name
             AND rtm.report_type = 'VIDEO_PERFORMANCE_REPORT'
     WHERE
-        dt_loaded = DATE('{year}-{month}-{day}')
+        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
         1,2,3,4,5,6,7,8
 )

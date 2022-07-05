@@ -10,4 +10,4 @@ SELECT
 FROM
     datalake_lifull_campaigns_clean.mitula_campaigns
 WHERE 
-    DATE(dt_attribution) = DATE('{year}-{month}-{day}')
+    dt_attribution BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

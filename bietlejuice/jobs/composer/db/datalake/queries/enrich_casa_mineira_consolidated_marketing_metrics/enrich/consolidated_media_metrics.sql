@@ -19,7 +19,7 @@ WITH consolidated_sources AS (
     FROM
         datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics
     WHERE
-        id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
+        id_date BETWEEN INT(REPLACE(DATE('{load_start_date}'), '-', '')) AND INT(REPLACE(DATE('{load_end_date}'), '-', ''))
     -- CRITEO
     UNION ALL
     SELECT
@@ -41,7 +41,7 @@ WITH consolidated_sources AS (
     FROM
         datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics
     WHERE
-        id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
+        id_date BETWEEN INT(REPLACE(DATE('{load_start_date}'), '-', '')) AND INT(REPLACE(DATE('{load_end_date}'), '-', ''))
     -- RTB
     UNION ALL
     SELECT
@@ -63,7 +63,7 @@ WITH consolidated_sources AS (
     FROM
         datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics
     WHERE
-        id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
+        id_date BETWEEN INT(REPLACE(DATE('{load_start_date}'), '-', '')) AND INT(REPLACE(DATE('{load_end_date}'), '-', ''))
     -- MITULA
     UNION ALL
     SELECT
@@ -85,7 +85,7 @@ WITH consolidated_sources AS (
     FROM
         datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics
     WHERE
-        id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
+        id_date BETWEEN INT(REPLACE(DATE('{load_start_date}'), '-', '')) AND INT(REPLACE(DATE('{load_end_date}'), '-', ''))
     -- TROVIT
     UNION ALL
     SELECT
@@ -107,7 +107,7 @@ WITH consolidated_sources AS (
     FROM
         datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics
     WHERE
-        id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
+        id_date BETWEEN INT(REPLACE(DATE('{load_start_date}'), '-', '')) AND INT(REPLACE(DATE('{load_end_date}'), '-', ''))
     -- FACEBOOK
     UNION ALL
     SELECT
@@ -129,7 +129,7 @@ WITH consolidated_sources AS (
     FROM
         datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics
     WHERE
-        id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
+        id_date BETWEEN INT(REPLACE(DATE('{load_start_date}'), '-', '')) AND INT(REPLACE(DATE('{load_end_date}'), '-', ''))
 )
 
 SELECT
