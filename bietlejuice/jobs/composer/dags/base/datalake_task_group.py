@@ -251,7 +251,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                             inmetro_bucket,
                             layer,
                             self.relative_query_path,
-                            table_name,
+                            tb_name,
                         ],
                     }
                 },
