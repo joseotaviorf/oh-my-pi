@@ -37,7 +37,6 @@ def parse_arguments():
         "date_filter_column",
         type=str,
         help="If incremental, filter by this column",
-        required=False,
         default=None,
     )
 
