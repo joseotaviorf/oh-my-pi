@@ -50,3 +50,6 @@ columns:
     datamart_name:
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.datamart_name
+    ts_load:
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.ts_load

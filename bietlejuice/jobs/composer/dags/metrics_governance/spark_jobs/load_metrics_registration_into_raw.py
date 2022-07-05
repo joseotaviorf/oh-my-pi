@@ -60,28 +60,39 @@ def get_content_from_paths(bucket, paths, s3_client) -> List[Dict[str, Any]]:
     return contents
 
 
-def fill_all_cols(content: Dict[str, any], metric_cols: Set[str]) -> Dict[str, Any]:
+def fill_all_cols(
+    content: Dict[str, any], metric_cols: Set[str], execution_date: datetime
+) -> Dict[str, Any]:
     """
     Some metrics don't have all fields. This function makes sure all columns exist in the dict
     :param content: the content of a metric file loaded from S3
     :type content: Dict[str, any]
     :param metric_cols: List with all required columns for a metric
     :type metric_cols: Set[str]
+    :param execution_date: the spark job execution date
+    :type execution_date: datetime
     :return: Dict with a metric with all columns filled
     :rtype: Dict
     """
-    return {col: content.get(col) for col in metric_cols}
+    metric_data = {col: content.get(col) for col in metric_cols}
+    metric_data["ts_load"] = execution_date
+    return metric_data
 
 
 def get_metrics_df(
-    bucket: str, prefix: str, spark_client: SparkClient, metric_cols
+    bucket: str,
+    prefix: str,
+    spark_client: SparkClient,
+    metric_cols: Set[str],
+    execution_date: datetime,
 ) -> DataFrame:
     s3_client = boto3.client("s3")
     metrics_paths = get_metrics_paths_from_bucket(bucket, prefix, s3_client)
     metrics_content = get_content_from_paths(bucket, metrics_paths, s3_client)
 
     metrics_with_all_cols = [
-        fill_all_cols(content, metric_cols) for content in metrics_content
+        fill_all_cols(content, metric_cols, execution_date)
+        for content in metrics_content
     ]
 
     metric_df = spark_client.create_dataframe(
@@ -130,7 +141,9 @@ if __name__ == "__main__":
     spark_metastore_service.create_database(database_name)
 
     # Creating metrics dataframe
-    metrics_df = get_metrics_df(metrics_bucket, metrics_path, spark_client, metric_cols)
+    metrics_df = get_metrics_df(
+        metrics_bucket, metrics_path, spark_client, metric_cols, execution_date
+    )
     metrics_df = (
         SparkDataFrameService()
         .input(metrics_df)

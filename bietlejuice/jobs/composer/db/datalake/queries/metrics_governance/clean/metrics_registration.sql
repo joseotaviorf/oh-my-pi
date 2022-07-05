@@ -15,6 +15,7 @@ SELECT
   has_datamart,
   datamart_name,
   is_active,
+  ts_load,
   year,
   month,
   day
