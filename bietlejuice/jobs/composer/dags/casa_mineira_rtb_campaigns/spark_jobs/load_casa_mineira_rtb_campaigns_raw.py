@@ -8,11 +8,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 
-from bietlejuice.jobs.composer.base.spark import (
-    BaseDBUtils,
-    SparkTableStorageFormat,
-    SparkDataFrameService,
-)
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.api import APIEnum
 from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
@@ -33,21 +29,15 @@ if __name__ == "__main__":
     parser.add_argument("environment")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
-    parser.add_argument("execution_date")
+    parser.add_argument("load_start_date")
+    parser.add_argument("load_end_date")
 
     args = parser.parse_args()
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
-    execution_date = args.execution_date
-
-    logger.info(
-        f"""
-            m={JOB_NAME}, environment={environment},
-            datalake_bucket={datalake_bucket}, source={source},
-            execution_date={execution_date}, msg=Starting spark job..."
-        """
-    )
+    load_start_date = args.load_start_date
+    load_end_date = args.load_end_date
 
     config_service = ConfigurationService(source)
     raw_partition_cols = config_service.get_config("raw_partition_cols")
@@ -71,37 +61,36 @@ if __name__ == "__main__":
     )
 
     stats = []
-    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
+    load_start_date = datetime.strptime(load_start_date, "%Y-%m-%d")
+    load_end_date = datetime.strptime(load_end_date, "%Y-%m-%d")
 
     for account_hash in account_hashes:
         stats_response = rtb_client.get_rtb_stats(
             adv_hash=account_hash,
-            day_from=dt_execution,
-            day_to=dt_execution,
+            day_from=load_start_date,
+            day_to=load_end_date,
             group_by=group_by,
             metrics=metrics,
             count_convention=Conversions.ATTRIBUTED_POST_CLICK,
         )
-        account_details = rtb_client.get_advertiser(adv_hash=account_hash)
-        # Appends string "account" into all keys from account_details dict:
-        account_details = {
-            "account" + k[0].upper() + k[1:]: v for k, v in account_details.items()
-        }
-        stats_response = list(
-            map(lambda record: {**record, **account_details}, stats_response)
-        )
-        stats += stats_response
-
+        if stats_response:
+            account_details = rtb_client.get_advertiser(adv_hash=account_hash)
+            # Appends string "account" into all keys from account_details dict:
+            account_details = {
+                "account" + k[0].upper() + k[1:]: v for k, v in account_details.items()
+            }
+            stats_response = list(
+                map(lambda record: {**record, **account_details}, stats_response)
+            )
+            stats += stats_response
+        else:
+            logger.warn(
+                f"m=__main__, msg=No data was received from account with ID {account_hash}."
+            )
     if stats:
         spark_client = SparkClient()
         df = spark_client.create_dataframe(stats, schema=schema)
         df = df.withColumnRenamed("day", "attributionDate")
-        df = (
-            SparkDataFrameService()
-            .input(df)
-            .create_year_month_day_columns_from_date(dt_execution)
-            .output()
-        )
 
         datalake_info = DatalakeMetastoreService.get_db_info(
             environment, source, datalake_bucket
@@ -137,3 +126,5 @@ if __name__ == "__main__":
             df=df,
             partition_cols=raw_partition_cols,
         )
+    else:
+        logger.warn(f"m=__main__, msg=All accounts returned no data.")

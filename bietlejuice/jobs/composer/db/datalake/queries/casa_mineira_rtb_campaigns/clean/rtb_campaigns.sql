@@ -13,13 +13,8 @@ SELECT
     ctr AS click_through_rate,
     cr AS conversion_rate,
     -- roas AS return_on_advertising_spend,
-    attributionDate AS dt_attribution,
-    year,
-    month,
-    day
+    attributionDate AS dt_attribution
 FROM
     datalake_casa_mineira_rtb_campaigns_raw.rtb_campaigns
 WHERE
-    year={year}
-    AND month={month}
-    AND day={day}
+    attributionDate BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

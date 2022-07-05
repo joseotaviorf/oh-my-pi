@@ -4,9 +4,7 @@ table_name: rtb_consolidated_metrics
 columns:
   id_date:
     lineage:
-      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.year
-      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.month
-      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.day
+      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.dt_attribution
   campaign_name:
     lineage:
       - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.sub_campaign_name

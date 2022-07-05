@@ -2,6 +2,9 @@
 database_name: datalake_consolidated_marketing_metrics
 table_name: rtb_consolidated_metrics
 columns:
+  id_date:
+    lineage:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.dt_attribution
   campaign_name:
     lineage:
       - datalake_rtb_campaigns_clean.rtb_campaigns.sub_campaign_name

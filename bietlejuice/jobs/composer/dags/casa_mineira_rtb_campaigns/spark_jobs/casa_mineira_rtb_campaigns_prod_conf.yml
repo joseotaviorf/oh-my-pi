@@ -1,5 +1,5 @@
 ---
-raw_partition_cols: ["year", "month", "day"]
+raw_partition_cols: ["attributionDate"]
 table_name: rtb_campaigns
 account_hashes:
   - q00nnVyP3JilwoZYlPTp
@@ -38,7 +38,7 @@ schema: |
   conversionsValue DOUBLE,
   cr DOUBLE,
   ctr DOUBLE,
-  attributionDate STRING,
+  day STRING,
   impsCount DOUBLE,
   subcampaign STRING,
   subcampaignHash STRING

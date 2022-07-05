@@ -1,5 +1,5 @@
 SELECT    
-    INT(year*10000 + month*100 + day) AS id_date,
+    INT(DATE_FORMAT(dt_attribution, 'YYYYMMdd')) AS id_date,
     sub_campaign_name AS campaign_name,
     account_name,
     sub_campaign_name AS utm_campaign,
@@ -10,6 +10,4 @@ SELECT
 FROM 
     datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    dt_attribution = DATE('{year}-{month}-{day}')
