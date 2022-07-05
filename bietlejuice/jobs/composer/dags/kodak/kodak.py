@@ -34,7 +34,7 @@ DOC_MD_BASE_URL = CONFIG_SERVICE.get_config("doc_md_chart_url")
 # databricks config
 LOGS_OUTPUT_PATH = CONFIG_SERVICE.get_config("spark_jobs_logs_path")
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_10_4_min_general_cluster", deserialize_json=True
+    "databricks_10_4_med_general_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
