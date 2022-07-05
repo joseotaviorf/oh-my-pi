@@ -46,6 +46,7 @@ dags_out_of_pattern:
         "gsheets.growth",
         "gsheets.growth_intraday",
         "gsheets.support_and_service",
+        "gsheets.static",
         "marketing_costs",
         "marketing_costs_sharing_rules",
         "portal_casa_mineira_pipedrive",
