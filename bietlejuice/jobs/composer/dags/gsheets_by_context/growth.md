@@ -31,6 +31,9 @@ This pipeline produces the following output tables:
     - `manual_cost_engagement`
     - `marketing_cost_taxonomy`
     - `mexico_costs_targets`
+    - `mexico_demand_marketing_cost_per_source_actual`
+    - `mexico_marketing_cost_per_source`
+    - `mexico_supply_costs_financial_and_actual`
     - `mkt_cost_per_source`
     - `mta_budget`
     - `offline_manual_costs`
@@ -54,6 +57,9 @@ This pipeline produces the following output tables:
     - `ecglobal_active_users`
     - `marketing_cost_taxonomy`
     - `mexico_costs_targets`
+    - `mexico_demand_marketing_cost_per_source_actual`
+    - `mexico_marketing_cost_per_source`
+    - `mexico_supply_costs_financial_and_actual`
     - `mkt_cost_per_source`
     - `mta_budget_october_2020`
     - `offline_manual_costs`

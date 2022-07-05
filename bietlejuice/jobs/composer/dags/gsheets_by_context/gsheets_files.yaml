@@ -108,6 +108,24 @@ mexico_costs_targets:
     clean_table_name: mexico_costs_targets
     sheet_context: growth
 
+mexico_demand_marketing_cost_per_source_actual:
+    sheet_id: 17p7m9Kk04LXKMvEV6KawPVaw52uMROFvfqiT69o_oFQ
+    sheet_name: mkt_cost_per_source
+    clean_table_name: mexico_demand_marketing_cost_per_source_actual
+    sheet_context: growth
+   
+mexico_marketing_cost_per_source:
+    sheet_id: 1eIjPgBuUYojHGW8JwVVnOvMRU0a9jwYb9QQtIejyPAc
+    sheet_name: mkt_cost_per_source
+    clean_table_name: mexico_marketing_cost_per_source
+    sheet_context: growth
+
+mexico_supply_costs_financial_and_actual:
+    sheet_id: 1znOU1En-d0d--Ppec6xUeAxcMvUEqMMhiM1FP_A3Sqg
+    sheet_name: costs_targets_mx
+    clean_table_name: mexico_supply_costs_financial_and_actual
+    sheet_context: growth
+
 affiliate_pro_registration:
     sheet_id: 196BCLJ7rwRAgb50IEdYB_b4KGnilleeCU8WMKghxddY
     sheet_name: affiliate_pro
