@@ -17,6 +17,8 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables:
 
 - `dim_proposal`
+- `quintoandar.dim_proposal_person`
+- `quintoandar.fact_proposal_people`
 
 ### Responsible Data Engineering Team
 

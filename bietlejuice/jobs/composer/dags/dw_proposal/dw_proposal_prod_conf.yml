@@ -1,0 +1,7 @@
+tables:
+  dim_proposal:
+    dw_schema: public
+  dim_proposal_person:
+    dw_schema: quintoandar
+  fact_proposal_people:
+    dw_schema: quintoandar

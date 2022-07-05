@@ -17,5 +17,5 @@ create table quintoandar.dim_proposal_person (
   ts_created timestamp,
   ts_updated timestamp,
   ts_load timestamp
-)
-;
+);
+ALTER TABLE quintoandar.dim_proposal_person owner to databricks;

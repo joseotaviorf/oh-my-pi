@@ -15,6 +15,7 @@ Produces the following output tables:
 
 - `pre_proposal`
 - `pre_proposal_aud`
+- `proposal_person`
 
 ### Responsible Data Engineering Team
 

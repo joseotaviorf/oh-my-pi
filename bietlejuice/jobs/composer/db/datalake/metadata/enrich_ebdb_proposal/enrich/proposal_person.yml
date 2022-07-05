@@ -1,0 +1,49 @@
+---
+database_name: datalake_ebdb_proposal
+table_name: proposal_person
+columns:
+  id_proposal_person:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id
+  id_personal_document:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.cpf
+  id_proposal:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id_proposal
+  email:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.email
+  full_name:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.name
+  marital_status:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.marital_status
+  personal_document:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.cpf
+  phone_number:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.phone_number
+  state_code:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id_estado
+  number_of_dependents:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.number_of_dependents
+  is_going_to_live:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.will_live
+  has_contributed_to_current_house:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.has_contributed_to_current_house
+  dt_birth:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.dt_birth
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.ts_updated

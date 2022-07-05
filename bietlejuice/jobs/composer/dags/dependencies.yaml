@@ -899,7 +899,9 @@ bietlejuice.dw_offer:
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_proposal:
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.enrich_proposal:load-enrich-proposal
+  - bietlejuice.enrich_ebdb_proposal:load-enrich-proposal-person
 
 bietlejuice.dw_quinto_messenger:
   - bietlejuice.enrich_ebdb_customer_contact_identification
@@ -1443,6 +1445,7 @@ bietlejuice.enrich_ebdb_proposal:
   - bietlejuice.ebdb:create-clean-pre-proposal-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-pre-proposal-condition-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-condition-in-data-lake
+  - bietlejuice.ebdb:create-clean-proponent-proposal-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
 

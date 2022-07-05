@@ -1,0 +1,49 @@
+---
+database_name: dw_proposal
+table_name: dim_proposal_person
+columns:
+  sk_proposal_person:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.id_proposal_person
+  full_name:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.full_name
+  email:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.email
+  personal_document:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.personal_document
+  personal_document_type:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.personal_document_type
+  employment_bond:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.employment_bond
+  number_of_dependents:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.number_of_dependents
+  current_house_situation:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.current_house_situation
+  has_contributed_to_current_house:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.has_contributed_to_current_house
+  gender:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.gender
+  marital_status:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.marital_status
+  state_code:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.state_code
+  dt_birth:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.dt_birth
+  ts_created:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.ts_updated

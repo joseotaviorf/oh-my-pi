@@ -1,0 +1,46 @@
+---
+database_name: dw_proposal
+table_name: fact_proposal_people
+columns:
+  sk_proposal_person:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.id_proposal_person
+  sk_personal_document:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.id_personal_document
+  sk_proponent:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  sk_proposal:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.id_proposal
+  sk_birth_date:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.dt_birth
+  sk_created_date:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.ts_created
+  expected_contract_role:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.expected_contract_role
+  rental_motive:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.rental_motive
+  brl_total_income:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.brl_total_income
+  is_going_to_live:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.is_going_to_live
+  is_first_proposal:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.is_first_proposal
+  is_last_proposal:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.is_last_proposal
+  is_valid_cpf:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.is_valid_cpf
+  is_valid_cnpj:
+    lineage:
+      - datalake_ebdb_proposal.proposal_person.is_valid_cnpj

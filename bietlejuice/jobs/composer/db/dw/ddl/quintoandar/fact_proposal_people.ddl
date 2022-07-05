@@ -16,5 +16,5 @@ create table quintoandar.fact_proposal_people (
   is_last_proposal boolean,
   brl_total_income integer,
   ts_load timestamp
-)
-;
+);
+ALTER TABLE quintoandar.fact_proposal_people owner to databricks;
