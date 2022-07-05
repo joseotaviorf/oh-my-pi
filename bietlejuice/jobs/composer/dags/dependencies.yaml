@@ -681,6 +681,14 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.wololo:load-clean-prospect
 
 # bietlejuice.dw_datamarts_spark.growth_cross:
+#   # top_of_funnel_volumes_daily:
+#   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-buyer-prospect-status
+#   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
+#   - bietlejuice.ebdb:create-clean-house-in-data-lake
+#   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
+#   - bietlejuice.gsheets.for_sale:load-clean-sale-tof-daily-targets
+#   - bietlejuice.gsheets.growth:load-clean-rental-tof-daily-targets
+#   - bietlejuice.dw_region:load-dw-public-dim-region
 # Removed dependency with dw_region in order to avoid loopings since dw_datamarts.cross already satisfies
 #   - bietlejuice.dw_contract:load-dw-public-dim-contract
 #   - bietlejuice.enrich_ebdb_listing:load-enrich-house
