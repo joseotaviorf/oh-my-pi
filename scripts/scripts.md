@@ -39,3 +39,33 @@
                 python3 skip_list_generator.py -j <skip_list_path> -d <dag_list_path> -l <last_updater>
             
             *The name of the last updater must be in quotes*
+
+    > find_redundant_dependencies.py:
+        This script is able to run locally, and its function is to find redundant dependencies in the `dependencies.yaml` file.
+        For example, if the DAG "A" is a dependency to "B" and "C", and "B" is also a dependency to "C":
+            B
+          /   \
+        A ------> C
+
+        "A" should not be a dependency to "C", since "B" already satifies it. This is a problem for mediator, since it will run two times if "A" is triggered during the day: when "A" finishes, and then when "B" finishes. That is a waste of cluster resources, and often causes incidents due to cache.
+
+        This script can print the redundancies to the console, and write them to a CSV file.
+        It can analyze a single DAG or all DAGs in the dependencies file.
+
+        To run it, we have three optional parameters:
+
+        (-- dag / -d): full name of the DAG to analyze. If not specified, all DAGs will be checked for redundancies.
+        (-- verbosity / -v) how much detail will be printed to console. Goes from 0 (nothing) to 3 (maximum detail).
+        (--csv / -c) path to the CSV file which will be written. This CSV will have three columns:
+            - DAG: name of the DAG where a redundancy was found
+            - Redundant Dependency: name of the dependency that can be removed
+            - Satisfied by: a path the satisfies this redundant dependency.
+
+        For example:
+            python3 find_redundant_dependencies.py -d bietlejuice.dw_datamarts_for_sale -v 3 -c redundancies.csv
+
+            Will check for redundancies in `bietlejuice.dw_datamarts_for_sale`, print them on console with maximum detail, and write to the file redundancies.csv.
+
+            python3 find_redundant_dependencies.py -v 0 -c redundancies.csv
+            
+            Will check all DAGs for redundancies and write them to redundancies.csv.
