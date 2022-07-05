@@ -293,7 +293,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
   # tenant_prospect_status
   - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
-  - bietlejuice.ebdb:create-dw-quintoandar-fact-contract-people-in-datalake
+  - bietlejuice.dw_contract:load-quintoandar-fact-contract-people-into-redshift
   # marketing_allocated_costs, rent_flow_interactions, rental_cohort_conversions, rental_marketplace_flows, sale_performance_marketing_metrics_demand
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_house:load-quintoandar-dim-house-into-redshift
