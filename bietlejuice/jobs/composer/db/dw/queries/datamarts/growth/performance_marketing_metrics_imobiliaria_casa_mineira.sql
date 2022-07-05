@@ -36,7 +36,7 @@ costs AS (
         0.0 AS new_contact_prospects_target,
         0.0 AS new_buyer_prospect_target
     FROM datalake_casa_mineira_marketing_costs_prod.daily_costs
-    WHERE funnel_side = 'imobiliaria'
+    WHERE ((flow_type = 'automatic' AND funnel_side = 'imobiliaria') OR (flow_type = 'manual' AND funnel_side = 'demand'))
         AND DATE(NULLIF(id_date, -1)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
 ),
