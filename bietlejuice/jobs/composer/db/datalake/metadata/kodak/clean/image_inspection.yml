@@ -1,0 +1,97 @@
+---
+database_name: datalake_kodak_clean
+table_name: image_inspection
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.image_inspection.id
+  id_photo:
+    lineage:
+      - datalake_kodak_raw.image_inspection.id_photo
+  id_group:
+    lineage:
+      - datalake_kodak_raw.image_inspection.id_group
+  url:
+    lineage:
+      - datalake_kodak_raw.image_inspection.url
+  house_place:
+    lineage:
+      - datalake_kodak_raw.image_inspection.house_place
+  room_type:
+    lineage:
+      - datalake_kodak_raw.image_inspection.room_type
+  status:
+    lineage:
+      - datalake_kodak_raw.image_inspection.status
+  width:
+    lineage:
+      - datalake_kodak_raw.image_inspection.width
+  height:
+    lineage:
+      - datalake_kodak_raw.image_inspection.height
+  ratio:
+    lineage:
+      - datalake_kodak_raw.image_inspection.ratio
+  sharpness:
+    lineage:
+      - datalake_kodak_raw.image_inspection.sharpness
+  brightness:
+    lineage:
+      - datalake_kodak_raw.image_inspection.brightness
+  framing:
+    lineage:
+      - datalake_kodak_raw.image_inspection.framing
+  condition:
+    lineage:
+      - datalake_kodak_raw.image_inspection.condition
+  ordination:
+    lineage:
+      - datalake_kodak_raw.image_inspection.ordination
+  is_approved:
+    lineage:
+      - datalake_kodak_raw.image_inspection.approved
+  has_red_flag_watermark:
+    lineage:
+      - datalake_kodak_raw.image_inspection.red_flag_watermark
+  has_red_flag_compliance:
+    lineage:
+      - datalake_kodak_raw.image_inspection.red_flag_compliance
+  has_red_flag_size:
+    lineage:
+      - datalake_kodak_raw.image_inspection.red_flag_size
+  has_red_flag_sharpness:
+    lineage:
+      - datalake_kodak_raw.image_inspection.red_flag_sharpness
+  has_red_flag_not_property:
+    lineage:
+      - datalake_kodak_raw.image_inspection.red_flag_not_property
+  has_red_flag_aspect_ratio:
+    lineage:
+      - datalake_kodak_raw.image_inspection.red_flag_aspect_ratio
+  has_fault_brightness:
+    lineage:
+      - datalake_kodak_raw.image_inspection.fault_brightness
+  has_fault_sharpness:
+    lineage:
+      - datalake_kodak_raw.image_inspection.fault_sharpness
+  has_fault_aspect_ratio:
+    lineage:
+      - datalake_kodak_raw.image_inspection.fault_aspect_ratio
+  has_bonus_sharpness:
+    lineage:
+      - datalake_kodak_raw.image_inspection.bonus_sharpness
+  ts_created:
+    lineage:
+      - datalake_kodak_raw.image_inspection.created_at
+  ts_updated:
+    lineage:
+      - datalake_kodak_raw.image_inspection.updated_at
+  year:
+    lineage:
+      - datalake_kodak_raw.image_inspection.year
+  month:
+    lineage:
+      - datalake_kodak_raw.image_inspection.month
+  day:
+    lineage:
+      - datalake_kodak_raw.image_inspection.day

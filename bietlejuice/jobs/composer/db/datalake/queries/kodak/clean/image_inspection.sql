@@ -1,0 +1,38 @@
+SELECT
+    id,
+    id_photo,
+    id_group,
+    url,
+    house_place,
+    room_type,
+    status,
+    width,
+    height,
+    ratio,
+    sharpness,
+    brightness,
+    framing,
+    condition,
+    ordination,
+    approved AS is_approved,
+    red_flag_watermark AS has_red_flag_watermark,
+    red_flag_compliance AS has_red_flag_compliance,
+    red_flag_size AS has_red_flag_size,
+    red_flag_sharpness AS has_red_flag_sharpness,
+    red_flag_not_property AS has_red_flag_not_property,
+    red_flag_aspect_ratio AS has_red_flag_aspect_ratio,
+    fault_brightness AS has_fault_brightness,
+    fault_sharpness AS has_fault_sharpness,
+    fault_aspect_ratio AS has_fault_aspect_ratio,
+    bonus_sharpness AS has_bonus_sharpness,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_kodak_raw.image_inspection
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

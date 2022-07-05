@@ -4,67 +4,105 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.db import DatabaseEnum
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
-from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
-from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
+from bietlejuice.jobs.composer.pipeline import (
+    IncrementalTableLoaderPipeline,
+    FullTableLoaderPipeline,
+)
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_kodak_into_datalake"
-ALLOW_LIST = [
-    "photosphere",
-    "photosphere_aud",
-    "userrevisionentity",
-    "video",
-    "video_aud",
-]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-if __name__ == "__main__":
-    parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env")
-    parser.add_argument("datalake_bucket")
-    parser.add_argument("source")
-    args = parser.parse_args()
-    environment = args.env
-    datalake_bucket = args.datalake_bucket
-    source = args.source
 
+def parse_arguments():
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("env", type=str, help="forno/prod environment")
+    parser.add_argument("datalake_bucket", type=str)
+    parser.add_argument("source", type=str)
+    parser.add_argument("table_name", type=str)
+    parser.add_argument("execution_date", type=str)
+    parser.add_argument("extraction_type", type=str, help="incremental/full")
+    parser.add_argument(
+        "date_filter_column",
+        type=str,
+        help="If incremental, filter by this column",
+        required=False,
+        default=None,
+    )
+
+    return parser.parse_args()
+
+
+def get_conn_config():
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
+        global dbutils
         dbutils = base_dbutils.get_dbutils()
 
     conn_config_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.KODAK)
-    conn_config = json.loads(conn_config_json)
+
+    return json.loads(conn_config_json)
+
+
+def main():
+    args = parse_arguments()
+
+    config_service = ConfigurationService(args.source)
+    partition_cols = config_service.get_config("partition_cols")
+
+    logger.info(
+        f"""
+        m=__main__, environment={args.env}, source={args.source}, datalake_bucket={args.datalake_bucket},
+        execution_date={args.execution_date}, table_name={args.table_name}, extraction_type={args.extraction_type},
+        date_filter_column={args.date_filter_column}, msg=Starting spark job...
+        """
+    )
+
+    conn_config = get_conn_config()
     spark_client = SparkClient()
     postgres_consumer = PostgresConsumer(conn_config, spark_client)
-
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
-    metastore_service = SparkMetastoreService(spark_client)
-
-    # create database if not exists
-    database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
+
+    db_info = DatalakeMetastoreService.get_db_info(
+        args.env, args.source, args.datalake_bucket
+    )
+    database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
-    metastore_service.create_database(database_name)
 
-    s3_loader = S3Loader()
-    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
+    spark_metastore_service = SparkMetastoreService(spark_client)
 
-    for table_name in ALLOW_LIST:
-        df = postgres_consumer.get_data_from_table(table_name)
-        # the table names in the datalake must be lowercase
-        s3_loader.load_full_table(
-            df=df,
-            database_name=database_name,
-            table_name=table_name.lower(),
-            format_options=format_options,
-            database_location=database_location,
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    spark_metastore_service.create_database(database_name)
+
+    if args.extraction_type == "incremental":
+        df = postgres_consumer.get_incremental_data_from_table(
+            args.table_name, args.date_filter_column, args.execution_date
         )
-        spark_metastore_loader.update_metastore(
-            df, database_name, table_name.lower(), format_options, database_location
-        )
+        IncrementalTableLoaderPipeline(
+            database_name,
+            args.table_name,
+            database_location,
+            LayerEnum.RAW,
+            None,
+            partition_cols,
+        ).load_and_register(df, format_options)
+    else:
+        df = postgres_consumer.get_data_from_table(args.table_name)
+        FullTableLoaderPipeline(
+            database_name, args.table_name, database_location, LayerEnum.RAW, None
+        ).load_and_register(df, format_options)
+
+
+if __name__ == "__main__":
+    main()

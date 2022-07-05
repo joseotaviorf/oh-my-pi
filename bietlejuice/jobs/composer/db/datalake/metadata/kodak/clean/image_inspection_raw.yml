@@ -1,0 +1,13 @@
+---
+database_name: datalake_kodak_clean
+table_name: image_inspection_raw
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.image_inspection_raw.id
+  id_inspection:
+    lineage:
+      - datalake_kodak_raw.image_inspection_raw.id_inspection
+  result:
+    lineage:
+      - datalake_kodak_raw.image_inspection_raw.result

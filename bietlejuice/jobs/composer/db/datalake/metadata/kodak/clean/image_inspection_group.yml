@@ -1,0 +1,82 @@
+---
+database_name: datalake_kodak_clean
+table_name: image_inspection_group
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.id
+  id_external_domain:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.externaldomainid
+  external_domain:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.externaldomain
+  status:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.status
+  bathrooms:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.bathrooms
+  bedrooms:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.bedrooms
+  score:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.score
+  property_condition:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.property_condition
+  framing_score:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.framing_score
+  num_internal_photos:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.num_internal_photos
+  images_per_room:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.images_per_room
+  total_faults:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.total_faults
+  is_approvable:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.approvable
+  has_bonus_good_sharpness:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.bonus_good_sharpness
+  has_bonus_aspect_ratio:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.bonus_aspect_ratio
+  has_bonus_images_per_room:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.bonus_images_per_room
+  has_bonus_view:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.bonus_view
+  has_bonus_external:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.bonus_external
+  has_red_flag_images_per_room:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.red_flag_images_per_room
+  has_red_flag_property_condition:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.red_flag_property_condition
+  has_red_flag_primary_risk:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.red_flag_primary_risk
+  ts_created:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.created_at
+  ts_updated:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.updated_at
+  year:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.year
+  month:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.month
+  day:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.day

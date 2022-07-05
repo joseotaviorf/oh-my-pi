@@ -1,0 +1,19 @@
+---
+database_name: datalake_kodak_clean
+table_name: photo
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.photo.id
+  id_external_domain:
+    lineage:
+      - datalake_kodak_raw.photo.externaldomainid
+  external_domain:
+    lineage:
+      - datalake_kodak_raw.photo.externaldomain
+  metadata:
+    lineage:
+      - datalake_kodak_raw.photo.metadata
+  path:
+    lineage:
+      - datalake_kodak_raw.photo.path
