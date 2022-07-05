@@ -182,12 +182,6 @@ Produces the following output tables:
     </div>
 
 
-3. In DW:
-    - `dim_contract_person`
-    - `dim_proposal_person`
-    - `fact_contract_people`
-    - `fact_proposal_people`
-
 ### Responsible Data Engineering Team
 
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the

@@ -28,8 +28,6 @@ DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # Job params
 SOURCE = "ebdb"
-DW_SCHEMA = "quintoandar"
-DW_BUCKET = Variable.get("dw_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 # s3 path setup
@@ -79,67 +77,6 @@ dag = DAG(
         chart_url=DOC_MD_BASE_URL, dag_id=FULL_DAG_ID
     ),
 )
-
-
-def dw_tasks(table_name):
-    """
-    Mounts the DW workflow for each table.
-
-    :return: the first and last tasks from the clean workflow slice.
-    :rtype: List[str, List[str]]
-    """
-    slugged_table_name = table_name.replace("_", "-")
-    dim_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"create-dw-{DW_SCHEMA}-{slugged_table_name}-in-datalake",
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": EBDB_SPARK_JOBS_PATH + "create_dw_table_in_datalake.py",
-                "parameters": [table_name, DW_BUCKET, DW_SCHEMA, ENV, DAG_ID],
-            }
-        },
-    )
-
-    load_dim_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"load-dw-{DW_SCHEMA}-{slugged_table_name}-in-datalake",
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": EBDB_SPARK_JOBS_PATH + "load_dw_table_into_redshift.py",
-                "parameters": [
-                    SPECTRUM_IAM_ROLE,
-                    table_name,
-                    DW_BUCKET,
-                    DW_SCHEMA,
-                    ENV,
-                ],
-            }
-        },
-    )
-
-    sync_metastore_dw_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=dag,
-        task_id=f"sync-hive-metastore-dw-{slugged_table_name}-structure",
-        json={
-            "spark_python_task": {
-                "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
-                "parameters": [
-                    DW_BUCKET,
-                    LayerEnum.DW.value,
-                    DW_SCHEMA,
-                    "--table-name",
-                    table_name,
-                ],
-            }
-        },
-    )
-
-    chain(dim_table_task, [sync_metastore_dw_table_structure_task, load_dim_table_task])
-
-    return [
-        dim_table_task,
-        [load_dim_table_task, sync_metastore_dw_table_structure_task],
-    ]
 
 
 def clean_tasks(table_name):
@@ -386,7 +323,6 @@ propagate_table_lineage_task = QuintoAndarDatabricksSubmitRunOperator(
 
 raw_task_list = build_raw_task_list()
 clean_task_list = build_layer_task_list("clean")
-dw_sub_dags = build_layer_task_list("dw")
 
 # create-cluster >> downstream
 create_cluster_task >> [
@@ -410,28 +346,6 @@ polygon_region_to_datalake_raw_task >> task_list_first_task(
     clean_task_list["polygon_region"]
 )
 
-# clean >> dw
-cross_downstream(
-    task_list_last_tasks(clean_task_list.pop("proponent_proposal")),
-    [
-        task_list_first_task(dw_sub_dags["dim_proposal_person"]),
-        task_list_first_task(dw_sub_dags["fact_proposal_people"]),
-    ],
-)
-
-cross_downstream(
-    task_list_last_tasks(clean_task_list.pop("proposal")),
-    task_list_first_task(dw_sub_dags["fact_proposal_people"]),
-)
-
-cross_downstream(
-    task_list_last_tasks(clean_task_list.pop("user")),
-    [
-        task_list_first_task(dw_sub_dags["fact_contract_people"]),
-        task_list_first_task(dw_sub_dags["fact_proposal_people"]),
-    ],
-)
-
 contract_model_dependencies = []
 contract_model_dependencies.extend(
     task_list_last_tasks(clean_task_list.pop("contract"))
@@ -451,14 +365,6 @@ contract_model_dependencies.extend(
 )
 contract_model_dependencies.extend(task_list_last_tasks(clean_task_list.pop("lead")))
 
-cross_downstream(
-    contract_model_dependencies,
-    [
-        task_list_first_task(dw_sub_dags["dim_contract_person"]),
-        task_list_first_task(dw_sub_dags["fact_contract_people"]),
-    ],
-)
-
 # upstream >> terminate-cluster
 cross_downstream(
     [propagate_table_lineage_task] + task_list_last_tasks(raw_task_list),
@@ -466,7 +372,4 @@ cross_downstream(
 )
 
 for task_list in clean_task_list.values():
-    cross_downstream(task_list_last_tasks(task_list), terminate_cluster_task)
-
-for task_list in dw_sub_dags.values():
     cross_downstream(task_list_last_tasks(task_list), terminate_cluster_task)
