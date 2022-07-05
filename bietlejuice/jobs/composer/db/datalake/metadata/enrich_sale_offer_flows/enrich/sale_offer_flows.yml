@@ -80,6 +80,12 @@ columns:
   id_agent:
     lineage:
       - datalake_sales_flow.offer_specialists.id_agent
+  id_user_post_dd_specialist:
+    lineage:
+      - datalake_sales_flow.offer_specialists.id_user_post_dd_specialist
+  id_post_dd_specialist:
+    lineage:
+      - datalake_sales_flow.offer_specialists.id_post_dd_specialist
   id_pendency:
     lineage:
       - datalake_sales_flow_clean.sales_flow_pendency.id
@@ -195,6 +201,12 @@ columns:
   agent_email:
     lineage:
       - datalake_sales_flow.offer_specialists.agent_email
+  post_dd_specialist_name:
+    lineage:
+      - datalake_sales_flow.offer_specialists.post_dd_specialist_name
+  post_dd_specialist_email:
+    lineage:
+      - datalake_sales_flow.offer_specialists.post_dd_specialist_email
   closing_status:
     lineage:
       - datalake_sales_flow_clean.sales_flow.status_closing

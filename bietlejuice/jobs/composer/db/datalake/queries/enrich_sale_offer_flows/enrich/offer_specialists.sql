@@ -51,6 +51,8 @@ SELECT
     lr.id_specialist AS id_legal_risk_analyst,
     ag.id_user AS id_user_agent,
     ag.id_specialist AS id_agent,
+    pdd.id_user AS id_user_post_dd_specialist, 
+    pdd.id_specialist AS id_post_dd_specialist, 
     dm.specialist_name AS consultant_name,
     dm.email AS consultant_email,
     tl.specialist_name AS team_lead_name,
@@ -74,7 +76,9 @@ SELECT
     lr.specialist_name AS legal_risk_analyst_name,
     lr.email AS legal_risk_analyst_email,
     ag.specialist_name AS agent_name,
-    ag.email AS agent_email
+    ag.email AS agent_email, 
+    pdd.specialist_name AS post_dd_specialist_name,
+    pdd.email AS post_dd_specialist_email
 FROM
     offers_specialists AS o
 LEFT JOIN 
@@ -137,3 +141,8 @@ LEFT JOIN
     ON ag.id_sales_flow = o.id_sales_flow
     AND ag.kind = 'AGENT'
     AND ag.row = 1
+LEFT JOIN
+    last_specialist AS pdd
+    ON pdd.id_sales_flow = o.id_sales_flow
+    AND pdd.kind = 'POST_DD'
+    AND pdd.row = 1
