@@ -22,6 +22,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `performance_marketing_cluster_promotional_bonus`
 - `pricing_rent_categorization`
 - `rent_flow_interactions`
+- `rental_cohort_conversions`
 - `sale_performance_marketing_metrics_supply_coincident`
 - `tenant_prospects_activations`
 - `top_of_funnel_volumes_daily`
