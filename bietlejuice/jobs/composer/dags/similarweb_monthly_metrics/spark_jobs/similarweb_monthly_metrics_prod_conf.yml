@@ -1,6 +1,6 @@
 ---
 traffic_configs:
-  raw_partition_cols: ["date", "main_domain", "platform"]
+  raw_partition_cols: ["main_domain", "date"]
   domains:
     - quintoandar.com.br
     - loft.com.br
@@ -27,7 +27,7 @@ traffic_configs:
             - platform
 
 traffic_sources_configs:
-  raw_partition_cols: ["date", "main_domain", "platform", "source_type"]
+  raw_partition_cols: ["main_domain", "date"]
   domains:
     - quintoandar.com.br
     - loft.com.br

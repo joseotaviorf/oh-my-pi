@@ -28,7 +28,7 @@ ENV = os.environ.get("ENVIRONMENT")
 SOURCE = "similarweb_daily_metrics"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2021, 10, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "@weekly"
+MAIN_SCHEDULE_INTERVAL = "0 3 * * TUE"
 
 # Task params
 TASK_POOL = "similarweb_pool"
