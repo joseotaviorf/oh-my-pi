@@ -1052,9 +1052,9 @@ bietlejuice.dw_tracksale:
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
 
 bietlejuice.dw_user:
+# Removed dependency with enrich_ebdb_user.user, ebdb.country & state since enrich_booking already satisfies
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
-  - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
   - bietlejuice.ebdb:create-clean-pre-proposal-in-data-lake
@@ -1064,11 +1064,11 @@ bietlejuice.dw_user:
   - bietlejuice.ebdb:create-clean-bank-in-data-lake
   - bietlejuice.ebdb:create-clean-photographer-data-in-data-lake
   - bietlejuice.ebdb:create-clean-sales-rep-in-data-lake
-  - bietlejuice.enrich_booking:load-enrich-booking
-  - bietlejuice.enrich_ebdb_user:load-enrich-user
-  - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
-  - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
   - bietlejuice.enrich_amplitude_partner_taxonomy:load-enrich-amplitude-partner-taxonomy
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
+  - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
 
 bietlejuice.dw_user_affiliate:
   - bietlejuice.enrich_amplitude_user:load-enrich-user-affiliate-origin
