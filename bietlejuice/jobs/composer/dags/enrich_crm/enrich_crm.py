@@ -11,6 +11,7 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
@@ -83,23 +84,23 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-tables = config_service.get_config("tables")
-enrich_task_groups = {}
-for table, configs in tables.items():
-    partitions = configs.get("partitions")
-    extraction_type = configs.get("extraction_type")
-    extra_query_params = configs.get("extra_query_params")
-    is_incremental = extraction_type == "incremental"
+incremental_enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.ENRICH,
+    source_database_base_name=CONTEXT,
+    target_database_base_name=CONTEXT,
+    is_incremental=True,
+    partitions=["year", "month", "day"],
+    schema="incremental",
+)
 
-    enrich_task_groups[table] = datalake_task_group.build_enrich_task_group(
-        table_name=table,
-        source_database_base_name=CONTEXT,
-        target_database_base_name=CONTEXT,
-        is_incremental=is_incremental,
-        schema=extraction_type,
-        partitions=partitions,
-        extra_query_template_params=extra_query_params,
-    )
+full_enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.ENRICH,
+    source_database_base_name=CONTEXT,
+    target_database_base_name=CONTEXT,
+    schema="full",
+)
+
+enrich_task_groups = {**incremental_enrich_task_groups, **full_enrich_task_groups}
 
 chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
 chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)

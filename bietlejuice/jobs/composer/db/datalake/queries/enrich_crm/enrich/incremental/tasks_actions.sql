@@ -1,9 +1,4 @@
-WITH tasks_to_exclude AS (
-  -- Remove tasks duplicated due to a bug in the Instant Refund flow.
-  SELECT
-    EXPLODE(SPLIT(REPLACE('{tasks_to_remove}', '\n', ''), ',')) AS id_task
-),
-exploded_actions AS (
+WITH exploded_actions AS (
   SELECT
     GET_JSON_OBJECT(REPLACE(id, '$', ''),"$.oid") AS id,
     EXPLODE(FROM_JSON(REPLACE(actions,'$',''), 'ARRAY<STRING>')) AS action,
@@ -11,17 +6,13 @@ exploded_actions AS (
     month,
     day
   FROM
-      datalake_crm_clean.tasks t
-  LEFT JOIN
-      tasks_to_exclude tte
-        ON TRIM(tte.id_task) = GET_JSON_OBJECT(REPLACE(t.id, '$', ''),"$.oid")
+      datalake_crm_clean.tasks
   WHERE
     -- Filtering out bugged tasks with more than 500 actions
     SIZE(FROM_JSON(actions,'ARRAY<STRUCT<>>')) <= 500
     AND year = {year}
     AND month = {month}
     AND day = {day}
-    AND tte.id_task IS NULL
 )
 SELECT
     GET_JSON_OBJECT(action, '$._id.oid') AS id,
