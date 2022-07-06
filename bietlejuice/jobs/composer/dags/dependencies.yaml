@@ -993,7 +993,7 @@ bietlejuice.dw_sale_listings:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
 
 bietlejuice.dw_sale_offers:
-  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  # Removed dependency with datalake_ebdb_clean.house, since enrich_offer already satisfies
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.gsheets:load-clean-taxonomy-demand
