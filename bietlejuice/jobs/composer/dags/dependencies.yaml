@@ -1513,6 +1513,7 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
+  - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
   - bietlejuice.enrich_quinto_messenger:load-enrich-channel-event
   - bietlejuice.enrich_quinto_messenger:load-enrich-channel
   - bietlejuice.enrich_quinto_messenger:load-enrich-task

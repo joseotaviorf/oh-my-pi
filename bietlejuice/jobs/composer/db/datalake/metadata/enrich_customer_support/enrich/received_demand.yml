@@ -1,0 +1,58 @@
+---
+database_name: datalake_customer_support
+table_name: received_demand
+columns:
+  id_external_service:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.id_task
+      - datalake_quinto_messenger_clean.task_event.id_task_external
+  id_channel:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.metadata
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  id_task_queue:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.id_task_queue
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  id_reservation:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.id_reservation
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  id_agent:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.id_agent
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  id_event:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.id_event
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  id_call:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.id_call 
+  id_user:
+    lineage:
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
+  task_queue_name:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.task_queue_name
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  agent_email:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.id_task_external
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  agent_location:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.agent_email
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  customer_phone:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.customer_phone
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  ts_created:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_updated
+  
