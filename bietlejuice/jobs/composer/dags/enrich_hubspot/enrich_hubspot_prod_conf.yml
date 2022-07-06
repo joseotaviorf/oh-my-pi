@@ -26,7 +26,6 @@ inner_dependencies:
 tables:
   company:
     is_incremental: false
-    partition_cols: ['year', 'month', 'day']
   company_history:
     is_incremental: true
     partition_cols: ['year', 'month', 'day']
@@ -34,7 +33,6 @@ tables:
     is_incremental: false
   contact:
     is_incremental: false
-    partition_cols: ['year', 'month', 'day']
   contact_history:
     is_incremental: true
     partition_cols: ['year', 'month', 'day']
@@ -42,7 +40,6 @@ tables:
     is_incremental: false
   deal:
     is_incremental: false
-    partition_cols: ['year', 'month', 'day']
   deal_history:
     is_incremental: true
     partition_cols: ['year', 'month', 'day']
@@ -50,7 +47,6 @@ tables:
     is_incremental: false
   ticket:
     is_incremental: false
-    partition_cols: ['year', 'month', 'day']
   ticket_history:
     is_incremental: true
     partition_cols: ['year', 'month', 'day']
@@ -58,19 +54,14 @@ tables:
     is_incremental: false
   pipeline:
     is_incremental: false
-    partition_cols: ['year', 'month', 'day']
   pipeline_history:
     is_incremental: false
-    partition_cols: ['year', 'month', 'day']
   stage:
     is_incremental: false
-    partition_cols: ['year', 'month', 'day']
   stage_history:
     is_incremental: false
-    partition_cols: ['year', 'month', 'day']
   owner:
     is_incremental: false
-    partition_cols: ['year', 'month', 'day']
   owner_history:
     is_incremental: true
     partition_cols: ['year', 'month', 'day']
