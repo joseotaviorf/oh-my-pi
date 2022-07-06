@@ -1,0 +1,91 @@
+---
+database_name: datalake_itbi_clean
+table_name: itbi_sp
+columns:
+  iptu_sql_registration_number:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.n_cadastro_sql
+  house_registry_number:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.matricula_imovel
+  address_street_name:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.nome_logradouro
+  address_number:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.numero
+  address_complement:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.complemento
+  address_neighborhood:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.bairro
+  address_reference:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.referencia
+  address_zipcode:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.cep
+  transaction_nature:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.natureza_transacao
+  financing_type:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.tipo_financiamento
+  house_registry_office:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.cartorio_registro
+  iptu_sql_status:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.situacao_sql
+  iptu_use_description:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.descricao_uso_iptu
+  iptu_standard_description:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.descricao_padrao_iptu
+  declared_transaction_value:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.valor_transacao_declarado
+  reference_appraisal_value:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.valor_venal_referencia
+  transmitted_proportion:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.proporcao_transmitida
+  proportional_reference_appraisal_value:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.valor_venal_referencia_proporcional
+  adopted_calculation_basis:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.base_calculo_adotada
+  financed_value:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.valor_financiado
+  land_area_m2:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.area_terreno_m2
+  portion_public_road_land_m:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.testada_m
+  ideal_fraction:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.fracao_ideal
+  built_area_m2:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.area_construida_m2
+  iptu_use_code:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.uso_iptu
+  iptu_standard_code:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.padrao_iptu
+  iptu_registration_year:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.acc_iptu
+  dt_transaction:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.data_transacao
+  dt_load:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.dt_load
