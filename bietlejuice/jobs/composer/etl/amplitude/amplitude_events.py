@@ -1,6 +1,5 @@
 import gzip
 import io
-import os
 import zipfile
 
 from quintoandar_logger import QuintoAndarLogger
@@ -75,59 +74,5 @@ class AmplitudeEvents:
             .format_column_names()
             .convert_struct_type_to_json()
             .create_year_month_day_columns_from_dataframe_column("server_upload_time")
-            .output()
-        )
-
-    @logger
-    def create_clean_events_df(
-        self, date, spark_sql_consumer, dataframe_service, partition_by_list
-    ):
-        year, month, day = date.year, date.month, date.day
-        logger.info(
-            "m=create_clean_events_df, year={}, month={}, day={}".format(
-                year, month, day
-            )
-        )
-
-        with open(
-            os.path.join(
-                os.path.dirname(os.path.realpath(__file__)),
-                "../../db/datalake/queries/amplitude/clean_events.sql",
-            )
-        ) as f:
-            query = f.read()
-
-        table_name = "events"
-        df = spark_sql_consumer.get_data_from_query(
-            query.format(self.db_raw, table_name, year, month, day)
-        )
-
-        return (
-            dataframe_service.input(df)
-            .optimize_partitions_by_partition_columns(partition_by_list)
-            .output()
-        )
-
-    @logger
-    def create_filtered_clean_events_df(
-        self, date, event_type, spark_sql_consumer, dataframe_service
-    ):
-        table_name = "events"
-        year, month, day = date.year, date.month, date.day
-        logger.info(
-            "m=create_filtered_clean_events_df, year={}, month={}, day={}, "
-            "event_type={}".format(year, month, day, event_type)
-        )
-
-        filtered_event_df = spark_sql_consumer.get_data_from_query(
-            "select * from {}.{} where year={} and month={} and day={} and event_type "
-            "= '{}'".format(self.db_clean, table_name, year, month, day, event_type)
-        )
-
-        return (
-            dataframe_service.input(filtered_event_df)
-            .explode_json_column("user_properties", "user_", True)
-            .explode_json_column("event_properties", "event_", True)
-            .optimize_partition(AmplitudeEvents.CLEAN_RECORDS_BY_PARTITION)
             .output()
         )
