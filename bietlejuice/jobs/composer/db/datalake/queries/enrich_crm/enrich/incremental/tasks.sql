@@ -1,4 +1,9 @@
-WITH cte_tasks AS(
+WITH tasks_to_exclude AS (
+  -- Remove tasks duplicated due to a bug in the Instant Refund flow.
+  SELECT
+    EXPLODE(SPLIT(REPLACE('{tasks_to_remove}', '\n', ''), ',')) AS id_task
+),
+cte_tasks AS(
   SELECT 
     *,
     FROM_JSON(metadata,
@@ -27,11 +32,15 @@ WITH cte_tasks AS(
       destinatarioId STRING'
     ) AS json_metadata
   FROM
-    datalake_crm_clean.tasks
+    datalake_crm_clean.tasks t
+  LEFT JOIN
+    tasks_to_exclude tte
+      ON TRIM(tte.id_task) = GET_JSON_OBJECT(REPLACE(t.id, '$', ''),"$.oid")
   WHERE
     year = {year}
     AND month = {month}
     AND day = {day}
+    AND tte.id_task IS NULL
 )
 SELECT 
     GET_JSON_OBJECT(REPLACE(id, '$', ''),"$.oid") AS id,
