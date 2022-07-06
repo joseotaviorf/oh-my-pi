@@ -1,12 +1,12 @@
 /*
-In order to run these queries directly from databricks notebook you must replace double 
+In order to run these queries directly from databricks notebook you must replace double
 brackets (`{{` `}}`) for single ones.
 */
 WITH quinto_messenger_tickets AS (
   WITH last_updated_task AS (
       SELECT
-        id_task, 
-        MAX(ts_updated) AS ts_last_updated 
+        id_task,
+        MAX(ts_updated) AS ts_last_updated
       FROM datalake_quinto_messenger.task
       GROUP BY 1
   ),
@@ -24,7 +24,7 @@ WITH quinto_messenger_tickets AS (
     SELECT DISTINCT
       id_reviewed AS id_task,
       rating_selected[0] AS transference_reason
-    FROM 
+    FROM
       datalake_insider_clean.review r
     JOIN
       datalake_insider_clean.review_feature rf
@@ -43,26 +43,26 @@ WITH quinto_messenger_tickets AS (
       MIN(ts_created_local) AS ts_task_created
     FROM
       datalake_quinto_messenger.task_event
-    WHERE 
+    WHERE
       type LIKE 'reservation.%'
     GROUP BY 1
   ),
   chat_metrics AS (
-    SELECT 
+    SELECT
       id_conversation,
       COUNT(DISTINCT t.id_task) AS number_of_tasks,
       COUNT(DISTINCT task_queue_name) AS number_of_departments,
       MAX(te.ts_created_local) AS ts_last_event,
       MIN(te.ts_created_local) AS ts_first_event
-    FROM 
+    FROM
       datalake_quinto_messenger.task t
-    JOIN 
+    JOIN
       datalake_quinto_messenger.task_event te
         ON t.id_task = te.id_task
     GROUP BY 1
   ),
   task AS (
-    SELECT 
+    SELECT
       t.id_task,
       t.id_channel,
       t.id_agent,
@@ -71,12 +71,12 @@ WITH quinto_messenger_tickets AS (
       LAG(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) AS transferred_from_dept,
       LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) AS transferred_to_dept,
       CASE
-          WHEN 
-            LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) = department 
+          WHEN
+            LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) = department
             AND LEAD(t.id_agent,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) = t.id_agent
             THEN 'internal-same-agent'
-          WHEN 
-            LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) = department 
+          WHEN
+            LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) = department
             AND LEAD(t.id_agent,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) != t.id_agent
             THEN 'internal-other-agent'
           WHEN LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) != department THEN 'external'
@@ -89,7 +89,7 @@ WITH quinto_messenger_tickets AS (
       tt.ts_task_created,
       t.ts_created,
       t.ts_updated
-    FROM 
+    FROM
       datalake_quinto_messenger.task t
     JOIN
       last_updated_task lup
@@ -116,23 +116,23 @@ WITH quinto_messenger_tickets AS (
   twilio_time_metrics AS (
     SELECT
         ctm.id_conversation,
-        CASE   
-            WHEN SUM(ctm.total_talk_time) IS NULL THEN 0   
-            ELSE CAST(SUM(ctm.total_talk_time) AS FLOAT)  
+        CASE
+            WHEN SUM(ctm.total_talk_time) IS NULL THEN 0
+            ELSE CAST(SUM(ctm.total_talk_time) AS FLOAT)
         END AS total_talk_time,
-        CASE   
-            WHEN SUM(ctm.total_queue_time) IS NULL THEN 0   
-            ELSE CAST(SUM(ctm.total_queue_time) AS FLOAT)  
+        CASE
+            WHEN SUM(ctm.total_queue_time) IS NULL THEN 0
+            ELSE CAST(SUM(ctm.total_queue_time) AS FLOAT)
         END AS total_queue_time,
-        CASE   
-            WHEN SUM(ctm.total_wrap_up_time) IS NULL THEN 0   
-            ELSE CAST(SUM(ctm.total_wrap_up_time) AS FLOAT)  
+        CASE
+            WHEN SUM(ctm.total_wrap_up_time) IS NULL THEN 0
+            ELSE CAST(SUM(ctm.total_wrap_up_time) AS FLOAT)
         END AS total_wrap_up_time,
-        CASE   
-            WHEN SUM(ctm.total_handling_time) IS NULL THEN 0   
-            ELSE CAST(SUM(ctm.total_handling_time) AS FLOAT)  
+        CASE
+            WHEN SUM(ctm.total_handling_time) IS NULL THEN 0
+            ELSE CAST(SUM(ctm.total_handling_time) AS FLOAT)
         END AS total_handling_time
-    FROM 
+    FROM
         datalake_twilio_flex_insights_clean.conversation_time_metrics ctm
     GROUP BY 1
   )
@@ -183,7 +183,7 @@ WITH quinto_messenger_tickets AS (
     JOIN
       task t
         ON t.id_channel = c.id_channel
-    LEFT JOIN 
+    LEFT JOIN
       chatbot_time_metrics bot
         ON c.id_source = bot.id_session
     LEFT JOIN
@@ -218,7 +218,7 @@ zendesk_tickets_unique AS (
   GROUP BY 1
 ),
 zendesk_aditional_ticket_info AS (
-  SELECT DISTINCT 
+  SELECT DISTINCT
     tf.id_ticket,
     ftm.id_session,
     ftm.id_user,
@@ -230,6 +230,8 @@ zendesk_aditional_ticket_info AS (
     tf.group_name AS zendesk_ticket_department,
     ftm.minutes_first_resolution_calendar AS minutes_first_resolution_time_calendar,
     ftm.minutes_first_resolution_business AS minutes_first_resolution_time_business,
+    ftm.reopens,
+    ftm.replies,
     tf.request_type,
     tf.client_type,
     tf.step_tag,
@@ -261,11 +263,11 @@ chat_csat AS(
         ROW_NUMBER() OVER (PARTITION BY c.id_ticket ORDER BY sa.ts_created DESC) AS rw_number
   FROM
       datalake_chat_fup_clean.chats_chat c
-  JOIN 
-      datalake_chat_fup_clean.surveys_survey ss 
+  JOIN
+      datalake_chat_fup_clean.surveys_survey ss
           ON ss.id_chat = c.id
-  LEFT JOIN 
-      datalake_chat_fup_clean.surveys_answer sa 
+  LEFT JOIN
+      datalake_chat_fup_clean.surveys_answer sa
           ON ss.id = sa.id_survey
   WHERE
       sa.id IS NOT NULL
@@ -289,14 +291,14 @@ back_tickets AS (
       ON qmt.id_task = COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1))
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
-      ON dc.department = zd.zendesk_ticket_department 
+      ON dc.department = zd.zendesk_ticket_department
   JOIN
     zendesk_aditional_ticket_info zd2
       ON qmt.id_session = zd2.id_session
   WHERE
     (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
-    AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)) != '' 
+    AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)) != ''
   GROUP BY 1,2,3,4,5,6
 ),
 last_and_first_back_tickets_timestamps AS (
@@ -325,19 +327,19 @@ last_back_ticket AS (
       AND lt.ts_last_solved = bt.ts_solved
 ),
 first_last_department AS (
-  SELECT 
+  SELECT
     ct.id_task,
     zd.id_ticket,
     ct.id_session,
     FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) AS first_department,
     FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created DESC) AS last_department
-  FROM 
+  FROM
     quinto_messenger_tickets ct
   JOIN
     zendesk_aditional_ticket_info zd
       ON zd.id_session = ct.id_session
 )
-SELECT DISTINCT 
+SELECT DISTINCT
   ct.id_task AS id_segment,
   zd.id_ticket,
   ct.id_conversation,
@@ -354,7 +356,7 @@ SELECT DISTINCT
   cc.comment AS csat_comment,
   ct.department,
   zd.zendesk_ticket_department AS zendesk_department,
-  ldep.first_department, 
+  ldep.first_department,
   ldep.last_department,
   ct.completion_reason,
   ct.transferred_from_dept,
@@ -383,6 +385,8 @@ SELECT DISTINCT
   CAST(ct.minutes_full_resolution_time_calendar AS DOUBLE) AS minutes_full_resolution_time_calendar,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
+  zd.replies,
+  zd.reopens,
   ct.total_minutes_reception_time,
   ct.seconds_total_talk_time/60.0 AS total_minutes_talk_time,
   ct.seconds_total_queue_time/60.0 AS total_minutes_queue_time,
@@ -393,8 +397,8 @@ SELECT DISTINCT
   ct.transference_reason,
   ct.has_transfers,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot,
-  zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge, 
-  CASE 
+  zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
+  CASE
     WHEN dc.front_or_back = 'Front' THEN 'front'
     WHEN dc.front_or_back = 'Back' OR zd.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'
     ELSE 'undefined'
@@ -419,7 +423,7 @@ FROM
 JOIN
   zendesk_aditional_ticket_info zd
     ON zd.id_session = ct.id_session
-JOIN 
+JOIN
   first_last_department ldep
     ON ldep.id_session = ct.id_session
 JOIN

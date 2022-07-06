@@ -63,7 +63,7 @@ columns:
   last_department:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.queue_name
-  transferred_from_dept: 
+  transferred_from_dept:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.queue_name
   transferred_to_dept:
@@ -120,6 +120,12 @@ columns:
   minutes_first_resolution_time_business:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_business
+  replies:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnels_metrics.replies
+  reopens:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.reopens
   request_type:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
@@ -182,12 +188,12 @@ columns:
       - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
   has_transfers:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.id_reservation  
+      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
   frt:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved 
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local   
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
   last_back_ticket:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket

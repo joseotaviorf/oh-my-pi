@@ -72,6 +72,8 @@ WITH call_tickets AS (
     total_minutes_handling_time,
     total_backoffice_minutes_time,
     total_minutes_front_to_open_back_ticket_time,
+    replies,
+    reopens,
     NULL AS csat_comment,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
@@ -81,7 +83,7 @@ WITH call_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
 ),
 chat_tickets AS (
   SELECT
@@ -157,6 +159,8 @@ chat_tickets AS (
     total_minutes_handling_time,
     total_backoffice_minutes_time,
     total_minutes_front_to_open_back_ticket_time,
+    replies,
+    reopens,
     csat_comment,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
@@ -166,7 +170,7 @@ chat_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
 ),
 email_tickets AS (
   SELECT
@@ -241,6 +245,8 @@ email_tickets AS (
     NULL AS total_minutes_handling_time,
     total_backoffice_minutes_time,
     total_minutes_front_to_open_back_ticket_time,
+    replies,
+    reopens,
     csat_comment,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
@@ -250,7 +256,7 @@ email_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.email
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
 ),
 historical_call_tickets AS (
   SELECT
@@ -299,6 +305,8 @@ historical_call_tickets AS (
     NULL AS total_minutes_handling_time,
     NULL AS total_backoffice_minutes_time,
     NULL AS total_minutes_front_to_open_back_ticket_time,
+    NULL AS replies,
+    NULL AS reopens,
     NULL AS csat_comment,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
@@ -308,7 +316,7 @@ historical_call_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.historical_call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
 ),
 historical_chat_tickets AS (
   SELECT
@@ -382,6 +390,8 @@ historical_chat_tickets AS (
     NULL AS total_minutes_handling_time,
     NULL AS total_backoffice_minutes_time,
     NULL AS total_minutes_front_to_open_back_ticket_time,
+    NULL AS replies,
+    NULL AS reopens,
     NULL AS csat_comment,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
@@ -391,7 +401,7 @@ historical_chat_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.historical_chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
 ),
 base_tickets AS (
   SELECT
@@ -429,12 +439,12 @@ fcr_customer AS (
     FROM
       datalake_customer_resolution.customer_resolution_static
   )
-  SELECT 
+  SELECT
     sk_main_session,
     CAST(ticket_recontact_list[FIND_IN_SET(recontact_ticket, CONCAT_WS(',',ticket_recontact_list))] AS BIGINT) AS sk_next_ticket,
     recontact_ticket,
     is_fcr_customer
-  FROM 
+  FROM
     base_fcr
 )
 SELECT
@@ -490,6 +500,8 @@ SELECT
     bt.total_minutes_handling_time,
     bt.total_backoffice_minutes_time,
     bt.total_minutes_front_to_open_back_ticket_time,
+    bt.replies,
+    bt.reopens,
     SUBSTR(bt.csat_comment,1,1000) AS csat_comment,
     bt.ts_started,
     bt.ts_closed,

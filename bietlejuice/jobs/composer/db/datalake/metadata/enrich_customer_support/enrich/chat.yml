@@ -136,6 +136,12 @@ columns:
   minutes_first_resolution_time_business:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_business
+  replies:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.replies
+  reopens:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.reopens
   total_minutes_talk_time:
     lineage:
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time

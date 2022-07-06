@@ -1,5 +1,5 @@
 /*
-In order to run these queries directly from databricks notebook you must replace double 
+In order to run these queries directly from databricks notebook you must replace double
 brackets (`{{` `}}`) for single ones.
 */
 WITH segment AS (
@@ -46,7 +46,7 @@ WITH segment AS (
     SELECT DISTINCT
       id_reviewed AS id_reservation,
       rating_selected[0] AS transference_reason
-    FROM 
+    FROM
       datalake_insider_clean.review r
     JOIN
       datalake_insider_clean.review_feature rf
@@ -74,13 +74,13 @@ WITH segment AS (
     LAG(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) AS transferred_from_dept,
     LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) AS transferred_to_dept,
     CASE
-        WHEN 
-          LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) = queue_name 
-          AND LEAD(id_queue,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) = id_queue 
+        WHEN
+          LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) = queue_name
+          AND LEAD(id_queue,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) = id_queue
           THEN 'internal-same-agent'
-        WHEN 
-          LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) = queue_name 
-          AND LEAD(id_queue,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) != id_queue 
+        WHEN
+          LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) = queue_name
+          AND LEAD(id_queue,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) != id_queue
           THEN 'internal-other-agent'
         WHEN LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) != queue_name THEN 'external'
     END AS transference_type,
@@ -159,7 +159,7 @@ conversation AS (
             GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') IS NULL
             OR GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') <> 'true'
             OR (
-                  GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') = 'true' 
+                  GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') = 'true'
                   AND GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.conversations.conversation_attribute_1') = 2
             )
           )
@@ -198,23 +198,23 @@ conversation AS (
   twilio_time_metrics AS (
       SELECT
           ctm.id_segment,
-          CASE   
-              WHEN SUM(ctm.total_talk_time) IS NULL THEN 0   
-              ELSE CAST(SUM(ctm.total_talk_time) AS FLOAT)  
+          CASE
+              WHEN SUM(ctm.total_talk_time) IS NULL THEN 0
+              ELSE CAST(SUM(ctm.total_talk_time) AS FLOAT)
           END AS total_talk_time,
-          CASE   
-              WHEN SUM(ctm.total_queue_time) IS NULL THEN 0   
-              ELSE CAST(SUM(ctm.total_queue_time) AS FLOAT)  
+          CASE
+              WHEN SUM(ctm.total_queue_time) IS NULL THEN 0
+              ELSE CAST(SUM(ctm.total_queue_time) AS FLOAT)
           END AS total_queue_time,
-          CASE   
-              WHEN SUM(ctm.total_wrap_up_time) IS NULL THEN 0   
-              ELSE CAST(SUM(ctm.total_wrap_up_time) AS FLOAT)  
+          CASE
+              WHEN SUM(ctm.total_wrap_up_time) IS NULL THEN 0
+              ELSE CAST(SUM(ctm.total_wrap_up_time) AS FLOAT)
           END AS total_wrap_up_time,
-          CASE   
-              WHEN SUM(ctm.total_handling_time) IS NULL THEN 0   
-              ELSE CAST(SUM(ctm.total_handling_time) AS FLOAT)  
+          CASE
+              WHEN SUM(ctm.total_handling_time) IS NULL THEN 0
+              ELSE CAST(SUM(ctm.total_handling_time) AS FLOAT)
           END AS total_handling_time
-      FROM 
+      FROM
           datalake_twilio_flex_insights_clean.conversation_time_metrics ctm
       GROUP BY 1
   )
@@ -251,7 +251,7 @@ conversation AS (
   FULL JOIN
       call_events fe
           ON fe.id_call = ie.id_call
-  LEFT JOIN 
+  LEFT JOIN
       datalake_bigfone_twilio.call_flex_events cfe
           ON fe.id_task = cfe.id_task
   LEFT JOIN
@@ -276,7 +276,7 @@ zendesk_tickets_unique AS (
   GROUP BY 1
 ),
 zendesk_aditional_ticket_info AS (
-  SELECT DISTINCT 
+  SELECT DISTINCT
     tf.id_ticket,
     ftm.id_call,
     ftm.id_user,
@@ -288,6 +288,8 @@ zendesk_aditional_ticket_info AS (
     tf.group_name AS zendesk_ticket_department,
     ftm.minutes_first_resolution_calendar AS minutes_first_resolution_time_calendar,
     ftm.minutes_first_resolution_business AS minutes_first_resolution_time_business,
+    ftm.replies,
+    ftm.reopens,
     tf.request_type,
     tf.client_type,
     tf.step_tag,
@@ -304,7 +306,7 @@ zendesk_aditional_ticket_info AS (
       ON tf.id_ticket = ftm.id_ticket
 ),
 back_tickets AS (
-  SELECT 
+  SELECT
     COALESCE(
       NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
       REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)
@@ -321,14 +323,14 @@ back_tickets AS (
       ON c.id_task = COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1))
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
-      ON dc.department = zd.zendesk_ticket_department 
-  JOIN  
+      ON dc.department = zd.zendesk_ticket_department
+  JOIN
     zendesk_aditional_ticket_info zd2
       ON zd2.id_call = c.sk_call
-  WHERE 
+  WHERE
     (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
-    AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)) != '' 
+    AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)) != ''
   GROUP BY 1,2,3,4,5,6
 ),
 last_and_first_back_tickets_timestamps AS (
@@ -357,7 +359,7 @@ last_back_ticket AS (
       AND lt.ts_last_solved = bt.ts_solved
 ),
 conversation_and_segment AS (
-  SELECT 
+  SELECT
     c.id_task AS id_external_service,
     t.id_reservation,
     c.id_call,
@@ -403,14 +405,14 @@ conversation_and_segment AS (
     t.ts_twilio_closed_local,
     c.ts_started,
     c.ts_ended
-  FROM 
+  FROM
     conversation c
-  JOIN 
+  JOIN
     segment t
       ON t.sk_call = c.sk_call
       AND t.id_task = c.id_task
 )
-SELECT DISTINCT 
+SELECT DISTINCT
   zd.id_ticket,
   c.id_external_service,
   c.id_reservation AS id_segment,
@@ -455,6 +457,8 @@ SELECT DISTINCT
   c.direction,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
+  zd.replies,
+  zd.reopens,
   zd.request_type,
   zd.client_type,
   zd.step_tag,
@@ -468,9 +472,9 @@ SELECT DISTINCT
   FIRST(c.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local DESC) = c.id_reservation AS is_last_segment,
   FIRST(c.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local ASC) = c.id_reservation AS is_first_segment,
   bt.front_ticket IS NOT NULL AS has_back_tickets,
-  zd.tags LIKE '%bot_end_conversation%' AS is_bot, 
+  zd.tags LIKE '%bot_end_conversation%' AS is_bot,
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
-  CASE 
+  CASE
     WHEN dc.front_or_back = 'Front' THEN 'front'
     WHEN dc.front_or_back = 'Back' OR zd.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'
     ELSE 'undefined'
@@ -491,17 +495,17 @@ SELECT DISTINCT
   c.ts_twilio_closed_local AS ts_segment_closed,
   c.ts_started AS ts_ticket_started,
   c.ts_ended AS ts_ticket_ended
-FROM 
+FROM
   conversation_and_segment c
-JOIN 
-  zendesk_aditional_ticket_info zd 
+JOIN
+  zendesk_aditional_ticket_info zd
     ON zd.id_call = c.sk_call
 JOIN
   zendesk_tickets_unique ztu
     ON zd.id_ticket = ztu.id_ticket
 LEFT JOIN
   datalake_gsheets_clean.department_control dc
-    ON dc.department = c.last_department  
+    ON dc.department = c.last_department
 LEFT JOIN
   last_back_ticket bt
     ON bt.front_ticket = zd.id_ticket

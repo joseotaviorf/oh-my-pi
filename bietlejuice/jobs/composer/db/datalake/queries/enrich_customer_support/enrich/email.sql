@@ -1,17 +1,17 @@
 /*
-In order to run these queries directly from databricks notebook you must replace double 
+In order to run these queries directly from databricks notebook you must replace double
 brackets (`{{` `}}`) for single ones.
 */
 WITH zendesk_email AS (
   WITH last_update_ticket AS (
-    SELECT 
-      id_ticket, 
-      MAX(ts_updated) AS ts_last_updated 
-    FROM 
+    SELECT
+      id_ticket,
+      MAX(ts_updated) AS ts_last_updated
+    FROM
       datalake_zendesk_tickets_clean.tickets
     GROUP BY 1
   )
-  SELECT DISTINCT 
+  SELECT DISTINCT
     t.id_ticket,
     t.id_requester,
     t.id_assignee AS id_agent,
@@ -44,6 +44,8 @@ WITH zendesk_email AS (
     tfm.minutes_requester_wait_business AS minutes_first_response,
     tfm.minutes_full_resolution_calendar AS minutes_full_resolution_time_calendar,
     tfm.minutes_full_resolution_business AS minutes_full_resolution_time_business,
+    tfm.reopens,
+    tfm.replies,
     tfm.ts_initially_assigned_local,
     tfm.ts_last_assigned_local,
     tfm.ts_created_local AS ts_ticket_started,
@@ -73,10 +75,10 @@ WITH zendesk_email AS (
 ),
 csat AS (
     WITH last_update_ticket AS (
-      SELECT 
-        id_ticket, 
-        MAX(ts_updated) AS ts_last_updated 
-      FROM 
+      SELECT
+        id_ticket,
+        MAX(ts_updated) AS ts_last_updated
+      FROM
         datalake_zendesk_tickets_clean.tickets
       GROUP BY 1
     )
@@ -148,8 +150,8 @@ back_tickets AS (
     zendesk_email
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
-      ON dc.department = zendesk_email.department 
-  WHERE 
+      ON dc.department = zendesk_email.department
+  WHERE
     (tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (tags NOT LIKE '%bot_end_conversation%' AND tags NOT LIKE '%closed_by_merge%')
     AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),REGEXP_EXTRACT(SUBSTRING(SPLIT(REGEXP_REPLACE(description, 'WT[a-z0-9]{{20,40}}',''), 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)) != ''
@@ -179,7 +181,7 @@ last_back_ticket AS (
       ON lt.front_ticket = bt.front_ticket
       AND lt.ts_last_solved = bt.ts_ticket_solved
 )
-SELECT DISTINCT 
+SELECT DISTINCT
   ze.id_ticket,
   ze.id_requester,
   ze.id_agent,
@@ -189,7 +191,7 @@ SELECT DISTINCT
   ze.agent_company,
   ze.agent_manager,
   ze.agent_email,
-  CASE 
+  CASE
     WHEN ze.tags LIKE '%"ticket_ativo"%' THEN 'outbound'
     ELSE 'inbound'
   END AS direction,
@@ -200,6 +202,8 @@ SELECT DISTINCT
   CAST(ze.minutes_full_resolution_time_calendar AS DOUBLE) AS minutes_full_resolution_time_calendar,
   ze.minutes_full_resolution_time_business,
   ze.minutes_first_response,
+  ze.replies,
+  ze.reopens,
   cs.csat_score,
   cs.is_answered,
   cs.is_solved,
@@ -215,9 +219,9 @@ SELECT DISTINCT
   ze.contact_theme_tag,
   ze.contact_theme_detail_tag,
   bt.front_ticket IS NOT NULL AS has_back_tickets,
-  ze.tags LIKE '%bot_end_conversation%' AS is_bot, 
+  ze.tags LIKE '%bot_end_conversation%' AS is_bot,
   ze.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
-  CASE 
+  CASE
     WHEN dc.front_or_back = 'Front' THEN 'front'
     WHEN dc.front_or_back = 'Back' OR ze.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'
     ELSE 'undefined'
@@ -237,7 +241,7 @@ SELECT DISTINCT
   ze.ts_ticket_started,
   ze.ts_ticket_solved,
   ze.ts_ticket_ended
-FROM 
+FROM
   zendesk_email ze
 LEFT JOIN
   datalake_gsheets_clean.department_control dc
@@ -249,7 +253,7 @@ LEFT JOIN
 LEFT JOIN
   last_back_ticket bt
     ON bt.front_ticket = ze.id_ticket
-WHERE 
+WHERE
   ze.channel IN ('email', 'form_faq', 'web', 'other')
   -- emails with the tags below are not new demands or automatically closed, therefore, they should not be considered
   AND ze.tags NOT LIKE '%resolve_ticket_acompanhamento%'

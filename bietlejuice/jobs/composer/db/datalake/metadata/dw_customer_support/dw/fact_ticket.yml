@@ -292,6 +292,16 @@ columns:
       - datalake_customer_support.call.total_minutes_front_to_open_back_ticket_time
       - datalake_customer_support.chat.total_minutes_front_to_open_back_ticket_time
       - datalake_customer_support.email.total_minutes_front_to_open_back_ticket_time
+  replies:
+    lineage:
+      - datalake_customer_support.call.replies
+      - datalake_customer_support.chat.replies
+      - datalake_customer_support.email.replies
+  reopens:
+    lineage:
+      - datalake_customer_support.call.reopens
+      - datalake_customer_support.chat.reopens
+      - datalake_customer_support.email.reopens
   csat_comment:
     lineage:
       - datalake_customer_support.email.csat_comment

@@ -1,7 +1,7 @@
 database_name: datalake_customer_support
 table_name: email
 columns:
-  id_ticket: 
+  id_ticket:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.id_ticket
   id_requester:
@@ -53,6 +53,12 @@ columns:
   minutes_first_response:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_requester_wait_business
+  replies:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.replies
+  reopens:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.reopens
   csat_score:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
