@@ -11,6 +11,7 @@
 
 growth_cross:
   affiliate_acquisition_metrics: {} # depends on: - affiliates_clusters
+  affiliates_clusters: {}
   daily_target_volumes_supply: {}
   efficiency_monitor_rental: {} # depends on: - marketing_demand_supply_branding_costs
   efficiency_monitor_sale: {} # - marketing_demand_supply_branding_costs
