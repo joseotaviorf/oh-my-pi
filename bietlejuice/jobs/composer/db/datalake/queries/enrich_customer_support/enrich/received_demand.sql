@@ -109,7 +109,6 @@ chat AS (
         ON ce.id_external_service = te.id_external_service
     WHERE
       GET_JSON_OBJECT(te.conversations, '$.conversation_attribute_2') = true
-      AND GET_JSON_OBJECT(te.conversations, '$.conversation_measure_1') IS NOT NULL
   ),
   customer_identification AS (
     SELECT
