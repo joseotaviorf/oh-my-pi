@@ -2,12 +2,6 @@
 database_name: datalake_online_attribution
 table_name: online_attribution
 columns:
-  event_type:
-    lineage:
-      - datalake_online_attribution.events_exploded.event_type
-  ts_event:
-    lineage:
-      - datalake_online_attribution.events_exploded.ts_event
   id_user:
     lineage:
       - datalake_online_attribution.events_exploded.id_user
@@ -27,12 +21,15 @@ columns:
   visit_code:
     lineage:
       - datalake_online_attribution.events_exploded.visit_code
-  entrance_uri:
+  amplitude_platform:
     lineage:
-      - datalake_online_attribution.events_exploded.entrance_uri
-  uri_event_property:
+      - datalake_online_attribution.events_exploded.amplitude_platform
+  event_type_sanitized:
     lineage:
-      - datalake_online_attribution.events_exploded.uri_event_property
+      - datalake_online_attribution.event_type_sanitized
+  web_gclid:
+    lineage:
+      - datalake_online_attribution.events_exploded.gclid
   web_medium:
     lineage:
       - datalake_online_attribution.events_exploded.web_medium
@@ -48,21 +45,9 @@ columns:
   web_term:
     lineage:
       - datalake_online_attribution.events_exploded.web_term
-  web_last_medium:
+  web_platform:
     lineage:
-      - datalake_online_attribution.events_exploded.web_last_medium
-  web_last_source:
-    lineage:
-      - datalake_online_attribution.events_exploded.web_last_source
-  web_last_campaign:
-    lineage:
-      - datalake_online_attribution.events_exploded.web_last_campaign
-  web_last_content:
-    lineage:
-      - datalake_online_attribution.events_exploded.web_last_content
-  web_last_term:
-    lineage:
-      - datalake_online_attribution.events_exploded.web_last_term
+      - datalake_online_attribution.events_exploded.web_platform
   adjust_adgroup:
     lineage:
       - datalake_online_attribution.events_exploded.adjust_adgroup
@@ -72,55 +57,45 @@ columns:
   adjust_creative:
     lineage:
       - datalake_online_attribution.events_exploded.adjust_creative
-  adjust_impression_based:
+  adjust_reattributed_at:
     lineage:
-      - datalake_online_attribution.events_exploded.adjust_impression_based
-  adjust_installed_at:
-    lineage:
-      - datalake_online_attribution.events_exploded.adjust_installed_at
-  adjust_is_organic:
-    lineage:
-      - datalake_online_attribution.events_exploded.adjust_is_organic
+      - datalake_online_attribution.events_exploded.adjust_reattributed_at
   adjust_network:
     lineage:
       - datalake_online_attribution.events_exploded.adjust_network
+  app_platform:
+    lineage:
+      - datalake_online_attribution.events_exploded.app_platform
   platform:
     lineage:
-      - datalake_online_attribution.events_exploded.platform
+      - datalake_online_attribution.events_exploded.web_platform
+      - datalake_online_attribution.events_exploded.app_platform
+  utm_source:
+    lineage:
+      - datalake_online_attribution.events_exploded.web_source
+      - datalake_online_attribution.events_exploded.adjust_network
+  utm_medium:
+    lineage:
+      - datalake_online_attribution.events_exploded.web_medium
+      - datalake_online_attribution.events_exploded.adjust_campaign
+  utm_campaign:
+    lineage:
+      - datalake_online_attribution.events_exploded.web_campaign
+      - datalake_online_attribution.events_exploded.adjust_campaign
+  utm_term:
+    lineage:
+      - datalake_online_attribution.events_exploded.web_term
+      - datalake_online_attribution.events_exploded.adjust_creative
+  utm_content:
+    lineage:
+      - datalake_online_attribution.events_exploded.web_content
+      - datalake_online_attribution.events_exploded.adjust_adgroup
+  ts_event:
+    lineage:
+      - datalake_online_attribution.events_exploded.ts_event
   ts_web_attribution:
     lineage:
       - datalake_online_attribution.events_exploded.ts_event
-  app_source:
-    lineage:
-      - datalake_online_attribution.events_exploded.adjust_network
   ts_app_attribution:
     lineage:
       - datalake_online_attribution.events_exploded.ts_event
-  utm_source:
-    lineage:
-      - datalake_online_attribution.events_exploded.app_source
-      - datalake_online_attribution.events_exploded.web_source
-  utm_medium:
-    lineage:
-      - datalake_online_attribution.events_exploded.app_medium
-      - datalake_online_attribution.events_exploded.web_medium
-  branded:
-    lineage:
-      - datalake_online_attribution.events_exploded.app_branded
-      - datalake_online_attribution.events_exploded.web_branded
-  media_source:
-    lineage:
-      - datalake_online_attribution.events_exploded.web_source
-      - datalake_online_attribution.events_exploded.adjust_network
-  utm_campaign:
-    lineage:
-      - datalake_online_attribution.events_exploded.adjust_campaign
-      - datalake_online_attribution.events_exploded.web_campaign
-  utm_term:
-    lineage:
-      - datalake_online_attribution.events_exploded.adjust_creative
-      - datalake_online_attribution.events_exploded.web_term
-  utm_content:
-    lineage:
-      - datalake_online_attribution.events_exploded.adjust_adgroup
-      - datalake_online_attribution.events_exploded.web_content
