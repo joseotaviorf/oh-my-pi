@@ -144,7 +144,7 @@ UNION ALL
 
 SELECT
   id_user,
-  COALESCE(id_user,email,id_contact_submission) AS id_contact,
+  COALESCE(id_user,user_email,id_contact_submission) AS id_contact,
   'Contact' AS event_name,
   cs.origin AS origin,
   'demand-contact-submission' AS channel,
