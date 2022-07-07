@@ -1,9 +1,9 @@
 import os
+import yaml
+
 from typing import Union
-
-import pconf
+from collections.abc import Mapping
 from quintoandar_logger import QuintoAndarLogger
-
 from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
 
 logger = QuintoAndarLogger("ConfigurationService")
@@ -16,6 +16,17 @@ class ConfigurationService:
     `general` scope as the lowest priority rule and `DAG` or `Spark Job` scopes as the
     highest ones. The environment affects the selection of each variable as well, requiring
     all variables to be replicated in each environment in order to be retrieved and used.
+    To override the configuration variables defined in the general scope, we just need
+    to use the same key, nested or not, in the DAG or Spark Job scope. For example:
+
+    ---
+    custom_cluster:
+        driver_node_type_id: m5a.xlarge
+        node_type_id: m5a.xlarge
+        autoscale:
+            max_workers: 4
+            min_workers: 2
+
     """
 
     VALID_ENVIRONMENTS = ["forno", "prod"]
@@ -108,16 +119,16 @@ class ConfigurationService:
         configuration_files = []
 
         if self._dag_name:
-            if self._config_file_exists(self._dag_configuration_file):
-                configuration_files.append(self._dag_configuration_file)
-
             if self._config_file_exists(self._spark_job_configuration_file):
                 configuration_files.append(self._spark_job_configuration_file)
+
+            if self._config_file_exists(self._dag_configuration_file):
+                configuration_files.append(self._dag_configuration_file)
 
             if inverse_file_config_order:
                 configuration_files = configuration_files[::-1]
 
-        configuration_files.append(self._general_configuration_file)
+        configuration_files.insert(0, self._general_configuration_file)
         return configuration_files
 
     def _config_file_exists(self, config_file_path: str) -> bool:
@@ -136,18 +147,48 @@ class ConfigurationService:
             return False
         return True
 
+    @staticmethod
+    def _read_configuration(conf_path) -> dict:
+        """
+        Read the configuration file and return the contents as a dictionary.
+
+        :param conf_path: path to the configuration file
+        :return: the contents of the configuration file as a dictionary
+        """
+        with open(conf_path) as f:
+            return yaml.safe_load(f)
+
+    def _deep_update(self, source, overrides):
+        """
+        Update a nested dictionary or similar mapping.
+        Modify ``source`` in place.
+
+        :param source: the nested dictionary to update
+        :param overrides: the dictionary with overrides
+        :return: the updated dictionary
+        """
+        for key, value in overrides.items():
+            if isinstance(value, Mapping) and value:
+                returned = self._deep_update(source.get(key, {}), value)
+                source[key] = returned
+            else:
+                source[key] = overrides[key]
+        return source
+
     def _load_configurations_from_files(self) -> dict:
         """
         Gets the configurations from the yaml files
 
         :returns: A dictionary with all configs
         """
-        pconf.Pconf.clear()
 
-        for file_path in self._configuration_files:
-            pconf.Pconf.file(file_path, encoding="yaml")
+        configs = {}
 
-        return pconf.Pconf.get()
+        for config_file in self._configuration_files:
+            conf_content = self._read_configuration(config_file)
+            configs = self._deep_update(configs, conf_content)
+
+        return configs
 
     @property
     def configs(self) -> dict:

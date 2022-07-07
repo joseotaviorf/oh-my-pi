@@ -38,7 +38,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-cluster_description = config_service.get_config("cluster")
+cluster_description = config_service.get_config("custom_cluster")
 default_libraries = config_service.get_config("default_libraries")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [

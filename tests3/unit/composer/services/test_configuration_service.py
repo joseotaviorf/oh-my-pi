@@ -2,6 +2,7 @@ import os
 
 import mock
 import pytest
+
 from mock import call
 
 from bietlejuice.jobs.composer.services.configuration_service import (
@@ -116,7 +117,7 @@ class TestConfigurationService:
         self, mocked__config_file_exists, configuration_service
     ):
         # arrange
-        mocked__config_file_exists.side_effect = [True, False]
+        mocked__config_file_exists.side_effect = [False, True]
 
         inverse_file_config_order = False
         configuration_service._dag_name = "dag"
@@ -129,7 +130,7 @@ class TestConfigurationService:
             mocked_general_conf_file_path
         )
 
-        expected_files = [mocked_dag_conf_file_path, mocked_general_conf_file_path]
+        expected_files = [mocked_general_conf_file_path, mocked_dag_conf_file_path]
 
         # act
         returned_files = configuration_service._get_configuration_files(
@@ -144,7 +145,7 @@ class TestConfigurationService:
         self, mocked__config_file_exists, configuration_service
     ):
         # arrange
-        mocked__config_file_exists.side_effect = [False, True]
+        mocked__config_file_exists.side_effect = [True, False]
 
         inverse_file_config_order = False
         configuration_service._dag_name = "dag"
@@ -160,8 +161,8 @@ class TestConfigurationService:
         )
 
         expected_files = [
-            mocked_spark_job_conf_file_path,
             mocked_general_conf_file_path,
+            mocked_spark_job_conf_file_path,
         ]
 
         # act
@@ -196,9 +197,9 @@ class TestConfigurationService:
         )
 
         expected_files = [
-            mocked_spark_job_conf_file_path,
-            mocked_dag_conf_file_path,
             mocked_general_conf_file_path,
+            mocked_dag_conf_file_path,
+            mocked_spark_job_conf_file_path,
         ]
 
         # act
@@ -255,24 +256,50 @@ class TestConfigurationService:
         assert returned_value is True
         mocked_isfile.assert_called_once_with(config_file_path)
 
-    @mock.patch("bietlejuice.jobs.composer.services.configuration_service.pconf")
-    def test__load_configurations_from_files(self, mocked_pconf, configuration_service):
+    @mock.patch.object(ConfigurationService, "_read_configuration")
+    def test_read_configuration(self, mocked_read_configuration, configuration_service):
+        # arrange
+        result = "mock str"
+        mocked_read_configuration.return_value = result
+
+        # act
+        returned_result = configuration_service._read_configuration()
+
+        # assert
+        assert result == returned_result
+
+    @pytest.mark.parametrize(
+        "source, overrides, result",
+        [
+            ({}, {"a": 1}, {"a": 1}),
+            ({"a": {"b": 1}}, {"a": {"b": 2}}, {"a": {"b": 2}}),
+            ({"a": 1}, {"b": 2}, {"a": 1, "b": 2}),
+        ],
+    )
+    def test_deep_update(self, configuration_service, source, overrides, result):
+        # act
+        returned_result = configuration_service._deep_update(source, overrides)
+
+        # assert
+        assert result == returned_result
+
+    @mock.patch.object(ConfigurationService, "_read_configuration")
+    def test_load_configurations_from_files(
+        self, mocked_read_configuration, configuration_service
+    ):
         # arrange
         configuration_service._configuration_files = ["a", "b", "c"]
 
         # act
         configuration_service._load_configurations_from_files()
 
-        # asert
-        mocked_pconf.Pconf.clear.assert_called_once_with()
-        mocked_pconf.Pconf.file.assert_has_calls(
-            [
-                call("a", encoding="yaml"),
-                call("b", encoding="yaml"),
-                call("c", encoding="yaml"),
-            ]
-        )
-        mocked_pconf.Pconf.get.assert_called_once_with()
+        # assert
+
+        assert configuration_service._read_configuration.call_args_list == [
+            call("a"),
+            call("b"),
+            call("c"),
+        ]
 
     def test_configs(self, configuration_service):
         # arrange
