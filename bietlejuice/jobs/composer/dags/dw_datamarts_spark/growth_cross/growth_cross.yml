@@ -20,6 +20,7 @@ growth_cross:
   marketing_campaigns_costs_and_volumes: {}
   performance_marketing_cluster_promotional_bonus: {} # depends_on: - affiliates_clusters
   performance_marketing_cluster_promotional_bonus_costs: {} # depends_on : - performance_marketing_cluster_promotional_bonus - affiliates_clusters
+  performance_marketing_metrics: {} # depends_on: - tenant_prospect_status
   pricing_rent_categorization: {} # depends_on: - performance_marketing_metrics_demand
   rent_flow_interactions: {}
   rental_cohort_conversions: {}
