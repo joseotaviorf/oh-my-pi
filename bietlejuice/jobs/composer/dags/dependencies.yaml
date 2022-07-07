@@ -88,14 +88,14 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.terminator:create-clean-utility-bill-external-table
 
 bietlejuice.dw_datamarts_for_rent_cross:
-# Removed dependency from dw_datamarts_cross.talk_to_agent because dw_datamarts_cross.funnel_demand_flows already satisfies;
-# Removed dependency from dw_datamarts_cross.quintoandar_consultant_listings since dw_datamarts_cross.lead_listing_flows already satisfies;
-# Removed dependency from dw_booking.dim_booking, dw_listing.dim_house_listing, dw_offer.dim_offer, dw_user.dim_partner, dw_region.dim_region,
-#  dw_rent_flow.fact_listing_rent_flows, dw_rent_listing_flow.fact_house_listing_flows since dw_datamarts_cross already satisfies;
+  # Removed dependency from dw_datamarts_cross.talk_to_agent because dw_datamarts_cross.funnel_demand_flows already satisfies;
+  # Removed dependency from dw_datamarts_cross.quintoandar_consultant_listings since dw_datamarts_cross.lead_listing_flows already satisfies;
+  # Removed dependency from dw_booking.dim_booking, dw_listing.dim_house_listing, dw_offer.dim_offer, dw_user.dim_partner, dw_region.dim_region,
+  #  dw_rent_flow.fact_listing_rent_flows, dw_rent_listing_flow.fact_house_listing_flows since dw_datamarts_cross already satisfies;
   - bietlejuice.dw_datamarts_cross:create-funnel-demand-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
-#  - bietlejuice.dw_datamarts_cross:create-quintoandar-consultant-listings-in-datalake
-#  - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
+  #  - bietlejuice.dw_datamarts_cross:create-quintoandar-consultant-listings-in-datalake
+  #  - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_proposal:load-dw-public-dim-proposal
   - bietlejuice.ebdb:create-proponent-proposal-clean-external-table
@@ -609,7 +609,6 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
 #   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
 
-
 # bietlejuice.dw_datamarts_spark.fintech_cross:
 # Removed dependency with dw_region in order to avoid loopings since dw_datamarts.cross already satisfies
 #   - bietlejuice.dw_contract:load-dw-public-dim-contract
@@ -690,6 +689,7 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.gsheets.growth:load-clean-rental-tof-daily-targets
 #   - bietlejuice.dw_region:load-dw-public-dim-region
 # Removed dependency with dw_region in order to avoid loopings since dw_datamarts.cross already satisfies
+# #tenant_prospect_status
 #   - bietlejuice.dw_contract:load-dw-public-dim-contract
 #   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 #   - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
@@ -705,12 +705,15 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
 #   - bietlejuice.dw_listing:load-public-fact-house-listings
 #   - bietlejuice.dw_offer:load-dw-public-dim-offer
+# tenant_prospect_status
 #   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
 #efficiency-monitor-sale
 #  #tenant_prospects_activations (ignored dim_region and dim_contract dependencies since it's above):
+#  #tenant_prospect_status
 #   - bietlejuice.ebdb:load-dw-quintoandar-fact-contract-people-in-datalake
 #  #efficiency-monitor-sale
 #   - bietlejuice.casa_mineira_crm.propagate-table-metadata-clean-house-exclusivity
+#  #tenant_prospect_status
 #   - bietlejuice.dw_region:load-dw-public-dim-region
 #   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
 #   - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
@@ -1052,7 +1055,7 @@ bietlejuice.dw_tracksale:
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
 
 bietlejuice.dw_user:
-# Removed dependency with enrich_ebdb_user.user, ebdb.country & state since enrich_booking already satisfies
+  # Removed dependency with enrich_ebdb_user.user, ebdb.country & state since enrich_booking already satisfies
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-visit-in-data-lake

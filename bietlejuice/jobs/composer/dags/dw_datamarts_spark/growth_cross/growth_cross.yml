@@ -26,6 +26,7 @@ growth_cross:
   rental_cohort_conversions: {}
   sale_performance_marketing_metrics_supply_coincident: {} # depends_on: - performance_marketing_cluster_promotional_bonus_costs
   tenant_prospects_activations: {} #  depends_on: - rent_flow_interactions
+  tenant_prospect_status: {} #depends_on: - rent_flow_interactions
   top_of_funnel_volumes_daily: {} # depends_on: - performance_marketing_metrics_demand - sale_performance_marketing_metrics_demand - tenant_prospect_status
   top_of_funnel_volumes_monthly: {} # depends_on: - performance_marketing_metrics_demand - sale_performance_marketing_metrics_demand - tenant_prospect_status
   top_of_funnel_volumes_weekly: {} # depends_on: - performance_marketing_metrics_demand - sale_performance_marketing_metrics_demand - tenant_prospect_status

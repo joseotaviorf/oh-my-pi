@@ -27,6 +27,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `rental_cohort_conversions`
 - `sale_performance_marketing_metrics_supply_coincident`
 - `tenant_prospects_activations`
+-  `tenant_prospect_status`
 - `top_of_funnel_volumes_daily`
 - `top_of_funnel_volumes_monthly`
 - `top_of_funnel_volumes_weekly`
