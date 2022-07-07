@@ -15,11 +15,14 @@ Some use cases will be shown here:
 """
 
 import argparse
+import pathlib
 import glob
 import os
 
 import yaml
 import pyaml
+
+SCRIPTPATH = pathlib.Path(__file__).parent.resolve()
 
 
 def create_yml_for_table(yaml_dict, database_name, table_name):
@@ -41,7 +44,7 @@ def create_yml_for_table(yaml_dict, database_name, table_name):
 
 
 def save_yml(database_name, table_name, yml_body):
-    filepath = f"data-documentation/documentation/atlas/{database_name}/"
+    filepath = f"{SCRIPTPATH}/data-documentation/documentation/atlas/{database_name}/"
     filename = f"{filepath}/{table_name}.yml"
 
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
@@ -68,15 +71,19 @@ if __name__ == "__main__":
     )
 
     args = arg_parser.parse_args()
-    scriptpath = os.path.realpath(__file__)
-    path = f"../bietlejuice/jobs/composer/db/datalake/metadata/"
+    path = f"{SCRIPTPATH}/../bietlejuice/jobs/composer/db/datalake/metadata/"
 
     dag_name_path = args.dag_folder  # use "ebdb", "godfather", for instance
     table = args.table if args.table != None else "*"
 
-    for file_path in glob.iglob(
-        f"{path}{dag_name_path}/**/{table}.yml", recursive=True
-    ):
+    paths_found = list(
+        glob.iglob(f"{path}{dag_name_path}/**/{table}.yml", recursive=True)
+    )
+    if len(paths_found) == 0:
+        print(
+            f"ERROR: No paths were found for this glob expression: {path}{dag_name_path}/**/{table}.yml"
+        )
+    for file_path in paths_found:
         print(file_path)
         with open(file_path, "r") as f:
             lineage = yaml.safe_load(f)
