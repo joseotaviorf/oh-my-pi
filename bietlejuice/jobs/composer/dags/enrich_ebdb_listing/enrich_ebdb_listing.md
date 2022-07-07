@@ -14,6 +14,7 @@ Produces the following output tables:
 
 - `agents_with_keys`
 - `house`
+- `house_entrance_history`
 - `house_listing`
 - `house_listing_status`
 - `house_status_version_order`
