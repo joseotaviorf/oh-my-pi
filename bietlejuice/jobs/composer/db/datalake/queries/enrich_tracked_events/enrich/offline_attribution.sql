@@ -119,8 +119,9 @@ DISTINCT
   YEAR(ts_event) AS year,
   MONTH(ts_event) AS month,
   DAY(ts_event) AS day
-FROM contact_cx AS cx
-
+FROM 
+  contact_cx AS cx
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 UNION ALL
 
 SELECT
@@ -135,4 +136,23 @@ DISTINCT
   YEAR(ts_event) AS year,
   MONTH(ts_event) AS month,
   DAY(ts_event) AS day
-FROM contact_secretaria AS cs
+FROM 
+  contact_secretaria AS cs
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+UNION ALL
+
+SELECT
+  id_user,
+  COALESCE(id_user,email,id_contact_submission) AS id_contact,
+  'Contact' AS event_name,
+  cs.origin AS origin,
+  'demand-contact-submission' AS channel,
+  'Secretaria' AS agent,
+  cs.ts_created_at as ts_event,
+  year,
+  month,
+  day
+FROM
+  datalake_demand_contact_submission_clean.contact_submissions AS cs
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10

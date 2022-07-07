@@ -1,6 +1,9 @@
 SELECT 
   id AS id_contact_submission,
   contact_type_id AS id_contact_type,
+  GET_JSON_OBJECT(metadata, '$.userId') AS id_user,
+  GET_JSON_OBJECT(metadata, '$.houseId') AS id_house,
+  GET_JSON_OBJECT(metadata, '$.regionId') AS id_region,
   business_context,
   origin,
   message,

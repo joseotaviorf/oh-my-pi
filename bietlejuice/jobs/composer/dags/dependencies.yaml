@@ -1963,6 +1963,7 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.enrich_quinto_messenger:load-enrich-channel
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
+  - bietlejuice.demand_contact_submission:load-clean-contact-submissions
 
 bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:load-clean-dispatch

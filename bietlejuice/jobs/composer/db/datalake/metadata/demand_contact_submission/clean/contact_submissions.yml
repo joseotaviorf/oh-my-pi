@@ -8,6 +8,15 @@ columns:
   id_contact_type:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions.contact_type_id
+  id_user:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions.metadata
+  id_house:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions.metadata
+  id_region:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions.metadata
   business_context:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions.business_context
