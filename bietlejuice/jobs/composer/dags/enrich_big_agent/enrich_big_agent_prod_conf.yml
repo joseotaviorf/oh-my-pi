@@ -1,0 +1,6 @@
+---
+inner_dependencies:
+  house_consultant_history:
+    - house
+    - enrollment
+    - program

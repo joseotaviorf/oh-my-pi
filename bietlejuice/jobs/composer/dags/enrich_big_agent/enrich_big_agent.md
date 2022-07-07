@@ -20,6 +20,7 @@ Produces the following output tables:
 - `earnings`
 - `enrollment`
 - `house`
+- `house_consultant_history`
 - `installment`
 - `program`
 

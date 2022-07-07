@@ -1,0 +1,25 @@
+---
+database_name: datalake_big_agent
+table_name: house_consultant_history
+columns:
+  id_agency:
+    lineage:
+      - datalake_big_agent_clean.agency_aud.id
+  id_enrollment:
+    lineage:
+      - datalake_big_agent_clean.agency_aud.id_enrollment
+  id_house:
+    lineage:
+      - datalake_big_agent.house.details
+  rev:
+    lineage:
+      - datalake_big_agent_clean.agency_aud.rev
+  consultant_type:
+    lineage:
+      - datalake_big_agent.program.name
+  ts_enrollment_started:
+    lineage:
+      - datalake_big_agent_clean.user_revision_entity.ts_revision
+  ts_enrollment_ended:
+    lineage:
+      - datalake_big_agent_clean.user_revision_entity.ts_revision
