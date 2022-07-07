@@ -31,5 +31,7 @@ growth_cross:
   top_of_funnel_volumes_daily: {} # depends_on: - performance_marketing_metrics_demand - sale_performance_marketing_metrics_demand - tenant_prospect_status
   top_of_funnel_volumes_monthly: {} # depends_on: - performance_marketing_metrics_demand - sale_performance_marketing_metrics_demand - tenant_prospect_status
   top_of_funnel_volumes_weekly: {} # depends_on: - performance_marketing_metrics_demand - sale_performance_marketing_metrics_demand - tenant_prospect_status
+  unique_performance_marketing_metrics_supply_coincident: {} # depends_on: - performance_marketing_cluster_promotional_bonus_costs - daily_target_volumes_supply
   unique_supply_cohort_conversions: {}
   unique_supply_events_funnel: {}
+  

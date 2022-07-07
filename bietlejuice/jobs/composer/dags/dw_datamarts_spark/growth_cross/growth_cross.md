@@ -32,6 +32,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `top_of_funnel_volumes_daily`
 - `top_of_funnel_volumes_monthly`
 - `top_of_funnel_volumes_weekly`
+- `unique_performance_marketing_metrics_supply_coincident`
 - `unique_supply_cohort_conversions`
 - `unique_supply_events_funnel`
 
