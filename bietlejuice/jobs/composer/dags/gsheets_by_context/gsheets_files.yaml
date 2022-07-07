@@ -630,6 +630,12 @@ supply_targets_2021:
     clean_table_name: supply_targets_2021
     sheet_context: static
 
+crm_tasks_to_remove:
+    sheet_id: 1AOV5JNoFH72sM9ehSRaXpqvOlbxTD66QabtLAeV_8fM
+    sheet_name: task_to_remove
+    clean_table_name: crm_tasks_to_remove
+    sheet_context: static
+
 users_cx_plaquinhas:
     sheet_id: 1oiUlhua9uFXbwkaSeF_EYRvaB652JIhOoWDy1bYolK0
     sheet_name: users_cx_plaquinhas

@@ -1,0 +1,7 @@
+---
+database_name: datalake_gsheets_clean
+table_name: crm_tasks_to_remove
+columns:
+  id_task:
+    lineage:
+      - datalake_gsheets_raw.crm_tasks_to_remove.id_task
