@@ -16,7 +16,7 @@ WITH exploded_actions AS (
 )
 SELECT
     GET_JSON_OBJECT(action, '$._id.oid') AS id,
-    id AS id_task,
+    ea.id AS id_task,
     CAST(GET_JSON_OBJECT(action, '$.userId') AS INT) AS id_user_action,
     REPLACE(GET_JSON_OBJECT(action, '$.userName'),'"') AS action_user_name,
     REPLACE(GET_JSON_OBJECT(action, '$.type'),'"') AS action_type,
@@ -28,6 +28,10 @@ SELECT
     month,
     day
 FROM
-    exploded_actions
+    exploded_actions ea
+LEFT JOIN
+    datalake_gsheets_clean.crm_tasks_to_remove ct -- removing tasks generated in a production bug in the instant refund flow.
+      ON ct.id_task = ea.id
 WHERE
     DATE(GET_JSON_OBJECT(action, '$.date.date')) = DATE('{year}-{month}-{day}')
+    AND ct.id_task IS NULL

@@ -96,4 +96,9 @@ SELECT
     month,
     day
 FROM 
-    cte_tasks
+    cte_tasks crm
+LEFT JOIN
+    datalake_gsheets_clean.crm_tasks_to_remove ct -- removing tasks generated in a production bug in the instant refund flow.
+      ON ct.id_task = GET_JSON_OBJECT(REPLACE(crm.id, '$', ''),"$.oid")
+WHERE
+    ct.id_task IS NULL
