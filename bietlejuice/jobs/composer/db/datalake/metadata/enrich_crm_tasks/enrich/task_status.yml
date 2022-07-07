@@ -4,6 +4,9 @@ columns:
   id_task:
     lineage:
       - datalake_crm.tasks.id
+  id_workgroup:
+    lineage:
+      - datalake_crm.tasks.id_workgroup
   id_rep:
     lineage:
       - datalake_crm.tasks.id_assignee

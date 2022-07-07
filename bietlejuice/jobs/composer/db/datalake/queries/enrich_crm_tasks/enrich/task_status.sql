@@ -29,6 +29,7 @@ rep_info AS (
 )
 SELECT DISTINCT
   t.id AS id_task,
+  t.id_workgroup,
   CAST(t.id_assignee AS BIGINT) AS id_rep,
   t.id_origin,
   CAST(COALESCE(ri.id_first_rep, t.id_assignee, -1) AS BIGINT) AS id_first_rep,
