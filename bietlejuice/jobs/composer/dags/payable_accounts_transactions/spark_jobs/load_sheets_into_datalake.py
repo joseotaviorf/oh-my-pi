@@ -24,7 +24,7 @@ from pyspark.sql.types import StructField, StructType, StringType
 import pandas as pd
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
-from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.http import MediaIoBaseDownload, HttpError
 
 JOB_NAME = "load_sheets_into_datalake"
 
@@ -126,16 +126,44 @@ def __list_files_gdrive(client, query):
     return files
 
 
-def __download_drive_file_as_bytes(drive_client, file_id):
+def __download_drive_file_as_bytes(drive_client, file_id, acknowledge_abuse=False):
 
-    request = drive_client.files().get_media(fileId=file_id)
+    request = drive_client.files().get_media(
+        fileId=file_id, acknowledgeAbuse=acknowledge_abuse
+    )
     fh = io.BytesIO()
     downloader = MediaIoBaseDownload(fh, request)
     done = False
-    while done is False:
-        status, done = downloader.next_chunk()
-    fh.seek(0)
+    try:
+        while done is False:
+            status, done = downloader.next_chunk()
+        fh.seek(0)
+    except HttpError as e:
+        if (
+            e.reason
+            == "This file has been identified as malware or spam and cannot be downloaded."
+        ):
+            return __download_drive_file_as_bytes(
+                drive_client, file_id, acknowledge_abuse=True
+            )
     return fh
+
+
+def __get_drive_file_ownership(drive_client, file_id):
+    request = drive_client.files().copy(fileId=file_id).execute()
+    return request["id"]
+
+
+def __delete_drive_file(drive_client, file_id):
+    drive_client.files().delete(fileId=file_id).execute()
+    return True
+
+
+def __drive_file_download(drive_client, file_id):
+    new_id = __get_drive_file_ownership(drive_client, file_id)
+    file = __download_drive_file_as_bytes(drive_client, new_id)
+    __delete_drive_file(drive_client, new_id)
+    return file
 
 
 if __name__ == "__main__":
@@ -231,7 +259,7 @@ if __name__ == "__main__":
             usecols = columns_to_read + ["Itaú"]
             usecols = usecols if after_2021 else usecols + ["Description"]
             df = pd.read_excel(
-                __download_drive_file_as_bytes(gdrive_client, i["id"]),
+                __drive_file_download(gdrive_client, i["id"]),
                 dtype=str,
                 header=1,
                 sheet_name=sheetname,
@@ -247,7 +275,7 @@ if __name__ == "__main__":
                 usecols = columns_to_read + [sheetname]
                 usecols = usecols if after_2021 else usecols + ["Description"]
                 df = pd.read_excel(
-                    __download_drive_file_as_bytes(gdrive_client, i["id"]),
+                    __drive_file_download(gdrive_client, i["id"]),
                     dtype=str,
                     header=1,
                     sheet_name=sheetname,
