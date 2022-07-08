@@ -27,6 +27,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.http import MediaIoBaseDownload, HttpError
 
 JOB_NAME = "load_sheets_into_datalake"
+TEMPORARY_DRIVE_FOLDER_ID = "1J_V6VFE0bVO7iMhxVc8rzg4E-oHhc-D_"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -150,7 +151,8 @@ def __download_drive_file_as_bytes(drive_client, file_id, acknowledge_abuse=Fals
 
 
 def __get_drive_file_ownership(drive_client, file_id):
-    request = drive_client.files().copy(fileId=file_id).execute()
+    file_propeties = {"parents": [TEMPORARY_DRIVE_FOLDER_ID]}
+    request = drive_client.files().copy(fileId=file_id, body=file_propeties).execute()
     return request["id"]
 
 
