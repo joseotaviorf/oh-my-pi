@@ -1,0 +1,3 @@
+---
+database_name: datalake_emlio_raw
+table_name: emlio_logs

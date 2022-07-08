@@ -1,0 +1,37 @@
+---
+database_name: datalake_emlio_clean
+table_name: emlio_logs
+columns:
+  id_service:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.id_service
+  service_version:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.service_version
+  inference_type:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.inference_type
+  service_type:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.service_type
+  ts_log:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.ts_log
+  inputs:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.inputs
+  outputs:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.outputs
+  service_keys:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.service_keys
+  year:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.year
+  month:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.month
+  day:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.day

@@ -1,0 +1,16 @@
+---
+kafka_brokers: kafka-forno-0.forno.data.quintoandar.com.br:9092,kafka-forno-1.forno.data.quintoandar.com.br:9092
+kafka_topic: emlio-logs
+load_format: JSON
+path_prefix: s3a://
+checkpoints_path_suffix: /raw/emlio/checkpoints
+load_path_suffix: /raw/emlio/emlio_logs
+kafka_columns: [
+    "key",
+    "topic",
+    "value",
+    "partition",
+    "offset",
+    "timestamp",
+    "timestampType",
+]

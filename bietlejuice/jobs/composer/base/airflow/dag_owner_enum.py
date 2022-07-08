@@ -14,3 +14,4 @@ class DAGOwnerEnum:
     DATA_AVAILABILITY = "Data Availability"
     DATA_GOVERNANCE = "Data Governance"
     DATA_FINTECH = "Data Fintech"
+    MLOPS = "MLOps"
