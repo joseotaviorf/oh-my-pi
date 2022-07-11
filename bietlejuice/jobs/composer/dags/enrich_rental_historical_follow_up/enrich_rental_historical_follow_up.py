@@ -12,7 +12,6 @@ from airflow.utils.helpers import chain
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
@@ -91,11 +90,25 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_result_location,
 )
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-)
+tables = config_service.get_config("tables")
+enrich_task_groups = {}
+for table in tables:
+    table_name = table["table_name"]
+    is_incremental = table["is_incremental"]
+    partition_cols = table.get("partition_cols")
+    enrich_task_groups[table_name] = datalake_task_group.build_enrich_task_group(
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        table_name=table_name,
+        partitions=partition_cols,
+        is_incremental=is_incremental,
+    )
 
-chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
-chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+    chain(
+        create_cluster_task,
+        DatalakeTaskGroup.first_tasks(enrich_task_groups[table_name]),
+    )
+    chain(
+        DatalakeTaskGroup.last_tasks(enrich_task_groups[table_name]),
+        terminate_cluster_task,
+    )

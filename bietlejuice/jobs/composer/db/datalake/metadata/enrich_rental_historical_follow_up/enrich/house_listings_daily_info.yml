@@ -1,0 +1,49 @@
+---
+database_name: datalake_rental_historical_follow_up
+table_name: house_listings_daily_info
+columns:
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house
+  id_country:
+    lineage:
+      - datalake_ebdb_listing.house.id_country
+  id_contract:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_contract
+  id_occupant:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.id_occupant
+  id_region:
+    lineage:
+      - datalake_ebdb_listing.house.id_region
+  consultant_type:
+    lineage:
+      - datalake_big_agent.house_consultant_history.consultant_type
+  doorman_type:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.doorman_type
+  first_key_location:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.first_key_location
+  listing_category:
+    lineage:
+      - datalake_ebdb_listing.house_listing.listing_category
+  status_change_reason:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.status_change_reason
+  status_history:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.status_history
+  is_exclusive:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_exclusive
+  ts_status_started:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.ts_status_started
+  ts_status_ended:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.ts_status_ended

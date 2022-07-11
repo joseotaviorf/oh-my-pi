@@ -1,0 +1,7 @@
+---
+tables:
+  - table_name: house_listings_daily_info
+    is_incremental: true
+    partition_cols: [year, month, day]
+  - table_name: house_weekly_entrance_info
+    is_incremental: false

@@ -1807,6 +1807,13 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.ebdb:create-clean-key-type-in-data-lake
   - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  - bietlejuice.enrich_big_agent:load-enrich-house-consultant-history
+  - bietlejuice.enrich_ebdb_listing:load-enrich-agents-with-keys
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
 
 bietlejuice.enrich_rental_guarantee:
   - bietlejuice.rental_guarantee:load-clean-guarantee

@@ -15,6 +15,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output tables:
 
+- `house_listings_daily_info`
 - `house_weekly_entrance_info`
 ​
 
