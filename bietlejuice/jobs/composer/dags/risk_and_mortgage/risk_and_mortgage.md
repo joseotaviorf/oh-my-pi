@@ -16,13 +16,7 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces, in datalake raw and clean:
 
 Via **incremental load**:
-    - `bank_application`
-    - `bank_application_aud`
-    - `credit_application`
-    - `credit_application_aud`
     - `credit_proposal`
-    - `financing_options`
-    - `financing_options_aud`
     - `offer_pre_analysis`
 
 ### Responsible Data Teams
