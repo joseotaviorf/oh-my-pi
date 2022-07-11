@@ -499,6 +499,7 @@ tqc_leads_bh:
     sheet_name: tqc_leads_bh
     clean_table_name: tqc_leads_bh
     sheet_context: for_sale
+    preload_time_in_seconds: 30
 
 #########################
 # STATIC SHEETS
