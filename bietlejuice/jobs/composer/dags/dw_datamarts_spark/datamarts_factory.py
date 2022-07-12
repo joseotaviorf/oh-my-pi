@@ -74,7 +74,9 @@ class DatamartsDAGFactory:
 
         return inner_dependencies
 
-    def _build_datamart_tasks(self, task_group, context_datamarts):
+    def _build_datamart_tasks(
+        self, task_group, context_datamarts, load_to_redshift=False
+    ):
         """
         With the task group, context and datamart configs, creates the staging and DW tasks for the datamarts.
 
@@ -100,7 +102,7 @@ class DatamartsDAGFactory:
                 datamart_task_groups["dw"][table_name] = task_group.build_dw_task_group(
                     table_name=table_name,
                     spectrum_iam_role=self.spectrum_iam_role,
-                    has_load_to_redshift_task=False,
+                    has_load_to_redshift_task=load_to_redshift,
                 )
                 dw_task_group_boundaries[
                     table_name
@@ -166,7 +168,9 @@ class DatamartsDAGFactory:
         )
 
         datamart_task_groups, dw_task_group_boundaries = self._build_datamart_tasks(
-            task_group=task_group, context_datamarts=context_datamarts
+            task_group=task_group,
+            context_datamarts=context_datamarts,
+            load_to_redshift=dag_details.get("load_to_redshift", False),
         )
 
         (

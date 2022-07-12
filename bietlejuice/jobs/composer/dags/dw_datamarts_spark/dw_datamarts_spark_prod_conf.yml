@@ -2,6 +2,7 @@
 ## TEMPLATE
 # dags:
 #   <context>:
+#     load_to_redshift: <boolean> -> default False
 #     cluster_name: <cluster_name>
 #       # Optional. By default, databricks_default_cluster
 #       # Eg: databricks_memory_optimized_cluster
@@ -35,3 +36,4 @@ dags:
     owner: Data Growth
   support_and_service:
     owner: Data S&S
+    load_to_redshift: True

@@ -769,10 +769,14 @@ bietlejuice.dw_customer_support:
 #  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
 #  - bietlejuice.dw_sale_listing_flow:load-dw-sale-fact-listing-flows
 
-# bietlejuice.dw_datamarts_spark.support_and_service:
-#   - bietlejuice.kodak:load-clean-photo-sphere
-#   - bietlejuice.kodak:load-clean-user-revision-entity
-#   - bietlejuice.kodak:load-clean-video
+bietlejuice.dw_datamarts_spark.support_and_service:
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  # kodak dependencies commented with the house-media datamart
+  # - bietlejuice.kodak:load-clean-photo-sphere
+  # - bietlejuice.kodak:load-clean-user-revision-entity
+  # - bietlejuice.kodak:load-clean-video
+  - bietlejuice.jira:load-clean-issues
 
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
