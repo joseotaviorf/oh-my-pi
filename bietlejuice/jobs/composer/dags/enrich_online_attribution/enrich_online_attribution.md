@@ -15,9 +15,9 @@ The enrich `online attribute` table is partitioned by year, month, and day from 
 
 ### Atention Points
 
-* We add sanitization to `event_type` column to create the column `event_type_sanitized`. There are some spelling problems with some event types that cause some erros in hive sync, so we fix it for partitioning purposes.
-* To make the consumption of this table faster please use `event_type_sanitized` for queries. You can replicate the sanitization process in SQL using the following code: `REGEXP_REPLACE(REGEXP_REPLACE(event_type,'[^\w\s]',''),'\s+','_') as event_type_sanitized` 
 * We extract the column `app_platform` from the `3fbf25d58c3cce92f0e6609904a37cc9` component of `user_properties`. The column have a very strange spelling, but means the platform of the mobile app (ex: IOS).
+* We are ignoring the Organic/Direct app touchpoints that overrides paids touchpoints.
+
 ### Execution Interval
 
 Daily. More information about run time [here]({chart_url}{dag_id}).

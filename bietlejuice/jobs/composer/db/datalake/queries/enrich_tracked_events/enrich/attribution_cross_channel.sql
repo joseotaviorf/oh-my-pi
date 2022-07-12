@@ -6,11 +6,11 @@ attribution_cross_channel AS (
         ROW_NUMBER() OVER(PARTITION BY COALESCE(visit_code,id_firestore) ORDER BY event_name DESC,ts_event) AS attribution_rn
     FROM
         datalake_tracked_events.cross_channel_full
-    WHERE -- #TODO: ADD INCREMENTAL CLAUSE AFTER online_attribution REPROCESS
-        -- YEAR = {year}
-        -- AND MONTH = {month}
-        -- AND DAY = {day}
-        event_name IN (
+    WHERE
+        YEAR = {year}
+        AND MONTH = {month}
+        AND DAY = {day}
+        AND event_name IN (
             'visit_schedule_confirmed',
             'debug_visit_schedule_confirmed',
             'offer_submitted',
