@@ -6,7 +6,7 @@ from airflow.operators.quintoandar_dag_mediator import (
     QuintoAndarCustomTriggerDagOperator,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
 from bietlejuice.jobs.composer.services import FileService
 
@@ -48,7 +48,7 @@ DAG_ID = f"airflow.{DAG_NAME}"
 mediator_dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DEFAULT_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

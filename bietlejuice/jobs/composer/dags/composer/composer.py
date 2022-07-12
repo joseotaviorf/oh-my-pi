@@ -11,7 +11,7 @@ from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Oper
 from airflow.utils.helpers import cross_downstream
 
 from bietlejuice.jobs.composer.base import DATALAKE_SQL_DIR
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.formatters import StringFormatter
 from bietlejuice.jobs.composer.services import FileService
@@ -59,7 +59,7 @@ QUERY_PATH = "{datalake_sql_dir}/queries/composer/raw/{table_name}.sql"
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DEFAULT_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

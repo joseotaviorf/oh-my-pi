@@ -3,7 +3,7 @@ from airflow.models import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import DAGOwnerEnum
 from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
 from bietlejuice.jobs.composer.services import FileService
 
@@ -47,7 +47,7 @@ def build_operator(dep_name, dag):
 
 dag = DAG(
     dag_id=DAG_ID,
-    default_args={"owner": BaseDAG.DEFAULT_OWNER},
+    default_args={"owner": DAGOwnerEnum.DEFAULT_OWNER},
     start_date=START_DATE,
     schedule_interval=None,
 )

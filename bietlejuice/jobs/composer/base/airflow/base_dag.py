@@ -1,22 +1,11 @@
 from glob import glob
-from os import path
-from datetime import timedelta
+from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
 from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger("BaseDAG")
-COMPOSER_DAGS_PATH = path.abspath(path.join(__file__, "../../../dags"))
 
 
 class BaseDAG:
-    # TODO: Keep it until all Composer DAG owners are re-assigned
-    DEFAULT_OWNER = "Data Engineering Team"
-    OPERATOR_RETRIES = {
-        "retries": 3,
-        "retry_delay": timedelta(minutes=3),
-        "max_retry_delay": timedelta(minutes=3),
-    }
-    EXECUTION_TIMEOUT = timedelta(hours=2)
-
     @staticmethod
     def get_dag_doc(dag_name):
         doc_md_string = ""
