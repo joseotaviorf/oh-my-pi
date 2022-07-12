@@ -13,9 +13,11 @@ To force the Mediator to skip a DAG temporarily, use the variable [MEDIATOR_SKIP
 
 Runs at every 15 minutes, starting at minute 0 of each hour. More information about run time [here]({chart_url}{dag_id}).
 
+*Dies (timeout) after 13 minutes.*
+
 ### Responsible Data Engineering Team
 
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
+For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the
 [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 
 ### Additional Information
