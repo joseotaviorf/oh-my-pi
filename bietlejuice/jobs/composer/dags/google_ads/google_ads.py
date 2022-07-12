@@ -3,8 +3,8 @@ import re
 from datetime import datetime
 from pendulum import timezone
 
-from airflow.models import DAG, Variable
-from airflow.utils.helpers import chain, cross_downstream
+from airflow.models import DAG
+from airflow.utils.helpers import cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -14,15 +14,17 @@ from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTask
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
+)
 
 # Pipeline inputs
 SOURCE = "google_ads"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
+MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 CUSTOM_LIBRARIES = [{"pypi": {"package": "google-ads"}}]
 
 config_service = ConfigurationService(SOURCE)
@@ -39,8 +41,15 @@ raw_spark_job_file = (
     f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 )
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 ENV = os.environ.get("ENVIRONMENT")
 
 
@@ -69,15 +78,16 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
+    cluster_configuration=cluster_configuration,
     libraries=default_libraries + CUSTOM_LIBRARIES,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-task_group = DatalakeTaskGroup(
+datalake_task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
@@ -88,20 +98,20 @@ task_group = DatalakeTaskGroup(
 
 for report_type in REPORTS_LIST:
 
-    raw_task_group = task_group.build_raw_task_group_for_single_table(
+    raw_task_group = datalake_task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,
         table_name=report_type,
         extraction_spark_job_file=raw_spark_job_file,
         raw_spark_job_extra_args=[
             SOURCE,
-            "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+            "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",
             "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
             report_type,
         ],
     )
 
-    clean_task_group = task_group.build_clean_task_group(
+    clean_task_group = datalake_task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
         table_name=report_type,
@@ -110,12 +120,12 @@ for report_type in REPORTS_LIST:
         partitions=PARTITION_COLS,
         execution_date="",
         extra_query_template_params={
-            "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+            "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",
             "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
         },
     )
 
-    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+    create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
 
     cross_downstream(
         DatalakeTaskGroup.last_tasks(raw_task_group),
