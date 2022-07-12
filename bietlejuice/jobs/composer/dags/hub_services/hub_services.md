@@ -55,9 +55,4 @@ Via **incremental load**:
     - `visitor`
     - `visitor_aud`
 
-### Responsible Data Teams
-For any questions or concerns about this DAG and data, please contact the Data Engineering Team or
-Data Analytics Team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
-</details>
-For any questions or concerns about this DAG and data, please contact the Data For Sale Team.
 </details>
