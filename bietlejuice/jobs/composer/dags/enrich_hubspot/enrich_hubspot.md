@@ -48,8 +48,4 @@ Produces the following output tables in `datalake_hubspot`:
 - `team`
 - `team_user`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data For Brokers Team.
-
 </details>
