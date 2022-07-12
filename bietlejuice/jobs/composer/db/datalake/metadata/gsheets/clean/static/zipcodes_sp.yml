@@ -1,0 +1,22 @@
+---
+database_name: datalake_gsheets_clean
+table_name: zipcodes_sp
+columns:
+  zipcode:
+    lineage:
+      - datalake_gsheets_raw.zipcodes_sp.cep
+  city:
+    lineage:
+      - datalake_gsheets_raw.zipcodes_sp.cidade_nome
+  neighborhood:
+    lineage:
+      - datalake_gsheets_raw.zipcodes_sp.bairro
+  address:
+    lineage:
+      - datalake_gsheets_raw.zipcodes_sp.logradouro
+  lat:
+    lineage:
+      - datalake_gsheets_raw.zipcodes_sp.latitude
+  lng:
+    lineage:
+      - datalake_gsheets_raw.zipcodes_sp.longitude

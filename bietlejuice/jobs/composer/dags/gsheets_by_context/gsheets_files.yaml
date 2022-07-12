@@ -661,6 +661,12 @@ atribuicao_de_maturidade_e_validacao_do_cadastro:
     clean_table_name: metrics_registration
     sheet_context: static
 
+zipcodes_sp:
+    sheet_id: 1ej4KiYUK-7gbxykN1AANpcWllW2wXffChTiF8h0nUPc
+    sheet_name: zipcodes_sp
+    clean_table_name: zipcodes_sp
+    sheet_context: static
+
 #########################
 # GENERAL SHEETS
 ###################
