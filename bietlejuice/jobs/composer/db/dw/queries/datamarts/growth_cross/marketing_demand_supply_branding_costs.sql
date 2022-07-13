@@ -6,7 +6,7 @@ demand_cost AS (
         'Rental' AS business,
         'Demand' AS planning_mkt_level1,
         CASE
-            WHEN co.mkt_channel = 'Online Paid'
+            WHEN co.mkt_channel LIKE '%Paid%' OR co.mkt_channel = 'Performance Max'
                 THEN 'Paid'
             ELSE co.mkt_channel
             END AS planning_mkt_level2,
@@ -20,6 +20,7 @@ demand_cost AS (
         co.funnel_side = 'demand'
         AND dbt.date BETWEEN '2019-01-01' AND CURRENT_DATE - 1
         AND co.mkt_medium != 'Branding'
+        AND co.mkt_channel != 'Paid Traffic'
         AND co.mkt_origin = 'Tenants PWA'
     GROUP BY 1, 2, 3, 4, 5, 6
 ),
@@ -754,7 +755,11 @@ demand_sale_cost AS (
         co.city_group AS city_group,
         'Sale' AS business,
         'Demand' AS planning_mkt_level1,
-        co.mkt_medium AS planning_mkt_level2,
+        CASE
+            WHEN co.mkt_channel LIKE '%Paid%' OR co.mkt_channel = 'Performance Max'
+                THEN 'Paid'
+            ELSE co.mkt_channel
+            END AS planning_mkt_level2,
         co.mkt_medium AS planning_mkt_level3,
         SUM(co.cost) AS costs
     FROM
@@ -765,6 +770,7 @@ demand_sale_cost AS (
         AND dbt.date BETWEEN '2019-01-01' AND CURRENT_DATE - 1
         AND co.mkt_medium != 'Social'
         AND co.mkt_origin = 'Tenants PWA - Sale'
+        AND co.mkt_channel != 'Paid Traffic'
         AND coalesce(account_name, '') != 'quintoandar_display_and_video_acquisition'
     GROUP BY 1, 2, 3, 4, 5, 6
 ),
