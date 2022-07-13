@@ -224,7 +224,7 @@ FROM
     LEFT JOIN events evt
         ON evt.email_md5 = c.email_md5
         AND evt.id_house = c.id_house_portal
-        AND ABS(DATE_DIFF('SECOND', ts_event, ts_contact)) <= 360
+        AND ABS(DATE_DIFF('HOUR', ts_event, ts_contact)) <= 12
     LEFT JOIN taxonomy_portal AS tp
         ON LOWER(COALESCE(tp.app_type, '')) = LOWER(COALESCE(evt.app_type, ''))
     	AND LOWER(COALESCE(tp.utm_source, '')) = LOWER(COALESCE(evt.utm_source, ''))
