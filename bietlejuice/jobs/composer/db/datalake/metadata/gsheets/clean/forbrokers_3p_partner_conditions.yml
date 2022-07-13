@@ -7,6 +7,9 @@ columns:
   partner_short_name:
     lineage:
       - datalake_gsheets_raw.forbrokers_3p_partner_conditions.partner_short_name
+  category:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.category
   state:
     lineage:
       - datalake_gsheets_raw.forbrokers_3p_partner_conditions.state
@@ -73,3 +76,6 @@ columns:
   dt_payment:
     lineage:
       - datalake_gsheets_raw.forbrokers_3p_partner_conditions.dt_payment
+  dt_category_end:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.dt_category_end

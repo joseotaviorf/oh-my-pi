@@ -1,6 +1,7 @@
 SELECT
     NULLIF(partner, '') AS partner,
     NULLIF(partner_short_name, '') AS partner_short_name,
+    NULLIF(category, '') AS category,
     NULLIF(state, '') AS state,
     NULLIF(city, '') AS city,
     CAST(NULLIF(brokerage, '') AS FLOAT) AS brokerage,
@@ -22,6 +23,7 @@ SELECT
     CAST(NULLIF(demand_partner_revenue_share, '') AS FLOAT) AS demand_partner_revenue_share,
     CAST(NULLIF(supply_partner_revenue_share, '') AS FLOAT) AS supply_partner_revenue_share,
     CAST(NULLIF(dt_term_signature, '') AS DATE) AS dt_term_signature,
-    CAST(NULLIF(dt_payment, '') AS DATE) AS dt_payment
+    CAST(NULLIF(dt_payment, '') AS DATE) AS dt_payment,
+    CAST(NULLIF(dt_category_end, '') AS DATE) AS dt_category_end
 FROM
     datalake_gsheets_raw.forbrokers_3p_partner_conditions
