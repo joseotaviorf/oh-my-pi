@@ -1,5 +1,5 @@
 ---
-database_name: dw_datamarts_growth_cross
+database_name: dw_datamarts_growth_blocklist
 table_name: marketing_allocated_costs
 columns:
   sk_date:

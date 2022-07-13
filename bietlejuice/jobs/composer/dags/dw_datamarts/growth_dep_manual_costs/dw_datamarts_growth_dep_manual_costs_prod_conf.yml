@@ -20,18 +20,6 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/affiliate_acquisition_metrics.sql
       table: affiliate_acquisition_metrics
-  indicaai_costs:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/indicaai_costs.sql
-      table: indicaai_costs
-  marketing_allocated_costs:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/marketing_allocated_costs.sql
-      table: marketing_allocated_costs
-      depends_on:
-        - marketing_campaigns_costs_and_volumes
   marketing_campaigns_costs_and_volumes:
     dw:
       <<: *redshift_anchor

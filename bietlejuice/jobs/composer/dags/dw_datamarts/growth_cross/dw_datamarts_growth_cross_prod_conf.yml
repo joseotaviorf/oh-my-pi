@@ -46,25 +46,11 @@ pipeline:
       table: efficiency_monitor_sale
       depends_on:
         - marketing_demand_supply_branding_costs
-  house_demand_trends:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/house_demand_trends.sql
-      table: house_demand_trends
-      depends_on:
-        - rental_marketplace_flows
   inbound_attendance_leads_flows:
     dw:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/inbound_attendance_leads_flows.sql
       table: inbound_attendance_leads_flows
-  marketing_allocated_costs:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/marketing_allocated_costs.sql
-      table: marketing_allocated_costs
-      depends_on:
-        - marketing_campaigns_costs_and_volumes
   marketing_demand_supply_branding_costs:
     dw:
       <<: *redshift_anchor
@@ -95,13 +81,6 @@ pipeline:
       depends_on:
         - tenant_prospect_status
         - rent_flow_interactions
-  plaquinhas_metrics:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/plaquinhas_metrics.sql
-      table: plaquinhas_metrics
-      depends_on:
-        - performance_marketing_metrics_demand
   pricing_rent_categorization:
     dw:
       <<: *redshift_anchor
@@ -210,20 +189,6 @@ pipeline:
       depends_on:
         - tenant_prospect_status
         - sale_performance_marketing_metrics_demand
-        - performance_marketing_metrics_demand
-  indicaai_costs:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/indicaai_costs.sql
-      table: indicaai_costs
-      depends_on:
-        - performance_marketing_cluster_promotional_bonus_costs
-  demand_housing_cluster_changes:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/demand_housing_cluster_changes.sql
-      table: demand_housing_cluster_changes
-      depends_on:
         - performance_marketing_metrics_demand
   plaquinhas_users_demand:
     dw:

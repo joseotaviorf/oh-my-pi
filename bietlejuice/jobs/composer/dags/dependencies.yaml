@@ -281,7 +281,6 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.gsheets:create-clean-targets-casa-mineira-cost-external-table
   - bietlejuice.gsheets:create-clean-targets-casa-mineira-ncp-external-table
   - bietlejuice.gsheets:create-clean-taxonomy-crm-casa-mineira-external-table
-  # demand_housing_cluster_changes
   - bietlejuice.enrich_lost_listings:create-enrich-lost-listings-external-table
 
 bietlejuice.dw_datamarts_growth_cross:
@@ -294,21 +293,21 @@ bietlejuice.dw_datamarts_growth_cross:
   # tenant_prospect_status
   - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
   - bietlejuice.dw_contract:load-quintoandar-fact-contract-people-into-redshift
-  # marketing_allocated_costs, rent_flow_interactions, rental_cohort_conversions, rental_marketplace_flows, sale_performance_marketing_metrics_demand
+  # rent_flow_interactions, rental_cohort_conversions, rental_marketplace_flows, sale_performance_marketing_metrics_demand
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_house:load-quintoandar-dim-house-into-redshift
-  # marketing_allocated_costs, performance_marketing_metrics_demand, pricing_rent_categorization, rent_flow_interactions,
+  # performance_marketing_metrics_demand, pricing_rent_categorization, rent_flow_interactions,
   # rental_cohort_conversions, rental_marketplace_flows, tenant_prospect_status, tenant_prospect_activations, user_funnel
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
-  # efficiency_monitor_rental, house_demand_trends, marketing_allocated_costs, plaquinhas_metrics, pricing_rent_categorization,
+  # efficiency_monitor_rental, pricing_rent_categorization,
   # rent_flow_interactions, rental_marketplace_flows, user_funnel
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
-  # inbound_attendance_leads_flows, marketing_allocated_costs, performance_marketing_cluster_promotional_bonus_costs, performance_marketing_cluster_promotional_bonus
+  # inbound_attendance_leads_flows, performance_marketing_cluster_promotional_bonus_costs, performance_marketing_cluster_promotional_bonus
   # rental_performance_marketing_metrics_supply_coincident, sale_performance_marketing_metrics_supply_coincident
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
-  # indicaai_costs, marketing_allocated_costs, marketing_demand_supply_branding_costs, performance_marketing_cluster_promotional_bonus_costs,
+  # marketing_demand_supply_branding_costs, performance_marketing_cluster_promotional_bonus_costs,
   # rental_performance_marketing_metrics_supply_coincident, sale_performance_marketing_metrics_supply_coincident
-  # affiliate_acquisition_metrics, indicaai_costs, marketing_allocated_costs, marketing_demand_supply_branding_costs, performance_marketing_metrics_demand,
+  # affiliate_acquisition_metrics, marketing_demand_supply_branding_costs, performance_marketing_metrics_demand,
   # rental_performance_marketing_metrics_supply_coincident, sale_performance_marketing_metrics_demand, sale_performance_marketing_metrics_supply_coincident
   - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
   # rent_flow_interactions
@@ -389,7 +388,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-plaquinhas-demand-targets-external-table
   # performance_marketing_metrics_imobiliaria_casa_mineira
   - bietlejuice.enrich_affiliates_cost_attributions:create-enrich-affiliates-cost-attributions-external-table
-  # marketing_allocated_costs
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
   # unique_supply_funnel_events
   - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
@@ -398,11 +396,36 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-tof-supply-targets-external-table
 
 # bietlejuice.dw_datamarts_growth_blocklist:
-#   # marketplace_intelligence_metrics
+#   # marketplace_intelligence_metrics, marketing_allocated_costs
 #   - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
+#   # market_share_by_sk_region
 #   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
 #   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
 #   - bietlejuice.amplitude:create-clean-staging-events
+#   # indicaai_costs, marketing_allocated_costs
+#   - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+#   - bietlejuice.ebdb:create-listing-business-context-aud-clean-external-table
+#   - bietlejuice.gsheets:create-clean-affiliates-extra-user-bonus-external-table
+#   - bietlejuice.dw_affiliate_costs:load-quintoandar-fact-affiliate-costs-into-redshift
+#   - bietlejuice.dw_affiliate_costs:load-quintoandar-dim-affiliate-cost-into-redshift
+#   # indicaai_costs, marketing_allocated_costs
+#   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+#   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+#   # indicaai_costs, marketing_allocated_costs
+#   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
+#   # demand_housing_cluster_changes
+#   - bietlejuice.enrich_lost_listings:create-enrich-lost-listings-external-table
+#   # plaquinhas_metrics, house_demand_trends -> Not mapped
+#   # market_share_by_sk_region
+#   - bietlejuice.ebdb:create-polygon-region-clean-external-table
+#   - bietlejuice.ebdb:create-polygon-region-clean-external-table
+#   # marketing_allocated_costs
+#   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+#   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+#   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+#   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
+#   - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
+#   # unique_owners, performance_marketing_metrics_supply, tof_demand_online_events -> Not mapped
 
 bietlejuice.dw_datamarts_growth_dep_manual_costs:
   - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table

@@ -30,3 +30,38 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/growth_blocklist/users_online_metrics.sql
       table: users_online_metrics
+  house_demand_trends:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_blocklist/house_demand_trends.sql
+      table: house_demand_trends
+      depends_on:
+        - rental_marketplace_flows
+  indicaai_costs:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_blocklist/indicaai_costs.sql
+      table: indicaai_costs
+      depends_on:
+        - performance_marketing_cluster_promotional_bonus_costs
+  demand_housing_cluster_changes:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_blocklist/demand_housing_cluster_changes.sql
+      table: demand_housing_cluster_changes
+      depends_on:
+        - performance_marketing_metrics_demand
+  plaquinhas_metrics:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_blocklist/plaquinhas_metrics.sql
+      table: plaquinhas_metrics
+      depends_on:
+        - performance_marketing_metrics_demand
+  marketing_allocated_costs:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_blocklist/marketing_allocated_costs.sql
+      table: marketing_allocated_costs
+      depends_on:
+        - marketing_campaigns_costs_and_volumes
