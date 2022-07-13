@@ -21,7 +21,7 @@ tables:
       date_range: '{year}{month}{day}0000:{year}{month}{day}2359',
     }
     clean_table_name: report_repliers
-    partitions_cols: ['year', 'month', 'day']
+    partition_cols: ['year', 'month', 'day']
 
   calls_report:
     api_endpoint: CALLS_REPORT_JSON_KEYS
@@ -32,4 +32,4 @@ tables:
     }
     clean_table_name: calls_report
     is_array_data_schema: True
-    partitions_cols: ['year', 'month', 'day']
+    partition_cols: ['year', 'month', 'day']

@@ -1,0 +1,38 @@
+---
+database_name: datalake_stilingue
+table_name: service_interactions
+columns:
+  id_conversation:
+    lineage:
+      - datalake_stilingue.interactions.id_conversation
+  id_interaction:
+    lineage:
+      - datalake_stilingue.status_changes.id
+  agent:
+    lineage:
+      - datalake_stilingue.status_changes.agent
+  channel:
+    lineage:
+      - datalake_stilingue.interactions.channel
+  interaction_type:
+    lineage:
+      - datalake_stilingue.interactions.interaction_type
+  status:
+    lineage:
+      - datalake_stilingue.status_changes.new_status
+      - datalake_stilingue.interactions.conversation_status
+  minutes_changed_status:
+    lineage:
+      - datalake_stilingue.status_changes.ts_created
+  dt_week:
+    lineage:
+      - datalake_stilingue.status_changes.ts_load
+      - datalake_stilingue.interactions.ts_load
+  ts_created:
+    lineage:
+      - datalake_stilingue.status_changes.ts_created
+      - datalake_stilingue.interactions.ts_posted
+  ts_load:
+    lineage:
+      - datalake_stilingue.status_changes.ts_load
+      - datalake_stilingue.interactions.ts_load

@@ -1,0 +1,5 @@
+---
+inner_dependencies:
+  service_interactions:
+    - interactions
+    - status_changes

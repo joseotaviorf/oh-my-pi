@@ -18,6 +18,7 @@ This pipeline produces the following output table on Enrich layer:
 - `cases` (full load)
 - `status_changes` (full load)
 - `interactions` (full load)
+- `service_interactions` (full load)
 
 ### Responsible Data Team
 ​
