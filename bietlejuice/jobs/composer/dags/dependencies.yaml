@@ -1896,11 +1896,6 @@ bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.hub_services:load-clean-visitor
 
 bietlejuice.enrich_sale_listings:
-  - bietlejuice.ebdb:create-clean-house-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
-  - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity

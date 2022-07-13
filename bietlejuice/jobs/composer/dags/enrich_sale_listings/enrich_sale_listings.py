@@ -15,6 +15,13 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
     TaskFlowHelper,
 )
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
+)
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -29,12 +36,18 @@ DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-LOGS_OUTPUT_PATH = f"s3://{Variable.get('databricks_s3_bucket')}/logs/jobs/{DAG_ID}"
 
-CLUSTER_DESCRIPTION = Variable.get(
-    f"databricks_bietlejuice_{DAG_NAME}_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+config_service = ConfigurationService(CONTEXT)
+default_libraries = config_service.get_config("default_libraries")
+
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_cluster")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 INNER_DEPENDENCIES = {
     "sale_listing": ["sale_status_version_order"],
@@ -56,7 +69,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    libraries=default_libraries,
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -102,3 +119,8 @@ chain(
     + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
     terminate_cluster_task,
 )
+
+# Set data quality tasks if exists
+independent_tasks = DatalakeTaskGroup.all_independent_tasks(enrich_task_groups)
+if independent_tasks:
+    terminate_cluster_task.set_upstream(independent_tasks)
