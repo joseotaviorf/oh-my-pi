@@ -1726,6 +1726,7 @@ bietlejuice.enrich_offboarding:
 
 bietlejuice.enrich_offer:
   # Removed dependency with enrich_region since enrich_booking and enrich_ebdb_listing already satisfies
+  # Removed dependency with enrich_ebdb_user.user since enrich_booking already satisfies
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
@@ -1734,7 +1735,6 @@ bietlejuice.enrich_offer:
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
   - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.enrich_firestore:load-enrich-rent-offer
