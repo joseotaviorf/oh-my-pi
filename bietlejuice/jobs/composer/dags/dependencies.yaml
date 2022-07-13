@@ -439,10 +439,10 @@ bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood
 
 bietlejuice.dw_agent:
+# Removed dependency with gsheets.for_rent.auxiliary_region since enrich_ebdb_agents already satisfies
   - bietlejuice.dw_user:load-dw-public-dim-user
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-region-group
-  - bietlejuice.gsheets.for_rent:load-clean-auxiliary-region
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
 
 bietlejuice.dw_agents_availability:
   - bietlejuice.dw_agent:load-dw-public-dim-agent-region
