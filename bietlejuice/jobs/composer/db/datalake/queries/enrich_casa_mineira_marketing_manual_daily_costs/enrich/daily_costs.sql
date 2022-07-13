@@ -89,4 +89,4 @@ SELECT
 FROM
     manual_costs_split
 WHERE
-    (cost * cost_factor) > 0
+    (cost * cost_factor) != 0

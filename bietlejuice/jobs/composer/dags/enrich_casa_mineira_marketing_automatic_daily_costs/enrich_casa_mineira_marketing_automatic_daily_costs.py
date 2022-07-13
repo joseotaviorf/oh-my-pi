@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime
 from pendulum import timezone
 
@@ -25,8 +26,8 @@ DAG_NAME = "enrich_casa_mineira_marketing_automatic_daily_costs"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2021, 5, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 PARTITION_COLS = ["id_date", "flow_type"]
+CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -36,7 +37,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-cluster_description = config_service.get_config(CLUSTER_DESCRIPTION)
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
@@ -46,6 +47,14 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 ENV = os.environ.get("ENVIRONMENT")
+
+
+def get_date_param(dag_run, ds, date_param_name):
+    date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
+    if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
+        return date_param
+    return ds
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -59,12 +68,13 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+    user_defined_macros={"get_date_param": get_date_param},
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=cluster_description,
+    cluster_configuration=cluster_configuration,
     libraries=default_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
@@ -88,6 +98,11 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     target_database_base_name=CONTEXT,
     is_incremental=True,
     partitions=PARTITION_COLS,
+    execution_date="",
+    extra_query_template_params={
+        "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",
+        "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+    },
 )
 
 create_cluster_task.set_downstream(

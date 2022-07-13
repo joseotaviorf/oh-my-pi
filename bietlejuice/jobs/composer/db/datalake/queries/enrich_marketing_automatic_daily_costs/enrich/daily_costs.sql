@@ -60,6 +60,6 @@ LEFT JOIN
         AND cmm.origin = tbp.origin
         AND cmm.campaign_origin_acquisition = tbp.campaign_origin_acquisition
 WHERE
-    cmm.id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
-    AND cmm.total_cost > 0
+    cmm.id_date BETWEEN INT(REPLACE('{load_start_date}', '-', '')) AND INT(REPLACE('{load_end_date}', '-', ''))
+    AND cmm.total_cost != 0
     AND LOWER(SPLIT(cmm.campaign_name, '[.]')[0]) <> 'zebra'
