@@ -47,7 +47,7 @@ ft AS(
         MIN(first_message_ts)::TIMESTAMP AS dt_tta,
         SUM(msg_sent) AS msg_sent
     FROM 
-        dw_datamarts_cross.talk_to_agent
+        dw_datamarts.talk_to_agent
     GROUP BY 1,2
 ),
 

@@ -544,7 +544,6 @@ bietlejuice.dw_customer_support:
 # Also, removed dependency from gsheets.taxonomy_demand since is satisfied by dw_rent_flow and dw_sale_offers;
 # Also, removed dependency from ebdb.house_aud & listing_business_context & user_revision_entity since enrich_ebdb_listing already satisfies.
 # Also, removed dependency from amplitude.subpartitioned_event because dw_sale_offers depends on enrich_amplitude_offer, which satisfies.
-#   - bietlejuice.dw_datamarts_cross:create-talk-to-agent-in-datalake
 #   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
 #   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
 #   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows

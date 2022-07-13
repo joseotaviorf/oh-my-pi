@@ -10,8 +10,12 @@
 #     # If the datamart has no inner dependency, declare it as an empty object
 
 cross:
-  buyer_prospect_status: {} # Add talk_to_agent dependency here when it is migrated
-  funnel_demand_flows: {} # Add talk_to_agent dependency here when it is migrated
+  buyer_prospect_status:
+    depends_on:
+      - talk_to_agent
+  funnel_demand_flows:
+    depends_on:
+      - talk_to_agent
   quintoandar_consultant_listings: {}
   talk_to_agent: {}
   lead_listing_flows: {}

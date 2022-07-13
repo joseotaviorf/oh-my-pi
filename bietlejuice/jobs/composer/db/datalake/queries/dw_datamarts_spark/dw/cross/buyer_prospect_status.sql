@@ -44,7 +44,7 @@ events AS (
         dh.sk_region,
         CAST(a.first_message_ts AS TIMESTAMP) AS ts_event
     FROM
-        dw_datamarts_cross.talk_to_agent AS a
+        dw_datamarts.talk_to_agent AS a
     JOIN
         dim_house AS dh
             ON a.house_id = dh.sk_house
