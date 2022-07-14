@@ -38,7 +38,7 @@ columns:
   city_group:
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.city_group
-      - datalake_marketing_costs_sharing_rules.sharing_rules.city_group
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.city_group
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.city_group
   campaign_origin_acquisition:
     lineage:
@@ -79,7 +79,7 @@ columns:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.other_cost
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.total_cost
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.cost_factor
-      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.cost
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.cost_share_desktop
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.cost_share_mobile

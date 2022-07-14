@@ -14,7 +14,7 @@ FROM
 	datalake_quintoandar.aux_date AS adt
 INNER JOIN
 	datalake_region.region AS rgn
-		ON adt.date BETWEEN '2021-05-01' AND CURRENT_DATE
+		ON ad.date BETWEEN '2021-05-01' AND CURRENT_DATE
 		AND rgn.city_group IN (
 			'Brasília',
 			'Goiânia',

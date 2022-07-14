@@ -33,7 +33,7 @@ columns:
     lineage:
       - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.city_group
       - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.city_group
-      - datalake_marketing_costs_sharing_rules.sharing_rules.city_group
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.city_group
   campaign_origin_acquisition:
     lineage:
       - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.campaign_origin_acquisition
