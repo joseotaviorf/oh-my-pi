@@ -8,26 +8,26 @@ count_prospects AS (
         dd_p.week_start,
         dr.city_group,
         CASE 
-            WHEN dua.tracking_campaign ~* '(branded)|(institucional)' AND dua.tracking_campaign !~* '(non-branded)' 
+            WHEN REGEXP_LIKE(dua.tracking_campaign, '(branded)|(institucional)') AND REGEXP_LIKE(dua.tracking_campaign, '(non-branded)')
                 THEN true
             ELSE false 
         END AS campaign_is_branded,
         COUNT(CASE WHEN dd_p.year_month = dd_aff.year_month THEN 1 END) new_user_prospects
     FROM
-        fact_house_listing_flows f
-        JOIN dim_date dd_p
+        dw_public.fact_house_listing_flows f
+        JOIN dw_public.dim_date dd_p
             ON dd_p.sk_date =f.sk_prospect_date
-        JOIN dim_user du
+        JOIN dw_public.dim_user du
             ON f.sk_user_lead_affiliate = du.sk_user
-        JOIN dim_user_affiliate dua
+        JOIN dw_public.dim_user_affiliate dua
             ON dua.sk_user_affiliate = du.dados_afiliado_id
-        JOIN dim_date dd_aff
+        JOIN dw_public.dim_date dd_aff
             ON dd_aff.date = DATE(du.dadosafiliado_inicio_atuacao)
-        JOIN dim_region dr
+        JOIN dw_public.dim_region dr
             ON f.sk_region = dr.sk_region
     WHERE
         f.mkt_origin = 'Indica Aí - General'
-        AND dua.tracking_source ~* '(google)|(facebook)'
+        AND REGEXP_LIKE(dua.tracking_source, '(google)|(facebook)')
         AND f.sk_prospect_date>=20190101
         AND dr.city_group IS NOT NULL
     GROUP BY 
@@ -41,7 +41,7 @@ dim_distinct AS ( --incluir combinações semana/cidade sem resultado
          dd.week_start,
          dr.city_group
     FROM
-         dim_date dd, dim_region dr
+         dw_public.dim_date dd, dw_public.dim_region dr
     WHERE
         dd.sk_date>=20190101
         AND dd.date < current_date
@@ -51,8 +51,8 @@ temp AS ( --Calculo do share por semana
         ddt.week_start,
         ddt.city_group,
         (
-            sum(t.new_user_prospects) OVER (PARTITION BY ddt.week_start, ddt.city_group)::FLOAT/
-            NULLIF(sum(t.new_user_prospects) OVER (PARTITION BY ddt.week_start)::FLOAT, 0)
+            CAST(sum(t.new_user_prospects) OVER (PARTITION BY ddt.week_start, ddt.city_group) AS FLOAT) /
+            NULLIF(CAST(sum(t.new_user_prospects) OVER (PARTITION BY ddt.week_start) AS FLOAT), 0)
         ) AS current_share
     FROM
         dim_distinct ddt
@@ -68,6 +68,7 @@ share AS (--pegando o share da ultima semana
 )
 SELECT
     d.sk_date AS id_date,
+    '{id_rule}' AS id_rule,
     d.city_group,
     coalesce(s.share,0) AS share,
     'affiliates' AS funnel_side

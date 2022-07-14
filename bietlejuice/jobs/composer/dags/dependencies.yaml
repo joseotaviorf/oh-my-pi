@@ -1276,7 +1276,7 @@ bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
   - bietlejuice.casa_mineira_lifull_campaigns:load-clean-mitula-campaigns
   - bietlejuice.casa_mineira_lifull_campaigns:load-clean-trovit-campaigns
   - bietlejuice.casa_mineira_rtb_campaigns:load-clean-rtb-campaigns
-  - bietlejuice.enrich_marketing_costs_sharing_rules:load-old-sharing-rules-from-redshift-to-datalake
+  - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
 
 bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:
   - bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
@@ -1294,7 +1294,7 @@ bietlejuice.enrich_chattermill:
 
 bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
-  - bietlejuice.enrich_marketing_costs_sharing_rules:load-old-sharing-rules-from-redshift-to-datalake
+  - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
   - bietlejuice.facebook_insights:load-clean-facebook-insights
   - bietlejuice.google_ads:load-clean-ads-performance
   - bietlejuice.google_ads:load-clean-campaigns-performance
@@ -1687,15 +1687,16 @@ bietlejuice.enrich_marketing_costs_offline:
 bietlejuice.enrich_marketing_costs_sharing_rules:
   # Removed dependency with dw_region in order to avoid loopings since dw_rent_listing_flow already satisfies.
   # Also, removed dependency with dw_booking.dim_booking and dw_offer.dim_offer, since it's already satisfied by dw_rent_flow.
-  # TO DO: migrate and add dependency to datalake_raw.gsheets_marketing_affiliates_targets_replanning
-  - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
-  - bietlejuice.dw_user:load-public-dim-user-into-redshift
-  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
-  - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
-  - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
-  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
-  - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
-  - bietlejuice.ebdb:create-partner-clean-external-table
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.dw_user_affiliate:load-dw-dim-user-affiliate
+  - bietlejuice.dw_user:load-dw-dim-user
+  - bietlejuice.dw_rent_listing_flow:load-dw-fact-house-listing-flows
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
+  - bietlejuice.dw_sale_listings:load-dw-fact-listing-status
+  - bietlejuice.dw_rent_flow:load-dw-fact-listing-rent-flows
+  - bietlejuice.dw_listing:load-dw-fact-house-listings
+  - bietlejuice.dw_datamarts_cross:create-talk-to-agent-in-datalake
+  - bietlejuice.ebdb:create-clean-partner-in-data-lake
 
 bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.gsheets.growth_intraday:load-clean-marketing-name-convention-shared-costs

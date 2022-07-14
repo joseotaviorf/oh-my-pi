@@ -57,7 +57,7 @@ city_group_share_rules AS (
     FROM
         datalake_gsheets_clean.marketing_name_convention_shared_costs s
     JOIN
-        datalake_marketing_costs_sharing_rules.old_sharing_rules AS r 
+        datalake_marketing_costs_sharing_rules.sharing_rules AS r 
             ON INT(REPLACE(dt_cost, '-', '')) = r.id_date
             AND s.id_rule = r.id_rule
             AND s.side = r.funnel_side

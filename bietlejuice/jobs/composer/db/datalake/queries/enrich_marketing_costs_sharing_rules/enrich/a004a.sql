@@ -1,32 +1,31 @@
 /*Share de custos com base na quantidade de prospects gerados no mes anterior com source = facebook
  Baseado na query em bi-etl-ejuice/bietlejuice/db/dw/queries/marketINg/affiliates_costs/affiliates_national_campaigns_share.sql */
-
 WITH affiliates AS ( --Afiliado por source= facebook
     SELECT DISTINCT 
         dua.sk_user_affiliate,
         du.sk_user
     FROM
-        dim_user_affiliate dua
+        dw_public.dim_user_affiliate dua
     JOIN
-        dim_user du
-    	ON du.dados_afiliado_id = dua.sk_user_affiliate
+        dw_public.dim_user du
+        ON du.dados_afiliado_id = dua.sk_user_affiliate
     WHERE
-        trackINg_source IN ('facebook')
+        tracking_source IN ('facebook')
 ),
 t_row_count AS ( --contagem de prospects
     SELECT
         dd.sk_date,
         cast(replace(dd.year_month, '/', '') AS INTEGER) AS year_month,
-        cast(to_char(dd.last_month, 'YYYYMM') AS INTEGER) AS last_year_month,
+        cast(date_format(dd.last_month, 'yyyyMM') AS INTEGER) AS last_year_month,
         dr.city_group,
         count(1) AS row_count
     FROM
-        fact_house_listINg_flows fhlf
+        dw_public.fact_house_listing_flows fhlf
     JOIN affiliates af
         ON af.sk_user = fhlf.sk_user_lead_affiliate
-    JOIN dim_region dr
+    JOIN dw_public.dim_region dr
         ON dr.sk_region = fhlf.sk_region
-    JOIN dim_date dd
+    JOIN dw_public.dim_date dd
         ON dd.sk_date = fhlf.sk_prospect_date
     WHERE
         affiliate_type = 'Standard'
@@ -39,7 +38,7 @@ dim_distinct AS (
 	 	cast(replace(dd.year_month, '/', '') AS INTEGER) AS year_month,
 	 	dr.city_group
 	FROM
-	 	dim_date dd, dim_region dr
+	 	dw_public.dim_date dd, dw_public.dim_region dr
 	WHERE
 	    dd.date < current_date
 ),
@@ -66,6 +65,7 @@ share AS (
 )
 SELECT
 	d.sk_date AS id_date,
+    '{id_rule}' AS id_rule,
 	d.city_group,
 	coalesce(s.share,0) AS share,
 	'affiliates' AS funnel_side

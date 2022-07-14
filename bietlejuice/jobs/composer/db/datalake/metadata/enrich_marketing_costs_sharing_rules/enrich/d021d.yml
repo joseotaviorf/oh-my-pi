@@ -1,0 +1,10 @@
+---
+database_name: datalake_marketing_costs_sharing_rules
+table_name: d021d
+columns:
+  id_date:
+    lineage:
+      - dw_public.dim_date.sk_date
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group

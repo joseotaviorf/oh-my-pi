@@ -1,0 +1,4 @@
+---
+main_table: "sharing_rules"
+partition_cols:
+  sharing_rules: ["id_date", "id_rule"]
