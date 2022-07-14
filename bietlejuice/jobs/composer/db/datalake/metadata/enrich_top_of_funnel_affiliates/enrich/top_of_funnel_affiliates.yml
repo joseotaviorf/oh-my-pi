@@ -3,22 +3,22 @@ table_name: top_of_funnel_affiliates
 columns:
   city:
     lineage:
-      - datalake_amplitude_clean.events.city
+      - datalake_amplitude_clean.205027_intro_page_viewed_events.city
   utm_source:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.205027_intro_page_viewed_events.up_utm_source
   utm_medium:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.205027_intro_page_viewed_events.up_utm_medium
   utm_campaign:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.205027_intro_page_viewed_events.up_utm_campaign
   utm_content:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.205027_intro_page_viewed_events.up_utm_content
   utm_term:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.205027_intro_page_viewed_events.up_utm_term
   mkt_channel:
     lineage:
       - datalake_gsheets_clean.taxonomy_affiliates.mkt_channel
@@ -30,13 +30,13 @@ columns:
       - datalake_gsheets_clean.taxonomy_affiliates.mkt_source
   dt_event:
     lineage:
-      - datalake_amplitude_clean.events.ts_event
+      - datalake_amplitude_clean.205027_intro_page_viewed_events.dt_event
   year:
     lineage:
-      - datalake_amplitude_clean.events.ts_event
+      - datalake_amplitude_clean.205027_intro_page_viewed_events.dt_event
   month:
     lineage:
-      - datalake_amplitude_clean.events.ts_event
+      - datalake_amplitude_clean.205027_intro_page_viewed_events.dt_event
   day:
     lineage:
-      - datalake_amplitude_clean.events.ts_event
+      - datalake_amplitude_clean.205027_intro_page_viewed_events.dt_event

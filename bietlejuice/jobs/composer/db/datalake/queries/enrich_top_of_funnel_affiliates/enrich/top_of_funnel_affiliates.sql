@@ -1,22 +1,20 @@
 WITH events AS(
     SELECT
-        DATE(ts_event) AS date,
+        dt_event AS date,
         city,
         'Standard' AS affiliate_type,
-        CAST(GET_JSON_OBJECT(user_properties, '$.utm_source') AS STRING) AS utm_source,
-        CAST(GET_JSON_OBJECT(user_properties, '$.utm_medium') AS STRING) AS utm_medium,
-        CAST(GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS STRING) AS utm_campaign,
-        CAST(GET_JSON_OBJECT(user_properties, '$.utm_content') AS STRING) AS utm_content,
-        CAST(GET_JSON_OBJECT(user_properties, '$.utm_term') AS STRING) AS utm_term,
+        up_utm_source AS utm_source,
+        up_utm_medium AS utm_medium,
+        up_utm_campaign AS utm_campaign,
+        up_utm_content AS utm_content,
+        up_utm_term AS utm_term,
         COUNT(DISTINCT id_amplitude) AS unique_user
     FROM
-        datalake_amplitude_clean.events
+        datalake_amplitude_clean.205027_intro_page_viewed_events
     WHERE
-        event_type IN ('intro_page_viewed')
-        AND id_app = 205027
-        AND DATE(ts_event) = DATE('{year}-{month}-{day}')
-        AND CAST(GET_JSON_OBJECT(event_properties, '$.uri') AS STRING) NOT LIKE '%https://mkt.quintoandar.com.br/indica-ai-porteiros/%'
-    GROUP BY 1,2,3,4,5,6,7,8
+       dt_event = DATE('{year}-{month}-{day}')
+        AND ep_uri NOT LIKE '%https://mkt.quintoandar.com.br/indica-ai-porteiros/%'
+    GROUP BY 1,2,3,4,5,6,7,8   
 )
 SELECT
     events.city,
