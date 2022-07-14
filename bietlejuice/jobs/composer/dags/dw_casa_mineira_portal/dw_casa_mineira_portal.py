@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -12,6 +12,12 @@ from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 
 from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.databricks.cluster_permission_enum import (
+    ClusterPermissionEnum,
+)
+from bietlejuice.jobs.composer.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.services.configuration_service import (
@@ -38,13 +44,15 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
-SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+DEFAULT_LIBRARIES = config_service.get_config("default_libraries")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -61,7 +69,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=DEFAULT_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -90,3 +102,8 @@ chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
 TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
 
 chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)
+
+# Set data quality tasks if exists
+independent_tasks = DWTaskGroup.all_independent_tasks(dw_staging_task_group)
+if independent_tasks:
+    terminate_cluster_task.set_upstream(independent_tasks)
