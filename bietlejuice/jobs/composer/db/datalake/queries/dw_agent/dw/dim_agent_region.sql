@@ -13,7 +13,7 @@ SELECT
 	CAST(CONCAT(sk_regions_date, sk_agent) AS BIGINT) AS sk_agent_region,
 	CAST(sk_regions_date AS INTEGER) AS sk_regions_date,
 	CAST(sk_agent AS INTEGER) AS sk_agent,
-	CAST(regions AS VARCHAR(3076)) AS regions,
+	CAST(regions AS VARCHAR(4000)) AS regions,
 	CAST(area AS VARCHAR(10)) AS area,
 	CAST(secondary_area AS VARCHAR(10)) AS secondary_area,
 	CAST(area_deprecated AS VARCHAR(10)) AS area_deprecated,
