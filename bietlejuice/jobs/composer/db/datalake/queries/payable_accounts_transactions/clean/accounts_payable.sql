@@ -1,7 +1,7 @@
 SELECT
     `_doc_nf` AS nf_file_description,
     CASE 
-        WHEN RLIKE(TRIM(fornecedor),"^[0-9]+\.0+$") THEN REGEXP_REPLACE(TRIM(fornecedor), "\.0+$", "")
+        WHEN RLIKE(TRIM(fornecedor),"^[0-9]+\\.0+$") THEN REGEXP_REPLACE(TRIM(fornecedor), "\\.0+$", "")
         ELSE TRIM(fornecedor)
     END AS supplier_description,
     NULLIF(TRIM(cost_and_profit_center), '') AS payment_source,
