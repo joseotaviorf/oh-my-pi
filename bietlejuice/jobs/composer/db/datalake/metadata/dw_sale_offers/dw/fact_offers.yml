@@ -113,3 +113,6 @@ columns:
   hours_visit_completed_to_offer:
     lineage:
       - datalake_offer.sale_offer.hours_visit_to_offer
+  ts_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed

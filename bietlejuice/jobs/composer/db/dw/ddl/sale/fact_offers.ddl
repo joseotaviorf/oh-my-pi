@@ -37,6 +37,7 @@ CREATE TABLE sale.fact_offers (
 	days_sale_agreement_created_to_sale_agreement_signed INTEGER,
 	hours_booking_to_offer FLOAT,
 	hours_visit_completed_to_offer FLOAT,
+	ts_sale_agreement_signed TIMESTAMP,
 	ts_load TIMESTAMP
 );
 ALTER TABLE sale.fact_offers OWNER TO airflow;
