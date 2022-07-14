@@ -1,5 +1,5 @@
 ---
-database_name: dw_datamarts_growth
+database_name: dw_datamarts_growth_blocklist
 table_name: market_share_by_sk_region
 columns:
   name:

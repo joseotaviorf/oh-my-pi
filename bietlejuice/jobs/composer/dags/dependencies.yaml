@@ -217,7 +217,6 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
   - bietlejuice.gsheets:create-clean-aux-check-photo-sender-external-table
   - bietlejuice.gsheets.growth:create-clean-branding-where-is-plaquinha-external-table
-  #market_share_by_sk_region
   - bietlejuice.ebdb:create-polygon-region-clean-external-table
   # performance_marketing_metrics_*_casa_mineira
   - bietlejuice.casa_mineira_portal:create-clean-house-external-table
@@ -225,9 +224,8 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-budget-external-table
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-external-table
   - bietlejuice.casa_mineira_portal:create-clean-uf-external-table
-  # unique_owners, plaquinhas_houses, sale_performance_marketing_metrics_supply_cohort
+  # plaquinhas_houses, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
-  # market_share_by_sk_region
   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
   # tof_demand_online_events
@@ -245,10 +243,10 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.gsheets.for_sale:create-clean-sale-supply-targets-external-table
   # users_online_metrics, listings-online-metrics
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  #performance_marketing_metrics_supply, unique_owners, sale_performance_marketing_metrics_supply_cohort
+  # sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
-  #performance_marketing_metrics_supply, sale_performance_marketing_metrics_supply_cohort
-  #performance_marketing_metrics_supply, sale_performance_marketing_metrics_supply_cohort
+  # sale_performance_marketing_metrics_supply_cohort
+  # sale_performance_marketing_metrics_supply_cohort
   # performance_marketing_metrics_portal_casa_mineira, performance_marketing_metrics_imobiliaria_casa_mineira
   - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
   - bietlejuice.gsheets:create-clean-taxonomy-portal-casa-mineira-external-table

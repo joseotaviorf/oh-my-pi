@@ -35,11 +35,6 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/performance_marketing_metrics_demand.sql
       table: performance_marketing_metrics_demand
-  performance_marketing_metrics_supply:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_supply.sql
-      table: performance_marketing_metrics_supply
   rental_performance_marketing_metrics_supply_coincident:
     dw:
       <<: *redshift_anchor

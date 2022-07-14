@@ -58,6 +58,28 @@ pipeline:
       table: plaquinhas_metrics
       # depends_on:
       #   - performance_marketing_metrics_demand
+  market_share_by_sk_region:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/growth_blocklist/market_share_by_sk_region.sql
+      table: market_share_by_sk_region
+  tof_demand_online_events:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/growth_blocklist/tof_demand_online_events.sql
+      table: tof_demand_online_events
+  unique_owners:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_blocklist/unique_owners.sql
+      table: unique_owners
+  performance_marketing_metrics_supply:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_blocklist/performance_marketing_metrics_supply.sql
+      table: performance_marketing_metrics_supply
+      # depends_on:
+      #   - performance_marketing_metrics_demand
   marketing_allocated_costs:
     dw:
       <<: *redshift_anchor

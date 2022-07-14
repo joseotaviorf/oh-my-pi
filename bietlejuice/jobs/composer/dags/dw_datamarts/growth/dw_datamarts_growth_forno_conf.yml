@@ -48,36 +48,16 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_portal_casa_mineira.sql
       table: performance_marketing_metrics_portal_casa_mineira
-  performance_marketing_metrics_supply:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_supply.sql
-      table: performance_marketing_metrics_supply
   plaquinhas_houses:
     dw:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth/plaquinhas_houses.sql
       table: plaquinhas_houses
-  unique_owners:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/unique_owners.sql
-      table: unique_owners
   sale_performance_marketing_metrics_supply_cohort:
     dw:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth/sale_performance_marketing_metrics_supply_cohort.sql
       table: sale_performance_marketing_metrics_supply_cohort
-  tof_demand_online_events:
-    dw:
-      <<: *athena_anchor
-      sql_file: dw/queries/datamarts/growth/tof_demand_online_events.sql
-      table: tof_demand_online_events
-  market_share_by_sk_region:
-    dw:
-      <<: *athena_anchor
-      sql_file: dw/queries/datamarts/growth/market_share_by_sk_region.sql
-      table: market_share_by_sk_region
   casa_mineira_top_of_funnel_volumes_monthly:
     dw:
       <<: *redshift_anchor
