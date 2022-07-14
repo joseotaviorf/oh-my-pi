@@ -70,8 +70,8 @@ tenant_prospects AS (
         	ON rgn.id = tpe.sk_region
     WHERE
 		rgn.short_region_name = 'SP'
-	    AND tp.mkt_medium = 'SEM branded'
-		AND tp.mkt_source = 'Google'
+	    AND tpe.mkt_medium = 'SEM branded'
+		AND tpe.mkt_source = 'Google'
 )
 SELECT
     adt.id_date,
