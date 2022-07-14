@@ -86,6 +86,7 @@ date_region_cross_join AS (
 )
 SELECT
     drc.id_date,
+    '{id_rule}' AS id_rule,
     drc.city_group,
     COALESCE(
 		COUNT(DISTINCT tp.sk_client)/NULLIF(SUM(COUNT(DISTINCT tp.sk_client)) OVER(PARTITION BY drc.id_date), 0),
@@ -100,4 +101,4 @@ LEFT JOIN
         AND drc.city_group=tp.city_group
         AND tp.interactions_order = 1
 GROUP BY
-    1,2
+    1,2,3

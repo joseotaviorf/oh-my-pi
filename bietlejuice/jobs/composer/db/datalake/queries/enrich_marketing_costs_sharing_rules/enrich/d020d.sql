@@ -75,6 +75,7 @@ tenant_prospects AS (
 )
 SELECT
     adt.id_date,
+    '{id_rule}' AS id_rule,
     tp.city_group,
     FLOAT(COUNT(DISTINCT tp.sk_client)/NULLIF(SUM(COUNT(DISTINCT tp.sk_client)) OVER(PARTITION BY adt.id_date), 0)) AS share,
 	'demand' AS funnel_side
@@ -86,4 +87,4 @@ INNER JOIN
 WHERE
     tp.interactions_order = 1
 GROUP BY
-    1,2
+    1,2,3
