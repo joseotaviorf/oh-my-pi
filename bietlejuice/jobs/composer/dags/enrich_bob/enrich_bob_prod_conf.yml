@@ -5,3 +5,8 @@ tables:
     partitions: [year, month, day]
   - table_name: house_draft
     is_incremental: false
+
+custom_cluster:
+  driver_node_type_id: c4.2xlarge
+  node_type_id: c4.4xlarge
+  num_workers: 2

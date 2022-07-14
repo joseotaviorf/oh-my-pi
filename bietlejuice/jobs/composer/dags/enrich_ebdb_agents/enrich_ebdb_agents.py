@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -17,6 +17,10 @@ from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
 )
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
+)
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
 )
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -41,10 +45,16 @@ tables = config_service.get_config("tables")
 
 SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{spark_jobs_logs_path}{DAG_ID}"
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 # dependent: [dependencies]
 inner_dependencies = config_service.get_config("inner_dependencies")
@@ -64,7 +74,10 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 

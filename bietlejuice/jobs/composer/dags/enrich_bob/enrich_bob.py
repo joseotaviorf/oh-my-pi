@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -11,9 +11,12 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
+)
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
 )
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -36,10 +39,13 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = f"s3://{databricks_bietlejuice_repo_path}/logs/jobs/{DAG_ID}"
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_enrich_bob_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+cluster_description = config_service.get_config("custom_cluster")
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 tables = config_service.get_config("tables")
 
@@ -58,7 +64,14 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+)
+
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
 )
 
 datalake_task_group = DatalakeTaskGroup(
@@ -70,20 +83,25 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
+enrich_task_groups = {}
 for table in tables:
     table_name = table["table_name"]
     is_incremental = table["is_incremental"]
     partitions = table.get("partitions")
 
-    enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-        layer=LayerEnum.ENRICH,
+    enrich_task_groups[table_name] = datalake_task_group.build_enrich_task_group(
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
+        table_name=table_name,
+        partitions=partitions,
+        is_incremental=is_incremental,
     )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
-)
-
-chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
-chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+    chain(
+        create_cluster_task,
+        DatalakeTaskGroup.first_tasks(enrich_task_groups[table_name]),
+    )
+    chain(
+        DatalakeTaskGroup.last_tasks(enrich_task_groups[table_name]),
+        terminate_cluster_task,
+    )
