@@ -29,3 +29,7 @@ class FullTableLoaderPipeline(TableLoaderPipeline):
             database_location=self.target_database_location,
             partitions=self.partitions,
         )
+
+        spark_metastore_service.refresh_table(
+            self.target_database_name, self.table_name
+        )
