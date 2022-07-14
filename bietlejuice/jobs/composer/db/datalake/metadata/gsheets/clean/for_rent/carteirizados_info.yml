@@ -1,0 +1,25 @@
+---
+database_name: datalake_gsheets_clean
+table_name: carteirizados_info
+columns:
+  id_client:
+    lineage:
+      - datalake_gsheets_raw.carteirizados_info.sk_client
+  id_proposal:
+    lineage:
+      - datalake_gsheets_raw.carteirizados_info.sk_proposal
+  name:
+    lineage:
+      - datalake_gsheets_raw.carteirizados_info.name
+  email:
+    lineage:
+      - datalake_gsheets_raw.carteirizados_info.email
+  phone_number:
+    lineage:
+      - datalake_gsheets_raw.carteirizados_info.phone_number
+  closing_group:
+    lineage:
+      - datalake_gsheets_raw.carteirizados_info.closing_group
+  dt_accreditation_week:
+    lineage:
+      - datalake_gsheets_raw.carteirizados_info.dt_inclusion

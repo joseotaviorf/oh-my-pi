@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_raw
+table_name: carteirizados_info
+columns:
+  name:
+    tags:
+    - PII
+  email:
+    tags:
+    - Confidential
+  phone_number:
+    tags:
+    - Confidential

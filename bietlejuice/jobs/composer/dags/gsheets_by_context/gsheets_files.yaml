@@ -113,7 +113,7 @@ mexico_demand_marketing_cost_per_source_actual:
     sheet_name: mkt_cost_per_source
     clean_table_name: mexico_demand_marketing_cost_per_source_actual
     sheet_context: growth
-   
+
 mexico_marketing_cost_per_source:
     sheet_id: 1eIjPgBuUYojHGW8JwVVnOvMRU0a9jwYb9QQtIejyPAc
     sheet_name: mkt_cost_per_source
@@ -310,6 +310,12 @@ aux_regiao:
     sheet_id: 1gh8S0xVQ9HsTs6EkvE0BcXvh5_cfaG3aUpIgrluqqlM
     sheet_name: aux_regiao
     clean_table_name: auxiliary_region
+    sheet_context: for_rent
+
+carteirizados_info:
+    sheet_id: 1L1W6n1s8csGAmhUBH2kfDh7kE-cTCGKeL5FGRKVZRk4
+    sheet_name: cart_base
+    clean_table_name: carteirizados_info
     sheet_context: for_rent
 
 demand_targets_2022:
