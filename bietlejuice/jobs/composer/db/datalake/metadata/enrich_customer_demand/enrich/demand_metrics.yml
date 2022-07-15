@@ -4,23 +4,21 @@ table_name: demand_metrics
 columns:
   id_agent:
     lineage:
-      - datalake_customer_demand.base_tasks.id_agent
+      - datalake_customer_demand.demand_metrics_tasks.id_agent
   type:
     lineage:
-      - datalake_customer_demand.base_tasks.type
+      - datalake_customer_demand.demand_metrics_tasks.type
   time_spent_on_tickets_solved_in_time:
     lineage:
-      - datalake_customer_demand.base_tasks.ts_started
-      - datalake_customer_demand.base_tasks.ts_completed
+      - datalake_customer_demand.demand_metrics_tasks.time_spent_solved_in_time
   time_spent_on_tickets_not_solved_in_time:
     lineage:
-      - datalake_customer_demand.base_tasks.ts_started
-      - datalake_customer_demand.base_tasks.ts_completed
+      - datalake_customer_demand.demand_metrics_tasks.time_spent_not_solved_in_time
   total_time_spent:
     lineage:
-      - datalake_customer_demand.base_tasks.ts_started
-      - datalake_customer_demand.base_tasks.ts_completed
+      - datalake_customer_demand.demand_metrics_tasks.total_time_spent
   dt_metric_reference:
     lineage:
-      - datalake_customer_demand.base_tasks.ts_started
-      - datalake_customer_demand.base_tasks.ts_completed
+      - datalake_customer_demand.demand_metrics_tasks.ts_started
+      - datalake_customer_demand.demand_metrics_tasks.ts_completed
+      - datalake_customer_demand.demand_metrics_tasks.ts_closed

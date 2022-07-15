@@ -1,0 +1,40 @@
+---
+database_name: datalake_customer_demand
+table_name: demand_metrics_tasks
+columns:
+  id_task:
+    lineage:
+      - datalake_customer_demand.base_tasks.id_task
+  id_agent:
+    lineage:
+      - datalake_customer_demand.base_tasks.id_agent
+  id_taxonomy:
+    lineage:
+      - datalake_customer_demand.base_tasks.id_taxonomy
+  id_tags:
+    lineage:
+      - datalake_customer_demand.base_tasks.id_tags
+  id_main_department:
+    lineage:
+      - datalake_customer_demand.base_tasks.id_main_department
+  type:
+    lineage:
+      - datalake_customer_demand.base_tasks.type
+  sla_target:
+    lineage:
+      - datalake_customer_demand.base_tasks.sla_target
+  origin:
+    lineage:
+      - datalake_customer_demand.base_tasks.origin
+  status:
+    lineage:
+      - datalake_customer_demand.base_tasks.status
+  ts_started:
+    lineage:
+      - datalake_customer_demand.base_tasks.ts_started
+  ts_completed:
+    lineage:
+      - datalake_customer_demand.base_tasks.ts_completed
+  ts_closed:
+    lineage:
+      - datalake_customer_demand.base_tasks.ts_closed

@@ -1,0 +1,10 @@
+---
+inner_dependencies:
+  demand_metrics_tasks:
+    - base_tasks
+  demand_metrics:
+    - demand_metrics_tasks
+  backlog_metrics:
+    - base_tasks
+  quality_metrics:
+    - base_tasks

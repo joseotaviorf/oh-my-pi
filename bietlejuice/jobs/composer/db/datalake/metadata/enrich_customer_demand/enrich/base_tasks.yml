@@ -10,6 +10,21 @@ columns:
     lineage:
       - datalake_gsheets_clean.agents_control.id_assignee
       - datalake_customer_support.email.id_agent
+  id_taxonomy:
+    lineage:
+      - datalake_customer_support.email.step_tag
+      - datalake_customer_support.email.customer_type_tag
+      - datalake_customer_support.email.client_type
+      - datalake_customer_support.email.request_type
+      - datalake_customer_support.email.contact_motivation_tag
+      - datalake_customer_support.email.contact_theme_tag
+      - datalake_customer_support.email.contact_theme_detail_tag
+  id_tags:
+    lineage:
+      - datalake_customer_support.email.tags
+  id_main_department:
+    lineage:
+      - datalake_customer_support.email.department
   type:
     lineage:
       - datalake_customer_support.email.department
@@ -18,6 +33,9 @@ columns:
     lineage:
       - datalake_gsheets_clean.taxonomy_sla.sla_in_days
       - datalake_gsheets_clean.tag_sla_target.sla
+  status:
+    lineage:
+      - datalake_customer_support.email.status
   csat_score:
     lineage:
       - datalake_customer_support.email.csat_score

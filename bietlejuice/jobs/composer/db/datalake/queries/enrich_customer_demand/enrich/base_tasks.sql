@@ -4,12 +4,12 @@ WITH base_crm_analyst_info AS (
     ac.id_assignee AS id_agent,
     action_type
   FROM
-    datalake_crm_tasks_flows.tasks_users_resolutions_flow turf
+    datalake_crm_tasks_flows.tasks_users_resolutions_flow AS turf
   JOIN
-    datalake_ebdb_user.user du
+    datalake_ebdb_user.user AS du
       ON du.id = turf.id_assignee
   JOIN
-    datalake_gsheets_clean.agents_control ac
+    datalake_gsheets_clean.agents_control AS ac
       ON ac.email = du.email
 ),
 crm_tasks AS (
@@ -28,14 +28,14 @@ crm_tasks AS (
     5 AS sla_target,
     tarf.ts_started,
     tarf.ts_completed
-  FROM 
-    datalake_crm_tasks_flows.tasks_actions_resolutions_flow tarf
+  FROM
+    datalake_crm_tasks_flows.tasks_actions_resolutions_flow AS tarf
   JOIN
-    last_updated_task lut
+    last_updated_task AS lut
       ON tarf.id_task = lut.id_task
       AND DATE(CONCAT(year, '-', month, '-', day)) = lut.dt_last_updated
   LEFT JOIN
-    base_crm_analyst_info bca
+    base_crm_analyst_info AS bca
       ON tarf.id_task = bca.id_task
   WHERE
     tarf.type IN (
@@ -50,28 +50,43 @@ ticket_tasks AS (
     SELECT
       e.id_ticket,
       e.id_agent,
+      MD5(
+        CONCAT(
+          COALESCE(e.step_tag, ''),
+          COALESCE(e.customer_type_tag, ''),
+          COALESCE(e.client_type, ''),
+          COALESCE(e.request_type, ''),
+          COALESCE(e.contact_motivation_tag, ''),
+          COALESCE(e.contact_theme_tag, ''),
+          COALESCE(e.contact_theme_detail_tag, '')
+        )
+      ) AS id_taxonomy,
+      MD5(e.department) AS id_main_department,
+      MD5(MAX(e.tags)) AS id_tags,
+      MAX(e.tags) AS tags,
       e.department,
       e.csat_score,
+      e.status,
       e.is_solved,
-      e.tags,
       e.contact_theme_detail_tag,
       e.contact_theme_tag,
       CASE
-        WHEN 
+        WHEN
           DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) IS NOT NULL
-          AND DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) >= e.ts_ticket_started 
+          AND DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) >= e.ts_ticket_started
           AND DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) < ts_ticket_solved
         THEN CAST(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ') AS TIMESTAMP)
-        ELSE e.ts_ticket_started  
+        ELSE e.ts_ticket_started
       END AS ts_started,
       ts_ticket_solved AS ts_completed,
       ts_ticket_ended AS ts_closed,
       ts_csat_first_response AS ts_csat_answer
     FROM
-      datalake_customer_support.email e
+      datalake_customer_support.email AS e
     LEFT JOIN
-      datalake_zendesk_ticket_funnels.ticket_funnel tf
+      datalake_zendesk_ticket_funnels.ticket_funnel AS tf
         ON e.id_ticket = tf.id_ticket
+    GROUP BY 1,2,3,4,7,8,9,10,11,12,13,14,15,16
   ),
   unique_theme_detail_sla_target AS (
     SELECT DISTINCT
@@ -127,41 +142,45 @@ ticket_tasks AS (
   SELECT DISTINCT
     t.id_ticket AS id_task,
     COALESCE(t.id_agent, '-1') AS id_agent,
+    t.id_taxonomy,
+    t.id_tags,
+    t.id_main_department,
     t.department AS type,
     t.csat_score,
+    t.status,
     t.is_solved,
-    CASE 
+    CASE
       WHEN t.department IN ('Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]') THEN 21
-      ELSE COALESCE(tds.sla_in_days,ts.sla_in_days, ujst.sla_in_days, tst.sla) 
+      ELSE COALESCE(tds.sla_in_days,ts.sla_in_days, ujst.sla_in_days, tst.sla)
     END AS sla_target,
     t.ts_started,
     t.ts_completed,
     t.ts_closed,
     t.ts_csat_answer
   FROM
-    ticket_started t
+    ticket_started AS t
   LEFT JOIN
-    datalake_gsheets_clean.department_control dc
+    datalake_gsheets_clean.department_control AS dc
       ON t.department = dc.department
   LEFT JOIN
-    unique_theme_detail_sla_target tds
+    unique_theme_detail_sla_target AS tds
       ON dc.journey_step = tds.journey_step
       AND t.contact_theme_detail_tag = tds.taxonomy_tag
       AND t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
       AND DATE(t.ts_started) = tds.dt_reference
   LEFT JOIN
-    unique_theme_sla_target ts
+    unique_theme_sla_target AS ts
       ON dc.journey_step = ts.journey_step
       AND t.contact_theme_tag = ts.taxonomy_tag
       AND t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
       AND DATE(t.ts_started) = ts.dt_reference
   LEFT JOIN
-    unique_journey_sla_target ujst
+    unique_journey_sla_target AS ujst
       ON dc.journey_step = ujst.journey_step
       AND t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
       AND DATE(t.ts_started) = ujst.dt_reference
   LEFT JOIN
-    datalake_gsheets_clean.tag_sla_target tst
+    datalake_gsheets_clean.tag_sla_target AS tst
       ON dc.journey_step = tst.journey
       AND t.department = 'Offboarding Reparos [OFF] [POS] [BACK]'
       AND t.tags LIKE CONCAT('%', tst.tag, '%')
@@ -181,8 +200,13 @@ ticket_tasks AS (
 SELECT
   id_task,
   id_agent,
+  NULL AS id_taxonomy,
+  NULL AS id_tags,
+  NULL AS id_main_department,
   type,
   sla_target,
+  'crm' AS origin,
+  NULL AS status,
   NULL AS csat_score,
   NULL AS is_solved,
   ts_started,
@@ -195,8 +219,13 @@ UNION ALL
 SELECT
   id_task,
   id_agent,
+  id_taxonomy,
+  id_tags,
+  id_main_department,
   type,
   sla_target,
+  'email' AS origin,
+  status,
   csat_score,
   is_solved,
   ts_started,
