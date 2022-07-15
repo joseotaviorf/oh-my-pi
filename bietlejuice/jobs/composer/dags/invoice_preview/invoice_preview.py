@@ -4,13 +4,13 @@ import json
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
+    QuintoAndarDatabricksSubmitRunOperator,
 )
-
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services.configuration_service import (
@@ -38,7 +38,7 @@ MAIN_SCHEDULE_INTERVAL = "30 3 * * *"
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 CUSTOM_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 
-CLUSTER_DESCRIPTION = Variable.get(f"databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_min_general_cluster")
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
@@ -95,6 +95,21 @@ raw_task_group = task_group.build_raw_task_group_for_single_table(
         json.dumps(CONSUMER_EXTRA_ARGS),
     ],
 )
+
+
+check_data = QuintoAndarDatabricksSubmitRunOperator(
+    task_id=f"check-completion-notify",
+    pool="default_pool",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": f"{CUSTOM_SPARK_JOB_PATH}/check_completion_notify.py",
+            "parameters": [ENV, datalake_bucket, SOURCE, TABLE_NAME],
+        }
+    },
+)
+
+
 partition_columns = config_service.get_config("partition_cols")
 clean_task_group = task_group.build_clean_task_group(
     source_database_base_name=SOURCE,
@@ -110,5 +125,6 @@ cross_downstream(
     DatalakeTaskGroup.last_tasks(raw_task_group),
     DatalakeTaskGroup.first_tasks(clean_task_group),
 )
+chain(DatalakeTaskGroup.last_tasks(clean_task_group), check_data)
 
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
+terminate_cluster_task.set_upstream(check_data)

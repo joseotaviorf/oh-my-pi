@@ -89,43 +89,63 @@ if __name__ == "__main__":
         by_day_files[yearmonthday].append(path)
 
     dfs = []
-    for csv in by_day_files[date_to_ingest]:
-        dfs.append(s3_consumer.get_data_from_file(path=csv, **consumer_extra_args))
-    df = reduce(DataFrame.unionAll, dfs)
-    df = (
-        SparkDataFrameService()
-        .input(df)
-        .create_year_month_day_columns_from_date(date_ingested)
-        .output()
-    )
 
-    df = df.withColumn("ts_load", functions.current_timestamp())
+    if len(by_day_files[date_to_ingest]) > 0:
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
-    spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+        for csv in by_day_files[date_to_ingest]:
+            dfs.append(s3_consumer.get_data_from_file(path=csv, **consumer_extra_args))
 
-    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    database_name = db_info["db_raw_databricks"]
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
-    database_location = db_info["db_raw_path"]
-    spark_metastore_service.create_database(database_name)
+        df = reduce(DataFrame.unionAll, dfs)
+        df = (
+            SparkDataFrameService()
+            .input(df)
+            .create_year_month_day_columns_from_date(date_ingested)
+            .output()
+        )
 
-    s3_loader = S3Loader()
+        df = df.withColumn("ts_load", functions.current_timestamp())
 
-    s3_path = f"{database_location}{table_name}"
+        db_info = DatalakeMetastoreService.get_db_info(
+            environment, source, datalake_bucket
+        )
+        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    s3_loader.load_df(
-        df=df, s3_path=s3_path, format_options=format_options, partitions=partition_cols
-    )
+        logger.info(
+            "m=__main__, msg=Creating database in Spark Metastore if not exists..."
+        )
+        database_name = db_info["db_raw_databricks"]
+        format_options = SparkTableStorageFormat.DEFAULT_RAW
+        database_location = db_info["db_raw_path"]
+        spark_metastore_service.create_database(database_name)
 
-    spark_metastore_loader.update_metastore(
-        df, database_name, table_name, format_options, database_location, partition_cols
-    )
+        s3_loader = S3Loader()
 
-    spark_metastore_service.create_new_partitions_from_df(
-        database_name=database_name,
-        table_name=table_name,
-        df=df,
-        partition_cols=partition_cols,
-    )
+        s3_path = f"{database_location}{table_name}"
+
+        s3_loader.load_df(
+            df=df,
+            s3_path=s3_path,
+            format_options=format_options,
+            partitions=partition_cols,
+        )
+
+        spark_metastore_loader.update_metastore(
+            df,
+            database_name,
+            table_name,
+            format_options,
+            database_location,
+            partition_cols,
+        )
+
+        spark_metastore_service.create_new_partitions_from_df(
+            database_name=database_name,
+            table_name=table_name,
+            df=df,
+            partition_cols=partition_cols,
+        )
+    else:
+        logger.warning(
+            "m=__main__, msg= No files were found on S3 bucket. Ending process without loading anything."
+        )
