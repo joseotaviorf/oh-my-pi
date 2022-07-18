@@ -1699,6 +1699,11 @@ bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.gsheets.growth_intraday:load-clean-marketing-name-convention-shared-costs
   - bietlejuice.gsheets.growth_intraday:load-clean-marketing-manual-shared-costs
 
+bietlejuice.enrich_money_laundering_prevention:
+  # Removed dependencies with ebdb in order to avoid loopings since enrich_booking already satisfies.
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_booking:load-enrich-booking-review
+
 bietlejuice.enrich_monopoly:
   - bietlejuice.monopoly:load-clean-sale
   - bietlejuice.monopoly:load-clean-outcome-status-log
