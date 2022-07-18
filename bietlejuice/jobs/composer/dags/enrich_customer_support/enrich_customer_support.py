@@ -9,11 +9,14 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum, BaseTaskGroup
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
+)
+from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
+    TaskFlowHelper,
 )
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -34,6 +37,7 @@ s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 spark_jobs_path = f"{s3_prefix}/spark_jobs/base"
 logs_output_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_base_url = config_service.get_config("doc_md_chart_url")
+inner_dependencies = config_service.get_config("inner_dependencies")
 
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_customer_support", deserialize_json=True
@@ -77,5 +81,22 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     target_database_base_name=CONTEXT,
 )
 
-chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
-chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=inner_dependencies,
+)
+
+chain(
+    create_cluster_task,
+    BaseTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
+    + BaseTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
+)
+chain(
+    BaseTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + BaseTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
+)

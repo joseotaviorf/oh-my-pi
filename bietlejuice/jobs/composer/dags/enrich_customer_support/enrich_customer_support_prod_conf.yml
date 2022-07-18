@@ -1,0 +1,4 @@
+---
+inner_dependencies:
+  received_demand:
+    - email

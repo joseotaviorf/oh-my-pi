@@ -144,8 +144,40 @@ chat AS (
       ON ci.customer_contact = crd.customer_phone
   WHERE
     task_queue_name <> next_task_queue_name
+),
+
+email AS(
+  SELECT
+    id_ticket AS id_external_service,
+    NULL AS id_channel,
+    NULL AS id_task_queue,
+    NULL AS id_reservation,
+    NULL AS id_agent,
+    NULL AS id_event,
+    NULL AS id_call,
+    id_user,
+    department AS task_queue_name,
+    'email' AS channel_name,
+    agent_email,
+    agent_company AS agent_location,
+    NULL AS customer_phone,
+    ts_ticket_started AS ts_created,
+    NULL AS ts_updated
+  FROM 
+    datalake_customer_support.email
 )
 
-SELECT * FROM call
+SELECT 
+  * 
+FROM 
+  call
 UNION ALL
-SELECT * FROM chat
+SELECT 
+  * 
+FROM 
+  chat
+UNION ALL
+SELECT 
+  * 
+FROM 
+  email
