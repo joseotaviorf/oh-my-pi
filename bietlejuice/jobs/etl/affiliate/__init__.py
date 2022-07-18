@@ -1,1 +1,0 @@
-from bietlejuice.jobs.etl.affiliate.affiliate import AffiliateETL

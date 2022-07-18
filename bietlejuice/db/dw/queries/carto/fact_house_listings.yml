@@ -1,4 +1,0 @@
----
-carto_table_name: fact_house_listings
-sql_filename: fact_house_listings
-final_sql:

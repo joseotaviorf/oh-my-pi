@@ -1,5 +1,0 @@
-# Config for rental_cost_allocation
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_rental_monthly_tickets_tasks']

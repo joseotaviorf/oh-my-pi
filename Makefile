@@ -1,20 +1,4 @@
 ############# DOCKER commands ########################
-.PHONY: create-docker-environment-python2
-create-docker-environment-python2:
-	@make create-docker-environment
-	@chmod +x start.sh
-	@sudo docker-compose -f docker/docker-compose.py2.yml --env-file docker/.env up --build -d --force-recreate
-	@sudo docker image prune -f
-
-.PHONY: restart-docker-environment-python2
-restart-docker-environment-python2:
-	@sudo docker-compose -f docker/docker-compose.py2.yml up --build -d
-
-.PHONY: kill-docker-environment-python2
-kill-docker-environment-python2:
-	@sudo docker-compose -f docker/docker-compose.py2.yml down
-
-
 .PHONY: create-docker-environment
 create-docker-environment:
 	@rm docker/.env || true
@@ -48,46 +32,6 @@ build-local-whl:
 .PHONY: upload-local-spark-jobs-to-s3
 upload-local-spark-jobs-to-s3:
 	@python3 scripts/upload_local_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
-
-############# PYTHON2 commands #######################
-
-.PHONY: environment-python2
-environment-python2:
-	@pyenv install -s 2.7.12
-	@pyenv virtualenv 2.7.12 bi-etl-ejuice-python2
-	@pyenv local bi-etl-ejuice-python2
-
-.PHONY: requirements-python2
-# install ordered requirements for python2, then test and lint requirements in any order
-requirements-python2:
-	@python -m pip install --upgrade pip
-	@xargs -L 1 python -m pip install --extra-index-url https://quintoandar.github.io/python-package-server/ < requirements.txt
-	@make requirements-test-python2
-	@make requirements-lint-python2
-
-.PHONY: requirements-test-python2
-requirements-test-python2:
-	@python -m pip install -r requirements_test.txt
-
-.PHONY: requirements-lint-python2
-requirements-lint-python2:
-	@python -m pip install -q flake8==3.5.0
-
-.PHONY: check-style-python2
-check-style-python2:
-	@echo ""
-	@echo "Check Style"
-	@echo "=========="
-	@echo ""
-	@python -m flake8 --config=setup.cfg
-
-.PHONY: unit-tests-python2
-unit-tests-python2:
-	@echo ""
-	@echo "Automated Tests"
-	@echo "=========="
-	@echo ""
-	@python -m pytest --cov=bietlejuice/jobs/etl --cov-report html:htmlcov --cov-fail-under=40 --cov-config .coveragerc tests
 
 ############# PYTHON3 commands #######################
 

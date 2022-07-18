@@ -1,2 +1,0 @@
-from bietlejuice.jobs.etl.house_status_history.house_status_full_history import HouseStatusFullHistory
-from bietlejuice.jobs.etl.house_status_history.house_status_history import HouseStatusHistory

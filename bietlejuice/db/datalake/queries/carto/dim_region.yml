@@ -1,7 +1,0 @@
----
-carto_table_name: dim_region
-sql_filename: dim_region
-final_sql: >-
-  UPDATE dim_region
-  SET the_geom = ST_GeomFromText(poligono, 4326)
-  WHERE the_geom IS NULL AND COALESCE(poligono, '') != ''

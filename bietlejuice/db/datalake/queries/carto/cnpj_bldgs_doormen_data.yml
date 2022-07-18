@@ -1,7 +1,0 @@
----
-carto_table_name: cnpj_bldgs_doormen_data
-sql_filename: cnpj_bldgs_doormen_data
-final_sql: >-
-  UPDATE cnpj_bldgs_doormen_data
-  SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326)
-  WHERE the_geom IS NULL

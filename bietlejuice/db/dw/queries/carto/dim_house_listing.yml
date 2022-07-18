@@ -1,8 +1,0 @@
----
-carto_table_name: dim_house_listing
-sql_filename: dim_house_listing
-final_sql: >-
-  UPDATE dim_house_listing
-  SET the_geom = ST_SetSRID(ST_MakePoint(house_lng::float, house_lat::float), 4326)
-  WHERE the_geom IS NULL
-    AND COALESCE(house_lng, '') != '' AND COALESCE(house_lat, '') != ''

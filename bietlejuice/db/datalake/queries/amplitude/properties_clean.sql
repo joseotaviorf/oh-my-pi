@@ -1,1 +1,0 @@
-describe datalake_amplitude_clean_prod.events

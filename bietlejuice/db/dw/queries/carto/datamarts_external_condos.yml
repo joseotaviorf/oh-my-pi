@@ -1,8 +1,0 @@
----
-carto_table_name: datamarts_external_condos
-sql_filename: datamarts_external_condos
-final_sql: >-
-  UPDATE datamarts_external_condos
-  SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326)
-  WHERE the_geom IS NULL
-  AND COALESCE(lng, '') != '' AND COALESCE(lat, '') != ''

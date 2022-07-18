@@ -1,7 +1,0 @@
----
-carto_table_name: dim_lead_last_90_days
-sql_filename: dim_lead_last_90_days
-final_sql: >-
-  UPDATE dim_lead_last_90_days
-  SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326)
-  WHERE the_geom IS NULL

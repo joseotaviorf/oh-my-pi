@@ -1,6 +1,0 @@
-# Config for supply_cost_allocation
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_house_listings', 'dw_supply_daily_costs']
-    
