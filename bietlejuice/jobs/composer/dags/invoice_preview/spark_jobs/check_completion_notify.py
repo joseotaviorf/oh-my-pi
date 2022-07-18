@@ -14,10 +14,10 @@ def create_message(environment, database_name, table_name, count_result):
 
     message = (
         f":warning:\n"
-        f"Validation: *`{database_name}.{table_name}`*\n"
-        f"Environment: *`{environment}`*"
+        f"Validation: `{database_name}.{table_name}`\n"
+        f"Environment: *{environment}*\n"
         f"Status: *FAILED*\n\n"
-        f"*Count validation failed for `{datetime.now().strftime('%Y-%m-%d')}`\n"
+        f"*Count validation failed for `{datetime.now().strftime('%Y-%m-%d')} execution_date`\n"
         f"*Count result: `{count_result}`\n"
     )
 
@@ -36,6 +36,7 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
     parser.add_argument("table_name", help="name of table to check")
+    parser.add_argument("execution_date", help="execution date")
 
     args = parser.parse_args()
 
@@ -43,11 +44,12 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     table_name = args.table_name
+    execution_date = args.execution_date
 
     logger.info(
         f"""
                 m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, source={source},
-                table_name={table_name}, msg=Starting spark job...
+                table_name={table_name}, execution_date={execution_date}, msg=Starting spark job...
         """
     )
 
@@ -57,7 +59,7 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     spark_client = SparkClient()
-    year, month, day = datetime.now().strftime("%Y-%m-%d").split("-")
+    year, month, day = execution_date.split("-")
     database_name = f"datalake_{source}_raw"
 
     filter_condition = f"WHERE year={year} AND month={month} AND day={day}"

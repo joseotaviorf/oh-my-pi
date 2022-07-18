@@ -104,7 +104,7 @@ check_data = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": f"{CUSTOM_SPARK_JOB_PATH}/check_completion_notify.py",
-            "parameters": [ENV, datalake_bucket, SOURCE, TABLE_NAME],
+            "parameters": [ENV, datalake_bucket, SOURCE, TABLE_NAME, "{{ds}}"],
         }
     },
 )
