@@ -9,7 +9,9 @@ SELECT
     cct.label AS crawler_type_label,
     cc.status AS crawler_status,
     msd.file_name AS document,
-    msu.ts_created AS ts_operation_created_at,
+    msu.ts_created AS ts_operation_created,
+    msu.ts_delivered AS ts_operation_delivered,
+    msd.ts_delivered AS ts_document_delivered,
     cc.ts_run_start AS ts_crawler_run_start,
     cc.ts_run_end AS ts_crawler_run_end
 FROM

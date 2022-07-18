@@ -18,6 +18,7 @@ In datalake raw and clean, via full load:
 - `crawlers_crawler`
 - `crawlers_crawlergroup`
 - `crawlers_crawlertype`
+- `meuSite_analysisqueue`
 - `meuSite_city`
 - `meuSite_document`
 - `meuSite_project`
