@@ -301,7 +301,7 @@ pipeline:
           -Dsonar.sources=./bietlejuice \
           -Dsonar.python.coverage.reportPath=coverage.xml \
           -Dsonar.sourceEncoding=UTF-8 \
-          -Dsonar.tests=./tests \
+          -Dsonar.tests=./tests3 \
           -Dsonar.host.url=https://sonar.quintoandar.com.br \
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
           -Dsonar.login=user \
