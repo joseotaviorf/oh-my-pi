@@ -1207,6 +1207,9 @@ bietlejuice.enrich_booking:
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets:load-clean-secretariat-hierarchy
+  - bietlejuice.insider:load-clean-review-feature
+  - bietlejuice.insider:load-clean-review
+
 
 bietlejuice.enrich_brand_tracking:
   - bietlejuice.brand_tracking:load-clean-brandtracking

@@ -1,0 +1,14 @@
+---
+database_name: datalake_booking
+table_name: booking_review
+columns:
+  id_booking:
+    lineage:
+      - datalake_ebdb_clean.booking.id
+  review_status:
+    lineage:
+      - datalake_insider_clean.review.status
+  comment:
+    lineage:
+      - datalake_insider_clean.review.comment
+  

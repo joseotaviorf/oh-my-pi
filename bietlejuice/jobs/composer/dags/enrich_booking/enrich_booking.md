@@ -19,6 +19,7 @@ Produces the following output table, via full load:
 - `booking`
 - `booking_cancellation`
 - `house_available_hours`
+- `booking_review`
 
 ### Responsible Data Teams
 
