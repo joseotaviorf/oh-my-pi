@@ -1,2 +1,6 @@
 ---
+custom_cluster:
+  driver_node_type_id: r5.large
+  node_type_id: c4.2xlarge
+  num_workers: 1
 lineage_product_database_name: wololo

@@ -12,6 +12,13 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
+)
 
 SOURCE = "wololo"
 DAG_ID = f"bietlejuice.{SOURCE}"
@@ -19,24 +26,30 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
-
 ENV = os.environ.get("ENVIRONMENT")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
+
+config_service = ConfigurationService(SOURCE)
+spectrum_iam_role = config_service.get_config("spectrum_iam_role")
+datalake_bucket = config_service.get_config("datalake_bucket")
+athena_query_result_location = config_service.get_config("athena_query_results_bucket")
+
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+default_libraries = config_service.get_config("default_libraries")
+
+s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
+SPARK_JOBS_PATH = f"{s3_prefix}/spark_jobs/base/"
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 LOAD_WOLOLO_INTO_DATALAKE_RAW_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/load_wololo_into_datalake.py".format(SOURCE)
+    s3_prefix + "/spark_jobs/{}/load_wololo_into_datalake.py".format(SOURCE)
 )
 
-# spark and databricks vars
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_wololo", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-
+cluster_description = config_service.get_config("custom_cluster")
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -51,7 +64,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -61,10 +78,10 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
+    datalake_bucket=datalake_bucket,
     relative_query_path=SOURCE,
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+    spark_jobs_path=SPARK_JOBS_PATH,
+    athena_query_result_location=athena_query_result_location,
 )
 
 raw_task_groups = task_group.build_raw_task_group_for_all_tables(

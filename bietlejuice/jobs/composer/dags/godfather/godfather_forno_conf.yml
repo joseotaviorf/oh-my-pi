@@ -1,4 +1,8 @@
 ---
+custom_cluster:
+  driver_node_type_id: i3.2xlarge
+  node_type_id: m4.xlarge
+  num_workers: 2
 lineage_product_database_name: godfather
 schemas: [
   "audit",

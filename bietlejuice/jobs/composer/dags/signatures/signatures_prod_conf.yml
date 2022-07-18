@@ -1,2 +1,6 @@
 ---
 lineage_product_database_name: signatures
+custom_cluster:
+  driver_node_type_id: c4.2xlarge
+  node_type_id: c4.4xlarge
+  num_workers: 1

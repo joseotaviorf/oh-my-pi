@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -16,26 +16,36 @@ from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTask
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
+)
 
 SOURCE = "metabase"
 CONTEXT = SOURCE
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
-DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
-# spark and databricks vars
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_metabase_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+config_service = ConfigurationService(SOURCE)
+spectrum_iam_role = config_service.get_config("spectrum_iam_role")
+datalake_bucket = config_service.get_config("datalake_bucket")
+athena_query_result_location = config_service.get_config("athena_query_results_bucket")
+
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+default_libraries = config_service.get_config("default_libraries")
+
+s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
+SPARK_JOBS_PATH = f"{s3_prefix}/spark_jobs/base/"
+RAW_SPARK_JOB_PATH = f"{s3_prefix}/spark_jobs/{CONTEXT}/load_data_to_raw.py"
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+cluster_description = config_service.get_config("custom_cluster")
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 # dag vars
 DAG_ID = f"bietlejuice.{SOURCE}"
@@ -58,11 +68,16 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -72,10 +87,10 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
+    datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+    spark_jobs_path=SPARK_JOBS_PATH,
+    athena_query_result_location=athena_query_result_location,
 )
 
 raw_task_groups = {}
@@ -90,7 +105,7 @@ for table in tables:
         parameters.extend([table["date_filter_column"], "{{ ds }}"])
 
     raw_spark_job_path = "{s3_prefix}/spark_jobs/{context}/load_{extraction_type}_data_into_datalake_raw.py".format(
-        s3_prefix=S3_PREFIX, context=CONTEXT, extraction_type=extraction_type
+        s3_prefix=s3_prefix, context=CONTEXT, extraction_type=extraction_type
     )
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,

@@ -1,0 +1,5 @@
+---
+custom_cluster:
+  driver_node_type_id: c5.4xlarge
+  node_type_id: m5.2xlarge
+  num_workers: 6
