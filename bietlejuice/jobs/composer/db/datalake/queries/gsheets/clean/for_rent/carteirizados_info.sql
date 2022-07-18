@@ -5,6 +5,6 @@ SELECT
     NULLIF(email, '') AS email,
     NULLIF(phone_number, '') AS phone_number,
     CAST(closing_group AS VARCHAR(255)) AS closing_group,
-    TO_DATE(dt_inclusion, 'dd-MM-yyyy') AS dt_accreditation_week
+    TO_DATE(dt_inclusion, 'dd/MM/yyyy') AS dt_accreditation_week
 FROM
     datalake_gsheets_raw.carteirizados_info
