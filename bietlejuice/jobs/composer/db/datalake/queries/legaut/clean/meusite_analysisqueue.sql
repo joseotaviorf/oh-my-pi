@@ -5,7 +5,7 @@ SELECT
     active,
     status,
     tries,
-    has_started,
+    started AS has_started,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM
