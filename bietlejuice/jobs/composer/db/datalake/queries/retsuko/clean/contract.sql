@@ -1,13 +1,15 @@
-select
+SELECT
     id,
-    external_id as id_external,
+    external_id AS id_external,
+    UPPER(country) AS country_code,
+    locale AS city,
     version, 
-    locale as city,
     guarantee,
     is_b2b,
-    timestamp(signature_date) as ts_signature,
-    timestamp(guarantee_start_date) as ts_guaranteed_start,
-    timestamp(start_period) as ts_period_started,
-    timestamp(start_charge) as ts_charge_started
-from
+    signature_date AS ts_signature,
+    guarantee_start_date AS ts_guarantee_started,
+    start_period AS ts_period_started,
+    start_charge AS ts_charge_started,
+    end_charge AS ts_charge_ended
+FROM
     datalake_retsuko_raw.contract

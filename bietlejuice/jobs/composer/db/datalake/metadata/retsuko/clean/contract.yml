@@ -7,12 +7,15 @@ columns:
   id_external:
     lineage:
       - datalake_retsuko_raw.contract.external_id
-  version:
+  country_code:
     lineage:
-      - datalake_retsuko_raw.contract.version
+      - datalake_retsuko_raw.contract.country
   city:
     lineage:
       - datalake_retsuko_raw.contract.locale
+  version:
+    lineage:
+      - datalake_retsuko_raw.contract.version
   guarantee:
     lineage:
       - datalake_retsuko_raw.contract.guarantee
@@ -22,7 +25,7 @@ columns:
   ts_signature:
     lineage:
       - datalake_retsuko_raw.contract.signature_date
-  ts_guaranteed_start:
+  ts_guarantee_started:
     lineage:
       - datalake_retsuko_raw.contract.guarantee_start_date
   ts_period_started:
@@ -31,3 +34,6 @@ columns:
   ts_charge_started:
     lineage:
       - datalake_retsuko_raw.contract.start_charge
+  ts_charge_ended:
+    lineage:
+      - datalake_retsuko_raw.contract.end_charge
