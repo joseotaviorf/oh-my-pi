@@ -19,8 +19,8 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `efficiency_monitor_sale`
 - `inbound_attendance_leads_flows`
 - `marketing_campaigns_costs_and_volumes`
-- `performance_marketing_cluster_promotional_bonus`
 - `performance_marketing_cluster_promotional_bonus_costs`
+- `performance_marketing_cluster_promotional_bonus`
 - `performance_marketing_metrics_demand`
 - `plaquinhas_users_metrics_demand`
 - `pricing_rent_categorization`
@@ -36,6 +36,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `unique_performance_marketing_metrics_supply_coincident`
 - `unique_supply_cohort_conversions`
 - `unique_supply_events_funnel`
+- `user_funnel`
 
 ### Responsible Data Engineering Team
 

@@ -35,4 +35,4 @@ growth_cross:
   unique_performance_marketing_metrics_supply_coincident: {} # depends_on: - performance_marketing_cluster_promotional_bonus_costs - daily_target_volumes_supply
   unique_supply_cohort_conversions: {}
   unique_supply_events_funnel: {} # depends_on: - lead_listing_flows
-  
+  user_funnel: {}
