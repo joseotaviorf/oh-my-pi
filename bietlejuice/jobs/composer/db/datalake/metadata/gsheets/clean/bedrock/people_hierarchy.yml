@@ -107,6 +107,9 @@ columns:
   l7:
     lineage:
       - datalake_gsheets_raw.base_hierarquia.l7
+  l8:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.l8
   dt_last_update:
     lineage:
       - datalake_gsheets_raw.base_hierarquia.dt_last_update

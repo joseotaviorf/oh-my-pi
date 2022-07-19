@@ -34,6 +34,11 @@ SELECT
     l5,
     l6,
     l7,
+    l8,
+    CASE 
+        WHEN pepa = 'sim' THEN True
+        ELSE False
+    END AS is_pepa,
     CAST(ts_load AS DATE) AS dt_last_update
 FROM
     datalake_gsheets_raw.base_hierarquia
