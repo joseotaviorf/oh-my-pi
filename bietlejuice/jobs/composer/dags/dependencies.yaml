@@ -1853,10 +1853,11 @@ bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-invoice
 
 bietlejuice.enrich_revenue_lines:
-  - bietlejuice.enrich_kill_queue:load-enrich-reservation
+  # Removed dependencies: enrich_kill_queue.reservation,rental_guarantee.guarantee, solved by dw_rent_flow.fact_listing_rent_flows
+  # and enrich_retsuko.invoice, enrich_retsuko.invoice_entry, retsuko_clean.contract, retsuko_clean.invoice, solved by
+  # enrich_invoice.invoice_entries
+  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries
-  - bietlejuice.enrich_retsuko:load-enrich-invoice
-  - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
   - bietlejuice.fastforward:load-clean-anticipation
   - bietlejuice.fastforward:load-clean-contract
   - bietlejuice.fastforward:load-clean-long-term-anticipation
@@ -1865,10 +1866,7 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.owner_fees:load-clean-contract
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
   - bietlejuice.rental_guarantee:load-clean-charge
-  - bietlejuice.rental_guarantee:load-clean-guarantee
-  - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-credit-card-payment
-  - bietlejuice.retsuko:load-clean-invoice
 
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
