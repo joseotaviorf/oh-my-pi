@@ -84,7 +84,4 @@ if __name__ == "__main__":
 
         messenger = SlackMessenger(slack_webhook)
         message = create_message(environment, database_name, table_name, result)
-        if messenger.send_message(message) is not True:
-            raise ValueError(
-                "m=__main__, msg=Could not send slack message, check logs."
-            )
+        messenger.send_message(message)
