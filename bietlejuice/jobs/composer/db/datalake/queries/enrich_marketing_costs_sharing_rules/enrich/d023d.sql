@@ -90,16 +90,17 @@ date_region AS (
     GROUP BY 1, 2
 )
 SELECT
-dr.sk_date AS id_date,
-dr.city_group,
-CASE
-		WHEN SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.sk_date) = 0
-			THEN 0.33
-		ELSE
-			COALESCE(tp.nTP, 0)
-				/ NULLIF(SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.sk_date), 0)
-	END AS share,
-	'demand' AS funnel_side
+  dr.sk_date AS id_date,
+  '{id_rule}' AS id_rule,
+  dr.city_group,
+  CASE
+    WHEN SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.sk_date) = 0
+      THEN 0.33
+    ELSE
+      COALESCE(tp.nTP, 0)
+        / NULLIF(SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.sk_date), 0)
+  END AS share,
+  'demand' AS funnel_side
 FROM
 grouped_tenant_prospects AS tp
 FULL OUTER JOIN date_region AS dr
