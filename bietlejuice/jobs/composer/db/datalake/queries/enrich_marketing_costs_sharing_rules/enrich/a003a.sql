@@ -6,9 +6,9 @@ WITH affiliates AS ( --Afiliado por source= google
         dua.sk_user_affiliate,
         du.sk_user
     FROM
-        dim_user_affiliate dua
+        dw_public.dim_user_affiliate dua
     JOIN
-        dim_user du
+        dw_public.dim_user du
         ON du.dados_afiliado_id = dua.sk_user_affiliate
     WHERE
         tracking_source IN ('google')
@@ -17,16 +17,16 @@ t_row_count AS ( --contagem de prospects
     SELECT
         dd.sk_date,
         CAST(REPLACE(dd.year_month, '/', '') AS INTEGER) AS year_month,
-        CAST(TO_CHAR(dd.last_month, 'YYYYMM') AS INTEGER) AS last_year_month,
+        CAST(date_format(dd.last_month, 'yyyyMM') AS INTEGER) AS last_year_month,
         dr.city_group,
         COUNT(1) AS row_count
     FROM
-        fact_house_listing_flows fhlf
+        dw_public.fact_house_listing_flows fhlf
     JOIN affiliates af
         ON af.sk_user = fhlf.sk_user_lead_affiliate
-    JOIN dim_region dr
+    JOIN dw_public.dim_region dr
         ON dr.sk_region = fhlf.sk_region
-    JOIN dim_date dd
+    JOIN dw_public.dim_date dd
         ON dd.sk_date = fhlf.sk_prospect_date
     WHERE
         affiliate_type = 'Standard'
@@ -39,7 +39,7 @@ dim_distinct AS (
          cast(replace(dd.year_month, '/', '') AS INTEGER) AS year_month,
          dr.city_group
     from
-         dim_date dd, dim_region dr
+         dw_public.dim_date dd, dw_public.dim_region dr
     WHERE
         dd.date < current_date
 ),
@@ -48,8 +48,8 @@ temp AS ( --Calculo do share por mes
         ddt.year_month,
         ddt.city_group,
         (
-            sum(row_count) OVER (PARTITION BY ddt.year_month, ddt.city_group)::FLOAT/
-            NULLIF(sum(row_count) OVER (PARTITION BY ddt.year_month)::FLOAT, 0)
+            sum(row_count) OVER (PARTITION BY ddt.year_month, ddt.city_group) /
+            NULLIF(sum(row_count) OVER (PARTITION BY ddt.year_month), 0)
            ) AS current_share
     FROM
         dim_distinct ddt
@@ -66,6 +66,7 @@ share AS (
 )
 SELECT
     d.sk_date AS id_date,
+    '{id_rule}' AS id_rule,
     d.city_group,
     coalesce(s.share,0) AS share,
     'affiliates' AS funnel_side

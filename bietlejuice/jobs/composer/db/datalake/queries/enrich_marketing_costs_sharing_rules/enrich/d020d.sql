@@ -68,23 +68,22 @@ tenant_prospects AS (
 	INNER JOIN
     	datalake_region.region AS rgn
         	ON rgn.id = tpe.sk_region
-    WHERE
-		rgn.short_region_name = 'SP'
-	    AND tpe.mkt_medium = 'SEM branded'
-		AND tpe.mkt_source = 'Google'
 )
 SELECT
-    adt.id_date,
-    '{id_rule}' AS id_rule,
-    tp.city_group,
-    FLOAT(COUNT(DISTINCT tp.sk_client)/NULLIF(SUM(COUNT(DISTINCT tp.sk_client)) OVER(PARTITION BY adt.id_date), 0)) AS share,
+	adt.id_date,
+	'{id_rule}' AS id_rule,
+	tp.city_group,
+	FLOAT(COUNT(DISTINCT tp.sk_client)/NULLIF(SUM(COUNT(DISTINCT tp.sk_client)) OVER(PARTITION BY adt.id_date), 0)) AS share,
 	'demand' AS funnel_side
 FROM
-    tenant_prospects AS tp
+	tenant_prospects AS tp
 INNER JOIN
 	datalake_quintoandar.aux_date AS adt
 		ON DATE(tp.ts_interaction) = adt.date
 WHERE
-    tp.interactions_order = 1
+	tp.interactions_order = 1
+	AND tp.short_region_name = 'SP'
+	AND tp.mkt_medium = 'SEM branded'
+	AND tp.mkt_source = 'Google'
 GROUP BY
-    1,2,3
+	1,2,3

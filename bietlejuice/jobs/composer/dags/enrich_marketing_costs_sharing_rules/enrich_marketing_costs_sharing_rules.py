@@ -1,99 +1,54 @@
-import pendulum
 import os
 from datetime import datetime
+from pendulum import timezone
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
+)
+from airflow.utils.helpers import chain
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
 )
 
-import airflow.utils.helpers as airflow_helpers
-
-from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
-
-
-def sync_metastore(table_name, table_task):
-
-    slugged_table_name = table_name.replace("_", "-")
-
-    sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"sync-{slugged_table_name}-hive-metastore-structure",
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH
-                + "sync_metastore_tables_structure.py",
-                "parameters": [
-                    DATALAKE_BUCKET,
-                    LayerEnum.ENRICH.value,
-                    SOURCE,
-                    "--table-name",
-                    table_name,
-                ],
-            }
-        },
-    )
-
-    sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"sync-{slugged_table_name}-hive-metastore-partitions",
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH
-                + "sync_metastore_tables_partitions.py",
-                "parameters": [
-                    DATALAKE_BUCKET,
-                    LayerEnum.ENRICH.value,
-                    SOURCE,
-                    "--table-name",
-                    table_name,
-                ],
-            }
-        },
-    )
-
-    airflow_helpers.chain(
-        table_task,
-        sync_metastore_table_structure_task,
-        sync_metastore_table_partitions_task,
-        terminate_cluster_task,
-    )
-
-
-# TODO: rename the folder /queries/marketing_costs_sharing_rules to /queries/enrich_marketing_costs_sharing_rules
-SOURCE = (
-    "marketing_costs_sharing_rules"
-)  # TODO: we do not have 'sources' in enrichment DAG, only context
-CONTEXT = SOURCE
+# Pipeline inputs
+CONTEXT = "marketing_costs_sharing_rules"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = os.environ.get("ENVIRONMENT")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = None
+CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_cluster"
 
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_NAME}/"
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_default_bucket")
+config_service = ConfigurationService(DAG_NAME)
+MAIN_TABLE = config_service.get_config("main_table")
 
-LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_ID
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+datalake_bucket = config_service.get_config("datalake_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
 )
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
 
-CUSTOM_LIBRARIES = [
-    {"jar": f"{ARTIFACTS_S3_BUCKET}/jars/RedshiftJDBC42-no-awssdk-1.2.12.1017.jar"}
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
 ]
 
-local_tz = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
-
-cost_types = ["online", "offline"]
+ENV = os.environ.get("ENVIRONMENT")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -103,49 +58,75 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=CUSTOM_LIBRARIES,
+    cluster_configuration=cluster_configuration,
+    libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-load_old_rules_table = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=f"load-old-sharing-rules-from-redshift-to-datalake",
+datalake_task_group = DatalakeTaskGroup(
     dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": f"{SPARK_JOBS_PATH}load_old_sharing_rules.py",
-            "parameters": [ENV, DATALAKE_BUCKET],
-        }
-    },
+    env=ENV,
+    datalake_bucket=datalake_bucket,
+    relative_query_path=DAG_NAME,
+    spark_jobs_path=base_spark_jobs_path,
+    athena_query_result_location=athena_query_results_bucket,
 )
 
-sync_metastore("old_sharing_rules", load_old_rules_table)
+table_names = datalake_task_group._get_table_names_from_sql_files(
+    layer=LayerEnum.ENRICH
+)
 
-create_cluster_task >> load_old_rules_table >> terminate_cluster_task
-
-for cost_type in cost_types:
-
-    load_rule = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"load-{cost_type}-sharing-rules-to-datalake",
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": f"{SPARK_JOBS_PATH}load_sharing_rules.py",
-                "parameters": [ENV, DATALAKE_BUCKET, SOURCE, cost_type],
-            }
-        },
+enrich_task_groups = {}
+for table_name in table_names:
+    extra_query_template_params = (
+        {"id_rule": table_name} if table_name != MAIN_TABLE else None
     )
-    sync_metastore(cost_type, load_rule)
-    create_cluster_task >> load_rule >> terminate_cluster_task
+    enrich_task_groups[table_name] = datalake_task_group.build_enrich_task_group(
+        table_name=table_name,
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        extra_query_template_params=extra_query_template_params,
+        has_create_external_table_task=False,
+    )
+
+inner_dependencies = {
+    MAIN_TABLE: list(set(enrich_task_groups.keys()).difference(set([MAIN_TABLE])))
+}
+
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=inner_dependencies,
+)
+
+chain(
+    create_cluster_task,
+    datalake_task_group.all_first_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.first_tasks(inner_dependencies_task_groups_boundaries),
+)
+
+chain(
+    datalake_task_group.all_last_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
+)

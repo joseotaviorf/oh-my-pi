@@ -3,102 +3,104 @@ WITH
 -- Query bookings, offers and talk to agent full history --
 -----------------------------------------------------------
 tenant_prospect_events AS (
-	SELECT
-		lrf.sk_client,
-		lrf.sk_region,
-		dbk.mkt_medium,
-		dbk.mkt_source,
-		dbk.dt_created AS ts_interaction
-	FROM
-		dw_public.dim_booking AS dbk
-	INNER JOIN
-        dw_public.fact_listing_rent_flows AS lrf
-        	USING(sk_booking)
-	WHERE
-		dbk.sk_booking > 0
-		AND dbk.visit_intent = 'RENT'
-		AND dbk.type = 'Visita'
-		AND dbk.dt_created IS NOT NULL
-    UNION ALL
-	SELECT
-		lrf.sk_client,
-		lrf.sk_region,
-		dof.mkt_medium,
-		dof.mkt_source,
-		dof.dt_first_sent AS ts_interaction
-	FROM
-		dw_public.dim_offer AS dof
-	INNER JOIN
-        dw_public.fact_listing_rent_flows AS lrf
-	        USING(sk_offer)
-	WHERE
-		dof.sk_offer > 0
-		AND dof.dt_first_sent IS NOT NULL
-    UNION ALL
-	SELECT
-		INT(tenant_id) AS sk_client,
-		fhl.sk_region,
-		tta.mkt_medium,
-		tta.mkt_source,
-		TIMESTAMP(tta.first_message_ts) AS ts_interaction
-	FROM
-		dw_datamarts_cross.talk_to_agent AS tta
-	INNER JOIN
-        dw_public.fact_house_listings AS fhl
-            USING(sk_house_listing)
-	WHERE
-		tta.business_context = 'RENT'
-		AND tta.first_message_ts IS NOT NULL
+  SELECT
+    flrf.sk_client,
+    flrf.sk_region,
+    b.mkt_medium,
+    b.mkt_source,
+    b.dt_created AS ts_event
+  FROM
+    dw_public.dim_booking AS b
+    JOIN dw_public.fact_listing_rent_flows AS flrf
+      on b.sk_booking = flrf.sk_booking
+  WHERE
+    b.sk_booking > 0
+    AND b.visit_intent = 'RENT'
+    AND b.type = 'Visita'
+    AND b.dt_created IS NOT NULL
+  UNION ALL
+  SELECT
+    flrf.sk_client,
+    flrf.sk_region,
+    o.mkt_medium,
+    o.mkt_source,
+    o.dt_first_sent AS ts_event
+  FROM
+    dw_public.dim_offer AS o
+    JOIN dw_public.fact_listing_rent_flows AS flrf
+      ON o.sk_offer = flrf.sk_offer
+  WHERE
+    o.sk_offer > 0
+    AND o.dt_first_sent IS NOT NULL
+  UNION ALL
+  SELECT
+    tta.tenant_id AS sk_client,
+    fhl.sk_region,
+    tta.mkt_medium,
+    tta.mkt_source,
+    tta.first_message_ts AS ts_event
+  FROM
+    dw_datamarts.talk_to_agent AS tta
+    JOIN dw_public.fact_house_listings AS fhl
+      ON tta.sk_house_listing = fhl.sk_house_listing
+  WHERE
+    tta.business_context = 'RENT'
+    AND tta.first_message_ts IS NOT NULL
 ),
 ------------------------------------------------------------------------------
 -- Order Tenant Prospects events by timestamp to extract only the first one --
 ------------------------------------------------------------------------------
 tenant_prospects AS (
-	SELECT
-		tpe.sk_client,
-		tpe.sk_region,
-		tpe.mkt_medium,
-		tpe.mkt_source,
-		tpe.ts_interaction,
-		rgn.city_group,
-		ROW_NUMBER() OVER(PARTITION BY tpe.sk_client ORDER BY tpe.ts_interaction) AS interactions_order
-	FROM
-	    tenant_prospect_events AS tpe
-	INNER JOIN
-		datalake_region.region AS rgn
-			ON rgn.id = tpe.sk_region
-	WHERE
-		rgn.city_group IN ('Brasília', 'Recife', 'Salvador')
-		AND tpe.mkt_medium = 'Display'
-		AND tpe.mkt_source = 'Facebook'
+  SELECT
+    evt.sk_client,
+    CAST(date_format(ts_event, 'yyyyMMdd') AS INT) as sk_date,
+    dr.city_group,
+    evt.mkt_medium,
+    evt.mkt_source,
+    ROW_NUMBER() OVER(PARTITION BY evt.sk_client
+                      ORDER BY evt.ts_event) AS interactions_order
+  FROM
+    tenant_prospect_events AS evt
+  JOIN
+    dw_public.dim_region AS dr
+    USING(sk_region)
 ),
-date_region_cross_join AS (
+grouped_tenant_prospects AS (
     SELECT
-        adt.date,
-		adt.id_date,
-        rgn.city_group,
-		1/COUNT(rgn.city_group) OVER(PARTITION BY adt.date) AS default_share
+        sk_date,
+        city_group,
+        COUNT(CASE WHEN interactions_order = 1 THEN sk_client ELSE NULL END) AS nTP
+    FROM tenant_prospects
+    WHERE mkt_medium = 'Display'
+        AND mkt_source = 'Facebook'
+        AND city_group IN ('Brasília', 'Recife', 'Salvador')
+    GROUP BY 1,2
+),
+date_region AS (
+    SELECT
+        CAST(date_format(evt.ts_event, 'yyyyMMdd') AS INT) as sk_date,
+        dr.city_group
     FROM
-        datalake_quintoandar.aux_date AS adt, datalake_region.region AS rgn
-	WHERE
-		rgn.city_group IN ('Brasília', 'Recife', 'Salvador')
-	GROUP BY 1,2,3
+        tenant_prospect_events AS evt
+    JOIN
+        dw_public.dim_region AS dr
+        USING(sk_region)
+    WHERE
+        dr.city_group IN ('Brasília', 'Recife', 'Salvador')
+    GROUP BY 1, 2
 )
 SELECT
-    drc.id_date,
-    '{id_rule}' AS id_rule,
-    drc.city_group,
-    COALESCE(
-		COUNT(DISTINCT tp.sk_client)/NULLIF(SUM(COUNT(DISTINCT tp.sk_client)) OVER(PARTITION BY drc.id_date), 0),
-		MAX(drc.default_share)
-	) AS share,
+dr.sk_date AS id_date,
+dr.city_group,
+CASE
+		WHEN SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.sk_date) = 0
+			THEN 0.33
+		ELSE
+			COALESCE(tp.nTP, 0)
+				/ NULLIF(SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.sk_date), 0)
+	END AS share,
 	'demand' AS funnel_side
 FROM
-	date_region_cross_join AS drc
-LEFT JOIN
-	tenant_prospects AS tp
-		ON drc.date=DATE(tp.ts_interaction)
-        AND drc.city_group=tp.city_group
-        AND tp.interactions_order = 1
-GROUP BY
-    1,2,3
+grouped_tenant_prospects AS tp
+FULL OUTER JOIN date_region AS dr
+	ON tp.sk_date = dr.sk_date AND dr.city_group = tp.city_group
