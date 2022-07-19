@@ -27,6 +27,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `rent_flow_interactions`
 - `rental_cohort_conversions`
 - `rental_performance_marketing_metrics_supply_coincident`
+- `sale_performance_marketing_metrics_demand`
 - `sale_performance_marketing_metrics_supply_coincident`
 - `tenant_prospect_status`
 - `tenant_prospects_activations`

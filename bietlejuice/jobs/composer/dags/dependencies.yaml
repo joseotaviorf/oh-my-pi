@@ -457,7 +457,7 @@ bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood
 
 bietlejuice.dw_agent:
-# Removed dependency with gsheets.for_rent.auxiliary_region since enrich_ebdb_agents already satisfies
+  # Removed dependency with gsheets.for_rent.auxiliary_region since enrich_ebdb_agents already satisfies
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-region-group
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
@@ -528,7 +528,7 @@ bietlejuice.dw_call:
   - bietlejuice.enrich_bigfone_twilio:load-enrich-inbound-call-locations
 
 bietlejuice.dw_casa_mineira_portal:
-# Removed dependency with casa_mineira_portal:load-clean-real-estate-agency, since enrich_casa_mineira_portal already satisfies
+  # Removed dependency with casa_mineira_portal:load-clean-real-estate-agency, since enrich_casa_mineira_portal already satisfies
   - bietlejuice.casa_mineira_portal:load-clean-attribute
   - bietlejuice.casa_mineira_portal:load-clean-attribute-type
   - bietlejuice.casa_mineira_portal:load-clean-city
@@ -1209,7 +1209,6 @@ bietlejuice.enrich_booking:
   - bietlejuice.gsheets:load-clean-secretariat-hierarchy
   - bietlejuice.insider:load-clean-review-feature
   - bietlejuice.insider:load-clean-review
-
 
 bietlejuice.enrich_brand_tracking:
   - bietlejuice.brand_tracking:load-clean-brandtracking
