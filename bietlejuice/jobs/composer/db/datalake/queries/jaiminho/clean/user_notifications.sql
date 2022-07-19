@@ -6,15 +6,16 @@ SELECT
 	status,
 	channel,
 	tags,
+	destination,
 	CAST(sent_at AS TIMESTAMP) AS ts_sent,
 	CAST(created_at AS TIMESTAMP) AS ts_created,
 	CAST(updated_at AS TIMESTAMP) AS ts_updated,
 	year,
 	month,
 	day
-FROM 
+FROM
 	datalake_jaiminho_raw.user_notifications_view
-WHERE 
+WHERE
 	year = {year}
 	AND month = {month}
 	AND day = {day}
