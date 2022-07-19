@@ -1,20 +1,19 @@
-import logging
 from argparse import ArgumentParser
 from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.base.db import (
+    DatalakeMetastoreService,
+    QUERIES_DATALAKE_PATH,
+)
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
 from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
-from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
+from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("create_clean_incremental_table_in_datalake")
 
 parser = ArgumentParser(description="create_clean_incremental_table_in_datalake")
@@ -59,7 +58,6 @@ if __name__ == "__main__":
     # create df
     # todo: use DatabricksConsumer to read data
     df = spark_client.get_records(query)
-    df = SparkDataFrameService(df).optimize_partition(250000).output()
 
     database_name = db_info["db_clean_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_CLEAN
@@ -70,6 +68,7 @@ if __name__ == "__main__":
         format_options=format_options,
         s3_path=f"{database_location}{table_name}",
         partitions=partition_cols,
+        optimize_dataframe=False,
     )
 
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)

@@ -230,7 +230,7 @@ class S3Loader:
             "m=load_df, s3_path={}, " "msg=loaded files into S3.".format(s3_path)
         )
 
-    @logger(exclude="df")
+    @logger(exclude="df", exclude_return=True)
     def _optimize_dataframe_partitions(self, df, partitions, max_records_per_file):
 
         df_service = Services.spark_dataframe_service(df)

@@ -1,51 +1,54 @@
 import os
-import pendulum
 from datetime import datetime
+from pendulum import timezone
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
+)
 
+# Pipeline inputs
 SOURCE = "casa_mineira_amplitude"
-CONTEXT = SOURCE
-
-# DAG vars
 DAG_ID = f"bietlejuice.{SOURCE}"
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2021, 6, 17, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "30 3 * * *"
-
-ENV = os.environ.get("ENVIRONMENT")
+MAIN_START_DATE = datetime(2021, 6, 17, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
+CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
+PARTITION_COLS = config_service.get_config("partition_cols")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+raw_spark_job_file = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
+)
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
 
-# spark and databricks vars
-BASE_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_incremental_data_into_datalake_raw.py"
-
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+ENV = os.environ.get("ENVIRONMENT")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -62,37 +65,39 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_configuration,
+    libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-partition_cols = config_service.get_config("partition_cols")
-
 task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
-    relative_query_path=CONTEXT,
-    spark_jobs_path=BASE_SPARK_JOB_PATH,
+    relative_query_path=SOURCE,
+    spark_jobs_path=base_spark_jobs_path,
     athena_query_result_location=athena_query_results_bucket,
 )
 
 raw_task_group = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
-    target_database_base_name=CONTEXT,
-    extraction_spark_job_file=RAW_SPARK_JOB_PATH,
+    target_database_base_name=SOURCE,
+    extraction_spark_job_file=raw_spark_job_file,
     raw_spark_job_extra_args=[SOURCE, "{{ds}}"],
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
     is_incremental=True,
-    partitions=partition_cols,
+    partitions=PARTITION_COLS,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))

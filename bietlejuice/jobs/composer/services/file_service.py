@@ -1,16 +1,18 @@
 import glob
+import gzip
+import re
+from io import BytesIO
 from os import listdir
 from os.path import isdir, isfile
-import re
-from typing import Generator, Tuple, List
+from typing import Generator, List, Tuple
 
 import yaml
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.paths import (
-    QUERIES_DATALAKE_PATH,
-    DATALAKE_METADATA_PATH,
     DATA_QUALITY_TESTS_PATH,
+    DATALAKE_METADATA_PATH,
+    QUERIES_DATALAKE_PATH,
 )
 from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
 
@@ -329,3 +331,11 @@ class FileService:
                 continue
             filtered_files.append(file)
         return filtered_files
+
+    @staticmethod
+    def get_data_from_zip_file(zip_file) -> List[str]:
+        data = []
+        for name in zip_file.namelist():
+            with gzip.open(BytesIO(zip_file.read(name)), "rb") as gzip_file:
+                data.extend(gzip_file.read().decode("utf-8").splitlines())
+        return data

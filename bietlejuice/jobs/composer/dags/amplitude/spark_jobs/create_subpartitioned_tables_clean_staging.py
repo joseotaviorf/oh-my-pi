@@ -7,14 +7,10 @@ from functools import reduce
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
-from bietlejuice.jobs.composer.base.db import (
-    DatalakeMetastoreService,
-    DDL_DATALAKE_PATH,
-)
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import spark, sqlContext
 from bietlejuice.jobs.composer.clients.db_clients import AthenaClient, SparkClient
 from bietlejuice.jobs.composer.formatters import StringFormatter
-from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.metastore_services import (
     AthenaMetastoreService,
     SparkMetastoreService,
@@ -139,10 +135,14 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
 
-    ddl_template = FileService.get_query_from_file_name(
-        DDL_DATALAKE_PATH
-        + "clean_staging/clean_staging_subpartitioned_table_template.ddl"
-    )
+    ddl_template = """
+        CREATE TABLE IF NOT EXISTS
+            `{clean_staging_db}`.`{subpartitioned_table_name}`
+        LIKE
+            `{clean_db}`.`{source_table_name}`
+        LOCATION
+            '{clean_staging_source_path}{target_table_name}/{partition_values_path}'
+    """
 
     athena_metastore_service = AthenaMetastoreService(
         AthenaClient(athena_query_result_location)

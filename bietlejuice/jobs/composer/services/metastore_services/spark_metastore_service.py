@@ -66,7 +66,7 @@ class SparkMetastoreService(MetastoreService):
 
         return partition_keys
 
-    @logger
+    @logger(exclude_return=True)
     def get_table_schema(self, database_name, table_name, ignore_partition_keys=False):
         """
         Gets the schema (columns' names and types) of a table
@@ -214,7 +214,7 @@ class SparkMetastoreService(MetastoreService):
 
         return data_files
 
-    @logger(exclude="df")
+    @logger(exclude="df", exclude_return=True)
     def merge_table_and_dataframe_schemas(self, database_name, table_name, df):
         """
         Merges the schemas of an existing table and a dataframe by an union operation.

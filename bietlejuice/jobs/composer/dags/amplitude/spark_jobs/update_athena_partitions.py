@@ -47,17 +47,12 @@ if __name__ == "__main__":
 
     # setup
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
-    spark_metastore_service = SparkMetastoreService(SparkClient())
     athena_metastore_service = AthenaMetastoreService(
         AthenaClient(athena_query_result_location)
     )
 
     # get table metadata
-    db_databricks = db_info["db_{}_databricks".format(stage)]
     db_athena = db_info["db_{}_athena".format(stage)]
-    db_path = db_info["db_{}_path".format(stage)]
-    table_schema = spark_metastore_service.get_table_schema(db_databricks, table_name)
-    format_options = TableStorageFormat.get_storage(stage)
 
     # create athena external table if not exist
     existing_tables = [
@@ -72,7 +67,14 @@ if __name__ == "__main__":
                 table_name
             )
         )
+        format_options = TableStorageFormat.get_storage(stage)
+        db_databricks = db_info["db_{}_databricks".format(stage)]
+        db_path = db_info["db_{}_path".format(stage)]
 
+        spark_metastore_service = SparkMetastoreService(SparkClient())
+        table_schema = spark_metastore_service.get_table_schema(
+            db_databricks, table_name
+        )
         athena_metastore_service.create_external_table(
             database_name=db_athena,
             table_name=table_name,

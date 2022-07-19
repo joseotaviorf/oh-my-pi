@@ -80,7 +80,7 @@ class MetastoreService(ABC):
 
         return res
 
-    @logger
+    @logger(exclude_return=True)
     def get_table_description(self, database_name, table_name, formatted=False):
         """
         Gets the description of a table (columns' names and types, including partition
