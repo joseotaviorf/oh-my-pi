@@ -22,6 +22,7 @@ class TaskGroupMethodFactory(object):
             LayerEnum.ENRICH,
             LayerEnum.DW_STAGING,
             LayerEnum.DW,
+            LayerEnum.REVERSE,
         ):
             raise ValueError(
                 "m=get_method_for_build_task_group_from_sql_files,"
@@ -48,10 +49,14 @@ class TaskGroupMethodFactory(object):
             DatalakeTaskGroup,
         )
         from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
+        from bietlejuice.jobs.composer.dags.base.reverse_task_group import (
+            ReverseTaskGroup,
+        )
 
         return {
             LayerEnum.CLEAN: DatalakeTaskGroup.build_clean_task_group,
             LayerEnum.ENRICH: DatalakeTaskGroup.build_enrich_task_group,
             LayerEnum.DW_STAGING: DWTaskGroup.build_dw_staging_task_group,
             LayerEnum.DW: DWTaskGroup.build_dw_task_group,
+            LayerEnum.REVERSE: ReverseTaskGroup.build_reverse_task_group,
         }.get(layer_enum)

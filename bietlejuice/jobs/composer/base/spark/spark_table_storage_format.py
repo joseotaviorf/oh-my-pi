@@ -7,6 +7,7 @@ class SparkTableStorageFormat:
     DEFAULT_CLEAN_STAGING = PARQUET
     DEFAULT_DW = PARQUET
     DEFAULT_DW_STAGING = PARQUET
+    DEFAULT_REVERSE = PARQUET
 
     @classmethod
     def is_valid_storage(cls, storage):
@@ -14,7 +15,15 @@ class SparkTableStorageFormat:
 
     @classmethod
     def get_valid_storages(cls):
-        return ["raw", "clean", "enrich", "clean_staging", "dw_staging", "dw"]
+        return [
+            "raw",
+            "clean",
+            "enrich",
+            "clean_staging",
+            "dw_staging",
+            "dw",
+            "reverse",
+        ]
 
     @classmethod
     def get_storage(cls, storage):
@@ -30,4 +39,5 @@ class SparkTableStorageFormat:
             "clean_staging": cls.DEFAULT_CLEAN_STAGING,
             "dw_staging": cls.DEFAULT_DW_STAGING,
             "dw": cls.DEFAULT_DW,
+            "reverse": cls.DEFAULT_REVERSE,
         }.get(storage)

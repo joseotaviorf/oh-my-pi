@@ -13,6 +13,7 @@ class TestLayerEnum:
             (LayerEnum.ENRICH, True),
             (LayerEnum.DW_STAGING, True),
             (LayerEnum.DW, True),
+            (LayerEnum.REVERSE, True),
             ("some wrong key", False),
         ],
     )
@@ -35,6 +36,7 @@ class TestLayerEnum:
             LayerEnum.ENRICH.value,
             LayerEnum.DW_STAGING.value,
             LayerEnum.DW.value,
+            LayerEnum.REVERSE.value,
         ]
 
     @pytest.mark.parametrize(
@@ -46,6 +48,7 @@ class TestLayerEnum:
             ("enrich", True),
             ("dw_staging", True),
             ("dw", True),
+            ("reverse", True),
         ],
     )
     def test_validate_layer_for_valid_value(self, layer, expected_return):

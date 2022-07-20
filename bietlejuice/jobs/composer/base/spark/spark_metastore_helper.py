@@ -5,6 +5,9 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreMapping
 from bietlejuice.jobs.composer.base.db.dw_metastore_mapping import DwMetastoreMapping
+from bietlejuice.jobs.composer.base.db.reverse_metastore_mapping import (
+    ReverseMetastoreMapping,
+)
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers.databricks_consumer import (
@@ -41,6 +44,13 @@ class SparkMetastoreHelper:
 
             spark_database_name = dw_ms_mapping["dw_schema_databricks"]
             database_location = dw_ms_mapping["dw_schema_path"]
+        elif self.layer == LayerEnum.REVERSE.value:
+            reverse_ms_mapping = ReverseMetastoreMapping(
+                schema=self.db_name_part, bucket=self.bucket
+            ).get_all_reverse_info()
+
+            spark_database_name = reverse_ms_mapping["reverse_schema_name"]
+            database_location = reverse_ms_mapping["reverse_schema_path"]
         else:
             dl_ms_mapping = DatalakeMetastoreMapping(
                 source=self.db_name_part, bucket=self.bucket
