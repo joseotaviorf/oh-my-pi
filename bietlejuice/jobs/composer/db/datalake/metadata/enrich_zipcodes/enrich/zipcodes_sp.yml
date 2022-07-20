@@ -1,0 +1,16 @@
+---
+database_name: datalake_zipcodes
+table_name: zipcodes_sp
+columns:
+  zipcode:
+    lineage:
+      - datalake_gsheets_clean.zipcodes_sp.zipcode
+  id_region:
+    lineage:
+      - datalake_region.region.id
+  neighborhood:
+    lineage:
+      - datalake_region.region.name
+  address:
+    lineage: 
+      - datalake_ebdb_listing.house.address

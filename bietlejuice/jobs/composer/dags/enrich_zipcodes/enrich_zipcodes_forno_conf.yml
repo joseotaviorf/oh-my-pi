@@ -1,0 +1,19 @@
+---
+custom_libraries:
+     - maven:
+          coordinates: "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.0-incubating"
+     - maven:
+          coordinates: "org.datasyslab:geotools-wrapper:1.1.0-25.2"
+     - pypi:
+          package: geospark
+     - pypi:
+          package: pytopojson
+     - pypi:
+          package: apache-sedona
+init_script:
+     - dbfs:
+          destination: "dbfs:/FileStore/sedona/sedona-init.sh"
+spark_conf:
+     - spark.serializer: "org.apache.spark.serializer.KryoSerializer"
+     - spark.sql.extensions: "org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions"
+     - spark.kryo.registrator: "org.apache.sedona.core.serde.SedonaKryoRegistrator"
