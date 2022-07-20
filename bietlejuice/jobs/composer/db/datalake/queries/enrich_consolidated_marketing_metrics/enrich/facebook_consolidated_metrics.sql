@@ -5,7 +5,7 @@ SELECT
     campaign_name AS utm_campaign,
     adset_name AS utm_term,
     ad_name AS utm_content,
-    SUM(IF(impression_device IN ('ipad','ipod','iphone','android_smartphone','android_tablet'), spend, 0)) AS mobile_cost,
+    SUM(IF(impression_device IN ('ipad','ipod','iphone','android_smartphone','android_tablet', 'All (Automated App Ads)'), spend, 0)) AS mobile_cost,
     SUM(IF(impression_device = 'desktop', spend, 0)) AS desktop_cost,
     SUM(IF(impression_device = 'other', spend, 0)) AS other_cost,
     SUM(spend) AS total_cost,
