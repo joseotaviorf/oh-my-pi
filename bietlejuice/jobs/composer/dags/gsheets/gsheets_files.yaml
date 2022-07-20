@@ -633,11 +633,6 @@ sale_flows_targets:
     sheet_name: sale_flows_targets
     clean_table_name: sale_flows_targets
 
-sale_nbp_source_targets:
-    sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
-    sheet_name: sale_nbp_source_targets
-    clean_table_name: sale_nbp_source_targets
-
 sale_closing_ops_targets:
     sheet_id: 1J32RiwqKyM8lg5IhRHYS_AuA64-trVP_Slf5j5UOcUg
     sheet_name: sale_closing_ops_targets

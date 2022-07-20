@@ -358,7 +358,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets.growth:create-clean-rental-tof-daily-targets-external-table
   - bietlejuice.gsheets.growth:create-clean-rental-tof-weekly-targets-external-table
   - bietlejuice.gsheets:create-clean-sale-flows-targets-external-table
-  - bietlejuice.gsheets:create-clean-sale-nbp-source-targets-external-table
+  # - bietlejuice.gsheets:create-clean-sale-nbp-source-targets-external-table
   - bietlejuice.gsheets:create-clean-secretariat-hierarchy-external-table
   - bietlejuice.gsheets:create-clean-unit-economics-amortization-curve-external-table
   - bietlejuice.gsheets.for_sale:create-clean-sale-supply-targets-external-table

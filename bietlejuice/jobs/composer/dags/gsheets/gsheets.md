@@ -157,7 +157,6 @@ This pipeline produces the following output tables:
     - `sale_closing_ops_targets_extra_slas_tags`
     - `sale_criteo_eng_ab_test`
     - `sale_flows_targets`
-    - `sale_nbp_source_targets`
     - `sale_rbp_targets`
     - `secretariat_hierarchy`
     - `secretariat_info`
