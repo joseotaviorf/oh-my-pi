@@ -36,7 +36,7 @@ This pipeline produces the following output tables:
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_monthly_targets`
-    - `sale_nbp_source_targets`
+    <!-- - `sale_nbp_source_targets` -->
     - `supply_targets_2019`
     - `supply_targets_2020`
     - `supply_targets_2021`
@@ -63,7 +63,7 @@ This pipeline produces the following output tables:
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_monthly_targets`
-    - `sale_nbp_source_targets`
+    <!-- - `sale_nbp_source_targets` -->
     - `supply_targets_2019`
     - `supply_targets_2020`
     - `supply_targets_2021`
