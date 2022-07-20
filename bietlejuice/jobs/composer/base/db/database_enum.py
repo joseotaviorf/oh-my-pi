@@ -63,6 +63,7 @@ class DatabaseEnum:
     TRINO = "TRINO"
     US_EMAILS = "US_EMAILS_DB"
     VANS = "VANS_DB"
+    VELO = "VELO_DB"
     WALL_STREET = "WALL_STREET_DB"
     WOLOLO = "WOLOLO"
 
