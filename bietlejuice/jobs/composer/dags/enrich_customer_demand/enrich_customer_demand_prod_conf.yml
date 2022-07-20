@@ -4,7 +4,25 @@ inner_dependencies:
     - base_tasks
   demand_metrics:
     - demand_metrics_tasks
+  backlog_metrics_tasks:
+    - base_tasks
   backlog_metrics:
     - base_tasks
   quality_metrics:
     - base_tasks
+tables:
+  backlog_metrics:
+    is_incremental: false
+  base_tasks:
+    is_incremental: false
+  backlog_metrics_tasks:
+    is_incremental: true
+    partition_cols: ["year", "month", "day"]
+  demand_metrics:
+    is_incremental: false
+  demand_metrics_tasks:
+    is_incremental: false
+  quality_metrics:
+    is_incremental: false
+  ra_metrics:
+    is_incremental: false

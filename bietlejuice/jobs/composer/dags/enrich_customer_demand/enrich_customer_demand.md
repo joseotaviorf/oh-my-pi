@@ -14,11 +14,13 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 This pipeline produces the following output table on Enrich layer:
 
-- `base_tasks` (full load)
-- `demand_metrics_tasks` (full load)
-- `demand_metrics` (full load)
 - `backlog_metrics` (full load)
-- `ra_data` (full load)
+- `base_tasks` (full load)
+- `base_tasks_metrics` (incremental load)
+- `demand_metrics` (full load)
+- `demand_metrics_tasks` (full load)
+- `quality_metrics` (full load)
+- `ra_metrics` (full load)
 
 ### Responsible Data Team
 ​

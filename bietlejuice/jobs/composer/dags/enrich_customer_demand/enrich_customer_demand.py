@@ -11,7 +11,6 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseTaskGroup, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
@@ -56,6 +55,8 @@ default_libraries = config_service.get_config("default_libraries")
 
 inner_dependencies = config_service.get_config("inner_dependencies")
 
+tables = config_service.get_config("tables")
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -91,12 +92,18 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-)
+enrich_task_groups = {}
 
+for table, configs in tables.items():
+    partitions = configs.get("partition_cols")
+    is_incremental = configs.get("is_incremental")
+    enrich_task_groups[table] = datalake_task_group.build_enrich_task_group(
+        table_name=table,
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        is_incremental=is_incremental,
+        partitions=partitions,
+    )
 
 (
     task_groups_boundaries_without_inner_dependencies,
@@ -106,7 +113,6 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     task_groups_boundaries=enrich_task_groups,
     dag_inner_dependencies=inner_dependencies,
 )
-
 
 chain(
     create_cluster_task,
