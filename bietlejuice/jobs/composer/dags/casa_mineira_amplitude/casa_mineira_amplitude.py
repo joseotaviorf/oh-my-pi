@@ -23,8 +23,8 @@ from bietlejuice.jobs.composer.base.databricks import (
 SOURCE = "casa_mineira_amplitude"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2021, 6, 17, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_cluster"
 
 config_service = ConfigurationService(SOURCE)
 PARTITION_COLS = config_service.get_config("partition_cols")
