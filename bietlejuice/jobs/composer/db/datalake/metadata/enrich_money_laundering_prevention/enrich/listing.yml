@@ -1,0 +1,58 @@
+---
+database_name: datalake_money_laundering_prevention
+table_name: listing
+columns:
+  id_sale_listing:
+    lineage:
+      - datalake_sale_listings.sale_listing.id_sale_listing
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house.id
+  id_user:
+    lineage:
+      - datalake_ebdb_listing.house.id_user
+  id_user_registrant:
+    lineage:
+      - datalake_ebdb_listing.house.id_user_registrant
+  listing_value:
+    lineage:
+      - datalake_ebdb_listing.house.sale_price
+  calculator_price:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.calculator_price
+  status:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.status
+  status_closing:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.status_closing
+  compare_price_with_average:
+    lineage:
+      - datalake_ebdb_listing.house.compare_price_with_average
+  is_for_rent:
+    lineage:
+      - datalake_ebdb_listing.house.is_for_rent
+  is_for_sale:
+    lineage:
+      - datalake_ebdb_listing.house.is_for_sale
+  is_3p_supply:
+    lineage:
+      - datalake_ebdb_listing.house.is_3p_supply
+  is_imovel_v3:
+    lineage:
+      - datalake_ebdb_listing.house.is_imovel_v3
+  is_photographer_job_pending:
+    lineage:
+      - datalake_ebdb_listing.house.is_photographer_job_pending
+  is_verified:
+    lineage:
+      - datalake_ebdb_listing.house.is_verified
+  dt_created:
+    lineage:
+      - datalake_ebdb_listing.house.dt_creation
+  ts_first_sale_listing:
+    lineage:
+      - datalake_sale_listings.sale_listing.ts_first_publication
+  ts_last_sale_listing:
+    lineage:
+      - datalake_sale_listings.sale_listing.ts_last_publication

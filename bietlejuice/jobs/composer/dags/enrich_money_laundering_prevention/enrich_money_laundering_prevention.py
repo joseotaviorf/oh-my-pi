@@ -9,7 +9,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseTaskGroup
+from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
@@ -22,7 +22,7 @@ from bietlejuice.jobs.composer.base.databricks import (
 )
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2021, 2, 4, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_START_DATE = datetime(2022, 7, 3, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 CONTEXT = "money_laundering_prevention"
 DAG_NAME = f"enrich_{CONTEXT}"
@@ -32,18 +32,16 @@ ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
-artifacts_bucket = config_service.get_config("artifacts_bucket")
-spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+
 cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
-base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -70,8 +68,8 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_description,
-    libraries=default_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -94,5 +92,5 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
 )
 
 
-chain(create_cluster_task, BaseTaskGroup.all_first_tasks(enrich_task_groups))
-chain(BaseTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
+chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
