@@ -105,7 +105,7 @@ class ReverseTaskGroup(BaseTaskGroup):
             dag=self.dag,
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/load_table_{load_table_mode}.py",
+                    "python_file": f"{self.spark_jobs_path}/load_reverse_table_{load_table_mode}.py",
                     "parameters": [
                         self.env,
                         self.s3_bucket,

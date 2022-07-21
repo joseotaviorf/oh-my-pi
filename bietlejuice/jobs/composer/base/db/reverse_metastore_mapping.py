@@ -22,7 +22,7 @@ class ReverseMetastoreMapping:
         database_name = {"reverse_schema_name": f"reverse_{self.schema}"}
 
         s3_file_path = {
-            "reverse_schema_path": f"s3://{self.bucket}/reverse/{self.source}/"
+            "reverse_schema_path": f"s3://{self.bucket}/reverse/{self.schema}/"
         }
 
         metastore_info = {}
