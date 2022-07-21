@@ -6,7 +6,7 @@ table_level_validations:
     greater_than: 3800
     severity_level: Error
 column_level_validations:
-  id_company:
+  id_contact:
     is_complete:
       severity_level: Error
     is_unique:

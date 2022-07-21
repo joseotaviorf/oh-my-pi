@@ -12,6 +12,7 @@ inner_dependencies:
     - deal_history
   deal_stage:
     - deal
+    - stage
   ticket:
     - ticket_history
   ticket_stage:
