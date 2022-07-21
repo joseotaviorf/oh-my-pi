@@ -68,6 +68,8 @@ sauron_uniques AS (
       source_environment,
       agent,
       status,
+      ts_last_message,
+      ts_first_message,
       ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS rank
     FROM
       datalake_sauron_clean.session AS s
@@ -77,12 +79,15 @@ sauron_uniques AS (
     source,
     source_environment,
     agent,
-    status
+    status,
+    ts_last_message,
+    ts_first_message
   FROM
     last_sauron_session
   WHERE
     rank = 1
 ),
+
 greenseer_retentions AS (
   SELECT
     g.id_session,
@@ -116,15 +121,19 @@ SELECT
   id_content,
   before_reception,
   after_reception,
-  is_retention,
   response_key,
-  is_menu_available,
   context_message,
   created_by_hsm,
   tags_added,
   flags,
   current_state,
-  more_help_required,
+  is_menu_available,
+  more_help_required AS is_more_help_required,
+  is_retention,
+  CASE
+    WHEN greenseer_sessions.ts_ended > greenseer_sessions.ts_started + INTERVAL '72 hour' THEN TRUE
+    ELSE FALSE
+  END AS has_exceeded_session_timeout,
   greenseer_sessions.ts_started,
   greenseer_sessions.ts_ended
 FROM

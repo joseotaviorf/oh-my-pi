@@ -38,7 +38,7 @@ columns:
   current_state:
     lineage:
       - datalake_greenseer_clean.session.current_state
-  more_help_required:
+  is_more_help_required:
     lineage:
       - datalake_greenseer_clean.session.memory
   ts_started:
