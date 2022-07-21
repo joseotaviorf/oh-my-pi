@@ -8,6 +8,9 @@ columns:
   neighbourhood:
     lineage:
       - datalake_gsheets_raw.regional_inspection_q1_2022.neighbourhood
-  regional_inspection:
+  regional_inspection_q1_2022:
     lineage:
-      - datalake_gsheets_raw.regional_inspection_q1_2022.regional_inspection
+      - datalake_gsheets_raw.regional_inspection_q1_2022.regional_inspection_q1_2022
+  regional_inspection_q2_2022:
+    lineage:
+      - datalake_gsheets_raw.regional_inspection_q1_2022.regional_inspection_q2_2022
