@@ -8,6 +8,7 @@ SELECT DISTINCT
     t.id_zendesk_assignee_user,
     t.id_session,
     t.id_call,
+    zuc.name AS user_name,
     t.total_group_stations,
     t.total_assignee_stations,
     t.minutes_reply_calendar,

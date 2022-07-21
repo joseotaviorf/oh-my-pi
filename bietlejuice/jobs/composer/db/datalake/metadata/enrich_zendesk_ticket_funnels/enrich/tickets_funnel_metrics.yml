@@ -28,6 +28,9 @@ columns:
   id_call:
     lineage:
       - datalake_zendesk_tickets.ticket_measurements.id_call
+  user_name:
+    lineage:
+      - datalake_zendesk_tickets.zendesk_users_contact.user_name
   total_group_stations:
     lineage:
       - datalake_zendesk_tickets.ticket_measurements.total_group_stations

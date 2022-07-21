@@ -1848,6 +1848,10 @@ bietlejuice.enrich_rental_historical_follow_up:
 bietlejuice.enrich_rental_guarantee:
   - bietlejuice.rental_guarantee:load-clean-guarantee
 
+bietlejuice.enrich_repair_services:
+  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
+  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
+
 bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-entry

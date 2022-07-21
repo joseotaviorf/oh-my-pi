@@ -1,0 +1,290 @@
+---
+database_name: datalake_repair_services
+table_name: repair_tickets
+columns:
+    id_ticket:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+    id_ticket_referential:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    id_ticket_cx:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    id_contract:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    id_house:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    id_band_aid:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    id_provider:
+        lineage:
+            - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
+    provider_name:
+        lineage:
+            - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.user_name
+    group_name:
+        lineage:
+            - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.group_name
+    status:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.status
+    ticket_status:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    number_photos_videos_attached:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    priority:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    budget_analyst:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    complexity:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    reason_cancellation_budgeting_phase:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    reason_rescheduling_budget_visit:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    visit_result:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    amount_budget_sent:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    responsible_budget_delay:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    responsible_budget_approved:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    repair_value_approved:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    reason_waiting:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    responsible_execution:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    consultation_duration:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    responsible_scheduling_delay:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    additional_repair:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    additional_type:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    additional_requester:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    execution_period_in_sla:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    responsible_execution_delay:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    responsible_disapproval:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    payment_format:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    occurrences:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    internal_evaluation:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    repair_type:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    repair_front:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    demand_type:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    ps_occurrences:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    request_type:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    occurrence_type:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    reason_budget_delay:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    reason_execution_delay:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    reason_scheduling_delay:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_ps_replied:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_csi:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_repair_negotiations_started:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_photos_videos_attached:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_availability_date_collected:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_waiting_request_sent_to_ps:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_waiting_budget_returned_by_ps:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_first_budgeting_fup_ps_made:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_second_budgeting_fup_ps_made:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_in_budgeting_phase_canceled:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_budget_visit_required:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_budget_visit_scheduled:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_visit_made:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_budget_visit_rescheduled:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_budget_received:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_budget_sent_in_sla:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_waiting_budget_approval_by_pp:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_budget_approved:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_ticket_on_hold:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_start_waiting_period:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_service_scheduled:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_fup_execution_done_by_ps:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_budgeted_repair_executed:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_final_photos_videos_sent:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_budget_disapproved:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_ticket_finalized:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_repair_performed:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    is_service_guarantee:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_first_available:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_second_available:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_third_available:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_budget_request_submitted:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_canceled:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_submission_visit_scheduling_team:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_visit_schedule:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_visit:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_visit_took_place:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_rescheduling_request:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_budget_submission_by_ps:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_budget_submission_to_cx:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_cx_approval_communication_for_partners:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_contact_scheduling_service_started:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_service_appointment:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_service_started:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_photos_videos_submission:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_repair_completion:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_additional_request:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_cx_disapproval_returned:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_ticket_resolution:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    dt_solicitation_iq:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.dt_created
+    dt_created:
+        lineage:
+            - datalake_zendesk_ticket_funnels.ticket_funnel.dt_created
