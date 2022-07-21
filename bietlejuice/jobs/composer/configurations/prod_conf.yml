@@ -51,6 +51,7 @@ dags_out_of_pattern:
         "quintoandar",
         "regions_polygon",
         "reverse_tracksale",
+        "reverse_nazare",
         "enrich_lost_listings",
     ]
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
