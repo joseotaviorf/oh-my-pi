@@ -9,7 +9,7 @@ cte_demand AS (
             wc.is_3p_contract
         FROM
             datalake_ebdb_agents.agent_contract AS ac
-        JOIN 
+        JOIN
             datalake_ebdb_work_contract.work_contract AS wc
                 ON ac.id_work_contract = wc.id
         WHERE
@@ -35,7 +35,7 @@ cte_demand AS (
     LEFT JOIN
         demand_3p AS dp
             ON fo.sk_booking = dp.sk_booking
-    LEFT JOIN 
+    LEFT JOIN
         datalake_gsheets_clean.forbrokers_3p_partner_conditions pc
             ON UPPER(dp.demand_3p_partner) = UPPER(pc.partner_short_name)
     WHERE TRIM(is_3p_demand) = 'true'
@@ -45,15 +45,15 @@ cte_categoria AS (
     SELECT
         fo.sk_offer,
         CASE
-            WHEN da.is_3p_demand = 'true' AND da.is_3p_supply = 'true' 
+            WHEN da.is_3p_demand = 'true' AND da.is_3p_supply = 'true'
                 THEN '6P'
             WHEN da.is_3p_demand = 'true'
                 THEN '3P - Demand'
             WHEN da.is_3p_supply = 'true'
                 THEN '3P - Supply'
         END AS tipo
-    FROM 
-        dw_sale.fact_offers fo  
+    FROM
+        dw_sale.fact_offers fo
     LEFT JOIN
         dw_sale.dim_sale_agreement da
             ON da.sk_offer = fo.sk_offer
@@ -72,34 +72,50 @@ cte_categoria_filtro AS (
     LEFT JOIN
         cte_demand demand
             ON demand.sk_offer = cc.sk_offer
-    
+
 )
 
-SELECT 
+SELECT
     fo.sk_offer AS external_id,
     fo.sk_house AS house_id,
-    CASE 
+    CASE
         WHEN dof.business_unit LIKE '%[3P%' and dr.city_group IN ('Rio de Janeiro')                                                                               THEN '22'
         WHEN dof.business_unit LIKE '%[3P%' and dr.city_group IN ('RMSP', 'Ribeirão Preto', 'Santos', 'Sorocaba', 'São José do Rio Preto', 'São José dos Campos') THEN '2'
         ELSE fo.sk_business_unit
     END AS business_unit_id,
     cc.partner_types AS category,
+    dh.address AS house_address,
+    dh.city AS house_city,
+    dh.complement AS house_complement,
+    dh.neighborhood AS house_neighborhood,
+    dh.number AS house_number,
+    dh.zipcode AS house_zipcode,
+    ds.sale_price_agreed AS price_agreed,
+    ds.sale_agreement_cancellation_reason AS cancellation_reason,
+    ds.ts_sale_agreement_cancelled AS cancellation_date,
+    TO_DATE(STRING(fc.sk_payment_allowed_date), 'yyyyMMdd') AS payment_allowed_date,
     ds.ts_sale_agreement_signed AS signature_date,
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS month,
     DAY(CURRENT_DATE) AS day
-FROM 
+FROM
     dw_sale.dim_offer dof
-LEFT JOIN 
+LEFT JOIN
     dw_sale.fact_offers fo
         ON fo.sk_offer = dof.sk_offer
-LEFT JOIN 
+LEFT JOIN
+    dw_sale.fact_closing_flows fc
+        ON fc.sk_offer = dof.sk_offer
+LEFT JOIN
+    dw_quintoandar.dim_house dh
+        ON fo.sk_house = dh.sk_house
+LEFT JOIN
     dw_sale.dim_sale_agreement ds
         ON ds.sk_offer = dof.sk_offer
 LEFT JOIN
     cte_categoria_filtro cc
         ON cc.sk_offer = dof.sk_offer
-LEFT JOIN 
+LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = fo.sk_region
 WHERE

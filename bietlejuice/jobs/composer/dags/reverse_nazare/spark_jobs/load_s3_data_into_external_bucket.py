@@ -101,6 +101,7 @@ if __name__ == "__main__":
                     Bucket=external_bucket,
                     Key=destination_path + file_name,
                     Body=csv_buffer.getvalue(),
+                    ACL="bucket-owner-full-control",
                 )
 
                 status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
