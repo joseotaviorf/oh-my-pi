@@ -2,7 +2,7 @@ import os
 import pendulum
 from datetime import datetime
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -15,6 +15,10 @@ from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.services import ConfigurationService
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
+)
 
 DW_SCHEMA = "public"
 CONTEXT = "lead"
@@ -35,10 +39,14 @@ env = os.environ.get("ENVIRONMENT")
 
 spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 logs_output_path = f"{spark_jobs_logs_path}{DAG_ID}"
-cluster_description = Variable.get(
-    "databricks_memory_optimized_cluster", deserialize_json=True
-)
-cluster_description["cluster_log_conf"]["s3"]["destination"] = logs_output_path
+default_libraries = configs_service.get_config("default_libraries")
+cluster_description = configs_service.get_config("databricks_10_4_med_memory_cluster")
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 main_start_date = datetime(2021, 8, 2, 0, 0, 0, tzinfo=local_tz)
@@ -57,7 +65,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=cluster_description
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
