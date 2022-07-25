@@ -1,0 +1,25 @@
+---
+database_name: datalake_money_laundering_prevention
+table_name: client
+columns:
+  client_id:
+    lineage:
+      - datalake_ebdb_user.user.id
+  client_name:
+    lineage:
+      - datalake_ebdb_user.user.name
+  client_email:
+    lineage:
+      - datalake_ebdb_user.user.email
+  client_cpf_cnpj:
+    lineage:
+      - datalake_ebdb_user.user.cpf
+  residence_country:
+    lineage:
+      - datalake_ebdb_user.user.country_code
+  ts_created:
+    lineage:
+      - datalake_ebdb_user.user.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_user.user.ts_updated
