@@ -20,7 +20,7 @@ ENV PYTHONIOENCODING=utf-8 \
     PYTHONPATH=":/bi-etl-ejuice" \
     SLUGIFY_USES_TEXT_UNIDECODE=yes \
     AIRFLOW_GPL_UNIDECODE=yes \
-    JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/" \ 
+    JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/" \
     PYSPARK_DRIVER_PYTHON=python3.7 \
     PYSPARK_PYTHON=python3.7
 
@@ -58,4 +58,4 @@ COPY . .
 
 RUN /bin/bash -c 'mkdir /bi-etl-ejuice/airflow_python3/plugins && cp -R /bi-etl-ejuice/airflow-plugins/quintoandar_airflow_plugins/* /bi-etl-ejuice/airflow_python3/plugins && rm -R /bi-etl-ejuice/airflow-plugins'
 
-CMD ["pytest", "tests3/"]
+CMD ["pytest", "tests/"]

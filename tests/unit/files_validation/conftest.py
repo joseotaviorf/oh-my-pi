@@ -1,7 +1,7 @@
 import pytest
 import mock
-from tests3.files_validation.validators.sql_validator import SQLValidator
-from tests3.files_validation.validators.yaml_validator import YamlValidator
+from tests.files_validation.validators.sql_validator import SQLValidator
+from tests.files_validation.validators.yaml_validator import YamlValidator
 
 @pytest.fixture
 def sql_validator_mock():

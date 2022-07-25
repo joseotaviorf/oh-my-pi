@@ -1,4 +1,4 @@
-from tests3.files_validation.validators.base_validator import BaseValidator
+from tests.files_validation.validators.base_validator import BaseValidator
 import yaml
 
 from quintoandar_logger import QuintoAndarLogger

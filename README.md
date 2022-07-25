@@ -72,7 +72,7 @@ The jobs running on the first environment have been implemented with Python 2.6 
 The pipelines that currently run on the Airflow EC2 are being migrated and will be discontinued soon. The reason is that Python 2 lost the community support and the limitations to scale the pipelines with parallel processing. The new DAGs should be written according to the new structure (check composer folder). For more information regarding the repo structure look at [Folders Structure](#folders-structure) topic.
 
 ## Getting Started
- 
+
  Commands for common steps are defined on a [Makefile](https://en.wikipedia.org/wiki/Makefile) according the python versions 2 and 3 (Ex.: `make environment-python2` and `make environment-python3`). Please refer to the Makefile at the project root to check the existing commands.
 
  Obs: when you're using `python 2 - Docker` and change to `python 3 - Docker` or vice-versa, sometimes the webserver will brake. A quick solution is clear cache from localhost page in your browser.
@@ -82,19 +82,19 @@ The pipelines that currently run on the Airflow EC2 are being migrated and will 
 The Airflow - python3 will run in your machine and at Databricks, thereby we can simulate the forno environment.
 
 **Requirements**
-    
+
     docker (https://docs.docker.com/get-docker/)
-    docker-compose (https://docs.docker.com/compose/install/) 
+    docker-compose (https://docs.docker.com/compose/install/)
 
 #### 1. Clone the project
 
     $ git clone git@github.com:quintoandar/bi-etl-ejuice.git
     $ cd bi-etl-ejuice
-    
+
 Obs.: From now on the current repo (`bi-etl-ejuice`) will be referred to as $BIETLEJUICE_HOME
-    
+
 #### 2. Change variables value
-    
+
 Run the following command in the project root folder replacing the placeholders
 
 ```bash
@@ -132,7 +132,7 @@ You can configure shared paths from Docker -> Preferences -> Resources -> File S
 ##### 3.2 Create docker local environemnt
 ```
 $ make create-docker-environment-python3
-``` 
+```
 
 Waiting some seconds, we could access the airflow UI by: `localhost:8080`
 
@@ -151,7 +151,7 @@ Only necessary when some dependencies in requirements.txt changes.
 
 ```
 $ make restart-docker-environment-python3
-``` 
+```
 
 #### 6. Kill Airflow container
 
@@ -159,7 +159,7 @@ Just in case to kill the container instance of Airflow and Postgres. But is not 
 
 ```
 $ make kill-docker-environment-python3
-``` 
+```
 
 #### 7. Update your spark jobs in your jobs
 
@@ -185,7 +185,7 @@ $ make build-local-whl
 ### Local Setup python 2 - Docker
 
 **Requirements**
-    
+
     docker-ce (https://docs.docker.com/install/linux/docker-ce/ubuntu/)
     docker-compose (https://docs.docker.com/compose/install/)
 
@@ -220,7 +220,7 @@ After install docker and docker-compose, we need to set the local environment
 ##### 3.1 Create docker local environemnt
 ```
 $ make create-docker-environment-python2
-``` 
+```
 
 Waiting some seconds, we could access the airflow UI by: `localhost:8080`
 
@@ -234,7 +234,7 @@ Only necessary when some dependencies in requirements.txt changes.
 
 ```
 $ make restart-docker-environment-python2
-``` 
+```
 
 #### 6. Kill Airflow container
 
@@ -242,7 +242,7 @@ Just in case to kill the container instance of Airflow and Postgres. But is not 
 
 ```
 $ make kill-docker-environment-python2
-``` 
+```
 
 ### Local Setup virtualenv
 
@@ -261,7 +261,7 @@ Obs.: From now on the current repo (`bi-etl-ejuice`) will be referred to as $BIE
 
 #### 2. Setup the python environment for the project
 
-If you use a Python version >2.7.16, you can follow the steps below to set your system version as 2.7.16. Else, you can go to step 2.2 to set your virtual environment. 
+If you use a Python version >2.7.16, you can follow the steps below to set your system version as 2.7.16. Else, you can go to step 2.2 to set your virtual environment.
 
 ##### 2.1. Setup the virtual environment
 ```
@@ -276,7 +276,7 @@ If you use a Python version >2.7.16, you can follow the steps below to set your 
 
 #### 4. Set necessary environment variables
 
-```    
+```
     $ echo export AIRFLOW_GPL_UNIDECODE=yes >> ~/.bash_profile
     $ echo export AIRFLOW_HOME=~/airflow >> ~/.bash_profile
 ```
@@ -286,7 +286,7 @@ If you use a Python version >2.7.16, you can follow the steps below to set your 
 #### 5. Export AWS credentials
 
 Go to https://5a.awsapps.com/start#/.
- 
+
 Click at __Command line or programmatic access__, copy your credentials and export them.
 
 ```
@@ -305,12 +305,12 @@ export AWS_SESSION_TOKEN=$(aws --profile default configure get aws_session_token
 
     $ dags_folder = $BIETLEJUICE_HOME/bietlejuice/jobs/dags
 
-##### 6.3. Start a Airflow webserver instance. 
+##### 6.3. Start a Airflow webserver instance.
 Will open Airflow UI on [http://localhost:8080](http://localhost:8080) by default (you will need two terminals).
 ```
     $ airflow webserver
 ```
-    
+
 To run the jobs call scheduler:
 ```
     $ airflow scheduler
@@ -328,14 +328,14 @@ Obs.: You may need to also export the second page
 
 Importing:
 - Go to http://localhost:8080/admin/variable/
-- Click in *Chose File* and import you saved file 
+- Click in *Chose File* and import you saved file
 - Click *Import Variables*
 
 You need to re-start the webserver. Stop the proccess you started on step 5.3 and re-run:
 ```
     $ airflow webserver
 ```
- 
+
 ##### 6.5. Create a connection variable inside the Airflow UI:
 
 Go to: http://localhost:8080/admin/connection/
@@ -346,8 +346,8 @@ Create a new connection like example below:
     Conn type: postgres
     Host: <HOST_FORNO>
     Schema: dw
-    Login: <LOGIN>   
-    Password: <VERY_SECRET_PASSWORD>   
+    Login: <LOGIN>
+    Password: <VERY_SECRET_PASSWORD>
     Port: 5439
 ```
 
@@ -359,7 +359,7 @@ Create a new connection like example below:
 
 ### Local setup python 3 - pyenv
 
-This setup is only used to run unit-tests, linting and style check. To run Airflow, use the docker environment 
+This setup is only used to run unit-tests, linting and style check. To run Airflow, use the docker environment
 
 **Requirements**
 
@@ -402,13 +402,13 @@ Your shell should have automatically activated the virtualenv
 Some dependencies might fail to install on Mac:
 
 * Pandas: Try installing cython and numpy manually: `pip install cython numpy`
-  
+
 * Psycopg2: You can install postgresql via homewbrew and then install psycopg2:
   ```
   brew install postgresql
-  pip install psycopg2 
+  pip install psycopg2
   ```
-  
+
 * Other dependencies (grpcio, criptography, etc): Make sure you're using a updated version of pip before installing dependencies
   ```
   pip install --upgrade pip
@@ -429,14 +429,14 @@ You should be all set with the correct environment. Now you can use any of the f
 ```
 ```
     make unit-tests-python3
-``` 
- 
+```
+
  - Run the check style:
 ```
     make check-style-python3
 ```
 
- - Run unit tests using docker environment 
+ - Run unit tests using docker environment
 ```bash
     make test-environment-python3
 ```
@@ -461,7 +461,7 @@ For best performance, we recommend you to use Postgres as your Airflow database 
     executor = LocalExecutor
 ```
 
-4. Run the command: 
+4. Run the command:
 ```
     airflow initdb
 ```
@@ -511,12 +511,12 @@ You can enable some extra features like an _Auto Refresh_ button on the DAG's pa
 If you need to urgent deploy a change you can use the _hotfix_ flow:
 1. Create a branch named `hotfix/<your_fix_name>` from the **most recent master version** and implement your fixes.
 2. Verify that all the automated checks and validation are passing for your branch.
-3. Push it to origin: `git push --set-upstream origin hotfix/<your_fix_name>`. 
+3. Push it to origin: `git push --set-upstream origin hotfix/<your_fix_name>`.
 _Note: Once you pushed your branch to origin, it
-will be deployed to production environments, therefore **do it wisely**. Also an alert will be thrown in 
+will be deployed to production environments, therefore **do it wisely**. Also an alert will be thrown in
 chanel [#de-warroom](https://quintoandar.slack.com/archives/G016M1LEX7Y)_
 4. Open a PR with your modifications following our normal PR's pair revisions flow.
-5. After the PR is reviewed, merge it to master (this step only guarantees our pair quality check. Since your 
+5. After the PR is reviewed, merge it to master (this step only guarantees our pair quality check. Since your
 modifications are already in master and prod envs =] ).
 
 ## Folders structure
@@ -526,38 +526,37 @@ modifications are already in master and prod envs =] ).
 |-- airflow_python2                Airflow configuration for python2
 |-- airflow_python3                Airflow configuration for python3
 |-- bietlejuice                    < todo: add short desc. >
-    |-- db                         < todo: add short desc. > 
-        |-- datalake               < todo: add short desc. >             
-        |-- dw                     < todo: add short desc. >     
-            |-- ddl                < todo: add short desc. >         
-            |-- functions          < todo: add short desc. >                 
-            |-- queries            < todo: add short desc. >             
-            |-- views              < todo: add short desc. >             
-        |-- ods                    < todo: add short desc. >     
-        |-- skynet                 < todo: add short desc. >         
-        |-- source                 < todo: add short desc. >         
-    |-- jobs                       < todo: add short desc. >     
-        |-- base                   < todo: add short desc. >         
-        |-- composer               < todo: add short desc. >             
-            |-- base               < todo: add short desc. >             
-            |-- consumers          < todo: add short desc. >                 
-            |-- dags               < todo: add short desc. >             
-            |-- db                 < todo: add short desc. >         
-            |-- etl                < todo: add short desc. >         
-            |-- loaders            < todo: add short desc. >             
-            |-- parsers            < todo: add short desc. >             
-            |-- wrappers           < todo: add short desc. >                 
-        |-- dags                   < todo: add short desc. >         
-        |-- etl                    < todo: add short desc. >     
-        |-- old_etl                < todo: add short desc. >         
-        |-- sensors                < todo: add short desc. >         
-        |-- wrappers               < todo: add short desc. >             
+    |-- db                         < todo: add short desc. >
+        |-- datalake               < todo: add short desc. >
+        |-- dw                     < todo: add short desc. >
+            |-- ddl                < todo: add short desc. >
+            |-- functions          < todo: add short desc. >
+            |-- queries            < todo: add short desc. >
+            |-- views              < todo: add short desc. >
+        |-- ods                    < todo: add short desc. >
+        |-- skynet                 < todo: add short desc. >
+        |-- source                 < todo: add short desc. >
+    |-- jobs                       < todo: add short desc. >
+        |-- base                   < todo: add short desc. >
+        |-- composer               < todo: add short desc. >
+            |-- base               < todo: add short desc. >
+            |-- consumers          < todo: add short desc. >
+            |-- dags               < todo: add short desc. >
+            |-- db                 < todo: add short desc. >
+            |-- etl                < todo: add short desc. >
+            |-- loaders            < todo: add short desc. >
+            |-- parsers            < todo: add short desc. >
+            |-- wrappers           < todo: add short desc. >
+        |-- dags                   < todo: add short desc. >
+        |-- etl                    < todo: add short desc. >
+        |-- old_etl                < todo: add short desc. >
+        |-- sensors                < todo: add short desc. >
+        |-- wrappers               < todo: add short desc. >
 |-- databricks_dag_template        < todo: add short desc. >
-|-- docker                         All files to build a container (Airflow and Composer) 
+|-- docker                         All files to build a container (Airflow and Composer)
 |-- plugins                        < todo: add short desc. >
 |-- scripts                        Some scripts used in CI/CD pipelines and docker local
-|-- tests                          < todo: add short desc. >
-|-- tests3                         < todo: add short desc. >
+|-- tests                         < todo: add short desc. >
 |-- util                           < todo: add short desc. >
 |-- .coveragerc                    < todo: add short desc. >
 |-- .dockerignore                  Specify files and folder that should be ignored by the Docker client when generating a build context
