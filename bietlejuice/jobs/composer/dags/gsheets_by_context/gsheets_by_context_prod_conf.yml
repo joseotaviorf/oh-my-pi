@@ -11,6 +11,7 @@ dags:
   growth:
     main_schedule_interval: 0 0 * * *
     dag_owner: Data Growth
+    cluster_name: databricks_10_4_med_general_cluster
   growth_intraday:
     main_schedule_interval: 0 10 * * *
     dag_owner: Data Growth

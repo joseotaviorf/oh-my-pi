@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 
 import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
 )
@@ -14,6 +14,10 @@ from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTask
 from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
+)
+from bietlejuice.jobs.composer.base.databricks import (
+    DatabricksGroupNameEnum,
+    ClusterPermissionEnum,
 )
 
 
@@ -26,14 +30,17 @@ class GsheetsDAGFactory:
     ENV = os.environ.get("ENVIRONMENT")
     MAIN_START_DATE = datetime(2022, 2, 10, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-    CLUSTER_DESCRIPTION = Variable.get(
-        "databricks_9_1_min_general_cluster", deserialize_json=True
-    )
-
     GOOGLE_FILES_YAML_PATH = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), "gsheets_files.yaml"
     )
     GOOGLE_FILES = FileService.get_dict_from_yaml_file(GOOGLE_FILES_YAML_PATH)
+
+    DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+        {
+            "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+            "permission_level": ClusterPermissionEnum.MANAGE,
+        }
+    ]
 
     def __init__(self, source, source_with_context, task_pool):
         self.source, self.source_with_context, self.task_pool = (
@@ -42,12 +49,12 @@ class GsheetsDAGFactory:
             task_pool,
         )
 
-        config_service = ConfigurationService(
+        self.config_service = ConfigurationService(
             dag_name=source_with_context, env=self.ENV
         )
 
-        artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
-        databricks_bietlejuice_repo_path = config_service.get_config(
+        artifacts_s3_bucket = self.config_service.get_config("artifacts_bucket")
+        databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"
         )
 
@@ -56,11 +63,13 @@ class GsheetsDAGFactory:
             self.athena_query_results_bucket,
             self.doc_md_chart_url,
             self.spark_jobs_logs_path,
+            self.default_libraries,
         ) = (
-            config_service.get_config("datalake_bucket"),
-            config_service.get_config("athena_query_results_bucket"),
-            config_service.get_config("doc_md_chart_url"),
-            config_service.get_config("spark_jobs_logs_path"),
+            self.config_service.get_config("datalake_bucket"),
+            self.config_service.get_config("athena_query_results_bucket"),
+            self.config_service.get_config("doc_md_chart_url"),
+            self.config_service.get_config("spark_jobs_logs_path"),
+            self.config_service.get_config("default_libraries"),
         )
 
         self.raw_spark_job_path, self.base_spark_jobs_path = (
@@ -75,6 +84,16 @@ class GsheetsDAGFactory:
                 f"quintoandar_gsheets_api_client-0.2.1-py2.py3-none-any.whl"
             }
         ]
+
+    def _get_cluster_description(self, cluster_name):
+        """
+        Obtains a dictionary with information about the cluster, using ConfigurationService.
+
+        :param cluster_name: Name of the config file key with the cluster description.
+        :type cluster_name: str
+        :return: dict with the cluster description
+        """
+        return self.config_service.get_config(cluster_name)
 
     @staticmethod
     def __filtering_gsheets_from_context(google_file, dag_context):
@@ -144,9 +163,9 @@ class GsheetsDAGFactory:
 
         main_schedule_interval = dag_details.get("main_schedule_interval")
 
-        self.CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-            "destination"
-        ] = f"{self.spark_jobs_logs_path}{dag_id}"
+        cluster_description = self._get_cluster_description(
+            dag_details.get("cluster_name", "databricks_10_4_min_general_cluster")
+        )
 
         dag = DAG(
             dag_id=dag_id,
@@ -165,8 +184,9 @@ class GsheetsDAGFactory:
         create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
             dag=dag,
             task_id="create-cluster",
-            cluster_configuration=self.CLUSTER_DESCRIPTION,
-            libraries=self.custom_libraries,
+            cluster_configuration=cluster_description,
+            libraries=self.default_libraries + self.custom_libraries,
+            access_control_list=self.DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
         )
 
         task_group = DatalakeTaskGroup(
