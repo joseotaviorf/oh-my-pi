@@ -138,8 +138,8 @@ Waiting some seconds, we could access the airflow UI by: `localhost:8080`
 
 
 **Important Notes:**
-1. Internal QuintoAndar's libs are not included in the local requirements by default, due to dependencies incompatibility. To use them locally for development purposes, include them in `requirements3_local_internal.txt`.
-2. Keep in mind that most of internal QuintoAndar's libs are used only in clusters for Spark jobs, not in Airflow's DAGs, so their dependencies are evaluated only at the job execution. To add them to the cluster creation, include their names in the file `requirements3.txt`.
+1. Internal QuintoAndar's libs are not included in the local requirements by default, due to dependencies incompatibility. To use them locally for development purposes, include them in `requirements_local_internal.txt`.
+2. Keep in mind that most of internal QuintoAndar's libs are used only in clusters for Spark jobs, not in Airflow's DAGs, so their dependencies are evaluated only at the job execution. To add them to the cluster creation, include their names in the file `requirements.txt`.
 
 #### 4.Import application variables
 
@@ -414,7 +414,7 @@ Some dependencies might fail to install on Mac:
   pip install --upgrade pip
   ```
 
-**Note**: QuintoAndar internal libs might fail to install due to dependency errors. You can avoid installing them by commenting their lines in `requirements3.txt`
+**Note**: QuintoAndar internal libs might fail to install due to dependency errors. You can avoid installing them by commenting their lines in `requirements.txt`
 
 Now you should be able to run the commands described in the Useful commands section
 
@@ -566,9 +566,9 @@ modifications are already in master and prod envs =] ).
 |-- MANIFEST.in                    < todo: add short desc. >
 |-- README.md                      < todo: add short desc. >
 |-- requirements.txt               < todo: add short desc. >
-|-- requirements3.txt              < todo: add short desc. >
-|-- requirements3_lint.txt         < todo: add short desc. >
-|-- requirements3_test.txt         < todo: add short desc. >
+|-- requirements.txt              < todo: add short desc. >
+|-- requirements_lint.txt         < todo: add short desc. >
+|-- requirements_test.txt         < todo: add short desc. >
 |-- requirements_test.txt          < todo: add short desc. >
 |-- setup.cfg                      < todo: add short desc. >
 |-- setup.py                       < todo: add short desc. >

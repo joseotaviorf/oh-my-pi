@@ -28,7 +28,7 @@ RUN apt-get update -yqq && \
     jq \
     locales
 
-COPY requirements3_local_composer.txt requirements3_local_extra.txt requirements3_local_internal.txt  ./
+COPY requirements_local_composer.txt requirements_local_extra.txt requirements_local_internal.txt  ./
 
 ARG GITHUB_TOKEN
 
@@ -36,9 +36,9 @@ ARG GITHUB_TOKEN
 # Until there, let's use this primitive way :D
 RUN python3 -m pip install -q --upgrade pip && \
     git config --global url.https://${GITHUB_TOKEN}:@github.com/.insteadOf https://github.com/ && \
-    pip install -q -r requirements3_local_composer.txt && \
-    pip install -q -r requirements3_local_extra.txt && \
-    pip install -q -r requirements3_local_internal.txt --extra-index-url https://quintoandar.github.io/python-package-server/ --no-deps && \
+    pip install -q -r requirements_local_composer.txt && \
+    pip install -q -r requirements_local_extra.txt && \
+    pip install -q -r requirements_local_internal.txt --extra-index-url https://quintoandar.github.io/python-package-server/ --no-deps && \
     git clone https://github.com/quintoandar/airflow-plugins.git && \
     locale-gen --purge pt_BR.UTF-8
 

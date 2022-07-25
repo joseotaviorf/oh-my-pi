@@ -60,7 +60,7 @@ requirements-python3:
 	@echo "Installing python 3 packages"
 	@echo "=========="
 	@echo ""
-	@python -m pip install -U -r requirements3.txt --extra-index-url https://quintoandar.github.io/python-package-server/
+	@python -m pip install -U -r requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
 	@make requirements-lint-python3
 
 .PHONY: requirements-test-python3
@@ -69,7 +69,7 @@ requirements-test-python3:
 	@echo "Installing Python 3 tests packages"
 	@echo "=========="
 	@echo ""
-	@python -m pip install -r requirements3_test.txt  --extra-index-url https://quintoandar.github.io/python-package-server/
+	@python -m pip install -r requirements_test.txt  --extra-index-url https://quintoandar.github.io/python-package-server/
 
 .PHONY: requirements-lint-python3
 requirements-lint-python3:
@@ -77,7 +77,7 @@ requirements-lint-python3:
 	@echo "Installing lint packages"
 	@echo "=========="
 	@echo ""
-	@python -m pip install -r requirements3_lint.txt
+	@python -m pip install -r requirements_lint.txt
 
 .PHONY: requirements-scripts-python3
 requirements-scripts-python3:
@@ -85,7 +85,7 @@ requirements-scripts-python3:
 	@echo "Installing scripts packages"
 	@echo "=========="
 	@echo ""
-	@python -m pip install -U -r requirements3_scripts.txt --extra-index-url https://quintoandar.github.io/python-package-server/
+	@python -m pip install -U -r requirements_scripts.txt --extra-index-url https://quintoandar.github.io/python-package-server/
 
 .PHONY: lint-python3
 ## run black to fix code style
@@ -110,10 +110,10 @@ check-style-python3:
 package-python3:
 	@make requirements-python3
 	@echo ""
-	@echo "Creating 'requirements3-freeze.txt' to prepare building dependencies"
+	@echo "Creating 'requirements-freeze.txt' to prepare building dependencies"
 	@echo "=========="
 	@echo ""
-	@python -m pip freeze > requirements3-freeze.txt
+	@python -m pip freeze > requirements-freeze.txt
 	@echo ""
 	@echo "Creating wheel for bi-etl-ejuice"
 	@echo "=========="

@@ -42,15 +42,15 @@ RUN apt update -yqq && \
     apt install libmysqlclient-dev -yqq && \
     rm -rf /var/lib/apt/lists/*
 
-COPY requirements3_local_composer.txt requirements3_local_extra.txt requirements3_local_internal.txt requirements3_test.txt ./
+COPY requirements_local_composer.txt requirements_local_extra.txt requirements_local_internal.txt requirements_test.txt ./
 
 ARG GITHUB_TOKEN
 
 RUN git config --global url.https://${GITHUB_TOKEN}:@github.com/.insteadOf https://github.com/ && \
-    python3.7 -m pip install  --no-use-pep517 -q -r requirements3_local_composer.txt && \
-    python3.7 -m pip install --no-use-pep517 -q -r requirements3_local_extra.txt && \
-    python3.7 -m pip install --no-use-pep517 -q -r requirements3_local_internal.txt --extra-index-url https://quintoandar.github.io/python-package-server/ --no-deps && \
-    python3.7 -m pip install --no-use-pep517 -q -r requirements3_test.txt && \
+    python3.7 -m pip install  --no-use-pep517 -q -r requirements_local_composer.txt && \
+    python3.7 -m pip install --no-use-pep517 -q -r requirements_local_extra.txt && \
+    python3.7 -m pip install --no-use-pep517 -q -r requirements_local_internal.txt --extra-index-url https://quintoandar.github.io/python-package-server/ --no-deps && \
+    python3.7 -m pip install --no-use-pep517 -q -r requirements_test.txt && \
     git clone https://github.com/quintoandar/airflow-plugins.git && \
     locale-gen --purge pt_BR.UTF-8
 

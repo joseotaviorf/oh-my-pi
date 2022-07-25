@@ -133,10 +133,10 @@ airflow_python3/plugins/*
 logs/
 
 # MacOs files
-.DS_Store 
+.DS_Store
 
 
 dag_dummy_pipedrive.py
 
 # build byproduct requirement file
-requirements3-freeze.txt
+requirements-freeze.txt
