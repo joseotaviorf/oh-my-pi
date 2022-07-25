@@ -125,6 +125,13 @@ cluster_template:
             spark.sql.legacy.parquet.datetimeRebaseModeInRead: LEGACY
             spark.sql.legacy.parquet.datetimeRebaseModeInWrite: LEGACY
             spark.sql.legacy.timeParserPolicy: LEGACY
+            spark.metrics.conf.*.sink.graphite.class: "org.apache.spark.metrics.sink.GraphiteSink"
+            spark.metrics.conf.*.sink.graphite.host: "a32e99cee07a64577ad38d0e132b9c07-20b220daa39bc736.elb.us-east-1.amazonaws.com"
+            spark.metrics.conf.*.sink.graphite.period: "15"
+            spark.metrics.conf.*.sink.graphite.port: "9109"
+            spark.metrics.conf.*.sink.graphite.unit: "seconds"
+            spark.metrics.conf.*.source.jvm.class: "org.apache.spark.metrics.source.JvmSource"
+            spark.metrics.namespace: "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}"
         spark_env_vars:
             PYSPARK_PYTHON: "/databricks/python3/bin/python3"
             ENVIRONMENT: "{{ var.value.environment }}"
