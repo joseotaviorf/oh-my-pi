@@ -1,0 +1,64 @@
+---
+  database_name: datalake_airtable
+  table_name: activated
+  columns:
+    id_user:
+      lineage:
+        - datalake_airtable_clean.activated.id_user
+    agent_actual_type:
+      lineage:
+        - datalake_airtable_clean.activated.agent_actual_type
+    agent_creci:
+      lineage:
+        - datalake_airtable_clean.activated.agent_creci
+    agent_email:
+      lineage:
+        - datalake_airtable_clean.activated.agent_email
+    agent_phone_number:
+      lineage:
+        - datalake_airtable_clean.activated.agent_phone_number
+    cpf:
+      lineage:
+        - datalake_airtable_clean.activated.cpf
+    dynamic_status:
+      lineage:
+        - datalake_airtable_clean.activated.dynamic_status
+    last_area:
+      lineage:
+        - datalake_airtable_clean.activated.last_area
+    last_suspension:
+      lineage:
+        - datalake_airtable_clean.activated.last_suspension
+    status:
+      lineage:
+        - datalake_airtable_clean.activated.status
+    suspensions:
+      lineage:
+        - datalake_airtable_clean.activated.suspensions
+    suspensions_register:
+      lineage:
+        - datalake_airtable_clean.activated.suspensions_register
+    tickets_jira:
+      lineage:
+        - datalake_airtable_clean.activated.tickets_jira
+    days_since_activation_week:
+      lineage:
+        - datalake_airtable_clean.activated.days_since_activation_week
+    dt_activated:
+      lineage:
+        - datalake_airtable_clean.activated.dt_activated
+    dt_last_suspended:
+      lineage:
+        - datalake_airtable_clean.activated.dt_last_suspended
+    dt_week_accreditated:
+      lineage:
+        - datalake_airtable_clean.activated.dt_week_accreditated
+    year:
+      lineage:
+        - datalake_airtable_clean.activated.year
+    month:
+      lineage:
+        - datalake_airtable_clean.activated.month
+    day:
+      lineage:
+        - datalake_airtable_clean.activated.day
