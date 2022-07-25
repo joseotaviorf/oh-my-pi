@@ -572,8 +572,8 @@ modifications are already in master and prod envs =] ).
 |-- requirements_test.txt          < todo: add short desc. >
 |-- setup.cfg                      < todo: add short desc. >
 |-- setup.py                       < todo: add short desc. >
-|-- setup3.cfg                     < todo: add short desc. >
-|-- setup3.py                      < todo: add short desc. >
+|-- setup.cfg                     < todo: add short desc. >
+|-- setup.py                      < todo: add short desc. >
 |-- start.sh                       Script to up all Airflow services
 |-- variables.json                 < todo: add short desc. >
 ```

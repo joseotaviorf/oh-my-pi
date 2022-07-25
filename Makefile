@@ -26,7 +26,7 @@ kill-docker-environment-python3:
 .PHONY: build-local-whl
 build-local-whl:
 	@python3 scripts/upload_local_spark_jobs_to_s3.py
-	@python3 -m setup3 sdist bdist_wheel
+	@python3 -m setup sdist bdist_wheel
 	@python3 scripts/upload_local_whl_to_s3.py
 
 .PHONY: upload-local-spark-jobs-to-s3
@@ -104,7 +104,7 @@ check-style-python3:
 	@echo "=========="
 	@echo ""
 	@python -m black --check bietlejuice/jobs/composer/ tests/unit/composer/ && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint-python3\" to apply style formatting to your code\n" && exit 1)
-	@python -m flake8 --config=setup3.cfg bietlejuice/jobs/composer/ tests/unit/composer/
+	@python -m flake8 --config=setup.cfg bietlejuice/jobs/composer/ tests/unit/composer/
 
 .PHONY: package-python3
 package-python3:
@@ -118,7 +118,7 @@ package-python3:
 	@echo "Creating wheel for bi-etl-ejuice"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python -m setup3 sdist bdist_wheel
+	@PYTHONPATH=. python -m setup sdist bdist_wheel
 
 .PHONY: unit-tests-python3
 unit-tests-python3:

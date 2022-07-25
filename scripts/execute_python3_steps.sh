@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # temporary added until python2->3 full migration
-CHANGED_PATHS=$(git diff-tree --no-commit-id --name-only -r HEAD..HEAD~1 | grep 'bietlejuice/jobs/composer\|tests\|requirements3\|setup3')
+CHANGED_PATHS=$(git diff-tree --no-commit-id --name-only -r HEAD..HEAD~1 | grep 'bietlejuice/jobs/composer\|tests\|requirements3\|setup')
 if [ ${#CHANGED_PATHS} -eq 0 ]; then
   echo "===== No changes in Composer files! Skipping! ===== "
   exit 0
