@@ -5,7 +5,7 @@ LABEL maintainer='Data Engineer Team'
 WORKDIR /bi-etl-ejuice
 
 ENV PYTHONIOENCODING=utf-8 \
-    AIRFLOW_HOME=/bi-etl-ejuice/airflow_python3 \
+    AIRFLOW_HOME=/bi-etl-ejuice/airflow_python \
     PYTHONPATH=":/bi-etl-ejuice" \
     SLUGIFY_USES_TEXT_UNIDECODE=yes \
     AIRFLOW_GPL_UNIDECODE=yes
@@ -45,6 +45,6 @@ RUN python3 -m pip install -q --upgrade pip && \
 COPY . .
 
 RUN chmod +x start.sh && \
-    /bin/bash -c 'mkdir /bi-etl-ejuice/airflow_python3/plugins && cp -R /bi-etl-ejuice/airflow-plugins/quintoandar_airflow_plugins/* /bi-etl-ejuice/airflow_python3/plugins && rm -R /bi-etl-ejuice/airflow-plugins'
+    /bin/bash -c 'mkdir /bi-etl-ejuice/airflow_python/plugins && cp -R /bi-etl-ejuice/airflow-plugins/quintoandar_airflow_plugins/* /bi-etl-ejuice/airflow_python/plugins && rm -R /bi-etl-ejuice/airflow-plugins'
 
 ENTRYPOINT ["/bin/bash", "-c", "/bi-etl-ejuice/start.sh"]

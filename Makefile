@@ -12,16 +12,16 @@ create-docker-environment:
 create-docker-environment-python3:
 	@make create-docker-environment
 	@chmod +x start.sh
-	@sudo docker-compose -f docker/docker-compose.py3.yml --env-file docker/.env up -d --build --force-recreate
+	@sudo docker-compose -f docker/docker-compose.yml --env-file docker/.env up -d --build --force-recreate
 	@sudo docker image prune -f
 
 .PHONY: restart-docker-environment-python3
 restart-docker-environment-python3:
-	@sudo docker-compose -f docker/docker-compose.py3.yml up -d --build
+	@sudo docker-compose -f docker/docker-compose.yml up -d --build
 
 .PHONY: kill-docker-environment-python3
 kill-docker-environment-python3:
-	@sudo docker-compose -f docker/docker-compose.py3.yml down
+	@sudo docker-compose -f docker/docker-compose.yml down
 
 .PHONY: build-local-whl
 build-local-whl:
@@ -47,7 +47,7 @@ environment-python3:
 
 .PHONY: build-test-environment-python3
 build-test-environment-python3:
-	@docker build --file docker/test-environment-py3.Dockerfile -t bietlejuice --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} .
+	@docker build --file docker/test-environment.Dockerfile -t bietlejuice --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} .
 
 .PHONY: test-environment-python3
 test-environment-python3:

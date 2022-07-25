@@ -29,11 +29,11 @@ services:
     networks:
       - airflow_postgres_py3
 
-  airflow_python3:
+  airflow_python:
     image: base
     build:
       context: ..
-      dockerfile: docker/airflow-py3.Dockerfile
+      dockerfile: docker/airflow-py.Dockerfile
       args:
         GITHUB_TOKEN: ${GITHUB_TOKEN}
     environment:
@@ -55,7 +55,7 @@ services:
       - C_FORCE_ROOT=true
       - ENVIRONMENT=forno
     depends_on:
-      - airflow_python3
+      - airflow_python
     volumes:
       - ${PROJECT_PATH}/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
     entrypoint: airflow worker -cn worker_1
@@ -63,7 +63,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "[ -f /bi-etl-ejuice/airflow_python3/airflow-worker.pid ]"
+          "[ -f /bi-etl-ejuice/airflow_python/airflow-worker.pid ]"
         ]
       interval: 30s
       timeout: 30s
@@ -78,7 +78,7 @@ services:
       - C_FORCE_ROOT=true
       - ENVIRONMENT=forno
     depends_on:
-      - airflow_python3
+      - airflow_python
     volumes:
       - ${PROJECT_PATH}/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
     entrypoint: airflow worker -cn worker_2
@@ -86,7 +86,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "[ -f /bi-etl-ejuice/airflow_python3/airflow-worker.pid ]"
+          "[ -f /bi-etl-ejuice/airflow_python/airflow-worker.pid ]"
         ]
       interval: 30s
       timeout: 30s

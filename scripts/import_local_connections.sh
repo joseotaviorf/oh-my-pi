@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat airflow_python3/local_connection.json | jq -c '.envs[]' | while read row;
+cat airflow_python/local_connection.json | jq -c '.envs[]' | while read row;
 do
   conn_id=$(echo ${row} | jq -r ${1} '.conn_id')
   conn_type=$(echo ${row} | jq -r ${1} '.conn_type')

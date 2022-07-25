@@ -16,7 +16,7 @@ RUN apt update -yqq && \
 WORKDIR /bi-etl-ejuice
 
 ENV PYTHONIOENCODING=utf-8 \
-    AIRFLOW_HOME=/bi-etl-ejuice/airflow_python3 \
+    AIRFLOW_HOME=/bi-etl-ejuice/airflow_python \
     PYTHONPATH=":/bi-etl-ejuice" \
     SLUGIFY_USES_TEXT_UNIDECODE=yes \
     AIRFLOW_GPL_UNIDECODE=yes \
@@ -56,6 +56,6 @@ RUN git config --global url.https://${GITHUB_TOKEN}:@github.com/.insteadOf https
 
 COPY . .
 
-RUN /bin/bash -c 'mkdir /bi-etl-ejuice/airflow_python3/plugins && cp -R /bi-etl-ejuice/airflow-plugins/quintoandar_airflow_plugins/* /bi-etl-ejuice/airflow_python3/plugins && rm -R /bi-etl-ejuice/airflow-plugins'
+RUN /bin/bash -c 'mkdir /bi-etl-ejuice/airflow_python/plugins && cp -R /bi-etl-ejuice/airflow-plugins/quintoandar_airflow_plugins/* /bi-etl-ejuice/airflow_python/plugins && rm -R /bi-etl-ejuice/airflow-plugins'
 
 CMD ["pytest", "tests/"]

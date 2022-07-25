@@ -523,8 +523,7 @@ modifications are already in master and prod envs =] ).
 
 ```
 |-- .terraform                     < todo: add short desc. >
-|-- airflow_python2                Airflow configuration for python2
-|-- airflow_python3                Airflow configuration for python3
+|-- airflow_python                Airflow configuration for python3
 |-- bietlejuice                    < todo: add short desc. >
     |-- db                         < todo: add short desc. >
         |-- datalake               < todo: add short desc. >
