@@ -112,7 +112,7 @@ weekly_listings_mkt AS (
             ON wl.id_contract = dc.sk_contract
             AND dc.ts_signature IS NOT NULL
     WHERE 
-        wl.dt_week < DATE_TRUNC('week', DATE('{year}-{month)-{day}')) 
+        wl.dt_week < DATE_TRUNC('week', DATE('{year}-{month}-{day}')) 
 ),
 weekly_listings_mkt_base AS (
   SELECT
