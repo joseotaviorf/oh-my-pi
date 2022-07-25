@@ -13,7 +13,7 @@ WITH daily_published_listings AS (
             ON d.sk_date between NULLIF(f.sk_status_start_date,-1) AND COALESCE(TO_CHAR(TO_DATE(NULLIF(sk_status_end_date,-1),'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, TO_CHAR(current_date -1, 'YYYYMMDD')::bigint)
     WHERE f.status_history = 'publicado' -- consider published AND suspended status
       AND substring(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
-      AND d.date > current_date - interval '180 DAYS'
+      AND d.date > current_date - interval '360 DAYS'
 )
 , house_available_hours AS (
     SELECT

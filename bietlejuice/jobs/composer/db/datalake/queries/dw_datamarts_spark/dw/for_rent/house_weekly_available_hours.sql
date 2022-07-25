@@ -10,12 +10,12 @@ WITH daily_published_listings AS (
         dw_public.fact_house_listing_status AS f
     JOIN
         dw_public.dim_date AS d
-            ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) 
+            ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1)
             AND CAST(DATE_FORMAT( COALESCE(to_date(CAST(NULLIF(sk_status_end_date,-1) AS STRING), 'yyyyMMdd'), CURRENT_DATE) -1 ,'yyyyMMdd') AS BIGINT)
-    WHERE 
+    WHERE
         f.status_history = 'publicado' -- consider published AND suspended status
         AND substring(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
-        AND d.date > DATE_SUB(CURRENT_DATE,180)
+        AND d.date > DATE_SUB(CURRENT_DATE,360)
 ),
 house_available_hours AS (
     SELECT /** RANGE_JOIN(hah, 1100) */
