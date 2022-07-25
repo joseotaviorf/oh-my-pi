@@ -18,7 +18,7 @@ SELECT
     CAST(
         CASE
             WHEN GET_JSON_OBJECT(ot.custom_fields, '$.PAR Tipo de Solicitação') = 'inicial_' THEN ot.id_ticket
-            ELSE GET_JSON_OBJECT(ot.custom_fields, '$.Ticket Inicial')
+            ELSE GET_JSON_OBJECT(ot.custom_fields, '$.PAR Ticket Inicial')
         END AS BIGINT
     ) AS id_ticket_referential,
     CAST(GET_JSON_OBJECT(ot.custom_fields, '$.PAR Ticket de CX') AS BIGINT) AS id_ticket_cx,
