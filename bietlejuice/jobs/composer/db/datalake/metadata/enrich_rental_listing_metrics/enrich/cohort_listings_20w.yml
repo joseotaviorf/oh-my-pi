@@ -1,0 +1,139 @@
+---
+database_name: datalake_rental_listing_metrics
+table_name: cohort_listings_20w
+columns:
+  id_cohort_listing:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.id_cohort_listing
+  consultant_type:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.consultant_type
+  entry_condition:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.entry_condition
+  exclusivity:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.exclusivity
+  hybrid:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.hybrid
+  listing_category_start:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.listing_category_start
+  mkt_completion:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.mkt_completion
+  mkt_origin:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.mkt_origin
+  depub_1w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.depub_w
+  imoveis_1w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.imoveis_w
+  list_w_cs_1w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.list_w_cs
+  suspenso_1w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.suspenso_w
+  l2r_1w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2r_w
+  l2s_1w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2s_w
+  l2u_1w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2u_w
+  depub_4w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.depub_w
+  imoveis_4w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.imoveis_w
+  list_w_cs_4w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.list_w_cs
+  suspenso_4w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.suspenso_w
+  l2r_4w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2r_w
+  l2s_4w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2s_w
+  l2u_4w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2u_w
+  depub_8w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.depub_w
+  imoveis_8w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.imoveis_w
+  list_w_cs_8w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.list_w_cs
+  suspenso_8w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.suspenso_w
+  l2r_8w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2r_w
+  l2s_8w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2s_w
+  l2u_8w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2u_w
+  depub_16w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.depub_w
+  imoveis_16w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.imoveis_w
+  list_w_cs_16w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.list_w_cs
+  suspenso_16w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.suspenso_w
+  l2r_16w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2r_w
+  l2s_16w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2s_w
+  l2u_16w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2u_w
+  depub_20w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.depub_w
+  imoveis_20w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.imoveis_w
+  list_w_cs_20w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.list_w_cs
+  suspenso_20w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.suspenso_w
+  l2r_20w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2r_w
+  l2s_20w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2s_w
+  l2u_20w:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.l2u_w
+  dt_listing_month_started:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.dt_listing_month_started
+  dt_listing_week_started:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.dt_listing_week_started

@@ -1,0 +1,16 @@
+---
+database_name: rental_listing_metrics
+table_name: coincident_listings_weekly
+columns:
+  listing_category_start:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.listing_category
+  listing_category_previous:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.listing_category
+  mkt_completion:
+    lineage:
+      - dw_public.fact_house_listing_flows.mkt_completion
+  mkt_origin:
+    lineage:
+      - dw_public.fact_house_listing_flows.mkt_origin

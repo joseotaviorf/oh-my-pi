@@ -1,0 +1,4 @@
+---
+inner_dependencies:
+  cohort_listings_20w:
+    - cohort_listings_weekly
