@@ -29,15 +29,21 @@ columns:
   payment_purpose:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.purpose
+  country:
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.country
   paid_amount:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.amount
   is_blocked:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.blocked
-  accrual_year_month:
+  entry_accrual_year_month:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.year-month
+  invoice_accrual_year_month:
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.invoice_filename
   dt_due:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.due-date
@@ -59,9 +65,6 @@ columns:
   dt_landlord_invoice_created_at:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.landlord-invoice-created-at
-  ts_load:
-    lineage:
-      - datalake_invoice_preview_raw.invoice_preview.ts_load
   year:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.year
@@ -71,3 +74,6 @@ columns:
   day:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.day
+  ts_load:
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.ts_load

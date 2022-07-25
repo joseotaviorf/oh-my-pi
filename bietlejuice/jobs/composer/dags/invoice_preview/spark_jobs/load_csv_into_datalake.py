@@ -93,7 +93,9 @@ if __name__ == "__main__":
     if len(by_day_files[date_to_ingest]) > 0:
 
         for csv in by_day_files[date_to_ingest]:
-            dfs.append(s3_consumer.get_data_from_file(path=csv, **consumer_extra_args))
+            df = s3_consumer.get_data_from_file(path=csv, **consumer_extra_args)
+            df = df.withColumn("invoice_filename", functions.lit(csv))
+            dfs.append(df)
 
         df = reduce(DataFrame.unionAll, dfs)
         df = (
