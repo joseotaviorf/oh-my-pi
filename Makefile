@@ -1,6 +1,6 @@
 ############# DOCKER commands ########################
-.PHONY: create-docker-environment
-create-docker-environment:
+.PHONY: _create-docker-environment
+_create-docker-environment:
 	@rm docker/.env || true
 	@touch docker/.env
 	@echo "GITHUB_TOKEN=${GITHUB_TOKEN}" >> docker/.env
@@ -8,19 +8,19 @@ create-docker-environment:
 	@echo "USERNAME=${USERNAME}" >> docker/.env
 	@echo "DATABRICKS_TOKEN=${DATABRICKS_TOKEN}" >> docker/.env
 
-.PHONY: create-docker-environment-python3
-create-docker-environment-python3:
-	@make create-docker-environment
+.PHONY: create-docker-environment
+create-docker-environment:
+	@make _create-docker-environment
 	@chmod +x start.sh
 	@sudo docker-compose -f docker/docker-compose.yml --env-file docker/.env up -d --build --force-recreate
 	@sudo docker image prune -f
 
-.PHONY: restart-docker-environment-python3
-restart-docker-environment-python3:
+.PHONY: restart-docker-environment
+restart-docker-environment:
 	@sudo docker-compose -f docker/docker-compose.yml up -d --build
 
-.PHONY: kill-docker-environment-python3
-kill-docker-environment-python3:
+.PHONY: kill-docker-environment
+kill-docker-environment:
 	@sudo docker-compose -f docker/docker-compose.yml down
 
 .PHONY: build-local-whl
@@ -33,82 +33,82 @@ build-local-whl:
 upload-local-spark-jobs-to-s3:
 	@python3 scripts/upload_local_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
 
-############# PYTHON3 commands #######################
+############# Local environment commands #######################
 
-.PHONY: environment-python3
-environment-python3:
+.PHONY: environment
+environment:
 	@echo ""
-	@echo "Creating environment for python 3 project"
+	@echo "Creating environment for Bi-etl-ejuice project"
 	@echo "=========="
 	@echo ""
 	@pyenv install -s 3.7.3
-	@pyenv virtualenv 3.7.3 bi-etl-ejuice-python3
-	@pyenv local bi-etl-ejuice-python3
+	@pyenv virtualenv 3.7.3 bi-etl-ejuice
+	@pyenv local bi-etl-ejuice
 
-.PHONY: build-test-environment-python3
-build-test-environment-python3:
+.PHONY: build-test-environment
+build-test-environment:
 	@docker build --file docker/test-environment.Dockerfile -t bietlejuice --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} .
 
-.PHONY: test-environment-python3
-test-environment-python3:
-	@make build-test-environment-python3
+.PHONY: test-environment
+test-environment:
+	@make build-test-environment
 	@docker run bietlejuice
 
-.PHONY: requirements-python3
-requirements-python3:
+.PHONY: requirements
+requirements:
 	@echo ""
-	@echo "Installing python 3 packages"
+	@echo "Installing packages"
 	@echo "=========="
 	@echo ""
 	@python -m pip install -U -r requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
-	@make requirements-lint-python3
+	@make requirements-lint
 
-.PHONY: requirements-test-python3
-requirements-test-python3:
+.PHONY: requirements-test
+requirements-test:
 	@echo ""
-	@echo "Installing Python 3 tests packages"
+	@echo "Installing tests packages"
 	@echo "=========="
 	@echo ""
 	@python -m pip install -r requirements_test.txt  --extra-index-url https://quintoandar.github.io/python-package-server/
 
-.PHONY: requirements-lint-python3
-requirements-lint-python3:
+.PHONY: requirements-lint
+requirements-lint:
 	@echo ""
 	@echo "Installing lint packages"
 	@echo "=========="
 	@echo ""
 	@python -m pip install -r requirements_lint.txt
 
-.PHONY: requirements-scripts-python3
-requirements-scripts-python3:
+.PHONY: requirements-scripts
+requirements-scripts:
 	@echo ""
 	@echo "Installing scripts packages"
 	@echo "=========="
 	@echo ""
 	@python -m pip install -U -r requirements_scripts.txt --extra-index-url https://quintoandar.github.io/python-package-server/
 
-.PHONY: lint-python3
+.PHONY: lint
 ## run black to fix code style
-lint-python3:
+lint:
 	@echo ""
 	@echo "Running lint in all files from <bietlejuice/jobs/composer/> and <tests/unit/composer/>"
 	@echo "=========="
 	@echo ""
 	@python -m black bietlejuice/jobs/composer/ tests/unit/composer/
 
-.PHONY: check-style-python3
+.PHONY: check-style
 ## check style with flake8 and black
-check-style-python3:
+check-style:
 	@echo ""
 	@echo "Running Check Style"
 	@echo "=========="
 	@echo ""
-	@python -m black --check bietlejuice/jobs/composer/ tests/unit/composer/ && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint-python3\" to apply style formatting to your code\n" && exit 1)
+	@python -m black --check bietlejuice/jobs/composer/ tests/unit/composer/ && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" to apply style formatting to your code\n" && exit 1)
 	@python -m flake8 --config=setup.cfg bietlejuice/jobs/composer/ tests/unit/composer/
 
-.PHONY: package-python3
-package-python3:
-	@make requirements-python3
+.PHONY: package
+package:
+	@make requirements
 	@echo ""
 	@echo "Creating 'requirements-freeze.txt' to prepare building dependencies"
 	@echo "=========="
@@ -120,16 +120,16 @@ package-python3:
 	@echo ""
 	@PYTHONPATH=. python -m setup sdist bdist_wheel
 
-.PHONY: unit-tests-python3
-unit-tests-python3:
+.PHONY: unit-tests
+unit-tests:
 	@echo ""
 	@echo "Unit Tests"
 	@echo "=========="
 	@echo ""
 	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov-report term --cov-report html:htmlcov --cov=bietlejuice/jobs/composer --cov-fail-under=40 tests/unit/
 
-.PHONY: files-validation-python3
-files-validation-python3:
+.PHONY: files-validation
+files-validation:
 	@echo ""
 	@echo "Validation Files Tests"
 	@echo "=========="

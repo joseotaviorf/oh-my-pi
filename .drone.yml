@@ -9,8 +9,8 @@ pipeline:
     commands:
       - apt-get update
       - apt-get install -y git > /dev/null
-      - chmod +x scripts/execute_python3_steps.sh
-      - bash scripts/execute_python3_steps.sh "make requirements-lint-python3" "make check-style-python3"
+      - make requirements-lint
+      - make check-style
     when:
       event: push
 
@@ -21,8 +21,8 @@ pipeline:
     commands:
       - apt-get update
       - apt-get install -y git > /dev/null
-      - chmod +x scripts/execute_python3_steps.sh
-      - bash scripts/execute_python3_steps.sh "make requirements-test-python3" "make files-validation-python3"
+      - make requirements-test
+      - make files-validation
     when:
       event: push
 
@@ -33,8 +33,9 @@ pipeline:
     commands:
       - export AIRFLOW_GPL_UNIDECODE=yes
       - export AWS_DEFAULT_REGION=us-east-1
-      - chmod +x scripts/execute_python3_steps.sh
-      - bash scripts/execute_python3_steps.sh "make requirements-test-python3" "make requirements-python3" "make unit-tests-python3"
+      - make requirements-test
+      - make requirements
+      - make unit-tests
     when:
       event: push
 
@@ -44,7 +45,7 @@ pipeline:
     environment:
       ENVIRONMENT: forno
     commands:
-      - make requirements-scripts-python3
+      - make requirements-scripts
       - make validate-dags-dependencies
     when:
       event: push
@@ -59,7 +60,7 @@ pipeline:
     environment:
       ENVIRONMENT: prod
     commands:
-      - make requirements-scripts-python3
+      - make requirements-scripts
       - make validate-dags-dependencies
     when:
       event: push
@@ -69,7 +70,7 @@ pipeline:
     group: tests
     image: python:3.7.3
     commands:
-      - make requirements-scripts-python3
+      - make requirements-scripts
       - make validate-atlas-metadata-files
     when:
       event: push
@@ -81,7 +82,7 @@ pipeline:
     group: tests
     image: python:3.7.3
     commands:
-      - make requirements-scripts-python3
+      - make requirements-scripts
       - make validate-metadata-files-exist
     when:
       event: push
@@ -94,7 +95,7 @@ pipeline:
     group: tests
     image: python:3.7.3
     commands:
-      - make requirements-scripts-python3
+      - make requirements-scripts
       - make validate-datamarts-metadata-files-exist
     when:
       event: push
@@ -107,7 +108,7 @@ pipeline:
     group: package
     image: python:3.7.3
     commands:
-      - make package-python3
+      - make package
     when:
       event: [ push, tag ]
       branch: [ master, forno, hotfix/* ]
