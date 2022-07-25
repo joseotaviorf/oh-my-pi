@@ -11,6 +11,8 @@ WITH sale_listing_flows_adjust AS (
         lf.mkt_origin,
         lf.mkt_channel,
         lf.sales_company,
+        CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
+        rbh.partner AS supply_3pbh_partner,
         CASE WHEN dhl.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
         dhl.partner_3p_supply AS supply_3p_partner,
         CASE
@@ -48,6 +50,9 @@ WITH sale_listing_flows_adjust AS (
     LEFT JOIN
         dw_public.dim_house_listing AS dhl
             ON dhl.sk_house_listing = lf.sk_house_listing 
+    LEFT JOIN
+        datalake_3p.houses_3p_bh AS rbh
+            ON rbh.id_house = lf.sk_house_listing / 1000
     WHERE
         lf.origin_table = 'Sale'
 ),
@@ -346,6 +351,8 @@ sale_demand_classification AS (
         NULLIF(sdc.demand_3p_partner, '') AS demand_3p_partner,
         CAST(sdc.is_3p_supply AS INT) AS is_3p_supply,
         NULLIF(sdc.supply_3p_partner, '') AS supply_3p_partner,
+        CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
+        rbh.partner AS supply_3pbh_partner,
         CASE
             WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Porto Alegre','Campinas')
                 THEN 'Out of coverage area'
@@ -392,6 +399,9 @@ sale_demand_classification AS (
     LEFT JOIN
         datalake_3p.houses_3p AS hp
             ON hp.id_house = sdc.id_house
+    LEFT JOIN
+        datalake_3p.houses_3p_bh AS rbh
+            ON rbh.id_house = sdc.id_house
 ),
 p2fc AS (
     SELECT
@@ -404,6 +414,8 @@ p2fc AS (
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
+        slf.is_3pbh_supply,
+        slf.supply_3pbh_partner,
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
@@ -458,7 +470,7 @@ p2fc AS (
     WHERE
         slf.sk_prospect_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 fc2q AS (
     SELECT
@@ -471,6 +483,8 @@ fc2q AS (
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
+        slf.is_3pbh_supply,
+        slf.supply_3pbh_partner,
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
@@ -525,7 +539,7 @@ fc2q AS (
     WHERE
         slf.sk_first_contact_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 p2q AS (
     SELECT
@@ -538,6 +552,8 @@ p2q AS (
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
+        slf.is_3pbh_supply,
+        slf.supply_3pbh_partner,
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
@@ -592,7 +608,7 @@ p2q AS (
     WHERE
         slf.sk_prospect_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 q2o AS (
     SELECT
@@ -605,6 +621,8 @@ q2o AS (
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
+        slf.is_3pbh_supply,
+        slf.supply_3pbh_partner,
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
@@ -659,7 +677,7 @@ q2o AS (
     WHERE
         slf.sk_qualified_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 o2fl AS (
     SELECT
@@ -672,6 +690,8 @@ o2fl AS (
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
+        slf.is_3pbh_supply,
+        slf.supply_3pbh_partner,
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
@@ -726,7 +746,7 @@ o2fl AS (
     WHERE
         slf.sk_opportunity_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 fl2ccv AS (
     SELECT
@@ -739,6 +759,8 @@ fl2ccv AS (
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
+        slf.is_3pbh_supply,
+        slf.supply_3pbh_partner,
         slf.is_3p_supply,
         slf.supply_3p_partner,
         sde.is_3p_demand,
@@ -796,7 +818,7 @@ fl2ccv AS (
     WHERE
         slf.sk_first_listing_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 vb2vc AS (
     SELECT
@@ -809,6 +831,8 @@ vb2vc AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -863,7 +887,7 @@ vb2vc AS (
     WHERE
         dt_created IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 vb2os AS (
     SELECT
@@ -876,6 +900,8 @@ vb2os AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -930,7 +956,7 @@ vb2os AS (
     WHERE
         dt_created IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 vb2oa AS (
     SELECT
@@ -943,6 +969,8 @@ vb2oa AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -997,7 +1025,7 @@ vb2oa AS (
     WHERE
         dt_created IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 vb2ccv AS (
     SELECT
@@ -1010,6 +1038,8 @@ vb2ccv AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1063,7 +1093,7 @@ vb2ccv AS (
         sale_demand_classification
     WHERE
         dt_created IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 vc2ccv AS (
     SELECT
@@ -1076,6 +1106,8 @@ vc2ccv AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1130,7 +1162,7 @@ vc2ccv AS (
     WHERE
         dt_completed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 vc2os AS (
     SELECT
@@ -1143,6 +1175,8 @@ vc2os AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1197,7 +1231,7 @@ vc2os AS (
     WHERE
         dt_completed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 vc2oa AS (
     SELECT
@@ -1210,6 +1244,8 @@ vc2oa AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1264,7 +1300,7 @@ vc2oa AS (
     WHERE
         dt_completed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 os2oa AS (
     SELECT
@@ -1277,6 +1313,8 @@ os2oa AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1331,7 +1369,7 @@ os2oa AS (
     WHERE
         dt_offer_sent IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 os2dq AS (
     SELECT
@@ -1344,6 +1382,8 @@ os2dq AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1398,7 +1438,7 @@ os2dq AS (
     WHERE
         dt_offer_sent IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 dq2oa AS (
     SELECT
@@ -1411,6 +1451,8 @@ dq2oa AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1465,7 +1507,7 @@ dq2oa AS (
     WHERE
         dt_deal_qualified IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 os2ccv AS (
     SELECT
@@ -1478,6 +1520,8 @@ os2ccv AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1532,7 +1576,7 @@ os2ccv AS (
     WHERE
         dt_offer_sent IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 oa2ccv AS (
     SELECT
@@ -1545,6 +1589,8 @@ oa2ccv AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1599,7 +1645,7 @@ oa2ccv AS (
     WHERE
         dt_offer_accepted IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 ccv2lts AS (
     SELECT
@@ -1612,6 +1658,8 @@ ccv2lts AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1666,7 +1714,7 @@ ccv2lts AS (
     WHERE
         dt_ccv_signed IS NOT NULL
     GROUP BY 
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 lts2lte AS (
     SELECT
@@ -1679,6 +1727,8 @@ lts2lte AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1733,7 +1783,7 @@ lts2lte AS (
     WHERE
         dt_diligence_started_legaut IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 lte2lrs AS (
     SELECT
@@ -1746,6 +1796,8 @@ lte2lrs AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1800,7 +1852,7 @@ lte2lrs AS (
     WHERE
         dt_diligence_ended_legaut IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 lrs2lre AS (
     SELECT
@@ -1813,6 +1865,8 @@ lrs2lre AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1867,7 +1921,7 @@ lrs2lre AS (
     WHERE
         dt_diligence_started_legal IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 lre2de AS (
     SELECT
@@ -1880,6 +1934,8 @@ lre2de AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -1934,7 +1990,7 @@ lre2de AS (
     WHERE
         dt_diligence_ended_legal IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 ccv2credstart AS (
     SELECT
@@ -1947,6 +2003,8 @@ ccv2credstart AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -2001,7 +2059,7 @@ ccv2credstart AS (
     WHERE
         dt_ccv_signed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 credstart2credsent AS (
     SELECT
@@ -2014,6 +2072,8 @@ credstart2credsent AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -2067,7 +2127,7 @@ credstart2credsent AS (
         sale_demand_classification
     WHERE
         dt_credit_started IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 ccv2crnended AS (
     SELECT
@@ -2080,6 +2140,8 @@ ccv2crnended AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -2133,7 +2195,7 @@ ccv2crnended AS (
         sale_demand_classification
     WHERE
         dt_ccv_signed IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 credsent2finstart AS (
     SELECT
@@ -2146,6 +2208,8 @@ credsent2finstart AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -2199,7 +2263,7 @@ credsent2finstart AS (
         sale_demand_classification
     WHERE
         dt_credit_approved IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 ccv2finstart AS (
     SELECT
@@ -2212,6 +2276,8 @@ ccv2finstart AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -2265,7 +2331,7 @@ ccv2finstart AS (
         sale_demand_classification
     WHERE
         dt_ccv_signed IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 finstart2finended AS (
     SELECT
@@ -2278,6 +2344,8 @@ finstart2finended AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -2331,7 +2399,7 @@ finstart2finended AS (
         sale_demand_classification
     WHERE
         dt_finan_started IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 ccv2mi AS (
     SELECT
@@ -2344,6 +2412,8 @@ ccv2mi AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -2397,7 +2467,7 @@ ccv2mi AS (
         sale_demand_classification
     WHERE
         dt_ccv_signed IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 mi2ma AS (
     SELECT
@@ -2410,6 +2480,8 @@ mi2ma AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -2464,7 +2536,7 @@ mi2ma AS (
     WHERE
         dt_matricula_inicio IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 ccv2ma AS (
     SELECT
@@ -2477,6 +2549,8 @@ ccv2ma AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -2531,7 +2605,7 @@ ccv2ma AS (
     WHERE
         dt_ccv_signed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 ccv2pc AS (
     SELECT
@@ -2544,6 +2618,8 @@ ccv2pc AS (
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
+        is_3pbh_supply,
+        supply_3pbh_partner,
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
@@ -2597,7 +2673,7 @@ ccv2pc AS (
     WHERE
         dt_ccv_signed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 union_all AS (
     SELECT *
@@ -2739,6 +2815,8 @@ union_all_date AS (
         dd.month,
         dd.quarter,
         ua.city_group,
+        ua.is_3pbh_supply,
+        ua.supply_3pbh_partner,
         ua.is_3p_supply,
         ua.supply_3p_partner,
         ua.is_3p_demand,
@@ -2819,8 +2897,10 @@ SELECT
     hub_visit,
     hub_offer,
     weeks_conversion,
+    supply_3pbh_partner,
     supply_3p_partner,
     demand_3p_partner,
+    is_3pbh_supply,
     is_3p_supply,
     is_3p_demand,
     SUM(p2fc) AS p2fc,
@@ -2879,7 +2959,9 @@ GROUP BY
     weeks_conversion,
     hub_visit,
     hub_offer,
-    is_3p_supply,
+    supply_3pbh_partner,
     supply_3p_partner,
-    is_3p_demand,
-    demand_3p_partner
+    demand_3p_partner,
+    is_3pbh_supply,
+    is_3p_supply,
+    is_3p_demand

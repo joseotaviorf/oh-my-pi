@@ -3,6 +3,8 @@ SELECT
         f.sk_sale_listing,
         CASE WHEN dhl.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
         dhl.partner_3p_supply AS supply_3p_partner,
+        CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
+        rbh.partner AS supply_3pbh_partner,
         f.status_history,
         d.date,
         d.week_start,
@@ -20,6 +22,9 @@ JOIN
 LEFT JOIN 
     public.dim_house_listing AS dhl
         ON dhl.id_house = CAST(SUBSTRING(CAST(f.sk_sale_listing AS VARCHAR), 1, 9) AS BIGINT)
+LEFT JOIN 
+    datalake_3p_prod.houses_3p_bh AS rbh
+        ON rbh.id_house = CAST(SUBSTRING(CAST(f.sk_sale_listing AS VARCHAR), 1, 9) AS BIGINT)
 WHERE 
     f.status_history = 'PUBLISHED'
 ), 
@@ -47,9 +52,11 @@ SELECT
     fhs.weekday_name,
     fhs.order_status,
     fhs.status_history,
-    dr.sk_region,
     fhs.supply_3p_partner,
+    fhs.supply_3pbh_partner,
     fhs.is_3p_supply,
+    fhs.is_3pbh_supply,
+    dr.sk_region,
     dr.name AS region,
     dr.city_name,
     dr.city_group
@@ -74,7 +81,9 @@ SELECT
     city_name,
     city_group,
     supply_3p_partner,
+    supply_3pbh_partner,
     is_3p_supply,
+    is_3pbh_supply,
     COUNT(DISTINCT sk_sale_listing) AS ongoing_listings,
     COUNT(DISTINCT ciq_assignment) AS ciq_listing,
     CURRENT_TIMESTAMP AS ts_load
@@ -89,4 +98,6 @@ GROUP BY
     6, 
     7,
     8,
-    9
+    9,
+    10,
+    11

@@ -63,6 +63,9 @@ columns:
   hub_offer:
     lineage:
       - dw_sale.dim_offer.business_unit
+  supply_3pbh_partner:
+    lineage:
+      - datalake_3p.houses_3p_bh.partner
   supply_3p_partner:
     lineage:
       - dw_public.dim_house_listing.partner_3p_supply
