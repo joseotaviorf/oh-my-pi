@@ -36,7 +36,6 @@ SELECT
 	eso.days_sale_agreement_created_to_sale_agreement_signed,
 	eso.hours_booking_to_offer,
 	eso.hours_visit_to_offer AS hours_visit_completed_to_offer,
-	eso.dt_sale_agreement_signed AS ts_sale_agreement_signed,
 	now() AS ts_load
 FROM datalake_offer.sale_offer eso
 LEFT JOIN datalake_ebdb_clean.house h
