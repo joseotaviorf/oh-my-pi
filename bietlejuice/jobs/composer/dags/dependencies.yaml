@@ -24,7 +24,7 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.dw_sale_listings:load-sale-dim-listing-into-redshift
   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
-  - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
+  - bietlejuice.dw_booking:load-public-dim-tenant-booking-review-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
@@ -61,7 +61,7 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
-  - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
+  - bietlejuice.dw_booking:load-public-dim-tenant-booking-review-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-dim-nps-campaign-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-fact-nps-dispatches-into-redshift
   - bietlejuice.ebdb:create-access-authorization-type-clean-external-table
@@ -134,7 +134,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
-  - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
+  - bietlejuice.dw_booking:load-public-dim-tenant-booking-review-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-dim-nps-answer-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-dim-nps-campaign-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-fact-nps-dispatches-into-redshift
@@ -493,6 +493,7 @@ bietlejuice.dw_booking:
   - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_booking:load-enrich-booking-cancellation
+  - bietlejuice.enrich_booking:load-enrich-booking-review
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_braze_events_user_centric:
@@ -576,7 +577,7 @@ bietlejuice.dw_customer_support:
 #   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
 #   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
 #   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-#   - bietlejuice.dw_tenant_booking_review:load-dw-public-dim-tenant-booking-review
+#   - bietlejuice.dw_booking:load-dw-public-dim-tenant-booking-review
 #   - bietlejuice.dw_user:load-dw-public-dim-partner
 #   - bietlejuice.dw_user:load-dw-public-dim-partner-agent
 #   - bietlejuice.ebdb:create-clean-follow-up-details-in-data-lake
@@ -1041,12 +1042,6 @@ bietlejuice.dw_smart_price:
   - bietlejuice.enrich_ebdb_smart_price:load-enrich-smart-price-versioning
   - bietlejuice.ebdb:create-clean-dynamic-pricing-house-in-data-lake
   - bietlejuice.ebdb:create-clean-dynamic-pricing-parameters-in-data-lake
-
-bietlejuice.dw_tenant_booking_review:
-  - bietlejuice.ebdb:create-clean-visit-in-data-lake
-  - bietlejuice.ebdb:create-clean-booking-in-data-lake
-  - bietlejuice.insider:load-clean-review-feature
-  - bietlejuice.insider:load-clean-review
 
 bietlejuice.dw_tenant_documentation:
   - bietlejuice.docx:load-clean-credit-evaluation

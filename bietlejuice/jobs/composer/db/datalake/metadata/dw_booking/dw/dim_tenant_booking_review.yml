@@ -1,0 +1,62 @@
+database_name: dw_public
+table_name: dim_tenant_booking_review
+columns:
+  sk_tenant_booking_review:
+    lineage:
+      - datalake_booking.booking_review.id_booking
+  id_tenant_booking_review:
+    lineage:
+      - datalake_booking.booking_review.id_booking
+  review_status:
+    lineage:
+      - datalake_booking.booking_review.review_status
+  visit_not_happened_reason:
+    lineage:
+      - datalake_booking.booking_review.visit_not_happened_reason
+  wrong_listing_info:
+    lineage:
+      - datalake_booking.booking_review.wrong_listing_info
+  no_offer_intent_reason:
+    lineage:
+      - datalake_booking.booking_review.no_offer_intent_reason
+  painting:
+    lineage:
+      - datalake_booking.booking_review.painting
+  cost_benefit:
+    lineage:
+      - datalake_booking.booking_review.cost_benefit
+  conservation:
+    lineage:
+      - datalake_booking.booking_review.conservation
+  cleaning:
+    lineage:
+      - datalake_booking.booking_review.cleaning
+  furniture:
+    lineage:
+      - datalake_booking.booking_review.furniture
+  natural_light:
+    lineage:
+      - datalake_booking.booking_review.natural_light
+  indoor_silence:
+    lineage:
+      - datalake_booking.booking_review.indoor_silence
+  agent_performance:
+    lineage:
+      - datalake_booking.booking_review.agent_performance
+  visit_type:
+    lineage:
+      - datalake_booking.booking_review.visit_type
+  comment:
+    lineage:
+      - datalake_booking.booking_review.comment
+  is_listing_accurate:
+    lineage:
+      - datalake_booking.booking_review.is_listing_accurate
+  is_offer_intent:
+    lineage:
+      - datalake_booking.booking_review.is_offer_intent
+  does_want_same_agent:
+    lineage:
+      - datalake_booking.booking_review.does_want_same_agent
+
+  

@@ -2,8 +2,7 @@
 
 ### Purpose
 
-Full load of the context `Booking` models into DW
-with enriched data of amplitude, booking, visits and data of taxonomy sheets.
+Full load of the context `Booking` models into DW with enriched data from Amplitude, Booking, Visits and Taxonomy sheets.
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -17,6 +16,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables:
 
 - `dim_booking`
+- `dim_tenant_booking_review`
 
 ### Responsible Data Engineering Team
 
