@@ -8,6 +8,9 @@ columns:
   review_status:
     lineage:
       - datalake_insider_clean.review.status
+  review_type:
+    lineage:
+      - datalake_insider_clean.review.type
   comment:
     lineage:
       - datalake_insider_clean.review.comment

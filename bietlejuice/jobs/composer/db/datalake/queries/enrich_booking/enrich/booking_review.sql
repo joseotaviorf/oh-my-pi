@@ -1,6 +1,7 @@
 SELECT
   b.id AS id_booking,
   MIN(review.status) AS review_status,
+  MAX(review.type) AS review_type,
   MAX(
     CASE
       WHEN array_contains(review.labels, '') THEN NULL
