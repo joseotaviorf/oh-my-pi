@@ -1,0 +1,64 @@
+---
+database_name: dw_customer_support
+table_name: fact_demand_metrics_tasks
+columns:
+  sk_task:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.id_task
+  sk_agent:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.id_agent
+  sk_taxonomy:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.id_taxonomy
+  sk_tags:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.id_tags
+  sk_main_department:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.id_main_department
+  sla_target:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.sla_target
+  origin:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.origin
+  status:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.status
+  time_spent_solved_within_sla:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.time_spent_solved_in_time
+  time_spent_solved_with_exceed_sla:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.time_spent_not_solved_in_time
+  days_worked:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.days_worked
+  days_off:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.days_off
+  is_ticket_solved_within_sla:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.is_ticket_solved_in_time
+  is_ticket_solved_with_exceed_sla:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.is_ticket_not_solved_in_time
+  is_received_demand:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.is_received_demand
+  is_solved_demand:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.is_solved_demand
+  is_closed_demand:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.is_closed_demand
+  ts_started:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.ts_started
+  ts_solved:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.ts_completed
+  ts_closed:
+    lineage:
+      - datalake_customer_demand.demand_metrics_tasks.ts_closed

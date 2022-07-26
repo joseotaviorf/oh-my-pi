@@ -15,15 +15,17 @@ More information about run time [here]({chart_url}{dag_id}).
 ​
 This pipeline produces the following output tables in `customer_support` schema
 
-- `fact_ticket`
-- `fact_segment`
+- `fact_ticket` (full load)
+- `fact_segment` (full load)
+- `fact_demand_metrics_tasks` (full load)
 - `fact_agent_daily_productivity` (incremental load)
 - `fact_agent_ranking` (incremental load)
-- `dim_ranking_targets`
-- `dim_agent`
-- `dim_department`
-- `dim_taxonomy`
-- `dim_channel`
+- `dim_ranking_targets` (full load)
+- `dim_agent` (full load)
+- `dim_department` (full load)
+- `dim_taxonomy` (full load)
+- `dim_channel` (full load)
+- `dim_ticket_tags` (full load)
 
 ​
 ### Responsible Data Team
