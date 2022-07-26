@@ -23,6 +23,12 @@ columns:
   tags:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.tags
+  destination:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.destination
+  template:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.template
   ts_sent:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.sent_at

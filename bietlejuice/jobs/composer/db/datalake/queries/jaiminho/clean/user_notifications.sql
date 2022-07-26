@@ -7,6 +7,7 @@ SELECT
 	channel,
 	tags,
 	destination,
+	template,
 	CAST(sent_at AS TIMESTAMP) AS ts_sent,
 	CAST(created_at AS TIMESTAMP) AS ts_created,
 	CAST(updated_at AS TIMESTAMP) AS ts_updated,
