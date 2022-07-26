@@ -1,0 +1,55 @@
+---
+database_name: dw_customer_support
+table_name: fact_backlog_metrics_tasks
+columns:
+  sk_task:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.id_task
+  sk_agent:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.id_agent
+  sk_taxonomy:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.id_taxonomy
+  sk_tags:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.id_tags
+  sk_main_department:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.id_main_department
+  sla_target:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.sla_target
+  origin:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.origin
+  status:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.status
+  days_worked:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.days_worked
+  days_worked_with_days_offs:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.days_worked_with_days_offs
+  days_off:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.days_off
+  is_daily_backlog:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.is_daily_backlog
+  is_backlog_within_sla:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.is_backlog_in_time
+  is_backlog_with_exceed_sla:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.is_backlog_not_in_time
+  dt_metric_reference:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.dt_metric_reference
+  ts_started:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.ts_started
+  ts_solved:
+    lineage:
+      - datalake_customer_demand.backlog_metrics_tasks.ts_completed

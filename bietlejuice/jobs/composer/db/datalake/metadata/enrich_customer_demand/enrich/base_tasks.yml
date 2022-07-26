@@ -25,6 +25,7 @@ columns:
   id_main_department:
     lineage:
       - datalake_customer_support.email.department
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
   type:
     lineage:
       - datalake_customer_support.email.department

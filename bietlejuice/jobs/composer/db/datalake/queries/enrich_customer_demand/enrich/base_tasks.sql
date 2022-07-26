@@ -202,7 +202,7 @@ SELECT
   id_agent,
   NULL AS id_taxonomy,
   NULL AS id_tags,
-  NULL AS id_main_department,
+  MD5(type) AS id_main_department,
   type,
   sla_target,
   'crm' AS origin,

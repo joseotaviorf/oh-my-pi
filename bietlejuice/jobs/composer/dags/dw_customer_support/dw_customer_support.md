@@ -15,21 +15,22 @@ More information about run time [here]({chart_url}{dag_id}).
 ​
 This pipeline produces the following output tables in `customer_support` schema
 
-- `fact_ticket` (full load)
-- `fact_segment` (full load)
-- `fact_demand_metrics_tasks` (full load)
+- `dim_agent` (full load)
+- `dim_channel` (full load)
+- `dim_department` (full load)
+- `dim_ranking_targets` (full load)
+- `dim_taxonomy` (full load)
+- `dim_ticket_tags` (full load)
 - `fact_agent_daily_productivity` (incremental load)
 - `fact_agent_ranking` (incremental load)
-- `dim_ranking_targets` (full load)
-- `dim_agent` (full load)
-- `dim_department` (full load)
-- `dim_taxonomy` (full load)
-- `dim_channel` (full load)
-- `dim_ticket_tags` (full load)
+- `fact_backlog_metrics_tasks` (full load)
+- `fact_demand_metrics_tasks` (full load)
+- `fact_segment` (full load)
+- `fact_ticket` (full load)
 
 ​
 ### Responsible Data Team
 ​
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+For any questions or concerns about this DAG, please contact the Data Engineering team responsible.
 
 </details>
