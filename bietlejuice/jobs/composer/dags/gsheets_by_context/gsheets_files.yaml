@@ -595,11 +595,11 @@ offline_and_branding_marketing_costs:
     clean_table_name: offline_and_branding_marketing_costs
     sheet_context: static
 
-# sale_nbp_source_targets:
-#     sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
-#     sheet_name: sale_nbp_source_targets
-#     clean_table_name: sale_nbp_source_targets
-#     sheet_context: static
+sale_nbp_source_targets:
+    sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
+    sheet_name: sale_nbp_source_targets
+    clean_table_name: sale_nbp_source_targets
+    sheet_context: static
 
 supply_targets_2019:
     sheet_id: 1Nxh1_mAsyr3tkChizMyYc4QIg3jTR1YNGAenjy9NWKQ
