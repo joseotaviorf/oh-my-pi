@@ -17,9 +17,24 @@ columns:
   residence_country:
     lineage:
       - datalake_ebdb_user.user.country_code
-  ts_created:
+  occupation_area:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.occupation_area
+  income_nature:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.income_nature
+  monthly_income:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.monthly_income
+  ts_credit_evaluation_created:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.ts_created
+  ts_credit_evaluation_updated:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.ts_updated
+  ts_user_created:
     lineage:
       - datalake_ebdb_user.user.ts_created
-  ts_updated:
+  ts_user_updated:
     lineage:
       - datalake_ebdb_user.user.ts_updated
