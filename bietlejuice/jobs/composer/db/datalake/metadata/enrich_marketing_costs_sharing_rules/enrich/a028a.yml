@@ -1,0 +1,13 @@
+---
+database_name: datalake_marketing_costs_sharing_rules
+table_name: a028a
+columns:
+ id_date:
+   lineage:
+     - datalake_quintoandar.aux_date.id_date
+ city_group:
+   lineage:
+     - datalake_region.region.city_group
+ mkt_origin:
+   lineage:
+     - dw_public.fact_house_listing_flows.mkt_origin
