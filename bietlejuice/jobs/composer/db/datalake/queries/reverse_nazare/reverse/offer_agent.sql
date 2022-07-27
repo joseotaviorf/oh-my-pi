@@ -1,139 +1,85 @@
-WITH contrato AS (
-    WITH base AS (
-        SELECT 
-            ac.id_agent AS agent_id,
-            du.id AS user_id,
-            ac.ts_work_contract_started,
-            rank() OVER (PARTITION BY ac.id_agent ORDER BY ac.ts_work_contract_started DESC) AS rn
-        FROM 
-            datalake_ebdb_agents.agent_contract ac
-        JOIN 
-            dw_public.dim_user du 
-                ON du.dados_agente_id = ac.id_agent
-  )
-    SELECT 
-        agent_id,
-        user_id,
-        ts_work_contract_started
-    FROM 
-        base
-    WHERE 
-        rn = 1 
-),
-dados_agent AS (
-    SELECT 
-        du.sk_user,
-        du.nome, 
-        du.cpf,
-        ROW_NUMBER() OVER (PARTITION BY du.cpf ORDER BY du.dadosagente_ativo DESC, c.ts_work_contract_started ) AS first_or_active_id
-    FROM 
-        dw_public.dim_user du
-    LEFT JOIN 
-        contrato c
-            ON c.user_id = du.sk_user
-    WHERE 
-        du.is_rent_agent IS true 
-        OR du.is_sale_agent IS true
-),
-cte_base_rh AS (
-  SELECT 
-    *
-  FROM 
-      dados_agent
-  WHERE first_or_active_id = 1
-),
-cte_agents_visit AS (
-    SELECT 
+WITH cte_agents_visit AS (
+    SELECT
         sk_sale_flow,
         dw.sk_user::INT AS sk_agent,
         sk_agent::INT AS sk_user_agent,
         max(sk_visit_completed_date) AS sk_visit_completed_date
     FROM
-        dw_sale.fact_visits fv 
+        dw_sale.fact_visits fv
     LEFT JOIN
         dw_public.dim_user dw
             ON dw.dados_agente_id = fv.sk_agent
-    WHERE sk_visit_completed_date > 0 
+    WHERE sk_visit_completed_date > 0
     GROUP BY 1,2,3
 ),
 cte_executivo_visitas AS (
     SELECT
         fo.sk_offer,
-        cadastro.sk_user::INT AS sk_user_rh,
+        du.sk_user::INT AS sk_user_rh,
         'Executivo Visitas' AS partner_type
     FROM
-       dw_sale.fact_offers fo
-    LEFT JOIN 
+        dw_sale.fact_offers fo
+    LEFT JOIN
         dw_public.dim_user du
             ON du.sk_user = fo.sk_user_agent
     LEFT JOIN
         cte_agents_visit av
             ON av.sk_user_agent = du.sk_user
             AND av.sk_sale_flow = fo.sk_sale_flow
-    LEFT JOIN  
-        cte_base_rh cadastro
-            ON cadastro.cpf = du.cpf
- ),
- cte_fifity_name AS (
-     SELECT
+),
+cte_fifity_name AS (
+    SELECT
         fo.sk_offer,
-        cadastro.sk_user::INT AS sk_user_rh,
+        du.sk_user::INT AS sk_user_rh,
         'Executivo Visitas Fifty' AS partner_type
     FROM
         cte_agents_visit av
-    LEFT JOIN 
+    LEFT JOIN
         dw_public.dim_user du
             ON av.sk_user_agent = du.sk_user
-    LEFT JOIN 
+    LEFT JOIN
         dw_sale.fact_offers fo
-            ON av.sk_sale_flow = fo.sk_sale_flow 
-            AND av.sk_user_agent <> fo.sk_agent
-    LEFT JOIN 
-        cte_base_rh cadastro
-            ON cadastro.cpf = du.cpf
+            ON av.sk_sale_flow = fo.sk_sale_flow
+            AND du.sk_user <> fo.sk_user_agent
+    WHERE
+        fo.sk_offer IS NOT NULL
 ),
 cte_executivo_associado AS (
     SELECT DISTINCT
         dim.sk_offer,
-        cadastro.sk_user AS sk_user_rh,
+        du.sk_user AS sk_user_rh,
         'Executivo Associado' AS partner_type
-    FROM 
+    FROM
         dw_sale.dim_offer dim
-    LEFT JOIN 
+    LEFT JOIN
         dw_sale.fact_offers fo
             ON fo.sk_offer = dim.sk_offer
-    LEFT JOIN 
+    LEFT JOIN
         dw_sale.dim_sale_agreement sa
             ON dim.sk_offer = sa.sk_offer
     LEFT JOIN
-        dw_public.dim_user du  
+        dw_public.dim_user du
             ON du.sk_user = fo.sk_user_team_lead
-    LEFT JOIN 
-        cte_base_rh cadastro
-            ON cadastro.cpf = du.cpf
-    WHERE 
+    WHERE
         team_lead_name IS NOT NULL
 ),
 cte_executivo_negociacao AS (
     SELECT DISTINCT
         dim.sk_offer,
-        cadastro.sk_user::INT AS sk_user_rh,
+        du.sk_user::INT AS sk_user_rh,
         'Executivo Negociacao' AS partner_type
-    FROM 
+    FROM
         dw_sale.dim_offer dim
-    LEFT JOIN 
+    LEFT JOIN
         dw_sale.fact_offers fo
             ON fo.sk_offer = dim.sk_offer
-    LEFT JOIN 
+    LEFT JOIN
         dw_sale.dim_sale_agreement sa
             ON sa.sk_offer = dim.sk_offer
     LEFT JOIN
         dw_public.dim_user du
             ON du.sk_user = fo.sk_user_consultant
-    LEFT JOIN 
-        cte_base_rh cadastro
-            ON cadastro.cpf = du.cpf
-    WHERE 
+    WHERE
         deal_maker_name IS NOT NULL
 ),
 cte_final AS (
