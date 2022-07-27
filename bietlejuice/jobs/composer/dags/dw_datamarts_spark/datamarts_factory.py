@@ -136,6 +136,19 @@ class DatamartsDAGFactory:
             dag_id, dag_details.get("cluster_name", "databricks_default_cluster")
         )
 
+        custom_libraries = dag_details.get("custom_libraries", [])
+
+        # init Apache Sedona
+        dag_custom_init_script = dag_details.get("init_script", [])
+        dag_spark_conf = dag_details.get("spark_conf", [])
+
+        for init_script in dag_custom_init_script:
+            cluster_description["init_scripts"].append(init_script)
+
+        for dag_config in dag_spark_conf:
+            for key, value in dag_config.items():
+                cluster_description["spark_conf"][key] = value
+
         dag = DAG(
             dag_id=dag_id,
             default_args={
@@ -151,7 +164,10 @@ class DatamartsDAGFactory:
         )
 
         create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-            dag=dag, task_id="create-cluster", cluster_configuration=cluster_description
+            dag=dag,
+            task_id="create-cluster",
+            cluster_configuration=cluster_description,
+            libraries=custom_libraries,
         )
 
         terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

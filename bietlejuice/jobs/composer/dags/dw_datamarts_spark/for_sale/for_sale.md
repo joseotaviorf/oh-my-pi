@@ -23,6 +23,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `sale_lead_flow`
 - `sale_ongoing_listings_casa_mineira`
 - `temp_autonomous_agents_listings`
+- `em_casa_House_listing_flows`
 
 
 ### Responsible Data Engineering Team
