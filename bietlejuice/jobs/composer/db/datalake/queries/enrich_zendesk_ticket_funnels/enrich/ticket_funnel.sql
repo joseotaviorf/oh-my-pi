@@ -59,6 +59,37 @@ distinct_groups AS (
             AND ge.ts_last_updated = g.ts_updated
     GROUP BY 1, 2, 3
 ),
+sale_offers_keys AS (
+    WITH custom_fields_exploded AS (
+            SELECT
+                id_ticket,
+                explode(custom_fields)
+            FROM
+                datalake_zendesk_custom_fields.custom_fields
+        ),
+  
+        sale_offers AS (
+            SELECT
+                id_offer, 
+                ts_accepted
+            FROM
+                datalake_sale_offer_flows.sale_offer_flows
+        )
+    
+    SELECT
+            ROW_NUMBER() OVER (PARTITION BY cfe.id_ticket ORDER BY so.ts_accepted ASC) AS ROW, 
+            cfe.id_ticket,
+            so.id_offer
+    FROM
+        custom_fields_exploded AS cfe
+    LEFT JOIN
+        sale_offers AS so
+            ON cfe.value = so.id_offer
+    WHERE
+        so.id_offer IS NOT NULL
+        AND cfe.value NOT IN ("false", "true")
+), 
+
 union_historical_chat_with_zendesk AS (
     SELECT DISTINCT
         c.id_ticket,
@@ -123,6 +154,7 @@ union_historical_chat_with_zendesk AS (
 )
 SELECT DISTINCT
     te.id_ticket,
+    sok.id_offer AS id_sale_offer,
     t.subject,
     t.description,
     t.ticket_via,
@@ -181,3 +213,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_zendesk_custom_fields.custom_fields cf
         ON te.id_ticket = cf.id_ticket
+LEFT JOIN 
+    sale_offers_keys AS sok
+        ON te.id_ticket = sok.id_ticket

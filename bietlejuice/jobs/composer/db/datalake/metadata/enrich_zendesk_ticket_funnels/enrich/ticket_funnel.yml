@@ -5,6 +5,9 @@ columns:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.id_ticket
       # - historical_datalake_zendesk_clean.chats.id_ticket
+  id_sale_offer:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_offer
   subject:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.subject

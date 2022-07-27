@@ -10,6 +10,9 @@ columns:
   sk_contract:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+  sk_sale_offer:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_offer
   sk_user:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
