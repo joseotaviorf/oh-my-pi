@@ -11,9 +11,6 @@ columns:
   value:
     lineage:
       - datalake_legaut_raw.crawlers_crawlertype.value
-  instant_return:
-    lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.instant_return
   repeat:
     lineage:
       - datalake_legaut_raw.crawlers_crawlertype.repeat

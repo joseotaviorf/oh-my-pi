@@ -2,7 +2,6 @@ SELECT
     id,
     default,
     value,
-    instant_return,
     repeat,
     monitor,
     results,
