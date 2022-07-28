@@ -1,9 +1,7 @@
 import pytest
 
-from bietlejuice.jobs.composer.consumers.db_consumers.databricks_consumer import (
-    DatabricksConsumer,
-)
-from bietlejuice.jobs.composer.clients.db_clients.spark_client import SparkClient
+from bietlejuice.consumers.db_consumers.databricks_consumer import DatabricksConsumer
+from bietlejuice.clients.db_clients.spark_client import SparkClient
 
 
 @pytest.fixture()

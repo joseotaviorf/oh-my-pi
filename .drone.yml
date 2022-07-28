@@ -178,8 +178,8 @@ pipeline:
     image: quintoandar/drone-gcs-sync
     pull: true
     bucket: us-east4-airflow-forno2-7f52154d-bucket
-    source: bietlejuice/jobs/composer/
-    target: dags/bietlejuice/jobs/composer/
+    source: bietlejuice/
+    target: dags/bietlejuice/
     delete: true
     dry_run: false
     secrets:
@@ -194,8 +194,8 @@ pipeline:
     image: quintoandar/drone-gcs-sync
     pull: true
     bucket: us-east4-airflow-prod2-fdaf9748-bucket
-    source: bietlejuice/jobs/composer/
-    target: dags/bietlejuice/jobs/composer/
+    source: bietlejuice/
+    target: dags/bietlejuice/
     delete: true
     dry_run: false
     secrets:

@@ -1,6 +1,6 @@
 import pytest
 
-from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum
+from bietlejuice.base.pipeline import EnvironmentEnum
 
 
 class TestEnvironmentEnum:

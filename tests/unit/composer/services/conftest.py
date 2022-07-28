@@ -1,9 +1,7 @@
 import mock
 import pytest
 
-from bietlejuice.jobs.composer.services.configuration_service import (
-    ConfigurationService,
-)
+from bietlejuice.services.configuration_service import ConfigurationService
 
 
 @pytest.fixture

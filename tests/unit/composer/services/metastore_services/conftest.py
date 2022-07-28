@@ -4,8 +4,8 @@ import pytest
 from pyspark import SparkContext
 from pyspark.sql import SQLContext
 
-from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.services.metastore_services.hive_metastore_service import (
+from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services.hive_metastore_service import (
     HiveMetastoreService,
 )
 

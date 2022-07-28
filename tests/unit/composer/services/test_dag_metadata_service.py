@@ -2,9 +2,9 @@ import re
 
 import pytest
 
-from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
-from bietlejuice.jobs.composer.services.dag_metadata_service import DAGMetadataService
+from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.dags import COMPOSER_DAGS_PATH
+from bietlejuice.services.dag_metadata_service import DAGMetadataService
 
 
 class TestDAGMetadataService:

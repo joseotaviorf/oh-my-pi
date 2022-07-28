@@ -5,13 +5,13 @@ import mock
 
 class TestSyncMetastoreExternalTablePartitionsPipeline:
     @mock.patch(
-        "bietlejuice.jobs.composer.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreLoader"
+        "bietlejuice.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreLoader"
     )
     @mock.patch(
-        "bietlejuice.jobs.composer.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreService"
+        "bietlejuice.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreService"
     )
     @mock.patch(
-        "bietlejuice.jobs.composer.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreClient"
+        "bietlejuice.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreClient"
     )
     def test_run_for_partitioned_table(
         self,
@@ -59,13 +59,13 @@ class TestSyncMetastoreExternalTablePartitionsPipeline:
         )
 
     @mock.patch(
-        "bietlejuice.jobs.composer.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreLoader"
+        "bietlejuice.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreLoader"
     )
     @mock.patch(
-        "bietlejuice.jobs.composer.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreService"
+        "bietlejuice.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreService"
     )
     @mock.patch(
-        "bietlejuice.jobs.composer.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreClient"
+        "bietlejuice.metastore_pipeline.sync_metastore_external_table_partitions_pipeline.HiveMetastoreClient"
     )
     def test_run_for_non_partitioned_table(
         self,

@@ -1,6 +1,4 @@
-from bietlejuice.jobs.composer.base.db.datalake_metastore_mapping import (
-    DatalakeMetastoreMapping,
-)
+from bietlejuice.base.db.datalake_metastore_mapping import DatalakeMetastoreMapping
 
 
 class TestDatalakeMetastoreMapping:

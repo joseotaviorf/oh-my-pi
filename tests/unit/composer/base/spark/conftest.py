@@ -1,6 +1,6 @@
 import pytest
 
-from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
+from bietlejuice.base.spark import SparkDataFrameService
 
 
 @pytest.fixture()

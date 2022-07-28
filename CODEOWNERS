@@ -16,5 +16,5 @@ bietlejuice/db/dw/ddl/sale/                                             @quintoa
 bietlejuice/db/ods/                                                     @quintoandar/bi-etl-ejuice-ods-owners
 bietlejuice/db/source/queries/ebdb/supply_demand_funnel/                @quintoandar/bi-etl-ejuice-ods-owners
 bietlejuice/db/source/queries/ebdb/agent_review.sql                     @quintoandar/bi-etl-ejuice-ods-owners
-bietlejuice/jobs/dags/supply_demand_funnel/                             @quintoandar/bi-etl-ejuice-ods-owners
-bietlejuice/jobs/dags/bi_supply_demand_etl.py                           @quintoandar/bi-etl-ejuice-ods-owners
+bietlejuice/dags/supply_demand_funnel/                                  @quintoandar/bi-etl-ejuice-ods-owners
+bietlejuice/dags/bi_supply_demand_etl.py                                @quintoandar/bi-etl-ejuice-ods-owners

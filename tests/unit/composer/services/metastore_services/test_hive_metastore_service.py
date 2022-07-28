@@ -6,8 +6,8 @@ from hive_metastore_client.builders import ColumnBuilder
 from hive_metastore_client.builders import PartitionBuilder
 from mock import Mock
 
-from bietlejuice.jobs.composer.base.hive import TableStorageDescriptorEnum
-from bietlejuice.jobs.composer.services.metastore_services import HiveMetastoreService
+from bietlejuice.base.hive import TableStorageDescriptorEnum
+from bietlejuice.services.metastore_services import HiveMetastoreService
 
 
 class TestHiveMetastoreService:
@@ -36,13 +36,13 @@ class TestHiveMetastoreService:
         assert returned_value == mocked_client
 
     @mock.patch(
-        "bietlejuice.jobs.composer.services.metastore_services.hive_metastore_service.TableBuilder"
+        "bietlejuice.services.metastore_services.hive_metastore_service.TableBuilder"
     )
     @mock.patch(
-        "bietlejuice.jobs.composer.services.metastore_services.hive_metastore_service.StorageDescriptorBuilder"
+        "bietlejuice.services.metastore_services.hive_metastore_service.StorageDescriptorBuilder"
     )
     @mock.patch(
-        "bietlejuice.jobs.composer.services.metastore_services.hive_metastore_service.SerDeInfoBuilder"
+        "bietlejuice.services.metastore_services.hive_metastore_service.SerDeInfoBuilder"
     )
     @mock.patch.object(HiveMetastoreService, "_build_columns_from_dict")
     def test_create_external_table(
@@ -310,7 +310,7 @@ class TestHiveMetastoreService:
         )
 
     @mock.patch(
-        "bietlejuice.jobs.composer.services.metastore_services.hive_metastore_service.DatabaseBuilder"
+        "bietlejuice.services.metastore_services.hive_metastore_service.DatabaseBuilder"
     )
     def test_create_database_if_not_exists(
         self, mocked_database_builder, hive_metastore_service

@@ -12,7 +12,7 @@ args = parser.parse_args()
 s3 = boto3.client('s3')
 s3_folder_path = 'github-repos/bi-etl-ejuice/spark_jobs'
 
-composer_dags_folder = 'bietlejuice/jobs/composer/dags/'
+composer_dags_folder = 'bietlejuice/dags/'
 abs_path = os.path.dirname(os.path.realpath(__file__))
 
 for root, _, files in os.walk('{}/../{}'.format(abs_path, composer_dags_folder)):

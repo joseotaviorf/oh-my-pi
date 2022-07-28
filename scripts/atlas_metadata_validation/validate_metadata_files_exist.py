@@ -1,12 +1,11 @@
 import argparse
-import logging
 import re
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base import QUERIES_DATALAKE_PATH
-from bietlejuice.jobs.composer.services import FileService, ConfigurationService
-from bietlejuice.jobs.composer.services.git_service import GitService
+from bietlejuice.base import QUERIES_DATALAKE_PATH
+from bietlejuice.services import FileService, ConfigurationService
+from bietlejuice.services.git_service import GitService
 
 logger = QuintoAndarLogger("validate_metadata_files_exist")
 
@@ -26,7 +25,18 @@ SKIP_LAYERS = {
 SKIP_SOURCES = {}
 SKIP_CONTEXTS = {}
 SKIP_DAGS = {}
-SKIP_TABLES = {"poligonoregiao"}
+SKIP_TABLES = {
+    "poligonoregiao",
+    "dw_casa_mineira_portal",
+    "fact_ongoing_real_estate_agency",
+    "events_affiliates",
+    "email_affiliates",
+    "inapp_affiliates",
+    "push_affiliates",
+    "sms_affiliates",
+    "webhook_affiliates",
+    "affiliates_events"
+}
 
 # Some raw/clean DAGs don't use DatalakeTaskGroup and thus won't have a "lineage from product" config.
 # Adding them to this set will skip checking for "lineage from product" config in raw tables
@@ -34,11 +44,11 @@ DAGS_OUT_OF_PATTERN = {"ebdb", "amplitude"}
 
 # This regex matches the relative path query according to FileService or GitService absolute paths
 # e.g.
-#   '/Users/root/bi-etl-ejuice/bietlejuice/jobs/composer/base/../db/datalake/queries/dag_name/layer/table_name.sql'
-#   '/Users/root/bi-etl-ejuice/bietlejuice/jobs/composer/db/datalake/queries/dag_name/layer/table_name.sql'
+#   '/Users/root/bi-etl-ejuice/bietlejuice/base/../db/datalake/queries/dag_name/layer/table_name.sql'
+#   '/Users/root/bi-etl-ejuice/bietlejuice/db/datalake/queries/dag_name/layer/table_name.sql'
 # would both have 'dag_name/layer/table_name.sql' in the first capture group
 RELATIVE_QUERY_PATH_REGEX = re.compile(
-    rf"composer(?:/base/\.\.)?/db/datalake/queries/(.*\.sql)"
+    rf"bietlejuice(?:/base/\.\.)?/db/datalake/queries/(.*\.sql)"
 )
 
 
@@ -92,7 +102,6 @@ def dag_has_product_lineage_config(source, context, dag):
 
 
 def has_lineage_or_tags(source, layer, context, dag, ingestion_type, table):
-
     if layer in SKIP_LAYERS or source in SKIP_SOURCES or table in SKIP_TABLES:
         logger.debug(f"source={source}, layer={layer}, table={table}, msg=Skipping")
         return True

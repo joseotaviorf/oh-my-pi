@@ -3,14 +3,12 @@ import mock
 
 from mock import MagicMock
 
-from bietlejuice.jobs.composer.base.db.database_client_factory import (
-    DatabaseClientFactory,
-)
+from bietlejuice.base.db.database_client_factory import DatabaseClientFactory
 
-from bietlejuice.jobs.composer.clients.db_clients import PostgresClient
-from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.clients.db_clients import MongoClient
+from bietlejuice.clients.db_clients import PostgresClient
+from bietlejuice.clients.db_clients import AthenaClient
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.clients.db_clients import MongoClient
 
 
 class TestDatabaseClientFactory:

@@ -1,7 +1,7 @@
 import pytest
 from tests.files_validation.validators.yaml_validator import YamlValidator
 
-DAG_DEPENDENCIES = ["bietlejuice/jobs/composer/dags/dependencies.yaml"]
+DAG_DEPENDENCIES = ["bietlejuice/dags/dependencies.yaml"]
 
 
 class TestDagDependencies:

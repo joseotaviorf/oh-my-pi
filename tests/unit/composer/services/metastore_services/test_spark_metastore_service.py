@@ -5,10 +5,8 @@ import pytest
 from mock import Mock
 from pyspark.sql.types import StructType, StringType, StructField
 
-from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.services.metastore_services.metastore_service import (
-    MetastoreService,
-)
+from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services.metastore_service import MetastoreService
 
 
 class TestSparkMetastoreService:

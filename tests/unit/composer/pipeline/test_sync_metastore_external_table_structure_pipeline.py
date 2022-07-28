@@ -5,13 +5,13 @@ import mock
 
 class TestSyncMetastoreExternalTableStructurePipeline:
     @mock.patch(
-        "bietlejuice.jobs.composer.metastore_pipeline.sync_metastore_external_table_structure_pipeline.HiveMetastoreLoader"
+        "bietlejuice.metastore_pipeline.sync_metastore_external_table_structure_pipeline.HiveMetastoreLoader"
     )
     @mock.patch(
-        "bietlejuice.jobs.composer.metastore_pipeline.sync_metastore_external_table_structure_pipeline.HiveMetastoreService"
+        "bietlejuice.metastore_pipeline.sync_metastore_external_table_structure_pipeline.HiveMetastoreService"
     )
     @mock.patch(
-        "bietlejuice.jobs.composer.metastore_pipeline.sync_metastore_external_table_structure_pipeline.HiveMetastoreClient"
+        "bietlejuice.metastore_pipeline.sync_metastore_external_table_structure_pipeline.HiveMetastoreClient"
     )
     def test_run(
         self,

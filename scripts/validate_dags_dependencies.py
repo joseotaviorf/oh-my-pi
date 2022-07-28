@@ -10,17 +10,18 @@ import json
 BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-from bietlejuice.jobs.composer.base.dependencies.bietlejuice_dependency_helper import BietlejuiceDependencyHelper
-from bietlejuice.jobs.composer.base.paths import QUERIES_DATALAKE_PATH
-from bietlejuice.jobs.composer.services import FileService, ConfigurationService
+from bietlejuice.base.dependencies.bietlejuice_dependency_helper import BietlejuiceDependencyHelper
+from bietlejuice.base.paths import QUERIES_DATALAKE_PATH
+from bietlejuice.services import FileService, ConfigurationService
 
 LAYERS = ["clean", "enrich", "dw", "raw"]
 
 PRINT_ALL_PARSING_ERRORS = False
-COMPOSER_FILES_ROOT = f"{BI_ETL_EJUICE_ROOT}/bietlejuice/jobs/composer"
+COMPOSER_FILES_ROOT = f"{BI_ETL_EJUICE_ROOT}/bietlejuice"
 DAGS_CROSS_DEPENDENCIES_FILE_NAME = "dependencies.yaml"
 VALIDATION_LOG_SEPARATOR = "=" * 150
 DEPENDENCIES_PATTERN = "bietlejuice\.(\w*):(.*)"
+
 
 class CrossDAGDependenciesValidator:
     """

@@ -1,5 +1,5 @@
 import mock
-from bietlejuice.jobs.composer.clients.db_clients.spark_client import SparkClient
+from bietlejuice.clients.db_clients.spark_client import SparkClient
 
 
 class TestDatabricksConsumer:

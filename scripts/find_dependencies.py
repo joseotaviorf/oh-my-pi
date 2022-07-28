@@ -5,7 +5,7 @@ import sys
 def get_dependencies_data_from_yaml() -> list:
     """This function will return all data readed in the dependencies yaml file"""
 
-    dependencies_file = "../bietlejuice/jobs/composer/dags/dependencies.yaml"
+    dependencies_file = "../bietlejuice/dags/dependencies.yaml"
 
     with open(dependencies_file, "r") as stream:
         dags = yaml.safe_load(stream)

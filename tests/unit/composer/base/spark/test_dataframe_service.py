@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime
 
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.base.spark import BaseSparkContext
 
 spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
 

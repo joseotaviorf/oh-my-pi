@@ -1,0 +1,73 @@
+import json
+import logging
+from argparse import ArgumentParser
+
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
+from bietlejuice.clients.db_clients import SparkClient, MongoClient
+from bietlejuice.consumers.db_consumers import MongoConsumer
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.metastore_services import SparkMetastoreService
+
+
+JOB_NAME = "load_heimdall_into_datalake"
+TABLE_ALLOW_LIST = ["activity"]
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
+
+if __name__ == "__main__":
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("env")
+    parser.add_argument("datalake_bucket")
+    args = parser.parse_args()
+    environment = args.env
+    datalake_bucket = args.datalake_bucket
+    source = "heimdall"
+
+    base_dbutils = BaseDBUtils()
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+
+    connection_json = dbutils.secrets.get(
+        scope="quintoandar", key=DatabaseEnum.HEIMDALL
+    )
+    connection = json.loads(connection_json)
+    mongo_client = MongoClient(connection)
+    spark_client = SparkClient()
+
+    mongo_consumer = MongoConsumer(mongo_client, spark_client)
+    tables = mongo_consumer.get_table_names_and_sizes().collect()
+
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    spark_metastore_service = SparkMetastoreService(spark_client)
+    s3_loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    database_name = db_info["db_raw_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    database_location = db_info["db_raw_path"]
+    spark_metastore_service.create_database(database_name)
+
+    for table in tables:
+        if table.table_name not in TABLE_ALLOW_LIST:
+            continue
+        df = mongo_consumer.get_data_from_table(table.table_name)
+
+        s3_loader.load_df(
+            df=df,
+            s3_path=f"{database_location}{table.table_name.lower()}",
+            format_options=format_options,
+        )
+
+        spark_metastore_loader.update_metastore(
+            df,
+            database_name,
+            table.table_name.lower(),
+            format_options,
+            database_location,
+        )

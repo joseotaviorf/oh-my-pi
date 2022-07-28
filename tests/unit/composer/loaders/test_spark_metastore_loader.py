@@ -3,7 +3,7 @@ from collections import OrderedDict
 import pytest
 from mock import patch
 
-from bietlejuice.jobs.composer.services.schema_service import SchemaService
+from bietlejuice.services.schema_service import SchemaService
 
 
 class TestSparkMetastoreLoader:

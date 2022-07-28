@@ -57,7 +57,7 @@ services:
     depends_on:
       - airflow_python
     volumes:
-      - ${PROJECT_PATH}/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
+      - ${PROJECT_PATH}/bietlejuice/dags:/bi-etl-ejuice/bietlejuice/dags
     entrypoint: airflow worker -cn worker_1
     healthcheck:
       test:
@@ -80,7 +80,7 @@ services:
     depends_on:
       - airflow_python
     volumes:
-      - ${PROJECT_PATH}/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
+      - ${PROJECT_PATH}/bietlejuice/dags:/bi-etl-ejuice/bietlejuice/dags
     entrypoint: airflow worker -cn worker_2
     healthcheck:
       test:

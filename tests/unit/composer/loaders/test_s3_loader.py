@@ -1,8 +1,8 @@
 import pytest
 
 from unittest import mock
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
-from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
+from bietlejuice.base.spark import BaseSparkContext
+from bietlejuice.loaders.s3_loader import S3Loader
 
 
 class TestS3Loader:

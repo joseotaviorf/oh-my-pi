@@ -1,4 +1,4 @@
-from bietlejuice.jobs.composer.base.db.dw_metastore_mapping import DwMetastoreMapping
+from bietlejuice.base.db.dw_metastore_mapping import DwMetastoreMapping
 
 
 class TestDwMetastoreMapping:

@@ -3,8 +3,8 @@ import re
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.services import FileService, ConfigurationService
-from bietlejuice.jobs.composer.services.git_service import GitService
+from bietlejuice.services import FileService, ConfigurationService
+from bietlejuice.services.git_service import GitService
 
 logger = QuintoAndarLogger("validate_datamarts_metadata_files_exist")
 

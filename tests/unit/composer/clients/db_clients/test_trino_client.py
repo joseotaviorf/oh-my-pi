@@ -2,7 +2,7 @@ from mock import Mock
 from trino import constants
 from trino.dbapi import Connection
 
-from bietlejuice.jobs.composer.clients.db_clients import TrinoClient
+from bietlejuice.clients.db_clients import TrinoClient
 
 
 class TestTrinoClient:

@@ -49,11 +49,11 @@ if __name__ == "__main__":
     arg_parser.add_argument('--table','-t', help='Specific table to create the lineage')
 
     args = arg_parser.parse_args()
-    path = f"../bietlejuice/jobs/composer/db/datalake/queries/"
+    path = f"../bietlejuice/db/datalake/queries/"
 
     dag_name_path = args.folder  # use "ebdb", "godfather", for instance
     table = args.table if args.table != None else '*'
-    
+
     for file_path in glob.iglob(f"{path}{dag_name_path}/**/{table}.sql", recursive=True):
         if "/clean/" in file_path:
             regex = f"{path}(.*)/clean(.*)/(.*).sql"

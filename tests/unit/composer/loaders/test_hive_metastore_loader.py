@@ -6,7 +6,7 @@ import pytest
 from hive_metastore_client.builders import ColumnBuilder
 from hive_metastore_client.builders import PartitionBuilder
 
-from bietlejuice.jobs.composer.loaders import HiveMetastoreLoader
+from bietlejuice.loaders import HiveMetastoreLoader
 
 
 class TestHiveMetastoreLoader:

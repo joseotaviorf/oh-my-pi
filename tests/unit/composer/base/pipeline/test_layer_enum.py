@@ -1,6 +1,6 @@
 import pytest
 
-from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.base.pipeline import LayerEnum
 
 
 class TestLayerEnum:

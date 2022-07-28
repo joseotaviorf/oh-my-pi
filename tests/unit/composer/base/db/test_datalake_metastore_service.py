@@ -1,5 +1,5 @@
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark import BaseSparkContext
 
 spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
 

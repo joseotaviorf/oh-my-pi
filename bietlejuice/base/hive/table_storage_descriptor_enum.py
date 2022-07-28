@@ -1,0 +1,35 @@
+from enum import Enum
+
+from bietlejuice.base.hive.table_format_info import TableFormatInfo
+from bietlejuice.base.pipeline import LayerEnum
+
+
+class TableStorageDescriptorEnum(Enum):
+    """
+    Maps the file type storage parameter for the Hive Metastore tables
+     according to the data lake layers.
+    """
+
+    RAW_FORMAT = TableFormatInfo().json
+    CLEAN_FORMAT = TableFormatInfo().parquet
+    CLEAN_STAGING_FORMAT = TableFormatInfo().parquet
+    ENRICH_FORMAT = TableFormatInfo().parquet
+    DW = TableFormatInfo().parquet
+
+    @staticmethod
+    def from_layer(layer):
+        """
+        Gets the table storage descriptor values based on layer value.
+
+        :param layer: one of LayerEnum.valid_values()
+        :return: an instance of TableFormatInfo
+        :rtype: TableFormatInfo
+        """
+        LayerEnum.validate_layer(layer)
+        return {
+            LayerEnum.RAW.value: TableStorageDescriptorEnum.RAW_FORMAT.value,
+            LayerEnum.CLEAN.value: TableStorageDescriptorEnum.CLEAN_FORMAT.value,
+            LayerEnum.CLEAN_STAGING.value: TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT.value,
+            LayerEnum.ENRICH.value: TableStorageDescriptorEnum.ENRICH_FORMAT.value,
+            LayerEnum.DW.value: TableStorageDescriptorEnum.DW.value,
+        }.get(layer)

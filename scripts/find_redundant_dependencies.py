@@ -6,9 +6,9 @@ import sys
 BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-
-from bietlejuice.jobs.composer.base.dependencies.bietlejuice_dependency_helper import BietlejuiceDependencyHelper
-from bietlejuice.jobs.composer.base.dependencies.bietlejuice_redundant_dependency_finder import BietlejuiceRedundantDependencyFinder
+from bietlejuice.base.dependencies.bietlejuice_dependency_helper import BietlejuiceDependencyHelper
+from bietlejuice.base.dependencies.bietlejuice_redundant_dependency_finder import \
+    BietlejuiceRedundantDependencyFinder
 
 
 def print_all_redundancies(redundancies_in_dags: dict, verbosity=1):
@@ -65,6 +65,7 @@ def write_redundancies_in_dag_to_csv(
                 }
             )
 
+
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument(
@@ -94,7 +95,7 @@ if __name__ == "__main__":
 
     dependencies = BietlejuiceDependencyHelper.read_dependencies()
     redundancy_finder = BietlejuiceRedundantDependencyFinder(dependencies)
-    
+
     all_redundancies = {}
     if dag:
         all_redundancies[dag] = redundancy_finder.find_redundant_dependencies(

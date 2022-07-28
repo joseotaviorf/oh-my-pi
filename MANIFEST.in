@@ -1,2 +1,2 @@
-recursive-include bietlejuice/jobs/composer/db *
-recursive-include bietlejuice/jobs/composer/ *.y*ml
+recursive-include bietlejuice/db *
+recursive-include bietlejuice/ *.y*ml

@@ -6,7 +6,7 @@ from typing import List, Iterable, Set
 import yamale
 
 GIT_DIFF_REGEX = re.compile(
-    r"bietlejuice/jobs/composer/db/datalake/metadata/.*(?:\.yml|\.yaml)"
+    r"bietlejuice/db/datalake/metadata/.*(?:\.yml|\.yaml)"
 )
 FILENAME_REGEX = re.compile(r".*/([a-z0-9_-]+)(?:\.yml|\.yaml)")
 

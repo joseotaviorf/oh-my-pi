@@ -5,9 +5,7 @@ import pytest
 
 from mock import call
 
-from bietlejuice.jobs.composer.services.configuration_service import (
-    ConfigurationService,
-)
+from bietlejuice.services.configuration_service import ConfigurationService
 
 
 class TestConfigurationService:
@@ -210,10 +208,8 @@ class TestConfigurationService:
         # assert
         assert returned_files == expected_files
 
-    @mock.patch("bietlejuice.jobs.composer.services.configuration_service.logger.debug")
-    @mock.patch(
-        "bietlejuice.jobs.composer.services.configuration_service.os.path.isfile"
-    )
+    @mock.patch("bietlejuice.services.configuration_service.logger.debug")
+    @mock.patch("bietlejuice.services.configuration_service.os.path.isfile")
     def test_config_file_exists_false(
         self, mocked_isfile, mocked_logger, configuration_service
     ):
@@ -241,9 +237,7 @@ class TestConfigurationService:
             f"msg=This configuration file was not found in the given path."
         )
 
-    @mock.patch(
-        "bietlejuice.jobs.composer.services.configuration_service.os.path.isfile"
-    )
+    @mock.patch("bietlejuice.services.configuration_service.os.path.isfile")
     def test_config_file_exists_true(self, mocked_isfile, configuration_service):
         # arrange
         config_file_path = "path"

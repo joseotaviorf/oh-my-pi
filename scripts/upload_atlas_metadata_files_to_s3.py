@@ -24,8 +24,8 @@ def get_remote_path_from_yml_file(yml_path: str) -> str:
     Args:
         yml_path: path where the metadata file is stored locally
         e.g:
-            /../bi-etl-ejuice/jobs/composer/db/datalake/metadata/monopoly/clean/person_sale.yml
-            /../bi-etl-ejuice/jobs/composer/db/datalake/metadata/metabase/raw/metabase_table.yml
+            /../bietlejuice/db/datalake/metadata/monopoly/clean/person_sale.yml
+            /../bietlejuice/db/datalake/metadata/metabase/raw/metabase_table.yml
 
     Returns:
         a string representing the path where this file should be stored in S3
@@ -54,7 +54,7 @@ def main():
     This script reads Atlas metadata files and uploads them to the data-documentation S3 bucket.
     It is expected that each file is stored in the following format:
 
-    bietlejuice/jobs/composer/db/datalake/metadata/{source}/{layer}/{table-name}.yml
+    bietlejuice/db/datalake/metadata/{source}/{layer}/{table-name}.yml
 
     And each file should have lineage OR tags definitions for the table columns
     """
@@ -67,7 +67,7 @@ def main():
 
     for extension in ("*.yml", "*.yaml"):
         files = glob.glob(
-            f"{ABS_PATH}/../bietlejuice/jobs/composer/db/datalake/metadata/**/{extension}",
+            f"{ABS_PATH}/../bietlejuice/db/datalake/metadata/**/{extension}",
             recursive=True,
         )
         if files:

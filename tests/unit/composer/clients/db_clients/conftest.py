@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import Mock
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient, TrinoClient
+from bietlejuice.clients.db_clients import SparkClient, TrinoClient
 
 
 @pytest.fixture
