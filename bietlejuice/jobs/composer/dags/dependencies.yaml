@@ -1526,6 +1526,9 @@ bietlejuice.enrich_ebdb_user_revision_entity:
 bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
 
+bietlejuice.enrich_open_external_data:
+  - bietlejuice.enrich_zipcodes:load-enrich-zipcodes-sp
+
 bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-monday
   - bietlejuice.firestore:load-clean-rent-offer

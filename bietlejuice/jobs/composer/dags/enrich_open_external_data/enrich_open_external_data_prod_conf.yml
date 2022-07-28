@@ -1,0 +1,4 @@
+---
+tables:
+  itbi_sp:
+    is_incremental: false

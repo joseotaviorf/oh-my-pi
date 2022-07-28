@@ -1,0 +1,14 @@
+---
+table_name: datalake_open_external_data.itbi_sp
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 260000
+    severity_level: Error
+column_level_validations:
+  iptu_sql_registration_number:
+    is_complete:
+      severity_level: Error
+  address_zipcode:
+    is_complete:
+      severity_level: Error
