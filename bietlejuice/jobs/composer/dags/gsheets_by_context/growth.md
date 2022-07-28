@@ -27,6 +27,7 @@ This pipeline produces the following output tables:
     - `costs_targets`
     - `ecglobal_active_users`
     - `historic_national_costs`
+    - `indicaai_tax_costs`
     - `manual_cost_engagement_history`
     - `manual_cost_engagement`
     - `marketing_cost_taxonomy`
@@ -55,6 +56,7 @@ This pipeline produces the following output tables:
     - `daily_target_supply_rental`
     - `daily_target_supply_sale`
     - `ecglobal_active_users`
+    - `indicaai_tax_costs`
     - `marketing_cost_taxonomy`
     - `mexico_costs_targets`
     - `mexico_demand_marketing_cost_per_source_actual`

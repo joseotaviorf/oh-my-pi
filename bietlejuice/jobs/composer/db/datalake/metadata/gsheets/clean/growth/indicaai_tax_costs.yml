@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: indicaai_tax_costs
+columns:
+  table_name:
+    lineage:
+      - datalake_gsheets_raw.indicaai_tax_costs.table_name
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.indicaai_tax_costs.mkt_origin
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.indicaai_tax_costs.city_group
+  vertical:
+    lineage:
+      - datalake_gsheets_raw.indicaai_tax_costs.vertical
+  source:
+    lineage:
+      - datalake_gsheets_raw.indicaai_tax_costs.source
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.indicaai_tax_costs.business_context
+  costs:
+    lineage:
+      - datalake_gsheets_raw.indicaai_tax_costs.costs
+  dt_tax_cost:
+    lineage:
+      - datalake_gsheets_raw.indicaai_tax_costs.dt
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_raw.indicaai_tax_costs.week_start

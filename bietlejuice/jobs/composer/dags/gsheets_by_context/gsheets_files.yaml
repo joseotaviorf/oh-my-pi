@@ -144,6 +144,12 @@ historic_national_costs:
     clean_table_name: affiliates_national_costs_history
     sheet_context: growth
 
+indicaai_tax_costs:
+    sheet_id: 1-ivCkEwGfATx6sza4t5LlPPjStH_CgPgBbR4aGwfLZ4
+    sheet_name: Output
+    clean_table_name: indicaai_tax_costs
+    sheet_context: growth
+
 manual_cost_engagement:
     sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
     sheet_name: manual_cost_engagement
