@@ -47,14 +47,13 @@ weekly_status_since_start AS (
         dhl.listing_category_start,
         mkt.mkt_completion,
         mkt.mkt_origin,
-        hldi.status_history,
         CASE
             WHEN hldi.status_history = 'suspenso'
                 AND LOWER(hldi.status_change_reason) RLIKE 'minuta|reservado|nogocia|proposta' THEN 'nogociacao avancada'
             WHEN hldi.status_history = 'despublicado'
                 AND LOWER(hldi.status_change_reason) RLIKE 'disabled|erro ao|despublicação automática após rescisão' THEN 'opt out / erro'
             ELSE hldi.status_history
-        END AS status_change_mapped,
+        END AS status_history,
         CEIL(COALESCE(NULLIF(DATEDIFF(hldi.dt_day, DATE(dhl.ts_listing_version_start)),0), 1)/7.0) AS weeks_since_listing_started, -- cohort 0 to 7 days => 1w, 8 to 14days  => 2w
         MAX(hldi.ts_status_started) OVER(PARTITION BY hldi.id_house_listing, CEIL(COALESCE(NULLIF(DATEDIFF(hldi.dt_day, DATE(dhl.ts_listing_version_start)),0), 1)/7.0)) = hldi.ts_status_started AS is_last_status_in_cohort,
         DATE_TRUNC('month', dhl.ts_listing_version_start) AS dt_listing_month_started,
@@ -92,8 +91,8 @@ weekly_amounts AS (
         mkt_origin,
         COUNT(DISTINCT id_house_listing) AS imoveis_w,
         COUNT(DISTINCT IF(status_history = 'alugado', id_house_listing, NULL)) AS list_w_cs_w,
-        COUNT(DISTINCT IF(status_history = 'despublicado' AND status_change_mapped IS NULL, id_house_listing, NULL)) AS depub_w,
-        COUNT(DISTINCT IF(status_history = 'suspenso' AND status_change_mapped IS NULL, id_house_listing, NULL)) AS suspenso_w,
+        COUNT(DISTINCT IF(status_history = 'despublicado', id_house_listing, NULL)) AS depub_w,
+        COUNT(DISTINCT IF(status_history = 'suspenso', id_house_listing, NULL)) AS suspenso_w,
         weeks_since_listing_started,
         dt_listing_month_started,
         dt_listing_week_started

@@ -34,7 +34,7 @@ WITH weekly_listings AS (
                 AND hldi.is_for_sale = FALSE THEN 'For Rent'
         END AS hybrid,
         hldi.listing_category AS listing_category_start,
-        LAG(hldi.listing_category) OVER(PARTITION BY hldi.id_house ORDER BY hldi.id_house_listing) AS listing_category_previous,
+        COALESCE(LAG(hldi.listing_category) OVER(PARTITION BY hldi.id_house ORDER BY hldi.id_house_listing), 'indisponivel') AS listing_category_previous,
         hldi.status_change_reason,
         CASE
             WHEN hldi.status_history = 'suspenso' 
