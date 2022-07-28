@@ -57,6 +57,9 @@ if __name__ == "__main__":
         client_id=credentials["client_id"], client_secret=credentials["client_secret"]
     )
     api_response = criteo_client.get_data(request_body, request_headers)
+    api_response = [
+        {f"{k[0].upper()}{k[1:]}": v for k, v in res.items()} for res in api_response
+    ]
 
     if api_response:
         spark_client = SparkClient()
