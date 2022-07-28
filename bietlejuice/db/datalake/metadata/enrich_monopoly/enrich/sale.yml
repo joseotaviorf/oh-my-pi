@@ -2,18 +2,24 @@
 database_name: datalake_monopoly
 table_name: sale
 columns:
-  id_sale:
+  id_offer:
     lineage:
-      - datalake_monopoly_clean.sale.id
-  id_external_offer:
+      - datalake_offer.sale_offer.id_offer
+  sale_price_agreed:
     lineage:
-      - datalake_monopoly_clean.sale.id_external_offer
-  id_income_reference:
+      - datalake_offer.sale_offer.sale_price_agreed
+  brokerage_fee:
     lineage:
-      - datalake_monopoly_clean.sale_transaction.id_income_reference
-  dt_occurence:
+      - datalake_offer.sale_offer.brokerage_fee
+  dt_occurence_old:
     lineage:
       - datalake_monopoly_clean.income_reference.dt_income
-  ts_created:
+  dt_sale_agreement_signed:
     lineage:
-      - datalake_monopoly_clean.sale.ts_created
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  dt_total_cash_flow_amount_last_updated:
+    lineage:
+      - datalake_monopoly_clean.sale_transaction.ts_created
+  dt_occurence:
+    lineage:
+      - datalake_monopoly_clean.sale_transaction.ts_created

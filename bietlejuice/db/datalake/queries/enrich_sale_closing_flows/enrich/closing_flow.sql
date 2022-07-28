@@ -1,6 +1,6 @@
 WITH payments_method_change AS (
     WITH last_method_change AS (
-        SELECT 
+        SELECT
             soa.id AS id_offer,
             GET_JSON_OBJECT(soa.original_message, '$.paymentOptions.paymentMethod') AS payment_method_original,
             GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.paymentMethod') AS payment_method_updated,
@@ -13,21 +13,21 @@ WITH payments_method_change AS (
             CAST(MAX(soa.ts_updated) AS DATE) AS dt_payment_method_change
         FROM
             datalake_firestore_clean.sale_offer AS soa
-        WHERE 
+        WHERE
             GET_JSON_OBJECT(soa.original_message, '$.paymentOptions.paymentMethod')<>GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.paymentMethod')
-        GROUP BY 
+        GROUP BY
             1,
             2,
             3
     )
-    SELECT 
+    SELECT
         id_offer,
         payment_method_original,
         payment_method_updated,
         dt_payment_method_change
     FROM
         last_method_change
-    WHERE 
+    WHERE
         ROW =1
 ),
 first_update_diligence AS (
@@ -36,7 +36,7 @@ first_update_diligence AS (
         MIN(ts_updated) AS ts_first_updated
     FROM
         datalake_sales_flow_clean.diligence
-    WHERE 
+    WHERE
         ts_buyer_seller_ended IS NOT NULL
     GROUP BY
         id_diligence
@@ -47,7 +47,7 @@ first_update_mortgage AS (
         MIN(ts_updated) AS ts_first_updated
     FROM
         datalake_sales_flow_clean.mortgage
-    WHERE 
+    WHERE
         dt_credit_ended IS NOT NULL
     GROUP BY
         1
@@ -63,7 +63,7 @@ diligence AS (
         first_update_diligence AS fud
             ON d.id_diligence = fud.id_diligence
             AND d.ts_updated = fud.ts_first_updated
-),  
+),
 mortgage AS (
     SELECT
         mg.id_mortgage,
@@ -77,7 +77,7 @@ mortgage AS (
         AND mg.ts_updated = fum.ts_first_updated
 ),
 payment_dates AS (
-    SELECT 
+    SELECT
         o.id_offer,
         o.id_sales_flow,
         so.current_payment_method,
@@ -87,22 +87,22 @@ payment_dates AS (
         pm.dt_payment_method_change,
         COALESCE(di.dt_legal_analysis_ended, m.dt_legal_analysis_ended) AS  dt_legal_analysis_ended,
         COALESCE(mg.dt_credit_analysis_ended, m.dt_credit_analysis_ended) AS dt_credit_analysis_ended
-    FROM 
+    FROM
         datalake_sale_offer_flows.sale_offer_flows AS o
-    INNER JOIN 
+    INNER JOIN
         datalake_offer.sale_offer AS so
             ON so.id_offer = o.id_offer
     INNER JOIN
         datalake_monopoly.sale AS ms
-            ON ms.id_external_offer = o.id_offer 
+            ON ms.id_offer = o.id_offer
             AND ms.dt_occurence IS NOT NULL
     LEFT JOIN
         payments_method_change AS pm
             ON pm.id_offer = o.id_offer
-    LEFT JOIN 
+    LEFT JOIN
         mortgage AS mg
             ON mg.id_sales_flow = o.id_sales_flow
-    LEFT JOIN 
+    LEFT JOIN
         diligence AS di
             ON di.id_sales_flow = o.id_sales_flow
     LEFT JOIN
@@ -110,7 +110,7 @@ payment_dates AS (
             ON o.id_offer = m.id_offer
 ),
 payment_rule AS (
-    SELECT 
+    SELECT
         id_offer,
         id_sales_flow,
         current_payment_method,
@@ -120,27 +120,27 @@ payment_rule AS (
         dt_payment_method_change,
         dt_legal_analysis_ended,
         dt_credit_analysis_ended,
-        CASE 
-            WHEN current_payment_method LIKE 'FINANCED%' 
-                AND CONCAT(dt_occurence,dt_legal_analysis_ended,dt_credit_analysis_ended) IS NOT NULL 
-                AND dt_payment_method_change IS NULL 
+        CASE
+            WHEN current_payment_method LIKE 'FINANCED%'
+                AND CONCAT(dt_occurence,dt_legal_analysis_ended,dt_credit_analysis_ended) IS NOT NULL
+                AND dt_payment_method_change IS NULL
                 THEN DATE(GREATEST(dt_occurence, dt_legal_analysis_ended, dt_credit_analysis_ended))
-            WHEN current_payment_method LIKE 'CASH%' 
+            WHEN current_payment_method LIKE 'CASH%'
                 AND CONCAT(dt_occurence, dt_legal_analysis_ended) IS NOT NULL
                 THEN DATE(GREATEST(dt_occurence,dt_legal_analysis_ended))
             WHEN current_payment_method LIKE 'FINANCED%' AND payment_method_updated LIKE 'FINANCED%'
-                AND CONCAT(dt_occurence,dt_legal_analysis_ended) IS NOT NULL 
-                AND dt_payment_method_change IS NOT NULL 
-            THEN 
-                CASE 
-                    WHEN dt_legal_analysis_ended <= dt_payment_method_change AND payment_method_original LIKE 'CASH%' 
+                AND CONCAT(dt_occurence,dt_legal_analysis_ended) IS NOT NULL
+                AND dt_payment_method_change IS NOT NULL
+            THEN
+                CASE
+                    WHEN dt_legal_analysis_ended <= dt_payment_method_change AND payment_method_original LIKE 'CASH%'
                         THEN DATE(GREATEST(dt_occurence,dt_legal_analysis_ended))
-                    WHEN CONCAT(dt_occurence,dt_legal_analysis_ended,dt_credit_analysis_ended) IS NOT NULL 
+                    WHEN CONCAT(dt_occurence,dt_legal_analysis_ended,dt_credit_analysis_ended) IS NOT NULL
                         THEN DATE(GREATEST(dt_occurence, dt_legal_analysis_ended, dt_credit_analysis_ended))
                 END
             ELSE NULL
         END AS dt_payment_allowed
-    FROM 
+    FROM
         payment_dates
 ),
 data_sources AS (
@@ -192,8 +192,8 @@ data_sources AS (
             ON so.id_offer = sof.id_offer
     LEFT JOIN
         datalake_monopoly.sale AS ms
-            ON ms.id_external_offer = so.id_offer
-    LEFT JOIN 
+            ON ms.id_offer = so.id_offer
+    LEFT JOIN
         payment_rule AS pr
             ON pr.id_offer = so.id_offer
     WHERE
