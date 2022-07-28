@@ -455,7 +455,8 @@ bietlejuice.dw_datamarts_support_and_service:
   - bietlejuice.kodak:create-clean-video-aud-external-table
 
 bietlejuice.dw_affiliate_costs:
-  - bietlejuice.enrich_robin_hood
+  - bietlejuice.enrich_robin_hood:load-enrich-affiliate-costs
+  - bietlejuice.robin_hood:load-clean-tax
 
 bietlejuice.dw_agent:
   # Removed dependency with gsheets.for_rent.auxiliary_region since enrich_ebdb_agents already satisfies
@@ -935,8 +936,10 @@ bietlejuice.dw_proposal:
   - bietlejuice.enrich_ebdb_proposal:load-enrich-proposal-person
 
 bietlejuice.dw_quinto_messenger:
-  - bietlejuice.enrich_ebdb_customer_contact_identification
-  - bietlejuice.enrich_quinto_messenger
+  - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
+  - bietlejuice.enrich_quinto_messenger:load-enrich-channel
+  - bietlejuice.enrich_quinto_messenger:load-enrich-task
+  - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
 
 bietlejuice.dw_region:
   - bietlejuice.enrich_booking:load-enrich-booking

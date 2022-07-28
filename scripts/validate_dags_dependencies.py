@@ -10,8 +10,8 @@ import json
 BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
+from bietlejuice.jobs.composer.base.dependencies.bietlejuice_dependency_helper import BietlejuiceDependencyHelper
 from bietlejuice.jobs.composer.base.paths import QUERIES_DATALAKE_PATH
-from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
 from bietlejuice.jobs.composer.services import FileService, ConfigurationService
 
 LAYERS = ["clean", "enrich", "dw", "raw"]
@@ -19,9 +19,6 @@ LAYERS = ["clean", "enrich", "dw", "raw"]
 PRINT_ALL_PARSING_ERRORS = False
 COMPOSER_FILES_ROOT = f"{BI_ETL_EJUICE_ROOT}/bietlejuice/jobs/composer"
 DAGS_CROSS_DEPENDENCIES_FILE_NAME = "dependencies.yaml"
-DAGS_CROSS_DEPENDENCIES_FILE_PATH = (
-    f"{COMPOSER_DAGS_PATH}/{DAGS_CROSS_DEPENDENCIES_FILE_NAME}"
-)
 VALIDATION_LOG_SEPARATOR = "=" * 150
 DEPENDENCIES_PATTERN = "bietlejuice\.(\w*):(.*)"
 
@@ -131,78 +128,6 @@ class CrossDAGDependenciesValidator:
         """
         return dependency_name.find(":") != -1
 
-    def _get_table_name_from_dw_task(self, dag_name, layer, task):
-        """
-        Clean the DW task in order to retrieve the table name being loaded
-
-        :type dag_name: str
-        :type layer: str
-        :type task: str
-        :return: str
-        """
-        dag_context = dag_name.replace(f"{layer}_", "")
-        table_name = task.replace("-", "_").replace(f"{dag_context}_", "")
-        return table_name
-
-    def _extract_dag_and_table_from_redshift_task(self, task_name):
-        """
-        Parses the DAG and table name from load into redshift tasks
-
-        :type task_name: str
-        :return: str, str
-        """
-        match = re.search("bietlejuice\.(.*):load-(public)?(.*)-into-redshift", task_name)
-
-        if not match:
-            match_dag_name = re.search(DEPENDENCIES_PATTERN, task_name)
-            dag_name = match_dag_name.group(1)
-            return dag_name, None
-
-        layer = "dw"
-        dag_name = match.group(1)
-        redshift_task = match.group(3)
-
-        table_name = self._get_table_name_from_dw_task(dag_name, layer, redshift_task)
-        table_name = f"{layer}:{table_name}"
-
-        return dag_name, table_name
-
-    def extract_dag_and_table_from_task_name(self, task_name):
-        """
-        Parses the DAG and table name from task name
-
-        :type task_name: str
-        :return: str, str
-        """
-        if task_name.endswith("-into-redshift"):
-            return self._extract_dag_and_table_from_redshift_task(task_name)
-
-        if task_name.endswith("-external-table"):
-            task_name_pattern = "bietlejuice\.(.*):create-(enrich|raw|clean|dw)*-(.*)-external-table"
-        else:
-            task_name_pattern = "bietlejuice\.(.*):load-(enrich|raw|clean|dw)*-(.*)"
-
-        match = re.search(task_name_pattern, task_name)
-        if match is None:
-            match_dag_name = re.search(DEPENDENCIES_PATTERN, task_name)
-            dag_name = match_dag_name.group(1)
-            return dag_name, None
-
-        dag_name = match.group(1)
-
-        match_layer = re.search("(dw|enrich|clean|raw)", task_name)
-        if match_layer is None:
-            return dag_name, None
-
-        layer = match_layer.group(1)
-        if layer == "dw":
-            table_name = self._get_table_name_from_dw_task(dag_name, layer, match.group(3))
-        else:
-            table_name = match.group(3).replace("-", "_")
-
-        table_name = f"{layer}:{table_name}"
-        return dag_name, table_name
-
     def extract_dependency_dags_and_tables_from_dependencies(self, dependencies):
         """
         Extracts the table names or DAG names from the dependencies, according to
@@ -218,7 +143,7 @@ class CrossDAGDependenciesValidator:
             for dependency_name in dependency_group:
 
                 if self.is_task(dependency_name):
-                    dag_name, table_name = self.extract_dag_and_table_from_task_name(
+                    dag_name, table_name = BietlejuiceDependencyHelper.extract_dag_and_table_from_task_name(
                         dependency_name
                     )
                     if table_name is None:
@@ -243,9 +168,7 @@ class CrossDAGDependenciesValidator:
         :return: a list of DAGs and a dictionary with the tables grouped by DAG
         :rtype: list, dict[str:list()]
         """
-        dependencies = FileService.get_dict_from_yaml_file(
-            DAGS_CROSS_DEPENDENCIES_FILE_PATH
-        )
+        dependencies = BietlejuiceDependencyHelper.read_dependencies()
 
         dags_without_tasks_in_dependencies_file = (
             self.extract_dependent_dags_from_dependencies(dependencies)

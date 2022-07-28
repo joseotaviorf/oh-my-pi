@@ -7,8 +7,12 @@ from airflow.operators.quintoandar_dag_mediator import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
-from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.base.dependencies.bietlejuice_redundant_dependency_finder import (
+    BietlejuiceRedundantDependencyFinder,
+)
+from bietlejuice.jobs.composer.base.dependencies.bietlejuice_dependency_helper import (
+    BietlejuiceDependencyHelper,
+)
 
 
 def validate_dependencies(dependencies_list):
@@ -20,9 +24,9 @@ def validate_dependencies(dependencies_list):
 
 
 def extract_dependencies():
-    dependencies_file_path = COMPOSER_DAGS_PATH + "/dependencies.yaml"
-    dependencies_dict = FileService.get_dict_from_yaml_file(dependencies_file_path)
-
+    dependencies_dict = BietlejuiceDependencyHelper.read_dependencies()
+    redundancy_finder = BietlejuiceRedundantDependencyFinder(dependencies_dict)
+    dependencies_dict = redundancy_finder.remove_all_redundancies()
     validate_dependencies(dependencies_dict)
 
     return dependencies_dict
