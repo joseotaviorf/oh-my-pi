@@ -43,6 +43,7 @@ In datalake raw, via full load:
 - `fiancavelo_packtype`
 - `fiancavelo_packvalues`
 - `fiancavelo_partnertext`
+- `fiancavelo_payment`
 - `fiancavelo_persondocuments`
 - `fiancavelo_persontype`
 - `fiancavelo_plans`

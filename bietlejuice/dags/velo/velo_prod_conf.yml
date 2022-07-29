@@ -87,6 +87,9 @@ tables:
   - table_name: fiancavelo_partnertext
     extraction_type: full
     is_cleaned: false
+  - table_name: fiancavelo_payment
+    extraction_type: full
+    is_cleaned: false
   - table_name: fiancavelo_persondocuments
     extraction_type: full
     is_cleaned: false
