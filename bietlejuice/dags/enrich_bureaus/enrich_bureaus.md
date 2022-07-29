@@ -13,7 +13,9 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables, via full load:
 
 - `transunion_bureau_analysis`
+- `transunion_income_features`
 - `bigdatacorp_bureau_analysis`
+- `boavista_bureau_analysis`
 - `neoway_bureau_analysis`
 - `serasa_bureau_analysis`
 - `all_bureau_analysis`

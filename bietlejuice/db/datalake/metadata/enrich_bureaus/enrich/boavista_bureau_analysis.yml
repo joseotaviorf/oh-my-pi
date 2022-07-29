@@ -1,5 +1,5 @@
 database_name: datalake_bureaus
-table_name: serasa_bureau_analysis
+table_name: boavista_bureau_analysis
 columns:
   id_proposal:
     lineage:
@@ -13,12 +13,7 @@ columns:
     lineage:
       - datalake_static_files_raw.bureaus_serasa_historical_raw.cpf
       - datalake_arquivo_confidencial_clean.integration_report_aud.cpf
-  serasa_score_csba:
+  boavista_score:
     lineage:
-      - datalake_static_files_raw.bureaus_serasa_historical_raw.SCORE_CSBA
-      - datalake_sorting_hat_clean.proponent.serasa_score  
-      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.score
-  serasa_score_hspn:
-    lineage:
-      - datalake_static_files_raw.bureaus_serasa_historical_raw.SCORE_HSPN
+      - datalake_sorting_hat_clean.proponent.boavista_score  
       - datalake_arquivo_confidencial_clean.integration_report_aud.attributes.score

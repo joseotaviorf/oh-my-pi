@@ -2,7 +2,9 @@ SELECT DISTINCT
   proponent.id_proposal,
   proponent.id_proponent,
   proponent.cpf AS cpf,
+  boavista.boavista_score,
   serasa.serasa_score_hspn,
+  serasa.serasa_score_csba,
   neoway.neoway_estimated_income_low,
   neoway.neoway_estimated_income_midpoint,
   neoway.neoway_estimated_income_upper,
@@ -11,7 +13,7 @@ SELECT DISTINCT
   bigdatacorp.bigdatacorp_total_partners,
   bigdatacorp.bigdatacorp_total_household,
   bigdatacorp.bigdatacorp_total_relationships,
-  transunion.transunion_presumed_income,
+  transunion_incomes.transunion_presumed_income,
   transunion.transunion_irpf_last_decl_class,
   transunion.transunion_index_job_stability,
   transunion.transunion_index_seg_12,
@@ -397,6 +399,11 @@ FROM
       datalake_sorting_hat_clean.proponent AS p
   ) AS proponent
 LEFT JOIN
+  datalake_bureaus.boavista_bureau_analysis AS boavista
+    ON proponent.id_proposal = boavista.id_proposal
+    AND proponent.id_proponent = boavista.id_proponent
+    AND proponent.cpf = boavista.cpf 
+LEFT JOIN
   datalake_bureaus.serasa_bureau_analysis AS serasa
     ON proponent.id_proposal = serasa.id_proposal
     AND proponent.id_proponent = serasa.id_proponent
@@ -412,6 +419,11 @@ LEFT JOIN
     AND proponent.cpf = bigdatacorp.cpf
 LEFT JOIN
   datalake_bureaus.transunion_bureau_analysis AS transunion
+    ON proponent.id_proposal = transunion.id_proposal
+    AND proponent.id_proponent = transunion.id_proponent
+    AND proponent.cpf = transunion.cpf
+LEFT JOIN
+  datalake_bureaus.transunion_income_features AS transunion_incomes
     ON proponent.id_proposal = transunion.id_proposal
     AND proponent.id_proponent = transunion.id_proponent
     AND proponent.cpf = transunion.cpf

@@ -3,7 +3,6 @@ WITH backtest AS (
     id_proposal,
     id_proponent,
     CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
-    renda_presumida AS transunion_presumed_income,
     class_banc_ult_decl AS transunion_irpf_last_decl_class,
     ind_estab_emprego AS transunion_index_job_stability,
     indic_seg_12 AS transunion_index_seg_12,
@@ -388,7 +387,7 @@ integration_report_aud AS (
     rev, 
     CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
     integration_provider,
-    REPLACE(REPLACE(REPLACE(attributes, "", ""), "Quantidade - ", ""), "") AS attributes
+    REPLACE(REPLACE(REPLACE(attributes, "Valor - ", ""), "Quantidade - ", ""), "Discreta - ", "") AS attributes
   FROM
     datalake_arquivo_confidencial_clean.integration_report_aud
 ),
@@ -396,8 +395,7 @@ integration_report_aud AS (
 integration_report_data AS (
   SELECT
     cpf,
-    CAST(NULL AS FLOAT) AS transunion_presumed_income,
-    CAST(GET_JSON_OBJECT(attributes, "$.class_banc_ult_decl") AS FLOAT) AS transunion_irpf_last_decl_class,
+    GET_JSON_OBJECT(attributes, "$.class_banc_ult_decl") AS transunion_irpf_last_decl_class,
     CAST(GET_JSON_OBJECT(attributes, "$.ind_estab_emprego") AS FLOAT) AS transunion_index_job_stability,
     CAST(GET_JSON_OBJECT(attributes, "$.indic_seg_12") AS FLOAT) AS transunion_index_seg_12,
     CAST(GET_JSON_OBJECT(attributes, "$.indic_seg_12_cob") AS FLOAT) AS transunion_index_seg_12_charge,
@@ -414,7 +412,20 @@ integration_report_data AS (
     CAST(GET_JSON_OBJECT(attributes, "$.indic_seg_6_ecom") AS FLOAT) AS transunion_index_seg_6_ecom,
     CAST(GET_JSON_OBJECT(attributes, "$.indic_seg_6_fin") AS FLOAT) AS transunion_index_seg_6_fin,
     CAST(GET_JSON_OBJECT(attributes, "$.indic_seg_6_tele") AS FLOAT) AS transunion_index_seg_6_tele,
-    CAST(GET_JSON_OBJECT(attributes, "$.porte_empregador") AS FLOAT) AS transunion_employer_size,
+    CAST(
+      CASE 
+        WHEN 
+          GET_JSON_OBJECT(attributes, "$.porte_empregador") = 'Sem informação ou empresa não possui porte' THEN 0.0
+        WHEN
+          GET_JSON_OBJECT(attributes, "$.porte_empregador") = 'Micro empresa' THEN 1.0
+        WHEN
+          GET_JSON_OBJECT(attributes, "$.porte_empregador") = 'Pequena empresa' THEN 2.0
+        WHEN
+          GET_JSON_OBJECT(attributes, "$.porte_empregador") = 'Média empresa' THEN 3.0
+        WHEN
+          GET_JSON_OBJECT(attributes, "$.porte_empregador") = 'Grande empresa' THEN 4.0
+      END AS FLOAT
+    ) AS transunion_employer_size,
     CAST(GET_JSON_OBJECT(attributes, "$.sc_situacao") AS FLOAT) AS transunion_sc_situation,
     CAST(GET_JSON_OBJECT(attributes, "$.automoveis_percap_m_munic") AS FLOAT) AS transunion_percap_m_munic_cars,
     CAST(GET_JSON_OBJECT(attributes, "$.caminhao_percap_m_munic") AS FLOAT) AS transunion_percap_m_munic_trucks,
@@ -837,10 +848,6 @@ SELECT
     btest.cpf,
     idata.cpf
   ) AS cpf,
-  COALESCE(
-    btest.transunion_presumed_income,
-    idata.transunion_presumed_income
-  ) AS transunion_presumed_income,
   COALESCE(
     btest.transunion_irpf_last_decl_class,
     idata.transunion_irpf_last_decl_class

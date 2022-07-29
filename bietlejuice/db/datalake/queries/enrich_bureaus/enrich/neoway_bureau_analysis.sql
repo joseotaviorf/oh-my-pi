@@ -16,8 +16,17 @@ income_report_data AS (
   SELECT
     CAST(REPLACE(REPLACE(p.cpf,".",""),"-","") AS BIGINT) AS cpf,
     r.ts_created AS timestamp,
-    MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeLowerValue")) AS neoway_lower_value,
-    MAX(COALESCE(GET_JSON_OBJECT(p.attributes, "$.incomeRangeHigherValue"), 19080)) AS neoway_upper_value
+    CASE
+      WHEN MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeLowerValue")) = 954 THEN 0
+      ELSE MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeLowerValue"))
+    END AS neoway_lower_value,
+    CASE
+      WHEN MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeHigherValue")) IS NULL 
+        AND MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeLowerValue")) = 954 THEN 954
+      WHEN MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeHigherValue")) IS NULL 
+        AND MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeLowerValue")) = 19080 THEN 19080
+      ELSE MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeHigherValue"))
+    END AS neoway_upper_value
   FROM
     datalake_arquivo_confidencial_clean.presumed_income_report_aud AS p
   JOIN

@@ -14,9 +14,6 @@ columns:
     lineage:
       - datalake_static_files_raw.bureaus_transunion_historical_raw.cpf
       - datalake_arquivo_confidencial_clean.integration_report_aud.cpf
-  transunion_presumed_income:
-    lineage:
-      - datalake_static_files_raw.bureaus_transunion_historical_raw.renda_presumida
   transunion_irpf_last_decl_class:
     lineage:
       - datalake_static_files_raw.bureaus_transunion_historical_raw.class_banc_ult_decl
