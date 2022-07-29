@@ -277,14 +277,12 @@ pipeline:
           -Dsonar.projectBaseDir=. \
           -Dsonar.sources=./bietlejuice \
           -Dsonar.sourceEncoding=UTF-8 \
-          -Dsonar.analysis.mode=preview \
-          -Dsonar.github.pullRequest=${DRONE_PULL_REQUEST} \
-          -Dsonar.github.repository=${DRONE_REPO_OWNER}/${DRONE_REPO_NAME} \
-          -Dsonar.github.oauth=$${GITHUB_ACCESS_TOKEN} \
-          -Dsonar.host.url=https://sonar.quintoandar.com.br \
-          -Dsonar.login=user \
-          -Dsonar.password=$${SONAR_PASSWORD}
-    secrets: [ sonar_password, github_access_token ]
+          -Dsonar.pullrequest.base=${DRONE_REPO_BRANCH} \
+          -Dsonar.pullrequest.branch=${DRONE_BRANCH} \
+          -Dsonar.pullrequest.key=${DRONE_PULL_REQUEST} \
+          -Dsonar.host.url=https://sonarqube.quintoandar.com.br \
+          -Dsonar.login=$${SONARQUBE_TOKEN} \
+    secrets: [ sonarqube_token ]
     when:
       event: pull_request
       branch: [ master, hotfix/* ]
@@ -303,11 +301,10 @@ pipeline:
           -Dsonar.python.coverage.reportPath=coverage.xml \
           -Dsonar.sourceEncoding=UTF-8 \
           -Dsonar.tests=./tests \
-          -Dsonar.host.url=https://sonar.quintoandar.com.br \
+          -Dsonar.host.url=https://sonarqube.quintoandar.com.br \
+          -Dsonar.login=$${SONARQUBE_TOKEN} \
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
-          -Dsonar.login=user \
-          -Dsonar.password=$${SONAR_PASSWORD}
-    secrets: [ sonar_password, github_access_token ]
+    secrets: [ sonarqube_token ]
     when:
       event: push
       branch: [ master, hotfix/* ]
