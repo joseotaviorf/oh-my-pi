@@ -22,7 +22,10 @@ SELECT DISTINCT
   bmt.is_backlog_with_exceed_sla AS is_backlog_not_in_time,
   bmt.dt_metric_reference,
   bmt.ts_started,
-  bmt.ts_solved
+  bmt.ts_solved,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day
 FROM
   dw_customer_support.fact_backlog_metrics_tasks AS bmt
 LEFT JOIN
