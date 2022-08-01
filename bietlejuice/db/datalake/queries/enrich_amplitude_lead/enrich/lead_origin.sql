@@ -1,6 +1,6 @@
 WITH app_205027_referral_form_events AS (
     SELECT
-        CAST(REGEXP_EXTRACT(id_lead, '(^\\d+)') AS BIGINT) AS id_lead,
+        id_lead::INTEGER AS id_lead,
         NULL AS id_firestore,
         NULL AS formfield_lead_uuid,
         1 AS rule_num,
@@ -19,12 +19,10 @@ WITH app_205027_referral_form_events AS (
     FROM
         datalake_amplitude_clean.205027_referral_form_accepted_events
     WHERE
-        -- TODO [ODS] This regexp is also filtering wrong values like '21617dac-3674-4490-bc05-995c01a3b19e'
-        -- We implemented it here because of ODS Migration, but the rule must be rewritten
-        RLIKE(CAST(id_lead AS VARCHAR(24)), '(^\\d+)')
+        id_lead::INTEGER IS NOT NULL
     UNION
     SELECT
-        CAST(REGEXP_EXTRACT(id_lead, '(^\\d+)') AS BIGINT) AS id_lead,
+        id_lead::INTEGER AS id_lead,
         NULL AS id_firestore,
         NULL AS formfield_lead_uuid,
         1 AS rule_num,
@@ -43,9 +41,7 @@ WITH app_205027_referral_form_events AS (
     FROM
         datalake_amplitude_clean.205027_referral_form_discarded_events
     WHERE
-        -- TODO [ODS] This regexp is also filtering wrong values like '21617dac-3674-4490-bc05-995c01a3b19e'
-        -- We implemented it here because of ODS Migration, but the rule must be rewritten
-        RLIKE(CAST(id_lead AS VARCHAR(24)), '(^\\d+)')
+        id_lead::INTEGER IS NOT NULL
 ),
 app_183047_form_submitted_events AS (
     SELECT
@@ -107,57 +103,123 @@ app_183047_form_submitted_events AS (
 ),
 app_ALL_lead_referred_events AS (
     SELECT
-        CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(event_properties , '$.Lead_id'), '(^\\d+)') AS BIGINT) AS id_lead,
+        ep_id_lead AS id_lead,
         NULL AS id_firestore,
         NULL AS formfield_lead_uuid,
         2 AS rule_num,
         'referral_2' AS rule,
         ts_event,
-        GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS utm_campaign,
-        GET_JSON_OBJECT(user_properties, '$.utm_medium') AS utm_medium,
-        GET_JSON_OBJECT(user_properties, '$.utm_source') AS utm_source,
-        GET_JSON_OBJECT(user_properties, '$.utm_content') AS utm_content,
-        GET_JSON_OBJECT(user_properties, '$.utm_term') AS utm_term,
-        GET_JSON_OBJECT(user_properties, '$.platform') AS platform,
-        GET_JSON_OBJECT(user_properties, '$.referring_domain') AS referring_domain,
+        up_utm_campaign AS utm_campaign,
+        up_utm_medium AS utm_medium,
+        up_utm_source AS utm_source,
+        up_utm_content AS utm_content,
+        up_utm_term AS utm_term,
+        up_platform AS platform,
+        up_referring_domain AS referring_domain,
+        region,
+        city,
+        uuid
+    FROM
+        datalake_amplitude_clean.160023_affiliate_lead_referred_events
+    WHERE
+        ep_id_lead::INTEGER IS NOT NULL
+
+    UNION
+
+    SELECT
+        ep_id_lead AS id_lead,
+        NULL AS id_firestore,
+        NULL AS formfield_lead_uuid,
+        2 AS rule_num,
+        'referral_2' AS rule,
+        ts_event,
+        up_utm_campaign AS utm_campaign,
+        up_utm_medium AS utm_medium,
+        up_utm_source AS utm_source,
+        up_utm_content AS utm_content,
+        up_utm_term AS utm_term,
+        up_platform AS platform,
+        up_referring_domain AS referring_domain,
+        region,
+        city,
+        uuid
+    FROM
+        datalake_amplitude_clean.155696_refer_lead_referred_events
+    WHERE
+        ep_id_lead::INTEGER IS NOT NULL
+
+    UNION
+
+    SELECT
+        ep_id_lead AS id_lead,
+        NULL AS id_firestore,
+        NULL AS formfield_lead_uuid,
+        2 AS rule_num,
+        'referral_2' AS rule,
+        ts_event,
+        up_utm_campaign AS utm_campaign,
+        up_utm_medium AS utm_medium,
+        up_utm_source AS utm_source,
+        up_utm_content AS utm_content,
+        up_utm_term AS utm_term,
+        up_platform AS platform,
+        up_referring_domain AS referring_domain,
+        region,
+        city,
+        uuid
+    FROM
+        datalake_amplitude_clean.155697_refer_lead_referred_events
+    WHERE
+        ep_id_lead::INTEGER IS NOT NULL            
+),
+user_attribution_exploded AS (
+    SELECT
+        FROM_JSON(user_properties,'
+                lead_firestore_id STRING,
+                utm_campaign STRING,
+                utm_medium STRING,
+                utm_source STRING,
+                utm_content STRING,
+                utm_term STRING,
+                platform STRING,
+                referring_domain STRING') AS user_properties,
+        ts_event,
         region,
         city,
         uuid
     FROM
         datalake_amplitude_clean.events
     WHERE
-        event_type IN ('Affiliate-Lead_referred', 'Refer-Lead_referred' )
-        AND RLIKE(GET_JSON_OBJECT(event_properties , '$.Lead_id'), '(^\\d+)')
+        id_app = 183047
 ),
 app_183047_all_events_firestore AS (
     SELECT
         NULL AS id_lead,
-        COALESCE(rene.id, GET_JSON_OBJECT(user_properties , '$.lead_firestore_id')) AS id_firestore,
+        COALESCE(rene.id, user_properties.lead_firestore_id) AS id_firestore,
         NULL AS formfield_lead_uuid,
         3 AS rule_num,
         'firestore' AS rule,
         ts_event,
-        GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS utm_campaign,
-        GET_JSON_OBJECT(user_properties, '$.utm_medium') AS utm_medium,
-        GET_JSON_OBJECT(user_properties, '$.utm_source') AS utm_source,
-        GET_JSON_OBJECT(user_properties, '$.utm_content') AS utm_content,
-        GET_JSON_OBJECT(user_properties, '$.utm_term') AS utm_term,
-        GET_JSON_OBJECT(user_properties, '$.platform') AS platform,
-        GET_JSON_OBJECT(user_properties, '$.referring_domain') AS referring_domain,
+        TRIM(user_properties.utm_campaign) AS utm_campaign,
+        TRIM(user_properties.utm_medium) AS utm_medium,
+        TRIM(user_properties.utm_source) AS utm_source,
+        TRIM(user_properties.utm_content) AS utm_content,
+        TRIM(user_properties.utm_term) AS utm_term,
+        TRIM(user_properties.platform) AS platform,
+        TRIM(user_properties.referring_domain) AS referring_domain,
         region,
         city,
         uuid
     FROM
-        datalake_amplitude_clean.events
+        user_attribution_exploded
     LEFT JOIN datalake_rene_descartes_clean.house_lead rene
-        ON rene.id_external_reference = GET_JSON_OBJECT(user_properties , '$.lead_firestore_id')
+        ON rene.id_external_reference = user_properties.lead_firestore_id
     -- On 2021-07-15 a change was made by the Product Team,
     -- the firestore_id is no longer being inserted on datalake_amplitude_clean_prod.events,
     -- but in datalake_rene_descartes_clean_prod.house_lead
         AND DATE(ts_event) >= DATE('2021-07-15')
     WHERE
-        id_app = 183047
-        AND GET_JSON_OBJECT(user_properties, '$.lead_firestore_id') IS NOT NULL
+        user_properties.lead_firestore_id IS NOT NULL
 ),
 app_183047_form_submitted_events_rene AS (
     SELECT

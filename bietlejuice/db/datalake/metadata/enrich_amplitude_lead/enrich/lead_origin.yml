@@ -4,102 +4,139 @@ columns:
   id_lead:
     lineage:
       - datalake_amplitude_clean.events.event_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.event_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.event_properties
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.ep_lead_id
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.ep_lead_id
+      - datalake_amplitude_clean.160023_affiliate_lead_referred.ep_id_lead
+      - datalake_amplitude_clean.155696_refer_lead_referred.ep_id_lead
+      - datalake_amplitude_clean.155697_refer_lead_referred.ep_id_lead
+      - datalake_amplitude_clean.205027_intro_page_viewed.ep_id_lead
   id_firestore:
     lineage:
       - datalake_rene_descartes_clean.house_lead.id
       - datalake_amplitude_clean.events.user_properties
   formfield_lead_uuid:
     lineage:
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.event_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.event_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.event_properties
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.formfield_lead_uuid
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.formfield_lead_uuid
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.formfield_lead_uuid
   ts_event:
     lineage:
       - datalake_amplitude_clean.events.ts_event
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.ts_event
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.ts_event
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.ts_event
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.ts_event
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.ts_event
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.ts_event
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.ts_event
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.ts_event
+      - datalake_amplitude_clean.155696_refer_lead_referred.ts_event
+      - datalake_amplitude_clean.155697_refer_lead_referred.ts_event
+      - datalake_amplitude_clean.205027_intro_page_viewed.ts_event
   utm_campaign:
     lineage:
       - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.user_properties
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_utm_campaign
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_utm_campaign
+      - datalake_amplitude_clean.155696_refer_lead_referred.up_utm_campaign
+      - datalake_amplitude_clean.155697_refer_lead_referred.up_utm_campaign
+      - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_campaign
   utm_medium:
     lineage:
       - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.user_properties
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_medium
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_medium
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_medium
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_utm_medium
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_utm_medium
+      - datalake_amplitude_clean.155696_refer_lead_referred.up_utm_medium
+      - datalake_amplitude_clean.155697_refer_lead_referred.up_utm_medium
+      - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_medium
   utm_source:
     lineage:
       - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.user_properties
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_source
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_source
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_source
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_utm_source
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_utm_source
+      - datalake_amplitude_clean.155696_refer_lead_referred.up_utm_source
+      - datalake_amplitude_clean.155697_refer_lead_referred.up_utm_source
+      - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_source
   utm_content:
     lineage:
       - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.user_properties
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_content
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_content
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_content
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_utm_content
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_utm_content
+      - datalake_amplitude_clean.155696_refer_lead_referred.up_utm_content
+      - datalake_amplitude_clean.155697_refer_lead_referred.up_utm_content
+      - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_content
   utm_term:
     lineage:
       - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.user_properties
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_term
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_term
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_term
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_utm_term
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_utm_term
+      - datalake_amplitude_clean.155696_refer_lead_referred.up_utm_term
+      - datalake_amplitude_clean.155697_refer_lead_referred.up_utm_term
+      - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_term
   platform:
     lineage:
       - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.user_properties
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.app_type
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.app_type
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.app_type
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_platform
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_platform
+      - datalake_amplitude_clean.155696_refer_lead_referred.up_platform
+      - datalake_amplitude_clean.155697_refer_lead_referred.up_platform
+      - datalake_amplitude_clean.205027_intro_page_viewed.up_platform
   referring_domain:
     lineage:
       - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.user_properties
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.user_properties
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.referring_domain
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.referring_domain
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.referring_domain
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_referring_domain
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_referring_domain
+      - datalake_amplitude_clean.155696_refer_lead_referred.up_referring_domain
+      - datalake_amplitude_clean.155697_refer_lead_referred.up_referring_domain
+      - datalake_amplitude_clean.205027_intro_page_viewed.up_referring_domain
   region:
     lineage:
       - datalake_amplitude_clean.events.region
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.region
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.region
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.region
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.region
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.region
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.region
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.region
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.region
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.region
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.region
+      - datalake_amplitude_clean.155696_refer_lead_referred.region
+      - datalake_amplitude_clean.155697_refer_lead_referred.region
+      - datalake_amplitude_clean.205027_intro_page_viewed.region
   city:
     lineage:
       - datalake_amplitude_clean.events.city
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.city
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.city
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.city
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.city
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.city
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.city
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.city
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.city
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.city
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.city
+      - datalake_amplitude_clean.155696_refer_lead_referred.city
+      - datalake_amplitude_clean.155697_refer_lead_referred.city
+      - datalake_amplitude_clean.205027_intro_page_viewed.city
   uuid:
     lineage:
       - datalake_amplitude_clean.events.uuid
-      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.uuid
-      - datalake_amplitude_clean_staging.183047_price_suggestion_form_submitted_events.uuid
-      - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.uuid
-      - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.uuid
-      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.uuid
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.uuid
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.uuid
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.uuid
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.uuid
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.uuid
+      - datalake_amplitude_clean.155696_refer_lead_referred.uuid
+      - datalake_amplitude_clean.155697_refer_lead_referred.uuid
+      - datalake_amplitude_clean.205027_intro_page_viewed.uuid
