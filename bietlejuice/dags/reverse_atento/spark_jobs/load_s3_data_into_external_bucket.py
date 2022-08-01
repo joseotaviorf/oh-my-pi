@@ -89,11 +89,8 @@ if __name__ == "__main__":
 
         if df is not None:
             df = df.drop("year", "month", "day")
-
-            destination_path = f"v1/{table}/"
-            file_name = (
-                f'{table}_{(execution_date.strftime("%Y-%m-%d %H:%M:%S%z"))}.csv'
-            )
+            destination_path = f"to_atento_{table}/"
+            file_name = f'{table}_{(execution_date.strftime("%Y%m%d"))}.csv'
             with io.StringIO() as csv_buffer:
                 df.toPandas().to_csv(csv_buffer, index=False, header=True)
 

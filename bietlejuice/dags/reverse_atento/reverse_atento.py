@@ -3,8 +3,8 @@ from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from pendulum import timezone
 import os
 
-from airflow.utils.helpers import chain
 from airflow.models import DAG
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
@@ -21,7 +21,7 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 ENV = os.environ.get("ENVIRONMENT")
 
 # DAG and Jobs params setup
-SOURCE = "nazare"
+SOURCE = "atento"
 DAG_NAME = f"reverse_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
@@ -59,7 +59,7 @@ partition_cols = config_service.get_config("partition_cols")
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FINTECH,
+        "owner": DAGOwnerEnum.DATA_SS,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

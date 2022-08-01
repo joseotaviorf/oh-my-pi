@@ -1,0 +1,3 @@
+---
+external_s3_bucket: atento-s3-data-quintoandar-com-br
+partition_cols: ["year", "month", "day"]

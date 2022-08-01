@@ -49,6 +49,7 @@ dags_out_of_pattern:
         "portal_casa_mineira_pipedrive",
         "quintoandar",
         "regions_polygon",
+        "reverse_atento",
         "reverse_tracksale",
         "reverse_nazare",
         "enrich_lost_listings",
