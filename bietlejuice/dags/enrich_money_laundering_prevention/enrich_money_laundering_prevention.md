@@ -13,6 +13,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following tables in enrich layer, via full load:
 
 - `client`
+- `document`
 - `house`
 - `listing`
 - `visit`

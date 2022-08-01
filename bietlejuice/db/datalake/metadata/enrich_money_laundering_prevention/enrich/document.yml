@@ -1,0 +1,22 @@
+---
+database_name: datalake_money_laundering_prevention
+table_name: document
+columns:
+  id_document:
+    lineage:
+      - datalake_docx_clean.document.id
+  id_proposal:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_proposal
+  document_type:
+    lineage:
+      - datalake_docx_clean.document_type.name
+  attributes:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  attachments:
+    lineage:
+      - datalake_docx_clean.document.attachments
+  document_context:
+    lineage:
+      - datalake_docx_clean.document_context.name
