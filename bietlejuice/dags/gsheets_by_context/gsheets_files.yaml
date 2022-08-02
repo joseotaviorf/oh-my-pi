@@ -601,6 +601,12 @@ offline_and_branding_marketing_costs:
     clean_table_name: offline_and_branding_marketing_costs
     sheet_context: static
 
+pld_suspicion_list:
+    sheet_id: 1sBdfDJqd6y1xS7fI31e0YfnSc4LahTWOhnmo-d1UAw0
+    sheet_name: suspicion_list_dl
+    clean_table_name: pld_suspicion_list
+    sheet_context: static
+
 # sale_nbp_source_targets:
 #     sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
 #     sheet_name: sale_nbp_source_targets

@@ -35,6 +35,7 @@ This pipeline produces the following output tables:
     - `for_sale_segmentation_survey`
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
+    - `pld_suspicion_list`
     - `rental_tof_monthly_targets`
     <!-- - `sale_nbp_source_targets` -->
     - `supply_targets_2019`
@@ -62,6 +63,7 @@ This pipeline produces the following output tables:
     - `legal_base_docato`
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
+    - `pld_suspicion_list`
     - `rental_tof_monthly_targets`
     <!-- - `sale_nbp_source_targets` -->
     - `supply_targets_2019`

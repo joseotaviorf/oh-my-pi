@@ -1,0 +1,55 @@
+---
+database_name: datalake_gsheets_clean
+table_name: pld_suspicion_list
+columns:
+  id_suspicion:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.id
+  name:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.nome_novo
+  old_name:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.nome_antigo
+  money_laundering_risk:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.risco_de_pld
+  suspicion_type:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.tipo_de_situacao
+  ref_jira:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.ref_jira
+  ref_siscoaf:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.ref_siscoaf
+  newops:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.newops
+  legaut:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.legaut
+  sorting:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.triagem
+  confection:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.confeccao
+  diligence_risk:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.risk_diligencia
+  crn:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.crn
+  cri:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.cri
+  funded:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.financiado
+  prompt_payment:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.a_vista
+  banks:
+    lineage:
+      - datalake_gsheets_raw.pld_suspicion_list.bancos
