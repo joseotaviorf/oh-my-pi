@@ -11,8 +11,8 @@ contract_docusign_signed_conversions AS (
         csa.utm_content,
         csa.utm_term,
         clofhl.sk_region
-    FROM datalake_amplitude_page_viewed_events.contract_docusign_signed_events csa
-    LEFT JOIN dw_public.fact_house_listings clofhl
+    FROM datalake_amplitude_page_viewed_events_prod.contract_docusign_signed_events csa
+    LEFT JOIN datalake_clean.ods_fact_house_listings clofhl
         ON CAST(csa.id_house AS INTEGER) = CAST(clofhl.sk_house_listing AS BIGINT) / 1000
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
@@ -41,7 +41,7 @@ pre_events AS (
       utm_content,
       utm_term,
       ts_event
-    FROM datalake_amplitude_page_viewed_events.listing_page_viewed
+    FROM datalake_amplitude_page_viewed_events_prod.listing_page_viewed
     UNION ALL
     SELECT
       id_amplitude,
@@ -53,7 +53,7 @@ pre_events AS (
       utm_content,
       utm_term,
       ts_event
-    FROM datalake_amplitude_page_viewed_events.home_page_viewed
+    FROM datalake_amplitude_page_viewed_events_prod.home_page_viewed
     UNION ALL
     SELECT
       id_amplitude,
@@ -65,7 +65,7 @@ pre_events AS (
       utm_content,
       utm_term,
       ts_event
-    FROM datalake_amplitude_page_viewed_events.search_results_page_viewed
+    FROM datalake_amplitude_page_viewed_events_prod.search_results_page_viewed
     UNION ALL
     SELECT
       id_amplitude,
@@ -77,7 +77,7 @@ pre_events AS (
       utm_content,
       utm_term,
       ts_event
-    FROM datalake_amplitude_page_viewed_events.schedule_page_viewed
+    FROM datalake_amplitude_page_viewed_events_prod.schedule_page_viewed
     UNION ALL
     SELECT
       id_amplitude,
