@@ -11,7 +11,10 @@ columns:
   id_house:
     lineage:
       - datalake_amplitude_clean_staging.170698_contract_docusign_signed_events.ep_house_id
-  country:
+  country_code:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_contract_docusign_signed_events.user_properties
+  user_country:
     lineage:
       - datalake_amplitude_clean_staging.170698_contract_docusign_signed_events.country
   utm_source:

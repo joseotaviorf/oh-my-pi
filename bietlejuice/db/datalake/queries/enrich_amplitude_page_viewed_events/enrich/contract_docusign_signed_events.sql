@@ -2,7 +2,8 @@ select
     coalesce(merged_amplitude_id, id_amplitude) as id_amplitude,
     id_session,
     ep_house_id as id_house,
-    damcs.country,
+    GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
+    damcs.country AS user_country,
     up_utm_source as utm_source,
     up_utm_medium as utm_medium,
     up_utm_campaign as utm_campaign,
@@ -14,4 +15,4 @@ left join datalake_amplitude_raw.`170698_user_merge` amu
     on damcs.id_amplitude = amu.amplitude_id
 where date(cast(year as string) || '-' || cast(month as string) || '-' || cast(day as string)) >= current_date - interval '3' month
     and platform = 'Web'
-group by 10,1,2,3,4,5,6,7,8,9
+group by 11,1,2,3,4,5,6,7,8,9,10

@@ -4,7 +4,8 @@ with contract_docusign_signed_conversions as (
     csa.id_amplitude,
     csa.id_session,
     csa.id_house,
-    csa.country,
+    csa.country_code,
+    csa.user_country,
     csa.utm_source,
     csa.utm_medium,
     csa.utm_campaign,
@@ -14,14 +15,15 @@ with contract_docusign_signed_conversions as (
   from datalake_amplitude_page_viewed_events_prod.contract_docusign_signed_events csa
   left join datalake_clean.ods_fact_house_listings clofhl
     on cast(csa.id_house as integer) = cast(clofhl.sk_house_listing as BIGINT) / 1000
-  group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+  group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 contract_docusign_signed_sessions as (
   select distinct
     csc.id_amplitude,
     csc.id_session,
     csc.id_house,
-    csc.country,
+    csa.country_code,
+    csa.user_country,
     csc.utm_source,
     csc.utm_medium,
     csc.utm_campaign,
@@ -29,7 +31,7 @@ contract_docusign_signed_sessions as (
     csc.utm_term,
     min(csc.ts_event) as ts_event
   from contract_docusign_signed_conversions csc
-  group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+  group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 pre_events as (
   select
