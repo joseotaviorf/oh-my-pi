@@ -1,57 +1,95 @@
-with contract_docusign_signed_conversions as (
-  select distinct
-    csa.ts_event,
-    csa.id_amplitude,
-    csa.id_session,
-    csa.id_house,
-    csa.country_code,
-    csa.user_country,
-    csa.utm_source,
-    csa.utm_medium,
-    csa.utm_campaign,
-    csa.utm_content,
-    csa.utm_term,
-    clofhl.sk_region
-  from datalake_amplitude_page_viewed_events_prod.contract_docusign_signed_events csa
-  left join datalake_clean.ods_fact_house_listings clofhl
-    on cast(csa.id_house as integer) = cast(clofhl.sk_house_listing as BIGINT) / 1000
-  group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+WITH 
+contract_docusign_signed_conversions AS (
+    SELECT
+        csa.ts_event,
+        csa.id_amplitude,
+        csa.id_session,
+        csa.id_house,
+        csa.utm_source,
+        csa.utm_medium,
+        csa.utm_campaign,
+        csa.utm_content,
+        csa.utm_term,
+        clofhl.sk_region
+    FROM datalake_amplitude_page_viewed_events.contract_docusign_signed_events csa
+    LEFT JOIN dw_public.fact_house_listings clofhl
+        ON CAST(csa.id_house AS INTEGER) = CAST(clofhl.sk_house_listing AS BIGINT) / 1000
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
-contract_docusign_signed_sessions as (
-  select distinct
+contract_docusign_signed_sessions AS (
+  SELECT
     csc.id_amplitude,
     csc.id_session,
     csc.id_house,
-    csa.country_code,
-    csa.user_country,
     csc.utm_source,
     csc.utm_medium,
     csc.utm_campaign,
     csc.utm_content,
     csc.utm_term,
-    min(csc.ts_event) as ts_event
-  from contract_docusign_signed_conversions csc
-  group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    min(csc.ts_event) AS ts_event
+  FROM contract_docusign_signed_conversions csc
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
 ),
-pre_events as (
-  select
-    *
-  from datalake_amplitude_page_viewed_events_prod.listing_page_viewed
-  union all
-    select
-      *
-    from datalake_amplitude_page_viewed_events_prod.home_page_viewed
-  union all
-    select
-      *
-    from datalake_amplitude_page_viewed_events_prod.search_results_page_viewed
-  union all
-    select
-      *
-    from datalake_amplitude_page_viewed_events_prod.schedule_page_viewed
-  union all
-    select *
-    from contract_docusign_signed_sessions
+pre_events AS (
+    SELECT
+      id_amplitude,
+      id_session,
+      id_house,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
+      ts_event
+    FROM datalake_amplitude_page_viewed_events.listing_page_viewed
+    UNION ALL
+    SELECT
+      id_amplitude,
+      id_session,
+      id_house,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
+      ts_event
+    FROM datalake_amplitude_page_viewed_events.home_page_viewed
+    UNION ALL
+    SELECT
+      id_amplitude,
+      id_session,
+      id_house,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
+      ts_event
+    FROM datalake_amplitude_page_viewed_events.search_results_page_viewed
+    UNION ALL
+    SELECT
+      id_amplitude,
+      id_session,
+      id_house,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
+      ts_event
+    FROM datalake_amplitude_page_viewed_events.schedule_page_viewed
+    UNION ALL
+    SELECT
+      id_amplitude,
+      id_session,
+      id_house,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
+      ts_event
+    FROM contract_docusign_signed_sessions
 ),
 first_event_on_session as (
   select
