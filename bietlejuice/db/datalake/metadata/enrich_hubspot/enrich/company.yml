@@ -86,6 +86,9 @@ columns:
   tag_real_estate_agency:
     lineage:
       - datalake_hubspot.company_history.tag_real_estate_agency
+  extracted_3p_tag:
+    lineage:
+      - datalake_hubspot.company_history.extracted_3p_tag
   lead_origin:
     lineage:
       - datalake_hubspot.company_history.lead_origin

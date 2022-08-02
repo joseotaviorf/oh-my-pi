@@ -33,6 +33,7 @@ SELECT
     unified_discard_reasons,
     name,
     tag_real_estate_agency,
+    extracted_3p_tag,
     lead_origin,
     phone,
     partnership_type,

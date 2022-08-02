@@ -86,6 +86,9 @@ columns:
   tag_real_estate_agency:
     lineage:
       - datalake_hubspot_clean.company.properties
+  extracted_3p_tag:
+    lineage:
+      - datalake_hubspot_clean.company.properties
   lead_origin:
     lineage:
       - datalake_hubspot_clean.company.properties
