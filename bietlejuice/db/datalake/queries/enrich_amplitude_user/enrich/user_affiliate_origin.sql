@@ -2,6 +2,7 @@ with amplitude_affiliate_tracking as(
 	with amplitude_events as (
     SELECT DISTINCT
         id_user,
+        GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
         get_json_object(user_properties, '$.utm_source') as utm_source,
         get_json_object(user_properties, '$.utm_medium') as utm_medium,
         get_json_object(user_properties, '$.utm_campaign') as utm_campaign,
@@ -27,6 +28,7 @@ with amplitude_affiliate_tracking as(
 )
 select
 	id_user,
+	country_code,
 	utm_source,
 	utm_medium,
 	utm_campaign,
@@ -47,7 +49,7 @@ select
 	utm_term,
 	platform,
 	device_type,
-	country,
+	country AS user_country,
 	region,
 	city,
 	ts_client_event

@@ -18,7 +18,7 @@ WITH affiliates_full AS (
     uao.city_campaign,
     uao.platform AS tracking_platform,
     uao.device_type AS tracking_device_type,
-    uao.country AS tracking_country,
+    uao.user_country AS tracking_country,
     uao.region AS tracking_state,
     uao.city AS tracking_city,
     ad.ts_operation_start,

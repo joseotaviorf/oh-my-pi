@@ -49,7 +49,7 @@ columns:
       - datalake_amplitude_user.user_affiliate_origin.device_type
   tracking_country:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.country
+      - datalake_amplitude_user.user_affiliate_origin.user_country
   tracking_state:
     lineage:
       - datalake_amplitude_user.user_affiliate_origin.region
