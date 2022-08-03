@@ -1,6 +1,6 @@
 ---
 database_name: datalake_open_external_data
-table_name: itbi_sp
+table_name: itbi_sp_residential_transactions
 columns:
   iptu_sql_registration_number:
     lineage:

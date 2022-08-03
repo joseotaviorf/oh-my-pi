@@ -17,6 +17,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables in `datalake_open_external_data`:
 
 **Fully:**
-- `itbi_sp`
+- `itbi_sp_residential_transactions`
 
 </details>
