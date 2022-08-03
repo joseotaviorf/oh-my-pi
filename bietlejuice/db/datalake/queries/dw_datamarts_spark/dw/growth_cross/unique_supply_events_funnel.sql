@@ -14,8 +14,10 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
-	h.partner_3p_supply AS supply_3p_partner,
-	CASE WHEN h.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	rbh.partner AS supply_3pbh_partner,
+	CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
   	COUNT(lf.sk_lead_date) AS leads,
 	CAST(NULL AS BIGINT) AS prospects,
 	CAST(NULL AS BIGINT) AS qualifieds,
@@ -29,8 +31,10 @@ LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
 LEFT JOIN datalake_3p.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
+LEFT JOIN datalake_3p.houses_3p_bh AS rbh
+  ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 prospect AS (
 SELECT
@@ -49,6 +53,8 @@ SELECT
 	funnel_drop_reason,
 	hp.partner AS supply_3p_partner,
 	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	rbh.partner AS supply_3pbh_partner,
+	CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
 	CAST(NULL AS BIGINT) AS leads,
 	COUNT(lf.sk_prospect_date) AS prospects, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	CAST(NULL AS BIGINT) AS qualifieds,
@@ -62,8 +68,10 @@ LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
 LEFT JOIN datalake_3p.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
+LEFT JOIN datalake_3p.houses_3p_bh AS rbh
+  ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE-- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 qualified AS (
 SELECT
@@ -82,6 +90,8 @@ SELECT
 	funnel_drop_reason,
 	hp.partner AS supply_3p_partner,
 	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	rbh.partner AS supply_3pbh_partner,
+	CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
 	CAST(NULL AS BIGINT) AS leads,
 	CAST(NULL AS BIGINT) AS prospects,
 	COUNT(lf.sk_qualified_date) AS qualifieds, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
@@ -95,8 +105,10 @@ LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
 LEFT JOIN datalake_3p.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
+LEFT JOIN datalake_3p.houses_3p_bh AS rbh
+  ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 opportunity AS (
 SELECT
@@ -115,6 +127,8 @@ SELECT
 	funnel_drop_reason,
 	hp.partner AS supply_3p_partner,
 	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	rbh.partner AS supply_3pbh_partner,
+	CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
 	CAST(NULL AS BIGINT) AS leads,
 	CAST(NULL AS BIGINT) AS prospects,
 	CAST(NULL AS BIGINT) AS qualifieds,
@@ -128,8 +142,10 @@ LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
 LEFT JOIN datalake_3p.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
+LEFT JOIN datalake_3p.houses_3p_bh AS rbh
+  ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 listing AS (
 SELECT
@@ -148,6 +164,8 @@ SELECT
 	funnel_drop_reason,
 	hp.partner AS supply_3p_partner,
 	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	rbh.partner AS supply_3pbh_partner,
+	CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
   	CAST(NULL AS BIGINT) AS leads,
 	CAST(NULL AS BIGINT) AS prospects,
 	CAST(NULL AS BIGINT) AS qualifieds,
@@ -161,8 +179,10 @@ LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
 LEFT JOIN datalake_3p.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
+LEFT JOIN datalake_3p.houses_3p_bh AS rbh
+  ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -191,6 +211,8 @@ SELECT
   ua.funnel_drop_reason,
   ua.supply_3p_partner,
   ua.is_3p_supply,
+  ua.supply_3pbh_partner,
+  ua.is_3pbh_supply,
   ua.leads,
   ua.prospects,
   ua.qualifieds,
@@ -225,7 +247,9 @@ SELECT
     rental_administrator,
     funnel_drop_reason,
     supply_3p_partner,
+    supply_3pbh_partner,
     is_3p_supply,
+    is_3pbh_supply,
     SUM(COALESCE(leads,0)) AS leads,
     SUM(COALESCE(prospects,0)) AS prospects,
     SUM(COALESCE(qualifieds,0)) AS qualifieds,
@@ -233,4 +257,4 @@ SELECT
     SUM(COALESCE(first_listings,0)) AS first_listings,
     current_timestamp AS ts_load
 FROM union_all_date
-GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17

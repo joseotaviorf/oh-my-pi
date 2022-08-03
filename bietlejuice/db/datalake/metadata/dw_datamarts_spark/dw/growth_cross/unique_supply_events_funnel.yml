@@ -49,3 +49,6 @@ columns:
   supply_3p_partner:
     lineage:
       - datalake_3p.houses_3p.partner
+  supply_3pbh_partner:
+    lineage:
+      - datalake_3p.houses_3p_bh.partner

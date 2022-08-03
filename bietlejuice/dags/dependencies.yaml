@@ -388,8 +388,9 @@ bietlejuice.dw_datamarts_growth_cross:
   # performance_marketing_metrics_imobiliaria_casa_mineira
   - bietlejuice.enrich_affiliates_cost_attributions:create-enrich-affiliates-cost-attributions-external-table
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
-  # unique_supply_funnel_events
-  - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
+  # unique_supply_funnel_events, unique_supply_cohort_conversions
+  - bietlejuice.enrich_3p:create-enrich-houses-3p-external-table
+  - bietlejuice.enrich_3p:create-enrich-houses-3p-bh-external-table
   # unique_performance_marketing_metrics_supply_coincident
   - bietlejuice.enrich_top_of_funnel_supply:create-enrich-top-of-funnel-supply-external-table
   - bietlejuice.gsheets:create-clean-tof-supply-targets-external-table

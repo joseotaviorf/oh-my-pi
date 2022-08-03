@@ -8,6 +8,10 @@ SELECT
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	rbh.partner AS supply_3pbh_partner,
+	CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
 	sales_company,
 	sourcing_ops,
 	origin_table,
@@ -25,6 +29,12 @@ JOIN
 LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
+LEFT JOIN
+    datalake_3p.houses_3p AS hp
+        ON hp.id_house = lf.sk_house_listing / 1000
+LEFT JOIN
+    datalake_3p.houses_3p_bh AS rbh
+        ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE  
 ),
@@ -36,13 +46,17 @@ SELECT
 	supply_mkt_origin,
 	supply_mkt_channel,
 	supply_mkt_completion,
+	supply_3p_partner,
+	is_3p_supply,
+	supply_3pbh_partner,
+	is_3pbh_supply,
 	sales_company,
 	sourcing_ops,
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
 	context_origin,
-	context_conversion, 
+	context_conversion,
 	CASE
 	    WHEN quantity_weeks_conversion < 0
 	        THEN 'W5+'
@@ -57,7 +71,7 @@ SELECT
 	NULL::BIGINT AS opp2fl
 FROM
     l2p_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
 ),
 p2q_pre AS (
 SELECT
@@ -68,6 +82,10 @@ SELECT
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	rbh.partner AS supply_3pbh_partner,
+	CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
 	sales_company,
 	sourcing_ops,
 	origin_table,
@@ -85,6 +103,12 @@ JOIN
 LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
+LEFT JOIN
+    datalake_3p.houses_3p AS hp
+        ON hp.id_house = lf.sk_house_listing / 1000
+LEFT JOIN
+    datalake_3p.houses_3p_bh AS rbh
+        ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE
 ),
@@ -96,6 +120,10 @@ SELECT
 	supply_mkt_origin,
 	supply_mkt_channel,
 	supply_mkt_completion,
+	supply_3p_partner,
+	is_3p_supply,
+	supply_3pbh_partner,
+	is_3pbh_supply,
 	sales_company,
 	sourcing_ops,
 	origin_table,
@@ -117,7 +145,7 @@ SELECT
 	NULL::BIGINT AS opp2fl
 FROM
 	p2q_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
 ),
 q2opp_pre AS (
 SELECT
@@ -128,6 +156,10 @@ SELECT
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	rbh.partner AS supply_3pbh_partner,
+	CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
 	sales_company,
 	sourcing_ops,
 	origin_table,
@@ -145,6 +177,12 @@ JOIN
 LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
+LEFT JOIN
+    datalake_3p.houses_3p AS hp
+        ON hp.id_house = lf.sk_house_listing / 1000
+LEFT JOIN
+    datalake_3p.houses_3p_bh AS rbh
+        ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE -- filter data from 4 years ago
 
@@ -157,6 +195,10 @@ SELECT
 	supply_mkt_origin,
 	supply_mkt_channel,
 	supply_mkt_completion,
+	supply_3p_partner,
+	is_3p_supply,
+	supply_3pbh_partner,
+	is_3pbh_supply,
 	sales_company,
 	sourcing_ops,
 	origin_table,
@@ -178,7 +220,7 @@ SELECT
 	NULL::BIGINT AS opp2fl
 FROM
 	q2opp_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
 ),
 opp2fl_pre AS (
 SELECT
@@ -189,6 +231,10 @@ SELECT
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	rbh.partner AS supply_3pbh_partner,
+	CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
 	sales_company,
 	sourcing_ops,
 	origin_table,
@@ -206,6 +252,12 @@ JOIN
 LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
+LEFT JOIN
+    datalake_3p.houses_3p AS hp
+        ON hp.id_house = lf.sk_house_listing / 1000
+LEFT JOIN
+    datalake_3p.houses_3p_bh AS rbh
+        ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE -- filter data from 4 years ago
 ),
@@ -217,6 +269,10 @@ SELECT
 	supply_mkt_origin,
 	supply_mkt_channel,
 	supply_mkt_completion,
+	supply_3p_partner,
+	is_3p_supply,
+	supply_3pbh_partner,
+	is_3pbh_supply,
 	sales_company,
 	sourcing_ops,
 	origin_table,
@@ -238,7 +294,7 @@ SELECT
 	COUNT(DISTINCT sk_house_listing) AS opp2fl
 FROM
 	opp2fl_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -256,6 +312,10 @@ SELECT
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
   ua.supply_mkt_completion,
+  ua.supply_3p_partner,
+  ua.is_3p_supply,
+  ua.supply_3pbh_partner,
+  ua.is_3pbh_supply,
   ua.sales_company,
   ua.sourcing_ops,
   ua.origin_table,
@@ -309,6 +369,10 @@ SELECT
   context_origin,
   context_conversion,
   weeks_conversion AS weeks_conversion,
+  supply_3p_partner,
+  supply_3pbh_partner,
+  is_3p_supply,
+  is_3pbh_supply,
   SUM(COALESCE(l2p,0)) AS l2p,
   SUM(COALESCE(p2q,0)) AS p2q,
   SUM(COALESCE(q2opp,0)) AS q2opp,
@@ -316,4 +380,4 @@ SELECT
   current_timestamp AS ts_load
 FROM
   union_all_date
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
