@@ -3,6 +3,8 @@ SELECT
     matricula AS registration_id,
     id_gestor AS manager_id,
     numero_centro_de_custo AS cost_center_id,
+    cargo_id AS position_id,
+    classe_cargo_id AS position_class_name,
     nome AS name,
     email,
     status,
@@ -39,6 +41,7 @@ SELECT
         WHEN pepa = 'sim' THEN True
         ELSE False
     END AS is_pepa,
+    CAST(inicio_no_cargo AS DATE) AS dt_started_position,
     CAST(ts_load AS DATE) AS dt_last_update
 FROM
     datalake_gsheets_raw.base_hierarquia

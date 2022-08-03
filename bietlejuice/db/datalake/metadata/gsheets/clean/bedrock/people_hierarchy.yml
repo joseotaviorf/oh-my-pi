@@ -14,6 +14,12 @@ columns:
   cost_center_id:
     lineage:
       - datalake_gsheets_raw.base_hierarquia.numero_centro_de_custo
+  position_id:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.cargo_id
+  position_class_name:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.classe_cargo_id
   name:
     lineage:
       - datalake_gsheets_raw.base_hierarquia.nome
@@ -110,6 +116,9 @@ columns:
   l8:
     lineage:
       - datalake_gsheets_raw.base_hierarquia.l8
+  dt_started_position:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.inicio_no_cargo
   dt_last_update:
     lineage:
       - datalake_gsheets_raw.base_hierarquia.dt_last_update
