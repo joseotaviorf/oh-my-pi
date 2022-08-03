@@ -1858,6 +1858,7 @@ bietlejuice.enrich_rental_guarantee:
 bietlejuice.enrich_repair_services:
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
+  - bietlejuice.gsheets:load-clean-service-city-holidays
 
 bietlejuice.enrich_rental_listing_metrics:
   - bietlejuice.dw_contract:load-dw-staging-public-dim-contract

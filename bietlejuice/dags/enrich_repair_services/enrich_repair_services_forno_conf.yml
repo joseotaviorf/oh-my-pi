@@ -1,0 +1,4 @@
+---
+inner_dependencies:
+  repair_tickets_metrics:
+    - repair_tickets

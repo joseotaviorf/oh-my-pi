@@ -10,10 +10,12 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.utils.helpers import chain
 
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
+
 
 # ENV setup
 ENV = os.environ.get("ENVIRONMENT")
@@ -61,6 +63,8 @@ dag = DAG(
     ),
 )
 
+inner_dependencies = config_service.get_config("inner_dependencies")
+
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
@@ -88,5 +92,23 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     target_database_base_name=CONTEXT,
 )
 
-chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
-chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=inner_dependencies,
+)
+
+chain(
+    create_cluster_task,
+    DatalakeTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
+)
+
+chain(
+    DatalakeTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
+)

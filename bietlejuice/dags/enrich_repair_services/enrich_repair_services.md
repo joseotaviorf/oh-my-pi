@@ -15,6 +15,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table on Enrich layer:
 
 - `repair_tickets` (full load)
+- `repair_tickets_metrics` (full load)
 
 ### Responsible Data Engineering Team
 
