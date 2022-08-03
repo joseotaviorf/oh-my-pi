@@ -2,6 +2,7 @@ WITH ongoing_tickets AS (
     SELECT
         tf.id_ticket,
         tfm.id_user,
+        tfm.id_zendesk_requester_user,
         tfm.user_name,
         tf.group_name,
         REPLACE(REPLACE(tf.custom_fields, ']', ''),'[', '') AS custom_fields,
@@ -26,6 +27,7 @@ SELECT
     GET_JSON_OBJECT(ot.custom_fields, '$.Código do imóvel') AS id_house,
     GET_JSON_OBJECT(ot.custom_fields, '$.PAR Código do band-aid') AS id_band_aid,
     ot.id_user AS id_provider,
+    ot.id_zendesk_requester_user AS id_zendesk_provider,
     ot.user_name AS provider_name,
     ot.group_name,
     ot.status,

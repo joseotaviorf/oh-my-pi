@@ -24,6 +24,9 @@ columns:
     id_provider:
         lineage:
             - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
+    id_zendesk_provider:
+        lineage:
+            - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_zendesk_requester_user
     provider_name:
         lineage:
             - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.user_name
