@@ -10,4 +10,4 @@ columns:
       - datalake_ebdb_listing.house.internal_admin_info
   partner:
     lineage:
-      - datalake_ebdb_listing.house.internal_admin_info
+      - datalake_ebdb_listing.house.partner_3p_supply
