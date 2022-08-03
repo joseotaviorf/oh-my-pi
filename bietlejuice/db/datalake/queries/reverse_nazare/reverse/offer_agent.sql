@@ -47,7 +47,7 @@ cte_fifity_name AS (
 cte_executivo_associado AS (
     SELECT DISTINCT
         dim.sk_offer,
-        du.sk_user AS sk_user_rh,
+        du.sk_user::INT AS sk_user_rh,
         'Executivo Associado' AS partner_type
     FROM
         dw_sale.dim_offer dim

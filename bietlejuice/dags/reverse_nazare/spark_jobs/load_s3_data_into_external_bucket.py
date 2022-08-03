@@ -95,7 +95,9 @@ if __name__ == "__main__":
                 f'{table}_{(execution_date.strftime("%Y-%m-%d %H:%M:%S%z"))}.csv'
             )
             with io.StringIO() as csv_buffer:
-                df.toPandas().to_csv(csv_buffer, index=False, header=True)
+                df.toPandas().convert_dtypes().to_csv(
+                    csv_buffer, index=False, header=True
+                )
 
                 response = s3_client.put_object(
                     Bucket=external_bucket,
