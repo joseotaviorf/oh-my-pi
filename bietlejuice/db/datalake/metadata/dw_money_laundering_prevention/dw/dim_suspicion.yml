@@ -1,0 +1,10 @@
+---
+database_name: dw_money_laundering_prevention
+table_name: dim_suspicion
+columns:
+  sk_suspicion:
+    lineage:
+      - datalake_gsheets_clean.pld_suspicion_list.id_suspicion
+  name:
+    lineage:
+      - datalake_gsheets_clean.pld_suspicion_list.name
