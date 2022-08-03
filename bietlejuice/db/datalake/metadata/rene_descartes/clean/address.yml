@@ -4,6 +4,9 @@ columns:
   id:
     lineage:
       - datalake_rene_descartes_raw.address.id
+  country_code:
+    lineage:
+      - datalake_rene_descartes_raw.address.country
   zip:
     lineage:
       - datalake_rene_descartes_raw.address.zip

@@ -1,5 +1,6 @@
 SELECT
     id,
+    country AS country_code,
     zip,
     state,
     city,
