@@ -250,31 +250,16 @@ if __name__ == "__main__":
     dfs = {"itau": [], "bradesco": [], "citi": []}
 
     for i in infos_sheets:
-        after_2021 = False if "2021" in i["name"] else True
-        engine = None if "xlsb" not in i["name"] else "pyxlsb"
-        if "Terceiros" in i["name"]:
-            sheetname = (
-                str(datetime.now().year)
-                if str(datetime.now().year) in i["name"]
-                else str(datetime.now().year - 1)
-            )
-            usecols = columns_to_read + ["Itaú"]
-            usecols = usecols if after_2021 else usecols + ["Description"]
-            df = pd.read_excel(
-                __drive_file_download(gdrive_client, i["id"]),
-                dtype=str,
-                header=1,
-                sheet_name=sheetname,
-                usecols=usecols,
-                engine=engine,
-            )
-            df = spark_client.create_dataframe(df, __generate_schema(df))
-            if after_2021:
-                df = df.withColumn("Description", functions.lit(None))
-            dfs["itau"].append(df)
-        else:
-            for sheetname in ["Bradesco", "Citi"]:
-                usecols = columns_to_read + [sheetname]
+        if not i["name"].lower().endswith(".tmp"):
+            after_2021 = False if "2021" in i["name"] else True
+            engine = None if "xlsb" not in i["name"] else "pyxlsb"
+            if "Terceiros" in i["name"]:
+                sheetname = (
+                    str(datetime.now().year)
+                    if str(datetime.now().year) in i["name"]
+                    else str(datetime.now().year - 1)
+                )
+                usecols = columns_to_read + ["Itaú"]
                 usecols = usecols if after_2021 else usecols + ["Description"]
                 df = pd.read_excel(
                     __drive_file_download(gdrive_client, i["id"]),
@@ -287,7 +272,23 @@ if __name__ == "__main__":
                 df = spark_client.create_dataframe(df, __generate_schema(df))
                 if after_2021:
                     df = df.withColumn("Description", functions.lit(None))
-                dfs[sheetname.lower()].append(df)
+                dfs["itau"].append(df)
+            else:
+                for sheetname in ["Bradesco", "Citi"]:
+                    usecols = columns_to_read + [sheetname]
+                    usecols = usecols if after_2021 else usecols + ["Description"]
+                    df = pd.read_excel(
+                        __drive_file_download(gdrive_client, i["id"]),
+                        dtype=str,
+                        header=1,
+                        sheet_name=sheetname,
+                        usecols=usecols,
+                        engine=engine,
+                    )
+                    df = spark_client.create_dataframe(df, __generate_schema(df))
+                    if after_2021:
+                        df = df.withColumn("Description", functions.lit(None))
+                    dfs[sheetname.lower()].append(df)
 
     # Create a pattern and union all sheets
     df_itau = (
