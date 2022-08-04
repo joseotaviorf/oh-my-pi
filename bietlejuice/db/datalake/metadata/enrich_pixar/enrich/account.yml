@@ -1,0 +1,30 @@
+database_name: datalake_pixar
+table_name: account
+columns:
+  id:
+    lineage:
+      - datalake_pixar_clean.account.id
+  id_charge:
+    lineage:
+      - datalake_pixar_clean.account.id_charge
+  amount:
+    lineage:
+      - datalake_pixar_clean.account.amount
+  status:
+    lineage:
+      - datalake_pixar_clean.account.status
+  ts_created:
+    lineage:
+      - datalake_pixar_clean.account.ts_created
+  ts_updated:
+    lineage:
+      - datalake_pixar_clean.account.ts_updated
+  year:
+    lineage:
+      - datalake_pixar_clean.account.year
+  month:
+    lineage:
+      - datalake_pixar_clean.account.month
+  day:
+    lineage:
+      - datalake_pixar_clean.account.day

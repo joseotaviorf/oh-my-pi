@@ -1800,6 +1800,11 @@ bietlejuice.enrich_online_attribution:
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
 
+bietlejuice.enrich_pixar:
+  - bietlejuice.pixar:load-clean-account
+  - bietlejuice.pixar:load-clean-charge
+  - bietlejuice.pixar:load-clean-refund
+
 bietlejuice.enrich_pro_owners:
   - bietlejuice.ebdb:create-clean-conversion-lead-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake

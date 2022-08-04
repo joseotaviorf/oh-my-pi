@@ -1,0 +1,51 @@
+database_name: datalake_pixar
+table_name: charge
+columns:
+  id:
+    lineage:
+      - datalake_pixar_clean.charge.id
+  id_account:
+    lineage:
+      - datalake_pixar_clean.charge.id_account
+  id_external:
+    lineage:
+      - datalake_pixar_clean.charge.id_external
+  id_transaction:
+    lineage:
+      - datalake_pixar_clean.charge.id_transaction
+  id_bank_payment:
+    lineage:
+      - datalake_pixar_clean.charge.id_bank_payment
+  pix_link:
+    lineage:
+      - datalake_pixar_clean.charge.pix_link
+  pix_emv:
+    lineage:
+      - datalake_pixar_clean.charge.pix_emv
+  amount:
+    lineage:
+      - datalake_pixar_clean.charge.amount
+  bank_fee:
+    lineage:
+      - datalake_pixar_clean.charge.bank_fee
+  status:
+    lineage:
+      - datalake_pixar_clean.charge.status
+  dt_limit:
+    lineage:
+      - datalake_pixar_clean.charge.dt_limit
+  ts_created:
+    lineage:
+      - datalake_pixar_clean.charge.ts_created
+  ts_updated:
+    lineage:
+      - datalake_pixar_clean.charge.ts_updated
+  year:
+    lineage:
+      - datalake_pixar_clean.charge.year
+  month:
+    lineage:
+      - datalake_pixar_clean.charge.month
+  day:
+    lineage:
+      - datalake_pixar_clean.charge.day

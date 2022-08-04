@@ -1,0 +1,33 @@
+database_name: datalake_pixar
+table_name: refund
+columns:
+  id:
+    lineage:
+      - datalake_pixar_clean.refund.id
+  pix_key:
+    lineage:
+      - datalake_pixar_clean.refund.pix_key
+  requested_by:
+    lineage:
+      - datalake_pixar_clean.refund.requested_by
+  bank_name:
+    lineage:
+      - datalake_pixar_clean.refund.bank_name
+  bank_fee:
+    lineage:
+      - datalake_pixar_clean.refund.bank_fee
+  ts_created:
+    lineage:
+      - datalake_pixar_clean.refund.ts_created
+  ts_updated:
+    lineage:
+      - datalake_pixar_clean.refund.ts_updated
+  year:
+    lineage:
+      - datalake_pixar_clean.refund.year
+  month:
+    lineage:
+      - datalake_pixar_clean.refund.month
+  day:
+    lineage:
+      - datalake_pixar_clean.refund.day
