@@ -1,0 +1,116 @@
+---
+database_name: datalake_repair_services
+table_name: repair_tickets_follow_up
+columns:
+    id_ticket_cx:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.id_ticket_cx
+    id_ticket:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.id_ticket
+            - datalake_repair_services.repair_tickets_metrics.id_ticket_follow_up
+    id_ticket_initial:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.id_ticket
+    id_ticket_referential:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.id_ticket_referential
+    id_contract:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.id_contract
+    id_provider:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.id_provider
+    id_zendesk_provider:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.id_zendesk_provider
+    budgeting_status:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.budgeting_status
+    execution_status:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.execution_status
+    repair_form:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.repair_form
+    ldt_opening:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_opening
+    ldt_budget_submission:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_budget_submission
+    ldt_visit_scheduling:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_visit_scheduling
+    ldt_start_visit:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_start_visit
+    ldt_technical_visit:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_technical_visit
+    ldt_budget_receipt:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_budget_receipt
+    ldt_sent_to_cx:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_sent_to_cx
+    ldt_cx_return_with_approval:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_cx_return_with_approval
+    ldt_start_service_scheduling:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_start_service_scheduling
+    ldt_service_scheduling:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_service_scheduling
+    ldt_start_execution:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_start_execution
+    ldt_execution_repair:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_execution_repair
+    ldt_execution:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.ldt_execution
+    frt:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.frt
+    is_sla_budget_sent:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.is_sla_budget_sent
+    is_sla_budgeting:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.is_sla_budgeting
+    is_sla_execution:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.is_sla_execution
+    dt_budget_submission_to_cx:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.dt_budget_submission_to_cx
+    dt_cx_disapproval_returned:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.dt_cx_disapproval_returned
+    dt_cx_approval_communication_for_ps:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.dt_cx_approval_communication_for_ps
+    dt_budget_request_submitted:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.dt_budget_request_submitted
+    dt_budget_submission_by_ps:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.dt_budget_submission_by_ps
+    dt_repair_completion:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.dt_repair_completion
+    dt_service_started:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.dt_service_started
+    dt_cx_created:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.dt_created
+    dt_initial_created:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.dt_created
+    dt_created:
+        lineage:
+            - datalake_repair_services.repair_tickets_metrics.dt_created
