@@ -1817,6 +1817,9 @@ bietlejuice.enrich_quinto_messenger:
   - bietlejuice.quinto_messenger:load-clean-task
   - bietlejuice.quinto_messenger:load-clean-task-event
 
+bietlejuice.enrich_rede_company:
+  - bietlejuice.enrich_hubspot:load-enrich-company
+
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:create-clean-country-in-data-lake
   - bietlejuice.ebdb:create-clean-region-in-data-lake

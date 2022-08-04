@@ -1,0 +1,7 @@
+---
+database_name: datalake_rede_company
+table_name: company_sks
+columns:
+  id_hubspot:
+    lineage:
+      - datalake_hubspot.company.id_company
