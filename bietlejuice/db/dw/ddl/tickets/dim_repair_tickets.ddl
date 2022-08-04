@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS tickets.dim_repair_tickets (
     additional_repair VARCHAR (50),
     is_budget_visit_required BOOLEAN,
     is_service_guarantee BOOLEAN,
-    dt_created DATE,
+    dt_created DATE
 );
 ALTER TABLE tickets.dim_repair_tickets OWNER TO airflow;

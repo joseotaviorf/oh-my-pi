@@ -36,6 +36,6 @@ CREATE TABLE IF NOT EXISTS tickets.fact_repair_tickets (
     dt_service_started DATE,
     dt_cx_created DATE,
     dt_initial_created DATE,
-    dt_created DATE,
+    dt_created DATE
 );
 ALTER TABLE tickets.fact_repair_tickets OWNER TO airflow;
