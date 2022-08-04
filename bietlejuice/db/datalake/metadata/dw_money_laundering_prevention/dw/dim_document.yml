@@ -1,0 +1,22 @@
+---
+database_name: dw_money_laundering_prevention
+table_name: dim_document
+columns:
+  sk_document:
+    lineage:
+      - datalake_money_laundering_prevention.document.id_document
+  sk_proposal:
+    lineage:
+      - datalake_money_laundering_prevention.document.id_proposal
+  document_type:
+    lineage:
+      - datalake_money_laundering_prevention.document.document_type
+  attributes:
+    lineage:
+      - datalake_money_laundering_prevention.document.attributes
+  attachments:
+    lineage:
+      - datalake_money_laundering_prevention.document.attachments
+  document_context:
+    lineage:
+      - datalake_money_laundering_prevention.document.document_context

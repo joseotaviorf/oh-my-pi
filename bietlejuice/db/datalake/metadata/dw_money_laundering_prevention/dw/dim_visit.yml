@@ -1,0 +1,32 @@
+---
+database_name: dw_money_laundering_prevention
+table_name: dim_visit
+columns:
+  sk_visit:
+    lineage:
+      - datalake_money_laundering_prevention.visit.id_visit
+  email:
+    lineage:
+      - datalake_money_laundering_prevention.visit.email
+  visit_type:
+    lineage:
+      - datalake_money_laundering_prevention.visit.visit_type
+  status:
+    lineage:
+      - datalake_money_laundering_prevention.visit.status
+  cancellation_reason_category:
+    lineage:
+      - datalake_money_laundering_prevention.visit.cancellation_reason_category
+  responsible:
+    lineage:
+      - datalake_money_laundering_prevention.visit.responsible
+  ts_visit:
+    lineage:
+      - datalake_money_laundering_prevention.visit.ts_visit
+  ts_visit_scheduling:
+    lineage:
+      - datalake_money_laundering_prevention.visit.ts_visit_scheduling
+  ts_visit_cancellation:
+    lineage:
+      - datalake_money_laundering_prevention.visit.ts_visit_cancellation
+

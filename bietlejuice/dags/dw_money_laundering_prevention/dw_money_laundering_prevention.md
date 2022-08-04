@@ -14,7 +14,12 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 This pipeline produces the following output table in DW, via full load: 
 
+- `dim_client`
+- `dim_document`
+- `dim_house`
+- `dim_listing`
 - `dim_suspicion`
+- `dim_visit`
 
 
 </details>

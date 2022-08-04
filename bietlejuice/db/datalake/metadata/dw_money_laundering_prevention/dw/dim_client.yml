@@ -1,0 +1,43 @@
+---
+database_name: dw_money_laundering_prevention
+table_name: dim_client
+columns:
+  sk_client:
+    lineage:
+      - datalake_money_laundering_prevention.client.client_id
+  client_name:
+    lineage:
+      - datalake_money_laundering_prevention.client.client_name
+  client_email:
+    lineage:
+      - datalake_money_laundering_prevention.client.client_email
+  client_type:
+    lineage:
+      - datalake_money_laundering_prevention.client.client_type
+  client_cpf_cnpj:
+    lineage:
+      - datalake_money_laundering_prevention.client.client_cpf_cnpj
+  residence_country:
+    lineage:
+      - datalake_money_laundering_prevention.client.residence_country
+  occupation_area:
+    lineage:
+      - datalake_money_laundering_prevention.client.occupation_area
+  income_nature:
+    lineage:
+      - datalake_money_laundering_prevention.client.income_nature
+  monthly_income:
+    lineage:
+      - datalake_money_laundering_prevention.client.monthly_income
+  ts_credit_evaluation_created:
+    lineage:
+      - datalake_money_laundering_prevention.client.ts_credit_evaluation_created
+  ts_credit_evaluation_updated:
+    lineage:
+      - datalake_money_laundering_prevention.client.ts_credit_evaluation_updated
+  ts_user_created:
+    lineage:
+      - datalake_money_laundering_prevention.client.ts_user_created
+  ts_user_updated:
+    lineage:
+      - datalake_money_laundering_prevention.client.ts_user_updated

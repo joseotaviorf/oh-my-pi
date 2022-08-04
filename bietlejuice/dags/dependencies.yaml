@@ -910,6 +910,14 @@ bietlejuice.dw_listing_owners:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user
 
+bietlejuice.dw_money_laundering_prevention:
+  - bietlejuice.enrich_money_laundering_prevention:load-enrich-client
+  - bietlejuice.enrich_money_laundering_prevention:load-enrich-document
+  - bietlejuice.enrich_money_laundering_prevention:load-enrich-house
+  - bietlejuice.enrich_money_laundering_prevention:load-enrich-listing
+  - bietlejuice.enrich_money_laundering_prevention:load-enrich-visit
+  - bietlejuice.gsheets.static:load-clean-pld-suspicion-list
+
 bietlejuice.dw_offer:
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal-aud
