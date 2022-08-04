@@ -1,0 +1,30 @@
+database_name: datalake_pixar_clean
+table_name: refund
+columns:
+  id:
+    lineage:
+      - datalake_pixar_raw.refund.id
+  id_charge:
+    lineage:
+      - datalake_pixar_raw.refund.charge_id
+  amount:
+    lineage:
+      - datalake_pixar_raw.refund.amount
+  status:
+    lineage:
+      - datalake_pixar_raw.refund.status
+  ts_created:
+    lineage:
+      - datalake_pixar_raw.refund.created_at
+  ts_updated:
+    lineage:
+      - datalake_pixar_raw.refund.updated_at
+  year:
+    lineage:
+      - datalake_pixar_raw.refund.year
+  month:
+    lineage:
+      - datalake_pixar_raw.refund.month
+  day:
+    lineage:
+      - datalake_pixar_raw.refund.day

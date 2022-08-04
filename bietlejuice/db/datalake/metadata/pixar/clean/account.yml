@@ -1,0 +1,33 @@
+database_name: datalake_pixar_clean
+table_name: account
+columns:
+  id:
+    lineage:
+      - datalake_pixar_raw.account.id
+  pix_key:
+    lineage:
+      - datalake_pixar_raw.account.pix_key
+  requested_by:
+    lineage:
+      - datalake_pixar_raw.account.requested_by
+  bank_name:
+    lineage:
+      - datalake_pixar_raw.account.bank
+  bank_fee:
+    lineage:
+      - datalake_pixar_raw.account.bank_fee
+  ts_created:
+    lineage:
+      - datalake_pixar_raw.account.created_at
+  ts_updated:
+    lineage:
+      - datalake_pixar_raw.account.updated_at
+  year:
+    lineage:
+      - datalake_pixar_raw.account.year
+  month:
+    lineage:
+      - datalake_pixar_raw.account.month
+  day:
+    lineage:
+      - datalake_pixar_raw.account.day
