@@ -15,8 +15,10 @@ More information about run time [here]({chart_url}{dag_id}).
 ​
 This pipeline produces the following output tables:
 ​
+- `dim_repair_tickets`
 - `dim_ticket`
 - `dim_zendesk_user`
+- `fact_repair_tickets`
 - `fact_ticket_contact_types`
 - `fact_ticket_tags`
 - `fact_tickets`

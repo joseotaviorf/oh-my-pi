@@ -1,0 +1,46 @@
+---
+database_name: dw_tickets
+table_name: dim_repair_tickets
+columns:
+  sk_ticket:
+    lineage:
+      - datalake_repair_services.repair_tickets.id_ticket
+  responsible_budget:
+    lineage:
+      - datalake_repair_services.repair_tickets.budget_analyst
+  responsible_execution:
+    lineage:
+      - datalake_repair_services.repair_tickets.responsible_execution
+  payment_format:
+    lineage:
+      - datalake_repair_services.repair_tickets.payment_format
+  reason_budget_delay:
+    lineage:
+      - datalake_repair_services.repair_tickets.reason_budget_delay
+  reason_execution_delay:
+    lineage:
+      - datalake_repair_services.repair_tickets.reason_execution_delay
+  request_type:
+    lineage:
+      - datalake_repair_services.repair_tickets.request_type
+  repair_type:
+    lineage:
+      - datalake_repair_services.repair_tickets.repair_type
+  internal_evaluation:
+    lineage:
+      - datalake_repair_services.repair_tickets.internal_evaluation
+  occurrences:
+    lineage:
+      - datalake_repair_services.repair_tickets.occurrences
+  additional_repair:
+    lineage:
+      - datalake_repair_services.repair_tickets.additional_repair
+  is_budget_visit_required:
+    lineage:
+      - datalake_repair_services.repair_tickets.is_budget_visit_required
+  is_service_guarantee:
+    lineage:
+      - datalake_repair_services.repair_tickets.is_service_guarantee
+  dt_created:
+    lineage:
+      - datalake_repair_services.repair_tickets.dt_created
