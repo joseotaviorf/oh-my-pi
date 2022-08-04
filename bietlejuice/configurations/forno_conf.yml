@@ -38,6 +38,7 @@ dags_out_of_pattern:
         "dw_user_affiliate",
         "dw_user_sales_rep",
         "ebdb",
+        "enrich_ebdb_contract",
         "enrich_marketing_costs_offline",
         "gsheets.for_rent",
         "gsheets.for_sale",
