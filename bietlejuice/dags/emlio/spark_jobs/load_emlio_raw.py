@@ -1,4 +1,3 @@
-from datetime import date
 import json
 from argparse import ArgumentParser
 
@@ -63,12 +62,14 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("partition_cols")
+    parser.add_argument("execution_date")
     args = parser.parse_args()
 
     environment = args.env
     datalake_bucket = args.datalake_bucket
     source = args.source
     partition_cols = json.loads(args.partition_cols)
+    execution_date = args.execution_date
 
     table_name = "emlio_logs"
 
@@ -124,8 +125,6 @@ if __name__ == "__main__":
     emlio_df = raw_df.withColumn("kafka_metadata", struct(kafka_columns))
     emlio_df = explode_json_column(raw_df, column="value", json_schema=value_schema)
     final_df = emlio_df.select([field.name for field in value_schema])
-
-    execution_date = date.today()
 
     part_df = (
         SparkDataFrameService()
