@@ -928,6 +928,10 @@ bietlejuice.dw_quinto_messenger:
   - bietlejuice.enrich_quinto_messenger:load-enrich-task
   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
 
+bietlejuice.dw_rede_company:
+  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
+
 bietlejuice.dw_region:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
