@@ -97,6 +97,7 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     target_database_base_name=CONTEXT,
     is_incremental=True,
     partitions=clean_partition_cols,
+    has_create_external_table_task=False,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
