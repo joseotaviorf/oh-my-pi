@@ -21,6 +21,6 @@ SELECT
     year,
     month,
     day
-FROM datalake_marketing_costs_raw.linkedin_campaigns
+FROM datalake_linkedin_raw.linkedin_campaigns
 WHERE
     year={year} and month={month} and day={day}

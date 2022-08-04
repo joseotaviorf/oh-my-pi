@@ -18,6 +18,6 @@ SELECT
     year,
     month,
     day
-FROM datalake_marketing_costs_raw.linkedin_creatives_stats
+FROM datalake_linkedin_raw.linkedin_creatives_stats
 WHERE
     year={year} and month={month} and day={day}

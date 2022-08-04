@@ -23,7 +23,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 
 DATABRICKS_SCOPE = "quintoandar"
-JOB_NAME = "load_incremental_data_into_datalake_raw"
+JOB_NAME = "load_twitter_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -35,14 +35,13 @@ if __name__ == "__main__":
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
-    parser.add_argument("media", help="name of the media")
     parser.add_argument("execution_date", help="execution date in str format")
 
     args = parser.parse_args()
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.source}, media={args.media},
+            m={JOB_NAME}, environment={args.environment}, source={args.source},
             execution_date={args.execution_date}, datalake_bucket={args.datalake_bucket}, msg=print spark jobs args"
         """
     )
@@ -50,7 +49,6 @@ if __name__ == "__main__":
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
-    media = args.media
     execution_date = args.execution_date
 
     config_service = ConfigurationService(source)
@@ -89,7 +87,7 @@ if __name__ == "__main__":
 
                     database_location = datalake_info["db_raw_path"]
                     format_options = SparkTableStorageFormat.DEFAULT_RAW
-                    table_name = f"{media}_{data_type}"
+                    table_name = f"{source}_{data_type}"
 
                     # loaders
                     s3_loader = S3Loader()

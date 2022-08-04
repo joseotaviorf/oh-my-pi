@@ -20,7 +20,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 
 from pyspark.sql.types import StructField, StructType, StringType
 
-JOB_NAME = "load_incremental_data_into_datalake_raw"
+JOB_NAME = "load_twitter_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -45,8 +45,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
-    parser.add_argument("target", help="name of the target")
-    parser.add_argument("media", help="name of the media")
+    parser.add_argument("source", help="name of the media")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("execution_date", help="execution date in str format")
 
@@ -54,14 +53,13 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.target}, media={args.media},
+            m={JOB_NAME}, environment={args.environment}, media={args.source},
             execution_date={args.execution_date}, datalake_bucket={args.datalake_bucket}, msg=print spark jobs args"
         """
     )
 
     environment = args.environment
-    target = args.target
-    media = args.media
+    source = args.source
     datalake_bucket = args.datalake_bucket
     execution_date = args.execution_date
     partition_cols = ["year", "month", "day"]
@@ -76,7 +74,7 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     datalake_info = DatalakeMetastoreService.get_db_info(
-        environment, target, datalake_bucket
+        environment, source, datalake_bucket
     )
 
     auth = get_auth(dbutils)
@@ -94,7 +92,7 @@ if __name__ == "__main__":
 
     for table, table_data in zip(tables, data):
 
-        table_name = f"{media}_{table}"
+        table_name = f"{source}_{table}"
 
         aggregated_table_data = []
         for page in table_data:

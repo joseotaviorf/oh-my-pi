@@ -1,0 +1,27 @@
+database_name: datalake_linkedin_clean
+table_name: linkedin_creatives
+columns:
+  id:
+    lineage:
+      - datalake_linkedin_raw.linkedin_creatives.id
+  id_campaign:
+    lineage:
+      - datalake_linkedin_raw.linkedin_creatives.campaign
+  status:
+    lineage:
+      - datalake_linkedin_raw.linkedin_creatives.status
+  type:
+    lineage:
+      - datalake_linkedin_raw.linkedin_creatives.type
+  acc:
+    lineage:
+      - datalake_linkedin_raw.linkedin_creatives.acc
+  year:
+    lineage:
+      - datalake_linkedin_raw.linkedin_creatives.year
+  month:
+    lineage:
+      - datalake_linkedin_raw.linkedin_creatives.month
+  day:
+    lineage:
+      - datalake_linkedin_raw.linkedin_creatives.day

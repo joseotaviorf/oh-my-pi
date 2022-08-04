@@ -1,10 +1,10 @@
-from datetime import datetime
-import pendulum
 import os
+from datetime import datetime
+from pendulum import timezone
 
 from airflow.utils.helpers import chain, cross_downstream
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -13,49 +13,48 @@ from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
-# airflow vars
-ENV = os.environ.get("ENVIRONMENT")
-
-# DAG params setup
-SOURCE = (
-    "marketing_costs"
-)  # TODO: source misapplied here. The source should be 1:1 to each DAG.
-MEDIA = "linkedin"
-DAG_ID = f"bietlejuice.{MEDIA}"
-
-local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
-MAIN_START_DATE = datetime(2019, 6, 1, 0, 0, 0, tzinfo=local_tz)
+# Pipeline inputs
+SOURCE = "linkedin"
+DAG_ID = f"bietlejuice.{SOURCE}"
+MAIN_START_DATE = datetime(2019, 6, 1, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
+CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 
-config_service = ConfigurationService(MEDIA)
-ATHENA_QUERY_RESULT_BUCKET = config_service.get_config("athena_query_results_bucket")
-ARTIFACTS_S3_BUCKET = config_service.get_config("artifacts_bucket")
-DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
-DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
+config_service = ConfigurationService(SOURCE)
+artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+datalake_bucket = config_service.get_config("datalake_bucket")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
-BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 
-LOAD_LINKEDIN_INTO_DATALAKE_RAW_FILE_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{MEDIA}/load_incremental_data_into_datalake_raw.py"
-DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
-
-PARTITION_COLS = config_service.get_config("partition_cols")
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+raw_spark_job_file = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
+)
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
 
 CUSTOM_LIBRARIES = [
     {
-        "whl": f"{ARTIFACTS_S3_BUCKET}/linkedin-client-python/"
+        "whl": f"{artifacts_s3_bucket}/linkedin-client-python/"
         f"quintoandar_linkedin_client-latest-py3-none-any.whl"
     }
 ]
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+ENV = os.environ.get("ENVIRONMENT")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -66,14 +65,17 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(MEDIA).format(chart_url=DOC_MD_CHART_URL, dag_id=DAG_ID),
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=CUSTOM_LIBRARIES,
+    cluster_configuration=cluster_configuration,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -83,18 +85,20 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=f"{SOURCE}/{MEDIA}",
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_BUCKET,
+    datalake_bucket=datalake_bucket,
+    relative_query_path=f"{SOURCE}",
+    spark_jobs_path=base_spark_jobs_path,
+    athena_query_result_location=athena_query_results_bucket,
 )
 
 raw_task_group = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
-    extraction_spark_job_file=LOAD_LINKEDIN_INTO_DATALAKE_RAW_FILE_PATH,
-    raw_spark_job_extra_args=[SOURCE, MEDIA, "{{ ds }}"],
+    extraction_spark_job_file=raw_spark_job_file,
+    raw_spark_job_extra_args=[SOURCE, "{{ ds }}"],
 )
+
+PARTITION_COLS = config_service.get_config("partition_cols")
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
