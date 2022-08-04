@@ -17,12 +17,18 @@ columns:
   id_lead:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.lead_id
+  uuid_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_uuid
   id_real_estate:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.real_estate_id
   id_by_real_estate:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.id_by_real_estate
+  status:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.status
   brokers:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.brokers
@@ -101,12 +107,18 @@ columns:
   mod_id_lead:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.lead_id_mod
+  mod_uuid_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_uuid_mod
   mod_id_real_estate:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.real_estate_id_mod
   mod_id_by_real_estate:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.id_by_real_estate_mod
+  mod_status:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.status_mod
   mod_brokers:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.brokers_mod
