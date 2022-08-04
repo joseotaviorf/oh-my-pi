@@ -1,0 +1,58 @@
+SELECT
+  c.id,
+  c.id_house,
+  c.country_code,
+  CAST(c.rent AS DECIMAL(14, 2)) AS rent,
+  CAST(c.first_rent_charged AS DECIMAL(14, 2)) AS first_rent_charged,
+  CAST(c.billing_day_of_month AS SMALLINT) AS billing_day_of_month,
+  c.guarantee_type,
+  c.type,
+  c.status,
+  c.rental_administrator,
+  c.paying_condo,
+  c.responsible_for_condo,
+  c.paying_iptu,
+  c.responsible_for_iptu,
+  CAST(c.rental_guarantee_installment AS SMALLINT) AS rental_guarantee_installment,
+  CAST(c.rental_guarantee_value AS  DECIMAL(14, 2)) AS rental_guarantee_value,
+  CAST(c.home_insurance_installment AS SMALLINT) AS home_insurance_installment,
+  CAST(c.home_insurance_value AS DECIMAL(14, 2)) AS home_insurance_value,
+  CAST(c.fist_rent_comission_fee AS DECIMAL(14, 2)) AS fist_rent_comission_fee,
+  CAST(c.monthly_administration_fee AS DECIMAL(5, 4)) AS monthly_administration_fee,
+  CAST(c.condo_price AS DECIMAL(14, 2)) AS condo_price,
+  CAST(c.iptu AS DECIMAL(14, 2)) AS iptu,
+  CAST(c.tenant_service_fee AS DECIMAL(5, 2)) AS tenant_service_fee,
+  c.signature_type,
+  c.status_closing,
+  c.cancellation_reason,
+  c.contract_version,
+  (c.id_house_listing IS NOT NULL) OR contract_b2b.is_b2b AS is_b2b,
+  contract_b2b.is_contract_b2b,
+  contract_b2b.contract_partner_type,
+  contract_b2b.b2b_type,
+  contract_b2b.b2b_prime_type,
+  contract_b2b.contract_plan,
+  c.is_ongoing_contract,
+  c.is_tenant_service_fee_opt_out,
+  c.is_exit_inspection_opted_out,
+  rc.is_rental_paid_in_advance,
+  c.dt_started,
+  c.dt_entered,
+  c.dt_contract_expected_end,
+  c.dt_termination,
+  c.ts_created,
+  c.ts_updated,
+  c.ts_expected_termination,
+  c.ts_signed,
+  c.ts_minuta_approved,
+  CAST(c.ts_canceled AS TIMESTAMP) AS ts_canceled,
+  c.ts_tenant_service_fee_opt_out,
+  CAST(c.ts_analyst_annulment_input AS TIMESTAMP) AS ts_analyst_annulment_input
+FROM
+    datalake_ebdb_contract.contract c
+LEFT JOIN
+    datalake_ebdb_contract.contract_b2b contract_b2b
+        ON contract_b2b.id_contract = c.id
+LEFT JOIN
+    datalake_retsuko_clean.contract rc
+        ON rc.id_external = c.id

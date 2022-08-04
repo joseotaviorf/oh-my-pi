@@ -1,0 +1,151 @@
+---
+database_name: datalake_contract
+table_name: contract
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_contract.contract.id
+  id_house:
+    lineage:
+      - datalake_ebdb_contract.contract.id_house
+  country_code:
+    lineage:
+      - datalake_ebdb_contract.contract.country_code
+  rent:
+    lineage:
+      - datalake_ebdb_contract.contract.rent
+  first_rent_charged:
+    lineage:
+      - datalake_ebdb_contract.contract.first_rent_charged
+  billing_day_of_month:
+    lineage:
+      - datalake_ebdb_contract.contract.billing_day_of_month
+  guaraguarantee_typentee:
+    lineage:
+      - datalake_ebdb_contract.contract.guarantee_type
+  type:
+    lineage:
+      - datalake_ebdb_contract.contract.type
+  status:
+    lineage:
+      - datalake_ebdb_contract.contract.status
+  rental_administrator:
+    lineage:
+      - datalake_ebdb_contract.contract.rental_administrator
+  paying_condo:
+    lineage:
+      - datalake_ebdb_contract.contract.paying_condo
+  responsible_for_condo:
+    lineage:
+      - datalake_ebdb_contract.contract.responsible_for_condo
+  paying_iptu:
+    lineage:
+      - datalake_ebdb_contract.contract.paying_iptu
+  responsible_for_iptu:
+    lineage:
+      - datalake_ebdb_contract.contract.responsible_for_iptu
+  rental_guarantee_installment:
+    lineage:
+      - datalake_ebdb_contract.contract.rental_guarantee_installment
+  rental_guarantee_value:
+    lineage:
+      - datalake_ebdb_contract.contract.rental_guarantee_value
+  home_insurance_installment:
+    lineage:
+      - datalake_ebdb_contract.contract.home_insurance_installment
+  home_insurance_value:
+    lineage:
+      - datalake_ebdb_contract.contract.home_insurance_value
+  fist_rent_comission_fee:
+    lineage:
+      - datalake_ebdb_contract.contract.fist_rent_comission_fee
+  monthly_administration_fee:
+    lineage:
+      - datalake_ebdb_contract.contract.monthly_administration_fee
+  condo_price:
+    lineage:
+      - datalake_ebdb_contract.contract.condo_price
+  iptu:
+    lineage:
+      - datalake_ebdb_contract.contract.iptu
+  tenant_service_fee:
+    lineage:
+      - datalake_ebdb_contract.contract.tenant_service_fee
+  signature_type:
+    lineage:
+      - datalake_ebdb_contract.contract.signature_type
+  status_closing:
+    lineage:
+      - datalake_ebdb_contract.contract.status_closing
+  cancellation_reason:
+    lineage:
+      - datalake_ebdb_contract.contract.cancellation_reason
+  contract_version:
+    lineage:
+      - datalake_ebdb_contract.contract.contract_version
+  is_b2b:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.is_b2b
+  is_contract_b2b:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.is_contract_b2b
+  contract_partner_type:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.contract_partner_type
+  b2b_type:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.b2b_type
+  b2b_prime_type:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.b2b_prime_type
+  contract_plan:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.contract_plan
+  is_ongoing_contract:
+    lineage:
+      - datalake_ebdb_contract.contract.is_ongoing_contract
+  is_tenant_service_fee_opt_out:
+    lineage:
+      - datalake_ebdb_contract.contract.is_tenant_service_fee_opt_out
+  is_exit_inspection_opted_out:
+    lineage:
+      - datalake_ebdb_contract.contract.is_exit_inspection_opted_out
+  is_rental_paid_in_advance:
+    lineage:
+      - datalake_retsuko_clean.contract.is_rental_paid_in_advance
+  dt_start:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_started
+  dt_entered:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_entered
+  dt_contract_expected_end:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_contract_expected_end
+  dt_termination:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_termination
+  ts_created:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_updated
+  ts_expected_termination:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_expected_termination
+  ts_signed:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_signed
+  ts_minuta_approved:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_minuta_approved
+  ts_canceled:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_canceled
+  ts_tenant_service_fee_opt_out:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_tenant_service_fee_opt_out
+  ts_analyst_annulment_input:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_analyst_annulment_input

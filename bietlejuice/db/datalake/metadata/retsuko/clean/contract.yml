@@ -1,3 +1,4 @@
+---
 database_name: datalake_retsuko_clean
 table_name: contract
 columns:
@@ -22,6 +23,9 @@ columns:
   is_b2b:
     lineage:
       - datalake_retsuko_raw.contract.is_b2b
+  is_rental_paid_in_advance:
+    lineage:
+      - datalake_retsuko_raw.contract.is_rental_paid_in_advance
   ts_signature:
     lineage:
       - datalake_retsuko_raw.contract.signature_date

@@ -6,6 +6,7 @@ SELECT
     version, 
     guarantee,
     is_b2b,
+    is_rental_paid_in_advance,
     signature_date AS ts_signature,
     guarantee_start_date AS ts_guarantee_started,
     start_period AS ts_period_started,

@@ -13,6 +13,9 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.contract.id_house
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
   country_code:
     lineage:
       - datalake_ebdb_listing.house.country_code
@@ -142,6 +145,9 @@ columns:
   ts_signed:
     lineage:
       - datalake_ebdb_clean.contract.ts_signed
+  ts_expected_termination:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_expected_termination
   dt_contract_expected_end:
     lineage:
       - datalake_ebdb_clean.contract.ts_contract_expected_end
