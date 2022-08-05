@@ -19,7 +19,4 @@ This pipeline produces the following tables in enrich layer, via full load:
 - `visit`
 
 
-### Responsible Data Teams
-​
-For any questions or concerns about this DAG, please contact the Data Engineering Team.
 ​</details>

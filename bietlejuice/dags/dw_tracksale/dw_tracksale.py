@@ -14,6 +14,7 @@ from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 ENV = os.environ.get("ENVIRONMENT")
 MAIN_START_DATE = datetime(2020, 8, 6, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
@@ -40,7 +41,14 @@ CLUSTER_DESCRIPTION = Variable.get(
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
+default_libraries = config_service.get_config("default_libraries")
 
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -57,7 +65,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

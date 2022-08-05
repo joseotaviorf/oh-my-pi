@@ -12,26 +12,29 @@ from airflow.utils.helpers import chain, cross_downstream
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 SOURCE = "fastforward"
 CONTEXT = SOURCE
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
+config_service = ConfigurationService(SOURCE)
+DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
+ARTIFACTS_S3_BUCKET = config_service.get_config("artifacts_bucket")
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
+S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
 RAW_SPARK_JOB_PATH = (
     f"{S3_PREFIX}/spark_jobs/{CONTEXT}/load_fastforward_into_datalake.py"
 )
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 # spark and databricks vars
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{CONTEXT}"
+LOGS_OUTPUT_PATH = f"{config_service.get_config('spark_jobs_logs_path')}/{CONTEXT}"
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_fastforward", deserialize_json=True
 )
@@ -44,6 +47,13 @@ CUSTOM_LIBRARIES = [
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
 # dag vars
 DAG_ID = f"bietlejuice.{CONTEXT}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -53,7 +63,7 @@ MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_BEDROCK,
+        "owner": DAGOwnerEnum.DATA_FINTECH,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -68,6 +78,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=LIBRARIES_DESCRIPTION,
 )
 

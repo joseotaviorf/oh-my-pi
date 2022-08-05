@@ -1,4 +1,5 @@
 ## Enrich NPS Answer Drivers
+
 ### Purpose
 
 Prepares [Tracksale](https://www.tracksale.co/) and EBDB ([Main's](https://github.com/quintoandar/main) database) data for business utilization. Tracksale is an external service that manages NPS data.
@@ -17,9 +18,5 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table on enrich layer:
 
 - `answer_drivers`
-
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 
 </details>

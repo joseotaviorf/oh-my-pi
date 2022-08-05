@@ -13,9 +13,8 @@ from airflow.utils.helpers import chain, cross_downstream
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
-
-# ENV setup
 from bietlejuice.services import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 ENV = os.environ.get("ENVIRONMENT")
 
@@ -32,28 +31,35 @@ MAIN_SCHEDULE_INTERVAL = "0 7 * * *"
 
 # s3 paths setup
 config_service = ConfigurationService(SOURCE)
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
+DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 ramo_sap_bucket = config_service.get_config("ramo_sap_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
+DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 SAP_DATA_PATH = f"s3://{ramo_sap_bucket}/razao"
 RAW_SPARK_JOB_PATH = (
     S3_PREFIX + f"/spark_jobs/{CONTEXT}/load_incremental_data_into_datalake_raw.py"
 )
-DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_9_1_med_general_cluster", deserialize_json=True
 )
+default_libraries = config_service.get_config("default_libraries")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_BEDROCK,
+        "owner": DAGOwnerEnum.DATA_FINTECH,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -66,7 +72,11 @@ dag = DAG(
 
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 

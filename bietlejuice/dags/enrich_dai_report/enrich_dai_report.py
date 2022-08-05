@@ -15,6 +15,7 @@ from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -54,6 +55,13 @@ libraries_description = [
     config_service.get_config("cluster_extra_libs"),
 ]
 
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
 
 def check_valid_run_date(dag_execution_date):
     if datetime.strptime(dag_execution_date, "%Y-%m-%d").day + 1 == 10:
@@ -78,6 +86,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=libraries_description,
 )
 

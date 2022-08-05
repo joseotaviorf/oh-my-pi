@@ -12,6 +12,7 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -34,6 +35,14 @@ SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_9_1_min_general_cluster", deserialize_json=True
 )
+default_libraries = config_service.get_config("default_libraries")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -50,7 +59,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

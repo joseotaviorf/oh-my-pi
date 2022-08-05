@@ -13,6 +13,8 @@ from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -23,18 +25,29 @@ CONTEXT = "chattermill"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
-SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
-DW_BUCKET = Variable.get("dw_bucket")
+config_service = ConfigurationService(DAG_NAME)
+SPECTRUM_IAM_ROLE = config_service.get_config("spectrum_iam_role")
+DW_BUCKET = config_service.get_config("dw_bucket")
 
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
-LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_ID
+DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
 )
+SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base"
+DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
+SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
+LOGS_OUTPUT_PATH = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+
+default_libraries = config_service.get_config("default_libraries")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -51,7 +64,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

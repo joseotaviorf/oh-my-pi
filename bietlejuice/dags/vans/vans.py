@@ -13,6 +13,8 @@ from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 SOURCE = "vans"
 CONTEXT = SOURCE
@@ -20,24 +22,29 @@ CONTEXT = SOURCE
 DAG_NAME = CONTEXT
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+config_service = ConfigurationService(DAG_NAME)
+DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
+ARTIFACTS_S3_BUCKET = config_service.get_config("artifacts_bucket")
+DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
+S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_NAME}/load_vans_into_datalake.py"
 
-LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_NAME
-)
+SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
+LOGS_OUTPUT_PATH = f"{SPARK_JOBS_LOGS_PATH}/{DAG_ID}"
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_bietlejuice_vans", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
-
-DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
+DEFAULT_LIBRARIES = config_service.get_config("default_libraries")
 CUSTOM_LIBRARIES = [
     {
         "jar": f"{ARTIFACTS_S3_BUCKET}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
@@ -53,7 +60,7 @@ MAIN_SCHEDULE_INTERVAL = "0 8 * * *"
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_BEDROCK,
+        "owner": DAGOwnerEnum.DATA_FINTECH,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -68,6 +75,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=LIBRARIES_DESCRIPTION,
 )
 

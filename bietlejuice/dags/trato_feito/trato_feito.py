@@ -13,6 +13,7 @@ from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 SOURCE = "trato_feito"
 DAG_ID = f"bietlejuice.{SOURCE}"
@@ -42,11 +43,19 @@ CLUSTER_DESCRIPTION = Variable.get(
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{spark_jobs_logs_path}{DAG_ID}"
+default_libraries = config_service.get_config("default_libraries")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_BEDROCK,
+        "owner": DAGOwnerEnum.DATA_FINTECH,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -58,7 +67,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

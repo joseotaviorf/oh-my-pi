@@ -11,6 +11,7 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 
 # ENV setup
@@ -48,6 +49,13 @@ CUSTOM_LIBRARIES = [
     }
 ]
 
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -66,6 +74,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=CUSTOM_LIBRARIES,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

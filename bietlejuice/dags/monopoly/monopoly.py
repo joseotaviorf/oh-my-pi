@@ -12,6 +12,8 @@ from airflow.utils.helpers import chain, cross_downstream
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 ENV = os.environ.get("ENVIRONMENT")
 
@@ -24,29 +26,38 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 6, 17, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 5 * * *"
 
+config_service = ConfigurationService(SOURCE)
 # s3 paths setup
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
+DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
+ARTIFACTS_S3_BUCKET = config_service.get_config("artifacts_bucket")
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
+DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{CONTEXT}/load_{SOURCE}_into_datalake.py"
 
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{CONTEXT}"
+SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
+LOGS_OUTPUT_PATH = f"{SPARK_JOBS_LOGS_PATH}/{DAG_ID}"
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+default_libraries = config_service.get_config("default_libraries")
 
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 # Dag definition
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_BEDROCK,
+        "owner": DAGOwnerEnum.DATA_FINTECH,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -58,7 +69,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

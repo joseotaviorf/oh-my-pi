@@ -15,6 +15,7 @@ from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 
 def check_valid_run_date(dag_execution_date):
@@ -49,6 +50,13 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{spark_jobs_logs_path}{DAG_ID}"
 
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
 cluster_libs = config_service.get_config("cluster_libs")
 
 dag = DAG(
@@ -70,6 +78,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=cluster_libs,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

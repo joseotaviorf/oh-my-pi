@@ -22,8 +22,5 @@ This pipeline produces the following output table:
 2. In data lake clean:​
 - `razao_sap`
 ​
-### Responsible Data Engineering Team
-​
-For any questions or concerns about this DAG, please contact the Dag Owner Team.
 
 </details>

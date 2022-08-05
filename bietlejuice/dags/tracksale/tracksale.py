@@ -13,6 +13,8 @@ from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 # ENV setup
 ENV = os.environ.get("ENVIRONMENT")
@@ -20,19 +22,20 @@ ENV = os.environ.get("ENVIRONMENT")
 # DAG params setup
 SOURCE = "tracksale"
 DAG_ID = f"bietlejuice.{SOURCE}"
+config_service = ConfigurationService(SOURCE)
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 6, 1, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 
 # s3 paths setup
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
+ARTIFACTS_S3_BUCKET = config_service.get_config("artifacts_bucket")
+DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
+S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
+SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
+DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_ID}"
+LOGS_OUTPUT_PATH = f"{SPARK_JOBS_LOGS_PATH}/{DAG_ID}"
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
 
@@ -45,6 +48,12 @@ CUSTOM_LIBRARIES = [
     {
         "whl": f"{ARTIFACTS_S3_BUCKET}/tracksale-api-client-python/"
         f"quintoandar_tracksale_api_client-0.2.0-py2.py3-none-any.whl"
+    }
+]
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
 
@@ -79,6 +88,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=CUSTOM_LIBRARIES,
 )
 

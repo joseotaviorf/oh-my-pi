@@ -13,6 +13,8 @@ from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.services.configuration_service import ConfigurationService
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -21,19 +23,30 @@ CONTEXT = "tracksale"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+config_service = ConfigurationService(DAG_NAME)
+DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
+DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
+S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
 
-LOGS_OUTPUT_PATH = f"s3://{Variable.get('databricks_s3_bucket')}/logs/jobs/{DAG_ID}"
+SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
+LOGS_OUTPUT_PATH = f"{SPARK_JOBS_LOGS_PATH}/{DAG_ID}"
 
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_enrich_tracksale", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+default_libraries = config_service.get_config("default_libraries")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
 
 INNER_DEPENDENCIES = {
     "answer_cities": ["answer_tags"],
@@ -57,7 +70,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

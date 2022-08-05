@@ -23,8 +23,5 @@ Load the following tables into the datalake clean (via full load):
 - `negotiation`
 - `payment`
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact its owner.
 
 </details>

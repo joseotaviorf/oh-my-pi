@@ -39,8 +39,5 @@ This pipeline produces the following output tables, both in `raw` and `clean` la
     - `installment_option_aud`
     - `users`
 ​
-### Responsible Data Engineering Team
-​
-For any questions or concerns about this DAG, please contact the Dag Owner Team.
 
 ​</details>
