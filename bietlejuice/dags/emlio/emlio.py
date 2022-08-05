@@ -91,7 +91,7 @@ raw_task_group = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
     extraction_spark_job_file=RAW_SPARK_JOB_FILE,
-    raw_spark_job_extra_args=[SOURCE, json.dumps(partition_cols)],
+    raw_spark_job_extra_args=[SOURCE, json.dumps(partition_cols), "{{ ds }}"],
 )
 
 clean_task_group = task_group.build_task_group_from_sql_files(
