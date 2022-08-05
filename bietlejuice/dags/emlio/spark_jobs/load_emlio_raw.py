@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from argparse import ArgumentParser
 
@@ -126,10 +127,12 @@ if __name__ == "__main__":
     emlio_df = explode_json_column(raw_df, column="value", json_schema=value_schema)
     final_df = emlio_df.select([field.name for field in value_schema])
 
+    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
+
     part_df = (
         SparkDataFrameService()
         .input(final_df)
-        .create_year_month_day_columns_from_date(execution_date)
+        .create_year_month_day_columns_from_date(dt_execution)
         .optimize_partitions_by_partition_columns(partition_cols)
         .output()
     )
