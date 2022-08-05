@@ -36,7 +36,6 @@ create table public.dim_contract (
   is_ongoing_contract boolean,
   is_tenant_service_fee_opt_out boolean,
   is_exit_inspection_opted_out boolean,
-  is_rental_paid_in_advance boolean,
   dt_start date,
   dt_entrance date,
   dt_intended_end date,

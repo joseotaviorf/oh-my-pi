@@ -140,27 +140,12 @@ first_rent AS (
     datalake_ebdb_clean.contract_aud AS ca
   WHERE
     status_closing = 'ContratoAssinado' 
-),
-house_b2b_portability AS (
-    SELECT
-        hl.id_house_listing
-    FROM
-        datalake_ebdb_listing.house_listing hl
-    JOIN
-        datalake_ebdb_clean.house h
-            ON h.id = hl.id_house
-    JOIN
-        datalake_ebdb_listing.portability p
-            ON p.id_house = hl.id_house AND p.is_owner_b2b
-    WHERE
-        p.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, NOW())
 )
 SELECT
   c.id,
   hl.id_country,
   c.id_proposal,
   c.id_house,
-  hp.id_house_listing,
   hl.country_code,
   c.rent,
   fre.first_rent AS first_rent_charged,
@@ -236,10 +221,3 @@ LEFT JOIN
 LEFT JOIN
   datalake_ebdb_listing.house AS hl
     ON hl.id = c.id_house
-LEFT JOIN
-    datalake_ebdb_listing.house_listing lhl
-	    ON lhl.id_house = c.id_house
-	    AND c.ts_created BETWEEN COALESCE(lhl.ts_listing_version_start, '1900-01-01') AND COALESCE(lhl.ts_listing_version_end, NOW())
-LEFT JOIN
-    house_b2b_portability hp
-        ON hp.id_house_listing = lhl.id_house_listing

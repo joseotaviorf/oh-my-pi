@@ -812,7 +812,14 @@ bietlejuice.dw_invoice_entries_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
 
 bietlejuice.dw_contract:
-  - bietlejuice.enrich_contract:load-enrich-contract
+  # Removed dependency with enrich_ebdb_listing.house_listing in order to avoid loopings since enrich_ebdb_contract already satisfies
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_ebdb_contract:load-enrich-ongoing-contracts
+  - bietlejuice.enrich_ebdb_listing:load-enrich-portability
+  - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
 
 bietlejuice.dw_credit_analysis:
   # Removed dependencies with ebdb.proposal and dw_rent_flow.fact_listing_rent_flows because it's already satisfied by dw_crm (that has dependencies with ebdb.proposal -> dw_proposal -> dw_rent_flow -> dw_crm).
@@ -1309,11 +1316,6 @@ bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
   - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
 
-bietlejuice.enrich_contract:
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
-  - bietlejuice.retsuko:load-clean-contract
-
 bietlejuice.enrich_credit_analysis:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.enrich_docx:load-enrich-credit-evaluation
@@ -1436,8 +1438,6 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
-  - bietlejuice.enrich_ebdb_listing:load-enrich-portability
-  - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
 
 bietlejuice.enrich_ebdb_customer_contact_identification:
   - bietlejuice.ebdb:create-clean-user-in-data-lake
