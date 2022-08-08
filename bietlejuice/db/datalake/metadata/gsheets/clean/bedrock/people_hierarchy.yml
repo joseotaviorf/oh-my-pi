@@ -77,9 +77,6 @@ columns:
   direct_employees:
     lineage:
       - datalake_gsheets_raw.base_hierarquia.diretos
-  indirect_employees:
-    lineage:
-      - datalake_gsheets_raw.base_hierarquia.indiretos
   layer:
     lineage:
       - datalake_gsheets_raw.base_hierarquia.layer

@@ -24,7 +24,6 @@ SELECT
     vice_presidencia AS vice_presidency,
     status_gestor AS manager_status,
     diretos AS direct_employees,
-    indiretos AS indirect_employees,
     layer,
     fl_lider AS fl_leader,
     lideranca AS leadership,
