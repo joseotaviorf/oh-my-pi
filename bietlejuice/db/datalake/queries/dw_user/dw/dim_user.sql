@@ -38,10 +38,13 @@ booking_counts AS (
  house_counts AS (
     SELECT
         id_owner,
-        houses
+        SUM(houses) as houses,
+        SUM(IF(rental_administrator = 'OWNER', houses, 0)) AS brokerage_only_houses_owned,
+        SUM(IF(rental_administrator = 'QUINTOANDAR', houses, 0)) AS quintoandar_houses_owned
     FROM datalake_pro_owners.owner_houses_quantity_history
     WHERE
         ts_house_number_ended IS NULL
+    GROUP BY 1
  )
 SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refactoring to remove castings and renamings
     u.id AS sk_user,
@@ -103,6 +106,8 @@ SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refacto
     b_counts.visits_realized,
     b_counts.visits_expected_to_happen,
     CAST(hc.houses AS INTEGER) AS houses_owned,
+    CAST(hc.brokerage_only_houses_owned AS INTEGER) AS brokerage_only_houses_owned,
+    CAST(hc.quintoandar_houses_owned AS INTEGER) AS quintoandar_houses_owned,
     u.dt_birth AS data_nascimento,
     CAST(user_dates.dt_first_visit AS TIMESTAMP) AS first_visit_date,
     CAST(user_dates.dt_first_visit_confirmed AS TIMESTAMP) AS first_visit_confirmed_date,
