@@ -1,13 +1,13 @@
-WITH macro_status AS (
-    -- Returns only the macro_status, which are the lines with id_parent = null.
+WITH last_status_updated AS (
+    -- Returns the latest record for each id status in the table
     SELECT
         id,
         id_label,
         id_parent,
-        key
+        key, 
+        ROW_NUMBER() OVER(PARTITION BY id ORDER BY ts_updated DESC) AS rn_lsu
     FROM
         datalake_sales_flow_clean.status
-    WHERE id_parent IS NULL
 ),
 ordering AS (
     SELECT
@@ -55,8 +55,9 @@ micro_status AS (
     FROM
         datalake_sales_flow_clean.status_record AS sr
     LEFT JOIN
-        datalake_sales_flow_clean.status AS stt
+        last_status_updated AS stt
             ON sr.id_status = stt.id
+            AND stt.rn_lsu = 1 
   )
     SELECT
         *,
@@ -69,7 +70,8 @@ closing_type_keys AS (
     SELECT
         id,
         key,
-        id_parent
+        id_parent,
+        ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS rn_ctk
     FROM
         datalake_sales_flow_clean.closing_type
 ),
@@ -108,7 +110,7 @@ last_closing_type AS (
     WITH last_row_number_closing_type (
         SELECT
             *,
-            ROW_NUMBER() OVER (PARTITION BY id_sales_flow, primary_ct ORDER BY ts_updated DESC) AS rw_primary
+            ROW_NUMBER() OVER (PARTITION BY id_sales_flow ORDER BY ts_updated DESC) AS rw_primary
         FROM closing_type
     )
     SELECT
@@ -144,19 +146,21 @@ SELECT
 FROM
     offer_status AS ofs
 LEFT JOIN
-    macro_status AS ms
+    last_status_updated AS ms
         ON ofs.id_status = ms.id
-        AND rw_offer_status = 1
+        AND ms.id_parent IS NULL
+        AND ofs.rw_offer_status = 1
 LEFT JOIN
     sales_flow AS sf
         ON ofs.id_sales_flow = sf.id_sales_flow
-        AND rw = 1
+        AND sf.rw = 1
 LEFT JOIN
     last_closing_type AS ct
         ON ct.id_sales_flow = sf.id_sales_flow
 LEFT JOIN
     closing_type_keys AS ctk
         ON ctk.id = ct.primary_ct
+        AND ctk.rn_ctk = 1
 LEFT JOIN
     closing_type_keys AS ctk_sec
         ON ctk_sec.id = ct.sec_ct
@@ -166,8 +170,10 @@ LEFT JOIN
         AND micro.macro_status_id = ms.id
         AND rw_micro = 1
 LEFT JOIN
-    micro_status_keys AS ms_key
+    last_status_updated AS ms_key
         ON ms_key.id = micro.micro_status_id
+        AND ms_key.id_parent IS NOT NULL
+        AND ms_key.rn_lsu = 1
 LEFT JOIN
     offer AS off
         ON off.id_sales_flow = sf.id_sales_flow
@@ -178,5 +184,5 @@ LEFT JOIN
 WHERE
     ms.key IS NOT NULL
 ORDER BY
-    ordering ASC,
-    sf.id_sales_flow ASC
+    sf.id_sales_flow ASC, 
+    ordering ASC
