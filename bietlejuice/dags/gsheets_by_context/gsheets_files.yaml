@@ -96,12 +96,6 @@ base_supply_souce_for_rent:
     clean_table_name: daily_target_supply_rental
     sheet_context: growth
 
-cities_neighborhoods_ibge_qa:
-    sheet_id: 19N1BVZuKcCw1RByXoL3hqaXSmEhdi7_mbtyOVff4oQs
-    sheet_name: ibge_5a_cities
-    clean_table_name: cities_neighborhoods_ibge_qa
-    sheet_context: growth
-
 costs_targets:
     sheet_id: 1g_HngmcykZuj-c5PfhGeBo0m969ipBEQ04Hy2diIns4
     sheet_name: costs_targets
@@ -196,12 +190,6 @@ rental_tof_weekly_targets:
     sheet_id: 1M3yd-RpHMDwnEdWs18sf0oCEHDhmz_Y_9O4zSEcD1nU
     sheet_name: rental_tof_weekly_targets
     clean_table_name: rental_tof_weekly_targets
-    sheet_context: growth
-
-sale_nbp_source_targets:
-    sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
-    sheet_name: sale_nbp_source_targets
-    clean_table_name: sale_nbp_source_targets
     sheet_context: growth
 
 tradecom_configuration:
@@ -696,6 +684,18 @@ zipcodes_sp:
     sheet_name: zipcodes_sp
     clean_table_name: zipcodes_sp
     sheet_context: static
+
+sale_nbp_source_targets:
+    sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
+    sheet_name: sale_nbp_source_targets
+    clean_table_name: sale_nbp_source_targets
+    sheet_context: static # TO-DO: must be growth context
+
+cities_neighborhoods_ibge_qa:
+    sheet_id: 19N1BVZuKcCw1RByXoL3hqaXSmEhdi7_mbtyOVff4oQs
+    sheet_name: ibge_5a_cities
+    clean_table_name: cities_neighborhoods_ibge_qa
+    sheet_context: static # TO-DO: must be growth context
 
 #########################
 # GENERAL SHEETS
