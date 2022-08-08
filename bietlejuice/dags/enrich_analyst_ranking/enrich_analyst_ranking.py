@@ -1,45 +1,51 @@
-import os
 from datetime import datetime
-
 import pendulum
-from airflow.models import DAG, Variable
+import os
+
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum, BaseTaskGroup
+from bietlejuice.base.airflow import BaseDAG, BaseTaskGroup, DAGOwnerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
+# ENV setup
+ENV = os.environ.get("ENVIRONMENT")
 
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2021, 8, 24, 0, 0, 0, tzinfo=LOCAL_TZ)
-PARTITION_COLS = ["year", "month", "day"]
-
+# DAG and Jobs params setup
 CONTEXT = "analyst_ranking"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
-ENV = os.environ.get("ENVIRONMENT")
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
+MAIN_START_DATE = datetime(2021, 8, 24, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 config_service = ConfigurationService(DAG_NAME)
-athena_query_result_bucket = config_service.get_config("athena_query_results_bucket")
-datalake_bucket = config_service.get_config("datalake_bucket")
-databricks_bietlejuice_repo_path = config_service.get_config(
-    "databricks_bietlejuice_repo_path"
-)
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
-base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+# S3 paths setup
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+datalake_bucket = config_service.get_config("datalake_bucket")
+s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
+base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
+default_libraries = config_service.get_config("default_libraries")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -56,7 +62,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -69,7 +79,7 @@ datalake_task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
     spark_jobs_path=base_spark_jobs_path,
-    athena_query_result_location=athena_query_result_bucket,
+    athena_query_result_location=athena_query_results_bucket,
 )
 
 enrich_task_groups = {}
