@@ -306,7 +306,13 @@ apply_attribution_rule AS (
         cross_channel
 )
 /*
-if there is no event immediately preceding the conversion event, get the attribution of the conversion event
+Once it gets events from distinct sources, it is necessary to order them 
+to verify the last change attribution touchpoint event before the conversion event.
+Some of these events may not be carrying utms (by failure or something else). 
+For that reason, when it happens it's applied a rule to get the utm from the conversion event.
+
+So if there is no event immediately preceding the conversion event
+or the source and medium are empty (not expected), get the attribution of the conversion event
 */
 SELECT
     id_user,
@@ -318,39 +324,58 @@ SELECT
     visit_code,
     event_name,
     CASE
-        WHEN final_attribution_app_type IS NULL THEN attribution_app_type_conversion
+        WHEN 
+            NULLIF(final_attribution_app_type, '') IS NULL
+            OR (NULLIF(final_attribution_source, '') IS NULL
+            AND NULLIF(final_attribution_medium, '') IS NULL) THEN attribution_app_type_conversion
         ELSE final_attribution_app_type
     END AS final_attribution_app_type,
     CASE
-        WHEN final_attribution_app_type IS NULL THEN attribution_branded_conversion
+        WHEN NULLIF(final_attribution_app_type, '') IS NULL
+            OR (NULLIF(final_attribution_source, '') IS NULL
+            AND NULLIF(final_attribution_medium, '') IS NULL) THEN attribution_branded_conversion
         ELSE final_attribution_branded
     END AS final_attribution_branded,
     CASE
-        WHEN final_attribution_app_type IS NULL THEN attribution_origin_conversion
+        WHEN NULLIF(final_attribution_app_type, '') IS NULL
+            OR (NULLIF(final_attribution_source, '') IS NULL
+            AND NULLIF(final_attribution_medium, '') IS NULL) THEN attribution_origin_conversion
         ELSE final_attribution_origin
     END AS final_attribution_origin,
     CASE
-        WHEN final_attribution_app_type IS NULL THEN attribution_source_conversion
+        WHEN NULLIF(final_attribution_app_type, '') IS NULL
+            OR (NULLIF(final_attribution_source, '') IS NULL
+            AND NULLIF(final_attribution_medium, '') IS NULL) THEN attribution_source_conversion
         ELSE final_attribution_source
     END AS final_attribution_source,
     CASE
-        WHEN final_attribution_app_type IS NULL THEN attribution_medium_conversion
+        WHEN NULLIF(final_attribution_app_type, '') IS NULL
+            OR (NULLIF(final_attribution_source, '') IS NULL
+            AND NULLIF(final_attribution_medium, '') IS NULL) THEN attribution_medium_conversion
         ELSE final_attribution_medium
     END AS final_attribution_medium,
     CASE
-        WHEN final_attribution_app_type IS NULL THEN attribution_campaign_conversion
+        WHEN NULLIF(final_attribution_app_type, '') IS NULL
+            OR (NULLIF(final_attribution_source, '') IS NULL
+            AND NULLIF(final_attribution_medium, '') IS NULL) THEN attribution_campaign_conversion
         ELSE final_attribution_campaign
     END AS final_attribution_campaign,
     CASE
-        WHEN final_attribution_app_type IS NULL THEN attribution_term_conversion
+        WHEN NULLIF(final_attribution_app_type, '') IS NULL
+            OR (NULLIF(final_attribution_source, '') IS NULL
+            AND NULLIF(final_attribution_medium, '') IS NULL) THEN attribution_term_conversion
         ELSE final_attribution_term
     END AS final_attribution_term,
     CASE
-        WHEN final_attribution_app_type IS NULL THEN attribution_content_conversion
+        WHEN NULLIF(final_attribution_app_type, '') IS NULL
+            OR (NULLIF(final_attribution_source, '') IS NULL
+            AND NULLIF(final_attribution_medium, '') IS NULL) THEN attribution_content_conversion
         ELSE final_attribution_content
     END AS final_attribution_content,
     CASE
-        WHEN final_attribution_app_type IS NULL THEN attribution_media_source_conversion
+        WHEN NULLIF(final_attribution_app_type, '') IS NULL
+            OR (NULLIF(final_attribution_source, '') IS NULL
+            AND NULLIF(final_attribution_medium, '') IS NULL) THEN attribution_media_source_conversion
         ELSE final_attribution_media_source
     END AS final_attribution_media_source,
     ts_event,
