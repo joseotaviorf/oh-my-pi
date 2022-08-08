@@ -1,58 +1,68 @@
-############# DOCKER commands ########################
-.PHONY: _create-docker-environment
-_create-docker-environment:
-	@rm docker/.env || true
-	@touch docker/.env
-	@echo "GITHUB_TOKEN=${GITHUB_TOKEN}" >> docker/.env
-	@echo "PROJECT_PATH=${PROJECT_PATH}" >> docker/.env
-	@echo "USERNAME=${USERNAME}" >> docker/.env
-	@echo "DATABRICKS_TOKEN=${DATABRICKS_TOKEN}" >> docker/.env
+############# Local Airflow Docker environment #############
+.PHONY: _setup-local-environment
+_setup-local-environment:
+	@rm local/.env || true
+	@touch local/.env
+	@echo "GITHUB_TOKEN=${GITHUB_TOKEN}" >> local/.env
+	@echo "PROJECT_PATH=${PROJECT_PATH}" >> local/.env
+	@echo "USERNAME=${USERNAME}" >> local/.env
+	@echo "DATABRICKS_TOKEN=${DATABRICKS_TOKEN}" >> local/.env
 
-.PHONY: create-docker-environment
-create-docker-environment:
-	@make _create-docker-environment
-	@chmod +x start.sh
-	@sudo docker-compose -f docker/docker-compose.yml --env-file docker/.env up -d --build --force-recreate
-	@sudo docker image prune -f
+.PHONY: run-local-environment
+run-local-environment:
+	@make _setup-local-environment
+	@docker-compose -f local/docker/docker-compose.yml --env-file local/.env up -d --build --force-recreate
 
-.PHONY: restart-docker-environment
-restart-docker-environment:
-	@sudo docker-compose -f docker/docker-compose.yml up -d --build
+.PHONY: restart-local-environment
+restart-local-environment:
+	@docker-compose -f local/docker/docker-compose.yml up -d --build
 
-.PHONY: kill-docker-environment
-kill-docker-environment:
-	@sudo docker-compose -f docker/docker-compose.yml down
+.PHONY: stop-local-environment
+stop-local-environment:
+	@docker-compose -f local/docker/docker-compose.yml down
 
-.PHONY: build-local-whl
-build-local-whl:
+############# Local Tests Docker environment #############
+
+.PHONY: _build-tests-environment
+_build-tests-environment:
+	@docker build -f local/tests-environment.Dockerfile -t bietlejuice-tests-local --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} .
+
+.PHONY: run-tests-environment
+run-tests-environment:
+	@make _build-tests-environment
+	@docker run bietlejuice
+
+############# Local environment S3 upload #############
+
+.PHONY: upload-local-wheel
+upload-local-wheel:
+	@python3 -m setup sdist bdist_wheel
+	@python3 scripts/upload_local_whl_to_s3.py
+
+.PHONY: upload-local-spark-jobs
+upload-local-spark-jobs:
+	@python3 scripts/upload_local_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
+
+.PHONY: upload-local-package
+upload-local-package:
 	@python3 scripts/upload_local_spark_jobs_to_s3.py
 	@python3 -m setup sdist bdist_wheel
 	@python3 scripts/upload_local_whl_to_s3.py
 
-.PHONY: upload-local-spark-jobs-to-s3
-upload-local-spark-jobs-to-s3:
-	@python3 scripts/upload_local_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
-
-############# Local environment commands #######################
+############# Local Python environment #############
 
 .PHONY: environment
 environment:
 	@echo ""
-	@echo "Creating environment for Bi-etl-ejuice project"
+	@echo "Creating Python environment for bi-etl-ejuice package"
 	@echo "=========="
 	@echo ""
-	@pyenv install -s 3.7.3
-	@pyenv virtualenv 3.7.3 bi-etl-ejuice
+	@pyenv install -s 3.8.12
+	@pyenv virtualenv 3.8.12 bi-etl-ejuice
 	@pyenv local bi-etl-ejuice
+	@echo "-> Python virtual environment 'bi-etl-ejuice' has been set as the current virtualenv."
 
-.PHONY: build-test-environment
-build-test-environment:
-	@docker build --file docker/test-environment.Dockerfile -t bietlejuice --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} .
-
-.PHONY: test-environment
-test-environment:
-	@make build-test-environment
-	@docker run bietlejuice
+############# Requirements setup #############
 
 .PHONY: requirements
 requirements:
@@ -87,6 +97,24 @@ requirements-scripts:
 	@echo ""
 	@python -m pip install -U -r requirements_scripts.txt --extra-index-url https://quintoandar.github.io/python-package-server/
 
+############# Package setup #############
+
+.PHONY: package
+package:
+	@make requirements
+	@echo ""
+	@echo "Creating 'requirements-freeze.txt' to prepare building dependencies"
+	@echo "=========="
+	@echo ""
+	@python -m pip freeze > requirements-freeze.txt
+	@echo ""
+	@echo "Creating wheel for bi-etl-ejuice"
+	@echo "=========="
+	@echo ""
+	@PYTHONPATH=. python -m setup sdist bdist_wheel
+
+############# Style handling #############
+
 .PHONY: lint
 ## run black to fix code style
 lint:
@@ -106,19 +134,7 @@ check-style:
 	@python -m black --check bietlejuice/ tests/unit/composer/ && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" to apply style formatting to your code\n" && exit 1)
 	@python -m flake8 --config=setup.cfg bietlejuice/ tests/unit/composer/
 
-.PHONY: package
-package:
-	@make requirements
-	@echo ""
-	@echo "Creating 'requirements-freeze.txt' to prepare building dependencies"
-	@echo "=========="
-	@echo ""
-	@python -m pip freeze > requirements-freeze.txt
-	@echo ""
-	@echo "Creating wheel for bi-etl-ejuice"
-	@echo "=========="
-	@echo ""
-	@PYTHONPATH=. python -m setup sdist bdist_wheel
+############# Validation commands #############
 
 .PHONY: unit-tests
 unit-tests:
@@ -171,7 +187,7 @@ validate-datamarts-metadata-files-exist:
 	@git fetch --no-tags origin +refs/heads/master
 	@PYTHONPATH=. python3 scripts/atlas_metadata_validation/validate_datamarts_metadata_files_exist.py  "$(DRONE_BRANCH)"
 
-############# common commands #######################
+############# common commands #############
 
 .PHONY: cov-badge
 ## build coverage badge
@@ -254,4 +270,3 @@ help:
 	| more $(shell test $(shell uname) = Darwin && echo '--no-init --raw-control-chars')
 
 .DEFAULT_GOAL := help
-

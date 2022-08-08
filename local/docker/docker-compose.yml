@@ -11,29 +11,29 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - airflow_postgres_py3
+      - airflow_network
 
-  postgres_airflow_py3:
+  postgres:
     image: postgres:alpine
     ports:
       - "5432:5432"
     environment:
       POSTGRES_PASSWORD: postgres
     volumes:
-      - /tmp/PostgreSQL/airflow_py3:/var/lib/postgresql/data
+      - /tmp/PostgreSQL/airflow:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - airflow_postgres_py3
+      - airflow_network
 
-  airflow_python:
-    image: base
+  airflow:
+    image: bietlejuice-airflow-local
     build:
-      context: ..
-      dockerfile: docker/airflow-py.Dockerfile
+      dockerfile: local/docker/airflow-environment.Dockerfile
+      context: ../..
       args:
         GITHUB_TOKEN: ${GITHUB_TOKEN}
     environment:
@@ -41,59 +41,60 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ${PROJECT_PATH}/bietlejuice:/bi-etl-ejuice/bietlejuice
+      - ${PROJECT_PATH}/bietlejuice:/bi-etl-ejuice/local/bietlejuice
+    entrypoint: ./entrypoint.sh
     depends_on:
-      postgres_airflow_py3:
+      postgres:
         condition: service_healthy
     networks:
-      - airflow_postgres_py3
+      - airflow_network
 
   worker_1:
-    image: base
+    image: bietlejuice-airflow-local
     restart: always
     environment:
       - C_FORCE_ROOT=true
       - ENVIRONMENT=forno
     depends_on:
-      - airflow_python
+      - airflow
     volumes:
-      - ${PROJECT_PATH}/bietlejuice/dags:/bi-etl-ejuice/bietlejuice/dags
+      - ${PROJECT_PATH}/bietlejuice:/bi-etl-ejuice/local/bietlejuice
     entrypoint: airflow worker -cn worker_1
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "[ -f /bi-etl-ejuice/airflow_python/airflow-worker.pid ]"
+          "[ -f /bi-etl-ejuice/airflow/airflow-worker.pid ]"
         ]
       interval: 30s
       timeout: 30s
       retries: 3
     networks:
-      - airflow_postgres_py3
+      - airflow_network
 
   worker_2:
-    image: base
+    image: bietlejuice-airflow-local
     restart: always
     environment:
       - C_FORCE_ROOT=true
       - ENVIRONMENT=forno
     depends_on:
-      - airflow_python
+      - airflow
     volumes:
-      - ${PROJECT_PATH}/bietlejuice/dags:/bi-etl-ejuice/bietlejuice/dags
+      - ${PROJECT_PATH}/bietlejuice:/bi-etl-ejuice/local/bietlejuice
     entrypoint: airflow worker -cn worker_2
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "[ -f /bi-etl-ejuice/airflow_python/airflow-worker.pid ]"
+          "[ -f /bi-etl-ejuice/airflow/airflow-worker.pid ]"
         ]
       interval: 30s
       timeout: 30s
       retries: 3
     networks:
-      - airflow_postgres_py3
+      - airflow_network
 
 networks:
-  airflow_postgres_py3:
+  airflow_network:
     driver: bridge

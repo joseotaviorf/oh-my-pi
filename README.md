@@ -45,7 +45,7 @@ Repository with implementation of Airflow DAGs and Spark Jobs.
  Commands for common steps are defined on a [Makefile](https://en.wikipedia.org/wiki/Makefile),
  please refer to this file at the project root to check the existing commands.
 
-### ⚙️ [Local Setup Instructions](local_setup.md)
+### ⚙️ [Local Setup Instructions](local/README.md)
 
 ## Useful Commands
 

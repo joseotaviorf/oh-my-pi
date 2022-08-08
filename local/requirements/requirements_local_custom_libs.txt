@@ -1,0 +1,1 @@
+quintoandar-logger>=0.4.0

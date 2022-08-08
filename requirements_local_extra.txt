@@ -1,6 +1,0 @@
-boto3==1.9.183
-deprecated==1.2.10
-pyspark==2.4.3
-requests>=2.22.0
-trino==0.305.0
-unidecode==1.1.1
