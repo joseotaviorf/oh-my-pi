@@ -1821,6 +1821,7 @@ bietlejuice.enrich_pro_owners:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
 
 bietlejuice.enrich_proposal:

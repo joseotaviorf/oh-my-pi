@@ -1,4 +1,4 @@
-WITH event_bus AS (
+WITH events AS (
     SELECT
         id_house,
         ts_status_started AS ts_event
@@ -10,6 +10,17 @@ WITH event_bus AS (
         ts_started AS ts_event
     FROM
         datalake_pro_owners.house_b2b_history
+),
+event_bus AS (
+    SELECT
+        events.id_house,
+        rl.rental_administrator,
+        events.ts_event
+    FROM
+        events
+    LEFT JOIN 
+        datalake_ebdb_listing.rent_listing AS rl
+        ON events.id_house = rl.id_house 
 ),
 lbc AS (
     SELECT
@@ -23,6 +34,7 @@ lbc AS (
 house_listing_owners_status AS (
     SELECT
         hls.id_house,
+        eb.rental_administrator,
         h.id_user AS id_owner,
         hls.status_history,
         IF((hbh.affiliate_type = 'B2BPartner') OR (hbh.id_partner IS NOT NULL AND partner.type = 'PRIME') OR (hbh.id_house_listing IS NOT NULL), TRUE, FALSE) AS is_b2b,
@@ -48,7 +60,7 @@ house_listing_owners_status AS (
         datalake_ebdb_clean.partner partner
             ON partner.id = hbh.id_partner
     LEFT JOIN 
-        lbc AS lbc
+        lbc
             ON lbc.id_house = h.id
     WHERE
         eb.ts_event IS NOT NULL
@@ -73,6 +85,7 @@ status_changes AS (
 houses_changes_filter AS (
     SELECT
         sc.id_owner,
+        hlos.rental_administrator,
         sc.ts_event AS ts_status_started,
         CASE
           WHEN hlos.status_history IN ('alugado', 'publicado', 'suspenso') 
@@ -93,12 +106,13 @@ houses_changes_filter AS (
 ),
 qtd_houses_changes AS (
   SELECT 
-    id_owner,
-    ts_status_started,
-    COUNT(DISTINCT id_house) AS houses
+    hcf.id_owner,
+    rental_administrator,
+    hcf.ts_status_started,
+    COUNT(DISTINCT hcf.id_house) AS houses
   FROM
-    houses_changes_filter
-  GROUP BY 1, 2
+    houses_changes_filter AS hcf
+  GROUP BY 1, 2, 3
 ),
 /*Same qtd could appear in sequence. If one house has status changing between
 alugado, publicado, suspenso the qtd won't change, so we will just store
@@ -107,7 +121,8 @@ a date that doesn't have meaning
 qtd_houses_changes_trimmed AS (
     SELECT
         id_owner,
-        LAG(houses) OVER (PARTITION BY id_owner ORDER BY ts_status_started) AS previous_houses,
+        rental_administrator,
+        LAG(houses) OVER (PARTITION BY id_owner, rental_administrator ORDER BY ts_status_started) AS previous_houses,
         houses,
         ts_status_started
     FROM
@@ -115,10 +130,11 @@ qtd_houses_changes_trimmed AS (
 )
 SELECT
     id_owner,
+    rental_administrator,
     houses,
     previous_houses,
     ts_status_started AS ts_house_number_started,
-    LEAD(ts_status_started) OVER (PARTITION BY id_owner ORDER BY ts_status_started) AS ts_house_number_ended
+    LEAD(ts_status_started) OVER (PARTITION BY id_owner, rental_administrator ORDER BY ts_status_started) AS ts_house_number_ended
 FROM
     qtd_houses_changes_trimmed
 WHERE
