@@ -222,15 +222,20 @@ class SparkDataFrameService:
             .withColumn("day", lit(date.day))
         )
 
-    def optimize_partition(self, records_by_partition):
+    def optimize_partition(self, records_by_partition, partitions=None):
         """
         Given a value of records_by_partition this operation will perform a coalesce or  a repartition in the dataframe
         to optimize the number of partitions of the dataframe based in the given number.
-        :param records_by_partition: number of records to be in each dataframe partition
+        :param records_by_partition: number of records to be in each dataframe partition.
+        :param partitions: partitions is an int that will avoid any calculation to decide what is the ideal
+               number of partitions, this value will be used arbitrarily.
+               This option make this method less costly, but reduce our capacity to define the ideal number of files.
         :return: SparkDataFrameService object with the result df
         """
-        len_data = self.df.count()
-        partitions = max(-(-len_data // records_by_partition), 1)
+
+        if not partitions:
+            len_data = self.df.count()
+            partitions = max(-(-len_data // records_by_partition), 1)
         if partitions > self.df.rdd.getNumPartitions():
             return SparkDataFrameService(self.df.repartition(partitions))
         return SparkDataFrameService(self.df.coalesce(partitions))

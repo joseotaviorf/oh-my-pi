@@ -192,6 +192,10 @@ class S3Loader:
 
         # check spark conf
         spark = BaseSparkContext.spark
+        sc = BaseSparkContext.sc
+        desired_partitions = (
+            sc.defaultParallelism
+        )  # Almost all the times, this line will run before the cluster had scaled up, so we need to force this number to be different from the minimum.
         partition_overwrite_mode = spark.conf.get(
             "spark.sql.sources.partitionOverwriteMode"
         ).lower()
@@ -208,7 +212,7 @@ class S3Loader:
 
         if optimize_dataframe:
             df = self._optimize_dataframe_partitions(
-                df, partitions, max_records_per_file
+                df, partitions, max_records_per_file, desired_partitions
             )
             df_writer = df.write.mode(write_mode).format(format_options)
         else:
@@ -231,7 +235,9 @@ class S3Loader:
         )
 
     @logger(exclude="df", exclude_return=True)
-    def _optimize_dataframe_partitions(self, df, partitions, max_records_per_file):
+    def _optimize_dataframe_partitions(
+        self, df, partitions, max_records_per_file, desired_partitions=None
+    ):
 
         df_service = Services.spark_dataframe_service(df)
 
@@ -240,7 +246,9 @@ class S3Loader:
                 partitions
             ).output()
 
-        return df_service.optimize_partition(max_records_per_file).output()
+        return df_service.optimize_partition(
+            max_records_per_file, partitions=desired_partitions
+        ).output()
 
     @logger(exclude="df")
     def _calculate_dynamic_max_records(self, df):
