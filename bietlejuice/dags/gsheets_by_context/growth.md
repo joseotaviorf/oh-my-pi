@@ -24,6 +24,7 @@ This pipeline produces the following output tables:
     - `base_supply_souce_for_rent`
     - `base_supply_souce_for_sale`
     - `branding_where_is_plaquinha`
+    - `cities_neighborhoods_ibge_qa`
     - `costs_targets`
     - `ecglobal_active_users`
     - `historic_national_costs`
@@ -45,6 +46,7 @@ This pipeline produces the following output tables:
     - `taxonomy_affiliates`
     - `taxonomy_growth`
     - `tradecom_configuration`
+    - `sale_nbp_source_targets`
 2. Data lake clean:
     - `affiliate_pro_registration`
     - `affiliates_cost_tradecom_configuration`
@@ -52,6 +54,7 @@ This pipeline produces the following output tables:
     - `affiliates_manual_cost_engagement`
     - `affiliates_national_costs_history`
     - `branding_where_is_plaquinha`
+    - `cities_neighborhoods_ibge_qa`
     - `costs_targets`
     - `daily_target_supply_rental`
     - `daily_target_supply_sale`
@@ -69,6 +72,7 @@ This pipeline produces the following output tables:
     - `offline_manual_share_cost_center`
     - `rental_tof_daily_targets`
     - `rental_tof_weekly_targets`
+    - `sale_nbp_source_targets`
     - `targets_casa_mineira_nbp`
     - `taxonomy_affiliates`
     - `taxonomy_growth`

@@ -140,11 +140,6 @@ ciq_training:
     sheet_name: Página1
     clean_table_name: ciq_training
 
-cities_neighborhoods_ibge_qa:
-    sheet_id: 19N1BVZuKcCw1RByXoL3hqaXSmEhdi7_mbtyOVff4oQs
-    sheet_name: ibge_5a_cities
-    clean_table_name: cities_neighborhoods_ibge_qa
-
 city_share:
     sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
     sheet_name: city_share

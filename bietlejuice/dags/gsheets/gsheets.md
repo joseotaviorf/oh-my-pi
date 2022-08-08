@@ -56,7 +56,6 @@ This pipeline produces the following output tables:
     - `census_subnormal_crowding_areas`
     - `ciq_costs`
     - `ciq_training`
-    - `cities_neighborhoods_ibge_qa`
     - `city_share`
     - `classifieds_fup_history`
     - `closing_analysts_hierarchy`
