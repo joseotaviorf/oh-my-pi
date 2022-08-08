@@ -180,7 +180,7 @@ contacts as (
         id_flow,
         order_new_contact_flow
     FROM info_contact
-        WHERE id_origin NOT IN ('12', '18', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '34', '35') AND id_origin::INT < 37
+        WHERE id_origin NOT IN ('12', '18', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '34', '35') AND id_origin::INT < 38
         AND DATE(date_add('hour', 3, ts_created)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
 ),
 -----------------------------------------------------------------------------------------------------------
@@ -224,7 +224,7 @@ FROM
     LEFT JOIN events evt
         ON evt.email_md5 = c.email_md5
         AND evt.id_house = c.id_house_portal
-        AND ABS(DATE_DIFF('HOUR', ts_event, ts_contact)) <= 12
+        AND ABS(DATE_DIFF('SECOND', ts_event, ts_contact)) <= 360
     LEFT JOIN taxonomy_portal AS tp
         ON LOWER(COALESCE(tp.app_type, '')) = LOWER(COALESCE(evt.app_type, ''))
     	AND LOWER(COALESCE(tp.utm_source, '')) = LOWER(COALESCE(evt.utm_source, ''))
@@ -287,8 +287,6 @@ visits AS (
         LEFT JOIN datalake_casa_mineira_crm_clean_prod.uf uf on uf.id = cmc.id_uf
         LEFT JOIN datalake_casa_mineira_crm_clean_prod.house_type cmht on cmht.id = cmh.id_type
         LEFT JOIN contact_next AS cn ON cn.id_client = cmv.id_client AND DATE(cmv.ts_created) between cn.dt and cn.dt_next_contact
-    WHERE
-        DATE(date_add('hour', 3, cmv.ts_created)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
 ),
 ---------------------------------
 --- Query Targets from Sheets ---

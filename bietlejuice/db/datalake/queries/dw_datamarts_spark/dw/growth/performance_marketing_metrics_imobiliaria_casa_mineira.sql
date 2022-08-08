@@ -193,7 +193,7 @@ contacts as (
         id_flow,
         order_new_contact_flow
     FROM info_contact
-        WHERE id_origin NOT IN ('12', '18', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '34', '35') AND id_origin::INT < 37
+        WHERE id_origin NOT IN ('12', '18', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '34', '35') AND id_origin::INT < 38
         AND DATE(ts_created + INTERVAL '3' HOUR) BETWEEN ADD_MONTHS(CURRENT_DATE, -12) AND DATE_ADD(CURRENT_DATE, -1)
 ),
 -----------------------------------------------------------------------------------------------------------
@@ -300,8 +300,6 @@ visits AS (
         LEFT JOIN datalake_casa_mineira_crm_clean.uf uf on uf.id = cmc.id_uf
         LEFT JOIN datalake_casa_mineira_crm_clean.house_type cmht on cmht.id = cmh.id_type
         LEFT JOIN contact_next AS cn ON cn.id_client = cmv.id_client AND DATE(cmv.ts_created) between cn.dt and cn.dt_next_contact
-    WHERE
-        DATE(cmv.ts_created + INTERVAL '3' HOUR) BETWEEN ADD_MONTHS(CURRENT_DATE, -12) AND DATE_ADD(CURRENT_DATE, -1)
 ),
 ---------------------------------
 --- Query Targets from Sheets ---
