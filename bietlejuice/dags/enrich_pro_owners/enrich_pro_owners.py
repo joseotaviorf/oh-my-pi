@@ -49,8 +49,6 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 
 inner_dependencies = config_service.get_config("inner_dependencies")
-incremental_tables = config_service.get_config("incremental_tables")
-partition_cols = config_service.get_config("partition_cols")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -92,14 +90,10 @@ tables = datalake_task_groups._get_table_names_from_sql_files(layer=LayerEnum.EN
 enrich_task_groups = {}
 
 for table in tables:
-    is_incremental = table in incremental_tables
-    partitions = partition_cols if table in incremental_tables else None
     enrich_task_groups[table] = datalake_task_groups.build_enrich_task_group(
         table_name=table,
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
-        is_incremental=is_incremental,
-        partitions=partitions,
     )
 
 # enrich_task_groups = datalake_task_groups.build_task_group_from_sql_files(
