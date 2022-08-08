@@ -29,7 +29,7 @@ class IntegrationsValidator:
     def _list_validation_suites_files() -> List[str]:
         """
         Lists all the validation suites files inside
-         composer/validation_suites/**/*_validation_suite.py
+         bietlejuice/validation_suites/**/*_validation_suite.py
         """
         validation_suites_classes_pattern = (
             f"{VALIDATION_SUITES_PATH}/**/*_validation_suite.py"

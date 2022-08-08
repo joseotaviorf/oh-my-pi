@@ -38,6 +38,12 @@ custom_libraries = [
         "whl": f"{artifacts_s3_bucket}/pipedrive-api-client-python/"
         f"quintoandar_pipedrive_api_client-0.1.0-py2.py3-none-any.whl"
     },
+    {
+        "whl": f"{artifacts_s3_bucket}/gsheets-api-client-python/"
+        f"quintoandar_gsheets_api_client-0.2.1-py2.py3-none-any.whl"
+    },
+    {"pypi": {"package": "google-auth==2.9.1"}},
+    {"pypi": {"package": "google-api-python-client==2.55.0"}},
 ]
 
 dag = DAG(

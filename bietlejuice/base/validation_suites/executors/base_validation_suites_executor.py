@@ -13,8 +13,8 @@ class BaseValidationSuitesExecutor:
     SECRET_KEY = None
     REPOSITORY_CONSUMER_CLASS = None
 
-    def __init__(self) -> None:
-        self.auth = None
+    def __init__(self, auth=None) -> None:
+        self.auth = auth
         self._suite_validation_has_failures = False
 
     def get_suite_validation_has_failures(self) -> bool:

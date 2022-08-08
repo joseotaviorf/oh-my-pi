@@ -21,7 +21,14 @@ logger = QuintoAndarLogger("FileService")
 
 class FileService:
     @staticmethod
-    def get_query_from_file_name(file_name):
+    def get_query_from_file_name(file_name: str):
+        """
+        Open a file from the bietlejuice wheel
+
+        :param file_name: absolute file path
+        :return: file content
+        :raises: RuntimeError
+        """
         try:
             with open(file_name) as f:
                 return f.read()
