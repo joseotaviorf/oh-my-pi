@@ -29,6 +29,9 @@ columns:
   zipcode:
     lineage:
       - datalake_money_laundering_prevention.house.zipcode
+  country_code:
+    lineage:
+      - datalake_money_laundering_prevention.house.country_code
   type:
     lineage:
       - datalake_money_laundering_prevention.house.type

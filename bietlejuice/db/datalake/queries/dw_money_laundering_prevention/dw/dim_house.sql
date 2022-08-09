@@ -8,6 +8,7 @@ SELECT
     complement,
     number,
     zipcode,
+    country_code,
     type,
     registry_name,
     registration,
