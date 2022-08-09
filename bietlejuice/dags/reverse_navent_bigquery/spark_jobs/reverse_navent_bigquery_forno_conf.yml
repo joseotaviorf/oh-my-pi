@@ -1,0 +1,5 @@
+---
+bigquery_project_id: xcbidw-prd
+tables:
+  - table_name: benvi_contract_billing_enrichment
+    bigquery_table_id: xcbidw-prd.benvi.mb_contracts
