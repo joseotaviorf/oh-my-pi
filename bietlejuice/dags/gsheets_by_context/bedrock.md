@@ -21,18 +21,14 @@ This pipeline produces the following output tables:
 
 1. Data lake raw:
 
-   - `agents_payments`
    - `basic_access`
    - `legal_provisioning`
-   - `mova_lra_owners`
    - `people_hierarchy`
    - `people_data`
 
 2. Data lake clean:
-   - `agents_payments`
    - `people_basic_access`
    - `legal_provisioning`
-   - `mova_lra_owners`
    - `people_employees`
    - `people_hierarchy`
 

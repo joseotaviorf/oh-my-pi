@@ -39,6 +39,7 @@ dags_out_of_pattern:
         "dw_user_sales_rep",
         "ebdb",
         "enrich_marketing_costs_offline",
+        "gsheets.fintech",
         "gsheets.for_rent",
         "gsheets.for_sale",
         "gsheets.growth",

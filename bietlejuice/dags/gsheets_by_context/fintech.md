@@ -20,9 +20,59 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
+    - `advance_base`
+    - `agents_payments`
+    - `agr_account`
+    - `associate_executive_bonus`
+    - `associate_executive_correction`
+    - `aux_commission`
+    - `business_rules_bonus`
+    - `campaign_bonus`
+    - `closing_analysts_hierarchy`
+    - `cod_locale`
     - `credit_decisions_auditing`
+    - `for_sale_bandaids`
+    - `for_sale_financial_flow`
+    - `for_sale_sap_invoices`
+    - `hub_bonus`
+    - `inspection_bugs_v2`
+    - `mova_lra_owners`
+    - `negotiation_executive_bonus`
+    - `negotiation_executive_correction`
+    - `owner_entrance_inspection_csat`
+    - `owner_exit_inspection_csat`
+    - `payments_deals_and_discounts`
+    - `poa_partners`
+    - `target_nps_weekly`
+    - `tenant_entrance_inspection_csat`
+    - `tracking_catalog_event_properties`
 
 2. Data lake clean:
+    - `advance_base`
+    - `agents_payments`
+    - `agr_account`
+    - `associate_executive_bonus`
+    - `associate_executive_correction`
+    - `aux_commission`
+    - `business_rules_bonus`
+    - `campaign_bonus`
+    - `closing_analysts_hierarchy`
+    - `cod_locale`
     - `credit_decisions_auditing`
+    - `for_sale_bandaids`
+    - `for_sale_financial_flow`
+    - `for_sale_sap_invoices`
+    - `hub_bonus`
+    - `inspection_bugs_v2`
+    - `mova_lra_owners`
+    - `negotiation_executive_bonus`
+    - `negotiation_executive_correction`
+    - `owner_entrance_inspection_csat`
+    - `owner_exit_inspection_csat`
+    - `payments_deals_and_discounts`
+    - `poa_partners`
+    - `target_nps_weekly`
+    - `tenant_entrance_inspection_csat`
+    - `tracking_catalog_event_properties`
 
 </details>

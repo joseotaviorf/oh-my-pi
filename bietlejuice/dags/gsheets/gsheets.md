@@ -25,7 +25,6 @@ This pipeline produces the following output tables:
 2. Data lake clean:
     - `acquisition_target_per_source`
     - `actionline_negotiations`
-    - `advance_base`
     - `affiliate_type_targets`
     - `affiliates_extra_user_bonus`
     - `affiliates_active_segmentation`
@@ -33,23 +32,17 @@ This pipeline produces the following output tables:
     - `affiliates_monthly_expected_results`
     - `agents_control`
     - `agents_ranking_targets`
-    - `agr_account`
     - `agreements_discounts_answer_forms`
     - `agreements_discounts_expenses_created`
-    - `associate_executive_bonus`
-    - `associate_executive_correction`
     - `aux_agents_sale_hub`
     - `aux_check_photo_sender`
-    - `aux_commission`
     - `bandaid_off`
     - `base_hunter`
     - `bbb22_coupon_sale_users`
     - `bbb22_giveaway_rent_users`
     - `braze_campaign_creative`
     - `braze_canvas_creative`
-    - `business_rules_bonus`
     - `business_unit_region`
-    - `campaign_bonus`
     - `casa_mineira_inside_sales_pipe`
     - `casa_mineira_marketing_cost_taxonomy`
     - `casa_mineira_marketing_manual_shared_costs`
@@ -58,8 +51,6 @@ This pipeline produces the following output tables:
     - `ciq_training`
     - `city_share`
     - `classifieds_fup_history`
-    - `closing_analysts_hierarchy`
-    - `cod_locale`
     - `contact_type_taxonomy`
     - `contract_attribution_models`
     - `criteo_abtest_rj`
@@ -76,20 +67,15 @@ This pipeline produces the following output tables:
     - `extra_invoice`
     - `extra_invoice_created_expenses`
     - `forbrokers_3p_partner_conditions`
-    - `for_sale_bandaids`
-    - `for_sale_financial_flow`
-    - `for_sale_sap_invoices`
     - `from_to_cancellation`
     - `google_searches_share_of_interest`
     - `hotjar_photos_repressed_demand`
     - `households_per_city_ibge`
     - `hub_agents_hierarchy`
-    - `hub_bonus`
     - `hub_sale_closing_process`
     - `inside_sale_supply_targets`
     - `inspection_analysis_forms`
     - `inspection_bugs`
-    - `inspection_bugs_v2`
     - `inspectors_control`
     - `ipsos_brandtracking_questions`
     - `keys_logistic_control`
@@ -114,8 +100,6 @@ This pipeline produces the following output tables:
     - `marketshare_seasonality`
     - `media_plan_current_quarter`
     - `monday_users`
-    - `negotiation_executive_bonus`
-    - `negotiation_executive_correction`
     - `offer_fup_history`
     - `offers_hub_central`
     - `offline_manual_costs`
@@ -123,17 +107,13 @@ This pipeline produces the following output tables:
     - `offline_manual_share_cost_center`
     - `ongoing_contracts_2020`
     - `ongoing_contracts_2021`
-    - `owner_entrance_inspection_csat`
-    - `owner_exit_inspection_csat`
     - `owner_negotiation_csat`
     - `owner_offboarding_keys_csat`
     - `owner_offboarding_repair_csat`
-    - `payments_deals_and_discounts`
     - `photographer_account`
     - `planning_rental_financial_targets`
     - `plaquinhas_installation_targets`
     - `plaquinhas_demand_targets`
-    - `poa_partners`
     - `pro_owner_analyst`
     - `process_eviction`
     - `projreparos_espelhamento_dl`
@@ -163,7 +143,6 @@ This pipeline produces the following output tables:
     - `tag_sla_target`
     - `targets_acquisition_cumulative_autonomous_agent`
     - `targets_agents_engagement`
-    - `target_nps_weekly`
     - `targets_avg_ticket_adm_fee`
     - `targets_casa_mineira_cost`
     - `targets_casa_mineira_ncp`
@@ -178,7 +157,6 @@ This pipeline produces the following output tables:
     - `taxonomy_mkt_cost`
     - `taxonomy_portal_casa_mineira`
     - `taxonomy_sla`
-    - `tenant_entrance_inspection_csat`
     - `tenant_negotiation_csat`
     - `tenant_onboarding_keys_csat`
     - `tenant_reimbursement_csat`
@@ -190,11 +168,11 @@ This pipeline produces the following output tables:
     - `unit_economics_amortization_curve`
     - `visits_fup_history`
     - `weekday_demand_share`
+    - `week_volumes_demand`
+    - `week_volumes_supply`
     - `weekday_holiday_share`
     - `weekday_holiday_share_supply`
     - `weekday_supply_channel_share`
-    - `week_volumes_demand`
-    - `week_volumes_supply`
 
 ### Responsible Data Engineering Team
 

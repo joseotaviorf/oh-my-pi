@@ -2142,13 +2142,13 @@ bietlejuice.reverse_nazare:
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.gsheets.for_sale:load-clean-sale-payments-tiers
-  - bietlejuice.gsheets:load-clean-advance-base
-  - bietlejuice.gsheets:load-clean-associate-executive-bonus
-  - bietlejuice.gsheets:load-clean-business-rules-bonus
-  - bietlejuice.gsheets:load-clean-campaign-bonus
+  - bietlejuice.gsheets.fintech:load-clean-advance-base
+  - bietlejuice.gsheets.fintech:load-clean-associate-executive-bonus
+  - bietlejuice.gsheets.fintech:load-clean-business-rules-bonus
+  - bietlejuice.gsheets.fintech:load-clean-campaign-bonus
   - bietlejuice.gsheets:load-clean-forbrokers-3p-partner-conditions
-  - bietlejuice.gsheets:load-clean-hub-bonus
-  - bietlejuice.gsheets:load-clean-negotiation-executive-bonus
+  - bietlejuice.gsheets.fintech:load-clean-hub-bonus
+  - bietlejuice.gsheets.fintech:load-clean-negotiation-executive-bonus
   - bietlejuice.hub_services:load-clean-business-unit
 
 bietlejuice.enrich_documentation_metrics:
