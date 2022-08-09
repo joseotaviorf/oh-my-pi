@@ -38,6 +38,7 @@ dags_out_of_pattern:
         "dw_user_affiliate",
         "dw_user_sales_rep",
         "ebdb",
+        "enrich_lost_listings",
         "enrich_marketing_costs_offline",
         "gsheets.fintech",
         "gsheets.for_rent",
@@ -51,9 +52,9 @@ dags_out_of_pattern:
         "quintoandar",
         "regions_polygon",
         "reverse_atento",
-        "reverse_tracksale",
+        "reverse_navent_bigquery",
         "reverse_nazare",
-        "enrich_lost_listings",
+        "reverse_tracksale",
     ]
 databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice
 datalake_bucket: datalake.s3.forno.data.quintoandar.com.br
