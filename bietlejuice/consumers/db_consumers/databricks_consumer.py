@@ -75,7 +75,6 @@ class DatabricksConsumer(DBConsumer):
         # todo: implement me!
         raise NotImplementedError()
 
-    @logger
     def get_data_from_query(self, query, table_name=None):
         """
         Gets the results of a query.

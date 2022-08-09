@@ -72,6 +72,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 run_validations_suites = QuintoAndarDatabricksSubmitRunOperator(
     task_id=f"run-validations-suites",
     dag=dag,
+    retries=0,
     json={
         "spark_python_task": {
             "python_file": f"{base_spark_jobs_path}/run_validation_suites.py"

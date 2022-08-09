@@ -1,3 +1,4 @@
+from time import sleep
 from typing import Any, List, Dict, Union, Tuple
 
 from datetime import datetime, timedelta
@@ -235,3 +236,4 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         data = gsheet_client.get_data_from_sheet(sheet_name, sheet_id)
         self.load_gsheet_on_temp_view(data, clean_table_name)
         self.run_and_validate_clean_query(gsheets_context, clean_table_name)
+        sleep(1)

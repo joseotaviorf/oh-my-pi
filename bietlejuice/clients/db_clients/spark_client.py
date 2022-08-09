@@ -29,7 +29,6 @@ class SparkClient(DBClient):
             self._session = session_builder.getOrCreate()
         return self._session
 
-    @logger
     def get_records(self, query, parameters=None):
         # todo: check if the session needs to be closed at the end. Right now,
         #  the session is never closed explicitly.
@@ -37,7 +36,6 @@ class SparkClient(DBClient):
 
         return df
 
-    @logger
     def run(self, command, autocommit=False, parameters=None):
         # todo: check if the session needs to be closed at the end. Right now,
         #  the session is never closed explicitly.
@@ -60,7 +58,6 @@ class SparkClient(DBClient):
         #  the session is never closed explicitly.
         return self.conn.read.format(format).options(**options).load(path=path)
 
-    @logger(exclude="data")
     def create_dataframe(
         self, data, schema=None, sampling_ratio=None, verify_schema=True
     ):
