@@ -5,6 +5,7 @@ SELECT
     id_user_registrant AS sk_user_registrant,  
     listing_value,
     calculator_price,
+    country_code,
     status,
     status_closing,
     compare_price_with_average,

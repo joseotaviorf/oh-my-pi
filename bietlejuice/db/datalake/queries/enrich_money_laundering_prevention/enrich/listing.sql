@@ -5,6 +5,7 @@ SELECT
     h.id_user_registrant,  
     h.sale_price AS listing_value,
     lbc.calculator_price,
+    h.country_code,
     lbc.status,
     lbc.status_closing,
     h.compare_price_with_average,
@@ -23,5 +24,3 @@ INNER JOIN datalake_sale_listings.sale_listing AS sl
     ON sl.id_house = h.id
 LEFT JOIN datalake_ebdb_listing.listing_business_context AS lbc
     ON lbc.id_house = h.id
-WHERE
-    h.id_country = 1 --BRAZIL

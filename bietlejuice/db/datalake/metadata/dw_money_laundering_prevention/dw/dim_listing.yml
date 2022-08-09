@@ -20,6 +20,9 @@ columns:
   calculator_price:
     lineage:
       - datalake_money_laundering_prevention.listing.calculator_price
+  country_code:
+    lineage:
+      - datalake_money_laundering_prevention.listing.country_code
   status:
     lineage:
       - datalake_money_laundering_prevention.listing.status
