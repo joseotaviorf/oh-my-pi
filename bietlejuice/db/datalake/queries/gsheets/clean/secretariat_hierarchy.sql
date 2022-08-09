@@ -6,8 +6,6 @@ SELECT
      allocation,
      status,
      manager,
-     TO_DATE(dt_started, 'dd/MM/yyyy') AS dt_started
+     TO_DATE(dt_started, 'd/M/yyyy') AS dt_started
 FROM
     datalake_gsheets_raw.secretariat_hierarchy
-
-
