@@ -1,4 +1,5 @@
 ---
 inner_dependencies:
   received_demand:
+    - call
     - email

@@ -1,7 +1,7 @@
 ## Enrich Customer Support
 ### Purpose
 
-Apply all the business rules needed to build an unified ticket vision on DW (Customer Support model). Each row of Call and Chat tables represent one task from a ticket. Each row in the Email table represents one ticket.
+Apply all the business rules needed to build an unified ticket vision on DW (Customer Support model). Each row of Call and Chat tables represent one task from a ticket. Each row in the Email table represents one ticket. About received_demand table, each row is a demand received from the user, it contains all the three channels (Call, Chat and Email)
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
