@@ -1,0 +1,55 @@
+---
+database_name: datalake_money_laundering_prevention
+table_name: transaction
+columns:
+  id_offer:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+  id_house:
+    lineage:
+      - datalake_offer.sale_offer.id_house
+  id_buyer:
+    lineage:
+      - datalake_offer.sale_offer.id_buyer
+  id_visit:
+    lineage:
+      - datalake_booking.booking.id_visit
+  id_booking:
+    lineage:
+      - datalake_booking.booking.id
+  current_payment_method:
+    lineage:
+      - datalake_offer.sale_offer.current_payment_method
+  planned_payment_method:
+    lineage:
+      - datalake_offer.sale_offer.planned_payment_method
+  monday_status:
+    lineage:
+      - datalake_offer.sale_offer.monday_status
+  payment_model:
+    lineage:
+      - datalake_offer.sale_offer.payment_model
+  itbi_price:
+    lineage:
+      - datalake_offer.sale_offer.itbi_price
+  registry_price:
+    lineage:
+      - datalake_offer.sale_offer.registry_price
+  payment_entry_amount:
+    lineage:
+      - datalake_offer.sale_offer.payment_entry_amount
+  financing_value:
+    lineage:
+      - datalake_offer.sale_offer.financing_value
+  fgts_value:
+    lineage:
+      - datalake_offer.sale_offer.fgts_value
+  earnest_value:
+    lineage:
+      - datalake_offer.sale_offer.earnest_value
+  sale_price_agreed:
+    lineage:
+      - datalake_offer.sale_offer.sale_price_agreed
+  is_ccv_canceled:
+    lineage:
+      - datalake_offer.sale_offer.is_ccv_canceled

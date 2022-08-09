@@ -16,6 +16,7 @@ This pipeline produces the following tables in enrich layer, via full load:
 - `document`
 - `house`
 - `listing`
+- `transaction`
 - `visit`
 
 

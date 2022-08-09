@@ -922,6 +922,7 @@ bietlejuice.dw_money_laundering_prevention:
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-document
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-house
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-listing
+  - bietlejuice.enrich_money_laundering_prevention:load-enrich-transaction
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-visit
   - bietlejuice.gsheets.static:load-clean-pld-suspicion-list
 
@@ -1725,6 +1726,7 @@ bietlejuice.enrich_money_laundering_prevention:
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_booking:load-enrich-booking-review
+  - bietlejuice.enrich_offer:load-enrich-offer
 
 bietlejuice.enrich_monopoly:
   - bietlejuice.monopoly:load-clean-sale
