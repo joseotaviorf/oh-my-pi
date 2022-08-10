@@ -14,6 +14,28 @@ columns:
     lineage:
       - datalake_rene_descartes_clean.house_lead.id
       - datalake_amplitude_clean.events.user_properties
+  country_code:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.155696_refer_lead_referred_events.user_properties
+      - datalake_amplitude_clean.155697_refer_lead_referred_events.user_properties
+      - datalake_amplitude_clean.160023_affiliate_lead_referred_events.user_properties
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.user_properties
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.user_properties
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.user_properties
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.user_properties
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.user_properties
+  user_country:
+    lineage:
+      - datalake_amplitude_clean.events.country
+      - datalake_amplitude_clean.155696_refer_lead_referred_events.country
+      - datalake_amplitude_clean.155697_refer_lead_referred_events.country
+      - datalake_amplitude_clean.160023_affiliate_lead_referred_events.country
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.country
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.country
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.country
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.country
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.country
   formfield_lead_uuid:
     lineage:
       - datalake_amplitude_clean.183047_lead_form_submitted_events.formfield_lead_uuid

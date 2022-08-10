@@ -4,6 +4,12 @@ columns:
   id_visit:
     lineage:
       - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.event_properties
+  country_code:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
+  user_country:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.country
   app_type:
     lineage:
       - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties

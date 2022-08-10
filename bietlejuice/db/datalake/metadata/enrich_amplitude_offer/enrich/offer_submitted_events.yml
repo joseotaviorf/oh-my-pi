@@ -16,6 +16,16 @@ columns:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.ep_id_firestore
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.ep_id_firestore
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.ep_id_firestore
+  country_code:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties  
+  user_country:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.country
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.country
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.country
   app_type:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_app_type

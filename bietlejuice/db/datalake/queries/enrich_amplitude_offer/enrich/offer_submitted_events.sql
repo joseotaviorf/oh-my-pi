@@ -4,6 +4,8 @@ with all_apps_events(
         id_app,
         ep_id_house AS id_house,
         ep_id_firestore AS id_firestore,
+        country AS user_country,
+        user_properties,
         up_app_type AS app_type,
         up_utm_source AS utm_source,
         up_utm_medium AS utm_medium,
@@ -18,6 +20,8 @@ with all_apps_events(
         id_app,
         ep_id_house AS id_house,
         ep_id_firestore AS id_firestore,
+        country AS user_country,
+        user_properties,
         up_app_type AS app_type,
         up_utm_source AS utm_source,
         up_utm_medium AS utm_medium,
@@ -32,6 +36,8 @@ with all_apps_events(
         id_app,
         ep_id_house AS id_house,
         ep_id_firestore AS id_firestore,
+        country AS user_country,
+        user_properties,
         up_app_type AS app_type,
         up_utm_source AS utm_source,
         up_utm_medium AS utm_medium,
@@ -46,6 +52,8 @@ select
     id_app,
     id_house,
     id_firestore,
+    GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
+    user_country,
     app_type,
     utm_source,
     utm_medium,
@@ -66,4 +74,3 @@ select
     ) as is_branded,
     dt_event
 from all_apps_events
-

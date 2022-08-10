@@ -4,6 +4,12 @@ columns:
   id_device:
     lineage:
       - datalake_amplitude_clean.events.id_device
+  country_code:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  user_country:
+    lineage:
+      - datalake_amplitude_clean.events.country
   utm_campaign:
     lineage:
       - datalake_amplitude_clean.events.user_properties

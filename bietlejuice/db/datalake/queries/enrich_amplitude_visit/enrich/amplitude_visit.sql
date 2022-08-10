@@ -1,16 +1,19 @@
 with extra_debug as (
-
-  SELECT d.*
-  FROM  datalake_amplitude_clean.170698_visit_schedule_confirmed_events as v
-  RIGHT JOIN datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events as d
-  ON v.ep_visit_code = d.ep_visit_code AND v.id_user = d.id_user
-  WHERE v.ep_visit_code IS NULL
-  
+  SELECT
+    d.*
+  FROM
+    datalake_amplitude_clean.170698_visit_schedule_confirmed_events as v
+  RIGHT JOIN
+    datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events as d
+      ON v.ep_visit_code = d.ep_visit_code AND v.id_user = d.id_user
+  WHERE
+    v.ep_visit_code IS NULL
 ),
-
 cross_platform as (
  select
     '170698' as id_app,
+    country AS user_country,
+    user_properties,
     ts_event,
     up_platform as app_type,
     ep_visit_code as id_visit,
@@ -41,6 +44,8 @@ cross_platform as (
   
   select
     '170698' as id_app,
+    country AS user_country,
+    user_properties,
     ts_event,
     up_platform as app_type,
     ep_visit_code as id_visit,
@@ -70,6 +75,8 @@ cross_platform as (
 select
   id_app,
   id_visit,
+  GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
+  user_country,
   app_type,
   coalesce(media_source, 'Unknown') as media_source,
   adjust_network,
