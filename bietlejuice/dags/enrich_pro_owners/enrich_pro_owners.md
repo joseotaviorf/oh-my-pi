@@ -18,4 +18,5 @@ Produces the following output table:
 - `house_b2b_history`
 - `owner_houses_quantity_history`
 - `pro_owner_history`
+- `tracking_weekly_changes`
 
