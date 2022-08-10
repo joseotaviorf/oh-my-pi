@@ -35,6 +35,7 @@ LINEAGE_FROM_PRODUCT_SOURCES_SKIP_LIST:
   - twitter
   - linkedin
   - facebook_insights
+  - gsheets_by_context
 DAG_METADATA_MANUAL_MAPPING:
   ebdb:
     raw:
