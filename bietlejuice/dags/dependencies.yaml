@@ -1187,8 +1187,8 @@ bietlejuice.enrich_bigfone_events:
 bietlejuice.enrich_bigfone_twilio:
   - bietlejuice.enrich_bigfone_events:load-enrich-events
 
-#bietlejuice.enrich_bigid:
-#  - bietlejuice.bigid:load-clean-data-catalog-entities
+bietlejuice.enrich_bigid:
+  - bietlejuice.bigid:load-clean-data-catalog-entities
 
 bietlejuice.enrich_bob:
   - bietlejuice.bob:load-clean-house-draft-aud
