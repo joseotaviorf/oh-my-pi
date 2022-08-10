@@ -53,7 +53,7 @@ SELECT
     FROM_JSON(NULLIF(GET_JSON_OBJECT(details, '$.accessibilityItems'), '{{}}'), 'map<string, boolean>') AS accessibility_items,
     FROM_JSON(NULLIF(enrichment_reason, '{{}}'), 'map<string, boolean>') AS enrichment_reason,
     FROM_JSON(NULLIF(discard_reason, '{{}}'), 'map<string, boolean>') AS discard_reason,
-    FROM_JSON(NULLIF(eligible_reason, '{{}}'), 'map<string, boolean>') AS eligible_reason,
+    FROM_JSON(NULLIF(eligible_reason, '{{}}'), 'map<string, string>') AS eligible_reason,
     FROM_JSON(
         NULLIF(GET_JSON_OBJECT(photos, '$.list'), '[]'),
         'array<struct<url: string, description: string>>'
