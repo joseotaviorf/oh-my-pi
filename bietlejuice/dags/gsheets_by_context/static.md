@@ -33,6 +33,7 @@ This pipeline produces the following output tables:
     - `dados_docato`
     - `de_para_cancelamento`
     - `for_sale_segmentation_survey`
+    - `great_price_tag_test_groups`
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
     - `pld_suspicion_list`
@@ -59,6 +60,7 @@ This pipeline produces the following output tables:
     - `costs_allocation_relative_indexes`
     - `for_sale_segmentation_survey_responses`
     - `from_to_cancellation`
+    - `great_price_tag_test_groups`
     - `legal_base_docato`
     - `mra_historical`
     - `offline_and_branding_marketing_costs`

@@ -834,6 +834,12 @@ cities_neighborhoods_ibge_qa:
     clean_table_name: cities_neighborhoods_ibge_qa
     sheet_context: static # TO-DO: must be growth context
 
+great_price_tag_test_groups:
+    sheet_id: 1IelEYQr306slcOrkyM8ELVRCq8UML6k27lixgjkEAfo
+    sheet_name: base_20220808
+    clean_table_name: great_price_tag_test_groups
+    sheet_context: static
+
 #########################
 # GENERAL SHEETS
 ###################
