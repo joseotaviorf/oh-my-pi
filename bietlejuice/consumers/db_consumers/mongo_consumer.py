@@ -1,14 +1,21 @@
 import json
 
 from datetime import datetime, timedelta
+from multiprocessing import Pool
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.consumers.db_consumers.db_consumer import DBConsumer
 from bietlejuice.services import JsonService
 
-from bson.json_util import dumps as bson_dumps, RELAXED_JSON_OPTIONS
+from bson.json_util import (
+    dumps as bson_dumps,
+    RELAXED_JSON_OPTIONS,
+    DEFAULT_JSON_OPTIONS,
+)
 
 logger = QuintoAndarLogger("MongoConsumer")
+NB_THREADS = 15
+NB_DOCUMENTS = 100000
 
 
 class MongoConsumer(DBConsumer):
@@ -98,7 +105,19 @@ class MongoConsumer(DBConsumer):
         """
         # documents are a list of Bson (Mongo format), it's necessary to convert to dict.
         # convert  bson -> json_string -> dict
-        data = json.loads(bson_dumps(documents, json_options=RELAXED_JSON_OPTIONS))
+
+        if documents.count() > NB_DOCUMENTS:
+            # 2 = datetime ISO8601
+            DEFAULT_JSON_OPTIONS.datetime_representation = 2
+            pool = Pool(processes=NB_THREADS)
+            data = []
+
+            bson_files = pool.map(bson_dumps, documents)
+            for i in bson_files:
+                data.append(json.loads(i))
+        else:
+            data = json.loads(bson_dumps(documents, json_options=RELAXED_JSON_OPTIONS))
+
         converted_data = self.__convert_columns_to_string_type(data)
 
         try:
