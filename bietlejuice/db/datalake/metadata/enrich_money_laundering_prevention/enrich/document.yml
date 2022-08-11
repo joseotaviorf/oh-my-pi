@@ -5,9 +5,15 @@ columns:
   id_document:
     lineage:
       - datalake_docx_clean.document.id
+  id_folder:
+    lineage:
+      - datalake_docx_clean.document.id_folder
   id_proposal:
     lineage:
-      - datalake_docx_clean.credit_evaluation.id_proposal
+      - datalake_docx_clean.folder_reference.reference_properties
+  id_proposal_proponent:
+    lineage:
+      - datalake_docx_clean.folder_reference.reference_properties
   document_type:
     lineage:
       - datalake_docx_clean.document_type.name

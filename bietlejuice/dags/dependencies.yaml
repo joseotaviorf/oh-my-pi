@@ -1723,7 +1723,6 @@ bietlejuice.enrich_marketing_manual_daily_costs:
 bietlejuice.enrich_money_laundering_prevention:
   # Removed dependencies with ebdb in order to avoid loopings since enrich_booking already satisfies.
   - bietlejuice.docx:load-clean-credit-evaluation-proponent
-  - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_booking:load-enrich-booking-review
   - bietlejuice.enrich_offer:load-enrich-offer

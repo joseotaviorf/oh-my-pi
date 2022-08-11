@@ -1,6 +1,16 @@
 SELECT
     d.id AS id_document,
-    ce.id_proposal,
+    d.id_folder,
+    CASE
+        WHEN id_folder_type = 2 THEN f.id_external
+        ELSE NULL
+    END AS id_house,
+    CASE
+        WHEN id_folder_type = 1 THEN f.id_external
+        ELSE NULL
+    END AS id_user,
+    GET_JSON_OBJECT(fr.reference_properties, '$.proposalId') AS id_proposal,
+    GET_JSON_OBJECT(fr.reference_properties, '$.proposalProponentId') AS id_proposal_proponent,
     dt.name AS document_type,
     d.attributes,
     d.attachments,
@@ -11,5 +21,8 @@ JOIN datalake_docx_clean.document_context AS dc
     ON dc.id = d.id_document_context
 JOIN datalake_docx_clean.document_type AS dt
     ON dt.id = d.id_document_type
-LEFT JOIN datalake_docx_clean.credit_evaluation AS ce
-    ON ce.id_proposal = d.id_context_external
+LEFT JOIN datalake_docx_clean.folder AS f
+    ON d.id_folder = f.id
+LEFT JOIN datalake_docx_clean.folder_reference AS fr
+    ON fr.id_source_folder = f.id
+    AND fr.reference_properties IS NOT NULL
