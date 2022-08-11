@@ -93,6 +93,9 @@ tables:
   - table_name: parceiro
     extraction_type: full
     is_cleaned: false
+  - table_name: parceiro_categoria
+    extraction_type: full
+    is_cleaned: false
   - table_name: pre_analise_observacao
     extraction_type: full
     is_cleaned: false
@@ -132,6 +135,6 @@ tables:
   - table_name: usuariospilotomultibancos
     extraction_type: full
     is_cleaned: false
-  
+
 partition_columns: [year, month, day]
 lineage_product_database_name: atta

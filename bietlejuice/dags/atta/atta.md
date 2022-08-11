@@ -46,6 +46,7 @@ In datalake raw, via full load:
 - `max_usuarios`
 - `meta_consultor`
 - `parceiro`
+- `parceiro_categoria`
 - `pre_analise_observacao`
 - `produto`
 - `produto_esteira`
