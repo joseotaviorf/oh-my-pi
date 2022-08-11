@@ -1,0 +1,21 @@
+---
+tables:
+  journal_entries:
+    query_code: DATA-1
+    schema_name: JOURNAL_ENTRIES_SCHEMA
+  journal_entry_lines:
+    query_code: DATA-2
+    schema_name: JOURNAL_ENTRY_LINES
+  invoices:
+    query_code: DATA-3
+    schema_name: INVOICES
+  incoming_payments:
+    query_code: DATA-4
+    schema_name: INCOMING_PAYMENTS
+  other_entries:
+    query_code: DATA-5
+    schema_name: OTHER_ENTRIES
+partition_cols:
+  - year
+  - month
+  - day

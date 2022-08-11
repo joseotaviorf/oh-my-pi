@@ -1,0 +1,3 @@
+---
+database_name: datalake_sap_raw
+table_name: invoices

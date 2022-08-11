@@ -1,0 +1,64 @@
+---
+database_name: datalake_sap_clean
+table_name: journal_entry_lines
+columns:
+  id_transaction:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.transaction_id_transid
+  id_line:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.line_id_line_id
+  id_business_entity:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.business_entity_id_ref1
+  id_finance_entity_entry:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.finance_entity_entry_id_u_financeentityentryid
+  id_finance_entity:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.finance_entity_id_ref2
+  cost_center_code:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.cost_center_ocrcode2
+  location_profit_code:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.location_profitcode
+  managerial_code:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.managerial_ocrcode3
+  memo_line:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.memo_linememo
+  account_shortname:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.account_shorname
+  transaction_type:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.transaction_type_transtype
+  credit:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.credit
+  debit:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.debit
+  dt_accrual:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.accrualdate_ref3line
+  dt_due:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.duedate
+  dt_reference:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.refdate
+  dt_tax:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.taxdate
+  year:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.year
+  month:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.month
+  day:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.day

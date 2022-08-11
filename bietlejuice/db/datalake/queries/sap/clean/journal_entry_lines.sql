@@ -1,0 +1,27 @@
+SELECT
+  transaction_id_transid AS id_transaction,
+  line_id_line_id AS id_line,
+  business_entity_id_ref1 AS id_business_entity,
+  finance_entity_entry_id_u_financeentityentryid AS id_finance_entity_entry,
+  finance_entity_id_ref2 AS id_finance_entity,
+  cost_center_ocrcode2 AS cost_center_code,
+  location_profitcode AS location_profit_code,
+  managerial_ocrcode3 AS managerial_code,
+  memo_linememo AS memo_line,
+  account_shorname AS account_shortname,
+  transaction_type_transtype AS transaction_type,
+  credit,
+  debit,
+  accrualdate_ref3line AS dt_accrual,
+  duedate AS dt_due,
+  refdate AS dt_reference,
+  taxdate AS dt_tax,
+  year,
+  month,
+  day
+FROM
+  datalake_sap_raw.journal_entry_lines
+WHERE
+  year = {year}
+  AND month = {month}
+  AND day = {day}

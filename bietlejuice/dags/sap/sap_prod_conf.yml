@@ -1,0 +1,5 @@
+---
+clean_partition_cols:
+  - year
+  - month
+  - day
