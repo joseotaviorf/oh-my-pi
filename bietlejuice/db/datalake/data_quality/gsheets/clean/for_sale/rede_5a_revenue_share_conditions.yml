@@ -23,12 +23,12 @@ column_level_validations:
       less_than: 1
   adm_5a:
     has_min_value:
-      greater_than: 0
+      greater_than_or_equal_to: 0
     has_max_value:
       less_than: 1
   additional_comission_supply:
     has_min_value:
-      greater_than: 0
+      greater_than_or_equal_to: 0
     has_max_value:
       less_than: 1
   comission_supply:
@@ -40,7 +40,7 @@ column_level_validations:
       less_than: 1
   additional_comission_demand:
     has_min_value:
-      greater_than: 0
+      greater_than_or_equal_to: 0
     has_max_value:
       less_than: 1
   comission_demand:
