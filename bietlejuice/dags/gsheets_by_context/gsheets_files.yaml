@@ -37,6 +37,12 @@ agents_ranking_targets:
     clean_table_name: agents_ranking_targets
     sheet_context: support_and_service
 
+aux_check_photo_sender:
+    sheet_id: 10dUA-ED5cqd8qEHrMC-iXjPio0WBEUP-dZGkcPwP6WU
+    sheet_name: aux_check_photo_sender
+    clean_table_name: aux_check_photo_sender
+    sheet_context: support_and_service
+
 aux_payments_photos:
     sheet_id: 1-I_TRK051HkgvY7OH09x5quCwn0K6mTbOFQIwlROsC8
     sheet_name: aux_payments_photos
@@ -742,12 +748,6 @@ mexico_supply_targets_2022:
 #########################
 # FOR SALE SHEETS
 ###################
-aux_check_photo_sender:
-    sheet_id: 10dUA-ED5cqd8qEHrMC-iXjPio0WBEUP-dZGkcPwP6WU
-    sheet_name: aux_check_photo_sender
-    clean_table_name: aux_check_photo_sender
-    sheet_context: for_sale
-
 business_unit_region:
     sheet_id: 1AqaMTw8A6QXW4UExztYWQpBLPNfn04kafXvEPwEhqps
     sheet_name: business_unit_region
@@ -758,12 +758,6 @@ forbrokers_3p_partner_conditions:
     sheet_id: 1b8dFqydGYZFy-m6K7hWpbThTS1SlFiWNli5qBF08HfE
     sheet_name: forbrokers_3p_partner_conditions
     clean_table_name: forbrokers_3p_partner_conditions
-    sheet_context: for_sale
-
-monday_users:
-    sheet_id: 1vB3GrQGLnx5fzJuVAjMVb2XzHpYepsfoSwN81rE1d-w
-    sheet_name: depara_monday_id_name
-    clean_table_name: monday_users
     sheet_context: for_sale
 
 offers_hub_central:
@@ -1002,6 +996,12 @@ marketing_affiliates_targets_replanning:
     sheet_id: 1KHK1D92S6LbHfrp5nivOkUCOrBABBMqoT9uFuMr_Fag
     sheet_name: marketing_affiliates_targets_replanning
     clean_table_name: marketing_affiliates_targets_replanning
+    sheet_context: static
+
+monday_users:
+    sheet_id: 1vB3GrQGLnx5fzJuVAjMVb2XzHpYepsfoSwN81rE1d-w
+    sheet_name: depara_monday_id_name
+    clean_table_name: monday_users
     sheet_context: static
 
 mra_historical:

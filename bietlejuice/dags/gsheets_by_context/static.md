@@ -46,6 +46,7 @@ This pipeline produces the following output tables:
     - `survival_estimation_new_version`
     - `users_cx_plaquinhas`
     - `marketing_affiliates_targets_replanning`
+    - `monday_users`
     - `zipcodes_sp`
 
 2. Data lake clean:
@@ -75,6 +76,7 @@ This pipeline produces the following output tables:
     - `survival_estimation_new_version`
     - `users_cx_plaquinhas`
     - `marketing_affiliates_targets_replanning`
+    - `monday_users`
     - `zipcodes_sp`
 
 </details>

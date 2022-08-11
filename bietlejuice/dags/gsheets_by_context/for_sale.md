@@ -39,10 +39,8 @@ This pipeline produces the following output tables:
     - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
     - `tqc_leads_bh`
-    - `aux_check_photo_sender`
     - `business_unit_region`
     - `forbrokers_3p_partner_conditions`
-    - `monday_users`
     - `offers_hub_central`
     - `secretariat_hierarchy`
 2. Data lake clean:
@@ -65,10 +63,8 @@ This pipeline produces the following output tables:
     - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
     - `tqc_leads_bh`
-    - `aux_check_photo_sender`
     - `business_unit_region`
     - `forbrokers_3p_partner_conditions`
-    - `monday_users`
     - `offers_hub_central`
     - `secretariat_hierarchy`
 

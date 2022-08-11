@@ -22,6 +22,7 @@ This pipeline produces the following output tables:
 1. Data lake raw:
     - `agendamento_vistoria_entrada`
     - `agendamento_vistoria_saida`
+    - `aux_check_photo_sender`
     - `aux_payments_photos`
     - `regional_inspection_q12022`
     - `support_agents_department`
@@ -34,6 +35,7 @@ This pipeline produces the following output tables:
     - `target_support_kpis`
     - `taxonomy_sla`
 2. Data lake clean:
+    - `aux_check_photo_sender`
     - `aux_payments_photos`
     - `regional_inspection_q1_2022`
     - `schedule_inspection_departure`

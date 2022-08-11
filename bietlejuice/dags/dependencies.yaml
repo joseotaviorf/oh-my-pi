@@ -165,7 +165,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.enrich_firestore:create-enrich-monday-external-table
   - bietlejuice.enrich_firestore:create-enrich-sale-offer-external-table
   - bietlejuice.enrich_sale_lead_flows:load-enrich-lead-flow
-  - bietlejuice.gsheets.for_sale:create-clean-monday-users-external-table
+  - bietlejuice.gsheets.static:create-clean-monday-users-external-table
   - bietlejuice.gsheets.for_sale:create-clean-offers-hub-central-external-table
   - bietlejuice.sales_flow:create-clean-ccv-flow-external-table
   - bietlejuice.sales_flow:create-clean-offer-external-table
@@ -216,7 +216,7 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
-  - bietlejuice.gsheets.for_sale:create-clean-aux-check-photo-sender-external-table
+  - bietlejuice.gsheets.support_and_service:create-clean-aux-check-photo-sender-external-table
   - bietlejuice.gsheets.growth:create-clean-branding-where-is-plaquinha-external-table
   - bietlejuice.ebdb:create-polygon-region-clean-external-table
   # performance_marketing_metrics_*_casa_mineira
@@ -348,7 +348,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.enrich_bigfone_twilio:create-enrich-call-flex-events-external-table
   - bietlejuice.enrich_top_of_funnel_demand:create-enrich-user-interactions-external-table
   - bietlejuice.gsheets.growth:create-clean-affiliates-extra-user-bonus-external-table
-  - bietlejuice.gsheets.for_sale:create-clean-aux-check-photo-sender-external-table
+  - bietlejuice.gsheets.support_and_service:create-clean-aux-check-photo-sender-external-table
   - bietlejuice.gsheets.growth:create-clean-branding-where-is-plaquinha-external-table
   - bietlejuice.gsheets.growth:create-clean-ciq-costs-external-table
   - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
@@ -681,7 +681,7 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.enrich_firestore:load-enrich-sale-offer
   - bietlejuice.enrich_sale_lead_flows:load-enrich-lead-flow
-  - bietlejuice.gsheets.for_sale:load-clean-monday-users
+  - bietlejuice.gsheets.static:load-clean-monday-users
 
 bietlejuice.dw_datamarts_spark.for_sale_cross:
   # Removed dependency with dw_region in order to avoid loopings since dw_datamarts.cross already satisfies
@@ -1793,7 +1793,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
   - bietlejuice.godfather:load-clean-offer
-  - bietlejuice.gsheets.for_sale:load-clean-monday-users
+  - bietlejuice.gsheets.static:load-clean-monday-users
   - bietlejuice.gsheets.for_sale:load-clean-offers-hub-central
   - bietlejuice.hub_services:load-clean-business-unit
 
