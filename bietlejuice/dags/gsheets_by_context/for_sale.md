@@ -20,6 +20,7 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
+    - `rede_5a_revenue_share_conditions`
     - `sale_asp_form_responses_2022q1`
     - `sale_asp_form_responses_2022q2`
     - `sale_asp_tratatives_2022q1`
@@ -44,6 +45,7 @@ This pipeline produces the following output tables:
     - `offers_hub_central`
     - `secretariat_hierarchy`
 2. Data lake clean:
+    - `rede_5a_revenue_share_conditions`
     - `sale_asp_form_responses_2022q1`
     - `sale_asp_form_responses_2022q2`
     - `sale_asp_tratatives_2022q1`

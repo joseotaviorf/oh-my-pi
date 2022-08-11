@@ -35,6 +35,9 @@ for dag_context, dag_details in DAG_CONF.items():
     )
 
     # Set data quality tasks if exists
-    independent_tasks = DatalakeTaskGroup.all_independent_tasks(raw_task_groups)
+    independent_tasks = DatalakeTaskGroup.all_independent_tasks(
+        raw_task_groups
+    ) + DatalakeTaskGroup.all_independent_tasks(clean_task_groups)
+
     if independent_tasks:
         terminate_cluster_task.set_upstream(independent_tasks)
