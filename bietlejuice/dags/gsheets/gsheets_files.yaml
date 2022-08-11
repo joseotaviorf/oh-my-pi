@@ -20,11 +20,6 @@ affiliates_active_segmentation:
     sheet_name: ativos
     clean_table_name: affiliates_active_segmentation
 
-affiliates_extra_user_bonus:
-    sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
-    sheet_name: extra_user_bonus
-    clean_table_name: affiliates_extra_user_bonus
-
 affiliates_inactive_segmentation:
     sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
     sheet_name: inativos
@@ -44,11 +39,6 @@ aux_agents_sale_hub:
     sheet_id: 1mom8xcJ4XCpr02S38DgW_cmEDcdzsOiMkW2vSbg0Ra0
     sheet_name: aux_agents_HUB
     clean_table_name: aux_agents_sale_hub
-
-aux_check_photo_sender:
-    sheet_id: 10dUA-ED5cqd8qEHrMC-iXjPio0WBEUP-dZGkcPwP6WU
-    sheet_name: aux_check_photo_sender
-    clean_table_name: aux_check_photo_sender
 
 base_hunter:
     sheet_id: 1gFxBxHVnmIveohw9fmRspW4ImPYSglH7dEITpFc17DI
@@ -75,35 +65,15 @@ braze_canvas_creative:
     sheet_name: canvas_dimensions
     clean_table_name: braze_canvas_creative
 
-business_unit_region:
-    sheet_id: 1AqaMTw8A6QXW4UExztYWQpBLPNfn04kafXvEPwEhqps
-    sheet_name: business_unit_region
-    clean_table_name: business_unit_region
-
 casa_mineira_inside_sales_pipe:
     sheet_id: 1sV89IeTziUUafu32NxVVBIDcLUQbzlwaZowqDacaPb0
     sheet_name: negocios
     clean_table_name: casa_mineira_inside_sales_pipe
 
-casa_mineira_marketing_cost_taxonomy:
-    sheet_id: 1F3HTv0rxdInhIs0JNs0GTyCN0_-jsE_3hNSKhzu_RM8
-    sheet_name: casa_mineira_marketing_cost_taxonomy
-    clean_table_name: casa_mineira_marketing_cost_taxonomy
-
-ciq_costs:
-    sheet_id: 1ZkPABh53UrzKn4aQudZzr5QpJsBXhCZDnJkDZob2Rqc
-    sheet_name: ciq_costs
-    clean_table_name: ciq_costs
-
 ciq_training:
     sheet_id: 1YsdJ-JHbCFlBL1_6XdiKScJGNrbbBPFglm_rn18iODA
     sheet_name: Página1
     clean_table_name: ciq_training
-
-city_share:
-    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
-    sheet_name: city_share
-    clean_table_name: city_share
 
 classifieds_fup_history:
     sheet_id: 1gFTC74jXxin6HiopkVGZQ6k96J1rr5w5emG8SlSerGM
@@ -134,16 +104,6 @@ crm_iptu_wave4:
     sheet_id: 1jz2kwgaE4qCi9aL1UaK2osdVv30ryWQI_sJ9qZARIqM
     sheet_name: crm_iptu_wave4
     clean_table_name: crm_iptu_wave4
-
-csat_chaves_onb_iq:
-    sheet_id: 1bMCeibiljXVwL13m-9VZ-TJw39YqH0YkBMLjB2OGXrQ
-    sheet_name: respostas_csat
-    clean_table_name: tenant_onboarding_keys_csat
-
-csat_chaves_off_pp:
-    sheet_id: 1mezgNmlXsMgMxPYmDib-av_T3rtKCGbqvyaZlh2z84M
-    sheet_name: respostas_csat
-    clean_table_name: owner_offboarding_keys_csat
 
 csat_negociacao_iq:
     sheet_id: 1zhk4z4aCnysNpWfi3VIT153nU7joHiX3toE_Tw3oXZk
@@ -238,16 +198,6 @@ jira_extraction_ba_sf:
     sheet_name: bandaid_off
     clean_table_name: bandaid_off
 
-forbrokers_3p_partner_conditions:
-    sheet_id: 1b8dFqydGYZFy-m6K7hWpbThTS1SlFiWNli5qBF08HfE
-    sheet_name: forbrokers_3p_partner_conditions
-    clean_table_name: forbrokers_3p_partner_conditions
-
-forms_analise_vistoria:
-    sheet_id: 1htuLjT4tBXbVl3TLP375CWKZDV7jIDtFFjpZNl7xH6w
-    sheet_name: inspection_analysis_forms
-    clean_table_name: inspection_analysis_forms
-
 full_taxonomy:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Full_Taxonomy
@@ -303,11 +253,6 @@ kenshoo_configuration:
     sheet_name: Kenshoo_Configuration
     clean_table_name: marketing_kenshoo_configuration
 
-legacy_doorman:
-    sheet_id: 19N4-pSsxcdQZVYSiCValrqYo8CYDATMrcmKtOO_P1mI
-    sheet_name: legacy_doorman
-    clean_table_name: legacy_doorman
-
 links_calls_entre_30ago_01set:
     sheet_id: 1XUKAl5TnIO1eBDkr_kaK-8IWS9APOe02ebMkHUmVluk
     sheet_name: links_calls_entre_30Ago_01Set
@@ -317,11 +262,6 @@ listings_with_agreed_discounts:
     sheet_id: 1Y6Z4CV1aDMey8vWnWqUZzpzPBz9os1shJ2anLtLT0Ds
     sheet_name: db_discounts_fr
     clean_table_name: listings_with_agreed_discounts
-
-local_holidays:
-    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
-    sheet_name: local_holidays
-    clean_table_name: local_holidays
 
 ltvoutput:
     sheet_id: 1Nf02DF6oHWUAAael_9M1g8tJfeTdq92fGt78x5_qNbg
@@ -403,16 +343,6 @@ media_plan:
     sheet_name: media_plan
     clean_table_name: media_plan_current_quarter
 
-monday_users:
-    sheet_id: 1vB3GrQGLnx5fzJuVAjMVb2XzHpYepsfoSwN81rE1d-w
-    sheet_name: depara_monday_id_name
-    clean_table_name: monday_users
-
-offers_hub_central:
-    sheet_id: 1uZpIFY-bhuxzS4LKl2jwFdBGdReQI7ifiYsewBIpKUE
-    sheet_name: offers_hub_central
-    clean_table_name: offers_hub_central
-
 offboarding_customer_portfolio_contract:
     sheet_id: 1x2dgpr3eemxnYft80JKRr3K_zlvgjvc-BjpIKaT2fe8
     sheet_name: contracts
@@ -448,40 +378,20 @@ plaquinhas_installation_targets:
     sheet_name: targets
     clean_table_name: plaquinhas_installation_targets
 
-plaquinhas_demand_targets:
-    sheet_id: 1PTguTGckx6mboWC2-AaFSH6yFAYCKBrdEDP1gpF5EUQ
-    sheet_name: targets
-    clean_table_name: plaquinhas_demand_targets
-
 process_eviction:
     sheet_id: 13D27A-NeWnDC2-army_6c-mc-ORy5KEzrnVZfJv9aDM
     sheet_name: datamart_send
     clean_table_name: process_eviction
-
-promotional_bonus_cluster_targets:
-    sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
-    sheet_name: promotional_bonus_cluster_targets
-    clean_table_name: promotional_bonus_cluster_targets
 
 promotional_bonus_segmentation_targets:
     sheet_id: 15SKrchR92WDs0I4Ia5_qmfkYl8jS6sutsAiX2HB445E
     sheet_name: promotional_bonus_segmentation_targets
     clean_table_name: promotional_bonus_segmentation_targets
 
-promotional_bonus_user_cluster_targets:
-    sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
-    sheet_name: promotional_bonus_user_cluster_targets
-    clean_table_name: promotional_bonus_user_cluster_targets
-
 promotional_bonus_user_targets:
     sheet_id: 15SKrchR92WDs0I4Ia5_qmfkYl8jS6sutsAiX2HB445E
     sheet_name: promotional_bonus_user_targets
     clean_table_name: promotional_bonus_user_targets
-
-provisioned_costs_import:
-    sheet_id: 1KZWx_b3tn754ImagBnGj4rJo16kXgxzg-lQFpYTolOs
-    sheet_name: provisioned_costs_import
-    clean_table_name: provisioned_costs_import
 
 rent_criteo_eng_ab_test:
     sheet_id: 17PonK69vjOYru-xD0acbVqD0bkl_LPuGodhR2AHmn5I
@@ -498,16 +408,6 @@ rental_cohort_supply:
     sheet_name: rental_cohort_supply
     clean_table_name: rental_cohort_supply
 
-rental_flows_targets:
-    sheet_id: 1_-_V3Js51s88opC8aZVc7SAzXT-OC7huQ1I-rsqpdlU
-    sheet_name: rental_flows_targets
-    clean_table_name: rental_flows_targets
-
-rental_ntp_source_targets:
-    sheet_id: 1gKybsAl4m69AjJOpBgTk9VDQfqR9ViKv7ei6SXZ3DEE
-    sheet_name: rental_ntp_source_targets
-    clean_table_name: rental_ntp_source_targets
-
 rental_rtp_targets:
     sheet_id: 1VZW41499YJO3Im--velqKWEblCLjxOqZIqNaaizMB_U
     sheet_name: rental_rtp_targets
@@ -522,11 +422,6 @@ sale_criteo_eng_ab_test:
     sheet_id: 1_Lbgnyz8-1BMs3eq6KteLCND1uvLbidzE1hXLAiVFmI
     sheet_name: sale_criteo_eng_ab_test
     clean_table_name: sale_criteo_eng_ab_test
-
-sale_flows_targets:
-    sheet_id: 1V316dJUIlf4xv3tOBVRIGdSn38NqKRPcS1emTCQlBYE
-    sheet_name: sale_flows_targets
-    clean_table_name: sale_flows_targets
 
 sale_closing_ops_targets:
     sheet_id: 1J32RiwqKyM8lg5IhRHYS_AuA64-trVP_Slf5j5UOcUg
@@ -548,25 +443,10 @@ schedule:
     sheet_name: Schedule
     clean_table_name: department_schedule
 
-secretariat_hierarchy:
-    sheet_id: 1JTWdWtoDrjoSD3pmf_-eks8ycXDN0V776jWegCw_M1M
-    sheet_name: secretariat_hierarchy
-    clean_table_name: secretariat_hierarchy
-
 secretary_info:
     sheet_id: 1KfGHse9VvHc5Uq-rgOnUQ9uBsD9_iFtTXkojhlqdNjw
     sheet_name: secretary_info
     clean_table_name: secretariat_info
-
-service_city_holidays:
-    sheet_id: 1wSYZjHde5RuFJQRigRFFIDiW4hpSOAtk88i6bkuwocI
-    sheet_name: data_extraction
-    clean_table_name: service_city_holidays
-
-tag_sla_target:
-    sheet_id: 1XB_PyWLyETfwUoJYyLDDF_PZ97swuTJExAjfhLfM7eo
-    sheet_name: SLA por tag
-    clean_table_name: tag_sla_target
 
 target_supply_and_demand_autonomous_agent:
     sheet_id: 1i2cHxc4h9c8FKEORH4K_0n_ho-3haXH04fWhdDHE2nU
@@ -588,75 +468,10 @@ targets_avg_ticket_adm_fee:
     sheet_name: targets_avg_ticket_adm_fee
     clean_table_name: targets_avg_ticket_adm_fee
 
-targets_casa_mineira_cost:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: Cost
-    clean_table_name: targets_casa_mineira_cost
-
-targets_casa_mineira_ncp:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: NCP
-    clean_table_name: targets_casa_mineira_ncp
-
-targets_casa_mineira_tof_daily:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: ToF - Daily
-    clean_table_name: targets_casa_mineira_tof_daily
-
-targets_casa_mineira_tof_monthly:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: ToF - Monthly
-    clean_table_name: targets_casa_mineira_tof_monthly
-
-targets_casa_mineira_tof_weekly:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: ToF - Weekly
-    clean_table_name: targets_casa_mineira_tof_weekly
-
 targets_nr_bf_er_or:
     sheet_id: 1hJu-ASanek3BV0SPxRqnG0pU0x8wPp-osoWcT14FMCU
     sheet_name: targets_nr_bf_er_or
     clean_table_name: targets_nr_bf_er_or
-
-targets_portal_casa_mineira:
-    sheet_id: 1KrV8H7PzhUzevUhYHw2ycL9Ai8tTV7uv1aenH5oadvM
-    sheet_name: targets
-    clean_table_name: targets_portal_casa_mineira_cost_cf
-
-target_service_kpis:
-    sheet_id: 1G6O5w3Ue5K2cyutyOUZM3_ToqU1xnFCz2ORwCvuYPaY
-    sheet_name: Export
-    clean_table_name: target_service_kpis
-
-target_support_kpis:
-    sheet_id: 1S3HB6hPfDHcbg23cZWR5xcukhF_nJcWHy5pBGHFqxlI
-    sheet_name: TARGET - S&S
-    clean_table_name: target_support_kpis
-
-taxonomy_crm_casa_mineira:
-    sheet_id: 12_zyljMVOTLUvBSCen6QXSx23bXSd6krs8_fpxueqNU
-    sheet_name: taxonomy_crm_casa_mineira
-    clean_table_name: taxonomy_crm_casa_mineira
-
-taxonomy_demand:
-    sheet_id: 11Cck3VVSt9TVt75ChvpU-mVwwfF7TNvUIXocG9vaHtw
-    sheet_name: taxonomy_demand
-    clean_table_name: taxonomy_demand
-
-taxonomy_portal_casa_mineira:
-    sheet_id: 12_zyljMVOTLUvBSCen6QXSx23bXSd6krs8_fpxueqNU
-    sheet_name: taxonomy_portal_casa_mineira
-    clean_table_name: taxonomy_portal_casa_mineira
-
-taxonomy_sla:
-    sheet_id: 1XB_PyWLyETfwUoJYyLDDF_PZ97swuTJExAjfhLfM7eo
-    sheet_name: SLA por taxonomias
-    clean_table_name: taxonomy_sla
-
-tof_supply_targets:
-    sheet_id: 13iYK42dvdIiMG5DEsjhMPP5BbYo5S15ytRztLGiGUfY
-    sheet_name: tof_supply_paid
-    clean_table_name: tof_supply_targets
 
 tqc_leads:
     sheet_id: 1s1GI7u9oidsTLtW3Z4_e1Go3EfJR2VMva8VgziSA7RU
@@ -684,11 +499,6 @@ tv_ads:
     sheet_name: base_clean
     clean_table_name: tv_ads
 
-unit_economics_amortization_curve:
-    sheet_id: 1Xoc-FhCfD3QgXiCSze3XT95BGr1SWqLqLyYTmyUGnHI
-    sheet_name: amortization_curve
-    clean_table_name: unit_economics_amortization_curve
-
 visits_fup_history:
     sheet_id: 1_drr7S6OWThtI5zdyxV5fs78QFls9muxMaahGUHNs_k
     sheet_name: visits_fup_history
@@ -705,27 +515,7 @@ week_volumes_demand:
     sheet_name: week_volumes_demand
     clean_table_name: week_volumes_demand
 
-week_volumes_supply:
-    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
-    sheet_name: week_volumes_supply
-    clean_table_name: week_volumes_supply
-
 weekday_demand_share:
     sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
     sheet_name: weekday_demand_share
     clean_table_name: weekday_demand_share
-
-weekday_holiday_share:
-    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
-    sheet_name: weekday_holiday_share
-    clean_table_name: weekday_holiday_share
-
-weekday_holiday_share_supply:
-    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
-    sheet_name: weekday_holiday_share_supply
-    clean_table_name: weekday_holiday_share_supply
-
-weekday_supply_channel_share:
-    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
-    sheet_name: weekday_supply_channel_share
-    clean_table_name: weekday_supply_channel_share

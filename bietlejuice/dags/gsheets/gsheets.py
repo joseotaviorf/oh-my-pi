@@ -22,7 +22,7 @@ SOURCE = "gsheets"
 DAG_ID = f"bietlejuice.{SOURCE}"
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 1, 14, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 18 * * *"
 
 ENV = os.environ.get("ENVIRONMENT")
 

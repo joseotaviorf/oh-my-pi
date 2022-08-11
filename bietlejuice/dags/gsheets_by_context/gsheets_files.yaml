@@ -11,20 +11,25 @@
 #########################
 # S&S SHEETS
 ###################
+agendamento_vistoria_entrada:
+    sheet_id: 1LHcKqdrbTWNvRBT7TGVEbKhIrtqaqSxVVaeKsIcJZus
+    sheet_name: agendamento_entrada
+    clean_table_name: schedule_inspection_entry
+    sheet_context: support_and_service
+    partitioned: true
 
 agendamento_vistoria_saida:
     sheet_id: 1LHcKqdrbTWNvRBT7TGVEbKhIrtqaqSxVVaeKsIcJZus
     sheet_name: agendamento_saida
     clean_table_name: schedule_inspection_departure
     sheet_context: support_and_service
-    partitioned: True
+    partitioned: true
 
-agendamento_vistoria_entrada:
-    sheet_id: 1LHcKqdrbTWNvRBT7TGVEbKhIrtqaqSxVVaeKsIcJZus
-    sheet_name: agendamento_entrada
-    clean_table_name: schedule_inspection_entry
+agents_control:
+    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
+    sheet_name: Agents Control
+    clean_table_name: agents_control
     sheet_context: support_and_service
-    partitioned: True
 
 agents_ranking_targets:
     sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
@@ -38,28 +43,16 @@ aux_payments_photos:
     clean_table_name: aux_payments_photos
     sheet_context: support_and_service
 
-support_agents_department:
-    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
-    sheet_name: Agents Main Department
-    clean_table_name: support_agents_department
+csat_chaves_off_pp:
+    sheet_id: 1mezgNmlXsMgMxPYmDib-av_T3rtKCGbqvyaZlh2z84M
+    sheet_name: respostas_csat
+    clean_table_name: owner_offboarding_keys_csat
     sheet_context: support_and_service
 
-agents_control:
-    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
-    sheet_name: Agents Control
-    clean_table_name: agents_control
-    sheet_context: support_and_service
-
-department_control:
-    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
-    sheet_name: Department/Channel
-    clean_table_name: department_control
-    sheet_context: support_and_service
-
-csat_reembolso_true:
-    sheet_id: 1nwpNuMa0h4tChnJAc5unGT1NpuJMbY5mxIkIjx93wRE
-    sheet_name: reembolso_true
-    clean_table_name: csat_reimbursement_true
+csat_chaves_onb_iq:
+    sheet_id: 1bMCeibiljXVwL13m-9VZ-TJw39YqH0YkBMLjB2OGXrQ
+    sheet_name: respostas_csat
+    clean_table_name: tenant_onboarding_keys_csat
     sheet_context: support_and_service
 
 csat_reembolso_pos_rescisao:
@@ -68,26 +61,79 @@ csat_reembolso_pos_rescisao:
     clean_table_name: csat_refund_after_termination
     sheet_context: support_and_service
 
+csat_reembolso_true:
+    sheet_id: 1nwpNuMa0h4tChnJAc5unGT1NpuJMbY5mxIkIjx93wRE
+    sheet_name: reembolso_true
+    clean_table_name: csat_reimbursement_true
+    sheet_context: support_and_service
+
+department_control:
+    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
+    sheet_name: Department/Channel
+    clean_table_name: department_control
+    sheet_context: support_and_service
+
+forms_analise_vistoria:
+    sheet_id: 1htuLjT4tBXbVl3TLP375CWKZDV7jIDtFFjpZNl7xH6w
+    sheet_name: inspection_analysis_forms
+    clean_table_name: inspection_analysis_forms
+    sheet_context: support_and_service
+
 ranking_rules:
     sheet_id: 1NgN-C7CUZxXAVSnqyC8IUFCEo3d0ROwo8lYDLaAJAuo
     sheet_name: Regras por time
     clean_table_name: ranking_rules
     sheet_context: support_and_service
 
+service_city_holidays:
+    sheet_id: 1wSYZjHde5RuFJQRigRFFIDiW4hpSOAtk88i6bkuwocI
+    sheet_name: data_extraction
+    clean_table_name: service_city_holidays
+    sheet_context: support_and_service
+
+support_agents_department:
+    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
+    sheet_name: Agents Main Department
+    clean_table_name: support_agents_department
+    sheet_context: support_and_service
+
+tag_sla_target:
+    sheet_id: 1XB_PyWLyETfwUoJYyLDDF_PZ97swuTJExAjfhLfM7eo
+    sheet_name: SLA por tag
+    clean_table_name: tag_sla_target
+    sheet_context: support_and_service
+
+target_service_kpis:
+    sheet_id: 1G6O5w3Ue5K2cyutyOUZM3_ToqU1xnFCz2ORwCvuYPaY
+    sheet_name: Export
+    clean_table_name: target_service_kpis
+    sheet_context: support_and_service
+
+target_support_kpis:
+    sheet_id: 1S3HB6hPfDHcbg23cZWR5xcukhF_nJcWHy5pBGHFqxlI
+    sheet_name: TARGET - S&S
+    clean_table_name: target_support_kpis
+    sheet_context: support_and_service
+
+taxonomy_sla:
+    sheet_id: 1XB_PyWLyETfwUoJYyLDDF_PZ97swuTJExAjfhLfM7eo
+    sheet_name: SLA por taxonomias
+    clean_table_name: taxonomy_sla
+    sheet_context: support_and_service
+
 #########################
 # GROWTH SHEETS
 ###################
-
-branding_where_is_plaquinha:
-    sheet_id: 1_jHpsbQx1J24l7TNxoMgHH-FgAgQMphVLW9_HVgQi-4
-    sheet_name: branding_where_is_plaquinha
-    clean_table_name: branding_where_is_plaquinha
+affiliate_pro_registration:
+    sheet_id: 196BCLJ7rwRAgb50IEdYB_b4KGnilleeCU8WMKghxddY
+    sheet_name: affiliate_pro
+    clean_table_name: affiliate_pro_registration
     sheet_context: growth
 
-base_supply_souce_for_sale:
-    sheet_id: 1UO0kxwf-fXm6nhSFSZg3GTGFF61ZAJiRlAqI-FAr-GE
-    sheet_name: Base_Supply_Souce_For_Sale
-    clean_table_name: daily_target_supply_sale
+affiliates_extra_user_bonus:
+    sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
+    sheet_name: extra_user_bonus
+    clean_table_name: affiliates_extra_user_bonus
     sheet_context: growth
 
 base_supply_souce_for_rent:
@@ -96,10 +142,88 @@ base_supply_souce_for_rent:
     clean_table_name: daily_target_supply_rental
     sheet_context: growth
 
+base_supply_souce_for_sale:
+    sheet_id: 1UO0kxwf-fXm6nhSFSZg3GTGFF61ZAJiRlAqI-FAr-GE
+    sheet_name: Base_Supply_Souce_For_Sale
+    clean_table_name: daily_target_supply_sale
+    sheet_context: growth
+
+branding_where_is_plaquinha:
+    sheet_id: 1_jHpsbQx1J24l7TNxoMgHH-FgAgQMphVLW9_HVgQi-4
+    sheet_name: branding_where_is_plaquinha
+    clean_table_name: branding_where_is_plaquinha
+    sheet_context: growth
+
+casa_mineira_marketing_cost_taxonomy:
+    sheet_id: 1F3HTv0rxdInhIs0JNs0GTyCN0_-jsE_3hNSKhzu_RM8
+    sheet_name: casa_mineira_marketing_cost_taxonomy
+    clean_table_name: casa_mineira_marketing_cost_taxonomy
+    sheet_context: growth
+
+ciq_costs:
+    sheet_id: 1ZkPABh53UrzKn4aQudZzr5QpJsBXhCZDnJkDZob2Rqc
+    sheet_name: ciq_costs
+    clean_table_name: ciq_costs
+    sheet_context: growth
+
+city_share:
+    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
+    sheet_name: city_share
+    clean_table_name: city_share
+    sheet_context: growth
+
 costs_targets:
     sheet_id: 1g_HngmcykZuj-c5PfhGeBo0m969ipBEQ04Hy2diIns4
     sheet_name: costs_targets
     clean_table_name: costs_targets
+    sheet_context: growth
+
+ecglobal_active_users:
+    sheet_id: 1S4QBYxMLTAfjre0xd5jS9kaT5YjL4KsE3sRKmvHFNjM
+    sheet_name: base
+    clean_table_name: ecglobal_active_users
+    sheet_context: growth
+
+full_taxonomy_new_test:
+    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
+    sheet_name: Full_Taxonomy_New_Test
+    clean_table_name: taxonomy_mkt_cost_new_test
+    sheet_context: growth
+
+historic_national_costs:
+    sheet_id: 1mcTp6mmjNBpsaEiwn1ZepnhkyGozDEC5HAmVWeeArGA
+    sheet_name: historic_national_costs
+    clean_table_name: affiliates_national_costs_history
+    sheet_context: growth
+
+indicaai_tax_costs:
+    sheet_id: 1-ivCkEwGfATx6sza4t5LlPPjStH_CgPgBbR4aGwfLZ4
+    sheet_name: Output
+    clean_table_name: indicaai_tax_costs
+    sheet_context: growth
+
+local_holidays:
+    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
+    sheet_name: local_holidays
+    clean_table_name: local_holidays
+    sheet_context: growth
+
+manual_cost_engagement:
+    sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
+    sheet_name: manual_cost_engagement
+    clean_table_name: affiliates_manual_cost_engagement
+    sheet_context: growth
+
+manual_cost_engagement_history:
+    sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
+    sheet_name: manual_cost_engagement_history
+    clean_table_name: affiliates_manual_cost_engagement_history
+    sheet_context: growth
+
+marketing_cost_taxonomy:
+    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
+    sheet_name: Oficial Taxonomy Composer
+    clean_table_name: marketing_cost_taxonomy
     sheet_context: growth
 
 mexico_costs_targets:
@@ -126,100 +250,16 @@ mexico_supply_costs_financial_and_actual:
     clean_table_name: mexico_supply_costs_financial_and_actual
     sheet_context: growth
 
-affiliate_pro_registration:
-    sheet_id: 196BCLJ7rwRAgb50IEdYB_b4KGnilleeCU8WMKghxddY
-    sheet_name: affiliate_pro
-    clean_table_name: affiliate_pro_registration
-    sheet_context: growth
-
-ecglobal_active_users:
-    sheet_id: 1S4QBYxMLTAfjre0xd5jS9kaT5YjL4KsE3sRKmvHFNjM
-    sheet_name: base
-    clean_table_name: ecglobal_active_users
-    sheet_context: growth
-
-historic_national_costs:
-    sheet_id: 1mcTp6mmjNBpsaEiwn1ZepnhkyGozDEC5HAmVWeeArGA
-    sheet_name: historic_national_costs
-    clean_table_name: affiliates_national_costs_history
-    sheet_context: growth
-
-indicaai_tax_costs:
-    sheet_id: 1-ivCkEwGfATx6sza4t5LlPPjStH_CgPgBbR4aGwfLZ4
-    sheet_name: Output
-    clean_table_name: indicaai_tax_costs
-    sheet_context: growth
-
-manual_cost_engagement:
-    sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
-    sheet_name: manual_cost_engagement
-    clean_table_name: affiliates_manual_cost_engagement
-    sheet_context: growth
-
-manual_cost_engagement_history:
-    sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
-    sheet_name: manual_cost_engagement_history
-    clean_table_name: affiliates_manual_cost_engagement_history
-    sheet_context: growth
-
 mkt_cost_per_source:
     sheet_id: 1kHFTMdaRTYyLa6e6FY6G2i1UpCkivcpmxZvYqVrqe5o
     sheet_name: mkt_cost_per_source
     clean_table_name: mkt_cost_per_source
     sheet_context: growth
 
-targets_casa_mineira_nbp:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: NBP
-    clean_table_name: targets_casa_mineira_nbp
-    sheet_context: growth
-
 mta_budget:
     sheet_id: 16HF0DnPTkCIG8oexncHizjhmoGyAJapvGVeA46mUCa4
     sheet_name: mta_budget
     clean_table_name: mta_budget_october_2020
-    sheet_context: growth
-
-rental_tof_daily_targets:
-    sheet_id: 1rUa1jyrjcbkZP_33O-7vZH376O16zkGI7FcFVAZkDSo
-    sheet_name: rental_tof_daily_targets
-    clean_table_name: rental_tof_daily_targets
-    sheet_context: growth
-
-rental_tof_weekly_targets:
-    sheet_id: 1M3yd-RpHMDwnEdWs18sf0oCEHDhmz_Y_9O4zSEcD1nU
-    sheet_name: rental_tof_weekly_targets
-    clean_table_name: rental_tof_weekly_targets
-    sheet_context: growth
-
-tradecom_configuration:
-    sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
-    sheet_name: tradecom_configuration
-    clean_table_name: affiliates_cost_tradecom_configuration
-    sheet_context: growth
-
-taxonomy_affiliates:
-    sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
-    sheet_name: taxonomy_affiliates
-    clean_table_name: taxonomy_affiliates
-    sheet_context: growth
-
-taxonomy_growth:
-    sheet_id: 1kqsc1xCs4y9Q7HMBl5XiXaBPHsBYS0jA-PJi9Sgp_UY
-    sheet_name: taxonomy_growth
-    clean_table_name: taxonomy_growth
-    sheet_context: growth
-
-full_taxonomy_new_test:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Full_Taxonomy_New_Test
-    clean_table_name: taxonomy_mkt_cost_new_test
-    sheet_context: growth
-
-marketing_cost_taxonomy:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Oficial Taxonomy Composer
-    clean_table_name: marketing_cost_taxonomy
     sheet_context: growth
 
 offline_manual_costs:
@@ -238,6 +278,174 @@ offline_manual_share_cost_center:
     sheet_id: 1zUM7FIxpNXmnTsbWZoX1wV7S_C49XMO8Vo68ElSqipo
     sheet_name: offline_manual_share_cost_center
     clean_table_name: offline_manual_share_cost_center
+    sheet_context: growth
+
+plaquinhas_demand_targets:
+    sheet_id: 1PTguTGckx6mboWC2-AaFSH6yFAYCKBrdEDP1gpF5EUQ
+    sheet_name: targets
+    clean_table_name: plaquinhas_demand_targets
+    sheet_context: growth
+
+promotional_bonus_cluster_targets:
+    sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
+    sheet_name: promotional_bonus_cluster_targets
+    clean_table_name: promotional_bonus_cluster_targets
+    sheet_context: growth
+
+promotional_bonus_user_cluster_targets:
+    sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
+    sheet_name: promotional_bonus_user_cluster_targets
+    clean_table_name: promotional_bonus_user_cluster_targets
+    sheet_context: growth
+
+provisioned_costs_import:
+    sheet_id: 1KZWx_b3tn754ImagBnGj4rJo16kXgxzg-lQFpYTolOs
+    sheet_name: provisioned_costs_import
+    clean_table_name: provisioned_costs_import
+    sheet_context: growth
+
+rental_flows_targets:
+    sheet_id: 1_-_V3Js51s88opC8aZVc7SAzXT-OC7huQ1I-rsqpdlU
+    sheet_name: rental_flows_targets
+    clean_table_name: rental_flows_targets
+    sheet_context: growth
+
+rental_ntp_source_targets:
+    sheet_id: 1gKybsAl4m69AjJOpBgTk9VDQfqR9ViKv7ei6SXZ3DEE
+    sheet_name: rental_ntp_source_targets
+    clean_table_name: rental_ntp_source_targets
+    sheet_context: growth
+
+rental_tof_daily_targets:
+    sheet_id: 1rUa1jyrjcbkZP_33O-7vZH376O16zkGI7FcFVAZkDSo
+    sheet_name: rental_tof_daily_targets
+    clean_table_name: rental_tof_daily_targets
+    sheet_context: growth
+
+rental_tof_weekly_targets:
+    sheet_id: 1M3yd-RpHMDwnEdWs18sf0oCEHDhmz_Y_9O4zSEcD1nU
+    sheet_name: rental_tof_weekly_targets
+    clean_table_name: rental_tof_weekly_targets
+    sheet_context: growth
+
+sale_flows_targets:
+    sheet_id: 1V316dJUIlf4xv3tOBVRIGdSn38NqKRPcS1emTCQlBYE
+    sheet_name: sale_flows_targets
+    clean_table_name: sale_flows_targets
+    sheet_context: growth
+
+targets_casa_mineira_cost:
+    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
+    sheet_name: Cost
+    clean_table_name: targets_casa_mineira_cost
+    sheet_context: growth
+
+targets_casa_mineira_nbp:
+    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
+    sheet_name: NBP
+    clean_table_name: targets_casa_mineira_nbp
+    sheet_context: growth
+
+targets_casa_mineira_ncp:
+    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
+    sheet_name: NCP
+    clean_table_name: targets_casa_mineira_ncp
+    sheet_context: growth
+
+targets_casa_mineira_tof_daily:
+    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
+    sheet_name: ToF - Daily
+    clean_table_name: targets_casa_mineira_tof_daily
+    sheet_context: growth
+
+targets_casa_mineira_tof_monthly:
+    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
+    sheet_name: ToF - Monthly
+    clean_table_name: targets_casa_mineira_tof_monthly
+    sheet_context: growth
+
+targets_casa_mineira_tof_weekly:
+    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
+    sheet_name: ToF - Weekly
+    clean_table_name: targets_casa_mineira_tof_weekly
+    sheet_context: growth
+
+targets_portal_casa_mineira:
+    sheet_id: 1KrV8H7PzhUzevUhYHw2ycL9Ai8tTV7uv1aenH5oadvM
+    sheet_name: targets
+    clean_table_name: targets_portal_casa_mineira_cost_cf
+    sheet_context: growth
+
+taxonomy_affiliates:
+    sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
+    sheet_name: taxonomy_affiliates
+    clean_table_name: taxonomy_affiliates
+    sheet_context: growth
+
+taxonomy_crm_casa_mineira:
+    sheet_id: 12_zyljMVOTLUvBSCen6QXSx23bXSd6krs8_fpxueqNU
+    sheet_name: taxonomy_crm_casa_mineira
+    clean_table_name: taxonomy_crm_casa_mineira
+    sheet_context: growth
+
+taxonomy_demand:
+    sheet_id: 11Cck3VVSt9TVt75ChvpU-mVwwfF7TNvUIXocG9vaHtw
+    sheet_name: taxonomy_demand
+    clean_table_name: taxonomy_demand
+    sheet_context: growth
+
+taxonomy_growth:
+    sheet_id: 1kqsc1xCs4y9Q7HMBl5XiXaBPHsBYS0jA-PJi9Sgp_UY
+    sheet_name: taxonomy_growth
+    clean_table_name: taxonomy_growth
+    sheet_context: growth
+
+taxonomy_portal_casa_mineira:
+    sheet_id: 12_zyljMVOTLUvBSCen6QXSx23bXSd6krs8_fpxueqNU
+    sheet_name: taxonomy_portal_casa_mineira
+    clean_table_name: taxonomy_portal_casa_mineira
+    sheet_context: growth
+
+tof_supply_targets:
+    sheet_id: 13iYK42dvdIiMG5DEsjhMPP5BbYo5S15ytRztLGiGUfY
+    sheet_name: tof_supply_paid
+    clean_table_name: tof_supply_targets
+    sheet_context: growth
+
+tradecom_configuration:
+    sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
+    sheet_name: tradecom_configuration
+    clean_table_name: affiliates_cost_tradecom_configuration
+    sheet_context: growth
+
+unit_economics_amortization_curve:
+    sheet_id: 1Xoc-FhCfD3QgXiCSze3XT95BGr1SWqLqLyYTmyUGnHI
+    sheet_name: amortization_curve
+    clean_table_name: unit_economics_amortization_curve
+    sheet_context: growth
+
+week_volumes_supply:
+    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
+    sheet_name: week_volumes_supply
+    clean_table_name: week_volumes_supply
+    sheet_context: growth
+
+weekday_holiday_share:
+    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
+    sheet_name: weekday_holiday_share
+    clean_table_name: weekday_holiday_share
+    sheet_context: growth
+
+weekday_holiday_share_supply:
+    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
+    sheet_name: weekday_holiday_share_supply
+    clean_table_name: weekday_holiday_share_supply
+    sheet_context: growth
+
+weekday_supply_channel_share:
+    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
+    sheet_name: weekday_supply_channel_share
+    clean_table_name: weekday_supply_channel_share
     sheet_context: growth
 
 #########################
@@ -534,6 +742,41 @@ mexico_supply_targets_2022:
 #########################
 # FOR SALE SHEETS
 ###################
+aux_check_photo_sender:
+    sheet_id: 10dUA-ED5cqd8qEHrMC-iXjPio0WBEUP-dZGkcPwP6WU
+    sheet_name: aux_check_photo_sender
+    clean_table_name: aux_check_photo_sender
+    sheet_context: for_sale
+
+business_unit_region:
+    sheet_id: 1AqaMTw8A6QXW4UExztYWQpBLPNfn04kafXvEPwEhqps
+    sheet_name: business_unit_region
+    clean_table_name: business_unit_region
+    sheet_context: for_sale
+
+forbrokers_3p_partner_conditions:
+    sheet_id: 1b8dFqydGYZFy-m6K7hWpbThTS1SlFiWNli5qBF08HfE
+    sheet_name: forbrokers_3p_partner_conditions
+    clean_table_name: forbrokers_3p_partner_conditions
+    sheet_context: for_sale
+
+monday_users:
+    sheet_id: 1vB3GrQGLnx5fzJuVAjMVb2XzHpYepsfoSwN81rE1d-w
+    sheet_name: depara_monday_id_name
+    clean_table_name: monday_users
+    sheet_context: for_sale
+
+offers_hub_central:
+    sheet_id: 1uZpIFY-bhuxzS4LKl2jwFdBGdReQI7ifiYsewBIpKUE
+    sheet_name: offers_hub_central
+    clean_table_name: offers_hub_central
+    sheet_context: for_sale
+
+sale_asp_control_2022q2:
+    sheet_id: 1c7y2IbC4Hw0KwUsarqOUub8hMbpQ0Ctpt1NmVwjO_w8
+    sheet_name: GrupoControle
+    clean_table_name: sale_asp_control_2022q2
+    sheet_context: for_sale
 
 sale_asp_form_responses_2022q1:
     sheet_id: 1p7LfY3u3kWXk6acGhmYfvvueBl1b3KS3wEmREm1GK0I
@@ -545,6 +788,18 @@ sale_asp_form_responses_2022q2:
     sheet_id: 1nFOm0Om3tdfarg8C9fdxbrkxdkj6zjOxgtLVIzcMW6Y
     sheet_name: GSheetsImport_BaseFormResponses_2022Q2
     clean_table_name: sale_asp_form_responses_2022q2
+    sheet_context: for_sale
+
+sale_asp_groupsab_2022q2:
+    sheet_id: 1nFOm0Om3tdfarg8C9fdxbrkxdkj6zjOxgtLVIzcMW6Y
+    sheet_name: GSheetsImport_GruposAB_2022Q2
+    clean_table_name: sale_asp_groupsab_2022q2
+    sheet_context: for_sale
+
+sale_asp_portfolio_2022q2:
+    sheet_id: 1c7y2IbC4Hw0KwUsarqOUub8hMbpQ0Ctpt1NmVwjO_w8
+    sheet_name: Portfolio
+    clean_table_name: sale_asp_portfolio_2022q2
     sheet_context: for_sale
 
 sale_asp_tratatives_2022q1:
@@ -563,24 +818,6 @@ sale_asp_tratatives_2022q2_oldlistings:
     sheet_id: 1nFOm0Om3tdfarg8C9fdxbrkxdkj6zjOxgtLVIzcMW6Y
     sheet_name: GSheetsImport_BaseOldListings_2022Q2
     clean_table_name: sale_asp_tratatives_2022q2_oldlistings
-    sheet_context: for_sale
-
-sale_asp_groupsab_2022q2:
-    sheet_id: 1nFOm0Om3tdfarg8C9fdxbrkxdkj6zjOxgtLVIzcMW6Y
-    sheet_name: GSheetsImport_GruposAB_2022Q2
-    clean_table_name: sale_asp_groupsab_2022q2
-    sheet_context: for_sale
-
-sale_asp_portfolio_2022q2:
-    sheet_id: 1c7y2IbC4Hw0KwUsarqOUub8hMbpQ0Ctpt1NmVwjO_w8
-    sheet_name: Portfolio
-    clean_table_name: sale_asp_portfolio_2022q2
-    sheet_context: for_sale
-
-sale_asp_control_2022q2:
-    sheet_id: 1c7y2IbC4Hw0KwUsarqOUub8hMbpQ0Ctpt1NmVwjO_w8
-    sheet_name: GrupoControle
-    clean_table_name: sale_asp_control_2022q2
     sheet_context: for_sale
 
 sale_demand_targets:
@@ -631,6 +868,12 @@ sale_tof_weekly_targets:
     clean_table_name: sale_tof_weekly_targets
     sheet_context: for_sale
 
+secretariat_hierarchy:
+    sheet_id: 1JTWdWtoDrjoSD3pmf_-eks8ycXDN0V776jWegCw_M1M
+    sheet_name: secretariat_hierarchy
+    clean_table_name: secretariat_hierarchy
+    sheet_context: for_sale
+
 target_sale_cohort_demand:
     sheet_id: 1IzXMT2uzLovZ6sI30a_dfFsBuWaffBAoid6rFdIszC0
     sheet_name: target_sale_cohort_demand
@@ -653,11 +896,22 @@ tqc_leads_bh:
 #########################
 # STATIC SHEETS
 ###################
-
 affiliates_acquisition_targets:
     sheet_id: 1Ln23SA7YQ-OhfZ49BEmoT_mm-kDbNC-HdMt9thTzbDM
     sheet_name: target_nau_budget_daily
     clean_table_name: affiliates_acquisition_targets
+    sheet_context: static
+
+atribuicao_de_maturidade_e_validacao_do_cadastro:
+    sheet_id: 1Q7nQfLRa_yTsqB0VN27AffeUES4r_urat3FA0R78MRI
+    sheet_name: FINAL
+    clean_table_name: metrics_registration
+    sheet_context: static
+
+autonomous_agent_listing:
+    sheet_id: 1VWXMApErzzt-rRvXaqajNu0s4MRrdss1mthYrxZL9qs
+    sheet_name: autonomous_agent_listing
+    clean_table_name: autonomous_agent_listing
     sheet_context: static
 
 autonomous_agent_payment_data_form_origin:
@@ -676,6 +930,36 @@ aux_agents_sale:
     sheet_id: 1mom8xcJ4XCpr02S38DgW_cmEDcdzsOiMkW2vSbg0Ra0
     sheet_name: aux_agents_sale
     clean_table_name: aux_agents_sale
+    sheet_context: static
+
+cities_neighborhoods_ibge_qa:
+    sheet_id: 19N1BVZuKcCw1RByXoL3hqaXSmEhdi7_mbtyOVff4oQs
+    sheet_name: ibge_5a_cities
+    clean_table_name: cities_neighborhoods_ibge_qa
+    sheet_context: static
+
+costs_allocation_relative_indexes:
+    sheet_id: 1f9Iyshj2N-jIbO-YIXs_CxCnDKq4aLEfBcS6dcN-qgM
+    sheet_name: costs_allocation_relative_indexes
+    clean_table_name: costs_allocation_relative_indexes
+    sheet_context: static
+
+crm_tasks_to_remove:
+    sheet_id: 1AOV5JNoFH72sM9ehSRaXpqvOlbxTD66QabtLAeV_8fM
+    sheet_name: task_to_remove
+    clean_table_name: crm_tasks_to_remove
+    sheet_context: static
+
+dados_docato:
+    sheet_id: 1wValHoubCG72NQZkOAGMJyBQM26Dkd4QwzKW1IXhSTw
+    sheet_name: dados_docato
+    clean_table_name: legal_base_docato
+    sheet_context: static
+
+de_para_cancelamento:
+    sheet_id: 1Om2IjwtSPHfg4GRq2IPKGshHLBdXnP0bCMBPbOrh5fc
+    sheet_name: de_para_cancelamento
+    clean_table_name: from_to_cancellation
     sheet_context: static
 
 demand_targets_2019:
@@ -702,28 +986,22 @@ demand_targets_replanning:
     clean_table_name: demand_targets_replanning
     sheet_context: static
 
-costs_allocation_relative_indexes:
-    sheet_id: 1f9Iyshj2N-jIbO-YIXs_CxCnDKq4aLEfBcS6dcN-qgM
-    sheet_name: costs_allocation_relative_indexes
-    clean_table_name: costs_allocation_relative_indexes
-    sheet_context: static
-
-dados_docato:
-    sheet_id: 1wValHoubCG72NQZkOAGMJyBQM26Dkd4QwzKW1IXhSTw
-    sheet_name: dados_docato
-    clean_table_name: legal_base_docato
-    sheet_context: static
-
-de_para_cancelamento:
-    sheet_id: 1Om2IjwtSPHfg4GRq2IPKGshHLBdXnP0bCMBPbOrh5fc
-    sheet_name: de_para_cancelamento
-    clean_table_name: from_to_cancellation
-    sheet_context: static
-
 for_sale_segmentation_survey:
     sheet_id: 1rpHRTqCaI1RtwH2OY4WStWGB9uj7YPaGQsJAL2EIaCo
     sheet_name: responses
     clean_table_name: for_sale_segmentation_survey_responses
+    sheet_context: static
+
+legacy_doorman:
+    sheet_id: 19N4-pSsxcdQZVYSiCValrqYo8CYDATMrcmKtOO_P1mI
+    sheet_name: legacy_doorman
+    clean_table_name: legacy_doorman
+    sheet_context: static
+
+marketing_affiliates_targets_replanning:
+    sheet_id: 1KHK1D92S6LbHfrp5nivOkUCOrBABBMqoT9uFuMr_Fag
+    sheet_name: marketing_affiliates_targets_replanning
+    clean_table_name: marketing_affiliates_targets_replanning
     sheet_context: static
 
 mra_historical:
@@ -744,34 +1022,28 @@ pld_suspicion_list:
     clean_table_name: pld_suspicion_list
     sheet_context: static
 
-supply_targets_2019:
-    sheet_id: 1Nxh1_mAsyr3tkChizMyYc4QIg3jTR1YNGAenjy9NWKQ
-    sheet_name: supply_targets_2019
-    clean_table_name: supply_targets_2019
-    sheet_context: static
-
-survival_estimation:
-    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
-    sheet_name: survival_estimation
-    clean_table_name: survival_estimation
-    sheet_context: static
-
 regional_inspection_q1_2022:
     sheet_id: 1ZSkD8Zucf8EFHAUweJiIk20VA3qAcuEshl_LtuOMX2E
     sheet_name: aux_regiao_regional_inspection
     clean_table_name: regional_inspection_q1_2022
     sheet_context: static
 
-survival_estimation_new_version:
-    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
-    sheet_name: survival_estimation_new_version
-    clean_table_name: survival_estimation_new_version
-    sheet_context: static
-
 rental_tof_monthly_targets:
     sheet_id: 1fMYV90b5hkmkRFspX6JRT9_yc4OjLB9AdPPGDvmu-Iw
     sheet_name: rental_tof_monthly_targets
     clean_table_name: rental_tof_monthly_targets
+    sheet_context: static
+
+sale_nbp_source_targets:
+    sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
+    sheet_name: sale_nbp_source_targets
+    clean_table_name: sale_nbp_source_targets
+    sheet_context: static
+
+supply_targets_2019:
+    sheet_id: 1Nxh1_mAsyr3tkChizMyYc4QIg3jTR1YNGAenjy9NWKQ
+    sheet_name: supply_targets_2019
+    clean_table_name: supply_targets_2019
     sheet_context: static
 
 supply_targets_2020:
@@ -786,10 +1058,16 @@ supply_targets_2021:
     clean_table_name: supply_targets_2021
     sheet_context: static
 
-crm_tasks_to_remove:
-    sheet_id: 1AOV5JNoFH72sM9ehSRaXpqvOlbxTD66QabtLAeV_8fM
-    sheet_name: task_to_remove
-    clean_table_name: crm_tasks_to_remove
+survival_estimation:
+    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
+    sheet_name: survival_estimation
+    clean_table_name: survival_estimation
+    sheet_context: static
+
+survival_estimation_new_version:
+    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
+    sheet_name: survival_estimation_new_version
+    clean_table_name: survival_estimation_new_version
     sheet_context: static
 
 users_cx_plaquinhas:
@@ -798,41 +1076,11 @@ users_cx_plaquinhas:
     clean_table_name: users_cx_plaquinhas
     sheet_context: static
 
-autonomous_agent_listing:
-    sheet_id: 1VWXMApErzzt-rRvXaqajNu0s4MRrdss1mthYrxZL9qs
-    sheet_name: autonomous_agent_listing
-    clean_table_name: autonomous_agent_listing
-    sheet_context: static
-
-marketing_affiliates_targets_replanning:
-    sheet_id: 1KHK1D92S6LbHfrp5nivOkUCOrBABBMqoT9uFuMr_Fag
-    sheet_name: marketing_affiliates_targets_replanning
-    clean_table_name: marketing_affiliates_targets_replanning
-    sheet_context: static
-
-atribuicao_de_maturidade_e_validacao_do_cadastro:
-    sheet_id: 1Q7nQfLRa_yTsqB0VN27AffeUES4r_urat3FA0R78MRI
-    sheet_name: FINAL
-    clean_table_name: metrics_registration
-    sheet_context: static
-
 zipcodes_sp:
     sheet_id: 1ej4KiYUK-7gbxykN1AANpcWllW2wXffChTiF8h0nUPc
     sheet_name: zipcodes_sp
     clean_table_name: zipcodes_sp
     sheet_context: static
-
-sale_nbp_source_targets:
-    sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
-    sheet_name: sale_nbp_source_targets
-    clean_table_name: sale_nbp_source_targets
-    sheet_context: static # TO-DO: must be growth context
-
-cities_neighborhoods_ibge_qa:
-    sheet_id: 19N1BVZuKcCw1RByXoL3hqaXSmEhdi7_mbtyOVff4oQs
-    sheet_name: ibge_5a_cities
-    clean_table_name: cities_neighborhoods_ibge_qa
-    sheet_context: static # TO-DO: must be growth context
 
 great_price_tag_test_groups:
     sheet_id: 1IelEYQr306slcOrkyM8ELVRCq8UML6k27lixgjkEAfo
@@ -850,12 +1098,6 @@ carteira_ciq:
     clean_table_name: ciq_wallet
     sheet_context: general
 
-user_properties:
-    sheet_id: 1vczbGi8fyT1AhuCkejL9xROs3d-87WToqUYBMAtoAKU
-    sheet_name: user_properties
-    clean_table_name: tracking_catalog_user_properties
-    sheet_context: general
-
 events_aud:
     sheet_id: 1vczbGi8fyT1AhuCkejL9xROs3d-87WToqUYBMAtoAKU
     sheet_name: events_aud
@@ -866,4 +1108,10 @@ tracking_catalog_projects:
     sheet_id: 1vczbGi8fyT1AhuCkejL9xROs3d-87WToqUYBMAtoAKU
     sheet_name: projects
     clean_table_name: tracking_catalog_projects
+    sheet_context: general
+
+user_properties:
+    sheet_id: 1vczbGi8fyT1AhuCkejL9xROs3d-87WToqUYBMAtoAKU
+    sheet_name: user_properties
+    clean_table_name: tracking_catalog_user_properties
     sheet_context: general

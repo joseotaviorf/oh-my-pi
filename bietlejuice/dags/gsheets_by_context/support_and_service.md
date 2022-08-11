@@ -25,12 +25,28 @@ This pipeline produces the following output tables:
     - `aux_payments_photos`
     - `regional_inspection_q12022`
     - `support_agents_department`
+    - `csat_chaves_off_pp`
+    - `csat_chaves_onb_iq`
+    - `forms_analise_vistoria`
+    - `service_city_holidays`
+    - `tag_sla_target`
+    - `target_service_kpis`
+    - `target_support_kpis`
+    - `taxonomy_sla`
 2. Data lake clean:
     - `aux_payments_photos`
     - `regional_inspection_q1_2022`
     - `schedule_inspection_departure`
     - `schedule_inspection_entry`
     - `support_agents_department`
+    - `owner_offboarding_keys_csat`
+    - `tenant_onboarding_keys_csat`
+    - `inspection_analysis_forms`
+    - `service_city_holidays`
+    - `tag_sla_target`
+    - `target_service_kpis`
+    - `target_support_kpis`
+    - `taxonomy_sla`
 ### Responsible Data Engineering Team
 
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the
