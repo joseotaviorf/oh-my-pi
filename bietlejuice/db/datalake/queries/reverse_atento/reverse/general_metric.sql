@@ -84,7 +84,7 @@ AND
     'Aditivos [REP] [POS] [BACK]',
     'CX Negociação de aluguel [PAY] [POS] [BACK]',
     'CX Partners [PRE] [FRONT]',
-    'CX Visitas Tarefas [PRE][BACK]',
+    'CX Visitas  Tarefas [PRE][BACK]',
     'CX Partners Tarefas [PRE] [BACK]',
     'CX Propostas Tarefas [PRE] [BACK]',
     'CX Pagamentos Ativo [POS] [BACK] [PAY]',
@@ -97,9 +97,9 @@ AND
     'Reparos Atento [REP] [POS] [BACK]',
     'CX Partners [PRE] [BACK]',
     'CIQ Assessor de Proprietário [PRE][BACK]',
-    'CX Closing',
-    'CX Offboarding ETP 1 [BACK]',
-    'CX Rescisão Back [BACK]',
-    'CX Onboarding [BACK]',
+    'CX Closing [BACK] [PRE]',
+    'CX Offboarding ETP 1 [BACK] [POS]',
+    'CX Rescisão [BACK] [POS]',
+    'CX Onboarding [BACK] [POS]',
     'CX Vistoria [BACK]'
   )
