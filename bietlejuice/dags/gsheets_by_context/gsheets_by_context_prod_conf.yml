@@ -8,6 +8,7 @@ dags:
   support_and_service:
     main_schedule_interval: 0 0 * * *
     dag_owner: Data S&S
+    cluster_name: databricks_10_4_med_general_cluster
   growth:
     main_schedule_interval: 0 0 * * *
     dag_owner: Data Growth
