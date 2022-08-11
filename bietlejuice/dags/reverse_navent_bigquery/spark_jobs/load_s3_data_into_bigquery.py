@@ -73,7 +73,10 @@ if __name__ == "__main__":
         credentials=credentials, project=bigquery_project_id
     )
 
-    job_config = bigquery.LoadJobConfig(source_format=bigquery.SourceFormat.CSV)
+    job_config = bigquery.LoadJobConfig(
+        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
+        source_format=bigquery.SourceFormat.CSV,
+    )
 
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
