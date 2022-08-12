@@ -28,6 +28,7 @@ columns:
   country_code:
     lineage:
       - datalake_region.region.country_code
+      - datalake_rene_descartes_clean.address.country_code
   address:
     lineage:
       - datalake_ebdb_clean.lead.address
@@ -82,9 +83,11 @@ columns:
   lat:
     lineage:
       - datalake_ebdb_clean.lead.lat
+      - datalake_rene_descartes_clean.address.lat
   lng:
     lineage:
       - datalake_ebdb_clean.lead.lng
+      - datalake_rene_descartes_clean.address.lng
   condo_price:
     lineage:
       - datalake_ebdb_clean.lead.condo_price

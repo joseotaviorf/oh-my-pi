@@ -7,7 +7,7 @@ SELECT DISTINCT
     l.id_lead_owner,
     user_affiliate.id AS id_user_has_indicated,
     l.id_affiliate_has_indicated,
-    rg.country_code,
+    COALESCE(ads.country_code, rg.country_code) AS country_code,
     l.address,
     l.house_number,
     l.complement,
@@ -25,8 +25,10 @@ SELECT DISTINCT
     l.email,
     l.pick_up_email,
     l.pick_up_phone,
-    l.lat,
-    l.lng,
+    -- As some bugs related to the lead from Main having a lat/lng different from the one found on Rene,
+    -- and considering Rene as the source of truth, on the coalesce we gave preference to Rene's data
+    COALESCE(ads.lat, l.lat) AS lat,
+    COALESCE(ads.lng, l.lng) AS lng,
     l.condo_price,
     l.iptu,
     l.status,
@@ -88,6 +90,14 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_clean.lead_reason AS lead_reason
  	    ON l.reason = lead_reason.reason_detail
+-- Rene Descartes is the new source of truth for leads. As we were facing problems to relate a lead to the Mexico country,
+-- the SWE International team added a new country column on Rene Descartes based on the latitude of the address.
+LEFT JOIN
+  datalake_rene_descartes_clean.house_lead AS hl
+    ON hl.id = l.id_external
+LEFT JOIN
+  datalake_rene_descartes_clean.address AS ads
+    ON ads.id = hl.id_address
 LEFT JOIN
     datalake_region.region AS rg
         ON l.id_region = rg.id

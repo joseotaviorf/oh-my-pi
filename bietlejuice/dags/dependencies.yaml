@@ -1620,6 +1620,8 @@ bietlejuice.enrich_lead:
   - bietlejuice.ebdb:create-clean-lead-reason-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.rene_descartes:load-clean-address
+  - bietlejuice.rene_descartes:load-clean-house-lead
 
 bietlejuice.enrich_lead_tracking:
   - bietlejuice.ebdb:create-clean-lead-in-data-lake
