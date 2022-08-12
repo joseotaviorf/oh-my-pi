@@ -922,7 +922,6 @@ bietlejuice.dw_money_laundering_prevention:
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-listing
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-transaction
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-visit
-  - bietlejuice.gsheets.static:load-clean-pld-suspicion-list
 
 bietlejuice.dw_offer:
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
@@ -1584,9 +1583,6 @@ bietlejuice.enrich_dai_report:
   - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
 
-bietlejuice.enrich_docato:
-  - bietlejuice.gsheets.static:load-clean-legal-base-docato
-
 bietlejuice.enrich_invoice:
   # Removed dependencies with ebdb.contract, conversion_lead, lead, house, partner_agent, rent_flow and user, and enrich_ebdb_listing.house_listing since it's all already satisfied by enrich_ebdb_contract.
   # Also, removed dependencies with retsuko.account, entry and invoice since it's already satisfied by enrich_retsuko.
@@ -1665,7 +1661,6 @@ bietlejuice.enrich_listing_flow:
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_wololo_lead:load-enrich-lead-sales-company
-  - bietlejuice.gsheets.static:load-clean-legacy-doorman
 
 bietlejuice.enrich_listing_jobs:
   - bietlejuice.enrich_crm_tasks:load-enrich-task-status
