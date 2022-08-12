@@ -52,7 +52,7 @@ INCREMENTAL_LOAD_PARAMETERS = {
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_RENT,
+        "owner": DAGOwnerEnum.DATA_GROWTH,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
