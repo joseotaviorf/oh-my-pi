@@ -424,9 +424,9 @@ LEFT JOIN
     AND proponent.cpf = transunion.cpf
 LEFT JOIN
   datalake_bureaus.transunion_income_features AS transunion_incomes
-    ON proponent.id_proposal = transunion.id_proposal
-    AND proponent.id_proponent = transunion.id_proponent
-    AND proponent.cpf = transunion.cpf
+    ON proponent.id_proposal = transunion_incomes.id_proposal
+    AND proponent.id_proponent = transunion_incomes.id_proponent
+    AND proponent.cpf = transunion_incomes.cpf
 WHERE
   proponent.id_proposal IS NOT NULL
   AND proponent.id_proponent IS NOT NULL
