@@ -11,6 +11,7 @@ WITH houses_without_lead_conversion AS (
     SELECT
         house.id AS id_house,
         NULL AS id_lead,
+        house.country_code,
         NULL AS lead_status,
         NULL AS lead_reason,
         NULL AS reason,
@@ -89,6 +90,7 @@ houses_without_lead AS (
     SELECT
         house.id AS id_house,
         NULL AS id_lead,
+        house.country_code,
         NULL AS lead_status,
         NULL AS lead_reason,
         NULL AS reason,
@@ -206,6 +208,7 @@ houses_with_lead AS (
     SELECT DISTINCT
         house.id AS id_house,
         lead.id AS id_lead,
+        lead.country_code,
         lead.status AS lead_status,
         lead.reason AS lead_reason,
         lead.original_reason AS reason,
@@ -404,6 +407,7 @@ base_listing_flows AS  (
     )
     SELECT
         ROW_NUMBER() OVER ( ORDER BY 0 ) AS id,
+        listing_flows.country_code,
         listing_flows.lead_reason,
         listing_flows.lead_status,
         last_pj.status AS photo_job_status,
@@ -504,6 +508,7 @@ SELECT
     id_first_region,
     id_user_lead_first_discarder,
     id_user_lead_last_discarder,
+    country_code,
     flow,
     acquisition_method,
     acquisition_channel,
