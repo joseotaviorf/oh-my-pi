@@ -246,6 +246,9 @@ tables:
   - table_name: veloscore_status
     extraction_type: full
     is_cleaned: false
+  - table_name: fiancavelo_subscriptionpayment
+    extraction_type: full
+    is_cleaned: false
   - table_name: veloscore_type
     extraction_type: full
     is_cleaned: false

@@ -153,6 +153,9 @@ tables:
   - table_name: fiancavelo_status
     extraction_type: full
     is_cleaned: false
+  - table_name: fiancavelo_subscriptionpayment
+    extraction_type: full
+    is_cleaned: false
   - table_name: fiancavelo_validity
     extraction_type: full
     is_cleaned: false

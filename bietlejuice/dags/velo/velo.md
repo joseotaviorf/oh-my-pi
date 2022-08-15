@@ -65,6 +65,7 @@ In datalake raw, via full load:
 - `fiancavelo_realestatestatus`
 - `fiancavelo_simulator`
 - `fiancavelo_status`
+- `fiancavelo_subscriptionpayment`
 - `fiancavelo_validity`
 - `field`
 - `menu`
