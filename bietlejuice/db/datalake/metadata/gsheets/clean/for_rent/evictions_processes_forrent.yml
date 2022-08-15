@@ -1,0 +1,38 @@
+---
+database_name: datalake_gsheets_clean
+table_name: evictions_processes_forrent
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.contract_id
+  id_process:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.process_number
+  responsible:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.resp
+  process_status:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.process_status
+  alert_message:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.alert_str
+  action_type_name:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.action_type
+  is_cav:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.is_cav
+  is_fraud:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.is_fraud
+  dt_insertion:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.insertion_date
+  dt_sentence:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.sentence_date
+  dt_final_sentence:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.final_sentence_date
+ 

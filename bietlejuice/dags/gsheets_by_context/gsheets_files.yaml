@@ -691,6 +691,13 @@ demand_targets_2022:
     clean_table_name: demand_targets_2022
     sheet_context: for_rent
 
+evictions_processes_forrent:
+    sheet_id: 13D27A-NeWnDC2-army_6c-mc-ORy5KEzrnVZfJv9aDM
+    sheet_name: GSHEETS_INGESTION_DATALAKE
+    clean_table_name: evictions_processes_forrent
+    sheet_context: for_rent
+    preload_time_in_seconds: 30
+
 mexico_demand_targets_2022:
     sheet_id: 1bVwi_m_x-lxrXcx--VyPmbbqDovwbiST1vnTEXBO1FQ
     sheet_name: demand_targets_mx_2022
@@ -744,6 +751,8 @@ mexico_supply_targets_2022:
     sheet_name: supply_targets_2022_mx
     clean_table_name: mexico_supply_targets_2022
     sheet_context: for_rent
+
+
 
 #########################
 # FOR SALE SHEETS
