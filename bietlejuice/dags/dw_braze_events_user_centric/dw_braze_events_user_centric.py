@@ -20,6 +20,7 @@ DW_SCHEMA = "braze"
 CONTEXT = "braze_events_user_centric"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_cluster"
 
 ENV = os.environ.get("ENVIRONMENT")
 
@@ -33,7 +34,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 
 default_libraries = config_service.get_config("default_libraries")
-cluster_description = config_service.get_config("custom_cluster")
+cluster_description = config_service.get_config(CLUSTER_DESCRIPTION)
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
