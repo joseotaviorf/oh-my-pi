@@ -97,6 +97,7 @@ dw_task_group = task_group.build_task_group_from_sql_files(
     is_incremental=True,
     partitions=INCREMENTAL_LOAD_PARAMETERS["partitions"],
     extra_query_template_params=INCREMENTAL_LOAD_PARAMETERS["dw_query_filters"],
+    has_load_to_redshift_task=False,
 )
 
 chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
