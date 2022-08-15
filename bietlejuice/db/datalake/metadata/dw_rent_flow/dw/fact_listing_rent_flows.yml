@@ -46,7 +46,7 @@ columns:
       - datalake_ebdb_rent_flow.rent_flow.id_proposal
   sk_contract:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_contract
+      - dw_public.dim_contract.sk_contract
   sk_rent_flow_taxonomy:
     lineage:
       - dw_public.dim_booking.sk_rent_flow_taxonomy
@@ -113,13 +113,13 @@ columns:
       - dw_public.dim_proposal.dt_tenant_doc_complete
   sk_contract_created_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_contract_created
+      - dw_public.dim_contract.ts_created
   sk_contract_signed_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_contract_signed
+      - dw_public.dim_contract.ts_signature
   sk_contract_annulment_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_contract_annulment
+      - dw_public.dim_contract.dt_annulment
   sk_contract_canceled_date:
     lineage:
       - dw_public.dim_contract.ts_canceled
