@@ -46,6 +46,7 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
+    schedule_interval=None,
     start_date=MAIN_START_DATE,
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
