@@ -34,6 +34,7 @@ WITH potential_listings AS (
         COALESCE(lfrl.id_region, -1) AS id_region,
         COALESCE(dr.city_id, -1) AS id_city,
         plb2b.id_user_registrant,
+        lfrl.country_code,
         plb2b.is_exclusive,
         COALESCE(
             LOWER(TRIM(lfet.tracking_campaign)) RLIKE '(institucional)|(branded)'
@@ -271,6 +272,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   CAST(atax.sk_discard_date AS INTEGER) AS sk_discard_date,
   CAST(atax.sk_user_lead_first_discarder AS INTEGER) AS sk_user_lead_first_discarder,
   CAST(atax.sk_user_lead_last_discarder AS INTEGER) AS sk_user_lead_last_discarder,
+  atax.country_code,
   atax.funnel_step,
   atax.funnel_drop_reason,
   atax.hours_lead_to_prospect,
@@ -332,4 +334,5 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   atax.listing_sale_status,
   CAST(atax.ts_opted_out_rent AS TIMESTAMP) AS ts_opted_out_rent,
   atax.ts_load
-FROM applied_taxonomy_flow AS atax
+FROM
+    applied_taxonomy_flow AS atax

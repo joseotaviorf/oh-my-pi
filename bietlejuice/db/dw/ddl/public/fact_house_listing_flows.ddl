@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS public.fact_house_listing_flows (
     sk_discard_date INTEGER,
     sk_user_lead_first_discarder INTEGER,
     sk_user_lead_last_discarder INTEGER,
+    country_code VARCHAR,
     funnel_step VARCHAR(255),
     funnel_drop_reason VARCHAR(255),
     hours_lead_to_prospect NUMERIC(10,1),

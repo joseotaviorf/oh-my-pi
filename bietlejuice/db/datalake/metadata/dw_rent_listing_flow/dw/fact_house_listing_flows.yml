@@ -93,6 +93,9 @@ columns:
   sk_user_lead_last_discarder:
     lineage:
       - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_user_lead_last_discarder
+  country_code:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.country_code
   funnel_drop_reason:
     lineage:
       - datalake_listing_flow.listing_flows_with_reprocessed_leads.funnel_step
