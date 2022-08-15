@@ -14,29 +14,22 @@ from bietlejuice.consumers.db_consumers import MySqlConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services import ConfigurationService
+
+
+SOURCE = "ebdb"
+config_service = ConfigurationService(SOURCE)
+
+BLOCK_LIST = config_service.get_config("block_list")
+NB_THREADS = config_service.get_config("nb_threads")
+PARTITION_SIZE = config_service.get_config("partition_size")
+TABLE_BLOCK_LIST = config_service.get_config("table_block_list")
+VIEW_ALLOW_LIST = config_service.get_config("view_allow_list")
 
 JOB_NAME = "load_ebdb_into_datalake"
-TABLE_BLOCK_LIST = [
-    "date_range",
-    "ENT_REVTYPE",
-    "REVCHANGES",
-    "schema_version",
-    "test",
-    "test_filho",
-    "tmp_condominio",
-    "tmp_update",
-    "tmp_update_AUD_01",
-    "_UsuarioRevisionEntity_new",
-]
-VIEW_ALLOW_LIST = ["MapRegiao", "vw_lead_reason"]
-BLOCK_LIST = ["PoligonoRegiao"]
 
 # todo: check this value and argument the choice
-PARTITION_SIZE = 1024
-# todo: check this value and argument the choice
-SIZE_THRESHOLD = PARTITION_SIZE * 8
-# todo: check this value and argument the choice
-NB_THREADS = 15
+SIZE_THRESHOLD = PARTITION_SIZE * 16
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -103,7 +96,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
-    source = "ebdb"
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -145,7 +137,7 @@ if __name__ == "__main__":
     )
     partition_columns = mysql_consumer.get_partition_columns_from_all_tables()
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
     metastore_service = SparkMetastoreService(SparkClient())
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
