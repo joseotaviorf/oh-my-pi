@@ -41,6 +41,9 @@ columns:
   id_user_lead_last_discarder:
     lineage:
       - datalake_listing_flow.listing_flow.id_user_lead_last_discarder
+  country_code:
+    lineage:
+      - datalake_listing_flow.listing_flow.country_code
   is_self_service_photo_job_scheduled:
     lineage:
       - datalake_listing_flow.listing_flow.is_self_service_photo_job_scheduled

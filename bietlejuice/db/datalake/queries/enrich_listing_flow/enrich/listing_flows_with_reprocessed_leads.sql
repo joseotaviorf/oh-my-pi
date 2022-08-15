@@ -122,6 +122,7 @@ acquisition_channels AS (
         lf.id_region,
         lf.id_user_lead_first_discarder,
         lf.id_user_lead_last_discarder,
+        lf.country_code,
         CASE
             WHEN l.is_for_rent
              THEN lf.ts_lead
@@ -279,6 +280,7 @@ SELECT
     acq.id_user_has_indicated,
     acq.id_user_lead_first_discarder,
     acq.id_user_lead_last_discarder,
+    acq.country_code,
     acq.is_self_service_photo_job_scheduled,
     acq.is_not_reprocessed,
     acq.is_b2b,
