@@ -11,6 +11,12 @@ columns:
   sk_buyer:
     lineage:
       - datalake_money_laundering_prevention.transaction.id_buyer
+  sk_firestore_sales_flow:
+    lineage:
+      - datalake_money_laundering_prevention.transaction.id_sale_flow_firestore
+  sk_sales_flow:
+    lineage:
+      - datalake_money_laundering_prevention.transaction.id_vendas
   sk_visit:
     lineage:
       - datalake_money_laundering_prevention.transaction.id_visit
@@ -23,9 +29,9 @@ columns:
   planned_payment_method:
     lineage:
       - datalake_money_laundering_prevention.transaction.planned_payment_method
-  monday_status:
+  offer_status:
     lineage:
-      - datalake_money_laundering_prevention.transaction.monday_status
+      - datalake_money_laundering_prevention.transaction.offer_status
   payment_model:
     lineage:
       - datalake_money_laundering_prevention.transaction.payment_model

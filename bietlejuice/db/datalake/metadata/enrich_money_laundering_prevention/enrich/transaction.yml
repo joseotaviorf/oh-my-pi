@@ -11,6 +11,12 @@ columns:
   id_buyer:
     lineage:
       - datalake_offer.sale_offer.id_buyer
+  id_sale_flow_firestore:
+    lineage:
+      - datalake_offer.sale_offer.id_sale_flow
+  id_vendas:
+    lineage:
+      - datalake_offer.sale_offer.id_vendas
   id_visit:
     lineage:
       - datalake_booking.booking.id_visit
@@ -23,9 +29,9 @@ columns:
   planned_payment_method:
     lineage:
       - datalake_offer.sale_offer.planned_payment_method
-  monday_status:
+  offer_status:
     lineage:
-      - datalake_offer.sale_offer.monday_status
+      - datalake_offer.sale_offer.offer_status
   payment_model:
     lineage:
       - datalake_offer.sale_offer.payment_model
