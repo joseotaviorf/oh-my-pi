@@ -100,6 +100,56 @@ supply_sale AS (
     GROUP BY 1,2,3,4
 
 ),
+
+-- Checks if last Listing update has been deleted from program
+agency_last_update AS (
+    SELECT 
+        id_house,
+        MAX(ts_updated) AS aud_agency_dt_updated
+    FROM
+        datalake_big_agent_clean_prod.agency_aud 
+    GROUP BY id_house
+    ),
+    
+agency_last_update_deleted AS (
+    SELECT
+        aud.id_house AS deleted_id, -- ID_HOUSE when last update has been deleted
+        aud.ts_deleted
+    FROM
+        datalake_big_agent_clean_prod.agency_aud  AS aud
+    INNER JOIN
+        agency_last_update AS du 
+            ON du.id_house = aud.id_house
+                AND du.aud_agency_dt_updated = aud.ts_updated
+    WHERE
+        aud.mod_ts_deleted
+),
+-- For removal of undue CIQ_Manager listings: gets IDs with status changes or Contract Signed after CIQ_Manager discontinuation
+has_status_changed AS (
+    SELECT
+        sk_house_listing
+    FROM
+        fact_house_listing_status
+    WHERE
+        ts_status_start > '2022-05-20'
+),
+
+sale_status_change AS (
+    SELECT
+        sk_sale_listing
+    FROM
+        sale.fact_listing_status
+    WHERE
+        ts_status_started > '2022-05-20'
+),
+has_signed_contract AS (
+    SELECT
+            sk_house_listing
+    FROM
+        fact_listing_rent_flows
+    WHERE
+        sk_contract_signed_date > '20220520'),
+
 quintoandar_consultant_listings_sale AS (
 
     SELECT
@@ -116,7 +166,13 @@ quintoandar_consultant_listings_sale AS (
         lbc.business_context AS businesscontext,
         NULL as businesscontext_detail,
         Agency.dt_since AS dt_ciq_started,
-        dp.id_partner
+        dp.id_partner,
+        dl.status AS house_status,
+        CASE
+            WHEN (dl.status = 'PUBLISHED' OR ssc.sk_sale_listing IS NOT NULL)
+                AND mud.deleted_id IS NOT NULL THEN TRUE
+            ELSE FALSE
+        END AS is_incorrect_attribution
     FROM
         datalake_big_agent_prod.House
     LEFT JOIN
@@ -148,6 +204,12 @@ quintoandar_consultant_listings_sale AS (
         datalake_ebdb_clean_prod.listing_business_context lbc
             ON lbc.id_house=JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId')
             AND lbc.business_context='SALE'
+    LEFT JOIN
+        agency_last_update_deleted AS mud
+            ON house.id = mud.deleted_id
+    LEFT JOIN
+        sale_status_change AS ssc
+            ON dl.sk_sale_listing = ssc.sk_sale_listing
     WHERE (lf.sk_lead_date>=20210601 OR lf.sk_first_listing_date>=20210601)
     ),
     
@@ -204,7 +266,13 @@ quintoandar_consultant_listings_rent AS (
         lbc.business_context AS businesscontext,
         NULL as businesscontext_detail,
         Agency.dt_since AS dt_ciq_started,
-        dp.id_partner
+        dp.id_partner,
+        dhl.status AS house_status,
+        CASE
+            WHEN (dhl.status = 'publicado' OR hsc.sk_house_listing IS NOT NULL OR hcs.sk_house_listing IS NOT NULL)
+    			AND mud.deleted_id IS NOT NULL THEN TRUE
+            ELSE FALSE
+        END AS is_incorrect_attribution
     FROM
         datalake_big_agent_prod.House
     LEFT JOIN
@@ -242,12 +310,41 @@ quintoandar_consultant_listings_rent AS (
         datalake_ebdb_clean_prod.listing_business_context lbc
             ON lbc.id_house=JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId')
             AND lbc.business_context='RENT'
+    LEFT JOIN
+        agency_last_update_deleted mud
+            ON House.id = mud.deleted_id
+    LEFT JOIN
+        has_status_changed hsc
+            ON dhl.sk_house_listing = hsc.sk_house_listing
+    LEFT JOIN
+    	has_signed_contract hcs
+    		ON dhl.sk_house_listing = hcs.sk_house_listing
     ),
 
 quintoandar_consultant_listings_uniao AS (
     SELECT * FROM quintoandar_consultant_listings_rent
     UNION ALL
     SELECT * FROM quintoandar_consultant_listings_sale
+),
+
+quintoandar_consultant_published AS (
+    SELECT *,
+       CASE
+           WHEN (house_status = 'publicado' OR house_status = 'PUBLISHED')
+               AND type_big_agent = 'CIQ_MANAGER' THEN TRUE
+           ELSE FALSE
+       END AS is_published_ciq_manager
+    FROM quintoandar_consultant_listings_uniao
+),
+
+-- published CIQ_Manager listings are to be considered Core (outside CIQ Program) since 20/05/2022
+-- Some exception listings had no deleted_date from CIQ_Manager program, so aditional filter was needed
+quintoandar_consultant_listings_filter AS (
+    SELECT *
+    FROM quintoandar_consultant_published
+    WHERE
+        NOT is_incorrect_attribution
+        AND NOT is_published_ciq_manager
 ),
 
 quintoandar_consultant_listings AS (
@@ -278,7 +375,7 @@ quintoandar_consultant_listings AS (
         qclu.id_partner,
         lcs.dt_sale,
         lcr.dt_rent
-    FROM quintoandar_consultant_listings_uniao qclu
+    FROM quintoandar_consultant_listings_filter qclu
     LEFT JOIN 
         first_change_sale lcs
             ON lcs.id_house=qclu.id_house
@@ -295,3 +392,4 @@ quintoandar_consultant_listings AS (
 )
 
 SELECT * FROM quintoandar_consultant_listings
+
