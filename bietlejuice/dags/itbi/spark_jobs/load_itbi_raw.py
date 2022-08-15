@@ -12,6 +12,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from pyspark import SparkFiles
 from pyspark.sql.types import DecimalType
 from pyspark.sql.functions import lpad, lit
+from pyspark.sql.utils import IllegalArgumentException
 
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -115,7 +116,7 @@ def get_data(
         urls = scrap_files_url(
             source_download_page_url, source_file_pattern, source_format
         )
-        data_path = source_url + list(filter(lambda s: YEAR in s, urls))[0]
+        data_path = source_url + list(filter(lambda s: YEAR in s, urls))[-1]
         file_name = data_path.split("/")[-1]
 
         logger.info(
@@ -146,10 +147,19 @@ def get_data(
 
         return df
 
+    except IllegalArgumentException as e:
+        logger.warning(
+            f"""
+            msg=Fail on get data from {source_url}, sheet not found in downloaded file.
+        """
+        )
+
+        raise e
+
     except Exception as e:
         logger.warning(
             f"""
-            msg=Fail on get data from {source_url} , error={e}
+            msg=Fail on get data from {data_path}, error={e}
         """
         )
 
