@@ -1,5 +1,6 @@
 SELECT
     id_document AS sk_document,
+    id_offer AS sk_offer,
     id_proposal AS sk_proposal,
     document_type,
     attributes,

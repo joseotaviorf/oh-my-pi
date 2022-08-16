@@ -8,6 +8,9 @@ columns:
   id_folder:
     lineage:
       - datalake_docx_clean.document.id_folder
+  id_offer:
+    lineage:
+      - datalake_docx_clean.folder_reference.reference_properties
   id_proposal:
     lineage:
       - datalake_docx_clean.folder_reference.reference_properties

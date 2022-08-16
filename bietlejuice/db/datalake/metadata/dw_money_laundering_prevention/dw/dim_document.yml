@@ -5,6 +5,9 @@ columns:
   sk_document:
     lineage:
       - datalake_money_laundering_prevention.document.id_document
+  sk_offer:
+    lineage:
+      - datalake_money_laundering_prevention.document.id_offer
   sk_proposal:
     lineage:
       - datalake_money_laundering_prevention.document.id_proposal

@@ -9,6 +9,7 @@ SELECT
         WHEN id_folder_type = 1 THEN f.id_external
         ELSE NULL
     END AS id_user,
+    GET_JSON_OBJECT(fr.reference_properties, '$.offerId') AS id_offer,
     GET_JSON_OBJECT(fr.reference_properties, '$.proposalId') AS id_proposal,
     GET_JSON_OBJECT(fr.reference_properties, '$.proposalProponentId') AS id_proposal_proponent,
     dt.name AS document_type,
