@@ -1,6 +1,6 @@
 ---
 table_name: accounts_payable
-gdrive_root_folder_id: "0BwY7ZypFBL1mR1RfWklGLUx4R0E"
+gdrive_root_folder_id: "1ld0eXsjU9d74TcPhqE8XgsD7xMslRwkV"
 columns_to_read:
         - Competência
         - Pagamento

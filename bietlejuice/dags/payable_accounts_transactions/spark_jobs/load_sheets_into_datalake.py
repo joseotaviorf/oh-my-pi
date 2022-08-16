@@ -152,7 +152,11 @@ def __download_drive_file_as_bytes(drive_client, file_id, acknowledge_abuse=Fals
 
 def __get_drive_file_ownership(drive_client, file_id):
     file_propeties = {"parents": [TEMPORARY_DRIVE_FOLDER_ID]}
-    request = drive_client.files().copy(fileId=file_id, body=file_propeties).execute()
+    request = (
+        drive_client.files()
+        .copy(fileId=file_id, body=file_propeties, supportsAllDrives=True)
+        .execute()
+    )
     return request["id"]
 
 
@@ -231,10 +235,7 @@ if __name__ == "__main__":
     items = __list_files_gdrive(gdrive_client, root_query)
     cap_year_folders_ids = []
     for item in items:
-        if item["name"] in [
-            f"CAP's {datetime.now().year}",
-            f"CAP's {datetime.now().year - 1}",
-        ]:
+        if any(str(year) in item["name"] for year in range(2021, datetime.now().year)):
             cap_year_folders_ids.append(item["id"])
     cap_year_folder_queries = [
         f"'{cap_year_folder_id}' in parents and trashed=false"
