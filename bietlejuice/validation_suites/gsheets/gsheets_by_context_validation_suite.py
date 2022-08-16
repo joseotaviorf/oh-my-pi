@@ -27,4 +27,5 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
             _sheet_info["sheet_name"],
             _sheet_info.get("sheet_context"),
             _sheet_info.get("clean_table_name"),
+            _sheet_info.get("raw_table_name"),
         )

@@ -104,7 +104,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         return df.createTempView(f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}")
 
     def run_and_validate_clean_query(
-        self, gsheets_context: str, clean_table_name: str
+        self, gsheets_context: str, clean_table_name: str, raw_table_name: str
     ) -> None:
         """
         Loads clean table from path and tries to run it in the previously
@@ -113,7 +113,9 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         :return: True if the validation succeeded. Else an error is raised.
         """
         clean_query = self.load_clean_query(gsheets_context, clean_table_name)
-        clean_query = self.swap_raw_table_with_temporary(clean_table_name, clean_query)
+        clean_query = self.swap_raw_table_with_temporary(
+            raw_table_name, clean_table_name, clean_query
+        )
         self.try_run_clean_query_into_table(clean_query)
 
     @staticmethod
@@ -125,9 +127,9 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         return query_content
 
     def swap_raw_table_with_temporary(
-        self, clean_table_name: str, clean_query: str
+        self, raw_table_name: str, clean_table_name: str, clean_query: str
     ) -> str:
-        raw_table = f"{self.GSHEETS_DATA_LAKE_RAW_SCHEMA}.{clean_table_name}"
+        raw_table = f"{self.GSHEETS_DATA_LAKE_RAW_SCHEMA}.{raw_table_name}"
         tmp_table = f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}"
 
         return clean_query.replace(raw_table, tmp_table)
@@ -200,7 +202,8 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
 
         # if not self.delta: maybe validate if there is any spreadsheet to validate before running.
         #     return
-        for sheet in all_sheets.values():
+        for raw_table_name, sheet in all_sheets.items():
+            sheet["raw_table_name"] = raw_table_name
             if sheet["sheet_id"] in self.delta:
                 validate_sheet_method_name = (
                     f'validate_sheet_{str(sheet["clean_table_name"]).lower()}'
@@ -231,9 +234,12 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         sheet_name: str,
         gsheets_context: str,
         clean_table_name: str,
+        raw_table_name: str,
     ) -> None:
         gsheet_client = self.get_gsheets_client()
         data = gsheet_client.get_data_from_sheet(sheet_name, sheet_id)
         self.load_gsheet_on_temp_view(data, clean_table_name)
-        self.run_and_validate_clean_query(gsheets_context, clean_table_name)
+        self.run_and_validate_clean_query(
+            gsheets_context, clean_table_name, raw_table_name
+        )
         sleep(1)
