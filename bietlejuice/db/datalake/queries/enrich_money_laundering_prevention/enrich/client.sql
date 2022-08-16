@@ -18,7 +18,7 @@ SELECT
     u.ts_updated AS ts_user_updated
 FROM
     datalake_ebdb_user.user u
-LEFT JOIN datalake_docx_clean.credit_evaluation ce
+INNER JOIN datalake_docx_clean.credit_evaluation ce
     ON ce.id_user = u.id
-LEFT JOIN datalake_docx_clean.credit_evaluation_proponent cep
+INNER JOIN datalake_docx_clean.credit_evaluation_proponent cep
     ON cep.id_credit_evaluation = ce.id
