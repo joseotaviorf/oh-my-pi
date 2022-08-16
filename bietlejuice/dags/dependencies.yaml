@@ -923,6 +923,7 @@ bietlejuice.dw_money_laundering_prevention:
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-house
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-listing
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-transaction
+  - bietlejuice.enrich_money_laundering_prevention:load-enrich-transaction-client
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-visit
 
 bietlejuice.dw_offer:

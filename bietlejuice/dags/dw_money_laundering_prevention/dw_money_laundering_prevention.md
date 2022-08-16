@@ -15,6 +15,7 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 This pipeline produces the following output table in DW, via full load: 
 
 - `fact_transaction`
+- `fact_transaction_client`
 - `dim_client`
 - `dim_document`
 - `dim_house`
