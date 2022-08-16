@@ -36,6 +36,14 @@ SELECT
     city_group,
     share,
     funnel_side
+FROM datalake_marketing_costs_sharing_rules.a028a
+UNION ALL
+SELECT
+    id_date,
+    id_rule,
+    city_group,
+    share,
+    funnel_side
 FROM datalake_marketing_costs_sharing_rules.b016b
 UNION ALL
 SELECT

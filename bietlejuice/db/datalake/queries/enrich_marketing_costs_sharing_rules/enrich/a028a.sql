@@ -13,7 +13,7 @@ WITH t_row_count AS ( --contagem de prospects
     WHERE
         fhlf.mkt_origin IN ('Indica Aí - General', 'Indica Aí - Agents', 'Doorman')
         AND dr.city_group IS NOT NULL
-        AND fhlf.sk_prospect_date > 0 
+        AND fhlf.sk_prospect_date > 0
     GROUP BY 1,2,3
 ),
 dim_distinct AS (
@@ -26,9 +26,9 @@ dim_distinct AS (
 	 	datalake_quintoandar.aux_date AS dd, datalake_region.region AS dr
 	WHERE
 	    dd.date < CURRENT_DATE
-	    
+
     UNION ALL
-    
+
     SELECT DISTINCT
 	 	dd.date,
 	 	dd.week_start,
@@ -38,9 +38,9 @@ dim_distinct AS (
 	 	datalake_quintoandar.aux_date AS dd, datalake_region.region AS dr
 	WHERE
 	    dd.date < CURRENT_DATE
-	    
+
     UNION ALL
-    
+
     SELECT DISTINCT
 	 	dd.date,
 	 	dd.week_start,
@@ -75,11 +75,12 @@ share AS (
 	FROM temp
 )
 SELECT
-	date_format(d.date,'yyyy-MM-dd') AS dt, 
+	INT(YEAR(d.date)*10000 + MONTH(d.date)*100 + DAY(d.date)) AS id_date,
 	'{id_rule}' AS id_rule,
 	d.city_group,
 	d.mkt_origin,
-	COALESCE(s.share,0) AS share
+	COALESCE(s.share,0) AS share,
+	'affiliates' AS funnel_side
 FROM
 	dim_distinct AS d
 	JOIN share AS s
