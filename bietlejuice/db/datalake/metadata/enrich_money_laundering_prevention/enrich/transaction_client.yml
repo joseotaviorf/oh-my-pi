@@ -1,0 +1,25 @@
+---
+database_name: datalake_money_laundering_prevention
+table_name: transaction_client
+columns:
+  id_client:
+    lineage:
+      - datalake_money_laundering_prevention.client.client_id
+  id_offer:
+    lineage:
+      - datalake_money_laundering_prevention.transaction.id_offer
+  id_document:
+    lineage:
+      - datalake_money_laundering_prevention.document.id_document
+  id_vendas:
+    lineage:
+      - datalake_money_laundering_prevention.transaction.id_vendas
+  id_sale_flow_firestore:
+    lineage:
+      - datalake_money_laundering_prevention.transaction.id_sale_flow_firestore
+  client_income_nature:
+    lineage:
+      - datalake_money_laundering_prevention.client.income_nature
+  client_monthly_income:
+    lineage:
+      - datalake_money_laundering_prevention.client.monthly_income
