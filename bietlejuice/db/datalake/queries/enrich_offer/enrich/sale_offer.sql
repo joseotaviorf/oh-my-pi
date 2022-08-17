@@ -381,6 +381,10 @@ data_sources AS (
         vo.tags_from_salesflow AS vo_tags_from_salesflow,
         vo.has_seller_debt_payments AS vo_has_seller_debt_payments,
         vo.is_ccv_canceled AS vo_is_ccv_canceled,
+        vo.is_a_rescued_ccv AS vo_is_a_rescued_ccv, 
+        vo.is_a_rescued_offer AS vo_is_a_rescued_offer, 
+        vo.dt_sale_agreement_rescued AS vo_dt_sale_agreement_rescued, 
+        vo.dt_offer_rescued AS vo_dt_offer_rescued,
         vo.ts_last_updated_pendency AS vo_ts_last_updated_pendency,
         vo.dt_sale_transacton_paid AS vo_dt_sale_transacton_paid,
         vo.dt_house_registry_ended AS vo_dt_house_registry_ended,
@@ -862,7 +866,11 @@ business_rules AS (
             WHEN ds.id_offer IS NOT NULL
                 THEN 'GIROFFER'
             ELSE 'NOT DEFINED'
-        END AS offer_platform
+        END AS offer_platform, 
+        ds.vo_is_a_rescued_ccv AS is_a_rescued_ccv, 
+        ds.vo_is_a_rescued_offer AS is_a_rescued_offer, 
+        ds.vo_dt_sale_agreement_rescued AS dt_sale_agreement_rescued, 
+        ds.vo_dt_offer_rescued AS dt_offer_rescued
     FROM
         data_sources AS ds
     LEFT JOIN
@@ -1021,8 +1029,12 @@ SELECT
     is_ccv_canceled,
     is_3p_supply,
     is_3p_demand,
+    is_a_rescued_ccv, 
+    is_a_rescued_offer, 
     flg_booking_before_offer,
     flg_visit_completed_before_offer,
+    dt_sale_agreement_rescued, 
+    dt_offer_rescued,
     dt_sale_transacton_paid,
     dt_house_registry_ended,
     dt_house_registry_started,

@@ -41,6 +41,7 @@ CREATE TABLE sale.dim_sale_agreement (
     is_ccv_canceled BOOLEAN,
     is_3p_supply BOOLEAN,
     is_3p_demand BOOLEAN,
+    is_a_rescued_ccv BOOLEAN,
     ts_sale_agreement_signed TIMESTAMP,
     ts_sale_agreement_cancelled TIMESTAMP,
     ts_house_registry_started TIMESTAMP,

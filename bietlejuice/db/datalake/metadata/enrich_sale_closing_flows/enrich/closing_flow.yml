@@ -65,6 +65,9 @@ columns:
   dt_sale_agreement_cancelled:
     lineage:
       - datalake_offer.sale_offer.dt_sale_agreement_cancelled
+  dt_sale_agreement_rescued:
+    lineage: 
+      - datalake_offer.sale_offer.dt_sale_agreement_rescued
   dt_onboarding_ended:
     lineage:
       - datalake_firestore.monday.dt_onboarding_ended

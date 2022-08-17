@@ -179,6 +179,7 @@ data_sources AS (
         so.dt_house_registry_ended,
         COALESCE(sof.dt_sale_key_delivered, m.dt_sale_key_delivered) AS dt_sale_key_delivered,
         so.dt_sale_transacton_paid,
+        so.dt_sale_agreement_rescued,
         pr.dt_payment_allowed,
         ms.dt_occurence AS dt_down_payment,
         so.ts_updated
@@ -255,6 +256,7 @@ SELECT
     dt_sale_agreement_created,
     dt_sale_agreement_signed,
     dt_sale_agreement_cancelled,
+    dt_sale_agreement_rescued,
     dt_onboarding_ended,
     dt_legal_analysis_ended,
     dt_legaut_analysis_started,

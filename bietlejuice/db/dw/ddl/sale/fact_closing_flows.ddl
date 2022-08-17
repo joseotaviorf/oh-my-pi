@@ -8,6 +8,7 @@ CREATE TABLE sale.fact_closing_flows (
   sk_sale_agreement_signed_date BIGINT,
   sk_onboarding_ended_date BIGINT,
   sk_sale_agreement_cancelled_date BIGINT,
+  sk_sale_agreement_rescued_date BIGINT,
   sk_legal_analysis_ended_date BIGINT,
   sk_legaut_analysis_started_date BIGINT,
   sk_legaut_analysis_ended_date BIGINT,

@@ -455,7 +455,48 @@ tag AS (
         ROW = 1
     GROUP BY
         id_sales_flow
+), 
+-- OFFER/SALE AGREEMENT RESCUE FLOW CTE
+rescue_flow AS (
+    WITH cancelation_history AS (
+      SELECT
+            id, 
+            is_canceled, 
+            LAG(is_canceled,1) OVER (PARTITION BY id ORDER BY ts_updated) AS last_cancelation_status, 
+            ts_canceled AS ts_sale_agreement_canceled, 
+            ts_updated
+      FROM 
+        datalake_sales_flow_clean.sales_flow_aud
+      WHERE
+        mod_is_canceled = TRUE
+   ), 
+   
+   rescue_status AS (
+     SELECT 
+         id, 
+         is_canceled, 
+         CASE 
+           WHEN is_canceled = FALSE and last_cancelation_status = TRUE THEN TRUE 
+         END AS is_a_rescue,
+         ts_sale_agreement_canceled,
+         CASE 
+           WHEN is_canceled = FALSE and last_cancelation_status = TRUE THEN ts_updated 
+         END AS ts_rescued, 
+         ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS ROW
+     FROM 
+         cancelation_history
+   )
+   SELECT 
+         id AS id_sales_flow, 
+         is_a_rescue,
+         ts_sale_agreement_canceled,
+         ts_rescued
+   FROM 
+       rescue_status 
+   WHERE 
+       ROW = 1
 )
+
 SELECT
     off.id_offer,
     sp.id_user_consultant,
@@ -614,6 +655,22 @@ SELECT
             THEN DATE(off.ts_discarded)
         END
     ) AS dt_sale_agreement_cancelled,
+    CASE 
+      WHEN rf.ts_sale_agreement_canceled IS NOT NULL AND rf.is_a_rescue = TRUE THEN TRUE
+      ELSE FALSE
+    END AS is_a_rescued_ccv, 
+    CASE 
+      WHEN rf.ts_sale_agreement_canceled IS NULL AND rf.is_a_rescue = TRUE THEN TRUE
+      ELSE FALSE
+    END AS is_a_rescued_offer, 
+    CASE 
+      WHEN rf.ts_sale_agreement_canceled IS NOT NULL AND rf.is_a_rescue = TRUE THEN DATE(rf.ts_rescued)
+      ELSE NULL
+    END AS dt_sale_agreement_rescued,
+    CASE 
+      WHEN rf.ts_sale_agreement_canceled IS NULL AND rf.is_a_rescue = TRUE THEN DATE(rf.ts_rescued)
+      ELSE NULL
+    END AS dt_offer_rescued,
     o.dt_ended AS dt_onboarding_ended,
     DATE(d.ts_buyer_seller_ended) AS dt_legal_analysis_ended,
     DATE(d.ts_partner_started) AS dt_legaut_analysis_started,
@@ -689,6 +746,9 @@ LEFT JOIN
 LEFT JOIN
     sales_flow_details AS sfd
         ON sfd.id_sales_flow = off.id_sales_flow
+LEFT JOIN 
+    rescue_flow AS rf
+        ON off.id_sales_flow = rf.id_sales_flow
 WHERE
     tag.label IS NULL
     OR tag.label NOT LIKE '%#offertestedeproduto%'

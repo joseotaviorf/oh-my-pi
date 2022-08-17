@@ -40,6 +40,7 @@ SELECT
   eso.is_ccv_canceled,
   eso.is_3p_supply,
   eso.is_3p_demand,
+  eso.is_a_rescued_ccv,
   CAST(eso.dt_sale_agreement_signed AS TIMESTAMP) AS ts_sale_agreement_signed,
   CAST(eso.dt_sale_agreement_cancelled AS TIMESTAMP) AS ts_sale_agreement_cancelled,
   CAST(eso.dt_house_registry_started AS TIMESTAMP) AS ts_house_registry_started,

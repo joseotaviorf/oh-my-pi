@@ -125,6 +125,9 @@ columns:
   is_3p_demand:
     lineage:
       - datalake_offer.sale_offer.is_3p_demand
+  is_a_rescued_ccv:
+    lineage: 
+      - datalake_offer.sale_offer.is_a_rescued_ccv
   ts_sale_agreement_signed:
     lineage:
       - datalake_offer.sale_offer.dt_sale_agreement_signed

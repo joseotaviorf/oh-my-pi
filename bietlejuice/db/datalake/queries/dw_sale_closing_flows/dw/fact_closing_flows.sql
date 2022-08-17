@@ -7,6 +7,7 @@ SELECT
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_agreement_signed,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_signed_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_onboarding_ended,1, 10),'-','') AS BIGINT), -1) AS sk_onboarding_ended_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_agreement_cancelled,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_cancelled_date,
+  COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_agreement_rescued,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_rescued_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_legal_analysis_ended,1, 10),'-','') AS BIGINT), -1) AS sk_legal_analysis_ended_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_legaut_analysis_started,1, 10),'-','') AS BIGINT), -1) AS sk_legaut_analysis_started_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_legaut_analysis_ended,1, 10),'-','') AS BIGINT), -1) AS sk_legaut_analysis_ended_date,
