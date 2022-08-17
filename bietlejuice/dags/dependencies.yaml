@@ -1359,6 +1359,7 @@ bietlejuice.enrich_crm_tasks_flows:
   - bietlejuice.enrich_crm:load-enrich-tasks-actions
   - bietlejuice.enrich_crm:load-enrich-workgroups
   - bietlejuice.enrich_crm_tasks_resolution:load-enrich-tasks-resolution
+  - bietlejuice.enrich_heimdall:load-enrich-activity
 
 bietlejuice.enrich_crm_tasks_resolution:
   - bietlejuice.enrich_crm:load-enrich-tasks-actions

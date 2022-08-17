@@ -1,9 +1,9 @@
 WITH tasks AS (
     SELECT
-        id AS id_task,
-        MAX(id_contract) AS id_contract
+        t.id AS id_task,
+        MAX(t.id_contract) AS id_contract
     FROM
-        datalake_crm.tasks
+        datalake_crm.tasks AS t
     GROUP BY 1
 ),
 prev_tasks_full AS (
@@ -25,8 +25,12 @@ prev_tasks_full AS (
         tr.action_user_name,
         tr.action_type AS task_user_type,
         tr.origin,
-        ROUND((TO_UNIX_TIMESTAMP(tr.ts_action, 'yyyy-MM-dd hh:mm:ss')
-               - TO_UNIX_TIMESTAMP(LAG(tr.ts_action) OVER (PARTITION BY tr.id_task ORDER BY DATE_TRUNC('SECOND', tr.ts_action)), 'yyyy-MM-dd hh:mm:ss')) / 3600.0 , 2) AS task_user_resolve_hours,
+        ROUND(
+                (
+                    TO_UNIX_TIMESTAMP(tr.ts_action, 'yyyy-MM-dd hh:mm:ss')-
+                    TO_UNIX_TIMESTAMP(LAG(tr.ts_action) OVER (PARTITION BY tr.id_task ORDER BY DATE_TRUNC('SECOND', tr.ts_action)), 'yyyy-MM-dd hh:mm:ss')
+                )/3600.0, 2
+        ) AS task_user_resolve_hours,
         tr.type,
         DATE(tr.ts_action) AS dt_partition,
         tr.ts_action,
@@ -36,14 +40,15 @@ prev_tasks_full AS (
         tr.year,
         tr.month,
         tr.day
-    FROM 
-        datalake_crm_tasks_resolution.tasks_resolution tr
-    JOIN
-        tasks t
-          USING(id_task)
+    FROM
+        datalake_crm_tasks_resolution.tasks_resolution AS tr
+    INNER JOIN
+        tasks AS t
+            ON tr.id_task = t.id_task
 ),
 prev_tasks AS (
-    SELECT *
+    SELECT
+        *
     FROM
         prev_tasks_full
     WHERE
@@ -56,9 +61,9 @@ prev_max_realized_by_user AS (
         id_task,
         id_user_action,
         MAX(ts_action) AS ts_max_action
-    FROM 
+    FROM
         prev_tasks
-    WHERE 
+    WHERE
         action_type = 'REALIZE'
         AND id_user_action != -1
     GROUP BY 1, 2
@@ -79,14 +84,14 @@ max_realized_by_user AS (
         t.year,
         t.month,
         t.day
-    FROM 
-        prev_tasks t
-    JOIN 
-        prev_max_realized_by_user prev_max
+    FROM
+        prev_tasks AS t
+    INNER JOIN
+        prev_max_realized_by_user AS prev_max
             ON t.id_task = prev_max.id_task
-            AND t.id_user_action = prev_max.id_user_action
-            AND t.ts_action = prev_max.ts_max_action
-            AND t.action_type = 'REALIZE'
+                AND t.id_user_action = prev_max.id_user_action
+                AND t.ts_action = prev_max.ts_max_action
+                AND t.action_type = 'REALIZE'
 )
 SELECT DISTINCT
     CAST(COALESCE(mrbu.id_action_date, t.id_action_date) AS BIGINT) AS id_action_date,
@@ -94,6 +99,11 @@ SELECT DISTINCT
     CAST(t.id_completed_date AS BIGINT) AS id_completed_date,
     t.id_contract,
     t.id_origin,
+    act.id AS id_activity,
+    act.id_house AS id_house_activity,
+    act.id_external_contract AS id_external_contract_activity,
+    act.id_user AS id_user_activity,
+    act.id_rent_flow AS id_rent_flow_activity,
     CAST(t.id_receiver AS BIGINT) AS id_receiver,
     CAST(t.id_start_date AS BIGINT) AS id_start_date,
     CAST(t.id_task AS STRING) AS id_task,
@@ -104,26 +114,46 @@ SELECT DISTINCT
     t.action_type,
     t.action_user_name,
     t.origin,
+    act.class AS class_activity,
+    act.previous_status AS previous_status_activity,
+    act.status AS status_activity,
+    act.type AS type_activity,
+    act.user_name AS user_name_activity,
+    act.event_name AS event_name_activity,
+    act.ticket_number AS ticket_number_activity,
+    act.discount_months AS discount_months_activity,
+    act.discount_percentage AS discount_percentage_activity,
+    act.discount_amount AS discount_amount_activity,
+    act.discounted_rental AS discounted_rental_activity,
+    act.rental_amount AS rental_amount_activity,
     CASE
         WHEN t.action_user_name IS NOT NULL THEN CAST(COALESCE(mrbu.task_user_resolve_hours, t.task_user_resolve_hours) AS DECIMAL)
         ELSE CAST(COALESCE(mrbu.task_user_resolve_hours, t.task_user_resolve_hours) AS DECIMAL(10,1))
     END AS task_user_resolve_hours,
-    t.type, 
+    t.type,
     t.action_type AS task_user_type,
     COALESCE(mrbu.ts_action, t.ts_action) AS ts_action,
     COALESCE(mrbu.ts_start, t.ts_start) AS ts_start,
     COALESCE(mrbu.ts_task_user_start, t.ts_task_user_start) AS ts_task_user_start,
     COALESCE(mrbu.ts_task_user_end, t.ts_task_user_end) AS ts_task_user_end,
+    act.ts_transferred AS ts_activity_transferred,
+    act.ts_requested AS ts_activity_requested,
+    act.ts_transition_created AS ts_activity_transition_created,
     COALESCE(mrbu.year, t.year) AS year,
     COALESCE(mrbu.month, t.month) AS month,
     COALESCE(mrbu.day, t.day) AS day
-FROM 
-    prev_tasks t
-LEFT JOIN 
-    max_realized_by_user mrbu
+FROM
+    prev_tasks AS t
+LEFT JOIN
+    max_realized_by_user AS mrbu
         ON t.id_task = mrbu.id_task
             AND t.id_user_action = mrbu.id_user_action
             AND t.action_type = mrbu.action_type
-WHERE 
-    NOT(t.id_user_action = -1
-          AND t.action_type = 'REALIZE')
+LEFT JOIN
+    datalake_heimdall.activity AS act
+        ON t.id_origin = act.id
+WHERE
+    NOT(
+          t.id_user_action = -1
+          AND t.action_type = 'REALIZE'
+    )

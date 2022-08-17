@@ -14,6 +14,21 @@ columns:
   id_origin:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.id_origin
+  id_activity:
+    lineage:
+      - datalake_heimdall.activiy.id
+  id_house_activity:
+    lineage:
+      - datalake_heimdall.activity.id_house
+  id_external_contract_activity:
+    lineage:
+      - datalake_heimdall.activity.id_external_contract
+  id_user_activity:
+    lineage:
+      - datalake_heimdall.activity.id_user
+  id_rent_flow_activity:
+    lineage:
+      - datalake_heimdall.activity.id_rent_flow
   id_receiver:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.id_receiver
@@ -44,6 +59,42 @@ columns:
   origin:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.origin
+  class_activity:
+    lineage:
+      - datalake_heimdall.activity.class
+  previous_status_activity:
+    lineage:
+      - datalake_heimdall.activity.previous_status
+  status_activity:
+    lineage:
+      - datalake_heimdall.activity.status
+  type_activity:
+    lineage:
+      - datalake_heimdall.activity.type
+  user_name_activity:
+    lineage:
+      - datalake_heimdall.activity.user_name
+  event_name_activity:
+    lineage:
+      - datalake_heimdall.activity.event_name
+  ticket_number_activity:
+    lineage:
+      - datalake_heimdall.activity.ticket_number
+  discount_months_activity:
+    lineage:
+      - datalake_heimdall.activity.discount_months
+  discount_percentage_activity:
+    lineage:
+      - datalake_heimdall.activity.discount_percentage
+  discount_amount_activity:
+    lineage:
+      - datalake_heimdall.activity.discount_amount
+  discounted_rental_activity:
+    lineage:
+      - datalake_heimdall.activity.discounted_rental
+  rental_amount_activity:
+    lineage:
+      - datalake_heimdall.activity.rental_amount
   task_user_resolve_hours:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.ts_action
@@ -62,4 +113,12 @@ columns:
   ts_task_user_end:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.ts_action
-  
+  ts_activity_transferred:
+    lineage:
+      - datalake_heimdall.activity.ts_transferred
+  ts_activity_requested:
+    lineage:
+      - datalake_heimdall.activity.ts_requested
+  ts_activity_transition_created:
+    lineage:
+      - datalake_heimdall.activity.ts_transition_created
