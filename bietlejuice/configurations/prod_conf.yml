@@ -13,6 +13,7 @@ dags_out_of_pattern:
         "dw_contract",
         "dw_datamarts_cross",
         "dw_datamarts_for_rent",
+        "dw_datamarts_for_rent_cross",
         "dw_datamarts_growth",
         "dw_datamarts_growth_cross",
         "dw_datamarts_growth_blocklist",
