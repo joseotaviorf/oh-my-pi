@@ -235,7 +235,9 @@ if __name__ == "__main__":
     items = __list_files_gdrive(gdrive_client, root_query)
     cap_year_folders_ids = []
     for item in items:
-        if any(str(year) in item["name"] for year in range(2021, datetime.now().year)):
+        if any(
+            str(year) in item["name"] for year in range(2021, datetime.now().year + 1)
+        ):
             cap_year_folders_ids.append(item["id"])
     cap_year_folder_queries = [
         f"'{cap_year_folder_id}' in parents and trashed=false"
