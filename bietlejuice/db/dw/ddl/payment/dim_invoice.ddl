@@ -11,6 +11,7 @@ CREATE TABLE if not exists payment.dim_invoice (
     paid_amount DECIMAL(13,2),
     accrual_year_month INT,
     ts_created TIMESTAMP,
+    ts_canceled TIMESTAMP,
     dt_sent DATE,
     dt_due DATE,
     dt_paid DATE,

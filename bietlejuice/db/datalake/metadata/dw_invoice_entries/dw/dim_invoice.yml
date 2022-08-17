@@ -35,6 +35,9 @@ columns:
   ts_created:
     lineage:
       - datalake_retsuko_clean.invoice.ts_created
+  ts_canceled:
+    lineage:
+      - datalake_retsuko.invoice.ts_canceled
   dt_sent:
     lineage:
       - datalake_retsuko.invoice.ts_sent

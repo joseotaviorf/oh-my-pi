@@ -17,6 +17,9 @@ columns:
   accounting_account:
     lineage:
       - datalake_retsuko_clean.entry.bill_item
+  is_rental_paid_in_advance:
+    lineage:
+      - datalake_retsuko_clean.contract.is_rental_paid_in_advance
   producer:
     lineage:
       - datalake_retsuko_clean.entry.producer

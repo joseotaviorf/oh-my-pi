@@ -23,6 +23,9 @@ columns:
   description:
     lineage:
       - datalake_retsuko.invoice_entry.description
+  is_rental_paid_in_advance:
+    lineage:
+      - datalake_retsuko.invoice_entry.is_rental_paid_in_advance
   invoice_entry_revenue:
     lineage:
       - datalake_invoice.invoice_revenues.invoice_entry_revenue

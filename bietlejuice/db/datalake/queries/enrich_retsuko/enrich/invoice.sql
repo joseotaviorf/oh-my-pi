@@ -13,15 +13,16 @@ WITH invoice_replace AS (
         END) AS invoice_user,
         i.ts_sent,
         i.ts_due,
-        i.ts_paid
+        i.ts_paid,
+        i.ts_canceled
     FROM datalake_retsuko_clean.invoice i
     LEFT JOIN datalake_retsuko_clean.entry e
             ON e.id_invoice = i.id
-    INNER JOIN datalake_retsuko_clean.account af 
+    INNER JOIN datalake_retsuko_clean.account af
         ON e.id_from_account = af.id
-    INNER JOIN datalake_retsuko_clean.account at 
+    INNER JOIN datalake_retsuko_clean.account at
         ON e.id_to_account = at.id
-    GROUP BY 1,2,3,4,5,6,8,9,10
+    GROUP BY 1,2,3,4,5,6,8,9,10,11
 )
 SELECT
     ir.id_invoice,
@@ -30,8 +31,9 @@ SELECT
     ir.negotiation_status,
     ir.closing_mode,
     ir.paid_via,
-    ir.invoice_user,   
+    ir.invoice_user,
     ir.ts_sent,
     ir.ts_due,
-    ir.ts_paid
+    ir.ts_paid,
+    ir.ts_canceled
 FROM invoice_replace ir
