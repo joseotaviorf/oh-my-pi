@@ -1,4 +1,3 @@
-from time import sleep
 from typing import Any, List, Dict, Union, Tuple
 
 from datetime import datetime, timedelta
@@ -6,6 +5,7 @@ import pendulum
 import re
 from unidecode import unidecode
 
+from pyspark.sql import functions
 from pyspark.sql.types import StructField, StructType, StringType
 from quintoandar_gsheets_api_client import GoogleSheetsClient
 from quintoandar_logger import QuintoAndarLogger
@@ -99,6 +99,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         spark_client = SparkClient()
         schema = self.__generate_schema(data, clean_table_name)
         df = spark_client.create_dataframe(data, schema=schema)
+        df = df.withColumn("ts_load", functions.current_timestamp())
         df = self.__columns_to_snake_case(df)
 
         return df.createTempView(f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}")
@@ -127,10 +128,10 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         return query_content
 
     def swap_raw_table_with_temporary(
-        self, raw_table_name: str, clean_table_name: str, clean_query: str
+        self, raw_table_name: str, tmp_table_name: str, clean_query: str
     ) -> str:
         raw_table = f"{self.GSHEETS_DATA_LAKE_RAW_SCHEMA}.{raw_table_name}"
-        tmp_table = f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}"
+        tmp_table = f"{self.TEMPORARY_TABLE_PREFIX}{tmp_table_name}"
 
         return clean_query.replace(raw_table, tmp_table)
 
@@ -242,4 +243,3 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         self.run_and_validate_clean_query(
             gsheets_context, clean_table_name, raw_table_name
         )
-        sleep(1)
