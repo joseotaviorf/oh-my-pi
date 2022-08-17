@@ -9,12 +9,6 @@ from bietlejuice.consumers.db_consumers import MongoConsumer
 class MongoValidationSuite(DatabaseValidationSuitesExecutor):
     REPOSITORY_CONSUMER_CLASS = MongoConsumer
 
-    def validate_cidade_alerta(self):
-        conn_config = self.auth[DatabaseEnum.CIDADE_ALERTA]
-        mongo_client = MongoClient(conn_config)
-        db_consumer = self.REPOSITORY_CONSUMER_CLASS(mongo_client, SparkClient())
-        self._validate_connection(db_consumer)
-
     def validate_crm(self):
         conn_config = self.auth[DatabaseEnum.CRM]
         mongo_client = MongoClient(conn_config)
