@@ -39,6 +39,7 @@ This pipeline produces the following output tables:
     - `offline_and_branding_marketing_costs`
     - `pld_suspicion_list`
     - `rental_tof_monthly_targets`
+    - `sale_business_unit_standardization`
     - `supply_targets_2019`
     - `supply_targets_2020`
     - `supply_targets_2021`
@@ -69,6 +70,7 @@ This pipeline produces the following output tables:
     - `offline_and_branding_marketing_costs`
     - `pld_suspicion_list`
     - `rental_tof_monthly_targets`
+    - `sale_business_unit_standardization`
     - `supply_targets_2019`
     - `supply_targets_2020`
     - `supply_targets_2021`

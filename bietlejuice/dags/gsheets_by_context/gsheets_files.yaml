@@ -1049,6 +1049,12 @@ rental_tof_monthly_targets:
     clean_table_name: rental_tof_monthly_targets
     sheet_context: static
 
+sale_business_unit_standardization:
+    sheet_id: 1d3kj_M3w_VbrAlJfAY_2spiBEuKbaSQ442GXuQP1DvE
+    sheet_name: sale_business_unit_standardization
+    clean_table_name: sale_business_unit_standardization
+    sheet_context: static
+
 sale_nbp_source_targets:
     sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
     sheet_name: sale_nbp_source_targets
