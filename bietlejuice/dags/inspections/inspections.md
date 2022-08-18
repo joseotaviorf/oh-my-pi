@@ -12,17 +12,17 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-We load the following tables into the datalake Raw and Clean via Full load:
+We load the following tables into the datalake:
 
-- `assessment`
-- `assessment_aud`
-- `inspection`
-- `inspection_aud`
-- `issue_type`
-- `item_group_type`
-- `item_type`
-- `room_type`
-- `rev_info`
+- `assessment` (full)
+- `assessment_aud` (full)
+- `inspection` (full)
+- `inspection_aud` (full)
+- `issue_type` (full)
+- `item_group_type` (full)
+- `item_type` (full)
+- `room_type` (full)
+- `rev_info` (full)
 
 ### Responsible Data Team
 ​

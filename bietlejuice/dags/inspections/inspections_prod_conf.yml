@@ -1,23 +1,27 @@
 ---
-tables:
-  - table_name: assessment
-    extraction_type: full
-  - table_name: assessment_aud
-    extraction_type: full
-  - table_name: inspection
-    extraction_type: full
-  - table_name: inspection_aud
-    extraction_type: full
-  - table_name: issue_type
-    extraction_type: full
-  - table_name: item_group_type
-    extraction_type: full
-  - table_name: item_type
-    extraction_type: full
-  - table_name: room_type
-    extraction_type: full
-  - table_name: revinfo
-    extraction_type: full
-    clean_table_name: rev_info
-
 partition_cols: ["year", "month", "day"]
+lineage_product_database_name: inspections
+tables:
+  # <raw_table_name>:
+  #   clean_table_name: <clean_table_name>
+  #   is_incremental: <is_incremental> #optional
+  #   date_column: <created_at> #optional
+  #   unixtime_measure: <unixtime_measure> #optional
+  assessment:
+    clean_table_name: assessment
+  assessment_aud:
+    clean_table_name: assessment_aud
+  inspection:
+    clean_table_name: inspection
+  inspection_aud:
+    clean_table_name: inspection_aud
+  issue_type:
+    clean_table_name: issue_type
+  item_group_type:
+    clean_table_name: item_group_type
+  item_type:
+    clean_table_name: item_type
+  revinfo:
+    clean_table_name: rev_info
+  room_type:
+    clean_table_name: room_type
