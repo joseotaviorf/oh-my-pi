@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: supply_processor_status_reasons
+columns:
+    id_reason:
+        lineage:
+            - datalake_gsheets_raw.supply_processor_status_reasons.id_reason
+    reason_name:
+        lineage:
+            - datalake_gsheets_raw.supply_processor_status_reasons.reason_name
+    reason_type:
+        lineage:
+            - datalake_gsheets_raw.supply_processor_status_reasons.reason_type

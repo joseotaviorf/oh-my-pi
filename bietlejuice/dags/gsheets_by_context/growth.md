@@ -46,7 +46,6 @@ This pipeline produces the following output tables:
     - `taxonomy_affiliates`
     - `taxonomy_growth`
     - `tradecom_configuration`
-    - `sale_nbp_source_targets`
     - `affiliates_extra_user_bonus`
     - `casa_mineira_marketing_cost_taxonomy`
     - `ciq_costs`
@@ -99,7 +98,6 @@ This pipeline produces the following output tables:
     - `offline_manual_share_cost_center`
     - `rental_tof_daily_targets`
     - `rental_tof_weekly_targets`
-    - `sale_nbp_source_targets`
     - `targets_casa_mineira_nbp`
     - `taxonomy_affiliates`
     - `taxonomy_growth`

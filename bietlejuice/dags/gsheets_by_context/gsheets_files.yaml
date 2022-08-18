@@ -1061,6 +1061,12 @@ sale_nbp_source_targets:
     clean_table_name: sale_nbp_source_targets
     sheet_context: static
 
+supply_processor_status_reasons:
+    sheet_id: 1Yud6fXc1ugqAKrUAD4Mw5i7tbR3q9oP3BVxCSbZdffs
+    sheet_name: reasons
+    clean_table_name: supply_processor_status_reasons
+    sheet_context: static
+
 supply_targets_2019:
     sheet_id: 1Nxh1_mAsyr3tkChizMyYc4QIg3jTR1YNGAenjy9NWKQ
     sheet_name: supply_targets_2019
