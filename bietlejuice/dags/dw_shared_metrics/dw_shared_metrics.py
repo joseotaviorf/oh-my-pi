@@ -1,6 +1,6 @@
 import pendulum
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -19,6 +19,7 @@ DW_SCHEMA = "metrics"
 CONTEXT = "shared_metrics"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+EXECUTION_TIMEOUT_HOURS = 3.0
 
 
 configs_service = ConfigurationService(DAG_NAME)
@@ -75,6 +76,7 @@ ctas_task = QuintoAndarDatabricksSubmitRunOperator(
             "parameters": [DW_SCHEMA, "ENV_DW", metrics_path],
         }
     },
+    execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
 )
 
 
