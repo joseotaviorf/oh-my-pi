@@ -119,10 +119,10 @@ package:
 ## run black to fix code style
 lint:
 	@echo ""
-	@echo "Running lint in all files from <bietlejuice/> and <tests/unit/composer/>"
+	@echo "Running lint in all files from <bietlejuice/>"
 	@echo "=========="
 	@echo ""
-	@python -m black bietlejuice/ tests/unit/composer/
+	@python -m black bietlejuice/ tests/unit/
 
 .PHONY: check-style
 ## check style with flake8 and black
@@ -131,10 +131,15 @@ check-style:
 	@echo "Running Check Style"
 	@echo "=========="
 	@echo ""
-	@python -m black --check bietlejuice/ tests/unit/composer/ && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" to apply style formatting to your code\n" && exit 1)
-	@python -m flake8 --config=setup.cfg bietlejuice/ tests/unit/composer/
+	@python -m black --check bietlejuice/ tests/unit/ && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" to apply style formatting to your code\n" && exit 1)
+	@python -m flake8 --config=setup.cfg bietlejuice/ tests/unit/
 
-############# Validation commands #############
+############# Tests commands #############
+.PHONY: tests
+## run all unit and integration tests with coverage report
+tests:
+	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov=bietlejuice/ --cov-report term --cov-report html:htmlcov --cov-report xml:coverage.xml tests
+	@python -m coverage xml -i
 
 .PHONY: unit-tests
 unit-tests:
@@ -144,6 +149,15 @@ unit-tests:
 	@echo ""
 	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov-report term --cov-report html:htmlcov --cov=bietlejuice/ --cov-fail-under=40 tests/unit/
 
+.PHONY: integration-tests
+## run integration tests with coverage report
+integration-tests:
+	@echo ""
+	@echo "Integration Tests"
+	@echo "================="
+	@echo ""
+	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov-report term --cov-report xml:integration-tests-cov.xml --cov=bietlejuice/ --cov-fail-under=0 tests/integration
+
 .PHONY: files-validation
 files-validation:
 	@echo ""
@@ -151,6 +165,8 @@ files-validation:
 	@echo "=========="
 	@echo ""
 	@python -m pytest tests/files_validation/
+
+############# Validations commands #############
 
 .PHONY: validate-dags-dependencies
 validate-dags-dependencies:

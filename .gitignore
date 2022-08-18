@@ -35,16 +35,16 @@ var/
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# Tests / coverage reports
 htmlcov/
 .tox/
 coverage/
-.coverage
-.coverage.*
+.coverage*
 .cache
 .pytest_cache/
 nosetests.xml
 coverage.xml
+*-cov.xml
 *,cover
 .hypothesis/
 
