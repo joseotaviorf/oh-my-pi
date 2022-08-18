@@ -47,7 +47,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 CUSTOM_LIBRARIES = [
     {
         "whl": f"{ARTIFACTS_S3_BUCKET}/tracksale-api-client-python/"
-        f"quintoandar_tracksale_api_client-0.2.0-py2.py3-none-any.whl"
+        f"quintoandar_tracksale_api_client-0.3.0-py2.py3-none-any.whl"
     }
 ]
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
