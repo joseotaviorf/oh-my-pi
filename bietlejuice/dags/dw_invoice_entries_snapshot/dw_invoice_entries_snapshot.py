@@ -20,24 +20,25 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 
 
 def check_valid_run_date(dag_execution_date):
-    # get last day of the month
-    next_month = datetime.strptime(dag_execution_date, "%Y-%m-%d").date().replace(
-        day=28
-    ) + timedelta(days=4)
-    last_day_of_month = next_month - timedelta(next_month.day)
+    # get first day of the month
+    first_day_of_month = (
+        datetime.strptime(dag_execution_date, "%Y-%m-%d").date().replace(day=1)
+    )
 
-    # check if it's a business day
-    if last_day_of_month.weekday() > 4:
-        last_business_day_of_month = last_day_of_month - timedelta(
-            days=last_day_of_month.weekday() - 4
+    # get second business day of the month
+    if first_day_of_month.weekday() > 4 or (
+        first_day_of_month.month in [1, 5] and first_day_of_month.weekday() == 4
+    ):  # weekends
+        second_business_day_of_month = first_day_of_month + timedelta(
+            days=-first_day_of_month.weekday() + 8
         )
+    elif first_day_of_month.month in [1, 5]:  # first business day is a holiday
+        second_business_day_of_month = first_day_of_month + timedelta(days=2)
     else:
-        last_business_day_of_month = last_day_of_month
+        second_business_day_of_month = first_day_of_month + timedelta(days=1)
 
     if datetime.strptime(dag_execution_date, "%Y-%m-%d").day in [
-        last_business_day_of_month.day,
-        3,
-        12,
+        second_business_day_of_month.day
     ]:
         return True
 
