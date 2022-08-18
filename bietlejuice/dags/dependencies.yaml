@@ -13,6 +13,7 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-fact-photo-job-into-redshift
   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
@@ -23,6 +24,7 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-dim-listing-into-redshift
   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+  - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.dw_booking:load-public-dim-tenant-booking-review-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
