@@ -1,0 +1,51 @@
+database_name: datalake_rental_guarantee
+table_name: charge
+columns: 
+  id:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.id
+  id_guarantee:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.id_guarantee
+  cancellation_reason:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.cancellation_reason
+  card_token:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.card_token
+  emv:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.emv
+  installments:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.installments
+  pix_link:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.pix_link
+  qr_code:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.qr_code
+  charge_status:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.charge_status
+  charge_type:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.charge_type
+  refund_amount:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.refund_amount
+  ts_created:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.ts_created
+  ts_updated:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.ts_updated
+  year:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.year
+  month:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.month
+  day:
+    lineage: 
+      - datalake_rental_guarantee_clean.charge.day
