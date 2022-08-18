@@ -12,6 +12,7 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services import ConfigurationService
 
@@ -22,6 +23,7 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 
 configs_service = ConfigurationService(DAG_NAME)
+default_libraries = configs_service.get_config("default_libraries")
 spectrum_iam_role = configs_service.get_config("spectrum_iam_role")
 dw_bucket = configs_service.get_config("dw_bucket")
 doc_md_chart_url = configs_service.get_config("doc_md_chart_url")
@@ -39,6 +41,13 @@ logs_output_path = f"{spark_jobs_logs_path}{DAG_ID}"
 cluster_description = Variable.get("databricks_default_cluster", deserialize_json=True)
 cluster_description["cluster_log_conf"]["s3"]["destination"] = logs_output_path
 
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -54,7 +63,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=cluster_description
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

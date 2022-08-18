@@ -10,10 +10,10 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.utils.helpers import chain
 
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.services.configuration_service import ConfigurationService
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -24,6 +24,7 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(DAG_NAME)
+default_libraries = config_service.get_config("default_libraries")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
@@ -62,6 +63,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

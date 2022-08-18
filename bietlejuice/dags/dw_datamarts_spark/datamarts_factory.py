@@ -12,6 +12,7 @@ from airflow.utils.helpers import chain
 from bietlejuice.base.airflow import BaseDAG
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
@@ -30,6 +31,7 @@ class DatamartsDAGFactory:
 
         config_service = ConfigurationService(dag_name=source, env=self.env)
 
+        self.default_libraries = config_service.get_config("default_libraries")
         self.doc_md_chart_url = config_service.get_config("doc_md_chart_url")
         self.spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
         self.dw_bucket = config_service.get_config("dw_bucket")
@@ -140,6 +142,13 @@ class DatamartsDAGFactory:
         dag_custom_init_script = dag_details.get("init_script", [])
         dag_spark_conf = dag_details.get("spark_conf", [])
 
+        DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+            {
+                "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+                "permission_level": ClusterPermissionEnum.MANAGE,
+            }
+        ]
+
         for init_script in dag_custom_init_script:
             cluster_description["init_scripts"].append(init_script)
 
@@ -165,7 +174,8 @@ class DatamartsDAGFactory:
             dag=dag,
             task_id="create-cluster",
             cluster_configuration=cluster_description,
-            libraries=custom_libraries,
+            libraries=self.default_libraries + custom_libraries,
+            access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
         )
 
         terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

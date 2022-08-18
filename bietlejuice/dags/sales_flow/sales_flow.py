@@ -11,6 +11,7 @@ from airflow.utils.helpers import chain, cross_downstream
 
 from bietlejuice.base.airflow import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -27,6 +28,7 @@ MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 ENV = os.environ.get("ENVIRONMENT")
 
 CONFIG_SERVICE = ConfigurationService(SOURCE)
+default_libraries = CONFIG_SERVICE.get_config("default_libraries")
 DATALAKE_BUCKET = CONFIG_SERVICE.get_config("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = CONFIG_SERVICE.get_config("athena_query_results_bucket")
 S3_PREFIX = CONFIG_SERVICE.get_config("databricks_bietlejuice_repo_path")
@@ -46,6 +48,13 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
 TABLES = CONFIG_SERVICE.get_config("tables")
 PARTITION_COLS = CONFIG_SERVICE.get_config("partition_cols")
 
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -61,7 +70,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
