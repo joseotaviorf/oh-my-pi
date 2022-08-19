@@ -1,4 +1,41 @@
-WITH cte_agents_visit AS (
+WITH  contrato AS (
+    WITH base AS (
+        SELECT 
+            ac.id_agent AS agent_id,
+            du.id AS user_id,
+            ac.ts_work_contract_started,
+            rank() OVER (PARTITION BY ac.id_agent ORDER BY ac.ts_work_contract_started DESC) AS rn
+        FROM 
+            datalake_ebdb_agents.agent_contract ac
+        JOIN 
+            dw_public.dim_user du 
+                ON du.dados_agente_id = ac.id_agent
+    )
+    SELECT 
+        agent_id,
+        user_id,
+        ts_work_contract_started
+    FROM 
+        base
+    WHERE 
+        rn = 1 
+),
+dados_agent AS (
+    SELECT 
+        du.sk_user,
+        du.nome, 
+        du.cpf,
+        ROW_NUMBER() OVER (PARTITION BY du.cpf ORDER BY du.dadosagente_ativo DESC, c.ts_work_contract_started ) AS first_or_active_id
+    FROM 
+        dw_public.dim_user du
+    LEFT JOIN 
+        contrato c
+            ON c.user_id = du.sk_user
+    WHERE 
+        du.is_rent_agent IS true 
+        OR du.is_sale_agent IS true
+),
+cte_agents_visit AS (
     SELECT
         sk_sale_flow,
         dw.sk_user::INT AS sk_agent,
@@ -47,7 +84,10 @@ cte_fifity_name AS (
 cte_executivo_associado AS (
     SELECT DISTINCT
         dim.sk_offer,
-        du.sk_user::INT AS sk_user_rh,
+        CASE
+            WHEN (du.is_rent_agent IS TRUE OR du.is_sale_agent IS TRUE) THEN du.sk_user::INT
+            ELSE da.sk_user::INT
+        END AS sk_user_rh,
         'Executivo Associado' AS partner_type
     FROM
         dw_sale.dim_offer dim
@@ -60,13 +100,19 @@ cte_executivo_associado AS (
     LEFT JOIN
         dw_public.dim_user du
             ON du.sk_user = fo.sk_user_team_lead
+    LEFT JOIN
+        dados_agent da
+            ON da.cpf = du.cpf
     WHERE
         team_lead_name IS NOT NULL
 ),
 cte_executivo_negociacao AS (
     SELECT DISTINCT
         dim.sk_offer,
-        du.sk_user::INT AS sk_user_rh,
+        CASE
+            WHEN (du.is_rent_agent IS TRUE OR du.is_sale_agent IS TRUE) THEN du.sk_user::INT
+            ELSE da.sk_user::INT
+        END AS sk_user_rh,
         'Executivo Negociacao' AS partner_type
     FROM
         dw_sale.dim_offer dim
@@ -79,6 +125,9 @@ cte_executivo_negociacao AS (
     LEFT JOIN
         dw_public.dim_user du
             ON du.sk_user = fo.sk_user_consultant
+    LEFT JOIN
+        dados_agent da
+            ON da.cpf = du.cpf
     WHERE
         deal_maker_name IS NOT NULL
 ),
