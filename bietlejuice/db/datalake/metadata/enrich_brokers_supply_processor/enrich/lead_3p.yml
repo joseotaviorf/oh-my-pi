@@ -140,15 +140,9 @@ columns:
   accessibility_items:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.details
-  enrichment_reason:
+  status_reason:
     lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.enrichment_reason
-  discard_reason:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.discard_reason
-  eligible_reason:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.eligible_reason
+      - datalake_brokers_supply_processor_clean.lead_3p.status_reason
   photos:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.photos
@@ -227,18 +221,9 @@ columns:
   has_concierge:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
-  is_eligible:
+  is_sent_to_main:
     lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.is_eligible
-  is_sent_to_bob:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.is_sent_to_bob
-  is_enriched:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.is_enriched
-  is_discarded:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.is_discarded
+      - datalake_brokers_supply_processor_clean.lead_3p.is_sent_to_main
   ts_house_created:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers

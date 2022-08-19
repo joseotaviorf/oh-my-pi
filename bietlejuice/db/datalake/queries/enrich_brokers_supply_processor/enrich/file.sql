@@ -17,3 +17,5 @@ SELECT
     ts_updated
 FROM
     files
+WHERE
+    rw = 1

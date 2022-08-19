@@ -53,15 +53,9 @@ columns:
   lead_hash:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.lead_hash
-  enrichment_reason:
+  status_reason:
     lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.enrichment_reason
-  discard_reason:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.discard_reason
-  eligible_reason:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.eligible_reason
+      - datalake_brokers_supply_processor_raw.lead3p.status_reason
   cnpj:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.cnpj
@@ -71,18 +65,9 @@ columns:
   version:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.version
-  is_eligible:
+  is_sent_to_main:
     lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.eligible
-  is_sent_to_bob:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.sent_to_bob
-  is_enriched:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.enriched
-  is_discarded:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.discard
+      - datalake_brokers_supply_processor_raw.lead3p.sent_to_main
   ts_created:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.created_at

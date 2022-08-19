@@ -59,33 +59,18 @@ columns:
   lead_hash:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.lead_hash
-  enrichment_reason:
+  status_reason:
     lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.enrichment_reason
-  discard_reason:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.discard_reason
-  eligible_reason:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.eligible_reason
+      - datalake_brokers_supply_processor_raw.lead3p_aud.status_reason
   cnpj:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.cnpj
   version:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.version
-  is_sent_to_bob:
+  is_sent_to_main:
     lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.sent_to_bob
-  is_eligible:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.eligible
-  is_enriched:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.enriched
-  is_discarded:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.discard
+      - datalake_brokers_supply_processor_raw.lead3p_aud.sent_to_main
   rev:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.rev
@@ -149,30 +134,15 @@ columns:
   mod_lead_hash:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.lead_hash_mod
-  mod_enrichment_reason:
+  mod_status_reason:
     lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.enrichment_reason_mod
-  mod_discard_reason:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.discard_reason_mod
-  mod_eligible_reason:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.eligible_reason_mod
+      - datalake_brokers_supply_processor_raw.lead3p_aud.status_reason_mod
   mod_cnpj:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.cnpj_mod
-  mod_is_sent_to_bob:
+  mod_is_sent_to_main:
     lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.sent_to_bob_mod
-  mod_is_enriched:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.enriched_mod
-  mod_is_eligible:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.eligible_mod
-  mod_is_discarded:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p_aud.discard_mod
+      - datalake_brokers_supply_processor_raw.lead3p_aud.sent_to_main_mod
   ts_created:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.created_at

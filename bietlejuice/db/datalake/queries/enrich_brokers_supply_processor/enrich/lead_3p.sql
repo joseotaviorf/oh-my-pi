@@ -51,11 +51,9 @@ SELECT
     FROM_JSON(NULLIF(GET_JSON_OBJECT(details, '$.installations'), '{{}}'), 'map<string, boolean>') AS installations,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(details, '$.appliances'), '{{}}'), 'map<string, boolean>') AS house_appliances,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(details, '$.accessibilityItems'), '{{}}'), 'map<string, boolean>') AS accessibility_items,
-    FROM_JSON(NULLIF(enrichment_reason, '{{}}'), 'map<string, boolean>') AS enrichment_reason,
-    FROM_JSON(NULLIF(discard_reason, '{{}}'), 'map<string, boolean>') AS discard_reason,
-    FROM_JSON(NULLIF(eligible_reason, '{{}}'), 'map<string, string>') AS eligible_reason,
+    FROM_JSON(NULLIF(status_reason, '{{}}'), 'map<string, string>') AS status_reason,
     FROM_JSON(
-        NULLIF(GET_JSON_OBJECT(photos, '$.list'), '[]'),
+        NULLIF(photos, '[]'),
         'array<struct<url: string, description: string>>'
     ) AS photos,
         FROM_JSON(
@@ -92,10 +90,7 @@ SELECT
     GET_JSON_OBJECT(brokers, '$.balcony')::BOOLEAN AS has_balcony,
     GET_JSON_OBJECT(brokers, '$.agencyKey')::BOOLEAN AS has_agency_key,
     GET_JSON_OBJECT(brokers, '$.concierge')::BOOLEAN AS has_concierge,
-    is_eligible,
-    is_sent_to_bob,
-    is_enriched,
-    is_discarded,
+    is_sent_to_main,
     GET_JSON_OBJECT(brokers, '$.createdAt')::TIMESTAMP AS ts_house_created,
     GET_JSON_OBJECT(brokers, '$.updatedAt')::TIMESTAMP AS ts_house_updated,
     ts_created,
