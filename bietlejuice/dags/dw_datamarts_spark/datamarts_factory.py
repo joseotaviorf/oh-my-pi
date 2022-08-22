@@ -29,7 +29,7 @@ class DatamartsDAGFactory:
         self.source = source
         self.env = os.environ.get("ENVIRONMENT")
 
-        config_service = ConfigurationService(dag_name=source, env=self.env)
+        config_service = ConfigurationService(dag_name=source)
 
         self.default_libraries = config_service.get_config("default_libraries")
         self.doc_md_chart_url = config_service.get_config("doc_md_chart_url")

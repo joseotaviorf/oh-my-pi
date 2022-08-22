@@ -221,10 +221,13 @@ clean:
 	@find ./ -type d -name 'build' -exec rm -rf {} +;
 	@find ./ -type d -name 'dist' -exec rm -rf {} +;
 	@find ./ -type d -name 'python_logger.egg-info' -exec rm -rf {} +;
+	@find ./ -type d -name 'metastore_db' -exec rm -rf {} +;
 	@find ./ -type d -name 'htmlcov' -exec rm -rf {} +;
 	@find ./ -type f -name 'coverage.xml' -exec rm -f {} \;
 	@find ./ -type f -name 'coverage-badge.svg' -exec rm -f {} \;
 	@find ./ -type f -name '.coverage' -exec rm -f {} \;
+	@find ./ -type f -name '*-cov.*' -exec rm -f {} \;
+	@find ./ -type f -name '*derby.log' -exec rm -f {} \;
 	@find ./ -type f -name '.version' -exec rm -f {} \;
 	@find ./ -type f -name '.package_name' -exec rm -f {} \;
 	@find ./ -type f -name '*.pyc' -exec rm -f {} \;

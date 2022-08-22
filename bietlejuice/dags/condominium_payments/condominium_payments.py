@@ -24,7 +24,7 @@ MAIN_START_DATE = datetime(2022, 4, 7, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 ENV = os.environ.get("ENVIRONMENT")
 
-config_service = ConfigurationService(dag_name=SOURCE, env=ENV)
+config_service = ConfigurationService(dag_name=SOURCE)
 
 # default configs
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")

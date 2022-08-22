@@ -215,7 +215,7 @@ def main():
             dag_intermediate_path = f"dw_datamarts/{context}"
             lineage_intermediate_path = f"dw_datamarts_{context}"
             configs = ConfigurationService(
-                dag_name, intermediate_path=dag_intermediate_path, env="prod"
+                dag_name, intermediate_path=dag_intermediate_path
             )
             for pipeline, pipe_configs in configs.get_config("pipeline").items():
                 table_name = pipe_configs["dw"]["table"]

@@ -24,7 +24,7 @@ MAIN_START_DATE = datetime(2022, 3, 30, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 ENV = os.environ.get("ENVIRONMENT")
 
-config_service = ConfigurationService(dag_name=SOURCE, env=ENV)
+config_service = ConfigurationService(dag_name=SOURCE)
 
 # airflow vars
 datalake_bucket = config_service.get_config("datalake_bucket")
