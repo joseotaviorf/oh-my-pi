@@ -51,12 +51,12 @@ demand_funnel_targets AS (
 SELECT
     DATE_TRUNC('month', DATE(dt_target)) AS month_start,
     city_group,
-    CAST(SUM(NULLIF(REPLACE(visits_booked,',',''), '')) AS INTEGER) AS visits_booked_target,
-    CAST(SUM(NULLIF(REPLACE(visits_completed,',',''), '')) AS INTEGER) AS visits_completed_target,
-    CAST(SUM(NULLIF(REPLACE(offer_sent,',',''), '')) AS INTEGER) AS offer_submitted_target,
-    CAST(SUM(NULLIF(REPLACE(offer_accepted,',',''), '')) AS INTEGER) AS offer_accepted_target,
-    CAST(SUM(NULLIF(REPLACE(credit_approved,',',''), '')) AS INTEGER) AS credit_approved_target,
-    CAST(SUM(NULLIF(REPLACE(contracts_signed,',',''), '')) AS INTEGER) AS contract_signed_target
+    CAST(SUM(NULLIF(REPLACE(visits_booked,',',''), '')) AS REAL) AS visits_booked_target,
+    CAST(SUM(NULLIF(REPLACE(visits_completed,',',''), '')) AS REAL) AS visits_completed_target,
+    CAST(SUM(NULLIF(REPLACE(offer_sent,',',''), '')) AS REAL) AS offer_submitted_target,
+    CAST(SUM(NULLIF(REPLACE(offer_accepted,',',''), '')) AS REAL) AS offer_accepted_target,
+    CAST(SUM(NULLIF(REPLACE(credit_approved,',',''), '')) AS REAL) AS credit_approved_target,
+    CAST(SUM(NULLIF(REPLACE(contracts_signed,',',''), '')) AS REAL) AS contract_signed_target
 FROM 
     datalake_gsheets_clean.mexico_demand_targets_2022
 GROUP BY 1, 2
@@ -89,12 +89,12 @@ SELECT
     df.visits_booked,
     df.offer_submitted,
     df.contract_signed,
-    dft.visits_booked_target,
-    dft.visits_completed_target,
-    dft.offer_submitted_target,
-    dft.offer_accepted_target,
-    dft.credit_approved_target,
-    dft.contract_signed_target,
+    CAST(dft.visits_booked_target AS FLOAT) AS visits_booked_target,
+    CAST(dft.visits_completed_target AS FLOAT) AS visits_completed_target,
+    CAST(dft.offer_submitted_target AS FLOAT) AS offer_submitted_target,
+    CAST(dft.offer_accepted_target AS FLOAT) AS offer_accepted_target,
+    CAST(dft.credit_approved_target AS FLOAT) AS credit_approved_target,
+    CAST(dft.contract_signed_target AS FLOAT) AS contract_signed_target,
     CAST(dtc.budget_target AS FLOAT) AS budget_target,
     CAST(dac.actual_cost AS FLOAT) AS actual_cost,
     YEAR(CURRENT_DATE) AS year,
