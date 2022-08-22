@@ -3,3 +3,10 @@ inner_dependencies:
   received_demand:
     - call
     - email
+
+custom_cluster:
+  driver_node_type_id: r5.12xlarge
+  node_type_id: r5.8xlarge
+  autoscale:
+    min_workers: 2
+    max_workers: 6

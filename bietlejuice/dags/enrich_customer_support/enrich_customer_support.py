@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -10,18 +10,19 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum, BaseTaskGroup
+from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2021, 5, 12, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 CONTEXT = "customer_support"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
+MAIN_START_DATE = datetime(2021, 5, 12, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 config_service = ConfigurationService(DAG_NAME)
 
@@ -35,10 +36,16 @@ logs_output_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_base_url = config_service.get_config("doc_md_chart_url")
 inner_dependencies = config_service.get_config("inner_dependencies")
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_customer_support", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = logs_output_path
+cluster_description = config_service.get_config("custom_cluster")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
+default_libraries = config_service.get_config("default_libraries")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -55,7 +62,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
