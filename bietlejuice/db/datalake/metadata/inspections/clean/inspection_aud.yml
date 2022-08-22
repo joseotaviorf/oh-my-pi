@@ -2,18 +2,12 @@
 database_name: datalake_inspections_clean
 table_name: inspection_aud
 columns:
-  id:
+  id_inspection:
     lineage:
       - datalake_inspections_raw.inspection_aud.id
-  rev:
+  id_previous_inspection:
     lineage:
-      - datalake_inspections_raw.inspection_aud.rev
-  rev_type:
-    lineage:
-      - datalake_inspections_raw.inspection_aud.revtype
-  rev_end:
-    lineage:
-      - datalake_inspections_raw.inspection_aud.revend
+      - datalake_inspections_raw.inspection_aud.previous_inspection_id
   id_client_side:
     lineage:
       - datalake_inspections_raw.inspection_aud.client_side_id
@@ -29,6 +23,15 @@ columns:
   id_schedule:
     lineage:
       - datalake_inspections_raw.inspection_aud.schedule_id
+  rev:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.rev
+  rev_type:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.revend
   contract:
     lineage:
       - datalake_inspections_raw.inspection_aud.contract
@@ -44,6 +47,9 @@ columns:
   type:
     lineage:
       - datalake_inspections_raw.inspection_aud.type
+  mod_id_previous_inspection:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.previous_inspection_id_mod
   mod_id_contract:
     lineage:
       - datalake_inspections_raw.inspection_aud.contract_id_mod
@@ -71,6 +77,9 @@ columns:
   mod_type:
     lineage:
       - datalake_inspections_raw.inspection_aud.type_mod
+  mod_assessments:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.assessments_mod
   mod_uuid:
     lineage:
       - datalake_inspections_raw.inspection_aud.uuid_mod

@@ -2,9 +2,12 @@
 database_name: datalake_inspections_clean
 table_name: inspection
 columns:
-  id:
+  id_inspection:
     lineage:
       - datalake_inspections_raw.inspection.id
+  id_previous_inspection:
+    lineage:
+      - datalake_inspections_raw.inspection.previous_inspection_id
   id_client_side:
     lineage:
       - datalake_inspections_raw.inspection.client_side_id
