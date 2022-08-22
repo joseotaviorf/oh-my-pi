@@ -1,0 +1,15 @@
+---
+table_name: datalake_ebdb_raw.offer
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+  client_id:
+    is_complete:
+  firestoreId:
+    is_complete:
+  house_id:
+    is_complete:
+  rentFlow_id:
+    is_complete:

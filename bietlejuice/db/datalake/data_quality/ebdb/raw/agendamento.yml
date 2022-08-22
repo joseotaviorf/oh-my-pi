@@ -1,0 +1,12 @@
+---
+table_name: datalake_ebdb_raw.Agendamento
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id:
+    is_unique:
+  businesscontext:
+    is_complete:
+  imovel_id:
+    is_complete:
+  status:
+    is_complete:

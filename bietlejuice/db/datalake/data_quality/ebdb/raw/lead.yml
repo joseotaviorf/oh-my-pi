@@ -1,0 +1,6 @@
+---
+table_name: datalake_ebdb_raw.lead
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id:
+    is_unique:

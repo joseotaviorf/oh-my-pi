@@ -13,7 +13,8 @@ from airflow.utils.helpers import cross_downstream, chain
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
-from bietlejuice.services.file_service import FileService
+from bietlejuice.formatters import StringFormatter
+from bietlejuice.services import FileService, ConfigurationService
 
 # DAG params
 DAG_ID = "ebdb"
@@ -61,6 +62,8 @@ CUSTOM_LIBRARIES = [
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
 RAW_EXECUTION_TIMEOUT_HOURS = 3.5
+
+config_service = ConfigurationService(SOURCE)
 
 # dag definition
 dag = DAG(
@@ -364,6 +367,32 @@ contract_model_dependencies.extend(
     task_list_last_tasks(clean_task_list.pop("conversion_lead"))
 )
 contract_model_dependencies.extend(task_list_last_tasks(clean_task_list.pop("lead")))
+
+
+# Data Quality tests for raw
+tb_names = FileService.list_data_quality_tests_files(SOURCE, "raw")
+
+for tb_name in tb_names:
+    inmetro_bucket = config_service.get_config("inmetro_bucket")
+    table_name_suffix = StringFormatter.slugify(f"-{tb_name}")
+
+    data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id=f"data-quality-tests-raw-{SOURCE}{table_name_suffix}",
+        json={
+            "spark_python_task": {
+                "python_file": f"{BASE_SPARK_JOBS_PATH}/data_quality_tests.py",
+                "parameters": [ENV, inmetro_bucket, "raw", SOURCE, tb_name],
+            }
+        },
+    )
+
+    chain(
+        task_list_first_task(raw_task_list),
+        data_quality_tests_task,
+        terminate_cluster_task,
+    )
+
 
 # upstream >> terminate-cluster
 cross_downstream(
