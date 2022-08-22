@@ -44,7 +44,9 @@ class GsheetsDAGFactory:
             task_pool,
         )
 
-        self.config_service = ConfigurationService(dag_name=source_with_context)
+        self.config_service = ConfigurationService(
+            dag_name=source_with_context, env=self.ENV
+        )
 
         artifacts_s3_bucket = self.config_service.get_config("artifacts_bucket")
         databricks_bietlejuice_repo_path = self.config_service.get_config(

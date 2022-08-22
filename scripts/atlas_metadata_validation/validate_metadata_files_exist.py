@@ -83,11 +83,21 @@ def dag_has_product_lineage_config(source, context, dag):
     else:
         intermediate_path = f"{source}/{context}"
 
-    configs = ConfigurationService(dag, intermediate_path=intermediate_path)
-    try:
-        configs.get_config("lineage_product_database_name")
+    lineage_from_product_config = None
+    for env in {"forno", "prod"}:
+        configs = ConfigurationService(
+            dag, intermediate_path=intermediate_path, env=env
+        )
+        try:
+            lineage_from_product_config = configs.get_config(
+                "lineage_product_database_name"
+            )
+        except IndexError:
+            continue
+
+    if lineage_from_product_config:
         return True
-    except IndexError:
+    else:
         return False
 
 
