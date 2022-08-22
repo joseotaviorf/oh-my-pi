@@ -4,6 +4,24 @@ columns:
   sk_task:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.id_task
+  sk_activity:
+    lineage:
+      - datalake_heimdall.activity.id
+  user_name_activity:
+    lineage:
+      - datalake_heimdall.activity.user_name
+  event_name_activity:
+    lineage:
+      - datalake_heimdall.activity.event_name
+  class_activity:
+    lineage:
+      - datalake_heimdall.activity.class
+  previous_status_activity:
+    lineage:
+      - datalake_heimdall.activity.previous_status
+  type_activity:
+    lineage:
+      - datalake_heimdall.activity.type
   score_factor:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.score_factor
@@ -30,7 +48,7 @@ columns:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.workgroups
   tenant_refund_status:
     lineage:
-      - datalake_heimdall_clean.activity.status
+      - datalake_heimdall.activity.status
   hours_task_start_to_completed:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.hours_task_started_to_completed

@@ -16,12 +16,18 @@ columns:
   sk_origin:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_origin
+  sk_activity:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_activity
   sk_assignee:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_assignee
   sk_user_action:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_user_action
+  sk_user_activity:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_user_activity
   sk_action_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_action_date
@@ -46,12 +52,33 @@ columns:
   sk_task_action_end_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_end_date
+  ticket_number_activity:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ticket_number_activity
+  discount_months_activity:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.discount_months_activity
+  discount_percentage_activity:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.discount_percentage_activity
+  discount_amount_activity:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.discount_amount_activity
+  discounted_rental_activity:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.discounted_rental_activity
+  rental_amount_activity:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.rental_amount_activity
   action_user_name:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_user_name
   action_type:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_type
+  type_activity:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.type_activity
   task_action_type:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_type
@@ -67,6 +94,15 @@ columns:
   ts_task_action_end:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_end
+  ts_activity_transferred:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_activity_transferred
+  ts_activity_requested:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_activity_requested
+  ts_activity_transition_created:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_activity_transition_created
   year:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.year
@@ -75,4 +111,4 @@ columns:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.month
   day:
     lineage:
-      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day 
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day
