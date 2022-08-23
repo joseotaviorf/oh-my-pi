@@ -19,6 +19,7 @@ On reverse's data lake layer, partitioning the DAG's execution date:
 - `benvi_monthly_bp_demand_metrics`
 - `benvi_monthly_bp_supply_metrics`
 - `benvi_weekly_bp_demand_metrics`
+- `benvi_weekly_bp_supply_metrics`
 - `mexico_supply_funnel`
 - `mexico_supply_funnel_coincident`
 - `mexico_supply_funnel_cohort`

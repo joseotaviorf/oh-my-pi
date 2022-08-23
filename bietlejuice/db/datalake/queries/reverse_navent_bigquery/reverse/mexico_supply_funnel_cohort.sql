@@ -1,7 +1,7 @@
 WITH supply_cohort_funnel_base AS (
     SELECT 
-        DATE_TRUNC('week', TO_DATE(CAST(sk_lead_date AS STRING),'yyyymmdd')) AS week_start,
-        DATE_TRUNC('month', TO_DATE(CAST(sk_lead_date AS STRING),'yyyymmdd')) AS month_start,
+        DATE_TRUNC('week', TO_DATE(CAST(sk_lead_date AS STRING),'yyyyMMdd')) AS week_start,
+        DATE_TRUNC('month', TO_DATE(CAST(sk_lead_date AS STRING),'yyyyMMdd')) AS month_start,
         country_name,
         city_group,
         supply_mkt_origin, 
@@ -46,8 +46,8 @@ SELECT
     first_listings_cohort,
     prospects_cohort/CAST(NULLIF(leads, 0) AS REAL) AS l2p_cohort,
     qualifieds_cohort/CAST(NULLIF(prospects_cohort, 0) AS REAL) AS p2q_cohort,
-    opportunities_cohort/CAST(NULLIF(qualifieds_cohort, 0) AS REAL) AS q20_cohort,
-    first_listings_cohort/CAST(NULLIF(opportunities_cohort, 0) AS REAL) AS O2fl_cohort,
+    opportunities_cohort/CAST(NULLIF(qualifieds_cohort, 0) AS REAL) AS q2o_cohort,
+    first_listings_cohort/CAST(NULLIF(opportunities_cohort, 0) AS REAL) AS o2fl_cohort,
     DATE(week_start) AS dt_lead_week_started,
     DATE(month_start) AS dt_lead_month_started,
     YEAR(CURRENT_DATE) AS year,

@@ -122,5 +122,3 @@ LEFT JOIN
     tof_demand_funnel AS tdf
         ON df.month_start = tdf.month_start 
         AND df.city_group = tdf.city_group
-ORDER BY
-    dim.month_start  

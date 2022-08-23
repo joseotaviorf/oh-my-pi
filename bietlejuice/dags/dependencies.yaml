@@ -2137,6 +2137,7 @@ bietlejuice.reverse_navent_bigquery:
   - bietlejuice.dw_contract:load-dw-quintoandar-dim-contract-person
   - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
   - bietlejuice.dw_datamarts_for_rent_cross:create-rental-events-funnel-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-rental-marketplace-flows-in-datalake
   - bietlejuice.dw_datamarts_growth_cross:create-top-of-funnel-volumes-monthly-in-datalake
   - bietlejuice.dw_datamarts_growth_cross:create-top-of-funnel-volumes-weekly-in-datalake
   - bietlejuice.dw_datamarts_growth_cross:create-unique-supply-events-funnel-in-datalake

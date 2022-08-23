@@ -322,7 +322,3 @@ LEFT JOIN
     ongoing_listings AS ol
         ON dim.month_end = ol.month_end
         AND dim.city_group = ol.city_group
-ORDER BY 
-    dim.month_start DESC,
-    sf.supply_mkt_origin,
-    sf.supply_mkt_origin_detailed

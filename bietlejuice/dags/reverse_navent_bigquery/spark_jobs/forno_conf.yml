@@ -9,3 +9,5 @@ tables:
     bigquery_table_id: xcbidw-prd.benvi.monthly_bp_supply_metrics
   - table_name: benvi_weekly_bp_demand_metrics
     bigquery_table_id: xcbidw-prd.benvi.weekly_bp_demand_metrics
+  - table_name: benvi_weekly_bp_supply_metrics
+    bigquery_table_id: xcbidw-prd.benvi.weekly_bp_supply_metrics

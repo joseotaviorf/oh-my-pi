@@ -1,3 +1,3 @@
 ---
-database_name: datalake_navent_bigquery_reverse
+database_name: reverse_navent_bigquery
 table_name: benvi_monthly_bp_supply_metrics

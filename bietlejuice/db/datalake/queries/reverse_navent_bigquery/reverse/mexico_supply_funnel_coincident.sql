@@ -1,7 +1,7 @@
 WITH leads AS (
     SELECT
-        DATE_TRUNC('month', TO_DATE(CAST(sk_lead_date AS STRING), 'yyyymmdd')) AS month_start,
-        DATE_TRUNC('week', TO_DATE(CAST(sk_lead_date AS STRING),'yyyymmdd')) AS week_start,
+        DATE_TRUNC('month', TO_DATE(CAST(sk_lead_date AS STRING), 'yyyyMMdd')) AS month_start,
+        DATE_TRUNC('week', TO_DATE(CAST(sk_lead_date AS STRING),'yyyyMMdd')) AS week_start,
 	country_name,
         city_group,
         supply_mkt_origin, 
@@ -18,8 +18,8 @@ WITH leads AS (
 ),
 prospects AS (
     SELECT
-        DATE_TRUNC('month', TO_DATE(CAST(sk_prospect_date AS STRING),'yyyymmdd')) AS month_start,
-        DATE_TRUNC('week', TO_DATE(CAST(sk_prospect_date AS STRING),'yyyymmdd')) AS week_start,
+        DATE_TRUNC('month', TO_DATE(CAST(sk_prospect_date AS STRING),'yyyyMMdd')) AS month_start,
+        DATE_TRUNC('week', TO_DATE(CAST(sk_prospect_date AS STRING),'yyyyMMdd')) AS week_start,
         country_name,
         city_group,
         supply_mkt_origin, 
@@ -38,8 +38,8 @@ prospects AS (
 ),
 qualifieds AS (
     SELECT
-        DATE_TRUNC('month', TO_DATE(CAST(sk_qualified_date AS STRING),'yyyymmdd')) AS month_start,
-        DATE_TRUNC('week', TO_DATE(CAST(sk_qualified_date AS STRING),'yyyymmdd')) AS week_start,
+        DATE_TRUNC('month', TO_DATE(CAST(sk_qualified_date AS STRING),'yyyyMMdd')) AS month_start,
+        DATE_TRUNC('week', TO_DATE(CAST(sk_qualified_date AS STRING),'yyyyMMdd')) AS week_start,
         country_name,
         city_group,
         supply_mkt_origin, 
@@ -58,8 +58,8 @@ qualifieds AS (
 ),
 opportunities AS (
     SELECT
-        DATE_TRUNC('month', TO_DATE(CAST(sk_opportunity_date AS STRING),'yyyymmdd')) AS month_start,
-        DATE_TRUNC('week', TO_DATE(CAST(sk_opportunity_date AS STRING),'yyyymmdd')) AS week_start,
+        DATE_TRUNC('month', TO_DATE(CAST(sk_opportunity_date AS STRING),'yyyyMMdd')) AS month_start,
+        DATE_TRUNC('week', TO_DATE(CAST(sk_opportunity_date AS STRING),'yyyyMMdd')) AS week_start,
         country_name,
         city_group,
         supply_mkt_origin, 
@@ -78,8 +78,8 @@ opportunities AS (
 ),
 first_listings AS (
     SELECT
-        DATE_TRUNC('month', TO_DATE(CAST(sk_first_listing_date AS STRING),'yyyymmdd')) AS month_start,
-        DATE_TRUNC('week', TO_DATE(CAST(sk_first_listing_date AS STRING),'yyyymmdd')) AS week_start,
+        DATE_TRUNC('month', TO_DATE(CAST(sk_first_listing_date AS STRING),'yyyyMMdd')) AS month_start,
+        DATE_TRUNC('week', TO_DATE(CAST(sk_first_listing_date AS STRING),'yyyyMMdd')) AS week_start,
         country_name,
         city_group,
         supply_mkt_origin, 

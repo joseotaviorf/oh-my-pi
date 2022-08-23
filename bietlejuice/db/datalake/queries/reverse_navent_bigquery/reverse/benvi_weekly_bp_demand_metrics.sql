@@ -128,5 +128,3 @@ LEFT JOIN
     tof_demand_funnel AS tdf
         ON dim.week_start = tdf.week_start 
         AND dim.city_group = tdf.city_group
-ORDER BY
-    dim.week_start

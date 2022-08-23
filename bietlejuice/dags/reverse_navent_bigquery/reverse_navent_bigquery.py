@@ -129,7 +129,8 @@ create_cluster_task.set_downstream(
 )
 
 chain(
-    ReverseTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies),
+    ReverseTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + ReverseTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
     load_s3_data_into_bigquery_task,
 )
 
