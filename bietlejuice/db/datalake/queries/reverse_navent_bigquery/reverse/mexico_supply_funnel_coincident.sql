@@ -13,7 +13,7 @@ WITH leads AS (
         NULL AS opportunities,
         NULL AS first_listings
     FROM
-        datalake_navent_bigquery_reverse.mexico_supply_funnel
+        reverse_navent_bigquery.mexico_supply_funnel
     GROUP BY 1, 2, 3, 4, 5, 6, 7
 ),
 prospects AS (
@@ -31,7 +31,7 @@ prospects AS (
         NULL AS opportunities,
         NULL AS first_listings
     FROM
-        datalake_navent_bigquery_reverse.mexico_supply_funnel
+        reverse_navent_bigquery.mexico_supply_funnel
     WHERE
         sk_prospect_date > 0
     GROUP BY 1, 2, 3, 4, 5, 6, 7
@@ -51,7 +51,7 @@ qualifieds AS (
         NULL AS opportunities,
         NULL AS first_listings
     FROM
-        datalake_navent_bigquery_reverse.mexico_supply_funnel
+        reverse_navent_bigquery.mexico_supply_funnel
     WHERE
         sk_qualified_date > 0
     GROUP BY 1, 2, 3, 4, 5, 6, 7
@@ -71,7 +71,7 @@ opportunities AS (
         COUNT(DISTINCT sk_house_listing) AS opportunities,
         NULL AS first_listings
     FROM
-        datalake_navent_bigquery_reverse.mexico_supply_funnel
+        reverse_navent_bigquery.mexico_supply_funnel
     WHERE
         sk_opportunity_date > 0
     GROUP BY 1, 2, 3, 4, 5, 6, 7
@@ -91,7 +91,7 @@ first_listings AS (
         NULL AS opportunities,
         COUNT(DISTINCT sk_house_listing) AS first_listings
     FROM
-        datalake_navent_bigquery_reverse.mexico_supply_funnel
+        reverse_navent_bigquery.mexico_supply_funnel
     WHERE
         sk_first_listing_date > 0
     GROUP BY 1, 2, 3, 4, 5, 6, 7

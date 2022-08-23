@@ -30,7 +30,7 @@ WITH supply_cohort_funnel_base AS (
             END
         ) AS first_listings_cohort
     FROM
-        datalake_navent_bigquery_reverse.mexico_supply_funnel
+        reverse_navent_bigquery.mexico_supply_funnel
     GROUP BY 1, 2, 3, 4, 5, 6, 7 
 )
 SELECT 
