@@ -1,4 +1,5 @@
 select 
+  uuid,
   service_id as id_service,
   service_version,
   inference_type,

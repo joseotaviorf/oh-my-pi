@@ -2,6 +2,9 @@
 database_name: datalake_emlio_clean
 table_name: emlio_logs
 columns:
+  uuid:
+    lineage:
+      - datalake_emlio_raw.emlio_logs.uuid
   id_service:
     lineage:
       - datalake_emlio_raw.emlio_logs.id_service

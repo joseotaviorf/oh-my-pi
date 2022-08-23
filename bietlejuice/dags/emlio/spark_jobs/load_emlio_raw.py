@@ -45,6 +45,7 @@ def explode_json_column(df, column, json_schema):
 
 value_schema = StructType(
     [
+        StructField("uuid", StringType(), nullable=True),
         StructField("service_id", StringType(), nullable=True),
         StructField("service_version", StringType(), nullable=True),
         StructField("log_timestamp", StringType(), nullable=True),
