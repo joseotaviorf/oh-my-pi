@@ -5,6 +5,7 @@ SELECT
     column_name,
     value,
     has_description,
+    date(format_string('%d-%d-%d',year, month, day)) as dt_ingested,
     year,
     month,
     day

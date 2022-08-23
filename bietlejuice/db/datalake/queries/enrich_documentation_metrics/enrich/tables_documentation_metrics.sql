@@ -31,6 +31,7 @@ SELECT
     ms.table_name,
     COALESCE(doc.owner != '', FALSE) AS has_owner,
     COALESCE(doc.table_description != '', FALSE) AS has_description,
+    date(format_string('%d-%d-%d', ms.year, ms.month, ms.day)) as dt_ingested,
     ms.year,
     ms.month,
     ms.day

@@ -17,7 +17,7 @@ WITH columns_metastore AS (
     SELECT
         database_name,
         table_name,
-        column_name, 
+        column_name,
         column_description,
         joins_with_column
     FROM
@@ -25,7 +25,7 @@ WITH columns_metastore AS (
     WHERE
         year = {year}
         AND month = {month}
-        AND day = {day} 
+        AND day = {day}
 )
 SELECT
     ms.layer,
@@ -34,6 +34,7 @@ SELECT
     ms.column_name,
     COALESCE(doc.column_description != '', FALSE) AS has_description,
     COALESCE(doc.joins_with_column != '', FALSE) AS has_joins_with_column,
+    date(format_string('%d-%d-%d', ms.year, ms.month, ms.day)) as dt_ingested,
     ms.year,
     ms.month,
     ms.day

@@ -20,6 +20,11 @@ columns:
   has_joins_with_column:
     lineage:
       - datalake_documentation_metrics_clean.columns_documentation.has_joins_with_column
+  dt_ingested:
+    lineage:
+      - datalake_documentation_metrics_clean.categories_documentation.year
+      - datalake_documentation_metrics_clean.categories_documentation.month
+      - datalake_documentation_metrics_clean.categories_documentation.day
   year:
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.year

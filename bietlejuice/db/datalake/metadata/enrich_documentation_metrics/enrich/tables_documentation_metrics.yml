@@ -17,6 +17,11 @@ columns:
   has_owner:
     lineage:
       - datalake_documentation_metrics_clean.columns_documentation.has_owner
+  dt_ingested:
+    lineage:
+      - datalake_documentation_metrics_clean.categories_documentation.year
+      - datalake_documentation_metrics_clean.categories_documentation.month
+      - datalake_documentation_metrics_clean.categories_documentation.day
   year:
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.year

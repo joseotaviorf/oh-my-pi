@@ -54,6 +54,7 @@ SELECT
     ms.table_name,
     COALESCE(md.has_lineage, di.has_lineage_from_product, False) as has_lineage,
     COALESCE(md.has_tags, False) as has_tags,
+    date(format_string('%d-%d-%d', ms.year, ms.month, ms.day)) as dt_ingested,
     ms.year,
     ms.month,
     ms.day
