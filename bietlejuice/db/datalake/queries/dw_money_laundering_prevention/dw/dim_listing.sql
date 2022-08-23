@@ -9,13 +9,10 @@ SELECT
     status,
     status_closing,
     compare_price_with_average,
-    is_for_rent,
-    is_for_sale,
     is_3p_supply,
-    is_imovel_v3,
     is_photographer_job_pending,
     is_verified,
-    dt_created,
+    ts_created,
     ts_first_sale_listing,
     ts_last_sale_listing
 FROM

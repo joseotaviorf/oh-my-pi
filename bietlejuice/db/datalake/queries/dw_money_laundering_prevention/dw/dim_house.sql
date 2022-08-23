@@ -14,7 +14,6 @@ SELECT
     registration,
     total_area,
     sale_price,
-    rent_value,
     is_verified,
     is_in_negotiation,
     is_in_external_negotiation,

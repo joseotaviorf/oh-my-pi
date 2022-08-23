@@ -47,9 +47,6 @@ columns:
   sale_price:
     lineage:
       - datalake_money_laundering_prevention.house.sale_price
-  rent_value:
-    lineage:
-      - datalake_money_laundering_prevention.house.rent_value
   is_verified:
     lineage:
       - datalake_money_laundering_prevention.house.is_verified

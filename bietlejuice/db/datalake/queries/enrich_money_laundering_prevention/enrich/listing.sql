@@ -9,13 +9,10 @@ SELECT
     lbc.status,
     lbc.status_closing,
     h.compare_price_with_average,
-    h.is_for_rent,
-    h.is_for_sale,
     h.is_3p_supply,
-    h.is_imovel_v3,
     h.is_photographer_job_pending,
     h.is_verified,
-    h.dt_creation AS dt_created,
+    h.dt_creation AS ts_created,
     sl.ts_first_publication AS ts_first_sale_listing,
     sl.ts_last_publication AS ts_last_sale_listing
 FROM

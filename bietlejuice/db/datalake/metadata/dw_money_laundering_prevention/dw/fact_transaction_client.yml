@@ -11,15 +11,3 @@ columns:
   sk_document:
     lineage:
       - datalake_money_laundering_prevention.transaction_client.id_document
-  sk_sales_flow:
-    lineage:
-      - datalake_money_laundering_prevention.transaction_client.id_vendas
-  sk_sale_flow_firestore:
-    lineage:
-      - datalake_money_laundering_prevention.transaction_client.id_sale_flow_firestore
-  client_income_nature:
-    lineage:
-      - datalake_money_laundering_prevention.transaction_client.client_income_nature
-  client_monthly_income:
-    lineage:
-      - datalake_money_laundering_prevention.transaction_client.client_monthly_income
