@@ -22,7 +22,7 @@ MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_cluster"
 
 config_service = ConfigurationService(SOURCE)
-PARTITION_COLS = config_service.get_config("partition_cols")
+PARTITION_COLS = config_service.get_config("partition_cols_dag")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")

@@ -1,2 +1,2 @@
 ---
-partition_cols: [year, month, day]
+partition_cols_dag: [year, month, day]

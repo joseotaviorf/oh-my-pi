@@ -25,7 +25,7 @@ MAIN_SCHEDULE_INTERVAL = "30 23 * * *"
 CLUSTER_DESCRIPTION = "custom_cluster"
 
 config_service = ConfigurationService(SOURCE)
-PARTITION_COLS = config_service.get_config("partition_cols")
+PARTITION_COLS = config_service.get_config("partition_cols_dag")
 INCREMENTAL_PARTITIONS = config_service.get_config("incremental_partitions")
 EXTRA_SPARK_CONF = config_service.get_config("spark_conf")
 
