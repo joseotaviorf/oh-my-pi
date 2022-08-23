@@ -3,3 +3,8 @@ custom_libraries:
  - pypi:
     package: "google-cloud-bigquery==3.2.0"
 partition_columns: ["year", "month", "day"]
+inner_dependencies:
+    mexico_supply_funnel_cohort:
+        - mexico_supply_funnel
+    mexico_supply_funnel_coincident:
+        - mexico_supply_funnel
