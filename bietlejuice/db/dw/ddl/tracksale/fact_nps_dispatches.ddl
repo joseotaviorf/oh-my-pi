@@ -2,15 +2,15 @@ DROP TABLE IF EXISTS tracksale.fact_nps_dispatches;
 CREATE TABLE IF NOT EXISTS tracksale.fact_nps_dispatches (
     sk_nps_dispatch VARCHAR(500) PRIMARY KEY,
     sk_nps_dispatch_lot VARCHAR(20),
-    sk_nps_campaign INTEGER,
-    sk_nps_customer VARCHAR(300),
+    sk_nps_campaign VARCHAR(50),
+    sk_nps_customer VARCHAR(400),
     sk_user BIGINT,
     sk_personal_document VARCHAR(25),
     sk_nps_answer BIGINT,
     sk_house_listing BIGINT,
     sk_booking BIGINT,
     sk_tta VARCHAR(50),
-    sk_offer BIGINT,
+    sk_offer VARCHAR(50),
     sk_contract BIGINT,
     sk_created_date BIGINT,
     sk_sent_date BIGINT,
@@ -25,4 +25,8 @@ CREATE TABLE IF NOT EXISTS tracksale.fact_nps_dispatches (
     has_comment BOOLEAN,
     is_customer_identified BOOLEAN,
     ts_load TIMESTAMP
-)
+);
+CALL grant_all_permissions_on_schema('tracksale');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA tracksale TO GROUP etl;
+GRANT ALL ON SCHEMA tracksale TO GROUP ETL;
+ALTER TABLE tracksale.fact_nps_dispatches owner TO airflow;
