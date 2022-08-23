@@ -8,4 +8,4 @@ SELECT
     agendamento_id AS id_booking,
     usuario_id AS id_user
 FROM
-    datalake_ebdb_raw.` Visitor`
+    datalake_ebdb_raw.`Visitor`
