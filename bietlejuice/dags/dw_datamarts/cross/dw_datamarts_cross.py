@@ -45,7 +45,7 @@ BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
+    "databricks_10_4_med_io-memory_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
