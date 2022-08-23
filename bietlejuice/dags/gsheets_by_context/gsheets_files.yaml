@@ -85,6 +85,20 @@ forms_analise_vistoria:
     clean_table_name: inspection_analysis_forms
     sheet_context: support_and_service
 
+inspectors_control:
+    sheet_id: 1cFwadBcEkIoC9zpGQNV7iA1Ii0fZmln5mRbB0LaW4zw
+    sheet_name: inspectors_control
+    clean_table_name: inspectors_control
+    sheet_context: support_and_service
+    preload_time_in_seconds: 30
+
+keys_logistic_control:
+    sheet_id: 1NsXQlPYoZ0RshYOU1N5TNMghZfOSozopzosfwy6Tv0A
+    sheet_name: keys_logistic_control
+    clean_table_name: keys_logistic_control
+    sheet_context: support_and_service
+    preload_time_in_seconds: 30
+
 ranking_rules:
     sheet_id: 1NgN-C7CUZxXAVSnqyC8IUFCEo3d0ROwo8lYDLaAJAuo
     sheet_name: Regras por time
@@ -751,8 +765,6 @@ mexico_supply_targets_2022:
     sheet_name: supply_targets_2022_mx
     clean_table_name: mexico_supply_targets_2022
     sheet_context: for_rent
-
-
 
 #########################
 # FOR SALE SHEETS

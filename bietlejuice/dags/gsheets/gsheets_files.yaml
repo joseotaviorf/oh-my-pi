@@ -238,11 +238,6 @@ inside_sale_supply_targets:
     sheet_name: inside_sale_supply_targets
     clean_table_name: inside_sale_supply_targets
 
-inspectors_control:
-    sheet_id: 1cFwadBcEkIoC9zpGQNV7iA1Ii0fZmln5mRbB0LaW4zw
-    sheet_name: inspectors_control
-    clean_table_name: inspectors_control
-
 ipsos_brandtracking_questions:
     sheet_id: 19RfjayG4z4qKpS6HMUTyYJbaM3LYmJB-rRl2dyTTSqw
     sheet_name: ipsos_brandtracking_questions
@@ -267,11 +262,6 @@ ltvoutput:
     sheet_id: 1Nf02DF6oHWUAAael_9M1g8tJfeTdq92fGt78x5_qNbg
     sheet_name: LTVOutput
     clean_table_name: affiliates_monthly_expected_results
-
-keys_logistic_control:
-    sheet_id: 1NsXQlPYoZ0RshYOU1N5TNMghZfOSozopzosfwy6Tv0A
-    sheet_name: keys_logistic_control
-    clean_table_name: keys_logistic_control
 
 keys_logistic_funil:
     sheet_id: 12yXccvLCYfl01OtFRFwg736_pDzz843nDhKVjf3IDZ0

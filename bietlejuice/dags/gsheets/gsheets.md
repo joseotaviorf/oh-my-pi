@@ -72,9 +72,7 @@ This pipeline produces the following output tables:
     - `hub_sale_closing_process`
     - `inside_sale_supply_targets`
     - `inspection_bugs`
-    - `inspectors_control`
     - `ipsos_brandtracking_questions`
-    - `keys_logistic_control`
     - `keys_logistic_funnel`
     - `keys_logistic_offboarding`
     - `keys_logistic_onboarding_tenant_b2b`
