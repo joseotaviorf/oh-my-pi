@@ -126,9 +126,7 @@ class DAGMetadataService:
         """
         intermediate_path = self._get_intermediate_path(source, context)
 
-        configs = ConfigurationService(
-            dag_name, intermediate_path=intermediate_path, env=env
-        )
+        configs = ConfigurationService(dag_name, intermediate_path=intermediate_path)
         try:
             configs.get_config("lineage_product_database_name")
             return True

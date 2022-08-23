@@ -58,7 +58,7 @@ if __name__ == "__main__":
         dbutils.secrets.get("quintoandar", APIEnum.AMPLITUDE_CASA_MINEIRA)
     )
 
-    config_service = ConfigurationService(source, inverse_file_config_order=True)
+    config_service = ConfigurationService(source)
     custom_records_per_file = config_service.get_config("custom_records_per_file")
     partition_cols = config_service.get_config("partition_cols")
     table_name = config_service.get_config("table_name")
