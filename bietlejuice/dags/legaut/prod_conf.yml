@@ -6,11 +6,15 @@ tables:
     extraction_type: full
   - table_name: crawlers_crawlertype
     extraction_type: full
+  - table_name: crawlers_owner
+    extraction_type: full
   - table_name: meuSite_analysisqueue
     extraction_type: full
   - table_name: meuSite_city
     extraction_type: full
   - table_name: meuSite_document
+    extraction_type: full
+  - table_name: meuSite_operation
     extraction_type: full
   - table_name: meuSite_project
     extraction_type: full
