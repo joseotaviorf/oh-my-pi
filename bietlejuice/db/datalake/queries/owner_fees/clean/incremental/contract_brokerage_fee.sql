@@ -6,6 +6,7 @@ SELECT
     CAST(fee AS FLOAT) AS brokerage_fee,
     CAST(premium_fee AS FLOAT) AS premium_fee,
     CAST(down_payment AS FLOAT) AS down_payment,
+    version,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

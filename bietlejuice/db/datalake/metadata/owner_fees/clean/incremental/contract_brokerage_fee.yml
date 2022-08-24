@@ -22,6 +22,9 @@ columns:
   down_payment:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee.down_payment
+  version:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.version
   ts_created:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee.created_at
