@@ -14,6 +14,8 @@ SELECT
     profile_mod AS mod_profile,
     active_mod AS mod_active,
     parent_member_profile_id_mod AS mod_id_parent_member_profile,
+    relationship_start_date_mod AS mod_dt_relationship_started, 
+    relationship_start_date AS dt_relationship_started,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

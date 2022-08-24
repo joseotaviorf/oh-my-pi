@@ -47,6 +47,12 @@ columns:
   mod_id_parent_member_profile:
     lineage:
       - datalake_hub_services_raw.member_profile_aud.parent_member_profile_id_mod
+  mod_dt_relationship_started:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.relationship_start_date_mod
+  dt_relationship_started:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.relationship_start_date
   ts_created:
     lineage:
       - datalake_hub_services_raw.member_profile_aud.created_at

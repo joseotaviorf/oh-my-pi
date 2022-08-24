@@ -23,6 +23,9 @@ columns:
   is_active:
     lineage:
       - datalake_hub_services_raw.member_profile.active
+  dt_relationship_started:
+    lineage:
+      - datalake_hub_services_raw.member_profile.relationship_start_date
   ts_created:
     lineage:
       - datalake_hub_services_raw.member_profile.created_at

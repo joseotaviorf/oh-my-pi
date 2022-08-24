@@ -6,6 +6,7 @@ SELECT
     parent_member_profile_id AS id_parent_member_profile,
     profile,
     active AS is_active,
+    relationship_start_date AS dt_relationship_started,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
