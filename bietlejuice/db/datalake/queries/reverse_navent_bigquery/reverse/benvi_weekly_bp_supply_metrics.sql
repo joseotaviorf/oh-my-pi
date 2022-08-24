@@ -138,7 +138,7 @@ market_place AS (
 )
 SELECT 
     dim.year AS base_year,
-    COALESCE(dim.week_start, sft.week_start) AS week_start,
+    DATE(COALESCE(dim.week_start, sft.week_start)) AS week_start,
     dim.country_name,
     dim.city_group,
     sf.supply_mkt_origin, 
@@ -189,11 +189,11 @@ FROM
     dimensions AS dim
 JOIN
     reverse_navent_bigquery.mexico_supply_funnel_coincident AS sf
-        ON DATE(dim.week_start) = sf.dt_week_started 
+        ON dim.week_start = sf.dt_week_started 
         AND dim.city_group = sf.city_group
 LEFT JOIN
     reverse_navent_bigquery.mexico_supply_funnel_cohort AS scf
-        ON DATE(dim.week_start) = scf.dt_lead_week_started 
+        ON dim.week_start = scf.dt_lead_week_started 
         AND dim.city_group = scf.city_group 
         AND sf.supply_mkt_origin = scf.supply_mkt_origin
         AND sf.supply_mkt_origin_detailed = scf.supply_mkt_origin_detailed
