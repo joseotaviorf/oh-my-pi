@@ -4,6 +4,9 @@
 
 Creates/updates the datamart tables that have cross squad dependencies, for the context of Growth, in data lake.
 
+​<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 
 Daily. More information about run time [here]({chart_url}{dag_id}).
@@ -48,3 +51,5 @@ For any questions or concerns about this DAG, please contact the Data For Sale t
 The file [growth_cross.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/dags/dw_datamarts_spark/growth_cross/growth_cross.yml)
 declares the datamarts that should be created in this DAG.
 So **to add/remove a datamart table** from the DAG you only need to **update this file**.
+
+</details>

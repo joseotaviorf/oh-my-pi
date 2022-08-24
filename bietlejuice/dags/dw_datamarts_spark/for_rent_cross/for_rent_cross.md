@@ -4,6 +4,9 @@
 
 Creates/updates the datamart tables
 
+​<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 
 Daily. More information about run time [here]({chart_url}{dag_id}).
@@ -26,3 +29,5 @@ The file [for_rent_cross.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/
 declares the datamarts that should be created in this DAG.
 
 So **to add/remove a datamart table** from the DAG you only need to **update this file**.
+
+</details>

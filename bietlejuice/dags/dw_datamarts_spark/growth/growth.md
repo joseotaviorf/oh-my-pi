@@ -1,5 +1,10 @@
 ## Datamarts Growth
 
+Creates/updates the datamart tables that don't have cross squad dependencies, for the context of Growth, in data lake.
+
+​<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>​
+
 ### Purpose
 
 Creates/updates the datamart tables, for the context of Growth, in data lake and DW.
@@ -26,3 +31,5 @@ This pipeline creates the tables in the schema `dw_datamart` of data lake and `d
 The file [dw_datamarts_growth_prod_conf.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/dags/dw_datamarts_spark/growth/growth.yml)
 declares the datamarts that should be created in this DAG.
 So **for add/remove a datamart table** from the DAG you only need to **update this file**.
+
+</details>

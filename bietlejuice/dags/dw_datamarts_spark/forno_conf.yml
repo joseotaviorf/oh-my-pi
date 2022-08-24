@@ -9,20 +9,28 @@
 #     owner: <dag_owner>
 #       # Mandatory.
 #       # Eg: Data ForSale
-
+custom_cluster:
+  driver_node_type_id: c5n.2xlarge
+  node_type_id: c5n.4xlarge
+  autoscale:
+    min_workers: 1
+    max_workers: 6
+  aws_attributes:
+    availability: ON_DEMAND
+    ebs_volume_size: 200
 dags:
   cross:
     owner: Data Engineering
-    cluster_name: databricks_9_1_med_memory_cluster
+    cluster_name: databricks_10_4_med_memory_cluster
   for_rent:
     owner: Data ForRent
-    cluster_name: databricks_9_1_med_memory_cluster
+    cluster_name: databricks_10_4_med_memory_cluster
   for_rent_cross:
     owner: Data ForRent
-    cluster_name: databricks_9_1_med_general_cluster
+    cluster_name: databricks_10_4_med_general_cluster
   for_sale:
     owner: Data ForSale
-    cluster_name: databricks_9_1_default_datamart_cluster
+    cluster_name: custom_cluster
     custom_libraries:
       - maven:
           coordinates: "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.0-incubating"
@@ -43,13 +51,13 @@ dags:
       - spark.kryo.registrator: "org.apache.sedona.core.serde.SedonaKryoRegistrator"
   for_sale_cross:
     owner: Data ForSale
-    cluster_name: databricks_9_1_default_datamart_cluster
+    cluster_name: custom_cluster
   fintech_cross:
-    cluster_name: databricks_9_1_med_general_cluster
+    cluster_name: databricks_10_4_med_general_cluster
     owner: Data Fintech
   growth:
     owner: Data Growth
-    cluster_name: databricks_9_1_med_general_cluster
+    cluster_name: databricks_10_4_med_general_cluster
   growth_cross:
     owner: Data Growth
   support_and_service:

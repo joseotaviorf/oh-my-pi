@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -25,43 +25,43 @@ class DatamartsDAGFactory:
     MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
     DW_SCHEMA = "datamarts"
 
+    DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+        {
+            "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+            "permission_level": ClusterPermissionEnum.MANAGE,
+        }
+    ]
+
     def __init__(self, source):
         self.source = source
         self.env = os.environ.get("ENVIRONMENT")
 
-        config_service = ConfigurationService(dag_name=source)
+        self.config_service = ConfigurationService(dag_name=source)
 
-        self.default_libraries = config_service.get_config("default_libraries")
-        self.doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-        self.spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
-        self.dw_bucket = config_service.get_config("dw_bucket")
-        self.databricks_bietlejuice_repo_path = config_service.get_config(
+        self.default_libraries = self.config_service.get_config("default_libraries")
+        self.doc_md_chart_url = self.config_service.get_config("doc_md_chart_url")
+        self.spark_jobs_logs_path = self.config_service.get_config(
+            "spark_jobs_logs_path"
+        )
+        self.dw_bucket = self.config_service.get_config("dw_bucket")
+        self.databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"
         )
-        self.spectrum_iam_role = config_service.get_config("spectrum_iam_role")
+        self.spectrum_iam_role = self.config_service.get_config("spectrum_iam_role")
 
         self.spark_jobs_path = (
             f"{self.databricks_bietlejuice_repo_path}/spark_jobs/base/"
         )
 
-    def _get_cluster_description(self, dag_id, cluster_name):
+    def _get_cluster_description(self, cluster_name):
         """
-        Obtains a dictionary with information about the cluster, using an Airflow variable.
+        Obtains a dictionary with information about the cluster, using ConfigurationService.
 
-        :param dag_id: Full name of the DAG.
-        :type dag_id: str
-        :param cluster_name: Name of the Airflow variable with the cluster description.
+        :param cluster_name: Name of the config file key with the cluster description.
         :type cluster_name: str
         :return: dict with the cluster description
         """
-
-        cluster_description = Variable.get(cluster_name, deserialize_json=True)
-        cluster_description["spark_env_vars"]["ENVIRONMENT"] = self.env
-        cluster_description["cluster_log_conf"]["s3"][
-            "destination"
-        ] = f"{self.spark_jobs_logs_path}{dag_id}"
-
-        return cluster_description
+        return self.config_service.get_config(cluster_name)
 
     @staticmethod
     def _create_inner_dependencies_dictionary(context_datamarts):
@@ -133,7 +133,7 @@ class DatamartsDAGFactory:
         dag_id = f"bietlejuice.{dag_name}"
 
         cluster_description = self._get_cluster_description(
-            dag_id, dag_details.get("cluster_name", "databricks_default_cluster")
+            dag_details.get("cluster_name", "databricks_10_4_med_general_cluster")
         )
 
         custom_libraries = dag_details.get("custom_libraries", [])
@@ -141,13 +141,6 @@ class DatamartsDAGFactory:
         # init Apache Sedona
         dag_custom_init_script = dag_details.get("init_script", [])
         dag_spark_conf = dag_details.get("spark_conf", [])
-
-        DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
-            {
-                "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
-                "permission_level": ClusterPermissionEnum.MANAGE,
-            }
-        ]
 
         for init_script in dag_custom_init_script:
             cluster_description["init_scripts"].append(init_script)
@@ -175,7 +168,7 @@ class DatamartsDAGFactory:
             task_id="create-cluster",
             cluster_configuration=cluster_description,
             libraries=self.default_libraries + custom_libraries,
-            access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+            access_control_list=self.DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
         )
 
         terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
