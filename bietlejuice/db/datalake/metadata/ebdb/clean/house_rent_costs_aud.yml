@@ -1,0 +1,31 @@
+---
+database_name: datalake_ebdb_clean
+table_name: house_rent_costs_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.houserentcosts_aud.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.houserentcosts_aud.house_id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.houserentcosts_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.houserentcosts_aud.revtype
+  price_trend:
+    lineage:
+      - datalake_ebdb_raw.houserentcosts_aud.pricetrend
+  mod_price_trend:
+    lineage:
+      - datalake_ebdb_raw.houserentcosts_aud.pricetrend_mod
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.houserentcosts_aud.criadoem
+  ts_last_price_udpated:
+    lineage:
+      - datalake_ebdb_raw.houserentcosts_aud.lastpriceupdate
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.houserentcosts_aud.atualizadoem

@@ -16,7 +16,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables:
 
 1. In datalake raw:
-    - All tables available in source's database, except for Operationals (REV_CHANGES) and some trash (_UsuarioRevisionEntity_new).
+    - All tables available in source's database that have clean or use in metabase, except for Operationals (REV_CHANGES) and some trash (_UsuarioRevisionEntity_new).
     - Views: MapRegiao and vw_lead_reason
 
 2. In datalake clean:
@@ -92,6 +92,7 @@ Produces the following output tables:
     `house_rating_rating_label`
     `house_registration_status`
     `house_registration_status_aud`
+    `house_rent_costs_aud`
     `house_special_condition`
     `house_user`
     `house_visit_information`
