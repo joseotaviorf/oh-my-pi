@@ -11,4 +11,5 @@ SELECT
     status,
     created_at AS ts_created,
     updated_at AS ts_updated
-FROM datalake_terminator_raw.termination_fee_negotiation_aud
+FROM
+    datalake_terminator_raw.termination_fee_negotiation_aud

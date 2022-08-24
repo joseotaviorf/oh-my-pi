@@ -1,4 +1,4 @@
-SELECT  
+SELECT
     id,
     external_id AS id_external,
     keycloak_token_id AS id_keycloak_token,
@@ -10,4 +10,5 @@ SELECT
     phone,
     created_at AS ts_created,
     updated_at AS ts_updated
-FROM datalake_terminator_raw.application_user_aud
+FROM
+    datalake_terminator_raw.application_user_aud

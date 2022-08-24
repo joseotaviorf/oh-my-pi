@@ -8,4 +8,5 @@ SELECT
     tenant_repair_costs_info,
     created_at AS ts_created,
     updated_at AS ts_updated
-FROM datalake_terminator_raw.negotiation
+FROM
+    datalake_terminator_raw.negotiation
