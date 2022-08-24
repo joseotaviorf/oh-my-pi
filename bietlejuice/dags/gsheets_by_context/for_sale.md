@@ -20,6 +20,9 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
+    - `business_unit_region`
+    - `forbrokers_3p_partner_conditions`
+    - `offers_hub_central`
     - `rede_5a_revenue_share_conditions`
     - `sale_asp_form_responses_2022q1`
     - `sale_asp_form_responses_2022q2`
@@ -37,14 +40,15 @@ This pipeline produces the following output tables:
     - `sale_tof_daily_targets`
     - `sale_tof_monthly_targets`
     - `sale_tof_weekly_targets`
+    - `secretariat_hierarchy`
+    - `subhub_regions`
     - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
     - `tqc_leads_bh`
-    - `business_unit_region`
-    - `forbrokers_3p_partner_conditions`
-    - `offers_hub_central`
-    - `secretariat_hierarchy`
 2. Data lake clean:
+    - `business_unit_region`
+    - `forbrokers_3p_partner_conditions`
+    - `offers_hub_central`
     - `rede_5a_revenue_share_conditions`
     - `sale_asp_form_responses_2022q1`
     - `sale_asp_form_responses_2022q2`
@@ -62,12 +66,10 @@ This pipeline produces the following output tables:
     - `sale_tof_daily_targets`
     - `sale_tof_monthly_targets`
     - `sale_tof_weekly_targets`
+    - `secretariat_hierarchy`
+    - `subhub_regions`
     - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
     - `tqc_leads_bh`
-    - `business_unit_region`
-    - `forbrokers_3p_partner_conditions`
-    - `offers_hub_central`
-    - `secretariat_hierarchy`
 
 </details>

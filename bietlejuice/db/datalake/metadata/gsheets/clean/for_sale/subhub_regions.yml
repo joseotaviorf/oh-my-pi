@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: subhub_regions
+columns:
+  id_region:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.id_bairro
+  hub_name:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.hub
+  subhub_name:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.subhub
