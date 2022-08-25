@@ -2,7 +2,7 @@
 database_name: datalake_inspections_clean
 table_name: assessment
 columns:
-  id:
+  id_assessment:
     lineage:
       - datalake_inspections_raw.assessment.id
   id_inspection:
@@ -17,6 +17,12 @@ columns:
   key_location_details:
     lineage:
       - datalake_inspections_raw.assessment.key_location_details
+  source:
+    lineage:
+      - datalake_inspections_raw.assessment.source
+  house_supplies:
+    lineage:
+      - datalake_inspections_raw.assessment.house_supplies
   dt_revision_limit:
     lineage:
       - datalake_inspections_raw.assessment.limit_revision_date
@@ -32,3 +38,12 @@ columns:
   ts_updated:
     lineage:
       - datalake_inspections_raw.assessment.updated_at
+  year:
+    lineage:
+      - datalake_inspections_raw.assessment.year
+  month:
+    lineage:
+      - datalake_inspections_raw.assessment.month
+  day:
+    lineage:
+      - datalake_inspections_raw.assessment.day

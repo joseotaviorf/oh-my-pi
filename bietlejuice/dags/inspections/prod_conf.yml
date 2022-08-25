@@ -9,6 +9,8 @@ tables:
   #   unixtime_measure: <unixtime_measure> #optional
   assessment:
     clean_table_name: assessment
+    is_incremental: True
+    date_column: updated_at
   assessment_aud:
     clean_table_name: assessment_aud
   inspection:
