@@ -1,4 +1,14 @@
-WITH leads AS (
+WITH base AS (
+    SELECT *
+    FROM
+        reverse_navent_bigquery.mexico_supply_funnel
+    WHERE
+        year = YEAR(CURRENT_DATE)
+        AND month = MONTH(CURRENT_DATE)
+        AND day = DAY(CURRENT_DATE)
+)
+
+leads AS (
     SELECT
         DATE_TRUNC('month', TO_DATE(CAST(sk_lead_date AS STRING), 'yyyyMMdd')) AS month_start,
         DATE_TRUNC('week', TO_DATE(CAST(sk_lead_date AS STRING),'yyyyMMdd')) AS week_start,
@@ -13,7 +23,7 @@ WITH leads AS (
         NULL AS opportunities,
         NULL AS first_listings
     FROM
-        reverse_navent_bigquery.mexico_supply_funnel
+        base
     GROUP BY 1, 2, 3, 4, 5, 6, 7
 ),
 prospects AS (
@@ -31,7 +41,7 @@ prospects AS (
         NULL AS opportunities,
         NULL AS first_listings
     FROM
-        reverse_navent_bigquery.mexico_supply_funnel
+        base
     WHERE
         sk_prospect_date > 0
     GROUP BY 1, 2, 3, 4, 5, 6, 7
@@ -51,7 +61,7 @@ qualifieds AS (
         NULL AS opportunities,
         NULL AS first_listings
     FROM
-        reverse_navent_bigquery.mexico_supply_funnel
+        base
     WHERE
         sk_qualified_date > 0
     GROUP BY 1, 2, 3, 4, 5, 6, 7
@@ -71,7 +81,7 @@ opportunities AS (
         COUNT(DISTINCT sk_house_listing) AS opportunities,
         NULL AS first_listings
     FROM
-        reverse_navent_bigquery.mexico_supply_funnel
+        base
     WHERE
         sk_opportunity_date > 0
     GROUP BY 1, 2, 3, 4, 5, 6, 7
@@ -91,7 +101,7 @@ first_listings AS (
         NULL AS opportunities,
         COUNT(DISTINCT sk_house_listing) AS first_listings
     FROM
-        reverse_navent_bigquery.mexico_supply_funnel
+        base
     WHERE
         sk_first_listing_date > 0
     GROUP BY 1, 2, 3, 4, 5, 6, 7

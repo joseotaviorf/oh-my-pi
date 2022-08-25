@@ -31,6 +31,10 @@ WITH supply_cohort_funnel_base AS (
         ) AS first_listings_cohort
     FROM
         reverse_navent_bigquery.mexico_supply_funnel
+    WHERE
+        year = YEAR(CURRENT_DATE)
+        AND month = MONTH(CURRENT_DATE)
+        AND day = DAY(CURRENT_DATE)
     GROUP BY 1, 2, 3, 4, 5, 6, 7 
 )
 SELECT 

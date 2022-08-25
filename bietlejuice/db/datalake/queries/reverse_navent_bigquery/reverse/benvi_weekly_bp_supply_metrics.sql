@@ -135,6 +135,47 @@ market_place AS (
     WHERE
         dr.country_name = 'Mexico'
     GROUP BY 1, 2
+),
+mexico_cohort_base_table AS (
+    SELECT
+        city_group,
+        supply_mkt_origin,
+        supply_mkt_origin_detailed,
+        mexico_channel,
+        prospects_cohort,
+        qualifieds_cohort,
+        opportunities_cohort,
+        first_listings_cohort,
+        l2p_cohort,
+        p2q_cohort,
+        q2o_cohort,
+        o2fl_cohort,
+        dt_lead_week_started
+    FROM
+        reverse_navent_bigquery.mexico_supply_funnel_cohort
+    WHERE
+        year = YEAR(CURRENT_DATE)
+        AND month = MONTH(CURRENT_DATE)
+        AND day = DAY(CURRENT_DATE)
+),
+mexico_coincident_base_table AS (
+    SELECT
+        city_group,
+        supply_mkt_origin,
+        supply_mkt_origin_detailed,
+        mexico_channel,
+        leads,
+        prospects,
+        qualifieds,
+        opportunities,
+        first_listings,
+        dt_week_started
+    FROM
+        reverse_navent_bigquery.mexico_supply_funnel_coincident
+    WHERE
+        year = YEAR(CURRENT_DATE)
+        AND month = MONTH(CURRENT_DATE)
+        AND day = DAY(CURRENT_DATE)
 )
 SELECT 
     dim.year AS base_year,
@@ -188,11 +229,11 @@ SELECT
 FROM
     dimensions AS dim
 JOIN
-    reverse_navent_bigquery.mexico_supply_funnel_coincident AS sf
+    mexico_coincident_base_table AS sf
         ON dim.week_start = sf.dt_week_started 
         AND dim.city_group = sf.city_group
 LEFT JOIN
-    reverse_navent_bigquery.mexico_supply_funnel_cohort AS scf
+    mexico_cohort_base_table AS scf
         ON dim.week_start = scf.dt_lead_week_started 
         AND dim.city_group = scf.city_group 
         AND sf.supply_mkt_origin = scf.supply_mkt_origin
