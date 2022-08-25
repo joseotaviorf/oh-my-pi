@@ -127,7 +127,8 @@ agency_last_update_deleted AS (
 -- For removal of undue CIQ_Manager listings: gets IDs with status changes or Contract Signed after CIQ_Manager discontinuation
 has_status_changed AS (
     SELECT
-        sk_house_listing
+        sk_house_listing,
+        max(ts_status_start) as last_status_change
     FROM
         fact_house_listing_status
     WHERE
@@ -137,7 +138,8 @@ has_status_changed AS (
 
 sale_status_change AS (
     SELECT
-        sk_sale_listing
+        sk_sale_listing,
+        max(ts_status_started) as last_status_change
     FROM
         sale.fact_listing_status
     WHERE
@@ -154,7 +156,7 @@ has_signed_contract AS (
     GROUP BY 1
 ),
 
-quintoandar_consultant_listings_sale AS (
+quintoandar_consultant_listings_sale_raw AS (
 
     SELECT
         dl.sk_sale_listing,
@@ -166,17 +168,20 @@ quintoandar_consultant_listings_sale AS (
             WHEN program.name='CIQ_MANAGER' THEN TRUE
             ELSE FALSE
         END AS is_account_manager,
-        program.name AS type_big_agent,
+        CASE
+            WHEN program.name = 'CIQ_MANAGER'
+                AND lcs.dt_sale > Agency.dt_since THEN 'CIQ_FULL'
+            ELSE program.name
+        END AS type_big_agent,
         lbc.business_context AS businesscontext,
         NULL as businesscontext_detail,
         Agency.dt_since AS dt_ciq_started,
         dp.id_partner,
         dl.status AS house_status,
-        CASE
-            WHEN (dl.status = 'PUBLISHED' OR ssc.sk_sale_listing IS NOT NULL)
-                AND mud.deleted_id IS NOT NULL THEN TRUE
-            ELSE FALSE
-        END AS is_incorrect_attribution
+        ssc.sk_sale_listing AS status_change_id,
+        last_status_change,
+        0 AS contract_signed_id,
+        mud.ts_deleted
     FROM
         datalake_big_agent_prod.House
     LEFT JOIN
@@ -214,9 +219,24 @@ quintoandar_consultant_listings_sale AS (
     LEFT JOIN
         sale_status_change AS ssc
             ON dl.sk_sale_listing = ssc.sk_sale_listing
+    LEFT JOIN 
+        first_change_sale lcs
+            ON lcs.id_house=JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId')
     WHERE (lf.sk_lead_date>=20210601 OR lf.sk_first_listing_date>=20210601)
     ),
-    
+
+quintoandar_consultant_listings_sale AS (
+    SELECT *,
+        CASE
+            WHEN (house_status = 'PUBLISHED' OR status_change_id IS NOT NULL)
+                AND ts_deleted IS NOT NULL
+                AND type_big_agent <> 'CIQ_FULL' THEN TRUE
+            ELSE FALSE
+        END AS is_incorrect_attribution
+    FROM
+    	quintoandar_consultant_listings_sale_raw
+),
+
 check_ciq_full AS (
     SELECT
         JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId') AS id_house_external
@@ -272,9 +292,14 @@ quintoandar_consultant_listings_rent AS (
         Agency.dt_since AS dt_ciq_started,
         dp.id_partner,
         dhl.status AS house_status,
+        hsc.sk_house_listing AS status_change_id,
+        last_status_change,
+        hcs.sk_house_listing AS contract_signed_id,
+        mud.ts_deleted,
         CASE
             WHEN (dhl.status = 'publicado' OR hsc.sk_house_listing IS NOT NULL OR hcs.sk_house_listing IS NOT NULL)
-    			AND mud.deleted_id IS NOT NULL THEN TRUE
+    			AND mud.deleted_id IS NOT NULL
+                AND type_big_agent <> 'CIQ_FULL' THEN TRUE
             ELSE FALSE
         END AS is_incorrect_attribution
     FROM
@@ -379,7 +404,7 @@ quintoandar_consultant_listings AS (
         qclu.id_partner,
         lcs.dt_sale,
         lcr.dt_rent
-    FROM quintoandar_consultant_listings_filter qclu
+    FROM quintoandar_consultant_listings_filter as qclu
     LEFT JOIN 
         first_change_sale lcs
             ON lcs.id_house=qclu.id_house
