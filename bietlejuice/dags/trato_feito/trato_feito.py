@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -25,24 +25,19 @@ MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 config_service = ConfigurationService(SOURCE)
 ENV = os.environ.get("ENVIRONMENT")
 
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
-artifacts_bucket = config_service.get_config("artifacts_bucket")
+# S3 path setup
 datalake_bucket = config_service.get_config("datalake_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
+)
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_into_datalake.py"
+artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 
-# s3 paths setup
-s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
-RAW_SPARK_JOB_PATH = s3_prefix + f"/spark_jobs/{SOURCE}/load_{SOURCE}_into_datalake.py"
-SPARK_JOBS_PATH = f"{s3_prefix}/spark_jobs/base/"
-
-# cluster setup
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
@@ -69,7 +64,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
+    cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries,
 )
@@ -83,14 +78,14 @@ task_group = DatalakeTaskGroup(
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=SOURCE,
-    spark_jobs_path=SPARK_JOBS_PATH,
+    spark_jobs_path=base_spark_jobs_path,
     athena_query_result_location=athena_query_results_bucket,
 )
 
 raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
-    extraction_spark_job_file=RAW_SPARK_JOB_PATH,
+    extraction_spark_job_file=raw_spark_job_path,
     raw_spark_job_extra_args=[SOURCE],
 )
 

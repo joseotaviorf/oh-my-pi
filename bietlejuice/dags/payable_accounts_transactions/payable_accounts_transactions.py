@@ -3,7 +3,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -39,10 +39,8 @@ LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     databricks_bietlejuice_repo_path, DAG_ID
 )
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_min_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 
 LIBRARIES_DESCRIPTION = config_service.get_config("default_libraries")
 ARTIFACTS_BUCKET = config_service.get_config("artifacts_bucket")
@@ -82,7 +80,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
+    cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=libraries_description,
 )

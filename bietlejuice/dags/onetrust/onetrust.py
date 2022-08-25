@@ -31,17 +31,20 @@ athena_query_results_bucket = config_service.get_config("athena_query_results_bu
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
+default_libraries = config_service.get_config("default_libraries")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_min_general_cluster")
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
 
-cluster_libs = config_service.get_config("cluster_libs")
+CUSTOM_LIBRARIES = [
+    {
+        "whl": f"{artifacts_s3_bucket}/onetrust-api-client-python/"
+        f"quintoandar_onetrust_api_client-1.0.1-py2.py3-none-any.whl"
+    }
+]
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -68,7 +71,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
-    libraries=cluster_libs,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
