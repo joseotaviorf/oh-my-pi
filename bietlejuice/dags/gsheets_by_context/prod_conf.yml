@@ -19,15 +19,18 @@ dags:
   for_rent:
     main_schedule_interval: 0 0 * * *
     dag_owner: Data ForRent
+    cluster_name: databricks_10_4_med_general_cluster
   fintech:
     main_schedule_interval: 0 0 * * *
     dag_owner: Data Fintech
+    cluster_name: databricks_10_4_med_general_cluster
   bedrock:
     main_schedule_interval: 0 0 * * *
     dag_owner: Data Bedrock
   for_sale:
     main_schedule_interval: 0 0 * * *
     dag_owner: Data ForSale
+    cluster_name: databricks_10_4_med_general_cluster
   static:
     dag_owner: Data Engineering
   general:
