@@ -1,18 +1,28 @@
 WITH base AS (
-    SELECT *
+    SELECT
+        sk_house_listing,
+        sk_lead_date,
+        sk_prospect_date,
+        sk_qualified_date,
+        sk_opportunity_date,
+        sk_first_listing_date,
+        country_name,
+        city_group,
+        supply_mkt_origin,
+        supply_mkt_origin_detailed,
+        mexico_channel
     FROM
         reverse_navent_bigquery.mexico_supply_funnel
     WHERE
         year = YEAR(CURRENT_DATE)
         AND month = MONTH(CURRENT_DATE)
         AND day = DAY(CURRENT_DATE)
-)
-
+),
 leads AS (
     SELECT
         DATE_TRUNC('month', TO_DATE(CAST(sk_lead_date AS STRING), 'yyyyMMdd')) AS month_start,
         DATE_TRUNC('week', TO_DATE(CAST(sk_lead_date AS STRING),'yyyyMMdd')) AS week_start,
-	country_name,
+        country_name,
         city_group,
         supply_mkt_origin, 
         supply_mkt_origin_detailed,
