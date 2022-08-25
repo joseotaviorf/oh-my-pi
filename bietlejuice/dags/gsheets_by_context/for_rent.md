@@ -22,33 +22,43 @@ This pipeline produces the following output tables:
 1. Data lake raw:
     - `aux_agents`
     - `aux_regiao`
+    - `base_hunter`
     - `carteirizados_info`
+    - `ciq_training`
     - `demand_targets_2022`
+    - `estrutura_gerente_corretor`
+    - `evictions_processes_forrent`
     - `forecast_cohort_demanda`
     - `forecast_cohort_supply`
     - `forecast_diario_demanda`
     - `forecast_diario_supply`
+    - `listings_with_agreed_discounts`
     - `mexico_demand_targets_2022`
     - `mexico_supply_targets_2022`
     - `ongoing_listings_target`
     - `rental_budget_targets`
     - `supply_targets_2022`
-    - `evictions_processes_forrent`
+    - `tratativas_actionline_ciq_full_responses`
 
 2. Data lake clean:
     - `aux_agents`
     - `auxiliary_region`
+    - `base_hunter`
     - `carteirizados_info`
+    - `ciq_training`
     - `demand_targets_2022`
+    - `evictions_processes_forrent`
+    - `listings_with_agreed_discounts`
+    - `mexico_demand_targets_2022`
+    - `mexico_supply_targets_2022`
     - `rental_forecast_cohort_demand`
     - `rental_forecast_cohort_supply`
     - `rental_forecast_daily_demand`
     - `rental_forecast_daily_supply`
-    - `mexico_demand_targets_2022`
-    - `mexico_supply_targets_2022`
+    - `responses_action_line_ciq_full`
     - `ongoing_listings_target`
+    - `proj_agent_manager`
     - `rental_budget_targets`
     - `supply_targets_2022`
-    - `evictions_processes_forrent`
 
 </details>

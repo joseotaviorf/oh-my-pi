@@ -631,6 +631,12 @@ poa_partners:
     clean_table_name: poa_partners
     sheet_context: fintech
 
+process_eviction:
+    sheet_id: 13D27A-NeWnDC2-army_6c-mc-ORy5KEzrnVZfJv9aDM
+    sheet_name: datamart_send
+    clean_table_name: process_eviction
+    sheet_context: fintech
+
 target_nps_weekly:
     sheet_id: 17hx0dsLK4CJ-sivMf7w1L54LMpZgkHboKpuI0S1Di3o
     sheet_name: target_nps_weekly
@@ -693,10 +699,22 @@ aux_regiao:
     clean_table_name: auxiliary_region
     sheet_context: for_rent
 
+base_hunter:
+    sheet_id: 1gFxBxHVnmIveohw9fmRspW4ImPYSglH7dEITpFc17DI
+    sheet_name: Página1
+    clean_table_name: base_hunter
+    sheet_context: for_rent
+
 carteirizados_info:
     sheet_id: 1L1W6n1s8csGAmhUBH2kfDh7kE-cTCGKeL5FGRKVZRk4
     sheet_name: cart_base
     clean_table_name: carteirizados_info
+    sheet_context: for_rent
+
+ciq_training:
+    sheet_id: 1YsdJ-JHbCFlBL1_6XdiKScJGNrbbBPFglm_rn18iODA
+    sheet_name: Página1
+    clean_table_name: ciq_training
     sheet_context: for_rent
 
 demand_targets_2022:
@@ -705,18 +723,18 @@ demand_targets_2022:
     clean_table_name: demand_targets_2022
     sheet_context: for_rent
 
+estrutura_gerente_corretor:
+    sheet_id: 1ytcDCgwYO0hs2vEexqx8XlJe8etbg7yhLi44z2ja1zw
+    sheet_name: Base
+    clean_table_name: proj_agent_manager
+    sheet_context: for_rent
+
 evictions_processes_forrent:
     sheet_id: 13D27A-NeWnDC2-army_6c-mc-ORy5KEzrnVZfJv9aDM
     sheet_name: GSHEETS_INGESTION_DATALAKE
     clean_table_name: evictions_processes_forrent
     sheet_context: for_rent
     preload_time_in_seconds: 30
-
-mexico_demand_targets_2022:
-    sheet_id: 1bVwi_m_x-lxrXcx--VyPmbbqDovwbiST1vnTEXBO1FQ
-    sheet_name: demand_targets_mx_2022
-    clean_table_name: mexico_demand_targets_2022
-    sheet_context: for_rent
 
 forecast_cohort_demanda:
     sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
@@ -742,6 +760,24 @@ forecast_diario_supply:
     clean_table_name: rental_forecast_daily_supply
     sheet_context: for_rent
 
+listings_with_agreed_discounts:
+    sheet_id: 1Y6Z4CV1aDMey8vWnWqUZzpzPBz9os1shJ2anLtLT0Ds
+    sheet_name: db_discounts_fr
+    clean_table_name: listings_with_agreed_discounts
+    sheet_context: for_rent
+
+mexico_demand_targets_2022:
+    sheet_id: 1bVwi_m_x-lxrXcx--VyPmbbqDovwbiST1vnTEXBO1FQ
+    sheet_name: demand_targets_mx_2022
+    clean_table_name: mexico_demand_targets_2022
+    sheet_context: for_rent
+
+mexico_supply_targets_2022:
+    sheet_id: 1sEl5H0PpnoRrKB4JmGGLq9WG-sWrGIfA1n4Cs4vDz1Q
+    sheet_name: supply_targets_2022_mx
+    clean_table_name: mexico_supply_targets_2022
+    sheet_context: for_rent
+
 ongoing_listings_targets:
     sheet_id: 16BHKdlbn4stT8q4bdoGJ_0Fo9i4Z_ibOFevsBR4lD5s
     sheet_name: ongoing_listings_target
@@ -760,10 +796,10 @@ supply_targets_2022:
     clean_table_name: supply_targets_2022
     sheet_context: for_rent
 
-mexico_supply_targets_2022:
-    sheet_id: 1sEl5H0PpnoRrKB4JmGGLq9WG-sWrGIfA1n4Cs4vDz1Q
-    sheet_name: supply_targets_2022_mx
-    clean_table_name: mexico_supply_targets_2022
+tratativas_actionline_ciq_full_responses:
+    sheet_id: 1PNFjoLH0RvuQv5u8n4nYzDKF9RrRE2d1jTDPFJeBxA8
+    sheet_name: Form Responses 1
+    clean_table_name: responses_action_line_ciq_full
     sheet_context: for_rent
 
 #########################
@@ -929,6 +965,12 @@ affiliates_acquisition_targets:
     clean_table_name: affiliates_acquisition_targets
     sheet_context: static
 
+aglomerados_subnormais_2010_limites:
+    sheet_id: 1fANN7TIDQt7qxQMKV-MbCJEJjqaUHjoowKm2UgnNHH0
+    sheet_name: AglomeradosSubnormais2010_Limites
+    clean_table_name: census_subnormal_crowding_areas
+    sheet_context: static
+
 atribuicao_de_maturidade_e_validacao_do_cadastro:
     sheet_id: 1Q7nQfLRa_yTsqB0VN27AffeUES4r_urat3FA0R78MRI
     sheet_name: FINAL
@@ -981,6 +1023,12 @@ dados_docato:
     sheet_id: 1wValHoubCG72NQZkOAGMJyBQM26Dkd4QwzKW1IXhSTw
     sheet_name: dados_docato
     clean_table_name: legal_base_docato
+    sheet_context: static
+
+de_para_analistas_proowner:
+    sheet_id: 1qXhl565T30pxSCrd5zkq2m9Ch6way4_p9J4v9mjKS1c
+    sheet_name: Página1
+    clean_table_name: pro_owner_analyst
     sheet_context: static
 
 de_para_cancelamento:

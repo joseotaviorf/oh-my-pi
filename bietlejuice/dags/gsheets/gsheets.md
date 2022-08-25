@@ -24,7 +24,6 @@ This pipeline produces the following output tables:
 
 2. Data lake clean:
     - `acquisition_target_per_source`
-    - `actionline_negotiations`
     - `affiliate_type_targets`
     - `affiliates_extra_user_bonus`
     - `affiliates_active_segmentation`
@@ -36,7 +35,6 @@ This pipeline produces the following output tables:
     - `agreements_discounts_expenses_created`
     - `aux_agents_sale_hub`
     - `bandaid_off`
-    - `base_hunter`
     - `bbb22_coupon_sale_users`
     - `bbb22_giveaway_rent_users`
     - `braze_campaign_creative`
@@ -44,9 +42,7 @@ This pipeline produces the following output tables:
     - `casa_mineira_inside_sales_pipe`
     - `casa_mineira_marketing_cost_taxonomy`
     - `casa_mineira_marketing_manual_shared_costs`
-    - `census_subnormal_crowding_areas`
     - `ciq_costs`
-    - `ciq_training`
     - `city_share`
     - `classifieds_fup_history`
     - `contact_type_taxonomy`
@@ -79,7 +75,6 @@ This pipeline produces the following output tables:
     - `keys_logistic_onboarding_tenant`
     - `keys_logistic_pre_contract`
     - `link_call_ticket`
-    - `listings_with_agreed_discounts`
     - `local_holidays`
     - `marketing_costs_campaign_city`
     - `marketing_costs_google_ad_type_flags`
@@ -96,18 +91,12 @@ This pipeline produces the following output tables:
     - `offline_manual_costs`
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
-    - `ongoing_contracts_2020`
-    - `ongoing_contracts_2021`
     - `owner_negotiation_csat`
     - `owner_offboarding_repair_csat`
     - `photographer_account`
-    - `planning_rental_financial_targets`
     - `plaquinhas_installation_targets`
     - `plaquinhas_demand_targets`
-    - `pro_owner_analyst`
-    - `process_eviction`
     - `projreparos_espelhamento_dl`
-    - `proj_agent_manager`
     - `promotional_bonus_cluster_targets`
     - `promotional_bonus_segmentation_targets`
     - `promotional_bonus_user_cluster_targets`
@@ -120,7 +109,6 @@ This pipeline produces the following output tables:
     - `rental_flows_targets`
     - `rental_ntp_source_targets`
     - `rental_rtp_targets`
-    - `responses_action_line_ciq_full`
     - `retention_exclusivity_active_contact`
     - `sale_closing_ops_targets`
     - `sale_closing_ops_targets_extra_slas_tags`

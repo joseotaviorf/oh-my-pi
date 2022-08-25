@@ -21,6 +21,7 @@ This pipeline produces the following output tables:
 
 1. Data lake raw:
     - `affiliates_acquisition_targets`
+    - `aglomerados_subnormais_2010_limites`
     - `autonomous_agent_listing`
     - `autonomous_agent_payment_data_form_origin`
     - `autonomous_agent_payment_data_lead_origin`
@@ -31,6 +32,7 @@ This pipeline produces the following output tables:
     - `demand_targets_replanning`
     - `costs_allocation_relative_indexes`
     - `dados_docato`
+    - `de_para_analistas_proowner`
     - `de_para_cancelamento`
     - `for_sale_segmentation_survey`
     - `legacy_doorman`
@@ -58,6 +60,7 @@ This pipeline produces the following output tables:
     - `autonomous_agent_payment_data_form_origin`
     - `autonomous_agent_payment_data_lead_origin`
     - `aux_agents_sale`
+    - `census_subnormal_crowding_areas`
     - `demand_targets_2019`
     - `demand_targets_2020`
     - `demand_targets_2021`
@@ -71,6 +74,7 @@ This pipeline produces the following output tables:
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
     - `pld_suspicion_list`
+    - `pro_owner_analyst`
     - `rental_tof_monthly_targets`
     - `sale_business_unit_standardization`
     - `sale_nbp_source_targets`
