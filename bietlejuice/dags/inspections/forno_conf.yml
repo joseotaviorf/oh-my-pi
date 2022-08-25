@@ -19,8 +19,12 @@ tables:
     clean_table_name: issue_type
   item_group_type:
     clean_table_name: item_group_type
+    is_incremental: True
+    date_column: updated_at
   item_type:
     clean_table_name: item_type
+    is_incremental: True
+    date_column: updated_at
   revinfo:
     clean_table_name: rev_info
   room_type:

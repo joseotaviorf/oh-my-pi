@@ -2,7 +2,7 @@
 database_name: datalake_inspections_clean
 table_name: item_type
 columns:
-  id:
+  id_item_type:
     lineage:
       - datalake_inspections_raw.item_type.id
   id_item_group_type:
@@ -29,3 +29,12 @@ columns:
   ts_updated:
     lineage:
       - datalake_inspections_raw.item_type.updated_at
+  year:
+    lineage:
+      - datalake_inspections_raw.item_type.year
+  month:
+    lineage:
+      - datalake_inspections_raw.item_type.month
+  day:
+    lineage:
+      - datalake_inspections_raw.item_type.day
