@@ -1,12 +1,14 @@
 DROP TABLE IF EXISTS credit.fact_proposal_credit_flows;
 CREATE TABLE credit.fact_proposal_credit_flows (
     sk_client BIGINT,
+    sk_house_listing BIGINT,
     sk_contract_signed_date BIGINT,
     sk_credit_analysis INTEGER,
     sk_credit_analysis_approved_date BIGINT,
     sk_credit_evaluation_approved_date BIGINT,
     sk_first_credit_analysis INTEGER,
     sk_first_variant INTEGER,
+    sk_last_variant_not_null INTEGER,
     sk_guarantee_category INTEGER,
     sk_guarantee_paid_date BIGINT,
     sk_last_credit_analysis INTEGER,

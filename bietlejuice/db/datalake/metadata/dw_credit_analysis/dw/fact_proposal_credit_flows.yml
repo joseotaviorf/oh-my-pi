@@ -5,6 +5,9 @@ columns:
   sk_client:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_client
+  sk_house_listing:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_house_listing
   sk_contract_signed_date:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_contract_signed_date
@@ -23,6 +26,9 @@ columns:
   sk_first_variant:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.id_first_variant
+  sk_last_variant_not_null:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.id_last_variant_not_null
   sk_guarantee_category:
     lineage:
       - datalake_credit_analysis.credit_analysis.category

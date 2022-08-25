@@ -10,6 +10,7 @@ WITH credit_analysis AS (
 
 SELECT
   flrf.sk_client,
+  flrf.sk_house_listing,
   flrf.sk_contract_signed_date,
   CAST(COALESCE(ca.id_credit_analysis, -1) AS INTEGER) AS sk_credit_analysis,
   flrf.sk_credit_analysis_approved_date,
@@ -23,6 +24,7 @@ SELECT
   ) AS sk_credit_evaluation_approved_date,
   CAST(COALESCE(cap.id_first_credit_analysis, -1) AS INTEGER) AS sk_first_credit_analysis,
   CAST(COALESCE(cap.id_first_variant, -1) AS INTEGER) AS sk_first_variant,
+  CAST(COALESCE(cap.id_last_variant_not_null, -1) AS INTEGER) AS sk_last_variant_not_null,
   COALESCE(ca.category, -1) AS sk_guarantee_category,
   flrf.sk_guarantee_paid_date,
   CAST(COALESCE(cap.id_last_credit_analysis, -1) AS INTEGER) AS sk_last_credit_analysis,
