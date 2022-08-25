@@ -38,6 +38,9 @@ columns:
   dt_end_7:
     lineage:
       - datalake_quintoandar.aux_date.date
+  dt_end_8:
+    lineage:
+      - datalake_quintoandar.aux_date.date
   dt_end_15:
     lineage:
       - datalake_quintoandar.aux_date.date
