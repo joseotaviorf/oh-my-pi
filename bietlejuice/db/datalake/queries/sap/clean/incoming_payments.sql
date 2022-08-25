@@ -1,8 +1,8 @@
 SELECT
   transaction_id_transid AS id_transaction,
   business_entity_id_ref1 AS id_business_entity,
-  financial_entity_id_ref2 AS id_financial_entity,
-  financial_entity_entry_id_u_financialentityentryid AS id_financial_entity_entry,
+  financial_entity_id_u_financeentityid AS id_financial_entity,
+  legacy_uuid_u_rsd_uuidsb AS legacy_uuid,
   external_payment_id_u_externalpaymentid AS id_external_payment,
   createdby_usersign AS id_user_sign,
   uuid_u_rsd_uuid AS uuid,

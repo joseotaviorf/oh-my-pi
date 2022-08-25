@@ -12,9 +12,6 @@ tables:
   incoming_payments:
     query_code: DATA-4
     schema_name: INCOMING_PAYMENTS
-  other_entries:
-    query_code: DATA-5
-    schema_name: OTHER_ENTRIES
 partition_cols:
   - year
   - month

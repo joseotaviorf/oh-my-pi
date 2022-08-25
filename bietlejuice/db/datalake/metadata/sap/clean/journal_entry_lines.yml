@@ -29,6 +29,9 @@ columns:
   memo_line:
     lineage:
       - datalake_sap_raw.journal_entry_lines.memo_linememo
+  account:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.account_account
   account_shortname:
     lineage:
       - datalake_sap_raw.journal_entry_lines.account_shorname

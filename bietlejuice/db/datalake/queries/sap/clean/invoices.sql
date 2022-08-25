@@ -6,6 +6,7 @@ SELECT
   financial_entity_entry_id_u_financialentityentryid AS id_financial_entity_entry,
   createdby_usersign AS id_user_sign,
   uuid_u_rsd_uuid AS uuid,
+  legacy_uuid_u_rsd_uuidsb AS legacy_uuid,
   docentry AS document_entry,
   memo,
   source_client_u_sourceclient AS source_client,

@@ -10,16 +10,16 @@ columns:
       - datalake_sap_raw.incoming_payments.business_entity_id_ref1
   id_financial_entity:
     lineage:
-      - datalake_sap_raw.incoming_payments.financial_entity_id_ref2
-  id_financial_entity_entry:
-    lineage:
-      - datalake_sap_raw.incoming_payments.financial_entity_entry_id_u_financialentityentryid
+      - datalake_sap_raw.incoming_payments.id_u_financeentityid
   id_external_payment:
     lineage:
       - datalake_sap_raw.incoming_payments.external_payment_id_u_externalpaymentid
   id_user_sign:
     lineage:
       - datalake_sap_raw.incoming_payments.createdby_usersign
+  legacy_uuid:
+    lineage:
+      - datalake_sap_raw.incoming_payments.legacy_uuid_u_rsd_uuidsb
   uuid:
     lineage:
       - datalake_sap_raw.incoming_payments.uuid_u_rsd_uuid

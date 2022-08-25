@@ -23,6 +23,9 @@ columns:
   uuid:
     lineage:
       - datalake_sap_raw.invoices.uuid_u_rsd_uuid
+  legacy_uuid:
+    lineage:
+      - datalake_sap_raw.invoices.legacy_uuid_u_rsd_uuidsb
   document_entry:
     lineage:
       - datalake_sap_raw.invoices.docentry

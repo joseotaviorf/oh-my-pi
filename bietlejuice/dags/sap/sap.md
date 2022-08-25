@@ -20,6 +20,5 @@ This pipeline produces the following output table in the raw and clean layers:
     - `invoices`
     - `journal_entries`
     - `journal_entry_lines`
-    - `other_entries`
 
 </details>

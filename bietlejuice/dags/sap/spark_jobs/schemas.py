@@ -22,11 +22,6 @@ class SapSchemaEnum:
             StructField(
                 "External Payment ID (U_ExternalPaymentId)", StringType(), True
             ),
-            StructField(
-                "Financial Entity Entry ID (U_FinancialEntityEntryId)",
-                StringType(),
-                True,
-            ),
             StructField("Financial Entity ID (Ref2)", StringType(), True),
             StructField("LocTotal", DoubleType(), True),
             StructField("Memo", StringType(), True),
@@ -43,7 +38,8 @@ class SapSchemaEnum:
 
     JOURNAL_ENTRY_LINES = StructType(
         [
-            StructField("Account (ShorName)", StringType(), True),
+            StructField("Account (Account)", StringType(), True),
+            StructField("Account (ShortName)", StringType(), True),
             StructField("AccrualDate (Ref3Line)", StringType(), True),
             StructField("Business Entity ID (Ref1)", StringType(), True),
             StructField("Cost Center (OcrCode2)", StringType(), True),
@@ -83,6 +79,7 @@ class SapSchemaEnum:
                 True,
             ),
             StructField("Financial Entity ID (Ref2)", StringType(), True),
+            StructField("Legacy UUID (U_RSD_UUIDSB)", StringType(), True),
             StructField("LocTotal", DoubleType(), True),
             StructField("Memo", StringType(), True),
             StructField("RefDate", StringType(), True),
@@ -99,7 +96,7 @@ class SapSchemaEnum:
     INCOMING_PAYMENTS = StructType(
         [
             StructField("AccrualDate (U_AccrualDate)", StringType(), True),
-            StructField("Business Entity ID (Ref1)", StringType(), True),
+            StructField("Business Entity ID (U_BusinessEntityId)", StringType(), True),
             StructField("CreateDate", StringType(), True),
             StructField("CreatedBy (UserSign)", IntegerType(), True),
             StructField("DocDate", StringType(), True),
@@ -108,12 +105,8 @@ class SapSchemaEnum:
             StructField(
                 "External Payment ID (U_ExternalPaymentId)", StringType(), True
             ),
-            StructField(
-                "Financial Entity Entry ID (U_FinancialEntityEntryId)",
-                StringType(),
-                True,
-            ),
-            StructField("Financial Entity ID (Ref2)", StringType(), True),
+            StructField("Financial Entity ID (U_FinanceEntityId))", StringType(), True),
+            StructField("Legacy UUID (U_RSD_UUIDSB)", StringType(), True),
             StructField("LocTotal", DoubleType(), True),
             StructField("Memo", StringType(), True),
             StructField("RefDate", StringType(), True),
@@ -121,33 +114,7 @@ class SapSchemaEnum:
             StructField("TaxDate", StringType(), True),
             StructField("Transaction ID (TransId)", IntegerType(), True),
             StructField("Transaction Type (TransType)", StringType(), True),
-            StructField("UUID (U_RSD_UUID)", StringType(), True),
-            StructField("UpdateDate", StringType(), True),
-            StructField("UpdatedBy (UserSign2)", IntegerType(), True),
-        ]
-    )
-
-    OTHER_ENTRIES = StructType(
-        [
-            StructField("AccrualDate (Ref3)", StringType(), True),
-            StructField("Business Entity ID (Ref1)", StringType(), True),
-            StructField("CreateDate", StringType(), True),
-            StructField("CreatedBy (UserSign)", IntegerType(), True),
-            StructField("DocDate", StringType(), True),
-            StructField("DocEntry", StringType(), True),
-            StructField("DueDate", StringType(), True),
-            StructField(
-                "External Payment ID (U_ExternalPaymentId)", StringType(), True
-            ),
-            StructField("Financial Entity ID (Ref2)", StringType(), True),
-            StructField("LocTotal", DoubleType(), True),
-            StructField("Memo", StringType(), True),
-            StructField("RefDate", StringType(), True),
-            StructField("Source Client (U_SourceClient)", StringType(), True),
-            StructField("TaxDate", StringType(), True),
-            StructField("Transaction ID (TransId)", IntegerType(), True),
-            StructField("Transaction Type (TransType)", StringType(), True),
-            StructField("UUID (U_RSD_UUID)", StringType(), True),
+            StructField("UUID (U_OINV_UUID)", StringType(), True),
             StructField("UpdateDate", StringType(), True),
             StructField("UpdatedBy (UserSign2)", IntegerType(), True),
         ]
