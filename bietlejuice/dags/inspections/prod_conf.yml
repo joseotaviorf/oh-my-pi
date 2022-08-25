@@ -11,8 +11,6 @@ tables:
     clean_table_name: assessment
     is_incremental: True
     date_column: updated_at
-  assessment_aud:
-    clean_table_name: assessment_aud
   inspection:
     clean_table_name: inspection
   inspection_aud:
