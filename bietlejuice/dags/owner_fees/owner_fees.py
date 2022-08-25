@@ -95,7 +95,7 @@ for table in configs_file:
     if extraction_type == "incremental":
         parameters.extend([table["date_filter_column"], "{{ ds }}"])
 
-    raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{extraction_type}_data_into_datalake_raw.py.py"
+    raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{extraction_type}_data_into_datalake_raw.py"
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         table_name=table_name,
