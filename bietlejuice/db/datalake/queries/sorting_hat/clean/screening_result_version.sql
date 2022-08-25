@@ -7,9 +7,11 @@ SELECT
   operation_type,
   risk_category,
   score,
+  risk_category_canon,
   proposal_id_mod AS mod_id_proposal,
   liquidity_mod AS mod_liquidity,
   risk_category_mod AS mod_risk_category,
-  score_mod AS mod_score
+  score_mod AS mod_score,
+  risk_category_canon_mod AS mod_risk_category_canon
 FROM 
   datalake_sorting_hat_raw.screeningresult_version

@@ -16,3 +16,6 @@ columns:
   id_proposal:
     lineage:
       - datalake_sorting_hat_raw.screeningresult.proposal_id
+  risk_category_canon:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult.risk_category_canon

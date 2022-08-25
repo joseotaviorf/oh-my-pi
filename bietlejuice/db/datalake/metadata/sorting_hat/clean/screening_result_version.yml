@@ -25,6 +25,9 @@ columns:
   score:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.score
+  risk_category_canon:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult_version.risk_category_canon
   mod_id_proposal:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.proposal_id_mod
@@ -37,3 +40,6 @@ columns:
   mod_score:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.score_mod
+  mod_risk_category_canon:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult_version.risk_category_canon_mod
