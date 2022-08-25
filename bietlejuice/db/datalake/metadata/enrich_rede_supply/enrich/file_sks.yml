@@ -1,0 +1,7 @@
+---
+database_name: datalake_rede_supply
+table_name: file_sks
+columns:
+  id_file:
+    lineage:
+      - datalake_brokers_supply_processor.file.id

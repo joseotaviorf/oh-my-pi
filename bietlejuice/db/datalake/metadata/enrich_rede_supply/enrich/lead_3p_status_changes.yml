@@ -1,0 +1,38 @@
+---
+database_name: datalake_rede_supply
+table_name: lead_3p_status_changes
+columns:
+  id_status_change:
+    lineage:
+      - datalake_rede_supply.simplified_lead_3p_status_changes.id_status_change
+  id_lead_3p:
+    lineage:
+      - datalake_rede_supply.simplified_lead_3p_status_changes.id_lead_3p
+  id_company_hubspot:
+    lineage:
+      - datalake_rede_supply.simplified_lead_3p_status_changes.id_company_hubspot
+  id_file:
+    lineage:
+      - datalake_rede_supply.simplified_lead_3p_status_changes.id_file
+  id_house:
+    lineage:
+      - datalake_rede_supply.simplified_lead_3p_status_changes.id_house
+  status:
+    lineage:
+      - datalake_rede_supply.simplified_lead_3p_status_changes.status
+      - datalake_rede_supply.simplified_lead_3p_status_changes.listing_status
+  is_waiting_for_enrichment:
+    lineage:
+      - datalake_rede_supply.simplified_lead_3p_status_changes.is_waiting_for_enrichment
+  is_ineligible:
+    lineage:
+      - datalake_rede_supply.simplified_lead_3p_status_changes.is_ineligible
+  is_discarded:
+    lineage:
+      - datalake_rede_supply.simplified_lead_3p_status_changes.is_discarded
+  ts_status_started:
+    lineage:
+      - datalake_rede_supply.simplified_lead_3p_status_changes.ts_status_started
+  ts_status_ended:
+    lineage:
+      - datalake_rede_supply.simplified_lead_3p_status_changes.ts_status_started

@@ -1,0 +1,56 @@
+---
+database_name: datalake_rede_supply
+table_name: lead_3p_reason_changes
+columns:
+  id_lead_3p:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.id
+  id_company_hubspot:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.id_company_hubspot
+  id_file:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.id_file
+  reason:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.status_reason
+  reason_type:
+    lineage:
+      - datalake_gsheets_clean.supply_processor_status_reasons.reason_type
+  status_when_reason_started:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.status
+  growth_status_when_reason_started:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.growth_status
+  status_when_reason_ended:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.status
+  growth_status_when_reason_ended:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.growth_status
+  is_waiting_for_enrichment_when_reason_started:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.is_waiting_for_enrichment
+  is_ineligible_when_reason_started:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.is_ineligible
+  is_discarded_when_reason_started:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.is_discarded
+  is_waiting_for_enrichment_when_reason_ended:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.is_waiting_for_enrichment
+  is_ineligible_when_reason_ended:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.is_ineligible
+  is_discarded_when_reason_ended:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.is_discarded
+  ts_reason_started:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.ts_updated
+  ts_reason_ended:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.ts_updated
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started

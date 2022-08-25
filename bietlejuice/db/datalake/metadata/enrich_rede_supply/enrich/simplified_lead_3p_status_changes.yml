@@ -1,0 +1,37 @@
+---
+database_name: datalake_rede_supply
+table_name: simplified_lead_3p_status_changes
+columns:
+  id_lead_3p:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.id
+      - datalake_brokers_supply_processor.lead_3p.id
+  id_company_hubspot:
+    lineage:
+      - datalake_hubspot.company.id_company
+  id_file:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.id_file
+      - datalake_brokers_supply_processor.lead_3p.id_file
+  id_house:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_house
+  status:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.status
+  listing_status:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.status_history
+  ts_status_started:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.ts_updated
+      - datalake_sale_listings.sale_listing_status.ts_status_started
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.year
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.month
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.day

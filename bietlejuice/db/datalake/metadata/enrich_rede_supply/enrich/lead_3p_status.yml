@@ -1,0 +1,19 @@
+---
+database_name: datalake_rede_supply
+table_name: lead_3p_status
+columns:
+  status:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.status
+  growth_status:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.growth_status
+  is_waiting_for_enrichment:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.is_waiting_for_enrichment
+  is_ineligible:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.is_ineligible
+  is_discarded:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.is_discarded
