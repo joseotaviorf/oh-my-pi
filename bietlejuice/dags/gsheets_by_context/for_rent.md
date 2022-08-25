@@ -27,7 +27,6 @@ This pipeline produces the following output tables:
     - `ciq_training`
     - `demand_targets_2022`
     - `estrutura_gerente_corretor`
-    - `evictions_processes_forrent`
     - `forecast_cohort_demanda`
     - `forecast_cohort_supply`
     - `forecast_diario_demanda`
@@ -47,7 +46,6 @@ This pipeline produces the following output tables:
     - `carteirizados_info`
     - `ciq_training`
     - `demand_targets_2022`
-    - `evictions_processes_forrent`
     - `listings_with_agreed_discounts`
     - `mexico_demand_targets_2022`
     - `mexico_supply_targets_2022`

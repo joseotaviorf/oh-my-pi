@@ -1,0 +1,64 @@
+---
+database_name: datalake_gsheets_clean
+table_name: evictions_processes_forrent
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.contract_id
+  id_process:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.process_number
+  alert_message:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.alert_str
+  responsible:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.resp
+  process_status:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.process_status
+  action_type_name:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.action_type
+  deal_status:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.deal_status
+  contract_status:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.contract_status
+  off_status:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.off_status
+  dt_insertion:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.insertion_date
+  dt_sentence:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.sentence_date
+  dt_final_sentence:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.final_sentence_date
+  dt_distribution:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.distribution_date
+  dt_deal_begin:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.deal_begin_date
+  dt_deal_end:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.deal_end_date
+  dt_deal_paid:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.deal_paid_dt
+  dt_no_deal_paid:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.no_deal_paid_dt
+  dt_finalizing:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.finalizing_dt
+  dt_contract_termination:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.termination_dt
+  
+  
+

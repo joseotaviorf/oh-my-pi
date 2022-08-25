@@ -31,6 +31,7 @@ This pipeline produces the following output tables:
     - `closing_analysts_hierarchy`
     - `cod_locale`
     - `credit_decisions_auditing`
+    - `evictions_processes_forrent`
     - `for_sale_bandaids`
     - `for_sale_financial_flow`
     - `for_sale_sap_invoices`
@@ -60,6 +61,7 @@ This pipeline produces the following output tables:
     - `closing_analysts_hierarchy`
     - `cod_locale`
     - `credit_decisions_auditing`
+    - `evictions_processes_forrent`
     - `for_sale_bandaids`
     - `for_sale_financial_flow`
     - `for_sale_sap_invoices`
