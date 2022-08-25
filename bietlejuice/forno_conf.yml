@@ -95,7 +95,6 @@ cluster_template:
                 destination: s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id}}
                 region: us-east-1
         cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
-        cluster_source: API
         custom_tags:
             - key: application
               value: airflow
@@ -104,7 +103,7 @@ cluster_template:
             - key: environment
               value: "{{ var.value.environment }}"
             - key: owner
-              value: analytics-engineering
+              value: "{{ task.owner.lower().replace(' ', '-') }}"
             - key: ecosystem
               value: data-engineering
             - key: data-classification
