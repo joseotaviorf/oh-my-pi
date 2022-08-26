@@ -14,5 +14,5 @@ class DAGOwnerEnum:
     DATA_GOVERNANCE = "Data Governance"
     DATA_GROWTH = "Data Growth"
     DATA_INTERNATIONAL = "Data International"
-    DATA_SS = "Data S&S"
+    DATA_SS = "Data SS"
     MLOPS = "MLOps"
