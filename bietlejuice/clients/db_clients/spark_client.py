@@ -41,7 +41,7 @@ class SparkClient(DBClient):
         #  the session is never closed explicitly.
         self.conn.sql(command)
 
-    @logger
+    @logger(exclude="options")
     def get_data_from_external_source(self, format, options, path=None):
         """
         Gets data from an external source with spark.
