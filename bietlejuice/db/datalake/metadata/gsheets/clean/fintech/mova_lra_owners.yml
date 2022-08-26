@@ -8,6 +8,12 @@ columns:
   cccb_number:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.numero_cccb
+  bank_account_number:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.conta
+  bank_branch_number:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.agencia
   compensatory_interest:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.juros_remuneratorios
@@ -74,6 +80,18 @@ columns:
   paid_value:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.valor_pago
+  gross_value:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.Valor_Bruto
+  net_value:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.Valor_Liquido
+  iof_tax_value:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.IOF
+  mova_fee_value:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.Fee_MOVA
   request_status:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.status_solicitacao
@@ -92,6 +110,9 @@ columns:
   sk_product:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.produto_id
+  id_bank:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.banco
   ts_created_at:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.created_at
