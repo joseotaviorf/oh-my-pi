@@ -11,4 +11,5 @@ SELECT
 	ts_first_message,
 	ts_updated,
 	NOW() AS ts_load
-FROM datalake_sauron.session
+FROM
+	datalake_sauron.session

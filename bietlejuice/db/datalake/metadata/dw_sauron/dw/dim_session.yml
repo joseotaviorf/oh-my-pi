@@ -1,3 +1,4 @@
+---
 database_name: dw_sauron
 table_name: dim_session
 columns:
@@ -34,4 +35,3 @@ columns:
   ts_updated:
     lineage:
       - datalake_sauron.session.ts_updated
-  
