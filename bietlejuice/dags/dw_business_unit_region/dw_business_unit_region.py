@@ -2,7 +2,7 @@ import os
 import pendulum
 from datetime import datetime
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -37,9 +37,7 @@ local_tz = pendulum.timezone("America/Sao_Paulo")
 main_start_date = datetime(2021, 8, 2, 0, 0, 0, tzinfo=local_tz)
 
 spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
-logs_output_path = f"{spark_jobs_logs_path}{DAG_ID}"
-cluster_description = Variable.get("databricks_default_cluster", deserialize_json=True)
-cluster_description["cluster_log_conf"]["s3"]["destination"] = logs_output_path
+cluster_description = configs_service.get_config("databricks_10_4_med_memory_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {

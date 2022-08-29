@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -27,6 +27,7 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(DAG_NAME)
+
 default_libraries = config_service.get_config("default_libraries")
 spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 dw_bucket = config_service.get_config("dw_bucket")
@@ -37,10 +38,8 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 
 SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
-LOGS_OUTPUT_PATH = f"{spark_jobs_logs_path}{DAG_ID}"
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {

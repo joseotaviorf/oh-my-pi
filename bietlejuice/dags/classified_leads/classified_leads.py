@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -28,15 +28,10 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 )
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
-SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 
 LOAD_CLASSIFIED_LEADS_INTO_DATALAKE_RAW_FILE_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{SOURCE}/load_classified_leads_into_datalake.py"
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
