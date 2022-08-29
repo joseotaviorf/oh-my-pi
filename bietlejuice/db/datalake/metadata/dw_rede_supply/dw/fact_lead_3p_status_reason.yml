@@ -1,0 +1,37 @@
+---
+database_name: dw_rede
+table_name: fact_lead_3p_status_reason
+columns:
+  sk_lead_3p:
+    lineage:
+      - datalake_rede_supply.lead_3p_sks.sk_lead_3p
+  sk_company:
+    lineage:
+      - datalake_rede_company.company_sks.sk_company
+  sk_file:
+    lineage:
+      - datalake_rede_supply.file_sks.sk_file
+  sk_lead_3p_reason:
+    lineage:
+      - datalake_rede_supply.lead_3p_reasons.sk_lead_3p_reason
+  sk_reason_started_date:
+    lineage:
+      - datalake_rede_supply.lead_3p_reason_changes.ts_reason_started
+  sk_reason_ended_date:
+    lineage:
+      - datalake_rede_supply.lead_3p_reason_changes.ts_reason_ended
+  sk_status_when_reason_started:
+    lineage:
+      - datalake_rede_supply.lead_3p_status.sk_status_when_reason_started
+  sk_status_when_reason_ended:
+    lineage:
+      - datalake_rede_supply.lead_3p_status.sk_status_when_reason_ended
+  days_in_reason:
+    lineage:
+      - datalake_rede_supply.lead_3p_reason_changes.days_in_reason
+  ts_reason_started:
+    lineage:
+      - datalake_rede_supply.lead_3p_reason_changes.ts_reason_started
+  ts_reason_ended:
+    lineage:
+      - datalake_rede_supply.lead_3p_reason_changes.ts_reason_ended

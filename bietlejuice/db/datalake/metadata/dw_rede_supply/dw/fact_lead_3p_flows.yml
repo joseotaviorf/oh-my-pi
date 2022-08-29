@@ -1,0 +1,49 @@
+---
+database_name: dw_rede
+table_name: fact_lead_3p_flows
+columns:
+  sk_lead_3p:
+    lineage:
+      - datalake_rede_supply.lead_3p_sks.sk_lead_3p
+  sk_file:
+    lineage:
+      - datalake_rede_supply.file_sks.sk_file
+  sk_company:
+    lineage:
+      - datalake_rede_company.company_sks.sk_company
+  sk_lead_3p_status:
+    lineage:
+      - datalake_rede_supply.lead_3p_status.sk_lead_3p_status
+  sk_house:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.id_house
+  sk_lead_date:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  sk_prospect_date:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  sk_qualified_date:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  sk_opportunity_date:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  sk_first_listing_date:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  ts_lead:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  ts_prospect:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  ts_qualified:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  ts_opportunity:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  ts_first_listing:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
