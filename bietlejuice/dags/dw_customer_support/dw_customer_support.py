@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -10,6 +10,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
@@ -25,6 +26,7 @@ DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 config_service = ConfigurationService(DAG_NAME)
+
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 dw_bucket = config_service.get_config("dw_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
@@ -37,11 +39,18 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 inner_dependencies = config_service.get_config("inner_dependencies")
 incremental_tables = config_service.get_config("incremental_tables")
 
-BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
-CLUSTER_DESCRIPTION = Variable.get("databricks_crm_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
+
+cluster_configuration = config_service.get_config("custom_cluster")
+cluster_configuration["spark_conf"].update(config_service.get_config("spark_conf"))
+
+default_libraries = config_service.get_config("default_libraries")
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -58,7 +67,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_configuration,
+    libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -71,7 +84,7 @@ task_group = DWTaskGroup(
     dw_bucket=dw_bucket,
     dw_schema=DW_SCHEMA,
     relative_query_path=DAG_NAME,
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    spark_jobs_path=base_spark_jobs_path,
 )
 
 dw_staging_task_group = {}
