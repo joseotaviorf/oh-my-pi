@@ -948,6 +948,18 @@ bietlejuice.dw_rede_company:
   - bietlejuice.enrich_hubspot:load-enrich-company
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
 
+bietlejuice.dw_rede_supply:
+  - bietlejuice.enrich_brokers_supply_processor:load-enrich-file
+  - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
+  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
+  - bietlejuice.enrich_rede_supply:load-enrich-file-sks
+  - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reasons
+  - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reason-changes
+  - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-sks
+  - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status
+  - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
+
 bietlejuice.dw_region:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
