@@ -2,7 +2,7 @@ import os
 import pendulum
 from datetime import datetime, timedelta
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 
 from airflow.operators.python_operator import ShortCircuitOperator
@@ -63,10 +63,9 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "databricks_10_4_min_io-general_cluster"
+)
 
 default_libraries = config_service.get_config("default_libraries")
 

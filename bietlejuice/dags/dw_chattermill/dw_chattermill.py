@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -37,8 +37,9 @@ DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 LOGS_OUTPUT_PATH = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "databricks_10_4_min_io-general_cluster"
+)
 
 default_libraries = config_service.get_config("default_libraries")
 
