@@ -16,9 +16,13 @@ class BaseValidationSuitesExecutor:
     def __init__(self, auth=None) -> None:
         self.auth = auth
         self._suite_validation_has_failures = False
+        self.errors = []
 
     def get_suite_validation_has_failures(self) -> bool:
         return self._suite_validation_has_failures
+
+    def get_suite_validation_failures_messages(self) -> list:
+        return self.errors
 
     def set_suite_validation_has_failures(self, state) -> None:
         self._suite_validation_has_failures = state
@@ -51,6 +55,14 @@ class BaseValidationSuitesExecutor:
 
                 logger.info("m=run, msg=:::: VALIDATION SUCCEEDED ::::")
             except Exception as e:
+                if self.errors == [] and hasattr(self, "SLACK_MSG_HEADER"):
+                    self.errors.append(
+                        (self.SLACK_MSG_HEADER, self.__dict__.get("SLACK_CHANNEL"))
+                    )
+                default_message = f":exclamation: Error validating with {validate_method_name} on {self.__class__.__name__}"
+                error_message = self.__dict__.get("SLACK_MSG", default_message)
+                self.errors.append((error_message, self.__dict__.get("SLACK_CHANNEL")))
+
                 self.set_suite_validation_has_failures(True)
                 logger.error(e)
                 logger.info(

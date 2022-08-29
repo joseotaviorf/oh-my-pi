@@ -19,7 +19,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.services import FileService
 from bietlejuice.base.service import ServiceEnum
 from bietlejuice.base.pipeline import LayerEnum, MetadataTypeEnum
-from bietlejuice.base.api import APIEnum
+from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.metadata_propagator_pipeline.atlas_quality_metrics_pipeline import (
     AtlasQualityMetricsPipeline,
@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     if validation_results["metadata"]["suite_result"] != "SUCCESS":
         slack_webhook = dbutils.secrets.get(
-            scope="quintoandar", key=APIEnum.AIRFLOW_ALERTS_INMETRO_SLACK_WEBHOOK
+            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_AIRFLOW_DE_DAGS_INMETRO
         )
 
         messenger = SlackMessenger(slack_webhook)

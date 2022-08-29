@@ -7,7 +7,7 @@ from quintoandar_logger import QuintoAndarLogger
 from inmetro.messengers import SlackMessenger
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
 
 
 def create_message(environment, database_name, table_name, count_result):
@@ -79,7 +79,7 @@ if __name__ == "__main__":
         )
 
         slack_webhook = dbutils.secrets.get(
-            scope="quintoandar", key=APIEnum.AIRFLOW_ALERTS_INMETRO_SLACK_WEBHOOK
+            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_AIRFLOW_DE_DAGS_INMETRO
         )
 
         messenger = SlackMessenger(slack_webhook)

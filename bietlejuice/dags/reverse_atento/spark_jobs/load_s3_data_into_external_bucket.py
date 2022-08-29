@@ -9,7 +9,7 @@ from inmetro.messengers import SlackMessenger
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
 
 import boto3
 from pyspark.sql.utils import AnalysisException
@@ -117,7 +117,7 @@ if __name__ == "__main__":
         if base_dbutils.get_dbutils() is not None:
             dbutils = base_dbutils.get_dbutils()
         slack_webhook = dbutils.secrets.get(
-            scope="quintoandar", key=APIEnum.AIRFLOW_ALERTS_INMETRO_SLACK_WEBHOOK
+            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_AIRFLOW_DE_DAGS_INMETRO
         )
 
         messenger = SlackMessenger(slack_webhook)

@@ -12,6 +12,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base import DATALAKE_SQL_DIR
 from bietlejuice.base.api import APIEnum
+from bietlejuice.base.notification import SLACK_USER_GROUPS_MAPPING_PATH
 from bietlejuice.base.validation_suites.executors.base_validation_suites_executor import (
     BaseValidationSuitesExecutor,
 )
@@ -48,6 +49,9 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         self.drive_service = self.build_drive_api_service()
 
         self.delta = self.get_recently_modified_gsheet(self.drive_service)
+        self.context_slack_owner_dict = FileService.get_dict_from_yaml_file(
+            SLACK_USER_GROUPS_MAPPING_PATH
+        )
 
     def __generate_schema(self, data: Union[List[Dict], List], sheet_name: str):
         """
@@ -65,6 +69,9 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
             return schema
 
         raise ValueError(f"m=__generate_schema, msg=Table {sheet_name} Empty!")
+
+    def _get_slack_group_from_context(self, context_name: str):
+        return self.context_slack_owner_dict.get(context_name)
 
     def get_credentials_and_scope(self) -> Tuple[dict, str]:
         credentials = self.auth[APIEnum.GSHEETS_CREDENTIALS]
@@ -159,7 +166,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
 
         :returns: A list of spreadsheet_ids (strings)
         """
-        files = []
+        files = {}
         page_token = None
         time_zone = pendulum.timezone("America/Sao_Paulo")
         execution_time = datetime.now(tz=time_zone) - timedelta(hours=24)
@@ -171,7 +178,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
                 .list(
                     q=query,
                     spaces="drive",
-                    fields="nextPageToken, files(id)",
+                    fields="nextPageToken, files(id, modifiedTime, lastModifyingUser(displayName, emailAddress))",
                     supportsAllDrives=True,
                     includeItemsFromAllDrives=True,
                     pageToken=page_token,
@@ -180,7 +187,19 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
             )
 
             for file in response.get("files", []):
-                files.append(file.get("id"))
+                files.update(
+                    {
+                        file.get("id"): {
+                            "modified_time": file.get("modifiedTime"),
+                            "modifier_user_email": file.get(
+                                "lastModifyingUser", {}
+                            ).get("emailAddress", "User email unkown"),
+                            "modifier_user_name": file.get("lastModifyingUser", {}).get(
+                                "displayName", "User name unkown"
+                            ),
+                        }
+                    }
+                )
 
             page_token = response.get("nextPageToken", None)
             if page_token is None:

@@ -1,0 +1,13 @@
+# This follows the template <!subteam^{ID}|{HANDLE}>,
+# where ID is get from slack web, via https://app.slack.com/client/T00000T/browse-user-groups/user_groups/{ID}
+# and HANDLE is the alias you want to use.
+# Example on: https://stackoverflow.com/questions/54284389/mention-users-group-via-slack-api
+bedrock: <!subteam^S02PEU3L274|@data-ae-bedrock>
+fintech: <!subteam^S03RTEGMBME|@ae-finance-fintech>
+for_rent: <!subteam^S019UM4HADD|@data-for-rent>
+for_sale: <!subteam^S02ALAW0L0G|@data-for-sale>
+growth: <!subteam^S01AFJT32SG|@ae-growth>
+international: <!subteam^S03UKFHC4NT|@ae-international>
+support_and_service: <!subteam^S02P870G95L|@data-ae-ss>
+general: <!subteam^S031HG8T5MZ|@analytics-engineers>
+static: <!subteam^S031HG8T5MZ|@analytics-engineers>
