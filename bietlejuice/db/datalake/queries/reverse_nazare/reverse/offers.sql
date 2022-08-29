@@ -91,6 +91,7 @@ SELECT
     dh.number AS house_number,
     dh.zipcode AS house_zipcode,
     ds.sale_price_agreed AS price_agreed,
+    ds.brokerage_fee AS brokage,
     ds.sale_agreement_cancellation_reason AS cancellation_reason,
     ds.ts_sale_agreement_cancelled AS cancellation_date,
     TO_DATE(STRING(fc.sk_payment_allowed_date), 'yyyyMMdd') AS payment_allowed_date,
