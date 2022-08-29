@@ -25,6 +25,7 @@ This pipeline creates the tables in the schema `dw_datamart` of data lake and `d
 - performance_marketing_metrics_imobiliaria_casa_mineira
 - performance_marketing_metrics_portal_casa_mineira
 - sale_performance_marketing_metrics_supply_cohort
+- plaquinhas_houses
 
 ### Additional Information
 
