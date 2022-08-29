@@ -92,3 +92,8 @@ dw_task_group = dw_task_group.build_task_group_from_sql_files(
 chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
 TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
 chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)
+
+# Set data quality tasks if exists
+independent_tasks = DWTaskGroup.all_independent_tasks(dw_staging_task_group)
+if independent_tasks:
+    terminate_cluster_task.set_upstream(independent_tasks)
