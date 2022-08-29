@@ -8,4 +8,5 @@ SELECT
     ts_created,
     ts_updated,
     NOW() AS ts_load
-FROM datalake_quinto_messenger.channel
+FROM
+    datalake_quinto_messenger.channel

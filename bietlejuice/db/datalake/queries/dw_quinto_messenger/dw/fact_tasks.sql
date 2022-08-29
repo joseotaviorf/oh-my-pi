@@ -1,4 +1,4 @@
-SELECT  
+SELECT
     t.id_task AS sk_task,
     c.id_conversation AS sk_chat,
     t.id_agent AS sk_quinto_messenger_agent,
@@ -7,6 +7,8 @@ SELECT
     t.seconds_to_first_response AS seconds_first_reply,
     t.task_number,
     NOW() AS ts_load
-FROM datalake_quinto_messenger.task t
-INNER JOIN datalake_quinto_messenger.channel c
-    ON t.id_channel = c.id_channel
+FROM
+    datalake_quinto_messenger.task t
+INNER JOIN
+    datalake_quinto_messenger.channel c
+        ON t.id_channel = c.id_channel
