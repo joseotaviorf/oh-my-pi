@@ -6,8 +6,9 @@ This DAG loads the DW tables of our Call data. This data is related to the syste
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>​
 
-### Execution​ Interval
-This DAG is triggered once per day via Mediator, after `enrich_bigfone_twilio` DAG, usually around 6:30 A.M. UTC.
+### Execution Interval
+
+This DAG is trigged daily.
 
 More information about run time [here]({chart_url}{dag_id}).
 
@@ -22,8 +23,8 @@ This pipeline produces the following output tables:
 - `fact_call_tasks`
 - `fact_ivr_paths`
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+### Responsible Data Engineering Team
+
+For any questions or concerns about this DAG, please contact its owner.
 
 </details>

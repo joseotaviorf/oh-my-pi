@@ -5,8 +5,10 @@ WITH ivr_paths AS (
 		event_type,
 		digits AS answer,
 		ts_created AS ts_answered
-	FROM datalake_bigfone_twilio.call_ivr_paths
-	WHERE event_type IN ('keypress','timeout')
+	FROM
+		datalake_bigfone_twilio.call_ivr_paths
+	WHERE
+		event_type IN ('keypress','timeout')
 	GROUP BY 1,2,3,4,5
 ),
 path_sequence AS (
@@ -17,7 +19,8 @@ path_sequence AS (
 		answer,
 		ts_answered,
 		LAG(ts_answered) OVER (PARTITION BY sk_call ORDER BY ts_answered) AS ts_last_answered
-	FROM ivr_paths
+	FROM
+		ivr_paths
 )
 SELECT
 	sk_call,
@@ -27,4 +30,5 @@ SELECT
 	UNIX_TIMESTAMP(ts_answered) - UNIX_TIMESTAMP(ts_last_answered) AS seconds_elapsed,
 	CAST(ts_answered AS TIMESTAMP) AS ts_answered,
 	NOW() AS ts_load
-FROM path_sequence
+FROM
+	path_sequence
