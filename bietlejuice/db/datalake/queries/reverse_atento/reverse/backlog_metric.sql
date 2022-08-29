@@ -3,6 +3,7 @@ SELECT DISTINCT
   bmt.sk_agent,
   bmt.origin AS channel,
   da.agent_company,
+  da.email AS agent_email,
   dd.department,
   dd.front_or_back,
   dt.motivation AS contact_motivation_tag,
@@ -41,8 +42,6 @@ LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON bmt.sk_agent = da.sk_agent
 WHERE
-  bmt.origin = 'email'
-AND
   DATE(bmt.dt_metric_reference) >= '2022-07-19'
 AND
   dd.department IN (
@@ -71,5 +70,7 @@ AND
     'CX Offboarding ETP 1 [BACK] [POS]',
     'CX Rescisão [BACK] [POS]',
     'CX Onboarding [BACK] [POS]',
-    'CX Vistoria [BACK]'
+    'CX Vistoria [BACK]',
+    'RevisarPagamentosRescisao',
+    'RescisaoPreVigencia'
   )
