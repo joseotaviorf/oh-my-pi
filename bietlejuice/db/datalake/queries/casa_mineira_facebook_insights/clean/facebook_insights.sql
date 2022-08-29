@@ -21,4 +21,4 @@ SELECT
 FROM
     datalake_casa_mineira_facebook_insights_raw.facebook_insights
 WHERE
-    date_start = DATE('{year}-{month}-{day}')
+    date_start BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

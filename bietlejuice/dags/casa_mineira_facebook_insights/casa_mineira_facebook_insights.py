@@ -1,6 +1,7 @@
 from datetime import datetime
 from pendulum import timezone
 import os
+import re
 
 from airflow.utils.helpers import chain, cross_downstream
 from airflow.models import DAG
@@ -54,7 +55,14 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
-ENV = os.environ.get("ENVIRONMENT")
+
+
+def get_date_param(dag_run, ds, date_param_name):
+    date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
+    if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
+        return date_param
+    return ds
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -68,6 +76,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+    user_defined_macros={"get_date_param": get_date_param},
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -97,7 +106,12 @@ for table_name in tables_list:
         target_database_base_name=SOURCE,
         table_name=table_name,
         extraction_spark_job_file=RAW_SPARK_JOB_FILE,
-        raw_spark_job_extra_args=[SOURCE, "{{ ds }}", table_name],
+        raw_spark_job_extra_args=[
+            SOURCE,
+            "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",
+            "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+            table_name,
+        ],
     )
 
     clean_task_group = task_group.build_clean_task_group(
@@ -107,6 +121,11 @@ for table_name in tables_list:
         is_incremental=True,
         partitions=partition_cols,
         has_create_external_table_task=False,
+        execution_date="",
+        extra_query_template_params={
+            "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",
+            "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+        },
     )
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))

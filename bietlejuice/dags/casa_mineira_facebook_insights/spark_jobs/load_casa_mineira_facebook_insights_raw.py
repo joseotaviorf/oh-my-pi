@@ -1,6 +1,5 @@
 import json
 from argparse import ArgumentParser
-from datetime import datetime
 
 from quintoandar_facebook_api_client.clients import FacebookClient
 from quintoandar_logger import QuintoAndarLogger
@@ -26,14 +25,16 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
-    parser.add_argument("execution_date")
+    parser.add_argument("load_start_date", help="time_range start date in str format")
+    parser.add_argument("load_end_date", help="time_range end date in str format")
     parser.add_argument("table_name")
 
     args = parser.parse_args()
     env = args.env
     source = args.source
     datalake_bucket = args.datalake_bucket
-    execution_date = args.execution_date
+    load_start_date = args.load_start_date
+    load_end_date = args.load_end_date
     table_name = args.table_name
 
     config_service = ConfigurationService(source)
@@ -44,7 +45,7 @@ if __name__ == "__main__":
 
     logger.info(
         f"""m=__main__, env={env}, source={source},
-        datalake_bucket={datalake_bucket}, execution_date={execution_date},
+        datalake_bucket={datalake_bucket}, load_start_date={load_start_date}, load_end_date={load_end_date},
         table_name={table_name}, msg=Starting spark job..."""
     )
 
@@ -58,8 +59,8 @@ if __name__ == "__main__":
 
     fb_client = FacebookClient(auth["access_token"])
     client_response = fb_client.get_data(
-        date_start=execution_date,
-        date_stop=execution_date,
+        date_start=load_start_date,
+        date_stop=load_end_date,
         accounts=accounts,
         fields=fields,
         breakdowns=breakdowns,
@@ -70,11 +71,10 @@ if __name__ == "__main__":
         spark_client = SparkClient()
         df = spark_client.create_dataframe(client_response)
 
-        dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
         df = (
             SparkDataFrameService()
             .input(df)
-            .create_year_month_day_columns_from_date(dt_execution)
+            .create_year_month_day_columns_from_dataframe_column("date_start")
             .output()
         )
 
@@ -115,6 +115,6 @@ if __name__ == "__main__":
 
     else:
         logger.warning(
-            f"""m=__main__, execution_date={execution_date}, table_name={table_name},
+            f"""m=__main__, load_start_date={load_start_date}, load_end_date={load_end_date}, table_name={table_name},
             accounts: {accounts}, msg=No data returned from API."""
         )
