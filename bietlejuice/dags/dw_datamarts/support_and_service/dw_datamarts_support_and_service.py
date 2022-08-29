@@ -1,20 +1,21 @@
-import os
 from datetime import datetime
-
-import airflow.utils.helpers as airflow_helpers
+import os
 import pendulum
-from airflow.models import DAG, Variable
+
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
-from bietlejuice.base.airflow import BaseDAG
-from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
+from airflow.utils.helpers import chain
+
+from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.pipeline import LayerEnum, MetadataTypeEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.file_service import FileService
+
 
 # DAG params
 SCHEMA = "datamarts"
@@ -22,11 +23,15 @@ CONTEXT = "support_and_service"
 DAG_NAME = f"dw_{SCHEMA}_{CONTEXT}"
 DAG_ID = f"bietlejuice.dw_{SCHEMA}_{CONTEXT}"
 INTERMEDIATE_PATH = f"dw_{SCHEMA}/{CONTEXT}"
+
 ENV = os.environ.get("ENVIRONMENT")
+local_tz = pendulum.timezone("America/Sao_Paulo")
+MAIN_START_DATE = datetime(2020, 1, 15, 0, 0, 0, tzinfo=local_tz)
 
 config_service = ConfigurationService(
     dag_name=DAG_NAME, intermediate_path=INTERMEDIATE_PATH
 )
+
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 dw_bucket = config_service.get_config("dw_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
@@ -36,24 +41,19 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-
-local_tz = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2020, 1, 15, 0, 0, 0, tzinfo=local_tz)
-
 # S3 paths setup
-SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{INTERMEDIATE_PATH}/"
-BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{INTERMEDIATE_PATH}/"
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
-# cluster setup
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
-LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
-)
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+
+default_libraries = config_service.get_config("default_libraries")
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 pipeline_config = config_service.get_config("pipeline") or {}
 
@@ -106,7 +106,7 @@ def build_table_tasks(entity_name, entity_pipeline):
         pool=pool,
         json={
             "spark_python_task": {
-                "python_file": f"{SPARK_JOBS_PATH}create_datamart_table_in_datalake.py",
+                "python_file": f"{spark_jobs_path}create_datamart_table_in_datalake.py",
                 "parameters": [
                     ENV,
                     dw_bucket,
@@ -126,7 +126,7 @@ def build_table_tasks(entity_name, entity_pipeline):
         dag=DAG,
         json={
             "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH
+                "python_file": base_spark_jobs_path
                 + "sync_metastore_tables_structure.py",
                 "parameters": [
                     dw_bucket,
@@ -144,7 +144,7 @@ def build_table_tasks(entity_name, entity_pipeline):
         dag=DAG,
         json={
             "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH
+                "python_file": base_spark_jobs_path
                 + "sync_metastore_tables_partitions.py",
                 "parameters": [
                     dw_bucket,
@@ -163,7 +163,7 @@ def build_table_tasks(entity_name, entity_pipeline):
             task_id=f"propagate-table-metadata-dw-{slugged_table_name}",
             json={
                 "spark_python_task": {
-                    "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_table_metadata.py",
+                    "python_file": f"{base_spark_jobs_path}/propagate_table_metadata.py",
                     "parameters": [
                         LayerEnum.DW.value,
                         MetadataTypeEnum.LINEAGE.value,
@@ -179,7 +179,7 @@ def build_table_tasks(entity_name, entity_pipeline):
     else:
         last_tasks = [sync_metastore_table_partitions_task]
 
-    airflow_helpers.chain(
+    chain(
         create_table_in_datalake_task,
         sync_metastore_table_structure_task,
         sync_metastore_table_partitions_task,
@@ -191,7 +191,7 @@ def build_table_tasks(entity_name, entity_pipeline):
             task_id=f"load-{slugged_table_name}-into-redshift",
             json={
                 "spark_python_task": {
-                    "python_file": f"{SPARK_JOBS_PATH}load_datamart_table_into_redshift.py",
+                    "python_file": f"{spark_jobs_path}load_datamart_table_into_redshift.py",
                     "parameters": [ENV, dw_bucket, spectrum_iam_role, DW_SCHEMA, table],
                 }
             },
@@ -226,8 +226,8 @@ DAG = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=DAG,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    cluster_configuration=cluster_description,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

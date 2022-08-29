@@ -4,9 +4,14 @@
 
 Creates/updates the datamart tables, for the context of Support and Service, in data lake and DW.
 
+​<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 
-Daily. More information about run time [here]({chart_url}{dag_id}).
+This DAG is trigged daily.
+
+More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
@@ -21,3 +26,5 @@ For any questions or concerns about this DAG, please contact the Data Engineerin
 The file [datamarts.yaml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/dags/dw_datamarts/support_and_service/dw_datamarts_support_and_service_prod_conf.yml)
 declares the datamarts that should be created in this DAG.
 So **for add/remove a datamart table** from the DAG you only need to **update this file**.
+
+</details>
