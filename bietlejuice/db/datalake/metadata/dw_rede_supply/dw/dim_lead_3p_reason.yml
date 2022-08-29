@@ -1,0 +1,22 @@
+---
+database_name: dw_rede
+table_name: dim_lead_3p_reason
+columns:
+  sk_lead_3p_reason:
+    lineage:
+      - datalake_rede_supply.lead_3p_reasons.sk_lead_3p_reason
+  reason:
+    lineage:
+      - datalake_rede_supply.lead_3p_reasons.reason
+  reason_type:
+    lineage:
+      - datalake_rede_supply.lead_3p_reasons.reason_type
+  is_ineligible_reason:
+    lineage:
+      - datalake_rede_supply.lead_3p_reasons.is_ineligible_reason
+  is_discard_reason:
+    lineage:
+      - datalake_rede_supply.lead_3p_reasons.is_discard_reason
+  is_enrichment_reason:
+    lineage:
+      - datalake_rede_supply.lead_3p_reasons.is_enrichment_reason

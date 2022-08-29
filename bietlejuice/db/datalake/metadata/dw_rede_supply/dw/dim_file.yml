@@ -1,0 +1,28 @@
+---
+database_name: dw_rede
+table_name: dim_file
+columns:
+  sk_file:
+    lineage:
+      - datalake_rede_supply.file_sks.sk_file
+  id_file:
+    lineage:
+      - datalake_brokers_supply_processor.file.id
+  hash:
+    lineage:
+      - datalake_brokers_supply_processor.file.hash
+  file_name:
+    lineage:
+      - datalake_brokers_supply_processor.file.file_name
+  type:
+    lineage:
+      - datalake_brokers_supply_processor.file.type
+  url:
+    lineage:
+      - datalake_brokers_supply_processor.file.url
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor.file.ts_created
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor.file.ts_updated
