@@ -6,8 +6,9 @@ This DAG loads the DW tables of our Tickets data. This data is related to the ex
 ​<details>
   <summary><strong> > DAG details (click to expand)</strong></summary>​
 
-### Execution​ Interval
-This DAG is triggered once per day via Mediator. Please check the dependencies on the `dependencies.yaml` file or [here](https://k6ead11b55326f9c9-tp.appspot.com/admin/airflow/graph?dag_id=airflow.dag_dependency_visualization&execution_date=).
+### Execution Interval
+
+This DAG is trigged daily.
 
 More information about run time [here]({chart_url}{dag_id}).
 
@@ -23,8 +24,8 @@ This pipeline produces the following output tables:
 - `fact_ticket_tags`
 - `fact_tickets`
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+### Responsible Data Engineering Team
+
+For any questions or concerns about this DAG, please contact its owner.
 
 </details>
