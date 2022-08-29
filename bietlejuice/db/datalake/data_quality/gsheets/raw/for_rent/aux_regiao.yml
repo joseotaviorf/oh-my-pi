@@ -17,12 +17,13 @@ column_level_validations:
   regional:
     is_contained_in:
       values:
-        - Nordeste
         - GFPC
-        - SPMG
+        - International
+        - Nordeste
         - Norte
-        - Vitória
         - RJPB
+        - SPMG
+        - Vitória
   tier:
-    is_contained_in: # On the raw this column still as string.
-      values: ['1', '2', '3', '4']
+    is_contained_in: # On the raw this column is still as string.
+      values: ['1', '2', '3', '4', '5']
