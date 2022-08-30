@@ -1067,6 +1067,12 @@ for_sale_segmentation_survey:
     clean_table_name: for_sale_segmentation_survey_responses
     sheet_context: static
 
+great_price_tag_test_groups:
+    sheet_id: 1IelEYQr306slcOrkyM8ELVRCq8UML6k27lixgjkEAfo
+    sheet_name: base_20220808
+    clean_table_name: great_price_tag_test_groups
+    sheet_context: static
+
 legacy_doorman:
     sheet_id: 19N4-pSsxcdQZVYSiCValrqYo8CYDATMrcmKtOO_P1mI
     sheet_name: legacy_doorman
@@ -1095,6 +1101,12 @@ offline_and_branding_marketing_costs:
     sheet_id: 14la3wTA9DitbyiJ8Lb4X7FnyAMsSE32ICzwPBPD2j4E
     sheet_name: offline_and_branding_marketing_costs
     clean_table_name: offline_and_branding_marketing_costs
+    sheet_context: static
+
+overpriced_campaign_test_groups:
+    sheet_id: 1YbUnHn7BE8Z1iI2b65lmwaJHO_ObO4cYOe0zwenRdzk
+    sheet_name: overpriced_campaign_test_groups
+    clean_table_name: overpriced_campaign_test_groups
     sheet_context: static
 
 pld_suspicion_list:
@@ -1175,11 +1187,6 @@ zipcodes_sp:
     clean_table_name: zipcodes_sp
     sheet_context: static
 
-great_price_tag_test_groups:
-    sheet_id: 1IelEYQr306slcOrkyM8ELVRCq8UML6k27lixgjkEAfo
-    sheet_name: base_20220808
-    clean_table_name: great_price_tag_test_groups
-    sheet_context: static
 
 #########################
 # GENERAL SHEETS

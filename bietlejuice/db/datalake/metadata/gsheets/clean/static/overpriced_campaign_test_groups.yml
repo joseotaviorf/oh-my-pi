@@ -1,0 +1,40 @@
+---
+database_name: datalake_gsheets_clean
+table_name: overpriced_campaign_test_groups
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.sk_house
+  id_user:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.sk_user
+  email:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.email
+  test_group:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.test_group
+  test_group_description:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.test_group_description
+  last_price_before_campaign:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.last_price_before_campaign
+  days_without_vb_before_campaign:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.days_without_vb_before_campaign
+  min_price_calculator:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.p_10
+  max_price_calculator:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.p_90
+  min_price_calculator_adjusted:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.p_10_adjusted
+  max_price_calculator_adjusted:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.p_90_adjusted
+  overpriced_calculator_range:
+    lineage:
+      - datalake_gsheets_raw.overpriced_campaign_test_groups.over_calc_range

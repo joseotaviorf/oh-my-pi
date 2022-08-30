@@ -1,0 +1,11 @@
+---
+database_name: datalake_gsheets_raw
+table_name: overpriced_campaign_test_groups
+columns:
+  sk_user:
+    tags:
+      - PII
+      - Confidential
+  email:
+    tags:
+      - Confidential

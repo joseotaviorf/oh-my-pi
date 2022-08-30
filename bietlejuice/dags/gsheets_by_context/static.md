@@ -39,6 +39,7 @@ This pipeline produces the following output tables:
     - `great_price_tag_test_groups`
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
+    - `overpriced_campaign_test_groups`
     - `pld_suspicion_list`
     - `rental_tof_monthly_targets`
     - `sale_business_unit_standardization`
@@ -73,6 +74,7 @@ This pipeline produces the following output tables:
     - `legal_base_docato`
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
+    - `overpriced_campaign_test_groups`
     - `pld_suspicion_list`
     - `pro_owner_analyst`
     - `rental_tof_monthly_targets`
