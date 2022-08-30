@@ -72,6 +72,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name=None,
         raw_spark_job_extra_args=None,
         pool=AIRFLOW_DEFAULT_POOL,
+        has_hive_sync=True,
     ):
         """
         Create a task group containing 2 tasks:
@@ -92,6 +93,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type raw_spark_job_extra_args: list[str]
         :param pool: airflow's pool name
         :type pool: str
+        :param has_hive_sync: if this table is going to have Hive sync
         :return: initial and final tasks of the created task group
         :rtype: dict
         """
@@ -122,105 +124,115 @@ class DatalakeTaskGroup(BaseTaskGroup):
             },
         )
 
-        sync_metastore_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"sync-hive-metastore-{layer}{tasks_name_suffix}-structure",
-            dag=self.dag,
-            json={
-                "spark_python_task": {
-                    "python_file": self.spark_jobs_path
-                    + "sync_metastore_tables_structure.py",
-                    "parameters": [
-                        self.datalake_bucket,
-                        layer,
-                        target_database_base_name,
-                        sync_mode,
-                    ]
-                    + table_name_arg,
-                }
-            },
-        )
-
-        sync_metastore_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"sync-hive-metastore-{layer}{tasks_name_suffix}-partitions",
-            dag=self.dag,
-            json={
-                "spark_python_task": {
-                    "python_file": self.spark_jobs_path
-                    + "sync_metastore_tables_partitions.py",
-                    "parameters": [
-                        self.datalake_bucket,
-                        layer,
-                        target_database_base_name,
-                        sync_mode,
-                    ]
-                    + table_name_arg,
-                }
-            },
-        )
-
-        airflow_helpers.chain(
-            load_table_task,
-            sync_metastore_tables_structure_task,
-            sync_metastore_tables_partitions_task,
-        )
-
         config_service = ConfigurationService(source)
-        try:
-            product_db_name = config_service.get_config("lineage_product_database_name")
-        except IndexError:
-            logger.debug(
-                f"m=_build_raw_task_group, msg=could not find lineage_product_database_name in configs"
-            )
-            product_db_name = ""
 
-        metadata_type = None
-        if FileService.metadata_file_exists(
-            self.relative_query_path, layer, table_name, sync_mode == self.ALL_TABLES
-        ):
-            metadata_type = MetadataTypeEnum.TAGS.value
-        elif product_db_name:
-            metadata_type = MetadataTypeEnum.FULL_CONTENT_LINEAGE.value
-
-        if metadata_type:
-            propagate_table_lineage_task = QuintoAndarDatabricksSubmitRunOperator(
+        if has_hive_sync:
+            sync_metastore_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+                task_id=f"sync-hive-metastore-{layer}{tasks_name_suffix}-structure",
                 dag=self.dag,
-                task_id=f"propagate-table-metadata-{layer}-{source}{tasks_name_suffix}",
                 json={
                     "spark_python_task": {
-                        "python_file": f"{self.spark_jobs_path}/propagate_raw_tables_metadata.py",
+                        "python_file": self.spark_jobs_path
+                        + "sync_metastore_tables_structure.py",
                         "parameters": [
+                            self.datalake_bucket,
                             layer,
-                            metadata_type,
                             target_database_base_name,
-                            self.relative_query_path,
-                            "--product-database-name",
-                            product_db_name,
                             sync_mode,
                         ]
                         + table_name_arg,
                     }
                 },
-                execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
 
-            bypass_task = DummyOperator(
+            sync_metastore_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+                task_id=f"sync-hive-metastore-{layer}{tasks_name_suffix}-partitions",
                 dag=self.dag,
-                task_id=f"propagation-bypass-{layer}-{source}{tasks_name_suffix}",
-                trigger_rule="all_done",
+                json={
+                    "spark_python_task": {
+                        "python_file": self.spark_jobs_path
+                        + "sync_metastore_tables_partitions.py",
+                        "parameters": [
+                            self.datalake_bucket,
+                            layer,
+                            target_database_base_name,
+                            sync_mode,
+                        ]
+                        + table_name_arg,
+                    }
+                },
             )
 
             airflow_helpers.chain(
+                load_table_task,
+                sync_metastore_tables_structure_task,
                 sync_metastore_tables_partitions_task,
-                propagate_table_lineage_task,
-                bypass_task,
             )
-            final_tasks = [sync_metastore_tables_partitions_task, bypass_task]
+
+            try:
+                product_db_name = config_service.get_config(
+                    "lineage_product_database_name"
+                )
+            except IndexError:
+                logger.debug(
+                    f"m=_build_raw_task_group, msg=could not find lineage_product_database_name in configs"
+                )
+                product_db_name = ""
+
+            metadata_type = None
+
+            if FileService.metadata_file_exists(
+                self.relative_query_path,
+                layer,
+                table_name,
+                sync_mode == self.ALL_TABLES,
+            ):
+                metadata_type = MetadataTypeEnum.TAGS.value
+            elif product_db_name:
+                metadata_type = MetadataTypeEnum.FULL_CONTENT_LINEAGE.value
+
+            if metadata_type:
+                propagate_table_lineage_task = QuintoAndarDatabricksSubmitRunOperator(
+                    dag=self.dag,
+                    task_id=f"propagate-table-metadata-{layer}-{source}{tasks_name_suffix}",
+                    json={
+                        "spark_python_task": {
+                            "python_file": f"{self.spark_jobs_path}/propagate_raw_tables_metadata.py",
+                            "parameters": [
+                                layer,
+                                metadata_type,
+                                target_database_base_name,
+                                self.relative_query_path,
+                                "--product-database-name",
+                                product_db_name,
+                                sync_mode,
+                            ]
+                            + table_name_arg,
+                        }
+                    },
+                    execution_timeout=timedelta(hours=self.execution_timeout_hours),
+                )
+
+                bypass_task = DummyOperator(
+                    dag=self.dag,
+                    task_id=f"propagation-bypass-{layer}-{source}{tasks_name_suffix}",
+                    trigger_rule="all_done",
+                )
+
+                airflow_helpers.chain(
+                    sync_metastore_tables_partitions_task,
+                    propagate_table_lineage_task,
+                    bypass_task,
+                )
+                final_tasks = [sync_metastore_tables_partitions_task, bypass_task]
+            else:
+                logger.debug(
+                    f"m=_build_raw_task_group, target_database_base_name={target_database_base_name}, "
+                    f"msg=Could not infer metadata type, skipping propagate metadata task"
+                )
+                final_tasks = [sync_metastore_tables_partitions_task]
         else:
-            logger.debug(
-                f"m=_build_raw_task_group, target_database_base_name={target_database_base_name}, "
-                f"msg=Could not infer metadata type, skipping propagate metadata task"
-            )
-            final_tasks = [sync_metastore_tables_partitions_task]
+            final_tasks = [load_table_task]
 
         tb_names = []
         if (
@@ -274,6 +286,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         extraction_spark_job_file,
         raw_spark_job_extra_args=None,
         pool=AIRFLOW_DEFAULT_POOL,
+        has_hive_sync=True,
     ):
         """
         Build a task group for raw layer to extract all tables from source
@@ -290,6 +303,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type raw_spark_job_extra_args: list[str]
         :param pool: airflow's pool name
         :type pool: str
+        :param has_hive_sync: if this table is going to have Hive sync
         :return: initial and final tasks of the created task group
         :rtype: dict
         """
@@ -299,6 +313,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             extraction_spark_job_file=extraction_spark_job_file,
             raw_spark_job_extra_args=raw_spark_job_extra_args,
             pool=pool,
+            has_hive_sync=has_hive_sync,
         )
 
     def build_raw_task_group_for_single_table(
@@ -309,6 +324,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         extraction_spark_job_file,
         raw_spark_job_extra_args=None,
         pool=AIRFLOW_DEFAULT_POOL,
+        has_hive_sync=True,
     ):
         """
         Build a task group for raw layer to extract a specific table from source
@@ -327,6 +343,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type raw_spark_job_extra_args: list[str]
         :param pool: airflow's pool name
         :type pool: str
+        :param has_hive_sync: if this table is going to have Hive sync
         :return: initial and final tasks of the created task group
         :rtype: dict
         """
@@ -337,6 +354,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             table_name=table_name,
             raw_spark_job_extra_args=raw_spark_job_extra_args,
             pool=pool,
+            has_hive_sync=has_hive_sync,
         )
 
     def _build_task_group(
@@ -356,6 +374,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         # cannot chose only one now, we would need a refactoring first.
         tree_path="",
         execution_date="{{ ds }}",
+        has_hive_sync=True,
     ):
         """
         Create a task group containing 4 tasks:
@@ -389,6 +408,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type schema: str
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
         :type execution_date: str
+        :param has_hive_sync: if this table is going to have Hive sync
         :return: dict with initial and final tasks of the created task group
         :rtype: dict
         """
@@ -425,63 +445,18 @@ class DatalakeTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
-        sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=self.dag,
-            task_id=f"sync-hive-metastore-{layer.value}-{slugged_table_name}-structure",
-            json={
-                "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_structure.py",
-                    "parameters": [
-                        self.datalake_bucket,
-                        layer.value,
-                        target_database_base_name,
-                        "--table-name",
-                        table_name,
-                    ],
-                }
-            },
-            execution_timeout=timedelta(hours=self.execution_timeout_hours),
-        )
-
-        sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=self.dag,
-            task_id=f"sync-hive-metastore-{layer.value}-{slugged_table_name}-partitions",
-            json={
-                "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_partitions.py",
-                    "parameters": [
-                        self.datalake_bucket,
-                        layer.value,
-                        target_database_base_name,
-                        "--table-name",
-                        table_name,
-                    ],
-                }
-            },
-            execution_timeout=timedelta(hours=self.execution_timeout_hours),
-        )
-
-        chain(
-            load_table_task,
-            sync_metastore_table_structure_task,
-            sync_metastore_table_partitions_task,
-        )
-
-        final_tasks = [sync_metastore_table_partitions_task]
-
-        if FileService.metadata_file_exists(
-            self.relative_query_path, layer.value, table_name
-        ):
-            propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
+        if has_hive_sync:
+            sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"propagate-table-metadata-{layer.value}-{slugged_table_name}",
+                task_id=f"sync-hive-metastore-{layer.value}-{slugged_table_name}-structure",
                 json={
                     "spark_python_task": {
-                        "python_file": f"{self.spark_jobs_path}/propagate_table_metadata.py",
+                        "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_structure.py",
                         "parameters": [
+                            self.datalake_bucket,
                             layer.value,
-                            MetadataTypeEnum.LINEAGE.value,
                             target_database_base_name,
+                            "--table-name",
                             table_name,
                         ],
                     }
@@ -489,19 +464,68 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
 
-            bypass_task = DummyOperator(
+            sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"propagation-bypass-{layer.value}-{slugged_table_name}",
-                trigger_rule="all_done",
+                task_id=f"sync-hive-metastore-{layer.value}-{slugged_table_name}-partitions",
+                json={
+                    "spark_python_task": {
+                        "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_partitions.py",
+                        "parameters": [
+                            self.datalake_bucket,
+                            layer.value,
+                            target_database_base_name,
+                            "--table-name",
+                            table_name,
+                        ],
+                    }
+                },
+                execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
 
-            airflow_helpers.chain(
+            chain(
+                load_table_task,
+                sync_metastore_table_structure_task,
                 sync_metastore_table_partitions_task,
-                propagate_table_metadata_task,
-                bypass_task,
             )
 
-            final_tasks = [sync_metastore_table_partitions_task, bypass_task]
+            final_tasks = [sync_metastore_table_partitions_task]
+        else:
+            final_tasks = [load_table_task]
+
+        if has_hive_sync:
+            if FileService.metadata_file_exists(
+                self.relative_query_path, layer.value, table_name
+            ):
+                propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
+                    dag=self.dag,
+                    task_id=f"propagate-table-metadata-{layer.value}-{slugged_table_name}",
+                    json={
+                        "spark_python_task": {
+                            "python_file": f"{self.spark_jobs_path}/propagate_table_metadata.py",
+                            "parameters": [
+                                layer.value,
+                                MetadataTypeEnum.LINEAGE.value,
+                                target_database_base_name,
+                                table_name,
+                            ],
+                        }
+                    },
+                    execution_timeout=timedelta(hours=self.execution_timeout_hours),
+                )
+
+                bypass_task = DummyOperator(
+                    dag=self.dag,
+                    task_id=f"propagation-bypass-{layer.value}-{slugged_table_name}",
+                    trigger_rule="all_done",
+                )
+
+                airflow_helpers.chain(
+                    sync_metastore_table_partitions_task,
+                    propagate_table_metadata_task,
+                    bypass_task,
+                )
+
+                final_tasks = [sync_metastore_table_partitions_task, bypass_task]
 
         if has_create_external_table_task:
             create_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -576,6 +600,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         schema="",
         tree_path="",
         execution_date="{{ ds }}",
+        has_hive_sync=True,
     ):
         """
         Build a task group for clean layer
@@ -602,6 +627,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param schema: db schema where the table is at. Used in the query path
         :type schema: str
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :param has_hive_sync: if this table is going to have Hive sync
         :type execution_date: str
         :rtype: list[BaseOperator]
         """
@@ -619,6 +645,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             schema,
             tree_path,
             execution_date,
+            has_hive_sync,
         )
 
     def build_enrich_task_group(
@@ -633,6 +660,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         extra_query_template_params=None,
         schema="",
         execution_date="{{ ds }}",
+        has_hive_sync=True,
     ):
         """
         Build a task group for enrich layer
@@ -659,6 +687,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param schema: db schema where the table is at. Used in the query path
         :type schema: str
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :param has_hive_sync: if this table is going to have Hive sync
         :type execution_date: str
         :rtype: list[BaseOperator]
         """
@@ -674,4 +703,5 @@ class DatalakeTaskGroup(BaseTaskGroup):
             extra_query_template_params,
             schema,
             execution_date=execution_date,
+            has_hive_sync=has_hive_sync,
         )
