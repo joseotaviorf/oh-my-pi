@@ -12,7 +12,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 This pipeline creates the following full tables in the schema `dw_datamart` of data lake and `datamarts` of DW:
 
-- `agents_activations_suspensions_contracts_changes`
 - `contract_termination`
 - `datamart_cohort_rentals`
 - `datamart_kpi_weekly`
