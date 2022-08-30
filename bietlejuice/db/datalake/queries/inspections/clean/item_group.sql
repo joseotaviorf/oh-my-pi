@@ -1,0 +1,21 @@
+SELECT
+    id AS id_item_group,
+    room_id AS id_room,
+    type_id AS id_type,
+    main_id AS id_main,
+    uuid,
+    name,
+    comment,
+    status,
+    is_inferior_quality,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_inspections_raw.item_group
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

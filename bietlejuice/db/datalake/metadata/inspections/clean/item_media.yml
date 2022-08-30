@@ -1,0 +1,37 @@
+---
+database_name: datalake_inspections_clean
+table_name: item_media
+columns:
+  id_item_media:
+    lineage:
+      - datalake_inspections_raw.item_media.id
+  id_item:
+    lineage:
+      - datalake_inspections_raw.item_media.item_id
+  id_main:
+    lineage:
+      - datalake_inspections_raw.item_media.main_id
+  uuid:
+    lineage:
+      - datalake_inspections_raw.item_media.uuid
+  type:
+    lineage:
+      - datalake_inspections_raw.item_media.type
+  url:
+    lineage:
+      - datalake_inspections_raw.item_media.url
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.item_media.created_at
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.item_media.updated_at
+  year:
+    lineage:
+      - datalake_inspections_raw.item_media.year
+  month:
+    lineage:
+      - datalake_inspections_raw.item_media.month
+  day:
+    lineage:
+      - datalake_inspections_raw.item_media.day

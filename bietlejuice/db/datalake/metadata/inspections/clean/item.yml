@@ -1,0 +1,49 @@
+---
+database_name: datalake_inspections_clean
+table_name: item
+columns:
+  id_item:
+    lineage:
+      - datalake_inspections_raw.item.id
+  id_item_group:
+    lineage:
+      - datalake_inspections_raw.item.item_group_id
+  id_previous_item:
+    lineage:
+      - datalake_inspections_raw.item.previous_item_id
+  id_type:
+    lineage:
+      - datalake_inspections_raw.item.type_id
+  id_main:
+    lineage:
+      - datalake_inspections_raw.item.main_id
+  uuid:
+    lineage:
+      - datalake_inspections_raw.item.uuid
+  comment:
+    lineage:
+      - datalake_inspections_raw.item.comment
+  present:
+    lineage:
+      - datalake_inspections_raw.item.present
+  count:
+    lineage:
+      - datalake_inspections_raw.item.count
+  status:
+    lineage:
+      - datalake_inspections_raw.item.status
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.item.created_at
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.item.updated_at
+  year:
+    lineage:
+      - datalake_inspections_raw.item.year
+  month:
+    lineage:
+      - datalake_inspections_raw.item.month
+  day:
+    lineage:
+      - datalake_inspections_raw.item.day

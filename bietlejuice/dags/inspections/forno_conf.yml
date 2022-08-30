@@ -5,7 +5,7 @@ tables:
   # <raw_table_name>:
   #   clean_table_name: <clean_table_name>
   #   is_incremental: <is_incremental> #optional
-  #   date_column: <created_at> #optional
+  #   date_column: <date_column> #optional
   #   unixtime_measure: <unixtime_measure> #optional
   assessment:
     clean_table_name: assessment
@@ -17,8 +17,24 @@ tables:
     clean_table_name: inspection_aud
   issue_type:
     clean_table_name: issue_type
+  item:
+    clean_table_name: item
+    is_incremental: True
+    date_column: updated_at
+  item_group:
+    clean_table_name: item_group
+    is_incremental: True
+    date_column: updated_at
   item_group_type:
     clean_table_name: item_group_type
+    is_incremental: True
+    date_column: updated_at
+  item_issue:
+    clean_table_name: item_issue
+    is_incremental: True
+    date_column: updated_at
+  item_media:
+    clean_table_name: item_media
     is_incremental: True
     date_column: updated_at
   item_type:
@@ -27,5 +43,9 @@ tables:
     date_column: updated_at
   revinfo:
     clean_table_name: rev_info
+  room:
+    clean_table_name: room
+    is_incremental: True
+    date_column: updated_at
   room_type:
     clean_table_name: room_type

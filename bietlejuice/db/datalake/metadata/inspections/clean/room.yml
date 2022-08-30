@@ -1,0 +1,37 @@
+---
+database_name: datalake_inspections_clean
+table_name: room
+columns:
+  id_room:
+    lineage:
+      - datalake_inspections_raw.room.id
+  id_assessment:
+    lineage:
+      - datalake_inspections_raw.room.assessment_id
+  id_type:
+    lineage:
+      - datalake_inspections_raw.room.type_id
+  uuid:
+    lineage:
+      - datalake_inspections_raw.room.uuid
+  room_name:
+    lineage:
+      - datalake_inspections_raw.room.name
+  comment:
+    lineage:
+      - datalake_inspections_raw.room.comment
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.room.created_at
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.room.updated_at
+  year:
+    lineage:
+      - datalake_inspections_raw.room.year
+  month:
+    lineage:
+      - datalake_inspections_raw.room.month
+  day:
+    lineage:
+      - datalake_inspections_raw.room.day
