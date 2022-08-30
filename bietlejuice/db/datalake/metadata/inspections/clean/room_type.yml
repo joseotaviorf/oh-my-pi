@@ -2,15 +2,30 @@
 database_name: datalake_inspections_clean
 table_name: room_type
 columns:
-  id:
+  id_room_type:
     lineage:
       - datalake_inspections_raw.room_type.id
   type:
     lineage:
       - datalake_inspections_raw.room_type.type
+  is_deletable:
+    lineage:
+      - datalake_inspections_raw.room_type.deletable
+  is_deleted:
+    lineage:
+      - datalake_inspections_raw.room_type.deleted
   ts_created:
     lineage:
       - datalake_inspections_raw.room_type.created_at
   ts_updated:
     lineage:
       - datalake_inspections_raw.room_type.updated_at
+  year:
+    lineage:
+      - datalake_inspections_raw.room_type.year
+  month:
+    lineage:
+      - datalake_inspections_raw.room_type.month
+  day:
+    lineage:
+      - datalake_inspections_raw.room_type.day

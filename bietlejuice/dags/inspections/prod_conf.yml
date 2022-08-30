@@ -21,6 +21,8 @@ tables:
     clean_table_name: inspection_aud
   issue_type:
     clean_table_name: issue_type
+    is_incremental: True
+    date_column: updated_at
   item:
     clean_table_name: item
     is_incremental: True
@@ -61,3 +63,5 @@ tables:
     date_column: updated_at
   room_type:
     clean_table_name: room_type
+    is_incremental: True
+    date_column: updated_at
