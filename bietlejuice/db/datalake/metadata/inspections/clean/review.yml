@@ -1,0 +1,34 @@
+---
+database_name: datalake_inspections_clean
+table_name: review
+columns:
+  id_review:
+    lineage:
+      - datalake_inspections_raw.review.id
+  id_item:
+    lineage:
+      - datalake_inspections_raw.review.item_id
+  id_user:
+    lineage:
+      - datalake_inspections_raw.review.user_id
+  user_type:
+    lineage:
+      - datalake_inspections_raw.review.user_type
+  comment:
+    lineage:
+      - datalake_inspections_raw.review.comment
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.review.created_at
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.review.updated_at
+  year:
+    lineage:
+      - datalake_inspections_raw.review.year
+  month:
+    lineage:
+      - datalake_inspections_raw.review.month
+  day:
+    lineage:
+      - datalake_inspections_raw.review.day

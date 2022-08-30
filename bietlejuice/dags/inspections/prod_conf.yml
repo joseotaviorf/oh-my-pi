@@ -7,6 +7,10 @@ tables:
   #   is_incremental: <is_incremental> #optional
   #   date_column: <date_column> #optional
   #   unixtime_measure: <unixtime_measure> #optional
+  access_info:
+    clean_table_name: access_info
+    is_incremental: True
+    date_column: updated_at
   assessment:
     clean_table_name: assessment
     is_incremental: True
@@ -39,6 +43,14 @@ tables:
     date_column: updated_at
   item_type:
     clean_table_name: item_type
+    is_incremental: True
+    date_column: updated_at
+  review:
+    clean_table_name: review
+    is_incremental: True
+    date_column: updated_at
+  review_media:
+    clean_table_name: review_media
     is_incremental: True
     date_column: updated_at
   revinfo:
