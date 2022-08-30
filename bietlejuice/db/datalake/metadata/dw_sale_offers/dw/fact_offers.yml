@@ -53,6 +53,9 @@ columns:
   sk_offer_dismissed_date:
     lineage:
       - datalake_offer.sale_offer.dt_offer_dismissed
+  sk_offer_rescued_date:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_rescued
   sk_sale_agreement_created_date:
     lineage:
       - datalake_offer.sale_offer.dt_sale_agreement_created

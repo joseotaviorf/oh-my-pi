@@ -97,6 +97,7 @@ SELECT
 	ot.flg_branded AS is_branded,
 	eso.is_3p_supply,
 	eso.is_3p_demand,
+	eso.is_a_rescued_offer,
 	eso.has_used_fgts_in_payment,
 	eso.has_used_negotiation_chat,
 	eso.ts_offer_submitted,

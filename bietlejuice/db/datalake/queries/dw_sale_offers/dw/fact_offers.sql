@@ -16,6 +16,7 @@ SELECT
 	COALESCE(CAST(REPLACE(substring(eso.ts_offer_submitted,1, 10),'-','') AS BIGINT), -1) AS sk_offer_submitted_date,
 	COALESCE(CAST(REPLACE(substring(eso.dt_offer_accepted,1, 10),'-','') AS BIGINT), -1) AS sk_offer_accepted_date,
 	COALESCE(CAST(REPLACE(substring(eso.dt_offer_dismissed,1, 10),'-','') AS BIGINT), -1) AS sk_offer_dismissed_date,
+	COALESCE(CAST(REPLACE(substring(eso.dt_offer_rescued,1, 10),'-','') AS BIGINT), -1) AS sk_offer_rescued_date,
 	COALESCE(CAST(REPLACE(substring(eso.dt_sale_agreement_created,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_created_date,
 	COALESCE(CAST(REPLACE(substring(eso.dt_sale_agreement_signed,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_signed_date,
 	eso.is_buyer_first_offer,

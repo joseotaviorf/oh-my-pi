@@ -17,6 +17,7 @@ CREATE TABLE sale.fact_offers (
 	sk_offer_submitted_date BIGINT,
 	sk_offer_accepted_date BIGINT,
 	sk_offer_dismissed_date BIGINT,
+	sk_offer_rescued_date BIGINT,
 	sk_sale_agreement_created_date BIGINT,
 	sk_sale_agreement_signed_date BIGINT,
 	is_buyer_first_offer BOOLEAN,
