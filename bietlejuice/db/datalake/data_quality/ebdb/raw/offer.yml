@@ -7,9 +7,13 @@ column_level_validations:
       severity_level: Error
   client_id:
     is_complete:
+      severity_level: Error
   firestoreId:
     is_complete:
+      severity_level: Error
   house_id:
     is_complete:
+      severity_level: Error
   rentFlow_id:
     is_complete:
+      severity_level: Error
