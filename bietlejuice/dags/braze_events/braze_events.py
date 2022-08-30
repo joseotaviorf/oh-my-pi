@@ -3,7 +3,7 @@ from pendulum import timezone
 import os
 
 from airflow.models import DAG
-from airflow.utils.helpers import cross_downstream
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -11,6 +11,7 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
@@ -104,11 +105,8 @@ clean_task_groups = datalake_task_group.build_task_group_from_sql_files(
     has_create_external_table_task=False,
 )
 
-create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
 
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_group),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
-)
+TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
 
 terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
