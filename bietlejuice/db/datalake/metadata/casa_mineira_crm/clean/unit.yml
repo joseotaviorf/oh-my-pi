@@ -11,6 +11,9 @@ columns:
   unit_name:
     lineage:
       - datalake_casa_mineira_crm_raw.unidade.nome
+  business_unit:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.hub
   unit_slug_name:
     lineage:
       - datalake_casa_mineira_crm_raw.unidade.slug

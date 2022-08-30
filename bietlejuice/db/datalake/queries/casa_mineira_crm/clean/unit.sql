@@ -2,6 +2,7 @@ SELECT
     id, 
     bairro_id AS id_neighborhood,
     nome AS unit_name, 
+    hub AS business_unit,
     slug AS unit_slug_name, 
     logradouro AS address, 
     numero AS unit_number, 
