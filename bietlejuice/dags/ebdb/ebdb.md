@@ -138,6 +138,8 @@ Produces the following output tables:
     `pre_proposal`
     `pre_proposal_aud`
     `pre_proposal_condition`
+    `property_fee`
+    `property_fee_assigned`
     `proponent_info_resend_request`
     `proponent_info_resend_request_aud`
     `proponent_proposal`

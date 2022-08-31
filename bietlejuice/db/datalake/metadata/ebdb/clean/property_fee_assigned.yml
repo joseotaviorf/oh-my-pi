@@ -1,0 +1,22 @@
+---
+database_name: datalake_ebdb_clean
+table_name: property_fee_assigned
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned.id
+  id_contract:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned.contract_id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned.imovel_id
+  id_property_fee:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned.propertyfee_id
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned.atualizadoEm

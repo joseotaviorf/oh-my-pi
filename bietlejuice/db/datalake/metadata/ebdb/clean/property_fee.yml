@@ -1,0 +1,58 @@
+---
+database_name: datalake_ebdb_clean
+table_name: property_fee
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.id
+  contract_type:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.contractType
+  category:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.category
+  region_type:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.regionType
+  body_observation:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.bodyObservation
+  body_text:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.bodyText
+  body_title:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.bodyTitle
+  header_subtitle:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.headerSubTitle
+  header_title:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.headerTitle
+  promotion_tag:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.promotionTag
+  promotion_url:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.promotionUrl
+  fee:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.fee
+  promotional_adm_fee:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.promotionalAdmFee
+  promotional_period:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.promotionalPeriod
+  ts_valid_from:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.validFrom
+  ts_valid_until:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.validUntil
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.propertyfee.atualizadoEm
