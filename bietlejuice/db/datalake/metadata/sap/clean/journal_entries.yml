@@ -17,6 +17,9 @@ columns:
   id_user_sign:
     lineage:
       - datalake_sap_raw.journal_entries.createdby_usersign
+  legacy_uuid_rsd:
+    lineage:
+      - datalake_sap_raw.journal_entries.legacy_uuid_u_rsd_uuidsb
   uuid_rsd:
     lineage:
       - datalake_sap_raw.journal_entries.uuid_u_rsd_uuid
@@ -31,7 +34,7 @@ columns:
       - datalake_sap_raw.journal_entries.source_client_u_sourceclient
   updated_by:
     lineage:
-      - datalake_sap_raw.journal_entries.updatedby
+      - datalake_sap_raw.journal_entries.updatedby_usersign2
   loc_total:
     lineage:
       - datalake_sap_raw.journal_entries.loctotal

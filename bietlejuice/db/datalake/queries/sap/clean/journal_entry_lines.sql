@@ -9,7 +9,7 @@ SELECT
   managerial_ocrcode3 AS managerial_code,
   memo_linememo AS memo_line,
   account_account AS account,
-  account_shorname AS account_shortname,
+  account_shortname AS account_shortname,
   transaction_type_transtype AS transaction_type,
   credit,
   debit,

@@ -23,6 +23,7 @@ class SapSchemaEnum:
                 "External Payment ID (U_ExternalPaymentId)", StringType(), True
             ),
             StructField("Financial Entity ID (Ref2)", StringType(), True),
+            StructField("Legacy UUID (U_RSD_UUIDSB)", StringType(), True),
             StructField("LocTotal", DoubleType(), True),
             StructField("Memo", StringType(), True),
             StructField("RefDate", StringType(), True),
@@ -32,7 +33,7 @@ class SapSchemaEnum:
             StructField("Transaction Type (TransType)", StringType(), True),
             StructField("UUID (U_RSD_UUID)", StringType(), True),
             StructField("UpdateDate", StringType(), True),
-            StructField("UpdatedBy", StringType(), True),
+            StructField("UpdatedBy (UserSign2)", StringType(), True),
         ]
     )
 
@@ -73,12 +74,8 @@ class SapSchemaEnum:
             StructField(
                 "External Payment ID (U_ExternalPaymentId)", StringType(), True
             ),
-            StructField(
-                "Financial Entity Entry ID (U_FinancialEntityEntryId)",
-                StringType(),
-                True,
-            ),
             StructField("Financial Entity ID (Ref2)", StringType(), True),
+            StructField("Financial Entity ID (U_FinanceEntityId)", StringType(), True),
             StructField("Legacy UUID (U_RSD_UUIDSB)", StringType(), True),
             StructField("LocTotal", DoubleType(), True),
             StructField("Memo", StringType(), True),

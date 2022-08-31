@@ -7,10 +7,10 @@ columns:
       - datalake_sap_raw.incoming_payments.transaction_id_transid
   id_business_entity:
     lineage:
-      - datalake_sap_raw.incoming_payments.business_entity_id_ref1
+      - datalake_sap_raw.incoming_payments.business_entity_id_u_businessentityid
   id_financial_entity:
     lineage:
-      - datalake_sap_raw.incoming_payments.id_u_financeentityid
+      - datalake_sap_raw.incoming_payments.financial_entity_id_u_financeentityid
   id_external_payment:
     lineage:
       - datalake_sap_raw.incoming_payments.external_payment_id_u_externalpaymentid

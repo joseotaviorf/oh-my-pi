@@ -8,15 +8,15 @@ columns:
   id_business_entity:
     lineage:
       - datalake_sap_raw.invoices.business_entity_id_numatcard
-  id_financial_entity:
-    lineage:
-      - datalake_sap_raw.invoices.financial_entity_id_ref2
-  id_financial_entity_entry:
-    lineage:
-      - datalake_sap_raw.invoices.financial_entity_entry_id_u_financialentityentryid
   id_external_payment:
     lineage:
       - datalake_sap_raw.invoices.external_payment_id_u_externalpaymentid
+  id_financial_entity_legacy:
+    lineage:
+      - datalake_sap_raw.invoices.financial_entity_id_ref2
+  id_financial_entity:
+    lineage:
+      - datalake_sap_raw.invoices.financial_entity_id_u_financeentityid
   id_user_sign:
     lineage:
       - datalake_sap_raw.invoices.createdby_usersign

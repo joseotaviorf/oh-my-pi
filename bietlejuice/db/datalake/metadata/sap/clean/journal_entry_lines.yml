@@ -34,7 +34,7 @@ columns:
       - datalake_sap_raw.journal_entry_lines.account_account
   account_shortname:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.account_shorname
+      - datalake_sap_raw.journal_entry_lines.account_shortname
   transaction_type:
     lineage:
       - datalake_sap_raw.journal_entry_lines.transaction_type_transtype
