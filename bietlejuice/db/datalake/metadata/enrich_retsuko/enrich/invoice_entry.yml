@@ -5,6 +5,15 @@ columns:
   id:
     lineage:
       - datalake_retsuko_clean.entry.id_external
+  id_invoice:
+    lineage:
+      - datalake_retsuko_clean.entry.id_invoice
+  id_contract:
+    lineage:
+      - datalake_retsuko_clean.contract.id_external
+  bill_item:
+    lineage:
+      - datalake_retsuko_clean.entry.bill_item
   entry_type:
     lineage:
       - datalake_retsuko_clean.entry.bill_item
