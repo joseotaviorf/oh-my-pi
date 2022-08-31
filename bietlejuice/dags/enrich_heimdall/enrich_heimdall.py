@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -14,33 +14,34 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 CONTEXT = "heimdall"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+ENV = os.environ.get("ENVIRONMENT")
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
+MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 config_service = ConfigurationService(DAG_NAME)
-ENV = os.environ.get("ENVIRONMENT")
+
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
+base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base"
 datalake_bucket = config_service.get_config("datalake_bucket")
-databricks_bietlejuice_repo_path = config_service.get_config(
-    "databricks_bietlejuice_repo_path"
-)
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-LOGS_OUTPUT_PATH = f"s3://{databricks_bietlejuice_repo_path}/logs/jobs/{DAG_ID}"
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
+default_libraries = config_service.get_config("default_libraries")
 inner_dependencies = config_service.get_config("inner_dependencies")
 
 dag = DAG(
@@ -58,7 +59,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -70,7 +75,7 @@ datalake_task_group = DatalakeTaskGroup(
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    spark_jobs_path=base_spark_jobs_path,
     athena_query_result_location=athena_query_results_bucket,
 )
 

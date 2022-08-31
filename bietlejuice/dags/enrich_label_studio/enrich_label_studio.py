@@ -15,13 +15,11 @@ from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
-# ENV setup
-ENV = os.environ.get("ENVIRONMENT")
 
-# DAG and Jobs params setup
 CONTEXT = "label_studio"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+ENV = os.environ.get("ENVIRONMENT")
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2022, 4, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
@@ -33,7 +31,6 @@ athena_query_results_bucket = config_service.get_config("athena_query_results_bu
 
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base"
-spark_job_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
