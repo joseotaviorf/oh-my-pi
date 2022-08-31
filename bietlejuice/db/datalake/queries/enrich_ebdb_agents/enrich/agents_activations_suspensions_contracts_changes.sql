@@ -4,6 +4,7 @@ WITH agent_work_contract_revision AS (
         id_work_contract,
         LAG(id_work_contract) OVER (PARTITION BY awc.id ORDER BY rev ASC) AS id_previous_work_contract,
         revision.id_user AS id_user_change,
+        abc.agent_business_context AS business_context,
         rev,
         rev_type,
         is_active AS is_agent_active,
@@ -13,6 +14,9 @@ WITH agent_work_contract_revision AS (
         TIMESTAMP(FROM_UNIXTIME(revision.ts_revision/1000)) AS ts_revision
     FROM
         datalake_ebdb_clean.agent_data_aud AS awc
+    LEFT JOIN 
+        datalake_ebdb_agents.agent_business_context_history AS abc
+            ON abc.id_agent_data = awc.id
     INNER JOIN
         datalake_ebdb_clean.user_revision_entity AS revision 
             ON awc.rev = revision.id
@@ -38,6 +42,7 @@ agent_work_contract_info AS (
             WHEN has_changed_activated = TRUE AND is_previous_active != FALSE AND is_agent_active = FALSE  THEN 'DEACTIVATED'
             WHEN has_changed_work_contract = TRUE AND id_work_contract != 6 AND id_previous_work_contract != 6 THEN 'ALTERED_CONTRACT'
         END AS action,
+        awc.business_context,
         awc.is_agent_active,
         awc.is_previous_active,
         awc.has_changed_work_contract,
@@ -84,6 +89,7 @@ agent_action AS (
                     ELSE 'ACTIVATED' END
             ELSE action
         END AS action,
+        business_context,
         is_agent_active,
         is_previous_active,
         has_changed_work_contract,
