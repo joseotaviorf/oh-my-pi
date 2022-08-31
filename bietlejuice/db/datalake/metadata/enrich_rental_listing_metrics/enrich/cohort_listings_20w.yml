@@ -5,6 +5,9 @@ columns:
   id_cohort_listing:
     lineage:
       - datalake_rental_listing_metrics.cohort_listings_weekly.id_cohort_listing
+  city_group:
+    lineage:
+      - datalake_rental_listing_metrics.cohort_listings_weekly.city_group
   consultant_type:
     lineage:
       - datalake_rental_listing_metrics.cohort_listings_weekly.consultant_type

@@ -1,5 +1,6 @@
 SELECT
     wr_1w.id_cohort_listing,
+    wr_1w.city_group,
     wr_1w.consultant_type,
     wr_1w.entry_condition,
     wr_1w.exclusivity,

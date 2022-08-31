@@ -13,7 +13,8 @@ WITH mkt_house AS (
 ),
 weekly_status_since_start AS (
     SELECT
-        hldi.id_house_listing,   
+        hldi.id_house_listing,
+        r.city_group,
         CASE 
             WHEN hldi.consultant_type IS NULL THEN 'Core' 
             ELSE hldi.consultant_type
@@ -48,10 +49,8 @@ weekly_status_since_start AS (
         mkt.mkt_completion,
         mkt.mkt_origin,
         CASE
-            WHEN hldi.status_history = 'suspenso'
-                AND LOWER(hldi.status_change_reason) RLIKE 'minuta|reservado|nogocia|proposta' THEN 'nogociacao avancada'
-            WHEN hldi.status_history = 'despublicado'
-                AND LOWER(hldi.status_change_reason) RLIKE 'disabled|erro ao|despublicação automática após rescisão' THEN 'opt out / erro'
+            WHEN LOWER(hldi.status_change_reason) RLIKE 'minuta|reservado|nogocia|proposta' THEN 'nogociacao avancada'
+            WHEN LOWER(hldi.status_change_reason) RLIKE 'disabled|erro ao|despublicação automática após rescisão|\\[auto\\] \\[rescisao\\]' THEN 'opt out / erro'
             ELSE hldi.status_history
         END AS status_history,
         CEIL(COALESCE(NULLIF(DATEDIFF(hldi.dt_day, DATE(dhl.ts_listing_version_start)),0), 1)/7.0) AS weeks_since_listing_started, -- cohort 0 to 7 days => 1w, 8 to 14days  => 2w
@@ -63,25 +62,27 @@ weekly_status_since_start AS (
     FROM
         dw_public.dim_house_listing AS dhl
     JOIN
-    -- this table already have the last status of a listing in a specific day, so there is no need to treat this on the query.
         datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
-            ON dhl.sk_house_listing = hldi.id_house_listing   
-               AND (MOD(DATEDIFF(DATE(CONCAT(hldi.year, '-', hldi.month, '-', hldi.day)), DATE(dhl.ts_listing_version_start)), 7) = 0  -- Get cohorts or current run. Obs: It is not pushed to the source
-                    OR hldi.dt_day = DATE('{year}-{month}-{day}'))
+            ON dhl.sk_house_listing = hldi.id_house_listing
     LEFT JOIN
         mkt_house AS mkt
             ON mkt.id_house = hldi.id_house
     LEFT JOIN
         datalake_ebdb_clean.occupant_type AS ot
-            ON hldi.id_occupant = ot.id 
+            ON hldi.id_occupant = ot.id
+    LEFT JOIN
+        datalake_region.region AS r
+            ON hldi.id_region = r.id 
     WHERE
         dhl.ts_listing_version_start >= DATE('{year}-{month}-{day}') - INTERVAL 90 WEEK
         AND DATE(CONCAT(hldi.year, '-', hldi.month, '-', hldi.day)) >= DATE('{year}-{month}-{day}') - INTERVAL 90 WEEK -- PartitionFilters
         AND dhl.country_code = 'BR'
+        AND r.city_group IS NOT NULL 
 ),
 weekly_amounts AS (
     SELECT
-        MD5(dt_listing_week_started || listing_category_start || hybrid || mkt_completion || mkt_origin || entry_condition || consultant_type || exclusivity) AS id_cohort_listing,
+        MD5(dt_listing_week_started || listing_category_start || city_group || hybrid || mkt_completion || mkt_origin || entry_condition || consultant_type || exclusivity) AS id_cohort_listing,
+        city_group,
         consultant_type,
         entry_condition,
         exclusivity,
@@ -100,11 +101,12 @@ weekly_amounts AS (
         weekly_status_since_start
     WHERE
         is_last_status_in_cohort = TRUE
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 15
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16
 ),
 weekly_conversions AS (
     SELECT
         id_cohort_listing,
+        city_group,
         consultant_type,
         entry_condition,
         exclusivity,
@@ -129,6 +131,7 @@ weekly_conversions AS (
 )
 SELECT
     id_cohort_listing,
+    city_group,
     consultant_type,
     entry_condition,
     exclusivity,

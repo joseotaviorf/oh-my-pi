@@ -2,6 +2,9 @@
 database_name: rental_listing_metrics
 table_name: cohort_listings_weekly
 columns:
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
   listing_category_start:
     lineage:
       - dw_public.dim_house_listing.listing_category_start
