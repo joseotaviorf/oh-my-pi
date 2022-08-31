@@ -1,0 +1,26 @@
+---
+database_name: datalake_sale_visit_hubs
+table_name: sale_visit_hubs
+columns:
+    id_booking:
+        lineage:
+            - datalake_booking.booking.id_booking
+    id_business_unit:
+        lineage:
+            - datalake_gsheets_clean.sale_business_unit_standardization.id_business_unit_teams
+            - datalake_hub_services_clean.member_profile.id_business_unit
+            - datalake_hub_services_clean.business_unit.id
+    business_unit:
+        lineage:
+            - datalake_gsheets_clean.sale_business_unit_standardization.business_unit_teams
+            - datalake_hub_services_clean.member_profile.business_unit
+            - datalake_hub_services_clean.business_unit.hub_name
+    id_user_agent:
+        lineage:
+            - datalake_booking.booking.id_user_sale_agent
+    id_user_en:
+        lineage:
+            - datalake_hub_services_clean.users.id_external
+    ts_visit_intent:
+        lineage:
+            - datalake_booking.booking.ts_created
