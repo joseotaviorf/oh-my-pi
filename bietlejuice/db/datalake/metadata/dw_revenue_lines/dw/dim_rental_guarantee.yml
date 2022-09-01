@@ -11,6 +11,9 @@ columns:
   id_charge:
     lineage:
       - datalake_revenue_lines.rental_guarantee.id_charge
+  status:
+    lineage:
+      - datalake_revenue_lines.rental_guarantee.guarantee_status
   guarantee_status:
     lineage:
       - datalake_revenue_lines.rental_guarantee.guarantee_status
@@ -35,9 +38,3 @@ columns:
   ts_guarantee_created:
     lineage:
       - datalake_revenue_lines.rental_guarantee.ts_guarantee_created
-  ts_charge_created:
-    lineage:
-      - datalake_revenue_lines.rental_guarantee.ts_charge_created
-  ts_guarantee_paid:
-    lineage:
-      - datalake_revenue_lines.rental_guarantee.ts_guarantee_paid

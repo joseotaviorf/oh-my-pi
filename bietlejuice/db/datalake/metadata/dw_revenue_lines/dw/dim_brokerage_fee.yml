@@ -1,0 +1,37 @@
+---
+database_name: dw_revenue_lines
+table_name: dim_brokerage_fee
+columns:
+  id_contract_ebdb:
+    lineage:
+      - datalake_revenue_lines.brokerage_fee.id_contract_ebdb
+  invoice_payment_status:
+    lineage:
+      - datalake_revenue_lines.brokerage_fee.invoice_payment_status
+  first_rental_commission:
+    lineage:
+      - datalake_revenue_lines.brokerage_fee.first_rental_commission
+  agent_brokerage_share:
+    lineage:
+      - datalake_revenue_lines.brokerage_fee.agent_brokerage_share
+  brokerage_split_percentage:
+    lineage:
+      - datalake_revenue_lines.brokerage_fee.brokerage_split_percentage
+  prod_theorical_amount:
+    lineage:
+      - datalake_revenue_lines.brokerage_fee.prod_theorical_amount
+  invoice_paid_amount:
+    lineage:
+      - datalake_revenue_lines.brokerage_fee.invoice_paid_amount
+  accrual_year_month:
+    lineage:
+      - datalake_revenue_lines.brokerage_fee.accrual_year_month
+  dt_due:
+    lineage:
+      - datalake_revenue_lines.brokerage_fee.dt_due
+  dt_paid:
+    lineage:
+      - datalake_revenue_lines.brokerage_fee.dt_paid
+  dt_contract_start:
+    lineage:
+      - datalake_revenue_lines.brokerage_fee.dt_contract_start

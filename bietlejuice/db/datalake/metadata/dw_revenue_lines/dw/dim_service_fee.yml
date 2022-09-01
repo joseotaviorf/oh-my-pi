@@ -1,0 +1,31 @@
+---
+database_name: dw_revenue_lines
+table_name: dim_service_fee
+columns:
+  id_contract_ebdb:
+    lineage:
+      - datalake_revenue_lines.service_fee.id_contract_ebdb
+  invoice_payment_status:
+    lineage:
+      - datalake_revenue_lines.service_fee.invoice_payment_status
+  tenant_service_fee:
+    lineage:
+      - datalake_revenue_lines.service_fee.tenant_service_fee
+  prod_theorical_amount:
+    lineage:
+      - datalake_revenue_lines.service_fee.prod_theorical_amount
+  invoice_theorical_amount:
+    lineage:
+      - datalake_revenue_lines.service_fee.invoice_theorical_amount
+  invoice_paid_amount:
+    lineage:
+      - datalake_revenue_lines.service_fee.invoice_paid_amount
+  accrual_year_month:
+    lineage:
+      - datalake_revenue_lines.service_fee.accrual_year_month
+  dt_due:
+    lineage:
+      - datalake_revenue_lines.service_fee.dt_due
+  dt_paid:
+    lineage:
+      - datalake_revenue_lines.service_fee.dt_paid
