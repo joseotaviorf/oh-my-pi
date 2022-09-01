@@ -230,7 +230,7 @@ quintoandar_consultant_listings_sale AS (
         CASE
             WHEN (house_status = 'PUBLISHED' OR status_change_id IS NOT NULL)
                 AND ts_deleted IS NOT NULL
-                AND type_big_agent <> 'CIQ_FULL' THEN TRUE
+                AND type_big_agent NOT IN ('CIQ_FULL','ASP') THEN TRUE
             ELSE FALSE
         END AS is_incorrect_attribution
     FROM
@@ -299,7 +299,7 @@ quintoandar_consultant_listings_rent AS (
         CASE
             WHEN (dhl.status = 'publicado' OR hsc.sk_house_listing IS NOT NULL OR hcs.sk_house_listing IS NOT NULL)
     			AND mud.deleted_id IS NOT NULL
-                AND type_big_agent <> 'CIQ_FULL' THEN TRUE
+                AND type_big_agent NOT IN ('CIQ_FULL','ASP') THEN TRUE
             ELSE FALSE
         END AS is_incorrect_attribution
     FROM
@@ -403,7 +403,8 @@ quintoandar_consultant_listings AS (
         qclu.dt_ciq_started,
         qclu.id_partner,
         lcs.dt_sale,
-        lcr.dt_rent
+        lcr.dt_rent,
+        CAST(ts_deleted AS DATE) as dt_last_update_deleted
     FROM quintoandar_consultant_listings_filter as qclu
     LEFT JOIN 
         first_change_sale lcs

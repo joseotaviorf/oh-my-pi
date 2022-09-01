@@ -34,3 +34,6 @@ columns:
   dt_rent:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+  dt_last_update_deleted:
+    lineage:
+      - datalake_big_agent_clean.agency_aud.ts_deleted
