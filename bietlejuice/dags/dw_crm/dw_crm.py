@@ -16,32 +16,28 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
+# ENV setup
+ENV = os.environ.get("ENVIRONMENT")
+
+# DAG and Jobs params setup
 DW_SCHEMA = "crm"
 CONTEXT = "crm"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
-ENV = os.environ.get("ENVIRONMENT")
 MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 
 config_service = ConfigurationService(DAG_NAME)
+
+# S3 paths setup
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 dw_bucket = config_service.get_config("dw_bucket")
-databricks_bietlejuice_repo_path = config_service.get_config(
-    "databricks_bietlejuice_repo_path"
-)
+s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 spectrum_iam_role = config_service.get_config("spectrum_iam_role")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-full_tables = config_service.get_config("full_tables")
-incremental_load_parameters = config_service.get_config("incremental_load_parameters")
-inner_dependencies = config_service.get_config("inner_dependencies")
-
-BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
-
-cluster_description = config_service.get_config("cluster")
-default_libraries = config_service.get_config("default_libraries")
+cluster_description = config_service.get_config("databricks_10_4_med_memory_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -49,6 +45,12 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
+
+default_libraries = config_service.get_config("default_libraries")
+
+full_tables = config_service.get_config("full_tables")
+incremental_load_parameters = config_service.get_config("incremental_load_parameters")
+inner_dependencies = config_service.get_config("inner_dependencies")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -82,7 +84,7 @@ task_group = DWTaskGroup(
     dw_bucket=dw_bucket,
     dw_schema=DW_SCHEMA,
     relative_query_path=DAG_NAME,
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    spark_jobs_path=base_spark_jobs_path,
 )
 
 dw_staging_task_group = {}
