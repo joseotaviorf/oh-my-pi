@@ -23,6 +23,9 @@ columns:
   score:
     lineage:
       - datalake_kodak_raw.image_inspection_group.score
+  approval_score_threshold:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.approval_score_threshold
   property_condition:
     lineage:
       - datalake_kodak_raw.image_inspection_group.property_condition
@@ -38,9 +41,9 @@ columns:
   total_faults:
     lineage:
       - datalake_kodak_raw.image_inspection_group.total_faults
-  is_approvable:
+  is_approved:
     lineage:
-      - datalake_kodak_raw.image_inspection_group.approvable
+      - datalake_kodak_raw.image_inspection_group.approved
   has_bonus_good_sharpness:
     lineage:
       - datalake_kodak_raw.image_inspection_group.bonus_good_sharpness
@@ -56,6 +59,9 @@ columns:
   has_bonus_external:
     lineage:
       - datalake_kodak_raw.image_inspection_group.bonus_external
+  has_red_flags:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.red_flags
   has_red_flag_images_per_room:
     lineage:
       - datalake_kodak_raw.image_inspection_group.red_flag_images_per_room
