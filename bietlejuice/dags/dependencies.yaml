@@ -190,6 +190,7 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.enrich_3p:create-enrich-houses-3p-bh-external-table
   - bietlejuice.enrich_firestore:create-enrich-monday-external-table
+  - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
   - bietlejuice.rene_descartes:create-clean-lead-rejection-external-table
   - bietlejuice.wololo:create-clean-context-discard-external-table
   - bietlejuice.wololo:create-clean-conversion-external-table
@@ -699,6 +700,7 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
   - bietlejuice.enrich_firestore:load-enrich-monday
+  - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
   - bietlejuice.rene_descartes:load-clean-lead-rejection
   - bietlejuice.wololo:load-clean-context-discard
   - bietlejuice.wololo:load-clean-conversion

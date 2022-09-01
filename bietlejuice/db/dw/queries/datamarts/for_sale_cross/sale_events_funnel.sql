@@ -126,7 +126,7 @@ SELECT
     fv.sk_offer,
     fv.sk_booking,
     fv.is_hub_flow,
-	bur.business_unit AS hub_visit,
+	sv.business_unit AS hub_visit,
     dr.city_group,
 	COALESCE(db.is_3p_demand, FALSE) AS is_3p_demand,
 	COALESCE(db.partner_3p_demand, '') AS demand_3p_partner,
@@ -143,8 +143,11 @@ JOIN dim_booking AS db
     ON db.sk_booking = fv.sk_booking
 LEFT JOIN sale.fact_business_unit_region bur
     ON bur.sk_region = fv.sk_region
-    AND DATE(fv.sk_booking_created_date) BETWEEN DATE (bur.dt_coverage_started) 
-    AND DATE(COALESCE(bur.dt_coverage_ended, current_date))
+	AND DATE(fv.sk_booking_created_date) BETWEEN DATE (bur.dt_coverage_started) 
+	AND DATE(COALESCE(bur.dt_coverage_ended, current_date))
+LEFT JOIN 
+	datalake_sale_visit_hubs.sale_visit_hubs AS sv
+		ON sv.id_booking = fv.sk_booking
 ),
 sale_bookings AS (
 SELECT 
@@ -180,7 +183,7 @@ sale_closing AS (
         COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
         sdo.is_3p_supply,
         COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
-        sdo.business_unit AS hub
+        sdo.business_unit_sales_flow AS hub
     FROM
         sale.fact_offers fo
     LEFT JOIN
@@ -203,7 +206,7 @@ sale_closing AS (
         COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
         sdo.is_3p_supply,
         COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
-        sdo.business_unit AS hub
+        sdo.business_unit_sales_flow AS hub
     FROM
         sale.fact_offers fo
     LEFT JOIN
@@ -226,7 +229,7 @@ sale_closing AS (
         COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
         sdo.is_3p_supply,
         COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
-        sdo.business_unit AS hub
+        sdo.business_unit_sales_flow AS hub
     FROM
         sale.fact_offers fo
     LEFT JOIN
