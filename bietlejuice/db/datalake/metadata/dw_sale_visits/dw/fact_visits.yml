@@ -14,12 +14,18 @@ columns:
   sk_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
+  sk_business_unit:
+    lineage:
+      - datalake_sale_visit_hubs.sale_visit_hubs.id_business_unit
   sk_agent:
     lineage:
       - datalake_booking.booking.id_agent
   sk_user_agent:
     lineage:
       - datalake_ebdb_clean.user.id
+  sk_user_en:
+    lineage:
+      - datalake_sale_visit_hubs.sale_visit_hubs.id_user_en
   sk_fixed_agent:
     lineage:
       - datalake_booking.booking.id_sale_fixed_agent

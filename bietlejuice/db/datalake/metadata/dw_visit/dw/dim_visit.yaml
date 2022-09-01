@@ -10,6 +10,9 @@ columns:
   cd_visit:
     lineage:
       - datalake_ebdb_clean.visit.code
+  business_unit:
+    lineage:
+      - datalake_sale_visit_hubs.sale_visit_hubs.business_unit
   day_visit:
     lineage:
       - datalake_ebdb_clean.visit.dt_visit

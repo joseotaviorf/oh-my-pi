@@ -10,8 +10,10 @@ SELECT
     COALESCE(b.id_sale_flow, -1) AS sk_sale_flow,
     COALESCE(b.id_house, -1) AS sk_house,
     COALESCE(h.id_region, -1) AS sk_region,
+    COALESCE(svh.id_business_unit, -1) AS sk_business_unit,
     COALESCE(b.id_agent, -1) AS sk_agent,
     COALESCE(ua.id, -1) AS sk_user_agent,
+    COALESCE(svh.id_user_en, -1) AS sk_user_en,
     COALESCE(b.id_sale_fixed_agent, -1) AS sk_fixed_agent,
     COALESCE(b.id_visitor, -1) AS sk_buyer,
     COALESCE(h.id_user, -1) AS sk_seller,
@@ -49,6 +51,9 @@ LEFT JOIN
     offer_after_booking AS so
       ON b.id = so.id_booking
       AND offer_order = 1
+LEFT JOIN
+    datalake_sale_visit_hubs.sale_visit_hubs AS svh
+      ON svh.id_booking = so.id_booking
 LEFT JOIN
     datalake_ebdb_clean.real_estate_agent_rating AS ar
       ON ar.id = b.id_real_estate_agent_rating

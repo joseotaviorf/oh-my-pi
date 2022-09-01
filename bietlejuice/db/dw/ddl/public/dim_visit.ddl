@@ -3,6 +3,7 @@ create table public.dim_visit (
   sk_visit integer primary key,
   id_visit integer,
   cd_visit varchar(200),
+  business_unit varchar,
   day_visit date,
   slot integer,
   slot_count integer,
