@@ -1,0 +1,19 @@
+---
+database_name: datalake_revenue_lines
+table_name: service_fee
+columns:
+  id_contract_ebdb:
+    lineage:
+      - dw_public.dim_contract.sk_contract
+  invoice_payment_status:
+    lineage:
+      - datalake_retsuko.invoice.id
+  tenant_service_fee:
+    lineage:
+      - dw_public.dim_contract.tenant_service_fee
+  dt_due:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+  dt_paid:
+    lineage:
+      - datalake_retsuko.invoice.ts_paid

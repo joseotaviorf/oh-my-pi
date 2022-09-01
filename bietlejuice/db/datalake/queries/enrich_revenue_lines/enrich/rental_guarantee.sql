@@ -1,87 +1,100 @@
-WITH last_charge_created AS (
-    SELECT 
-        id,
-        MAX(ts_created) AS ts_last_created
-    FROM 
-        datalake_rental_guarantee_clean.charge
-    GROUP BY 1
-),
-last_contract_guarantee_updated AS (
-    SELECT
+WITH recent_guarantee AS (
+    SELECT DISTINCT
         id AS id_guarantee,
         MAX(ts_updated) AS ts_last_updated
     FROM
         datalake_rental_guarantee_clean.guarantee
-    GROUP BY 1 
+    GROUP BY 1
 ),
-charge_info AS (
-    SELECT
-        c.id_guarantee,
-        c.id,
-        CASE
-            WHEN c.charge_type = 'BILL' THEN 12
-            ELSE c.installments
-        END AS installments,
-        c.charge_status,
-        c.charge_type,
-        c.ts_created
-    FROM 
-        datalake_rental_guarantee_clean.charge AS c
-    INNER JOIN
-        last_charge_created lcu
-            ON c.id = lcu.id
-            AND c.ts_created = lcu.ts_last_created
-),
-guarantee AS (
-    SELECT 
-        g.id_contract_ebdb,
-        g.id AS id_guarantee,
-        ci.id AS id_charge,
-        g.ts_created AS ts_guarantee_created,
-        ci.ts_created AS ts_charge_created,
-        ADD_MONTHS(DATE_TRUNC('month', ci.ts_created), ci.installments) AS dt_charge_end,
-        DATE_TRUNC('month',ci.ts_created) AS dt_charge_started,
-        ci.installments,
-        g.ts_paid AS ts_guarantee_paid,
-        g.guarantee_status,
-        g.base_value,
-        g.final_value,
-        ((g.final_value/100/installments)/1.0738)*0.825 AS monthly_revenue,
-        ci.charge_status,
-        ci.charge_type
+recent_guarantee_distinct AS (
+    SELECT DISTINCT
+        id AS id_guarantee,
+        id_contract_ebdb,
+        guarantee_status,
+        final_value,
+        ts_created
     FROM
-        datalake_rental_guarantee_clean.guarantee AS g
-    INNER JOIN 
-        charge_info AS ci
-            ON g.id = ci.id_guarantee
+        datalake_rental_guarantee_clean.guarantee g
     INNER JOIN
-        last_contract_guarantee_updated AS lcgu
-            ON lcgu.id_guarantee = g.id
-            AND g.ts_updated = lcgu.ts_last_updated
+        recent_guarantee rg
+          ON rg.id_guarantee = g.id
+          AND g.ts_updated = rg.ts_last_updated
+),
+captured_charge AS (
+    SELECT DISTINCT
+        id_guarantee,
+        MAX(ts_updated) AS ts_last_updated
+    FROM 
+        datalake_rental_guarantee_clean.charge
     WHERE
-        g.id_contract_ebdb IS NOT NULL
-        AND g.ts_paid IS NOT NULL
-        AND ci.charge_status = 'CAPTURED' 
-)
-SELECT
-DISTINCT
-    gb.id_guarantee,
-    gb.id_contract_ebdb,
-    gb.id_charge,
-    gb.guarantee_status,
-    gb.charge_status,
-    gb.charge_type,
-    gb.installments AS total_installments,
-    (1+MONTHS_BETWEEN(ts_charge_created, dd.month_start)) AS installment_number,
-    gb.monthly_revenue,
-    dd.month_start AS accrual_year_month,
-    gb.ts_guarantee_created,
-    gb.ts_charge_created,
-    gb.ts_guarantee_paid
-FROM guarantee AS gb
+        charge_status = 'CAPTURED'
+    GROUP BY 1
+),
+captured_charge_distinct AS (
+    SELECT DISTINCT
+        c.id_guarantee,
+        c.id AS id_charge,
+        installments AS total_installments,
+        charge_status,
+        charge_type,
+        ts_updated
+    FROM 
+        datalake_rental_guarantee_clean.charge c
+    INNER JOIN
+        captured_charge cc
+          ON c.id_guarantee = cc.id_guarantee
+          AND c.ts_updated = cc.ts_last_updated      
+),
+df AS (
+SELECT DISTINCT
+  rg.id_guarantee,
+  rg.guarantee_status,
+  rc.id_charge,
+  rc.total_installments,
+  rc.charge_status,
+  rc.charge_type,
+  dc.sk_contract AS id_contract_ebdb,
+  dc.type,
+  dc.rent,
+  dc.status,
+  COALESCE(date_trunc('month', dt_start), date_trunc('month', dt_entrance)) AS dt_started,
+  COALESCE(date_trunc('month', dt_annulment), date_trunc('month', current_date)) AS dt_ended,
+  rg.final_value/100 AS final_value,
+  ROUND(((((CAST(rg.final_value AS DECIMAL(10,4))/100)/12)/1.0738)*0.825),2) AS installment_value,
+  rg.ts_created AS ts_guarantee_created
+FROM 
+  recent_guarantee_distinct AS rg
 INNER JOIN
-    datalake_quintoandar.aux_date AS dd
-        ON dd.date BETWEEN dt_charge_started AND dt_charge_end
+  captured_charge_distinct AS rc
+    ON rc.id_guarantee = rg.id_guarantee
+INNER JOIN
+  dw_public.dim_contract dc
+    ON dc.sk_contract = rg.id_contract_ebdb
+WHERE 
+  dc.guarantee = 'RentalGuarantee'
+AND
+  dc.type != 'DealOnly'
+AND
+  dc.status IN ('Ativo', 'Finalizado')
+AND
+  dc.country_code = 'BR'
+)
+SELECT DISTINCT
+  id_guarantee,
+  id_contract_ebdb,
+  id_charge,
+  status AS contract_status,
+  guarantee_status,
+  charge_status,
+  charge_type,
+  total_installments,
+  installment_value AS monthly_revenue,
+  CAST(CAST(YEAR(dd.month_start) AS STRING) || LPAD(CAST(MONTH(dd.month_start) AS STRING), 2, '0') AS INTEGER) AS accrual_year_month,
+  ts_guarantee_created
+FROM 
+  df
+INNER JOIN
+  dw_public.dim_date AS dd
+    ON dd.date BETWEEN dt_started AND dt_ended
 WHERE
-    (1+MONTHS_BETWEEN(ts_charge_created, dd.month_start)) <= installments
-    AND dd.month_start <= current_date
+    date(dd.month_start) >= date('2022-01-01')

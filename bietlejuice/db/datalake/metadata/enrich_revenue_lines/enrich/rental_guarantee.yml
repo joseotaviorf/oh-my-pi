@@ -11,6 +11,9 @@ columns:
   id_charge:
     lineage:
       - datalake_rental_guarantee_clean.charge.id
+  status:
+    lineage:
+      - dw_public.dim_contract.status
   guarantee_status:
     lineage:
       - datalake_rental_guarantee_clean.guarantee.guarantee_status
@@ -29,9 +32,3 @@ columns:
   ts_guarantee_created:
     lineage:
       - datalake_rental_guarantee_clean.guarantee.ts_created
-  ts_charge_created:
-    lineage:
-      - datalake_rental_guarantee_clean.charge.ts_created
-  ts_guarantee_paid:
-    lineage:
-      - datalake_rental_guarantee_clean.guarantee.ts_paid
