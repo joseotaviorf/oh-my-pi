@@ -1,0 +1,31 @@
+---
+database_name: datalake_velo_neurotech_clean
+table_name: logs_credit_granting
+columns:
+  id_proposal:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.codigo_proposta
+  id_operation:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.codigo_operacao
+  analysis_result:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.resultado
+  model_score:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_modelo_def
+  model_metadata:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_decisao_json
+  ts_operation:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.instante
+  year:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.year
+  month:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.month
+  day:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.day

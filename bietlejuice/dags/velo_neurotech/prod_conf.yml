@@ -1,0 +1,6 @@
+---
+table_name: logs_credit_granting
+report_name: DadosConcessaoCreditoAPI
+partition_cols: ["year", "month", "day"]
+cluster_libs:
+    - whl: "{artifacts_s3_bucket}/velo-neurotech-api-client-python/quintoandar_velo_neurotech_api_client-0.2.2-py2.py3-none-any.whl"
