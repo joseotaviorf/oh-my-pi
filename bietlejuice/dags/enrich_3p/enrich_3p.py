@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -33,10 +33,7 @@ DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-LOGS_OUTPUT_PATH = f"{config_service.get_config('spark_jobs_logs_path')}{DAG_ID}"
-
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -48,7 +45,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_BROKERS,
+        "owner": DAGOwnerEnum.DATA_REDE,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

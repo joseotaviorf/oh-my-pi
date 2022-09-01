@@ -3,7 +3,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -36,12 +36,7 @@ base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_enrich_amplitude", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+CLUSTER_DESCRIPTION = config_service.get_config("custom_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {

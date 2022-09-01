@@ -50,7 +50,7 @@ DEFAULT_LIBRARIES = config_service.get_config("default_libraries")
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_BROKERS,
+        "owner": DAGOwnerEnum.DATA_REDE,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

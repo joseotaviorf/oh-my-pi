@@ -63,8 +63,4 @@ Via **incremental load**:
   - `user_requirements`
   - `user_requirements_aud`
 
-### Responsible Data Teams
-
-For any questions or concerns about this DAG and data, please contact the Data For Brokers Team.
-
 </details>

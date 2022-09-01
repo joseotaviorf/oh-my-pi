@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import Variable, DAG
+from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -43,10 +43,7 @@ SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{LOGS_OUTPUT_PATH}{DAG_ID}"
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
 CUSTOM_LIBRARIES = [
     {
         "whl": f"{ARTIFACTS_DEFAULT_BUCKET}/pipedrive-api-client-python/"
@@ -63,7 +60,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_BROKERS,
+        "owner": DAGOwnerEnum.DATA_REDE,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
