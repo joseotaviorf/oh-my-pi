@@ -8,6 +8,9 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.id_house
+  id_contract:
+    lineage:
+      - datalake_ebdb_contract.contract.id
   version:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.order_version
@@ -23,6 +26,12 @@ columns:
   last_iorent_type:
     lineage:
       - datalake_ebdb_clean.special_condition.special_condition_type
+  nr_renting:
+    lineage:
+      - datalake_ebdb_contract.contract.id
+  who_is_living:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.name
   is_exclusive:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_in
@@ -40,6 +49,9 @@ columns:
   ts_listing_version_end:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.ts_status_changed_next
+  ts_entrance_started:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
   ts_last_unpublished:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.ts_status_changed_new
@@ -61,9 +73,6 @@ columns:
   dt_last_iorent_opted_out:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_out
-  id_contract:
-    lineage:
-      - datalake_ebdb_contract.contract.id
   ts_contract_signed:
     lineage:
       - datalake_ebdb_contract.contract.ts_signed
@@ -73,9 +82,6 @@ columns:
   ts_next_contract_signed:
     lineage:
       - datalake_ebdb_contract.contract.ts_signed
-  nr_renting:
-    lineage:
-      - datalake_ebdb_contract.contract.id
   dt_stranded:
     lineage:
       - datalake_ebdb_listing.house_listing_status.ts_status_started

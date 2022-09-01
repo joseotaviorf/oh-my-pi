@@ -415,20 +415,61 @@ house_listing_stranded_date AS (
         END AS dt_stranded
     FROM house_listing_stranded_status
     WHERE rn = 1
+),
+house_entrance_history AS (
+  SELECT 
+        hl.id_house_listing,
+        ot.name,
+        hl.version,
+        MAX(heh.rev) OVER(PARTITION BY hl.id_house_listing) = heh.rev AS is_last_status_in_listing,
+        heh.ts_entrance_started
+  FROM datalake_ebdb_listing.house_entrance_history AS heh
+  LEFT JOIN datalake_ebdb_clean.occupant_type AS ot
+    ON ot.id = heh.id_occupant
+  JOIN house_listing AS hl
+    ON heh.id_house = hl.id_house
+    AND (heh.ts_entrance_started BETWEEN COALESCE(hl.ts_listing_version_start, DATE('1922-01-01')) AND COALESCE(hl.ts_listing_version_end, DATE('2100-01-01'))
+    OR COALESCE(hl.ts_listing_version_start, DATE('1922-01-01')) BETWEEN heh.ts_entrance_started AND COALESCE(heh.ts_entrance_ended, DATE('2100-01-01')))
+    AND is_last_status_of_day = True
 )
-select
-  hl.*,
-  hl_c.id_contract,
-  count(c.id) over (partition by c.id_house) as nr_renting,
-  hl_c.order_renting,
-  hlsd.dt_stranded,
-  c.dt_termination as dt_contract_annulment,
-  c.ts_signed as ts_contract_signed,
-  lead(c.ts_signed, 1) over (partition by hl.id_house order by hl.version) as ts_next_contract_signed
-from house_listing hl
-left join house_listing_latest_contracts hl_c
-  on hl.id_house_listing = hl_c.id_house_listing
-left join datalake_ebdb_clean.contract c
-  on hl_c.id_contract = c.id
-left join house_listing_stranded_date hlsd
+SELECT
+    hl.id_house_listing,
+    hl.id_house,
+    hl_c.id_contract,
+    hl.version,
+    hl.status,
+    hl.rent,
+    hl.listing_category,
+    hl.last_originals_type,
+    hl.last_iorent_type,
+    COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
+    hl_c.order_renting,
+    heh.name AS who_is_living,
+    hl.is_last_version,
+    hl.is_exclusive,
+    hl.is_originals_active,
+    hl.is_iorent_active,
+    hl.ts_listing_version_start,
+    hl.ts_listing_version_end,
+    heh.ts_entrance_started,
+    hl.ts_last_unpublished,
+    hl.dt_last_exclusive_opted_in,
+    hl.dt_last_exclusive_opted_out,
+    hl.dt_last_originals_opted_in,
+    hl.dt_last_originals_opted_out,
+    hl.dt_last_iorent_opted_in,
+    hl.dt_last_iorent_opted_out,
+    hlsd.dt_stranded,
+    c.dt_termination AS dt_contract_annulment,
+    c.ts_signed AS ts_contract_signed,
+    LEAD(c.ts_signed, 1) OVER (PARTITION BY hl.id_house ORDER BY hl.version) AS ts_next_contract_signed
+FROM house_listing AS hl
+LEFT JOIN house_listing_latest_contracts AS hl_c
+    ON hl.id_house_listing = hl_c.id_house_listing
+LEFT JOIN datalake_ebdb_clean.contract AS c
+    ON hl_c.id_contract = c.id
+LEFT JOIN house_listing_stranded_date AS hlsd
     ON hlsd.id_house_listing = hl.id_house_listing
+LEFT JOIN house_entrance_history AS heh
+    ON heh.id_house_listing = hl.id_house_listing
+    AND heh.is_last_status_in_listing = True

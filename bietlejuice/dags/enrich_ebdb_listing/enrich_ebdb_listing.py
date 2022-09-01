@@ -53,7 +53,11 @@ LIBRARIES_DESCRIPTION = Variable.get(
 
 # dependent: [dependencies]
 INNER_DEPENDENCIES = {
-    "house_listing": ["house_status_version_order", "house_listing_status"],
+    "house_listing": [
+        "house_status_version_order",
+        "house_listing_status",
+        "house_entrance_history",
+    ],
     "house_listing_status": ["house_status_version_order"],
     "agents_with_keys": ["house_listing"],
 }
