@@ -1183,6 +1183,11 @@ bietlejuice.enrich_analyst_ranking:
   - bietlejuice.gsheets.support_and_service:load-clean-support-agents-department
   - bietlejuice.gsheets.support_and_service:load-clean-ranking-rules
 
+bietlejuice.enrich_betopera:
+  - bietlejuice.betopera:load-clean-certificate
+  - bietlejuice.betopera:load-clean-certificate-request
+  - bietlejuice.betopera:load-clean-insurance
+
 bietlejuice.enrich_big_agent:
   - bietlejuice.big_agent:load-clean-agency
   - bietlejuice.big_agent:load-clean-agency-aud

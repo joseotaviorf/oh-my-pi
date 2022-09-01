@@ -1,0 +1,33 @@
+database_name: datalake_betopera
+table_name: insurance
+columns:
+  id:
+    lineage:
+      - datalake_betopera_clean.insurance.id
+  id_idempotency:
+    lineage:
+      - datalake_betopera_clean.insurance.id_idempotency
+  source_type_code:
+    lineage:
+      - datalake_betopera_clean.insurance.source_type_code
+  status:
+    lineage:
+      - datalake_betopera_clean.insurance.status
+  version:
+    lineage:
+      - datalake_betopera_clean.insurance.version
+  ts_created:
+    lineage:
+      - datalake_betopera_clean.insurance.ts_created
+  ts_updated:
+    lineage:
+      - datalake_betopera_clean.insurance.ts_updated
+  year:
+    lineage:
+      - datalake_betopera_clean.insurance.year
+  month:
+    lineage:
+      - datalake_betopera_clean.insurance.month
+  day:
+    lineage:
+      - datalake_betopera_clean.insurance.day

@@ -1,0 +1,48 @@
+database_name: datalake_betopera
+table_name: certificate
+columns:
+  id:
+    lineage:
+      - datalake_betopera_clean.certificate.id
+  id_insurance:
+    lineage:
+      - datalake_betopera_clean.certificate.id_insurance
+  id_certificate_request:
+    lineage:
+      - datalake_betopera_clean.certificate.id_certificate_request
+  version:
+    lineage:
+      - datalake_betopera_clean.certificate.version
+  status:
+    lineage:
+      - datalake_betopera_clean.certificate.status
+  response_payload:
+    lineage:
+      - datalake_betopera_clean.certificate.response_payload
+  file_url:
+    lineage:
+      - datalake_betopera_clean.certificate.file_url
+  dt_start:
+    lineage:
+      - datalake_betopera_clean.certificate.dt_start
+  dt_end:
+    lineage:
+      - datalake_betopera_clean.certificate.dt_end
+  dt_cancel:
+    lineage:
+      - datalake_betopera_clean.certificate.dt_cancel
+  ts_created:
+    lineage:
+      - datalake_betopera_clean.certificate.ts_created
+  ts_updated:
+    lineage:
+      - datalake_betopera_clean.certificate.ts_updated
+  year:
+    lineage:
+      - datalake_betopera_clean.certificate.year
+  month:
+    lineage:
+      - datalake_betopera_clean.certificate.month
+  day:
+    lineage:
+      - datalake_betopera_clean.certificate.day
