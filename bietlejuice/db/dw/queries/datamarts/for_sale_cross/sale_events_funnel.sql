@@ -146,7 +146,7 @@ LEFT JOIN sale.fact_business_unit_region bur
 	AND DATE(fv.sk_booking_created_date) BETWEEN DATE (bur.dt_coverage_started) 
 	AND DATE(COALESCE(bur.dt_coverage_ended, current_date))
 LEFT JOIN 
-	datalake_sale_visit_hubs.sale_visit_hubs AS sv
+	datalake_sale_visit_hubs_prod.sale_visit_hubs AS sv
 		ON sv.id_booking = fv.sk_booking
 ),
 sale_bookings AS (
