@@ -118,11 +118,7 @@ if __name__ == "__main__":
     )
 
     if len(pandas_df) == 0:
-        logger.warn(
-            f"""
-                m={JOB_NAME}, msg=result is empty"
-            """
-        )
+        logger.warn(f"m={JOB_NAME}, msg=result is empty")
     else:
         spark_client = SparkClient()
         df = spark_client.create_dataframe(pandas_df, __generate_schema(pandas_df))
@@ -161,5 +157,11 @@ if __name__ == "__main__":
             format_options,
             database_location,
             args.partition_cols,
-            force_recreate=False,
+            force_recreate=True,
+        )
+        spark_metastore_service.create_new_partitions_from_df(
+            database_name=database_name,
+            table_name=table_name,
+            df=df,
+            partition_cols=args.partition_cols,
         )
