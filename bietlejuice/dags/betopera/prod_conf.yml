@@ -3,7 +3,6 @@ tables_exclusion_list:
   - certificate_aud
   - certificate_request_aud
   - change_owner_control
-  - contract_canceled_temp
   - flyway_schema_history
   - insurance_aud
   - revinfo
