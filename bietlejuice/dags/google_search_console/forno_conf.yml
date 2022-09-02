@@ -1,0 +1,14 @@
+---
+property_type_list:
+  domain:
+    - by_property
+    - by_page
+    - by_property_without_query
+    - by_page_without_page
+  url:
+    - by_property
+    - by_page
+    - by_property_without_query
+    - by_page_without_page
+partition_cols:
+  - dt_created

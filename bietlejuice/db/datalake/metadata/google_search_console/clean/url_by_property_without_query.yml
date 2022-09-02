@@ -1,0 +1,40 @@
+---
+database_name: datalake_google_search_console_clean
+table_name: url_by_property_without_query
+columns:
+  site_url:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.site_url
+  google_property:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.type
+  country:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.keys
+  device_category:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.keys
+  clicks:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.clicks
+  ctr:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.ctr
+  impressions:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.impressions
+  position:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.position
+  dt_created:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.date
+  year:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.date
+  month:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.date
+  day:
+    lineage:
+      - datalake_google_search_console_raw.url_by_property_without_query.date
