@@ -113,8 +113,7 @@ weekly_listings_mkt AS (
     WHERE 
         wl.dt_week < DATE_TRUNC('week', DATE('{year}-{month}-{day}')) 
 ),
-weekly_listings_base AS (
-    -- Create a PK for these elements to join them and guarantee uniqueness  
+weekly_listings_base AS ( 
     SELECT
         wlm.sk_contract,
         MD5(wlm.dt_week || wlm.dt_month || wlm.listing_category_start || wlm.hybrid || wlm.mkt_completion || wlm.mkt_origin || wlm.entry_condition || wlm.consultant_type || wlm.exclusivity || wlm.listing_category_previous) AS id_coincident_listing,
@@ -135,6 +134,24 @@ weekly_listings_base AS (
         wlm.dt_week_signed
     FROM
         weekly_listings_mkt AS wlm
+),
+weekly_coincident AS (
+    -- Create a PK for these elements to join them and guarantee uniqueness  
+    SELECT
+        wlb.id_coincident_listing,
+        wlb.consultant_type,
+        wlb.entry_condition,
+        wlb.exclusivity,
+        wlb.hybrid,
+        wlb.listing_category_start,
+        wlb.listing_category_previous,
+        wlb.mkt_completion,
+        wlb.mkt_origin,
+        wlb.dt_month,
+        wlb.dt_week
+    FROM
+        weekly_listings_base AS wlb
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 churned AS (
     SELECT
@@ -174,31 +191,31 @@ contracts AS (
     GROUP BY 1
 )
 SELECT
-    wlm.id_coincident_listing,
-    wlm.consultant_type,
-    wlm.entry_condition,
-    wlm.exclusivity,
-    wlm.hybrid,
-    wlm.listing_category_start,
-    wlm.listing_category_previous,
-    wlm.mkt_completion,
-    wlm.mkt_origin,
+    wc.id_coincident_listing,
+    wc.consultant_type,
+    wc.entry_condition,
+    wc.exclusivity,
+    wc.hybrid,
+    wc.listing_category_start,
+    wc.listing_category_previous,
+    wc.mkt_completion,
+    wc.mkt_origin,
     COALESCE(c.listings_with_contracts_signed, 0) AS listings_with_contracts_signed,
     COALESCE(ch.unpublished, 0) AS unpublished,
     COALESCE(ch.excluded, 0) AS excluded,
     COALESCE(ch.suspended, 0) AS suspended,
     COALESCE(r.return_from_unpublished, 0) AS return_from_unpublished,
     COALESCE(r.return_from_suspended, 0) AS return_from_suspended,
-    wlm.dt_month AS dt_month_started,
-    wlm.dt_week AS dt_week_started
+    wc.dt_month AS dt_month_started,
+    wc.dt_week AS dt_week_started
 FROM
-    weekly_listings_base AS wlm 
+    weekly_coincident AS wc
 LEFT JOIN
     churned AS ch
-        ON wlm.id_coincident_listing = ch.id_coincident_listing
+        ON wc.id_coincident_listing = ch.id_coincident_listing
 LEFT JOIN
     contracts AS c
-        ON wlm.id_coincident_listing = c.id_coincident_listing
+        ON wc.id_coincident_listing = c.id_coincident_listing
 LEFT JOIN
     returned AS r
-        ON wlm.id_coincident_listing = r.id_coincident_listing
+        ON wc.id_coincident_listing = r.id_coincident_listing
