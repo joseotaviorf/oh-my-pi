@@ -12,8 +12,8 @@ from pyspark.sql.utils import AnalysisException
 class GSheetValidationSuite(GsheetsValidationSuitesExecutor):
     REPOSITORY_CONSUMER_CLASS = GoogleSheetsClient
     GSHEETS_FILES_PATH = COMPOSER_DAGS_PATH + "/gsheets/gsheets_files.yaml"
-    SLACK_MSG_TEMPLATE = """:sheets: Sheet: <{}|{}> (ID:{})\n\t_Last modifier: {} - <@{}> - {}. Owner team: {}._\n\tError: ```{}```"""
-    SLACK_MSG_TEMPLATE_SMALL = """:sheets: Sheet: <{}|{}> (ID:{})\n. Owner team: {}._\n\tError: *Other related errors, please contact the Analytics Engineering owner team.*"""
+    SLACK_MSG_TEMPLATE = """:sheets: Sheet: <{}|{}> (ID: {})\n\t_Last modifier: {} - <@{}> - {}. Owner team: {}._\n\tError: ```{}```"""
+    SLACK_MSG_TEMPLATE_SMALL = """:sheets: Sheet: <{}|{}> (ID: {})\n _Owner team: {}._\n\tError: *Other related errors, please contact the Analytics Engineering owner team.*"""
 
     def __init__(self, auth) -> None:
         super().__init__(auth)
