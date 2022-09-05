@@ -59,7 +59,6 @@ This pipeline produces the following output tables:
     - `extra_invoice_created_expenses`
     - `from_to_cancellation`
     - `google_searches_share_of_interest`
-    - `hotjar_photos_repressed_demand`
     - `households_per_city_ibge`
     - `inside_sale_supply_targets`
     - `inspection_bugs`
@@ -98,7 +97,6 @@ This pipeline produces the following output tables:
     - `provisioned_costs_import`
     - `refund_after_termination_csat`
     - `rent_criteo_eng_ab_test`
-    - `rental_cohort_demand`
     - `rental_cohort_supply`
     - `rental_flows_targets`
     - `rental_ntp_source_targets`

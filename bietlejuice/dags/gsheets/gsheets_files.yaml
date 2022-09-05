@@ -173,11 +173,6 @@ google_searches_share_of_interest:
     sheet_name: google_searches_share_of_interest
     clean_table_name: google_searches_share_of_interest
 
-hotjar_demanda_reprimida_fotos:
-    sheet_id: 1aP3ir1aAPLpzGwbRiS16UH1iTtTQPJbaKz0CcLIbTdc
-    sheet_name: demanda_reprimida_fotos
-    clean_table_name: hotjar_photos_repressed_demand
-
 households_per_city_ibge:
     sheet_id: 1pziUrjcQhYv0JGdbv9SDaimgn1Wg9uCxNMba-bGzhkY
     sheet_name: Domicilios_por_Municipio_Censo_2010
@@ -307,11 +302,6 @@ rent_criteo_eng_ab_test:
     sheet_id: 17PonK69vjOYru-xD0acbVqD0bkl_LPuGodhR2AHmn5I
     sheet_name: rent_criteo_eng_ab_test
     clean_table_name: rent_criteo_eng_ab_test
-
-rental_cohort_demand:
-    sheet_id: 1rTjKP11jXCV8Jfchynmi3UHx5wwoWDVPojxAWABj-rw
-    sheet_name: rental_cohort_demand
-    clean_table_name: rental_cohort_demand
 
 rental_cohort_supply:
     sheet_id: 1qz4QZD4OYSfXV_mMiAUH9okYT5hodlwfP3edmeyldO4

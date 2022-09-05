@@ -790,6 +790,12 @@ rental_budget_targets:
     clean_table_name: rental_budget_targets
     sheet_context: for_rent
 
+rental_cohort_demand:
+    sheet_id: 1rTjKP11jXCV8Jfchynmi3UHx5wwoWDVPojxAWABj-rw
+    sheet_name: rental_cohort_demand
+    clean_table_name: rental_cohort_demand
+    sheet_context: for_rent
+
 supply_targets_2022:
     sheet_id: 1rU-ptg-ZtD0WdnbXnUVpGw8Lrf-0grc2IitwEmn2yZ0
     sheet_name: supply_targets_2022

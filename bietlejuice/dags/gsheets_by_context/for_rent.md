@@ -36,6 +36,7 @@ This pipeline produces the following output tables:
     - `mexico_supply_targets_2022`
     - `ongoing_listings_target`
     - `rental_budget_targets`
+    - `rental_cohort_demand`
     - `supply_targets_2022`
     - `tratativas_actionline_ciq_full_responses`
 
@@ -49,6 +50,8 @@ This pipeline produces the following output tables:
     - `listings_with_agreed_discounts`
     - `mexico_demand_targets_2022`
     - `mexico_supply_targets_2022`
+    - `rental_budget_targets`
+    - `rental_cohort_demand`
     - `rental_forecast_cohort_demand`
     - `rental_forecast_cohort_supply`
     - `rental_forecast_daily_demand`
