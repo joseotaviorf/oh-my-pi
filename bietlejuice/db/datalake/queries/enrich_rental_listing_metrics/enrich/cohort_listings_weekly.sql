@@ -54,7 +54,7 @@ weekly_status_since_start AS (
             ELSE hldi.status_history
         END AS status_history,
         CEIL(COALESCE(NULLIF(DATEDIFF(hldi.dt_day, DATE(dhl.ts_listing_version_start)),0), 1)/7.0) AS weeks_since_listing_started, -- cohort 0 to 7 days => 1w, 8 to 14days  => 2w
-        MAX(hldi.ts_status_started) OVER(PARTITION BY hldi.id_house_listing, CEIL(COALESCE(NULLIF(DATEDIFF(hldi.dt_day, DATE(dhl.ts_listing_version_start)),0), 1)/7.0)) = hldi.ts_status_started AS is_last_status_in_cohort,
+        MAX(hldi.dt_day) OVER(PARTITION BY hldi.id_house_listing, CEIL(COALESCE(NULLIF(DATEDIFF(hldi.dt_day, DATE(dhl.ts_listing_version_start)),0), 1)/7.0)) = hldi.dt_day AS is_last_status_in_cohort,
         DATE_TRUNC('month', dhl.ts_listing_version_start) AS dt_listing_month_started,
         DATE_TRUNC('week', dhl.ts_listing_version_start) AS dt_listing_week_started,
         hldi.ts_status_started,
@@ -81,7 +81,7 @@ weekly_status_since_start AS (
 ),
 weekly_amounts AS (
     SELECT
-        MD5(dt_listing_week_started || listing_category_start || city_group || hybrid || mkt_completion || mkt_origin || entry_condition || consultant_type || exclusivity) AS id_cohort_listing,
+        MD5(dt_listing_week_started || dt_listing_month_started || listing_category_start || city_group || hybrid || mkt_completion || mkt_origin || entry_condition || consultant_type || exclusivity) AS id_cohort_listing,
         city_group,
         consultant_type,
         entry_condition,
@@ -116,9 +116,6 @@ weekly_conversions AS (
         mkt_origin,
         depub_w,
         imoveis_w,
-        IF(imoveis_w = 0, 0, 1.0*list_w_cs_w/imoveis_w) AS l2r_w,
-        IF(imoveis_w = 0, 0, 1.0*suspenso_w/imoveis_w) AS l2s_w,
-        IF(imoveis_w = 0, 0, 1.0*depub_w/imoveis_w) AS l2u_w,
         list_w_cs_w,
         suspenso_w,
         weeks_since_listing_started,
@@ -130,6 +127,7 @@ weekly_conversions AS (
         weeks_since_listing_started <= 28
 )
 SELECT
+    id_cohort_listing || weeks_since_listing_started AS id_cohort_listing_week,
     id_cohort_listing,
     city_group,
     consultant_type,
@@ -141,10 +139,6 @@ SELECT
     mkt_origin,
     depub_w,
     imoveis_w,
-    l2r_w,
-    l2s_w,
-    l2u_w,
-    IF(l2r_w = 0, 0, (l2s_w + l2u_w)/(l2s_w + l2u_w + l2r_w)) AS churn_w,
     list_w_cs_w,
     suspenso_w,
     weeks_since_listing_started,
