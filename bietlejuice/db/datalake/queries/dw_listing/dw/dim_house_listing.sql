@@ -153,7 +153,7 @@ house_listings AS (
         hl.listing_category,
         hl.is_last_version,
         hl.is_exclusive,
-        h.occupant_type AS who_is_living,
+        hl.who_is_living,
         h.key_type,
         h.key_location,
         COALESCE(h.visit_restriction = 'Restriction', FALSE) AS has_visit_restriction,
