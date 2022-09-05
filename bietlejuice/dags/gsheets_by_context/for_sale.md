@@ -8,7 +8,7 @@ If you need information to understand how you can add your sheet, check our [Goo
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
-  
+
 ### Execution Interval
 
 This DAG is trigged daily.
@@ -20,9 +20,15 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
+    - `aux_agents_sale_hub`
     - `business_unit_region`
+    - `deduplicate_batch_listings_forsale`
     - `forbrokers_3p_partner_conditions`
+    - `hub_agents_hierarchy`
+    - `hub_sale_closing_process`
     - `offers_hub_central`
+    - `sale_closing_ops_targets`
+    - `sale_closing_ops_targets_extra_slas_tags`
     - `rede_5a_revenue_share_conditions`
     - `sale_asp_form_responses_2022q1`
     - `sale_asp_form_responses_2022q2`
@@ -44,11 +50,18 @@ This pipeline produces the following output tables:
     - `subhub_regions`
     - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
+    - `tqc_leads`
     - `tqc_leads_bh`
 2. Data lake clean:
+    - `aux_agents_sale_hub`
     - `business_unit_region`
+    - `deduplicate_batch_listings_forsale`
     - `forbrokers_3p_partner_conditions`
+    - `hub_agents_hierarchy`
+    - `hub_sale_closing_process`
     - `offers_hub_central`
+    - `sale_closing_ops_targets`
+    - `sale_closing_ops_targets_extra_slas_tags`
     - `rede_5a_revenue_share_conditions`
     - `sale_asp_form_responses_2022q1`
     - `sale_asp_form_responses_2022q2`
@@ -70,6 +83,7 @@ This pipeline produces the following output tables:
     - `subhub_regions`
     - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
+    - `tqc_leads`
     - `tqc_leads_bh`
 
 </details>

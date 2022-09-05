@@ -805,10 +805,22 @@ tratativas_actionline_ciq_full_responses:
 #########################
 # FOR SALE SHEETS
 ###################
+aux_agents_sale_hub:
+    sheet_id: 1mom8xcJ4XCpr02S38DgW_cmEDcdzsOiMkW2vSbg0Ra0
+    sheet_name: aux_agents_HUB
+    clean_table_name: aux_agents_sale_hub
+    sheet_context: for_sale
+
 business_unit_region:
     sheet_id: 1AqaMTw8A6QXW4UExztYWQpBLPNfn04kafXvEPwEhqps
     sheet_name: business_unit_region
     clean_table_name: business_unit_region
+    sheet_context: for_sale
+
+deduplicate_batch_listings_forsale:
+    sheet_id: 18zKmMCSdcZSttLhj0Kb8qqU4-_yCt2njKurjxhZrSc4
+    sheet_name: deduplicate_batch_listings_forsale
+    clean_table_name: deduplicate_batch_listings_forsale
     sheet_context: for_sale
 
 forbrokers_3p_partner_conditions:
@@ -817,10 +829,34 @@ forbrokers_3p_partner_conditions:
     clean_table_name: forbrokers_3p_partner_conditions
     sheet_context: for_sale
 
+hub_agents_hierarchy:
+    sheet_id: 1LCtC41-pZRUM34Y6jyfSSys5zCXcueZ5uDmXVoQ5zVk
+    sheet_name: Output
+    clean_table_name: hub_agents_hierarchy
+    sheet_context: for_sale
+
+hub_sale_closing_process:
+    sheet_id: 1yD11Nsj9Bcl1ugfK-R7e185Vr4wGqo8A3d7K95q6ieE
+    sheet_name: clean
+    clean_table_name: hub_sale_closing_process
+    sheet_context: for_sale
+
 offers_hub_central:
     sheet_id: 1uZpIFY-bhuxzS4LKl2jwFdBGdReQI7ifiYsewBIpKUE
     sheet_name: offers_hub_central
     clean_table_name: offers_hub_central
+    sheet_context: for_sale
+
+sale_closing_ops_targets:
+    sheet_id: 1J32RiwqKyM8lg5IhRHYS_AuA64-trVP_Slf5j5UOcUg
+    sheet_name: sale_closing_ops_targets
+    clean_table_name: sale_closing_ops_targets
+    sheet_context: for_sale
+
+sale_closing_ops_targets_extra_slas_tags:
+    sheet_id: 1J32RiwqKyM8lg5IhRHYS_AuA64-trVP_Slf5j5UOcUg
+    sheet_name: sale_closing_ops_targets_extra_slas_tags
+    clean_table_name: sale_closing_ops_targets_extra_slas_tags
     sheet_context: for_sale
 
 sale_asp_control_2022q2:
@@ -948,6 +984,13 @@ target_sale_cohort_supply:
     sheet_name: target_sale_cohort_supply
     clean_table_name: target_sale_cohort_supply
     sheet_context: for_sale
+
+tqc_leads:
+    sheet_id: 1s1GI7u9oidsTLtW3Z4_e1Go3EfJR2VMva8VgziSA7RU
+    sheet_name: tqc_leads
+    clean_table_name: tqc_leads
+    sheet_context: for_sale
+    preload_time_in_seconds: 30
 
 tqc_leads_bh:
     sheet_id: 134aaiWWqIE4P9nEOONk7dSesdRZrTZf1otcxwZGjT-g
@@ -1186,7 +1229,6 @@ zipcodes_sp:
     sheet_name: zipcodes_sp
     clean_table_name: zipcodes_sp
     sheet_context: static
-
 
 #########################
 # GENERAL SHEETS

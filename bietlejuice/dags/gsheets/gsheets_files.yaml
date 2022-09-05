@@ -30,11 +30,6 @@ agents_ranking_offboarding:
     sheet_name: Ranking Analista x Demanda
     clean_table_name: agents_ranking_offboarding
 
-aux_agents_sale_hub:
-    sheet_id: 1mom8xcJ4XCpr02S38DgW_cmEDcdzsOiMkW2vSbg0Ra0
-    sheet_name: aux_agents_HUB
-    clean_table_name: aux_agents_sale_hub
-
 bbb22_coupon_for_sale:
     sheet_id: 1ZnRK-EXvUVNneRtoyCZ0y1ET-Cc859JokFIEFZUfacQ
     sheet_name: users
@@ -122,11 +117,6 @@ csat_vistoria_saida:
     sheet_name: saida
     clean_table_name: exit_inspection_csat
 
-deduplicate_batch_listings_forsale:
-    sheet_id: 18zKmMCSdcZSttLhj0Kb8qqU4-_yCt2njKurjxhZrSc4
-    sheet_name: deduplicate_batch_listings_forsale
-    clean_table_name: deduplicate_batch_listings_forsale
-
 demand_channel_share:
     sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
     sheet_name: demand_channel_share
@@ -192,16 +182,6 @@ households_per_city_ibge:
     sheet_id: 1pziUrjcQhYv0JGdbv9SDaimgn1Wg9uCxNMba-bGzhkY
     sheet_name: Domicilios_por_Municipio_Censo_2010
     clean_table_name: households_per_city_ibge
-
-hub_agents_hierarchy:
-    sheet_id: 1LCtC41-pZRUM34Y6jyfSSys5zCXcueZ5uDmXVoQ5zVk
-    sheet_name: Output
-    clean_table_name: hub_agents_hierarchy
-
-hub_sale_closing_process:
-    sheet_id: 1yD11Nsj9Bcl1ugfK-R7e185Vr4wGqo8A3d7K95q6ieE
-    sheet_name: clean
-    clean_table_name: hub_sale_closing_process
 
 inside_sale_supply_targets:
     sheet_id: 1AMY3biIPE8bD32xaYVv7lh-LbSZNGhA8P9L7kse3Poc
@@ -353,16 +333,6 @@ sale_criteo_eng_ab_test:
     sheet_name: sale_criteo_eng_ab_test
     clean_table_name: sale_criteo_eng_ab_test
 
-sale_closing_ops_targets:
-    sheet_id: 1J32RiwqKyM8lg5IhRHYS_AuA64-trVP_Slf5j5UOcUg
-    sheet_name: sale_closing_ops_targets
-    clean_table_name: sale_closing_ops_targets
-
-sale_closing_ops_targets_extra_slas_tags:
-    sheet_id: 1J32RiwqKyM8lg5IhRHYS_AuA64-trVP_Slf5j5UOcUg
-    sheet_name: sale_closing_ops_targets_extra_slas_tags
-    clean_table_name: sale_closing_ops_targets_extra_slas_tags
-
 sale_rbp_targets:
     sheet_id: 1dbPJT39JNkgakOE95INVipThMe-vLDDXHZ4aOp3q4pg
     sheet_name: sale_rbp_targets
@@ -387,12 +357,6 @@ targets_agents_engagement:
     sheet_id: 1Nf3OlUhvk8TiIN0T6uvQ_ES99yyB9D3K6anj5Hdr-ys
     sheet_name: targets_agents_engagement
     clean_table_name: targets_agents_engagement
-
-tqc_leads:
-    sheet_id: 1s1GI7u9oidsTLtW3Z4_e1Go3EfJR2VMva8VgziSA7RU
-    sheet_name: tqc_leads
-    clean_table_name: tqc_leads
-    preload_time_in_seconds: 30
 
 tqc_registered_agents:
     sheet_id: 1FuN5jlN9pDvVfwPDJAqROfqXKF3tIhXDUvR6a6RGqYg

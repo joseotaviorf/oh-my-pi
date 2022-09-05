@@ -33,7 +33,6 @@ This pipeline produces the following output tables:
     - `agents_ranking_targets`
     - `agreements_discounts_answer_forms`
     - `agreements_discounts_expenses_created`
-    - `aux_agents_sale_hub`
     - `bandaid_off`
     - `bbb22_coupon_sale_users`
     - `bbb22_giveaway_rent_users`
@@ -49,7 +48,6 @@ This pipeline produces the following output tables:
     - `criteo_abtest_rj`
     - `credit_analysis_fraudsters`
     - `crm_iptu_wave4`
-    - `deduplicate_batch_listings_forsale`
     - `demand_channel_share`
     - `demand_retention_ab_tests`
     - `demand_targets_replanning`
@@ -63,8 +61,6 @@ This pipeline produces the following output tables:
     - `google_searches_share_of_interest`
     - `hotjar_photos_repressed_demand`
     - `households_per_city_ibge`
-    - `hub_agents_hierarchy`
-    - `hub_sale_closing_process`
     - `inside_sale_supply_targets`
     - `inspection_bugs`
     - `ipsos_brandtracking_questions`
@@ -108,8 +104,6 @@ This pipeline produces the following output tables:
     - `rental_ntp_source_targets`
     - `rental_rtp_targets`
     - `retention_exclusivity_active_contact`
-    - `sale_closing_ops_targets`
-    - `sale_closing_ops_targets_extra_slas_tags`
     - `sale_criteo_eng_ab_test`
     - `sale_flows_targets`
     - `sale_rbp_targets`
@@ -129,7 +123,6 @@ This pipeline produces the following output tables:
     - `tenant_negotiation_csat`
     - `tenant_reimbursement_csat`
     - `tof_supply_targets`
-    - `tqc_leads`
     - `tqc_registered_agents`
     - `tracking_catalog_event_properties`
     - `tv_ads`
