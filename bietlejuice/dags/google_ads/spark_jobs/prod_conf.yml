@@ -31,7 +31,7 @@ GAQL:
         metrics.impressions,
         ad_group_ad.ad.image_ad.name,
         customer.descriptive_name,
-        segments.adNetworkType
+        segments.ad_network_type
     FROM ad_group_ad
     WHERE
         segments.date BETWEEN '{load_start_date}' AND '{load_end_date}'
@@ -50,7 +50,7 @@ GAQL:
         campaign.labels,
         segments.week,
         segments.year,
-        segments.adNetworkType
+        segments.ad_network_type
     FROM campaign
     WHERE
         segments.date BETWEEN '{load_start_date}' AND '{load_end_date}'
@@ -70,7 +70,7 @@ GAQL:
         metrics.impressions,
         metrics.clicks,
         metrics.cost_micros,
-        segments.adNetworkType
+        segments.ad_network_type
     FROM keyword_view
     WHERE
         segments.date BETWEEN '{load_start_date}' AND '{load_end_date}'
@@ -89,7 +89,7 @@ GAQL:
           metrics.impressions,
           customer.descriptive_name,
           video.id,
-          segments.adNetworkType
+          segments.ad_network_type
       FROM video
       WHERE
         segments.date BETWEEN '{load_start_date}' AND '{load_end_date}'
