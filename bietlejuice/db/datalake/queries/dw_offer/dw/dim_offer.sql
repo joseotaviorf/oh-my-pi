@@ -235,7 +235,8 @@ offer_enriched AS (
             AND o.id_firestore = ose_id_firestore.id_firestore
 ),
 taxonomy_demand AS (
-    SELECT DISTINCT
+    SELECT
+        id,
 		app_type,
         utm_source,
         utm_medium,
@@ -247,21 +248,44 @@ taxonomy_demand AS (
         medium AS mkt_medium,
         origin AS mkt_origin,
         source AS mkt_source,
-        platform AS mkt_platform,
-        row_number() OVER (PARTITION BY lower(app_type),
-                                        lower(utm_source),
-                                        lower(utm_medium),
-                                        lower(branded)
-                            ORDER BY lower(app_type),
-                                     lower(utm_source),
-                                     lower(utm_medium),
-                                     lower(branded),
-                                     id) AS rn
+        platform AS mkt_platform
 	FROM
 		datalake_gsheets_clean.taxonomy_demand
 	WHERE
 		first_update_source = 'Inquilinos'
 		AND flg_via_reschedule = 0
+),
+taxonomy_demand_versions AS (
+    /*
+    As flg_branded is used to define a relationship with offer
+    it is necessary to make sure that this CTE will be deduplicated 
+    considering this column to. In this way offer: taxonomy will
+    be 1:1.
+    */
+    SELECT
+        row_number() OVER (PARTITION BY lower(app_type),
+                                lower(utm_source),
+                                lower(utm_medium),
+                                flg_branded
+                    ORDER BY lower(app_type),
+                                lower(utm_source),
+                                lower(utm_medium),
+                                flg_branded,
+                                id) AS rn,
+        app_type,
+        utm_source,
+        utm_medium,
+        flg_branded,
+        mkt_category,
+        mkt_flow,
+        mkt_completion,
+        mkt_channel,
+        mkt_medium,
+        mkt_origin,
+        mkt_source,
+        mkt_platform
+    FROM
+        taxonomy_demand
 )
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
     o.sk_offer,
@@ -316,7 +340,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     o.dt_timestamp
 FROM
     offer_enriched o
-LEFT JOIN taxonomy_demand td
+LEFT JOIN taxonomy_demand_versions td
     ON td.rn = 1
     AND lower(coalesce(td.app_type,'')) = lower(coalesce(o.app_type,''))
 	AND lower(coalesce(td.utm_source,'')) = lower(coalesce(o.utm_source,''))
