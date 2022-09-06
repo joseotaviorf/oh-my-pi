@@ -4,14 +4,7 @@ from functools import reduce
 from argparse import ArgumentParser
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit, element_at, to_date
-from pyspark.sql.types import (
-    StructType,
-    StructField,
-    StringType,
-    IntegerType,
-    ArrayType,
-    DoubleType,
-)
+from pyspark.sql.types import StructType, StructField, StringType, ArrayType
 
 import googleapiclient.discovery
 from google.oauth2.credentials import Credentials
@@ -20,11 +13,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import (
-    BaseDBUtils,
-    SparkTableStorageFormat,
-    BaseSparkContext,
-)
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -106,10 +95,10 @@ if __name__ == "__main__":
     schema = StructType(
         [
             StructField("keys", ArrayType(StringType())),
-            StructField("clicks", IntegerType()),
-            StructField("impressions", IntegerType()),
-            StructField("ctr", DoubleType()),
-            StructField("position", DoubleType()),
+            StructField("clicks", StringType()),
+            StructField("impressions", StringType()),
+            StructField("ctr", StringType()),
+            StructField("position", StringType()),
         ]
     )
 
@@ -136,8 +125,8 @@ if __name__ == "__main__":
                 if "rows" in query_result:
                     numRows = numRows + len(query_result["rows"])
 
-                    df_site_url = spark_client.conn.read.schema(schema).json(
-                        BaseSparkContext.sc.parallelize(query_result["rows"])
+                    df_site_url = spark_client.conn.createDataFrame(
+                        query_result["rows"], schema
                     )
 
                     df_site_url = (
