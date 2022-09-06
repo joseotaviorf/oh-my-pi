@@ -29,6 +29,9 @@ columns:
   device:
     lineage:
       - datalake_google_ads_raw.campaigns_performance.segments
+  ad_network_type:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.segments
   impressions:
     lineage:
       - datalake_google_ads_raw.campaigns_performance.metrics

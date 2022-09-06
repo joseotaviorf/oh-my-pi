@@ -8,6 +8,7 @@ SELECT
     TINYINT(segments.week) AS week,
     TINYINT(segments.year) AS YEAR,
     segments.device,
+    segments.adNetworkType AS ad_network_type,
     INT(metrics.impressions) AS impressions,
     customer.descriptiveName AS account_descriptive_name,
     campaign.labels,

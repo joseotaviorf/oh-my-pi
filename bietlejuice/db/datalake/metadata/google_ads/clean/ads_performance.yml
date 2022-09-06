@@ -35,6 +35,9 @@ columns:
   device:
     lineage:
       - datalake_google_ads_raw.ads_performance.segments
+  ad_network_type:
+    lineage:
+      - datalake_google_ads_raw.ads_performance.segments
   display_url:
     lineage:
       - datalake_google_ads_raw.ads_performance.adGroupAd
