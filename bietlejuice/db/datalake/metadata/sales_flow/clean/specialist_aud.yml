@@ -11,6 +11,9 @@ columns:
   id_main_user:
     lineage:
       - datalake_sales_flow_raw.specialist_aud.main_user_id
+  id_user:
+    lineage:
+      - datalake_sales_flow_raw.specialist_aud.user_id
   rev:
     lineage:
       - datalake_sales_flow_raw.specialist_aud.rev
@@ -35,6 +38,9 @@ columns:
   mod_id_main_used:
     lineage:
       - datalake_sales_flow_raw.specialist_aud.main_user_id_mod
+  mod_id_user:
+    lineage:
+      - datalake_sales_flow_raw.specialist_aud.user_id_mod
   mod_kind:
     lineage:
       - datalake_sales_flow_raw.specialist_aud.kind_mod

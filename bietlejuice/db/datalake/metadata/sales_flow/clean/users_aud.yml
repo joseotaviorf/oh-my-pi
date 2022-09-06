@@ -22,6 +22,15 @@ columns:
   email:
     lineage:
       - datalake_sales_flow_raw.users_aud.email
+  phone:
+    lineage:
+      - datalake_sales_flow_raw.users_aud.phone
+  type:
+    lineage:
+      - datalake_sales_flow_raw.users_aud.type
+  cpf:
+    lineage:
+      - datalake_sales_flow_raw.users_aud.cpf
   mod_id_external:
     lineage:
       - datalake_sales_flow_raw.users_aud.external_id_mod
@@ -31,6 +40,15 @@ columns:
   mod_email:
     lineage:
       - datalake_sales_flow_raw.users_aud.email_mod
+  mod_phone:
+    lineage:
+      - datalake_sales_flow_raw.users_aud.phone_mod
+  mod_type:
+    lineage:
+      - datalake_sales_flow_raw.users_aud.type_mod
+  mod_cpf:
+    lineage:
+      - datalake_sales_flow_raw.users_aud.cpf_mod
   ts_created:
     lineage:
       - datalake_sales_flow_raw.users_aud.created_at

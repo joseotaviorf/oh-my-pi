@@ -13,6 +13,15 @@ columns:
   email:
     lineage:
       - datalake_sales_flow_raw.users.email
+  phone:
+    lineage:
+      - datalake_sales_flow_raw.users.phone
+  type:
+    lineage:
+      - datalake_sales_flow_raw.users.type
+  cpf:
+    lineage:
+      - datalake_sales_flow_raw.users.cpf
   ts_created:
     lineage:
       - datalake_sales_flow_raw.users.created_at

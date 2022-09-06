@@ -1,19 +1,26 @@
 WITH last_specialist AS (
     SELECT
         ROW_NUMBER() OVER (
-            PARTITION BY 
+            PARTITION BY
                 id_sales_flow,
                 kind
             ORDER BY
                 sp.ts_updated DESC
         ) AS row,
-        sp.*,
+        sp.id_specialist,
+        sp.kind,
+        sp.id_sales_flow,
+        sfu.name AS specialist_name,
+        sfu.email,
         us.id AS id_user
     FROM
         datalake_sales_flow_clean.specialist AS sp
-    LEFT JOIN 
+    INNER JOIN
+        datalake_sales_flow_clean.users AS sfu
+            ON sp.id_user = sfu.id
+    LEFT JOIN
         datalake_ebdb_clean.user AS us
-            ON sp.id_main_user = us.id
+            ON sfu.id_external = us.id
 ),
 offers_specialists AS (
     SELECT
@@ -51,8 +58,8 @@ SELECT
     lr.id_specialist AS id_legal_risk_analyst,
     ag.id_user AS id_user_agent,
     ag.id_specialist AS id_agent,
-    pdd.id_user AS id_user_post_dd_specialist, 
-    pdd.id_specialist AS id_post_dd_specialist, 
+    pdd.id_user AS id_user_post_dd_specialist,
+    pdd.id_specialist AS id_post_dd_specialist,
     dm.specialist_name AS consultant_name,
     dm.email AS consultant_email,
     tl.specialist_name AS team_lead_name,
@@ -76,62 +83,62 @@ SELECT
     lr.specialist_name AS legal_risk_analyst_name,
     lr.email AS legal_risk_analyst_email,
     ag.specialist_name AS agent_name,
-    ag.email AS agent_email, 
+    ag.email AS agent_email,
     pdd.specialist_name AS post_dd_specialist_name,
     pdd.email AS post_dd_specialist_email
 FROM
     offers_specialists AS o
-LEFT JOIN 
-    last_specialist AS dm 
+LEFT JOIN
+    last_specialist AS dm
     ON dm.id_sales_flow = o.id_sales_flow
     AND dm.kind = 'DEAL_MAKER'
     AND dm.row = 1
-LEFT JOIN 
-    last_specialist AS tl 
+LEFT JOIN
+    last_specialist AS tl
     ON tl.id_sales_flow = o.id_sales_flow
     AND tl.kind = 'TEAM_LEAD'
     AND tl.row = 1
-LEFT JOIN 
-    last_specialist AS pre 
+LEFT JOIN
+    last_specialist AS pre
     ON pre.id_sales_flow = o.id_sales_flow
     AND pre.kind = 'PRE'
     AND pre.row = 1
-LEFT JOIN 
-    last_specialist AS post 
+LEFT JOIN
+    last_specialist AS post
     ON post.id_sales_flow = o.id_sales_flow
     AND post.kind = 'POST'
     AND post.row = 1
-LEFT JOIN 
-    last_specialist AS credit 
+LEFT JOIN
+    last_specialist AS credit
     ON credit.id_sales_flow = o.id_sales_flow
     AND credit.kind = 'CREDIT'
     AND credit.row = 1
-LEFT JOIN 
-    last_specialist AS ms 
+LEFT JOIN
+    last_specialist AS ms
     ON ms.id_sales_flow = o.id_sales_flow
     AND ms.kind = 'MORTGAGE_START'
     AND ms.row = 1
-LEFT JOIN 
+LEFT JOIN
     last_specialist AS mfup
     ON mfup.id_sales_flow = o.id_sales_flow
     AND mfup.kind = 'MORTGAGE_FUP'
     AND mfup.row = 1
-LEFT JOIN 
+LEFT JOIN
     last_specialist AS me
     ON me.id_sales_flow = o.id_sales_flow
     AND me.kind = 'MORTGAGE_END'
     AND me.row = 1
-LEFT JOIN 
+LEFT JOIN
     last_specialist AS crn
     ON crn.id_sales_flow = o.id_sales_flow
     AND crn.kind = 'CRN'
     AND crn.row = 1
-LEFT JOIN 
+LEFT JOIN
     last_specialist AS cri
     ON cri.id_sales_flow = o.id_sales_flow
     AND cri.kind = 'CRI'
     AND cri.row = 1
-LEFT JOIN 
+LEFT JOIN
     last_specialist AS lr
     ON lr.id_sales_flow = o.id_sales_flow
     AND lr.kind = 'LEGAL_RISK'

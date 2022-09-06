@@ -11,6 +11,9 @@ columns:
   id_main_user:
     lineage:
       - datalake_sales_flow_raw.specialist.main_user_id
+  id_user:
+    lineage:
+      - datalake_sales_flow_raw.specialist.user_id
   kind:
     lineage:
       - datalake_sales_flow_raw.specialist.kind
@@ -26,12 +29,3 @@ columns:
   ts_updated:
     lineage:
       - datalake_sales_flow_raw.specialist.updated_at
-  year:
-    lineage:
-      - datalake_sales_flow_raw.specialist.year
-  month:
-    lineage:
-      - datalake_sales_flow_raw.specialist.month
-  day:
-    lineage:
-      - datalake_sales_flow_raw.specialist.day
