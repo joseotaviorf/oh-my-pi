@@ -1,3 +1,12 @@
+WITH houses AS (
+    SELECT
+        id,
+        house_type LIKE '%CASA%'
+        OR house_type LIKE '%SOBRADO%' 
+        OR house_type LIKE '%HOUSE%' AS is_house
+    FROM
+        datalake_brokers_supply_processor.lead_3p
+)
 SELECT
     lsk.sk_lead_3p,
     l.id AS id_lead_3p, 
@@ -18,10 +27,10 @@ SELECT
     COALESCE(l.zip_code, 'Unknown') AS zip_code, 
     COALESCE(l.address, 'Unknown') AS address,
     COALESCE(l.number, 'Unknown') AS number,
-    COALESCE(l.block, 'Unknown') AS block,
-    COALESCE(l.tower, 'Unknown') AS tower,
-    COALESCE(l.floor, 'Unknown') AS floor,
-    COALESCE(l.complement, 'Unknown') AS complement,
+    COALESCE(l.block, CASE WHEN h.is_house THEN 'N/A' ELSE 'Unknown' END) AS block,
+    COALESCE(l.tower, CASE WHEN h.is_house THEN 'N/A' ELSE 'Unknown' END) AS tower,
+    COALESCE(l.floor, CASE WHEN h.is_house THEN 'N/A' ELSE 'Unknown' END) AS floor,
+    COALESCE(l.complement, CASE WHEN h.is_house THEN 'N/A' ELSE 'Unknown' END) AS complement,
     COALESCE(l.reference_point, 'Unknown') AS reference_point,
     COALESCE(l.condominium, 'Unknown') AS condominium,
     COALESCE(l.owner_email, 'Unknown') AS owner_email,
@@ -67,6 +76,9 @@ SELECT
     NOW() AS ts_load
 FROM
     datalake_brokers_supply_processor.lead_3p AS l
+JOIN
+    houses AS h
+        ON l.id = h.id
 JOIN
     datalake_rede_supply.lead_3p_sks AS lsk
         ON l.id = lsk.id_lead_3p

@@ -23,6 +23,7 @@ SELECT
     id_company,
     lead_status,
     DATEDIFF(COALESCE(ts_status_ended, NOW()), ts_status_started) AS days_in_status,
+    lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento') AS is_partner,
     ts_status_started,
     ts_status_ended
 FROM
