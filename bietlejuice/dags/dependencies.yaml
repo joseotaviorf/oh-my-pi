@@ -2096,6 +2096,9 @@ bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:load-clean-dispatch
   - bietlejuice.tracksale:load-clean-answer
 
+bietlejuice.enrich_velo_omie:
+  - bietlejuice.velo_omie:load-clean-cash-flows
+
 bietlejuice.enrich_debt_recovery:
   - bietlejuice.retsuko:load-clean-invoice
   - bietlejuice.trato_feito:load-clean-accounting-installment
