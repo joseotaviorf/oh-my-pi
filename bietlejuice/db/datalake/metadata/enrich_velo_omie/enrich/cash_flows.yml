@@ -1,0 +1,207 @@
+database_name: datalake_velo_omie
+table_name: cash_flows
+columns:
+  id_category:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_category
+  id_integration_securities:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_integration_securities
+  id_project:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_project
+  id_seller:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_seller
+  id_group:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_group
+  id_operation:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_operation
+  client_cpf_cnpj:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.client_cpf_cnpj
+  barcode:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.barcode
+  bill_number:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.bill_number
+  contract_number:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.contract_number
+  tax_document_number:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.tax_document_number
+  service_order_number:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.service_order_number
+  id_client:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_client
+  id_buyer:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_buyer
+  id_write_off:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_write_off
+  id_bank_account:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_bank_account
+  id_contract:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_contract
+  id_moviment_bank_account:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_moviment_bank_account
+  id_moviment_bank_account_repeat:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_moviment_bank_account_repeat
+  id_invoice:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_invoice
+  id_service_order:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_service_order
+  id_securities_repeat:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_securities_repeat
+  id_securities:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_securities
+  id_payment_receipt:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_payment_receipt
+  id_installment:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_installment
+  securities_code:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.securities_code
+  eletronic_invoice_key:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.eletronic_invoice_key
+  origin:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.origin
+  status:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.status
+  type:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.type
+  financial_nature:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.financial_nature
+  alteration_user:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.alteration_user
+  conciliation_user:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.conciliation_user
+  creation_user:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.creation_user
+  discount_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.discount_value
+  interest_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.interest_value
+  fine_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.fine_value
+  open_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.open_value
+  net_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.net_value
+  paid_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.paid_value
+  bank_account_movement_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.bank_account_movement_value
+  securities_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.securities_value
+  pis_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.pis_value
+  cofins_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.cofins_value
+  csll_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.csll_value
+  income_tax_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.income_tax_value
+  iss_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.iss_value
+  inss_value:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.inss_value
+  comments:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.comments
+  is_liquidated:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.is_liquidated
+  is_pis_retained:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.is_pis_retained
+  is_cofins_retained:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.is_cofins_retained
+  is_csll_retained:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.is_csll_retained
+  is_income_tax_retained:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.is_income_tax_retained
+  is_iss_retained:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.is_iss_retained
+  is_inss_retained:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.is_inss_retained
+  dt_credit:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.dt_credit
+  dt_issue:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.dt_issue
+  dt_payment:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.dt_payment
+  dt_predicted:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.dt_predicted
+  dt_register:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.dt_register
+  dt_due:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.dt_due
+  ts_modified:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.ts_modified
+  ts_reconciliation:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.ts_reconciliation
+  ts_created:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.ts_created
+  year:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.year
+  month:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.month
+  day:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.day
