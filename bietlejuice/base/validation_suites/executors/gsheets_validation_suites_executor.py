@@ -13,6 +13,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base import DATALAKE_SQL_DIR
 from bietlejuice.base.api import APIEnum
 from bietlejuice.base.notification import SLACK_USER_GROUPS_MAPPING_PATH
+from bietlejuice.base.spark import SparkDataFrameService
 from bietlejuice.base.validation_suites.executors.base_validation_suites_executor import (
     BaseValidationSuitesExecutor,
 )
@@ -96,7 +97,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         return drive_service
 
     def load_gsheet_on_temp_view(
-        self, data: Union[List[Dict], List], clean_table_name: str
+        self, data: Union[List[Dict], List], clean_table_name: str, is_partitioned: bool
     ):
         """
         Load the data from API into a temporary view.
@@ -107,6 +108,13 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         schema = self.__generate_schema(data, clean_table_name)
         df = spark_client.create_dataframe(data, schema=schema)
         df = df.withColumn("ts_load", functions.current_timestamp())
+        if is_partitioned:
+            df = (
+                SparkDataFrameService()
+                .input(df)
+                .create_year_month_day_columns_from_dataframe_column("ts_load")
+                .output()
+            )
         df = self.__columns_to_snake_case(df)
 
         return df.createTempView(f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}")
@@ -255,10 +263,11 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         gsheets_context: str,
         clean_table_name: str,
         raw_table_name: str,
+        is_partitioned: bool = False,
     ) -> None:
         gsheet_client = self.get_gsheets_client()
         data = gsheet_client.get_data_from_sheet(sheet_name, sheet_id)
-        self.load_gsheet_on_temp_view(data, clean_table_name)
+        self.load_gsheet_on_temp_view(data, clean_table_name, is_partitioned)
         self.run_and_validate_clean_query(
             gsheets_context, clean_table_name, raw_table_name
         )

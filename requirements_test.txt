@@ -1,6 +1,7 @@
 attrs==19.1.0
 coverage==5.5
 coverage-badge==1.0.1
+cryptography==3.4.6
 mock==2.0.0
 moto[s3]==2.0.1
 pandas==0.24.2
