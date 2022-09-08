@@ -1224,6 +1224,7 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:create-clean-booking-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-status-change-in-data-lake
   - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-country-in-data-lake
   - bietlejuice.ebdb:create-clean-entrance-in-data-lake
   - bietlejuice.ebdb:create-clean-follow-up-details-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
