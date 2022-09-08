@@ -7,39 +7,47 @@ columns:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.id_date
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.dt_cost
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.dt_cost
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.id_date
   origin:
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.origin
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.origin
   account_name:
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.account_name
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.account_name
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.account_name
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.account_name
   campaign_name:
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.campaign_name
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.campaign_name
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.campaign_name
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.campaign_name
   utm_campaign:
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_campaign
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.campaign_name
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.campaign_name
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.utm_campaign
   utm_term:
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_term
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.utm_term
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.utm_term
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.utm_term
   utm_content:
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_content
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.utm_content
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.utm_content
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.utm_content
   city_group:
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.city_group
       - datalake_marketing_costs_sharing_rules.sharing_rules.city_group
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.city_group
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.city_group
   campaign_origin_acquisition:
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.campaign_origin_acquisition
@@ -57,6 +65,7 @@ columns:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_origin
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_origin
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_origin
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.context
   mkt_channel:
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_channel
@@ -67,11 +76,13 @@ columns:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_medium
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_medium
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_medium
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.ia_general
   mkt_source:
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_source
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_source
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_source
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.ia_general
   cost:
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.desktop_cost
@@ -87,8 +98,10 @@ columns:
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.cost_share_desktop
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.cost_share_mobile
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.cost_share_other
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.cost
   funnel_side:
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.side
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.side
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.side
+      - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.funnel_side

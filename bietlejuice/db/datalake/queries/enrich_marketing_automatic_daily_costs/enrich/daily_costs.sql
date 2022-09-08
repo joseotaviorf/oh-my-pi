@@ -1,6 +1,5 @@
 WITH taxonomy_by_platform AS (
-    SELECT
-        campaign_origin_acquisition,
+    SELECT campaign_origin_acquisition,
         mkt_category,
         mkt_flow,
         mkt_completion,
@@ -13,15 +12,15 @@ WITH taxonomy_by_platform AS (
         report_type,
         ad_type,
         origin,
-        INLINE_OUTER(ARRAYS_ZIP(
-            COALESCE(SPLIT(cost_factor, ';'), ARRAY(NULL)),
-            ARRAY('Desktop', 'Mobile', 'Other')
-        )) AS (platform_cost_factor, mkt_platform)
-    FROM
-        datalake_gsheets_clean.marketing_cost_taxonomy
+        INLINE_OUTER(
+            ARRAYS_ZIP(
+                COALESCE(SPLIT(cost_factor, ';'), ARRAY(NULL)),
+                ARRAY('Desktop', 'Mobile', 'Other')
+            )
+        ) AS (platform_cost_factor, mkt_platform)
+    FROM datalake_gsheets_clean.marketing_cost_taxonomy
 )
-
-SELECT
+SELECT 
     cmm.id_date,
     'automatic' AS flow_type,
     cmm.origin,
@@ -50,16 +49,53 @@ SELECT
             ELSE cmm.total_cost
         END
     ) AS cost
-FROM
+FROM 
     datalake_consolidated_marketing_metrics.consolidated_media_metrics cmm
-LEFT JOIN
-    taxonomy_by_platform AS tbp 
-        ON COALESCE(cmm.account_name, '') = COALESCE(tbp.account_name, '')
-        AND COALESCE(cmm.report_type, '') = COALESCE(tbp.report_type, '')
-        AND COALESCE(cmm.ad_type, 'other') = COALESCE(tbp.ad_type, 'other')
-        AND cmm.origin = tbp.origin
-        AND cmm.campaign_origin_acquisition = tbp.campaign_origin_acquisition
-WHERE
-    cmm.id_date BETWEEN INT(REPLACE('{load_start_date}', '-', '')) AND INT(REPLACE('{load_end_date}', '-', ''))
+    LEFT JOIN taxonomy_by_platform AS tbp ON COALESCE(cmm.account_name, '') = COALESCE(tbp.account_name, '')
+    AND COALESCE(cmm.report_type, '') = COALESCE(tbp.report_type, '')
+    AND COALESCE(cmm.ad_type, 'other') = COALESCE(tbp.ad_type, 'other')
+    AND cmm.origin = tbp.origin
+    AND cmm.campaign_origin_acquisition = tbp.campaign_origin_acquisition
+WHERE 
+    cmm.id_date BETWEEN INT(REPLACE('{load_start_date}', '-', ''))
+    AND INT(REPLACE('{load_end_date}', '-', ''))
     AND cmm.total_cost != 0
-    AND LOWER(SPLIT(cmm.campaign_name, '[.]')[0]) <> 'zebra'
+    AND LOWER(SPLIT(cmm.campaign_name, '[.]') [0]) <> 'zebra'
+
+UNION ALL
+
+SELECT 
+    id_date,
+    'automatic' AS flow_type,
+    origin,
+    account_name,
+    campaign_name,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    city_group,
+    CAST(NULL AS STRING) AS campaign_origin_acquisition,
+    CAST(NULL AS STRING) AS mkt_category,
+    CAST(NULL AS STRING) AS mkt_flow,
+    CAST(NULL AS STRING) AS mkt_completion,
+    context AS mkt_origin,
+    'CRM/Notification' AS mkt_channel,
+    CASE
+        WHEN ia_general = 'SMS' THEN 'SMS'
+        WHEN ia_general = 'Whatsapp' THEN 'Whatsapp'
+        ELSE NULL
+    END AS mkt_medium,
+    CASE
+        WHEN ia_general = 'SMS' THEN 'Movile'
+        WHEN ia_general = 'Whatsapp' THEN 'Twilio'
+        ELSE NULL
+    END AS mkt_source,
+    NULL AS mkt_platform,
+    funnel_side,
+    cost
+FROM
+    datalake_consolidated_marketing_metrics.braze_consolidated_metrics
+WHERE
+    id_date BETWEEN INT(REPLACE('{load_start_date}', '-', ''))
+    AND INT(REPLACE('{load_end_date}', '-', ''))
+    AND id_date>=20220912

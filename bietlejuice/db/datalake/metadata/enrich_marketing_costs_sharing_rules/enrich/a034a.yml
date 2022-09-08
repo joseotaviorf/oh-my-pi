@@ -1,6 +1,6 @@
 ---
 database_name: datalake_marketing_costs_sharing_rules
-table_name: a028a
+table_name: a034a
 columns:
  id_date:
    lineage:

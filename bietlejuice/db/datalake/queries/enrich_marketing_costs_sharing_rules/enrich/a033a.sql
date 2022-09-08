@@ -11,7 +11,7 @@ t_row_count AS (
     JOIN datalake_quintoandar.aux_date AS dd
         ON dd.id_date = fhlf.sk_prospect_date
     WHERE
-        fhlf.mkt_origin  = 'Indica Aí - General'
+        fhlf.mkt_origin = 'Doorman'
         AND dr.id_country = 1
         AND fhlf.sk_prospect_date > 0
     GROUP BY 1,2
