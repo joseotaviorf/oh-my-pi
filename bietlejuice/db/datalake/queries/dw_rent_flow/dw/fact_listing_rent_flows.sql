@@ -38,7 +38,7 @@ WITH listing_rent_flows AS (
             COALESCE(rent_flow.id_proposal, -1) AS sk_proposal,
             COALESCE(dim_contract.sk_contract, -1) AS sk_contract,
             COALESCE(reservation.id_reservation, -1) AS sk_reservation,
-            dim_booking.sk_rent_flow_taxonomy,
+            COALESCE(dim_booking.sk_rent_flow_taxonomy, -1) AS sk_rent_flow_taxonomy,
             dim_proposal.status AS proposal_status,
             rent_flow.visit_created_type,
             dim_booking.utm_campaign AS booking_utm_campaign,
@@ -209,13 +209,16 @@ WITH listing_rent_flows AS (
     )
     SELECT
         *,
-        MIN(CASE
-            WHEN sk_offer_submitted_date != -1
-                THEN sk_offer_submitted_date
-            ELSE
-                NULL
-            END) OVER (PARTITION BY id_house)
-        AS sk_min_offer_submitted_date,
+        COALESCE(
+            MIN(
+                CASE
+                    WHEN sk_offer_submitted_date != -1
+                        THEN sk_offer_submitted_date
+                    ELSE
+                        NULL
+                    END
+                ) OVER (PARTITION BY id_house), -1
+                ) AS sk_min_offer_submitted_date,
 	    CASE
 	        WHEN sk_tenant_auto_first_doc_sent_date = -1
 	            THEN sk_tenant_manual_first_doc_sent_date
