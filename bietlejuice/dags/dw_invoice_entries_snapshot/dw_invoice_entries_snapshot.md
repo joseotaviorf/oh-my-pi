@@ -13,7 +13,7 @@ This DAG creates a snapshot of the invoice entry tables.
 
 ### Execution​ Interval
 
-This DAG is triggered on the 8th and 13th of every month, via Mediator.
+This DAG is triggered when execution_date is the first business day, monthly, via Mediator.
 
 More information about run time [here]({chart_url}{dag_id}).
 

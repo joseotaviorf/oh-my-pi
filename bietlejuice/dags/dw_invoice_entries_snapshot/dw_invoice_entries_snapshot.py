@@ -25,17 +25,18 @@ def check_valid_run_date(dag_execution_date):
         datetime.strptime(dag_execution_date, "%Y-%m-%d").date().replace(day=1)
     )
 
-    # get second business day of the month
-    if first_day_of_month.weekday() > 4 or (
-        first_day_of_month.month in [1, 5] and first_day_of_month.weekday() == 4
-    ):  # weekends
+    # get day after first business day
+    if first_day_of_month.weekday() > 4 or (  # weekends
+        first_day_of_month.month in [1, 5]
+        and first_day_of_month.weekday() == 4  # holiday on friday
+    ):
         second_business_day_of_month = first_day_of_month + timedelta(
-            days=-first_day_of_month.weekday() + 8
+            days=-first_day_of_month.weekday() + 7
         )
     elif first_day_of_month.month in [1, 5]:  # first business day is a holiday
-        second_business_day_of_month = first_day_of_month + timedelta(days=2)
-    else:
         second_business_day_of_month = first_day_of_month + timedelta(days=1)
+    else:
+        second_business_day_of_month = first_day_of_month
 
     if datetime.strptime(dag_execution_date, "%Y-%m-%d").day in [
         second_business_day_of_month.day
