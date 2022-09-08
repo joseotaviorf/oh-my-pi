@@ -11,6 +11,8 @@ costs AS (
         mkt_source,
         NULL::STRING utm_campaign,
         campaign_name,
+        NULL::STRING AS origin_contact_name,
+        NULL::STRING AS media_contact_name,
         NULL::STRING uf_listing,
         NULL::STRING city_listing,
         NULL::STRING neighborhood_listing,
@@ -38,7 +40,7 @@ costs AS (
     FROM datalake_casa_mineira_marketing_costs.daily_costs
     WHERE ((flow_type = 'automatic' AND funnel_side = 'imobiliaria') OR (flow_type = 'manual' AND funnel_side = 'demand'))
         AND TO_DATE(CAST(COALESCE(id_date,-1) AS STRING), 'yyyyMMdd') BETWEEN ADD_MONTHS(CURRENT_DATE, -12) AND DATE_ADD(CURRENT_DATE, -1)
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 ),
 ----------------------------------------------------
 -- Query Taxonomy Portal Casa Mineira From Sheets --
@@ -208,6 +210,8 @@ SELECT
     COALESCE(tc.mkt_source, tp.mkt_source, 'Not Mapped') AS mkt_source,
     COALESCE(evt.utm_campaign, '') AS utm_campaign,
     NULL::STRING AS campaign_name,
+    c.origin_contact_name,
+    c.media_contact_name,
     c.uf_listing,
     c.city_listing,
     c.neighborhood_listing,
@@ -246,60 +250,63 @@ FROM
     LEFT JOIN taxonomy_crm AS tc
         ON LOWER(COALESCE(tc.origin_contact_name, '')) = LOWER(COALESCE(c.origin_contact_name, ''))
     	AND LOWER(COALESCE(tc.media_contact_name, '')) = LOWER(COALESCE(c.media_contact_name, ''))
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 ),
 contact_next AS (
-    SELECT
-        dt,
-        DATE_ADD(coalesce(LEAD(dt) OVER(partition by id_client order by dt), current_date), -1) as dt_next_contact,
-        mkt_origin,
-	    mkt_channel,
-	    mkt_medium,
-	    mkt_source,
-	    id_client
-    FROM
-        results
-),
-visits AS (
-    SELECT
-        DATE(cmv.ts_created + INTERVAL '3' HOUR) as dt,
-        cn.mkt_origin,
-        cn.mkt_channel,
-        cn.mkt_medium,
-        cn.mkt_source,
-        NULL::STRING AS utm_campaign,
-        NULL::STRING AS campaign_name,
-        NULL::STRING AS uf_listing,
-        NULL::STRING AS city_listing,
-        NULL::STRING AS neighborhood_listing,
-        NULL::STRING AS city_group,
-        NULL::STRING AS id_house,
-        NULL::STRING AS id_client,
-        NULL::INT AS order_new_client,
-        NULL::STRING AS id_prospect,
-        NULL::INT AS order_new_contact_prospect,
-        NULL::STRING AS id_flow,
-        NULL::INT AS order_new_contact_flow,
-        cmv.id AS id_visit,
-        cmv.id_house AS id_house_booked,
-        cmv.id_client AS id_client_booked,
-        cmht.house_type_name AS listing_type,
-        uf.uf_name AS uf_listing_booked,
-        cmc.city_name AS city_listing_booked,
-        cmn.neighborhood_name AS neighborhood_listing_booked,
-        CASE WHEN cmv.is_virtual = false THEN 'presential' ELSE 'virtual' END AS type_visit,
-        ROW_NUMBER() OVER(PARTITION BY cmv.id_client ORDER BY cmv.ts_created) AS order_new_visit_booked,
-        0.0 AS cost,
-        0.0 AS budget,
-        0.0 AS new_contact_prospects_target,
-        0.0 AS new_buyer_prospect_target
-    FROM datalake_casa_mineira_crm_clean.visit AS cmv
-        LEFT JOIN datalake_casa_mineira_crm_clean.house cmh on cmh.id = cmv.id_house
-        LEFT JOIN datalake_casa_mineira_crm_clean.neighborhood cmn on cmn.id = cmh.id_neighborhood
-        LEFT JOIN datalake_casa_mineira_crm_clean.city cmc on cmc.id = cmn.id_city
-        LEFT JOIN datalake_casa_mineira_crm_clean.uf uf on uf.id = cmc.id_uf
-        LEFT JOIN datalake_casa_mineira_crm_clean.house_type cmht on cmht.id = cmh.id_type
-        LEFT JOIN contact_next AS cn ON cn.id_client = cmv.id_client AND DATE(cmv.ts_created) between cn.dt and cn.dt_next_contact
+  SELECT
+    dt,
+    DATE_ADD(coalesce(LEAD(dt) OVER(partition by id_client order by dt), current_date), -1) as dt_next_contact,
+    mkt_origin,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    origin_contact_name,
+    media_contact_name,
+    id_client
+  FROM
+    results
+), visits AS (
+  SELECT
+    DATE(cmv.ts_created + INTERVAL '3' HOUR) as dt,
+    cn.mkt_origin,
+    cn.mkt_channel,
+    cn.mkt_medium,
+    cn.mkt_source,
+    NULL::STRING AS utm_campaign,
+    NULL::STRING AS campaign_name,
+    cn.origin_contact_name,
+    cn.media_contact_name,
+    NULL::STRING AS uf_listing,
+    NULL::STRING AS city_listing,
+    NULL::STRING AS neighborhood_listing,
+    NULL::STRING AS city_group,
+    NULL::STRING AS id_house,
+    NULL::STRING AS id_client,
+    NULL::INT AS order_new_client,
+    NULL::STRING AS id_prospect,
+    NULL::INT AS order_new_contact_prospect,
+    NULL::STRING AS id_flow,
+    NULL::INT AS order_new_contact_flow,
+    cmv.id AS id_visit,
+    cmv.id_house AS id_house_booked,
+    cmv.id_client AS id_client_booked,
+    cmht.house_type_name AS listing_type,
+    uf.uf_name AS uf_listing_booked,
+    cmc.city_name AS city_listing_booked,
+    cmn.neighborhood_name AS neighborhood_listing_booked,
+    CASE WHEN cmv.is_virtual = false THEN 'presential' ELSE 'virtual' END AS type_visit,
+    ROW_NUMBER() OVER(PARTITION BY cmv.id_client ORDER BY cmv.ts_created) AS order_new_visit_booked,
+    0.0 AS cost,
+    0.0 AS budget,
+    0.0 AS new_contact_prospects_target,
+    0.0 AS new_buyer_prospect_target
+  FROM datalake_casa_mineira_crm_clean.visit AS cmv
+    LEFT JOIN datalake_casa_mineira_crm_clean.house cmh on cmh.id = cmv.id_house
+    LEFT JOIN datalake_casa_mineira_crm_clean.neighborhood cmn on cmn.id = cmh.id_neighborhood
+    LEFT JOIN datalake_casa_mineira_crm_clean.city cmc on cmc.id = cmn.id_city
+    LEFT JOIN datalake_casa_mineira_crm_clean.uf uf on uf.id = cmc.id_uf
+    LEFT JOIN datalake_casa_mineira_crm_clean.house_type cmht on cmht.id = cmh.id_type
+    LEFT JOIN contact_next AS cn ON cn.id_client = cmv.id_client AND DATE(cmv.ts_created) between cn.dt and cn.dt_next_contact
 ),
 ---------------------------------
 --- Query Targets from Sheets ---
@@ -316,6 +323,8 @@ SELECT
     mkt_source,
     NULL::STRING AS utm_campaign,
     NULL::STRING AS campaign_name,
+    NULL::STRING AS origin_contact_name,
+    NULL::STRING AS media_contact_name,
     NULL::STRING AS uf_listing,
     NULL::STRING AS city_listing,
     NULL::STRING AS neighborhood_listing,
@@ -342,7 +351,7 @@ SELECT
     0.0 AS new_buyer_prospect_target
 FROM
     datalake_gsheets_clean.targets_casa_mineira_ncp
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 
 UNION ALL
 
@@ -357,6 +366,8 @@ SELECT
     mkt_source,
     NULL::STRING AS utm_campaign,
     NULL::STRING AS campaign_name,
+    NULL::STRING AS origin_contact_name,
+    NULL::STRING AS media_contact_name,
     NULL::STRING AS uf_listing,
     NULL::STRING AS city_listing,
     NULL::STRING AS neighborhood_listing,
@@ -383,7 +394,7 @@ SELECT
     0.0 AS new_buyer_prospect_target
 FROM
     datalake_gsheets_clean.targets_casa_mineira_cost
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 
 UNION ALL
 
@@ -398,6 +409,8 @@ SELECT
     mkt_source,
     NULL::STRING AS utm_campaign,
     NULL::STRING AS campaign_name,
+    NULL::STRING AS origin_contact_name,
+    NULL::STRING AS media_contact_name,
     NULL::STRING AS uf_listing,
     NULL::STRING AS city_listing,
     NULL::STRING AS neighborhood_listing,
@@ -424,7 +437,7 @@ SELECT
     SUM(nbp_target) AS new_buyer_prospect_target
 FROM
     datalake_gsheets_clean.targets_casa_mineira_nbp
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 )
 --------------------------------------
 -- UNION Costs, Results and Targets --

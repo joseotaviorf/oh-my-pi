@@ -39,6 +39,12 @@ columns:
   campaign_name:
     lineage:
       - datalake_casa_mineira_marketing_costs.daily_costs.campaign_name
+  origin_contact_name:
+    lineage:
+      - datalake_casa_mineira_crm_clean.origin_contact.origin_contact_name
+  media_contact_name:
+    lineage:
+      - datalake_casa_mineira_crm_clean.media_contact.media_contact_name
   uf_listing:
     lineage:
       - datalake_casa_mineira_crm_clean.uf.uf_initials

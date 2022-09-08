@@ -11,6 +11,8 @@ costs AS (
         mkt_source,
         NULL::TEXT utm_campaign,
         campaign_name,
+        NULL::TEXT AS origin_contact_name,
+        NULL::TEXT AS media_contact_name,
         NULL::TEXT uf_listing,
         NULL::TEXT city_listing,
         NULL::TEXT neighborhood_listing,
@@ -38,7 +40,7 @@ costs AS (
     FROM datalake_casa_mineira_marketing_costs_prod.daily_costs
     WHERE ((flow_type = 'automatic' AND funnel_side = 'imobiliaria') OR (flow_type = 'manual' AND funnel_side = 'demand'))
         AND DATE(NULLIF(id_date, -1)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 ),
 ----------------------------------------------------
 -- Query Taxonomy Portal Casa Mineira From Sheets --
@@ -195,6 +197,8 @@ SELECT
     COALESCE(tc.mkt_source, tp.mkt_source, 'Not Mapped') AS mkt_source,
     COALESCE(evt.utm_campaign, '') AS utm_campaign,
     NULL::TEXT AS campaign_name,
+    c.origin_contact_name,
+    c.media_contact_name,
     c.uf_listing,
     c.city_listing,
     c.neighborhood_listing,
@@ -233,7 +237,7 @@ FROM
     LEFT JOIN taxonomy_crm AS tc
         ON LOWER(COALESCE(tc.origin_contact_name, '')) = LOWER(COALESCE(c.origin_contact_name, ''))
     	AND LOWER(COALESCE(tc.media_contact_name, '')) = LOWER(COALESCE(c.media_contact_name, ''))
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 ),
 contact_next AS (
     SELECT
@@ -256,6 +260,8 @@ visits AS (
         cn.mkt_source,
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS campaign_name,
+        NULL::TEXT AS origin_contact_name,
+        NULL::TEXT AS media_contact_name,
         NULL::TEXT AS uf_listing,
         NULL::TEXT AS city_listing,
         NULL::TEXT AS neighborhood_listing,
@@ -303,6 +309,8 @@ SELECT
     mkt_source,
     NULL::TEXT AS utm_campaign,
     NULL::TEXT AS campaign_name,
+    NULL::TEXT AS origin_contact_name,
+    NULL::TEXT AS media_contact_name,
     NULL::TEXT AS uf_listing,
     NULL::TEXT AS city_listing,
     NULL::TEXT AS neighborhood_listing,
@@ -329,7 +337,7 @@ SELECT
     0.0 AS new_buyer_prospect_target
 FROM
     datalake_gsheets_clean_prod.targets_casa_mineira_ncp
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 
 UNION ALL
 
@@ -344,6 +352,8 @@ SELECT
     mkt_source,
     NULL::TEXT AS utm_campaign,
     NULL::TEXT AS campaign_name,
+    NULL::TEXT AS origin_contact_name,
+    NULL::TEXT AS media_contact_name,
     NULL::TEXT AS uf_listing,
     NULL::TEXT AS city_listing,
     NULL::TEXT AS neighborhood_listing,
@@ -370,7 +380,7 @@ SELECT
     0.0 AS new_buyer_prospect_target
 FROM
     datalake_gsheets_clean_prod.targets_casa_mineira_cost
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 
 UNION ALL
 
@@ -385,6 +395,8 @@ SELECT
     mkt_source,
     NULL::TEXT AS utm_campaign,
     NULL::TEXT AS campaign_name,
+    NULL::TEXT AS origin_contact_name,
+    NULL::TEXT AS media_contact_name,
     NULL::TEXT AS uf_listing,
     NULL::TEXT AS city_listing,
     NULL::TEXT AS neighborhood_listing,
@@ -411,7 +423,7 @@ SELECT
     SUM(nbp_target) AS new_buyer_prospect_target
 FROM
     datalake_gsheets_clean_prod.targets_casa_mineira_nbp
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 )
 --------------------------------------
 -- UNION Costs, Results and Targets --
