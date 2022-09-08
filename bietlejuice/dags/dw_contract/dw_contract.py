@@ -102,3 +102,8 @@ for table in tables:
         DWTaskGroup.first_tasks(dw_task_group),
     )
     chain(DWTaskGroup.last_tasks(dw_task_group), terminate_cluster_task)
+
+    # Set data quality tasks if exists
+    independent_tasks = DWTaskGroup.independent_tasks(dw_staging_task_group)
+    if independent_tasks:
+        terminate_cluster_task.set_upstream(independent_tasks)
