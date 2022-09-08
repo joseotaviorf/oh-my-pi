@@ -162,8 +162,8 @@ UNION ALL
     JOIN public.dim_date dd
         ON dd.sk_date =  mkt.id_date
     WHERE mkt.funnel_side IN ('supply','affiliates')
-        AND mkt.mkt_origin IN ('Indica Aí - General', 'Indica Aí - Agents')
-        AND mkt.mkt_channel IN ('Paid', 'Organic')
+        AND ((mkt.mkt_origin IN ('Indica Aí - General', 'Indica Aí - Agents') AND mkt.mkt_channel IN ('Paid', 'Organic')) OR
+            (mkt.mkt_origin = 'Doorman' AND mkt.mkt_channel IN ('Paid', 'Other')))
     GROUP BY 1,2,3,4,5,6,7,8,9
 
 UNION ALL
