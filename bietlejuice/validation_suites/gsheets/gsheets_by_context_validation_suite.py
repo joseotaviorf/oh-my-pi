@@ -1,6 +1,6 @@
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
 
-from bietlejuice.base.validation_suites.executors.gsheets_validation_suites_executor import (
+from bietlejuice.validation_suites.executors.gsheets_validation_suites_executor import (
     GsheetsValidationSuitesExecutor,
 )
 from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum

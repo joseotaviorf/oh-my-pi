@@ -1,1 +1,2 @@
 quintoandar-logger>=0.4.0
+validations-engine==1.0.0

@@ -8,11 +8,10 @@ from json import JSONDecodeError
 from typing import Dict
 
 from quintoandar_logger import QuintoAndarLogger
+from validations_engine.validations_engine import ValidationsEngine
 
 from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.base.validation_suites.integrations_validator import (
-    IntegrationsValidator,
-)
+from bietlejuice.validation_suites import VALIDATION_SUITES_PATH
 
 JOB_NAME = "run_validation_suites"
 
@@ -49,7 +48,9 @@ def read_databricks_secrets() -> Dict[str, Dict]:
 if __name__ == "__main__":
     logger.info(f"m={JOB_NAME}, msg=Running validations for all suite groups")
 
-    integrations_validator = IntegrationsValidator()
+    integrations_validator = ValidationsEngine(
+        validations_suites_root_path=VALIDATION_SUITES_PATH
+    )
     integrations_validator.set_connections_auth_params(
         connections_auth_params=read_databricks_secrets()
     )

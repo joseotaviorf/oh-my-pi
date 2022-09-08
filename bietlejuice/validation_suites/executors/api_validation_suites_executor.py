@@ -1,5 +1,5 @@
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.base.validation_suites.executors.base_validation_suites_executor import (
+from validations_engine.base_validation_suites_executor import (
     BaseValidationSuitesExecutor,
 )
 

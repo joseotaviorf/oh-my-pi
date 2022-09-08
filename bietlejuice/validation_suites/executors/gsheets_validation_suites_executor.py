@@ -9,14 +9,14 @@ from pyspark.sql import functions
 from pyspark.sql.types import StructField, StructType, StringType
 from quintoandar_gsheets_api_client import GoogleSheetsClient
 from quintoandar_logger import QuintoAndarLogger
+from validations_engine.base_validation_suites_executor import (
+    BaseValidationSuitesExecutor,
+)
 
 from bietlejuice.base import DATALAKE_SQL_DIR
 from bietlejuice.base.api import APIEnum
 from bietlejuice.base.notification import SLACK_USER_GROUPS_MAPPING_PATH
 from bietlejuice.base.spark import SparkDataFrameService
-from bietlejuice.base.validation_suites.executors.base_validation_suites_executor import (
-    BaseValidationSuitesExecutor,
-)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.services import FileService

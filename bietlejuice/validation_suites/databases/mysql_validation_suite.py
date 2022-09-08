@@ -1,5 +1,5 @@
 from bietlejuice.base.db import DatabaseEnum
-from bietlejuice.base.validation_suites.executors.database_validation_suites_executor import (
+from bietlejuice.validation_suites.executors.database_validation_suites_executor import (
     DatabaseValidationSuitesExecutor,
 )
 from bietlejuice.clients.db_clients import SparkClient

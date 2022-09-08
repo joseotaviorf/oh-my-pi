@@ -1,7 +1,7 @@
 from hubspot import HubSpot
 
 from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.base.validation_suites.executors.api_validation_suites_executor import (
+from bietlejuice.validation_suites.executors.api_validation_suites_executor import (
     APIValidationSuitesExecutor,
 )
 

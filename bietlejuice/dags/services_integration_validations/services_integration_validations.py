@@ -44,6 +44,7 @@ custom_libraries = [
     },
     {"pypi": {"package": "google-auth==2.9.1"}},
     {"pypi": {"package": "google-api-python-client==2.55.0"}},
+    {"pypi": {"package": "validations-engine==1.0.0"}},
 ]
 
 dag = DAG(
