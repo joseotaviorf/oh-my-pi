@@ -26,6 +26,7 @@ MAIN_START_DATE = datetime(2021, 2, 18, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
 config_service = ConfigurationService(SOURCE)
+partition_cols = config_service.get_config("partition_cols")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
@@ -38,7 +39,7 @@ s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 raw_spark_job_path = s3_prefix + f"/spark_jobs/{SOURCE}/load_greenseer_into_datalake.py"
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 
-cluster_description = config_service.get_config("databricks_10_4_med_memory_cluster")
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -87,14 +88,16 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
     extraction_spark_job_file=raw_spark_job_path,
-    raw_spark_job_extra_args=[SOURCE],
+    raw_spark_job_extra_args=[SOURCE, "{{ ds }}"],
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
-    partitions=["dt_month_started"],
+    is_incremental=True,
+    has_create_external_table_task=False,
+    partitions=partition_cols,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
