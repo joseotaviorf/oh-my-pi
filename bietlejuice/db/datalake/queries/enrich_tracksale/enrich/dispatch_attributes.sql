@@ -16,7 +16,7 @@ SELECT DISTINCT
   GET_JSON_OBJECT(d.customers_explode,'$.status') as status,
   GET_JSON_OBJECT(d.customers_explode,'$.has_answered') as has_answered,
   GET_JSON_OBJECT(d.customers_explode,'$.survey_opened') as survey_opened,
-  FROM_UTC_TIMESTAMP(FROM_UNIXTIME(GET_JSON_OBJECT(d.customers_explode,'$.dispatch_time'),"yyyy-MM-dd hh:mm:ss"),"America/Brasilia") as dispatch_time,
+  FROM_UTC_TIMESTAMP(FROM_UNIXTIME(GET_JSON_OBJECT(d.customers_explode,'$.dispatch_time'),"yyyy-MM-dd hh:mm:ss"),"America/Sao_Paulo") as dispatch_time,
   ts_created,
   dt_updated
 FROM
