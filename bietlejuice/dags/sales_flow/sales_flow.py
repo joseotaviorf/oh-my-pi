@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -40,10 +40,7 @@ RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{CONTEXT}"
 RAW_LOAD_SPARK_JOB_PATH = f"{RAW_SPARK_JOB_PATH}/load_sales_flow_into_datalake.py"
 
 LOGS_OUTPUT_PATH = CONFIG_SERVICE.get_config("spark_jobs_logs_path")
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{LOGS_OUTPUT_PATH}{CONTEXT}"
+CLUSTER_DESCRIPTION = CONFIG_SERVICE.get_config("databricks_10_4_med_general_cluster")
 
 TABLES = CONFIG_SERVICE.get_config("tables")
 PARTITION_COLS = CONFIG_SERVICE.get_config("partition_cols")

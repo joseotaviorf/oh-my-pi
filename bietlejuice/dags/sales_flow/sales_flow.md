@@ -4,6 +4,9 @@
 
 This DAG imports the tables from [Sales Flow](https://github.com/quintoandar/sales-flow), a service responsible for the management of ForSale's operations after receiving an offer.
 
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 
 This DAG is triggered daily.
@@ -93,6 +96,4 @@ Then, create the clean query.
 
 If the table isn't found in the configuration file, it will still be ingested to raw incrementally, using `updated_at` as a date filter. It WILL NOT be ingested to clean, even if you add the query.
 
-### Responsible Data Teams
-For any questions or concerns about this DAG and data, please contact the Data Engineering Team or
-Data Analytics Team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+</details>
