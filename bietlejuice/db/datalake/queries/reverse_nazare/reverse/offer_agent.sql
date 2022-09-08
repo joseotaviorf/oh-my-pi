@@ -37,15 +37,12 @@ dados_agent AS (
 ),
 cte_agents_visit AS (
     SELECT
-        sk_sale_flow,
-        dw.sk_user::INT AS sk_agent,
-        sk_agent::INT AS sk_user_agent,
+        fv.sk_sale_flow,
+        fv.sk_agent::INT AS sk_agent,
+        fv.sk_user_agent::INT AS sk_user_agent,
         max(sk_visit_completed_date) AS sk_visit_completed_date
     FROM
         dw_sale.fact_visits fv
-    LEFT JOIN
-        dw_public.dim_user dw
-            ON dw.dados_agente_id = fv.sk_agent
     WHERE sk_visit_completed_date > 0
     GROUP BY 1,2,3
 ),
