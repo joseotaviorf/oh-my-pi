@@ -29,7 +29,7 @@ JOB_NAME = "load_tables_public_into_dw"
 # Constants that needs to be changed to execute this script.
 ENVIRONMENT = EnvironmentEnum.FORNO  # Change to the environment where you will run it.
 SCHEMA = "public"  # Schema that table is going to be created
-TABLES_TO_CREATE_AND_SYNC = ["dim_date"]
+TABLES_TO_CREATE_AND_SYNC = ["dim_country", "dim_date"]
 
 
 os.environ["ENVIRONMENT"] = ENVIRONMENT  # Necessary to use the ConfigurationService.
