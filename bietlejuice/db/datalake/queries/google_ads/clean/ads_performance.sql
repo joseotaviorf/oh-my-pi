@@ -13,7 +13,7 @@ SELECT
     -- adGroupAd.ad.textAd.description2 AS description_two,
     segments.device AS device,
     segments.adNetworkType AS ad_network_type,
-    adGroupAd.ad.displayUrl AS display_url,
+    -- adGroupAd.ad.displayUrl AS display_url,
     INT(metrics.impressions) AS impressions,
     -- adGroupAd.ad.imageAd.name AS image_creative_name,
     customer.descriptiveName AS account_descriptive_name,
