@@ -97,3 +97,4 @@ SELECT
     day
 FROM
     datalake_velo_omie_raw.cash_flows
+WHERE nCodTitulo IS NOT NULL
