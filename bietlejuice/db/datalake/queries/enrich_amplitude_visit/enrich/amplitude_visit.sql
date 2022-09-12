@@ -1,114 +1,112 @@
-with extra_debug as (
+WITH extra_debug AS (
   SELECT
     d.*
   FROM
-    datalake_amplitude_clean.170698_visit_schedule_confirmed_events as v
+    datalake_amplitude_clean.170698_visit_schedule_confirmed_events AS v
   RIGHT JOIN
-    datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events as d
-      ON v.ep_visit_code = d.ep_visit_code AND v.id_user = d.id_user
+    datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events AS d
+      ON v.ep_visit_code = d.ep_visit_code 
+      AND v.id_user = d.id_user
   WHERE
     v.ep_visit_code IS NULL
 ),
-cross_platform as (
- select
-    '170698' as id_app,
+cross_platform AS (
+ SELECT
+    '170698' AS id_app,
+    id_user,
     country AS user_country,
     user_properties,
     ts_event,
-    up_platform as app_type,
-    ep_visit_code as id_visit,
-    up_utm_source as utm_source,
-    up_utm_medium as utm_medium,
-    up_utm_campaign as utm_campaign,
-    up_utm_content as utm_content,
-    up_utm_term as utm_term,
-    up_adjust_network as adjust_network,
-    coalesce(
-      nullif(
-        case
-          when up_platform in ("web_desktop", "web_mobile")
-            then up_utm_source
-          else up_adjust_network
-        end,
+    up_platform AS app_type,
+    ep_visit_code AS id_visit,
+    up_utm_source AS utm_source,
+    up_utm_medium AS utm_medium,
+    up_utm_campaign AS utm_campaign,
+    up_utm_content AS utm_content,
+    up_utm_term AS utm_term,
+    up_adjust_network AS adjust_network,
+    COALESCE(
+      NULLIF(
+        CASE
+          WHEN up_platform in ("web_desktop", "web_mobile")
+            THEN up_utm_source
+          ELSE up_adjust_network
+        END,
       "Organic"),
     "organic")
-    as media_source,
-    row_number() over (
-      partition by ep_visit_code
-      order by cast(ts_event as date)
-    ) as rn
-  from
+    AS media_source
+  FROM
     datalake_amplitude_clean.170698_visit_schedule_confirmed_events
-    
-  union all
+  WHERE
+    ep_visit_code IS NOT NULL
+
+  UNION ALL
   
-  select
-    '170698' as id_app,
+  SELECT
+    '170698' AS id_app,
+    id_user,
     country AS user_country,
     user_properties,
     ts_event,
-    up_platform as app_type,
-    ep_visit_code as id_visit,
-    up_utm_source as utm_source,
-    up_utm_medium as utm_medium,
-    up_utm_campaign as utm_campaign,
-    up_utm_content as utm_content,
-    up_utm_term as utm_term,
-    up_adjust_network as adjust_network,
-    coalesce(
-      nullif(
-        case
-          when up_platform in ("web_desktop", "web_mobile")
-            then up_utm_source
-          else up_adjust_network
-        end,
+    up_platform AS app_type,
+    ep_visit_code AS id_visit,
+    up_utm_source AS utm_source,
+    up_utm_medium AS utm_medium,
+    up_utm_campaign AS utm_campaign,
+    up_utm_content AS utm_content,
+    up_utm_term AS utm_term,
+    up_adjust_network AS adjust_network,
+    COALESCE(
+      NULLIF(
+        CASE
+          WHEN up_platform in ("web_desktop", "web_mobile")
+            THEN up_utm_source
+          ELSE up_adjust_network
+        END,
       "Organic"),
     "organic")
-    as media_source,
-    row_number() over (
-      partition by ep_visit_code
-      order by cast(ts_event as date)
-    ) as rn
-  from
+    AS media_source
+  FROM
     extra_debug
+  WHERE
+    ep_visit_code IS NOT NULL
 )
-select
+SELECT
   id_app,
   id_visit,
   GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
   user_country,
   app_type,
-  coalesce(media_source, 'Unknown') as media_source,
+  COALESCE(media_source, 'Unknown') AS media_source,
   adjust_network,
   utm_source,
   utm_campaign,
   utm_medium,
   utm_content,
   utm_term,
-  coalesce(
+  COALESCE(
     (
       (
-        UPPER(utm_campaign) like '%BRANDED%'
-        or UPPER(utm_campaign) like '%INSTITUCIONAL%'
+        UPPER(utm_campaign) LIKE '%BRANDED%'
+        OR UPPER(utm_campaign) LIKE '%INSTITUCIONAL%'
       )
-      and lower(utm_campaign) not like '%non-branded%'
+      AND LOWER(utm_campaign) NOT LIKE '%non-branded%'
     ), false
-  ) as is_branded,
+  ) AS is_branded,
   -- temporary column to join with taxonomy,
   -- it can be replaced by the usage of previous column but
   -- some refactoring will be needed in demand taxonomy
-  case when
+  CASE WHEN
     (
-      UPPER(utm_campaign) like '%BRANDED%'
-      or UPPER(utm_campaign) like '%INSTITUCIONAL%'
+      UPPER(utm_campaign) LIKE '%BRANDED%'
+      OR UPPER(utm_campaign) LIKE '%INSTITUCIONAL%'
     )
-    and lower(utm_campaign) not like '%non-branded%'
-    then 'Branded'
-    else 'Outro'
-  end as branded,
+    AND LOWER(utm_campaign) NOT LIKE '%non-branded%'
+    THEN 'Branded'
+    ELSE 'Outro'
+  END AS branded,
   ts_event
-from
+FROM
   cross_platform
-where
-  rn = 1
-  and id_visit is not null;
+QUALIFY 
+  ROW_NUMBER() OVER (PARTITION BY id_visit ORDER BY ts_event DESC) = 1
