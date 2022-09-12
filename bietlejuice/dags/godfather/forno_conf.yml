@@ -6,7 +6,3 @@ custom_cluster:
     max_workers: 2
     min_workers: 1
 lineage_product_database_name: godfather
-schemas: [
-  "audit",
-  "business"
-]

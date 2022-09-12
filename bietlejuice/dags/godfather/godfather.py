@@ -1,6 +1,5 @@
 import os
 import pendulum
-import json
 from datetime import datetime
 
 from airflow.models import DAG
@@ -48,8 +47,6 @@ local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 10, 1, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
-config_service = ConfigurationService(SOURCE)
-
 # DAG definition
 dag = DAG(
     dag_id=DAG_ID,
@@ -86,13 +83,11 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_result_location,
 )
 
-schemas = json.dumps(config_service.get_config("schemas"))
-
 raw_task_group = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=CONTEXT,
     extraction_spark_job_file=RAW_SPARK_JOB_PATH,
-    raw_spark_job_extra_args=[SOURCE, schemas],
+    raw_spark_job_extra_args=[SOURCE],
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(

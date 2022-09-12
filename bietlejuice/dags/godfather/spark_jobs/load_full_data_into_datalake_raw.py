@@ -10,6 +10,7 @@ from bietlejuice.consumers.db_consumers import PostgresConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_full_data_into_datalake_raw"
 
@@ -21,19 +22,17 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
-    parser.add_argument("schemas")
 
     args = parser.parse_args()
 
     environment = args.env
     datalake_bucket = args.datalake_bucket
     source = args.source
-    schemas = args.schemas
 
     logger.info(
         f"""
         m=load_full_data_into_datalake_raw, environment={environment}, datalake_bucket={datalake_bucket},
-        source={source}, schemas={schemas}, msg=Starting spark job...
+        source={source}, msg=Starting spark job...
         """
     )
 
@@ -49,31 +48,33 @@ if __name__ == "__main__":
 
     postgres_consumer = PostgresConsumer(conn_config, spark_client)
 
-    schemas = json.loads(args.schemas)
+    config_service = ConfigurationService(source)
+    schemas = config_service.get_config("schemas")
+    tables_allow_list = config_service.get_config("tables_allow_list")
 
-    for schema in schemas:
-        postgres_consumer.conn_config["schema"] = schema
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    metastore_service = SparkMetastoreService(spark_client)
+    s3_loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
-        tables = postgres_consumer.get_table_names_and_sizes().collect()
+    logger.info("msg=Creating database in Spark Metastore if not exists...")
 
-        logger.info(f"""msg=Getting tables from schema {schema}...""")
+    database_name = db_info["db_raw_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    database_location = db_info["db_raw_path"]
+    metastore_service.create_database(database_name)
 
-        db_info = DatalakeMetastoreService.get_db_info(
-            environment, source, datalake_bucket
-        )
-        metastore_service = SparkMetastoreService(spark_client)
-        s3_loader = S3Loader()
-        spark_metastore_loader = SparkMetastoreLoader(metastore_service)
+    schema = json.dumps(schemas)
+    postgres_consumer.conn_config["schema"] = schema
 
-        logger.info("msg=Creating database in Spark Metastore if not exists...")
+    tables = postgres_consumer.get_table_names_and_sizes().collect()
 
-        database_name = db_info["db_raw_databricks"]
-        format_options = SparkTableStorageFormat.DEFAULT_RAW
-        database_location = db_info["db_raw_path"]
-        metastore_service.create_database(database_name)
+    for table in tables:
+        table_name = table.table_name
 
-        for table in tables:
-            table_name = table.table_name
+        if table_name.lower() in tables_allow_list:
+            logger.info(f"""msg=Getting table {table_name} from schema {schema}...""")
+
             df = postgres_consumer.get_data_from_table(table_name)
 
             s3_loader.load_df(
@@ -81,6 +82,7 @@ if __name__ == "__main__":
                 s3_path=f"{database_location}{table_name.lower()}",
                 format_options=format_options,
             )
+
             spark_metastore_loader.update_metastore(
                 df, database_name, table_name.lower(), format_options, database_location
             )

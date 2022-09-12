@@ -1,6 +1,0 @@
-database_name: datalake_godfather_clean
-table_name: message_modify
-columns:
-  id:
-    lineage:
-      - datalake_godfather_raw.message_modify.id
