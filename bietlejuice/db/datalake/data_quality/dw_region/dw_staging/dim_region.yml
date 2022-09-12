@@ -1,0 +1,26 @@
+---
+table_name: dw_public_staging.dim_region
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 3000
+    severity_level: Error
+column_level_validations:
+  sk_region:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  country_code:
+    has_completeness:
+      greater_than: 0.9
+      severity_level: Warning
+    is_contained_in:
+      values:
+        - BR
+        - MX
+      severity_level: Warning
+  level:
+    has_completeness:
+      greater_than: 0.9
+      severity_level: Warning
