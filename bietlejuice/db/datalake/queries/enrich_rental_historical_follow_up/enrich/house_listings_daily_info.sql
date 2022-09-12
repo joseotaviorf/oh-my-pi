@@ -11,9 +11,10 @@ WITH daily_base AS (
     FROM
         datalake_quintoandar.aux_date
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+    -- If a status ends in the current day, but the listing still existing and there's a new status
+    -- we are not consuming the ended status in this day. In order to update the ts_status_ended
+    -- for this status, we need to go back 1 day and rewrite its partition. 
+        date BETWEEN DATE('{year}-{month}-{day}') - INTERVAL 1 DAY AND DATE('{year}-{month}-{day}')
 ),
 lbc AS (
     SELECT
@@ -52,75 +53,108 @@ last_ciq_of_day AS (
             AND dbase.dt_day < COALESCE(DATE(hch.ts_enrollment_ended), '2100-01-01')
     WHERE
         hch.is_last_status_of_day = True
+),
+listings_states_per_day AS (
+    SELECT /*+ RANGE_JOIN(heh, 1180) */
+        CONCAT(hl.id_house_listing, DATE_FORMAT(dbase.dt_day, 'yMMdd')) AS id_house_listing_day,
+        hl.id_house_listing,
+        hl.id_house,
+        h.id_country,
+        hl.id_contract,
+        heh.id_occupant,
+        h.id_region,
+        lcod.consultant_type,
+        heh.doorman_type,
+        awk.first_key_location,
+        hls.status_history,
+        hls.status_change_reason,
+        hl.listing_category,
+        hl.is_exclusive,
+        CASE
+            WHEN lbc.id_house IS NULL THEN TRUE -- When house is not in listing_business_context, it is for rent
+            ELSE COALESCE(lbc.is_for_rent, FALSE)
+        END AS is_for_rent,
+        COALESCE(lbc.is_for_sale, FALSE) AS is_for_sale,
+        /* is_last_status_of_day (house_listing_status) isn't enough to tell what is the last status
+           when we extended it using the dim_date.
+        */
+        MAX(hls.ts_status_started) OVER(PARTITION BY dbase.dt_day, hls.id_house_listing) = hls.ts_status_started AS is_last_state_of_day,
+        IF(dbase.dt_month_started = dbase.dt_day, TRUE, FALSE) AS is_month_start,
+        IF(dbase.dt_month_ended = dbase.dt_day, TRUE, FALSE) AS is_month_end,
+        IF(dbase.dt_week_started = dbase.dt_day, TRUE, FALSE) AS is_week_start,
+        IF(dbase.dt_week_ended = dbase.dt_day, TRUE, FALSE) AS is_week_end,
+        dbase.dt_day,
+        hls.ts_status_started,
+        hls.ts_status_ended,
+        dbase.year,
+        dbase.month,
+        dbase.day
+    FROM
+        datalake_ebdb_listing.house_listing AS hl -- id_house_listing is PK
+    JOIN
+        datalake_ebdb_listing.house_listing_status AS hls -- 1:M => 1 listing has M statuses 
+            ON hl.id_house_listing = hls.id_house_listing
+            AND hls.is_last_status_of_day = True
+    JOIN
+        daily_base AS dbase
+            ON dbase.dt_day BETWEEN DATE(hls.ts_status_started) AND COALESCE(DATE(hls.ts_status_ended), '2100-01-01')
+    LEFT JOIN
+        lbc
+            ON lbc.id_house = hl.id_house
+    LEFT JOIN
+        datalake_ebdb_listing.house AS h
+            ON hl.id_house = h.id
+    LEFT JOIN
+        last_ciq_of_day AS lcod
+            ON hl.id_house = lcod.id_house
+            AND dbase.dt_day = lcod.dt_day
+            AND lcod.is_last_status_house_of_day = True
+    LEFT JOIN
+        datalake_ebdb_listing.house_entrance_history AS heh
+            ON hl.id_house = heh.id_house
+            AND dbase.dt_day >= DATE(heh.ts_entrance_started)
+            AND dbase.dt_day < COALESCE(DATE(heh.ts_entrance_ended), '2100-01-01')
+            AND heh.is_last_status_of_day = True
+    LEFT JOIN
+        datalake_ebdb_listing.agents_with_keys AS awk
+            ON hl.id_house_listing = awk.id_house_listing
+    /* 
+    This table is used for For_Rent and
+    should be similar to fact_house_listing_status, so
+    we are removing houses that are pure Sales from here.
+    */
+    WHERE
+        lbc.id_house IS NULL
+        OR lbc.is_for_rent
 )
-SELECT /*+ RANGE_JOIN(heh, 1180) */
-    CONCAT(hl.id_house_listing, DATE_FORMAT(dbase.dt_day, 'yMMdd')) AS id_house_listing_day,
-    hl.id_house_listing,
-    hl.id_house,
-    h.id_country,
-    hl.id_contract,
-    heh.id_occupant,
-    h.id_region,
-    lcod.consultant_type,
-    heh.doorman_type,
-    awk.first_key_location,
-    hls.status_history,
-    hls.status_change_reason,
-    hl.listing_category,
-    hl.is_exclusive,
-    CASE
-        WHEN lbc.id_house IS NULL THEN TRUE -- When house is not in listing_business_context, it is for rent
-        ELSE COALESCE(lbc.is_for_rent, FALSE)
-    END AS is_for_rent,
-    COALESCE(lbc.is_for_sale, FALSE) AS is_for_sale,
-    IF(dbase.dt_month_started = dbase.dt_day, TRUE, FALSE) AS is_month_start,
-    IF(dbase.dt_month_ended = dbase.dt_day, TRUE, FALSE) AS is_month_end,
-    IF(dbase.dt_week_started = dbase.dt_day, TRUE, FALSE) AS is_week_start,
-    IF(dbase.dt_week_ended = dbase.dt_day, TRUE, FALSE) AS is_week_end,
-    dbase.dt_day,
-    hls.ts_status_started,
-    hls.ts_status_ended,
-    dbase.year,
-    dbase.month,
-    dbase.day
+SELECT
+    id_house_listing_day,
+    id_house_listing,
+    id_house,
+    id_country,
+    id_contract,
+    id_occupant,
+    id_region,
+    consultant_type,
+    doorman_type,
+    first_key_location,
+    status_history,
+    status_change_reason,
+    listing_category,
+    is_exclusive,
+    is_for_rent,
+    is_for_sale,
+    is_month_start,
+    is_month_end,
+    is_week_start,
+    is_week_end,
+    dt_day,
+    ts_status_started,
+    ts_status_ended,
+    year,
+    month,
+    day
 FROM
-    datalake_ebdb_listing.house_listing AS hl -- id_house_listing is PK
-JOIN
-    datalake_ebdb_listing.house_listing_status AS hls -- 1:M => 1 listing has M statuses 
-        ON hl.id_house_listing = hls.id_house_listing
-        AND hls.is_last_status_of_day = True
-JOIN
-    daily_base AS dbase
-        ON ((dbase.dt_day >= DATE(hls.ts_status_started)
-              AND dbase.dt_day < COALESCE(DATE(hls.ts_status_ended), '2100-01-01'))
-              OR (dbase.dt_day = DATE(hls.ts_status_started)
-                  AND dbase.dt_day = DATE(hls.ts_status_ended))
-             )
-LEFT JOIN
-    lbc
-        ON lbc.id_house = hl.id_house
-LEFT JOIN
-    datalake_ebdb_listing.house AS h
-        ON hl.id_house = h.id
-LEFT JOIN
-    last_ciq_of_day AS lcod
-        ON hl.id_house = lcod.id_house
-        AND dbase.dt_day = lcod.dt_day
-        AND lcod.is_last_status_house_of_day = True
-LEFT JOIN
-    datalake_ebdb_listing.house_entrance_history AS heh
-        ON hl.id_house = heh.id_house
-        AND dbase.dt_day >= DATE(heh.ts_entrance_started)
-        AND dbase.dt_day < COALESCE(DATE(heh.ts_entrance_ended), '2100-01-01')
-        AND heh.is_last_status_of_day = True
-LEFT JOIN
-    datalake_ebdb_listing.agents_with_keys AS awk
-        ON hl.id_house_listing = awk.id_house_listing
-/* 
-   This table is used for For_Rent and
-   should be similar to fact_house_listing_status, so
-   we are removing houses that are pure Sales from here.
-*/
+    listings_states_per_day
 WHERE
-    lbc.id_house IS NULL
-    OR lbc.is_for_rent
+    is_last_state_of_day = TRUE

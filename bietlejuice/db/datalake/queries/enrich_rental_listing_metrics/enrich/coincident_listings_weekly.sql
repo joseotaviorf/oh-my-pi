@@ -49,6 +49,9 @@ WITH weekly_listings AS (
         hldi.ts_status_started
     FROM
         datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
+    JOIN
+        dw_public.dim_house_listing AS dhl
+            ON hldi.id_house_listing = dhl.sk_house_listing
     JOIN -- We will get just one day : Sunday
         dw_public.dim_date AS d
             ON d.date = hldi.dt_day
@@ -64,7 +67,8 @@ WITH weekly_listings AS (
         -- We get weeks that already are closed or ongoing ones.
         -- Instead of CURRENT_DATE, DATE('{year}-{month}-{day}') try to ensure idempotence
         AND (hldi.is_week_end = TRUE 
-            OR DATE(CONCAT(hldi.year, '-', hldi.month, '-', hldi.day)) = DATE('{year}-{month}-{day}'))
+            OR DATE(CONCAT(hldi.year, '-', hldi.month, '-', hldi.day)) = DATE('{year}-{month}-{day}')
+            OR dhl.ts_listing_version_end = hldi.ts_status_ended)
         AND dr.country_code = 'BR'
         AND DATE(CONCAT(hldi.year, '-', hldi.month, '-', hldi.day)) >= DATE('{year}-{month}-{day}') - INTERVAL 58 WEEK
 ),
