@@ -27,6 +27,15 @@ columns:
   event_type_sanitized:
     lineage:
       - datalake_online_attribution.event_type_sanitized
+  entrance_uri:
+    lineage:
+      - datalake_online_attribution.events_exploded.entrance_uri
+  referrer:
+    lineage:
+      - datalake_online_attribution.events_exploded.referrer
+  business_context:
+    lineage:
+      - datalake_online_attribution.events_exploded.business_context
   web_gclid:
     lineage:
       - datalake_online_attribution.events_exploded.gclid

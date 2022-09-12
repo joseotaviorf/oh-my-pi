@@ -35,6 +35,9 @@ columns:
   uri_event_property:
     lineage:
       - datalake_amplitude_clean.events.event_properties
+  business_context:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
   web_medium:
     lineage:
       - datalake_amplitude_clean.events.user_properties

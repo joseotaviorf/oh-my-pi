@@ -11,6 +11,7 @@ WITH events_filtered AS (
                 house_id STRING,
                 offer_id STRING,
                 visit_code STRING,
+                business_context STRING,
                 uri STRING') AS event_properties,
         FROM_JSON(user_properties,'
                 entrance_uri STRING,
@@ -68,6 +69,7 @@ SELECT
     TRIM(event_properties.visit_code) AS visit_code,
     user_properties.entrance_uri AS entrance_uri,
     event_properties.uri AS uri_event_property,
+    event_properties.business_context AS business_context,
     user_properties.utm_medium AS web_medium,
     user_properties.utm_source AS web_source,
     user_properties.utm_campaign AS web_campaign,

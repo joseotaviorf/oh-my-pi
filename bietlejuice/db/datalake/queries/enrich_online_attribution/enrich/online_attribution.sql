@@ -100,6 +100,9 @@ events_filtered AS (
         visit_code,
         amplitude_platform,
         gclid,
+        entrance_uri,
+        referrer,
+        business_context,
         web_medium,
         web_source,
         web_campaign,
@@ -121,7 +124,7 @@ events_filtered AS (
         DATE(CONCAT_WS("-",evt.year, evt.month, evt.day)) > DATE('{year}-{month}-{day}') - INTERVAL '4' month
     GROUP BY 
         1,2,3,4,5,6,7,8,9,10,11,12,
-        13,14,15,16,17,18,19,20,21,22
+        13,14,15,16,17,18,19,20,21,22,23,24,25
 ),
 events_app AS (
     SELECT
@@ -130,6 +133,9 @@ events_app AS (
         id_user,
         id_amplitude,
         id_session,
+        entrance_uri,
+        referrer,
+        business_context,
         id_house,
         id_firestore,
         visit_code,
@@ -155,6 +161,9 @@ events_web AS (
         id_user,
         id_amplitude,
         id_session,
+        entrance_uri,
+        referrer,
+        business_context,
         id_house,
         id_firestore,
         visit_code,
@@ -180,6 +189,9 @@ SELECT
     COALESCE(web.visit_code, app.visit_code) AS visit_code,
     COALESCE(web.amplitude_platform, app.amplitude_platform) AS amplitude_platform,
     COALESCE(web.event_type_sanitized, app.event_type_sanitized) AS event_type_sanitized,
+    COALESCE(web.entrance_uri, app.entrance_uri) AS entrance_uri,
+    COALESCE(web.referrer, app.referrer) AS referrer,
+    COALESCE(web.business_context, app.business_context) AS business_context,
     web_gclid,
     web_medium,
     web_source,
