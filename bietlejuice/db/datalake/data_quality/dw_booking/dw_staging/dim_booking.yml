@@ -1,0 +1,19 @@
+---
+table_name: dw_public.dim_booking
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 14000000
+    severity_level: Error
+column_level_validations:
+  sk_booking:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_booking:
+    has_completeness:
+      greater_than: 0.99 # Won't be 100% because of the default row
+  id_property:
+    has_completeness:
+      greater_than: 0.99 # Won't be 100% because of the default row
