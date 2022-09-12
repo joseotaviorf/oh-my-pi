@@ -29,7 +29,7 @@ def get_previous_month(execution_date):
 SOURCE = "similarweb_monthly_metrics"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2021, 10, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 3 12 * *"
+MAIN_SCHEDULE_INTERVAL = "0 9 12 * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 
 # Task params
