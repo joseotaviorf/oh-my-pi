@@ -1,0 +1,57 @@
+---
+database_name: datalake_pdd_payments
+table_name: pdd_payments_monthly
+columns:
+  id_invoice:
+    lineage:
+      - datalake_retsuko_clean.invoice.id_external
+  id_contract:
+    lineage:
+      - datalake_retsuko_clean.contract.id_external
+  frequency:
+    lineage:
+      - datalake_retsuko_clean.invoice.purpose
+  payment_status:
+    lineage:
+      - datalake_retsuko_clean.invoice.status
+  user:
+    lineage:
+      - datalake_retsuko_clean.account.type
+  due_amount:
+    lineage:
+      - datalake_retsuko_clean.invoice.due_amount
+  paid_amount:
+    lineage:
+      - datalake_retsuko_clean.invoice.paid_amount
+  original_amount:
+    lineage:
+      - datalake_vans_clean.boleto.due_amount
+      - datalake_vans_clean.payment.due_amount
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+  dt_sent:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_sent
+  dt_due:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_due
+  dt_paid:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_paid
+  dt_probable_created:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_created
+  dt_probable_due:
+    lineage:
+      - datalake_retsuko_clean.invoice.dt_due
+  dt_min_contract_due:
+    lineage:
+      - datalake_retsuko_clean.invoice.dt_due
+  ts_created:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_created
+  ts_canceled:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_canceled

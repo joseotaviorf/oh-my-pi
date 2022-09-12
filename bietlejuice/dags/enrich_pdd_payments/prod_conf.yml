@@ -1,0 +1,12 @@
+---
+inner_dependencies:
+  pdd_payments_monthly:
+    - skip_execution
+  skip_execution:
+    - pdd_payments
+incremental_tables:
+  - pdd_payments_monthly
+partition_cols:
+  - year
+  - month
+  - day

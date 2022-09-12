@@ -1834,6 +1834,14 @@ bietlejuice.enrich_online_attribution:
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
 
+bietlejuice.enrich_pdd_payments:
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
+  - bietlejuice.retsuko:load-clean-account
+  - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.retsuko:load-clean-invoice
+  - bietlejuice.vans:load-clean-boleto
+  - bietlejuice.vans:load-clean-payment
+
 bietlejuice.enrich_pixar:
   - bietlejuice.pixar:load-clean-account
   - bietlejuice.pixar:load-clean-charge
