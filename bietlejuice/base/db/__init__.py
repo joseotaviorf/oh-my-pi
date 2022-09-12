@@ -5,6 +5,7 @@ from bietlejuice.base.db.database_enum import DatabaseEnum, DatabaseTypeEnum
 
 from bietlejuice.base.db.database_client_factory import DatabaseClientFactory
 from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
+from bietlejuice.base.db.dw_metastore_mapping import DwMetastoreMapping
 from bietlejuice.base.db.dw_metastore_service import DWMetastoreService
 
 # TODO: Refactor project to import directly from base.paths

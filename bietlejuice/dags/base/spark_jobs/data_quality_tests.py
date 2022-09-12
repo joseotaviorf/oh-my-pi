@@ -17,6 +17,7 @@ from inmetro.clients import (
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.services import FileService
+from bietlejuice.base.db import DwMetastoreMapping
 from bietlejuice.base.service import ServiceEnum
 from bietlejuice.base.pipeline import LayerEnum, MetadataTypeEnum
 from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
@@ -72,6 +73,24 @@ def parse_complete_table_name(complete_table_name):
     table_name = name_components[1]
 
     return database_name, table_name
+
+
+def mapping_dw_schema(database):
+    """
+    If the database is DW, map it from dw_staging to dw.
+
+    :param database: database name
+    :type database: str
+    :rtype: str
+    """
+
+    schema = DwMetastoreMapping.get_schema_from_database(database)
+    if schema:
+        database = DwMetastoreMapping.get_database_dw_info(schema)[
+            "dw_schema_databricks"
+        ]
+
+    return database
 
 
 def parse_args():
@@ -148,6 +167,12 @@ if __name__ == "__main__":
         output_parser=validation_results,
         path_name=destination_directory,
     )
+
+    # ################################ Mapping from DW_STAGING to DW  #################################
+    # In this case, tests will run on dw_staging, but metadata will associated to dw entities.
+
+    if layer == "dw_staging":
+        database_name = mapping_dw_schema(database=database_name)
 
     # ############################## Metadata Propagator Call ################################
 
