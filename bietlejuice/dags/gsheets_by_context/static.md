@@ -26,6 +26,7 @@ This pipeline produces the following output tables:
     - `autonomous_agent_payment_data_form_origin`
     - `autonomous_agent_payment_data_lead_origin`
     - `aux_agents_sale`
+    - `base_pdd`
     - `demand_targets_2019`
     - `demand_targets_2020`
     - `demand_targets_2021`
@@ -61,6 +62,7 @@ This pipeline produces the following output tables:
     - `autonomous_agent_payment_data_form_origin`
     - `autonomous_agent_payment_data_lead_origin`
     - `aux_agents_sale`
+    - `base_pdd`
     - `census_subnormal_crowding_areas`
     - `demand_targets_2019`
     - `demand_targets_2020`

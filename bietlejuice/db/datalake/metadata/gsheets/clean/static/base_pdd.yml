@@ -1,0 +1,94 @@
+---
+database_name: datalake_gsheets_clean
+table_name: base_pdd
+columns:
+    id_invoice:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_id
+    id_contract:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.contract_id
+    qty_invoice:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.qty_invoice
+    contract_version:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.contract_version
+    invoice_type:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_type
+    invoice_competence_renegotiated:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.competencia_invoice_renegociada
+    invoice_amount:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_amount
+    invoice_status:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_status
+    invoice_paid_amount:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_paid_amount
+    invoice_paid_date:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_paid_date
+    invoice_paid_via:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_paid_via
+    contract_guarantee:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.contract_guarantee
+    invoice_account_type:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_account_type
+    invoice_indentifier:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_indentifier
+    our_number:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.our_number
+    delay_invoice_at_closure:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.delay_invoice_at_closure
+    delay_contamined_at_closure:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.delay_contamined_at_closure
+    delay_invoice_range:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.delay_invoice_range
+    delay_contamined_range:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.delay_contamined_range
+    city_name:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.city_name
+    city_group:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.city_group
+    provisional_group:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.grupoprovisao
+    dt_contract_signature:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.contract_signature_date
+    dt_accrual_year_month:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.accrual_year_month
+    dt_invoice_original_due:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_original_due_date
+    dt_invoice_due:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_due_date
+    dt_invoice_created:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_created_at
+    dt_invoice_sent:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.invoice_sent_at
+    dt_contract_due_date_min:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.contract_due_date_min
+    dt_processing:
+        lineage:
+            - datalake_gsheets_raw.base_pdd.dt_processamento
