@@ -4,6 +4,7 @@ SELECT
   GET_JSON_OBJECT(metadata, '$.userId') AS id_user,
   GET_JSON_OBJECT(metadata, '$.houseId') AS id_house,
   GET_JSON_OBJECT(metadata, '$.regionId') AS id_region,
+  GET_JSON_OBJECT(metadata, '$.abSecretariatTag') AS secretariat_tag,
   business_context,
   origin,
   message,

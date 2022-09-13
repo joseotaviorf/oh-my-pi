@@ -17,6 +17,9 @@ columns:
   id_region:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions.metadata
+  secretariat_tag:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions.metadata
   business_context:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions.business_context
