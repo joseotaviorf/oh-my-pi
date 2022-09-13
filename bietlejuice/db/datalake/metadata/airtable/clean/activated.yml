@@ -86,6 +86,9 @@ columns:
   dt_week_accreditated:
     lineage:
       - datalake_airtable_raw.activated.accreditation_week
+  ts_updated:
+    lineage:
+      - datalake_airtable_raw.activated.last_modified
   year:
     lineage:
       - datalake_airtable_raw.activated.year

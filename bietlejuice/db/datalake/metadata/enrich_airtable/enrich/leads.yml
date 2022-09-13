@@ -1,0 +1,148 @@
+---
+database_name: datalake_airtable
+table_name: leads
+columns:
+  id_lead:
+    lineage:
+      - datalake_airtable_clean.leads.id_lead
+  id_admin:
+    lineage:
+      - datalake_airtable_clean.leads.id_admin
+  id_airtable_record:
+    lineage:
+      - datalake_airtable_clean.leads.id_airtable_record
+  accreditations:
+    lineage:
+      - datalake_airtable_clean.leads.accreditations
+  activation:
+    lineage:
+      - datalake_airtable_clean.leads.activation
+  actuation_model:
+    lineage:
+      - datalake_airtable_clean.leads.actuation_model
+  actuation_preference:
+    lineage:
+      - datalake_airtable_clean.leads.actuation_preference
+  actuation_state:
+    lineage:
+      - datalake_airtable_clean.leads.actuation_state
+  adjusted_cpf:
+    lineage:
+      - datalake_airtable_clean.leads.adjusted_cpf
+  agent_creci:
+    lineage:
+      - datalake_airtable_clean.leads.agent_creci
+  approved_status:
+    lineage:
+      - datalake_airtable_clean.leads.approved_status
+  checked_by:
+    lineage:
+      - datalake_airtable_clean.leads.checked_by
+  chosen_region:
+    lineage:
+      - datalake_airtable_clean.leads.chosen_region
+  creci_situation:
+    lineage:
+      - datalake_airtable_clean.leads.creci_situation
+  creci_status:
+    lineage:
+      - datalake_airtable_clean.leads.creci_status
+  grade:
+    lineage:
+      - datalake_airtable_clean.leads.grade
+  how_met_5a:
+    lineage:
+      - datalake_airtable_clean.leads.how_met_5a
+  lead_email:
+    lineage:
+      - datalake_airtable_clean.leads.lead_email
+  lead_name:
+    lineage:
+      - datalake_airtable_clean.leads.lead_name
+  lead_phone_number:
+    lineage:
+      - datalake_airtable_clean.leads.lead_phone_number
+  permanent_deaccreditation:
+    lineage:
+      - datalake_airtable_clean.leads.permanent_deaccreditation
+  real_estate:
+    lineage:
+      - datalake_airtable_clean.leads.real_estate
+  region_first_option:
+    lineage:
+      - datalake_airtable_clean.leads.region_first_option
+  region_second_option:
+    lineage:
+      - datalake_airtable_clean.leads.region_second_option
+  region_first_option_complete:
+    lineage:
+      - datalake_airtable_clean.leads.region_first_option_complete
+  region_second_option_complete:
+    lineage:
+      - datalake_airtable_clean.leads.region_second_option_complete
+  rental_status:
+    lineage:
+      - datalake_airtable_clean.leads.rental_status
+  rental_activated:
+    lineage:
+      - datalake_airtable_clean.leads.rental_activated
+  training_giving_up:
+    lineage:
+      - datalake_airtable_clean.leads.training_giving_up
+  is_duplicated:
+    lineage:
+      - datalake_airtable_clean.leads.is_duplicated
+  dt_answer:
+    lineage:
+      - datalake_airtable_clean.leads.dt_answer
+  dt_auto_data_creci:
+    lineage:
+      - datalake_airtable_clean.leads.dt_auto_data_creci
+  dt_birth:
+    lineage:
+      - datalake_airtable_clean.leads.dt_birth
+  dt_contract_sent:
+    lineage:
+      - datalake_airtable_clean.leads.dt_contract_sent
+  dt_fup_call:
+    lineage:
+      - datalake_airtable_clean.leads.dt_fup_call
+  dt_fup_email_sent:
+    lineage:
+      - datalake_airtable_clean.leads.dt_fup_email_sent
+  dt_fup_sms_sent:
+    lineage:
+      - datalake_airtable_clean.leads.dt_fup_sms_sent
+  dt_fup_whatsapp_sent:
+    lineage:
+      - datalake_airtable_clean.leads.dt_fup_whatsapp_sent
+  dt_id_created:
+    lineage:
+      - datalake_airtable_clean.leads.dt_id_created
+  dt_reforce_sent:
+    lineage:
+      - datalake_airtable_clean.leads.dt_reforce_sent
+  dt_signed:
+    lineage:
+      - datalake_airtable_clean.leads.dt_signed
+  dt_subscripted:
+    lineage:
+      - datalake_airtable_clean.leads.dt_subscripted
+  dt_training_giving_up:
+    lineage:
+      - datalake_airtable_clean.leads.dt_training_giving_up
+  dt_training_sent:
+    lineage:
+      - datalake_airtable_clean.leads.dt_training_sent
+  ts_updated:
+    lineage:
+      - datalake_airtable_clean.leads.ts_updated
+  year:
+    lineage:
+      - datalake_airtable_clean.leads.year
+  month:
+    lineage:
+      - datalake_airtable_clean.leads.month
+  day:
+    lineage:
+      - datalake_airtable_clean.leads.day

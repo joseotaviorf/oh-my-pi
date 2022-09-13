@@ -17,6 +17,10 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output table:
 
 - `activated`
+- `activations`
+- `cr_occurrences`
+- `jira_tickets`
+- `leads`
 
 
 </details>

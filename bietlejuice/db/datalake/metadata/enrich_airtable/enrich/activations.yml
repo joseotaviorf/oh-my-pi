@@ -1,0 +1,100 @@
+---
+database_name: datalake_airtable
+table_name: activations
+columns:
+  id_activations:
+    lineage:
+      - datalake_airtable_clean.activations.id_activations
+  id_airtable_record:
+    lineage:
+      - datalake_airtable_clean.activations.id_airtable_record
+  activation_status:
+    lineage:
+      - datalake_airtable_clean.activations.activation_status
+  actuation_state:
+    lineage:
+      - datalake_airtable_clean.activations.actuation_state
+  agent_complete_name:
+    lineage:
+      - datalake_airtable_clean.activations.agent_complete_name
+  agent_creci:
+    lineage:
+      - datalake_airtable_clean.activations.agent_creci
+  agent_email:
+    lineage:
+      - datalake_airtable_clean.activations.agent_email
+  agent_phone_number:
+    lineage:
+      - datalake_airtable_clean.activations.agent_phone_number
+  chosen_region:
+    lineage:
+      - datalake_airtable_clean.activations.chosen_region
+  cpf:
+    lineage:
+      - datalake_airtable_clean.activations.cpf
+  giving_up_reason:
+    lineage:
+      - datalake_airtable_clean.activations.giving_up_reason
+  model:
+    lineage:
+      - datalake_airtable_clean.activations.model
+  original_lead:
+    lineage:
+      - datalake_airtable_clean.activations.original_lead
+  region:
+    lineage:
+      - datalake_airtable_clean.activations.region
+  region_first_option:
+    lineage:
+      - datalake_airtable_clean.activations.region_first_option
+  region_second_option:
+    lineage:
+      - datalake_airtable_clean.activations.region_second_option
+  has_activation_notification:
+    lineage:
+      - datalake_airtable_clean.activations.has_activation_notification
+  has_welcome_email:
+    lineage:
+      - datalake_airtable_clean.activations.has_welcome_email
+  has_whats_pocket:
+    lineage:
+      - datalake_airtable_clean.activations.has_whats_pocket
+  dt_agency_confirmation:
+    lineage:
+      - datalake_airtable_clean.activations.dt_agency_confirmation
+  dt_birth:
+    lineage:
+      - datalake_airtable_clean.activations.dt_birth
+  dt_contract_sent:
+    lineage:
+      - datalake_airtable_clean.activations.dt_contract_sent
+  dt_giving_up:
+    lineage:
+      - datalake_airtable_clean.activations.dt_giving_up
+  dt_id_creation:
+    lineage:
+      - datalake_airtable_clean.activations.dt_id_creation
+  dt_jitex_requested:
+    lineage:
+      - datalake_airtable_clean.activations.dt_jitex_requested
+  dt_kit_received:
+    lineage:
+      - datalake_airtable_clean.activations.dt_kit_received
+  dt_signed:
+    lineage:
+      - datalake_airtable_clean.activations.dt_signed
+  dt_week_accreditated:
+    lineage:
+      - datalake_airtable_clean.activations.dt_week_accreditated
+  ts_updated:
+    lineage:
+      - datalake_airtable_clean.activations.ts_updated
+  year:
+    lineage:
+      - datalake_airtable_clean.activations.year
+  month:
+    lineage:
+      - datalake_airtable_clean.activations.month
+  day:
+    lineage:
+      - datalake_airtable_clean.activations.day

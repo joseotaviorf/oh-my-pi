@@ -15,6 +15,7 @@ SELECT
     TO_DATE(_envio_de_contrato, 'yyyy-MM-dd') AS dt_contract_sent,
     TO_DATE(assinatura_do_contrato, 'yyyy-MM-dd') AS dt_contract_signed,
     TO_DATE(semana_de_credenciamento, 'yyyy-MM-dd') AS dt_week_accreditated,
+    TO_TIMESTAMP(last_modified) AS ts_updated,
     year,
     month,
     day

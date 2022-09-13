@@ -71,6 +71,9 @@ columns:
   ts_created:
     lineage:
       - datalake_airtable_raw.jira_tickets.created
+  ts_updated:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.last_modified
   year:
     lineage:
       - datalake_airtable_raw.jira_tickets.year

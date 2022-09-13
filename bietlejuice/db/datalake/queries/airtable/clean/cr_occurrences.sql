@@ -15,6 +15,7 @@ SELECT
     resumo AS summary,
     ql_ql_quem_esta_fazendo_essa_reclamacaodenunciasolicitacao AS who_is_complaining,
     TO_TIMESTAMP(created) AS ts_created,
+    TO_TIMESTAMP(last_modified) AS ts_updated,
     year,
     month,
     day

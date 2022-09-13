@@ -50,6 +50,9 @@ columns:
   ts_created:
     lineage:
       - datalake_airtable_raw.cr_occurrences.created
+  ts_updated:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.last_modified
   year:
     lineage:
       - datalake_airtable_raw.cr_occurrences.year

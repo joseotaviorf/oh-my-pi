@@ -50,6 +50,9 @@ columns:
   dt_week_accreditated:
     lineage:
       - datalake_airtable_raw.historical.semana_de_credenciamento
+  ts_updated:
+    lineage:
+      - datalake_airtable_raw.historical.last_modified
   year:
     lineage:
       - datalake_airtable_raw.historical.year

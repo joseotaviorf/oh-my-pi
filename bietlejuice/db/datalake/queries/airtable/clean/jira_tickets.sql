@@ -22,6 +22,7 @@ SELECT
     TO_DATE(data_retorno_descred,'yyyy-MM-dd') AS dt_deaccreditation_return,
     TO_DATE(ql_data_final, 'yyyy-MM-dd') AS dt_end,
     TO_TIMESTAMP(created) AS ts_created,
+    TO_TIMESTAMP(last_modified) AS ts_updated,
     year,
     month,
     day

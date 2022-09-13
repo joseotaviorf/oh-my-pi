@@ -27,7 +27,7 @@ SELECT
     TO_DATE(recebimento_kit, 'yyyy-MM-dd') AS dt_kit_received,
     TO_DATE(assinatura, 'yyyy-MM-dd') AS dt_signed,
     TO_DATE(semana_de_credenciamento, 'yyyy-MM-dd') AS dt_week_accreditated,
-    TO_TIMESTAMP(ultima_alteracao) AS ts_updated,
+    TO_TIMESTAMP(last_modified) AS ts_updated,
     year,
     month,
     day
