@@ -3,7 +3,7 @@ CREATE TABLE credit.dim_variant (
     id_variant INTEGER,
     id_experiment INTEGER,
     variant_name VARCHAR,
-    variant_description VARCHAR,
+    variant_description VARCHAR(1024),
     variant_percentage_paticipation_on_test FLOAT,
     ts_load TIMESTAMP
 );
