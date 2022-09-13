@@ -7,6 +7,7 @@ SELECT
     lbc.status_reason,
     lbc.ts_first_publication,
     lbc.ts_last_publication,
+    FROM_UNIXTIME(ure.ts_revision/1000) AS ts_administrator_changed,
     lbc.ts_created,
     lbc.ts_updated
 FROM
@@ -14,5 +15,10 @@ FROM
 LEFT JOIN
     datalake_ebdb_clean.listing_rent_model AS lrm
         ON lbc.id = lrm.id_listing_business_context
+LEFT JOIN datalake_ebdb_clean.listing_rent_model_aud AS aud
+        ON aud.id_listing_business_context = lbc.id
+        AND aud.rental_administrator = lrm.rental_administrator
+LEFT JOIN datalake_ebdb_clean.user_revision_entity AS ure 
+        ON aud.rev = ure.id
 WHERE
     lbc.business_context = 'RENT'
