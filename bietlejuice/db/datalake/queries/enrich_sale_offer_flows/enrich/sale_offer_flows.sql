@@ -434,6 +434,18 @@ onboarding AS (
     GROUP BY
         id_sales_flow
 ),
+-- ONBOARDING FROM STATUS ENRICH CTE
+onboarding_status AS (
+  SELECT 
+      id_sales_flow, 
+      id_firestore AS id_offer,
+      DATE(ts_macro_status_end) AS dt_onboarding_ended
+  FROM 
+      datalake_sale_offer_flows.sale_offer_status
+  WHERE 
+      macro_status_name = 'ONBOARDING'
+      AND DATE(ts_macro_status_end) > DATE('2022-04-12')
+),
 -- TAG CTE
 last_update_tag AS (
     SELECT
@@ -671,7 +683,7 @@ SELECT
       WHEN rf.ts_sale_agreement_canceled IS NULL AND rf.is_a_rescue = TRUE THEN DATE(rf.ts_rescued)
       ELSE NULL
     END AS dt_offer_rescued,
-    o.dt_ended AS dt_onboarding_ended,
+    COALESCE(os.dt_onboarding_ended, o.dt_ended) AS dt_onboarding_ended,
     DATE(d.ts_buyer_seller_ended) AS dt_legal_analysis_ended,
     DATE(d.ts_partner_started) AS dt_legaut_analysis_started,
     DATE(d.ts_partner_ended) AS dt_legaut_analysis_ended,
@@ -737,6 +749,9 @@ LEFT JOIN
 LEFT JOIN
     onboarding AS o
         ON o.id_sales_flow = off.id_sales_flow
+LEFT JOIN
+    onboarding_status AS os
+        ON os.id_sales_flow = off.id_sales_flow
 LEFT JOIN
     tag
         ON tag.id_sales_flow = off.id_sales_flow

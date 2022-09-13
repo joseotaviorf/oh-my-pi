@@ -265,6 +265,7 @@ columns:
   dt_onboarding_ended:
     lineage:
       - datalake_sales_flow_clean.sales_flow_aud.ts_updated
+      - datalake_sale_offer_flows.sale_offer_status.ts_macro_status_end
   dt_legal_analysis_ended:
     lineage:
       - datalake_sales_flow_clean.diligence.ts_buyer_seller_ended
