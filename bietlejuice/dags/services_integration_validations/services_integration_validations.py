@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -18,11 +18,9 @@ MAIN_START_DATE = datetime(
 )
 MAIN_SCHEDULE_INTERVAL = "0 13,16,18,20 * * *"
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_min_general_cluster", deserialize_json=True
-)
 
 config_service = ConfigurationService()
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )

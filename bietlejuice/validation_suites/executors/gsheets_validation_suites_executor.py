@@ -1,3 +1,4 @@
+import gc
 from typing import Any, List, Dict, Union, Tuple
 
 from datetime import datetime, timedelta
@@ -5,7 +6,7 @@ import pendulum
 import re
 from unidecode import unidecode
 
-from pyspark.sql import functions
+from pyspark.sql import functions, DataFrame
 from pyspark.sql.types import StructField, StructType, StringType
 from quintoandar_gsheets_api_client import GoogleSheetsClient
 from quintoandar_logger import QuintoAndarLogger
@@ -133,6 +134,18 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
             raw_table_name, clean_table_name, clean_query
         )
         self.try_run_clean_query_into_table(clean_query)
+
+    def release_memory(self, dataframe: DataFrame, clean_table_name: str) -> None:
+        """
+        Drops temp table, JVM dataframe and python runtime variables to release cluster memory
+        """
+        spark_client = SparkClient()
+        spark_client.conn.catalog.dropTempView(
+            f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}"
+        )
+        dataframe.unpersist(blocking=True)
+        del dataframe
+        gc.collect()
 
     @staticmethod
     def load_clean_query(gsheets_context: str, clean_table_name: str) -> str:
@@ -271,3 +284,4 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         self.run_and_validate_clean_query(
             gsheets_context, clean_table_name, raw_table_name
         )
+        self.release_memory(data, clean_table_name)
