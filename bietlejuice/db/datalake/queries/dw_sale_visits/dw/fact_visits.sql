@@ -53,7 +53,7 @@ LEFT JOIN
       AND offer_order = 1
 LEFT JOIN
     datalake_sale_visit_hubs.sale_visit_hubs AS svh
-      ON svh.id_booking = so.id_booking
+      ON svh.id_booking = b.id
 LEFT JOIN
     datalake_ebdb_clean.real_estate_agent_rating AS ar
       ON ar.id = b.id_real_estate_agent_rating
