@@ -1,0 +1,61 @@
+---
+database_name: datalake_airtable_clean
+table_name: historical
+columns:
+  id_historical:
+    lineage:
+      - datalake_airtable_raw.historical.id
+  id_admin:
+    lineage:
+      - datalake_airtable_raw.historical.id_admin
+  id_airtable_record:
+    lineage:
+      - datalake_airtable_raw.historical.id_airtable_record
+  id_rental_activated:
+    lineage:
+      - datalake_airtable_raw.historical.ativados_rental
+  agent_creci:
+    lineage:
+      - datalake_airtable_raw.historical.creci
+  agent_email:
+    lineage:
+      - datalake_airtable_raw.historical.email
+  agent_main_phone:
+    lineage:
+      - datalake_airtable_raw.historical.telefone_principal
+  agent_name:
+    lineage:
+      - datalake_airtable_raw.historical.name
+  cpf:
+    lineage:
+      - datalake_airtable_raw.historical.cpf
+  model_type:
+    lineage:
+      - datalake_airtable_raw.historical.modalidade
+  status:
+    lineage:
+      - datalake_airtable_raw.historical.status
+  region:
+    lineage:
+      - datalake_airtable_raw.historical.regiao
+  dt_activated:
+    lineage:
+      - datalake_airtable_raw.historical.data_ativacao
+  dt_contract_sent:
+    lineage:
+      - datalake_airtable_raw.historical._envio_de_contrato
+  dt_contract_signed:
+    lineage:
+      - datalake_airtable_raw.historical.assinatura_do_contrato
+  dt_week_accreditated:
+    lineage:
+      - datalake_airtable_raw.historical.semana_de_credenciamento
+  year:
+    lineage:
+      - datalake_airtable_raw.historical.year
+  month:
+    lineage:
+      - datalake_airtable_raw.historical.month
+  day:
+    lineage:
+      - datalake_airtable_raw.historical.day

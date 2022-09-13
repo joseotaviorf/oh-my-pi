@@ -14,10 +14,14 @@ This DAG is triggered daily.
 More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
-This pipeline produces the following output table in the raw and clean layers:
+This pipeline produces the following output incremental table in the raw and clean layers:
 
 - Via incremental load:
     - `activated`
+    - `activations`
+    - `cr_occurencies`
+    - `historical`
     - `jira_tickets`
+    - `leads`
 
 </details>

@@ -1,0 +1,148 @@
+---
+database_name: datalake_airtable_clean
+table_name: leads
+columns:
+  id_lead:
+    lineage:
+      - datalake_airtable_raw.leads.inscricao
+  id_admin:
+    lineage:
+      - datalake_airtable_raw.leads.id_admin
+  id_airtable_record:
+    lineage:
+      - datalake_airtable_raw.leads.id_airtable_record
+  accreditations:
+    lineage:
+      - datalake_airtable_raw.leads.credenciamentos
+  activation:
+    lineage:
+      - datalake_airtable_raw.leads.ativacao
+  actuation_model:
+    lineage:
+      - datalake_airtable_raw.leads.modalidade_de_atuacao
+  actuation_preference:
+    lineage:
+      - datalake_airtable_raw.leads.preferencia_de_atuacao
+  actuation_state:
+    lineage:
+      - datalake_airtable_raw.leads.estado_de_atuacao
+  adjusted_cpf:
+    lineage:
+      - datalake_airtable_raw.leads.cpf_ajustado
+  agent_creci:
+    lineage:
+      - datalake_airtable_raw.leads.creci
+  approved_status:
+    lineage:
+      - datalake_airtable_raw.leads.status_aprovacao
+  checked_by:
+    lineage:
+      - datalake_airtable_raw.leads.checado_por
+  chosen_region:
+    lineage:
+      - datalake_airtable_raw.leads.regiao_escolhida
+  creci_situation:
+    lineage:
+      - datalake_airtable_raw.leads.situacao_creci
+  creci_status:
+    lineage:
+      - datalake_airtable_raw.leads.status_creci
+  grade:
+    lineage:
+      - datalake_airtable_raw.leads.nota
+  how_met_5a:
+    lineage:
+      - datalake_airtable_raw.leads.como_conheceu_o_5a
+  lead_email:
+    lineage:
+      - datalake_airtable_raw.leads.email
+  lead_name:
+    lineage:
+      - datalake_airtable_raw.leads.nome_completo
+  lead_phone_number:
+    lineage:
+      - datalake_airtable_raw.leads.telefone
+  permanent_deaccreditation:
+    lineage:
+      - datalake_airtable_raw.leads.descred_permanente
+  real_estate:
+    lineage:
+      - datalake_airtable_raw.leads.qual_imobiliaria
+  region_first_option:
+    lineage:
+      - datalake_airtable_raw.leads.1_opcao
+  region_second_option:
+    lineage:
+      - datalake_airtable_raw.leads.2_opcao
+  region_first_option_complete:
+    lineage:
+      - datalake_airtable_raw.leads.1_opcao_completa
+  region_second_option_complete:
+    lineage:
+      - datalake_airtable_raw.leads.2_opcao_completa
+  rental_status:
+    lineage:
+      - datalake_airtable_raw.leads.status_rental
+  rental_activated:
+    lineage:
+      - datalake_airtable_raw.leads.ativos_rental
+  training_giving_up:
+    lineage:
+      - datalake_airtable_raw.leads.desistencia_treinamento
+  is_duplicated:
+    lineage:
+      - datalake_airtable_raw.leads.duplicado
+  dt_answer:
+    lineage:
+      - datalake_airtable_raw.leads.data_da_resposta
+  dt_auto_data_creci:
+    lineage:
+      - datalake_airtable_raw.leads.auto_data_creci
+  dt_birth:
+    lineage:
+      - datalake_airtable_raw.leads.data_de_nascimento
+  dt_contract_sent:
+    lineage:
+      - datalake_airtable_raw.leads.envio_contrato
+  dt_fup_call:
+    lineage:
+      - datalake_airtable_raw.leads.fup_ligacao
+  dt_fup_email_sent:
+    lineage:
+      - datalake_airtable_raw.leads.fup_email
+  dt_fup_sms_sent:
+    lineage:
+      - datalake_airtable_raw.leads.fup_sms
+  dt_fup_whatsapp_sent:
+    lineage:
+      - datalake_airtable_raw.leads.fup_whatsapp
+  dt_id_created:
+    lineage:
+      - datalake_airtable_raw.leads.criacao_de_id
+  dt_reforce_sent:
+    lineage:
+      - datalake_airtable_raw.leads.envio_reforco
+  dt_signed:
+    lineage:
+      - datalake_airtable_raw.leads.assinatura
+  dt_subscripted:
+    lineage:
+      - datalake_airtable_raw.leads.data_de_inscricao
+  dt_training_giving_up:
+    lineage:
+      - datalake_airtable_raw.leads.data_desistencia_treinamento
+  dt_training_sent:
+    lineage:
+      - datalake_airtable_raw.leads.envio_treinamento
+  ts_updated:
+    lineage:
+      - datalake_airtable_raw.leads.ultima_atualizacao
+  year:
+    lineage:
+      - datalake_airtable_raw.leads.year
+  month:
+    lineage:
+      - datalake_airtable_raw.leads.month
+  day:
+    lineage:
+      - datalake_airtable_raw.leads.day

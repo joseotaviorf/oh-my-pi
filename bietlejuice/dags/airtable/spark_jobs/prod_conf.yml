@@ -1,11 +1,33 @@
 ---
+standard_base_id: app1Xchm7V2ypMlBQ
 tables:
   activated:
-    base_id: app1Xchm7V2ypMlBQ
     table_id: tblXIVyaK8QFpjLdy
+    params:
+      view: viwWbSdPz8p3TEow6
   jira_tickets:
-    base_id: app1Xchm7V2ypMlBQ
     table_id: tblZl2bbgWIJpvhA3
+    params:
+      view: viwcC4sQQzVUDa099
+  historical:
+    table_id: tblrDwceCJcDMJhBP
+    params:
+      view: viwiq3dffbK6z2bog
+  cr_occurrences:
+    table_id: tblswVeTPw5LtSXwl
+    params:
+      view: viwOosdLmusE800Or
+  leads:
+    base_id: appRwCXduJRV0KHfz
+    table_id: tblLIcq7KPI8aZxRY
+    params:
+      view: viwPDHngY9tHPHXan
+  activations:
+    base_id: appRwCXduJRV0KHfz
+    table_id: tblhwdN61WJ5URbrA
+    params:
+      view: viwQ1cadHa9ieyfLG
+
 partition_cols:
   - year
   - month

@@ -5,21 +5,30 @@ columns:
   id_agent:
     lineage:
       - datalake_airtable_raw.jira_tickets.id_do_corretor
+  id_airtable_record:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.id_airtable_record
   id_ql_agent:
     lineage:
       - datalake_airtable_raw.jira_tickets.ql_id_do_agente
   id_issue:
     lineage:
       - datalake_airtable_raw.jira_tickets.issue_key
-  activated_sale:
+  activated:
     lineage:
-      - datalake_airtable_raw.jira_tickets.ativados_sale
+      - datalake_airtable_raw.jira_tickets.ativos
+  cpf:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.cpf_from_ativos
   description:
     lineage:
       - datalake_airtable_raw.jira_tickets.descricao
   open_in_jira:
     lineage:
       - datalake_airtable_raw.jira_tickets.open_in_jira
+  permanent_deaccreditation:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.descredenciamento_permanente
   ql_agent_complete_name:
     lineage:
       - datalake_airtable_raw.jira_tickets.ql_nome_completo_do_corretor
@@ -34,22 +43,34 @@ columns:
       - datalake_airtable_raw.jira_tickets.ql_tipo_agent
   ql_deaccreditation_reason:
     lineage:
+      - datalake_airtable_raw.jira_tickets.ql_motivo_descredenciamento
+  ql_solicitation_type:
+    lineage:
       - datalake_airtable_raw.jira_tickets.ql_tipo_de_solicitacao
+  ql_suspension_type:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.ql_tipo_de_suspensao
   responsible:
     lineage:
       - datalake_airtable_raw.jira_tickets.responsavel
   summary:
     lineage:
       - datalake_airtable_raw.jira_tickets.resumo
-  dt_created:
+  dt_begin:
     lineage:
-      - datalake_airtable_raw.jira_tickets.created
+      - datalake_airtable_raw.jira_tickets.ql_data_inicial
   dt_deaccreditated:
     lineage:
       - datalake_airtable_raw.jira_tickets.data_descredenciamento
   dt_deaccreditation_return:
     lineage:
       - datalake_airtable_raw.jira_tickets.data_retorno_descred
+  dt_end:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.ql_data_final
+  ts_created:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.created
   year:
     lineage:
       - datalake_airtable_raw.jira_tickets.year

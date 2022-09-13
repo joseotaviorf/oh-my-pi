@@ -1,0 +1,61 @@
+---
+database_name: datalake_airtable_clean
+table_name: cr_occurrences
+columns:
+  id_airtable_record:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.id_airtable_record
+  id_agent:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.ql_id_do_agente
+  id_issue:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.issue_key
+  department:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.departamento
+  description:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.descricao
+  ql_agent_complete_name:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.ql_nome_completo_do_corretor
+  ql_agent_region:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.ql_regiao_de_atuacao
+  ql_agent_segment:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.ql_seguimento_do_corretor
+  ql_ocorrency_category:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.ql_qual_ocorrencia_deseja_informar_corretor_presencial_virtual
+  ql_occorency_type:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.ql_tipo_de_ocorrencia
+  ql_resolution:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.ql_resolucao
+  ql_ticket_from:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.ql_ticket_e_de
+  responsible:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.responsavel
+  summary:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.resumo
+  who_is_complaining:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.ql_ql_quem_esta_fazendo_essa_reclamacaodenunciasolicitacao
+  ts_created:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.created
+  year:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.year
+  month:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.month
+  day:
+    lineage:
+      - datalake_airtable_raw.cr_occurrences.day

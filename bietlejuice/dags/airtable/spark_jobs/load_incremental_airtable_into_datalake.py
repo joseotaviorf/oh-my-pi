@@ -11,7 +11,6 @@ from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
     BaseDBUtils,
-    BaseSparkContext,
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
@@ -48,7 +47,7 @@ def extend_incremental_params(params: dict, execution_date: str) -> dict:
     return params
 
 
-def parse_records(records: list):
+def parse_records(records: list, spark_client):
     """Function to parse and convert response records into a dataframe
 
     :param records: Raw records from consumer/API reponse
@@ -57,8 +56,20 @@ def parse_records(records: list):
     :rtype: Spark Dataframe
     """
 
-    records = [rec["fields"] for rec in records]
-    df = BaseSparkContext.sc.parallelize(records).toDF()
+    # Spark couldn't handle same column with different data type,
+    # so to be sure that we could create the dataframe regardless
+    # of changes in the schema, we are casting everything to string
+    # here and casting to the correct data type on clean.
+    records = [
+        {
+            **{k: str(v) for k, v in rec["fields"].items()},
+            "id_airtable_record": rec["id"],
+        }
+        for rec in records
+    ]
+    # rdd.toDF() get a sample of records and infer schema wrong for keys
+    # with low frequency.
+    df = spark_client.create_dataframe(records, sampling_ratio=1)
     formatted_columns = list(
         map(StringFormatter.set_alphanumeric_snake_case, df.columns)
     )
@@ -81,6 +92,7 @@ if __name__ == "__main__":
     execution_date = args.execution_date
 
     config_service = ConfigurationService(source)
+    standard_base_id = config_service.get_config("standard_base_id")
     tables = config_service.get_config("tables")
     partitions_cols = config_service.get_config("partition_cols")
 
@@ -118,7 +130,7 @@ if __name__ == "__main__":
 
     for table_name in tables:
         table_config = tables[table_name]
-        base_id = table_config["base_id"]
+        base_id = table_config.get("base_id", standard_base_id)
         table_id = table_config["table_id"]
         params = table_config.get("params", {})
 
@@ -130,7 +142,7 @@ if __name__ == "__main__":
         records = airtable_consumer.sync(params=extended_params)
 
         if records:
-            df = parse_records(records)
+            df = parse_records(records, spark_client)
             df = (
                 SparkDataFrameService()
                 .input(df)

@@ -2,9 +2,18 @@
 database_name: datalake_airtable_clean
 table_name: activated
 columns:
+  id_airtable_record:
+    lineage:
+      - datalake_airtable_raw.activated.id_airtable_record
+  ids_history:
+    lineage:
+      - datalake_airtable_raw.activated.historico_v2
   id_user:
     lineage:
       - datalake_airtable_raw.activated.id_user
+  accreditations:
+    lineage:
+      - datalake_airtable_raw.activated.credenciamentos
   agent_actual_type:
     lineage:
       - datalake_airtable_raw.activated.agent_actual_type
@@ -23,18 +32,30 @@ columns:
   cpf:
     lineage:
       - datalake_airtable_raw.activated.cpf
+  disqualification:
+    lineage:
+      - datalake_airtable_raw.activated.disqualification
   dynamic_status:
     lineage:
       - datalake_airtable_raw.activated.status_dinamico
   last_area:
     lineage:
       - datalake_airtable_raw.activated.last_area
+  last_disqualification:
+    lineage:
+      - datalake_airtable_raw.activated.last_disqualification
+  last_disqualification_reason:
+    lineage:
+      - datalake_airtable_raw.activated.last_disqualification_reason
   last_suspension:
     lineage:
       - datalake_airtable_raw.activated.last_suspension
-  status:
+  last_suspension_reason:
     lineage:
-      - datalake_airtable_raw.activated.status
+      - datalake_airtable_raw.activated.last_suspension_reason
+  permanent_deaccreditation:
+    lineage:
+      - datalake_airtable_raw.activated.descred_permanente
   suspensions:
     lineage:
       - datalake_airtable_raw.activated.suspensoes
@@ -50,9 +71,18 @@ columns:
   dt_activated:
     lineage:
       - datalake_airtable_raw.activated.activation_date
+  dt_last_disqualificated:
+    lineage:
+      - datalake_airtable_raw.activated.last_disqualification_date
+  dt_last_disqualification_returned:
+    lineage:
+      - datalake_airtable_raw.activated.last_disqualification_return_date
   dt_last_suspended:
     lineage:
       - datalake_airtable_raw.activated.last_suspension_date
+  dt_last_suspension_returned:
+    lineage:
+      - datalake_airtable_raw.activated.last_supension_return_date
   dt_week_accreditated:
     lineage:
       - datalake_airtable_raw.activated.accreditation_week

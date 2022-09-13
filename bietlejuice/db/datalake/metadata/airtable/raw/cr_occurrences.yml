@@ -1,16 +1,8 @@
 ---
 database_name: datalake_airtable_raw
-table_name: jira_tickets
+table_name: cr_occurrences
 columns:
-  id_do_corretor:
-    tags:
-      - Confidential
-      - PII
   ql_id_do_agente:
-    tags:
-      - Confidential
-      - PII
-  cpf_from_ativos:
     tags:
       - Confidential
       - PII
@@ -19,6 +11,10 @@ columns:
       - Confidential
       - PII
   ql_nome_completo_do_corretor:
+    tags:
+      - Confidential
+      - PII
+  ql_ql_quem_esta_fazendo_essa_reclamacaodenunciasolicitacao:
     tags:
       - Confidential
       - PII

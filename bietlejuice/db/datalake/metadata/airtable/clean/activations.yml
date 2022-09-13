@@ -1,0 +1,100 @@
+---
+database_name: datalake_airtable_clean
+table_name: activations
+columns:
+  id_activations:
+    lineage:
+      - datalake_airtable_raw.activations.id
+  id_airtable_record:
+    lineage:
+      - datalake_airtable_raw.activations.id_airtable_record
+  activation_status:
+    lineage:
+      - datalake_airtable_raw.activations.status_ativacao
+  actuation_state:
+    lineage:
+      - datalake_airtable_raw.activations.estado_de_atuacao
+  agent_complete_name:
+    lineage:
+      - datalake_airtable_raw.activations.nome_completo
+  agent_creci:
+    lineage:
+      - datalake_airtable_raw.activations.creci
+  agent_email:
+    lineage:
+      - datalake_airtable_raw.activations.email
+  agent_phone_number:
+    lineage:
+      - datalake_airtable_raw.activations.telefone
+  chosen_region:
+    lineage:
+      - datalake_airtable_raw.activations.regiao_escolhida
+  cpf:
+    lineage:
+      - datalake_airtable_raw.activations.cpf
+  giving_up_reason:
+    lineage:
+      - datalake_airtable_raw.activations.desistencia_motivo
+  model:
+    lineage:
+      - datalake_airtable_raw.activations.modalidade
+  original_lead:
+    lineage:
+      - datalake_airtable_raw.activations.lead_original
+  region:
+    lineage:
+      - datalake_airtable_raw.activations.regiao
+  region_first_option:
+    lineage:
+      - datalake_airtable_raw.activations.1_opcao
+  region_second_option:
+    lineage:
+      - datalake_airtable_raw.activations.2_opcao
+  has_activation_notification:
+    lineage:
+      - datalake_airtable_raw.activations.aviso_ativacao
+  has_welcome_email:
+    lineage:
+      - datalake_airtable_raw.activations.email_boasvindas
+  has_whats_pocket:
+    lineage:
+      - datalake_airtable_raw.activations.whats_pocket
+  dt_agency_confirmation:
+    lineage:
+      - datalake_airtable_raw.activations.confirmacao_de_agenda
+  dt_birth:
+    lineage:
+      - datalake_airtable_raw.activations.data_de_nascimento
+  dt_contract_sent:
+    lineage:
+      - datalake_airtable_raw.activations.envio_de_contrato
+  dt_giving_up:
+    lineage:
+      - datalake_airtable_raw.activations.data_desistencia
+  dt_id_creation:
+    lineage:
+      - datalake_airtable_raw.activations.criacao_id
+  dt_jitex_requested:
+    lineage:
+      - datalake_airtable_raw.activations.solicitacao_jitex
+  dt_kit_received:
+    lineage:
+      - datalake_airtable_raw.activations.recebimento_kit
+  dt_signed:
+    lineage:
+      - datalake_airtable_raw.activations.assinatura
+  dt_week_accreditated:
+    lineage:
+      - datalake_airtable_raw.activations.semana_de_credenciamento
+  ts_updated:
+    lineage:
+      - datalake_airtable_raw.activations.ultima_alteracao
+  year:
+    lineage:
+      - datalake_airtable_raw.activations.year
+  month:
+    lineage:
+      - datalake_airtable_raw.activations.month
+  day:
+    lineage:
+      - datalake_airtable_raw.activations.day
