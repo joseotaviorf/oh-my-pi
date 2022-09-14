@@ -1,5 +1,5 @@
 CREATE TABLE public.dim_country (
-    sk_country INTEGER PRIMARY KEY,
+    sk_country_code VARCHAR PRIMARY KEY,
     id_country INTEGER,
     country_code VARCHAR,
     country_name VARCHAR,

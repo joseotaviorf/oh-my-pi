@@ -1,5 +1,5 @@
 SELECT
-    CAST(id AS INTEGER) AS sk_country,
+    code AS sk_country_code,
     CAST(id AS INTEGER) AS id_country,
     code AS country_code,
     name AS country_name,
@@ -12,7 +12,7 @@ FROM
     datalake_ebdb_clean.country
 UNION ALL
 SELECT
-    -1 AS sk_country,
+    -1 AS sk_country_code,
     NULL AS id_country,
     NULL AS country_code,
     NULL AS country_name,
