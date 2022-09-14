@@ -1,0 +1,95 @@
+---
+table_name: dw_sale_staging.fact_visits
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 1002403
+    severity_level: Error
+column_level_validations:
+  sk_booking:
+    is_complete:
+      severity_level: Error
+  sk_sale_flow:
+    is_complete:
+      severity_level: Error
+  sk_house:
+    is_complete:
+      severity_level: Error
+  sk_region:
+    is_complete:
+      severity_level: Error
+  sk_business_unit:
+    is_complete:
+      severity_level: Error
+  sk_agent:
+    is_complete:
+      severity_level: Error
+  sk_user_agent:
+    is_complete:
+      severity_level: Error
+  sk_user_en:
+    is_complete:
+      severity_level: Error
+  sk_fixed_agent:
+    is_complete:
+      severity_level: Error
+  sk_buyer:
+    is_complete:
+      severity_level: Error
+  sk_seller:
+    is_complete:
+      severity_level: Error
+  sk_user_creation:
+    is_complete:
+      severity_level: Error
+  sk_user_cancelation:
+    is_complete:
+      severity_level: Error
+  sk_visit:
+    is_complete:
+      severity_level: Error
+  sk_offer:
+    is_complete:
+      severity_level: Error
+  sk_agent_booking_review:
+    is_complete:
+      severity_level: Error
+  sk_buyer_booking_review:
+    is_complete:
+      severity_level: Error
+  sk_booking_created_date:
+    is_complete:
+      severity_level: Error
+  sk_visit_date:
+    is_complete:
+      severity_level: Error
+  sk_visit_canceled_date:
+    is_complete:
+      severity_level: Error
+  sk_visit_completed_date:
+    is_complete:
+      severity_level: Error
+  sk_visit_follow_up_date:
+    is_complete:
+      severity_level: Error
+  sk_agent_review_rating_date:
+    is_complete:
+      severity_level: Error
+  sk_buyer_review_rating_date:
+    is_complete:
+      severity_level: Error
+  is_hub_flow:
+    is_complete:
+      severity_level: Error
+  is_house_rented:
+    is_complete:
+      severity_level: Error
+  is_virtual_visit:
+    is_complete:
+      severity_level: Error
+  days_visit_booked_to_visit:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

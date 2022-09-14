@@ -1,0 +1,35 @@
+---
+table_name: dw_sale_staging.fact_listing_status
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 958721
+    severity_level: Error
+column_level_validations:
+  sk_sale_listing:
+    is_complete:
+      severity_level: Error
+  sk_region:
+    is_complete:
+      severity_level: Error
+  sk_first_publication_date:
+    is_complete:
+      severity_level: Error
+  sk_status_start_date:
+    is_complete:
+      severity_level: Error
+  sk_status_end_date:
+    is_complete:
+      severity_level: Error
+  ts_status_started:
+    is_complete:
+      severity_level: Error
+  status_history:
+    is_complete:
+      severity_level: Error
+  is_last_status:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

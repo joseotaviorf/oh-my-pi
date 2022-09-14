@@ -1,0 +1,29 @@
+---
+table_name: dw_sale_staging.fact_business_unit_region
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 907
+    severity_level: Error
+column_level_validations:
+  sk_region:
+    is_complete:
+      severity_level: Error
+  sk_coverage_started_date:
+    is_complete:
+      severity_level: Error
+  sk_coverage_ended_date:
+    is_complete:
+      severity_level: Error
+  business_model:
+    is_complete:
+      severity_level: Error
+  business_unit:
+    is_complete:
+      severity_level: Error
+  dt_coverage_started:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

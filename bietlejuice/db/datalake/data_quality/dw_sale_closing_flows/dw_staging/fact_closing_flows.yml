@@ -1,0 +1,88 @@
+---
+table_name: dw_sale_staging.fact_closing_flows
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 12542
+    severity_level: Error
+column_level_validations:
+  sk_offer:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_sale_agreement_created_date:
+    is_complete:
+      severity_level: Error
+  sk_sale_agreement_signed_date:
+    is_complete:
+      severity_level: Error
+  sk_onboarding_ended_date:
+    is_complete:
+      severity_level: Error
+  sk_sale_agreement_cancelled_date:
+    is_complete:
+      severity_level: Error
+  sk_sale_agreement_rescued_date:
+    is_complete:
+      severity_level: Error
+  sk_legal_analysis_ended_date:
+    is_complete:
+      severity_level: Error
+  sk_legaut_analysis_started_date:
+    is_complete:
+      severity_level: Error
+  sk_legaut_analysis_ended_date:
+    is_complete:
+      severity_level: Error
+  sk_legal_risk_started_date:
+    is_complete:
+      severity_level: Error
+  sk_legal_risk_ended_date:
+    is_complete:
+      severity_level: Error
+  sk_bank_legal_analysis_started:
+    is_complete:
+      severity_level: Error
+  sk_credit_analysis_started_date:
+    is_complete:
+      severity_level: Error
+  sk_credit_analysis_ended_date:
+    is_complete:
+      severity_level: Error
+  sk_financing_started_date:
+    is_complete:
+      severity_level: Error
+  sk_financing_ended_date:
+    is_complete:
+      severity_level: Error
+  sk_notes_registry_started_date:
+    is_complete:
+      severity_level: Error
+  sk_notes_registry_ended_date:
+    is_complete:
+      severity_level: Error
+  sk_house_registry_started_date:
+    is_complete:
+      severity_level: Error
+  sk_house_registry_ended_date:
+    is_complete:
+      severity_level: Error
+  sk_sale_key_delivered_date:
+    is_complete:
+      severity_level: Error
+  sk_sale_transaction_paid_date:
+    is_complete:
+      severity_level: Error
+  sk_payment_allowed_date:
+    is_complete:
+      severity_level: Error
+  sk_down_payment_date:
+    is_complete:
+      severity_level: Error
+  ts_monday_load:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

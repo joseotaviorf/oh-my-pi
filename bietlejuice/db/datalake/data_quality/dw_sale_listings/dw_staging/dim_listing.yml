@@ -1,0 +1,19 @@
+---
+table_name: dw_sale_staging.dim_listing
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 375772
+    severity_level: Error
+column_level_validations:
+  sk_sale_listing:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_house:
+    is_unique:
+      severity_level: Error
+  short_url:
+    is_unique:
+      severity_level: Error

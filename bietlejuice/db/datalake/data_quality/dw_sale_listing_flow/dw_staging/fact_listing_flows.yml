@@ -1,0 +1,151 @@
+---
+table_name: dw_sale_staging.fact_listing_flows
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 10134306
+    severity_level: Error
+column_level_validations:
+  sk_house_listing_flow:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_condo:
+    is_complete:
+      severity_level: Error
+  sk_lead:
+    is_complete:
+      severity_level: Error
+  sk_lead_conversion:
+    is_complete:
+      severity_level: Error
+  sk_first_photo_job:
+    is_complete:
+      severity_level: Error
+  sk_house_listing:
+    is_complete:
+      severity_level: Error
+  sk_user_house_registrant:
+    is_complete:
+      severity_level: Error
+  sk_user_sales_rep:
+    is_complete:
+      severity_level: Error
+  sk_user_lead_affiliate:
+    is_complete:
+      severity_level: Error
+  sk_user_first_task_assignee:
+    is_complete:
+      severity_level: Error
+  sk_user_last_task_assignee:
+    is_complete:
+      severity_level: Error
+  sk_region:
+    is_complete:
+      severity_level: Error
+  sk_city:
+    is_complete:
+      severity_level: Error
+  sk_partner:
+    is_complete:
+      severity_level: Error
+  sk_lead_date:
+    is_complete:
+      severity_level: Error
+  sk_sales_company_lead_sent_date:
+    is_complete:
+      severity_level: Error
+  sk_prospect_date:
+    is_complete:
+      severity_level: Error
+  sk_first_task_created_date:
+    is_complete:
+      severity_level: Error
+  sk_first_task_closed_date:
+    is_complete:
+      severity_level: Error
+  sk_last_task_created_date:
+    is_complete:
+      severity_level: Error
+  sk_last_task_closed_date:
+    is_complete:
+      severity_level: Error
+  sk_first_contact_date:
+    is_complete:
+      severity_level: Error
+  sk_conversion_date:
+    is_complete:
+      severity_level: Error
+  sk_qualified_date:
+    is_complete:
+      severity_level: Error
+  sk_opportunity_date:
+    is_complete:
+      severity_level: Error
+  sk_first_listing_date:
+    is_complete:
+      severity_level: Error
+  sk_discard_date:
+    is_complete:
+      severity_level: Error
+  sk_user_lead_first_discarder:
+    is_complete:
+      severity_level: Error
+  sk_user_lead_last_discarder:
+    is_complete:
+      severity_level: Error
+  funnel_step:
+    is_complete:
+      severity_level: Error
+  funnel_drop_reason:
+    is_complete:
+      severity_level: Error
+  is_doorman:
+    is_complete:
+      severity_level: Error
+  is_isales_direct_register:
+    is_complete:
+      severity_level: Error
+  is_cx_direct_register:
+    is_complete:
+      severity_level: Error
+  is_ops_direct_register:
+    is_complete:
+      severity_level: Error
+  is_call_center:
+    is_complete:
+      severity_level: Error
+  is_agent_referral:
+    is_complete:
+      severity_level: Error
+  lead_referring_category:
+    is_complete:
+      severity_level: Error
+  mkt_branded:
+    is_complete:
+      severity_level: Error
+  mkt_category:
+    is_complete:
+      severity_level: Error
+  mkt_flow:
+    is_complete:
+      severity_level: Error
+  mkt_completion:
+    is_complete:
+      severity_level: Error
+  mkt_origin:
+    is_complete:
+      severity_level: Error
+  mkt_platform:
+    is_complete:
+      severity_level: Error
+  lead_context_origin:
+    is_complete:
+      severity_level: Error
+  listing_rent_status:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

@@ -1,0 +1,130 @@
+---
+table_name: dw_sale_staging.fact_sale_flows
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 756897
+    severity_level: Error
+column_level_validations:
+  sk_sale_flow:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_buyer:
+    is_complete:
+      severity_level: Error
+  sk_house:
+    is_complete:
+      severity_level: Error
+  sk_region:
+    is_complete:
+      severity_level: Error
+  sk_first_listing_date:
+    is_complete:
+      severity_level: Error
+  sk_first_event_date:
+    is_complete:
+      severity_level: Error
+  sk_first_tta_message_sent_date:
+    is_complete:
+      severity_level: Error
+  sk_first_booking_created_date:
+    is_complete:
+      severity_level: Error
+  sk_first_visit_completed_date:
+    is_complete:
+      severity_level: Error
+  sk_first_offer_submitted_date:
+    is_complete:
+      severity_level: Error
+  sk_first_offer_accepted_date:
+    is_complete:
+      severity_level: Error
+  sk_first_offer_dismissed_date:
+    is_complete:
+      severity_level: Error
+  sk_sale_agreement_created_date:
+    is_complete:
+      severity_level: Error
+  sk_sale_agreement_signed_date:
+    is_complete:
+      severity_level: Error
+  sk_sale_agreement_cancelled_date:
+    is_complete:
+      severity_level: Error
+  sk_house_registry_ended_date:
+    is_complete:
+      severity_level: Error
+  first_event:
+    is_complete:
+      severity_level: Error
+  rank_buyer_sale_flow:
+    is_complete:
+      severity_level: Error
+  rank_house_sale_flow:
+    is_complete:
+      severity_level: Error
+  is_buyer_first_sale_flow:
+    is_complete:
+      severity_level: Error
+  is_house_first_sale_flow:
+    is_complete:
+      severity_level: Error
+  flow_type:
+    is_complete:
+      severity_level: Error
+  bookings:
+    is_complete:
+      severity_level: Error
+  visits_completed:
+    is_complete:
+      severity_level: Error
+  offers_submitted:
+    is_complete:
+      severity_level: Error
+  tta_messages_sent:
+    is_complete:
+      severity_level: Error
+  app_type:
+    is_complete:
+      severity_level: Error
+  utm_source:
+    is_complete:
+      severity_level: Error
+  utm_medium:
+    is_complete:
+      severity_level: Error
+  utm_campaign:
+    is_complete:
+      severity_level: Error
+  is_branded:
+    is_complete:
+      severity_level: Error
+  mkt_category:
+    is_complete:
+      severity_level: Error
+  mkt_flow:
+    is_complete:
+      severity_level: Error
+  mkt_completion:
+    is_complete:
+      severity_level: Error
+  mkt_origin:
+    is_complete:
+      severity_level: Error
+  mkt_channel:
+    is_complete:
+      severity_level: Error
+  mkt_medium:
+    is_complete:
+      severity_level: Error
+  mkt_source:
+    is_complete:
+      severity_level: Error
+  mkt_platform:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

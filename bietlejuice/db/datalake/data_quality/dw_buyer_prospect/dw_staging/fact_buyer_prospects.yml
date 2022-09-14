@@ -1,0 +1,103 @@
+---
+table_name: dw_sale_staging.fact_buyer_prospects
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 256318
+    severity_level: Error
+column_level_validations:
+  sk_buyer:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_first_sale_flow_date:
+    is_complete:
+      severity_level: Error
+  sk_first_booking_created_date:
+    is_complete:
+      severity_level: Error
+  sk_first_visit_completed_date:
+    is_complete:
+      severity_level: Error
+  sk_first_offer_submitted_date:
+    is_complete:
+      severity_level: Error
+  sk_first_offer_accepted_date:
+    is_complete:
+      severity_level: Error
+  sk_first_sale_agreement_signed_date:
+    is_complete:
+      severity_level: Error
+  sk_last_sale_flow_date:
+    is_complete:
+      severity_level: Error
+  sk_last_booking_created_date:
+    is_complete:
+      severity_level: Error
+  sk_last_visit_completed_date:
+    is_complete:
+      severity_level: Error
+  sk_last_offer_submitted_date:
+    is_complete:
+      severity_level: Error
+  sk_last_offer_accepted_date:
+    is_complete:
+      severity_level: Error
+  sk_last_sale_agreement_signed_date:
+    is_complete:
+      severity_level: Error
+  sk_last_event_date:
+    is_complete:
+      severity_level: Error
+  further_funnel_step:
+    is_complete:
+      severity_level: Error
+  is_tenant:
+    is_complete:
+      severity_level: Error
+  is_current_tenant:
+    is_complete:
+      severity_level: Error
+  is_contract_owner:
+    is_complete:
+      severity_level: Error
+  is_tenant_prospect:
+    is_complete:
+      severity_level: Error
+  bookings_created:
+    is_complete:
+      severity_level: Error
+  bookings_created_by_agent:
+    is_complete:
+      severity_level: Error
+  bookings_canceled:
+    is_complete:
+      severity_level: Error
+  visits_completed:
+    is_complete:
+      severity_level: Error
+  offers_submitted:
+    is_complete:
+      severity_level: Error
+  offers_accepted:
+    is_complete:
+      severity_level: Error
+  offers_dismissed:
+    is_complete:
+      severity_level: Error
+  sale_agreements_signed:
+    is_complete:
+      severity_level: Error
+  houses_owned:
+    is_complete:
+      severity_level: Error
+  listings_for_sale:
+    is_complete:
+      severity_level: Error
+  listings_for_rent:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error
