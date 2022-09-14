@@ -176,7 +176,8 @@ house_listings AS (
         END AS is_for_rent,
         COALESCE(lbc.is_for_sale, FALSE) AS is_for_sale,
         h.has_instant_offer_enabled,
-        h.is_3p_supply
+        h.is_3p_supply,
+        rl.ts_administrator_changed
     FROM
         datalake_ebdb_listing.house AS h
     JOIN
@@ -270,6 +271,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.ts_last_unpublished AS ts_last_de_publication,
     hl.ts_house_create,
     hl.ts_house_update,
+    hl.ts_administrator_changed,
     NOW() AS ts_load
 FROM house_listings hl
 LEFT JOIN b2b_info bi

@@ -7,7 +7,7 @@ SELECT
     lbc.status_reason,
     lbc.ts_first_publication,
     lbc.ts_last_publication,
-    FROM_UNIXTIME(ure.ts_revision/1000) AS ts_administrator_changed,
+    CAST(FROM_UNIXTIME(ure.ts_revision/1000) AS TIMESTAMP) AS ts_administrator_changed,
     lbc.ts_created,
     lbc.ts_updated
 FROM

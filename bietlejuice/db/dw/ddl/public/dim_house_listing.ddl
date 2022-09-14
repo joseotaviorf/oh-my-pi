@@ -77,6 +77,7 @@ create table if not exists public.dim_house_listing
  ts_last_de_publication timestamp,
  ts_house_create timestamp,
  ts_house_update timestamp,
+ ts_administrator_changed timestamp,
  ts_load timestamp
 );
 
