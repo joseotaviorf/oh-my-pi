@@ -4,43 +4,43 @@ table_name: workday_window
 columns:
   id_date:
     lineage:
-      - datalake_quintoandar.aux_date.id_date
+      - datalake_date.cities_calendar.id_date
   id_city:
     lineage:
-      - datalake_region.region.id
+      - datalake_date.cities_calendar.id_city
   city:
     lineage:
-      - datalake_region.region.name
+      - datalake_date.cities_calendar.city
   dt_ref:
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_date.cities_calendar.dt_reference
   dt_start:
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_date.cities_calendar.dt_workday
   dt_end_1:
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_date.cities_calendar.dt_workday
   dt_end_2:
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_date.cities_calendar.dt_workday
   dt_end_3:
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_date.cities_calendar.dt_workday
   dt_end_4:
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_date.cities_calendar.dt_workday
   dt_end_5:
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_date.cities_calendar.dt_workday
   dt_end_6:
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_date.cities_calendar.dt_workday
   dt_end_7:
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_date.cities_calendar.dt_workday
   dt_end_8:
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_date.cities_calendar.dt_workday
   dt_end_15:
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_date.cities_calendar.dt_workday

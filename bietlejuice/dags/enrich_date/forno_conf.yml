@@ -1,0 +1,4 @@
+---
+inner_dependencies:
+  workday_window:
+    - cities_calendar
