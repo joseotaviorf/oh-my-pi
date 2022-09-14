@@ -130,3 +130,9 @@ cross_downstream(
 )
 
 terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+
+# adding data quality tasks
+independent_tasks = DatalakeTaskGroup.all_independent_tasks(clean_task_groups)
+
+if independent_tasks:
+    terminate_cluster_task.set_upstream(independent_tasks)

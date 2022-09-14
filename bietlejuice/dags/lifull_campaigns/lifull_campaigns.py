@@ -144,3 +144,9 @@ for clean_table_name in clean_tables_list:
     )
 
     terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
+
+    # adding data quality tasks :)
+    independent_tasks = DatalakeTaskGroup.independent_tasks(clean_task_group)
+
+    if independent_tasks:
+        terminate_cluster_task.set_upstream(independent_tasks)
