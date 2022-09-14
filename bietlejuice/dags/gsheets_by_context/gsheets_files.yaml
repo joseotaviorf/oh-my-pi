@@ -117,6 +117,12 @@ support_agents_department:
     clean_table_name: support_agents_department
     sheet_context: support_and_service
 
+stilingue_agents:
+    sheet_id: 1WimBScvf2sRj122azMqiqFjS-4aTzekQHHjfzvKAcJ4
+    sheet_name: stilingue_agents
+    clean_table_name: stilingue_agents
+    sheet_context: support_and_service
+
 tag_sla_target:
     sheet_id: 1XB_PyWLyETfwUoJYyLDDF_PZ97swuTJExAjfhLfM7eo
     sheet_name: SLA por tag

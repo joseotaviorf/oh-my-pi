@@ -1,0 +1,12 @@
+---
+database_name: datalake_gsheets_raw
+table_name: stilingue_agents
+columns:
+  external_agent_name:
+    tags:
+      - PII
+      - Confidential
+  agent_email:
+    tags:
+      - PII
+      - Confidential

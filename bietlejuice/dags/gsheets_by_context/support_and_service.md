@@ -31,6 +31,7 @@ This pipeline produces the following output tables:
     - `keys_logistic_control`
     - `regional_inspection_q12022`
     - `service_city_holidays`
+    - `stilingue_agents`
     - `support_agents_department`
     - `tag_sla_target`
     - `target_service_kpis`
@@ -47,6 +48,7 @@ This pipeline produces the following output tables:
     - `schedule_inspection_departure`
     - `schedule_inspection_entry`
     - `service_city_holidays`
+    - `stilingue_agents`
     - `support_agents_department`
     - `tag_sla_target`
     - `target_service_kpis`
