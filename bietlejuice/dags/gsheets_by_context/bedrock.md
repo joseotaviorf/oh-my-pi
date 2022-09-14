@@ -22,13 +22,11 @@ This pipeline produces the following output tables:
 1. Data lake raw:
 
    - `basic_access`
-   - `legal_provisioning`
    - `people_hierarchy`
    - `people_data`
 
 2. Data lake clean:
    - `people_basic_access`
-   - `legal_provisioning`
    - `people_employees`
    - `people_hierarchy`
 
