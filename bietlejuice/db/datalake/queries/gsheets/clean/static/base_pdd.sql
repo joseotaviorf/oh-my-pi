@@ -1,5 +1,5 @@
 SELECT
-    CAST(NULLIF(invoice_id,'') AS INT) AS id_invoice,
+    CAST(NULLIF(invoice_id,'') AS BIGINT) AS id_invoice,
     CAST(NULLIF(contract_id,'') AS INT) AS id_contract,
     NULLIF(qty_invoice,'') AS qty_invoice,
     NULLIF(contract_version,'') AS contract_version,
@@ -8,7 +8,6 @@ SELECT
     CAST(NULLIF(invoice_amount,'') AS FLOAT) AS invoice_amount,
     NULLIF(invoice_status,'') AS invoice_status,
     NULLIF(invoice_paid_amount,'') AS invoice_paid_amount,
-    NULLIF(invoice_paid_date,'') AS invoice_paid_date,
     NULLIF(invoice_paid_via,'') AS invoice_paid_via,
     NULLIF(contract_guarantee,'') AS contract_guarantee,
     NULLIF(invoice_account_type,'') AS invoice_account_type,
@@ -21,12 +20,13 @@ SELECT
     NULLIF(city_name,'') AS city_name,
     NULLIF(city_group,'') AS city_group,
     NULLIF(grupoprovisao,'') AS provisional_group,
+    NULLIF(accrual_year_month,'') AS accrual_year_month,
     DATE(contract_signature_date) AS dt_contract_signature,
-    DATE(accrual_year_month) AS dt_accrual_year_month,
     DATE(invoice_original_due_date) AS dt_invoice_original_due,
     DATE(invoice_due_date) AS dt_invoice_due,
     DATE(invoice_created_at) AS dt_invoice_created,
     DATE(invoice_sent_at) AS dt_invoice_sent,
+    DATE(invoice_paid_date) AS invoice_paid_date,
     DATE(contract_due_date_min) AS dt_contract_due_date_min,
     DATE(dt_processamento) AS dt_processing
 FROM
