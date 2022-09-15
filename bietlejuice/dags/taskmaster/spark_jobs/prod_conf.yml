@@ -1,0 +1,3 @@
+max_records_per_file: 250000
+partitioned_by: "updated_at"
+allow_list: ["task"]
