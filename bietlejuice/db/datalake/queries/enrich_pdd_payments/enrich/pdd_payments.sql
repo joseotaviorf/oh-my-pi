@@ -166,15 +166,11 @@ invoices_to_receive AS (
     i.frequency,
     i.payment_status,
     i.user,
-    IF(i.due_amount = 0 
-      AND i.original_amount IS NOT NULL 
-      AND i.original_amount != 0 
-      AND i.payment_status = 'canceled'
-      AND i.ts_canceled > DATE('{year}-{month}-{day}'), -1*i.original_amount, i.due_amount) AS due_amount, 
+    i.due_amount,
     paid_amount,
     DATEDIFF(i.dt_due, pd.dt_probable_created) AS days_until_due,
     i.accrual_year_month,
-    IF(ts_created <= dt_due, ts_created, dt_probable_created) AS ts_created,
+    i.ts_created,
     i.dt_sent,
     CASE
       WHEN DATEDIFF(i.dt_due, pd.dt_probable_created) >= 30 THEN pd.dt_probable_due
@@ -235,7 +231,7 @@ invoices_at_closing AS (
   WHERE 
     payment_status != 'canceled'
     AND (dt_paid IS NULL OR dt_paid >= DATE('{year}-{month}-{day}')) 
-    AND ts_created < DATE('{year}-{month}-{day}') 
+    AND ts_created < DATE_ADD('{year}-{month}-{day}', 1) 
 ),
 
 late_contracts AS (
