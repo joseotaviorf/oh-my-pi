@@ -4,10 +4,7 @@ alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id_date:
     is_complete:
-      severity_level: Error
-  report_type:
+  campaign_name:
     is_complete:
-      severity_level: Error
   account_name:
     is_complete:
-      severity_level: Error
