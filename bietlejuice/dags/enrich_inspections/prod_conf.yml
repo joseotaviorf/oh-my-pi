@@ -1,0 +1,4 @@
+---
+inner_dependencies:
+  inspection_metrics:
+    - inspection

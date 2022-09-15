@@ -1,0 +1,34 @@
+---
+database_name: datalake_inspections
+table_name: inspection_metrics
+columns:
+  id_inspection:
+    lineage:
+      - datalake_inspections.inspection.id_inspection
+  id_city:
+    lineage:
+      - datalake_region.region.id_city
+  city_name:
+    lineage:
+      - datalake_inspections.inspection.city_name
+  inspection_type:
+    lineage:
+      - datalake_inspections.inspection.inspection_type
+  status:
+    lineage:
+      - datalake_inspections.inspection.status
+  sla_execution_target:
+    lineage:
+      - datalake_support_and_service_kpis_targets.kpis_targets.target
+  dt_execution_limit:
+    lineage:
+      - datalake_inspections.inspection.dt_execution_limit
+  ts_execution_started:
+    lineage:
+      - datalake_inspections.inspection.ts_started
+  ts_execution_finished:
+    lineage:
+      - datalake_inspections.inspection.ts_finished
+  ts_created:
+    lineage:
+      - datalake_inspections.inspection.ts_created

@@ -1622,6 +1622,16 @@ bietlejuice.enrich_docato:
   # The gsheet is static, but it's the only source of this enrich. So if the gsheet is updated and we need to run the task, the enrich will be updated.
   - bietlejuice.gsheets.static:load-clean-legal-base-docato
 
+bietlejuice.enrich_inspections:
+  - bietlejuice.ebdb:create-clean-inspection-in-data-lake
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_date:load-enrich-cities-calendar
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_support_and_service_kpis_targets:load-enrich-kpis-targets
+  - bietlejuice.inspections:load-clean-assessment
+  - bietlejuice.inspections:load-clean-inspection
+
 bietlejuice.enrich_invoice:
   # Removed dependencies with ebdb.contract, conversion_lead, lead, house, partner_agent, rent_flow and user, and enrich_ebdb_listing.house_listing since it's all already satisfied by enrich_ebdb_contract.
   # Also, removed dependencies with retsuko.account, entry and invoice since it's already satisfied by enrich_retsuko.

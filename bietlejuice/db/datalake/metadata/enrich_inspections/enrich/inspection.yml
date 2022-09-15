@@ -1,0 +1,78 @@
+---
+database_name: datalake_inspections
+table_name: inspection
+columns:
+  id_inspection:
+    lineage:
+      - datalake_inspections_clean.inspection.id_inspection
+  id_external:
+    lineage:
+      - datalake_inspections_clean.inspection.id_external
+      - datalake_ebdb_clean.inspection.id
+  id_assessment:
+    lineage:
+      - datalake_inspections_clean.inspection.id_assessment
+  id_booking:
+    lineage:
+      - datalake_inspections_clean.inspection.id_schedule
+      - datalake_ebdb_clean.inspection.id_booking
+  id_contract:
+    lineage:
+      - datalake_inspections_clean.inspection.id_contract
+      - datalake_ebdb_clean.inspection.id_contract
+  id_city:
+    lineage:
+      - datalake_region.region.id_cityß
+      - datalake_inspections_clean.inspection.house
+  city_name:
+    lineage:
+      - datalake_region.region.city_name
+      - datalake_inspections_clean.inspection.house
+  inspection_type:
+    lineage:
+      - datalake_inspections_clean.inspection.type
+      - datalake_ebdb_clean.inspection.type
+  booking_type:
+    lineage:
+      - datalake_booking.booking.type
+  assessment_source:
+    lineage:
+      - datalake_inspections_clean.assessment.source
+  status:
+    lineage:
+      - datalake_inspections_clean.inspection.status
+      - datalake_ebdb_clean.inspection.status
+  dt_contract_entrance:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_contract_entrance
+  dt_contract_termination:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_termination
+  dt_execution_limit:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_contract_entrance
+      - datalake_offboarding.contract_termination.dt_termination
+  dt_booking_inspected:
+    lineage:
+      - datalake_booking.booking.dt_booking
+  ts_booking_cancelled:
+    lineage:
+      - datalake_booking.booking.ts_first_canceled_unevaluated
+  ts_termination_canceled:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_canceled
+  ts_started:
+    lineage:
+      - datalake_inspections_clean.inspection.ts_started
+  ts_finished:
+    lineage:
+      - datalake_inspections_clean.inspection.ts_finished
+      - datalake_ebdb_clean.inspection.dt_inspected
+  ts_created:
+    lineage:
+      - datalake_inspections_clean.inspection.ts_created
+      - datalake_ebdb_clean.inspection.ts_created
+  ts_updated:
+    lineage:
+      - datalake_inspections_clean.inspection.ts_updated
+      - datalake_ebdb_clean.inspection.ts_updated
