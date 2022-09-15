@@ -2,3 +2,10 @@
 inner_dependencies:
   inspection_metrics:
     - inspection
+
+custom_cluster:
+  driver_node_type_id: m5a.4xlarge
+  node_type_id: m5a.2xlarge
+  autoscale:
+    max_workers: 3
+    min_workers: 1
