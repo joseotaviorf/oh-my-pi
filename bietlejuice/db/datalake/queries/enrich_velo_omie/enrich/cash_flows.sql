@@ -1,10 +1,11 @@
 WITH cte_most_recent AS (
     SELECT
         id_securities,
+        id_group,
         GREATEST(MAX(ts_reconciliation), MAX(ts_created), MAX(ts_modified)) AS ts_last_modified
     FROM
         datalake_velo_omie_clean.cash_flows
-    GROUP BY 1
+    GROUP BY 1, 2
 )
 SELECT
     cf.id_securities,
@@ -80,6 +81,7 @@ FROM
 RIGHT JOIN
     cte_most_recent AS cte
         ON cte.id_securities = cf.id_securities
+        AND cte.id_group = cf.id_group
         AND (
             cte.ts_last_modified = cf.ts_reconciliation
             OR cte.ts_last_modified = cf.ts_created
