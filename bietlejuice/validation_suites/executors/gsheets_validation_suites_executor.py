@@ -101,7 +101,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         self, data: Union[List[Dict], List], clean_table_name: str, is_partitioned: bool
     ):
         """
-        Load the data from API into a temporary view.
+        Load the data from API into a temporary view and return the DataFrame used.
 
         :return: Temporary view from each gsheet.
         """
@@ -117,8 +117,9 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
                 .output()
             )
         df = self.__columns_to_snake_case(df)
+        df.createTempView(f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}")
 
-        return df.createTempView(f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}")
+        return df
 
     def run_and_validate_clean_query(
         self, gsheets_context: str, clean_table_name: str, raw_table_name: str
@@ -280,8 +281,8 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
     ) -> None:
         gsheet_client = self.get_gsheets_client()
         data = gsheet_client.get_data_from_sheet(sheet_name, sheet_id)
-        self.load_gsheet_on_temp_view(data, clean_table_name, is_partitioned)
+        df = self.load_gsheet_on_temp_view(data, clean_table_name, is_partitioned)
         self.run_and_validate_clean_query(
             gsheets_context, clean_table_name, raw_table_name
         )
-        self.release_memory(data, clean_table_name)
+        self.release_memory(df, clean_table_name)
