@@ -205,6 +205,38 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
+  load-dag-packages-composer-forno:
+    group: update_jobs
+    image: quintoandar/drone-gcs-sync
+    pull: true
+    bucket: us-east4-airflow-forno2-7f52154d-bucket
+    source: dags/
+    target: dags/bietlejuice_dag_packages/
+    delete: true
+    dry_run: false
+    secrets:
+      - source: google_cloud_composer_credentials
+        target: google_application_credentials
+    when:
+      event: push
+      branch: [ forno ]
+
+  load-dag-packages-composer-prod:
+    group: update_jobs
+    image: quintoandar/drone-gcs-sync
+    pull: true
+    bucket: us-east4-airflow-prod2-fdaf9748-bucket
+    source: dags/
+    target: dags/bietlejuice_dag_packages/
+    delete: true
+    dry_run: false
+    secrets:
+      - source: google_cloud_composer_credentials
+        target: google_application_credentials
+    when:
+      event: push
+      branch: [ master, hotfix/* ]
+
   load-spark-jobs-s3-forno:
     group: update_jobs
     image: python:3.7.3
