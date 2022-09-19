@@ -1,0 +1,43 @@
+---
+database_name: dw_inspections
+table_name: dim_assessment
+columns:
+  sk_assessment:
+    lineage:
+      - datalake_inspections_clean.assessment.id_assessment
+  source:
+    lineage:
+      - datalake_inspections_clean.assessment.source
+  house_supplies:
+    lineage:
+      - datalake_inspections_clean.assessment.house_supplies
+  key_location:
+    lineage:
+      - datalake_inspections_clean.assessment.key_location
+  key_location_details:
+    lineage:
+      - datalake_inspections_clean.assessment.key_location_details
+  dt_revision_limit:
+    lineage:
+      - datalake_inspections_clean.assessment.dt_revision_limit
+  ts_created:
+    lineage:
+      - datalake_inspections_clean.assessment.ts_created
+  ts_finished:
+    lineage:
+      - datalake_inspections_clean.assessment.ts_finished
+  ts_started:
+    lineage:
+      - datalake_inspections_clean.assessment.ts_started
+  ts_updated:
+    lineage:
+      - datalake_inspections_clean.assessment.ts_updated
+  year:
+    lineage:
+      - datalake_inspections_clean.assessment.year
+  month:
+    lineage:
+      - datalake_inspections_clean.assessment.month
+  day:
+    lineage:
+      - datalake_inspections_clean.assessment.day

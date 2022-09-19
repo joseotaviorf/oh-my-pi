@@ -1,0 +1,52 @@
+---
+database_name: dw_inspections
+table_name: fact_inspection
+columns:
+    sk_inspection:
+        lineage:
+            - datalake_inspections.inspection.id_inspection
+    sk_main_inspection:
+        lineage:
+            - datalake_inspections.inspection.id_external
+    sk_assessment:
+        lineage:
+            - datalake_inspections.inspection.id_assessment
+    sk_booking:
+        lineage:
+            - datalake_inspections.inspection.id_booking
+    sk_contract:
+        lineage:
+            - datalake_inspections.inspection.id_contract
+    sk_city:
+        lineage:
+            - datalake_inspections.inspection.id_city
+    ldt_hours_execution:
+        lineage:
+            - datalake_inspections.inspection_metrics.ldt_hours_execution
+    sla_execution_target:
+        lineage:
+            - datalake_inspections.inspection_metrics.sla_execution_target
+    is_sla_execution:
+        lineage:
+            - datalake_inspections.inspection_metrics.is_sla_execution
+    dt_contract_entrance:
+        lineage:
+            - datalake_inspections.inspection.dt_contract_entrance
+    dt_contract_termination:
+        lineage:
+            - datalake_inspections.inspection.dt_contract_termination
+    dt_execution_limit:
+        lineage:
+            - datalake_inspections.inspection.dt_execution_limit
+    dt_booking_inspected:
+        lineage:
+            - datalake_inspections.inspection.dt_booking_inspected
+    ts_booking_cancelled:
+        lineage:
+            - datalake_inspections.inspection.ts_booking_cancelled
+    ts_termination_canceled:
+        lineage:
+            - datalake_inspections.inspection.ts_termination_canceled
+    ts_created:
+        lineage:
+            - datalake_inspections.inspection_metrics.ts_created

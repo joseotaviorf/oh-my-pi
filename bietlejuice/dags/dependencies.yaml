@@ -802,6 +802,11 @@ bietlejuice.dw_datamarts_spark.support_and_service:
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
+bietlejuice.dw_inspections:
+  - bietlejuice.enrich_inspections:load-enrich-inspection
+  - bietlejuice.enrich_inspections:load-enrich-inspection-metrics
+  - bietlejuice.gsheets.support_and_service:load-clean-inspectors-control
+
 bietlejuice.dw_invoice_entries:
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries
   - bietlejuice.enrich_invoice:load-enrich-invoice-revenues

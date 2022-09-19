@@ -1,0 +1,43 @@
+---
+database_name: dw_inspections
+table_name: dim_inspector
+columns:
+  sk_inspector:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.id_inspector
+  inspector_name:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.inspector_name
+  inspector_email:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.insperctor_email
+  inspector_corporate_name:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.inspector_corporate_name
+  beneficiary_name:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.beneficiary_name
+  employee_contract_type:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.employee_contract_type
+  company:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.company
+  status:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.status
+  operating_city:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.operating_city
+  operating_regions:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.operating_regions
+  transportation_type:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.transportation_type
+  dt_start:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.dt_start
+  dt_end:
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.dt_end

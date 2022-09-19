@@ -1,0 +1,5 @@
+---
+incremental_tables:
+  - dim_assessment
+
+partitions_cols: [year, month, day]

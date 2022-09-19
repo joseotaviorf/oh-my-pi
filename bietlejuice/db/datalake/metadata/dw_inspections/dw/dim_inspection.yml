@@ -1,0 +1,40 @@
+---
+database_name: dw_inspections
+table_name: dim_inspection
+columns:
+    sk_inspection:
+        lineage:
+            - datalake_inspections.inspection.id_inspection
+    inspection_type:
+        lineage:
+            - datalake_inspections.inspection.inspection_type
+    booking_type:
+        lineage:
+            - datalake_inspections.inspection.booking_type
+    source:
+        lineage:
+            - datalake_inspections.inspection.source
+    status:
+        lineage:
+            - datalake_inspections.inspection.status
+    has_owner_accompanying:
+        lineage:
+            - datalake_inspections.inspection.has_owner_accompanying
+    is_first_schedule:
+        lineage:
+            - datalake_inspections.inspection.is_first_schedule
+    is_executed_in_first_schedule:
+        lineage:
+            - datalake_inspections.inspection.is_executed_in_first_schedule
+    is_d0_canceled:
+        lineage:
+            - datalake_inspections.inspection.is_d0_canceled
+    is_d1_canceled:
+        lineage:
+            - datalake_inspections.inspection.is_d1_canceled
+    ts_created:
+        lineage:
+            - datalake_inspections.inspection.ts_created
+    ts_updated:
+        lineage:
+            - datalake_inspections.inspection.ts_updated
