@@ -62,10 +62,9 @@ SELECT
     fo.sk_offer AS external_id,
     fo.sk_house AS house_id,
     CASE
-        WHEN dof.business_unit LIKE '%[3P%'
-        AND dr.city_group IN ('Rio de Janeiro') THEN '22'
-        WHEN dof.business_unit LIKE '%[3P%'
-        AND dr.city_group IN (
+        WHEN dof.business_unit LIKE '%[3P%' AND dr.city_group IN ('Rio de Janeiro') THEN '22'
+        WHEN dof.business_unit LIKE '%[3P%' AND dr.city_group
+        IN (
             'RMSP',
             'Ribeirão Preto',
             'Santos',
@@ -87,17 +86,29 @@ SELECT
     ds.sale_agreement_cancellation_reason AS cancellation_reason,
     ds.ts_sale_agreement_cancelled AS cancellation_date,
     TO_DATE(STRING(fc.sk_payment_allowed_date), 'yyyyMMdd') AS payment_allowed_date,
-    DATE(ds.ts_sale_agreement_signed) AS signature_date,
+    ds.ts_sale_agreement_signed AS signature_date,
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS MONTH,
     DAY(CURRENT_DATE) AS DAY
 FROM
     dw_sale.dim_offer dof
-    LEFT JOIN dw_sale.fact_offers fo ON fo.sk_offer = dof.sk_offer
-    LEFT JOIN dw_sale.fact_closing_flows fc ON fc.sk_offer = dof.sk_offer
-    LEFT JOIN dw_quintoandar.dim_house dh ON fo.sk_house = dh.sk_house
-    LEFT JOIN dw_sale.dim_sale_agreement ds ON ds.sk_offer = dof.sk_offer
-    LEFT JOIN cte_categoria_filtro cc ON cc.sk_offer = dof.sk_offer
-    LEFT JOIN dw_public.dim_region dr ON dr.sk_region = fo.sk_region
+LEFT JOIN
+    dw_sale.fact_offers fo
+        ON fo.sk_offer = dof.sk_offer
+LEFT JOIN
+    dw_sale.fact_closing_flows fc
+        ON fc.sk_offer = dof.sk_offer
+LEFT JOIN
+    dw_quintoandar.dim_house dh
+        ON fo.sk_house = dh.sk_house
+LEFT JOIN
+    dw_sale.dim_sale_agreement ds
+        ON ds.sk_offer = dof.sk_offer
+LEFT JOIN
+    cte_categoria_filtro cc
+        ON cc.sk_offer = dof.sk_offer
+LEFT JOIN
+    dw_public.dim_region dr
+        ON dr.sk_region = fo.sk_region
 WHERE
     ds.ts_sale_agreement_signed IS NOT NULL
