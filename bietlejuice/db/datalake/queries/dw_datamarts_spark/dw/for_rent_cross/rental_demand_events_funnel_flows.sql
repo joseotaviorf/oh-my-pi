@@ -8,7 +8,7 @@ WITH rent_flows_adap AS (
       region_code,
       DATE(first_message_ts) AS first_message_date,
       DATE(first_attendance_ts) AS first_attendance_date
-    FROM 
+    FROM
       dw_datamarts_cross.talk_to_agent
   )
   SELECT
@@ -45,12 +45,13 @@ WITH rent_flows_adap AS (
     tta_c.first_message_date,
     tta_c.first_attendance_date,
     tta_c.sk_house_listing || tta_c.sk_client || tta_c.agent_id as tta_id
-  FROM 
+  FROM
     dw_public.fact_listing_rent_flows AS rf
-  LEFT JOIN 
-    dw_datamarts.funnel_demand_flows AS fdf
+  LEFT JOIN
+    dw_datamarts_cross.funnel_demand_flows AS fdf
       ON rf.sk_rent_flow = fdf.sk_rent_flow
-  FULL OUTER JOIN 
+      AND rf.sk_house_listing = fdf.sk_house_listing
+  FULL OUTER JOIN
     tta_complete AS tta_c
       ON rf.sk_house_listing = tta_c.sk_house_listing
       AND rf.sk_client = tta_c.sk_client
@@ -84,18 +85,18 @@ messages_sent AS (
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON DATE(rf.first_message_date) = dd.date
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     (SELECT DISTINCT city_group, region_code FROM dw_public.dim_region) AS dr
       ON rf.region_code = dr.region_code
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -128,18 +129,18 @@ agent_supports AS (
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON DATE(rf.first_attendance_date) = dd.date
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -172,21 +173,21 @@ visits_booked AS (
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_booking_created_date
       AND rf.sk_booking_created_date > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN dw_public.dim_booking db
       ON rf.sk_booking = db.sk_booking
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -219,21 +220,21 @@ visits_completed AS (
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_visit_date
       AND rf.sk_visit_date > 0 AND rf.flg_visit_completed = 1
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN dw_public.dim_booking db
       ON rf.sk_booking = db.sk_booking
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -266,22 +267,22 @@ offer_submitted AS (
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_offer_submitted_date
       AND rf.sk_offer_submitted_date > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -314,22 +315,22 @@ offer_approved AS(
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_offer_approved_date
       AND rf.sk_offer_approved_date > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -362,22 +363,22 @@ credit_evaluation_init AS(
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_first_credit_evaluation_init
       AND rf.sk_first_credit_evaluation_init > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -410,22 +411,22 @@ credit_evaluation_positive AS(
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_first_credit_evaluation_positive
       AND rf.sk_first_credit_evaluation_positive > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -458,22 +459,22 @@ doc_sent AS(
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_tenant_first_doc_sent_date
       AND rf.sk_tenant_first_doc_sent_date > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -506,22 +507,22 @@ doc_approved AS(
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_last_doc_analysis_approved
       AND rf.sk_last_doc_analysis_approved > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -554,22 +555,22 @@ doc_completed AS(
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_credit_analysis_init_date
       AND rf.sk_credit_analysis_init_date > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -602,22 +603,22 @@ credit_processed AS(
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_credit_analysis_end_date
       AND rf.sk_credit_analysis_end_date > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -650,22 +651,22 @@ credit_approved AS(
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_credit_analysis_approved_date
       AND rf.sk_credit_analysis_approved_date > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -698,22 +699,22 @@ contract_created AS (
     COUNT(DISTINCT rf.sk_contract) AS contract_created,
     NULL::BIGINT AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_contract_created_date
       AND rf.sk_contract_created_date > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
     ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -746,22 +747,26 @@ contract_signed AS (
     NULL::BIGINT AS contract_created,
     COUNT(DISTINCT rf.sk_contract) AS contract_signed,
     NULL::BIGINT AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_contract_signed_date
       AND rf.sk_contract_signed_date > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  INNER JOIN
+    dw_public.dim_contract AS dc
+      ON rf.sk_contract = dc.sk_contract
+      AND dc.status in ('Ativo', 'Finalizado')
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -794,22 +799,22 @@ contract_ended AS (
     NULL::BIGINT AS contract_created,
     NULL::BIGINT AS contract_signed,
     COUNT(DISTINCT rf.sk_contract) AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flows_adap AS rf
       ON dd.sk_date = rf.sk_contract_annulment_date
       AND rf.sk_contract_signed_date > 0 and rf.sk_contract_annulment_date > 0
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE() -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -874,12 +879,12 @@ union_all_date AS (
     ua.contract_created,
     ua.contract_signed,
     ua.contract_ended
-  FROM 
+  FROM
     union_all AS ua
-  RIGHT JOIN 
+  RIGHT JOIN
     dw_public.dim_date AS dd
       ON ua.sk_date = dd.sk_date
-  WHERE 
+  WHERE
     dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_DATE()
 )
 SELECT
@@ -891,10 +896,10 @@ SELECT
   had_flow_direct,
   had_flow_tta,
   flow_type,
-  CASE 
-    WHEN demand_channel IN ('Not Mapped', 'Other') 
+  CASE
+    WHEN demand_channel IN ('Not Mapped', 'Other')
         OR demand_channel IS null THEN 'Other'
-    ELSE demand_channel 
+    ELSE demand_channel
   END AS demand_channel,
   is_b2b AS is_b2b_demand,
   SUM(messages_sent_tta) AS messages_sent_tta,
@@ -914,6 +919,6 @@ SELECT
   SUM(contract_signed) AS contract_signed,
   SUM(contract_ended) AS contract_ended,
   CURRENT_TIMESTAMP() AS ts_load
-FROM 
+FROM
   union_all
-GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10 
+GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10

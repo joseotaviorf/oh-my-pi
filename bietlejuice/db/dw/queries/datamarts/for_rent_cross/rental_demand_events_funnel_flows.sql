@@ -49,6 +49,7 @@ rent_flows_adap as (
 	from fact_listing_rent_flows rf
 	left join datamarts.funnel_demand_flows fdf
 	  on rf.sk_rent_flow = fdf.sk_rent_flow
+	  and rf.sk_house_listing = fdf.sk_house_listing
 	full outer join tta_complete tta_c
 	  on rf.sk_house_listing = tta_c.sk_house_listing
 	  and rf.sk_client = tta_c.sk_client
@@ -674,6 +675,9 @@ left join dim_offer dof
   on rf.sk_offer = dof.sk_offer
 left join dim_region dr
   on rf.sk_region = dr.sk_region
+inner join dim_contract AS dc
+  on rf.sk_contract = dc.sk_contract
+  and dc.status in ('Ativo', 'Finalizado')
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
 group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
