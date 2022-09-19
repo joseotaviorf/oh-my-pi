@@ -1149,6 +1149,14 @@ bietlejuice.enrich_3p:
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
+bietlejuice.enrich_accounting_funnel:
+  - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
+  - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry
+  - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.gsheets.fintech:load-clean-cod-locale
+  - bietlejuice.payable_accounts_transactions:load-clean-accounts-payable
+
 bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.enrich_ebdb_affiliates_cost:load-enrich-affiliates-engagement-cost
   - bietlejuice.enrich_region:load-enrich-region

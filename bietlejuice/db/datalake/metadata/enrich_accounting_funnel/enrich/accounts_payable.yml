@@ -1,0 +1,46 @@
+---
+database_name: datalake_accounting_funnel
+table_name: accounts_payable
+columns:
+  sk_contract:
+    lineage:
+      - datalake_payable_accounts_transactions_clean.accounts_payable.supplier_description
+  version:
+    lineage:
+      - dw_public.dim_contract.version
+  is_contract_b2b:
+    lineage:
+      - dw_public.dim_contract.version
+  locale:
+    lineage:
+      - dw_public.dim_region.city_name
+  localidade:
+    lineage:
+      - datalake_gsheets_clean.cod_locale.id_locale
+  guarantee:
+    lineage:
+      - dw_public.dim_contract.guarantee
+  rental_administrator:
+    lineage:
+      - dw_public.dim_contract.rental_administrator
+  is_rental_paid_in_advance:
+    lineage:
+      - dw_payment.dim_invoice_entry.is_rental_paid_in_advance
+  accrual_year_month:
+    lineage:
+      - datalake_payable_accounts_transactions_clean.accounts_payable.accrual_year_month
+  entry_accrual_year_month:
+    lineage:
+      - datalake_payable_accounts_transactions_clean.accounts_payable.accrual_year_month
+  entry_creation_accrual_year_month:
+    lineage:
+      - datalake_payable_accounts_transactions_clean.accounts_payable.accrual_year_month
+  entry_created_date:
+    lineage:
+      - datalake_payable_accounts_transactions_clean.accounts_payable.dt_paid
+  contract_start:
+    lineage:
+      - dw_public.dim_contract.dt_start
+  contract_annulment:
+    lineage:
+      - dw_public.dim_contract.dt_annulment

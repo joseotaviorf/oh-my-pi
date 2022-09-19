@@ -1,0 +1,97 @@
+---
+database_name: datalake_accounting_funnel
+table_name: invoice_all
+columns:
+  id_entry:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_invoice_entry
+  id_invoice:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_invoice
+  sk_contract:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_contract
+  version:
+    lineage:
+      - dw_public.dim_contract.version
+  is_contract_b2b:
+    lineage:
+      - dw_public.dim_contract.version
+  locale:
+    lineage:
+      - dw_public.dim_region.city_name
+  localidade:
+    lineage:
+      - datalake_gsheets_clean.cod_locale.id_locale
+  guarantee:
+    lineage:
+      - dw_public.dim_contract.guarantee
+  rental_administrator:
+    lineage:
+      - dw_public.dim_contract.rental_administrator
+  is_rental_paid_in_advance:
+    lineage:
+      - dw_payment.dim_invoice_entry.is_rental_paid_in_advance
+  bill_item:
+    lineage:
+      - dw_payment.dim_invoice_entry.entry_type
+  description:
+    lineage:
+      - dw_payment.dim_invoice_entry.description
+  purpose:
+    lineage:
+      - dw_payment.dim_invoice.frequency
+  invoice_account_type:
+    lineage:
+      - dw_payment.dim_invoice.user
+  from_account_type:
+    lineage:
+      - dw_payment.dim_invoice_entry.from_account_type
+  to_account_type:
+    lineage:
+      - dw_payment.dim_invoice_entry.to_account_type
+  status:
+    lineage:
+      - dw_payment.dim_invoice.payment_status
+  closing_mode:
+    lineage:
+      - dw_payment.dim_invoice.closing_mode
+  due_amount:
+    lineage:
+      - dw_payment.fact_invoice_entries.brl_entry_due_amount
+  invoice_due_amount:
+    lineage:
+      - dw_payment.fact_invoice_entries.due_amount
+  accrual_year_month:
+    lineage:
+      - dw_payment.dim_invoice.accrual_year_month
+  invoice_accrual_year_month:
+    lineage:
+      - dw_payment.dim_invoice.accrual_year_month
+  entry_accrual_year_month:
+    lineage:
+      - dw_payment.dim_invoice_entry.accrual_year_month
+  entry_created_date:
+    lineage:
+      - dw_public.dim_date.date
+  invoice_created_date:
+    lineage:
+      - dw_payment.dim_invoice.ts_created
+  invoice_due_date:
+    lineage:
+      - dw_payment.dim_invoice.dt_due
+  invoice_paid_date:
+    lineage:
+      - dw_payment.dim_invoice.dt_paid
+  invoice_canceled_date:
+    lineage:
+      - dw_payment.dim_invoice.ts_canceled
+  invoice_paid_date_next_business_day:
+    lineage:
+      - dw_public.dim_date.date
+  contract_start:
+    lineage:
+      - dw_public.dim_contract.dt_start
+  contract_annulment:
+    lineage:
+      - dw_public.dim_contract.dt_annulment
