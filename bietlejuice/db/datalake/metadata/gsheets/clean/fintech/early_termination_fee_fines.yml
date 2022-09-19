@@ -1,0 +1,124 @@
+---
+database_name: datalake_gsheets_clean
+table_name: early_termination_fee_fines
+columns:
+  requester_email:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.solicitante
+  requester_team:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.time
+  id_request:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.solicitacao
+  ticket:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.ticket
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.contrato
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.imovel
+  id_bandaid:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.id_do_bandaid
+  fee_fine_type:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.tipo_de_multa
+  total_value:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.valor_total
+  final_negotiated_value:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.valor_final_negociado
+  quantity_installments_collection:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.parcelas_cobranca
+  quantity_installments_pass_through:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.parcelas_repasses
+  agent_brokerage_fee:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.tx_de_corretagem_corretor
+  quintoandar_brokerage_fee:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.tx_de_corretagem_5a
+  tenant_document_number:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_cpfcnpj
+  tenant_bank_name:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_banco
+  tenant_bank_branch:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_agencia
+  tenant_bank_account_type:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_tipo_de_conta
+  admininistration_rate:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.taxa_adm
+  reason_manual_task:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.motivo_manual
+  installment_zeroing_status:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.fatura_zerada
+  installment_payment_status:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.fatura_paga
+  installment_owner_status:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.fatura_pp_fechada
+  bill_code:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.boleto
+  admin_updated_status:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.alteracao_admin
+  sheet_row_number:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.row
+  is_adm_exempt:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.adm_isenta
+  is_getnet_transaction:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.getnet
+  has_interest_exemption:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.isencao_de_juros
+  has_related_bandaid:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.bandaid_aberto
+  is_irent_orent:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.isirentororent
+  is_manual_task:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.tarefa_manual
+  ts_execution:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.execucao
+  spent_time:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.tempo_gasto
+  ts_request:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.data_de_solicitacao
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.vigencia
+  dt_termination:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.rescisao
+  dt_first_pass_through:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.dataprimeirorepasse
+  dt_first_collection:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.dataprimeiracobranca
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.ts_load

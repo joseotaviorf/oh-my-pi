@@ -590,6 +590,13 @@ evictions_processes_forrent:
     sheet_context: fintech
     preload_time_in_seconds: 30
 
+# to be excluded @Q1, 2023
+early_termination_fee_fines:
+    sheet_id: 1k4r39kKZJFG_oUozNf20oT4ENVczdm_ufFeSbARUiVA
+    sheet_name: MultasCriadas
+    clean_table_name: early_termination_fee_fines
+    sheet_context: fintech
+
 for_sale_bandaids:
     sheet_id: 1LPSu9lbDddTiHk9EtVKwQKsAVzgzuIwG-nMGcYiP2dA
     sheet_name: forsale
@@ -630,6 +637,20 @@ negotiation_executive_correction:
     sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
     sheet_name: negotiation_executive_correction
     clean_table_name: negotiation_executive_correction
+    sheet_context: fintech
+
+# to be excluded @Q1, 2023
+offboarding_payments_contracts:
+    sheet_id: 1aN5gU1eKM-9ukMzdtCpb9hLJPKLy6LHav7DcNNP7tGw
+    sheet_name: Contratos
+    clean_table_name: offboarding_payments_contracts
+    sheet_context: fintech
+
+# to be excluded @Q1, 2023
+offboarding_payments_expenses:
+    sheet_id: 1aN5gU1eKM-9ukMzdtCpb9hLJPKLy6LHav7DcNNP7tGw
+    sheet_name: Despesas Calculadas
+    clean_table_name: offboarding_payments_expenses
     sheet_context: fintech
 
 payments_deals_and_discounts:

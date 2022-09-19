@@ -1,0 +1,40 @@
+---
+database_name: datalake_gsheets_clean
+table_name: offboarding_payments_contracts
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.contrato
+  condo_payer:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.pagante_condominio
+  rent:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.aluguel
+  condo:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.cota_condominial
+  iptu:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.iptu
+  fire_insurance_fee_value:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.seguro_contra_incendio
+  service_fee_value:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.taxa_de_servico
+  condo_responsible:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.responsavel_condominio
+  is_paid_in_advance:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.adiantado
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.vigencia
+  dt_termination:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.rescisao
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_contracts.ts_load

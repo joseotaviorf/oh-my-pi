@@ -31,6 +31,7 @@ This pipeline produces the following output tables:
     - `closing_analysts_hierarchy`
     - `cod_locale`
     - `credit_decisions_auditing`
+    - `early_termination_fee_fines`
     - `evictions_processes_forrent`
     - `for_sale_bandaids`
     - `for_sale_financial_flow`
@@ -40,6 +41,8 @@ This pipeline produces the following output tables:
     - `mova_lra_owners`
     - `negotiation_executive_bonus`
     - `negotiation_executive_correction`
+    - `offboarding_payments_contracts`
+    - `offboarding_payments_expenses`
     - `owner_entrance_inspection_csat`
     - `owner_exit_inspection_csat`
     - `payments_deals_and_discounts`
@@ -61,6 +64,7 @@ This pipeline produces the following output tables:
     - `closing_analysts_hierarchy`
     - `cod_locale`
     - `credit_decisions_auditing`
+    - `early_termination_fee_fines`
     - `evictions_processes_forrent`
     - `for_sale_bandaids`
     - `for_sale_financial_flow`
@@ -70,6 +74,8 @@ This pipeline produces the following output tables:
     - `mova_lra_owners`
     - `negotiation_executive_bonus`
     - `negotiation_executive_correction`
+    - `offboarding_payments_contracts`
+    - `offboarding_payments_expenses`
     - `owner_entrance_inspection_csat`
     - `owner_exit_inspection_csat`
     - `payments_deals_and_discounts`

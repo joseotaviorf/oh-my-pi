@@ -1,0 +1,55 @@
+---
+database_name: datalake_gsheets_clean
+table_name: offboarding_payments_expenses
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.contrato
+  expense_description:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.despesa
+  expense_value:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.valor
+  original_value:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.valor_original
+  item:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.item
+  payer:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.de
+  payee:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.para
+  original_expense_reason:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.despesa_original
+  collection_mode:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.cobranca
+  contract_version:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.versao
+  status:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.status
+  exception_type:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.tipo_excecao
+  is_exception:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.excecao
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.vigencia
+  dt_termination:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.rescisao
+  ts_created:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.created_at
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.ts_load
