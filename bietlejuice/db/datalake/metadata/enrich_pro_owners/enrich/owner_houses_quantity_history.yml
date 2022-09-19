@@ -4,7 +4,7 @@ table_name: owner_houses_quantity_history
 columns:
   id_owner:
     lineage:
-      - datalake_ebdb_clean.house_aud.id_user
+      - datalake_pro_owners.house_b2b_history.id_user
   rental_administrator:
     lineage:
       - datalake_ebdb_listing.rent_listing.rental_administrator

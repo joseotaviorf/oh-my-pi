@@ -34,11 +34,12 @@ lbc AS (
 house_listing_owners_status AS (
     SELECT
         hls.id_house,
+        hbh.id_user AS id_owner,
         eb.rental_administrator,
-        h.id_user AS id_owner,
         hls.status_history,
         IF((hbh.affiliate_type = 'B2BPartner') OR (hbh.id_partner IS NOT NULL AND partner.type = 'PRIME') OR (hbh.id_house_listing IS NOT NULL), TRUE, FALSE) AS is_b2b,
         IF(lbc.is_for_rent OR lbc.id_house IS NULL, TRUE, FALSE) AS is_for_rent,
+        eb.ts_event,
         hls.ts_status_ended,
         hls.ts_status_started
      FROM
@@ -68,19 +69,15 @@ house_listing_owners_status AS (
 status_changes AS (
   SELECT
         id_owner,
+        ts_event
+  FROM
+      house_listing_owners_status
+  UNION ALL
+  SELECT
+        id_owner,
         ts_status_started AS ts_event
   FROM
       house_listing_owners_status
-  WHERE
-      id_owner > 0 
-  UNION
-  SELECT
-      id_owner,
-      ts_status_ended AS ts_event
-  FROM
-      house_listing_owners_status
-  WHERE
-      id_owner > 0
 ),
 houses_changes_filter AS (
     SELECT
