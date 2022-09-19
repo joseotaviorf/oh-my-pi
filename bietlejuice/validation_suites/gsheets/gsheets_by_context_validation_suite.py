@@ -48,6 +48,8 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
             context_owner = self._get_slack_group_from_context(context)
 
             if e.__class__ == AnalysisException:
+                error_trace = str(e).split("\n")[0].replace("`", "")
+                error_trace = error_trace.replace('"', "")[slice(0, 150)]
                 self.SLACK_MSG = self.SLACK_MSG_TEMPLATE.format(
                     sheet_url,
                     _sheet_info.get("sheet_name"),
@@ -56,7 +58,7 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
                     sheet_info.get("modifier_user_email").split("@")[0],
                     sheet_info.get("modifier_user_email"),
                     context_owner,
-                    str(e).split("\n")[0].replace("`", ""),
+                    error_trace,
                 )
             else:
                 self.SLACK_MSG = self.SLACK_MSG_TEMPLATE_SMALL.format(
