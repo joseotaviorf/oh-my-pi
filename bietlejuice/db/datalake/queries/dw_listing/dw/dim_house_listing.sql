@@ -100,6 +100,15 @@ house_listings AS (
            CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent
         FROM datalake_ebdb_listing.listing_business_context
         GROUP BY 1
+    ), 
+    rl AS (
+        SELECT
+            id_house,
+            rental_administrator,
+            MAX(ts_administrator_changed) AS ts_administrator_changed
+        FROM 
+            datalake_ebdb_listing.rent_listing
+        GROUP BY 1, 2
     )
     SELECT
         hl.id_house_listing AS sk_house_listing,
@@ -185,7 +194,7 @@ house_listings AS (
             ON hl.id_house = h.id
     LEFT JOIN lbc
         ON lbc.id_house = h.id
-    LEFT JOIN datalake_ebdb_listing.rent_listing AS rl
+    LEFT JOIN rl
         ON rl.id_house = lbc.id_house
     LEFT JOIN
         agents_with_keys AS awk
