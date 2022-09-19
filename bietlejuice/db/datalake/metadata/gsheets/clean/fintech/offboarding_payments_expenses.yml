@@ -38,6 +38,15 @@ columns:
   exception_type:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.tipo_excecao
+  spent_time:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.tempo_decorrido
+  is_condo_adjusted:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.condominio_ajustado
+  is_new_guarantee:
+    lineage:
+      - datalake_gsheets_raw.offboarding_payments_expenses.nova_garantia
   is_exception:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.excecao
