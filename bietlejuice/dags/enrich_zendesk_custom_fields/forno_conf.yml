@@ -1,0 +1,11 @@
+---
+custom_cluster:
+  driver_node_type_id: r5a.12xlarge
+  node_type_id: r5a.12xlarge
+  autoscale:
+    min_workers: 2
+    max_workers: 6
+  aws_attributes:
+    ebs_volume_size: 500
+spark_conf:
+  spark.sql.mapKeyDedupPolicy: "LAST WIN"
