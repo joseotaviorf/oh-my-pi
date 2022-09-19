@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS tickets.dim_repair_tickets (
     reason_budget_delay VARCHAR (100),
     reason_execution_delay VARCHAR (100),
     request_type VARCHAR (50),
-    repair_type VARCHAR (50),
+    repair_type VARCHAR (70),
     internal_evaluation VARCHAR (50),
     occurrences VARCHAR (150),
     additional_repair VARCHAR (50),
