@@ -1,4 +1,10 @@
 ---
+custom_cluster:
+  driver_node_type_id: r5a.xlarge
+  node_type_id: m5a.xlarge
+  autoscale:
+    max_workers: 2
+    min_workers: 1
 lineage_product_database_name: usemails
 tables:
   - table_name: emails
