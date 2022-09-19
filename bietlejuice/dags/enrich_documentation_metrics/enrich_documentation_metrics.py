@@ -2,7 +2,7 @@ from datetime import datetime
 from pendulum import timezone
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -20,7 +20,7 @@ DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 MAIN_START_DATE = datetime(2022, 5, 5, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 0 * * 0"
+MAIN_SCHEDULE_INTERVAL = "0 9 * * 0"
 PARTITION_COLS = ["year", "month", "day"]
 
 config_service = ConfigurationService(CONTEXT)
@@ -34,10 +34,9 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
 
+DEFAULT_LIBRARIES = config_service.get_config("default_libraries")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -46,7 +45,7 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    schedule_interval=None,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     start_date=MAIN_START_DATE,
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
@@ -54,7 +53,10 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    libraries=DEFAULT_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

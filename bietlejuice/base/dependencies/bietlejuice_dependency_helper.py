@@ -15,7 +15,7 @@ DAGS_CROSS_DEPENDENCIES_FILE_PATH = (
 class BietlejuiceDependencyHelper:
     @staticmethod
     def read_dependencies() -> dict:
-        """Reads the dependencies file from the DAGs """
+        """Reads the dependencies file from the DAGs"""
 
         return FileService.get_dict_from_yaml_file(DAGS_CROSS_DEPENDENCIES_FILE_PATH)
 

@@ -35,9 +35,13 @@ spark_client = SparkClient(
 
 
 def main():
-    environment, datalake_bucket, source, execution_date, full_load_execution_date = (
-        parse_arguments()
-    )
+    (
+        environment,
+        datalake_bucket,
+        source,
+        execution_date,
+        full_load_execution_date,
+    ) = parse_arguments()
     logger.info(
         f"""
         m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source},
@@ -203,7 +207,7 @@ def format_columns(dataframe):
 
 
 def get_year_month_to_execute(execution_date):
-    """ This function will return the year and month of the last month"""
+    """This function will return the year and month of the last month"""
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
     date_in_last_month = execution_date - relativedelta(months=1)
