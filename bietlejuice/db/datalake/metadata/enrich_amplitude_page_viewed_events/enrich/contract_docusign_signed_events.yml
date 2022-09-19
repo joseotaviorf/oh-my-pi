@@ -4,7 +4,7 @@ columns:
   id_amplitude:
     lineage:
       - datalake_amplitude_clean_staging.170698_contract_docusign_signed_events.id_amplitude
-      - datalake_amplitude_raw.170698_user_merge.merged_amplitude_id
+      - datalake_amplitude_clean.170698_user_merge.id_amplitude_merged
   id_session:
     lineage:
       - datalake_amplitude_clean_staging.170698_contract_docusign_signed_events.id_session
