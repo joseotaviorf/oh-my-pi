@@ -260,12 +260,32 @@ pipeline:
       event: push
       branch: forno
 
+  load-spark-jobs-s3-forno-from-dag-packages:
+    group: update_jobs
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.9.159
+      - python scripts/upload_spark_jobs_to_s3_from_dag_packages.py 5a-databricks-forno
+    when:
+      event: push
+      branch: forno
+
   load-spark-jobs-s3-new-forno-account:
     group: update_jobs
     image: python:3.7.3
     commands:
       - pip install boto3==1.9.159
       - python scripts/upload_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
+    when:
+      event: push
+      branch: forno
+
+  load-spark-jobs-s3-new-forno-account-from-dag-packages:
+    group: update_jobs
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.9.159
+      - python scripts/upload_spark_jobs_to_s3_from_dag_packages.py databricks.s3.forno.data.quintoandar.com.br
     when:
       event: push
       branch: forno
@@ -280,12 +300,32 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
+  load-spark-jobs-s3-prod-from-dag-packages:
+    group: update_jobs
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.9.159
+      - python scripts/upload_spark_jobs_to_s3_from_dag_packages.py 5a-databricks
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
   load-spark-jobs-s3-new-prod-account:
     group: update_jobs
     image: python:3.7.3
     commands:
       - pip install boto3==1.9.159
       - python scripts/upload_spark_jobs_to_s3.py databricks.s3.data.quintoandar.com.br
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
+  load-spark-jobs-s3-new-prod-account-from-dag-packages:
+    group: update_jobs
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.9.159
+      - python scripts/upload_spark_jobs_to_s3_from_dag_packages.py databricks.s3.data.quintoandar.com.br
     when:
       event: push
       branch: [master, hotfix/*]
