@@ -16,10 +16,12 @@ columns:
   doorman_type:
     lineage:
       - datalake_ebdb_clean.house_aud.doorman_type
+  key_location:
+    lineage:
+      - datalake_ebdb_clean.access_authorization_type.name
   ts_entrance_started:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
   ts_entrance_ended:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
-  
