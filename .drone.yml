@@ -39,6 +39,19 @@ pipeline:
     when:
       event: push
 
+  integration-tests-python:
+    group: tests
+    image: quintoandar/pyspark:0.2
+    pull: true
+    commands:
+      - export AIRFLOW_GPL_UNIDECODE=yes
+      - export AWS_DEFAULT_REGION=us-east-1
+      - make requirements-test
+      - make requirements
+      - make integration-tests
+    when:
+      event: push
+
   validate-dags-dependencies-forno:
     group: tests
     image: python:3.7.3
