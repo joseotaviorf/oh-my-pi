@@ -1,0 +1,25 @@
+---
+database_name: datalake_nazare_clean
+table_name: tier_bonus
+columns:
+  id_tier_bonus:
+    lineage:
+      - datalake_nazare_raw.tier_bonus.id
+  id_agent:
+    lineage:
+      - datalake_nazare_raw.tier_bonus.agent_id
+  agent_role:
+    lineage:
+      - datalake_nazare_raw.tier_bonus.agent_role
+  current_revision:
+    lineage:
+      - datalake_nazare_raw.tier_bonus.current_revision
+  dt_bonus_start:
+    lineage:
+      - datalake_nazare_raw.tier_bonus.bonus_start_date
+  dt_bonus_end:
+    lineage:
+      - datalake_nazare_raw.tier_bonus.bonus_end_date
+  ts_created:
+    lineage:
+      - datalake_nazare_raw.tier_bonus.created_at

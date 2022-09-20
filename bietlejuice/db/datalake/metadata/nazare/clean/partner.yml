@@ -1,0 +1,22 @@
+---
+database_name: datalake_nazare_clean
+table_name: partner
+columns:
+  id_partner:
+    lineage:
+      - datalake_nazare_raw.partner.id
+  full_name:
+    lineage:
+      - datalake_nazare_raw.partner.full_name
+  short_name:
+    lineage:
+      - datalake_nazare_raw.partner.short_name
+  current_revision:
+    lineage:
+      - datalake_nazare_raw.partner.current_revision
+  ts_created:
+    lineage:
+      - datalake_nazare_raw.partner.created_at
+  ts_updated:
+    lineage:
+      - datalake_nazare_raw.partner.updated_at

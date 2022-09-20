@@ -1,0 +1,34 @@
+---
+database_name: datalake_nazare_clean
+table_name: campaign
+columns:
+  id_campaign:
+    lineage:
+      - datalake_nazare_raw.campaign.id
+  id_offer:
+    lineage:
+      - datalake_nazare_raw.campaign.offer_id
+  id_agent:
+    lineage:
+      - datalake_nazare_raw.campaign.agent_id
+  description:
+    lineage:
+      - datalake_nazare_raw.campaign.description
+  agent_role:
+    lineage:
+      - datalake_nazare_raw.campaign.agent_role
+  bonus_fee:
+    lineage:
+      - datalake_nazare_raw.campaign.bonus_fee
+  is_cumulative:
+    lineage:
+      - datalake_nazare_raw.campaign.cumulative
+  dt_campaign_start:
+    lineage:
+      - datalake_nazare_raw.campaign.start_date
+  dt_campaign_end:
+    lineage:
+      - datalake_nazare_raw.campaign.end_date
+  ts_created:
+    lineage:
+      - datalake_nazare_raw.campaign.created_at
