@@ -436,6 +436,7 @@ LEFT JOIN dim_offer dof
   ON rf.sk_offer = dof.sk_offer
 LEFT JOIN datamarts.funnel_demand_flows fdf
   ON rf.sk_rent_flow = fdf.sk_rent_flow
+  AND rf.sk_house_listing = fdf.sk_house_listing
 LEFT JOIN datamarts.quintoandar_consultant_listings ciq
   ON rf.sk_house_listing = ciq.sk_house_listing AND ciq.businesscontext= 'RENT'
 ),
@@ -1022,6 +1023,9 @@ FROM dim_date dd
 JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_contract_signed_date
   AND rf.sk_contract_signed_date > 0
+JOIN dim_contract dc
+  ON rf.sk_contract = dc.sk_contract
+  and dc.status in ('Ativo', 'Finalizado')
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -1160,7 +1164,7 @@ SELECT
 	city_group,
   country_code,
 	supply_mkt_origin,
-  	CASE 
+  	CASE
 		WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
   	   	WHEN supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
   	END AS supply_mkt_origin_detailed,
@@ -1168,11 +1172,11 @@ SELECT
   	lead_processing_operation,
   	sales_company,
     	lead_origin,
-    	CASE 
+    	CASE
 		WHEN demand_mkt_channel in ('Not Mapped', 'Other') or demand_mkt_channel IS NULL THEN 'Other'
-        	ELSE demand_mkt_channel 
+        	ELSE demand_mkt_channel
 	END AS demand_mkt_channel,
-    	CASE 
+    	CASE
 		WHEN demand_mkt_channel in ('Not Mapped', 'Other') or demand_mkt_channel is NULL THEN 'Other'
 	     	WHEN demand_mkt_channel in ('Online Classifieds','Agents') THEN demand_mkt_channel
 	     	WHEN demand_mkt_medium in ('SEO branded', 'SEO non-branded') THEN 'SEO'

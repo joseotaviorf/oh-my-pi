@@ -8,14 +8,14 @@ WITH lead_ AS (
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
     CASE
-      WHEN fhlf.mkt_origin = 'B2B' 
+      WHEN fhlf.mkt_origin = 'B2B'
         OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
       WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
       ELSE 'IS'
     END AS lead_context,
     CASE
-      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') 
-        AND (fhlf.mkt_completion = 'Full Self-Service' 
+      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other')
+        AND (fhlf.mkt_completion = 'Full Self-Service'
         OR mkt_origin NOT IN ('B2B','CIQ')) THEN 'IS'
       ELSE sourcing_ops
     END AS lead_processing_operation,
@@ -46,16 +46,16 @@ WITH lead_ AS (
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
   JOIN
     dw_datamarts_cross.lead_listing_flows AS fhlf
       ON dd.sk_date = fhlf.sk_lead_date
       AND fhlf.sk_lead_date > 0
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON dr.sk_region = fhlf.sk_region
-  WHERE 
+  WHERE
     origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
@@ -70,14 +70,14 @@ prospect AS (
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
     CASE
-      WHEN fhlf.mkt_origin = 'B2B' 
+      WHEN fhlf.mkt_origin = 'B2B'
         OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
       WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
       ELSE 'IS'
     END AS lead_context,
     CASE
-      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') 
-        AND (fhlf.mkt_completion = 'Full Self-Service' 
+      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other')
+        AND (fhlf.mkt_completion = 'Full Self-Service'
         OR mkt_origin NOT IN('B2B', 'CIQ')) THEN 'IS'
       ELSE sourcing_ops
     END AS lead_processing_operation,
@@ -108,16 +108,16 @@ prospect AS (
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT) AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     dw_datamarts_cross.lead_listing_flows AS fhlf
       ON dd.sk_date = fhlf.sk_prospect_date
       AND fhlf.sk_prospect_date > 0
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON dr.sk_region = fhlf.sk_region
-  WHERE 
+  WHERE
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
@@ -132,13 +132,13 @@ qualified AS (
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
     CASE
-      WHEN fhlf.mkt_origin = 'B2B' 
+      WHEN fhlf.mkt_origin = 'B2B'
         OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
       WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
       ELSE 'IS'
     END AS lead_context,
     CASE
-      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') 
+      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other')
         AND (fhlf.mkt_completion = 'Full Self-Service' OR mkt_origin NOT IN('B2B', 'CIQ')) THEN 'IS'
       ELSE sourcing_ops
     END AS lead_processing_operation,
@@ -169,16 +169,16 @@ qualified AS (
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     dw_datamarts_cross.lead_listing_flows AS fhlf
       ON dd.sk_date = fhlf.sk_qualified_date
       AND fhlf.sk_qualified_date > 0
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON dr.sk_region = fhlf.sk_region
-  WHERE 
+  WHERE
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
@@ -193,13 +193,13 @@ opportunity AS (
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
     CASE
-      WHEN fhlf.mkt_origin = 'B2B' 
+      WHEN fhlf.mkt_origin = 'B2B'
         OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
       WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
       ELSE 'IS'
     END AS lead_context,
     CASE
-      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') 
+      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other')
         AND (fhlf.mkt_completion = 'Full Self-Service' OR mkt_origin NOT IN('B2B', 'CIQ')) THEN 'IS'
       ELSE sourcing_ops
     END AS lead_processing_operation,
@@ -230,16 +230,16 @@ opportunity AS (
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     dw_datamarts_cross.lead_listing_flows AS fhlf
       ON dd.sk_date = fhlf.sk_opportunity_date
       AND fhlf.sk_opportunity_date > 0
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON dr.sk_region = fhlf.sk_region
-  WHERE 
+  WHERE
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
@@ -254,13 +254,13 @@ listing AS (
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
     CASE
-      WHEN fhlf.mkt_origin = 'B2B' 
+      WHEN fhlf.mkt_origin = 'B2B'
         OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
       WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
       ELSE 'IS'
     END AS lead_context,
     CASE
-      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') 
+      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other')
         AND (fhlf.mkt_completion = 'Full Self-Service' OR mkt_origin NOT IN('B2B','CIQ')) THEN 'IS'
       ELSE sourcing_ops
     END AS lead_processing_operation,
@@ -293,14 +293,14 @@ listing AS (
     CAST(NULL AS BIGINT)  AS contract_ended
   FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     dw_datamarts_cross.lead_listing_flows AS fhlf
       ON dd.sk_date = fhlf.sk_first_listing_date
       AND fhlf.sk_first_listing_date > 0
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON dr.sk_region = fhlf.sk_region
-  WHERE 
+  WHERE
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
@@ -348,16 +348,16 @@ messages_sent AS (
     CAST(NULL AS BIGINT)  AS contract_ended
   FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     dw_datamarts_cross.talk_to_agent AS tta
       ON date(tta.first_message_ts) = dd.date
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON tta.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     (SELECT distinct city_group, region_code, country_code FROM dw_public.dim_region) AS dr
       ON tta.region_code = dr.region_code
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -402,21 +402,21 @@ agent_supports AS (
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     dw_datamarts_cross.talk_to_agent AS tta
       ON date(tta.first_attendance_ts) = dd.date
-  JOIN 
+  JOIN
     dw_public.fact_listing_rent_flows AS rf
       ON tta.sk_house_listing = rf.sk_house_listing
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -456,9 +456,9 @@ rent_flow_adjusted AS (
     dp.guarantee,
     CASE
       WHEN dhl.is_b2b = TRUE THEN 'B2B'
-      WHEN ciq.businesscontext = 'RENT' 
+      WHEN ciq.businesscontext = 'RENT'
         AND ciq.type_big_agent IS NOT NULL THEN ciq.type_big_agent
-      WHEN dhl.is_b2b = FALSE 
+      WHEN dhl.is_b2b = FALSE
         OR ciq.sk_house_listing IS NULL THEN 'FALSE'
     END AS is_b2b,
     dr.city_group,
@@ -467,29 +467,30 @@ rent_flow_adjusted AS (
     db.mkt_medium AS demand_mkt_medium_booking,
     dof.mkt_channel AS demand_mkt_channel_offer,
     dof.mkt_medium AS demand_mkt_medium_offer
-  FROM 
+  FROM
     dw_public.fact_listing_rent_flows AS rf
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_proposal AS dp
       ON rf.sk_proposal = dp.sk_proposal
-  JOIN 
+  JOIN
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_booking AS db
       ON rf.sk_booking = db.sk_booking
   LEFT JOIN
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
-  LEFT JOIN 
+  LEFT JOIN
     dw_datamarts.funnel_demand_flows AS fdf
       ON rf.sk_rent_flow = fdf.sk_rent_flow
-  LEFT JOIN 
+      AND rf.sk_house_listing = fdf.sk_house_listing
+  LEFT JOIN
     dw_datamarts_cross.quintoandar_consultant_listings ciq
-      ON rf.sk_house_listing = ciq.sk_house_listing 
+      ON rf.sk_house_listing = ciq.sk_house_listing
       AND ciq.businesscontext = 'RENT'
 ),
 visits_booked AS (
@@ -530,13 +531,13 @@ visits_booked AS (
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_booking_created_date
       AND rf.sk_booking_created_date > 0
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -580,11 +581,11 @@ visits_completed AS (
     CAST(NULL AS BIGINT)  AS contract_ended
   FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_visit_date
       AND rf.sk_visit_date > 0 AND rf.flg_visit_completed = 1
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -626,13 +627,13 @@ offer_submitted AS (
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_offer_submitted_date
       AND rf.sk_offer_submitted_date > 0
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -674,13 +675,13 @@ offer_approved AS(
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_offer_approved_date
       AND rf.sk_offer_approved_date > 0
-  WHERE 
+  WHERE
       (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -722,9 +723,9 @@ credit_evaluation_init AS(
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_first_credit_evaluation_init
       AND rf.sk_first_credit_evaluation_init > 0
@@ -769,13 +770,13 @@ credit_evaluation_positive AS(
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_first_credit_evaluation_positive
       AND rf.sk_first_credit_evaluation_positive > 0
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -817,13 +818,13 @@ guarantee_started AS(
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_guarantee_date
       AND rf.sk_guarantee_date > 0
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -865,13 +866,13 @@ doc_sent AS(
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_tenant_first_doc_sent_date
       AND rf.sk_tenant_first_doc_sent_date > 0
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -913,13 +914,13 @@ doc_approved AS(
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_last_doc_analysis_approved
       AND rf.sk_last_doc_analysis_approved > 0
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
     AND sk_offer > 0 -- correcting cases with doc approved date but sk_offer = -1
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
@@ -962,13 +963,13 @@ guarantee_paid AS(
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_guarantee_paid_date
       AND rf.sk_guarantee_paid_date > 0
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -1010,13 +1011,13 @@ credit_approved AS(
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_credit_analysis_approved_date
       AND rf.sk_credit_analysis_approved_date > 0
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -1058,13 +1059,13 @@ contract_created AS (
     COUNT(DISTINCT rf.sk_contract) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_contract_created_date
       AND rf.sk_contract_created_date > 0
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -1106,13 +1107,17 @@ contract_signed AS (
     CAST(NULL AS BIGINT) AS contract_created,
     COUNT(DISTINCT rf.sk_contract) AS contract_signed,
     CAST(NULL AS BIGINT)  AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_contract_signed_date
       AND rf.sk_contract_signed_date > 0
-  WHERE 
+  JOIN
+    dw_public.dim_contract AS dc
+      ON rf.sk_contract = dc.sk_contract
+      AND dc.status in ('Ativo', 'Finalizado')
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -1154,14 +1159,14 @@ contract_ended AS (
     CAST(NULL AS BIGINT) AS contract_created,
     CAST(NULL AS BIGINT) AS contract_signed,
     COUNT(DISTINCT rf.sk_contract) AS contract_ended
-  FROM 
+  FROM
     dw_public.dim_date AS dd
-  JOIN 
+  JOIN
     rent_flow_adjusted AS rf
       ON dd.sk_date = rf.sk_contract_annulment_date
       AND rf.sk_contract_signed_date > 0
       AND rf.sk_contract_annulment_date > 0
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
@@ -1245,12 +1250,12 @@ union_all_date AS (
     ua.contract_created,
     ua.contract_signed,
     ua.contract_ended
-  FROM 
+  FROM
     union_all AS ua
-  RIGHT JOIN 
+  RIGHT JOIN
     dw_public.dim_date AS dd
       ON ua.sk_date = dd.sk_date
-  WHERE 
+  WHERE
     (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE)
 )
 SELECT
@@ -1258,7 +1263,7 @@ SELECT
   city_group,
   country_code,
   supply_mkt_origin,
-  CASE 
+  CASE
     WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
     WHEN supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
   END AS supply_mkt_origin_detailed,
@@ -1266,13 +1271,13 @@ SELECT
   lead_processing_operation,
   sales_company,
   lead_origin,
-  CASE 
+  CASE
     WHEN demand_mkt_channel IN ('Not Mapped', 'Other')
       OR demand_mkt_channel IS NULL THEN 'Other'
-    ELSE demand_mkt_channel 
+    ELSE demand_mkt_channel
   END AS demand_mkt_channel,
-  CASE 
-    WHEN demand_mkt_channel IN ('Not Mapped', 'Other') 
+  CASE
+    WHEN demand_mkt_channel IN ('Not Mapped', 'Other')
       OR demand_mkt_channel IS NULL THEN 'Other'
     WHEN demand_mkt_channel IN ('Online Classifieds','Agents') THEN demand_mkt_channel
     WHEN demand_mkt_medium IN ('SEO branded', 'SEO non-branded') THEN 'SEO'
@@ -1303,6 +1308,6 @@ SELECT
   SUM(COALESCE(contract_signed,0)) AS contract_signed,
   SUM(COALESCE(contract_ended,0)) AS contract_ended,
   current_timestamp AS ts_load
-FROM 
+FROM
   union_all
 GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
