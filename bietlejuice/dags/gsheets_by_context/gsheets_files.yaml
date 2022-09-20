@@ -1071,12 +1071,6 @@ aux_agents_sale:
     clean_table_name: aux_agents_sale
     sheet_context: static
 
-base_pdd:
-    sheet_id: 1xKf5Af05mnDAK4v5UBWTpQjHLrxejlaEQUGKCJCeaR4
-    sheet_name: base_pdd
-    clean_table_name: base_pdd
-    sheet_context: static
-
 cities_neighborhoods_ibge_qa:
     sheet_id: 19N1BVZuKcCw1RByXoL3hqaXSmEhdi7_mbtyOVff4oQs
     sheet_name: ibge_5a_cities
