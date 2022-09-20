@@ -1,8 +1,12 @@
 import argparse
 import os
 import re
+import sys
 
 import boto3
+
+BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BI_ETL_EJUICE_ROOT)
 
 from dags import DAG_PACKAGES_ROOT
 
