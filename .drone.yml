@@ -224,7 +224,7 @@ pipeline:
     pull: true
     bucket: us-east4-airflow-forno2-7f52154d-bucket
     source: dags/
-    target: dags/bietlejuice_dag_packages/
+    target: dags/dags/
     delete: true
     dry_run: false
     secrets:
@@ -240,7 +240,7 @@ pipeline:
     pull: true
     bucket: us-east4-airflow-prod2-fdaf9748-bucket
     source: dags/
-    target: dags/bietlejuice_dag_packages/
+    target: dags/dags/
     delete: true
     dry_run: false
     secrets:
