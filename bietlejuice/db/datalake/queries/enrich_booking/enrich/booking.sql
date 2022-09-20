@@ -317,7 +317,6 @@ base_booking AS (
     vo.id_real_estate_agent_rating,
     IF(b.business_context = 'SALE', vfa.id_fixed_agent,NULL) AS id_sale_fixed_agent,
     hl.country_code,
-    COALESCE(ct.default_timezone, 'UTC') AS default_timezone,
     b.dt_booking,
     b.status,
     b.business_context AS visit_intent,
@@ -442,8 +441,8 @@ base_booking AS (
       + ((b.slot_day * 15 / 60)+8) * INTERVAL 1 HOURS
       + abs(b.slot_day * 15 % 60) * INTERVAL 1 MINUTES
     AS ts_booking_local_tz,
-    FROM_UTC_TIMESTAMP(b.ts_created, COALESCE(ct.default_timezone, 'UTC')) AS ts_created_local_tz,
-    FROM_UTC_TIMESTAMP(b.ts_visit_fup, COALESCE(ct.default_timezone, 'UTC')) AS ts_visit_follow_up_local_tz,
+    FROM_UTC_TIMESTAMP(b.ts_created, 'Brazil/East') AS ts_created_local_tz,
+    FROM_UTC_TIMESTAMP(b.ts_visit_fup, 'Brazil/East') AS ts_visit_follow_up_local_tz,
     b.is_confirmed,
     b.is_closed,
     b.is_agent_fixed,
@@ -532,15 +531,12 @@ base_booking AS (
   LEFT JOIN
     datalake_ebdb_listing.house AS hl
       ON b.id_house = hl.id
-  LEFT JOIN
-    datalake_ebdb_clean.country AS ct
-      ON ct.code = hl.country_code
 )
 -- custom columns that need pre-calculated ones
 SELECT
   bb.*,
-  TO_UTC_TIMESTAMP(bb.ts_booking_local_tz, default_timezone) AS ts_booking_utc,
-  FROM_UTC_TIMESTAMP(bb.ts_first_canceled, default_timezone) AS ts_first_canceled_local_tz,
+  TO_UTC_TIMESTAMP(bb.ts_booking_local_tz, 'Brazil/East') AS ts_booking_utc,
+  FROM_UTC_TIMESTAMP(bb.ts_first_canceled, 'Brazil/East') AS ts_first_canceled_local_tz,
   CASE
     WHEN bb.cancellation_reason_category IN (
       'Agent',
@@ -555,8 +551,8 @@ SELECT
       ) THEN 'Reschedule'
     ELSE bb.cancellation_reason_category
   END AS responsible,
-  DATEDIFF(FROM_UTC_TIMESTAMP(bb.ts_first_canceled, default_timezone), bb.ts_created_local_tz) AS days_visit_booked_to_visit_cancelled,
-  DATEDIFF(bb.ts_booking_local_tz, FROM_UTC_TIMESTAMP(bb.ts_first_canceled, default_timezone)) AS days_visit_cancelled_to_visit,
+  DATEDIFF(FROM_UTC_TIMESTAMP(bb.ts_first_canceled, 'Brazil/East'), bb.ts_created_local_tz) AS days_visit_booked_to_visit_cancelled,
+  DATEDIFF(bb.ts_booking_local_tz, FROM_UTC_TIMESTAMP(bb.ts_first_canceled, 'Brazil/East')) AS days_visit_cancelled_to_visit,
   DATEDIFF(bb.ts_booking_local_tz, bb.ts_created_local_tz) AS days_visit_booked_to_visit,
   IF(is_visit_completed, DATEDIFF(bb.ts_booking_local_tz, bb.ts_created_local_tz), NULL)
    AS days_visit_booked_to_visit_completed 
