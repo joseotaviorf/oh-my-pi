@@ -3,7 +3,7 @@ import pendulum
 import os
 
 from airflow.utils.helpers import chain
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -12,6 +12,8 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.services import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -20,24 +22,32 @@ CONTEXT = "ebdb_smart_price"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
-SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
 
-LOGS_OUTPUT_PATH = f"s3://{Variable.get('databricks_s3_bucket')}/logs/jobs/{DAG_ID}"
-
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_10_4_med_general_cluster", deserialize_json=True
+config_service = ConfigurationService(DAG_NAME)
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+datalake_bucket = config_service.get_config("datalake_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
 )
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
-)
+SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
+
+cluster_description = config_service.get_config("custom_cluster")
+cluster_description["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{spark_jobs_logs_path}{DAG_ID}"
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
+default_libraries = config_service.get_config("default_libraries")
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -49,15 +59,16 @@ dag = DAG(
     start_date=MAIN_START_DATE,
     schedule_interval=None,
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    cluster_configuration=cluster_description,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -67,10 +78,10 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 datalake_task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
+    datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
     spark_jobs_path=SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+    athena_query_result_location=athena_query_results_bucket,
 )
 
 enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
@@ -81,3 +92,8 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
 
 chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
 chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+
+# Set data quality tasks if exists
+independent_tasks = DatalakeTaskGroup.all_independent_tasks(enrich_task_groups)
+if independent_tasks:
+    terminate_cluster_task.set_upstream(independent_tasks)

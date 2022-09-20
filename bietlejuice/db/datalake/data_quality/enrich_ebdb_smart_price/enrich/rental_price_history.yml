@@ -1,0 +1,14 @@
+---
+table_name: datalake_ebdb_smart_price.rental_price_history
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_house:
+    is_complete:
+      severity_level: Error
+  rent:
+    has_mean_value:
+      greater_than: 1000
+      severity_level: Warning
+  ts_price_started:
+    is_complete:
+      severity_level: Warning
