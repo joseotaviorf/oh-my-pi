@@ -27,7 +27,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 tables = config_service.get_config("tables")
-clean_partition_cols = ["year", "month", "day"]
+clean_partition_cols = ["year", "month"]
 custom_libraries = config_service.get_config("custom_libraries")
 default_libraries = config_service.get_config("default_libraries")
 

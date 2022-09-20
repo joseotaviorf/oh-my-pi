@@ -68,9 +68,6 @@ columns:
   source_tab:
     lineage:
       - datalake_itbi_clean.itbi_sp.source_tab
-  day:
-    lineage:
-      - datalake_itbi_clean.itbi_sp.day
   month:
     lineage:
       - datalake_itbi_clean.itbi_sp.month

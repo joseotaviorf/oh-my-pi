@@ -37,3 +37,5 @@ tables:
       Padrão (IPTU): "padrao_iptu"
       Descrição do padrão (IPTU): "descricao_padrao_iptu"
       ACC (IPTU): "acc_iptu"
+      ACC (IPTU)26: "descricao_padrao_iptu"
+      ACC (IPTU)27: "acc_iptu"

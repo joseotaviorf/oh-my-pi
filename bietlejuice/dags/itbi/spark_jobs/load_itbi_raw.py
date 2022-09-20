@@ -7,11 +7,10 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
+from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from pyspark import SparkFiles
-from pyspark.sql.types import DecimalType
-from pyspark.sql.functions import lpad, lit
+from pyspark.sql.functions import lit
 from pyspark.sql.utils import IllegalArgumentException
 
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
@@ -35,13 +34,10 @@ spark_client = SparkClient(
 
 
 def main():
-    (
-        environment,
-        datalake_bucket,
-        source,
-        execution_date,
-        full_load_execution_date,
-    ) = parse_arguments()
+    environment, datalake_bucket, source, execution_date, full_load_execution_date, = (
+        parse_arguments()
+    )
+
     logger.info(
         f"""
         m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source},
@@ -93,8 +89,6 @@ def main():
             if columns_raname_mapped:
                 dataframe = rename_columns(dataframe, columns_raname_mapped)
 
-            dataframe = format_columns(dataframe)
-
             load_dataframe_into_datalake(
                 dataframe,
                 table_name,
@@ -135,13 +129,16 @@ def get_data(
             spark_client.conn.read.format(source_read_format)
             .option("dataAddress", f"'{MONTH}-{YEAR}'!")
             .option("header", "true")
-            .option("inferSchema", "true")
             .load("file://" + SparkFiles.get(file_name))
         )
 
         df = df.withColumn("source_file", lit(data_path))
         df = df.withColumn("source_tab", lit(f"{MONTH}-{YEAR}"))
         df = df.withColumn("dt_load", lit(date.today()))
+        df = df.withColumn("year", lit(YEAR))
+        df = df.withColumn(
+            "month", lit(transform_month_to_portuguese_relative(MONTH, reverse=True))
+        )
 
         logger.info(
             f"""
@@ -154,11 +151,11 @@ def get_data(
     except IllegalArgumentException as e:
         logger.warning(
             f"""
-            msg=Fail on get data from {source_url}, sheet not found in downloaded file.
+            msg=Fail on get data from {source_url}, sheet not found in downloaded file. error={e}
         """
         )
 
-        raise e
+        return None
 
     except Exception as e:
         logger.warning(
@@ -184,28 +181,6 @@ def rename_columns(dataframe, columns_rename_mapped):
     return dataframe
 
 
-def format_columns(dataframe):
-
-    dataframe = dataframe.withColumn("cep", lpad(dataframe.cep, 8, "0"))
-    dataframe = dataframe.withColumn(
-        "valor_transacao_declarado",
-        dataframe.valor_transacao_declarado.cast(DecimalType(18, 2)),
-    )
-    dataframe = dataframe.withColumn(
-        "valor_venal_referencia",
-        dataframe.valor_venal_referencia.cast(DecimalType(18, 2)),
-    )
-    dataframe = dataframe.withColumn(
-        "valor_venal_referencia_proporcional",
-        dataframe.valor_venal_referencia_proporcional.cast(DecimalType(18, 2)),
-    )
-    dataframe = dataframe.withColumn(
-        "valor_financiado", dataframe.valor_financiado.cast(DecimalType(18, 2))
-    )
-
-    return dataframe
-
-
 def get_year_month_to_execute(execution_date):
     """This function will return the year and month of the last month"""
 
@@ -218,7 +193,7 @@ def get_year_month_to_execute(execution_date):
     return year, month
 
 
-def transform_month_to_portuguese_relative(month):
+def transform_month_to_portuguese_relative(month, reverse=False):
 
     months = {
         "1": "JAN",
@@ -235,18 +210,10 @@ def transform_month_to_portuguese_relative(month):
         "12": "DEZ",
     }
 
+    if reverse:
+        months = dict(zip(months.values(), months.keys()))
+
     return months[str(month)]
-
-
-def create_date_partitions(df):
-    """Creates the columns year, month and day using updated_at"""
-
-    return (
-        SparkDataFrameService()
-        .input(df)
-        .create_year_month_day_columns_from_dataframe_column("dt_load")
-        .output()
-    )
 
 
 def load_dataframe_into_datalake(
@@ -264,14 +231,12 @@ def load_dataframe_into_datalake(
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(database_name)
 
-    partition_cols = ["year", "month", "day"]
+    partition_cols = ["year", "month"]
 
     if df.rdd.isEmpty():
         logger.info(f"m=__main__, msg={table_name}'s RDD is empty")
 
     if is_incremental:
-        df = create_date_partitions(df)
-
         IncrementalTableLoaderPipeline(
             database_name,
             table_name,

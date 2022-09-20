@@ -58,7 +58,6 @@ SELECT
     address_reference AS raw_source_reference,
     source_file,
     source_tab,
-    day,
     month,
     year,
     TO_DATE(dt_transaction, 'yyyy-MM-dd') AS dt_transaction,
