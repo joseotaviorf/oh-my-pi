@@ -7,5 +7,5 @@ custom_cluster:
     max_workers: 6
   aws_attributes:
     ebs_volume_size: 500
-spark_conf:
-  spark.sql.mapKeyDedupPolicy: "LAST WIN"
+  spark_conf:
+    spark.sql.mapKeyDedupPolicy: "LAST_WIN"
