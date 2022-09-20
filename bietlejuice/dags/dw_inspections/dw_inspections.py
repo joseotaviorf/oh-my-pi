@@ -94,10 +94,10 @@ tables = task_group._get_table_names_from_sql_files(layer=LayerEnum.DW)
 
 for table_name in tables:
     is_incremental = table_name in incremental_tables
-    partitions_cols = partitions_cols if is_incremental else None
+    partitions = partitions_cols if is_incremental else None
 
     dw_staging_task_group[table_name] = task_group.build_dw_staging_task_group(
-        table_name=table_name, is_incremental=is_incremental, partitions=partitions_cols
+        table_name=table_name, is_incremental=is_incremental, partitions=partitions
     )
 
     dw_task_group[table_name] = task_group.build_dw_task_group(
@@ -105,7 +105,7 @@ for table_name in tables:
         has_load_to_redshift_task=False,
         is_incremental=is_incremental,
         spectrum_iam_role=spectrum_iam_role,
-        partitions=partitions_cols,
+        partitions=partitions,
     )
 
 chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
