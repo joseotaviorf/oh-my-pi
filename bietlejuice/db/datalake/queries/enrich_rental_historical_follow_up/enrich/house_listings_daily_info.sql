@@ -62,10 +62,13 @@ listings_states_per_day AS (
         h.id_country,
         hl.id_contract,
         heh.id_occupant,
+        hbh.id_partner,
         h.id_region,
         lcod.consultant_type,
         heh.doorman_type,
         awk.first_key_location,
+        heh.key_location,
+        rph.rent,
         hls.status_history,
         hls.status_change_reason,
         hl.listing_category,
@@ -116,6 +119,18 @@ listings_states_per_day AS (
             AND dbase.dt_day < COALESCE(DATE(heh.ts_entrance_ended), '2100-01-01')
             AND heh.is_last_status_of_day = True
     LEFT JOIN
+        datalake_ebdb_smart_price.rental_price_history AS rph
+            ON hl.id_house = rph.id_house
+            AND dbase.dt_day >= DATE(rph.ts_price_started)
+            AND dbase.dt_day < COALESCE(DATE(rph.ts_price_ended), '2100-01-01')
+            AND rph.is_last_status_of_day = True
+    LEFT JOIN
+        datalake_pro_owners.house_b2b_history AS hbh
+            ON hl.id_house = hbh.id_house
+            AND dbase.dt_day >= DATE(hbh.ts_started)
+            AND dbase.dt_day < COALESCE(DATE(hbh.ts_ended), '2100-01-01')
+            AND hbh.is_last_status_of_day = True
+    LEFT JOIN
         datalake_ebdb_listing.agents_with_keys AS awk
             ON hl.id_house_listing = awk.id_house_listing
     /* 
@@ -134,10 +149,13 @@ SELECT
     id_country,
     id_contract,
     id_occupant,
+    id_partner,
     id_region,
     consultant_type,
     doorman_type,
     first_key_location,
+    key_location,
+    rent,
     status_history,
     status_change_reason,
     listing_category,

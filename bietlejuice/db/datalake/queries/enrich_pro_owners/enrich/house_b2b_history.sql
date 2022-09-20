@@ -185,6 +185,7 @@ SELECT
     pac.id_partner,
     oc.id_user,
     lc.affiliate_type,
+    MAX(eb.ts_event) OVER(PARTITION BY eb.id_house, DATE(eb.ts_event)) = eb.ts_event AS is_last_status_of_day,
     eb.ts_event AS ts_started,
     LEAD(eb.ts_event) OVER(PARTITION BY eb.id_house ORDER BY eb.ts_event) AS ts_ended
 FROM
@@ -224,6 +225,7 @@ SELECT
     id_partner,
     id_user,
     affiliate_type,
+    is_last_status_of_day,
     ts_started,
     ts_ended
 FROM

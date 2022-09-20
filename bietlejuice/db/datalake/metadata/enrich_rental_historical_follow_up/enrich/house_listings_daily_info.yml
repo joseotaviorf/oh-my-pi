@@ -17,6 +17,9 @@ columns:
   id_occupant:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.id_occupant
+  id_partner:
+    lineage:
+      - datalake_pro_owners.house_b2b_history.id_partner
   id_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
@@ -29,9 +32,15 @@ columns:
   first_key_location:
     lineage:
       - datalake_ebdb_listing.agents_with_keys.first_key_location
+  key_location:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.rent
   listing_category:
     lineage:
       - datalake_ebdb_listing.house_listing.listing_category
+  rent:
+    lineage:
+      - datalake_ebdb_smart_price.rental_price_history.rent
   status_change_reason:
     lineage:
       - datalake_ebdb_listing.house_listing_status.status_change_reason
