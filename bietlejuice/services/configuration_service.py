@@ -2,6 +2,9 @@ from hierarchical_conf.hierarchical_conf import HierarchicalConf
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice import BIETLEJUICE_PROJECT_ROOT
+from bietlejuice.base.airflow.dag_packages.dag_packages_path_service import (
+    DAGPackagesPathService,
+)
 
 logger = QuintoAndarLogger("ConfigurationService")
 
@@ -20,16 +23,19 @@ class ConfigurationService(HierarchicalConf):
         :param dag_name: the DAG name where the conf file is inside
         :param intermediate_path: optional intermediate path for DAGs inside a context path
         """
-        dag_folder = dag_name
+        dag_parent_folder = DAGPackagesPathService.get_dag_parent_path(dag_name)
         if intermediate_path:
             dag_folder = intermediate_path
+        else:
+            dag_folder = dag_name
 
-        general_conf_file = f"{BIETLEJUICE_PROJECT_ROOT}"
-        dag_conf_file = f"{BIETLEJUICE_PROJECT_ROOT}/dags/{dag_folder}"
-        dag_spark_job_conf_file = (
-            f"{BIETLEJUICE_PROJECT_ROOT}/dags/{dag_folder}/spark_jobs"
-        )
+        # General configurations file
+        searched_paths = [f"{BIETLEJUICE_PROJECT_ROOT}"]
 
-        super().__init__(
-            searched_paths=[general_conf_file, dag_conf_file, dag_spark_job_conf_file]
-        )
+        if dag_folder:
+            # DAG config file
+            searched_paths.append(f"{dag_parent_folder}/{dag_folder}")
+            # Spark job config file
+            searched_paths.append(f"{dag_parent_folder}/{dag_folder}/spark_jobs")
+
+        super().__init__(searched_paths)
