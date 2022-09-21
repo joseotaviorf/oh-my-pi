@@ -95,6 +95,7 @@ select
             when job_creator_info.id_sales_rep is not null then job_creator_info.id_user
             else null
         end as id_rep,
+        COALESCE(ct.code, region.country_code) AS country_code,
         f.status as job_status,
         f.booking_instructions,
         photographer_data.photographer_name,
@@ -157,6 +158,7 @@ select
         f.ts_photo_job_requested,
         f.ts_session_started,
         f.ts_scheduled,
+        FROM_UTC_TIMESTAMP(f.ts_scheduled, 'America/Sao_Paulo') AS ts_scheduled_local,
         f.ts_photos_uploaded,
         cancellation_info.ts_revision as ts_problem_reported,
         problems_info.ts_revision as ts_canceled,
@@ -174,3 +176,20 @@ select
         on job_creator_info.id_photographer_job = f.id
     left join cancellation_reason
         on cancellation_reason.id_photo_shoot = f.id
+    LEFT JOIN
+      datalake_ebdb_clean.house AS h
+        ON h.id = f.id_house
+    LEFT JOIN
+      datalake_ebdb_clean.state
+        ON state.id = h.id_state
+    LEFT JOIN
+      datalake_ebdb_clean.country AS ct
+        ON ct.id = state.id_country
+    LEFT JOIN
+      datalake_ebdb_clean.map_region AS m_region
+        ON h.id_region = COALESCE(m_region.id,
+                              m_region.id_macro,
+                              m_region.id_city)
+    LEFT JOIN
+      datalake_region.region
+        ON region.id = m_region.id

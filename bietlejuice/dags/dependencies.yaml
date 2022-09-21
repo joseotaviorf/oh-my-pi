@@ -1521,14 +1521,19 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.hubspot:load-clean-company
 
 bietlejuice.enrich_ebdb_listing_jobs:
+  - bietlejuice.ebdb:create-clean-country-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-registration-status-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-inspection-in-data-lake
   - bietlejuice.ebdb:create-clean-inspection-item-in-data-lake
+  - bietlejuice.ebdb:create-clean-map-region-in-data-lake
   - bietlejuice.ebdb:create-clean-photographer-data-in-data-lake
   - bietlejuice.ebdb:create-clean-photographer-job-in-data-lake
   - bietlejuice.ebdb:create-clean-photographer-job-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-state-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_region:load-enrich-region
 
 bietlejuice.enrich_ebdb_proposal:
   - bietlejuice.ebdb:create-clean-pre-proposal-in-data-lake

@@ -17,6 +17,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.id_sales_rep
       - datalake_ebdb_clean.user.id
+  country_code:
+    lineage:
+      - datalake_ebdb_clean.country.code
+      - datalake_region.region.country_code
   job_status:
     lineage:
       - datalake_ebdb_clean.photographer_job.status
@@ -126,6 +130,9 @@ columns:
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_session_started
   ts_scheduled:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  ts_scheduled_local:
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_scheduled
   ts_photos_uploaded:
