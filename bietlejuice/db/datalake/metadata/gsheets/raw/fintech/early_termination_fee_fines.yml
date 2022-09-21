@@ -5,3 +5,6 @@ columns:
   dados_iq_cpfcnpj:
     tags:
     - PII
+  dados_iq_titular:
+    tags:
+    - PII

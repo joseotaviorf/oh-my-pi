@@ -47,16 +47,22 @@ columns:
   tenant_document_number:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_cpfcnpj
+  tenant_holder:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_titular
   tenant_bank_name:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_banco
   tenant_bank_branch:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_agencia
+  tenant_account:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_conta
   tenant_bank_account_type:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_tipo_de_conta
-  admininistration_rate:
+  administration_rate:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.taxa_adm
   reason_manual_task:
@@ -80,9 +86,6 @@ columns:
   sheet_row_number:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.row
-  is_adm_exempt:
-    lineage:
-      - datalake_gsheets_raw.early_termination_fee_fines.adm_isenta
   is_getnet_transaction:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.getnet
@@ -92,6 +95,9 @@ columns:
   has_related_bandaid:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.bandaid_aberto
+  is_adm_exempt:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee_fines.adm_isenta
   is_irent_orent:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.isirentororent
