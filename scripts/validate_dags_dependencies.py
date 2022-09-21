@@ -4,6 +4,7 @@ import sys
 import glob
 
 from typing import List, Tuple, Dict
+from itertools import chain
 import collections
 import json
 
@@ -13,6 +14,8 @@ sys.path.append(BI_ETL_EJUICE_ROOT)
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import BietlejuiceDependencyHelper
 from bietlejuice.base.paths import QUERIES_DATALAKE_PATH
 from bietlejuice.services import FileService, ConfigurationService
+
+from dags import DAG_PACKAGES_ROOT
 
 LAYERS = ["clean", "enrich", "dw", "raw"]
 
@@ -69,9 +72,19 @@ class CrossDAGDependenciesValidator:
         :rtype: str, str
         """
         table_name = None
-        queries_index = file_path.index("queries")
-        queries_path = file_path[queries_index:]
-        dag_items = queries_path.split("/")[1:]
+
+        # DAG package path example: */bi-etl-ejuice/dags/{dag_context}/{dag_name}/queries/{query_layer}/{table_name}.sql
+        if re.match("(.*)\/dags\/(.*)\/(.*)\/queries\/(.*)\/(.*)\.sql", file_path):
+            root_index = file_path.index("dags")
+            dag_items = file_path[root_index:].split("/")[2:]
+            dag_items.remove("queries")
+
+        # Legacy structure path example: */bi-etl-ejuice/bietlejuice/db/datalake/queries/{dag_name}/{query_layer}/{table_name}.sql
+        else:
+            queries_index = file_path.index("queries")
+            queries_path = file_path[queries_index:]
+            dag_items = queries_path.split("/")[1:]
+
         if dag_items[1] not in LAYERS:
             dag_name = dag_items[0]
         else:
@@ -87,7 +100,9 @@ class CrossDAGDependenciesValidator:
         :return: Dictionary with the tables names of each DAG
         :rtype: dict[str:list()]
         """
-        all_query_files = FileService.list_all_files_recursively(QUERIES_DATALAKE_PATH)
+        query_files_from_legacy_path = FileService.list_all_files_recursively(QUERIES_DATALAKE_PATH, extension='sql')
+        query_files_from_dag_packages = FileService.list_all_files_recursively(DAG_PACKAGES_ROOT, extension="sql")
+        all_query_files = chain(query_files_from_legacy_path, query_files_from_dag_packages)
         for file_path in all_query_files:
             dag_name, table_name = self.extract_dag_and_table_from_file(
                 file_path=file_path
