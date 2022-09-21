@@ -253,7 +253,10 @@ if __name__ == "__main__":
     dfs = {"itau": [], "bradesco": [], "citi": []}
 
     for i in infos_sheets:
-        if not i["name"].lower().endswith(".tmp"):
+        if (
+            not i["name"].lower().endswith(".tmp")
+            and "Controle Financeiro - CAP" in i["name"]
+        ):
             after_2021 = False if "2021" in i["name"] else True
             engine = None if "xlsb" not in i["name"] else "pyxlsb"
             if "Terceiros" in i["name"]:
