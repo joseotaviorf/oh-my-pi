@@ -13,6 +13,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
 	j.id_rep AS rep_id,
 	j.id_photographer AS photographer_id,
 	j.id_user_who_canceled AS user_cancel_id,
+	j.country_code,
 	j.job_status,
 	j.creation_origin,
 	LEFT(NULLIF(j.booking_instructions, ''), 100) as scheduling_instructions,
@@ -44,6 +45,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
 	j.ts_photo_job_requested AS dt_job_issued,
 	j.ts_session_started AS dt_shoot_started,
 	j.ts_scheduled AS dt_job_scheduled,
+	j.ts_scheduled_local AS ts_job_scheduled_local,
 	j.ts_photos_uploaded AS dt_photos_uploaded,
 	j.ts_updated AS dt_updated,
 	j.ts_canceled AS dt_problem_reported,
@@ -52,7 +54,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
 	-- Applying FLOOR function to match ODS
 	CAST(FLOOR(j.creation_to_scheduling_diff_minutes) AS DECIMAL(10,1)) AS creation_to_scheduling_diff_minutes,
 	CAST(ROUND(FLOOR(j.creation_to_scheduling_diff_minutes) / 60, 1) AS DECIMAL(10,1)) AS creation_to_scheduling_diff_hours,
-	CAST(ROUND(FLOOR(j.creation_to_scheduling_diff_minutes) / 1440, 1) AS DECIMAL(10,1)) AS creation_to_scheduling_diff_days
+	CAST(ROUND(FLOOR(j.creation_to_scheduling_diff_minutes) / 1440, 1) AS DECIMAL(10,1)) AS creation_to_scheduling_diff_days,
+	NOW() AS ts_load
 FROM
 	base_jobs j
 LEFT JOIN

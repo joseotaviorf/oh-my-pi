@@ -7,6 +7,7 @@ CREATE TABLE public.dim_photo_job (
     rep_id bigint,
     photographer_id bigint,
     user_cancel_id bigint,
+    country_code VARCHAR,
     job_status varchar(255),
     creation_origin varchar(20),
     scheduling_instructions varchar,
@@ -38,6 +39,7 @@ CREATE TABLE public.dim_photo_job (
     dt_job_issued datetime,
     dt_shoot_started datetime,
     dt_job_scheduled datetime,
+    ts_job_scheduled_local TIMESTAMP,
     dt_photos_uploaded datetime,
     dt_updated datetime,
     dt_problem_reported datetime,
@@ -45,7 +47,8 @@ CREATE TABLE public.dim_photo_job (
     user_cancel_dt datetime,
     creation_to_scheduling_diff_minutes decimal(10,1),
     creation_to_scheduling_diff_hours decimal(10,1),
-    creation_to_scheduling_diff_days decimal(10,1)
+    creation_to_scheduling_diff_days decimal(10,1),
+    ts_load TIMESTAMP
 )
 
 ALTER TABLE public.dim_photo_job OWNER TO databricks;

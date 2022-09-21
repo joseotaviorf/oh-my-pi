@@ -19,6 +19,9 @@ columns:
   user_cancel_id:
     lineage:
       - datalake_ebdb_listing_jobs.photo_job.id_user_who_canceled
+  country_code:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.country_code
   job_status:
     lineage:
       - datalake_ebdb_listing_jobs.photo_job.job_status
@@ -112,6 +115,9 @@ columns:
   dt_job_scheduled:
     lineage:
       - datalake_ebdb_listing_jobs.photo_job.ts_scheduled
+  ts_job_scheduled_local:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.ts_scheduled_local
   dt_photos_uploaded:
     lineage:
       - datalake_ebdb_listing_jobs.photo_job.ts_photos_uploaded
