@@ -32,6 +32,9 @@ columns:
   entrance_uri:
     lineage:
       - datalake_amplitude_clean.events.user_properties
+  attributed_at:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
   uri_event_property:
     lineage:
       - datalake_amplitude_clean.events.event_properties

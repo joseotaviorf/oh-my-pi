@@ -103,6 +103,7 @@ events_filtered AS (
         entrance_uri,
         referrer,
         business_context,
+        attributed_at,
         web_medium,
         web_source,
         web_campaign,
@@ -124,7 +125,7 @@ events_filtered AS (
         DATE(CONCAT_WS("-",evt.year, evt.month, evt.day)) > DATE('{year}-{month}-{day}') - INTERVAL '4' month
     GROUP BY 
         1,2,3,4,5,6,7,8,9,10,11,12,
-        13,14,15,16,17,18,19,20,21,22,23,24,25
+        13,14,15,16,17,18,19,20,21,22,23,24,25,26
 ),
 events_app AS (
     SELECT
@@ -164,6 +165,7 @@ events_web AS (
         entrance_uri,
         referrer,
         business_context,
+        attributed_at,
         id_house,
         id_firestore,
         visit_code,
@@ -176,7 +178,7 @@ events_web AS (
         web_term,
         web_platform,
         IF((UPPER(web_campaign) LIKE '%BRANDED%' OR UPPER(web_campaign) LIKE '%INSTITUCIONAL%') AND UPPER(web_campaign) NOT LIKE 'NON-BRANDED', 'Branded', 'Outro' ) AS web_branded,
-        FIRST_VALUE(ts_event) OVER (PARTITION BY id_amplitude, web_medium, web_source, web_campaign, web_term, web_content, gclid ORDER BY ts_event) AS ts_web_attribution
+        FIRST_VALUE(ts_event) OVER (PARTITION BY id_amplitude, web_medium, web_source, web_campaign, web_term, web_content, gclid, attributed_at ORDER BY ts_event) AS ts_web_attribution
     FROM 
         events_filtered
 )
@@ -192,6 +194,7 @@ SELECT
     COALESCE(web.entrance_uri, app.entrance_uri) AS entrance_uri,
     COALESCE(web.referrer, app.referrer) AS referrer,
     COALESCE(web.business_context, app.business_context) AS business_context,
+    attributed_at,
     web_gclid,
     web_medium,
     web_source,

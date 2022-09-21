@@ -36,6 +36,9 @@ columns:
   business_context:
     lineage:
       - datalake_online_attribution.events_exploded.business_context
+  attributed_at:
+    lineage:
+      - datalake_online_attribution.events_exploded.attributed_at
   web_gclid:
     lineage:
       - datalake_online_attribution.events_exploded.gclid
