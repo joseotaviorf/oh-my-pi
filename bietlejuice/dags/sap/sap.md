@@ -17,7 +17,9 @@ This pipeline produces the following output table in the raw and clean layers:
 
 - Via incremental load:
     - `incoming_payments`
+    - `incoming_payments_lines`
     - `invoices`
+    - `invoices_lines`
     - `journal_entries`
     - `journal_entry_lines`
 

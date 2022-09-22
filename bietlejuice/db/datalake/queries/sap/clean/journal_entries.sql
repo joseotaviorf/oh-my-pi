@@ -8,6 +8,8 @@ SELECT
   uuid_u_rsd_uuid AS uuid_rsd,
   transaction_type_transtype AS transaction_type,
   memo,
+  number_number AS source_document_number,
+  series_series AS series,
   source_client_u_sourceclient AS source_client,
   updatedby_usersign2 AS updated_by,
   loctotal AS total_loc,

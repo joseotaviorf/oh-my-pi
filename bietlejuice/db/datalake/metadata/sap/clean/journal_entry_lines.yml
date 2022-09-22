@@ -20,6 +20,9 @@ columns:
   cost_center_code:
     lineage:
       - datalake_sap_raw.journal_entry_lines.cost_center_ocrcode2
+  contra_act:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.contraact_contraact
   location_profit_code:
     lineage:
       - datalake_sap_raw.journal_entry_lines.location_profitcode
@@ -29,6 +32,12 @@ columns:
   memo_line:
     lineage:
       - datalake_sap_raw.journal_entry_lines.memo_linememo
+  source_document_number:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.number_number
+  series:
+    lineage:
+      - datalake_sap_raw.journal_entry_lines.series_series
   account:
     lineage:
       - datalake_sap_raw.journal_entry_lines.account_account

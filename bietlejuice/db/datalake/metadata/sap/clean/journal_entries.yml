@@ -29,6 +29,12 @@ columns:
   memo:
     lineage:
       - datalake_sap_raw.journal_entries.memo
+  source_document_number:
+    lineage:
+      - datalake_sap_raw.journal_entries.number_number
+  series:
+    lineage:
+      - datalake_sap_raw.journal_entries.series_series
   source_client:
     lineage:
       - datalake_sap_raw.journal_entries.source_client_u_sourceclient

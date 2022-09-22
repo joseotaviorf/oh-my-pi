@@ -29,6 +29,12 @@ columns:
   memo:
     lineage:
       - datalake_sap_raw.incoming_payments.memo
+  source_document_number:
+    lineage:
+      - datalake_sap_raw.incoming_payments.number_number
+  series:
+    lineage:
+      - datalake_sap_raw.incoming_payments.series_series
   source_client:
     lineage:
       - datalake_sap_raw.incoming_payments.source_client_u_sourceclient

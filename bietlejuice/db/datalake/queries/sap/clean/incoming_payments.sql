@@ -8,6 +8,8 @@ SELECT
   uuid_u_oinv_uuid AS uuid,
   docentry AS document_entry,
   memo,
+  number_number AS source_document_number,
+  series_series AS series,
   source_client_u_sourceclient AS source_client,
   transaction_type_transtype AS transaction_type,
   updatedby_usersign2 AS updated_by,

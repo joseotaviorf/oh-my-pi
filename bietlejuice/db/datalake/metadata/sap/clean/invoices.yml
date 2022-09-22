@@ -11,9 +11,6 @@ columns:
   id_external_payment:
     lineage:
       - datalake_sap_raw.invoices.external_payment_id_u_externalpaymentid
-  id_financial_entity_legacy:
-    lineage:
-      - datalake_sap_raw.invoices.financial_entity_id_ref2
   id_financial_entity:
     lineage:
       - datalake_sap_raw.invoices.financial_entity_id_u_financeentityid
@@ -26,12 +23,21 @@ columns:
   legacy_uuid:
     lineage:
       - datalake_sap_raw.invoices.legacy_uuid_u_rsd_uuidsb
+  id_document:
+    lineage:
+      - datalake_sap_raw.invoices.document
   document_entry:
     lineage:
       - datalake_sap_raw.invoices.docentry
   memo:
     lineage:
       - datalake_sap_raw.invoices.memo
+  source_document_number:
+    lineage:
+      - datalake_sap_raw.invoices.number_number
+  series:
+    lineage:
+      - datalake_sap_raw.invoices.series_series
   source_client:
     lineage:
       - datalake_sap_raw.invoices.source_client_u_sourceclient

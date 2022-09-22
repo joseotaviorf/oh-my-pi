@@ -12,6 +12,12 @@ tables:
   incoming_payments:
     query_code: DATA-4
     schema_name: INCOMING_PAYMENTS
+  invoice_lines:
+    query_code: DATA-5
+    schema_name: INVOICE_LINES
+  incoming_payments_lines:
+    query_code: DATA-6
+    schema_name: INCOMING_PAYMENTS_LINES
 partition_cols:
   - year
   - month
