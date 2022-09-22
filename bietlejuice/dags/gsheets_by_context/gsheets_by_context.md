@@ -1,8 +1,8 @@
-## GSHEETS BEDROCK
+## GSHEETS {dag_context}
 
 ### Purpose
 
-This DAG extracts data from Google Sheets files for Bedrock Context.
+This DAG extracts data from Google Sheets files for {dag_context} Context.
 
 If you need information to understand how you can add your sheet, check our [Google Sheets Guide](https://www.notion.so/productquintoandar/Google-Sheets-0c11b1f13b7349918f91c0dec2b7e8f1).
 
@@ -11,7 +11,7 @@ If you need information to understand how you can add your sheet, check our [Goo
 
 ### Execution Interval
 
-This DAG is trigged daily.
+This DAG is {trigger_interval} triggered.
 
 More information about run time [here]({chart_url}{dag_id}).
 
@@ -20,14 +20,14 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
-
-   - `basic_access`
-   - `people_hierarchy`
-   - `people_data`
+  {raw_tables}
 
 2. Data lake clean:
-   - `people_basic_access`
-   - `people_employees`
-   - `people_hierarchy`
+  {clean_tables}
 
+### Responsible Data Team
+​
+For any questions or concerns about this DAG, please contact its owner.
+
+{additional_information}
 </details>

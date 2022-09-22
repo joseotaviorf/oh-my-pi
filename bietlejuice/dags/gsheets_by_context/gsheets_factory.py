@@ -88,6 +88,47 @@ class GsheetsDAGFactory:
         """
         return self.config_service.get_config(cluster_name)
 
+    def __get_dag_doc_md(self, google_files, dag_context, dag_id, dag_doc_details):
+        """
+        Format the markdown document for the specified context.
+        @param google_files: the dict_items with the general information of the
+        context sheets.
+        @param dag_context: a str with the name of the context/DAG.
+        @param dag_id: a str with the id of the context/DAG.
+        @param dag_doc_details: a dictionary with documentary details about the DAG.
+        @return: string.
+        """
+
+        trigger_interval = (
+            dag_doc_details.get("trigger_interval") if dag_doc_details else None
+        )
+        additional_information = (
+            dag_doc_details.get("additional_information") if dag_doc_details else None
+        )
+
+        doc_md = BaseDAG.get_dag_doc(self.source_with_context)
+
+        raw_tables = list(map(self.__get_table_name, google_files))
+        clean_tables = list(
+            map(
+                lambda google_file: self.__get_table_name(google_file, layer="clean"),
+                google_files,
+            )
+        )
+        return doc_md.format(
+            dag_context=dag_context.upper().replace("_", " "),
+            raw_tables="".join(raw_tables),
+            clean_tables="".join(clean_tables),
+            chart_url=self.doc_md_chart_url,
+            dag_id=dag_id,
+            trigger_interval=trigger_interval if trigger_interval else "daily",
+            additional_information=(
+                f"\n\n### Additional Information\n\n{additional_information}"
+                if additional_information
+                else ""
+            ),
+        )
+
     @staticmethod
     def __filtering_gsheets_from_context(google_file, dag_context):
         """
@@ -100,6 +141,22 @@ class GsheetsDAGFactory:
         sheet_details = list(google_file)[1]
         if sheet_details["sheet_context"] == dag_context:
             return google_file
+
+    @staticmethod
+    def __get_table_name(google_file, layer="raw"):
+        """
+        Get the raw/clean table name from the specified gsheets file.
+        @param google_file: a dict_items with the general information of the sheets.
+        @param layer: raw/clean. Defines the layer from which you want to get
+        the name of the table.
+        @return: string
+        """
+        if layer == "raw":
+            table_name = google_file[0]
+        else:
+            table_name = google_file[1]["clean_table_name"]
+
+        return f"    - `{table_name}` \n"
 
     @staticmethod
     def __create_raw_tasks(
@@ -160,6 +217,15 @@ class GsheetsDAGFactory:
             dag_details.get("cluster_name", "databricks_10_4_min_general_cluster")
         )
 
+        google_files_context = list(
+            filter(
+                lambda google_file: self.__filtering_gsheets_from_context(
+                    google_file, dag_context
+                ),
+                self.GOOGLE_FILES.items(),
+            )
+        )
+
         dag = DAG(
             dag_id=dag_id,
             default_args={
@@ -169,8 +235,8 @@ class GsheetsDAGFactory:
             },
             start_date=self.MAIN_START_DATE,
             schedule_interval=main_schedule_interval,
-            doc_md=BaseDAG.get_dag_doc(f"gsheets_by_context/{dag_context}").format(
-                chart_url=self.doc_md_chart_url, dag_id=dag_id
+            doc_md=self.__get_dag_doc_md(
+                google_files_context, dag_context, dag_id, dag_details.get("dag_doc")
             ),
         )
 
@@ -189,15 +255,6 @@ class GsheetsDAGFactory:
             relative_query_path=self.source,
             spark_jobs_path=self.base_spark_jobs_path,
             athena_query_result_location=self.athena_query_results_bucket,
-        )
-
-        google_files_context = list(
-            filter(
-                lambda google_file: self.__filtering_gsheets_from_context(
-                    google_file, dag_context
-                ),
-                self.GOOGLE_FILES.items(),
-            )
         )
 
         raw_task_groups, create_cluster_task = self.__create_raw_tasks(

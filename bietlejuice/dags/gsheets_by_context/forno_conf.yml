@@ -4,6 +4,9 @@
 #   <dag_name>:
 #     main_schedule_interval: <main_schedule_interval>
 #     dag_owner: <dag_owner>
+#     dag_doc: #optional. These fields refer only to the documentation, not interfering with the behavior of the DAG.
+#       trigger_interval: <trigger_interval>
+#       additional_information: <additional_information>
 dags:
   support_and_service:
     main_schedule_interval: 0 0 * * *
@@ -31,6 +34,9 @@ dags:
     cluster_name: databricks_10_4_med_general_cluster
   static:
     dag_owner: Data Engineering
+    dag_doc:
+      trigger_interval: not automatically
+      additional_information: This DAG must be manually activated as needed to reprocess your data.
   general:
     main_schedule_interval: 0 0 * * *
     dag_owner: Data Engineering
