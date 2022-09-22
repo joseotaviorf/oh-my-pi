@@ -40,6 +40,7 @@ SELECT
     aeh.id_agency,
     aeh.id_enrollment,
     GET_JSON_OBJECT(h.details, '$.houseExternalId') AS id_house,
+    pa.id_partner,
     aeh.rev,
     p.name AS consultant_type,
     aeh.is_last_status_of_day,
@@ -56,3 +57,9 @@ JOIN
 JOIN
     datalake_big_agent.program AS p
         ON e.id_program = p.id
+JOIN
+    datalake_big_agent.agent AS ag
+        ON e.id_agent = ag.id
+JOIN
+    datalake_ebdb_clean.partner_agent AS pa
+       ON GET_JSON_OBJECT(ag.details, '$.userExternalId') = pa.id_user

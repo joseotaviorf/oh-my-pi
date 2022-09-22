@@ -40,6 +40,7 @@ last_ciq_of_day AS (
     */
     SELECT /*+ RANGE_JOIN(hch, 340) */
         id_house,
+        id_partner,
         consultant_type,
         MAX(rev) OVER(PARTITION BY id_house, dbase.dt_day) = rev AS is_last_status_house_of_day,
         dbase.dt_day,
@@ -63,6 +64,7 @@ listings_states_per_day AS (
         hl.id_contract,
         heh.id_occupant,
         hbh.id_partner,
+        lcod.id_partner AS id_partner_big_agent,
         h.id_region,
         lcod.consultant_type,
         heh.doorman_type,
@@ -150,6 +152,7 @@ SELECT
     id_contract,
     id_occupant,
     id_partner,
+    id_partner_big_agent,
     id_region,
     consultant_type,
     doorman_type,

@@ -11,6 +11,9 @@ columns:
   id_house:
     lineage:
       - datalake_big_agent.house.details
+  id_partner:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_partner
   rev:
     lineage:
       - datalake_big_agent_clean.agency_aud.rev
