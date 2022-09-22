@@ -12,6 +12,7 @@ SELECT
     msu.ts_created AS ts_operation_created,
     msu.ts_delivered AS ts_operation_delivered,
     msd.ts_delivered AS ts_document_delivered,
+    cc.ts_run_deleted AS ts_crawler_run_deleted,
     cc.ts_run_start AS ts_crawler_run_start,
     cc.ts_run_end AS ts_crawler_run_end
 FROM

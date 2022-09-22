@@ -22,6 +22,7 @@ In datalake raw and clean, via full load:
 - `meuSite_analysisqueue`
 - `meuSite_city`
 - `meuSite_document`
+- `meuSite_notary`
 - `meuSite_operation`
 - `meuSite_project`
 - `meuSite_state`

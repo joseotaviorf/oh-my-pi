@@ -41,6 +41,9 @@ columns:
   ts_document_delivered:
     lineage:
       - datalake_legaut_clean.meusite_document.ts_delivered
+  ts_crawler_run_deleted:
+    lineage:
+      - datalake_legaut_clean.crawlers_crawler.ts_run_deleted
   ts_crawler_run_start:
     lineage:
       - datalake_legaut_clean.crawlers_crawler.ts_run_start

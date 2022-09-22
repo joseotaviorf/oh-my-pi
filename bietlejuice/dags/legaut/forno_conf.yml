@@ -14,6 +14,8 @@ tables:
     extraction_type: full
   - table_name: meuSite_document
     extraction_type: full
+  - table_name: meuSite_notary
+    extraction_type: full
   - table_name: meuSite_operation
     extraction_type: full
   - table_name: meuSite_project

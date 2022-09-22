@@ -17,12 +17,21 @@ columns:
   id_document:
     lineage:
       - datalake_legaut_raw.crawlers_crawler.document_id
+  error_code:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.error_code
+  manual_reason:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.manual_reason
   storages_path:
     lineage:
       - datalake_legaut_raw.crawlers_crawler.storages_path
   status:
     lineage:
       - datalake_legaut_raw.crawlers_crawler.status
+  rerun_tries:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.rerun_tries
   type:
     lineage:
       - datalake_legaut_raw.crawlers_crawler.type
@@ -32,6 +41,9 @@ columns:
   ts_run_start:
     lineage:
       - datalake_legaut_raw.crawlers_crawler.run_start
+  ts_run_deleted:
+    lineage:
+      - datalake_legaut_raw.crawlers_crawler.deleted
   ts_run_end:
     lineage:
       - datalake_legaut_raw.crawlers_crawler.run_end
