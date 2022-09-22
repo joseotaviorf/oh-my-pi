@@ -62,6 +62,7 @@ ticket_tasks AS (
         )
       ) AS id_taxonomy,
       MD5(e.department) AS id_main_department,
+      MAX(e.id_user) AS id_user,
       MD5(MAX(e.tags)) AS id_tags,
       MAX(e.tags) AS tags,
       e.department,
@@ -70,11 +71,13 @@ ticket_tasks AS (
       e.is_solved,
       e.contact_theme_detail_tag,
       e.contact_theme_tag,
+      e.ts_ticket_started AS ts_zendesk_started,
+      CAST(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ') AS TIMESTAMP) AS ts_budget,
       CASE
         WHEN
           DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) IS NOT NULL
           AND DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) >= e.ts_ticket_started
-          AND DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) < ts_ticket_solved
+          AND DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) < COALESCE(ts_ticket_solved, NOW())
         THEN CAST(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ') AS TIMESTAMP)
         ELSE e.ts_ticket_started
       END AS ts_started,
@@ -86,7 +89,7 @@ ticket_tasks AS (
     LEFT JOIN
       datalake_zendesk_ticket_funnels.ticket_funnel AS tf
         ON e.id_ticket = tf.id_ticket
-    GROUP BY 1,2,3,4,7,8,9,10,11,12,13,14,15,16
+    GROUP BY 1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19
   ),
   unique_theme_detail_sla_target AS (
     SELECT DISTINCT
@@ -142,6 +145,7 @@ ticket_tasks AS (
   SELECT DISTINCT
     t.id_ticket AS id_task,
     COALESCE(t.id_agent, '-1') AS id_agent,
+    t.id_user,
     t.id_taxonomy,
     t.id_tags,
     t.id_main_department,
@@ -153,6 +157,8 @@ ticket_tasks AS (
       WHEN t.department IN ('Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]') THEN 21
       ELSE COALESCE(tds.sla_in_days,ts.sla_in_days, ujst.sla_in_days, tst.sla)
     END AS sla_target,
+    t.ts_zendesk_started,
+    t.ts_budget,
     t.ts_started,
     t.ts_completed,
     t.ts_closed,
@@ -200,6 +206,7 @@ ticket_tasks AS (
 SELECT
   id_task,
   id_agent,
+  NULL AS id_user,
   NULL AS id_taxonomy,
   NULL AS id_tags,
   MD5(type) AS id_main_department,
@@ -209,6 +216,8 @@ SELECT
   NULL AS status,
   NULL AS csat_score,
   NULL AS is_solved,
+  NULL AS ts_zendesk_started,
+  NULL AS ts_budget,
   ts_started,
   ts_completed,
   ts_completed AS ts_closed,
@@ -219,6 +228,7 @@ UNION ALL
 SELECT
   id_task,
   id_agent,
+  id_user,
   id_taxonomy,
   id_tags,
   id_main_department,
@@ -228,6 +238,8 @@ SELECT
   status,
   csat_score,
   is_solved,
+  ts_zendesk_started,
+  ts_budget,
   ts_started,
   ts_completed,
   ts_closed,

@@ -10,6 +10,9 @@ columns:
     lineage:
       - datalake_gsheets_clean.agents_control.id_assignee
       - datalake_customer_support.email.id_agent
+  id_user:
+    lineage:
+      - datalake_customer_support.email.id_user
   id_taxonomy:
     lineage:
       - datalake_customer_support.email.step_tag
@@ -43,6 +46,12 @@ columns:
   is_solved:
     lineage:
       - datalake_customer_support.email.is_solved
+  ts_zendesk_started:
+    lineage:
+      - datalake_customer_support.email.ts_ticket_started
+  ts_budget:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
   ts_started:
     lineage:
       - datalake_customer_support.email.ts_ticket_started

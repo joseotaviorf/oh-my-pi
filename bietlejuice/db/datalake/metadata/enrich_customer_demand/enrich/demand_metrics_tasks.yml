@@ -8,6 +8,9 @@ columns:
   id_agent:
     lineage:
       - datalake_customer_demand.base_tasks.id_agent
+  id_user:
+    lineage:
+      - datalake_customer_demand.base_tasks.id_user
   id_taxonomy:
     lineage:
       - datalake_customer_demand.base_tasks.id_taxonomy
@@ -35,6 +38,12 @@ columns:
   ts_completed:
     lineage:
       - datalake_customer_demand.base_tasks.ts_completed
+  ts_zendesk_started:
+    lineage:
+      - datalake_customer_demand.base_tasks.ts_zendesk_started
+  ts_budget:
+    lineage:
+      - datalake_customer_demand.base_tasks.ts_budget
   ts_closed:
     lineage:
       - datalake_customer_demand.base_tasks.ts_closed

@@ -2,14 +2,14 @@ WITH weekends_and_holidays AS (
   SELECT
     ad.date AS dt_non_working
   FROM
-    datalake_quintoandar.aux_date ad
+    datalake_quintoandar.aux_date AS ad
   WHERE
     ad.weekend = 'Weekend'
   UNION
   SELECT
     sch.dt_holiday AS dt_non_working
   FROM
-    datalake_gsheets_clean.service_city_holidays sch
+    datalake_gsheets_clean.service_city_holidays AS sch
   WHERE
     sch.category = 'Nacional'
 ),
@@ -30,9 +30,9 @@ days_off AS (
     id_task,
     COUNT(1) AS days_off
   FROM
-    task_days_until_solved tdus
-  JOIN
-    weekends_and_holidays nw
+    task_days_until_solved AS tdus
+  INNER JOIN
+    weekends_and_holidays AS nw
       ON DATE(tdus.ts_interval) = nw.dt_non_working
   GROUP BY 1
 ),
@@ -40,6 +40,7 @@ task_info AS (
   SELECT
     bt.id_task,
     bt.id_agent,
+    bt.id_user,
     bt.id_taxonomy,
     bt.id_tags,
     bt.id_main_department,
@@ -51,16 +52,19 @@ task_info AS (
     DATEDIFF(DATE(ts_completed), DATE(ts_started)) - COALESCE(do.days_off, 0) AS days_worked,
     bt.ts_completed,
     bt.ts_started,
+    bt.ts_zendesk_started,
+    bt.ts_budget,
     bt.ts_closed
   FROM
     datalake_customer_demand.base_tasks AS bt
   LEFT JOIN
-    days_off do
+    days_off AS do
       ON bt.id_task = do.id_task
 )
 SELECT
   ti.id_task,
   ti.id_agent,
+  ti.id_user,
   ti.id_taxonomy,
   ti.id_tags,
   ti.id_main_department,
@@ -76,8 +80,8 @@ SELECT
     WHEN IF(ti.days_worked < 0, 0, ti.days_worked) > sla_target THEN IF(ti.days_worked < 0, 0, ti.days_worked)
     ELSE 0
   END AS time_spent_not_solved_in_time,
-  ti.days_worked,
-  ti.days_off,
+  IF(ti.days_worked < 0, 0, ti.days_worked) AS days_worked,
+  IF(ti.days_off < 0, 0, ti.days_off) AS days_off,
   IF(ti.days_worked < 0, 0, ti.days_worked) AS total_time_spent,
   CASE
     WHEN IF(ti.days_worked < 0, 0, ti.days_worked) <= sla_target THEN TRUE
@@ -102,6 +106,8 @@ SELECT
   END AS is_closed_demand,
   ti.ts_started,
   ti.ts_completed,
+  ti.ts_zendesk_started,
+  ti.ts_budget,
   ti.ts_closed
 FROM
   task_info AS ti

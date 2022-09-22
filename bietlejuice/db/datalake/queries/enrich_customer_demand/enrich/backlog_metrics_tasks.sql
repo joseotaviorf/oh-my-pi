@@ -17,6 +17,7 @@ exploded_backlog AS (
     SELECT
         id_task,
         id_agent,
+        id_user,
         id_taxonomy,
         id_tags,
         id_main_department,
@@ -32,6 +33,8 @@ exploded_backlog AS (
         ) AS dt_interval,
         DATE(ts_completed) AS dt_final,
         ts_started,
+        ts_zendesk_started,
+        ts_budget,
         ts_completed
     FROM
         datalake_customer_demand.base_tasks
@@ -51,6 +54,7 @@ days_off AS (
 SELECT
   eb.id_task,
   eb.id_agent,
+  eb.id_user,
   eb.id_taxonomy,
   eb.id_tags,
   eb.id_main_department,
@@ -72,6 +76,8 @@ SELECT
   END AS is_backlog_not_in_time,
   eb.ts_started,
   eb.ts_completed,
+  eb.ts_zendesk_started,
+  eb.ts_budget,
   eb.dt_interval AS dt_metric_reference,
   YEAR(eb.dt_interval) AS year,
   MONTH(eb.dt_interval) AS month,
