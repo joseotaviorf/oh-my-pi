@@ -18,6 +18,7 @@ We incrementally load the following table into the Datalake Reverse bucket, for 
 
 - `general_metric`
 - `backlog_metric`
+- `demand_metric`
 - `fcr_metric`
 
 This pipeline also exports results do atento bucket (`s3://atento-s3-data-quintoandar-com-br`).
