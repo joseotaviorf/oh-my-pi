@@ -5,7 +5,7 @@ WITH aud_ts AS (
     aud.is_active,
     LAG(aud.id_account_manager) OVER (PARTITION BY aud.id_user ORDER BY aud.rev) AS previous_account_manager,
     LAG(aud.is_active) OVER (PARTITION BY aud.id_user ORDER BY aud.rev) AS previous_status,
-    FROM_UNIXTIME(ure.ts_revision/1000) AS ts_event
+    TIMESTAMP(FROM_UNIXTIME(ure.ts_revision/1000)) AS ts_event
   FROM 
     datalake_ebdb_clean.user_pro_owner_aud AS aud
   LEFT JOIN 
