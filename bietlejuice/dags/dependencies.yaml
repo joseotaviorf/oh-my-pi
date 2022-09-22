@@ -2066,7 +2066,6 @@ bietlejuice.enrich_sale_visit_hubs:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-activations-suspensions-contracts-changes
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.gsheets.for_sale:load-clean-business-unit-region
 
