@@ -2,9 +2,7 @@ from hierarchical_conf.hierarchical_conf import HierarchicalConf
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice import BIETLEJUICE_PROJECT_ROOT
-from bietlejuice.base.airflow.dag_packages.dag_packages_path_service import (
-    DAGPackagesPathService,
-)
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
 logger = QuintoAndarLogger("ConfigurationService")
 

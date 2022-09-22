@@ -2,27 +2,27 @@ import mock
 import pytest
 
 from bietlejuice import BIETLEJUICE_PROJECT_ROOT
-from bietlejuice.base.airflow.dag_packages.dag_packages_path_service import (
+from bietlejuice.base.service.dag_packages_path_service import (
     DAGPackagesPathService,
+    DuplicateDAGException,
 )
-from bietlejuice.base.airflow.exceptions.exceptions import DuplicateDAGException
 
 
 class TestDAGPackagesPathService:
-    @mock.patch("bietlejuice.base.airflow.dag_packages.dag_packages_path_service.glob")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.glob")
     def test_get_dag_package_path(self, mock_glob, dag_package_service):
         # arrange
         dag_name = "my_dag"
         mock_glob.return_value = ["/the/dag/path/my_dag"]
-        expected_value = "/the/dag/path"
+        expected_value = "/the/dag/path/my_dag"
 
         # act
-        returned_value = dag_package_service.get_dag_package_path(dag_name)
+        returned_value = dag_package_service._get_dag_package_path(dag_name)
 
         # assert
         assert returned_value == expected_value
 
-    @mock.patch("bietlejuice.base.airflow.dag_packages.dag_packages_path_service.glob")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.glob")
     def test_get_dag_package_path_for_non_migrated_ones(
         self, mock_glob, dag_package_service
     ):
@@ -32,12 +32,12 @@ class TestDAGPackagesPathService:
         expected_value = None
 
         # act
-        returned_value = dag_package_service.get_dag_package_path(dag_name)
+        returned_value = dag_package_service._get_dag_package_path(dag_name)
 
         # assert
         assert returned_value == expected_value
 
-    @mock.patch("bietlejuice.base.airflow.dag_packages.dag_packages_path_service.glob")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.glob")
     def test_get_dag_package_path_for_dup_dag(self, mock_glob, dag_package_service):
         # arrange
         dag_name = "my_dag"
@@ -45,7 +45,7 @@ class TestDAGPackagesPathService:
 
         # act & assert
         with pytest.raises(DuplicateDAGException) as e:
-            dag_package_service.get_dag_package_path(dag_name)
+            dag_package_service._get_dag_package_path(dag_name)
 
         assert (
             str(e.value)
@@ -59,7 +59,7 @@ class TestDAGPackagesPathService:
             ("dag2", True, "new/path/mocked"),
         ],
     )
-    @mock.patch.object(DAGPackagesPathService, "get_dag_package_path")
+    @mock.patch.object(DAGPackagesPathService, "_get_dag_package_path")
     def test_get_dag_parent_path(
         self,
         mock_get_dag_package_path,
@@ -70,11 +70,41 @@ class TestDAGPackagesPathService:
     ):
         # arrange
         if is_migrated_mock:
-            mock_get_dag_package_path.return_value = "new/path/mocked"
+            mock_get_dag_package_path.return_value = f"new/path/mocked/{dag_name}"
         else:
             mock_get_dag_package_path.return_value = False
         # act
         returned_value = dag_package_service.get_dag_parent_path(dag_name)
+
+        # assert
+        assert returned_value == expected_return
+
+    @pytest.mark.parametrize(
+        "dag_name, dag_path, expected_return",
+        [
+            ("dag1", None, f"{BIETLEJUICE_PROJECT_ROOT}/dags/dag1"),
+            ("dag2", "new/path/mocked", "new/path/mocked"),
+        ],
+    )
+    @mock.patch.object(DAGPackagesPathService, "_get_dag_package_path")
+    def test_get_dag_path(
+        self,
+        mock_get_dag_package_path,
+        dag_name,
+        dag_path,
+        expected_return,
+        dag_package_service,
+    ):
+        # arrange
+        if dag_path is None:
+            mock_get_dag_package_path.return_value = (
+                f"{BIETLEJUICE_PROJECT_ROOT}/dags/{dag_name}"
+            )
+        else:
+            mock_get_dag_package_path.return_value = dag_path
+
+        # act
+        returned_value = dag_package_service.get_dag_path(dag_name)
 
         # assert
         assert returned_value == expected_return

@@ -2,9 +2,7 @@ from unittest import mock
 
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
 
-from bietlejuice.base.airflow.dag_packages.dag_packages_path_service import (
-    DAGPackagesPathService,
-)
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.configuration_service import ConfigurationService
 
 

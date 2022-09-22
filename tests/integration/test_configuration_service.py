@@ -2,7 +2,7 @@ import os
 from os.path import dirname
 from unittest import mock
 
-from bietlejuice.base.airflow.dag_packages.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services import ConfigurationService
 
 

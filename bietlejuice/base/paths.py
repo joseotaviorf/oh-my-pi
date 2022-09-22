@@ -1,6 +1,6 @@
 import os
 
-
+# TODO: create a constant inside db package and use here instead of the definition `../db`
 DB_SQL_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../db")
 
 DATALAKE_METADATA_PATH = f"{DB_SQL_PATH}/datalake/metadata"
