@@ -16,6 +16,7 @@ from bietlejuice.base.paths import (
     QUERIES_DATALAKE_PATH,
 )
 from bietlejuice.dags import COMPOSER_DAGS_PATH
+from dags import DAG_PACKAGES_ROOT
 
 logger = QuintoAndarLogger("FileService")
 
@@ -352,17 +353,22 @@ class FileService:
     def list_dag_files() -> List[str]:
         """
         List all composer dag file paths.
+
         :return: a list of dag file paths
             e.g.
             - '/Users/my-user/bi-etl-ejuice/bietlejuice/dags/source/dag_file.py'
             - '/Users/my-user/bi-etl-ejuice/bietlejuice/dags/source/context/dag_file.py'
         :rtype: List[str]
         """
-        all_files = glob.glob(f"{COMPOSER_DAGS_PATH}/**/*.py", recursive=True)
+        all_legacy_files = glob.glob(f"{COMPOSER_DAGS_PATH}/**/*.py", recursive=True)
+        all_dag_packages_files = glob.glob(
+            f"{DAG_PACKAGES_ROOT}/**/*.py", recursive=True
+        )
+        all_files = all_legacy_files + all_dag_packages_files
+
         filtered_files = []
         for file in all_files:
-            split = file.split("/")
-            if "spark_jobs" in split or "__init__.py" in split:
+            if "spark_jobs" in file or "__init__.py" in file:
                 continue
             filtered_files.append(file)
         return filtered_files

@@ -1,11 +1,19 @@
 import argparse
+import os
 import re
+import sys
 
 from quintoandar_logger import QuintoAndarLogger
 
+from dags import DAG_PACKAGES_ROOT
+
+BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BI_ETL_EJUICE_ROOT)
+
 from bietlejuice.base import QUERIES_DATALAKE_PATH
-from bietlejuice.services import FileService, ConfigurationService
 from bietlejuice.services.git_service import GitService
+from bietlejuice.services.file_service import FileService
+from bietlejuice.services.configuration_service import ConfigurationService
 
 logger = QuintoAndarLogger("validate_metadata_files_exist")
 
@@ -47,16 +55,26 @@ DAGS_OUT_OF_PATTERN = {"ebdb", "amplitude"}
 #   '/Users/root/bi-etl-ejuice/bietlejuice/base/../db/datalake/queries/dag_name/layer/table_name.sql'
 #   '/Users/root/bi-etl-ejuice/bietlejuice/db/datalake/queries/dag_name/layer/table_name.sql'
 # would both have 'dag_name/layer/table_name.sql' in the first capture group
-RELATIVE_QUERY_PATH_REGEX = re.compile(
+LEGACY_RELATIVE_QUERY_PATH_REGEX = re.compile(
     rf"bietlejuice(?:/base/\.\.)?/db/datalake/queries/(.*\.sql)"
+)
+DAG_PACKAGES_RELATIVE_QUERY_PATH_REGEX = re.compile(
+    rf"dags\/(.*)\/(.*)\/queries\/(.*)\/(.*)\.sql"
 )
 
 
 def get_all_query_files():
-    return {
+    # legacy files
+    all_files = {
         file: "M"
-        for file in FileService.list_all_files_recursively(QUERIES_DATALAKE_PATH)
+        for file in FileService.list_all_files_recursively(QUERIES_DATALAKE_PATH, 'sql')
     }
+    # dag_packages
+    all_files.update({
+        file: "M"
+        for file in FileService.list_all_files_recursively(DAG_PACKAGES_ROOT, 'sql')
+    })
+    return all_files
 
 
 def get_files_from_diff(branch):
@@ -70,9 +88,18 @@ def get_files_from_diff(branch):
 
 
 def extract_relative_query_path(file_path):
-    search_res = re.search(RELATIVE_QUERY_PATH_REGEX, file_path)
+    search_res = re.search(LEGACY_RELATIVE_QUERY_PATH_REGEX, file_path)
+    dag_packages_search_res = re.search(DAG_PACKAGES_RELATIVE_QUERY_PATH_REGEX, file_path)
+
+    # legacy
     if search_res:
         return search_res.group(1)
+    elif dag_packages_search_res:
+        dag_name = dag_packages_search_res.group(2)
+        layer = dag_packages_search_res.group(3)
+        table_name = dag_packages_search_res.group(4)
+
+        return f"{dag_name}/{layer}/{table_name}.sql"
     else:
         return None
 

@@ -9,10 +9,11 @@ from bietlejuice.services.git_service import GitService
 logger = QuintoAndarLogger("validate_datamarts_metadata_files_exist")
 
 DATAMARTS_DAG_REGEX = re.compile(
-    r"/dags/dw_datamarts/(?P<context>\w+)/(?P<dagname>\W+)\.py"
+    r"\/dags\/dw_datamarts\/(?P<context>\w+)\/(?P<dagname>\w+)\.py"
 )
+
 DATAMARTS_YAML_REGEX = re.compile(
-    r"/dags/dw_datamarts/(?P<context>\w+)/(?P<dagname>\w+)_(:?forno|prod)_conf\.(:?yml|yaml)"
+    r"\/dags\/dw_datamarts\/(?P<context>\w+)\/(:?forno|prod)_conf\.(:?yml|yaml)"
 )
 
 # These datamarts were created without lineage due to the
@@ -145,11 +146,12 @@ SKIP_LIST = {
 
 
 def get_all_datamarts_files():
-    return {
+    all_files = {
         file: "M"
         for file in FileService.list_dag_files()
         if re.search(DATAMARTS_DAG_REGEX, file)
     }
+    return all_files
 
 
 def get_files_from_diff(branch):
@@ -171,6 +173,22 @@ def table_in_skip_list(intermediate_path, table_name):
     except KeyError:
         return False
 
+
+def get_info(file_path):
+    match_dag = re.search(DATAMARTS_DAG_REGEX, file_path)
+    match_yaml = re.search(DATAMARTS_YAML_REGEX, file_path)
+
+    if match_dag:
+        match_dict = match_dag.groupdict()
+        dag_name = match_dict.get("dagname")
+    elif match_yaml:
+        match_dict = match_yaml.groupdict()
+        dag_name = "dw_datamarts/" + match_dict.get("context")
+    else:
+        return ()
+
+    context = match_dict.get("context")
+    return context, dag_name
 
 def main():
     parser = argparse.ArgumentParser()
@@ -198,19 +216,14 @@ def main():
             logger.debug(f"file={file} msg=Skipping deleted file")
             continue
 
-        match_dag = re.search(DATAMARTS_DAG_REGEX, file)
-        match_yaml = re.search(DATAMARTS_YAML_REGEX, file)
-
-        if match_dag:
-            match_dict = match_dag.groupdict()
-        elif match_yaml:
-            match_dict = match_yaml.groupdict()
-        else:
+        info = get_info(file)
+        if not info:
             # skipping non-matched file
             continue
+        else:
+            context = info[0]
+            dag_name = info[1]
 
-        context = match_dict.get("context")
-        dag_name = match_dict.get("dagname")
         if context and dag_name:
             dag_intermediate_path = f"dw_datamarts/{context}"
             lineage_intermediate_path = f"dw_datamarts_{context}"

@@ -66,10 +66,20 @@ def main():
     s3 = boto3.client("s3")
 
     for extension in ("*.yml", "*.yaml"):
-        files = glob.glob(
+        # Get non-migrated metadata files
+        files_legacy = glob.glob(
             f"{ABS_PATH}/../bietlejuice/db/datalake/metadata/**/{extension}",
             recursive=True,
         )
+
+        # Get DAG Packages metadata files
+        files_dags_packages = glob.glob(
+            f"{ABS_PATH}/../dags/**/metadata/**/{extension}",
+            # TODO: get all metadata files from the DAG packages instead
+            recursive=True,
+        )
+
+        files = files_legacy + files_dags_packages
         if files:
             for file_path in files:
                 remote_path = get_remote_path_from_yml_file(file_path)
