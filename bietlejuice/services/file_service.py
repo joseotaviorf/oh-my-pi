@@ -9,6 +9,7 @@ from typing import Generator, List, Tuple
 import yaml
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.paths import (
     DATA_QUALITY_TESTS_PATH,
     DATALAKE_METADATA_PATH,
@@ -160,12 +161,41 @@ class FileService:
         return file_name[:ext_pos]
 
     @staticmethod
+    def get_all_dag_metadata_files(dag_name: str) -> List:
+        # TODO: this method and the other metadata methods in this class with rules out
+        #  of the FileServices context must be replaced to another place like some Metadata Service
+        dag_path = DAGPackagesPathService.get_dag_path(dag_name)
+        path = f"{dag_path}/metadata/**/*.*"
+        files_found = glob.glob(path, recursive=True)
+
+        if not files_found:
+            path = f"{DATALAKE_METADATA_PATH}/{dag_name}"
+            files_found = glob.glob(path, recursive=True)
+
+        return files_found
+
+    @staticmethod
+    def get_dag_metadata_file(dag_name: str, layer: str, table_name: str) -> List:
+        # TODO: this method and the other metadata methods in this class with rules out
+        #  of the FileServices context must be replaced to another place like some Metadata Service
+        dag_path = DAGPackagesPathService.get_dag_path(dag_name)
+        path = f"{dag_path}/metadata/{layer}/{table_name}.*"
+        files_found = glob.glob(path, recursive=True)
+
+        if not files_found:
+            path = f"{DATALAKE_METADATA_PATH}/{dag_name}/{layer}/**/{table_name}.*"
+            files_found = glob.glob(path, recursive=True)
+
+        return files_found
+
+    @staticmethod
     def metadata_file_exists(
         relative_file_path: str, layer: str, table_name, check_all_tables=False
     ) -> bool:
         """
         Checks if a metadata file for a given table exists. If check_all_tables is True,
         checks if at least the folder for the relative_file_path and layer exists.
+
         :param relative_file_path: The relative path to the file.
             This should be the same as the relative_query_path used in other tasks
             e.g:
@@ -175,20 +205,18 @@ class FileService:
         :param check_all_tables: if all tables are being checked or not
         :return: True if the file exists, False if no file is found
         """
+        # TODO: this method and the other metadata methods in this class with rules out
+        #  of the FileServices context must be replaced to another place like some Metadata Service
         if check_all_tables:
-            folder = glob.glob(f"{DATALAKE_METADATA_PATH}/{relative_file_path}/{layer}")
-            if folder:
-                return True
-            return False
-        else:
-            for extension in ("yml", "yaml"):
-                files = glob.glob(
-                    f"{DATALAKE_METADATA_PATH}/{relative_file_path}/{layer}/**/{table_name}.{extension}",
-                    recursive=True,
-                )
-                if files and files[0]:
-                    return True
-            return False
+            return bool(
+                FileService.get_all_dag_metadata_files(dag_name=relative_file_path)
+            )
+
+        return bool(
+            FileService.get_dag_metadata_file(
+                dag_name=relative_file_path, layer=layer, table_name=table_name
+            )
+        )
 
     @staticmethod
     def list_metadata_files() -> Generator[str, None, None]:
