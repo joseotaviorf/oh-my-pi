@@ -185,7 +185,7 @@ SELECT
     END AS execution_status,
     CASE
         WHEN t.repair_front = 'reparos_ongoing_novo'
-            AND t.group_name = 'Prestadores Parceiros [REP] [POS] [BACK]'
+            AND t.group_name = 'Prestadores Parceiros [SO]'
             THEN 'reparos_ongoing'
         ELSE NULL
     END AS repair_form,
