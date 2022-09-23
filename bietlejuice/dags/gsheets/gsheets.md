@@ -95,7 +95,6 @@ This pipeline produces the following output tables:
     - `promotional_bonus_user_cluster_targets`
     - `promotional_bonus_user_targets`
     - `provisioned_costs_import`
-    - `refund_after_termination_csat`
     - `rent_criteo_eng_ab_test`
     - `rental_cohort_supply`
     - `rental_flows_targets`
