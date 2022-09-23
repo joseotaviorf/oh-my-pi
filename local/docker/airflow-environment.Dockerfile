@@ -44,7 +44,8 @@ RUN python3 -m pip install -qq --upgrade pip && \
 COPY ./local/airflow ./airflow
 COPY ./local/docker/entrypoint.sh ./entrypoint.sh
 COPY ./bietlejuice ./bietlejuice
+COPY ./dags ./dags
 
-RUN mkdir /bi-etl-ejuice/local/airflow/plugins/ \
+RUN mkdir ./airflow/plugins \
     && cp -R ./airflow-plugins/quintoandar_airflow_plugins/* ./airflow/plugins \
     && rm -R ./airflow-plugins
