@@ -41,7 +41,7 @@ raw_spark_job_path = (
 )
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 
-cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
+cluster_description = config_service.get_config("custom_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {

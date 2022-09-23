@@ -1,2 +1,10 @@
 lineage_product_database_name: taskmaster
 partition_cols: ["year", "month", "day"]
+custom_cluster:
+  driver_node_type_id: m5a.xlarge
+  node_type_id: m5a.xlarge
+  autoscale:
+    max_workers: 3
+    min_workers: 1
+  spark_conf:
+    spark.sql.session.timeZone: "America/Sao_Paulo"
