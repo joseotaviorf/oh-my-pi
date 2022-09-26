@@ -1363,10 +1363,13 @@ bietlejuice.enrich_consolidated_marketing_metrics:
 
 bietlejuice.enrich_credit_analysis:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-offer-in-data-lake
   - bietlejuice.enrich_docx:load-enrich-credit-evaluation
+  - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
   - bietlejuice.rental_guarantee:load-clean-risk-category
   - bietlejuice.sorting_hat:load-clean-credit-analysis
+  - bietlejuice.sorting_hat:load-clean-early-credit-analysis
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat:load-clean-proposal-version

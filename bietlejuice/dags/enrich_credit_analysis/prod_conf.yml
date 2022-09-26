@@ -2,6 +2,7 @@
 tables:
   - table_name: credit_analysis
   - table_name: credit_analysis_proposals
+  - table_name: early_credit_analysis
 
 inner_dependencies:
   credit_analysis:

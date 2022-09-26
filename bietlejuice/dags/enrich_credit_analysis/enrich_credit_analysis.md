@@ -14,3 +14,4 @@ Produces the following output tables, via full load:
 
 - `credit_analysis`
 - `credit_analysis_proposals`
+- `early_credit_analysis`
