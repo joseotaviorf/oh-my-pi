@@ -1,0 +1,56 @@
+database_name: datalake_mexico_rent_supply_funnel
+table_name: mexico_rent_listing_flow
+columns:
+  id_lead:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_lead
+  id_house_listing:
+    lineage:
+      - datalake_rent_potential_listing.potential_listing_b2b.id_house_listing
+  id_region:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_region
+  country_code:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.country_code
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+  supply_mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_growth.mkt_origin
+  supply_mkt_origin_detailed:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_growth.mkt_channel
+      - datalake_gsheets_clean.taxonomy_growth.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_growth.mkt_channel
+  mexico_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_growth.mkt_origin
+  lead_origin:
+    lineage:
+      - datalake_lead.lead.source
+  ub_page_name:
+    lineage:
+      - datalake_lead.lead.unbounce_page_variant
+  advertiser_name:
+    lineage:
+      - datalake_lead.lead.advertiser_name
+  ts_lead:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_lead
+  ts_prospect:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_prospect
+  ts_qualified:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_qualified
+  ts_opportunity:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_opportunity
+  ts_first_listing:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_first_listing
+  

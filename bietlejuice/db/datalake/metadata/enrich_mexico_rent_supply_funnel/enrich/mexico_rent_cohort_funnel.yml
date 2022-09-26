@@ -1,0 +1,25 @@
+database_name: datalake_mexico_rent_supply_funnel
+table_name: mexico_rent_cohort_funnel
+columns:
+  country_code:
+    lineage:
+      - datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow.country_code
+  city_group:
+    lineage:
+      - datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow.city_group
+  supply_mkt_origin:
+    lineage:
+      - datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow.supply_mkt_origin
+  supply_mkt_origin_detailed:
+    lineage:
+      - datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow.supply_mkt_origin_detailed
+  mexico_channel:
+    lineage:
+      - datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow.mexico_channel
+  dt_lead_week_started:
+    lineage:
+      - datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow.ts_lead
+  dt_lead_month_started:
+    lineage:
+      - datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow.ts_lead
+  
