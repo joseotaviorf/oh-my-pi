@@ -1,4 +1,11 @@
-WITH mkt_house AS (
+WITH projected_weeks AS (
+    SELECT 
+        weeks.weeks_since_listing_started,
+        CAST(7*weeks.weeks_since_listing_started AS INT) AS days_since_listing_started
+    FROM
+        RANGE(1,29) AS weeks(weeks_since_listing_started)
+),
+mkt_house AS (
 -- We set this to house grain to avoid mess up with
 -- the listing grain
     SELECT
@@ -29,8 +36,7 @@ weekly_status_since_start AS (
                         ELSE 'Ocupado' 
                     END ||
                         CASE
-                            WHEN hldi.doorman_type in ('horas24','Diurno') 
-                                AND (ot.name = 'Empty' OR ot.name = 'None') THEN ' Com Portaria' 
+                            WHEN hldi.doorman_type in ('horas24','Diurno')  THEN ' Com Portaria' 
                             ELSE ' Sem Portaria' 
                         END)
             ELSE hldi.first_key_location 
@@ -53,8 +59,8 @@ weekly_status_since_start AS (
             WHEN LOWER(hldi.status_change_reason) RLIKE 'disabled|erro ao|despublicação automática após rescisão|\\[auto\\] \\[rescisao\\]' THEN 'opt out / erro'
             ELSE hldi.status_history
         END AS status_history,
-        CEIL(COALESCE(NULLIF(DATEDIFF(hldi.dt_day, DATE(dhl.ts_listing_version_start)),0), 1)/7.0) AS weeks_since_listing_started, -- cohort 0 to 7 days => 1w, 8 to 14days  => 2w
-        MAX(hldi.dt_day) OVER(PARTITION BY hldi.id_house_listing, CEIL(COALESCE(NULLIF(DATEDIFF(hldi.dt_day, DATE(dhl.ts_listing_version_start)),0), 1)/7.0)) = hldi.dt_day AS is_last_status_in_cohort,
+        pw.weeks_since_listing_started, -- cohort 0 to 7 days => 1w, 8 to 14days  => 2w
+        MAX(hldi.dt_day) OVER(PARTITION BY hldi.id_house_listing ORDER BY pw.weeks_since_listing_started) = hldi.dt_day AS is_last_status_in_cohort,
         DATE_TRUNC('month', dhl.ts_listing_version_start) AS dt_listing_month_started,
         DATE_TRUNC('week', dhl.ts_listing_version_start) AS dt_listing_week_started,
         hldi.ts_status_started,
@@ -64,6 +70,9 @@ weekly_status_since_start AS (
     JOIN
         datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
             ON dhl.sk_house_listing = hldi.id_house_listing
+    JOIN
+        projected_weeks AS pw
+            ON DATE(CONCAT(hldi.year, '-', hldi.month, '-', hldi.day)) <= DATE_ADD(dhl.ts_listing_version_start, pw.days_since_listing_started)
     LEFT JOIN
         mkt_house AS mkt
             ON mkt.id_house = hldi.id_house
@@ -72,7 +81,8 @@ weekly_status_since_start AS (
             ON hldi.id_occupant = ot.id
     LEFT JOIN
         datalake_region.region AS r
-            ON hldi.id_region = r.id 
+            ON hldi.id_region = r.id
+
     WHERE
         dhl.ts_listing_version_start >= DATE('{year}-{month}-{day}') - INTERVAL 90 WEEK
         AND DATE(CONCAT(hldi.year, '-', hldi.month, '-', hldi.day)) >= DATE('{year}-{month}-{day}') - INTERVAL 90 WEEK -- PartitionFilters
@@ -102,29 +112,6 @@ weekly_amounts AS (
     WHERE
         is_last_status_in_cohort = TRUE
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16
-),
-weekly_conversions AS (
-    SELECT
-        id_cohort_listing,
-        city_group,
-        consultant_type,
-        entry_condition,
-        exclusivity,
-        hybrid,
-        listing_category_start,
-        mkt_completion,
-        mkt_origin,
-        depub_w,
-        imoveis_w,
-        list_w_cs_w,
-        suspenso_w,
-        weeks_since_listing_started,
-        dt_listing_month_started,
-        dt_listing_week_started
-    FROM
-        weekly_amounts
-    WHERE
-        weeks_since_listing_started <= 28
 )
 SELECT
     id_cohort_listing || weeks_since_listing_started AS id_cohort_listing_week,
@@ -145,4 +132,4 @@ SELECT
     dt_listing_month_started,
     dt_listing_week_started
 FROM
-    weekly_conversions
+    weekly_amounts
