@@ -1,4 +1,6 @@
 ---
+partition_cols: [year, month, day]
+
 # entry example:
 # endpoint_schema_exceptions:
 #   <endpointEnum_name>: <schema>
@@ -11,7 +13,7 @@ endpoint_schema_exceptions:
 #     api_endpoint: <api_endpoint>
 #     api_params: <api_params>
 #     clean_table_name: <clean_table_name>
-#     partition_cols: <partition_cols> (Optional)
+#     is_incremental: <is_incremental> (Optional)
 tables:
   report_repliers:
     api_endpoint: SAC_REPORT_REPLIES_JSON_KEYS
@@ -21,7 +23,7 @@ tables:
       date_range: '{year}{month}{day}0000:{year}{month}{day}2359',
     }
     clean_table_name: report_repliers
-    partition_cols: ['year', 'month', 'day']
+    is_incremental: True
 
   calls_report:
     api_endpoint: CALLS_REPORT_JSON_KEYS
@@ -32,4 +34,4 @@ tables:
     }
     clean_table_name: calls_report
     is_array_data_schema: True
-    partition_cols: ['year', 'month', 'day']
+    is_incremental: True

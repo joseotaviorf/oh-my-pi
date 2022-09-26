@@ -1,10 +1,9 @@
-import os
-import pendulum
 import json
+import os
 from datetime import datetime
 
+import pendulum
 from airflow.models import DAG
-from airflow.models import Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -12,52 +11,54 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.utils.helpers import cross_downstream
 
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 
 SOURCE = "stilingue"
 DAG_ID = f"bietlejuice.{SOURCE}"
-local_tz = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2022, 4, 7, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 
-# ENV setup
+# dag vars
 ENV = os.environ.get("ENVIRONMENT")
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
+MAIN_START_DATE = datetime(2022, 4, 7, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 
 config_service = ConfigurationService(dag_name=SOURCE)
 
 # s3 paths setup
-ATHENA_QUERY_RESULTS_BUCKET = config_service.get_config("athena_query_results_bucket")
-ARTIFACTS_S3_BUCKET = config_service.get_config("artifacts_bucket")
-DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
-S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
-RAW_SPARK_JOB_PATH = S3_PREFIX + f"/spark_jobs/{SOURCE}/load_{SOURCE}_into_datalake.py"
-LOGS_OUTPUT_PATH = config_service.get_config("spark_jobs_logs_path")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
-
-SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
-DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
-DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
+datalake_bucket = config_service.get_config("datalake_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_into_datalake.py"
+
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+
+default_libraries = config_service.get_config("default_libraries")
 CUSTOM_LIBRARIES = [
     {
-        "whl": f"{ARTIFACTS_S3_BUCKET}/stilingue-api-client-python/"
+        "whl": f"{artifacts_bucket}/stilingue-api-client-python/"
         f"quintoandar_stilingue_api_client-0.1.1-py2.py3-none-any.whl"
     }
 ]
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{LOGS_OUTPUT_PATH}{DAG_ID}"
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
-ENDPOINT_SCHEMA_EXCEPTIONS = config_service.get_config("endpoint_schema_exceptions")
-TABLES = config_service.get_config("tables")
+endpoint_schema_exceptions = config_service.get_config("endpoint_schema_exceptions")
+tables = config_service.get_config("tables")
+partition_cols = config_service.get_config("partition_cols")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -69,15 +70,16 @@ dag = DAG(
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=DOC_MD_CHART_URL, dag_id=DAG_ID
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=CUSTOM_LIBRARIES,
+    cluster_configuration=cluster_description,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -87,35 +89,36 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
+    datalake_bucket=datalake_bucket,
     relative_query_path=SOURCE,
-    spark_jobs_path=SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULTS_BUCKET,
+    spark_jobs_path=base_spark_jobs_path,
+    athena_query_result_location=athena_query_results_bucket,
 )
 
 raw_task_groups = {}
-for TABLE_NAME, TABLE_DETAILS in TABLES.items():
+for raw_table_name, table_details in tables.items():
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,
-        table_name=TABLE_NAME,
-        extraction_spark_job_file=RAW_SPARK_JOB_PATH,
+        table_name=raw_table_name,
+        extraction_spark_job_file=raw_spark_job_path,
         raw_spark_job_extra_args=[
             SOURCE,
-            TABLE_NAME,
+            raw_table_name,
             "{{ ds }}",
-            json.dumps(TABLE_DETAILS),
-            json.dumps(ENDPOINT_SCHEMA_EXCEPTIONS),
+            json.dumps(table_details),
+            json.dumps(endpoint_schema_exceptions),
         ],
     )
 
     clean_task_group = task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
-        table_name=TABLE_DETAILS.get("clean_table_name"),
-        is_incremental=True if TABLE_DETAILS.get("partition_cols") else False,
-        partitions=TABLE_DETAILS.get("partition_cols"),
+        has_create_external_table_task=False,
+        table_name=table_details.get("clean_table_name"),
+        is_incremental=True if table_details.get("is_incremental") else False,
+        partitions=partition_cols if table_details.get("is_incremental") else None,
     )
 
     create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
