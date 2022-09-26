@@ -178,7 +178,7 @@ events_web AS (
         web_term,
         web_platform,
         IF((UPPER(web_campaign) LIKE '%BRANDED%' OR UPPER(web_campaign) LIKE '%INSTITUCIONAL%') AND UPPER(web_campaign) NOT LIKE 'NON-BRANDED', 'Branded', 'Outro' ) AS web_branded,
-        FIRST_VALUE(ts_event) OVER (PARTITION BY id_amplitude, web_medium, web_source, web_campaign, web_term, web_content, gclid, attributed_at ORDER BY ts_event) AS ts_web_attribution
+        FIRST_VALUE(ts_event) OVER (PARTITION BY id_amplitude, web_medium, web_source, web_campaign, web_term, web_content, gclid ORDER BY ts_event) AS ts_web_attribution
     FROM 
         events_filtered
 )
