@@ -26,6 +26,9 @@ columns:
   id_user_rejection:
     lineage:
       - datalake_casa_mineira_crm_raw.contato.usuario_rejeicao_id
+  conversion_url:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.url_conversao
   created_by:
     lineage:
       - datalake_casa_mineira_crm_raw.contato.criado_por
