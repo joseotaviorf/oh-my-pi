@@ -6,11 +6,14 @@ create table if not exists public.fact_inspection_bookings (
   sk_inspector bigint,
   sk_contract bigint,
   sk_booking_inspected_date bigint,
+  sk_booking_inspected_date_local bigint,
   sk_booking_cancelled_date bigint,
+  sk_booking_cancelled_date_local bigint,
   sk_inspected_date bigint,
   sk_expired_date bigint,
   sk_tenant_approved_date bigint,
   sk_owner_approved_date bigint,
+  country_code varchar,
   booking_retry_rank_by_inspection_type smallint,
   ts_load timestamp
 );

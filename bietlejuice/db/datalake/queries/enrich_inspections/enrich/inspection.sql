@@ -105,8 +105,10 @@ SELECT DISTINCT
     i.id_assessment,
     i.id_booking,
     i.id_contract,
+    b.id_country,
     COALESCE(r.id_city, i.id_city) AS id_city,
     COALESCE(r.city_name, i.city_name) AS city_name,
+    b.country_code,
     i.inspection_type,
     b.type AS booking_type,
     i.source,
@@ -127,11 +129,11 @@ SELECT DISTINCT
         ELSE FALSE
     END AS is_executed_in_first_schedule,
     CASE
-        WHEN DATE(b.ts_first_canceled_unevaluated) = b.dt_booking THEN True
+        WHEN DATE(b.ts_first_canceled_unevaluated) = DATE(b.ts_booking_utc) THEN True
         ELSE False
     END AS is_d0_canceled,
     CASE
-        WHEN DATE(b.ts_first_canceled_unevaluated) = DATE_SUB(b.dt_booking, 1) THEN True
+        WHEN DATE(b.ts_first_canceled_unevaluated) = DATE_SUB(DATE(b.ts_booking_utc), 1) THEN True
         ELSE False
     END AS is_d1_canceled,
     ct.dt_contract_entrance,
@@ -140,8 +142,10 @@ SELECT DISTINCT
       WHEN i.inspection_type = "offboarding" THEN ct.dt_contract_termination
       WHEN i.inspection_type = "onboarding" THEN ct.dt_contract_entrance
     END AS dt_execution_limit,
-    b.dt_booking AS dt_booking_inspected,
-    b.ts_first_canceled_unevaluated AS ts_booking_cancelled,
+    b.ts_booking_utc AS ts_booking_inspected_utc,
+    b.ts_booking_local_tz AS ts_booking_inspected_local_tz,
+    b.ts_first_canceled_unevaluated AS ts_booking_cancelled_utc,
+    b.ts_first_canceled_unevaluated_local_tz AS ts_booking_cancelled_local_tz,
     ct.ts_termination_canceled,
     i.ts_started,
     i.ts_finished,

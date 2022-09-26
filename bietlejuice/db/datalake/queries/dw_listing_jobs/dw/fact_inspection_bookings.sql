@@ -17,12 +17,15 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   CAST(CONCAT(CONCAT(insp.id_house, '00'), COALESCE(hl.version, 1)) AS BIGINT) AS sk_house_listing, -- TODO [ODS] maybe this should be centralized in a dim
   COALESCE(insp.id_user_inspector, -1) AS sk_inspector,
   insp.id_contract AS sk_contract,
-  CAST(COALESCE(CAST(DATE_FORMAT(CAST(b.dt_booking AS DATE), 'yyyyMMdd') AS INTEGER), -1) AS BIGINT) AS sk_booking_inspected_date,
+  CAST(COALESCE(CAST(DATE_FORMAT(CAST(b.ts_booking_utc AS DATE), 'yyyyMMdd') AS INTEGER), -1) AS BIGINT) AS sk_booking_inspected_date,
+  CAST(COALESCE(CAST(DATE_FORMAT(CAST(b.ts_booking_local_tz AS DATE), 'yyyyMMdd') AS INTEGER), -1) AS BIGINT) AS sk_booking_inspected_date_local,
   CAST(COALESCE(CAST(DATE_FORMAT(CAST(b.ts_first_canceled_unevaluated AS DATE), 'yyyyMMdd') AS INTEGER), -1) AS BIGINT) AS sk_booking_cancelled_date,
+  CAST(COALESCE(CAST(DATE_FORMAT(CAST(b.ts_first_canceled_unevaluated_local_tz AS DATE), 'yyyyMMdd') AS INTEGER), -1) AS BIGINT) AS sk_booking_cancelled_date_local,
   CAST(COALESCE(CAST(DATE_FORMAT(CAST(insp.dt_inspected AS DATE), 'yyyyMMdd') AS INTEGER), -1) AS BIGINT) AS sk_inspected_date,
   CAST(COALESCE(CAST(DATE_FORMAT(CAST(insp.ts_expired AS DATE), 'yyyyMMdd') AS INTEGER), -1) AS BIGINT) AS sk_expired_date,
   CAST(COALESCE(CAST(DATE_FORMAT(CAST(insp.ts_tenant_approved AS DATE), 'yyyyMMdd') AS INTEGER), -1) AS BIGINT) AS sk_tenant_approved_date,
   CAST(COALESCE(CAST(DATE_FORMAT(CAST(insp.ts_owner_approved AS DATE), 'yyyyMMdd') AS INTEGER), -1) AS BIGINT) AS sk_owner_approved_date,
+  b.country_code,
   CAST(COALESCE(ibr.rn, 1) AS SMALLINT) AS booking_retry_rank_by_inspection_type,
   NOW() AS ts_load
 FROM datalake_ebdb_clean.inspection insp

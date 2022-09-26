@@ -17,9 +17,15 @@ columns:
     sk_contract:
         lineage:
             - datalake_inspections.inspection.id_contract
+    sk_country:
+        lineage:
+            - datalake_inspections.inspection.id_country
     sk_city:
         lineage:
             - datalake_inspections.inspection.id_city
+    country_code:
+        lineage:
+            - datalake_inspections.inspection.country_code
     ldt_hours_execution:
         lineage:
             - datalake_inspections.inspection_metrics.ldt_hours_execution
@@ -38,12 +44,18 @@ columns:
     dt_execution_limit:
         lineage:
             - datalake_inspections.inspection.dt_execution_limit
-    dt_booking_inspected:
+    ts_booking_inspected:
         lineage:
-            - datalake_inspections.inspection.dt_booking_inspected
+            - datalake_inspections.inspection.ts_booking_inspected_utc
+    ts_booking_inspected_local:
+        lineage:
+            - datalake_inspections.inspection.ts_booking_inspected_local_tz
     ts_booking_cancelled:
         lineage:
-            - datalake_inspections.inspection.ts_booking_cancelled
+            - datalake_inspections.inspection.ts_booking_cancelled_utc
+    ts_booking_cancelled_local:
+        lineage:
+            - datalake_inspections.inspection.ts_booking_cancelled_local_tz
     ts_termination_canceled:
         lineage:
             - datalake_inspections.inspection.ts_termination_canceled

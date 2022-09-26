@@ -227,6 +227,9 @@ columns:
   ts_first_canceled_local_tz:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_first_canceled_unevaluated_local_tz:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
   responsible:
     lineage:
       - datalake_ebdb_clean.booking_status_change.reason_enum

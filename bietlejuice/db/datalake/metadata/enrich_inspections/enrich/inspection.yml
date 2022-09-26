@@ -20,14 +20,20 @@ columns:
     lineage:
       - datalake_inspections_clean.inspection.id_contract
       - datalake_ebdb_clean.inspection.id_contract
+  id_country:
+    lineage:
+      - datalake_booking.booking.id_country
   id_city:
     lineage:
-      - datalake_region.region.id_cityß
+      - datalake_region.region.id_city
       - datalake_inspections_clean.inspection.house
   city_name:
     lineage:
       - datalake_region.region.city_name
       - datalake_inspections_clean.inspection.house
+  country_code:
+    lineage:
+      - datalake_booking.booking.country_code
   inspection_type:
     lineage:
       - datalake_inspections_clean.inspection.type
@@ -52,12 +58,18 @@ columns:
     lineage:
       - datalake_offboarding.contract_termination.dt_contract_entrance
       - datalake_offboarding.contract_termination.dt_termination
-  dt_booking_inspected:
+  ts_booking_inspected_utc:
     lineage:
-      - datalake_booking.booking.dt_booking
-  ts_booking_cancelled:
+      - datalake_booking.booking.ts_booking_utc
+  ts_booking_inspected_local_tz:
+    lineage:
+      - datalake_booking.booking.ts_booking_local_tz
+  ts_booking_cancelled_utc:
     lineage:
       - datalake_booking.booking.ts_first_canceled_unevaluated
+  ts_booking_cancelled_local_tz:
+    lineage:
+      - datalake_booking.booking.ts_first_canceled_unevaluated_local_tz
   ts_termination_canceled:
     lineage:
       - datalake_offboarding.contract_termination.ts_canceled

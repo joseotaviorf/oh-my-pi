@@ -19,10 +19,16 @@ columns:
       - datalake_ebdb_clean.inspection.id_contract
   sk_booking_inspected_date:
     lineage:
-      - datalake_booking.booking.dt_booking
+      - datalake_booking.booking.dt_booking_utc
+  sk_booking_inspected_date_local:
+    lineage:
+      - datalake_booking.booking.ts_booking_local_tz
   sk_booking_cancelled_date:
     lineage:
       - datalake_booking.booking.ts_first_canceled_unevaluated
+  sk_booking_cancelled_date_local:
+    lineage:
+      - datalake_booking.booking.ts_first_canceled_unevaluated_local_tz
   sk_inspected_date:
     lineage:
       - datalake_ebdb_clean.inspection.dt_inspected
@@ -35,3 +41,6 @@ columns:
   sk_owner_approved_date:
     lineage:
       - datalake_ebdb_clean.inspection.ts_owner_approved
+  country_code:
+    lineage:
+      - datalake_booking.booking.country_code

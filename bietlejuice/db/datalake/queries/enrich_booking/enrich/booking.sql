@@ -146,7 +146,7 @@ visitor_fixed_agent as (
     GROUP BY 1
   ),
   preferred_fixed_agent AS (
-    SELECT 
+    SELECT
       id,
       id_user_visit_preferences,
       id_agent_data,
@@ -155,8 +155,8 @@ visitor_fixed_agent as (
       ROW_NUMBER() OVER (PARTITION BY id_user_visit_preferences ORDER BY ts_updated DESC) AS rw_number,
       is_enabled,
       ts_created
-    FROM 
-      datalake_ebdb_clean.preferred_fixed_agent AS a 
+    FROM
+      datalake_ebdb_clean.preferred_fixed_agent AS a
   )
   -- Looks the booking date and find which agent was linked to the buyer at the period
   -- Buyers can have different fixed agents in each city, so it has to match the id_city of the house visited
@@ -287,8 +287,8 @@ aux_3p_supply AS (
 ),
 
 secretariat_users AS (
-  SELECT 
-    id_user_5a 
+  SELECT
+    id_user_5a
   FROM
     datalake_gsheets_clean.secretariat_hierarchy
   GROUP BY
@@ -415,7 +415,7 @@ base_booking AS (
       'Unknown')
     AS reason_category,
     IF(
-      b.business_context = 'SALE', 
+      b.business_context = 'SALE',
         (
           CASE
             WHEN fba.id_user_creation = ua.id THEN 'Agent'
@@ -541,6 +541,7 @@ SELECT
   bb.*,
   TO_UTC_TIMESTAMP(bb.ts_booking_local_tz, default_timezone) AS ts_booking_utc,
   FROM_UTC_TIMESTAMP(bb.ts_first_canceled, default_timezone) AS ts_first_canceled_local_tz,
+  FROM_UTC_TIMESTAMP(bb.ts_first_canceled_unevaluated, default_timezone) AS ts_first_canceled_unevaluated_local_tz,
   CASE
     WHEN bb.cancellation_reason_category IN (
       'Agent',
@@ -559,6 +560,6 @@ SELECT
   DATEDIFF(bb.ts_booking_local_tz, FROM_UTC_TIMESTAMP(bb.ts_first_canceled, default_timezone)) AS days_visit_cancelled_to_visit,
   DATEDIFF(bb.ts_booking_local_tz, bb.ts_created_local_tz) AS days_visit_booked_to_visit,
   IF(is_visit_completed, DATEDIFF(bb.ts_booking_local_tz, bb.ts_created_local_tz), NULL)
-   AS days_visit_booked_to_visit_completed 
+   AS days_visit_booked_to_visit_completed
 FROM
   base_booking AS bb
