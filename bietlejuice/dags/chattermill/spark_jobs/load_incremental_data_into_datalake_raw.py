@@ -17,6 +17,15 @@ from bietlejuice.base.spark import (
     SparkTableStorageFormat,
     SparkDataFrameService,
 )
+from pyspark.sql.types import (
+    StructType,
+    StructField,
+    StringType,
+    LongType,
+    IntegerType,
+    ArrayType,
+    MapType,
+)
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"
@@ -94,7 +103,32 @@ if __name__ == "__main__":
         )
 
         if api_response:
-            df = spark_client.create_dataframe(api_response)
+            schema = StructType(
+                [
+                    StructField("comment", StringType(), True),
+                    StructField("created_at", StringType(), True),
+                    StructField("data_source", StringType(), True),
+                    StructField("data_type", StringType(), True),
+                    StructField("dataset", StringType(), True),
+                    StructField("id", LongType(), True),
+                    StructField("original_comment", StringType(), True),
+                    StructField("phrases", StringType(), True),
+                    StructField("score", LongType(), True),
+                    StructField("tags", StringType(), True),
+                    StructField("updated_at", StringType(), True),
+                    StructField("user_attributes", StringType(), True),
+                    StructField(
+                        "themes",
+                        ArrayType(MapType(StringType(), StringType(), True), True),
+                        True,
+                    ),
+                    StructField("year", IntegerType(), True),
+                    StructField("month", IntegerType(), True),
+                    StructField("day", IntegerType(), True),
+                ]
+            )
+
+            df = spark_client.create_dataframe(api_response, schema=schema)
             dt_execution = datetime.strptime(execution_date, "%Y%m%d")
             df = df.coalesce(1)
             df = (
