@@ -339,6 +339,8 @@ diligence AS (
         d.id_sales_flow,
         d.classification,
         d.step,
+        d.ts_buyer_sent,
+        d.ts_seller_sent,
         d.ts_buyer_seller_ended,
         d.ts_partner_started,
         d.ts_partner_ended,
@@ -436,13 +438,13 @@ onboarding AS (
 ),
 -- ONBOARDING FROM STATUS ENRICH CTE
 onboarding_status AS (
-  SELECT 
-      id_sales_flow, 
+  SELECT
+      id_sales_flow,
       id_firestore AS id_offer,
       DATE(ts_macro_status_end) AS dt_onboarding_ended
-  FROM 
+  FROM
       datalake_sale_offer_flows.sale_offer_status
-  WHERE 
+  WHERE
       macro_status_name = 'ONBOARDING'
       AND DATE(ts_macro_status_end) > DATE('2022-04-12')
 ),
@@ -467,45 +469,45 @@ tag AS (
         ROW = 1
     GROUP BY
         id_sales_flow
-), 
+),
 -- OFFER/SALE AGREEMENT RESCUE FLOW CTE
 rescue_flow AS (
     WITH cancelation_history AS (
       SELECT
-            id, 
-            is_canceled, 
-            LAG(is_canceled,1) OVER (PARTITION BY id ORDER BY ts_updated) AS last_cancelation_status, 
-            ts_canceled AS ts_sale_agreement_canceled, 
+            id,
+            is_canceled,
+            LAG(is_canceled,1) OVER (PARTITION BY id ORDER BY ts_updated) AS last_cancelation_status,
+            ts_canceled AS ts_sale_agreement_canceled,
             ts_updated
-      FROM 
+      FROM
         datalake_sales_flow_clean.sales_flow_aud
       WHERE
         mod_is_canceled = TRUE
-   ), 
-   
+   ),
+
    rescue_status AS (
-     SELECT 
-         id, 
-         is_canceled, 
-         CASE 
-           WHEN is_canceled = FALSE and last_cancelation_status = TRUE THEN TRUE 
+     SELECT
+         id,
+         is_canceled,
+         CASE
+           WHEN is_canceled = FALSE and last_cancelation_status = TRUE THEN TRUE
          END AS is_a_rescue,
          ts_sale_agreement_canceled,
-         CASE 
-           WHEN is_canceled = FALSE and last_cancelation_status = TRUE THEN ts_updated 
-         END AS ts_rescued, 
+         CASE
+           WHEN is_canceled = FALSE and last_cancelation_status = TRUE THEN ts_updated
+         END AS ts_rescued,
          ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS ROW
-     FROM 
+     FROM
          cancelation_history
    )
-   SELECT 
-         id AS id_sales_flow, 
+   SELECT
+         id AS id_sales_flow,
          is_a_rescue,
          ts_sale_agreement_canceled,
          ts_rescued
-   FROM 
-       rescue_status 
-   WHERE 
+   FROM
+       rescue_status
+   WHERE
        ROW = 1
 )
 
@@ -667,23 +669,25 @@ SELECT
             THEN DATE(off.ts_discarded)
         END
     ) AS dt_sale_agreement_cancelled,
-    CASE 
+    CASE
       WHEN rf.ts_sale_agreement_canceled IS NOT NULL AND rf.is_a_rescue = TRUE THEN TRUE
       ELSE FALSE
-    END AS is_a_rescued_ccv, 
-    CASE 
+    END AS is_a_rescued_ccv,
+    CASE
       WHEN rf.ts_sale_agreement_canceled IS NULL AND rf.is_a_rescue = TRUE THEN TRUE
       ELSE FALSE
-    END AS is_a_rescued_offer, 
-    CASE 
+    END AS is_a_rescued_offer,
+    CASE
       WHEN rf.ts_sale_agreement_canceled IS NOT NULL AND rf.is_a_rescue = TRUE THEN DATE(rf.ts_rescued)
       ELSE NULL
     END AS dt_sale_agreement_rescued,
-    CASE 
+    CASE
       WHEN rf.ts_sale_agreement_canceled IS NULL AND rf.is_a_rescue = TRUE THEN DATE(rf.ts_rescued)
       ELSE NULL
     END AS dt_offer_rescued,
     COALESCE(os.dt_onboarding_ended, o.dt_ended) AS dt_onboarding_ended,
+    DATE(d.ts_buyer_sent) AS dt_diligence_buyer_sent_at,
+    DATE(d.ts_seller_sent) AS dt_diligence_seller_sent_at,
     DATE(d.ts_buyer_seller_ended) AS dt_legal_analysis_ended,
     DATE(d.ts_partner_started) AS dt_legaut_analysis_started,
     DATE(d.ts_partner_ended) AS dt_legaut_analysis_ended,
@@ -761,7 +765,7 @@ LEFT JOIN
 LEFT JOIN
     sales_flow_details AS sfd
         ON sfd.id_sales_flow = off.id_sales_flow
-LEFT JOIN 
+LEFT JOIN
     rescue_flow AS rf
         ON off.id_sales_flow = rf.id_sales_flow
 WHERE

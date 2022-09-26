@@ -29,6 +29,12 @@ columns:
   ts_buyer_seller_ended:
     lineage:
       - datalake_sales_flow_raw.diligence.buyer_seller_ended_at
+  ts_buyer_sent:
+    lineage:
+      - datalake_sales_flow_raw.diligence.buyer_sent_at
+  ts_seller_sent:
+    lineage:
+      - datalake_sales_flow_raw.diligence.seller_sent_at
   ts_created:
     lineage:
       - datalake_sales_flow_raw.diligence.created_at

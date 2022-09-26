@@ -314,16 +314,16 @@ columns:
     lineage:
       - datalake_booking.booking.is_3p_demand
   is_a_rescued_ccv:
-    lineage: 
+    lineage:
       - datalake_sale_offer_flows.sale_offer_flows.is_a_rescued_ccv
   is_a_rescued_offer:
-    lineage: 
+    lineage:
       - datalake_sale_offer_flows.sale_offer_flows.is_a_rescued_offer
   dt_sale_agreement_rescued:
-    lineage: 
+    lineage:
       - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_rescued
   dt_offer_rescued:
-    lineage: 
+    lineage:
       - datalake_sale_offer_flows.sale_offer_flows.dt_offer_rescued
   dt_offer_accepted:
     lineage:

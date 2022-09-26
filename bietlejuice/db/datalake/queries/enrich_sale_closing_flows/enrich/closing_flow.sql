@@ -181,6 +181,8 @@ data_sources AS (
         so.dt_sale_transacton_paid,
         so.dt_sale_agreement_rescued,
         pr.dt_payment_allowed,
+        sof.dt_diligence_buyer_sent_at,
+        sof.dt_diligence_seller_sent_at,
         ms.dt_occurence AS dt_down_payment,
         so.ts_updated
     FROM
@@ -274,6 +276,8 @@ SELECT
     dt_house_registry_ended,
     dt_sale_key_delivered,
     dt_sale_transacton_paid,
+    dt_diligence_buyer_sent_at,
+    dt_diligence_seller_sent_at,
     dt_payment_allowed,
     dt_down_payment,
     ts_updated,

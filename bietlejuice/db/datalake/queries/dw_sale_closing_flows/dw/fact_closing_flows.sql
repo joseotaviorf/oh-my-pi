@@ -26,6 +26,8 @@ SELECT
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_transacton_paid,1, 10),'-','') AS BIGINT), -1) AS sk_sale_transaction_paid_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_payment_allowed,1, 10),'-','') AS BIGINT), -1) AS sk_payment_allowed_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_down_payment,1, 10),'-','') AS BIGINT), -1) AS sk_down_payment_date,
+  COALESCE(CAST(REPLACE(SUBSTRING(dt_diligence_buyer_sent_at,1, 10),'-','') AS BIGINT), -1) AS sk_diligence_buyer_sent_at,
+  COALESCE(CAST(REPLACE(SUBSTRING(dt_diligence_seller_sent_at,1, 10),'-','') AS BIGINT), -1) AS sk_diligence_seller_sent_at,
   --
   id_closing_specialist,
   id_legal_risk_analyst,

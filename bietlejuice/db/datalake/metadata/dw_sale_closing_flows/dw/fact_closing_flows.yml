@@ -26,7 +26,7 @@ columns:
   sk_sale_agreement_cancelled_date:
     lineage:
       - datalake_sale_closing_flows.closing_flow.dt_sale_agreement_cancelled
-  sk_sale_agreement_rescued_date: 
+  sk_sale_agreement_rescued_date:
     lineage:
       - datalake_sale_closing_flows.closing_flows.dt_sale_agreement_rescued
   sk_legal_analysis_ended_date:
@@ -83,6 +83,12 @@ columns:
   sk_down_payment_date:
     lineage:
       - datalake_sale_closing_flows.closing_flow.dt_down_payment
+  sk_diligence_buyer_sent_at:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.dt_diligence_buyer_sent_at
+  sk_diligence_seller_sent_at:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.dt_diligence_seller_sent_at
   id_closing_specialist:
     lineage:
       - datalake_sale_closing_flows.closing_flow.id_closing_specialist
