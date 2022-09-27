@@ -1,17 +1,18 @@
+import json
 from datetime import timedelta
+
+import airflow.utils.helpers as airflow_helpers
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
-import json
+
 from bietlejuice.base.airflow import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.formatters import StringFormatter
-
-import airflow.utils.helpers as airflow_helpers
-
 from bietlejuice.services import FileService, ConfigurationService
+from bietlejuice.services.dag_metadata_service import DAGMetadataService
 
 
 class DWTaskGroup(BaseTaskGroup):
@@ -178,7 +179,7 @@ class DWTaskGroup(BaseTaskGroup):
 
         final_tasks.append(sync_metastore_tables_partitions_task)
 
-        if FileService.metadata_file_exists(
+        if DAGMetadataService.metadata_file_exists(
             self.relative_query_path, layer, table_name
         ):
             propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(

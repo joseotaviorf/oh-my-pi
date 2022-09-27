@@ -4,6 +4,7 @@ import re
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.services import FileService, ConfigurationService
+from bietlejuice.services.dag_metadata_service import DAGMetadataService
 from bietlejuice.services.git_service import GitService
 
 logger = QuintoAndarLogger("validate_datamarts_metadata_files_exist")
@@ -237,7 +238,7 @@ def main():
                         f"dag={dag_intermediate_path}, table_name={table_name}, msg=Table in skip list"
                     )
                     continue
-                if not FileService.metadata_file_exists(
+                if not DAGMetadataService.metadata_file_exists(
                     lineage_intermediate_path, "dw", table_name
                 ):
                     failed.append((dag_intermediate_path, table_name))

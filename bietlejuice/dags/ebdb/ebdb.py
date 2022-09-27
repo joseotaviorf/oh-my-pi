@@ -1,7 +1,7 @@
+import os
 from datetime import datetime, timedelta
 
 import pendulum
-import os
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -17,6 +17,8 @@ from bietlejuice.formatters import StringFormatter
 from bietlejuice.services import FileService, ConfigurationService
 
 # DAG params
+from bietlejuice.services.dag_metadata_service import DAGMetadataService
+
 DAG_ID = "ebdb"
 FULL_DAG_ID = "bietlejuice.{}".format(DAG_ID)
 ENV = os.environ.get("ENVIRONMENT")
@@ -146,7 +148,9 @@ def clean_tasks(table_name):
     )
 
     final_task = sync_metastore_clean_table_structure_task
-    if FileService.metadata_file_exists(SOURCE, LayerEnum.CLEAN.value, table_name):
+    if DAGMetadataService.metadata_file_exists(
+        SOURCE, LayerEnum.CLEAN.value, table_name
+    ):
         propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=dag,
             task_id=f"propagate-table-metadata-clean-{slugged_table_name}",

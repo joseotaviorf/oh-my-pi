@@ -5,6 +5,7 @@ import sys
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.services.dag_metadata_service import DAGMetadataService
 from dags import DAG_PACKAGES_ROOT
 
 BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -128,7 +129,7 @@ def has_lineage_or_tags(source, layer, context, dag, ingestion_type, table):
             return True
         elif dag_has_product_lineage_config(source, context, dag):
             return True
-    if FileService.metadata_file_exists(source, layer, table):
+    if DAGMetadataService.metadata_file_exists(source, layer, table):
         logger.debug(
             f"source={source}, layer={layer}, table={table}, msg=has lineage/tags file"
         )

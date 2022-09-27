@@ -15,7 +15,7 @@ from bietlejuice.metadata_propagator_pipeline.lineage_tags_pipeline import (
 from bietlejuice.metadata_propagator_pipeline.raw_lineage_pipeline import (
     RawLineagePipeline,
 )
-from bietlejuice.services import FileService
+from bietlejuice.services.dag_metadata_service import DAGMetadataService
 
 JOB_NAME = "propagate_raw_tables_metadata"
 
@@ -41,7 +41,9 @@ def get_all_tables_metadata(spark_metastore_helper, metadata_type, relative_file
 
         elif (
             metadata_type == MetadataTypeEnum.TAGS
-            and FileService.metadata_file_exists(relative_file_path, layer, table_name)
+            and DAGMetadataService.metadata_file_exists(
+                relative_file_path, layer, table_name
+            )
         ):
             tables_spark_metadata[table_name] = dict()
             tables_spark_metadata[table_name]["name"] = table_name

@@ -14,6 +14,7 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.services import FileService, ConfigurationService
+from bietlejuice.services.dag_metadata_service import DAGMetadataService
 
 logger = QuintoAndarLogger("DatalakeTaskGroup")
 
@@ -181,7 +182,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
             metadata_type = None
 
-            if FileService.metadata_file_exists(
+            if DAGMetadataService.metadata_file_exists(
                 self.relative_query_path,
                 layer,
                 table_name,
@@ -493,7 +494,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             final_tasks = [load_table_task]
 
         if has_hive_sync:
-            if FileService.metadata_file_exists(
+            if DAGMetadataService.metadata_file_exists(
                 self.relative_query_path, layer.value, table_name
             ):
                 propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
