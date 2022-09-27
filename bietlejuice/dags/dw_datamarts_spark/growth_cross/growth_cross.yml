@@ -18,6 +18,7 @@ growth_cross:
   inbound_attendance_leads_flows: {}
   lead_listing_flows: {} # depends_on: - quintoandar_consultant_listings
   marketing_campaigns_costs_and_volumes: {}
+  marketing_demand_supply_branding_costs: {} #depends_on: - performance_marketing_cluster_promotional_bonus_costs
   performance_marketing_cluster_promotional_bonus: {} # depends_on: - affiliates_clusters
   performance_marketing_cluster_promotional_bonus_costs: {} # depends_on : - performance_marketing_cluster_promotional_bonus - affiliates_clusters
   performance_marketing_metrics: {} # depends_on: - tenant_prospect_status
