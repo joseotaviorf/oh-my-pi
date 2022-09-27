@@ -61,7 +61,7 @@ mediator_dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=Variable.get("DOC_MD_BASE_URL"), dag_id=DAG_ID
     ),
-    dagrun_timeout=timedelta(minutes=13),
+    dagrun_timeout=timedelta(minutes=14),
 )
 
 dependencies_dict = extract_dependencies()
