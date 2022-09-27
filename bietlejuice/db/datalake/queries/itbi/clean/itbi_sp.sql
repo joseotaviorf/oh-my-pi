@@ -1,6 +1,6 @@
 SELECT 
     n_cadastro_sql AS iptu_sql_registration_number,
-    CAST(TRIM(matricula_imovel) AS BIGINT) AS house_registry_number,
+    TRIM(matricula_imovel) AS house_registry_number,
     nome_logradouro AS address_street_name,
     CAST(numero AS BIGINT) AS address_number,
     complemento AS address_complement,
@@ -28,7 +28,7 @@ SELECT
     CAST(acc_iptu AS BIGINT) AS iptu_registration_year,
     source_file,
     source_tab,
-    TO_DATE(data_transacao) AS dt_transaction,
+    COALESCE(TO_DATE(data_transacao), TO_DATE(data_transacao, 'M/d/yy')) AS dt_transaction,
     dt_load,
     year,
     month
