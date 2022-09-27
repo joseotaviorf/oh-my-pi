@@ -38,7 +38,7 @@ s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 spark_jobs_path = f"{s3_prefix}/spark_jobs/base"
 
 # databricks var
-cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
