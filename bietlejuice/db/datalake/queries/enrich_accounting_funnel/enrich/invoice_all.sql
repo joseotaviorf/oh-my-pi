@@ -34,6 +34,14 @@ SELECT
   cl.id_locale AS localidade,
   c.guarantee,
   c.rental_administrator,
+  CASE 
+    WHEN
+        c.status='Ativo' and c.ts_expected_termination is null THEN 'Ativo' 
+    WHEN 
+        c.status='Ativo' and c.ts_expected_termination is not null THEN 'Finalizando'
+    ELSE 
+        c.status END
+    AS contract_status,
   ie.is_rental_paid_in_advance,
   ie.entry_type AS bill_item,
   ie.description,
@@ -49,6 +57,7 @@ SELECT
   COALESCE(i.user, 'quinto-andar') AS invoice_account_type,
   ie.from_account_type,
   ie.to_account_type,
+  ie.producer,
   CASE
     WHEN ie.from_account_type = 'tenant' OR ie.to_account_type = 'tenant' THEN 'tenant'
     WHEN ie.from_account_type = 'landlord' OR ie.to_account_type = 'landlord' THEN 'landlord'
@@ -67,6 +76,7 @@ SELECT
     ELSE COALESCE(i.payment_status, 'not-invoiceable') 
   END AS status,
   i.closing_mode,
+  i.paid_via,
   ROUND(fie.brl_entry_due_amount,2) AS due_amount,
   ROUND(-1.0*i.due_amount,2) AS invoice_due_amount,
   CASE
@@ -83,6 +93,7 @@ SELECT
   DATE_FORMAT(dd_entry_created.date, 'yyyy-MM-dd') AS entry_created_date, 
   DATE_FORMAT(DATE(i.ts_created), 'yyyy-MM-dd') AS invoice_created_date, 
   DATE_FORMAT(i.dt_due, 'yyyy-MM-dd') AS invoice_due_date,
+  DATE_FORMAT(i.dt_sent, 'yyyy-MM-dd') AS invoice_sent_date,
   DATE_FORMAT(i.dt_paid, 'yyyy-MM-dd') AS invoice_paid_date,
   DATE_FORMAT(i.ts_canceled, 'yyyy-MM-dd') AS invoice_canceled_date,
   DATE_FORMAT(nbd.date_next_bd, 'yyyy-MM-dd') AS invoice_paid_date_next_business_day,

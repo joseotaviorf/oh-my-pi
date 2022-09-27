@@ -29,6 +29,10 @@ columns:
   rental_administrator:
     lineage:
       - dw_public.dim_contract.rental_administrator
+  contract_status:
+    lineage:
+      - dw_public.dim_contract.status
+      - dw_public.dim_contract.ts_expected_termination
   is_rental_paid_in_advance:
     lineage:
       - dw_payment.dim_invoice_entry.is_rental_paid_in_advance
@@ -50,12 +54,18 @@ columns:
   to_account_type:
     lineage:
       - dw_payment.dim_invoice_entry.to_account_type
+  producer:
+    lineage:
+      - dw_payment.dim_invoice_entry.producer
   status:
     lineage:
       - dw_payment.dim_invoice.payment_status
   closing_mode:
     lineage:
       - dw_payment.dim_invoice.closing_mode
+  paid_via:
+    lineage:
+      - dw_payment.dim_invoice.paid_via
   due_amount:
     lineage:
       - dw_payment.fact_invoice_entries.brl_entry_due_amount
@@ -80,6 +90,9 @@ columns:
   invoice_due_date:
     lineage:
       - dw_payment.dim_invoice.dt_due
+  invoice_sent_date:
+    lineage:
+      - dw_payment.dim_invoice.dt_sent
   invoice_paid_date:
     lineage:
       - dw_payment.dim_invoice.dt_paid
