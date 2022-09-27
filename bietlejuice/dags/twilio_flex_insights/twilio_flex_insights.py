@@ -1,14 +1,17 @@
-from datetime import datetime
-import pendulum
+import json
 import os
+from datetime import datetime
 
-from airflow.models import Variable, DAG
-from airflow.utils.helpers import chain, cross_downstream
+import pendulum
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.utils.helpers import chain, cross_downstream
+
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -18,38 +21,46 @@ ENV = os.environ.get("ENVIRONMENT")
 
 # DAG and Jobs params setup
 SOURCE = "twilio_flex_insights"
-CONTEXT = SOURCE
-DAG_NAME = SOURCE
 DAG_ID = f"bietlejuice.{SOURCE}"
-local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
-MAIN_START_DATE = datetime(2020, 10, 1, 0, 0, 0, tzinfo=local_tz)
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
+MAIN_START_DATE = datetime(2020, 10, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 
-config_service = ConfigurationService(DAG_NAME)
+config_service = ConfigurationService(SOURCE)
 
 # s3 paths setup
-ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
-ARTIFACTS_DEFAULT_BUCKET = config_service.get_config("artifacts_bucket")
-DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
-S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
-RAW_SPARK_JOB_PATH = (
-    S3_PREFIX + f"/spark_jobs/{SOURCE}/load_incremental_data_into_datalake_raw.py"
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
+datalake_bucket = config_service.get_config("datalake_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
 )
-LOGS_OUTPUT_PATH = config_service.get_config("spark_jobs_logs_path")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_incremental_data_into_datalake_raw.py"
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{LOGS_OUTPUT_PATH}{DAG_ID}"
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+
+default_libraries = config_service.get_config("default_libraries")
 CUSTOM_LIBRARIES = [
     {
-        "whl": f"{ARTIFACTS_DEFAULT_BUCKET}/twilio-flex-insights-api-client-python/"
+        "whl": f"{artifacts_bucket}/twilio-flex-insights-api-client-python/"
         f"quintoandar_twilio_flex_insights_api_client-0.1.0-py2.py3-none-any.whl"
     }
 ]
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
+partition_cols = config_service.get_config("partition_cols")
+tables = config_service.get_config("tables_configurations")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -60,14 +71,17 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=CUSTOM_LIBRARIES,
+    cluster_configuration=cluster_description,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -77,24 +91,25 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=CONTEXT,
-    spark_jobs_path=SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+    datalake_bucket=datalake_bucket,
+    relative_query_path=SOURCE,
+    spark_jobs_path=base_spark_jobs_path,
+    athena_query_result_location=athena_query_results_bucket,
 )
 
 raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
-    extraction_spark_job_file=RAW_SPARK_JOB_PATH,
-    raw_spark_job_extra_args=[SOURCE, CONTEXT],
+    extraction_spark_job_file=raw_spark_job_path,
+    raw_spark_job_extra_args=[SOURCE, json.dumps(partition_cols), json.dumps(tables)],
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
-    partitions=["year", "month", "day"],
+    has_create_external_table_task=False,
+    partitions=partition_cols,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))

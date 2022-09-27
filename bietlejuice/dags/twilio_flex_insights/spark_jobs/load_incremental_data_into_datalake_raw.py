@@ -10,10 +10,6 @@ from quintoandar_twilio_flex_insights_api_client.constants.endpoint_enum import 
     EndpointEnum,
 )
 
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
@@ -21,8 +17,11 @@ from bietlejuice.base.spark import (
     SparkTableStorageFormat,
     SparkDataFrameService,
 )
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.formatters import StringFormatter
-from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"
@@ -38,19 +37,22 @@ if __name__ == "__main__":
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
-    parser.add_argument("context", help="name of the context")
+    parser.add_argument("partition_cols")
+    parser.add_argument("tables")
 
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
-    context = args.context
+    partition_cols = json.loads(args.partition_cols)
+    tables = json.loads(args.tables)
 
     logger.info(
         f"""
             m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
-            source={source}, context={context}, msg=print spark jobs args"
+            source={source}, partition_cols={partition_cols}, tables={tables},
+            msg=print spark jobs args"
         """
     )
 
@@ -83,12 +85,7 @@ if __name__ == "__main__":
     database_location = datalake_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
-    config_service = ConfigurationService(context)
-    partition_cols = config_service.get_config("partition_cols")
-
-    for table_name, table_config in config_service.get_config(
-        "tables_configurations"
-    ).items():
+    for table_name, table_config in tables.items():
         workspace_id = table_config["workspace_id"]
         object_id = table_config["object_id"]
         column_create_date = table_config["column_create_date"]
