@@ -1171,6 +1171,12 @@ bietlejuice.enrich_amplitude_lead:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.rene_descartes:load-clean-house-lead
 
+bietlejuice.enrich_amplitude_magic_link:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.gsheets.support_and_service:load-clean-agents-control
+  - bietlejuice.gsheets.support_and_service:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:load-clean-support-agents-department
+
 bietlejuice.enrich_amplitude_offer:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 

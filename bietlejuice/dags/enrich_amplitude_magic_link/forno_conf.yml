@@ -1,0 +1,3 @@
+---
+partitions_cols: [year, month, day]
+inner_dependencies: {}

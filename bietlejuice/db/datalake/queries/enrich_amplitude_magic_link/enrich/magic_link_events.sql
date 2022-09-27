@@ -1,0 +1,80 @@
+SELECT
+    e.id_amplitude,
+    e.id_app,
+    e.id_device,
+    e.id_event,
+    e.id_session,
+    e.id_schema,
+    e.id_inserted,
+    e.id_user,
+    ac.id_assignee AS id_agent,
+    e.uuid,
+    e.ids_amplitude_attributed,
+    e.adid,
+    e.event_properties,
+    e.user_properties,
+    GET_JSON_OBJECT(e.user_properties, '$.country') AS country_code,
+    GET_JSON_OBJECT(e.user_properties, '$.email') AS agent_email,
+    ac.agent_name,
+    ac.agent_company,
+    ac.manager AS agent_manager,
+    COALESCE(sad.department, ac.department) AS agent_department,
+    dc.team AS department_team,
+    dc.journey_step AS department_journey_step,
+    dc.area AS department_area,
+    dc.front_or_back AS department_front_or_back,
+    e.amplitude_event_type,
+    e.city,
+    e.country,
+    e.device_brand,
+    e.device_carrier,
+    e.device_family,
+    e.device_manufacturer,
+    e.device_model,
+    e.device_type,
+    e.dma,
+    e.event_type,
+    e.idfa,
+    e.ip_address,
+    e.location_lat,
+    e.location_lng,
+    e.os_name,
+    e.os_version,
+    e.platform,
+    e.library,
+    e.region,
+    e.start_version,
+    e.language,
+    e.version_name,
+    e.sample_rate,
+    e.data AS event_data,
+    e.is_attribution_event,
+    e.is_paying,
+    ac.dt_start AS dt_agent_started,
+    e.ts_client_event,
+    e.ts_client_uploaded,
+    e.ts_server_received,
+    e.ts_event,
+    e.ts_server_uploaded,
+    e.ts_user_created,
+    e.ts_processed,
+    e.year,
+    e.month,
+    e.day
+FROM
+    datalake_amplitude_clean.events e
+LEFT JOIN
+    datalake_gsheets_clean.agents_control ac
+        ON GET_JSON_OBJECT(e.user_properties, '$.email') = ac.email
+LEFT JOIN
+    datalake_gsheets_clean.support_agents_department sad
+        ON ac.id_assignee = sad.id_agent
+        AND DATE(CONCAT(year, '-', month, '-', day)) BETWEEN sad.dt_start AND COALESCE(sad.dt_end, NOW())
+LEFT JOIN
+    datalake_gsheets_clean.department_control dc
+        ON COALESCE(sad.department, ac.department) = dc.department
+WHERE
+    id_app = 370096
+    AND year = {year}
+    AND month = {month}
+    AND day = {day}
