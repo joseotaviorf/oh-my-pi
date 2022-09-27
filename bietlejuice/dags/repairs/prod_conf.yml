@@ -1,42 +1,52 @@
 ---
+partition_cols: [year, month, day]
+lineage_product_database_name: repairs
 tables:
-  - table_name: instant_approval_preference_aud
-    extraction_type: full
-  - table_name: instant_approval_preference
-    extraction_type: incremental
-    date_filter_column: updated_at
-  - table_name: repair_evidence_aud
-    extraction_type: full
-  - table_name: repair_evidence
-    extraction_type: incremental
-    date_filter_column: updated_at
-  - table_name: repair_expense_aud
-    extraction_type: full
-  - table_name: repair_expense
-    extraction_type: full
-  - table_name: repair_expense_group_aud
-    extraction_type: full
-  - table_name: repair_expense_group
-    extraction_type: full
-  - table_name: repair_request_aud
-    extraction_type: full
-  - table_name: repair_request
-    extraction_type: incremental
-    date_filter_column: updated_at
-  - table_name: repair_request_item_aud
-    extraction_type: full
-  - table_name: repair_request_item
-    extraction_type: incremental
-    date_filter_column: updated_at
-  - table_name: revinfo
+  # <raw_table_name>:
+  #   clean_table_name: <clean_table_name>
+  #   is_incremental: <is_incremental> #optional
+  #   date_column: <date_column> #optional
+  #   unixtime_measure: <unixtime_measure> #optional
+  instant_approval_preference_aud:
+    clean_table_name: instant_approval_preference_aud
+  instant_approval_preference:
+    clean_table_name: instant_approval_preference
+    is_incremental: True
+    date_column: updated_at
+  repair_evidence_aud:
+    clean_table_name: repair_evidence_aud
+  repair_evidence:
+    clean_table_name: repair_evidence
+    is_incremental: True
+    date_column: updated_at
+  repair_expense_aud:
+    clean_table_name: repair_expense_aud
+  repair_expense:
+    clean_table_name: repair_expense
+  repair_expense_group_aud:
+    clean_table_name: repair_expense_group_aud
+  repair_expense_group:
+    clean_table_name: repair_expense_group
+  repair_request_aud:
+    clean_table_name: repair_request_aud
+  repair_request:
+    clean_table_name: repair_request
+    is_incremental: True
+    date_column: updated_at
+  repair_request_item_aud:
+    clean_table_name: repair_request_item_aud
+  repair_request_item:
+    clean_table_name: repair_request_item
+    is_incremental: True
+    date_column: updated_at
+  revinfo:
     clean_table_name: rev_info
-    extraction_type: incremental
-    date_filter_column: revtstmp
+    is_incremental: True
+    date_column: revtstmp
     unixtime_measure: milliseconds
-  - table_name: service_request
-    extraction_type: incremental
-    date_filter_column: updated_at
-  - table_name: service_request_aud
-    extraction_type: full
-
-clean_partition_columns: [year, month, day]
+  service_request:
+    clean_table_name: service_request
+    is_incremental: True
+    date_column: updated_at
+  service_request_aud:
+    clean_table_name: service_request_aud
