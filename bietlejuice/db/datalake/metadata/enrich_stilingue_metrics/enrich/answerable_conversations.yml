@@ -1,0 +1,13 @@
+---
+database_name: datalake_stilingue_metrics
+table_name: answerable_conversations
+columns:
+  quarter:
+    lineage:
+      - datalake_quintoandar.aux_date.quarter
+  calendar_week:
+    lineage:
+      - datalake_quintoandar.aux_date.calendar_week
+  dt_week:
+    lineage:
+      - datalake_stilingue.service_interactions.dt_week

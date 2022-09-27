@@ -1,0 +1,31 @@
+---
+database_name: datalake_stilingue_metrics
+table_name: agent_productivity
+columns:
+  id_agent:
+    lineage:
+      - datalake_gsheets_clean.agents_control.id_assignee
+  id_external_agent:
+    lineage:
+      - datalake_gsheets_clean.stilingue_agents.id_external_agent
+  external_agent_name:
+    lineage:
+      - datalake_gsheets_clean.stilingue_agents.external_agent_name
+  agent_email:
+    lineage:
+      - datalake_gsheets_clean.stilingue_agents.agent_email
+  channel:
+    lineage:
+      - datalake_gsheets_clean.stilingue_agents.channel
+  is_moderator:
+    lineage:
+      - datalake_gsheets_clean.stilingue_agents.is_moderator
+  total_minutes_changed_status:
+    lineage:
+      - datalake_stilingue.service_interactions.minutes_changed_status
+  average_service_minutes:
+    lineage:
+      - datalake_stilingue.service_interactions.minutes_changed_status
+  dt_ref:
+    lineage:
+      - datalake_stilingue.service_interactions.ts_load

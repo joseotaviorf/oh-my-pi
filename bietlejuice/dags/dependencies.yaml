@@ -2104,6 +2104,11 @@ bietlejuice.enrich_sorting_hat:
 bietlejuice.enrich_stilingue:
   - bietlejuice.stilingue:load-clean-calls-report
 
+bietlejuice.enrich_stilingue_metrics:
+  - bietlejuice.enrich_stilingue:load-enrich-service-interactions
+  - bietlejuice.gsheets.support_and_service:load-clean-agents-control
+  - bietlejuice.gsheets.support_and_service:load-clean-stilingue-agents
+
 bietlejuice.enrich_survicate:
   - bietlejuice.gsheets.support_and_service:load-clean-owner-offboarding-keys-csat
   - bietlejuice.gsheets.support_and_service:load-clean-tenant-onboarding-keys-csat
