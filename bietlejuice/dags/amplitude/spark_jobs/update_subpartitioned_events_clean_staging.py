@@ -2,9 +2,12 @@ import logging
 from datetime import datetime
 from argparse import ArgumentParser
 from multiprocessing.dummy import Pool
+from urllib.parse import unquote
+from functools import reduce
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.formatters import StringFormatter
 from bietlejuice.base.spark import sqlContext
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.clients.db_clients import SparkClient, AthenaClient
@@ -29,7 +32,14 @@ NB_THREADS = 8
 
 
 def update_daily_partition(row):
+    replace_map = ("/", "%2F"), ("[", "%5B"), ("]", "%5D")
     subpartitioned_table_name = "_".join(str(col) for col in row) + "_events"
+    subpartitioned_table_name = reduce(
+        lambda a, t: str(a).replace(*t), replace_map, subpartitioned_table_name
+    )
+    subpartitioned_table_name = StringFormatter.set_alphanumeric_snake_case(
+        unquote(subpartitioned_table_name.replace("-", "_"))
+    )
     partitions = [{"year": year, "month": month, "day": day}]
 
     if spark_flag and subpartitioned_table_name in spark_existing_tables:
@@ -39,6 +49,10 @@ def update_daily_partition(row):
             partitions=partitions,
         )
         logger.info("m=__main__, msg=Table in Spark metastore daily partition repaired")
+    elif spark_flag and subpartitioned_table_name not in spark_existing_tables:
+        logger.info(
+            f"m=__main__, msg=Table {subpartitioned_table_name} do not exist in spark_existing_tables"
+        )
 
     if athena_flag and subpartitioned_table_name in athena_existing_tables:
         athena_metastore_service.add_partitions(
@@ -48,6 +62,10 @@ def update_daily_partition(row):
         )
         logger.info(
             "m=__main__, msg=Table in Athena metastore daily partition repaired"
+        )
+    elif athena_flag and subpartitioned_table_name not in athena_existing_tables:
+        logger.info(
+            f"m=__main__, msg=Table {subpartitioned_table_name} do not exist in athena_existing_tables"
         )
 
 
