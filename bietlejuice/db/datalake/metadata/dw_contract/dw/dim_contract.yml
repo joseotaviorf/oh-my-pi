@@ -70,6 +70,9 @@ columns:
   tenant_service_fee:
     lineage:
       - datalake_ebdb_contract.contract.tenant_service_fee
+  agent_brokerage_share:
+    lineage:
+      - datalake_ebdb_contract.contract.agent_brokerage_share
   signature_type:
     lineage:
       - datalake_ebdb_contract.contract.signature_type
@@ -100,6 +103,12 @@ columns:
   contract_plan:
     lineage:
       - datalake_ebdb_contract.contract_b2b.contract_plan
+  administration_split_percentage:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.administration_split_percentage
+  brokerage_split_percentage:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.brokerage_split_percentage
   is_ongoing_contract:
     lineage:
       - datalake_ebdb_contract.contract.is_ongoing_contract
