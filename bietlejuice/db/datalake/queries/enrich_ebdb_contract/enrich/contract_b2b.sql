@@ -29,6 +29,8 @@ b2b_contracts AS (
         cpd.id_contract,
         cpd.partner_type,
         cpd.contract_plan,
+        cpd.administration_split_percentage,
+        cpd.brokerage_split_percentage,
         IF(cpd.partner_type= 'PRIME', TRUE, FALSE) AS is_contract_b2b
     FROM 
         datalake_ebdb_clean.contract_partnership_data AS cpd
@@ -47,6 +49,8 @@ b2b_info AS (
         END AS b2b_type,
         b2b_c.partner_type AS contract_partner_type,
         b2b_c.contract_plan,
+        b2b_c.administration_split_percentage,
+        b2b_c.brokerage_split_percentage,
         CASE
             WHEN
                 -- because a lead can have both 'affiliate_type' = 'B2BPartner' and 'partner_agent.id' not null and we need to
@@ -96,6 +100,8 @@ SELECT
     id_contract,
     contract_plan,
     contract_partner_type,
+    administration_split_percentage,
+    brokerage_split_percentage,
     b2b_type,
     b2b_prime_type,
     is_b2b,

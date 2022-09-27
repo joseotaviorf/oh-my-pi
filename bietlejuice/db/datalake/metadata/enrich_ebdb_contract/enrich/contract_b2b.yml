@@ -11,3 +11,9 @@ columns:
   contract_partner_type:
     lineage:
       - datalake_ebdb_clean.contract_partnership_data.partner_type
+  administration_split_percentage:
+    lineage:
+      - datalake_ebdb_clean.contract_partnership_data.administration_split_percentage
+  brokerage_split_percentage:
+    lineage:
+      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage

@@ -166,6 +166,7 @@ SELECT
   c.condo_price,
   c.iptu,
   c.tenant_service_fee,
+  c.agent_brokerage_share,
   (sfo.id_contract is not null) as is_tenant_service_fee_opt_out,
   dt_last_tenant_service_fee_change as ts_tenant_service_fee_opt_out,
   c.is_exit_inspection_opted_out,

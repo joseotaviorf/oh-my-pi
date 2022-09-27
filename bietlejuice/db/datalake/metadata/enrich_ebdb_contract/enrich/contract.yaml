@@ -73,6 +73,9 @@ columns:
   tenant_service_fee:
     lineage:
       - datalake_ebdb_clean.contract.tenant_service_fee
+  agent_brokerage_share:
+    lineage:
+      - datalake_ebdb_clean.contract.agent_brokerage_share
   is_tenant_service_fee_opt_out:
     lineage:
       - datalake_ebdb_clean.contract_aud.id_contract
