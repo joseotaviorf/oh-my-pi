@@ -1,5 +1,5 @@
 ---
-artifacts_bucket: s3://artifacts.s3.forno.data.quintoandar.com.br
+artifacts_bucket: &artifacts_bucket s3://artifacts.s3.forno.data.quintoandar.com.br
 athena_query_results_bucket: s3://aws-athena-query-results-713278628093-us-east-1/
 dags_out_of_pattern:
     [
@@ -144,6 +144,7 @@ cluster_template:
         spark_env_vars:
             PYSPARK_PYTHON: "/databricks/python3/bin/python3"
             ENVIRONMENT: "{{ var.value.environment }}"
+            ARTIFACTS_BUCKET: *artifacts_bucket
         ssh_public_keys: []
         node_type_id: m5a.large
         driver_node_type_id: m5a.large

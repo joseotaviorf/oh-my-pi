@@ -31,9 +31,12 @@ echo "END: Modify Spark config settings"
 echo "BEGIN: Installing QuintoAndar internal libs"
 /databricks/python/bin/pip install -q awscli
 
-aws s3 cp s3://artifacts.s3.data.quintoandar.com.br/bi-etl-ejuice/bi_etl_ejuice-latest-py3-none-any.whl /bi_etl_ejuice-latest-py3-none-any.whl
-aws s3 cp s3://artifacts.s3.data.quintoandar.com.br/python-logger/quintoandar_logger-0.8.0-py3-none-any.whl /quintoandar_logger-0.8.0-py3-none-any.whl
-aws s3 cp s3://artifacts.s3.data.quintoandar.com.br/inmetro/inmetro-2.2.5-py3-none-any.whl /inmetro-2.2.5-py3-none-any.whl
+# Here, the script differentiate between environments
+# using different buckets.
+
+aws s3 cp ${ARTIFACTS_BUCKET}/bi-etl-ejuice/bi_etl_ejuice-latest-py3-none-any.whl /bi_etl_ejuice-latest-py3-none-any.whl
+aws s3 cp ${ARTIFACTS_BUCKET}/python-logger/quintoandar_logger-0.8.0-py3-none-any.whl /quintoandar_logger-0.8.0-py3-none-any.whl
+aws s3 cp ${ARTIFACTS_BUCKET}/inmetro/inmetro-2.2.5-py3-none-any.whl /inmetro-2.2.5-py3-none-any.whl
 
 /databricks/python/bin/pip install -q /bi_etl_ejuice-latest-py3-none-any.whl
 /databricks/python/bin/pip install -q /quintoandar_logger-0.8.0-py3-none-any.whl

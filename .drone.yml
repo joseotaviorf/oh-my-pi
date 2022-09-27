@@ -123,14 +123,14 @@ pipeline:
     commands:
       - make package
     when:
-      event: [ push, tag ]
-      branch: [ master, forno, hotfix/* ]
+      event: [push, tag]
+      branch: [master, forno, hotfix/*]
 
   prepare-release-forno:
     group: release
     image: alpine:3.10
     commands:
-      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec mv '{}' ./dist/bi_etl_ejuice-forno-py3-none-any.whl \;
+      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec mv '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
     when:
       event: push
       branch: forno
@@ -141,7 +141,7 @@ pipeline:
     commands:
       - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec cp '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
     when:
-      event: [ push, tag ]
+      event: [push, tag]
       branch: [master, hotfix/*]
 
   export-releases-to-s3-prod:
@@ -155,7 +155,7 @@ pipeline:
     acl: bucket-owner-full-control
     cache_control: no-cache
     when:
-      event: [ push, tag ]
+      event: [push, tag]
       branch: [master, hotfix/*]
 
   export-releases-to-s3-new-prod-account:
@@ -169,7 +169,7 @@ pipeline:
     acl: bucket-owner-full-control
     cache_control: no-cache
     when:
-      event: [ push, tag ]
+      event: [push, tag]
       branch: [master, hotfix/*]
 
   export-releases-to-s3-forno:
@@ -183,8 +183,50 @@ pipeline:
     acl: bucket-owner-full-control
     cache_control: no-cache
     when:
-      event: [ push, tag ]
+      event: [push, tag]
       branch: forno
+
+  export-init-script-to-s3-forno:
+    group: export
+    image: plugins/s3
+    pull: true
+    bucket: artifacts.s3.forno.data.quintoandar.com.br
+    source: scripts/init_script.sh
+    target: bi-etl-ejuice/
+    strip_prefix: scripts/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: forno
+
+  export-init-script-to-s3-prod:
+    group: export
+    image: plugins/s3
+    pull: true
+    bucket: 5a-artifacts
+    source: scripts/init_script.sh
+    target: bi-etl-ejuice/
+    strip_prefix: scripts/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
+
+  export-init-script-to-s3-new-prod-account:
+    group: export
+    image: plugins/s3
+    pull: true
+    bucket: artifacts.s3.data.quintoandar.com.br
+    source: scripts/init_script.sh
+    target: bi-etl-ejuice/
+    strip_prefix: scripts/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
 
   load-dags-composer-forno:
     group: update_jobs
@@ -200,7 +242,7 @@ pipeline:
         target: google_application_credentials
     when:
       event: push
-      branch: [ forno ]
+      branch: [forno]
 
   load-dags-composer-prod:
     group: update_jobs
@@ -367,10 +409,10 @@ pipeline:
           -Dsonar.pullrequest.key=${DRONE_PULL_REQUEST} \
           -Dsonar.host.url=https://sonarqube.quintoandar.com.br \
           -Dsonar.login=$${SONARQUBE_TOKEN} \
-    secrets: [ sonarqube_token ]
+    secrets: [sonarqube_token]
     when:
       event: pull_request
-      branch: [ master, hotfix/* ]
+      branch: [master, hotfix/*]
 
   sonar-report:
     group: common-sonar
@@ -389,7 +431,7 @@ pipeline:
           -Dsonar.host.url=https://sonarqube.quintoandar.com.br \
           -Dsonar.login=$${SONARQUBE_TOKEN} \
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
-    secrets: [ sonarqube_token ]
+    secrets: [sonarqube_token]
     when:
       event: push
-      branch: [ master, hotfix/* ]
+      branch: [master, hotfix/*]
