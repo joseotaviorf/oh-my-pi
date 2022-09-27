@@ -105,8 +105,7 @@ clean_task_group = task_group.build_clean_task_group(
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
     table_name=table_name,
-    is_incremental=True,
-    partitions=partition_cols,
+    is_incremental=False,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))

@@ -17,15 +17,201 @@ columns:
   model_metadata:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_decisao_json
+  bigdata_age_amax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_idade_amax
+  bigdata_age_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_idade_amin
+  bigdata_age_bureau:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_idade_bureau
+  bigdata_total_addresses_sum:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_total_enderecos_sum
+  bigdata_total_tickets_emails_mean:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_total_passagens_emails_mean
+  boavista_score_amax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_boavista_score_amax
+  boavista_score_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_boavista_score_amin
+  boavista_score_mean:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_boavista_score_mean
+  boavista_score_bureau:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_boavista_score_bureau
+  serasa_score_csba_amax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_serasa_score_csba_amax
+  serasa_score_csba_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_serasa_score_csba_amin
+  serasa_score_csba_mean:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_serasa_score_csba_mean
+  serasa_score_csba_sum:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_serasa_score_csba_sum
+  serasa_score_hspn_amax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_serasa_score_hspn_amax
+  serasa_score_hspn_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_serasa_score_hspn_amin
+  serasa_score_hspn_sum:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_serasa_score_hspn_sum
+  transunion_dist_fronteira_m_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_dist_fronteira_m_amin
+  transunion_indic_seg_24_sum:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_indic_seg_24_sum
+  transunion_percent_decl_10_01_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_percent_decl_10_01_amin
+  transunion_percent_escol_10_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_percent_escol_10_amin
+  neoway_income_bureau:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_neoway_income_bureau
+  neoway_income_mean:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_neoway_income_mean
+  proposal_state:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_estado
+  proposal_real_state_tax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_taxa_imobiliaria
+  proposal_birth_date_proponents:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_nasc_titular
+  proposal_value_package_item:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_valor_item_pacote
+  proposal_property_type:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_tipo_imovel
+  proposal_city:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_cidade
+  proposal_verified_income:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_renda_comprovada
+  proposal_real_state_agent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_corretor
+  proposal_nature_income:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_natureza_renda
+  proposal_declared_income:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_renda_declarada
+  proposal_approved_percentage:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_percentual_aprovado
+  proposal_rating:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_rating
+  proposal_number:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_num_proposta
+  dti:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_dti
+  dti_max:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_dti_maximo
+  dti_real:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_dti_real
+  dti_presumed:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_dti_presumido
+  dti_calculated:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_dti_apurado
+  package_range:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_faixa_pacote
+  package_value:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_valor_pacote
+  main_proponent_name:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_nome_principal
+  main_proponent_age:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_idade
+  main_proponent_email:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_email_titular
+  presumed_income_range:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_faixa_renda_presumida
+  model_total_income:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_modelo_renda_total
+  elected_income:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_renda_eleita
+  branch_activity:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_ramo_atividade
+  log_user:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.log_usuario
+  log_result:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.log_resultado
+  status_decision:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_status_decisao
+  rating_random:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_rating_random
+  decision_status:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_decisao_status
+  decision_flex:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.flx_decisao
+  calculate_score_result:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.rgr_calcular_score
+  status_exec_bigid:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.vi_exec_bigid
+  status_filters:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_filtros
+  status_foreign_filter:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.rgr_estrangeiro
+  flag_cnpj:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.flag_cnpj
+  flag_fraud:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.flag_fraude
+  is_success:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.sucesso
+  is_resubmission:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_resubmissao
+  is_package_value_approved:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.rgr_valor_pacote
+  has_lawsuits:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_processos
   ts_operation:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.instante
-  year:
-    lineage:
-      - datalake_velo_neurotech_raw.logs_credit_granting.year
-  month:
-    lineage:
-      - datalake_velo_neurotech_raw.logs_credit_granting.month
-  day:
-    lineage:
-      - datalake_velo_neurotech_raw.logs_credit_granting.day
