@@ -35,7 +35,8 @@ WITH fact_house_listing_flows_adjust AS (
             ELSE hl.mkt_origin
         END AS mkt_origin,
         dhl.ts_house_first_publication,
-        FROM_UTC_TIMESTAMP(dhl.ts_house_first_publication,'Brazil/East') AS ts_house_first_publication_br_tz
+        FROM_UTC_TIMESTAMP(dhl.ts_house_first_publication,'Brazil/East') AS ts_house_first_publication_br_tz,
+		hl.country_code
     FROM
         dw_public.fact_house_listing_flows AS hl
     INNER JOIN
@@ -118,7 +119,8 @@ source_ops_rent AS (
         hlf.funnel_drop_reason,
         pj.sk_first_photo_job_date,
         pj.ts_first_job_scheduled,
-        FROM_UTC_TIMESTAMP(pj.ts_first_job_scheduled,'Brazil/East') AS ts_first_job_scheduled_br_tz
+        FROM_UTC_TIMESTAMP(pj.ts_first_job_scheduled,'Brazil/East') AS ts_first_job_scheduled_br_tz,
+        hlf.country_code
     FROM
         fact_house_listing_flows_adjust AS hlf
         JOIN
@@ -310,7 +312,8 @@ fact_sale AS (
         ssf.has_isales_intervention,
         ssf.sk_user_lead_affiliate,
         'Sale' AS origin_table,
-        sor.rental_administrator
+        sor.rental_administrator,
+        NULL AS country_code
     FROM
         sale_fact_listing_flows_adjust AS ssf
     JOIN
@@ -360,7 +363,8 @@ fact_rent AS (
         hlf.has_isales_intervention,
         hlf.sk_user_lead_affiliate,
         'Rent' AS origin_table,
-        hlf.rental_administrator
+        hlf.rental_administrator,
+        hlf.country_code
     FROM
         fact_house_listing_flows_adjust AS hlf
     JOIN
@@ -394,6 +398,7 @@ SELECT
     sk_discard_date,
     sk_first_photojob_date_fact_photo_job,
     sk_user_lead_affiliate,
+    country_code,
     context_lead,
     context_prospect,
     context_qualified,
