@@ -13,6 +13,7 @@ from airflow.utils.helpers import cross_downstream, chain
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.services import FileService, ConfigurationService
 
@@ -374,7 +375,9 @@ contract_model_dependencies.extend(task_list_last_tasks(clean_task_list.pop("lea
 
 
 # Data Quality tests for raw
-tb_names = FileService.list_data_quality_tests_files(SOURCE, "raw")
+tb_names = DAGPackagesPathService.list_data_quality_tests_files_in_composer(
+    dag_name=SOURCE, layer="raw"
+)
 
 for tb_name in tb_names:
     inmetro_bucket = config_service.get_config("inmetro_bucket")

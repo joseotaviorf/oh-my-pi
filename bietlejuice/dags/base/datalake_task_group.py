@@ -14,7 +14,7 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.formatters import StringFormatter
-from bietlejuice.services import FileService, ConfigurationService
+from bietlejuice.services import ConfigurationService
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 
 logger = QuintoAndarLogger("DatalakeTaskGroup")
@@ -245,8 +245,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         ):
             tb_names = [table_name]
         elif sync_mode == self.ALL_TABLES:
-            tb_names = FileService.list_data_quality_tests_files(
-                self.relative_query_path, layer
+            tb_names = DAGPackagesPathService.list_data_quality_tests_files_in_composer(
+                dag_name=self.relative_query_path, layer=layer
             )
 
         quality_tasks = []

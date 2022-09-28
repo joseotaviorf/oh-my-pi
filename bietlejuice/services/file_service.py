@@ -1,6 +1,5 @@
 import glob
 import gzip
-import re
 from io import BytesIO
 from os import listdir
 from os.path import isdir, isfile
@@ -171,29 +170,6 @@ class FileService:
                 f"{DATALAKE_METADATA_PATH}/**/{extension}", recursive=True
             ):
                 yield file
-
-    @staticmethod
-    def list_data_quality_tests_files(relative_file_path: str, layer: str) -> list:
-        """
-        Lists all data quality tests files for a given relative file path.
-        :param relative_file_path: The relative path to lists files to.
-        :param layer: the layer that the file is related to.
-        :return: the list of files for the given relative file path.
-        """
-        filename_regex = re.compile(
-            rf".*/{relative_file_path}/{layer}/([a-z0-9_-]+)(?:\.yml|\.yaml)"
-        )
-        table_names = []
-        for extension in ("*.yml", "*.yaml"):
-            files = glob.glob(
-                f"{DATA_QUALITY_TESTS_PATH}/{relative_file_path}/{layer}/**/{extension}",
-                recursive=True,
-            )
-            if files:
-                for file_path in files:
-                    table_names.append(re.search(filename_regex, file_path).group(1))
-
-        return table_names
 
     @staticmethod
     def get_data_quality_test_file(

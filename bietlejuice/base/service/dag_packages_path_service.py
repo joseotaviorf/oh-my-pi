@@ -1,4 +1,5 @@
 import os
+import re
 from glob import glob
 from os import path
 from os.path import dirname, isfile
@@ -21,14 +22,18 @@ class DuplicateDAGException(Exception):
 class DAGPackagesPathService:
     """
     Abstracts and centralizes path/directory manipulations related to the DAGs or its inner contents.
+
+    The methods are annotated, so we know if they can be used in Databricks or Composer to avoid errors
+     and after migration we can easily uncouple the code between Orchestration and Jobs Core code.
     """
 
     @staticmethod
     def _get_dag_package_path(dag_name):
         """
         Returns the DAG's path (considering it is inside the DAG Packages structure)
-
         The path returned does not contain trailing slash like `/dags/bla/foo`
+
+        * Method can be used Composer (GCS) or Databricks (wheel) *
 
         :param dag_name: the DAG name, that is expected to be unique in the entire platform
         :return: full DAG Package path
@@ -50,8 +55,9 @@ class DAGPackagesPathService:
     def _is_dag_in_legacy_structure(dag_name: str) -> bool:
         """
         Returns the DAG's path (considering it is inside the legacy structure)
-
         The path returned does not contain trailing slash like `/dags/bla/foo`
+
+        * Method can be used Composer (GCS) or Databricks (wheel) *
 
         :param dag_name: the DAG name, that is expected to be unique in the entire platform
         :return: full legacy DAG path
@@ -64,6 +70,8 @@ class DAGPackagesPathService:
     def _read_file_content_from_filesystem(file_path: str):
         """
         Open a file from the bietlejuice wheel (for Databricks) or GCS path (for Composer)
+
+        * Method can be used Composer (GCS) or Databricks (wheel) *
 
         :param file_path: absolute file path
         :return: file content
@@ -82,6 +90,8 @@ class DAGPackagesPathService:
     def _read_file_from_s3(bucket_name: str, file_key: str):
         """
         Read a file from S3 based on Bucket and s3 file path.
+
+        * Method used only in Databricks *
 
         :return: file content.
         """
@@ -254,9 +264,36 @@ class DAGPackagesPathService:
             data_quality_file_path = path.join(
                 DAGPackagesPathService.get_dag_path(dag_name),
                 "data_quality",
-                intermediate_path,
                 layer,
+                intermediate_path,
                 f"{table_name}.yml",
             )
 
         return isfile(data_quality_file_path)
+
+    @staticmethod
+    def list_data_quality_tests_files_in_composer(dag_name: str, layer: str) -> list:
+        """
+        Lists all data quality tests files for a given DAG.
+
+        * Method used only in Composer *
+
+        :param dag_name: The DAG we want to list the D.Q. files.
+        :param layer: the layer that the file is related to.
+        :return: list of D.Q. files found.
+        """
+        if DAGPackagesPathService._is_dag_in_legacy_structure(dag_name):
+            data_quality_folder = f"{DATA_QUALITY_TESTS_PATH}/{dag_name}/{layer}"
+        else:
+            data_quality_folder = path.join(
+                DAGPackagesPathService.get_dag_path(dag_name), "data_quality", layer
+            )
+
+        files = glob(f"{data_quality_folder}/**/*.yml", recursive=True)
+        filename_regex = re.compile(rf".*/([a-z0-9_-]+)(?:\.yml|\.yaml)")
+
+        table_names = []
+        for file_path in files:
+            table_names.append(re.search(filename_regex, file_path).group(1))
+
+        return table_names
