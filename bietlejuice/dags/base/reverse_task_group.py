@@ -8,8 +8,9 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.airflow import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.formatters import StringFormatter
-from bietlejuice.services import FileService, ConfigurationService
+from bietlejuice.services import ConfigurationService
 
 logger = QuintoAndarLogger("ReverseTaskGroup")
 
@@ -129,7 +130,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         final_tasks = [load_table_task]
 
         quality_tasks = []
-        if FileService.data_quality_tests_file_exists(
+        if DAGPackagesPathService.data_quality_tests_file_exists_in_composer(
             self.relative_query_path, layer.value, table_name
         ):
             config_service = ConfigurationService()

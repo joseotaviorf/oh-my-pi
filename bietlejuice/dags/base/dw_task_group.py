@@ -10,8 +10,9 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.base.airflow import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.formatters import StringFormatter
-from bietlejuice.services import FileService, ConfigurationService
+from bietlejuice.services import ConfigurationService
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 
 
@@ -289,7 +290,7 @@ class DWTaskGroup(BaseTaskGroup):
         )
 
         quality_tasks = []
-        if FileService.data_quality_tests_file_exists(
+        if DAGPackagesPathService.data_quality_tests_file_exists_in_composer(
             self.relative_query_path, layer, table_name
         ):
             config_service = ConfigurationService()

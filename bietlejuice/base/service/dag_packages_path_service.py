@@ -1,7 +1,7 @@
 import os
 from glob import glob
 from os import path
-from os.path import dirname
+from os.path import dirname, isfile
 
 import boto3
 
@@ -94,6 +94,8 @@ class DAGPackagesPathService:
     def get_dag_path(dag_name: str) -> str:
         """
         Gets the DAG's full path
+
+        The path returned does not contain trailing slash like `/dags/bla/foo`
 
         * Method used only in Composer *
 
@@ -225,3 +227,36 @@ class DAGPackagesPathService:
             )
 
         return data_quality_content
+
+    @staticmethod
+    def data_quality_tests_file_exists_in_composer(
+        dag_name: str, layer: str, table_name: str, intermediate_path: str = ""
+    ) -> bool:
+        """
+        Checks if a data quality tests file for a given table exists.
+
+        * Method used only in Composer *
+
+        :param dag_name: the DAG name
+        :param layer: the layer that the file is related to.
+        :param table_name: the name of the table that the file is related to
+        :param intermediate_path: off intermediate path structure used in some DAGs
+        :return: True if the file exists, False if no file is found
+        """
+
+        if DAGPackagesPathService._is_dag_in_legacy_structure(dag_name):
+            data_quality_file_path = path.join(
+                f"{DATA_QUALITY_TESTS_PATH}/{dag_name}/{layer}",
+                intermediate_path,
+                f"{table_name}.yml",
+            )
+        else:
+            data_quality_file_path = path.join(
+                DAGPackagesPathService.get_dag_path(dag_name),
+                "data_quality",
+                intermediate_path,
+                layer,
+                f"{table_name}.yml",
+            )
+
+        return isfile(data_quality_file_path)
