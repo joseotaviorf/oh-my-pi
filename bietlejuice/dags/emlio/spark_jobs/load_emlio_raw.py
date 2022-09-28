@@ -143,7 +143,7 @@ if __name__ == "__main__":
     streaming_query = (
         part_df.writeStream.partitionBy(partition_cols)
         .format(load_format)
-        .trigger(once=True)
+        .trigger(availableNow=True)
         .option("checkpointLocation", checkpoints_path)
         .outputMode("append")
         .option("path", load_path)

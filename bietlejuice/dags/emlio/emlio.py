@@ -42,7 +42,7 @@ RAW_SPARK_JOB_FILE = (
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_min_general_cluster", deserialize_json=True
+    "databricks_10_4_med_io-memory_cluster", deserialize_json=True
 )
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
