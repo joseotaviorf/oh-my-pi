@@ -23,8 +23,6 @@ This pipeline produces the following output tables, all via **full load**:
 
 - `schema_migrations`
 - `change_owner_control`
-- `revenue_share_file`
-- `revenue_share_file_importation_error`
 
 1. In data lake clean:​​
 
@@ -44,6 +42,8 @@ This pipeline produces the following output tables, all via **full load**:
 - `partner`
 - `partner_revision`
 - `revenue_share_by_participant`
+- `revenue_share_file`
+- `revenue_share_file_importation_error`
 - `tier_bonus`
 - `tier_bonus_revision`
 

@@ -2,8 +2,6 @@
 tables_exclusion_list:
   - schema_migrations
   - change_owner_control
-  - revenue_share_file
-  - revenue_share_file_importation_error
   - t1
   - t2
   - t3
