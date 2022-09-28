@@ -60,7 +60,7 @@ weekly_status_since_start AS (
             ELSE hldi.status_history
         END AS status_history,
         pw.weeks_since_listing_started, -- cohort 0 to 7 days => 1w, 8 to 14days  => 2w
-        MAX(hldi.dt_day) OVER(PARTITION BY hldi.id_house_listing ORDER BY pw.weeks_since_listing_started) = hldi.dt_day AS is_last_status_in_cohort,
+        MAX(hldi.dt_day) OVER(PARTITION BY hldi.id_house_listing, pw.weeks_since_listing_started) = hldi.dt_day AS is_last_status_in_cohort,
         DATE_TRUNC('month', dhl.ts_listing_version_start) AS dt_listing_month_started,
         DATE_TRUNC('week', dhl.ts_listing_version_start) AS dt_listing_week_started,
         hldi.ts_status_started,
@@ -89,9 +89,15 @@ weekly_status_since_start AS (
         AND dhl.country_code = 'BR'
         AND r.city_group IS NOT NULL 
 ),
-weekly_amounts AS (
+listing_first_group AS (
+/*
+We are fixing the first group which a listing belongs
+as a reference. So any other week considers this first
+group, regardless any change in this listing.
+In this way, we keep only the listing status changing over time.
+*/
     SELECT
-        MD5(dt_listing_week_started || dt_listing_month_started || listing_category_start || city_group || hybrid || mkt_completion || mkt_origin || entry_condition || consultant_type || exclusivity) AS id_cohort_listing,
+        id_house_listing,
         city_group,
         consultant_type,
         entry_condition,
@@ -100,15 +106,37 @@ weekly_amounts AS (
         listing_category_start,
         mkt_completion,
         mkt_origin,
-        COUNT(DISTINCT id_house_listing) AS imoveis_w,
-        COUNT(DISTINCT IF(status_history = 'alugado', id_house_listing, NULL)) AS list_w_cs_w,
-        COUNT(DISTINCT IF(status_history = 'despublicado', id_house_listing, NULL)) AS depub_w,
-        COUNT(DISTINCT IF(status_history = 'suspenso', id_house_listing, NULL)) AS suspenso_w,
-        weeks_since_listing_started,
         dt_listing_month_started,
         dt_listing_week_started
     FROM
         weekly_status_since_start
+    WHERE
+        is_last_status_in_cohort = TRUE
+        AND weeks_since_listing_started = 1
+),
+weekly_amounts AS (
+    SELECT
+        MD5(lfg.dt_listing_week_started || lfg.dt_listing_month_started || lfg.listing_category_start || lfg.city_group || lfg.hybrid || lfg.mkt_completion || lfg.mkt_origin || lfg.entry_condition || lfg.consultant_type || lfg.exclusivity) AS id_cohort_listing,
+        lfg.city_group,
+        lfg.consultant_type,
+        lfg.entry_condition,
+        lfg.exclusivity,
+        lfg.hybrid,
+        lfg.listing_category_start,
+        lfg.mkt_completion,
+        lfg.mkt_origin,
+        COUNT(DISTINCT wsss.id_house_listing) AS imoveis_w,
+        COUNT(DISTINCT IF(wsss.status_history = 'alugado', wsss.id_house_listing, NULL)) AS list_w_cs_w,
+        COUNT(DISTINCT IF(wsss.status_history = 'despublicado', wsss.id_house_listing, NULL)) AS depub_w,
+        COUNT(DISTINCT IF(wsss.status_history = 'suspenso', wsss.id_house_listing, NULL)) AS suspenso_w,
+        wsss.weeks_since_listing_started,
+        lfg.dt_listing_month_started,
+        lfg.dt_listing_week_started
+    FROM
+        weekly_status_since_start AS wsss
+    JOIN
+        listing_first_group AS lfg
+            ON wsss.id_house_listing = lfg.id_house_listing
     WHERE
         is_last_status_in_cohort = TRUE
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16
