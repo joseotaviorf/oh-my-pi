@@ -50,7 +50,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 
-tables_details = config_service.get_config("tables")
+tables = config_service.get_config("tables")
 partition_cols = config_service.get_config("partition_cols")
 
 dag = DAG(
@@ -88,7 +88,7 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-for raw_table_name, table_details in tables_details.items():
+for raw_table_name, table_details in tables.items():
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,
@@ -106,6 +106,7 @@ for raw_table_name, table_details in tables_details.items():
     clean_task_group = task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
+        has_create_external_table_task=False,
         table_name=table_details["clean_table_name"],
         partitions=partition_cols if table_details.get("is_incremental") else None,
         is_incremental=True if table_details.get("is_incremental") else False,
