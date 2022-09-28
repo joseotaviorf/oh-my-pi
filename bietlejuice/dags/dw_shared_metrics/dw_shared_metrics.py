@@ -1,7 +1,7 @@
 import pendulum
 
 from datetime import datetime, timedelta
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -34,8 +34,7 @@ spark_jobs_logs_path = configs_service.get_config("spark_jobs_logs_path")
 spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 logs_output_path = "{}{}".format(spark_jobs_logs_path, DAG_ID)
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = logs_output_path
+cluster_description = configs_service.get_config("databricks_10_4_med_general_cluster")
 default_libraries = configs_service.get_config("default_libraries")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
@@ -62,7 +61,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
+    cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries,
 )
