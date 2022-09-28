@@ -75,6 +75,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         raw_spark_job_extra_args=None,
         pool=AIRFLOW_DEFAULT_POOL,
         has_hive_sync=True,
+        tree_path="",
     ):
         """
         Create a task group containing 2 tasks:
@@ -96,6 +97,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param pool: airflow's pool name
         :type pool: str
         :param has_hive_sync: if this table is going to have Hive sync
+        :param tree_path: partial path used in some DAGs off of our pattern
         :return: initial and final tasks of the created task group
         :rtype: dict
         """
@@ -240,7 +242,10 @@ class DatalakeTaskGroup(BaseTaskGroup):
         if (
             sync_mode == self.SINGLE_TABLE
             and DAGPackagesPathService.data_quality_tests_file_exists_in_composer(
-                self.relative_query_path, layer, table_name
+                dag_name=self.relative_query_path,
+                layer=layer,
+                table_name=table_name,
+                intermediate_path=tree_path,
             )
         ):
             tb_names = [table_name]
@@ -327,6 +332,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         raw_spark_job_extra_args=None,
         pool=AIRFLOW_DEFAULT_POOL,
         has_hive_sync=True,
+        tree_path="",
     ):
         """
         Build a task group for raw layer to extract a specific table from source
@@ -346,6 +352,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param pool: airflow's pool name
         :type pool: str
         :param has_hive_sync: if this table is going to have Hive sync
+        :param tree_path: partial path used in some DAGs off of our pattern
         :return: initial and final tasks of the created task group
         :rtype: dict
         """
@@ -357,6 +364,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             raw_spark_job_extra_args=raw_spark_job_extra_args,
             pool=pool,
             has_hive_sync=has_hive_sync,
+            tree_path=tree_path,
         )
 
     def _build_task_group(
@@ -557,7 +565,10 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         quality_tasks = []
         if DAGPackagesPathService.data_quality_tests_file_exists_in_composer(
-            self.relative_query_path, layer.value, table_name
+            dag_name=self.relative_query_path,
+            layer=layer.value,
+            table_name=table_name,
+            intermediate_path=tree_path,
         ):
             config_service = ConfigurationService()
             inmetro_bucket = config_service.get_config("inmetro_bucket")

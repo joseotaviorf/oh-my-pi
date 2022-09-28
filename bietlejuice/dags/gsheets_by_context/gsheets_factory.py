@@ -166,6 +166,7 @@ class GsheetsDAGFactory:
         raw_spark_job_path,
         create_cluster_task,
         task_group,
+        tree_path,
     ):
         """
         This method creates the raw task for each worksheet associated with the DAG
@@ -194,6 +195,7 @@ class GsheetsDAGFactory:
                     json.dumps(sheet_details),
                 ],
                 pool=task_pool,
+                tree_path=tree_path,
             )
             raw_task_groups[sheet_details["clean_table_name"]] = raw_task_group
 
@@ -264,6 +266,7 @@ class GsheetsDAGFactory:
             self.raw_spark_job_path,
             create_cluster_task,
             task_group,
+            f"{dag_context}/",
         )
 
         clean_task_groups = task_group.build_task_group_from_sql_files(
