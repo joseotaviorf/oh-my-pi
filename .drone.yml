@@ -276,7 +276,7 @@ pipeline:
         target: google_application_credentials
     when:
       event: push
-      branch: [ forno ]
+      branch: [forno]
 
   load-dag-packages-composer-prod:
     group: update_jobs
@@ -292,7 +292,7 @@ pipeline:
         target: google_application_credentials
     when:
       event: push
-      branch: [ master, hotfix/* ]
+      branch: [master, hotfix/*]
 
   load-spark-jobs-s3-forno:
     group: update_jobs
@@ -304,12 +304,12 @@ pipeline:
       event: push
       branch: forno
 
-  load-spark-jobs-s3-forno-from-dag-packages:
+  upload-dag-packages-spark-jobs-s3-forno:
     group: update_jobs
     image: python:3.7.3
     commands:
-      - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3_from_dag_packages.py 5a-databricks-forno
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks-forno spark_jobs
     when:
       event: push
       branch: forno
@@ -324,12 +324,12 @@ pipeline:
       event: push
       branch: forno
 
-  load-spark-jobs-s3-new-forno-account-from-dag-packages:
+  upload-dag-packages-spark-jobs-s3-new-forno-account:
     group: update_jobs
     image: python:3.7.3
     commands:
-      - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3_from_dag_packages.py databricks.s3.forno.data.quintoandar.com.br
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br spark_jobs
     when:
       event: push
       branch: forno
@@ -344,12 +344,12 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
-  load-spark-jobs-s3-prod-from-dag-packages:
+  upload-dag-packages-spark-jobs-s3-prod:
     group: update_jobs
     image: python:3.7.3
     commands:
-      - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3_from_dag_packages.py 5a-databricks
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks spark_jobs
     when:
       event: push
       branch: [master, hotfix/*]
@@ -364,12 +364,52 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
-  load-spark-jobs-s3-new-prod-account-from-dag-packages:
+  upload-dag-packages-spark-jobs-s3-new-prod-account:
     group: update_jobs
     image: python:3.7.3
     commands:
-      - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3_from_dag_packages.py databricks.s3.data.quintoandar.com.br
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.data.quintoandar.com.br spark_jobs
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
+  upload-dag-packages-queries-s3-forno:
+    group: update_jobs
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks-forno queries
+    when:
+      event: push
+      branch: forno
+
+  upload-dag-packages-queries-s3-new-forno-account:
+    group: update_jobs
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br queries
+    when:
+      event: push
+      branch: forno
+
+  upload-dag-packages-queries-s3-prod:
+    group: update_jobs
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks queries
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
+  upload-dag-packages-queries-s3-new-prod-account:
+    group: update_jobs
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.data.quintoandar.com.br queries
     when:
       event: push
       branch: [master, hotfix/*]
