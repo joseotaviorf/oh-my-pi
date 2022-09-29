@@ -75,6 +75,9 @@ columns:
   sk_qualified_date:
     lineage:
       - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_qualified
+  sk_available_qualified_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_qualified
   sk_opportunity_date:
     lineage:
       - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_opportunity

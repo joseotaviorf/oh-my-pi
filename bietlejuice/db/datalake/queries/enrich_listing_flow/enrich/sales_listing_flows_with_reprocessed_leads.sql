@@ -172,17 +172,17 @@ acquisition_channels AS (
         lbc.ts_opt_out_sale,
         CASE
             WHEN l.is_for_sale
-             THEN lf.ts_lead
+                THEN lf.ts_lead
             ELSE lbc.ts_qualified_sale
         END AS ts_lead,
         CASE
             WHEN l.is_for_sale
-             THEN lf.ts_prospect
+                THEN lf.ts_prospect
             ELSE lbc.ts_qualified_sale
         END AS ts_prospect,
         CASE
             WHEN l.is_for_sale
-             THEN lf.ts_first_contact
+                THEN lf.ts_first_contact
             ELSE lbc.ts_qualified_sale
         END AS ts_first_contact,
         lf.ts_conversion,
@@ -238,6 +238,85 @@ acquisition_channels AS (
         lbc.is_for_sale
         OR l.is_for_sale
 ),
+supply_2_0_prospect AS (
+    SELECT
+        ac.*,
+        CASE -- filtering prospect sale
+            WHEN drbc.lead_discard_sale IN (
+                'HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS',
+                'ForaArea',
+                'DUPLICATED_LEAD',
+                'CONTACT_ON_BLOCK_LIST'
+            )
+            AND ts_opportunity IS NULL
+                THEN NULL
+            ELSE ac.ts_prospect
+	    END AS ts_prospect_sale,
+        prospect_status,
+        prospect_discard_sale
+    FROM
+        acquisition_channels ac
+    LEFT JOIN
+        datalake_listing_flow.discards_reason_by_context drbc
+        ON ac.id_lead = drbc.id_lead
+),
+supply_2_0_qualified AS (
+    SELECT
+        *,
+        CASE
+            WHEN prospect_discard_sale IN (
+                'CONTACT_DIDNT_EXIST',
+                'HOUSE_ALREADY_PUBLISHED',
+                'CONTACT_KNOW_OWNER',
+                'CONTACT_WASNT_THE_HOUSE_OWNER',
+                'HOUSE_ALREADY_SOLD',
+                'HOUSE_WAS_A_BUSINESS_REAL_ESTATE',
+                'HOUSE_WITH_BAD_CONDITIONS',
+                'OWNER_DIDNT_ANSWER_PHONE',
+                'OWNER_DIDNT_LISTEN_TO_PITCH',
+                'OWNER_DIDNT_WANT_RECEIVE_CALL',
+                'PROPERTY_IN_OFFPLANT',
+                'HOUSE_PRICE_WAS_OUT_OF_BOUNDS',
+                'HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS',
+                'CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT',
+                -- prospect discards
+                'ForaArea',
+                'DUPLICATED_LEAD',
+                'CONTACT_ON_BLOCK_LIST'
+            )
+            AND ts_opportunity IS NULL
+                THEN NULL
+            -- This condition below was added to correct wrongly discarded qualifieds on listing_flow table
+            -- TO-DO: refactor the tables involved with supply funnel step rules to avoid these additional rules
+            WHEN ts_prospect_sale IS NOT NULL
+                AND ts_qualified IS NULL
+                AND prospect_status IN ('CONVERTED','DISCARDED')
+                THEN COALESCE(
+                    ts_conversion,
+                    ts_discarded,
+                    ts_prospect_sale
+                )
+            ELSE ts_qualified
+        END AS ts_qualified_sale
+    FROM
+        supply_2_0_prospect
+),
+supply_2_0 AS (
+    SELECT
+        *,
+        CASE
+            WHEN prospect_discard_sale IN (
+                'OWNER_GAVE_UP_SELLING',
+                'ISSUES_WITH_HOUSE_DOCUMENTATION',
+                'PROPERTY_IN_JUDICIAL_INVENTORY'
+            )
+            AND ts_opportunity IS NULL
+                THEN NULL
+            ELSE ts_qualified_sale
+        END AS ts_available_qualified_sale
+    FROM
+        supply_2_0_qualified
+),
 acquisition_channels_dt_diffs AS (
     SELECT
         acquisition_channels.*,
@@ -259,7 +338,7 @@ acquisition_channels_dt_diffs AS (
             ) AS LONG)
             - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG
         ) AS lead_to_processing_seconds_diff
-    FROM acquisition_channels
+    FROM supply_2_0 AS acquisition_channels
 ),
 legacy_doorman AS (
     SELECT
@@ -418,16 +497,19 @@ SELECT
     ROUND(CAST(acq.opportunity_to_listing_seconds_diff / 86400 AS DECIMAL(10, 2)), 1) AS days_opportunity_to_listing,
     ROUND(CAST(acq.lead_to_listing_seconds_diff / 86400 AS DECIMAL(10, 2)), 1) AS days_lead_to_listing,
     ROUND(CASE
-      WHEN (acq.ts_conversion IS NULL AND acq.ts_discarded IS NULL)
-        THEN NULL
-      ELSE CAST(acq.lead_to_processing_seconds_diff / 86400 AS DECIMAL(10, 2))
+        WHEN (acq.ts_conversion IS NULL AND acq.ts_discarded IS NULL)
+            THEN NULL
+        ELSE CAST(acq.lead_to_processing_seconds_diff / 86400 AS DECIMAL(10, 2))
     END, 1) AS days_lead_to_processing,
     acq.ts_opt_out_sale,
     acq.ts_lead,
     acq.ts_prospect,
+    acq.ts_prospect_sale,
     acq.ts_first_contact,
     acq.ts_conversion,
     acq.ts_qualified,
+    acq.ts_qualified_sale,
+    acq.ts_available_qualified_sale,
     acq.ts_opportunity,
     acq.ts_first_listing,
     acq.ts_discarded,

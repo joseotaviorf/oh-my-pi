@@ -125,17 +125,17 @@ acquisition_channels AS (
         lf.country_code,
         CASE
             WHEN l.is_for_rent
-             THEN lf.ts_lead
+                THEN lf.ts_lead
             ELSE lbc.ts_qualified_rent
         END AS ts_lead,
         CASE
             WHEN l.is_for_rent
-             THEN lf.ts_prospect
+                THEN lf.ts_prospect
             ELSE lbc.ts_qualified_rent
         END AS ts_prospect,
         CASE
             WHEN l.is_for_rent
-             THEN lf.ts_first_contact
+                THEN lf.ts_first_contact
             ELSE lbc.ts_qualified_rent
         END AS ts_first_contact,
         lf.ts_conversion,
@@ -239,6 +239,89 @@ acquisition_channels AS (
         OR lbc.is_for_rent
         OR l.is_for_rent
 ),
+supply_2_0_prospect AS (
+    SELECT
+        ac.*,
+        CASE -- filtering prospect rent
+            WHEN drbc.lead_discard_rent IN (
+                'HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS', 
+                'ForaArea',
+                'DUPLICATED_LEAD',
+                'CONTACT_ON_BLOCK_LIST'
+            )
+            AND ts_opportunity IS NULL
+                THEN NULL
+            ELSE ac.ts_prospect
+	    END AS ts_prospect_rent,
+        prospect_status,
+        prospect_discard_rent
+    FROM
+        acquisition_channels ac
+    LEFT JOIN datalake_listing_flow.discards_reason_by_context drbc
+        ON ac.id_lead = drbc.id_lead
+),
+supply_2_0_qualified AS (
+    SELECT
+        *,
+        CASE
+            WHEN prospect_discard_rent IN (
+                'CONTACT_DIDNT_EXIST',
+                'HOUSE_ALREADY_PUBLISHED',
+                'CONTACT_KNOW_OWNER',
+                'CONTACT_WASNT_THE_HOUSE_OWNER',
+                'HOUSE_ALREADY_SOLD',
+                'HOUSE_WAS_A_BUSINESS_REAL_ESTATE',
+                'HOUSE_WITH_BAD_CONDITIONS',
+                'OWNER_DIDNT_ANSWER_PHONE',
+                'OWNER_DIDNT_LISTEN_TO_PITCH',
+                'OWNER_DIDNT_WANT_RECEIVE_CALL',
+                'PROPERTY_IN_OFFPLANT',
+                'HOUSE_PRICE_WAS_OUT_OF_BOUNDS',
+                'ONLY_PART_OF_THE_HOUSE_WAS_AVAILABLE_FOR_RENTING',
+                'HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS',
+                'CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT',
+                -- prospect discards
+                'ForaArea',
+                'DUPLICATED_LEAD',
+                'CONTACT_ON_BLOCK_LIST'
+            )
+            AND ts_opportunity IS NULL
+                THEN NULL
+            -- This condition below was added to correct wrongly discarded qualifieds on listing_flow table
+            -- TO-DO: refactor the tables involved with supply funnel step rules to avoid these additional rules
+            WHEN ts_prospect_rent IS NOT NULL
+                AND ts_qualified IS NULL
+                AND prospect_status IN ('CONVERTED','DISCARDED')
+                    THEN COALESCE(
+                        ts_conversion,
+                        ts_discarded,
+                        ts_prospect_rent
+                    )
+            ELSE ts_qualified
+        END AS ts_qualified_rent
+    FROM
+        supply_2_0_prospect
+),
+supply_2_0 AS (
+    SELECT
+        *,
+        CASE
+            WHEN prospect_discard_rent IN (
+                'HOUSE_ALREADY_RENTED_AVAILABLE_IN_6_MONTHS',
+                'HOUSE_ALREADY_RENTED_AVAILABLE_IN_MORE_THAN_6_MONTHS',
+                'HOUSE_ALREADY_RENTED',
+                'OWNER_GAVE_UP_RENTING',
+                'SEASONAL_RENT',
+                'HOUSE_UNDER_MAJOR_RENOVATION',
+                'HOUSE_ALREADY_RENTED_FOR_MORE_THAN_3_MONTHS'
+            )
+            AND ts_opportunity IS NULL
+                THEN NULL
+            ELSE ts_qualified_rent
+        END AS ts_available_qualified_rent
+    FROM
+        supply_2_0_qualified
+),
 acquisition_channels_dt_diffs AS (
     SELECT
     acquisition_channels.*,
@@ -256,7 +339,7 @@ acquisition_channels_dt_diffs AS (
             COALESCE(ts_discarded, ts_conversion + INTERVAL 1 DAY)) AS TIMESTAMP
         ) AS LONG
     ) - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG) AS lead_to_processing_seconds_diff
-    FROM acquisition_channels
+    FROM supply_2_0 AS acquisition_channels
 ),
 legacy_doorman AS (
     SELECT
@@ -416,16 +499,19 @@ SELECT
     ROUND(CAST(acq.opportunity_to_listing_seconds_diff / 86400 AS DECIMAL(10, 2)), 1) AS days_opportunity_to_listing,
     ROUND(CAST(acq.lead_to_listing_seconds_diff / 86400 AS DECIMAL(10, 2)), 1) AS days_lead_to_listing,
     ROUND(CASE
-      WHEN (acq.ts_conversion IS NULL AND acq.ts_discarded IS NULL)
-        THEN NULL
-      ELSE CAST(acq.lead_to_processing_seconds_diff / 86400 AS DECIMAL(10, 2))
+        WHEN (acq.ts_conversion IS NULL AND acq.ts_discarded IS NULL)
+            THEN NULL
+        ELSE CAST(acq.lead_to_processing_seconds_diff / 86400 AS DECIMAL(10, 2))
     END, 1) AS days_lead_to_processing,
     acq.ts_opt_out_rent,
     acq.ts_lead,
     acq.ts_prospect,
+    acq.ts_prospect_rent,
     acq.ts_first_contact,
     acq.ts_conversion,
     acq.ts_qualified,
+    acq.ts_qualified_rent,
+    acq.ts_available_qualified_rent,
     acq.ts_opportunity,
     acq.ts_first_listing,
     acq.ts_discarded,

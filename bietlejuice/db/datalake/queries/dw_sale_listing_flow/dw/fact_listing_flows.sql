@@ -1,4 +1,76 @@
-WITH potential_listings AS (
+WITH
+sales_listing_flows_with_reprocessed_leads (
+    SELECT
+        id,
+        id_lead,
+        id_conversion,
+        id_photo_job,
+        id_rep,
+        id_affiliate,
+        id_user_has_indicated,
+        id_region,
+        ts_lead,
+        CASE
+            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+                THEN ts_prospect_sale
+            ELSE ts_prospect
+        END AS ts_prospect,
+        CASE
+            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+                THEN ts_qualified_sale
+            ELSE ts_qualified
+        END AS ts_qualified,
+        CASE
+            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+                THEN ts_available_qualified_sale
+            ELSE NULL
+        END AS ts_available_qualified,
+        ts_first_contact,
+        ts_conversion,
+        ts_opportunity,
+        ts_first_listing,
+        ts_discarded,
+        ts_sales_company_sent,
+        id_user_lead_first_discarder,
+        id_user_lead_last_discarder,
+        id_affiliate,
+        id_user_has_indicated,
+        id_lead,
+        id_region,
+        is_b2b,
+        acquisition_channel_rep,
+        acquisition_channel_rep,
+        acquisition_channel_rep,
+        acquisition_channel_rep,
+        is_agent_referral,
+        is_doorman,
+        flow,
+        acquisition_method,
+        acquisition_channel,
+        acquisition_source,
+        funnel_step,
+        affiliate_type,
+        lead_context_origin,
+        listing_rent_status,
+        hours_lead_to_prospect,
+        hours_prospect_to_qualified,
+        hours_lead_to_first_contact,
+        hours_prospect_to_first_contact,
+        hours_qualified_to_opportunity,
+        hours_opportunity_to_listing,
+        hours_lead_to_listing,
+        days_lead_to_prospect,
+        days_prospect_to_qualified,
+        days_lead_to_first_contact,
+        days_prospect_to_first_contact,
+        days_qualified_to_opportunity,
+        days_opportunity_to_listing,
+        days_lead_to_listing,
+        days_lead_to_processing,
+        ts_opt_out_sale
+    FROM datalake_listing_flow.sales_listing_flows_with_reprocessed_leads
+),
+potential_listings AS (
     SELECT
         COALESCE(lfrl.id, -1) AS sk_house_listing_flow,
         COALESCE(lfrl.id_lead, -1) AS sk_lead,
@@ -23,6 +95,7 @@ WITH potential_listings AS (
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_first_contact, "yyyyMMdd") AS BIGINT), -1) AS sk_first_contact_date,
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_conversion, "yyyyMMdd") AS BIGINT), -1) AS sk_conversion_date,
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_qualified, "yyyyMMdd") AS BIGINT), -1) AS sk_qualified_date,
+        COALESCE(CAST(DATE_FORMAT(lfrl.ts_available_qualified, "yyyyMMdd") AS BIGINT), -1) AS sk_available_qualified_date,
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_opportunity, "yyyyMMdd") AS BIGINT), -1) AS sk_opportunity_date,
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_first_listing, "yyyyMMdd") AS BIGINT), -1) AS sk_first_listing_date,
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_discarded, "yyyyMMdd") AS BIGINT), -1) AS sk_discard_date,
@@ -55,13 +128,14 @@ WITH potential_listings AS (
         lfrl.acquisition_channel,
         lfrl.acquisition_source,
         CASE
-          WHEN lfrl.ts_first_listing IS NOT NULL THEN 'listing'
-          WHEN lfrl.ts_opportunity IS NOT NULL THEN 'opportunity'
-          WHEN lfrl.ts_qualified IS NOT NULL THEN 'qualified'
-          WHEN lfrl.ts_first_contact IS NOT NULL THEN 'first contact'
-          WHEN lfrl.ts_prospect IS NOT NULL THEN 'prospect'
-          WHEN lfrl.ts_lead IS NOT NULL THEN 'lead'
-          ELSE NULL
+            WHEN lfrl.ts_first_listing IS NOT NULL THEN 'listing'
+            WHEN lfrl.ts_opportunity IS NOT NULL THEN 'opportunity'
+            WHEN lfrl.ts_available_qualified IS NOT NULL THEN 'available qualified'
+            WHEN lfrl.ts_qualified IS NOT NULL THEN 'qualified'
+            WHEN lfrl.ts_first_contact IS NOT NULL THEN 'first contact'
+            WHEN lfrl.ts_prospect IS NOT NULL THEN 'prospect'
+            WHEN lfrl.ts_lead IS NOT NULL THEN 'lead'
+            ELSE NULL
         END AS funnel_step,
         lfrl.funnel_step AS funnel_drop_reason,
         pllt.first_isales_intervention,
@@ -104,7 +178,7 @@ WITH potential_listings AS (
         lfrl.days_lead_to_listing,
         lfrl.days_lead_to_processing,
         lfrl.ts_opt_out_sale
-      FROM datalake_listing_flow.sales_listing_flows_with_reprocessed_leads lfrl
+      FROM sales_listing_flows_with_reprocessed_leads lfrl
       LEFT JOIN datalake_lead_tracking.lead_first_event_tracking lfet
         ON lfet.id_lead = lfrl.id_lead
       LEFT JOIN datalake_sale_potential_listing.potential_listing_lead_tasks pllt
@@ -265,6 +339,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   CAST(atax.sk_first_contact_date AS INTEGER) AS sk_first_contact_date,
   CAST(atax.sk_conversion_date AS INTEGER) AS sk_conversion_date,
   CAST(atax.sk_qualified_date AS INTEGER) AS sk_qualified_date,
+  CAST(atax.sk_available_qualified_date AS INTEGER) AS sk_available_qualified_date,
   CAST(atax.sk_opportunity_date AS INTEGER) AS sk_opportunity_date,
   CAST(atax.sk_first_listing_date AS INTEGER) AS sk_first_listing_date,
   CAST(atax.sk_discard_date AS INTEGER) AS sk_discard_date,

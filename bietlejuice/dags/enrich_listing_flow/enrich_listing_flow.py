@@ -24,8 +24,14 @@ MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
 CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_cluster"
 INNER_DEPENDENCIES = {
-    "listing_flows_with_reprocessed_leads": ["listing_flow"],
-    "sales_listing_flows_with_reprocessed_leads": ["listing_flow"],
+    "listing_flows_with_reprocessed_leads": [
+        "listing_flow",
+        "discards_reason_by_context",
+    ],
+    "sales_listing_flows_with_reprocessed_leads": [
+        "listing_flow",
+        "discards_reason_by_context",
+    ],
 }
 
 config_service = ConfigurationService(DAG_NAME)

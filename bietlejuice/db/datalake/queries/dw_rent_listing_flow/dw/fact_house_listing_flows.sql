@@ -1,4 +1,69 @@
-WITH potential_listings AS (
+WITH
+listing_flows_with_reprocessed_leads (
+    SELECT
+        id,
+        id_lead,
+        id_conversion,
+        id_photo_job,
+        id_rep,
+        id_affiliate,
+        id_user_has_indicated,
+        id_region,
+        ts_opt_out_rent,
+        ts_lead,
+        CASE
+            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+                THEN ts_prospect_rent
+            ELSE ts_prospect
+        END AS ts_prospect,
+        CASE
+            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+                THEN ts_qualified_rent
+            ELSE ts_qualified
+        END AS ts_qualified,
+        CASE
+            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+                THEN ts_available_qualified_rent
+            ELSE NULL
+        END AS ts_available_qualified,
+        ts_first_contact,
+        ts_conversion,
+        ts_opportunity,
+        ts_first_listing,
+        ts_discarded,
+        ts_sales_company_sent,
+        id_user_lead_first_discarder,
+        id_user_lead_last_discarder,
+        is_b2b,
+        acquisition_channel_rep,
+        is_agent_referral,
+        is_doorman,
+        flow,
+        acquisition_method,
+        acquisition_channel,
+        acquisition_source,
+        funnel_step,
+        affiliate_type,
+        lead_context_origin,
+        listing_sale_status,
+        hours_lead_to_prospect,
+        hours_prospect_to_qualified,
+        hours_lead_to_first_contact,
+        hours_prospect_to_first_contact,
+        hours_qualified_to_opportunity,
+        hours_opportunity_to_listing,
+        hours_lead_to_listing,
+        days_lead_to_prospect,
+        days_prospect_to_qualified,
+        days_lead_to_first_contact,
+        days_prospect_to_first_contact,
+        days_qualified_to_opportunity,
+        days_opportunity_to_listing,
+        days_lead_to_listing,
+        days_lead_to_processing
+      FROM datalake_listing_flow.listing_flows_with_reprocessed_leads
+),
+potential_listings AS (
     SELECT
         COALESCE(lfrl.id, -1) AS sk_house_listing_flow,
         COALESCE(lfrl.id_lead, -1) AS sk_lead,
@@ -23,6 +88,7 @@ WITH potential_listings AS (
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_first_contact, "yyyyMMdd") AS BIGINT), -1) AS sk_first_contact_date,
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_conversion, "yyyyMMdd") AS BIGINT), -1) AS sk_conversion_date,
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_qualified, "yyyyMMdd") AS BIGINT), -1) AS sk_qualified_date,
+        COALESCE(CAST(DATE_FORMAT(lfrl.ts_available_qualified, "yyyyMMdd") AS BIGINT), -1) AS sk_available_qualified_date,
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_opportunity, "yyyyMMdd") AS BIGINT), -1) AS sk_opportunity_date,
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_first_listing, "yyyyMMdd") AS BIGINT), -1) AS sk_first_listing_date,
         COALESCE(CAST(DATE_FORMAT(lfrl.ts_discarded, "yyyyMMdd") AS BIGINT), -1) AS sk_discard_date,
@@ -56,13 +122,14 @@ WITH potential_listings AS (
         lfrl.acquisition_channel,
         lfrl.acquisition_source,
         CASE
-          WHEN lfrl.ts_first_listing IS NOT NULL THEN 'listing'
-          WHEN lfrl.ts_opportunity IS NOT NULL THEN 'opportunity'
-          WHEN lfrl.ts_qualified IS NOT NULL THEN 'qualified'
-          WHEN lfrl.ts_first_contact IS NOT NULL THEN 'first contact'
-          WHEN lfrl.ts_prospect IS NOT NULL THEN 'prospect'
-          WHEN lfrl.ts_lead IS NOT NULL THEN 'lead'
-          ELSE NULL
+            WHEN lfrl.ts_first_listing IS NOT NULL THEN 'listing'
+            WHEN lfrl.ts_opportunity IS NOT NULL THEN 'opportunity'
+            WHEN lfrl.ts_available_qualified IS NOT NULL THEN 'available qualified'
+            WHEN lfrl.ts_qualified IS NOT NULL THEN 'qualified'
+            WHEN lfrl.ts_first_contact IS NOT NULL THEN 'first contact'
+            WHEN lfrl.ts_prospect IS NOT NULL THEN 'prospect'
+            WHEN lfrl.ts_lead IS NOT NULL THEN 'lead'
+            ELSE NULL
         END AS funnel_step,
         lfrl.funnel_step AS funnel_drop_reason,
         pllt.first_isales_intervention,
@@ -81,10 +148,10 @@ WITH potential_listings AS (
         lfet.tracking_platform,
         lfet.tracking_referring_domain AS lead_referring_domain,
         CASE
-          WHEN LOWER(lfet.tracking_referring_domain) LIKE '%corretor%' THEN 'Agents'
-          WHEN LOWER(lfet.tracking_referring_domain) LIKE '%indicaai%' THEN 'Indica Ai'
-          WHEN LOWER(lfet.tracking_referring_domain) LIKE '%proprietario%' THEN 'Owner'
-          ELSE 'Other'
+            WHEN LOWER(lfet.tracking_referring_domain) LIKE '%corretor%' THEN 'Agents'
+            WHEN LOWER(lfet.tracking_referring_domain) LIKE '%indicaai%' THEN 'Indica Ai'
+            WHEN LOWER(lfet.tracking_referring_domain) LIKE '%proprietario%' THEN 'Owner'
+            ELSE 'Other'
         END AS lead_referring_category,
         lfrl.affiliate_type AS listing_flows_affiliate_type,
         lfrl.lead_context_origin,
@@ -105,16 +172,16 @@ WITH potential_listings AS (
         lfrl.days_lead_to_listing,
         lfrl.days_lead_to_processing,
         lfrl.ts_opt_out_rent AS ts_opted_out_rent
-      FROM datalake_listing_flow.listing_flows_with_reprocessed_leads lfrl
-      LEFT JOIN datalake_lead_tracking.lead_first_event_tracking lfet
+    FROM listing_flows_with_reprocessed_leads lfrl
+    LEFT JOIN datalake_lead_tracking.lead_first_event_tracking lfet
         ON lfet.id_lead = lfrl.id_lead
-      LEFT JOIN datalake_rent_potential_listing.potential_listing_lead_tasks pllt
+    LEFT JOIN datalake_rent_potential_listing.potential_listing_lead_tasks pllt
         ON pllt.id = lfrl.id
-      LEFT JOIN datalake_rent_potential_listing.potential_listings_reprocessed_leads plrl
+    LEFT JOIN datalake_rent_potential_listing.potential_listings_reprocessed_leads plrl
         ON plrl.id = lfrl.id
-      LEFT JOIN dw_public.dim_region dr
+    LEFT JOIN dw_public.dim_region dr
         ON dr.sk_region = lfrl.id_region
-      LEFT JOIN datalake_rent_potential_listing.potential_listing_b2b plb2b
+    LEFT JOIN datalake_rent_potential_listing.potential_listing_b2b plb2b
         ON plb2b.id = lfrl.id
 ),
 potential_listings_enrich AS (
@@ -136,13 +203,13 @@ potential_listings_enrich AS (
         ON us_cad.id = p.id_user_registrant
         AND us_cad.email LIKE '%@hargos.com.br'
     LEFT JOIN datalake_ebdb_clean.user AS u
-      ON u.id = p.id_affiliate
+        ON u.id = p.id_affiliate
     LEFT JOIN datalake_ebdb_user.user_doorman AS us_d
-      ON us_d.id_affiliate_data = u.id_affiliates
+        ON us_d.id_affiliate_data = u.id_affiliates
     LEFT JOIN datalake_ebdb_clean.affiliate_data AS ad
-      ON ad.id = u.id_affiliates
+        ON ad.id = u.id_affiliates
     LEFT JOIN datalake_lead.lead_city_region AS lcr
-      ON lcr.id_lead = p.id_lead AND p.id_region = -1
+        ON lcr.id_lead = p.id_lead AND p.id_region = -1
 ),
 taxonomy AS (
     SELECT DISTINCT
@@ -229,110 +296,109 @@ applied_taxonomy_flow AS (
     SELECT
         *,
         CASE
-             WHEN lead_type = 'Proparceria' THEN 'Non Self-Service'
-             WHEN lead_type = 'Marketing' AND lead_origin IN ('Facebook', 'Reprocessado') THEN 'Non Self-Service'
-             WHEN is_ops_direct_register THEN 'Non Self-Service'
-             WHEN lead_origin = 'Landing' THEN 'Non Self-Service'
-             WHEN mkt_origin IN ('Owner PWA', 'Price Calculator') THEN 'Self-Service'
-             WHEN mkt_origin IN ('Indica Aí - Agents', 'Indica Aí - General')
-                  AND mkt_source = 'Direct Referral' THEN 'Self-Service'
-             WHEN mkt_origin IN ('Other', 'Not Mapped') THEN mkt_origin
-             ELSE 'Non Self-Service'
+            WHEN lead_type = 'Proparceria' THEN 'Non Self-Service'
+            WHEN lead_type = 'Marketing' AND lead_origin IN ('Facebook', 'Reprocessado') THEN 'Non Self-Service'
+            WHEN is_ops_direct_register THEN 'Non Self-Service'
+            WHEN lead_origin = 'Landing' THEN 'Non Self-Service'
+            WHEN mkt_origin IN ('Owner PWA', 'Price Calculator') THEN 'Self-Service'
+            WHEN mkt_origin IN ('Indica Aí - Agents', 'Indica Aí - General')
+                AND mkt_source = 'Direct Referral' THEN 'Self-Service'
+            WHEN mkt_origin IN ('Other', 'Not Mapped') THEN mkt_origin
+            ELSE 'Non Self-Service'
         END AS mkt_flow
-    FROM  applied_taxonomy
+    FROM applied_taxonomy
 )
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
-  CAST(atax.sk_house_listing_flow AS BIGINT) AS sk_house_listing_flow,
-  atax.sk_condo,
-  CAST(atax.sk_lead AS INTEGER) AS sk_lead,
-  CAST(atax.sk_lead_conversion AS INTEGER) AS sk_lead_conversion,
-  CAST(atax.sk_first_photo_job AS INTEGER) AS sk_first_photo_job,
-  atax.sk_house_listing,
-  CAST(atax.sk_user_house_registrant AS INTEGER) AS sk_user_house_registrant,
-  CAST(atax.sk_user_sales_rep AS INTEGER) AS sk_user_sales_rep,
-  CAST(atax.sk_user_lead_affiliate AS INTEGER) AS sk_user_lead_affiliate,
-  CAST(atax.sk_user_first_task_assignee AS INTEGER) AS sk_user_first_task_assignee,
-  CAST(atax.sk_user_last_task_assignee AS INTEGER) AS sk_user_last_task_assignee,
-  CAST(atax.sk_region AS INTEGER) AS sk_region,
-  CAST(atax.sk_city AS INTEGER) AS sk_city,
-  CAST(atax.sk_partner AS INTEGER) AS sk_partner,
-  CAST(atax.sk_autonomous_agent AS INTEGER) AS sk_autonomous_agent,
-  CAST(atax.sk_lead_date AS INTEGER) AS sk_lead_date,
-  CAST(atax.sk_sales_company_lead_sent_date AS INTEGER) AS sk_sales_company_lead_sent_date,
-  CAST(atax.sk_prospect_date AS INTEGER) AS sk_prospect_date,
-  CAST(atax.sk_first_task_created_date AS INTEGER) AS sk_first_task_created_date,
-  CAST(atax.sk_first_task_closed_date AS INTEGER) AS sk_first_task_closed_date,
-  CAST(atax.sk_last_task_created_date AS INTEGER) AS sk_last_task_created_date,
-  CAST(atax.sk_last_task_closed_date AS INTEGER) AS sk_last_task_closed_date,
-  CAST(atax.sk_first_contact_date AS INTEGER) AS sk_first_contact_date,
-  CAST(atax.sk_conversion_date AS INTEGER) AS sk_conversion_date,
-  CAST(atax.sk_qualified_date AS INTEGER) AS sk_qualified_date,
-  CAST(atax.sk_opportunity_date AS INTEGER) AS sk_opportunity_date,
-  CAST(atax.sk_first_listing_date AS INTEGER) AS sk_first_listing_date,
-  CAST(atax.sk_discard_date AS INTEGER) AS sk_discard_date,
-  CAST(atax.sk_user_lead_first_discarder AS INTEGER) AS sk_user_lead_first_discarder,
-  CAST(atax.sk_user_lead_last_discarder AS INTEGER) AS sk_user_lead_last_discarder,
-  atax.country_code,
-  atax.funnel_step,
-  atax.funnel_drop_reason,
-  atax.hours_lead_to_prospect,
-  atax.hours_prospect_to_qualified,
-  atax.hours_lead_to_first_contact,
-  atax.hours_prospect_to_first_contact,
-  atax.hours_qualified_to_opportunity,
-  atax.hours_opportunity_to_listing,
-  atax.hours_lead_to_listing,
-  atax.days_lead_to_prospect,
-  atax.days_prospect_to_qualified,
-  atax.days_lead_to_first_contact,
-  atax.days_prospect_to_first_contact,
-  atax.days_qualified_to_opportunity,
-  atax.days_opportunity_to_listing,
-  atax.days_lead_to_listing,
-  atax.days_lead_to_processing,
-  CAST(atax.is_exclusive AS SMALLINT) AS is_exclusive,
-  atax.first_isales_intervention,
-  IF(atax.lead_type == '', NULL, atax.lead_type) AS lead_type,
-  IF(atax.lead_origin == '', NULL, atax.lead_origin) AS lead_origin,
-  IF(atax.utm_source == '', NULL, atax.utm_source) AS lead_tracking_source,
-  IF(atax.utm_medium == '', NULL, atax.utm_medium) AS lead_tracking_medium,
-  IF(atax.tracking_platform == '', NULL, atax.tracking_platform) AS lead_tracking_platform,
-  atax.is_branded,
-  atax.is_b2b,
-  atax.is_autonomous_agent,
-  atax.is_doorman,
-  atax.is_isales_direct_register,
-  atax.is_cx_direct_register,
-  atax.is_ops_direct_register,
-  atax.has_isales_intervention,
-  atax.has_fup_photo_task,
-  atax.is_call_center,
-  atax.is_reprocessed AS is_lead_reprocessed,
-  atax.affiliate_type,
-  atax.is_agent_referral,
-  IF(atax.lead_referring_domain == '', NULL, atax.lead_referring_domain) AS lead_referring_domain,
-  IF(atax.lead_referring_category == '', NULL, atax.lead_referring_category) AS lead_referring_category,
-  atax.subscription_source,
-  IF(atax.mkt_branded == '', NULL, atax.mkt_branded) AS mkt_branded,
-  CASE WHEN atax.mkt_flow = 'Self-Service' THEN 'Outbound'
-       WHEN atax.mkt_flow = 'Non Self-Service' AND atax.lead_origin IN ('App', 'Crawling', 'Form', 'Planilha') THEN 'Outbound'
-       WHEN atax.mkt_flow = 'Non Self-Service' AND atax.lead_origin IN ('Facebook', 'Landing', 'OwnerPWA', 'Price Suggestion') THEN 'Inbound'
-       WHEN atax.mkt_flow = 'Not Mapped' THEN 'Not Mapped'
-       ELSE 'Other' END AS mkt_category,
-  IF(atax.mkt_flow == '', NULL, atax.mkt_flow) AS mkt_flow,
-  CASE WHEN atax.mkt_flow = 'Non Self-Service' THEN 'Non Self-Service'
-       WHEN atax.mkt_flow = 'Self-Service' AND not atax.has_isales_intervention THEN 'Full Self-Service'
-       WHEN atax.mkt_flow = 'Self-Service' AND atax.has_isales_intervention THEN 'Recovered Self-Service'
-       WHEN atax.mkt_flow IN ('Not Mapped', 'Other') THEN IF(atax.mkt_flow == '', NULL, atax.mkt_flow)
-       ELSE 'Not Mapped' END AS mkt_completion,
-  IF(atax.mkt_origin == '', NULL, atax.mkt_origin) AS mkt_origin,
-  IF(atax.mkt_channel == '', NULL, atax.mkt_channel) AS mkt_channel,
-  IF(atax.mkt_platform == '', NULL, atax.mkt_platform) AS mkt_platform,
-  IF(atax.mkt_medium == '', NULL, atax.mkt_medium) AS mkt_medium,
-  IF(atax.mkt_source == '', NULL, atax.mkt_source) AS mkt_source,
-  atax.lead_context_origin,
-  atax.listing_sale_status,
-  CAST(atax.ts_opted_out_rent AS TIMESTAMP) AS ts_opted_out_rent,
-  atax.ts_load
-FROM
-    applied_taxonomy_flow AS atax
+    CAST(atax.sk_house_listing_flow AS BIGINT) AS sk_house_listing_flow,
+    atax.sk_condo,
+    CAST(atax.sk_lead AS INTEGER) AS sk_lead,
+    CAST(atax.sk_lead_conversion AS INTEGER) AS sk_lead_conversion,
+    CAST(atax.sk_first_photo_job AS INTEGER) AS sk_first_photo_job,
+    atax.sk_house_listing,
+    CAST(atax.sk_user_house_registrant AS INTEGER) AS sk_user_house_registrant,
+    CAST(atax.sk_user_sales_rep AS INTEGER) AS sk_user_sales_rep,
+    CAST(atax.sk_user_lead_affiliate AS INTEGER) AS sk_user_lead_affiliate,
+    CAST(atax.sk_user_first_task_assignee AS INTEGER) AS sk_user_first_task_assignee,
+    CAST(atax.sk_user_last_task_assignee AS INTEGER) AS sk_user_last_task_assignee,
+    CAST(atax.sk_region AS INTEGER) AS sk_region,
+    CAST(atax.sk_city AS INTEGER) AS sk_city,
+    CAST(atax.sk_partner AS INTEGER) AS sk_partner,
+    CAST(atax.sk_autonomous_agent AS INTEGER) AS sk_autonomous_agent,
+    CAST(atax.sk_lead_date AS INTEGER) AS sk_lead_date,
+    CAST(atax.sk_sales_company_lead_sent_date AS INTEGER) AS sk_sales_company_lead_sent_date,
+    CAST(atax.sk_prospect_date AS INTEGER) AS sk_prospect_date,
+    CAST(atax.sk_first_task_created_date AS INTEGER) AS sk_first_task_created_date,
+    CAST(atax.sk_first_task_closed_date AS INTEGER) AS sk_first_task_closed_date,
+    CAST(atax.sk_last_task_created_date AS INTEGER) AS sk_last_task_created_date,
+    CAST(atax.sk_last_task_closed_date AS INTEGER) AS sk_last_task_closed_date,
+    CAST(atax.sk_first_contact_date AS INTEGER) AS sk_first_contact_date,
+    CAST(atax.sk_conversion_date AS INTEGER) AS sk_conversion_date,
+    CAST(atax.sk_qualified_date AS INTEGER) AS sk_qualified_date,
+    CAST(atax.sk_available_qualified_date AS INTEGER) AS sk_available_qualified_date,
+    CAST(atax.sk_opportunity_date AS INTEGER) AS sk_opportunity_date,
+    CAST(atax.sk_first_listing_date AS INTEGER) AS sk_first_listing_date,
+    CAST(atax.sk_discard_date AS INTEGER) AS sk_discard_date,
+    CAST(atax.sk_user_lead_first_discarder AS INTEGER) AS sk_user_lead_first_discarder,
+    CAST(atax.sk_user_lead_last_discarder AS INTEGER) AS sk_user_lead_last_discarder,
+    atax.funnel_step,
+    atax.funnel_drop_reason,
+    atax.hours_lead_to_prospect,
+    atax.hours_prospect_to_qualified,
+    atax.hours_lead_to_first_contact,
+    atax.hours_prospect_to_first_contact,
+    atax.hours_qualified_to_opportunity,
+    atax.hours_opportunity_to_listing,
+    atax.hours_lead_to_listing,
+    atax.days_lead_to_prospect,
+    atax.days_prospect_to_qualified,
+    atax.days_lead_to_first_contact,
+    atax.days_prospect_to_first_contact,
+    atax.days_qualified_to_opportunity,
+    atax.days_opportunity_to_listing,
+    atax.days_lead_to_listing,
+    atax.days_lead_to_processing,
+    CAST(atax.is_exclusive AS SMALLINT) AS is_exclusive,
+    atax.first_isales_intervention,
+    IF(atax.lead_type == '', NULL, atax.lead_type) AS lead_type,
+    IF(atax.lead_origin == '', NULL, atax.lead_origin) AS lead_origin,
+    IF(atax.utm_source == '', NULL, atax.utm_source) AS lead_tracking_source,
+    IF(atax.utm_medium == '', NULL, atax.utm_medium) AS lead_tracking_medium,
+    IF(atax.tracking_platform == '', NULL, atax.tracking_platform) AS lead_tracking_platform,
+    atax.is_branded,
+    atax.is_b2b,
+    atax.is_autonomous_agent,
+    atax.is_doorman,
+    atax.is_isales_direct_register,
+    atax.is_cx_direct_register,
+    atax.is_ops_direct_register,
+    atax.has_isales_intervention,
+    atax.has_fup_photo_task,
+    atax.is_call_center,
+    atax.is_reprocessed AS is_lead_reprocessed,
+    atax.affiliate_type,
+    atax.is_agent_referral,
+    IF(atax.lead_referring_domain == '', NULL, atax.lead_referring_domain) AS lead_referring_domain,
+    IF(atax.lead_referring_category == '', NULL, atax.lead_referring_category) AS lead_referring_category,
+    atax.subscription_source,
+    IF(atax.mkt_branded == '', NULL, atax.mkt_branded) AS mkt_branded,
+    CASE WHEN atax.mkt_flow = 'Self-Service' THEN 'Outbound'
+        WHEN atax.mkt_flow = 'Non Self-Service' AND atax.lead_origin IN ('App', 'Crawling', 'Form', 'Planilha') THEN 'Outbound'
+        WHEN atax.mkt_flow = 'Non Self-Service' AND atax.lead_origin IN ('Facebook', 'Landing', 'OwnerPWA', 'Price Suggestion') THEN 'Inbound'
+        WHEN atax.mkt_flow = 'Not Mapped' THEN 'Not Mapped'
+        ELSE 'Other' END AS mkt_category,
+    IF(atax.mkt_flow == '', NULL, atax.mkt_flow) AS mkt_flow,
+    CASE WHEN atax.mkt_flow = 'Non Self-Service' THEN 'Non Self-Service'
+        WHEN atax.mkt_flow = 'Self-Service' AND not atax.has_isales_intervention THEN 'Full Self-Service'
+        WHEN atax.mkt_flow = 'Self-Service' AND atax.has_isales_intervention THEN 'Recovered Self-Service'
+        WHEN atax.mkt_flow IN ('Not Mapped', 'Other') THEN IF(atax.mkt_flow == '', NULL, atax.mkt_flow)
+        ELSE 'Not Mapped' END AS mkt_completion,
+    IF(atax.mkt_origin == '', NULL, atax.mkt_origin) AS mkt_origin,
+    IF(atax.mkt_channel == '', NULL, atax.mkt_channel) AS mkt_channel,
+    IF(atax.mkt_platform == '', NULL, atax.mkt_platform) AS mkt_platform,
+    IF(atax.mkt_medium == '', NULL, atax.mkt_medium) AS mkt_medium,
+    IF(atax.mkt_source == '', NULL, atax.mkt_source) AS mkt_source,
+    atax.lead_context_origin,
+    atax.listing_sale_status,
+    CAST(atax.ts_opted_out_rent AS TIMESTAMP) AS ts_opted_out_rent,
+    atax.ts_load
+FROM applied_taxonomy_flow AS atax
