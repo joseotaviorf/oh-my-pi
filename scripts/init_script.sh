@@ -11,6 +11,7 @@ spark_driver_config_file="$DB_HOME/driver/conf/00-spark-plugin-driver-defaults.c
 spark_driver_config_content="[driver] {
     \"spark.plugins\" = \"ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics\",
     \"spark.cernSparkPlugin.cloudFsName\" = \"s3a\",
+    \"spark.cernSparkPlugin.registerOnDriver\" = \"true\",
     \"spark.extraListeners\" = \"ch.cern.sparkmeasure.FlightRecorderStageMetrics\"
 }
 "
