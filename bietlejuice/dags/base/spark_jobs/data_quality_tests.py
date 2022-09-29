@@ -1,12 +1,8 @@
 import json
 import logging
-
 from argparse import ArgumentParser
 
-from inmetro.messengers import SlackMessenger
-from inmetro.config_reader import ConfigReader
-from inmetro.validators import PyDeequValidator
-from inmetro.loaders import S3Loader as InmetroS3Loader
+import yamale
 from inmetro.builders.validations.pydeequ.validation_suite_builder import (
     ValidationSuiteBuilder,
 )
@@ -14,18 +10,22 @@ from inmetro.clients import (
     SparkClient as InmetroSparkClient,
     S3Client as InmetroS3Client,
 )
-
+from inmetro.config_reader import ConfigReader
+from inmetro.loaders import S3Loader as InmetroS3Loader
+from inmetro.messengers import SlackMessenger
+from inmetro.validators import PyDeequValidator
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.services import FileService
+from yamale import YamaleError
+
 from bietlejuice.base.db import DwMetastoreMapping
-from bietlejuice.base.service import ServiceEnum
-from bietlejuice.base.pipeline import LayerEnum, MetadataTypeEnum
 from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
+from bietlejuice.base.pipeline import LayerEnum, MetadataTypeEnum
+from bietlejuice.base.service import ServiceEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.metadata_propagator_pipeline.atlas_quality_metrics_pipeline import (
     AtlasQualityMetricsPipeline,
 )
-
 
 JOB_NAME = "data_quality_tests"
 
@@ -109,6 +109,11 @@ def parse_args():
         " The `source` and/or `context` name for enrich layer. The `schema` for DW layer.",
     )
     parser.add_argument("table_name", type=str)
+    parser.add_argument(
+        "intermediate_path",
+        type=str,
+        help="partial path used in some DAGs off of our pattern",
+    )
 
     args = parser.parse_args()
 
@@ -117,12 +122,79 @@ def parse_args():
     layer = LayerEnum(args.layer).value
     relative_file_path = args.relative_file_path
     table_name = args.table_name
+    intermediate_path = args.intermediate_path
 
-    return env, inmetro_bucket, layer, relative_file_path, table_name
+    return env, inmetro_bucket, layer, relative_file_path, table_name, intermediate_path
+
+
+def _check_input_config_schema(input_config: list) -> bool:
+    """Method extracted from inmetro.config_reader.ConfigReader"""
+    try:
+        config_schema = yamale.make_schema(ConfigReader.CONFIG_FILE_SCHEMA_PATH)
+        yamale.validate(config_schema, input_config)
+    except YamaleError as error:
+        raise Exception(
+            "The input config file does not match the yaml schema. Please, check it again"
+        ) from error
+    return True
+
+
+def _check_validation_sections_exist(input_validations: dict) -> bool:
+    """Method extracted from inmetro.config_reader.ConfigReader"""
+    input_root_validations = list(input_validations.keys())
+    intersection = set(ConfigReader.VALIDATION_SECTIONS) & set(input_root_validations)
+
+    if len(intersection) == 0:
+        raise Exception(
+            f"The input configuration file does not contain any of the available validation sections: "
+            f"{ConfigReader.VALIDATION_SECTIONS}. Please, check your input file."
+        )
+    return True
+
+
+def _check_conflicting_validations_on_same_column(input_validations: dict) -> bool:
+    """Method extracted from inmetro.config_reader.ConfigReader"""
+    column_validations = input_validations.get(
+        ConfigReader.COLUMN_VALIDATIONS_SECTION, {}
+    )
+
+    for column, validations in column_validations.items():
+        validation_keys = list(validations.keys())
+        intersection = set(validation_keys) & set(ConfigReader.CONFLICTING_VALIDATIONS)
+
+        if len(intersection) > 1:
+            raise Exception(
+                f"There are conflicting validations on column {column}. "
+                f"Please, verify that only one of the following validations occurs: "
+                f"{ConfigReader.CONFLICTING_VALIDATIONS}"
+            )
+    return True
+
+
+def validate_input_config(input_config) -> None:
+    """
+    Reads the input file, converting it to a dict with all the validations,
+    and executes some verifications on the final structure.
+
+    Method extracted from inmetro.config_reader.ConfigReader
+
+    :return: Dict with all the validations contained in the input file.
+    """
+    input_validations = input_config[0][0]
+    _check_input_config_schema(input_config)
+    _check_validation_sections_exist(input_validations)
+    _check_conflicting_validations_on_same_column(input_validations)
 
 
 if __name__ == "__main__":
-    (env, inmetro_bucket, layer, relative_file_path, table_name) = parse_args()
+    (
+        env,
+        inmetro_bucket,
+        layer,
+        relative_file_path,
+        table_name,
+        intermediate_path,
+    ) = parse_args()
 
     logger.info(
         f"m={JOB_NAME}, env={env}, inmetro_bucket={inmetro_bucket}, layer={layer}, "
@@ -130,20 +202,27 @@ if __name__ == "__main__":
     )
 
     # ############################# Getting Validation Results ###############################
-
-    validation_file = FileService.get_data_quality_test_file(
-        relative_file_path, layer, table_name
+    validation_file_content = DAGPackagesPathService.get_data_quality_file_content_in_spark_jobs(
+        dag_name=relative_file_path,
+        layer=layer,
+        table_name=table_name,
+        intermediate_path=intermediate_path,
     )
-    input_config = ConfigReader(validation_file).read()
+
+    # ConfigReader(path).read() does not handle S3 paths, so we extracted some of its
+    #  behaviours until the lib is enhanced.
+    validation_file_content = yamale.make_data(content=validation_file_content)
+    validate_input_config(input_config=validation_file_content)
+    input_configs = validation_file_content[0][0]
 
     spark_client = InmetroSparkClient()
     validation_suite_builder = ValidationSuiteBuilder(spark_client.conn)
     validation_suite = validation_suite_builder.build_validation_suite_from_input_config(
-        input_config
+        input_configs
     )
 
     database_name, table_name = parse_complete_table_name(
-        input_config.get("table_name")
+        input_configs.get("table_name")
     )
     input_df = spark_client.read_table(
         database_name=database_name, table_name=table_name

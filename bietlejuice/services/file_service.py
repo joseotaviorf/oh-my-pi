@@ -8,11 +8,7 @@ from typing import Generator, List, Tuple
 import yaml
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.paths import (
-    DATA_QUALITY_TESTS_PATH,
-    DATALAKE_METADATA_PATH,
-    QUERIES_DATALAKE_PATH,
-)
+from bietlejuice.base.paths import DATALAKE_METADATA_PATH, QUERIES_DATALAKE_PATH
 from bietlejuice.dags import COMPOSER_DAGS_PATH
 from dags import DAG_PACKAGES_ROOT
 
@@ -170,24 +166,6 @@ class FileService:
                 f"{DATALAKE_METADATA_PATH}/**/{extension}", recursive=True
             ):
                 yield file
-
-    @staticmethod
-    def get_data_quality_test_file(
-        relative_file_path: str, layer: str, table_name: str
-    ) -> str:
-        file_search_path = f"{DATA_QUALITY_TESTS_PATH}/{relative_file_path}/{layer}/**/{table_name}.y*ml"
-        files = glob.glob(file_search_path, recursive=True)
-
-        if files and files[0]:
-            return files[0]
-
-        error_msg = (
-            f"m=get_data_quality_test_file, file_search_path={file_search_path}, "
-            f"msg=The validation file for this table could not be reached. "
-            f"Check if it is in the right folder and has the same name as the table. "
-            f"Expeted location: (bietlejuice/db/datalake/data_quality/{{context}}/{{layer}}/)"
-        )
-        raise FileNotFoundError(error_msg)
 
     @staticmethod
     def get_table_info_from_path(path: str) -> Tuple[str, str, str, str, str, str]:

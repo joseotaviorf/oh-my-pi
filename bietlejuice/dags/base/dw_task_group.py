@@ -308,6 +308,7 @@ class DWTaskGroup(BaseTaskGroup):
                             layer,
                             self.relative_query_path,
                             table_name,
+                            tree_path,
                         ],
                     }
                 },

@@ -271,6 +271,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                             layer,
                             self.relative_query_path,
                             tb_name,
+                            tree_path,
                         ],
                     }
                 },
@@ -585,6 +586,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                             layer.value,
                             self.relative_query_path,
                             table_name,
+                            tree_path,
                         ],
                     }
                 },

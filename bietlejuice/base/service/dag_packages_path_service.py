@@ -202,7 +202,7 @@ class DAGPackagesPathService:
             data_quality_file_path = path.join(
                 f"{DATA_QUALITY_TESTS_PATH}/{dag_name}/{layer}",
                 intermediate_path,
-                f"{table_name}.sql",
+                f"{table_name}.yml",
             )
             data_quality_content = DAGPackagesPathService._read_file_content_from_filesystem(
                 data_quality_file_path
