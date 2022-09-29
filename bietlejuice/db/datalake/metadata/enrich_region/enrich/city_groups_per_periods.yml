@@ -1,0 +1,21 @@
+database_name: datalake_region
+table_name: city_groups_per_periods
+columns:
+  country_code:
+    lineage:
+      - datalake_region.region.country_code
+  country_name:
+    lineage:
+      - datalake_region.region.country_name
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+  year:
+    lineage:
+      - datalake_quintoandar.aux_date.year
+  dt_month_started:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+  dt_weekly_started:
+    lineage:
+      - datalake_quintoandar.aux_date.week_start
