@@ -19,7 +19,8 @@ SELECT
 	funnel_drop_reason,
 	context_lead AS context_origin,
 	context_prospect AS context_conversion,
-    CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_prospect_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_lead_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion
+    CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_prospect_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_lead_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion,
+	lf.country_code
 FROM
     dw_public.dim_date dd
 JOIN
@@ -68,10 +69,11 @@ SELECT
   	COUNT(sk_lead_date) AS l2p,
 	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2opp,
-	NULL::BIGINT AS opp2fl
+	NULL::BIGINT AS opp2fl,
+	country_code
 FROM
     l2p_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
 ),
 p2q_pre AS (
 SELECT
@@ -93,7 +95,8 @@ SELECT
 	funnel_drop_reason,
 	context_prospect AS context_origin,
 	context_qualified AS context_conversion,
-    CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_qualified_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_prospect_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion
+    CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_qualified_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_prospect_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion,
+	lf.country_code
 FROM
     dw_public.dim_date dd
 JOIN
@@ -142,10 +145,11 @@ SELECT
   	NULL::BIGINT AS l2p,
 	COUNT(sk_prospect_date) AS p2q, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS q2opp,
-	NULL::BIGINT AS opp2fl
+	NULL::BIGINT AS opp2fl,
+	country_code
 FROM
 	p2q_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
 ),
 q2opp_pre AS (
 SELECT
@@ -167,7 +171,8 @@ SELECT
 	funnel_drop_reason,
 	context_qualified AS context_origin,
 	context_opportunity AS context_conversion,
-    CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_opportunity_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_qualified_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion
+    CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_opportunity_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_qualified_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion,
+	lf.country_code
 FROM
     dw_public.dim_date dd
 JOIN
@@ -217,10 +222,11 @@ SELECT
   	NULL::BIGINT AS l2p,
 	NULL::BIGINT AS p2q,
 	COUNT(sk_qualified_date) AS q2opp, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
-	NULL::BIGINT AS opp2fl
+	NULL::BIGINT AS opp2fl,
+	country_code
 FROM
 	q2opp_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
 ),
 opp2fl_pre AS (
 SELECT
@@ -242,7 +248,8 @@ SELECT
 	funnel_drop_reason,
 	context_opportunity AS context_origin,
 	context_first_listing AS context_conversion,
-    CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_first_listing_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_opportunity_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion
+    CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_first_listing_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_opportunity_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion,
+	lf.country_code
 FROM
     dw_public.dim_date dd
 JOIN
@@ -291,10 +298,11 @@ SELECT
   	NULL::BIGINT AS l2p,
 	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2opp,
-	COUNT(DISTINCT sk_house_listing) AS opp2fl
+	COUNT(DISTINCT sk_house_listing) AS opp2fl,
+	country_code
 FROM
 	opp2fl_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -327,7 +335,8 @@ SELECT
   ua.l2p,
   ua.p2q,
   ua.q2opp,
-  ua.opp2fl
+  ua.opp2fl,
+  ua.country_code
 FROM
     union_all ua
 RIGHT JOIN
@@ -339,6 +348,7 @@ WHERE
 
 SELECT
  date,
+  country_code,
   city_group,
   supply_mkt_origin,
   CASE
@@ -380,4 +390,4 @@ SELECT
   current_timestamp AS ts_load
 FROM
   union_all_date
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 24

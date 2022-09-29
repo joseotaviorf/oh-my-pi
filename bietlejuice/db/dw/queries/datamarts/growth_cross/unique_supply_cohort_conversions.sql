@@ -29,7 +29,8 @@ SELECT
   	COUNT(lf.sk_lead_date) AS l2p,
 	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2opp,
-	NULL::BIGINT AS opp2fl
+	NULL::BIGINT AS opp2fl,
+	lf.country_code
 FROM
     dim_date dd
 JOIN
@@ -47,7 +48,7 @@ LEFT JOIN
         ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
 ),
 p2q AS (
 SELECT
@@ -79,7 +80,8 @@ SELECT
   	NULL::BIGINT AS l2p,
 	COUNT(lf.sk_prospect_date) AS p2q, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS q2opp,
-	NULL::BIGINT AS opp2fl
+	NULL::BIGINT AS opp2fl,
+	lf.country_code
 FROM
     dim_date dd
 JOIN
@@ -97,7 +99,7 @@ LEFT JOIN
         ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
 ),
 q2opp AS (
 SELECT
@@ -129,7 +131,8 @@ SELECT
   	NULL::BIGINT AS l2p,
 	NULL::BIGINT AS p2q,
 	COUNT(lf.sk_qualified_date) AS q2opp, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
-	NULL::BIGINT AS opp2fl
+	NULL::BIGINT AS opp2fl,
+	lf.country_code
 FROM
     dim_date dd
 JOIN
@@ -147,7 +150,7 @@ LEFT JOIN
         ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
 ),
 opp2fl AS (
 SELECT
@@ -179,7 +182,8 @@ SELECT
   	NULL::BIGINT AS l2p,
 	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2opp,
-	COUNT(DISTINCT lf.sk_house_listing) AS opp2fl
+	COUNT(DISTINCT lf.sk_house_listing) AS opp2fl,
+	lf.country_code
 FROM
     dim_date dd
 JOIN
@@ -197,7 +201,7 @@ LEFT JOIN
         ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -230,7 +234,8 @@ SELECT
   ua.l2p,
   ua.p2q,
   ua.q2opp,
-  ua.opp2fl
+  ua.opp2fl,
+  ua.country_code
 FROM
     union_all ua
 RIGHT JOIN
@@ -241,6 +246,7 @@ WHERE
 )
 SELECT
    "date",
+	country_code,
     city_group,
     supply_mkt_origin,
     CASE
@@ -279,4 +285,4 @@ SELECT
     current_timestamp AS ts_load
 FROM
     union_all_date
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 24

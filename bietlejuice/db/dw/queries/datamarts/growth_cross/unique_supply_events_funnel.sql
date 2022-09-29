@@ -22,7 +22,8 @@ SELECT
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
-	NULL::BIGINT AS first_listings
+	NULL::BIGINT AS first_listings,
+	lf.country_code
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows lf
   ON dd.sk_date = lf.sk_lead_date
@@ -34,7 +35,7 @@ LEFT JOIN datalake_3p_prod.houses_3p AS hp
 LEFT JOIN datalake_3p_prod.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23
 ),
 prospect AS (
 SELECT
@@ -59,7 +60,8 @@ SELECT
 	COUNT(lf.sk_prospect_date) AS prospects, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
-	NULL::BIGINT AS first_listings
+	NULL::BIGINT AS first_listings,
+	lf.country_code
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows lf
   ON dd.sk_date = lf.sk_prospect_date
@@ -71,7 +73,7 @@ LEFT JOIN datalake_3p_prod.houses_3p AS hp
 LEFT JOIN datalake_3p_prod.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE-- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23
 ),
 qualified AS (
 SELECT
@@ -96,7 +98,8 @@ SELECT
 	NULL::BIGINT AS prospects,
 	COUNT(lf.sk_qualified_date) AS qualifieds, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS opportunities,
-	NULL::BIGINT AS first_listings
+	NULL::BIGINT AS first_listings,
+	lf.country_code
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows lf
   ON dd.sk_date = lf.sk_qualified_date
@@ -108,7 +111,7 @@ LEFT JOIN datalake_3p_prod.houses_3p AS hp
 LEFT JOIN datalake_3p_prod.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23
 ),
 opportunity AS (
 SELECT
@@ -133,7 +136,8 @@ SELECT
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
 	COUNT(DISTINCT lf.sk_house_listing) AS opportunities,
-	NULL::BIGINT AS first_listings
+	NULL::BIGINT AS first_listings,
+	lf.country_code
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows lf
   ON dd.sk_date = lf.sk_opportunity_date
@@ -145,7 +149,7 @@ LEFT JOIN datalake_3p_prod.houses_3p AS hp
 LEFT JOIN datalake_3p_prod.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23
 ),
 listing AS (
 SELECT
@@ -170,7 +174,8 @@ SELECT
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
-	COUNT(DISTINCT lf.sk_house_listing) AS first_listings
+	COUNT(DISTINCT lf.sk_house_listing) AS first_listings,
+	lf.country_code
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows lf
   ON dd.sk_date = lf.sk_first_listing_date
@@ -182,7 +187,7 @@ LEFT JOIN datalake_3p_prod.houses_3p AS hp
 LEFT JOIN datalake_3p_prod.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -217,7 +222,8 @@ SELECT
   ua.prospects,
   ua.qualifieds,
   ua.opportunities,
-  ua.first_listings
+  ua.first_listings,
+  ua.country_code
 FROM union_all ua
 RIGHT JOIN dim_date dd
   ON ua.sk_date = dd.sk_date
@@ -225,6 +231,7 @@ WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND 
 )
 SELECT
 	"date",
+	country_code,
 	city_group,
 	supply_mkt_origin,
   	CASE WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
@@ -257,4 +264,4 @@ SELECT
     SUM(COALESCE(first_listings,0)) AS first_listings,
     current_timestamp AS ts_load
 FROM union_all_date
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24
