@@ -38,9 +38,6 @@ columns:
   user_change_email:
     lineage:
       - datalake_ebdb_clean.user.email
-  business_context:
-    lineage:
-      - datalake_ebdb_agents.agent_business_context_history.agent_business_context
   is_agent_active:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.is_active
