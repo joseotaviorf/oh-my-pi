@@ -173,7 +173,7 @@ sale_fact_listing_flows_adjust AS (
         dw_sale.fact_listing_flows AS hl
     LEFT JOIN
         dw_sale.dim_listing AS dl
-            on hl.sk_house_listing = sk_sale_listing
+            on left(hl.sk_house_listing,9) = dl.sk_house
     LEFT JOIN
         dw_datamarts.quintoandar_consultant_listings AS ciq
             ON LEFT(ciq.sk_house_listing,9) = LEFT(hl.sk_house_listing,9) AND ciq.businesscontext='SALE'
