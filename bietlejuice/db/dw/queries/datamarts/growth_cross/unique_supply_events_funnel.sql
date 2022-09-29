@@ -264,4 +264,4 @@ SELECT
     SUM(COALESCE(first_listings,0)) AS first_listings,
     current_timestamp AS ts_load
 FROM union_all_date
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24
+GROUP BY 1, 3, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
