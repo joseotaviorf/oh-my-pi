@@ -13,6 +13,9 @@ columns:
   id_acquirer_transaction:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.acquirer_transaction_id
+  id_recurrent_credit_card:
+    lineage:
+      - datalake_retsuko_raw.credit_card_payment.recurrent_credit_card_id
   acquirer_auth_code:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.acquirer_auth_code
