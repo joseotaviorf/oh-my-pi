@@ -113,8 +113,6 @@ def parse_args():
         "intermediate_path",
         type=str,
         help="partial path used in some DAGs off of our pattern",
-        required=False,
-        default="",
     )
 
     args = parser.parse_args()

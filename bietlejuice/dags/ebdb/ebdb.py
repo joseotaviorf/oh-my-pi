@@ -382,6 +382,7 @@ tb_names = DAGPackagesPathService.list_data_quality_tests_files_in_composer(
 for tb_name in tb_names:
     inmetro_bucket = config_service.get_config("inmetro_bucket")
     table_name_suffix = StringFormatter.slugify(f"-{tb_name}")
+    intermediate_path = ""
 
     data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
         dag=dag,
@@ -389,7 +390,14 @@ for tb_name in tb_names:
         json={
             "spark_python_task": {
                 "python_file": f"{BASE_SPARK_JOBS_PATH}/data_quality_tests.py",
-                "parameters": [ENV, inmetro_bucket, "raw", SOURCE, tb_name],
+                "parameters": [
+                    ENV,
+                    inmetro_bucket,
+                    "raw",
+                    SOURCE,
+                    tb_name,
+                    intermediate_path,
+                ],
             }
         },
     )
