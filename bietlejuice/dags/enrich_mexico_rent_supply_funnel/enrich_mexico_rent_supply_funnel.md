@@ -15,9 +15,9 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Creates the enriched tables via full load, partitioned by `country_code`: 
 
-- `mexico_rent_cohort_funnel`, soon to be migrated to the metric layer.
-- `mexico_rent_coincident_funnel`, soon to be migrated to the metric layer.
-- `mexico_rent_listing_flow`
+- `cohort_funnel`, soon to be migrated to the metric layer.
+- `coincident_funnel`, soon to be migrated to the metric layer.
+- `listing_flow`
 
 ### Responsible Data Engineering Team
 

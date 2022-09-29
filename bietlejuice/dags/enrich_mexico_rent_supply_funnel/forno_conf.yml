@@ -1,8 +1,8 @@
 ---
 inner_dependencies:
-  mexico_rent_coincident_funnel:
-    - mexico_rent_listing_flow
-  mexico_rent_cohort_funnel:
-    - mexico_rent_listing_flow
+  cohort_funnel:
+    - listing_flow
+  coincident_funnel:
+    - listing_flow
 partition_cols:
   - country_code

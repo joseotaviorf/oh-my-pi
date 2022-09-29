@@ -10,10 +10,10 @@ WITH leads AS (
         NULL AS qualifieds,
         NULL AS opportunities,
         NULL AS first_listings,
-        DATE_TRUNC('month', ts_lead) AS dt_month_started,
-        DATE_TRUNC('week', ts_lead) AS dt_week_started
+        DATE(DATE_TRUNC('month', ts_lead)) AS dt_month_started,
+        DATE(DATE_TRUNC('week', ts_lead)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow
+        datalake_mexico_rent_supply_funnel.listing_flow
     GROUP BY 1, 2, 3, 4, 5, 11, 12
 ),
 prospects AS (
@@ -28,10 +28,10 @@ prospects AS (
         NULL AS qualifieds,
         NULL AS opportunities,
         NULL AS first_listings,
-        DATE_TRUNC('month', ts_prospect) AS dt_month_started,
-        DATE_TRUNC('week', ts_prospect) AS dt_week_started
+        DATE(DATE_TRUNC('month', ts_prospect)) AS dt_month_started,
+        DATE(DATE_TRUNC('week', ts_prospect)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow
+        datalake_mexico_rent_supply_funnel.listing_flow
     WHERE
         ts_prospect IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 11, 12
@@ -48,10 +48,10 @@ qualifieds AS (
         COUNT(ts_qualified) AS qualifieds,
         NULL AS opportunities,
         NULL AS first_listings,
-        DATE_TRUNC('month', ts_qualified) AS dt_month_started,
-        DATE_TRUNC('week', ts_qualified) AS dt_week_started
+        DATE(DATE_TRUNC('month', ts_qualified)) AS dt_month_started,
+        DATE(DATE_TRUNC('week', ts_qualified)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow
+        datalake_mexico_rent_supply_funnel.listing_flow
     WHERE
         ts_qualified IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 11, 12
@@ -68,10 +68,10 @@ opportunities AS (
         NULL AS qualifieds,
         COUNT(DISTINCT id_house_listing) AS opportunities,
         NULL AS first_listings,
-        DATE_TRUNC('month', ts_opportunity) AS dt_month_started,
-        DATE_TRUNC('week', ts_opportunity) AS dt_week_started
+        DATE(DATE_TRUNC('month', ts_opportunity)) AS dt_month_started,
+        DATE(DATE_TRUNC('week', ts_opportunity)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow
+        datalake_mexico_rent_supply_funnel.listing_flow
     WHERE
         ts_opportunity IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 11, 12
@@ -88,10 +88,10 @@ first_listings AS (
         NULL AS qualifieds,
         NULL AS opportunities,
         COUNT(DISTINCT id_house_listing) AS first_listings,
-        DATE_TRUNC('month', ts_first_listing) AS dt_month_started,
-        DATE_TRUNC('week', ts_first_listing) AS dt_week_started
+        DATE(DATE_TRUNC('month', ts_first_listing)) AS dt_month_started,
+        DATE(DATE_TRUNC('week', ts_first_listing)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow
+        datalake_mexico_rent_supply_funnel.listing_flow
     WHERE
         ts_first_listing IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 11, 12

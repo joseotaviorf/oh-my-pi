@@ -1,5 +1,5 @@
 database_name: datalake_mexico_rent_supply_funnel
-table_name: mexico_rent_listing_flow
+table_name: listing_flow
 columns:
   id_lead:
     lineage:

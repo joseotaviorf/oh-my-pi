@@ -22,10 +22,10 @@ WITH supply_cohort_funnel_base AS (
                 WHEN ts_first_listing IS NOT NULL THEN ts_first_listing
             END
         ) AS first_listings_cohort,
-        DATE_TRUNC('month', ts_lead) AS dt_month_started,
-        DATE_TRUNC('week', ts_lead) AS dt_week_started
+        DATE(DATE_TRUNC('month', ts_lead)) AS dt_month_started,
+        DATE(DATE_TRUNC('week', ts_lead)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.mexico_rent_listing_flow
+        datalake_mexico_rent_supply_funnel.listing_flow
     GROUP BY 1, 2, 3, 4, 5, 11, 12
 )
 SELECT 
