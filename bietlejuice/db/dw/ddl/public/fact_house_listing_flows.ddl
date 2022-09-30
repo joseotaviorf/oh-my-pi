@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS public.fact_house_listing_flows (
     sk_first_contact_date INTEGER,
     sk_conversion_date INTEGER,
     sk_qualified_date INTEGER,
+    sk_available_qualified_date INTEGER,
     sk_opportunity_date INTEGER,
     sk_first_listing_date INTEGER,
     sk_discard_date INTEGER,

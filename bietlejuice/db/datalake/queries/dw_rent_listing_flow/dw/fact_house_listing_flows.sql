@@ -9,6 +9,7 @@ listing_flows_with_reprocessed_leads (
         id_affiliate,
         id_user_has_indicated,
         id_region,
+        country_code,
         ts_opt_out_rent,
         ts_lead,
         CASE
@@ -340,6 +341,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     CAST(atax.sk_discard_date AS INTEGER) AS sk_discard_date,
     CAST(atax.sk_user_lead_first_discarder AS INTEGER) AS sk_user_lead_first_discarder,
     CAST(atax.sk_user_lead_last_discarder AS INTEGER) AS sk_user_lead_last_discarder,
+    atax.country_code,
     atax.funnel_step,
     atax.funnel_drop_reason,
     atax.hours_lead_to_prospect,
