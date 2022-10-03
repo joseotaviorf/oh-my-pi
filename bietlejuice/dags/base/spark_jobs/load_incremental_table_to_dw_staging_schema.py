@@ -2,13 +2,13 @@ import logging
 import json
 from argparse import ArgumentParser
 from datetime import datetime
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import QUERIES_DATALAKE_PATH, DWMetastoreService
+from bietlejuice.base.db import DWMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
-from bietlejuice.services import FileService
 
 JOB_NAME = "load_incremental_table_to_dw_staging_schema"
 
@@ -67,11 +67,12 @@ if __name__ == "__main__":
         env, dw_schema, dw_bucket, "staging"
     )
 
-    query_path = f"{QUERIES_DATALAKE_PATH}{relative_query_path}/dw/{tree_path}/{table_name}.sql".replace(
-        "//", "/"
+    query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+        dag_name=relative_query_path,
+        layer="dw",
+        intermediate_path=tree_path,
+        table_name=table_name,
     )
-
-    query = FileService.get_query_from_file_name(query_path)
 
     table_loader_pipeline = IncrementalTableLoaderPipeline(
         database_name=schema_database_name,
