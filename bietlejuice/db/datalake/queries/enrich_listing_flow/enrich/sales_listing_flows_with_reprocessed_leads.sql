@@ -179,7 +179,8 @@ acquisition_channels AS (
             WHEN l.is_for_sale
                 THEN lf.ts_prospect
             ELSE lbc.ts_qualified_sale
-        END AS ts_prospect,
+        END AS ts_prospect_old, -- Although the Supply 2.0 rule continues to use this field,
+        -- we call it _old because deprecated rules for the prospect step are still used to maintain historical values.
         CASE
             WHEN l.is_for_sale
                 THEN lf.ts_first_contact
@@ -194,7 +195,8 @@ acquisition_channels AS (
             )
                 THEN lf.ts_qualified
             ELSE lbc.ts_qualified_sale
-        END AS ts_qualified,
+        END AS ts_qualified_old, -- Although the Supply 2.0 rule continues to use this field,
+        -- we call it _old because deprecated rules for the qualified step are still used to maintain historical values.
         CASE
             WHEN (lbc.ts_opt_out_sale < lf.ts_opportunity AND lbc.status_sale = 'OPTED_OUT')
                 THEN NULL
@@ -250,7 +252,7 @@ supply_2_0_prospect AS (
             )
             AND ts_opportunity IS NULL
                 THEN NULL
-            ELSE ac.ts_prospect
+            ELSE ac.ts_prospect_old
 	    END AS ts_prospect_sale,
         prospect_status,
         prospect_discard_sale
@@ -289,14 +291,14 @@ supply_2_0_qualified AS (
             -- This condition below was added to correct wrongly discarded qualifieds on listing_flow table
             -- TO-DO: refactor the tables involved with supply funnel step rules to avoid these additional rules
             WHEN ts_prospect_sale IS NOT NULL
-                AND ts_qualified IS NULL
+                AND ts_qualified_old IS NULL
                 AND prospect_status IN ('CONVERTED','DISCARDED')
                 THEN COALESCE(
                     ts_conversion,
                     ts_discarded,
                     ts_prospect_sale
                 )
-            ELSE ts_qualified
+            ELSE ts_qualified_old
         END AS ts_qualified_sale
     FROM
         supply_2_0_prospect
@@ -316,6 +318,26 @@ supply_2_0 AS (
         END AS ts_available_qualified_sale
     FROM
         supply_2_0_qualified
+),
+supply_2_0_turning_point AS (
+    SELECT
+        *,
+        CASE
+            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+                THEN ts_prospect_sale
+            ELSE ts_prospect_old
+        END AS ts_prospect,
+        CASE
+            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+                THEN ts_qualified_sale
+            ELSE ts_qualified_old
+        END AS ts_qualified,
+        CASE
+            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+                THEN ts_available_qualified_sale
+            ELSE NULL
+        END AS ts_available_qualified
+    FROM supply_2_0
 ),
 acquisition_channels_dt_diffs AS (
     SELECT
@@ -338,7 +360,7 @@ acquisition_channels_dt_diffs AS (
             ) AS LONG)
             - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG
         ) AS lead_to_processing_seconds_diff
-    FROM supply_2_0 AS acquisition_channels
+    FROM supply_2_0_turning_point AS acquisition_channels
 ),
 legacy_doorman AS (
     SELECT
@@ -504,12 +526,10 @@ SELECT
     acq.ts_opt_out_sale,
     acq.ts_lead,
     acq.ts_prospect,
-    acq.ts_prospect_sale,
     acq.ts_first_contact,
     acq.ts_conversion,
     acq.ts_qualified,
-    acq.ts_qualified_sale,
-    acq.ts_available_qualified_sale,
+    acq.ts_available_qualified,
     acq.ts_opportunity,
     acq.ts_first_listing,
     acq.ts_discarded,

@@ -76,10 +76,6 @@ columns:
     lineage:
       - datalake_listing_flow.listing_flow.ts_prospect
       - datalake_ebdb_listing.listing_business_context.ts_created
-  ts_prospect_rent:
-    lineage:
-      - datalake_listing_flow.listing_flow.ts_prospect
-      - datalake_ebdb_listing.listing_business_context.ts_created
   ts_first_contact:
     lineage:
       - datalake_listing_flow.listing_flow.ts_first_contact
@@ -90,15 +86,11 @@ columns:
   ts_qualified:
     lineage:
       - datalake_listing_flow.listing_flow.ts_qualified
-      - datalake_ebdb_listing.listing_business_context.ts_created
-  ts_qualified_rent:
-    lineage:
-      - datalake_listing_flow.listing_flow.ts_qualified
       - datalake_listing_flow.listing_flow.ts_conversion
       - datalake_listing_flow.listing_flow.ts_discarded
       - datalake_listing_flow.listing_flow.ts_prospect
       - datalake_ebdb_listing.listing_business_context.ts_created
-  ts_available_qualified_rent:
+  ts_available_qualified:
     lineage:
       - datalake_listing_flow.listing_flow.ts_qualified
       - datalake_listing_flow.listing_flow.ts_conversion
