@@ -47,6 +47,9 @@ columns:
   ts_qualified:
     lineage:
       - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_qualified
+  ts_available_qualified:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_available_qualified
   ts_opportunity:
     lineage:
       - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_opportunity

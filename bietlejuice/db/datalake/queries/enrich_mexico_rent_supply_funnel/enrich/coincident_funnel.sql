@@ -8,13 +8,14 @@ WITH leads AS (
         COUNT(ts_lead) AS leads,
         NULL AS prospects,
         NULL AS qualifieds,
+        NULL AS available_qualifieds,
         NULL AS opportunities,
         NULL AS first_listings,
         DATE(DATE_TRUNC('month', ts_lead)) AS dt_month_started,
         DATE(DATE_TRUNC('week', ts_lead)) AS dt_week_started
     FROM
         datalake_mexico_rent_supply_funnel.listing_flow
-    GROUP BY 1, 2, 3, 4, 5, 11, 12
+    GROUP BY 1, 2, 3, 4, 5, 12, 13
 ),
 prospects AS (
     SELECT
@@ -26,6 +27,7 @@ prospects AS (
         NULL AS leads,
         COUNT(ts_prospect) AS prospects,
         NULL AS qualifieds,
+        NULL AS available_qualifieds,
         NULL AS opportunities,
         NULL AS first_listings,
         DATE(DATE_TRUNC('month', ts_prospect)) AS dt_month_started,
@@ -34,7 +36,7 @@ prospects AS (
         datalake_mexico_rent_supply_funnel.listing_flow
     WHERE
         ts_prospect IS NOT NULL
-    GROUP BY 1, 2, 3, 4, 5, 11, 12
+    GROUP BY 1, 2, 3, 4, 5, 12, 13
 ),
 qualifieds AS (
     SELECT
@@ -46,6 +48,7 @@ qualifieds AS (
         NULL AS leads,
         NULL AS prospects,
         COUNT(ts_qualified) AS qualifieds,
+        NULL AS available_qualifieds,
         NULL AS opportunities,
         NULL AS first_listings,
         DATE(DATE_TRUNC('month', ts_qualified)) AS dt_month_started,
@@ -54,7 +57,28 @@ qualifieds AS (
         datalake_mexico_rent_supply_funnel.listing_flow
     WHERE
         ts_qualified IS NOT NULL
-    GROUP BY 1, 2, 3, 4, 5, 11, 12
+    GROUP BY 1, 2, 3, 4, 5, 12, 13
+),
+available_qualifieds AS (
+    SELECT
+        country_code,
+        city_group,
+        supply_mkt_origin, 
+        supply_mkt_origin_detailed,
+        mexico_channel,
+        NULL AS leads,
+        NULL AS prospects,
+        NULL AS qualifieds,
+        COUNT(ts_available_qualified) AS available_qualifieds,
+        NULL AS opportunities,
+        NULL AS first_listings,
+        DATE(DATE_TRUNC('month', ts_available_qualified)) AS dt_month_started,
+        DATE(DATE_TRUNC('week', ts_available_qualified)) AS dt_week_started
+    FROM
+        datalake_mexico_rent_supply_funnel.listing_flow
+    WHERE
+        ts_available_qualified IS NOT NULL
+    GROUP BY 1, 2, 3, 4, 5, 12, 13
 ),
 opportunities AS (
     SELECT
@@ -66,6 +90,7 @@ opportunities AS (
         NULL AS leads,
         NULL AS prospects,
         NULL AS qualifieds,
+        NULL AS available_qualifieds,
         COUNT(DISTINCT id_house_listing) AS opportunities,
         NULL AS first_listings,
         DATE(DATE_TRUNC('month', ts_opportunity)) AS dt_month_started,
@@ -74,7 +99,7 @@ opportunities AS (
         datalake_mexico_rent_supply_funnel.listing_flow
     WHERE
         ts_opportunity IS NOT NULL
-    GROUP BY 1, 2, 3, 4, 5, 11, 12
+    GROUP BY 1, 2, 3, 4, 5, 12, 13
 ),
 first_listings AS (
     SELECT
@@ -86,6 +111,7 @@ first_listings AS (
         NULL AS leads,
         NULL AS prospects,
         NULL AS qualifieds,
+        NULL AS available_qualifieds,
         NULL AS opportunities,
         COUNT(DISTINCT id_house_listing) AS first_listings,
         DATE(DATE_TRUNC('month', ts_first_listing)) AS dt_month_started,
@@ -94,7 +120,7 @@ first_listings AS (
         datalake_mexico_rent_supply_funnel.listing_flow
     WHERE
         ts_first_listing IS NOT NULL
-    GROUP BY 1, 2, 3, 4, 5, 11, 12
+    GROUP BY 1, 2, 3, 4, 5, 12, 13
 ),
 union_all AS (
     SELECT *
@@ -108,6 +134,10 @@ union_all AS (
     SELECT *
     FROM
         qualifieds
+    UNION ALL
+    SELECT *
+    FROM
+        available_qualifieds
     UNION ALL
     SELECT *
     FROM
@@ -126,10 +156,11 @@ SELECT
     SUM(COALESCE(leads, 0)) AS leads,
     SUM(COALESCE(prospects, 0)) AS prospects,
     SUM(COALESCE(qualifieds, 0)) AS qualifieds,
+    SUM(COALESCE(available_qualifieds, 0)) AS available_qualifieds,
     SUM(COALESCE(opportunities, 0)) AS opportunities,
     SUM(COALESCE(first_listings, 0)) AS first_listings,
     dt_week_started,
     dt_month_started
 FROM
     union_all
-GROUP BY 1, 2, 3, 4, 5, 11, 12
+GROUP BY 1, 2, 3, 4, 5, 12, 13

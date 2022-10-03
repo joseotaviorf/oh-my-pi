@@ -23,6 +23,7 @@ columns:
       - datalake_mexico_rent_supply_funnel.listing_flow.ts_opportunity
       - datalake_mexico_rent_supply_funnel.listing_flow.ts_prospect
       - datalake_mexico_rent_supply_funnel.listing_flow.ts_qualified
+      - datalake_mexico_rent_supply_funnel.listing_flow.ts_available_qualified
   dt_month_started:
     lineage:
       - datalake_mexico_rent_supply_funnel.listing_flow.ts_first_listing
@@ -30,4 +31,5 @@ columns:
       - datalake_mexico_rent_supply_funnel.listing_flow.ts_opportunity
       - datalake_mexico_rent_supply_funnel.listing_flow.ts_prospect
       - datalake_mexico_rent_supply_funnel.listing_flow.ts_qualified
+      - datalake_mexico_rent_supply_funnel.listing_flow.ts_available_qualified
   

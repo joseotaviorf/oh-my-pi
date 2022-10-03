@@ -28,6 +28,7 @@ WITH listing_flows AS (
     lfrl.ts_lead,
     lfrl.ts_prospect,
     lfrl.ts_qualified,
+    lfrl.ts_available_qualified,
     lfrl.ts_opportunity,
     lfrl.ts_first_listing
   FROM
@@ -145,6 +146,7 @@ mexico_channels AS (
     atx.ts_lead,
     atx.ts_prospect,
     atx.ts_qualified,
+    atx.ts_available_qualified,
     atx.ts_opportunity,
     atx.ts_first_listing
 FROM
@@ -177,6 +179,7 @@ SELECT
   mc.ts_lead,
   mc.ts_prospect,
   mc.ts_qualified,
+  mc.ts_available_qualified,
   mc.ts_opportunity,
   mc.ts_first_listing
 FROM
