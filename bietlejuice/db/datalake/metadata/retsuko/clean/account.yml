@@ -7,9 +7,21 @@ columns:
   id_external:
     lineage:
       - datalake_retsuko_raw.account.external_id
-  type:
-    lineage:
-      - datalake_retsuko_raw.account.type
   id_contract:
     lineage:
       - datalake_retsuko_raw.account.contract_id
+  id_main_user:
+    lineage:
+      - datalake_retsuko_raw.account.external_main_user_id
+  bank_code:
+    lineage:
+      - datalake_retsuko_raw.account.bank_code
+  type:
+    lineage:
+      - datalake_retsuko_raw.account.type
+  is_savings:
+    lineage:
+      - datalake_retsuko_raw.account.is_savings
+  ts_bank_info_updated:
+    lineage:
+      - datalake_retsuko_raw.account.bank_info_updated_at
