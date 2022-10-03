@@ -77,5 +77,7 @@ AND
     'CX Onboarding [BACK] [POS]',
     'CX Vistoria [BACK]',
     'RevisarPagamentosRescisao',
-    'RescisaoPreVigencia'
+    'RescisaoPreVigencia',
+    'Reparos N2 - Emergenciais [QA]',
+    'Reparos Back [ATN]'
   )
