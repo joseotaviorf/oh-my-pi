@@ -14,3 +14,4 @@ kafka_columns: [
     "timestamp",
     "timestampType",
 ]
+max_records_per_file: 100000

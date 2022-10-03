@@ -97,8 +97,8 @@ if __name__ == "__main__":
         + config_service.get_config("datalake_bucket")
         + config_service.get_config("load_path_suffix")
     )
-
     kafka_columns = config_service.get_config("kafka_columns")
+    max_records_per_file = config_service.get_config("max_records_per_file")
 
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
@@ -144,6 +144,7 @@ if __name__ == "__main__":
         part_df.writeStream.partitionBy(partition_cols)
         .format(load_format)
         .trigger(availableNow=True)
+        .option("maxRecordsPerFile", max_records_per_file)
         .option("checkpointLocation", checkpoints_path)
         .outputMode("append")
         .option("path", load_path)
