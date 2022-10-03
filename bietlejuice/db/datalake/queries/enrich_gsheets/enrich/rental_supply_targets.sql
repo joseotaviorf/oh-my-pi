@@ -1,9 +1,39 @@
 SELECT
-    *
+   city_group,
+    first_listings,
+    lead_context,
+    opportunities,
+    prospects,
+    qualifieds,
+    NULL AS available_qualifieds,
+    supply_channel,
+    supply_origin,
+    tier,
+    halfyear,
+    quarter,
+    month,
+    year,
+    dt_week_started,
+    dt_target
 FROM
     datalake_static_files.rental_supply_targets
 UNION ALL
 SELECT
-    *
+    city_group,
+    first_listings,
+    lead_context,
+    opportunities,
+    prospects,
+    qualifieds,
+    available_qualifieds,
+    supply_channel,
+    supply_origin,
+    tier,
+    halfyear,
+    quarter,
+    month,
+    year,
+    dt_week_started,
+    dt_target 
 FROM
     datalake_gsheets_clean.supply_targets_2022

@@ -25,6 +25,9 @@ columns:
   qualified:
     lineage:
       - datalake_gsheets_raw.rental_cohort_supply.qualified
+  available_qualifieds:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_supply.available_qualifieds
   week:
     lineage:
       - datalake_gsheets_raw.rental_cohort_supply.week

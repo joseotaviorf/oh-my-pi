@@ -20,6 +20,9 @@ columns:
   qualifieds:
     lineage:
       - datalake_gsheets_raw.supply_targets_2022.qualifieds
+  available_qualifieds:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2022.available_qualifieds
   supply_channel:
     lineage:
       - datalake_gsheets_raw.supply_targets_2022.supply_channel

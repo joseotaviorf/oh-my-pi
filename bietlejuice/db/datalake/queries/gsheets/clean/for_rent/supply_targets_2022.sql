@@ -5,6 +5,7 @@ SELECT
     opportunities,
     prospects,
     qualifieds,
+    available_qualifieds,
     supply_channel,
     supply_origin,
     CAST(tier AS INTEGER) AS tier,

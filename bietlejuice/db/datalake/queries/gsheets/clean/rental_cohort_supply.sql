@@ -7,6 +7,7 @@ SELECT
     opportunities,
     prospect,
     qualified,
+    available_qualifieds,
     week,
     week_origin,
     year
