@@ -1,21 +1,21 @@
 import os
 from datetime import datetime
-from pendulum import timezone
-import airflow.utils.helpers as airflow_helpers
 
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
+from pendulum import timezone
 
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-
 
 # Pipeline inputs
 SOURCE = "amplitude"
@@ -457,6 +457,9 @@ update_subpartitioned_events_clean_staging_athena_task = QuintoAndarDatabricksSu
     },
 )
 
+tables_list = DAGPackagesPathService.list_queries_files_in_composer(
+    dag_name=SOURCE, layer="clean"
+)
 load_subpartitioned_events_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="load-subpartitioned-event-tables-to-clean",
     dag=dag,
@@ -468,8 +471,10 @@ load_subpartitioned_events_clean_task = QuintoAndarDatabricksSubmitRunOperator(
                 ENV,
                 datalake_bucket,
                 "amplitude",
-                "--partition_by",
+                "--tables_list",
             ]
+            + tables_list
+            + ["--partition_by"]
             + INCREMENTAL_PARTITIONS,
         }
     },

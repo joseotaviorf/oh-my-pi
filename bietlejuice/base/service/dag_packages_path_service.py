@@ -146,11 +146,11 @@ class DAGPackagesPathService:
 
         * Method used only in Databricks *
 
-        :param dag_name:
-        :param table_name:
-        :param layer:
-        :param intermediate_path:
-        :return:
+        :param dag_name: the DAG name
+        :param table_name: the name of the table that the file is related to
+        :param layer: the layer that the file is related to.
+        :param intermediate_path: off intermediate path structure used in some DAGs
+        :return: query content (the SQL)
         """
         if DAGPackagesPathService._is_dag_in_legacy_structure(dag_name):
             # TODO: remove after DAG-Packages migration
@@ -182,6 +182,40 @@ class DAGPackagesPathService:
         return query_content
 
     @staticmethod
+    def list_queries_files_in_composer(
+        dag_name: str, layer: str, intermediate_path: str = ""
+    ) -> list:
+        """
+        Lists all query files for a given DAG and layer.
+
+        * Method used only in Composer *
+
+        :param dag_name: The DAG we want to list the D.Q. files.
+        :param layer: the layer that the file is related to.
+        :param intermediate_path: off intermediate path structure used in some DAGs
+        :return: list of queries files without file extension (only table names)
+        """
+        if DAGPackagesPathService._is_dag_in_legacy_structure(dag_name):
+            sql_files_folder = path.join(
+                QUERIES_DATALAKE_PATH, dag_name, layer, intermediate_path
+            )
+        else:
+            sql_files_folder = path.join(
+                DAGPackagesPathService.get_dag_path(dag_name),
+                "queries",
+                layer,
+                intermediate_path,
+            )
+
+        filename_regex = re.compile(rf"([a-z0-9_-]+)\.sql")
+        files = glob(f"{sql_files_folder}/*.sql")
+        table_names = []
+        for file_path in files:
+            table_names.append(re.search(filename_regex, file_path).group(1))
+
+        return table_names
+
+    @staticmethod
     def get_data_quality_file_content_in_spark_jobs(
         dag_name: str, table_name: str, layer: str, intermediate_path: str
     ):
@@ -191,11 +225,11 @@ class DAGPackagesPathService:
 
         * Method used only in Databricks *
 
-        :param dag_name:
-        :param table_name:
-        :param layer:
-        :param intermediate_path:
-        :return:
+        :param dag_name: the DAG name
+        :param layer: the layer that the file is related to.
+        :param table_name: the name of the table that the file is related to
+        :param intermediate_path: off intermediate path structure used in some DAGs
+        :return: the data quality content
         """
         if DAGPackagesPathService._is_dag_in_legacy_structure(dag_name):
             # TODO: remove after DAG-Packages migration

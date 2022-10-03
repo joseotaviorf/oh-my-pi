@@ -77,23 +77,6 @@ class FileService:
         return [file for file in listdir(path) if isfile(f"{path}/{file}")]
 
     @staticmethod
-    def list_layer_sql_files(source, layer, tree_path=None):
-        """
-        Return the SQL files for a given layer and tree_path (if specified)
-
-        :param source: the source's directory name on db directory. E.g:
-         godfather, oscar.
-        :param layer: the data lake layer
-        :param tree_path: The rest of the path, used for full or incremental ingestions or specific contextual ingestions e:g crawlers listings
-        :return: Tables SQL files list
-        """
-        raw_to_clean_path = f"{QUERIES_DATALAKE_PATH}{source}/{layer}"
-        if tree_path:
-            raw_to_clean_path = f"{raw_to_clean_path}/{tree_path}"
-
-        return FileService.list_files(raw_to_clean_path)
-
-    @staticmethod
     def list_all_files_recursively(root_directory, extension="*"):
         """
         Recursively lists all the files inside the path and its subdirectories.
@@ -107,21 +90,6 @@ class FileService:
         :rtype: generator object
         """
         files = glob.iglob(f"{root_directory}/**/*.{extension}", recursive=True)
-        return files
-
-    @staticmethod
-    def list_sql_files_without_extension_from_layer(source, layer, tree_path=None):
-        """
-        Return the SQL files without extension for a given layer and tree_path (if specified)
-
-        :param source: the database base name for the table
-        :param layer: the data lake layer
-        :param tree_path: The rest of the path, used for full or incremental ingestions or specific contextual ingestions e:g crawlers listings
-        :return: Tables SQL files list without extension
-        """
-        files = []
-        for file in FileService.list_layer_sql_files(source, layer, tree_path):
-            files.append(FileService.remove_file_extension(file))
         return files
 
     @staticmethod

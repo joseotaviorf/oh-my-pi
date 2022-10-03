@@ -15,9 +15,7 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.formatters import StringFormatter
-from bietlejuice.services import FileService, ConfigurationService
-
-# DAG params
+from bietlejuice.services import ConfigurationService
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 
 DAG_ID = "ebdb"
@@ -238,11 +236,11 @@ def build_layer_task_list(layer):
     :return: A dictionary where the key is the table name and the value is the
      task group's last and first tasks.
     """
-    file_list = FileService.list_layer_sql_files(SOURCE, layer)
+    file_list = DAGPackagesPathService.list_queries_files_in_composer(
+        dag_name=SOURCE, layer=layer
+    )
     task_list = {}
-
-    for file_name in file_list:
-        table_name = FileService.remove_file_extension(file_name)
+    for table_name in file_list:
         task_list[table_name] = eval(f"{layer}_tasks('{table_name}')")
 
     return task_list
@@ -373,7 +371,6 @@ contract_model_dependencies.extend(
 )
 contract_model_dependencies.extend(task_list_last_tasks(clean_task_list.pop("lead")))
 
-
 # Data Quality tests for raw
 tb_names = DAGPackagesPathService.list_data_quality_tests_files_in_composer(
     dag_name=SOURCE, layer="raw"
@@ -407,7 +404,6 @@ for tb_name in tb_names:
         data_quality_tests_task,
         terminate_cluster_task,
     )
-
 
 # upstream >> terminate-cluster
 cross_downstream(

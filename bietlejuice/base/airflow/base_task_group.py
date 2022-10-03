@@ -1,9 +1,10 @@
-from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.base.airflow import TaskGroupMethodFactory
-from bietlejuice.services import FileService
-from bietlejuice.base.pipeline import LayerEnum
-
 from copy import copy
+
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.airflow import TaskGroupMethodFactory
+from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
 logger = QuintoAndarLogger("BaseTaskGroup")
 
@@ -56,7 +57,7 @@ class BaseTaskGroup(object):
         """
 
         schema = kwargs.get("schema")
-        tree_path = kwargs.get("tree_path")
+        tree_path = kwargs.get("tree_path", "")
         # To avoid legacy codes who uses full / incremental on schema variable
         path_variable = schema if schema is not None else tree_path
 
@@ -74,7 +75,7 @@ class BaseTaskGroup(object):
 
         return task_groups
 
-    def _get_table_names_from_sql_files(self, layer, tree_path=None):
+    def _get_table_names_from_sql_files(self, layer, tree_path=""):
         """
         Auxiliary method to adjust the layer and fetch table names from queries
          within the DAG's queries folder via FileService
@@ -89,8 +90,10 @@ class BaseTaskGroup(object):
         if layer == LayerEnum.DW_STAGING:
             layer = LayerEnum.DW
 
-        return FileService.list_sql_files_without_extension_from_layer(
-            self.relative_query_path, layer.value, tree_path
+        return DAGPackagesPathService.list_queries_files_in_composer(
+            dag_name=self.relative_query_path,
+            layer=layer.value,
+            intermediate_path=tree_path,
         )
 
     @staticmethod

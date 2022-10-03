@@ -31,6 +31,7 @@ parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")
 parser.add_argument("source")
+parser.add_argument("--tables_list", nargs="+", dest="tables_list", required=True)
 parser.add_argument("--partition_by", nargs="+", dest="partition_by", required=False)
 
 
@@ -40,6 +41,7 @@ if __name__ == "__main__":
     env = args.env
     datalake_bucket = args.datalake_bucket
     source = args.source
+    incremental_tables_queries = args.tables_list
     partition_cols = args.partition_by
 
     logger.info(
@@ -56,10 +58,8 @@ if __name__ == "__main__":
     amplitude_clean_database_name = db_info["db_clean_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_CLEAN
     database_location = db_info["db_clean_path"]
-    incremental_tables_queries = FileService.list_layer_sql_files(source, "clean")
 
     for table_name in incremental_tables_queries:
-        table_name = table_name.replace(".sql", "")
         query_path = (
             QUERIES_DATALAKE_PATH + source + "/clean" + "/{}.sql".format(table_name)
         )
