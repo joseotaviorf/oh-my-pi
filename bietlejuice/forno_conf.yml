@@ -69,7 +69,7 @@ spark_jobs_logs_path: s3://databricks.s3.forno.data.quintoandar.com.br/logs/jobs
 default_libraries:
     [
         {
-            "whl": "s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/bi_etl_ejuice-forno-py3-none-any.whl",
+            "whl": "s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/bi_etl_ejuice-latest-py3-none-any.whl",
         },
         {
             "whl": "s3://artifacts.s3.forno.data.quintoandar.com.br/python-logger/quintoandar_logger-0.8.0-py3-none-any.whl",
