@@ -35,7 +35,7 @@ SELECT
     IF(rf.id_visit IS NOT NULL, DATEDIFF(rf.dt_visit, eca.ts_created), NULL) AS days_visit_after_early_credit_evaluation,
     IF(eval.rank = 1, TRUE, FALSE) AS is_most_recent_evaluation,
     rf.dt_visit,
-    rf.dt_booking_created,
+    rf.dt_booking_created AS ts_booking_created,
     rf.ts_offer_created,
     eca.ts_created AS ts_early_credit_analysis_created
 FROM datalake_sorting_hat_clean.early_credit_analysis AS eca
