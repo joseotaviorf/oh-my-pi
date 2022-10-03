@@ -122,8 +122,8 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
-	context_prospect AS context_origin,
-	context_qualified AS context_conversion,
+	context_qualified AS context_origin,
+	context_available_qualified AS context_conversion,
 	CASE
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(lf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(lf.sk_available_qualified_date,-1)))) < 0
 	        THEN 'W5+'
@@ -175,8 +175,8 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
-	context_prospect AS context_origin,
-	context_qualified AS context_conversion,
+	context_available_qualified AS context_origin,
+	context_opportunity AS context_conversion,
 	CASE
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(lf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(lf.sk_opportunity_date,-1)))) < 0
 	        THEN 'W5+'
@@ -321,6 +321,10 @@ union_all AS (
     SELECT * FROM l2p
 	UNION ALL
 	SELECT * FROM p2q
+	UNION ALL
+	SELECT * FROM q2avq
+	UNION ALL
+	SELECT * FROM avq2opp
 	UNION ALL
 	SELECT * FROM q2opp
 	UNION ALL
