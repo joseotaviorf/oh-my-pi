@@ -1,0 +1,16 @@
+---
+database_name: datalake_mexico_rent_demand_funnel
+table_name: weekly_demand_flow_metrics
+columns:
+  country_code:
+    lineage:
+      - datalake_region.region.country_code
+  city_group:
+    lineage:
+      - datalake_region.region.country_name
+  base_year:
+    lineage:
+      - datalake_region.city_groups_per_periods.year
+  dt_weekly_started:
+    lineage:
+      - datalake_region.city_groups_per_periods.dt_weekly_started

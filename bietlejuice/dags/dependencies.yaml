@@ -1349,6 +1349,16 @@ bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:
 bietlejuice.enrich_casa_mineira_marketing_manual_daily_costs:
   - bietlejuice.gsheets.growth_intraday:load-clean-casa-mineira-marketing-manual-shared-costs
 
+bietlejuice.enrich_mexico_rent_demand_funnel:
+  - bietlejuice.dw_datamarts_for_rent_cross:create-rental-events-funnel-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-top-of-funnel-volumes-monthly-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-top-of-funnel-volumes-weekly-in-datalake
+  - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.gsheets.for_rent:load-clean-mexico-demand-targets-2022
+  - bietlejuice.gsheets.growth:load-clean-mexico-demand-marketing-cost-per-source-actual
+  - bietlejuice.gsheets.growth:load-clean-mexico-marketing-cost-per-source
+
 bietlejuice.enrich_casa_mineira_portal:
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-history
