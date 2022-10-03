@@ -5,6 +5,12 @@ columns:
   id:
     lineage:
       - datalake_ebdb_clean.work_contract.id
+  id_hub_teams:
+    lineage:
+      - datalake_gsheets_clean.sale_business_unit_standardization.id_business_unit_teams
+  hub_name_teams:
+    lineage:
+      - datalake_gsheets_clean.sale_business_unit_standardization.hub_name_teams
   contract_name:
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
