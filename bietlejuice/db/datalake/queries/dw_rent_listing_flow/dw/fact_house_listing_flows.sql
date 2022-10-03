@@ -108,7 +108,7 @@ potential_listings AS (
         lfrl.days_lead_to_listing,
         lfrl.days_lead_to_processing,
         lfrl.ts_opt_out_rent AS ts_opted_out_rent
-    FROM listing_flows_with_reprocessed_leads lfrl
+    FROM datalake_listing_flow.listing_flows_with_reprocessed_leads lfrl
     LEFT JOIN datalake_lead_tracking.lead_first_event_tracking lfet
         ON lfet.id_lead = lfrl.id_lead
     LEFT JOIN datalake_rent_potential_listing.potential_listing_lead_tasks pllt
