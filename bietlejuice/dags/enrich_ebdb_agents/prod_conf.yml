@@ -5,6 +5,8 @@ tables:
     partitions: [year, month, day]
   - table_name: agent_business_context_history
     is_incremental: false
+  - table_name: agent_coincident_business_contexts
+    is_incremental: false
   - table_name: agent_contract
     is_incremental: false
   - table_name: agent_region_group
@@ -30,6 +32,8 @@ tables:
     is_incremental: false
 
 inner_dependencies:
+  agent_coincident_business_contexts:
+    - agent_business_context_history
   agents_slots:
     - agents_specific_weekly_schedule
     - agents_weekly_schedule_history

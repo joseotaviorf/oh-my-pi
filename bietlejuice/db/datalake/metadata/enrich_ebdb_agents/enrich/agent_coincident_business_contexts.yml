@@ -1,0 +1,15 @@
+---
+database_name: datalake_ebdb_agents
+table_name: agent_coincident_business_contexts
+columns:
+  id_agent_data:
+    lineage:
+      - datalake_ebdb_agents.agent_business_context_history.id_agent_data
+  ts_agent_business_context_started:
+    lineage:
+      - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_started
+      - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_ended
+  ts_agent_business_context_ended:
+    lineage:
+      - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_started
+      - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_ended
