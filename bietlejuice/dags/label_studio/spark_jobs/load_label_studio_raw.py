@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
     # get updated projects from LabelStudio
     projects_info = spark_client.conn.sparkContext.parallelize(
-        label_studio_connection_sync.get_projects_info()["results"]
+        label_studio_connection_sync.get_projects_info()
     )
     projects_updated = projects_info.filter(
         lambda project: label_studio_connection_sync.project_is_updated(

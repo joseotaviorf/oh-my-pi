@@ -42,14 +42,20 @@ class LabelStudioConnectionSync:
 
     def get_projects_info(self):
         """
-        This method returns projects of the Label Studio.
-        @return: json
+        This method returns a list of dicts for each project in Label Studio
+        @return: list
         """
         response = requests.get(
             f"{self.api_endpoint}projects", headers=self.api_headers
         )
         if response:
-            return json.loads(response.content)
+            resp = json.loads(response.content)
+            results = resp["results"]
+            while resp["next"]:
+                response = requests.get(resp["next"], headers=self.api_headers)
+                resp = json.loads(response.content)
+                results.extend(resp["results"])
+            return results
         else:
             raise Exception(
                 f"""m=__get_project_id, status_code={response.status_code},
