@@ -90,7 +90,13 @@ owners AS (
 	LEFT JOIN
         crisis_users uc
 		    ON uc.sk_contract = ac.sk_contract
-	WHERE uc.sk_contract IS NULL
+	LEFT JOIN
+		datalake_ebdb_clean.user_pro_owner AS upo
+			ON cp.id_user = upo.id_user
+			AND upo.is_active = TRUE
+	WHERE 
+		uc.sk_contract IS NULL
+		AND upo.id_user IS NULL
 )
 SELECT
 	name AS customer_name,
