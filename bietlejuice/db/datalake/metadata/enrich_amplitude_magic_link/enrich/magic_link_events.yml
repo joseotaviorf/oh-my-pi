@@ -61,8 +61,7 @@ columns:
       - datalake_gsheets_clean.agents_control.manager
   agent_department:
     lineage:
-      - datalake_gsheets_clean.agents_control.department
-      - datalake_gsheets_clean.support_agents_department.department
+      - datalake_gsheets_clean.department_control.department
   department_team:
     lineage:
       - datalake_gsheets_clean.department_control.team

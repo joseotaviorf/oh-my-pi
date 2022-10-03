@@ -1,4 +1,37 @@
-SELECT
+WITH agent_department AS (
+    SELECT DISTINCT
+        us.email,
+        FIRST(g.name) OVER (PARTITION BY us.email ORDER BY us.ts_updated DESC) AS main_department
+    FROM
+        datalake_zendesk_tickets_clean.users AS us
+    JOIN
+        datalake_zendesk_tickets_clean.groups AS g
+            ON us.id_default_group = g.id_group
+),
+agents AS (
+    WITH last_agent_info AS (
+        SELECT
+            ac.email,
+            MAX(ac.dt_start) AS dt_start
+        FROM
+            datalake_gsheets_clean.agents_control ac
+        GROUP BY 1
+    )
+    SELECT
+        ac.id_assignee,
+        ac.agent_name,
+        ac.email,
+        ac.agent_company,
+        ac.manager,
+        ac.dt_start
+    FROM
+        datalake_gsheets_clean.agents_control ac
+    JOIN
+        last_agent_info a
+            ON a.email = ac.email
+            AND a.dt_start = ac.dt_start
+)
+SELECT DISTINCT
     e.id_amplitude,
     e.id_app,
     e.id_device,
@@ -18,7 +51,7 @@ SELECT
     ac.agent_name,
     ac.agent_company,
     ac.manager AS agent_manager,
-    COALESCE(sad.department, ac.department) AS agent_department,
+    dc.department AS agent_department,
     dc.team AS department_team,
     dc.journey_step AS department_journey_step,
     dc.area AS department_area,
@@ -64,15 +97,14 @@ SELECT
 FROM
     datalake_amplitude_clean.events e
 LEFT JOIN
-    datalake_gsheets_clean.agents_control ac
+    agents ac
         ON GET_JSON_OBJECT(e.user_properties, '$.email') = ac.email
 LEFT JOIN
-    datalake_gsheets_clean.support_agents_department sad
-        ON ac.id_assignee = sad.id_agent
-        AND DATE(CONCAT(year, '-', month, '-', day)) BETWEEN sad.dt_start AND COALESCE(sad.dt_end, NOW())
+    agent_department ad
+        ON GET_JSON_OBJECT(e.user_properties, '$.email') = ad.email
 LEFT JOIN
     datalake_gsheets_clean.department_control dc
-        ON COALESCE(sad.department, ac.department) = dc.department
+        ON ad.main_department = dc.department
 WHERE
     id_app = 370096
     AND year = {year}

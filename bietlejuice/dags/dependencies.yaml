@@ -1175,7 +1175,8 @@ bietlejuice.enrich_amplitude_magic_link:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.gsheets.support_and_service:load-clean-agents-control
   - bietlejuice.gsheets.support_and_service:load-clean-department-control
-  - bietlejuice.gsheets.support_and_service:load-clean-support-agents-department
+  - bietlejuice.zendesk_tickets:load-clean-groups
+  - bietlejuice.zendesk_tickets:load-clean-users
 
 bietlejuice.enrich_amplitude_offer:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
