@@ -4,7 +4,7 @@ from pendulum import timezone
 import os
 
 from airflow.utils.helpers import chain
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
@@ -12,6 +12,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
 ENV = os.environ.get("ENVIRONMENT")
@@ -36,14 +37,24 @@ REVERSE_SPARK_JOB_PATH = (
     f"{databricks_bietlejuice_repo_path}/spark_jobs/reverse_{SOURCE}/"
 )
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
 
-cluster_libs = config_service.get_config("cluster_libs")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
+
+custom_libraries = [
+    {
+        "whl": f"{artifacts_s3_bucket}/tracksale-api-client-python/"
+        f"quintoandar_tracksale_api_client-0.3.1-py2.py3-none-any.whl"
+    }
+]
+
+default_libraries = config_service.get_config("default_libraries")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -63,7 +74,8 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=cluster_libs,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=custom_libraries + default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
