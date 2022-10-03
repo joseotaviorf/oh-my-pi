@@ -28,22 +28,12 @@ SELECT DISTINCT
   da.full_name AS agent_full_name,
   da.email AS agent_email,
   da.agent_company,
-  dmt.sla_target,
-  dmt.days_worked,
-  dmt.days_off,
-  dmt.days_worked AS leadtime_day,
-  dmt.time_spent_solved_within_sla AS days_spent_on_solved_tickets_within_sla,
-  dmt.time_spent_solved_with_exceed_sla AS days_spent_on_solved_tickets_with_exceed_sla,
   ft.reopens,
   ft.replies,
   dd.is_active,
   ft.has_answered_csat,
   ft.has_transfers,
   ft.resolution_survey AS is_resolution,
-  dmt.is_received_demand AS is_received_demand,
-  dmt.is_solved_demand AS is_resolved_demand,
-  dmt.is_ticket_solved_within_sla AS is_solved_within_sla,
-  dmt.is_ticket_solved_with_exceed_sla AS is_solved_with_exceed_sla,
   ft.ts_started,
   ft.ts_survey,
   ft.ts_csat_response,
@@ -54,9 +44,6 @@ SELECT DISTINCT
   DAY(CURRENT_DATE) AS day
 FROM
   dw_customer_support.fact_ticket AS ft
-LEFT JOIN
-  dw_customer_support.fact_demand_metrics_tasks AS dmt
-    ON ft.sk_ticket = dmt.sk_task
 LEFT JOIN
   dw_customer_support.dim_channel AS dc
     ON ft.sk_channel = dc.sk_channel
@@ -101,5 +88,7 @@ AND
     'CX Offboarding ETP 1 [BACK] [POS]',
     'CX Rescisão [BACK] [POS]',
     'CX Onboarding [BACK] [POS]',
-    'CX Vistoria [BACK]'
+    'CX Vistoria [BACK]',
+    'Reparos N2 - Emergenciais [QA]',
+    'Reparos Back [ATN]'
   )
