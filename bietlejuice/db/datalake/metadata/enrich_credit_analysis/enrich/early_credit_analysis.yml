@@ -26,6 +26,9 @@ columns:
   dt_visit:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_visit
+  dt_booking_created:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_booking_created
   ts_offer_created:
     lineage:
       - datalake_ebdb_clean.offer.ts_created
