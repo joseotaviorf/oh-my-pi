@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
         dag_name=relative_query_path,
-        layer="dw",
+        layer=LayerEnum.DW.value,
         intermediate_path=tree_path,
         table_name=table_name,
     )
