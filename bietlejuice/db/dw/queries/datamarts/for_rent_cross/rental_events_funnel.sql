@@ -26,6 +26,7 @@ SELECT
   	COUNT(fhlf.sk_lead_date) AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
+	NULL::BIGINT AS available_qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
 	NULL::BIGINT AS messages_sent_tta,
@@ -81,6 +82,7 @@ SELECT
   	NULL::BIGINT AS leads,
 	COUNT(fhlf.sk_prospect_date) AS prospects, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS qualifieds,
+	NULL::BIGINT AS available_qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
 	NULL::BIGINT AS messages_sent_tta,
@@ -136,6 +138,7 @@ SELECT
   	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	COUNT(fhlf.sk_qualified_date) AS qualifieds, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
+	NULL::BIGINT AS available_qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
 	NULL::BIGINT AS messages_sent_tta,
@@ -158,6 +161,62 @@ FROM dim_date dd
 JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_qualified_date
   AND fhlf.sk_qualified_date > 0
+LEFT JOIN dim_region dr
+  ON dr.sk_region = fhlf.sk_region
+WHERE fhlf.origin_table = 'Rent'
+AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+),
+available_qualified AS (
+SELECT
+    dd."date",
+	dd.sk_date,
+	dr.city_group,
+  dr.country_code,
+	NULL AS is_b2b,
+	fhlf.mkt_origin AS supply_mkt_origin,
+	fhlf.mkt_channel AS supply_mkt_channel,
+	CASE
+	    WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
+	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
+	    ELSE 'IS'
+	END AS lead_context,
+	CASE
+    	WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
+	    ELSE sourcing_ops
+    	END AS lead_processing_operation,
+    	sales_company,
+    	lead_origin,
+	NULL AS demand_mkt_channel,
+	NULL AS demand_mkt_medium,
+	NULL AS first_touchpoint,
+	FALSE AS is_guarantee,
+  	NULL::BIGINT AS leads,
+	NULL::BIGINT AS prospects,
+	COUNT(fhlf.sk_available_qualified_date) AS available_qualifieds, -- this count is done on the available qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
+	NULL::BIGINT AS qualifieds,
+	NULL::BIGINT AS opportunities,
+	NULL::BIGINT AS first_listings,
+	NULL::BIGINT AS messages_sent_tta,
+	NULL::BIGINT AS registered_agent_supports,
+	NULL::BIGINT AS visits_booked,
+  	NULL::BIGINT AS visits_completed,
+  	NULL::BIGINT AS offer_submitted,
+  	NULL::BIGINT AS offer_approved,
+  	NULL::BIGINT AS credit_evaluation_init,
+  	NULL::BIGINT AS credit_evaluation_positive,
+  	NULL::BIGINT AS guarantee_started,
+  	NULL::BIGINT AS doc_sent,
+  	NULL::BIGINT AS doc_approved,
+  	NULL::BIGINT AS guarantee_paid,
+  	NULL::BIGINT AS credit_approved,
+  	NULL::BIGINT AS contract_created,
+  	NULL::BIGINT AS contract_signed,
+  	NULL::BIGINT  AS contract_ended
+FROM dim_date dd
+JOIN datamarts.lead_listing_flows fhlf
+  ON dd.sk_date = fhlf.sk_available_qualified_date
+  AND fhlf.sk_available_qualified_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE fhlf.origin_table = 'Rent'
@@ -191,6 +250,7 @@ SELECT
   	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
+	NULL::BIGINT AS available_qualifieds,
 	COUNT(DISTINCT fhlf.sk_house_listing) AS opportunities,
 	NULL::BIGINT AS first_listings,
 	NULL::BIGINT AS messages_sent_tta,
@@ -246,6 +306,7 @@ SELECT
   	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
+	NULL::BIGINT AS available_qualifieds,
 	NULL::BIGINT AS opportunities,
 	COUNT(DISTINCT fhlf.sk_house_listing) AS first_listings,
 	NULL::BIGINT AS messages_sent_tta,
@@ -297,6 +358,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   COUNT(DISTINCT (tta.agent_id || tta.tenant_id || tta.sk_house_listing)) AS messages_sent_tta,
@@ -348,6 +410,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -460,6 +523,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -505,6 +569,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -550,6 +615,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -595,6 +661,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -640,6 +707,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -685,6 +753,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -730,6 +799,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -775,6 +845,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -820,6 +891,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -866,6 +938,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -911,6 +984,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -956,6 +1030,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -1001,6 +1076,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS visits_booked,
@@ -1049,6 +1125,7 @@ SELECT
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
+  NULL::BIGINT AS available_qualifieds,
   NULL::BIGINT AS opportunities,
   NULL::BIGINT AS first_listings,
   NULL::BIGINT AS messages_sent_tta,
@@ -1080,6 +1157,8 @@ union_all AS (
 	SELECT * FROM prospect
 	UNION ALL
 	SELECT * FROM qualified
+	UNION ALL
+	SELECT * FROM available_qualified
 	UNION ALL
 	SELECT * FROM opportunity
 	UNION ALL
@@ -1136,6 +1215,7 @@ SELECT
   ua.leads,
   ua.prospects,
   ua.qualifieds,
+  ua.available_qualifieds,
   ua.opportunities,
   ua.first_listings,
   ua.messages_sent_tta,
@@ -1188,6 +1268,7 @@ SELECT
    	SUM(COALESCE(leads,0)) AS leads,
     	SUM(COALESCE(prospects,0)) AS prospects,
     	SUM(COALESCE(qualifieds,0)) AS qualifieds,
+    	SUM(COALESCE(available_qualifieds,0)) AS available_qualifieds,
     	SUM(COALESCE(opportunities,0)) AS opportunities,
     	SUM(COALESCE(first_listings,0)) AS first_listings,
     	SUM(COALESCE(messages_sent_tta,0)) AS messages_sent_tta,
@@ -1207,5 +1288,5 @@ SELECT
     	SUM(COALESCE(contract_signed,0)) AS contract_signed,
     	SUM(COALESCE(contract_ended,0)) AS contract_ended,
     	current_timestamp AS ts_load
-FROM union_all
+FROM union_all_date
 GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14

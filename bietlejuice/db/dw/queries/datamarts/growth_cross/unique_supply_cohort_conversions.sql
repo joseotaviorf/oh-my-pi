@@ -30,6 +30,8 @@ SELECT
 	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2opp,
 	NULL::BIGINT AS opp2fl,
+	NULL::BIGINT AS q2avq,
+	NULL::BIGINT AS avq2opp,
 	lf.country_code
 FROM
     dim_date dd
@@ -48,7 +50,7 @@ LEFT JOIN
         ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
 ),
 p2q AS (
 SELECT
@@ -81,6 +83,8 @@ SELECT
 	COUNT(lf.sk_prospect_date) AS p2q, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS q2opp,
 	NULL::BIGINT AS opp2fl,
+	NULL::BIGINT AS q2avq,
+	NULL::BIGINT AS avq2opp,
 	lf.country_code
 FROM
     dim_date dd
@@ -99,7 +103,113 @@ LEFT JOIN
         ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+),
+q2avq AS (
+SELECT
+	dd."date",
+	dd.sk_date,
+	dr.city_group,
+	lf.mkt_origin AS supply_mkt_origin,
+	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_completion AS supply_mkt_completion,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	rbh.partner AS supply_3pbh_partner,
+	CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
+	sales_company,
+	sourcing_ops,
+	origin_table,
+	lead_origin,
+	funnel_drop_reason,
+	context_prospect AS context_origin,
+	context_qualified AS context_conversion,
+	CASE
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(lf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(lf.sk_available_qualified_date,-1)))) < 0
+	        THEN 'W5+'
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(lf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(lf.sk_available_qualified_date,-1)))) BETWEEN 0 AND 4
+	        THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(lf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(lf.sk_available_qualified_date,-1))))
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(lf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(lf.sk_available_qualified_date,-1)))) >= 5
+	        THEN 'W5+'
+	END AS weeks_conversion,
+  	NULL::BIGINT AS l2p,
+	NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2opp,
+	NULL::BIGINT AS opp2fl,
+	COUNT(lf.sk_qualified_date) AS q2avq, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
+	NULL::BIGINT AS avq2opp,
+	lf.country_code
+FROM
+    dim_date dd
+JOIN
+    datamarts.lead_listing_flows lf
+        ON dd.sk_date = lf.sk_qualified_date
+        AND lf.sk_qualified_date > 0
+LEFT JOIN
+    dim_region dr
+        ON dr.sk_region = lf.sk_region
+LEFT JOIN
+    datalake_3p_prod.houses_3p AS hp
+		ON hp.id_house = lf.sk_house_listing / 1000
+LEFT JOIN
+    datalake_3p_prod.houses_3p_bh AS rbh
+        ON rbh.id_house = lf.sk_house_listing / 1000
+WHERE
+    dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+),
+avq2opp AS (
+SELECT
+	dd."date",
+	dd.sk_date,
+	dr.city_group,
+	lf.mkt_origin AS supply_mkt_origin,
+	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_completion AS supply_mkt_completion,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	rbh.partner AS supply_3pbh_partner,
+	CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
+	sales_company,
+	sourcing_ops,
+	origin_table,
+	lead_origin,
+	funnel_drop_reason,
+	context_prospect AS context_origin,
+	context_qualified AS context_conversion,
+	CASE
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(lf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(lf.sk_opportunity_date,-1)))) < 0
+	        THEN 'W5+'
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(lf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(lf.sk_opportunity_date,-1)))) BETWEEN 0 AND 4
+	        THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(lf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(lf.sk_opportunity_date,-1))))
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(lf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(lf.sk_opportunity_date,-1)))) >= 5
+	        THEN 'W5+'
+	END AS weeks_conversion,
+  	NULL::BIGINT AS l2p,
+	NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2opp,
+	NULL::BIGINT AS opp2fl,
+	NULL::BIGINT AS q2avq,
+	COUNT(lf.sk_available_qualified_date) AS avq2opp, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
+	lf.country_code
+FROM
+    dim_date dd
+JOIN
+    datamarts.lead_listing_flows lf
+        ON dd.sk_date = lf.sk_available_qualified_date
+        AND lf.sk_available_qualified_date > 0
+LEFT JOIN
+    dim_region dr
+        ON dr.sk_region = lf.sk_region
+LEFT JOIN
+    datalake_3p_prod.houses_3p AS hp
+		ON hp.id_house = lf.sk_house_listing / 1000
+LEFT JOIN
+    datalake_3p_prod.houses_3p_bh AS rbh
+        ON rbh.id_house = lf.sk_house_listing / 1000
+WHERE
+    dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
 ),
 q2opp AS (
 SELECT
@@ -132,6 +242,8 @@ SELECT
 	NULL::BIGINT AS p2q,
 	COUNT(lf.sk_qualified_date) AS q2opp, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS opp2fl,
+	NULL::BIGINT AS q2avq,
+	NULL::BIGINT AS avq2opp,
 	lf.country_code
 FROM
     dim_date dd
@@ -150,7 +262,7 @@ LEFT JOIN
         ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
 ),
 opp2fl AS (
 SELECT
@@ -183,6 +295,8 @@ SELECT
 	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2opp,
 	COUNT(DISTINCT lf.sk_house_listing) AS opp2fl,
+	NULL::BIGINT AS q2avq,
+	NULL::BIGINT AS avq2opp,
 	lf.country_code
 FROM
     dim_date dd
@@ -201,7 +315,7 @@ LEFT JOIN
         ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -235,6 +349,8 @@ SELECT
   ua.p2q,
   ua.q2opp,
   ua.opp2fl,
+  ua.q2avq,
+  ua.avq2opp,
   ua.country_code
 FROM
     union_all ua
@@ -282,6 +398,8 @@ SELECT
     SUM(COALESCE(p2q,0)) AS p2q,
     SUM(COALESCE(q2opp,0)) AS q2opp,
     SUM(COALESCE(opp2fl,0)) AS opp2fl,
+	SUM(COALESCE(q2avq,0)) AS q2avq,
+	SUM(COALESCE(avq2opp,0)) AS avq2opp,
     current_timestamp AS ts_load
 FROM
     union_all_date

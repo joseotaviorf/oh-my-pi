@@ -31,6 +31,8 @@ WITH l2p AS (
         END AS weeks_conversion,
         COUNT(fhlf.sk_lead_date) AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -99,6 +101,8 @@ p2q AS (
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         COUNT(fhlf.sk_prospect_date) AS p2q, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -134,6 +138,143 @@ p2q AS (
         AND dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
 ),
+-- new step 1 q2aq
+q2aq AS (
+    SELECT
+        dd."date",
+        dd.sk_date,
+        dr.city_group,
+        NULL AS is_b2b,
+        fhlf.mkt_origin AS supply_mkt_origin,
+        fhlf.mkt_channel AS supply_mkt_channel,
+        CASE
+            WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
+            WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
+            ELSE 'IS'
+        END AS lead_context,
+        CASE
+            WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
+            ELSE sourcing_ops
+        END AS lead_processing_operation,
+        NULL AS demand_mkt_channel,
+        NULL AS demand_mkt_medium,
+        NULL AS first_touchpoint,
+        NULL::BOOLEAN AS is_guarantee,
+        CASE
+            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_available_qualified_date,-1)))) < 0
+                THEN 'W5+'
+            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_available_qualified_date,-1)))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_available_qualified_date,-1))))
+            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_available_qualified_date,-1)))) >= 5
+                THEN 'W5+'
+        END AS weeks_conversion,
+        NULL::BIGINT AS l2p,
+        NULL::BIGINT AS p2q,
+        COUNT(fhlf.sk_qualified_date) AS q2aq, -- add -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
+        NULL::BIGINT AS aq2o,
+        NULL::BIGINT AS q2opp,
+        NULL::BIGINT AS opp2fl,
+        NULL::BIGINT AS vb2vc,
+        NULL::BIGINT AS vc,
+        NULL::BIGINT AS vc2os,
+        NULL::BIGINT AS os2oa,
+        NULL::BIGINT AS oa2cei,
+        NULL::BIGINT AS oa2da,
+        NULL::BIGINT AS oa2ds,
+        NULL::BIGINT AS cei2cep,
+        NULL::BIGINT AS cei2gs,
+        NULL::BIGINT AS cep2ds,
+        NULL::BIGINT AS gs2ds,
+        NULL::BIGINT AS ds2da,
+        NULL::BIGINT AS da2cc,
+        NULL::BIGINT AS da2gp,
+        NULL::BIGINT AS gp2cc,
+        NULL::BIGINT AS da2cs,
+        NULL::BIGINT AS da_gp2cs,
+        NULL::BIGINT AS cc2cs,
+        NULL::BIGINT AS cs2ce
+    FROM
+        dw_public.dim_date dd
+    JOIN
+        dw_datamarts_cross.lead_listing_flows fhlf
+            ON dd.sk_date = fhlf.sk_qualified_date
+                AND fhlf.sk_qualified_date > 0
+    LEFT JOIN
+        dw_public.dim_region dr
+            ON dr.sk_region = fhlf.sk_region
+    WHERE
+        fhlf.origin_table = 'Rent'
+        AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+), -- new aq2o step 2
+aq2o AS (
+    SELECT
+        dd."date",
+        dd.sk_date,
+        dr.city_group,
+        NULL AS is_b2b,
+        fhlf.mkt_origin AS supply_mkt_origin,
+        fhlf.mkt_channel AS supply_mkt_channel,
+        CASE
+            WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
+            WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
+            ELSE 'IS'
+        END AS lead_context,
+        CASE
+            WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
+            ELSE sourcing_ops
+        END AS lead_processing_operation,
+        NULL AS demand_mkt_channel,
+        NULL AS demand_mkt_medium,
+        NULL AS first_touchpoint,
+        NULL::BOOLEAN AS is_guarantee,
+        CASE
+            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) < 0
+                THEN 'W5+'
+            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1))))
+            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) >= 5
+                THEN 'W5+'
+        END AS weeks_conversion,
+        NULL::BIGINT AS l2p,
+        NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        COUNT(fhlf.sk_available_qualified_date) AS aq2o, -- this count is done on the available qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
+        NULL::BIGINT AS q2opp,
+        NULL::BIGINT AS opp2fl,
+        NULL::BIGINT AS vb2vc,
+        NULL::BIGINT AS vc,
+        NULL::BIGINT AS vc2os,
+        NULL::BIGINT AS os2oa,
+        NULL::BIGINT AS oa2cei,
+        NULL::BIGINT AS oa2da,
+        NULL::BIGINT AS oa2ds,
+        NULL::BIGINT AS cei2cep,
+        NULL::BIGINT AS cei2gs,
+        NULL::BIGINT AS cep2ds,
+        NULL::BIGINT AS gs2ds,
+        NULL::BIGINT AS ds2da,
+        NULL::BIGINT AS da2cc,
+        NULL::BIGINT AS da2gp,
+        NULL::BIGINT AS gp2cc,
+        NULL::BIGINT AS da2cs,
+        NULL::BIGINT AS da_gp2cs,
+        NULL::BIGINT AS cc2cs,
+        NULL::BIGINT AS cs2ce
+    FROM
+        dw_public.dim_date dd
+    JOIN
+        dw_datamarts_cross.lead_listing_flows fhlf
+            ON dd.sk_date = fhlf.sk_available_qualified_date
+                AND fhlf.sk_available_qualified_date > 0
+    LEFT JOIN
+        dw_public.dim_region dr
+            ON dr.sk_region = fhlf.sk_region
+    WHERE
+        fhlf.origin_table = 'Rent'
+        AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+),
 q2opp AS (
     SELECT
         dd.date,
@@ -167,6 +308,8 @@ q2opp AS (
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         COUNT(fhlf.sk_qualified_date) AS q2opp, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -235,6 +378,8 @@ opp2fl AS (
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         COUNT(DISTINCT fhlf.sk_house_listing) AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -365,6 +510,8 @@ vb2vc AS (
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         COUNT(DISTINCT rf.sk_booking) AS vb2vc,
@@ -413,6 +560,8 @@ vc AS (
         NULL::STRING AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -468,6 +617,8 @@ vc2os AS (
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -523,6 +674,8 @@ os2oa AS (
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -578,6 +731,8 @@ oa2cei AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -633,6 +788,8 @@ oa2da AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -688,6 +845,8 @@ oa2ds AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -743,6 +902,8 @@ cei2cep AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -799,6 +960,8 @@ cei2gs AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -855,6 +1018,8 @@ cep2ds AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -911,6 +1076,8 @@ gs2ds AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -967,6 +1134,8 @@ ds2da AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -1022,6 +1191,8 @@ da2cc AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -1078,6 +1249,8 @@ da2gp AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -1134,6 +1307,8 @@ gp2cc AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -1190,6 +1365,8 @@ da2cs AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -1245,6 +1422,8 @@ da_gp2cs AS(
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -1300,6 +1479,8 @@ cc2cs AS (
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -1355,6 +1536,8 @@ cs2ce AS (
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
@@ -1390,6 +1573,10 @@ union_all AS (
     SELECT * FROM l2p
 	UNION ALL
 	SELECT * FROM p2q
+    UNION ALL
+    SELECT * FROM q2aq
+	UNION ALL
+	SELECT * FROM aq2o
 	UNION ALL
 	SELECT * FROM q2opp
 	UNION ALL
@@ -1449,6 +1636,8 @@ union_all_date AS (
         ua.weeks_conversion,
         ua.l2p,
         ua.p2q,
+        ua.q2aq,
+        ua.aq2o,
         ua.q2opp,
         ua.opp2fl,
         ua.vb2vc,
@@ -1504,6 +1693,8 @@ SELECT
     weeks_conversion AS weeks_conversion,
     SUM(COALESCE(l2p,0)) AS l2p,
     SUM(COALESCE(p2q,0)) AS p2q,
+    SUM(COALESCE(q2aq,0)) AS q2aq,
+    SUM(COALESCE(aq2o,0)) AS aq2o,
     SUM(COALESCE(q2opp,0)) AS q2opp,
     SUM(COALESCE(opp2fl,0)) AS opp2fl,
     SUM(COALESCE(vb2vc,0)) AS vb2vc,

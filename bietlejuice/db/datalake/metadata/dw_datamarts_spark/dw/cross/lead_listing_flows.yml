@@ -38,6 +38,10 @@ columns:
     lineage:
       - dw_sale.fact_listing_flows.sk_qualified_date
       - dw_public.fact_house_listing_flows.sk_qualified_date
+  sk_available_qualified_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_available_qualified_date
+      - dw_public.fact_house_listing_flows.sk_available_qualified_date
   sk_opportunity_date:
     lineage:
       - dw_sale.fact_listing_flows.sk_opportunity_date

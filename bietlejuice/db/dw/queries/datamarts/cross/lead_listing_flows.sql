@@ -9,6 +9,7 @@ WITH fact_house_listing_flows_adjust AS (
 		hl.sk_lead_date,
 		hl.sk_prospect_date,
 		hl.sk_qualified_date,
+		hl.sk_available_qualified_date,
 		hl.sk_opportunity_date,
 		hl.sk_first_listing_date,
 		hl.sk_first_contact_date,
@@ -102,6 +103,12 @@ source_ops_rent AS (
 			ELSE NULL
 		END AS qualified_context,
 		CASE
+			WHEN hlf.sk_available_qualified_date = ssf.sk_available_qualified_date
+				AND hlf.sk_available_qualified_date > 0 THEN 'Hybrid'
+			WHEN hlf.sk_available_qualified_date > 0  THEN 'Rent'
+			ELSE NULL
+		END AS available_qualified_context,
+		CASE
 			WHEN hlf.sk_opportunity_date = ssf.sk_opportunity_date
 				AND hlf.sk_opportunity_date > 0 THEN 'Hybrid'
 			WHEN hlf.sk_opportunity_date > 0  THEN 'Rent'
@@ -147,6 +154,7 @@ sale_fact_listing_flows_adjust AS (
 		hl.sk_lead_date,
 		hl.sk_prospect_date,
 		hl.sk_qualified_date,
+		hl.sk_available_qualified_date,
 		hl.sk_opportunity_date,
 		hl.sk_first_listing_date,
 		hl.sk_first_contact_date,
@@ -233,6 +241,12 @@ source_ops_sale AS (
 			ELSE NULL
 		END AS qualified_context,
 		CASE
+			WHEN hlf.sk_available_qualified_date = ssf.sk_available_qualified_date
+				AND hlf.sk_available_qualified_date > 0 THEN 'Hybrid'
+			WHEN hlf.sk_available_qualified_date > 0  THEN 'Rent'
+			ELSE NULL
+		END AS available_qualified_context,
+		CASE
 			WHEN hlf.sk_opportunity_date = ssf.sk_opportunity_date
 				AND ssf.sk_opportunity_date > 0 THEN 'Hybrid'
 			WHEN ssf.sk_opportunity_date > 0  THEN 'Sale'
@@ -279,6 +293,7 @@ fact_sale AS (
 		ssf.sk_first_contact_date,
 	    ssf.sk_prospect_date,
 	    ssf.sk_qualified_date,
+	    ssf.sk_available_qualified_date,
 	    ssf.sk_opportunity_date,
 	    ssf.sk_first_listing_date,
 	    ssf.sk_conversion_date,
@@ -286,6 +301,7 @@ fact_sale AS (
 	   	sor.lead_context AS context_lead,
 	    sor.prospect_context AS context_prospect,
 	    sor.qualified_context AS context_qualified,
+	    sor.available_qualified_context AS context_available_qualified,
 	    sor.opportunity_context AS context_opportunity,
 	    sor.first_listing_context AS context_first_listing,
 	    sor.sk_first_photo_job_date AS sk_first_photojob_date_fact_photo_job,
@@ -330,6 +346,7 @@ fact_rent AS (
 		hlf.sk_first_contact_date,
 	    hlf.sk_prospect_date,
 	    hlf.sk_qualified_date,
+	    hlf.sk_available_qualified_date,
 	    hlf.sk_opportunity_date,
 	    hlf.sk_first_listing_date,
 	    hlf.sk_conversion_date,
@@ -337,6 +354,7 @@ fact_rent AS (
 	    sor.lead_context AS context_lead,
 	    sor.prospect_context AS context_prospect,
 	    sor.qualified_context AS context_qualified,
+	    sor.available_qualified_context AS context_available_qualified,
 	    sor.opportunity_context AS context_opportunity,
 	    sor.first_listing_context AS context_first_listing,
 	    sor.sk_first_photo_job_date AS sk_first_photojob_date_fact_photo_job,
@@ -392,6 +410,7 @@ SELECT
 	sk_first_contact_date,
 	sk_prospect_date,
 	sk_qualified_date,
+	sk_available_qualified_date,
 	sk_opportunity_date,
 	sk_first_listing_date,
 	sk_conversion_date,
@@ -402,6 +421,7 @@ SELECT
 	context_lead,
 	context_prospect,
 	context_qualified,
+	context_available_qualified,
 	context_opportunity,
 	context_first_listing,
 	mkt_origin,
@@ -420,10 +440,14 @@ SELECT
 	DENSE_RANK() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_prospect_date,-1)) AS aux_order_prospect,
 	ROW_NUMBER() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_qualified_date,-1)) AS aux_rn_qualified, -- column to help differentiate the qualified with equal dates
 	DENSE_RANK() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_qualified_date,-1)) AS aux_order_qualified,
+	ROW_NUMBER() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_available_qualified_date,-1)) AS aux_rn_available_qualified, -- column to help differentiate the available qualified with equal dates
+	DENSE_RANK() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_available_qualified_date,-1)) AS aux_order_available_qualified,
 	MIN(NULLIF(sk_prospect_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS first_prospect_date,
 	MAX(NULLIF(sk_prospect_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS last_prospect_date,
 	MIN(NULLIF(sk_qualified_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS first_qualified_date,
 	MAX(NULLIF(sk_qualified_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS last_qualified_date,
+	MIN(NULLIF(sk_available_qualified_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS first_available_qualified_date,
+	MAX(NULLIF(sk_available_qualified_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS last_available_qualified_date,
 	has_isales_intervention,
 	ts_first_job_scheduled,
 	ts_first_job_scheduled_br_tz,
