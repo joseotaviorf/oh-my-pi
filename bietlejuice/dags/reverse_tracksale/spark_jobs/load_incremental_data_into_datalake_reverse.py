@@ -1,20 +1,20 @@
 import logging
 from argparse import ArgumentParser
-from pyspark.sql.functions import when, count, lit, col
-from pyspark.sql.window import Window as w
 from datetime import datetime, timedelta
 
+from pyspark.sql.functions import when, count, lit, col
+from pyspark.sql.window import Window as w
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.services import FileService
-from bietlejuice.base.db import QUERIES_DATALAKE_PATH
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_reverse"
@@ -48,13 +48,11 @@ if __name__ == "__main__":
 
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
-
-    query_path = (
-        QUERIES_DATALAKE_PATH
-        + f"reverse_{source}/reverse"
-        + "/{}.sql".format(campaign_query)
+    query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+        dag_name=f"reverse_{source}",
+        layer=LayerEnum.REVERSE.value,
+        table_name=campaign_query,
     )
-    query = FileService.get_query_from_file_name(query_path)
 
     df = spark_client.get_records(query)
 
