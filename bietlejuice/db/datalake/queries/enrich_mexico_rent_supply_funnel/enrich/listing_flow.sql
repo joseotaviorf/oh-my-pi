@@ -154,8 +154,6 @@ FROM
 LEFT JOIN
   datalake_lead.lead AS dl
     ON atx.id_lead = dl.id
-WHERE
-  dl.country_code = 'MX'
 )
 SELECT
   mc.id_lead,
