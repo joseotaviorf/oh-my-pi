@@ -22,11 +22,11 @@ WITH l2p AS (
         NULL AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_lead_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_prospect_date,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_lead_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_prospect_date,-1) AS STRING),'yyyyMMdd'))) < 0
                 THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_lead_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_prospect_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_lead_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_prospect_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_lead_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_prospect_date,-1),'yyyyMMdd'))) >=5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_lead_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_prospect_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_lead_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_prospect_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_lead_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_prospect_date,-1) AS STRING),'yyyyMMdd'))) >=5
                 THEN 'W5+'
         END AS weeks_conversion,
         COUNT(fhlf.sk_lead_date) AS l2p,
@@ -92,11 +92,11 @@ p2q AS (
         NULL AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_prospect_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_qualified_date,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_prospect_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_qualified_date,-1) AS STRING),'yyyyMMdd'))) < 0
                 THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_prospect_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_qualified_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_prospect_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_qualified_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_prospect_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_qualified_date,-1),'yyyyMMdd'))) >= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_prospect_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_qualified_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_prospect_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_qualified_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_prospect_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_qualified_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -299,11 +299,11 @@ q2opp AS (
         NULL AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_qualified_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_opportunity_date,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_qualified_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_opportunity_date,-1) AS STRING),'yyyyMMdd'))) < 0
                 THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_qualified_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_opportunity_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_qualified_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_opportunity_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_qualified_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_opportunity_date,-1),'yyyyMMdd'))) >= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_qualified_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_opportunity_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_qualified_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_opportunity_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_qualified_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_opportunity_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -369,11 +369,11 @@ opp2fl AS (
         NULL AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_opportunity_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_first_listing_date,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_opportunity_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_first_listing_date,-1) AS STRING),'yyyyMMdd'))) < 0
                 THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_opportunity_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_first_listing_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_opportunity_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_first_listing_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(fhlf.sk_opportunity_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(fhlf.sk_first_listing_date,-1),'yyyyMMdd'))) >= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_opportunity_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_first_listing_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_opportunity_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_first_listing_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_opportunity_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_first_listing_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -501,11 +501,11 @@ vb2vc AS (
         rf.funnel_first_touchpoint AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_booking_created_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_visit_date,-1),'yyyyMMdd'))) < 0 AND rf.flg_visit_completed
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_visit_date,-1) AS STRING),'yyyyMMdd'))) < 0 AND rf.flg_visit_completed
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_booking_created_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_visit_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4 AND rf.flg_visit_completed
-                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_booking_created_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_visit_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_booking_created_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_visit_date,-1),'yyyyMMdd'))) >= 5 AND rf.flg_visit_completed
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_visit_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4 AND rf.flg_visit_completed
+                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_visit_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_visit_date,-1) AS STRING),'yyyyMMdd'))) >= 5 AND rf.flg_visit_completed
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -608,11 +608,11 @@ vc2os AS (
         rf.funnel_first_touchpoint AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_visit_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_offer_submitted_date,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_visit_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_visit_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_offer_submitted_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_visit_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_offer_submitted_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_visit_date, 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_offer_submitted_date,-1),'yyyyMMdd'))) >= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_visit_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_visit_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_visit_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -665,11 +665,11 @@ os2oa AS (
         rf.funnel_first_touchpoint AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_submitted_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_offer_approved_date,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_submitted_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_approved_date,-1) AS STRING),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_submitted_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_offer_approved_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_submitted_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_offer_approved_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_submitted_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_offer_approved_date,-1),'yyyyMMdd'))) >= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_submitted_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_approved_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_submitted_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_approved_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_submitted_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_approved_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -722,11 +722,11 @@ oa2cei AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_first_credit_evaluation_init,-1) AS STRING),'yyyyMMdd'))) < 0
                 THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1),'yyyyMMdd'))) >=5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_first_credit_evaluation_init,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_first_credit_evaluation_init,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_first_credit_evaluation_init,-1) AS STRING),'yyyyMMdd'))) >=5
                 THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -779,11 +779,11 @@ oa2da AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)AS STRING),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1),'yyyyMMdd'))) >= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -836,11 +836,11 @@ oa2ds AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_offer_approved_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd'))) >= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -893,11 +893,11 @@ cei2cep AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_init,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_init AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_first_credit_evaluation_positive,-1) AS STRING),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_init,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_init,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_init,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1),'yyyyMMdd'))) >=5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_init AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_first_credit_evaluation_positive,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_init AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_first_credit_evaluation_positive,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_init AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_first_credit_evaluation_positive,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -951,11 +951,11 @@ cei2gs AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_init,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_guarantee_date,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_init AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_guarantee_date,-1) AS STRING),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_init,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_guarantee_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_init,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_guarantee_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_init,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_guarantee_date,-1),'yyyyMMdd'))) >=5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_init AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_guarantee_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_init AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_guarantee_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_init AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_guarantee_date,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -1009,11 +1009,11 @@ cep2ds AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_positive,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_positive AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_positive,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_positive,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_first_credit_evaluation_positive,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd'))) >=5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_positive AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_positive AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_positive AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -1067,11 +1067,11 @@ gs2ds AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_guarantee_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_guarantee_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_guarantee_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_guarantee_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_guarantee_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1),'yyyyMMdd'))) >=5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_guarantee_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_guarantee_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_guarantee_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -1125,11 +1125,11 @@ ds2da AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_tenant_first_doc_sent_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_tenant_first_doc_sent_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)AS STRING),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_tenant_first_doc_sent_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_tenant_first_doc_sent_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_tenant_first_doc_sent_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1),'yyyyMMdd'))) >=5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_tenant_first_doc_sent_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_tenant_first_doc_sent_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_tenant_first_doc_sent_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -1182,11 +1182,11 @@ da2cc AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_created_date,-1),'yyyyMMdd'))) <0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_created_date,-1) AS STRING),'yyyyMMdd'))) <0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_created_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_created_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_created_date,-1),'yyyyMMdd'))) >= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_created_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_created_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_created_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -1240,11 +1240,11 @@ da2gp AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_guarantee_paid_date,-1),'yyyyMMdd'))) <0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_guarantee_paid_date,-1) AS STRING),'yyyyMMdd'))) <0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_guarantee_paid_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_guarantee_paid_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_guarantee_paid_date,-1),'yyyyMMdd'))) >= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_guarantee_paid_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_guarantee_paid_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_guarantee_paid_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -1298,11 +1298,11 @@ gp2cc AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_guarantee_paid_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_created_date,-1),'yyyyMMdd'))) <0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_guarantee_paid_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_created_date,-1) AS STRING),'yyyyMMdd'))) <0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_guarantee_paid_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_created_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_guarantee_paid_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_created_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_guarantee_paid_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_created_date,-1),'yyyyMMdd'))) >=5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_guarantee_paid_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_created_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_guarantee_paid_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_created_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_guarantee_paid_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_created_date,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -1356,11 +1356,11 @@ da2cs AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_credit_analysis_approved_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd'))) >=5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -1413,11 +1413,11 @@ da_gp2cs AS(
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_da_gp_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd'))) <0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_da_gp_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd'))) <0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_da_gp_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_da_gp_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_da_gp_date_adjust,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd')))>= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_da_gp_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_da_gp_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_da_gp_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd')))>= 5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -1470,11 +1470,11 @@ cc2cs AS (
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_contract_created_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd'))) <0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_contract_created_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd'))) <0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_contract_created_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_contract_created_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_contract_created_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_signed_date,-1),'yyyyMMdd')))>= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_contract_created_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_contract_created_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_contract_created_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd')))>= 5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -1527,11 +1527,11 @@ cs2ce AS (
         rf.funnel_first_touchpoint AS first_touchpoint,
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
-                WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_contract_signed_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_annulment_date,-1),'yyyyMMdd'))) <0
+                WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_contract_signed_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_annulment_date,-1) AS STRING),'yyyyMMdd'))) <0
                     THEN 'W5+'
-                WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_contract_signed_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_annulment_date,-1),'yyyyMMdd'))) BETWEEN 0 AND 4
-                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_contract_signed_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_annulment_date,-1),'yyyyMMdd')))
-                WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(rf.sk_contract_signed_date,'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(NULLIF(rf.sk_contract_annulment_date,-1),'yyyyMMdd'))) >= 5
+                WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_contract_signed_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_annulment_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                    THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_contract_signed_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_annulment_date,-1) AS STRING),'yyyyMMdd')))
+                WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_contract_signed_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_annulment_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,

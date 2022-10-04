@@ -60,7 +60,7 @@ rene_tasks AS (
     SELECT
       DISTINCT id,
       REGEXP_REPLACE(SPLIT(SPLIT(REGEXP_EXTRACT(acquisition_campaign,'"taskId":[^.]*', 0), ',')[0], ':')[1], '"', '') AS task_id,
-      REGEXP_REPLACE(REGEXP_REPLACE(SPLIT(SPLIT(REGEXP_EXTRACT(acquisition_campaign,'"originPhone":[^.]*', 0), ',')[0], ':')[1], '"', ''), '}', '') AS origin_phone
+      REGEXP_REPLACE(REGEXP_REPLACE(SPLIT(SPLIT(REGEXP_EXTRACT(acquisition_campaign,'"originPhone":[^.]*', 0), ',')[0], ':')[1], '"', ''), '}}', '') AS origin_phone
     FROM
       datalake_rene_descartes_clean.acquisition_misc_data
     WHERE acquisition_campaign LIKE '%taskId%'
