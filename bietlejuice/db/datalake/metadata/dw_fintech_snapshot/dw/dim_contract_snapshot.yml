@@ -1,0 +1,160 @@
+---
+database_name: dw_public_snapshot
+table_name: dim_contract_snapshot
+columns:
+  sk_contract:
+    lineage:
+      - dw_public.dim_contract.sk_contract
+  id_contract:
+    lineage:
+      - dw_public.dim_contract.id_contract
+  country_code:
+    lineage:
+      - dw_public.dim_contract.country_code
+  rent:
+    lineage:
+      - dw_public.dim_contract.rent
+  first_rent_charged:
+    lineage:
+      - dw_public.dim_contract.first_rent_charged
+  day_month_due:
+    lineage:
+      - dw_public.dim_contract.day_month_due
+  guarantee:
+    lineage:
+      - dw_public.dim_contract.guarantee
+  type:
+    lineage:
+      - dw_public.dim_contract.type
+  status:
+    lineage:
+      - dw_public.dim_contract.status
+  rental_administrator:
+    lineage:
+      - dw_public.dim_contract.rental_administrator
+  condo_payer:
+    lineage:
+      - dw_public.dim_contract.condo_payer
+  condo_responsible:
+    lineage:
+      - dw_public.dim_contract.condo_responsible
+  iptu_payer:
+    lineage:
+      - dw_public.dim_contract.iptu_payer
+  iptu_responsible:
+    lineage:
+      - dw_public.dim_contract.iptu_responsible
+  rental_insurance_installments:
+    lineage:
+      - dw_public.dim_contract.rental_insurance_installmen
+  rental_insurance_value:
+    lineage:
+      - dw_public.dim_contract.rental_insurance_value
+  home_insurance_installments:
+    lineage:
+      - dw_public.dim_contract.home_insurance_installments
+  home_insurance_value:
+    lineage:
+      - dw_public.dim_contract.home_insurance_value
+  first_rental_commission:
+    lineage:
+      - dw_public.dim_contract.first_rental_commission
+  monthly_administration_fee:
+    lineage:
+      - dw_public.dim_contract.monthly_administration_fee
+  condo:
+    lineage:
+      - dw_public.dim_contract.condo
+  iptu:
+    lineage:
+      - dw_public.dim_contract.iptu
+  tenant_service_fee:
+    lineage:
+      - dw_public.dim_contract.tenant_service_fee
+  agent_brokerage_share:
+    lineage:
+      - dw_public.dim_contract.agent_brokerage_share
+  signature_type:
+    lineage:
+      - dw_public.dim_contract.signature_type
+  closing_status:
+    lineage:
+      - dw_public.dim_contract.closing_status
+  cancellation_reason:
+    lineage:
+      - dw_public.dim_contract.cancellation_reason
+  version:
+    lineage:
+      - dw_public.dim_contract.version
+  is_b2b:
+    lineage:
+      - dw_public.dim_contract.is_b2b
+  is_contract_b2b:
+    lineage:
+      - dw_public.dim_contract.is_contract_b2b
+  contract_partner_type:
+    lineage:
+      - dw_public.dim_contract.contract_partner_type
+  b2b_type:
+    lineage:
+      - dw_public.dim_contract.b2b_type
+  b2b_prime_type:
+    lineage:
+      - dw_public.dim_contract.b2b_prime_type
+  contract_plan:
+    lineage:
+      - dw_public.dim_contract.contract_plan
+  administration_split_percentage:
+    lineage:
+      - dw_public.dim_contract.administration_split_percen
+  brokerage_split_percentage:
+    lineage:
+      - dw_public.dim_contract.brokerage_split_percentage
+  is_ongoing_contract:
+    lineage:
+      - dw_public.dim_contract.is_ongoing_contract
+  is_tenant_service_fee_opt_out:
+    lineage:
+      - dw_public.dim_contract.is_tenant_service_fee_opt_o
+  is_exit_inspection_opted_out:
+    lineage:
+      - dw_public.dim_contract.is_exit_inspection_opted_ou
+  dt_start:
+    lineage:
+      - dw_public.dim_contract.dt_start
+  dt_entrance:
+    lineage:
+      - dw_public.dim_contract.dt_entrance
+  dt_intended_end:
+    lineage:
+      - dw_public.dim_contract.dt_intended_end
+  dt_annulment:
+    lineage:
+      - dw_public.dim_contract.dt_annulment
+  ts_created:
+    lineage:
+      - dw_public.dim_contract.ts_created
+  ts_updated:
+    lineage:
+      - dw_public.dim_contract.ts_updated
+  ts_expected_termination:
+    lineage:
+      - dw_public.dim_contract.ts_expected_termination
+  ts_signature:
+    lineage:
+      - dw_public.dim_contract.ts_signature
+  ts_draft_approved:
+    lineage:
+      - dw_public.dim_contract.ts_draft_approved
+  ts_canceled:
+    lineage:
+      - dw_public.dim_contract.ts_canceled
+  ts_tenant_service_fee_opt_out:
+    lineage:
+      - dw_public.dim_contract.ts_tenant_service_fee_opt_o
+  ts_analyst_annulment_input:
+    lineage:
+      - dw_public.dim_contract.ts_analyst_annulment_input
+  ts_snapshot:
+    lineage:
+      - dw_public.dim_contract.ts_load

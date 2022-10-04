@@ -14,7 +14,6 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
@@ -48,8 +47,7 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
 ENV = os.environ.get("ENVIRONMENT")
 
-DW_SCHEMA = "payment_snapshot"
-CONTEXT = "invoice_entries_snapshot"
+CONTEXT = "fintech_snapshot"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
@@ -109,28 +107,30 @@ skip_run_task = ShortCircuitOperator(
     op_kwargs={"dag_execution_date": "{{ds}}"},
 )
 
-task_group = DWTaskGroup(
-    dag=dag,
-    env=ENV,
-    dw_bucket=dw_bucket,
-    dw_schema=DW_SCHEMA,
-    relative_query_path=DAG_NAME,
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
-)
+tables = config_service.get_config("tables")
 
 dw_staging_task_group = {}
 dw_task_group = {}
-tables = task_group._get_table_names_from_sql_files(layer=LayerEnum.DW)
-
 for table in tables:
+    table_name = table["table_name"]
+    dw_schema = table.get("schema")
     partitions = ["year", "month", "day"]
 
-    dw_staging_task_group[table] = task_group.build_dw_staging_task_group(
-        table_name=table, is_incremental=True, partitions=partitions
+    task_group = DWTaskGroup(
+        dag=dag,
+        env=ENV,
+        dw_bucket=dw_bucket,
+        dw_schema=dw_schema,
+        relative_query_path=DAG_NAME,
+        spark_jobs_path=BASE_SPARK_JOBS_PATH,
     )
 
-    dw_task_group[table] = task_group.build_dw_task_group(
-        table_name=table,
+    dw_staging_task_group[table_name] = task_group.build_dw_staging_task_group(
+        table_name=table_name, is_incremental=True, partitions=partitions
+    )
+
+    dw_task_group[table_name] = task_group.build_dw_task_group(
+        table_name=table_name,
         is_incremental=True,
         spectrum_iam_role=spectrum_iam_role,
         partitions=partitions,
