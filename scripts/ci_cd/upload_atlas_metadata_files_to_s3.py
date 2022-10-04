@@ -5,7 +5,7 @@ import os
 from yaml import safe_load
 import boto3
 
-ABS_PATH = os.path.dirname(os.path.realpath(__file__))
+ABS_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 
 def get_first_key(input_dict: dict) -> str:
