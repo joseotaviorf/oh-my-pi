@@ -242,8 +242,8 @@ source_ops_sale AS (
         END AS qualified_context,
         CASE
             WHEN hlf.sk_available_qualified_date = ssf.sk_available_qualified_date
-                AND hlf.sk_available_qualified_date > 0 THEN 'Hybrid'
-            WHEN hlf.sk_available_qualified_date > 0  THEN 'Rent'
+                AND ssf.sk_available_qualified_date > 0 THEN 'Hybrid'
+            WHEN ssf.sk_available_qualified_date > 0  THEN 'Rent'
             ELSE NULL
         END AS available_qualified_context,
         CASE
