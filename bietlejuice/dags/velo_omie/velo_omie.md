@@ -18,9 +18,11 @@ In datalake raw:
 - `cash_flows` (incremental)
 - `categories` (full load)
 - `projects` (full load)
+- `bank_account` (full load)
 
 In datalake clean:
 
 - `cash_flows`
 - `categories`
 - `projects`
+- `bank_account`

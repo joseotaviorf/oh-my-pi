@@ -21,7 +21,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 from quintoandar_omie_api_client.clients.omie_client import OmieClient
 from quintoandar_omie_api_client.consumers import CONSUMERS
 
-from pyspark.sql.types import StructType, StructField, StringType
+from pyspark.sql.types import StructType, StructField, StringType, ArrayType
 
 JOB_NAME = "load_incremental_velo_omie_into_datalake"
 
@@ -105,6 +105,7 @@ def get_cash_flows_missing_cols():
         "dDtAlt",
         "cHrAlt",
         "cUsAlt",
+        "categorias",
     ]
     return {k: None for k in all_columns_from_api}
 
@@ -116,7 +117,28 @@ def create_schema(json_list: list):
 
     schema = []
     for col in cols:
-        schema.append(StructField(col, StringType(), True))
+        if col != "categorias":
+            schema.append(StructField(col, StringType(), True))
+        else:
+            schema.append(
+                StructField(
+                    "categorias",
+                    ArrayType(
+                        StructType(
+                            [
+                                StructField(subcol, StringType(), True)
+                                for subcol in [
+                                    "cCodCateg",
+                                    "nDistrPercentual",
+                                    "nDistrValor",
+                                    "nValorFixo",
+                                ]
+                            ]
+                        )
+                    ),
+                    True,
+                )
+            )
     return StructType(schema)
 
 

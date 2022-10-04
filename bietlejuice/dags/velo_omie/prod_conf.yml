@@ -1,13 +1,13 @@
 ---
 cluster_libs:
-  - whl: "{artifacts_s3_bucket}/omie-api-client-python/quintoandar_omie_api_client-0.2.0-py2.py3-none-any.whl"
+  - whl: "{artifacts_s3_bucket}/omie-api-client-python/quintoandar_omie_api_client-0.3.0-py2.py3-none-any.whl"
 partition_columns:
   - year
   - month
   - day
 tables:
   - api_consumer_id: CashFlow
-    consumer_args: "{ \"updated_start_date\": \"execution_date\", \"updated_end_date\": \"execution_date\", \"extra_body_args\": { \"lDadosCad\": true, \"cOrdenarPor\": \"CODIGO_INTEGRACAO\", \"cExibirDepartamentos\": \"N\" } }"
+    consumer_args: "{ \"updated_start_date\": \"execution_date\", \"updated_end_date\": \"execution_date\", \"extra_body_args\": { \"lDadosCad\": true, \"cOrdenarPor\": \"CODIGO_INTEGRACAO\", \"cExibirDepartamentos\": \"S\" } }"
     extraction_type: incremental
     table_name: cash_flows
   - api_consumer_id: Categories
@@ -18,3 +18,7 @@ tables:
     consumer_args: "{ \"extra_body_args\": { \"ordenar_por\": \"CODIGO\", }, }"
     extraction_type: full
     table_name: projects
+  - api_consumer_id: BankAccount
+    consumer_args: "{}"
+    extraction_type: full
+    table_name: bank_account

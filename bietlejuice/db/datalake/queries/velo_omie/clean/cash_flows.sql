@@ -48,6 +48,7 @@ SELECT
     CAST(nValorISS AS DOUBLE) AS iss_value,
     CAST(nValorINSS AS DOUBLE) AS inss_value,
     observacao AS comments,
+    categorias AS categories,
     CASE
         WHEN cLiquidado = 'S' THEN TRUE
         WHEN cLiquidado = 'N' THEN FALSE
