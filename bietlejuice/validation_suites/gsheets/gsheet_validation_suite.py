@@ -16,8 +16,8 @@ class GSheetValidationSuite(GsheetsValidationSuitesExecutor):
     SLACK_MSG_TEMPLATE_SMALL = """:sheets: Sheet: <{}|{}> (ID: {})\n _Owner team: {}._\n\tError: *Other related errors, please contact the Analytics Engineering owner team.*"""
 
     def __init__(self, auth) -> None:
-        super().__init__(auth)
-        self.append_validations_for_each_sheet(self.GSHEETS_FILES_PATH)
+        super().__init__(auth, self.GSHEETS_FILES_PATH)
+        self.append_validations_for_each_sheet()
         self.SLACK_CHANNEL = auth[SlackWebhooksEnum.DATA_ALERTS]
         self.SLACK_MSG_HEADER = ":alert: Gsheet validations failures\n>The following sheets have errors and will not be ingested on the next pipeline run if the issues are not resolved."
 

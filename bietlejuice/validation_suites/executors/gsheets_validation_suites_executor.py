@@ -4,6 +4,7 @@ from typing import Any, List, Dict, Union, Tuple
 from datetime import datetime, timedelta
 import pendulum
 import re
+import time
 from unidecode import unidecode
 
 from pyspark.sql import functions, DataFrame
@@ -44,16 +45,22 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         "https://www.googleapis.com/auth/drive.readonly",
     ]
 
-    def __init__(self, auth):
+    def __init__(self, auth, gsheets_file_path: str):
         super().__init__(auth)
         self.auth = auth
+        self.gsheets_file_path = gsheets_file_path
+
         self.credentials, self.scope = self.get_credentials_and_scope()
         self.drive_service = self.build_drive_api_service()
 
+        self.all_sheets = self.get_all_sheets_info()
         self.delta = self.get_recently_modified_gsheet(self.drive_service)
         self.context_slack_owner_dict = FileService.get_dict_from_yaml_file(
             SLACK_USER_GROUPS_MAPPING_PATH
         )
+
+    def get_all_sheets_info(self):
+        return FileService.get_dict_from_yaml_file(self.gsheets_file_path)
 
     def __generate_schema(self, data: Union[List[Dict], List], sheet_name: str):
         """
@@ -99,11 +106,11 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
 
     def load_gsheet_on_temp_view(
         self, data: Union[List[Dict], List], clean_table_name: str, is_partitioned: bool
-    ):
+    ) -> DataFrame:
         """
         Load the data from API into a temporary view and return the DataFrame used.
 
-        :return: Temporary view from each gsheet.
+        :return df: DataFrame used to create the temporary view.
         """
         spark_client = SparkClient()
         schema = self.__generate_schema(data, clean_table_name)
@@ -229,7 +236,45 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
 
         return files
 
-    def append_validations_for_each_sheet(self, gsheets_files_path: str) -> None:
+    def has_import_range(self, sheet_data: list) -> bool:
+        regex_pattern = re.compile("IMPORTRANGE")
+        for row in sheet_data:
+            for column_value in row:
+                if re.search(regex_pattern, str(column_value)) is not None:
+                    return True
+        return False
+
+    def get_gsheets_with_import_range(self) -> List:
+        import_range_sheets_ids = []
+        gsheets_client = self.get_gsheets_client()
+        gsheets_count = 0
+
+        for raw_table_name, sheet in self.all_sheets.items():
+
+            if gsheets_count == 180:  # Current quota = 600. Each call makes 3 requests.
+                gsheets_count = 0
+                time.sleep(60)  # Time to reset the quota
+            sheet_id = sheet["sheet_id"]
+            sheet_name = sheet["sheet_name"]
+
+            if sheet.get("sheet_context") == "static":
+                continue
+
+            sheet_data = gsheets_client.get_all_sheet_rows(
+                sheet_id=sheet_id, sheet_name=sheet_name, value_render_option="FORMULA"
+            )
+
+            if (
+                self.has_import_range(sheet_data)
+                and sheet_id not in import_range_sheets_ids
+            ):
+                import_range_sheets_ids.append(sheet_id)
+
+            gsheets_count += 1
+
+        return import_range_sheets_ids
+
+    def append_validations_for_each_sheet(self) -> None:
         """
         Creates a validation method for each sheet mapped in the gsheets_files.yaml
 
@@ -240,13 +285,13 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
 
         :param gsheets_files_path: the path of yaml with gsheets to be read
         """
-        all_sheets = FileService.get_dict_from_yaml_file(gsheets_files_path)
+        import_range_gsheets = self.get_gsheets_with_import_range()
 
-        # if not self.delta: maybe validate if there is any spreadsheet to validate before running.
-        #     return
-        for raw_table_name, sheet in all_sheets.items():
+        for raw_table_name, sheet in self.all_sheets.items():
             sheet["raw_table_name"] = raw_table_name
-            if sheet["sheet_id"] in self.delta:
+            sheet_id = sheet["sheet_id"]
+
+            if sheet_id in self.delta or sheet_id in import_range_gsheets:
                 validate_sheet_method_name = (
                     f'validate_sheet_{str(sheet["clean_table_name"]).lower()}'
                 )
