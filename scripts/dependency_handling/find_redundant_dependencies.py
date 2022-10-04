@@ -3,12 +3,17 @@ from csv import DictWriter
 import os
 import sys
 
-BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BI_ETL_EJUICE_ROOT = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-from bietlejuice.base.dependencies.bietlejuice_dependency_helper import BietlejuiceDependencyHelper
-from bietlejuice.base.dependencies.bietlejuice_redundant_dependency_finder import \
-    BietlejuiceRedundantDependencyFinder
+from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
+    BietlejuiceDependencyHelper,
+)
+from bietlejuice.base.dependencies.bietlejuice_redundant_dependency_finder import (
+    BietlejuiceRedundantDependencyFinder,
+)
 
 
 def print_all_redundancies(redundancies_in_dags: dict, verbosity=1):
@@ -42,9 +47,7 @@ def write_all_redundancies_to_csv(all_redundancies: dict, path: str):
         writer = DictWriter(stream, fieldnames=field_names)
         writer.writeheader()
         for dag, redundancies_in_dag in all_redundancies.items():
-            write_redundancies_in_dag_to_csv(
-                dag, redundancies_in_dag, writer
-            )
+            write_redundancies_in_dag_to_csv(dag, redundancies_in_dag, writer)
 
 
 def write_redundancies_in_dag_to_csv(
@@ -98,18 +101,12 @@ if __name__ == "__main__":
 
     all_redundancies = {}
     if dag:
-        all_redundancies[dag] = redundancy_finder.find_redundant_dependencies(
-            dag
-        )
+        all_redundancies[dag] = redundancy_finder.find_redundant_dependencies(dag)
     else:
         for dag in redundancy_finder.dependencies:
             all_redundancies[dag] = redundancy_finder.find_redundant_dependencies(dag)
 
     if verbosity != 0:
-        print_all_redundancies(
-            all_redundancies, verbosity
-        )
+        print_all_redundancies(all_redundancies, verbosity)
     if csv_file:
-        write_all_redundancies_to_csv(
-            all_redundancies, csv_file
-        )
+        write_all_redundancies_to_csv(all_redundancies, csv_file)

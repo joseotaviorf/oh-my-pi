@@ -8,7 +8,7 @@ from itertools import chain
 import collections
 import json
 
-BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import BietlejuiceDependencyHelper

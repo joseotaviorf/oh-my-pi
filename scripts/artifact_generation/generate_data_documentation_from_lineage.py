@@ -71,7 +71,7 @@ if __name__ == "__main__":
     )
 
     args = arg_parser.parse_args()
-    path = f"{SCRIPTPATH}/../bietlejuice/db/datalake/metadata/"
+    path = f"{SCRIPTPATH}/../../bietlejuice/db/datalake/metadata/"
 
     dag_name_path = args.dag_folder  # use "ebdb", "godfather", for instance
     table = args.table if args.table != None else "*"

@@ -299,7 +299,7 @@ pipeline:
     image: python:3.7.3
     commands:
       - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3.py 5a-databricks-forno
+      - python scripts/ci_cd/upload_spark_jobs_to_s3.py 5a-databricks-forno
     when:
       event: push
       branch: forno
@@ -319,7 +319,7 @@ pipeline:
     image: python:3.7.3
     commands:
       - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
+      - python scripts/ci_cd/upload_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
     when:
       event: push
       branch: forno
@@ -339,7 +339,7 @@ pipeline:
     image: python:3.7.3
     commands:
       - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3.py 5a-databricks
+      - python scripts/ci_cd/upload_spark_jobs_to_s3.py 5a-databricks
     when:
       event: push
       branch: [master, hotfix/*]
@@ -359,7 +359,7 @@ pipeline:
     image: python:3.7.3
     commands:
       - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3.py databricks.s3.data.quintoandar.com.br
+      - python scripts/ci_cd/upload_spark_jobs_to_s3.py databricks.s3.data.quintoandar.com.br
     when:
       event: push
       branch: [master, hotfix/*]
@@ -419,7 +419,7 @@ pipeline:
     image: python:3.7.3
     commands:
       - pip install boto3==1.9.159 PyYAML==5.1
-      - python scripts/upload_atlas_metadata_files_to_s3.py data-documentation.s3.forno.data.quintoandar.com.br
+      - python scripts/ci_cd/upload_atlas_metadata_files_to_s3.py data-documentation.s3.forno.data.quintoandar.com.br
     when:
       event: push
       branch: forno
@@ -429,7 +429,7 @@ pipeline:
     image: python:3.7.3
     commands:
       - pip install boto3==1.9.159 PyYAML==5.1
-      - python scripts/upload_atlas_metadata_files_to_s3.py data-documentation.s3.data.quintoandar.com.br
+      - python scripts/ci_cd/upload_atlas_metadata_files_to_s3.py data-documentation.s3.data.quintoandar.com.br
     when:
       event: push
       branch: [master, hotfix/*]

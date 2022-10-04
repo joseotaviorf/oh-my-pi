@@ -37,17 +37,17 @@ run-tests-environment:
 .PHONY: upload-local-wheel
 upload-local-wheel:
 	@python3 -m setup sdist bdist_wheel
-	@python3 scripts/upload_local_whl_to_s3.py
+	@python3 local/upload_local_whl_to_s3.py
 
 .PHONY: upload-local-spark-jobs
 upload-local-spark-jobs:
-	@python3 scripts/upload_local_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
+	@python3 local/upload_local_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
 
 .PHONY: upload-local-package
 upload-local-package:
-	@python3 scripts/upload_local_spark_jobs_to_s3.py
+	@python3 local/upload_local_spark_jobs_to_s3.py
 	@python3 -m setup sdist bdist_wheel
-	@python3 scripts/upload_local_whl_to_s3.py
+	@python3 local/upload_local_whl_to_s3.py
 
 ############# Local Python environment #############
 
@@ -174,7 +174,7 @@ validate-dags-dependencies:
 	@echo "Validating DAGs dependencies"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/validate_dags_dependencies.py
+	@PYTHONPATH=. python3 scripts/ci_cd/validate_dags_dependencies.py
 
 .PHONY: validate-atlas-metadata-files
 validate-atlas-metadata-files:

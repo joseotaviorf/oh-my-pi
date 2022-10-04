@@ -10,11 +10,14 @@ from sql_metadata import Parser
 
 def create_yml_for_table(sql, database_name, table_name):
     sql_parser = Parser(sql)
-    print('{"vendor": ["atlas"],"database_name": "' + database_name + '", "table_name": "' + table_name + '"},')
-    yml_body = {"database_name": database_name,
-                "table_name": table_name,
-                "columns": {}
-                }
+    print(
+        '{"vendor": ["atlas"],"database_name": "'
+        + database_name
+        + '", "table_name": "'
+        + table_name
+        + '"},'
+    )
+    yml_body = {"database_name": database_name, "table_name": table_name, "columns": {}}
 
     alias_columns = {}
     for alias, column in sql_parser.columns_aliases.items():
@@ -26,7 +29,9 @@ def create_yml_for_table(sql, database_name, table_name):
 
     for column in sql_parser.columns:
         alias = alias_columns.get(column) or column
-        yml_body["columns"][alias.lower()] = {"lineage": [f"{sql_parser.tables[0].lower()}.{column.lower()}"]}
+        yml_body["columns"][alias.lower()] = {
+            "lineage": [f"{sql_parser.tables[0].lower()}.{column.lower()}"]
+        }
 
     return yml_body
 
@@ -45,16 +50,20 @@ if __name__ == "__main__":
     make requirements-scripts-python3
     """
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--folder','-f', required=True, help='dag name folder')
-    arg_parser.add_argument('--table','-t', help='Specific table to create the lineage')
+    arg_parser.add_argument("--folder", "-f", required=True, help="dag name folder")
+    arg_parser.add_argument(
+        "--table", "-t", help="Specific table to create the lineage"
+    )
 
     args = arg_parser.parse_args()
-    path = f"../bietlejuice/db/datalake/queries/"
+    path = f"../../bietlejuice/db/datalake/queries/"
 
     dag_name_path = args.folder  # use "ebdb", "godfather", for instance
-    table = args.table if args.table != None else '*'
+    table = args.table if args.table != None else "*"
 
-    for file_path in glob.iglob(f"{path}{dag_name_path}/**/{table}.sql", recursive=True):
+    for file_path in glob.iglob(
+        f"{path}{dag_name_path}/**/{table}.sql", recursive=True
+    ):
         if "/clean/" in file_path:
             regex = f"{path}(.*)/clean(.*)/(.*).sql"
             database_name = re.search(regex, file_path).group(1)
@@ -63,8 +72,11 @@ if __name__ == "__main__":
             with open(file_path, "r") as stream:
                 sql = stream.read()
                 try:
-                    yml_body = create_yml_for_table(sql, f"datalake_{database_name}_clean",
-                                                    table_name)
+                    yml_body = create_yml_for_table(
+                        sql, f"datalake_{database_name}_clean", table_name
+                    )
                     save_yml(file_path, yml_body)
                 except Exception:
-                    print(f"ERROR database_name={database_name}, table_name={table_name}")
+                    print(
+                        f"ERROR database_name={database_name}, table_name={table_name}"
+                    )
