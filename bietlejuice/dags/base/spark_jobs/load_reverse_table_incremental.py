@@ -105,13 +105,8 @@ if __name__ == "__main__":
     target_database_name = target_database_info["reverse_schema_name"]
     target_database_location = target_database_info["reverse_schema_path"]
 
-    intermediate_path = schema if schema else tree_path
-
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
-        dag_name=relative_query_path,
-        layer=layer,
-        intermediate_path=intermediate_path,
-        table_name=table_name,
+        dag_name=relative_query_path, layer=layer, table_name=table_name
     )
 
     table_loader_pipeline = IncrementalTableLoaderPipeline(
