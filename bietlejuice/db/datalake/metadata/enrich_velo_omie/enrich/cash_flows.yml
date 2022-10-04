@@ -148,6 +148,9 @@ columns:
   comments:
     lineage:
       - datalake_velo_omie_clean.cash_flows.comments
+  categories:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.categories
   is_liquidated:
     lineage:
       - datalake_velo_omie_clean.cash_flows.is_liquidated

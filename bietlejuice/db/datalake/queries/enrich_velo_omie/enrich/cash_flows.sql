@@ -57,6 +57,7 @@ SELECT
     cf.iss_value,
     cf.inss_value,
     cf.comments,
+    cf.categories,
     cf.is_liquidated,
     cf.is_pis_retained,
     cf.is_cofins_retained,
