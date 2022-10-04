@@ -3,12 +3,12 @@ import json
 from argparse import ArgumentParser
 from datetime import datetime
 
+
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import QUERIES_DATALAKE_PATH
 from bietlejuice.base.db.reverse_metastore_mapping import ReverseMetastoreMapping
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
-from bietlejuice.services import FileService
 from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipeline
 
 JOB_NAME = "load_table"
@@ -104,11 +104,9 @@ if __name__ == "__main__":
     target_database_name = target_database_info["reverse_schema_name"]
     target_database_location = target_database_info["reverse_schema_path"]
 
-    query_path = (
-        f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{table_name}.sql"
+    query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+        dag_name=relative_query_path, layer=layer, table_name=table_name
     )
-
-    query = FileService.get_query_from_file_name(query_path)
 
     table_loader_pipeline = FullTableLoaderPipeline(
         database_name=database_name,
