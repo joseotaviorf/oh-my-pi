@@ -1,2 +1,11 @@
 ---
 lineage_product_database_name: sauron
+
+custom_cluster:
+  driver_node_type_id: m5a.xlarge
+  node_type_id: c5a.4xlarge
+  autoscale:
+    max_workers: 3
+    min_workers: 1
+
+partition_cols: [year, month, day]
