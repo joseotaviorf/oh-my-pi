@@ -168,6 +168,7 @@ SELECT
     WHEN mc.mexico_channel = 'CIQ' THEN 'CIB'
     WHEN mc.mexico_channel = 'Owner PWA' AND mc.supply_mkt_origin_detailed = 'Organic'  THEN 'Organic Traffic - PWA'
     WHEN mc.mexico_channel = 'Owner PWA' AND mc.supply_mkt_origin_detailed = 'Paid' THEN 'Landing Page - PWA'
+    WHEN mc.mexico_channel = 'LP Navent' THEN 'I24'
     WHEN mc.mexico_channel LIKE '%Indica Aí%' THEN 'Refiere y Gana'
     ELSE mc.mexico_channel
   END AS mexico_channel,

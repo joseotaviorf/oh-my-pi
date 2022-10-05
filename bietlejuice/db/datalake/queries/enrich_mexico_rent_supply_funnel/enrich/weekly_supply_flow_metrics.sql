@@ -22,15 +22,16 @@ supply_funnel_targets AS (
         END AS supply_mkt_origin,
         CASE 
             WHEN supply_origin = 'Organic traffic' THEN 'Organic'
-            WHEN supply_origin = 'Landing page - PWA' AND supply_channel like '%Paid%' THEN 'Paid' 
+            WHEN supply_origin = 'Landing page - PWA' AND supply_channel LIKE '%Paid%' THEN 'Paid' 
             WHEN supply_origin = 'Indica Ai - General' THEN 'Indica Aí - General'
             WHEN supply_origin = 'Refiere y Gana' THEN 'Indica Aí - General'
             WHEN supply_origin = 'CIB' THEN 'CIQ'
+            WHEN supply_origin = 'Owner PWA' THEN supply_channel
             WHEN supply_origin LIKE '%Human crawlers%' THEN 'Human Crawlers'
             ELSE supply_origin
         END AS supply_mkt_origin_detailed,
         CASE 
-            WHEN supply_origin = 'Owner PWA' AND supply_channel = 'Paid' THEN 'Landing page - PWA'
+            WHEN supply_origin = 'Owner PWA' AND supply_channel = 'Paid' THEN 'Landing Page - PWA'
             WHEN supply_origin = 'Owner PWA' AND supply_channel = 'Organic' THEN 'Organic Traffic'
             WHEN supply_origin LIKE '%Indica%' THEN 'Refiere y Gana'
             WHEN supply_origin = 'CIQ' THEN 'CIB'
@@ -47,7 +48,8 @@ supply_funnel_targets AS (
     FROM 
         datalake_gsheets_clean.mexico_supply_targets_2022
     WHERE
-        DATE_TRUNC('week', DATE(dt_target)) <= DATE_ADD(CURRENT_DATE, -1)     
+        DATE_TRUNC('week', DATE(dt_target)) <= DATE_ADD(CURRENT_DATE, -1) 
+        AND supply_channel NOT IN ('Crawlers classifieds', 'Price Calculator')    
     GROUP BY 1, 2, 3, 4, 10
 ),
 supply_budget_targets AS (
@@ -160,8 +162,8 @@ cohort_funnel AS (
     GROUP BY 1, 2, 3, 4, 13
 )
 SELECT 
-    dim.country_code,
-    dim.city_group,
+    COALESCE(dim.country_code, 'Other') AS country_code,
+    COALESCE(dim.city_group, 'Not Mapped') AS city_group,
     cf.supply_mkt_origin, 
     cf.supply_mkt_origin_detailed,
     COALESCE(cf.mexico_channel, sft.mexico_channel) AS mexico_channel,     

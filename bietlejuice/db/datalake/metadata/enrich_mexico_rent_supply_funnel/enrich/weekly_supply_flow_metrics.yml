@@ -9,14 +9,17 @@ columns:
       - datalake_region.city_groups_per_periods.city_group
   supply_mkt_origin:
     lineage:
+      - datalake_gsheets_clean.mexico_supply_targets_2022.supply_origin
       - datalake_mexico_rent_supply_funnel.coincident_funnel.supply_mkt_origin
   supply_mkt_origin_detailed:
     lineage:
+      - datalake_gsheets_clean.mexico_supply_targets_2022.supply_channel
+      - datalake_gsheets_clean.mexico_supply_targets_2022.supply_origin
       - datalake_mexico_rent_supply_funnel.coincident_funnel.supply_mkt_origin_detailed
   mexico_channel:
     lineage:
-      - datalake_mexico_rent_supply_funnel.coincident_funnel.mexico_channel
       - datalake_gsheets_clean.mexico_supply_targets_2022.supply_origin
+      - datalake_mexico_rent_supply_funnel.coincident_funnel.mexico_channel
   dt_week_started:
     lineage:
       - datalake_region.city_groups_per_periods.dt_week_started
