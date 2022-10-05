@@ -152,10 +152,13 @@ class DAGPackagesPathService:
         :param intermediate_path: off intermediate path structure used in some DAGs
         :return: query content (the SQL)
         """
+        intermediate_path = intermediate_path if intermediate_path is not None else ""
         if DAGPackagesPathService._is_dag_in_legacy_structure(dag_name):
             # TODO: remove after DAG-Packages migration
             sql_file_path = path.join(
-                f"{QUERIES_DATALAKE_PATH}/{dag_name}/{layer}",
+                QUERIES_DATALAKE_PATH,
+                dag_name,
+                layer,
                 intermediate_path,
                 f"{table_name}.sql",
             )
@@ -164,7 +167,7 @@ class DAGPackagesPathService:
             )
         else:
             sql_file_relative_path = path.join(
-                f"queries/{dag_name}/{layer}", intermediate_path, f"{table_name}.sql"
+                "queries", dag_name, layer, intermediate_path, f"{table_name}.sql"
             )
             sql_file_path = path.join(
                 DAGPackagesEnum.S3_DAG_PACKAGES_FILES_PATH, sql_file_relative_path
