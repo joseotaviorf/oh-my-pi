@@ -9,7 +9,7 @@ CREATE TABLE agent.fact_agent_hourly_allocations (
     ts_slot_hour TIMESTAMP,
     allocated_slots INTEGER,
     allocated_slots_0 INTEGER,
-    agent_business_context VARCHAR(10),
+    agent_business_context VARCHAR(50),
     is_allocation_available BOOLEAN,
     area varchar(50),
     ts_first_visit TIMESTAMP,

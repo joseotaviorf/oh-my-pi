@@ -7,7 +7,7 @@ CREATE TABLE agent.fact_agent_daily_allocations (
     id_work_contract INTEGER,
     allocated_slots INTEGER,
     allocated_slots_0 INTEGER,
-    agent_business_context VARCHAR(10),
+    agent_business_context VARCHAR(50),
     max_slots_allocation_available INTEGER,
     area VARCHAR(50),
     ts_first_visit TIMESTAMP,
