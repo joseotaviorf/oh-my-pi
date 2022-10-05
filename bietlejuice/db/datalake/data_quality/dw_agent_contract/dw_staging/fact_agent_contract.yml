@@ -1,0 +1,39 @@
+---
+table_name: dw_agent_staging.fact_agent_contract
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 62000
+    severity_level: Error
+column_level_validations:
+  sk_agent:
+    is_complete:
+      severity_level: Error
+  sk_work_contract:
+    is_complete:
+      severity_level: Error
+  sk_company:
+    is_complete:
+      severity_level: Error
+  sk_status_started_date:
+    is_complete:
+      severity_level: Error
+  sk_status_ended_date:
+    is_complete:
+      severity_level: Error
+  action:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - REACTIVATED
+        - ACTIVATED
+        - DEACTIVATED
+        - SUSPENDED
+        - UNSUSPENDED
+        - ALTERED_CONTRACT
+        - BUSINESS_CONTEXT_CHANGED
+      severity_level: Error
+  ts_status_started:
+    is_complete:
+      severity_level: Error

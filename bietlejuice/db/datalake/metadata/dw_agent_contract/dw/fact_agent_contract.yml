@@ -1,0 +1,33 @@
+---
+database_name: dw_agent
+table_name: fact_agent_contract
+columns:
+  sk_agent:
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.id_agent
+      - datalake_ebdb_agents.agent_coincident_business_contexts.id_agent_data
+  sk_work_contract:
+    lineage:
+      - dw_agent.dim_work_contract.sk_work_contract
+  sk_company:
+    lineage:
+      - dw_rede.dim_company.sk_company
+  sk_status_started_date:
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+      - datalake_ebdb_agents.agent_coincident_business_contexts.ts_agent_business_context_started
+  sk_status_ended_date:
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+      - datalake_ebdb_agents.agent_coincident_business_contexts.ts_agent_business_context_started
+  action:
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.action
+  ts_status_started:
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+      - datalake_ebdb_agents.agent_coincident_business_contexts.ts_agent_business_context_started
+  ts_status_ended:
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+      - datalake_ebdb_agents.agent_coincident_business_contexts.ts_agent_business_context_started

@@ -1,0 +1,25 @@
+---
+database_name: dw_agent
+table_name: dim_work_contract
+columns:
+  sk_work_contract:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.id
+  id_work_contract:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.id
+  contract_name:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.contract_name
+  rede_partner:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.3p_partner
+  is_rede_contract:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.is_3p_contract
+  ts_created:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.ts_updated
