@@ -35,7 +35,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   CAST(c.monthly_administration_fee AS DECIMAL(5, 4)) AS monthly_administration_fee,
   CAST(c.condo_price AS DECIMAL(14, 2)) AS condo,
   CAST(c.iptu AS DECIMAL(14, 2)) AS iptu,
-  CAST(c.tenant_service_fee AS DECIMAL(5, 2)) AS tenant_service_fee,
+  CAST(c.tenant_service_fee AS DECIMAL(5, 3)) AS tenant_service_fee,
   CAST(c.agent_brokerage_share AS DECIMAL(5, 2)) AS agent_brokerage_share,
   c.signature_type,
   c.status_closing AS closing_status,
