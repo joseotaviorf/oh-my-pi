@@ -54,12 +54,12 @@ if __name__ == "__main__":
         if table.table_name not in BLOCK_LIST:
             df = postgres_consumer.get_data_from_table(table.table_name)
             # the table names in the datalake must be lowercase
-            s3_loader.load_full_table(
+            s3_loader.load_df(
                 df=df,
-                database_name=database_name,
-                table_name=table.table_name.lower(),
+                s3_path=f"{database_location}{table.table_name.lower()}",
                 format_options=format_options,
                 database_location=database_location,
+                max_records_per_file=100000,
             )
             spark_metastore_loader.update_metastore(
                 df,
