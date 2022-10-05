@@ -22,7 +22,7 @@ List of URLs retrieved in this DAG currently:
 
 ## Execution Interval
 
-Daily. More information about run time [here]({chart_url}{dag_id}).
+Daily (retrieves D-4 data). More information about run time [here]({chart_url}{dag_id}).
 
 ## Outputs
 

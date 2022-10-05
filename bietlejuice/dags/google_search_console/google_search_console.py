@@ -118,8 +118,8 @@ for property_type in PROPERTY_TYPE_LIST:
             partitions=PARTITION_COLS,
             execution_date="",
             extra_query_template_params={
-                "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}",
-                "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}",
+                "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_start_date') }}",
+                "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_end_date') }}",
             },
         )
 
