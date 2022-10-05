@@ -1,2 +1,10 @@
-# Add 'db-change' to any file containing .sql/.ddl
-db-changes: .{ddl|sql}
+# More info about labler usage here: https://github.com/actions/labeler
+# Validate globs here: https://www.digitalocean.com/community/tools/glob
+datamart-only:
+  - "**/*datamart*/**/*.sql"
+db-changes:
+  - "**/*.ddl"
+documentation:
+  - "**/*.md"
+lineage:
+  - "**/metadata/**/*(*.yml|*.yaml)"
