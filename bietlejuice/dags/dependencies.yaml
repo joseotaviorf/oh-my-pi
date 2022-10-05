@@ -467,6 +467,12 @@ bietlejuice.dw_agent:
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-region-group
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
 
+bietlejuice.dw_agent_contract:
+  - bietlejuice.dw_rede_company:load-dw-rede-dim-company
+  - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agent-coincident-business-contexts
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-activations-suspensions-contracts-changes
+
 bietlejuice.dw_agents_availability:
   - bietlejuice.dw_agent:load-dw-public-dim-agent-region
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake

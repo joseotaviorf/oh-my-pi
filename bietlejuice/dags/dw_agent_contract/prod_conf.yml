@@ -1,0 +1,4 @@
+---
+inner_dependencies:
+  fact_agent_contract:
+    - dim_work_contract

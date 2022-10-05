@@ -26,6 +26,7 @@ dags_out_of_pattern:
         "dw_offer",
         "dw_proposal",
         "dw_quinto_messenger",
+        "dw_rede_company",
         "dw_region",
         "dw_rent_flow",
         "dw_rent_listing_flow",
