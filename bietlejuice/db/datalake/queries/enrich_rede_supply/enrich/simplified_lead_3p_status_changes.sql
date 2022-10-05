@@ -104,6 +104,10 @@ last_id AS (
         COALESCE(MAX(id_status_change), 0) AS id_last_status_change
     FROM
         datalake_rede_supply.simplified_lead_3p_status_changes
+    WHERE
+        year != {year}
+        OR month != {month}
+        OR day != {day}
 )
 SELECT
     id_last_status_change + MONOTONICALLY_INCREASING_ID() + 1 AS id_status_change,
