@@ -33,18 +33,21 @@ affiliates AS (
             mkt_origin,
             fc.city_group,
             CASE
-                WHEN fc.utm_campaign ~* '(acq)' OR fc.mkt_source = 'Bing'
-                    THEN 'acquisition'
-                WHEN fc.utm_campaign ~* '(eng)'
-                    THEN 'engagement'
+                WHEN fc.utm_campaign ~* '(acq)'  OR fc.campaign_name ~* '(acq)' THEN 'acquisition'
+                WHEN fc.utm_campaign ~* '(eng)' OR fc.campaign_name ~* '(eng)' THEN 'engagement'
+                WHEN fc.mkt_source = 'Bing' THEN 'acquisition'
                 ELSE NULL
-            END AS vertical,
+		    END AS vertical,
             CASE
                 WHEN fc.mkt_source IN ('Twilio', 'Movile')
                     THEN 'Notification'
                 ELSE mkt_source
             END AS source, 
-            NULL AS business_context,
+            CASE
+			    WHEN fc.utm_campaign ~* '(sale)'  OR fc.campaign_name ~* '(sale)' THEN 'sale'
+			    WHEN fc.utm_campaign ~* '(rent)' OR fc.campaign_name ~* '(rent)' THEN 'rent'
+			    ELSE NULL
+		    END AS business_context,
             fc.cost
         FROM
             datalake_marketing_costs_prod.daily_costs AS fc
@@ -64,18 +67,21 @@ affiliates AS (
             mkt_origin,
             fc.city_group,
             CASE
-                WHEN fc.utm_campaign ~* '(acq)' OR fc.mkt_source = 'Bing'
-                    THEN 'acquisition'
-                WHEN fc.utm_campaign ~* '(eng)'
-                    THEN 'engagement'
+                WHEN fc.utm_campaign ~* '(acq)'  OR fc.campaign_name ~* '(acq)' THEN 'acquisition'
+                WHEN fc.utm_campaign ~* '(eng)' OR fc.campaign_name ~* '(eng)' THEN 'engagement'
+                WHEN fc.mkt_source = 'Bing' THEN 'acquisition'
                 ELSE NULL
-            END AS vertical,
+		    END AS vertical,
             CASE
                 WHEN fc.mkt_source IN ('Twilio', 'Movile')
                     THEN 'Notification'
                 ELSE mkt_source
             END AS source,
-            NULL AS business_context,
+            CASE
+			    WHEN fc.utm_campaign ~* '(sale)'  OR fc.campaign_name ~* '(sale)' THEN 'sale'
+			    WHEN fc.utm_campaign ~* '(rent)' OR fc.campaign_name ~* '(rent)' THEN 'rent'
+			    ELSE NULL
+		    END AS business_context,
             fc.cost
         FROM
         	datalake_marketing_costs_prod.daily_costs fc
@@ -536,6 +542,19 @@ affiliates AS (
         WHERE sk_first_listing_date >= 20210125
         GROUP BY 1,2,3,4,5,6,7, flag_publication_sale_and_rent_same_month
     ),
+    manual_tax AS (
+        SELECT
+            CAST(REPLACE(dt_tax_cost, '-', '') AS BIGINT) AS sk_date,
+            'manual_tax' AS table_origin,
+            mkt_origin,
+            city_group,
+            vertical,
+            source,
+            business_context,
+            costs
+        FROM
+            datalake_gsheets_clean_prod.indicaai_tax_costs
+    ),
     ia_total_cost AS (
         SELECT	* FROM ia_fact_cost
         UNION ALL
@@ -550,6 +569,8 @@ affiliates AS (
         SELECT * FROM ia_sale_costs
         UNION ALL
         SELECT * FROM doorman_rent_costs
+        UNION ALL
+        SELECT * FROM manual_tax
     ),
     base AS (
         SELECT
@@ -644,7 +665,7 @@ affiliates_sale_cost AS (
     FROM
         affiliates
     WHERE
-        business_context = 'sale' OR (business_context IS NULL AND mkt_origin IN ('Doorman Sale','Indica Aí - Agents Sale','Indica Aí - General Sale'))
+        LOWER(business_context) = 'sale' OR (business_context IS NULL AND mkt_origin IN ('Doorman Sale','Indica Aí - Agents Sale','Indica Aí - General Sale'))
     GROUP BY 1, 2, 3, 4, 5, 6
 ),
 supply_affiliates_cost AS (
@@ -659,7 +680,7 @@ supply_affiliates_cost AS (
     FROM
         affiliates
     WHERE
-        business_context = 'rent' OR (business_context IS NULL AND mkt_origin IN ('Doorman','Indica Aí - Agents','Indica Aí - General'))
+        LOWER(business_context) = 'rent' OR (business_context IS NULL AND mkt_origin IN ('Doorman','Indica Aí - Agents','Indica Aí - General'))
     GROUP BY 1, 2, 3, 4, 5, 6
 ),
 supply_affiliates_cost_hybrid_sale AS (
@@ -672,7 +693,7 @@ supply_affiliates_cost_hybrid_sale AS (
         mkt_origin AS planning_mkt_level3,
         sum(costs/2) AS costs
     FROM affiliates
-    WHERE business_context = 'hybrid' 
+    WHERE LOWER(business_context) = 'hybrid' 
     GROUP BY 1, 2, 3, 4, 5, 6
 ),
 supply_affiliates_cost_hybrid_rental AS (
@@ -685,7 +706,7 @@ supply_affiliates_cost_hybrid_rental AS (
         mkt_origin AS planning_mkt_level3,
         sum(costs/2) AS costs
     FROM affiliates
-    WHERE business_context = 'hybrid' 
+    WHERE LOWER(business_context) = 'hybrid' 
     GROUP BY 1, 2, 3, 4, 5, 6
 ),
 supply_landlords_cost AS (
