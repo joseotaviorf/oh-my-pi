@@ -309,7 +309,7 @@ pipeline:
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks-forno spark_jobs
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br spark_jobs
     when:
       event: push
       branch: forno
@@ -320,16 +320,6 @@ pipeline:
     commands:
       - pip install boto3==1.9.159
       - python scripts/ci_cd/upload_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
-    when:
-      event: push
-      branch: forno
-
-  upload-dag-packages-spark-jobs-s3-new-forno-account:
-    group: update_jobs
-    image: python:3.7.3
-    commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br spark_jobs
     when:
       event: push
       branch: forno
@@ -349,7 +339,7 @@ pipeline:
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks spark_jobs
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.data.quintoandar.com.br spark_jobs
     when:
       event: push
       branch: [master, hotfix/*]
@@ -364,27 +354,7 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
-  upload-dag-packages-spark-jobs-s3-new-prod-account:
-    group: update_jobs
-    image: python:3.7.3
-    commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.data.quintoandar.com.br spark_jobs
-    when:
-      event: push
-      branch: [master, hotfix/*]
-
   upload-dag-packages-queries-s3-forno:
-    group: update_jobs
-    image: python:3.7.3
-    commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks-forno queries
-    when:
-      event: push
-      branch: forno
-
-  upload-dag-packages-queries-s3-new-forno-account:
     group: update_jobs
     image: python:3.7.3
     commands:
@@ -399,17 +369,27 @@ pipeline:
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks queries
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.data.quintoandar.com.br queries
     when:
       event: push
       branch: [master, hotfix/*]
 
-  upload-dag-packages-queries-s3-new-prod-account:
+  upload-dag-packages-data-quality-s3-forno:
     group: update_jobs
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.data.quintoandar.com.br queries
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br data_quality
+    when:
+      event: push
+      branch: forno
+
+  upload-dag-packages-data-quality-s3-prod:
+    group: update_jobs
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.data.quintoandar.com.br data_quality
     when:
       event: push
       branch: [master, hotfix/*]
