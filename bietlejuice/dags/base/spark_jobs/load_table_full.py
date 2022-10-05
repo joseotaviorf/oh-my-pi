@@ -5,9 +5,8 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import QUERIES_DATALAKE_PATH, DatalakeMetastoreService
-
-from bietlejuice.services import FileService
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipeline
 
 JOB_NAME = "load_table"
@@ -108,16 +107,13 @@ if __name__ == "__main__":
     )
 
     intermediate_path = schema if schema else tree_path
-    query_path = (
-        # TODO: maybe we can remove the line below since we do not have schemas on the queries folder anymore
-        f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{intermediate_path}/{table_name}.sql".replace(
-            "//", "/"
-        )
-        if intermediate_path
-        else f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{table_name}.sql"
-    )
 
-    query = FileService.get_query_from_file_name(query_path)
+    query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+        dag_name=relative_query_path,
+        layer=layer,
+        intermediate_path=intermediate_path,
+        table_name=table_name,
+    )
 
     table_loader_pipeline = FullTableLoaderPipeline(
         database_name=database_name,
