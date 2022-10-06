@@ -16,6 +16,5 @@ from bietlejuice.base.paths import (
     DATALAKE_SQL_DIR,
     QUERIES_DATALAKE_PATH,
     DDL_DATALAKE_PATH,
-    DW_SQL_PATH,
     DW_QUERY_PATH,
 )
