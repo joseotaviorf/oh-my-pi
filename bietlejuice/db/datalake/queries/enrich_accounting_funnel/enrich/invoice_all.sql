@@ -99,7 +99,7 @@ SELECT
   DATE_FORMAT(nbd.date_next_bd, 'yyyy-MM-dd') AS invoice_paid_date_next_business_day,
   c.dt_start AS contract_start,
   c.dt_annulment AS contract_annulment,
-  CASE WHEN c.dt_start <= c.dt_annulment THEN false ELSE true END AS ended_before_started 
+  c.dt_start > c.dt_annulment AND c.dt_annulment IS NOT NULL AS ended_before_started 
 FROM 
   dw_payment.fact_invoice_entries AS fie
 LEFT JOIN 
