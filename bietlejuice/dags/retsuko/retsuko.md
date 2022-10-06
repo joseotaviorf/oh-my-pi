@@ -26,6 +26,7 @@ We load the following tables into the datalake:
     * invoice
     * monthly_closing_checks
     * pg_stat_statements
+    * recurrent_credit_card
     * vw_billable
 
 2. In datalake clean
@@ -37,5 +38,6 @@ We load the following tables into the datalake:
     * entry
     * file
     * invoice
+    * recurrent_credit_card
 
 </details>
