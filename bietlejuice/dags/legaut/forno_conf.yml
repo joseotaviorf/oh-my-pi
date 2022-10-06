@@ -1,5 +1,7 @@
 ---
 tables:
+  - table_name: crawlers_company
+    extraction_type: full
   - table_name: crawlers_crawler
     extraction_type: full
   - table_name: crawlers_crawlergroup
