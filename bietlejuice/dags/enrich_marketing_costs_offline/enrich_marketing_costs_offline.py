@@ -2,7 +2,7 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -14,13 +14,12 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from airflow.utils.helpers import chain
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
-# ENV setup
-ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
 CONTEXT = "marketing_costs"
-DAG_NAME = f"enrich_{CONTEXT}_offline"
+DAG_NAME = "enrich_marketing_costs_offline"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2021, 3, 31, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -34,14 +33,20 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 )
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
+CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+ENV = os.environ.get("ENVIRONMENT")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -58,7 +63,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_configuration,
+    libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -69,7 +78,7 @@ datalake_task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=f"{CONTEXT}/offline",
+    relative_query_path=DAG_NAME,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_BUCKET,
 )

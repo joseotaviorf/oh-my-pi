@@ -5,7 +5,7 @@ import math
 
 import pendulum
 from airflow.utils.helpers import chain
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -16,6 +16,7 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 
 def get_date_from_previous_quarter(execution_date):
@@ -33,8 +34,6 @@ CONTEXT = "brand_tracking"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
-ENV = os.environ.get("ENVIRONMENT")
-
 config_service = ConfigurationService(DAG_NAME)
 ATHENA_QUERY_RESULT_BUCKET = config_service.get_config("athena_query_results_bucket")
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
@@ -47,11 +46,19 @@ DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 
 PARTITION_COLS = config_service.get_config("partition_cols")
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
+# cluster setup
+CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+
+ENV = os.environ.get("ENVIRONMENT")
 
 INNER_DEPENDENCIES = {"brandtracking_lean": ["brandtracking_full"]}
 
@@ -74,7 +81,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_configuration,
+    libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

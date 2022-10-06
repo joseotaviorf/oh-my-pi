@@ -2,7 +2,7 @@ from datetime import datetime
 from pendulum import timezone
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -16,9 +16,6 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-
-
-ENV = os.environ.get("ENVIRONMENT")
 
 SOURCE = "braze_analytics"
 DAG_ID = f"bietlejuice.{SOURCE}"
@@ -44,10 +41,11 @@ app_groups_list = config_service.get_config("app_groups_list")
 identifiers = config_service.get_config("identifiers")
 partition_cols = config_service.get_config("partition_cols")
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+# cluster setup
+CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -61,6 +59,8 @@ CUSTOM_LIBRARIES = [
         f"quintoandar_braze_api_client-0.1.0-py2.py3-none-any.whl"
     }
 ]
+
+ENV = os.environ.get("ENVIRONMENT")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -79,8 +79,8 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=CUSTOM_LIBRARIES,
+    cluster_configuration=cluster_configuration,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 

@@ -4,7 +4,7 @@ import os
 import re
 
 from airflow.utils.helpers import chain, cross_downstream
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -27,7 +27,6 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 ARTIFACTS_BUCKET = config_service.get_config("artifacts_bucket")
-default_libraries = config_service.get_config("default_libraries")
 
 PARTITION_COLS = config_service.get_config("partition_cols")
 TABLES_LIST = config_service.get_config("tables_list")
@@ -37,9 +36,10 @@ MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 RAW_SPARK_JOB_FILE = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{SOURCE}/load_facebook_insights_raw.py"
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_10_4_min_general_cluster", deserialize_json=True
-)
+# cluster setup
+CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
 
 CUSTOM_LIBRARIES = [
     {
@@ -81,7 +81,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
+    cluster_configuration=cluster_configuration,
     libraries=default_libraries + CUSTOM_LIBRARIES,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
