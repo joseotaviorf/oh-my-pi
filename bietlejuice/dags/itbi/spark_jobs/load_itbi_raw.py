@@ -1,6 +1,9 @@
 import logging
 import requests
 import re
+import pandas as pd
+
+from functools import reduce
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
@@ -9,15 +12,13 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
-from pyspark import SparkFiles
-from pyspark.sql.functions import lit
-from pyspark.sql.utils import IllegalArgumentException
+from pyspark.sql.types import IntegerType, StringType
+from pyspark.sql.functions import lit, expr, udf
 
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from datetime import date
 
@@ -26,17 +27,17 @@ JOB_NAME = "load_itbi_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
-spark_client = SparkClient(
-    session_params={
-        "spark.jars.packages": "com.crealytics:spark-excel_2.12:3.1.2_0.17.1"
-    }
-)
+spark_client = SparkClient()
 
 
 def main():
-    environment, datalake_bucket, source, execution_date, full_load_execution_date, = (
-        parse_arguments()
-    )
+    (
+        environment,
+        datalake_bucket,
+        source,
+        execution_date,
+        full_load_execution_date,
+    ) = parse_arguments()
 
     logger.info(
         f"""
@@ -58,9 +59,8 @@ def main():
         source_download_page_url = value["source"]["site_download_page_url"]
         source_file_pattern = value["source"]["file_pattern"]
         source_format = value["source"]["format"]
-        source_read_format = value["source"]["spark_read_format"]
         is_incremental = value["is_incremental"]
-        columns_raname_mapped = value["columns_to_raname"].items()
+        columns_rename_mapped = value["columns_to_rename"].items()
 
         logger.info(
             f"""
@@ -74,20 +74,16 @@ def main():
             source_download_page_url,
             source_format,
             source_file_pattern,
-            source_read_format,
-            execution_date,
+            columns_rename_mapped,
         )
 
         if dataframe:
             logger.info(
                 f"""
                 m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date}
-                msg=Dataframe Size {dataframe.count()}
+                msg=Dataframe imported with sucess.
                 """
             )
-
-            if columns_raname_mapped:
-                dataframe = rename_columns(dataframe, columns_raname_mapped)
 
             load_dataframe_into_datalake(
                 dataframe,
@@ -104,67 +100,55 @@ def get_data(
     source_download_page_url,
     source_format,
     source_file_pattern,
-    source_read_format,
-    execution_date,
+    columns_rename_mapped,
 ):
+    udf_transform_month_to_portuguese_relative = udf(
+        transform_month_to_portuguese_relative, StringType()
+    )
 
-    YEAR, MONTH = get_year_month_to_execute(execution_date)
+    urls = scrap_files_url(source_download_page_url, source_file_pattern, source_format)
 
-    try:
-        urls = scrap_files_url(
-            source_download_page_url, source_file_pattern, source_format
-        )
-        data_path = source_url + list(filter(lambda s: YEAR in s, urls))[-1]
-        file_name = data_path.split("/")[-1]
+    dataframes = []
+
+    for url in urls:
+        full_url = source_url + url
 
         logger.info(
             f"""
-            msg=DataPath {data_path}, FileName {file_name}
+            msg= Downloading url={full_url}
         """
         )
 
-        spark_client.conn.sparkContext.addFile(data_path)
+        sheets = pd.read_excel(full_url, sheet_name=None)
+        sheets = {k: sheets[k] for k in sheets if re.match("[a-zA-Z]+-[0-9]+", k)}
 
-        df = (
-            spark_client.conn.read.format(source_read_format)
-            .option("dataAddress", f"'{MONTH}-{YEAR}'!")
-            .option("header", "true")
-            .load("file://" + SparkFiles.get(file_name))
-        )
+        dfs = pd.concat([df.assign(name=n) for n, df in sheets.items()])
+        df = spark_client.conn.createDataFrame(dfs.astype(str))
 
-        df = df.withColumn("source_file", lit(data_path))
-        df = df.withColumn("source_tab", lit(f"{MONTH}-{YEAR}"))
+        df = df.replace("nan", None)
+        df = df.withColumnRenamed("name", "source_tab")
+        df = df.withColumn("source_file", lit(url))
+        df = df.withColumn("year", expr("substring(source_tab, 5, length(source_tab))"))
+        df = df.withColumn("year", df.year.cast(IntegerType()))
+        df = df.withColumn("month", expr("substring(source_tab, 0, 3)"))
+        df = df.withColumn("month", udf_transform_month_to_portuguese_relative("month"))
+        df = df.withColumn("month", df.month.cast(IntegerType()))
         df = df.withColumn("dt_load", lit(date.today()))
-        df = df.withColumn("year", lit(YEAR))
-        df = df.withColumn(
-            "month", lit(transform_month_to_portuguese_relative(MONTH, reverse=True))
-        )
 
-        logger.info(
-            f"""
-            msg=Success on get data from {data_path}
-        """
-        )
+        if columns_rename_mapped:
+            df = rename_columns(df, columns_rename_mapped)
 
-        return df
+        dataframes.append(df)
 
-    except IllegalArgumentException as e:
-        logger.warning(
-            f"""
-            msg=Fail on get data from {source_url}, sheet not found in downloaded file. error={e}
-        """
-        )
+    logger.info(
+        f"""
+        msg= Getting out of the download loop. {len(dataframes)} worksheets was downloaded.
+    """
+    )
 
-        return None
+    dataframe = reduce(lambda df1, df2: df1.unionByName(df2), dataframes)
 
-    except Exception as e:
-        logger.warning(
-            f"""
-            msg=Fail on get data from {data_path}, error={e}
-        """
-        )
-
-        return None
+    return dataframe
 
 
 def scrap_files_url(source_url, source_file_pattern, source_format):
@@ -181,19 +165,16 @@ def rename_columns(dataframe, columns_rename_mapped):
     return dataframe
 
 
-def get_year_month_to_execute(execution_date):
+def get_year_to_execute(execution_date):
     """This function will return the year and month of the last month"""
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
-    date_in_last_month = execution_date - relativedelta(months=1)
+    year = execution_date.year
 
-    month = transform_month_to_portuguese_relative(date_in_last_month.month)
-    year = str(date_in_last_month.year)
-
-    return year, month
+    return int(year)
 
 
-def transform_month_to_portuguese_relative(month, reverse=False):
+def transform_month_to_portuguese_relative(month, reverse=True):
 
     months = {
         "1": "JAN",
@@ -247,7 +228,12 @@ def load_dataframe_into_datalake(
         ).load_and_register(df, format_options)
     else:
         FullTableLoaderPipeline(
-            database_name, table_name, database_location, LayerEnum.RAW, None
+            database_name,
+            table_name,
+            database_location,
+            LayerEnum.RAW,
+            None,
+            partition_cols,
         ).load_and_register(df, format_options)
 
 

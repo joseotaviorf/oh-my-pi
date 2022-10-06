@@ -1,7 +1,7 @@
 ---
 custom_libraries:
-  - maven:
-      coordinates: "com.crealytics:spark-excel_2.12:3.2.1_0.16.5-pre2"
+    - pypi:
+        package: openpyxl
 tables:
   itbi_sp:
     is_incremental: true

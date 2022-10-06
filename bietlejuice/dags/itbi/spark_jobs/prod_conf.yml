@@ -7,8 +7,7 @@ tables:
       site_download_page_url: "https://www.prefeitura.sp.gov.br/cidade/secretarias/fazenda/acesso_a_informacao/index.php?p=31501"
       file_pattern: "/cidade/secretarias/upload/fazenda/arquivos/"
       format: ".xlsx"
-      spark_read_format: "com.crealytics.spark.excel"
-    columns_to_raname:
+    columns_to_rename:
       N° do Cadastro (SQL): "n_cadastro_sql"
       Nome do Logradouro: "nome_logradouro"
       Número: "numero"
@@ -36,6 +35,5 @@ tables:
       Descrição do uso (IPTU): "descricao_uso_iptu"
       Padrão (IPTU): "padrao_iptu"
       Descrição do padrão (IPTU): "descricao_padrao_iptu"
-      ACC (IPTU): "acc_iptu"
-      ACC (IPTU)26: "descricao_padrao_iptu"
-      ACC (IPTU)27: "acc_iptu"
+      ACC (IPTU): "descricao_padrao_iptu"
+      ACC (IPTU).1: "acc_iptu"
