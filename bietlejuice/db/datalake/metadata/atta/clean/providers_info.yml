@@ -1,0 +1,28 @@
+---
+database_name: datalake_atta_clean
+table_name: providers_info
+columns:
+  id_provider:
+    lineage:
+      - datalake_atta_raw.fornecedores.id
+  provider_name:
+    lineage:
+      - datalake_atta_raw.fornecedores.nome
+  provider_description:
+    lineage:
+      - datalake_atta_raw.fornecedores.descricao
+  is_active:
+    lineage:
+      - datalake_atta_raw.fornecedores.ativo
+  ts_created:
+    lineage:
+      - datalake_atta_raw.fornecedores.dtcadastro
+  year:
+    lineage:
+      - datalake_atta_raw.fornecedores.year
+  month:
+    lineage:
+      - datalake_atta_raw.fornecedores.month
+  day:
+    lineage:
+      - datalake_atta_raw.fornecedores.day

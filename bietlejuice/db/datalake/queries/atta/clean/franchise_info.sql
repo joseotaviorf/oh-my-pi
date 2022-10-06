@@ -1,0 +1,23 @@
+SELECT
+    ID AS id_franchise,
+    IDUsuCad AS id_registration_user,
+    Status AS id_franchise_status,
+    Nome AS franchise_name,
+    CategoriaFranquia AS franchise_category,
+    TpFranquia AS franchise_type,
+    PercRoyalties AS royalties_percentage_value,
+    PercFundoMarketing AS martketing_fund_percentage,
+    CarenciaRoyalties AS grace_period_royalties,
+    CarenciaTec AS grace_period_tec,
+    PrazoContrato AS ts_contract_deadline,
+    TIMESTAMP(DtCadastro) AS ts_registration,
+    TIMESTAMP(DtAssinatura) AS ts_franchise_signature,
+    year,
+    month,
+    day
+FROM
+    datalake_atta_raw.franquia
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

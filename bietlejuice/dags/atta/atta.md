@@ -60,3 +60,17 @@ In datalake raw, via full load:
 - `sla_fornecedor`
 - `spcrepositorio`
 - `usuariospilotomultibancos`
+
+In datalake clean, via full load:
+
+- `financing_proposal`
+- `financing_proposal_check`
+- `franchise_info`
+- `log_isolve_v1`
+- `log_isolve_v2`
+- `partner_info`
+- `pre_analysis`
+- `product_info`
+- `proposal`
+- `providers_info`
+- `users_info`

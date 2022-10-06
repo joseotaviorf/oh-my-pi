@@ -1,0 +1,43 @@
+---
+database_name: datalake_atta_clean
+table_name: pre_analysis
+columns:
+  id_pre_analysis:
+    lineage:
+      - datalake_atta_raw.consulta_score.id
+  id_franchise:
+    lineage:
+      - datalake_atta_raw.consulta_score.idfranquia
+  id_partner:
+    lineage:
+      - datalake_atta_raw.consulta_score.idparceiro
+  id_offer:
+    lineage:
+      - datalake_atta_raw.consulta_score.idpreanaliseext
+  id_registration_user:
+    lineage:
+      - datalake_atta_raw.consulta_score.idusuario
+  client_cpf:
+    lineage:
+      - datalake_atta_raw.consulta_score.cpf
+  down_payment_amount:
+    lineage:
+      - datalake_atta_raw.consulta_score.vlrentrada
+  financing_value:
+    lineage:
+      - datalake_atta_raw.consulta_score.vlrfinanciado
+  house_value:
+    lineage:
+      - datalake_atta_raw.consulta_score.vlrimovel
+  ts_registration:
+    lineage:
+      - datalake_atta_raw.consulta_score.data_solicitacao
+  year:
+    lineage:
+      - datalake_atta_raw.consulta_score.year
+  month:
+    lineage:
+      - datalake_atta_raw.consulta_score.month
+  day:
+    lineage:
+      - datalake_atta_raw.consulta_score.day

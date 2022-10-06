@@ -19,7 +19,7 @@ DAG_NAME = SOURCE
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2019, 1, 16, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_START_DATE = datetime(2022, 9, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 ENV = os.environ.get("ENVIRONMENT")
 
@@ -93,6 +93,7 @@ partition_columns = config_service.get_config("partition_columns")
 
 for table in tables:
     table_name = table["table_name"]
+    clean_table_name = table["clean_table_name"]
     extraction_type = table["extraction_type"]
     parameters = [SOURCE, table_name]
 
@@ -119,7 +120,7 @@ for table in tables:
     create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
 
     if is_cleaned:
-        clean_table_name = table.get("clean_table_name", table_name)
+        clean_table_name = table.get("clean_table_name", clean_table_name)
         clean_task_group = task_group.build_clean_task_group(
             source_database_base_name=SOURCE,
             target_database_base_name=SOURCE,

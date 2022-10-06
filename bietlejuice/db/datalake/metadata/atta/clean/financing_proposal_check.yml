@@ -1,0 +1,79 @@
+---
+database_name: datalake_atta_clean
+table_name: financing_proposal_check
+columns:
+  id:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.id
+  id_proposal_product:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.idpropostaprd
+  id_confirmed_user:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.idusuconf
+  id_included_user:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.idusuinc
+  house_sale_value:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.vlrvendaimovel
+  down_payment_own_resources_value:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.vlrentrecprop
+  fgts_down_payment_value:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.vlrentfgts
+  financing_value:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.vlrfinan
+  bank_valuation_value:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.vlravalbco
+  bank_valuation_fee_value:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.vlrtaravalbco
+  itbi_value:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.vlritbi
+  installments_quantity:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.prazo
+  financing_fee:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.taxa
+  payment_sale_value:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.vlrpgtovend
+  has_seller_debt_payment:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.iq
+  seller_debt_payment_value:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.vlriq
+  channel:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.canal
+  is_confirmed:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.Confirmado
+  ts_updated:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.atualizadoem
+  ts_confirmation:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.dtconfirmacao
+  ts_inclusion:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.dtinclusao
+  ts_seller_debt_payment:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.DataIQ
+  year:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.year
+  month:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.month
+  day:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.day

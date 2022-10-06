@@ -1,0 +1,32 @@
+SELECT
+    ID AS id,
+    IDPropostaPRD AS id_proposal_product,
+    IDUsuConf AS id_confirmed_user,
+    IDUsuInc AS id_included_user,
+    VlrVendaImovel AS house_sale_value,
+    VlrEntRecProp AS down_payment_own_resources_value,
+    VlrEntFGTS AS fgts_down_payment_value,
+    VlrFinan AS financing_value,
+    VlrAvalBco AS bank_valuation_value,
+    VlrTarAvalBco AS bank_valuation_fee_value,
+    VlrITBI AS itbi_value,
+    Prazo AS installments_quantity,
+    Taxa AS financing_fee,
+    VlrPgtoVend AS payment_sale_value,
+    IQ AS has_seller_debt_payment,
+    VlrIQ AS seller_debt_payment_value,
+    Canal AS channel,
+    Confirmado AS is_confirmed,
+    TIMESTAMP(AtualizadoEm) AS ts_updated,
+    TIMESTAMP(DtConfirmacao) AS ts_confirmation,
+    TIMESTAMP(DtInclusao) AS ts_inclusion,
+    TIMESTAMP(DataIQ) AS ts_seller_debt_payment,
+    year,
+    month,
+    day
+FROM
+    datalake_atta_raw.proposta_credimob_confval
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
