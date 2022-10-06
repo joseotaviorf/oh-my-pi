@@ -101,8 +101,8 @@ for property_type in PROPERTY_TYPE_LIST:
             extraction_spark_job_file=raw_spark_job_file,
             raw_spark_job_extra_args=[
                 SOURCE,
-                "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}",
-                "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}",
+                "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_start_date') }}",
+                "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_end_date') }}",
                 table_name,
                 property_type,
                 aggregation_type,
