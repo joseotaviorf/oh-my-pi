@@ -31,6 +31,9 @@ columns:
   qualifieds:
     lineage:
       - datalake_gsheets_raw.sale_supply_targets.qualifieds
+  available_qualifieds:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.available_qualifieds
   halfyear:
     lineage:
       - datalake_gsheets_raw.sale_supply_targets.halfyear

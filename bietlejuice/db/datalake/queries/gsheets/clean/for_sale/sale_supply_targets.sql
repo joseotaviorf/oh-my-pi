@@ -9,6 +9,7 @@ SELECT
     CAST(opportunities AS FLOAT) AS opportunities,
     CAST(prospects AS FLOAT) AS prospects,
     CAST(qualifieds AS FLOAT) AS qualifieds,
+    CAST(available_qualifieds AS FLOAT) AS available_qualifieds,
     CAST(halfyear AS INTEGER) AS halfyear,
     CAST(quarter AS INTEGER) AS quarter,
     CAST(year AS INTEGER) AS year,

@@ -22,6 +22,9 @@ columns:
   qualified:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_supply.qualified
+  available_qualified:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_supply.available_qualified
   dt_week:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_supply.week

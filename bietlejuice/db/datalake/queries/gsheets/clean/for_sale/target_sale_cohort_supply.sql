@@ -6,6 +6,7 @@ SELECT
     operacao AS operation,
     opportunity,
     qualified,
+    available_qualified,
     week_origin,
     DATE(week) AS dt_week
 FROM
