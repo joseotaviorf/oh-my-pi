@@ -1,0 +1,15 @@
+database_name: datalake_ebdb_listing
+table_name: listing_business_context_status_history
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.id_house
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.business_context
+  status:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.status
+  status_reason:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.status_reason

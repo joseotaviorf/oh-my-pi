@@ -19,6 +19,7 @@ Produces the following output tables:
 - `house_listing_status`
 - `house_status_version_order`
 - `listing_business_context`
+- `listing_business_context_status_history`
 - `portability`
 - `rent_listing`
 
