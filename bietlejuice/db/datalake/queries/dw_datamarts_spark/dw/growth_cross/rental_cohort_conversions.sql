@@ -449,8 +449,8 @@ rent_flow_adjusted AS (
         rf.sk_credit_analysis_end_date,
         rf.sk_guarantee_paid_date,
         rf.sk_credit_analysis_approved_date,
-        COALESCE(nullif(rf.sk_last_doc_analysis_approved, -1),rf.sk_credit_analysis_approved_date) as sk_credit_analysis_approved_date_adjust, -- consider credit approved date to historical data (before 8/jun)
-        COALESCE(nullif(rf.sk_guarantee_paid_date,-1),rf.sk_credit_analysis_approved_date) as sk_da_gp_date_adjust, -- consider guarantee paid date as the date of credit approved
+        COALESCE(NULLIF(rf.sk_last_doc_analysis_approved, -1),rf.sk_credit_analysis_approved_date) AS sk_credit_analysis_approved_date_adjust, -- consider credit approved date to historical data (before 8/jun)
+        COALESCE(NULLIF(rf.sk_guarantee_paid_date,-1),rf.sk_credit_analysis_approved_date) AS sk_da_gp_date_adjust, -- consider guarantee paid date as the date of credit approved
         rf.sk_contract,
         rf.sk_contract_created_date,
         rf.sk_contract_signed_date,
@@ -951,7 +951,7 @@ cei2cep AS(
             ON dd.sk_date = rf.sk_first_credit_evaluation_init
                 AND rf.sk_first_credit_evaluation_init > 0
     WHERE
-        dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
+        dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee != 'RentalGuarantee'
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14
 ),
@@ -1010,7 +1010,7 @@ cei2gs AS(
             ON dd.sk_date = rf.sk_first_credit_evaluation_init
                 AND rf.sk_first_credit_evaluation_init > 0
     WHERE
-        dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
+        dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee = 'RentalGuarantee'
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14
 ),
@@ -1069,7 +1069,7 @@ cep2ds AS(
             ON dd.sk_date = rf.sk_first_credit_evaluation_positive
                 AND rf.sk_first_credit_evaluation_positive > 0
     WHERE
-        dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
+        dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee != 'RentalGuarantee'
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
@@ -1128,7 +1128,7 @@ gs2ds AS(
             ON dd.sk_date = rf.sk_guarantee_date
                 AND rf.sk_guarantee_date > 0
     WHERE
-        dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
+        dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee = 'RentalGuarantee'
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
@@ -1245,7 +1245,7 @@ da2cc AS(
             ON dd.sk_date = rf.sk_credit_analysis_approved_date_adjust
                 AND rf.sk_credit_analysis_approved_date_adjust > 0
     WHERE
-        dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
+        dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee != 'RentalGuarantee'
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
@@ -1304,7 +1304,7 @@ da2gp AS(
             ON dd.sk_date = rf.sk_credit_analysis_approved_date_adjust
                 AND rf.sk_credit_analysis_approved_date_adjust > 0
     WHERE
-        dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
+        dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee = 'RentalGuarantee'
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
@@ -1363,7 +1363,7 @@ gp2cc AS(
             ON dd.sk_date = rf.sk_guarantee_paid_date
                 AND rf.sk_guarantee_paid_date > 0
     WHERE
-        dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
+        dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee = 'RentalGuarantee'
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14
 ),
@@ -1603,7 +1603,7 @@ union_all AS (
     SELECT * FROM l2p
 	UNION ALL
 	SELECT * FROM p2q
-    UNION ALL
+	UNION ALL
     SELECT * FROM q2aq
 	UNION ALL
 	SELECT * FROM aq2o
@@ -1696,7 +1696,7 @@ union_all_date AS (
         dw_public.dim_date dd
             ON ua.sk_date = dd.sk_date
     WHERE
-        dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP()
+        dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP()
 )
 SELECT
    date,
