@@ -17,6 +17,7 @@ supply_funnel_targets AS (
             WHEN supply_origin = 'Indica Ai - General' THEN 'Indica Aí - General'
             WHEN supply_origin = 'Refiere y Gana' THEN 'Indica Aí - General'
             WHEN supply_origin = 'CIB' THEN 'CIQ'
+            WHEN supply_origin = 'I24' THEN 'LP Navent'
             WHEN supply_origin LIKE '%Human crawlers%' THEN 'Human Crawlers'
             ELSE supply_origin
         END AS supply_mkt_origin,
@@ -32,7 +33,7 @@ supply_funnel_targets AS (
         END AS supply_mkt_origin_detailed,
         CASE 
             WHEN supply_origin = 'Owner PWA' AND supply_channel = 'Paid' THEN 'Landing Page - PWA'
-            WHEN supply_origin = 'Owner PWA' AND supply_channel = 'Organic' THEN 'Organic Traffic'
+            WHEN supply_origin = 'Owner PWA' AND supply_channel = 'Organic' THEN 'Organic Traffic - PWA'
             WHEN supply_origin LIKE '%Indica%' THEN 'Refiere y Gana'
             WHEN supply_origin = 'CIQ' THEN 'CIB'
             WHEN supply_origin LIKE '%Human crawlers%' THEN 'Human Crawlers'
