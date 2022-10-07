@@ -116,7 +116,7 @@ apply_city_group_share AS ( --Applying city_group share
     LEFT JOIN
         datalake_region.region dr
     ON
-        SF_REMOVE_ACCENTUATION(TRIM(LOWER(mp.city_name))) = SF_REMOVE_ACCENTUATION(TRIM(LOWER(dr.name)))
+        SF_REMOVE_ACCENTUATION(COALESCE(TRIM(LOWER(mp.city_name)),"")) = SF_REMOVE_ACCENTUATION(COALESCE(TRIM(LOWER(dr.name)),""))
         AND dr.level = 'Cidade'
 ),
 date_range AS ( --Creating a dim_date with the used dates
