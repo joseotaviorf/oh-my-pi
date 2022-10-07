@@ -1675,7 +1675,7 @@ bietlejuice.enrich_inspections:
 bietlejuice.enrich_invoice:
   # Removed dependencies with ebdb.contract, conversion_lead, lead, house, partner_agent, rent_flow and user, and enrich_ebdb_listing.house_listing since it's all already satisfied by enrich_ebdb_contract.
   # Also, removed dependencies with retsuko.account, entry and invoice since it's already satisfied by enrich_retsuko.
-  - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
+  # - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
   - bietlejuice.enrich_retsuko:load-enrich-invoice
@@ -1904,9 +1904,7 @@ bietlejuice.enrich_owner_fees:
 
 bietlejuice.enrich_pdd_payments:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
-  - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
-  - bietlejuice.retsuko:load-clean-invoice
   - bietlejuice.vans:load-clean-boleto
   - bietlejuice.vans:load-clean-payment
 
@@ -2029,7 +2027,7 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.fastforward:load-clean-lra-installment-option
   - bietlejuice.owner_fees:load-clean-contract
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
-  - bietlejuice.rental_guarantee:load-clean-charge
+  # - bietlejuice.rental_guarantee:load-clean-charge
   - bietlejuice.retsuko:load-clean-credit-card-payment
 
 bietlejuice.enrich_robin_hood:
