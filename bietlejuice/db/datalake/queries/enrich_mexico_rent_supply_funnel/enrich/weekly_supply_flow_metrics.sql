@@ -28,6 +28,7 @@ supply_funnel_targets AS (
             WHEN supply_origin = 'Refiere y Gana' THEN 'Indica Aí - General'
             WHEN supply_origin = 'CIB' THEN 'CIQ'
             WHEN supply_origin = 'Owner PWA' THEN supply_channel
+            WHEN supply_origin = 'I24' THEN 'LP Navent'
             WHEN supply_origin LIKE '%Human crawlers%' THEN 'Human Crawlers'
             ELSE supply_origin
         END AS supply_mkt_origin_detailed,
@@ -37,7 +38,6 @@ supply_funnel_targets AS (
             WHEN supply_origin LIKE '%Indica%' THEN 'Refiere y Gana'
             WHEN supply_origin = 'CIQ' THEN 'CIB'
             WHEN supply_origin LIKE '%Human crawlers%' THEN 'Human Crawlers'
-            WHEN supply_origin = 'I24' THEN 'Imuebles 24'
             ELSE supply_origin
         END AS mexico_channel,
         SUM(CAST(NULLIF(top_of_funnel,'') AS REAL)) AS leads,
@@ -61,7 +61,7 @@ supply_budget_targets AS (
             WHEN planning_mkt_level3 LIKE '%Refiere y Gana%' THEN 'Indica Aí - General'
             WHEN planning_mkt_level3 LIKE '%CIB%' THEN 'CIQ'
             WHEN planning_mkt_level3 LIKE '%Human crawlers%' THEN 'Human Crawlers'
-            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'i24'
+            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'LP Navent'
             ELSE planning_mkt_level3 
         END AS supply_mkt_origin,
         CASE 
@@ -70,7 +70,7 @@ supply_budget_targets AS (
             WHEN planning_mkt_level3 LIKE '%Refiere y Gana%' THEN 'Indica Aí - General'
             WHEN planning_mkt_level3 LIKE '%CIB%' THEN 'CIQ'
             WHEN planning_mkt_level3 LIKE '%Human crawlers%' THEN 'Human Crawlers'
-            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'i24'
+            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'LP Navent'
             ELSE planning_mkt_level3 
         END AS supply_mkt_origin_detailed,
         SUM(budget) AS budget_total,
@@ -79,6 +79,8 @@ supply_budget_targets AS (
         dt_week AS dt_week_started
     FROM
         datalake_gsheets_clean.mexico_costs_targets
+    WHERE
+        planning_mkt_level3 <> 'Price Calculator'
     GROUP BY 1, 2, 3, 7
 ),
 supply_actual_costs AS (
@@ -89,16 +91,16 @@ supply_actual_costs AS (
             WHEN planning_mkt_level3 LIKE '%Refiere y Gana%' THEN 'Indica Aí - General'
             WHEN planning_mkt_level3 LIKE '%CIB%' THEN 'CIQ'
             WHEN planning_mkt_level3 LIKE '%Human crawlers%' THEN 'Human Crawlers'
-            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'i24'
+            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'LP Navent'
             ELSE planning_mkt_level3 
         END AS supply_mkt_origin,
         CASE 
             WHEN planning_mkt_level3 = 'Landing page - PWA' THEN 'Paid'
             WHEN planning_mkt_level3 = 'Organic traffic' THEN 'Organic'
+            WHEN planning_mkt_level3 = 'I24' THEN 'LP Navent'
             WHEN planning_mkt_level3 LIKE '%Refiere y Gana%' THEN 'Indica Aí - General'
             WHEN planning_mkt_level3 LIKE '%CIB%' THEN 'CIQ'
             WHEN planning_mkt_level3 LIKE '%Human crawlers%' THEN 'Human Crawlers'
-            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'i24'
             ELSE planning_mkt_level3 
         END AS supply_mkt_origin_detailed,
         SUM(budget) AS actual_cost,
@@ -107,6 +109,8 @@ supply_actual_costs AS (
         dt_week_started
     FROM
         datalake_gsheets_clean.mexico_supply_costs_financial_and_actual
+    WHERE
+        planning_mkt_level3 <> 'Price Calculator'
     GROUP BY 1, 2, 3, 7
 ),
 market_place AS (

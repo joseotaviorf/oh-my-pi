@@ -31,20 +31,25 @@ supply_funnel_targets AS (
     SELECT
         COALESCE(city_group, 'Not Mapped') AS city_group,
         CASE 
-            WHEN supply_origin = 'Organic traffic' THEN 'Organic'
-            WHEN supply_origin = 'Landing page - PWA' AND supply_channel LIKE '%Paid%' THEN 'Paid' 
-            WHEN supply_origin = 'Refiere y Gana' THEN 'Indica Aí - General'
-            WHEN supply_origin = 'CIB' THEN 'CIQ'
-            WHEN supply_origin LIKE '%Human crawlers%' THEN 'Human Crawlers'
-            ELSE supply_origin
-        END AS supply_channel,
-        CASE 
             WHEN supply_origin IN ('Landing page - PWA', 'Organic traffic') THEN 'Owner PWA'
             WHEN supply_origin = 'Refiere y Gana' THEN 'Indica Aí - General'
+            WHEN supply_origin LIKE '%Indica Ai%' THEN 'Indica Aí - General'
             WHEN supply_origin = 'CIB' THEN 'CIQ'
+            WHEN supply_origin = 'I24' THEN 'LP Navent'
             WHEN supply_origin LIKE '%Human crawlers%' THEN 'Human Crawlers'
             ELSE supply_origin
-        END AS supply_origin,
+        END AS supply_mkt_origin,
+        CASE 
+            WHEN supply_origin = 'Organic traffic' THEN 'Organic'
+            WHEN supply_origin = 'Landing page - PWA' AND supply_channel LIKE '%Paid%' THEN 'Paid' 
+            WHEN supply_origin = 'Indica Ai - General' THEN 'Indica Aí - General'
+            WHEN supply_origin = 'Refiere y Gana' THEN 'Indica Aí - General'
+            WHEN supply_origin = 'CIB' THEN 'CIQ'
+            WHEn supply_origin = 'I24' THEN 'LP Navent'
+            WHEN supply_origin = 'Owner PWA' THEN supply_channel
+            WHEN supply_origin LIKE '%Human crawlers%' THEN 'Human Crawlers'
+            ELSE supply_origin
+        END AS supply_mkt_origin_detailed,
         SUM(CAST(NULLIF(prospects,'') AS FLOAT)) AS prospects,
         SUM(CAST(NULLIF(qualifieds,'') AS FLOAT)) AS qualifieds,
         SUM(CAST(NULLIF(opportunities,'') AS FLOAT)) AS opportunities,
@@ -52,28 +57,30 @@ supply_funnel_targets AS (
         DATE(DATE_TRUNC('month', DATE(dt_target))) AS dt_month_started
     FROM 
         datalake_gsheets_clean.mexico_supply_targets_2022
+    WHERE
+        supply_origin NOT IN ('Crawlers classifieds', 'Price Calculator')
     GROUP BY 1, 2, 3, 8
 ),
 supply_costs_targets AS (
     SELECT
         COALESCE(city_group, 'Not Mapped') AS city_group,
         CASE 
-            WHEN planning_mkt_level3 in ('Landing page - PWA', 'Organic traffic') THEN 'Owner PWA'
+            WHEN planning_mkt_level3 IN ('Landing page - PWA', 'Organic traffic') THEN 'Owner PWA'
             WHEN planning_mkt_level3 LIKE '%Refiere y Gana%' THEN 'Indica Aí - General'
             WHEN planning_mkt_level3 LIKE '%CIB%' THEN 'CIQ'
             WHEN planning_mkt_level3 LIKE '%Human crawlers%' THEN 'Human Crawlers'
-            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'i24'
+            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'LP Navent'
             ELSE planning_mkt_level3 
-        END AS supply_origin,
+        END AS supply_mkt_origin,
         CASE 
             WHEN planning_mkt_level3 = 'Landing page - PWA' THEN 'Paid'
             WHEN planning_mkt_level3 = 'Organic traffic' THEN 'Organic'
             WHEN planning_mkt_level3 LIKE '%Refiere y Gana%' THEN 'Indica Aí - General'
             WHEN planning_mkt_level3 LIKE '%CIB%' THEN 'CIQ'
             WHEN planning_mkt_level3 LIKE '%Human crawlers%' THEN 'Human Crawlers'
-            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'i24'
+            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'LP Navent'
             ELSE planning_mkt_level3 
-        END AS supply_channel,
+        END AS supply_mkt_origin_detailed,
         SUM(budget) AS budget_total,
         SUM(CASE
                 WHEN UPPER(planning_mkt_level3) LIKE '%COMISION%' OR UPPER(planning_mkt_level3) LIKE '%COMISIÓN%' THEN budget
@@ -94,18 +101,18 @@ supply_actual_costs AS (
             WHEN planning_mkt_level3 LIKE '%Refiere y Gana%' THEN 'Indica Aí - General'
             WHEN planning_mkt_level3 LIKE '%CIB%' THEN 'CIQ'
             WHEN planning_mkt_level3 LIKE '%Human crawlers%' THEN 'Human Crawlers'
-            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'i24'
+            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'LP Navent'
             ELSE planning_mkt_level3 
-        END AS supply_origin,
+        END AS supply_mkt_origin,
         CASE 
             WHEN planning_mkt_level3 = 'Landing page - PWA' THEN 'Paid'
             WHEN planning_mkt_level3 = 'Organic traffic' THEN 'Organic'
+            WHEN planning_mkt_level3 = 'I24' THEN 'LP Navent'
             WHEN planning_mkt_level3 LIKE '%Refiere y Gana%' THEN 'Indica Aí - General'
             WHEN planning_mkt_level3 LIKE '%CIB%' THEN 'CIQ'
             WHEN planning_mkt_level3 LIKE '%Human crawlers%' THEN 'Human Crawlers'
-            WHEN planning_mkt_level3 LIKE '%I24%' THEN 'i24'
             ELSE planning_mkt_level3 
-        END AS supply_channel,
+        END AS supply_mkt_origin_detailed,
         SUM(budget) AS actual_cost,
         SUM(CASE
                 WHEN UPPER(planning_mkt_level3) LIKE '%COMISION%' OR UPPER(planning_mkt_level3) LIKE '%COMISIÓN%' THEN budget
@@ -216,8 +223,8 @@ LEFT JOIN
     supply_funnel_targets AS sft
         ON dim.dt_month_started = sft.dt_month_started 
         AND dim.city_group = sft.city_group 
-        AND sf.supply_mkt_origin = sft.supply_origin
-        AND sf.supply_mkt_origin_detailed = sft.supply_channel
+        AND sf.supply_mkt_origin = sft.supply_mkt_origin
+        AND sf.supply_mkt_origin_detailed = sft.supply_mkt_origin_detailed
 LEFT JOIN
     leads_rules AS lr
         ON dim.dt_month_started = lr.dt_month_started 
@@ -228,14 +235,14 @@ LEFT JOIN
    supply_costs_targets AS sct
         ON sct.dt_month_started = dim.dt_month_started
         AND sct.city_group = dim.city_group
-        AND sf.supply_mkt_origin = sct.supply_origin
-        AND sf.supply_mkt_origin_detailed = sct.supply_channel
+        AND sf.supply_mkt_origin = sct.supply_mkt_origin
+        AND sf.supply_mkt_origin_detailed = sct.supply_mkt_origin_detailed
 LEFT JOIN
     supply_actual_costs AS sac
         ON sac.dt_month_started = dim.dt_month_started
         AND sac.city_group = dim.city_group
-        AND sf.supply_mkt_origin = sac.supply_origin
-        AND sf.supply_mkt_origin_detailed = sac.supply_channel
+        AND sf.supply_mkt_origin = sac.supply_mkt_origin
+        AND sf.supply_mkt_origin_detailed = sac.supply_mkt_origin_detailed
 LEFT JOIN
     ongoing_listings AS ol
         ON dim.dt_month_ended = ol.dt_month_ended
