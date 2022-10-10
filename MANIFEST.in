@@ -1,2 +1,3 @@
 recursive-include bietlejuice/db *
 recursive-include bietlejuice/ *.y*ml
+recursive-include dags/ **/spark_jobs/*_conf.y*ml
