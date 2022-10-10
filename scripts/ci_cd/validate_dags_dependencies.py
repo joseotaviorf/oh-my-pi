@@ -214,6 +214,21 @@ class CrossDAGDependenciesValidator:
         return dag_name
 
     @staticmethod
+    def dag_file_exists_legacy(dag_name):
+        """
+        Verifies if the DAG has a declaration file in the DAGs' path.
+
+        will be dropped after DAG Packages migration
+
+        :param dag_name: the dag name
+        :type dag_name: str
+        :rtype: bool
+        """
+        dag_file = f"{COMPOSER_FILES_ROOT}/dags/**/{dag_name}.py"
+        validate_dag_file = glob.glob(dag_file, recursive=True)
+        return len(validate_dag_file) != 0
+
+    @staticmethod
     def dag_file_exists(dag_name):
         """
         Verifies if the DAG has a declaration file in the DAGs' path.
@@ -222,7 +237,7 @@ class CrossDAGDependenciesValidator:
         :type dag_name: str
         :rtype: bool
         """
-        dag_file = f"{COMPOSER_FILES_ROOT}/dags/**/{dag_name}.py"
+        dag_file = f"{DAG_PACKAGES_ROOT}/**/{dag_name}.py"
         validate_dag_file = glob.glob(dag_file, recursive=True)
         return len(validate_dag_file) != 0
 
@@ -250,7 +265,7 @@ class CrossDAGDependenciesValidator:
         :type dags: list[str]
         """
         for dag in dags:
-            if not self.dag_file_exists(dag):
+            if not self.dag_file_exists(dag) and not self.dag_file_exists_legacy(dag):
                 self.register_into_invalid_list(dag)
 
     def validate_tables(self, tables_by_dag):
@@ -261,7 +276,7 @@ class CrossDAGDependenciesValidator:
         :type tables_by_dag: dict
         """
         for dag in tables_by_dag:
-            if not self.dag_file_exists(dag):
+            if not self.dag_file_exists(dag) and not self.dag_file_exists_legacy(dag):
                 self.register_into_invalid_list(dag)
             else:
                 for table in tables_by_dag[dag]:
