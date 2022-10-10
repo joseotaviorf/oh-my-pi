@@ -50,7 +50,7 @@ supply_funnel_targets AS (
         datalake_gsheets_clean.mexico_supply_targets_2022
     WHERE
         DATE_TRUNC('week', DATE(dt_target)) <= DATE_ADD(CURRENT_DATE, -1) 
-        AND supply_channel NOT IN ('Crawlers classifieds', 'Price Calculator')    
+        AND supply_origin NOT IN ('Crawlers classifieds', 'Price Calculator')
     GROUP BY 1, 2, 3, 4, 10
 ),
 supply_budget_targets AS (
