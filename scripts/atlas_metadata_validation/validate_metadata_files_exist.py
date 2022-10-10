@@ -11,7 +11,7 @@ from dags import DAG_PACKAGES_ROOT
 BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-from bietlejuice.base import QUERIES_DATALAKE_PATH
+from bietlejuice.base.paths import QUERIES_DATALAKE_PATH
 from bietlejuice.services.git_service import GitService
 from bietlejuice.services.file_service import FileService
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -44,7 +44,7 @@ SKIP_TABLES = {
     "push_affiliates",
     "sms_affiliates",
     "webhook_affiliates",
-    "affiliates_events"
+    "affiliates_events",
 }
 
 # Some raw/clean DAGs don't use DatalakeTaskGroup and thus won't have a "lineage from product" config.
@@ -68,13 +68,15 @@ def get_all_query_files():
     # legacy files
     all_files = {
         file: "M"
-        for file in FileService.list_all_files_recursively(QUERIES_DATALAKE_PATH, 'sql')
+        for file in FileService.list_all_files_recursively(QUERIES_DATALAKE_PATH, "sql")
     }
     # dag_packages
-    all_files.update({
-        file: "M"
-        for file in FileService.list_all_files_recursively(DAG_PACKAGES_ROOT, 'sql')
-    })
+    all_files.update(
+        {
+            file: "M"
+            for file in FileService.list_all_files_recursively(DAG_PACKAGES_ROOT, "sql")
+        }
+    )
     return all_files
 
 
@@ -90,7 +92,9 @@ def get_files_from_diff(branch):
 
 def extract_relative_query_path(file_path):
     search_res = re.search(LEGACY_RELATIVE_QUERY_PATH_REGEX, file_path)
-    dag_packages_search_res = re.search(DAG_PACKAGES_RELATIVE_QUERY_PATH_REGEX, file_path)
+    dag_packages_search_res = re.search(
+        DAG_PACKAGES_RELATIVE_QUERY_PATH_REGEX, file_path
+    )
 
     # legacy
     if search_res:

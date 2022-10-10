@@ -8,7 +8,7 @@ import boto3
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
 
 from bietlejuice import BIETLEJUICE_PROJECT_ROOT
-from bietlejuice.base import QUERIES_DATALAKE_PATH, DATA_QUALITY_TESTS_PATH
+from bietlejuice.base.paths import QUERIES_DATALAKE_PATH, DATA_QUALITY_TESTS_PATH
 from dags import DAG_PACKAGES_ROOT
 
 

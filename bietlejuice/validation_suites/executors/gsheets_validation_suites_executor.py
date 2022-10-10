@@ -15,7 +15,7 @@ from validations_engine.base_validation_suites_executor import (
     BaseValidationSuitesExecutor,
 )
 
-from bietlejuice.base import DATALAKE_SQL_DIR
+from bietlejuice.base.paths import DATALAKE_SQL_DIR
 from bietlejuice.base.api import APIEnum
 from bietlejuice.base.notification import SLACK_USER_GROUPS_MAPPING_PATH
 from bietlejuice.base.spark import SparkDataFrameService

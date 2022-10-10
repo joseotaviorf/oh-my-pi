@@ -10,7 +10,7 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Operator
 from airflow.utils.helpers import cross_downstream
 
-from bietlejuice.base import DATALAKE_SQL_DIR
+from bietlejuice.base.paths import DATALAKE_SQL_DIR
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.formatters import StringFormatter

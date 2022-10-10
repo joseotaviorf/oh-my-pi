@@ -4,7 +4,7 @@ from typing import Dict, Optional, Tuple, Set, List
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base import DATALAKE_METADATA_PATH
+from bietlejuice.base.paths import DATALAKE_METADATA_PATH
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.dags import COMPOSER_DAGS_PATH
