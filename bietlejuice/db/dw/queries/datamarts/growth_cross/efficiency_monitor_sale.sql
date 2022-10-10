@@ -148,7 +148,6 @@ WITH sale_volumes AS (
         ON LOWER(mc.classification) = TRIM('amortização ' FROM ac.classification)
     WHERE (mc.dt_month_start BETWEEN ac.dt_term_start AND ac.dt_term_end) AND business = 'sale'
     GROUP BY 1,2
-    ORDER BY 1,2
 ), supply_per_month_amortization AS (
 SELECT
     dt_month_start,
@@ -223,7 +222,6 @@ FROM
         ON LOWER(mc.classification) = TRIM('amortização ' FROM ac.classification)
     WHERE (mc.dt_month_start BETWEEN ac.dt_term_start AND ac.dt_term_end) AND business = 'sale'
     GROUP BY 1,2
-    ORDER BY 1,2
 ), demand_per_month_amortization AS (
 SELECT
     dt_month_start,
@@ -356,7 +354,6 @@ FROM
         ON TRIM('amortização ' FROM ac.classification) = 'demand'
     WHERE (bs.dt_month_start BETWEEN ac.dt_term_start AND ac.dt_term_end) AND ac.business = 'sale'
     GROUP BY 1,2
-    ORDER BY 1,2
 ), branding_demand_per_month AS (
 SELECT
     dt_month_start,
@@ -431,7 +428,6 @@ FROM
         ON TRIM('amortização ' FROM ac.classification) = 'supply'
     WHERE (bs.dt_month_start BETWEEN ac.dt_term_start AND ac.dt_term_end) AND ac.business = 'sale'
     GROUP BY 1,2
-    ORDER BY 1,2
 ), branding_supply_per_month AS (
 SELECT
     dt_month_start,

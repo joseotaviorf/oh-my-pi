@@ -174,7 +174,6 @@ WITH sale_volumes AS (
         (mc.dt_month_start BETWEEN ac.dt_term_start AND ac.dt_term_end)
         AND business = 'sale'
     GROUP BY 1,2
-    ORDER BY 1,2
 ), supply_per_month_amortization AS (
 SELECT
     dt_month_start,
@@ -254,7 +253,6 @@ FROM
         (mc.dt_month_start BETWEEN ac.dt_term_start AND ac.dt_term_end)
         AND business = 'sale'
     GROUP BY 1,2
-    ORDER BY 1,2
 ), demand_per_month_amortization AS (
 SELECT
     dt_month_start,
@@ -397,7 +395,6 @@ FROM
         (bs.dt_month_start BETWEEN ac.dt_term_start AND ac.dt_term_end)
         AND ac.business = 'sale'
     GROUP BY 1,2
-    ORDER BY 1,2
 ), branding_demand_per_month AS (
 SELECT
     dt_month_start,
@@ -477,7 +474,6 @@ FROM
         (bs.dt_month_start BETWEEN ac.dt_term_start AND ac.dt_term_end)
         AND ac.business = 'sale'
     GROUP BY 1,2
-    ORDER BY 1,2
 ), branding_supply_per_month AS (
 SELECT
     dt_month_start,

@@ -120,7 +120,6 @@ rentals_and_tickets AS (
     ON LOWER(mc.classification) = TRIM('amortização ' FROM ac.classification)
     WHERE (mc.dt_month_start BETWEEN ac.dt_term_start AND ac.dt_term_end) AND business = 'rental'
     GROUP BY 1,2
-    ORDER BY 1,2
 ), supply_per_month_amortization AS (
 SELECT
     dt_month_start,
@@ -218,7 +217,6 @@ FROM
     ON TRIM('amortização ' FROM ac.classification) = 'supply'
     WHERE (ba.dt_month_start BETWEEN ac.dt_term_start AND ac.dt_term_end) AND business = 'rental'
     GROUP BY 1,2
-    ORDER BY 1,2
 ), brand_supply_per_month_amortization_amortization AS (
 SELECT
     dt_month_start,

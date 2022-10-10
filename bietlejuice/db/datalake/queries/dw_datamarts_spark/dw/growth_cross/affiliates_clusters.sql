@@ -109,7 +109,6 @@ clusters AS(
             ELSE NULL
         END AS cluster
     FROM calculated_metrics
-    ORDER BY 1 DESC
 ),
 first_inactivation AS(
     SELECT
@@ -143,4 +142,3 @@ FROM clusters AS c
 LEFT JOIN first_inactivation AS f
     ON f.sk_user = c.sk_user
 WHERE c.month_start >= '2019-01-01'
-ORDER BY 1 DESC

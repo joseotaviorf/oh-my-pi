@@ -253,9 +253,6 @@ supply_metric_amortization AS (
     GROUP BY
         1,
         2
-    ORDER BY
-        1,
-        2
 ),
 supply_per_month_amortization AS (
     SELECT
@@ -458,9 +455,6 @@ brand_supply_metric_amortization_amortization AS (
         )
         AND business = 'rental'
     GROUP BY
-        1,
-        2
-    ORDER BY
         1,
         2
 ),

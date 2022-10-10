@@ -880,7 +880,6 @@ supply_spinver_cost AS(
             AND dd.date >= DATE('2021-07-01')
             AND dr.city_group IS NOT NULL
             GROUP BY 1,2,3
-            ORDER BY 1 DESC
         ),
         operation_costs_by_qualified AS(
             SELECT
@@ -997,7 +996,6 @@ supply_spinver_cost AS(
                 AND oc.year_month = ef.year_month
                 AND oc.city_group = ef.city_group
         WHERE qualifieds > 0
-        ORDER BY 1 DESC, 7 DESC
     )
     SELECT
         month_start AS dt_cost,
@@ -1095,4 +1093,3 @@ LEFT JOIN (
 WHERE
     dt_cost < current_date
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13
-ORDER BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12

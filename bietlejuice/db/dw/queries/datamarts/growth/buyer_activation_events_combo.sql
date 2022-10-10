@@ -27,7 +27,6 @@ sale_users AS (
     AND year >= 2021
     AND DATE(ts_event) >= DATE('2021-05-01')
   GROUP BY 1, 2
-  ORDER BY 1, 2
 ),
 combo_events AS (
     SELECT

@@ -27,7 +27,6 @@ WITH
         FROM
             final_bonus f
         GROUP BY 1,2,3
-        ORDER BY 1
     ),
     first_listings AS (
         WITH
@@ -137,7 +136,6 @@ WITH
                 b.listing_rank = 1 --showing only the first conversion
                 AND dua.is_active = 1
             GROUP BY 1,2,3,4,5,6
-            ORDER BY 1 DESC,2,3,4,5,6
         ),
         cum_listings AS(
             SELECT
@@ -153,7 +151,6 @@ WITH
                 NVL(SUM(total_sale_listings) OVER (PARTITION BY listing_year_month, sk_user, city_group ORDER BY listing_date ROWS UNBOUNDED PRECEDING), 0) AS total_sale_listings
             FROM final
             GROUP BY 1,2,3,4,5,6,7,9,total_rent_listings, total_sale_listings
-            ORDER BY 1 DESC,2,3,4,5,6
         )
         SELECT
             sk_date,
@@ -169,7 +166,6 @@ WITH
             NVL((total_sale_listings - daily_sale_listings), 0) AS previous_total_sale_listings,
             NVL(daily_sale_listings, 0) AS daily_sale_listings
             FROM cum_listings
-            ORDER BY 1 DESC,2,3,4,5,6
     ),
     total_user_listings AS(
         SELECT
@@ -184,7 +180,6 @@ WITH
                 ON p.sk_user = fl.sk_user
                 AND p.year_month = fl.listing_year_month
         GROUP BY 1,2,3
-        ORDER BY 2 desc, 1
         ),
     final_bonus AS(
         SELECT
@@ -207,7 +202,7 @@ WITH
             LEFT JOIN total_user_listings u
                 ON p.sk_user = u.sk_user
                 AND p.year_month = u.year_month
-        ORDER BY 3 DESC,1)
+        )
 SELECT
     sk_user,
     city_group,

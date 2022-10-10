@@ -173,7 +173,6 @@ touchpoints AS (
   	AND evt.ts_event > COALESCE(conv.ts_last_session, DATE('2000-01-01')) -- JOIN events that happened between last conversion AND current conversion
     AND evt.ts_event <= conv.ts_session
   GROUP BY 1,2,3,4,5,6,7
-  ORDER BY 1,6,4
 )
 -- aggregate touchpoints to unique conversions with their path concatenated in one column
 SELECT
