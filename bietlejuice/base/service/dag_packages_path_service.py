@@ -5,13 +5,11 @@ from os import path
 from os.path import dirname, isfile
 
 import boto3
+from hierarchical_conf.hierarchical_conf import HierarchicalConf
 
 from bietlejuice import BIETLEJUICE_PROJECT_ROOT
 from bietlejuice.base import QUERIES_DATALAKE_PATH, DATA_QUALITY_TESTS_PATH
-from bietlejuice.enums.dag_package_enum import DAGPackagesEnum
 from dags import DAG_PACKAGES_ROOT
-
-S3 = boto3.client("s3")
 
 
 class DuplicateDAGException(Exception):
@@ -87,15 +85,24 @@ class DAGPackagesPathService:
             )
 
     @staticmethod
-    def _read_file_from_s3(bucket_name: str, file_key: str):
+    def _read_dag_package_file_from_s3(sql_file_relative_path: str):
         """
-        Read a file from S3 based on Bucket and s3 file path.
+        Read the DAG Package's file stored in S3 based on the relative file path.
 
         * Method used only in Databricks *
 
         :return: file content.
         """
-        data = S3.get_object(Bucket=bucket_name, Key=file_key)
+        global_confs = HierarchicalConf([BIETLEJUICE_PROJECT_ROOT])
+        dags_packages_files_prefix = global_confs.get_config(
+            "dags_packages_files_path_in_s3"
+        )
+
+        s3_client = boto3.client("s3")
+        sql_file_key = path.join(dags_packages_files_prefix, sql_file_relative_path)
+        data = s3_client.get_object(
+            Bucket=global_confs.get_config("databricks_bucket"), Key=sql_file_key
+        )
         query = data["Body"].read().decode("utf-8")
 
         return query
@@ -169,17 +176,13 @@ class DAGPackagesPathService:
             sql_file_relative_path = path.join(
                 "queries", dag_name, layer, intermediate_path, f"{table_name}.sql"
             )
-            sql_file_path = path.join(
-                DAGPackagesEnum.S3_DAG_PACKAGES_FILES_PATH, sql_file_relative_path
-            )
-            query_content = DAGPackagesPathService._read_file_from_s3(
-                bucket_name=DAGPackagesEnum.DATABRICKS_FILES_BUCKET,
-                file_key=sql_file_path,
+            query_content = DAGPackagesPathService._read_dag_package_file_from_s3(
+                sql_file_relative_path=sql_file_relative_path
             )
 
         if not query_content:
             raise FileNotFoundError(
-                f"Query file was not found or is empty, dag_name={dag_name}, sql_file_path={sql_file_path}"
+                f"Query file was not found or is empty, dag_name={dag_name}, sql_file_relative_path={sql_file_relative_path}"
             )
 
         return query_content
@@ -237,7 +240,9 @@ class DAGPackagesPathService:
         if DAGPackagesPathService._is_dag_in_legacy_structure(dag_name):
             # TODO: remove after DAG-Packages migration
             data_quality_file_path = path.join(
-                f"{DATA_QUALITY_TESTS_PATH}/{dag_name}/{layer}",
+                DATA_QUALITY_TESTS_PATH,
+                dag_name,
+                layer,
                 intermediate_path,
                 f"{table_name}.yml",
             )
@@ -245,25 +250,20 @@ class DAGPackagesPathService:
                 data_quality_file_path
             )
         else:
-            data_quality_relative_path = path.join(
-                f"data_quality/{dag_name}/{layer}",
-                intermediate_path,
-                f"{table_name}.yml",
-            )
             data_quality_file_path = path.join(
-                DAGPackagesEnum.S3_DAG_PACKAGES_FILES_PATH, data_quality_relative_path
+                "data_quality", dag_name, layer, intermediate_path, f"{table_name}.yml"
             )
 
             try:
-                data_quality_content = DAGPackagesPathService._read_file_from_s3(
-                    bucket_name=DAGPackagesEnum.DATABRICKS_FILES_BUCKET,
-                    file_key=data_quality_file_path,
+                data_quality_content = DAGPackagesPathService._read_dag_package_file_from_s3(
+                    sql_file_relative_path=data_quality_file_path
                 )
             except Exception as e:
                 if "NoSuchKey" in str(e):
-                    data_quality_content = DAGPackagesPathService._read_file_from_s3(
-                        bucket_name=DAGPackagesEnum.DATABRICKS_FILES_BUCKET,
-                        file_key=data_quality_file_path.replace("yml", "yaml"),
+                    data_quality_content = DAGPackagesPathService._read_dag_package_file_from_s3(
+                        sql_file_relative_path=data_quality_file_path.replace(
+                            "yml", "yaml"
+                        )
                     )
                 else:
                     raise e
@@ -293,7 +293,9 @@ class DAGPackagesPathService:
 
         if DAGPackagesPathService._is_dag_in_legacy_structure(dag_name):
             data_quality_file_path = path.join(
-                f"{DATA_QUALITY_TESTS_PATH}/{dag_name}/{layer}",
+                DATA_QUALITY_TESTS_PATH,
+                dag_name,
+                layer,
                 intermediate_path,
                 f"{table_name}.yml",
             )

@@ -1,10 +1,11 @@
 import argparse
+import logging
 import os
 import re
 import sys
-import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
+from os import path
 
 import boto3
 from botocore.config import Config
@@ -15,7 +16,6 @@ BI_ETL_EJUICE_ROOT = os.path.dirname(
 )
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-from bietlejuice.enums.dag_package_enum import DAGPackagesEnum
 from dags import DAG_PACKAGES_ROOT
 
 boto3.set_stream_logger(__name__, logging.INFO)
@@ -28,7 +28,7 @@ args = parser.parse_args()
 s3_bucket = args.s3_bucket
 artifact = args.artifact
 
-S3_FOLDER_PATH = f"{DAGPackagesEnum.S3_DAG_PACKAGES_FILES_PATH}{artifact}"
+S3_DAGS_PACKAGES_PATH_PREFIX = path.join("github-repos/bi-etl-ejuice/", artifact)
 
 config = Config(retries={"max_attempts": 5, "mode": "standard"})
 session = boto3.Session()
@@ -69,8 +69,8 @@ for root, dirs, files in os.walk(DAG_PACKAGES_ROOT):
             list(filter(None, dag_path.replace(DAG_PACKAGES_ROOT, "").split("/")))[1:]
         )
 
-        spark_job_local_path = f"{root}/{file_name}"
-        spark_job_s3_path = f"{S3_FOLDER_PATH}/{dag_name}{artifact_path}/{file_name}"
+        spark_job_local_path = path.join(root, file_name)
+        spark_job_s3_path = path.join(S3_DAGS_PACKAGES_PATH_PREFIX, dag_name, artifact_path, file_name)
         files_to_upload.append((spark_job_local_path, spark_job_s3_path))
 
 with tqdm(
