@@ -59,6 +59,7 @@ if __name__ == "__main__":
     consumer_extra_args = json.loads(args.consumer_extra_args)
     partition_cols = ["year", "month", "day"]
     date_ingested = datetime.strptime(date_to_ingest, "%Y-%m-%d") + timedelta(days=1)
+    date_to_ingest = date_ingested.strftime("%Y-%m-%d")
 
     logger.info(
         f"""

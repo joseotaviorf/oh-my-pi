@@ -26,7 +26,3 @@ SELECT
     ts_load
 FROM
     datalake_invoice_preview_raw.invoice_preview
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

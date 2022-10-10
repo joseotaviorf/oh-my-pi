@@ -122,7 +122,7 @@ clean_task_group = task_group.build_clean_task_group(
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
     table_name=TABLE_NAME,
-    is_incremental=True,
+    is_incremental=False,
     partitions=partition_columns,
 )
 

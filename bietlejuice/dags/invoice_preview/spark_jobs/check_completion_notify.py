@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 from quintoandar_logger import QuintoAndarLogger
@@ -45,6 +45,9 @@ if __name__ == "__main__":
     source = args.source
     table_name = args.table_name
     execution_date = args.execution_date
+    execution_date = (
+        datetime.strptime(execution_date, "%Y-%m-%d") + timedelta(days=1)
+    ).strftime("%Y-%m-%d")
 
     logger.info(
         f"""
