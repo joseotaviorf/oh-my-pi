@@ -1,12 +1,8 @@
 import json
 import logging
-from datetime import datetime
-
 from argparse import ArgumentParser
 
 import yamale
-from yamale import YamaleError
-
 from inmetro.builders.validations.pydeequ.validation_suite_builder import (
     ValidationSuiteBuilder,
 )
@@ -19,6 +15,7 @@ from inmetro.loaders import S3Loader as InmetroS3Loader
 from inmetro.messengers import SlackMessenger
 from inmetro.validators import PyDeequValidator
 from quintoandar_logger import QuintoAndarLogger
+from yamale import YamaleError
 
 from bietlejuice.base.db import DwMetastoreMapping
 from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
@@ -29,8 +26,6 @@ from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.metadata_propagator_pipeline.atlas_quality_metrics_pipeline import (
     AtlasQualityMetricsPipeline,
 )
-
-from pyspark.sql.functions import col, to_timestamp
 
 JOB_NAME = "data_quality_tests"
 
@@ -102,9 +97,6 @@ def parse_args():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="Environment where the task is executing")
     parser.add_argument(
-        "execution_date", type=str, help="Execution date when the task is executing"
-    )
-    parser.add_argument(
         "inmetro_bucket",
         type=str,
         help="Bucket that stores all the Inmetro's validation data",
@@ -126,22 +118,13 @@ def parse_args():
     args = parser.parse_args()
 
     env = args.env
-    execution_date = args.execution_date
     inmetro_bucket = args.inmetro_bucket.replace("s3://", "")
     layer = LayerEnum(args.layer).value
     relative_file_path = args.relative_file_path
     table_name = args.table_name
     intermediate_path = args.intermediate_path
 
-    return (
-        env,
-        execution_date,
-        inmetro_bucket,
-        layer,
-        relative_file_path,
-        table_name,
-        intermediate_path,
-    )
+    return env, inmetro_bucket, layer, relative_file_path, table_name, intermediate_path
 
 
 def _check_input_config_schema(input_config: list) -> bool:
@@ -192,7 +175,9 @@ def validate_input_config(input_config) -> None:
     """
     Reads the input file, converting it to a dict with all the validations,
     and executes some verifications on the final structure.
+
     Method extracted from inmetro.config_reader.ConfigReader
+
     :return: Dict with all the validations contained in the input file.
     """
     input_validations = input_config[0][0]
@@ -204,7 +189,6 @@ def validate_input_config(input_config) -> None:
 if __name__ == "__main__":
     (
         env,
-        execution_date,
         inmetro_bucket,
         layer,
         relative_file_path,
@@ -243,30 +227,13 @@ if __name__ == "__main__":
     input_df = spark_client.read_table(
         database_name=database_name, table_name=table_name
     )
-
-    is_incremental = input_configs.get("is_incremental")
-
-    if is_incremental:
-        incremental_date_column = is_incremental["incremental_date_column"]
-        incremental_date_mask = is_incremental["incremental_date_mask"]
-
-        df = input_df.where(
-            to_timestamp(
-                col(incremental_date_column).cast("string"), incremental_date_mask
-            )
-            == datetime.strptime(execution_date, "%Y-%m-%d")
-        )
-
-    else:
-        df = input_df
-
     pydeequ_validator = PyDeequValidator(
         suite_name=f"Pipeline Validations: {database_name}.{table_name}",
         validation_suite=validation_suite,
         client=spark_client,
     )
 
-    validation_results = pydeequ_validator.execute_and_parse(df)
+    validation_results = pydeequ_validator.execute_and_parse(input_df)
 
     # ################################ Writing to Inmetro's S3 Bucket ##################################
 
