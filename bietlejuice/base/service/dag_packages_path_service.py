@@ -6,10 +6,13 @@ from os.path import dirname, isfile
 
 import boto3
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice import BIETLEJUICE_PROJECT_ROOT
 from bietlejuice.base.paths import QUERIES_DATALAKE_PATH, DATA_QUALITY_TESTS_PATH
 from dags import DAG_PACKAGES_ROOT
+
+logger = QuintoAndarLogger("DAGPackagesPathService")
 
 
 class DuplicateDAGException(Exception):
@@ -62,6 +65,9 @@ class DAGPackagesPathService:
         """
 
         dag_path = f"{BIETLEJUICE_PROJECT_ROOT}/dags/{dag_name}"
+        logger.info(
+            f"m=_is_dag_in_legacy_structure, dag_path={dag_path}, path_exists={os.path.exists(dag_path)}"
+        )
         return os.path.exists(dag_path)
 
     @staticmethod
@@ -201,7 +207,16 @@ class DAGPackagesPathService:
         :param intermediate_path: off intermediate path structure used in some DAGs
         :return: list of queries files without file extension (only table names)
         """
-        if DAGPackagesPathService._is_dag_in_legacy_structure(dag_name):
+
+        is_dag_in_legacy_structure = DAGPackagesPathService._is_dag_in_legacy_structure(
+            dag_name
+        )
+        logger.info(
+            f"m=list_queries_files_in_composer, dag_name={dag_name} "
+            f"is_dag_in_legacy_structure={is_dag_in_legacy_structure}"
+        )
+
+        if is_dag_in_legacy_structure:
             sql_files_folder = path.join(
                 QUERIES_DATALAKE_PATH, dag_name, layer, intermediate_path
             )
@@ -218,6 +233,11 @@ class DAGPackagesPathService:
         table_names = []
         for file_path in files:
             table_names.append(re.search(filename_regex, file_path).group(1))
+
+        logger.info(
+            f"m=list_queries_files_in_composer, dag_name={dag_name} sql_files_folder={sql_files_folder}, "
+            f"files={files}, table_names={table_names}"
+        )
 
         return table_names
 
@@ -321,14 +341,25 @@ class DAGPackagesPathService:
         :param layer: the layer that the file is related to.
         :return: list of D.Q. files found.
         """
-        if DAGPackagesPathService._is_dag_in_legacy_structure(dag_name):
+        dag_path = DAGPackagesPathService.get_dag_path(dag_name)
+        is_dag_in_legacy_structure = DAGPackagesPathService._is_dag_in_legacy_structure(
+            dag_name
+        )
+        logger.info(
+            f"m=list_data_quality_tests_files_in_composer, dag_name={dag_name}, dag_path={dag_path}"
+            f"legacy_structure={is_dag_in_legacy_structure}"
+        )
+        if is_dag_in_legacy_structure:
             data_quality_folder = f"{DATA_QUALITY_TESTS_PATH}/{dag_name}/{layer}"
         else:
-            data_quality_folder = path.join(
-                DAGPackagesPathService.get_dag_path(dag_name), "data_quality", layer
-            )
+            data_quality_folder = path.join(dag_path, "data_quality", layer)
 
         files = glob(f"{data_quality_folder}/**/*.yml", recursive=True)
+        logger.info(
+            f"m=list_data_quality_tests_files_in_composer, dag_name={dag_name}, dag_path={dag_path}"
+            f"legacy_structure={is_dag_in_legacy_structure} files={files}"
+        )
+
         filename_regex = re.compile(rf".*/([a-z0-9_-]+)(?:\.yml|\.yaml)")
 
         table_names = []
