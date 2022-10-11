@@ -59,12 +59,3 @@ columns:
   ts_last_updated:
     lineage:
       - datalake_atta_raw.proposta.dtultatu
-  year:
-    lineage:
-      - datalake_atta_raw.proposta.year
-  month:
-    lineage:
-      - datalake_atta_raw.proposta.month
-  day:
-    lineage:
-      - datalake_atta_raw.proposta.day

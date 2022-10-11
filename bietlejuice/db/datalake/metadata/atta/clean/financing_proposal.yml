@@ -56,12 +56,3 @@ columns:
   ts_send_financing_proposal:
     lineage:
       - datalake_atta_raw.proposta_itau.data_envio
-  year:
-    lineage:
-      - datalake_atta_raw.proposta_itau.year
-  month:
-    lineage:
-      - datalake_atta_raw.proposta_itau.month
-  day:
-    lineage:
-      - datalake_atta_raw.proposta_itau.day

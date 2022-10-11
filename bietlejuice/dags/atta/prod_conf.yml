@@ -1,185 +1,58 @@
 ---
 tables:
-  - table_name: analiseparametrizacoes
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: analisescredito
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: analisesenriquecimento
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: cadastro_cliente
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: cadastro_imovel
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: cadastro_rating
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: canal
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: cliente
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: cliente_vendedor
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: cms_fechamento_detalhe
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
   - table_name: consulta_score
+    extraction_type: full
+    is_cleaned: true
     clean_table_name: pre_analysis
-    extraction_type: incremental
-    is_cleaned: true
-  - table_name: consulta_score_caixa
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: consulta_score_cliente_ctrl
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: consulta_score_itau
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: documento_produto
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: documento_sub_categoria
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: documento_tipo
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: documento_tpcontratacao
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
   - table_name: entidade_log
+    extraction_type: full
+    is_cleaned: true
     clean_table_name: log_isolve_v2
-    extraction_type: incremental
-    is_cleaned: true
   - table_name: franquia
+    extraction_type: full
+    is_cleaned: true
     clean_table_name: franchise_info
-    extraction_type: incremental
-    is_cleaned: true
   - table_name: fornecedores
+    extraction_type: full
+    is_cleaned: true
     clean_table_name: providers_info
-    extraction_type: incremental
-    is_cleaned: true
-  - table_name: lead_dados_captura
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: lead_detalhe_acompanhamento
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: lead_detalhe_categoria
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: log_contrato_assinado_parceiro
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
   - table_name: log_proposta_esteira
+    extraction_type: full
+    date_filter_column: DtSITatu
+    is_cleaned: true
     clean_table_name: log_isolve_v1
-    extraction_type: incremental
-    is_cleaned: true
-  - table_name: log_proposta_reemissao
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: log_vinculo_analista_proposta
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
   - table_name: max_usuarios
+    extraction_type: full
+    date_filter_column: data_ultima_atualizacao
+    is_cleaned: true
     clean_table_name: users_info
-    extraction_type: incremental
-    is_cleaned: true
-  - table_name: meta_consultor
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
   - table_name: parceiro
+    extraction_type: full
+    is_cleaned: true
     clean_table_name: partner_info
-    extraction_type: incremental
-    is_cleaned: true
-  - table_name: parceiro_categoria
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: pre_analise_observacao
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
   - table_name: produto
+    extraction_type: full
+    date_filter_column: DtUltAtu
+    is_cleaned: true
     clean_table_name: product_info
-    extraction_type: incremental
-    is_cleaned: true
   - table_name: produto_esteira
-    clean_table_name:
     extraction_type: full
-    is_cleaned: false
+    is_cleaned: true
+    clean_table_name: track_step_detail
   - table_name: proposta
+    extraction_type: full
+    date_filter_column: DtUltAtu
+    is_cleaned: true
     clean_table_name: proposal
-    extraction_type: incremental
-    is_cleaned: true
   - table_name: proposta_credimob_confval
+    extraction_type: full
+    date_filter_column: AtualizadoEm
+    is_cleaned: true
     clean_table_name: financing_proposal_check
-    extraction_type: incremental
-    is_cleaned: true
-  - table_name: proposta_esteira
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
   - table_name: proposta_itau
-    clean_table_name: financing_proposal
-    extraction_type: incremental
+    extraction_type: full
     is_cleaned: true
-  - table_name: simulacao_fornecedor
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: simulador_credito_imobiliario
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: simulador_credito_imobiliario_fornecedor
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: sla_fornecedor
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: spcrepositorio
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
-  - table_name: usuariospilotomultibancos
-    clean_table_name:
-    extraction_type: full
-    is_cleaned: false
+    clean_table_name: financing_proposals
 
 partition_columns: [year, month, day]
 lineage_product_database_name: atta

@@ -16,13 +16,6 @@ SELECT
     a_valor_tarifas AS fees_value,
     a_valor_despesas AS costs_value,
     TIMESTAMP(data_cadastro) AS ts_registration_financing_proposal,
-    TIMESTAMP(data_envio) AS ts_send_financing_proposal,
-    year,
-    month,
-    day
+    TIMESTAMP(data_envio) AS ts_send_financing_proposal
 FROM
     datalake_atta_raw.proposta_itau
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

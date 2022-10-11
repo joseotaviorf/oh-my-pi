@@ -26,12 +26,3 @@ columns:
   user_status:
     lineage:
       - datalake_atta_raw.max_usuarios.status
-  year:
-    lineage:
-      - datalake_atta_raw.max_usuarios.year
-  month:
-    lineage:
-      - datalake_atta_raw.max_usuarios.month
-  day:
-    lineage:
-      - datalake_atta_raw.max_usuarios.day

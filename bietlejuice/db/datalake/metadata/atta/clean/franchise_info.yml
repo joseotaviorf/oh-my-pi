@@ -41,12 +41,3 @@ columns:
   ts_franchise_signature:
     lineage:
       - datalake_atta_raw.franquia.dtassinatura
-  year:
-    lineage:
-      - datalake_atta_raw.franquia.year
-  month:
-    lineage:
-      - datalake_atta_raw.franquia.month
-  day:
-    lineage:
-      - datalake_atta_raw.franquia.day

@@ -23,12 +23,3 @@ columns:
   ts_created:
     lineage:
       - datalake_atta_raw.entidade_log.criadoem
-  year:
-    lineage:
-      - datalake_atta_raw.entidade_log.year
-  month:
-    lineage:
-      - datalake_atta_raw.entidade_log.month
-  day:
-    lineage:
-      - datalake_atta_raw.entidade_log.day

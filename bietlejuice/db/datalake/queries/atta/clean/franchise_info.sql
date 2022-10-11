@@ -11,13 +11,6 @@ SELECT
     CarenciaTec AS grace_period_tec,
     PrazoContrato AS ts_contract_deadline,
     TIMESTAMP(DtCadastro) AS ts_registration,
-    TIMESTAMP(DtAssinatura) AS ts_franchise_signature,
-    year,
-    month,
-    day
+    TIMESTAMP(DtAssinatura) AS ts_franchise_signature
 FROM
     datalake_atta_raw.franquia
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

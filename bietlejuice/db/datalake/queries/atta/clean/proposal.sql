@@ -17,13 +17,6 @@ SELECT
     Valor AS financing_value,
     TIMESTAMP(DtEntrada) AS ts_registration,
     TIMESTAMP(DtFinalizacao) AS ts_financing_ended,
-    TIMESTAMP(DtUltAtu) AS ts_last_updated,
-    year,
-    month,
-    day
+    TIMESTAMP(DtUltAtu) AS ts_last_updated
 FROM
     datalake_atta_raw.proposta
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

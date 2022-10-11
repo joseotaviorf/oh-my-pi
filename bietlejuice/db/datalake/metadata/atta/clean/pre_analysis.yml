@@ -32,12 +32,3 @@ columns:
   ts_registration:
     lineage:
       - datalake_atta_raw.consulta_score.data_solicitacao
-  year:
-    lineage:
-      - datalake_atta_raw.consulta_score.year
-  month:
-    lineage:
-      - datalake_atta_raw.consulta_score.month
-  day:
-    lineage:
-      - datalake_atta_raw.consulta_score.day

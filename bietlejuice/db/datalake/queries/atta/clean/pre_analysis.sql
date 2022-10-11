@@ -8,13 +8,6 @@ SELECT
     vlrentrada AS down_payment_amount,
     vlrfinanciado AS financing_value,
     vlrimovel AS house_value,
-    TIMESTAMP(data_solicitacao) AS ts_registration,
-    year,
-    month,
-    day
+    TIMESTAMP(data_solicitacao) AS ts_registration
 FROM
     datalake_atta_raw.consulta_score
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

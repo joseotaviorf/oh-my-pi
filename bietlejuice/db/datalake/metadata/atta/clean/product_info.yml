@@ -17,12 +17,3 @@ columns:
   ts_registration:
     lineage:
       - datalake_atta_raw.produto.dtcadastro
-  year:
-    lineage:
-      - datalake_atta_raw.produto.year
-  month:
-    lineage:
-      - datalake_atta_raw.produto.month
-  day:
-    lineage:
-      - datalake_atta_raw.produto.day

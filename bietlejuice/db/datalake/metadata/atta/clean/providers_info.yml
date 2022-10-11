@@ -17,12 +17,3 @@ columns:
   ts_created:
     lineage:
       - datalake_atta_raw.fornecedores.dtcadastro
-  year:
-    lineage:
-      - datalake_atta_raw.fornecedores.year
-  month:
-    lineage:
-      - datalake_atta_raw.fornecedores.month
-  day:
-    lineage:
-      - datalake_atta_raw.fornecedores.day

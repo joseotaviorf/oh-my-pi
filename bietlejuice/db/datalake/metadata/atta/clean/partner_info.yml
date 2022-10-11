@@ -20,12 +20,3 @@ columns:
   ts_inactive_user:
     lineage:
       - datalake_atta_raw.parceiro.dtinativo
-  year:
-    lineage:
-      - datalake_atta_raw.parceiro.year
-  month:
-    lineage:
-      - datalake_atta_raw.parceiro.month
-  day:
-    lineage:
-      - datalake_atta_raw.parceiro.day

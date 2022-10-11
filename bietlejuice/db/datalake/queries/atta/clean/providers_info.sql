@@ -3,13 +3,6 @@ SELECT
     Nome AS provider_name,
     Descricao AS provider_description,
     Ativo AS is_active,
-    TIMESTAMP(DtCadastro) AS ts_created,
-    year,
-    month,
-    day
+    TIMESTAMP(DtCadastro) AS ts_created
 FROM
     datalake_atta_raw.fornecedores
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
