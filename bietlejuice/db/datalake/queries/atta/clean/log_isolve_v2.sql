@@ -7,3 +7,4 @@ SELECT
     Para AS to,
     TIMESTAMP(CriadoEm) AS ts_created
 FROM
+   datalake_atta_raw.entidade_log

@@ -52,7 +52,7 @@ tables:
   - table_name: proposta_itau
     extraction_type: full
     is_cleaned: true
-    clean_table_name: financing_proposals
+    clean_table_name: financing_proposal
 
 partition_columns: [year, month, day]
 lineage_product_database_name: atta
