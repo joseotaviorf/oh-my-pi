@@ -130,7 +130,7 @@ listings_info AS (
 	FROM
 	    houses_infos hi
 	LEFT JOIN
-	    dw_datamarts_growth_cross.performance_marketing_metrics_demand dem
+	    dw_datamarts.performance_marketing_metrics_demand dem
           ON dem.sk_house_listing = hi.sk_house_listing
 	LEFT JOIN
 	    dw_public.dim_contract dc

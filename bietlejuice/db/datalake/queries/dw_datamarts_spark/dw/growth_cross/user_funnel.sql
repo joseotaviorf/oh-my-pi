@@ -4,7 +4,7 @@ events_agent AS (
         CAST(tta.tenant_id AS INT) AS sk_client,
         fhl.sk_region,
         CAST(DATE_FORMAT(CAST(first_message_ts AS TIMESTAMP), 'yyyyMMdd') AS INT) AS sk_talk_to_agent_date
-    FROM dw_datamarts_cross.talk_to_agent AS tta
+    FROM dw_datamarts.talk_to_agent AS tta
         JOIN dw_public.fact_house_listings AS fhl
           ON tta.sk_house_listing = fhl.sk_house_listing
     WHERE

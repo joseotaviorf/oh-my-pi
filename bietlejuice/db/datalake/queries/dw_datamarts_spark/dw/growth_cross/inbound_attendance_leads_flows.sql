@@ -355,7 +355,7 @@ lead_context_dates AS (
         WHEN origin_table = 'Sale' THEN lead_origin
       END AS lead_origin_sale
     FROM
-      dw_datamarts_cross.lead_listing_flows
+      dw_datamarts.lead_listing_flows
 ),
 lead_unique_table AS (
     SELECT

@@ -34,7 +34,7 @@ listings AS (
             ac.sk_user AS sk_user,
             ac.cluster AS cluster
         FROM
-            dw_datamarts_growth_cross.affiliates_clusters ac
+            dw_datamarts.affiliates_clusters ac
             JOIN dw_public.dim_date dd
                 ON dd.date = ac.month_start
     ),
@@ -49,7 +49,7 @@ listings AS (
             NULLIF(llf.sk_house_listing,-1)/1000 AS id_house
         FROM
             dw_public.dim_lead dl
-            LEFT JOIN dw_datamarts_cross.lead_listing_flows llf
+            LEFT JOIN dw_datamarts.lead_listing_flows llf
                 ON dl.sk_lead = llf.sk_lead
             INNER JOIN dw_public.dim_date dd
                 ON dd.sk_date = llf.sk_first_listing_date

@@ -58,7 +58,7 @@ WITH l2p AS (
     FROM
         dw_public.dim_date dd
     JOIN
-        dw_datamarts_cross.lead_listing_flows fhlf
+        dw_datamarts.lead_listing_flows fhlf
             ON dd.sk_date = fhlf.sk_lead_date
                 AND fhlf.sk_lead_date > 0
     LEFT JOIN
@@ -129,7 +129,7 @@ p2q AS (
     FROM
         dw_public.dim_date dd
     JOIN
-        dw_datamarts_cross.lead_listing_flows fhlf
+        dw_datamarts.lead_listing_flows fhlf
             ON dd.sk_date = fhlf.sk_prospect_date
                 AND fhlf.sk_prospect_date > 0
     LEFT JOIN
@@ -201,7 +201,7 @@ q2aq AS (
     FROM
         dw_public.dim_date dd
     JOIN
-        dw_datamarts_cross.lead_listing_flows fhlf
+        dw_datamarts.lead_listing_flows fhlf
             ON dd.sk_date = fhlf.sk_qualified_date
                 AND fhlf.sk_qualified_date > 0
     LEFT JOIN
@@ -272,7 +272,7 @@ aq2o AS (
     FROM
         dw_public.dim_date dd
     JOIN
-        dw_datamarts_cross.lead_listing_flows fhlf
+        dw_datamarts.lead_listing_flows fhlf
             ON dd.sk_date = fhlf.sk_available_qualified_date
                 AND fhlf.sk_available_qualified_date > 0
     LEFT JOIN
@@ -343,7 +343,7 @@ q2opp AS (
     FROM
         dw_public.dim_date dd
     JOIN
-        dw_datamarts_cross.lead_listing_flows fhlf
+        dw_datamarts.lead_listing_flows fhlf
             ON dd.sk_date = fhlf.sk_qualified_date
                 AND fhlf.sk_qualified_date > 0
     LEFT JOIN
@@ -414,7 +414,7 @@ opp2fl AS (
     FROM
         dw_public.dim_date dd
     JOIN
-        dw_datamarts_cross.lead_listing_flows fhlf
+        dw_datamarts.lead_listing_flows fhlf
             ON dd.sk_date = fhlf.sk_opportunity_date
                 AND fhlf.sk_opportunity_date > 0
     LEFT JOIN
@@ -490,10 +490,10 @@ rent_flow_adjusted AS (
         dw_public.dim_offer dof
             ON rf.sk_offer = dof.sk_offer
     LEFT JOIN
-        dw_datamarts_cross.funnel_demand_flows fdf
+        dw_datamarts.funnel_demand_flows fdf
             ON rf.sk_rent_flow = fdf.sk_rent_flow
     LEFT JOIN
-        dw_datamarts_cross.quintoandar_consultant_listings ciq
+        dw_datamarts.quintoandar_consultant_listings ciq
             ON rf.sk_house_listing = ciq.sk_house_listing
                 AND ciq.businesscontext= 'RENT'
 ),

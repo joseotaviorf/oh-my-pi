@@ -12,7 +12,7 @@ WITH
                 NVL(SUM(((pb.promotional_bonus/NULLIF(pb.total_listings, 0))*(pb.cnt_first_conversion_hybrid))/2),0) AS bonus_hybrid_sale,
                 NVL(SUM(pb.promotional_bonus),0) AS promotional_bonus
             FROM
-                dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus pb
+                dw_datamarts.performance_marketing_cluster_promotional_bonus pb
             WHERE
                 pb.is_active = 'true'
             GROUP BY 1,2,3
@@ -39,7 +39,7 @@ WITH
                     f.sk_user,
                     cluster
                 FROM
-                    dw_datamarts_growth_cross.affiliates_clusters f
+                    dw_datamarts.affiliates_clusters f
                     JOIN dw_public.dim_date dd
                         ON dd.date = f.month_start
             ),

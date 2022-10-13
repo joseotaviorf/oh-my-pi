@@ -10,7 +10,7 @@ tenant_prospect_status AS (
         LAG(status) OVER(PARTITION BY sk_client, city_group ORDER BY ts_start) AS last_status,
         LEAD(status) OVER(PARTITION BY sk_client, city_group ORDER BY ts_start) AS next_status
     FROM
-        dw_datamarts_growth_cross.tenant_prospect_status
+        dw_datamarts.tenant_prospect_status
     WHERE
         CAST(ts_start AS TIMESTAMP) >= CAST(ts_first_activation AS TIMESTAMP)
 ),
@@ -103,7 +103,7 @@ fact_rent_flows AS (
         CAST(0.0 AS DOUBLE) AS recovered_tenant_prospects_target,
         CAST(0.0 AS DOUBLE) AS budget
     FROM
-        dw_datamarts_growth_cross.rent_flow_interactions AS rf
+        dw_datamarts.rent_flow_interactions AS rf
         JOIN dw_public.dim_region AS dr
             USING(sk_region)
         LEFT JOIN rental_funnel AS frf

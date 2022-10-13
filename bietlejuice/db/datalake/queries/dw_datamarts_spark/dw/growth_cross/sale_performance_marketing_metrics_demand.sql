@@ -18,7 +18,7 @@ buyer_prospect_status as (
         LAG(status) OVER(PARTITION BY sk_buyer, city_group order by ts_start) as last_status,
         LEAD(status) OVER(PARTITION BY sk_buyer, city_group order by ts_start) as next_status
     FROM
-        dw_datamarts_cross.buyer_prospect_status
+        dw_datamarts.buyer_prospect_status
     WHERE
         ts_start >= ts_first_activation
 ),

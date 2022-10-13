@@ -161,7 +161,7 @@ rent_flow_interactions AS (
         rfi.sk_client,
         rfi.sk_rf
     FROM
-        dw_datamarts_growth_cross.rent_flow_interactions AS rfi
+        dw_datamarts.rent_flow_interactions AS rfi
         JOIN dw_public.dim_region AS dr
             USING(sk_region)
     WHERE
@@ -371,7 +371,7 @@ activation_periods AS (
     dd.week_start,
     MAX(ts_start) OVER(PARTITION BY sk_client, city_group, week_start) AS last_status_start
   FROM
-    dw_datamarts_growth_cross.tenant_prospect_status AS tps
+    dw_datamarts.tenant_prospect_status AS tps
     JOIN dw_public.dim_date AS dd
       ON dd.sk_date BETWEEN sk_start_date
       AND COALESCE(sk_end_date::INT, DATE_FORMAT((CURRENT_DATE - 1), 'yMMd')::INT)

@@ -53,7 +53,7 @@ metrics_base AS (
           NULL:DOUBLE AS marketing_cost
         FROM
           plaquinhas_users u
-        LEFT JOIN dw_datamarts_growth_cross.performance_marketing_metrics_demand AS rent
+        LEFT JOIN dw_datamarts.performance_marketing_metrics_demand AS rent
             ON u.id_user = rent.sk_client AND rent.dt_event BETWEEN u.dt_first_interaction AND dateadd(day, 90, u.dt_last_interaction)
         UNION ALL
         SELECT
@@ -94,7 +94,7 @@ metrics_base AS (
           NULL:DOUBLE AS marketing_cost
         FROM
           plaquinhas_users u
-        LEFT JOIN dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand sale
+        LEFT JOIN dw_datamarts.sale_performance_marketing_metrics_demand sale
             ON u.id_user = sale.sk_buyer AND sale.dt_event BETWEEN u.dt_first_interaction AND dateadd(day, 90, u.dt_last_interaction)
 ),
 marketing_cost AS (
@@ -134,7 +134,7 @@ marketing_cost AS (
             NULL::BOOLEAN AS is_3p,        
             NULL::DOUBLE AS visits_booked_target,
             marketing_cost
-      FROM dw_datamarts_growth_cross.performance_marketing_metrics_demand
+      FROM dw_datamarts.performance_marketing_metrics_demand
       WHERE
           mkt_medium = 'Placas'  
       UNION ALL         
@@ -174,7 +174,7 @@ marketing_cost AS (
             NULL::BOOLEAN AS is_3p,        
             NULL::DOUBLE AS visits_booked_target,
             marketing_cost
-      FROM dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand
+      FROM dw_datamarts.sale_performance_marketing_metrics_demand
       WHERE
           mkt_medium = 'Placas'
 ),

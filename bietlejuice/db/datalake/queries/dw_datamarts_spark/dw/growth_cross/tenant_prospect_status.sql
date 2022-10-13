@@ -75,7 +75,7 @@ rent_flows AS (
         rfi.ts_event,
         'rent_flow' AS event_type
     FROM
-        dw_datamarts_growth_cross.rent_flow_interactions as rfi
+        dw_datamarts.rent_flow_interactions as rfi
         JOIN dw_public.dim_region AS dr
             USING(sk_region)
     WHERE

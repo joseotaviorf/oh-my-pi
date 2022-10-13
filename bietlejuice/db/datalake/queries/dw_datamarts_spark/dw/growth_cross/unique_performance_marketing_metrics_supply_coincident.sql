@@ -208,7 +208,7 @@ costs_targets_results_combined AS (
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS budget_rental
     FROM
-        dw_datamarts_cross.lead_listing_flows AS f
+        dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
         ON dl.sk_lead = f.sk_lead
     JOIN dw_public.dim_region AS dr
@@ -273,7 +273,7 @@ costs_targets_results_combined AS (
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS budget_rental
     FROM
-        dw_datamarts_cross.lead_listing_flows AS f
+        dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
         ON dl.sk_lead = f.sk_lead
     JOIN dw_public.dim_region AS dr
@@ -337,7 +337,7 @@ costs_targets_results_combined AS (
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS budget_rental
     FROM
-        dw_datamarts_cross.lead_listing_flows AS f
+        dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
         ON dl.sk_lead = f.sk_lead
     JOIN dw_public.dim_region AS dr
@@ -402,7 +402,7 @@ costs_targets_results_combined AS (
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS budget_rental
     FROM
-        dw_datamarts_cross.lead_listing_flows AS f
+        dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
         ON dl.sk_lead = f.sk_lead
     JOIN dw_public.dim_region AS dr
@@ -467,7 +467,7 @@ costs_targets_results_combined AS (
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS budget_rental
     FROM
-        dw_datamarts_cross.lead_listing_flows AS f
+        dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
         ON dl.sk_lead = f.sk_lead
     JOIN dw_public.dim_region AS dr
@@ -626,7 +626,7 @@ costs_targets_results_combined AS (
                 'Rent' AS business_context,
                 SUM(final_bonus_rent) AS cost
             FROM
-                dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs
+                dw_datamarts.performance_marketing_cluster_promotional_bonus_costs
             WHERE final_bonus_rent > 0
             AND sk_date >= 20210701
             GROUP BY 1,2,3,4,5,6,7,8,9,10,11
@@ -652,7 +652,7 @@ costs_targets_results_combined AS (
                 'Sale' AS business_context,
                 SUM(final_bonus_sale) AS cost
             FROM
-                dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs
+                dw_datamarts.performance_marketing_cluster_promotional_bonus_costs
             WHERE final_bonus_sale > 0
             AND sk_date >= 20210701
             GROUP BY 1,2,3,4,5,6,7,8,9,10,11
@@ -1421,7 +1421,7 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
         SUM(CAST(0 AS FLOAT)) AS budget_rental
     FROM
-        dw_datamarts_growth_cross.daily_target_volumes_supply str
+        dw_datamarts.daily_target_volumes_supply str
     WHERE
         str.date < '2021-04-01'
         OR (str.date > '2021-04-01'
@@ -1477,7 +1477,7 @@ costs_targets_results_combined AS (
         SUM(CAST(REPLACE(str.first_listing,',','') AS FLOAT)) AS first_listings_target_rental,
         SUM(CAST(0 AS FLOAT)) AS budget_rental
     FROM
-        dw_datamarts_growth_cross.daily_target_volumes_supply str
+        dw_datamarts.daily_target_volumes_supply str
    GROUP BY
         1,2,3,4,5,6,7,8,9,10
 

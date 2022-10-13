@@ -210,7 +210,7 @@ events AS (
         SUM(contact_flow_target) AS contact_flow_target,
         COUNT(NULL) AS tof_users_target
 FROM
-    dw_datamarts_growth.performance_marketing_metrics_portal_casa_mineira
+    dw_datamarts.performance_marketing_metrics_portal_casa_mineira
     WHERE
         dt >= CURRENT_DATE - INTERVAL '360 DAY'
         AND mkt_business = 'portal'
@@ -251,7 +251,7 @@ FROM
         COUNT(NULL) AS contact_flow_target,
         COUNT(NULL) AS tof_users_target
 FROM
-    dw_datamarts_growth.performance_marketing_metrics_imobiliaria_casa_mineira
+    dw_datamarts.performance_marketing_metrics_imobiliaria_casa_mineira
     WHERE
         dt >= CURRENT_DATE - INTERVAL '360 DAY'
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19

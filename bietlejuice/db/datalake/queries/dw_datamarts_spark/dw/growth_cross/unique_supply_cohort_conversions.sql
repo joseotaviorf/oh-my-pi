@@ -24,7 +24,7 @@ SELECT
 FROM
     dw_public.dim_date dd
 JOIN
-    dw_datamarts_cross.lead_listing_flows lf
+    dw_datamarts.lead_listing_flows lf
         ON dd.sk_date = lf.sk_lead_date
         AND lf.sk_lead_date > 0
 LEFT JOIN
@@ -102,7 +102,7 @@ SELECT
 FROM
     dw_public.dim_date dd
 JOIN
-    dw_datamarts_cross.lead_listing_flows lf
+    dw_datamarts.lead_listing_flows lf
         ON dd.sk_date = lf.sk_prospect_date
         AND lf.sk_prospect_date > 0
 LEFT JOIN
@@ -180,7 +180,7 @@ SELECT
 FROM
     dw_public.dim_date dd
 JOIN
-    dw_datamarts_cross.lead_listing_flows lf
+    dw_datamarts.lead_listing_flows lf
         ON dd.sk_date = lf.sk_qualified_date
         AND lf.sk_qualified_date > 0
 LEFT JOIN
@@ -258,7 +258,7 @@ SELECT
 FROM
     dw_public.dim_date dd
 JOIN
-    dw_datamarts_cross.lead_listing_flows lf
+    dw_datamarts.lead_listing_flows lf
         ON dd.sk_date = lf.sk_available_qualified_date
         AND lf.sk_available_qualified_date > 0
 LEFT JOIN
@@ -336,7 +336,7 @@ SELECT
 FROM
     dw_public.dim_date dd
 JOIN
-    dw_datamarts_cross.lead_listing_flows lf
+    dw_datamarts.lead_listing_flows lf
         ON dd.sk_date = lf.sk_qualified_date
         AND lf.sk_qualified_date > 0
 LEFT JOIN
@@ -415,7 +415,7 @@ SELECT
 FROM
     dw_public.dim_date dd
 JOIN
-    dw_datamarts_cross.lead_listing_flows lf
+    dw_datamarts.lead_listing_flows lf
         ON dd.sk_date = lf.sk_opportunity_date
         AND lf.sk_opportunity_date > 0
 LEFT JOIN

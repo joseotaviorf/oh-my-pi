@@ -10,7 +10,7 @@ WITH tp_status AS(
         city_group_first_activation,
         MAX(ts_start) OVER(PARTITION BY sk_client, city_group, month_start) AS last_status_start
     FROM
-        dw_datamarts_growth_cross.tenant_prospect_status AS tps
+        dw_datamarts.tenant_prospect_status AS tps
         JOIN dw_public.dim_date AS dd
             ON dd.sk_date BETWEEN sk_start_date
                                   AND COALESCE(CAST(sk_end_date AS INT), CAST(date_format(current_date(), 'yyyyMMdd') as INT))
@@ -310,7 +310,7 @@ events AS (
         COUNT(NULL) AS recovered_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
     FROM
-        dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand AS pmmd
+        dw_datamarts.sale_performance_marketing_metrics_demand AS pmmd
     LEFT JOIN 
         bps_monthly AS bps
             ON bps.sk_buyer = pmmd.sk_buyer
@@ -424,7 +424,7 @@ events AS (
         SUM(pmmd.recovered_tenant_prospects_target) AS recovered_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
     FROM
-        dw_datamarts_growth_cross.performance_marketing_metrics_demand AS pmmd
+        dw_datamarts.performance_marketing_metrics_demand AS pmmd
     LEFT JOIN 
         tps_monthly AS tps
             ON tps.sk_client = pmmd.sk_client

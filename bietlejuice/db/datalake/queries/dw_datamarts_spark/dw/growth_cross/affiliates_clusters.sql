@@ -27,7 +27,7 @@ metrics AS(
         dw_public.dim_user_affiliate AS dua
     LEFT JOIN date_month_range AS dt
         ON dt.month_start BETWEEN DATE_TRUNC('month', dua.ts_joined_program) AND current_date
-    LEFT JOIN dw_datamarts_cross.lead_listing_flows AS llf
+    LEFT JOIN dw_datamarts.lead_listing_flows AS llf
         ON dua.sk_user = llf.sk_user_lead_affiliate
     LEFT JOIN dw_public.dim_date AS dtl
         ON dtl.sk_date = llf.sk_lead_date

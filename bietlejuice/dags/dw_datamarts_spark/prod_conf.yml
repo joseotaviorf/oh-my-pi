@@ -57,9 +57,10 @@ dags:
     owner: Data Fintech
   growth:
     owner: Data Growth
-    cluster_name: databricks_10_4_med_general_cluster
+    cluster_name: databricks_10_4_max_memory_cluster
   growth_cross:
     owner: Data Growth
+    cluster_name: databricks_10_4_max_memory_cluster
   support_and_service:
     owner: Data SS
     load_to_redshift: True

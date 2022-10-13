@@ -60,7 +60,7 @@ base_act AS (
         TRIM(planning_mkt_level3) AS planning_mkt_level3,
         SUM(costs) AS cost_act
     FROM
-        dw_datamarts_growth_cross.marketing_demand_supply_branding_costs
+        dw_datamarts.marketing_demand_supply_branding_costs
     WHERE
         TRIM(business) = 'Rental'
         AND dt_cost BETWEEN DATE('2020-01-01')

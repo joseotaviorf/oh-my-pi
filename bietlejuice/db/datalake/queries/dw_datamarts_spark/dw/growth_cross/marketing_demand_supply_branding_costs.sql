@@ -196,7 +196,7 @@ affiliates AS (
                 'rent' AS business_context,
                 SUM(final_bonus_rent) AS cost
             FROM 
-                dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs
+                dw_datamarts.performance_marketing_cluster_promotional_bonus_costs
             WHERE final_bonus_rent > 0
             AND sk_date >= 20210701
             GROUP BY 1,2,3,4,5,6,7
@@ -217,7 +217,7 @@ affiliates AS (
                 'sale' AS business_context,
                 SUM(final_bonus_sale) AS cost
             FROM 
-                dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs
+                dw_datamarts.performance_marketing_cluster_promotional_bonus_costs
             WHERE final_bonus_sale > 0
             AND sk_date >= 20210701
             GROUP BY 1,2,3,4,5,6,7
@@ -869,7 +869,7 @@ supply_spinver_cost AS(
                 COUNT(DISTINCT (CASE WHEN llf.context_qualified = 'Sale' THEN llf.sk_house_listing_flow ELSE NULL END)) sale_qualified,
                 COUNT(DISTINCT (CASE WHEN llf.context_qualified = 'Hybrid' THEN llf.sk_house_listing_flow ELSE NULL END)) hybrid_qualified,
                 COUNT(DISTINCT llf.sk_house_listing_flow ) total_qualified
-            FROM dw_datamarts_cross.lead_listing_flows llf
+            FROM dw_datamarts.lead_listing_flows llf
             LEFT JOIN dw_public.dim_date dd
                 ON dd.sk_date = llf.sk_qualified_date
             LEFT JOIN dw_public.dim_region dr
