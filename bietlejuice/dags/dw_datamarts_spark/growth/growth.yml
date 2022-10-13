@@ -12,18 +12,9 @@
 growth:
   attribution_conversion_paths_demand: {}
   buyer_activation_events_combo: {}
-  casa_mineira_top_of_funnel_volumes_daily:
-    depends_on: 
-      - performance_marketing_metrics_imobiliaria_casa_mineira 
-      - performance_marketing_metrics_portal_casa_mineira
-  casa_mineira_top_of_funnel_volumes_monthly: 
-    depends_on: 
-      - performance_marketing_metrics_imobiliaria_casa_mineira 
-      - performance_marketing_metrics_portal_casa_mineira
-  casa_mineira_top_of_funnel_volumes_weekly: 
-    depends_on: 
-      - performance_marketing_metrics_imobiliaria_casa_mineira 
-      - performance_marketing_metrics_portal_casa_mineira
+  casa_mineira_top_of_funnel_volumes_daily: {}
+  casa_mineira_top_of_funnel_volumes_monthly: {}
+  casa_mineira_top_of_funnel_volumes_weekly: {}
   performance_marketing_metrics_imobiliaria_casa_mineira: {}
   performance_marketing_metrics_portal_casa_mineira: {}
   plaquinhas_houses: {}
