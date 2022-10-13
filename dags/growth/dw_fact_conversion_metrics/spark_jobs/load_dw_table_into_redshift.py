@@ -6,7 +6,7 @@ import boto3
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatabaseEnum, DWMetastoreService
-from bietlejuice.dags.dw_fact_conversion_metrics import DW_SCHEMA
+from dags.growth.dw_fact_conversion_metrics import DW_SCHEMA
 from bietlejuice.services import S3Service
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import PostgresClient, SparkClient

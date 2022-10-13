@@ -5,7 +5,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db import DWMetastoreService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import DatabricksConsumer
-from bietlejuice.dags.dw_fact_conversion_metrics import DW_SCHEMA
+from dags.growth.dw_fact_conversion_metrics import DW_SCHEMA
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
