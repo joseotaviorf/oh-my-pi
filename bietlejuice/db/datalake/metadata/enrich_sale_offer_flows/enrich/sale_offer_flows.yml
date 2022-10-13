@@ -260,8 +260,13 @@ columns:
       - datalake_sales_flow_clean.ccv_flow.ts_signed
   dt_sale_agreement_cancelled:
     lineage:
-      - datalake_sales_flow_clean.sales_flow.ts_caneceled
-      - datalake_sales_flow_clean.offer.ts_discarded
+      - datalake_sales_flow_clean.sales_flow_aud.ts_updated
+  dt_offer_rescued:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_aud.ts_updated
+  dt_sale_agreement_rescued:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_aud.ts_updated
   dt_onboarding_ended:
     lineage:
       - datalake_sales_flow_clean.sales_flow_aud.ts_updated

@@ -148,6 +148,7 @@ ccvs AS (
 
     SELECT
         o.id_offer,
+        o.id_sales_flow,
         lce.ts_signed,
         lce.ts_created
     FROM
@@ -472,45 +473,104 @@ tag AS (
 ),
 -- OFFER/SALE AGREEMENT RESCUE FLOW CTE
 rescue_flow AS (
-    WITH cancelation_history AS (
-      SELECT
+    WITH offers_history AS (
+        SELECT
+            id_sales_flow,
+            id_firestore AS id_offer,
+            MAX(ts_accepted) ts_last_offer_accepted,
+            MAX(ts_discarded) AS ts_last_offer_discarded,
+            IF(MAX(ts_accepted) > MAX(ts_discarded), True, False) AS is_a_rescued_offer
+        FROM
+            datalake_sales_flow_clean.offer_aud
+        GROUP BY 1, 2
+   ),
+   cancelation_history AS (
+        SELECT
             id,
             is_canceled,
-            LAG(is_canceled,1) OVER (PARTITION BY id ORDER BY ts_updated) AS last_cancelation_status,
-            ts_canceled AS ts_sale_agreement_canceled,
+            closing_canceled_reason,
+            LAG(is_canceled, 1) OVER (PARTITION BY id ORDER BY ts_updated) AS last_cancelation_status,
+            LAG(ts_updated, 1) OVER (PARTITION BY id ORDER BY ts_updated) AS ts_last_canceled,
             ts_updated
-      FROM
-        datalake_sales_flow_clean.sales_flow_aud
-      WHERE
-        mod_is_canceled = TRUE
+        FROM
+            datalake_sales_flow_clean.sales_flow_aud
+        QUALIFY
+            last_cancelation_status IS DISTINCT FROM is_canceled
+    ),
+    rescue_and_cancelation_status AS (
+        SELECT
+            id AS id_sales_flow,
+            closing_canceled_reason,
+            is_canceled,
+            CASE
+                WHEN is_canceled = FALSE AND last_cancelation_status = TRUE THEN TRUE
+            END AS is_a_rescue,
+            CASE
+                WHEN is_canceled = FALSE AND last_cancelation_status = TRUE THEN ts_updated
+            END AS ts_rescued,
+            ts_last_canceled,
+            ts_updated,
+            ccvs.ts_signed
+        FROM
+            cancelation_history AS ch
+        LEFT JOIN
+            ccvs
+                ON ch.id = ccvs.id_sales_flow
    ),
-
-   rescue_status AS (
-     SELECT
-         id,
-         is_canceled,
-         CASE
-           WHEN is_canceled = FALSE and last_cancelation_status = TRUE THEN TRUE
-         END AS is_a_rescue,
-         ts_sale_agreement_canceled,
-         CASE
-           WHEN is_canceled = FALSE and last_cancelation_status = TRUE THEN ts_updated
-         END AS ts_rescued,
-         ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS ROW
-     FROM
-         cancelation_history
-   )
-   SELECT
-         id AS id_sales_flow,
-         is_a_rescue,
-         ts_sale_agreement_canceled,
-         ts_rescued
-   FROM
-       rescue_status
-   WHERE
-       ROW = 1
+   canceled_ccvs AS (
+        SELECT
+            id_sales_flow,
+            CASE
+                WHEN closing_canceled_reason IS NOT NULL THEN ts_updated
+                ELSE NULL
+            END AS ts_sale_agreement_canceled,
+            ts_signed,
+            ts_rescued
+        FROM
+            rescue_and_cancelation_status
+        WHERE
+            is_canceled = TRUE
+            AND closing_canceled_reason IS NOT NULL
+        QUALIFY
+            ROW_NUMBER() OVER (PARTITION BY id_sales_flow ORDER BY ts_updated DESC) = 1
+   ),
+   rescued_offers AS (
+        SELECT
+            ofh.id_sales_flow,
+            ofh.id_offer,
+            ofh.is_a_rescued_offer,
+            ofh.ts_last_offer_discarded,
+            rcs.ts_rescued
+        FROM
+            offers_history AS ofh
+        INNER JOIN
+            rescue_and_cancelation_status AS rcs
+                ON rcs.id_sales_flow = ofh.id_sales_flow
+                AND ofh.ts_last_offer_discarded <= rcs.ts_last_canceled
+        WHERE
+            rcs.is_a_rescue = TRUE
+            AND closing_canceled_reason IS NULL
+        QUALIFY
+            ROW_NUMBER() OVER (PARTITION BY rcs.id_sales_flow ORDER BY rcs.ts_updated DESC) = 1
+     )
+        SELECT
+            sf.id AS id_sales_flow,
+            rof.id_offer,
+            rof.is_a_rescued_offer,
+            IF(c_ccvs.ts_signed > c_ccvs.ts_sale_agreement_canceled, True, False) AS is_a_rescued_ccv,
+            rof.ts_last_offer_discarded AS ts_offer_canceled,
+            c_ccvs.ts_sale_agreement_canceled,
+            rof.ts_rescued AS ts_offer_rescued,
+            c_ccvs.ts_rescued AS ts_sale_agreement_rescued
+        FROM
+            sales_flow AS sf
+        LEFT JOIN
+            rescued_offers AS rof
+                ON rof.id_sales_flow = sf.id
+        LEFT JOIN
+            canceled_ccvs AS c_ccvs
+                ON c_ccvs.id_sales_flow = sf.id
 )
-
 SELECT
     off.id_offer,
     sp.id_user_consultant,
@@ -660,31 +720,13 @@ SELECT
             ELSE NULL
     END
     ) AS is_ccv_canceled,
+    rf.is_a_rescued_ccv,
+    rf.is_a_rescued_offer,
     ccvf.dt_confection_started AS dt_sale_agreement_created,
     ccvf.dt_sale_agreement_signed AS dt_sale_agreement_signed,
-    COALESCE(
-        DATE(sf.ts_canceled),
-        CASE
-            WHEN sf.flow_step = 'CANCELED_CCV'
-            THEN DATE(off.ts_discarded)
-        END
-    ) AS dt_sale_agreement_cancelled,
-    CASE
-      WHEN rf.ts_sale_agreement_canceled IS NOT NULL AND rf.is_a_rescue = TRUE THEN TRUE
-      ELSE FALSE
-    END AS is_a_rescued_ccv,
-    CASE
-      WHEN rf.ts_sale_agreement_canceled IS NULL AND rf.is_a_rescue = TRUE THEN TRUE
-      ELSE FALSE
-    END AS is_a_rescued_offer,
-    CASE
-      WHEN rf.ts_sale_agreement_canceled IS NOT NULL AND rf.is_a_rescue = TRUE THEN DATE(rf.ts_rescued)
-      ELSE NULL
-    END AS dt_sale_agreement_rescued,
-    CASE
-      WHEN rf.ts_sale_agreement_canceled IS NULL AND rf.is_a_rescue = TRUE THEN DATE(rf.ts_rescued)
-      ELSE NULL
-    END AS dt_offer_rescued,
+    DATE(rf.ts_sale_agreement_canceled) AS dt_sale_agreement_cancelled,
+    DATE(rf.ts_offer_rescued) AS dt_offer_rescued,
+    DATE(rf.ts_sale_agreement_rescued) AS dt_sale_agreement_rescued,
     COALESCE(os.dt_onboarding_ended, o.dt_ended) AS dt_onboarding_ended,
     DATE(d.ts_buyer_sent) AS dt_diligence_buyer_sent_at,
     DATE(d.ts_seller_sent) AS dt_diligence_seller_sent_at,

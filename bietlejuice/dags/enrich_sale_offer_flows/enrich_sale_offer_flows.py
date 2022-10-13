@@ -3,7 +3,7 @@ import pendulum
 import os
 
 from airflow.utils.helpers import chain
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -38,14 +38,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 inner_dependencies = config_service.get_config("inner_dependencies")
 
-LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_ID
-)
-
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
