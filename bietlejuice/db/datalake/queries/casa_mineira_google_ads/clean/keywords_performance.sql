@@ -8,6 +8,7 @@ SELECT
     SMALLINT(metrics.clicks) AS clicks,
     metrics.costMicros AS cost,
     segments.device AS device,
+    segments.adNetworkType AS ad_network_type,
     INT(metrics.impressions) AS impressions,
     adGroupCriterion.keyword.matchType AS match_type,
     adGroupCriterion.keyword.text AS criteria,

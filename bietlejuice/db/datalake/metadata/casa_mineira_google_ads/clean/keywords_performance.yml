@@ -29,6 +29,9 @@ columns:
   device:
     lineage:
       - datalake_casa_mineira_google_ads_raw.keywords_performance.segments
+  ad_network_type:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance.segments
   impressions:
     lineage:
       - datalake_casa_mineira_google_ads_raw.keywords_performance.metrics

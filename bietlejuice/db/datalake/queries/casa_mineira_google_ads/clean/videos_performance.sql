@@ -8,6 +8,7 @@ SELECT
     metrics.clicks AS clicks,
     metrics.costMicros AS cost,
     segments.device AS device,
+    segments.adNetworkType AS ad_network_type,
     metrics.impressions AS impressions,
     customer.descriptiveName AS account_descriptive_name,
     account_snake_case,

@@ -3,7 +3,9 @@ WITH campaign_reports AS (
         campaign_name,
         id_campaign,
         ad_group_name,
-        report_type
+        report_type,
+        device,
+        ad_network_type
     FROM
         datalake_casa_mineira_google_ads_clean.ads_performance
     WHERE
@@ -15,7 +17,9 @@ WITH campaign_reports AS (
         campaign_name,
         id_campaign,
         ad_group_name,
-        report_type
+        report_type,
+        device,
+        ad_network_type
     FROM
         datalake_casa_mineira_google_ads_clean.keywords_performance
     WHERE
@@ -27,7 +31,9 @@ WITH campaign_reports AS (
         campaign_name,
         id_campaign,
         NULL AS ad_group_name,
-        report_type
+        report_type,
+        device,
+        ad_network_type
     FROM
         datalake_casa_mineira_google_ads_clean.campaigns_performance
     WHERE
@@ -39,7 +45,9 @@ WITH campaign_reports AS (
         campaign_name,
         id_campaign,
         ad_group_name,
-        report_type
+        report_type,
+        device,
+        ad_network_type
     FROM
         datalake_casa_mineira_google_ads_clean.videos_performance
     WHERE
@@ -52,6 +60,8 @@ report_type_mapping AS (
         campaign_name,
         id_campaign,
         ad_group_name,
+        device,
+        ad_network_type
         CASE
             WHEN (LOWER(campaign_name) LIKE '%discovery%'
                OR LOWER(campaign_name) LIKE '%smart%') 
@@ -67,7 +77,7 @@ report_type_mapping AS (
         END AS report_type
     FROM
         campaign_reports
-    GROUP BY 1, 2, 3
+    GROUP BY 1, 2, 3, 4, 5
 ),
 
 -- Joining selected report types to reports
@@ -83,11 +93,11 @@ keywords_metrics AS (
         NULL AS utm_content,
         gkpr.campaign_name AS utm_campaign,
         SUM(CASE
-            WHEN device = 'DESKTOP' THEN cost/1000000
+            WHEN gkpr.device = 'DESKTOP' THEN cost/1000000
             ELSE 0
         END) AS desktop_cost,
         SUM(CASE
-            WHEN device IN ('MOBILE', 'TABLET') THEN cost/1000000
+            WHEN gkpr.device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost,
@@ -100,6 +110,8 @@ keywords_metrics AS (
             ON rtm.campaign_name = gkpr.campaign_name
             AND rtm.ad_group_name = gkpr.ad_group_name
             AND rtm.report_type = 'KEYWORDS_PERFORMANCE_REPORT'
+            AND rtm.device = gkpr.device
+            AND rtm.ad_network_type = gkpr.ad_network_type
     WHERE
         dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
@@ -134,11 +146,11 @@ ads_metrics AS (
         STRING(id_ad) AS utm_content,
         gapr.campaign_name AS utm_campaign,
         SUM(CASE
-            WHEN device = 'DESKTOP' THEN cost/1000000
+            WHEN gapr.device = 'DESKTOP' THEN cost/1000000
             ELSE 0
         END) AS desktop_cost,
         SUM(CASE
-            WHEN device IN ('MOBILE', 'TABLET') THEN cost/1000000
+            WHEN gapr.device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost,
@@ -151,6 +163,8 @@ ads_metrics AS (
             ON rtm.campaign_name = gapr.campaign_name
             AND rtm.ad_group_name = gapr.ad_group_name
             AND rtm.report_type = 'AD_PERFORMANCE_REPORT'
+            AND rtm.device = gapr.device
+            AND rtm.ad_network_type = gapr.ad_network_type
     LEFT JOIN
         ad_type_flags ad_types
             ON ad_types.ad_type = gapr.ad_type
@@ -171,11 +185,11 @@ campaigns_metrics AS (
         NULL AS utm_content,
         gcpr.campaign_name AS utm_campaign,
         SUM(CASE
-            WHEN device = 'DESKTOP' THEN cost/1000000
+            WHEN gcpr.device = 'DESKTOP' THEN cost/1000000
             ELSE 0
         END) AS desktop_cost,
         SUM(CASE
-            WHEN device IN ('MOBILE', 'TABLET') THEN cost/1000000
+            WHEN gcpr.device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost,
@@ -187,6 +201,8 @@ campaigns_metrics AS (
         report_type_mapping rtm
             ON rtm.campaign_name = gcpr.campaign_name
             AND rtm.report_type = 'CAMPAIGN_PERFORMANCE_REPORT'
+            AND rtm.device = gcpr.device
+            AND rtm.ad_network_type = gcpr.ad_network_type
     WHERE
         dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
@@ -204,11 +220,11 @@ videos_metrics AS (
         NULL AS utm_content,
         gvpr.campaign_name AS utm_campaign,
         SUM(CASE
-            WHEN device = 'DESKTOP' THEN cost/1000000
+            WHEN gvpr.device = 'DESKTOP' THEN cost/1000000
             ELSE 0
         END) AS desktop_cost,
         SUM(CASE
-            WHEN device IN ('MOBILE', 'TABLET') THEN cost/1000000
+            WHEN gvpr.device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost,
@@ -221,6 +237,8 @@ videos_metrics AS (
             ON rtm.campaign_name = gvpr.campaign_name
             AND rtm.ad_group_name = gvpr.ad_group_name
             AND rtm.report_type = 'VIDEO_PERFORMANCE_REPORT'
+            AND rtm.device = gvpr.device
+            AND rtm.ad_network_type = gvpr.ad_network_type
     WHERE
         dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY

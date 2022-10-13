@@ -1,0 +1,10 @@
+---
+table_name: datalake_casa_mineira_google_ads_clean.campaigns_performance
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  campaign_name:
+    is_complete:
+  id_campaign:
+    is_complete:
+  report_type:
+    is_complete:
