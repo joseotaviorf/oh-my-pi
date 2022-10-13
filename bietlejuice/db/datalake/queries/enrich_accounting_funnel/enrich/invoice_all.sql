@@ -64,7 +64,9 @@ SELECT
     ELSE 'other'
   END AS account_type,    
   CASE 
-    WHEN (ROUND(-1.0*i.due_amount,2) > 0 OR (ROUND(-1.0*i.due_amount,2)=0 AND NOT(from_account_type = 'landlord' OR to_account_type= 'landlord') )) THEN 'receivable'
+    WHEN entry_type IN ('postponement', 'payment adjustment') AND (ie.from_account_type = 'landlord' OR ie.to_account_type = 'landlord') THEN 'payable'
+    WHEN entry_type IN ('postponement', 'payment adjustment') AND (ie.from_account_type = 'tenant' OR ie.to_account_type = 'tenant') THEN 'receivable'
+    WHEN (ROUND(-1.0*i.due_amount,2) > 0 OR (ROUND(-1.0*i.due_amount,2) = 0 AND NOT(from_account_type = 'landlord' OR to_account_type= 'landlord') )) THEN 'receivable'
     ELSE 'payable'
   END AS account_classification,  
   CASE
@@ -130,4 +132,5 @@ WHERE
     c.country_code = 'BR'
     AND c.status IN ('Ativo','Finalizado')
     AND ie.from_account_type IN ('contract', 'tenant','landlord')
-    AND ie.to_account_type IN ('contract', 'tenant','landlord')
+    AND ( (ie.to_account_type IN ('contract', 'tenant','landlord')) OR 
+        (ie.to_account_type = 'quinto andar' AND ie.entry_type in ('condominium' , 'condominium usage', 'condominium defaulting', 'condominium fine')) )
