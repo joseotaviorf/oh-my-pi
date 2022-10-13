@@ -1,0 +1,25 @@
+---
+database_name: dw_agent
+table_name: fact_daily_accredited_agent
+columns:
+  sk_date:
+    lineage:
+      - dw_public.dim_date.sk_date
+  sk_agent:
+    lineage:
+      - dw_agent.fact_agent_contract.sk_agent
+  sk_work_contract:
+    lineage:
+      - dw_agent.fact_agent_contract.sk_work_contract
+  sk_company:
+    lineage:
+      - dw_agent.fact_agent_contract.sk_company
+  year:
+    lineage:
+      - dw_public.dim_date.year
+  month:
+    lineage:
+      - dw_public.dim_date.month
+  day:
+    lineage:
+      - dw_public.dim_date.day

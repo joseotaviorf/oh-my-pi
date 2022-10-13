@@ -19,5 +19,6 @@ This pipeline produces the following output tables, fully:
 
 - `dim_work_contract`
 - `fact_agent_contract`
+- `fact_daily_accredited_agent`
 
 </details>

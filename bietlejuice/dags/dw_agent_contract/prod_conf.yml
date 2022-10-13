@@ -2,3 +2,20 @@
 inner_dependencies:
   fact_agent_contract:
     - dim_work_contract
+  fact_daily_accredited_agent:
+    - fact_agent_contract
+tables:
+  - table_name: fact_agent_contract
+    is_incremental: false
+  - table_name: dim_work_contract
+    is_incremental: false
+  - table_name: fact_daily_accredited_agent
+    is_incremental: true
+    partitions:
+      - year
+      - month
+      - day
+    dw_query_filters:
+      "year" : "{year}"
+      "month" : "{month}"
+      "day" : "{day}"

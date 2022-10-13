@@ -12,7 +12,6 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
@@ -82,18 +81,27 @@ task_group = DWTaskGroup(
 
 dw_staging_task_group = {}
 dw_task_group = {}
-tables = task_group._get_table_names_from_sql_files(layer=LayerEnum.DW)
+tables = config_service.get_config("tables")
 
 for table in tables:
-    dw_staging_task_group[table] = task_group.build_dw_staging_task_group(
-        table_name=table, is_incremental=False
+    table_name = table["table_name"]
+    is_incremental = table["is_incremental"]
+    partition_cols = table.get("partitions")
+    dw_query_filters = table.get("dw_query_filters")
+
+    dw_staging_task_group[table_name] = task_group.build_dw_staging_task_group(
+        table_name=table_name,
+        is_incremental=is_incremental,
+        partitions=partition_cols,
+        extra_query_template_params=dw_query_filters,
     )
 
-    dw_task_group[table] = task_group.build_dw_task_group(
-        table_name=table,
-        is_incremental=False,
+    dw_task_group[table_name] = task_group.build_dw_task_group(
+        table_name=table_name,
         spectrum_iam_role=SPECTRUM_IAM_ROLE,
-        has_load_to_redshift_task=True,
+        is_incremental=is_incremental,
+        partitions=partition_cols,
+        extra_query_template_params=dw_query_filters,
     )
 
 dw_task_group_boundaries = {}
