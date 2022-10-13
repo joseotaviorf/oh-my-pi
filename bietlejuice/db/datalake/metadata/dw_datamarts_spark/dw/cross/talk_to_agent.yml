@@ -4,7 +4,7 @@ table_name: talk_to_agent
 columns:
   tenant_id:
     lineage:
-      - datalake_amplitude_clean.events.id_user
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.id_user
   sk_house_listing:
     lineage:
       - dw_public.dim_house_listing.sk_house_listing

@@ -1,63 +1,68 @@
-with
-taxonomy_demand as (
-	with taxonomy_min_ids as (
-		select
-		  min(id) as id
-		from datalake_gsheets_clean.taxonomy_demand
-		where first_update_source = 'Inquilinos'
-		    and CAST(flg_via_reschedule AS STRING) = '0'
-		group by
-			lower(app_type),
-			lower(utm_source),
-			lower(utm_medium),
-			lower(branded),
-			lower(first_update_source),
-		        flg_via_reschedule
-	)
-	 select
-	    cast(td.id as bigint) as id,
-		td.app_type,
-		td.utm_source,
-		td.utm_medium,
-		td.branded,
-		td.Category as mkt_category,
-		td.Flow as mkt_flow,
-		td.Completion as mkt_completion,
-		td.Channel as mkt_channel,
-		td.Medium as mkt_medium,
-		td.Origin as mkt_origin,
-		td.Source as mkt_source,
-		td.Platform as mkt_platform
-	from datalake_gsheets_clean.taxonomy_demand td
-	join taxonomy_min_ids td_min
-		on td.id = td_min.id
+WITH taxonomy_demand AS (
+    WITH taxonomy_min_ids AS (
+	SELECT
+	    MIN(id) AS id
+	FROM 
+	    datalake_gsheets_clean.taxonomy_demand
+	WHERE 
+	    first_update_source = 'Inquilinos'
+	    AND CAST(flg_via_reschedule AS STRING) = '0'
+	GROUP BY
+	    LOWER(app_type),
+	    LOWER(utm_source),
+	    LOWER(utm_medium),
+	    LOWER(branded),
+	    LOWER(first_update_source),
+	    flg_via_reschedule
+)
+    SELECT
+        CAST(td.id AS BIGINT) AS id,
+        td.app_type,
+        td.utm_source,
+        td.utm_medium,
+        td.branded,
+        td.Category AS mkt_category,
+        td.Flow AS mkt_flow,
+        td.Completion AS mkt_completion,
+        td.Channel AS mkt_channel,
+        td.Medium AS mkt_medium,
+        td.Origin AS mkt_origin,
+        td.Source AS mkt_source,
+        td.Platform AS mkt_platform
+    FROM 
+        datalake_gsheets_clean.taxonomy_demand AS td
+    JOIN 
+        taxonomy_min_ids AS td_min
+            ON td.id = td_min.id
 ),
 
-tta_taxonomy as (
-    WITH
-    tta_raw as (
-        select distinct
-	        coalesce(cast(get_json_object(event_properties, '$.house_id') as integer), -1) as house,
-	        coalesce(cast(get_json_object(event_properties, '$.agent_id') as integer), -1) as agent,
-        	coalesce(cast(evt.id_user as integer), -1) as tenant,
-            get_json_object(user_properties, '$.utm_source') as utm_source,
-        	get_json_object(user_properties, '$.utm_medium') as utm_medium,
-        	get_json_object(user_properties, '$.utm_campaign') as utm_campaign,
-        	get_json_object(user_properties, '$.utm_term') as utm_term,
-        	get_json_object(user_properties, '$.utm_content') as utm_content,
-        	case when (UPPER(get_json_object(user_properties, '$.utm_campaign')) like '%BRANDED%'
-        					or UPPER(get_json_object(user_properties, '$.utm_campaign')) like '%INSTITUCIONAL%')
-        					and UPPER(get_json_object(user_properties, '$.utm_campaign')) not like '%NON-BRANDED%'
-        		 then 'Branded'
-        		 else 'Outro'
-        	end as branded,
-        	get_json_object(user_properties , '$.platform') as app_type,
-            cast(ts_event as timestamp) as event_timestamp
-        from datalake_amplitude_clean.events evt
-    	where event_type = 'piloto_cw_message_sent'
-			and ts_event > timestamp '2020-03-01 00:00'
+tta_taxonomy AS (
+    WITH tta_raw AS (
+        SELECT DISTINCT
+	    COALESCE(ep_id_house, -1) AS house,
+	    COALESCE(ep_id_agent, -1) AS agent,
+	    COALESCE(evt.id_user, -1) AS tenant,
+	    up_utm_source AS utm_source,
+	    up_utm_medium AS utm_medium,
+	    up_utm_campaign AS utm_campaign,
+	    up_utm_term AS utm_term,
+	    up_utm_content AS utm_content,
+	    CASE 
+	        WHEN (UPPER(up_utm_campaign) LIKE '%BRANDED%'
+					     OR UPPER(up_utm_campaign) LIKE '%INSTITUCIONAL%')
+				             AND UPPER(up_utm_campaign) NOT LIKE '%NON-BRANDED%'
+		    THEN 'Branded'
+	    	ELSE 'Outro'
+	    END AS branded,
+	    platform AS app_type,
+	    ts_event AS event_timestamp
+        FROM 
+            datalake_amplitude_clean.170698_piloto_cw_message_sent_events AS evt
+    	WHERE 
+            YEAR > 2020
+            OR (YEAR = 2020 AND MONTH >= 3)
     )
-    select
+    SELECT
         tta.house,
         tta.tenant,
         tta.agent,
@@ -77,210 +82,229 @@ tta_taxonomy as (
     	tta.utm_term,
     	tta.utm_content,
     	tta.event_timestamp,
-    	row_number() over(
-    					partition by tta.house, tta.tenant, tta.agent
-						order by event_timestamp
-						) as event_order
-    from tta_raw tta
-    left join taxonomy_demand td
-        on lower(coalesce(td.app_type,'')) = lower(coalesce(tta.app_type,''))
-    	and lower(coalesce(td.utm_source,'')) = lower(coalesce(tta.utm_source,''))
-    	and lower(coalesce(td.utm_medium,'')) = lower(coalesce(tta.utm_medium,''))
-    	and lower(coalesce(td.branded,'')) = lower(coalesce(tta.branded,''))
+    	ROW_NUMBER() OVER(
+    					PARTITION BY tta.house, tta.tenant, tta.agent
+						ORDER BY event_timestamp
+						) AS event_order
+    FROM 
+        tta_raw tta
+    LEFT JOIN 
+        taxonomy_demand AS td
+            ON LOWER(COALESCE(td.app_type,'')) = LOWER(COALESCE(tta.app_type,''))
+            AND LOWER(COALESCE(td.utm_source,'')) = LOWER(COALESCE(tta.utm_source,''))
+            AND LOWER(COALESCE(td.utm_medium,'')) = LOWER(COALESCE(tta.utm_medium,''))
+            AND LOWER(COALESCE(td.branded,'')) = LOWER(COALESCE(tta.branded,''))
 ),
 
--- Completed Talk to Agent accounting from Bookings (mainly before 2020/05/20)
-bookings_agent_tenant as(
-
-    select
-        cast(u.id as integer) as agent,
-        cast(id_visitor as integer) as tenant,
-        cast(id_property as integer) as house,
-        count(distinct db.sk_booking) as bookings_by_agent,
-        min(CAST(db.dt_created AS STRING)) as first_agent_booking_ts
-
-    from dw_public.dim_booking db
-    left join dw_public.dim_user u
-        on id_agent=CAST(u.dados_agente_id AS BIGINT)
-
-    where db.dt_created > DATE('2020-03-01') --After feature has started
-        and db.first_update_source='Corretores' --Bookings created by Agents
-
-        and u.id IS NOT NULL
-        and id_visitor IS NOT NULL
-        and id_property IS NOT NULL
-
-        --considering also "Agendamentos" when the Agent schedule a Visit
-        --and date_trunc('day',cast(db.dt_created as timestamp))=date_trunc('day',cast(db.dt_scheduling as timestamp)) --Bookings registered by Agents = they have the same created and scheduling day
-
-    group by 1,2,3 -- Only count one attendance for the triple agent-tenant-house
+-- Completed Talk to Agent accounting FROM Bookings (mainly before 2020/05/20)
+bookings_agent_tenant AS (
+    SELECT
+        CAST(u.id AS INTEGER) AS agent,
+        CAST(id_visitor AS INTEGER) AS tenant,
+        CAST(id_property AS INTEGER) AS house,
+        COUNT(distinct db.sk_booking) AS bookings_by_agent,
+        MIN(CAST(db.dt_created AS STRING)) AS first_agent_booking_ts
+    FROM 
+        dw_public.dim_booking db
+    LEFT JOIN 
+        dw_public.dim_user u
+            ON id_agent=CAST(u.dados_agente_id AS BIGINT)
+    WHERE 
+        db.dt_created > DATE('2020-03-01') --After feature has started
+        AND db.first_update_source='Corretores' --Bookings created by Agents
+        AND u.id IS NOT NULL
+        AND id_visitor IS NOT NULL
+        AND id_property IS NOT NULL
+        --considering also "Agendamentos" WHEN the Agent schedule a Visit
+        --and date_trunc('day',CAST(db.dt_created as timestamp))=date_trunc('day',CAST(db.dt_scheduling as timestamp)) --Bookings registered BY Agents = they have the same created and scheduling day
+    GROUP BY 
+        1,2,3 -- Only count one attendance for the triple agent-tenant-house
 ),
 
 -- Filter one version per listing
-listing as (
-    select cast(id_house as bigint) as id_house,
-        cast(max(sk_house_listing) as bigint) as sk_house_listing
-    from dw_public.dim_house_listing
-    where cast(sk_house_listing as STRING) > ''
-        and cast(id_house as STRING) > ''
-    group by 1),
+listing AS (
+    SELECT 
+        CAST(id_house AS BIGINT) AS id_house,
+        CAST(MAX(sk_house_listing) AS BIGINT) AS sk_house_listing
+    FROM 
+        dw_public.dim_house_listing
+    WHERE 
+        CAST(sk_house_listing AS STRING) > ''
+        AND CAST(id_house AS STRING) > ''
+    GROUP BY 
+        1
+),
 
--- Completed Talk to Agent accounting from AgentSupport (mainly after 2020/05/20)
-registered_tta as (
-    select
-        cast(u.id as integer) as agent,
-        cast(a.id_user as integer) as tenant,
-        cast(h.id_house as integer) as house,
-        count(*) as attendances_by_agent,
-        substr(cast(min(a.ts_created) as STRING),1,19) as first_agent_attendance_ts
-    from datalake_ebdb_clean.agent_support a --this one is not on clean yet
-    join datalake_ebdb_clean.listing_business_context bc
-        on bc.id = a.id_listing
-    join dw_public.dim_house_listing h
-        on bc.id_house = cast(h.id_house as bigint)
-    join dw_public.dim_user u
-        on cast(u.dados_agente_id as bigint) = a.id_agent
-    join listing l
-        on cast(h.sk_house_listing as bigint) = cast(l.sk_house_listing as bigint)
-    where cast(h.id_house as STRING) > ''
-        and u.dados_agente_id IS NOT NULL
-        and a.status = 'COMPLETE' --here at this stage of Prod. Dev. we want to account only for Completed Talk to Agents
-    group by 1,2,3 -- Only count one attendance for the triple agent-tenant-house
+-- Completed Talk to Agent accounting FROM AgentSupport (mainly after 2020/05/20)
+registered_tta AS (
+    SELECT
+        CAST(u.id AS INTEGER) AS agent,
+        CAST(a.id_user AS INTEGER) AS tenant,
+        CAST(h.id_house AS INTEGER) AS house,
+        COUNT(*) AS attendances_by_agent,
+        substr(CAST(MIN(a.ts_created) AS STRING),1,19) AS first_agent_attendance_ts
+    FROM 
+        datalake_ebdb_clean.agent_support AS a --this one is not on clean yet
+    JOIN 
+        datalake_ebdb_clean.listing_business_context AS bc
+            ON bc.id = a.id_listing
+    JOIN 
+        dw_public.dim_house_listing AS h
+            ON bc.id_house = CAST(h.id_house AS BIGINT)
+    JOIN 
+        dw_public.dim_user AS u
+            ON CAST(u.dados_agente_id AS BIGINT) = a.id_agent
+    JOIN 
+        listing AS l
+            ON CAST(h.sk_house_listing AS BIGINT) = CAST(l.sk_house_listing AS BIGINT)
+    WHERE 
+        CAST(h.id_house AS STRING) > ''
+        AND u.dados_agente_id IS NOT NULL
+        AND a.status = 'COMPLETE' --here at this stage of Prod. Dev. we want to account only for Completed Talk to Agents
+    GROUP BY 
+        1,2,3 -- Only count one attendance for the triple agent-tenant-house
 ),
 
 
 -- Completed Talk to Agent (everything)
-talk_to_agent_completed as (
-
-    select
-        coalesce(b.agent,t.agent) as agent,
-        coalesce(b.tenant,t.tenant) as tenant,
-        coalesce(b.house,t.house) as house,
-
-        max(b.bookings_by_agent) as bookings_by_agent,
-        max(t.attendances_by_agent) as attendances_by_agent,
-
-        min(coalesce(b.first_agent_booking_ts,t.first_agent_attendance_ts)) as first_attendance_ts,
-
-        min(b.first_agent_booking_ts) as first_agent_booking_ts,
-        min(t.first_agent_attendance_ts) as first_agent_attendance_ts
-
-    from bookings_agent_tenant b
-    full outer join registered_tta t
-        on b.agent=t.agent
-        and b.tenant=t.tenant
-        and b.house=t.house
-
-    group by 1,2,3
+talk_to_agent_completed AS (
+    SELECT
+        COALESCE(b.agent,t.agent) AS agent,
+        COALESCE(b.tenant,t.tenant) AS tenant,
+        COALESCE(b.house,t.house) AS house,
+        MAX(b.bookings_by_agent) AS bookings_by_agent,
+        MAX(t.attendances_by_agent) AS attendances_by_agent,
+        MIN(COALESCE(b.first_agent_booking_ts,t.first_agent_attendance_ts)) AS first_attendance_ts,
+        MIN(b.first_agent_booking_ts) AS first_agent_booking_ts,
+        MIN(t.first_agent_attendance_ts) AS first_agent_attendance_ts
+    FROM 
+        bookings_agent_tenant AS b
+    FULL OUTER JOIN
+        registered_tta AS t
+            ON b.agent=t.agent
+            AND b.tenant=t.tenant
+            AND b.house=t.house
+    GROUP BY 
+        1,2,3
 ),
 
 --Listing region code
-house_properties as(
-    select h.id as sk_house_listing,
+house_properties AS(
+    SELECT 
+        h.id AS sk_house_listing,
         r.region_code
-    from datalake_ebdb_clean.house h
-    left join dw_public.dim_region r
-        on cast(r.id as bigint)=h.id_region
+    FROM 
+        datalake_ebdb_clean.house AS h
+    LEFT JOIN 
+        dw_public.dim_region AS r
+            ON CAST(r.id AS BIGINT)=h.id_region
 ),
 
 -- Events (current registry for every Talk to Agent started)
-events as(
-    select
-        cast(get_json_object(event_properties, '$.house_id') as integer) as house_id,
-        cast(get_json_object(event_properties, '$.agent_id') as integer) as agent_id,
-        cast(id_user as integer) as tenant_id,
-        min(nullif(substr(cast(ts_event as STRING),1,19),'')) as first_message_ts,
-        array_join(collect_list(replace(trim(substr(regexp_extract(replace(regexp_replace(get_json_object(event_properties, '$.message_content'),'\n',' '),'''',' '),'(?<=(([0-9]{{9}}))).*', 0),3)), 'omprar.', '')),' + ') as message,
-        count(*) as count_messages
-
-    from datalake_amplitude_clean.events
-    where event_type = 'piloto_cw_message_sent'
-
-        and ts_event > timestamp '2020-03-01 00:00'
-
-    group by 1,2,3
+events AS(
+    SELECT
+        ep_id_house AS house_id,
+        ep_id_agent AS agent_id,
+        id_user AS tenant_id,
+        MIN(NULLIF(substr(CAST(ts_event AS STRING),1,19),'')) AS first_message_ts,
+        ARRAY_JOIN(COLLECT_LIST(REPLACE(TRIM(SUBSTR(REGEXP_EXTRACT(REPLACE(REGEXP_REPLACE(ep_message_content,'\n',' '),'''',' '),'(?<=(([0-9]{{9}}))).*', 0),3)), 'omprar.', '')), '+') AS message,
+        COUNT(*) AS count_messages
+    FROM 
+        datalake_amplitude_clean.170698_piloto_cw_message_sent_events AS evt
+    WHERE
+        YEAR > 2020
+        OR (YEAR = 2020 AND MONTH >= 3)
+    GROUP BY 
+        1,2,3
 ),
 
 --putting everything together
-final as(
-
-select
-    e.agent_id,
-    e.tenant_id,
-    e.house_id,
-    m.sk_house_listing,
-    case when t.first_attendance_ts is null then false else true end as attended,
-    e.message,
-    u.nome as tenant_name,
-    u.telefone_principal as tenant_phone,
-    u.email as tenant_email,
-    count_messages as msg_sent,
-
-case when t.first_attendance_ts is null then 1.00*FLOOR(unix_timestamp(current_timestamp - interval 3 hours) - unix_timestamp(cast(e.first_message_ts as timestamp)) / 60)/60 end as delta_hours_elapsed,
-case when t.first_attendance_ts is not null then 1.00*FLOOR(unix_timestamp(cast(t.first_attendance_ts as timestamp)) - unix_timestamp(cast(e.first_message_ts as timestamp)) / 60)/60 else null end as delta_hours_attended,
-h.region_code,
-
-    case when sa.id is null then 'RENT' else 'SALE' end as business_context,
-
-    e.first_message_ts,
-    t.bookings_by_agent,
-    t.attendances_by_agent,
-    t.first_attendance_ts,
-
-    coalesce(mkt.app_type, '') as app_type,
-	coalesce(mkt.utm_source, '') as utm_source,
-	coalesce(mkt.utm_medium, '') as utm_medium,
-	coalesce(mkt.branded, '') as branded,
-	coalesce(mkt.mkt_category, 'Not Mapped') as mkt_category,
-	coalesce(mkt.mkt_flow, 'Not Mapped') as mkt_flow,
-	coalesce(mkt.mkt_completion, 'Not Mapped') as mkt_completion,
-	coalesce(mkt.mkt_origin, 'Not Mapped') as mkt_origin,
-	coalesce(mkt.mkt_channel, 'Not Mapped') as mkt_channel,
-	coalesce(mkt.mkt_medium, 'Not Mapped') as mkt_medium,
-	coalesce(mkt.mkt_source, 'Not Mapped') as mkt_source,
-	coalesce(mkt.mkt_platform, 'Not Mapped') as mkt_platform,
-	coalesce(mkt.utm_campaign, '') as utm_campaign,
-	coalesce(mkt.utm_term, '') as utm_term,
-	coalesce(mkt.utm_content, '') as utm_content
-
-from events e
-
-left join talk_to_agent_completed t
-    on t.tenant=e.tenant_id
-    and t.agent=e.agent_id
-    and t.house=e.house_id
-
-left join dw_public.dim_user u
-    on u.id=e.tenant_id
-
-left join house_properties h
-    on cast(h.sk_house_listing as integer) = e.house_id
-
--- identifies the agent context with the booleans columns in user dimension: is_sale_agent
-left join dw_public.dim_user sa
-    on CAST(e.agent_id AS INTEGER) = cast(sa.id as integer)
-    and sa.is_sale_agent
-
--- version of the moment the tenant has sent the message
-join dw_public.dim_house_listing m
-    on e.house_id = cast(nullif(cast(m.id_house as STRING),'') as bigint)
-    and cast(ts_listing_version_start as STRING) <  e.first_message_ts
-    and (cast(ts_listing_version_end as STRING)='' or cast(ts_listing_version_end as STRING) > e.first_message_ts)
-
--- marketing taxonomy
-join tta_taxonomy mkt
-    on mkt.tenant = coalesce(e.tenant_id, -1)
-    and mkt.agent = coalesce(e.agent_id, -1)
-    and mkt.house = coalesce(e.house_id, -1)
-    and event_order = 1
-
-)
-
+final AS(
+    SELECT
+        e.agent_id,
+        e.tenant_id,
+        e.house_id,
+        m.sk_house_listing,
+        CASE 
+            WHEN t.first_attendance_ts IS NULL 
+                THEN false 
+            ELSE true 
+        END AS attended,
+        e.message,
+        u.nome AS tenant_name,
+        u.telefone_principal AS tenant_phone,
+        u.email AS tenant_email,
+        count_messages AS msg_sent,
+        CASE 
+            WHEN t.first_attendance_ts IS NULL 
+                THEN 1.00*FLOOR((unix_timestamp(current_timestamp - interval 3 hours) - unix_timestamp(CAST(e.first_message_ts AS TIMESTAMP))) / 60)/60 
+        END AS delta_hours_elapsed,
+        CASE 
+            WHEN t.first_attendance_ts IS NOT NULL 
+                THEN 1.00*FLOOR((unix_timestamp(CAST(t.first_attendance_ts AS TIMESTAMP)) - unix_timestamp(CAST(e.first_message_ts AS TIMESTAMP))) / 60)/60 
+            ELSE NULL 
+        END AS delta_hours_attended,
+        h.region_code,
+        CASE 
+            WHEN sa.id IS NULL 
+                THEN 'RENT' 
+            ELSE 'SALE' 
+        END AS business_context,
+        e.first_message_ts,
+        t.bookings_by_agent,
+        t.attendances_by_agent,
+        t.first_attendance_ts,
+        COALESCE(mkt.app_type, '') AS app_type,
+        COALESCE(mkt.utm_source, '') AS utm_source,
+        COALESCE(mkt.utm_medium, '') AS utm_medium,
+        COALESCE(mkt.branded, '') AS branded,
+        COALESCE(mkt.mkt_category, 'Not Mapped') AS mkt_category,
+        COALESCE(mkt.mkt_flow, 'Not Mapped') AS mkt_flow,
+        COALESCE(mkt.mkt_completion, 'Not Mapped') AS mkt_completion,
+        COALESCE(mkt.mkt_origin, 'Not Mapped') AS mkt_origin,
+        COALESCE(mkt.mkt_channel, 'Not Mapped') AS mkt_channel,
+        COALESCE(mkt.mkt_medium, 'Not Mapped') AS mkt_medium,
+        COALESCE(mkt.mkt_source, 'Not Mapped') AS mkt_source,
+        COALESCE(mkt.mkt_platform, 'Not Mapped') AS mkt_platform,
+        COALESCE(mkt.utm_campaign, '') AS utm_campaign,
+        COALESCE(mkt.utm_term, '') AS utm_term,
+        COALESCE(mkt.utm_content, '') AS utm_content
+    FROM 
+        events AS e
+    LEFT JOIN 
+        talk_to_agent_completed AS t
+            ON t.tenant=e.tenant_id
+            AND t.agent=e.agent_id
+            AND t.house=e.house_id
+    LEFT JOIN 
+        dw_public.dim_user AS u
+            ON u.id=e.tenant_id
+    LEFT JOIN 
+        house_properties AS h
+            ON CAST(h.sk_house_listing AS INTEGER) = e.house_id
+    -- identifies the agent context with the booleans columns in user dimension: is_sale_agent
+    LEFT JOIN 
+        dw_public.dim_user AS sa
+            ON CAST(e.agent_id AS INTEGER) = CAST(sa.id AS INTEGER)
+            AND sa.is_sale_agent
+    -- version of the moment the tenant has sent the message
+    JOIN 
+        dw_public.dim_house_listing AS m
+            ON e.house_id = CAST(NULLIF(CAST(m.id_house AS STRING),'') AS BIGINT)
+            AND CAST(ts_listing_version_start AS STRING) <  e.first_message_ts
+            AND (CAST(ts_listing_version_end AS STRING)='' OR CAST(ts_listing_version_end AS STRING) > e.first_message_ts)
+    -- marketing taxonomy
+    JOIN 
+        tta_taxonomy AS mkt
+            ON mkt.tenant = COALESCE(e.tenant_id, -1)
+            AND mkt.agent = COALESCE(e.agent_id, -1)
+            AND mkt.house = COALESCE(e.house_id, -1)
+            AND event_order = 1
+    )
 
 -- validator
---select count(*) as total_tta, count(case when attended=true then 1 end) as total_attended, count(case when bookings_by_agent>0 then 1 end) as bookings_by_agent,count(case when attendances_by_agent>0 then 1 end) as attendances_by_agent  from final
-
-select
+--SELECT count(*) as total_tta, count(CASE WHEN attended=true THEN 1 end) as total_attended, count(CASE WHEN bookings_by_agent>0 THEN 1 end) as bookings_by_agent,count(CASE WHEN attendances_by_agent>0 THEN 1 end) as attendances_by_agent  FROM final
+SELECT
     CAST(agent_id AS STRING) AS agent_id,
     CAST(tenant_id AS STRING) AS tenant_id,
     CAST(house_id AS STRING) AS house_id,
@@ -299,9 +323,9 @@ select
     CAST(bookings_by_agent AS STRING) AS bookings_by_agent,
     CAST(attendances_by_agent AS STRING) AS attendances_by_agent,
     CAST(first_attendance_ts AS STRING) AS first_attendance_ts,
-    CAST(app_type AS STRING) AS app_type,
-    CAST(utm_source AS STRING) AS utm_source,
-    CAST(utm_medium AS STRING) AS utm_medium,
+    NULLIF(CAST(app_type AS STRING), "") AS app_type,
+    NULLIF(CAST(utm_source AS STRING), "") AS utm_source,
+    NULLIF(CAST(utm_medium AS STRING), "") AS utm_medium,
     CAST(branded AS STRING) AS branded,
     CAST(mkt_category AS STRING) AS mkt_category,
     CAST(mkt_flow AS STRING) AS mkt_flow,
@@ -311,9 +335,9 @@ select
     CAST(mkt_medium AS STRING) AS mkt_medium,
     CAST(mkt_source AS STRING) AS mkt_source,
     CAST(mkt_platform AS STRING) AS mkt_platform,
-    CAST(utm_campaign AS STRING) AS utm_campaign,
-    CAST(utm_term AS STRING) AS utm_term,
-    CAST(utm_content AS STRING) AS utm_content,
+    NULLIF(CAST(utm_campaign AS STRING), "") AS utm_campaign,
+    NULLIF(CAST(utm_term AS STRING), "") AS utm_term,
+    NULLIF(CAST(utm_content AS STRING), "") AS utm_content,
     CAST(NOW() AS STRING) AS ts_load
-from
+FROM
     final
