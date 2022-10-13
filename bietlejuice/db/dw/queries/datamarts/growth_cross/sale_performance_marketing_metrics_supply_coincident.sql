@@ -48,12 +48,14 @@ costs_targets_results_combined AS (
     COUNT(DISTINCT CASE WHEN sk_lead_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS leads,
     COUNT(NULL) AS prospects,
     COUNT(NULL) AS qualifieds,
+    COUNT(NULL) AS available_qualifieds,
     COUNT(NULL) AS opportunities,
     COUNT(NULL) AS first_listings,
     COUNT(NULL) AS hybrid_listings,
     SUM(0::FLOAT) AS cost,
     SUM(0::FLOAT) AS prospects_target,
     SUM(0::FLOAT) AS qualifieds_target,
+    SUM(0::FLOAT) AS available_qualifieds_target,
     SUM(0::FLOAT) AS opportunities_target,
     SUM(0::FLOAT) AS first_listings_target,
     SUM(0::FLOAT) AS budget
@@ -104,12 +106,14 @@ UNION ALL
         COUNT(NULL) AS leads,
         COUNT(DISTINCT CASE WHEN sk_prospect_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(0::FLOAT) AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -160,12 +164,14 @@ UNION ALL
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(DISTINCT CASE WHEN sk_qualified_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(0::FLOAT) AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -179,6 +185,64 @@ UNION ALL
             ON p.id_reference = f.sk_lead
     WHERE
         f.sk_qualified_date > 0
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+
+UNION ALL
+
+  --------------------------------------
+  -- Supply ForSale Available Qualifieds Volume --
+  --------------------------------------
+    SELECT
+        f.sk_available_qualified_date AS sk_date,
+		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
+		CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+		    ELSE COALESCE(f.mkt_origin,'')
+        END AS mkt_origin,
+		COALESCE(f.mkt_channel,'') AS mkt_channel,
+		COALESCE(f.mkt_medium,'') AS mkt_medium,
+		CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+		    ELSE COALESCE(f.mkt_source,'')
+	    END AS mkt_source,
+		COALESCE(dl.utm_campaign,'') AS utm_campaign,
+		COALESCE(dl.utm_content,'') AS utm_content,
+		COALESCE(dl.utm_term,'') AS utm_term,
+		COALESCE(p.origin_phone,'') AS origin_phone,
+        CASE
+            WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate IN (912255, 360754, 1711931, 2257503)
+                THEN 'Sale'
+            WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) LIKE '%hybrid%'
+                THEN 'Hybrid'
+            WHEN ((dl.utm_campaign IS NULL OR dl.utm_campaign = '') AND LOWER(f.mkt_channel) NOT LIKE '%paid%') OR (LOWER(dl.utm_campaign) LIKE '%branded%' AND LOWER(dl.utm_campaign) NOT LIKE '%non-branded%')
+                THEN 'Organic'
+            ELSE 'Rental'
+        END AS campaign_context,
+        'Sale' AS business_context,
+        COUNT(NULL) AS leads,
+        COUNT(NULL) AS prospects,
+        COUNT(NULL) AS qualifieds,
+        COUNT(DISTINCT CASE WHEN sk_available_qualified_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS available_qualifieds,
+        COUNT(NULL) AS opportunities,
+        COUNT(NULL) AS first_listings,
+        COUNT(NULL) AS hybrid_listings,
+        SUM(0::FLOAT) AS cost,
+        SUM(0::FLOAT) AS prospects_target,
+        SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
+        SUM(0::FLOAT) AS opportunities_target,
+        SUM(0::FLOAT) AS first_listings_target,
+        SUM(0::FLOAT) AS budget
+    FROM
+        sale.fact_listing_flows AS f
+        JOIN dim_lead AS dl
+            ON dl.sk_lead = f.sk_lead
+        JOIN dim_region AS dr
+            ON f.sk_region = dr.sk_region
+        LEFT JOIN datalake_wololo_clean_prod.prospect p
+            ON p.id_reference = f.sk_lead
+    WHERE
+        f.sk_available_qualified_date > 0
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
 UNION ALL
@@ -216,12 +280,14 @@ UNION ALL
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(DISTINCT CASE WHEN sk_opportunity_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(0::FLOAT) AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -272,12 +338,14 @@ UNION ALL
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(DISTINCT CASE WHEN f.sk_first_listing_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS first_listings,
         COUNT(DISTINCT CASE WHEN lr.id_house IS NOT NULL THEN f.sk_house_listing_flow ELSE NULL END) AS hybrid_listings,
         SUM(0::FLOAT) AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -575,12 +643,14 @@ affiliates AS (
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(costs)::FLOAT AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -605,12 +675,14 @@ affiliates AS (
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(costs)::FLOAT AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -635,12 +707,14 @@ affiliates AS (
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(co.cost)::FLOAT AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -669,12 +743,14 @@ affiliates AS (
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(co.cost)::FLOAT AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -701,12 +777,14 @@ affiliates AS (
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(co.cost)::FLOAT AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -754,12 +832,14 @@ UNION ALL
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(0::FLOAT) AS cost,
         SUM(str.prospects) AS prospects_target,
         SUM(str.qualifieds) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(str.cost_per_source) AS budget
@@ -798,12 +878,14 @@ UNION ALL
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(0::FLOAT) AS cost,
         SUM(CAST(REPLACE(str.prospects,',','') AS FLOAT8)) AS prospects_target,
         SUM(CAST(REPLACE(str.qualifieds,',','') AS FLOAT8)) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -850,12 +932,14 @@ UNION ALL
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(0::FLOAT) AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(CAST(REPLACE(str.opportunities,',','') AS FLOAT8)) AS opportunities_target,
         SUM(CAST(REPLACE(str.first_listings,',','') AS FLOAT8)) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -895,12 +979,14 @@ UNION ALL
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS available_qualifieds,
         COUNT(NULL) AS opportunities,
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(0::FLOAT) AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS available_qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(CAST(REPLACE(sct.monthly_budget,',','') AS FLOAT8)) AS budget
@@ -952,12 +1038,14 @@ SELECT
     SUM(leads) AS leads,
     SUM(prospects) AS prospects,
     SUM(qualifieds) AS qualifieds,
+    SUM(available_qualifieds) AS available_qualifieds,
     SUM(opportunities) AS opportunities,
     SUM(first_listings) AS first_listings,
     SUM(hybrid_listings) AS hybrid_listings,
     SUM(CAST(cost AS FLOAT8)) AS cost,
     SUM(CAST(prospects_target AS FLOAT8)) AS prospects_target,
     SUM(CAST(qualifieds_target AS FLOAT8)) AS qualifieds_target,
+    SUM(CAST(available_qualifieds_target AS FLOAT8)) AS available_qualifieds_target,
     SUM(CAST(opportunities_target AS FLOAT8)) AS opportunities_target,
     SUM(CAST(first_listings_target AS FLOAT8)) AS first_listings_target,
     SUM(CAST(budget AS FLOAT8)) AS budget
