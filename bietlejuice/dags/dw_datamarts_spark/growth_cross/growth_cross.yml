@@ -26,7 +26,6 @@ growth_cross:
   marketing_demand_supply_branding_costs: 
     depends_on: 
       - performance_marketing_cluster_promotional_bonus_costs
-      - performance_marketing_promotional_bonus_costs_daily
   performance_marketing_cluster_promotional_bonus:
     depends_on: 
       - affiliates_clusters
@@ -55,12 +54,10 @@ growth_cross:
     depends_on: 
       - performance_marketing_cluster_promotional_bonus_costs 
       - daily_target_volumes_supply
-      - performance_marketing_promotional_bonus_costs_daily
   sale_performance_marketing_metrics_demand: {}
   sale_performance_marketing_metrics_supply_coincident: 
     depends_on: 
       - performance_marketing_cluster_promotional_bonus_costs
-      - performance_marketing_promotional_bonus_costs_daily
   tenant_prospect_status: 
     depends_on: 
       - rent_flow_interactions
@@ -88,7 +85,6 @@ growth_cross:
   unique_performance_marketing_metrics_supply_coincident:
     depends_on: 
       - performance_marketing_cluster_promotional_bonus_costs 
-      - performance_marketing_promotional_bonus_costs_daily
       - daily_target_volumes_supply
   unique_supply_cohort_conversions: {}
   unique_supply_events_funnel: {}
