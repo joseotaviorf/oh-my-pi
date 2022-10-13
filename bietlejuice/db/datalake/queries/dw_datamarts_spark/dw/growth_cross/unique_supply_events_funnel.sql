@@ -127,7 +127,7 @@ SELECT
 	lf.rental_administrator,
 	sales_company,
 	sourcing_ops,
-	context_qualified AS context,
+	context_available_qualified AS context,
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
