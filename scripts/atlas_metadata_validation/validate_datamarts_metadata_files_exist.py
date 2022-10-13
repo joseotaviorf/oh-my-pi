@@ -25,8 +25,6 @@ SKIP_LIST = {
         "lead_listing_flows",
         "buyer_prospect_status",
         "quintoandar_consultant_listings",
-        "houses_3p",
-        "agents_3p",
     },
     "dw_datamarts/growth": {
         "performance_marketing_metrics_supply",
