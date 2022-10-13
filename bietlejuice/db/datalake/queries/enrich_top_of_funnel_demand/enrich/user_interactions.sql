@@ -47,6 +47,8 @@ filtered_events AS (
     SELECT DISTINCT
         COALESCE(business_context, 'rent') AS business_context,
         COALESCE(CAST(ep_house_id AS STRING), top5_house_id[1]) AS id_house,
+        entrance_uri,
+        referrer,
         utm_source,
         utm_medium,
         utm_campaign,
@@ -99,6 +101,8 @@ SELECT
     COALESCE(td.mkt_source, 'Not Mapped') AS mkt_source,
     COALESCE(td.mkt_platform, 'Not Mapped') AS mkt_platform,
     evt.business_context,
+    evt.entrance_uri,
+    evt.referrer,
     evt.app_type,
     evt.utm_source,
     evt.utm_medium,

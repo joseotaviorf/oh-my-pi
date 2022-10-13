@@ -11,6 +11,8 @@ SELECT
   GET_JSON_OBJECT(user_properties, '$.utm_term') AS utm_term,
   GET_JSON_OBJECT(user_properties, '$.utm_content') AS utm_content,
   GET_JSON_OBJECT(user_properties , '$.platform') AS up_platform,
+  GET_JSON_OBJECT(user_properties, '$.entrance_uri') AS entrance_uri,
+  GET_JSON_OBJECT(user_properties, '$.referrer') AS referrer,
   CASE WHEN GET_JSON_OBJECT(event_properties , '$.top5_house_id') <> '[]'
     THEN SPLIT(REGEXP_REPLACE(GET_JSON_OBJECT(event_properties , '$.top5_house_id'), '\\[|\\]|\\"', ''), ',')
     ELSE NULL

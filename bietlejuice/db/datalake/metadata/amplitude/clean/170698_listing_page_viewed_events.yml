@@ -191,7 +191,13 @@ columns:
   utm_content:
     lineage:
       - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.user_properties
-  up_platform:
+  entrance_uri:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.user_properties
+  utm_content:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.user_properties
+  referrer:
     lineage:
       - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.user_properties
   top5_house_id:

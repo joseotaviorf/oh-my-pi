@@ -45,6 +45,12 @@ columns:
   business_context:
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.business_context
+  entrance_uri:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.entrance_uri
+  referrer:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.referrer
   app_type:
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.up_platform

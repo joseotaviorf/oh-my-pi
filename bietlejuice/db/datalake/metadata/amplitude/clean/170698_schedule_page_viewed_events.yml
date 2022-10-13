@@ -188,6 +188,12 @@ columns:
   utm_content:
     lineage:
       - datalake_amplitude_clean_staging.170698_schedule_page_viewed_events.user_properties
+  entrance_uri:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_schedule_page_viewed_events.user_properties
+  referrer:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_schedule_page_viewed_events.user_properties
   up_platform:
     lineage:
       - datalake_amplitude_clean_staging.170698_schedule_page_viewed_events.user_properties
