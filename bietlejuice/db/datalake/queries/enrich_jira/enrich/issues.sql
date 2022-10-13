@@ -1,5 +1,5 @@
 WITH record_selection AS (
-    SELECT 
+    SELECT
         key AS id_issue,
         GET_JSON_OBJECT(fields,'$.parent.key') AS id_parent_issue,
         GET_JSON_OBJECT(fields, '$.project.id') AS id_project,
@@ -27,7 +27,7 @@ WITH record_selection AS (
         GET_JSON_OBJECT(fields, '$.customfield_12078.value') AS incident_owner,
         FROM_JSON(GET_JSON_OBJECT(fields, '$.labels'), 'array<string>') AS labels,
         FROM_JSON(
-            GET_JSON_OBJECT(fields, '$.customfield_10115'), 
+            GET_JSON_OBJECT(fields, '$.customfield_10115'),
             'array<struct<
                 id:int,
                 name:string,
@@ -40,6 +40,7 @@ WITH record_selection AS (
             >>'
         ) AS cycles,
         CAST(GET_JSON_OBJECT(fields, '$.customfield_10117') AS DOUBLE) AS story_points,
+        CAST(GET_JSON_OBJECT(fields,'$.customfield_10508') AS DOUBLE) AS story_points_estimate,
         GET_JSON_OBJECT(fields, '$.customfield_10400[0].value') IS NOT NULL AS is_flagged,
         CAST(GET_JSON_OBJECT(fields, '$.customfield_10503') AS TIMESTAMP) AS dt_started,
         CAST(REPLACE(GET_JSON_OBJECT(fields,'$.created'), '-0300', '') AS TIMESTAMP) AS ts_created,
@@ -52,15 +53,15 @@ WITH record_selection AS (
                 WHEN GET_JSON_OBJECT(fields, '$.resolutiondate') IS NULL
                 AND GET_JSON_OBJECT(fields, '$.status.statusCategory.name') = 'Done'
                     THEN GET_JSON_OBJECT(fields, '$.statuscategorychangedate')
-                ELSE 
+                ELSE
                     GET_JSON_OBJECT(fields,'$.resolutiondate')
             END, '-0300', ''
         ) AS TIMESTAMP) AS ts_resolved,
         ROW_NUMBER() OVER (PARTITION BY key ORDER BY GET_JSON_OBJECT(fields,'$.updated') DESC) AS row_num
-    FROM 
+    FROM
         datalake_jira_clean.issues
 )
-SELECT 
+SELECT
     id_issue,
     id_parent_issue,
     id_project,
@@ -81,6 +82,7 @@ SELECT
     labels,
     cycles,
     story_points,
+    story_points_estimate,
     is_flagged,
     dt_started,
     ts_created,

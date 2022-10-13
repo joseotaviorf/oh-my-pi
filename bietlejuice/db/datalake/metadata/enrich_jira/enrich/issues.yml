@@ -62,6 +62,9 @@ columns:
   story_points:
     lineage:
       - datalake_jira_clean.issues.fields
+  story_points_estimate:
+    lineage:
+      - datalake_jira_clean.issues.fields
   dt_started:
     lineage:
       - datalake_jira_clean.issues.fields
