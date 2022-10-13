@@ -9,6 +9,7 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.dags import COMPOSER_DAGS_PATH
 from bietlejuice.services import ConfigurationService
+from dags import DAG_PACKAGES_ROOT
 
 logger = QuintoAndarLogger("DAGMetadataService")
 
@@ -31,6 +32,11 @@ class DAGMetadataService:
         # general operations
         self._DAG_PATH_REGEX = re.compile(
             r"dags/(?P<source>\w+)(?:/(?P<context>\w+))?/(?P<dag>\w+)\.py"
+        )
+
+        # Regex that contains dag package and dag legacy path
+        self._DAG_PACKAGE_AND_LEGACY_REGEX = re.compile(
+            r"dags/(.*/)?(?P<source>\w+)(?:/(?P<context>\w+))?/(?P<dag>\w+)\.py"
         )
 
         # extract dag owner
@@ -72,6 +78,13 @@ class DAGMetadataService:
 
     def _get_dag_file_path(self, source: str, context: str, dag_name: str):
         intermediate_path = self._get_intermediate_path(source, context)
+        dag_packages_path = glob.glob(
+            f"{DAG_PACKAGES_ROOT}/**/{dag_name}.py", recursive=True
+        )
+
+        if dag_packages_path:
+            return dag_packages_path[0]
+
         if intermediate_path:
             return f"{COMPOSER_DAGS_PATH}/{intermediate_path}/{dag_name}.py"
         else:
@@ -107,7 +120,7 @@ class DAGMetadataService:
         :param dag_path: path to dag file
         :return: tuple with source, context, and dag name
         """
-        match = re.search(self._DAG_PATH_REGEX, dag_path).groupdict()
+        match = re.search(self._DAG_PACKAGE_AND_LEGACY_REGEX, dag_path).groupdict()
         source = match["source"]
         context = match["context"]
         dag = match["dag"]

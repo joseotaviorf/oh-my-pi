@@ -104,7 +104,7 @@ class TestDAGMetadataService:
         assert result == expected_path
 
     @mock.patch(
-        "bietlejuice.services.file_service.DATALAKE_METADATA_PATH",
+        "bietlejuice.services.dag_metadata_service.DATALAKE_METADATA_PATH",
         MOCK_DATALAKE_METADATA_PATH,
     )
     @mock.patch("bietlejuice.services.dag_metadata_service.glob")

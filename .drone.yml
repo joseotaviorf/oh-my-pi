@@ -414,6 +414,30 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
+  load-all-metadata-files-information-to-s3-forno:
+    group: update_jobs
+    image: python:3.7.3
+    environment:
+      ENVIRONMENT: forno
+    commands:
+      - pip install boto3==1.9.159 PyYAML==5.1 hierarchical-conf==1.0.1
+      - python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py databricks.s3.forno.data.quintoandar.com.br
+    when:
+      event: push
+      branch: forno
+
+  load-all-metadata-files-information-to-s3-prod:
+    group: update_jobs
+    image: python:3.7.3
+    environment:
+      ENVIRONMENT: prod
+    commands:
+      - pip install boto3==1.9.159 PyYAML==5.1 hierarchical-conf==1.0.1
+      - python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py 5a-databricks
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
   sonar-preview:
     group: common-sonar
     image: quintoandar/sonar-scanner

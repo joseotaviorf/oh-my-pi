@@ -4,6 +4,8 @@ import logging
 
 import yaml
 
+import boto3
+
 from datetime import datetime
 from argparse import ArgumentParser
 from pyspark.sql import Row
@@ -15,8 +17,6 @@ from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageForma
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 
-from bietlejuice.services import FileService
-
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -26,41 +26,17 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_first_key(input_dict: dict) -> str:
-    """
-    returns the first key of a dict
-    it is expected that the key is a string
-    """
-    return next(iter(input_dict))
+def get_lineage_and_tags_data(
+    s3_client, bucket: str, remote_path: str
+) -> List[Dict[str, Union[str, bool]]]:
+    obj = s3_client.get_object(
+        Bucket=bucket, Key=f"{remote_path}metadata/all_lineage_tags_data.yml"
+    )
+    yaml_data = yaml.safe_load(obj["Body"])
+    return yaml_data
 
 
-def get_lineage_and_tags_data() -> List[Dict[str, Union[str, bool]]]:
-    yamls_data = []
-    for file in FileService.list_metadata_files():
-        with open(file, "r") as fp:
-            data = yaml.safe_load(fp)
-            db_name = data["database_name"]
-            tb_name = data["table_name"]
-            columns = data.get("columns")
-            if not columns:
-                file_type = "tags"
-            else:
-                first_column_key = get_first_key(columns)
-                file_type = get_first_key(data["columns"][first_column_key])
-
-        yamls_data.append(
-            {
-                "database_name": db_name,
-                "table_name": tb_name,
-                "has_lineage": file_type == "lineage",
-                "has_tags": file_type == "tags",
-            }
-        )
-    return yamls_data
-
-
-def get_lineage_and_tags_df(spark_client: SparkClient) -> DataFrame:
-    yaml_data = get_lineage_and_tags_data()
+def get_lineage_and_tags_df(spark_client: SparkClient, yaml_data: List) -> DataFrame:
     metadata_df = spark_client.create_dataframe(Row(**row) for row in yaml_data).drop(
         "columns"
     )
@@ -95,8 +71,13 @@ if __name__ == "__main__":
         config_service.get_config("LINEAGE_FROM_PRODUCT_SOURCES_SKIP_LIST")
     )
     dag_manual_mapping = config_service.get_config("DAG_METADATA_MANUAL_MAPPING")
+    databricks_bucket = config_service.get_config("databricks_bucket")
+    dags_packages_files_path_in_s3 = config_service.get_config(
+        "dags_packages_files_path_in_s3"
+    )
 
     s3_loader = S3Loader()
+    s3_client = boto3.client("s3")
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
@@ -108,7 +89,14 @@ if __name__ == "__main__":
     spark_metastore_service.create_database(database_name)
 
     # Creating metrics dataframe
-    lineage_and_tags_df = get_lineage_and_tags_df(spark_client)
+    lineage_and_tags_yaml_data = get_lineage_and_tags_data(
+        s3_client=s3_client,
+        bucket=databricks_bucket,
+        remote_path=dags_packages_files_path_in_s3,
+    )
+    lineage_and_tags_df = get_lineage_and_tags_df(
+        spark_client=spark_client, yaml_data=lineage_and_tags_yaml_data
+    )
     lineage_and_tags_df = (
         SparkDataFrameService()
         .input(lineage_and_tags_df)

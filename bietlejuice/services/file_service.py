@@ -3,12 +3,12 @@ import gzip
 from io import BytesIO
 from os import listdir
 from os.path import isdir, isfile
-from typing import Generator, List, Tuple
+from typing import List, Tuple
 
 import yaml
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.paths import DATALAKE_METADATA_PATH, QUERIES_DATALAKE_PATH
+from bietlejuice.base.paths import QUERIES_DATALAKE_PATH
 from bietlejuice.dags import COMPOSER_DAGS_PATH
 from dags import DAG_PACKAGES_ROOT
 
@@ -122,18 +122,6 @@ class FileService:
     def remove_file_extension(file_name):
         ext_pos = file_name.rfind(".")
         return file_name[:ext_pos]
-
-    @staticmethod
-    def list_metadata_files() -> Generator[str, None, None]:
-        """
-        Yields all metadata YAML file paths.
-        :return: A generator that yields metadata file paths
-        """
-        for extension in ("*.yml", "*.yaml"):
-            for file in glob.iglob(
-                f"{DATALAKE_METADATA_PATH}/**/{extension}", recursive=True
-            ):
-                yield file
 
     @staticmethod
     def get_table_info_from_path(path: str) -> Tuple[str, str, str, str, str, str]:
