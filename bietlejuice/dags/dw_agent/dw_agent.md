@@ -14,5 +14,6 @@ This dag is triggered once per day via Mediator. More information about run time
 
 This pipeline produces the following output tables: 
 
+- `public.dim_agent`
 - `public.dim_agent_region`
 - `public.dim_agent_review`

@@ -1,0 +1,109 @@
+---
+database_name: dw_public
+table_name: dim_agent
+columns:
+  sk_agent:
+    lineage:
+      - dw_public.dim_user.dados_agente_id
+  id_user:
+    lineage:
+      - dw_public.dim_user.id
+  name:
+    lineage:
+      - dw_public.dim_user.nome
+  cpf:
+    lineage:
+      - dw_public.dim_user.cpf
+  rg:
+    lineage:
+      - dw_public.dim_user.rg
+  sex:
+    lineage:
+      - dw_public.dim_user.sexo
+  email:
+    lineage:
+      - dw_public.dim_user.email
+  alternative_email:
+    lineage:
+      - dw_public.dim_user.email_alternativo
+  main_phone_number:
+    lineage:
+      - dw_public.dim_user.telefone_principal
+  address:
+    lineage:
+      - dw_public.dim_user.endereco
+  number:
+    lineage:
+      - dw_public.dim_user.numero
+  complement:
+    lineage:
+      - dw_public.dim_user.complemento
+  neighborhood:
+    lineage:
+      - dw_public.dim_user.bairro
+  cep:
+    lineage:
+      - dw_public.dim_user.cep
+  city:
+    lineage:
+      - dw_public.dim_user.cidade
+  state_name:
+    lineage:
+      - dw_public.dim_user.estado_nome
+  state_abbreviation:
+    lineage:
+      - dw_public.dim_user.estado_abreviacao
+  country_code:
+    lineage:
+      - dw_public.dim_user.country_code
+  work_contract_name:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.contract_name
+  rede_partner:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.3p_partner
+  agent_type:
+    lineage:
+      - datalake_ebdb_clean.agent_data_types.types
+  agent_profile:
+    lineage:
+      - dw_public.dim_user.dadosagente_perfil
+  agent_creci:
+    lineage:
+      - dw_public.dim_user.dadosagente_numero_creci
+  is_user_active:
+    lineage:
+      - dw_public.dim_user.active
+  is_blocked:
+    lineage:
+      - dw_public.dim_user.bloqueado
+  is_affiliate_active:
+    lineage:
+      - dw_public.dim_user.dadosafiliado_ativo
+  is_agent_active:
+    lineage:
+      - dw_public.dim_user.dadosagente_ativo
+  is_photographer_active:
+    lineage:
+      - dw_public.dim_user.dadosfotografo_ativo
+  is_tenant:
+    lineage:
+      - dw_public.dim_user.inquilino
+  is_sale_agent:
+    lineage:
+      - dw_public.dim_user.is_sale_agent
+  is_rent_agent:
+    lineage:
+      - dw_public.dim_user.is_rent_agent
+  is_rede_agent:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.is_3p_contract
+  dt_birth:
+    lineage:
+      - dw_public.dim_user.data_nascimento
+  ts_created:
+    lineage:
+      - dw_public.dim_user.criado_em
+  ts_updated:
+    lineage:
+      - dw_public.dim_user.atualizado_em
