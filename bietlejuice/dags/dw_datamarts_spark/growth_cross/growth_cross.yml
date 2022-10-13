@@ -10,31 +10,79 @@
 #     # If the datamart has no inner dependency, declare it as an empty object
 
 growth_cross:
-  affiliate_acquisition_metrics: {}
+  affiliate_acquisition_metrics:
+    depends on:
+      - affiliates_clusters
   affiliates_clusters: {}
   daily_target_volumes_supply: {}
-  efficiency_monitor_rental: {}
-  efficiency_monitor_sale: {}
+  efficiency_monitor_rental:
+    depends on:
+      - marketing_demand_supply_branding_costs
+  efficiency_monitor_sale:
+    depends on:
+      - marketing_demand_supply_branding_costs
   inbound_attendance_leads_flows: {}
   marketing_campaigns_costs_and_volumes: {}
-  marketing_demand_supply_branding_costs: {}
-  performance_marketing_cluster_promotional_bonus: {}
-  performance_marketing_cluster_promotional_bonus_costs: {}
-  performance_marketing_metrics_demand: {}
-  plaquinhas_users_metrics_demand: {}
-  pricing_rent_categorization: {}
+  marketing_demand_supply_branding_costs:
+    depends_on:
+      - performance_marketing_cluster_promotional_bonus_costs
+  performance_marketing_cluster_promotional_bonus:
+    depends_on:
+      - affiliates_clusters
+  performance_marketing_cluster_promotional_bonus_costs:
+    depends_on:
+      - affiliates_clusters
+      - performance_marketing_cluster_promotional_bonus 
+  performance_marketing_metrics_demand: 
+    depends_on:
+      - tenant_prospect_status 
+      - rent_flow_interactions
+  plaquinhas_users_metrics_demand:
+    depends_on: 
+      - performance_marketing_metrics_demand 
+      - sale_performance_marketing_metrics_demand
+  pricing_rent_categorization: 
+    depends_on: 
+      - performance_marketing_metrics_demand
   rent_flow_interactions: {}
   rental_cohort_conversions: {}
-  rental_marketplace_flows: {}
-  rental_performance_marketing_metrics_supply_coincident: {}
+  rental_marketplace_flows: 
+    depends_on: 
+      - rent_flow_interactions 
+      - tenant_prospect_status
+  rental_performance_marketing_metrics_supply_coincident:
+    depends_on: 
+      - performance_marketing_cluster_promotional_bonus_costs 
+      - daily_target_volumes_supply
   sale_performance_marketing_metrics_demand: {}
-  sale_performance_marketing_metrics_supply_coincident: {}
-  tenant_prospect_status: {}
-  tenant_prospects_activations: {}
-  top_of_funnel_volumes_daily: {}
-  top_of_funnel_volumes_monthly: {}
-  top_of_funnel_volumes_weekly: {}
-  unique_performance_marketing_metrics_supply_coincident: {}
+  sale_performance_marketing_metrics_supply_coincident: 
+    depends_on: 
+      - performance_marketing_cluster_promotional_bonus_costs
+  tenant_prospect_status: 
+    depends_on: 
+      - rent_flow_interactions
+  tenant_prospects_activations:
+    depends_on: 
+      - rent_flow_interactions
+  top_of_funnel_volumes_daily:
+    depends_on: 
+      - performance_marketing_metrics_demand 
+      - sale_performance_marketing_metrics_demand 
+      - tenant_prospect_status
+  top_of_funnel_volumes_monthly: 
+    depends_on: 
+      - performance_marketing_metrics_demand 
+      - sale_performance_marketing_metrics_demand 
+      - tenant_prospect_status
+  top_of_funnel_volumes_weekly:
+    depends_on: 
+      - performance_marketing_metrics_demand 
+      - sale_performance_marketing_metrics_demand 
+      - tenant_prospect_status
+  unique_performance_marketing_metrics_supply_coincident:
+    depends_on: 
+      - performance_marketing_cluster_promotional_bonus_costs 
+      - daily_target_volumes_supply
   unique_supply_cohort_conversions: {}
   unique_supply_events_funnel: {}
   user_funnel: {}
