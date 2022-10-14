@@ -323,17 +323,17 @@ supply_2_0_turning_point AS (
     SELECT
         *,
         CASE
-            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+            WHEN DATE(COALESCE(ts_prospect_sale, ts_lead)) >= DATE('2022-10-01') -- turning point date for funnel 2.0
                 THEN ts_prospect_sale
             ELSE ts_prospect_old
         END AS ts_prospect,
         CASE
-            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+            WHEN DATE(COALESCE(ts_qualified_sale, ts_lead)) >= DATE('2022-10-01') -- turning point date for funnel 2.0
                 THEN ts_qualified_sale
             ELSE ts_qualified_old
         END AS ts_qualified,
         CASE
-            WHEN DATE(ts_lead) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+            WHEN DATE(COALESCE(ts_available_qualified_sale, ts_lead)) >= DATE('2022-10-01') -- turning point date for funnel 2.0
                 THEN ts_available_qualified_sale
             ELSE NULL
         END AS ts_available_qualified
