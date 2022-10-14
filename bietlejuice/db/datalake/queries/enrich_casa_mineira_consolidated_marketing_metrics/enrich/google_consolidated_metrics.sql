@@ -61,7 +61,7 @@ report_type_mapping AS (
         id_campaign,
         ad_group_name,
         device,
-        ad_network_type
+        ad_network_type,
         CASE
             WHEN (LOWER(campaign_name) LIKE '%discovery%'
                OR LOWER(campaign_name) LIKE '%smart%') 
