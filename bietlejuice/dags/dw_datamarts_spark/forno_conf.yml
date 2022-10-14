@@ -18,6 +18,17 @@ custom_cluster:
   aws_attributes:
     availability: ON_DEMAND
     ebs_volume_size: 200
+
+databricks_10_4_max_memory_cluster:
+  driver_node_type_id: r5d.4xlarge
+  node_type_id: r5d.8xlarge
+  runtime_engine: PHOTON
+  autoscale:
+    max_workers: 4
+    min_workers: 1
+  aws_attributes:
+    ebs_volume_size: 200
+
 dags:
   cross:
     owner: Data Engineering
@@ -57,9 +68,22 @@ dags:
     owner: Data Fintech
   growth:
     owner: Data Growth
-    cluster_name: databricks_10_4_med_general_cluster
+    cluster_name: databricks_10_4_max_memory_cluster
+    spark_conf:
+      - spark.executor.cores: 5
+      - spark.executor.memory: 37g
+      - spark.yarn.executor.memoryOverhead: 5g
+      - spark.driver.memory: 37g
+      - spark.driver.cores: 5
   growth_cross:
     owner: Data Growth
+    cluster_name: databricks_10_4_max_memory_cluster
+    spark_conf:
+      - spark.executor.cores: 5
+      - spark.executor.memory: 37g
+      - spark.yarn.executor.memoryOverhead: 5g
+      - spark.driver.memory: 37g
+      - spark.driver.cores: 5
   support_and_service:
     owner: Data SS
     load_to_redshift: True
