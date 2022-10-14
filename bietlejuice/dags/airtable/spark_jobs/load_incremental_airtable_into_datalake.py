@@ -47,7 +47,7 @@ def extend_incremental_params(params: dict, execution_date: str) -> dict:
     return params
 
 
-def parse_records(records: list, spark_client):
+def parse_records(records: list, spark_client, columns_to_drop=[]):
     """Function to parse and convert response records into a dataframe
 
     :param records: Raw records from consumer/API reponse
@@ -70,6 +70,7 @@ def parse_records(records: list, spark_client):
     # rdd.toDF() get a sample of records and infer schema wrong for keys
     # with low frequency.
     df = spark_client.create_dataframe(records, sampling_ratio=1)
+    df = df.drop(*columns_to_drop)
     formatted_columns = list(
         map(StringFormatter.set_alphanumeric_snake_case, df.columns)
     )
@@ -95,6 +96,7 @@ if __name__ == "__main__":
     standard_base_id = config_service.get_config("standard_base_id")
     tables = config_service.get_config("tables")
     partitions_cols = config_service.get_config("partition_cols")
+    columns_to_ignore = config_service.get_config("columns_to_ignore")
 
     logger.info(
         f"""
@@ -142,7 +144,7 @@ if __name__ == "__main__":
         records = airtable_consumer.sync(params=extended_params)
 
         if records:
-            df = parse_records(records, spark_client)
+            df = parse_records(records, spark_client, columns_to_drop=columns_to_ignore)
             df = (
                 SparkDataFrameService()
                 .input(df)
