@@ -1,0 +1,8 @@
+---
+database_name: metric_rent
+table_name: new_rentals_weekly
+columns:
+  week:
+    lineage:
+      - dw_public.dim_contract.dt_start
+      - dw_public.dim_contract.dt_entrance

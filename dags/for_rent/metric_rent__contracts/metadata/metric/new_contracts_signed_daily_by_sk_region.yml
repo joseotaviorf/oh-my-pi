@@ -1,0 +1,11 @@
+---
+database_name: metric_rent
+table_name: new_contracts_signed_daily_by_sk_region
+columns:
+  contract_signed_date:
+    lineage:
+      - dw_public.dim_contract.dt_start
+      - dw_public.dim_contract.ts_signature
+  sk_region:
+    lineage:
+      - dw_public.fact_house_listings.sk_region

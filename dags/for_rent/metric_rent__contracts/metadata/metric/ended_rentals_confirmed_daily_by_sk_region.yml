@@ -1,0 +1,11 @@
+---
+database_name: metric_rent
+table_name: ended_rentals_confirmed_daily_by_sk_region
+columns:
+  contract_annulment_date:
+    lineage:
+      - dw_public.dim_contract.ts_analyst_annulment_input
+      - dw_public.dim_contract.dt_anullment
+  sk_region:
+    lineage:
+      - dw_public.fact_house_listings.sk_region

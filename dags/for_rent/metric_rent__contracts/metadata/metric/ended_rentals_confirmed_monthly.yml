@@ -1,0 +1,8 @@
+---
+database_name: metric_rent
+table_name: ended_rentals_confirmed_monthly
+columns:
+  month:
+    lineage:
+      - dw_public.dim_contract.ts_analyst_annulment_input
+      - dw_public.dim_contract.dt_anullment

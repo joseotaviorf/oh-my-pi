@@ -10,8 +10,8 @@
 
 owner: DATA_FOR_RENT
 domain_details:
-  brief_description: |
-    The listings domain follows the house publication,
-    and intermediate steps until its rent. Here, it
-    usually is interesting to follow conversions 
-    during the listing life.
+    brief_description: |
+        The listings domain follows the house publication,
+        and intermediate steps until its rent. Here, it
+        usually is interesting to follow conversions 
+        during the listing life.

@@ -1,0 +1,7 @@
+---
+database_name: metric_rent
+table_name: new_first_listings_weekly
+columns:
+  week:
+    lineage:
+      - dw_public.dim_date.date

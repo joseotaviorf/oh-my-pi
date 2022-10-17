@@ -1,0 +1,10 @@
+---
+database_name: metric_rent
+table_name: new_first_listings_daily_by_sk_region
+columns:
+  first_listing_date:
+    lineage:
+      - dw_public.dim_date.date
+  sk_region:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_region
