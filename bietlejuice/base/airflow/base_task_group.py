@@ -61,17 +61,8 @@ class BaseTaskGroup(object):
         # To avoid legacy codes who uses full / incremental on schema variable
         path_variable = schema if schema is not None else tree_path
 
-        logger.info(
-            f"m=build_task_group_from_sql_files, msg=pre list tables, "
-            f"dag_name={self.relative_query_path}, layer={layer}, tree_path={path_variable}"
-        )
-
         table_names = self._get_table_names_from_sql_files(
             layer=layer, tree_path=path_variable
-        )
-
-        logger.info(
-            f"m=build_task_group_from_sql_files, msg=after listing tables, table_names={table_names}"
         )
 
         method = TaskGroupMethodFactory.get_method_for_build_task_group_from_sql_files(
@@ -98,11 +89,6 @@ class BaseTaskGroup(object):
         """
         if layer == LayerEnum.DW_STAGING:
             layer = LayerEnum.DW
-
-        logger.info(
-            f"m=_get_table_names_from_sql_files, dag_name={self.relative_query_path}, "
-            f"layer={layer}, tree_path={tree_path}"
-        )
 
         return DAGPackagesPathService.list_queries_files_in_composer(
             dag_name=self.relative_query_path,
