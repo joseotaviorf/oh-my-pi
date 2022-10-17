@@ -719,7 +719,7 @@ affiliates AS (
     SELECT * FROM cost_union
     WHERE sk_date < TO_CHAR(current_date,'yyyymmdd')::bigint
     AND business = 'Rental'
-    AND cost > 0
+    AND cost <> 0
     AND cost IS NOT NULL
 )
 

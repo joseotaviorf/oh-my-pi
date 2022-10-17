@@ -807,7 +807,7 @@ affiliates AS (
     SELECT * FROM cost_union
     WHERE sk_date < CAST(date_format(current_date, 'yyyyMMdd') as BIGINT)
     AND business = 'Sale'
-    AND cost > 0
+    AND cost <> 0
     AND cost IS NOT NULL
 )
 
