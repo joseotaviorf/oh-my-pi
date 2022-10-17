@@ -105,6 +105,12 @@ ranking_rules:
     clean_table_name: ranking_rules
     sheet_context: support_and_service
 
+recuperacao_fachada_e_area_comum:
+    sheet_id: 1DB63rTGhu5b_x6fUzgUEzIAKdQ-O52hly2D7hIa10CI
+    sheet_name: recovery_common_area_facade
+    clean_table_name: photos_recovery_common_area_facade
+    sheet_context: support_and_service
+
 service_city_holidays:
     sheet_id: 1wSYZjHde5RuFJQRigRFFIDiW4hpSOAtk88i6bkuwocI
     sheet_name: data_extraction
