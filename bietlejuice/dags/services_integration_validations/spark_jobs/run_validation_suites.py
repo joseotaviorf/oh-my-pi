@@ -16,6 +16,7 @@ from bietlejuice.validation_suites import VALIDATION_SUITES_PATH
 JOB_NAME = "run_validation_suites"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
+logging.getLogger("py4j.java_gateway").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 base_dbutils = BaseDBUtils()

@@ -60,6 +60,7 @@ class GsheetsConsumer(GoogleSheetsReader):
         :param sheet_id: Sheet ID for data
         :param preload_time_in_seconds: If data needs to be preloaded before fetching
         """
+        logger.info(f"m=__preload_gsheet, msg=Stating preload o gsheet")
         preload_client_response = self.read(sheet_name, sheet_id)
         logger.info(
             f"""
@@ -123,7 +124,11 @@ class GsheetsConsumer(GoogleSheetsReader):
         :param preload_time_in_seconds: If data needs to be preloaded before fetching
         """
         if preload_time_in_seconds:
-            self.__preload_gsheet(sheet_id, sheet_name, preload_time_in_seconds)
+            self.__preload_gsheet(
+                sheet_name=sheet_name,
+                sheet_id=sheet_id,
+                preload_time_in_seconds=preload_time_in_seconds,
+            )
 
         sheet_data = self.read(sheet_name, sheet_id)
         df = self.parse_data_on_dataframe(sheet_data, table_name, is_partitioned)
