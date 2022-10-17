@@ -4,7 +4,7 @@ import pendulum
 import os
 
 from airflow.models import DAG
-from airflow.utils.helpers import chain, cross_downstream
+from airflow.utils.helpers import cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -38,7 +38,9 @@ MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "30 3 * * *"
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_{CONTEXT}_into_datalake_raw.py"
+RAW_SPARK_JOB_PATH = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_{CONTEXT}_raw.py"
+)
 
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_cluster")
 
@@ -92,15 +94,13 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     raw_spark_job_extra_args=[CONTEXT],
 )
 
-
 clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
 )
 
-
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
+create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_groups))
 
 cross_downstream(
     DatalakeTaskGroup.last_tasks(raw_task_groups),

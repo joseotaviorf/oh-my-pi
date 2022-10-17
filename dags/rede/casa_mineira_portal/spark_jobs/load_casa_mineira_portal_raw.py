@@ -13,7 +13,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
-JOB_NAME = "load_casa_mineira_portal_into_datalake_raw"
+JOB_NAME = "load_casa_mineira_portal_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -47,34 +47,26 @@ if __name__ == "__main__":
     # Initializing clients
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
+    s3_loader = S3Loader()
+    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    database_name = db_info["db_raw_databricks"]
+    database_location = db_info["db_raw_path"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    # Retrieving folders/tables from root location.
+    spark_metastore_service.create_database(database_name)
+
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
+    # Retrieving folders/tables from root location.
     tables = dbutils.fs.ls(source_root_path)
-
     for table in tables:
         table_name = table.name.replace("/", "")
         source_path = f"{source_root_path}{table_name}/*.csv"
         df = s3_consumer.get_data_from_file(path=source_path, **consumer_extra_args)
-
-        db_info = DatalakeMetastoreService.get_db_info(
-            environment, source, datalake_bucket
-        )
-        spark_metastore_service = SparkMetastoreService(spark_client)
-        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-
-        logger.info(
-            "m=__main__, msg=Creating database in Spark Metastore if not exists..."
-        )
-        database_name = db_info["db_raw_databricks"]
-        format_options = SparkTableStorageFormat.DEFAULT_RAW
-        database_location = db_info["db_raw_path"]
-        spark_metastore_service.create_database(database_name)
-
-        s3_loader = S3Loader()
 
         s3_loader.load_df(
             df=df,
