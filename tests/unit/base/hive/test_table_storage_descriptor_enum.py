@@ -13,6 +13,7 @@ class TestLayerEnum:
             ("clean_staging", TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT.value),
             ("enrich", TableStorageDescriptorEnum.ENRICH_FORMAT.value),
             ("dw", TableStorageDescriptorEnum.DW.value),
+            ("metric", TableStorageDescriptorEnum.METRIC_FORMAT.value),
         ],
     )
     def test_from_layer_with_valid_layer(self, layer, expected_return):

@@ -8,6 +8,7 @@ class LayerEnum(Enum):
     ENRICH = "enrich"
     DW_STAGING = "dw_staging"
     DW = "dw"
+    METRIC = "metric"
     REVERSE = "reverse"
 
     @classmethod

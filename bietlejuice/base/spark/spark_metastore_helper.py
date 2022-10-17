@@ -3,7 +3,7 @@ from collections import OrderedDict
 from pyspark.sql.functions import split
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatalakeMetastoreMapping
+from bietlejuice.base.db import DatalakeMetastoreMapping, MetricMetastoreMapping
 from bietlejuice.base.db.dw_metastore_mapping import DwMetastoreMapping
 from bietlejuice.base.db.reverse_metastore_mapping import ReverseMetastoreMapping
 from bietlejuice.base.pipeline import LayerEnum
@@ -47,6 +47,11 @@ class SparkMetastoreHelper:
 
             spark_database_name = reverse_ms_mapping["reverse_schema_name"]
             database_location = reverse_ms_mapping["reverse_schema_path"]
+        elif self.layer == LayerEnum.METRIC.value:
+            metric_ms_mapping = MetricMetastoreMapping(
+                bucket=self.bucket, schema=self.db_name_part
+            )
+            spark_database_name, database_location = metric_ms_mapping.get_metric_info()
         else:
             dl_ms_mapping = DatalakeMetastoreMapping(
                 source=self.db_name_part, bucket=self.bucket

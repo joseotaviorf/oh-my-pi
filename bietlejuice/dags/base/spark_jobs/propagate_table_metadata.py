@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatalakeMetastoreMapping
+from bietlejuice.base.db import DatalakeMetastoreMapping, MetricMetastoreMapping
 from bietlejuice.base.db.dw_metastore_mapping import DwMetastoreMapping
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
@@ -59,6 +59,9 @@ if __name__ == "__main__":
             schema=db_name_part, bucket=""
         ).get_all_dw_info()
         database_name = dw_ms_mapping["dw_schema_databricks"]
+    elif layer == LayerEnum.METRIC.value:
+        metric_ms_mapping = MetricMetastoreMapping(schema=db_name_part, bucket="")
+        database_name, _ = metric_ms_mapping.get_metric_info()
     else:
         dl_ms_mapping = DatalakeMetastoreMapping(source=db_name_part, bucket="")
         database_name, _ = dl_ms_mapping.get_datalake_info_from_layer(layer)

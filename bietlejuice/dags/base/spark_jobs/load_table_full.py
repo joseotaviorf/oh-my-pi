@@ -5,9 +5,11 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.db import DatalakeMetastoreService, MetricMetastoreMapping
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipeline
+
 
 JOB_NAME = "load_table"
 
@@ -90,21 +92,35 @@ if __name__ == "__main__":
     )
     query_template_params.update(dt_dict)
 
-    (
-        database_name,
-        database_location,
-        athena_database_name,
-    ) = DatalakeMetastoreService.get_layer_info(
-        env, database_base_name, datalake_bucket, layer
-    )
+    if layer == LayerEnum.METRIC.value:
+        metric_ms_mapping = MetricMetastoreMapping(
+            bucket=datalake_bucket, schema=database_base_name
+        )
+        database_name, database_location = metric_ms_mapping.get_metric_info()
 
-    (
-        target_database_name,
-        target_database_location,
-        target_athena_database_name,
-    ) = DatalakeMetastoreService.get_layer_info(
-        env, target_database_base_name, datalake_bucket, layer
-    )
+        metric_ms_mapping = MetricMetastoreMapping(
+            bucket=datalake_bucket, schema=target_database_base_name
+        )
+        target_database_name, target_database_location = (
+            metric_ms_mapping.get_metric_info()
+        )
+
+    else:
+        (
+            database_name,
+            database_location,
+            athena_database_name,
+        ) = DatalakeMetastoreService.get_layer_info(
+            env, database_base_name, datalake_bucket, layer
+        )
+
+        (
+            target_database_name,
+            target_database_location,
+            target_athena_database_name,
+        ) = DatalakeMetastoreService.get_layer_info(
+            env, target_database_base_name, datalake_bucket, layer
+        )
 
     intermediate_path = schema if schema else tree_path
 

@@ -8,16 +8,20 @@ from itertools import chain
 import collections
 import json
 
-BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BI_ETL_EJUICE_ROOT = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-from bietlejuice.base.dependencies.bietlejuice_dependency_helper import BietlejuiceDependencyHelper
+from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
+    BietlejuiceDependencyHelper,
+)
 from bietlejuice.base.paths import QUERIES_DATALAKE_PATH
 from bietlejuice.services import FileService, ConfigurationService
 
 from dags import DAG_PACKAGES_ROOT
 
-LAYERS = ["clean", "enrich", "dw", "raw"]
+LAYERS = ["clean", "enrich", "dw", "metric", "raw"]
 
 PRINT_ALL_PARSING_ERRORS = False
 COMPOSER_FILES_ROOT = f"{BI_ETL_EJUICE_ROOT}/bietlejuice"
@@ -100,9 +104,15 @@ class CrossDAGDependenciesValidator:
         :return: Dictionary with the tables names of each DAG
         :rtype: dict[str:list()]
         """
-        query_files_from_legacy_path = FileService.list_all_files_recursively(QUERIES_DATALAKE_PATH, extension='sql')
-        query_files_from_dag_packages = FileService.list_all_files_recursively(DAG_PACKAGES_ROOT, extension="sql")
-        all_query_files = chain(query_files_from_legacy_path, query_files_from_dag_packages)
+        query_files_from_legacy_path = FileService.list_all_files_recursively(
+            QUERIES_DATALAKE_PATH, extension="sql"
+        )
+        query_files_from_dag_packages = FileService.list_all_files_recursively(
+            DAG_PACKAGES_ROOT, extension="sql"
+        )
+        all_query_files = chain(
+            query_files_from_legacy_path, query_files_from_dag_packages
+        )
         for file_path in all_query_files:
             dag_name, table_name = self.extract_dag_and_table_from_file(
                 file_path=file_path
@@ -186,8 +196,8 @@ class CrossDAGDependenciesValidator:
         """
         dependencies = BietlejuiceDependencyHelper.read_dependencies()
 
-        dags_without_tasks_in_dependencies_file = (
-            self.extract_dependent_dags_from_dependencies(dependencies)
+        dags_without_tasks_in_dependencies_file = self.extract_dependent_dags_from_dependencies(
+            dependencies
         )
 
         dags, tables_by_dag = self.extract_dependency_dags_and_tables_from_dependencies(
@@ -238,8 +248,10 @@ class CrossDAGDependenciesValidator:
         :rtype: bool
         """
         dag_file = f"{DAG_PACKAGES_ROOT}/**/{dag_name}.py"
+        dag_config_file = f"{DAG_PACKAGES_ROOT}/**/{dag_name}.yml"
         validate_dag_file = glob.glob(dag_file, recursive=True)
-        return len(validate_dag_file) != 0
+        validate_config_dag_file = glob.glob(dag_config_file, recursive=True)
+        return len(validate_dag_file) != 0 or len(validate_config_dag_file) != 0
 
     def table_query_exists(self, dag, table):
         """
@@ -295,14 +307,21 @@ class CrossDAGDependenciesValidator:
         """
         dependencies_without_tasks = []
         for dependent in dependencies:
-            dependency_without_task = getattr(re.search('bietlejuice.[^:]*$', dependent), 'string', '')
+            dependency_without_task = getattr(
+                re.search("bietlejuice.[^:]*$", dependent), "string", ""
+            )
             dependency_without_task_name = dependency_without_task.split(".")[-1]
-            if dependency_without_task and dependency_without_task_name not in dependencies_without_tasks:
+            if (
+                dependency_without_task
+                and dependency_without_task_name not in dependencies_without_tasks
+            ):
                 dependencies_without_tasks.append(dependency_without_task_name)
         return dependencies_without_tasks
 
     @staticmethod
-    def get_duplicate_dependencies(dependencies: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
+    def get_duplicate_dependencies(
+        dependencies: List[Tuple[str, str]]
+    ) -> List[Tuple[str, str]]:
         """
         Receives the dependencies list and returns the dependency names which appear more than once.
 
@@ -312,10 +331,16 @@ class CrossDAGDependenciesValidator:
         :return: Dependencies that appear more than once.
         :rtype: list(tuple)
         """
-        return [item for item, count in collections.Counter(dependencies).items() if count > 1]
+        return [
+            item
+            for item, count in collections.Counter(dependencies).items()
+            if count > 1
+        ]
 
     @staticmethod
-    def list_dependencies_to_dict(dependencies: List[Tuple[str, str]]) -> Dict[str, List[str]]:
+    def list_dependencies_to_dict(
+        dependencies: List[Tuple[str, str]]
+    ) -> Dict[str, List[str]]:
         """
         Transform a list of dependencies into a dictionary
 
@@ -359,7 +384,9 @@ class CrossDAGDependenciesValidator:
         """
         return dag in self.dags_out_of_pattern
 
-    def concat_dependent_and_dependencies_to_msg(self, data: Dict[str, List[str]], msg: str) -> str:
+    def concat_dependent_and_dependencies_to_msg(
+        self, data: Dict[str, List[str]], msg: str
+    ) -> str:
         """
         Receives a dictionary with dependent (key) and dependencies list (values) and creates a log.
 
@@ -375,7 +402,9 @@ class CrossDAGDependenciesValidator:
         str_concat = ""
         for dependent in data:
             for dependency in data[dependent]:
-                str_concat += "\n" + msg.format(dependent=dependent, dependency=dependency)
+                str_concat += "\n" + msg.format(
+                    dependent=dependent, dependency=dependency
+                )
         return str_concat
 
     def validate_only_tasks_in_dependencies_file(self) -> None:
@@ -391,11 +420,20 @@ class CrossDAGDependenciesValidator:
         for dependent in self.dependencies_raw:
             dag_dependencies = self.dependencies_raw[dependent]
             dependent_name = dependent.split(".")[-1]
-            dependencies_without_tasks = self.get_dependency_values_without_tasks(dag_dependencies)
+            dependencies_without_tasks = self.get_dependency_values_without_tasks(
+                dag_dependencies
+            )
 
-            if dependencies_without_tasks and not self.is_dag_out_of_pattern(dependent_name):
-                dag_dependencies_without_tasks[dependent_name] = dependencies_without_tasks
-                [self.register_into_invalid_list(dag=dependent_name, table=table) for table in dependencies_without_tasks]
+            if dependencies_without_tasks and not self.is_dag_out_of_pattern(
+                dependent_name
+            ):
+                dag_dependencies_without_tasks[
+                    dependent_name
+                ] = dependencies_without_tasks
+                [
+                    self.register_into_invalid_list(dag=dependent_name, table=table)
+                    for table in dependencies_without_tasks
+                ]
 
         if dag_dependencies_without_tasks:
 
@@ -409,7 +447,9 @@ class CrossDAGDependenciesValidator:
         Validates if dependencies in dependecies file has repeated dependencies in the same DAG.
         """
         self.log_msg(msg=f"\n{VALIDATION_LOG_SEPARATOR}", force_log=True)
-        starting_validaton_message = f"Validation to check if there are repeated dependencies is running..."
+        starting_validaton_message = (
+            f"Validation to check if there are repeated dependencies is running..."
+        )
         self.log_msg(msg=f"msg={starting_validaton_message}", force_log=True)
 
         dependent_dependencies = []
@@ -417,7 +457,10 @@ class CrossDAGDependenciesValidator:
             dependencies = self.dependencies_raw[dependent]
             if self.is_dag_out_of_pattern(dependent):
                 continue
-            [dependent_dependencies.append((dependent, dependency)) for dependency in dependencies]
+            [
+                dependent_dependencies.append((dependent, dependency))
+                for dependency in dependencies
+            ]
         duplicates = self.get_duplicate_dependencies(dependent_dependencies)
         [self.register_into_invalid_list(tup[0], tup[1]) for tup in duplicates]
 
@@ -462,11 +505,13 @@ class CrossDAGDependenciesValidator:
                 continue
             invalid_tasks_names = self.get_invalid_characters(dependencies)
             if invalid_tasks_names:
-                [self.register_into_invalid_list(dependent, task_name) for task_name in invalid_tasks_names]
+                [
+                    self.register_into_invalid_list(dependent, task_name)
+                    for task_name in invalid_tasks_names
+                ]
                 dict_structure = {dependent: invalid_tasks_names}
                 msg = f"There are DAGs or Tables dependencies with invalid characters. There must be only alphanumeric and hyphen in task names. {self.concat_dependent_and_dependencies_to_msg(dict_structure, validation_message)}"
                 self.log_msg(msg=f"msg={msg}", force_log=True)
-
 
     def validate(self) -> int:
         """

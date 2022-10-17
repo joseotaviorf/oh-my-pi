@@ -7,6 +7,7 @@ class SparkTableStorageFormat:
     DEFAULT_CLEAN_STAGING = PARQUET
     DEFAULT_DW = PARQUET
     DEFAULT_DW_STAGING = PARQUET
+    DEFAULT_METRIC = PARQUET
     DEFAULT_REVERSE = PARQUET
 
     @classmethod
@@ -22,6 +23,7 @@ class SparkTableStorageFormat:
             "clean_staging",
             "dw_staging",
             "dw",
+            "metric",
             "reverse",
         ]
 
@@ -39,5 +41,6 @@ class SparkTableStorageFormat:
             "clean_staging": cls.DEFAULT_CLEAN_STAGING,
             "dw_staging": cls.DEFAULT_DW_STAGING,
             "dw": cls.DEFAULT_DW,
+            "metric": cls.DEFAULT_METRIC,
             "reverse": cls.DEFAULT_REVERSE,
         }.get(storage)

@@ -13,6 +13,7 @@ class TestLayerEnum:
             (LayerEnum.ENRICH, True),
             (LayerEnum.DW_STAGING, True),
             (LayerEnum.DW, True),
+            (LayerEnum.METRIC, True),
             (LayerEnum.REVERSE, True),
             ("some wrong key", False),
         ],
@@ -36,6 +37,7 @@ class TestLayerEnum:
             LayerEnum.ENRICH.value,
             LayerEnum.DW_STAGING.value,
             LayerEnum.DW.value,
+            LayerEnum.METRIC.value,
             LayerEnum.REVERSE.value,
         ]
 
@@ -48,6 +50,7 @@ class TestLayerEnum:
             ("enrich", True),
             ("dw_staging", True),
             ("dw", True),
+            ("metric", True),
             ("reverse", True),
         ],
     )

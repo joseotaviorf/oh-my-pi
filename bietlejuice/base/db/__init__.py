@@ -7,6 +7,7 @@ from bietlejuice.base.db.database_client_factory import DatabaseClientFactory
 from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
 from bietlejuice.base.db.dw_metastore_mapping import DwMetastoreMapping
 from bietlejuice.base.db.dw_metastore_service import DWMetastoreService
+from bietlejuice.base.db.metric_metastore_mapping import MetricMetastoreMapping
 
 # TODO: Refactor project to import directly from base.paths
 from bietlejuice.base.paths import (
