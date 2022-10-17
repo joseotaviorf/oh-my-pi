@@ -36,6 +36,8 @@ class GSheetValidationSuite(GsheetsValidationSuitesExecutor):
                 _sheet_info.get("sheet_context"),
                 _sheet_info.get("clean_table_name"),
                 _sheet_info.get("raw_table_name"),
+                _sheet_info.get("partitioned", False),
+                _sheet_info.get("preload_time_in_seconds", None),
             )
         except Exception as e:
             sheet_info = self.delta.get(_sheet_info["sheet_id"])
@@ -43,7 +45,7 @@ class GSheetValidationSuite(GsheetsValidationSuitesExecutor):
                 f"https://docs.google.com/spreadsheets/d/{_sheet_info['sheet_id']}"
             )
 
-            context = _sheet_info.get("sheet_context").replace("_intraday", "")
+            context = _sheet_info.get("sheet_context", "").replace("_intraday", "")
             context_owner = self._get_slack_group_from_context(context)
 
             if e.__class__ == AnalysisException:

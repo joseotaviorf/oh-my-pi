@@ -1,10 +1,29 @@
+import gc
+import logging
 import os
+import re
+import time
+from typing import List, Optional, Union
+from datetime import datetime, timedelta
+import pendulum
 
 from bietlejuice import dags
+from bietlejuice.base.paths import DATALAKE_SQL_DIR
 from bietlejuice.dags import gsheets, gsheets_by_context
 from bietlejuice.services import FileService
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.consumers.db_consumers import DatabricksConsumer
+
+from quintoandar_logger import QuintoAndarLogger
+from quintoandar_gsheets_api_client import GoogleSheetsClient
 
 import pandas as pd
+from pyspark.sql import DataFrame
+
+JOB_NAME = "gsheets_service"
+
+logging.getLogger("py4j").setLevel(logging.INFO)
+logger = QuintoAndarLogger(JOB_NAME)
 
 
 DEPS_YAML_PATH = os.path.dirname(os.path.realpath(dags.__file__)) + "/dependencies.yaml"
@@ -18,13 +37,13 @@ CONTEXT_GSHEETS_FILES_YAML_PATH = (
 
 
 class GsheetsService:
-    def __init__(self) -> None:
-        pass
+    GSHEETS_DATA_LAKE_RAW_SCHEMA = "datalake_gsheets_raw"
+    GSHEETS_DATA_LAKE_CLEAN_SCHEMA = "datalake_gsheets_clean"
+    TEMPORARY_TABLE_PREFIX = "temp_"
 
-    def get_sheets_are_dependencies(self):
+    def get_sheets_are_dependencies(self) -> List[str]:
         """
         Return the gsheets clean tables that are dependencies to other DAGs on depencencies.yaml
-        :return: list[str]
         """
         dependencies_dict = FileService.get_dict_from_yaml_file(DEPS_YAML_PATH)
         all_deps = []
@@ -67,3 +86,203 @@ class GsheetsService:
             if len([dep for dep in gsheets_deps if clean in dep]) > 0:
                 dependencies_sheets.append(row["clean_table_name"])
         return dependencies_sheets
+
+    def get_recently_modified_gsheet(self, drive_service) -> List:
+        """
+        Get the sheet ids for the Gsheets modified until the DAG run.
+
+        This method won't use the GoogleSheetClient. Needs a better understanding
+        on how to fit inside this class, maybe some more methods will be developed.
+
+        :returns: A list of spreadsheet_ids (strings)
+        """
+        files = {}
+        page_token = None
+        time_zone = pendulum.timezone("America/Sao_Paulo")
+        execution_time = datetime.now(tz=time_zone) - timedelta(hours=24)
+        query = f"mimeType='application/vnd.google-apps.spreadsheet' and modifiedTime > '{execution_time.isoformat()}'"
+
+        while True:
+            response = (
+                drive_service.files()
+                .list(
+                    q=query,
+                    spaces="drive",
+                    fields="nextPageToken, files(id, modifiedTime, lastModifyingUser(displayName, emailAddress))",
+                    supportsAllDrives=True,
+                    includeItemsFromAllDrives=True,
+                    pageToken=page_token,
+                )
+                .execute()
+            )
+
+            for file in response.get("files", []):
+                files.update(
+                    {
+                        file.get("id"): {
+                            "modified_time": file.get("modifiedTime"),
+                            "modifier_user_email": file.get(
+                                "lastModifyingUser", {}
+                            ).get("emailAddress", "User email unkown"),
+                            "modifier_user_name": file.get("lastModifyingUser", {}).get(
+                                "displayName", "User name unkown"
+                            ),
+                        }
+                    }
+                )
+
+            page_token = response.get("nextPageToken", None)
+            if page_token is None:
+                break
+
+        return files
+
+    def __has_import_range(self, sheet_data: list) -> bool:
+        regex_pattern = re.compile("IMPORTRANGE")
+        for row in sheet_data:
+            for column_value in row:
+                if re.search(regex_pattern, str(column_value)) is not None:
+                    return True
+        return False
+
+    def get_gsheets_with_import_range(
+        self, gsheets_client: GoogleSheetsClient, all_sheets_dict: dict
+    ) -> List:
+        logger.info(
+            "m=get_gsheets_with_import_range, msg=Started checking all sheets for IMPORTRANGE presence"
+        )
+        import_range_sheets_ids = []
+        gsheets_count = 0
+
+        for raw_table_name, sheet in all_sheets_dict.items():
+
+            if gsheets_count == 90:  # Current quota = 600. Each call makes 3 requests.
+                gsheets_count = 0
+                time.sleep(60)  # Time to reset the quota
+            sheet_id = sheet["sheet_id"]
+            sheet_name = sheet["sheet_name"]
+
+            if sheet.get("sheet_context") == "static":
+                continue
+
+            sheet_data = gsheets_client.get_all_sheet_rows(
+                sheet_id=sheet_id, sheet_name=sheet_name, value_render_option="FORMULA"
+            )
+
+            if (
+                self.__has_import_range(sheet_data)
+                and sheet_id not in import_range_sheets_ids
+            ):
+                import_range_sheets_ids.append(sheet_id)
+
+            gsheets_count += 1
+
+        logger.info("m=get_gsheets_with_import_range, msg=Finished executing")
+        return import_range_sheets_ids
+
+    @staticmethod
+    def load_clean_query(
+        clean_table_name: str, gsheets_context: Optional[str] = None
+    ) -> str:
+        """
+        :param clean_table_name: Table name for sheet on clean layer
+        :param gsheets_context: Sheet Context. Optional.
+        """
+        context_level = f"{gsheets_context}/" if gsheets_context else ""
+        query_path = f"{DATALAKE_SQL_DIR}/queries/gsheets/clean/{context_level}{clean_table_name}.sql"
+        query_content = FileService.get_query_from_file_name(query_path)
+
+        return query_content
+
+    def swap_raw_table_with_temporary(
+        self, raw_table_name: str, tmp_table_name: str, clean_query: str
+    ) -> str:
+        """
+        :param raw_table_name: Table name for sheet on raw layer
+        :param tmp_table_name: Table name for sheet on temporary table
+        :param clean_query: SQL query for clean layer
+        """
+        raw_table = f"{self.GSHEETS_DATA_LAKE_RAW_SCHEMA}.{raw_table_name}"
+        tmp_table = f"{self.TEMPORARY_TABLE_PREFIX}{tmp_table_name}"
+
+        return clean_query.replace(raw_table, tmp_table)
+
+    def try_run_clean_query_into_table(
+        self, spark_client: SparkClient, clean_query: str
+    ) -> None:
+        """
+        Try to run the clean query on sheet temp raw table.
+        If it succeeds, the data is returned. If it fails, an exception is
+         raised and caught by validator engine.
+
+        :param spark_client: A client to handle the Spark connection
+        :param clean_query: SQL query for clean layer
+        """
+        databricks_consumer = DatabricksConsumer(
+            conn_config={"db": self.GSHEETS_DATA_LAKE_CLEAN_SCHEMA},
+            spark_client=spark_client,
+        )
+        databricks_consumer.get_data_from_query(clean_query)
+
+    def run_and_validate_clean_query(
+        self,
+        spark_client: SparkClient,
+        gsheets_context: str,
+        clean_table_name: str,
+        raw_table_name: str,
+    ) -> Union[bool, None]:
+        """
+        Loads clean table from path and tries to run it in the previously
+         created temp table.
+        :param spark_client: A client to handle the Spark connection
+        :param gsheets_context: Sheet Context. Optional.
+        :param clean_table_name: Table name for sheet on clean layer
+        :param raw_table_name: Table name for sheet on raw layer
+
+        Returns True if the validation succeeded. Else an error is raised.
+        """
+        clean_query = self.load_clean_query(clean_table_name, gsheets_context)
+        clean_query = self.swap_raw_table_with_temporary(
+            raw_table_name, clean_table_name, clean_query
+        )
+        self.try_run_clean_query_into_table(spark_client, clean_query)
+        return True
+
+    def release_memory(
+        self, spark_client: SparkClient, dataframe: DataFrame, clean_table_name: str
+    ) -> None:
+        """
+        Drops temp table, JVM dataframe and python runtime variables to release cluster memory
+        :param spark_client: A client to handle the Spark connection
+        :param dataframe: Spark Dataframe with google sheets data.
+        :param clean_table_name: Table name for sheet on clean layer
+        """
+        spark_client.conn.catalog.dropTempView(
+            f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}"
+        )
+        dataframe.unpersist(blocking=True)
+        del dataframe
+        gc.collect()
+
+    def validate_clean_query_against_raw(
+        self,
+        spark_client: SparkClient,
+        df: DataFrame,
+        gsheet_context: str,
+        raw_table_name: str,
+        clean_table_name: str,
+    ) -> None:
+        """
+        Loads raw Dataframe into an temporary view and validates clean query against it
+        :param spark_client: A client to handle the Spark connection
+        :param df: Spark Dataframe with google sheets data.
+        :param gsheets_context: Sheet Context. Optional.
+        :param raw_table_name: Table name for sheet on raw layer
+        :param clean_table_name: Table name for sheet on clean layer
+        """
+
+        df.createTempView(f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}")
+        self.run_and_validate_clean_query(
+            spark_client, gsheet_context, clean_table_name, raw_table_name
+        )
+        self.release_memory(spark_client, df, clean_table_name)
