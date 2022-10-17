@@ -1,22 +1,27 @@
 from datetime import datetime
-import pendulum
 import os
+import pendulum
 
-from airflow.utils.helpers import cross_downstream
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.utils.helpers import cross_downstream
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
+# dag params
 SOURCE = "linhadireta"
 CONTEXT = SOURCE
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = os.environ.get("ENVIRONMENT")
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 5 * * *"
 
 config_service = ConfigurationService(SOURCE)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -28,23 +33,20 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 
-RAW_SPARK_JOB_PATH = (
-    f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_{CONTEXT}_raw.py"
+raw_spark_jobs_path = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{CONTEXT}_raw.py"
 )
-BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+default_libraries = config_service.get_config("default_libraries")
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
-# dag params
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
-MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 5 * * *"
-
-local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -61,7 +63,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    cluster_configuration=cluster_description,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -73,14 +79,14 @@ task_group = DatalakeTaskGroup(
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    spark_jobs_path=base_spark_jobs_path,
     athena_query_result_location=athena_query_results_bucket,
 )
 
 raw_task_group = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=CONTEXT,
-    extraction_spark_job_file=RAW_SPARK_JOB_PATH,
+    extraction_spark_job_file=raw_spark_jobs_path,
     raw_spark_job_extra_args=[CONTEXT],
 )
 
