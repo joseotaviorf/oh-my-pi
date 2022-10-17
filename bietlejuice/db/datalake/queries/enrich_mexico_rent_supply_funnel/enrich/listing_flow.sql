@@ -134,12 +134,6 @@ mexico_channels AS (
         WHEN atx.mkt_origin != 'Owner PWA' THEN atx.mkt_origin 
     END AS supply_mkt_origin_detailed,
     atx.mkt_channel,
-    CASE 
-        WHEN (dl.unbounce_page_variant = 'Registrar Lead' OR dl.advertiser_name = 'Monkey Lab') THEN 'Human Crawlers'
-        WHEN dl.unbounce_page_variant = 'Leads NAVENT' THEN 'Imuebles 24'
-        WHEN dl.unbounce_page_variant = 'Landing Owner Mexico' THEN 'Landing Page - PWA'
-        ELSE atx.mkt_origin
-    END AS mexico_channel,
     dl.unbounce_page_variant AS ub_page_name,
     dl.advertiser_name,
     dl.source AS lead_origin,
@@ -165,12 +159,12 @@ SELECT
   mc.supply_mkt_origin_detailed,
   mc.mkt_channel,
   CASE 
-    WHEN mc.mexico_channel = 'CIQ' THEN 'CIB'
-    WHEN mc.mexico_channel = 'Owner PWA' AND mc.supply_mkt_origin_detailed = 'Organic'  THEN 'Organic Traffic - PWA'
-    WHEN mc.mexico_channel = 'Owner PWA' AND mc.supply_mkt_origin_detailed = 'Paid' THEN 'Landing Page - PWA'
-    WHEN mc.mexico_channel = 'LP Navent' THEN 'I24'
-    WHEN mc.mexico_channel LIKE '%Indica Aí%' THEN 'Refiere y Gana'
-    ELSE mc.mexico_channel
+      WHEN mc.supply_mkt_origin = 'CIQ' THEN 'CIB'
+      WHEN mc.supply_mkt_origin = 'Owner PWA' AND mc.supply_mkt_origin_detailed = 'Organic'  THEN 'Organic Traffic - PWA'
+      WHEN mc.supply_mkt_origin = 'Owner PWA' AND mc.supply_mkt_origin_detailed = 'Paid' THEN 'Landing Page - PWA'
+      WHEN mc.supply_mkt_origin = 'LP Navent' THEN 'I24'
+      WHEN mc.supply_mkt_origin LIKE '%Indica Aí%' THEN 'Refiere y Gana'
+      ELSE mc.supply_mkt_origin
   END AS mexico_channel,
   mc.lead_origin,
   mc.ub_page_name,
