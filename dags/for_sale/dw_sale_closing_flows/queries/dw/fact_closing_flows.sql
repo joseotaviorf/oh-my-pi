@@ -1,3 +1,4 @@
+
 SELECT
   id_offer AS sk_offer,
   id_buyer AS sk_buyer,
