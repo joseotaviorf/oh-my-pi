@@ -2141,10 +2141,12 @@ bietlejuice.enrich_sale_closing_flows:
   - bietlejuice.sales_flow:load-clean-diligence
 
 bietlejuice.enrich_sale_flows:
-  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_offer:load-enrich-sale-offer
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status
 
 bietlejuice.enrich_sale_lead_flows:
   # Removed dependency with enrich_booking.booking since enrich_offer already satisfies
