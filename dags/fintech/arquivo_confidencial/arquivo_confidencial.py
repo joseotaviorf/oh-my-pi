@@ -1,6 +1,6 @@
-import pendulum
-from datetime import datetime
 import os
+from pendulum import timezone
+from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
@@ -15,36 +15,25 @@ from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 SOURCE = "arquivo_confidencial"
-DAG_NAME = SOURCE
-DAG_ID = f"bietlejuice.{DAG_NAME}"
-
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2019, 1, 16, 0, 0, 0, tzinfo=LOCAL_TZ)
+DAG_ID = f"bietlejuice.{SOURCE}"
+MAIN_START_DATE = datetime(2019, 1, 16, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 6 * * *"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(SOURCE)
 datalake_bucket = config_service.get_config("datalake_bucket")
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{{extraction_type}}_{SOURCE}_into_datalake.py"
-
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{{extraction_type}}_{SOURCE}_raw.py"
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 
-CUSTOM_LIBRARIES = [
-    {
-        "jar": f"{artifacts_s3_bucket}/mysql-connector-java/mysql-connector-java-5.1"
-        f".47.jar"
-    }
-]
+CUSTOM_LIBRARIES = [{"maven": {"coordinates": "mysql:mysql-connector-java:5.1.47"}}]
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -62,7 +51,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
@@ -70,7 +59,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=cluster_description,
+    cluster_configuration=cluster_configuration,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries + CUSTOM_LIBRARIES,
 )
@@ -84,7 +73,7 @@ task_group = DatalakeTaskGroup(
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=SOURCE,
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    spark_jobs_path=base_spark_jobs_path,
     athena_query_result_location=athena_query_results_bucket,
 )
 
@@ -107,7 +96,7 @@ for table in tables:
         source=SOURCE,
         target_database_base_name=SOURCE,
         table_name=table_name,
-        extraction_spark_job_file=RAW_SPARK_JOB_PATH.format(
+        extraction_spark_job_file=raw_spark_job_path.format(
             extraction_type=extraction_type
         ),
         raw_spark_job_extra_args=parameters,
