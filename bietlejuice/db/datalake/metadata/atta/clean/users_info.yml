@@ -26,6 +26,9 @@ columns:
   user_status:
     lineage:
       - datalake_atta_raw.max_usuarios.status
+  ts_last_updated:
+    lineage:
+      - datalake_atta_raw.max_usuarios.data_ultima_atualizacao
   year:
     lineage:
       - datalake_atta_raw.max_usuarios.year

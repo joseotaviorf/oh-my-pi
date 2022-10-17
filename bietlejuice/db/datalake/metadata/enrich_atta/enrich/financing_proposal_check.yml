@@ -1,0 +1,79 @@
+---
+database_name: datalake_atta
+table_name: financing_proposal_check
+columns:
+  id:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.id
+  id_proposal_product:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.id_proposal_product
+  id_confirmed_user:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.id_confirmed_user
+  id_included_user:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.id_included_user
+  house_sale_value:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.house_sale_value
+  down_payment_own_resources_value:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.down_payment_own_resources_value
+  fgts_down_payment_value:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.fgts_down_payment_value
+  financing_value:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.financing_value
+  bank_valuation_value:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.bank_valuation_value
+  bank_valuation_fee_value:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.bank_valuation_fee_value
+  itbi_value:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.itbi_value
+  installments_quantity:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.installments_quantity
+  financing_fee:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.financing_fee
+  payment_sale_value:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.payment_sale_value
+  has_seller_debt_payment:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.has_seller_debt_payment
+  seller_debt_payment_value:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.seller_debt_payment_value
+  channel:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.channel
+  is_confirmed:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.is_confirmed
+  ts_updated:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.ts_updated
+  ts_confirmation:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.ts_confirmation
+  ts_inclusion:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.ts_inclusion
+  ts_seller_debt_payment:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.ts_seller_debt_payment
+  year:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.year
+  month:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.month
+  day:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.day

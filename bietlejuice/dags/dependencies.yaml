@@ -1302,6 +1302,13 @@ bietlejuice.enrich_analyst_ranking:
   - bietlejuice.gsheets.support_and_service:load-clean-support-agents-department
   - bietlejuice.gsheets.support_and_service:load-clean-ranking-rules
 
+bietlejuice.enrich_atta:
+  - bietlejuice.atta:load-clean-financing-proposal-check
+  - bietlejuice.atta:load-clean-log-isolve-v1
+  - bietlejuice.atta:load-clean-product-info
+  - bietlejuice.atta:load-clean-proposal
+  - bietlejuice.atta:load-clean-users-info
+
 bietlejuice.enrich_betopera:
   - bietlejuice.betopera:load-clean-certificate
   - bietlejuice.betopera:load-clean-certificate-request
