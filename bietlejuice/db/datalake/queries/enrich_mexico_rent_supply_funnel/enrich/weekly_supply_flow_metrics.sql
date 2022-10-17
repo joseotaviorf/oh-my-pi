@@ -40,11 +40,11 @@ supply_funnel_targets AS (
             WHEN supply_origin LIKE '%Human crawlers%' THEN 'Human Crawlers'
             ELSE supply_origin
         END AS mexico_channel,
-        SUM(CAST(NULLIF(top_of_funnel,'') AS REAL)) AS leads,
-        SUM(CAST(NULLIF(prospects,'') AS REAL)) AS prospects,
-        SUM(CAST(NULLIF(qualifieds,'') AS REAL)) AS qualifieds,
-        SUM(CAST(NULLIF(opportunities,'') AS REAL)) AS opportunities,
-        SUM(CAST(NULLIF(first_listings,'') AS REAL)) AS first_listings,
+        SUM(CAST(NULLIF(top_of_funnel,'') AS FLOAT)) AS leads,
+        SUM(CAST(NULLIF(prospects,'') AS FLOAT)) AS prospects,
+        SUM(CAST(NULLIF(qualifieds,'') AS FLOAT)) AS qualifieds,
+        SUM(CAST(NULLIF(opportunities,'') AS FLOAT)) AS opportunities,
+        SUM(CAST(NULLIF(first_listings,'') AS FLOAT)) AS first_listings,
         DATE(DATE_TRUNC('week', DATE(dt_target))) AS dt_week_started
     FROM 
         datalake_gsheets_clean.mexico_supply_targets_2022
@@ -74,8 +74,12 @@ supply_budget_targets AS (
             ELSE planning_mkt_level3 
         END AS supply_mkt_origin_detailed,
         SUM(budget) AS budget_total,
-        SUM(CASE WHEN UPPER(planning_mkt_level3) LIKE '%COMISION%' OR UPPER(planning_mkt_level3) LIKE '%COMISIÓN%' THEN budget END) AS budget_comission,
-        SUM(CASE WHEN UPPER(planning_mkt_level3) NOT LIKE '%COMISION%' AND UPPER(planning_mkt_level3) NOT LIKE '%COMISIÓN%' THEN budget END) AS budget,
+        SUM(CASE
+                WHEN UPPER(planning_mkt_level3) LIKE '%COMISION%' OR UPPER(planning_mkt_level3) LIKE '%COMISIÓN%' THEN budget
+        END) AS budget_comission,
+        SUM(CASE
+                WHEN UPPER(planning_mkt_level3) NOT LIKE '%COMISION%' AND UPPER(planning_mkt_level3) NOT LIKE '%COMISIÓN%' THEN budget
+        END) AS budget,
         dt_week AS dt_week_started
     FROM
         datalake_gsheets_clean.mexico_costs_targets
@@ -157,10 +161,10 @@ cohort_funnel AS (
         SUM(qualifieds_cohort) AS qualifieds_cohort,
         SUM(opportunities_cohort) AS opportunities_cohort,
         SUM(first_listings_cohort) AS first_listings_cohort,
-        SUM(l2p_cohort) AS l2p_cohort,
-        SUM(p2q_cohort) AS p2q_cohort,
-        SUM(q2o_cohort) AS q2o_cohort,
-        SUM(o2fl_cohort) AS o2fl_cohort,
+        CAST(SUM(l2p_cohort) AS FLOAT) AS l2p_cohort,
+        CAST(SUM(p2q_cohort) AS FLOAT) AS p2q_cohort,
+        CAST(SUM(q2o_cohort) AS FLOAT) AS q2o_cohort,
+        CAST(SUM(o2fl_cohort) AS FLOAT) AS o2fl_cohort,
         dt_lead_week_started
     FROM
         datalake_mexico_rent_supply_funnel.cohort_funnel 
@@ -184,21 +188,21 @@ SELECT
     cfl.opportunities_cohort,
     cfl.first_listings_cohort,
     -- Coincident "conversions"
-    CAST(cf.prospects/CAST(NULLIF(cf.leads,0) AS REAL) AS FLOAT) AS l2p_coincident,
-    CAST(cf.qualifieds/CAST(NULLIF(cf.prospects,0) AS REAL) AS FLOAT) AS p2q_coincident,
-    CAST(cf.opportunities/CAST(NULLIF(cf.qualifieds,0) AS REAL) AS FLOAT) AS q2o_coincident,
-    CAST(cf.first_listings/CAST(NULLIF(cf.opportunities,0) AS REAL) AS FLOAT) AS o2fl_coincident,
+    CAST(cf.prospects/CAST(NULLIF(cf.leads,0) AS FLOAT) AS FLOAT) AS l2p_coincident,
+    CAST(cf.qualifieds/CAST(NULLIF(cf.prospects,0) AS FLOAT) AS FLOAT) AS p2q_coincident,
+    CAST(cf.opportunities/CAST(NULLIF(cf.qualifieds,0) AS FLOAT) AS FLOAT) AS q2o_coincident,
+    CAST(cf.first_listings/CAST(NULLIF(cf.opportunities,0) AS FLOAT) AS FLOAT) AS o2fl_coincident,
     -- Cohort conversions
-    CAST(cfl.l2p_cohort AS FLOAT) AS l2p_cohort,
-    CAST(cfl.p2q_cohort AS FLOAT) AS p2q_cohort,
-    CAST(cfl.q2o_cohort AS FLOAT) AS q2o_cohort,
-    CAST(cfl.o2fl_cohort AS FLOAT) AS o2fl_cohort,
+    cfl.l2p_cohort,
+    cfl.p2q_cohort,
+    cfl.q2o_cohort,
+    cfl.o2fl_cohort,
     -- Actual volume targets
-    CAST(sft.leads AS FLOAT) AS leads_targets,
-    CAST(sft.prospects AS FLOAT) AS prospects_targets,
-    CAST(sft.qualifieds AS FLOAT) AS qualifieds_targets,
-    CAST(sft.opportunities AS FLOAT) AS opportunities_targets,
-    CAST(sft.first_listings AS FLOAT) AS first_listings_targets,
+    sft.leads AS leads_targets,
+    sft.prospects AS prospects_targets,
+    sft.qualifieds AS qualifieds_targets,
+    sft.opportunities AS opportunities_targets,
+    sft.first_listings AS first_listings_targets,
     -- Actual costs
     CAST(sac.actual_cost AS FLOAT) AS actual_cost,
     CAST(sac.actual_cost_comission AS FLOAT) AS actual_cost_comission,
@@ -213,7 +217,7 @@ SELECT
     DATE(COALESCE(dim.dt_week_started, sft.dt_week_started)) AS dt_week_started
 FROM
     mexico_regions AS dim
-JOIN
+LEFT JOIN
     coincident_funnel AS cf
         ON dim.dt_week_started = cf.dt_week_started 
         AND dim.city_group = cf.city_group
@@ -224,7 +228,7 @@ LEFT JOIN
         AND cf.supply_mkt_origin = cfl.supply_mkt_origin
         AND cf.supply_mkt_origin_detailed = cfl.supply_mkt_origin_detailed
         AND cf.mexico_channel = cfl.mexico_channel
-FULL OUTER JOIN
+LEFT JOIN
     supply_funnel_targets AS sft
         ON dim.dt_week_started = sft.dt_week_started 
         AND dim.city_group = sft.city_group 
