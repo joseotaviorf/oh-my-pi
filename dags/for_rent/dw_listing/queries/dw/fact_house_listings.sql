@@ -56,7 +56,7 @@ autonomous_agent_info AS (
 )
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   hl.id_house_listing AS sk_house_listing,
-  COALESCE(NULLIF(NULLIF(h.id_user, pa_b2b_online.id_user), pa_b2b_prime.id_user), -1) AS sk_owner,
+  COALESCE(h.id_user, -1) AS sk_owner,
   COALESCE(h.id_region, -1) AS sk_region,
   COALESCE(h.id_user_registrant, -1) AS sk_user_registration,
   COALESCE(hlc.id_contract, -1) AS sk_contract,

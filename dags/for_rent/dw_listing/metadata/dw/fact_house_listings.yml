@@ -7,7 +7,6 @@ columns:
   sk_owner:
     lineage:
       - datalake_ebdb_listing.house.id_user
-      - datalake_ebdb_clean.partner_agent.id_user
   sk_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
