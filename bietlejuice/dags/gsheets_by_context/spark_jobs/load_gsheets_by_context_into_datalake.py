@@ -109,15 +109,14 @@ if __name__ == "__main__":
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
 
-    df = gsheets_consumer.get_sheet_df(
-        sheet_details["sheet_name"],
-        sheet_details["sheet_id"],
-        sheet_details["clean_table_name"],
-        sheet_details.get("partitioned"),
-        sheet_details.get("preload_time_in_seconds"),
-    )
-
     try:
+        df = gsheets_consumer.get_sheet_df(
+            sheet_details["sheet_name"],
+            sheet_details["sheet_id"],
+            sheet_details["clean_table_name"],
+            sheet_details.get("partitioned"),
+            sheet_details.get("preload_time_in_seconds"),
+        )
         # validate data before loading
         GsheetsService().validate_clean_query_against_raw(
             spark_client,
