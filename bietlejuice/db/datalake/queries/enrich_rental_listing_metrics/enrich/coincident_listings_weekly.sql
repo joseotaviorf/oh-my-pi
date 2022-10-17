@@ -66,9 +66,11 @@ WITH weekly_listings AS (
         AND RIGHT(hldi.id_house_listing, 3) <> '000'
         -- We get weeks that already are closed or ongoing ones.
         -- Instead of CURRENT_DATE, DATE('{year}-{month}-{day}') try to ensure idempotence
+        -- If a listing ends on the middle of a week, we won`t have a problem because
+        -- we are considering the final state of the house on that week.
         AND (hldi.is_week_end = TRUE 
             OR DATE(CONCAT(hldi.year, '-', hldi.month, '-', hldi.day)) = DATE('{year}-{month}-{day}')
-            OR dhl.ts_listing_version_end = hldi.ts_status_ended)
+            )
         AND dr.country_code = 'BR'
         AND DATE(CONCAT(hldi.year, '-', hldi.month, '-', hldi.day)) >= DATE('{year}-{month}-{day}') - INTERVAL 58 WEEK
 ),
@@ -114,8 +116,6 @@ weekly_listings_mkt AS (
         dw_public.dim_contract AS dc
             ON wl.id_contract = dc.sk_contract
             AND dc.ts_signature IS NOT NULL
-    WHERE 
-        wl.dt_week < DATE_TRUNC('week', DATE('{year}-{month}-{day}')) 
 ),
 weekly_listings_base AS ( 
     SELECT
