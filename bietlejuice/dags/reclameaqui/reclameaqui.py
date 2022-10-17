@@ -28,7 +28,8 @@ MAIN_START_DATE = datetime(
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 
 config_service = ConfigurationService(DAG_NAME)
-partition_cols = config_service.get_config("partition_cols")
+tickets_endpoint_config = config_service.get_config("tickets")
+partition_cols = tickets_endpoint_config.get("partition_cols")
 
 # s3 paths setup
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
