@@ -51,8 +51,8 @@ table_block_list = config_service.get_config("tables_exclusion_list")
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2022, 8, 23, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = (
-    "0 12 * * *"
-)  # Nazaré only finishes loading its daily data around 11am UTC-3
+    "0 12 * * *"  # Nazaré only finishes loading its daily data around 11am UTC-3
+)
 
 
 dag = DAG(
