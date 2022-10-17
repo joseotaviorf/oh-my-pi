@@ -1,19 +1,19 @@
 from datetime import datetime
-import pendulum
 import os
+import pendulum
 
-from airflow.utils.helpers import chain, cross_downstream
 from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.utils.helpers import chain, cross_downstream
 
-from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services import ConfigurationService
-from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 SOURCE = "insider"
 CONTEXT = SOURCE
@@ -30,9 +30,11 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 # s3 paths setup
-s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
-raw_spark_job_path = s3_prefix + f"/spark_jobs/{SOURCE}/load_insider_into_datalake.py"
-base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
+)
+raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_into_datalake.py"
+base_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 # cluster setup
 cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
@@ -65,7 +67,11 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=cluster_description
+    dag=dag,
+    task_id="create-cluster",
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    cluster_configuration=cluster_description,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -77,7 +83,7 @@ task_group = DatalakeTaskGroup(
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
-    spark_jobs_path=base_spark_jobs_path,
+    spark_jobs_path=base_spark_job_path,
     athena_query_result_location=athena_query_results_bucket,
 )
 
