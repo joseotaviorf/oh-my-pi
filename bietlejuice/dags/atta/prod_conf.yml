@@ -2,57 +2,45 @@
 tables:
   - table_name: consulta_score
     extraction_type: full
-    is_cleaned: true
     clean_table_name: pre_analysis
   - table_name: entidade_log
     extraction_type: full
-    is_cleaned: true
     clean_table_name: log_isolve_v2
   - table_name: franquia
     extraction_type: full
-    is_cleaned: true
     clean_table_name: franchise_info
   - table_name: fornecedores
     extraction_type: full
-    is_cleaned: true
     clean_table_name: providers_info
   - table_name: log_proposta_esteira
-    extraction_type: full
+    extraction_type: incremental
     date_filter_column: DtSITatu
-    is_cleaned: true
     clean_table_name: log_isolve_v1
   - table_name: max_usuarios
-    extraction_type: full
+    extraction_type: incremental
     date_filter_column: data_ultima_atualizacao
-    is_cleaned: true
     clean_table_name: users_info
   - table_name: parceiro
     extraction_type: full
-    is_cleaned: true
     clean_table_name: partner_info
   - table_name: produto
-    extraction_type: full
+    extraction_type: incremental
     date_filter_column: DtUltAtu
-    is_cleaned: true
     clean_table_name: product_info
   - table_name: produto_esteira
     extraction_type: full
-    is_cleaned: true
     clean_table_name: track_step_detail
   - table_name: proposta
-    extraction_type: full
+    extraction_type: incremental
     date_filter_column: DtUltAtu
-    is_cleaned: true
     clean_table_name: proposal
   - table_name: proposta_credimob_confval
-    extraction_type: full
+    extraction_type: incremental
     date_filter_column: AtualizadoEm
-    is_cleaned: true
     clean_table_name: financing_proposal_check
   - table_name: proposta_itau
     extraction_type: full
-    is_cleaned: true
     clean_table_name: financing_proposal
 
-partition_columns: [year, month, day]
+clean_partition_columns: [year, month, day]
 lineage_product_database_name: atta

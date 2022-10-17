@@ -13,64 +13,41 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 ### Outputs
 
-In datalake raw, via full load:
+In datalake RAW, via full load:
 
-- `analiseparametrizacoes`
-- `analisescredito`
-- `analisesenriquecimento`
-- `cadastro_cliente`
-- `cadastro_imovel`
-- `cadastro_rating`
-- `canal`
-- `cliente`
-- `cliente_vendedor`
-- `cms_fechamento_detalhe`
 - `consulta_score`
-- `consulta_score_caixa`
-- `consulta_score_cliente_ctrl`
-- `consulta_score_itau`
-- `documento_produto`
-- `documento_sub_categoria`
-- `documento_tipo`
-- `documento_tpcontratacao`
 - `entidade_log`
 - `franquia`
 - `fornecedores`
-- `lead_dados_captura`
-- `lead_detalhe_acompanhamento`
-- `lead_detalhe_categoria`
-- `log_contrato_assinado_parceiro`
-- `log_proposta_esteira`
-- `log_proposta_reemissao`
-- `log_vinculo_analista_proposta`
-- `max_usuarios`
-- `meta_consultor`
 - `parceiro`
-- `parceiro_categoria`
-- `pre_analise_observacao`
-- `produto`
 - `produto_esteira`
+- `proposta_itau`
+
+via incremental load:
+
+- `log_proposta_esteira`
+- `max_usuarios`
+- `produto`
 - `proposta`
 - `proposta_credimob_confval`
-- `proposta_esteira`
-- `proposta_itau`
-- `simulacao_fornecedor`
-- `simulador_credito_imobiliario`
-- `simulador_credito_imobiliario_fornecedor`
-- `sla_fornecedor`
-- `spcrepositorio`
-- `usuariospilotomultibancos`
 
-In datalake clean, via full load:
+
+
+In datalake CLEAN, via full load:
 
 - `financing_proposal`
-- `financing_proposal_check`
 - `franchise_info`
-- `log_isolve_v1`
 - `log_isolve_v2`
 - `partner_info`
 - `pre_analysis`
-- `product_info`
-- `proposal`
 - `providers_info`
+- `track_step_detail`
+
+
+via incremental load:
+
+- `financing_proposal_check`
+- `log_isolve_v1`
+- `proposal`
+- `product_info`
 - `users_info`

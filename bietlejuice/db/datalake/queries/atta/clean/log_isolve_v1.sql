@@ -6,6 +6,13 @@ SELECT
     SITatu AS id_current_proposal_situation ,
     Usuario AS id_user,
     Controle AS control,
-    TIMESTAMP(DtSITatu) AS ts_current_log
+    TIMESTAMP(DtSITatu) AS ts_current_log,
+    year,
+    month,
+    day
 FROM
     datalake_atta_raw.log_proposta_esteira
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

@@ -89,7 +89,7 @@ task_group = DatalakeTaskGroup(
 )
 
 tables = config_service.get_config("tables")
-partition_columns = config_service.get_config("partition_columns")
+partition_columns = config_service.get_config("clean_partition_columns")
 
 for table in tables:
     table_name = table["table_name"]
@@ -98,7 +98,6 @@ for table in tables:
     parameters = [SOURCE, table_name]
 
     is_incremental = extraction_type == "incremental"
-    is_cleaned = table["is_cleaned"]
 
     if is_incremental:
         parameters.append(table["date_filter_column"])
@@ -119,25 +118,18 @@ for table in tables:
 
     create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
 
-    if is_cleaned:
-        clean_table_name = table.get("clean_table_name", clean_table_name)
-        clean_task_group = task_group.build_clean_task_group(
-            source_database_base_name=SOURCE,
-            target_database_base_name=SOURCE,
-            table_name=clean_table_name,
-            is_incremental=is_incremental,
-            partitions=partitions,
-        )
+    clean_table_name = table.get("clean_table_name", clean_table_name)
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=clean_table_name,
+        is_incremental=is_incremental,
+        partitions=partitions,
+    )
 
-        cross_downstream(
-            DatalakeTaskGroup.last_tasks(raw_task_group),
-            DatalakeTaskGroup.first_tasks(clean_task_group),
-        )
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
 
-        terminate_cluster_task.set_upstream(
-            DatalakeTaskGroup.last_tasks(clean_task_group)
-        )
-    else:
-        terminate_cluster_task.set_upstream(
-            DatalakeTaskGroup.last_tasks(raw_task_group)
-        )
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
