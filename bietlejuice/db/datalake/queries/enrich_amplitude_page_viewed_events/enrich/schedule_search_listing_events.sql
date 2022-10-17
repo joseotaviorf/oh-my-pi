@@ -1,5 +1,3 @@
-DROP VIEW IF EXISTS datalake_amplitude_page_viewed_events.schedule_search_listing_events;
-CREATE OR REPLACE VIEW datalake_amplitude_page_viewed_events.schedule_search_listing_events AS
 SELECT  
     ep_house_id,
     id_user,
