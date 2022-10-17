@@ -324,7 +324,7 @@ class DAGMetadataService:
         #  of the FileServices context must be replaced to another place like some Metadata Service
         dag_path = DAGPackagesPathService.get_dag_path(dag_name)
         path = (
-            f"{dag_path}/metadata/{layer}/{table_name}.*"
+            f"{dag_path}/metadata/{layer}/**/{table_name}.*"
         )  # Para Databricks: pegar do S3.
         files_found = glob.glob(path, recursive=True)
 

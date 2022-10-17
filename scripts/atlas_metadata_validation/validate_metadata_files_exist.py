@@ -170,6 +170,7 @@ def main():
         query_path = extract_relative_query_path(file)
         if query_path:
             try:
+                # table_info =  (source, layer, context, dag, ingestion_type, table)
                 table_info = FileService.get_table_info_from_path(query_path)
             except ValueError:
                 logger.debug(f"query_path={query_path} msg=File is not a query file")
