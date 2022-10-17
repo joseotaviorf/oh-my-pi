@@ -64,7 +64,6 @@ for root, dirs, files in os.walk(DAG_PACKAGES_ROOT):
 
     for file_name in files:
         dag_path, artifact_path = re.split(f"{artifact}", root)
-        artifact_path = artifact_path.replace("/incremental", "").replace("/full", "")
         dag_name = "/".join(
             list(filter(None, dag_path.replace(DAG_PACKAGES_ROOT, "").split("/")))[1:]
         )
