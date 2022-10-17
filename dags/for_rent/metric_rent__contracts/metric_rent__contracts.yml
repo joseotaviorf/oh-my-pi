@@ -1,0 +1,16 @@
+---
+## TEMPLATE
+# <owner> <mandatory>: # What is the team responsible for this Dag.
+# <domain_details> <mandatory>: #
+#   <brief_description> <mandatory>: # A brief overview about the domain and what we are measuring.
+#                                      this will fill up the doc md of your dag.
+# <custom_cluster> <optional>:
+# <dag_end_date> <mandatory on alpha Dags>:
+# <custom_table_configs> <optional>: The default tables are full without partitions. In this config
+#                                    one can choose a incremental load and customize any partition.
+
+owner: DATA_FOR_RENT
+domain_details:
+  brief_description: |
+    Rental contracts metrics, including active and ended,
+    to get the information about the new rentals, new and ended contracts.
