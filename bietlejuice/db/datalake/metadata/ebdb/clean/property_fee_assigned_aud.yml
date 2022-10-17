@@ -1,0 +1,22 @@
+---
+database_name: datalake_ebdb_clean
+table_name: property_fee_assigned_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned_aud.id
+  id_contract:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned_aud.contract_id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned_aud.imovel_id
+  id_property_fee:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned_aud.propertyfee_id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.propertyfeeassigned_aud.revtype

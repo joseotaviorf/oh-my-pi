@@ -1,0 +1,58 @@
+---
+database_name: datalake_ebdb_clean
+table_name: property_fee_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.revtype
+  contract_type:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.contractType
+  category:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.category
+  region_type:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.regionType
+  body_observation:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.bodyObservation
+  body_text:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.bodyText
+  body_title:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.bodyTitle
+  header_subtitle:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.headerSubTitle
+  header_title:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.headerTitle
+  promotion_tag:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.promotionTag
+  promotion_url:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.promotionUrl
+  fee:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.fee
+  promotional_adm_fee:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.promotionalAdmFee
+  promotional_period:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.promotionalPeriod
+  ts_valid_from:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.validFrom
+  ts_valid_until:
+    lineage:
+      - datalake_ebdb_raw.propertyfee_aud.validUntil

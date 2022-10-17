@@ -35,7 +35,6 @@ table_block_list:
   - ContatoCondominio_AUD
   - PreProcessedHouseInsight
   - ContactSituation_AUD
-  - PropertyFeeAssigned_AUD
   - NotificationExternal
   - ImovelFavorito
   - HouseSpecialCondition_AUD
@@ -191,7 +190,6 @@ table_block_list:
   - PaymentRules_AUD
   - ProOwnerFee
   - Avaliacao
-  - PropertyFee_AUD
   - DadosOperacaoContaCorrente
   - Parametro
   - Negociacao_animais
