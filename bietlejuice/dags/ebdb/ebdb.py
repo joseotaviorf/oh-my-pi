@@ -389,6 +389,7 @@ for tb_name in tb_names:
                 "python_file": f"{BASE_SPARK_JOBS_PATH}/data_quality_tests.py",
                 "parameters": [
                     ENV,
+                    "{{ ds }}",
                     inmetro_bucket,
                     "raw",
                     SOURCE,

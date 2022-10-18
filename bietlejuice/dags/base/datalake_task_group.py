@@ -71,6 +71,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         source,
         target_database_base_name,
         extraction_spark_job_file,
+        execution_date="{{ ds }}",
         table_name=None,
         raw_spark_job_extra_args=None,
         pool=AIRFLOW_DEFAULT_POOL,
@@ -89,6 +90,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type target_database_base_name: str
         :param extraction_spark_job_file: full filepath for the extraction spark job
         :type extraction_spark_job_file: str
+        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :type execution_date: str
         :param table_name: the table name when loading a single table
         :type table_name: str
         :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
@@ -267,6 +270,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
                         "parameters": [
                             self.env,
+                            execution_date,
                             inmetro_bucket,
                             layer,
                             self.relative_query_path,
@@ -582,6 +586,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
                         "parameters": [
                             self.env,
+                            execution_date,
                             inmetro_bucket,
                             layer.value,
                             self.relative_query_path,

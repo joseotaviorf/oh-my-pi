@@ -144,6 +144,7 @@ class ReverseTaskGroup(BaseTaskGroup):
                         "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
                         "parameters": [
                             self.env,
+                            execution_date,
                             inmetro_bucket,
                             layer.value,
                             self.relative_query_path,

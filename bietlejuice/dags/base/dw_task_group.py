@@ -226,6 +226,7 @@ class DWTaskGroup(BaseTaskGroup):
     def build_dw_staging_task_group(
         self,
         table_name: str,
+        execution_date="{{ ds }}",
         is_incremental: bool = False,
         partitions: list = None,
         has_ods_migration_test: bool = False,
@@ -304,6 +305,7 @@ class DWTaskGroup(BaseTaskGroup):
                         "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
                         "parameters": [
                             self.env,
+                            execution_date,
                             inmetro_bucket,
                             layer,
                             self.relative_query_path,
