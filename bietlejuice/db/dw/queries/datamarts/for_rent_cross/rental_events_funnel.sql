@@ -191,10 +191,10 @@ SELECT
 	NULL AS demand_mkt_medium,
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
-  	NULL::BIGINT AS leads,
+  NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+  NULL::BIGINT AS qualifieds,
 	COUNT(fhlf.sk_available_qualified_date) AS available_qualifieds, -- this count is done on the available qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
-	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
 	NULL::BIGINT AS messages_sent_tta,
