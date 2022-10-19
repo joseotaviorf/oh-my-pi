@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 import pendulum
-from airflow.models import DAG
+from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -16,25 +16,27 @@ from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
+
 SOURCE = "crawlers"
 CONTEXT = f"listings"
-ORIGIN = f"zap_imoveis"
+ORIGIN = f"loft"
 DAG_NAME = f"{CONTEXT}.{ORIGIN}"
 SOURCE_WITH_CONTEXT = f"{SOURCE}_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-INTERMEDIATE_PATH = f"{SOURCE}/{CONTEXT}"
+DAG_NAME_PARTIAL = f"{SOURCE}/{CONTEXT}"
 CONFIG_NAME = "crawlers_listings"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 ENV = os.environ.get("ENVIRONMENT")
-MAIN_START_DATE = datetime(2021, 7, 22, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 3 * * 2"
+MAIN_START_DATE = datetime(2021, 6, 10, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 2 * * 1"
 
 config_service = ConfigurationService(
-    dag_name=CONFIG_NAME, intermediate_path=INTERMEDIATE_PATH
+    dag_name=DAG_NAME_PARTIAL, intermediate_path=CONTEXT
 )
+default_libraries = config_service.get_config("default_libraries")
 
-zap_imoveis_configs = config_service.get_config("zap_imoveis")
-origin = zap_imoveis_configs["origin"]
+loft_configs = config_service.get_config("loft")
+origin = loft_configs["origin"]
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -46,11 +48,16 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = (
-    f"{databricks_bietlejuice_repo_path}/spark_jobs/{INTERMEDIATE_PATH}"
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME_PARTIAL}"
 )
 
-default_libraries = config_service.get_config("default_libraries")
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+CLUSTER_DESCRIPTION = Variable.get(
+    f"databricks_9_1_med_general_cluster", deserialize_json=True
+)
+CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{spark_jobs_logs_path}{DAG_ID}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -61,7 +68,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_RENT,
+        "owner": DAGOwnerEnum.DATA_FOR_SALE,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -75,9 +82,9 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=cluster_description,
-    libraries=default_libraries,
+    cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

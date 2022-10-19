@@ -18,23 +18,23 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 
 SOURCE = "crawlers"
 CONTEXT = f"listings"
-ORIGIN = f"viva_real"
+ORIGIN = f"olx"
 DAG_NAME = f"{CONTEXT}.{ORIGIN}"
 SOURCE_WITH_CONTEXT = f"{SOURCE}_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-INTERMEDIATE_PATH = f"{SOURCE}/{CONTEXT}"
+DAG_NAME_PARTIAL = f"{SOURCE}/{CONTEXT}"
 CONFIG_NAME = "crawlers_listings"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 ENV = os.environ.get("ENVIRONMENT")
-MAIN_START_DATE = datetime(2021, 8, 23, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 3 * * 3"
+MAIN_START_DATE = datetime(2021, 7, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 2 * * 5"
 
 config_service = ConfigurationService(
-    dag_name=CONFIG_NAME, intermediate_path=INTERMEDIATE_PATH
+    dag_name=DAG_NAME_PARTIAL, intermediate_path=CONTEXT
 )
 
-viva_real_configs = config_service.get_config("viva_real")
-origin = viva_real_configs["origin"]
+olx_configs = config_service.get_config("olx")
+origin = olx_configs["origin"]
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -46,9 +46,8 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = (
-    f"{databricks_bietlejuice_repo_path}/spark_jobs/{INTERMEDIATE_PATH}"
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME_PARTIAL}"
 )
-
 
 default_libraries = config_service.get_config("default_libraries")
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")

@@ -16,28 +16,25 @@ from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
-CRAWLER_CONTEXT = f"listings"
-CRAWLER_ORIGIN = f"em_casa"
-
 SOURCE = "crawlers"
-CONTEXT = SOURCE
-DAG_NAME = f"{CRAWLER_CONTEXT}.{CRAWLER_ORIGIN}"
-
-SOURCE_WITH_CONTEXT = f"{SOURCE}_{CRAWLER_CONTEXT}"
+CONTEXT = f"listings"
+ORIGIN = f"zap_imoveis"
+DAG_NAME = f"{CONTEXT}.{ORIGIN}"
+SOURCE_WITH_CONTEXT = f"{SOURCE}_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-INTERMEDIATE_PATH = f"{SOURCE}/{CRAWLER_CONTEXT}"
+DAG_NAME_PARTIAL = f"{SOURCE}/{CONTEXT}"
 CONFIG_NAME = "crawlers_listings"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 ENV = os.environ.get("ENVIRONMENT")
-MAIN_START_DATE = datetime(2021, 10, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 3 * * 5"
+MAIN_START_DATE = datetime(2021, 7, 22, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 3 * * 2"
 
 config_service = ConfigurationService(
-    dag_name=CONFIG_NAME, intermediate_path=INTERMEDIATE_PATH
+    dag_name=DAG_NAME_PARTIAL, intermediate_path=CONTEXT
 )
 
-em_casa_configs = config_service.get_config("em_casa")
-origin = em_casa_configs["origin"]
+zap_imoveis_configs = config_service.get_config("zap_imoveis")
+origin = zap_imoveis_configs["origin"]
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -49,7 +46,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = (
-    f"{databricks_bietlejuice_repo_path}/spark_jobs/{INTERMEDIATE_PATH}"
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME_PARTIAL}"
 )
 
 default_libraries = config_service.get_config("default_libraries")
@@ -64,13 +61,13 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_SALE,
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(CRAWLER_ORIGIN).format(
+    doc_md=BaseDAG.get_dag_doc(ORIGIN).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
@@ -100,7 +97,7 @@ partition_cols = config_service.get_config("partition_cols")
 
 
 raw_spark_job_path = f"{RAW_SPARK_JOB_PATH}/load_crawlers_listings_into_datalake.py"
-parameters = [SOURCE, CRAWLER_CONTEXT, origin, origin, "{{ds}}"]
+parameters = [SOURCE, CONTEXT, origin, origin, "{{ds}}"]
 
 
 raw_task_group = task_group.build_raw_task_group_for_single_table(
@@ -115,7 +112,7 @@ clean_task_group = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE_WITH_CONTEXT,
     target_database_base_name=SOURCE_WITH_CONTEXT,
-    tree_path=f"{CRAWLER_CONTEXT}/{CRAWLER_ORIGIN}/",
+    tree_path=f"{CONTEXT}/{ORIGIN}/",
     partitions=partition_cols,
 )
 

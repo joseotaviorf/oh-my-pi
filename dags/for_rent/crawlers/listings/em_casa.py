@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -16,27 +16,28 @@ from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
+CRAWLER_CONTEXT = f"listings"
+CRAWLER_ORIGIN = f"em_casa"
 
 SOURCE = "crawlers"
-CONTEXT = f"listings"
-ORIGIN = f"loft"
-DAG_NAME = f"{CONTEXT}.{ORIGIN}"
-SOURCE_WITH_CONTEXT = f"{SOURCE}_{CONTEXT}"
+CONTEXT = SOURCE
+DAG_NAME = f"{CRAWLER_CONTEXT}.{CRAWLER_ORIGIN}"
+
+SOURCE_WITH_CONTEXT = f"{SOURCE}_{CRAWLER_CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-INTERMEDIATE_PATH = f"{SOURCE}/{CONTEXT}"
+DAG_NAME_PARTIAL = f"{SOURCE}/{CRAWLER_CONTEXT}"
 CONFIG_NAME = "crawlers_listings"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 ENV = os.environ.get("ENVIRONMENT")
-MAIN_START_DATE = datetime(2021, 6, 10, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 2 * * 1"
+MAIN_START_DATE = datetime(2021, 10, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 3 * * 5"
 
 config_service = ConfigurationService(
-    dag_name=CONFIG_NAME, intermediate_path=INTERMEDIATE_PATH
+    dag_name=DAG_NAME_PARTIAL, intermediate_path=CRAWLER_CONTEXT
 )
-default_libraries = config_service.get_config("default_libraries")
 
-loft_configs = config_service.get_config("loft")
-origin = loft_configs["origin"]
+em_casa_configs = config_service.get_config("em_casa")
+origin = em_casa_configs["origin"]
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -48,16 +49,11 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = (
-    f"{databricks_bietlejuice_repo_path}/spark_jobs/{INTERMEDIATE_PATH}"
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME_PARTIAL}"
 )
 
-CLUSTER_DESCRIPTION = Variable.get(
-    f"databricks_9_1_med_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+default_libraries = config_service.get_config("default_libraries")
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -74,7 +70,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(ORIGIN).format(
+    doc_md=BaseDAG.get_dag_doc(CRAWLER_ORIGIN).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
@@ -82,9 +78,9 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    cluster_configuration=cluster_description,
     libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -104,7 +100,7 @@ partition_cols = config_service.get_config("partition_cols")
 
 
 raw_spark_job_path = f"{RAW_SPARK_JOB_PATH}/load_crawlers_listings_into_datalake.py"
-parameters = [SOURCE, CONTEXT, origin, origin, "{{ds}}"]
+parameters = [SOURCE, CRAWLER_CONTEXT, origin, origin, "{{ds}}"]
 
 
 raw_task_group = task_group.build_raw_task_group_for_single_table(
@@ -119,7 +115,7 @@ clean_task_group = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE_WITH_CONTEXT,
     target_database_base_name=SOURCE_WITH_CONTEXT,
-    tree_path=f"{CONTEXT}/{ORIGIN}/",
+    tree_path=f"{CRAWLER_CONTEXT}/{CRAWLER_ORIGIN}/",
     partitions=partition_cols,
 )
 
