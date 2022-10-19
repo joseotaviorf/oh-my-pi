@@ -37,7 +37,7 @@ def __get_auth(dbutils):
     return credentials, scope
 
 
-SLACK_MSG_HEADER = ":alert: *Gsheet ingestion failures*\n>The following sheet have errors have not been ingested on this DAG Run."
+SLACK_MSG_HEADER = ":alert: *Gsheet ingestion failures*\n>The following sheet have errors have not been ingested on this Run."
 TIMEOUT_LIMIT = 5 * 60
 
 
@@ -124,6 +124,7 @@ if __name__ == "__main__":
             sheet_details.get("sheet_context"),
             sheet_details["raw_table_name"],
             sheet_details["clean_table_name"],
+            release_memory=False,
         )
 
         # loaders
@@ -148,7 +149,7 @@ if __name__ == "__main__":
 
     except Exception as e:
         slack_channel = dbutils.secrets.get(
-            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_DE_AIRFLOW_DAGS
+            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_DE_AIRFLW_DGS
         )
         message_sent = __alert_not_ingesting_sheet(sheet_details, e, slack_channel)
         logger.error(
