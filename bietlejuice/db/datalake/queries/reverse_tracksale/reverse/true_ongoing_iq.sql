@@ -27,7 +27,7 @@ recovery_contracts AS (
         dw_tickets.fact_tickets ft
 		    ON dt.sk_ticket  = ft.sk_ticket
 	INNER JOIN
-        datalake_gsheets_clean.department_control dc
+        dw_customer_support.dim_department dc
 		    ON dt.group_name = dc.department
 	LEFT JOIN
         dw_public.dim_contract dc_
@@ -52,7 +52,7 @@ crisis_users AS (
         dw_tickets.fact_tickets ft
 		    ON dt.sk_ticket = ft.sk_ticket
 	INNER JOIN
-        datalake_gsheets_clean.department_control dc
+        dw_customer_support.dim_department dc
 		    ON dt.group_name = dc.department
 	WHERE
         dc.team IN ('Casos Especiais','Proteção 5A','Ouvidoria','ReclameAqui')

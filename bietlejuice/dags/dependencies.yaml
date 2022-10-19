@@ -2333,6 +2333,7 @@ bietlejuice.reverse_tracksale:
   #   dw_rent_flow.fact_listing_rent_flows and dw_user.dim_user since dw_datamarts_cross already satisfies.
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.dw_contract:load-dw-public-dim-contract
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_proposal:load-dw-public-dim-proposal
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
