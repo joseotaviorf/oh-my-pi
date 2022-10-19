@@ -1,0 +1,61 @@
+---
+database_name: dw_sale
+table_name: fact_sale_demand_event
+columns:
+  sk_event_date:
+    lineage:
+      - dw_sale.fact_visits.sk_booking_created_date
+      - dw_sale.fact_visits.sk_visit_completed_date
+      - dw_sale.fact_offers.sk_offer_submitted_date
+      - dw_sale.fact_offers.sk_offer_accepted_date
+      - dw_sale.fact_offers.sk_sale_agreement_created_date
+      - dw_sale.fact_offers.sk_sale_agreement_signed_date
+  sk_booking:
+    lineage:
+      - dw_sale.fact_visits.sk_booking
+      - dw_sale.fact_offers.sk_booking
+  sk_offer:
+    lineage:
+      - dw_sale.fact_offers.sk_offer
+  sk_house:
+    lineage:
+      - dw_sale.fact_visits.sk_house
+      - dw_sale.fact_offers.sk_house
+  sk_region:
+    lineage:
+      - dw_sale.fact_visits.sk_region
+      - dw_sale.fact_offers.sk_region
+  sk_buyer:
+    lineage:
+      - dw_sale.fact_visits.sk_buyer
+      - dw_sale.fact_offers.sk_buyer
+  sk_seller:
+    lineage:
+      - dw_sale.fact_visits.sk_seller
+      - dw_sale.fact_offers.sk_seller
+  sk_agent:
+    lineage:
+      - dw_sale.fact_visits.sk_agent
+      - dw_sale.fact_offers.sk_agent
+  sk_agent_work_contract:
+    lineage:
+      - dw_agent.fact_agent_contract.sk_work_contract
+  sk_business_unit:
+    lineage:
+      - dw_sale.fact_visits.sk_business_unit
+      - dw_sale.fact_offers.sk_business_unit
+  sk_company_supply:
+    lineage:
+      - dw_rede.dim_company.sk_company
+  sk_company_demand:
+    lineage:
+      - dw_rede.dim_company.sk_company
+  year:
+    lineage:
+      - dw_public.dim_date.year
+  month:
+    lineage:
+      - dw_public.dim_date.month
+  day:
+    lineage:
+      - dw_public.dim_date.day

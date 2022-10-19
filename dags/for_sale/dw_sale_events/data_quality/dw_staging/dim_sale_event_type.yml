@@ -1,0 +1,17 @@
+---
+table_name: dw_sale_staging.dim_sale_event_type
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 5
+    severity_level: Error
+column_level_validations:
+  sk_event_type:
+    is_unique:
+      severity_level: Error
+  event_name:
+    is_unique:
+      severity_level: Error
+  abbreviation:
+    is_unique:
+      severity_level: Error

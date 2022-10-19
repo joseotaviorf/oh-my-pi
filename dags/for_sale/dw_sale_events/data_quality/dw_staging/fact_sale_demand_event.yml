@@ -1,0 +1,56 @@
+---
+table_name: dw_sale_staging.fact_sale_demand_event
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 1500000
+    severity_level: Error
+column_level_validations:
+  sk_event_date:
+    is_complete:
+      severity_level: Error
+  sk_event_type:
+    is_complete:
+      severity_level: Error
+  sk_booking:
+    is_complete:
+      severity_level: Error
+  sk_offer:
+    is_complete:
+      severity_level: Error
+  sk_house:
+    is_complete:
+      severity_level: Error
+  sk_region:
+    is_complete:
+      severity_level: Error
+  sk_buyer:
+    is_complete:
+      severity_level: Error
+  sk_seller:
+    is_complete:
+      severity_level: Error
+  sk_agent:
+    is_complete:
+      severity_level: Error
+  sk_agent_work_contract:
+    is_complete:
+      severity_level: Error
+  sk_business_unit:
+    is_complete:
+      severity_level: Error
+  sk_company_supply:
+    is_complete:
+      severity_level: Error
+  sk_company_demand:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
