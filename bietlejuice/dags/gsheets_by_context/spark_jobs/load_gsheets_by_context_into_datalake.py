@@ -124,7 +124,6 @@ if __name__ == "__main__":
             sheet_details.get("sheet_context"),
             sheet_details["raw_table_name"],
             sheet_details["clean_table_name"],
-            release_memory=False,
         )
 
         # loaders
