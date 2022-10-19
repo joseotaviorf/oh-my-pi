@@ -37,7 +37,6 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
                 _sheet_info.get("clean_table_name"),
                 _sheet_info.get("raw_table_name"),
                 _sheet_info.get("partitioned", False),
-                _sheet_info.get("preload_time_in_seconds", None),
             )
         except Exception as e:
             sheet_info = self.delta.get(_sheet_info["sheet_id"])

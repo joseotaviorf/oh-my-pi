@@ -74,7 +74,7 @@ class GsheetsDAGFactory:
         self.custom_libraries = [
             {
                 "whl": f"{artifacts_s3_bucket}/gsheets-api-client-python/"
-                f"quintoandar_gsheets_api_client-0.5.0-py2.py3-none-any.whl"
+                f"quintoandar_gsheets_api_client-0.2.1-py2.py3-none-any.whl"
             }
         ]
 
@@ -183,7 +183,6 @@ class GsheetsDAGFactory:
         raw_task_groups = {}
 
         for table_name, sheet_details in google_files:
-            sheet_details["raw_table_name"] = table_name
 
             raw_task_group = task_group.build_raw_task_group_for_single_table(
                 source=source,

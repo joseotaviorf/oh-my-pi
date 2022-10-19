@@ -27,7 +27,6 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}"
 
 artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
-default_libraries = config_service.get_config("default_libraries")
 custom_libraries = [
     {
         "jar": f"{artifacts_s3_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
@@ -39,7 +38,7 @@ custom_libraries = [
     },
     {
         "whl": f"{artifacts_s3_bucket}/gsheets-api-client-python/"
-        f"quintoandar_gsheets_api_client-0.5.0-py2.py3-none-any.whl"
+        f"quintoandar_gsheets_api_client-0.4.0-py2.py3-none-any.whl"
     },
     {"pypi": {"package": "google-auth==2.9.1"}},
     {"pypi": {"package": "google-api-python-client==2.55.0"}},
@@ -62,7 +61,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=default_libraries + custom_libraries,
+    libraries=custom_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
