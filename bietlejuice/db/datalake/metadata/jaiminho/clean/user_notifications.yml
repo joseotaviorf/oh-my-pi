@@ -11,6 +11,12 @@ columns:
   id_event:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.event_id
+  id_entity: 
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.entity_id
+  entity_name:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.entity_name
   action:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.action

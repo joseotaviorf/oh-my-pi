@@ -2,6 +2,8 @@ SELECT
 	CAST(id AS BIGINT) AS id,
 	CAST(user_id AS BIGINT) AS id_user,
 	CAST(event_id AS BIGINT) AS id_event,
+	entity_id AS id_entity,
+	entity_name,
 	action,
 	status,
 	channel,
