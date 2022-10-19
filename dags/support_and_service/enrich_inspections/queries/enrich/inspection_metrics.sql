@@ -1,13 +1,12 @@
 WITH sla_target AS (
   SELECT DISTINCT
-    r.id_city,
     SPLIT(team, ' - ') [0] AS service_type,
     CASE
       WHEN LOWER(team) LIKE "%saida%" THEN "offboarding"
       WHEN LOWER(team) LIKE "%entrada%" THEN "onboarding"
       ELSE NULL
     END AS inspection_type,
-    r.city_name,
+    team,
     CAST(target AS INT) AS target,
     CASE
       WHEN CAST(target AS INT) < 0 THEN CAST(target AS INT)
@@ -20,10 +19,6 @@ WITH sla_target AS (
     dt_target
   FROM
     datalake_support_and_service_kpis_targets.kpis_targets AS kt
-  LEFT JOIN
-    datalake_region.region AS r
-      ON LOWER(kt.team) LIKE CONCAT("%", LOWER(r.city_name), "%")
-      AND r.id_city IS NOT NULL
   WHERE
     metric_name = "LDT"
     AND target IS NOT NULL
@@ -61,7 +56,7 @@ FROM
     datalake_inspections.inspection AS i
 JOIN
   sla_target AS st
-    ON st.id_city = i.id_city
+    ON LOWER(st.team) LIKE CONCAT("% - ", LOWER(i.city_name))
     AND st.inspection_type = i.inspection_type
     AND st.dt_target = DATE(i.ts_created)
 LEFT JOIN

@@ -7,7 +7,7 @@ columns:
       - datalake_inspections.inspection.id_inspection
   id_city:
     lineage:
-      - datalake_region.region.id_city
+      - datalake_inspections.inspection.id_city
   city_name:
     lineage:
       - datalake_inspections.inspection.city_name
