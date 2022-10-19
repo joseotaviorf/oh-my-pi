@@ -32,6 +32,7 @@ SELECT
     COALESCE(own.id_house_listing, -1) AS sk_house_listing,
     COALESCE(t.id_contract, -1)  AS sk_contract,
     COALESCE(tf.id_sale_offer, -1) AS sk_sale_offer,
+    CAST(COALESCE(tf.id_job, -1) AS BIGINT) AS sk_job,
     COALESCE(t.id_user, -1) AS sk_user,
     t.id_personal_document AS sk_personal_document,
     COALESCE(ten.id_client, -1) AS sk_client,
@@ -86,7 +87,7 @@ LEFT JOIN
 LEFT JOIN
     house_owner own
         ON t.id_ticket = own.id_ticket
-LEFT JOIN 
-    datalake_zendesk_ticket_funnels.ticket_funnel AS tf 
+LEFT JOIN
+    datalake_zendesk_ticket_funnels.ticket_funnel AS tf
         ON t.id_ticket = tf.id_ticket
         AND id_sale_offer IS NOT NULL

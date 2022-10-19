@@ -34,7 +34,7 @@ last_updated_ticket as (
     SELECT
         id_ticket,
         MAX(ts_updated) AS ts_last_updated
-    FROM   
+    FROM
         historical_zendesk_chat
     GROUP BY 1
 ),
@@ -67,17 +67,17 @@ sale_offers_keys AS (
             FROM
                 datalake_zendesk_custom_fields.custom_fields
         ),
-  
+
         sale_offers AS (
             SELECT
-                id_offer, 
+                id_offer,
                 ts_accepted
             FROM
                 datalake_sale_offer_flows.sale_offer_flows
         )
-    
+
     SELECT
-            ROW_NUMBER() OVER (PARTITION BY cfe.id_ticket ORDER BY so.ts_accepted ASC) AS ROW, 
+            ROW_NUMBER() OVER (PARTITION BY cfe.id_ticket ORDER BY so.ts_accepted ASC) AS ROW,
             cfe.id_ticket,
             so.id_offer
     FROM
@@ -88,7 +88,7 @@ sale_offers_keys AS (
     WHERE
         so.id_offer IS NOT NULL
         AND cfe.value NOT IN ("false", "true")
-), 
+),
 
 union_historical_chat_with_zendesk AS (
     SELECT DISTINCT
@@ -114,7 +114,7 @@ union_historical_chat_with_zendesk AS (
         YEAR(c.ts_updated) AS year,
         MONTH(c.ts_updated) AS month,
         DAY(c.ts_updated) AS day
-    FROM 
+    FROM
         historical_zendesk_chat c
     UNION ALL
     SELECT DISTINCT
@@ -155,6 +155,7 @@ union_historical_chat_with_zendesk AS (
 SELECT DISTINCT
     te.id_ticket,
     sok.id_offer AS id_sale_offer,
+    cf.custom_fields['[AQ] ID do Job '] AS id_job,
     t.subject,
     t.description,
     t.ticket_via,
@@ -171,7 +172,7 @@ SELECT DISTINCT
     TO_JSON(cf.custom_fields) AS custom_fields,
     cf.custom_fields['Tipo de Solicitação'] AS request_type,
     COALESCE(
-        cf.custom_fields['Tipo de Cliente'], 
+        cf.custom_fields['Tipo de Cliente'],
         REPLACE(REPLACE(REPLACE(cf.custom_fields['[CC] - Tipo de Cliente'], 'cc_',''), 'er_', 'er'), 'serviços', 'serviço')
     ) AS client_type,
     SPLIT(cf.custom_fields['Classificação do atendimento (Tags)'], '__')[0] AS step_tag,
@@ -181,17 +182,17 @@ SELECT DISTINCT
     ) AS customer_type_tag,
     COALESCE(
         SPLIT(cf.custom_fields['Classificação do atendimento (Tags)'], '__')[3],
-        cf.custom_fields['Motivo Tag'], 
+        cf.custom_fields['Motivo Tag'],
         cf.custom_fields['[CC] - Motivo do contato']
     ) AS contact_motivation_tag,
     SPLIT(cf.custom_fields['Classificação do atendimento (Tags)'], '__')[4] AS contact_theme_detail_tag,
     COALESCE(
         SPLIT(cf.custom_fields['Classificação do atendimento (Tags)'], '__')[2],
-        cf.custom_fields['Assunto Tag'], 
-        cf.custom_fields['Tipo de Solicitação'], 
-        cf.custom_fields['[CC] - Assunto do Contato'], 
-        cf.custom_fields['[NG] Tipo de solicitação (IGPM/IPCA)'], 
-        cf.custom_fields['[PAY] Tipo de Solicitação'], 
+        cf.custom_fields['Assunto Tag'],
+        cf.custom_fields['Tipo de Solicitação'],
+        cf.custom_fields['[CC] - Assunto do Contato'],
+        cf.custom_fields['[NG] Tipo de solicitação (IGPM/IPCA)'],
+        cf.custom_fields['[PAY] Tipo de Solicitação'],
         cf.custom_fields['Tema do DM']
     ) AS contact_theme_tag,
     t.ts_created,
@@ -213,6 +214,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_zendesk_custom_fields.custom_fields cf
         ON te.id_ticket = cf.id_ticket
-LEFT JOIN 
+LEFT JOIN
     sale_offers_keys AS sok
         ON te.id_ticket = sok.id_ticket

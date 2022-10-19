@@ -14,6 +14,9 @@ columns:
   sk_sale_offer:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_offer
+  sk_job:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_job
   sk_user:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS tickets.fact_tickets (
     sk_house_listing BIGINT,
     sk_contract BIGINT,
     sk_sale_offer VARCHAR,
+    sk_job BIGINT,
     sk_user BIGINT,
     sk_personal_document VARCHAR(30),
     sk_client BIGINT,
