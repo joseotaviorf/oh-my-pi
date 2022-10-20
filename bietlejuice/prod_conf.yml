@@ -65,6 +65,7 @@ dags_packages_files_path_in_s3: "github-repos/bi-etl-ejuice/"
 datalake_bucket: 5a-datalake-prod
 doc_md_chart_url: https://n2065e18540524a1cp-tp.appspot.com/admin/airflow/chart?chart_id=11&iteration_no=22&dag_id=
 dw_bucket: 5a-dw-prod
+people_bucket: people-s3-data-quintoandar-com-br
 inmetro_bucket: s3://inmetro-s3-data-quintoandar-com-br
 metrics_bucket: 5a-business-metrics-com-br-prod
 ods_migration_tests_threshold:
