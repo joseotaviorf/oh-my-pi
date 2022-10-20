@@ -1,0 +1,16 @@
+---
+database_name: datalake_convenia_raw
+table_name: active_employees
+columns:
+  name:
+    tags:
+      - Confidential
+      - PII
+  last_name:
+    tags:
+      - Confidential
+      - PII
+  email:
+    tags:
+      - Confidential
+      - PII

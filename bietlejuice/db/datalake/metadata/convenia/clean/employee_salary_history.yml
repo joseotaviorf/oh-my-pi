@@ -1,0 +1,58 @@
+---
+database_name: datalake_convenia_clean
+table_name: employee_salary_history
+columns:
+  id:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.id
+  id_relationship:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.relationship_id
+  id_department:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.department_id
+  id_job_description:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.job_description_id
+  id_cost_center:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.cost_center_id
+  id_motive:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.motive_id
+  salary:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.salary
+  relationship:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.relationship
+  department:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.department
+  job:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.job
+  cost_center:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.cost_center
+  motive:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.motive
+  description:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.description
+  is_active:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.is_active
+  dt_from:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.date_from
+  dt_to:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.date_to
+  dt_created:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.created_at
+  dt_updated:
+    lineage:
+      - datalake_convenia_raw.employee_salary_history.updated_at

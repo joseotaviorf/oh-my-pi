@@ -1,0 +1,10 @@
+---
+database_name: datalake_convenia_clean
+table_name: inactive_employees
+columns:
+  id:
+    lineage:
+      - datalake_convenia_raw.inactive_employees.id
+  dismissal:
+    lineage:
+      - datalake_convenia_raw.inactive_employees.dismissal

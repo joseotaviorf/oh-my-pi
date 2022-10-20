@@ -1,0 +1,19 @@
+---
+database_name: datalake_convenia_clean
+table_name: active_employees
+columns:
+  id:
+    lineage:
+      - datalake_convenia_raw.active_employees.id
+  name:
+    lineage:
+      - datalake_convenia_raw.active_employees.name
+  last_name:
+    lineage:
+      - datalake_convenia_raw.active_employees.last_name
+  email:
+    lineage:
+      - datalake_convenia_raw.active_employees.email
+  dt_hiring:
+    lineage:
+      - datalake_convenia_raw.active_employees.dt_hiring
