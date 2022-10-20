@@ -50,6 +50,9 @@ columns:
   financing_value:
     lineage:
       - datalake_atta_clean.proposal.financing_value
+  send_backoffice:
+    lineage:
+      - datalake_atta_clean.proposal.EnviarMesa
   ts_registration:
     lineage:
       - datalake_atta_clean.proposal.ts_registration

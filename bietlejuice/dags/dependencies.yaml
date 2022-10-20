@@ -720,7 +720,7 @@ bietlejuice.dw_datamarts_spark.growth:
   # attribution_conversion_paths_demand, listings-online-metrics
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-contract-docusign-signed-events
-  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-home-page-viewed 
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-home-page-viewed
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-page-viewed
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-search-results-page-viewed
@@ -1221,7 +1221,6 @@ bietlejuice.enrich_analyst_ranking:
 
 bietlejuice.enrich_atta:
   - bietlejuice.atta:load-clean-financing-proposal-check
-  - bietlejuice.atta:load-clean-log-isolve-v1
   - bietlejuice.atta:load-clean-product-info
   - bietlejuice.atta:load-clean-proposal
   - bietlejuice.atta:load-clean-users-info

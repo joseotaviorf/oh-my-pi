@@ -23,6 +23,7 @@ SELECT
     p.client_cpf,
     p.client_name,
     p.financing_value,
+    p.send_backoffice,
     p.ts_registration,
     p.ts_financing_ended,
     p.ts_last_updated,

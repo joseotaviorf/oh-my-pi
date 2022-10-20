@@ -26,12 +26,3 @@ columns:
   ts_current_log:
     lineage:
       - datalake_atta_raw.log_proposta_esteira.dtsitatu
-  year:
-    lineage:
-      - datalake_atta_raw.log_proposta_esteira.year
-  month:
-    lineage:
-      - datalake_atta_raw.log_proposta_esteira.month
-  day:
-    lineage:
-      - datalake_atta_raw.log_proposta_esteira.day
