@@ -8,6 +8,15 @@ columns:
   id_user_braze:
     lineage:
       - datalake_braze.events_owners.id_user_braze
+  id_user:
+    lineage:
+      - datalake_braze.events_owners.id_user
+  id_canvas:
+    lineage:
+      - datalake_braze.events_owners.id_canvas
+  id_step_canvas:
+    lineage:
+      - datalake_braze.events_owners.id_step_canvas
   event_channel:
     lineage:
       - datalake_braze.events_owners.event_channel
