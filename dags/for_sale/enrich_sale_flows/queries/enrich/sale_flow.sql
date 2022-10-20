@@ -44,10 +44,8 @@ sale_talk_to_agent AS (
 sale_offer AS (
     SELECT
         id_sale_flow,
-        id_vendas,
         id_buyer,
         id_house,
-        id_owner,
         MIN(ts_offer_submitted) AS ts_first_offer_submitted,
         MIN(dt_offer_accepted) AS dt_first_offer_accepted,
         MIN(dt_offer_dismissed) AS dt_first_offer_dismissed,
@@ -61,7 +59,7 @@ sale_offer AS (
         datalake_offer.sale_offer
     WHERE
         id_sale_flow IS NOT NULL
-    GROUP BY 1, 2, 3, 4, 5
+    GROUP BY 1, 2, 3
 ),
 base AS (
     SELECT
@@ -133,7 +131,6 @@ SELECT
     COALESCE(b.id_sale_flow, o.id_sale_flow, tta.id_sale_flow) AS id_sale_flow,
     CAST(COALESCE(b.id_buyer, o.id_buyer, tta.id_buyer) AS BIGINT) AS id_buyer,
     CAST(COALESCE(b.id_house, o.id_house, tta.id_house) AS BIGINT)  AS id_house,
-    o.id_owner AS id_seller,
     CASE
         WHEN LEAST(b.ts_first_booking_created,o.ts_first_offer_submitted, tta.ts_first_tta_message_sent) = b.ts_first_booking_created
             THEN 'booking'
