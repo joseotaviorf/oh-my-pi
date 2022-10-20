@@ -35,6 +35,8 @@ SELECT
     GET_JSON_OBJECT(properties, '$.motivo_de_ganho') AS gain_reason,
     GET_JSON_OBJECT(properties, '$.motivo_de_perda') AS loss_reason,
     GET_JSON_OBJECT(properties, '$.produtos') AS product,
+    NULLIF(GET_JSON_OBJECT(properties, '$.priorizacao'), '') AS soft_opening_priority,
+    NULLIF(GET_JSON_OBJECT(properties, '$.fase_soft_opening'), '') AS soft_opening_phase,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.com_quais_imobiliarias_tem_parceria_'), ''), ';') AS partner_agencies,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.em_quais_portais_anuncia_'), ''), ';') AS advertising_portals,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.qual_a_solucao_empresa_de_garantia_locaticia_oferece_para_os_clientes_de_locacao___clonado_'), ''), ';') AS rental_guarantee_solutions,

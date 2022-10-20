@@ -1,9 +1,3 @@
-WITH numbered_ticket_history AS (
-    SELECT *,
-        ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS rw
-    FROM
-        datalake_hubspot.ticket_history
-)
 SELECT
     id_ticket,
     id_deal,
@@ -29,7 +23,6 @@ SELECT
     month,
     day
 FROM
-    numbered_ticket_history
-WHERE
-    rw = 1
-    AND NOT is_archived
+    datalake_hubspot.ticket_history
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1

@@ -1,9 +1,3 @@
-WITH numbered_company_history AS (
-    SELECT *,
-        ROW_NUMBER() OVER(PARTITION BY id_company ORDER BY ts_updated DESC) AS rw
-    FROM
-        datalake_hubspot.company_history
-)
 SELECT
     id_company,
     id_hubspot_owner,
@@ -73,18 +67,19 @@ SELECT
     has_partnerships_with_other_agencies,
     is_natural_person,
     is_juridical_person,
+    is_archived,
     ts_first_conversion,
     ts_recent_deal_close,
     ts_hubspot_owner_assigned,
     ts_last_logged_call,
     ts_notes_last_updated,
+    ts_archived,
     ts_created,
     ts_updated,
     year,
     month,
     day
 FROM
-    numbered_company_history
-WHERE
-    rw = 1
-    AND NOT is_archived
+    datalake_hubspot.company_history
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_company ORDER BY ts_updated DESC) = 1

@@ -55,11 +55,13 @@ CREATE TABLE rede.dim_company (
     is_for_sale BOOLEAN,
     is_for_rent BOOLEAN,
     has_partnerships_with_other_agencies BOOLEAN,
+    is_archived BOOLEAN,
     ts_first_conversion TIMESTAMP,
     ts_recent_deal_close TIMESTAMP,
     ts_hubspot_owner_assigned TIMESTAMP,
     ts_last_logged_call TIMESTAMP,
     ts_notes_last_updated TIMESTAMP,
+    ts_archived TIMESTAMP,
     ts_created TIMESTAMP,
     ts_updated TIMESTAMP,
     ts_load TIMESTAMP

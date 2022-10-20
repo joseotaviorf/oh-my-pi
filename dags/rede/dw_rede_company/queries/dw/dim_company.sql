@@ -53,7 +53,7 @@ SELECT
     c.num_properties_for_rent,
     c.lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento') AS is_partner,
     t.team_name IN ('BH Sul', 'BH Norte') AS is_3p_bh,
-    t.team_name NOT IN ('BH Sul', 'BH Norte') AS is_3p_5a,
+    t.team_name IS NULL OR t.team_name NOT IN ('BH Sul', 'BH Norte') AS is_3p_5a,
     c.has_property_advertisement_online,
     c.is_correspondent_bank,
     c.is_lost,
@@ -61,11 +61,13 @@ SELECT
     c.is_for_sale,
     c.is_for_rent,
     c.has_partnerships_with_other_agencies,
+    c.is_archived,
     c.ts_first_conversion,
     c.ts_recent_deal_close,
     c.ts_hubspot_owner_assigned,
     c.ts_last_logged_call,
     c.ts_notes_last_updated,
+    c.ts_archived,
     c.ts_created,
     c.ts_updated,
     NOW() AS ts_load
@@ -74,14 +76,16 @@ FROM
 JOIN
     datalake_rede_company.company_sks AS cs
         ON c.id_company = cs.id_hubspot
-JOIN
+LEFT JOIN
     datalake_hubspot.deal AS d
         ON d.id_company = c.id_company
-JOIN
+        AND d.id_pipeline = 5160960 -- We only want companies in the negotiation pipeline for Rede QuintoAndar.
+        AND d.id_hubspot_team NOT IN (6194580,5795941) -- With a deal not made by adm or help sales
+LEFT JOIN
     datalake_hubspot.team AS t 
         ON t.id_team = d.id_hubspot_team
 WHERE
-    d.id_pipeline = 5160960 -- We only want companies in the negotiation pipeline for Rede QuintoAndar.
-    AND d.id_hubspot_team NOT IN (6194580,5795941) -- With a deal not made by adm or help sales
+    c.extracted_3p_tag IS NOT NULL
+    OR d.id_deal IS NOT NULL
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY c.id_company ORDER BY d.ts_created DESC) = 1 -- There may be more than one deal. We want the most recent one.

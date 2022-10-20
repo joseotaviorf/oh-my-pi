@@ -38,6 +38,9 @@ columns:
   has_accepted_contact_with_agents:
     lineage:
       - datalake_hubspot.ticket_history.has_accepted_contact_with_agents
+  is_archived:
+    lineage:
+      - datalake_hubspot.ticket_history.is_archived
   dt_term_signed:
     lineage:
       - datalake_hubspot.ticket_history.dt_term_signed
@@ -50,6 +53,9 @@ columns:
   dt_onboarding:
     lineage:
       - datalake_hubspot.ticket_history.dt_onboarding
+  ts_archived:
+    lineage:
+      - datalake_hubspot.ticket_history.ts_archived
   ts_created:
     lineage:
       - datalake_hubspot.ticket_history.ts_created

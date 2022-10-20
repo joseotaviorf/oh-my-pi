@@ -101,6 +101,9 @@ columns:
   is_enrolled_in_sequence:
     lineage:
       - datalake_hubspot.contact_history.is_enrolled_in_sequence
+  is_archived:
+    lineage:
+      - datalake_hubspot.contact_history.is_archived
   ts_first_conversion:
     lineage:
       - datalake_hubspot.contact_history.ts_first_conversion
@@ -113,6 +116,9 @@ columns:
   ts_closed:
     lineage:
       - datalake_hubspot.contact_history.ts_closed
+  ts_archived:
+    lineage:
+      - datalake_hubspot.contact_history.ts_archived
   ts_created:
     lineage:
       - datalake_hubspot.contact_history.ts_created

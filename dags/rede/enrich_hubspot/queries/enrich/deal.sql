@@ -1,9 +1,3 @@
-WITH numbered_deal_history AS (
-    SELECT *,
-        ROW_NUMBER() OVER(PARTITION BY id_deal ORDER BY ts_updated DESC) AS rw
-    FROM
-        datalake_hubspot.deal_history
-)
 SELECT
     id_deal,
     id_stage,
@@ -21,6 +15,8 @@ SELECT
     gain_reason,
     loss_reason,
     product,
+    soft_opening_priority,
+    soft_opening_phase,
     partner_agencies,
     advertising_portals,
     rental_guarantee_solutions,
@@ -47,17 +43,18 @@ SELECT
     is_for_sale,
     is_for_rent,
     has_partnerships_with_other_agencies,
+    is_archived,
     ts_closed,
     ts_engagements_last_meeting_booked,
     ts_hubspot_owner_assigned,
     ts_notes_last_updated,
+    ts_archived,
     ts_created,
     ts_updated,
     year,
     month,
     day
 FROM
-    numbered_deal_history
-WHERE
-    rw = 1
-    AND NOT is_archived
+    datalake_hubspot.deal_history
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_deal ORDER BY ts_updated DESC) = 1

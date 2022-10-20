@@ -206,6 +206,9 @@ columns:
   is_juridical_person:
     lineage:
       - datalake_hubspot.company_history.is_juridical_person
+  is_archived:
+    lineage:
+      - datalake_hubspot.company_history.is_archived
   ts_first_conversion:
     lineage:
       - datalake_hubspot.company_history.ts_first_conversion
@@ -221,6 +224,9 @@ columns:
   ts_notes_last_updated:
     lineage:
       - datalake_hubspot.company_history.ts_notes_last_updated
+  ts_archived:
+    lineage:
+      - datalake_hubspot.company_history.ts_archived
   ts_created:
     lineage:
       - datalake_hubspot.company_history.ts_created

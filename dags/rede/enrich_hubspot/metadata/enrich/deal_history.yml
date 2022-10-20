@@ -50,6 +50,12 @@ columns:
   product:
     lineage:
       - datalake_hubspot_clean.deal.properties
+  soft_opening_priority:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  soft_opening_phase:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
   partner_agencies:
     lineage:
       - datalake_hubspot_clean.deal.properties

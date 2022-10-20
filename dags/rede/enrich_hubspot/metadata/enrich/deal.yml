@@ -50,6 +50,12 @@ columns:
   product:
     lineage:
       - datalake_hubspot.deal_history.product
+  soft_opening_priority:
+    lineage:
+      - datalake_hubspot.deal_history.soft_opening_priority
+  soft_opening_phase:
+    lineage:
+      - datalake_hubspot.deal_history.soft_opening_phase
   partner_agencies:
     lineage:
       - datalake_hubspot.deal_history.partner_agencies
@@ -128,6 +134,9 @@ columns:
   has_partnerships_with_other_agencies:
     lineage:
       - datalake_hubspot.deal_history.has_partnerships_with_other_agencies
+  is_archived:
+    lineage:
+      - datalake_hubspot.deal_history.is_archived
   ts_closed:
     lineage:
       - datalake_hubspot.deal_history.ts_closed
@@ -140,6 +149,9 @@ columns:
   ts_notes_last_updated:
     lineage:
       - datalake_hubspot.deal_history.ts_notes_last_updated
+  ts_archived:
+    lineage:
+      - datalake_hubspot.deal_history.ts_archived
   ts_created:
     lineage:
       - datalake_hubspot.deal_history.ts_created

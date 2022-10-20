@@ -159,6 +159,9 @@ columns:
   has_partnerships_with_other_agencies:
     lineage:
       - datalake_hubspot.company.has_partnerships_with_other_agencies
+  is_archived:
+    lineage:
+      - datalake_hubspot.company.is_archived
   ts_first_conversion:
     lineage:
       - datalake_hubspot.company.ts_first_conversion
@@ -174,6 +177,9 @@ columns:
   ts_notes_last_updated:
     lineage:
       - datalake_hubspot.company.ts_notes_last_updated
+  ts_archived:
+    lineage:
+      - datalake_hubspot.company.ts_archived
   ts_created:
     lineage:
       - datalake_hubspot.company.ts_created

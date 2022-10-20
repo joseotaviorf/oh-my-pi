@@ -146,6 +146,7 @@ tables:
       - createdate
       - dealname
       - estado
+      - fase_soft_opening
       - hs_object_id
       - hs_priority
       - hubspot_owner_id
@@ -154,6 +155,7 @@ tables:
       - motivo_de_desqualificacao
       - motivo_de_ganho
       - motivo_de_perda
+      - priorizacao
       - produtos
       - revenue_share___demanda_
       - revenue_share___supply_

@@ -1,9 +1,3 @@
-WITH numbered_contact_history AS (
-    SELECT *,
-        ROW_NUMBER() OVER(PARTITION BY id_contact ORDER BY ts_updated DESC) AS rw
-    FROM
-        datalake_hubspot.contact_history
-)
 SELECT
     id_contact,
     id_hubspot_owner,
@@ -38,17 +32,18 @@ SELECT
     num_conversion_events,
     num_associated_deals,
     is_enrolled_in_sequence,
+    is_archived,
     ts_first_conversion,
     ts_notes_last_updated,
     ts_notes_next_activity,
     ts_closed,
+    ts_archived,
     ts_created,
     ts_updated,
     year,
     month,
     day
 FROM
-    numbered_contact_history
-WHERE
-    rw = 1
-    AND NOT is_archived
+    datalake_hubspot.contact_history
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_contact ORDER BY ts_updated DESC) = 1
