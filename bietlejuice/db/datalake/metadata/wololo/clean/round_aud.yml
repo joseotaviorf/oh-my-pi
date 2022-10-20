@@ -1,0 +1,27 @@
+database_name: datalake_wololo_clean
+table_name: round_aud
+columns:
+  id_prospect:
+    lineage:
+      - datalake_wololo_raw.round_aud.prospect_id
+  id_reference:
+    lineage:
+      - datalake_wololo_raw.round_aud.reference_id
+  round_number:
+    lineage:
+      - datalake_wololo_raw.round_aud.round_count
+  round_max_tries:
+    lineage:
+      - datalake_wololo_raw.round_aud.max_tries
+  mod_round_max_tries:
+    lineage:
+      - datalake_wololo_raw.round_aud.maxtries_mod
+  rev:
+    lineage:
+      - datalake_wololo_raw.round_aud.rev
+  rev_type:
+    lineage:
+      - datalake_wololo_raw.round_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_wololo_raw.round_aud.revend

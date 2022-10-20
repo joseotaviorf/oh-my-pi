@@ -1,0 +1,21 @@
+database_name: datalake_wololo_clean
+table_name: whatsapp_aud
+columns:
+  phone_number:
+    lineage:
+      - datalake_wololo_raw.whatsapp_aud.phone_number
+  opt_in:
+    lineage:
+      - datalake_wololo_raw.whatsapp_aud.optin
+  mod_opt_in:
+    lineage:
+      - datalake_wololo_raw.whatsapp_aud.optin_mod
+  rev:
+    lineage:
+      - datalake_wololo_raw.whatsapp_aud.rev
+  rev_type:
+    lineage:
+      - datalake_wololo_raw.whatsapp_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_wololo_raw.whatsapp_aud.revend

@@ -1,0 +1,18 @@
+database_name: datalake_wololo_clean
+table_name: round
+columns:
+  id_prospect:
+    lineage:
+      - datalake_wololo_raw.round.prospect_id
+  id_reference:
+    lineage:
+      - datalake_wololo_raw.round.reference_id
+  round_number:
+    lineage:
+      - datalake_wololo_raw.round.round_count
+  round_max_tries:
+    lineage:
+      - datalake_wololo_raw.round.max_tries
+  ts_created:
+    lineage:
+      - datalake_wololo_raw.round.created_at
