@@ -28,10 +28,7 @@ SELECT
     fpc.ts_updated,
     fpc.ts_confirmation,
     fpc.ts_inclusion,
-    fpc.ts_seller_debt_payment,
-    fpc.year,
-    fpc.month,
-    fpc.day
+    fpc.ts_seller_debt_payment
 FROM
     datalake_atta_clean.financing_proposal_check AS fpc
 RIGHT JOIN

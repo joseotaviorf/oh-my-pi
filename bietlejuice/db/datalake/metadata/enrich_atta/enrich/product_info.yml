@@ -17,12 +17,3 @@ columns:
   ts_registration:
     lineage:
       - datalake_atta_clean.product_info.ts_registration
-  year:
-    lineage:
-      - datalake_atta_clean.product_info.year
-  month:
-    lineage:
-      - datalake_atta_clean.product_info.month
-  day:
-    lineage:
-      - datalake_atta_clean.product_info.day
