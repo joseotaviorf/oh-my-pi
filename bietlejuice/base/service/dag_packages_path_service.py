@@ -2,7 +2,7 @@ import os
 import re
 from glob import glob
 from os import path
-from os.path import dirname, isfile
+from os.path import dirname, isfile, isdir, join
 
 import boto3
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
@@ -10,11 +10,6 @@ from hierarchical_conf.hierarchical_conf import HierarchicalConf
 from bietlejuice import BIETLEJUICE_PROJECT_ROOT
 from bietlejuice.base.paths import QUERIES_DATALAKE_PATH, DATA_QUALITY_TESTS_PATH
 from dags import DAG_PACKAGES_ROOT
-
-
-class DuplicateDAGException(Exception):
-    # TODO move to base/airflow/exceptions when imports conflicts are resolved
-    """Raises when a DAG is duplicated inside the repository"""
 
 
 class DAGPackagesPathService:
@@ -36,20 +31,17 @@ class DAGPackagesPathService:
         :param dag_name: the DAG name, that is expected to be unique in the entire platform
         :return: full DAG Package path
         """
-        if dag_name and "gsheets" in dag_name:
-            return None
-        dag_folder = glob(f"{DAG_PACKAGES_ROOT}/**/{dag_name}", recursive=True)
-
-        # Non-migrated DAGs (in bietlejuice module) or non-existent
-        if not dag_folder:
+        if not dag_name:
             return None
 
-        if len(dag_folder) > 1:
-            raise DuplicateDAGException(
-                f"There is more than one registry for the DAG, dag_name={dag_name}"
-            )
+        dag_packges_parent_folders = os.scandir(DAG_PACKAGES_ROOT)
+        for line_folder in dag_packges_parent_folders:
+            dag_path = join(line_folder.path, dag_name)
+            if isdir(dag_path):
+                return dag_path
 
-        return dag_folder[0]
+        # Non-migrated DAGs (yet in bietlejuice module) or non-existent
+        return None
 
     @staticmethod
     def _is_dag_in_legacy_structure(dag_name: str) -> bool:

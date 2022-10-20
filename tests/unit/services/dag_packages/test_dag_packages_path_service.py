@@ -1,20 +1,25 @@
+from unittest.mock import Mock
+
 import mock
 import pytest
 
 from bietlejuice import BIETLEJUICE_PROJECT_ROOT
-from bietlejuice.base.service.dag_packages_path_service import (
-    DAGPackagesPathService,
-    DuplicateDAGException,
-)
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
 
 class TestDAGPackagesPathService:
-    @mock.patch("bietlejuice.base.service.dag_packages_path_service.glob")
-    def test_get_dag_package_path(self, mock_glob, dag_package_service):
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.os.scandir")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.isdir")
+    def test_get_dag_package_path(
+        self, mock_isdir, mock_os_scandir, dag_package_service
+    ):
         # arrange
         dag_name = "my_dag"
-        mock_glob.return_value = ["/the/dag/path/my_dag"]
-        expected_value = "/the/dag/path/my_dag"
+        dir_mock = Mock()
+        dir_mock.path = "/path1"
+        mock_os_scandir.return_value = [dir_mock]
+        mock_isdir.return_value = True
+        expected_value = "/path1/my_dag"
 
         # act
         returned_value = dag_package_service._get_dag_package_path(dag_name)
@@ -36,21 +41,6 @@ class TestDAGPackagesPathService:
 
         # assert
         assert returned_value == expected_value
-
-    @mock.patch("bietlejuice.base.service.dag_packages_path_service.glob")
-    def test_get_dag_package_path_for_dup_dag(self, mock_glob, dag_package_service):
-        # arrange
-        dag_name = "my_dag"
-        mock_glob.return_value = ["/the/dag/path/my_dag", "/the/dag/otherpath/my_dag"]
-
-        # act & assert
-        with pytest.raises(DuplicateDAGException) as e:
-            dag_package_service._get_dag_package_path(dag_name)
-
-        assert (
-            str(e.value)
-            == "There is more than one registry for the DAG, dag_name=my_dag"
-        )
 
     @pytest.mark.parametrize(
         "dag_name, is_migrated_mock, expected_return",
