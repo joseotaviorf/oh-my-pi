@@ -44,12 +44,12 @@ SELECT
     available_qualifieds_cohort,
     opportunities_cohort,
     first_listings_cohort,
-    prospects_cohort/CAST(NULLIF(leads, 0) AS REAL) AS l2p_cohort,
-    qualifieds_cohort/CAST(NULLIF(prospects_cohort, 0) AS REAL) AS p2q_cohort,
-    available_qualifieds_cohort/CAST(NULLIF(qualifieds_cohort, 0) AS REAL) AS q2aq_cohort,
-    opportunities_cohort/CAST(NULLIF(available_qualifieds_cohort, 0) AS REAL) AS aq2o_cohort,
-    opportunities_cohort/CAST(NULLIF(qualifieds_cohort, 0) AS REAL) AS q2o_cohort,
-    first_listings_cohort/CAST(NULLIF(opportunities_cohort, 0) AS REAL) AS o2fl_cohort,
+    ROUND(prospects_cohort/CAST(NULLIF(leads, 0) AS REAL), 2) AS l2p_cohort,
+    ROUND(qualifieds_cohort/CAST(NULLIF(prospects_cohort, 0) AS REAL), 2) AS p2q_cohort,
+    ROUND(available_qualifieds_cohort/CAST(NULLIF(qualifieds_cohort, 0) AS REAL), 2) AS q2aq_cohort,
+    ROUND(opportunities_cohort/CAST(NULLIF(available_qualifieds_cohort, 0) AS REAL), 2) AS aq2o_cohort,
+    ROUND(opportunities_cohort/CAST(NULLIF(qualifieds_cohort, 0) AS REAL), 2) AS q2o_cohort,
+    ROUND(first_listings_cohort/CAST(NULLIF(opportunities_cohort, 0) AS REAL), 2) AS o2fl_cohort,
     dt_week_started AS dt_lead_week_started,
     dt_month_started AS dt_lead_month_started
 FROM

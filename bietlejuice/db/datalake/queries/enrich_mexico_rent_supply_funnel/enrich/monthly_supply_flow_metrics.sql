@@ -50,10 +50,10 @@ supply_funnel_targets AS (
             WHEN supply_origin LIKE '%Human crawlers%' THEN 'Human Crawlers'
             ELSE supply_origin
         END AS supply_mkt_origin_detailed,
-        SUM(CAST(NULLIF(prospects,'') AS FLOAT)) AS prospects,
-        SUM(CAST(NULLIF(qualifieds,'') AS FLOAT)) AS qualifieds,
-        SUM(CAST(NULLIF(opportunities,'') AS FLOAT)) AS opportunities,
-        SUM(CAST(NULLIF(first_listings,'') AS FLOAT)) AS first_listings,
+        SUM(CAST(NULLIF(prospects,'') AS REAL)) AS prospects_targets,
+        SUM(CAST(NULLIF(qualifieds,'') AS REAL)) AS qualifieds_targets,
+        SUM(CAST(NULLIF(opportunities,'') AS REAL)) AS opportunities_targets,
+        SUM(CAST(NULLIF(first_listings,'') AS REAL)) AS first_listings_targets,
         DATE(DATE_TRUNC('month', DATE(dt_target))) AS dt_month_started
     FROM 
         datalake_gsheets_clean.mexico_supply_targets_2022
@@ -199,12 +199,12 @@ SELECT
     sf.qualifieds,
     sf.opportunities,
     sf.first_listings,
-    ROUND(sft.prospects, 2) AS prospects_targets,
-    ROUND(sft.qualifieds, 2) AS qualifieds_targets,
-    ROUND(sft.opportunities, 2) AS opportunities_targets,
-    ROUND(sft.first_listings, 2) AS first_listings_targets,
-    ROUND(CAST(sf.qualifieds/CAST(NULLIF(sf.prospects, 0) AS FLOAT) AS FLOAT), 2) AS p2q,
-    ROUND(CAST(sf.first_listings/CAST(NULLIF(sf.qualifieds, 0) AS FLOAT) AS FLOAT), 2) AS q2fl,
+    ROUND(sft.prospects_targets, 2) AS prospects_targets,
+    ROUND(sft.qualifieds_targets, 2) AS qualifieds_targets,
+    ROUND(sft.opportunities_targets, 2) AS opportunities_targets,
+    ROUND(sft.first_listings_targets, 2) AS first_listings_targets,
+    ROUND(CAST(sf.qualifieds/NULLIF(sf.prospects, 0) AS FLOAT), 2) AS p2q,
+    ROUND(CAST(sf.first_listings/NULLIF(sf.qualifieds, 0) AS FLOAT), 2) AS q2fl,
     ol.ongoing_listings,
     CAST(sct.budget_total AS FLOAT) AS budget_total_target,
     CAST(sct.budget_comission AS FLOAT) AS budget_comission_target,
