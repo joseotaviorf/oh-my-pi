@@ -13,9 +13,9 @@ column_level_validations:
     is_contained_in:
       values:
         - old
-        - prata
-        - ouro
-        - diamante
+        - Prata
+        - Ouro
+        - Diamante
   brokerage:
     has_min_value:
       greater_than: 0
