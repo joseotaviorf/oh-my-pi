@@ -42,6 +42,13 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 crawlers = config_service.get_config("tables")
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 
+# start sedona
+dag_custom_init_script = config_service.get_config("init_script")
+dag_spark_conf = config_service.get_config("spark_conf")
+
+cluster_description["init_scripts"].append(dag_custom_init_script[0])
+cluster_description["spark_conf"].update(dag_spark_conf)
+
 cluster_description["spark_env_vars"]["ENVIRONMENT"] = ENV
 cluster_description["cluster_log_conf"]["s3"][
     "destination"
@@ -52,6 +59,8 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
+default_libraries = config_service.get_config("default_libraries")
+custom_libraries = config_service.get_config("custom_libraries")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -72,6 +81,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries + custom_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
