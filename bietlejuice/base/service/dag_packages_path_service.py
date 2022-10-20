@@ -36,6 +36,8 @@ class DAGPackagesPathService:
         :param dag_name: the DAG name, that is expected to be unique in the entire platform
         :return: full DAG Package path
         """
+        if dag_name and "gsheets" in dag_name:
+            return None
         dag_folder = glob(f"{DAG_PACKAGES_ROOT}/**/{dag_name}", recursive=True)
 
         # Non-migrated DAGs (in bietlejuice module) or non-existent
