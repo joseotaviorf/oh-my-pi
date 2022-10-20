@@ -47,6 +47,9 @@ columns:
   user_role:
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.user_role
+  fired_response:
+    lineage:
+      - datalake_journey_flow_raw.t_journey_flow.fired_response
   ts_shared_var_expiration:
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.shared_var_expiration

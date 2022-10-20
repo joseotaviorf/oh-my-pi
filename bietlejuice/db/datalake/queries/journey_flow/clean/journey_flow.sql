@@ -14,6 +14,7 @@ SELECT
     rule_description,
     submenu_content,
     user_role,
+    fired_response,
     shared_var_expiration AS ts_shared_var_expiration,
     created_at AS ts_created,
     updated_at AS ts_updated
