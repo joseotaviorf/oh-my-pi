@@ -15,26 +15,6 @@ pipeline:
   #     table: <targe-table-name>
   #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
   #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
-  credit_proposal_attribute:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent_cross/credit_proposal_attribute.sql
-      table: credit_proposal_attribute   
-  funnel_credit_event_flows:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent_cross/funnel_credit_event_flows.sql
-      table: funnel_credit_event_flows
-  funnel_weekly_credit_user_flow:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent_cross/funnel_weekly_credit_user_flow.sql
-      table: funnel_weekly_credit_user_flow
-  funnel_monthly_credit_user_flow:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent_cross/funnel_monthly_credit_user_flow.sql
-      table: funnel_monthly_credit_user_flow
   rental_demand_events_funnel_flows:
     dw:
       <<: *redshift_anchor
