@@ -2164,6 +2164,7 @@ bietlejuice.enrich_top_of_funnel_affiliates:
 
 bietlejuice.enrich_top_of_funnel_demand:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events
 
 bietlejuice.enrich_top_of_funnel_portal_cm:
   - bietlejuice.gsheets.growth:load-clean-taxonomy-portal-casa-mineira
