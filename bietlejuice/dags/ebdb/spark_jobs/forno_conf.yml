@@ -93,7 +93,6 @@ table_block_list:
   - NotificacaoConfirmaDisponibilidadeImovel
   - InfoPagamentoCondominio_AUD
   - DadosAgente_houseTypesServed
-  - UserMerge
   - DoormanAffiliateData_AUD
   - UserInfoFinancialData_AUD
   - NegociacaoLocatario_AUD

@@ -1,0 +1,24 @@
+database_name: datalake_ebdb_clean
+table_name: user_merge
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.usermerge.id
+  id_loser_account:
+    lineage:
+      - datalake_ebdb_raw.usermerge.loseraccountid
+  id_winner_account:
+    lineage:
+      - datalake_ebdb_raw.usermerge.winneraccountid
+  status:
+    lineage:
+      - datalake_ebdb_raw.usermerge.status
+  failure_count:
+    lineage:
+      - datalake_ebdb_raw.usermerge.failurecount
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.usermerge.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.usermerge.atualizadoEm

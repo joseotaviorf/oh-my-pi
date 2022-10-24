@@ -172,6 +172,7 @@ Produces the following output tables:
     `user_aud`
     `user_document`
     `user_info`
+    `user_merge`
     `user_merge_aud`
     `user_preferences`
     `user_pro_owner`
