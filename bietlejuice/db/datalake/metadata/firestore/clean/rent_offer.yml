@@ -1,3 +1,4 @@
+---
 database_name: datalake_firestore_clean
 table_name: rent_offer
 columns:
@@ -13,6 +14,9 @@ columns:
   event_type:
     lineage:
       - datalake_firestore_raw.rent_offer.eventtype
+  ts_email_sent_to_owner:
+    lineage:
+      - datalake_firestore_raw.rent_offer.after
   ts_updated:
     lineage:
       - datalake_firestore_raw.rent_offer.timestamp
