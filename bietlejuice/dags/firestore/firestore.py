@@ -38,6 +38,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 clean_partition_cols = config_service.get_config("clean_partition_cols")
 subscriptions = config_service.get_config("subscriptions")
+default_libraries = config_service.get_config("default_libraries")
 custom_libraries = config_service.get_config("custom_libraries")
 
 # s3 paths setup
@@ -75,7 +76,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=custom_libraries,
+    libraries=default_libraries + custom_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
