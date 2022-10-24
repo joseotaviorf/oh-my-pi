@@ -22,6 +22,7 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2022, 10, 18, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
 CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+PARTITION_COLS = ["year", "month", "day"]
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -92,6 +93,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     target_database_base_name=CONTEXT,
     is_incremental=True,
     has_create_external_table_task=False,
+    partitions=PARTITION_COLS,
     extra_query_template_params={
         "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",
         "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
