@@ -906,6 +906,7 @@ bietlejuice.dw_listing:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-photographer-job-in-data-lake
   - bietlejuice.ebdb:create-clean-portability-in-data-lake
+  - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
@@ -1136,6 +1137,7 @@ bietlejuice.dw_user:
   - bietlejuice.ebdb:create-clean-photographer-data-in-data-lake
   - bietlejuice.ebdb:create-clean-sales-rep-in-data-lake
   - bietlejuice.enrich_amplitude_partner_taxonomy:load-enrich-amplitude-partner-taxonomy
+  - bietlejuice.enrich_big_agent:load-enrich-agent-current-program
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
   - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
@@ -1241,6 +1243,9 @@ bietlejuice.enrich_big_agent:
   - bietlejuice.big_agent:load-clean-external-invoice
   - bietlejuice.big_agent:load-clean-program
   - bietlejuice.big_agent:load-clean-user-revision-entity
+  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
 
 bietlejuice.enrich_bigfone_events:
   - bietlejuice.bigfone:load-clean-event

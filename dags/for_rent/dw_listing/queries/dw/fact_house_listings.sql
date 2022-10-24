@@ -64,6 +64,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   COALESCE(pa_b2b_online.id_user, pa_b2b_prime.id_user, -1) AS sk_user_partner_agent,
   COALESCE(pa_b2b_online.id_partner, pa_b2b_prime.id_partner, -1) AS sk_partner,
   COALESCE(aa_info.sk_autonomous_agent, -1) AS sk_autonomous_agent,
+  COALESCE(hlco.id_user, -1) AS sk_user_consultant,
   COALESCE(CAST(DATE_FORMAT(hl.dt_stranded, 'yyyyMMdd') AS BIGINT), -1) AS sk_stranded_date,
   -- SparkSQL's datediff ignores the time part, so we get the seconds diff and convert it to integer days.
   -- 60s*60m*24h = 86400s
@@ -95,6 +96,10 @@ LEFT JOIN datalake_ebdb_clean.partner_agent pa_b2b_online
   ON pa_b2b_online.id_user = l.id_user_has_indicated
 LEFT JOIN autonomous_agent_info aa_info
   ON aa_info.id_house = h.id
+LEFT JOIN
+    datalake_big_agent.house_rent_listing_consultant AS hlco
+        ON hlco.id_house_listing = hl.id_house_listing
+        AND hlco.is_last_ciq_on_listing = True
 WHERE
   lbc.id_house IS NULL
   OR lbc.is_for_rent

@@ -31,6 +31,9 @@ columns:
   google_id:
     lineage:
       - datalake_ebdb_user.user.id_google
+  id_partner:
+    lineage:
+      - datalake_big_agent.agent_current_program.id_partner
   country_code:
     lineage:
       - datalake_ebdb_user.user.country_code
@@ -40,6 +43,9 @@ columns:
   bloqueado:
     lineage:
       - datalake_ebdb_user.user.is_blocked
+  consultant_type:
+    lineage:
+      - datalake_big_agent.agent_current_program.consultant_type
   dadosafiliado_ativo:
     lineage:
       - datalake_ebdb_user.affiliate_data.is_active

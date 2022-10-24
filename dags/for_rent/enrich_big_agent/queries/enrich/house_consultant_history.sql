@@ -35,15 +35,28 @@ agency_enrollment_history AS (
     WHERE
         rev_type <> 2
         AND ts_deleted IS NULL
+),
+last_status_agency AS (
+    SELECT
+        id AS id_agency,
+        id_enrollment,
+        ROW_NUMBER() OVER(PARTITION BY id ORDER BY ts_updated DESC) = 1 AS is_last_agency_status,
+        dt_since AS dt_consultant_started,
+        ts_deleted AS ts_consultant_deleted
+    FROM
+        datalake_big_agent_clean.agency
 )
 SELECT
     aeh.id_agency,
     aeh.id_enrollment,
     GET_JSON_OBJECT(h.details, '$.houseExternalId') AS id_house,
     pa.id_partner,
+    GET_JSON_OBJECT(ag.details, '$.userExternalId') AS id_user,
     aeh.rev,
     p.name AS consultant_type,
     aeh.is_last_status_of_day,
+    lsa.dt_consultant_started,
+    lsa.ts_consultant_deleted,
     aeh.ts_enrollment_started,
     aeh.ts_enrollment_ended
 FROM
@@ -54,6 +67,10 @@ JOIN
 JOIN
     datalake_big_agent.enrollment AS e
         ON aeh.id_enrollment = e.id
+LEFT JOIN
+    last_status_agency AS lsa
+        ON lsa.id_agency = aeh.id_agency
+        AND lsa.is_last_agency_status = True
 JOIN
     datalake_big_agent.program AS p
         ON e.id_program = p.id

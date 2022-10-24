@@ -17,10 +17,13 @@ Produces the following output tables:
 
 - `agency`
 - `agent`
+- `agent_current_program`
 - `earnings`
 - `enrollment`
+- `external_invoice`
 - `house`
 - `house_consultant_history`
+- `house_rent_listing_consultant`
 - `installment`
 - `program`
 

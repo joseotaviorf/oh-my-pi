@@ -17,6 +17,9 @@ columns:
   version:
     lineage:
       - datalake_ebdb_listing.house_listing.version
+  consultant_type:
+    lineage:
+      - datalake_big_agent.house_rent_listing_consultant.consultant_type
   first_key_location:
     lineage:
       - datalake_ebdb_listing.agents_with_keys.first_key_location
@@ -185,6 +188,9 @@ columns:
   last_originals_type:
     lineage:
       - datalake_ebdb_listing.house_listing.last_originals_type
+  dt_consultant_started:
+    lineage:
+      - datalake_big_agent.house_rent_listing_consultant.dt_consultant_started
   dt_last_originals_opted_in:
     lineage:
       - datalake_ebdb_listing.house_listing.dt_last_originals_opted_in
@@ -203,6 +209,9 @@ columns:
   dt_last_iorent_opted_out:
     lineage:
       - datalake_ebdb_listing.house_listing.dt_last_iorent_opted_out
+  ts_consultant_deleted:
+    lineage:
+      - datalake_big_agent.house_rent_listing_consultant.ts_consultant_deleted
   sale_price:
     lineage:
       - datalake_ebdb_listing.house.sale_price

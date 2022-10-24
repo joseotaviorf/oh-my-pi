@@ -28,6 +28,9 @@ columns:
   sk_autonomous_agent:
     lineage:
       - datalake_ebdb_clean.partner_agent.id_user
+  sk_user_consultant:
+    lineage:
+      - datalake_big_agent.house_rent_listing_consultant.id_user
   sk_stranded_date:
     lineage:
       - datalake_ebdb_listing.house_listing.dt_stranded

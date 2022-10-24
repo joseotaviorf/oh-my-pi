@@ -14,12 +14,21 @@ columns:
   id_partner:
     lineage:
       - datalake_ebdb_clean.partner_agent.id_partner
+  id_user:
+    lineage:
+      - datalake_big_agent_clean.agent.details
   rev:
     lineage:
       - datalake_big_agent_clean.agency_aud.rev
   consultant_type:
     lineage:
       - datalake_big_agent.program.name
+  dt_consultant_started:
+    lineage:
+      - datalake_big_agent_clean.agency.dt_since
+  ts_consultant_deleted:
+    lineage:
+      - datalake_big_agent_clean.agency.ts_deleted
   ts_enrollment_started:
     lineage:
       - datalake_big_agent_clean.user_revision_entity.ts_revision

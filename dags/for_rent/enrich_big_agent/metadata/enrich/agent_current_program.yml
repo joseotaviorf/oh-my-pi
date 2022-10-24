@@ -1,0 +1,22 @@
+---
+database_name: datalake_big_agent
+table_name: agent_current_program
+columns:
+  id_agent:
+    lineage:
+      - datalake_big_agent_clean.agent.id
+  id_user:
+    lineage:
+      - datalake_ebdb_user.user.id
+  id_partner:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_partner
+  consultant_type:
+    lineage:
+      - datalake_big_agent_clean.program.name
+  ts_agent_updated:
+    lineage:
+      - datalake_big_agent_clean.agent.ts_updated
+  ts_enrollment_updated:
+    lineage:
+      - datalake_big_agent_clean.enrollment.ts_updated

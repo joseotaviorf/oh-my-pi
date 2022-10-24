@@ -10,6 +10,7 @@ create table if not exists public.fact_house_listings
  sk_user_partner_agent BIGINT,
  sk_partner BIGINT,
  sk_autonomous_agent BIGINT,
+ sk_user_consultant BIGINT,
  sk_stranded_date BIGINT,
  days_listing_to_contract_signed INTEGER,
  days_listing_to_depublication INTEGER,

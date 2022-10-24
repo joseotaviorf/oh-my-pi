@@ -4,3 +4,5 @@ inner_dependencies:
     - house
     - enrollment
     - program
+  house_listing_consultant:
+    - house_consultant_history

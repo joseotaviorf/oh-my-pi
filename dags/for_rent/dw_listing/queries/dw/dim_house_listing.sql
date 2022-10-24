@@ -207,6 +207,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.short_id_house,
     hl.country_code,
     CAST(hl.version AS SMALLINT) AS version,
+    hlco.consultant_type,
     hl.first_key_location,
     hl.status,
     CAST(hl.rent AS DECIMAL(14, 2)) AS rent,
@@ -266,12 +267,14 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.is_for_rent,
     hl.is_for_sale,
     hl.is_3p_supply,
+    hlco.dt_consultant_started,
     hl.dt_last_exclusive_opted_in,
     hl.dt_last_exclusive_opted_out,
     hl.dt_last_originals_opted_in,
     hl.dt_last_originals_opted_out,
     hl.dt_last_iorent_opted_in,
     hl.dt_last_iorent_opted_out,
+    hlco.ts_consultant_deleted,
     hl.ts_listing_version_start,
     hl.ts_listing_version_end,
     CAST(hl.ts_publication AS TIMESTAMP) AS ts_publication,
@@ -289,3 +292,7 @@ LEFT JOIN house_portability hp
     ON hp.id_house_listing = hl.sk_house_listing
 LEFT JOIN autonomous_agent_info aa_info
 	ON aa_info.sk_house_listing = hl.sk_house_listing
+LEFT JOIN
+    datalake_big_agent.house_rent_listing_consultant AS hlco
+        ON hlco.id_house_listing = hl.sk_house_listing
+        AND hlco.is_last_ciq_on_listing = True
