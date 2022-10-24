@@ -58,7 +58,7 @@ columns:
       - datalake_sale_visit_hubs.sale_visit_hubs.business_unit
   hub_offer:
     lineage:
-      - dw_sale.dim_offer.business_unit_sales_flow
+      - dw_sale.dim_offer.business_unit
   supply_3pbh_partner:
     lineage:
       - datalake_3p.houses_3p_bh.partner

@@ -167,7 +167,7 @@ sale_closing AS (
             COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
             sdo.is_3p_supply,
             COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
-            sdo.business_unit_sales_flow AS hub
+            sdo.business_unit AS hub
         FROM
             dw_sale.fact_offers AS fo
         LEFT JOIN
@@ -190,7 +190,7 @@ sale_closing AS (
             COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
             sdo.is_3p_supply,
             COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
-            sdo.business_unit_sales_flow AS hub
+            sdo.business_unit AS hub
         FROM
             dw_sale.fact_offers AS fo
         LEFT JOIN
@@ -213,7 +213,7 @@ sale_closing AS (
             COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
             sdo.is_3p_supply,
             COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
-            sdo.business_unit_sales_flow AS hub
+            sdo.business_unit AS hub
         FROM
             dw_sale.fact_offers AS fo
         LEFT JOIN

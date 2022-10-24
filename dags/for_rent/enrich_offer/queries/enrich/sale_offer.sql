@@ -105,83 +105,20 @@ relation_booking_offer AS (
 ),
 -- WORK CONTRACT
 work_contract AS (
-    WITH agent_contract AS (
-        SELECT
-            aud.id AS agent_id,
-            from_unixtime(ure.ts_revision / 1000) AS agent_contract_timestamp,
-            aud.id_work_contract AS workContract_id
-        FROM
-            datalake_ebdb_clean.agent_data_aud AS aud
-        JOIN
-            datalake_ebdb_clean.user_revision_entity AS ure
-                ON aud.REV = ure.id
-    ),
-    contract_aud AS (
-        SELECT
-            agent_id,
-            du.id AS user_id,
-            contract.contract_name,
-            agent_contract_timestamp,
-            RANK() OVER (
-                PARTITION BY agent_id
-                ORDER BY
-                agent_contract_timestamp DESC
-            ) AS r
-        FROM
-            agent_contract AS ac
-        INNER JOIN
-            datalake_ebdb_user.user du
-                ON du.id_agent = ac.agent_id
-        INNER JOIN
-            datalake_ebdb_clean.work_contract AS contract
-                ON ac.workcontract_id = contract.id
-    ),
-    actual_contract AS (
-        SELECT
-            agent_id,
-            contract_name
-        FROM
-            contract_aud
-        WHERE
-            r = 1
-    ),
-    base_agents AS (
-        SELECT
-            ca.*,
-            LAG(ca.contract_name) OVER(
-                PARTITION BY ca.agent_id
-                ORDER BY
-                ca.r DESC
-            ) AS previous_work_contract,
-            ac.contract_name AS actual_contract
-        FROM
-            contract_aud ca
-        LEFT JOIN
-            actual_contract ac
-                ON ac.agent_id = ca.agent_id
-    )
     SELECT
-        agent_id as id_agent,
-        user_id as id_user_agent,
-        actual_contract,
-        contract_name,
-        previous_work_contract,
-        agent_contract_timestamp AS ts_work_contract_start,
-        LEAD(agent_contract_timestamp) OVER(
-        PARTITION BY
-            agent_id
-            ORDER BY
-                r DESC
-            ) AS ts_work_contract_end,
-        r
-    FROM
-        base_agents
-    WHERE
-        previous_work_contract <> contract_name
-        OR previous_work_contract IS NULL
-    ORDER BY
-        1,
-        r DESC
+        ac.id_agent,
+        ac.id_user_agent,
+        wc.id_hub_teams,
+        wc.hub_name_teams,
+        ac.previous_work_contract_name,
+        ac.work_contract_name AS contract_name,
+        ac.ts_work_contract_started AS ts_work_contract_start,
+        COALESCE(ac.ts_work_contract_ended, CURRENT_DATE) AS ts_work_contract_end
+    FROM 
+        datalake_ebdb_agents.agent_contract AS ac
+    LEFT JOIN
+        datalake_ebdb_work_contract.work_contract AS wc
+            ON ac.id_work_contract = wc.id
 ),
 -- REGIONS
 regions AS (
@@ -307,6 +244,7 @@ data_sources AS (
         ohc.offer_model AS ohc_offer_model,
         -- data from work_contract
         wc.id_agent AS wc_id_agent,
+        wc.id_hub_teams,
         wc.contract_name AS agent_work_contract,
         CASE
             WHEN wc.contract_name LIKE '%HUB%'
@@ -315,21 +253,7 @@ data_sources AS (
                 THEN 'CENTRAL'
             ELSE 'DEAL_MAKING'
         END AS wc_offer_flow,
-        CASE
-            WHEN UPPER(wc.contract_name) LIKE '%POA%'
-                THEN REPLACE(REPLACE('HUB PORTO ALEGRE','-',''),'  ',' ')
-            WHEN UPPER(wc.contract_name) LIKE '%HAMBURGO%'
-                THEN REPLACE(REPLACE('HUB PORTO ALEGRE','-',''),'  ',' ')
-            WHEN UPPER(wc.contract_name) LIKE '%LEOPOLDO%'
-                THEN REPLACE(REPLACE('HUB PORTO ALEGRE','-',''),'  ',' ')
-            WHEN UPPER(wc.contract_name) LIKE '%MORUMBI%'
-                THEN REPLACE(REPLACE('HUB BUTANTÃ','-',''),'  ',' ')
-            WHEN UPPER(wc.contract_name) LIKE '%BROOKLYN%'
-                THEN REPLACE(REPLACE('HUB BROOKLIN','-',''),'  ',' ')
-            WHEN UPPER(wc.contract_name) LIKE '%HUB%'
-                THEN REPLACE(REPLACE(UPPER(wc.contract_name),'-',''),'  ',' ')
-            ELSE UPPER(wc.contract_name)
-        END AS wc_hub_name_ajs,
+        wc.hub_name_teams,
         -- data from gsheets_offer_hub_central
         ohc.ohc_offer_flow,
         ohc.ohc_offer_flow_detail,
@@ -381,9 +305,9 @@ data_sources AS (
         vo.tags_from_salesflow AS vo_tags_from_salesflow,
         vo.has_seller_debt_payments AS vo_has_seller_debt_payments,
         vo.is_ccv_canceled AS vo_is_ccv_canceled,
-        vo.is_a_rescued_ccv AS vo_is_a_rescued_ccv,
-        vo.is_a_rescued_offer AS vo_is_a_rescued_offer,
-        vo.dt_sale_agreement_rescued AS vo_dt_sale_agreement_rescued,
+        vo.is_a_rescued_ccv AS vo_is_a_rescued_ccv, 
+        vo.is_a_rescued_offer AS vo_is_a_rescued_offer, 
+        vo.dt_sale_agreement_rescued AS vo_dt_sale_agreement_rescued, 
         vo.dt_offer_rescued AS vo_dt_offer_rescued,
         vo.ts_last_updated_pendency AS vo_ts_last_updated_pendency,
         vo.dt_sale_transacton_paid AS vo_dt_sale_transacton_paid,
@@ -499,7 +423,8 @@ offer_flow AS (
         ohc_offer_flow_detail,
         vo_id_offer,
         id_hub,
-        wc_hub_name_ajs,
+        id_hub_teams,
+        hub_name_teams,
         CASE
             WHEN ds.ohc_offer_flow IS NOT NULL
                 THEN ds.ohc_offer_flow -- Offers que estão na planilha de trabalho
@@ -531,19 +456,20 @@ business_unit_by_hub_id(
 
 business_unit AS (
   SELECT
-    off.id_offer,
-    off.ohc_id_offer,
-    REPLACE(UPPER(
-        CASE
-            WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
-            WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
-            WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
-            WHEN offer_flow = 'CENTRAL' THEN 'CENTRAL NO INFO'
-            WHEN offer_flow = 'HUB' THEN (CASE WHEN off.ohc_offer_flow_detail IS NULL AND off.vo_id_offer IS NOT NULL THEN off.wc_hub_name_ajs ELSE off.ohc_offer_flow_detail END)
-            ELSE offer_flow
-        END
-    ), '  ',' ') AS business_unit,
-    offer_flow
+        off.id_offer,
+        off.ohc_id_offer,
+        off.id_hub_teams AS id_business_unit,
+        REPLACE(UPPER(
+            CASE
+                WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
+                WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
+                WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
+                WHEN offer_flow = 'CENTRAL' THEN 'CENTRAL NO INFO'
+                WHEN offer_flow = 'HUB' THEN (CASE WHEN off.ohc_offer_flow_detail IS NULL AND off.vo_id_offer IS NOT NULL THEN off.hub_name_teams ELSE off.ohc_offer_flow_detail END)
+                ELSE offer_flow
+            END
+        ), '  ',' ') AS business_unit,
+        offer_flow
     FROM
         offer_flow AS off
     INNER JOIN
@@ -556,17 +482,17 @@ offer_portfolio AS (
         id_offer,
         ohc_id_offer,
         CASE
-            WHEN bu.business_unit = 'HUB PERDIZES'
+            WHEN bu.business_unit = 'HUB SP - Perdizes'
                 THEN to_timestamp('2021-11-01 00:00:00', "yyyy-MM-dd HH:mm:ss")
-            WHEN bu.business_unit = 'HUB BELA VISTA'
+            WHEN bu.business_unit = 'HUB SP - Bela Vista'
                 THEN to_timestamp('2021-11-04 00:00:00', "yyyy-MM-dd HH:mm:ss")
-            WHEN bu.business_unit IN ('HUB RIO DE JANEIRO','HUB VILA MADALENA','HUB SANTANA','HUB BROOKLIN')
+            WHEN bu.business_unit IN ('HUB RJ - Zona Sul','HUB SP - Vila Madalena','HUB SP - Santana','HUB SP - Brooklin')
                 THEN to_timestamp('2021-12-01 00:00:00', "yyyy-MM-dd HH:mm:ss")
-            WHEN bu.business_unit = 'HUB PORTO ALEGRE'
+            WHEN bu.business_unit = 'HUB RS - Porto Alegre'
                 THEN to_timestamp('2021-12-03 00:00:00', "yyyy-MM-dd HH:mm:ss")
-            WHEN bu.business_unit IN ('HUB SAÚDE','HUB VILA MARIANA','HUB TATUAPÉ')
+            WHEN bu.business_unit IN ('HUB SP - Saúde','HUB SP - Vila Mariana','HUB SP - Tatuapé')
                 THEN to_timestamp('2021-12-07 00:00:00', "yyyy-MM-dd HH:mm:ss")
-            WHEN bu.business_unit IN ('HUB BUTANTÃ')
+            WHEN bu.business_unit IN ('HUB SP - Butantã')
                 OR bu.offer_flow = 'HUB'
                     THEN to_timestamp('2021-12-09 00:00:00', "yyyy-MM-dd HH:mm:ss")
             WHEN bu.offer_flow = 'HUB'
@@ -617,7 +543,7 @@ business_rules AS (
         ds.id_vendas,
         ds.id_pendency,
         ds.vo_id_user_team_lead AS id_user_team_lead,
-        ds.id_hub AS id_hub_sales_flow,
+        COALESCE(busf.id_hub, bu.id_business_unit) AS id_business_unit,
         CASE
             WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
                 THEN ds.vo_agent_name
@@ -657,8 +583,7 @@ business_rules AS (
         earnest_value,
         brokerage_fee,
         off.offer_flow,
-        bu.business_unit,
-        busf.hub_name AS hub_name_sales_flow,
+        COALESCE(busf.hub_name, bu.business_unit) AS business_unit,
         busf.business_context AS business_context_sales_flow,
         ofp.offer_portfolio_start_date,
         COALESCE(vo_flow_step, monday_status) AS monday_status,
@@ -866,10 +791,10 @@ business_rules AS (
             WHEN ds.id_offer IS NOT NULL
                 THEN 'GIROFFER'
             ELSE 'NOT DEFINED'
-        END AS offer_platform,
-        ds.vo_is_a_rescued_ccv AS is_a_rescued_ccv,
-        ds.vo_is_a_rescued_offer AS is_a_rescued_offer,
-        ds.vo_dt_sale_agreement_rescued AS dt_sale_agreement_rescued,
+        END AS offer_platform, 
+        ds.vo_is_a_rescued_ccv AS is_a_rescued_ccv, 
+        ds.vo_is_a_rescued_offer AS is_a_rescued_offer, 
+        ds.vo_dt_sale_agreement_rescued AS dt_sale_agreement_rescued, 
         ds.vo_dt_offer_rescued AS dt_offer_rescued
     FROM
         data_sources AS ds
@@ -917,7 +842,7 @@ SELECT
     id_closing_specialist,
     id_vendas,
     id_pendency,
-    id_hub_sales_flow AS id_business_unit,
+    id_business_unit,
     pendency,
     CASE
         WHEN current_payment_method = "INSTANT_MORTGAGE" THEN (
@@ -944,7 +869,6 @@ SELECT
     agent_name,
     offer_flow,
     business_unit,
-    hub_name_sales_flow AS business_unit_sales_flow,
     offer_platform,
     offer_status,
     monday_status,
@@ -1029,11 +953,11 @@ SELECT
     is_ccv_canceled,
     is_3p_supply,
     is_3p_demand,
-    is_a_rescued_ccv,
-    is_a_rescued_offer,
+    is_a_rescued_ccv, 
+    is_a_rescued_offer, 
     flg_booking_before_offer,
     flg_visit_completed_before_offer,
-    dt_sale_agreement_rescued,
+    dt_sale_agreement_rescued, 
     dt_offer_rescued,
     dt_sale_transacton_paid,
     dt_house_registry_ended,

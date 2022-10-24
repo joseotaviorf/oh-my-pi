@@ -69,7 +69,6 @@ SELECT
 	eso.drop_reason_responsible,
 	eso.current_payment_method AS payment_method,
 	eso.business_unit,
-	eso.business_unit_sales_flow,
 	eso.offer_platform,
 	eso.offer_flow,
 	eso.agent_work_contract,

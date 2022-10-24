@@ -58,6 +58,7 @@ columns:
   id_business_unit:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_hub
+      - datalake_ebdb_work_contract.work_contract.id_hub_teams
   pendency:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.pendency
@@ -85,11 +86,8 @@ columns:
       - datalake_sale_offer_flows.sale_offer_flows.offer_flow
   business_unit:
     lineage:
-      - datalake_ebdb_clean.work_contract.contract_name
       - datalake_gsheets.sale_hub_offer.offer_flow
-  business_unit_sales_flow:
-    lineage:
-      - datalake_hub_services_clean.business_unit.hub_name
+      - datalake_ebdb_work_contract.work_contract
   offer_platform:
     lineage:
       - datalake_gsheets.sale_hub_offer.offer_model
@@ -162,7 +160,7 @@ columns:
       - datalake_sale_offer_flows.sale_offer_flows.sale_agreement_status
   agent_work_contract:
     lineage:
-      - datalake_ebdb_clean.work_contract.contract_name
+      - datalake_ebdb_agents.agent_contract.work_contract_name
   financing_bank:
     lineage:
       - datalake_firestore.monday.financing_bank
