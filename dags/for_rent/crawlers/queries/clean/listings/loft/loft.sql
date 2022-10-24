@@ -1,6 +1,7 @@
-SELECT 
+SELECT
     id,
     address,
+    agency_name,
     contact_information,
     crawl_metadata,
     date_info,
@@ -11,9 +12,16 @@ SELECT
     name AS listing_name,
     origin,
     price,
+    installments_price,
     region,
+    contract_type,
     type,
+    property_type,
     city,
+    status,
+    has_agency,
+    is_marketplace,
+    created_at AS ts_created,
     year,
     month,
     day

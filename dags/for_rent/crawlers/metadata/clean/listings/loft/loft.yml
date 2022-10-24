@@ -8,6 +8,9 @@ columns:
   address:
     lineage:
       - datalake_crawlers_raw.loft_listings.address
+  agency_name:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.agency_name
   contact_information:
     lineage:
       - datalake_crawlers_raw.loft_listings.contact_information
@@ -38,15 +41,36 @@ columns:
   price:
     lineage:
       - datalake_crawlers_raw.loft_listings.price
+  installments_price:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.installments_price
   region:
     lineage:
       - datalake_crawlers_raw.loft_listings.region
+  contract_type:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.contract_type
   type:
     lineage:
       - datalake_crawlers_raw.loft_listings.type
+  property_type:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.property_type
   city:
     lineage:
       - datalake_crawlers_raw.loft_listings.city
+  status:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.status
+  has_agency:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.has_agency
+  is_marketplace:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.is_marketplace
+  ts_created:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.created_at
   year:
     lineage:
       - datalake_crawlers_raw.loft_listings.year
