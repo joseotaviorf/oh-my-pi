@@ -50,6 +50,7 @@ supply_funnel_targets AS (
             WHEN supply_origin LIKE '%Human crawlers%' THEN 'Human Crawlers'
             ELSE supply_origin
         END AS supply_mkt_origin_detailed,
+        SUM(CAST(NULLIF(top_of_funnel,'') AS REAL)) AS leads_targets,
         SUM(CAST(NULLIF(prospects,'') AS REAL)) AS prospects_targets,
         SUM(CAST(NULLIF(qualifieds,'') AS REAL)) AS qualifieds_targets,
         SUM(CAST(NULLIF(opportunities,'') AS REAL)) AS opportunities_targets,
@@ -59,7 +60,7 @@ supply_funnel_targets AS (
         datalake_gsheets_clean.mexico_supply_targets_2022
     WHERE
         supply_origin NOT IN ('Crawlers classifieds', 'Price Calculator')
-    GROUP BY 1, 2, 3, 8
+    GROUP BY 1, 2, 3, 9
 ),
 supply_costs_targets AS (
     SELECT
@@ -199,12 +200,16 @@ SELECT
     sf.qualifieds,
     sf.opportunities,
     sf.first_listings,
+    ROUND(sft.leads_targets, 2) AS leads_targets,
     ROUND(sft.prospects_targets, 2) AS prospects_targets,
     ROUND(sft.qualifieds_targets, 2) AS qualifieds_targets,
     ROUND(sft.opportunities_targets, 2) AS opportunities_targets,
     ROUND(sft.first_listings_targets, 2) AS first_listings_targets,
-    ROUND(CAST(sf.qualifieds/NULLIF(sf.prospects, 0) AS FLOAT), 2) AS p2q,
-    ROUND(CAST(sf.first_listings/NULLIF(sf.qualifieds, 0) AS FLOAT), 2) AS q2fl,
+    ROUND(CAST(sf.prospects/NULLIF(sf.leads, 0) AS FLOAT), 2) AS l2p_coincident,
+    ROUND(CAST(sf.qualifieds/NULLIF(sf.prospects, 0) AS FLOAT), 2) AS p2q_coincident,
+    ROUND(CAST(sf.opportunities/NULLIF(sf.qualifieds, 0) AS FLOAT), 2) AS q2o_coincident,
+    ROUND(CAST(sf.first_listings/NULLIF(sf.qualifieds, 0) AS FLOAT), 2) AS q2fl_coincident,
+    ROUND(CAST(sf.first_listings/NULLIF(sf.opportunities, 0) AS FLOAT), 2) AS o2fl_coincident,
     ol.ongoing_listings,
     CAST(sct.budget_total AS FLOAT) AS budget_total_target,
     CAST(sct.budget_comission AS FLOAT) AS budget_comission_target,

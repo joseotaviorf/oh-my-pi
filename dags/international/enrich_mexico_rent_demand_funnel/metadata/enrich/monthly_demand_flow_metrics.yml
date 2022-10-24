@@ -8,9 +8,6 @@ columns:
   city_group:
     lineage:
       - datalake_region.region.country_name
-  base_year:
-    lineage:
-      - datalake_region.city_groups_per_periods.year
   dt_month_started:
     lineage:
       - datalake_region.city_groups_per_periods.dt_month_started

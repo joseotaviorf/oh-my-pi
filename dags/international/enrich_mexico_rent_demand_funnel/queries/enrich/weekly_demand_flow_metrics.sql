@@ -16,10 +16,10 @@ demand_funnel AS (
         ref.city_group,
         SUM(ref.visits_booked) AS visits_booked,
         SUM(ref.visits_completed) AS visits_completed,
-        SUM(ref.offer_submitted) AS offer_submitted,
-        SUM(ref.offer_approved) AS offer_accepted,
-        SUM(ref.credit_approved) AS credit_approved,
-        SUM(ref.contract_signed) AS contract_signed,
+        SUM(ref.offer_submitted) AS offers_submitted,
+        SUM(ref.offer_approved) AS offers_accepted,
+        SUM(ref.credit_approved) AS credits_approved,
+        SUM(ref.contract_signed) AS contracts_signed,
         DATE(DATE_TRUNC('week', ref.date)) AS dt_week_started
     FROM 
         dw_datamarts_for_rent_cross.rental_events_funnel AS ref
@@ -33,10 +33,10 @@ demand_funnel_targets AS (
         mdt.city_group,
         CAST(SUM(NULLIF(REPLACE(mdt.visits_booked,',',''), '')) AS FLOAT) AS visits_booked_target,
         CAST(SUM(NULLIF(REPLACE(mdt.visits_completed,',',''), '')) AS FLOAT) AS visits_completed_target,
-        CAST(SUM(NULLIF(REPLACE(mdt.offer_sent,',',''), '')) AS FLOAT) AS offer_submitted_target,
-        CAST(SUM(NULLIF(REPLACE(mdt.offer_accepted,',',''), '')) AS FLOAT) AS offer_accepted_target,
-        CAST(SUM(NULLIF(REPLACE(mdt.credit_approved,',',''), '')) AS FLOAT) AS credit_approved_target,
-        CAST(SUM(NULLIF(REPLACE(mdt.contracts_signed,',',''), '')) AS FLOAT) AS contract_signed_target,
+        CAST(SUM(NULLIF(REPLACE(mdt.offer_sent,',',''), '')) AS FLOAT) AS offers_submitted_target,
+        CAST(SUM(NULLIF(REPLACE(mdt.offer_accepted,',',''), '')) AS FLOAT) AS offers_accepted_target,
+        CAST(SUM(NULLIF(REPLACE(mdt.credit_approved,',',''), '')) AS FLOAT) AS credits_approved_target,
+        CAST(SUM(NULLIF(REPLACE(mdt.contracts_signed,',',''), '')) AS FLOAT) AS contracts_signed_target,
         DATE(DATE_TRUNC('week', DATE(mdt.dt_target))) AS dt_week_started
     FROM 
         datalake_gsheets_clean.mexico_demand_targets_2022 AS mdt
@@ -64,8 +64,7 @@ periods_dimension AS (
     SELECT DISTINCT 
         dt_week_started,
         country_code,
-        city_group,
-        year
+        city_group
     FROM
         datalake_region.city_groups_per_periods
     WHERE
@@ -79,19 +78,18 @@ SELECT
     tdf.tenant_prospects,
     df.visits_booked,
     df.visits_completed,
-    df.offer_submitted,
-    df.offer_accepted,
-    df.credit_approved,
-    df.contract_signed,
+    df.offers_submitted,
+    df.offers_accepted,
+    df.credits_approved,
+    df.contracts_signed,
     dft.visits_booked_target,
     dft.visits_completed_target,
-    dft.offer_submitted_target,
-    dft.offer_accepted_target,
-    dft.credit_approved_target,
-    dft.contract_signed_target,
+    dft.offers_submitted_target,
+    dft.offers_accepted_target,
+    dft.credits_approved_target,
+    dft.contracts_signed_target,
     dtc.budget_target,
     dac.actual_cost,
-    dim.year AS base_year,
     dim.dt_week_started
 FROM
     periods_dimension AS dim
