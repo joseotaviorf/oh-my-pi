@@ -1,5 +1,5 @@
 SELECT
-    transaction_id_transid AS id_transaction,
+    CAST(transaction_id_transid AS STRING) AS id_transaction,
     line_id_line_id AS id_line,
     business_entity_id_u_businessentityid AS id_business_entity,
     finance_entity_entry_id_u_financeentityentryid AS id_finance_entity_entry,
@@ -27,6 +27,6 @@ SELECT
 FROM
     datalake_sap_raw.invoice_lines
 WHERE
-  year = {year}
-  AND month = {month}
-  AND day = {day}
+    year = {year}
+    AND month = {month}
+    AND day = {day}
