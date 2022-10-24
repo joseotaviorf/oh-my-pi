@@ -34,7 +34,6 @@ databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{{extraction_type}}_{SOURCE}_into_datalake.py"
 
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
@@ -104,13 +103,15 @@ for table in tables:
         parameters.append(table.get("unixtime_measure", "date"))
         parameters.append("{{ ds }}")
 
+    raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}//load_{extraction_type}_{SOURCE}_into_datalake.py"
+
     partitions = partition_columns if is_incremental else None
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,
         table_name=table_name,
-        extraction_spark_job_file=RAW_SPARK_JOB_PATH.format(
+        extraction_spark_job_file=raw_spark_job_path.format(
             extraction_type=extraction_type
         ),
         raw_spark_job_extra_args=parameters,
