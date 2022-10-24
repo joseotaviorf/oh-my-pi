@@ -64,7 +64,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   COALESCE(pa_b2b_online.id_user, pa_b2b_prime.id_user, -1) AS sk_user_partner_agent,
   COALESCE(pa_b2b_online.id_partner, pa_b2b_prime.id_partner, -1) AS sk_partner,
   COALESCE(aa_info.sk_autonomous_agent, -1) AS sk_autonomous_agent,
-  COALESCE(hlco.id_user, -1) AS sk_user_consultant,
+  CAST(COALESCE(hlco.id_user, -1) AS BIGINT) AS sk_user_consultant,
   COALESCE(CAST(DATE_FORMAT(hl.dt_stranded, 'yyyyMMdd') AS BIGINT), -1) AS sk_stranded_date,
   -- SparkSQL's datediff ignores the time part, so we get the seconds diff and convert it to integer days.
   -- 60s*60m*24h = 86400s
