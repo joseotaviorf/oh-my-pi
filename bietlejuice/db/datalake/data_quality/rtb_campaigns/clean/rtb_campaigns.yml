@@ -4,7 +4,7 @@ alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id_account:
     is_complete:
-  id_sub_campaign:
+  sub_campaign_name:
     is_complete:
   account_name:
     is_complete:

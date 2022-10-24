@@ -1,0 +1,18 @@
+---
+table_name: datalake_criteo_campaigns_raw.criteo_campaigns
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: AttributionDate
+  incremental_date_mask: yyyy-MM-dd
+table_level_validations:
+  has_size:
+    greater_than: 20
+column_level_validations:
+  AdvertiserId:
+    is_complete:
+  AdsetId:
+    is_complete:
+  Advertiser:
+    is_complete:
+  Adset:
+    is_complete:

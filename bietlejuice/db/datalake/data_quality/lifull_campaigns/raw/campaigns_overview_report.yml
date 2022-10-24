@@ -1,0 +1,18 @@
+---
+table_name: datalake_lifull_campaigns_raw.campaigns_overview_report
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: dt
+  incremental_date_mask: yyyy-MM-dd
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 50
+column_level_validations:
+  acc:
+    is_complete:
+  id:
+    is_complete:
+  name:
+    is_complete:
+  account_name:
+    is_complete:
