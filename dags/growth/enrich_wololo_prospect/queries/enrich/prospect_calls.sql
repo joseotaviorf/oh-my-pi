@@ -34,9 +34,9 @@ SELECT
     wc.ts_contacted,
     wr.ts_round_started,
     NOW() AS ts_load,
-    {year} year,
-    {month} month,
-    {day} day
+    YEAR(wc.ts_contacted) AS year,
+    MONTH(wc.ts_contacted) AS month,
+    DAY(wc.ts_contacted) AS day
 FROM
     datalake_wololo_clean.prospect AS pr
 INNER JOIN wololo_calls AS wc
