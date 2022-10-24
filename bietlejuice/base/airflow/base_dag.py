@@ -1,6 +1,8 @@
-from glob import glob
-from bietlejuice.dags import COMPOSER_DAGS_PATH
+from os.path import join
+
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
 logger = QuintoAndarLogger("BaseDAG")
 
@@ -8,20 +10,18 @@ logger = QuintoAndarLogger("BaseDAG")
 class BaseDAG:
     @staticmethod
     def get_dag_doc(dag_name, root_path=None):
+        dag_path = DAGPackagesPathService.get_dag_path(dag_name)
         doc_md_string = ""
-        if root_path:
-            DOC_ROOT_PATH = root_path
-        else:
-            DOC_ROOT_PATH = f"{COMPOSER_DAGS_PATH}/**"
-        file_path = glob(f"{DOC_ROOT_PATH}/{dag_name}.md", recursive=True)
+        dag_path = root_path if root_path else dag_path
+        doc_file_path = join(dag_path, f"{dag_name}.md")
+
         try:
-            if len(file_path) == 1:
-                doc_md_string = open(file_path[0]).read()
-            else:
-                raise Exception(
-                    f"The amount of files discovered for {dag_name} is {len(file_path)} and we expected to get 1"
-                )
+            doc_md_string = open(doc_file_path).read()
         except Exception as e:
-            logger.info(f"m=get_dag_doc, msg=we found an issue for {dag_name}, e={e}")
+            logger.info(
+                f"m=BaseDAG.get_dag_doc, msg=The DAG doc file could not be opened, "
+                f"dag_name={dag_name}, file_path={doc_file_path}"
+            )
+            raise e
         finally:
             return doc_md_string
