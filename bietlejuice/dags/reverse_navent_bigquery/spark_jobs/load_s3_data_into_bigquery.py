@@ -1,7 +1,6 @@
 import json
 import logging
 
-from datetime import datetime
 from argparse import ArgumentParser
 
 from google.cloud import bigquery
@@ -81,13 +80,11 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
 
-    execution_date = datetime.now()
-
     for table in tables:
         table_name = table["table_name"]
         bigquery_table_id = table["bigquery_table_id"]
 
-        datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table_name}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
+        datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table_name}"
 
         df = s3_consumer.get_data_from_file(path=datalake_path, format="parquet")
 

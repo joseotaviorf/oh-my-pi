@@ -14,7 +14,6 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.base.airflow import BaseDAG
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.reverse_task_group import ReverseTaskGroup
-from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
@@ -52,14 +51,11 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 
 default_libraries = config_service.get_config("default_libraries")
-inner_dependencies = config_service.get_config("inner_dependencies")
 
 libraries_description = [
     *default_libraries,
     *config_service.get_config("custom_libraries"),
 ]
-
-partition_columns = config_service.get_config("partition_columns")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -99,17 +95,6 @@ datalake_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.REVERSE,
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
-    is_incremental=True,
-    partitions=partition_columns,
-)
-
-(
-    task_groups_boundaries_without_inner_dependencies,
-    inner_dependencies_task_groups_boundaries,
-) = task_group.set_inner_dag_dependencies(
-    task_flow_helper=TaskFlowHelper(),
-    task_groups_boundaries=datalake_task_groups,
-    dag_inner_dependencies=inner_dependencies,
 )
 
 load_s3_data_into_bigquery_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -123,15 +108,13 @@ load_s3_data_into_bigquery_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-create_cluster_task.set_downstream(
-    ReverseTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
-    + ReverseTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries)
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
 )
 
+chain(create_cluster_task, ReverseTaskGroup.all_first_tasks(datalake_task_groups))
 chain(
-    ReverseTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
-    + ReverseTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    ReverseTaskGroup.all_last_tasks(datalake_task_groups),
     load_s3_data_into_bigquery_task,
 )
-
 chain(load_s3_data_into_bigquery_task, terminate_cluster_task)
