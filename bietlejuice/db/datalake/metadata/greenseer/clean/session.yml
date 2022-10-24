@@ -22,6 +22,9 @@ columns:
   ts_ended:
     lineage:
       - datalake_greenseer_raw.session.end_timestamp
+  ts_updated:
+    lineage:
+      - datalake_greenseer_raw.session.update_timestamp
   year:
     lineage:
       - datalake_greenseer_raw.session.year

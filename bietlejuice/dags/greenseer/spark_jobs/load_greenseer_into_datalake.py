@@ -2,10 +2,6 @@ import json
 import logging
 
 from argparse import ArgumentParser
-from dateutil.relativedelta import relativedelta
-from datetime import datetime, timedelta
-
-from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
@@ -14,6 +10,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
+from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_greenseer_into_datalake"
 
@@ -32,13 +29,11 @@ if __name__ == "__main__":
     source = args.source
     execution_date = args.execution_date
 
-    def date_range(start_date, end_date):
-        for n in range(int((end_date - start_date).days) + 1):
-            yield start_date + timedelta(n)
-
     logger.info(
-        f"m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, "
-        "msg=Starting spark job..."
+        f""""
+        m=load_greenseer_into_datalake, environment={environment}, datalake_bucket={datalake_bucket},
+        source={source}, msg=Starting spark job...
+        """
     )
 
     base_dbutils = BaseDBUtils()
@@ -50,7 +45,6 @@ if __name__ == "__main__":
     allow_list = config_service.get_config("allow_list")
     max_records_per_file = config_service.get_config("max_records_per_file")
     partitioned_by = config_service.get_config("partitioned_by")
-    days_interval = config_service.get_config("days_interval")
     partition_cols = config_service.get_config("partition_cols")
 
     conn_config_json = dbutils.secrets.get(
@@ -76,38 +70,33 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
     metastore_service.create_database(database_name)
 
-    end_date = datetime.strptime(execution_date, "%Y-%m-%d")
-    start_date = end_date - relativedelta(days=days_interval)
-
     for table in tables:
         if table.table_name.lower() in allow_list:
-            for dt_day in date_range(start_date, end_date):
-                df = postgres_consumer.get_incremental_data_from_table(
-                    table.table_name, partitioned_by, dt_day.strftime("%Y-%m-%d")
-                )
+            df = postgres_consumer.get_incremental_data_from_table(
+                table.table_name, partitioned_by, execution_date
+            )
 
-                s3_loader.load_df(
-                    df=df,
-                    s3_path=f"{database_location}{table.table_name.lower()}",
-                    format_options=format_options,
-                    database_location=database_location,
-                    max_records_per_file=max_records_per_file,
-                    partitions=partition_cols,
-                )
+            s3_loader.load_df(
+                df=df,
+                s3_path=f"{database_location}{table.table_name.lower()}",
+                format_options=format_options,
+                max_records_per_file=max_records_per_file,
+                partitions=partition_cols,
+            )
 
-                spark_metastore_loader.update_metastore(
-                    df=df,
-                    database_name=database_name,
-                    table_name=table.table_name.lower(),
-                    format_options=format_options,
-                    force_recreate=False,
-                    database_location=database_location,
-                    partitions=partition_cols,
-                )
+            spark_metastore_loader.update_metastore(
+                df=df,
+                database_name=database_name,
+                table_name=table.table_name.lower(),
+                format_options=format_options,
+                force_recreate=False,
+                database_location=database_location,
+                partitions=partition_cols,
+            )
 
-                metastore_service.create_new_partitions_from_df(
-                    database_name=database_name,
-                    table_name=table.table_name.lower(),
-                    df=df,
-                    partition_cols=partition_cols,
-                )
+            metastore_service.create_new_partitions_from_df(
+                database_name=database_name,
+                table_name=table.table_name.lower(),
+                df=df,
+                partition_cols=partition_cols,
+            )

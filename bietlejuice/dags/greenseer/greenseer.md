@@ -14,7 +14,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-We load the following tables into the datalake, updating only sessions created within 5 days:
+We load the following tables into the datalake, but only sessions updated in D-1:
 
 1. In datalake raw:
 

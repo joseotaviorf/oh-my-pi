@@ -6,10 +6,13 @@ SELECT
     current_state,
     beginning_timestamp AS ts_started,
     end_timestamp AS ts_ended,
+    update_timestamp AS ts_updated,
     year,
     month,
     day
 FROM
     datalake_greenseer_raw.session
 WHERE
-    DATE(CONCAT(year,'-',month,'-',day)) >= DATE('{year}-{month}-{day}') - INTERVAL 4 days
+    year = {year}
+    AND month = {month}
+    AND day = {day}

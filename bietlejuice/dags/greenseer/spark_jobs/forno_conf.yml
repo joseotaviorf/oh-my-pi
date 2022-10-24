@@ -1,5 +1,4 @@
 ---
 max_records_per_file: 25000
-partitioned_by: "beginning_timestamp"
-days_interval: 4
+partitioned_by: "update_timestamp"
 allow_list: ["session"]
