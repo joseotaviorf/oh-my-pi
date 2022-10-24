@@ -644,6 +644,15 @@ bietlejuice.dw_datamarts_spark.for_rent_cross:
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
 
+bietlejuice.dw_datamarts_spark.fintech:
+  # This DAG also depends on datalake_gsheets_clean.base_pdd table which is static and not present on any DAG
+  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-snapshot
+  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-entry-snapshot
+  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-fact-invoice-entries-snapshot
+  - bietlejuice.retsuko:load-clean-boleto
+  - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.dw_region:load-dw-public-dim-region
+
 bietlejuice.dw_datamarts_spark.fintech_cross:
   # Removed dependency with dw_region in order to avoid loopings since dw_datamarts.cross already satisfies
   - bietlejuice.dw_contract:load-dw-public-dim-contract
