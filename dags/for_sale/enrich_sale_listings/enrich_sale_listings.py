@@ -45,6 +45,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 INNER_DEPENDENCIES = {
     "sale_listing": ["sale_status_version_order"],
     "sale_listing_status": ["sale_status_version_order"],
+    "sale_listing_price_changes": ["sale_status_version_order"],
 }
 
 dag = DAG(

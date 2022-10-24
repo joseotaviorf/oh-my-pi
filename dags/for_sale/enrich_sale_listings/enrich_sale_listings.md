@@ -15,6 +15,7 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following tables in enrich layer, via full load:
 
     - `sale_listing`
+    - `sale_listing_price_changes`
     - `sale_listings_status`
     - `sale_status_version_order`
 

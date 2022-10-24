@@ -2100,6 +2100,7 @@ bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.hub_services:load-clean-visitor
 
 bietlejuice.enrich_sale_listings:
+  - bietlejuice.ebdb:create-clean-house-predicted-price-aud-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity

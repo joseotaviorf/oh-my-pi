@@ -1,0 +1,43 @@
+---
+database_name: datalake_sale_listings
+table_name: sale_listing_price_changes
+columns:
+  id_house: 
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+  id_user_revision: 
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user
+  id_owner: 
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_user
+  id_region: 
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_region
+  sale_price: 
+    lineage:
+      - datalake_ebdb_clean.house_aud.sale_price
+  calculator_min_sale_price: 
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_10
+  calculator_p30_sale_price:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_30
+  calculator_sale_price: 
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_50
+  calculator_p70_sale_price:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_70
+  calculator_max_sale_price: 
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_90
+  calculator_certainty: 
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.certainty
+  ts_price_started:
+    lineage: 
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_price_ended:
+    lineage: 
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
