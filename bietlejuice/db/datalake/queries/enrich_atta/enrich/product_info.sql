@@ -11,7 +11,10 @@ SELECT
     pi.product_name,
     pi.profile_doc,
     pi.is_active,
-    pi.ts_registration
+    pi.ts_registration,
+    pi.year,
+    pi.month,
+    pi.day
 FROM
     datalake_atta_clean.product_info AS pi
 RIGHT JOIN

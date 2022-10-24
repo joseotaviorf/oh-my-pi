@@ -62,3 +62,12 @@ columns:
   ts_last_updated:
     lineage:
       - datalake_atta_clean.proposal.ts_last_updated
+  year:
+    lineage:
+      - datalake_atta_clean.proposal.year
+  month:
+    lineage:
+      - datalake_atta_clean.proposal.month
+  day:
+    lineage:
+      - datalake_atta_clean.proposal.day

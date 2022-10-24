@@ -26,7 +26,10 @@ SELECT
     p.send_backoffice,
     p.ts_registration,
     p.ts_financing_ended,
-    p.ts_last_updated
+    p.ts_last_updated,
+    p.year,
+    p.month,
+    p.day
 FROM
     datalake_atta_clean.proposal AS p
 RIGHT JOIN

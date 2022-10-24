@@ -15,7 +15,10 @@ SELECT
     ui.user_last_name,
     ui.user_email,
     ui.user_status,
-    ui.ts_last_updated
+    ui.ts_last_updated,
+    ui.year,
+    ui.month,
+    ui.day
 FROM
     datalake_atta_clean.users_info AS ui
 RIGHT JOIN

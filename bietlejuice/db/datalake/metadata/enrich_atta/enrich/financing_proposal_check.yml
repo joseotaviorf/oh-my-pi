@@ -68,3 +68,12 @@ columns:
   ts_seller_debt_payment:
     lineage:
       - datalake_atta_clean.financing_proposal_check.ts_seller_debt_payment
+  year:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.year
+  month:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.month
+  day:
+    lineage:
+      - datalake_atta_clean.financing_proposal_check.day

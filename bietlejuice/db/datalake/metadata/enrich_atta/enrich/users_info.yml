@@ -29,3 +29,12 @@ columns:
   ts_last_updated:
     lineage:
       - datalake_atta_clean.users_info.data_ultima_atualizacao
+  year:
+    lineage:
+      - datalake_atta_clean.users_info.year
+  month:
+    lineage:
+      - datalake_atta_clean.users_info.month
+  day:
+    lineage:
+      - datalake_atta_clean.users_info.day

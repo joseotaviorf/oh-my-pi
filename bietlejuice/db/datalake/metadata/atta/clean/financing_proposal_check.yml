@@ -68,3 +68,12 @@ columns:
   ts_seller_debt_payment:
     lineage:
       - datalake_atta_raw.proposta_credimob_confval.DataIQ
+  year:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.year
+  month:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.month
+  day:
+    lineage:
+      - datalake_atta_raw.proposta_credimob_confval.day

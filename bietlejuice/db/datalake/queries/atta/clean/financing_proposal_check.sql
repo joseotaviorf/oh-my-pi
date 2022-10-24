@@ -20,6 +20,13 @@ SELECT
     TIMESTAMP(AtualizadoEm) AS ts_updated,
     TIMESTAMP(DtConfirmacao) AS ts_confirmation,
     TIMESTAMP(DtInclusao) AS ts_inclusion,
-    TIMESTAMP(DataIQ) AS ts_seller_debt_payment
+    TIMESTAMP(DataIQ) AS ts_seller_debt_payment,
+    year,
+    month,
+    day
 FROM
     datalake_atta_raw.proposta_credimob_confval
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

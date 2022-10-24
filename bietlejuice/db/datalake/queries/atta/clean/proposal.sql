@@ -18,6 +18,13 @@ SELECT
     EnviarMesa AS send_backoffice,
     TIMESTAMP(DtEntrada) AS ts_registration,
     TIMESTAMP(DtFinalizacao) AS ts_financing_ended,
-    TIMESTAMP(DtUltAtu) AS ts_last_updated
+    TIMESTAMP(DtUltAtu) AS ts_last_updated,
+    year,
+    month,
+    day
 FROM
     datalake_atta_raw.proposta
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
