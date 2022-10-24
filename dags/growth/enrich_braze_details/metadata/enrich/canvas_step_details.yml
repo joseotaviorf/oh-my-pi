@@ -1,0 +1,43 @@
+database_name: datalake_braze_details
+table_name: canvas_step_details
+columns:
+  id_canvas:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.id_canvas
+      - datalake_braze_details_clean.canvas_details_tenants.id_canvas
+      - datalake_braze_details_clean.canvas_details_indica_ai.id_canvas
+  canvas_name:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.canvas_name
+      - datalake_braze_details_clean.canvas_details_tenants.canvas_name
+      - datalake_braze_details_clean.canvas_details_indica_ai.canvas_name
+  id_step:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.step
+      - datalake_braze_details_clean.canvas_details_tenants.step
+      - datalake_braze_details_clean.canvas_details_indica_ai.step
+  step_name:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.step
+      - datalake_braze_details_clean.canvas_details_tenants.step
+      - datalake_braze_details_clean.canvas_details_indica_ai.step
+  step_channel:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.step
+      - datalake_braze_details_clean.canvas_details_tenants.step
+      - datalake_braze_details_clean.canvas_details_indica_ai.step
+  step_message:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.step
+      - datalake_braze_details_clean.canvas_details_tenants.step
+      - datalake_braze_details_clean.canvas_details_indica_ai.step
+  id_next_step:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.step
+      - datalake_braze_details_clean.canvas_details_tenants.step
+      - datalake_braze_details_clean.canvas_details_indica_ai.step
+  ts_updated:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.ts_updated
+      - datalake_braze_details_clean.canvas_details_tenants.ts_updated
+      - datalake_braze_details_clean.canvas_details_indica_ai.ts_updated

@@ -1307,6 +1307,11 @@ bietlejuice.enrich_brand_tracking:
   - bietlejuice.brand_tracking:load-clean-brandtracking
   - bietlejuice.brand_tracking:load-clean-brandtracking-unpivoted
 
+bietlejuice.enrich_braze_details:
+  - bietlejuice.braze_details:load-clean-canvas-details-indica-ai
+  - bietlejuice.braze_details:load-clean-canvas-details-owners
+  - bietlejuice.braze_details:load-clean-canvas-details-tenants
+
 bietlejuice.enrich_braze_events:
   - bietlejuice.braze_events:load-clean-events-tenants
   - bietlejuice.braze_events:load-clean-events-owners
