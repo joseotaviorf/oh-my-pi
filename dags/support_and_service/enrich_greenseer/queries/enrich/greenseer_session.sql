@@ -1,4 +1,12 @@
-WITH greenseer_sessions AS (
+WITH last_updated_sessions AS (
+  SELECT
+    s.id_session,
+    MAX(DATE(CONCAT(year, '-', month, '-', day))) AS dt_last_updated
+  FROM
+    datalake_greenseer_clean.session AS s
+  GROUP BY 1
+),
+greenseer_sessions AS (
   SELECT
     g.id_session,
     COALESCE(
@@ -36,6 +44,10 @@ WITH greenseer_sessions AS (
     g.ts_ended
   FROM
     datalake_greenseer_clean.session AS g
+  INNER JOIN
+    last_updated_sessions AS lus
+      ON g.id_session = lus.id_session
+      AND lus.dt_last_updated = DATE(CONCAT(g.year, '-', g.month, '-', g.day))
   LEFT JOIN
     datalake_journey_flow_clean.journey_flow AS j
       ON j.id_correlation = g.id_session
