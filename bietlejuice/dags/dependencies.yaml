@@ -2215,6 +2215,11 @@ bietlejuice.enrich_wololo_lead:
   - bietlejuice.wololo:load-clean-prospect-dimension-aud
   - bietlejuice.wololo:load-clean-rev-info
 
+bietlejuice.enrich_wololo_prospect:
+  - bietlejuice.wololo:load-clean-round
+  - bietlejuice.wololo:load-clean-prospect
+  - bietlejuice.wololo:load-clean-contact
+
 bietlejuice.enrich_zendesk_custom_fields:
   - bietlejuice.zendesk_tickets:load-clean-tickets
   - bietlejuice.zendesk_tickets:load-clean-ticket-fields

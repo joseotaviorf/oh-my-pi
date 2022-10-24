@@ -1,0 +1,31 @@
+---
+database_name: datalake_wololo_prospect
+table_name: prospect_calls
+columns:
+  id_prospect:
+    lineage:
+      - datalake_wololo_clean.prospect.id
+  id_call_analyst:
+    lineage:
+        - datalake_wololo_clean.contact.id_analyst
+  phone_number:
+    lineage:
+        - datalake_wololo_clean.contact.phone_number
+  channel:
+    lineage:
+        - datalake_wololo_clean.contact.channel
+  call_output:
+    lineage:
+        - datalake_wololo_clean.contact.phone_output
+  round_number:
+    lineage:
+        - datalake_wololo_clean.round.round_number
+  round_max_tries:
+    lineage:
+        - datalake_wololo_clean.round.round_max_tries
+  ts_contacted:
+    lineage:
+        - datalake_wololo_clean.contact.ts_contacted
+  ts_round_started:
+    lineage:
+        - datalake_wololo_clean.round.ts_created
