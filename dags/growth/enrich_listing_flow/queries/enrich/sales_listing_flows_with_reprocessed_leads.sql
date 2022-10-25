@@ -303,7 +303,7 @@ supply_2_0_qualified AS (
     FROM
         supply_2_0_prospect
 ),
-supply_2_0 AS (
+supply_2_0_available_qualified AS (
     SELECT
         *,
         CASE
@@ -337,7 +337,192 @@ supply_2_0_turning_point AS (
                 THEN ts_available_qualified_sale
             ELSE NULL
         END AS ts_available_qualified
-    FROM supply_2_0
+    FROM supply_2_0_available_qualified
+),
+funnel_drop_reason AS (
+    SELECT
+        *,
+        CASE
+            WHEN (ts_first_listing IS NOT NULL)
+                THEN 'Listed'
+            WHEN (ts_opportunity IS NOT NULL
+                AND ts_first_listing IS NULL)
+                AND photo_job_status IN ('FotosTiradas','Completado', 'NaoListado')
+                THEN 'NotListedYet'
+            WHEN (ts_opportunity IS NOT NULL
+                AND ts_opt_out_sale >= ts_opportunity
+                AND ts_first_listing IS NULL)
+                AND photo_job_status in ('FotosTiradas','Completado', 'NaoListado')
+                THEN 'OptedOut Opportunity'
+            WHEN (ts_opportunity IS NOT NULL
+                AND ts_first_listing IS NULL
+                AND photo_job_status in ('Agendado','Iniciado','Novo'))
+                THEN 'PhotoJobScheduled'
+            WHEN (ts_opportunity IS NOT NULL
+                AND ts_first_listing IS NULL
+                AND photo_job_status = 'Cancelado')
+                THEN COALESCE(photo_job_reason, 'CancelledPhotoJob')
+            WHEN (ts_opportunity IS NOT NULL
+                AND ts_first_listing IS NULL)
+                THEN COALESCE(photo_job_reason, 'CancelledPhotoJob')
+            WHEN (ts_opportunity IS NULL
+                AND ts_qualified IS NOT NULL
+                AND lead_status = 'Descartado')
+                THEN 'DiscardedQualified'
+            WHEN (ts_opportunity IS NULL
+                AND ts_qualified IS NOT NULL
+                AND lead_status = 'Convertido')
+                THEN 'NoPhotoJob'
+            WHEN (ts_opportunity IS NULL
+                AND ts_qualified IS NOT NULL
+                AND id_conversion IS NOT NULL)
+                THEN 'NoPhotoJob'
+            WHEN (ts_opportunity IS NULL
+                AND ts_qualified IS NOT NULL
+                AND ts_opt_out_sale >= ts_qualified)
+                THEN 'OptedOut Qualified'
+            WHEN (ts_opportunity IS NULL
+                AND lead_reason = 'EmProspeccao')
+                THEN 'OnHold'
+            WHEN (ts_qualified IS NULL
+                AND lead_status = 'Descartado')
+                THEN 'DiscardedProspect'
+            WHEN (ts_qualified IS NULL
+                AND lead_status = 'Novo'
+                AND city = 'Outra cidade')
+                THEN 'NaoProcessadoArea'
+            WHEN (ts_qualified IS NULL
+                AND lead_status = 'Novo')
+                THEN 'NaoProcessado'
+            WHEN (flow = 'Lead Flow'
+                AND ts_qualified IS NULL)
+                THEN 'NaoProcessado'
+            WHEN (lead_status = 'Convertido'
+                AND id_conversion IS NULL)
+                THEN 'BrokenLeadFlow'
+            WHEN (flow = 'Lead Flow'
+                AND ts_prospect IS NULL
+                AND lead_status IS NULL)
+                THEN 'DiscardedLead'
+            WHEN (flow = 'Self-Service Flow'
+                AND ts_prospect IS NOT NULL
+                AND ts_qualified IS NULL)
+                THEN 'TermsNotAccepted'
+            WHEN (flow = 'Self-Service Flow'
+                AND ts_qualified IS NOT NULL
+                AND ts_opportunity IS NULL)
+                THEN 'NoPhotoJob'
+            WHEN (flow = 'Organic Flow'
+                AND ts_prospect IS NOT NULL
+                AND ts_qualified IS NULL)
+                THEN 'UnfinishedForm'
+            WHEN (flow = 'Organic Flow'
+                AND ts_qualified IS NOT NULL
+                AND ts_opportunity IS NULL)
+                THEN 'NoPhotoJob'
+            ELSE 'NotMapped'
+        END AS funnel_step_old,
+        CASE
+            WHEN (ts_first_listing IS NOT NULL)
+                    THEN 'Listed'
+            WHEN (ts_opportunity IS NOT NULL
+                    AND ts_first_listing IS NULL)
+                    AND photo_job_status IN ('FotosTiradas','Completado', 'NaoListado')
+                    THEN 'NotListedYet'
+            WHEN (ts_opportunity IS NOT NULL
+                    AND ts_opt_out_sale >= ts_opportunity
+                    AND ts_first_listing IS NULL)
+                    AND photo_job_status in ('FotosTiradas','Completado', 'NaoListado')
+                    THEN 'OptedOut Opportunity'
+            WHEN (ts_opportunity IS NOT NULL
+                    AND ts_first_listing IS NULL
+                    AND photo_job_status in ('Agendado','Iniciado','Novo'))
+                    THEN 'PhotoJobScheduled'
+            WHEN (ts_opportunity IS NOT NULL
+                    AND ts_first_listing IS NULL
+                    AND photo_job_status = 'Cancelado')
+                    THEN COALESCE(photo_job_reason, 'CancelledPhotoJob')
+            WHEN (ts_opportunity IS NOT NULL
+                    AND ts_first_listing IS NULL)
+                    THEN COALESCE(photo_job_reason, 'CancelledPhotoJob')
+            WHEN (ts_opportunity IS NULL
+                    AND ts_available_qualified IS NOT NULL
+                    AND lead_status = 'Descartado')
+                    THEN 'DiscardedAvQualified'
+            WHEN (ts_opportunity IS NULL
+                    AND ts_available_qualified IS NOT NULL
+                    AND lead_status = 'Convertido')
+                    THEN 'NoPhotoJob'
+            WHEN (ts_opportunity IS NULL
+                    AND ts_available_qualified IS NOT NULL
+                    AND id_conversion IS NOT NULL)
+                    THEN 'NoPhotoJob'
+            WHEN (ts_opportunity IS NULL
+                    AND ts_available_qualified IS NOT NULL
+                    AND ts_opt_out_sale >= ts_available_qualified)
+                    THEN 'OptedOut AvQualified'
+            WHEN (ts_available_qualified IS NULL
+                    AND ts_qualified IS NOT NULL
+                    AND lead_status = 'Descartado')
+                    THEN 'DiscardedQualified'
+            WHEN (ts_available_qualified IS NULL
+                    AND ts_qualified IS NOT NULL
+                    AND ts_opt_out_sale >= ts_qualified)
+                    THEN 'OptedOut Qualified'
+            WHEN (ts_opportunity IS NULL
+                    AND lead_reason = 'EmProspeccao')
+                    THEN 'OnHold'
+            WHEN (ts_qualified IS NULL
+                    AND lead_status = 'Descartado')
+                    THEN 'DiscardedProspect'
+            WHEN (ts_qualified IS NULL
+                    AND lead_status = 'Novo'
+                    AND city = 'Outra cidade')
+                    THEN 'NaoProcessadoArea'
+            WHEN (ts_qualified IS NULL
+                    AND lead_status = 'Novo')
+                    THEN 'NaoProcessado'
+            WHEN (flow = 'Lead Flow'
+                    AND ts_qualified IS NULL)
+                    THEN 'NaoProcessado'
+            WHEN (lead_status = 'Convertido'
+                    AND id_conversion IS NULL)
+                    THEN 'BrokenLeadFlow'
+            WHEN (flow = 'Lead Flow'
+                    AND ts_prospect IS NULL
+                    AND lead_status IS NULL)
+                    THEN 'DiscardedLead'
+            WHEN (flow = 'Self-Service Flow'
+                    AND ts_prospect IS NOT NULL
+                    AND ts_qualified IS NULL)
+                    THEN 'TermsNotAccepted'
+            WHEN (flow = 'Self-Service Flow'
+                    AND ts_available_qualified IS NOT NULL
+                    AND ts_opportunity IS NULL)
+                    THEN 'NoPhotoJob'
+            WHEN (flow = 'Organic Flow'
+                    AND ts_prospect IS NOT NULL
+                    AND ts_qualified IS NULL)
+                    THEN 'UnfinishedForm'
+            WHEN (flow = 'Organic Flow'
+                    AND ts_available_qualified IS NOT NULL
+                    AND ts_opportunity IS NULL)
+                    THEN 'NoPhotoJob'
+            ELSE 'NotMapped'
+        END AS funnel_step_supply2dot0
+    FROM
+        supply_2_0_turning_point
+),
+supply_2_0 AS (
+    SELECT
+        *,
+        CASE
+            WHEN DATE(COALESCE(ts_available_qualified, ts_qualified, ts_prospect, ts_lead)) >= DATE('2022-10-01') -- turning point date for funnel 2.0
+                THEN funnel_step_supply2dot0
+            ELSE funnel_step_old
+        END AS funnel_step
+    FROM
+        funnel_drop_reason
 ),
 acquisition_channels_dt_diffs AS (
     SELECT
@@ -360,7 +545,7 @@ acquisition_channels_dt_diffs AS (
             ) AS LONG)
             - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG
         ) AS lead_to_processing_seconds_diff
-    FROM supply_2_0_turning_point AS acquisition_channels
+    FROM supply_2_0 AS acquisition_channels
 ),
 legacy_doorman AS (
     SELECT
@@ -422,86 +607,7 @@ SELECT
     acq.affiliate_type,
     acq.lead_context_origin,
     acq.listing_rent_status,
-    CASE
-        WHEN (acq.ts_first_listing IS NOT NULL)
-            THEN 'Listed'
-        WHEN (acq.ts_opportunity IS NOT NULL
-            AND acq.ts_first_listing IS NULL)
-            AND acq.photo_job_status IN ('FotosTiradas','Completado', 'NaoListado')
-            THEN 'NotListedYet'
-        WHEN (acq.ts_opportunity IS NOT NULL
-            AND acq.ts_opt_out_sale >= acq.ts_opportunity
-            AND acq.ts_first_listing IS NULL)
-            AND acq.photo_job_status in ('FotosTiradas','Completado', 'NaoListado')
-            THEN 'OptedOut Opportunity'
-        WHEN (acq.ts_opportunity IS NOT NULL
-            AND acq.ts_first_listing IS NULL
-            AND acq.photo_job_status in ('Agendado','Iniciado','Novo'))
-            THEN 'PhotoJobScheduled'
-        WHEN (acq.ts_opportunity IS NOT NULL
-            AND acq.ts_first_listing IS NULL
-            AND acq.photo_job_status = 'Cancelado')
-            THEN COALESCE(acq.photo_job_reason, 'CancelledPhotoJob')
-        WHEN (acq.ts_opportunity IS NOT NULL
-            AND acq.ts_first_listing IS NULL)
-            THEN COALESCE(acq.photo_job_reason, 'CancelledPhotoJob')
-        WHEN (acq.ts_opportunity IS NULL
-            AND acq.ts_qualified IS NOT NULL
-            AND acq.lead_status = 'Descartado')
-            THEN 'DiscardedQualified'
-        WHEN (acq.ts_opportunity IS NULL
-            AND acq.ts_qualified IS NOT NULL
-            AND acq.lead_status = 'Convertido')
-            THEN 'NoPhotoJob'
-        WHEN (acq.ts_opportunity IS NULL
-            AND acq.ts_qualified IS NOT NULL
-            AND acq.id_conversion IS NOT NULL)
-            THEN 'NoPhotoJob'
-        WHEN (acq.ts_opportunity IS NULL
-            AND acq.ts_qualified IS NOT NULL
-            AND acq.ts_opt_out_sale >= acq.ts_qualified)
-            THEN 'OptedOut Qualified'
-        WHEN (acq.ts_opportunity IS NULL
-            AND acq.lead_reason = 'EmProspeccao')
-            THEN 'OnHold'
-        WHEN (acq.ts_qualified IS NULL
-            AND acq.lead_status = 'Descartado')
-            THEN 'DiscardedProspect'
-        WHEN (acq.ts_qualified IS NULL
-            AND acq.lead_status = 'Novo'
-            AND acq.city = 'Outra cidade')
-            THEN 'NaoProcessadoArea'
-        WHEN (acq.ts_qualified IS NULL
-            AND acq.lead_status = 'Novo')
-            THEN 'NaoProcessado'
-        WHEN (acq.flow = 'Lead Flow'
-            AND acq.ts_qualified IS NULL)
-            THEN 'NaoProcessado'
-        WHEN (acq.lead_status = 'Convertido'
-            AND acq.id_conversion IS NULL)
-            THEN 'BrokenLeadFlow'
-        WHEN (acq.flow = 'Lead Flow'
-            AND acq.ts_prospect IS NULL
-            AND acq.lead_status IS NULL)
-            THEN 'DiscardedLead'
-        WHEN (acq.flow = 'Self-Service Flow'
-            AND acq.ts_prospect IS NOT NULL
-            AND acq.ts_qualified IS NULL)
-            THEN 'TermsNotAccepted'
-        WHEN (acq.flow = 'Self-Service Flow'
-            AND acq.ts_qualified IS NOT NULL
-            AND acq.ts_opportunity IS NULL)
-            THEN 'NoPhotoJob'
-        WHEN (acq.flow = 'Organic Flow'
-            AND acq.ts_prospect IS NOT NULL
-            AND acq.ts_qualified IS NULL)
-            THEN 'UnfinishedForm'
-        WHEN (acq.flow = 'Organic Flow'
-            AND acq.ts_qualified IS NOT NULL
-            AND acq.ts_opportunity IS NULL)
-            THEN 'NoPhotoJob'
-        ELSE 'NotMapped'
-    END AS funnel_step,
+    acq.funnel_step,
     -- [ODS] It was necessary a ROUND + CAST to DECIMAL(x, 2) to force a round up in the decimal points and match most
     --  of DW table's values. Some values will yet diverge because this will always round UP. E.g.: 1.64 -> 1.7
     ROUND(CAST(acq.lead_to_prospect_seconds_diff / 3600 AS DECIMAL(10, 2)), 1) AS hours_lead_to_prospect,
