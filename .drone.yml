@@ -298,7 +298,7 @@ pipeline:
     group: update_jobs
     image: python:3.7.3
     commands:
-      - pip install boto3==1.9.159
+      - pip install boto3==1.24.0
       - python scripts/ci_cd/upload_spark_jobs_to_s3.py 5a-databricks-forno
     when:
       event: push
@@ -318,7 +318,7 @@ pipeline:
     group: update_jobs
     image: python:3.7.3
     commands:
-      - pip install boto3==1.9.159
+      - pip install boto3==1.24.0
       - python scripts/ci_cd/upload_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
     when:
       event: push
@@ -328,7 +328,7 @@ pipeline:
     group: update_jobs
     image: python:3.7.3
     commands:
-      - pip install boto3==1.9.159
+      - pip install boto3==1.24.0
       - python scripts/ci_cd/upload_spark_jobs_to_s3.py 5a-databricks
     when:
       event: push
@@ -348,7 +348,7 @@ pipeline:
     group: update_jobs
     image: python:3.7.3
     commands:
-      - pip install boto3==1.9.159
+      - pip install boto3==1.24.0
       - python scripts/ci_cd/upload_spark_jobs_to_s3.py databricks.s3.data.quintoandar.com.br
     when:
       event: push
@@ -398,7 +398,7 @@ pipeline:
     group: update_jobs
     image: python:3.7.3
     commands:
-      - pip install boto3==1.9.159 PyYAML==5.1
+      - pip install boto3==1.24.0 PyYAML==5.1
       - python scripts/ci_cd/upload_atlas_metadata_files_to_s3.py data-documentation.s3.forno.data.quintoandar.com.br
     when:
       event: push
@@ -408,7 +408,7 @@ pipeline:
     group: update_jobs
     image: python:3.7.3
     commands:
-      - pip install boto3==1.9.159 PyYAML==5.1
+      - pip install boto3==1.24.0 PyYAML==5.1
       - python scripts/ci_cd/upload_atlas_metadata_files_to_s3.py data-documentation.s3.data.quintoandar.com.br
     when:
       event: push
@@ -420,7 +420,7 @@ pipeline:
     environment:
       ENVIRONMENT: forno
     commands:
-      - pip install boto3==1.9.159 PyYAML==5.1 hierarchical-conf==1.0.1
+      - pip install boto3==1.24.0 PyYAML==5.1 hierarchical-conf==1.0.1
       - python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py databricks.s3.forno.data.quintoandar.com.br
     when:
       event: push
@@ -432,7 +432,7 @@ pipeline:
     environment:
       ENVIRONMENT: prod
     commands:
-      - pip install boto3==1.9.159 PyYAML==5.1 hierarchical-conf==1.0.1
+      - pip install boto3==1.24.0 PyYAML==5.1 hierarchical-conf==1.0.1
       - python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py 5a-databricks
     when:
       event: push
