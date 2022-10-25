@@ -26,6 +26,7 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 config_service = ConfigurationService(DAG_NAME)
 ENV = os.environ.get("ENVIRONMENT")
+EXTRA_SPARK_CONF = config_service.get_config("spark_conf")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
@@ -38,6 +39,8 @@ BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = f"s3://{databricks_bietlejuice_repo_path}/logs/jobs/{DAG_ID}"
 
 cluster_description = config_service.get_config("custom_cluster")
+cluster_description["spark_conf"].update(EXTRA_SPARK_CONF)
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,

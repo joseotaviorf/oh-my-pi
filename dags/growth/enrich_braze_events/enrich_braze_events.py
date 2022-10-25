@@ -23,9 +23,12 @@ PARTITION_COLS = ["event_type", "event_channel", "year", "month", "day"]
 CONTEXT = "braze_events"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+CLUSTER_DESCRIPTION = "custom_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 ENV = os.environ.get("ENVIRONMENT")
+EXTRA_SPARK_CONF = config_service.get_config("spark_conf")
+
 datalake_bucket = config_service.get_config("datalake_bucket")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
@@ -36,7 +39,9 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = f"s3://{databricks_bietlejuice_repo_path}/logs/jobs/{DAG_ID}"
 
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config(CLUSTER_DESCRIPTION)
+cluster_description["spark_conf"].update(EXTRA_SPARK_CONF)
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
