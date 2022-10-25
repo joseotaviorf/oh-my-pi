@@ -2357,3 +2357,9 @@ bietlejuice.enrich_zipcodes:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_region:load-enrich-region
+
+bietlejuice.enrich_seo_funnel:
+  - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
+  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
+  - bietlejuice.dw_datamarts_growth_cross:create-sale-performance-marketing-metrics-demand-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-performance-marketing-metrics-demand-in-datalake
