@@ -16,7 +16,7 @@ from bietlejuice.base.spark import (
     SparkTableStorageFormat,
 )
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.dags.sap.spark_jobs.schemas import SapSchemaEnum
+from dags.fintech.sap.spark_jobs.schemas import SapSchemaEnum
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
