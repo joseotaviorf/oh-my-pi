@@ -30,6 +30,7 @@ SKIP_LAYERS = {
     "facebook_insights",
     "linkedin",
     "offline",
+    "enrich_for_looker"  # DAG regions_polygon
 }
 SKIP_SOURCES = {}
 SKIP_CONTEXTS = {}

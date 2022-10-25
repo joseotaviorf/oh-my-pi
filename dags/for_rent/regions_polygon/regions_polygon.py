@@ -28,7 +28,9 @@ DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 LOOKER_BUCKET = Variable.get("looker_bucket")
 
-RELATIVE_FULL_QUERY_PATH = f"{DAG_NAME}/regions_polygon.sql"
+# This layer does not exist, it was added in this DAG because it is out of pattern and
+# a layer name is needed so the validation flows does not break
+RELATIVE_FULL_QUERY_PATH = f"{DAG_NAME}/queries/enrich_for_looker/regions_polygon.sql"
 POLYGONS_FILE_OUTPUT_PATH = f"s3://{LOOKER_BUCKET}/subregion_polygons_new"
 POLYGONS_FILE_NAME = "5a_subregion_polygons.topojson"
 
