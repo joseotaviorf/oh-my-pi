@@ -9,7 +9,7 @@ SELECT
     storages_path,
     rerun_tries,
     status,
-    type,
+    type_id AS type,
     result,
     deleted AS ts_run_deleted,
     run_start AS ts_run_start,
