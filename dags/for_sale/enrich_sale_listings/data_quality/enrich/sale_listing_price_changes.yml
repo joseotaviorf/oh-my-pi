@@ -1,5 +1,5 @@
 ---
-table_name: datalake_sale_listings.sale_listing
+table_name: datalake_sale_listings.sale_listing_price_changes
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
