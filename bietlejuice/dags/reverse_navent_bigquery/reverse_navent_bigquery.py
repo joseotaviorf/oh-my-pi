@@ -108,10 +108,6 @@ load_s3_data_into_bigquery_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
-)
-
 chain(create_cluster_task, ReverseTaskGroup.all_first_tasks(datalake_task_groups))
 chain(
     ReverseTaskGroup.all_last_tasks(datalake_task_groups),
