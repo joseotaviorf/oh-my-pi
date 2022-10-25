@@ -1,6 +1,6 @@
 WITH tof_demand_funnel AS (
     SELECT 
-        tof.city_group,
+        COALESCE(tof.city_group, 'Undefined') AS city_group,
         SUM(tof.new_tenant_prospects) AS new_tenant_prospects, 
         SUM(tof.tenant_prospects) AS tenant_prospects,
         DATE(tof.week_start) AS dt_week_started
@@ -13,7 +13,7 @@ WITH tof_demand_funnel AS (
 ),
 demand_funnel AS (
     SELECT 
-        ref.city_group,
+        COALESCE(ref.city_group, 'Undefined') AS city_group,
         SUM(ref.visits_booked) AS visits_booked,
         SUM(ref.visits_completed) AS visits_completed,
         SUM(ref.offer_submitted) AS offers_submitted,
@@ -30,7 +30,7 @@ demand_funnel AS (
 ),
 demand_funnel_targets AS (
     SELECT
-        mdt.city_group,
+        COALESCE(mdt.city_group, 'Undefined') AS city_group,
         CAST(SUM(NULLIF(REPLACE(mdt.visits_booked,',',''), '')) AS FLOAT) AS visits_booked_target,
         CAST(SUM(NULLIF(REPLACE(mdt.visits_completed,',',''), '')) AS FLOAT) AS visits_completed_target,
         CAST(SUM(NULLIF(REPLACE(mdt.offer_sent,',',''), '')) AS FLOAT) AS offers_submitted_target,
@@ -44,7 +44,7 @@ demand_funnel_targets AS (
 ),
 demand_target_costs AS (
     SELECT
-        mmc.city,
+        COALESCE(mmc.city, 'Undefined') AS city,
         SUM(mmc.week_value) AS budget_target,
         mmc.dt_week_started
     FROM
@@ -53,7 +53,7 @@ demand_target_costs AS (
 ),
 demand_actual_costs AS (
     SELECT
-        mdm.city,
+        COALESCE(mdm.city, 'Undefined') AS city,
         SUM(mdm.week_value) AS actual_cost,
         mdm.dt_week_started
     FROM
@@ -62,9 +62,9 @@ demand_actual_costs AS (
 ),
 periods_dimension AS (
     SELECT DISTINCT 
-        dt_week_started,
         country_code,
-        city_group
+        COALESCE(city_group, 'Undefined') AS city_group,
+        dt_week_started
     FROM
         datalake_region.city_groups_per_periods
     WHERE
@@ -73,7 +73,7 @@ periods_dimension AS (
 )
 SELECT 
     dim.country_code,
-    COALESCE(dim.city_group, 'Not Mapped') AS city_group,
+    dim.city_group,
     tdf.new_tenant_prospects,
     tdf.tenant_prospects,
     df.visits_booked,

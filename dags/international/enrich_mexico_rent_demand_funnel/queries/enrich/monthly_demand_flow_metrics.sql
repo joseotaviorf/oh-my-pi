@@ -1,6 +1,6 @@
 WITH tof_demand_funnel AS (
     SELECT 
-        tof.city_group,
+        COALESCE(tof.city_group, 'Undefined') AS city_group,
         SUM(tof.new_tenant_prospects) AS new_tenant_prospects, 
         SUM(tof.tenant_prospects) AS tenant_prospects,
         DATE(tof.month_start) AS dt_month_started
@@ -13,7 +13,7 @@ WITH tof_demand_funnel AS (
 ),
 demand_funnel AS (
     SELECT  
-        ref.city_group,
+        COALESCE(ref.city_group, 'Undefined') AS city_group,
         SUM(ref.visits_booked) AS visits_booked, 
         SUM(ref.offer_submitted) AS offers_submitted,
         SUM(ref.contract_signed) AS contracts_signed,
@@ -28,7 +28,7 @@ demand_funnel AS (
 ),
 demand_funnel_targets AS (
     SELECT
-        city_group,
+        COALESCE(city_group, 'Undefined') AS city_group,
         CAST(SUM(NULLIF(REPLACE(visits_booked,',',''), '')) AS FLOAT) AS visits_booked_target,
         CAST(SUM(NULLIF(REPLACE(visits_completed,',',''), '')) AS FLOAT) AS visits_completed_target,
         CAST(SUM(NULLIF(REPLACE(offer_sent,',',''), '')) AS FLOAT) AS offers_submitted_target,
@@ -42,7 +42,7 @@ demand_funnel_targets AS (
 ),
 demand_target_costs AS (
     SELECT
-        city,
+        COALESCE(city, 'Undefined') AS city,
         SUM(week_value) AS budget_target,
         DATE(DATE_TRUNC('month', dt_week_started)) AS dt_month_started
     FROM
@@ -51,7 +51,7 @@ demand_target_costs AS (
 ),
 demand_actual_costs AS (
     SELECT
-        city,
+        COALESCE(city, 'Undefined') AS city,
         SUM(week_value) AS actual_cost,
         DATE(DATE_TRUNC('month', dt_week_started)) AS dt_month_started
     FROM
@@ -60,9 +60,9 @@ demand_actual_costs AS (
 ),
 periods_dimension AS (
     SELECT DISTINCT 
-        dt_month_started,
         country_code,
-        city_group
+        COALESCE(city_group, 'Undefined') AS city_group,
+        dt_month_started
     FROM
         datalake_region.city_groups_per_periods
     WHERE
@@ -71,7 +71,7 @@ periods_dimension AS (
 )
 SELECT 
     dim.country_code,
-    COALESCE(dim.city_group, 'Not Mapped') AS city_group,
+    dim.city_group,
     tdf.new_tenant_prospects,
     tdf.tenant_prospects,
     df.visits_booked,

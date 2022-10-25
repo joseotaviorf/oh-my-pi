@@ -5,7 +5,7 @@ WITH listing_flows AS (
     lfrl.id_region,
     COALESCE(lfrl.id_affiliate, lfrl.id_user_has_indicated, -1) AS id_affiliate,
     lfrl.country_code,
-    COALESCE(rg.city_group, 'Not Mapped') AS city_group,
+    COALESCE(rg.city_group, 'Undefined') AS city_group,
     lfrl.affiliate_type AS listing_flows_affiliate_type,
     plrl.lead_type,
     plrl.lead_origin,

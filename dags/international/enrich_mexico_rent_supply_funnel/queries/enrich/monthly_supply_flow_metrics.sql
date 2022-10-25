@@ -1,9 +1,9 @@
 WITH dimensions AS (
     SELECT DISTINCT
-        dt_month_started,
-        LAST_DAY(dt_month_started) AS dt_month_ended,
         country_code,
-        COALESCE(city_group, 'Not Mapped') AS city_group
+        COALESCE(city_group, 'Undefined') AS city_group,
+        dt_month_started,
+        LAST_DAY(dt_month_started) AS dt_month_ended
     FROM
         datalake_region.city_groups_per_periods
     WHERE
@@ -12,7 +12,7 @@ WITH dimensions AS (
 ),
 supply_funnel AS (
     SELECT 
-        city_group,
+        COALESCE(city_group, 'Undefined') AS city_group,
         supply_mkt_origin, 
         supply_mkt_origin_detailed,
         mexico_channel,
@@ -29,7 +29,7 @@ supply_funnel AS (
 ),
 supply_funnel_targets AS (
     SELECT
-        COALESCE(city_group, 'Not Mapped') AS city_group,
+        COALESCE(city_group, 'Undefined') AS city_group,
         CASE 
             WHEN supply_origin IN ('Landing page - PWA', 'Organic traffic') THEN 'Owner PWA'
             WHEN supply_origin = 'Refiere y Gana' THEN 'Indica Aí - General'
@@ -64,7 +64,7 @@ supply_funnel_targets AS (
 ),
 supply_costs_targets AS (
     SELECT
-        COALESCE(city_group, 'Not Mapped') AS city_group,
+        COALESCE(city_group, 'Undefined') AS city_group,
         CASE 
             WHEN planning_mkt_level3 IN ('Landing page - PWA', 'Organic traffic') THEN 'Owner PWA'
             WHEN planning_mkt_level3 LIKE '%Refiere y Gana%' THEN 'Indica Aí - General'
@@ -96,7 +96,7 @@ supply_costs_targets AS (
 ),
 supply_actual_costs AS (
     SELECT
-        COALESCE(city_group, 'Not Mapped') AS city_group,
+        COALESCE(city_group, 'Undefined') AS city_group,
         CASE 
             WHEN planning_mkt_level3 IN ('Landing page - PWA', 'Organic traffic') THEN 'Owner PWA'
             WHEN planning_mkt_level3 LIKE '%Refiere y Gana%' THEN 'Indica Aí - General'
@@ -129,7 +129,7 @@ supply_actual_costs AS (
 house_listings AS (
     SELECT
         hld.id_house_listing,
-        COALESCE(rg.city_group, 'Not Mapped') AS city_group,
+        COALESCE(rg.city_group, 'Undefined') AS city_group,
         ROW_NUMBER() OVER(PARTITION BY hld.id_house_listing, d.date ORDER BY hld.ts_status_started DESC) AS order_status,
         hld.ts_status_started,
         d.month_end AS dt_month_ended

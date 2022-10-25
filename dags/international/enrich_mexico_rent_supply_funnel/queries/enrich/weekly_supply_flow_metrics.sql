@@ -171,8 +171,8 @@ cohort_funnel AS (
     GROUP BY 1, 2, 3, 4, 13
 )
 SELECT 
-    COALESCE(dim.country_code, 'Other') AS country_code,
-    COALESCE(dim.city_group, 'Not Mapped') AS city_group,
+    COALESCE(dim.country_code, 'Undefined') AS country_code,
+    COALESCE(dim.city_group, 'Undefined') AS city_group,
     cf.supply_mkt_origin, 
     cf.supply_mkt_origin_detailed,
     COALESCE(cf.mexico_channel, sft.mexico_channel) AS mexico_channel,     
