@@ -2,7 +2,6 @@ import json
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
-from os.path import join
 
 import boto3
 from geospark.register import GeoSparkRegistrator
@@ -12,10 +11,10 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import DatabricksConsumer
-from bietlejuice.services import FileService, S3Service
-from dags import DAG_PACKAGES_ROOT
+from bietlejuice.services import S3Service
 
 JOB_NAME = "regions_polygon_topojson_to_s3"
 SOURCE = "ebdb"
@@ -85,8 +84,8 @@ if __name__ == "__main__":
         env, SOURCE, datalake_bucket, LayerEnum.CLEAN.value
     )
 
-    query = FileService.get_query_from_file_name(
-        join(DAG_PACKAGES_ROOT, relative_full_query_path)
+    query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+        "regions_polygon", "regions_polygon", "enrich_for_looker"
     )
 
     databricks_consumer = DatabricksConsumer({"db": database_name}, spark_client)
