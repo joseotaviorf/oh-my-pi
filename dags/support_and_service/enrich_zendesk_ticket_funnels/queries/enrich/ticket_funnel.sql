@@ -61,35 +61,21 @@ distinct_groups AS (
 ),
 sale_offers_keys AS (
     WITH custom_fields_exploded AS (
-            SELECT
-                id_ticket,
-                explode(custom_fields)
-            FROM
-                datalake_zendesk_custom_fields.custom_fields
-        ),
-
-        sale_offers AS (
-            SELECT
-                id_offer,
-                ts_accepted
-            FROM
-                datalake_sale_offer_flows.sale_offer_flows
-        )
-
+        SELECT
+            id_ticket,
+            explode(custom_fields)
+        FROM
+            datalake_zendesk_custom_fields.custom_fields
+    ),
     SELECT
-            ROW_NUMBER() OVER (PARTITION BY cfe.id_ticket ORDER BY so.ts_accepted ASC) AS ROW,
-            cfe.id_ticket,
-            so.id_offer
+        cfe.id_ticket,
+        so.id_offer
     FROM
         custom_fields_exploded AS cfe
-    LEFT JOIN
-        sale_offers AS so
+    JOIN
+        datalake_sale_offer_flows.sale_offer_flows AS so
             ON cfe.value = so.id_offer
-    WHERE
-        so.id_offer IS NOT NULL
-        AND cfe.value NOT IN ("false", "true")
 ),
-
 union_historical_chat_with_zendesk AS (
     SELECT DISTINCT
         c.id_ticket,

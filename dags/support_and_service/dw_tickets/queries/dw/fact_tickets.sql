@@ -90,4 +90,3 @@ LEFT JOIN
 LEFT JOIN
     datalake_zendesk_ticket_funnels.ticket_funnel AS tf
         ON t.id_ticket = tf.id_ticket
-        AND id_sale_offer IS NOT NULL
