@@ -16,12 +16,14 @@ from bietlejuice.base.spark import (
     SparkTableStorageFormat,
 )
 from bietlejuice.clients.db_clients import SparkClient
-from dags.fintech.sap.spark_jobs.schemas import SapSchemaEnum
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
+
+
+from pyspark.sql.types import StructType
 
 JOB_NAME = "load_incremental_sap_into_datalake"
 
@@ -48,12 +50,12 @@ def extend_incremental_params(params: dict, execution_date: str) -> dict:
     return params
 
 
-def parse_records(records: list, schema_name: str):
+def parse_records(records: list, schema_content: str):
     """Function to parse and convert response records into a dataframe
 
     :param records: Raw records from consumer/API reponse
     :type records: list[dict]
-    :param schema_name: Key for retrieve schema from SapSchemaEnum
+    :param schema_content: Pyspark Schema in JSON form
     :type records: str
     :return: Dataframe with formatted columns
     :rtype: Spark Dataframe
@@ -61,7 +63,7 @@ def parse_records(records: list, schema_name: str):
 
     response = BaseSparkContext.sc.parallelize(records)
 
-    schema = getattr(SapSchemaEnum, schema_name)
+    schema = StructType.fromJson(schema_content)
 
     df = spark_client.create_dataframe(response, schema)
 
@@ -128,7 +130,7 @@ if __name__ == "__main__":
     for table_name in tables:
         table_config = tables[table_name]
         query_code = table_config["query_code"]
-        schema_name = table_config["schema_name"]
+        schema_content = table_config["schema_content"]
         params = table_config.get("params", {})
 
         extended_params = extend_incremental_params(params, execution_date)
@@ -137,7 +139,7 @@ if __name__ == "__main__":
 
         if records:
             try:
-                df = parse_records(records, schema_name)
+                df = parse_records(records, schema_content)
                 df = (
                     SparkDataFrameService()
                     .input(df)
@@ -170,12 +172,12 @@ if __name__ == "__main__":
 
                 logger.info(
                     f"""m={JOB_NAME}, environment={environment}, source={source}, table_name={table_name},
-                    schema_name={schema_name}. Tables successfully loaded into datalake!
+                    schema_content={schema_content}. Tables successfully loaded into datalake!
                     """
                 )
 
             except Exception as e:
                 logger.error(
-                    f"""m={JOB_NAME}, table_name={table_name}, schema_name={schema_name},
+                    f"""m={JOB_NAME}, table_name={table_name}, schema_content={schema_content},
                     error_message={e}"""
                 )
