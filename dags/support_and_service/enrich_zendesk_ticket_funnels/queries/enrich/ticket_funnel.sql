@@ -66,7 +66,7 @@ sale_offers_keys AS (
             explode(custom_fields)
         FROM
             datalake_zendesk_custom_fields.custom_fields
-    ),
+    )
     SELECT
         cfe.id_ticket,
         so.id_offer
