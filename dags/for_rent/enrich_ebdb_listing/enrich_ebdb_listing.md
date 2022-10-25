@@ -16,6 +16,7 @@ Produces the following output tables:
 - `house`
 - `house_entrance_history`
 - `house_listing`
+- `house_listing_fees`
 - `house_listing_status`
 - `house_status_version_order`
 - `listing_business_context`

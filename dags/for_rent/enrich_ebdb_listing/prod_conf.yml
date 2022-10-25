@@ -17,3 +17,5 @@ inner_dependencies:
     - house_status_version_order
   agents_with_keys:
     - house_listing
+  house_listing_fees:
+    - house_listing

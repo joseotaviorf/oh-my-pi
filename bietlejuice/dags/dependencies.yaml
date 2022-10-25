@@ -1573,6 +1573,10 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:create-clean-map-region-in-data-lake
   - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
   - bietlejuice.ebdb:create-clean-portability-in-data-lake
+  - bietlejuice.ebdb:create-clean-property-fee-assigned-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-property-fee-assigned-in-data-lake
+  - bietlejuice.ebdb:create-clean-property-fee-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-property-fee-in-data-lake
   - bietlejuice.ebdb:create-clean-restriction-type-in-data-lake
   - bietlejuice.ebdb:create-clean-special-condition-in-data-lake
   - bietlejuice.ebdb:create-clean-special-condition-aud-in-data-lake
