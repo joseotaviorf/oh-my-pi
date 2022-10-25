@@ -2,33 +2,46 @@ WITH member_profile_order AS (
     SELECT 
         *, 
         ROW_NUMBER() OVER(
-                PARTITION BY id ORDER BY version DESC
+                PARTITION BY id ORDER BY ts_updated DESC
         ) AS r
     FROM 
         datalake_hub_services_clean.member_profile
 ),
-member_profile AS (
-    SELECT 
-        mp.id,
-        mp.id_business_unit,
-        mp.id_user,
-        mp.id_parent_member_profile,
-        mp.version,
-        mp.profile,
-        CASE 
-            WHEN r!=1 
+member_profile_aux AS (
+  SELECT 
+        mpo.id,
+        mpo.id_business_unit,
+        mpo.id_user,
+        mpo.version,
+        mpo.id_parent_member_profile,
+        mpo.profile,
+        CASE WHEN 
+            mpo.r!=1
                 THEN false 
-            ELSE mp.is_active 
-        END AS is_active,
-        COALESCE(LAG(mp.ts_updated) OVER (PARTITION BY mp.id ORDER BY mp.version), mp.ts_created) AS ts_created,
-        CASE 
-            WHEN mp.r = 1 AND mp.is_active = true 
-                THEN CURRENT_DATE 
-            ELSE mp.ts_updated 
-        END AS ts_updated,
-        r
+            ELSE 
+                mpo.is_active 
+        END AS is_actual_active,
+        mpo.ts_updated AS ts_started,
+        CASE WHEN 
+            mpo.r = 1 AND mpo.is_active = true 
+                THEN current_date 
+            ELSE 
+                COALESCE(LEAD(mpo.ts_updated) OVER(PARTITION BY mpo.id ORDER BY mpo.ts_updated), mpo.ts_updated) 
+        END AS ts_ended,
+        mpo.r
     FROM 
-        member_profile_order AS mp
+        member_profile_order AS mpo
+),
+member_profile AS (
+    SELECT
+        mp_p.id_user AS id_user_parent,
+        mp.*
+    FROM 
+        member_profile_aux AS mp
+    LEFT JOIN 
+        member_profile_aux AS mp_p
+            ON mp_p.id = mp.id_parent_member_profile
+            AND mp_p.r = 1
 ),
 business_unit_order AS (
     SELECT 
@@ -69,12 +82,12 @@ users AS (
 teams_relations AS (
     SELECT 
         mp.id,
-        mp.id_business_unit,
+        bu.id AS id_business_unit,
         bu.hub_name,
         u1.id_external AS id_user_agent,
         u2.id_external AS id_user_en,
-        mp.ts_created AS ts_started,
-        mp.ts_updated AS ts_ended
+        mp.ts_started,
+        mp.ts_ended
     FROM
         member_profile AS mp
     LEFT JOIN 
@@ -85,7 +98,7 @@ teams_relations AS (
             ON mp.id_user = u1.id
     LEFT JOIN 
         users AS u2
-            ON mp.id_parent_member_profile = u2.id
+            ON mp.id_user_parent = u2.id
     WHERE
         bu.hub_name NOT LIKE "%[For rent]%"
 ),
@@ -113,25 +126,25 @@ wc_hubs_padronization AS (
             ON bus.hub_name_wc = wc.work_contract_name
 ),
 
-business_unit_region_relations AS (
-    SELECT
-        IF (bur.business_unit = bus.hub_name_bur, bus.id_business_unit_teams, NULL) AS id_hub,
-        bur.id_region,
-        bur.business_unit AS hub_name,
-        bur.dt_start,
-        COALESCE(bur.dt_end, CURRENT_DATE) AS dt_end
-    FROM 
-        datalake_gsheets_clean.business_unit_region AS bur
-    LEFT JOIN 
-        datalake_gsheets_clean.sale_business_unit_standardization AS bus
-            ON bus.hub_name_bur = bur.business_unit
-),
+-- business_unit_region_relations AS (
+--     SELECT
+--         IF (bur.business_unit = bus.hub_name_bur, bus.id_business_unit_teams, NULL) AS id_hub,
+--         bur.id_region,
+--         bur.business_unit AS hub_name,
+--         bur.dt_start,
+--         COALESCE(bur.dt_end, CURRENT_DATE) AS dt_end
+--     FROM 
+--         datalake_gsheets_clean.business_unit_region AS bur
+--     LEFT JOIN 
+--         datalake_gsheets_clean.sale_business_unit_standardization AS bus
+--             ON bus.hub_name_bur = bur.business_unit
+-- ),
 
 visit_relation AS (
     SELECT
         b.id AS id_booking,
-        COALESCE(tr.id_business_unit, whp.id_hub, bur.id_hub) AS id_business_unit,
-        COALESCE(tr.hub_name, whp.hub_name, bur.hub_name) AS business_unit,
+        COALESCE(tr.id_business_unit, whp.id_hub) AS id_business_unit,
+        COALESCE(tr.hub_name, whp.hub_name) AS business_unit,
         b.id_user_sale_agent AS id_user_agent,
         tr.id_user_en,
         b.ts_created AS ts_visit_intent
@@ -149,11 +162,11 @@ visit_relation AS (
           ON whp.id_user_agent = b.id_user_sale_agent
           AND b.ts_created BETWEEN whp.ts_started AND whp.ts_ended
           AND whp.id_hub IS NOT NULL
-    LEFT JOIN
-        business_unit_region_relations AS bur
-          ON bur.id_region = h.id_region
-          AND b.ts_created BETWEEN bur.dt_start AND bur.dt_end
-          AND bur.id_hub IS NOT NULL
+--     LEFT JOIN
+--         business_unit_region_relations AS bur
+--           ON bur.id_region = h.id_region
+--           AND b.ts_created BETWEEN bur.dt_start AND bur.dt_end
+--           AND bur.id_hub IS NOT NULL
     WHERE
         b.visit_intent = 'SALE'
 )
