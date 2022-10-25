@@ -46,6 +46,9 @@ columns:
   tenant_amount:
     lineage:
       - datalake_terminator_raw.termination_fee.tenant_amount
+  tenant_payment_method:
+    lineage:
+      - datalake_terminator_raw.termination_fee.tenant_payment_method
   landlord_amount:
     lineage:
       - datalake_terminator_raw.termination_fee.landlord_amount

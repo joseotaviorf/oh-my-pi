@@ -14,6 +14,7 @@ SELECT
     fee_factor,
     fee_prior_notice AS is_fee_prior_notice,
     tenant_amount,
+    tenant_payment_method,
     landlord_amount,
     created_at AS ts_created,
     updated_at AS ts_updated
