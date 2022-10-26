@@ -32,6 +32,7 @@ create table if not exists public.dim_house_listing
  house_type varchar(256),
  house_entrance varchar(256),
  house_garage_type varchar(256),
+ administration_fee float,
  house_total_value numeric(14,2),
  house_total_area numeric(14,2),
  house_construction_area numeric(14,2),

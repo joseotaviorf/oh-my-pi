@@ -113,6 +113,9 @@ columns:
   house_garage_type:
     lineage:
       - datalake_ebdb_listing.house.parking_slot_type
+  administration_fee:
+    lineage:
+      - datalake_ebdb_listing.house_listing_fees.administration_fee
   is_house_registration_verified:
     lineage:
       - datalake_ebdb_listing.house.is_verified

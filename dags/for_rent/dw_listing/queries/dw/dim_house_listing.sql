@@ -232,6 +232,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.house_type,
     hl.house_entrance,
     hl.house_garage_type,
+    CAST(hlf.administration_fee AS FLOAT) AS administration_fee,
     CAST(hl.house_total_value AS DECIMAL(14, 2)) AS house_total_value,
     CAST(hl.house_total_area AS DECIMAL(14, 2)) AS house_total_area,
     CAST(hl.house_construction_area AS DECIMAL(14, 2)) AS house_construction_area,
@@ -285,13 +286,20 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.ts_house_update,
     hl.ts_administrator_changed,
     NOW() AS ts_load
-FROM house_listings hl
-LEFT JOIN b2b_info bi
-    ON bi.id_house_listing = hl.sk_house_listing
-LEFT JOIN house_portability hp
-    ON hp.id_house_listing = hl.sk_house_listing
-LEFT JOIN autonomous_agent_info aa_info
-	ON aa_info.sk_house_listing = hl.sk_house_listing
+FROM 
+    house_listings hl
+LEFT JOIN 
+    b2b_info bi
+        ON bi.id_house_listing = hl.sk_house_listing
+LEFT JOIN 
+    house_portability hp
+        ON hp.id_house_listing = hl.sk_house_listing
+LEFT JOIN 
+    autonomous_agent_info aa_info
+        ON aa_info.sk_house_listing = hl.sk_house_listing
+LEFT JOIN 
+    datalake_ebdb_listing.house_listing_fees AS hlf
+        ON hl.sk_house_listing = hlf.id_house_listing
 LEFT JOIN
     datalake_big_agent.house_rent_listing_consultant AS hlco
         ON hlco.id_house_listing = hl.sk_house_listing
