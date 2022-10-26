@@ -1915,6 +1915,21 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.terminator:load-clean-rev-info
   - bietlejuice.terminator:load-clean-utility-bill
 
+bietlejuice.enrich_offboarding_repairs_probability:
+  - bietlejuice.dw_booking:load-public-dim-tenant-booking-review-into-redshift
+  - bietlejuice.dw_contract:load-dw-public-dim-contract
+  - bietlejuice.dw_contract:load-quintoandar-fact-contract-people-into-redshift
+  - bietlejuice.dw_datamarts_for_sale:create-dim-house-listing-amenities-in-datalake
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection
+  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.ebdb:create-clean-inspection-item-in-data-lake
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.repairs:load-clean-repair-request
+  - bietlejuice.sorting_hat:load-clean-proponent
+
 bietlejuice.enrich_offer:
   # Removed dependency with enrich_region since enrich_booking and enrich_ebdb_listing already satisfies
   # Removed dependency with enrich_ebdb_user.user since enrich_booking already satisfies
