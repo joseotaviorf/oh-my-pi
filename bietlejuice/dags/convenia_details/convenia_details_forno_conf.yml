@@ -1,6 +1,0 @@
----
-tables:
-  - active_employee_details
-  - inactive_employee_details
-custom_libraries:
-  whl: "s3://artifacts.s3.forno.data.quintoandar.com.br/convenia-api-client-python/quintoandar_convenia_api_client-0.1.1-py2.py3-none-any.whl"

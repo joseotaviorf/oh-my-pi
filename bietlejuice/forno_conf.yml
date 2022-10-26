@@ -66,6 +66,7 @@ databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.
 databricks_bucket: databricks.s3.forno.data.quintoandar.com.br
 dags_packages_files_path_in_s3: "github-repos/bi-etl-ejuice/"
 datalake_bucket: datalake.s3.forno.data.quintoandar.com.br
+people_bucket: people-s3-data-quintoandar-com-br
 doc_md_chart_url: https://qb343dade3ecd6cd6p-tp.appspot.com/admin/airflow/chart?chart_id=3&iteration_no=0&dag_id=
 dw_bucket: dw.s3.forno.data.quintoandar.com.br
 inmetro_bucket: s3://inmetro-s3-forno-quintoandar-com-br
@@ -303,7 +304,7 @@ databricks_10_4_med_people_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
-    instance_profile: databricks-people
+    instance_profile_arn: databricks-people
 
 databricks_10_4_med_io-memory_photon_cluster:
     <<: *cluster_anchor
@@ -317,7 +318,7 @@ databricks_10_4_med_io-memory_photon_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
-        
+
 databricks_10_4_med_memory_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5d.8xlarge

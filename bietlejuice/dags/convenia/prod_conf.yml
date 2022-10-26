@@ -1,0 +1,5 @@
+---
+tables:
+  - active_employees
+  - inactive_employees
+  - employee_salary_history

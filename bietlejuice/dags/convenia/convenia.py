@@ -24,6 +24,7 @@ MAIN_START_DATE = datetime(2022, 5, 6, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
 config_service = ConfigurationService(SOURCE)
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("people_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
@@ -43,7 +44,12 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 
 default_libraries = config_service.get_config("default_libraries")
-custom_libraries = config_service.get_config("custom_libraries")
+custom_libraries = [
+    {
+        "whl": f"{artifacts_s3_bucket}/convenia-api-client-python/"
+        "quintoandar_convenia_api_client-1.0.0-py2.py3-none-any.whl"
+    }
+]
 cluster_description = config_service.get_config("databricks_10_4_med_people_cluster")
 
 
@@ -79,6 +85,7 @@ task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=SOURCE,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=athena_query_results_bucket,
 )
 
 table_names = config_service.get_config("tables")
