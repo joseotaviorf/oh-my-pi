@@ -1069,6 +1069,9 @@ bietlejuice.dw_sale_listing_flow:
   - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
   - bietlejuice.gsheets.growth:load-clean-taxonomy-growth
 
+bietlejuice.dw_sale_listing_price_changes:
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
+
 bietlejuice.dw_sale_listings:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-registration-status-in-data-lake

@@ -1,0 +1,26 @@
+SELECT 
+    CONCAT(id_house, BIGINT(DATE_FORMAT(ts_price_started, 'yyyyMMdd'))) AS sk_price_change,
+    id_house AS sk_house,
+    id_user_revision AS sk_user_revision,
+    id_owner AS sk_owner,
+    id_region AS sk_region,
+    BIGINT(DATE_FORMAT(ts_price_started, 'yyyyMMdd')) AS sk_price_started_date,
+    COALESCE(BIGINT(DATE_FORMAT(ts_price_ended, 'yyyyMMdd')), -1) AS sk_price_ended_date,
+    status_history,
+    sale_price AS price,
+    lag_sale_price AS previous_price,
+    last_price_variation AS previous_price_variation,
+    is_last_price,
+    is_first_price,
+    change_type,
+    change_number AS change,
+    days_with_pricing_scheme,
+    calculator_min_sale_price AS min_predicted_price,
+    calculator_p30_sale_price AS p30_predicted_price,
+    calculator_sale_price AS predicted_price,
+    calculator_p70_sale_price AS p70_predicted_price,
+    calculator_max_sale_price AS max_predicted_price,
+    calculator_certainty AS predict_certainty,
+    NOW() AS ts_load
+FROM
+    datalake_sale_listings.sale_listing_price_changes
