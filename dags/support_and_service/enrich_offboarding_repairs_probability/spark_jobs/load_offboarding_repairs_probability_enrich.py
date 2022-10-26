@@ -212,7 +212,7 @@ if __name__ == "__main__":
 
     s3_loader = S3Loader()
     s3_loader.load_df(
-        df=df_prod,
+        df=df,
         format_options=SparkTableStorageFormat.DEFAULT_ENRICH,
         s3_path=f"{database_location}{output_table_name}",
         partitions=partition_cols,
@@ -220,7 +220,7 @@ if __name__ == "__main__":
 
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     spark_metastore_loader.update_metastore(
-        df=df_prod,
+        df=df,
         database_name=database_name,
         table_name=output_table_name,
         format_options=SparkTableStorageFormat.DEFAULT_ENRICH,
@@ -230,7 +230,7 @@ if __name__ == "__main__":
     )
 
     spark_metastore_service.create_new_partitions_from_df(
-        df=df_prod,
+        df=df,
         database_name=database_name,
         table_name=output_table_name,
         partition_cols=partition_cols,
