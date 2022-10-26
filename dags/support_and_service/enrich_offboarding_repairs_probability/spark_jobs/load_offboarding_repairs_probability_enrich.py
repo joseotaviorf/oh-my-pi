@@ -30,7 +30,7 @@ col_settings = {
     "is_exit_inspection_opted_out": ("int64", 1, 1, 0, 0),
     "tenant_qty_entry_comment": ("float64", 0, 0, 1, 0),
     "contract_rent": ("float64", 0, 0, 1, 0),
-    "is_contract_b2b": ("int64", 0, 0, 1, 0),
+    "contract_is_b2b": ("int64", 0, 0, 1, 0),
     "contract_was_too_early_terminated": ("int64", 1, 0, 0, 0),
     "contract_ndays_started2annulment": ("int64", 0, 0, 1, 0),
     "contract_qty_inspection_itens": ("int64", 0, 0, 1, 0),
@@ -46,10 +46,10 @@ col_settings = {
     "house_score_painting": ("float64", 0, 1, 0, 0),
     "house_score_cost_benefit": ("float64", 0, 1, 0, 0),
     "house_score_conservation": ("float64", 0, 1, 0, 0),
-    "has_closet": ("int64", 0, 0, 1, 0),
-    "has_gas_system": ("int64", 0, 0, 1, 0),
-    "has_new_plug": ("int64", 0, 0, 1, 0),
-    "is_pet_friendly": ("int64", 0, 0, 1, 0),
+    "house_has_closet": ("int64", 0, 0, 1, 0),
+    "house_has_gas_system": ("int64", 0, 0, 1, 0),
+    "house_has_new_plug": ("int64", 0, 0, 1, 0),
+    "house_is_pet_friendly": ("int64", 0, 0, 1, 0),
 }
 
 
@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
     df_model = df_prev_model.drop(
         columns=list(
-            filter(lambda x: x not in ["sk_contract", "dt_booked"], lst_treatment)
+            filter(lambda x: x not in ["id_contract", "dt_booked"], lst_treatment)
         )
         + lst_dummy_feature
     ).copy()
@@ -191,7 +191,7 @@ if __name__ == "__main__":
 
     df_prod = pd.concat(
         [
-            df_model.loc[:, ["sk_contract", "dt_booked"]],
+            df_model.loc[:, ["id_contract", "dt_booked"]],
             pd.DataFrame(
                 np.round(y_prob * 100, 2),
                 columns=["predicted_offboarding_repair_probability"],
