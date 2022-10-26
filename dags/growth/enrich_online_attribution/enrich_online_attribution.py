@@ -26,10 +26,11 @@ INNER_DEPENDENCIES = {
     "online_attribution": ["events_exploded"],
     "online_attribution_with_attributed_at": ["online_attribution"],
 }
-CLUSTER_DESCRIPTION = "databricks_10_4_med_io-memory_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_io-memory_photon_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 PARTITION_COLS = config_service.get_config("partition_cols")
+EXTRA_SPARK_CONF = config_service.get_config("spark_conf")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -39,6 +40,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+cluster_configuration["spark_conf"].update(EXTRA_SPARK_CONF)
 default_libraries = config_service.get_config("default_libraries")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [

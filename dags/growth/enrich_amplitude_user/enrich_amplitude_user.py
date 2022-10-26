@@ -20,7 +20,7 @@ DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = "databricks_10_4_med_io-memory_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_io-memory_photon_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -28,10 +28,12 @@ datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
+EXTRA_SPARK_CONF = config_service.get_config("spark_conf")
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
+cluster_configuration["spark_conf"].update(EXTRA_SPARK_CONF)
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
