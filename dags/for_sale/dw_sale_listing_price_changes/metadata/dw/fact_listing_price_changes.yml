@@ -23,21 +23,9 @@ columns:
   status_history:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.status_history
-  price:
+  predict_certainty:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.sale_price
-  previous_price:
-    lineage:
-      - datalake_sale_listings.sale_listing_price_changes.previous_price
-  previous_price_variation:
-    lineage:
-      - datalake_sale_listings.sale_listing_price_changes.previous_price_variation
-  is_last_price:
-    lineage:
-      - datalake_sale_listings.sale_listing_price_changes.is_last_price
-  is_first_price:
-    lineage:
-      - datalake_sale_listings.sale_listing_price_changes.is_first_price
+      - datalake_sale_listings.sale_listing_price_changes.calculator_certainty
   change_type:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.change_type
@@ -47,6 +35,15 @@ columns:
   days_with_pricing_scheme:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.days_with_pricing_scheme
+  price:
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.sale_price
+  previous_price:
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.previous_price
+  previous_price_variation:
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.previous_price_variation
   min_predicted_price:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.calculator_min_sale_price
@@ -62,6 +59,9 @@ columns:
   max_predicted_price:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.calculator_max_sale_price
-  predict_certainty:
+  is_last_price:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.calculator_certainty
+      - datalake_sale_listings.sale_listing_price_changes.is_last_price
+  is_first_price:
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.is_first_price
