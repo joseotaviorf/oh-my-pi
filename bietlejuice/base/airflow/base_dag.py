@@ -9,10 +9,18 @@ logger = QuintoAndarLogger("BaseDAG")
 
 class BaseDAG:
     @staticmethod
-    def get_dag_doc(dag_name, root_path=None):
+    def get_dag_doc(dag_name, template_path=None):
+        """
+        :param dag_name: dag_name or tree_path to your doc.
+        :type dag_name: str
+        :param template_path: Used to bypass dag package path
+            and set a path to a doc template.
+        :type template_path: str, optional.
+        :rtype: str
+        """
         dag_path = DAGPackagesPathService.get_dag_path(dag_name)
         doc_md_string = ""
-        dag_path = root_path if root_path else dag_path
+        dag_path = template_path if template_path else dag_path
         doc_file_path = join(dag_path, f"{dag_name}.md")
 
         try:

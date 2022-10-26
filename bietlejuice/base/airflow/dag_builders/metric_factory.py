@@ -114,7 +114,7 @@ class MetricsDagFactory:
     def build_doc_md(self):
         """ Fill doc with customized information
         """
-        doc_md = BaseDAG.get_dag_doc("metric", root_path=self.METRIC_ROOT)
+        doc_md = BaseDAG.get_dag_doc("metric", template_path=self.METRIC_ROOT)
         tables = "\n - ".join([f"`{table}`" for table in self.table_names])
 
         return doc_md.format(
