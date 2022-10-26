@@ -69,6 +69,8 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `sales_flow_pendency`
 `sales_flow_pendency_aud`
 `sales_flow_tag_aud`
+`sales_flow_users`
+`sales_flow_users_aud`
 `specialist`
 `specialist_aud`
 `status`
