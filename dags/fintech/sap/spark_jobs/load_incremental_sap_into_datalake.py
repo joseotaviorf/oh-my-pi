@@ -130,7 +130,7 @@ if __name__ == "__main__":
     for table_name in tables:
         table_config = tables[table_name]
         query_code = table_config["query_code"]
-        schema_content = table_config["schema_content"]
+        schema_content = json.loads(table_config["schema_content"])
         params = table_config.get("params", {})
 
         extended_params = extend_incremental_params(params, execution_date)
