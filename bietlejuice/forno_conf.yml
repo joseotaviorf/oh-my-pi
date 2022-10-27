@@ -304,7 +304,7 @@ databricks_10_4_med_people_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
-    instance_profile_arn: databricks-people
+        instance_profile_arn: databricks-people
 
 databricks_10_4_med_io-memory_photon_cluster:
     <<: *cluster_anchor
