@@ -2,13 +2,9 @@ import logging
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.base.db import DWMetastoreService
+from bietlejuice.base.db import DWMetastoreService, QUERIES_DATALAKE_PATH
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import DatabricksConsumer
-from dags.growth.dw_fact_conversion_metrics import (
-    DW_SCHEMA,
-    QUERIES_DW_FACT_CONVERSION_METRICS_PATH,
-)
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -16,6 +12,10 @@ from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.services import FileService
 
 JOB_NAME = "create_table_in_dw_staging"
+
+SOURCE = "dw_fact_conversion_metrics"
+DW_SCHEMA = "quintoandar"
+QUERIES_DW_FACT_CONVERSION_METRICS_PATH = QUERIES_DATALAKE_PATH + SOURCE
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
