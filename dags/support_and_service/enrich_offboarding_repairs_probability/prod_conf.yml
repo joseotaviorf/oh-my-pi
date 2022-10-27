@@ -3,5 +3,5 @@ custom_libraries: [{ pypi: { "package": "scikit-learn>=0.24.0" } }]
 partitions: ["dt_booked"]
 model_filename: /dbfs/FileStore/models/inspections/off_repair_prediction_rf_model_v0.pkl
 input_query: SELECT * FROM datalake_offboarding_repairs_probability.contracts
-threshold: 0.43
+threshold: 0.42
 partition_cols: ["dt_predicted"]
