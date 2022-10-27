@@ -15,7 +15,9 @@ demand_funnel AS (
     SELECT  
         COALESCE(ref.city_group, 'Undefined') AS city_group,
         SUM(ref.visits_booked) AS visits_booked, 
+        SUM(ref.visits_completed) AS visits_completed,
         SUM(ref.offer_submitted) AS offers_submitted,
+        SUM(ref.offer_approved) AS offers_accepted,
         SUM(ref.contract_signed) AS contracts_signed,
         SUM(ref.credit_approved) AS credits_approved,
         DATE(DATE_TRUNC('month', ref.date)) AS dt_month_started
@@ -24,7 +26,7 @@ demand_funnel AS (
     WHERE
         country_code = 'MX'
         AND ref.date >= DATE('2022-06-01')
-    GROUP BY 1, 6
+    GROUP BY 1, 8
 ),
 demand_funnel_targets AS (
     SELECT
@@ -75,7 +77,9 @@ SELECT
     tdf.new_tenant_prospects,
     tdf.tenant_prospects,
     df.visits_booked,
+    df.visits_completed,
     df.offers_submitted,
+    df.offers_accepted,
     df.contracts_signed,
     df.credits_approved,
     dft.visits_booked_target,
