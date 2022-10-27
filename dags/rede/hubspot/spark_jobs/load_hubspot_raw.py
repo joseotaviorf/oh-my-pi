@@ -1,9 +1,21 @@
+import datetime
 import json
 import logging
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 from hubspot import HubSpot
+
+from pyspark.sql.types import (
+    StructType,
+    StructField,
+    StringType,
+    IntegerType,
+    TimestampType,
+    BooleanType,
+    MapType,
+    ArrayType,
+)
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -14,8 +26,6 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
 )
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.dags.hubspot.spark_jobs.hubspot_encoder import HubSpotEncoder
-from bietlejuice.dags.hubspot.spark_jobs.schemas import HubSpotSchemaEnum
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.json_service import JsonService
@@ -27,6 +37,96 @@ JOB_NAME = "load_hubspot_raw"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 spark_client = SparkClient()
+
+class HubSpotEncoder(json.JSONEncoder):
+    def default(self, o):
+        if "ValueWithTimestamp" in str(type(o)):
+            return o.to_dict()
+        if isinstance(o, datetime.datetime):
+            return o.isoformat()
+
+        return json.JSONEncoder.default(self, o)
+
+class HubSpotSchemaEnum:
+    """This class contains the Spark schemas for the tables loaded by the HubSpot Consumer."""
+
+    PIPELINE_SCHEMA = StructType(
+        [
+            StructField("label", StringType(), True),
+            StructField("display_order", IntegerType(), True),
+            StructField("id", StringType(), True),
+            StructField(
+                "stages",
+                ArrayType(
+                    StructType(
+                        [
+                            StructField("label", StringType(), True),
+                            StructField("display_order", IntegerType(), True),
+                            StructField(
+                                "metadata", MapType(StringType(), StringType()), True
+                            ),
+                            StructField("id", StringType(), True),
+                            StructField("created_at", TimestampType(), True),
+                            StructField("archived_at", TimestampType(), True),
+                            StructField("updated_at", TimestampType(), True),
+                            StructField("archived", BooleanType(), True),
+                        ]
+                    )
+                ),
+                True,
+            ),
+            StructField("created_at", TimestampType(), True),
+            StructField("archived_at", TimestampType(), True),
+            StructField("updated_at", TimestampType(), True),
+            StructField("archived", BooleanType(), True),
+        ]
+    )
+    TEAM_SCHEMA = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("name", StringType(), True),
+            StructField("user_ids", ArrayType(StringType()), True),
+            StructField("secondary_user_ids", ArrayType(StringType()), True),
+        ]
+    )
+    OWNER_SCHEMA = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("email", StringType(), True),
+            StructField("first_name", StringType(), True),
+            StructField("last_name", StringType(), True),
+            StructField("user_id", IntegerType(), True),
+            StructField("created_at", TimestampType(), True),
+            StructField("updated_at", TimestampType(), True),
+            StructField("archived", BooleanType(), True),
+            StructField(
+                "teams",
+                ArrayType(
+                    StructType(
+                        [
+                            StructField("id", StringType(), True),
+                            StructField("name", StringType(), True),
+                            StructField("membership", StringType(), True),
+                        ]
+                    )
+                ),
+            ),
+            StructField("archived_at", TimestampType(), True),
+        ]
+    )
+    OBJECT_SCHEMA = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("properties", StringType(), True),
+            StructField("properties_with_history", StringType(), True),
+            StructField("created_at", TimestampType(), True),
+            StructField("updated_at", TimestampType(), True),
+            StructField("archived", BooleanType(), True),
+            StructField("archived_at", TimestampType(), True),
+            StructField("associations", StringType(), True),
+        ]
+    )
+
 
 
 def main():
