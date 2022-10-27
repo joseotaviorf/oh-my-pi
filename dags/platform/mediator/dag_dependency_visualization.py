@@ -1,11 +1,13 @@
+from os.path import join
+
 import pendulum
 from airflow.models import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.airflow import DAGOwnerEnum
-from bietlejuice.dags import COMPOSER_DAGS_PATH
 from bietlejuice.services import FileService
+from dags import DAG_PACKAGES_ROOT
 
 logger = QuintoAndarLogger("dag_dependency_visualization")
 
@@ -52,7 +54,7 @@ dag = DAG(
     schedule_interval=None,
 )
 
-dependencies_file_path = COMPOSER_DAGS_PATH + "/dependencies.yaml"
+dependencies_file_path = join(DAG_PACKAGES_ROOT,  "dependencies.yaml")
 dependencies = get_dependencies_from_file(dependencies_file_path)
 task_dict = {}
 

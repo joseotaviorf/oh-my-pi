@@ -1,14 +1,15 @@
 import re
+from os.path import join
 from typing import Tuple
 
-from bietlejuice.dags import COMPOSER_DAGS_PATH
 from bietlejuice.services.file_service import FileService
+from dags import DAG_PACKAGES_ROOT
 
 DEPENDENCIES_PATTERN = "bietlejuice\.(\w*):(.*)"
 
 DAGS_CROSS_DEPENDENCIES_FILE_NAME = "dependencies.yaml"
-DAGS_CROSS_DEPENDENCIES_FILE_PATH = (
-    f"{COMPOSER_DAGS_PATH}/{DAGS_CROSS_DEPENDENCIES_FILE_NAME}"
+DAGS_CROSS_DEPENDENCIES_FILE_PATH = join(
+    DAG_PACKAGES_ROOT, DAGS_CROSS_DEPENDENCIES_FILE_NAME
 )
 
 

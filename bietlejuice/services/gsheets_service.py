@@ -1,13 +1,13 @@
 import os
-
-from bietlejuice import dags
-from bietlejuice.dags import gsheets, gsheets_by_context
-from bietlejuice.services import FileService
+from os.path import join
 
 import pandas as pd
 
+from bietlejuice.dags import gsheets, gsheets_by_context
+from bietlejuice.services import FileService
+from dags import DAG_PACKAGES_ROOT
 
-DEPS_YAML_PATH = os.path.dirname(os.path.realpath(dags.__file__)) + "/dependencies.yaml"
+DEPS_YAML_PATH = join(DAG_PACKAGES_ROOT, "dependencies.yaml")
 GENERIC_GSHEETS_FILES_YAML_PATH = (
     os.path.dirname(os.path.realpath(gsheets.__file__)) + "/gsheets_files.yaml"
 )

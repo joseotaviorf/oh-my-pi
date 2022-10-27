@@ -1,7 +1,11 @@
+from os.path import join
+
 import pytest
+
+from dags import DAG_PACKAGES_ROOT
 from tests.files_validation.validators.yaml_validator import YamlValidator
 
-DAG_DEPENDENCIES = ["bietlejuice/dags/dependencies.yaml"]
+DAG_DEPENDENCIES = [join(DAG_PACKAGES_ROOT, "dependencies.yaml")]
 
 
 class TestDagDependencies:

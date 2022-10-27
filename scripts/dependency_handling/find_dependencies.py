@@ -1,12 +1,15 @@
-import yaml
 import sys
+from os.path import join
+
+import yaml
+
+from dags import DAG_PACKAGES_ROOT
 
 
 def get_dependencies_data_from_yaml() -> list:
     """This function will return all data readed in the dependencies yaml file"""
 
-    dependencies_file = "../../bietlejuice/dags/dependencies.yaml"
-
+    dependencies_file = join(DAG_PACKAGES_ROOT, "dependencies.yaml")
     with open(dependencies_file, "r") as stream:
         dags = yaml.safe_load(stream)
 

@@ -25,7 +25,6 @@ LAYERS = ["clean", "enrich", "dw", "metric", "raw"]
 
 PRINT_ALL_PARSING_ERRORS = False
 COMPOSER_FILES_ROOT = f"{BI_ETL_EJUICE_ROOT}/bietlejuice"
-DAGS_CROSS_DEPENDENCIES_FILE_NAME = "dependencies.yaml"
 VALIDATION_LOG_SEPARATOR = "=" * 150
 DEPENDENCIES_PATTERN = "bietlejuice\.(\w*):(.*)"
 
@@ -33,7 +32,7 @@ DEPENDENCIES_PATTERN = "bietlejuice\.(\w*):(.*)"
 class CrossDAGDependenciesValidator:
     """
     Checks whether the dependent DAGs and the dependency tasks and DAGs defined
-     in the DAGS_CROSS_DEPENDENCIES_FILE_NAME are valid.
+     in the dependencies file are valid.
 
     A DAG is valid if it has a declaration file.
     A task is valid if it has a SparkSQL file and the task name in dependency
@@ -521,7 +520,7 @@ class CrossDAGDependenciesValidator:
         :rtype: int
         """
         self.log_msg(
-            msg=f"msg=Validating dependencies from {DAGS_CROSS_DEPENDENCIES_FILE_NAME}",
+            msg=f"msg=Validating dependencies from dependencies.yaml",
             force_log=True,
         )
         self.log_msg(
