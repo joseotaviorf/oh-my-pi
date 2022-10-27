@@ -24,7 +24,7 @@ supply_funnel AS (
         dt_month_started,
         LAST_DAY(dt_month_started) AS dt_month_ended
     FROM 
-        datalake_mexico_rent_supply_funnel.coincident_funnel
+        datalake_mexico_rent_supply.coincident_funnel
     GROUP BY 1, 2, 3, 4, 10, 11
 ),
 supply_funnel_targets AS (
@@ -180,7 +180,7 @@ leads_rules AS (
         AS leads_ub_owner_mx,
         DATE(DATE_TRUNC('month', DATE(fhlf.ts_lead))) AS dt_month_started
     FROM 
-        datalake_mexico_rent_supply_funnel.listing_flow AS fhlf
+        datalake_mexico_rent_supply.listing_flow AS fhlf
     LEFT JOIN 
         datalake_lead.lead AS dl
             ON fhlf.id_lead = dl.id

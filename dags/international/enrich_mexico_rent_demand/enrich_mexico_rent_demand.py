@@ -20,7 +20,7 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2022, 6, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-CONTEXT = "mexico_rent_demand_funnel"
+CONTEXT = "mexico_rent_demand"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")

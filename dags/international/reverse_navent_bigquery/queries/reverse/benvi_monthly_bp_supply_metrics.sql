@@ -28,4 +28,4 @@ SELECT
     actual_cost_comission,
     cost
 FROM 
-    datalake_mexico_rent_supply_funnel.monthly_supply_flow_metrics
+    datalake_mexico_rent_supply.monthly_supply_funnel

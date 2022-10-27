@@ -45,4 +45,4 @@ SELECT
     ongoing_listings,
     net_churn
 FROM 
-    datalake_mexico_rent_supply_funnel.weekly_supply_flow_metrics
+    datalake_mexico_rent_supply.weekly_supply_funnel

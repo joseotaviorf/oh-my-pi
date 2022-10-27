@@ -14,7 +14,7 @@ WITH leads AS (
         DATE(DATE_TRUNC('month', ts_lead)) AS dt_month_started,
         DATE(DATE_TRUNC('week', ts_lead)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.listing_flow
+        datalake_mexico_rent_supply.listing_flow
     GROUP BY 1, 2, 3, 4, 5, 12, 13
 ),
 prospects AS (
@@ -33,7 +33,7 @@ prospects AS (
         DATE(DATE_TRUNC('month', ts_prospect)) AS dt_month_started,
         DATE(DATE_TRUNC('week', ts_prospect)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.listing_flow
+        datalake_mexico_rent_supply.listing_flow
     WHERE
         ts_prospect IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 12, 13
@@ -54,7 +54,7 @@ qualifieds AS (
         DATE(DATE_TRUNC('month', ts_qualified)) AS dt_month_started,
         DATE(DATE_TRUNC('week', ts_qualified)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.listing_flow
+        datalake_mexico_rent_supply.listing_flow
     WHERE
         ts_qualified IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 12, 13
@@ -75,7 +75,7 @@ available_qualifieds AS (
         DATE(DATE_TRUNC('month', ts_available_qualified)) AS dt_month_started,
         DATE(DATE_TRUNC('week', ts_available_qualified)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.listing_flow
+        datalake_mexico_rent_supply.listing_flow
     WHERE
         ts_available_qualified IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 12, 13
@@ -96,7 +96,7 @@ opportunities AS (
         DATE(DATE_TRUNC('month', ts_opportunity)) AS dt_month_started,
         DATE(DATE_TRUNC('week', ts_opportunity)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.listing_flow
+        datalake_mexico_rent_supply.listing_flow
     WHERE
         ts_opportunity IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 12, 13
@@ -117,7 +117,7 @@ first_listings AS (
         DATE(DATE_TRUNC('month', ts_first_listing)) AS dt_month_started,
         DATE(DATE_TRUNC('week', ts_first_listing)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.listing_flow
+        datalake_mexico_rent_supply.listing_flow
     WHERE
         ts_first_listing IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 12, 13

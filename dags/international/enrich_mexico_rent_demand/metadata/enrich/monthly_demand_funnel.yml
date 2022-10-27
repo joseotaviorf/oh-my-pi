@@ -1,6 +1,6 @@
 ---
-database_name: datalake_mexico_rent_demand_funnel
-table_name: monthly_demand_flow_metrics
+database_name: datalake_mexico_rent_demand
+table_name: monthly_demand_funnel
 columns:
   country_code:
     lineage:

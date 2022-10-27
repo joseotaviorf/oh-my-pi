@@ -29,7 +29,7 @@ WITH supply_cohort_funnel_base AS (
         DATE(DATE_TRUNC('month', ts_lead)) AS dt_month_started,
         DATE(DATE_TRUNC('week', ts_lead)) AS dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.listing_flow
+        datalake_mexico_rent_supply.listing_flow
     GROUP BY 1, 2, 3, 4, 5, 12, 13
 )
 SELECT 

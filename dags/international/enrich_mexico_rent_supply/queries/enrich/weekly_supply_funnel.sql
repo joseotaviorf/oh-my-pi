@@ -148,7 +148,7 @@ coincident_funnel AS (
         SUM(first_listings) AS first_listings,
         dt_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.coincident_funnel
+        datalake_mexico_rent_supply.coincident_funnel
     GROUP BY 1, 2, 3, 4, 10
 ),
 cohort_funnel AS (
@@ -167,7 +167,7 @@ cohort_funnel AS (
         SUM(o2fl_cohort) AS o2fl_cohort,
         dt_lead_week_started
     FROM
-        datalake_mexico_rent_supply_funnel.cohort_funnel 
+        datalake_mexico_rent_supply.cohort_funnel 
     GROUP BY 1, 2, 3, 4, 13
 )
 SELECT 

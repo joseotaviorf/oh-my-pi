@@ -1,8 +1,8 @@
-## Enrich Mexico Rent Demand Funnel
+## Enrich Mexico Rent Supply
 
 ### Purpose
 
-This DAG creates the enriched tables related to Benvi Mexico's Rent Demand Funnel.
+This DAG creates the enriched tables related to Benvi Mexico's Rent Supply Funnel.
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -15,8 +15,11 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Creates the enriched tables via full load, partitioned by `country_code`: 
 
-- `monthly_demand_flow_metrics`
-- `weekly_demand_flow_metrics`
+- `cohort_funnel`, soon to be migrated to the metric layer.
+- `coincident_funnel`, soon to be migrated to the metric layer.
+- `listing_flow`
+- `monthly_supply_funnel`, soon to be migrated to the metric layer.
+- `weekly_supply_funnel`, soon to be migrated to the metric layer.
 
 ### Responsible Data Engineering Team
 
