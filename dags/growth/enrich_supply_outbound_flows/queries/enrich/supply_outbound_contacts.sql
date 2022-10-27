@@ -84,7 +84,7 @@ braze_supply_events (
       csd.canvas_name,
       csd.step_name AS canvas_step_name,
       REGEXP_EXTRACT(
-         csd.step_message, '(?<=\"max-tries":")(.*?)(?="},)'
+         csd.step_message, '(?<=\"max-tries":")(.*?)(?=")'
        ) AS wololo_call_round_max_tries,
       REGEXP_EXTRACT(
          csd.step_message, '(?<=\"entityId": ")(.*?)(?=",)'
