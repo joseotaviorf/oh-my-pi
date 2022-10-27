@@ -1,0 +1,25 @@
+---
+database_name: datalake_crawlers_listings
+table_name: loft_status_listing_flows
+columns:
+  id_house:
+    lineage:
+      - datalake_crawlers_listings.loft_region_mapping.id_house
+  id_house_platform:
+    lineage:
+      - datalake_crawlers_listings.loft_region_mapping.id_house_platform
+  id_neighborhood:
+    lineage:
+      - datalake_crawlers_listings.loft_region_mapping.id_neighborhood
+  neighborhood:
+    lineage:
+      - datalake_crawlers_listings.loft_region_mapping.neighborhood
+  ts_last_extraction:
+    lineage:
+      - datalake_crawlers_listings.loft_region_mapping.dt_updated
+  ts_started_date:
+    lineage:
+      - dw_public.dim_date.date
+  ts_ended_date:
+    lineage:
+      - dw_public.dim_date.date

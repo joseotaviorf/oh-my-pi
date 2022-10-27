@@ -1,0 +1,17 @@
+---
+database_name: datalake_crawlers_listings
+table_name: loft_region_mapping
+columns:
+  id_house:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.id
+  id_house_platform:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.id
+  id_neighborhood:
+    lineage:
+      - datalake_ebdb_clean.map_region.id
+  neighborhood:
+    lineage:
+      - datalake_ebdb_clean.map_region.name
+      - datalake_crawlers_listings_clean.loft.address

@@ -3,10 +3,38 @@
 tables:
   - table_name: olx
     weekday_run: 4
+    is_incremental: true
+    partition_cols:
+      - address_city
+      - year
+      - month
+      - day
   - table_name: viva_real
-    weekday_run: 2 
+    weekday_run: 2
+    is_incremental: true
+    partition_cols:
+      - address_city
+      - year
+      - month
+      - day
   - table_name: zap_imoveis
     weekday_run: 1
+    is_incremental: true
+    partition_cols:
+      - address_city
+      - year
+      - month
+      - day
+  - table_name: loft_region_mapping
+    weekday_run: 0
+    is_incremental: true
+    partition_cols:
+      - dt_updated
+  - table_name: loft_status_listing_flows
+    depends_on:
+      - loft_region_mapping
+    is_incremental: false
+
 custom_libraries:
   - maven:
       coordinates: "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.0-incubating"

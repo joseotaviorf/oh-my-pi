@@ -9,7 +9,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow import BaseDAG, BaseTaskGroup, DAGOwnerEnum
+from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
@@ -23,11 +24,10 @@ def check_valid_run_date(dag_execution_date, crawler_weekday):
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 7, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 6 * * 2,3,5"
+MAIN_SCHEDULE_INTERVAL = "0 6 * * *"
 CONTEXT = "crawlers_listings"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-PARTITION_COLS = ["address_city", "year", "month", "day"]
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(DAG_NAME)
@@ -97,22 +97,47 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
+enrich_task_groups = {}
+inner_dependencies = {}
+
+# The execution date will always be the previous day, because this DAG runs daily.
+# However, it should be the previous week, because the source runs weekly. That is why we are subtracting 6 days.
+actual_execution_date = "{{macros.ds_add(ds, -6)}}"
+
 for crawler in crawlers:
     crawler_name = crawler["table_name"]
-    crawler_weekday = crawler["weekday_run"]
+    is_incremental = crawler["is_incremental"]
+    partition_cols = crawler.get("partition_cols")
 
-    task_group = datalake_task_group.build_enrich_task_group(
+    enrich_task_groups[crawler_name] = datalake_task_group.build_enrich_task_group(
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         table_name=crawler_name,
-        is_incremental=True,
-        partitions=PARTITION_COLS,
+        is_incremental=is_incremental,
+        partitions=partition_cols,
+        execution_date=actual_execution_date
     )
-    skip_run_task = ShortCircuitOperator(
-        task_id=f"check-day-to-skip-execution-{crawler_name}",
-        python_callable=check_valid_run_date,
-        op_kwargs={"dag_execution_date": "{{ds}}", "crawler_weekday": crawler_weekday},
-    )
+    if "depends_on" not in crawler:
+        crawler_weekday = crawler["weekday_run"]
+        skip_run_task = ShortCircuitOperator(
+            task_id=f"check-day-to-skip-execution-{crawler_name}",
+            python_callable=check_valid_run_date,
+            op_kwargs={"dag_execution_date": actual_execution_date, "crawler_weekday": crawler_weekday},
+        )
+        chain(create_cluster_task, skip_run_task, DatalakeTaskGroup.first_tasks(enrich_task_groups[crawler_name]))
+    else:
+        inner_dependencies[crawler_name] = crawler["depends_on"]
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=inner_dependencies,
+)
 
-    chain(create_cluster_task, skip_run_task, DatalakeTaskGroup.first_tasks(task_group))
-    chain(DatalakeTaskGroup.last_tasks(task_group), terminate_cluster_task)
+chain(
+    BaseTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + BaseTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
+)
