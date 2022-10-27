@@ -1,8 +1,8 @@
 import os
 from datetime import datetime
+from pendulum import timezone
 
-import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -10,23 +10,20 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Operator
 from airflow.utils.helpers import cross_downstream
 
-from bietlejuice.base.paths import DATALAKE_SQL_DIR
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.formatters import StringFormatter
-from bietlejuice.services import FileService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
+
+# Pipeline inputs
 SOURCE = "composer"
-CONTEXT = SOURCE
 DAG_ID = f"bietlejuice.{SOURCE}"
-
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2019, 8, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
-SCHEDULE_INTERVAL = "0 6-12/1,14,18 * * *"
-
-ENV = os.environ.get("ENVIRONMENT")
-
+MAIN_START_DATE = datetime(2019, 8, 21, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = "0 6-12/1,14,18 * * *"
+CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -34,25 +31,24 @@ datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+raw_spark_job_file = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{{extraction_type}}_{SOURCE}_raw.py"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
 
 clean_partition_cols = config_service.get_config("clean_partition_cols")
 tables = config_service.get_config("tables")
 
-BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{{extraction_type}}_{SOURCE}_into_datalake.py"
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+ENV = os.environ.get("ENVIRONMENT")
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_min_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
-
-
-QUERY_PATH = "{datalake_sql_dir}/queries/composer/raw/{table_name}.sql"
+QUERY_PATH = DAGPackagesPathService.get_dag_path(SOURCE) + "/queries/raw/"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -62,7 +58,7 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=SCHEDULE_INTERVAL,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
@@ -78,9 +74,10 @@ def get_sql_from_table_name(table_name):
     :return: the query to built the given table.
     :rtype: str
     """
-    sql = FileService.get_query_from_file_name(
-        QUERY_PATH.format(datalake_sql_dir=DATALAKE_SQL_DIR, table_name=table_name)
+    sql = DAGPackagesPathService._read_file_content_from_filesystem(
+        QUERY_PATH + f"{table_name}.sql"
     )
+
     return sql
 
 
@@ -131,7 +128,11 @@ def create_extraction_tasks(table_name, has_query=False, is_incremental=False):
 
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_configuration,
+    libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -142,11 +143,10 @@ task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
-    relative_query_path=CONTEXT,
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    relative_query_path=SOURCE,
+    spark_jobs_path=base_spark_jobs_path,
     athena_query_result_location=athena_query_results_bucket,
 )
-
 
 for table_name, table_config in tables.items():
     table_config = table_config if table_config else {}
@@ -167,7 +167,7 @@ for table_name, table_config in tables.items():
         source=SOURCE,
         target_database_base_name=SOURCE,
         table_name=table_name,
-        extraction_spark_job_file=RAW_SPARK_JOB_PATH.format(
+        extraction_spark_job_file=raw_spark_job_file.format(
             extraction_type=extraction_type
         ),
         raw_spark_job_extra_args=parameters,

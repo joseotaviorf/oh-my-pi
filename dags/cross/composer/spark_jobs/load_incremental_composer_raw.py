@@ -13,7 +13,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
 
 DATABRICKS_SCOPE = "quintoandar"
-JOB_NAME = "load_incremental_composer_into_datalake_raw"
+JOB_NAME = "load_incremental_composer_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
