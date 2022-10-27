@@ -110,7 +110,7 @@ tof AS (
         FALSE AS is_booking
     FROM 
         datalake_top_of_funnel_demand.user_interactions AS ui
-        LEFT JOIN dim_region AS dr
+        LEFT JOIN dw_public.dim_region AS dr
         ON CAST(ui.sk_region AS INT) = dr.sk_region
     WHERE 
         dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
