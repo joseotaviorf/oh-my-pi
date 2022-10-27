@@ -3,7 +3,8 @@ SELECT
     NULLIF(hub_name_teams, '') AS hub_name_teams,
     NULLIF(hub_name_wc, '') AS hub_name_wc,
     NULLIF(hub_name_bur, '') AS hub_name_bur,
+    CAST(NULLIF(is_work_contract, '') AS BOOLEAN) AS is_work_contract,
+    CAST(NULLIF(is_business_unit_region, '') AS BOOLEAN) AS is_business_unit_region,
     NOW() AS ts_load
 FROM
     datalake_gsheets_raw.sale_business_unit_standardization
-    

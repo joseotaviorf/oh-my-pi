@@ -14,3 +14,9 @@ columns:
     hub_name_bur:
         lineage:
             - datalake_gsheets_raw.sale_business_unit_standardization.hub_name_bur
+    is_work_contract:
+        lineage:
+            - datalake_gsheets_raw.sale_business_unit_standardization.is_work_contract
+    is_business_unit_region:
+        lineage:
+            - datalake_gsheets_raw.sale_business_unit_standardization.is_business_unit_region
