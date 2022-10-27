@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: mexico_rental_flows_targets
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_flows_targets.city_group
+  rf_target:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_flows_targets.rf_target
+  rf_type:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_flows_targets.rf_type
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_flows_targets.week_start
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_flows_targets.date

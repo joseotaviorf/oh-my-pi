@@ -276,6 +276,12 @@ mexico_marketing_cost_per_source:
     clean_table_name: mexico_marketing_cost_per_source
     sheet_context: growth
 
+mexico_rental_flows_targets:
+    sheet_id: 1C1ULA1wW_By-xFwoVioNs-P0VXPb6IX3pUNYwDHkNHs
+    sheet_name: rental_flows_targets
+    clean_table_name: mexico_rental_flows_targets
+    sheet_context: growth
+
 mexico_supply_costs_financial_and_actual:
     sheet_id: 1znOU1En-d0d--Ppec6xUeAxcMvUEqMMhiM1FP_A3Sqg
     sheet_name: costs_targets_mx
@@ -797,6 +803,12 @@ mexico_demand_targets_2022:
     sheet_id: 1bVwi_m_x-lxrXcx--VyPmbbqDovwbiST1vnTEXBO1FQ
     sheet_name: demand_targets_mx_2022
     clean_table_name: mexico_demand_targets_2022
+    sheet_context: for_rent
+
+mexico_ongoing_listings_targets:
+    sheet_id: 1Ij2Yek5ZZaCmSHk6xHLiLF2LqviORn3tzDrdc5hMMI8
+    sheet_name: ongoing_listings_target
+    clean_table_name: mexico_ongoing_listings_target
     sheet_context: for_rent
 
 mexico_supply_targets_2022:
