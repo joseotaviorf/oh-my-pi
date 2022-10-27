@@ -140,3 +140,6 @@ dag_dummy_pipedrive.py
 
 # build byproduct requirement file
 requirements-freeze.txt
+
+# local environment files
+local/airflow/plugins*

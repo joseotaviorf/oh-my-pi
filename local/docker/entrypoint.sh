@@ -15,7 +15,7 @@ do
   conn_extra=$(echo ${row} | jq -c ${1} '.extra[]')
 
   airflow connections -d --conn_id $conn_id
-  airflow connections -a --conn_id $conn_id --conn_type $conn_type --conn_host $conn_host --conn_login $conn_login --conn_password $conn_password --conn_extra ${conn_extra/\{DATABRICKS_TOKEN\}/$DATABRICKS_TOKEN}
+  airflow connections -a --conn_id $conn_id --conn_type $conn_type --conn_host $conn_host --conn_login $conn_login --conn_password $conn_password --conn_extra ${conn_extra/\{DATABRICKS_TOKEN\}/$1}
 done
 
 airflow variables -i $AIRFLOW_HOME/variables.json

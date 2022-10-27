@@ -25,7 +25,7 @@ git clone git@github.com:quintoandar/bi-etl-ejuice.git
 cd bi-etl-ejuice
 ```
 
-> **Note:** references to the repo path on the following topics are identified as {{BIETLEJUICE_PROJECT_PATH}}
+> **Note:** references to the repo path on the following topics are identified as `{{BIETLEJUICE_PROJECT_PATH}}`
 
 ## Local Airflow environment using Docker
 
@@ -40,23 +40,20 @@ The Airflow will run in your machine and at Databricks, thereby we can simulate 
 
 ### 1. Changing variables value
 
-Run the following command in the project root folder, replacing the placeholders
+The local Airflow environment require two authentication configs:
 
-> **Note for macOS ZSH users**: Replace `~/.bashrc` by `~/.zshrc` in the code to modify the proper file.
-
-```bash
-echo export USERNAME=$(whoami) >> ~/.bashrc
-echo export PROJECT_PATH=$(pwd) >> ~/.bashrc
-echo export GITHUB_TOKEN=<GITHUB_TOKEN> >> ~/.bashrc
-echo export DATABRICKS_TOKEN=<DATABRICKS_TOKEN> >> ~/.bashrc
-source ~/.bashrc
-```
-
-- USERNAME: name of your current user on your work station, retrievable by the command `whoami`.
-- PROJECT_PATH: full path to the {{BIETLEJUICE_PROJECT_PATH}} repository folder. Once it's your current folder, it's retrievable by the command `pwd`.
-    Example `PROJECT_PATH=/Users/amy/projects/bi-etl-ejuice`
 - GITHUB_TOKEN: personal token generated for your GitHub user. You may retrieve it in the [GitHub's tokens settings page](https://github.com/settings/tokens).
 - DATABRICKS_TOKEN: personal token generated for your Databricks user. Check [this guide](https://docs.databricks.com/dev-tools/api/latest/authentication.html) for more details of how to retrieve it.
+
+Once obtained, both configs may be set as environment variables to be used in the local test enviroment. This step may be done automatically using the Make's recipe `setup-local-variables`.
+Type the following line in your command prompt and fill up the configs requested:
+
+```bash
+make setup-local-variables
+```
+
+> If any of the variables already exist, the recipe **will not** prompt you for a new value, using the existing values instead.
+> However, **if any variable is added by you, remember to restart your shell/code editor before continuing!**
 
 ### 2. Deploying Docker local environment
 
@@ -76,6 +73,16 @@ Local environment deploys 4 services using `docker-compose`:
 >
 > - `{{BIETLEJUICE_PROJECT_PATH}}/bietlejuice/dags`
 > - `/tmp/PostgreSQL/airflow`
+
+#### Requirements files
+
+- `requirements_local_composer`
+
+  The libs inside `requirements_local_composer.txt` locally simulate the Composer environment with the same libs as disposed in the current Composer version in use by QuintoAndar Engineering team, [available here](https://cloud.google.com/composer/docs/concepts/versioning/composer-versions). Its purpose is to replicate the same static environment that we find in Composer as a test environment.
+
+- `requirements_local_custom_libs`
+
+  The `requirements_local_custom_libs.txt` file provides a flexible way to add, into the same environment, custom libs installed in environments outside Composer, like in Spark clusters. This includes libs that are being currently installed in Production pipelines using the `libs_install.sh` shell (which includes the `quintoandar-logger` lib added into the file) and custom libs added into clusters by DAGs, to be used by Spark jobs.
 
 #### 2.1 Running Airflow in Docker local environment
 

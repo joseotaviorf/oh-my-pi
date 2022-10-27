@@ -1,17 +1,35 @@
 ############# Local Airflow Docker environment #############
-.PHONY: _setup-local-environment
-_setup-local-environment:
-	@rm local/.env || true
-	@touch local/.env
-	@echo "GITHUB_TOKEN=${GITHUB_TOKEN}" >> local/.env
-	@echo "PROJECT_PATH=${PROJECT_PATH}" >> local/.env
-	@echo "USERNAME=${USERNAME}" >> local/.env
-	@echo "DATABRICKS_TOKEN=${DATABRICKS_TOKEN}" >> local/.env
+.PHONY: _clone-airflow-plugins
+_clone-airflow-plugins:
+	@rm -fR ./local/airflow/plugins || true
+	@rm -fR ./local/airflow/plugins_temp || true
+	@git clone --quiet --depth 1 https://github.com/quintoandar/airflow-plugins.git ./local/airflow/plugins_temp
+	@cp -Rf ./local/airflow/plugins_temp/quintoandar_airflow_plugins/ ./local/airflow/plugins
+	@rm -fR ./local/airflow/plugins_temp
+
+.PHONY: setup-local-variables
+setup-local-variables:
+	@echo "Setting up local variables"
+	@echo "=========="
+	@if [ -z "${GITHUB_TOKEN}" ]; then\
+		if [ -f $$HOME/.zshrc ]; then SHELL_RC="$$HOME/.zshrc"; else SHELL_RC="$$HOME/.bashrc"; fi;\
+		printf 'Enter your GitHub token \e]8;;https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\e\\[more info]\e]8;;\e\\: ';\
+		read -r GITHUB_TOKEN;\
+		echo export GITHUB_TOKEN=$$GITHUB_TOKEN >> $$SHELL_RC;\
+	fi
+	@if [ -z "${DATABRICKS_TOKEN}" ]; then\
+		if [ -f $$HOME/.zshrc ]; then SHELL_RC="$$HOME/.zshrc"; else SHELL_RC="$$HOME/.bashrc"; fi;\
+		printf 'Enter your Databricks token \e]8;;https://docs.databricks.com/dev-tools/api/latest/authentication.html#generate-a-personal-access-token\e\\[more info]\e]8;;\e\\: ';\
+		read -r DATABRICKS_TOKEN;\
+		echo export DATABRICKS_TOKEN=$$DATABRICKS_TOKEN >> $$SHELL_RC;\
+	fi
+	@echo "All variables set!"
+	@echo "~> Restart your shell to apply changes!"
 
 .PHONY: run-local-environment
 run-local-environment:
-	@make _setup-local-environment
-	@docker-compose -f local/docker/docker-compose.yml --env-file local/.env up -d --build --force-recreate
+	@make _clone-airflow-plugins
+	@docker-compose -f local/docker/docker-compose.yml up -d --build --force-recreate
 
 .PHONY: restart-local-environment
 restart-local-environment:
