@@ -1,0 +1,14 @@
+database_name: datalake_gsheets_raw
+table_name: de_para_ciq_captador
+columns:
+  name:
+    tags:
+    - PII
+    - Confidential
+  email:
+    tags:
+    - Confidential
+  cpf:
+    tags:
+    - PII
+    - Confidential

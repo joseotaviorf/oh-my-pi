@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: de_para_ciq_captador
+columns:
+  id_ciq_5a:
+    lineage:
+      - datalake_gsheets_raw.de_para_ciq_captador.id_ciq_5a
+  id_captador_cm:
+    lineage:
+      - datalake_gsheets_raw.de_para_ciq_captador.id_captador_cm
+  name:
+    lineage:
+      - datalake_gsheets_raw.de_para_ciq_captador.name
+  email:
+    lineage:
+      - datalake_gsheets_raw.de_para_ciq_captador.email
+  cpf:
+    lineage:
+      - datalake_gsheets_raw.de_para_ciq_captador.cpf
