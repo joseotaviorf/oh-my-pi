@@ -1,0 +1,59 @@
+database_name: datalake_supply_outbound_flows
+table_name: supply_outbound_contacts
+columns:
+  id_wololo_prospect:
+    lineage:
+      - datalake_wololo_clean.prospect.id
+  id_prospect_external:
+    lineage:
+      - datalake_wololo_clean.prospect.id_reference
+  id_user_dispatch:
+    lineage:
+      - datalake_braze_dispatches.webhook_owners.id_user_dispatch
+  id_user_braze:
+    lineage:
+      - datalake_braze_dispatches.webhook_owners.id_user_braze
+  id_canvas:
+    lineage:
+      - datalake_braze_dispatches.webhook_owners.id_canvas
+  id_step_canvas:
+    lineage:
+      - datalake_braze_dispatches.webhook_owners.id_step_canvas
+  canvas_name:
+    lineage:
+      - datalake_braze_details.canvas_step_details.canvas_name
+  canvas_step_name:
+    lineage:
+      - datalake_braze_details.canvas_step_details.canvas_step_name
+  phone_number:
+    lineage:
+      - datalake_wololo_clean.prospect.phone
+  mkt_origin:
+    lineage:
+      - datalake_wololo_clean.prospect.mkt_origin
+  contact_channel:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.channel
+      - datalake_wololo_prospect.prospect_calls.channel
+  contact_extra_info:
+      - datalake_jaiminho_clean.user_notifications.id
+      - datalake_jaiminho_clean.user_notifications.template
+      - datalake_jaiminho_clean.user_notifications.tags
+      - datalake_jaiminho_clean.user_notifications.status
+      - datalake_wololo_prospect.prospect_calls.id_call_analyst
+      - datalake_wololo_prospect.prospect_calls.call_output
+      - datalake_wololo_prospect.prospect_calls.call_number
+      - datalake_wololo_prospect.prospect_calls.round_number
+      - datalake_wololo_prospect.prospect_calls.round_max_tries
+      - datalake_wololo_prospect.prospect_calls.ts_round_started
+      - datalake_wololo_clean.whatsapp.optin
+  ts_webhook_sent:
+    lineage:
+      - datalake_braze_dispatches.webhook_owners.ts_webhook_sent
+  dt_prospect_created:
+    lineage:
+      - datalake_wololo_clean.prospect.ts_created
+  ts_contacted:
+    lineage:
+      - datalake_wololo_prospect.prospect_calls.ts_contacted
+      - datalake_jaiminho_clean.user_notifications.ts_sent

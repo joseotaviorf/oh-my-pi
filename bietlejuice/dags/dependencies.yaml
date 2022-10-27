@@ -2193,6 +2193,13 @@ bietlejuice.enrich_survicate:
   - bietlejuice.gsheets.support_and_service:load-clean-tenant-onboarding-keys-csat
   - bietlejuice.survicate:load-clean-surveys
 
+bietlejuice.enrich_supply_outbound_flows:
+  - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details
+  - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-owners
+  - bietlejuice.enrich_wololo_prospect:load-enrich-prospect-calls
+  - bietlejuice.jaiminho:load-clean-user-notifications
+  - bietlejuice.wololo:load-clean-whatsapp
+
 bietlejuice.enrich_support_and_service_kpis_targets:
   - bietlejuice.gsheets.support_and_service:load-clean-target-service-kpis
   - bietlejuice.gsheets.support_and_service:load-clean-target-support-kpis
