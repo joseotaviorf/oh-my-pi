@@ -33,12 +33,22 @@ SELECT
     id_partner,
     id_user,
     /*
-    If there isn't a consultant related to this listing,
-    but it was CIQ_FULL once, then it will be CIQ_FULL. 
-    puff.
+    There are some rules between what is historical on 
+    our operational database (BIG AGENT) and what should
+    be attributed on the analytcal side. They are:
+    1. If there isn't a consultant related to this listing,
+        but it was CIQ_FULL once, then it will be CIQ_FULL. 
+        puff.
+    2. We don't have a default program for agents out of 
+        these programs. In this case, it is set to "Core".
+    3. If a program is deleted or has the enrollment ended
+        (that is deleted too XD) within a listing, we
+        set it to Core too.
     */
     CASE 
         WHEN consultant_type IS NULL AND was_ciq_full THEN 'CIQ_FULL'
+        WHEN ts_enrollment_ended < ts_listing_version_end THEN 'Core'
+        WHEN consultant_type IS NULL THEN 'Core'
         ELSE consultant_type
     END AS consultant_type,
     enrollment_number,
