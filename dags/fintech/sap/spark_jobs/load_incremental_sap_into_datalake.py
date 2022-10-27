@@ -1,5 +1,6 @@
 import json
 import logging
+import urllib3
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
@@ -22,13 +23,13 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-
 from pyspark.sql.types import StructType
 
 JOB_NAME = "load_incremental_sap_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def extend_incremental_params(params: dict, execution_date: str) -> dict:
@@ -73,6 +74,13 @@ def parse_records(records: list, schema_content: str):
     df = df.toDF(*formatted_columns)
 
     return df
+
+
+def get_max_page_size(query_id, count_result_list):
+    for d in count_result_list:
+        if d["SQLQueries"] == query_id:
+            return d["odata.maxpagesize"] + 1
+    raise Exception()
 
 
 if __name__ == "__main__":
@@ -127,6 +135,12 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
 
+    count_query_code = config_service.get_config("count_lines_query_code")
+    extended_params = extend_incremental_params({}, execution_date)
+    count_result_list = sap_consumer.sync(
+        query_code=count_query_code, params=extended_params
+    )
+
     for table_name in tables:
         table_config = tables[table_name]
         query_code = table_config["query_code"]
@@ -134,8 +148,11 @@ if __name__ == "__main__":
         params = table_config.get("params", {})
 
         extended_params = extend_incremental_params(params, execution_date)
+        max_page_size = get_max_page_size(query_code, count_result_list)
 
-        records = sap_consumer.sync(query_code=query_code, params=extended_params)
+        records = sap_consumer.sync(
+            query_code=query_code, params=extended_params, max_page_size=max_page_size
+        )
 
         if records:
             try:

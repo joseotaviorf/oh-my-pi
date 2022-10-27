@@ -1,4 +1,5 @@
 ---
+count_lines_query_code: DATA-7
 tables:
   journal_entries:
     query_code: DATA-1

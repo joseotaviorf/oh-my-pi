@@ -52,7 +52,7 @@ RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/l
 CUSTOM_LIBRARIES = [
     {
         "whl": f"{artifacts_default_bucket}/sap-api-client-python/"
-        f"quintoandar_sap_api_client-0.1.0-py2.py3-none-any.whl"
+        f"quintoandar_sap_api_client-0.2.0-py2.py3-none-any.whl"
     }
 ]
 
