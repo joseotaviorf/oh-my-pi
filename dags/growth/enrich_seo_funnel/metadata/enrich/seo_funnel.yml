@@ -11,6 +11,11 @@ columns:
     lineage:
       - datalake_online_attribution.online_attribution.business_context
       - datalake_top_of_funnel_demand.user_interactions.business_context
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.city_group
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.city_group
   structure:
     lineage:
       - datalake_online_attribution.online_attribution.entrance_uri

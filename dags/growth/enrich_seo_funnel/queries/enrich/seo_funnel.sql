@@ -15,6 +15,7 @@ visit_schedule_confirmed_events AS (
         ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND event_type_sanitized = 'visit_schedule_confirmed'
         AND utm_medium = 'seo'
+        AND utm_source IN ('google', 'bing')
 ),
 debug_visit_schedule_confirmed_events AS (
     SELECT
@@ -32,6 +33,7 @@ debug_visit_schedule_confirmed_events AS (
         ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND event_type_sanitized = 'debug_visit_schedule_confirmed'
         AND utm_medium = 'seo'
+        AND utm_source IN ('google', 'bing')
 ),
 extra_debug AS (
     SELECT
@@ -95,22 +97,25 @@ amplitude_visit AS (
 ),
 tof AS (
     SELECT
-        id_tof_user AS id_user,
-        id_tof_user AS id_amplitude,
-        utm_source,
-        dt_event, 
-        entrance_uri, 
-        referrer,
-        LOWER(business_context) AS business_context,
+        ui.id_tof_user AS id_user,
+        ui.id_tof_user AS id_amplitude,
+        ui.utm_source,
+        ui.dt_event, 
+        ui.entrance_uri, 
+        ui.referrer,
+        dr.city_group,
+        LOWER(ui.business_context) AS business_context,
         TRUE AS is_tof,
         FALSE AS is_first_booking,
         FALSE AS is_booking
     FROM 
-        datalake_top_of_funnel_demand.user_interactions
+        datalake_top_of_funnel_demand.user_interactions AS ui
+        LEFT JOIN dim_region AS dr
+        ON CAST(ui.sk_region AS INT) = dr.sk_region
     WHERE 
         dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND mkt_medium LIKE '%SEO%'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 rent_booking AS (
     SELECT
@@ -120,6 +125,7 @@ rent_booking AS (
         DATE(av.ts_event) dt_event, 
         av.entrance_uri, 
         av.referrer,
+        pmmd.city_group,
         LOWER(av.business_context) AS business_context,
         FALSE AS is_tof,
         CASE 
@@ -137,7 +143,7 @@ rent_booking AS (
             ON b.sk_booking = pmmd.sk_booking
     WHERE 
         av.business_context IN ('rent', 'RENT')
-    GROUP BY 1,2,3,4,5,6,7,8,9,10
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 sale_booking AS (
 SELECT
@@ -147,6 +153,7 @@ SELECT
     DATE(av.ts_event) dt_event, 
     av.entrance_uri, 
     av.referrer,
+    pmmd.city_group,
     LOWER(av.business_context) AS business_context,
     FALSE AS is_tof,
     CASE 
@@ -164,7 +171,7 @@ SELECT
             ON b.sk_booking = pmmd.sk_booking
 WHERE 
     av.business_context IN ('sale', 'SALE')
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 aux_funnel AS (
     SELECT 
@@ -190,16 +197,18 @@ seo_funnel AS (
         dt_event, 
         t.entrance_uri, 
         t.referrer,
+        t.city_group,
         t.business_context,
         MAX(is_tof) AS is_tof,
         MAX(is_booking) AS is_booking,
         MAX(is_first_booking) AS is_first_booking
     FROM 
         aux_funnel AS t
-    GROUP BY 1,2,3,4,5,6,7
+    GROUP BY 1,2,3,4,5,6,7,8
 )
 SELECT
     COALESCE (id_user, id_amplitude) AS id_user,
+    city_group,
     business_context,
     CASE 
         WHEN 
@@ -409,4 +418,4 @@ FROM
     seo_funnel
 WHERE
     dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
