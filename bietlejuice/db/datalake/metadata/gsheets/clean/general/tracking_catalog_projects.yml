@@ -14,3 +14,15 @@ columns:
   owner:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_projects.owner
+  tracking_tool:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_projects.tracking_tool
+  lines:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_projects.lines
+  principal_metrics:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_projects.principal_metrics
+  key_concepts:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_projects.key_concepts

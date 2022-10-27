@@ -2,42 +2,54 @@
 database_name: datalake_gsheets_clean
 table_name: tracking_catalog_events_aud
 columns:
-  category:
-    lineage:
-      - datalake_gsheets_raw.events_aud.category
-  description:
-    lineage:
-      - datalake_gsheets_raw.events_aud.description
-  event_type:
-    lineage:
-      - datalake_gsheets_raw.events_aud.event_type
-  first_seen:
-    lineage:
-      - datalake_gsheets_raw.events_aud.first_seen
   id_app:
     lineage:
       - datalake_gsheets_raw.events_aud.id_app
-  last_seen:
+  category:
     lineage:
-      - datalake_gsheets_raw.events_aud.last_seen
-  owner:
+      - datalake_gsheets_raw.events_aud.category
+  event_type:
     lineage:
-      - datalake_gsheets_raw.events_aud.owner
+      - datalake_gsheets_raw.events_aud.event_type
+  business_owner:
+    lineage:
+      - datalake_gsheets_raw.events_aud.business_owner
+  technical_owner:
+    lineage:
+      - datalake_gsheets_raw.events_aud.technical_owner
+  squad_ownership:
+    lineage:
+      - datalake_gsheets_raw.events_aud.squad_ownership
   platform:
     lineage:
       - datalake_gsheets_raw.events_aud.platform
   project_name:
     lineage:
       - datalake_gsheets_raw.events_aud.project_name
-  rev_timestamp:
+  screen_image_link:
     lineage:
-      - datalake_gsheets_raw.events_aud.rev_timestamp
+      - datalake_gsheets_raw.events_aud.screen_image_link
+  status:
+    lineage:
+      - datalake_gsheets_raw.events_aud.status
+  emitting_app:
+    lineage:
+      - datalake_gsheets_raw.events_aud.emitting_app
   rev_type:
     lineage:
       - datalake_gsheets_raw.events_aud.rev_type
   rev_user:
     lineage:
       - datalake_gsheets_raw.events_aud.rev_user
-  status:
+  description:
     lineage:
-      - datalake_gsheets_raw.events_aud.status
+      - datalake_gsheets_raw.events_aud.description
+  is_key_event:
+    lineage:
+      - datalake_gsheets_raw.events_aud.is_key_event
+  first_seen:
+    lineage:
+      - datalake_gsheets_raw.events_aud.first_seen
+  last_seen:
+    lineage:
+      - datalake_gsheets_raw.events_aud.last_seen
