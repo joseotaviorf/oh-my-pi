@@ -192,6 +192,8 @@ SELECT
     ROUND(CAST(cf.qualifieds/NULLIF(cf.prospects, 0) AS FLOAT), 2) AS p2q_coincident,
     ROUND(CAST(cf.opportunities/NULLIF(cf.qualifieds, 0) AS FLOAT), 2) AS q2o_coincident,
     ROUND(CAST(cf.first_listings/NULLIF(cf.opportunities, 0) AS FLOAT), 2) AS o2fl_coincident,
+    ROUND(CAST(cf.first_listings/NULLIF(cf.qualifieds, 0) AS FLOAT), 2) AS q2fl_coincident,
+    ROUND(CAST(cf.first_listings/NULLIF(cf.prospects, 0) AS FLOAT), 2) AS p2fl_coincident,
     -- Cohort conversions
     cfl.l2p_cohort,
     cfl.p2q_cohort,

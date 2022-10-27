@@ -210,6 +210,7 @@ SELECT
     ROUND(CAST(sf.opportunities/NULLIF(sf.qualifieds, 0) AS FLOAT), 2) AS q2o_coincident,
     ROUND(CAST(sf.first_listings/NULLIF(sf.qualifieds, 0) AS FLOAT), 2) AS q2fl_coincident,
     ROUND(CAST(sf.first_listings/NULLIF(sf.opportunities, 0) AS FLOAT), 2) AS o2fl_coincident,
+    ROUND(CAST(sf.first_listings/NULLIF(sf.prospects, 0) AS FLOAT), 2) AS p2fl_coincident,
     ol.ongoing_listings,
     CAST(sct.budget_total AS FLOAT) AS budget_total_target,
     CAST(sct.budget_comission AS FLOAT) AS budget_comission_target,
