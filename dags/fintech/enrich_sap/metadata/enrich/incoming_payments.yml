@@ -1,0 +1,82 @@
+---
+database_name: datalake_sap_clean
+table_name: incoming_payments
+columns:
+  id_transaction:
+    lineage:
+      - datalake_sap_clean.incoming_payments.id_transaction
+  id_business_entity:
+    lineage:
+      - datalake_sap_clean.incoming_payments.id_business_entity
+  id_financial_entity:
+    lineage:
+      - datalake_sap_clean.incoming_payments.id_financial_entity
+  id_external_payment:
+    lineage:
+      - datalake_sap_clean.incoming_payments.id_external_payment
+  id_user_sign:
+    lineage:
+      - datalake_sap_clean.incoming_payments.id_user_sign
+  legacy_uuid:
+    lineage:
+      - datalake_sap_clean.incoming_payments.legacy_uuid
+  uuid:
+    lineage:
+      - datalake_sap_clean.incoming_payments.uuid
+  document_entry:
+    lineage:
+      - datalake_sap_clean.incoming_payments.document_entry
+  memo:
+    lineage:
+      - datalake_sap_clean.incoming_payments.memo
+  source_document_number:
+    lineage:
+      - datalake_sap_clean.incoming_payments.source_document_number
+  series:
+    lineage:
+      - datalake_sap_clean.incoming_payments.series
+  source_client:
+    lineage:
+      - datalake_sap_clean.incoming_payments.source_client
+  transaction_type:
+    lineage:
+      - datalake_sap_clean.incoming_payments.transaction_type
+  updated_by:
+    lineage:
+      - datalake_sap_clean.incoming_payments.updated_by
+  loc_total:
+    lineage:
+      - datalake_sap_clean.incoming_payments.loc_total
+  dt_document:
+    lineage:
+      - datalake_sap_clean.incoming_payments.dt_document
+  dt_accrual:
+    lineage:
+      - datalake_sap_clean.incoming_payments.dt_accrual
+  dt_tax:
+    lineage:
+      - datalake_sap_clean.incoming_payments.dt_tax
+  dt_reference:
+    lineage:
+      - datalake_sap_clean.incoming_payments.dt_reference
+  dt_due:
+    lineage:
+      - datalake_sap_clean.incoming_payments.dt_due
+  dt_created:
+    lineage:
+      - datalake_sap_clean.incoming_payments.dt_created
+  dt_updated:
+    lineage:
+      - datalake_sap_clean.incoming_payments.dt_updated
+  year:
+    lineage:
+      - datalake_sap_clean.incoming_payments.year
+  month:
+    lineage:
+      - datalake_sap_clean.incoming_payments.month
+  day:
+    lineage:
+      - datalake_sap_clean.incoming_payments.day
+  year:
+    lineage:
+      - datalake_sap_clean.incoming_payments.year

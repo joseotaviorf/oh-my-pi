@@ -1,0 +1,73 @@
+---
+database_name: datalake_sap_clean
+table_name: journal_entries
+columns:
+  id_transaction:
+    lineage:
+      - datalake_sap_clean.journal_entries.id_transaction
+  id_business_entity:
+    lineage:
+      - datalake_sap_clean.journal_entries.id_business_entity
+  id_external_payment:
+    lineage:
+      - datalake_sap_clean.journal_entries.id_external_payment
+  id_financial_entity:
+    lineage:
+      - datalake_sap_clean.journal_entries.id_financial_entity
+  id_user_sign:
+    lineage:
+      - datalake_sap_clean.journal_entries.id_user_sign
+  legacy_uuid_rsd:
+    lineage:
+      - datalake_sap_clean.journal_entries.legacy_uuid_rsd
+  uuid_rsd:
+    lineage:
+      - datalake_sap_clean.journal_entries.uuid_rsd
+  transaction_type:
+    lineage:
+      - datalake_sap_clean.journal_entries.transaction_type
+  memo:
+    lineage:
+      - datalake_sap_clean.journal_entries.memo
+  source_document_number:
+    lineage:
+      - datalake_sap_clean.journal_entries.source_document_number
+  series:
+    lineage:
+      - datalake_sap_clean.journal_entries.series
+  source_client:
+    lineage:
+      - datalake_sap_clean.journal_entries.source_client
+  updated_by:
+    lineage:
+      - datalake_sap_clean.journal_entries.updated_by
+  total_loc:
+    lineage:
+      - datalake_sap_clean.journal_entries.total_loc
+  dt_reference:
+    lineage:
+      - datalake_sap_clean.journal_entries.dt_reference
+  dt_tax:
+    lineage:
+      - datalake_sap_clean.journal_entries.dt_tax
+  dt_accrual:
+    lineage:
+      - datalake_sap_clean.journal_entries.dt_accrual
+  dt_due:
+    lineage:
+      - datalake_sap_clean.journal_entries.dt_due
+  dt_updated:
+    lineage:
+      - datalake_sap_clean.journal_entries.dt_updated
+  dt_created:
+    lineage:
+      - datalake_sap_clean.journal_entries.dt_created
+  year:
+    lineage:
+      - datalake_sap_clean.journal_entries.year
+  month:
+    lineage:
+      - datalake_sap_clean.journal_entries.month
+  day:
+    lineage:
+      - datalake_sap_clean.journal_entries.day

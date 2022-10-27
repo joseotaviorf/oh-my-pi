@@ -1,0 +1,82 @@
+---
+database_name: datalake_sap_clean
+table_name: invoices
+columns:
+  id_transaction:
+    lineage:
+      - datalake_sap_clean.invoices.id_transaction
+  id_business_entity:
+    lineage:
+      - datalake_sap_clean.invoices.id_business_entity
+  id_external_payment:
+    lineage:
+      - datalake_sap_clean.invoices.id_external_payment
+  id_financial_entity:
+    lineage:
+      - datalake_sap_clean.invoices.id_financial_entity
+  id_user_sign:
+    lineage:
+      - datalake_sap_clean.invoices.id_user_sign
+  uuid:
+    lineage:
+      - datalake_sap_clean.invoices.uuid
+  legacy_uuid:
+    lineage:
+      - datalake_sap_clean.invoices.legacy_uuid
+  id_document:
+    lineage:
+      - datalake_sap_clean.invoices.id_document
+  document_entry:
+    lineage:
+      - datalake_sap_clean.invoices.document_entry
+  memo:
+    lineage:
+      - datalake_sap_clean.invoices.memo
+  source_document_number:
+    lineage:
+      - datalake_sap_clean.invoices.source_document_number
+  series:
+    lineage:
+      - datalake_sap_clean.invoices.series
+  source_client:
+    lineage:
+      - datalake_sap_clean.invoices.source_client
+  transaction_type:
+    lineage:
+      - datalake_sap_clean.invoices.transaction_type
+  updated_by:
+    lineage:
+      - datalake_sap_clean.invoices.updated_by
+  loc_total:
+    lineage:
+      - datalake_sap_clean.invoices.loc_total
+  dt_document:
+    lineage:
+      - datalake_sap_clean.invoices.dt_document
+  dt_accrual:
+    lineage:
+      - datalake_sap_clean.invoices.dt_accrual
+  dt_tax:
+    lineage:
+      - datalake_sap_clean.invoices.dt_tax
+  dt_reference:
+    lineage:
+      - datalake_sap_clean.invoices.dt_reference
+  dt_due:
+    lineage:
+      - datalake_sap_clean.invoices.dt_due
+  dt_created:
+    lineage:
+      - datalake_sap_clean.invoices.dt_created
+  dt_updated:
+    lineage:
+      - datalake_sap_clean.invoices.dt_updated
+  year:
+    lineage:
+      - datalake_sap_clean.invoices.year
+  month:
+    lineage:
+      - datalake_sap_clean.invoices.month
+  day:
+    lineage:
+      - datalake_sap_clean.invoices.day

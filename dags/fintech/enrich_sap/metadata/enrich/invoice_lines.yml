@@ -1,0 +1,79 @@
+---
+database_name: datalake_sap_clean
+table_name: invoice_lines
+columns:
+  id_transaction:
+    lineage:
+      - datalake_sap_clean.invoice_lines.id_transaction
+  id_line:
+    lineage:
+      - datalake_sap_clean.invoice_lines.id_line
+  id_business_entity:
+    lineage:
+      - datalake_sap_clean.invoice_lines.id_business_entity
+  id_finance_entity_entry:
+    lineage:
+      - datalake_sap_clean.invoice_lines.id_finance_entity_entry
+  id_finance_entity:
+    lineage:
+      - datalake_sap_clean.invoice_lines.id_finance_entity
+  id_document:
+    lineage:
+      - datalake_sap_clean.invoice_lines.id_document
+  cost_center_code:
+    lineage:
+      - datalake_sap_clean.invoice_lines.cost_center_code
+  contra_act:
+    lineage:
+      - datalake_sap_clean.invoice_lines.contra_act
+  location_profit_code:
+    lineage:
+      - datalake_sap_clean.invoice_lines.location_profit_code
+  managerial_code:
+    lineage:
+      - datalake_sap_clean.invoice_lines.managerial_code
+  memo_line:
+    lineage:
+      - datalake_sap_clean.invoice_lines.memo_line
+  source_document_number:
+    lineage:
+      - datalake_sap_clean.invoice_lines.source_document_number
+  series:
+    lineage:
+      - datalake_sap_clean.invoice_lines.series
+  account:
+    lineage:
+      - datalake_sap_clean.invoice_lines.account
+  account_shortname:
+    lineage:
+      - datalake_sap_clean.invoice_lines.account_shortname
+  transaction_type:
+    lineage:
+      - datalake_sap_clean.invoice_lines.transaction_type
+  credit:
+    lineage:
+      - datalake_sap_clean.invoice_lines.credit
+  debit:
+    lineage:
+      - datalake_sap_clean.invoice_lines.debit
+  dt_accrual:
+    lineage:
+      - datalake_sap_clean.invoice_lines.dt_accrual
+  dt_due:
+    lineage:
+      - datalake_sap_clean.invoice_lines.dt_due
+  dt_reference:
+    lineage:
+      - datalake_sap_clean.invoice_lines.dt_reference
+  dt_tax:
+    lineage:
+      - datalake_sap_clean.invoice_lines.dt_tax
+  year:
+    lineage:
+      - datalake_sap_clean.invoice_lines.year
+  month:
+    lineage:
+      - datalake_sap_clean.invoice_lines.month
+  day:
+    lineage:
+      - datalake_sap_clean.invoice_lines.day

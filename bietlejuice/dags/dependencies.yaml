@@ -2168,6 +2168,14 @@ bietlejuice.enrich_sale_visit_hubs:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.gsheets.for_sale:load-clean-business-unit-region
 
+bietlejuice.enrich_sap:
+  - bietlejuice.sap:load-clean-incoming-payments
+  - bietlejuice.sap:load-clean-journal-entry-lines
+  - bietlejuice.sap:load-clean-invoice-lines
+  - bietlejuice.sap:load-clean-invoices
+  - bietlejuice.sap:load-clean-journal-entries
+  - bietlejuice.sap:load-clean-incoming-payments-lines
+
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
 
