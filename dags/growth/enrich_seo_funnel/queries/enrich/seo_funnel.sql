@@ -14,8 +14,6 @@ visit_schedule_confirmed_events AS (
     WHERE 
         ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND event_type_sanitized = 'visit_schedule_confirmed'
-        AND utm_medium = 'seo'
-        AND utm_source IN ('google', 'bing')
 ),
 debug_visit_schedule_confirmed_events AS (
     SELECT
@@ -32,8 +30,6 @@ debug_visit_schedule_confirmed_events AS (
     WHERE 
         ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND event_type_sanitized = 'debug_visit_schedule_confirmed'
-        AND utm_medium = 'seo'
-        AND utm_source IN ('google', 'bing')
 ),
 extra_debug AS (
     SELECT
@@ -104,6 +100,7 @@ tof AS (
         ui.entrance_uri, 
         ui.referrer,
         dr.city_group,
+        ui.mkt_origin,
         LOWER(ui.business_context) AS business_context,
         TRUE AS is_tof,
         FALSE AS is_first_booking,
@@ -115,7 +112,7 @@ tof AS (
     WHERE 
         dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND mkt_medium LIKE '%SEO%'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 rent_booking AS (
     SELECT
@@ -126,6 +123,7 @@ rent_booking AS (
         av.entrance_uri, 
         av.referrer,
         pmmd.city_group,
+        pmmd.mkt_origin,
         LOWER(av.business_context) AS business_context,
         FALSE AS is_tof,
         CASE 
@@ -143,7 +141,8 @@ rent_booking AS (
             ON b.sk_booking = pmmd.sk_booking
     WHERE 
         av.business_context IN ('rent', 'RENT')
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+        AND pmmd.mkt_medium LIKE '%SEO%'
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 sale_booking AS (
 SELECT
@@ -154,6 +153,7 @@ SELECT
     av.entrance_uri, 
     av.referrer,
     pmmd.city_group,
+    pmmd.mkt_origin,
     LOWER(av.business_context) AS business_context,
     FALSE AS is_tof,
     CASE 
@@ -171,7 +171,8 @@ SELECT
             ON b.sk_booking = pmmd.sk_booking
 WHERE 
     av.business_context IN ('sale', 'SALE')
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    AND pmmd.mkt_medium LIKE '%SEO%'
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 aux_funnel AS (
     SELECT 
@@ -198,17 +199,19 @@ seo_funnel AS (
         t.entrance_uri, 
         t.referrer,
         t.city_group,
+        t.mkt_origin,
         t.business_context,
         MAX(is_tof) AS is_tof,
         MAX(is_booking) AS is_booking,
         MAX(is_first_booking) AS is_first_booking
     FROM 
         aux_funnel AS t
-    GROUP BY 1,2,3,4,5,6,7,8
+    GROUP BY 1,2,3,4,5,6,7,8,9
 )
 SELECT
     COALESCE (id_user, id_amplitude) AS id_user,
-    city_group,
+    COALESCE(city_group, 'Not Mapped') AS city_group,
+    mkt_origin,
     business_context,
     CASE 
         WHEN 
@@ -219,7 +222,7 @@ SELECT
         WHEN 
             entrance_uri LIKE '%/regioes-atendidas%'
             OR entrance_uri LIKE '%br/condominio%'
-            OR entrance_uri LIKE '%/morar%'
+            OR entrance_uri LIKE '%br/morar%'
         THEN 'Informacional'
         WHEN 
             entrance_uri LIKE 'https://www.quintoandar.com.br/' 
@@ -418,4 +421,4 @@ FROM
     seo_funnel
 WHERE
     dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
