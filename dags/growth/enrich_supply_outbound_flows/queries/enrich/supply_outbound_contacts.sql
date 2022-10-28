@@ -186,4 +186,4 @@ LEFT JOIN
       ON ppi.phone_number = wpp.phone_number 
       AND UPPER(un.channel) = 'WHATSAPP'
 WHERE
-    bse.ts_webhook_sent BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(bse.ts_webhook_sent) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

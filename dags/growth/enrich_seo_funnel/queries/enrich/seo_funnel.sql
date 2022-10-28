@@ -12,7 +12,7 @@ visit_schedule_confirmed_events AS (
     FROM 
         datalake_online_attribution.online_attribution 
     WHERE 
-        ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND event_type_sanitized = 'visit_schedule_confirmed'
 ),
 debug_visit_schedule_confirmed_events AS (
@@ -28,7 +28,7 @@ debug_visit_schedule_confirmed_events AS (
     FROM 
         datalake_online_attribution.online_attribution 
     WHERE 
-        ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND event_type_sanitized = 'debug_visit_schedule_confirmed'
 ),
 extra_debug AS (
@@ -110,7 +110,7 @@ tof AS (
         LEFT JOIN dw_public.dim_region AS dr
         ON CAST(ui.sk_region AS INT) = dr.sk_region
     WHERE 
-        dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        DATE(dt_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND mkt_medium LIKE '%SEO%'
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 ),
@@ -420,5 +420,5 @@ SELECT
 FROM 
     seo_funnel
 WHERE
-    dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(dt_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15

@@ -49,4 +49,4 @@ LEFT JOIN wololo_round AS wr
              (wr.ts_next_round_started IS NULL AND wc.ts_contacted >= wr.ts_round_started)
          )
 WHERE
-    ts_contacted BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(ts_contacted) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
