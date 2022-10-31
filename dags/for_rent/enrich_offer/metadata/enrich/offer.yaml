@@ -106,6 +106,9 @@ columns:
     lineage:
       - datalake_godfather_clean.offer.ts_last_sent
       - datalake_godfather_clean.offer.ts_last_sent
+  ts_email_sent_to_owner:
+    lineage:
+      - datalake_firestore.rent_offer.ts_email_sent_to_owner
   ts_expired:
     lineage:
       - datalake_ebdb_clean.offer.ts_expired

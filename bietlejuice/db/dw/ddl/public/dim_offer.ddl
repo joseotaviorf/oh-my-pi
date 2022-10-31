@@ -43,13 +43,14 @@ CREATE TABLE public.dim_offer (
   tenant_pets_info VARCHAR(255),
   tenant_type VARCHAR(255),
   has_pets BOOLEAN,
-  last_updated_date TIMETAMP,
-  expiration_date TIMETAMP,
-  dt_analysis TIMETAMP,
-  dt_first_sent TIMETAMP,
-  dt_created TIMETAMP,
-  dt_updated TIMETAMP,
-  dt_timestamp TIMETAMP
+  ts_email_sent_to_owner TIMESTAMP,
+  last_updated_date TIMESTAMP,
+  expiration_date TIMESTAMP,
+  dt_analysis TIMESTAMP,
+  dt_first_sent TIMESTAMP,
+  dt_created TIMESTAMP,
+  dt_updated TIMESTAMP,
+  dt_timestamp TIMESTAMP
 );
 
 ALTER TABLE public.dim_offer OWNER TO databricks;

@@ -33,6 +33,7 @@ SELECT
     BOOLEAN(GET_JSON_OBJECT(roa.updated_message, '$.hasDraftTopics')) AS has_draft_topics,
     BOOLEAN(GET_JSON_OBJECT(roa.updated_message, '$.instantOffer')) AS is_instant_offer,
     BOOLEAN(GET_JSON_OBJECT(roa.updated_message, '$.visualized')) AS is_visualized,
+    TIMESTAMP(FROM_UNIXTIME(BIGINT(GET_JSON_OBJECT(updated_message, '$.notifications.emailSentToOwnerAt._seconds')), 'yyyy-MM-dd HH:mm:ss')) AS ts_email_sent_to_owner,
     TIMESTAMP(BIGINT(COALESCE(GET_JSON_OBJECT(roa.updated_message, '$.firstSentAt._seconds'), GET_JSON_OBJECT(roa.updated_message, '$.firstSentAt[*]._seconds')))) AS ts_first_sent,
     TIMESTAMP(BIGINT(COALESCE(GET_JSON_OBJECT(roa.updated_message, '$.lastSentDate._seconds'), GET_JSON_OBJECT(roa.updated_message, '$.lastSentDate[*]._seconds')))) AS ts_last_sent,
     TIMESTAMP(BIGINT(COALESCE(GET_JSON_OBJECT(roa.updated_message, '$.deadline._seconds'), GET_JSON_OBJECT(roa.updated_message, '$.deadline[*]._seconds')))) AS ts_deadline,

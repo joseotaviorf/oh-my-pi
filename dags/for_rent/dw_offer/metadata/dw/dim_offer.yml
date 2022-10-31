@@ -150,6 +150,9 @@ columns:
   has_pets:
     lineage:
       - datalake_offer.offer.has_pets
+  ts_email_sent_to_owner:
+    lineage:
+      - datalake_offer.offer.ts_email_sent_to_owner
   last_updated_date:
     lineage:
       - datalake_offer.offer.ts_updated

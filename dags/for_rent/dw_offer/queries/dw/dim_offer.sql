@@ -125,7 +125,8 @@ old_pre_proposal AS (
         NULL AS tenant_type,
         CAST('Other' AS VARCHAR(255)) AS type,
         NULL AS has_pets,
-        FALSE AS is_instant_offer
+        FALSE AS is_instant_offer,
+        NULL AS ts_email_sent_to_owner
     FROM
       datalake_ebdb_proposal.pre_proposal pp
     LEFT JOIN pre_proposal_aud pp_aud
@@ -167,7 +168,8 @@ new_offer AS (
         tenant_type,
         type,
         has_pets,
-        is_instant_offer
+        is_instant_offer,
+        ts_email_sent_to_owner
     FROM
         datalake_offer.offer
 ),
@@ -331,6 +333,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     o.tenant_pets_info,
     o.tenant_type,
     CAST(o.has_pets AS BOOLEAN) AS has_pets,
+    o.ts_email_sent_to_owner,
     o.last_updated_date,
     o.expiration_date,
     o.dt_analysis,

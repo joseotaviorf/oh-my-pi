@@ -87,6 +87,7 @@ firestore_offers as (
         type,
         GET_JSON_OBJECT(resident, '$.pets') AS has_pets,
         is_instant_offer,
+        ts_email_sent_to_owner,
         ts_first_sent,
         ts_last_sent
       from datalake_firestore.rent_offer fo
@@ -106,6 +107,7 @@ firestore_offers as (
     io_firestore.type,
     io_firestore.has_pets,
     io_firestore.is_instant_offer,
+    io_firestore.ts_email_sent_to_owner,
     COALESCE(bo_godfather.ts_first_sent, io_firestore.ts_first_sent) AS ts_first_sent,
     COALESCE(bo_godfather.ts_last_sent, io_firestore.ts_last_sent) AS ts_last_sent
   from offer_firestore o_firestore
@@ -149,6 +151,7 @@ select distinct
   firestore.has_pets,
   coalesce(firestore.is_instant_offer, false) as is_instant_offer,
   coalesce(bus_offer.ts_last_sent, firestore.ts_last_sent) is not null as is_offer_submitted,
+  firestore.ts_email_sent_to_owner,
   offer.ts_expired,
   analyzed.first_ts_revision as ts_analyzed,
   coalesce(bus_offer.ts_first_sent, firestore.ts_first_sent) as ts_first_sent,
