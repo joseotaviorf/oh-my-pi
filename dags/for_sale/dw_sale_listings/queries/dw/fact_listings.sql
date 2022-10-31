@@ -2,7 +2,7 @@ SELECT
   sl.id_sale_listing AS sk_sale_listing,
   sl.id_house AS sk_house,
   h.id_user AS sk_owner,
-  hslc.id_user AS sk_user_consultant,
+  CAST(hslc.id_user AS BIGINT) AS sk_user_consultant,
   h.id_region AS sk_region, 
   NULLIF(h.sale_price, 0) AS price,
   h.sale_price/h.total_area AS price_m2,
