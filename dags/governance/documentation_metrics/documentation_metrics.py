@@ -2,7 +2,7 @@ from datetime import datetime
 from pendulum import timezone
 import os
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -24,7 +24,6 @@ MAIN_SCHEDULE_INTERVAL = "0 0 * * 0"
 config_service = ConfigurationService(SOURCE)
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
@@ -33,13 +32,9 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+default_libraries = config_service.get_config("default_libraries")
+
 EXECUTION_DATE = datetime.today().strftime("%Y-%m-%d")
 
 dag = DAG(
@@ -57,7 +52,10 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
