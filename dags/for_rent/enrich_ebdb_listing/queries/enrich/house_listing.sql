@@ -431,6 +431,19 @@ house_entrance_history AS (
     AND (heh.ts_entrance_started BETWEEN COALESCE(hl.ts_listing_version_start, DATE('1922-01-01')) AND COALESCE(hl.ts_listing_version_end, DATE('2100-01-01'))
     OR COALESCE(hl.ts_listing_version_start, DATE('1922-01-01')) BETWEEN heh.ts_entrance_started AND COALESCE(heh.ts_entrance_ended, DATE('2100-01-01')))
     AND is_last_status_of_day = True
+),
+listing_business_context_relisting AS (
+    SELECT
+        id_house,
+        business_context,
+        status,
+        status_reason,
+        ts_status_started,
+        ts_status_ended
+    FROM
+        datalake_ebdb_listing.listing_business_context_status_history
+    WHERE
+        status_reason = 'RELISTING'
 )
 SELECT
     hl.id_house_listing,
@@ -445,6 +458,7 @@ SELECT
     COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
     hl_c.order_renting,
     heh.name AS who_is_living,
+    IF(lbcr.status_reason = 'RELISTING', TRUE, FALSE) AS is_early_relisting,
     hl.is_last_version,
     hl.is_exclusive,
     hl.is_originals_active,
@@ -473,3 +487,8 @@ LEFT JOIN house_listing_stranded_date AS hlsd
 LEFT JOIN house_entrance_history AS heh
     ON heh.id_house_listing = hl.id_house_listing
     AND heh.is_last_status_in_listing = True
+LEFT JOIN
+    listing_business_context_relisting AS lbcr
+        ON lbcr.id_house = hl.id_house
+            AND lbcr.ts_status_started >= hl.ts_listing_version_start
+            AND COALESCE(lbcr.ts_status_ended, CAST('2200-01-01 12:00:00' AS TIMESTAMP)) <= COALESCE(hl.ts_listing_version_end, CAST('2200-01-01 12:00:00' AS TIMESTAMP))

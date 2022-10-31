@@ -13,6 +13,7 @@ inner_dependencies:
   house_listing:
     - house_status_version_order
     - house_listing_status
+    - listing_business_context_status_history
   house_listing_status:
     - house_status_version_order
   agents_with_keys:
