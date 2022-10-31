@@ -1236,7 +1236,6 @@ bietlejuice.enrich_analyst_ranking:
 
 bietlejuice.enrich_atta:
   - bietlejuice.atta:load-clean-financing-proposal-check
-  - bietlejuice.atta:load-clean-product-info
   - bietlejuice.atta:load-clean-proposal
   - bietlejuice.atta:load-clean-users-info
 

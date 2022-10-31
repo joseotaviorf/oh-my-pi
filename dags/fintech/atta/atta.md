@@ -19,15 +19,16 @@ In datalake RAW, via full load:
 - `entidade_log`
 - `franquia`
 - `fornecedores`
+- `log_proposta_esteira`
 - `parceiro`
+- `produto`
 - `produto_esteira`
 - `proposta_itau`
 
 via incremental load:
 
-- `log_proposta_esteira`
+
 - `max_usuarios`
-- `produto`
 - `proposta`
 - `proposta_credimob_confval`
 
@@ -37,9 +38,11 @@ In datalake CLEAN, via full load:
 
 - `financing_proposal`
 - `franchise_info`
+- `log_isolve_v1`
 - `log_isolve_v2`
 - `partner_info`
 - `pre_analysis`
+- `product_info`
 - `providers_info`
 - `track_step_detail`
 
@@ -47,7 +50,5 @@ In datalake CLEAN, via full load:
 via incremental load:
 
 - `financing_proposal_check`
-- `log_isolve_v1`
 - `proposal`
-- `product_info`
 - `users_info`
