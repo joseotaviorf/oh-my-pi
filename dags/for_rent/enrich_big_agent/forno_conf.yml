@@ -6,3 +6,5 @@ inner_dependencies:
     - program
   house_rent_listing_consultant:
     - house_consultant_history
+  house_sale_listing_consultant:
+    - house_consultant_history

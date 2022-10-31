@@ -2,7 +2,8 @@ SELECT
   sl.id_sale_listing AS sk_sale_listing,
   sl.id_house AS sk_house,
   h.id_user AS sk_owner,
-  h.id_region AS sk_region,
+  hslc.id_user AS sk_user_consultant,
+  h.id_region AS sk_region, 
   NULLIF(h.sale_price, 0) AS price,
   h.sale_price/h.total_area AS price_m2,
   COALESCE(BIGINT(DATE_FORMAT(sl.ts_first_publication, 'yyyyMMdd')), -1) AS sk_first_publication_date,
@@ -33,3 +34,7 @@ FROM
 JOIN 
   datalake_ebdb_clean.house AS h
     ON sl.id_house = h.id
+LEFT JOIN
+  datalake_big_agent.house_sale_listing_consultant AS hslc
+    ON sl.id_sale_listing = hslc.id_sale_listing
+    AND hslc.is_last_ciq_on_listing = True

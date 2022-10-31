@@ -8,6 +8,9 @@ columns:
   sk_house:
     lineage:
       - datalake_ebdb_listing.listing_business_context.id_house
+  consultant_type:
+    lineage:
+      - datalake_big_agent.house_sale_listing_consultant.consultant_type
   price:
     lineage:
       - datalake_ebdb_clean.house.sale_price
@@ -44,6 +47,12 @@ columns:
   has_house_been_rented:
     lineage:
       - datalake_sale_listings.sale_listing.has_house_been_rented
+  dt_consultant_started:
+    lineage:
+      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+  ts_consultant_deleted:
+    lineage:
+      - datalake_big_agent.house_sale_listing_consultant.ts_consultant_deleted
   ts_created:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_created

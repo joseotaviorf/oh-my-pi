@@ -24,6 +24,7 @@ Produces the following output tables:
 - `house`
 - `house_consultant_history`
 - `house_rent_listing_consultant`
+- `house_sale_listing_consultant`
 - `installment`
 - `program`
 

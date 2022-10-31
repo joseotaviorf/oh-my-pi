@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS sale.dim_listing;
 CREATE TABLE sale.dim_listing (
 	sk_sale_listing BIGINT PRIMARY KEY,
 	sk_house BIGINT,
+	consultant_type VARCHAR(50),
 	price BIGINT,
 	predicted_price BIGINT,
 	status VARCHAR,
@@ -14,6 +15,8 @@ CREATE TABLE sale.dim_listing (
 	is_for_rent BOOLEAN,
 	has_active_rental_contract BOOLEAN,
 	has_house_been_rented BOOLEAN,
+	dt_consultant_started DATE,
+	ts_consultant_deleted TIMESTAMP,
 	ts_created TIMESTAMP,
 	ts_first_publication TIMESTAMP,
 	ts_last_publication TIMESTAMP,

@@ -1,6 +1,7 @@
 SELECT
   sl.id_sale_listing AS sk_sale_listing,
   lbc.id_house AS sk_house,
+  hslc.consultant_type,
   NULLIF(h.sale_price, 0) AS price,
   lbc.calculator_price AS predicted_price,
   lbc.status AS status,
@@ -13,6 +14,8 @@ SELECT
   sl.is_for_rent,
   sl.has_active_rental_contract,
   sl.has_house_been_rented,
+  hslc.dt_consultant_started,
+  hslc.ts_consultant_deleted,
   lbc.ts_created,
   lbc.ts_first_listing AS ts_first_publication,
   lbc.ts_last_listing AS ts_last_publication,
@@ -36,5 +39,9 @@ JOIN
 LEFT JOIN
   datalake_ebdb_clean.house_registration_status AS hrs
     ON hrs.id_house = lbc.id_house
+LEFT JOIN
+  datalake_big_agent.house_sale_listing_consultant AS hslc
+    ON hslc.id_sale_listing = sl.id_sale_listing
+    AND hslc.is_last_ciq_on_listing = True
 WHERE 
   lbc.business_context = 'SALE'

@@ -3,6 +3,7 @@ CREATE TABLE sale.fact_listings (
 	sk_sale_listing BIGINT PRIMARY KEY,
 	sk_house BIGINT,
 	sk_owner BIGINT,
+	sk_user_consultant BIGINT,
 	sk_region BIGINT,
 	price BIGINT,
 	price_m2 FLOAT,
