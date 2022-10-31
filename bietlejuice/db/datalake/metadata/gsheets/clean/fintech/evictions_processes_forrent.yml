@@ -8,6 +8,18 @@ columns:
   id_process:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.process_number
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.movel_number
+  id_ticket_number:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.ticket_number
+  id_sentence_number:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.sentence_number
+  id_lawsuit_against:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.lawsuit_against_number
   alert_message:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.alert_str
@@ -29,6 +41,51 @@ columns:
   off_status:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.off_status
+  status_cs:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.status_cs
+  general_comments:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.general_comments
+  judge_district:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.judge_district
+  comments_lawsuit_against:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.comments_lawsuit_against
+  ending_reason:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.ending_reason
+  informed_distribution:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.informed_distribution
+  process_comunication_status:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.process_comunication_status
+  validator_execution:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.validator_execution
+  city:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.city
+  is_cav:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.is_cav
+  is_fraud:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.is_fraud
+  is_abandonment:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.abandonment_bool
+  is_iq_comunicated:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.iq_comunicated_bool
+  is_reoccurent:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.reoccurent_bool
+  is_office_comunicated:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.office_comunicated_bool
   dt_insertion:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.insertion_date
@@ -59,6 +116,34 @@ columns:
   dt_contract_termination:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.termination_dt
+  dt_verification:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.verification_dt
+  dt_distribution_cs:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.distribution_cs_dt
+  dt_sentence_cs:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.sentence_cs_dt
+  dt_eviction_order:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.eviction_order_dt
+  dt_change_ending:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.change_ending_dt
+  dt_change_ended:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.change_ended_dt
+  dt_massive:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.massive_dt
+  dt_second_massive:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.second_massive_dt
+  dt_validity:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.validity
+
   
   
 
