@@ -293,19 +293,6 @@ databricks_10_4_max_io-general_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
-databricks_10_4_med_people_cluster:
-    <<: *cluster_anchor
-    driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.xlarge
-    autoscale:
-        max_workers: 3
-        min_workers: 1
-    spark_version: 10.4.x-scala2.12
-    aws_attributes:
-        <<: *aws_anchor
-        ebs_volume_size: 200
-        instance_profile_arn: "databricks-people"
-
 databricks_10_4_med_io-memory_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5d.2xlarge

@@ -50,7 +50,7 @@ custom_libraries = [
         "quintoandar_convenia_api_client-1.0.0-py2.py3-none-any.whl"
     }
 ]
-cluster_description = config_service.get_config("databricks_10_4_med_people_cluster")
+custom_cluster = config_service.get_config("custom_cluster")
 
 
 dag = DAG(
@@ -70,7 +70,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=cluster_description,
+    cluster_configuration=custom_cluster,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries + custom_libraries,
 )
