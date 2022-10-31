@@ -1,3 +1,5 @@
+import time
+
 import json
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
@@ -23,6 +25,11 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_amplitude_raw"
 AMPLITUDE_API_DATE_FORMAT = "%Y%m%dT%H"
+
+# Timeout between retries in seconds.
+BACKOFF_FACTOR = 5
+# Maximum number of retries for errors.
+MAX_RETRIES = 5
 
 logger = QuintoAndarLogger(JOB_NAME)
 
@@ -83,26 +90,61 @@ if __name__ == "__main__":
             )
         )
 
-        amplitude_client = AmplitudeClient(key["app_key"], key["secret_key"])
+        retry_count = 0
+        exceptions = []
+        while retry_count < MAX_RETRIES:
 
-        time_ranges_rdd = spark_client.conn.sparkContext.parallelize(time_ranges_list)
-        file_streams_responses = time_ranges_rdd.map(
-            lambda time_range: amplitude_client.get_event_data_files(*time_range)
-        ).collect()
+            try:
+                amplitude_client = AmplitudeClient(key["app_key"], key["secret_key"])
 
-        filtered_responses = list(filter(None, file_streams_responses))
+                time_ranges_rdd = spark_client.conn.sparkContext.parallelize(
+                    time_ranges_list
+                )
+                file_streams_responses = time_ranges_rdd.map(
+                    lambda time_range: amplitude_client.get_event_data_files(
+                        *time_range
+                    )
+                ).collect()
 
-        if filtered_responses:
-            events_json = []
+                filtered_responses = list(filter(None, file_streams_responses))
 
-            for file_stream in filtered_responses:
-                with ZipFile(file_stream, "r") as zip_file:
-                    events_json.extend(FileService.get_data_from_zip_file(zip_file))
+                events_json = []
+                if filtered_responses:
 
-            logger.info(
-                f"m=get_event_data_files, msg=received {len(events_json)} events."
+                    for file_stream in filtered_responses:
+                        with ZipFile(file_stream, "r") as zip_file:
+                            events_json.extend(
+                                FileService.get_data_from_zip_file(zip_file)
+                            )
+
+                    logger.info(
+                        f"m=get_event_data_files, msg=received {len(events_json)} events."
+                    )
+
+                break
+
+            except Exception as error:
+                time.sleep(retry_count * BACKOFF_FACTOR)
+
+                logger.info(
+                    "msg=fail fetch events requests, retry={}, cause={}".format(
+                        retry_count, error
+                    )
+                )
+
+                exceptions.append(error)
+
+            retry_count += 1
+
+        if retry_count == 5:
+            logger.info("msg=fail fetch events requests, max retries exception")
+
+            exceptions_message = "\n" + "\n".join(exceptions)
+            raise Exception(
+                f"Max retries achieved. Fetch events failed {MAX_RETRIES} times. Exceptions:{exceptions_message}"
             )
 
+        elif events_json:
             df = spark_client.conn.read.json(spark_context.parallelize(events_json))
             df = (
                 dataframe_service.input(df)
