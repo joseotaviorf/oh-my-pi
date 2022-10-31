@@ -1,0 +1,106 @@
+---
+database_name: datalake_crawlers_listings
+table_name: loft
+columns:
+  id_house:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.id
+  id_house_platform:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.id
+  id_neighborhood:
+    lineage:
+      - datalake_crawlers_listings.loft_region_mapping.id_neighborhood
+  3p_name:
+    lineage:
+      - datalake_crawlers_listings.loft.agency_name
+  unit_type:
+    lineage:
+      - datalake_crawlers_listings.loft.house_info
+  usage_type:
+    lineage:
+      - datalake_crawlers_listings.loft.house_info
+  property_type:
+    lineage:
+      - datalake_crawlers_listings.loft.property_type
+  contract_type:
+    lineage:
+      - datalake_crawlers_listings.loft.contract_type
+  business_type:
+    lineage:
+      - datalake_crawlers_listings.loft.status
+  city:
+    lineage:
+      - datalake_crawlers_listings.loft.address
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+  neighborhood:
+    lineage:
+      - datalake_crawlers_listings.loft_region_mapping.neighborhood
+  state:
+    lineage:
+      - datalake_crawlers_listings.loft.address
+  address:
+    lineage:
+      - datalake_crawlers_listings.loft.address
+  st_number:
+    lineage:
+      - datalake_crawlers_listings.loft.address
+  zip_code:
+    lineage:
+      - datalake_crawlers_listings.loft.address
+  lat:
+    lineage:
+      - datalake_crawlers_listings.loft.geolocation
+  lng:
+    lineage:
+      - datalake_crawlers_listings.loft.geolocation
+  floors:
+    lineage:
+      - datalake_crawlers_listings.loft.house_info
+  num_floors:
+    lineage:
+      - datalake_crawlers_listings.loft.house_info
+  total_area:
+    lineage:
+      - datalake_crawlers_listings.loft.house_info
+  bedrooms:
+    lineage:
+      - datalake_crawlers_listings.loft.house_info
+  suites:
+    lineage:
+      - datalake_crawlers_listings.loft.house_info
+  parking_spaces:
+    lineage:
+      - datalake_crawlers_listings.loft.house_info
+  bathrooms:
+    lineage:
+      - datalake_crawlers_listings.loft.house_info
+  year_built:
+    lineage:
+      - datalake_crawlers_listings.loft.house_info
+  price:
+    lineage:
+      - datalake_crawlers_listings.loft.price
+  installments_price:
+    lineage:
+      - datalake_crawlers_listings.loft.installments_price
+  condo_fee:
+    lineage:
+      - datalake_crawlers_listings.loft.price
+  iptu:
+    lineage:
+      - datalake_crawlers_listings.loft.price
+  is_3p:
+    lineage:
+      - datalake_crawlers_listings.loft.has_agency
+  is_marketplace:
+    lineage:
+      - datalake_crawlers_listings.loft.is_marketplace
+  is_platform_property:
+    lineage:
+      - datalake_crawlers_listings.loft.metadata
+  ts_created:
+    lineage:
+      - datalake_crawlers_listings.loft.ts_created

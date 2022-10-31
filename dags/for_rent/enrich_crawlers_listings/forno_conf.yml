@@ -25,6 +25,10 @@ tables:
       - year
       - month
       - day
+  - table_name: loft
+    depends_on:
+      - loft_region_mapping
+    is_incremental: false
   - table_name: loft_region_mapping
     weekday_run: 0
     is_incremental: true
