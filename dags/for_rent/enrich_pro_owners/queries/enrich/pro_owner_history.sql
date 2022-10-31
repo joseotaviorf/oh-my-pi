@@ -59,7 +59,8 @@ account_manager AS (
       AND aud_ts.ts_event > aud.ts_event
   GROUP BY 
     1,2
-)
+),
+pro_owner_base AS (
 SELECT DISTINCT
   at.id_owner,
   aud.id_account_manager,
@@ -93,5 +94,27 @@ LEFT JOIN
     AND aud.id_account_manager = am.id_account_manager
     AND at.ts_event >= am.ts_account_manager_started 
     AND at.ts_event < COALESCE(am.ts_account_manager_ended, CURRENT_TIMESTAMP())
+)
+
+SELECT
+  COALESCE(um2.id_winner_account, um.id_winner_account, po.id_owner) AS id_owner,
+  po.id_account_manager,
+  po.is_pro_owner,
+  po.is_expert,
+  po.ts_event,
+  po.ts_pro_owner_started,
+  po.ts_pro_owner_ended,
+  po.ts_account_manager_started,
+  po.ts_account_manager_ended
+FROM 
+  pro_owner_base AS po
+LEFT JOIN
+  datalake_ebdb_clean.user_merge AS um
+    ON po.id_owner = um.id_loser_account
+    AND um.status = 'MERGED'
+LEFT JOIN
+  datalake_ebdb_clean.user_merge AS um2
+    ON um.id_winner_account = um2.id_loser_account
+    AND um2.status = 'MERGED'
 WHERE
-  DATE(at.ts_event) <= DATE('{year}-{month}-{day}')
+  DATE(po.ts_event) <= DATE('{year}-{month}-{day}')
