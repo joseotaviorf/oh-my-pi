@@ -28,7 +28,7 @@ class AtlasQualityMetricsPipeline(MetadataPropagatorPipeline):
 
         return [
             {
-                "vendor": ["atlas"],
+                "vendor": ["datahub"],
                 "database_name": self.database_name,
                 "table_name": self.table_name,
                 "quality_check_status": quality_check_status,
