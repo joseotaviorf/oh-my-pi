@@ -810,6 +810,119 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.gsheets.growth:load-clean-taxonomy-crm-casa-mineira
   - bietlejuice.enrich_lost_listings:load-enrich-lost-listings
 
+bietlejuice.dw_datamarts_spark.growth_cross:
+  # Removed dependency with dw_region, dw_rent_listing_flow.fact_house_listing_flows and dw_sale_listing_flow.fact_listing_flows since dw_datamarts_cross already satisfies
+  # affiliate_acquisition_metrics
+  - bietlejuice.gsheets.growth:load-clean-provisioned-costs-import
+  # affiliate_acquisition_metrics, rent_flow_interactions
+  - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
+  - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
+  # tenant_prospect_status
+  - bietlejuice.dw_contract:load-dw-public-dim-contract
+  - bietlejuice.dw_contract:load-quintoandar-fact-contract-people
+  # rent_flow_interactions, rental_cohort_conversions, rental_marketplace_flows, sale_performance_marketing_metrics_demand
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
+  - bietlejuice.dw_house:load-quintoandar-dim-house
+  # performance_marketing_metrics_demand, pricing_rent_categorization, rent_flow_interactions,
+  # rental_cohort_conversions, rental_marketplace_flows, tenant_prospect_status, tenant_prospect_activations, user_funnel
+  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
+  # efficiency_monitor_rental, pricing_rent_categorization,
+  # rent_flow_interactions, rental_marketplace_flows, user_funnel
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+  # inbound_attendance_leads_flows, performance_marketing_cluster_promotional_bonus_costs, performance_marketing_cluster_promotional_bonus
+  # rental_performance_marketing_metrics_supply_coincident, sale_performance_marketing_metrics_supply_coincident
+  - bietlejuice.dw_lead:load-dw-public-dim-lead
+  # marketing_demand_supply_branding_costs, performance_marketing_cluster_promotional_bonus_costs,
+  # rental_performance_marketing_metrics_supply_coincident, sale_performance_marketing_metrics_supply_coincident
+  # affiliate_acquisition_metrics, marketing_demand_supply_branding_costs, performance_marketing_metrics_demand,
+  # rental_performance_marketing_metrics_supply_coincident, sale_performance_marketing_metrics_demand, sale_performance_marketing_metrics_supply_coincident
+  - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
+  # rent_flow_interactions
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.casa_mineira_crm:load-clean-house
+  - bietlejuice.dw_affiliate_costs:load-quintoandar-dim-affiliate-cost
+  - bietlejuice.dw_affiliate_costs:load-quintoandar-fact-affiliate-costs
+  - bietlejuice.dw_call:load-dw-call-dim-call-agent
+  - bietlejuice.dw_call:load-dw-call-dim-call
+  - bietlejuice.dw_call:load-dw-call-dim-call-task
+  - bietlejuice.dw_call:load-dw-call-fact-call-tasks
+  - bietlejuice.dw_call:load-dw-call-fact-calls
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-buyer-prospect-status
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent 
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
+  - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
+  - bietlejuice.dw_offer:load-dw-public-dim-offer
+  - bietlejuice.dw_proposal:load-dw-public-dim-proposal
+  - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-chat
+  - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-task
+  - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-quinto-messenger-agent
+  - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-fact-tasks
+  - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
+  - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
+  - bietlejuice.dw_user:load-dw-public-dim-user
+  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-predicted-price-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-predicted-price-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
+  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
+  - bietlejuice.gsheets.growth:load-clean-affiliates-extra-user-bonus
+  - bietlejuice.gsheets.support_and_service:load-clean-aux-check-photo-sender
+  - bietlejuice.gsheets.growth:load-clean-branding-where-is-plaquinha
+  - bietlejuice.gsheets.growth:load-clean-ciq-costs
+  - bietlejuice.gsheets.growth:load-clean-costs-targets
+  - bietlejuice.gsheets.growth:load-clean-daily-target-supply-rental
+  - bietlejuice.gsheets.for_sale:load-clean-offers-hub-central
+  - bietlejuice.gsheets.growth:load-clean-promotional-bonus-cluster-targets
+  - bietlejuice.gsheets.growth:load-clean-promotional-bonus-user-cluster-targets
+  - bietlejuice.gsheets.growth:load-clean-rental-tof-daily-targets
+  - bietlejuice.gsheets.growth:load-clean-rental-tof-weekly-targets
+  - bietlejuice.gsheets.growth:load-clean-sale-flows-targets
+  # - bietlejuice.gsheets.growth:load-clean-sale-nbp-source-targets
+  - bietlejuice.gsheets.for_sale:load-clean-secretariat-hierarchy
+  - bietlejuice.gsheets.growth:load-clean-unit-economics-amortization-curve
+  - bietlejuice.gsheets.for_sale:load-clean-sale-supply-targets
+  - bietlejuice.gsheets.for_sale:load-clean-sale-tof-daily-targets
+  - bietlejuice.gsheets.for_sale:load-clean-sale-tof-monthly-targets
+  - bietlejuice.gsheets.for_sale:load-clean-sale-tof-weekly-targets
+  # rent_flow_interactions, performance_marketing_metrics_imobiliaria_casa_mineira
+  # daily_target_volumes_supply
+  - bietlejuice.gsheets.growth:load-clean-city-share
+  - bietlejuice.gsheets.growth:load-clean-local-holidays
+  - bietlejuice.gsheets.growth:load-clean-weekday-holiday-share-supply
+  - bietlejuice.gsheets.growth:load-clean-weekday-supply-channel-share
+  - bietlejuice.gsheets.growth:load-clean-week-volumes-supply
+  # - bietlejuice.enrich_marketing_manual_daily_costs:load-enrich-daily-costs
+  - bietlejuice.gsheets.growth:load-clean-daily-target-supply-sale
+  - bietlejuice.wololo:load-clean-prospect
+  # performance_marketing_metrics_demand
+  - bietlejuice.gsheets.growth:load-clean-mkt-cost-per-source
+  - bietlejuice.gsheets.growth:load-clean-rental-ntp-source-targets
+  - bietlejuice.gsheets.growth:load-clean-rental-flows-targets
+  # - bietlejuice.gsheets:load-clean-provisioned-costs-import mysterious sheet that doesnt exist anymore, but is used in some datamarts
+  - bietlejuice.wololo:load-clean-context-discard
+  - bietlejuice.wololo:load-clean-conversion
+  # plaquinhas_users_demand
+  - bietlejuice.gsheets.growth:load-clean-plaquinhas-demand-targets
+  # performance_marketing_metrics_imobiliaria_casa_mineira
+  - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliates-cost-attributions
+  # - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate # DUPLICATED
+  # unique_supply_funnel_events, unique_supply_cohort_conversions
+  - bietlejuice.enrich_3p:load-enrich-houses-3p
+  - bietlejuice.enrich_3p:load-enrich-houses-3p-bh 
+  # unique_performance_marketing_metrics_supply_coincident
+  - bietlejuice.enrich_top_of_funnel_supply:load-enrich-top-of-funnel-supply
+  - bietlejuice.gsheets.growth:load-clean-tof-supply-targets
+
 bietlejuice.dw_datamarts_spark.support_and_service:
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
   - bietlejuice.dw_region:load-dw-public-dim-region
