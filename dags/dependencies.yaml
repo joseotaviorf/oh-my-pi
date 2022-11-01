@@ -819,10 +819,10 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
   # tenant_prospect_status
   - bietlejuice.dw_contract:load-dw-public-dim-contract
-  - bietlejuice.dw_contract:load-quintoandar-fact-contract-people
+  - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
   # rent_flow_interactions, rental_cohort_conversions, rental_marketplace_flows, sale_performance_marketing_metrics_demand
   - bietlejuice.dw_booking:load-dw-public-dim-booking
-  - bietlejuice.dw_house:load-quintoandar-dim-house
+  - bietlejuice.dw_house:load-dw-quintoandar-dim-house
   # performance_marketing_metrics_demand, pricing_rent_categorization, rent_flow_interactions,
   # rental_cohort_conversions, rental_marketplace_flows, tenant_prospect_status, tenant_prospect_activations, user_funnel
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
@@ -840,8 +840,8 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   # rent_flow_interactions
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.casa_mineira_crm:load-clean-house
-  - bietlejuice.dw_affiliate_costs:load-quintoandar-dim-affiliate-cost
-  - bietlejuice.dw_affiliate_costs:load-quintoandar-fact-affiliate-costs
+  - bietlejuice.dw_affiliate_costs:load-dw-quintoandar-dim-affiliate-cost
+  - bietlejuice.dw_affiliate_costs:load-dw-quintoandar-fact-affiliate-costs
   - bietlejuice.dw_call:load-dw-call-dim-call-agent
   - bietlejuice.dw_call:load-dw-call-dim-call
   - bietlejuice.dw_call:load-dw-call-dim-call-task
