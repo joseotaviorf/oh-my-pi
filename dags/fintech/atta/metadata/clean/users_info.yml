@@ -29,12 +29,3 @@ columns:
   ts_last_updated:
     lineage:
       - datalake_atta_raw.max_usuarios.data_ultima_atualizacao
-  year:
-    lineage:
-      - datalake_atta_raw.max_usuarios.year
-  month:
-    lineage:
-      - datalake_atta_raw.max_usuarios.month
-  day:
-    lineage:
-      - datalake_atta_raw.max_usuarios.day

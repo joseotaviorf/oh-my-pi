@@ -16,7 +16,7 @@ tables:
     extraction_type: full
     clean_table_name: log_isolve_v1
   - table_name: max_usuarios
-    extraction_type: incremental
+    extraction_type: full
     date_filter_column: data_ultima_atualizacao
     clean_table_name: users_info
   - table_name: parceiro
@@ -29,11 +29,11 @@ tables:
     extraction_type: full
     clean_table_name: track_step_detail
   - table_name: proposta
-    extraction_type: incremental
+    extraction_type: full
     date_filter_column: DtUltAtu
     clean_table_name: proposal
   - table_name: proposta_credimob_confval
-    extraction_type: incremental
+    extraction_type: full
     date_filter_column: AtualizadoEm
     clean_table_name: financing_proposal_check
   - table_name: proposta_itau
