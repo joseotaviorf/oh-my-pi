@@ -86,9 +86,13 @@ if __name__ == "__main__":
 
     id_list = consumer_list.sync(reduce_key="id")
 
-    results = consumer_analytics.sync(
-        id_values=id_list, executor_type="spark", spark_context=sc, length=1
-    )
+    chunk_size = 100
+    id_chunks = [
+        id_list[x: x + chunk_size] for x in range(0, len(id_list), chunk_size)
+    ]
+
+    raw_results = [consumer_analytics.sync(id_values=chunk, executor_type="spark", spark_context=sc, length=1) for chunk in id_chunks]
+    results = [item for sublist in raw_results for item in sublist]
 
     if identifier == "campaign":
         results = [item for sublist in results for item in sublist]

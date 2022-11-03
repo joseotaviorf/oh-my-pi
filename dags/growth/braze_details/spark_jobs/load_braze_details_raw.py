@@ -84,7 +84,8 @@ if __name__ == "__main__":
         id_list[x: x + chunk_size] for x in range(0, len(id_list), chunk_size)
     ]
 
-    results = [r for r in consumer.sync(id_values=chunk, executor_type="spark", spark_context=sc) for chunk in id_chunks]
+    raw_results = [consumer.sync(id_values=chunk, executor_type="spark", spark_context=sc) for chunk in id_chunks]
+    results = [item for sublist in raw_results for item in sublist]
 
     df = spark_client.create_dataframe(results)
     if not df.rdd.isEmpty():
