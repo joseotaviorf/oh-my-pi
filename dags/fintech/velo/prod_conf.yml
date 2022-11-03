@@ -40,7 +40,7 @@ tables:
     extraction_type: full
     is_cleaned: false
   - table_name: fiancavelo_billingtype
-    extraction_type: false
+    extraction_type: full
     is_cleaned: false
   - table_name: fiancavelo_colaborador
     extraction_type: full
@@ -97,7 +97,7 @@ tables:
     extraction_type: full
     is_cleaned: false
   - table_name: fiancavelo_paymentstatus
-    extraction_type: full 
+    extraction_type: full
     is_cleaned: false
   - table_name: fiancavelo_persondocuments
     extraction_type: full
@@ -282,6 +282,6 @@ tables:
   - table_name: velosign_template
     extraction_type: full
     is_cleaned: false
-  
+
 partition_columns: [year, month, day]
 lineage_product_database_name: velo
