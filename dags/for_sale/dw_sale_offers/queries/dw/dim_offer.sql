@@ -95,6 +95,8 @@ SELECT
 	COALESCE(ot.mkt_platform,'Not Mapped') AS mkt_platform,
 	ot.flg_branded AS is_branded,
 	eso.is_3p_supply,
+	eso.is_3p_supply_5a,
+	eso.is_3p_supply_bh,
 	eso.is_3p_demand,
 	eso.is_a_rescued_offer,
 	eso.has_used_fgts_in_payment,

@@ -39,6 +39,8 @@ SELECT
   eso.has_seller_debt_payments,
   eso.is_ccv_canceled,
   eso.is_3p_supply,
+  eso.is_3p_supply_5a,
+  eso.is_3p_supply_bh,
   eso.is_3p_demand,
   eso.is_a_rescued_ccv,
   CAST(eso.dt_sale_agreement_signed AS TIMESTAMP) AS ts_sale_agreement_signed,

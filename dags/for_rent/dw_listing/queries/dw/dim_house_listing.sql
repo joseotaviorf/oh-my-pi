@@ -186,6 +186,8 @@ house_listings AS (
         COALESCE(lbc.is_for_sale, FALSE) AS is_for_sale,
         h.has_instant_offer_enabled,
         h.is_3p_supply,
+        h.is_3p_supply_5a,
+        h.is_3p_supply_bh,
         rl.ts_administrator_changed
     FROM
         datalake_ebdb_listing.house AS h
@@ -268,6 +270,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.is_for_rent,
     hl.is_for_sale,
     hl.is_3p_supply,
+    hl.is_3p_supply_5a,
+    hl.is_3p_supply_bh,
     hlco.dt_consultant_started,
     hl.dt_last_exclusive_opted_in,
     hl.dt_last_exclusive_opted_out,

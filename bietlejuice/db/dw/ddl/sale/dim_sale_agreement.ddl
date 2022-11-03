@@ -40,6 +40,8 @@ CREATE TABLE sale.dim_sale_agreement (
     has_seller_debt_payments BOOLEAN,
     is_ccv_canceled BOOLEAN,
     is_3p_supply BOOLEAN,
+    is_3p_supply_5a BOOLEAN,
+    is_3p_supply_bh BOOLEAN,
     is_3p_demand BOOLEAN,
     is_a_rescued_ccv BOOLEAN,
     ts_sale_agreement_signed TIMESTAMP,

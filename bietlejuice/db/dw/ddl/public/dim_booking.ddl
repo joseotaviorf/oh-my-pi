@@ -65,6 +65,8 @@ create table if not exists public.dim_booking
   mkt_source varchar(255) encode lzo,
   mkt_platform varchar(255) encode lzo,
   is_3p_supply boolean,
+  is_3p_supply_5a boolean,
+  is_3p_supply_bh boolean,
   is_3p_demand boolean,
   dt_visit_follow_up timestamp without time zone encode az64,
   ts_visit_follow_up_local timestamp without time zone encode az64,

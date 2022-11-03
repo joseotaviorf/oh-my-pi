@@ -65,6 +65,8 @@ create table if not exists public.dim_house_listing
  is_for_rent boolean,
  is_for_sale boolean,
  is_3p_supply boolean,
+ is_3p_supply_5a boolean,
+ is_3p_supply_bh boolean,
  dt_consultant_started DATE,
  dt_last_exclusive_opted_in date,
  dt_last_exclusive_opted_out date,

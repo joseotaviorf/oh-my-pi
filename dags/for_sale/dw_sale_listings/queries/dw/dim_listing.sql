@@ -11,6 +11,8 @@ SELECT
   lbc.short_url,
   h.partner_3p_supply,
   h.is_3p_supply,
+  h.is_3p_supply_5a,
+  h.is_3p_supply_bh,
   sl.is_for_rent,
   sl.has_active_rental_contract,
   sl.has_house_been_rented,

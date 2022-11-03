@@ -101,6 +101,12 @@ columns:
   is_3p_supply:
     lineage:
       - datalake_offer.sale_offer.is_3p_supply
+  is_3p_supply_5a:
+    lineage:
+      - datalake_offer.sale_offer.is_3p_supply_5a
+  is_3p_supply_bh:
+    lineage:
+      - datalake_offer.sale_offer.is_3p_supply_bh
   is_3p_demand:
     lineage:
       - datalake_offer.sale_offer.is_3p_demand

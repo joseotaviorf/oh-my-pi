@@ -102,6 +102,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   CASE WHEN td.id IS NULL THEN 'Not Mapped' ELSE td.mkt_source END AS mkt_source,
   CASE WHEN td.id IS NULL THEN 'Not Mapped' ELSE td.mkt_platform END AS mkt_platform,
   b.is_3p_supply,
+  b.is_3p_supply_5a,
+  b.is_3p_supply_bh,
   b.is_3p_demand,
   b.ts_visit_fup AS dt_visit_follow_up,
   b.ts_visit_follow_up_local_tz AS ts_visit_follow_up_local,

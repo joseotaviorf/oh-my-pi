@@ -6,7 +6,7 @@ SELECT
     COALESCE(c.extracted_3p_tag, 'Unknown') AS extracted_3p_tag,
     COALESCE(c.lead_status, 'Unknown') AS lead_status,
     CASE
-        WHEN t.team_name IN ('BH Sul', 'BH Norte') THEN '3P BH'
+        WHEN UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%' OR t.team_name IN ('BH Sul', 'BH Norte') THEN '3P BH'
         ELSE '3P 5A' 
     END AS product,
     COALESCE(c.address, 'Unknown') AS address,
@@ -52,8 +52,8 @@ SELECT
     c.num_properties_for_sale,
     c.num_properties_for_rent,
     c.lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento') AS is_partner,
-    t.team_name IN ('BH Sul', 'BH Norte') AS is_3p_bh,
-    t.team_name IS NULL OR t.team_name NOT IN ('BH Sul', 'BH Norte') AS is_3p_5a,
+    UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%' OR t.team_name IN ('BH Sul', 'BH Norte') AS is_3p_bh,
+    UPPER(c.tag_real_estate_agency) NOT LIKE '%[3PBH-%]%' AND (t.team_name IS NULL OR t.team_name NOT IN ('BH Sul', 'BH Norte')) AS is_3p_5a,
     c.has_property_advertisement_online,
     c.is_correspondent_bank,
     c.is_lost,

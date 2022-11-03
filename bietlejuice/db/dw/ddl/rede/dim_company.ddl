@@ -3,7 +3,7 @@ CREATE TABLE rede.dim_company (
     sk_company BIGINT PRIMARY KEY,
     id_hubspot BIGINT,
     company_name VARCHAR,
-    tag VARCHAR,
+    "tag" VARCHAR,
     extracted_3p_tag VARCHAR,
     lead_status VARCHAR,
     product VARCHAR,

@@ -33,6 +33,8 @@ CREATE TABLE sale.dim_offer (
 	mkt_platform VARCHAR,
 	is_branded BOOLEAN,
 	is_3p_supply BOOLEAN,
+	is_3p_supply_5a BOOLEAN,
+	is_3p_supply_bh BOOLEAN,
 	is_3p_demand BOOLEAN,
 	is_a_rescued_offer BOOLEAN,
 	has_used_fgts_in_payment BOOLEAN,
