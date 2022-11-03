@@ -206,8 +206,8 @@ SELECT
     WHEN sc.is_3p_supply THEN TRUE -- After supply processor is in production, the ELSE part should be discarded.
     ELSE COALESCE(UPPER(h.internal_admin_info) LIKE '%[3P%-%]%', FALSE)
   END AS is_3p_supply,
-  UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3P-%]%' AS is_3p_supply_5a,
-  UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3PBH-%]%' AS is_3p_supply_bh,
+  COALESCE(UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3P-%]%', sc.is_3p_supply, FALSE) AS is_3p_supply_5a,
+  COALESCE(UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3PBH-%]%', FALSE) AS is_3p_supply_bh,
   (COALESCE(h.announced_by, h.id_announced_by) IS NOT NULL) AS is_imovel_v3,
   COALESCE(r_type.name = 'Restriction', FALSE) AS has_visit_restriction,
   h.has_requested_professional_photos,
