@@ -27,6 +27,7 @@ In datalake raw, via full load:
 - `fiancavelo_activation`
 - `fiancavelo_activator`
 - `fiancavelo_billet`
+- `fiancavelo_billingtype`
 - `fiancavelo_colaborador`
 - `fiancavelo_colaboradortype`
 - `fiancavelo_commission`
@@ -38,12 +39,14 @@ In datalake raw, via full load:
 - `fiancavelo_evaluationtext`
 - `fiancavelo_faixacep`
 - `fiancavelo_fianca`
+- `fiancavelo_gateway`
 - `fiancavelo_message`
 - `fiancavelo_object`
 - `fiancavelo_packtype`
 - `fiancavelo_packvalues`
 - `fiancavelo_partnertext`
 - `fiancavelo_payment`
+- `fiancavelo_paymentstatus`
 - `fiancavelo_persondocuments`
 - `fiancavelo_persontype`
 - `fiancavelo_plans`

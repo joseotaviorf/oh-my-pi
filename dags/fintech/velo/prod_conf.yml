@@ -39,6 +39,9 @@ tables:
   - table_name: fiancavelo_billet
     extraction_type: full
     is_cleaned: false
+  - table_name: fiancavelo_billingtype
+    extraction_type: false
+    is_cleaned: false
   - table_name: fiancavelo_colaborador
     extraction_type: full
     is_cleaned: false
@@ -72,6 +75,9 @@ tables:
   - table_name: fiancavelo_fianca
     extraction_type: full
     is_cleaned: false
+  - table_name: fiancavelo_gateway
+    extraction_type: full
+    is_cleaned: false
   - table_name: fiancavelo_message
     extraction_type: full
     is_cleaned: false
@@ -89,6 +95,9 @@ tables:
     is_cleaned: false
   - table_name: fiancavelo_payment
     extraction_type: full
+    is_cleaned: false
+  - table_name: fiancavelo_paymentstatus
+    extraction_type: full 
     is_cleaned: false
   - table_name: fiancavelo_persondocuments
     extraction_type: full

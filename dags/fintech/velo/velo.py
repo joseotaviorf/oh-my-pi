@@ -18,7 +18,7 @@ DAG_NAME = SOURCE
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2019, 1, 16, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_START_DATE = datetime(2022, 10, 30, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 ENV = os.environ.get("ENVIRONMENT")
 
