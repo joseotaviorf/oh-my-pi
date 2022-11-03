@@ -1,6 +1,5 @@
 import logging
 import json
-import time
 
 from argparse import ArgumentParser
 
@@ -8,53 +7,21 @@ from quintoandar_logger import QuintoAndarLogger
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
 
 from bietlejuice.base.api import APIEnum
+from bietlejuice.base.notification import SlackWebhooksEnum
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import (
-    BaseDBUtils,
-    SparkTableStorageFormat,
-    SparkDataFrameService,
-)
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.formatters import StringFormatter
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from pyspark.sql import functions
-from pyspark.sql.types import StructField, StructType, StringType
+from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
+from bietlejuice.services.gsheets_service import GsheetsService
+from bietlejuice.services.slack_service import SlackService
 
 JOB_NAME = "load_gsheets_by_context_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
-
-
-def __columns_to_alphanumeric_snake_case(df):
-    """
-    This method applies changes to dataframe column names.
-    @param df: dataframe with google sheets data.
-    @return: dataframe
-    """
-    old_columns = df.columns
-    new_columns = [
-        StringFormatter.set_alphanumeric_snake_case(column) for column in old_columns
-    ]
-    return df.toDF(*new_columns)
-
-
-def __generate_schema(data):
-    """
-    This method creates the schema from the data returned by the API.
-    @param data: list with data returned by the API.
-    @return: StructType
-    """
-    if len(data):
-        columns = data[0].keys()
-        type_array = [StructField(column_name, StringType()) for column_name in columns]
-        schema = StructType(type_array)
-        return schema
-
-    raise ValueError(f"m=__generate_schema, msg=Table {table_name} Empty!")
 
 
 def __get_auth(dbutils):
@@ -70,22 +37,27 @@ def __get_auth(dbutils):
     return credentials, scope
 
 
-def __preload_gsheet(sheet_details):
-    """
-    This method makes an API call to preload the gsheet, and then waits the amount of seconds
-    specified by sheet_details['preload_time_in_seconds']
-    @param sheet_details: dict
-    """
-    preload_client_response = client.get_data_from_sheet(
-        sheet_details["sheet_name"], sheet_details["sheet_id"]
+SLACK_MSG_HEADER = ":alert: *Gsheet ingestion failures*\n>The following sheet have errors have not been ingested on this Run."
+TIMEOUT_LIMIT = 5 * 60
+
+
+def __alert_not_ingesting_sheet(sheet_details, exeption, slack_channel):
+    msg = """:sheets: Sheet: <{}|{}> (ID: {})\n _Owner team: {}._\n\tError: ```{}```"""
+    sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_details['sheet_id']}"
+    error_trace = str(exeption).split("\n")[0]
+    # remove chars that break slack messaging and limit error msg to 150 chars
+    for bad_char in ["`", '"']:
+        error_trace = error_trace.replace(bad_char, "")
+    error_trace[slice(0, 150)]
+    msg = msg.format(
+        sheet_url,
+        sheet_details["clean_table_name"],
+        sheet_details["sheet_id"],
+        sheet_details["sheet_context"],
+        error_trace,
     )
-    logger.info(
-        f"""
-        m=__preload_gsheet, msg=Initial length of {len(preload_client_response)}. Waiting for
-        {sheet_details["preload_time_in_seconds"]} seconds to preload the gsheet {sheet_details["sheet_name"]}"
-    """
-    )
-    time.sleep(sheet_details["preload_time_in_seconds"])
+    error_list = [(SLACK_MSG_HEADER, slack_channel), (msg, slack_channel)]
+    return SlackService.send_slack_errors(error_list)
 
 
 if __name__ == "__main__":
@@ -115,17 +87,15 @@ if __name__ == "__main__":
         """
     )
 
-    # Initializing GoogleSheetsClient
+    # Initializing clients
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
     credentials, scope = __get_auth(dbutils)
-
-    client = GoogleSheetsClient(credentials, scope)
-
-    # Initializing clients
+    gsheets_client = GoogleSheetsClient(credentials, scope, timeout=TIMEOUT_LIMIT)
     spark_client = SparkClient()
+    gsheets_consumer = GsheetsConsumer(gsheets_client, spark_client)
 
     datalake_info = DatalakeMetastoreService.get_db_info(
         environment, source, datalake_bucket
@@ -139,46 +109,50 @@ if __name__ == "__main__":
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
 
-    # Preloading the gsheet, if necessary
-    if "preload_time_in_seconds" in sheet_details:
-        __preload_gsheet(sheet_details)
-
-    # API response
-    client_response = client.get_data_from_sheet(
-        sheet_details["sheet_name"], sheet_details["sheet_id"]
-    )
-    schema = __generate_schema(client_response)
-
-    df = spark_client.create_dataframe(client_response, schema=schema)
-
-    df = __columns_to_alphanumeric_snake_case(df)
-
-    df = df.withColumn("ts_load", functions.current_timestamp())
-
-    if sheet_details.get("partitioned"):
-        df = (
-            SparkDataFrameService()
-            .input(df)
-            .create_year_month_day_columns_from_dataframe_column("ts_load")
-            .output()
+    try:
+        df = gsheets_consumer.get_sheet_df(
+            sheet_details["sheet_name"],
+            sheet_details["sheet_id"],
+            sheet_details["clean_table_name"],
+            sheet_details.get("partitioned"),
+            sheet_details.get("preload_time_in_seconds"),
+        )
+        # validate data before loading
+        GsheetsService().validate_clean_query_against_raw(
+            spark_client,
+            df,
+            sheet_details.get("sheet_context"),
+            sheet_details["raw_table_name"],
+            sheet_details["clean_table_name"],
         )
 
-    # loaders
-    s3_loader = S3Loader()
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-    s3_loader.load_df(
-        df=df,
-        s3_path=f"{database_location}{table_name}",
-        format_options=format_options,
-        partitions=partitions_cols if sheet_details.get("partitioned") else None,
-    )
+        # loaders
+        s3_loader = S3Loader()
+        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+        s3_loader.load_df(
+            df=df,
+            s3_path=f"{database_location}{table_name}",
+            format_options=format_options,
+            partitions=partitions_cols if sheet_details.get("partitioned") else None,
+        )
 
-    spark_metastore_loader.update_metastore(
-        df, database_name, table_name, format_options, database_location
-    )
+        spark_metastore_loader.update_metastore(
+            df, database_name, table_name, format_options, database_location
+        )
 
-    logger.info(
-        f"""
-            m={JOB_NAME}, table_name={table_name}, msg=sheet successfully loaded!"
-        """
-    )
+        logger.info(
+            f"""
+                m={JOB_NAME}, table_name={table_name}, msg=sheet successfully loaded!"
+            """
+        )
+
+    except Exception as e:
+        slack_channel = dbutils.secrets.get(
+            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_DE_AIRFLW_DGS
+        )
+        message_sent = __alert_not_ingesting_sheet(sheet_details, e, slack_channel)
+        logger.error(
+            f"""
+                m={JOB_NAME}, table_name={table_name}, msg=Sheet was not loaded, message_sending_result={message_sent}"
+            """
+        )
