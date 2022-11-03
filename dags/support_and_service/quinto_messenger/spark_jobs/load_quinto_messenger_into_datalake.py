@@ -23,11 +23,12 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("execution_date")
+    parser.add_argument("partition_cols")
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
     execution_date = args.execution_date
-    partition_cols = ["year", "month", "day"]
+    partition_cols = json.loads(args.partition_cols)
 
     logger.info(
         f"m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, "
