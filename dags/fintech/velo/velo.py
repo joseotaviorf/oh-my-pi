@@ -10,6 +10,7 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.utils.helpers import cross_downstream
 
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -33,13 +34,16 @@ databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{{extraction_type}}_{SOURCE}_into_datalake.py"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+default_libraries = config_service.get_config("default_libraries")
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 
 CUSTOM_LIBRARIES = [
     {
@@ -65,8 +69,9 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=CUSTOM_LIBRARIES,
+    cluster_configuration=cluster_description,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -98,13 +103,14 @@ for table in tables:
         parameters.append(table.get("unixtime_measure", "date"))
         parameters.append("{{ ds }}")
 
+    raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}//load_{extraction_type}_{SOURCE}_into_datalake.py"
     partitions = partition_columns if is_incremental else None
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,
         table_name=table_name,
-        extraction_spark_job_file=RAW_SPARK_JOB_PATH.format(
+        extraction_spark_job_file=raw_spark_job_path.format(
             extraction_type=extraction_type
         ),
         raw_spark_job_extra_args=parameters,

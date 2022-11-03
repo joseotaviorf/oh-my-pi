@@ -274,16 +274,7 @@ tables:
   #   extraction_type: full
   #   is_cleaned: false
 
-  - table_name: fiancavelo_gateway
-    extraction_type: full
-    is_cleaned: false
-  - table_name: fiancavelo_paymentstatus
-    extraction_type: full
-    is_cleaned: false
   - table_name: fiancavelo_billingtype
-    extraction_type: full
-    is_cleaned: false
-  - table_name: clientes_customers
     extraction_type: full
     is_cleaned: false
 
