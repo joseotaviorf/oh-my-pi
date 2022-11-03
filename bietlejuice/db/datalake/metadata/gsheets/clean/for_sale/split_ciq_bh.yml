@@ -1,0 +1,24 @@
+database_name: datalake_gsheets_clean
+table_name: split_ciq_bh
+columns:
+  id_house_quintoandar:
+    lineage:
+      - datalake_gsheets_raw.split_ciq_bh.id_imovel_5a
+  id_ciq_quintoandar:
+    lineage:
+      - datalake_gsheets_raw.split_ciq_bh.id_ciq_5a
+  name_participant:
+    lineage:
+      - datalake_gsheets_raw.split_ciq_bh.name_participante
+  email:
+    lineage:
+      - datalake_gsheets_raw.split_ciq_bh.email
+  participant:
+    lineage:
+      - datalake_gsheets_raw.split_ciq_bh.participante
+  n_participants:
+    lineage:
+      - datalake_gsheets_raw.split_ciq_bh.n_participantes
+  perc_captation:
+    lineage:
+      - datalake_gsheets_raw.split_ciq_bh.perc_captacao
