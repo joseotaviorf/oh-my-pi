@@ -10,6 +10,7 @@ SELECT
 	tags,
 	destination,
 	template,
+	ccost AS cost_center,
 	CAST(sent_at AS TIMESTAMP) AS ts_sent,
 	CAST(created_at AS TIMESTAMP) AS ts_created,
 	CAST(updated_at AS TIMESTAMP) AS ts_updated,

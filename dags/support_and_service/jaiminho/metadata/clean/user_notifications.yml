@@ -11,7 +11,7 @@ columns:
   id_event:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.event_id
-  id_entity: 
+  id_entity:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.entity_id
   entity_name:
@@ -35,6 +35,9 @@ columns:
   template:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.template
+  cost_center:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.ccost
   ts_sent:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.sent_at
