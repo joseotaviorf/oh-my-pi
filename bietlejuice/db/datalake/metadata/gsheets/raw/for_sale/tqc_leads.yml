@@ -10,6 +10,10 @@ columns:
     tags:
       - PII
       - Confidential
+  agent_creci:
+    tags:
+      - PII
+      - Confidential
   lead_phone:
     tags:
       - Confidential

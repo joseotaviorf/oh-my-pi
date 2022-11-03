@@ -7,12 +7,24 @@ columns:
   agent_cpf:
     lineage:
       - datalake_gsheets_raw.tqc_leads.agent_cpf
+  agent_creci:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.agent_creci
+  lead_name:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.lead_name
   lead_phone:
     lineage:
       - datalake_gsheets_raw.tqc_leads.lead_phone
   lead_email:
     lineage:
       - datalake_gsheets_raw.tqc_leads.lead_email
+  agent_visits:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.agent_visits
+  lead_interest_area:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.lead_interest_area
   program_phase:
     lineage:
       - datalake_gsheets_raw.tqc_leads.program_phase
