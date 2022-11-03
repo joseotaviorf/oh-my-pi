@@ -79,7 +79,7 @@ if __name__ == "__main__":
             s3_path=f"{database_location}{datalake_table_name}",
             format_options=format_options,
             max_records_per_file=max_records_per_file,
-            partition_cols=partition_cols,
+            partitions=partition_cols,
         )
 
         spark_metastore_loader.update_metastore(
