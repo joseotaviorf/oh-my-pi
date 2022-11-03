@@ -30,7 +30,7 @@ SELECT
     NULLIF(GET_JSON_OBJECT(properties, '$.motivos_de_descarte_unificados'), '') AS unified_discard_reasons,
     NULLIF(GET_JSON_OBJECT(properties, '$.name'), '') AS name,
     NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '') AS tag_real_estate_agency,
-    NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '(?<=\\[3[P|p]\\-)(.+?)(?=\\])'), '') AS extracted_3p_tag,
+    NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') AS extracted_3p_tag,
     NULLIF(GET_JSON_OBJECT(properties, '$.origem_do_lead'), '') AS lead_origin,
     NULLIF(GET_JSON_OBJECT(properties, '$.phone'), '') AS phone,
     NULLIF(GET_JSON_OBJECT(properties, '$.tipo_de_parceria'), '') AS partnership_type,

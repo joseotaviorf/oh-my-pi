@@ -1,37 +1,38 @@
-with special_condition as (
+WITH special_condition AS (
   -- there is a known bug that creates multiple rows for some houses
-  select
+  SELECT
     hsc.id_house,
-    max(hsc.id_special_condition is not null) as is_exclusive
-  from datalake_ebdb_clean.house_special_condition hsc
-  join
-    datalake_ebdb_clean.special_condition sc
-      on sc.id = hsc.id_special_condition
-      and sc.special_condition_type = 'Exclusivity'
-      and sc.special_condition_status in ('OptedIn', 'Applied')
-  group by 1
+    max(hsc.id_special_condition IS NOT NULL) AS is_exclusive
+  FROM
+    datalake_ebdb_clean.house_special_condition AS hsc
+  JOIN
+    datalake_ebdb_clean.special_condition AS sc
+      ON sc.id = hsc.id_special_condition
+      AND sc.special_condition_type = 'Exclusivity'
+      AND sc.special_condition_status IN ('OptedIn', 'Applied')
+  GROUP BY 1
 ),
-visit_info as (
-  select
+visit_info AS (
+  SELECT
     id_house,
-    max(visit_information='AUTORIZACAO_DE_ENTRADA') as has_entry_authorization,
-    max(visit_information='PROPRIETARIO_ACOMPANHA') as is_owner_joinning,
-    max(visit_information='ESTAMOS_LIBERADOS') as is_quintoandar_authorized,
-    max(visit_information='PROPRIETARIO_PRECISA_LIBERAR') as need_owner_authorization,
-    max(visit_information='CHAVE_CAIXA_QUINTOANDAR') as has_key_box
-  from
+    max(visit_information='AUTORIZACAO_DE_ENTRADA') AS has_entry_authorization,
+    max(visit_information='PROPRIETARIO_ACOMPANHA') AS is_owner_joinning,
+    max(visit_information='ESTAMOS_LIBERADOS') AS is_quintoandar_authorized,
+    max(visit_information='PROPRIETARIO_PRECISA_LIBERAR') AS need_owner_authorization,
+    max(visit_information='CHAVE_CAIXA_QUINTOANDAR') AS has_key_box
+  FROM
     datalake_ebdb_clean.house_visit_information
-  group by 1
+  GROUP BY 1
 ),
-house_aud as (
-  select
+house_aud AS (
+  SELECT
     id_house,
-    max(rev) as REV
-  from
+    MAX(rev) AS REV
+  FROM
     datalake_ebdb_clean.house_aud
-  where
+  WHERE
     mod_status = 1
-  group by 1
+  GROUP BY 1
 ),
 supply_context AS (
   SELECT
@@ -45,29 +46,22 @@ supply_context AS (
 -- While we don't have 3P agencies included in datalake_company_clean.company, we need to find their name via HubSpot
 -- This is a temporary measure, and should be changed in 22Q3
 -- Also, the reason we are not using the enriched HubSpot tables is because they run later than this query, so we can't simplify it
-partner_agencies AS (
+partner_agencies_aux AS (
   SELECT
-    NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '(?<=\\[3[P|p]\\-)(.+?)(?=\\])'), '') AS partner_3p_supply,
-    REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', '') AS cnpj,
-    ROW_NUMBER() OVER (
-      PARTITION BY
-        REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', '')
-      ORDER BY
-        ts_updated
-      DESC
-  ) AS rw
+    NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '') AS tag,
+    REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', '') AS cnpj
   FROM
     datalake_hubspot_clean.company
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY cnpj ORDER BY ts_updated DESC) = 1 AND tag IS NOT NULL
 ),
-partner_agencies_deduplicated AS (
-    SELECT
-      partner_3p_supply,
-      cnpj
-    FROM
-        partner_agencies
-    WHERE
-      rw = 1
-      AND partner_3p_supply IS NOT NULL
+partner_agencies AS (
+  SELECT
+    tag,
+    cnpj,
+    NULLIF(REGEXP_EXTRACT(tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') AS partner_3p_supply
+  FROM
+    partner_agencies_aux
 )
 SELECT
   h.id,
@@ -133,8 +127,8 @@ SELECT
   h.admin_info,
   h.internal_admin_info,
   COALESCE(
-    pad.partner_3p_supply, -- should be replaced by company
-    NULLIF(REGEXP_EXTRACT(h.internal_admin_info, '(?<=\\[3[P|p]\\-)(.+?)(?=\\])'), '') -- should be replaced by supply processor
+    pa.partner_3p_supply, -- should be replaced by company
+    NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') -- should be replaced by supply processor
   ) AS partner_3p_supply,
   h.photo_booking_historic,
   h.default_neighborhood,
@@ -210,8 +204,10 @@ SELECT
   h.is_for_sale,
   CASE
     WHEN sc.is_3p_supply THEN TRUE -- After supply processor is in production, the ELSE part should be discarded.
-    ELSE COALESCE(UPPER(h.internal_admin_info) LIKE '%[3P-%]%', FALSE)
+    ELSE COALESCE(UPPER(h.internal_admin_info) LIKE '%[3P%-%]%', FALSE)
   END AS is_3p_supply,
+  UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3P-%]%' AS is_3p_supply_5a,
+  UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3PBH-%]%' AS is_3p_supply_bh,
   (COALESCE(h.announced_by, h.id_announced_by) IS NOT NULL) AS is_imovel_v3,
   COALESCE(r_type.name = 'Restriction', FALSE) AS has_visit_restriction,
   h.has_requested_professional_photos,
@@ -254,7 +250,7 @@ LEFT JOIN
     ON h.id_region = COALESCE(m_region.id,
                               m_region.id_macro,
                               m_region.id_city)
--- As we have several ids on House that has id_state null and would end up with no country info,
+-- AS we have several ids on House that has id_state null and would end up with no country info,
 -- this join between map_region and region attributes a country using the respective id_region
 LEFT JOIN
   datalake_region.region
@@ -306,5 +302,5 @@ LEFT JOIN
   supply_context AS sc
     ON h.id = sc.id_house
 LEFT JOIN
-  partner_agencies_deduplicated AS pad
-    ON pad.cnpj = NULLIF(REGEXP_EXTRACT(h.internal_admin_info, '(?<=\\[3[P|p]\\-)(.+?)(?=\\])'), '')
+  partner_agencies AS pa
+    ON pa.cnpj = NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')

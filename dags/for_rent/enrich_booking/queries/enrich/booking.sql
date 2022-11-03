@@ -279,7 +279,9 @@ booking_3p_demand_agent AS (
 aux_3p_supply AS (
   SELECT
     id,
-    partner_3p_supply
+    partner_3p_supply,
+    is_3p_supply_5a,
+    is_3p_supply_bh
   FROM
     datalake_ebdb_listing.house
   WHERE
@@ -450,6 +452,8 @@ base_booking AS (
     IF(bha.id IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
     IF(b3pa.id IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
     IF(a3ps.id IS NOT NULL, TRUE, FALSE) AS is_3p_supply,
+    COALESCE(a3ps.is_3p_supply_5a, FALSE) AS is_3p_supply_5a,
+    COALESCE(a3ps.is_3p_supply_bh, FALSE) AS is_3p_supply_bh,
     IF(fud.visit_type = 'VIDEO', TRUE, FALSE) AS is_virtual_visit,
     e.is_successful AS is_entrance_successful,
     (b.status = 'Cancelado') AS is_canceled,
