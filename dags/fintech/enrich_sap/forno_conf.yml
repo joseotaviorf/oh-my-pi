@@ -1,0 +1,9 @@
+---
+inner_dependencies:
+  ledger:
+    - incoming_payments_lines
+    - incoming_payments
+    - invoice_lines
+    - invoices
+    - journal_entries
+    - journal_entry_lines

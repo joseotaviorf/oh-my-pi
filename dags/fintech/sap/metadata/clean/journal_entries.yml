@@ -1,73 +1,73 @@
 ---
-database_name: datalake_sap_clean
+database_name: datalake_pas_clean
 table_name: journal_entries
 columns:
   id_transaction:
     lineage:
-      - datalake_sap_raw.journal_entries.transaction_id_transid
+      - datalake_pas_raw.journal_entries.transaction_id_transid
   id_business_entity:
     lineage:
-      - datalake_sap_raw.journal_entries.business_entity_id_ref1
+      - datalake_pas_raw.journal_entries.business_entity_id_ref1
   id_external_payment:
     lineage:
-      - datalake_sap_raw.journal_entries.external_payment_id_u_externalpaymentid
+      - datalake_pas_raw.journal_entries.external_payment_id_u_externalpaymentid
   id_financial_entity:
     lineage:
-      - datalake_sap_raw.journal_entries.financial_entity_id_ref2
+      - datalake_pas_raw.journal_entries.financial_entity_id_ref2
   id_user_sign:
     lineage:
-      - datalake_sap_raw.journal_entries.createdby_usersign
+      - datalake_pas_raw.journal_entries.createdby_usersign
   legacy_uuid_rsd:
     lineage:
-      - datalake_sap_raw.journal_entries.legacy_uuid_u_rsd_uuidsb
+      - datalake_pas_raw.journal_entries.legacy_uuid_u_rsd_uuidsb
   uuid_rsd:
     lineage:
-      - datalake_sap_raw.journal_entries.uuid_u_rsd_uuid
+      - datalake_pas_raw.journal_entries.uuid_u_rsd_uuid
   transaction_type:
     lineage:
-      - datalake_sap_raw.journal_entries.transaction_type_transtype
+      - datalake_pas_raw.journal_entries.transaction_type_transtype
   memo:
     lineage:
-      - datalake_sap_raw.journal_entries.memo
+      - datalake_pas_raw.journal_entries.memo
   source_document_number:
     lineage:
-      - datalake_sap_raw.journal_entries.number_number
+      - datalake_pas_raw.journal_entries.number_number
   series:
     lineage:
-      - datalake_sap_raw.journal_entries.series_series
+      - datalake_pas_raw.journal_entries.series_series
   source_client:
     lineage:
-      - datalake_sap_raw.journal_entries.source_client_u_sourceclient
+      - datalake_pas_raw.journal_entries.source_client_u_sourceclient
   updated_by:
     lineage:
-      - datalake_sap_raw.journal_entries.updatedby_usersign2
+      - datalake_pas_raw.journal_entries.updatedby_usersign2
   loc_total:
     lineage:
-      - datalake_sap_raw.journal_entries.loctotal
+      - datalake_pas_raw.journal_entries.loctotal
   dt_reference:
     lineage:
-      - datalake_sap_raw.journal_entries.refdate
+      - datalake_pas_raw.journal_entries.refdate
   dt_tax:
     lineage:
-      - datalake_sap_raw.journal_entries.taxdate
+      - datalake_pas_raw.journal_entries.taxdate
   dt_accrual:
     lineage:
-      - datalake_sap_raw.journal_entries.accrualdate_ref3
+      - datalake_pas_raw.journal_entries.accrualdate_ref3
   dt_due:
     lineage:
-      - datalake_sap_raw.journal_entries.duedate
+      - datalake_pas_raw.journal_entries.duedate
   dt_created:
     lineage:
-      - datalake_sap_raw.journal_entries.createdate
+      - datalake_pas_raw.journal_entries.createdate
   dt_updated:
     lineage:
-      - datalake_sap_raw.journal_entries.updatedate
+      - datalake_pas_raw.journal_entries.updatedate
   year:
     lineage:
-      - datalake_sap_raw.journal_entries.year
+      - datalake_pas_raw.journal_entries.year
   month:
     lineage:
-      - datalake_sap_raw.journal_entries.month
+      - datalake_pas_raw.journal_entries.month
   day:
     lineage:
-      - datalake_sap_raw.journal_entries.day
+      - datalake_pas_raw.journal_entries.day

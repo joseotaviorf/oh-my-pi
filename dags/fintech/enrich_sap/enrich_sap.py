@@ -3,23 +3,26 @@ from datetime import datetime
 
 import pendulum
 from airflow.models import DAG
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow import BaseDAG, BaseTaskGroup
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2022, 10, 25, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-CONTEXT = "sap"
-DAG_NAME = f"enrich_{CONTEXT}"
+SOURCE = "sap"
+CONTEXT = "pas"
+DAG_NAME = f"enrich_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 ENV = os.environ.get("ENVIRONMENT")
@@ -34,7 +37,7 @@ SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 
-cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
+cluster_description = config_service.get_config("databricks_10_4_min_io-memory_cluster")
 default_libraries = config_service.get_config("default_libraries")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
@@ -43,6 +46,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
+inner_dependencies = config_service.get_config("inner_dependencies")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -85,9 +89,25 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     target_database_base_name=CONTEXT,
 )
 
-create_cluster_task.set_downstream(
-    DatalakeTaskGroup.all_first_tasks(enrich_task_groups)
+
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=inner_dependencies,
 )
-terminate_cluster_task.set_upstream(
-    DatalakeTaskGroup.all_last_tasks(enrich_task_groups)
+
+
+chain(
+    create_cluster_task,
+    BaseTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
+    + BaseTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
+)
+
+chain(
+    BaseTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + BaseTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
 )

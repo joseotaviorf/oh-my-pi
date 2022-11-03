@@ -1,79 +1,79 @@
 ---
-database_name: datalake_sap_clean
+database_name: datalake_pas_clean
 table_name: invoice_lines
 columns:
   id_transaction:
     lineage:
-      - datalake_sap_raw.invoice_lines.transaction_id_transid
+      - datalake_pas_raw.invoice_lines.transaction_id_transid
   id_line:
     lineage:
-      - datalake_sap_raw.invoice_lines.line_id_line_id
+      - datalake_pas_raw.invoice_lines.line_id_line_id
   id_business_entity:
     lineage:
-      - datalake_sap_raw.invoice_lines.business_entity_id_u_businessentityid
+      - datalake_pas_raw.invoice_lines.business_entity_id_u_businessentityid
   id_finance_entity_entry:
     lineage:
-      - datalake_sap_raw.invoice_lines.finance_entity_entry_id_u_financeentityentryid
+      - datalake_pas_raw.invoice_lines.finance_entity_entry_id_u_financeentityentryid
   id_finance_entity:
     lineage:
-      - datalake_sap_raw.invoice_lines.financial_entity_id_u_financeentityid
+      - datalake_pas_raw.invoice_lines.financial_entity_id_u_financeentityid
   id_document:
     lineage:
-      - datalake_sap_raw.invoice_lines.document
+      - datalake_pas_raw.invoice_lines.document
   cost_center_code:
     lineage:
-      - datalake_sap_raw.invoice_lines.cost_center_ocrcode2
+      - datalake_pas_raw.invoice_lines.cost_center_ocrcode2
   contra_act:
     lineage:
-      - datalake_sap_raw.invoice_lines.contraact_contraact
+      - datalake_pas_raw.invoice_lines.contraact_contraact
   location_profit_code:
     lineage:
-      - datalake_sap_raw.invoice_lines.location_profitcode
+      - datalake_pas_raw.invoice_lines.location_profitcode
   managerial_code:
     lineage:
-      - datalake_sap_raw.invoice_lines.managerial_ocrcode3
+      - datalake_pas_raw.invoice_lines.managerial_ocrcode3
   memo_line:
     lineage:
-      - datalake_sap_raw.invoice_lines.memo_linememo
+      - datalake_pas_raw.invoice_lines.memo_linememo
   source_document_number:
     lineage:
-      - datalake_sap_raw.invoice_lines.number_number
+      - datalake_pas_raw.invoice_lines.number_number
   series:
     lineage:
-      - datalake_sap_raw.invoice_lines.series_series
+      - datalake_pas_raw.invoice_lines.series_series
   account:
     lineage:
-      - datalake_sap_raw.invoice_lines.account_account
+      - datalake_pas_raw.invoice_lines.account_account
   account_shortname:
     lineage:
-      - datalake_sap_raw.invoice_lines.account_shortname
+      - datalake_pas_raw.invoice_lines.account_shortname
   transaction_type:
     lineage:
-      - datalake_sap_raw.invoice_lines.transaction_type_transtype
+      - datalake_pas_raw.invoice_lines.transaction_type_transtype
   credit:
     lineage:
-      - datalake_sap_raw.invoice_lines.credit
+      - datalake_pas_raw.invoice_lines.credit
   debit:
     lineage:
-      - datalake_sap_raw.invoice_lines.debit
+      - datalake_pas_raw.invoice_lines.debit
   dt_accrual:
     lineage:
-      - datalake_sap_raw.invoice_lines.accrualdate_u_accrualdate
+      - datalake_pas_raw.invoice_lines.accrualdate_u_accrualdate
   dt_due:
     lineage:
-      - datalake_sap_raw.invoice_lines.duedate
+      - datalake_pas_raw.invoice_lines.duedate
   dt_reference:
     lineage:
-      - datalake_sap_raw.invoice_lines.refdate
+      - datalake_pas_raw.invoice_lines.refdate
   dt_tax:
     lineage:
-      - datalake_sap_raw.invoice_lines.taxdate
+      - datalake_pas_raw.invoice_lines.taxdate
   year:
     lineage:
-      - datalake_sap_raw.invoice_lines.year
+      - datalake_pas_raw.invoice_lines.year
   month:
     lineage:
-      - datalake_sap_raw.invoice_lines.month
+      - datalake_pas_raw.invoice_lines.month
   day:
     lineage:
-      - datalake_sap_raw.invoice_lines.day
+      - datalake_pas_raw.invoice_lines.day

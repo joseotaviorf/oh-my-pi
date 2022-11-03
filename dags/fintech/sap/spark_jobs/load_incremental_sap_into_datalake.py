@@ -80,6 +80,7 @@ def get_max_page_size(query_id, count_result_list):
     for d in count_result_list:
         if d["SQLQueries"] == query_id:
             return d["odata.maxpagesize"] + 1
+    logger.error(f"m=get_max_page_size, msg=Did not find lines count for {query_id} query code.")
     raise Exception()
 
 
@@ -96,7 +97,7 @@ if __name__ == "__main__":
     source = args.source
     execution_date = args.execution_date
 
-    config_service = ConfigurationService(source)
+    config_service = ConfigurationService(source[::-1])
     tables = config_service.get_config("tables")
     partitions_cols = config_service.get_config("partition_cols")
 

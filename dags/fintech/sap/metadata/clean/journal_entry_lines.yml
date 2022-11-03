@@ -1,76 +1,76 @@
 ---
-database_name: datalake_sap_clean
+database_name: datalake_pas_clean
 table_name: journal_entry_lines
 columns:
   id_transaction:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.transaction_id_transid
+      - datalake_pas_raw.journal_entry_lines.transaction_id_transid
   id_line:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.line_id_line_id
+      - datalake_pas_raw.journal_entry_lines.line_id_line_id
   id_business_entity:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.business_entity_id_ref1
+      - datalake_pas_raw.journal_entry_lines.business_entity_id_ref1
   id_finance_entity_entry:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.finance_entity_entry_id_u_financeentityentryid
+      - datalake_pas_raw.journal_entry_lines.finance_entity_entry_id_u_financeentityentryid
   id_finance_entity:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.finance_entity_id_ref2
+      - datalake_pas_raw.journal_entry_lines.finance_entity_id_ref2
   cost_center_code:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.cost_center_ocrcode2
+      - datalake_pas_raw.journal_entry_lines.cost_center_ocrcode2
   contra_act:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.contraact_contraact
+      - datalake_pas_raw.journal_entry_lines.contraact_contraact
   location_profit_code:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.location_profitcode
+      - datalake_pas_raw.journal_entry_lines.location_profitcode
   managerial_code:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.managerial_ocrcode3
+      - datalake_pas_raw.journal_entry_lines.managerial_ocrcode3
   memo_line:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.memo_linememo
+      - datalake_pas_raw.journal_entry_lines.memo_linememo
   source_document_number:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.number_number
+      - datalake_pas_raw.journal_entry_lines.number_number
   series:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.series_series
+      - datalake_pas_raw.journal_entry_lines.series_series
   account:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.account_account
+      - datalake_pas_raw.journal_entry_lines.account_account
   account_shortname:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.account_shortname
+      - datalake_pas_raw.journal_entry_lines.account_shortname
   transaction_type:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.transaction_type_transtype
+      - datalake_pas_raw.journal_entry_lines.transaction_type_transtype
   credit:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.credit
+      - datalake_pas_raw.journal_entry_lines.credit
   debit:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.debit
+      - datalake_pas_raw.journal_entry_lines.debit
   dt_accrual:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.accrualdate_ref3line
+      - datalake_pas_raw.journal_entry_lines.accrualdate_ref3line
   dt_due:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.duedate
+      - datalake_pas_raw.journal_entry_lines.duedate
   dt_reference:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.refdate
+      - datalake_pas_raw.journal_entry_lines.refdate
   dt_tax:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.taxdate
+      - datalake_pas_raw.journal_entry_lines.taxdate
   year:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.year
+      - datalake_pas_raw.journal_entry_lines.year
   month:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.month
+      - datalake_pas_raw.journal_entry_lines.month
   day:
     lineage:
-      - datalake_sap_raw.journal_entry_lines.day
+      - datalake_pas_raw.journal_entry_lines.day

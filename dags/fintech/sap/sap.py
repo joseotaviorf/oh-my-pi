@@ -16,7 +16,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 # dag vars
 SOURCE = "sap"
-CONTEXT = SOURCE
+CONTEXT = "pas"
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(SOURCE)
@@ -47,7 +47,7 @@ MAIN_START_DATE = datetime(2022, 8, 8, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_incremental_{CONTEXT}_into_datalake.py"
+RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_incremental_{SOURCE}_into_datalake.py"
 
 CUSTOM_LIBRARIES = [
     {
@@ -86,7 +86,7 @@ task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
-    relative_query_path=CONTEXT,
+    relative_query_path=SOURCE,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=athena_query_results_bucket,
 )
@@ -96,6 +96,7 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     target_database_base_name=CONTEXT,
     extraction_spark_job_file=RAW_SPARK_JOB_PATH,
     raw_spark_job_extra_args=[CONTEXT, "{{ ds }}"],
+    has_hive_sync=False,
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(

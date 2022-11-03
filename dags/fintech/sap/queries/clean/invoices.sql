@@ -15,18 +15,18 @@ SELECT
     transaction_type_transtype AS transaction_type,
     updatedby_usersign2 AS updated_by,
     loctotal AS loc_total,
-    docdate AS dt_document,
-    accrualdate_u_accrualdate AS dt_accrual,
-    taxdate AS dt_tax,
-    refdate AS dt_reference,
-    duedate AS dt_due,
-    createdate AS dt_created,
-    updatedate AS dt_updated,
+    TO_DATE(docdate, 'yyyyMMdd') AS dt_document,
+    TO_DATE(accrualdate_u_accrualdate, 'yyyyMMdd') AS dt_accrual,
+    TO_DATE(taxdate, 'yyyyMMdd') AS dt_tax,
+    TO_DATE(refdate, 'yyyyMMdd') AS dt_reference,
+    TO_DATE(duedate, 'yyyyMMdd') AS dt_due,
+    TO_DATE(createdate, 'yyyyMMdd') AS dt_created,
+    TO_DATE(updatedate, 'yyyyMMdd') AS dt_updated,
     year,
     month,
     day
 FROM
-    datalake_sap_raw.invoices
+    datalake_pas_raw.invoices
 WHERE
     year = {year}
     AND month = {month}

@@ -1,82 +1,82 @@
 ---
-database_name: datalake_sap_clean
+database_name: datalake_pas_clean
 table_name: invoices
 columns:
   id_transaction:
     lineage:
-      - datalake_sap_raw.invoices.transaction_id_transid
+      - datalake_pas_raw.invoices.transaction_id_transid
   id_business_entity:
     lineage:
-      - datalake_sap_raw.invoices.business_entity_id_numatcard
+      - datalake_pas_raw.invoices.business_entity_id_numatcard
   id_external_payment:
     lineage:
-      - datalake_sap_raw.invoices.external_payment_id_u_externalpaymentid
+      - datalake_pas_raw.invoices.external_payment_id_u_externalpaymentid
   id_financial_entity:
     lineage:
-      - datalake_sap_raw.invoices.financial_entity_id_u_financeentityid
+      - datalake_pas_raw.invoices.financial_entity_id_u_financeentityid
   id_user_sign:
     lineage:
-      - datalake_sap_raw.invoices.createdby_usersign
+      - datalake_pas_raw.invoices.createdby_usersign
   uuid:
     lineage:
-      - datalake_sap_raw.invoices.uuid_u_rsd_uuid
+      - datalake_pas_raw.invoices.uuid_u_rsd_uuid
   legacy_uuid:
     lineage:
-      - datalake_sap_raw.invoices.legacy_uuid_u_rsd_uuidsb
+      - datalake_pas_raw.invoices.legacy_uuid_u_rsd_uuidsb
   id_document:
     lineage:
-      - datalake_sap_raw.invoices.document
+      - datalake_pas_raw.invoices.document
   document_entry:
     lineage:
-      - datalake_sap_raw.invoices.docentry
+      - datalake_pas_raw.invoices.docentry
   memo:
     lineage:
-      - datalake_sap_raw.invoices.memo
+      - datalake_pas_raw.invoices.memo
   source_document_number:
     lineage:
-      - datalake_sap_raw.invoices.number_number
+      - datalake_pas_raw.invoices.number_number
   series:
     lineage:
-      - datalake_sap_raw.invoices.series_series
+      - datalake_pas_raw.invoices.series_series
   source_client:
     lineage:
-      - datalake_sap_raw.invoices.source_client_u_sourceclient
+      - datalake_pas_raw.invoices.source_client_u_sourceclient
   transaction_type:
     lineage:
-      - datalake_sap_raw.invoices.transaction_type_transtype
+      - datalake_pas_raw.invoices.transaction_type_transtype
   updated_by:
     lineage:
-      - datalake_sap_raw.invoices.updatedby_usersign2
+      - datalake_pas_raw.invoices.updatedby_usersign2
   loc_total:
     lineage:
-      - datalake_sap_raw.invoices.loctotal
+      - datalake_pas_raw.invoices.loctotal
   dt_document:
     lineage:
-      - datalake_sap_raw.invoices.docdate
+      - datalake_pas_raw.invoices.docdate
   dt_accrual:
     lineage:
-      - datalake_sap_raw.invoices.accrualdate_u_accrualdate
+      - datalake_pas_raw.invoices.accrualdate_u_accrualdate
   dt_tax:
     lineage:
-      - datalake_sap_raw.invoices.taxdate
+      - datalake_pas_raw.invoices.taxdate
   dt_reference:
     lineage:
-      - datalake_sap_raw.invoices.refdate
+      - datalake_pas_raw.invoices.refdate
   dt_due:
     lineage:
-      - datalake_sap_raw.invoices.duedate
+      - datalake_pas_raw.invoices.duedate
   dt_created:
     lineage:
-      - datalake_sap_raw.invoices.createdate
+      - datalake_pas_raw.invoices.createdate
   dt_updated:
     lineage:
-      - datalake_sap_raw.invoices.updatedate
+      - datalake_pas_raw.invoices.updatedate
   year:
     lineage:
-      - datalake_sap_raw.invoices.year
+      - datalake_pas_raw.invoices.year
   month:
     lineage:
-      - datalake_sap_raw.invoices.month
+      - datalake_pas_raw.invoices.month
   day:
     lineage:
-      - datalake_sap_raw.invoices.day
+      - datalake_pas_raw.invoices.day

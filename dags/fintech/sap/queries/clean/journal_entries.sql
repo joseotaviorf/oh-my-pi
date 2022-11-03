@@ -13,17 +13,17 @@ SELECT
     source_client_u_sourceclient AS source_client,
     CAST(updatedby_usersign2 AS INT) AS updated_by,
     loctotal AS total_loc,
-    refdate AS dt_reference,
-    taxdate AS dt_tax,
-    accrualdate_ref3 AS dt_accrual,
-    duedate AS dt_due,
-    updatedate AS dt_updated,
-    createdate AS dt_created,
+    TO_DATE(refdate, 'yyyyMMdd') AS dt_reference,
+    TO_DATE(taxdate, 'yyyyMMdd') AS dt_tax,
+    TO_DATE(accrualdate_ref3, 'yyyyMMdd') AS dt_accrual,
+    TO_DATE(duedate, 'yyyyMMdd') AS dt_due,
+    TO_DATE(updatedate, 'yyyyMMdd') AS dt_updated,
+    TO_DATE(createdate, 'yyyyMMdd') AS dt_created,
     year,
     month,
     day
 FROM
-    datalake_sap_raw.journal_entries
+    datalake_pas_raw.journal_entries
 WHERE
     year = {year}
     AND month = {month}

@@ -1,0 +1,105 @@
+---
+database_name: datalake_pas
+table_name: ledger
+columns:
+  id_transaction:
+    lineage:
+      - datalake_pas.journal_entries.id_transaction
+      - datalake_pas.invoices.id_transaction
+      - datalake_pas.incoming_payments.id_transaction
+  id_business_entity:
+    lineage:
+      - datalake_pas.journal_entries.id_business_entity
+      - datalake_pas.invoices.id_business_entity
+      - datalake_pas.incoming_payments.id_business_entity
+  id_finance_entity:
+    lineage:
+      - datalake_pas.journal_entry_lines.id_finance_entity
+      - datalake_pas.invoice_lines.id_finance_entity
+      - datalake_pas.incoming_payments_lines.id_finance_entity
+  id_finance_entity_entry:
+    lineage:
+      - datalake_pas.journal_entry_lines.id_finance_entity_entry
+      - datalake_pas.invoice_lines.id_finance_entity_entry
+      - datalake_pas.incoming_payments_lines.id_finance_entity_entry
+  id_external_payment:
+    lineage:
+      - datalake_pas.journal_entries.id_external_payment
+      - datalake_pas.invoices.id_external_payment
+      - datalake_pas.incoming_payments.id_external_payment
+  id_document:
+    lineage:
+      - datalake_pas.invoice_lines.id_document
+      - datalake_pas.incoming_payments_lines.id_document
+  account_number:
+    lineage:
+      - datalake_pas.journal_entry_lines.account
+      - datalake_pas.invoice_lines.account
+      - datalake_pas.incoming_payments_lines.account
+  account_name:
+    lineage:
+      - datalake_pas.journal_entry_lines.account
+      - datalake_pas.invoice_lines.account
+      - datalake_pas.incoming_payments_lines.account
+  series:
+    lineage:
+      - datalake_pas.journal_entries.series
+      - datalake_pas.invoices.series
+      - datalake_pas.incoming_payments.series
+  document_number:
+    lineage:
+      - datalake_pas.journal_entries.transaction_type
+      - datalake_pas.invoices.transaction_type
+      - datalake_pas.incoming_payments.transaction_type
+      - datalake_pas.journal_entries.source_document_number
+      - datalake_pas.invoices.source_document_number
+      - datalake_pas.incoming_payments.source_document_number
+  comments:
+    lineage:
+      - datalake_pas.journal_entry_lines.memo_line
+      - datalake_pas.invoice_lines.memo_line
+      - datalake_pas.incoming_payments_lines.memo_line
+  debit_credit:
+    lineage:
+      - datalake_pas.journal_entry_lines.debit
+      - datalake_pas.invoice_lines.debit
+      - datalake_pas.incoming_payments_lines.debit
+      - datalake_pas.journal_entry_lines.credit
+      - datalake_pas.invoice_lines.credit
+      - datalake_pas.incoming_payments_lines.credit
+  created_by:
+    lineage:
+      - datalake_pas.journal_entries.id_user_sign
+      - datalake_pas.invoices.id_user_sign
+      - datalake_pas.incoming_payments.id_user_sign
+  location_profit_code:
+    lineage:
+      - datalake_pas.journal_entry_lines.location_profit_code
+      - datalake_pas.invoice_lines.location_profit_code
+      - datalake_pas.incoming_payments_lines.location_profit_code
+  cost_center_code:
+    lineage:
+      - datalake_pas.journal_entry_lines.cost_center_code
+      - datalake_pas.invoice_lines.cost_center_code
+      - datalake_pas.incoming_payments_lines.cost_center_code
+  uuid:
+    lineage:
+      - datalake_pas.journal_entries.uuid
+      - datalake_pas.invoices.uuid
+      - datalake_pas.incoming_payments.uuid
+  dt_reference:
+    lineage:
+      - datalake_pas.journal_entries.dt_reference
+      - datalake_pas.invoices.dt_reference
+      - datalake_pas.incoming_payments.dt_reference
+  dt_due:
+    lineage:
+      - datalake_pas.journal_entries.dt_due
+      - datalake_pas.invoices.dt_due
+      - datalake_pas.incoming_payments.dt_due
+  dt_accrual:
+    lineage:
+      - datalake_pas.journal_entries.dt_accrual
+      - datalake_pas.invoices.dt_accrual
+      - datalake_pas.incoming_payments.dt_accrual
+

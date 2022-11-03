@@ -16,15 +16,15 @@ SELECT
     transaction_type_transtype AS transaction_type,
     credit,
     debit,
-    accrualdate_ref3line AS dt_accrual,
-    duedate AS dt_due,
-    refdate AS dt_reference,
-    taxdate AS dt_tax,
+    TO_DATE(accrualdate_ref3line, 'yyyyMMdd') AS dt_accrual,
+    TO_DATE(duedate, 'yyyyMMdd') AS dt_due,
+    TO_DATE(refdate, 'yyyyMMdd') AS dt_reference,
+    TO_DATE(taxdate, 'yyyyMMdd') AS dt_tax,
     year,
     month,
     day
 FROM
-    datalake_sap_raw.journal_entry_lines
+    datalake_pas_raw.journal_entry_lines
 WHERE
     year = {year}
     AND month = {month}

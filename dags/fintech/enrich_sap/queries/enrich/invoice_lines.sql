@@ -4,7 +4,7 @@ WITH cte_most_recent AS (
         id_line,
         MAX(MAKE_DATE(year, month, day)) AS dt_last_updated
     FROM
-        datalake_sap_clean.invoice_lines
+        datalake_pas_clean.invoice_lines
     GROUP BY 1, 2
 )
 
@@ -35,7 +35,7 @@ SELECT
     t1.month,
     t1.day
 FROM
-    datalake_sap_clean.invoice_lines AS t1
+    datalake_pas_clean.invoice_lines AS t1
 RIGHT JOIN
     cte_most_recent AS cte
     ON cte.id_transaction = t1.id_transaction
