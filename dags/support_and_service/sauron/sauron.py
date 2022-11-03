@@ -1,5 +1,7 @@
+import json
 import pendulum
 import os
+
 
 from datetime import datetime
 from airflow.models import DAG
@@ -24,6 +26,9 @@ MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 
 config_service = ConfigurationService(dag_name=SOURCE)
 partition_cols = config_service.get_config("partition_cols")
+tables = config_service.get_config("tables")
+update_col = config_service.get_config("update_col")
+max_records_per_file = config_service.get_config("max_records_per_file")
 
 # s3 paths setup
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -89,7 +94,14 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
     extraction_spark_job_file=raw_spark_job_path,
-    raw_spark_job_extra_args=["{{ ds }}"],
+    raw_spark_job_extra_args=[
+        "{{ ds }}",
+        SOURCE,
+        json.dumps(tables),
+        json.dumps(partition_cols),
+        update_col,
+        max_records_per_file,
+    ],
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(

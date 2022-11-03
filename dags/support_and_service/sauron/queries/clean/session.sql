@@ -9,6 +9,7 @@ SELECT
   department,
   tags,
   context,
+  source_identity,
   created_by,
   last_message_at as ts_last_message,
   first_message_at as ts_first_message,

@@ -31,6 +31,9 @@ columns:
   context:
     lineage:
       - datalake_sauron_raw.session.context
+  source_identity:
+    lineage:
+      - datalake_sauron_raw.session.source_identity
   created_by:
     lineage:
       - datalake_sauron_raw.session.created_by
