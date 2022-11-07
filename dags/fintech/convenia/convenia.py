@@ -98,6 +98,10 @@ for table_name in table_names:
         target_database_base_name=SOURCE,
         extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}load_{table_name}_to_raw.py",
         has_hive_sync=False,
+        raw_spark_job_extra_args=[
+            SOURCE,
+            table_name,
+        ],
     )
     raw_task_groups[table_name] = raw_task_group
 
