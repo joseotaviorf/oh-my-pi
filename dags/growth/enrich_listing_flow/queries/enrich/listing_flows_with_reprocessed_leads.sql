@@ -210,7 +210,9 @@ acquisition_channels AS (
             WHEN lbc.status_sale = 'OPTED_OUT'
                 THEN 'Opted Out'
             ELSE 'Once Published'
-        END AS listing_sale_status
+        END AS listing_sale_status,
+        lbc.is_for_rent AS lbc_is_for_rent,
+        lbc.is_for_sale AS lbc_is_for_sale
     FROM datalake_listing_flow.listing_flow AS lf
     LEFT JOIN datalake_lead.lead AS l
         ON l.id = lf.id_lead
@@ -266,28 +268,33 @@ supply_2_0_qualified AS (
     SELECT
         *,
         CASE
-            WHEN prospect_discard_rent IN (
-                'CONTACT_DIDNT_EXIST',
-                'HOUSE_ALREADY_PUBLISHED',
-                'CONTACT_KNOW_OWNER',
-                'CONTACT_WASNT_THE_HOUSE_OWNER',
-                'HOUSE_ALREADY_SOLD',
-                'HOUSE_WAS_A_BUSINESS_REAL_ESTATE',
-                'HOUSE_WITH_BAD_CONDITIONS',
-                'OWNER_DIDNT_ANSWER_PHONE',
-                'OWNER_DIDNT_LISTEN_TO_PITCH',
-                'OWNER_DIDNT_WANT_RECEIVE_CALL',
-                'PROPERTY_IN_OFFPLANT',
-                'HOUSE_PRICE_WAS_OUT_OF_BOUNDS',
-                'ONLY_PART_OF_THE_HOUSE_WAS_AVAILABLE_FOR_RENTING',
-                'HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS',
-                'CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT',
-                -- prospect discards
-                'ForaArea',
-                'DUPLICATED_LEAD',
-                'CONTACT_ON_BLOCK_LIST'
-            )
-            AND ts_opportunity IS NULL
+            WHEN
+              (
+                prospect_discard_rent IN (
+                  'CONTACT_DIDNT_EXIST',
+                  'HOUSE_ALREADY_PUBLISHED',
+                  'CONTACT_KNOW_OWNER',
+                  'CONTACT_WASNT_THE_HOUSE_OWNER',
+                  'HOUSE_ALREADY_SOLD',
+                  'HOUSE_WAS_A_BUSINESS_REAL_ESTATE',
+                  'HOUSE_WITH_BAD_CONDITIONS',
+                  'OWNER_DIDNT_ANSWER_PHONE',
+                  'OWNER_DIDNT_LISTEN_TO_PITCH',
+                  'OWNER_DIDNT_WANT_RECEIVE_CALL',
+                  'PROPERTY_IN_OFFPLANT',
+                  'HOUSE_PRICE_WAS_OUT_OF_BOUNDS',
+                  'ONLY_PART_OF_THE_HOUSE_WAS_AVAILABLE_FOR_RENTING',
+                  'HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS',
+                  'CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT',
+                  -- prospect discards
+                  'ForaArea',
+                  'DUPLICATED_LEAD',
+                  'CONTACT_ON_BLOCK_LIST'
+                )
+                OR
+                lbc_is_for_rent = False
+              )
+              AND ts_opportunity IS NULL
                 THEN NULL
             -- This condition below was added to correct wrongly discarded qualifieds on listing_flow table
             -- TO-DO: refactor the tables involved with supply funnel step rules to avoid these additional rules
@@ -308,16 +315,22 @@ supply_2_0_available_qualified AS (
     SELECT
         *,
         CASE
-            WHEN prospect_discard_rent IN (
-                'HOUSE_ALREADY_RENTED_AVAILABLE_IN_6_MONTHS',
-                'HOUSE_ALREADY_RENTED_AVAILABLE_IN_MORE_THAN_6_MONTHS',
-                'HOUSE_ALREADY_RENTED',
-                'OWNER_GAVE_UP_RENTING',
-                'SEASONAL_RENT',
-                'HOUSE_UNDER_MAJOR_RENOVATION',
-                'HOUSE_ALREADY_RENTED_FOR_MORE_THAN_3_MONTHS'
-            )
-            AND ts_opportunity IS NULL
+            WHEN
+              (
+                prospect_discard_rent IN (
+                  'HOUSE_ALREADY_RENTED_AVAILABLE_IN_6_MONTHS',
+                  'HOUSE_ALREADY_RENTED_AVAILABLE_IN_MORE_THAN_6_MONTHS',
+                  'HOUSE_ALREADY_RENTED',
+                  'OWNER_GAVE_UP_RENTING',
+                  'SEASONAL_RENT',
+                  'HOUSE_UNDER_MAJOR_RENOVATION',
+                  'HOUSE_ALREADY_RENTED_FOR_MORE_THAN_3_MONTHS'
+                )
+                OR
+                lbc_is_for_rent = False
+              )
+            
+              AND ts_opportunity IS NULL
                 THEN NULL
             ELSE ts_qualified_rent
         END AS ts_available_qualified_rent

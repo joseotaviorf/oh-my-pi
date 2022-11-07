@@ -210,7 +210,9 @@ acquisition_channels AS (
         END AS ts_opportunity,
         lbc.ts_first_listing_sale AS ts_first_listing,
         lf.ts_discarded,
-        lsc.ts_sales_company_sent
+        lsc.ts_sales_company_sent,
+        lbc.is_for_rent AS lbc_is_for_rent,
+        lbc.is_for_sale AS lbc_is_for_sale
     FROM datalake_listing_flow.listing_flow AS lf
     LEFT JOIN datalake_lead.lead AS l
         ON l.id = lf.id_lead
@@ -266,27 +268,31 @@ supply_2_0_qualified AS (
     SELECT
         *,
         CASE
-            WHEN prospect_discard_sale IN (
-                'CONTACT_DIDNT_EXIST',
-                'HOUSE_ALREADY_PUBLISHED',
-                'CONTACT_KNOW_OWNER',
-                'CONTACT_WASNT_THE_HOUSE_OWNER',
-                'HOUSE_ALREADY_SOLD',
-                'HOUSE_WAS_A_BUSINESS_REAL_ESTATE',
-                'HOUSE_WITH_BAD_CONDITIONS',
-                'OWNER_DIDNT_ANSWER_PHONE',
-                'OWNER_DIDNT_LISTEN_TO_PITCH',
-                'OWNER_DIDNT_WANT_RECEIVE_CALL',
-                'PROPERTY_IN_OFFPLANT',
-                'HOUSE_PRICE_WAS_OUT_OF_BOUNDS',
-                'HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS',
-                'CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT',
-                -- prospect discards
-                'ForaArea',
-                'DUPLICATED_LEAD',
-                'CONTACT_ON_BLOCK_LIST'
-            )
-            AND ts_opportunity IS NULL
+            WHEN
+              (
+                prospect_discard_sale IN (
+                  'CONTACT_DIDNT_EXIST',
+                  'HOUSE_ALREADY_PUBLISHED',
+                  'CONTACT_KNOW_OWNER',
+                  'CONTACT_WASNT_THE_HOUSE_OWNER',
+                  'HOUSE_ALREADY_SOLD',
+                  'HOUSE_WAS_A_BUSINESS_REAL_ESTATE',
+                  'HOUSE_WITH_BAD_CONDITIONS',
+                  'OWNER_DIDNT_ANSWER_PHONE',
+                  'OWNER_DIDNT_LISTEN_TO_PITCH',
+                  'OWNER_DIDNT_WANT_RECEIVE_CALL',
+                  'PROPERTY_IN_OFFPLANT',
+                  'HOUSE_PRICE_WAS_OUT_OF_BOUNDS',
+                  'HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS',
+                  'CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT',
+                  -- prospect discards
+                  'ForaArea',
+                  'DUPLICATED_LEAD',
+                  'CONTACT_ON_BLOCK_LIST'
+                )
+                OR lbc_is_for_sale = False
+              )
+              AND ts_opportunity IS NULL
                 THEN NULL
             -- This condition below was added to correct wrongly discarded qualifieds on listing_flow table
             -- TO-DO: refactor the tables involved with supply funnel step rules to avoid these additional rules
@@ -307,12 +313,17 @@ supply_2_0_available_qualified AS (
     SELECT
         *,
         CASE
-            WHEN prospect_discard_sale IN (
-                'OWNER_GAVE_UP_SELLING',
-                'ISSUES_WITH_HOUSE_DOCUMENTATION',
-                'PROPERTY_IN_JUDICIAL_INVENTORY'
-            )
-            AND ts_opportunity IS NULL
+            WHEN
+              (
+                prospect_discard_sale IN (
+                  'OWNER_GAVE_UP_SELLING',
+                  'ISSUES_WITH_HOUSE_DOCUMENTATION',
+                  'PROPERTY_IN_JUDICIAL_INVENTORY'
+                )
+                OR
+                lbc_is_for_sale = False
+              )
+              AND ts_opportunity IS NULL
                 THEN NULL
             ELSE ts_qualified_sale
         END AS ts_available_qualified_sale
