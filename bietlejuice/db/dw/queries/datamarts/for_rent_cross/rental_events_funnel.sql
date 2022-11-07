@@ -446,16 +446,17 @@ SELECT
   ddciq.sk_date,
   ciq.dt_day,
   ciq.id_house_listing,
+  ciq.is_for_rent,
   ciq.is_for_sale,
   ciq.consultant_type
 FROM
   datalake_rental_historical_follow_up_prod.house_listings_daily_info ciq
 INNER JOIN
   dim_date ddciq
-    ON DATE(date_part('year',ciq.dt_day) || '-' || date_part('month',ciq.dt_day) || '-' || date_part('day', ciq.dt_day)) = ddciq.date
+    ON DATE(ciq.year || '-' || ciq.month || '-' || ciq.day) = ddciq.date
 WHERE
   ciq.is_for_rent = TRUE
-  AND DATE(date_part('year',ciq.dt_day) || '-' || date_part('month',ciq.dt_day) || '-' || date_part('day', ciq.dt_day)) >= INTERVAL '4 year'
+  AND DATE(ciq.year || '-' || ciq.month || '-' || ciq.day) >= DATE('2020-07-29') -- First CIQ appears.
 ),
 rent_flow_adjusted AS (
 SELECT
@@ -521,7 +522,6 @@ LEFT JOIN house_listing_daily_info ciq
   AND ciq.sk_date = COALESCE(rf.sk_contract_annulment_date, rf.sk_contract_signed_date, rf.sk_contract_created_date, rf.sk_last_doc_analysis_approved, rf.sk_credit_analysis_approved_date, rf.sk_credit_analysis_end_date,
         rf.sk_credit_analysis_init_date, rf.sk_tenant_first_doc_sent_date, rf.sk_guarantee_paid_date, rf.sk_first_credit_evaluation_positive, rf.sk_offer_approved_date, rf.sk_offer_submitted_date,
         rf.sk_visit_date, rf.sk_booking_created_date)
-)
 ),
 visits_booked AS (
 SELECT
