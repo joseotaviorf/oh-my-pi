@@ -34,7 +34,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 DAG_ID = f"bietlejuice.{CONTEXT}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2021, 1, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 7,13 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 5,13 * * *"
 
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_9_1_min_general_cluster", deserialize_json=True
