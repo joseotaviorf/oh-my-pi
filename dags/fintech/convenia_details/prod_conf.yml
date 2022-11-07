@@ -9,7 +9,3 @@ custom_cluster:
   aws_attributes:
       ebs_volume_size: 200
       instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
-
-tables:
-  - active_employee_details
-  - inactive_employee_details

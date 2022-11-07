@@ -1,0 +1,4 @@
+---
+tables:
+  - active_employee_details
+  - inactive_employee_details
