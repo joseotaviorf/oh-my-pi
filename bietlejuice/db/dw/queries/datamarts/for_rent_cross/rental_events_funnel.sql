@@ -441,6 +441,22 @@ LEFT JOIN dim_region dr
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
+house_listing_daily_info AS (
+SELECT
+  ddciq.sk_date,
+  ciq.dt_day,
+  ciq.id_house_listing,
+  ciq.is_for_sale,
+  ciq.consultant_type
+FROM
+  datalake_rental_historical_follow_up_prod.house_listings_daily_info ciq
+INNER JOIN
+  dim_date ddciq
+    ON DATE(date_part('year',ciq.dt_day) || '-' || date_part('month',ciq.dt_day) || '-' || date_part('day', ciq.dt_day)) = ddciq.date
+WHERE
+  ciq.is_for_rent = TRUE
+  AND DATE(date_part('year',ciq.dt_day) || '-' || date_part('month',ciq.dt_day) || '-' || date_part('day', ciq.dt_day)) >= INTERVAL '4 year'
+),
 rent_flow_adjusted AS (
 SELECT
     rf.sk_rent_flow,
@@ -477,8 +493,8 @@ SELECT
     dp.guarantee,
     CASE
         WHEN dhl.is_b2b = TRUE THEN 'B2B'
-        WHEN ciq.businesscontext='RENT' AND ciq.type_big_agent IS NOT NULL THEN ciq.type_big_agent
-        WHEN dhl.is_b2b = FALSE OR ciq.sk_house_listing IS NULL THEN 'FALSE'
+        WHEN ciq.is_for_rent = TRUE AND ciq.consultant_type IS NOT NULL THEN ciq.consultant_type
+        WHEN dhl.is_b2b = FALSE OR ciq.id_house_listing IS NULL THEN 'FALSE'
     END AS is_b2b,
     dr.city_group,
     dr.country_code,
@@ -500,8 +516,12 @@ LEFT JOIN dim_offer dof
 LEFT JOIN datamarts.funnel_demand_flows fdf
   ON rf.sk_rent_flow = fdf.sk_rent_flow
   AND rf.sk_house_listing = fdf.sk_house_listing
-LEFT JOIN datamarts.quintoandar_consultant_listings ciq
-  ON rf.sk_house_listing = ciq.sk_house_listing AND ciq.businesscontext= 'RENT'
+LEFT JOIN house_listing_daily_info ciq
+  ON rf.sk_house_listing = ciq.id_house_listing
+  AND ciq.sk_date = COALESCE(rf.sk_contract_annulment_date, rf.sk_contract_signed_date, rf.sk_contract_created_date, rf.sk_last_doc_analysis_approved, rf.sk_credit_analysis_approved_date, rf.sk_credit_analysis_end_date,
+        rf.sk_credit_analysis_init_date, rf.sk_tenant_first_doc_sent_date, rf.sk_guarantee_paid_date, rf.sk_first_credit_evaluation_positive, rf.sk_offer_approved_date, rf.sk_offer_submitted_date,
+        rf.sk_visit_date, rf.sk_booking_created_date)
+)
 ),
 visits_booked AS (
 SELECT
