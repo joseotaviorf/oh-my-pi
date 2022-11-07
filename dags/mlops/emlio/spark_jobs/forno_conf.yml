@@ -1,5 +1,5 @@
 ---
-kafka_brokers: kafka-forno-0.forno.data.quintoandar.com.br:9092,kafka-forno-1.forno.data.quintoandar.com.br:9092
+kafka_brokers: kb0.forno.quintoandar.com.br:9092,kb1.forno.quintoandar.com.br:9092,kb2.forno.quintoandar.com.br:9092
 kafka_topic: emlio-logs
 load_format: JSON
 path_prefix: s3a://

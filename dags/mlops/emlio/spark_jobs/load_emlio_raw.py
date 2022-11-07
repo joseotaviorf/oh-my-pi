@@ -116,6 +116,7 @@ if __name__ == "__main__":
         .option("kafka.bootstrap.servers", kafka_brokers)
         .option("subscribe", kafka_topic)
         .option("auto.offset.reset", "earliest")
+        .option("failOnDataLoss", "false")
         .option("enable.auto.commit", False)
         .load()
     )
