@@ -87,7 +87,6 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-
 chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
 
 TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)

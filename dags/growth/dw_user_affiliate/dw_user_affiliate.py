@@ -66,10 +66,6 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
-)
-
 dw_task_group = DWTaskGroup(
     dag=dag,
     env=ENV,
@@ -85,6 +81,10 @@ dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
 
 dw_task_group = dw_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.DW, spectrum_iam_role=spectrum_iam_role
+)
+
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
 )
 
 chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
