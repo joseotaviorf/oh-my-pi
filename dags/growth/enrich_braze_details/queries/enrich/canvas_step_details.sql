@@ -89,7 +89,7 @@ SELECT
 FROM
     canvas_step_details_owners
 WHERE
-    ts_updated BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 UNION ALL
 SELECT
     id_canvas,
@@ -107,7 +107,7 @@ SELECT
 FROM
     canvas_step_details_tenants
 WHERE
-    ts_updated BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 UNION ALL
 SELECT
     id_canvas,
@@ -125,4 +125,4 @@ SELECT
 FROM
     canvas_step_details_affiliates
 WHERE
-    ts_updated BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
