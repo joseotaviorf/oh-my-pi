@@ -33,4 +33,4 @@ SELECT
     birth_date AS dt_birth,
     hiring_date AS dt_hiring
 FROM
-    datalake_convenia_raw.inactive_employee_details
+    datalake_convenia_details_raw.inactive_employee_details
