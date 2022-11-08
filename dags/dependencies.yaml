@@ -1660,6 +1660,14 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
 
+bietlejuice.enrich_ebdb_country:
+  - bietlejuice.ebdb:create-clean-country-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
+  - bietlejuice.ebdb:create-clean-region-in-data-lake
+  - bietlejuice.ebdb:create-clean-state-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
+
 bietlejuice.enrich_ebdb_customer_contact_identification:
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-user-aud-in-data-lake

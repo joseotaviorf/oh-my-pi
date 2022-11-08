@@ -1,0 +1,6 @@
+---
+tables:
+  - table_name: house
+    partitions: [country_code, business_context]
+  - table_name: user
+    partitions: [country_code]

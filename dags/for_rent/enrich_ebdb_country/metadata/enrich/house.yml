@@ -1,0 +1,31 @@
+---
+database_name: datalake_ebdb_country
+table_name: house
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id
+  id_country:
+    lineage:
+      - datalake_ebdb_clean.country.id
+  id_state:
+    lineage:
+      - datalake_ebdb_clean.house.id_state
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  country_code:
+    lineage:
+      - datalake_ebdb_clean.country.code
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.house.dt_creation
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.house.ts_updated

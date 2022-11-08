@@ -1,0 +1,34 @@
+---
+database_name: datalake_ebdb_country
+table_name: user
+columns:
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.user.id_agent
+  id_sales_rep:
+    lineage:
+      - datalake_ebdb_clean.user.id_sales_rep
+  id_affiliates:
+    lineage:
+      - datalake_ebdb_clean.user.id_affiliates
+  id_photographer_data:
+    lineage:
+      - datalake_ebdb_clean.user.id_photographer_data
+  id_country:
+    lineage:
+      - datalake_ebdb_clean.user.id_country
+  id_state:
+    lineage:
+      - datalake_ebdb_clean.user.id_state
+  country_code:
+    lineage:
+      - datalake_ebdb_clean.country.code
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.user.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.user.ts_updated
