@@ -113,7 +113,6 @@ for report_type in REPORTS_LIST:
         is_incremental=True,
         has_create_external_table_task=False,
         partitions=PARTITION_COLS,
-        execution_date="",
         extra_query_template_params={
             "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",
             "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
