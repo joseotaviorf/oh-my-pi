@@ -423,17 +423,16 @@ house_listing_daily_info AS (
         ddciq.sk_date,
         ciq.dt_day,
         ciq.id_house_listing,
-        ciq.is_for_rent,
         ciq.is_for_sale,
         ciq.consultant_type
     FROM
         datalake_rental_historical_follow_up_prod.house_listings_daily_info ciq
     INNER JOIN
         public.dim_date ddciq
-            ON DATE(ciq.year || '-' || ciq.month || '-' || ciq.month) = ddciq.date
+            ON DATE(date_part('year',ciq.dt_day) || '-' || date_part('month',ciq.dt_day) || '-' || date_part('day', ciq.dt_day)) = ddciq.date
     WHERE
         ciq.is_for_rent = TRUE
-        AND DATE(ciq.year || '-' || ciq.month || '-' || ciq.day) >= DATE('2020-07-29') -- First CIQ appears.
+        AND DATE(date_part('year',ciq.dt_day) || '-' || date_part('month',ciq.dt_day) || '-' || date_part('day', ciq.dt_day)) >= INTERVAL '4 year'
 ),
 rent_flow_adjusted AS (
     SELECT
