@@ -44,6 +44,9 @@ columns:
   is_3p_supply_bh:
     lineage:
       - datalake_ebdb_listing.house.is_3p_supply_bh
+  is_casa_mineira_migration:
+    lineage:
+      - datalake_ebdb_listing.house.is_casa_mineira_migration
   is_for_rent:
     lineage:
       - datalake_sale_listings.sale_listing.is_for_rent

@@ -209,6 +209,11 @@ SELECT
   COALESCE(UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3P-%]%', sc.is_3p_supply, FALSE) AS is_3p_supply_5a,
   COALESCE(UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3PBH-%]%', FALSE) AS is_3p_supply_bh,
   (COALESCE(h.announced_by, h.id_announced_by) IS NOT NULL) AS is_imovel_v3,
+  CASE 
+    WHEN (h.id_external LIKE '%[SCM%-%]%' OR h.internal_admin_info LIKE '%[SCM%-%]%') THEN TRUE
+    WHEN h.id_user_registrant = 7212349 THEN TRUE -- For Casa Mineira migration, a single user was created to import the CM listings
+    ELSE FALSE 
+  END AS is_casa_mineira_migration,
   COALESCE(r_type.name = 'Restriction', FALSE) AS has_visit_restriction,
   h.has_requested_professional_photos,
   h.has_owner_incomplete_listing_notification,

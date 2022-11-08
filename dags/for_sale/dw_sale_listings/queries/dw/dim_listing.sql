@@ -13,6 +13,7 @@ SELECT
   h.is_3p_supply,
   h.is_3p_supply_5a,
   h.is_3p_supply_bh,
+  h.is_casa_mineira_migration,
   sl.is_for_rent,
   sl.has_active_rental_contract,
   sl.has_house_been_rented,
