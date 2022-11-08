@@ -89,6 +89,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     target_database_base_name="braze_user_centric_periodicity",  # TODO this should be the context
     is_incremental=True,
     partitions=PARTITION_COLS,
+    has_create_external_table_task=False,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
