@@ -98,4 +98,9 @@ SELECT
     day
 FROM
     datalake_velo_omie_raw.cash_flows
-WHERE nCodTitulo IS NOT NULL
+WHERE
+    nCodTitulo IS NOT NULL
+    AND year = {year}
+    AND month = {month}
+    AND day = {day}
+

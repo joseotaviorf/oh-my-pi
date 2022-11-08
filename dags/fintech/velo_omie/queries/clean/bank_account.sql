@@ -38,7 +38,7 @@ SELECT
         ELSE NULL
     END AS is_point_of_sale_omie_pdv,
     CASE
-        WHEN pdv_enviar = 'S' THEN TRUE
+        WHEN nao_resumo = 'S' THEN TRUE
         WHEN nao_resumo = 'N' THEN FALSE
         ELSE NULL
     END AS does_not_display_account_summary,
