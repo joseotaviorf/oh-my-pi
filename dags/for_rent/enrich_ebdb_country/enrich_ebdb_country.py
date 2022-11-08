@@ -98,7 +98,8 @@ for table in tables:
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         table_name=table_name,
-        partitions=partitions
+        partitions=partitions,
+        has_create_external_table_task=False,
     )
 
     chain(

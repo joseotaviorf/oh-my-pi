@@ -7,17 +7,9 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  id_listing_business_context:
-    is_complete:
-      severity_level: Error
-    is_unique:
-      severity_level: Error
   id_country:
     has_completeness:
       greater_than: 0.1
   id_state:
-    has_completeness:
-      greater_than: 0.1
-  business_context:
     has_completeness:
       greater_than: 0.1

@@ -1,18 +1,13 @@
 SELECT
   h.id AS id_house,
-  lbc.id AS id_listing_business_context,
   ct.id AS id_country,
   h.id_state,
   h.id_region,
   COALESCE(ct.code, 'Undefined') AS country_code,
-  lbc.business_context,
   h.dt_creation AS ts_created,
   h.ts_updated
 FROM
   datalake_ebdb_clean.house AS h
-LEFT JOIN
-  datalake_ebdb_clean.listing_business_context AS lbc
-    ON lbc.id_house = h.id
 LEFT JOIN
   datalake_ebdb_clean.region AS r
     ON r.id = h.id_region

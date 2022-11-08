@@ -5,9 +5,6 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.house.id
-  id_listing_business_context:
-    lineage:
-      - datalake_ebdb_clean.listing_business_context.id
   id_country:
     lineage:
       - datalake_ebdb_clean.country.id
@@ -20,9 +17,6 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_clean.country.code
-  business_context:
-    lineage:
-      - datalake_ebdb_clean.listing_business_context.business_context
   ts_created:
     lineage:
       - datalake_ebdb_clean.house.dt_creation
