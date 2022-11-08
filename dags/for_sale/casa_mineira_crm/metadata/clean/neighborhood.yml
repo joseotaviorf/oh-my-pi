@@ -17,6 +17,9 @@ columns:
   neighborhood_full_slug_name:
     lineage:
       - datalake_casa_mineira_crm_raw.bairro.slug_completo
+  region_code_5a:
+    lineage:
+      - datalake_casa_mineira_crm_raw.bairro.codigo_regiao_quintoandar
   is_priority:
     lineage:
       - datalake_casa_mineira_crm_raw.bairro.prioridade
