@@ -3,7 +3,7 @@ from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
 import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -46,15 +46,9 @@ SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{INTERMEDIATE_
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
-LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
-)
+cluster_description = config_service.get_config("databricks_10_4_med_memory_cluster")
+
+default_libraries = config_service.get_config("default_libraries")
 
 pipeline_config = config_service.get_config("pipeline") or {}
 
@@ -227,8 +221,8 @@ DAG = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=DAG,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    cluster_configuration=cluster_description,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
