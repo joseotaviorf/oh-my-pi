@@ -21,7 +21,7 @@ ENV = os.environ.get("ENVIRONMENT")
 SOURCE = "convenia_details"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2022, 5, 6, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
 config_service = ConfigurationService(SOURCE)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
