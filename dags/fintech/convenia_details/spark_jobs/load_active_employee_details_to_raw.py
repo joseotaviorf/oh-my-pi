@@ -38,6 +38,7 @@ def fetch_convenia_active_employee_details(host, token):
     for employee in active_employees_results:
         rows.append(Row(id=employee["id"]))
 
+    spark_client = SparkClient()
     active_employees = spark_client.create_dataframe(rows)
 
     active_employee_details = CONSUMERS["EmployeeDetails"](client=client)
