@@ -26,10 +26,10 @@ dim_house AS (
     SELECT
         id AS sk_house,
         id_region AS sk_region,
-        CASE WHEN internal_admin_info LIKE '%[3P-%]%' THEN 'true' ELSE 'false' END AS is_3p
+        CASE WHEN is_3p_supply THEN 'true' ELSE 'false' END AS is_3p,
+        CASE WHEN is_3p_supply_bh THEN 'true' ELSE 'false' END AS is_3p_bh
     FROM
-        datalake_ebdb_clean_prod.house
-    GROUP BY 1,2,3
+        datalake_ebdb_listing_prod.house
 ),
 -----------------------------------------------------------
 -- Query bookings, offers and talk to agent full history --
@@ -40,6 +40,7 @@ events AS (
         fsf.sk_buyer,
         fsf.sk_house,
         dh.is_3p,
+        dh.is_3p_bh,
         fsf.sk_region,
         CASE WHEN fv.sk_user_creation = us.id_user_attendence_5a THEN 'Secretaria' ELSE db.mkt_origin END as mkt_origin,
         db.mkt_channel,
@@ -75,6 +76,7 @@ events AS (
         fsf.sk_buyer,
         fsf.sk_house,
         dh.is_3p,
+        dh.is_3p_bh,
         fsf.sk_region,
         o.mkt_origin,
         o.mkt_channel,
@@ -103,6 +105,7 @@ events AS (
         tenant_id::INT AS sk_buyer,
         house_id::INT AS id_house,
         dh.is_3p,
+        dh.is_3p_bh,
         dh.sk_region,
         a.mkt_origin,
         a.mkt_channel,
@@ -148,6 +151,7 @@ sale_flows AS (
         evt.sk_buyer,
         evt.sk_house,
         evt.is_3p,
+        evt.is_3p_bh,
         ROW_NUMBER() OVER(PARTITION BY evt.sk_sale_flow
                             ORDER BY evt.ts_event) AS sale_flow_order,
         ROW_NUMBER() OVER(PARTITION BY evt.sk_buyer
@@ -165,6 +169,7 @@ sale_funnel AS (
         fo.sk_offer,
         fv.sk_booking,
         dh.is_3p,
+        dh.is_3p_bh,
         dd_os.date AS dt_offer_submitted,
         dd_oa.date AS dt_offer_accepted,
         dd_ccv.date AS dt_sale_agreement_signed,
@@ -226,6 +231,7 @@ sale_flows_funnel_events AS (
         sf.sk_buyer,
         sf.sk_house,
         sf.is_3p,
+        sf.is_3p_bh,
         funnel.sk_offer,
         funnel.sk_booking,
         funnel.dt_offer_submitted,
@@ -282,6 +288,7 @@ targets AS (
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
         NULL::TEXT AS is_3p,
+        NULL::TEXT AS is_3p_bh,
         NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
@@ -326,6 +333,7 @@ targets AS (
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
         NULL::TEXT AS is_3p,
+        NULL::TEXT AS is_3p_bh,
         NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
@@ -368,6 +376,7 @@ targets AS (
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
         NULL::TEXT AS is_3p,
+        NULL::TEXT AS is_3p_bh,
         NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
@@ -414,6 +423,7 @@ investment AS (
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
         NULL::TEXT AS is_3p,
+        NULL::TEXT AS is_3p_bh,
         NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
@@ -467,6 +477,7 @@ deactivations AS (
         sk_buyer,
         NULL::INT AS sk_house,
         NULL::TEXT AS is_3p,
+        NULL::TEXT AS is_3p_bh,
         NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
