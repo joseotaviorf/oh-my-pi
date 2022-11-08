@@ -21,8 +21,7 @@ from inmetro.validators import PyDeequValidator
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DwMetastoreMapping
-from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
-from bietlejuice.base.pipeline import LayerEnum, MetadataTypeEnum, EnvironmentEnum
+from bietlejuice.base.pipeline import LayerEnum, MetadataTypeEnum
 from bietlejuice.base.service import ServiceEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark import BaseDBUtils
@@ -32,13 +31,21 @@ from bietlejuice.metadata_propagator_pipeline.atlas_quality_metrics_pipeline imp
 
 from pyspark.sql.functions import col, to_timestamp
 
+from bietlejuice.services import ConfigurationService
+
 JOB_NAME = "data_quality_tests"
+DATAHUB_URL_TEMPLATE = (
+    "{DATAHUB_HOST}/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,"
+    "hive.{DATABASE_NAME}.{TABLE_NAME},PROD)/Validation"
+)
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def create_message_from_validation_results(validation_results):
+def create_message_from_validation_results(
+    datahub_host, database_name, table_name, validation_results
+):
     suite_name = validation_results["metadata"]["suite_name"]
     status = validation_results["metadata"]["suite_result"].upper()
     n_failures = validation_results["metadata"]["failure"]
@@ -51,7 +58,9 @@ def create_message_from_validation_results(validation_results):
             if v["status"] != "Success"
         ]
     )
-
+    datahub_validations_url = DATAHUB_URL_TEMPLATE.format(
+        DATAHUB_HOST=datahub_host, DATABASE_NAME=database_name, TABLE_NAME=table_name
+    )
     message = (
         f":warning:\n"
         f"Validation suite: *`{suite_name}`*\n"
@@ -61,6 +70,8 @@ def create_message_from_validation_results(validation_results):
     )
     for column in failed_columns:
         message += f"\t• *`{column}`*\n"
+
+    message += f"Check validation details in <{datahub_validations_url}|DataHub>"
 
     return message
 
@@ -306,16 +317,19 @@ if __name__ == "__main__":
     ).run()
 
     # #################################### Slack Alert ######################################
-    if env == EnvironmentEnum.PROD:
-        webhook_key = SlackWebhooksEnum.ALERTS_AIRFLOW_DE_DAGS_INMETRO
-    else:
-        webhook_key = SlackWebhooksEnum.DE_TESTS
+    config_service = ConfigurationService()
+    webhook_key = config_service.get_config("notification_webhooks_keys")[
+        "data_quality"
+    ]
+    datahub_host = config_service.get_config("datahub_host")
 
     if validation_results["metadata"]["suite_result"] != "SUCCESS":
         slack_webhook = dbutils.secrets.get(scope="quintoandar", key=webhook_key)
 
         messenger = SlackMessenger(slack_webhook)
-        message = create_message_from_validation_results(validation_results)
+        message = create_message_from_validation_results(
+            datahub_host, database_name, table_name, validation_results
+        )
         messenger.send_message(message)
 
     logger.info(

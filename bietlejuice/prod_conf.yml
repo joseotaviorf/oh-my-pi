@@ -71,6 +71,7 @@ dw_bucket: 5a-dw-prod
 people_bucket: people-s3-data-quintoandar-com-br
 inmetro_bucket: s3://inmetro-s3-data-quintoandar-com-br
 metrics_bucket: 5a-business-metrics-com-br-prod
+datahub_host: https://datahub.quintoandar.com.br
 ods_migration_tests_threshold:
     { "count_test_min_assert": 0.99, "content_test_max_error": 0.01 }
 spectrum_iam_role: arn:aws:iam::206390561754:role/SpectrumCrossAccount
@@ -344,3 +345,7 @@ databricks_10_4_med_io-general_photon_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
+
+### Notification Configs ###
+notification_webhooks_keys:
+    data_quality: AIRFLOW_ALERTS_INMETRO_SLACK_WEBHOOK

@@ -71,6 +71,7 @@ doc_md_chart_url: https://qb343dade3ecd6cd6p-tp.appspot.com/admin/airflow/chart?
 dw_bucket: dw.s3.forno.data.quintoandar.com.br
 inmetro_bucket: s3://inmetro-s3-forno-quintoandar-com-br
 metrics_bucket: 5a-business-metrics-com-br-forno
+datahub_host: https://datahub.forno.quintoandar.com.br
 ods_migration_tests_threshold:
     { "count_test_min_assert": 0.0, "content_test_max_error": 1.0 }
 spectrum_iam_role: arn:aws:iam::713278628093:role/SpectrumAccess
@@ -344,3 +345,7 @@ databricks_10_4_med_io-general_photon_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
+
+### Notification Configs ###
+notification_webhooks_keys:
+    data_quality: SLACK_DE_TESTS_WEBHOOK
