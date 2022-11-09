@@ -1,5 +1,7 @@
 # More info about labler usage here: https://github.com/actions/labeler
 # Validate globs here: https://www.digitalocean.com/community/tools/glob
+
+# File type labels
 datamart-only:
   - "**/*datamart*/**/*.sql"
 db-changes:
@@ -8,3 +10,25 @@ documentation:
   - "**/*.md"
 lineage:
   - "**/metadata/**/*(*.yml|*.yaml)"
+tests:
+  - "/tests/**"
+
+## Line labels
+data-bedrock:
+  - "**/dags/bedrock/**"
+data-for-rent:
+  - "**/dags/for_rent/**"
+data-for-sale:
+  - "**/dags/for_sale/**"
+data-governance:
+  - "**/dags/governance/**"
+data-growth:
+  - "**/dags/growth/**"
+data-international:
+  - "**/dags/international/**"
+data-ingestion:
+  - "**/dags/platform/**"
+data-rede:
+  - "**/dags/rede/**"
+data-services-support:
+  - "**/dags/support_and_service/**"
