@@ -2,7 +2,7 @@ SELECT
   u.id AS id_user,
   u.id_agent, -- is the same ID as the id_agent_rep
   u.id_sales_rep,
-  u.id_affiliates,
+  u.id_affiliates AS id_affiliate,
   u.id_photographer_data,
   u.id_country,
   u.id_state,

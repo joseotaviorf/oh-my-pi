@@ -11,7 +11,7 @@ columns:
   id_sales_rep:
     lineage:
       - datalake_ebdb_clean.user.id_sales_rep
-  id_affiliates:
+  id_affiliate:
     lineage:
       - datalake_ebdb_clean.user.id_affiliates
   id_photographer_data:
