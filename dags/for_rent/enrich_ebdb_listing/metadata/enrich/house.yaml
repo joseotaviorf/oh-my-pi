@@ -7,8 +7,7 @@ columns:
       - datalake_ebdb_clean.house.id
   id_country:
     lineage:
-      - datalake_ebdb_clean.country.id
-      - datalake_region.region.id_country
+      - datalake_ebdb_country.house.id_country
   id_state:
     lineage:
       - datalake_ebdb_clean.house.id_state
@@ -30,13 +29,12 @@ columns:
   house_short_id:
     lineage:
       - datalake_ebdb_clean.house.id
+  country_code:
+    lineage:
+      - datalake_ebdb_country.house.country_code
   rent:
     lineage:
       - datalake_ebdb_clean.house.rent
-  country_code:
-    lineage:
-      - datalake_ebdb_clean.country.code
-      - datalake_region.region.country_code
   state_abbreviation:
     lineage:
       - datalake_ebdb_clean.state.abbreviation

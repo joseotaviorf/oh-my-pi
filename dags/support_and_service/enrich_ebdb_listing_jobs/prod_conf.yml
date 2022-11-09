@@ -1,4 +1,6 @@
 ---
+partition_cols:
+  - country_code
 custom_cluster:
   driver_node_type_id: m5a.2xlarge
   node_type_id: r5a.xlarge

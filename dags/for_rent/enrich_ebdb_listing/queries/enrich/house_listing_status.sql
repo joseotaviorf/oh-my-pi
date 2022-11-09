@@ -2,6 +2,7 @@ SELECT
     CAST(CAST(id_house AS STRING)||'00'||CAST(order_version AS STRING) AS BIGINT) AS id_house_listing,
     id_house,
     id_region,
+    country_code,
     order_version AS version,
     status_history_new AS status_history,
     REGEXP_REPLACE(reason, '\n', '') AS status_change_reason,

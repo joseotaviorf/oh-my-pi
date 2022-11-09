@@ -14,6 +14,10 @@ columns:
   all_id_agents:
     lineage:
       - datalake_ebdb_clean.house_agent_key_tracking_aud.id_agent
+  country_code:
+    lineage:
+      - datalake_ebdb_listing.house_listing.country_code
+      - datalake_ebdb_country.user.country_code
   first_key_location:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name

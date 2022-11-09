@@ -22,7 +22,7 @@ CONTEXT = "ebdb_listing_jobs"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
-config_service = ConfigurationService(dag_name=CONTEXT)
+config_service = ConfigurationService(dag_name=DAG_NAME)
 
 spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -75,10 +75,13 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
+partition_cols = config_service.get_config("partition_cols")
+
 enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
+    partitions=partition_cols,
 )
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"

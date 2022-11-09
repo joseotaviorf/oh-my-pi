@@ -105,6 +105,7 @@ event_bus AS (
 SELECT
     eb.id_house,
     so.id_occupant,
+    ch.country_code,
     eb.rev,
     sd.doorman_type,
     skl.key_location,
@@ -128,3 +129,6 @@ LEFT JOIN
         ON eb.ts_event >= skl.ts_key_location_started
         AND eb.ts_event < COALESCE(skl.ts_key_location_ended, '2100-01-01')
         AND eb.id_house = skl.id_house
+LEFT JOIN
+    datalake_ebdb_country.house AS ch
+        ON ch.id_house = eb.id_house

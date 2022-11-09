@@ -19,6 +19,9 @@ columns:
   id_house_region:
     lineage:
       - datalake_ebdb_clean.portability.id_region
+  country_code:
+    lineage:
+      - datalake_ebdb_country.house.country_code
   owner_type:
     lineage:
       - datalake_ebdb_clean.portability.owner_type

@@ -33,6 +33,7 @@ SELECT
     i.id_booking,
     i.id_ref,
     i.id_final_report_pdf,
+    h.country_code,
     i.status,
     i.mode,
     i.comment,
@@ -77,7 +78,12 @@ SELECT
     ias.ts_last_synced
 FROM
     datalake_ebdb_clean.inspection AS i
-    LEFT JOIN comments c
+LEFT JOIN
+    comments c
         ON i.id = c.id_inspection
-    LEFT JOIN inspection_aud_sync ias
+LEFT JOIN
+    inspection_aud_sync ias
         ON i.id = ias.id_inspection
+LEFT JOIN
+    datalake_ebdb_country.house AS h
+        ON h.id_house = i.id_house

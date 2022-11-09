@@ -1671,7 +1671,6 @@ bietlejuice.enrich_ebdb_customer_contact_identification:
   - bietlejuice.ebdb:create-clean-proponent-proposal-aud-in-data-lake
 
 bietlejuice.enrich_ebdb_listing:
-  # Removed dependency with ebdb.country and state tables, since is already satisfied by enrich_region
   - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
   - bietlejuice.ebdb:create-clean-access-type-in-data-lake
   - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
@@ -1701,7 +1700,8 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:create-clean-special-condition-in-data-lake
   - bietlejuice.ebdb:create-clean-special-condition-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
-  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_ebdb_country:load-enrich-house
+  - bietlejuice.enrich_ebdb_country:load-enrich-user
   - bietlejuice.hubspot:load-clean-company
 
 bietlejuice.enrich_ebdb_listing_jobs:

@@ -72,7 +72,8 @@ latest_contract AS (
 SELECT
   hl.id_house_listing,
   hl.id_house,
-  COALESCE(fc.monthly_administration_fee, MIN(hf.administration_fee), mf.fee) as administration_fee
+  hl.country_code,
+  COALESCE(fc.monthly_administration_fee, MIN(hf.administration_fee), mf.fee) AS administration_fee
 FROM
   datalake_ebdb_listing.house_listing AS hl
 LEFT JOIN
@@ -89,4 +90,4 @@ LEFT JOIN
 LEFT JOIN
   minimum_fees AS mf
     ON hl.id_house = mf.id_house
-GROUP BY 1, 2, monthly_administration_fee, mf.fee
+GROUP BY 1, 2, 3, monthly_administration_fee, mf.fee

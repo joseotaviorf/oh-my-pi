@@ -5,22 +5,26 @@ with house_aud as (
 -- (status_MOD = 1 may not work sometimes)                                                            --
 --------------------------------------------------------------------------------------------------------
     select
+        rev.id_user,
+        h.id_region,
+        h_aud.id_house,
+        ch.country_code,
         cast(from_unixtime(cast(rev.ts_revision as bigint)/1000) as timestamp)  as revision_time,
         cast(from_unixtime(cast(rev.ts_revision as bigint)/1000) as date) as status_date,
-        rev.id_user,
         rev.reason,
         lag(h_aud.status) over(partition by h_aud.id_house order by h_aud.rev) as previous_status,
         lag(h_aud.rent) over(partition by h_aud.id_house order by h_aud.rev) as previous_rent_price,
         h_aud.status,
-        h.id_region,
         h_aud.rent,
-        h_aud.id_house,
         h_aud.rev,
         h_aud.mod_rent,
         h_aud.dt_first_publication
     from datalake_ebdb_clean.house_aud h_aud
     join datalake_ebdb_clean.house h
         on h.id = h_aud.id_house
+    INNER JOIN
+        datalake_ebdb_country.house AS ch
+            ON ch.id_house = h.id
     inner join datalake_ebdb_clean.user_revision_entity rev
         on rev.id = h_aud.rev
 ),
@@ -31,6 +35,7 @@ house_status_history as (
     select
         id_house,
         id_region,
+        country_code,
         rev,
         max(dt_first_publication) over(partition by id_house) as ts_first_publication,
         revision_time as ts_status_changed,
@@ -101,6 +106,7 @@ house_status_version_publications as (
     select
         id_house,
         id_region,
+        country_code,
         rev,
         reason,
         status_history,

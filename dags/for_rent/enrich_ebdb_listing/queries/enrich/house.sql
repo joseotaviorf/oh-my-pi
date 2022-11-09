@@ -65,7 +65,7 @@ partner_agencies AS (
 )
 SELECT
   h.id,
-  COALESCE(ct.id, region.id_country) AS id_country,
+  ch.id_country,
   h.id_state,
   h.id_region,
   h.id_user,
@@ -74,7 +74,7 @@ SELECT
   h.id_condo_parent,
   h.id % 892700000 AS house_short_id,
   h.rent,
-  COALESCE(ct.code, region.country_code) AS country_code,
+  ch.country_code,
   state.abbreviation AS state_abbreviation,
   state.name AS state_name,
   m_region.city_name AS region_city_name,
@@ -248,18 +248,13 @@ LEFT JOIN
   datalake_ebdb_clean.state
     ON state.id = h.id_state
 LEFT JOIN
-  datalake_ebdb_clean.country AS ct
-    ON ct.id = state.id_country
+  datalake_ebdb_country.house AS ch
+    ON ch.id_house = h.id
 LEFT JOIN
   datalake_ebdb_clean.map_region AS m_region
     ON h.id_region = COALESCE(m_region.id,
                               m_region.id_macro,
                               m_region.id_city)
--- AS we have several ids on House that has id_state null and would end up with no country info,
--- this join between map_region and region attributes a country using the respective id_region
-LEFT JOIN
-  datalake_region.region
-    ON region.id = m_region.id
 LEFT JOIN
   datalake_ebdb_clean.condo
     ON condo.id = h.id_condo_parent

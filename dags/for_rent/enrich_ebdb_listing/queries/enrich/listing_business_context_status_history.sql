@@ -16,6 +16,7 @@ WITH events AS (
 )
 SELECT
     e.id_house,
+    COALESCE(ch.country_code, 'Undefined') AS country_code,
     e.business_context,
     e.status,
     e.status_reason,
@@ -28,3 +29,6 @@ LEFT JOIN
         ON e2.id_house = e.id_house
         AND e2.business_context = e.business_context
         AND e.event_order = e2.event_order - 1
+LEFT JOIN
+    datalake_ebdb_country.house AS ch
+        ON ch.id_house = e.id_house

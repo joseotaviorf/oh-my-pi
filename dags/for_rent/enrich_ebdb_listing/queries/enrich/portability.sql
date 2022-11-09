@@ -1,10 +1,11 @@
 SELECT
-  id,
-  id_house,
+  p.id,
+  p.id_house,
   id_flow,
   id_tenant,
-  id_state as id_house_state,
-  id_region as id_house_region,
+  p.id_state AS id_house_state,
+  p.id_region AS id_house_region,
+  COALESCE(ch.country_code, 'Undefined') AS country_code,
   owner_type,
   dt_contract_started,
   dt_contract_ended,
@@ -30,8 +31,11 @@ SELECT
   tenant_data_name,
   tenant_data_phone_number,
   contract_observations,
-  coalesce(owner_type = 'B2B', false) as is_owner_b2b,
-  ts_created,
-  ts_updated
-from
-  datalake_ebdb_clean.portability
+  COALESCE(owner_type = 'B2B', FALSE) AS is_owner_b2b,
+  p.ts_created,
+  p.ts_updated
+FROM
+  datalake_ebdb_clean.portability AS p
+LEFT JOIN
+    datalake_ebdb_country.house AS ch
+        ON ch.id_house = p.id_house

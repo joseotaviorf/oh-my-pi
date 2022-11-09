@@ -147,6 +147,7 @@ non_doorman_listing AS (
     SELECT DISTINCT
         hl.id_house,
         hl.id_house_listing,
+        hl.country_code,
         h.doorman_type,
         FIRST_VALUE(kla.access_type_name) OVER (PARTITION BY hl.id_house_listing ORDER BY kla.key_location_rev) AS first_key_location,
         h.key_location AS house_key_location,
@@ -176,7 +177,8 @@ SELECT DISTINCT
     ka.id_agent,
     ndl.id_house,
     ndl.id_house_listing,
-    CAST(ka.id_agents AS STRING) AS all_id_agents, 
+    CAST(ka.id_agents AS STRING) AS all_id_agents,
+    COALESCE(user.country_code, ndl.country_code) AS country_code,
     ndl.first_key_location,
     ndl.house_key_location,
     ndl.last_key_location,
@@ -215,3 +217,6 @@ FROM
 LEFT JOIN
     keys_attributions ka
         USING(id_house_listing)
+LEFT JOIN
+    datalake_ebdb_country.user
+        ON user.id_user = ka.id_agent

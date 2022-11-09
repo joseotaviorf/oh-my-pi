@@ -19,8 +19,7 @@ columns:
       - datalake_ebdb_clean.user.id
   country_code:
     lineage:
-      - datalake_ebdb_clean.country.code
-      - datalake_region.region.country_code
+      - datalake_ebdb_country.house.country_code
   job_status:
     lineage:
       - datalake_ebdb_clean.photographer_job.status

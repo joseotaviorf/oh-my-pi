@@ -11,6 +11,9 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id_house
+  country_code:
+    lineage:
+      - datalake_ebdb_country.house.country_code
   rental_administrator:
     lineage:
       - datalake_ebdb_clean.listing_rent_model.rental_administrator

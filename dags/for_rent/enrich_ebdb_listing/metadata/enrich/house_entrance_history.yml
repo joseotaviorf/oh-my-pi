@@ -9,6 +9,9 @@ columns:
   id_occupant:
     lineage:
       - datalake_ebdb_clean.access_type_aud.id_occupant
+  country_code:
+    lineage:
+      - datalake_ebdb_country.house.country_code
   rev:
     lineage:
       - datalake_ebdb_clean.access_type_aud.rev

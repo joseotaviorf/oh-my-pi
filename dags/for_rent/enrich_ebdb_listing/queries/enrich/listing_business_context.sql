@@ -46,6 +46,7 @@ registrant AS (
 SELECT 
     lbc.id,
     lbc.id_house,
+    COALESCE(ch.country_code, 'Undefined') AS country_code,
     lbc.business_context,
     lbc.ownership,
     lbc.calculator_price,
@@ -72,3 +73,6 @@ LEFT JOIN
 LEFT JOIN
     registrant
         ON lbc.id_house = registrant.id_house
+LEFT JOIN
+    datalake_ebdb_country.house AS ch
+        ON ch.id_house = lbc.id_house

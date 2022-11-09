@@ -22,6 +22,9 @@ columns:
   id_final_report_pdf:
     lineage:
       - datalake_ebdb_clean.inspection.id_final_report_pdf
+  country_code:
+    lineage:
+      - datalake_ebdb_country.house.country_code
   status:
     lineage:
       - datalake_ebdb_clean.inspection.status

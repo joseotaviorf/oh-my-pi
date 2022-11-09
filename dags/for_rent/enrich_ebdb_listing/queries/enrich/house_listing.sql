@@ -71,6 +71,7 @@ house_listing_plain as (
 --------------------------------------------------------------------------------------------------------
     select
         hs_v.id_house,
+        hs_v.country_code,
         hs_v.order_version as version,
         sc_v.category_change as change_version_status,
         hs_v.ts_last_unpublished,
@@ -83,7 +84,7 @@ house_listing_plain as (
     left join status_change_version sc_v
         on hs_v.id_house = sc_v.id_house
         and hs_v.order_version = sc_v.order_version
-    group by 1, 2, 3, 4
+    group by 1, 2, 3, 4, 5
 ),
 house_listing_full as (
 --------------------------------------------------------------------------------------------------------
@@ -92,6 +93,7 @@ house_listing_full as (
     select
         cast(cast(id_house as string)||'00'||cast(version as string) as bigint) as id_house_listing,
         id_house,
+        country_code,
         version,
         case when version = 0 then null
              when version = 1 then 'First Listing'
@@ -126,6 +128,7 @@ house_rent_max as (
     select
         hlf.id_house_listing,
         hlf.id_house,
+        hlf.country_code,
         hlf.version,
         rh.rev,
         rh.rent_price_history,
@@ -193,6 +196,7 @@ listing_special_conditions as (
 -- ----------------------------------------------------------------------------------
     select
         hl.id_house_listing,
+        hl.country_code,
         sc.special_condition_type,
         max(sc.dt_opted_in) as dt_opted_in,
         max(sc.dt_opted_out) as dt_opted_out
@@ -203,12 +207,13 @@ listing_special_conditions as (
         and greatest(sc.dt_opted_in, date(hl.ts_listing_version_start)) < coalesce(date(hl.ts_listing_version_end), date(now()))
         and greatest(coalesce(sc.dt_opted_out, date(now() - interval '1' day)), coalesce(date(hl.ts_listing_version_end), date((now() - interval '1' day)))) >= coalesce(date(hl.ts_listing_version_end), date(now() - interval '1' day))
         and greatest(coalesce(sc.dt_opted_out, date(now() - interval '1' day)), coalesce(date(hl.ts_listing_version_end), date((now() - interval '1' day)))) >= date(hl.ts_listing_version_start)
-    group by 1, 2
+    group by 1, 2, 3
 ),
 multiple_special_conditions as (
 -- in case a house listing has more than one Special Condition types: exclusivity, ready and reno on the same version
     select
         id_house_listing,
+        country_code,
         special_condition_type,
         dt_opted_in,
         dt_opted_out,
@@ -229,6 +234,7 @@ last_opt as (
 -- select the latest Special Condition type a house listing has entered
     select
         id_house_listing,
+        country_code,
         special_condition_type,
         dt_opted_in,
         dt_opted_out
@@ -239,6 +245,7 @@ first_opt as (
 -- select the oldest Special Condition type a house listing has entered
     select
         id_house_listing,
+        country_code,
         special_condition_type,
         dt_opted_in,
         dt_opted_out
@@ -248,6 +255,7 @@ first_opt as (
 listing_special_conditions_dates as (
     select
         fo.id_house_listing,
+        fo.country_code,
         lo.special_condition_type, -- important to select special_condition_type from last_op since we want to show LAST special condition type
         fo.dt_opted_in as dt_first_opted_in,
         fo.dt_opted_out as dt_first_opted_out,
@@ -271,6 +279,7 @@ house_listing AS (
     select
         hl.id_house_listing,
         hl.id_house,
+        hl.country_code,
         hl.version,
         hl.status,
         rent_last.rent,
@@ -449,6 +458,7 @@ SELECT
     hl.id_house_listing,
     hl.id_house,
     hl_c.id_contract,
+    hl.country_code,
     hl.version,
     hl.status,
     hl.rent,
