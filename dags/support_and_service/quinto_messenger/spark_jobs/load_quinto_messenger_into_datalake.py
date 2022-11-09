@@ -71,7 +71,7 @@ if __name__ == "__main__":
             # the table names in the datalake must be lowercase
             s3_loader.load_df(
                 df=df,
-                s3_path=f"{database_location}{table.table_name}",
+                s3_path=f"{database_location}{table.table_name.lower()}",
                 format_options=format_options,
                 max_records_per_file=MAX_RECORDS_PER_FILE,
                 partitions=partition_cols,
