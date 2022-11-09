@@ -111,9 +111,9 @@ aud_guarantee as (
 SELECT
     p.id,
     p.id_pre_proposal,
-    hl.id_country,
+    ch.id_country,
     p.id_offer,
-    hl.country_code,
+    COALESCE(ch.country_code, 'Undefined') AS country_code,
     p.guarantee,
     cap.income,
     cap.last_result,
@@ -188,5 +188,5 @@ LEFT JOIN
     datalake_credit_analysis.credit_analysis_proposals AS cap
         ON p.id = cap.id_proposal
 LEFT JOIN
-    datalake_ebdb_listing.house AS hl
-        ON hl.id = p.id_house
+    datalake_ebdb_country.house AS ch
+        ON ch.id_house = p.id_house

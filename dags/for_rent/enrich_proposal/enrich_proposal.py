@@ -75,10 +75,13 @@ datalake_task_groups = DatalakeTaskGroup(
     athena_query_result_location=athena_query_result_location,
 )
 
+partition_cols = config_service.get_config("partition_cols")
+
 enrich_task_groups = datalake_task_groups.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
+    partitions=partition_cols,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

@@ -10,7 +10,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-Produces the following output table:
+Produces the following output table, partitioned by `country_code`:
 
 - `proposal`
 
