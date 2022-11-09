@@ -1,4 +1,0 @@
----
-partition_cols: ["pwa", "dt"]
-tables_list: ["suites", "tests"]
-cypress_source_bucket: cypress-old.s3.forno.quintoandar.com.br

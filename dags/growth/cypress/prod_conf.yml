@@ -1,4 +1,0 @@
----
-partition_cols: ["pwa", "dt"]
-tables_list: ["suites", "tests"]
-cypress_source_bucket: 5a-cypress
