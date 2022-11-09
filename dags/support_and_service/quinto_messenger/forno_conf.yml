@@ -1,3 +1,6 @@
 ---
 lineage_product_database_name: quintomessenger
 partition_cols: [year, month, day]
+ALLOW_LIST: [Channel, ChannelEvent, Chat, Task, TaskEvent]
+incremental_col: updated_at
+MAX_RECORDS_PER_FILE: 250000

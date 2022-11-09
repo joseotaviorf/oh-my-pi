@@ -27,6 +27,9 @@ ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(SOURCE)
 partition_cols = config_service.get_config("partition_cols")
+allow_list = config_service.get_config("ALLOW_LIST")
+incremental_col = config_service.get_config("incremental_col")
+MAX_RECORDS_PER_FILE = config_service.get_config("MAX_RECORDS_PER_FILE")
 
 # airflow vars
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -87,7 +90,7 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
     extraction_spark_job_file=raw_spark_jobs_path,
-    raw_spark_job_extra_args=["{{ ds }}", json.dumps(partition_cols)],
+    raw_spark_job_extra_args=["{{ ds }}"],
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(

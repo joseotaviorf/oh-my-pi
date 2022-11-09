@@ -10,10 +10,17 @@ from bietlejuice.consumers.db_consumers import PostgresConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.configuration_service import ConfigurationService
 
-SOURCE = "quinto_messenger"
 JOB_NAME = "load_quinto_messenger_into_datalake"
-ALLOW_LIST = ["Channel", "ChannelEvent", "Task", "TaskEvent"]
+SOURCE = "quinto_messenger"
+
+# parameters
+config_service = ConfigurationService(SOURCE)
+partition_cols = config_service.get_config("partition_cols")
+allow_list = config_service.get_config("ALLOW_LIST")
+incremental_col = config_service.get_config("incremental_col")
+MAX_RECORDS_PER_FILE = config_service.get_config("MAX_RECORDS_PER_FILE")
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -23,12 +30,10 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("execution_date")
-    parser.add_argument("partition_cols")
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
     execution_date = args.execution_date
-    partition_cols = json.loads(args.partition_cols)
 
     logger.info(
         f"m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, "
@@ -59,18 +64,25 @@ if __name__ == "__main__":
     metastore_service.create_database(database_name)
 
     for table in tables:
-        if table.table_name in ALLOW_LIST:
+        if table.table_name in allow_list:
             df = postgres_consumer.get_incremental_data_from_table(
-                table.table_name, "updated_at", execution_date
+                table.table_name, incremental_col, execution_date
             )
             # the table names in the datalake must be lowercase
-            s3_loader.load_incremental_table(
+            s3_loader.load_df(
+                df=df,
+                s3_path=f"{database_location}{table.table_name}",
+                format_options=format_options,
+                max_records_per_file=MAX_RECORDS_PER_FILE,
+                partitions=partition_cols,
+            )
+            spark_metastore_loader.update_metastore(
                 df=df,
                 database_name=database_name,
                 table_name=table.table_name.lower(),
                 format_options=format_options,
                 database_location=database_location,
-                partition_cols=partition_cols,
+                partitions=partition_cols,
             )
             metastore_service.create_new_partitions_from_df(
                 database_name, table.table_name.lower(), df, partition_cols
