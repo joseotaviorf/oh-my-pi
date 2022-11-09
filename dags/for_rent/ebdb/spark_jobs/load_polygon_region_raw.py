@@ -1,12 +1,11 @@
 import json
-import logging
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
-from bietlejuice.base.db import QUERIES_DATALAKE_PATH
-from bietlejuice.services import FileService
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import MySqlConsumer
@@ -14,11 +13,8 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger("load_query_table_in_datalake")
-
-JOB_NAME = "load_query_table_in_datalake"
-
+JOB_NAME = "load_polygon_region_raw"
+logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -33,10 +29,10 @@ if __name__ == "__main__":
     table_name = args.table_name
     datalake_bucket = args.datalake_bucket
 
-    query_path = QUERIES_DATALAKE_PATH + source + "/raw/{}.sql".format(table_name)
-    query = FileService.get_query_from_file_name(query_path)
+    query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+        dag_name=source, layer=LayerEnum.RAW.value, table_name=table_name
+    )
 
-    # setup
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
@@ -48,13 +44,11 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     conn_config_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.EBDB)
-    conn_config = json.loads(conn_config_json)
-    mysql_consumer = MySqlConsumer(conn_config, spark_client)
+    mysql_consumer = MySqlConsumer(json.loads(conn_config_json), spark_client)
 
-    # create database if not exists
     database_name = db_info["db_raw_databricks"]
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = db_info["db_raw_path"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
     metastore_service.create_database(database_name)
     df = mysql_consumer.get_data_from_query(query, table_name=table_name)
 

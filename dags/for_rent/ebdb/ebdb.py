@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+from pendulum import timezone
 
 import pendulum
 from airflow.models import DAG, Variable
@@ -17,58 +18,48 @@ from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathSe
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.services import ConfigurationService
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
-DAG_ID = "ebdb"
-FULL_DAG_ID = "bietlejuice.{}".format(DAG_ID)
-ENV = os.environ.get("ENVIRONMENT")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
-local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
-MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "10 21 * * *"
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
-
-# Job params
+# Pipeline inputs
 SOURCE = "ebdb"
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-
-# s3 path setup
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-EBDB_SPARK_JOBS_PATH = S3_PREFIX + "/spark_jobs/{}/".format(DAG_ID)
-LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_ID
-)
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
-CREATE_CLEAN_TABLE_IN_DATA_LAKE_PATH = (
-    EBDB_SPARK_JOBS_PATH + "create_clean_table_in_datalake.py"
-)
-CREATE_EXTERNAL_TABLES_FILE_PATH = EBDB_SPARK_JOBS_PATH + "create_external_tables.py"
-LOAD_DB_SCHEMA_INTO_DATALAKE_RAW_FILE_PATH = (
-    EBDB_SPARK_JOBS_PATH + "load_ebdb_into_datalake.py"
-)
-
-# cluster params
-CLUSTER_DESCRIPTION = Variable.get("databricks_ebdb_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-
-# cluster libraries
-DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
-CUSTOM_LIBRARIES = [
-    {
-        "jar": f"{ARTIFACTS_S3_BUCKET}/mysql-connector-java/mysql-connector-java-5.1"
-        f".47.jar"
-    }
-]
-LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
-
-RAW_EXECUTION_TIMEOUT_HOURS = 3.5
+DAG_ID = "bietlejuice.{}".format(SOURCE)
+MAIN_START_DATE = datetime(2019, 5, 31, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = "10 21 * * *"
+CLUSTER_DESCRIPTION = "databricks_ebdb_cluster"
 
 config_service = ConfigurationService(SOURCE)
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+datalake_bucket = config_service.get_config("datalake_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
+)
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+default_libraries = config_service.get_config("default_libraries")
+cluster_configuration = Variable.get(CLUSTER_DESCRIPTION, deserialize_json=True)
+cluster_configuration["cluster_log_conf"]["s3"][
+    "destination"
+] = f"s3://{databricks_bietlejuice_repo_path}/logs/jobs/{DAG_ID}"
 
-# dag definition
+EBDB_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
+RAW_SPARK_JOB_FILE = EBDB_SPARK_JOBS_PATH + "load_ebdb_raw.py"
+CLEAN_SPARK_JOB_PATH = EBDB_SPARK_JOBS_PATH + "load_ebdb_clean.py"
+EXTERNAL_TABLE_SPARK_JOB_FILE = EBDB_SPARK_JOBS_PATH + "create_external_tables.py"
+
+CUSTOM_LIBRARIES = [{"maven": {"coordinates": "mysql:mysql-connector-java:5.1.47"}}]
+RAW_EXECUTION_TIMEOUT_HOURS = 3.5
+
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
+ENV = os.environ.get("ENVIRONMENT")
+
+
 dag = DAG(
-    dag_id=FULL_DAG_ID,
+    dag_id=DAG_ID,
     default_args={
         "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
@@ -78,7 +69,7 @@ dag = DAG(
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     catchup=False,
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=DOC_MD_BASE_URL, dag_id=FULL_DAG_ID
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 
@@ -96,15 +87,8 @@ def clean_tasks(table_name):
         task_id=f"create-clean-{slugged_table_name}-in-data-lake",
         json={
             "spark_python_task": {
-                "python_file": CREATE_CLEAN_TABLE_IN_DATA_LAKE_PATH,
-                "parameters": [
-                    table_name,
-                    SOURCE,
-                    ENV,
-                    DATALAKE_BUCKET,
-                    DAG_ID,
-                    "clean",
-                ],
+                "python_file": CLEAN_SPARK_JOB_PATH,
+                "parameters": [ENV, datalake_bucket, table_name, SOURCE],
             }
         },
     )
@@ -115,12 +99,12 @@ def clean_tasks(table_name):
         pool="athena",
         json={
             "spark_python_task": {
-                "python_file": CREATE_EXTERNAL_TABLES_FILE_PATH,
+                "python_file": EXTERNAL_TABLE_SPARK_JOB_FILE,
                 "parameters": [
                     ENV,
-                    ATHENA_QUERY_RESULT_LOCATION,
+                    athena_query_results_bucket,
                     "clean",
-                    DATALAKE_BUCKET,
+                    datalake_bucket,
                     SOURCE,
                     "--tables",
                 ]
@@ -134,9 +118,9 @@ def clean_tasks(table_name):
         task_id=f"sync-hive-metastore-clean-{slugged_table_name}-structure",
         json={
             "spark_python_task": {
-                "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
+                "python_file": f"{base_spark_jobs_path}/sync_metastore_tables_structure.py",
                 "parameters": [
-                    DATALAKE_BUCKET,
+                    datalake_bucket,
                     LayerEnum.CLEAN.value,
                     SOURCE,
                     "--table-name",
@@ -155,7 +139,7 @@ def clean_tasks(table_name):
             task_id=f"propagate-table-metadata-clean-{slugged_table_name}",
             json={
                 "spark_python_task": {
-                    "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_table_metadata.py",
+                    "python_file": f"{base_spark_jobs_path}/propagate_table_metadata.py",
                     "parameters": [
                         LayerEnum.CLEAN.value,
                         MetadataTypeEnum.LINEAGE.value,
@@ -191,8 +175,8 @@ def build_raw_task_list():
         dag=dag,
         json={
             "spark_python_task": {
-                "python_file": LOAD_DB_SCHEMA_INTO_DATALAKE_RAW_FILE_PATH,
-                "parameters": [ENV, DATALAKE_BUCKET],
+                "python_file": RAW_SPARK_JOB_FILE,
+                "parameters": [ENV, datalake_bucket],
             }
         },
         execution_timeout=timedelta(hours=RAW_EXECUTION_TIMEOUT_HOURS),
@@ -204,12 +188,12 @@ def build_raw_task_list():
         pool="athena",
         json={
             "spark_python_task": {
-                "python_file": CREATE_EXTERNAL_TABLES_FILE_PATH,
+                "python_file": EXTERNAL_TABLE_SPARK_JOB_FILE,
                 "parameters": [
                     ENV,
-                    ATHENA_QUERY_RESULT_LOCATION,
+                    athena_query_results_bucket,
                     "raw",
-                    DATALAKE_BUCKET,
+                    datalake_bucket,
                     SOURCE,
                     "--all",
                 ],
@@ -269,25 +253,25 @@ def task_list_last_tasks(task_list_tasks):
     return last_tasks
 
 
-# Tasks definitions
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    cluster_configuration=cluster_configuration,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-polygon_region_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+polygon_region_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
-    task_id="polygon_region_to_datalake_raw",
+    task_id="load-polygon-region-raw",
     json={
         "spark_python_task": {
-            "python_file": EBDB_SPARK_JOBS_PATH + "load_query_table_in_datalake.py",
-            "parameters": [ENV, DATALAKE_BUCKET, "poligonoregiao", SOURCE],
+            "python_file": EBDB_SPARK_JOBS_PATH + "load_polygon_region_raw.py",
+            "parameters": [ENV, datalake_bucket, "poligonoregiao", SOURCE],
         }
     },
 )
@@ -297,9 +281,9 @@ sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id=f"sync-hive-metastore-raw-structure",
     json={
         "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
+            "python_file": f"{base_spark_jobs_path}/sync_metastore_tables_structure.py",
             "parameters": [
-                DATALAKE_BUCKET,
+                datalake_bucket,
                 LayerEnum.RAW.value,
                 SOURCE,
                 "--all-tables",
@@ -313,7 +297,7 @@ propagate_table_lineage_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id=f"propagate-table-metadata-raw",
     json={
         "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_raw_tables_metadata.py",
+            "python_file": f"{base_spark_jobs_path}/propagate_raw_tables_metadata.py",
             "parameters": [
                 LayerEnum.RAW.value,
                 MetadataTypeEnum.FULL_CONTENT_LINEAGE.value,
@@ -331,10 +315,7 @@ raw_task_list = build_raw_task_list()
 clean_task_list = build_layer_task_list("clean")
 
 # create-cluster >> downstream
-create_cluster_task >> [
-    task_list_first_task(raw_task_list),
-    polygon_region_to_datalake_raw_task,
-]
+create_cluster_task >> [task_list_first_task(raw_task_list), polygon_region_raw_task]
 
 # raw >> hive sync
 chain(task_list_first_task(raw_task_list), sync_metastore_table_structure_task)
@@ -348,9 +329,7 @@ chain(
     [task_list_first_task(c) for c in clean_task_list.values()],
 )
 
-polygon_region_to_datalake_raw_task >> task_list_first_task(
-    clean_task_list["polygon_region"]
-)
+polygon_region_raw_task >> task_list_first_task(clean_task_list["polygon_region"])
 
 contract_model_dependencies = []
 contract_model_dependencies.extend(
@@ -386,7 +365,7 @@ for tb_name in tb_names:
         task_id=f"data-quality-tests-raw-{SOURCE}{table_name_suffix}",
         json={
             "spark_python_task": {
-                "python_file": f"{BASE_SPARK_JOBS_PATH}/data_quality_tests.py",
+                "python_file": f"{base_spark_jobs_path}/data_quality_tests.py",
                 "parameters": [
                     ENV,
                     "{{ ds }}",
