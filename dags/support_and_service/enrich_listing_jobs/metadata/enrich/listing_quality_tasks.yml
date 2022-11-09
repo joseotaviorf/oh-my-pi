@@ -1,0 +1,46 @@
+---
+database_name: datalake_listing_jobs
+table_name: listing_quality_tasks
+columns:
+  id_photo_job:
+    lineage:
+      - datalake_gsheets_clean.aux_check_photo_sender.id_photo_job
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_job
+  id_house:
+    lineage:
+      - datalake_gsheets_clean.aux_check_photo_sender.id_house
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  id_ticket:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ticket_funnel
+  responsible_analyst_name:
+    lineage:
+      - datalake_gsheets_clean.aux_check_photo_sender.analyzed_by
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  user_sender:
+    lineage:
+      - datalake_gsheets_clean.aux_check_photo_sender.final_user_sender
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  house_classification:
+    lineage:
+      - datalake_gsheets_clean.aux_check_photo_sender.final_classification
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  house_classification_reason:
+    lineage:
+      - datalake_gsheets_clean.aux_check_photo_sender.final_classification_reason
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  classification_comments:
+    lineage:
+      - datalake_gsheets_clean.aux_check_photo_sender.final_classification_comments
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  signboard_location:
+    lineage:
+      - datalake_gsheets_clean.aux_check_photo_sender.sign_placement
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  dt_analyzed_utc:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated
+  dt_analyzed:
+    lineage:
+      - datalake_gsheets_clean.aux_check_photo_sender.dt_analyzed
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated_local

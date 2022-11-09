@@ -37,12 +37,6 @@ agents_ranking_targets:
     clean_table_name: agents_ranking_targets
     sheet_context: support_and_service
 
-aux_check_photo_sender:
-    sheet_id: 10dUA-ED5cqd8qEHrMC-iXjPio0WBEUP-dZGkcPwP6WU
-    sheet_name: aux_check_photo_sender
-    clean_table_name: aux_check_photo_sender
-    sheet_context: support_and_service
-
 aux_payments_photos:
     sheet_id: 1-I_TRK051HkgvY7OH09x5quCwn0K6mTbOFQIwlROsC8
     sheet_name: aux_payments_photos
@@ -1099,6 +1093,12 @@ aux_agents_sale:
     sheet_id: 1mom8xcJ4XCpr02S38DgW_cmEDcdzsOiMkW2vSbg0Ra0
     sheet_name: aux_agents_sale
     clean_table_name: aux_agents_sale
+    sheet_context: static
+
+aux_check_photo_sender:
+    sheet_id: 10dUA-ED5cqd8qEHrMC-iXjPio0WBEUP-dZGkcPwP6WU
+    sheet_name: aux_check_photo_sender
+    clean_table_name: aux_check_photo_sender
     sheet_context: static
 
 cities_neighborhoods_ibge_qa:
