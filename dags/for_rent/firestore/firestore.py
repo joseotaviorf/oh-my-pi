@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from pendulum import timezone
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -48,9 +48,7 @@ RAW_SPARK_JOB_FILE = (
 )
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_firestore_cluster", deserialize_json=True
-)
+cluster_description = config_service.get_config("custom_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -75,7 +73,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
+    cluster_configuration=cluster_description,
     libraries=default_libraries + custom_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
