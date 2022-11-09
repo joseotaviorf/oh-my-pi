@@ -747,6 +747,7 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
+  - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks
   - bietlejuice.gsheets.growth:load-clean-branding-where-is-plaquinha
   - bietlejuice.ebdb:create-clean-polygon-region-in-data-lake
   # performance_marketing_metrics_*_casa_mineira

@@ -5,9 +5,9 @@ houses_w_plaquinhas AS (
 ---------------------------------------------------------
     SELECT
         p.id_house::BIGINT AS id_house,
-        dt_plaquinha::DATE AS dt_plaquinha,
         installation_type,
-        listing_type
+        listing_type,
+        dt_plaquinha::DATE AS dt_plaquinha
     FROM
         datalake_gsheets_clean.branding_where_is_plaquinha p
     GROUP BY
@@ -17,16 +17,17 @@ houses_w_plaquinhas AS (
 -- Plaquinhas installed by photographers --
 -------------------------------------------
     SELECT
-        gsps.id_house::BIGINT AS id_house,
-        dpj.dt_photos_uploaded::DATE AS dt_plaquinha,
+        lqt.id_house,
         'Photographer' AS installation_type,
-        'New Listing' AS listing_type
+        'New Listing' AS listing_type,
+        dpj.dt_photos_uploaded AS dt_plaquinha
     FROM
-        datalake_gsheets_clean.aux_check_photo_sender gsps
-    LEFT JOIN dw_public.dim_photo_job dpj
-        ON dpj.sk_photo_job = gsps.id_photo_job
+        datalake_listing_jobs.listing_quality_tasks lqt
+    LEFT JOIN
+        dw_public.dim_photo_job dpj
+            ON dpj.sk_photo_job = lqt.id_photo_job
     WHERE
-        gsps.sign_placement <> ''
+        lqt.signboard_location <> ''
     GROUP BY
         1,2,3,4
 ),
@@ -42,9 +43,9 @@ condo_w_plaquinhas_rent AS (
         ON hp.id_house = dhl.id_house
     JOIN dw_public.fact_house_listing_flows f
         ON f.sk_house_listing = dhl.sk_house_listing
-    WHERE 
+    WHERE
         f.sk_condo > 0
-    GROUP BY 
+    GROUP BY
         1,2,3,4
 ),
 daily_published_listings_rent AS (
@@ -62,18 +63,18 @@ daily_published_listings_rent AS (
         ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start DESC NULLS FIRST) AS order_status -- daily order status
     FROM
         dw_public.fact_house_listing_status f
-    JOIN dw_public.dim_date d 
+    JOIN dw_public.dim_date d
         ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) AND COALESCE(DATE_FORMAT(TO_DATE(NULLIF(sk_status_end_date, -1)::STRING, 'yyyyMMdd') - INTERVAL '1' day, 'yyyyMMdd')::BIGINT, DATE_FORMAT(CURRENT_DATE - INTERVAL '1' day, 'yyyyMMdd'))::BIGINT
     WHERE
         f.status_history = 'publicado' -- consider only published status
         AND SUBSTRING(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
-        AND date >= DATE('2021-02-01') -- Month when the campaign started 
+        AND date >= DATE('2021-02-01') -- Month when the campaign started
 ),
 plaquinhas_rent AS (
     ----------------------------------------
     -- Joining OL and plaquinhas FR infos --
     ----------------------------------------
-    SELECT 
+    SELECT
         fhs.sk_house_listing,
         fhs.date,
         fhs.week_start,
@@ -91,10 +92,10 @@ plaquinhas_rent AS (
         COALESCE(hp.listing_type) AS listing_type
     FROM
         daily_published_listings_rent fhs
-    LEFT JOIN dw_public.fact_house_listings fhl 
+    LEFT JOIN dw_public.fact_house_listings fhl
         ON fhs.sk_house_listing = fhl.sk_house_listing
     LEFT JOIN houses_w_plaquinhas hp
-        ON (fhl.sk_house_listing/1000)::INTEGER = hp.id_house 
+        ON (fhl.sk_house_listing/1000)::INTEGER = hp.id_house
     LEFT JOIN condo_w_plaquinhas_rent cp
         ON fhl.sk_condo = cp.sk_condo
     WHERE
@@ -102,7 +103,7 @@ plaquinhas_rent AS (
         AND fhl.sk_region > 0
 ),
 plaquinhas_sale AS (
-    WITH 
+    WITH
     condo_w_plaquinhas_sale AS (
         SELECT
             flf.sk_condo,
@@ -113,9 +114,9 @@ plaquinhas_sale AS (
             houses_w_plaquinhas hp
         JOIN dw_sale.fact_listing_flows flf
             ON substring(flf.sk_house_listing,0,9) = hp.id_house
-        WHERE 
+        WHERE
             flf.sk_condo > 0
-        GROUP BY 
+        GROUP BY
             1,2,3,4
     ),
     daily_published_listings_sale AS (
@@ -133,7 +134,7 @@ plaquinhas_sale AS (
             ROW_NUMBER() OVER(PARTITION BY f.sk_sale_listing, d.date ORDER BY f.ts_status_started DESC) AS order_status -- daily order status
         FROM
             dw_sale.fact_listing_status f
-        JOIN dw_public.dim_date d 
+        JOIN dw_public.dim_date d
             ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) AND COALESCE(DATE_FORMAT(TO_DATE(NULLIF(sk_status_end_date, -1)::STRING, 'yyyyMMdd') - INTERVAL '1' day, 'yyyyMMdd')::BIGINT, DATE_FORMAT(CURRENT_DATE - INTERVAL '1' day, 'yyyyMMdd')::BIGINT)
         WHERE
             f.status_history = 'PUBLISHED' -- consider only published status
@@ -160,7 +161,7 @@ plaquinhas_sale AS (
         COALESCE(hp.listing_type) AS listing_type
     FROM
         daily_published_listings_sale fhs
-    LEFT JOIN dw_sale.fact_listing_flows flf 
+    LEFT JOIN dw_sale.fact_listing_flows flf
         ON substring(fhs.sk_house_listing,0,9) = substring(flf.sk_house_listing,0,9)
     LEFT JOIN houses_w_plaquinhas hp
         ON substring(fhs.sk_house_listing,0,9) = hp.id_house
@@ -182,12 +183,12 @@ metrics_base AS (
         CAST(pr.listing_type AS STRING) AS listing_type,
         CAST(pr.weekday_name AS STRING) AS weekday_name,
         CAST(CASE
-            WHEN pr.id_plaquinha IS NOT NULL 
+            WHEN pr.id_plaquinha IS NOT NULL
                 AND pr.dt_plaquinha <= pr.date THEN TRUE
             ELSE FALSE
         END AS BOOLEAN) AS has_plaquinha, -- flag to identify if the house or the house condo has plaquinha
         CAST(CASE
-            WHEN pr.id_plaquinha_house IS NOT NULL 
+            WHEN pr.id_plaquinha_house IS NOT NULL
                 AND pr.dt_plaquinha_house <= pr.date THEN TRUE
             ELSE FALSE
         END AS BOOLEAN) AS has_plaquinha_house, -- flag to identify if the house has plaquinha
@@ -202,7 +203,7 @@ metrics_base AS (
         plaquinhas_rent pr
     LEFT JOIN dw_public.dim_region dr
         ON pr.sk_region = dr.sk_region
-    GROUP BY 
+    GROUP BY
         1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
     UNION
     SELECT
@@ -216,12 +217,12 @@ metrics_base AS (
         CAST(ps.listing_type AS STRING) AS listing_type,
         CAST(ps.weekday_name AS STRING) AS weekday_name,
         CAST(CASE
-            WHEN ps.id_plaquinha IS NOT NULL 
+            WHEN ps.id_plaquinha IS NOT NULL
                 AND ps.dt_plaquinha <= ps.date THEN TRUE
             ELSE FALSE
         END AS BOOLEAN) AS has_plaquinha, -- flag to identify if the house or the house condo has plaquinha
         CAST(CASE
-            WHEN ps.id_plaquinha_house IS NOT NULL 
+            WHEN ps.id_plaquinha_house IS NOT NULL
                 AND ps.dt_plaquinha_house <= ps.date THEN TRUE
             ELSE FALSE
         END AS BOOLEAN) AS has_plaquinha_house, -- flag to identify if the house has plaquinha
@@ -236,14 +237,14 @@ metrics_base AS (
         plaquinhas_sale ps
     LEFT JOIN dw_public.dim_region dr
         ON ps.sk_region = dr.sk_region
-    GROUP BY 
+    GROUP BY
         1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ),
 targets AS (
     -------------------------------------
     -- New installed plaquinhas target --
     -------------------------------------
-    SELECT 
+    SELECT
         CAST(NULL AS BIGINT) AS id_house,
         CAST(tgt.business_context AS STRING) AS business_context,
         CAST(NULL AS STRING) AS short_region_name,
@@ -262,13 +263,13 @@ targets AS (
         CAST(tgt.new_installed_plaquinhas_target AS DOUBLE) AS new_installed_plaquinhas_target,
         CAST(NULL AS DOUBLE) AS active_plaquinhas_target,
         CAST(NULL AS DOUBLE) AS cover_percent_target
-    FROM 
+    FROM
         datalake_gsheets_clean.plaquinhas_installation_targets tgt
-    UNION ALL 
+    UNION ALL
     ------------------------------
     -- Active plaquinhas target --
     ------------------------------
-    SELECT 
+    SELECT
         CAST(NULL AS BIGINT) AS id_house,
         CAST(tgt.business_context AS STRING) AS business_context,
         CAST(NULL AS STRING) AS short_region_name,
@@ -287,18 +288,18 @@ targets AS (
         CAST(NULL AS DOUBLE) AS new_installed_plaquinhas_target,
         CAST(tgt.active_plaquinhas_target AS DOUBLE) AS active_plaquinhas_target,
         CAST(tgt.cover_percent_target AS DOUBLE) AS cover_percent_target
-    FROM 
+    FROM
         datalake_gsheets_clean.plaquinhas_installation_targets tgt
 )
 -------------------------------
 -- UNION metrics and targets --
 -------------------------------
-SELECT 
+SELECT
     mb.*
-FROM 
+FROM
     metrics_base mb
 UNION ALL
-SELECT 
+SELECT
     t.*
-FROM 
+FROM
     targets t

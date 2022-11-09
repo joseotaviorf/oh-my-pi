@@ -36,13 +36,13 @@ columns:
       - dw_public.dim_date.date
       - dw_sale.fact_listing_flows.sk_condo
       - datalake_gsheets_clean.branding_where_is_plaquinha.id_house
-      - datalake_gsheets_clean.aux_check_photo_sender.id_house
+      - datalake_listing_jobs.listing_quality_tasks.id_house
   has_plaquinha_house:
     lineage:
       - dw_public.dim_date.date
       - dw_sale.fact_listing_flows.sk_condo
       - datalake_gsheets_clean.branding_where_is_plaquinha.id_house
-      - datalake_gsheets_clean.aux_check_photo_sender.id_house
+      - datalake_listing_jobs.listing_quality_tasks.id_house
   dt_month_end:
     lineage:
       - dw_public.dim_date.month_end
