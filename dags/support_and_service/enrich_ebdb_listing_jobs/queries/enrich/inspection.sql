@@ -84,6 +84,6 @@ LEFT JOIN
 LEFT JOIN
     inspection_aud_sync ias
         ON i.id = ias.id_inspection
-LEFT JOIN
+JOIN
     datalake_ebdb_country.house AS h
         ON h.id_house = i.id_house

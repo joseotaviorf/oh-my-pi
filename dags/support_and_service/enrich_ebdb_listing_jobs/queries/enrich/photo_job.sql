@@ -95,7 +95,7 @@ select
             when job_creator_info.id_sales_rep is not null then job_creator_info.id_user
             else null
         end as id_rep,
-        h.country_code,
+        COALESCE(h.country_code, 'Undefined') AS country_code,
         f.status as job_status,
         f.booking_instructions,
         photographer_data.photographer_name,
