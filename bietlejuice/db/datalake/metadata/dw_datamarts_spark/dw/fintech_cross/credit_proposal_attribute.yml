@@ -73,4 +73,4 @@ columns:
       - dw_public.dim_offer.type
   house_origin_type:
     lineage:
-      - dw_datamarts_cross.quintoandar_consultant_listings.type_big_agent
+      - dw_public.dim_house_listing.consultant_type

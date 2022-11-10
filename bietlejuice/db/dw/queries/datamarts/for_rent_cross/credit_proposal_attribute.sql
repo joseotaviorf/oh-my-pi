@@ -142,17 +142,17 @@ house_origin_type as (
     SELECT
         dhl.id_house,
         CASE
-            WHEN ciq.is_ciq_origin = true THEN ciq.type_big_agent
-            WHEN ciq.is_ciq_origin = false THEN ciq.type_big_agent
+            WHEN dhl.consultant_type IS NOT NULL THEN dhl.consultant_type
             WHEN dhl.is_b2b = true THEN 'B2B'
             ELSE 'Core'
         END as house_origin_type
-    FROM dim_house_listing AS dhl
-    LEFT JOIN
-        datamarts.quintoandar_consultant_listings AS ciq
-            ON dhl.id_house = ciq.id_house
+    FROM 
+        dim_house_listing AS dhl
     WHERE
         dhl.ts_house_first_publication >= '2020-01-01'
+        -- IF we want just the origin, we don't need
+        -- all the versions, and IT would cause duplications.
+        AND dhl.version = 1
     )
     
 SELECT DISTINCT
