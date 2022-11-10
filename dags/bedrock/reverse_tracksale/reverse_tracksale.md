@@ -16,9 +16,12 @@ We incrementally load the following table into the Datalake Reverse bucket, for 
 - `lost_buyer_proposals`
 - `lost_buyer_visits`
 - `lost_iq_proposals`
+- `lost_iq_proposals_bo`
 - `lost_iq_rejected`
 - `lost_iq_visitas`
+- `lost_iq_visitas_bo`
 - `lost_pp`
+- `lost_pp_bo`
 - `lost_seller_unpublished`
 - `true_buyer_ccv_central`
 - `true_buyer_ccv_hub`
@@ -27,7 +30,9 @@ We incrementally load the following table into the Datalake Reverse bucket, for 
 - `true_offboarding_iq`
 - `true_offboarding_pp`
 - `true_onboarding_iq`
+- `true_onboarding_iq_bo`
 - `true_onboarding_pp`
+- `true_onboarding_pp_bo`
 - `true_ongoing_iq`
 - `true_ongoing_pp`
 - `true_seller_ccv_central`

@@ -10,7 +10,7 @@ columns:
       - dw_public.dim_user.email
   customer_phone:
     lineage:
-      - dw_public.dim_user.customer_phone
+      - dw_public.dim_user.telefone_principal
   customer_cpf:
     lineage:
       - dw_public.dim_user.cpf

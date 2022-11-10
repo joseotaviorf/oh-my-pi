@@ -1,6 +1,6 @@
 ---
 database_name: datalake_tracksale_reverse
-table_name: lost_pp
+table_name: lost_iq_visitas_bo
 columns:
   customer_name:
     lineage:
@@ -19,4 +19,6 @@ columns:
       - dw_public.dim_user.sk_user
   id_driver:
     lineage:
-      - dw_public.fact_house_listings.sk_house_listing
+      - dw_datamarts_cross.talk_to_agent.house_id
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+      - dw_datamarts_cross.talk_to_agent.agent_id

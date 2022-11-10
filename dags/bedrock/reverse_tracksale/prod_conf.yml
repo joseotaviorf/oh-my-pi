@@ -9,14 +9,23 @@ campaigns:
   - campaign_code: 117
     query: lost_iq_proposals
     tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
+  - campaign_code: 370
+    query: lost_iq_proposals_bo
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
   - campaign_code: 238
     query: lost_iq_rejected
     tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
   - campaign_code: 116
     query: lost_iq_visitas
     tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
+  - campaign_code: 371
+    query: lost_iq_visitas_bo
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
   - campaign_code: 104
     query: lost_pp
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
+  - campaign_code: 368
+    query: lost_pp_bo
     tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
   - campaign_code: 249
     query: lost_seller_unpublished
@@ -42,8 +51,14 @@ campaigns:
   - campaign_code: 125
     query: true_onboarding_iq
     tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
+  - campaign_code: 367
+    query: true_onboarding_iq_bo
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
   - campaign_code: 124
     query: true_onboarding_pp
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
+  - campaign_code: 369
+    query: true_onboarding_pp_bo
     tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
   - campaign_code: 113
     query: true_ongoing_iq
