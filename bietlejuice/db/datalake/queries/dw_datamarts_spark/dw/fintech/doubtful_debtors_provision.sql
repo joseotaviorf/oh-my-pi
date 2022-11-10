@@ -11,7 +11,7 @@ WITH invoice_snapshot AS (
         payment_status AS status,
         paid_amount,
         CASE
-            WHEN date_trunc('DAY', ts_created) <= '2022-09-30' AND (dt_paid IS NULL OR DATE_TRUNC('DAY', dt_paid) >= '2022-09-30') THEN 1
+            WHEN date_trunc('DAY', ts_created) <= (date_trunc('MONTH', DATE(ts_snapshot)) - INTERVAL 1 DAY) AND (dt_paid IS NULL OR DATE_TRUNC('DAY', dt_paid) >= (date_trunc('MONTH', DATE(ts_snapshot)) - INTERVAL 1 DAY)) THEN 1
             ELSE 0
         END AS Flag_fechamento,
         DATE(ts_created) AS ts_created,
@@ -192,8 +192,8 @@ base_tratada AS (
         a.year,
         a.month,
         a.day,
-        EXTRACT( DAY FROM (DATE '2022-09-30' - a.invoice_original_due_date)) AS delay_invoice_at_closure,
-        EXTRACT( DAY FROM (DATE '2022-09-30' - b.contract_due_date_min)) AS delay_contamined_at_closure
+        EXTRACT( DAY FROM ((date_trunc('MONTH', DATE(MAKE_DATE(a.year, a.month, a.day))) - INTERVAL 1 DAY) - a.invoice_original_due_date)) AS delay_invoice_at_closure,
+        EXTRACT( DAY FROM ((date_trunc('MONTH', DATE(MAKE_DATE(a.year, a.month, a.day))) - INTERVAL 1 DAY)- b.contract_due_date_min)) AS delay_contamined_at_closure
     FROM
         base_invoice AS a
     LEFT JOIN atraso_contaminado AS b
