@@ -22,7 +22,7 @@ WITH l2p AS (
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_lead_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_prospect_date,-1)))) < 0
-                THEN 'W0'
+                THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_lead_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_prospect_date,-1)))) BETWEEN 0 AND 4
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_lead_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_prospect_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_lead_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_prospect_date,-1)))) >=5
@@ -92,7 +92,7 @@ p2q AS (
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_qualified_date,-1)))) < 0
-                THEN 'W0'
+                THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_qualified_date,-1)))) BETWEEN 0 AND 4
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_qualified_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_qualified_date,-1)))) >= 5
@@ -162,7 +162,7 @@ q2aq AS (
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_available_qualified_date,-1)))) < 0
-                THEN 'W0'
+                THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_available_qualified_date,-1)))) BETWEEN 0 AND 4
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_available_qualified_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_available_qualified_date,-1)))) >= 5
@@ -232,7 +232,7 @@ aq2o AS (
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) < 0
-                THEN 'W0'
+                THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) BETWEEN 0 AND 4
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_available_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) >= 5
@@ -302,7 +302,7 @@ q2opp AS (
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) < 0
-                THEN 'W0'
+                THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) BETWEEN 0 AND 4
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) >= 5
@@ -372,7 +372,7 @@ opp2fl AS (
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_first_listing_date,-1)))) < 0
-                THEN 'W0'
+                THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_first_listing_date,-1)))) BETWEEN 0 AND 4
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_first_listing_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(fhlf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_first_listing_date,-1)))) >= 5
@@ -529,7 +529,7 @@ vb2vc AS (
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) < 0 AND rf.flg_visit_completed
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) BETWEEN 0 AND 4 AND rf.flg_visit_completed
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) >= 5 AND rf.flg_visit_completed
@@ -588,7 +588,7 @@ vb2os AS (
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) < 0 AND rf.flg_visit_completed
-                    THEN 'W0+'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) BETWEEN 0 AND 4 AND rf.flg_visit_completed
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) >= 5 AND rf.flg_visit_completed
@@ -699,7 +699,7 @@ vc2os AS (
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_visit_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1)))) < 0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_visit_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_visit_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_visit_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1)))) >= 5
@@ -758,7 +758,7 @@ os2oa AS (
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_submitted_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_approved_date,-1)))) < 0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_submitted_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_approved_date,-1)))) BETWEEN 0 AND 4
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_submitted_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_approved_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_submitted_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_approved_date,-1)))) >= 5
@@ -817,7 +817,7 @@ oa2cei AS(
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1)))) < 0
-                THEN 'W0'
+                THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1)))) BETWEEN 0 AND 4
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1)))) >=5
@@ -876,7 +876,7 @@ oa2da AS(
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)))) < 0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)))) BETWEEN 0 AND 4
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)))) >= 5
@@ -935,7 +935,7 @@ oa2ds AS(
         NULL::BOOLEAN AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) < 0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) BETWEEN 0 AND 4
                 THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) >= 5
@@ -994,7 +994,7 @@ cei2cep AS(
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1)))) < 0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1)))) >=5
@@ -1054,7 +1054,7 @@ cei2gs AS(
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_date,-1)))) < 0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_date,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_date,-1)))) >=5
@@ -1114,7 +1114,7 @@ cep2ds AS(
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_positive)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) < 0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_positive)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_positive)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_positive)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) >=5
@@ -1174,7 +1174,7 @@ gs2ds AS(
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) < 0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) >=5
@@ -1234,7 +1234,7 @@ ds2da AS(
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_tenant_first_doc_sent_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)))) < 0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_tenant_first_doc_sent_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_tenant_first_doc_sent_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_tenant_first_doc_sent_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)))) >=5
@@ -1293,7 +1293,7 @@ da2cc AS(
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) <0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) >= 5
@@ -1353,7 +1353,7 @@ da2gp AS(
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_paid_date,-1)))) <0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_paid_date,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_paid_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_paid_date,-1)))) >= 5
@@ -1413,7 +1413,7 @@ gp2cc AS(
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_paid_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) <0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_paid_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_paid_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_paid_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) >=5
@@ -1473,7 +1473,7 @@ da2cs AS(
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) < 0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) >=5
@@ -1532,7 +1532,7 @@ da_gp2cs AS(
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_da_gp_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) <0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_da_gp_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_da_gp_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_da_gp_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1))))>= 5
@@ -1591,7 +1591,7 @@ cc2cs AS (
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_contract_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) <0
-                    THEN 'W0'
+                    THEN 'W5+'
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_contract_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_contract_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1))))
             WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_contract_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1))))>= 5
@@ -1650,7 +1650,7 @@ cs2ce AS (
         rf.guarantee = 'RentalGuarantee' AS is_guarantee,
         CASE
                 WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_contract_signed_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_annulment_date,-1)))) <0
-                    THEN 'W0'
+                    THEN 'W5+'
                 WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_contract_signed_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_annulment_date,-1)))) BETWEEN 0 AND 4
                     THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_contract_signed_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_annulment_date,-1))))
                 WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_contract_signed_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_annulment_date,-1)))) >= 5
