@@ -1,0 +1,79 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: sales_flow_invite_aud
+columns:
+  id:
+    lineage:
+    - datalake_sales_flow_raw.sales_flow_invite_aud.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.sales_flow_id
+  id_inviter:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.inviter_id
+  id_invitee:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.invitee_id
+  id_folder:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.folder_id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.revend
+  type:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.type
+  name:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.name
+  email:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.email
+  status:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.status
+  mod_id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.sales_flow_id_mod
+  mod_id_inviter:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.id_inviter_mod
+  mod_id_invitee:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.id_invitee_mod
+  mod_id_folder:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.id_folder_mod
+  mod_type:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.type_mod
+  mod_name:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.name_mod
+  mod_email:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.email_mod
+  mod_status:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.status_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite_aud.day

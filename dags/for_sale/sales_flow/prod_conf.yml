@@ -66,6 +66,10 @@ tables:
     extraction_type: incremental
   mortgage_aud:
     extraction_type: incremental
+  negotiation:
+    extraction_type: incremental
+  negotiation_aud:
+    extraction_type: incremental
   notary:
     extraction_type: incremental
   notary_aud:
@@ -106,6 +110,10 @@ tables:
   sales_flow_details:
     extraction_type: incremental
   sales_flow_details_aud:
+    extraction_type: incremental
+  sales_flow_invite:
+    extraction_type: incremental
+  sales_flow_invite_aud:
     extraction_type: incremental
   sales_flow_pendency:
     extraction_type: incremental

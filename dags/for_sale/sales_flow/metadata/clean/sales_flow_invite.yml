@@ -1,0 +1,46 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: sales_flow_invite
+columns:
+  id:
+    lineage:
+    - datalake_sales_flow_raw.sales_flow_invite.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.sales_flow_id
+  id_inviter:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.inviter_id
+  id_invitee:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.invitee_id
+  id_folder:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.folder_id
+  type:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.type
+  name:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.name
+  email:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.email
+  status:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.status
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.day

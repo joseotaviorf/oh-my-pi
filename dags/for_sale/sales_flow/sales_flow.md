@@ -48,6 +48,8 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `microstatus_order_aud`
 `mortgage`
 `mortgage_aud`
+`negotiation`
+`negotiation_aud`
 `notary`
 `notary_aud`
 `offer`
@@ -66,6 +68,8 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `sales_flow_contact_aud`
 `sales_flow_details`
 `sales_flow_details_aud`
+`sales_flow_invite`
+`sales_flow_invite_aud`
 `sales_flow_pendency`
 `sales_flow_pendency_aud`
 `sales_flow_tag_aud`

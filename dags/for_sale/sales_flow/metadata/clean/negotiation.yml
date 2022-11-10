@@ -1,0 +1,49 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: negotiation
+columns:  
+  id:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.sales_flow_id
+  has_fgts_draft:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.use_fgts
+  has_final_value_refund:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.has_final_value_refund
+  is_seller_pj:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.is_seller_pj
+  is_buyer_pj:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.is_buyer_pj
+  ts_buyer_documentation_started:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.buyer_documentation_started_at
+  ts_buyer_dcumentation_submitted:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.buyer_documentation_submitted_at
+  ts_buyer_credit_started:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.buyer_credit_started_at
+  ts_buyer_credit_submitted:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.buyer_credit_submitted_at
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.day
