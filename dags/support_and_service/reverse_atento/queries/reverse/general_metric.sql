@@ -94,5 +94,19 @@ AND
     'Triagem Reparos [Back]',
     'PARTNERS/CIQ [FRONT] [PRE]',
     'Reparos Comuns [Back]',
-    'Assessor de Proprietário [ASP] [PRE] [BACK]'
+    'Assessor de Proprietário [ASP] [PRE] [BACK]',
+    'MX_PP_Anúncio',
+    'MX_PP_Visitas',
+    'MX_PP_Contrato',
+    'MX_PP_Administrativo',
+    'MX_IQ_Visitas',
+    'MX_IQ_Contratos',
+    'MX_IQ_Administrativo',
+    'MX_Socio_Agente',
+    'MX_Socio_Fotógrafos',
+    'MX_Socio_Refere_y_Gaña',
+    'MX_Socio_Otros',
+    'MX_Socio_Inspector',
+    '[MX] CX Front [front] [pre] [pos]',
+    '[MX] CX Back [back] [pre] [pos]'
   )
