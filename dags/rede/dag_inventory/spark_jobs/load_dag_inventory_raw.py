@@ -1,0 +1,325 @@
+"""
+This spark job reads the data previously fetched from DagBags and saved to S3, enriches it, and saves it to datalake_dag_inventory_raw.
+
+This process has 5 steps:
+1 - Read json from S3 as a dictionary
+2 - Enrich dictionary
+3 - Transform dictionary into a Spark DataFrame
+4 - Enrich DataFrame
+5 - Create table in Spark Metastore using the dataframe.
+
+Steps 2 and 4 are separate because some enrichments are easier to be done before serializing, and some are more efficient after.
+"""
+
+import json
+import boto3
+import logging
+from argparse import ArgumentParser
+from datetime import datetime
+import pyspark.sql.functions as SF
+from pyspark.sql.utils import AnalysisException
+from pyspark.sql import Row, DataFrame
+
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.metastore_services import SparkMetastoreService
+
+JOB_NAME = "load_dag_inventory_raw"
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
+
+
+"""
+Given the table name and execution date, finds the content fetched from DagBags and saved on S3, and returns it as a dictionary.
+"""
+
+
+def read_dag_bag_content(table_name: str, execution_date: datetime) -> dict:
+    s3 = boto3.resource("s3")
+    date_partitions = f"year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
+    file_path = f"raw/dag_inventory/dag_bag_content/{table_name}/{date_partitions}/{table_name}.json"
+    content_object = s3.Object(datalake_bucket, file_path)
+    file_content = content_object.get()["Body"].read().decode("utf-8")
+    return json.loads(file_content)
+
+
+"""
+Given a dictionary with table data fetched from DagBags, enriches it with complementary information from Spark Metastore.
+
+For example, the dictionary data originally comes from the arguments passed to tasks that sync with hive metastore. However, in some cases
+a single task is responsible for syncing all tables in the database, so table_name comes as null. For those cases, this function searches
+for all tables in that database to fill this information.
+"""
+
+
+def enrich_table_dictionary_with_spark_metastore(content: dict) -> dict:
+    mapping = []
+    for row in content:
+        try:
+            spark_ms = SparkMetastoreHelper(
+                row["bucket"],
+                row["layer"],
+                row["database"],
+                row["table"],
+                all_tables=row["table"] is None,
+            )
+            spark_ms.validate_table_arguments()
+            database_name, database_location = spark_ms.get_metastores_metadata()
+            table_names = spark_ms.get_table_names()
+            for table in table_names:
+                mapping.append(
+                    {
+                        "dag": row["dag"],
+                        "task": row["task"],
+                        "files_location": f"{database_location}{table}",
+                        "table": f"{database_name}.{table}",
+                        "layer": row["layer"],
+                    }
+                )
+        except AnalysisException:
+            logger.info(
+                f"Error finding {'table ' + row['table'] if row['table'] is not None else 'tables '} from database {row['database']}, layer {row['layer']}"
+            )
+    return mapping
+
+
+"""
+Given the dictionary with the DagBag content and the table name, enriches it appropriately.
+"""
+
+
+def enrich_dictionary(content: dict, table_name: dict) -> dict:
+    enrichments = {"table": enrich_table_dictionary_with_spark_metastore}
+    return enrichments.get(table_name, lambda x: x)(content)
+
+
+"""
+Given the bucket and the file name as given by the S3 iterator, returns it in the appropriate format of the folder.
+"""
+
+
+def sanitize_file_name(prefix_layer: str, file: str) -> str:
+    if "dw" in prefix_layer:
+        file_sanitized = "/".join(file.split("/")[0:2])
+    else:
+        file_sanitized = "/".join(file.split("/")[0:3])
+
+    return f"s3a://{prefix_layer}/{file_sanitized}"
+
+
+"""
+Given the bucket, layer and execution date, finds all files modified in that day, and returns a DataFrame with some metrics
+associated with file size and quantity.
+"""
+
+
+def find_recently_modified_files_by_layer_prefix(
+    bucket: str, layer_prefix: str, execution_date: datetime, s3_paginator
+):
+    s3_iterator = s3_paginator.paginate(Bucket=bucket, Prefix=layer_prefix)
+    formatted_date = execution_date.strftime("%Y-%m-%d")
+    objects = s3_iterator.search(
+        f"Contents[?(to_string(LastModified)>='\"{formatted_date} 00:00:00+00:00\"'&&to_string(LastModified)<='\"{formatted_date} 23:59:59+00:00\"')].[Key,Size]"
+    )
+
+    object_tuples = [
+        (sanitize_file_name(bucket, obj[0]), obj[1])
+        for obj in objects
+        if obj[0].endswith((".json", ".parquet", ".txt", ".csv"))
+    ]
+
+    return create_file_metrics_data_frame(object_tuples)
+
+
+"""""
+Transforms a list of tuples containing, in order, file name and file size, into a DataFrame. It also adds file size and quantity
+metrics.
+"""
+
+
+def create_file_metrics_data_frame(object_tuples: list) -> DataFrame:
+    df = spark.createDataFrame(
+        object_tuples, schema="file_name:string, file_size:bigint"
+    )
+    return df.groupBy("file_name").agg(
+        SF.sum(SF.when(SF.col("file_size") < 1000000, 1).otherwise(0)).alias(
+            "qty_smaller_than_1mb"
+        ),
+        SF.sum(SF.when(SF.col("file_size") > 1000000000, 1).otherwise(0)).alias(
+            "qty_bigger_than_1gb"
+        ),
+        SF.count("*").alias("qty_total_files"),
+    )
+
+
+"""
+Finds all files modified in that day, and returns a DataFrame with some metrics associated with file size and quantity.
+"""
+
+
+def find_recently_modified_files(
+    datalake_bucket: str, dw_bucket: str, execution_date: datetime
+) -> DataFrame:
+    layers = [
+        {"bucket": datalake_bucket, "layer_prefix": "clean"},
+        {"bucket": datalake_bucket, "layer_prefix": "enrich"},
+        {"bucket": dw_bucket, "layer_prefix": ""},
+    ]
+    s3_client = boto3.client("s3")
+    s3_paginator = s3_client.get_paginator("list_objects_v2")
+    df = None
+    for layer in layers:
+        layer_df = find_recently_modified_files_by_layer_prefix(
+            layer["bucket"], layer["layer_prefix"], execution_date, s3_paginator
+        )
+        if df is None:
+            df = layer_df
+        else:
+            df = df.unionByName(layer_df)
+    return df
+
+
+"""
+Adds file size and quantity data to table DataFrame.
+"""
+
+
+def enrich_table_data_frame_with_file_size_infos(
+    data_frame: DataFrame,
+    datalake_bucket: str,
+    dw_bucket: str,
+    execution_date: datetime,
+) -> DataFrame:
+    file_info_data_frame = find_recently_modified_files(
+        datalake_bucket, dw_bucket, execution_date
+    )
+    return data_frame.join(
+        file_info_data_frame,
+        file_info_data_frame.file_name == data_frame.files_location,
+        "left",
+    ).select(
+        "table",
+        "dag",
+        "task",
+        "layer",
+        "files_location",
+        "qty_smaller_than_1mb",
+        "qty_bigger_than_1gb",
+        "qty_total_files",
+        "year",
+        "month",
+        "day",
+    )
+
+
+"""
+Enriches the DagBag content DataFrame appropriately according to the table name.
+"""
+
+
+def enrich_data_frame(
+    data_frame: DataFrame,
+    table_name: str,
+    datalake_bucket: str,
+    dw_bucket: str,
+    execution_date: datetime,
+) -> DataFrame:
+    enrichments = {"table": enrich_table_data_frame_with_file_size_infos}
+    return enrichments.get(table_name, lambda x, *_: x)(
+        data_frame, datalake_bucket, dw_bucket, execution_date
+    )
+
+
+"""
+Given the DagBag content dictionary and execution date, creates a Spark DataFrame with year, month and day.
+"""
+
+
+def transform_list_of_dicts_to_dataframe_with_partitions(content, execution_date):
+    df = spark.createDataFrame(Row(**row_content) for row_content in content)
+    return (
+        df.withColumn("year", SF.lit(execution_date.year))
+        .withColumn("month", SF.lit(execution_date.month))
+        .withColumn("day", SF.lit(execution_date.day))
+    )
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("env")
+    parser.add_argument("datalake_bucket")
+    parser.add_argument("dw_bucket")
+    parser.add_argument("source")
+    parser.add_argument("table_name")
+    parser.add_argument("execution_date", type=str, help="DAG execution date")
+    args = parser.parse_args()
+
+    environment = args.env
+    datalake_bucket = args.datalake_bucket
+    dw_bucket = args.dw_bucket
+    source = args.source
+    table_name = args.table_name
+    execution_date = datetime.strptime(args.execution_date, "%Y-%m-%d")
+    partition_cols = ["year", "month", "day"]
+
+    logger.info(
+        f"""
+        m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, source={source},
+        table_name={table_name}, raw_partition_cols={partition_cols}, execution_date={execution_date}, msg=Starting Spark job...
+        """
+    )
+    spark_client = SparkClient()
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    database_name = db_info["db_raw_databricks"]
+    database_location = db_info["db_raw_path"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+
+    spark_metastore_service = SparkMetastoreService(spark_client)
+
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    spark_metastore_service.create_database(database_name)
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+
+    s3_loader = S3Loader()
+
+    content_dictionary = read_dag_bag_content(table_name, execution_date)
+    enriched_content_dictionary = enrich_dictionary(content_dictionary, table_name)
+    df = transform_list_of_dicts_to_dataframe_with_partitions(
+        enriched_content_dictionary, execution_date
+    )
+    enriched_df = enrich_data_frame(
+        df,
+        table_name,
+        datalake_bucket=datalake_bucket,
+        dw_bucket=dw_bucket,
+        execution_date=execution_date,
+    )
+
+    s3_loader.load_df(
+        df=enriched_df,
+        s3_path=f"{database_location}{table_name}",
+        format_options=format_options,
+        partitions=partition_cols,
+    )
+    spark_metastore_loader.update_metastore(
+        enriched_df,
+        database_name,
+        table_name,
+        format_options,
+        database_location,
+        partition_cols,
+        force_recreate=False,
+    )
+    spark_metastore_service.create_new_partitions_from_df(
+        database_name=database_name,
+        table_name=table_name,
+        df=enriched_df,
+        partition_cols=partition_cols,
+    )

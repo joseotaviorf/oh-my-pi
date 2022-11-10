@@ -1,0 +1,22 @@
+---
+database_name: datalake_dag_inventory_clean
+table_name: dag
+columns:
+  dag:
+    lineage:
+      - datalake_dag_inventory_raw.dag.dag
+  dag_location:
+    lineage:
+      - datalake_dag_inventory_raw.dag.dag_location
+  cluster_configuration:
+    lineage:
+      - datalake_dag_inventory_raw.dag.cluster_configuration
+  year:
+    lineage:
+      - datalake_dag_inventory_raw.dag.year
+  month:
+    lineage:
+      - datalake_dag_inventory_raw.dag.month
+  day:
+    lineage:
+      - datalake_dag_inventory_raw.dag.day

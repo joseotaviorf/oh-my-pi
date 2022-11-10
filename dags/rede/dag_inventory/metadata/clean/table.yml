@@ -1,0 +1,37 @@
+---
+database_name: datalake_dag_inventory_clean
+table_name: table
+columns:
+  table:
+    lineage:
+      - datalake_dag_inventory_raw.table.table
+  dag:
+    lineage:
+      - datalake_dag_inventory_raw.table.dag
+  task:
+    lineage:
+      - datalake_dag_inventory_raw.table.task
+  layer:
+    lineage:
+      - datalake_dag_inventory_raw.table.layer
+  files_location:
+    lineage:
+      - datalake_dag_inventory_raw.table.files_location
+  qty_smaller_than_1mb:
+    lineage:
+      - datalake_dag_inventory_raw.table.qty_smaller_than_1mb
+  qty_bigger_than_1gb:
+    lineage:
+      - datalake_dag_inventory_raw.table.qty_bigger_than_1gb
+  qty_total_files:
+    lineage:
+      - datalake_dag_inventory_raw.table.qty_total_files
+  year:
+    lineage:
+      - datalake_dag_inventory_raw.table.year
+  month:
+    lineage:
+      - datalake_dag_inventory_raw.table.month
+  day:
+    lineage:
+      - datalake_dag_inventory_raw.table.day
