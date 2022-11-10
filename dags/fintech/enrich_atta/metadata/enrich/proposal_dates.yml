@@ -1,0 +1,96 @@
+---
+database_name: datalake_atta
+table_name: proposal_dates
+columns:
+  id_proposal:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.id_proposal
+      - datalake_atta_clean.log_isolve_v2.id_proposal
+  ts_credit_started:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_credit_ended:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_financing_started:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_bank_legal_analysis_started:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_bank_legal_analysis_ended:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_last_approved_log:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_first_cancelation:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_last_cancelation:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_min_pre_analysis:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_max_pre_analysis:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_min_credit_application:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_max_credit_application:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_min_inspection:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_max_inspection:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_min_checklist:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_max_checklist:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_min_bank_application:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_max_bank_application:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_min_financing_contract:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_max_financing_contract:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_min_contracted:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_max_contracted:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
