@@ -30,15 +30,15 @@ WITH daily_published_listings AS (
 ), 
 ciq AS (
     SELECT
-        sk_house_listing, 
-        sk_quintoandar_consultant,
-        type_big_agent,
-        businesscontext
+        dl.sk_sale_listing AS sk_house_listing
     FROM 
-        dw_datamarts_cross.quintoandar_consultant_listings
-    WHERE 
-        businesscontext = 'SALE'
-        AND (type_big_agent='CIQ_FULL' OR type_big_agent='CIQ_MANAGER' AND dt_sale > dt_ciq_started)
+        dw_sale.dim_listing AS dl
+    JOIN
+        dw_sale.fact_listings AS fl
+            ON dl.sk_sale_listing = fl.sk_sale_listing
+    WHERE
+        dl.consultant_type IN ('CIQ_FULL', 'CIQ_MANAGER')
+        AND dl.ts_created > dl.dt_consultant_started
 ),
 daily_published_listings_with_region AS (
     SELECT
