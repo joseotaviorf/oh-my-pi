@@ -125,7 +125,7 @@ SELECT
         COALESCE(ppc.ts_contacted, un.ts_sent, bse.ts_webhook_sent))
       ) AS id_outbound_contact,
     ppi.id_wololo_prospect,
-    ppi.id_prospect_external,
+    ppi.id_prospect_external AS id_prospect,
     bse.id_user_dispatch,
     bse.id_user_braze,
     bse.id_canvas,

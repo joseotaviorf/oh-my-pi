@@ -23,7 +23,8 @@ wololo_round AS (
     datalake_wololo_clean.round
 )
 SELECT
-    pr.id AS id_prospect,
+    pr.id AS id_wololo_prospect,
+    pr.id_reference AS id_prospect,
     wc.id_call_analyst,
     wc.phone_number,
     wc.channel,

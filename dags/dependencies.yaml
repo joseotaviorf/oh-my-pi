@@ -1219,6 +1219,9 @@ bietlejuice.dw_smart_price:
   - bietlejuice.ebdb:create-clean-dynamic-pricing-house-in-data-lake
   - bietlejuice.ebdb:create-clean-dynamic-pricing-parameters-in-data-lake
 
+bietlejuice.dw_supply_outbound_contacts:
+  - bietlejuice.enrich_supply_outbound_flows:load-enrich-supply-outbound-contacts
+
 bietlejuice.dw_tenant_documentation:
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.ebdb:create-clean-proponent-info-resend-request-in-data-lake

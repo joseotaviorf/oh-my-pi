@@ -1,0 +1,60 @@
+database_name: dw_supply_outbound_contacts
+table_name: fact_outbound_contacts
+columns:
+  sk_outbound_contact:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.id_outbound_contact
+  sk_prospect_created_date:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.dt_prospect_created
+  sk_contact_requested_date:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.ts_webhook_sent
+  sk_contacted_date:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.ts_contacted
+  id_wololo_prospect:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.id_wololo_prospect
+  id_prospect:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.id_prospect
+  id_user_dispatch:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.id_user_dispatch
+  id_user_braze:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.id_user_braze
+  id_canvas:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.id_canvas
+  id_step_canvas:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.id_step_canvas
+  id_jaiminho_user_notifications:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+  id_call_analyst:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+  canvas_name:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.canvas_name
+  canvas_step_name:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.canvas_step_name
+  phone_number:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.phone_number
+  mkt_origin:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.mkt_origin
+  contact_channel:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_channel
+  ts_contact_requested:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.ts_webhook_sent
+  ts_contacted:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.ts_contacted

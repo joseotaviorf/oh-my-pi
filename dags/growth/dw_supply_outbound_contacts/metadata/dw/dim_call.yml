@@ -1,0 +1,21 @@
+database_name: dw_supply_outbound_contacts
+table_name: dim_call
+columns:
+  sk_outbound_contact:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.id_outbound_contact
+  call_output:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+  round_number:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+  round_max_tries:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+  call_number_in_round:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+  ts_call_round_started:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info

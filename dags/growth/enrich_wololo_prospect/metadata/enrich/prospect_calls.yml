@@ -4,6 +4,9 @@ table_name: prospect_calls
 columns:
   id_prospect:
     lineage:
+      - datalake_wololo_clean.prospect.id_reference
+  id_wololo_prospect:
+    lineage:
       - datalake_wololo_clean.prospect.id
   id_call_analyst:
     lineage:

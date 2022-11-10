@@ -4,7 +4,7 @@ columns:
   id_wololo_prospect:
     lineage:
       - datalake_wololo_clean.prospect.id
-  id_prospect_external:
+  id_prospect:
     lineage:
       - datalake_wololo_clean.prospect.id_reference
   id_user_dispatch:

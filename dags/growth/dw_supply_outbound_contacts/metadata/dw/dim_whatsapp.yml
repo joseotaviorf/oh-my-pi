@@ -1,0 +1,18 @@
+database_name: dw_supply_outbound_contacts
+table_name: dim_whatsapp
+columns:
+  sk_outbound_contact:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.id_outbound_contact
+  message_template:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+  tags:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+  message_status:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+  has_opted_in:
+    lineage:
+      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
