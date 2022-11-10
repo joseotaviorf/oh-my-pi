@@ -19,6 +19,7 @@ select
     ad.id,
     ad.id_indicated_by,
     ad.id_doorman_affiliate_data,
+    COALESCE(ur.country_code, 'Undefined') AS country_code,
     ad.is_active,
     (ad.id_doorman_affiliate_data is not null) as is_doorman_affiliate,
     ad.origin,
@@ -36,8 +37,11 @@ select
     ad.ts_created,
     ad.ts_updated
 from datalake_ebdb_clean.affiliate_data ad
-left join datalake_ebdb_clean.user u
-    on u.id_affiliates = ad.id
+left join datalake_ebdb_clean.user u    -- A left join is being applied because not all affiliates are on the user table.
+    on u.id_affiliates = ad.id          
+LEFT JOIN
+    datalake_ebdb_country.user AS ur
+        ON u.id = ur.id_user
 left join datalake_ebdb_clean.doorman_affiliate_data dad
     on dad.id = ad.id_doorman_affiliate_data
 left join first_operation_start fos

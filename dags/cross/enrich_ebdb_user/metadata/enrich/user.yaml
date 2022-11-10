@@ -6,7 +6,7 @@ columns:
       - datalake_ebdb_clean.user.id
   id_country:
     lineage:
-      - datalake_ebdb_clean.user.id_country
+      - datalake_ebdb_country.user.id_country
   id_facebook:
     lineage:
       - datalake_ebdb_clean.user.id_facebook
@@ -36,7 +36,7 @@ columns:
       - datalake_ebdb_clean.user.id_state
   country_code:
     lineage:
-      - datalake_ebdb_clean.country.code
+      - datalake_ebdb_country.user.country_code
   cpf:
     lineage:
       - datalake_ebdb_clean.user.cpf

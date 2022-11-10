@@ -1,0 +1,6 @@
+---
+inner_dependencies:
+  agent_data:
+    - user
+partition_cols:
+  - country_code

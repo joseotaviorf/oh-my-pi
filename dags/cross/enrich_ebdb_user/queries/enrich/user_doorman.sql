@@ -3,6 +3,7 @@ select
     ad.id as id_affiliate_data,
     dad.id_doorman_occupation,
     dad.id_place,
+    COALESCE(ur.country_code, 'Undefined') AS country_code,
     dad.work_address,
     dad.work_street,
     dad.work_house_number,
@@ -23,5 +24,8 @@ left join datalake_ebdb_clean.affiliate_data ad
     on ad.id_doorman_affiliate_data = dad.id
 left join datalake_ebdb_clean.user u
     on u.id_affiliates = ad.id
+LEFT JOIN
+    datalake_ebdb_country.user AS ur
+        ON u.id = ur.id_user
 left join datalake_ebdb_clean.doorman_affiliate_occupation dao
     on dad.id_doorman_occupation = dao.id

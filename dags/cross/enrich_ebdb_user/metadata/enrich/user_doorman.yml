@@ -13,6 +13,9 @@ columns:
   id_place:
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.id_place
+  country_code:
+    lineage:
+      - datalake_ebdb_country.user.country_code
   work_address:
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.work_address

@@ -1,5 +1,6 @@
 SELECT
     u.id AS id_user_sales_rep,
+    ur.country_code,
     u.name,
     u.email,
     u.main_phone AS phone_number,
@@ -13,7 +14,11 @@ SELECT
     END AS sales_company,
     COALESCE(sp.is_active, u.is_active) AS is_sales_rep_active,
     DATE(COALESCE(sp.ts_contract_started, u.ts_created)) AS dt_sales_rep_started
-FROM datalake_ebdb_clean.user AS u 
+FROM
+    datalake_ebdb_clean.user AS u
+JOIN
+    datalake_ebdb_country.user AS ur
+        ON u.id = ur.id_user
 LEFT JOIN
     datalake_ebdb_clean.sales_rep AS sp
         ON sp.id = u.id_sales_rep

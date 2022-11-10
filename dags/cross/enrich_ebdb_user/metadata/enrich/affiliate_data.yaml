@@ -10,6 +10,9 @@ columns:
   id_doorman_affiliate_data:
     lineage:
       - datalake_ebdb_clean.affiliate_data.id_doorman_affiliate_data
+  country_code:
+    lineage:
+      - datalake_ebdb_country.user.country_code
   is_active:
     lineage:
       - datalake_ebdb_clean.affiliate_data.is_active

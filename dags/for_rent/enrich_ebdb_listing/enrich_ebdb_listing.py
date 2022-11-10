@@ -51,8 +51,6 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 
-inner_dependencies = config_service.get_config("inner_dependencies")
-
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -75,7 +73,6 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
-
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -89,11 +86,21 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_result_bucket,
 )
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-)
+tables = config_service.get_config("tables")
+inner_dependencies = config_service.get_config("inner_dependencies")
+
+enrich_task_groups = {}
+for table in tables:
+    table_name = table["table_name"]
+    partitions = table.get("partitions")
+
+    task_group = datalake_task_group.build_enrich_task_group(
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        table_name=table_name,
+        partitions=partitions,
+    )
+    enrich_task_groups[table_name] = task_group
 
 (
     task_groups_boundaries_without_inner_dependencies,

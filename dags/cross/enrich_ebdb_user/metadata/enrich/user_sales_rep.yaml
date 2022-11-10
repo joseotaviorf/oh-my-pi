@@ -4,6 +4,9 @@ columns:
   id_user_sales_rep:
     lineage:
       - datalake_ebdb_clean.user.id
+  country_code:
+    lineage:
+      - datalake_ebdb_country.user.country_code
   name:
     lineage:
       - datalake_ebdb_clean.user.name

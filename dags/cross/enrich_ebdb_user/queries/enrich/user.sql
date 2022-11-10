@@ -105,7 +105,7 @@ user_state AS (
 )
 SELECT
     u.id,
-    u.id_country,
+    ur.id_country,
     u.id_facebook,
     u.id_linkedin,
     u.id_google,
@@ -115,7 +115,7 @@ SELECT
     u.id_affiliates,
     u.id_bank,
     u.id_state,
-    ct.code AS country_code,
+    ur.country_code,
     u.cpf,
     u.rg,
     CASE
@@ -164,6 +164,9 @@ SELECT
     u.ts_updated
 FROM
     datalake_ebdb_clean.user AS u
+JOIN
+    datalake_ebdb_country.user AS ur
+        ON u.id = ur.id_user
 LEFT JOIN
     proponent_document_dates AS pdd
         ON pdd.id_proponent = u.id
@@ -173,6 +176,3 @@ LEFT JOIN
 LEFT JOIN
     user_state AS us
         ON us.id_user = u.id
-LEFT JOIN
-    datalake_ebdb_clean.country AS ct
-        ON ct.id = u.id_country
