@@ -507,7 +507,7 @@ rent_flow_adjusted AS (
     LEFT JOIN
         house_listing_daily_info ciq
             ON rf.sk_house_listing = ciq.id_house_listing
-            AND ciq.sk_date = COALESCE(rf.sk_visit_date,rf.sk_contract_annulment_date, rf.sk_booking_created_date, rf.sk_offer_submitted_date,
+            AND ciq.sk_date IN (rf.sk_visit_date,rf.sk_contract_annulment_date, rf.sk_booking_created_date, rf.sk_offer_submitted_date,
                 rf.sk_offer_approved_date, rf.sk_first_credit_evaluation_positive, rf.sk_guarantee_date, rf.sk_tenant_first_doc_sent_date, rf.sk_last_doc_analysis_approved,
                 rf.sk_credit_analysis_init_date, rf.sk_credit_analysis_end_date, rf.sk_guarantee_paid_date, rf.sk_credit_analysis_approved_date, rf.sk_contract_created_date,
                 rf.sk_contract_signed_date)
