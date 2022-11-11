@@ -11,6 +11,7 @@ columns:
       - datalake_marketing_costs_sharing_rules.b016b.id_date
       - datalake_marketing_costs_sharing_rules.b017b.id_date
       - datalake_marketing_costs_sharing_rules.b018b.id_date
+      - datalake_marketing_costs_sharing_rules.b035b.id_date
       - datalake_marketing_costs_sharing_rules.d000d.id_date
       - datalake_marketing_costs_sharing_rules.d001d.id_date
       - datalake_marketing_costs_sharing_rules.d005d.id_date
@@ -42,6 +43,7 @@ columns:
       - datalake_marketing_costs_sharing_rules.b016b.id_rule
       - datalake_marketing_costs_sharing_rules.b017b.id_rule
       - datalake_marketing_costs_sharing_rules.b018b.id_rule
+      - datalake_marketing_costs_sharing_rules.b035b.id_rule
       - datalake_marketing_costs_sharing_rules.d000d.id_rule
       - datalake_marketing_costs_sharing_rules.d001d.id_rule
       - datalake_marketing_costs_sharing_rules.d005d.id_rule
@@ -73,6 +75,7 @@ columns:
       - datalake_marketing_costs_sharing_rules.b016b.city_group
       - datalake_marketing_costs_sharing_rules.b017b.city_group
       - datalake_marketing_costs_sharing_rules.b018b.city_group
+      - datalake_marketing_costs_sharing_rules.b035b.city_group
       - datalake_marketing_costs_sharing_rules.d000d.city_group
       - datalake_marketing_costs_sharing_rules.d001d.city_group
       - datalake_marketing_costs_sharing_rules.d005d.city_group
@@ -104,6 +107,7 @@ columns:
       - datalake_marketing_costs_sharing_rules.b016b.share
       - datalake_marketing_costs_sharing_rules.b017b.share
       - datalake_marketing_costs_sharing_rules.b018b.share
+      - datalake_marketing_costs_sharing_rules.b035b.share
       - datalake_marketing_costs_sharing_rules.d000d.share
       - datalake_marketing_costs_sharing_rules.d001d.share
       - datalake_marketing_costs_sharing_rules.d005d.share
@@ -135,6 +139,7 @@ columns:
       - datalake_marketing_costs_sharing_rules.b016b.funnel_side
       - datalake_marketing_costs_sharing_rules.b017b.funnel_side
       - datalake_marketing_costs_sharing_rules.b018b.funnel_side
+      - datalake_marketing_costs_sharing_rules.b035b.funnel_side
       - datalake_marketing_costs_sharing_rules.d000d.funnel_side
       - datalake_marketing_costs_sharing_rules.d001d.funnel_side
       - datalake_marketing_costs_sharing_rules.d005d.funnel_side
