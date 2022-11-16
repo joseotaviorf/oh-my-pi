@@ -1,5 +1,6 @@
 SELECT
     oc.id_contract_person AS sk_contract_person,
+    COALESCE(oc.country_code, cp.country_code) AS country_code,
     oc.full_name,
     oc.phone_number,
     oc.email,

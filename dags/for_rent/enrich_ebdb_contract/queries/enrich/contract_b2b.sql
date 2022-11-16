@@ -1,5 +1,5 @@
 WITH b2b_house_contracts AS (
-  /** This CTE checks reflecties the currently house status (B2B or not), but not necessarily the contract status. 
+  /** This CTE checks reflects the currently house status (B2B or not), but not necessarily the contract status. 
   As a reminder, a house can belong to different existing contracts, and during this flows, the house may has changed it status from B2B or not. **/
     SELECT
         c.id AS id_contract,
@@ -41,6 +41,7 @@ b2b_contracts AS (
 b2b_info AS (
     SELECT DISTINCT
         c.id AS id_contract,
+        ch.country_code,
         CASE
           WHEN b2b_h_c.is_from_b2b_partner
             THEN 'online'
@@ -75,6 +76,9 @@ b2b_info AS (
     JOIN
         datalake_ebdb_clean.house AS h
             ON c.id_house = h.id
+    JOIN
+        datalake_ebdb_country.house AS ch
+            ON ch.id_house = c.id_house
     LEFT JOIN
         b2b_house_contracts AS b2b_h_c
             ON b2b_h_c.id_contract = c.id
@@ -98,6 +102,7 @@ b2b_info AS (
 )
 SELECT
     id_contract,
+    country_code,
     contract_plan,
     contract_partner_type,
     administration_split_percentage,

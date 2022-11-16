@@ -17,6 +17,9 @@ columns:
   id_max_ongoig_contract_cpf:
     lineage:
       - datalake_ebdb_clean.contract.id
+  country_code:
+    lineage:
+      - datalake_ebdb_country.user.country_code
   full_name:
     lineage:
       - datalake_ebdb_clean.contract_person.name

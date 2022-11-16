@@ -4,6 +4,7 @@ SELECT DISTINCT
     CAST(COALESCE(house.id_user, '-1') AS BIGINT) AS id_owner,
     CAST(COALESCE(dhl.id_house_listing, '-1') AS BIGINT) AS id_house_listing,
     dhl.id_house,
+    dhl.country_code,
     COALESCE(CAST(dhl.version AS SMALLINT), 1) AS version,
     dhl.ts_listing_version_start AS dt_listing_version_start,
     dhl.ts_listing_version_end AS dt_listing_version_end

@@ -5,6 +5,9 @@ columns:
   id_contract:
     lineage:
       - datalake_ebdb_clean.contract.id
+  country_code:
+    lineage:
+      - datalake_ebdb_country.house.country_code
   contract_plan:
     lineage:
       - datalake_ebdb_clean.contract_partnership_data.contract_plan

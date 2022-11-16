@@ -16,6 +16,9 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house
+  country_code:
+    lineage:
+      - datalake_ebdb_listing.house_listing.country_code
   version:
     lineage:
       - datalake_ebdb_listing.house_listing.version

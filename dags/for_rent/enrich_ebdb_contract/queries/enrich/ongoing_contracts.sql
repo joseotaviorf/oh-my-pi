@@ -66,6 +66,7 @@ SELECT
     uo.id_user,
     uo.id_max_ongoing_contract AS id_max_ongoing_contract_user,
     co.id_max_ongoing_contract AS id_max_ongoig_contract_cpf,
+    COALESCE(ch.country_code, 'Undefined') AS country_code,
     cp.name AS full_name,
     cp.cpf AS personal_document,
     cp.phone_number,
@@ -77,9 +78,12 @@ SELECT
     cp.ts_updated
 FROM
     datalake_ebdb_clean.contract_person AS cp
-    LEFT JOIN 
-        users_ongoing AS uo
-            ON uo.id_user = cp.id_user
-    LEFT JOIN
-        cpfs_ongoing AS co
-            ON co.cpf = cp.cpf
+LEFT JOIN 
+    users_ongoing AS uo
+        ON uo.id_user = cp.id_user
+LEFT JOIN
+    cpfs_ongoing AS co
+        ON co.cpf = cp.cpf
+LEFT JOIN
+    datalake_ebdb_country.user AS ch
+        ON ch.id_user = cp.id_user

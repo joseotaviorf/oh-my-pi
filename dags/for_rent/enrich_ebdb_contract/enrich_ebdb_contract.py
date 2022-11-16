@@ -35,10 +35,7 @@ BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
-cluster_description["spark_env_vars"]["ENVIRONMENT"] = ENV
-cluster_description["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -80,10 +77,13 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=ATHENA_QUERY_RESULT_BUCKET,
 )
 
+partition_cols = config_service.get_config("partition_cols")
+
 enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
+    partitions=partition_cols,
 )
 
 create_cluster_task.set_downstream(

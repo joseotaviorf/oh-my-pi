@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS quintoandar.dim_contract_person;
 CREATE TABLE quintoandar.dim_contract_person (
   sk_contract_person BIGINT PRIMARY KEY,
+  country_code VARCHAR,
   full_name VARCHAR,
   phone_number VARCHAR,
   email VARCHAR,

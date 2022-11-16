@@ -7,6 +7,7 @@ CREATE TABLE quintoandar.fact_contract_people (
   sk_birth_date BIGINT,
   sk_created_date BIGINT,
   sk_updated_date BIGINT,
+  country_code VARCHAR,
   contract_role VARCHAR,
   is_user BOOLEAN,
   is_valid_cpf BOOLEAN,

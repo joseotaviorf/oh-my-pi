@@ -197,6 +197,7 @@ SELECT
     cp.id_user AS id_user_contract_person,
     cp.id_contract,
     u.id AS id_user,
+    COALESCE(ch.country_code, 'Undefined') AS country_code,
     cp.name AS full_name,
     cp.phone_number,
     cp.email,
@@ -235,21 +236,25 @@ SELECT
     cp.ts_updated
 FROM
     datalake_ebdb_clean.contract_person AS cp
-    LEFT JOIN
-        datalake_ebdb_clean.user AS u
-            ON u.id = cp.id_user
-            AND cp.id_user IS NOT NULL
-    LEFT JOIN
-        contract_users AS cusr
-            ON cusr.id_contract = cp.id_contract
-    LEFT JOIN
-        user_agg_contracts AS uag
-            ON uag.id_user = cp.id_user
-            AND uag.id_max = cp.id -- prevent duplicated contract and contract person in various ids
-    LEFT JOIN
-        cpf_agg_contracts AS cag
-            ON cag.cpf = cp.cpf
-            AND cag.id_max = cp.id -- prevent duplicated contract and contract person in various ids
-    LEFT JOIN
-        cpf_validator AS cv
-            ON cp.id = cv.id
+LEFT JOIN
+    datalake_ebdb_clean.user AS u
+        ON u.id = cp.id_user
+        AND cp.id_user IS NOT NULL
+LEFT JOIN
+    datalake_ebdb_country.user AS ch
+        ON ch.id_user = cp.id_user
+        AND cp.id_user IS NOT NULL
+LEFT JOIN
+    contract_users AS cusr
+        ON cusr.id_contract = cp.id_contract
+LEFT JOIN
+    user_agg_contracts AS uag
+        ON uag.id_user = cp.id_user
+        AND uag.id_max = cp.id -- prevent duplicated contract and contract person in various ids
+LEFT JOIN
+    cpf_agg_contracts AS cag
+        ON cag.cpf = cp.cpf
+        AND cag.id_max = cp.id -- prevent duplicated contract and contract person in various ids
+LEFT JOIN
+    cpf_validator AS cv
+        ON cp.id = cv.id

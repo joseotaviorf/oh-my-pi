@@ -4,6 +4,10 @@ columns:
   sk_contract_person:
     lineage:
       - datalake_ebdb_contract.ongoing_contracts.id_contract_person
+  country_code:
+    lineage:
+      - datalake_ebdb_contract.contract_person.country_code
+      - datalake_ebdb_contract.ongoing_contracts.country_code
   full_name:
     lineage:
       - datalake_ebdb_contract.ongoing_contracts.full_name

@@ -22,6 +22,9 @@ columns:
   sk_updated_date:
     lineage:
       - datalake_ebdb_contract.contract_person.ts_updated
+  country_code:
+    lineage:
+      - datalake_ebdb_contract.contract_person.country_code
   contract_role:
     lineage:
       - datalake_ebdb_contract.contract_person.contract_role

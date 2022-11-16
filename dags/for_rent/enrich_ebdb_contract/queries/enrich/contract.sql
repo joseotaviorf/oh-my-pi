@@ -143,10 +143,10 @@ first_rent AS (
 )
 SELECT
   c.id,
-  hl.id_country,
+  ch.id_country,
   c.id_proposal,
   c.id_house,
-  hl.country_code,
+  ch.country_code,
   c.rent,
   fre.first_rent AS first_rent_charged,
   c.billing_day_of_month,
@@ -219,6 +219,6 @@ LEFT JOIN
 LEFT JOIN
   first_rent AS fre
     ON fre.id_contract = c.id
-LEFT JOIN
-  datalake_ebdb_listing.house AS hl
-    ON hl.id = c.id_house
+JOIN
+  datalake_ebdb_country.house AS ch
+    ON ch.id_house = c.id_house

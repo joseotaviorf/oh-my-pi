@@ -6,6 +6,7 @@ SELECT
     COALESCE(CAST(DATE_FORMAT(dt_birth, 'yyyyMMdd') AS BIGINT), -1) AS sk_birth_date,
     COALESCE(CAST(DATE_FORMAT(ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_created_date,
     COALESCE(CAST(DATE_FORMAT(ts_updated, 'yyyyMMdd') AS BIGINT), -1) AS sk_updated_date,
+    country_code,
     contract_role,
     is_user,
     is_valid_cpf,
