@@ -54,7 +54,9 @@ if __name__ == "__main__":
         table_name=campaign_query,
     )
 
-    df = spark_client.get_records(query)
+    # We need to drop the duplicates here the first time, because some queries might return duplicates.
+    # Otherwise, is_dispatched will be True even if we have never sent them the email before.
+    df = spark_client.get_records(query).dropDuplicates(["customer_name", "customer_email"])
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d") + timedelta(days=1)
 
