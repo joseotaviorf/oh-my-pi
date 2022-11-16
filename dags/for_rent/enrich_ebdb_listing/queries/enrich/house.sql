@@ -48,18 +48,32 @@ supply_context AS (
 -- Also, the reason we are not using the enriched HubSpot tables is because they run later than this query, so we can't simplify it
 partner_agencies_aux AS (
   SELECT
+    id_company,
     NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '') AS tag,
-    REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', '') AS cnpj
+    NULLIF(GET_JSON_OBJECT(properties, '$.name'), '') AS name,
+    NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', ''), '') AS cnpj,
+    COALESCE(
+        NULLIF(GET_JSON_OBJECT(properties, '$.estado'), ''),
+        NULLIF(GET_JSON_OBJECT(properties, '$.state'), '')
+    ) AS partner_state,
+    ROW_NUMBER() OVER(PARTITION BY id_company ORDER BY ts_updated DESC) = 1 AS is_most_recent_for_company
   FROM
     datalake_hubspot_clean.company
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY cnpj ORDER BY ts_updated DESC) = 1 AND tag IS NOT NULL
+    ROW_NUMBER() OVER(PARTITION BY cnpj ORDER BY ts_updated DESC) = 1
+    AND (tag IS NOT NULL OR cnpj IS NOT NULL)
 ),
 partner_agencies AS (
   SELECT
+    id_company,
     tag,
+    CASE
+        WHEN is_most_recent_for_company THEN NULLIF(REGEXP_EXTRACT(tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')
+        ELSE NULL
+    END AS extracted_3p_tag,
     cnpj,
-    NULLIF(REGEXP_EXTRACT(tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') AS partner_3p_supply
+    COALESCE(NULLIF(REGEXP_EXTRACT(tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), ''), name) AS partner_3p_supply,
+    partner_state
   FROM
     partner_agencies_aux
 )
@@ -72,6 +86,7 @@ SELECT
   h.id_user_registrant,
   h.id_external,
   h.id_condo_parent,
+  pa.id_company AS id_company_hubspot,
   h.id % 892700000 AS house_short_id,
   h.rent,
   ch.country_code,
@@ -206,8 +221,17 @@ SELECT
     WHEN sc.is_3p_supply THEN TRUE -- After supply processor is in production, the ELSE part should be discarded.
     ELSE COALESCE(UPPER(h.internal_admin_info) LIKE '%[3P%-%]%', FALSE)
   END AS is_3p_supply,
-  COALESCE(UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3P-%]%', sc.is_3p_supply, FALSE) AS is_3p_supply_5a,
-  COALESCE(UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3PBH-%]%', FALSE) AS is_3p_supply_bh,
+  (pa.partner_state IS DISTINCT FROM 'MG'
+    AND COALESCE(
+      UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3P-%]%',
+      sc.is_3p_supply,
+      FALSE
+  )) AS is_3p_supply_5a,
+  (pa.partner_state IS NOT DISTINCT FROM 'MG'
+    OR COALESCE(
+      UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3PBH-%]%',
+      FALSE
+  )) AS is_3p_supply_bh,
   (COALESCE(h.announced_by, h.id_announced_by) IS NOT NULL) AS is_imovel_v3,
   CASE 
     WHEN (h.id_external LIKE '%[SCM%-%]%' OR h.internal_admin_info LIKE '%[SCM%-%]%') THEN TRUE
@@ -303,4 +327,4 @@ LEFT JOIN
     ON h.id = sc.id_house
 LEFT JOIN
   partner_agencies AS pa
-    ON pa.cnpj = NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')
+    ON NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') IN (pa.cnpj, pa.extracted_3p_tag)

@@ -26,6 +26,9 @@ columns:
   id_condo_parent:
     lineage:
       - datalake_ebdb_clean.house.id_condo_parent
+  id_company_hubspot:
+    lineage:
+      - datalake_hubspot_clean.company.id_company
   house_short_id:
     lineage:
       - datalake_ebdb_clean.house.id
