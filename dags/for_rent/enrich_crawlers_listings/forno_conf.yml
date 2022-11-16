@@ -38,6 +38,15 @@ tables:
     depends_on:
       - loft_region_mapping
     is_incremental: false
+  - table_name: em_casa_region_mapping
+    weekday_run: 0
+    is_incremental: true
+    partition_cols:
+      - ts_updated
+  - table_name: em_casa_status_listing_flows
+    depends_on:
+      - em_casa_region_mapping
+    is_incremental: false
 
 custom_libraries:
   - maven:

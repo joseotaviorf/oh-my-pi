@@ -16,6 +16,8 @@ Produces the following output table:
 - `loft`
 - `loft_region_mapping`
 - `loft_status_listing_flows`
+- `em_casa_region_mapping`
+- `em_casa_listing_flows`
 - `olx`
 - `viva_real`
 - `zap_imoveis`

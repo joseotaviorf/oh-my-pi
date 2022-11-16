@@ -1,0 +1,21 @@
+---
+database_name: datalake_crawlers_listings
+table_name: em_casa_region_mapping
+columns:
+    id_house:
+        lineage:
+            - datalake_crawlers_listings_clean.em_casa.id
+    id_house_platform:
+        lineage:
+            - datalake_crawlers_listings_clean.em_casa.id
+    id_neighborhood:
+        lineage:
+            - datalake_ebdb_clean.map_region.id_neighborhood
+    neighborhood:
+        lineage:
+            - datalake_crawlers_listings_clean.em_casa.neighborhood
+            - datalake_ebdb_clean.polygon_region.neighborhood
+    neighborhood_em_casa:
+        lineage:
+            - datalake_crawlers_listings_clean.em_casa.neighborhood
+            - datalake_ebdb_clean.polygon_region.neighborhood
