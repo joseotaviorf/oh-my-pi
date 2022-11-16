@@ -86,13 +86,21 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_result_bucket,
 )
 
+tables = config_service.get_config("tables")
 inner_dependencies = config_service.get_config("inner_dependencies")
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-)
+enrich_task_groups = {}
+for table in tables:
+    table_name = table["table_name"]
+    partitions = table.get("partitions")
+
+    enrich_task_groups = datalake_task_group.build_enrich_task_group(
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        table_name=table_name,
+        partitions=partitions,
+    )
+    enrich_task_groups[table_name] = enrich_task_groups
 
 (
     task_groups_boundaries_without_inner_dependencies,

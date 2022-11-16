@@ -1,4 +1,28 @@
 ---
+tables:
+  - table_name: agents_with_keys
+    partitions: [country_code]
+  - table_name: house
+    partitions: [country_code]
+  - table_name: house_entrance_history
+    partitions: [country_code]
+  - table_name: house_listing
+    partitions: [country_code]
+  - table_name: house_listing_fees
+    partitions: [country_code]
+  - table_name: house_listing_status
+    partitions: [country_code]
+  - table_name: house_status_version_order
+    partitions: [country_code]
+  - table_name: listing_business_context
+    partitions: [country_code, business_context]
+  - table_name: listing_business_context_status_history
+    partitions: [country_code, business_context]
+  - table_name: portability
+    partitions: [country_code]
+  - table_name: rent_listing
+    partitions: [country_code]
+
 custom_cluster:
   driver_node_type_id: m5.2xlarge
   node_type_id: r4.2xlarge

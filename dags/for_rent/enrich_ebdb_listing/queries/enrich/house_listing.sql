@@ -347,7 +347,6 @@ house_listing_stranded_status_all AS (
     FROM datalake_ebdb_listing.house_listing_status hls
     LEFT JOIN house_listing hl
       ON hls.id_house_listing = hl.id_house_listing
-      ORDER BY hls.id_house_listing DESC, hls.ts_status_started
 ),
 house_listing_stranded_rank_stranded AS (
     --select only status WHERE stranded date already happened
@@ -371,7 +370,6 @@ house_listing_stranded_rank_stranded AS (
         MIN(CASE WHEN type_stranded = 'stranded' THEN ts_to_be_stranded END) over (PARTITION BY id_house_listing) AS min_ts_to_be_stranded
     FROM house_listing_stranded_status_all
     WHERE type_stranded IS NOT NULL
-    ORDER BY id_house_listing desc, ts_status_started
 ),
 house_listing_stranded_status AS (
     select
@@ -412,7 +410,6 @@ house_listing_stranded_status AS (
              *  --------------------------------------------------------------------------------------------------------------------
              */
     FROM house_listing_stranded_rank_stranded
-    ORDER BY id_house_listing DESC
 ),
 house_listing_stranded_date AS (
     SELECT
@@ -426,7 +423,7 @@ house_listing_stranded_date AS (
     WHERE rn = 1
 ),
 house_entrance_history AS (
-  SELECT 
+  SELECT
         hl.id_house_listing,
         ot.name,
         hl.version,
