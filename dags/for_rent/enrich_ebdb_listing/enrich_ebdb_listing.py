@@ -94,13 +94,13 @@ for table in tables:
     table_name = table["table_name"]
     partitions = table.get("partitions")
 
-    enrich_task_groups = datalake_task_group.build_enrich_task_group(
+    task_group = datalake_task_group.build_enrich_task_group(
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         table_name=table_name,
         partitions=partitions,
     )
-    enrich_task_groups[table_name] = enrich_task_groups
+    enrich_task_groups[table_name] = task_group
 
 (
     task_groups_boundaries_without_inner_dependencies,
