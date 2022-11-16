@@ -166,6 +166,7 @@ SELECT
 	pp.id AS id_proposal_person,
 	pp.cpf AS id_personal_document,
 	pp.id_proposal AS id_proposal,
+	COALESCE(u.country_code, 'Undefined') AS country_code,
     CASE 
         WHEN current_situation = 'Familiares' THEN 'family'
         WHEN current_situation = 'Alugado' THEN 'rented'
@@ -234,3 +235,6 @@ LEFT JOIN
 LEFT JOIN 
     cpf_validator cv
 	    ON cv.id = pp.id
+LEFT JOIN
+	datalake_ebdb_country.user AS u
+		ON u.id_user = pp.id

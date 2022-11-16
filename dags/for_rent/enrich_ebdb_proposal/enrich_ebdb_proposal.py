@@ -35,16 +35,15 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = f"s3://{databricks_bietlejuice_repo_path}/logs/jobs/{DAG_ID}"
 
-
+default_libraries = config_service.get_config("default_libraries")
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
-
-default_libraries = config_service.get_config("default_libraries")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -77,10 +76,13 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
+partition_cols = config_service.get_config("partition_cols")
+
 enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
+    partitions=partition_cols,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

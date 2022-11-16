@@ -11,6 +11,9 @@ columns:
   id_proposal:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.id_proposal
+  country_code:
+    lineage:
+      - datalake_ebdb_country.user.country_code
   email:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.email
