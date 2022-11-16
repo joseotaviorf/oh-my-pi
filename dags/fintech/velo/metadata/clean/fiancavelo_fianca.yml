@@ -1,0 +1,52 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_fianca
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.id
+  id_realtor:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.realtor
+  id_realestate:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.realestate
+  id_responsible:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.responsible
+  id_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.type
+  id_status:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.status
+  id_external:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.externalref
+  id_propose:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.propose
+  id_validity:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.validity
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.userupdate
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.active
+  dt_begin:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.begin
+  dt_end:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.end
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_fianca.dateupdate

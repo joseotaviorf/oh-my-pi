@@ -1,0 +1,46 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_propose
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.id
+  id_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.type
+  id_status:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.status
+  id_plan:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.plan
+  id_step:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.step
+  id_activator:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.activator
+  id_external:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.externalref
+  id_realtor:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.realtor
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.userupdate
+  hash:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.hash
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_propose.dateupdate

@@ -1,0 +1,37 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_realestate
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_realestate.id
+  id_person:
+    lineage:
+      - datalake_velo_raw.fiancavelo_realestate.person
+  id_company:
+    lineage:
+      - datalake_velo_raw.fiancavelo_realestate.company
+  id_status:
+    lineage:
+      - datalake_velo_raw.fiancavelo_realestate.status
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_realestate.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_realestate.userupdate
+  creci:
+    lineage:
+      - datalake_velo_raw.fiancavelo_realestate.creci
+  has_flexplan:
+    lineage:
+      - datalake_velo_raw.fiancavelo_realestate.flexplan
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_realestate.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_realestate.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_realestate.dateupdate

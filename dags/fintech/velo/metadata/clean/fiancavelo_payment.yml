@@ -1,0 +1,73 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_payment
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.id
+  id_propose:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.propose
+  id_billing_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.billingtype
+  id_status:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.status
+  id_gateway:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.gateway
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.userupdate
+  unicid:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.unicid
+  customer:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.customer
+  subscription:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.subscription
+  payment_link:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.paymentlink
+  invoice_url:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.invoiceurl
+  description:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.description
+  value:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.value
+  netvalue:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.netvalue
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.active
+  dt_due:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.duedate
+  dt_original_due:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.originalduedate
+  dt_created:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.datecreated
+  dt_client_payment:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.clientpaymentdate
+  dt_confirmed:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.confirmeddate
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.dateupdate

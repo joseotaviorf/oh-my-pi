@@ -1,0 +1,46 @@
+---
+database_name: datalake_velo_clean
+table_name: clientes_person
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.clientes_person.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.clientes_person.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.clientes_person.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.clientes_person.name
+  document:
+    lineage:
+      - datalake_velo_raw.clientes_person.document
+  email:
+    lineage:
+      - datalake_velo_raw.clientes_person.email
+  mother:
+    lineage:
+      - datalake_velo_raw.clientes_person.mother
+  phone:
+    lineage:
+      - datalake_velo_raw.clientes_person.phone
+  rental:
+    lineage:
+      - datalake_velo_raw.clientes_person.rental
+  is_foreigner:
+    lineage:
+      - datalake_velo_raw.clientes_person.estrangeiro
+  is_active:
+    lineage:
+      - datalake_velo_raw.clientes_person.active
+  dt_birth:
+    lineage:
+      - datalake_velo_raw.clientes_person.birth
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.clientes_person.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.clientes_person.dateupdate

@@ -1,0 +1,43 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_simulator
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.id
+  id_person:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.person
+  id_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.type
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.userupdate
+  users:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.users
+  value:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.value
+  value_approved:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.valueaproved
+  hash:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.hash
+  is_approved:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.approved
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_simulator.dateupdate

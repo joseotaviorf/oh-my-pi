@@ -1,0 +1,46 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_colaborador
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.id
+  id_person:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.person
+  id_user:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.user
+  id_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.type
+  id_external:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.externalref
+  id_realestate:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.realestate
+  id_creci:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.creci
+  id_wallet:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.walletid
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.userupdate
+  apikey:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.apikey
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_colaborador.dateupdate

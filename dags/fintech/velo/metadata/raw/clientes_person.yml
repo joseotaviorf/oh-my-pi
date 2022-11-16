@@ -1,0 +1,19 @@
+---
+database_name: datalake_velo_raw
+table_name: clientes_person
+columns:
+  name:
+    tags:
+    - PII
+  document:
+    tags:
+    - PII
+  email:
+    tags:
+    - PII
+  mother:
+    tags:
+    - PII
+  phone:
+    tags:
+    - PII

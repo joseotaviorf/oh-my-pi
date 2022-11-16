@@ -1,0 +1,55 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_subscriptionpayment
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.id
+  id_propose:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.propose
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.userupdate
+  id_status:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.status
+  id_billing_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.billingtype
+  unicid:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.unicid
+  customer:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.customer
+  description:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.description
+  cycle:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.cycle
+  value:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.value
+  is_deleted:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.deleted
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.active
+  dt_next_due:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.nextduedate
+  dt_created:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.datecreated
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_subscriptionpayment.dateupdate

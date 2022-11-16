@@ -1,0 +1,31 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_proposeperson
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposeperson.id
+  id_propose:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposeperson.propose
+  id_person:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposeperson.person
+  id_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposeperson.type
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposeperson.active
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposeperson.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposeperson.userupdate
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposeperson.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposeperson.dateupdate

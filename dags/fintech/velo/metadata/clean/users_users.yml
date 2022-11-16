@@ -1,0 +1,43 @@
+---
+database_name: datalake_velo_clean
+table_name: users_users
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.users_users.id
+  id_external:
+    lineage:
+      - datalake_velo_raw.users_users.externalref
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.users_users.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.users_users.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.users_users.name
+  email:
+    lineage:
+      - datalake_velo_raw.users_users.email
+  password:
+    lineage:
+      - datalake_velo_raw.users_users.password
+  phone:
+    lineage:
+      - datalake_velo_raw.users_users.phone
+  profile:
+    lineage:
+      - datalake_velo_raw.users_users.profile
+  is_first:
+    lineage:
+      - datalake_velo_raw.users_users.first
+  is_active:
+    lineage:
+      - datalake_velo_raw.users_users.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.users_users.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.users_users.dateupdate

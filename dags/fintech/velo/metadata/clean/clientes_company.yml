@@ -1,0 +1,46 @@
+---
+database_name: datalake_velo_clean
+table_name: clientes_company
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.clientes_company.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.clientes_company.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.clientes_company.userupdate
+  document:
+    lineage:
+      - datalake_velo_raw.clientes_company.document
+  name:
+    lineage:
+      - datalake_velo_raw.clientes_company.name
+  comercial_name:
+    lineage:
+      - datalake_velo_raw.clientes_company.comercialname
+  foundation:
+    lineage:
+      - datalake_velo_raw.clientes_company.foundation
+  rental:
+    lineage:
+      - datalake_velo_raw.clientes_company.rental
+  complement:
+    lineage:
+      - datalake_velo_raw.clientes_company.complement
+  address:
+    lineage:
+      - datalake_velo_raw.clientes_company.address
+  phone:
+    lineage:
+      - datalake_velo_raw.clientes_company.phone
+  is_active:
+    lineage:
+      - datalake_velo_raw.clientes_company.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.clientes_company.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.clientes_company.dateupdate

@@ -1,0 +1,31 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_evaluationtext
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_evaluationtext.id
+  id_propose:
+    lineage:
+      - datalake_velo_raw.fiancavelo_evaluationtext.propose
+  id_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_evaluationtext.type
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_evaluationtext.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_evaluationtext.userupdate
+  description:
+    lineage:
+      - datalake_velo_raw.fiancavelo_evaluationtext.description
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_evaluationtext.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_evaluationtext.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_evaluationtext.dateupdate

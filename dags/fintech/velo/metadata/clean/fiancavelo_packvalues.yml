@@ -1,0 +1,34 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_packvalues
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packvalues.id
+  id_pack_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packvalues.packtype
+  id_propose:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packvalues.propose
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packvalues.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packvalues.userupdate
+  description:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packvalues.description
+  value:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packvalues.value
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packvalues.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packvalues.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packvalues.dateupdate

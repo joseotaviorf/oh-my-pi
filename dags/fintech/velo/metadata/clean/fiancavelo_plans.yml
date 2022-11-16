@@ -1,0 +1,43 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_plans
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.id
+  id_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.type
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.name
+  link:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.link
+  percent:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.percent
+  coverage:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.coverage
+  damage:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.damage
+  commission:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.commission
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plans.dateupdate

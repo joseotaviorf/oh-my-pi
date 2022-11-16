@@ -1,0 +1,25 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_packtype
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packtype.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packtype.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packtype.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packtype.name
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packtype.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packtype.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_packtype.dateupdate

@@ -1,0 +1,31 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_activator
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_activator.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_activator.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_activator.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.fiancavelo_activator.name
+  value:
+    lineage:
+      - datalake_velo_raw.fiancavelo_activator.value
+  icon:
+    lineage:
+      - datalake_velo_raw.fiancavelo_activator.icon
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_activator.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_activator.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_activator.dateupdate

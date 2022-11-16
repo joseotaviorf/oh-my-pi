@@ -1,0 +1,28 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_proposestatus
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposestatus.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposestatus.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposestatus.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposestatus.name
+  colorhex:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposestatus.colorhex
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposestatus.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposestatus.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposestatus.dateupdate

@@ -1,0 +1,25 @@
+---
+database_name: datalake_velo_clean
+table_name: velosign_template
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.velosign_template.id
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.velosign_template.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.velosign_template.name
+  hash:
+    lineage:
+      - datalake_velo_raw.velosign_template.hash
+  is_active:
+    lineage:
+      - datalake_velo_raw.velosign_template.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.velosign_template.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.velosign_template.dateupdate

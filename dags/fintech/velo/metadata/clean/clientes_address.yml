@@ -1,0 +1,49 @@
+---
+database_name: datalake_velo_clean
+table_name: clientes_address
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.clientes_address.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.clientes_address.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.clientes_address.userupdate
+  neighborhood:
+    lineage:
+      - datalake_velo_raw.clientes_address.neighborhood
+  street:
+    lineage:
+      - datalake_velo_raw.clientes_address.street
+  number:
+    lineage:
+      - datalake_velo_raw.clientes_address.number
+  complement:
+    lineage:
+      - datalake_velo_raw.clientes_address.complement
+  zipcode:
+    lineage:
+      - datalake_velo_raw.clientes_address.zipcode
+  city:
+    lineage:
+      - datalake_velo_raw.clientes_address.city
+  state:
+    lineage:
+      - datalake_velo_raw.clientes_address.state
+  country:
+    lineage:
+      - datalake_velo_raw.clientes_address.country
+  geolocation:
+    lineage:
+      - datalake_velo_raw.clientes_address.geolocation
+  is_active:
+    lineage:
+      - datalake_velo_raw.clientes_address.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.clientes_address.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.clientes_address.dateupdate

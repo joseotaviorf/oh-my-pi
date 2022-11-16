@@ -1,0 +1,34 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_proposehistory
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposehistory.id
+  id_propose:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposehistory.propose
+  id_type_history:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposehistory.typehistory
+  id_text_key:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposehistory.textkey
+  id_additional_key:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposehistory.additionalkey
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposehistory.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposehistory.userupdate
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposehistory.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposehistory.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_proposehistory.dateupdate

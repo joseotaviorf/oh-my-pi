@@ -1,0 +1,34 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_object
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object.id
+  id_propose:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object.propose
+  id_object_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object.objecttype
+  id_property:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object.property
+  description:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object.description
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object.userupdate
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object.dateupdate

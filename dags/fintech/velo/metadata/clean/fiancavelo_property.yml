@@ -1,0 +1,52 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_property
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.id
+  id_property_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.propertytype
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.userupdate
+  neighborhood:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.neighborhood
+  street:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.street
+  number:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.number
+  complement:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.complement
+  zipcode:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.zipcode
+  city:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.city
+  state:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.state
+  country:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.country
+  geolocation:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.geolocation
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property.dateupdate

@@ -7,10 +7,11 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.utils.helpers import cross_downstream
 
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -45,12 +46,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 
-CUSTOM_LIBRARIES = [
-    {
-        "jar": f"{artifacts_s3_bucket}/mysql-connector-java/mysql-connector-java-5.1"
-        f".47.jar"
-    }
-]
+CUSTOM_LIBRARIES = [{"maven": {"coordinates": "mysql:mysql-connector-java:5.1.47"}}]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -90,13 +86,14 @@ task_group = DatalakeTaskGroup(
 tables = config_service.get_config("tables")
 partition_columns = config_service.get_config("partition_columns")
 
+cleaned_tables = task_group._get_table_names_from_sql_files(LayerEnum.CLEAN)
+raw_task_groups = {}
 for table in tables:
     table_name = table["table_name"]
     extraction_type = table["extraction_type"]
     parameters = [SOURCE, table_name]
 
     is_incremental = extraction_type == "incremental"
-    is_cleaned = table["is_cleaned"]
 
     if is_incremental:
         parameters.append(table["date_filter_column"])
@@ -115,28 +112,24 @@ for table in tables:
         ),
         raw_spark_job_extra_args=parameters,
     )
+    raw_task_groups[table_name] = raw_task_group
 
     create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
 
-    if is_cleaned:
-        clean_table_name = table.get("clean_table_name", table_name)
-        clean_task_group = task_group.build_clean_task_group(
-            source_database_base_name=SOURCE,
-            target_database_base_name=SOURCE,
-            table_name=clean_table_name,
-            is_incremental=is_incremental,
-            partitions=partitions,
-        )
 
-        cross_downstream(
-            DatalakeTaskGroup.last_tasks(raw_task_group),
-            DatalakeTaskGroup.first_tasks(clean_task_group),
-        )
+clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+)
 
-        terminate_cluster_task.set_upstream(
-            DatalakeTaskGroup.last_tasks(clean_task_group)
-        )
-    else:
-        terminate_cluster_task.set_upstream(
-            DatalakeTaskGroup.last_tasks(raw_task_group)
-        )
+table_names = task_group._get_table_names_from_sql_files(layer=LayerEnum.CLEAN)
+
+for table in table_names:
+    TaskFlowHelper().cross_downstream_task_groups(
+        raw_task_groups[table], clean_task_groups[table]
+    )
+
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(raw_task_groups))

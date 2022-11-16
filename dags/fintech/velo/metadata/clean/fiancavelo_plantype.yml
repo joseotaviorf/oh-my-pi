@@ -1,0 +1,25 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_plantype
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plantype.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plantype.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plantype.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plantype.name
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plantype.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plantype.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_plantype.dateupdate
