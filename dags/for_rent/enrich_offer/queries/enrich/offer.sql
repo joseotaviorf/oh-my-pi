@@ -168,6 +168,6 @@ left join firestore_offers firestore
   on offer.id = firestore.id_offer
 left join offer_negotiation negotiation
   on negotiation.id_offer = offer.id
-LEFT JOIN
-    datalake_ebdb_listing.house AS hl
-        ON hl.id = offer.id_house
+JOIN
+    datalake_ebdb_country.house AS hl
+        ON hl.id_house = offer.id_house
