@@ -1,0 +1,57 @@
+database_name: datalake_wall_street_clean
+table_name: subscription
+columns:
+  id:
+    lineage:
+      - datalake_wall_street_raw.subscription.id
+  id_external:
+    lineage:
+      - datalake_wall_street_raw.subscription.externalid
+  id_customer:
+    lineage:
+      - datalake_wall_street_raw.subscription.customerid
+  id_store:
+    lineage:
+      - datalake_wall_street_raw.subscription.storeid
+  id_credit_card:
+    lineage:
+      - datalake_wall_street_raw.subscription.creditcardid
+  id_business_entity:
+    lineage:
+      - datalake_wall_street_raw.subscription.businessentityid
+  id_finance_entity:
+    lineage:
+      - datalake_wall_street_raw.subscription.financeentityid
+  code:
+    lineage:
+      - datalake_wall_street_raw.subscription.code
+  recurrence:
+    lineage:
+      - datalake_wall_street_raw.subscription.recurrence
+  status:
+    lineage:
+      - datalake_wall_street_raw.subscription.status
+  currency:
+    lineage:
+      - datalake_wall_street_raw.subscription.currency
+  acquire:
+    lineage:
+      - datalake_wall_street_raw.subscription.acquire
+  payer_name:
+    lineage:
+      - datalake_wall_street_raw.subscription.payername
+  payer_document_number:
+    lineage:
+      - datalake_wall_street_raw.subscription.payerdocumentnumber
+  ts_created:
+    lineage:
+      - datalake_wall_street_raw.subscription.createdat
+  ts_canceled:
+    lineage:
+      - datalake_wall_street_raw.subscription.canceledat
+  ts_updated:
+    lineage:
+      - datalake_wall_street_raw.subscription.updatedat
+  dt_start:
+    lineage:
+      - datalake_wall_street_raw.subscription.startat

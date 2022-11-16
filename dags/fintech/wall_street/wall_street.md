@@ -25,5 +25,6 @@ This pipeline produces the following output tables:
     - `charge`
     - `charge_aud`
     - `charge_mundipagg`
+    - `subscription`
 ​
 </details>

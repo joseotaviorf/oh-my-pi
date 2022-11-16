@@ -4,45 +4,78 @@ columns:
   id:
     lineage:
       - datalake_wall_street_raw.charge.id
-  acquire:
-    lineage:
-      - datalake_wall_street_raw.charge.acquire
   id_acquire:
     lineage:
       - datalake_wall_street_raw.charge.acquireid
-  amount:
-    lineage:
-      - datalake_wall_street_raw.charge.amount
-  charge_status:
-    lineage:
-      - datalake_wall_street_raw.charge.chargestatus
-  code:
-    lineage:
-      - datalake_wall_street_raw.charge.code
   id_customer:
     lineage:
       - datalake_wall_street_raw.charge.customerid
-  id_external:
-    lineage:
-      - datalake_wall_street_raw.charge.externalid
-  ts_updated:
-    lineage:
-      - datalake_wall_street_raw.charge.lastupdate
   id_store:
     lineage:
       - datalake_wall_street_raw.charge.store_id
-  acquire_charge_status:
+  id_external:
     lineage:
-      - datalake_wall_street_raw.charge.acquirechargestatus
-  installments:
+      - datalake_wall_street_raw.charge.externalid
+  id_acquire_transaction:
     lineage:
-      - datalake_wall_street_raw.charge.installments
+      - datalake_wall_street_raw.charge.acquiretid
+  id_business_entity:
+    lineage:
+      - datalake_wall_street_raw.charge.businessentityid
+  id_finance_entity:
+    lineage:
+      - datalake_wall_street_raw.charge.financeentityid
+  id_credit_card:
+    lineage:
+      - datalake_wall_street_raw.charge.creditcardid
+  code:
+    lineage:
+      - datalake_wall_street_raw.charge.code
   acquire_auth_code:
     lineage:
       - datalake_wall_street_raw.charge.acquireauthcode
   acquire_nsu:
     lineage:
       - datalake_wall_street_raw.charge.acquirensu
-  id_acquire_transaction:
+  acquire:
     lineage:
-      - datalake_wall_street_raw.charge.acquiretid
+      - datalake_wall_street_raw.charge.acquire
+  acquire_name:
+    lineage:
+      - datalake_wall_street_raw.charge.acquirename
+  card_brand:
+    lineage:
+      - datalake_wall_street_raw.charge.cardbrand
+  acquire_fee_percentage:
+    lineage:
+      - datalake_wall_street_raw.charge.acquirefeepercentage
+  payer_name:
+    lineage:
+      - datalake_wall_street_raw.charge.payername
+  payer_document_number:
+    lineage:
+      - datalake_wall_street_raw.charge.payerdocumentnumber
+  charge_status:
+    lineage:
+      - datalake_wall_street_raw.charge.chargestatus
+  acquire_charge_status:
+    lineage:
+      - datalake_wall_street_raw.charge.acquirechargestatus
+  invoice_message:
+    lineage:
+      - datalake_wall_street_raw.charge.invoicemessage
+  installments:
+    lineage:
+      - datalake_wall_street_raw.charge.installments
+  amount:
+    lineage:
+      - datalake_wall_street_raw.charge.amount
+  refund_amount:
+    lineage:
+      - datalake_wall_street_raw.charge.refundamount
+  ts_paid:
+    lineage:
+      - datalake_wall_street_raw.charge.paidat
+  ts_updated:
+    lineage:
+      - datalake_wall_street_raw.charge.lastupdate
