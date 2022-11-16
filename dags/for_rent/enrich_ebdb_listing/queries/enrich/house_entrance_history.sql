@@ -105,7 +105,7 @@ event_bus AS (
 SELECT
     eb.id_house,
     so.id_occupant,
-    ch.country_code,
+    COALESCE(ch.country_code, 'Undefined') AS country_code,
     eb.rev,
     sd.doorman_type,
     skl.key_location,
