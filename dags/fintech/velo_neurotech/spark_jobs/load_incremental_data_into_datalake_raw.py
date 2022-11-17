@@ -54,6 +54,8 @@ def sync_data(username, password, client_id, client_secret, end_date, report_nam
     start_date = convert_datetime_to_neurotech_format(start_date)
 
     end_date = datetime(end_date.year, end_date.month, end_date.day, hour=23, minute=59)
+    # fix execution date given by Airflow which is delayed by 1 day
+    end_date = end_date + timedelta(days=1)
     end_date = convert_datetime_to_neurotech_format(end_date)
 
     client = VeloNeurotechClient(username, password, client_id, client_secret)
@@ -108,6 +110,7 @@ if __name__ == "__main__":
     credentials = json.loads(json_credentials)
 
     dt_execution = datetime.strptime(args.execution_date, "%Y-%m-%d").date()
+
     pandas_df = sync_data(
         username=credentials["username"],
         password=credentials["password"],
