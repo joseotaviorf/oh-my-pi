@@ -89,4 +89,3 @@ dags:
       - spark.driver.cores: 5
   support_and_service:
     owner: Data SS
-    load_to_redshift: True
