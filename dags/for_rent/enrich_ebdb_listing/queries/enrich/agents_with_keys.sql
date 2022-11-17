@@ -4,6 +4,7 @@ WITH key_location_aud AS (
         ata.id_house,
         ata.rev AS key_location_rev,
         aat.name AS access_type_name,
+        COALESCE(LAG(aat.name) OVER(PARTITION BY ata.id_house ORDER BY ata.rev), 'no information available') AS previous_access_type_name,
         ata.additional_info AS comments,
         ata.has_opted_keys_with_agent,
         ata.mod_has_opted_keys_with_agent,
@@ -17,6 +18,19 @@ WITH key_location_aud AS (
     JOIN
         datalake_ebdb_clean.user_revision_entity AS ure
             ON ata.rev = ure.id
+),
+key_location_changes AS (
+    SELECT
+        id_house,
+        key_location_rev,
+        access_type_name,
+        MAX(key_location_rev) OVER(PARTITION BY id_house, DATE(ts_revision)) = key_location_rev AS is_last_status_of_day,
+        DATE(ts_revision) AS dt_key_location_started,
+        COALESCE(LEAD(DATE(ts_revision)) OVER(PARTITION BY id_house ORDER BY key_location_rev),'2100-01-01') AS dt_key_location_ended
+    FROM
+        key_location_aud
+    WHERE
+        access_type_name <> previous_access_type_name
 ),
 agent_aud AS (
     SELECT
@@ -149,9 +163,9 @@ non_doorman_listing AS (
         hl.id_house_listing,
         hl.country_code,
         h.doorman_type,
-        FIRST_VALUE(kla.access_type_name) OVER (PARTITION BY hl.id_house_listing ORDER BY kla.key_location_rev) AS first_key_location,
+        FIRST_VALUE(klc.access_type_name) OVER (PARTITION BY hl.id_house_listing ORDER BY klc.key_location_rev) AS first_key_location,
         h.key_location AS house_key_location,
-        LAST_VALUE(kla.access_type_name) OVER (PARTITION BY hl.id_house_listing ORDER BY kla.key_location_rev RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_key_location,
+        LAST_VALUE(klc.access_type_name) OVER (PARTITION BY hl.id_house_listing ORDER BY klc.key_location_rev RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_key_location,
         h.occupant_type AS who_is_living,
         h.is_for_sale,
         IF(h.id_user = h.id_user_registrant, TRUE, FALSE) AS is_fss,
@@ -165,9 +179,13 @@ non_doorman_listing AS (
         datalake_ebdb_listing.house h
             ON hl.id_house = h.id
     LEFT JOIN
-        key_location_aud kla
-            ON kla.id_house = hl.id_house
-            AND kla.ts_revision BETWEEN COALESCE(hl.ts_listing_version_start, kla.ts_revision) AND COALESCE(hl.ts_listing_version_end, kla.ts_revision)
+        key_location_changes klc
+            ON klc.id_house = hl.id_house
+            AND (
+                 (klc.dt_key_location_started >= DATE(COALESCE(ts_listing_version_start, '1900-01-01')) AND klc.dt_key_location_started < DATE(COALESCE(ts_listing_version_end, '2100-01-01')))
+                 OR (DATE(COALESCE(ts_listing_version_start, '1900-01-01')) >= klc.dt_key_location_started AND DATE(COALESCE(ts_listing_version_start, '1900-01-01')) < klc.dt_key_location_ended)
+                )
+            AND klc.is_last_status_of_day = True
     LEFT JOIN
         agent_aud AS aa
             ON hl.id_house = aa.id_house
