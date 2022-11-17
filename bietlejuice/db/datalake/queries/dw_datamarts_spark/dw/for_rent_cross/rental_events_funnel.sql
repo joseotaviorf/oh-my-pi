@@ -489,23 +489,6 @@ agent_supports AS (
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
-house_listing_daily_info AS (
-  SELECT
-    ddciq.sk_date,
-    ciq.dt_day,
-    ciq.id_house_listing,
-    ciq.is_for_rent,
-    ciq.is_for_sale,
-    ciq.consultant_type
-  FROM
-    datalake_rental_historical_follow_up.house_listings_daily_info ciq
-  INNER JOIN
-    dw_public.dim_date ddciq
-      ON DATE(CONCAT(ciq.year, '-', ciq.month, '-', ciq.day)) = ddciq.date
-  WHERE
-    ciq.is_for_rent = TRUE
-    AND DATE(CONCAT(ciq.year, '-', ciq.month, '-', ciq.day)) >= DATE('2020-07-29') -- First CIQ appears.
-),
 rent_flow_adjusted AS (
   SELECT
     rf.sk_rent_flow,
@@ -542,10 +525,10 @@ rent_flow_adjusted AS (
     dp.guarantee,
     CASE
       WHEN dhl.is_b2b = TRUE THEN 'B2B'
-      WHEN ciq.is_for_sale = false
-        AND ciq.consultant_type IS NOT NULL THEN ciq.consultant_type
+      WHEN ciq.businesscontext = 'RENT'
+        AND ciq.type_big_agent IS NOT NULL THEN ciq.type_big_agent
       WHEN dhl.is_b2b = FALSE
-        OR ciq.id_house_listing IS NULL THEN 'FALSE'
+        OR ciq.sk_house_listing IS NULL THEN 'FALSE'
     END AS is_b2b,
     dr.city_group,
     dr.country_code,
@@ -575,12 +558,9 @@ rent_flow_adjusted AS (
       ON rf.sk_rent_flow = fdf.sk_rent_flow
       AND rf.sk_house_listing = fdf.sk_house_listing
   LEFT JOIN
-        house_listing_daily_info ciq
-      ON rf.sk_house_listing = ciq.id_house_listing
-      AND ciq.sk_date IN (rf.sk_visit_date,rf.sk_contract_annulment_date, rf.sk_booking_created_date, rf.sk_offer_submitted_date,
-            rf.sk_offer_approved_date, rf.sk_first_credit_evaluation_positive, rf.sk_guarantee_date, rf.sk_tenant_first_doc_sent_date, rf.sk_last_doc_analysis_approved,
-            rf.sk_credit_analysis_init_date, rf.sk_credit_analysis_end_date, rf.sk_guarantee_paid_date, rf.sk_credit_analysis_approved_date, rf.sk_contract_created_date,
-            rf.sk_contract_signed_date)
+    dw_datamarts_cross.quintoandar_consultant_listings ciq
+      ON rf.sk_house_listing = ciq.sk_house_listing
+      AND ciq.businesscontext = 'RENT'
 ),
 visits_booked AS (
   SELECT
