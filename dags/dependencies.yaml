@@ -450,11 +450,6 @@ bietlejuice.dw_datamarts_support_and_service:
   - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
   - bietlejuice.enrich_ebdb_user_revision_entity:create-enrich-user-revision-entity-external-table
-  - bietlejuice.kodak:create-clean-photo-sphere-external-table
-  - bietlejuice.kodak:create-clean-photo-sphere-aud-external-table
-  - bietlejuice.kodak:create-clean-user-revision-entity-external-table
-  - bietlejuice.kodak:create-clean-video-external-table
-  - bietlejuice.kodak:create-clean-video-aud-external-table
 
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood:load-enrich-affiliate-costs
@@ -927,10 +922,9 @@ bietlejuice.dw_datamarts_spark.growth_cross:
 bietlejuice.dw_datamarts_spark.support_and_service:
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
   - bietlejuice.dw_region:load-dw-public-dim-region
-  # kodak dependencies commented with the house-media datamart
-  # - bietlejuice.kodak:load-clean-photo-sphere
-  # - bietlejuice.kodak:load-clean-user-revision-entity
-  # - bietlejuice.kodak:load-clean-video
+  - bietlejuice.kodak:load-clean-photo-sphere
+  - bietlejuice.kodak:load-clean-user-revision-entity
+  - bietlejuice.kodak:load-clean-video
   - bietlejuice.jira:load-clean-issues
 
 bietlejuice.dw_house:
