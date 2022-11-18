@@ -102,7 +102,6 @@ entities_tasks = {}
 for entity_name, entity_pipeline in pipeline_config.items():
     dw_workflow_config = entity_pipeline["dw"]
     try:
-        sql_file = dw_workflow_config["sql_file"]
         table = dw_workflow_config["table"]
         runs_on = dw_workflow_config["runs_on"]
     except KeyError as ex:
@@ -127,7 +126,6 @@ for entity_name, entity_pipeline in pipeline_config.items():
                     DW_SCHEMA,
                     DAG_NAME,
                     table,
-                    sql_file,
                     runs_on,
                 ],
             }
@@ -178,7 +176,7 @@ for entity_name, entity_pipeline in pipeline_config.items():
                     "parameters": [
                         LayerEnum.DW.value,
                         MetadataTypeEnum.LINEAGE.value,
-                        DAG_NAME,
+                        DW_SCHEMA,
                         table,
                     ],
                 }

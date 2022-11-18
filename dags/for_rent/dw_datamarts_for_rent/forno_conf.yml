@@ -1,69 +1,55 @@
 # Merge Keys are available only in Yaml 1.1.
 redshift_template:
   dw: &redshift_anchor
-    schema: datamarts
     runs_on: redshift
 athena_template:
   dw: &athena_anchor
-    schema: datamarts
     runs_on: athena
 pipeline:
   ##<KEEP THIS COMMENTED AS A TEMPLATE>
   # <task-name-like-attribution-conversion-paths>:
   #   dw:
-  #     sql_file: <query-file E.g: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql>
   #     table: <targe-table-name>
-  #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
   #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
-  contract_termination:
+  weekly_demand_metrics:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/contract_termination.sql
-      table: contract_termination
-  datamart_kpi_weekly:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/datamart_kpi_weekly.sql
-      table: datamart_kpi_weekly
-  datamart_opportunity:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/datamart_opportunity.sql
-      table: datamart_opportunity
+      table: weekly_demand_metrics
   house_available_hours:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/house_available_hours.sql
       table: house_available_hours
   house_weekly_available_hours:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/house_weekly_available_hours.sql
       table: house_weekly_available_hours
       depends_on:
         - house_available_hours
   house_weekly_entrance_info:
     dw:
       <<: *athena_anchor
-      sql_file: dw/queries/datamarts/for_rent/house_weekly_entrance_info.sql
       table: house_weekly_entrance_info
+  datamart_opportunity:
+    dw:
+      <<: *redshift_anchor
+      table: datamart_opportunity
   repressed_demand:
     dw:
       <<: *athena_anchor
-      sql_file: dw/queries/datamarts/for_rent/repressed_demand.sql
       table: repressed_demand
-  weekly_demand_metrics:
+  contract_termination:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/weekly_demand_metrics.sql
-      table: weekly_demand_metrics
+      table: contract_termination
+  datamart_kpi_weekly:
+    dw:
+      <<: *redshift_anchor
+      table: datamart_kpi_weekly
   ongoing_listed_suspended_listings:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/ongoing_listed_suspended_listings.sql
       table: ongoing_listed_suspended_listings
   datamart_cohort_rentals:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/datamart_cohort_rentals.sql
       table: datamart_cohort_rentals

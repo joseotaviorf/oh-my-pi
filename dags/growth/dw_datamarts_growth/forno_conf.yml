@@ -1,44 +1,35 @@
 ---
 redshift_template:
   dw: &redshift_anchor
-    schema: datamarts
     runs_on: redshift
 athena_template:
   dw: &athena_anchor
-    schema: datamarts
     runs_on: athena
 pipeline:
   ##<KEEP THIS COMMENTED AS A TEMPLATE>
   # <task-name-like-attribution-conversion-paths>:
   #   dw:
-  #     sql_file: <query-file E.g: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql>
   #     table: <targe-table-name>
-  #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
   #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
   # example_redshift_weekly_demand_metrics:
   #   dw:
   #     <<: *redshift_anchor
-  #     sql_file: dw/queries/datamarts/for_rent/weekly_demand_metrics.sql
   #     table: weekly_demand_metrics
   # example_athena_house_weekly_entrance_info:
   #   dw:
   #     <<: *athena_anchor
-  #     sql_file: dw/queries/datamarts/for_rent/house_weekly_entrance_info.sql
   #     table: house_weekly_entrance_info
   attribution_conversion_paths_demand:
     dw:
       <<: *athena_anchor
-      sql_file: dw/queries/datamarts/growth/attribution_conversion_paths_demand.sql
       table: attribution_conversion_paths_demand
   buyer_activation_events_combo:
     dw:
       <<: *athena_anchor
-      sql_file: dw/queries/datamarts/growth/buyer_activation_events_combo.sql
       table: buyer_activation_events_combo
   casa_mineira_top_of_funnel_volumes_daily:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/casa_mineira_top_of_funnel_volumes_daily.sql
       table: casa_mineira_top_of_funnel_volumes_daily
       depends_on:
         - performance_marketing_metrics_imobiliaria_casa_mineira
@@ -46,27 +37,22 @@ pipeline:
   performance_marketing_metrics_portal_casa_mineira:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_portal_casa_mineira.sql
       table: performance_marketing_metrics_portal_casa_mineira
   plaquinhas_houses:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/plaquinhas_houses.sql
       table: plaquinhas_houses
   sale_performance_marketing_metrics_supply_cohort:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/sale_performance_marketing_metrics_supply_cohort.sql
       table: sale_performance_marketing_metrics_supply_cohort
   casa_mineira_top_of_funnel_volumes_monthly:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/casa_mineira_top_of_funnel_volumes_monthly.sql
       table: casa_mineira_top_of_funnel_volumes_monthly
   casa_mineira_top_of_funnel_volumes_weekly:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/casa_mineira_top_of_funnel_volumes_weekly.sql
       table: casa_mineira_top_of_funnel_volumes_weekly
       depends_on:
         - performance_marketing_metrics_imobiliaria_casa_mineira
@@ -74,5 +60,4 @@ pipeline:
   performance_marketing_metrics_imobiliaria_casa_mineira:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_imobiliaria_casa_mineira.sql
       table: performance_marketing_metrics_imobiliaria_casa_mineira

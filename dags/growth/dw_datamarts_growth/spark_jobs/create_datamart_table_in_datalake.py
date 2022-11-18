@@ -39,7 +39,6 @@ parser.add_argument("athena_query_results_bucket")
 parser.add_argument("dw_schema")
 parser.add_argument("dag_name")
 parser.add_argument("table")
-parser.add_argument("sql_file")
 parser.add_argument("runs_on")
 
 if __name__ == "__main__":
@@ -50,7 +49,6 @@ if __name__ == "__main__":
     dw_schema = args.dw_schema
     dag_name = args.dag_name
     table = args.table
-    sql_file = args.sql_file
     runs_on = args.runs_on
 
     s3_query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
