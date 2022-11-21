@@ -2,7 +2,7 @@ WITH
 prospect_info AS (
   SELECT
     id AS id_wololo_prospect,
-    id_reference AS id_prospect_external,
+    id_reference AS id_prospect,
     phone AS phone_number, 
     REPLACE(phone, '+') AS phone_number_formated, 
     status,
@@ -32,6 +32,7 @@ user_notification_last_update AS (
 
 prospect_calls_last_update AS (
   SELECT
+    id_wololo_prospect,
     id_prospect,
     id_call_analyst,
     phone_number,
@@ -125,7 +126,7 @@ SELECT
         COALESCE(ppc.ts_contacted, un.ts_sent, bse.ts_webhook_sent))
       ) AS id_outbound_contact,
     ppi.id_wololo_prospect,
-    ppi.id_prospect_external AS id_prospect,
+    ppi.id_prospect,
     bse.id_user_dispatch,
     bse.id_user_braze,
     bse.id_canvas,
@@ -174,7 +175,7 @@ LEFT JOIN
       AND bse.id_step_canvas = jk.id_step_canvas
 LEFT JOIN
     prospect_calls_last_update AS ppc
-      ON ppi.id_wololo_prospect = ppc.id_prospect
+      ON ppi.id_wololo_prospect = ppc.id_wololo_prospect
       AND bse.wololo_call_round_max_tries = ppc.round_max_tries
       AND DATE(bse.ts_webhook_sent) = DATE(ppc.ts_round_started)
 LEFT JOIN 
