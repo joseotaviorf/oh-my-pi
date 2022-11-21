@@ -11,8 +11,9 @@ Three times a week. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-Produces the following output table: 
+Produces the following output table:
 
+- `em_casa`
 - `loft`
 - `loft_region_mapping`
 - `loft_status_listing_flows`

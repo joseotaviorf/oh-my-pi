@@ -1,0 +1,73 @@
+---
+database_name: datalake_crawlers_listings
+table_name: em_casa
+columns:
+  id_house_platform:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.id
+  id_neighborhood:
+    lineage:
+      - datalake_crawlers_listings.em_casa_region_mapping.id_neighborhood
+  city:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.address
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+  neighborhood:
+    lineage:
+      - datalake_crawlers_listings.em_casa_region_mapping.neighborhood
+  state:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.address
+  lat:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.geolocation
+  lng:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.geolocation
+  address:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.address
+  zip_code:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.address
+  floors:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+  num_floors:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+  unit_per_floor:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+  total_area:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+  bedrooms:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+  suites:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+  parking_spaces:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+  bathrooms:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+  price:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.price
+  condo_fee:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.price
+  iptu:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.price
+  is_for_sale:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.type
+  is_for_rent:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.type

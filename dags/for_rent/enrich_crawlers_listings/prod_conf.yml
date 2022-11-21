@@ -1,6 +1,10 @@
 ---
 #weekday: 0 = monday
 tables:
+  - table_name: em_casa
+    depends_on:
+      - em_casa_region_mapping
+    is_incremental: false
   - table_name: olx
     weekday_run: 4
     is_incremental: true

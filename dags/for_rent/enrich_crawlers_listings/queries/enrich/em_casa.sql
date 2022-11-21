@@ -1,0 +1,138 @@
+WITH em_casa_listings_raw AS (
+    SELECT
+        id AS id_house_platform,
+        CONCAT(id, "Emcasa") AS id_house,
+        "Emcasa" AS platform,
+        CAST(address.neighborhood AS STRING) AS neighborhood,
+        CAST(address.city AS STRING) AS city,
+        CAST(address.state AS STRING) AS state,
+        CAST(address.street AS STRING) AS address,
+        REGEXP_REPLACE(LOWER(CAST(address.street AS STRING)), "avenida|rua|av.|#|&|1|2|3|4|5|6|7|8|9| da | de | do | das | dos ", "") AS address_for_join,
+        NULL::INT AS st_number,
+        NULL::STRING AS zip_code,
+        CAST(geolocation.latitude AS STRING) AS lat,
+        CAST(geolocation.longitude AS STRING) AS lng,
+        CAST(house_info.floor AS STRING) AS floors,
+        CAST(house_info.num_floors AS STRING) AS num_floors,
+        CAST(house_info.unit_per_floor AS INT) AS unit_per_floor,
+        CAST(house_info.area AS INT) AS total_area,
+        CAST(house_info.bedrooms AS INT) AS bedrooms,
+        CAST(house_info.suites AS INT) AS suites,
+        CAST(house_info.parking_spaces AS INT) AS parking_spaces,
+        CAST(house_info.bathrooms AS INT) AS bathrooms,
+        NULL::STRING AS year_built,
+        CONCAT(UPPER(SUBSTR(CAST(house_info.unit_type AS STRING), 1, 1)), LOWER(SUBSTR(CAST(house_info.unit_type AS STRING), 2, 15))) AS unit_type,
+        NULL::STRING AS usage_type,
+        CAST(price.sale.price AS DOUBLE) AS price,
+        (CAST(price.sale.price AS DOUBLE)/CAST(house_info.area AS INT)) AS price_m2,
+        CAST(price.sale.condo_fee AS DOUBLE) AS condo_fee,
+        CAST(price.sale.iptu AS DOUBLE) AS iptu,
+        CAST(type.buyable AS BOOLEAN) AS for_sale,
+        CAST(type.rentable AS BOOLEAN) AS for_rent,
+        "False" AS is_platform_property,
+        CAST(CONCAT(CAST(year AS STRING), '-', CAST(month AS STRING), '-', CAST(day AS STRING)) AS DATE) AS ts_updated,
+        FIRST_VALUE(CAST(CONCAT(CAST(year AS STRING), '-', CAST(month AS STRING), '-', CAST(day AS STRING)) AS DATE)) OVER (PARTITION BY id ORDER BY CAST(CONCAT(CAST(year AS STRING), '-', CAST(month AS STRING), '-', CAST(day AS STRING)) AS DATE) DESC) AS ts_last_publication,
+        FIRST_VALUE(CAST(CONCAT(CAST(year AS STRING), '-', CAST(month AS STRING), '-', CAST(day AS STRING)) AS DATE)) OVER (PARTITION BY 1 ORDER BY CAST(CONCAT(CAST(year AS STRING), '-', CAST(month AS STRING), '-', CAST(day AS STRING)) AS DATE) DESC) AS ts_last_extraction
+    FROM
+        datalake_crawlers_listings_clean.em_casa
+),
+em_casa_listings AS (
+    SELECT
+        id_house,
+        id_house_platform,
+        platform,
+        neighborhood,
+        city,
+        state,
+        address,
+        address_for_join,
+        st_number,
+        zip_code,
+        lat,
+        lng,
+        floors,
+        num_floors,
+        unit_per_floor,
+        total_area,
+        bedrooms,
+        suites,
+        parking_spaces,
+        bathrooms,
+        year_built,
+        unit_type,
+        usage_type,
+        price,
+        price_m2,
+        condo_fee,
+        iptu,
+        for_sale,
+        for_rent,
+        is_platform_property,
+        ROW_NUMBER() OVER (PARTITION BY id_house_platform ORDER BY ts_updated DESC) = 1 AS is_last_status,
+        ts_updated,
+        ts_last_publication,
+        ts_last_extraction
+    FROM
+        em_casa_listings_raw
+    QUALIFY
+        is_last_status
+),
+regions AS (
+    SELECT
+        rm.id_house_platform,
+        rm.id_neighborhood,
+        rm.neighborhood,
+        r.city_group
+    FROM
+        datalake_crawlers_listings.em_casa_region_mapping AS rm
+    LEFT JOIN
+        datalake_region.region AS r
+            ON rm.id_neighborhood = r.id
+            AND r.level IN ('SubRegiao', 'Cidade')
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_house_platform ORDER BY rm.ts_updated DESC) = 1
+)
+SELECT
+    el.id_house,
+    el.id_house_platform,
+    re.id_neighborhood,
+    el.platform,
+    IF(ts_updated = ts_last_extraction, 'Publicado', 'Despublicado') AS status,
+    el.city,
+    re.city_group,
+    re.neighborhood,
+    el.state,
+    el.lat,
+    el.lng,
+    el.address,
+    el.st_number,
+    el.zip_code,
+    el.floors,
+    el.num_floors,
+    el.unit_per_floor,
+    el.total_area,
+    el.bedrooms,
+    el.suites,
+    el.parking_spaces,
+    el.bathrooms,
+    el.year_built,
+    el.unit_type,
+    el.usage_type,
+    el.price,
+    el.price_m2,
+    el.condo_fee,
+    el.iptu,
+    for_sale AS is_for_sale,
+    for_rent AS is_for_rent,
+    NULL::INTEGER AS nearby_other_platform_houses,
+    NULL::DOUBLE AS avg_nearby_price_m2,
+    NULL::DOUBLE AS avg_distance,
+    el.is_platform_property,
+    NULL::STRING AS is_exclusive,
+    el.ts_updated,
+    NOW() AS ts_load
+FROM
+    em_casa_listings AS el
+LEFT JOIN
+    regions AS re
+        USING(id_house_platform)
