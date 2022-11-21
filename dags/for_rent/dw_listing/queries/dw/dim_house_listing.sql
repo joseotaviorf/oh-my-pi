@@ -4,12 +4,15 @@ WITH b2b_info AS (
         hl.id_house_listing,
         -- TODO [ODS]: centralize rules like these ones
         COALESCE(
-            COALESCE(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
-                OR (partner_agent.id IS NOT NULL AND partner.type = 'PRIME'),
+            (COALESCE(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
+                OR (partner_agent.id IS NOT NULL AND partner.type = 'PRIME'))
+                AND partner_agent.status = 'ACTIVE',
             FALSE
             )
         AS is_b2b,
         CASE
+          WHEN partner_agent.status = 'INACTIVE'
+            THEN NULL
           WHEN COALESCE(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
             THEN 'online'
           WHEN (partner_agent.id IS NOT NULL AND partner.type = 'PRIME')
