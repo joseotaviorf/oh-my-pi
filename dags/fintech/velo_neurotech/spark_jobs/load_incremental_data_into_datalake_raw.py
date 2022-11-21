@@ -1,25 +1,25 @@
 import json
 import logging
 import ast
-
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.spark import SparkDataFrameService
+from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
+from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.slack_service import SlackService
+
 from quintoandar_velo_neurotech_api_client.clients import VeloNeurotechClient
 from quintoandar_velo_neurotech_api_client.constants import EndpointEnum
 from quintoandar_velo_neurotech_api_client.consumers import VeloNeurotechConsumer
-
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
-from bietlejuice.clients.db_clients import SparkClient
-
-from bietlejuice.base.spark import SparkDataFrameService
-from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
 
 from pyspark.sql.types import StructField, StructType, StringType
 
@@ -122,6 +122,23 @@ if __name__ == "__main__":
 
     if len(pandas_df) == 0:
         logger.warn(f"m={JOB_NAME}, msg=result is empty")
+
+        slack_webhook = dbutils.secrets.get(
+            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_AIRFLOW_DE_DAGS_INMETRO
+        )
+
+        message = (
+            f":warning:\n"
+            f"DAG: *{args.source}*\n"
+            f"Report: *{args.report_name}*\n"
+            f"Environment: *{args.environment}*\n"
+            f"Status: *FAILED*\n"
+            f"*Existence validation failed for `{datetime.now().strftime('%Y-%m-%d')}`\n"
+        )
+
+        logger.info(f"m=__main__, message=sending slack message: {message}")
+        SlackService.send_slack_errors([(message,slack_webhook)])
+
     else:
         spark_client = SparkClient()
         df = spark_client.create_dataframe(pandas_df, __generate_schema(pandas_df))
