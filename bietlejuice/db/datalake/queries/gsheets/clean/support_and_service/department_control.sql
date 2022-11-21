@@ -8,6 +8,7 @@ SELECT
     caixa_ativa_atualmente AS active_department,
     etapa_da_jornada AS journey_step,
     front_back AS front_or_back,
-    area
+    area,
+    CAST(parceiras AS BOOLEAN) AS is_partner
 FROM
     datalake_gsheets_raw.department_control

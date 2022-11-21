@@ -31,3 +31,6 @@ columns:
   area:
     lineage:
       - datalake_gsheets_raw.department_control.area
+  is_partner:
+    lineage:
+      - datalake_gsheets_raw.department_control.parceiras
