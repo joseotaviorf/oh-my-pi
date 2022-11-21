@@ -456,8 +456,12 @@ rent_flow_adjusted AS (
         dp.guarantee,
         CASE
             WHEN dhl.is_b2b = TRUE THEN 'B2B'
-            WHEN ciq.businesscontext='RENT' AND ciq.type_big_agent IS NOT NULL THEN ciq.type_big_agent
-            WHEN dhl.is_b2b = FALSE OR ciq.sk_house_listing IS NULL THEN 'FALSE'
+            WHEN dhl.is_for_rent=True
+                 AND (dhl.consultant_type IS NOT NULL
+                      AND dhl.consultant_type <> 'Core') THEN dhl.consultant_type
+            WHEN dhl.is_b2b = FALSE
+                 OR (dhl.consultant_type IS NULL
+                     OR dhl.consultant_type = 'Core') THEN 'FALSE'
         END AS is_b2b,
         dr.city_group,
         db.mkt_channel AS demand_mkt_channel_booking,
@@ -485,10 +489,6 @@ rent_flow_adjusted AS (
     LEFT JOIN
         datamarts.funnel_demand_flows fdf
             ON rf.sk_rent_flow = fdf.sk_rent_flow
-    LEFT JOIN
-        datamarts.quintoandar_consultant_listings ciq
-            ON rf.sk_house_listing = ciq.sk_house_listing
-                AND ciq.businesscontext= 'RENT'
 ),
 vb2vc AS (
     SELECT
