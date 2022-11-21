@@ -8,7 +8,11 @@ WITH historical_consultant AS (
         hch.id_user,
         hch.consultant_type,
         ROW_NUMBER() OVER(PARTITION BY sl.id_sale_listing ORDER BY hch.rev) AS enrollment_number,
-        MAX(hch.rev) OVER(PARTITION BY sl.id_sale_listing) = hch.rev AS is_last_ciq_on_listing,
+        -- If we don't have a consultant related to one listing
+        -- we still needing to propagate that there isnt information
+        -- about consultant for this listing, and this is the last
+        -- status on this listing. So COALESCE.
+        COALESCE(MAX(hch.rev) OVER(PARTITION BY sl.id_sale_listing) = hch.rev, True) AS is_last_ciq_on_listing,
         MAX(IF(hch.consultant_type = 'CIQ_FULL', True, False)) OVER(PARTITION BY sl.id_house) AS was_ciq_full,
         hch.dt_consultant_started,
         hch.ts_consultant_deleted,
