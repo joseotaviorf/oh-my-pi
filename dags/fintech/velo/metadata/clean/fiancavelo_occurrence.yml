@@ -1,0 +1,58 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_occurrence
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.id
+  id_propose:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.propose
+  id_tenant:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.tenant
+  id_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.type
+  id_status:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.status
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.userupdate
+  value:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.value
+  original_value:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.originalvalue
+  paid_value:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.paid
+  unicid:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.unicid
+  invoice_url:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.invoiceurl
+  description:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.description
+  is_valid:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.valid
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.active
+  dt_due:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.duedate
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrence.dateupdate

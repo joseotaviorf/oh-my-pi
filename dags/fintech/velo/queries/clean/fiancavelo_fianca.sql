@@ -10,7 +10,7 @@ SELECT
     validity AS id_validity,
     userinsert AS id_user_insert,
     userupdate AS id_user_update,
-    active AS is_active,
+    BOOLEAN(active) AS is_active,
     begin AS dt_begin,
     end AS dt_end,
     dateinsert AS ts_insert,

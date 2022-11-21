@@ -188,6 +188,15 @@ tables:
     extraction_type: full
   - table_name: velosign_template
     extraction_type: full
+  - table_name: fiancavelo_occurrence
+    extraction_type: full
+  - table_name: fiancavelo_occurrencepayment
+    extraction_type: full
+  - table_name: fiancavelo_occurrencestatus
+    extraction_type: full
+  - table_name: fiancavelo_occurrencetype
+    extraction_type: full
+
 
 partition_columns: [year, month, day]
 lineage_product_database_name: velo

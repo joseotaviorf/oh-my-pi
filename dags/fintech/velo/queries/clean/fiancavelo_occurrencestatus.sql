@@ -7,4 +7,4 @@ SELECT
     dateinsert AS ts_insert,
     dateupdate AS ts_update
 FROM
-    datalake_velo_raw.fiancavelo_plantype
+    datalake_velo_raw.fiancavelo_occurrencestatus

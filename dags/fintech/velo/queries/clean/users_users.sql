@@ -8,8 +8,8 @@ SELECT
     password,
     phone,
     profile,
-    first AS is_first,
-    active AS is_active,
+    BOOLEAN(first) AS is_first,
+    BOOLEAN(active) AS is_active,
     dateinsert AS ts_insert,
     dateupdate AS ts_update
 FROM

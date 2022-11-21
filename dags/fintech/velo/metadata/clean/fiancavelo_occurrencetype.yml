@@ -1,0 +1,25 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_occurrencetype
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencetype.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencetype.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencetype.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencetype.name
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencetype.active
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencetype.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencetype.dateupdate

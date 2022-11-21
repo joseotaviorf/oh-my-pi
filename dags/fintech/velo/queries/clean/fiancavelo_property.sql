@@ -12,7 +12,7 @@ SELECT
     state,
     country,
     geolocation,
-    active AS is_active,
+    BOOLEAN(active) AS is_active,
     dateinsert AS ts_insert,
     dateupdate AS ts_update
 FROM

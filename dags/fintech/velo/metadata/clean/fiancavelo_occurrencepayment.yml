@@ -1,0 +1,61 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_occurrencepayment
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.id
+  id_propose:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.propose
+  id_customer:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.customer
+  id_billing_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.billingtype
+  id_status:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.status
+  id_gateway:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.gateway
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.userupdate
+  unicid:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.unicid
+  value:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.value
+  net_value:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.netvalue
+  invoice_url:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.invoiceurl
+  description:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.description
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.active
+  dt_due:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.duedate
+  dt_created:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.datecreated
+  dt_confirmed:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.confirmeddate
+  ts_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.dateinsert
+  ts_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_occurrencepayment.dateupdate

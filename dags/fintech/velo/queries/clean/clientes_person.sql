@@ -8,8 +8,8 @@ SELECT
     mother,
     phone,
     rental,
-    estrangeiro AS is_foreigner,
-    active AS is_active,
+    BOOLEAN(estrangeiro) AS is_foreigner,
+    BOOLEAN(active) AS is_active,
     birth AS dt_birth,
     dateinsert AS ts_insert,
     dateupdate AS ts_update

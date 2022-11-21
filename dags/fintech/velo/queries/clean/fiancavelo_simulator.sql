@@ -8,8 +8,8 @@ SELECT
     value,
     valueaproved AS value_approved,
     hash,
-    approved AS is_approved,
-    active AS is_active,
+    BOOLEAN(approved) AS is_approved,
+    BOOLEAN(active) AS is_active,
     dateinsert AS ts_insert,
     dateupdate AS ts_update
 FROM

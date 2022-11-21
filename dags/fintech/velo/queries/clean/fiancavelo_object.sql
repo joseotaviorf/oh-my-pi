@@ -6,7 +6,7 @@ SELECT
     description,
     userinsert AS id_user_insert,
     userupdate AS id_user_update,
-    active AS is_active,
+    BOOLEAN(active) AS is_active,
     dateinsert AS ts_insert,
     dateupdate AS ts_update
 FROM
