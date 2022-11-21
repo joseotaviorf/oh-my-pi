@@ -4,17 +4,19 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DB_SQL_PATH, DatabaseEnum, DWMetastoreService
-from bietlejuice.base.spark import SparkDataFrameService
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.db import DatabaseEnum, DWMetastoreService
+from bietlejuice.base.spark import (
+    SparkDataFrameService,
+    BaseDBUtils,
+    SparkTableStorageFormat,
+)
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.clients.db_clients import SparkClient, AthenaClient, PostgresClient
 from bietlejuice.consumers.db_consumers import PostgresConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.file_service import FileService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from pyspark.sql.functions import col
-
 
 JOB_NAME = "create_datamart_table_in_datalake"
 
@@ -35,9 +37,8 @@ parser.add_argument("env")
 parser.add_argument("dw_bucket")
 parser.add_argument("athena_query_results_bucket")
 parser.add_argument("dw_schema")
-parser.add_argument("schema")
+parser.add_argument("dag_name")
 parser.add_argument("table")
-parser.add_argument("sql_file")
 parser.add_argument("runs_on")
 
 if __name__ == "__main__":
@@ -46,14 +47,13 @@ if __name__ == "__main__":
     dw_bucket = args.dw_bucket
     athena_query_results_bucket = args.athena_query_results_bucket
     dw_schema = args.dw_schema
-    schema = args.schema  # TODO this schema is not used
+    dag_name = args.dag_name
     table = args.table
-    sql_file = args.sql_file
     runs_on = args.runs_on
 
-    # check if query_path is diff from built one and raise warning
-    query_path = f"{DB_SQL_PATH}/{sql_file}"
-    s3_query = FileService.get_query_from_file_name(query_path)
+    s3_query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+        dag_name=dag_name, table_name=table, layer="dw"
+    )
 
     spark_client = SparkClient()
     # TODO: Needs refactoring. We're using default here because the consumer requests a
@@ -111,12 +111,10 @@ if __name__ == "__main__":
 
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
-    s3_loader.load_full_table(
+    s3_loader.load_df(
         df=dm_table_df,
-        database_name=database_name,
-        table_name=table,
+        s3_path=f"{database_location}{table}",
         format_options=format_options,
-        database_location=database_location,
     )
 
     spark_metastore_loader.update_metastore(
