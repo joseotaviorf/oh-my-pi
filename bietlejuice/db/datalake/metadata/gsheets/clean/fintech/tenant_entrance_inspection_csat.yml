@@ -4,6 +4,9 @@ columns:
   id_contract:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.id_do_contrato
+  id_csat:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_entrada.id_csat
   email:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.email
@@ -16,6 +19,9 @@ columns:
   general_satisfaction_evaluation:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.avaliacao_csat
+  house_satisfation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_entrada.house_satisfation
   ts_submitted:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.submitted_at
