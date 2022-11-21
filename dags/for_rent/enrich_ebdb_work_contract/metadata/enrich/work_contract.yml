@@ -5,6 +5,9 @@ columns:
   id:
     lineage:
       - datalake_ebdb_clean.work_contract.id
+  id_company_hubspot:
+    lineage:
+      - datalake_hubspot_clean.company.id_company
   id_hub_teams:
     lineage:
       - datalake_gsheets_clean.sale_business_unit_standardization.id_business_unit_teams

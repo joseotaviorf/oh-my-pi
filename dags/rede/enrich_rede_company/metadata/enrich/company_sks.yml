@@ -5,3 +5,7 @@ columns:
   id_hubspot:
     lineage:
       - datalake_hubspot.company.id_company
+  extracted_3p_tag:
+    lineage:
+      - datalake_ebdb_listing.house.partner_3p_supply
+      - datalake_ebdb_work_contract.work_contract.3p_partner

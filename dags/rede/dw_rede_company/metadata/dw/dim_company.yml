@@ -15,12 +15,15 @@ columns:
   company_name:
     lineage:
       - datalake_hubspot.company.name
+      - datalake_rede_company.company_sks.extracted_3p_tag
   tag:
     lineage:
       - datalake_hubspot.company.tag
+      - datalake_rede_company.company_sks.extracted_3p_tag
   extracted_3p_tag:
     lineage:
       - datalake_hubspot.company.extracted_3p_tag
+      - datalake_rede_company.company_sks.extracted_3p_tag
   lead_status:
     lineage:
       - datalake_hubspot.company.lead_status

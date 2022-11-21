@@ -44,7 +44,7 @@ supply_context AS (
     1
 ),
 -- While we don't have 3P agencies included in datalake_company_clean.company, we need to find their name via HubSpot
--- This is a temporary measure, and should be changed in 22Q3
+-- This is a temporary measure, and should be changed in 23Q1
 -- Also, the reason we are not using the enriched HubSpot tables is because they run later than this query, so we can't simplify it
 partner_agencies_aux AS (
   SELECT
@@ -56,26 +56,50 @@ partner_agencies_aux AS (
         NULLIF(GET_JSON_OBJECT(properties, '$.estado'), ''),
         NULLIF(GET_JSON_OBJECT(properties, '$.state'), '')
     ) AS partner_state,
-    ROW_NUMBER() OVER(PARTITION BY id_company ORDER BY ts_updated DESC) = 1 AS is_most_recent_for_company
+    ts_updated
   FROM
     datalake_hubspot_clean.company
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY cnpj ORDER BY ts_updated DESC) = 1
-    AND (tag IS NOT NULL OR cnpj IS NOT NULL)
 ),
+extracted_partner_tags AS (
+  SELECT
+    id_company,
+    tag,
+    NULLIF(REGEXP_EXTRACT(tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') AS extracted_3p_tag,
+    name,
+    cnpj,
+    partner_state,
+    ROW_NUMBER() OVER(
+      PARTITION BY
+        REPLACE(UPPER(NULLIF(REGEXP_EXTRACT(tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')), ' ', '')
+      ORDER BY
+        ts_updated
+      DESC
+    ) = 1 AS is_most_recent_for_tag,
+    ROW_NUMBER() OVER(PARTITION BY cnpj ORDER BY ts_updated DESC) = 1 AS is_most_recent_for_cnpj
+  FROM
+    partner_agencies_aux
+  QUALIFY
+    (is_most_recent_for_tag OR is_most_recent_for_cnpj)
+    AND (tag IS NOT NULL or cnpj IS NOT NULL)
+),
+--- We're getting the most recent row in datalake_hubspot_clean.company for each tag and CNPJ.
+--- Since they are merged, extracted_3p_tag only shows up if that row is the most recent company for the given tag. Same for the CNPJ.
 partner_agencies AS (
   SELECT
     id_company,
     tag,
     CASE
-        WHEN is_most_recent_for_company THEN NULLIF(REGEXP_EXTRACT(tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')
-        ELSE NULL
+      WHEN is_most_recent_for_tag THEN extracted_3p_tag
+      ELSE NULL
     END AS extracted_3p_tag,
-    cnpj,
-    COALESCE(NULLIF(REGEXP_EXTRACT(tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), ''), name) AS partner_3p_supply,
+    CASE
+      WHEN is_most_recent_for_cnpj THEN cnpj
+      ELSE NULL
+    END AS cnpj,
+    COALESCE(extracted_3p_tag, name) AS partner_3p_supply,
     partner_state
   FROM
-    partner_agencies_aux
+      extracted_partner_tags
 )
 SELECT
   h.id,
@@ -327,4 +351,5 @@ LEFT JOIN
     ON h.id = sc.id_house
 LEFT JOIN
   partner_agencies AS pa
-    ON NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') IN (pa.cnpj, pa.extracted_3p_tag)
+    ON REPLACE(UPPER(NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')), ' ', '') 
+       IN (pa.cnpj, REPLACE(UPPER(pa.extracted_3p_tag), ' ', ''))

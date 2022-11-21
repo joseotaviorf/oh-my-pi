@@ -1,12 +1,14 @@
 SELECT
     cs.sk_company,
     cs.id_hubspot,
-    COALESCE(c.name, 'Unknown') AS company_name,
-    COALESCE(c.tag_real_estate_agency, 'Unknown') AS tag,
-    COALESCE(c.extracted_3p_tag, 'Unknown') AS extracted_3p_tag,
+    COALESCE(c.name, cs.extracted_3p_tag, 'Unknown') AS company_name,
+    COALESCE(c.tag_real_estate_agency, cs.extracted_3p_tag, 'Unknown') AS tag,
+    COALESCE(c.extracted_3p_tag, cs.extracted_3p_tag, 'Unknown') AS extracted_3p_tag,
     COALESCE(c.lead_status, 'Unknown') AS lead_status,
     CASE
-        WHEN (c.state IS NOT DISTINCT FROM 'MG'
+        WHEN (
+            cs.is_3p_bh
+            OR c.state IS NOT DISTINCT FROM 'MG'
             OR COALESCE(UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%', FALSE)
             OR t.team_name IN ('BH Sul', 'BH Norte')
         )
@@ -56,11 +58,15 @@ SELECT
     c.num_properties_for_sale,
     c.num_properties_for_rent,
     c.lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento') AS is_partner,
-    (c.state IS NOT DISTINCT FROM 'MG'
+    (
+        cs.is_3p_bh
+        OR c.state IS NOT DISTINCT FROM 'MG'
         OR COALESCE(UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%', FALSE)
         OR t.team_name IN ('BH Sul', 'BH Norte')
     ) AS is_3p_bh,
-    (c.state IS DISTINCT FROM 'MG'
+    (
+        (cs.is_3p_bh IS NULL OR NOT cs.is_3p_bh)
+        AND c.state IS DISTINCT FROM 'MG'
         AND COALESCE(UPPER(c.tag_real_estate_agency) NOT LIKE '%[3PBH-%]%', TRUE)
         AND (t.team_name IS NULL OR t.team_name NOT IN ('BH Sul', 'BH Norte'))
     ) AS is_3p_5a,
@@ -82,20 +88,21 @@ SELECT
     c.ts_updated,
     NOW() AS ts_load
 FROM
-    datalake_hubspot.company AS c
-JOIN
     datalake_rede_company.company_sks AS cs
+LEFT JOIN
+    datalake_hubspot.company AS c
         ON c.id_company = cs.id_hubspot
 LEFT JOIN
     datalake_hubspot.deal AS d
         ON d.id_company = c.id_company
         AND d.id_pipeline = 5160960 -- We only want companies in the negotiation pipeline for Rede QuintoAndar.
-        AND d.id_hubspot_team NOT IN (6194580,5795941) -- With a deal not made by adm or help sales
+        AND (d.id_hubspot_team IS NULL OR d.id_hubspot_team NOT IN (6194580,5795941)) -- With a deal not made by adm or help sales
 LEFT JOIN
     datalake_hubspot.team AS t 
         ON t.id_team = d.id_hubspot_team
 WHERE
     c.extracted_3p_tag IS NOT NULL
+    OR cs.extracted_3p_tag IS NOT NULL
     OR d.id_deal IS NOT NULL
 QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY c.id_company ORDER BY d.ts_created DESC) = 1 -- There may be more than one deal. We want the most recent one.
+    ROW_NUMBER() OVER(PARTITION BY cs.sk_company ORDER BY d.ts_created DESC) = 1 -- There may be more than one deal. We want the most recent one.
