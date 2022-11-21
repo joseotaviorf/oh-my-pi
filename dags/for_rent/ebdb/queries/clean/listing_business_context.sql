@@ -5,6 +5,7 @@ SELECT
   status,
   statusReason AS status_reason,
   closingStatus AS status_closing,
+  suspensionReason AS suspension_reason,
   criadoEm AS ts_created,
   atualizadoEm AS ts_updated,
   firstPublicationDate AS ts_first_publication,

@@ -67,6 +67,18 @@ columns:
   mod_calculator_price:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.calculatorprice_mod
+  suspension_reason:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.suspensionReason
+  mod_suspension_reason:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.suspensionReason_MOD
+  mod_suspended_until:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.suspendedUntil_MOD
+  ts_suspended_until:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.suspendedUntil
   ts_first_publication:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.firstpublicationdate

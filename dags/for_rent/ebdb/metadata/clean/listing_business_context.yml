@@ -19,6 +19,9 @@ columns:
   status_closing:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.closingstatus
+  suspension_reason:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.suspensionReason
   ts_created:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.criadoem
