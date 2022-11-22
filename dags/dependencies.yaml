@@ -2463,6 +2463,13 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
 
+bietlejuice.metric_rent__contracts:
+  - bietlejuice.dw_contract:load-dw-public-dim-contract
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+
+bietlejuice.metric_rent__listings:
+  - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
+
 bietlejuice.reverse_atento:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
