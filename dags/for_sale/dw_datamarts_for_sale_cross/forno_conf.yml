@@ -1,10 +1,8 @@
 redshift_template:
   dw: &redshift_anchor
-    schema: datamarts
     runs_on: redshift
 athena_template:
   dw: &athena_anchor
-    schema: datamarts
     runs_on: athena
 pipeline:
   ##<KEEP THIS COMMENTED AS A TEMPLATE>
@@ -12,25 +10,20 @@ pipeline:
   #   dw:
   #     sql_file: <query-file E.g: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql>
   #     table: <targe-table-name>
-  #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
   #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
   sale_cohort_conversions:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_sale_cross/sale_cohort_conversions.sql
       table: sale_cohort_conversions
   sale_events_funnel:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_sale_cross/sale_events_funnel.sql
       table: sale_events_funnel
   sale_ongoing_listings:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_sale_cross/sale_ongoing_listings.sql
       table: sale_ongoing_listings
   temp_supply_flows:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_sale_cross/temp_supply_flows.sql
       table: temp_supply_flows
