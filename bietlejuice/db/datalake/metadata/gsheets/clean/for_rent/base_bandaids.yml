@@ -1,0 +1,54 @@
+database_name: datalake_gsheets_clean
+table_name: base_bandaids
+columns:
+  key:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.key
+  issue_type:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.issue_type
+  status:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.status
+  summary:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.summary
+  ba_bandaid_type:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.ba_tipo_de_bandaid
+  ba_contract:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.ba_codigo_do_contrato
+  sf_contract:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.sf_codigo_do_contrato
+  ba_department:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.ba_departamento
+  ba_department_for_rent:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.ba_forrent_departamento
+  ba_expense_category_for_rent:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.ba_categoria_do_gasto_forrent
+  sf_expense_category:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.sf_categoria_do_gasto
+  ba_stage_journey:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.ba_etapa_da_jornada
+  ba_error_journey_step_for_rent:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.ba_em_qual_etapa_da_jornada_ocorreu_o_erro_forrent
+  ba_error_journey_step:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.ba_em_qual_etapa_da_jornada_ocorreu_o_erro
+  ba_bandaid_value:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.ba_qual_o_valor_total_do_bandaid
+  ts_created:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.created
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.base_bandaids.ts_load
