@@ -1,7 +1,6 @@
-import logging
 from argparse import ArgumentParser
-from datetime import datetime
 from collections import OrderedDict
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -13,7 +12,6 @@ from bietlejuice.services.metastore_services import (
     SparkMetastoreService,
 )
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("update_athena_table_daily_partition")
 
 parser = ArgumentParser(description="update_athena_table_daily_partition")

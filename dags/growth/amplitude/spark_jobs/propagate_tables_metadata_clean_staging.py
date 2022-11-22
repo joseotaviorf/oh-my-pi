@@ -1,14 +1,12 @@
 import json
-import logging
-from datetime import datetime
 from argparse import ArgumentParser
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service import ServiceEnum
-from bietlejuice.base.spark import BaseSparkContext
-from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
+from bietlejuice.base.spark import BaseSparkContext, SparkMetastoreHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.metadata_propagator_pipeline.full_content_lineage_pipeline import (
     FullContentLineagePipeline,
@@ -19,7 +17,6 @@ DAYS_TO_CHECK_FOR_NEW_TABLES = 4
 
 JOB_NAME = "propagate_tables_metadata_clean_staging"
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 BLOCK_LIST = ["subpartitions_values"]
@@ -30,7 +27,7 @@ def get_all_columns_lineage_from_events_table(spark_metastore_helper):
         "events"
     )
     columns_lineage = {}
-    for col_name, col_type in spark_ms_table_columns.items():
+    for col_name in spark_ms_table_columns.keys():
         columns_lineage[col_name] = {
             "lineage": [f"datalake_amplitude_clean.events.{col_name}"]
         }

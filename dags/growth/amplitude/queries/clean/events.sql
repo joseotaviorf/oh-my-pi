@@ -52,4 +52,4 @@ SELECT
 FROM
     datalake_amplitude_raw.events
 WHERE
-    year = {year} and month = {month} and day = {day}
+    year = {} and month = {} and day = {}

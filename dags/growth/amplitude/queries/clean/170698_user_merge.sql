@@ -12,6 +12,6 @@ FROM
 WHERE
     amplitude_id IS NOT NULL
     AND merge_time IS NOT NULL
-    AND YEAR(timestamp(merge_time/1000)) = {year}
-    AND MONTH(timestamp(merge_time/1000)) = {month}
-    AND DAY(timestamp(merge_time/1000)) = {day}
+    AND YEAR(timestamp(merge_time/1000)) = {}
+    AND MONTH(timestamp(merge_time/1000)) = {}
+    AND DAY(timestamp(merge_time/1000)) = {}

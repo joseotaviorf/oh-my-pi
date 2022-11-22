@@ -14,3 +14,6 @@ spark_conf:
   spark.executor.memory: "100g"
   spark.executor.memoryOverhead: "23g"
   spark.network.timeout: "480"
+clean_staging_block_tables:
+  - 170698_user_merge
+  - events

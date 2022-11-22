@@ -1,7 +1,6 @@
 import json
-import logging
-from datetime import datetime
 from argparse import ArgumentParser
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -18,7 +17,6 @@ DAYS_TO_CHECK_FOR_NEW_TABLES = 4
 
 JOB_NAME = "propagate_clean_tables_metadata"
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 BLOCK_LIST = ["subpartitions_values"]
@@ -29,7 +27,7 @@ def get_all_columns_lineage_from_clean_tables(spark_metastore_helper, table_name
         table_name
     )
     columns_lineage = {}
-    for col_name, col_type in spark_ms_table_columns.items():
+    for col_name in spark_ms_table_columns.keys():
         columns_lineage[col_name] = {
             "lineage": [f"datalake_amplitude_clean.{table_name}.{col_name}"]
         }

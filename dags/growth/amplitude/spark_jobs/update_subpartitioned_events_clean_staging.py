@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime
 from argparse import ArgumentParser
 from multiprocessing.dummy import Pool
@@ -16,10 +15,11 @@ from bietlejuice.services.metastore_services import (
     SparkMetastoreService,
 )
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger("update_clean_staging_subpartitioned_tables")
+JOB_NAME = "update_subpartitioned_events_clean_staging"
 
-parser = ArgumentParser(description="update_clean_staging_subpartitioned_tables")
+logger = QuintoAndarLogger(JOB_NAME)
+
+parser = ArgumentParser(JOB_NAME)
 parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")

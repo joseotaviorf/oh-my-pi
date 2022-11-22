@@ -28,6 +28,7 @@ config_service = ConfigurationService(SOURCE)
 PARTITION_COLS = config_service.get_config("partition_cols_dag")
 INCREMENTAL_PARTITIONS = config_service.get_config("incremental_partitions")
 EXTRA_SPARK_CONF = config_service.get_config("spark_conf")
+CLEAN_STAGING_BLOCK_TABLES = config_service.get_config("clean_staging_block_tables")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -473,7 +474,7 @@ load_subpartitioned_events_clean_task = QuintoAndarDatabricksSubmitRunOperator(
                 "amplitude",
                 "--tables_list",
             ]
-            + tables_list
+            + list(set(tables_list) - set(CLEAN_STAGING_BLOCK_TABLES))
             + ["--partition_by"]
             + INCREMENTAL_PARTITIONS,
         }

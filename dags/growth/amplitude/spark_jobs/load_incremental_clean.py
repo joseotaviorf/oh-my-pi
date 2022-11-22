@@ -3,17 +3,19 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatalakeMetastoreService, QUERIES_DATALAKE_PATH
-from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.spark.spark_table_storage_format import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services import FileService
+from bietlejuice.loaders.spark_metastore_loader import SparkMetastoreLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-logger = QuintoAndarLogger("create_clean_incremental_table_in_datalake")
+JOB_NAME = "load_incremental_clean"
 
-parser = ArgumentParser(description="create_clean_incremental_table_in_datalake")
+logger = QuintoAndarLogger(JOB_NAME)
+
+parser = ArgumentParser(JOB_NAME)
 parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")
@@ -32,38 +34,31 @@ if __name__ == "__main__":
     partition_cols = args.partition_by
 
     logger.info(
-        "m=__main__, date={}, source={}, table_name={}, msg=Job started".format(
-            execution_date, source, table_name
-        )
+        f"m=__main__, date={execution_date}, source={source}, "
+        f"table_name={table_name}, msg=Job started"
     )
 
-    date = datetime.strptime(execution_date, "%Y-%m-%d")
-    year, month, day = date.year, date.month, date.day
-
-    # setup
-    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
+    execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
     spark_client = SparkClient()
-    s3_loader = S3Loader()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    s3_loader = S3Loader()
 
-    query_path = QUERIES_DATALAKE_PATH + source + "/{}.sql".format(table_name)
-    query = FileService.get_query_from_file_name(query_path).format(
-        year=year, month=month, day=day
-    )
-
-    # create df
-    # todo: use DatabricksConsumer to read data
-    df = spark_client.get_records(query)
-
-    database_name = db_info["db_clean_databricks"]
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
+    db_clean_name = db_info["db_clean_databricks"]
+    db_clean_path = db_info["db_clean_path"]
     format_options = SparkTableStorageFormat.DEFAULT_CLEAN
-    database_location = db_info["db_clean_path"]
+
+    query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+        dag_name=source, table_name=table_name, layer="clean"
+    ).format(execution_date.year, execution_date.month, execution_date.day)
+
+    df = spark_client.get_records(query)
 
     s3_loader.load_df(
         df=df,
         format_options=format_options,
-        s3_path=f"{database_location}{table_name}",
+        s3_path=f"{db_clean_path}{table_name}",
         partitions=partition_cols,
         optimize_dataframe=False,
     )
@@ -71,17 +66,17 @@ if __name__ == "__main__":
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     spark_metastore_loader.update_metastore(
         df=df,
-        database_name=database_name,
+        database_name=db_clean_name,
         table_name=table_name,
         format_options=format_options,
-        database_location=database_location,
+        database_location=db_clean_path,
         partitions=partition_cols,
         force_recreate=True,
     )
 
     spark_metastore_service.create_new_partitions_from_df(
         df=df,
-        database_name=database_name,
+        database_name=db_clean_name,
         table_name=table_name,
         partition_cols=partition_cols,
     )

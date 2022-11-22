@@ -1,9 +1,8 @@
-import time
-
 import json
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 from zipfile import ZipFile
+from time import sleep
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -124,7 +123,7 @@ if __name__ == "__main__":
                 break
 
             except Exception as error:
-                time.sleep(retry_count * BACKOFF_FACTOR)
+                sleep(retry_count * BACKOFF_FACTOR)
 
                 logger.info(
                     "msg=fail fetch events requests, retry={}, cause={}".format(

@@ -1,5 +1,5 @@
 database_name: datalake_amplitude_raw
-table_name: 170689_user_merge
+table_name: 170698_user_merge
 columns:
   scope:
     tags:
