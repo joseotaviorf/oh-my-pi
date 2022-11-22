@@ -103,12 +103,15 @@ if __name__ == "__main__":
     spark_metastore_service = SparkMetastoreService(spark_client)
     database_name = datalake_info["db_raw_databricks"]
     spark_metastore_service.create_database(database_name)
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     database_location = datalake_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    s3_loader = S3Loader()
 
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    is_able_to_load = True
     try:
         df = gsheets_consumer.get_sheet_df(
             sheet_details["sheet_name"],
@@ -126,9 +129,25 @@ if __name__ == "__main__":
             sheet_details["clean_table_name"],
         )
 
-        # loaders
-        s3_loader = S3Loader()
-        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+        logger.info(
+            f"""
+                m={JOB_NAME}, table_name={table_name}, msg=sheet is able to be loaded!"
+            """
+        )
+
+    except Exception as e:
+        is_able_to_load = False
+        slack_channel = dbutils.secrets.get(
+            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_DE_AIRFLW_DGS
+        )
+        message_sent = __alert_not_ingesting_sheet(sheet_details, e, slack_channel)
+        logger.error(
+            f"""
+                m={JOB_NAME}, table_name={table_name}, msg=Sheet was not loaded, message_sending_result={message_sent}"
+            """
+        )
+
+    if is_able_to_load:
         s3_loader.load_df(
             df=df,
             s3_path=f"{database_location}{table_name}",
@@ -139,20 +158,8 @@ if __name__ == "__main__":
         spark_metastore_loader.update_metastore(
             df, database_name, table_name, format_options, database_location
         )
-
         logger.info(
             f"""
-                m={JOB_NAME}, table_name={table_name}, msg=sheet successfully loaded!"
-            """
-        )
-
-    except Exception as e:
-        slack_channel = dbutils.secrets.get(
-            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_DE_AIRFLW_DGS
-        )
-        message_sent = __alert_not_ingesting_sheet(sheet_details, e, slack_channel)
-        logger.error(
-            f"""
-                m={JOB_NAME}, table_name={table_name}, msg=Sheet was not loaded, message_sending_result={message_sent}"
+                m={JOB_NAME}, table_name={table_name}, msg=sheet fully loaded!"
             """
         )
