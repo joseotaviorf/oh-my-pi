@@ -66,8 +66,8 @@ if __name__ == "__main__":
     table_name = args.table_name
 
     logger.info(
-        f"m=__main__, table_name={table_name}, dw_schema={dw_schema}, env={env}, "
-        f"msg=Job execution started"
+        f"m=load_datamart_table_into_redshift, table_name={table_name}, dw_schema={dw_schema}, env={env}, "
+        f"msg=Job execution started..."
     )
 
     s3_client = S3Service(boto3.resource("s3"))
