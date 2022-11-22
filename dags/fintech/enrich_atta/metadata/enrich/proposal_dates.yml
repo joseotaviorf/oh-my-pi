@@ -54,6 +54,22 @@ columns:
     lineage:
       - datalake_atta_clean.log_isolve_v1.ts_current_log
       - datalake_atta_clean.log_isolve_v2.to
+  ts_min_credit_application_approval:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_max_credit_application_approval:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_min_credit_application_reproval:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
+  ts_max_credit_application_reproval:
+    lineage:
+      - datalake_atta_clean.log_isolve_v1.ts_current_log
+      - datalake_atta_clean.log_isolve_v2.to
   ts_min_inspection:
     lineage:
       - datalake_atta_clean.log_isolve_v1.ts_current_log

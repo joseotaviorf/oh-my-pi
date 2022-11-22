@@ -162,6 +162,30 @@ SELECT
     ) AS ts_max_credit_application,
     MIN(
         CASE
+            WHEN track_step = 'Carta de Crédito' AND track_detail = 'Aprovado'
+                THEN ts_log
+        END
+    ) AS ts_min_credit_application_approval,
+    MAX(
+        CASE
+            WHEN track_step = 'Carta de Crédito' AND track_detail = 'Aprovado'
+                THEN ts_log
+        END
+    ) AS ts_max_credit_application_approval,
+    MIN(
+        CASE
+            WHEN track_step = 'Carta de Crédito' AND track_detail = 'Reprovado'
+                THEN ts_log
+        END
+    ) AS ts_min_credit_application_reproval,
+    MAX(
+        CASE
+            WHEN track_step = 'Carta de Crédito' AND track_detail = 'Reprovado'
+                THEN ts_log
+        END
+    ) AS ts_max_credit_application_reproval,
+    MIN(
+        CASE
             WHEN track_step = 'Vistoria'
                 THEN min_ts_step
         END
