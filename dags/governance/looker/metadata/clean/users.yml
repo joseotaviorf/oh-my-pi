@@ -1,0 +1,40 @@
+---
+database_name: datalake_looker_clean
+table_name: users
+columns:
+    id:
+      lineage:
+        - datalake_looker_raw.users.id
+    title:
+      lineage:
+        - datalake_looker_raw.users.title
+    folder_id:
+      lineage:
+        - datalake_looker_raw.users.folder_id
+    description:
+      lineage:
+        - datalake_looker_raw.users.description
+    last_accessed_at:
+      lineage:
+        - datalake_looker_raw.users.last_accessed_at
+    user_id:
+      lineage:
+        - datalake_looker_raw.users.user_id
+    url:
+      lineage:
+        - datalake_looker_raw.users.url
+    created_at:
+      lineage:
+        - datalake_looker_raw.users.created_at
+    updated_at:
+      lineage:
+        - datalake_looker_raw.users.updated_at
+    year:
+      lineage:
+        - datalake_looker_raw.users.year
+    month:
+      lineage:
+        - datalake_looker_raw.users.month
+    day:
+      lineage:
+        - datalake_looker_raw.users.day

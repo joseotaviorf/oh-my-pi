@@ -1,0 +1,31 @@
+---
+database_name: datalake_looker_clean
+table_name: dashboard_elements
+columns:
+  id:
+    lineage:
+      - datalake_looker_raw.dashboard_elements.id
+  title:
+    lineage:
+      - datalake_looker_raw.dashboard_elements.title
+  type:
+    lineage:
+      - datalake_looker_raw.dashboard_elements.type
+  dashboard_id:
+    lineage:
+      - datalake_looker_raw.dashboard_elements.dashboard_id
+  look_id:
+    lineage:
+      - datalake_looker_raw.dashboard_elements.look_id
+  query_id:
+    lineage:
+      - datalake_looker_raw.dashboard_elements.query_id
+  year:
+    lineage:
+      - datalake_looker_raw.dashboard_elements.year
+  month:
+    lineage:
+      - datalake_looker_raw.dashboard_elements.month
+  day:
+    lineage:
+      - datalake_looker_raw.dashboard_elements.day
