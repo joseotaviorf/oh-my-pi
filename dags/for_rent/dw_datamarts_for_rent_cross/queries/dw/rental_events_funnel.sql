@@ -483,7 +483,7 @@ SELECT
           -- to consider it NULL too.
              AND (dhl.consultant_type IS NOT NULL
                   AND dhl.consultant_type <> 'Core') THEN dhl.consultant_type
-        WHEN dhl.is_b2b = FALSE 
+        WHEN dhl.is_b2b = FALSE
             OR (dhl.consultant_type IS NULL
                 OR dhl.consultant_type = 'Core') THEN 'FALSE'
     END AS is_b2b,

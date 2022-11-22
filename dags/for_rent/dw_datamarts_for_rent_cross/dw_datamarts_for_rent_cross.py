@@ -18,15 +18,13 @@ from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 
 # DAG params
-SCHEMA = "datamarts"
 CONTEXT = "for_rent_cross"
-DAG_NAME = f"dw_{SCHEMA}_{CONTEXT}"
-DAG_ID = f"bietlejuice.dw_{SCHEMA}_{CONTEXT}"
-INTERMEDIATE_PATH = f"dw_{SCHEMA}/{CONTEXT}"
+DAG_NAME = f"dw_datamarts_{CONTEXT}"
+DAG_ID = f"bietlejuice.dw_datamarts_{CONTEXT}"
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(
-    dag_name=DAG_NAME, intermediate_path=INTERMEDIATE_PATH
+    dag_name=DAG_NAME
 )
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 dw_bucket = config_service.get_config("dw_bucket")
@@ -42,7 +40,7 @@ local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 1, 15, 0, 0, 0, tzinfo=local_tz)
 
 # S3 paths setup
-SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{INTERMEDIATE_PATH}/"
+SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}/"
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 # cluster setup
@@ -52,7 +50,35 @@ default_libraries = config_service.get_config("default_libraries")
 
 pipeline_config = config_service.get_config("pipeline") or {}
 
-DW_SCHEMA = f"{SCHEMA}_{CONTEXT}"
+DW_SCHEMA = f"datamarts_{CONTEXT}"
+
+
+# DAG definition
+dag = DAG(
+    dag_id=DAG_ID,
+    default_args={
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
+        "wait_for_downstream": False,
+        "depends_on_past": False,
+    },
+    start_date=MAIN_START_DATE,
+    schedule_interval=None,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    ),
+)
+
+# Tasks definition
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    libraries=default_libraries,
+)
+
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
 
 
 def validate_pipeline_steps(entity_name, entity_pipeline):
@@ -86,17 +112,13 @@ def build_table_tasks(entity_name, entity_pipeline):
 
     validate_pipeline_steps(entity_name, entity_pipeline)
 
-    sql_file = get_option(entity_pipeline["dw"], "sql_file")
     table = get_option(entity_pipeline["dw"], "table")
-    schema = get_option(
-        entity_pipeline["dw"], "schema"
-    )  # TODO this value is not used in the job
     runs_on = get_option(entity_pipeline["dw"], "runs_on")
     pool = "datamarts_redshift" if runs_on == "redshift" else "datamarts_athena"
 
     slugged_table_name = table.replace("_", "-")
     create_table_in_datalake_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=DAG,
+        dag=dag,
         task_id=f"create-{slugged_table_name}-in-datalake",
         pool=pool,
         json={
@@ -107,9 +129,8 @@ def build_table_tasks(entity_name, entity_pipeline):
                     dw_bucket,
                     athena_query_results_bucket,
                     DW_SCHEMA,
-                    schema,
+                    DAG_NAME,
                     table,
-                    sql_file,
                     runs_on,
                 ],
             }
@@ -118,7 +139,7 @@ def build_table_tasks(entity_name, entity_pipeline):
 
     sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"sync-hive-metastore-{slugged_table_name}-table-structure",
-        dag=DAG,
+        dag=dag,
         json={
             "spark_python_task": {
                 "python_file": BASE_SPARK_JOBS_PATH
@@ -136,7 +157,7 @@ def build_table_tasks(entity_name, entity_pipeline):
 
     sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"sync-hive-metastore-{slugged_table_name}-table-partitions",
-        dag=DAG,
+        dag=dag,
         json={
             "spark_python_task": {
                 "python_file": BASE_SPARK_JOBS_PATH
@@ -154,7 +175,7 @@ def build_table_tasks(entity_name, entity_pipeline):
 
     if DAGMetadataService.metadata_file_exists(DAG_NAME, LayerEnum.DW.value, table):
         propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=DAG,
+            dag=dag,
             task_id=f"propagate-table-metadata-dw-{slugged_table_name}",
             json={
                 "spark_python_task": {
@@ -162,7 +183,7 @@ def build_table_tasks(entity_name, entity_pipeline):
                     "parameters": [
                         LayerEnum.DW.value,
                         MetadataTypeEnum.LINEAGE.value,
-                        DAG_NAME,
+                        DW_SCHEMA,
                         table,
                     ],
                 }
@@ -182,7 +203,7 @@ def build_table_tasks(entity_name, entity_pipeline):
 
     if runs_on == "athena":
         load_table_into_redshift_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=DAG,
+            dag=dag,
             task_id=f"load-{slugged_table_name}-into-redshift",
             json={
                 "spark_python_task": {
@@ -200,34 +221,6 @@ def build_table_tasks(entity_name, entity_pipeline):
             "last_tasks": last_tasks,
         }
     }
-
-
-# DAG definition
-DAG = DAG(
-    dag_id=DAG_ID,
-    default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_RENT,
-        "wait_for_downstream": False,
-        "depends_on_past": False,
-    },
-    start_date=MAIN_START_DATE,
-    schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
-    ),
-)
-
-# Tasks definition
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=DAG,
-    task_id="create-cluster",
-    cluster_configuration=cluster_description,
-    libraries=default_libraries,
-)
-
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=DAG, task_id="terminate-cluster"
-)
 
 
 def build_tasks():
