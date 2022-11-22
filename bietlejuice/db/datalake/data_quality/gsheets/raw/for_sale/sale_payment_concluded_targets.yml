@@ -1,0 +1,24 @@
+---
+table_name: datalake_gsheets_raw.sale_payment_concluded_targets
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  city_group:
+    is_complete:
+      severity_level: Error
+  operacao:
+    is_complete:
+      severity_level: Error
+  forma_pagamento:
+    is_complete:
+      severity_level: Error
+  week:
+    is_complete:
+      severity_level: Error
+  date:
+    is_complete:
+      severity_level: Error
+  

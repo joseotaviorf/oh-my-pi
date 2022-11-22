@@ -4,6 +4,9 @@ columns:
   city_group:
     lineage:
       - datalake_gsheets_raw.sale_payment_concluded_targets.city_group
+  operacao:
+    lineage:
+      - datalake_gsheets_raw.sale_payment_concluded_targets.operacao
   forma_pagamento:
     lineage:
       - datalake_gsheets_raw.sale_payment_concluded_targets.forma_pagamento
