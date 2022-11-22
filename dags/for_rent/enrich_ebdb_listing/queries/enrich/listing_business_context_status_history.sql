@@ -4,6 +4,7 @@ WITH events AS (
         business_context,
         status,
         status_reason,
+        suspension_reason,
         CAST(FROM_UNIXTIME(CAST(ure.ts_revision/1000 AS BIGINT)) AS TIMESTAMP) AS ts_event,
         ROW_NUMBER() OVER(PARTITION BY id_house, business_context ORDER BY CAST(FROM_UNIXTIME(CAST(ure.ts_revision/1000 AS BIGINT)) AS TIMESTAMP)) AS event_order
     FROM 
@@ -20,6 +21,7 @@ SELECT
     COALESCE(e.business_context, 'Undefined') AS business_context,
     e.status,
     e.status_reason,
+    e.suspension_reason,
     e.ts_event AS ts_status_started,
     e2.ts_event AS ts_status_ended
 FROM 
