@@ -1,5 +1,5 @@
 ---
-table_name: metric_rent.new_rentals_week
+table_name: metric_rent.new_rentals_weekly
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   week:
