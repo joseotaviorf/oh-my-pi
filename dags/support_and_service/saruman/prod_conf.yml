@@ -1,0 +1,18 @@
+---
+partition_cols: ["year", "month", "day"]
+max_records_per_file: 250000
+lineage_product_database_name: saruman
+tables:
+  # <raw_table_name>:
+  #   clean_table_name: <clean_table_name>
+  #   is_incremental: <is_incremental> #optional
+  #   date_column: <date_column> #optional
+  #   unixtime_measure: <unixtime_measure> #optional
+  session:
+    clean_table_name: session
+    is_incremental: True
+    date_column: updated_at
+  session_history:
+    clean_table_name: session_history
+    is_incremental: True
+    date_column: created_at
