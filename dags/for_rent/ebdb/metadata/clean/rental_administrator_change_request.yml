@@ -1,0 +1,28 @@
+---
+database_name: datalake_ebdb_clean
+table_name: rental_administrator_change_request
+columns:
+  id_rental_administrator_change_request:
+    lineage:
+      - datalake_ebdb_raw.rentaladministratorchangerequest.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.rentaladministratorchangerequest.houseId
+  old_rental_administrator:
+    lineage:
+      - datalake_ebdb_raw.rentaladministratorchangerequest.oldRentalAdministrator
+  new_rental_administrator:
+    lineage:
+      - datalake_ebdb_raw.rentaladministratorchangerequest.newRentalAdministrator
+  status:
+    lineage:
+      - datalake_ebdb_raw.rentaladministratorchangerequest.status
+  ts_migrated:
+    lineage:
+      - datalake_ebdb_raw.rentaladministratorchangerequest.migratedAt
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.rentaladministratorchangerequest.updated_at
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.rentaladministratorchangerequest.created_at

@@ -159,6 +159,8 @@ Produces the following output tables:
     `region`
     `rent_flow`
     `rent_flow_aud`
+    `rental_administrator_change_request`
+    `rental_administrator_change_request_aud`
     `restriction_type`
     `restriction_type_aud`
     `sales_rep`
