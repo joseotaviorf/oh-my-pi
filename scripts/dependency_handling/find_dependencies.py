@@ -1,9 +1,12 @@
 import sys
 from os.path import join
+from pathlib import Path
 
 import yaml
 
-from dags import DAG_PACKAGES_ROOT
+path = Path(__file__).absolute()
+BIETLEJUICE_ROOT = path.parent.parent.parent.absolute()
+DAG_PACKAGES_ROOT = join(BIETLEJUICE_ROOT, "dags")
 
 
 def get_dependencies_data_from_yaml() -> list:

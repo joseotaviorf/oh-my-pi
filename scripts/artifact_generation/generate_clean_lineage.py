@@ -2,10 +2,16 @@ import argparse
 import glob
 import os
 import re
+from os.path import join
+from pathlib import Path
 
 import pyaml
 
 from sql_metadata import Parser
+
+path = Path(__file__).absolute()
+BIETLEJUICE_ROOT = path.parent.parent.parent.absolute()
+DAG_PACKAGES_ROOT = join(BIETLEJUICE_ROOT, "dags")
 
 
 def create_yml_for_table(sql, database_name, table_name):
@@ -56,14 +62,17 @@ if __name__ == "__main__":
     )
 
     args = arg_parser.parse_args()
-    path = f"../../bietlejuice/db/datalake/queries/"
+    path = DAG_PACKAGES_ROOT
 
     dag_name_path = args.folder  # use "ebdb", "godfather", for instance
     table = args.table if args.table != None else "*"
+    file_paths = list(
+        glob.iglob(f"{path}/**/{dag_name_path}/**/{table}.sql", recursive=True)
+    )
+    if len(file_paths) == 0:
+        print("No files found")
 
-    for file_path in glob.iglob(
-        f"{path}{dag_name_path}/**/{table}.sql", recursive=True
-    ):
+    for file_path in file_paths:
         if "/clean/" in file_path:
             regex = f"{path}(.*)/clean(.*)/(.*).sql"
             database_name = re.search(regex, file_path).group(1)
