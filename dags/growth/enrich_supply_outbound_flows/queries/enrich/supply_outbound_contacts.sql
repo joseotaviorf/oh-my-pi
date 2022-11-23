@@ -84,15 +84,15 @@ braze_supply_events (
       wo.id_step_canvas,
       csd.canvas_name,
       csd.step_name AS canvas_step_name,
-      REGEXP_EXTRACT(
+      NULLIF(REGEXP_EXTRACT(
          csd.step_message, '(?<=\"max-tries":")(.*?)(?=")'
-       ) AS wololo_call_round_max_tries,
-      REGEXP_EXTRACT(
+       ), '') AS wololo_call_round_max_tries,
+      NULLIF(REGEXP_EXTRACT(
          csd.step_message, '(?<=\"entityId": ")(.*?)(?=",)'
-       ) AS jaimnho_entity_id_template,
-       REGEXP_EXTRACT(
+       ), '') AS jaimnho_entity_id_template,
+      NULLIF(REGEXP_EXTRACT(
          csd.step_message, '(?<=}}_)(.*?)(?=")'
-       ) AS jaiminho_entity_name_sufix,
+       ), '') AS jaiminho_entity_name_sufix,
       wo.event_channel,
       wo.ts_webhook_sent,
       wo.year,
@@ -176,7 +176,7 @@ LEFT JOIN
 LEFT JOIN
     prospect_calls_last_update AS ppc
       ON ppi.id_wololo_prospect = ppc.id_wololo_prospect
-      AND bse.wololo_call_round_max_tries = ppc.round_max_tries
+      AND bse.wololo_call_round_max_tries IS NOT NULL
       AND DATE(bse.ts_webhook_sent) = DATE(ppc.ts_round_started)
 LEFT JOIN 
     user_notification_last_update AS un
