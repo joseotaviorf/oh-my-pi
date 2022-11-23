@@ -13,7 +13,6 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_retsuko_into_datalake"
-BLOCK_LIST = ["schema_migrations"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -22,10 +21,13 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
+    parser.add_argument("table_name")
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
-    source = "retsuko"
+    source = args.source
+    table_name = args.table_name
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -38,7 +40,6 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     postgres_consumer = PostgresConsumer(conn_config, spark_client)
 
-    tables = postgres_consumer.get_table_names_and_sizes().collect()
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
     s3_loader = S3Loader()
@@ -50,21 +51,15 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
     metastore_service.create_database(database_name)
 
-    for table in tables:
-        if table.table_name not in BLOCK_LIST:
-            df = postgres_consumer.get_data_from_table(table.table_name)
-            # the table names in the datalake must be lowercase
-            s3_loader.load_df(
-                df=df,
-                s3_path=f"{database_location}{table.table_name.lower()}",
-                format_options=format_options,
-                database_location=database_location,
-                max_records_per_file=100000,
-            )
-            spark_metastore_loader.update_metastore(
-                df,
-                database_name,
-                table.table_name.lower(),
-                format_options,
-                database_location,
-            )
+    df = postgres_consumer.get_data_from_table(table_name)
+    # the table names in the datalake must be lowercase
+    s3_loader.load_df(
+        df=df,
+        s3_path=f"{database_location}{table_name.lower()}",
+        format_options=format_options,
+        database_location=database_location,
+        max_records_per_file=100000,
+    )
+    spark_metastore_loader.update_metastore(
+        df, database_name, table_name.lower(), format_options, database_location
+    )

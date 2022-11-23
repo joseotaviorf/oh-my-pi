@@ -1,2 +1,11 @@
 ---
 lineage_product_database_name: retsuko
+tables:
+  - account
+  - boleto
+  - contract
+  - credit_card_payment
+  - entry
+  - file
+  - invoice
+  - recurrent_credit_card

@@ -1,4 +1,3 @@
-from airflow.utils.helpers import chain, cross_downstream
 from datetime import datetime
 import pendulum
 import os
@@ -8,19 +7,17 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from airflow.utils.helpers import chain, cross_downstream
 
-from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
-
-from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.services.configuration_service import ConfigurationService
 
 
 SOURCE = "retsuko"
-CONTEXT = SOURCE
 
-DAG_NAME = CONTEXT
+DAG_NAME = SOURCE
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 config_service = ConfigurationService(DAG_NAME)
@@ -81,28 +78,33 @@ task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
-    relative_query_path=CONTEXT,
+    relative_query_path=SOURCE,
     spark_jobs_path=base_spark_jobs_path,
     athena_query_result_location=athena_query_results_bucket,
 )
 
-raw_task_group = task_group.build_raw_task_group_for_all_tables(
-    source=CONTEXT,
-    target_database_base_name=CONTEXT,
-    extraction_spark_job_file=raw_spark_job_path,
-)
+tables = config_service.get_config("tables")
+for table_name in tables:
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        table_name=table_name,
+        target_database_base_name=SOURCE,
+        extraction_spark_job_file=raw_spark_job_path,
+        raw_spark_job_extra_args=[SOURCE, table_name],
+    )
 
-clean_task_groups = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.CLEAN,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-)
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+        is_incremental=False,
+    )
 
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
 
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_group),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
-)
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
 
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
