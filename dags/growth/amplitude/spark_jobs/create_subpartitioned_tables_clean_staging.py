@@ -141,18 +141,20 @@ if __name__ == "__main__":
         f"{db_clean_staging_spark}.subpartitions_values"
     ).collect()
 
+    spark_metastore_service = SparkMetastoreService(SparkClient())
+
+    athena_metastore_service = AthenaMetastoreService(
+        AthenaClient(athena_query_result_location)
+    )
+
     # get existing tables
     if spark_flag:
-        spark_metastore_service = SparkMetastoreService(SparkClient())
         spark_metastore_service.create_database(db_clean_staging_spark)
         spark_existing_tables = spark_metastore_service.get_table_names(
             db_clean_staging_spark
         )
 
     if athena_flag:
-        athena_metastore_service = AthenaMetastoreService(
-            AthenaClient(athena_query_result_location)
-        )
         athena_metastore_service.create_database(db_clean_staging_athena)
         athena_existing_tables = [
             row["Data"][0]["VarCharValue"]
