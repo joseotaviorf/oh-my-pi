@@ -16,6 +16,12 @@ columns:
   id_house:
     lineage:
       - datalake_offer.sale_offer.id_house
+  id_company_supply:
+    lineage:
+      - datalake_offer.sale_offer.id_company_supply
+  id_company_demand:
+    lineage:
+      - datalake_offer.sale_offer.id_company_demand
   id_closing_specialist:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_consultant
@@ -56,6 +62,12 @@ columns:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_real_estate_register_specialist
       - datalake_firestore.monday.id_real_estate_register_specialist
+  partner_3p_supply:
+    lineage:
+      - datalake_offer.sale_offer.partner_3p_supply
+  partner_3p_demand:
+    lineage:
+      - datalake_offer.sale_offer.partner_3p_demand
   dt_sale_agreement_created:
     lineage:
       - datalake_offer.sale_offer.dt_sale_agreement_created

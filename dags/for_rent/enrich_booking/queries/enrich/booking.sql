@@ -262,9 +262,10 @@ booking_hub_agent AS (
 booking_3p_demand_agent AS (
   SELECT
     b.id,
+    wc.id_company_hubspot AS id_company_demand,
     wc.3p_partner AS partner_3p_demand
   FROM
-    agent_contract ac
+    agent_contract AS ac
   JOIN
     datalake_ebdb_clean.booking AS b
       ON b.ts_created BETWEEN ac.ts_work_contract_start AND COALESCE(ac.ts_work_contract_end, CURRENT_TIMESTAMP)
@@ -274,18 +275,6 @@ booking_3p_demand_agent AS (
       ON wc.id = ac.id_work_contract
   WHERE
     is_3p_contract
-),
-
-aux_3p_supply AS (
-  SELECT
-    id,
-    partner_3p_supply,
-    is_3p_supply_5a,
-    is_3p_supply_bh
-  FROM
-    datalake_ebdb_listing.house
-  WHERE
-    is_3p_supply
 ),
 
 secretariat_users AS (
@@ -318,6 +307,8 @@ base_booking AS (
     ) AS id_sale_flow,
     vo.id_real_estate_agent_rating,
     IF(b.business_context = 'SALE', vfa.id_fixed_agent,NULL) AS id_sale_fixed_agent,
+    hl.id_company_hubspot AS id_company_supply,
+    b3pa.id_company_demand,
     hl.country_code,
     COALESCE(ct.default_timezone, 'UTC') AS default_timezone,
     b.dt_booking,
@@ -431,7 +422,7 @@ base_booking AS (
     ) AS user_sale_booking_creator,
     bha.contract_name AS hub_agent_region,
     b3pa.partner_3p_demand,
-    a3ps.partner_3p_supply,
+    hl.partner_3p_supply,
     b.ts_visit_fup,
     b.ts_created,
     b.ts_updated,
@@ -451,9 +442,9 @@ base_booking AS (
     b.is_agent_fixed,
     IF(bha.id IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
     IF(b3pa.id IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
-    IF(a3ps.id IS NOT NULL, TRUE, FALSE) AS is_3p_supply,
-    COALESCE(a3ps.is_3p_supply_5a, FALSE) AS is_3p_supply_5a,
-    COALESCE(a3ps.is_3p_supply_bh, FALSE) AS is_3p_supply_bh,
+    COALESCE(hl.is_3p_supply, FALSE) AS is_3p_supply,
+    COALESCE(hl.is_3p_supply_5a, FALSE) AS is_3p_supply_5a,
+    COALESCE(hl.is_3p_supply_bh, FALSE) AS is_3p_supply_bh,
     IF(fud.visit_type = 'VIDEO', TRUE, FALSE) AS is_virtual_visit,
     e.is_successful AS is_entrance_successful,
     (b.status = 'Cancelado') AS is_canceled,
@@ -521,9 +512,6 @@ base_booking AS (
   LEFT JOIN
     booking_3p_demand_agent AS b3pa
       ON b3pa.id = b.id
-  LEFT JOIN
-    aux_3p_supply AS a3ps
-      ON a3ps.id = b.id_house
   LEFT JOIN
     datalake_ebdb_clean.user AS ua
       ON ua.id_agent = b.id_agent

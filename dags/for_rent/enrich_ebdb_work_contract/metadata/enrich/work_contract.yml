@@ -20,6 +20,7 @@ columns:
   3p_partner:
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
+      - datalake_hubspot_clean.company.properties
   ts_created:
     lineage:
       - datalake_ebdb_clean.work_contract.ts_created

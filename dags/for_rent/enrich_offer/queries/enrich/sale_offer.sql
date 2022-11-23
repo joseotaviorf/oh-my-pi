@@ -5,7 +5,8 @@ WITH visit_before_offer AS (
             so.id AS id_offer,
             bs.id AS id_booking,
             bs.id_agent,
-            du.id as id_user_agent,
+            du.id AS id_user_agent,
+            bs.id_company_demand,
             du.name AS agent_name,
             bs.partner_3p_demand,
             bs.is_3p_demand,
@@ -46,7 +47,8 @@ booking_before_offer AS (
             so.id AS id_offer,
             bs.id AS id_booking,
             bs.id_agent,
-            du.id as id_user_agent,
+            du.id AS id_user_agent,
+            bs.id_company_demand,
             du.name AS agent_name,
             bs.partner_3p_demand,
             bs.is_3p_demand,
@@ -87,6 +89,10 @@ relation_booking_offer AS (
         COALESCE(vo.id_booking, bo.id_booking) AS id_booking,
         COALESCE(vo.id_agent, bo.id_agent) AS id_agent,
         COALESCE(vo.id_user_agent, bo.id_user_agent) AS id_user_agent,
+        CASE
+            WHEN vo.is_3p_demand IS NOT NULL THEN vo.id_company_demand
+            ELSE bo.id_company_demand
+        END AS id_company_demand,
         COALESCE(vo.agent_name, bo.agent_name) AS agent_name,
         CASE
             WHEN vo.is_3p_demand IS NOT NULL THEN vo.partner_3p_demand
@@ -229,9 +235,10 @@ data_sources AS (
         -- data from relation_booking_offer
         rbo.id_user_agent AS rbo_id_user_agent,
         rbo.id_booking,
+        rbo.id_company_demand,
         UPPER(rbo.agent_name) AS rbo_agent_name,
-        partner_3p_demand,
-        COALESCE(is_3p_demand, FALSE) AS is_3p_demand,
+        rbo.partner_3p_demand,
+        COALESCE(rbo.is_3p_demand, FALSE) AS is_3p_demand,
         COALESCE(rbo.flg_booking_before_offer,FALSE) AS flg_booking_before_offer,
         COALESCE(rbo.flg_visit_completed_before_offer,FALSE) AS flg_visit_completed_before_offer,
         rbo.hours_booking_to_offer,
@@ -544,6 +551,8 @@ business_rules AS (
         ds.id_pendency,
         ds.vo_id_user_team_lead AS id_user_team_lead,
         COALESCE(busf.id_hub, bu.id_business_unit) AS id_business_unit,
+        h.id_company_hubspot AS id_company_supply,
+        ds.id_company_demand AS id_company_demand,
         CASE
             WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
                 THEN ds.vo_agent_name
@@ -845,6 +854,8 @@ SELECT
     id_vendas,
     id_pendency,
     id_business_unit,
+    id_company_supply,
+    id_company_demand,
     pendency,
     CASE
         WHEN current_payment_method = "INSTANT_MORTGAGE" THEN (

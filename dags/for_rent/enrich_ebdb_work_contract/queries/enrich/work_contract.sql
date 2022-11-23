@@ -1,24 +1,36 @@
-WITH partner_agencies AS (
+WITH partner_agencies_aux AS (
     SELECT
         id_company AS id_company_hubspot,
-        REPLACE(UPPER(
-            NULLIF(
-                REGEXP_EXTRACT(
-                    GET_JSON_OBJECT(properties, '$.tag_imobiliarias'),
-                    r'\[3(?i:p)(?i:BH)?\-(.+?)\]'
-                ), '') 
-            ), ' ', ''
-        ) AS extracted_3p_tag,
+        NULLIF(
+            REGEXP_EXTRACT(
+                GET_JSON_OBJECT(properties, '$.tag_imobiliarias'),
+                r'\[3(?i:p)(?i:BH)?\-(.+?)\]'
+        ), '') AS extracted_3p_tag,
         COALESCE(
             NULLIF(GET_JSON_OBJECT(properties, '$.estado'), ''),
             NULLIF(GET_JSON_OBJECT(properties, '$.state'), '')
         ) AS partner_state,
+        ROW_NUMBER() OVER(PARTITION BY id_company ORDER BY ts_updated DESC) = 1 AS is_most_recent_row,
         ts_updated
     FROM
         datalake_hubspot_clean.company
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY REPLACE(UPPER(extracted_3p_tag), ' ', '') ORDER BY ts_updated DESC) = 1
         AND extracted_3p_tag IS NOT NULL
+),
+partner_agencies AS (
+    SELECT
+        paa.id_company_hubspot,
+        REPLACE(UPPER(paa.extracted_3p_tag), ' ', '') AS extracted_3p_tag,
+        current_paa.extracted_3p_tag AS current_tag,
+        paa.partner_state,
+        paa.ts_updated
+    FROM
+        partner_agencies_aux AS paa
+    LEFT JOIN
+        partner_agencies_aux AS current_paa
+            ON paa.id_company_hubspot = current_paa.id_company_hubspot
+            AND current_paa.is_most_recent_row
 )
 SELECT
     wc.id,
@@ -26,7 +38,7 @@ SELECT
     pa.id_company_hubspot,
     IF (wc.contract_name = bus.hub_name_wc, bus.hub_name_teams, NULL) AS hub_name_teams,
     wc.contract_name,
-    NULLIF(REGEXP_EXTRACT(wc.contract_name, '(?<=\\[3P\\-)(.+?)(?=\\])'), '') AS 3p_partner,
+    COALESCE(pa.current_tag, NULLIF(REGEXP_EXTRACT(wc.contract_name, '(?<=\\[3P\\-)(.+?)(?=\\])'), '')) AS 3p_partner,
     wc.contract_name LIKE '%[3P-%]%' AS is_3p_contract,
     wc.contract_name LIKE '%[3P-%]%' AND partner_state IS DISTINCT FROM 'MG' AS is_3p_5a_contract,
     wc.contract_name LIKE '%[3P-%]%' AND partner_state IS NOT DISTINCT FROM 'MG' AS is_3p_bh_contract,

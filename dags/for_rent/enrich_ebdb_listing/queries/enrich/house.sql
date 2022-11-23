@@ -75,31 +75,36 @@ extracted_partner_tags AS (
         ts_updated
       DESC
     ) = 1 AS is_most_recent_for_tag,
-    ROW_NUMBER() OVER(PARTITION BY cnpj ORDER BY ts_updated DESC) = 1 AS is_most_recent_for_cnpj
+    ROW_NUMBER() OVER(PARTITION BY cnpj ORDER BY ts_updated DESC) = 1 AS is_most_recent_for_cnpj,
+    ROW_NUMBER() OVER(PARTITION BY id_company ORDER BY ts_updated DESC) = 1 AS is_most_recent_for_company
   FROM
     partner_agencies_aux
   QUALIFY
-    (is_most_recent_for_tag OR is_most_recent_for_cnpj)
+    (is_most_recent_for_tag OR is_most_recent_for_cnpj OR is_most_recent_for_company)
     AND (tag IS NOT NULL or cnpj IS NOT NULL)
 ),
 --- We're getting the most recent row in datalake_hubspot_clean.company for each tag and CNPJ.
 --- Since they are merged, extracted_3p_tag only shows up if that row is the most recent company for the given tag. Same for the CNPJ.
 partner_agencies AS (
   SELECT
-    id_company,
-    tag,
+    ept.id_company,
+    ept.tag,
     CASE
-      WHEN is_most_recent_for_tag THEN extracted_3p_tag
+      WHEN ept.is_most_recent_for_tag THEN ept.extracted_3p_tag
       ELSE NULL
     END AS extracted_3p_tag,
     CASE
-      WHEN is_most_recent_for_cnpj THEN cnpj
+      WHEN ept.is_most_recent_for_cnpj THEN ept.cnpj
       ELSE NULL
     END AS cnpj,
-    COALESCE(extracted_3p_tag, name) AS partner_3p_supply,
-    partner_state
+    COALESCE(current_ept.extracted_3p_tag, ept.extracted_3p_tag, ept.name) AS partner_3p_supply,
+    ept.partner_state
   FROM
-      extracted_partner_tags
+    extracted_partner_tags AS ept
+  JOIN
+    extracted_partner_tags AS current_ept
+      ON ept.id_company = current_ept.id_company
+      AND current_ept.is_most_recent_for_company
 )
 SELECT
   h.id,
@@ -167,7 +172,8 @@ SELECT
   h.internal_admin_info,
   COALESCE(
     pa.partner_3p_supply, -- should be replaced by company
-    NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') -- should be replaced by supply processor
+    NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), ''), -- should be replaced by supply processor
+    IF(sc.is_3p_supply, 'Unknown', NULL) -- Sometimes, listing_business_context sets ownership to THIRD_PARTY, but internal_admin_info is empty
   ) AS partner_3p_supply,
   h.photo_booking_historic,
   h.default_neighborhood,
