@@ -18,7 +18,7 @@ WITH events AS (
 SELECT
     e.id_house,
     COALESCE(ch.country_code, 'Undefined') AS country_code,
-    COALESCE(e.business_context, 'Undefined') AS business_context,
+    COALESCE(NULLIF(e.business_context, ''), 'Undefined') AS business_context,
     e.status,
     e.status_reason,
     e.suspension_reason,

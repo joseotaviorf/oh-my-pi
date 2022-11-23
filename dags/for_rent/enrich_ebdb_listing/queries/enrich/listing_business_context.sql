@@ -47,7 +47,7 @@ SELECT
     lbc.id,
     lbc.id_house,
     COALESCE(ch.country_code, 'Undefined') AS country_code,
-    COALESCE(lbc.business_context, 'Undefined') AS business_context,
+    COALESCE(NULLIF(lbc.business_context, ''), 'Undefined') AS business_context,
     lbc.ownership,
     lbc.calculator_price,
     lbc.status,
