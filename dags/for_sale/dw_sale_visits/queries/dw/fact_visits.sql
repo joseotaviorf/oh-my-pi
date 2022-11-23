@@ -11,6 +11,8 @@ SELECT
     COALESCE(b.id_house, -1) AS sk_house,
     COALESCE(h.id_region, -1) AS sk_region,
     COALESCE(svh.id_business_unit, -1) AS sk_business_unit,
+    COALESCE(cs_supply.sk_company, -1) AS sk_company_supply,
+    COALESCE(cs_demand.sk_company, -1) AS sk_company_demand,
     COALESCE(b.id_agent, -1) AS sk_agent,
     COALESCE(ua.id, -1) AS sk_user_agent,
     COALESCE(svh.id_user_en, -1) AS sk_user_en,
@@ -63,7 +65,19 @@ LEFT JOIN
       AND b.id_visitor = br.id_reviewer
       AND br.type='tenant_visit'
 LEFT JOIN
-    datalake_ebdb_clean.user ua
+    datalake_ebdb_clean.user AS ua
       ON ua.id_agent = b.id_agent
+LEFT JOIN
+    datalake_rede_company.company_sks AS cs_demand
+        ON (b.id_company_demand IS NOT NULL
+        AND b.id_company_demand = cs_demand.id_hubspot)
+        OR (b.id_company_demand IS NULL
+        AND b.partner_3p_demand = cs_demand.extracted_3p_tag)
+LEFT JOIN
+    datalake_rede_company.company_sks AS cs_supply
+        ON (b.id_company_supply IS NOT NULL
+        AND b.id_company_supply = cs_supply.id_hubspot)
+        OR (b.id_company_supply IS NULL
+        AND b.partner_3p_supply = cs_supply.extracted_3p_tag)
 WHERE
    b.visit_intent = 'SALE'

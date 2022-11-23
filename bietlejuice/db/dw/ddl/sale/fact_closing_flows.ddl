@@ -4,6 +4,8 @@ CREATE TABLE sale.fact_closing_flows (
   sk_buyer BIGINT,
   sk_owner BIGINT,
   sk_house BIGINT,
+  sk_company_supply BIGINT,
+  sk_company_demand BIGINT,
   sk_sale_agreement_created_date BIGINT,
   sk_sale_agreement_signed_date BIGINT,
   sk_onboarding_ended_date BIGINT,

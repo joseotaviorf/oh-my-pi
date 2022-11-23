@@ -93,7 +93,7 @@ SELECT
         dwc.sk_work_contract,
         BIGINT(-1 || INT(usc.is_agent_active) || INT(usc.is_agent_for_sale) || INT(usc.is_agent_for_rent))
     ) AS sk_work_contract,
-    COALESCE(dc.sk_company, -1) AS sk_company,
+    COALESCE(cs.sk_company, -1) AS sk_company,
     COALESCE(BIGINT(DATE_FORMAT(usc.ts_status_started, 'yyyyMMdd')), -1) AS sk_status_started_date,
     COALESCE(BIGINT(DATE_FORMAT(usc.ts_status_ended, 'yyyyMMdd')), -1) AS sk_status_ended_date,
     COALESCE(usc.ascc_action, usc.bcc_action) AS action,
@@ -104,11 +104,17 @@ SELECT
 FROM
     unite_simultaneous_changes AS usc
 LEFT JOIN
+    datalake_ebdb_work_contract.work_contract AS wc
+        ON wc.id = usc.id_work_contract
+LEFT JOIN
     dw_agent.dim_work_contract AS dwc
         ON dwc.id_work_contract IS NOT DISTINCT FROM NULLIF(usc.id_work_contract, -1)
         AND dwc.is_active = usc.is_agent_active
         AND dwc.is_for_sale_contract = usc.is_agent_for_sale
         AND dwc.is_for_rent_contract = usc.is_agent_for_rent
 LEFT JOIN
-    dw_rede.dim_company AS dc
-        ON dc.tag = dwc.contract_name
+    datalake_rede_company.company_sks AS cs
+        ON (wc.id_company_hubspot IS NOT NULL
+        AND wc.id_company_hubspot = cs.id_hubspot)
+        OR (wc.id_company_hubspot IS NULL
+        AND wc.3p_partner = cs.extracted_3p_tag)

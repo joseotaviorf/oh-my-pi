@@ -14,6 +14,12 @@ columns:
   sk_house:
     lineage:
       - datalake_sale_closing_flows.closing_flow.id_house
+  sk_company_supply:
+    lineage:
+      - datalake_rede_company.company_sks.sk_company
+  sk_company_demand:
+    lineage:
+      - datalake_rede_company.company_sks.sk_company
   sk_sale_agreement_created_date:
     lineage:
       - datalake_sale_closing_flows.closing_flow.dt_sale_agreement_created

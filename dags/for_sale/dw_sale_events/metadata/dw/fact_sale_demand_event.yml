@@ -46,10 +46,12 @@ columns:
       - dw_sale.fact_offers.sk_business_unit
   sk_company_supply:
     lineage:
-      - dw_rede.dim_company.sk_company
+      - dw_sale.fact_visits.sk_company_supply
+      - dw_sale.fact_offers.sk_company_supply
   sk_company_demand:
     lineage:
-      - dw_rede.dim_company.sk_company
+      - dw_sale.fact_visits.sk_company_demand
+      - dw_sale.fact_offers.sk_company_demand
   year:
     lineage:
       - dw_public.dim_date.year

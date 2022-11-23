@@ -6,6 +6,8 @@ CREATE TABLE sale.fact_offers (
 	sk_buyer BIGINT,
 	sk_owner BIGINT,
 	sk_business_unit BIGINT,
+	sk_company_supply BIGINT,
+	sk_company_demand BIGINT,
 	sk_region BIGINT,
 	sk_booking BIGINT,
 	sk_agent BIGINT,

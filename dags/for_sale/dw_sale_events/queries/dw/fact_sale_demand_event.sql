@@ -10,8 +10,8 @@ WITH bookings AS (
         fv.sk_agent,
         fac.sk_work_contract AS sk_agent_work_contract,
         fv.sk_business_unit,
-        b.partner_3p_supply,
-        b.partner_3p_demand
+        fv.sk_company_supply,
+        fv.sk_company_demand
     FROM
         dw_sale.fact_visits AS fv
     JOIN
@@ -37,8 +37,8 @@ offers AS (
         fo.sk_agent,
         fac.sk_work_contract AS sk_agent_work_contract,
         fo.sk_business_unit,
-        so.partner_3p_supply,
-        so.partner_3p_demand
+        fo.sk_company_supply,
+        fo.sk_company_demand
     FROM
         dw_sale.fact_offers AS fo
     JOIN
@@ -65,8 +65,8 @@ events AS (
         sk_agent,
         sk_agent_work_contract,
         sk_business_unit,
-        partner_3p_supply,
-        partner_3p_demand
+        sk_company_supply,
+        sk_company_demand
     FROM
         bookings
     WHERE
@@ -84,8 +84,8 @@ events AS (
         sk_agent,
         sk_agent_work_contract,
         sk_business_unit,
-        partner_3p_supply,
-        partner_3p_demand
+        sk_company_supply,
+        sk_company_demand
     FROM
         bookings
     WHERE
@@ -103,8 +103,8 @@ events AS (
         sk_agent,
         sk_agent_work_contract,
         sk_business_unit,
-        partner_3p_supply,
-        partner_3p_demand
+        sk_company_supply,
+        sk_company_demand
     FROM
         offers
     WHERE
@@ -122,8 +122,8 @@ events AS (
         sk_agent,
         sk_agent_work_contract,
         sk_business_unit,
-        partner_3p_supply,
-        partner_3p_demand
+        sk_company_supply,
+        sk_company_demand
     FROM
         offers
     WHERE
@@ -141,8 +141,8 @@ events AS (
         sk_agent,
         sk_agent_work_contract,
         sk_business_unit,
-        partner_3p_supply,
-        partner_3p_demand
+        sk_company_supply,
+        sk_company_demand
     FROM
         offers
     WHERE
@@ -160,8 +160,8 @@ events AS (
         sk_agent,
         sk_agent_work_contract,
         sk_business_unit,
-        partner_3p_supply,
-        partner_3p_demand
+        sk_company_supply,
+        sk_company_demand
     FROM
         offers
     WHERE
@@ -179,20 +179,14 @@ SELECT
     COALESCE(e.sk_agent, -1) AS sk_agent,
     COALESCE(e.sk_agent_work_contract, -1) AS sk_agent_work_contract,
     COALESCE(e.sk_business_unit, -1) AS sk_business_unit,
-    COALESCE(dcs.sk_company, -1) AS sk_company_supply,
-    COALESCE(dcd.sk_company, -1) AS sk_company_demand,
+    COALESCE(e.sk_company_supply, -1) AS sk_company_supply,
+    COALESCE(e.sk_company_demand, -1) AS sk_company_demand,
     dd.year,
     dd.month,
     dd.day,
     NOW() AS ts_load
 FROM
     events AS e
-LEFT JOIN
-    dw_rede.dim_company AS dcs
-        ON dcs.extracted_3p_tag = e.partner_3p_supply
-LEFT JOIN
-    dw_rede.dim_company AS dcd
-        ON dcd.extracted_3p_tag = e.partner_3p_demand
 JOIN
     dw_public.dim_date AS dd
         ON e.sk_event_date = dd.sk_date

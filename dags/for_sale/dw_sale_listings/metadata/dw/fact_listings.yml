@@ -17,6 +17,9 @@ columns:
   sk_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
+  sk_company:
+    lineage:
+      - datalake_rede_company.company_sks.sk_company
   price:
     lineage:
       - datalake_ebdb_clean.house.sale_price

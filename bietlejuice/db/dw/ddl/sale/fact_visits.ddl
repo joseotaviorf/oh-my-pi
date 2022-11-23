@@ -5,6 +5,8 @@ CREATE TABLE sale.fact_visits (
     sk_house BIGINT,
     sk_region BIGINT,
     sk_business_unit BIGINT,
+    sk_company_supply BIGINT,
+    sk_company_demand BIGINT,
     sk_agent BIGINT,
     sk_user_agent BIGINT,
     sk_user_en BIGINT,

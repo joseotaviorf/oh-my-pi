@@ -4,6 +4,7 @@ SELECT
   h.id_user AS sk_owner,
   CAST(hslc.id_user AS BIGINT) AS sk_user_consultant,
   h.id_region AS sk_region, 
+  COALESCE(cs_supply.sk_company, -1) AS sk_company,
   NULLIF(h.sale_price, 0) AS price,
   h.sale_price/h.total_area AS price_m2,
   COALESCE(BIGINT(DATE_FORMAT(sl.ts_first_publication, 'yyyyMMdd')), -1) AS sk_first_publication_date,
@@ -32,9 +33,15 @@ SELECT
 FROM
   datalake_sale_listings.sale_listing AS sl
 JOIN 
-  datalake_ebdb_clean.house AS h
+  datalake_ebdb_listing.house AS h
     ON sl.id_house = h.id
 LEFT JOIN
   datalake_big_agent.house_sale_listing_consultant AS hslc
     ON sl.id_sale_listing = hslc.id_sale_listing
     AND hslc.is_last_ciq_on_listing = True
+LEFT JOIN
+  datalake_rede_company.company_sks AS cs_supply
+    ON (h.id_company_hubspot IS NOT NULL
+    AND h.id_company_hubspot = cs_supply.id_hubspot)
+    OR (h.id_company_hubspot IS NULL
+    AND h.partner_3p_supply = cs_supply.extracted_3p_tag)

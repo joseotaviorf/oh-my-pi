@@ -11,7 +11,7 @@ columns:
       - dw_agent.dim_work_contract.sk_work_contract
   sk_company:
     lineage:
-      - dw_rede.dim_company.sk_company
+      - datalake_rede_company.company_sks.sk_company
   sk_status_started_date:
     lineage:
       - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
