@@ -1185,10 +1185,22 @@ legacy_doorman:
     clean_table_name: legacy_doorman
     sheet_context: static
 
+looker_folders_domains:
+    sheet_id: 1nfDXQtPrlGlZzOSMNwyO7_zRd2jbkJqPh744bS3AJwA
+    sheet_name: looker_folders_domains
+    clean_table_name: looker_folders_domains
+    sheet_context: static
+
 marketing_affiliates_targets_replanning:
     sheet_id: 1KHK1D92S6LbHfrp5nivOkUCOrBABBMqoT9uFuMr_Fag
     sheet_name: marketing_affiliates_targets_replanning
     clean_table_name: marketing_affiliates_targets_replanning
+    sheet_context: static
+
+metabase_collections_domains:
+    sheet_id: 1nfDXQtPrlGlZzOSMNwyO7_zRd2jbkJqPh744bS3AJwA
+    sheet_name: metabase_collections_domains
+    clean_table_name: metabase_collections_domains
     sheet_context: static
 
 monday_users:
