@@ -1,0 +1,99 @@
+database_name: datalake_google_search_console
+table_name: seo_gsc_data
+columns:
+    device_category:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.device_category
+    country:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.country
+    google_property:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.google_property
+    query:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.query
+    page:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    branded:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.query
+    page_cluster:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    structure:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    page_path:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    state:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    city:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    location_level:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    search_region:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    street_abbreviations:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    poi_type:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    filter_count:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    filter_combination:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    filter:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    condo_filter:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    house_char_filter:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    house_type_filter:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    filter_1:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    filter_2:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    lp_wo_filter:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.page
+    position:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.position
+    impressions:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.impressions
+    clicks:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.clicks
+    ctr:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.ctr
+    dt_created:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.dt_created
+    year:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.year
+    month:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.month
+    day:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.day

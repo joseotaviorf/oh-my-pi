@@ -1855,6 +1855,9 @@ bietlejuice.enrich_invoice:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
   - bietlejuice.retsuko:load-clean-contract
 
+bietlejuice.enrich_google_search_console:
+  - bietlejuice.google_search_console:load-clean-url-by-page
+
 bietlejuice.enrich_hubspot:
   - bietlejuice.hubspot:load-clean-company
   - bietlejuice.hubspot:load-clean-contact
@@ -2312,6 +2315,12 @@ bietlejuice.enrich_sap:
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
 
+bietlejuice.enrich_seo_funnel:
+  - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
+  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
+  - bietlejuice.dw_datamarts_growth_cross:create-sale-performance-marketing-metrics-demand-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-performance-marketing-metrics-demand-in-datalake
+
 bietlejuice.enrich_sirena:
   - bietlejuice.sirena:load-clean-agents
   - bietlejuice.sirena:load-clean-groups
@@ -2535,9 +2544,3 @@ bietlejuice.enrich_zipcodes:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_region:load-enrich-region
-
-bietlejuice.enrich_seo_funnel:
-  - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
-  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
-  - bietlejuice.dw_datamarts_growth_cross:create-sale-performance-marketing-metrics-demand-in-datalake
-  - bietlejuice.dw_datamarts_growth_cross:create-performance-marketing-metrics-demand-in-datalake
