@@ -565,11 +565,11 @@ vb2os AS (
         rf.funnel_first_touchpoint AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) < 0 AND rf.flg_visit_completed
+            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1)))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) BETWEEN 0 AND 4 AND rf.flg_visit_completed
-                THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1))))
-            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) >= 5 AND rf.flg_visit_completed
+            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1)))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1))))
+            WHEN DATEDIFF('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1)))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -579,7 +579,7 @@ vb2os AS (
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
-        COUNT(DISTINCT rf.sk_offer) AS vb2os,
+        COUNT(DISTINCT rf.sk_booking) AS vb2os,
         NULL::BIGINT AS vc,
         NULL::BIGINT AS vc2os,
         NULL::BIGINT AS os2oa,
@@ -1745,6 +1745,7 @@ union_all_date AS (
         ua.q2opp,
         ua.opp2fl,
         ua.vb2vc,
+        ua.vb2os,
         ua.vc,
         ua.vc2os,
         ua.os2oa,
