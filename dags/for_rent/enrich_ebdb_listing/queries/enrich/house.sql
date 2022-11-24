@@ -43,6 +43,18 @@ supply_context AS (
   GROUP BY
     1
 ),
+sale_primary_market AS (
+  SELECT 
+    id_house,
+    is_primary_market AS is_sale_primary_market
+  FROM
+    datalake_ebdb_clean.listing_business_context AS lbc
+  JOIN 
+    datalake_ebdb_clean.listing_sale_model AS lsm
+      ON lbc.id = lsm.id_listing_business_context
+  WHERE 
+    is_primary_market
+),
 -- While we don't have 3P agencies included in datalake_company_clean.company, we need to find their name via HubSpot
 -- This is a temporary measure, and should be changed in 23Q1
 -- Also, the reason we are not using the enriched HubSpot tables is because they run later than this query, so we can't simplify it
@@ -268,6 +280,7 @@ SELECT
     WHEN h.id_user_registrant = 7212349 THEN TRUE -- For Casa Mineira migration, a single user was created to import the CM listings
     ELSE FALSE 
   END AS is_casa_mineira_migration,
+  COALESCE(pm.is_sale_primary_market, FALSE) AS is_sale_primary_market,
   COALESCE(r_type.name = 'Restriction', FALSE) AS has_visit_restriction,
   h.has_requested_professional_photos,
   h.has_owner_incomplete_listing_notification,
@@ -355,6 +368,9 @@ LEFT JOIN
 LEFT JOIN
   supply_context AS sc
     ON h.id = sc.id_house
+LEFT JOIN 
+  sale_primary_market AS pm
+    ON h.id = pm.id_house
 LEFT JOIN
   partner_agencies AS pa
     ON REPLACE(UPPER(NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')), ' ', '') 

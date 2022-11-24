@@ -15,6 +15,7 @@ CREATE TABLE sale.dim_listing (
 	is_3p_supply_5a BOOLEAN,
 	is_3p_supply_bh BOOLEAN,
 	is_casa_mineira_migration BOOLEAN,
+	is_primary_market BOOLEAN,
 	is_for_rent BOOLEAN,
 	has_active_rental_contract BOOLEAN,
 	has_house_been_rented BOOLEAN,

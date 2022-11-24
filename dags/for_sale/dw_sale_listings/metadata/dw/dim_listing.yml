@@ -47,6 +47,9 @@ columns:
   is_casa_mineira_migration:
     lineage:
       - datalake_ebdb_listing.house.is_casa_mineira_migration
+  is_primary_market:
+    lineage:
+      - datalake_ebdb_listing.house.is_sale_primary_market
   is_for_rent:
     lineage:
       - datalake_sale_listings.sale_listing.is_for_rent

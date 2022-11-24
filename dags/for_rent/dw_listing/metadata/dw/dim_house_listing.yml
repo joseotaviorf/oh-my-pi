@@ -179,6 +179,12 @@ columns:
   is_3p_supply_bh:
     lineage:
       - datalake_ebdb_listing.house.is_3p_supply_bh
+  is_casa_mineira_migration:
+    lineage:
+      - datalake_ebdb_listing.house.is_casa_mineira_migration
+  is_sale_primary_market:
+    lineage:
+      - datalake_ebdb_listing.house.is_sale_primary_market
   dt_last_exclusive_opted_in:
     lineage:
       - datalake_ebdb_listing.house_listing.dt_last_exclusive_opted_in

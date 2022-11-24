@@ -191,6 +191,8 @@ house_listings AS (
         h.is_3p_supply,
         h.is_3p_supply_5a,
         h.is_3p_supply_bh,
+        h.is_casa_mineira_migration,
+        h.is_sale_primary_market,
         rl.ts_administrator_changed
     FROM
         datalake_ebdb_listing.house AS h
@@ -275,6 +277,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.is_3p_supply,
     hl.is_3p_supply_5a,
     hl.is_3p_supply_bh,
+    hl.is_casa_mineira_migration,
+    hl.is_sale_primary_market,
     hlco.dt_consultant_started,
     hl.dt_last_exclusive_opted_in,
     hl.dt_last_exclusive_opted_out,

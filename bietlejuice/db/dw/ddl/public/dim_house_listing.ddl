@@ -67,6 +67,8 @@ create table if not exists public.dim_house_listing
  is_3p_supply boolean,
  is_3p_supply_5a boolean,
  is_3p_supply_bh boolean,
+ is_casa_mineira_migration BOOLEAN,
+ is_sale_primary_market BOOLEAN,
  dt_consultant_started DATE,
  dt_last_exclusive_opted_in date,
  dt_last_exclusive_opted_out date,

@@ -341,6 +341,9 @@ columns:
   is_for_rent:
     lineage:
       - datalake_ebdb_clean.house.is_for_rent
+  is_sale_primary_market:
+    lineage:
+      - datalake_ebdb_clean.listing_sale_model.is_primary_market
   is_for_sale:
     lineage:
       - datalake_ebdb_clean.house.is_for_sale
