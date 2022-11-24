@@ -16,7 +16,7 @@ columns:
       - datalake_rede_supply.lead_3p_status.sk_lead_3p_status
   sk_house:
     lineage:
-      - datalake_rede_supply.lead_3p_status_changes.id_house
+      - datalake_ebdb_clean.house.id
   sk_lead_date:
     lineage:
       - datalake_rede_supply.lead_3p_status_changes.ts_status_started

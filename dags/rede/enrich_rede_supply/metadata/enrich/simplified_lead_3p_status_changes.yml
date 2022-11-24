@@ -6,9 +6,6 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p_aud.id
       - datalake_brokers_supply_processor.lead_3p.id
-  id_company_hubspot:
-    lineage:
-      - datalake_hubspot.company.id_company
   id_file:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p_aud.id_file

@@ -30,7 +30,7 @@ SELECT
     COALESCE(fsk.sk_file, -1) AS sk_file,
     COALESCE(csk.sk_company, -1) AS sk_company,
     ls.sk_lead_3p_status,
-    COALESCE(lsc.id_house, -1) AS sk_house,
+    COALESCE(h.id, -1) AS sk_house,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_lead, 'yyyyMMdd')), -1) AS sk_lead_date,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_prospect, 'yyyyMMdd')), -1) AS sk_prospect_date,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_qualified, 'yyyyMMdd')), -1) AS sk_qualified_date,
@@ -48,6 +48,12 @@ SELECT
     NOW() AS ts_load
 FROM
     funnel AS f
+JOIN
+    datalake_brokers_supply_processor.lead_3p AS l3p
+        ON f.id_lead_3p = l3p.id
+LEFT JOIN
+    datalake_ebdb_clean.house AS h
+        ON h.id_external = l3p.uuid_lead
 JOIN
     datalake_rede_supply.lead_3p_status_changes AS lsc
         ON f.id_lead_3p = lsc.id_lead_3p
@@ -67,4 +73,5 @@ LEFT JOIN
         ON fsk.id_file = lsc.id_file
 LEFT JOIN
     datalake_rede_company.company_sks AS csk
-        ON csk.id_hubspot = lsc.id_company_hubspot
+        ON (lsc.id_company_hubspot IS NOT NULL AND csk.id_hubspot = lsc.id_company_hubspot)
+        OR (lsc.id_company_hubspot IS NULL AND csk.extracted_3p_tag = COALESCE(NULLIF(l3p.cnpj, 'Não informado'), 'Unknown'))

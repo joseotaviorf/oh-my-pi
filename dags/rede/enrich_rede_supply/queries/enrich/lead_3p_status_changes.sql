@@ -1,4 +1,15 @@
-WITH first_time_for_status AS (
+WITH partner_agencies_aux AS (
+    SELECT
+        id_company AS id_company_hubspot,
+        NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', ''), '') AS cnpj,
+        ts_updated
+    FROM
+        datalake_hubspot_clean.company
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY cnpj ORDER BY ts_updated DESC) = 1
+        AND cnpj IS NOT NULL
+),
+first_time_for_status AS (
     SELECT *
     FROM (
         SELECT
@@ -27,7 +38,6 @@ status_changes AS (
     SELECT
         sc.id_status_change,
         sc.id_lead_3p,
-        sc.id_company_hubspot,
         sc.id_file,
          CASE
             WHEN sc.status = 'REGISTERED' THEN FIRST(id_house, TRUE) OVER (PARTITION BY sc.id_lead_3p ORDER BY sc.ts_status_started)
@@ -56,7 +66,6 @@ status_ended_aux AS (
     SELECT
         id_status_change,
         id_lead_3p,
-        id_company_hubspot,
         LAST(id_file, TRUE) OVER (PARTITION BY id_lead_3p ORDER BY ts_status_started) AS id_file,
         LAST(id_house, TRUE) OVER (PARTITION BY id_lead_3p ORDER BY ts_status_started) AS id_house,
         COALESCE(status, listing_status) AS status,
@@ -73,18 +82,24 @@ status_ended_aux AS (
         OR listing_status IN ('PUBLISHED', 'UNPUBLISHED')
 )
 SELECT
-    id_status_change,
-    id_lead_3p,
-    id_company_hubspot,
-    id_file,
-    id_house,
-    status,
-    growth_status,
-    DATEDIFF(ts_status_ended, ts_status_started) AS days_in_status,
-    is_waiting_for_enrichment,
-    is_ineligible,
-    is_discarded,
-    ts_status_started,
-    ts_status_ended
+    sea.id_status_change,
+    sea.id_lead_3p,
+    paa.id_company_hubspot,
+    sea.id_file,
+    sea.id_house,
+    sea.status,
+    sea.growth_status,
+    DATEDIFF(sea.ts_status_ended, sea.ts_status_started) AS days_in_status,
+    sea.is_waiting_for_enrichment,
+    sea.is_ineligible,
+    sea.is_discarded,
+    sea.ts_status_started,
+    sea.ts_status_ended
 FROM
-    status_ended_aux
+    status_ended_aux AS sea
+JOIN
+    datalake_brokers_supply_processor.lead_3p AS l
+        ON sea.id_lead_3p = l.id
+LEFT JOIN
+    partner_agencies_aux AS paa
+        ON paa.cnpj = l.cnpj

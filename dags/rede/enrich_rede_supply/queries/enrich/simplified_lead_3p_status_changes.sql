@@ -1,12 +1,4 @@
-WITH companies AS (
-    SELECT
-        id_company,
-        cnpj,
-        ROW_NUMBER() OVER (PARTITION BY cnpj ORDER BY ts_created) AS rw
-    FROM
-        datalake_hubspot.company
-),
-status_changes AS (
+WITH status_changes AS (
     SELECT
         la.id,
         la.id_file,
@@ -112,7 +104,6 @@ last_id AS (
 SELECT
     id_last_status_change + MONOTONICALLY_INCREASING_ID() + 1 AS id_status_change,
     sea.id AS id_lead_3p,
-    c.id_company AS id_company_hubspot,
     COALESCE(sea.id_file, l.id_file) AS id_file,
     sea.id_house,
     sea.status,
@@ -132,7 +123,3 @@ FROM
 JOIN
     datalake_brokers_supply_processor.lead_3p AS l
         ON l.id = sea.id
-LEFT JOIN
-    companies AS c
-        ON c.rw = 1
-        AND c.cnpj = l.cnpj

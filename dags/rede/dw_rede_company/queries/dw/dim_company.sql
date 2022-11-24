@@ -7,10 +7,9 @@ SELECT
     COALESCE(c.lead_status, 'Unknown') AS lead_status,
     CASE
         WHEN (
-            cs.is_3p_bh
+            (cs.is_3p_bh IS NOT NULL AND cs.is_3p_bh)
             OR c.state IS NOT DISTINCT FROM 'MG'
             OR COALESCE(UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%', FALSE)
-            OR t.team_name IN ('BH Sul', 'BH Norte')
         )
             THEN '3P BH'
         ELSE '3P 5A' 
@@ -59,16 +58,14 @@ SELECT
     c.num_properties_for_rent,
     c.lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento') AS is_partner,
     (
-        cs.is_3p_bh
+        (cs.is_3p_bh IS NOT NULL AND cs.is_3p_bh)
         OR c.state IS NOT DISTINCT FROM 'MG'
         OR COALESCE(UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%', FALSE)
-        OR t.team_name IN ('BH Sul', 'BH Norte')
     ) AS is_3p_bh,
     (
         (cs.is_3p_bh IS NULL OR NOT cs.is_3p_bh)
         AND c.state IS DISTINCT FROM 'MG'
         AND COALESCE(UPPER(c.tag_real_estate_agency) NOT LIKE '%[3PBH-%]%', TRUE)
-        AND (t.team_name IS NULL OR t.team_name NOT IN ('BH Sul', 'BH Norte'))
     ) AS is_3p_5a,
     c.has_property_advertisement_online,
     c.is_correspondent_bank,

@@ -15,6 +15,9 @@ SELECT
 FROM
     datalake_rede_supply.lead_3p_reason_changes AS lrc
 JOIN
+    datalake_brokers_supply_processor.lead_3p AS l3p
+        ON lrc.id_lead_3p = l3p.id
+JOIN
     datalake_rede_supply.lead_3p_sks AS lsk
         ON lsk.id_lead_3p = lrc.id_lead_3p
 JOIN
@@ -39,4 +42,5 @@ LEFT JOIN
         ON fsk.id_file = lrc.id_file
 LEFT JOIN
     datalake_rede_company.company_sks AS csk
-        ON csk.id_hubspot = lrc.id_company_hubspot
+    ON (lrc.id_company_hubspot IS NOT NULL AND csk.id_hubspot = lrc.id_company_hubspot)
+    OR (lrc.id_company_hubspot IS NULL AND csk.extracted_3p_tag = COALESCE(NULLIF(l3p.cnpj, 'Não informado'), 'Unknown'))

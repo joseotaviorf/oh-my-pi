@@ -373,5 +373,5 @@ LEFT JOIN
     ON h.id = pm.id_house
 LEFT JOIN
   partner_agencies AS pa
-    ON REPLACE(UPPER(NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')), ' ', '') 
+    ON UPPER(NULLIF(REGEXP_EXTRACT(REPLACE(h.internal_admin_info, ' ', ''), r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')) 
        IN (pa.cnpj, REPLACE(UPPER(pa.extracted_3p_tag), ' ', ''))
