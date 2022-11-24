@@ -1,0 +1,31 @@
+---
+database_name: datalake_dashboard_documentation
+table_name: dashboard_documentation
+columns:
+  dashboard_path:
+    lineage:
+      - datalake_metabase_clean.collection.location
+  dashboard_id:
+    lineage:
+      - datalake_metabase_clean.report_dashboard.id
+  title:
+    lineage:
+      - datalake_metabase_clean.report_dashboard.name
+  description:
+    lineage:
+      - datalake_metabase_clean.report_dashboard.description
+  last_view:
+    lineage:
+      - datalake_metabase_clean.view_log.ts_last_view
+  dashboard_url:
+    lineage:
+      - datalake_metabase_clean.report_dashboard.id
+  id_chart:
+    lineage:
+      - datalake_metabase_clean.report_chart.id
+  chart:
+    lineage:
+      - datalake_metabase_clean.report_chart.name
+  ownership:
+    lineage:
+      - datalake_metabase_clean.core_user.email

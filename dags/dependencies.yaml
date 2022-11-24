@@ -976,6 +976,16 @@ bietlejuice.dw_crm:
   - bietlejuice.enrich_firestore:load-enrich-rent-offer
   - bietlejuice.heimdall:load-clean-activity
 
+bietlejuice.enrich_dashboard_governance:
+  - bietlejuice.metabase:load-clean-collection
+  - bietlejuice.metabase:load-clean-view-log
+  - bietlejuice.metabase:load-clean-metabase-database
+  - bietlejuice.metabase:load-clean-metabase-table
+  - bietlejuice.metabase:load-clean-core-user
+  - bietlejuice.metabase:load-clean-report-card
+  - bietlejuice.metabase:load-clean-report-dashboard
+  - bietlejuice.metabase:load-clean-report-dashboard-card
+
 bietlejuice.dw_debt_recovery:
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
   - bietlejuice.enrich_debt_recovery:load-enrich-installment

@@ -1,0 +1,32 @@
+---
+database_name: datalake_dashboard_documentation
+table_name: chart_documentation
+columns:
+  chart_path:
+    lineage:
+      - datalake_metabase_clean.collection.location
+  chart_id:
+    lineage:
+      - datalake_metabase_clean.report_card.id
+  type:
+    lineage:
+      - datalake_metabase_clean.report_card.display
+  title:
+    lineage:
+      - datalake_metabase_clean.report_card.name
+  chart_description:
+    lineage:
+      - datalake_metabase_clean.report_card.description
+  last_view:
+    lineage:
+      - datalake_metabase_clean.view_log.ts_last_view
+  chart_url:
+    lineage:
+      - datalake_metabase_clean.report_card.id
+  dataset:
+    lineage:
+      - datalake_metabase_clean.metabase_database.name
+      - datalake_metabase_clean.metabase_table.name
+  ownership:
+    lineage:
+      - datalake_metabase_clean.core_user.email
