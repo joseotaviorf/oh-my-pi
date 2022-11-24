@@ -1,9 +1,9 @@
 ---
 custom_cluster:
-  driver_node_type_id: r5a.12xlarge
-  node_type_id: r5a.8xlarge
+  driver_node_type_id: r5.12xlarge
+  node_type_id: r5.8xlarge
   autoscale:
-    min_workers: 2
+    min_workers: 3
     max_workers: 6
   aws_attributes:
-    ebs_volume_size: 200
+    ebs_volume_size: 500
