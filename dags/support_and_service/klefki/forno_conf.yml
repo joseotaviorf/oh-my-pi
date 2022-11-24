@@ -1,0 +1,27 @@
+---
+lineage_product_database_name: klefki
+partition_cols: [year, month, day]
+tables:
+  address_location_key:
+    partitioned: True
+    incremental_col: updated_at
+  address_location_key_aud:
+    partitioned: True
+    incremental_col: updated_at
+  change_owner_control:
+    partitioned: False
+  inspector_booking_retrieve_key:
+    partitioned: True
+    incremental_col: updated_at
+  key_return_preferred_location:
+    partitioned: True
+    incremental_col: updated_at
+  key_return_preferred_location_aud:
+    partitioned: True
+    incremental_col: updated_at
+  lock_box_track_entries:
+    partitioned: True
+    incremental_col: updated_at
+  notifications_sent:
+    partitioned: True
+    incremental_col: created_at

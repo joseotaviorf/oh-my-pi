@@ -1,0 +1,25 @@
+SELECT
+	id AS id_inspector_booking_retrieve_key,
+	inspector_id AS id_inspector,
+	house_id AS id_house,
+	collect_day,
+	collect_hour,
+	zipcode,
+	street,
+	`number`,
+	complement,
+	district,
+	city,
+	state,
+	instructions,
+	created_at as ts_created,
+	updated_at as ts_updated,
+	year,
+	month,
+	day
+FROM
+	datalake_klefki_raw.inspector_booking_retrieve_key
+WHERE
+	year = {year}
+	AND month = {month}
+	AND day = {day}
