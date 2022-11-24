@@ -721,12 +721,6 @@ base_hierarquia:
 # FOR RENT SHEETS
 ###################
 
-aux_agents:
-    sheet_id: 13LTRNCzLk1BcGcccDqvzG75d97NUwVt6CGYw6RxeBUk
-    sheet_name: aux_agents
-    clean_table_name: aux_agents
-    sheet_context: for_rent
-
 aux_regiao:
     sheet_id: 1gh8S0xVQ9HsTs6EkvE0BcXvh5_cfaG3aUpIgrluqqlM
     sheet_name: aux_regiao
