@@ -12,6 +12,7 @@ Steps 2 and 4 are separate because some enrichments are easier to be done before
 """
 
 import json
+import re
 import boto3
 import logging
 from argparse import ArgumentParser
@@ -108,10 +109,16 @@ Given the bucket and the file name as given by the S3 iterator, returns it in th
 def sanitize_file_name(prefix_layer: str, file: str) -> str:
     if "dw" in prefix_layer:
         file_sanitized = "/".join(file.split("/")[0:2])
+        sanitized_prefix_layer = prefix_layer.replace(dw_bucket_data_acc, dw_bucket)
     else:
         file_sanitized = "/".join(file.split("/")[0:3])
+        sanitized_prefix_layer = prefix_layer.replace(datalake_bucket_data_acc, datalake_bucket)
 
-    return f"s3a://{prefix_layer}/{file_sanitized}"
+    return f"s3a://{sanitized_prefix_layer}/{file_sanitized}"
+
+
+def fetch_partition_name(file_name):
+    return re.sub('/part\-.*', '', file_name)
 
 
 """
@@ -126,11 +133,11 @@ def find_recently_modified_files_by_layer_prefix(
     s3_iterator = s3_paginator.paginate(Bucket=bucket, Prefix=layer_prefix)
     formatted_date = execution_date.strftime("%Y-%m-%d")
     objects = s3_iterator.search(
-        f"Contents[?(to_string(LastModified)>='\"{formatted_date} 00:00:00+00:00\"'&&to_string(LastModified)<='\"{formatted_date} 23:59:59+00:00\"')].[Key,Size]"
+        f"Contents[?(to_string(LastModified)>='\"{formatted_date} 00:00:00+00:00\"'&&to_string(LastModified)<='\"{formatted_date} 23:59:59+00:00\"')].[Key,Size,LastModified]"
     )
 
     object_tuples = [
-        (sanitize_file_name(bucket, obj[0]), obj[1])
+        (sanitize_file_name(bucket, obj[0]), fetch_partition_name(obj[0]), obj[0], obj[1], obj[2])
         for obj in objects
         if obj[0].endswith((".json", ".parquet", ".txt", ".csv"))
     ]
@@ -146,16 +153,21 @@ metrics.
 
 def create_file_metrics_data_frame(object_tuples: list) -> DataFrame:
     df = spark.createDataFrame(
-        object_tuples, schema="file_name:string, file_size:bigint"
+        object_tuples, schema="table_name:string, partition_name:string, file_name:string, file_size_in_bytes:bigint, ts_modified: timestamp"
     )
-    return df.groupBy("file_name").agg(
-        SF.sum(SF.when(SF.col("file_size") < 1000000, 1).otherwise(0)).alias(
-            "qty_smaller_than_1mb"
-        ),
-        SF.sum(SF.when(SF.col("file_size") > 1000000000, 1).otherwise(0)).alias(
-            "qty_bigger_than_1gb"
-        ),
-        SF.count("*").alias("qty_total_files"),
+
+    return df.groupBy(['table_name']).agg(
+        SF.countDistinct('partition_name').alias('qty_modified_partitions'),
+        SF.countDistinct('file_name').alias('qty_modified_files'),
+        SF.min('file_size_in_bytes').alias('min_file_size_in_bytes'),
+        SF.percentile_approx("file_size_in_bytes", 0.25, SF.lit(1000000)).alias("q25_size_in_bytes"),
+        SF.percentile_approx("file_size_in_bytes", 0.50, SF.lit(1000000)).alias("q50_size_in_bytes"),
+        SF.percentile_approx("file_size_in_bytes", 0.75, SF.lit(1000000)).alias("q75_size_in_bytes"),
+        SF.max('file_size_in_bytes').alias('max_file_size_in_bytes'),
+        SF.avg('file_size_in_bytes').alias('avg_file_size_in_bytes'),
+        SF.sum(SF.when(SF.col("file_size_in_bytes") < 1000000, 1).otherwise(0)).alias("qty_smaller_than_1mb"),
+        SF.sum(SF.when(SF.col("file_size_in_bytes") > 1000000000, 1).otherwise(0)).alias("qty_bigger_than_1gb"),
+        SF.sum('file_size_in_bytes').alias('total_modified_files_size_in_bytes')
     )
 
 
@@ -168,14 +180,15 @@ def find_recently_modified_files(
     datalake_bucket: str, dw_bucket: str, execution_date: datetime
 ) -> DataFrame:
     layers = [
-        {"bucket": datalake_bucket, "layer_prefix": "clean"},
-        {"bucket": datalake_bucket, "layer_prefix": "enrich"},
-        {"bucket": dw_bucket, "layer_prefix": ""},
+        {"bucket": datalake_bucket_data_acc, "layer_prefix": "clean"},
+        {"bucket": datalake_bucket_data_acc, "layer_prefix": "enrich"},
+        {"bucket": dw_bucket_data_acc, "layer_prefix": ""},
     ]
     s3_client = boto3.client("s3")
     s3_paginator = s3_client.get_paginator("list_objects_v2")
     df = None
     for layer in layers:
+        print(layer)
         layer_df = find_recently_modified_files_by_layer_prefix(
             layer["bucket"], layer["layer_prefix"], execution_date, s3_paginator
         )
@@ -202,7 +215,7 @@ def enrich_table_data_frame_with_file_size_infos(
     )
     return data_frame.join(
         file_info_data_frame,
-        file_info_data_frame.file_name == data_frame.files_location,
+        file_info_data_frame.table_name == data_frame.files_location,
         "left",
     ).select(
         "table",
@@ -210,9 +223,17 @@ def enrich_table_data_frame_with_file_size_infos(
         "task",
         "layer",
         "files_location",
+        "qty_modified_partitions",
+        "qty_modified_files",
+        "min_file_size_in_bytes",
+        "q25_size_in_bytes",
+        "q50_size_in_bytes",
+        "q75_size_in_bytes",
+        "max_file_size_in_bytes",
+        "avg_file_size_in_bytes",
         "qty_smaller_than_1mb",
         "qty_bigger_than_1gb",
-        "qty_total_files",
+        "total_modified_files_size_in_bytes",
         "year",
         "month",
         "day",
@@ -256,6 +277,8 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("dw_bucket")
+    parser.add_argument("datalake_bucket_data_acc")
+    parser.add_argument("dw_bucket_data_acc")
     parser.add_argument("source")
     parser.add_argument("table_name")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
@@ -264,6 +287,8 @@ if __name__ == "__main__":
     environment = args.env
     datalake_bucket = args.datalake_bucket
     dw_bucket = args.dw_bucket
+    datalake_bucket_data_acc = args.datalake_bucket_data_acc
+    dw_bucket_data_acc = args.dw_bucket_data_acc
     source = args.source
     table_name = args.table_name
     execution_date = datetime.strptime(args.execution_date, "%Y-%m-%d")

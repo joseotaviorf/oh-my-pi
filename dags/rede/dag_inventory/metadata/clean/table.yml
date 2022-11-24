@@ -17,15 +17,39 @@ columns:
   files_location:
     lineage:
       - datalake_dag_inventory_raw.table.files_location
+  qty_modified_partitions:
+    lineage:
+      - datalake_dag_inventory_raw.table.qty_modified_partitions
+  qty_modified_files:
+    lineage:
+      - datalake_dag_inventory_raw.table.qty_modified_files
+  min_file_size_in_bytes:
+    lineage:
+      - datalake_dag_inventory_raw.table.min_file_size_in_bytes
+  q25_size_in_bytes:
+    lineage:
+      - datalake_dag_inventory_raw.table.q25_size_in_bytes
+  q50_size_in_bytes:
+    lineage:
+      - datalake_dag_inventory_raw.table.q50_size_in_bytes
+  q75_size_in_bytes:
+    lineage:
+      - datalake_dag_inventory_raw.table.q75_size_in_bytes
+  max_file_size_in_bytes:
+    lineage:
+      - datalake_dag_inventory_raw.table.max_file_size_in_bytes
+  avg_file_size_in_bytes:
+    lineage:
+      - datalake_dag_inventory_raw.table.avg_file_size_in_bytes
   qty_smaller_than_1mb:
     lineage:
       - datalake_dag_inventory_raw.table.qty_smaller_than_1mb
   qty_bigger_than_1gb:
     lineage:
       - datalake_dag_inventory_raw.table.qty_bigger_than_1gb
-  qty_total_files:
+  total_modified_files_size_in_bytes:
     lineage:
-      - datalake_dag_inventory_raw.table.qty_total_files
+      - datalake_dag_inventory_raw.table.total_modified_files_size_in_bytes
   year:
     lineage:
       - datalake_dag_inventory_raw.table.year
