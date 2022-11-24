@@ -1,17 +1,23 @@
-from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
-from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
+from os.path import join, dirname
 
+from pyspark.sql.utils import AnalysisException
+from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
+
+from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.validation_suites.executors.gsheets_validation_suites_executor import (
     GsheetsValidationSuitesExecutor,
 )
-from bietlejuice.dags import COMPOSER_DAGS_PATH
-
-from pyspark.sql.utils import AnalysisException
+from dags import DAG_PACKAGES_ROOT
 
 
 class GSheetValidationSuite(GsheetsValidationSuitesExecutor):
+    DAG_NAME = "gsheets"
     REPOSITORY_CONSUMER_CLASS = GoogleSheetsClient
-    GSHEETS_FILES_PATH = COMPOSER_DAGS_PATH + "/gsheets/gsheets_files.yaml"
+    gsheets_path = DAGPackagesPathService.get_dag_path(DAG_NAME)
+    GSHEETS_FILES_PATH = join(
+        dirname(DAG_PACKAGES_ROOT), gsheets_path, "gsheets_files.yaml"
+    )
     SLACK_MSG_TEMPLATE = """:sheets: Sheet: <{}|{}> (ID: {})\n\t_Last modifier: {} - <@{}> - {}. Owner team: {}._\n\tError: ```{}```"""
     SLACK_MSG_TEMPLATE_SMALL = """:sheets: Sheet: <{}|{}> (ID: {})\n _Owner team: {}._\n\tError: *Other related errors, please contact the Analytics Engineering owner team.*"""
 
@@ -31,6 +37,7 @@ class GSheetValidationSuite(GsheetsValidationSuitesExecutor):
         """
         try:
             self._run_sheet_validation(
+                self.DAG_NAME,
                 _sheet_info["sheet_id"],
                 _sheet_info["sheet_name"],
                 _sheet_info.get("sheet_context"),

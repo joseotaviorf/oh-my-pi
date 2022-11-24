@@ -118,6 +118,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
 
     def _run_sheet_validation(
         self,
+        dag_name: str,
         sheet_id: str,
         sheet_name: str,
         gsheets_context: str,
@@ -139,5 +140,10 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         )
 
         self.gsheets_service.validate_clean_query_against_raw(
-            spark_client, df, gsheets_context, raw_table_name, clean_table_name
+            dag_name,
+            spark_client,
+            df,
+            gsheets_context,
+            raw_table_name,
+            clean_table_name,
         )

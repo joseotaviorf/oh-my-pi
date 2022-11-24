@@ -10,6 +10,7 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.base.airflow import BaseDAG
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services import FileService
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -25,9 +26,10 @@ class GsheetsDAGFactory:
     ENV = os.environ.get("ENVIRONMENT")
     MAIN_START_DATE = datetime(2022, 2, 10, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-    GOOGLE_FILES_YAML_PATH = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), "gsheets_files.yaml"
+    gsheets_by_context_path = DAGPackagesPathService.get_dag_path(
+        dag_name="gsheets_by_context"
     )
+    GOOGLE_FILES_YAML_PATH = os.path.join(gsheets_by_context_path, "gsheets_files.yaml")
     GOOGLE_FILES = FileService.get_dict_from_yaml_file(GOOGLE_FILES_YAML_PATH)
 
     DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
@@ -251,7 +253,7 @@ class GsheetsDAGFactory:
             access_control_list=self.DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
         )
 
-        task_group = DatalakeTaskGroup(
+        raw_task_group = DatalakeTaskGroup(
             dag=dag,
             env=self.ENV,
             datalake_bucket=self.datalake_bucket,
@@ -266,11 +268,20 @@ class GsheetsDAGFactory:
             self.task_pool,
             self.raw_spark_job_path,
             create_cluster_task,
-            task_group,
+            raw_task_group,
             f"{dag_context}/",
         )
 
-        clean_task_groups = task_group.build_task_group_from_sql_files(
+        clean_task_group = DatalakeTaskGroup(
+            dag=dag,
+            env=self.ENV,
+            datalake_bucket=self.datalake_bucket,
+            relative_query_path=self.source_with_context,
+            spark_jobs_path=self.base_spark_jobs_path,
+            athena_query_result_location=self.athena_query_results_bucket,
+        )
+
+        clean_task_groups = clean_task_group.build_task_group_from_sql_files(
             layer=LayerEnum.CLEAN,
             source_database_base_name=self.source,
             target_database_base_name=self.source,

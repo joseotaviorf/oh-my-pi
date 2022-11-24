@@ -1,0 +1,5 @@
+---
+database_name: datalake_gsheets_clean
+table_name: proj_agent_manager
+columns:
+  

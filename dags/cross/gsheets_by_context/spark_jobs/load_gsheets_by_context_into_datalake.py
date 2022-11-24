@@ -122,6 +122,7 @@ if __name__ == "__main__":
         )
         # validate data before loading
         GsheetsService().validate_clean_query_against_raw(
+            "gsheets_by_context",
             spark_client,
             df,
             sheet_details.get("sheet_context"),

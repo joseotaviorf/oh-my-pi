@@ -3,22 +3,21 @@ import logging
 import os
 import re
 import time
-from typing import List, Optional, Union
 from datetime import datetime, timedelta
-import pendulum
-
-from bietlejuice.base.paths import DATALAKE_SQL_DIR
-from bietlejuice.dags import gsheets, gsheets_by_context
-from bietlejuice.services import FileService
-from dags import DAG_PACKAGES_ROOT
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.consumers.db_consumers import DatabricksConsumer
-
-from quintoandar_logger import QuintoAndarLogger
-from quintoandar_gsheets_api_client import GoogleSheetsClient
+from os.path import join
+from typing import List, Optional, Union
 
 import pandas as pd
+import pendulum
 from pyspark.sql import DataFrame
+from quintoandar_gsheets_api_client import GoogleSheetsClient
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.consumers.db_consumers import DatabricksConsumer
+from bietlejuice.services import FileService
+from dags import DAG_PACKAGES_ROOT
 
 JOB_NAME = "gsheets_service"
 
@@ -28,12 +27,11 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 DEPS_YAML_PATH = os.path.join(DAG_PACKAGES_ROOT, "dependencies.yaml")
 
-GENERIC_GSHEETS_FILES_YAML_PATH = (
-    os.path.dirname(os.path.realpath(gsheets.__file__)) + "/gsheets_files.yaml"
+GENERIC_GSHEETS_FILES_YAML_PATH = join(
+    DAGPackagesPathService.get_dag_path("gsheets"), "gsheets_files.yaml"
 )
-CONTEXT_GSHEETS_FILES_YAML_PATH = (
-    os.path.dirname(os.path.realpath(gsheets_by_context.__file__))
-    + "/gsheets_files.yaml"
+CONTEXT_GSHEETS_FILES_YAML_PATH = join(
+    DAGPackagesPathService.get_dag_path("gsheets_by_context"), "gsheets_files.yaml"
 )
 
 
@@ -183,16 +181,21 @@ class GsheetsService:
 
     @staticmethod
     def load_clean_query(
-        clean_table_name: str, gsheets_context: Optional[str] = None
+        clean_table_name: str, dag_name: str, gsheets_context: Optional[str] = None
     ) -> str:
         """
+        :param dag_name: The DAG (Package) name
         :param clean_table_name: Table name for sheet on clean layer
         :param gsheets_context: Sheet Context. Optional.
         """
         context_level = f"{gsheets_context}/" if gsheets_context else ""
-        query_path = f"{DATALAKE_SQL_DIR}/queries/gsheets/clean/{context_level}{clean_table_name}.sql"
-        query_content = FileService.get_query_from_file_name(query_path)
 
+        query_content = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+            dag_name=dag_name,
+            table_name=clean_table_name,
+            layer="clean",
+            intermediate_path=context_level,
+        )
         return query_content
 
     def swap_raw_table_with_temporary(
@@ -227,6 +230,7 @@ class GsheetsService:
 
     def run_and_validate_clean_query(
         self,
+        dag_name,
         spark_client: SparkClient,
         gsheets_context: str,
         clean_table_name: str,
@@ -235,6 +239,7 @@ class GsheetsService:
         """
         Loads clean table from path and tries to run it in the previously
          created temp table.
+        :param dag_name: Used to find the query file according to the DAG Package
         :param spark_client: A client to handle the Spark connection
         :param gsheets_context: Sheet Context. Optional.
         :param clean_table_name: Table name for sheet on clean layer
@@ -242,7 +247,7 @@ class GsheetsService:
 
         Returns True if the validation succeeded. Else an error is raised.
         """
-        clean_query = self.load_clean_query(clean_table_name, gsheets_context)
+        clean_query = self.load_clean_query(clean_table_name, dag_name, gsheets_context)
         clean_query = self.swap_raw_table_with_temporary(
             raw_table_name, clean_table_name, clean_query
         )
@@ -267,6 +272,7 @@ class GsheetsService:
 
     def validate_clean_query_against_raw(
         self,
+        dag_name,
         spark_client: SparkClient,
         df: DataFrame,
         gsheet_context: str,
@@ -275,6 +281,7 @@ class GsheetsService:
     ) -> None:
         """
         Loads raw Dataframe into an temporary view and validates clean query against it
+        :param dag_name: Used to find the query file according to the DAG Package
         :param spark_client: A client to handle the Spark connection
         :param df: Spark Dataframe with google sheets data.
         :param gsheets_context: Sheet Context. Optional.
@@ -284,6 +291,6 @@ class GsheetsService:
 
         df.createTempView(f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}")
         self.run_and_validate_clean_query(
-            spark_client, gsheet_context, clean_table_name, raw_table_name
+            dag_name, spark_client, gsheet_context, clean_table_name, raw_table_name
         )
         self.release_memory(spark_client, df, clean_table_name)

@@ -1,9 +1,10 @@
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+
+from bietlejuice.base.airflow.dag_builders.gsheets.gsheets_factory import GsheetsDAGFactory
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.dags.gsheets_by_context.gsheets_factory import GsheetsDAGFactory
 from bietlejuice.services.configuration_service import ConfigurationService
 
 SOURCE = "gsheets"
