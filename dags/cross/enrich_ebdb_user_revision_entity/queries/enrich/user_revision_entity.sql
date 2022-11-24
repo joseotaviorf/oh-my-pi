@@ -1,11 +1,8 @@
-select
+SELECT
   id,
   id_user,
   reason,
   -- Adding milliseconds to ts_revision default timestamp format
-  cast(
-    from_unixtime(ts_revision/1000) +
-    (ts_revision % 1000) * interval 1 milliseconds
-  as timestamp) as ts_revision
-from 
+  DATEADD(MILLISECOND, ts_revision % 1000, TIMESTAMP(FROM_UNIXTIME(ts_revision/1000))) AS ts_revision
+FROM 
   datalake_ebdb_clean.user_revision_entity
