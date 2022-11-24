@@ -1617,7 +1617,7 @@ bietlejuice.enrich_customer_demand:
   - bietlejuice.gsheets.support_and_service:load-clean-tag-sla-target
   - bietlejuice.gsheets.support_and_service:load-clean-taxonomy-sla
   - bietlejuice.gsheets.support_and_service:load-clean-service-city-holidays
-  - bietlejuice.reclameaqui:load-clean-tickets
+  # - bietlejuice.reclameaqui:load-clean-tickets
 
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-credit-evaluation
