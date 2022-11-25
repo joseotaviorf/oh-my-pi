@@ -34,7 +34,6 @@ WITH weekly_listings AS (
                 AND hldi.is_for_sale = FALSE THEN 'For Rent'
         END AS hybrid,
         hldi.listing_category AS listing_category_start,
-        COALESCE(LAG(hldi.listing_category) OVER(PARTITION BY hldi.id_house ORDER BY hldi.id_house_listing), 'indisponivel') AS listing_category_previous,
         hldi.status_change_reason,
         CASE
             WHEN hldi.status_history = 'suspenso' 
@@ -43,6 +42,12 @@ WITH weekly_listings AS (
                 AND LOWER(status_change_reason) RLIKE 'disabled|erro ao|despublicação automática após rescisão|\\[auto\\] \\[rescisao\\]' THEN 'opt out / erro' -- casos de despublicação após aluguel sem re-publicação não são churn
             ELSE hldi.status_history
         END AS status_history,
+        -- When we have transitions between listings, we endup with two listings registered
+        -- on the same day, but for coincidents what matters is just the last status of this
+        -- house on this week, so we need to guaranteee that we are getting only the last listing.
+        -- In addition, two listings in the same week would do the LAG to calculate last status
+        -- randomic, we are partitioning by house and ordering by week.
+        MAX(hldi.id_house_listing) OVER(PARTITION BY hldi.id_house, hldi.dt_day) = hldi.id_house_listing AS is_last_listing_on_day,
         IF(DATE(DATE_TRUNC('week', hldi.ts_status_started)) = d.week_start, TRUE, FALSE) AS is_status_started_on_week,
         d.week_start AS dt_week,
         DATE(DATE_TRUNC('week', hldi.ts_status_started)) AS dt_week_status_started,
@@ -98,7 +103,7 @@ weekly_listings_mkt AS (
         wl.exclusivity,
         wl.hybrid,
         wl.listing_category_start,
-        wl.listing_category_previous,
+        COALESCE(LAG(wl.listing_category_start) OVER(PARTITION BY wl.id_house ORDER BY wl.id_house_listing), 'indisponivel') AS listing_category_previous,
         mkt.mkt_completion,
         mkt.mkt_origin,
         wl.status_history,
@@ -116,6 +121,8 @@ weekly_listings_mkt AS (
         dw_public.dim_contract AS dc
             ON wl.id_contract = dc.sk_contract
             AND dc.ts_signature IS NOT NULL
+    WHERE
+        wl.is_last_listing_on_day = True
 ),
 weekly_listings_base AS ( 
     SELECT
