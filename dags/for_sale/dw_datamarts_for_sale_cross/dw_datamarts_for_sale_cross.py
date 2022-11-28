@@ -1,55 +1,45 @@
 import os
 from datetime import datetime
+from pendulum import timezone
 
-import airflow.utils.helpers as airflow_helpers
-import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
+    QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG
-from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
+from bietlejuice.base.databricks import ClusterPermissionEnum, DatabricksGroupNameEnum
 
-# DAG params
+# Pipeline inputs
 CONTEXT = "for_sale_cross"
+DW_SCHEMA = f"datamarts_{CONTEXT}"
 DAG_NAME = f"dw_datamarts_{CONTEXT}"
-DAG_ID = f"bietlejuice.dw_datamarts_{CONTEXT}"
-ENV = os.environ.get("ENVIRONMENT")
+DAG_ID = f"bietlejuice.{DAG_NAME}"
+MAIN_START_DATE = datetime(2020, 1, 15, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = None
+CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_cluster"
 
-config_service = ConfigurationService(dag_name=DAG_NAME)
-default_libraries = config_service.get_config("default_libraries")
+config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 dw_bucket = config_service.get_config("dw_bucket")
+spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
-spectrum_iam_role = config_service.get_config("spectrum_iam_role")
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
 
-
-local_tz = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2020, 1, 15, 0, 0, 0, tzinfo=local_tz)
-
-# S3 paths setup
-SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}/"
-BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-
-# cluster setup
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+dw_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}/"
+pipeline_config = config_service.get_config("pipeline") or {}
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -57,55 +47,78 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
-
-pipeline_config = config_service.get_config("pipeline") or {}
-
-DW_SCHEMA = f"datamarts_{CONTEXT}"
+ENV = os.environ.get("ENVIRONMENT")
 
 
-def validate_pipeline_steps(entity_name, entity_pipeline):
-    if "dw" not in entity_pipeline:
-        raise RuntimeError(
-            f"m=validate_pipeline_steps, entity={entity_name}, msg=you must provide the dw "
-            f"step configuration for this entity."
-        )
+dag = DAG(
+    dag_id=DAG_ID,
+    default_args={
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
+        "wait_for_downstream": False,
+        "depends_on_past": False,
+    },
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    ),
+)
+
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_configuration,
+    libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+)
+
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
 
 
-def get_option(task_configs, option_key):
-    """
-    Extract the task configuration from YAML file and check for missing config params.
-    :param task_configs: the pipeline configs from YAML
-    :param option_key: The YAML property
-    :return: string
-    """
+def build_tasks_dependency(create_cluster_task, terminate_cluster_task, entities_tasks):
+    dependencies_list = []
+    for entity_name, entity_pipeline in pipeline_config.items():
+        dependencies = entity_pipeline["dw"].get("depends_on", [])
+        dependencies_list += dependencies
+        entity_task = entities_tasks[entity_name]
 
-    option = task_configs.get(option_key, False)
-    if not option:
-        raise RuntimeError(
-            f"m=get_option, yaml_property={option},  msg=Config not found. You must "
+        if not dependencies:
+            create_cluster_task >> entity_task["first_task"]
+        else:
+            for dep_entity_name in dependencies:
+                dep_task = entities_tasks[dep_entity_name]
+                entity_task["first_task"].set_upstream(dep_task["last_tasks"])
+
+    dependencies_list = list(set(dependencies_list))
+    for entity_name, entity_pipeline in pipeline_config.items():
+        entity_task = entities_tasks[entity_name]
+        if entity_name not in dependencies_list:
+            terminate_cluster_task.set_upstream(entity_task["last_tasks"])
+
+
+entities_tasks = {}
+for entity_name, entity_pipeline in pipeline_config.items():
+    dw_workflow_config = entity_pipeline["dw"]
+    try:
+        table = dw_workflow_config["table"]
+        runs_on = dw_workflow_config["runs_on"]
+    except KeyError as ex:
+        raise KeyError(
+            f"m=build_table_tasks, key_not_found={ex.args[0]}, msg=Config not found. You must "
             f"provide all the required task configs in the pipeline configuration in "
             f"the YAML file."
         )
-
-    return option
-
-
-def build_table_tasks(entity_name, entity_pipeline):
-
-    validate_pipeline_steps(entity_name, entity_pipeline)
-
-    table = get_option(entity_pipeline["dw"], "table")
-    runs_on = get_option(entity_pipeline["dw"], "runs_on")
-    pool = "datamarts_redshift" if runs_on == "redshift" else "datamarts_athena"
 
     slugged_table_name = table.replace("_", "-")
     create_table_in_datalake_task = QuintoAndarDatabricksSubmitRunOperator(
         dag=dag,
         task_id=f"create-{slugged_table_name}-in-datalake",
-        pool=pool,
+        pool=f"datamarts_{runs_on}",
         json={
             "spark_python_task": {
-                "python_file": f"{SPARK_JOBS_PATH}create_datamart_table_in_datalake.py",
+                "python_file": f"{dw_spark_jobs_path}create_datamart_table_in_datalake.py",
                 "parameters": [
                     ENV,
                     dw_bucket,
@@ -124,8 +137,7 @@ def build_table_tasks(entity_name, entity_pipeline):
         dag=dag,
         json={
             "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH
-                + "sync_metastore_tables_structure.py",
+                "python_file": f"{base_spark_jobs_path}sync_metastore_tables_structure.py",
                 "parameters": [
                     dw_bucket,
                     LayerEnum.DW.value,
@@ -142,8 +154,7 @@ def build_table_tasks(entity_name, entity_pipeline):
         dag=dag,
         json={
             "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH
-                + "sync_metastore_tables_partitions.py",
+                "python_file": f"{base_spark_jobs_path}sync_metastore_tables_partitions.py",
                 "parameters": [
                     dw_bucket,
                     LayerEnum.DW.value,
@@ -161,7 +172,7 @@ def build_table_tasks(entity_name, entity_pipeline):
             task_id=f"propagate-table-metadata-dw-{slugged_table_name}",
             json={
                 "spark_python_task": {
-                    "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_table_metadata.py",
+                    "python_file": f"{base_spark_jobs_path}propagate_table_metadata.py",
                     "parameters": [
                         LayerEnum.DW.value,
                         MetadataTypeEnum.LINEAGE.value,
@@ -172,12 +183,14 @@ def build_table_tasks(entity_name, entity_pipeline):
             },
         )
 
-        sync_metastore_table_partitions_task >> propagate_table_metadata_task
+        sync_metastore_table_partitions_task.set_downstream(
+            propagate_table_metadata_task
+        )
         last_tasks = [propagate_table_metadata_task]
     else:
         last_tasks = [sync_metastore_table_partitions_task]
 
-    airflow_helpers.chain(
+    chain(
         create_table_in_datalake_task,
         sync_metastore_table_structure_task,
         sync_metastore_table_partitions_task,
@@ -189,7 +202,7 @@ def build_table_tasks(entity_name, entity_pipeline):
             task_id=f"load-{slugged_table_name}-into-redshift",
             json={
                 "spark_python_task": {
-                    "python_file": f"{SPARK_JOBS_PATH}load_datamart_table_into_redshift.py",
+                    "python_file": f"{dw_spark_jobs_path}load_datamart_table_into_redshift.py",
                     "parameters": [ENV, dw_bucket, spectrum_iam_role, DW_SCHEMA, table],
                 }
             },
@@ -197,77 +210,13 @@ def build_table_tasks(entity_name, entity_pipeline):
         create_table_in_datalake_task.set_downstream(load_table_into_redshift_task)
         last_tasks.append(load_table_into_redshift_task)
 
-    return {
-        entity_name: {
-            "first_task": create_table_in_datalake_task,
-            "last_tasks": last_tasks,
+    entities_tasks.update(
+        {
+            entity_name: {
+                "first_task": create_table_in_datalake_task,
+                "last_tasks": last_tasks,
+            }
         }
-    }
+    )
 
-
-# DAG definition
-dag = DAG(
-    dag_id=DAG_ID,
-    default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_SALE,
-        "wait_for_downstream": False,
-        "depends_on_past": False,
-    },
-    start_date=MAIN_START_DATE,
-    schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
-    ),
-)
-
-# Tasks definition
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
-    libraries=default_libraries,
-)
-
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
-)
-
-
-def build_tasks():
-    entities_tasks = {}
-    for entity_name, entity_pipeline in pipeline_config.items():
-        entity_tasks = build_table_tasks(entity_name, entity_pipeline)
-        entities_tasks.update(entity_tasks)
-
-    return entities_tasks
-
-
-def build_tasks_dependency(create_cluster_task, terminate_cluster_task, entities_tasks):
-    dependencies_list = []
-    for entity_name, entity_pipeline in pipeline_config.items():
-        dependencies = entity_pipeline["dw"].get("depends_on", [])
-        dependencies_list += dependencies
-        entity_task = entities_tasks[entity_name]  # DAG.task_dict[entity_name]
-
-        if not dependencies:
-            create_cluster_task >> entity_task["first_task"]
-        else:
-            for dep_entity_name in dependencies:
-                dep_task = entities_tasks[
-                    dep_entity_name
-                ]  # DAG.task_dict[dep_entity_name]
-                entity_task["first_task"].set_upstream(dep_task["last_tasks"])
-
-    dependencies_list = list(set(dependencies_list))
-    for entity_name, entity_pipeline in pipeline_config.items():
-        entity_task = entities_tasks[entity_name]  # DAG.task_dict[entity_name]
-        if entity_name not in dependencies_list:
-            terminate_cluster_task.set_upstream(entity_task["last_tasks"])
-
-
-if pipeline_config and pipeline_config.items():
-    entities_tasks = build_tasks()
-    build_tasks_dependency(create_cluster_task, terminate_cluster_task, entities_tasks)
-else:
-    create_cluster_task >> terminate_cluster_task
+build_tasks_dependency(create_cluster_task, terminate_cluster_task, entities_tasks)
