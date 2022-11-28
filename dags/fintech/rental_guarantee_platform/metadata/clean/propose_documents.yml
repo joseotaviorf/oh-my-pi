@@ -1,0 +1,37 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: propose_documents
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_documents.id
+  id_user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_documents.userinsert
+  id_user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_documents.userupdate
+  id_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_documents.propose
+  id_document:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_documents.document
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_documents.active
+  ts_inserted:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_documents.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_documents.dateupdate
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_documents.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_documents.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_documents.day

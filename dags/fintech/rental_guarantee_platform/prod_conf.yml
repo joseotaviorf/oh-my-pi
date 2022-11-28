@@ -68,4 +68,40 @@ tables:
     date_filter_column: updated_at
   - table_name: user_account_aud
     date_filter_column: created_at
+  - table_name: bussines_type # here and bellow we have the Velo 3.0 tables.
+    date_filter_column: dateupdate
+  #- table_name: contract
+    #date_filter_column: dateupdate
+  #- table_name: contract_status
+    #date_filter_column: dateupdate
+  - table_name: document_status
+    date_filter_column: dateupdate
+  - table_name: document_type
+    date_filter_column: dateupdate
+  - table_name: documents
+    date_filter_column: dateupdate
+  - table_name: history_type
+    date_filter_column: dateupdate
+  - table_name: item_type
+    date_filter_column: dateupdate
+  - table_name: person_documents
+    date_filter_column: dateupdate
+  - table_name: plans
+    date_filter_column: dateupdate
+  #- table_name: property
+    #date_filter_column: dateupdate
+  - table_name: property_type
+    date_filter_column: dateupdate
+  - table_name: propose
+    date_filter_column: dateupdate
+  - table_name: propose_documents
+    date_filter_column: dateupdate
+  - table_name: propose_history
+    date_filter_column: dateupdate
+  - table_name: propose_item
+    date_filter_column: dateupdate
+  - table_name: propose_person
+    date_filter_column: dateupdate
+  - table_name: propose_person_type
+    date_filter_column: dateupdate
 partition_cols: ["year", "month", "day"]

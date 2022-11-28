@@ -1,0 +1,43 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: propose_history
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.id
+  id_user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.userinsert
+  id_user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.userupdate
+  id_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.propose
+  id_history_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.type
+  value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.value
+  old_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.old_value
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.active
+  ts_inserted:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.dateupdate
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_history.day

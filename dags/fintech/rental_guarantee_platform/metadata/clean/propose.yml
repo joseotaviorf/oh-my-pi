@@ -1,0 +1,55 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: propose
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.id
+  id_user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.userinsert
+  id_user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.userupdate
+  id_business_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.type
+  id_propose_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.status
+  id_real_estate:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.realestate
+  id_plan:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.plan
+  id_activator:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.activator
+  realtor:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.realtor
+  hash:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.hash
+  external_ref:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.externalref
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.active
+  ts_inserted:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.dateupdate
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.day

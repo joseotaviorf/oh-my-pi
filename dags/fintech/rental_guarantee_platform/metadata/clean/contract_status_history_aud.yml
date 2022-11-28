@@ -29,12 +29,12 @@ columns:
   mod_id_contract:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_status_history_aud.contract_id_mod
-  mod_id_edited_by_person:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.mod_edited_by_person
   mod_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_status_history_aud.status_mod
+  mod_id_edited_by_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.edited_by_person_mod
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_status_history_aud.created_at

@@ -1,0 +1,34 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: document_type
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.document_type.id
+  id_user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.document_type.userinsert
+  id_user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.document_type.userupdate
+  name:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.document_type.name
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.document_type.active
+  ts_inserted:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.document_type.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.document_type.dateupdate
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.document_type.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.document_type.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.document_type.day
