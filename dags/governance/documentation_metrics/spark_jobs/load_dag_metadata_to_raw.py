@@ -60,9 +60,12 @@ def get_dag_metadata_df(
     dag_metadata_data = get_dag_metadata(
         lineage_from_product_skip_list, dag_manual_mapping, env
     )
+
     metadata_df = spark_client.create_dataframe(
-        Row(**row) for row in dag_metadata_data
+        [Row(**row) for row in dag_metadata_data],
+        schema="layer string, dag_name string, database_name string, has_lineage_from_product boolean, owner string"
     ).drop("columns")
+
     return metadata_df
 
 
