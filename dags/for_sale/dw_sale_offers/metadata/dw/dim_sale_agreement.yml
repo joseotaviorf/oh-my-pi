@@ -59,6 +59,9 @@ columns:
   credit_model:
     lineage:
       - datalake_offer.sale_offer.credit_model
+  ccv_model:
+    lineage:
+      - datalake_offer.sale_offer.is_ccv_5a_model
   early_keys_status:
     lineage:
       - datalake_offer.sale_offer.early_keys_status
@@ -132,7 +135,7 @@ columns:
     lineage:
       - datalake_offer.sale_offer.is_3p_demand
   is_a_rescued_ccv:
-    lineage: 
+    lineage:
       - datalake_offer.sale_offer.is_a_rescued_ccv
   ts_sale_agreement_signed:
     lineage:

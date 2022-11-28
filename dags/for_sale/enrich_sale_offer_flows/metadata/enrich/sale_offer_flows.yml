@@ -252,6 +252,9 @@ columns:
   is_ccv_canceled:
     lineage:
       - datalake_sales_flow_clean.sales_flow.is_canceled
+  is_ccv_5a_model:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.is_5a_model
   dt_sale_agreement_created:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.ts_confection_started

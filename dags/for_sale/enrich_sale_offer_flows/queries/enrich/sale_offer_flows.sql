@@ -178,6 +178,7 @@ ccv_flow AS (
         ccv_flow.id_ccv_flow,
         ccv_flow.id_sales_flow,
         ccv_flow.status,
+        ccv_flow.is_5a_model,
         DATE(ts_confection_started) AS dt_confection_started,
         DATE(ts_signed) AS dt_sale_agreement_signed
     FROM
@@ -722,6 +723,7 @@ SELECT
     ) AS is_ccv_canceled,
     rf.is_a_rescued_ccv,
     rf.is_a_rescued_offer,
+    ccvf.is_5a_model AS is_ccv_5a_model,
     ccvf.dt_confection_started AS dt_sale_agreement_created,
     ccvf.dt_sale_agreement_signed AS dt_sale_agreement_signed,
     DATE(rf.ts_sale_agreement_canceled) AS dt_sale_agreement_cancelled,

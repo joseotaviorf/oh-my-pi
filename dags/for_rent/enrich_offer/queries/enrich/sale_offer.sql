@@ -120,7 +120,7 @@ work_contract AS (
         ac.work_contract_name AS contract_name,
         ac.ts_work_contract_started AS ts_work_contract_start,
         COALESCE(ac.ts_work_contract_ended, CURRENT_DATE) AS ts_work_contract_end
-    FROM 
+    FROM
         datalake_ebdb_agents.agent_contract AS ac
     LEFT JOIN
         datalake_ebdb_work_contract.work_contract AS wc
@@ -312,9 +312,10 @@ data_sources AS (
         vo.tags_from_salesflow AS vo_tags_from_salesflow,
         vo.has_seller_debt_payments AS vo_has_seller_debt_payments,
         vo.is_ccv_canceled AS vo_is_ccv_canceled,
-        vo.is_a_rescued_ccv AS vo_is_a_rescued_ccv, 
-        vo.is_a_rescued_offer AS vo_is_a_rescued_offer, 
-        vo.dt_sale_agreement_rescued AS vo_dt_sale_agreement_rescued, 
+        vo.is_a_rescued_ccv AS vo_is_a_rescued_ccv,
+        vo.is_a_rescued_offer AS vo_is_a_rescued_offer,
+        vo.is_ccv_5a_model AS vo_is_ccv_5a_model,
+        vo.dt_sale_agreement_rescued AS vo_dt_sale_agreement_rescued,
         vo.dt_offer_rescued AS vo_dt_offer_rescued,
         vo.ts_last_updated_pendency AS vo_ts_last_updated_pendency,
         vo.dt_sale_transacton_paid AS vo_dt_sale_transacton_paid,
@@ -802,10 +803,11 @@ business_rules AS (
             WHEN ds.id_offer IS NOT NULL
                 THEN 'GIROFFER'
             ELSE 'NOT DEFINED'
-        END AS offer_platform, 
-        ds.vo_is_a_rescued_ccv AS is_a_rescued_ccv, 
-        ds.vo_is_a_rescued_offer AS is_a_rescued_offer, 
-        ds.vo_dt_sale_agreement_rescued AS dt_sale_agreement_rescued, 
+        END AS offer_platform,
+        ds.vo_is_a_rescued_ccv AS is_a_rescued_ccv,
+        ds.vo_is_a_rescued_offer AS is_a_rescued_offer,
+        ds.vo_is_ccv_5a_model AS is_ccv_5a_model,
+        ds.vo_dt_sale_agreement_rescued AS dt_sale_agreement_rescued,
         ds.vo_dt_offer_rescued AS dt_offer_rescued
     FROM
         data_sources AS ds
@@ -968,11 +970,12 @@ SELECT
     is_3p_supply_5a,
     is_3p_supply_bh,
     is_3p_demand,
-    is_a_rescued_ccv, 
-    is_a_rescued_offer, 
+    is_a_rescued_ccv,
+    is_a_rescued_offer,
+    is_ccv_5a_model,
     flg_booking_before_offer,
     flg_visit_completed_before_offer,
-    dt_sale_agreement_rescued, 
+    dt_sale_agreement_rescued,
     dt_offer_rescued,
     dt_sale_transacton_paid,
     dt_house_registry_ended,
