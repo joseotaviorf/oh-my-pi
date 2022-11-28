@@ -52,6 +52,8 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 
 tables = config_service.get_config("tables")
 partition_cols = config_service.get_config("partition_cols")
+dag_documentation = config_service.get_config("dag_documentation")
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -62,8 +64,12 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAGOwnerEnum.DATA_SS,
     ),
 )
 

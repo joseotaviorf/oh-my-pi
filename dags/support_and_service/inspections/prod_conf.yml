@@ -1,6 +1,12 @@
 ---
 partition_cols: ["year", "month", "day"]
 lineage_product_database_name: inspections
+dag_documentation:
+  dag_purpose:
+    "Retrieves data from the Inspections database (PostgreSQL). [Inspections](https://github.com/quintoandar/inspections-service)\n
+    is a micro service to inspections with this database we need to measure the lead time inspections, when inspector start and \n
+    finish inspection, if he follow the planner's route."
+
 tables:
   # <raw_table_name>:
   #   clean_table_name: <clean_table_name>
