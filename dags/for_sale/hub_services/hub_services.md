@@ -18,6 +18,8 @@ This pipeline produces, in datalake_hub_services_raw:
 Via **incremental load**:
     - `business_unit`
     - `business_unit_aud`
+    - `business_unit_region`
+    - `business_unit_region_aud`
     - `lead`
     - `lead_aud`
     - `member_profile`
@@ -39,6 +41,8 @@ This pipeline produces, in datalake_hub_services_clean:
 Via **incremental load**:
     - `business_unit`
     - `business_unit_aud`
+    - `business_unit_region`
+    - `business_unit_region_aud`
     - `lead`
     - `lead_aud`
     - `member_profile`

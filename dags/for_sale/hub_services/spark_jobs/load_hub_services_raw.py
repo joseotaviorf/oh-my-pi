@@ -6,9 +6,11 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatabaseEnum
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import PostgresConsumer
+from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -27,6 +29,7 @@ if __name__ == "__main__":
     parser.add_argument("table_name")
     parser.add_argument("date_filter_column", help="Date filter column")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
+    parser.add_argument("extraction_type")
     parser.add_argument(
         "unixtime_measure",
         nargs="?",
@@ -42,16 +45,18 @@ if __name__ == "__main__":
     table_name = args.table_name
     date_filter_column = args.date_filter_column
     execution_date = args.execution_date
+    extraction_type = args.extraction_type
     unixtime_measure = args.unixtime_measure
 
     config_service = ConfigurationService(source)
-    partition_cols = config_service.get_config("raw_partition_cols")
+    partition_cols = None if extraction_type == "full" else config_service.get_config("raw_partition_cols")
 
     logger.info(
         f"""
-        m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, source={source},
-        table_name={table_name}, raw_partition_cols={partition_cols}, date_filter_column={date_filter_column},
-        execution_date={execution_date}, unixtime_measure={unixtime_measure}, msg=Starting Spark job...
+        m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, 
+        source={source}, table_name={table_name}, raw_partition_cols={partition_cols}, 
+        date_filter_column={date_filter_column}, execution_date={execution_date}, 
+        extraction_type={extraction_type}, unixtime_measure={unixtime_measure}, msg=Starting Spark job...
         """
     )
 
@@ -80,36 +85,33 @@ if __name__ == "__main__":
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     s3_loader = S3Loader()
-
-    df = postgres_consumer.get_incremental_data_by_granularity_from_table(
-        table_name, date_filter_column, execution_date, unixtime_measure
-    )
-
     table_name = table_name.lower()
 
-    if not df.rdd.isEmpty():
-        logger.info("m=__main__, msg=RDD is not empty. Loading into S3.")
-
-        s3_loader.load_df(
-            df=df,
-            s3_path=f"{database_location}{table_name}",
-            format_options=format_options,
-            partitions=partition_cols,
-        )
-        spark_metastore_loader.update_metastore(
-            df,
-            database_name,
+    if extraction_type == "incremental":
+        df = postgres_consumer.get_incremental_data_by_granularity_from_table(
             table_name,
-            format_options,
-            database_location,
-            partition_cols,
-            force_recreate=False,
+            date_filter_column,
+            execution_date,
+            unixtime_measure,
         )
-        spark_metastore_service.create_new_partitions_from_df(
-            database_name=database_name,
-            table_name=table_name,
-            df=df,
-            partition_cols=partition_cols,
-        )
+        if not df.rdd.isEmpty():
+            logger.info("m=__main__, msg=RDD is not empty. Loading into S3.")
+            IncrementalTableLoaderPipeline(
+                database_name,
+                table_name,
+                database_location,
+                LayerEnum.RAW,
+                None,
+                partition_cols,
+            ).load_and_register(df, format_options)
+        else:
+            logger.info("m=__main__, msg=RDD is empty")          
     else:
-        logger.info("m=__main__, msg=RDD is empty")
+        df = postgres_consumer.get_data_from_table(table_name)
+        if not df.rdd.isEmpty():
+            logger.info("m=__main__, msg=RDD is not empty. Loading into S3.")
+            FullTableLoaderPipeline(
+                database_name, table_name, database_location, LayerEnum.RAW, None
+            ).load_and_register(df, format_options)
+        else:
+            logger.info("m=__main__, msg=RDD is empty")    
