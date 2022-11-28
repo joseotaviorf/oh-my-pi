@@ -1,0 +1,22 @@
+---
+database_name: datalake_ebdb_rental_administration
+table_name: rental_administrator_change_history
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.rental_administrator_change_request_aud.id_house
+  country_code:
+    lineage:
+      - datalake_ebdb_country.house.country_code
+  previous_rental_administrator:
+    lineage:
+      - datalake_ebdb_clean.rental_administrator_change_request_aud.old_rental_administrator
+  rental_administrator:
+    lineage:
+      - datalake_ebdb_clean.rental_administrator_change_request_aud.new_rental_administrator
+  ts_started:
+    lineage:
+      - datalake_ebdb_clean.rental_administrator_change_request_aud.ts_created
+  ts_ended:
+    lineage:
+      - datalake_ebdb_clean.rental_administrator_change_request_aud.ts_created

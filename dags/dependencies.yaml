@@ -1765,6 +1765,10 @@ bietlejuice.enrich_ebdb_rent_flow:
   - bietlejuice.ebdb:create-clean-visit-origin-in-data-lake
   - bietlejuice.ebdb:create-clean-visitor-in-data-lake
 
+bietlejuice.enrich_ebdb_rental_administration:
+  - bietlejuice.ebdb:create-clean-rental-administrator-change-request-aud-in-data-lake
+  - bietlejuice.enrich_ebdb_country:load-enrich-house
+
 bietlejuice.enrich_ebdb_smart_price:
   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-dynamic-pricing-house-aud-in-data-lake
