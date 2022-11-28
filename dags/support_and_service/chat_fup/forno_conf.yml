@@ -1,2 +1,19 @@
 ---
 lineage_product_database_name: chatfup
+partition_cols: [year, month, day]
+tables:
+  chats_chat:
+    partitioned: False
+  django_content_type:
+    partitioned: False
+  django_migrations:
+    partitioned: False
+  health_check_db_testmodel:
+    partitioned: False
+  rating:
+    partitioned: True
+    incremental_col: updated_at
+  surveys_answer:
+    partitioned: False
+  surveys_survey:
+    partitioned: False
