@@ -276,7 +276,7 @@ SELECT
   )) AS is_3p_supply_bh,
   (COALESCE(h.announced_by, h.id_announced_by) IS NOT NULL) AS is_imovel_v3,
   CASE 
-    WHEN (h.id_external LIKE '%[SCM%-%]%' OR h.internal_admin_info LIKE '%[SCM%-%]%') THEN TRUE
+    WHEN (h.id_external LIKE '%SCM%-%' OR h.internal_admin_info LIKE '%[SCM%-%]%') THEN TRUE
     WHEN h.id_user_registrant = 7212349 THEN TRUE -- For Casa Mineira migration, a single user was created to import the CM listings
     ELSE FALSE 
   END AS is_casa_mineira_migration,
