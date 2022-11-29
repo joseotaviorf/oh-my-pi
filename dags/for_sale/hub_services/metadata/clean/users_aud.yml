@@ -20,7 +20,7 @@ columns:
   id_external:
     lineage:
       - datalake_hub_services_raw.users_aud.external_id
-  hub_name:
+  name:
     lineage:
       - datalake_hub_services_raw.users_aud.name
   email:

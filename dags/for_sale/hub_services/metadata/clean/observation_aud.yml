@@ -7,6 +7,9 @@ columns:
   id_visitor:
     lineage:
       - datalake_hub_services_raw.observation_aud.visitor_id
+  id_creator:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.creator_id
   rev:
     lineage:
       - datalake_hub_services_raw.observation_aud.rev
@@ -19,15 +22,6 @@ columns:
   version:
     lineage:
       - datalake_hub_services_raw.observation_aud.version
-  creator_email:
-    lineage:
-      - datalake_hub_services_raw.observation_aud.creator_email
-  created_by:
-    lineage:
-      - datalake_hub_services_raw.observation_aud.created_by
-  creator_name:
-    lineage:
-      - datalake_hub_services_raw.observation_aud.creator_name
   value:
     lineage:
       - datalake_hub_services_raw.observation_aud.value
@@ -37,15 +31,9 @@ columns:
   mod_id_visitor:
     lineage:
       - datalake_hub_services_raw.observation_aud.visitor_id_mod
-  mod_created_by:
+  mod_id_creator:
     lineage:
-      - datalake_hub_services_raw.observation_aud.created_by_mod
-  mod_creator_name:
-    lineage:
-      - datalake_hub_services_raw.observation_aud.creator_name_mod
-  mod_creator_email:
-    lineage:
-      - datalake_hub_services_raw.observation_aud.creator_email_mod
+      - datalake_hub_services_raw.observation_aud.creator_id_mod
   ts_created:
     lineage:
       - datalake_hub_services_raw.observation_aud.created_at

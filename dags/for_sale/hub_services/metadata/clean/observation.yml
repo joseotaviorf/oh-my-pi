@@ -7,21 +7,15 @@ columns:
   id_visitor:
     lineage:
       - datalake_hub_services_raw.observation.visitor_id
+  id_creator:
+    lineage:
+      - datalake_hub_services_raw.observation.creator_id
   version:
     lineage:
       - datalake_hub_services_raw.observation.version
-  created_by:
-    lineage:
-      - datalake_hub_services_raw.observation.created_by
-  creator_name:
-    lineage:
-      - datalake_hub_services_raw.observation.creator_name
   value:
     lineage:
       - datalake_hub_services_raw.observation.value
-  creator_email:
-    lineage:
-      - datalake_hub_services_raw.observation.creator_email
   ts_created:
     lineage:
       - datalake_hub_services_raw.observation.created_at

@@ -9,25 +9,13 @@ columns:
       - datalake_hub_services_raw.responsible.lead_id
   id_responsible:
     lineage:
-      - datalake_hub_services_raw.responsible.responsible_id
+      - datalake_hub_services_raw.responsible.responsible
   id_distributor:
     lineage:
-      - datalake_hub_services_raw.responsible.distributor_id
+      - datalake_hub_services_raw.responsible.distributor
   version:
     lineage:
       - datalake_hub_services_raw.responsible.version
-  responsible_name:
-    lineage:
-      - datalake_hub_services_raw.responsible.responsible_name
-  distributor_name:
-    lineage:
-      - datalake_hub_services_raw.responsible.distributor_name
-  responsible_email:
-    lineage:
-      - datalake_hub_services_raw.responsible.responsible_email
-  distributor_email:
-    lineage:
-      - datalake_hub_services_raw.responsible.distributor_email
   is_active:
     lineage:
       - datalake_hub_services_raw.responsible.active

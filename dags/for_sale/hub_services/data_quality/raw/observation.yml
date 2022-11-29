@@ -9,10 +9,7 @@ column_level_validations:
   id:
     is_complete:
       severity_level: Error
-  created_by:
-    is_complete:
-      severity_level: Error
-  creator_name:
+  creator_id:
     is_complete:
       severity_level: Error
   value:

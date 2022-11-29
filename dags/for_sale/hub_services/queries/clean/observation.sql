@@ -1,11 +1,9 @@
 SELECT
     id,
     visitor_id AS id_visitor,
+    creator_id AS id_creator,
     version,
-    created_by,
-    creator_name,
     value,
-    creator_email,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

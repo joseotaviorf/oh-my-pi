@@ -5,7 +5,7 @@ SELECT
     revtype AS rev_type,
     version,
     external_id AS id_external,
-    name AS hub_name,
+    name,
     email,
     phone_number,
     email_mod AS mod_email,

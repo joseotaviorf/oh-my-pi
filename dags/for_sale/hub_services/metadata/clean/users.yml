@@ -10,7 +10,7 @@ columns:
   version:
     lineage:
       - datalake_hub_services_raw.users.version
-  hub_name:
+  name:
     lineage:
       - datalake_hub_services_raw.users.name
   email:

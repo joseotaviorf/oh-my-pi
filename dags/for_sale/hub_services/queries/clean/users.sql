@@ -2,7 +2,7 @@ SELECT
     id,
     external_id AS id_external,
     version,
-    name AS hub_name,
+    name,
     email,
     phone_number,
     created_at AS ts_created,

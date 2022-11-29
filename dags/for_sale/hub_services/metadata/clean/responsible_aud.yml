@@ -9,10 +9,10 @@ columns:
       - datalake_hub_services_raw.responsible_aud.lead_id
   id_responsible:
     lineage:
-      - datalake_hub_services_raw.responsible_aud.responsible_id
+      - datalake_hub_services_raw.responsible_aud.responsible
   id_distributor:
     lineage:
-      - datalake_hub_services_raw.responsible_aud.distributor_id
+      - datalake_hub_services_raw.responsible_aud.distributor
   rev:
     lineage:
       - datalake_hub_services_raw.responsible_aud.rev
@@ -22,18 +22,6 @@ columns:
   rev_end:
     lineage:
       - datalake_hub_services_raw.responsible_aud.revend
-  responsible_name:
-    lineage:
-      - datalake_hub_services_raw.responsible_aud.responsible_name
-  responsible_email:
-    lineage:
-      - datalake_hub_services_raw.responsible_aud.responsible_email
-  distributor_email:
-    lineage:
-      - datalake_hub_services_raw.responsible_aud.distributor_email
-  distributor_name:
-    lineage:
-      - datalake_hub_services_raw.responsible_aud.distributor_name
   version:
     lineage:
       - datalake_hub_services_raw.responsible_aud.version
@@ -48,22 +36,16 @@ columns:
       - datalake_hub_services_raw.responsible_aud.active_mod
   mod_id_distributor:
     lineage:
-      - datalake_hub_services_raw.responsible_aud.distributor_id_mod
-  mod_responsible_name:
-    lineage:
-      - datalake_hub_services_raw.responsible_aud.responsible_name_mod
+      - datalake_hub_services_raw.responsible_aud.distributor_mod
   mod_id_responsible:
     lineage:
-      - datalake_hub_services_raw.responsible_aud.responsible_id_mod
+      - datalake_hub_services_raw.responsible_aud.responsible_mod
   mod_ts_assigned:
     lineage:
       - datalake_hub_services_raw.responsible_aud.assigned_at_mod
   mod_ts_unassigned:
     lineage:
       - datalake_hub_services_raw.responsible_aud.unassigned_at_mod
-  mod_distributor_name:
-    lineage:
-      - datalake_hub_services_raw.responsible_aud.distributor_name_mod
   ts_assigned:
     lineage:
       - datalake_hub_services_raw.responsible_aud.assigned_at
