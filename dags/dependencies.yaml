@@ -1681,6 +1681,7 @@ bietlejuice.enrich_ebdb_contract:
 bietlejuice.enrich_ebdb_country:
   - bietlejuice.ebdb:create-clean-country-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-region-in-data-lake
   - bietlejuice.ebdb:create-clean-state-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake

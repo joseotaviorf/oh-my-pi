@@ -4,6 +4,7 @@ SELECT
   u.id_sales_rep,
   u.id_affiliates AS id_affiliate,
   u.id_photographer_data,
+  p.id AS id_partner_agent,
   u.id_country,
   u.id_state,
   COALESCE(ct.code, 'Undefined') AS country_code,
@@ -11,6 +12,9 @@ SELECT
   u.ts_updated
 FROM
   datalake_ebdb_clean.user AS u
+LEFT JOIN
+  datalake_ebdb_clean.partner_agent AS p
+    ON u.id = p.id_user
 LEFT JOIN
   datalake_ebdb_clean.country AS ct
     ON ct.id = u.id_country
