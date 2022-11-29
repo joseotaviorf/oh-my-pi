@@ -12,6 +12,7 @@ create table if not exists public.fact_house_listings
  sk_autonomous_agent BIGINT,
  sk_user_consultant BIGINT,
  sk_stranded_date BIGINT,
+ country_code VARCHAR,
  days_listing_to_contract_signed INTEGER,
  days_listing_to_depublication INTEGER,
  days_ended_rental_to_relisting INTEGER,

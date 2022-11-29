@@ -34,6 +34,9 @@ columns:
   sk_stranded_date:
     lineage:
       - datalake_ebdb_listing.house_listing.dt_stranded
+  country_code:
+    lineage:
+      datalake_ebdb_listing.house.country_code
   days_listing_to_contract_signed:
     lineage:
       - datalake_ebdb_clean.contract.ts_signed

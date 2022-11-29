@@ -12,6 +12,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     COALESCE(CAST(DATE_FORMAT(hls.ts_first_publication, "yyyyMMdd") AS BIGINT), -1) AS sk_first_publication_date,
     COALESCE(CAST(DATE_FORMAT(hls.ts_status_started, "yyyyMMdd") AS BIGINT), -1) AS sk_status_start_date,
     COALESCE(CAST(DATE_FORMAT(hls.ts_status_ended, "yyyyMMdd") AS BIGINT), -1) AS sk_status_end_date,
+    hls.country_code,
     hls.ts_status_started AS ts_status_start,
     hls.ts_status_ended AS ts_status_end,
     hls.status_history,

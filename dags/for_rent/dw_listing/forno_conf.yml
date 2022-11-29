@@ -1,0 +1,10 @@
+---
+tables:
+  - table_name: dim_condo
+    partitions: []
+  - table_name: dim_house_listing
+    partitions: [country_code]
+  - table_name: fact_house_listing_status
+    partitions: [country_code]
+  - table_name: fact_house_listings
+    partitions: [country_code]

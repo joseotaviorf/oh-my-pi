@@ -68,6 +68,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   COALESCE(CAST(DATE_FORMAT(hl.dt_stranded, 'yyyyMMdd') AS BIGINT), -1) AS sk_stranded_date,
   -- SparkSQL's datediff ignores the time part, so we get the seconds diff and convert it to integer days.
   -- 60s*60m*24h = 86400s
+  h.country_code,
   CAST((CAST(CAST(hlc.ts_contract_signed AS TIMESTAMP) AS LONG) - CAST(CAST(hl.ts_listing_version_start AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_listing_to_contract_signed,
   CAST((CAST(CAST(hl.ts_last_unpublished AS TIMESTAMP) AS LONG) - CAST(CAST(hl.ts_listing_version_start AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_listing_to_depublication,
   CAST((CAST(CAST(hl.ts_listing_version_end AS TIMESTAMP) AS LONG) - CAST(CAST(hlc.dt_contract_annulment AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_ended_rental_to_relisting,

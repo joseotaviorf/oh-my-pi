@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS public.fact_house_listing_status (
   sk_first_publication_date BIGINT,
   sk_status_start_date BIGINT,
   sk_status_end_date BIGINT,
+  country_code VARCHAR,
   ts_status_start TIMESTAMP,
   ts_status_end TIMESTAMP,
   status_history VARCHAR,

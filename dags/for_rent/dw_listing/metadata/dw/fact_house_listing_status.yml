@@ -16,6 +16,9 @@ columns:
   sk_status_end_date:
     lineage:
       - datalake_ebdb_listing.house_listing_status.ts_status_ended
+  country_code:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.country_code
   ts_status_start:
     lineage:
       - datalake_ebdb_listing.house_listing_status.ts_status_started

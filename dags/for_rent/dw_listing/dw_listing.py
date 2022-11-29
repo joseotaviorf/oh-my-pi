@@ -75,23 +75,33 @@ dw_task_group = DWTaskGroup(
     spark_jobs_path=base_spark_jobs_path,
 )
 
-dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW_STAGING
-)
+tables = config_service.get_config("tables")
 
-dw_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW, spectrum_iam_role=spectrum_iam_role
-)
+dw_staging_task_group = {}
+dw_task_groups = {}
+
+for table in tables:
+    table_name = table["table_name"]
+    partitions = table.get("partitions")
+
+    dw_staging_task_group[table_name] = dw_task_group.build_dw_staging_task_group(
+        table_name=table_name, is_incremental=False, partitions=partitions
+    )
+
+    dw_task_groups[table_name] = dw_task_group.build_dw_task_group(
+        table_name=table_name,
+        is_incremental=False,
+        spectrum_iam_role=spectrum_iam_role,
+        partitions=partitions,
+    )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
 chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
-
-TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
-
-chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)
+TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_groups)
+chain(DWTaskGroup.all_last_tasks(dw_task_groups), terminate_cluster_task)
 
 # Set data quality tasks if exists
 independent_tasks = DWTaskGroup.all_independent_tasks(dw_staging_task_group)
