@@ -20,6 +20,12 @@ columns:
   company_tag:
     lineage:
       - datalake_hubspot.company.tag_real_estate_agency
+  extracted_3p_tag:
+    lineage:
+      - datalake_hubspot.company.extracted_3p_tag
+  recurrency_type:
+    lineage:
+      - datalake_brokers_supply_processor.lead_3p.recurrency_type
   house_category:
     lineage:
       - datalake_brokers_supply_processor.lead_3p.house_category

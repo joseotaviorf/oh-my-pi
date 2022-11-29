@@ -6,6 +6,8 @@ CREATE TABLE rede.dim_lead_3p (
     growth_status VARCHAR,
     company_name VARCHAR,
     company_tag VARCHAR,
+    extracted_3p_tag VARCHAR,
+    recurrency_type VARCHAR,
     house_category VARCHAR,
     house_type VARCHAR,
     house_subtype VARCHAR,

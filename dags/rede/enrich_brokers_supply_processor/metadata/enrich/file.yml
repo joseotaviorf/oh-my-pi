@@ -8,6 +8,9 @@ columns:
   id_partner:
     lineage:
       - datalake_brokers_supply_processor_clean.file.id_partner
+  id_company_hubspot:
+    lineage:
+      - datalake_hubspot_clean.company.id_company
   hash:
     lineage:
       - datalake_brokers_supply_processor_clean.file.hash
@@ -26,6 +29,9 @@ columns:
   version:
     lineage:
       - datalake_brokers_supply_processor_clean.file.version
+  ts_previous_file_sent_by_agency:
+    lineage:
+      - datalake_brokers_supply_processor_clean.file.ts_created
   ts_created:
     lineage:
       - datalake_brokers_supply_processor_clean.file.ts_created

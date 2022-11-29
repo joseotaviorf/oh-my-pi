@@ -12,7 +12,5 @@ column_level_validations:
     is_unique:
       severity_level: Error
   id_hubspot:
-    is_complete:
-      severity_level: Error
     is_unique:
       severity_level: Error

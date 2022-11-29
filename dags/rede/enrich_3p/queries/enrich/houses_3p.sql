@@ -6,4 +6,4 @@ SELECT
 FROM
     datalake_ebdb_listing.house AS h
 WHERE
-    UPPER(h.internal_admin_info) LIKE '%[3P-%]%'
+    is_3p_supply

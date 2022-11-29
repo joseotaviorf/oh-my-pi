@@ -29,6 +29,9 @@ columns:
   id_region:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+  id_company_hubspot:
+    lineage:
+      - datalake_brokers_supply_processor.file.id_company_hubspot
   lead_hash:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.lead_hash

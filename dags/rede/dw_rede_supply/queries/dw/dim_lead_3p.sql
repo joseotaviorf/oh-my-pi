@@ -14,6 +14,8 @@ SELECT
     COALESCE(lsc.growth_status, 'Unknown') AS growth_status,
     COALESCE(c.name, 'Unknown') AS company_name,
     COALESCE(c.tag_real_estate_agency, 'Unknown') AS company_tag,
+    COALESCE(C.extracted_3p_tag, 'Unknown') AS extracted_3p_tag,
+    COALESCE(l.recurrency_type, 'Unknown') AS recurrency_type,
     COALESCE(l.house_category, 'Unknown') AS house_category,
     COALESCE(l.house_type, 'Unknown') AS house_type, 
     COALESCE(l.house_subtype, 'Unknown') AS house_subtype, 
@@ -88,4 +90,4 @@ JOIN
         AND lsc.ts_status_ended IS NULL
 LEFT JOIN
     datalake_hubspot.company AS c
-        ON c.id_company = lsc.id_company_hubspot
+        ON c.id_company = COALESCE(l.id_company_hubspot, lsc.id_company_hubspot)
