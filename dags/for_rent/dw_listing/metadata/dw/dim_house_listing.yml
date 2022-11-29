@@ -20,6 +20,9 @@ columns:
   consultant_type:
     lineage:
       - datalake_big_agent.house_rent_listing_consultant.consultant_type
+  first_consultant_type:
+    lineage:
+      - datalake_big_agent.house_rent_listing_consultant.first_consultant_type
   first_key_location:
     lineage:
       - datalake_ebdb_listing.agents_with_keys.first_key_location

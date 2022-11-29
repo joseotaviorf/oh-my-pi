@@ -215,6 +215,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.country_code,
     CAST(hl.version AS SMALLINT) AS version,
     hlco.consultant_type,
+    hlco.first_consultant_type,
     hl.first_key_location,
     hl.status,
     CAST(hl.rent AS DECIMAL(14, 2)) AS rent,

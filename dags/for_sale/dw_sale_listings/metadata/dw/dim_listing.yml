@@ -11,6 +11,9 @@ columns:
   consultant_type:
     lineage:
       - datalake_big_agent.house_sale_listing_consultant.consultant_type
+  first_consultant_type:
+    lineage:
+      - datalake_big_agent.house_sale_listing_consultant.first_consultant_type
   price:
     lineage:
       - datalake_ebdb_clean.house.sale_price

@@ -8,6 +8,7 @@ create table if not exists public.dim_house_listing
  country_code VARCHAR,
  version smallint,
  consultant_type VARCHAR(50),
+ first_consultant_type VARCHAR(50),
  first_key_location varchar(256),
  status varchar(256),
  rent numeric(14,2),

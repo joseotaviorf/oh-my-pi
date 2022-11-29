@@ -2,6 +2,7 @@ SELECT
   sl.id_sale_listing AS sk_sale_listing,
   lbc.id_house AS sk_house,
   hslc.consultant_type,
+  hslc.first_consultant_type,
   NULLIF(h.sale_price, 0) AS price,
   lbc.calculator_price AS predicted_price,
   lbc.status AS status,

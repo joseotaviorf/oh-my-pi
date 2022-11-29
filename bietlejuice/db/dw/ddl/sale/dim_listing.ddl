@@ -3,6 +3,7 @@ CREATE TABLE sale.dim_listing (
 	sk_sale_listing BIGINT PRIMARY KEY,
 	sk_house BIGINT,
 	consultant_type VARCHAR(50),
+	first_consultant_type VARCHAR(50),
 	price BIGINT,
 	predicted_price BIGINT,
 	status VARCHAR,

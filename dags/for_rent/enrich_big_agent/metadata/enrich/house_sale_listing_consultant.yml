@@ -20,6 +20,9 @@ columns:
   consultant_type:
     lineage:
       - datalake_big_agent.house_consultant_history.consultant_type
+  first_consultant_type:
+    lineage:
+      - datalake_big_agent.house_consultant_history.consultant_type
   dt_consultant_started:
     lineage:
       - datalake_big_agent.house_consultant_history.dt_consultant_started
