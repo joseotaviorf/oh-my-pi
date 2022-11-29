@@ -14,9 +14,6 @@ columns:
   id_propose_person:
     lineage:
       - datalake_rental_guarantee_platform_raw.person_documents.person
-  id_propose:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.person_documents.propose
   id_document:
     lineage:
       - datalake_rental_guarantee_platform_raw.person_documents.document

@@ -3,7 +3,6 @@ SELECT
     userinsert AS id_user_insert,
     userupdate AS id_user_update,
     person AS id_propose_person,
-    propose AS id_propose,
     document AS id_document,
     active AS is_active,
     dateinsert AS ts_inserted,
