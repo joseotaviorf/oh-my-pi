@@ -176,7 +176,8 @@ sale_fact_listing_flows_adjust AS (
             ELSE hl.mkt_origin
         END AS mkt_origin,
         dl.ts_first_publication,
-        FROM_UTC_TIMESTAMP(dl.ts_first_publication,'Brazil/East') AS ts_house_first_publication_br_tz
+        FROM_UTC_TIMESTAMP(dl.ts_first_publication,'Brazil/East') AS ts_house_first_publication_br_tz,
+        COALESCE(dl.is_casa_mineira_migration, false) as is_casa_mineira_migration
     FROM
         dw_sale.fact_listing_flows AS hl
     LEFT JOIN
@@ -282,6 +283,7 @@ source_ops_sale AS (
         LEFT JOIN
             dw_public.dim_house_listing AS dhl
             ON dhl.sk_house_listing = hlf.sk_house_listing
+        where ssf.is_casa_mineira_migration = false
 ),
 fact_sale AS (
     SELECT
@@ -335,6 +337,7 @@ fact_sale AS (
     JOIN
         source_ops_sale AS sor
             ON sor.sk_house_listing_flow = ssf.sk_house_listing_flow
+    where ssf.is_casa_mineira_migration = false
 ),
 fact_rent AS (
     SELECT
