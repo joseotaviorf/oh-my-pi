@@ -20,6 +20,7 @@ Via **incremental load**:
     - `contact`
     - `deal`
     - `deal_pipeline`
+    - `email`
     - `owner`
     - `team`
     - `ticket`

@@ -185,6 +185,9 @@ def get_integration_method(table_name, hubspot_client):
         "ticket": lambda **kwargs: fetch_all(
             hubspot_client.crm.tickets.basic_api, **kwargs
         ),
+        "email": lambda **kwargs: fetch_all(
+            hubspot_client.crm.objects.emails.basic_api, **kwargs
+        ),
         "deal_pipeline": hubspot_client.crm.pipelines.pipelines_api.get_all,
         "ticket_pipeline": hubspot_client.crm.pipelines.pipelines_api.get_all,
         "owner": hubspot_client.crm.owners.get_all,
