@@ -1,22 +1,27 @@
-SELECT 
+SELECT
     id,
-    contract_id AS id_contract, 
-    house_id AS id_house, 
-    requester_user_id AS id_requester_user, 
+    contract_id AS id_contract,
+    house_id AS id_house,
+    requester_user_id AS id_requester_user,
     third_party_crm_ticket_external_id AS id_third_party_crm_ticket_external,
+    customer_user_id AS id_customer_user,
+    taskmaster_task_id AS id_taskmaster_task,
     allow_personal_info_sharing,
-    status, 
+    status,
     third_party_crm,
+    origin_channel,
+    assumed_urgency,
+    owner_approval,
+    service_provider,
+    zendesk_tickets_info,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    year, 
-    month, 
+    year,
+    month,
     day
-FROM 
-    datalake_repairs_raw.repair_request 
-WHERE 
+FROM
+    datalake_repairs_raw.repair_request
+WHERE
     year = {year}
     AND month = {month}
     AND day = {day}
-
-
