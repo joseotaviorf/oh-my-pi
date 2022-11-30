@@ -19,6 +19,7 @@ In datalake raw:
 - `categories` (full load)
 - `projects` (full load)
 - `bank_account` (full load)
+- `clients` (full load)
 
 In datalake clean:
 
@@ -26,3 +27,4 @@ In datalake clean:
 - `categories`
 - `projects`
 - `bank_account`
+- `clients`

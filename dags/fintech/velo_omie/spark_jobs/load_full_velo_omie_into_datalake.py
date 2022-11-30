@@ -16,6 +16,8 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 from quintoandar_omie_api_client.clients.omie_client import OmieClient
 from quintoandar_omie_api_client.consumers import CONSUMERS
 
+from pyspark.sql.functions import col, when
+
 JOB_NAME = "load_full_velo_omie_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -94,6 +96,12 @@ if __name__ == "__main__":
     json_list = [dict_flatner(record) for record in json_list]
 
     df = spark_client.create_dataframe(json_list)
+
+    complex_types = ["array", "map"]
+    # Replace empty string for NULL on non-complex types
+    for i in df.columns:
+        if any(type_ not in dict(df.dtypes)[i] for type_ in complex_types):
+            df = df.withColumn(i, when((col(i) == ""), None).otherwise(col(i)))
 
     if df:
         s3_loader.load_df(

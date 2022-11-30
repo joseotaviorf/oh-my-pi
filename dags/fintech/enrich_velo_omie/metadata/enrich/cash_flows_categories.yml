@@ -1,0 +1,15 @@
+database_name: datalake_velo_omie
+table_name: cash_flows_categories
+columns:
+  id_securities:
+    lineage:
+      - datalake_velo_omie.cash_flows.id_securities
+  id_category:
+    lineage:
+      - datalake_velo_omie.cash_flows.categories
+  category_percentage:
+    lineage:
+      - datalake_velo_omie.cash_flows.categories
+  category_value:
+    lineage:
+      - datalake_velo_omie.cash_flows.categories
