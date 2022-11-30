@@ -18,6 +18,8 @@ tables:
     partitions: [country_code, business_context]
   - table_name: listing_business_context_status_history
     partitions: [country_code, business_context]
+  - table_name: listing_business_context_suspension_history
+    partitions: [country_code, business_context]
   - table_name: portability
     partitions: [country_code]
   - table_name: rent_listing
