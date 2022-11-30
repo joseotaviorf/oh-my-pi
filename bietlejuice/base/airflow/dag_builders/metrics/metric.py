@@ -1,7 +1,9 @@
 # Hey, airflow! Take a look at this DAG!
 
 import glob
-from bietlejuice.base.airflow.dag_builders.metric_factory import MetricsDagFactory
+from bietlejuice.base.airflow.dag_builders.metrics.metric_factory import (
+    MetricsDagFactory,
+)
 from dags import DAG_PACKAGES_ROOT
 
 METRICS_FOLDER_PATTERN = "/*/metric_*/queries/metric"
