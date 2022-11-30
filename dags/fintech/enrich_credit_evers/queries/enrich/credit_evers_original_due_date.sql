@@ -22,9 +22,10 @@ WITH debtors_all_time AS (
       WHEN is_over_15 THEN 15
     END AS invoice_over_number,
     due_amount,
+    original_due_date,
+    dt_contract_updated,
     ts_signature,
-    ts_due,
-    dt_contract_updated
+    ts_due
   FROM
     datalake_invoice.credit_invoice_original_due_date
   WHERE
@@ -59,8 +60,8 @@ SELECT
       MAX(
         CASE
           WHEN invoice_over_number >= ea.contract_ever_number
-            AND (12*(DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "y") - DATE_FORMAT(ts_signature, "y")) + 
-                      (DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "M")-DATE_FORMAT(ts_signature, "M"))) <= ma.contract_mob_number THEN 1
+            AND (12*(DATE_FORMAT(DATE_ADD(original_due_date, ea.contract_ever_number), "y") - DATE_FORMAT(ts_signature, "y")) +
+                      (DATE_FORMAT(DATE_ADD(original_due_date, ea.contract_ever_number), "M")-DATE_FORMAT(ts_signature, "M"))) <= ma.contract_mob_number THEN 1
           ELSE 0
         END
       ) AS BOOLEAN
@@ -69,8 +70,8 @@ SELECT
       SUM(
         CASE
           WHEN invoice_over_number >= ea.contract_ever_number
-            AND (12*(DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "y") - DATE_FORMAT(ts_signature, "y")) + 
-                      (DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "M")-DATE_FORMAT(ts_signature, "M"))) <= ma.contract_mob_number THEN 1
+            AND (12*(DATE_FORMAT(DATE_ADD(original_due_date, ea.contract_ever_number), "y") - DATE_FORMAT(ts_signature, "y")) +
+                      (DATE_FORMAT(DATE_ADD(original_due_date, ea.contract_ever_number), "M")-DATE_FORMAT(ts_signature, "M"))) <= ma.contract_mob_number THEN 1
           ELSE 0
         END
       ) AS INTEGER
@@ -78,8 +79,8 @@ SELECT
     SUM(
       CASE
         WHEN invoice_over_number >= ea.contract_ever_number
-          AND (12*(DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "y") - DATE_FORMAT(ts_signature, "y")) + 
-                     (DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "M")-DATE_FORMAT(ts_signature, "M"))) <= ma.contract_mob_number THEN due_amount
+          AND (12*(DATE_FORMAT(DATE_ADD(original_due_date, ea.contract_ever_number), "y") - DATE_FORMAT(ts_signature, "y")) +
+                     (DATE_FORMAT(DATE_ADD(original_due_date, ea.contract_ever_number), "M")-DATE_FORMAT(ts_signature, "M"))) <= ma.contract_mob_number THEN due_amount
         ELSE 0
       END
     )
@@ -102,7 +103,7 @@ SELECT
     ) AS total_due_amount,
     ts_signature,
     dt_contract_updated
-FROM 
+FROM
     debtors_all_time
 CROSS JOIN
     mob_array AS ma
@@ -110,7 +111,7 @@ CROSS JOIN
     ever_array AS ea
 GROUP BY
     1,2,3,4,5,6,12,13
-HAVING 
+HAVING
     (is_ever = FALSE
         AND (months_of_contract > ma.contract_mob_number)
             OR (is_ever = TRUE)
