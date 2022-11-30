@@ -23,6 +23,11 @@ def get_week_start_date(execution_date):
     # substracted 8 days because some metrics are D-1 and others D-2
     return datetime.strptime(execution_date, "%Y-%m-%d") - relativedelta(days=8)
 
+def get_executor_type_param(dag_run, default_executor_type, executor_type_param_name):
+    executor_type_param = dag_run.conf.get(executor_type_param_name) if dag_run.conf else None
+    if executor_type_param and executor_type_param in ['thread', 'multiprocessing', 'spark']:
+        return executor_type_param 
+    return default_executor_type
 
 SOURCE = "similarweb_daily_metrics"
 DAG_ID = f"bietlejuice.{SOURCE}"
@@ -71,7 +76,8 @@ dag = DAG(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
     user_defined_macros={
-        "get_week_start_date": get_week_start_date  # Macro can also be a function
+        "get_week_start_date": get_week_start_date,  # Macro can also be a function
+        "get_executor_type_param": get_executor_type_param,
     },
 )
 
@@ -106,7 +112,12 @@ for table_name in table_names:
         table_name=table_name,
         target_database_base_name=SOURCE,
         extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}load_{SOURCE}_to_raw.py",
-        raw_spark_job_extra_args=[SOURCE, table_name, "{{ get_week_start_date(ds) }}"],
+        raw_spark_job_extra_args=[
+            SOURCE,
+            table_name,
+            "{{ get_week_start_date(ds) }}",
+            "{{ get_executor_type_param(dag_run, 'spark', 'executor_type') }}",
+        ],
         pool=TASK_POOL,
     )
     raw_task_groups[table_name] = raw_task_group

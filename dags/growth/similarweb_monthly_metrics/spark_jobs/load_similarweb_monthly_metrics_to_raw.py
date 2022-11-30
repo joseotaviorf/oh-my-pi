@@ -67,15 +67,27 @@ def list_to_dict(response):
 
 
 def fetch_similarweb_metrics(
-    consumer_instance, domain, platform, metrics, start_date, end_date
+    consumer_instance, domain, platform, metrics, start_date, end_date, executor_type
 ):
+    if executor_type == "spark":
+        return consumer_instance.sync(
+            domain=domain,
+            platform=platform,
+            metrics_list=metrics,
+            start_date=start_date,
+            end_date=end_date,
+            executor_type=executor_type,
+            executor_spark_context=BaseSparkContext.sc,
+        )
     return consumer_instance.sync(
         domain=domain,
         platform=platform,
         metrics_list=metrics,
         start_date=start_date,
         end_date=end_date,
+        executor_type=executor_type,
     )
+    
 
 
 def join_list_of_dataframes(dfs_list=list, join_on_list=list):
@@ -93,6 +105,10 @@ if __name__ == "__main__":
     parser.add_argument("source", help="name of the API")
     parser.add_argument("table_name", help="table name to be created")
     parser.add_argument("month", help="month to retrieve data from API")
+    parser.add_argument(
+        "executor_type",
+        help="dag config passed manually. could be spark, thread or multiprocessing.",
+    )
 
     args = parser.parse_args()
 
@@ -101,6 +117,7 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     table_name = args.table_name
     month = args.month
+    executor_type = args.executor_type
 
     config_service = ConfigurationService(source)
     consumer_configs = config_service.get_config(f"{table_name}_configs")
@@ -110,7 +127,7 @@ if __name__ == "__main__":
 
     logger.info(
         f"m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, "
-        f"table_name={table_name}, msg=Starting spark job..."
+        f"table_name={table_name}, executor_type={executor_type}, msg=Starting spark job..."
     )
 
     spark_client = SparkClient()
@@ -133,6 +150,7 @@ if __name__ == "__main__":
                 list(metrics.keys()),
                 start_date=month,
                 end_date=month,
+                executor_type=executor_type
             )
 
             if not response:

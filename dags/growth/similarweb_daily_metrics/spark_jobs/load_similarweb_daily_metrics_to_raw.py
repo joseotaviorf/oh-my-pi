@@ -63,13 +63,20 @@ def list_to_dict(response):
     return {key: value for result in response for key, value in result.items()}
 
 
-def fetch_similarweb_metrics(consumer_instance, domain, platform, metrics):
+def fetch_similarweb_metrics(consumer_instance, domain, platform, metrics, executor_type):
+    if executor_type == "spark":
+        return consumer_instance.sync(
+            domain=domain,
+            platform=platform,
+            metrics_list=metrics,
+            executor_type=executor_type,
+            executor_spark_context=BaseSparkContext.sc,
+        )
     return consumer_instance.sync(
         domain=domain,
         platform=platform,
         metrics_list=metrics,
-        executor_type="spark",
-        executor_spark_context=BaseSparkContext.sc,
+        executor_type=executor_type,
     )
 
 
@@ -91,6 +98,11 @@ if __name__ == "__main__":
         "week_start_date",
         help="start date to filter returned dates from API in str format",
     )
+    parser.add_argument(
+        "executor_type",
+        help="dag config passed manually. could be spark, thread or multiprocessing.",
+    )
+
 
     args = parser.parse_args()
 
@@ -99,6 +111,7 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     table_name = args.table_name
     week_start_date = args.week_start_date
+    executor_type = args.executor_type
 
     config_service = ConfigurationService(source)
     consumer_configs = config_service.get_config(f"{table_name}_configs")
@@ -109,7 +122,7 @@ if __name__ == "__main__":
     join_on_list = consumer_configs["join_on_list"]
 
     logger.info(
-        f"""m=load_similarweb_daily_metrics_to_raw, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, week_start_date={week_start_date}, table_name={table_name}, msg=Starting spark job..."""
+        f"""m=load_similarweb_daily_metrics_to_raw, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, week_start_date={week_start_date}, table_name={table_name}, executor_type={executor_type}, msg=Starting spark job..."""
     )
 
     spark_client = SparkClient()
