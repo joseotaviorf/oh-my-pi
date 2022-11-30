@@ -13,6 +13,15 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 We incrementally load the following table into the Datalake Reverse bucket, for backup pourposes:
 
+- `benvi_iq_lost_proposals` 
+- `benvi_iq_lost_visits`
+- `benvi_iq_offboarding`
+- `benvi_pp_offboarding`
+- `benvi_iq_onboarding`
+- `benvi_pp_onboarding`
+- `benvi_iq_ongoing`
+- `benvi_pp_lost`
+- `benvi_pp_ongoing`
 - `lost_buyer_proposals`
 - `lost_buyer_visits`
 - `lost_iq_proposals`
@@ -42,6 +51,6 @@ We incrementally load the following table into the Datalake Reverse bucket, for 
 
 This pipeline also POST data to the Tracksale API (endpoint: `dispatches`) aiming to schedule NPS survey dispatches.
 
-For further information, please read [this documentation](https://docs.google.com/document/d/15YEa41mdZ2YRUgpKpMNK63sIrHhCSXAYuf2QbW_Df7E).
+For further information, please read our [Tracksale integration documentation](https://docs.google.com/document/d/15YEa41mdZ2YRUgpKpMNK63sIrHhCSXAYuf2QbW_Df7E) and our [DAG documentation and how to create a dispatch on it](https://www.notion.so/productquintoandar/Reverse-ETL-Tracksale-b6de0bf03f244c8ea4014a7ae916077d).
 
 </details>

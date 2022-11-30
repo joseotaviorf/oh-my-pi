@@ -45,6 +45,8 @@ if __name__ == "__main__":
     parser.add_argument("campaign_code", help="source name")
     parser.add_argument("campaign_query", help="campaign query")
     parser.add_argument("tags", help="campaign tags")
+    parser.add_argument("trigger_at_hour", help="hour that the campaign should be triggered")
+    parser.add_argument("trigger_at_minute", help="minute that the campaign should be triggered")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
@@ -55,10 +57,15 @@ if __name__ == "__main__":
     campaign_code = args.campaign_code
     campaign_query = args.campaign_query
     tags = args.tags
+    trigger_at_hour = args.trigger_at_hour
+    trigger_at_minute = args.trigger_at_minute
     execution_date = args.execution_date
 
     logger.info(
-        f"m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, campaign_code={campaign_code}, campaign_query={campaign_query}, tags={tags}, execution_date={execution_date}"
+        f"""m={JOB_NAME}, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
+        campaign_code={campaign_code}, campaign_query={campaign_query}, tags={tags},
+        trigger_at_hour={trigger_at_hour}, trigger_at_minute={trigger_at_minute}, execution_date={execution_date},
+        msg=Starting Spark Job..."""
     )
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d") + timedelta(days=1)
@@ -70,7 +77,7 @@ if __name__ == "__main__":
 
     schedule_time = int(
         datetime(
-            schedule_date.year, schedule_date.month, schedule_date.day, 17, 0, 0
+            schedule_date.year, schedule_date.month, schedule_date.day, int(trigger_at_hour), int(trigger_at_minute), 0
         ).timestamp()
     )
     end_time = int(

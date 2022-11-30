@@ -2545,16 +2545,26 @@ bietlejuice.reverse_nazare:
   - bietlejuice.hub_services:load-clean-business-unit
 
 bietlejuice.reverse_tracksale:
-  # Removed dependencies with dw_listing.dim_house_listing, dw_offer.dim_offer, dw_region.dim_region,
-  #   dw_rent_flow.fact_listing_rent_flows and dw_user.dim_user since dw_datamarts_cross already satisfies.
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.dw_contract:load-dw-public-dim-contract
+  - bietlejuice.dw_contract:load-dw-quintoandar-dim-contract-person
+  - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
-  - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+  - bietlejuice.dw_offer:load-dw-public-dim-offer
   - bietlejuice.dw_proposal:load-dw-public-dim-proposal
+  - bietlejuice.dw_region:load-dw-public-dim-region 
+  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
+  - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
+  - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
   - bietlejuice.gsheets.support_and_service:load-clean-department-control
+  - bietlejuice.terminator:load-clean-termination
 
 bietlejuice.enrich_zipcodes:
   - bietlejuice.ebdb:create-polygon-region-clean-external-table

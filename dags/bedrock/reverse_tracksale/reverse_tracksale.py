@@ -88,10 +88,14 @@ for campaign in campaigns:
     campaign_code = campaign["campaign_code"]
     campaign_query = campaign["query"]
     tags = campaign["tags"]
+    trigger_at_hour = campaign["trigger_at_hour"]
+    trigger_at_minute = campaign["trigger_at_minute"]
 
     table_name = campaign_query
+    slugged_table_name = table_name.replace("_", "-")
+
     load_campaing_targets_into_datalake = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"load-{table_name}-in-datalake",
+        task_id=f"load-{slugged_table_name}-in-datalake",
         dag=dag,
         json={
             "spark_python_task": {
@@ -103,7 +107,7 @@ for campaign in campaigns:
     )
 
     load_targets_into_tracksale = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"load-{table_name}-into-tracksale",
+        task_id=f"load-{slugged_table_name}-into-tracksale",
         dag=dag,
         json={
             "spark_python_task": {
@@ -116,6 +120,8 @@ for campaign in campaigns:
                     campaign_code,
                     table_name,
                     tags,
+                    trigger_at_hour,
+                    trigger_at_minute,
                     "{{ds}}",
                 ],
             }

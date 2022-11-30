@@ -1,0 +1,22 @@
+---
+database_name: datalake_tracksale_reverse
+table_name: benvi_iq_offboarding
+columns:
+  customer_name:
+    lineage:
+      - dw_quintoandar.dim_contract_person.full_name
+  customer_email:
+    lineage:
+      - dw_quintoandar.dim_contract_person.email
+  customer_phone:
+    lineage:
+      - dw_quintoandar.dim_contract_person.phone_number
+  customer_cpf:
+    lineage:
+      - dw_quintoandar.dim_contract_person.personal_document
+  id_user:
+    lineage:
+      - dw_quintoandar.fact_contract_people.sk_user
+  id_driver:
+    lineage:
+      - datalake_offboarding.contract_termination.id_contract

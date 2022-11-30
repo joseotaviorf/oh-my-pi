@@ -43,7 +43,9 @@ if __name__ == "__main__":
     partition_cols = ["year", "month", "day"]
 
     logger.info(
-        f"m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, "
+        f"""m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket}, source={source},
+        campaign_query={campaign_query}, execution_date={execution_date}, partition_cols={partition_cols},
+        msg=Starting Spark Job..."""
     )
 
     spark_client = SparkClient()
