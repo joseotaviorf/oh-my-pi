@@ -1,16 +1,16 @@
-SELECT 
-    id, 
+SELECT
+    id,
     contract_ebdb_id AS id_contract_ebdb,
     documentation_ebdb_id AS id_documentation_ebdb,
-    house_ebdb_id AS id_house_ebdb, 
-    tenant_ebdb_id AS id_tenant_ebdb, 
+    house_ebdb_id AS id_house_ebdb,
+    tenant_ebdb_id AS id_tenant_ebdb,
     accepted_terms_and_conditions,
     cancellation_reason,
     score,
-    source AS guarantee_source, 
+    source AS guarantee_source,
     status AS guarantee_status,
-    base_value,
-    final_value,
+    CAST(base_value/100.00 AS DECIMAL(12,2)),
+    CAST(final_value/100.00 AS DECIMAL(12,2)),
     type AS guarantee_type,
     created_at AS ts_created,
     updated_at AS ts_updated,
@@ -21,11 +21,11 @@ SELECT
     payment_expires_at AS ts_payment_expired,
     begins_at AS ts_started,
     year,
-    month, 
+    month,
     day
-FROM 
+FROM
     datalake_rental_guarantee_raw.guarantee
-WHERE 
+WHERE
     year = {year}
-    AND month = {month} 
+    AND month = {month}
     AND day = {day}
