@@ -166,13 +166,13 @@ ticket_tasks AS (
   FROM
     ticket_started AS t
   LEFT JOIN
+    datalake_gsheets_clean.department_control AS dc
+      ON t.department = dc.department
+  LEFT JOIN
     datalake_gsheets_clean.tag_sla_target AS tst
       ON dc.journey_step = tst.journey
       AND t.tags LIKE CONCAT('%', tst.tag, '%')
       AND t.ts_started BETWEEN tst.dt_start AND COALESCE(tst.dt_end, NOW())
-  LEFT JOIN
-    datalake_gsheets_clean.department_control AS dc
-      ON t.department = dc.department
   LEFT JOIN
     unique_theme_detail_sla_target AS tds
       ON dc.journey_step = tds.journey_step
