@@ -1,0 +1,82 @@
+---
+database_name: datalake_inspections
+table_name: inspection_booking
+columns:
+  id_inspection:
+    lineage:
+      - datalake_inspections.inspection_history.id_inspection
+  id_external:
+    lineage:
+      - datalake_inspections.inspection_history.id_external
+  id_assessment:
+    lineage:
+      - datalake_inspections.inspection_history.id_assessment
+  id_booking:
+    lineage:
+      - datalake_inspections.inspection_history.id_schedule
+  id_contract:
+    lineage:
+      - datalake_inspections.inspection_history.id_contract
+  id_country:
+    lineage:
+      - datalake_booking.booking.id_country
+  id_city:
+    lineage:
+      - datalake_region.region.id_city
+      - datalake_inspections.inspection_history.id_city
+  city_name:
+    lineage:
+      - datalake_region.region.city_name
+      - datalake_inspections.inspection_history.city_name
+  country_code:
+    lineage:
+      - datalake_booking.booking.country_code
+  inspection_type:
+    lineage:
+      - datalake_inspections.inspection_history.inspection_type
+  booking_type:
+    lineage:
+      - datalake_booking.booking.type
+  assessment_source:
+    lineage:
+      - datalake_inspections_clean.assessment.assessment_source
+  status:
+    lineage:
+      - datalake_inspections.inspection_history.status
+  dt_contract_entrance:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_contract_entrance
+  dt_contract_termination:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_termination
+  dt_execution_limit:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_contract_entrance
+      - datalake_offboarding.contract_termination.dt_termination
+  ts_booking_inspected_utc:
+    lineage:
+      - datalake_booking.booking.ts_booking_utc
+  ts_booking_inspected_local_tz:
+    lineage:
+      - datalake_booking.booking.ts_booking_local_tz
+  ts_booking_cancelled_utc:
+    lineage:
+      - datalake_booking.booking.ts_first_canceled_unevaluated
+  ts_booking_cancelled_local_tz:
+    lineage:
+      - datalake_booking.booking.ts_first_canceled_unevaluated_local_tz
+  ts_termination_canceled:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_canceled
+  ts_execution_started:
+    lineage:
+      - datalake_inspections.inspection_history.ts_execution_started
+  ts_execution_finished:
+    lineage:
+      - datalake_inspections.inspection_history.ts_execution_finished
+  ts_created:
+    lineage:
+      - datalake_inspections.inspection_history.ts_created
+  ts_updated:
+    lineage:
+      - datalake_inspections.inspection_history.ts_updated

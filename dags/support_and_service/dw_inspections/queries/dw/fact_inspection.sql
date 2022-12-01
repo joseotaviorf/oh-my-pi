@@ -7,12 +7,16 @@ SELECT
     i.id_country AS sk_country,
     i.id_city AS sk_city,
     i.country_code,
+    i.booking_type,
     im.ldt_hours_execution,
     im.sla_execution_target,
     im.is_sla_execution,
+    i.is_d0_canceled,
+    i.is_d1_canceled,
     i.dt_contract_entrance,
     i.dt_contract_termination,
     i.dt_execution_limit,
+    i.ts_inspected,
     i.ts_booking_inspected_utc AS ts_booking_inspected,
     i.ts_booking_inspected_local_tz AS ts_booking_inspected_local,
     i.ts_booking_cancelled_utc AS ts_booking_cancelled,
@@ -21,7 +25,7 @@ SELECT
     im.ts_created,
     NOW() AS ts_load
 FROM
-    datalake_inspections.inspection i
+    datalake_inspections_metrics.inspection_booking i
 LEFT JOIN
-    datalake_inspections.inspection_metrics im
+    datalake_inspections_metrics.inspection_achievements im
         ON im.id_inspection = i.id_inspection

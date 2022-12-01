@@ -17,7 +17,7 @@ from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
-CONTEXT = "inspections"
+CONTEXT = "inspections_metrics"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")

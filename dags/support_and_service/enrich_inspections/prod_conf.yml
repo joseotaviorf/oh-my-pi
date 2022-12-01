@@ -1,8 +1,9 @@
 ---
-inner_dependencies:
-  inspection_metrics:
-    - inspection
-
+dag_documentation:
+  dag_purpose:
+    "This DAG is responsible for the union tables between new Inspection Services data and old PWA data, \n
+    as well as the construction of metrics through this data."
+inner_dependencies: {}
 custom_cluster:
   driver_node_type_id: m5a.4xlarge
   node_type_id: m5a.2xlarge
