@@ -90,6 +90,7 @@ AND
     'CX Onboarding [BACK] [POS]',
     'CX Vistoria [BACK]',
     'Reparos N2 - Emergenciais [QA]',
+    'Reparos Urgentes [Back]',
     'Reparos Back [ATN]',
     'Triagem Reparos [Back]',
     'PARTNERS/CIQ [FRONT] [PRE]',

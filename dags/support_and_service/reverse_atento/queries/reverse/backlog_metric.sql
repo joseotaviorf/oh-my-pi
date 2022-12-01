@@ -74,6 +74,7 @@ AND
     'RevisarPagamentosRescisao',
     'RescisaoPreVigencia',
     'Reparos N2 - Emergenciais [QA]',
+    'Reparos Urgentes [Back]',
     'Reparos Back [ATN]',
     'Triagem Reparos [Back]',
     'PARTNERS/CIQ [FRONT] [PRE]',
