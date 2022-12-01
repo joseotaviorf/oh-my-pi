@@ -2,30 +2,49 @@
 database_name: datalake_dashboard_documentation
 table_name: dashboard_documentation
 columns:
+  id_dashboard:
+    lineage:
+      - datalake_metabase_clean.report_dashboard.id
+      - datalake_looker_clean.dashboards.id
   dashboard_path:
     lineage:
       - datalake_metabase_clean.collection.location
-  dashboard_id:
-    lineage:
-      - datalake_metabase_clean.report_dashboard.id
+      - datalake_looker_clean.folders.path
   title:
     lineage:
       - datalake_metabase_clean.report_dashboard.name
+      - datalake_looker_clean.dashboards.title
   description:
     lineage:
       - datalake_metabase_clean.report_dashboard.description
-  last_view:
-    lineage:
-      - datalake_metabase_clean.view_log.ts_last_view
-  dashboard_url:
-    lineage:
-      - datalake_metabase_clean.report_dashboard.id
-  id_chart:
-    lineage:
-      - datalake_metabase_clean.report_chart.id
-  chart:
-    lineage:
-      - datalake_metabase_clean.report_chart.name
+      - datalake_looker_clean.dashboards.description
   ownership:
     lineage:
       - datalake_metabase_clean.core_user.email
+      - datalake_looker_clean.users.email
+  last_view:
+    lineage:
+      - datalake_metabase_clean.view_log.ts_last_view
+      - datalake_looker_clean.dashboards.last_accessed_at
+  dashboard_url:
+    lineage:
+      - datalake_metabase_clean.report_dashboard.id
+      - datalake_looker_clean.dashboards.url
+  id_charts:
+    lineage:
+      - datalake_metabase_clean.report_chart.id
+      - datalake_looker_clean.dashboard_elements.id
+  dt_updated:
+    lineage:
+      - datalake_looker_clean.dashboards.year
+      - datalake_looker_clean.dashboards.month
+      - datalake_looker_clean.dashboards.day
+  year:
+    lineage:
+      - datalake_looker_clean.dashboards.year
+  month:
+    lineage:
+      - datalake_looker_clean.dashboards.year
+  day:
+    lineage:
+      - datalake_looker_clean.dashboards.year

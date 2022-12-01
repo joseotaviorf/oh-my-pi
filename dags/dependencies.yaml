@@ -986,6 +986,10 @@ bietlejuice.enrich_dashboard_governance:
   - bietlejuice.metabase:load-clean-report-card
   - bietlejuice.metabase:load-clean-report-dashboard
   - bietlejuice.metabase:load-clean-report-dashboard-card
+  - bietlejuice.looker:load-clean-folders
+  - bietlejuice.looker:load-clean-dashboard-elements
+  - bietlejuice.looker:load-clean-dashboards
+  - bietlejuice.looker:load-clean-users
 
 bietlejuice.dw_debt_recovery:
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
