@@ -155,7 +155,7 @@ ticket_tasks AS (
     t.is_solved,
     CASE
       WHEN t.department IN ('Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]') THEN 21
-      ELSE COALESCE(tds.sla_in_days,ts.sla_in_days, ujst.sla_in_days, tst.sla)
+      ELSE COALESCE(tst.sla, tds.sla_in_days, ts.sla_in_days, ujst.sla_in_days)
     END AS sla_target,
     t.ts_zendesk_started,
     t.ts_budget,
@@ -166,31 +166,27 @@ ticket_tasks AS (
   FROM
     ticket_started AS t
   LEFT JOIN
+    datalake_gsheets_clean.tag_sla_target AS tst
+      ON dc.journey_step = tst.journey
+      AND t.tags LIKE CONCAT('%', tst.tag, '%')
+      AND t.ts_started BETWEEN tst.dt_start AND COALESCE(tst.dt_end, NOW())
+  LEFT JOIN
     datalake_gsheets_clean.department_control AS dc
       ON t.department = dc.department
   LEFT JOIN
     unique_theme_detail_sla_target AS tds
       ON dc.journey_step = tds.journey_step
       AND t.contact_theme_detail_tag = tds.taxonomy_tag
-      AND t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
       AND DATE(t.ts_started) = tds.dt_reference
   LEFT JOIN
     unique_theme_sla_target AS ts
       ON dc.journey_step = ts.journey_step
       AND t.contact_theme_tag = ts.taxonomy_tag
-      AND t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
       AND DATE(t.ts_started) = ts.dt_reference
   LEFT JOIN
     unique_journey_sla_target AS ujst
       ON dc.journey_step = ujst.journey_step
-      AND t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
       AND DATE(t.ts_started) = ujst.dt_reference
-  LEFT JOIN
-    datalake_gsheets_clean.tag_sla_target AS tst
-      ON dc.journey_step = tst.journey
-      AND t.department = 'Offboarding Reparos [OFF] [POS] [BACK]'
-      AND t.tags LIKE CONCAT('%', tst.tag, '%')
-      AND t.ts_started BETWEEN tst.dt_start AND COALESCE(tst.dt_end, NOW())
   WHERE
     t.ts_started >= '2021-01-01'
     AND t.tags NOT LIKE '%robotserviceaccount02%'
