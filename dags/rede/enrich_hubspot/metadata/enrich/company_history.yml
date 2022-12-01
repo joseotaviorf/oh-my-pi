@@ -89,6 +89,12 @@ columns:
   extracted_3p_tag:
     lineage:
       - datalake_hubspot_clean.company.properties
+  member_category:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+  member_category_history:
+    lineage:
+      - datalake_hubspot_clean.company.properties
   lead_origin:
     lineage:
       - datalake_hubspot_clean.company.properties

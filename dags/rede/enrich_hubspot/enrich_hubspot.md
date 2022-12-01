@@ -28,6 +28,7 @@ Produces the following output tables in `datalake_hubspot`:
 - `company_history`
 - `contact_history`
 - `deal_history`
+- `email_history`
 - `ticket_history`
 - `owner_history`
 
@@ -38,6 +39,7 @@ Produces the following output tables in `datalake_hubspot`:
 - `contact_status`
 - `deal`
 - `deal_stage`
+- `email`
 - `ticket`
 - `ticket_stage`
 - `pipeline`

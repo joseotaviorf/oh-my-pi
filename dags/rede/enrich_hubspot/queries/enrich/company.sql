@@ -28,6 +28,8 @@ SELECT
     name,
     tag_real_estate_agency,
     extracted_3p_tag,
+    member_category,
+    member_category_history,
     lead_origin,
     phone,
     partnership_type,
