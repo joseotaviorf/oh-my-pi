@@ -7,12 +7,3 @@ is_incremental:
 table_level_validations:
   has_size:
     greater_than_or_equal_to: 50
-column_level_validations:
-  acc:
-    is_complete:
-  id:
-    is_complete:
-  name:
-    is_complete:
-  account_name:
-    is_complete:

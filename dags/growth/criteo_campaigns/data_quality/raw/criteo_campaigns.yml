@@ -7,12 +7,3 @@ is_incremental:
 table_level_validations:
   has_size:
     greater_than: 20
-column_level_validations:
-  AdvertiserId:
-    is_complete:
-  AdsetId:
-    is_complete:
-  Advertiser:
-    is_complete:
-  Adset:
-    is_complete:
