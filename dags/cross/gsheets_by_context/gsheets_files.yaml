@@ -787,6 +787,12 @@ forecast_diario_supply:
     clean_table_name: rental_forecast_daily_supply
     sheet_context: for_rent
 
+fup_agents_historico:
+    sheet_id: 19hQtsMWhqgso4xZnOo9vNMywdCKSlQXPlRuo6elf4Ik
+    sheet_name: all_offers
+    clean_table_name: proj_fup_agents
+    sheet_context: for_rent
+
 listings_with_agreed_discounts:
     sheet_id: 1Y6Z4CV1aDMey8vWnWqUZzpzPBz9os1shJ2anLtLT0Ds
     sheet_name: db_discounts_fr

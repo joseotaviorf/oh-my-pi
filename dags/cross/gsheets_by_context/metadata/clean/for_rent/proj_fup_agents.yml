@@ -1,0 +1,37 @@
+---
+database_name: datalake_gsheets_clean
+table_name: proj_fup_agents
+columns:
+  visitor_id:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.tp_id
+  id_property:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.imovel_id
+  region_code:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.region_code
+  owner_id:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.owner_id
+  offer_id:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.offer_id
+  dt_offer_sent:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.os_date
+  offer_status:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.offer_status
+  offer_type:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.type_offer
+  agent_id:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.agent_id
+  fup_agents_type:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.fup_agents_type
+  gt_gc:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.gt_gc
