@@ -146,7 +146,7 @@ if __name__ == "__main__":
                 metrics_list.remove("average-visit-duration")
 
             response = fetch_similarweb_metrics(
-                consumer_instance, domain, platform, metrics_list
+                consumer_instance, domain, platform, metrics_list, executor_type
             )
 
             if not response:
