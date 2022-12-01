@@ -477,15 +477,15 @@ SELECT
     dp.guarantee,
     CASE
         WHEN dhl.is_b2b = TRUE THEN 'B2B'
-        WHEN dhl.is_for_rent = True
+        WHEN dhl.is_for_rent = TRUE
           -- Core is a treatment for NULLs, as this datamart
           -- isn't expecting this value, it would be better
           -- to consider it NULL too.
-             AND (dhl.consultant_type IS NOT NULL
-                  AND dhl.consultant_type <> 'Core') THEN dhl.consultant_type
+             AND (dhl.first_consultant_type IS NOT NULL
+                  AND dhl.first_consultant_type <> 'Core') THEN dhl.first_consultant_type
         WHEN dhl.is_b2b = FALSE
-            OR (dhl.consultant_type IS NULL
-                OR dhl.consultant_type = 'Core') THEN 'FALSE'
+            OR (dhl.first_consultant_type IS NULL
+                OR dhl.first_consultant_type = 'Core') THEN 'FALSE'
     END AS is_b2b,
     dr.city_group,
     dr.country_code,
@@ -1249,49 +1249,51 @@ SELECT
 	city_group,
   country_code,
 	supply_mkt_origin,
-  	CASE
-		WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
-  	   	WHEN supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
-  	END AS supply_mkt_origin_detailed,
-  	lead_context,
-  	lead_processing_operation,
-  	sales_company,
-    	lead_origin,
-    	CASE
-		WHEN demand_mkt_channel in ('Not Mapped', 'Other') or demand_mkt_channel IS NULL THEN 'Other'
-        	ELSE demand_mkt_channel
+  CASE
+    WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
+    WHEN supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
+  END AS supply_mkt_origin_detailed,
+  lead_context,
+  lead_processing_operation,
+  sales_company,
+  lead_origin,
+  CASE
+		WHEN demand_mkt_channel IN ('Not Mapped', 'Other') OR demand_mkt_channel IS NULL THEN 'Other'
+    ELSE demand_mkt_channel
 	END AS demand_mkt_channel,
-    	CASE
-		WHEN demand_mkt_channel in ('Not Mapped', 'Other') or demand_mkt_channel is NULL THEN 'Other'
-	     	WHEN demand_mkt_channel in ('Online Classifieds','Agents') THEN demand_mkt_channel
-	     	WHEN demand_mkt_medium in ('SEO branded', 'SEO non-branded') THEN 'SEO'
-	     	ELSE demand_mkt_medium
-	END as demand_mkt_channel_detailed,
+  CASE
+		WHEN demand_mkt_channel IN ('Not Mapped', 'Other') OR demand_mkt_channel IS NULL THEN 'Other'
+    WHEN demand_mkt_channel IN ('Online Classifieds','Agents') THEN demand_mkt_channel
+    WHEN demand_mkt_medium IN ('SEO branded', 'SEO non-branded') THEN 'SEO'
+    ELSE demand_mkt_medium
+	END AS demand_mkt_channel_detailed,
 	first_touchpoint,
 	is_guarantee,
-    	is_b2b AS is_b2b_demand,
-   	SUM(COALESCE(leads,0)) AS leads,
-    	SUM(COALESCE(prospects,0)) AS prospects,
-    	SUM(COALESCE(qualifieds,0)) AS qualifieds,
-    	SUM(COALESCE(available_qualifieds,0)) AS available_qualifieds,
-    	SUM(COALESCE(opportunities,0)) AS opportunities,
-    	SUM(COALESCE(first_listings,0)) AS first_listings,
-    	SUM(COALESCE(messages_sent_tta,0)) AS messages_sent_tta,
-    	SUM(COALESCE(registered_agent_supports,0)) AS registered_agent_supports,
-    	SUM(COALESCE(visits_booked,0)) AS visits_booked,
-    	SUM(COALESCE(visits_completed,0)) AS visits_completed,
-    	SUM(COALESCE(offer_submitted,0)) AS offer_submitted,
-    	SUM(COALESCE(offer_approved,0)) AS offer_approved,
-    	SUM(COALESCE(credit_evaluation_init,0)) AS credit_evaluation_init,
-    	SUM(COALESCE(credit_evaluation_positive,0)) AS credit_evaluation_positive,
-    	SUM(COALESCE(guarantee_started,0)) AS guarantee_started,
-    	SUM(COALESCE(doc_sent,0)) AS doc_sent,
-    	SUM(COALESCE(doc_approved,0)) AS doc_approved,
-    	SUM(COALESCE(guarantee_paid,0)) AS guarantee_paid,
-    	SUM(COALESCE(credit_approved,0)) AS credit_approved,
-    	SUM(COALESCE(contract_created,0)) AS contract_created,
-    	SUM(COALESCE(contract_signed,0)) AS contract_signed,
-    	SUM(COALESCE(contract_ended,0)) AS contract_ended,
-    	current_timestamp AS ts_load
-FROM union_all_date
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  is_b2b AS is_b2b_demand,
+  SUM(COALESCE(leads,0)) AS leads,
+  SUM(COALESCE(prospects,0)) AS prospects,
+  SUM(COALESCE(qualifieds,0)) AS qualifieds,
+  SUM(COALESCE(available_qualifieds,0)) AS available_qualifieds,
+  SUM(COALESCE(opportunities,0)) AS opportunities,
+  SUM(COALESCE(first_listings,0)) AS first_listings,
+  SUM(COALESCE(messages_sent_tta,0)) AS messages_sent_tta,
+  SUM(COALESCE(registered_agent_supports,0)) AS registered_agent_supports,
+  SUM(COALESCE(visits_booked,0)) AS visits_booked,
+  SUM(COALESCE(visits_completed,0)) AS visits_completed,
+  SUM(COALESCE(offer_submitted,0)) AS offer_submitted,
+  SUM(COALESCE(offer_approved,0)) AS offer_approved,
+  SUM(COALESCE(credit_evaluation_init,0)) AS credit_evaluation_init,
+  SUM(COALESCE(credit_evaluation_positive,0)) AS credit_evaluation_positive,
+  SUM(COALESCE(guarantee_started,0)) AS guarantee_started,
+  SUM(COALESCE(doc_sent,0)) AS doc_sent,
+  SUM(COALESCE(doc_approved,0)) AS doc_approved,
+  SUM(COALESCE(guarantee_paid,0)) AS guarantee_paid,
+  SUM(COALESCE(credit_approved,0)) AS credit_approved,
+  SUM(COALESCE(contract_created,0)) AS contract_created,
+  SUM(COALESCE(contract_signed,0)) AS contract_signed,
+  SUM(COALESCE(contract_ended,0)) AS contract_ended,
+  CURRENT_TIMESTAMP AS ts_load
+FROM 
+  union_all_date
+GROUP BY 
+  "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14

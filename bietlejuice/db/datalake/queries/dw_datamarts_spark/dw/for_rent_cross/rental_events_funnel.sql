@@ -529,11 +529,11 @@ rent_flow_adjusted AS (
           -- Core is a treatment for NULLs, as this datamart
           -- isn't expecting this value, it would be better
           -- to consider it NULL too.
-          AND (dhl.consultant_type IS NOT NULL
-                AND dhl.consultant_type <> 'Core') THEN dhl.consultant_type
+          AND (dhl.first_consultant_type IS NOT NULL
+                AND dhl.first_consultant_type <> 'Core') THEN dhl.first_consultant_type
       WHEN dhl.is_b2b = FALSE
-          OR (dhl.consultant_type IS NULL
-              OR dhl.consultant_type = 'Core') THEN 'FALSE'
+          OR (dhl.first_consultant_type IS NULL
+              OR dhl.first_consultant_type = 'Core') THEN 'FALSE'
     END AS is_b2b,
     dr.city_group,
     dr.country_code,
