@@ -1,0 +1,30 @@
+database_name: datalake_cozy_metrics_clean
+table_name: library_versions
+columns:
+  metric_name:
+    lineage:
+      - datalake_cozy_metrics_raw.name
+  project_name:
+    lineage:
+      - datalake_cozy_metrics_raw.project
+  project_version:
+      lineage:
+      - datalake_cozy_metrics_raw.project_version
+  core:
+    lineage:
+      - datalake_cozy_metrics_raw.value
+  icons:
+    lineage:
+      - datalake_cozy_metrics_raw.value  
+  theme:
+    lineage:
+      - datalake_cozy_metrics_raw.value 
+  tokens:
+    lineage:
+      - datalake_cozy_metrics_raw.value 
+  utils:
+    lineage:
+      - datalake_cozy_metrics_raw.value 
+  dt_created:
+    lineage:
+      - datalake_cozy_metrics_raw.created_at

@@ -1,0 +1,4 @@
+---
+cozy_bucket: 'datalake.s3.forno.data.quintoandar.com.br/test/cozy'
+source_path: "s3://{cozy_bucket}/CozyFoundations/v1/{execution_date}/*/{metric}.json"
+raw_partition_cols: ["year","month","day"]

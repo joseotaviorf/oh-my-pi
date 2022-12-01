@@ -1,0 +1,22 @@
+---
+table_name: datalake_cozy_metrics_clean.library_versions
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  metric_name:
+    is_complete:
+  project_name:
+    is_complete:
+  project_version:
+    is_complete:
+  core:
+    is_complete:
+  icons:
+    is_complete:
+  theme:
+    is_complete:
+  tokens:
+    is_complete:
+  utils:
+    is_complete:
+  dt_created:
+    is_complete:
