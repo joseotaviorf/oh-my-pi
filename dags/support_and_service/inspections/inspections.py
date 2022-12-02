@@ -40,7 +40,7 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 raw_spark_job_path = f"{s3_prefix}/spark_jobs/{SOURCE}/load_{CONTEXT}_into_datalake.py"
 
-cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 
 default_libraries = config_service.get_config("default_libraries")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
