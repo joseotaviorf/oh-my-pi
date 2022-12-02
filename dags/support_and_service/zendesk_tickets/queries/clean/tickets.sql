@@ -1,24 +1,11 @@
-WITH max_stitch_data AS (
-    SELECT
-        id,
-        MAX(CAST(updated_at AS TIMESTAMP)) AS max_updated_at
-    FROM
-        datalake_zendesk_tickets_raw.tickets
-    GROUP BY 1
-),
-filtered_max_stitch_data AS (
+WITH filtered_max_stitch_data AS (
     SELECT
         t.*,
         CAST(GET_JSON_OBJECT(t.via, '$.channel') AS STRING) AS ticket_via
     FROM
         datalake_zendesk_tickets_raw.tickets t
-    JOIN
-        max_stitch_data max_sd
-            ON max_sd.id = t.id
-            AND max_sd.max_updated_at = CAST(t.updated_at AS TIMESTAMP)
-    WHERE
-        CAST(GET_JSON_OBJECT(t.via, '$.channel') AS STRING) IS NOT NULL
-        AND t.raw_subject != 'scrubbed'
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1
 )
 SELECT
     id AS id_ticket,
@@ -55,3 +42,5 @@ SELECT
     DAY(CAST(updated_at AS DATE)) AS day
 FROM
     filtered_max_stitch_data
+WHERE
+    ticket_via IS NOT NULL AND raw_subject != 'scrubbed'
