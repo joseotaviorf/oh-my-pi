@@ -6,7 +6,7 @@ metabase_last_view as (
   from
     datalake_metabase_clean.view_log
   where
-    ts_viewed < timestamp(format_string('%d-%d-%dT00:00:00.000+0000', {year}, {month}, {day} + 1))
+    ts_viewed < date_add(timestamp(format_string('%d-%d-%dT00:00:00.000+0000', 2022, 11, 30)), 1)
   group by
     id_model
 ),
@@ -27,7 +27,7 @@ metabase_dashboard_last_update as (
   from
     datalake_metabase_clean.report_dashboard md
   where
-    ts_updated < timestamp(format_string('%d-%d-%dT00:00:00.000+0000', {year}, {month}, {day} + 1))
+    ts_updated < date_add(timestamp(format_string('%d-%d-%dT00:00:00.000+0000', 2022, 11, 30)), 1)
 ),
 metabase_dashboards as (
   select
@@ -104,7 +104,7 @@ metabase_dash_card as (
     datalake_metabase_clean.report_dashboard_card
   where
     id_card is not null and
-    ts_updated < timestamp(format_string('%d-%d-%dT00:00:00.000+0000', {year}, {month}, {day} + 1))
+    ts_updated < date_add(timestamp(format_string('%d-%d-%dT00:00:00.000+0000', 2022, 11, 30)), 1)
   group by
     id_dashboard
 ),
