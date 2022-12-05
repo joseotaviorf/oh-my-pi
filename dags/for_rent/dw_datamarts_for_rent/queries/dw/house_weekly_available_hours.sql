@@ -14,8 +14,8 @@ WITH daily_published_listings AS (
     WHERE f.status_history = 'publicado' -- consider published AND suspended status
       AND substring(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
       AND d.date > current_date - interval '360 DAYS'
-)
-, house_available_hours AS (
+),
+house_available_hours AS (
     SELECT
         dpl.id_house,
         REPLACE(hah.id_house||dpl.week_start, '-', '') AS id_house_week,
@@ -26,9 +26,9 @@ WITH daily_published_listings AS (
     FROM
         daily_published_listings dpl
     LEFT JOIN
-        datamarts.house_available_hours hah
+        datalake_booking_prod.house_available_hours hah
             ON hah.id_house = dpl.id_house
-            AND dpl.date BETWEEN hah.available_started_date AND COALESCE(hah.available_ended_date, current_date)
+            AND dpl.date BETWEEN hah.dt_available_started AND COALESCE(hah.dt_available_ended, current_date)
             AND dpl.week_day = (hah.day_of_week - 1) -- matching exactly week day schedule change
     WHERE dpl.order_status = 1
 )

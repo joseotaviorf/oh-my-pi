@@ -23,8 +23,6 @@ pipeline:
     dw:
       <<: *redshift_anchor
       table: house_weekly_available_hours
-      depends_on:
-        - house_available_hours
   house_weekly_entrance_info:
     dw:
       <<: *athena_anchor

@@ -79,6 +79,7 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.ebdb:create-house-user-clean-external-table
   - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
   - bietlejuice.ebdb:create-work-contract-clean-external-table
+  - bietlejuice.enrich_booking:create-enrich-house-available-hours-external-table
   - bietlejuice.terminator:create-clean-application-user-external-table
   - bietlejuice.terminator:create-clean-negotiation-external-table
   - bietlejuice.terminator:create-clean-rev-info-external-table
@@ -624,6 +625,7 @@ bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
+  - bietlejuice.enrich_booking:load-enrich-house-available-hours
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
 
 bietlejuice.dw_datamarts_spark.for_rent_cross:

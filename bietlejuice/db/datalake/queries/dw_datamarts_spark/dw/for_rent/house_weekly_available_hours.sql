@@ -28,9 +28,9 @@ house_available_hours AS (
     FROM
         daily_published_listings AS dpl
     LEFT JOIN
-        dw_datamarts.house_available_hours AS hah
+        datalake_booking.house_available_hours AS hah
             ON hah.id_house = dpl.id_house
-            AND dpl.date BETWEEN hah.available_started_date AND COALESCE(hah.available_ended_date, current_date)
+            AND dpl.date BETWEEN hah.dt_available_started AND COALESCE(hah.dt_available_ended, current_date)
             AND dpl.week_day = (hah.day_of_week - 1) -- matching exactly week day schedule change
     WHERE
         dpl.order_status = 1
