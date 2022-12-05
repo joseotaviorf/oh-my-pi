@@ -71,7 +71,9 @@ if __name__ == "__main__":
     )
 
     s3_client = S3Service(boto3.resource("s3"))
-    dw_info = DWMetastoreService.get_dw_info(env, dw_schema, dw_bucket)
+    database_name, database_location = DWMetastoreService.get_layer_info(
+        env=env, schema=dw_schema, bucket=dw_bucket, layer="dw"
+    )
     redshift_conn = json.loads(dbutils.secrets.get("quintoandar", DatabaseEnum.DW))
     redshift_client = PostgresClient(
         dbname=redshift_conn["db"],
@@ -84,11 +86,11 @@ if __name__ == "__main__":
 
     metastore_service = SparkMetastoreService(SparkClient())
     redshift_loader = RedshiftLoader(
-        spectrum_iam_role, redshift_client, s3_client, dw_info["dw_bucket"]
+        spectrum_iam_role, redshift_client, s3_client, dw_bucket
     )
     redshift_loader.load_table_from_metastore(
         metastore_service=metastore_service,
-        source_schema=dw_info["dw_schema_databricks"],
+        source_schema=database_name,
         source_table_name=table_name,
         target_schema="datamarts",
         target_table_name=table_name,
@@ -96,4 +98,4 @@ if __name__ == "__main__":
     )
 
     # load validation
-    validate_load(dw_info["dw_schema_databricks"], "datamarts", table_name)
+    validate_load(database_name, "datamarts", table_name)

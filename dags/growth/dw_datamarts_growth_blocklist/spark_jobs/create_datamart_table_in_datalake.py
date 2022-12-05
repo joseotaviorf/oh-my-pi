@@ -100,12 +100,12 @@ if __name__ == "__main__":
 
     dm_table_df = SparkDataFrameService(dm_table_df).optimize_partition(250000).output()
 
-    dw_db_info = DWMetastoreService.get_dw_info(env, dw_schema, dw_bucket)
     metastore_service = SparkMetastoreService(spark_client)
-    database_name = dw_db_info["dw_schema_databricks"]
-    format_options = SparkTableStorageFormat.DEFAULT_DW
-    database_location = dw_db_info["dw_schema_path"]
+    database_name, database_location = DWMetastoreService.get_layer_info(
+        env=env, schema=dw_schema, bucket=dw_bucket, layer="dw"
+    )
     metastore_service.create_database(database_name)
+    format_options = SparkTableStorageFormat.DEFAULT_DW
 
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
