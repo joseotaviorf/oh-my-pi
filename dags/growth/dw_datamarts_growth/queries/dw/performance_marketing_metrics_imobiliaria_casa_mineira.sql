@@ -85,7 +85,7 @@ info_events AS (
     SELECT
         ts_event,
         JSON_EXTRACT_PATH_TEXT(event_properties, 'email_md5') AS email_md5,
-        JSON_EXTRACT_PATH_TEXT(event_properties, 'house_id') AS id_house,
+        COALESCE(JSON_EXTRACT_PATH_TEXT(event_properties, 'publisher_house_id'), JSON_EXTRACT_PATH_TEXT(event_properties, 'house_id')) AS id_house,
         JSON_EXTRACT_PATH_TEXT(user_properties, 'utm_source') AS utm_source,
         JSON_EXTRACT_PATH_TEXT(user_properties, 'utm_medium') AS utm_medium,
         JSON_EXTRACT_PATH_TEXT(user_properties, 'utm_campaign') AS utm_campaign,
@@ -96,11 +96,11 @@ info_events AS (
             ELSE 'Outro'
         END AS branded,
         JSON_EXTRACT_PATH_TEXT(user_properties , 'platform') AS app_type,
-        ROW_NUMBER() OVER(PARTITION BY JSON_EXTRACT_PATH_TEXT(event_properties, 'email_md5'), JSON_EXTRACT_PATH_TEXT(event_properties, 'house_id') ORDER BY ts_event) AS rn
+        ROW_NUMBER() OVER(PARTITION BY JSON_EXTRACT_PATH_TEXT(event_properties, 'email_md5'), COALESCE(JSON_EXTRACT_PATH_TEXT(event_properties, 'publisher_house_id'), JSON_EXTRACT_PATH_TEXT(event_properties, 'house_id')) ORDER BY ts_event) AS rn
     FROM
         datalake_casa_mineira_amplitude_clean_prod."329001_portal"
     WHERE
-        event_type = 'receive_information_clicked'
+        event_type IN ('receive_information_clicked', 'contact_intent_clicked', 'visit_intent_clicked')
         AND DATE(ts_event) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND CURRENT_DATE
 ),
 ------------------------------------------------------
@@ -110,7 +110,7 @@ events AS (
     SELECT
         ts_event,
         email_md5,
-        id_house,
+        CASE WHEN lower(left(id_house, 1)) = 's' THEN substring(id_house, 2) ELSE id_house END AS id_house,
         utm_source,
         utm_medium,
         utm_campaign,
@@ -130,6 +130,7 @@ info_contact as (
         COALESCE(c.id_client, c.phone_number, MD5(c.email)) as id_prospect,
         COALESCE(c.id_client, c.phone_number, MD5(c.email)) || '_' || COALESCE(c.id_house, '') as id_flow,
         hp.id AS id_house_portal,
+        h.id_house_quintoandar,
         c.id_house AS id_house_crm,
         MD5(c.email) email_md5,
         c.ts_created,
@@ -174,6 +175,7 @@ contacts as (
         --ID DIMENSIONS
         email_md5,
         id_house_portal,
+        id_house_quintoandar,
         id_house_crm AS id_house,
         id_client,
         order_new_client,
@@ -237,6 +239,60 @@ FROM
     LEFT JOIN taxonomy_crm AS tc
         ON LOWER(COALESCE(tc.origin_contact_name, '')) = LOWER(COALESCE(c.origin_contact_name, ''))
     	AND LOWER(COALESCE(tc.media_contact_name, '')) = LOWER(COALESCE(c.media_contact_name, ''))
+WHERE DATE(c.ts_contact) <= DATE('2022-08-06')
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
+
+UNION ALL
+
+SELECT
+    DATE(c.ts_contact) dt,
+    COALESCE(tc.mkt_origin, tp.mkt_origin, 'Other') AS mkt_origin,
+    COALESCE(tc.mkt_channel, tp.mkt_channel, 'Not Mapped') AS mkt_channel,
+    COALESCE(tc.mkt_medium, tp.mkt_medium, 'Not Mapped') AS mkt_medium,
+    COALESCE(tc.mkt_source, tp.mkt_source, 'Not Mapped') AS mkt_source,
+    COALESCE(evt.utm_campaign, '') AS utm_campaign,
+    NULL::TEXT AS campaign_name,
+    c.origin_contact_name,
+    c.media_contact_name,
+    c.uf_listing,
+    c.city_listing,
+    c.neighborhood_listing,
+    c.city_group,
+    c.id_house,
+    c.id_client,
+    c.order_new_client,
+    c.id_prospect,
+    c.order_new_contact_prospect,
+    c.id_flow,
+    c.order_new_contact_flow,
+    NULL::TEXT AS id_visit,
+    NULL::TEXT AS id_house_booked,
+    NULL::TEXT AS id_client_booked,
+    NULL::TEXT AS listing_type,
+    NULL::TEXT AS uf_listing_booked,
+    NULL::TEXT AS city_listing_booked,
+    NULL::TEXT AS neighborhood_listing_booked,
+    NULL::TEXT AS type_visit,
+    NULL::INT AS order_new_visit_booked,
+    0.0 AS cost,
+    0.0 AS budget,
+    0.0 AS new_contact_prospects_target,
+    0.0 AS new_buyer_prospect_target
+FROM
+    contacts as c
+    LEFT JOIN events evt
+        ON evt.email_md5 = c.email_md5
+        AND ABS(DATE_DIFF('SECOND', ts_event, ts_contact)) <= 360
+        AND (evt.id_house = c.id_house OR evt.id_house = c.id_house_quintoandar)
+    LEFT JOIN taxonomy_portal AS tp
+        ON LOWER(COALESCE(tp.app_type, '')) = LOWER(COALESCE(evt.app_type, ''))
+    	AND LOWER(COALESCE(tp.utm_source, '')) = LOWER(COALESCE(evt.utm_source, ''))
+    	AND LOWER(COALESCE(tp.utm_medium, '')) = LOWER(COALESCE(evt.utm_medium, ''))
+    	AND LOWER(COALESCE(tp.branded, '')) = LOWER(COALESCE(evt.branded, ''))
+    LEFT JOIN taxonomy_crm AS tc
+        ON LOWER(COALESCE(tc.origin_contact_name, '')) = LOWER(COALESCE(c.origin_contact_name, ''))
+    	AND LOWER(COALESCE(tc.media_contact_name, '')) = LOWER(COALESCE(c.media_contact_name, ''))
+WHERE DATE(c.ts_contact) > DATE('2022-08-06')
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 ),
 contact_next AS (

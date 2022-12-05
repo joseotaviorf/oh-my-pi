@@ -62,7 +62,7 @@ info_events AS (
     SELECT
         ts_event,
         GET_JSON_OBJECT(event_properties, '$.email_md5') AS email_md5,
-        GET_JSON_OBJECT(event_properties, '$.house_id') AS id_house,
+        COALESCE(GET_JSON_OBJECT(event_properties, '$.publisher_house_id'), GET_JSON_OBJECT(event_properties, '$.house_id')) AS id_house,
         GET_JSON_OBJECT(user_properties, '$.utm_source') AS utm_source,
         GET_JSON_OBJECT(user_properties, '$.utm_medium') AS utm_medium,
         GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS utm_campaign,
@@ -73,11 +73,11 @@ info_events AS (
             ELSE 'Outro'
         END AS branded,
         GET_JSON_OBJECT(user_properties , '$.platform') AS app_type,
-        ROW_NUMBER() OVER(PARTITION BY GET_JSON_OBJECT(event_properties, '$.email_md5'), GET_JSON_OBJECT(event_properties, '$.house_id') ORDER BY ts_event) AS rn
+        ROW_NUMBER() OVER(PARTITION BY GET_JSON_OBJECT(event_properties, '$.email_md5'), COALESCE(GET_JSON_OBJECT(event_properties, '$.publisher_house_id'), GET_JSON_OBJECT(event_properties, '$.house_id')) ORDER BY ts_event) AS rn
     FROM
         datalake_casa_mineira_amplitude_clean.329001_portal
     WHERE
-        event_type = 'receive_information_clicked'
+        event_type IN ('receive_information_clicked', 'contact_intent_clicked', 'visit_intent_clicked')
         AND DATE(ts_event) BETWEEN ADD_MONTHS(CURRENT_DATE, -12) AND CURRENT_DATE
 ),
 ------------------------------------------------------

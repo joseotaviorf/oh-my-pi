@@ -17,6 +17,7 @@ events AS (
     SELECT
         id_device,
         COALESCE(
+            CAST(GET_JSON_OBJECT(event_properties, '$.publisher_house_id') AS STRING),
             CAST(GET_JSON_OBJECT(event_properties, '$.house_id') AS STRING),
             SPLIT(TRANSLATE(CAST(GET_JSON_OBJECT(event_properties, '$.top5_house_id') AS string), '[]', ''), ',')[0]
         ) AS id_house,

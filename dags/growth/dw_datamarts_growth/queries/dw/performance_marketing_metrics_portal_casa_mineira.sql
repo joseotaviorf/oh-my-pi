@@ -62,7 +62,7 @@ info_events AS (
     SELECT
         ts_event,
         JSON_EXTRACT_PATH_TEXT(event_properties, 'email_md5') AS email_md5,
-        JSON_EXTRACT_PATH_TEXT(event_properties, 'house_id') AS id_house,
+        COALESCE(JSON_EXTRACT_PATH_TEXT(event_properties, 'publisher_house_id'), JSON_EXTRACT_PATH_TEXT(event_properties, 'house_id')) AS id_house,
         JSON_EXTRACT_PATH_TEXT(user_properties, 'utm_source') AS utm_source,
         JSON_EXTRACT_PATH_TEXT(user_properties, 'utm_medium') AS utm_medium,
         JSON_EXTRACT_PATH_TEXT(user_properties, 'utm_campaign') AS utm_campaign,
@@ -73,11 +73,11 @@ info_events AS (
             ELSE 'Outro'
         END AS branded,
         JSON_EXTRACT_PATH_TEXT(user_properties , 'platform') AS app_type,
-        ROW_NUMBER() OVER(PARTITION BY JSON_EXTRACT_PATH_TEXT(event_properties, 'email_md5'), JSON_EXTRACT_PATH_TEXT(event_properties, 'house_id') ORDER BY ts_event) AS rn
+        ROW_NUMBER() OVER(PARTITION BY JSON_EXTRACT_PATH_TEXT(event_properties, 'email_md5'), COALESCE(JSON_EXTRACT_PATH_TEXT(event_properties, 'publisher_house_id'), JSON_EXTRACT_PATH_TEXT(event_properties, 'house_id')) ORDER BY ts_event) AS rn
     FROM
         datalake_casa_mineira_amplitude_clean_prod."329001_portal"
     WHERE
-        event_type = 'receive_information_clicked'
+        event_type IN ('receive_information_clicked', 'contact_intent_clicked', 'visit_intent_clicked')
         AND DATE(ts_event) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND CURRENT_DATE
 ),
 ------------------------------------------------------
