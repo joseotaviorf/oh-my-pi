@@ -1,10 +1,27 @@
-WITH last_updated_sessions AS (
+WITH greenseer_uniques AS (
   SELECT
-    s.id_session,
-    MAX(DATE(CONCAT(year, '-', month, '-', day))) AS dt_last_updated
+    id_session,
+    id_pipeline,
+    memory,
+    current_state,
+    ts_started,
+    ts_ended
   FROM
-    datalake_greenseer_clean.session AS s
-  GROUP BY 1
+    datalake_greenseer_clean.session
+  QUALIFY
+    RANK() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
+),
+journeys_uniques AS (
+  SELECT
+    id_correlation,
+    id_content,
+    'journey_flow' AS fired_response
+  FROM
+    datalake_journey_flow_clean.journey_flow
+  WHERE
+    fired_response
+  QUALIFY
+    RANK() OVER (PARTITION BY id_correlation ORDER BY ts_created, ts_updated DESC) = 1
 ),
 greenseer_sessions AS (
   SELECT
@@ -15,6 +32,7 @@ greenseer_sessions AS (
     ) AS id_user,
     g.id_pipeline,
     j.id_content,
+    j.fired_response,
     NULLIF(
       GET_JSON_OBJECT(g.memory,'$.predictions.intents.before_reception.intent'), ''
     ) AS before_reception,
@@ -43,13 +61,9 @@ greenseer_sessions AS (
     g.ts_started,
     g.ts_ended
   FROM
-    datalake_greenseer_clean.session AS g
-  INNER JOIN
-    last_updated_sessions AS lus
-      ON g.id_session = lus.id_session
-      AND lus.dt_last_updated = DATE(CONCAT(g.year, '-', g.month, '-', g.day))
+    greenseer_uniques AS g
   LEFT JOIN
-    datalake_journey_flow_clean.journey_flow AS j
+    journeys_uniques AS j
       ON j.id_correlation = g.id_session
 ),
 greenseer_tried_retention AS (
@@ -58,14 +72,14 @@ greenseer_tried_retention AS (
     id_pipeline,
     CASE
       WHEN menu_new_style OR DATE_TRUNC('DD', ts_started) > '2022-06-27' THEN (
-        COALESCE(NULLIF(before_reception, 'fallback'), response_key, id_content) IS NOT NULL
+        COALESCE(NULLIF(before_reception, 'fallback'), response_key, fired_response) IS NOT NULL
       )
       ELSE (
         COALESCE(
           NULLIF(before_reception, 'fallback'),
           NULLIF(after_reception, 'fallback'),
           response_key,
-          id_content
+          fired_response
         ) IS NOT NULL
       )
     END AS tried_retention
@@ -73,19 +87,6 @@ greenseer_tried_retention AS (
     greenseer_sessions
 ),
 sauron_uniques AS (
-  WITH last_sauron_session AS (
-    SELECT
-      id,
-      source,
-      source_environment,
-      agent,
-      status,
-      ts_last_message,
-      ts_first_message,
-      ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS rank
-    FROM
-      datalake_sauron_clean.session AS s
-  )
   SELECT
     id,
     source,
@@ -95,22 +96,21 @@ sauron_uniques AS (
     ts_last_message,
     ts_first_message
   FROM
-    last_sauron_session
-  WHERE
-    rank = 1
+    datalake_sauron_clean.session
+  QUALIFY
+    RANK() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
 ),
-
 greenseer_retentions AS (
   SELECT
     g.id_session,
-    (s.agent is not null and s.agent <> 'QuintoAndar') AS is_retention
+    (s.agent IS NOT NULL AND s.agent <> 'QuintoAndar') AS is_retention
   FROM
     greenseer_tried_retention AS g
   LEFT JOIN
     sauron_uniques AS s
       ON s.id = g.id_session
   WHERE
-    g.id_pipeline in ('whatsapp', 'whatsapp_main', 'whatsapp_main_legacy')
+    g.id_pipeline IN ('whatsapp', 'whatsapp_main', 'whatsapp_main_legacy')
     AND s.source = 'whatsapp'
     AND s.source_environment = 'default'
     AND s.status = 'expired'
@@ -131,6 +131,7 @@ SELECT
   greenseer_sessions.id_user,
   id_pipeline,
   id_content,
+  (fired_response IS NOT NULL) AS has_journey_flow_response,
   before_reception,
   after_reception,
   response_key,
