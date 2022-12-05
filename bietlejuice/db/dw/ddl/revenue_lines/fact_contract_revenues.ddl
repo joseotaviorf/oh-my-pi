@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS revenue_lines.fact_contract_revenues
 (
     sk_contract_revenue BIGINT NOT NULL
     ,sk_late_payments_rent BIGINT
-    ,sk_late_payments_condo   BIGINT 
+    ,sk_late_payments_condo   BIGINT
     ,sk_month_rental_anticipation BIGINT
     ,sk_long_term_rental_anticipation BIGINT
     ,sk_brokerage_finance BIGINT
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS revenue_lines.fact_contract_revenues
     ,sk_credit_card_payment BIGINT
     ,sk_rental_guarantee BIGINT
     ,sk_rental_guarantee_charge BIGINT
-    ,sk_month_start BIGINT
+    ,sk_month_start CHAR(8)
     ,due_monthly_revenue NUMERIC (19,2)
     ,paid_monthly_revenue NUMERIC (19,2)
     ,ts_load TIMESTAMP
