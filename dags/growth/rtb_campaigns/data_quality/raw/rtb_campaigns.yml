@@ -7,3 +7,10 @@ is_incremental:
 table_level_validations:
   has_size:
     greater_than_or_equal_to: 1
+column_level_validations:
+  accountHash:
+    is_complete:
+  accountName:
+    is_complete:
+  accountStatus:
+    is_complete:
