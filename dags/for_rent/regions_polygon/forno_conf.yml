@@ -1,0 +1,3 @@
+---
+output_file_path: s3://looker.s3.forno.data.quintoandar.com.br/subregion_polygons_new
+output_file_name: 5a_subregion_polygons.topojson

@@ -1,8 +1,8 @@
-from datetime import datetime
-import pendulum
 import os
+from datetime import datetime
+from pendulum import timezone
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -13,50 +13,40 @@ from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2020, 8, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
+SOURCE = "regions_polygon"
+DAG_ID = f"bietlejuice.{SOURCE}"
+MAIN_START_DATE = datetime(2020, 8, 1, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+CUSTOM_LIBRARIES = [
+    {
+        "maven": {
+            "coordinates": "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating"
+        }
+    },
+    {
+        "maven": {
+            "coordinates": "org.apache.sedona:sedona-viz-3.0_2.12:1.2.1-incubating"
+        }
+    },
+    {"maven": {"coordinates": "org.datasyslab:geotools-wrapper:1.3.0-27.2"}},
+    {"pypi": {"package": "pytopojson==1.0.0"}},
+    {"pypi": {"package": "apache-sedona"}},
+]
 
-DAG_NAME = "regions_polygon"
-DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = os.environ.get("ENVIRONMENT")
-
-config_service = ConfigurationService(DAG_NAME)
-
-DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
-DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
-
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
-LOOKER_BUCKET = Variable.get("looker_bucket")
-
-# This layer does not exist, it was added in this DAG because it is out of pattern and
-# a layer name is needed so the validation flows does not break
-RELATIVE_FULL_QUERY_PATH = f"{DAG_NAME}/queries/enrich_for_looker/regions_polygon.sql"
-POLYGONS_FILE_OUTPUT_PATH = f"s3://{LOOKER_BUCKET}/subregion_polygons_new"
-POLYGONS_FILE_NAME = "5a_subregion_polygons.topojson"
-
-DATBRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
+config_service = ConfigurationService(SOURCE)
+datalake_bucket = config_service.get_config("datalake_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+raw_spark_job_file = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/create_regions_polygon_topojson.py"
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
 
-SPARK_JOBS_PATH = f"{DATBRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{DAG_NAME}/"
-SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
-
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_minimum_resources_cluster_spark_3", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
-
-# databricks libraries
-DEFAULT_LIBRARIES = config_service.get_config("default_libraries")
-CUSTOM_LIBRARIES = [
-    {"whl": f"{ARTIFACTS_S3_BUCKET}/geo_spark/geospark-1.3.2-py3-none-any.whl"},
-    {"jar": f"{ARTIFACTS_S3_BUCKET}/geo_spark/geospark-1.3.2.jar"},
-    {"jar": f"{ARTIFACTS_S3_BUCKET}/geo_spark/geospark-sql_2.3-1.3.2.jar"},
-    {"jar": f"{ARTIFACTS_S3_BUCKET}/pytopojson/pytopojson-1.0.0-py3-none-any.whl"},
-]
-LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
+output_file_path = config_service.get_config("output_file_path")
+output_file_name = config_service.get_config("output_file_name")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -64,6 +54,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
+ENV = os.environ.get("ENVIRONMENT")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -73,17 +64,17 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=DOC_MD_CHART_URL, dag_id=DAG_ID
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    cluster_configuration=cluster_configuration,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
@@ -92,13 +83,13 @@ regions_polygon_topojson_to_s3_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH + "create_regions_polygon_topojson.py",
+            "python_file": raw_spark_job_file,
             "parameters": [
                 ENV,
-                DATALAKE_BUCKET,
-                RELATIVE_FULL_QUERY_PATH,
-                POLYGONS_FILE_OUTPUT_PATH,
-                POLYGONS_FILE_NAME,
+                datalake_bucket,
+                SOURCE,
+                output_file_path,
+                output_file_name,
                 "{{ ds }}",
             ],
         }

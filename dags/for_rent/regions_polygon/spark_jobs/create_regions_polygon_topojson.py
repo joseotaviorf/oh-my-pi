@@ -1,11 +1,9 @@
 import json
-import logging
 from argparse import ArgumentParser
 from datetime import datetime
 
 import boto3
-from geospark.register import GeoSparkRegistrator
-from geospark.register import upload_jars
+from sedona.register import SedonaRegistrator
 from pytopojson import topology
 from quintoandar_logger import QuintoAndarLogger
 
@@ -17,9 +15,9 @@ from bietlejuice.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.services import S3Service
 
 JOB_NAME = "regions_polygon_topojson_to_s3"
-SOURCE = "ebdb"
+DESTINATION_DATABASE_SOURCE = "ebdb"
+S3_PATH_LAYER = "enrich_for_looker"  # TODO: transform this DAG in enrich
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
@@ -37,55 +35,39 @@ def parse_json_from_json_string(geojson_str):
 
 if __name__ == "__main__":
 
-    parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env", type=str, help="forno/prod values")
-    parser.add_argument("datalake_bucket", type=str, help="datalake bucket")
-    parser.add_argument(
-        "relative_full_query_path",
-        type=str,
-        help="relative full query path for sql file (from datalake-queries path)",
-    )
-    parser.add_argument(
-        "output_file_path", type=str, help="file path where file will be created"
-    )
-    parser.add_argument(
-        "output_file_name",
-        type=str,
-        help="file name that will be created, with extension",
-    )
+    parser = ArgumentParser(JOB_NAME)
+    parser.add_argument("env")
+    parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
+    parser.add_argument("output_file_path")
+    parser.add_argument("output_file_name")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
 
     env = args.env
     datalake_bucket = args.datalake_bucket
-    relative_full_query_path = args.relative_full_query_path
+    source = args.source
     output_file_path = args.output_file_path
     output_file_name = args.output_file_name
     execution_date = args.execution_date
 
     logger.info(
-        f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, "
-        f"relative_full_query_path={relative_full_query_path}, output_file_path={output_file_path}, "
-        f"output_file_name={output_file_name}, execution_date={execution_date}, "
-        "msg=Job execution started"
+        f"m={__name__}, env={env}, datalake_bucket={datalake_bucket}, source={source} "
+        f"output_file_path={output_file_path}, output_file_name={output_file_name}, "
+        f"execution_date={execution_date}, msg=Job execution started"
     )
 
-    # upload geospark lib jars and registering them to be able to use its functions in query for polygons
-    upload_jars()
+    # upload apache sedona lib and registering them to be able to use its functions in query for polygons
     spark_client = SparkClient()
-    GeoSparkRegistrator.registerAll(spark_client.conn)
+    SedonaRegistrator.registerAll(spark_client.conn)
 
-    (
-        database_name,
-        database_location,
-        athena_database_name,
-    ) = DatalakeMetastoreService.get_layer_info(
-        env, SOURCE, datalake_bucket, LayerEnum.CLEAN.value
+    database_name, _, _ = DatalakeMetastoreService.get_layer_info(
+        env, DESTINATION_DATABASE_SOURCE, datalake_bucket, LayerEnum.CLEAN.value
     )
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
-        "regions_polygon", "regions_polygon", "enrich_for_looker"
+        dag_name=source, table_name=source, layer=S3_PATH_LAYER
     )
 
     databricks_consumer = DatabricksConsumer({"db": database_name}, spark_client)
