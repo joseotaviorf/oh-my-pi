@@ -1,10 +1,10 @@
 import json
-import logging
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatabaseEnum, DWMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.pipeline.load_table_to_redshift_pipeline import (
     LoadTableToRedshiftPipeline,
@@ -12,23 +12,16 @@ from bietlejuice.pipeline.load_table_to_redshift_pipeline import (
 
 JOB_NAME = "load_table_to_redshift"
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env", type=str, help="forno/prod values")
-    parser.add_argument(
-        "spectrum_iam_role",
-        type=str,
-        help="permission for Spectrum to access the table",
-    )
-    parser.add_argument("dw_bucket", type=str, help="dw bucket")
-    parser.add_argument("dw_schema", type=str, help="dw schema")
-    parser.add_argument(
-        "table_name", type=str, help="table name that will be created in Redshift"
-    )
+    parser.add_argument("env")
+    parser.add_argument("spectrum_iam_role")
+    parser.add_argument("dw_bucket")
+    parser.add_argument("dw_schema")
+    parser.add_argument("table_name")
 
     args = parser.parse_args()
     env = args.env
@@ -38,12 +31,13 @@ if __name__ == "__main__":
     table_name = args.table_name
 
     logger.info(
-        f"m={JOB_NAME}, env={env}, spectrum_iam_role={spectrum_iam_role}, dw_bucket={dw_bucket}, "
-        + f"dw_schema={dw_schema}, table_name={table_name}, msg=Job execution started"
+        f"m={JOB_NAME}, env={env}, spectrum_iam_role={spectrum_iam_role}, "
+        f"dw_bucket={dw_bucket}, dw_schema={dw_schema}, table_name={table_name}, "
+        "msg=Job execution started"
     )
 
-    schema_database_name, schema_database_location = DWMetastoreService.get_layer_info(
-        env, dw_schema, dw_bucket, "schema"
+    dw_db_name, _ = DWMetastoreService.get_layer_info(
+        env=env, schema=dw_schema, bucket=dw_bucket, layer=LayerEnum.DW.value
     )
 
     base_dbutils = BaseDBUtils()
@@ -55,11 +49,11 @@ if __name__ == "__main__":
     )
 
     load_table_to_redshift_pipeline = LoadTableToRedshiftPipeline(
-        spectrum_iam_role,
-        redshift_connection,
-        dw_bucket,
-        dw_schema,
-        schema_database_name,
-        table_name,
+        spectrum_iam_role=spectrum_iam_role,
+        redshift_connection=redshift_connection,
+        dw_bucket=dw_bucket,
+        dw_schema=dw_schema,
+        source_schema=dw_db_name,
+        table_name=table_name,
     )
     load_table_to_redshift_pipeline.run()

@@ -1,4 +1,4 @@
-import logging
+import json
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
@@ -9,16 +9,16 @@ from bietlejuice.pipeline import FullTableLoaderPipeline
 
 JOB_NAME = "load_full_table_to_dw_final_schema"
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
 
-    parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env", type=str, help="forno/prod values")
-    parser.add_argument("dw_bucket", type=str, help="dw bucket")
-    parser.add_argument("dw_schema", type=str, help="dw schema")
-    parser.add_argument("table_name", type=str, help="table name that will be created")
+    parser = ArgumentParser(JOB_NAME)
+    parser.add_argument("env")
+    parser.add_argument("dw_bucket")
+    parser.add_argument("dw_schema")
+    parser.add_argument("table_name")
+    parser.add_argument("partitions")
 
     args = parser.parse_args()
 
@@ -26,28 +26,29 @@ if __name__ == "__main__":
     dw_bucket = args.dw_bucket
     dw_schema = args.dw_schema
     table_name = args.table_name
+    partitions = json.loads(args.partitions.replace("'", '"'))
 
     logger.info(
-        f"m={JOB_NAME}, env={env}, dw_bucket={dw_bucket}, dw_schema={dw_schema}, table_name={table_name}, "
-        + "msg=Job execution started"
+        f"m={__name__}, env={env}, dw_bucket={dw_bucket}, dw_schema={dw_schema}, "
+        f"table_name={table_name}, msg=Job execution started"
     )
 
-    schema_database_name, schema_database_location = DWMetastoreService.get_layer_info(
-        env, dw_schema, dw_bucket, "schema"
+    dw_db_name, dw_db_location = DWMetastoreService.get_layer_info(
+        env=env, schema=dw_schema, bucket=dw_bucket, layer=LayerEnum.DW.value
     )
 
-    (
-        database_name_staging,
-        database_location_staging,
-    ) = DWMetastoreService.get_layer_info(env, dw_schema, dw_bucket, "staging")
+    dw_staging_db_name, _ = DWMetastoreService.get_layer_info(
+        env=env, schema=dw_schema, bucket=dw_bucket, layer=LayerEnum.DW_STAGING.value
+    )
 
-    query = f"SELECT * FROM {database_name_staging}.{table_name}"
+    query = f"SELECT * FROM {dw_staging_db_name}.{table_name}"
 
     table_loader_pipeline = FullTableLoaderPipeline(
-        schema_database_name,
-        table_name,
-        schema_database_location,
-        LayerEnum.DW.value,
-        query,
+        database_name=dw_db_name,
+        table_name=table_name,
+        database_location=dw_db_location,
+        layer=LayerEnum.DW.value,
+        query=query,
+        partitions=partitions,
     )
     table_loader_pipeline.run()

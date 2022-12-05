@@ -1,7 +1,7 @@
 import json
 from datetime import timedelta
 
-import airflow.utils.helpers as airflow_helpers
+from airflow.utils.helpers import chain
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
@@ -89,21 +89,13 @@ class DWTaskGroup(BaseTaskGroup):
         slugged_dw_schema = StringFormatter.slugify(self.dw_schema)
         slugged_table_name = StringFormatter.slugify(table_name)
         extra_query_template_params = extra_query_template_params or {}
-
+        partitions = partitions or []
         table_load_mode = self._get_load_mode(is_incremental)
-
-        load_table_to_dw_final_schema_params = [
-            self.env,
-            self.dw_bucket,
-            self.dw_schema,
-            table_name,
-        ]
-        if is_incremental:
-            load_table_to_dw_final_schema_params += [
-                str(partitions),
-                "{{ ds }}",
-                json.dumps(extra_query_template_params),
-            ]
+        incremental_params = (
+            ["{{ ds }}", json.dumps(extra_query_template_params)]
+            if is_incremental
+            else []
+        )
 
         load_table_to_dw_final_schema_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
@@ -111,7 +103,14 @@ class DWTaskGroup(BaseTaskGroup):
             json={
                 "spark_python_task": {
                     "python_file": f"{self.spark_jobs_path}/load_{table_load_mode}_table_to_dw_final_schema.py",
-                    "parameters": load_table_to_dw_final_schema_params,
+                    "parameters": [
+                        self.env,
+                        self.dw_bucket,
+                        self.dw_schema,
+                        table_name,
+                        json.dumps(partitions),
+                    ]
+                    + incremental_params,
                 }
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
@@ -206,14 +205,14 @@ class DWTaskGroup(BaseTaskGroup):
                 trigger_rule="all_done",
             )
 
-            airflow_helpers.chain(
+            chain(
                 sync_metastore_tables_partitions_task,
                 propagate_table_metadata_task,
                 dummy_task,
             )
             final_tasks.append(dummy_task)
 
-        airflow_helpers.chain(
+        chain(
             load_table_to_dw_final_schema_task,
             sync_metastore_table_structure_task,
             sync_metastore_tables_partitions_task,
@@ -229,7 +228,6 @@ class DWTaskGroup(BaseTaskGroup):
         execution_date="{{ ds }}",
         is_incremental: bool = False,
         partitions: list = None,
-        has_ods_migration_test: bool = False,
         extra_query_template_params: dict = None,
         cluster_config_params: dict = None,
         tree_path: str = "",
@@ -243,8 +241,6 @@ class DWTaskGroup(BaseTaskGroup):
         :param is_incremental: if this table uses incremental load type
         :param partitions: list of columns to partition table
         :type partitions: list[str]
-        :param has_ods_migration_test: whether to create tasks to validate migrated
-            data x ods
         :param extra_query_template_params: additional parameters to be supplied to query template
         :param cluster_config_params: custom config parameters to be set in spark cluster
         :param tree_path: subfolder where the query is located. By default, an empty string, which means it's in the root folder "dw"
@@ -331,7 +327,6 @@ class DWTaskGroup(BaseTaskGroup):
             return self._build_dw_staging_full_load_extra_tasks(
                 load_table_to_dw_staging_schema_task=load_table_to_dw_staging_schema_task,
                 table_name=table_name,
-                has_ods_migration_test=has_ods_migration_test,
                 independent_tasks=quality_tasks,
             )
 
@@ -339,20 +334,15 @@ class DWTaskGroup(BaseTaskGroup):
         self,
         load_table_to_dw_staging_schema_task,
         table_name: str,
-        has_ods_migration_test: bool = False,
         independent_tasks: list = [],
     ) -> dict:
         """
         For full load pipelines, it builds the additional tasks:
         . emptiness_test_task: validate if table in staging is not empty
-        . test_entity_ods_migration_task: (optional) test if migrated data from ods
-         matches transformations mapped
         . add_default_row_to_dim_task: (optional) if table is a dimension, add
          default row with -1 in primary key column
 
         :param table_name: table name to be created
-        :param has_ods_migration_test: whether to create tasks to validate migrated
-            data versus ods
         :return: dict with initial and final tasks of the created task group
         :rtype: dict[str:list[airflow.models.BaseOperator]]
         """
@@ -375,28 +365,6 @@ class DWTaskGroup(BaseTaskGroup):
         )
 
         test_tasks = [emptiness_test_task]
-        if has_ods_migration_test:
-            config_service = ConfigurationService()
-            ods_migration_tests_threshold = config_service.get_config(
-                "ods_migration_tests_threshold"
-            )
-            test_entity_ods_migration_task = QuintoAndarDatabricksSubmitRunOperator(
-                dag=self.dag,
-                task_id=f"test-{slugged_layer}-{slugged_dw_schema}-{slugged_table_name}-ods-migration",
-                json={
-                    "spark_python_task": {
-                        "python_file": f"{self.spark_jobs_path}/test_ods_migration.py",
-                        "parameters": [
-                            self.env,
-                            table_name,
-                            json.dumps(ods_migration_tests_threshold),
-                            "{{ ds }}",
-                        ],
-                    }
-                },
-                execution_timeout=timedelta(hours=self.execution_timeout_hours),
-            )
-            test_tasks.append(test_entity_ods_migration_task)
 
         if self.is_dim(table_name):
             add_default_row_to_dim_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -416,13 +384,13 @@ class DWTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            airflow_helpers.chain(
+            chain(
                 load_table_to_dw_staging_schema_task,
                 add_default_row_to_dim_task,
                 test_tasks,
             )
         else:
-            airflow_helpers.chain(load_table_to_dw_staging_schema_task, test_tasks)
+            chain(load_table_to_dw_staging_schema_task, test_tasks)
 
         return DWTaskGroup.format_tasks_boundaries(
             initial_tasks=[load_table_to_dw_staging_schema_task],

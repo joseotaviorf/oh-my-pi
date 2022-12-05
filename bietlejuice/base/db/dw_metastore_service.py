@@ -17,11 +17,11 @@ class DWMetastoreService:
         dw_bucket = {"dw_bucket": bucket}
         spark_db_infos = {
             "dw_staging_databricks": f"dw_{schema}_staging",
-            "dw_schema_databricks": f"dw_{schema}",
+            "dw_databricks": f"dw_{schema}",
         }
         s3_infos = {
             "dw_staging_path": f"s3://{bucket}/staging/{schema}/",
-            "dw_schema_path": f"s3://{bucket}/{schema}/",
+            "dw_path": f"s3://{bucket}/{schema}/",
         }
 
         db_infos = {}
@@ -43,7 +43,7 @@ class DWMetastoreService:
         """
         db_info = DWMetastoreService.get_dw_info(env, schema, bucket)
 
-        schema_database_name = db_info["dw_" + layer + "_databricks"]
-        schema_database_location = db_info["dw_" + layer + "_path"]
+        schema_database_name = db_info[layer + "_databricks"]
+        schema_database_location = db_info[layer + "_path"]
 
         return schema_database_name, schema_database_location

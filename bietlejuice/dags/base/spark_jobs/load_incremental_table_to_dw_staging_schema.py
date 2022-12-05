@@ -17,24 +17,16 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
 
-    parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env", type=str, help="forno/prod values")
-    parser.add_argument("dw_bucket", type=str, help="dw bucket")
-    parser.add_argument("dw_schema", type=str, help="dw schema")
-    parser.add_argument(
-        "relative_query_path",
-        type=str,
-        help="relative query path for sql file to create table",
-    )
-    parser.add_argument("table_name", type=str, help="table name that will be created")
+    parser = ArgumentParser(JOB_NAME)
+    parser.add_argument("env")
+    parser.add_argument("dw_bucket")
+    parser.add_argument("dw_schema")
+    parser.add_argument("relative_query_path")
+    parser.add_argument("table_name")
     parser.add_argument("partitions")
     parser.add_argument("execution_date")
-    parser.add_argument("additional_query_template_params")
-    parser.add_argument(
-        "cluster_config_params",
-        type=str,
-        help="custom config parameters to be set in spark cluster",
-    )
+    parser.add_argument("extra_query_template_params")
+    parser.add_argument("cluster_config_params")
     parser.add_argument("tree_path", type=str, help="path to reach the query place")
 
     args = parser.parse_args()
@@ -46,13 +38,14 @@ if __name__ == "__main__":
     table_name = args.table_name
     partitions = json.loads(args.partitions.replace("'", '"'))
     execution_date = args.execution_date
-    query_template_params = json.loads(args.additional_query_template_params)
+    extra_query_template_params = json.loads(args.extra_query_template_params)
     cluster_config_params = json.loads(args.cluster_config_params)
     tree_path = args.tree_path
 
     logger.info(
         f"m={JOB_NAME}, env={env}, dw_bucket={dw_bucket},  dw_schema={dw_schema}, "
-        + f"relative_query_path={relative_query_path}, table_name={table_name}, tree_path={tree_path} msg=Job execution started"
+        f"relative_query_path={relative_query_path}, table_name={table_name}, "
+        "msg=Job execution started"
     )
 
     dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
@@ -61,27 +54,24 @@ if __name__ == "__main__":
         "month": dt_datetime.month,
         "day": dt_datetime.day,
     }
-    query_template_params.update(dt_dict)
+    extra_query_template_params.update(dt_dict)
 
-    schema_database_name, schema_database_location = DWMetastoreService.get_layer_info(
-        env, dw_schema, dw_bucket, "staging"
+    dw_staging_db_name, dw_staging_db_location = DWMetastoreService.get_layer_info(
+        env=env, schema=dw_schema, bucket=dw_bucket, layer=LayerEnum.DW_STAGING.value
     )
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
-        dag_name=relative_query_path,
-        layer=LayerEnum.DW.value,
-        intermediate_path=tree_path,
-        table_name=table_name,
+        dag_name=relative_query_path, table_name=table_name, layer=LayerEnum.DW.value
     )
 
     table_loader_pipeline = IncrementalTableLoaderPipeline(
-        database_name=schema_database_name,
+        database_name=dw_staging_db_name,
         table_name=table_name,
-        database_location=schema_database_location,
+        database_location=dw_staging_db_location,
         layer=LayerEnum.DW_STAGING.value,
         query=query,
         cluster_config_params=cluster_config_params,
         partitions=partitions,
-        query_template_params=query_template_params,
+        query_template_params=extra_query_template_params,
     )
     table_loader_pipeline.run()

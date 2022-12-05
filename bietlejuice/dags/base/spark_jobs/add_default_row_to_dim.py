@@ -1,28 +1,25 @@
-import logging
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DWMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.pipeline.default_row_addition_pipeline import (
     DefaultRowAdditionPipeline,
 )
 
 JOB_NAME = "add_default_row_to_dim"
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env", type=str, help="forno or prod values")
-    parser.add_argument("dw_bucket", type=str, help="dw bucket")
-    parser.add_argument("dw_schema", type=str, help="dw schema")
-    parser.add_argument("layer", type=str, help="layer to save data to")
-    parser.add_argument(
-        "table_name", type=str, help="table name that will be processed"
-    )
+    parser.add_argument("env")
+    parser.add_argument("dw_bucket")
+    parser.add_argument("dw_schema")
+    parser.add_argument("layer")
+    parser.add_argument("table_name")
 
     args = parser.parse_args()
 
@@ -37,11 +34,14 @@ if __name__ == "__main__":
         + f"dw_schema={dw_schema}, table_name={table_name},  msg=Job execution started"
     )
 
-    schema_database_name, schema_database_location = DWMetastoreService.get_layer_info(
-        env, dw_schema, dw_bucket, "staging"
+    dw_staging_db_name, dw_staging_db_location = DWMetastoreService.get_layer_info(
+        env=env, schema=dw_schema, bucket=dw_bucket, layer=LayerEnum.DW_STAGING.value
     )
 
     default_row_addition_pipeline = DefaultRowAdditionPipeline(
-        schema_database_name, table_name, schema_database_location, layer
+        database_name=dw_staging_db_name,
+        table_name=table_name,
+        database_location=dw_staging_db_location,
+        layer=layer,
     )
     default_row_addition_pipeline.run()

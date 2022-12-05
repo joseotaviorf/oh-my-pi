@@ -1,4 +1,3 @@
-import logging
 import json
 from argparse import ArgumentParser
 from datetime import datetime
@@ -11,31 +10,28 @@ from bietlejuice.pipeline import IncrementalTableLoaderPipeline
 
 JOB_NAME = "load_incremental_table_to_dw_final_schema"
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def build_query(query_filters, database_name_staging, table_name):
+def build_query(query_filters, dw_staging_database_name, table_name):
 
     where = ""
     if query_filters:
-        filters = []
-        for key, value in query_filters.items():
-            filters.append(f"{key} = {value}")
+        filters = [f"{key} = {value}" for key, value in query_filters.items()]
         where = "WHERE " + " AND ".join(filters)
 
-    query = f"SELECT * FROM {database_name_staging}.{table_name} {where}"
+    query = f"SELECT * FROM {dw_staging_database_name}.{table_name} {where}"
 
     return query
 
 
 if __name__ == "__main__":
 
-    parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env", type=str, help="forno/prod values")
-    parser.add_argument("dw_bucket", type=str, help="dw bucket")
-    parser.add_argument("dw_schema", type=str, help="dw schema")
-    parser.add_argument("table_name", type=str, help="table name that will be created")
+    parser = ArgumentParser(JOB_NAME)
+    parser.add_argument("env")
+    parser.add_argument("dw_bucket")
+    parser.add_argument("dw_schema")
+    parser.add_argument("table_name")
     parser.add_argument("partitions")
     parser.add_argument("execution_date")
     parser.add_argument("query_filters")
@@ -51,18 +47,17 @@ if __name__ == "__main__":
     execution_date = args.execution_date
 
     logger.info(
-        f"m={JOB_NAME}, env={env}, dw_bucket={dw_bucket}, dw_schema={dw_schema}, table_name={table_name}, "
-        + "msg=Job execution started"
+        f"m={__name__}, env={env}, dw_bucket={dw_bucket}, dw_schema={dw_schema}, "
+        f"table_name={table_name}, execution_date={execution_date}, msg=Job execution started"
     )
 
-    schema_database_name, schema_database_location = DWMetastoreService.get_layer_info(
-        env, dw_schema, dw_bucket, "schema"
+    dw_db_name, dw_db_location = DWMetastoreService.get_layer_info(
+        env=env, schema=dw_schema, bucket=dw_bucket, layer=LayerEnum.DW.value
     )
 
-    (
-        database_name_staging,
-        database_location_staging,
-    ) = DWMetastoreService.get_layer_info(env, dw_schema, dw_bucket, "staging")
+    dw_staging_db_name, _ = DWMetastoreService.get_layer_info(
+        env=env, schema=dw_schema, bucket=dw_bucket, layer=LayerEnum.DW_STAGING.value
+    )
 
     dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
     query_template_params = {
@@ -71,12 +66,12 @@ if __name__ == "__main__":
         "day": dt_datetime.day,
     }
 
-    query = build_query(query_filters, database_name_staging, table_name)
+    query = build_query(query_filters, dw_staging_db_name, table_name)
 
     table_loader_pipeline = IncrementalTableLoaderPipeline(
-        database_name=schema_database_name,
+        database_name=dw_db_name,
         table_name=table_name,
-        database_location=schema_database_location,
+        database_location=dw_db_location,
         layer=LayerEnum.DW.value,
         query=query,
         partitions=partitions,

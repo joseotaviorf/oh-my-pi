@@ -1,4 +1,3 @@
-import logging
 import json
 from argparse import ArgumentParser
 
@@ -12,27 +11,18 @@ from bietlejuice.pipeline import FullTableLoaderPipeline
 
 JOB_NAME = "load_full_table_to_dw_staging_schema"
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
 
-    parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env", type=str, help="forno/prod values")
-    parser.add_argument("dw_bucket", type=str, help="dw bucket")
-    parser.add_argument("dw_schema", type=str, help="dw schema")
-    parser.add_argument(
-        "relative_query_path",
-        type=str,
-        help="relative query path for sql file to create table",
-    )
-    parser.add_argument("table_name", type=str, help="table name that will be created")
-    parser.add_argument(
-        "cluster_config_params",
-        type=str,
-        help="custom config parameters to be set in spark cluster",
-    )
-    parser.add_argument("tree_path", type=str, help="path to reach the query place")
+    parser = ArgumentParser(JOB_NAME)
+    parser.add_argument("env")
+    parser.add_argument("dw_bucket")
+    parser.add_argument("dw_schema")
+    parser.add_argument("relative_query_path")
+    parser.add_argument("table_name")
+    parser.add_argument("cluster_config_params")
+    parser.add_argument("tree_path")
 
     args = parser.parse_args()
 
@@ -46,11 +36,12 @@ if __name__ == "__main__":
 
     logger.info(
         f"m={JOB_NAME}, env={env}, dw_bucket={dw_bucket},  dw_schema={dw_schema}, "
-        + f"relative_query_path={relative_query_path}, table_name={table_name}, tree_path={tree_path} msg=Job execution started"
+        f"relative_query_path={relative_query_path}, table_name={table_name}, "
+        f"tree_path={tree_path} msg=Job execution started"
     )
 
-    schema_database_name, schema_database_location = DWMetastoreService.get_layer_info(
-        env, dw_schema, dw_bucket, "staging"
+    dw_staging_db_name, dw_staging_db_location = DWMetastoreService.get_layer_info(
+        env=env, schema=dw_schema, bucket=dw_bucket, layer=LayerEnum.DW_STAGING.value
     )
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
@@ -61,9 +52,9 @@ if __name__ == "__main__":
     )
 
     table_loader_pipeline = FullTableLoaderPipeline(
-        database_name=schema_database_name,
+        database_name=dw_staging_db_name,
         table_name=table_name,
-        database_location=schema_database_location,
+        database_location=dw_staging_db_location,
         layer=LayerEnum.DW_STAGING.value,
         query=query,
         cluster_config_params=cluster_config_params,
