@@ -49,6 +49,6 @@ if __name__ == "__main__":
         database_location=dw_db_location,
         layer=LayerEnum.DW.value,
         query=query,
-        partitions=partitions,
+        # partitions=partitions,
     )
     table_loader_pipeline.run()
