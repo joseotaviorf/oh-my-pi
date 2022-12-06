@@ -1,0 +1,95 @@
+from datetime import datetime
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from pendulum import timezone
+import os
+
+from airflow.utils.helpers import chain
+from airflow.models import DAG
+from airflow.operators.quintoandar_databricks import (
+    QuintoAndarDatabricksCreateClusterOperator,
+    QuintoAndarDatabricksSubmitRunOperator,
+    QuintoAndarDatabricksTerminateClusterOperator,
+)
+
+from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.dags.base.reverse_task_group import ReverseTaskGroup
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+
+# ENV setup
+ENV = os.environ.get("ENVIRONMENT")
+
+# DAG and Jobs params setup
+SOURCE = "dashboard_governance"
+DAG_NAME = f"reverse_{SOURCE}"
+DAG_ID = f"bietlejuice.{DAG_NAME}"
+
+MAIN_START_DATE = datetime(2022, 7, 12, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
+
+config_service = ConfigurationService(DAG_NAME)
+
+# S3 path setup
+datalake_bucket = config_service.get_config("datalake_bucket")
+s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
+base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
+artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+
+reverse_spark_job_path = (
+    f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_dashboard_governance_into_mp.py"
+)
+
+cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
+
+default_libraries = config_service.get_config("default_libraries")
+
+dag = DAG(
+    dag_id=DAG_ID,
+    default_args={
+        "owner": DAGOwnerEnum.DATA_GOVERNANCE,
+        "wait_for_downstream": False,
+        "depends_on_past": False,
+    },
+    start_date=MAIN_START_DATE,
+    schedule_interval=None,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID, ENV=ENV
+    ),
+)
+
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=cluster_description,
+    libraries=default_libraries,
+)
+
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
+
+
+task_group = ReverseTaskGroup(
+    dag=dag,
+    env=ENV,
+    s3_bucket=datalake_bucket,
+    relative_query_path=DAG_NAME,
+    spark_jobs_path=base_spark_jobs_path,
+)
+
+submit_metadata_propagator_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id=f"load_dashboard_governance_into_mp",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": reverse_spark_job_path,
+            "parameters": [ENV, "{{ ds }}"],
+        }
+    },
+)
+
+
+chain(create_cluster_task, submit_metadata_propagator_task)
+chain(submit_metadata_propagator_task, terminate_cluster_task)

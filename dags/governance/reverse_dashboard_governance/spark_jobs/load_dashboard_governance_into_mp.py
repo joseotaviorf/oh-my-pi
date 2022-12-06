@@ -1,0 +1,111 @@
+import json
+import logging
+from argparse import ArgumentParser
+from datetime import datetime
+
+import requests
+from quintoandar_logger import QuintoAndarLogger
+from requests import RequestException
+from requests.adapters import HTTPAdapter, Retry
+
+from bietlejuice.base.service import ServiceEnum
+from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.clients.db_clients import SparkClient
+
+
+DATABRICKS_SCOPE = "quintoandar"
+JOB_NAME = "load_dashboard_governance_into_mp"
+DASHBOARDS_PATH = "/dashboards"
+EXTRACTION_QUERY = """
+SELECT
+  platform,
+  id_dashboard,
+  dashboard_path,
+  title,
+  description,
+  ownership,
+  domain,
+  status,
+  ids_charts,
+  last_view,
+  dashboard_url
+FROM
+  datalake_dashboard_governance.dashboard_metadata
+WHERE
+  day == {day} and month == {month} and year == {year}
+"""
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
+
+
+def _get_payloads_from_datalake(spark_client, execution_date):
+    query = EXTRACTION_QUERY
+    query_params = {
+        "day": execution_date.day,
+        "month": execution_date.month,
+        "year": execution_date.year,
+    }
+    formatted_query = query.format(**query_params)
+
+    df = spark_client.get_records(formatted_query)
+    rows = df.rdd.map(lambda row: row.asDict()).collect()
+
+    return json.dumps([{"vendor": ["datahub"], **row} for row in rows], default=str)
+
+
+def _send_requests(endpoint, payloads, chunk_size=30):
+    session = requests.Session()
+    retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504])
+    session.mount(endpoint, HTTPAdapter(max_retries=retries))
+
+    for idx in range(0, len(payloads), chunk_size):
+        chunk = payloads[idx : idx + chunk_size]
+        response = session.post(endpoint, json=chunk)
+
+        try:
+            response.raise_for_status()
+        except RequestException as exception:
+            if exception.response is not None:
+                logger.error(
+                    f"Exception trying to call metadata-propagator service, "
+                    f"status_code={exception.response.status_code}, "
+                    f"error_message={exception.response.text}"
+                )
+            else:
+                logger.error(
+                    f"Exception trying to call metadata-propagator service, "
+                    f"exception={exception}"
+                )
+
+
+if __name__ == "__main__":
+
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("env")
+    parser.add_argument("execution_date_str")
+
+    args = parser.parse_args()
+    env = args.env
+    execution_date_str = args.execution_date_str
+    execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
+
+    logger.info(
+        f"""m={JOB_NAME}, env={env}, execution_date_str={execution_date_str}
+        msg=Job execution started."""
+    )
+
+    base_dbutils = BaseDBUtils()
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+
+    json_credentials = dbutils.secrets.get(
+        scope=DATABRICKS_SCOPE, key=ServiceEnum.METADATA_PROPAGATOR.value
+    )
+    credentials = json.loads(json_credentials)
+    host = credentials["host"]
+    endpoint = f"{host}{DASHBOARDS_PATH}"
+
+    spark_client = SparkClient()
+    payloads = _get_payloads_from_datalake(spark_client, execution_date)
+    _send_requests(endpoint, payloads)

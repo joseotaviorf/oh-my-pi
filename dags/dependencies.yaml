@@ -2566,7 +2566,7 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
   - bietlejuice.dw_offer:load-dw-public-dim-offer
   - bietlejuice.dw_proposal:load-dw-public-dim-proposal
-  - bietlejuice.dw_region:load-dw-public-dim-region 
+  - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
@@ -2581,3 +2581,6 @@ bietlejuice.enrich_zipcodes:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_region:load-enrich-region
+
+bietlejuice.reverse_dashboard_governance:
+  - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
