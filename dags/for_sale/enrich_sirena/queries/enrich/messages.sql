@@ -2,20 +2,44 @@ with agents_class AS (
     SELECT
         gr.group_name,
         ag.id,
+        row_number() OVER (
+            PARTITION BY ag.id
+            ORDER BY
+                CASE
+                    WHEN gr.group_name = 'QuintoAndar Admin' THEN 0
+                    WHEN gr.group_name = 'Deal Making' THEN 1
+                    WHEN gr.group_name = 'Closing' THEN 2
+                    WHEN gr.group_name = 'Casa Mineira' THEN 4
+                    WHEN gr.group_name = 'QuintoAndar' THEN 5
+                    ELSE 6
+                END DESC,
+                gr.group_name,
+                gr.display_name
+            ) AS num_line
+    FROM
+        datalake_sirena_clean.agents as ag
+    INNER JOIN
+        datalake_sirena_clean.groups AS gr
+            ON ag.id_group = gr.id
+),
+agent_info AS (
+    SELECT
+        ag.id,
         ag.first_name,
         ag.last_name,
         ag.phone,
         ag.email
     FROM
         datalake_sirena_clean.agents as ag
-    INNER JOIN
-        datalake_sirena_clean.groups AS gr
-            ON ag.id_group = gr.id
-    WHERE
-        gr.group_name IN ('Closing', 'Deal Making','QuintoAndar Expert','Casa Mineira','QuintoAndar Assessor','QuintoAndar Consultor','QuintoAndar - Assessoria de Proprietários ForSale','Sucesso do Cliente')
+    GROUP BY
+        ag.id,
+        ag.first_name,
+        ag.last_name,
+        ag.phone,
+        ag.email
 ),
 client_info AS (
-    SELECT  
+    SELECT
         id,
         CASE
             WHEN pr.last_name REGEXP '[0-9]{{9}}'
@@ -56,18 +80,14 @@ SELECT
             THEN intrc.output.message.sender
         ELSE intrc.output.message.recipient
     END AS prospect_phone,
-    CASE
-        WHEN ac.group_name IS NULL
-            THEN 'QuintoAndar Admin'
-        ELSE ac.group_name
-    END AS group_name,
-    ac.first_name AS agent_first_name,
-    ac.last_name AS agent_last_name,
-    ac.phone AS agent_phone,
-    ac.email AS agent_email,
+    ac.group_name,
+    ai.first_name AS agent_first_name,
+    ai.last_name AS agent_last_name,
+    ai.phone AS agent_phone,
+    ai.email AS agent_email,
     intrc.via,
     CASE
-        WHEN intrc.output.message.attachment.type IS NOT NULL 
+        WHEN intrc.output.message.attachment.type IS NOT NULL
             THEN 'Anexo'
         ELSE 'Texto'
     END AS message_type,
@@ -94,8 +114,12 @@ LEFT JOIN
 LEFT JOIN
     client_info AS ci
         ON intrc.id_prospect = ci.id
+LEFT JOIN
+    agent_info AS ai
+        ON intrc.id_prospect = ai.id
 WHERE
     intrc.via = 'whatsApp'
+    AND ac.num_line = 1
     AND (intrc.output.message.content NOT LIKE '%Mensagem automática do QuintoAndar%'
         OR intrc.output.message.attachment.type IS NOT NULL)
     AND ts_created >= '2021-01-01'
