@@ -18,7 +18,6 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.slack_service import SlackService
 
 from quintoandar_velo_neurotech_api_client.clients import VeloNeurotechClient
-from quintoandar_velo_neurotech_api_client.constants import EndpointEnum
 from quintoandar_velo_neurotech_api_client.consumers import VeloNeurotechConsumer
 
 from pyspark.sql.types import StructField, StructType, StringType
@@ -29,7 +28,6 @@ JOB_NAME = "load_incremental_data_into_datalake_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
-endpoint_enum = EndpointEnum
 
 
 def convert_datetime_to_neurotech_format(datetime_object):
@@ -45,7 +43,7 @@ def sync_data(username, password, client_id, client_secret, end_date, report_nam
     :param client_secret: client_secret for authentication
     :param start_date: start date for querying log data
     :param end_date: end date for querying log data
-    :return: Json list of returned records
+    :return: Json list zof returned records
     """
     start_date = end_date - timedelta(days=1)
     start_date = datetime(
@@ -59,7 +57,11 @@ def sync_data(username, password, client_id, client_secret, end_date, report_nam
     end_date = convert_datetime_to_neurotech_format(end_date)
 
     client = VeloNeurotechClient(username, password, client_id, client_secret)
-    consumer = VeloNeurotechConsumer(endpoint_enum=endpoint_enum, client=client)
+    consumer = VeloNeurotechConsumer(client=client)
+
+    logging.info(
+        f"m=sync_data, report_name={report_name}, start_date={start_date}, end_date={end_date}"
+    )
 
     return consumer.sync(report_name, start_date, end_date)
 

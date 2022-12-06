@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 from pendulum import timezone
 import os
 
@@ -22,9 +23,6 @@ MAIN_START_DATE = datetime(2022, 8, 29, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 config_service = ConfigurationService(SOURCE)
-table_name = config_service.get_config("table_name")
-report_name = config_service.get_config("report_name")
-partition_cols = config_service.get_config("partition_cols")
 artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
@@ -52,6 +50,14 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 
+
+def get_date_param(dag_run, ds, date_param_name):
+    date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
+    if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
+        return date_param
+    return ds
+
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -64,6 +70,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+    user_defined_macros={"get_date_param": get_date_param},
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -87,32 +94,39 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-raw_task_group = task_group.build_raw_task_group_for_single_table(
-    source=SOURCE,
-    table_name=table_name,
-    target_database_base_name=SOURCE,
-    extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}/load_incremental_data_into_datalake_raw.py",
-    raw_spark_job_extra_args=[
-        SOURCE,
-        "{{ ds }}",
-        table_name,
-        report_name,
-        str(partition_cols),
-    ],
-)
+reports = config_service.get_config("reports")
+partition_cols = config_service.get_config("partition_cols")
 
-clean_task_group = task_group.build_clean_task_group(
-    source_database_base_name=SOURCE,
-    target_database_base_name=SOURCE,
-    table_name=table_name,
-    is_incremental=False,
-)
+for report in reports:
+    report_name = report["report_name"]
+    table_name = report["table_name"]
 
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        table_name=table_name,
+        target_database_base_name=SOURCE,
+        extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}/load_incremental_data_into_datalake_raw.py",
+        raw_spark_job_extra_args=[
+            SOURCE,
+            "{{ get_date_param(dag_run, ds, 'execution_date') }}",
+            table_name,
+            report_name,
+            str(partition_cols),
+        ],
+    )
 
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_group),
-    DatalakeTaskGroup.first_tasks(clean_task_group),
-)
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+        is_incremental=False,
+    )
 
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
+    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
+
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))

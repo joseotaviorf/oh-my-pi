@@ -18,9 +18,11 @@ This DAG is triggered daily at 06:00am.
 In datalake raw:
 
 - `logs_credit_granting` (incremental load)
+- `logs_scoping_policy` (incremental load)
 
 In datalake clean:
 
 - `logs_credit_granting` (full load)
+- `logs_scoping_policy` (full load)
 
 </details>
