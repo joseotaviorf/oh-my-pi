@@ -16,7 +16,6 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 SOURCE = "regions_polygon"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2020, 8, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 CUSTOM_LIBRARIES = [
     {
@@ -64,7 +63,7 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    schedule_interval=None,
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
