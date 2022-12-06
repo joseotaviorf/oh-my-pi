@@ -10,7 +10,7 @@ columns:
       - datalake_velo_neurotech_raw.logs_scoping_policy.codigo_operacao
   id_proposal_log:
     lineage:
-      - datalake_velo_neurotech_raw.logs_scoping_policy.prop_ffp_log_id_proposta
+      - datalake_velo_neurotech_raw.logs_scoping_policy.log_id_proposta
   log_id_proposta:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.log_id_proposta

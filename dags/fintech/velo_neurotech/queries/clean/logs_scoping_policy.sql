@@ -1,7 +1,6 @@
 SELECT
     CAST(codigo_proposta AS BIGINT) AS id_proposal,
     CAST(codigo_operacao AS BIGINT) AS id_operation,
-    CAST(prop_ffp_log_id_proposta AS BIGINT) AS id_proposal_log,
     CAST(log_id_proposta AS BIGINT) AS id_proposal_log,
     prop_dom_alcada_usuario AS prop_dom_competence_user,
     calc_status AS calc_status,
@@ -41,7 +40,6 @@ SELECT
     prop_ffp_tipo_contribuinte AS proposal_contributor_type,
     flx_principal AS flx_principal,
     politica AS policy,
-    calc_parecer AS status_decision,
     prop_fma_parecer_documento AS proposal_fma_decision_document,
     prop_fma_motivos AS proposal_fma_motives,
     case_alcada_decisao AS case_competence_decision,
