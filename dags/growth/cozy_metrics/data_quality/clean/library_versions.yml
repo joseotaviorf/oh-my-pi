@@ -9,14 +9,19 @@ column_level_validations:
   project_version:
     is_complete:
   core:
-    is_complete:
+    has_completeness:
+      greater_than: 0.98
   icons:
-    is_complete:
+    has_completeness:
+      greater_than: 0.98
   theme:
-    is_complete:
+    has_completeness:
+      greater_than: 0.98
   tokens:
-    is_complete:
+    has_completeness:
+      greater_than: 0.98
   utils:
-    is_complete:
+    has_completeness:
+      greater_than: 0.98
   dt_created:
     is_complete:
