@@ -195,6 +195,12 @@ class PostgresValidationSuite(DatabaseValidationSuitesExecutor):
         )
         self._validate_connection(db_consumer)
 
+    def validate_saruman(self):
+        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
+            self.auth[DatabaseEnum.SARUMAN], SparkClient()
+        )
+        self._validate_connection(db_consumer)
+
     def validate_sauron(self):
         db_consumer = self.REPOSITORY_CONSUMER_CLASS(
             self.auth[DatabaseEnum.SAURON], SparkClient()
