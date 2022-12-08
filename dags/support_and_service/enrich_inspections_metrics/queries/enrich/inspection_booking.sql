@@ -8,7 +8,7 @@ WITH contract_termination AS (
     FROM
         datalake_offboarding.contract_termination AS ct
     QUALIFY
-        ct.ts_updated = FIRST(ct.ts_updated) OVER (PARTITION BY ct.id_contract ORDER BY ct.ts_updated DESC)
+        ct.ts_created = FIRST(ct.ts_created) OVER (PARTITION BY ct.id_contract ORDER BY ct.ts_created DESC)
 )
 SELECT DISTINCT
     i.id_inspection,

@@ -1,5 +1,5 @@
 WITH assessment AS ( --There should only be a single assessment for an inspection, but there are some duplications that should be removed.
-    SELECT
+    SELECT DISTINCT
         a.id_inspection,
         a.id_assessment,
         a.source,
@@ -9,7 +9,7 @@ WITH assessment AS ( --There should only be a single assessment for an inspectio
     FROM
         datalake_inspections_clean.assessment AS a
     QUALIFY
-        a.ts_updated = FIRST(a.ts_updated) OVER (PARTITION BY a.id_inspection ORDER BY a.ts_updated DESC)
+        a.ts_created = FIRST(a.ts_created) OVER (PARTITION BY a.id_inspection ORDER BY a.ts_created DESC)
 ),
 main_exception AS (
     SELECT
