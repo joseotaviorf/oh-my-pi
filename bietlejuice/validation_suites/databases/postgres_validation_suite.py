@@ -111,6 +111,12 @@ class PostgresValidationSuite(DatabaseValidationSuitesExecutor):
         )
         self._validate_connection(db_consumer)
 
+    def validate_klefki(self):
+        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
+            self.auth[DatabaseEnum.KLEFKI], SparkClient()
+        )
+        self._validate_connection(db_consumer)
+
     def validate_linha_direta(self):
         db_consumer = self.REPOSITORY_CONSUMER_CLASS(
             self.auth[DatabaseEnum.LINHADIRETA], SparkClient()
