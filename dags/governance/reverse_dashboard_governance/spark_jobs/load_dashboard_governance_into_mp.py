@@ -15,7 +15,7 @@ from bietlejuice.clients.db_clients import SparkClient
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_dashboard_governance_into_mp"
-DASHBOARDS_PATH = "/dashboards"
+DASHBOARDS_PATH = "/dashboard"
 EXTRACTION_QUERY = """
 SELECT
   platform,
