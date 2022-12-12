@@ -44,40 +44,5 @@ LEFT JOIN
 WHERE
   DATE(bmt.dt_metric_reference) >= '2022-07-19'
 AND
-  dd.department IN (
-    'Entrada no imóvel [ONB] [POS] [BACK]',
-    'Proteção QuintoAndar [OFF] [POS] [BACK]',
-    'Reparos [REP] [POS] [BACK]',
-    'BACK [Visitas]',
-    'BACK [Propostas]',
-    'Aditivos [REP] [POS] [BACK]',
-    'CX Negociação de aluguel [PAY] [POS] [BACK]',
-    'CX Partners [PRE] [FRONT]',
-    'CX Visitas  Tarefas [PRE][BACK]',
-    'CX Partners Tarefas [PRE] [BACK]',
-    'CX Propostas Tarefas [PRE] [BACK]',
-    'CX Pagamentos Ativo [POS] [BACK] [PAY]',
-    'Consultores Imobiliarios QuintoAndar [PRE] [BACK]',
-    'Offboarding [OFF] [POS] [BACK]',
-    'Rescisão - Despejo [OFF][POS][BACK]',
-    'Offboarding Reparos [OFF] [POS] [BACK]',
-    'CX Ação Plaquinhas [PRE] [BACK]',
-    'Contas de Consumo [ONB] [POS] [BACK]',
-    'Reparos Atento [REP] [POS] [BACK]',
-    'CX Partners [PRE] [BACK]',
-    'CIQ Assessor de Proprietário [PRE][BACK]',
-    'CX Closing [BACK] [PRE]',
-    'CX Offboarding ETP 1 [BACK] [POS]',
-    'CX Rescisão [BACK] [POS]',
-    'CX Onboarding [BACK] [POS]',
-    'CX Vistoria [BACK]',
-    'RevisarPagamentosRescisao',
-    'RescisaoPreVigencia',
-    'Reparos N2 - Emergenciais [QA]',
-    'Reparos Urgentes [Back]',
-    'Reparos Back [ATN]',
-    'Triagem Reparos [Back]',
-    'PARTNERS/CIQ [FRONT] [PRE]',
-    'Reparos Comuns [Back]',
-    'Assessor de Proprietário [ASP] [PRE] [BACK]'
-  )
+  dd.is_partner IS TRUE
+  AND dd.front_or_back <> 'front'

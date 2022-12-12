@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS customer_support.dim_department (
     concentrix_area_name VARCHAR,
     is_concentrix BOOLEAN,
     is_active BOOLEAN,
+    is_partner BOOLEAN,
     ts_load TIMESTAMP
 );
 ALTER TABLE customer_support.dim_department OWNER TO airflow;

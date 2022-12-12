@@ -34,3 +34,6 @@ columns:
   is_active:
     lineage:
       - datalake_gsheets_clean.department_control.active_department
+  is_partner:
+    lineage:
+      - datalake_gsheets_clean.department_control.is_partner
