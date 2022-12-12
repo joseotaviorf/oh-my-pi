@@ -80,8 +80,8 @@ source_ops_rent AS (
                     OR (hlf.has_isales_intervention = false))
                     AND photo_job_by_isales >= 1
                     AND sk_first_photo_job_date = hlf.sk_opportunity_date THEN 'FSS IS PhotoJob'
-            WHEN coalesce(du.sales_company,dl.sales_company) IN ('QUINTO_ANDAR','') THEN 'IS Int'
-            WHEN coalesce(du.sales_company,dl.sales_company) IN ('ACTION_LINE','ATENTO','ALGAR') THEN 'IS Ext'
+            WHEN coalesce(du.sales_company,dl.sales_company) IN ('QUINTO_ANDAR','OLOS','') THEN 'IS Int'
+            WHEN coalesce(du.sales_company,dl.sales_company) IN ('ACTION_LINE','ATENTO','ALGAR','AEC') THEN 'IS Ext'
             ELSE  'Other'
         END  AS sourcing_ops,
         CASE
@@ -219,8 +219,8 @@ source_ops_sale AS (
                     OR (ssf.has_isales_intervention = false))
                 AND photo_job_by_isales >= 1
                 AND sk_first_photo_job_date = ssf.sk_opportunity_date THEN 'FSS IS PhotoJob'
-            WHEN coalesce(du.sales_company,dl.sales_company) IN ('QUINTO_ANDAR','') THEN 'IS Int'
-            WHEN coalesce(du.sales_company,dl.sales_company) IN ('ACTION_LINE','ATENTO','ALGAR') THEN 'IS Ext'
+            WHEN coalesce(du.sales_company,dl.sales_company) IN ('QUINTO_ANDAR','OLOS','') THEN 'IS Int'
+            WHEN coalesce(du.sales_company,dl.sales_company) IN ('ACTION_LINE','ATENTO','ALGAR','AEC') THEN 'IS Ext'
             ELSE  'Other'
         END AS sourcing_ops,
         CASE

@@ -11,6 +11,8 @@ SELECT
         WHEN u.email LIKE '%@actionline%.com.br' THEN 'ACTION_LINE'
         WHEN u.email LIKE '%@atento.com.br' THEN 'ATENTO'
         WHEN u.email LIKE '%@algar%' THEN 'ALGAR'
+        WHEN u.email LIKE '%@aec%' THEN 'AEC'
+        WHEN u.email LIKE '%@olos%' THEN 'OLOS'
     END AS sales_company,
     COALESCE(sp.is_active, u.is_active) AS is_sales_rep_active,
     DATE(COALESCE(sp.ts_contract_started, u.ts_created)) AS dt_sales_rep_started
@@ -26,5 +28,7 @@ WHERE
     u.email LIKE '%@actionline.com.br' 
     OR u.email LIKE '%@atento.com.br' 
     OR u.email LIKE '%@algar%' 
+    OR u.email LIKE '%@aec%' 
+    OR u.email LIKE '%@olos%' 
     OR (u.id_sales_rep IS NOT NULL
         AND u.email LIKE '%@quintoandar.com.br')
