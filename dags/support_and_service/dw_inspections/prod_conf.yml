@@ -10,5 +10,6 @@ incremental_tables:
   - dim_item_group
   - dim_item
   - dim_room
+  - fact_item
 
 partitions_cols: [year, month, day]
