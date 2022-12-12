@@ -19,7 +19,7 @@ ENV = os.environ.get("ENVIRONMENT")
 SOURCE = "documentation_metrics"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2021, 10, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 0 * * 0"
+MAIN_SCHEDULE_INTERVAL = "0 5 * * *"
 
 config_service = ConfigurationService(SOURCE)
 datalake_bucket = config_service.get_config("datalake_bucket")

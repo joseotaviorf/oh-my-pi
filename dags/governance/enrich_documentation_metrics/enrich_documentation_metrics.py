@@ -20,7 +20,6 @@ DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 MAIN_START_DATE = datetime(2022, 5, 5, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 9 * * 0"
 PARTITION_COLS = ["year", "month", "day"]
 
 config_service = ConfigurationService(CONTEXT)
@@ -45,7 +44,7 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    schedule_interval=None,
     start_date=MAIN_START_DATE,
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
