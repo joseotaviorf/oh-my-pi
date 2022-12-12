@@ -12,7 +12,6 @@ from bietlejuice.base.service import ServiceEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
 
-
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_dashboard_governance_into_mp"
 DASHBOARDS_PATH = "/dashboard"
@@ -27,7 +26,7 @@ SELECT
   domain,
   status,
   ids_charts,
-  last_view,
+  date_format(last_view, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") as last_view,
   dashboard_url
 FROM
   datalake_dashboard_governance.dashboard_metadata
@@ -37,6 +36,10 @@ WHERE
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def remove_nulls(row_dict):
+    return {k: v for k, v in row_dict.items() if v}
 
 
 def _get_payloads_from_datalake(spark_client, execution_date):
@@ -51,7 +54,7 @@ def _get_payloads_from_datalake(spark_client, execution_date):
     df = spark_client.get_records(formatted_query)
     rows = df.rdd.map(lambda row: row.asDict()).collect()
 
-    return json.dumps([{"vendor": ["datahub"], **row} for row in rows], default=str)
+    return [{"vendor": ["datahub"], **remove_nulls(row)} for row in rows]
 
 
 def _send_requests(endpoint, payloads, chunk_size=30):
@@ -60,7 +63,7 @@ def _send_requests(endpoint, payloads, chunk_size=30):
     session.mount(endpoint, HTTPAdapter(max_retries=retries))
 
     for idx in range(0, len(payloads), chunk_size):
-        chunk = payloads[idx : idx + chunk_size]
+        chunk = payloads[idx: idx + chunk_size]
         response = session.post(endpoint, json=chunk)
 
         try:
