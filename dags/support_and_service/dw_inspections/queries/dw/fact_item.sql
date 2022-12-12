@@ -20,5 +20,9 @@ SELECT
     i.day
 FROM
     datalake_inspections_metrics.item_description i
+WHERE
+    i.year = {year}
+    AND i.month = {month}
+    AND i.day = {day}
 QUALIFY
     i.ts_updated = FIRST(i.ts_updated) OVER(PARTITION BY i.id_item ORDER BY i.ts_updated DESC)
