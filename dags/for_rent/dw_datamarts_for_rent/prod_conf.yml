@@ -15,18 +15,10 @@ pipeline:
     dw:
       <<: *redshift_anchor
       table: weekly_demand_metrics
-  house_available_hours:
-    dw:
-      <<: *redshift_anchor
-      table: house_available_hours
   house_weekly_available_hours:
     dw:
       <<: *redshift_anchor
       table: house_weekly_available_hours
-  house_weekly_entrance_info:
-    dw:
-      <<: *athena_anchor
-      table: house_weekly_entrance_info
   datamart_opportunity:
     dw:
       <<: *redshift_anchor

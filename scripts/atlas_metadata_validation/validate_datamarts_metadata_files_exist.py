@@ -54,11 +54,9 @@ SKIP_LIST = {
         "marketing_allocated_costs",
     },
     "dw_datamarts/for_rent": {
-        "house_available_hours",
         "house_weekly_available_hours",
         "datamart_kpi_weekly",
         "datamart_cohort_rentals",
-        "house_weekly_entrance_info",
         "repressed_demand",
         "ongoing_listed_suspended_listings",
         "contract_termination",
