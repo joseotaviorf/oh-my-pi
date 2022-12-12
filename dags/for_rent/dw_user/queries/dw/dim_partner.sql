@@ -2,7 +2,7 @@ SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a futur
   p.id as sk_partner,
   p.id as id_partner,
   p.id_amplitude_device,
-  c.code AS country_code,
+  COALESCE(u.country_code, 'Undefined') AS country_code,
   p.name,
   p.trade_name,
   p.phone,
@@ -24,9 +24,9 @@ LEFT JOIN
   datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy AS apt
     ON p.id_amplitude_device = apt.id_device
 LEFT JOIN
-  datalake_ebdb_clean.state AS s
-    ON s.id = p.id_state
-LEFT JOIN
-  datalake_ebdb_clean.country AS c
-    ON c.id = s.id_country
+  datalake_ebdb_clean.partner_agent AS pa
+    ON pa.id_partner = p.id
+LEFT JOIN 
+    datalake_ebdb_country.user AS u
+        ON pa.id_user = u.id_user
 WINDOW w AS (PARTITION BY apt.id_device ORDER BY apt.year, apt.month, apt.DAY ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)

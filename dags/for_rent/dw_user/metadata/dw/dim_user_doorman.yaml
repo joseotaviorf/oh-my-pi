@@ -16,6 +16,9 @@ columns:
   work_place_id:
     lineage:
       - datalake_ebdb_user.user_doorman.id_place
+  country_code:
+    lineage:
+      - datalake_ebdb_user.user_doorman.country_code
   work_address:
     lineage:
       - datalake_ebdb_user.user_doorman.work_address

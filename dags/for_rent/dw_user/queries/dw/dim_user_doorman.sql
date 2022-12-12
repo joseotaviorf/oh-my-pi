@@ -4,6 +4,7 @@ select -- [ODS] This table was migrated from ODS flow and needs a future refacto
     id as id_user_doorman,
     id_doorman_occupation as occupation_id,
     id_place as work_place_id,
+    country_code,
     work_address,
     work_street,
     cast(work_house_number as varchar(255)) as work_house_number,

@@ -13,6 +13,9 @@ columns:
   id_partner:
     lineage:
       - datalake_ebdb_clean.partner_agent.id_partner
+  country_code:
+    lineage:
+      - datalake_ebdb_country.user.country_code
   status_partner_agent:
     lineage:
       - datalake_ebdb_clean.partner_agent.status

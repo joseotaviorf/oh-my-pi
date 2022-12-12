@@ -276,7 +276,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     CAST(atax.sk_discard_date AS INTEGER) AS sk_discard_date,
     CAST(atax.sk_user_lead_first_discarder AS INTEGER) AS sk_user_lead_first_discarder,
     CAST(atax.sk_user_lead_last_discarder AS INTEGER) AS sk_user_lead_last_discarder,
-    atax.country_code,
+    COALESCE(atax.country_code, 'Undefined') AS country_code,
     atax.funnel_step,
     atax.funnel_drop_reason,
     atax.hours_lead_to_prospect,

@@ -5,6 +5,7 @@ create table public.dim_user_doorman(
     id_user_doorman bigint,
     occupation_id bigint,
     work_place_id varchar(255),
+    country_code VARCHAR,
     work_address varchar(1024),
     work_street varchar(255),
     work_house_number varchar(255),

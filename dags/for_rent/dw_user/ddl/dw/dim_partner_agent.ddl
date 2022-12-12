@@ -4,6 +4,7 @@ create table public.dim_partner_agent (
     id_partner_agent bigint,
     id_user bigint,
     id_partner bigint,
+    country_code VARCHAR,
     status_partner_agent varchar,
     type varchar,
     ts_created timestamp,

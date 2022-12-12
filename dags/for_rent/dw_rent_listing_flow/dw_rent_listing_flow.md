@@ -12,7 +12,7 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 ### Outputs
 
-This pipeline produces the following output table in DW: 
+This pipeline produces the following output table in DW, partitioned by `country_code`:
 
 - `fact_house_listing_flows`
 
