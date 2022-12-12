@@ -309,7 +309,7 @@ base_booking AS (
     IF(b.business_context = 'SALE', vfa.id_fixed_agent,NULL) AS id_sale_fixed_agent,
     hl.id_company_hubspot AS id_company_supply,
     b3pa.id_company_demand,
-    hl.country_code,
+    COALESCE(hl.country_code, 'Undefined') AS country_code,
     COALESCE(ct.default_timezone, 'UTC') AS default_timezone,
     b.dt_booking,
     b.status,

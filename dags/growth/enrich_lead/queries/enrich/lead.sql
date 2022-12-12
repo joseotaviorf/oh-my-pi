@@ -7,7 +7,7 @@ SELECT DISTINCT
     l.id_lead_owner,
     user_affiliate.id AS id_user_has_indicated,
     l.id_affiliate_has_indicated,
-    COALESCE(ads.country_code, rg.country_code) AS country_code,
+    COALESCE(ads.country_code, rg.country_code, 'Undefined') AS country_code,
     l.address,
     l.house_number,
     l.complement,
