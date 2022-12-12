@@ -1,0 +1,7 @@
+---
+database_name: metric_rent
+table_name: listing_to_rental_8w
+columns:
+  dt_week_started:
+    lineage:
+      - dw_public.dim_date.week_start
