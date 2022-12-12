@@ -19,13 +19,14 @@ supply_funnel AS (
         SUM(leads) AS leads,
         SUM(prospects) AS prospects,
         SUM(qualifieds) AS qualifieds,
+        SUM(available_qualifieds) AS available_qualifieds,
         SUM(opportunities) AS opportunities,
         SUM(first_listings) AS first_listings,
         dt_month_started,
         LAST_DAY(dt_month_started) AS dt_month_ended
     FROM 
         datalake_mexico_rent_supply.coincident_funnel
-    GROUP BY 1, 2, 3, 4, 10, 11
+    GROUP BY 1, 2, 3, 4, 11, 12
 ),
 supply_funnel_targets AS (
     SELECT
@@ -198,6 +199,7 @@ SELECT
     lr.leads_ub_owner_mx,
     sf.prospects,
     sf.qualifieds,
+    sf.available_qualifieds,
     sf.opportunities,
     sf.first_listings,
     ROUND(sft.leads_targets, 2) AS leads_targets,
@@ -207,7 +209,9 @@ SELECT
     ROUND(sft.first_listings_targets, 2) AS first_listings_targets,
     ROUND(CAST(sf.prospects/NULLIF(sf.leads, 0) AS FLOAT), 2) AS l2p_coincident,
     ROUND(CAST(sf.qualifieds/NULLIF(sf.prospects, 0) AS FLOAT), 2) AS p2q_coincident,
+    ROUND(CAST(sf.available_qualifieds/NULLIF(sf.qualifieds, 0) AS FLOAT), 2) AS q2aq_coincident,
     ROUND(CAST(sf.opportunities/NULLIF(sf.qualifieds, 0) AS FLOAT), 2) AS q2o_coincident,
+    ROUND(CAST(sf.opportunities/NULLIF(sf.available_qualifieds, 0) AS FLOAT), 2) AS aq2o_coincident,
     ROUND(CAST(sf.first_listings/NULLIF(sf.qualifieds, 0) AS FLOAT), 2) AS q2fl_coincident,
     ROUND(CAST(sf.first_listings/NULLIF(sf.opportunities, 0) AS FLOAT), 2) AS o2fl_coincident,
     ROUND(CAST(sf.first_listings/NULLIF(sf.prospects, 0) AS FLOAT), 2) AS p2fl_coincident,
