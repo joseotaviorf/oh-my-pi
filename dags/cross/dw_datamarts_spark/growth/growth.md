@@ -29,7 +29,7 @@ This pipeline creates the tables in the schema `dw_datamart` of data lake and `d
 
 ### Additional Information
 
-The file [dw_datamarts_growth_prod_conf.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/dags/dw_datamarts_spark/growth/growth.yml)
+The file [dw_datamarts_growth_prod_conf.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/growth/growth.yml)
 declares the datamarts that should be created in this DAG.
 So **for add/remove a datamart table** from the DAG you only need to **update this file**.
 

@@ -1,11 +1,10 @@
-## Datamarts Fintech Cross
+## Datamarts Cross
 
 ### Purpose
 
-Creates/updates the datamart tables that have cross squad dependencies, for the context of Fintech, in data lake.
+Creates/updates the datamart tables for cross squad contexts in datalake.
 
 ​<details>
-
   <summary><strong> > DAG details (click to expand)</strong></summary>
 
 ### Execution Interval
@@ -16,16 +15,19 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 This pipeline creates the following full tables in the schema `dw_datamarts` of data lake:
 
-- `funnel_credit_event_flows`
-- `credit_proposal_attribute`
+- `buyer_prospect_status`
+- `funnel_demand_flows`
+- `quintoandar_consultant_listings`
+- `talk_to_agent`
+- `lead_listing_flows`
 
 ### Responsible Data Engineering Team
 
-For any questions or concerns about this DAG, please contact the Data Fintech team.
+For any questions or concerns about this DAG, please contact the Data Engineering team.
 
 ### Additional Information
 
-The file [fintech_cross.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/dags/dw_datamarts_spark/fintech_cross/fintech_cross.yml)
+The file [cross.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/cross/cross.yml)
 declares the datamarts that should be created in this DAG.
 So **to add/remove a datamart table** from the DAG you only need to **update this file**.
 

@@ -1,10 +1,11 @@
-## Datamarts For Rent Cross
+## Datamarts Fintech
 
 ### Purpose
 
-Creates/updates the datamart tables
+Creates/updates the datamart tables that don't have cross squad dependencies, for the context of Fintech, in data lake.
 
 ​<details>
+
   <summary><strong> > DAG details (click to expand)</strong></summary>
 
 ### Execution Interval
@@ -15,19 +16,16 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 This pipeline creates the following full tables in the schema `dw_datamarts` of data lake:
 
-- `rental_demand_events_funnel_flows`
-- `rental_events_funnel`
-- `rental_events_funnel_partners`
+- `doubtful_debtors_provision`
 
 ### Responsible Data Engineering Team
 
-For any questions or concerns about this DAG, please contact the Data For Rent team.
+For any questions or concerns about this DAG, please contact the Data Fintech team.
 
 ### Additional Information
 
-The file [for_rent_cross.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/dags/dw_datamarts_spark/for_rent_cross/for_rent_cross.yml)
+The file [fintech.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/fintech/fintech.yml)
 declares the datamarts that should be created in this DAG.
-
 So **to add/remove a datamart table** from the DAG you only need to **update this file**.
 
 </details>

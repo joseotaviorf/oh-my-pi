@@ -32,7 +32,7 @@ For any questions or concerns about this DAG, please contact the Data For Rent t
 
 ### Additional Information
 
-The file [for_rent.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/dags/dw_datamarts_spark/for_rent/for_rent.yml)
+The file [for_rent.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/for_rent/for_rent.yml)
 declares the datamarts that should be created in this DAG.
 So **to add/remove a datamart table** from the DAG you only need to **update this file**.
 

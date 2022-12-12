@@ -50,7 +50,7 @@ For any questions or concerns about this DAG, please contact the Data For Sale t
 
 ### Additional Information
 
-The file [growth_cross.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/dags/dw_datamarts_spark/growth_cross/growth_cross.yml)
+The file [growth_cross.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/growth_cross/growth_cross.yml)
 declares the datamarts that should be created in this DAG.
 So **to add/remove a datamart table** from the DAG you only need to **update this file**.
 

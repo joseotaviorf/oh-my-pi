@@ -11,6 +11,7 @@ from airflow.utils.helpers import chain
 
 from bietlejuice.base.airflow import BaseDAG
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -131,6 +132,7 @@ class DatamartsDAGFactory:
 
         dag_name = f"{self.source}.{dag_context}"
         dag_id = f"bietlejuice.{dag_name}"
+        dag_path = DAGPackagesPathService.get_dag_path("dw_datamarts_spark")
 
         cluster_description = self._get_cluster_description(
             dag_details.get("cluster_name", "databricks_10_4_med_general_cluster")
@@ -159,7 +161,7 @@ class DatamartsDAGFactory:
             start_date=self.MAIN_START_DATE,
             schedule_interval=None,
             doc_md=BaseDAG.get_dag_doc(
-                f"dw_datamarts_spark/{dag_context}/{dag_context}"
+                dag_name=dag_context, template_path=f"{dag_path}/{dag_context}"
             ).format(chart_url=self.doc_md_chart_url, dag_id=dag_id),
         )
 

@@ -4,7 +4,7 @@ dw_datamarts_spark_[env]_conf.yml, using a DAG factory.
 """
 import os
 from bietlejuice.services import ConfigurationService, FileService
-from bietlejuice.dags.dw_datamarts_spark.datamarts_factory import DatamartsDAGFactory
+from bietlejuice.base.airflow.dag_builders.datamarts.datamarts_factory import DatamartsDAGFactory
 
 SOURCE = "dw_datamarts_spark"
 
@@ -17,7 +17,6 @@ for dag_context, dag_details in dag_configs.items():
         os.path.dirname(os.path.realpath(__file__)), dag_context, f"{dag_context}.yml"
     )
     datamart_configs = FileService.get_dict_from_yaml_file(datamart_config_path)
-
     globals()[dag_id] = dag_factory.build_dag(
         dag_context, dag_details, datamart_configs
     )
