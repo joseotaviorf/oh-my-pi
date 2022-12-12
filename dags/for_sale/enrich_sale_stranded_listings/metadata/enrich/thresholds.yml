@@ -1,0 +1,7 @@
+---
+database_name: datalake_sale_stranded_listings
+table_name: thresholds
+columns:
+  month_start:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start

@@ -1,0 +1,13 @@
+table_name: datalake_sale_stranded_listings.stranded_status
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 700000
+    severity_level: Error
+column_level_validations:
+  id_sale_listing:
+    is_complete:
+      severity_level: Error
+  stranded_status:
+    is_complete:
+      severity_level: Error

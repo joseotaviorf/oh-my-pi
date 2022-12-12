@@ -1,0 +1,28 @@
+---
+database_name: datalake_sale_stranded_listings
+table_name: stranded_status
+columns:
+  id_sale_listing:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_sale_listing
+  id_house:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_house
+  id_region:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_region
+  id_first_publication_date:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.ts_first_publication
+  id_started_date:
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  id_ended_date:
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  dt_status_started:
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  dt_status_ended:
+    lineage:
+      - datalake_quintoandar.aux_date.id_date

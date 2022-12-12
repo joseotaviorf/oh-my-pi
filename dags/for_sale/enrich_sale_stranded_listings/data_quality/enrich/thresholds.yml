@@ -1,0 +1,21 @@
+table_name: datalake_sale_stranded_listings.thresholds
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 590
+    severity_level: Error
+column_level_validations:
+  month_start:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  city_group:
+    is_complete:
+      severity_level: Error
+  bedrooms_price_bins:
+    is_complete:
+      severity_level: Error
+  bins_order:
+    is_complete:
+      severity_level: Error
