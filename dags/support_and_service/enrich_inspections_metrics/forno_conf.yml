@@ -1,6 +1,7 @@
 ---
 dag_documentation:
   dag_purpose: "This DAG is responsible for generating indicators and metrics for QuintoAndar's inspection services"
+
 inner_dependencies:
   inspection_achievements:
     - inspection_booking
@@ -11,3 +12,8 @@ custom_cluster:
   autoscale:
     max_workers: 3
     min_workers: 1
+
+partitions_cols: [year, month, day]
+
+incremental_tables:
+  - item_description

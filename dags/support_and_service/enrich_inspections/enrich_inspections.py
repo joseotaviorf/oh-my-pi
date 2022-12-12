@@ -47,7 +47,10 @@ DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 default_libraries = config_service.get_config("default_libraries")
 inner_dependencies = config_service.get_config("inner_dependencies")
+
 dag_documentation = config_service.get_config("dag_documentation")
+incremental_tables = config_service.get_config("incremental_tables")
+partitions_cols = config_service.get_config("partitions_cols")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -88,12 +91,22 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-    has_create_external_table_task=False,
-)
+enrich_task_groups = {}
+
+tables = datalake_task_group._get_table_names_from_sql_files(layer=LayerEnum.ENRICH)
+
+for table_name in tables:
+    is_incremental = table_name in incremental_tables
+    partitions = partitions_cols if is_incremental else None
+
+    enrich_task_groups[table_name] = datalake_task_group.build_enrich_task_group(
+        table_name=table_name,
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        has_create_external_table_task=False,
+        is_incremental=is_incremental,
+        partitions=partitions,
+    )
 
 (
     task_groups_boundaries_without_inner_dependencies,

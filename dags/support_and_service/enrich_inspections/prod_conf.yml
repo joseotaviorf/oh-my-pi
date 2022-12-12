@@ -3,10 +3,23 @@ dag_documentation:
   dag_purpose:
     "This DAG is responsible for the union tables between new Inspection Services data and old PWA data, \n
     as well as the construction of metrics through this data."
-inner_dependencies: {}
+
+inner_dependencies:
+  item_comment_media:
+    - item
+
 custom_cluster:
   driver_node_type_id: m5a.4xlarge
   node_type_id: m5a.2xlarge
   autoscale:
     max_workers: 3
     min_workers: 1
+
+partitions_cols: [year, month, day]
+
+incremental_tables:
+  - item_comment_media
+  - item_group
+  - item_issue
+  - item
+  - room

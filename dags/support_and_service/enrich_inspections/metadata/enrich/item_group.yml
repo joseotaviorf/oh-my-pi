@@ -1,0 +1,43 @@
+---
+database_name: datalake_inspections
+table_name: item_group
+columns:
+  id_item_group:
+    lineage:
+      - datalake_inspections_clean.item_group.id_item_group
+  id_item_group_type:
+    lineage:
+      - datalake_inspections_clean.item_group_type.id_item_group_type
+  id_room:
+    lineage:
+      - datalake_inspections_clean.item_group.id_room
+  id_main:
+    lineage:
+      - datalake_inspections_clean.item_group.id_main
+  item_group_name:
+    lineage:
+      - datalake_inspections_clean.item_group.name
+  item_group_type:
+    lineage:
+      - datalake_inspections_clean.item_group_type.type
+  status:
+    lineage:
+      - datalake_inspections_clean.item_group.status
+  is_inferior_quality:
+    lineage:
+      - datalake_inspections_clean.item_group.is_inferior_quality
+  ts_created:
+    lineage:
+      - datalake_inspections_clean.item_group.ts_created
+  ts_updated:
+    lineage:
+      - datalake_inspections_clean.item_group.ts_updated
+  year:
+    lineage:
+      - datalake_inspections_clean.item_group.year
+  month:
+    lineage:
+      - datalake_inspections_clean.item_group.month
+  day:
+    lineage:
+      - datalake_inspections_clean.item_group.day

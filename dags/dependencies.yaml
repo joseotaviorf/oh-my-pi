@@ -1870,11 +1870,27 @@ bietlejuice.enrich_inspections:
   - bietlejuice.ebdb:create-clean-inspection-in-data-lake
   - bietlejuice.inspections:load-clean-assessment
   - bietlejuice.inspections:load-clean-inspection
+  - bietlejuice.inspections:load-clean-item
+  - bietlejuice.inspections:load-clean-item-group
+  - bietlejuice.inspections:load-clean-item-group-type
+  - bietlejuice.inspections:load-clean-item-issue
+  - bietlejuice.inspections:load-clean-item-media
+  - bietlejuice.inspections:load-clean-item-type
+  - bietlejuice.inspections:load-clean-issue-type
+  - bietlejuice.inspections:load-clean-review
+  - bietlejuice.inspections:load-clean-review-media
+  - bietlejuice.inspections:load-clean-room
+  - bietlejuice.inspections:load-clean-room-type
 
 bietlejuice.enrich_inspections_metrics:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_date:load-enrich-cities-calendar
   - bietlejuice.enrich_inspections:load-enrich-inspection-history
+  - bietlejuice.enrich_inspections:load-enrich-item
+  - bietlejuice.enrich_inspections:load-enrich-item-comment-media
+  - bietlejuice.enrich_inspections:load-enrich-item-group
+  - bietlejuice.enrich_inspections:load-enrich-item-issue
+  - bietlejuice.enrich_inspections:load-enrich-room
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_support_and_service_kpis_targets:load-enrich-kpis-targets
