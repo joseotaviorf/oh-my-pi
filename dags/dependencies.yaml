@@ -934,8 +934,11 @@ bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
 bietlejuice.dw_inspections:
+  - bietlejuice.enrich_inspections:load-enrich-item-group
+  - bietlejuice.enrich_inspections:load-enrich-room
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-booking
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements
+  - bietlejuice.enrich_inspections_metrics:load-enrich-item-description
   - bietlejuice.inspections:load-clean-assessment
   - bietlejuice.gsheets.support_and_service:load-clean-inspectors-control
 

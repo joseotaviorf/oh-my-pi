@@ -31,3 +31,7 @@ FROM
 JOIN
     item_type it
         ON it.id_item_type = i.id_type
+WHERE
+    i.year = {year}
+    AND i.month = {month}
+    AND i.day = {day}

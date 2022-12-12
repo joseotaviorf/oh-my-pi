@@ -1,0 +1,31 @@
+---
+database_name: dw_inspections
+table_name: dim_room
+columns:
+  sk_room:
+    lineage:
+      - datalake_inspections.room.id_room
+  room_name:
+    lineage:
+      - datalake_inspections.room.room_name
+  room_type:
+    lineage:
+      - datalake_inspections.room.room_type
+  comment:
+    lineage:
+      - datalake_inspections.room.comment
+  ts_created:
+    lineage:
+      - datalake_inspections.room.ts_created
+  ts_updated:
+    lineage:
+      - datalake_inspections.room.ts_updated
+  year:
+    lineage:
+      - datalake_inspections.room.year
+  month:
+    lineage:
+      - datalake_inspections.room.month
+  day:
+    lineage:
+      - datalake_inspections.room.day

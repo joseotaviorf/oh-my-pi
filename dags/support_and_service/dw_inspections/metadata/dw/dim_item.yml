@@ -1,0 +1,31 @@
+---
+database_name: dw_inspections
+table_name: dim_item
+columns:
+  sk_item:
+    lineage:
+      - datalake_inspections_metrics.item_description.id_item
+  item_type:
+    lineage:
+      - datalake_inspections_metrics.item_description.item_type
+  inspection_media_type:
+    lineage:
+      - datalake_inspections_metrics.item_description.inspection_media_type
+  is_commented:
+    lineage:
+      - datalake_inspections_metrics.item_description.is_commented
+  ts_created:
+    lineage:
+      - datalake_inspections_metrics.item_description.ts_created
+  ts_updated:
+    lineage:
+      - datalake_inspections_metrics.item_description.ts_updated
+  year:
+    lineage:
+      - datalake_inspections_metrics.item_description.year
+  month:
+    lineage:
+      - datalake_inspections_metrics.item_description.month
+  day:
+    lineage:
+      - datalake_inspections_metrics.item_description.day

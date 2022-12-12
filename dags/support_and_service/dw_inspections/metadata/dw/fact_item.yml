@@ -1,0 +1,61 @@
+---
+database_name: dw_inspections
+table_name: fact_item
+columns:
+  sk_item:
+    lineage:
+      - datalake_inspections_metrics.item_description.id_item
+  sk_previous_item:
+    lineage:
+      - datalake_inspections_metrics.item_description.id_previous_item
+  sk_item_group:
+    lineage:
+      - datalake_inspections_metrics.item_description.id_item_group
+  sk_room:
+    lineage:
+      - datalake_inspections_metrics.item_description.id_room
+  sk_assessment:
+    lineage:
+      - datalake_inspections_metrics.item_description.id_assessment
+  total_item_issue:
+    lineage:
+      - datalake_inspections_metrics.item_description.total_item_issue
+  total_media:
+    lineage:
+      - datalake_inspections_metrics.item_description.total_media
+  total_inspector_comment:
+    lineage:
+      - datalake_inspections_metrics.item_description.total_inspector_comment
+  total_tenant_comment:
+    lineage:
+      - datalake_inspections_metrics.item_description.total_tenant_comment
+  total_owner_comment:
+    lineage:
+      - datalake_inspections_metrics.item_description.total_owner_comment
+  has_media:
+    lineage:
+      - datalake_inspections_metrics.item_description.has_media
+  has_inspector_comment:
+    lineage:
+      - datalake_inspections_metrics.item_description.has_inspector_comment
+  has_tenant_comment:
+    lineage:
+      - datalake_inspections_metrics.item_description.has_tenant_comment
+  has_owner_comment:
+    lineage:
+      - datalake_inspections_metrics.item_description.has_owner_comment
+  ts_created:
+    lineage:
+      - datalake_inspections_metrics.item_description.ts_created
+  ts_updated:
+    lineage:
+      - datalake_inspections_metrics.item_description.ts_updated
+  year:
+    lineage:
+      - datalake_inspections_metrics.item_description.year
+  month:
+    lineage:
+      - datalake_inspections_metrics.item_description.month
+  day:
+    lineage:
+      - datalake_inspections_metrics.item_description.day

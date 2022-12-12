@@ -23,7 +23,7 @@ DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2021, 2, 7, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = "databricks_10_4_min_io-general_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_io-general_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 dw_bucket = config_service.get_config("dw_bucket")
@@ -38,6 +38,7 @@ default_libraries = config_service.get_config("default_libraries")
 
 incremental_tables = config_service.get_config("incremental_tables")
 partitions_cols = config_service.get_config("partitions_cols")
+dag_documentation = config_service.get_config("dag_documentation")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -46,11 +47,12 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 ENV = os.environ.get("ENVIRONMENT")
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -58,6 +60,13 @@ dag = DAG(
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
+    ),
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=DAG_NAME,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 

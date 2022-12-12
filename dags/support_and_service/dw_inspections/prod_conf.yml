@@ -1,5 +1,14 @@
 ---
+dag_documentation:
+  dag_purpose:
+    "This DAG loads the DW tables for Inspection Services and PWA data \n
+    (old data). These data are mainly related to the entry and exit \n
+    inspections carried out by QuintoAndar​."
+
 incremental_tables:
   - dim_assessment
+  - dim_item_group
+  - dim_item
+  - dim_room
 
 partitions_cols: [year, month, day]
