@@ -10,3 +10,5 @@ custom_cluster:
   autoscale:
     min_workers: 2
     max_workers: 6
+  aws_attributes:
+    ebs_volume_size: 300
