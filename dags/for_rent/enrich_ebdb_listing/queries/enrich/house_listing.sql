@@ -442,14 +442,13 @@ listing_business_context_relisting AS (
     SELECT
         id_house,
         business_context,
-        status,
-        status_reason,
+        suspension_reason,
         ts_status_started,
         ts_status_ended
     FROM
-        datalake_ebdb_listing.listing_business_context_status_history
+        datalake_ebdb_listing.listing_business_context_suspension_history
     WHERE
-        status_reason = 'RELISTING'
+        suspension_reason = 'RELISTING'
 )
 SELECT
     hl.id_house_listing,
@@ -465,7 +464,7 @@ SELECT
     COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
     hl_c.order_renting,
     heh.name AS who_is_living,
-    IF(lbcr.status_reason = 'RELISTING', TRUE, FALSE) AS is_early_relisting,
+    IF(lbcr.suspension_reason = 'RELISTING', TRUE, FALSE) AS is_early_relisting,
     hl.is_last_version,
     hl.is_exclusive,
     hl.is_originals_active,
