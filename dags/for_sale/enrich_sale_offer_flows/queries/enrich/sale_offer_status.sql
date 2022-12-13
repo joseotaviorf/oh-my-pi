@@ -17,6 +17,8 @@ ordering AS (
         ordering
     FROM
         datalake_sales_flow_clean.status_order
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_closing_type, id_status ORDER BY ts_updated DESC) = 1
 ),
 offer AS (
     SELECT
@@ -183,6 +185,3 @@ LEFT JOIN
         AND ord.id_status = ofs.id_status
 WHERE
     ms.key IS NOT NULL
-ORDER BY
-    sf.id_sales_flow ASC, 
-    ordering ASC
