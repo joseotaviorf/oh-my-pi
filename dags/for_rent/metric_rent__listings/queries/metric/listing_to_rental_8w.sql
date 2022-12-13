@@ -14,6 +14,6 @@ LEFT JOIN
 WHERE
     dd.date >= DATE('2019-01-01')
     AND dd.date < DATE_ADD(CURRENT_DATE, -56)
-    AND (country_code = 'BR' OR country_code = 'Undefined')
+    AND (dhl.country_code = 'BR' OR dhl.country_code = 'Undefined')
 GROUP BY 1
 ORDER BY 1 DESC
