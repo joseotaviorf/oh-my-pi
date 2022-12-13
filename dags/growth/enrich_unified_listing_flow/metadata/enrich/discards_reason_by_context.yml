@@ -1,0 +1,28 @@
+database_name: datalake_unified_listing_flow
+table_name: discards_reason_by_context
+columns:
+  id_lead:
+    lineage:
+      - datalake_lead.lead.id
+  is_for_rent:
+    lineage:
+      - datalake_lead.lead.is_for_rent
+  is_for_sale:
+    lineage:
+      - datalake_lead.lead.is_for_sale
+  lead_discard_rent:
+    lineage:
+      - datalake_rene_descartes_clean.lead_rejection.reason
+  lead_discard_sale:
+    lineage:
+      - datalake_rene_descartes_clean.lead_rejection.reason
+  prospect_status:
+    lineage:
+      - datalake_wololo_clean.prospect.status
+  prospect_discard_rent:
+    lineage:
+      - datalake_wololo_clean.context_discard.reason
+      - datalake_lead.lead.reason_detail
+  prospect_discard_sale:
+    lineage:
+      - datalake_wololo_clean.context_discard.reason
