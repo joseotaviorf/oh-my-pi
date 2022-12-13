@@ -13,4 +13,4 @@ FROM
     datalake_lifull_campaigns_raw.campaigns_overview_report
 WHERE
     group_name = 'mitula'
-    AND DATE(dt) = DATE('{year}-{month}-{day}')
+    AND DATE(dt) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
