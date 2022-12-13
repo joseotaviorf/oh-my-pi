@@ -19,7 +19,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 SOURCE = "saruman"
 CONTEXT = SOURCE
 DAG_ID = f"bietlejuice.{SOURCE}"
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 
 # Dag Inputs
 ENV = os.environ.get("ENVIRONMENT")
