@@ -7,10 +7,7 @@ attribution_cross_channel AS (
     FROM
         datalake_tracked_events.cross_channel_full
     WHERE
-        YEAR = {year}
-        AND MONTH = {month}
-        AND DAY = {day}
-        AND event_name IN (
+        event_name IN (
             'visit_schedule_confirmed',
             'debug_visit_schedule_confirmed',
             'offer_submitted',
