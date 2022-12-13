@@ -110,11 +110,26 @@ events_filtered AS (
         web_content,
         web_term,
         web_platform,
-        adjust_adgroup,
-        adjust_campaign,
-        adjust_creative,
-        adjust_reattributed_at,
-        adjust_network,
+        CASE
+            WHEN appsflyer_campaign = 'N/A' THEN adjust_adgroup
+            ELSE appsflyer_adset
+        END AS adjust_adgroup,
+        CASE
+            WHEN appsflyer_campaign = 'N/A' THEN adjust_campaign
+            ELSE appsflyer_campaign
+        END AS adjust_campaign,
+        CASE
+            WHEN appsflyer_campaign = 'N/A' THEN adjust_creative
+            ELSE appsflyer_ad
+        END AS adjust_creative,
+        CASE
+            WHEN appsflyer_campaign = 'N/A' THEN adjust_reattributed_at
+            ELSE NULL
+        END AS adjust_reattributed_at,
+        CASE
+            WHEN appsflyer_campaign = 'N/A' THEN adjust_network
+            ELSE appsflyer_media_source
+        END AS adjust_network,
         app_platform
     FROM
         datalake_online_attribution.events_exploded AS evt
