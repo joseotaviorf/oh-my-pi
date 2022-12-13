@@ -7,9 +7,10 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.utils.helpers import chain, cross_downstream
+from airflow.utils.helpers import chain
 
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
@@ -19,16 +20,15 @@ from bietlejuice.services import ConfigurationService
 SOURCE = "zendesk_tickets"
 CONTEXT = SOURCE
 config_service = ConfigurationService(SOURCE)
-
-
-# default configs
 ENV = os.environ.get("ENVIRONMENT")
+
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
+table_list = config_service.get_config("table_list")
 
 # s3 paths setup
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
@@ -86,12 +86,16 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-raw_task_groups = task_group.build_raw_task_group_for_all_tables(
-    source=SOURCE,
-    target_database_base_name=SOURCE,
-    extraction_spark_job_file=raw_spark_job_path,
-    raw_spark_job_extra_args=["{{ ds }}"],
-)
+raw_task_groups = {}
+for table_name in table_list:
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        table_name=table_name,
+        target_database_base_name=SOURCE,
+        extraction_spark_job_file=raw_spark_job_path,
+        raw_spark_job_extra_args=["{{ ds }}", table_name],
+    )
+    raw_task_groups[table_name] = raw_task_group
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
@@ -99,11 +103,7 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     target_database_base_name=SOURCE,
 )
 
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
-
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_groups),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
-)
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
+TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
 
 terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))

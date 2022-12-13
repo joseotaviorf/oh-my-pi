@@ -1,4 +1,15 @@
----
+table_list:
+  [
+    "group_memberships",
+    "groups",
+    "organizations",
+    "satisfaction_ratings",
+    "ticket_fields",
+    "ticket_metrics",
+    "tickets",
+    "users",
+  ]
+
 custom_cluster:
   driver_node_type_id: r6gd.12xlarge
   node_type_id: r6gd.8xlarge
