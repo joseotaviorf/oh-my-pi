@@ -6,3 +6,5 @@ tables:
     schema: quintoandar
   - table_name: fact_contract_people
     schema: quintoandar
+partition_cols:
+  - country_code

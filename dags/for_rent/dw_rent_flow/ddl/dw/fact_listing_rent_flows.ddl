@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS public.fact_listing_rent_flows
     sk_last_doc_analysis_rejected BIGINT ENCODE AZ64,
     sk_guarantee_paid_date BIGINT ENCODE AZ64,
     sk_agent_review_rating_date BIGINT ENCODE AZ64,
+    country_code VARCHAR,
     visit_created_type VARCHAR(256) ENCODE LZO,
     booking_utm_campaign VARCHAR(2000) ENCODE LZO,
     booking_utm_content VARCHAR(256) ENCODE LZO,

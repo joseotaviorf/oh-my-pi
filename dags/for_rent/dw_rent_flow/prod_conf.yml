@@ -1,0 +1,6 @@
+---
+tables:
+  - table_name: dim_rent_flow_taxonomy
+    partition_cols: []
+  - table_name: fact_listing_rent_flows
+    partition_cols: [country_code]

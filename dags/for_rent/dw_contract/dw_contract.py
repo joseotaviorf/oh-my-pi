@@ -10,6 +10,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
@@ -40,6 +41,7 @@ SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 LOGS_OUTPUT_PATH = f"{spark_jobs_logs_path}{DAG_ID}"
 default_libraries = config_service.get_config("default_libraries")
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -74,6 +76,10 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 tables = config_service.get_config("tables")
+partition_cols = config_service.get_config("partition_cols")
+
+dw_staging_task_group = {}
+dw_task_groups = {}
 
 for table in tables:
     table_name = table["table_name"]
@@ -88,22 +94,25 @@ for table in tables:
         spark_jobs_path=SPARK_JOBS_PATH,
     )
 
-    dw_staging_task_group = task_group.build_dw_staging_task_group(
-        table_name=table_name
+    dw_staging_task_group[table_name] = task_group.build_dw_staging_task_group(
+        table_name=table_name,
+        is_incremental=False,
+        partitions=partition_cols,
     )
 
-    dw_task_group = task_group.build_dw_task_group(
-        table_name=table_name, spectrum_iam_role=spectrum_iam_role
+    dw_task_groups[table_name] = task_group.build_dw_task_group(
+        table_name=table_name,
+        is_incremental=False,
+        spectrum_iam_role=spectrum_iam_role,
+        partitions=partition_cols,
     )
 
-    chain(create_cluster_task, DWTaskGroup.first_tasks(dw_staging_task_group))
-    cross_downstream(
-        DWTaskGroup.last_tasks(dw_staging_task_group),
-        DWTaskGroup.first_tasks(dw_task_group),
-    )
-    chain(DWTaskGroup.last_tasks(dw_task_group), terminate_cluster_task)
+chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
+TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_groups)
+chain(DWTaskGroup.all_last_tasks(dw_task_groups), terminate_cluster_task)
 
-    # Set data quality tasks if exists
-    independent_tasks = DWTaskGroup.independent_tasks(dw_staging_task_group)
-    if independent_tasks:
-        terminate_cluster_task.set_upstream(independent_tasks)
+# Set data quality tasks if exists
+independent_tasks = DWTaskGroup.all_independent_tasks(dw_staging_task_group)
+if independent_tasks:
+    terminate_cluster_task.set_upstream(independent_tasks)
+

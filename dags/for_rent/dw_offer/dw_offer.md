@@ -12,7 +12,7 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 ### Outputs
 
-This pipeline produces the following output table in DW, via full load: 
+This pipeline produces the following output table in DW, via full load and partitioned by `country_code`:
 
 - `dim_offer`
 
