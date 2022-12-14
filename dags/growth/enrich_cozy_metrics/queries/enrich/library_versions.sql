@@ -20,6 +20,6 @@ SELECT
         ELSE
             'end-user'
     END AS type_of_pwa,
-    IF(CAST(split(core,'.')[1] AS BIGINT) >= 19, true, false) as is_updated_v19,
+    IF(CAST(split(core,'\\.')[0] AS BIGINT) >= 19, true, false) as is_updated_v19,
     dt_created
 FROM datalake_cozy_metrics_clean.library_versions
