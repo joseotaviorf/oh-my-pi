@@ -88,7 +88,11 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-table_names = config_service.get_config("tables")
+table_names = [
+                "active_employees",
+                "inactive_employees",
+                "employee_salary_history"
+            ]
 
 raw_task_groups = {}
 for table_name in table_names:
