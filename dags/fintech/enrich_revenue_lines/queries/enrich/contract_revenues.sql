@@ -263,7 +263,12 @@ SELECT DISTINCT
     COALESCE(g.id_guarantee, -1) AS id_guarantee,
     COALESCE(g.id_charge, -1) AS id_guarantee_charge,
     (COALESCE(p.brl_entry_due_amount,0) + COALESCE(r.monthly_value,0) + COALESCE(ccp.value,0) + COALESCE(g.monthly_revenue,0)) AS due_monthly_revenue,
-    (COALESCE(p.brl_entry_paid_amount,0) + COALESCE(r.monthly_value,0) + COALESCE(ccp.value,0) + COALESCE(g.monthly_revenue,0)) AS paid_monthly_revenue
+    (COALESCE(p.brl_entry_paid_amount,0) + COALESCE(r.monthly_value,0) + COALESCE(ccp.value,0) + COALESCE(g.monthly_revenue,0)) AS paid_monthly_revenue,
+    p.brl_entry_due_amount AS due_rental_amount,
+    p.brl_entry_paid_amount AS paid_rental_amount,
+    r.monthly_value AS reservation_monthly_value,
+    ccp.value AS credit_card_value,
+    g.monthly_revenue AS guarantee_monthly_revenue
 FROM 
     contracts AS b
 INNER JOIN 

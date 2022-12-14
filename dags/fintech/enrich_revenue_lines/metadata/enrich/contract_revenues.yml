@@ -35,4 +35,3 @@ columns:
   id_guarantee_charge:
     lineage:
       - datalake_rental_guarantee_clean.charge.id
-      
