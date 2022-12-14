@@ -1,0 +1,26 @@
+database_name: metric_rent_benvi
+table_name: weekly_supply_funnel
+columns:
+  country_code:
+    lineage:
+      - datalake_region.city_groups_per_periods.country_code
+  city_group:
+    lineage:
+      - datalake_region.city_groups_per_periods.city_group
+  supply_mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.mexico_supply_targets_2022.supply_origin
+      - datalake_mexico_rent_supply.coincident_funnel.supply_mkt_origin
+  supply_mkt_origin_detailed:
+    lineage:
+      - datalake_gsheets_clean.mexico_supply_targets_2022.supply_channel
+      - datalake_gsheets_clean.mexico_supply_targets_2022.supply_origin
+      - datalake_mexico_rent_supply.coincident_funnel.supply_mkt_origin_detailed
+  mexico_channel:
+    lineage:
+      - datalake_gsheets_clean.mexico_supply_targets_2022.supply_origin
+      - datalake_mexico_rent_supply.coincident_funnel.mexico_channel
+  dt_week_started:
+    lineage:
+      - datalake_region.city_groups_per_periods.dt_week_started
+      - datalake_gsheets_clean.mexico_supply_targets_2022.dt_target
