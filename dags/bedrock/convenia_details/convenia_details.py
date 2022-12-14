@@ -3,7 +3,7 @@ from pendulum import timezone
 import os
 
 from airflow.models import DAG
-from airflow.utils.helpers import chain, cross_downstream
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -93,6 +93,7 @@ table_names = [
                 "inactive_employee_details"
             ]
 
+raw_task_groups = {}
 for table_name in table_names:
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
@@ -105,20 +106,15 @@ for table_name in table_names:
             table_name,
         ],
     )
+    raw_task_groups[table_name] = raw_task_group
 
-    clean_task_groups = task_group.build_task_group_from_sql_files(
-        layer=LayerEnum.CLEAN,
-        source_database_base_name=SOURCE,
-        target_database_base_name=SOURCE,
-        has_hive_sync=False,
-        table_name=table_name,
-    )
+clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+    has_hive_sync=False,
+)
 
-    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
-
-    cross_downstream(
-        DatalakeTaskGroup.last_tasks(raw_task_group),
-        DatalakeTaskGroup.all_first_tasks(clean_task_groups),
-    )
-
-    terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
+TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
