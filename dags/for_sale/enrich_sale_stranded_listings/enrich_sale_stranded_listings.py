@@ -9,7 +9,9 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from bietlejuice.base.airflow import BaseDAG, BaseTaskGroup, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -17,10 +19,10 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 
 
 def check_valid_run_date(dag_execution_date, table_day):
-    lag_dag_execution_date = datetime.strptime(dag_execution_date, "%Y-%m-%d") + timedelta(days=1)
-    return (
-        lag_dag_execution_date.day in table_day
-    )
+    lag_dag_execution_date = datetime.strptime(
+        dag_execution_date, "%Y-%m-%d"
+    ) + timedelta(days=1)
+    return lag_dag_execution_date.day in table_day
 
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -71,9 +73,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, 
-    task_id="terminate-cluster", 
-    trigger_rule="none_failed", 
+    dag=dag, task_id="terminate-cluster", trigger_rule="none_failed"
 )
 
 datalake_task_group = DatalakeTaskGroup(
@@ -100,17 +100,21 @@ for table in tables:
         table_name=table_name,
         is_incremental=is_incremental,
         partitions=partition_cols,
-        execution_date=execution_date
+        execution_date=execution_date,
     )
-    
+
     table_day = table["day_run"]
     skip_run_task = ShortCircuitOperator(
         task_id=f"check-day-to-skip-execution-{table_name}",
         python_callable=check_valid_run_date,
         op_kwargs={"dag_execution_date": execution_date, "table_day": table_day},
-        trigger_rule="none_failed", 
+        trigger_rule="none_failed",
     )
-    chain(create_cluster_task, skip_run_task, DatalakeTaskGroup.first_tasks(enrich_task_groups[table_name]))
+    chain(
+        create_cluster_task,
+        skip_run_task,
+        DatalakeTaskGroup.first_tasks(enrich_task_groups[table_name]),
+    )
 (
     task_groups_boundaries_without_inner_dependencies,
     inner_dependencies_task_groups_boundaries,

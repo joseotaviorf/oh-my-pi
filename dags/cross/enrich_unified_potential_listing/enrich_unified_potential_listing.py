@@ -9,7 +9,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -18,7 +18,7 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-CONTEXT = "unified_potential_listing" # potential_listing
+CONTEXT = "unified_potential_listing"  # potential_listing
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")

@@ -8,7 +8,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.services import ConfigurationService
 
 DAG_NAME = "services_integration_validations"

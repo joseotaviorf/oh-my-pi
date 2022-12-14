@@ -8,7 +8,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -24,7 +25,9 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 config_service = ConfigurationService(DAG_NAME)
 
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
-DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config("databricks_bietlejuice_repo_path")
+DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
+)
 CLUSTER_DESCRIPTION = config_service.get_config("cluster_description")
 SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")

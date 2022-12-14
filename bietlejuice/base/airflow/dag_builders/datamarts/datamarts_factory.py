@@ -9,7 +9,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 from airflow.utils.helpers import chain
 
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup

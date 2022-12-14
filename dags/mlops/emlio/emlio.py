@@ -12,7 +12,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 from airflow.utils.helpers import chain
 
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum

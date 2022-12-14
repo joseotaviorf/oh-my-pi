@@ -10,7 +10,9 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG, BaseTaskGroup, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
@@ -53,7 +55,10 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION, libraries=default_libraries
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

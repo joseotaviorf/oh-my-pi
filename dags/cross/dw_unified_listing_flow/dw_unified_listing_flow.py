@@ -9,7 +9,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 from airflow.utils.helpers import chain
 
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -20,7 +20,7 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 11, 14, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-DW_SCHEMA = "unified_listing_flow" # public
+DW_SCHEMA = "unified_listing_flow"  # public
 CONTEXT = "unified_listing_flow"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -90,7 +90,7 @@ for table in tables:
     )
 
     dw_staging_task_group[table_name] = task_group.build_dw_staging_task_group(
-        table_name=table_name,
+        table_name=table_name
     )
 
     dw_task_group[table_name] = task_group.build_dw_task_group(

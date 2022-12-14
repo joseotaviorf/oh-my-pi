@@ -10,7 +10,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
@@ -25,11 +25,19 @@ def get_previous_month(execution_date):
         "%Y-%m",
     )
 
+
 def get_executor_type_param(dag_run, default_executor_type, executor_type_param_name):
-    executor_type_param = dag_run.conf.get(executor_type_param_name) if dag_run.conf else None
-    if executor_type_param and executor_type_param in ['thread', 'multiprocessing', 'spark']:
-        return executor_type_param 
+    executor_type_param = (
+        dag_run.conf.get(executor_type_param_name) if dag_run.conf else None
+    )
+    if executor_type_param and executor_type_param in [
+        "thread",
+        "multiprocessing",
+        "spark",
+    ]:
+        return executor_type_param
     return default_executor_type
+
 
 SOURCE = "similarweb_monthly_metrics"
 DAG_ID = f"bietlejuice.{SOURCE}"

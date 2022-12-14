@@ -8,7 +8,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService

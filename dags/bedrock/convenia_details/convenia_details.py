@@ -9,7 +9,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline import LayerEnum
@@ -88,10 +89,7 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-table_names = [
-                "active_employee_details",
-                "inactive_employee_details"
-            ]
+table_names = ["active_employee_details", "inactive_employee_details"]
 
 raw_task_groups = {}
 for table_name in table_names:
@@ -101,10 +99,7 @@ for table_name in table_names:
         target_database_base_name=SOURCE,
         extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}load_{table_name}_to_raw.py",
         has_hive_sync=False,
-        raw_spark_job_extra_args=[
-            SOURCE,
-            table_name,
-        ],
+        raw_spark_job_extra_args=[SOURCE, table_name],
     )
     raw_task_groups[table_name] = raw_task_group
 

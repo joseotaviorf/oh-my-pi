@@ -2,7 +2,7 @@ from copy import copy
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.airflow import TaskGroupMethodFactory
+from bietlejuice.base.airflow.task_group_method_factory import TaskGroupMethodFactory
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 

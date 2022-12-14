@@ -11,7 +11,8 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.utils.helpers import cross_downstream
 from airflow.operators.python_operator import PythonOperator
 from airflow.hooks.S3_hook import S3Hook
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -175,7 +176,14 @@ def create_extraction_task(table_name: str) -> PythonOperator:
 for table_name in tables:
     load_raw_to_s3_task = create_extraction_task(table_name=table_name)
 
-    extra_parameters = [dw_bucket, datalake_bucket_data_acc, dw_bucket_data_acc, SOURCE, table_name, "{{ ds }}"]
+    extra_parameters = [
+        dw_bucket,
+        datalake_bucket_data_acc,
+        dw_bucket_data_acc,
+        SOURCE,
+        table_name,
+        "{{ ds }}",
+    ]
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,

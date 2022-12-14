@@ -9,7 +9,8 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.utils.helpers import chain, cross_downstream
 from pendulum import timezone
 
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum

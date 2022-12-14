@@ -9,7 +9,9 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from bietlejuice.base.airflow import BaseDAG, BaseTaskGroup, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -115,16 +117,23 @@ for crawler in crawlers:
         table_name=crawler_name,
         is_incremental=is_incremental,
         partitions=partition_cols,
-        execution_date=actual_execution_date
+        execution_date=actual_execution_date,
     )
     if "depends_on" not in crawler:
         crawler_weekday = crawler["weekday_run"]
         skip_run_task = ShortCircuitOperator(
             task_id=f"check-day-to-skip-execution-{crawler_name}",
             python_callable=check_valid_run_date,
-            op_kwargs={"dag_execution_date": actual_execution_date, "crawler_weekday": crawler_weekday},
+            op_kwargs={
+                "dag_execution_date": actual_execution_date,
+                "crawler_weekday": crawler_weekday,
+            },
         )
-        chain(create_cluster_task, skip_run_task, DatalakeTaskGroup.first_tasks(enrich_task_groups[crawler_name]))
+        chain(
+            create_cluster_task,
+            skip_run_task,
+            DatalakeTaskGroup.first_tasks(enrich_task_groups[crawler_name]),
+        )
     else:
         inner_dependencies[crawler_name] = crawler["depends_on"]
 (

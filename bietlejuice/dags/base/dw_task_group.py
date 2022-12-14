@@ -7,7 +7,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
-from bietlejuice.base.airflow import BaseTaskGroup
+from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService

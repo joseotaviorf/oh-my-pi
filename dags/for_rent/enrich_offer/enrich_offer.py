@@ -8,7 +8,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -29,7 +29,6 @@ config_service = ConfigurationService(DAG_NAME)
 datalake_bucket = config_service.get_config("datalake_bucket")
 athena_query_result_bucket = config_service.get_config("athena_query_results_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-
 
 
 databricks_bietlejuice_repo_path = config_service.get_config(

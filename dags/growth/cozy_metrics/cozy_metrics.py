@@ -9,7 +9,8 @@ from airflow.operators.quintoandar_databricks import (
 from pendulum import timezone
 import re
 
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
@@ -24,7 +25,9 @@ MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 config_service = ConfigurationService(SOURCE)
 
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
-DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config("databricks_bietlejuice_repo_path")
+DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
+)
 CLUSTER_DESCRIPTION = config_service.get_config("cluster_description")
 SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
@@ -47,11 +50,13 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 ENV = os.environ.get("ENVIRONMENT")
 
+
 def get_date_param(dag_run, ds, date_param_name):
     date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
     if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
         return date_param
     return ds
+
 
 dag = DAG(
     dag_id=DAG_ID,

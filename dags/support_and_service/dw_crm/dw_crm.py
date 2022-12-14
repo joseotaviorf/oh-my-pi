@@ -10,7 +10,8 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum

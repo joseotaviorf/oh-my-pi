@@ -5,7 +5,7 @@ from airflow.models import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.airflow import DAGOwnerEnum
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.services import FileService
 from dags import DAG_PACKAGES_ROOT
 
@@ -54,7 +54,7 @@ dag = DAG(
     schedule_interval=None,
 )
 
-dependencies_file_path = join(DAG_PACKAGES_ROOT,  "dependencies.yaml")
+dependencies_file_path = join(DAG_PACKAGES_ROOT, "dependencies.yaml")
 dependencies = get_dependencies_from_file(dependencies_file_path)
 task_dict = {}
 

@@ -1,5 +1,5 @@
 import airflow.utils.helpers as airflow_helpers
-from bietlejuice.base.airflow import BaseTaskGroup
+from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 
 
 class TaskFlowHelper:

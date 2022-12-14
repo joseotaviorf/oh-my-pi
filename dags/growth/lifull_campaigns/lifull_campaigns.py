@@ -9,7 +9,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -51,11 +52,13 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 ENV = os.environ.get("ENVIRONMENT")
 
+
 def get_date_param(dag_run, ds, date_param_name):
     date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
     if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
         return date_param
     return ds
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -99,7 +102,7 @@ raw_task_group = task_group.build_raw_task_group_for_single_table(
     table_name=raw_table_name,
     extraction_spark_job_file=raw_spark_job_file,
     raw_spark_job_extra_args=[
-        SOURCE, 
+        SOURCE,
         "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
         "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
         raw_table_name,
@@ -117,7 +120,7 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     extra_query_template_params={
         "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
         "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
-    },        
+    },
 )
 
 create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
@@ -130,7 +133,7 @@ cross_downstream(
 terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
 
 # adding data quality tasks :)
-independent_tasks = DatalakeTaskGroup.all_independent_tasks(clean_task_groups) 
+independent_tasks = DatalakeTaskGroup.all_independent_tasks(clean_task_groups)
 
 if independent_tasks:
     terminate_cluster_task.set_upstream(independent_tasks)

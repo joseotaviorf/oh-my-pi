@@ -12,7 +12,8 @@ from airflow.utils.helpers import chain, cross_downstream
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
 
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 

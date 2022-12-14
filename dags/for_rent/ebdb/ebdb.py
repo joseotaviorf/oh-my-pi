@@ -11,7 +11,8 @@ from airflow.operators.quintoandar_databricks import (
 )
 from airflow.utils.helpers import cross_downstream, chain
 
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService

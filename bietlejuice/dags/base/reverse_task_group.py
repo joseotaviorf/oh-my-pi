@@ -6,7 +6,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.airflow import BaseTaskGroup
+from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.formatters import StringFormatter

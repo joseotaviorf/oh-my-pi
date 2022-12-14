@@ -8,7 +8,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline import LayerEnum
@@ -35,7 +35,9 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 
-CLUSTER_DESCRIPTION = Variable.get(f"databricks_10_4_min_general_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    f"databricks_10_4_min_general_cluster", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"

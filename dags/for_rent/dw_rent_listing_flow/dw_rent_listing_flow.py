@@ -9,7 +9,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
@@ -83,9 +84,7 @@ partition_cols = config_service.get_config("partition_cols")
 
 for table in tables:
     dw_staging_task_group[table] = dw_task_group.build_dw_staging_task_group(
-        table_name=table,
-        is_incremental=False,
-        partitions=partition_cols,
+        table_name=table, is_incremental=False, partitions=partition_cols
     )
 
     dw_task_groups[table] = dw_task_group.build_dw_task_group(

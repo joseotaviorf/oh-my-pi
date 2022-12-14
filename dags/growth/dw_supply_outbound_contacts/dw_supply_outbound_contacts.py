@@ -9,7 +9,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
@@ -85,9 +85,9 @@ dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.DW_STAGING
 )
 dw_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW, 
+    layer=LayerEnum.DW,
     spectrum_iam_role=SPECTRUM_IAM_ROLE,
-    has_load_to_redshift_task=False
+    has_load_to_redshift_task=False,
 )
 
 chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))

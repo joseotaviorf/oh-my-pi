@@ -8,7 +8,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
 from bietlejuice.base.databricks.databricks_group_name_enum import (
@@ -91,7 +91,11 @@ for table in tables:
     table_name = table["table_name"]
     clean_table_name = table.get("clean_table_name", table_name)
     extraction_type = table.get("extraction_type", "incremental")
-    partition_cols = None if extraction_type == "full" else config_service.get_config("partition_cols")
+    partition_cols = (
+        None
+        if extraction_type == "full"
+        else config_service.get_config("partition_cols")
+    )
     parameters = [SOURCE, table_name]
 
     extended_parameters = [

@@ -9,7 +9,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 from airflow.utils.helpers import chain, cross_downstream
 
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
@@ -45,9 +45,7 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = (
-    f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME_PARTIAL}"
-)
+RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME_PARTIAL}"
 
 
 default_libraries = config_service.get_config("default_libraries")

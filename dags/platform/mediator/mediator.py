@@ -6,7 +6,8 @@ from airflow.operators.quintoandar_dag_mediator import (
     QuintoAndarCustomTriggerDagOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )

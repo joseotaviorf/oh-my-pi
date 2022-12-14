@@ -9,7 +9,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 from airflow.utils.helpers import chain
 
-from bietlejuice.base.airflow import BaseDAG
+from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
 from bietlejuice.base.databricks.databricks_group_name_enum import (

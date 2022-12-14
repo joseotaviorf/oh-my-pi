@@ -9,7 +9,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.base.airflow import BaseDAG, DAGOwnerEnum
+from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -95,9 +96,7 @@ for table in tables:
     )
 
     dw_staging_task_group[table_name] = task_group.build_dw_staging_task_group(
-        table_name=table_name,
-        is_incremental=False,
-        partitions=partition_cols,
+        table_name=table_name, is_incremental=False, partitions=partition_cols
     )
 
     dw_task_groups[table_name] = task_group.build_dw_task_group(
@@ -115,4 +114,3 @@ chain(DWTaskGroup.all_last_tasks(dw_task_groups), terminate_cluster_task)
 independent_tasks = DWTaskGroup.all_independent_tasks(dw_staging_task_group)
 if independent_tasks:
     terminate_cluster_task.set_upstream(independent_tasks)
-
