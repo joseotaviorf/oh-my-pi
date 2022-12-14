@@ -12,7 +12,7 @@ table_list:
 
 custom_cluster:
   driver_node_type_id: r6gd.12xlarge
-  node_type_id: r6gd.8xlarge
+  node_type_id: r6gd.12xlarge
   runtime_engine: PHOTON
   autoscale:
     min_workers: 3
