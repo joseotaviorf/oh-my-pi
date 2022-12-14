@@ -74,6 +74,9 @@ columns:
   ts_execution_finished:
     lineage:
       - datalake_inspections.inspection_history.ts_execution_finished
+  ts_first_synced:
+    lineage:
+      - datalake_inspections.inspection_history.ts_first_synced
   ts_created:
     lineage:
       - datalake_inspections.inspection_history.ts_created

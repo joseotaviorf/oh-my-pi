@@ -1889,6 +1889,7 @@ bietlejuice.enrich_docato:
 
 bietlejuice.enrich_inspections:
   - bietlejuice.ebdb:create-clean-inspection-in-data-lake
+  - bietlejuice.ebdb:create-clean-inspection-aud-in-data-lake
   - bietlejuice.inspections:load-clean-assessment
   - bietlejuice.inspections:load-clean-inspection
   - bietlejuice.inspections:load-clean-item

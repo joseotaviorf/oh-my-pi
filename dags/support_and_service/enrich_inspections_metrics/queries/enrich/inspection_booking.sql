@@ -50,6 +50,7 @@ SELECT DISTINCT
     i.ts_execution_started,
     i.ts_execution_finished,
     i.ts_inspected,
+    i.ts_first_synced,
     i.ts_created,
     i.ts_updated
 FROM

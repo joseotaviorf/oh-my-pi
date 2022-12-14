@@ -22,6 +22,13 @@ main_exception AS (
     FROM
         datalake_inspections_clean.inspection AS i
 ),
+main_inspection_aud_sync as(
+    SELECT DISTINCT
+        ia.id_inspection,
+        FIRST_VALUE(ia.ts_last_synced) OVER (PARTITION BY ia.id_inspection, status ORDER BY ia.ts_last_synced ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ts_first_synced
+    FROM
+        datalake_ebdb_clean.inspection_aud ia
+),
 union_inspection_history AS (
     SELECT
         i.id_inspection,
@@ -112,6 +119,10 @@ SELECT
     a.ts_started AS ts_execution_started,
     a.ts_finished AS ts_execution_finished,
     COALESCE(a.ts_created, i.ts_inspected) AS ts_inspected,
+    CASE
+        WHEN i.source = "PWA" THEN mias.ts_first_synced
+        ELSE a.ts_started
+    END AS ts_first_synced,
     i.ts_created,
     i.ts_updated
 FROM
@@ -123,3 +134,6 @@ LEFT JOIN
     inspection_reschedule AS ir
         ON ir.id_contract = i.id_contract
         AND ir.inspection_type = i.inspection_type
+LEFT JOIN
+    main_inspection_aud_sync AS mias
+        ON mias.id_inspection = i.id_inspection

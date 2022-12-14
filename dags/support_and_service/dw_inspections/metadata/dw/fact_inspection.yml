@@ -26,6 +26,9 @@ columns:
     country_code:
         lineage:
             - datalake_inspections_metrics.inspection_booking.country_code
+    booking_type:
+        lineage:
+            - datalake_inspections_metrics.inspection_booking.booking_type
     ldt_hours_execution:
         lineage:
             - datalake_inspections_metrics.inspection_achievements.ldt_hours_execution
@@ -44,6 +47,12 @@ columns:
     dt_execution_limit:
         lineage:
             - datalake_inspections_metrics.inspection_booking.dt_execution_limit
+    ts_inspected:
+        lineage:
+            - datalake_inspections_metrics.inspection_booking.ts_inspected
+    ts_first_synced:
+        lineage:
+            - datalake_inspections_metrics.inspection_booking.ts_first_synced
     ts_booking_inspected:
         lineage:
             - datalake_inspections_metrics.inspection_booking.ts_booking_inspected_utc
