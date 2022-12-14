@@ -1,12 +1,14 @@
+import collections
+import glob
+import json
 import os.path
 import re
 import sys
-import glob
-
-from typing import List, Tuple, Dict
 from itertools import chain
-import collections
-import json
+from os.path import join, isfile
+from typing import List, Tuple, Dict
+
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
 BI_ETL_EJUICE_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -93,7 +95,7 @@ class CrossDAGDependenciesValidator:
         else:
             dag_name = self.build_dag_name(dag_items[:-1])
             layer = dag_items[1]
-            table_name = f'{layer}:{dag_items[-1].replace(".sql","")}'
+            table_name = f'{layer}:{dag_items[-1].replace(".sql", "")}'
         return dag_name, table_name
 
     def load_tables_from_db_folder(self):
@@ -246,11 +248,15 @@ class CrossDAGDependenciesValidator:
         :type dag_name: str
         :rtype: bool
         """
-        dag_file = f"{DAG_PACKAGES_ROOT}/**/{dag_name}.py"
-        dag_config_file = f"{DAG_PACKAGES_ROOT}/**/{dag_name}.yml"
-        validate_dag_file = glob.glob(dag_file, recursive=True)
-        validate_config_dag_file = glob.glob(dag_config_file, recursive=True)
-        return len(validate_dag_file) != 0 or len(validate_config_dag_file) != 0
+        dag_pacakge_path = DAGPackagesPathService.get_dag_path(dag_name)
+        # DAGs declared in YAML
+        dag_yaml_file = join(dag_pacakge_path, f"{dag_name}_declaration.yaml")
+        # DAGs declared in Python
+        dag_python_file = join(dag_pacakge_path, f"{dag_name}.py")
+        # Metrics DAGs
+        dag_metric_file = join(dag_pacakge_path, f"{dag_name}.yml")
+
+        return isfile(dag_yaml_file) or isfile(dag_python_file) or isfile(dag_metric_file)
 
     def table_query_exists(self, dag, table):
         """
@@ -435,7 +441,6 @@ class CrossDAGDependenciesValidator:
                 ]
 
         if dag_dependencies_without_tasks:
-
             validation_message = "The DAG/Table '{dependent}' has the dependency '{dependency}' without a task defined."
 
             msg = f"There are DAGs or Tables dependencies without tasks defined in dependencies. You must declare a `dependency` with DAG and Task, using the following standards: 'bietlejuice.DAG_NAME:TASK_NAME':{self.concat_dependent_and_dependencies_to_msg(dag_dependencies_without_tasks, validation_message)}"
@@ -520,8 +525,7 @@ class CrossDAGDependenciesValidator:
         :rtype: int
         """
         self.log_msg(
-            msg=f"msg=Validating dependencies from dependencies.yaml",
-            force_log=True,
+            msg=f"msg=Validating dependencies from dependencies.yaml", force_log=True
         )
         self.log_msg(
             msg=f"non_standard_dags={self.dags_out_of_pattern}, msg=Ignoring out-of-pattern DAGs.",
