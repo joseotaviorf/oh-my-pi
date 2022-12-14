@@ -52,7 +52,7 @@ default_libraries = config_service.get_config("default_libraries")
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FINTECH,
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
