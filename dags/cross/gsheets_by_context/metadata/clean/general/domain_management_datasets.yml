@@ -1,0 +1,28 @@
+---
+database_name: datalake_gsheets_clean
+table_name: domain_management_datasets
+columns:
+  table:
+    lineage:
+      - datalake_gsheets_raw.domain_management_datasets.table
+  dag:
+    lineage:
+      - datalake_gsheets_raw.domain_management_datasets.dag
+  dag_owners:
+    lineage:
+      - datalake_gsheets_raw.domain_management_datasets.dag_owners
+  current_domain:
+    lineage:
+      - datalake_gsheets_raw.domain_management_datasets.current_domain
+  updated_domain:
+    lineage:
+      - datalake_gsheets_raw.domain_management_datasets.updated_domain
+  editor:
+    lineage:
+      - datalake_gsheets_raw.domain_management_datasets.editor
+  status:
+    lineage:
+      - datalake_gsheets_raw.domain_management_datasets.status
+  updated_at:
+    lineage:
+      - datalake_gsheets_raw.domain_management_datasets.updated_at

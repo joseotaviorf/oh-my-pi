@@ -1,0 +1,22 @@
+---
+database_name: datalake_gsheets_clean
+table_name: domain_management_metabase_dashboards
+columns:
+  dashboard_name:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metabase_dashboards.dashboard_name
+  current_domain:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metabase_dashboards.current_domain
+  updated_domain:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metabase_dashboards.updated_domain
+  editor:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metabase_dashboards.editor
+  status:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metabase_dashboards.status
+  updated_at:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metabase_dashboards.updated_at

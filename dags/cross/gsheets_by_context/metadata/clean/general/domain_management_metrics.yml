@@ -1,0 +1,25 @@
+---
+database_name: datalake_gsheets_clean
+table_name: domain_management_metrics
+columns:
+  metrics_name:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metrics.metrics_name
+  maturity_level:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metrics.maturity_level
+  current_domain:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metrics.current_domain
+  updated_domain:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metrics.updated_domain
+  editor:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metrics.editor
+  status:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metrics.status
+  updated_at:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metrics.updated_at

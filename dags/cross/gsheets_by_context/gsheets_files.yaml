@@ -1332,3 +1332,27 @@ user_properties:
     sheet_name: user_properties
     clean_table_name: tracking_catalog_user_properties
     sheet_context: general
+
+domain_management_metrics:
+    sheet_id: 1y1NlhMRcPgckYZljKkI9z2pRincAiv2z5tOs7lOrq_8
+    sheet_name: metrics
+    clean_table_name: domain_management_metrics
+    sheet_context: general
+
+domain_management_datasets:
+    sheet_id: 1y1NlhMRcPgckYZljKkI9z2pRincAiv2z5tOs7lOrq_8
+    sheet_name: datasets
+    clean_table_name: domain_management_datasets
+    sheet_context: general
+
+domain_management_metabase_dashboards:
+    sheet_id: 1y1NlhMRcPgckYZljKkI9z2pRincAiv2z5tOs7lOrq_8
+    sheet_name: metabase_dashboards
+    clean_table_name: domain_management_metabase_dashboards
+    sheet_context: general
+
+domain_management_looker_dashboards:
+    sheet_id: 1y1NlhMRcPgckYZljKkI9z2pRincAiv2z5tOs7lOrq_8
+    sheet_name: looker_dashboards
+    clean_table_name: domain_management_looker_dashboards
+    sheet_context: general
