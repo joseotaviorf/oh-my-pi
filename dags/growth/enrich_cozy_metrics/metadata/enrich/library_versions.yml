@@ -1,0 +1,18 @@
+database_name: datalake_cozy_metrics
+table_name: library_versions
+columns:
+  project_name:
+    lineage:
+      - datalake_cozy_metrics_clean.library_versions.project_name
+  major_version:
+    lineage:
+      - datalake_cozy_metrics_clean.library_versions.core
+  minor_version:
+    lineage:
+      - datalake_cozy_metrics_clean.library_versions.core
+  patches:
+    lineage:
+      - datalake_cozy_metrics_clean.library_versions.core
+  dt_created:
+    lineage:
+      - datalake_cozy_metrics_clean.library_versions.dt_created

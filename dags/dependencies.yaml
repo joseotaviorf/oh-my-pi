@@ -1581,6 +1581,9 @@ bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
   - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
 
+bietlejuice.enrich_cozy_metrics:
+  - bietlejuice.cozy_metrics:load-clean-library-versions
+
 bietlejuice.enrich_credit_analysis:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
