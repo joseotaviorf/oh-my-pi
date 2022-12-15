@@ -1,0 +1,16 @@
+---
+## TEMPLATE
+# <owner> <mandatory>: # What is the team responsible for this Dag.
+# <domain_details> <mandatory>: #
+#   <brief_description> <mandatory>: # A brief overview about the domain and what we are measuring.
+#                                      this will fill up the doc md of your dag.
+# <custom_cluster> <optional>:
+# <dag_end_date> <mandatory on alpha Dags>:
+# <custom_table_configs> <optional>: The default tables are full without partitions. In this config
+#                                    one can choose a incremental load and customize any partition.
+
+owner: DATA_INTERNATIONAL
+domain_details:
+  brief_description: |
+    Rental's demand metrics for Benvi (Mexico operation), in 
+    a weekly or monthly view. Includes volumes, targets, costs.

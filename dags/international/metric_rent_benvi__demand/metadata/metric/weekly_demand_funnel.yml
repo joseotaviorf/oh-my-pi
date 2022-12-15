@@ -1,0 +1,13 @@
+---
+database_name: metric_rent_benvi
+table_name: weekly_demand_funnel
+columns:
+  country_code:
+    lineage:
+      - datalake_region.region.country_code
+  city_group:
+    lineage:
+      - datalake_region.region.country_name
+  dt_weekly_started:
+    lineage:
+      - datalake_region.city_groups_per_periods.dt_weekly_started
