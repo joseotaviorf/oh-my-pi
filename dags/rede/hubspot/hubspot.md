@@ -21,6 +21,9 @@ Via **incremental load**:
     - `deal`
     - `deal_pipeline`
     - `email`
+    - `marketing_campaign`
+    - `marketing_email`
+    - `marketing_email_event`
     - `owner`
     - `team`
     - `ticket`

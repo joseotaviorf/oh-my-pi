@@ -1,0 +1,43 @@
+---
+database_name: datalake_hubspot_clean
+table_name: marketing_campaign
+columns:
+  id_marketing_campaign:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.id
+  id_app:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.appId
+  id_content:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.contentId
+  app_name:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.appName
+  subject:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.subject
+  name:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.name
+  processing_state:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.processingState
+  type:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.type
+  counters:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.counters
+  num_included:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.numIncluded
+  ts_last_processing_started:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.lastProcessingStartedAt
+  ts_last_processing_finished:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.lastProcessingFinishedAt
+  ts_last_processing_state_change:
+    lineage:
+      - datalake_hubspot_raw.marketing_campaign.lastProcessingStateChangeAt

@@ -31,8 +31,15 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 tables = config_service.get_config("tables")
 clean_partition_cols = ["year", "month", "day"]
-custom_libraries = config_service.get_config("custom_libraries")
 default_libraries = config_service.get_config("default_libraries")
+
+artifacts_default_bucket = config_service.get_config("artifacts_bucket")
+custom_libraries = [
+    {
+        "whl": f"{artifacts_default_bucket}/hubspot-api-client-python/"
+        f"quintoandar_hubspot_api_client-0.1.0-py2.py3-none-any.whl"
+    }
+]
 
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")

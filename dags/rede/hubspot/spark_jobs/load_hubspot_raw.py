@@ -1,10 +1,10 @@
-import datetime
 import json
 import logging
 from argparse import ArgumentParser
+from datetime import datetime
+from enum import Enum
 
 from quintoandar_logger import QuintoAndarLogger
-from hubspot import HubSpot
 
 from pyspark.sql.types import (
     StructType,
@@ -31,6 +31,8 @@ from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.json_service import JsonService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from pyspark.sql.functions import greatest, col
+from quintoandar_hubspot_api_client.factories.endpoint_factory import EndpointFactory
+from quintoandar_hubspot_api_client.clients.hubspot_client import HubspotClient
 
 JOB_NAME = "load_hubspot_raw"
 
@@ -40,14 +42,12 @@ spark_client = SparkClient()
 
 class HubSpotEncoder(json.JSONEncoder):
     def default(self, o):
-        if "ValueWithTimestamp" in str(type(o)):
-            return o.to_dict()
-        if isinstance(o, datetime.datetime):
+        if isinstance(o, datetime):
             return o.isoformat()
 
         return json.JSONEncoder.default(self, o)
 
-class HubSpotSchemaEnum:
+class HubSpotSchemaEnum(Enum):
     """This class contains the Spark schemas for the tables loaded by the HubSpot Consumer."""
 
     PIPELINE_SCHEMA = StructType(
@@ -139,7 +139,7 @@ def main():
     )
 
     config_service = ConfigurationService(source)
-    tables = get_tables(config_service)
+    tables = get_tables(config_service, execution_date)
     transform_tables_into_dataframes(tables)
     load_table_dataframes_into_datalake(
         tables, environment, source, datalake_bucket, execution_date
@@ -169,152 +169,92 @@ def get_token():
     return json.loads(json_credentials)["token"]
 
 
-def get_integration_method(table_name, hubspot_client):
-    """Returns the method used to call the api given the table name and hubspot client"""
-
-    methods = {
-        "contact": lambda **kwargs: fetch_all(
-            hubspot_client.crm.contacts.basic_api, **kwargs
-        ),
-        "company": lambda **kwargs: fetch_all(
-            hubspot_client.crm.companies.basic_api, **kwargs
-        ),
-        "deal": lambda **kwargs: fetch_all(
-            hubspot_client.crm.deals.basic_api, **kwargs
-        ),
-        "ticket": lambda **kwargs: fetch_all(
-            hubspot_client.crm.tickets.basic_api, **kwargs
-        ),
-        "email": lambda **kwargs: fetch_all(
-            hubspot_client.crm.objects.emails.basic_api, **kwargs
-        ),
-        "deal_pipeline": hubspot_client.crm.pipelines.pipelines_api.get_all,
-        "ticket_pipeline": hubspot_client.crm.pipelines.pipelines_api.get_all,
-        "owner": hubspot_client.crm.owners.get_all,
-        "team": hubspot_client.settings.users.teams_api.get_all,
-    }
-
-    if table_name not in methods:
-        raise KeyError(f"The table {table_name} is not valid")
-
-    return methods[table_name]
-
-
-def get_tables(config_service):
+def get_tables(config_service, execution_date):
     """Returns all the tables from the API in the form of a dictionary"""
 
-    hubspot_client = HubSpot()
-    hubspot_client.access_token = get_token()
-
+    hubspot_client = HubspotClient(get_token())
+    factory = EndpointFactory(hubspot_client)
+    
     tables = config_service.get_config("tables")
-
     table_results = {}
     for table_name, table_configs in tables.items():
-        kwargs = {
-            arg_name: arg_val
-            for arg_name, arg_val in table_configs.items()
-            if arg_name not in ("is_incremental", "bring_archived")
-        }
-        get_table_function = get_integration_method(table_name, hubspot_client)
+        kwargs = table_configs.get("params", {})
+        if "ids_list" in table_configs:
+            ids_list_results = factory.build(table_configs["ids_list"]["endpoint"], execution_date).sync()
+            key = table_configs["ids_list"]["key"]
+            kwargs["ids_list"] = [result[key] for result in ids_list_results]
+
+        consumer = factory.build(table_name, execution_date)
+
         table_results[table_name] = {
-            "content": get_table_function(**kwargs),
+            "content": consumer.sync(**kwargs),
             "is_incremental": table_configs["is_incremental"],
+            "schema": table_configs.get("schema", None),
+            "encode_inner_dictionaries": table_configs.get("encode_inner_dictionaries", False),
+            "date_filter_column": table_configs.get("date_filter_column", None),
         }
         if table_configs.get("bring_archived"):
-            table_results[table_name]["archived_content"] = get_table_function(
+            table_results[table_name]["archived_content"] = consumer.sync(
                 **kwargs, archived=True
             )
 
     return table_results
 
 
-def fetch_all(base_api_client, **kwargs):
+def generate_schema(data: dict) -> list:
     """
-    Given a base api client, returns the table contents.
-    This function already exists in HubSpot client, but the paging is fixed as 100, which is above
-    the limit to get the history.
+    Given a raw dictionary containing the result from the consumer, creates a schema with only strings except for created_at and updated_at,
+    which become timestamps.
     """
-
-    results = []
-    after = None
-
-    while True:
-        page = base_api_client.get_page(after=after, limit=50, **kwargs)
-        results.extend(page.results)
-        if page.paging is None:
-            break
-        after = page.paging.next.after
-
-    return results
+    if len(data):
+        columns = data[0].keys()
+        type_array = []
+        for column_name in columns:
+            if column_name in ("created_at", "updated_at"):
+                type_array.append(StructField(column_name, TimestampType()))
+            else:
+                type_array.append(StructField(column_name, StringType()))
+        schema = StructType(type_array)
+        return schema
 
 
-def transform_tables_into_dataframes(tables):
+def transform_tables_into_dataframes(tables: dict) -> None:
     """Transforms all tables in the dictionary into dataframes, assigning the result to the key "dataframe"."""
 
-    transformation_methods = {
-        "deal_pipeline": transform_pipeline_table_into_dataframe,
-        "ticket_pipeline": transform_pipeline_table_into_dataframe,
-        "team": transform_team_table_into_dataframe,
-        "owner": transform_owner_table_into_dataframe,
-    }
+    for table in tables.values():
+        if "schema" not in table or table["schema"] is None:
+            schema = generate_schema(table["content"])
+        else:
+            schema = HubSpotSchemaEnum[table["schema"].upper() + "_SCHEMA"].value
 
-    for table_name, table in tables.items():
-        transform_table_into_dataframe = transformation_methods.get(
-            table_name, transform_object_table_into_dataframe
-        )
-        table["dataframe"] = transform_table_into_dataframe(table["content"])
+        table["dataframe"] = create_dataframe_with_schema(table["content"], schema, table["encode_inner_dictionaries"])
         if "archived_content" in table:
             table["dataframe"] = (
                 table["dataframe"]
-                .unionAll(transform_table_into_dataframe(table["archived_content"]))
+                .unionAll(create_dataframe_with_schema(table["archived_content"], schema, table["encode_inner_dictionaries"]))
                 .withColumn(
                     "updated_at", greatest(col("updated_at"), col("archived_at"))
                 )  # HubSpot doesn't change updated_at when it archives an object
             )
 
 
-def transform_pipeline_table_into_dataframe(table_content):
-    """Receives the raw content of a pipeline table returned by the api consumer, and returns a Spark dataframe"""
+def create_dataframe_with_schema(table_content: dict, schema: StructType, encode_inner_dictionaries: bool):
+    """Receives the raw content returned by the consumer, and returns a Spark Dataframe"""
 
-    schema = HubSpotSchemaEnum.PIPELINE_SCHEMA
-    table_dict = table_content.to_dict()["results"]
-    return spark_client.create_dataframe(table_dict, schema)
-
-
-def transform_team_table_into_dataframe(table_content):
-    """Receives the raw content of a team table returned by the api consumer, and returns a Spark dataframe"""
-
-    schema = HubSpotSchemaEnum.TEAM_SCHEMA
-    table_dict = table_content.to_dict()["results"]
-    return spark_client.create_dataframe(table_dict, schema)
+    if encode_inner_dictionaries:
+        table_content = JsonService.transform_json_list_terms(
+          table_content, cls=HubSpotEncoder
+        )
+    return spark_client.create_dataframe(table_content, schema)
 
 
-def transform_owner_table_into_dataframe(table_content):
-    """Receives the raw content of an owner table returned by the api consumer, and returns a Spark dataframe"""
-
-    schema = HubSpotSchemaEnum.OWNER_SCHEMA
-    table_dict = list(map(lambda x: x.to_dict(), table_content))
-    return spark_client.create_dataframe(table_dict, schema)
-
-
-def transform_object_table_into_dataframe(table_content):
-    """Receives the raw content of a CRM object returned by the api consumer, and returns a Spark dataframe"""
-
-    schema = HubSpotSchemaEnum.OBJECT_SCHEMA
-    table_dict = list(map(lambda x: x.to_dict(), table_content))
-    unnested_table_dict = JsonService.transform_json_list_terms(
-        table_dict, cls=HubSpotEncoder
-    )
-    return spark_client.create_dataframe(unnested_table_dict, schema)
-
-
-def create_date_partitions(df):
+def create_date_partitions(df, date_filter_column):
     """Creates the columns year, month and day using updated_at"""
 
     return (
         SparkDataFrameService()
         .input(df)
-        .create_year_month_day_columns_from_dataframe_column("updated_at")
+        .create_year_month_day_columns_from_dataframe_column(date_filter_column)
         .output()
     )
 
@@ -352,7 +292,7 @@ def load_table_dataframes_into_datalake(
             continue
 
         if table_content["is_incremental"]:
-            df = create_date_partitions(df)
+            df = create_date_partitions(df, table_content["date_filter_column"])
             df = filter_dataframe_by_execution_date(df, execution_date)
             IncrementalTableLoaderPipeline(
                 database_name,
