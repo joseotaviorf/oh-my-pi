@@ -435,7 +435,7 @@ onboarding AS (
         status_closing_changes
     WHERE
         previous_status = 'ONBOARDING'
-        AND ts_updated < '2022-04-05'
+        AND ts_updated < '2022-04-12'
     GROUP BY
         id_sales_flow
 ),

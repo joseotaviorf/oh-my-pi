@@ -166,7 +166,13 @@ data_sources AS (
         so.dt_sale_agreement_created,
         so.dt_sale_agreement_signed,
         so.dt_sale_agreement_cancelled,
-        COALESCE(sof.dt_onboarding_ended, m.dt_onboarding_ended) AS dt_onboarding_ended,
+        COALESCE(
+            sof.dt_onboarding_ended,
+            CASE
+                WHEN DATE(so.ts_offer_submitted) > "2022-04-12" 
+                    THEN NULL
+                ELSE m.dt_onboarding_ended
+            END) AS dt_onboarding_ended,
         COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended) AS dt_legal_analysis_ended,
         COALESCE(sof.dt_legaut_analysis_started, m.dt_legaut_analysis_started) AS dt_legaut_analysis_started,
         COALESCE(sof.dt_legaut_analysis_ended, m.dt_legaut_analysis_ended) AS dt_legaut_analysis_ended,
