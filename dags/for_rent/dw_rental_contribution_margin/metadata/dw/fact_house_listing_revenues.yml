@@ -1,0 +1,24 @@
+database_name: dw_rental_contribution_margin
+table_name: fact_house_listing_revenues
+columns:
+  id_contract:
+    lineage:
+      - datalake_revenue_lines.management_fee.id_contract_ebdb
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+  id_house:
+    lineage:
+      - datalake_ebdb_contract.contract.id_house
+  country_code:
+    lineage:
+      - datalake_ebdb_country.house.country_code
+  quarter:
+    lineage:
+      - dw_public.dim_date.quarter
+  accrual_year_month:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.month_start
+  dt_month_start:
+    lineage:
+      - dw_public.dim_date.month_start
