@@ -1,8 +1,9 @@
-WITH invoices_values AS (
-  SELECT
+WITH invoices AS (
+  SELECT DISTINCT
+    ies.id_invoice,
     ies.id_contract,
-    SUM(IF(ie.entry_type = 'rental', ies.brl_entry_due_amount, 0)) AS rent_value,
-    SUM(IF(ie.entry_type = 'home insurance', ies.brl_entry_due_amount, 0)) AS home_insurance,
+    ie.entry_type,
+    brl_entry_due_amount,
     invoice.accrual_year_month
   FROM
     datalake_invoice.invoice_entries AS ies
@@ -16,6 +17,16 @@ WITH invoices_values AS (
     ie.entry_type IN ('rental', 'home insurance')
     AND ie.from_account_type = 'tenant'
     AND ie.to_account_type = 'contract'
+),
+
+invoices_values AS (
+  SELECT
+    id_contract,
+    SUM(IF(entry_type = 'rental', brl_entry_due_amount, 0)) AS rent_value,
+    SUM(IF(entry_type = 'home insurance', brl_entry_due_amount, 0)) AS home_insurance,
+    accrual_year_month
+  FROM 
+    invoices
   GROUP BY 1,4
 ),
 
@@ -43,6 +54,56 @@ management_fees AS (
   WHERE
     management_fee_share IN ('quintoandar', 'partner')
   GROUP BY 1,4
+),
+
+late_payments AS (
+  SELECT
+    id_contract,
+    SUM(invoice_theorical_amount) AS invoice_theorical_amount,
+    accrual_year_month
+  FROM
+    datalake_revenue_lines.late_payments
+  GROUP BY 1,3
+),
+
+long_term_rental_anticipation AS (
+  SELECT
+    id_contract_ebdb,
+    SUM(invoice_theorical_amount) AS invoice_theorical_amount,
+    accrual_year_month
+  FROM
+    datalake_revenue_lines.long_term_rental_anticipation
+  GROUP BY 1,3
+),
+
+service_fee AS (
+  SELECT
+    id_contract_ebdb,
+    SUM(invoice_theorical_amount) AS invoice_theorical_amount,
+    accrual_year_month
+  FROM
+    datalake_revenue_lines.service_fee
+  GROUP BY 1,3
+),
+
+month_rental_anticipation AS (
+  SELECT
+    id_contract_ebdb,
+    SUM(invoice_theorical_amount) AS invoice_theorical_amount,
+    accrual_year_month
+  FROM
+    datalake_revenue_lines.month_rental_anticipation
+  GROUP BY 1,3
+),
+
+brokerage_finance AS (
+  SELECT
+    id_contract_ebdb,
+    SUM(invoice_theorical_amount) AS invoice_theorical_amount,
+    accrual_year_month
+  FROM
+    datalake_revenue_lines.brokerage_finance
+  GROUP BY 1,3
 )
 
 SELECT
@@ -56,11 +117,11 @@ SELECT
   COALESCE(mf.administration_fee, 0) AS administration_fee,
   COALESCE(bf.brokerage_fee, 0) AS brokerage_fee,
   COALESCE(iv.home_insurance, 0) AS home_insurance,
-  SUM(COALESCE(sf.invoice_theorical_amount, 0)) AS service_fee,
-  SUM(COALESCE(mra.invoice_theorical_amount, 0)) AS mra,
-  SUM(COALESCE(lra.invoice_theorical_amount, 0)) AS lra,
-  SUM(COALESCE(bfi.invoice_theorical_amount, 0)) as bfi,
-  SUM(COALESCE(lp.invoice_theorical_amount, 0)) AS lp,
+  COALESCE(sf.invoice_theorical_amount, 0) AS service_fee,
+  COALESCE(mra.invoice_theorical_amount, 0) AS mra,
+  COALESCE(lra.invoice_theorical_amount, 0) AS lra,
+  COALESCE(bfi.invoice_theorical_amount, 0) as bfi,
+  COALESCE(lp.invoice_theorical_amount, 0) AS lp,
   COALESCE(bf.brokerage_partner_share, 0) AS brokerage_partner_share,
   COALESCE(mf.management_partner_share, 0) AS management_partner_share,
   dd.quarter,
@@ -74,23 +135,23 @@ LEFT JOIN
     ON mf.id_contract_ebdb = bf.id_contract_ebdb
     AND mf.accrual_year_month = bf.accrual_year_month
 LEFT JOIN
-  datalake_revenue_lines.service_fee AS sf
+  service_fee AS sf
     ON mf.id_contract_ebdb = sf.id_contract_ebdb
     AND mf.accrual_year_month = sf.accrual_year_month
 LEFT JOIN
-  datalake_revenue_lines.month_rental_anticipation AS mra
+  month_rental_anticipation AS mra
     ON mf.id_contract_ebdb = mra.id_contract_ebdb
     AND mf.accrual_year_month = mra.accrual_year_month
 LEFT JOIN
-  datalake_revenue_lines.long_term_rental_anticipation AS lra
+  long_term_rental_anticipation AS lra
     ON mf.id_contract_ebdb = lra.id_contract_ebdb
     AND mf.accrual_year_month = lra.accrual_year_month
 LEFT JOIN
-  datalake_revenue_lines.late_payments AS lp
+  late_payments AS lp
     ON mf.id_contract_ebdb = lp.id_contract
     AND mf.accrual_year_month = lp.accrual_year_month
 LEFT JOIN
-  datalake_revenue_lines.brokerage_finance AS bfi
+  brokerage_finance AS bfi
     ON mf.id_contract_ebdb = bfi.id_contract_ebdb
     AND mf.accrual_year_month = bfi.accrual_year_month
 LEFT JOIN
@@ -119,4 +180,3 @@ INNER JOIN
     ON c.dt_started = dd_contract.date
 WHERE
   h.country_code = 'BR'
-GROUP BY 1,2,3,4,5,6,7,8,9,10,16,17,18,19,20
