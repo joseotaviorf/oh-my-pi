@@ -59,19 +59,12 @@ if __name__ == "__main__":
     lost_listings_df_pd = spark_client.conn.sql(
         lost_listings_query.format(execution_date=execution_date)
     ).toPandas()
-    lost_listings_df_pd["cluster"] = model.predict(lost_listings_df_pd.iloc[:, 1:])
+    lost_listings_df_pd["cluster"] = model.predict(lost_listings_df_pd.iloc[:, 1:-3])
     lost_listings_df_pd["cluster"] = lost_listings_df_pd["cluster"].map(
         segements_mapping
     )
 
-    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
     df = spark_client.create_dataframe(lost_listings_df_pd)
-    df = (
-        SparkDataFrameService()
-        .input(df)
-        .create_year_month_day_columns_from_date(dt_execution)
-        .output()
-    )
 
     db_info = DatalakeMetastoreService.get_db_info(env, context, datalake_bucket)
     database_name = db_info["db_enrich_databricks"]

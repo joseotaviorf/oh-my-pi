@@ -57,3 +57,12 @@ columns:
   house_type:
     lineage:
       - dw_public.dim_house_listing.house_type
+  year:
+    lineage:
+      - dw_public.dim_house_listing.ts_listing_version_start
+  month:
+    lineage:
+      - dw_public.dim_house_listing.ts_listing_version_start
+  day:
+    lineage:
+      - dw_public.dim_house_listing.ts_listing_version_start

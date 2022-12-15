@@ -112,7 +112,10 @@ lost_listings_query: |
     CASE WHEN dhl.has_visit_restriction = 'True' THEN 1 ELSE 0 END AS has_visit_restriction,
     COALESCE(CAST(dhl.house_elevator AS INT), 0) AS house_elevator,
     dhl.house_entrance,
-    dhl.house_type
+    dhl.house_type,
+    YEAR(dhl.ts_listing_version_start) AS year,
+    MONTH(dhl.ts_listing_version_start) AS month,
+    DAY(dhl.ts_listing_version_start) AS day
   FROM
     dw_public.dim_house_listing AS dhl
     LEFT JOIN dim_house_listing_amenities AS dhla
