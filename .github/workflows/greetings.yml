@@ -4,7 +4,7 @@
 
  jobs:
    greeting:
-     runs-on: ubuntu-latest
+     runs-on: github-actions-developers-runner
      steps:
      - uses: actions/first-interaction@v1.1.1
        with:
