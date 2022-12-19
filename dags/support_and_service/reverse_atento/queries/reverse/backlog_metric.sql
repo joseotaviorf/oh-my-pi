@@ -2,6 +2,7 @@ SELECT DISTINCT
   bmt.sk_task AS sk_ticket,
   bmt.sk_agent,
   bmt.origin AS channel,
+  bmt.status,
   da.agent_company,
   da.email AS agent_email,
   dd.department,
