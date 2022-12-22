@@ -14,7 +14,7 @@ SELECT
     BOOLEAN(active) AS is_active,
     nextduedate AS dt_next_due,
     datecreated AS dt_created,
-    dateinsert AS ts_insert,
-    dateupdate AS ts_update
+    dateinsert AS ts_inserted,
+    dateupdate AS ts_updated
 FROM
     datalake_velo_raw.fiancavelo_subscriptionpayment

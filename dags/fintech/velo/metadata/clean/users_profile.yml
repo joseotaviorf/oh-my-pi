@@ -1,0 +1,31 @@
+---
+database_name: datalake_velo_clean
+table_name: users_profile
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.users_profile.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.users_profile.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.users_profile.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.users_profile.name
+  menu:
+    lineage:
+      - datalake_velo_raw.users_profile.menu
+  filter:
+    lineage:
+      - datalake_velo_raw.users_profile.filter
+  is_active:
+    lineage:
+      - datalake_velo_raw.users_profile.active
+  ts_inserted:
+    lineage:
+      - datalake_velo_raw.users_profile.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_velo_raw.users_profile.dateupdate

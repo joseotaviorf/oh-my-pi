@@ -1,0 +1,28 @@
+---
+database_name: dw_velo
+table_name: dim_velo_propose_company
+columns:
+  sk_company:
+    lineage:
+      - datalake_velo.propose_company.id_company
+  company_name:
+    lineage:
+      - datalake_velo.propose_company.company_name
+  city:
+    lineage:
+      - datalake_velo.propose_company.city
+  state:
+    lineage:
+      - datalake_velo.propose_company.state
+  country:
+    lineage:
+      - datalake_velo.propose_company.country
+  zipcode:
+    lineage:
+      - datalake_velo.propose_company.zipcode
+  geolocation:
+    lineage:
+      - datalake_velo.propose_company.geolocation
+  cnpj:
+    lineage:
+      - datalake_velo.propose_company.cnpj

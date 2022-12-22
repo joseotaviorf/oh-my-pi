@@ -1,0 +1,31 @@
+---
+database_name: datalake_velo_clean
+table_name: clientes_persongateway
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.clientes_persongateway.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.clientes_persongateway.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.clientes_persongateway.userupdate
+  id_person:
+    lineage:
+      - datalake_velo_raw.clientes_persongateway.person
+  id_bank_gateway:
+    lineage:
+      - datalake_velo_raw.clientes_persongateway.gateway
+  id_invoice_customer:
+    lineage:
+      - datalake_velo_raw.clientes_persongateway.customer
+  is_active:
+    lineage:
+      - datalake_velo_raw.clientes_persongateway.active
+  ts_inserted:
+    lineage:
+      - datalake_velo_raw.clientes_persongateway.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_velo_raw.clientes_persongateway.dateupdate

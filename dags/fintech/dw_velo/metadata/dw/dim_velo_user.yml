@@ -1,0 +1,22 @@
+---
+database_name: dw_velo
+table_name: dim_velo_user
+columns:
+  sk_user:
+    lineage:
+      - datalake_velo.user.id_user
+  name:
+    lineage:
+      - datalake_velo.user.name
+  email:
+    lineage:
+      - datalake_velo.user.email
+  user_role:
+    lineage:
+      - datalake_velo.user.user_role
+  phone:
+    lineage:
+      - datalake_velo.user.phone
+  ts_created:
+    lineage:
+      - datalake_velo.user.ts_created

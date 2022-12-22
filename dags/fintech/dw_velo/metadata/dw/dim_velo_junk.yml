@@ -1,0 +1,19 @@
+---
+database_name: dw_velo
+table_name: dim_velo_junk
+columns:
+  sk_junk:
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_master_type:
+    lineage:
+      - datalake_velo.junk.id_master_type
+  desc_master_type:
+    lineage:
+      - datalake_velo.junk.desc_master_type
+  id_lvl_1:
+    lineage:
+      - datalake_velo.junk.id_lvl_1
+  desc_lvl_1:
+    lineage:
+      - datalake_velo.junk.desc_lvl_1

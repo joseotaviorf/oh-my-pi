@@ -38,9 +38,9 @@ columns:
   dt_birth:
     lineage:
       - datalake_velo_raw.clientes_person.birth
-  ts_insert:
+  ts_inserted:
     lineage:
       - datalake_velo_raw.clientes_person.dateinsert
-  ts_update:
+  ts_updated:
     lineage:
       - datalake_velo_raw.clientes_person.dateupdate

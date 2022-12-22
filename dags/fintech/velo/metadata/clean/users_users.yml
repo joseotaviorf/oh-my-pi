@@ -20,9 +20,6 @@ columns:
   email:
     lineage:
       - datalake_velo_raw.users_users.email
-  password:
-    lineage:
-      - datalake_velo_raw.users_users.password
   phone:
     lineage:
       - datalake_velo_raw.users_users.phone
@@ -35,9 +32,9 @@ columns:
   is_active:
     lineage:
       - datalake_velo_raw.users_users.active
-  ts_insert:
+  ts_inserted:
     lineage:
       - datalake_velo_raw.users_users.dateinsert
-  ts_update:
+  ts_updated:
     lineage:
       - datalake_velo_raw.users_users.dateupdate

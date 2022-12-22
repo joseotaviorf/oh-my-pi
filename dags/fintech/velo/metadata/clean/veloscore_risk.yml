@@ -1,0 +1,25 @@
+---
+database_name: datalake_velo_clean
+table_name: veloscore_risk
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.veloscore_risk.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.veloscore_risk.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.veloscore_risk.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.veloscore_risk.name
+  is_active:
+    lineage:
+      - datalake_velo_raw.veloscore_risk.active
+  ts_inserted:
+    lineage:
+      - datalake_velo_raw.veloscore_risk.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_velo_raw.veloscore_risk.dateupdate

@@ -1,0 +1,24 @@
+database_name: datalake_velo
+table_name: house
+columns:
+  id_house:
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.id
+  type:
+    lineage:
+      - datalake_velo_clean.fiancavelo_propertytype.name
+  city:
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.city
+  state:
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.state
+  country:
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.country
+  zipcode:
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.zipcode
+  geolocation:
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.geolocation

@@ -145,6 +145,12 @@ columns:
   inss_value:
     lineage:
       - datalake_velo_omie_clean.cash_flows.inss_value
+  due_amount:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.securities_value
+  paid_amount:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.paid_value
   comments:
     lineage:
       - datalake_velo_omie_clean.cash_flows.comments

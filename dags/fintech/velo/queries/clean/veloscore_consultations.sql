@@ -8,7 +8,7 @@ SELECT
     document,
     risk,
     BOOLEAN(active) AS is_active,
-    dateinsert AS ts_insert,
-    dateupdate AS ts_update
+    dateinsert AS ts_inserted,
+    dateupdate AS ts_updated
 FROM
     datalake_velo_raw.veloscore_consultations

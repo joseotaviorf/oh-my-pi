@@ -1,0 +1,84 @@
+database_name: datalake_velo
+table_name: propose
+columns:
+  id_propose:
+    lineage:
+      - datalake_velo_clean.fiancavelo_propose.id
+  id_propose_values:
+    lineage:
+      - datalake_velo_clean.fiancavelo_propose.id
+      - datalake_velo_clean.fiancavelo_activator.id
+      - datalake_velo_clean.fiancavelo_plans.id
+  id_broker:
+    lineage:
+      - datalake_velo_clean.fiancavelo_fianca.id_realestate
+  id_house:
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.id
+  id_agent:
+    lineage:
+      - datalake_velo_clean.fiancavelo_propose.id_realtor
+  id_contract:
+    lineage:
+      - datalake_velo_clean.fiancavelo_fianca.id
+  id_propose_company:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposecompany.id_company
+  id_primary_person:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposeperson.id_person
+  id_propose_status:
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_guarantee_status:
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_propose_type:
+    lineage:
+      - datalake_velo.junk.id_junk
+  propose_status:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposestatus.name
+  guarantee_status:
+    lineage:
+      - datalake_velo_clean.fiancavelo_status.name
+  propose_type:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposetype.name
+  dt_contract_started:
+    lineage:
+      - datalake_velo_clean.fiancavelo_fianca.dt_begin
+  dt_ended:
+    lineage:
+      - datalake_velo_clean.fiancavelo_fianca.dt_ended
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+  dt_propose_started:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+  dt_waiting_new_docs:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+  dt_evaluation_started:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+  dt_rejected:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+  dt_sign_started:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+  dt_paid:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+  dt_activation:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+  dt_secured:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+  dt_activation_analysis:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+  dt_secure_pending:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated

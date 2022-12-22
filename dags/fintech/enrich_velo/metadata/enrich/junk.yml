@@ -1,0 +1,13 @@
+database_name: datalake_velo
+table_name: junk
+columns:
+  id_lvl_1:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposestatus.id
+      - datalake_velo_clean.fiancavelo_status.id
+      - datalake_velo_clean.fiancavelo_proposetype.id
+  desc_lvl_1:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposestatus.name
+      - datalake_velo_clean.fiancavelo_status.name
+      - datalake_velo_clean.fiancavelo_proposetype.name

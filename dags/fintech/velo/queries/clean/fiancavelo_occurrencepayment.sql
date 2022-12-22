@@ -16,7 +16,7 @@ SELECT
     duedate AS dt_due,
     datecreated AS dt_created,
     confirmeddate As dt_confirmed,
-    dateinsert AS ts_insert,
-    dateupdate AS ts_update
+    dateinsert AS ts_inserted,
+    dateupdate AS ts_updated
 FROM
     datalake_velo_raw.fiancavelo_occurrencepayment

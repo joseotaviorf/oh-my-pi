@@ -15,7 +15,7 @@ SELECT
     BOOLEAN(valid) AS is_valid,
     BOOLEAN(active) AS is_active,
     duedate AS dt_due,
-    dateinsert AS ts_insert,
-    dateupdate AS ts_update
+    dateinsert AS ts_inserted,
+    dateupdate AS ts_updated
 FROM
     datalake_velo_raw.fiancavelo_occurrence

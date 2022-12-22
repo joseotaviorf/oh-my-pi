@@ -23,9 +23,9 @@ columns:
   id_user_update:
     lineage:
       - datalake_velo_raw.fiancavelo_proposeperson.userupdate
-  ts_insert:
+  ts_inserted:
     lineage:
       - datalake_velo_raw.fiancavelo_proposeperson.dateinsert
-  ts_update:
+  ts_updated:
     lineage:
       - datalake_velo_raw.fiancavelo_proposeperson.dateupdate

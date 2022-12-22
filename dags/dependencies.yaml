@@ -1347,6 +1347,18 @@ bietlejuice.dw_visit:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
 
+bietlejuice.dw_velo:
+  - bietlejuice.enrich_velo:load-enrich-broker
+  - bietlejuice.enrich_velo:load-enrich-house
+  - bietlejuice.enrich_velo:load-enrich-junk
+  - bietlejuice.enrich_velo:load-enrich-propose-company
+  - bietlejuice.enrich_velo:load-enrich-propose-person
+  - bietlejuice.enrich_velo:load-enrich-propose-values
+  - bietlejuice.enrich_velo:load-enrich-propose
+  - bietlejuice.enrich_velo:load-enrich-transaction-category
+  - bietlejuice.enrich_velo:load-enrich-transaction-entries
+  - bietlejuice.enrich_velo:load-enrich-user
+
 bietlejuice.enrich_3p:
   - bietlejuice.ebdb:create-clean-agent-data-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
@@ -2519,6 +2531,40 @@ bietlejuice.enrich_tracked_events:
 bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:load-clean-dispatch
   - bietlejuice.tracksale:load-clean-answer
+
+bietlejuice.enrich_velo:
+  - bietlejuice.enrich_velo_omie:load-enrich-cash-flows
+  - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories
+  - bietlejuice.velo_omie:load-clean-categories
+  - bietlejuice.velo_omie:load-clean-projects
+  - bietlejuice.velo_omie:load-clean-bank-account
+  - bietlejuice.velo:load-clean-fiancavelo-realestate
+  - bietlejuice.velo:load-clean-clientes-company
+  - bietlejuice.velo:load-clean-clientes-person
+  - bietlejuice.velo:load-clean-clientes-address
+  - bietlejuice.velo:load-clean-fiancavelo-property
+  - bietlejuice.velo:load-clean-fiancavelo-propertytype
+  - bietlejuice.velo:load-clean-veloscore-consultations
+  - bietlejuice.velo:load-clean-veloscore-bureau
+  - bietlejuice.velo:load-clean-veloscore-personal
+  - bietlejuice.velo:load-clean-veloscore-risk
+  - bietlejuice.velo:load-clean-fiancavelo-proposeperson
+  - bietlejuice.velo:load-clean-fiancavelo-proposecompany
+  - bietlejuice.velo:load-clean-fiancavelo-packvalues
+  - bietlejuice.velo:load-clean-fiancavelo-payment
+  - bietlejuice.velo:load-clean-fiancavelo-propose
+  - bietlejuice.velo:load-clean-fiancavelo-activator
+  - bietlejuice.velo:load-clean-fiancavelo-plans
+  - bietlejuice.velo:load-clean-fiancavelo-plantype
+  - bietlejuice.velo:load-clean-fiancavelo-proposehistory
+  - bietlejuice.velo:load-clean-fiancavelo-object
+  - bietlejuice.velo:load-clean-fiancavelo-fianca
+  - bietlejuice.velo:load-clean-fiancavelo-proposestatus
+  - bietlejuice.velo:load-clean-fiancavelo-proposetype
+  - bietlejuice.velo:load-clean-fiancavelo-status
+  - bietlejuice.velo:load-clean-users-users
+  - bietlejuice.velo:load-clean-users-profile
+
 
 bietlejuice.enrich_velo_omie:
   - bietlejuice.velo_omie:load-clean-cash-flows

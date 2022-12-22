@@ -1,0 +1,28 @@
+database_name: datalake_velo
+table_name: propose_company
+columns:
+  id_company:
+    lineage:
+      - datalake_velo_clean.clientes_company.id
+  company_name:
+    lineage:
+      - datalake_velo_clean.clientes_company.comercial_name
+      - datalake_velo_clean.clientes_company.name
+  city:
+    lineage:
+      - datalake_velo_clean.clientes_address.city
+  state:
+    lineage:
+      - datalake_velo_clean.clientes_address.state
+  country:
+    lineage:
+      - datalake_velo_clean.clientes_address.country
+  zipcode:
+    lineage:
+      - datalake_velo_clean.clientes_address.zipcode
+  geolocation:
+    lineage:
+      - datalake_velo_clean.clientes_address.geolocation
+  cnpj:
+    lineage:
+      - datalake_velo_clean.clientes_company.document

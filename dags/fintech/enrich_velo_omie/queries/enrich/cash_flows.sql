@@ -56,6 +56,14 @@ SELECT
     cf.income_tax_value,
     cf.iss_value,
     cf.inss_value,
+    CASE
+        WHEN cf.id_group = 'CONTA_A_PAGAR' THEN -1.0 * cf.securities_value
+        ELSE cf.securities_value
+    END AS due_amount,
+    CASE
+        WHEN cf.id_group = 'CONTA_A_PAGAR' THEN -1.0 * cf.paid_value
+        ELSE cf.paid_value
+    END AS paid_amount,
     cf.comments,
     cf.categories,
     cf.is_liquidated,

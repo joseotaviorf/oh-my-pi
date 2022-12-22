@@ -1,0 +1,32 @@
+database_name: datalake_velo
+table_name: propose_values
+columns:
+  id_propose_values:
+    lineage:
+      - datalake_velo_clean.fiancavelo_propose.id
+      - datalake_velo_clean.fiancavelo_activator.id
+      - datalake_velo_clean.fiancavelo_plans.id
+  plan_type:
+    lineage:
+      - datalake_velo_clean.fiancavelo_plantype.name
+  activator_type:
+    lineage:
+      - datalake_velo_clean.fiancavelo_activator.name
+  plan:
+    lineage:
+      - datalake_velo_clean.fiancavelo_plans.name
+  activator_amount:
+    lineage:
+      - datalake_velo_clean.fiancavelo_activator.value
+  plan_percent:
+    lineage:
+      - datalake_velo_clean.fiancavelo_plans.percent
+  plan_coverage:
+    lineage:
+      - datalake_velo_clean.fiancavelo_plans.coverage
+  plan_damage:
+    lineage:
+      - datalake_velo_clean.fiancavelo_plans.damage
+  plan_commission:
+    lineage:
+      - datalake_velo_clean.fiancavelo_plans.commission

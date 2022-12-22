@@ -1,0 +1,52 @@
+---
+database_name: dw_velo
+table_name: fact_velo_transaction_entries
+columns:
+  sk_transaction_entry:
+    lineage:
+      - datalake_velo.transaction_entries.id_transaction_entry
+  sk_transaction:
+    lineage:
+      - datalake_velo.transaction_entries.id_trasaction
+  sk_category:
+    lineage:
+      - datalake_velo.transaction_entries.id_category
+  sk_propose:
+    lineage:
+      - datalake_velo.transaction_entries.id_propose
+  sk_bank_account:
+    lineage:
+      - datalake_velo.transaction_entries.id_bank_account
+  sk_omie_client:
+    lineage:
+      - datalake_velo.transaction_entries.id_omie_client
+  category_percent_amount:
+    lineage:
+      - datalake_velo.transaction_entries.category_percent_amount
+  category_due_amount:
+    lineage:
+      - datalake_velo.transaction_entries.category_due_amount
+  category_paid_amount:
+    lineage:
+      - datalake_velo.transaction_entries.category_paid_amount
+  is_occurency:
+    lineage:
+      - datalake_velo.transaction_entries.is_occurency
+  dt_issue:
+    lineage:
+      - datalake_velo.transaction_entries.dt_issue
+  dt_register:
+    lineage:
+      - datalake_velo.transaction_entries.dt_register
+  dt_created:
+    lineage:
+      - datalake_velo.transaction_entries.dt_created
+  dt_modified:
+    lineage:
+      - datalake_velo.transaction_entries.dt_modified
+  dt_due:
+    lineage:
+      - datalake_velo.transaction_entries.dt_due
+  dt_paid:
+    lineage:
+      - datalake_velo.transaction_entries.dt_paid

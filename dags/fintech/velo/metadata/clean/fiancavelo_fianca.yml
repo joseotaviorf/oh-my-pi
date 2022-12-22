@@ -41,12 +41,12 @@ columns:
   dt_begin:
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.begin
-  dt_end:
+  dt_ended:
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.end
-  ts_insert:
+  ts_inserted:
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.dateinsert
-  ts_update:
+  ts_updated:
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.dateupdate

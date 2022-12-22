@@ -47,9 +47,9 @@ columns:
   dt_created:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.datecreated
-  ts_insert:
+  ts_inserted:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.dateinsert
-  ts_update:
+  ts_updated:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.dateupdate

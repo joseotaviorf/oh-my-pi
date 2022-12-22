@@ -1,0 +1,10 @@
+---
+database_name: dw_velo
+table_name: bridge_velo_propose_person
+columns:
+  sk_person:
+    lineage:
+      - datalake_velo.propose_person.id_person
+  sk_propose:
+    lineage:
+      - datalake_velo.propose_person.id_propose

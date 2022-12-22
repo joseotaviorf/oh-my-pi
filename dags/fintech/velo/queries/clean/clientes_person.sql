@@ -11,7 +11,7 @@ SELECT
     BOOLEAN(estrangeiro) AS is_foreigner,
     BOOLEAN(active) AS is_active,
     birth AS dt_birth,
-    dateinsert AS ts_insert,
-    dateupdate AS ts_update
+    dateinsert AS ts_inserted,
+    dateupdate AS ts_updated
 FROM
     datalake_velo_raw.clientes_person

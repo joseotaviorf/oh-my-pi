@@ -20,7 +20,7 @@ SELECT
     datecreated AS dt_created,
     clientPaymentDate AS dt_client_payment,
     confirmedDate AS dt_confirmed,
-    dateinsert AS ts_insert,
-    dateupdate AS ts_update
+    dateinsert AS ts_inserted,
+    dateupdate AS ts_updated
 FROM
     datalake_velo_raw.fiancavelo_payment

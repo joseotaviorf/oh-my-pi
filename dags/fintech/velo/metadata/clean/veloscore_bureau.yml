@@ -1,0 +1,25 @@
+---
+database_name: datalake_velo_clean
+table_name: veloscore_bureau
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.veloscore_bureau.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.veloscore_bureau.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.veloscore_bureau.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.veloscore_bureau.name
+  is_active:
+    lineage:
+      - datalake_velo_raw.veloscore_bureau.active
+  ts_inserted:
+    lineage:
+      - datalake_velo_raw.veloscore_bureau.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_velo_raw.veloscore_bureau.dateupdate

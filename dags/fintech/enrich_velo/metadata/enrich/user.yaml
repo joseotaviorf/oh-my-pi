@@ -1,0 +1,21 @@
+database_name: datalake_velo
+table_name: user
+columns:
+  id_user:
+    lineage:
+      - datalake_velo_clean.users_users.id
+  name:
+    lineage:
+      - datalake_velo_clean.users_users.name
+  email:
+    lineage:
+      - datalake_velo_clean.users_users.email
+  user_role:
+    lineage:
+      - datalake_velo_clean.users_profile.name
+  phone:
+    lineage:
+      - datalake_velo_clean.users_users.phone
+  ts_created:
+    lineage:
+      - datalake_velo_clean.users_users.ts_inserted

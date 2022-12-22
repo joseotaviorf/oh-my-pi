@@ -1,0 +1,165 @@
+WITH cte_categories_details_merged AS (
+    (
+    SELECT
+        cfc.id_securities,
+        cfc.id_group,
+        cfc.id_category,
+        cfc.category_percentage,
+        cfc.category_value
+    FROM
+        datalake_velo_omie.cash_flows_categories AS cfc
+    )
+    UNION ALL
+    (
+    SELECT
+        cf.id_securities,
+        cf.id_group,
+        cf.id_category,
+        100 AS category_percentage,
+        cf.due_amount AS category_value
+    FROM
+        datalake_velo_omie.cash_flows AS cf
+    WHERE
+        categories iS NULL
+    )
+),
+cte_transactions AS (
+    SELECT
+        cf.id_securities,
+        cte_cat.id_category,
+        cf.id_bank_account,
+        cf.id_client,
+        cf.id_project,
+        p.project_name AS project,
+        cf.status,
+        cf.id_group AS transaction_type,
+        CASE
+            WHEN c2.description IN ('Alugueis', 'Condominio') THEN 'ongoing'
+            WHEN c2.description IN ('Danos ao Imóvel', 'Rescisão') THEN 'rescisão'
+            ELSE NULL
+        END AS transaction_purpose,
+        cte_cat.category_percentage AS category_percent_amount,
+        SIGN(cf.due_amount) * cte_cat.category_value AS category_due_amount,
+        cte_cat.category_percentage/100 * cf.paid_amount AS category_paid_amount,
+        c2.description IN ('Alugueis', 'Condominio', 'Danos ao Imóvel', 'Rescisão', 'Ocorrências') AND cf.id_project IS NOT NULL AS is_occurency,
+        COALESCE(CAST(SPLIT(cf.id_installment, '/')[0] AS DOUBLE),0) AS installment,
+        COALESCE(CAST(SPLIT(cf.id_installment, '/')[1] AS DOUBLE),0) AS total_installments,
+        SUM(CASE
+                WHEN cf.id_group = 'CONTA_A_RECEBER' AND cf.id_project IS NOT NULL THEN cf.securities_value
+                ELSE 0
+            END) OVER (PARTITION BY cf.id_project, cf.dt_register) > 0
+            AND cf.id_project IS NOT NULL AS is_project_receivable_created,
+        SUM(CASE
+                WHEN cf.id_group = 'CONTA_A_RECEBER' AND cf.id_project IS NOT NULL THEN cf.securities_value
+                ELSE 0
+            END) OVER (PARTITION BY cf.id_project, cf.dt_register)
+        >=
+        SUM(CASE
+                WHEN cf.id_group = 'CONTA_A_PAGAR' AND cf.id_project IS NOT NULL THEN cf.securities_value
+                ELSE 0
+            END) OVER (PARTITION BY cf.id_project, cf.dt_register)
+            AND cf.id_project IS NOT NULL AS is_project_receivable_greater_than_payable,
+        cf.dt_issue,
+        cf.dt_register,
+        DATE(cf.ts_created) AS dt_created,
+        DATE(cf.ts_modified) AS dt_modified,
+        cf.dt_due,
+        cf.dt_payment AS dt_paid
+    FROM
+        datalake_velo_omie.cash_flows AS cf
+    LEFT JOIN
+        cte_categories_details_merged AS cte_cat
+        ON cte_cat.id_securities = cf.id_securities
+        AND cte_cat.id_group = cf.id_group
+    LEFT JOIN
+        datalake_velo_omie_clean.projects AS p
+        ON cf.id_project = p.id_project
+    LEFT JOIN
+        datalake_velo_omie_clean.categories AS c1
+        ON c1.id_category = cte_cat.id_category
+    LEFT JOIN
+        datalake_velo_omie_clean.categories AS c2
+        ON c2.id_category = cf.id_category
+    LEFT JOIN
+        datalake_velo_omie_clean.bank_account AS ba
+        ON ba.id_account = cf.id_bank_account
+    WHERE
+        cf.id_group IN ('CONTA_A_PAGAR', 'CONTA_A_RECEBER')
+        AND cf.status <> 'CANCELADO'
+),
+client_cpf AS(
+    SELECT
+        id_client,
+        MAX(NULLIF(REPLACE(REPLACE(REPLACE(REGEXP_EXTRACT(client_cpf_cnpj, '(\\d{{3}}\\.\\d{{3}}\.\\d{{3}}\\-\\d{{2}})|(\\d{{3}}\\.\\d{{3}}\\.\\d{{3}}\\,\\d{{2}})|(\\d{{11}})',0),'-',''),'.',''),',',''), '')) AS document_number
+    FROM
+        datalake_velo_omie.cash_flows
+    WHERE
+        id_group = 'CONTA_A_RECEBER'
+    GROUP BY
+        1
+),
+client_cnpj AS (
+    SELECT
+        id_client,
+        MAX(NULLIF(REPLACE(REPLACE(REPLACE(REGEXP_EXTRACT(client_cpf_cnpj, '(\\d{{2}}\\.\\d{{3}}\\.\\d{{3}}\\/\\d{{4}}\\-\\d{{2}})',0),'-',''),'.',''),'/',''), '')) AS document_number
+    FROM
+        datalake_velo_omie.cash_flows
+    WHERE
+        id_group = 'CONTA_A_RECEBER'
+    GROUP BY
+        1
+),
+client_last_propose AS(
+    SELECT
+        cf.id_client,
+        pp_doc.id_propose AS id_propose,
+        ROW_NUMBER() OVER (PARTITION BY cf.id_client ORDER BY pp_doc.id_propose DESC) AS rn
+    FROM
+        datalake_velo_omie.cash_flows AS cf
+    LEFT JOIN
+        client_cpf AS ccpf
+            ON ccpf.id_client = cf.id_client
+    LEFT JOIN
+        client_cnpj AS ccnpj
+            ON ccnpj.id_client = cf.id_client
+    LEFT JOIN
+        datalake_velo.propose_person AS pp_doc
+            ON pp_doc.document = COALESCE(ccpf.document_number, ccnpj.document_number)
+    LEFT JOIN
+        datalake_velo.propose AS p_doc
+            ON p_doc.id_propose = pp_doc.id_propose
+    WHERE
+        pp_doc.id_propose IS NOT NULL
+        AND p_doc.id_propose IS NOT NULL
+)
+SELECT
+    CAST(CONCAT(ct.id_securities, REPLACE(ct.id_category, '.', '')) AS BIGINT) AS id_transaction_entry,
+    CAST(CONCAT(ct.id_securities, CASE WHEN ct.transaction_type = 'CONTA_A_RECEBER' THEN '0' ELSE '1' END) AS BIGINT) AS id_trasaction,
+    ct.id_category,
+    cfp.id_propose,
+    ct.id_bank_account,
+    ct.id_client AS id_omie_client,
+    ct.project,
+    ct.status,
+    ct.transaction_type,
+    ct.transaction_purpose,
+    ct.installment,
+    ct.total_installments AS total_expected_installments,
+    ct.category_percent_amount,
+    ct.category_due_amount,
+    ct.category_paid_amount,
+    ct.is_occurency,
+    ct.is_project_receivable_created,
+    ct.is_project_receivable_greater_than_payable,
+    ct.dt_issue,
+    ct.dt_register,
+    ct.dt_created,
+    ct.dt_modified,
+    ct.dt_due,
+    ct.dt_paid
+FROM
+    cte_transactions AS ct
+LEFT JOIN
+    client_last_propose AS cfp
+        ON cfp.id_client = ct.id_client
+        AND cfp.rn = 1

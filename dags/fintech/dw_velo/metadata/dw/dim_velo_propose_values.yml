@@ -1,0 +1,67 @@
+---
+database_name: dw_velo
+table_name: dim_velo_propose_values
+columns:
+  sk_propose_values:
+    lineage:
+      - datalake_velo.propose_values.id_propose_values
+  subscription_type:
+    lineage:
+      - datalake_velo.propose_values.subscription_type
+  plan_type:
+    lineage:
+      - datalake_velo.propose_values.plan_type
+  activator_type:
+    lineage:
+      - datalake_velo.propose_values.activator_type
+  plan:
+    lineage:
+      - datalake_velo.propose_values.plan
+  subscription_installments:
+    lineage:
+      - datalake_velo.propose_values.subscription_installments
+  activator_amount:
+    lineage:
+      - datalake_velo.propose_values.activator_amount
+  monthly_guarantee:
+    lineage:
+      - datalake_velo.propose_values.monthly_guarantee
+  annual_guarantee:
+    lineage:
+      - datalake_velo.propose_values.annual_guarantee
+  rent_amount:
+    lineage:
+      - datalake_velo.propose_values.rent_amount
+  condo_amount:
+    lineage:
+      - datalake_velo.propose_values.condo_amount
+  light_amount:
+    lineage:
+      - datalake_velo.propose_values.light_amount
+  water_amount:
+    lineage:
+      - datalake_velo.propose_values.water_amount
+  phone_amount:
+    lineage:
+      - datalake_velo.propose_values.phone_amount
+  iptu_amount:
+    lineage:
+      - datalake_velo.propose_values.iptu_amount
+  other_amount:
+    lineage:
+      - datalake_velo.propose_values.other_amount
+  total_package_amount:
+    lineage:
+      - datalake_velo.propose_values.total_package_amount
+  plan_percent:
+    lineage:
+      - datalake_velo.propose_values.plan_percent
+  plan_coverage:
+    lineage:
+      - datalake_velo.propose_values.plan_coverage
+  plan_damage:
+    lineage:
+      - datalake_velo.propose_values.plan_damage
+  plan_commission:
+    lineage:
+      - datalake_velo.propose_values.plan_commission

@@ -1,0 +1,40 @@
+---
+database_name: datalake_velo_clean
+table_name: veloscore_personal
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.userupdate
+  consultations:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.consultations
+  value:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.value
+  rental:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.rental
+  percent:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.percent
+  declared:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.declared
+  requested:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.requested
+  is_active:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.active
+  ts_inserted:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_velo_raw.veloscore_personal.dateupdate

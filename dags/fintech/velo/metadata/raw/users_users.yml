@@ -1,0 +1,16 @@
+---
+database_name: datalake_velo_raw
+table_name: users_users
+columns:
+  name:
+    tags:
+    - PII
+  email:
+    tags:
+    - PII
+  phone:
+    tags:
+    - PII
+  password:
+    tags:
+    - Confidential

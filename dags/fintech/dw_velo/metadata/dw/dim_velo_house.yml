@@ -1,0 +1,25 @@
+---
+database_name: dw_velo
+table_name: dim_velo_house
+columns:
+  sk_house:
+    lineage:
+      - datalake_velo.house.id_house
+  type:
+    lineage:
+      - datalake_velo.house.type
+  city:
+    lineage:
+      - datalake_velo.house.city
+  state:
+    lineage:
+      - datalake_velo.house.state
+  country:
+    lineage:
+      - datalake_velo.house.country
+  zipcode:
+    lineage:
+      - datalake_velo.house.zipcode
+  geolocation:
+    lineage:
+      - datalake_velo.house.geolocation

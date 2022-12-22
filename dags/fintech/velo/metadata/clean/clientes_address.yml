@@ -41,9 +41,9 @@ columns:
   is_active:
     lineage:
       - datalake_velo_raw.clientes_address.active
-  ts_insert:
+  ts_inserted:
     lineage:
       - datalake_velo_raw.clientes_address.dateinsert
-  ts_update:
+  ts_updated:
     lineage:
       - datalake_velo_raw.clientes_address.dateupdate

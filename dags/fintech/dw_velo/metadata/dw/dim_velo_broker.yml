@@ -1,0 +1,34 @@
+---
+database_name: dw_velo
+table_name: dim_velo_broker
+columns:
+  sk_broker:
+    lineage:
+      - datalake_velo.broker.id_broker
+  broker_name:
+    lineage:
+      - datalake_velo.broker.broker_name
+  city:
+    lineage:
+      - datalake_velo.broker.city
+  state:
+    lineage:
+      - datalake_velo.broker.state
+  country:
+    lineage:
+      - datalake_velo.broker.country
+  zipcode:
+    lineage:
+      - datalake_velo.broker.zipcode
+  geolocation:
+    lineage:
+      - datalake_velo.broker.geolocation
+  creci:
+    lineage:
+      - datalake_velo.broker.creci
+  cnpj:
+    lineage:
+      - datalake_velo.broker.cnpj
+  is_broker_active:
+    lineage:
+      - datalake_velo.broker.is_broker_active

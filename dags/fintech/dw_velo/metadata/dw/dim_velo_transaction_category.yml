@@ -1,0 +1,16 @@
+---
+database_name: dw_velo
+table_name: dim_velo_transaction_category
+columns:
+  sk_category:
+    lineage:
+      - datalake_velo.transaction_category.id_category
+  description:
+    lineage:
+      - datalake_velo.transaction_category.description
+  nature_description:
+    lineage:
+      - datalake_velo.transaction_category.nature_description
+  dre_description:
+    lineage:
+      - datalake_velo.transaction_category.dre_description

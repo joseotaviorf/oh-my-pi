@@ -1,0 +1,34 @@
+database_name: datalake_velo
+table_name: broker
+columns:
+  id_broker:
+    lineage:
+      - datalake_velo_clean.fiancavelo_realestate.id
+  broker_name:
+    lineage:
+      - datalake_velo_clean.clientes_company.comercial_name
+      - datalake_velo_clean.clientes_company.name
+  city:
+    lineage:
+      - datalake_velo_clean.clientes_address.city
+  state:
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.state
+  country:
+    lineage:
+      - datalake_velo_clean.clientes_address.country
+  zipcode:
+    lineage:
+      - datalake_velo_clean.clientes_address.zipcode
+  geolocation:
+    lineage:
+      - datalake_velo_clean.clientes_address.geolocation
+  creci:
+    lineage:
+      - datalake_velo_clean.fiancavelo_realestate.creci
+  cnpj:
+    lineage:
+      - datalake_velo_clean.clientes_company.document
+  is_broker_active:
+    lineage:
+      - datalake_velo_clean.fiancavelo_realestate.is_active

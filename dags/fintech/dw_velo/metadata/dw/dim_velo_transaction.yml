@@ -1,0 +1,31 @@
+---
+database_name: dw_velo
+table_name: dim_velo_transaction
+columns:
+  sk_transaction:
+    lineage:
+      - datalake_velo.transaction_entries.id_trasaction
+  project:
+    lineage:
+      - datalake_velo.transaction_entries.project
+  status:
+    lineage:
+      - datalake_velo.transaction_entries.status
+  transaction_type:
+    lineage:
+      - datalake_velo.transaction_entries.transaction_type
+  transaction_purpose:
+    lineage:
+      - datalake_velo.transaction_entries.transaction_purpose
+  installment:
+    lineage:
+      - datalake_velo.transaction_entries.installment
+  total_expected_installments:
+    lineage:
+      - datalake_velo.transaction_entries.total_expected_installments
+  is_project_receivable_created:
+    lineage:
+      - datalake_velo.transaction_entries.is_project_receivable_created
+  is_project_receivable_greater_than_payable:
+    lineage:
+      - datalake_velo.transaction_entries.is_project_receivable_greater_than_payable

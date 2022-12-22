@@ -1,0 +1,42 @@
+database_name: datalake_velo
+table_name: propose_person
+columns:
+  id_person:
+    lineage:
+      - datalake_velo_clean.clientes_person.id
+  id_propose:
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposeperson.id_propose
+  name:
+    lineage:
+      - datalake_velo_clean.clientes_person.name
+  email:
+    lineage:
+      - datalake_velo_clean.clientes_person.email
+  bureau_name:
+    lineage:
+      - datalake_velo_clean.veloscore_bureau.name
+  document:
+    lineage:
+      - datalake_velo_clean.clientes_person.document
+  serasa_score:
+    lineage:
+      - datalake_velo_clean.veloscore_consultations.value
+  risk_score:
+    lineage:
+      - datalake_velo_clean.veloscore_consultations.risk
+  risk_classification:
+    lineage:
+      - datalake_velo_clean.veloscore_risk.name
+  score_personal_value:
+    lineage:
+      - datalake_velo_clean.veloscore_personal.value
+  declared_income:
+    lineage:
+      - datalake_velo_clean.veloscore_personal.declared
+  requested_income:
+    lineage:
+      - datalake_velo_clean.veloscore_personal.requested
+  dt_birth:
+    lineage:
+      - datalake_velo_clean.clientes_person.dt_birth

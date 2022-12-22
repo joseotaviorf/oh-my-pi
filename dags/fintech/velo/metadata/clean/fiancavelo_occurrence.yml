@@ -50,9 +50,9 @@ columns:
   dt_due:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.duedate
-  ts_insert:
+  ts_inserted:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.dateinsert
-  ts_update:
+  ts_updated:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.dateupdate

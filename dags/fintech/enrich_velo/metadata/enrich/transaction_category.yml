@@ -1,0 +1,21 @@
+database_name: datalake_velo
+table_name: transaction_categories
+columns:
+  id_trasaction:
+    lineage:
+      -  datalake_velo_omie.cash_flows_categories.id_securities
+      -  datalake_velo_omie.cash_flows.id_securities
+  id_category:
+    lineage:
+      -  datalake_velo_omie.cash_flows_categories.id_category
+      -  datalake_velo_omie.cash_flows.id_category
+  category:
+    lineage:
+      -  datalake_velo_omie_clean.categories.description
+  category_type:
+    lineage:
+      -  datalake_velo_omie_clean.categories.description
+  category_percent_amount:
+    lineage:
+      -  datalake_velo_omie.cash_flows_categories.category_percentage
+      -  datalake_velo_omie.cash_flows.category_percentage

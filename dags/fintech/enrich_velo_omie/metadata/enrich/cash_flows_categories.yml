@@ -4,6 +4,9 @@ columns:
   id_securities:
     lineage:
       - datalake_velo_omie.cash_flows.id_securities
+  id_group:
+    lineage:
+      - datalake_velo_omie_clean.cash_flows.id_group
   id_category:
     lineage:
       - datalake_velo_omie.cash_flows.categories

@@ -1,0 +1,94 @@
+---
+database_name: dw_velo
+table_name: fact_velo_propose
+columns:
+  sk_propose:
+    lineage:
+      - datalake_velo.propose.id_propose
+  sk_propose_values:
+    lineage:
+      - datalake_velo.propose.id_propose_values
+  sk_broker:
+    lineage:
+      - datalake_velo.propose.id_broker
+  sk_house:
+    lineage:
+      - datalake_velo.propose.id_house
+  sk_propose_company:
+    lineage:
+      - datalake_velo.propose.id_propose_company
+  sk_agent:
+    lineage:
+      - datalake_velo.propose.id_agent
+  sk_contract:
+    lineage:
+      - datalake_velo.propose.id_contract
+  sk_primary_person:
+    lineage:
+      - datalake_velo.propose.id_primary_person
+  sk_origin:
+    lineage:
+      - datalake_velo.propose.id_origin
+  sk_propose_status:
+    lineage:
+      - datalake_velo.propose.id_propose_status
+  sk_guarantee_status:
+    lineage:
+      - datalake_velo.propose.id_guarantee_status
+  sk_propose_type:
+    lineage:
+      - datalake_velo.propose.id_propose_type
+  count_persons_included:
+    lineage:
+      - datalake_velo.propose.count_persons_included
+  percentage_income_from_primary_person:
+    lineage:
+      - datalake_velo.propose.percentage_income_from_primary_person
+  avg_serasa_score:
+    lineage:
+      - datalake_velo.propose.avg_serasa_score
+  avg_risk_score:
+    lineage:
+      - datalake_velo.propose.avg_risk_score
+  avg_declared_income:
+    lineage:
+      - datalake_velo.propose.avg_declared_income
+  is_contract:
+    lineage:
+      - datalake_velo.propose.is_contract
+  dt_contract_started:
+    lineage:
+      - datalake_velo.propose.dt_contract_started
+  dt_ended:
+    lineage:
+      - datalake_velo.propose.dt_ended
+  dt_propose_started:
+    lineage:
+      - datalake_velo.propose.dt_propose_started
+  dt_waiting_new_docs:
+    lineage:
+      - datalake_velo.propose.dt_waiting_new_docs
+  dt_evaluation_started:
+    lineage:
+      - datalake_velo.propose.dt_evaluation_started
+  dt_rejected:
+    lineage:
+      - datalake_velo.propose.dt_rejected
+  dt_sign_started:
+    lineage:
+      - datalake_velo.propose.dt_sign_started
+  dt_paid:
+    lineage:
+      - datalake_velo.propose.dt_paid
+  dt_activation:
+    lineage:
+      - datalake_velo.propose.dt_activation
+  dt_secured:
+    lineage:
+      - datalake_velo.propose.dt_secured
+  dt_activation_analysis:
+    lineage:
+      - datalake_velo.propose.dt_activation_analysis
+  dt_secure_pending:
+    lineage:
+      - datalake_velo.propose.dt_secure_pending

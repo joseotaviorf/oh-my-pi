@@ -12,8 +12,8 @@ SELECT
     userupdate AS id_user_update,
     BOOLEAN(active) AS is_active,
     begin AS dt_begin,
-    end AS dt_end,
-    dateinsert AS ts_insert,
-    dateupdate AS ts_update
+    end AS dt_ended,
+    dateinsert AS ts_inserted,
+    dateupdate AS ts_updated
 FROM
     datalake_velo_raw.fiancavelo_fianca

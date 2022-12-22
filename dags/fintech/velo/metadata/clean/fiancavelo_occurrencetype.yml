@@ -17,9 +17,9 @@ columns:
   is_active:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrencetype.active
-  ts_insert:
+  ts_inserted:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrencetype.dateinsert
-  ts_update:
+  ts_updated:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrencetype.dateupdate

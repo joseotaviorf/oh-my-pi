@@ -26,9 +26,9 @@ columns:
   is_active:
     lineage:
       - datalake_velo_raw.fiancavelo_proposehistory.active
-  ts_insert:
+  ts_inserted:
     lineage:
       - datalake_velo_raw.fiancavelo_proposehistory.dateinsert
-  ts_update:
+  ts_updated:
     lineage:
       - datalake_velo_raw.fiancavelo_proposehistory.dateupdate

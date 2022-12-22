@@ -1,0 +1,43 @@
+---
+database_name: dw_velo
+table_name: dim_velo_propose_person
+columns:
+  sk_person:
+    lineage:
+      - datalake_velo.propose_person.id_person
+  name:
+    lineage:
+      - datalake_velo.propose_person.name
+  email:
+    lineage:
+      - datalake_velo.propose_person.email
+  bureau_name:
+    lineage:
+      - datalake_velo.propose_person.bureau_name
+  document:
+    lineage:
+      - datalake_velo.propose_person.document
+  serasa_score:
+    lineage:
+      - datalake_velo.propose_person.serasa_score
+  risk_score:
+    lineage:
+      - datalake_velo.propose_person.risk_score
+  risk_classification:
+    lineage:
+      - datalake_velo.propose_person.risk_classification
+  score_personal_value:
+    lineage:
+      - datalake_velo.propose_person.score_personal_value
+  declared_income:
+    lineage:
+      - datalake_velo.propose_person.declared_income
+  requested_income:
+    lineage:
+      - datalake_velo.propose_person.requested_income
+  is_primary_person:
+    lineage:
+      - datalake_velo.propose_person.is_primary_person
+  dt_birth:
+    lineage:
+      - datalake_velo.propose_person.dt_birth

@@ -1,0 +1,25 @@
+SELECT
+    id_propose_values AS sk_propose_values,
+    subscription_type,
+    plan_type,
+    activator_type,
+    plan,
+    subscription_installments,
+    activator_amount,
+    monthly_guarantee,
+    annual_guarantee,
+    rent_amount,
+    condo_amount,
+    light_amount,
+    water_amount,
+    phone_amount,
+    iptu_amount,
+    other_amount,
+    total_package_amount,
+    plan_percent,
+    plan_coverage,
+    plan_damage,
+    plan_commission,
+    NOW() AS ts_load
+FROM
+    datalake_velo.propose_values
