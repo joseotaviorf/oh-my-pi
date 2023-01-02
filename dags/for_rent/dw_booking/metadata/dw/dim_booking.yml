@@ -68,6 +68,7 @@ columns:
   flg_branded:
     lineage:
       - datalake_amplitude_visit.amplitude_visit.is_branded
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
   visitor_arrived:
     lineage:
       - datalake_booking.booking.has_tenant_attended
@@ -146,27 +147,34 @@ columns:
   app_type:
     lineage:
       - datalake_amplitude_visit.amplitude_visit.app_type
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
   media_source:
     lineage:
       - datalake_amplitude_visit.amplitude_visit.media_source
-  adjust_network:
-    lineage:
-      - datalake_amplitude_visit.amplitude_visit.adjust_network
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_media_source
   utm_source:
     lineage:
       - datalake_amplitude_visit.amplitude_visit.utm_source
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_source
   utm_medium:
     lineage:
       - datalake_amplitude_visit.amplitude_visit.utm_medium
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_medium
   utm_campaign:
     lineage:
       - datalake_amplitude_visit.amplitude_visit.utm_campaign
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_campaign
   utm_content:
     lineage:
       - datalake_amplitude_visit.amplitude_visit.utm_content
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_content
   utm_term:
     lineage:
       - datalake_amplitude_visit.amplitude_visit.utm_term
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_term
+  final_attribution_origin:
+    lineage:
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
   mkt_category:
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.id

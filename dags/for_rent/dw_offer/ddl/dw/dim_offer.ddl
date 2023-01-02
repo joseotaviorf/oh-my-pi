@@ -17,6 +17,7 @@ CREATE TABLE public.dim_offer (
   utm_campaign VARCHAR(2000),
   utm_content VARCHAR(255),
   utm_term VARCHAR(255),
+  final_attribution_origin VARCHAR(255),
   mkt_category VARCHAR(255),
   mkt_flow VARCHAR(255),
   mkt_completion VARCHAR(255),

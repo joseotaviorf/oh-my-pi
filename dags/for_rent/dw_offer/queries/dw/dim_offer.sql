@@ -71,23 +71,65 @@ all_offer_submitted_events AS (
         up_utm_term AS utm_term
     FROM datalake_amplitude_clean.183049_offer_submitted_events
 ),
+enrich_attribution AS (
+    SELECT
+        aos.id_user,
+        aos.id_house,
+        aos.id_firestore,
+        aos.ts_event,
+        /*
+        Attribution Rules, enriched with the new attribution and the old one.
+        The new one starts on H2/2021.
+        Using CASE WHEN instead of COALESCE to don't create strange combinations.
+        */
+        CASE 
+            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_app_type
+            ELSE aos.app_type
+        END AS app_type,
+        CASE 
+            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_source
+            ELSE aos.utm_source
+        END AS utm_source,
+        CASE 
+            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_medium
+            ELSE aos.utm_medium
+        END AS utm_medium,
+        CASE 
+            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_campaign
+            ELSE aos.utm_campaign
+        END AS utm_campaign,
+        CASE 
+            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_content
+            ELSE aos.utm_content
+        END AS utm_content,
+        CASE 
+            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_term
+            ELSE aos.utm_term
+        END AS utm_term,
+        CASE 
+            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_branded = 'Branded'
+            ELSE COALESCE(((UPPER(utm_campaign) LIKE '%BRANDED%'OR UPPER(utm_campaign) LIKE '%INSTITUCIONAL%') AND UPPER(utm_campaign) NOT LIKE '%NON-BRANDED%'), FALSE)
+        END AS flg_branded,
+        CASE 
+            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_origin
+            ELSE 'old_attribution'
+        END AS final_attribution_origin
+    FROM
+        all_offer_submitted_events aos
+        LEFT JOIN datalake_tracked_events.attribution_cross_channel acc
+            ON aos.id_firestore = acc.id_firestore
+            AND acc.event_name = 'offer_submitted'
+),
 offer_submitted_events AS (
     SELECT
         *,
-        COALESCE(
-            (
-                (UPPER(utm_campaign) LIKE '%BRANDED%'
-                    OR UPPER(utm_campaign) LIKE '%INSTITUCIONAL%')
-                AND lower(utm_campaign) NOT LIKE '%non-branded%'
-            ), FALSE
-        ) AS is_branded,
-        row_number() OVER (PARTITION BY id_user, id_house ORDER BY id_user, id_house, ts_event)
+        ROW_NUMBER() OVER (PARTITION BY id_user, id_house ORDER BY id_user, id_house, ts_event)
             AS rn_without_id_firestore,
-        row_number() OVER (PARTITION BY id_firestore ORDER BY id_firestore, ts_event)
+        ROW_NUMBER() OVER (PARTITION BY id_firestore ORDER BY id_firestore, ts_event)
             AS rn_id_firestore,
         (id_firestore IS NOT NULL) AS has_id_firestore
     FROM
-        all_offer_submitted_events
+        enrich_attribution
 ),
 old_pre_proposal AS (
     SELECT
@@ -219,9 +261,14 @@ offer_enriched AS (
         END AS utm_term,
         CASE
             WHEN ose_id_firestore.id_firestore IS NOT NULL
-                THEN ose_id_firestore.is_branded
-            ELSE ose_wo_id_firestore.is_branded
-        END AS flg_branded
+                THEN ose_id_firestore.flg_branded
+            ELSE ose_wo_id_firestore.flg_branded
+        END AS flg_branded,
+        CASE
+            WHEN ose_id_firestore.final_attribution_origin IS NOT NULL
+                THEN ose_id_firestore.final_attribution_origin
+            ELSE ose_wo_id_firestore.final_attribution_origin
+        END AS final_attribution_origin
     FROM
         all_offers o
     LEFT JOIN
@@ -289,7 +336,7 @@ taxonomy_demand_versions AS (
     FROM
         taxonomy_demand
 )
-SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
+SELECT-- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
     o.sk_offer,
     o.id_offer,
     o.id_godfather,
@@ -307,6 +354,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     o.utm_campaign,
     o.utm_content,
     o.utm_term,
+    o.final_attribution_origin,
     CASE WHEN td.mkt_flow IS NULL THEN 'Not Mapped' ELSE td.mkt_category END AS mkt_category,
 	CASE WHEN td.mkt_flow IS NULL THEN 'Not Mapped' ELSE td.mkt_flow END AS mkt_flow,
 	CASE WHEN td.mkt_flow IS NULL THEN 'Not Mapped' ELSE td.mkt_completion END AS mkt_completion,
@@ -345,7 +393,7 @@ FROM
     offer_enriched o
 LEFT JOIN taxonomy_demand_versions td
     ON td.rn = 1
-    AND lower(coalesce(td.app_type,'')) = lower(coalesce(o.app_type,''))
-	AND lower(coalesce(td.utm_source,'')) = lower(coalesce(o.utm_source,''))
-	AND lower(coalesce(td.utm_medium,'')) = lower(coalesce(o.utm_medium,''))
-	AND coalesce(td.flg_branded, FALSE) = COALESCE(o.flg_branded, FALSE)
+    AND LOWER(COALESCE(td.app_type,'')) = LOWER(COALESCE(o.app_type,''))
+	AND LOWER(COALESCE(td.utm_source,'')) = LOWER(COALESCE(o.utm_source,''))
+	AND LOWER(COALESCE(td.utm_medium,'')) = LOWER(COALESCE(o.utm_medium,''))
+	AND COALESCE(td.flg_branded, FALSE) = COALESCE(o.flg_branded, FALSE)

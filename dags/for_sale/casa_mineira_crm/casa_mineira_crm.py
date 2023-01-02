@@ -28,7 +28,7 @@ default_libraries = config_service.get_config("default_libraries")
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 
 ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
 S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")

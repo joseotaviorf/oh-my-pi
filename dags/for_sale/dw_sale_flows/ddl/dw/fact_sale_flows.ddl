@@ -60,6 +60,7 @@ CREATE TABLE sale.fact_sale_flows (
   days_first_offer_accepted_to_sale_agreement_signed INTEGER,
   days_first_offer_submitted_to_house_registry_ended INTEGER,
   --
+  final_attribution_origin VARCHAR,
   app_type VARCHAR,
   utm_source VARCHAR,
   utm_medium VARCHAR,

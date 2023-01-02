@@ -169,23 +169,37 @@ columns:
       - datalake_sale_flows.sale_flow.days_first_offer_submitted_to_house_registry_ended
   app_type:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.app_type
+      - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
+      - datalake_amplitude_talk_to_agent.talk_to_agent_events.utm_campaign
+      - datalake_amplitude_visit.amplitude_visit.utm_campaign
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
   utm_source:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.utm_source
+      - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
+      - datalake_amplitude_talk_to_agent.talk_to_agent_events.utm_campaign
+      - datalake_amplitude_visit.amplitude_visit.utm_campaign
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_source
   utm_medium:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.utm_medium
+      - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
+      - datalake_amplitude_talk_to_agent.talk_to_agent_events.utm_campaign
+      - datalake_amplitude_visit.amplitude_visit.utm_campaign
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_medium
   utm_campaign:
     lineage:
       - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
       - datalake_amplitude_talk_to_agent.talk_to_agent_events.utm_campaign
       - datalake_amplitude_visit.amplitude_visit.utm_campaign
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_campaign
   is_branded:
     lineage:
       - datalake_amplitude_offer.sale_offer_raw_events.branded
       - datalake_amplitude_talk_to_agent.talk_to_agent_events.branded
       - datalake_amplitude_visit.amplitude_visit.branded
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
+  final_attribution_origin:
+    lineage:
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
   mkt_category:
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.category

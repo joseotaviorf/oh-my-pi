@@ -23,6 +23,7 @@ CREATE TABLE sale.dim_offer (
 	utm_source VARCHAR,
 	utm_medium VARCHAR,
 	utm_campaign VARCHAR,
+	final_attribution_origin VARCHAR,
 	mkt_category VARCHAR,
 	mkt_flow VARCHAR,
 	mkt_completion VARCHAR,
