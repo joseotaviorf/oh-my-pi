@@ -14,6 +14,12 @@ columns:
   negotiation_status:
     lineage:
       - dw_payment.dim_invoice.negotiation_status
+  closing_mode:
+    lineage:
+      - dw_payment.dim_invoice.closing_mode
+  paid_via:
+    lineage:
+      - dw_payment.dim_invoice.paid_via
   user:
     lineage:
       - dw_payment.dim_invoice.user
@@ -29,6 +35,9 @@ columns:
   ts_created:
     lineage:
       - dw_payment.dim_invoice.ts_created
+  ts_canceled:
+    lineage:
+      - dw_payment.dim_invoice.ts_canceled
   dt_sent:
     lineage:
       - dw_payment.dim_invoice.dt_sent
