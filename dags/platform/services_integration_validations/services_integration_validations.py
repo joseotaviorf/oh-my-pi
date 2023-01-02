@@ -40,7 +40,7 @@ custom_libraries = [
     },
     {
         "whl": f"{artifacts_s3_bucket}/gsheets-api-client-python/"
-        f"quintoandar_gsheets_api_client-0.5.0-py2.py3-none-any.whl"
+        f"quintoandar_gsheets_api_client-0.6.0-py2.py3-none-any.whl"
     },
     {"pypi": {"package": "google-auth==2.13.0"}},
     {"pypi": {"package": "google-api-python-client==2.55.0"}},

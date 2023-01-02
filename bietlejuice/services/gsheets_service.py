@@ -11,6 +11,7 @@ import pandas as pd
 import pendulum
 from pyspark.sql import DataFrame
 from quintoandar_gsheets_api_client import GoogleSheetsClient
+from quintoandar_gsheets_api_client.consumer import GoogleSheetsReader
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
@@ -147,6 +148,7 @@ class GsheetsService:
     def get_gsheets_with_import_range(
         self, gsheets_client: GoogleSheetsClient, all_sheets_dict: dict
     ) -> List:
+        gsheets_consumer = GoogleSheetsReader(google_sheets_client=gsheets_client)
         logger.info(
             "m=get_gsheets_with_import_range, msg=Started checking all sheets for IMPORTRANGE presence"
         )
@@ -164,7 +166,7 @@ class GsheetsService:
             if sheet.get("sheet_context") == "static":
                 continue
 
-            sheet_data = gsheets_client.get_all_sheet_rows(
+            sheet_data = gsheets_consumer.read_sheet_rows(
                 sheet_id=sheet_id, sheet_name=sheet_name, value_render_option="FORMULA"
             )
 

@@ -76,7 +76,7 @@ class GsheetsDAGFactory:
         self.custom_libraries = [
             {
                 "whl": f"{artifacts_s3_bucket}/gsheets-api-client-python/"
-                f"quintoandar_gsheets_api_client-0.5.0-py2.py3-none-any.whl"
+                f"quintoandar_gsheets_api_client-0.6.0-py2.py3-none-any.whl"
             }
         ]
 
@@ -253,7 +253,7 @@ class GsheetsDAGFactory:
             access_control_list=self.DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
         )
 
-        raw_task_group = DatalakeTaskGroup(
+        task_group = DatalakeTaskGroup(
             dag=dag,
             env=self.ENV,
             datalake_bucket=self.datalake_bucket,
@@ -268,20 +268,13 @@ class GsheetsDAGFactory:
             self.task_pool,
             self.raw_spark_job_path,
             create_cluster_task,
-            raw_task_group,
+            task_group,
             f"{dag_context}/",
         )
 
-        clean_task_group = DatalakeTaskGroup(
-            dag=dag,
-            env=self.ENV,
-            datalake_bucket=self.datalake_bucket,
-            relative_query_path=self.source_with_context,
-            spark_jobs_path=self.base_spark_jobs_path,
-            athena_query_result_location=self.athena_query_results_bucket,
-        )
+        task_group.relative_query_path = self.source_with_context
 
-        clean_task_groups = clean_task_group.build_task_group_from_sql_files(
+        clean_task_groups = task_group.build_task_group_from_sql_files(
             layer=LayerEnum.CLEAN,
             source_database_base_name=self.source,
             target_database_base_name=self.source,

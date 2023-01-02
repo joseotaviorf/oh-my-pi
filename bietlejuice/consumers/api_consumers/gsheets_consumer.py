@@ -109,6 +109,7 @@ class GsheetsConsumer(GoogleSheetsReader):
 
         return df
 
+    @logger(exclude_return=True)
     def get_sheet_df(
         self,
         sheet_name: str,
