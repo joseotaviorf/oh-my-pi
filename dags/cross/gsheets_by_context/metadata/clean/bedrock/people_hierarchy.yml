@@ -17,6 +17,18 @@ columns:
   position_id:
     lineage:
       - datalake_gsheets_raw.base_hierarquia.cargo_id
+  company_id:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.empresa_id
+  employee_company_id:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.chave
+  manager_company_id:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.chave_gestor
+  company_name:
+    lineage:
+      - datalake_gsheets_raw.base_hierarquia.empresa
   position_class_name:
     lineage:
       - datalake_gsheets_raw.base_hierarquia.classe_cargo_id
