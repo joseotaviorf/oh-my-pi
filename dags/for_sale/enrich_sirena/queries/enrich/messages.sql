@@ -116,7 +116,7 @@ LEFT JOIN
         ON intrc.id_prospect = ci.id
 LEFT JOIN
     agent_info AS ai
-        ON intrc.id_prospect = ai.id
+        ON intrc.id_agent = ai.id
 WHERE
     intrc.via = 'whatsApp'
     AND ac.num_line = 1
