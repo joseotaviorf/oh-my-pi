@@ -34,6 +34,7 @@ SELECT
     TO_DATE(NULLIF(data_contrato_gerado, ''), 'd/M/y') AS dt_generated_contract,
     TO_DATE(NULLIF(data_contrato_assinado, ''), 'd/M/y') AS dt_signed_contract,
     TO_DATE(NULLIF(data_vencimento, ''), 'd/M/y') AS dt_expiration,
+    TO_DATE(NULLIF(data_pagamento_parcela, ''), 'd/M/y') AS dt_installment_payment,
     TO_DATE(NULLIF(data_pagamento, ''), 'd/M/y') AS dt_payment,
     TO_DATE(NULLIF(Data_Liquidacao, ''), 'd/M/y') AS dt_settle,
     TO_TIMESTAMP(NULLIF(created_at, ''), 'y-M-d H:m:s') AS ts_created_at
