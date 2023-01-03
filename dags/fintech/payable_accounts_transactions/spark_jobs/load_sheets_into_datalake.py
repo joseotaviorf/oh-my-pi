@@ -260,11 +260,12 @@ if __name__ == "__main__":
             after_2021 = False if "2021" in i["name"] else True
             engine = None if "xlsb" not in i["name"] else "pyxlsb"
             if "Terceiros" in i["name"]:
-                sheetname = (
-                    str(datetime.now().year)
-                    if str(datetime.now().year) in i["name"]
-                    else str(datetime.now().year - 1)
-                )
+                if str(datetime.now().year) in i["name"]:
+                    sheetname = str(datetime.now().year)  # 2023
+                elif str(datetime.now().year - 1) in i["name"]:
+                    sheetname = str(datetime.now().year - 1)  # 2022
+                else:
+                    sheetname = str(datetime.now().year - 2)  # 2021 (not in sheet name)
                 usecols = columns_to_read + ["Itaú"]
                 usecols = usecols if after_2021 else usecols + ["Description"]
                 df = pd.read_excel(
