@@ -35,6 +35,12 @@ columns:
   reporter:
     lineage:
       - datalake_jira_clean.issues.fields
+  owner_person:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  team_name:
+    lineage:
+      - datalake_jira_clean.issues.fields
   priority:
     lineage:
       - datalake_jira_clean.issues.fields

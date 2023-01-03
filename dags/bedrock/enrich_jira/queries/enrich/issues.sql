@@ -11,6 +11,8 @@ WITH record_selection AS (
         GET_JSON_OBJECT(fields, '$.status.statusCategory.name') AS current_status_category,
         GET_JSON_OBJECT(fields, '$.assignee.displayName') AS assignee,
         GET_JSON_OBJECT(fields, '$.reporter.displayName') AS reporter,
+        REGEXP_REPLACE(GET_JSON_OBJECT(fields, '$.customfield_13658'),'[^,a-zA-Z0-9]', '') AS owner_person,
+        GET_JSON_OBJECT(fields, '$.customfield_13655.value') AS team_name,
         GET_JSON_OBJECT(fields, '$.priority.name') AS priority,
         -- There was a failure with the automation of the field "resolution", which we can identify when
         -- the issue's status category is done, but there is no resolution.
@@ -73,6 +75,8 @@ SELECT
     current_status_category,
     assignee,
     reporter,
+    owner_person,
+    team_name,
     priority,
     resolution,
     root_cause_resolution,
