@@ -11,7 +11,7 @@ SELECT
     nome_politica AS policy_name,
     CAST(prop_business_unit_uid AS DECIMAL(15,1)) AS proposal_business_unit_uid,
     calc_valor_aprovado AS status_approved_value,
-    calc_motivos AS status_motives,
+    reflect('java.net.URLDecoder','decode', calc_motivos , 'utf-8') AS status_motives,
     prop_ffp_campo11 AS proposal_rating,
     calc_status_decisao AS status_decision,
     calc_erro AS status_error,
