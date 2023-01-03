@@ -1,43 +1,53 @@
 redshift_template:
   dw: &redshift_anchor
+    schema: datamarts
     runs_on: redshift
 athena_template:
   dw: &athena_anchor
+    schema: datamarts
     runs_on: athena
 pipeline:
   ##<KEEP THIS COMMENTED AS A TEMPLATE>
   # <task-name-like-attribution-conversion-paths>:
   #   dw:
+  #     sql_file: <query-file E.g: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql>
   #     table: <targe-table-name>
   #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
   #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
   buyer_first_visit_intent:
     dw:
       <<: *redshift_anchor
-      table: buyer_first_visit_intent
+      sql_file: dw/queries/datamarts/for_sale/buyer_first_visit_intent.sql
+      table: buyer_first_visit_intent  
   dim_house_listing_amenities:
     dw:
       <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_sale/dim_house_listing_amenities.sql
       table: dim_house_listing_amenities
   deal_making_funnel:
     dw:
       <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/deal_making_funnel.sql
       table: deal_making_funnel
   liquidity_by_sk_region:
     dw:
       <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/liquidity_by_sk_region.sql
       table: liquidity_by_sk_region
   loft_house_listing:
     dw:
       <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_sale/loft_house_listing.sql
       table: loft_house_listing
   loft_status_listing_flows:
     dw:
       <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_sale/loft_status_listing_flows.sql
       table: loft_status_listing_flows
   neighborhood_competition:
     dw:
       <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/neighborhood_competition.sql
       table: neighborhood_competition
       depends_on:
         - loft_house_listing
@@ -45,28 +55,35 @@ pipeline:
   repressed_demand_sale:
     dw:
       <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/repressed_demand_sale.sql
       table: repressed_demand_sale
   repressed_demand_sale_booking_fit_in:
     dw:
       <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/repressed_demand_sale_booking_fit_in.sql
       table: repressed_demand_sale_booking_fit_in
   sale_agents_weekly_performance:
     dw:
       <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/sale_agents_weekly_performance.sql
       table: sale_agents_weekly_performance
   sale_available_hours:
     dw:
       <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/sale_available_hours.sql
       table: sale_available_hours
   sale_ongoing_listings_casa_mineira:
     dw:
       <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/sale_ongoing_listings_casa_mineira.sql
       table: sale_ongoing_listings_casa_mineira
   temp_autonomous_agents_listings:
     dw:
       <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/temp_autonomous_agents_listings.sql
       table: temp_autonomous_agents_listings
   sale_lead_flow:
     dw:
       <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/sale_lead_flow.sql
       table: sale_lead_flow
