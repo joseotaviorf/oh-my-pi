@@ -2,15 +2,15 @@
 partition_cols_dag: ["id_app", "event_type"]
 incremental_partitions: ["year", "month", "day"]
 custom_cluster:
-  driver_node_type_id: r5a.8xlarge
+  driver_node_type_id: r5a.12xlarge
   node_type_id: r5a.4xlarge
   autoscale:
     min_workers: 3
     max_workers: 5
 spark_conf:
   spark.driver.maxResultSize: "0"
-  spark.driver.memory: "120g"
-  spark.driver.memoryOverhead: "80g"
+  spark.driver.memory: "240g"
+  spark.driver.memoryOverhead: "160g"
   spark.executor.memory: "100g"
   spark.executor.memoryOverhead: "23g"
   spark.network.timeout: "480"
