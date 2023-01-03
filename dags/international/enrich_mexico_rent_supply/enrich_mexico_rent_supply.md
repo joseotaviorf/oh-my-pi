@@ -20,7 +20,3 @@ Creates the enriched tables via full load, partitioned by `country_code`:
 - `listing_flow`
 - `monthly_supply_funnel`, soon to be migrated to the metric layer.
 - `weekly_supply_funnel`, soon to be migrated to the metric layer.
-
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.

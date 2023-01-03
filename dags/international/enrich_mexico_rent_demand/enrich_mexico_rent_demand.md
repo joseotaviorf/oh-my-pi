@@ -17,7 +17,3 @@ Creates the enriched tables via full load, partitioned by `country_code`:
 
 - `monthly_demand_funnel`
 - `weekly_demand_funnel`
-
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.

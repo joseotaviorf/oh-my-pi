@@ -17,7 +17,3 @@ Into clean layer, through full load:
 
 - `rental_demand_targets`
 - `rental_supply_targets`
-
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.

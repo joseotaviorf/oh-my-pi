@@ -24,8 +24,3 @@ Produces the following output tables:
 - `listing_business_context_suspension_history`
 - `portability`
 - `rent_listing`
-
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).

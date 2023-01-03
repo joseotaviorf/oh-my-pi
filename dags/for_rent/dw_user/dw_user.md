@@ -21,8 +21,3 @@ Produces the following output tables, partitioned by `country_code`:
 - `dim_user`
 - `dim_user_doorman`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
-</details>
