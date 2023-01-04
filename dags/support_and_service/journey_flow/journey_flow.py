@@ -1,17 +1,19 @@
-from datetime import datetime
-import pendulum
 import os
-from airflow.utils.helpers import chain, cross_downstream
-from airflow.models import DAG, Variable
+import pendulum
+from datetime import datetime
+
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.utils.helpers import chain, cross_downstream
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
@@ -22,7 +24,6 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2021, 2, 18, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
-
 
 # config vars
 ENV = os.environ.get("ENVIRONMENT")
@@ -42,9 +43,7 @@ raw_spark_job_path = (
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -70,7 +69,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
+    cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries,
 )
