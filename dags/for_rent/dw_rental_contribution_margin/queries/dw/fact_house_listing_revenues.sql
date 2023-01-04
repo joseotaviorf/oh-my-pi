@@ -104,6 +104,16 @@ brokerage_finance AS (
   FROM
     datalake_revenue_lines.brokerage_finance
   GROUP BY 1,3
+),
+
+credit_card_payment AS (
+  SELECT
+    id_contract_ebdb,
+    accrual_year_month,
+    SUM(invoice_paid_amount + invoice_theorical_amount) - SUM(acquirer_cost + advance_cost) AS ccp_net
+  FROM
+    datalake_revenue_lines.credit_card_payment
+  GROUP BY 1,2
 )
 
 SELECT
@@ -122,6 +132,7 @@ SELECT
   COALESCE(lra.invoice_theorical_amount, 0) AS lra,
   COALESCE(bfi.invoice_theorical_amount, 0) as bfi,
   COALESCE(lp.invoice_theorical_amount, 0) AS lp,
+  COALESCE(ccp.ccp_net, 0) AS ccp_net,
   COALESCE(bf.brokerage_partner_share, 0) AS brokerage_partner_share,
   COALESCE(mf.management_partner_share, 0) AS management_partner_share,
   dd.quarter,
@@ -154,6 +165,10 @@ LEFT JOIN
   brokerage_finance AS bfi
     ON mf.id_contract_ebdb = bfi.id_contract_ebdb
     AND mf.accrual_year_month = bfi.accrual_year_month
+LEFT JOIN
+  credit_card_payment AS ccp
+    ON mf.id_contract_ebdb = ccp.id_contract_ebdb
+    AND mf.accrual_year_month = ccp.accrual_year_month
 LEFT JOIN
   invoices_values AS iv
     ON mf.id_contract_ebdb = iv.id_contract

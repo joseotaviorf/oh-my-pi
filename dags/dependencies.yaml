@@ -1165,6 +1165,7 @@ bietlejuice.dw_rental_contribution_margin:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
   - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-fee
   - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-finance
+  - bietlejuice.enrich_revenue_lines:load-enrich-credit-card-payment
   - bietlejuice.enrich_revenue_lines:load-enrich-late-payments
   - bietlejuice.enrich_revenue_lines:load-enrich-long-term-rental-anticipation
   - bietlejuice.enrich_revenue_lines:load-enrich-management-fee
