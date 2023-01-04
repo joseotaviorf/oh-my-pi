@@ -26,13 +26,14 @@ WITH fact_house_listing_flows_adjust AS (
 		hl.is_b2b,
 		dhl.rental_administrator,
 		CASE
-			WHEN ciq.businesscontext= 'RENT'
-				AND ciq.type_big_agent = 'CIQ_FULL' THEN 'CIQ'
+			WHEN dhl.is_for_rent = True
+				AND dhl.consultant_type = 'CIQ_FULL' THEN 'CIQ'
+			WHEN dhl.is_for_rent = True
+				AND hl.mkt_origin = 'CIQ'
+				AND dhl.consultant_type = 'CIQ_MANAGER' THEN 'Backend'
 			WHEN hl.mkt_origin = 'CIQ'
-				AND ciq.businesscontext= 'RENT'
-				AND ciq.type_big_agent = 'CIQ_MANAGER' THEN 'Backend'
-			WHEN hl.mkt_origin = 'CIQ'
-				AND ciq.type_big_agent IS NULL THEN 'Other'
+				AND (dhl.consultant_type IS NULL
+					OR dhl.consultant_type = 'Core') THEN 'Other'
 			ELSE hl.mkt_origin
 		END AS mkt_origin,
 		dhl.ts_house_first_publication,
@@ -43,10 +44,6 @@ WITH fact_house_listing_flows_adjust AS (
 	INNER JOIN
 		dim_house_listing AS dhl
 			ON hl.sk_house_listing = dhl.sk_house_listing
-	LEFT JOIN
-		datamarts.quintoandar_consultant_listings AS ciq
-			ON ciq.sk_house_listing = hl.sk_house_listing
-			AND ciq.businesscontext= 'RENT'
 ),
 source_ops_rent AS (
 	WITH photo_job AS (
@@ -170,9 +167,9 @@ sale_fact_listing_flows_adjust AS (
 		hl.sk_user_house_registrant,
 		hl.is_b2b,
 		CASE
-			WHEN  ciq.type_big_agent = 'CIQ_FULL'
-				OR (type_big_agent='CIQ_MANAGER'
-					AND dt_sale > dt_ciq_started) THEN 'CIQ'
+			WHEN dl.consultant_type = 'CIQ_FULL'
+				OR (dl.consultant_type='CIQ_MANAGER'
+					AND dl.ts_created > dl.dt_consultant_started) THEN 'CIQ'
 			ELSE hl.mkt_origin
 		END AS mkt_origin,
 		dl.ts_first_publication,
@@ -183,9 +180,6 @@ sale_fact_listing_flows_adjust AS (
 	LEFT JOIN
 		sale.dim_listing AS dl
 			on left(hl.sk_house_listing,9) = dl.sk_house
-	LEFT JOIN
-		datamarts.quintoandar_consultant_listings AS ciq
-			ON LEFT(ciq.sk_house_listing,9) = LEFT(hl.sk_house_listing,9) AND ciq.businesscontext='SALE'
 ),
 source_ops_sale AS (
 	with photo_job AS (

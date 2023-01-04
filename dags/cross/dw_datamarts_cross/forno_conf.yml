@@ -27,8 +27,6 @@ pipeline:
     dw:
       <<: *redshift_anchor
       table: lead_listing_flows
-      depends_on:
-        - quintoandar_consultant_listings
   quintoandar_consultant_listings:
     dw:
       <<: *redshift_anchor
