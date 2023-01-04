@@ -18,6 +18,4 @@ cross:
       - talk_to_agent
   quintoandar_consultant_listings: {}
   talk_to_agent: {}
-  lead_listing_flows:
-    depends_on:
-      - quintoandar_consultant_listings
+  lead_listing_flows: {}
