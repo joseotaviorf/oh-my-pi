@@ -23,7 +23,7 @@ For any questions or concerns about this DAG, please contact the Data Engineerin
 
 ### Additional Information
 
-The [configuration file](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/dags/dw_datamarts/support_and_service/prod_conf.yml)
+The [configuration file](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/support_and_service/dw_datamarts_support_and_service/prod_conf.yml)
 declares the datamarts that should be created in this DAG.
 So **for add/remove a datamart table** from the DAG you only need to **update this file**.
 
