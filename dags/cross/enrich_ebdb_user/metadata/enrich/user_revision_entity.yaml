@@ -1,4 +1,4 @@
-database_name: datalake_ebdb_user_revision_entity
+database_name: datalake_ebdb_user
 table_name: user_revision_entity
 columns:
   id:
@@ -7,6 +7,9 @@ columns:
   id_user:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user
+  country_code:
+    lineage:
+      - datalake_ebdb_country.user.country_code
   reason:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.reason

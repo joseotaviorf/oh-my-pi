@@ -19,7 +19,7 @@ with cancellation_info as (
     from datalake_ebdb_clean.photographer_job pj
     join cancelled_jobs_max_rev cjmr
         on cjmr.id_photographer_job = pj.id
-    join datalake_ebdb_user_revision_entity.user_revision_entity ure
+    join datalake_ebdb_user.user_revision_entity ure
         on ure.id = cjmr.rev
     join datalake_ebdb_clean.user
         on user.id = ure.id_user
@@ -52,7 +52,7 @@ problems_info as (
         pjmr.id_photographer_job,
         ure.ts_revision
     from jobs_with_problem_max_rev pjmr
-    join datalake_ebdb_user_revision_entity.user_revision_entity ure
+    join datalake_ebdb_user.user_revision_entity ure
         on ure.id = pjmr.rev
 ),
 photographer_data as (
@@ -81,7 +81,7 @@ job_creator_info as (
         creator.id_sales_rep,
         creator.email
     from jobs_min_rev jmr
-    join datalake_ebdb_user_revision_entity.user_revision_entity ure
+    join datalake_ebdb_user.user_revision_entity ure
         on ure.id = jmr.rev
     join datalake_ebdb_clean.user creator
         on creator.id = ure.id_user

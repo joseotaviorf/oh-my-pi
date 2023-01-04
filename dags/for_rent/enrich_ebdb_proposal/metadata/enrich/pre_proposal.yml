@@ -51,10 +51,10 @@ columns:
       - datalake_ebdb_clean.pre_proposal.ts_updated
   ts_first_sent:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_last_analysis:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   has_rental_accepted:
     lineage:
       - datalake_ebdb_clean.pre_proposal.has_rental_accepted

@@ -43,7 +43,7 @@ house_aud AS (
         datalake_ebdb_clean.user_revision_entity AS rev
             ON rev.id = lbc_aud.rev
     JOIN 
-        datalake_ebdb_user_revision_entity.user_revision_entity AS rev2
+        datalake_ebdb_user.user_revision_entity AS rev2
             ON rev2.id = lbc_aud.rev
 ),
 house_status_history AS (

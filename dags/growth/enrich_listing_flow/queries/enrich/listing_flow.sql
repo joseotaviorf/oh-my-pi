@@ -81,7 +81,7 @@ WITH houses_without_lead_conversion AS (
         min_house_guarantees_aud min_hga
         ON house.id = min_hga.id_house
     LEFT JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity ure
+        datalake_ebdb_user.user_revision_entity ure
         ON min_hga.rev = ure.id
     WHERE
         cl.id IS NULL
@@ -159,7 +159,7 @@ houses_with_lead AS (
         FROM
             datalake_ebdb_clean.lead_aud
         JOIN
-            datalake_ebdb_user_revision_entity.user_revision_entity ure
+            datalake_ebdb_user.user_revision_entity ure
             ON ure.id = lead_aud.rev
         WHERE
             lead_aud.status = 'Convertido'
@@ -178,7 +178,7 @@ houses_with_lead AS (
             lead_aud.id_lead,
             MIN(ure.id) AS id_ure
         FROM datalake_ebdb_clean.lead_aud
-        JOIN datalake_ebdb_user_revision_entity.user_revision_entity ure
+        JOIN datalake_ebdb_user.user_revision_entity ure
             ON lead_aud.rev = ure.id
         WHERE lead_aud.mod_status
             AND lead_aud.status = 'Descartado'
@@ -190,7 +190,7 @@ houses_with_lead AS (
             lead_aud.id_lead,
             MAX(ure.id) AS id_ure
         FROM datalake_ebdb_clean.lead_aud
-        JOIN datalake_ebdb_user_revision_entity.user_revision_entity ure
+        JOIN datalake_ebdb_user.user_revision_entity ure
             ON lead_aud.rev = ure.id
         WHERE lead_aud.status = 'Descartado'
             AND NOT lead_aud.has_automatically_discarded
@@ -306,13 +306,13 @@ houses_with_lead AS (
         ON lead_aud.id_lead = lead.id
         AND lead_aud.rev = lfu.rev
     LEFT JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity ure
+        datalake_ebdb_user.user_revision_entity ure
         ON ure.id = lead_aud.rev
     LEFT JOIN
         lead_last_discarded lld
         ON lead.id = lld.id_lead
     LEFT JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity discard_ure
+        datalake_ebdb_user.user_revision_entity discard_ure
         ON discard_ure.id = lld.rev
     LEFT JOIN
         lead_has_aud has_aud
@@ -339,13 +339,13 @@ houses_with_lead AS (
         lead_first_discarded
         ON lead_first_discarded.id_lead = lead.id
     LEFT JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity d_ure
+        datalake_ebdb_user.user_revision_entity d_ure
         ON d_ure.id = lead_first_discarded.id_ure
     LEFT JOIN
         lead_max_discarded
         ON lead_max_discarded.id_lead = lead.id
     LEFT JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity d_ure_max
+        datalake_ebdb_user.user_revision_entity d_ure_max
         ON d_ure_max.id = lead_max_discarded.id_ure
     LEFT JOIN
         lead_first_region
@@ -395,7 +395,7 @@ base_listing_flows AS  (
             ON house.id = jaud.id_house
             AND jaud.mod_status
             AND jaud.status = 'Agendado'
-        JOIN datalake_ebdb_user_revision_entity.user_revision_entity ure
+        JOIN datalake_ebdb_user.user_revision_entity ure
             ON ure.id = jaud.rev
             AND (house.dt_first_publication IS NULL
                 OR
@@ -467,7 +467,7 @@ base_listing_flows AS  (
         first_rev_photo_job
         ON photo_jobs.min_id = first_rev_photo_job.id_photographer_job
     LEFT JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity first_rev_photo_job_ure
+        datalake_ebdb_user.user_revision_entity first_rev_photo_job_ure
         ON first_rev_photo_job_ure.id = first_rev_photo_job.rev
     LEFT JOIN
         datalake_ebdb_user.user first_rev_photo_job_user
@@ -492,7 +492,7 @@ base_listing_flows AS  (
         photo_rep_via_house
         ON photo_rep_via_house.id = house.id
     LEFT JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity photo_rep_ure
+        datalake_ebdb_user.user_revision_entity photo_rep_ure
         ON photo_rep_ure.id = photo_rep_via_house.min_rev
 )
 SELECT

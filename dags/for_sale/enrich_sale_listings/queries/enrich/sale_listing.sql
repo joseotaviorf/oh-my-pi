@@ -8,7 +8,7 @@ WITH listing_depublication AS (
   FROM 
     datalake_ebdb_clean.listing_business_context_aud lbc_aud
   LEFT JOIN
-    datalake_ebdb_user_revision_entity.user_revision_entity rev
+    datalake_ebdb_user.user_revision_entity rev
       ON lbc_aud.rev = rev.id
       AND lbc_aud.status = 'UNPUBLISHED'
       AND lbc_aud.mod_status = 1

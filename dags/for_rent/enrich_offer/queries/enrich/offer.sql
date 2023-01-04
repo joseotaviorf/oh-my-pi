@@ -3,7 +3,7 @@ with analyzed_offers as (
         oa.id_offer,
         min(ts_revision) as first_ts_revision
     from datalake_ebdb_clean.offer_aud oa
-    join datalake_ebdb_user_revision_entity.user_revision_entity ure
+    join datalake_ebdb_user.user_revision_entity ure
         on oa.rev = ure.id
     where oa.mod_status
         and oa.status in ('Aprovada', 'Rejeitada')

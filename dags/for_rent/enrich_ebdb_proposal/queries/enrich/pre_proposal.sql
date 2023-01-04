@@ -14,7 +14,7 @@ with first_sent as (
   from datalake_ebdb_clean.pre_proposal pp
   join first_change fc
     on fc.id_pre_proposal = pp.id
-  join datalake_ebdb_user_revision_entity.user_revision_entity ure
+  join datalake_ebdb_user.user_revision_entity ure
     on ure.id = fc.min_rev
   group by 1
 ),
@@ -23,7 +23,7 @@ last_analysis as (
     ppa.id_pre_proposal,
     max(ure.ts_revision) as ts_last_analysis
   from datalake_ebdb_clean.pre_proposal_aud ppa
-  join datalake_ebdb_user_revision_entity.user_revision_entity ure
+  join datalake_ebdb_user.user_revision_entity ure
     on ure.id = ppa.rev
   	and ppa.status in ('Aprovada', 'Rejeitada')
   group by 1

@@ -24,7 +24,7 @@ house_aud AS (
     FROM
         datalake_ebdb_clean.house_aud AS ha
     JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity AS ure
+        datalake_ebdb_user.user_revision_entity AS ure
             ON ha.rev = ure.id
 ),
 owners_changes AS (
@@ -47,7 +47,7 @@ lead_aud AS (
     FROM
         datalake_ebdb_clean.lead_aud AS la
     JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity AS ure
+        datalake_ebdb_user.user_revision_entity AS ure
             ON la.rev = ure.id
 ),
 lead_changes AS (
@@ -71,7 +71,7 @@ conversion_lead_aud AS (
     FROM
         datalake_ebdb_clean.conversion_lead_aud AS cla
     JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity AS ure
+        datalake_ebdb_user.user_revision_entity AS ure
             ON cla.rev = ure.id
 ),
 conversion_lead_changes AS (
@@ -111,7 +111,7 @@ partner_agent_aud AS (
     FROM
         datalake_ebdb_clean.partner_agent_aud AS pau
     JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity AS ure
+        datalake_ebdb_user.user_revision_entity AS ure
             ON pau.rev = ure.id
 ),
 partner_agent_changes AS (

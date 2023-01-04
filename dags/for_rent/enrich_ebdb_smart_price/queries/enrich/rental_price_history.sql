@@ -15,7 +15,7 @@ WITH price_audition AS (
     FROM
         datalake_ebdb_clean.house_aud AS ha
     JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity AS ure
+        datalake_ebdb_user.user_revision_entity AS ure
             ON ha.rev = ure.id
     WHERE
         -- We have some tests in ebdb. So in order to remove

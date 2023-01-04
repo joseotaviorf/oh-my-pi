@@ -10,7 +10,7 @@ WITH proponent_document_dates AS (
         datalake_ebdb_clean.proposal_aud AS p_aud
             ON p_aud.id_proposal = p.id
     JOIN
-        datalake_ebdb_user_revision_entity.user_revision_entity AS ure
+        datalake_ebdb_user.user_revision_entity AS ure
             ON ure.id = p_aud.rev
     GROUP BY
           p.id_proponent

@@ -90,7 +90,7 @@ columns:
       - datalake_ebdb_clean.proposal.ts_owner_documentation_sent
   ts_processed:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_created:
     lineage:
       - datalake_ebdb_clean.proposal.ts_created
@@ -102,64 +102,64 @@ columns:
       - datalake_ebdb_clean.proposal_aud.ts_documentation_sent
   ts_tenant_auto_first_doc_sent:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_tenant_first_doc_complete:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_tenant_last_doc_complete:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_credit_analysis_first_init:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   dt_credit_analysis_last_init:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_credit_analysis_last_init:
     lineage:
       - datalake_sorting_hat_clean.proposal_version.ts_analyzed
       - datalake_sorting_hat_clean.proposal.ts_analyzed
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_credit_analysis_first_end:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   dt_credit_analysis_last_end:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_credit_analysis_last_end:
     lineage:
       - datalake_sorting_hat_clean.proposal.ts_processed
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_credit_approved_last:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_credit_evaluation_first_init:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_credit_evaluation_last_init:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_credit_evaluation_first_negative:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_credit_evaluation_last_negative:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_guarantee:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_doc_analysis_first_approved:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_doc_analysis_last_approved:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_doc_analysis_first_rejected:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_doc_analysis_last_rejected:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_first_credit_evaluation_positive:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.ts_first_credit_evaluation_positive

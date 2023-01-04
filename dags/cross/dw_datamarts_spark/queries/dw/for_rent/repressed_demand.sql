@@ -4,7 +4,7 @@ with house_available_hours as (
         	ure.ts_revision as date_time,
         	hou.*
 		from datalake_ebdb_clean.house_weekly_schedule_aud hou
-			join datalake_ebdb_user_revision_entity.user_revision_entity ure
+			join datalake_ebdb_user.user_revision_entity ure
 				on hou.rev = ure.id
 	),
  	house_available as (
@@ -175,7 +175,7 @@ date_series as (
                 ure.ts_revision as init_rev,
                 coalesce(lead(ts_revision) over (partition by id_house order by ts_revision), current_date) as end_rev
             from datalake_ebdb_clean.house_visit_status_aud vs
-                join datalake_ebdb_user_revision_entity.user_revision_entity ure
+                join datalake_ebdb_user.user_revision_entity ure
                     on vs.rev = ure.id
                     and mod_status = true
       	)
@@ -191,7 +191,7 @@ date_series as (
                 ure.ts_revision as init_rev,
                 coalesce(lead(ts_revision) over (partition by id_house order by ts_revision), current_date) as end_rev
             from datalake_ebdb_clean.house_aud vs
-                join datalake_ebdb_user_revision_entity.user_revision_entity ure
+                join datalake_ebdb_user.user_revision_entity ure
                     on vs.rev = ure.id
                     and mod_status = true
       	)

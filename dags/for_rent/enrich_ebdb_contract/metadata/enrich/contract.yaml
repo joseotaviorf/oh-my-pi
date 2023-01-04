@@ -81,7 +81,7 @@ columns:
       - datalake_ebdb_clean.contract_aud.id_contract
   ts_tenant_service_fee_opt_out:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   is_exit_inspection_opted_out:
     lineage:
       - datalake_ebdb_clean.contract.is_exit_inspection_opted_out

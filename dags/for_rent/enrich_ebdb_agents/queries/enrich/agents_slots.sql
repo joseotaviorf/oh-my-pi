@@ -7,7 +7,7 @@ WITH active_history_mod AS (
     FROM
         datalake_ebdb_clean.agent_data_aud da
     LEFT JOIN 
-        datalake_ebdb_user_revision_entity.user_revision_entity ure
+        datalake_ebdb_user.user_revision_entity ure
             ON da.rev = ure.id
 ),
 active_history AS (

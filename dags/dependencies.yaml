@@ -450,7 +450,7 @@ bietlejuice.dw_datamarts_support_and_service:
   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
-  - bietlejuice.enrich_ebdb_user_revision_entity:create-enrich-user-revision-entity-external-table
+  - bietlejuice.enrich_ebdb_user:create-enrich-user-revision-entity-external-table
 
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood:load-enrich-affiliate-costs
@@ -627,7 +627,7 @@ bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.enrich_booking:load-enrich-house-available-hours
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 
 bietlejuice.dw_datamarts_spark.for_rent_cross:
   # Removed dependency from dw_datamarts_cross.talk_to_agent because dw_datamarts_cross.funnel_demand_flows already satisfies;
@@ -1740,7 +1740,7 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.enrich_ebdb_country:load-enrich-user
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
 
 bietlejuice.enrich_ebdb_country:
@@ -1804,7 +1804,7 @@ bietlejuice.enrich_ebdb_listing_jobs:
   - bietlejuice.ebdb:create-clean-photographer-job-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-state-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_region:load-enrich-region
 
 bietlejuice.enrich_ebdb_proposal:
@@ -1815,7 +1815,7 @@ bietlejuice.enrich_ebdb_proposal:
   - bietlejuice.ebdb:create-clean-proponent-proposal-in-data-lake
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_country:load-enrich-user
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 
 bietlejuice.enrich_ebdb_rent_flow:
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
@@ -1855,9 +1855,6 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.enrich_ebdb_country:load-enrich-user
-
-bietlejuice.enrich_ebdb_user_revision_entity:
-  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
 
 bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
@@ -2025,7 +2022,7 @@ bietlejuice.enrich_listing_flow:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-photo-job
   - bietlejuice.enrich_ebdb_user:load-enrich-user
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
@@ -2043,7 +2040,7 @@ bietlejuice.enrich_unified_listing_flow:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-photo-job
   - bietlejuice.enrich_ebdb_user:load-enrich-user
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
@@ -2196,7 +2193,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.enrich_firestore:load-enrich-rent-offer
@@ -2243,14 +2240,14 @@ bietlejuice.enrich_pro_owners:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-aud-in-data-lake
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
   - bietlejuice.enrich_ebdb_country:load-enrich-house
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 
 bietlejuice.enrich_quinto_messenger:
   - bietlejuice.quinto_messenger:load-clean-channel
@@ -2413,7 +2410,7 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.ebdb:create-clean-house-predicted-price-aud-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 
 bietlejuice.enrich_sale_potential_listing:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake

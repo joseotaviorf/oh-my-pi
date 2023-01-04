@@ -10,7 +10,7 @@ columns:
       - datalake_ebdb_clean.house_aud.rev
   change_reason:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.reason
+      - datalake_ebdb_user.user_revision_entity.reason
   previous_rent:
     lineage:
       - datalake_ebdb_clean.house_aud.rent
@@ -19,7 +19,7 @@ columns:
       - datalake_ebdb_clean.house_aud.rent
   ts_price_started:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_price_ended:
     lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision

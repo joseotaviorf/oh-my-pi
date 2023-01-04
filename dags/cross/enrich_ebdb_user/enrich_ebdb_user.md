@@ -18,11 +18,12 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables:
 
 1. In data lake enrich:
-    - `user`
-    - `agent_data`
-    - `user_doorman`
-    - `user_sales_rep`
     - `affiliate_data`
+    - `agent_data`
+    - `user`
+    - `user_doorman`
+    - `user_revision_entity`
+    - `user_sales_rep`
 
 ### Responsible Data Engineering Team
 
