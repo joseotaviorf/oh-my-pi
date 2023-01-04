@@ -192,7 +192,7 @@ base_tratada AS (
         a.year,
         a.month,
         a.day,
-        EXTRACT( DAY FROM ((date_trunc('MONTH', DATE(MAKE_DATE(a.year, a.month, a.day))) - INTERVAL 1 DAY) - a.invoice_original_due_date)) AS delay_invoice_at_closure,
+        EXTRACT( DAY FROM ((date_trunc('MONTH', DATE(MAKE_DATE(a.year, a.month, a.day))) - INTERVAL 1 DAY) -  CAST(a.invoice_original_due_date AS TIMESTAMP))) AS delay_invoice_at_closure,
         EXTRACT( DAY FROM ((date_trunc('MONTH', DATE(MAKE_DATE(a.year, a.month, a.day))) - INTERVAL 1 DAY)- b.contract_due_date_min)) AS delay_contamined_at_closure
     FROM
         base_invoice AS a
