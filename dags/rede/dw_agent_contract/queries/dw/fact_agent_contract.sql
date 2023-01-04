@@ -118,3 +118,4 @@ LEFT JOIN
         AND wc.id_company_hubspot = cs.id_hubspot)
         OR (wc.id_company_hubspot IS NULL
         AND wc.3p_partner = cs.extracted_3p_tag)
+WHERE usc.ts_status_started IS NOT NULL -- added clause on rotation to fix NULL values
