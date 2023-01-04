@@ -38,7 +38,7 @@ default_libraries = config_service.get_config("default_libraries")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 
 RAW_SPARK_JOB_FILE = (
-    f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{SOURCE}/load_{SOURCE}_into_raw.py"
+    f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 )
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 

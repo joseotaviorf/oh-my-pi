@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
-import pandas as pd
+import datetime as dt
 
 from bietlejuice.base.db import DatalakeMetastoreMapping
 from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
@@ -10,13 +10,15 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 
-JOB_NAME = "load_cozy_metrics_into_raw"
+JOB_NAME = "load_cozy_metrics_raw"
 
 def _generate_date_range(load_start_date, load_end_date):
-    date_index = pd.date_range(
-        start = pd.to_datetime(load_start_date),
-        end = pd.to_datetime(load_end_date),
-        freq='d'
+    start_date = dt.datetime.strptime(load_start_date, "%Y-%m-%d")
+    end_date = dt.datetime.strptime(load_end_date, "%Y-%m-%d")
+    date_index = [start_date + dt.timedelta(days=x) for x in range(0, (end_date - start_date).days)]
+
+    logger.info(
+        f"""m=_generate_date_range, msg=Getting data from {start_date} to {end_date}..."""
     )
 
     return date_index

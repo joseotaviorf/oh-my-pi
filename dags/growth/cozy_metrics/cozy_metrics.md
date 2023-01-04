@@ -26,9 +26,5 @@ Tables:
 
 - datalake_cozy_metrics_raw.library_versions
 - datalake_cozy_metrics_clean.library_versions
-
-### Responsible Data Teams
-
-For any questions or concerns about this DAG, please contact the AE Growth Team. This DAG is under Brand context.
   
 </details>
