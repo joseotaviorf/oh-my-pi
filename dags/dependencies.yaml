@@ -2660,8 +2660,8 @@ bietlejuice.metric_rent__listings:
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
 
 bietlejuice.metric_rent_benvi__demand:
-  - bietlejuice.dw_datamarts_growth_cross:create-top-of-funnel-volumes-monthly-in-datalake
-  - bietlejuice.dw_datamarts_growth_cross:create-top-of-funnel-volumes-weekly-in-datalake
+  - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-top-of-funnel-volumes-monthly
+  - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-top-of-funnel-volumes-weekly
   - bietlejuice.dw_datamarts_spark.for_rent_cross:load-dw-datamarts-rental-events-funnel
   - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
   - bietlejuice.gsheets.for_rent:load-clean-mexico-demand-targets-2022
@@ -2669,7 +2669,7 @@ bietlejuice.metric_rent_benvi__demand:
   - bietlejuice.gsheets.growth:load-clean-mexico-marketing-cost-per-source
 
 bietlejuice.metric_rent_benvi__supply:
-  - bietlejuice.dw_datamarts_growth_cross:create-rental-marketplace-flows-in-datalake
+  - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-rental-marketplace-flows
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-cohort-funnel
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-coincident-funnel

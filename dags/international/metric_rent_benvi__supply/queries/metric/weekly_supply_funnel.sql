@@ -126,7 +126,7 @@ market_place AS (
             COUNT(DISTINCT CASE WHEN rmf.status_last_week_short = 'Other' AND rmf.status_short = 'Ongoing Listing' THEN rmf.sk_house_listing END) AS net_churn,
         rmf.week_start AS dt_week_started
     FROM 
-        dw_datamarts_growth_cross.rental_marketplace_flows AS rmf
+        dw_datamarts.rental_marketplace_flows AS rmf
     JOIN 
         datalake_region.region AS dr
             ON rmf.sk_region = dr.id 

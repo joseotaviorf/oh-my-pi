@@ -5,7 +5,7 @@ WITH tof_demand_funnel AS (
         SUM(tof.tenant_prospects) AS tenant_prospects,
         DATE(tof.month_start) AS dt_month_started
     FROM 
-        dw_datamarts_growth_cross.top_of_funnel_volumes_monthly AS tof
+        dw_datamarts.top_of_funnel_volumes_monthly AS tof
     WHERE
         tof.business_context = 'rent'
         AND tof.month_start >= DATE('2022-06-01')

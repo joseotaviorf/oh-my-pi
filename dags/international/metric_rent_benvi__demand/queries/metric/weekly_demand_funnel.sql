@@ -5,7 +5,7 @@ WITH tof_demand_funnel AS (
         SUM(tof.tenant_prospects) AS tenant_prospects,
         DATE(tof.week_start) AS dt_week_started
     FROM 
-        dw_datamarts_growth_cross.top_of_funnel_volumes_weekly AS tof
+        dw_datamarts.top_of_funnel_volumes_weekly AS tof
     WHERE
         tof.business_context = 'rent'
         AND DATE(tof.week_start) >= DATE('2022-05-30') -- Mexico's launch was on July 1st, but the week started on March 30th. 
