@@ -4,6 +4,9 @@ domain_list:
   - sc-domain:quintoandar.com.br
 url_list:
   - https://www.quintoandar.com.br
+  - https://proprietario.quintoandar.com.br
+  - https://meulugar.quintoandar.com.br
+  - http://conteudos.quintoandar.com.br
 by_property:
   aggregation_type: BY_PROPERTY
   dimensions:

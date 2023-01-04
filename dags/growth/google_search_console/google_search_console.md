@@ -16,6 +16,9 @@ List of domains retrieved in this DAG currently:
 
 List of URLs retrieved in this DAG currently:
 * https://www.quintoandar.com.br
+* https://proprietario.quintoandar.com.br
+* https://meulugar.quintoandar.com.br
+* http://conteudos.quintoandar.com.br
 
 ​<details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
