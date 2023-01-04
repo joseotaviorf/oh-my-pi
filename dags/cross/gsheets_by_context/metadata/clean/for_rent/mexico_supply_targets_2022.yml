@@ -5,6 +5,9 @@ columns:
   city_group:
     lineage:
       - datalake_gsheets_raw.mexico_supply_targets_2022.city_group
+  available_qualifieds:
+    lineage:
+      - datalake_gsheets_raw.mexico_supply_targets_2022.available_qualifieds
   first_listings:
     lineage:
       - datalake_gsheets_raw.mexico_supply_targets_2022.first_listings

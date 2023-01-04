@@ -1,5 +1,6 @@
 SELECT
     city_group,
+    available_qualifieds,
     first_listings,
     lead_context,
     opportunities,
