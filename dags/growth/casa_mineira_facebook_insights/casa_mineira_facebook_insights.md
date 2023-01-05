@@ -11,6 +11,11 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
+Accounts that we ingest:
+
+- 364632185662226 -> Casa Mineira Portal - Retargeting 2.0
+- 351587129983600 -> Social Insights
+
 This pipeline produces, via incremental load:
 
 - In datalake raw and clean:
