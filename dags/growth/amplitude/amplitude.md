@@ -11,6 +11,8 @@ Currently, there is the following output table for both our raw, staging (clean)
 
 - `events`
 - `170698_user_merge`
+- `183047_user_merge`
+- `205027_user_merge`
   
 ### Note about data flow
 
