@@ -134,6 +134,7 @@ for table in tables:
         table_name=table_name,
         is_incremental=True,
         spectrum_iam_role=spectrum_iam_role,
+        has_load_to_redshift_task=False,
         partitions=partitions,
     )
 
