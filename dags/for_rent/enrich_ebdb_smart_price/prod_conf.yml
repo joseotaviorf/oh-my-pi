@@ -1,3 +1,5 @@
 ---
 custom_cluster:
-  num_workers: 2
+  driver_node_type_id: r4.xlarge
+    node_type_id: c5.4xlarge
+    num_workers: 3
