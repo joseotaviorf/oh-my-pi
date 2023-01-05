@@ -271,6 +271,19 @@ if __name__ == "__main__":
     else:
         df = input_df
 
+    """
+    PyDeequValidator fails when try to execute 'column_level_validations' with an empty dataframe.
+    """
+    if df.rdd.isEmpty():
+        input_configs.pop("column_level_validations", None)
+
+        if "table_level_validations" in input_configs.keys():
+            input_configs["table_level_validations"].update(
+                {"has_size": {"greater_than": 1}}
+            )
+        else:
+            input_configs["table_level_validations"] = {"has_size": {"greater_than": 1}}
+
     pydeequ_validator = PyDeequValidator(
         suite_name=f"Pipeline Validations: {database_name}.{table_name}",
         validation_suite=validation_suite,
