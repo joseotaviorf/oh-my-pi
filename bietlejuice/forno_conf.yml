@@ -160,9 +160,6 @@ cluster_template:
         ssh_public_keys: []
         node_type_id: m5a.large
         driver_node_type_id: m5a.large
-        autoscale:
-            max_workers: 2
-            min_workers: 1
         spark_version: 10.4.x-scala2.12
 
 custom_cluster:
@@ -204,6 +201,9 @@ databricks_10_4_med_compute_cluster:
 databricks_10_4_min_memory_cluster:
     <<: *cluster_anchor
     node_type_id: "r5a.large"
+    autoscale:
+        max_workers: 2
+        min_workers: 1
     spark_version: 10.4.x-scala2.12
 
 databricks_10_4_med_memory_cluster:
@@ -267,6 +267,9 @@ databricks_10_4_min_io-general_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5n.large
     node_type_id: m5n.xlarge
+    autoscale:
+        max_workers: 2
+        min_workers: 1
     spark_version: 10.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
