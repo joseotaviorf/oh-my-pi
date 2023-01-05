@@ -5,51 +5,48 @@ columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.id
-  id_company:
+  id_user_insert:
     lineage:
-      - datalake_rental_guarantee_platform_raw.contract.company_id
-  id_property:
+      - datalake_rental_guarantee_platform_raw.contract.userinsert
+  id_user_update:
     lineage:
-      - datalake_rental_guarantee_platform_raw.contract.property_id
-  uuid_contract:
+      - datalake_rental_guarantee_platform_raw.contract.userupdate
+  id_propose:
     lineage:
-      - datalake_rental_guarantee_platform_raw.contract.contractuuid
-  monthly_value:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.contract.monthly_value
-  activation_value:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.contract.activation_value
-  total_value:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.contract.total_value
-  guarantee_value:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.contract.guarantee_value
-  status:
+      - datalake_rental_guarantee_platform_raw.contract.propose
+  id_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.status
-  created_by:
+  id_plan:
     lineage:
-      - datalake_rental_guarantee_platform_raw.contract.createdby
-  service_tax:
+      - datalake_rental_guarantee_platform_raw.contract.plan
+  id_main_tenant:
     lineage:
-      - datalake_rental_guarantee_platform_raw.contract.service_tax
-  contract_duration_months:
+      - datalake_rental_guarantee_platform_raw.contract.maintenant
+  id_real_estate:
     lineage:
-      - datalake_rental_guarantee_platform_raw.contract.contract_duration_months
-  version:
+      - datalake_rental_guarantee_platform_raw.contract.realestate
+  contract_number:
     lineage:
-      - datalake_rental_guarantee_platform_raw.contract.version
-  ts_sent_guarantee_term:
+      - datalake_rental_guarantee_platform_raw.contract.number
+  external_ref:
     lineage:
-      - datalake_rental_guarantee_platform_raw.contract.sent_guarantee_term_at
-  ts_created:
+      - datalake_rental_guarantee_platform_raw.contract.externalref
+  is_active:
     lineage:
-      - datalake_rental_guarantee_platform_raw.contract.created_at
+      - datalake_rental_guarantee_platform_raw.contract.active
+  ts_began:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.begin
+  ts_done:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.done
+  ts_inserted:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.dateinsert
   ts_updated:
     lineage:
-      - datalake_rental_guarantee_platform_raw.contract.updated_at
+      - datalake_rental_guarantee_platform_raw.contract.dateupdate
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.year

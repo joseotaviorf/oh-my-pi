@@ -1,0 +1,73 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: payment
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.id
+  id_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.propose
+  customer:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.customer
+  subscription:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.subscription
+  payment_link:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.payment_link
+  invoice_url:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.invoice_url
+  unicid:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.unicid
+  description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.description
+  gateway:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.gateway
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.version
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.status
+  billing_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.billing_type
+  value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.value
+  net_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.net_value
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.active
+  ts_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.due_date
+  ts_due_original:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.original_due_date
+  ts_client_payment:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.client_payment_date
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.day
