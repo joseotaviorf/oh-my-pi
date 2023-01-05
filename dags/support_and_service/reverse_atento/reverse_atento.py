@@ -13,7 +13,7 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.dags.base.reverse_task_group import ReverseTaskGroup
+from bietlejuice.base.airflow.task_groups.reverse_task_group import ReverseTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 

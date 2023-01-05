@@ -14,7 +14,7 @@ from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
-from bietlejuice.dags.base.dw_task_group import DWTaskGroup
+from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")

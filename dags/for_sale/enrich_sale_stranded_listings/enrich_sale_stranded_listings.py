@@ -10,10 +10,9 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.base.airflow.base_dag import BaseDAG
-from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
-from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
@@ -125,8 +124,8 @@ for table in tables:
 )
 
 chain(
-    BaseTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
-    + BaseTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    DatalakeTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
     terminate_cluster_task,
 )
 

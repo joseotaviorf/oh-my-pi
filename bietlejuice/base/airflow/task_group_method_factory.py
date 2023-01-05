@@ -45,9 +45,13 @@ class TaskGroupMethodFactory(object):
         """
         # By adding these imports to the head of the file it raises
         # error by python circular dependency
-        from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
-        from bietlejuice.dags.base.dw_task_group import DWTaskGroup
-        from bietlejuice.dags.base.reverse_task_group import ReverseTaskGroup
+        from bietlejuice.base.airflow.task_groups.datalake_task_group import (
+            DatalakeTaskGroup,
+        )
+        from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
+        from bietlejuice.base.airflow.task_groups.reverse_task_group import (
+            ReverseTaskGroup,
+        )
 
         return {
             LayerEnum.CLEAN: DatalakeTaskGroup.build_clean_task_group,

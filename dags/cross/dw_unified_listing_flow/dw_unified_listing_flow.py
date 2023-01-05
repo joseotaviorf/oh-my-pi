@@ -13,7 +13,7 @@ from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.dags.base.dw_task_group import DWTaskGroup
+from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
 from bietlejuice.services import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 

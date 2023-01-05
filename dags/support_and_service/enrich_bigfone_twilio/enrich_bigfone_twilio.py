@@ -10,9 +10,8 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
-from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
@@ -93,6 +92,6 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     is_incremental=True,
 )
 
-chain(create_cluster_task, BaseTaskGroup.all_first_tasks(enrich_task_groups))
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
 
-chain(BaseTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)

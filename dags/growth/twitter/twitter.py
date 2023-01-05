@@ -7,7 +7,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 
 
 from bietlejuice.base.airflow.base_dag import BaseDAG

@@ -11,7 +11,7 @@ from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.dags.base.dw_task_group import DWTaskGroup
+from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 

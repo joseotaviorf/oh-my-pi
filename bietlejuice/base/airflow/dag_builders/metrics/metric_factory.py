@@ -16,7 +16,7 @@ from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathSe
 from bietlejuice.services import ConfigurationService
 
 
-from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 
 
 class MetricsDagFactory:

@@ -10,12 +10,11 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.utils.helpers import chain
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
-from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 
 # ENV setup
@@ -103,12 +102,12 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
 
 chain(
     create_cluster_task,
-    BaseTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
-    + BaseTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
+    DatalakeTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
 )
 
 chain(
-    BaseTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
-    + BaseTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    DatalakeTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
     terminate_cluster_task,
 )

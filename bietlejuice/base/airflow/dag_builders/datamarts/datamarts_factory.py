@@ -12,7 +12,7 @@ from airflow.utils.helpers import chain
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.dags.base.dw_task_group import DWTaskGroup
+from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
