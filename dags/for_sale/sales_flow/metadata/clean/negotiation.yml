@@ -23,9 +23,15 @@ columns:
   ts_buyer_documentation_started:
     lineage:
       - datalake_sales_flow_raw.negotiation.buyer_documentation_started_at
-  ts_buyer_dcumentation_submitted:
+  ts_buyer_documentation_submitted:
     lineage:
       - datalake_sales_flow_raw.negotiation.buyer_documentation_submitted_at
+  ts_seller_documentation_started:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.seller_documentation_started_at
+  ts_seller_documentation_submitted:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.seller_documentation_submitted_at
   ts_buyer_credit_started:
     lineage:
       - datalake_sales_flow_raw.negotiation.buyer_credit_started_at

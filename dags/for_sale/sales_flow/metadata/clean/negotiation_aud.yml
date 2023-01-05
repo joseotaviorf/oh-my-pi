@@ -47,6 +47,12 @@ columns:
   mod_ts_buyer_documentation_submitted:
     lineage:
       - datalake_sales_flow_raw.negotiation_aud.buyer_documentation_submitted_at_mod
+  mod_ts_seller_documentation_started:
+    lineage:
+      - datalake_sales_flow_raw.negotiation_aud.seller_documentation_started_at_mod
+  mod_ts_seller_documentation_submitted:
+    lineage:
+      - datalake_sales_flow_raw.negotiation_aud.seller_documentation_submitted_at_mod
   mod_ts_buyer_credit_started:
     lineage:
       - datalake_sales_flow_raw.negotiation_aud.buyer_credit_started_at_mod
@@ -59,6 +65,12 @@ columns:
   ts_buyer_documentation_submitted:
     lineage:
       - datalake_sales_flow_raw.negotiation_aud.buyer_documentation_submitted_at
+  ts_seller_documentation_started:
+    lineage:
+      - datalake_sales_flow_raw.negotiation_aud.seller_documentation_started_at
+  ts_seller_documentation_submitted:
+    lineage:
+      - datalake_sales_flow_raw.negotiation_aud.seller_documentation_submitted_at
   ts_buyer_credit_started:
     lineage:
       - datalake_sales_flow_raw.negotiation_aud.buyer_credit_started_at
