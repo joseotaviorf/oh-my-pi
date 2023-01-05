@@ -20,8 +20,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 This pipeline produces the following output tables in each layer: 
 * raw:
-    - datalake_lifull_campaigns_raw.trovit_campaigns
-    - datalake_lifull_campaigns_raw.mitula_campaigns
+    - datalake_lifull_campaigns_raw.campaigns_overview_report
 * clean:
     - datalake_lifull_campaigns_clean.trovit_campaigns
     - datalake_lifull_campaigns_clean.mitula_campaigns

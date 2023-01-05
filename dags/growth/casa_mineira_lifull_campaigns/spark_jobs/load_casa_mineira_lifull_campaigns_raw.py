@@ -28,7 +28,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
-JOB_NAME = "load_lifull_campaigns_raw"
+JOB_NAME = "load_casa_mineira_lifull_campaigns_raw"
 
 logger = QuintoAndarLogger(JOB_NAME)
 

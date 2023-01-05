@@ -1,10 +1,10 @@
 import os
+import re
 from datetime import datetime
 from pendulum import timezone
 
 from airflow.models import DAG
 from airflow.utils.helpers import cross_downstream
-from airflow.contrib.operators.awsbatch_operator import AWSBatchOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -12,6 +12,7 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
@@ -19,15 +20,13 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 # Pipeline inputs
 SOURCE = "casa_mineira_lifull_campaigns"
 DAG_ID = f"bietlejuice.{SOURCE}"
-MAIN_START_DATE = datetime(2021, 8, 26, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_START_DATE = datetime(2021, 9, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
-accounts = config_service.get_config("accounts")
 raw_table_name = config_service.get_config("raw_table_name")
-aws_conn_id = config_service.get_config("aws_conn_id")
-raw_output_path = config_service.get_config("raw_output_path")
+raw_partition_cols = config_service.get_config("raw_partition_cols")
 clean_tables_list = config_service.get_config("clean_tables_list")
 partition_cols = config_service.get_config("partition_cols")
 
@@ -39,7 +38,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 raw_spark_job_file = (
-    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/create_{SOURCE}_raw.py"
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 )
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
@@ -53,6 +52,14 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 ENV = os.environ.get("ENVIRONMENT")
 
+
+def get_date_param(dag_run, ds, date_param_name):
+    date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
+    if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
+        return date_param
+    return ds
+
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -65,15 +72,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
-)
-
-task_group = DatalakeTaskGroup(
-    dag=dag,
-    env=ENV,
-    datalake_bucket=datalake_bucket,
-    relative_query_path=SOURCE,
-    spark_jobs_path=base_spark_jobs_path,
-    athena_query_result_location=athena_query_results_bucket,
+    user_defined_macros={"get_date_param": get_date_param},
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -88,60 +87,53 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
+task_group = DatalakeTaskGroup(
+    dag=dag,
+    env=ENV,
+    datalake_bucket=datalake_bucket,
+    relative_query_path=SOURCE,
+    spark_jobs_path=base_spark_jobs_path,
+    athena_query_result_location=athena_query_results_bucket,
+)
+
 raw_task_group = task_group.build_raw_task_group_for_single_table(
     source=SOURCE,
     target_database_base_name=SOURCE,
-    table_name="campaigns_overview_report",
+    table_name=raw_table_name,
     extraction_spark_job_file=raw_spark_job_file,
-    raw_spark_job_extra_args=[SOURCE],
+    raw_spark_job_extra_args=[
+        SOURCE,
+        "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+        "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+        raw_table_name,
+        str(raw_partition_cols),
+    ],
+)
+
+clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+    is_incremental=True,
+    has_create_external_table_task=False,
+    partitions=partition_cols,
+    extra_query_template_params={
+        "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+        "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+    },
 )
 
 create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
 
-for account_type, account_info in accounts.items():
-    account_id = account_info["account_id"]
-    account_name = account_info["account_name"]
-    output_path = raw_output_path.format(
-        datalake_bucket=datalake_bucket,
-        source=SOURCE,
-        raw_table_name=raw_table_name,
-        account_id=account_id,
-        execution_date="{{ ds }}",
-    )
+cross_downstream(
+    DatalakeTaskGroup.last_tasks(raw_task_group),
+    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
+)
 
-    aws_batch_start_job_task = AWSBatchOperator(
-        dag=dag,
-        task_id=f"load-{account_type}-lifull-campaigns-report",
-        job_name="crawler-lifull-{}-{}".format(account_type, "{{ ds }}"),
-        job_definition="5a-data-crawler-lifull",
-        job_queue="5a-data-crawler-mkt-queue",
-        parameters={
-            "start_date": "start_date={{ ds }}",
-            "end_date": "end_date={{ ds }}",
-            "account_id": f"account_id={account_id}",
-            "account_name": f"account_name={account_name}",
-            "output_path": output_path,
-        },
-        overrides={},
-        aws_conn_id=aws_conn_id,
-        region_name="us-east-1",
-    )
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
 
-    aws_batch_start_job_task.set_downstream(create_cluster_task)
+# adding data quality tasks :)
+independent_tasks = DatalakeTaskGroup.all_independent_tasks(clean_task_groups)
 
-for clean_table_name in clean_tables_list:
-    clean_task_group = task_group.build_clean_task_group(
-        source_database_base_name=SOURCE,
-        target_database_base_name=SOURCE,
-        table_name=clean_table_name,
-        is_incremental=True,
-        partitions=partition_cols,
-        has_create_external_table_task=False,
-    )
-
-    cross_downstream(
-        DatalakeTaskGroup.last_tasks(raw_task_group),
-        DatalakeTaskGroup.first_tasks(clean_task_group),
-    )
-
-    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
+if independent_tasks:
+    terminate_cluster_task.set_upstream(independent_tasks)

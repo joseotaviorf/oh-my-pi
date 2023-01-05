@@ -1,15 +1,10 @@
 ---
-raw_partition_cols: ["acc", "dt"]
-raw_table_name: campaigns_overview_report
-schema:
-  - ["id", "STRING"]
-  - ["name", "STRING"]
-  - ["account_name", "STRING"]
-  - ["clicks", "STRING"]
-  - ["desktop_cost", "STRING"]
-  - ["mobile_cost", "STRING"]
-  - ["total_cost", "STRING"]
-  - ["curr_date", "DATE"]
-  - ["group_name", "STRING"]
-  - ["acc", "INT"]
-  - ["dt", "DATE"]
+login_url: https://thribee.com/index.php/cod.campaigns_performance
+campaign_url: https://thribee.com/index.php/cod.source_overview_report_json
+accounts:
+  casa_mineira:
+    account_name: casa_mineira_homes_br
+    account_id: 5931955
+  casa_mineira_imobiliaria:
+    account_name: casa_mineira_imobiliaria_homes_br
+    account_id: 5941075
