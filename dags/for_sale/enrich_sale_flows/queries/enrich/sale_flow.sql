@@ -271,11 +271,5 @@ LEFT JOIN
 LEFT JOIN
     sale_talk_to_agent AS tta
         ON tta.id_sale_flow = sf.id_sale_flow
-    -- Filter to remove Casa Mineira listings included in Quinto Andar tables due to the BBB 22 campaign
-LEFT JOIN
-    datalake_ebdb_listing.house AS h
-        ON h.id = sf.id_house
-        AND h.internal_admin_info = '3P\n[FS-CM]'
 WHERE
-    h.id IS NULL
-    AND sf.id_buyer != hi.id_seller
+    sf.id_buyer != hi.id_seller
