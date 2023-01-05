@@ -28,7 +28,7 @@ MAIN_SCHEDULE_INTERVAL = "30 2 * * *"
 
 config_service = ConfigurationService(SOURCE)
 default_libraries = config_service.get_config("default_libraries")
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
@@ -48,7 +48,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 CUSTOM_LIBRARIES = [
     {
-        "whl": f"{artifacts_s3_bucket}/sirena-api-client-python/"
+        "whl": f"{artifacts_bucket}/sirena-api-client-python/"
         f"quintoandar_sirena_api_client-0.1.0-py2.py3-none-any.whl"
     }
 ]

@@ -48,7 +48,7 @@ class GsheetsDAGFactory:
 
         self.config_service = ConfigurationService(dag_name=source_with_context)
 
-        artifacts_s3_bucket = self.config_service.get_config("artifacts_bucket")
+        artifacts_bucket = self.config_service.get_config("artifacts_bucket")
         databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"
         )
@@ -75,7 +75,7 @@ class GsheetsDAGFactory:
         # GSHEETS CONFIG
         self.custom_libraries = [
             {
-                "whl": f"{artifacts_s3_bucket}/gsheets-api-client-python/"
+                "whl": f"{artifacts_bucket}/gsheets-api-client-python/"
                 f"quintoandar_gsheets_api_client-0.6.0-py2.py3-none-any.whl"
             }
         ]

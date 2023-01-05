@@ -24,7 +24,7 @@ MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
@@ -44,7 +44,7 @@ default_libraries = config_service.get_config("default_libraries")
 
 CUSTOM_LIBRARIES = [
     {
-        "whl": f"{artifacts_s3_bucket}/linkedin-client-python/"
+        "whl": f"{artifacts_bucket}/linkedin-client-python/"
         f"quintoandar_linkedin_client-latest-py3-none-any.whl"
     }
 ]

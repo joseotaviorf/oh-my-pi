@@ -27,19 +27,17 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}"
 
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 default_libraries = config_service.get_config("default_libraries")
 custom_libraries = [
-    {
-        "jar": f"{artifacts_s3_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
-    },
+    {"maven": {"coordinates": "mysql:mysql-connector-java:5.1.47"}},
     {"pypi": {"package": "hubspot-api-client==5.0.0"}},
     {
-        "whl": f"{artifacts_s3_bucket}/pipedrive-api-client-python/"
+        "whl": f"{artifacts_bucket}/pipedrive-api-client-python/"
         f"quintoandar_pipedrive_api_client-0.1.0-py2.py3-none-any.whl"
     },
     {
-        "whl": f"{artifacts_s3_bucket}/gsheets-api-client-python/"
+        "whl": f"{artifacts_bucket}/gsheets-api-client-python/"
         f"quintoandar_gsheets_api_client-0.6.0-py2.py3-none-any.whl"
     },
     {"pypi": {"package": "google-auth==2.13.0"}},

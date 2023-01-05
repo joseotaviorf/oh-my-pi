@@ -23,7 +23,7 @@ MAIN_START_DATE = datetime(2022, 2, 8, 0, 0, 0, tzinfo=timezone("America/Sao_Pau
 
 config_service = ConfigurationService(DAG_NAME)
 
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket_reverse")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
@@ -42,7 +42,7 @@ CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_clu
 
 custom_libraries = [
     {
-        "whl": f"{artifacts_s3_bucket}/tracksale-api-client-python/"
+        "whl": f"{artifacts_bucket}/tracksale-api-client-python/"
         f"quintoandar_tracksale_api_client-0.3.1-py2.py3-none-any.whl"
     }
 ]

@@ -32,7 +32,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_into_datalake.py"
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -48,9 +48,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 
 DEFAULT_LIBRARIES = config_service.get_config("default_libraries")
 CUSTOM_LIBRARIES = [
-    {
-        "jar": f"{artifacts_s3_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
-    }
+    {"jar": f"{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"}
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 

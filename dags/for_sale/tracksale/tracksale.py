@@ -30,7 +30,7 @@ MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 
 # s3 paths setup
 ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
-ARTIFACTS_S3_BUCKET = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
 SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
@@ -45,7 +45,7 @@ default_libraries = config_service.get_config("default_libraries")
 
 CUSTOM_LIBRARIES = [
     {
-        "whl": f"{ARTIFACTS_S3_BUCKET}/tracksale-api-client-python/"
+        "whl": f"{artifacts_bucket}/tracksale-api-client-python/"
         f"quintoandar_tracksale_api_client-0.3.0-py2.py3-none-any.whl"
     }
 ]

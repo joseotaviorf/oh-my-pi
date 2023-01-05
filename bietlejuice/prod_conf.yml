@@ -128,7 +128,7 @@ cluster_template:
               value: databricks
         init_scripts:
             - s3:
-                  destination: "{{ var.value.artifacts_s3_bucket }}/bi-etl-ejuice/init_script.sh"
+                  destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
                   region: ""
         spark_conf:
             spark.rpc.message.maxSize: "2000"

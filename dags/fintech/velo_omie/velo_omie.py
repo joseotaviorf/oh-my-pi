@@ -25,7 +25,7 @@ ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(SOURCE)
 datalake_bucket = config_service.get_config("datalake_bucket")
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
@@ -41,9 +41,7 @@ CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 
 default_libs = config_service.get_config("default_libraries")
 custom_libs = config_service.get_config("cluster_libs")
-custom_libs[0]["whl"] = custom_libs[0]["whl"].format(
-    artifacts_s3_bucket=artifacts_s3_bucket
-)
+custom_libs[0]["whl"] = custom_libs[0]["whl"].format(artifacts_bucket=artifacts_bucket)
 
 dag = DAG(
     dag_id=DAG_ID,

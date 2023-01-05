@@ -31,7 +31,7 @@ MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 config_service = ConfigurationService(SOURCE)
 # s3 paths setup
 ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
-ARTIFACTS_S3_BUCKET = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
 
@@ -52,7 +52,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 
 CUSTOM_LIBRARIES = [
     {
-        "whl": f"{ARTIFACTS_S3_BUCKET}/jira-api-client-python/"
+        "whl": f"{artifacts_bucket}/jira-api-client-python/"
         f"quintoandar_jira_api_client-0.2.1-py2.py3-none-any.whl"
     }
 ]

@@ -26,7 +26,7 @@ MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
 config_service = ConfigurationService(SOURCE)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("people_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
@@ -47,7 +47,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 default_libraries = config_service.get_config("default_libraries")
 custom_libraries = [
     {
-        "whl": f"{artifacts_s3_bucket}/convenia-api-client-python/"
+        "whl": f"{artifacts_bucket}/convenia-api-client-python/"
         "quintoandar_convenia_api_client-1.0.0-py2.py3-none-any.whl"
     }
 ]

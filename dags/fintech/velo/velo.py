@@ -27,7 +27,6 @@ ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(SOURCE)
 datalake_bucket = config_service.get_config("datalake_bucket")
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")

@@ -10,7 +10,7 @@ columns_to_read:
         - Cost And Profit Center
         - Revenue and Cost Elements
 cluster_extra_libs:
-        - whl: "{artifacts_s3_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.3.0-py2.py3-none-any.whl"
+        - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.3.0-py2.py3-none-any.whl"
         - pypi:
                   package: "google-api-python-client==2.48.0"
         - pypi:

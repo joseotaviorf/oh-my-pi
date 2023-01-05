@@ -44,7 +44,7 @@ cluster_description = config_service.get_config("databricks_10_4_min_general_clu
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 
 LIBRARIES_DESCRIPTION = config_service.get_config("default_libraries")
-ARTIFACTS_BUCKET = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 GDRIVE_ROOT_FOLDER_ID = config_service.get_config("gdrive_root_folder_id")
 TABLE_NAME = config_service.get_config("table_name")
 COLUMNS_TO_READ = config_service.get_config("columns_to_read")
@@ -54,7 +54,7 @@ libraries_description = [
     *config_service.get_config("cluster_extra_libs"),
 ]
 libraries_description[2]["whl"] = libraries_description[2]["whl"].format(
-    artifacts_s3_bucket=ARTIFACTS_BUCKET
+    artifacts_bucket=artifacts_bucket
 )
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {

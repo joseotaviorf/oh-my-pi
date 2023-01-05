@@ -27,7 +27,7 @@ ENV = os.environ.get("ENVIRONMENT")
 config_service = ConfigurationService(SOURCE)
 default_libraries = config_service.get_config("default_libraries")
 datalake_bucket = config_service.get_config("datalake_bucket")
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
@@ -54,10 +54,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 
 CUSTOM_LIBRARIES = [
-    {
-        "jar": f"{artifacts_s3_bucket}/mysql-connector-java/mysql-connector-java-5.1"
-        f".47.jar"
-    }
+    {"jar": f"{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"}
 ]
 
 dag = DAG(

@@ -25,7 +25,7 @@ config_service = ConfigurationService(SOURCE)
 spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 datalake_bucket = config_service.get_config("datalake_bucket")
 athena_query_result_location = config_service.get_config("athena_query_results_bucket")
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
 
@@ -35,10 +35,7 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 LOGS_OUTPUT_PATH = f"{spark_jobs_logs_path}{DAG_ID}"
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 CUSTOM_LIBRARIES = [
-    {
-        "jar": f"{artifacts_s3_bucket}/mysql-connector-java/mysql-connector-java-5.1"
-        f".47.jar"
-    }
+    {"jar": f"{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"}
 ]
 LIBRARIES_DESCRIPTION = default_libraries + CUSTOM_LIBRARIES
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [

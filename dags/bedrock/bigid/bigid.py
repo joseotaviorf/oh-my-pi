@@ -31,7 +31,6 @@ MAIN_START_DATE = datetime(2021, 10, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
 config_service = ConfigurationService(SOURCE)
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")

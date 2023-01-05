@@ -31,7 +31,7 @@ config_service = ConfigurationService(dag_name=SOURCE)
 partition_cols = config_service.get_config("partition_cols")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
@@ -52,7 +52,7 @@ raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/lo
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 custom_libraries = [
     {
-        "whl": f"{artifacts_s3_bucket}/survicate-api-client-python/"
+        "whl": f"{artifacts_bucket}/survicate-api-client-python/"
         f"quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl"
     }
 ]

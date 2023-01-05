@@ -27,7 +27,7 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 )
 SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
-ARTIFACTS_BUCKET = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 
 PARTITION_COLS = config_service.get_config("partition_cols")
 TABLES_LIST = config_service.get_config("tables_list")
@@ -44,7 +44,7 @@ default_libraries = config_service.get_config("default_libraries")
 
 CUSTOM_LIBRARIES = [
     {
-        "whl": f"{ARTIFACTS_BUCKET}/facebook-api-client-python/"
+        "whl": f"{artifacts_bucket}/facebook-api-client-python/"
         f"quintoandar_facebook_api_client-0.1.2-py2.py3-none-any.whl"
     }
 ]

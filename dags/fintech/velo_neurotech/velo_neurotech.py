@@ -24,7 +24,7 @@ MAIN_START_DATE = datetime(2022, 8, 29, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 config_service = ConfigurationService(SOURCE)
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
@@ -41,7 +41,7 @@ CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_min_general_clu
 default_libraries = config_service.get_config("default_libraries")
 cluster_libs = config_service.get_config("cluster_libs")
 cluster_libs[0]["whl"] = cluster_libs[0]["whl"].format(
-    artifacts_s3_bucket=artifacts_s3_bucket
+    artifacts_bucket=artifacts_bucket
 )
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [

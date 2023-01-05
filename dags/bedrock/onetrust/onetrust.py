@@ -24,7 +24,7 @@ MAIN_START_DATE = datetime(2022, 6, 23, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 
 config_service = ConfigurationService(SOURCE)
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
@@ -41,7 +41,7 @@ CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_min_general_clu
 
 CUSTOM_LIBRARIES = [
     {
-        "whl": f"{artifacts_s3_bucket}/onetrust-api-client-python/"
+        "whl": f"{artifacts_bucket}/onetrust-api-client-python/"
         f"quintoandar_onetrust_api_client-1.0.1-py2.py3-none-any.whl"
     }
 ]

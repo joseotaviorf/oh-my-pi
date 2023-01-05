@@ -33,7 +33,7 @@ config_service = ConfigurationService(SOURCE)
 
 # s3 paths setup
 ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
-ARTIFACTS_S3_BUCKET = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
@@ -51,7 +51,7 @@ default_libraries = config_service.get_config("default_libraries")
 
 CUSTOM_LIBRARIES = [
     {
-        "whl": f"{ARTIFACTS_S3_BUCKET}/gsheets-api-client-python/"
+        "whl": f"{artifacts_bucket}/gsheets-api-client-python/"
         f"quintoandar_gsheets_api_client-0.2.1-py2.py3-none-any.whl"
     }
 ]

@@ -47,7 +47,7 @@ CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 TASK_POOL = "similarweb_pool"
 
 config_service = ConfigurationService(SOURCE)
-artifacts_s3_bucket = config_service.get_config("artifacts_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
@@ -62,6 +62,9 @@ RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 custom_libraries = config_service.get_config("custom_libraries")
+custom_libraries[0]["whl"] = custom_libraries[0]["whl"].format(
+    artifacts_bucket=artifacts_bucket
+)
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
