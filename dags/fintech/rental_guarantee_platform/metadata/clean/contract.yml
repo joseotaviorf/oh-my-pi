@@ -26,12 +26,9 @@ columns:
   id_real_estate:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.realestate
-  contract_number:
+  id_realtor:
     lineage:
-      - datalake_rental_guarantee_platform_raw.contract.number
-  external_ref:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.contract.externalref
+      - datalake_rental_guarantee_platform_raw.contract.realtor
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.active
