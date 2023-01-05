@@ -16,8 +16,6 @@ tables:
     date_filter_column: updated_at
   - table_name: company_user_account_aud
     date_filter_column: created_at
-  - table_name: contract
-    date_filter_column: updated_at
   - table_name: contract_aud
     date_filter_column: created_at
   - table_name: contract_item
@@ -72,8 +70,8 @@ tables:
     date_filter_column: updated_at
   - table_name: bussines_type # here and bellow we have the Velo 3.0 tables.
     date_filter_column: dateupdate
-  #- table_name: contract
-    #date_filter_column: dateupdate
+  - table_name: contract
+    date_filter_column: dateupdate
   #- table_name: contract_status
     #date_filter_column: dateupdate
   - table_name: document_status
