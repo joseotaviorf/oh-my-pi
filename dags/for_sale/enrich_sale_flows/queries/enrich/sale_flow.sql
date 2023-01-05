@@ -102,7 +102,8 @@ ajusted_house AS (
         OR lag_id_user IS NULL)
 ),
 sale_listing_status AS (
-    SELECT  *
+    SELECT  
+        *
     FROM
         datalake_sale_listings.sale_listing_status
     WHERE
@@ -115,7 +116,7 @@ house_info AS (
         h.id_region,
         ts_first_day_as_seller,
         ts_last_day_as_seller,
-        sls.ts_status_started AS ts_first_listing
+        sls.ts_first_publication AS ts_first_listing
     FROM
         ajusted_house AS h
     LEFT JOIN
