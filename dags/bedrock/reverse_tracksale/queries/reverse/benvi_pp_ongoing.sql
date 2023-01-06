@@ -42,7 +42,7 @@ recovery_contracts AS (
 		dw_public.dim_contract AS dc_
 			ON dc_.sk_contract = ft.sk_contract
 	WHERE
-		dc_.country_code= 'BR'
+		dc_.country_code= 'MX'
 		AND DATE(ft.ts_closed_local) = DATE_ADD(CURRENT_DATE(), -10) -- select tickets from Proteção 5A closed 10 days ago
 		AND dc_.status = 'Ativo'
 		AND COALESCE(dc_.dt_start, DATE(dc_.ts_signature)) IN (ADD_MONTHS(CURRENT_DATE(), -6), ADD_MONTHS(CURRENT_DATE(), -12), ADD_MONTHS(CURRENT_DATE(), -18), 
