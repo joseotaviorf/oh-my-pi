@@ -3,9 +3,10 @@ SELECT
   lbc.id_house AS sk_house,
   hslc.consultant_type,
   hslc.first_consultant_type,
-  NULLIF(h.sale_price, 0) AS price,
-  lbc.calculator_price AS predicted_price,
   lbc.status AS status,
+  NULLIF(h.sale_price, 0) AS price,
+  hpp.p_50 AS predicted_price,
+  hpp.certainty AS predicted_price_certainty,
   lbc.status_closing AS closing_status,
   hrs.registration_abandoned_reason,
   lbc.status_reason AS unpublished_reason,
@@ -48,5 +49,9 @@ LEFT JOIN
   datalake_big_agent.house_sale_listing_consultant AS hslc
     ON hslc.id_sale_listing = sl.id_sale_listing
     AND hslc.is_last_ciq_on_listing = True
-WHERE 
+LEFT JOIN 
+    datalake_ebdb_clean.house_predicted_price AS hpp
+      ON hpp.id_house = lbc.id_house
+      AND hpp.business_context = 'SALE'
+WHERE  
   lbc.business_context = 'SALE'
