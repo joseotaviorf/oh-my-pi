@@ -1,16 +1,17 @@
 select
     id,
     external_id as id_external,
-    accrual_year_month, 
-    due_year_month,
+    invoice_id as id_invoice,
+    contract_id as id_contract,
     from_account_id as id_from_account,
     to_account_id as id_to_account,
-    invoice_id as id_invoice,
+    reversed_entry_external_id as id_external_reversed_entry,
     amount,
     bill_item,
     description,
     producer,
-    timestamp(created_at) as ts_created,
-    contract_id as id_contract
+    accrual_year_month, 
+    due_year_month,
+    timestamp(created_at) as ts_created
 from
     datalake_retsuko_raw.entry
