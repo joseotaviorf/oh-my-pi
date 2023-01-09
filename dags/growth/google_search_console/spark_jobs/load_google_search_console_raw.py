@@ -88,9 +88,6 @@ if __name__ == "__main__":
 
     spark_client = SparkClient()
 
-    maxRows = 25000  # Maximum 25K per call
-    numRows = 0  # Start at Row Zero
-    finished = False  # Initialize status of extraction
 
     schema = StructType(
         [
@@ -105,6 +102,9 @@ if __name__ == "__main__":
     dfs = []
     for site_url in site_url_list:
         for type in query_request_body["type_list"]:
+            maxRows = 25000  # Maximum 25K per call
+            numRows = 0  # Start at Row Zero
+            finished = False # Initialize status of extraction
             while not finished:  # As long as data have not been fully extracted.
                 request_body = {
                     "startDate": load_start_date,
