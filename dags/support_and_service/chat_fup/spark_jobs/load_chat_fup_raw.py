@@ -11,7 +11,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-JOB_NAME = "load_chat_fup_into_datalake"
+JOB_NAME = "load_chat_fup_raw"
 SOURCE = "chat_fup"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
