@@ -1,4 +1,5 @@
 ---
 custom_cluster:
-  node_type_id: m5.4xlarge
+  driver_node_type_id: m5a.xlarge
+  node_type_id: m5a.xlarge
   num_workers: 2
