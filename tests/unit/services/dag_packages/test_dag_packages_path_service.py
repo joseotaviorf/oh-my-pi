@@ -3,7 +3,6 @@ from unittest.mock import Mock
 import mock
 import pytest
 
-from bietlejuice import BIETLEJUICE_PROJECT_ROOT
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
 
@@ -44,10 +43,7 @@ class TestDAGPackagesPathService:
 
     @pytest.mark.parametrize(
         "dag_name, is_migrated_mock, expected_return",
-        [
-            ("dag1", False, f"{BIETLEJUICE_PROJECT_ROOT}/dags"),
-            ("dag2", True, "new/path/mocked"),
-        ],
+        [("dag1", True, "new/path/mocked")],
     )
     @mock.patch.object(DAGPackagesPathService, "_get_dag_package_path")
     def test_get_dag_parent_path(
@@ -71,10 +67,7 @@ class TestDAGPackagesPathService:
 
     @pytest.mark.parametrize(
         "dag_name, dag_path, expected_return",
-        [
-            ("dag1", None, f"{BIETLEJUICE_PROJECT_ROOT}/dags/dag1"),
-            ("dag2", "new/path/mocked", "new/path/mocked"),
-        ],
+        [("dag1", "new/path/mocked", "new/path/mocked")],
     )
     @mock.patch.object(DAGPackagesPathService, "_get_dag_package_path")
     def test_get_dag_path(
@@ -86,12 +79,7 @@ class TestDAGPackagesPathService:
         dag_package_service,
     ):
         # arrange
-        if dag_path is None:
-            mock_get_dag_package_path.return_value = (
-                f"{BIETLEJUICE_PROJECT_ROOT}/dags/{dag_name}"
-            )
-        else:
-            mock_get_dag_package_path.return_value = dag_path
+        mock_get_dag_package_path.return_value = dag_path
 
         # act
         returned_value = dag_package_service.get_dag_path(dag_name)

@@ -121,16 +121,10 @@ class DAGMetadataService:
         :return: tuple with source, context, and dag name
         """
         # TODO: remove after dag packages migration finishes.
-        match = re.search(self._DAG_PATH_REGEX, dag_path).groupdict()
+        match = re.search(self._DAG_PACKAGE_REGEX, dag_path).groupdict()
         source = match["source"]
         context = match["context"]
         dag = match["dag"]
-
-        if DAGPackagesPathService._is_dag_in_legacy_structure(dag_name=dag):
-            match = re.search(self._DAG_PACKAGE_REGEX, dag_path).groupdict()
-            source = match["source"]
-            context = match["context"]
-            dag = match["dag"]
 
         if not context:
             context = source
