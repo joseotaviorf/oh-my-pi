@@ -12,7 +12,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 from quintoandar_logger import QuintoAndarLogger
 
-JOB_NAME = "load_greenseer_into_datalake"
+JOB_NAME = "load_greenseer_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)

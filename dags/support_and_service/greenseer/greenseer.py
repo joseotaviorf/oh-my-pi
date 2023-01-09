@@ -37,7 +37,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 # s3 paths setup
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
-raw_spark_job_path = s3_prefix + f"/spark_jobs/{SOURCE}/load_greenseer_into_datalake.py"
+raw_spark_job_path = s3_prefix + f"/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
