@@ -1,4 +1,4 @@
-select
+SELECT
     our_number
-from
+FROM
     datalake_vans_raw.boletoournumbercounter

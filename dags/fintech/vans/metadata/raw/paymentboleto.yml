@@ -1,0 +1,7 @@
+database_name: datalake_vans_raw
+table_name: paymentboleto
+columns:
+  payee_name:
+    tags:
+      - PII
+      - Confidential

@@ -1,22 +1,22 @@
-select
+SELECT
     id,
-    related_document_id as id_related_document,
+    related_document_id AS id_related_document,
     due_amount,
-    due_date as dt_dued, 
-    timestamp(issue_date_time) as ts_issued,
+    due_date AS dt_dued,
+    timestamp(issue_date_time) AS ts_issued,
     company_use,
     our_number,
     occurrence_code,
-    sha2(payee_name,256) as payee_name, 
-    sha2(payee_document,256) as payee_document,
-    sha2(payee_agency,256) as payee_agency,
-    sha2(payee_account,256) as payee_account,
-    boolean(payee_savings_acc) as has_payee_savings_acc,
-    payee_bank_code, 
-    timestamp(created_at) as ts_created,
-    timestamp(updated_at) as ts_updated,
+    payee_name,
+    payee_document,
+    payee_agency,
+    payee_account,
+    boolean(payee_savings_acc) AS has_payee_savings_acc,
+    payee_bank_code,
+    timestamp(created_at) AS ts_created,
+    timestamp(updated_at) AS ts_updated,
     status,
-    paid_at as dt_paid,
+    paid_at AS dt_paid,
     requested_by,
     related_document_type,
     original_response,
@@ -25,6 +25,6 @@ select
     bank_payment_code,
     type,
     style,
-    bank_payment_id as id_bank_payment    
-from
+    bank_payment_id AS id_bank_payment
+FROM
     datalake_vans_raw.payment

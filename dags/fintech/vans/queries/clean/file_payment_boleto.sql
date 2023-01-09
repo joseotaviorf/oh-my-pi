@@ -1,5 +1,5 @@
-select
-    file_id as id_file,
-    payment_boleto_id as id_payment_boleto
-from
+SELECT
+    file_id AS id_file,
+    payment_boleto_id AS id_payment_boleto
+FROM
     datalake_vans_raw.file_paymentboleto

@@ -1,7 +1,7 @@
-select
+SELECT
     id,
     name,
     acronym,
     code
-from
+FROM
     datalake_vans_raw.bank

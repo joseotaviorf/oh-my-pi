@@ -1,9 +1,9 @@
-select
+SELECT
     id,
-    bank_id as id_bank,
-    sha2(agency,256) as agency,
-    sha2(account,256) as account, 
-    boolean(active) as is_active,
-    sha2(account_digit,256) as account_digit
-from
+    bank_id AS id_bank,
+    agency,
+    account,
+    boolean(active) AS is_active,
+    account_digit
+FROM
     datalake_vans_raw.bankboleto
