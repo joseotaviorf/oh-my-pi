@@ -38,7 +38,7 @@ SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 
 LOGS_OUTPUT_PATH = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
 default_libraries = config_service.get_config("default_libraries")
-cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
+cluster_description = config_service.get_config("custom_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
