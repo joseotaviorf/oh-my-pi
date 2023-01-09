@@ -1,4 +1,13 @@
 ---
+custom_cluster:
+  driver_node_type_id: m5a.2xlarge
+  node_type_id: m5a.xlarge
+  autoscale:
+    max_workers: 3
+    min_workers: 1
+spark_conf:
+  spark.driver.memory: "16g"
+  spark.driver.memoryOverhead: "10g"
 clean_partition_cols: ["year", "month", "day"]
 subscriptions:
   sale_offer: "domainSaleOffer-audit-data-engineering-subscription"
