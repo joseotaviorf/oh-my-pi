@@ -250,7 +250,7 @@ class CrossDAGDependenciesValidator:
         """
         dag_pacakge_path = DAGPackagesPathService.get_dag_path(dag_name)
         # DAGs declared in YAML
-        dag_yaml_file = join(dag_pacakge_path, f"{dag_name}_declaration.yaml")
+        dag_yaml_file = join(dag_pacakge_path, f"{dag_name}_declaration.yml")
         # DAGs declared in Python
         dag_python_file = join(dag_pacakge_path, f"{dag_name}.py")
         # Metrics DAGs
