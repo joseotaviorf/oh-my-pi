@@ -1,0 +1,33 @@
+database_name: datalake_property_tax_clean
+table_name: tax_report
+columns:
+  id:
+    lineage:
+      - datalake_property_tax_raw.tax_report.id
+  id_contract_ebdb:
+    lineage:
+      - datalake_property_tax_raw.tax_report.contract_id
+  id_house_ebdb:
+    lineage:
+      - datalake_property_tax_raw.tax_report.house_external_id
+  status:
+    lineage:
+      - datalake_property_tax_raw.tax_report.status
+  last_year_amount:
+    lineage:
+      - datalake_property_tax_raw.tax_report.last_year_amount
+  ts_created:
+    lineage:
+      - datalake_property_tax_raw.tax_report.created_at
+  ts_updated:
+    lineage:
+      - datalake_property_tax_raw.tax_report.updated_at
+  year:
+    lineage:
+      - datalake_property_tax_raw.tax_report.year
+  month:
+    lineage:
+      - datalake_property_tax_raw.tax_report.month
+  day:
+    lineage:
+      - datalake_property_tax_raw.tax_report.day

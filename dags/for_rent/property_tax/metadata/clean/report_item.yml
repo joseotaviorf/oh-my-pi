@@ -1,0 +1,36 @@
+database_name: datalake_property_tax_clean
+table_name: report_item
+columns:
+  id:
+    lineage:
+      - datalake_property_tax_raw.report_item.id
+  id_report_version:
+    lineage:
+      - datalake_property_tax_raw.report_item.report_version_id
+  id_external_document:
+    lineage:
+      - datalake_property_tax_raw.report_item.document_external_id
+  description:
+    lineage:
+      - datalake_property_tax_raw.report_item.description
+  value:
+    lineage:
+      - datalake_property_tax_raw.report_item.value
+  installments:
+    lineage:
+      - datalake_property_tax_raw.report_item.installments
+  is_finished:
+    lineage:
+      - datalake_property_tax_raw.report_item.finished
+  ts_created:
+    lineage:
+      - datalake_property_tax_raw.report_item.created_at
+  year:
+    lineage:
+      - datalake_property_tax_raw.report_item.year
+  month:
+    lineage:
+      - datalake_property_tax_raw.report_item.month
+  day:
+    lineage:
+      - datalake_property_tax_raw.report_item.day
