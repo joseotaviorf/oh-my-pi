@@ -150,20 +150,6 @@ pipeline:
     group: export
     image: plugins/s3
     pull: true
-    bucket: 5a-artifacts
-    source: dist/*.whl
-    target: bi-etl-ejuice/
-    strip_prefix: dist/
-    acl: bucket-owner-full-control
-    cache_control: no-cache
-    when:
-      event: [push, tag]
-      branch: [master, hotfix/*]
-
-  export-releases-to-s3-new-prod-account:
-    group: export
-    image: plugins/s3
-    pull: true
     bucket: artifacts.s3.data.quintoandar.com.br
     source: dist/*.whl
     target: bi-etl-ejuice/
@@ -206,20 +192,6 @@ pipeline:
     group: export
     image: plugins/s3
     pull: true
-    bucket: 5a-artifacts
-    source: scripts/init_script.sh
-    target: bi-etl-ejuice/
-    strip_prefix: scripts/
-    acl: bucket-owner-full-control
-    cache_control: no-cache
-    when:
-      event: [push, tag]
-      branch: [master, hotfix/*]
-
-  export-init-script-to-s3-new-prod-account:
-    group: export
-    image: plugins/s3
-    pull: true
     bucket: artifacts.s3.data.quintoandar.com.br
     source: scripts/init_script.sh
     target: bi-etl-ejuice/
@@ -231,7 +203,7 @@ pipeline:
       branch: [master, hotfix/*]
 
   load-dags-composer-forno:
-    group: update_jobs
+    group: upload
     image: quintoandar/drone-gcs-sync
     pull: true
     bucket: us-east4-airflow-forno2-7f52154d-bucket
@@ -247,7 +219,7 @@ pipeline:
       branch: [forno]
 
   load-dags-composer-prod:
-    group: update_jobs
+    group: upload
     image: quintoandar/drone-gcs-sync
     pull: true
     bucket: us-east4-airflow-prod2-fdaf9748-bucket
@@ -262,8 +234,8 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
-  load-dag-packages-composer-forno:
-    group: update_jobs
+  upload-dag-packages-dags-gcs-forno:
+    group: upload
     image: quintoandar/drone-gcs-sync
     pull: true
     bucket: us-east4-airflow-forno2-7f52154d-bucket
@@ -278,8 +250,8 @@ pipeline:
       event: push
       branch: [forno]
 
-  load-dag-packages-composer-prod:
-    group: update_jobs
+  upload-dag-packages-dags-gcs-prod:
+    group: upload
     image: quintoandar/drone-gcs-sync
     pull: true
     bucket: us-east4-airflow-prod2-fdaf9748-bucket
@@ -294,18 +266,8 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
-  load-spark-jobs-s3-forno:
-    group: update_jobs
-    image: python:3.7.3
-    commands:
-      - pip install boto3==1.24.0
-      - python scripts/ci_cd/upload_spark_jobs_to_s3.py 5a-databricks-forno
-    when:
-      event: push
-      branch: forno
-
   upload-dag-packages-spark-jobs-s3-forno:
-    group: update_jobs
+    group: upload
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
@@ -314,28 +276,8 @@ pipeline:
       event: push
       branch: forno
 
-  load-spark-jobs-s3-new-forno-account:
-    group: update_jobs
-    image: python:3.7.3
-    commands:
-      - pip install boto3==1.24.0
-      - python scripts/ci_cd/upload_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
-    when:
-      event: push
-      branch: forno
-
-  load-spark-jobs-s3-prod:
-    group: update_jobs
-    image: python:3.7.3
-    commands:
-      - pip install boto3==1.24.0
-      - python scripts/ci_cd/upload_spark_jobs_to_s3.py 5a-databricks
-    when:
-      event: push
-      branch: [master, hotfix/*]
-
   upload-dag-packages-spark-jobs-s3-prod:
-    group: update_jobs
+    group: upload
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
@@ -344,18 +286,8 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
-  load-spark-jobs-s3-new-prod-account:
-    group: update_jobs
-    image: python:3.7.3
-    commands:
-      - pip install boto3==1.24.0
-      - python scripts/ci_cd/upload_spark_jobs_to_s3.py databricks.s3.data.quintoandar.com.br
-    when:
-      event: push
-      branch: [master, hotfix/*]
-
   upload-dag-packages-queries-s3-forno:
-    group: update_jobs
+    group: upload
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
@@ -365,7 +297,7 @@ pipeline:
       branch: forno
 
   upload-dag-packages-queries-s3-prod:
-    group: update_jobs
+    group: upload
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
@@ -375,7 +307,7 @@ pipeline:
       branch: [master, hotfix/*]
 
   upload-dag-packages-data-quality-s3-forno:
-    group: update_jobs
+    group: upload
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
@@ -385,7 +317,7 @@ pipeline:
       branch: forno
 
   upload-dag-packages-data-quality-s3-prod:
-    group: update_jobs
+    group: upload
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
@@ -395,7 +327,7 @@ pipeline:
       branch: [master, hotfix/*]
 
   load-atlas-metadata-files-to-s3-forno:
-    group: update_jobs
+    group: upload
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 PyYAML==5.1
@@ -405,7 +337,7 @@ pipeline:
       branch: forno
 
   load-atlas-metadata-files-to-s3-prod:
-    group: update_jobs
+    group: upload
     image: python:3.7.3
     commands:
       - pip install boto3==1.24.0 PyYAML==5.1
@@ -415,7 +347,7 @@ pipeline:
       branch: [master, hotfix/*]
 
   load-all-metadata-files-information-to-s3-forno:
-    group: update_jobs
+    group: upload
     image: python:3.7.3
     environment:
       ENVIRONMENT: forno
@@ -427,7 +359,7 @@ pipeline:
       branch: forno
 
   load-all-metadata-files-information-to-s3-prod:
-    group: update_jobs
+    group: upload
     image: python:3.7.3
     environment:
       ENVIRONMENT: prod

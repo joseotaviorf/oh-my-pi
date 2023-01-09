@@ -1,8 +1,5 @@
 #! /bin/bash
 
-# This script is used for initializing clusters dependencies in Databricks
-# and it is manually placed inside 5a-artifacts/bi-etl-ejuice
-
 echo "BEGIN: Modify Spark config settings"
 apt-get install maven -yqq
 
