@@ -30,7 +30,7 @@ default_libraries = config_service.get_config("default_libraries")
 
 # s3 paths setup
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
-raw_spark_job_path = s3_prefix + f"/spark_jobs/{SOURCE}/load_bigfone_into_datalake.py"
+raw_spark_job_path = s3_prefix + f"/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 
 # databricks var

@@ -12,7 +12,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 SOURCE = "bigfone"
-JOB_NAME = "load_bigfone_into_datalake"
+JOB_NAME = "load_bigfone_raw"
 ALLOW_LIST_FULL = ["Call", "Queued"]
 ALLOW_LIST_INCREMENTAL = ["Event"]
 
