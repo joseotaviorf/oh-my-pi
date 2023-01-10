@@ -93,7 +93,7 @@ enrich_task_groups = {}
 
 for table in tables:
     is_incremental = table in incremental_tables
-    partitions = partition_cols if table in incremental_tables else None
+    partitions = partition_cols[table] if table in partition_cols else None
     enrich_task_groups[table] = datalake_task_groups.build_enrich_task_group(
         table_name=table,
         source_database_base_name=CONTEXT,
@@ -101,13 +101,6 @@ for table in tables:
         is_incremental=is_incremental,
         partitions=partitions,
     )
-
-# enrich_task_groups = datalake_task_groups.build_task_group_from_sql_files(
-#     layer=LayerEnum.ENRICH,
-#     source_database_base_name=CONTEXT,
-#     target_database_base_name=CONTEXT,
-# )
-
 
 (
     task_groups_boundaries_without_inner_dependencies,

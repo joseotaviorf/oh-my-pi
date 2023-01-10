@@ -7,6 +7,4 @@ inner_dependencies:
 incremental_tables:
   - tracking_weekly_changes
 partition_cols:
-  - year
-  - month
-  - day
+  tracking_weekly_changes: ["year", "month", "day"]
