@@ -2650,8 +2650,12 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
 
 bietlejuice.metric_rent__contracts:
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-public-dim-contract
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+  - bietlejuice.dw_offer:load-dw-public-dim-offer
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
 
 bietlejuice.metric_rent__listings:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing

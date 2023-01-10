@@ -1,0 +1,6 @@
+---
+table_name: metric_rent.new_tenant_prospect_to_contract_signed_4w
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  month:
+    is_unique:
