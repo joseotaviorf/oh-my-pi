@@ -8,6 +8,7 @@ layer1 AS (
         dt_created,
         device_category,
         google_property,
+        site_url,
         page,
         query,
         REGEXP_EXTRACT(page, '.*ar\/imovel\/(.*\-brasil).*$') AS regiao_busca,
@@ -316,6 +317,7 @@ layer2 AS (
         street_abbreviations,
         tipo_poi,
         google_property,
+        site_url,
         page,
         CASE
             WHEN estruturas = 'Informacional' THEN 'n/a'
@@ -453,6 +455,7 @@ SELECT
     country,
     google_property,
     query,
+    site_url,
     page,
     branded,
     cluster_de_paginas AS page_cluster,
@@ -497,6 +500,7 @@ SELECT
     lp_sem_filtro AS lp_wo_filter,
     position,
     impressions,
+    position*impressions AS posimp,
     clicks,
     ctr,
     dt_created,
@@ -505,4 +509,4 @@ SELECT
     day
 FROM
     layer2
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34

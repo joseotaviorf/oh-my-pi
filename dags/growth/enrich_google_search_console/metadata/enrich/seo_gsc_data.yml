@@ -13,6 +13,9 @@ columns:
     query:
       lineage:
         - datalake_google_search_console_clean.url_by_page.query
+    site_url:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.site_url
     page:
       lineage:
         - datalake_google_search_console_clean.url_by_page.page
@@ -79,6 +82,10 @@ columns:
     impressions:
       lineage:
         - datalake_google_search_console_clean.url_by_page.impressions
+    posimp:
+      lineage:
+        - datalake_google_search_console_clean.url_by_page.impressions
+        - datalake_google_search_console_clean.url_by_page.position
     clicks:
       lineage:
         - datalake_google_search_console_clean.url_by_page.clicks
