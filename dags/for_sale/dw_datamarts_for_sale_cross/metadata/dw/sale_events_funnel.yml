@@ -55,7 +55,7 @@ columns:
       - dw_sale.fact_sale_flows.higher_intent_after_offer
   hub_visit:
     lineage:
-      - datalake_hub_services_clean.business_unit.hub_name
+      - datalake_sale_visit_hubs.sale_visit_hubs.hub_name
   hub_offer:
     lineage:
       - dw_sale.dim_offer.business_unit
