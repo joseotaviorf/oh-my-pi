@@ -8,6 +8,7 @@ SELECT
   hpp.p_50 AS predicted_price,
   hpp.certainty AS predicted_price_certainty,
   lbc.status_closing AS closing_status,
+  COALESCE(ssl.stranded_status, 'NA') AS stranded_status, 
   hrs.registration_abandoned_reason,
   lbc.status_reason AS unpublished_reason,
   lbc.short_url,
@@ -53,5 +54,9 @@ LEFT JOIN
     datalake_ebdb_clean.house_predicted_price AS hpp
       ON hpp.id_house = lbc.id_house
       AND hpp.business_context = 'SALE'
-WHERE  
+LEFT JOIN
+  datalake_sale_stranded_listings.stranded_status AS ssl
+    ON ssl.id_sale_listing = sl.id_sale_listing
+    AND ssl.is_last_status = True
+WHERE 
   lbc.business_context = 'SALE'

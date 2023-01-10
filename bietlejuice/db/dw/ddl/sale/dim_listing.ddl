@@ -9,6 +9,7 @@ CREATE TABLE sale.dim_listing (
 	predicted_price BIGINT,
 	predicted_price_certainty VARCHAR,
 	closing_status VARCHAR,
+	stranded_status VARCHAR,
 	registration_abandoned_reason VARCHAR,
 	unpublished_reason VARCHAR,
 	short_url VARCHAR,
