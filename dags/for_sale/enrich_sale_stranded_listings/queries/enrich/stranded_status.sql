@@ -112,35 +112,40 @@ In this CTE, we import all thresholds present in the other table,
 as well as apply logic to check which listings are stranded in each category.
 */
     SELECT 
-        id_sale_listing,
-        id_house,
-        id_region,
-        id_first_publication_date,
-        id_date, 
-        ongoing_days_published,
+        ol.id_sale_listing,
+        ol.id_house,
+        ol.id_region,
+        ol.id_first_publication_date,
+        ol.id_date, 
+        ol.ongoing_days_published,
         CASE
-            WHEN first_visit IS NULL AND ongoing_days_published >= threshold_first_visit THEN TRUE
-            WHEN first_visit IS NOT NULL AND id_date < first_visit AND ongoing_days_published >= threshold_first_visit THEN TRUE
+            WHEN ol.first_visit IS NULL AND ol.ongoing_days_published >= t.threshold_first_visit THEN TRUE
+            WHEN ol.first_visit IS NOT NULL AND ol.id_date < ol.first_visit AND ol.ongoing_days_published >= t.threshold_first_visit THEN TRUE
             ELSE false
         END AS visit_stranded_check,
         CASE
-            WHEN first_offer IS NULL AND ongoing_days_published >= threshold_first_offer THEN TRUE
-            WHEN first_offer IS NOT NULL AND id_date < first_offer AND ongoing_days_published >= threshold_first_offer THEN TRUE
+            WHEN ol.first_offer IS NULL AND ol.ongoing_days_published >= t.threshold_first_offer THEN TRUE
+            WHEN ol.first_offer IS NOT NULL AND ol.id_date < ol.first_offer AND ol.ongoing_days_published >= t.threshold_first_offer THEN TRUE
             ELSE false
         END AS offer_stranded_check,
         CASE
-            WHEN first_visit IS NOT NULL AND DATEDIFF(date, TO_DATE(CAST(lag_visits AS STRING), 'yyyyMMdd')) >= threshold_recurrence_visit THEN TRUE
+            WHEN ol.first_visit IS NOT NULL AND DATEDIFF(date, TO_DATE(CAST(ol.lag_visits AS STRING), 'yyyyMMdd')) >= t.threshold_recurrence_visit THEN TRUE
             ELSE FALSE
         END AS visit_stranded_recurrence_check,
         CASE
-            WHEN first_offer IS NOT NULL AND DATEDIFF(date, TO_DATE(CAST(lag_offers AS STRING), 'yyyyMMdd')) >= threshold_recurrence_offer THEN TRUE
+            WHEN ol.first_offer IS NOT NULL AND DATEDIFF(date, TO_DATE(CAST(ol.lag_offers AS STRING), 'yyyyMMdd')) >= t.threshold_recurrence_offer THEN TRUE
             ELSE FALSE
         END AS offer_stranded_recurrence_check
     FROM 
-        ongoing_listings
+        ongoing_listings AS ol
     LEFT JOIN 
         datalake_sale_stranded_listings.thresholds AS t
-            USING(bedrooms_price_bins, city_group, bins_order, month_start)
+            ON ol.bedrooms_price_bins = t.bedrooms_price_bins
+            AND ol.city_group = t.city_group
+            AND ol.bins_order = t.bins_order
+            AND ol.month_start = t.month_start
+    QUALIFY 
+        MAX(t.month_start) OVER (PARTITION BY 1) >= ol.month_start
 ),
 apply_hierarchy AS (
 /*
