@@ -143,7 +143,7 @@ JOIN dim_region dr
 JOIN dim_booking AS db
     ON db.sk_booking = fv.sk_booking
 LEFT JOIN 
-	datalake_hub_services_clean.business_unit AS hs
+	datalake_hub_services_clean_prod.business_unit AS hs
 		ON hs.id = fv.sk_business_unit
 ),
 sale_bookings AS (
