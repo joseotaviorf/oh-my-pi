@@ -110,12 +110,6 @@ SKIP_LIST = {
         "sale_performance_marketing_metrics_supply_coincident",
         "unique_performance_marketing_metrics_supply_coincident",
     },
-    "dw_datamarts/support_and_service": {
-        "house_media",
-        "customer_sessions_resolution",
-        "repressed_demand_booking_fit_in",
-        "ongoing_refund_requests",
-    },
     "dw_datamarts/for_sale": {
         "repressed_demand_sale",
         "neighborhood_competition",
@@ -186,6 +180,7 @@ def get_info(file_path):
 
     context = match_dict.get("context")
     return context, dag_name
+
 
 def main():
     parser = argparse.ArgumentParser()

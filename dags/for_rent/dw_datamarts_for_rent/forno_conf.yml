@@ -43,3 +43,7 @@ pipeline:
     dw:
       <<: *redshift_anchor
       table: datamart_cohort_rentals
+  repressed_demand_booking_fit_in:
+    dw:
+      <<: *redshift_anchor
+      table: repressed_demand_booking_fit_in

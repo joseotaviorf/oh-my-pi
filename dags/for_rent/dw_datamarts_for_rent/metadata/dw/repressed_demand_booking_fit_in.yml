@@ -1,5 +1,5 @@
 ---
-database_name: dw_datamarts_support_and_service
+database_name: dw_datamarts_for_rent
 table_name: repressed_demand_booking_fit_in
 columns:
   region_code:
