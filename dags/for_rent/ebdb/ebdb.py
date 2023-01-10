@@ -2,7 +2,6 @@ import os
 from datetime import datetime, timedelta
 from pendulum import timezone
 
-import pendulum
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -104,7 +103,7 @@ def clean_tasks(table_name):
                 "parameters": [
                     ENV,
                     athena_query_results_bucket,
-                    "clean",
+                    LayerEnum.CLEAN.value,
                     datalake_bucket,
                     SOURCE,
                     "--tables",
@@ -193,7 +192,7 @@ def build_raw_task_list():
                 "parameters": [
                     ENV,
                     athena_query_results_bucket,
-                    "raw",
+                    LayerEnum.RAW.value,
                     datalake_bucket,
                     SOURCE,
                     "--all",
@@ -313,7 +312,7 @@ propagate_table_lineage_task = QuintoAndarDatabricksSubmitRunOperator(
 )
 
 raw_task_list = build_raw_task_list()
-clean_task_list = build_layer_task_list("clean")
+clean_task_list = build_layer_task_list(LayerEnum.CLEAN.value)
 
 # create-cluster >> downstream
 create_cluster_task >> [task_list_first_task(raw_task_list), polygon_region_raw_task]
@@ -353,7 +352,7 @@ contract_model_dependencies.extend(task_list_last_tasks(clean_task_list.pop("lea
 
 # Data Quality tests for raw
 tb_names = DAGPackagesPathService.list_data_quality_tests_files_in_composer(
-    dag_name=SOURCE, layer="raw"
+    dag_name=SOURCE, layer=LayerEnum.RAW.value
 )
 
 for tb_name in tb_names:
@@ -371,7 +370,7 @@ for tb_name in tb_names:
                     ENV,
                     "{{ ds }}",
                     inmetro_bucket,
-                    "raw",
+                    LayerEnum.RAW.value,
                     SOURCE,
                     tb_name,
                     intermediate_path,
