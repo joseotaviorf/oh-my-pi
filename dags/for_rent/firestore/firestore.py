@@ -49,8 +49,6 @@ RAW_SPARK_JOB_FILE = (
 
 # cluster setup
 cluster_description = config_service.get_config("custom_cluster")
-extra_spark_conf = config_service.get_config("spark_conf")
-cluster_description["spark_conf"].update(extra_spark_conf)
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
