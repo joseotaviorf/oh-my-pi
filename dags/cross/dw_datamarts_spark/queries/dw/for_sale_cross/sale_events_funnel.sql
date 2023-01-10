@@ -128,7 +128,7 @@ SELECT
     fv.sk_offer,
     fv.sk_booking,
     fv.is_hub_flow,
-	sv.business_unit AS hub_visit,
+	hs.hub_name AS hub_visit,
     dr.city_group,
 	COALESCE(db.is_3p_demand, FALSE) AS is_3p_demand,
 	COALESCE(db.partner_3p_demand, '') AS demand_3p_partner,
@@ -136,20 +136,16 @@ SELECT
 	COALESCE(db.partner_3p_supply, '') AS supply_3p_partner,
     DATE(NULLIF(CONCAT(SUBSTRING(CAST(fv.sk_booking_created_date AS VARCHAR(8)), 1, 4), '-', SUBSTRING(CAST(fv.sk_booking_created_date AS VARCHAR(8)), 5, 2), '-', SUBSTRING(CAST(fv.sk_booking_created_date AS VARCHAR(8)), 7, 2)), -1)) AS dt_created,
     DATE(NULLIF(CONCAT(SUBSTRING(CAST(fv.sk_visit_completed_date AS VARCHAR(8)), 1, 4), '-', SUBSTRING(CAST(fv.sk_visit_completed_date AS VARCHAR(8)), 5, 2), '-', SUBSTRING(CAST(fv.sk_visit_completed_date AS VARCHAR(8)), 7, 2)), -1)) AS dt_completed,
-    ROW_NUMBER() OVER (PARTITION BY fv.sk_booking ORDER BY COALESCE(bur.dt_coverage_ended,current_date) DESC ) AS order_booking
+    ROW_NUMBER() OVER (PARTITION BY fv.sk_booking ORDER BY COALESCE(hs.ts_updated,current_date) DESC ) AS order_booking
 FROM
     dw_sale.fact_visits fv
 JOIN dw_public.dim_region dr
     ON fv.sk_region = dr.sk_region
 JOIN dw_public.dim_booking AS db
     ON db.sk_booking = fv.sk_booking
-LEFT JOIN dw_sale.fact_business_unit_region bur
-	ON bur.sk_region = fv.sk_region
-	AND DATE(CONCAT(SUBSTRING(CAST(fv.sk_booking_created_date AS VARCHAR(8)), 1, 4), '-', SUBSTRING(CAST(fv.sk_booking_created_date AS VARCHAR(8)), 5, 2), '-', SUBSTRING(CAST(fv.sk_booking_created_date AS VARCHAR(8)), 7, 2))) BETWEEN DATE (bur.dt_coverage_started) 
-	AND DATE(COALESCE(bur.dt_coverage_ended, current_date))
 LEFT JOIN 
-	datalake_sale_visit_hubs.sale_visit_hubs AS sv
-		ON sv.id_booking = fv.sk_booking
+	datalake_hub_services_clean.business_unit AS hs
+		ON hs.id = fv.sk_business_unit
 ),
 sale_bookings AS (
 SELECT 
@@ -389,8 +385,8 @@ SELECT
     CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
     rbh.partner AS supply_3pbh_partner,
     CASE
-        WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Porto Alegre','Campinas') THEN 'Out of coverage area'
-        WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro','Porto Alegre','Campinas') THEN COALESCE(sdr.city_group,sdc.city_group)
+        WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN 'Out of coverage area'
+        WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN COALESCE(sdr.city_group,sdc.city_group)
     END AS city_group,
     sdc.form_of_payment,
 	sdc.dt_offer_sent,
