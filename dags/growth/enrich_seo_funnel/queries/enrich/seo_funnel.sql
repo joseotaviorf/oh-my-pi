@@ -206,6 +206,7 @@ seo_funnel AS (
         MAX(is_first_booking) AS is_first_booking
     FROM 
         aux_funnel AS t
+    WHERE t.entrance_uri IS NOT NULL
     GROUP BY 1,2,3,4,5,6,7,8,9
 )
 SELECT
@@ -407,8 +408,8 @@ SELECT
         ELSE 'Other'   
     END AS filter_1,
     CASE 
-        WHEN referrer LIKE '%google%' OR referrer LIKE '%bing%'THEN FALSE 
-        ELSE FALSE
+        WHEN referrer LIKE '%google%' OR referrer LIKE '%bing%' THEN FALSE 
+        ELSE TRUE
     END AS is_attribution,
     is_tof,
     is_booking,
