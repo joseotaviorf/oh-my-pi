@@ -73,7 +73,7 @@ def _load_table_data(raw_table_name, table_details):
 
 
 DATABRICKS_SCOPE = "quintoandar"
-JOB_NAME = "load_repairs_into_datalake"
+JOB_NAME = "load_repairs_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
