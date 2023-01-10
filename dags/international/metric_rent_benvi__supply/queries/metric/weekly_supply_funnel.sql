@@ -42,6 +42,7 @@ supply_funnel_targets AS (
         END AS mexico_channel,
         SUM(CAST(NULLIF(top_of_funnel,'') AS REAL)) AS leads_targets,
         SUM(CAST(NULLIF(prospects,'') AS REAL)) AS prospects_targets,
+        SUM(CAST(NULLIF(available_qualifieds, '') AS REAL)) AS available_qualifieds_targets,
         SUM(CAST(NULLIF(qualifieds,'') AS REAL)) AS qualifieds_targets,
         SUM(CAST(NULLIF(opportunities,'') AS REAL)) AS opportunities_targets,
         SUM(CAST(NULLIF(first_listings,'') AS REAL)) AS first_listings_targets,
@@ -51,7 +52,7 @@ supply_funnel_targets AS (
     WHERE
         DATE_TRUNC('week', DATE(dt_target)) <= DATE_ADD(CURRENT_DATE, -1) 
         AND supply_origin NOT IN ('Crawlers classifieds', 'Price Calculator')
-    GROUP BY 1, 2, 3, 4, 10
+    GROUP BY 1, 2, 3, 4, 11
 ),
 supply_budget_targets AS (
     SELECT 
@@ -212,6 +213,7 @@ SELECT
     -- Actual volume targets
     sft.leads_targets,
     sft.prospects_targets,
+    sft.available_qualifieds_targets,
     sft.qualifieds_targets,
     sft.opportunities_targets,
     sft.first_listings_targets,

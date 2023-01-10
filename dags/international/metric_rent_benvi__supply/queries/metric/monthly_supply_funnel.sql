@@ -53,6 +53,7 @@ supply_funnel_targets AS (
         END AS supply_mkt_origin_detailed,
         SUM(CAST(NULLIF(top_of_funnel,'') AS REAL)) AS leads_targets,
         SUM(CAST(NULLIF(prospects,'') AS REAL)) AS prospects_targets,
+        SUM(CAST(NULLIF(available_qualifieds, '') AS REAL)) AS available_qualifieds_targets,
         SUM(CAST(NULLIF(qualifieds,'') AS REAL)) AS qualifieds_targets,
         SUM(CAST(NULLIF(opportunities,'') AS REAL)) AS opportunities_targets,
         SUM(CAST(NULLIF(first_listings,'') AS REAL)) AS first_listings_targets,
@@ -61,7 +62,7 @@ supply_funnel_targets AS (
         datalake_gsheets_clean.mexico_supply_targets_2022
     WHERE
         supply_origin NOT IN ('Crawlers classifieds', 'Price Calculator')
-    GROUP BY 1, 2, 3, 9
+    GROUP BY 1, 2, 3, 10
 ),
 supply_costs_targets AS (
     SELECT
@@ -204,6 +205,7 @@ SELECT
     sf.first_listings,
     ROUND(sft.leads_targets, 2) AS leads_targets,
     ROUND(sft.prospects_targets, 2) AS prospects_targets,
+    ROUND(sft.available_qualifieds_targets, 2) AS available_qualifieds_targets,
     ROUND(sft.qualifieds_targets, 2) AS qualifieds_targets,
     ROUND(sft.opportunities_targets, 2) AS opportunities_targets,
     ROUND(sft.first_listings_targets, 2) AS first_listings_targets,
