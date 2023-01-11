@@ -1,8 +1,8 @@
 import json
 import os
 from datetime import datetime
+from pendulum import timezone
 
-import pendulum
 from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -17,19 +17,14 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 
-# ENV setup
-ENV = os.environ.get("ENVIRONMENT")
-
-# DAG and Jobs params setup
+# Pipeline inputs
 SOURCE = "twilio_flex_insights"
 DAG_ID = f"bietlejuice.{SOURCE}"
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2020, 10, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_START_DATE = datetime(2020, 10, 1, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
-
-# s3 paths setup
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -40,40 +35,46 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_incremental_data_into_datalake_raw.py"
-
-# cluster setup
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
-
+raw_spark_job_path = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
+)
+cluster_description = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
+
+partition_cols = config_service.get_config("partition_cols")
+tables = config_service.get_config("tables_configurations")
+dag_documentation = config_service.get_config("dag_documentation")
+
 CUSTOM_LIBRARIES = [
     {
         "whl": f"{artifacts_bucket}/twilio-flex-insights-api-client-python/"
         f"quintoandar_twilio_flex_insights_api_client-0.1.0-py2.py3-none-any.whl"
     }
 ]
-
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
-
-partition_cols = config_service.get_config("partition_cols")
-tables = config_service.get_config("tables_configurations")
+ENV = os.environ.get("ENVIRONMENT")
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 
@@ -98,26 +99,35 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-raw_task_groups = task_group.build_raw_task_group_for_all_tables(
-    source=SOURCE,
-    target_database_base_name=SOURCE,
-    extraction_spark_job_file=raw_spark_job_path,
-    raw_spark_job_extra_args=[SOURCE, json.dumps(partition_cols), json.dumps(tables)],
-)
+for raw_table_name, table_details in tables.items():
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=raw_table_name,
+        extraction_spark_job_file=raw_spark_job_path,
+        raw_spark_job_extra_args=[
+            SOURCE,
+            json.dumps(table_details),
+            raw_table_name,
+            json.dumps(partition_cols),
+        ],
+    )
 
-clean_task_groups = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.CLEAN,
-    source_database_base_name=SOURCE,
-    target_database_base_name=SOURCE,
-    has_create_external_table_task=False,
-    partitions=partition_cols,
-)
+    clean_table_name = table_details.get("clean_table_name", raw_table_name)
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        has_create_external_table_task=False,
+        table_name=clean_table_name,
+        partitions=partition_cols,
+        is_incremental=True,
+    )
 
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
+    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
 
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_groups),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
-)
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
 
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))

@@ -1,4 +1,9 @@
 ---
+dag_documentation:
+  dag_purpose:
+    "Twilio Flex Insights brings the service metrics data (call and chat). We implement a \n
+    [client API](https://github.com/quintoandar/twilio-flex-insights-api-client-python) for raw use."
+
 partition_cols: [year, month, day]
 tables_configurations:
   conversation_time_metrics:
