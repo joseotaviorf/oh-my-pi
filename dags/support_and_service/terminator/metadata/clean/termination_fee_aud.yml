@@ -79,3 +79,12 @@ columns:
   ts_outdated:
     lineage:
       - datalake_terminator_raw.termination_fee_aud.outdated_at
+  year:
+    lineage:
+      - datalake_terminator_raw.termination_fee_aud.year
+  month:
+    lineage:
+      - datalake_terminator_raw.termination_fee_aud.month
+  day:
+    lineage:
+      - datalake_terminator_raw.termination_fee_aud.day

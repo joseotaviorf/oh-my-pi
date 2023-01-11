@@ -11,6 +11,13 @@ SELECT
     attachments_payment_voucher,
     is_included_condominium,
     created_at AS ts_created,
-    updated_at AS ts_updated
-FROM 
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
     datalake_terminator_raw.utility_bill_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

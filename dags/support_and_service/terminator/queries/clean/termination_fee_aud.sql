@@ -2,7 +2,7 @@ SELECT
     id,
     termination_id AS id_termination,
     contract_adm_fee,
-    category,    
+    category,
     rev,
     revtype AS rev_type,
     revend AS rev_end,
@@ -24,6 +24,13 @@ SELECT
     request_date AS dt_requested,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    outdated_at AS ts_outdated
+    outdated_at AS ts_outdated,
+    year,
+    month,
+    day
 FROM
     datalake_terminator_raw.termination_fee_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

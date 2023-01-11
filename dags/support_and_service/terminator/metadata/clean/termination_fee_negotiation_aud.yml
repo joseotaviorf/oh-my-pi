@@ -37,3 +37,12 @@ columns:
   ts_updated:
     lineage:
       - datalake_terminator_raw.termination_fee_negotiation_aud.updated_at
+  year:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation_aud.year
+  month:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation_aud.month
+  day:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation_aud.day

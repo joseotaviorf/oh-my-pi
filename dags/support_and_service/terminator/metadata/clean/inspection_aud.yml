@@ -37,3 +37,12 @@ columns:
   keys_location_comment:
     lineage:
       - datalake_terminator_raw.inspection_aud.keys_location_comment
+  year:
+    lineage:
+      - datalake_terminator_raw.inspection_aud.year
+  month:
+    lineage:
+      - datalake_terminator_raw.inspection_aud.month
+  day:
+    lineage:
+      - datalake_terminator_raw.inspection_aud.day

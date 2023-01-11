@@ -16,6 +16,13 @@ SELECT
     vacancy_date AS dt_vacancy,
     canceled_at AS ts_canceled,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
 FROM
     datalake_terminator_raw.termination_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

@@ -1,14 +1,21 @@
 SELECT
     id,
+    termination_id AS id_termination,
     rev,
     revtype AS rev_type,
     revend AS rev_end,
-    termination_id AS id_termination,
-    has_landlord_comment,
     needs_repair_by_tenant,
     repair_resolution,
     repair_cost,
+    has_landlord_comment,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
 FROM
     datalake_terminator_raw.negotiation_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
