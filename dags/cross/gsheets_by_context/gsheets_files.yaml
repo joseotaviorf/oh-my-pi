@@ -456,6 +456,12 @@ unit_economics_amortization_curve:
     clean_table_name: unit_economics_amortization_curve
     sheet_context: growth
 
+voucherify_users:
+    sheet_id: 1qvnfJswKdOvscd9hhGBsCThVzimTIOEP47sJWBeyqiY
+    sheet_name: Sheet1
+    clean_table_name: voucherify_users
+    sheet_context: growth
+
 week_volumes_supply:
     sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
     sheet_name: week_volumes_supply
