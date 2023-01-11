@@ -25,7 +25,7 @@ data-governance:
 data-growth:
   - "**/dags/growth/**"
 data-international:
-  - "**/dags/international/**"
+  - "**/dags/benvi/**"
 data-ingestion:
   - "**/dags/platform/**"
 data-rede:
