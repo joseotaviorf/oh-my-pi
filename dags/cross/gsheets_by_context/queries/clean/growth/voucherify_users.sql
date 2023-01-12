@@ -1,5 +1,5 @@
 SELECT
-    CAST(Customer_Source_ID AS INT) AS id_customer_source,
+    CAST(Customer_Source_ID AS INT) AS sk_user,
     Code AS code,
     CAST(Creation_Date AS TIMESTAMP) AS dt_created_at,
     CAST(Expiration_Date AS TIMESTAMP) AS dt_expirate_at

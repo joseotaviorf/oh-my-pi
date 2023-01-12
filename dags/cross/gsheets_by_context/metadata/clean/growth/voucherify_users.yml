@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: voucherify_users
 columns:
-  id_customer_source:
+  sk_user:
     lineage:
       - datalake_gsheets_raw.voucherify_users.Customer_Source_ID
   code:

@@ -458,7 +458,7 @@ unit_economics_amortization_curve:
 
 voucherify_users:
     sheet_id: 1qvnfJswKdOvscd9hhGBsCThVzimTIOEP47sJWBeyqiY
-    sheet_name: Sheet1
+    sheet_name: voucherify_users
     clean_table_name: voucherify_users
     sheet_context: growth
 
