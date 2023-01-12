@@ -61,17 +61,27 @@ sale_offer AS (
         id_sale_flow IS NOT NULL
     GROUP BY 1, 2, 3
 ),
+current_region AS (
+    SELECT
+        id,
+        id_region
+    FROM
+        datalake_ebdb_clean.house AS h
+),
 base AS (
     SELECT
         ha.id_user,
-        id_house,
-        id_region,
+        ha.id_house,
+        cr.id_region,
         FROM_UNIXTIME(ure.ts_revision/1000) AS first_update
     FROM
         datalake_ebdb_clean.house_aud AS ha
     LEFT JOIN
         datalake_ebdb_clean.user_revision_entity AS ure
             ON ha.rev = ure.id
+    LEFT JOIN
+        current_region AS cr
+            ON ha.id_house = cr.id
     WHERE
         ha.id_user IS NOT NULL
     QUALIFY
@@ -102,7 +112,7 @@ ajusted_house AS (
         OR lag_id_user IS NULL)
 ),
 sale_listing_status AS (
-    SELECT  
+    SELECT
         *
     FROM
         datalake_sale_listings.sale_listing_status

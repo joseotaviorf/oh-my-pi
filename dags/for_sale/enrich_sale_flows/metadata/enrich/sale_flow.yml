@@ -24,7 +24,7 @@ columns:
       - datalake_ebdb_clean.house_aud.id_user
   id_region:
     lineage:
-      - datalake_ebdb_clean.house_aud.id_region
+      - datalake_ebdb_clean.house.id_region
   first_event:
     lineage:
       - datalake_amplitude_talk_to_agent.talk_to_agent_events.ts_event
