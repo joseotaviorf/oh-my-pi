@@ -79,7 +79,7 @@ if __name__ == "__main__":
     if read_from_sql_file:
         query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
             dag_name=source, layer=LayerEnum.RAW.value, table_name=table_name
-        )
+        ).format(execution_date=execution_date)
 
         df = postgres_consumer.get_data_from_query(query)
     else:
