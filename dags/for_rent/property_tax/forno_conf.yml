@@ -1,13 +1,8 @@
 ---
 tables:
-  - table_name: report_item
-    extraction_type: incremental
-    date_filter_column: created_at
-  - table_name: report_version
-    extraction_type: incremental
-    date_filter_column: created_at
   - table_name: tax_report
     extraction_type: incremental
     date_filter_column: updated_at
+    read_from_sql_file: True
 
 partition_cols: ["year", "month", "day"]

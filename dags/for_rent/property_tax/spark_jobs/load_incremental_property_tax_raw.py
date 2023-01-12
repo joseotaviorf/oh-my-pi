@@ -4,6 +4,8 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import PostgresConsumer
@@ -25,6 +27,7 @@ if __name__ == "__main__":
     parser.add_argument("table_name")
     parser.add_argument("date_column")
     parser.add_argument("execution_date")
+    parser.add_argument("read_from_sql_file")
 
     args = parser.parse_args()
 
@@ -34,6 +37,7 @@ if __name__ == "__main__":
     table_name = args.table_name
     date_column = args.date_column
     execution_date = args.execution_date
+    read_from_sql_file = args.read_from_sql_file
 
     logger.info(
         f"""
@@ -66,9 +70,22 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
-    df = postgres_consumer.get_incremental_data_from_table(
-        table_name, date_column, execution_date
-    )
+    # We're using a sql file in raw layer because there's a column named "year".
+    # When we call the method get_incremental_data_from_table, the "year" column
+    # is duplicated and an error is given.
+    # PS: if a new table should be ingested, we need to add the config "read_from_sql_file"
+    # to check if the spark_job should read from sql file in raw folder.
+
+    if read_from_sql_file:
+        query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+            dag_name=source, layer=LayerEnum.RAW.value, table_name=table_name
+        )
+
+        df = postgres_consumer.get_data_from_query(query)
+    else:
+        df = postgres_consumer.get_incremental_data_from_table(
+            table_name, date_column, execution_date
+        )
 
     if df:
         s3_loader.load_df(

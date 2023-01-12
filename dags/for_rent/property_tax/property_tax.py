@@ -91,6 +91,7 @@ for table in tables:
     if is_incremental:
         parameters.append(table["date_filter_column"])
         parameters.append("{{ ds }}")
+        parameters.append(table["read_from_sql_file"])
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,

@@ -22,6 +22,9 @@ columns:
   ts_updated:
     lineage:
       - datalake_property_tax_raw.tax_report.updated_at
+  year_tax_report:
+    lineage:
+      - datalake_property_tax_raw.tax_report.year_tax_report
   year:
     lineage:
       - datalake_property_tax_raw.tax_report.year

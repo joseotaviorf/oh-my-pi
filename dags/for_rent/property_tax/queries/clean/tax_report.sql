@@ -6,6 +6,7 @@ SELECT
     last_year_amount,
     created_at AS ts_created,
     updated_at AS ts_updated,
+    year_tax_report,
     year,
     month,
     day

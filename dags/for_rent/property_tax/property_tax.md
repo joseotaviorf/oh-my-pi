@@ -16,6 +16,4 @@ More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 
 1. In datalake raw and clean, via incremental load:
- - `report_item`
- - `report_version`
- - `tax_report`
+ - `tax_report` - To avoid the duplicated column year in raw task, we're adding a sql file to use it to create the raw dataframe.
