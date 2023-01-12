@@ -39,6 +39,7 @@ lbc_history AS (
 )
 SELECT 
     lbch.id_house,
+    lbch.rev,
     COALESCE(ch.country_code, 'Undefined') AS country_code,
     lbch.business_context,
     lbch.status,
