@@ -12,6 +12,13 @@ SELECT
     status,
     type,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
 FROM
     datalake_inspections_raw.inspection
+WHERE
+    year = {year}
+    and month = {month}
+    and day = {day}
