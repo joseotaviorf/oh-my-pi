@@ -1192,6 +1192,10 @@ bietlejuice.dw_revenue_lines:
   - bietlejuice.enrich_revenue_lines:load-enrich-rental-guarantee
   - bietlejuice.enrich_revenue_lines:load-enrich-reservation
 
+bietlejuice.dw_sale_available_booking_hours:
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
+  - bietlejuice.enrich_sale_available_booking_hours:load-enrich-weekly-available-booking-hours
+
 bietlejuice.dw_sale_closing_flows:
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_sale_closing_flows:load-enrich-closing-flow
@@ -2355,6 +2359,11 @@ bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-payee
   - bietlejuice.robin_hood:load-clean-tax
+
+bietlejuice.enrich_sale_available_booking_hours:
+  - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.enrich_booking:load-enrich-house-available-hours
 
 bietlejuice.enrich_sale_closing_flows:
   - bietlejuice.enrich_firestore:load-enrich-monday

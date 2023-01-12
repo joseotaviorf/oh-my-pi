@@ -1,0 +1,14 @@
+---
+table_name: datalake_sale_available_booking_hours.weekly_available_booking_hours
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 840000
+    severity_level: Error
+column_level_validations:
+  id_house:
+    is_complete:
+      severity_level: Error
+  dt_schedule_started:
+    is_complete:
+      severity_level: Error

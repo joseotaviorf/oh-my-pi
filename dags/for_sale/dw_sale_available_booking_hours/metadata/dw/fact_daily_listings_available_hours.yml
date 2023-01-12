@@ -1,0 +1,52 @@
+---
+database_name: dw_sale
+table_name: fact_daily_listings_available_hours
+columns:
+  sk_date:
+    lineage:
+      - dw_public.dim_date.sk_date
+  sk_house:
+    lineage:
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.id_house
+  sk_region:
+    lineage:
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.id_region
+  status_history:
+    lineage:
+      - dw_sale.fact_listing_status.status_history
+  week_available_hours:
+    lineage:
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.week_available_hours
+  workdays_available_hours:
+    lineage:
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.workdays_available_hours
+  monday_available_hours:
+    lineage:
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.monday_available_hours
+  tuesday_available_hours:
+    lineage:
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.tuesday_available_hours
+  wednesday_available_hours:
+    lineage:
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.wednesday_available_hours
+  thursday_available_hours:
+    lineage:
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.thursday_available_hours
+  friday_available_hours:
+    lineage:
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.friday_available_hours
+  saturday_available_hours:
+    lineage:
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.saturday_available_hours
+  sunday_available_hours:
+    lineage:
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.sunday_available_hours
+  year:
+    lineage:
+      - dw_public.dim_date.year
+  month:
+    lineage:
+      - dw_public.dim_date.month
+  day:
+    lineage:
+      - dw_public.dim_date.day

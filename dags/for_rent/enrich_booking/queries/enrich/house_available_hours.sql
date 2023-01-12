@@ -1,4 +1,4 @@
-WITH all_events AS (
+WITH events AS (
     SELECT
         wsa.id_house,
         ure.id_user,
@@ -49,6 +49,64 @@ WITH all_events AS (
     WHERE 
         ws.weekday BETWEEN 1 AND 7
 ),
+houses_first_schedule AS (
+-- Creating the default time for all listings, even if it's not the last time of the day, they all had this first time
+    SELECT DISTINCT
+        h.id AS id_house,
+        IF(e.id_house IS NULL, true, false) AS houses_without_schedule, 
+        DATE(h.dt_creation) AS dt_revision
+    FROM 
+        datalake_ebdb_clean.house AS h
+    LEFT JOIN 
+        events AS e
+            ON h.id = e.id_house
+),
+all_events AS (
+
+    SELECT
+        id_house,
+        id_user,
+        rev,
+        weekday,
+        hours_available_08to09,
+        hours_available_09to10,
+        hours_available_10to11,
+        hours_available_11to12,
+        hours_available_12to13,
+        hours_available_13to14,
+        hours_available_14to15,
+        hours_available_15to16,
+        hours_available_16to17,
+        hours_available_17to18,
+        hours_available_18to19,
+        hours_available_19to20,
+        false AS has_artificial_schedule, -- We created a flag to flag schedules present in the product base and schedules arithmetically created to make sense with the business.
+        ts_revision
+    FROM 
+        events
+    UNION 
+    SELECT
+        id_house,
+        NULL AS id_user,
+        0 AS rev,
+        EXPLODE(SEQUENCE(1,7)) AS weekday,
+        IF(weekday <> 7,true, false) AS hours_available_08to09,
+        IF(weekday <> 7,true, false) AS hours_available_09to10,
+        IF(weekday <> 7,true, false) AS hours_available_10to11,
+        IF(weekday <> 7,true, false) AS hours_available_11to12,
+        IF(weekday <> 7,true, false) AS hours_available_12to13,
+        IF(weekday <> 7,true, false) AS hours_available_13to14,
+        IF(weekday <> 7,true, false) AS hours_available_14to15,
+        IF(weekday <> 7,true, false) AS hours_available_15to16,
+        IF(weekday <> 7,true, false) AS hours_available_16to17,
+        IF(weekday NOT IN (6,7),true, false) AS hours_available_17to18,
+        IF(weekday NOT IN (6,7),true, false) AS hours_available_18to19,
+        false AS hours_available_19to20,
+        IF(houses_without_schedule, false, true) AS has_artificial_schedule,
+        dt_revision
+	FROM 
+        houses_first_schedule
+),
 truncate_daily_events AS (
     SELECT
         id_house,
@@ -68,72 +126,12 @@ truncate_daily_events AS (
         hours_available_17to18,
         hours_available_18to19,
         hours_available_19to20,
+        has_artificial_schedule,
         DATE(ts_revision) AS dt_revision
     FROM
         all_events
 ),
 deduplicated_events AS (
-  SELECT
-      id_house,
-      id_house_date,
-      id_user,
-      weekday,
-      hours_available_08to09,
-      hours_available_09to10,
-      hours_available_10to11,
-      hours_available_11to12,
-      hours_available_12to13,
-      hours_available_13to14,
-      hours_available_14to15,
-      hours_available_15to16,
-      hours_available_16to17,
-      hours_available_17to18,
-      hours_available_18to19,
-      hours_available_19to20,
-      dt_revision
-  FROM
-      truncate_daily_events
-  WHERE
-      daily_freshness_order = 1
-),
--- if the house doesn't appear in house_weekly_schedule THEN it has the default schedule
--- 8h-19h FROM Monday to Friday and 8h-17h in Saturday
-houses_without_schedule AS (
-    SELECT
-        h.id AS id_house,
-        DATE(h.dt_creation) AS dt_revision
-    FROM 
-        datalake_ebdb_clean.house AS h
-    LEFT JOIN 
-        deduplicated_events AS de
-            ON h.id = de.id_house
-    WHERE
-        de.id_house IS NULL
-),
-all_schedules AS (
--- Could be in a different table, but
--- it doesn't seem to be valuable outside this scope.
-    SELECT
-        id_house,
-        CONCAT(id_house, DATE_FORMAT(dt_revision, 'yyyyMMdd'), weekday) AS id_house_date,
-        NULL AS id_user,
-        EXPLODE(SEQUENCE(1,7)) AS weekday,
-        IF(weekday <> 7,true, false) AS hours_available_08to09,
-        IF(weekday <> 7,true, false) AS hours_available_09to10,
-        IF(weekday <> 7,true, false) AS hours_available_10to11,
-        IF(weekday <> 7,true, false) AS hours_available_11to12,
-        IF(weekday <> 7,true, false) AS hours_available_12to13,
-        IF(weekday <> 7,true, false) AS hours_available_13to14,
-        IF(weekday <> 7,true, false) AS hours_available_14to15,
-        IF(weekday <> 7,true, false) AS hours_available_15to16,
-        IF(weekday <> 7,true, false) AS hours_available_16to17,
-        IF(weekday NOT IN (6,7),true, false) AS hours_available_17to18,
-        IF(weekday NOT IN (6,7),true, false) AS hours_available_18to19,
-        IF(weekday NOT IN (6,7),true, false) AS hours_available_19to20,
-        dt_revision
-	FROM 
-        houses_without_schedule
-    UNION
     SELECT
         id_house,
         id_house_date,
@@ -151,9 +149,12 @@ all_schedules AS (
         hours_available_17to18,
         hours_available_18to19,
         hours_available_19to20,
+        has_artificial_schedule,
         dt_revision
     FROM
-        deduplicated_events
+        truncate_daily_events
+    WHERE
+        daily_freshness_order = 1
 ),
 house_available_hours AS (
     SELECT
@@ -173,10 +174,11 @@ house_available_hours AS (
         hours_available_17to18,
         hours_available_18to19,
         hours_available_19to20,
+        has_artificial_schedule,
         dt_revision AS dt_available_started,
         LEAD(dt_revision) OVER(PARTITION BY id_house, weekday ORDER BY dt_revision) AS dt_available_ended
     FROM 
-        all_schedules
+        deduplicated_events
 )
 SELECT
     id_house,
@@ -209,6 +211,7 @@ SELECT
     hours_available_17to18 AS has_hours_available_17to18,
     hours_available_18to19 AS has_hours_available_18to19,
     hours_available_19to20 AS has_hours_available_19to20,
+    has_artificial_schedule,
     dt_available_started,
     dt_available_ended
 FROM 

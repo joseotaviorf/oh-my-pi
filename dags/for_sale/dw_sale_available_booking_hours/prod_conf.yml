@@ -1,0 +1,8 @@
+---
+  tables:
+    - table_name: fact_daily_listings_available_hours
+      is_incremental: true
+      partitions:
+        - year
+        - month
+        - day

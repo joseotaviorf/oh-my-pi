@@ -1,0 +1,16 @@
+---
+database_name: datalake_sale_available_booking_hours
+table_name: weekly_available_booking_hours
+columns:
+  id_house:
+    lineage:
+      - datalake_booking.house_available_hours.id_house
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  dt_schedule_started:
+    lineage:
+      - datalake_booking.house_available_hours.dt_available_started
+  dt_schedule_ended:
+    lineage:
+      - datalake_booking.house_available_hours.dt_available_started
