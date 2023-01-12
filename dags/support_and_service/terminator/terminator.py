@@ -109,7 +109,6 @@ for raw_table_name, table_details in tables.items():
     clean_task_group = task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
-        has_create_external_table_task=False,
         table_name=clean_table_name,
         partitions=partition_cols if table_details.get("is_incremental") else None,
         is_incremental=True if table_details.get("is_incremental") else False,
