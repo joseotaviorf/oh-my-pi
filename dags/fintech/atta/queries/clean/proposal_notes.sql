@@ -8,7 +8,6 @@ SELECT
     CtrlObs         AS control_notes,
     Observacao      AS notes,
     Interna         AS is_internal,
-    DtObs           AS ts_notes,
-
+    DtObs           AS ts_notes
 FROM
     datalake_atta_raw.proposta_observacao
