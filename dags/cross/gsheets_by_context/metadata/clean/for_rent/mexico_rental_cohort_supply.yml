@@ -1,0 +1,40 @@
+---
+database_name: datalake_gsheets_clean
+table_name: mexico_rental_cohort_supply
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.city_group
+  first_listing:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.first_listing
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.mkt_channel
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.mkt_origin
+  operacao:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.operacao
+  opportunities:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.opportunities
+  prospect:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.prospect
+  qualified:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.qualified
+  available_qualifieds:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.available_qualifieds
+  year:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.year
+  week_origin:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.week_origin
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_raw.mexico_rental_cohort_supply.week

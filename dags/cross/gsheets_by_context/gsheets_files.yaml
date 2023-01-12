@@ -817,6 +817,18 @@ mexico_ongoing_listings_targets:
     clean_table_name: mexico_ongoing_listings_target
     sheet_context: for_rent
 
+mexico_rental_cohort_demand:
+    sheet_id: 1U6lqAKjhxyOPdS_tq278KttKINq6DCGDiadQ80ATZqM
+    sheet_name: mexico_rental_cohort_demand
+    clean_table_name: mexico_rental_cohort_demand
+    sheet_context: for_rent
+
+mexico_rental_cohort_supply:
+    sheet_id: 1y7cXmEgj6cQzTLJJFMhHIJT9reO5rhl-UdNyztoc9Bw
+    sheet_name: mexico_rental_cohort_supply
+    clean_table_name: mexico_rental_cohort_supply
+    sheet_context: for_rent
+
 mexico_supply_targets_2022:
     sheet_id: 1sEl5H0PpnoRrKB4JmGGLq9WG-sWrGIfA1n4Cs4vDz1Q
     sheet_name: supply_targets_2022_mx
