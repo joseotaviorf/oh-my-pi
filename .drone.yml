@@ -52,6 +52,16 @@ pipeline:
     when:
       event: push
 
+  validate-dag-declaration-files:
+    group: tests
+    image: python:3.7.3
+    commands:
+      - pip install tqdm==4.64.1 Cerberus==1.3.4
+      - make requirements-scripts
+      - make validate-dag-declaration-files level=debug
+    when:
+      event: push
+
   validate-dags-dependencies-forno:
     group: tests
     image: python:3.7.3
@@ -201,6 +211,15 @@ pipeline:
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
+
+  create-dag-files:
+    group: export
+    image: python:3.7.3
+    commands:
+      - make create-dag-files
+    when:
+      event: push
+      branch: [forno, master, hotfix/*]
 
   load-dags-composer-forno:
     group: upload

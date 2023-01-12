@@ -1,4 +1,7 @@
-class DatabricksGroupNameEnum:
+from enum import Enum
+
+
+class DatabricksGroupNameEnum(Enum):
     """
     Mapping of all groups in Databricks for defining permissions to clusters.
     """
@@ -15,3 +18,7 @@ class DatabricksGroupNameEnum:
     BUSINESS_ANALYSTS_CREDIT = "credit-team"
     MLOPS = "mlops"
     PEOPLE_ANALYTICS = "people-analytics"
+
+    @classmethod
+    def get_available_enum_values(cls):
+        return [member.value for member in cls]

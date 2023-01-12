@@ -16,3 +16,11 @@ class DAGOwnerEnum:
     DATA_REDE = "Data Rede"
     DATA_SS = "Data SS"
     MLOPS = "MLOps"
+
+    @classmethod
+    def get_available_enum_values(cls):
+        return [
+            v
+            for k, v in cls.__dict__.items()
+            if not k.startswith("_") and isinstance(v, str)
+        ]

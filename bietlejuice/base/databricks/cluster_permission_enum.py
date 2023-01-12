@@ -1,4 +1,7 @@
-class ClusterPermissionEnum:
+from enum import Enum
+
+
+class ClusterPermissionEnum(Enum):
     """
     Mapping of all permissions to interact with the clusters.
     For details of the scope of each permission type, check the official documentation
@@ -12,3 +15,7 @@ class ClusterPermissionEnum:
     MANAGE = (
         "CAN_MANAGE"
     )  # Can edit and manage the cluster, also view logs and monitoring tabs
+
+    @classmethod
+    def get_available_enum_values(cls):
+        return [member.value for member in cls]

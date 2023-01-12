@@ -1,0 +1,89 @@
+import json
+from cerberus import Validator
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum import (
+    WorkflowEnum,
+)
+
+
+class DAGDeclarationValidator(Validator):
+    """Runs the validations for the DAG declaration info."""
+
+    __VALIDATION_SCHEMA = {
+        "dag": {
+            "type": "dict",
+            "allow_unknown": True,
+            "required": True,
+            "empty": False,
+            "schema": {
+                "name": {"type": "string", "required": True, "empty": False},
+                "owner": {
+                    "type": "string",
+                    "required": True,
+                    "empty": False,
+                    "allowed": DAGOwnerEnum.get_available_enum_values(),
+                },
+            },
+        },
+        "workflow": {
+            "type": "dict",
+            "allow_unknown": False,
+            "required": True,
+            "empty": False,
+            "schema": {
+                "type": {
+                    "type": "string",
+                    "required": True,
+                    "empty": False,
+                    "allowed": WorkflowEnum.get_available_enum_values(),
+                },
+                "layer": {
+                    "type": "string",
+                    "required": True,
+                    "empty": False,
+                    "allowed": LayerEnum.get_available_enum_values(),
+                },
+                "custom_schema": {"type": "string", "empty": False},
+            },
+        },
+        "cluster": {
+            "type": "dict",
+            "allow_unknown": False,
+            "required": True,
+            "empty": False,
+            "schema": {
+                "type": {"type": "string", "required": True, "empty": False},
+                "access_control_list": {
+                    "type": "dict",
+                    "empty": False,
+                    "schema": {
+                        "group_name": {
+                            "type": "string",
+                            "empty": False,
+                            "allowed": DatabricksGroupNameEnum.get_available_enum_values(),
+                        },
+                        "permission_level": {
+                            "type": "string",
+                            "empty": False,
+                            "allowed": ClusterPermissionEnum.get_available_enum_values(),
+                        },
+                    },
+                },
+            },
+        },
+    }
+
+    def __init__(self, *args, **kwargs) -> None:
+        super(DAGDeclarationValidator, self).__init__(*args, **kwargs)
+
+    def validate(self, dag_declaration: dict) -> None:
+        super(DAGDeclarationValidator, self).validate(
+            dag_declaration, schema=self.__VALIDATION_SCHEMA
+        )
+        if self.errors:
+            raise AssertionError(
+                "m=validate, msg=One or more validation rules had errors:\n",
+                f"{json.dumps(self.errors, indent=2)}",
+            )

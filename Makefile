@@ -1,4 +1,6 @@
-############# Local Airflow Docker environment #############
+###############################################################################
+###################### Local Airflow Docker environment #######################
+###############################################################################
 .PHONY: _clone-airflow-plugins
 _clone-airflow-plugins:
 	@rm -fR ./local/airflow/plugins || true
@@ -39,8 +41,9 @@ restart-local-environment:
 stop-local-environment:
 	@docker-compose -f local/docker/docker-compose.yml down
 
-############# Local Tests Docker environment #############
-
+###############################################################################
+###################### Local Tests Docker environment #########################
+###############################################################################
 .PHONY: _build-tests-environment
 _build-tests-environment:
 	@docker build -f local/tests-environment.Dockerfile -t bietlejuice-tests-local --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} .
@@ -50,8 +53,9 @@ run-tests-environment:
 	@make _build-tests-environment
 	@docker run bietlejuice
 
-############# Local environment S3 upload #############
-
+###############################################################################
+###################### Local environment S3 upload ############################
+###############################################################################
 .PHONY: upload-local-wheel
 upload-local-wheel:
 	@python3 -m setup sdist bdist_wheel
@@ -67,8 +71,9 @@ upload-local-package:
 	@python3 -m setup sdist bdist_wheel
 	@python3 local/upload_local_whl_to_s3.py
 
-############# Local Python environment #############
-
+###############################################################################
+###################### Local Python environment ###############################
+###############################################################################
 .PHONY: environment
 environment:
 	@echo ""
@@ -80,8 +85,9 @@ environment:
 	@pyenv local bi-etl-ejuice
 	@echo "-> Python virtual environment 'bi-etl-ejuice' has been set as the current virtualenv."
 
-############# Requirements setup #############
-
+###############################################################################
+###################### Requirements setup #####################################
+###############################################################################
 .PHONY: requirements
 requirements:
 	@echo ""
@@ -115,8 +121,9 @@ requirements-scripts:
 	@echo ""
 	@python -m pip install -U -r requirements_scripts.txt --extra-index-url https://quintoandar.github.io/python-package-server/
 
-############# Package setup #############
-
+###############################################################################
+###################### Package setup ##########################################
+###############################################################################
 .PHONY: package
 package:
 	@make requirements
@@ -131,8 +138,9 @@ package:
 	@echo ""
 	@PYTHONPATH=. python -m setup sdist bdist_wheel
 
-############# Style handling #############
-
+###############################################################################
+###################### Style handling #########################################
+###############################################################################
 .PHONY: lint
 ## run black to fix code style
 lint:
@@ -140,7 +148,7 @@ lint:
 	@echo "Running lint in all files from <bietlejuice/>"
 	@echo "=========="
 	@echo ""
-	@python -m black bietlejuice/ tests/unit/
+	@python -m black bietlejuice/ tests/unit/ --exclude=".*\/__dags_template__.py"
 
 .PHONY: check-style
 ## check style with flake8 and black
@@ -149,10 +157,12 @@ check-style:
 	@echo "Running Check Style"
 	@echo "=========="
 	@echo ""
-	@python -m black --check bietlejuice/ tests/unit/ && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" to apply style formatting to your code\n" && exit 1)
+	@python -m black --check bietlejuice/ tests/unit/ --exclude=".*\/__dags_template__.py" && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" to apply style formatting to your code\n" && exit 1)
 	@python -m flake8 --config=setup.cfg bietlejuice/ tests/unit/
 
-############# Tests commands #############
+###############################################################################
+###################### Tests commands #########################################
+###############################################################################
 .PHONY: tests
 ## run all unit and integration tests with coverage report
 tests:
@@ -184,8 +194,9 @@ files-validation:
 	@echo ""
 	@python -m pytest tests/files_validation/
 
-############# Validations commands #############
-
+###############################################################################
+###################### Validations commands ###################################
+###############################################################################
 .PHONY: validate-dags-dependencies
 validate-dags-dependencies:
 	@echo ""
@@ -193,6 +204,17 @@ validate-dags-dependencies:
 	@echo "=========="
 	@echo ""
 	@PYTHONPATH=. python3 scripts/ci_cd/validate_dags_dependencies.py
+
+level ?= warning
+.PHONY: validate-dag-declaration-files
+## validates the content of DAG declaration YAML files, returning which keys of which files are not following requirements.
+## May receive an optional `level={level}` argument to declare the expected logging level of the validation.
+validate-dag-declaration-files:
+	@echo ""
+	@echo "Validating DAG declaration files"
+	@echo "=========="
+	@echo ""
+	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/validate_dag_declaration_files.py -l $(level)
 
 .PHONY: validate-atlas-metadata-files
 validate-atlas-metadata-files:
@@ -221,7 +243,17 @@ validate-datamarts-metadata-files-exist:
 	@git fetch --no-tags origin +refs/heads/master
 	@PYTHONPATH=. python3 scripts/atlas_metadata_validation/validate_datamarts_metadata_files_exist.py  "$(DRONE_BRANCH)"
 
-############# common commands #############
+###############################################################################
+###################### Common commands ########################################
+###############################################################################
+.PHONY: create-dag-files
+## create the DAG python files
+create-dag-files:
+	@echo ""
+	@echo "Creating the DAGs' Python files"
+	@echo "=========="
+	@echo ""
+	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/create_dag_files.py
 
 .PHONY: cov-badge
 ## build coverage badge

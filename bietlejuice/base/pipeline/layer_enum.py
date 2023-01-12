@@ -22,7 +22,7 @@ class LayerEnum(Enum):
         return layer in cls.__members__.values()
 
     @staticmethod
-    def validate_layer(layer):
+    def validate_layer(layer: str):
         """
         Checks if a layer is one of the enum layers values.
 
@@ -31,7 +31,7 @@ class LayerEnum(Enum):
         :rtype: bool
         :raises: ValueError
         """
-        valid_values = LayerEnum.get_valid_values()
+        valid_values = LayerEnum.get_available_enum_values()
         if layer not in valid_values:
             raise ValueError(
                 "m=validate_layer, msg=The layer is not valid, "
@@ -39,7 +39,6 @@ class LayerEnum(Enum):
             )
         return True
 
-    @staticmethod
-    def get_valid_values():
-        """Returns a set-like object providing a view of the enum keys."""
-        return LayerEnum._value2member_map_.keys()
+    @classmethod
+    def get_available_enum_values(cls):
+        return [member.value for member in cls]

@@ -19,6 +19,32 @@ class DAGPackagesPathService:
      and after migration we can easily uncouple the code between Orchestration and Jobs Core code.
     """
 
+    __EXTENSIONS = {
+        "dag_declaration": ["yml", "yaml"],
+        "data_quality": ["yml", "yaml"],
+        "metadata": ["yml", "yaml"],
+        "configuration_file": ["yml", "yaml"],
+        "doc_md": ["md"],
+        "query": ["sql"],
+    }
+
+    __FILE_SUFFIXES = {"dag_declaration": "_declaration", "configuration_file": "_conf"}
+
+    __FILE_NAME_TEMPLATES = {
+        "dag_declaration": "{dag_name}{file_suffix}",
+        "data_quality": "{table_name}",
+        "metadata": "{dag_name}",
+        "configuration_file": "{dag_name}{file_suffix}",
+        "doc_md": "{dag_name}",
+        "query": "{table_name}",
+    }
+
+    __FILE_FOLDERS = {
+        "data_quality": "data_quality",
+        "metadata": "metadata",
+        "query": "queries",
+    }
+
     @staticmethod
     def _get_dag_package_path(dag_name):
         """
@@ -90,7 +116,7 @@ class DAGPackagesPathService:
         """
         Gets the DAG's full path
 
-        The path returned does not contain trailing slash like `/dags/bla/foo`
+        The path returned does not contain trailing slash, like `/dags/bla/foo`
 
         * Method used only in Composer *
 
@@ -268,3 +294,93 @@ class DAGPackagesPathService:
             table_names.append(re.search(filename_regex, file_path).group(1))
 
         return table_names
+
+    @classmethod
+    def artifact_file_exists(
+        cls, artifact_type: str, dag_name: str, layer: str = "", table_name: str = ""
+    ) -> bool:
+        """
+        Validates if a provided artifact exists in a provided DAG package.
+
+        :param artifact_type: type of artifact being validated.
+        :param dag_name: DAG which folder the artifact will be searched.
+            Also used into naming templates.
+        :param layer: datalake layer related to the artifact being searched.
+            Optional. Defaults to "" (empty string).
+        :param table_name: used to search for artifacts that contain the table name in their names.
+            Optional. Defaults to "" (empty string).
+        :return: boolean
+        """
+        extensions = cls.__EXTENSIONS[artifact_type]
+        extensions_validation = []
+
+        for ext in extensions:
+            file_path = cls.generate_artifact_file_path(
+                artifact_type, dag_name, layer, table_name, add_default_ext=False
+            )
+            file_path_ext = "{}.{}".format(file_path, ext)
+            extensions_validation.append(isfile(file_path_ext))
+
+        return any(extensions_validation)
+
+    @classmethod
+    def generate_artifact_file_name(
+        cls,
+        artifact_type: str,
+        dag_name: str = "",
+        table_name: str = "",
+        add_default_ext: bool = True,
+    ) -> str:
+        """
+        Generates the file name for a provided artifact of a provided DAG package.
+        Follows the naming templates declared internally in the class constants.
+
+        :param artifact_type: type of artifact for which the file name will be generated.
+        :param dag_name: used to compose artifact names that contain the DAG name
+            in their names. Optional. Defaults to "" (empty string).
+        :param table_name: used to compose artifact names that contain the table name
+            in their names. Optional. Defaults to "" (empty string).
+        :param add_default_ext: switches whether to add or not the file extension into
+            the end of the name. Optional. Defaults to `True`.
+        :return: string
+        """
+        file_suffix = cls.__FILE_SUFFIXES.get(artifact_type, "")
+        file_name = cls.__FILE_NAME_TEMPLATES[artifact_type].format(
+            dag_name=dag_name, table_name=table_name, file_suffix=file_suffix
+        )
+        if add_default_ext:
+            file_name = "{}.{}".format(file_name, cls.__EXTENSIONS[artifact_type][0])
+        return file_name
+
+    @classmethod
+    def generate_artifact_file_path(
+        cls,
+        artifact_type: str,
+        dag_name: str = "",
+        layer: str = "",
+        table_name: str = "",
+        add_default_ext: bool = True,
+    ) -> str:
+        """
+        Generates the file path for a provided artifact of a provided DAG package. Follows the
+        naming templates declared internally in the class constants.
+
+        :param artifact_type: type of artifact for which the file path will be generated.
+        :param dag_name: used to compose the file path and into artifact names that contain
+            the DAG name in their names. Optional. Defaults to "" (empty string).
+        :param layer: datalake layer related to the artifact being provided.
+            Optional. Defaults to "" (empty string).
+        :param table_name: used to compose artifact names that contain the table name
+            in their names. Optional. Defaults to "" (empty string).
+        :param add_default_ext: switches whether to add or not the file extension into
+            the end of the path. Optional. Defaults to `True`.
+        :return: string
+        """
+        dag_path = cls.get_dag_path(dag_name=dag_name)
+        file_folder = cls.__FILE_FOLDERS.get(artifact_type, "")
+        file_name = cls.generate_artifact_file_name(
+            artifact_type, dag_name, table_name, add_default_ext
+        )
+        file_path = os.path.join(dag_path, file_folder, layer, file_name)
+
+        return file_path

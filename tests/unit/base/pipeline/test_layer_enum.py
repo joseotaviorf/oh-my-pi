@@ -25,9 +25,9 @@ class TestLayerEnum:
         # assert
         assert returned_value == expected_return
 
-    def test_get_valid_values(self):
+    def test_get_available_enum_values(self):
         # act
-        returned_value = LayerEnum.get_valid_values()
+        returned_value = LayerEnum.get_available_enum_values()
 
         # assert
         assert list(returned_value) == [
