@@ -1,0 +1,26 @@
+database_name: datalake_atta_raw
+table_name: pre_analysis_caixa
+columns:
+  id_registration_user:
+    tags:
+      - PII
+      - Confidential
+  client_cpf:
+    tags:
+      - PII
+      - Confidential
+  client_cpf_secondary:
+    tags:
+      - PII
+      - Confidential
+  state:
+    tags:
+      - Restricted
+  r_name:
+    tags:
+      - PII
+      - Confidential
+  r_score:
+    tags:
+      - PII
+      - Confidential

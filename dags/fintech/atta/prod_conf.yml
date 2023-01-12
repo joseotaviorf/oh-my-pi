@@ -39,6 +39,42 @@ tables:
   - table_name: proposta_itau
     extraction_type: full
     clean_table_name: financing_proposal
+  - table_name: consulta_score_bradesco
+    extraction_type: full
+    clean_table_name: pre_analysis_bradesco
+  - table_name: consulta_score_bradesco_params
+    extraction_type: full
+    clean_table_name: pre_analysis_bradesco_params
+  - table_name: consulta_score_bradesco_ratings
+    extraction_type: full
+    clean_table_name: pre_analysis_bradesco_ratings
+  - table_name: consulta_score_caixa
+    extraction_type: full
+    clean_table_name: pre_analysis_caixa
+  - table_name: consulta_score_ctrl
+    extraction_type: full
+    clean_table_name: pre_analysis_ctrl
+  - table_name: consulta_score_cliente_ctrl
+    extraction_type: full
+    clean_table_name: pre_analysis_client_ctrl
+  - table_name: consulta_score_itau
+    extraction_type: full
+    clean_table_name: pre_analysis_itau
+  - table_name: consulta_score_itau_ratings
+    extraction_type: full
+    clean_table_name: pre_analysis_itau_ratings
+  - table_name: consulta_score_santander
+    extraction_type: full
+    clean_table_name: pre_analysis_santander
+  - table_name: consulta_score_santander_matriz_decisao
+    extraction_type: full
+    clean_table_name: pre_analysis_santander_matrix
+  - table_name: consulta_score_santander_ratings
+    extraction_type: full
+    clean_table_name: pre_analysis_santander_ratings
+  - table_name: proposta_observacao
+    extraction_type: full
+    clean_table_name: proposal_notes
 
 clean_partition_columns: [year, month, day]
 lineage_product_database_name: atta

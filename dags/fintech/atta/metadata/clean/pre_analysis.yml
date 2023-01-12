@@ -20,7 +20,16 @@ columns:
   client_cpf:
     lineage:
       - datalake_atta_raw.consulta_score.cpf
-  down_payment_amount:
+  status:
+    lineage:
+      - datalake_atta_raw.consulta_score.status
+  priority_status:
+    lineage:
+      - datalake_atta_raw.consulta_score.priority
+  situation:
+    lineage:
+      - datalake_atta_raw.consulta_score.situacao
+  donw_payment_amount:
     lineage:
       - datalake_atta_raw.consulta_score.vlrentrada
   financing_value:

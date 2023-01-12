@@ -1,0 +1,7 @@
+database_name: datalake_atta_raw
+table_name: proposal_notes
+columns:
+  id_user:
+    tags:
+      - PII
+      - Confidential
