@@ -1,0 +1,12 @@
+dag:
+  name: dw_agent
+  owner: Data ForRent
+workflow:
+  type: query
+  layer: dw
+  custom_schema: public
+cluster:
+  type: databricks_10_4_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
