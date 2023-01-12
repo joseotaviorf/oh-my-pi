@@ -44,7 +44,6 @@ class DatabaseEnum:
     MONOPOLY = "MONOPOLY_DB"
     NAZARE = "NAZARE_DB"
     ODS = "ENV_ODS"
-    OSCAR = "OSCAR_DB"
     OWNER_FEES = "OWNER_FEES_DB"
     PERSON = "PERSON_DB"
     PIXAR = "PIXAR_DB"

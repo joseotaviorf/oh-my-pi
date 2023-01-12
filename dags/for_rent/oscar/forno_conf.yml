@@ -1,6 +1,0 @@
----
-  tables_block_list:
-    - pg_stat_statements
-    - flyway_schema_history
-    - change_owner_control
-  lineage_product_database_name: oscar

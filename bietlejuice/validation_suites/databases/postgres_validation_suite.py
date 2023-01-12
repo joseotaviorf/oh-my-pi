@@ -135,12 +135,6 @@ class PostgresValidationSuite(DatabaseValidationSuitesExecutor):
         )
         self._validate_connection(db_consumer)
 
-    def validate_oscar(self):
-        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
-            self.auth[DatabaseEnum.OSCAR], SparkClient()
-        )
-        self._validate_connection(db_consumer)
-
     def validate_owner_fees(self):
         db_consumer = self.REPOSITORY_CONSUMER_CLASS(
             self.auth[DatabaseEnum.OWNER_FEES], SparkClient()
