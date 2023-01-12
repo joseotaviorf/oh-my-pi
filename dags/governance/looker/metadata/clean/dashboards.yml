@@ -14,6 +14,9 @@ columns:
   description:
     lineage:
       - datalake_looker_raw.dashboards.description
+  view_count:
+    lienage:
+      - datalake_looker_raw.dashboards.view_count
   last_accessed_at:
     lineage:
       - datalake_looker_raw.dashboards.last_accessed_at

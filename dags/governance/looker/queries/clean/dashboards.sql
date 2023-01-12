@@ -3,6 +3,7 @@ SELECT
     title,
     folder_id,
     description,
+    view_count,
     last_accessed_at,
     user_id,
     url,

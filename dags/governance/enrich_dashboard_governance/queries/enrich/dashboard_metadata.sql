@@ -2,11 +2,12 @@ with
 metabase_last_view as (
   select
     id_model,
+    count(id_model) as views,
     max(ts_viewed) as ts_last_view
   from
     datalake_metabase_clean.view_log
   where
-    ts_viewed < date_add(timestamp(format_string('%d-%d-%dT00:00:00.000+0000', 2022, 11, 30)), 1)
+    date(ts_viewed) <= date(format_string('%d-%d-%d', {year}, {month}, {day}))
   group by
     id_model
 ),
@@ -27,7 +28,7 @@ metabase_dashboard_last_update as (
   from
     datalake_metabase_clean.report_dashboard md
   where
-    ts_updated < date_add(timestamp(format_string('%d-%d-%dT00:00:00.000+0000', 2022, 11, 30)), 1)
+    date(ts_updated) <= date(format_string('%d-%d-%d', {year}, {month}, {day}))
 ),
 metabase_dashboards as (
   select
@@ -104,7 +105,7 @@ metabase_dash_card as (
     datalake_metabase_clean.report_dashboard_card
   where
     id_card is not null and
-    ts_updated < date_add(timestamp(format_string('%d-%d-%dT00:00:00.000+0000', 2022, 11, 30)), 1)
+    date(ts_updated) <= date(format_string('%d-%d-%d', {year}, {month}, {day}))
   group by
     id_dashboard
 ),
@@ -115,6 +116,7 @@ metabase_dashboard_enrich as (
       mc.readable_location as dashboard_path,
       md.title,
       md.description,
+      lv.views,
       mu.email as ownership,
       CASE
         WHEN mc.readable_location like 'Fintech%' THEN 'Fintech'
@@ -217,6 +219,7 @@ select
   lf.path as dashboard_path,
   ld.title,
   ld.description,
+  ld.view_count as views,
   lu.email as ownership,
   CASE
     WHEN lf.path like 'Shared/Fintech%' THEN 'Fintech'
@@ -252,6 +255,7 @@ select
   dashboard_path,
   title,
   description,
+  views,
   ownership,
   domain,
   status,
@@ -270,6 +274,7 @@ select
   dashboard_path,
   title,
   description,
+  views,
   ownership,
   domain,
   status,
