@@ -7,9 +7,9 @@ SELECT
     created_at,
     updated_at,
     year AS year_tax_report,
-    YEAR(DATE('{execution_date}')) AS year,
-    MONTH(DATE('{execution_date}')) AS month,
-    DAY(DATE('{execution_date}')) AS day
+    CAST(EXTRACT(YEAR FROM DATE('{execution_date}')) AS INT) AS year,
+    CAST(EXTRACT(MONTH FROM DATE('{execution_date}')) AS INT) AS month,
+    CAST(EXTRACT(DAY FROM DATE('{execution_date}')) AS INT) AS day
 FROM 
     public.tax_report
 WHERE
