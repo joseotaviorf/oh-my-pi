@@ -197,6 +197,7 @@ select
   id as id_dashboard,
   title,
   description,
+  view_count,
   last_accessed_at,
   concat("https://quintoandar.sa.looker.com", url) as dashboard_url,
   created_at,
