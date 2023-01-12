@@ -1,0 +1,19 @@
+---
+database_name: datalake_ebdb_listing
+table_name: business_context_history
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.id_house
+  country_code:
+    lineage:
+      - datalake_ebdb_country.house.country_code
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.business_context
+  status:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.status
+  suspension_reason:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.suspension_reason

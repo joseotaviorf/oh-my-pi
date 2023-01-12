@@ -2,6 +2,8 @@
 tables:
   - table_name: agents_with_keys
     partitions: [country_code]
+  - table_name: business_context_history
+    partitions: [country_code, business_context]
   - table_name: house
     partitions: [country_code]
   - table_name: house_entrance_history

@@ -13,6 +13,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables:
 
 - `agents_with_keys`
+- `business_context_history`
 - `house`
 - `house_entrance_history`
 - `house_listing`
