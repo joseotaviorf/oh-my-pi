@@ -110,6 +110,7 @@ for table in tables:
         table_name=table_name,
         is_incremental=is_incremental,
         partitions=partitions,
+        has_create_external_table_task=False
     )
 
     create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
