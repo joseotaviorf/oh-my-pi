@@ -282,6 +282,7 @@ clean:
 	@find ./ -type f -name '.package_name' -exec rm -f {} \;
 	@find ./ -type f -name '*.pyc' -exec rm -f {} \;
 	@find ./ -type f -name '*~' -exec rm -f {} \;
+	@find ./dags/ -type f -name '*_dag.py' -exec rm -f {} \;
 
 .PHONY: help
 # Inspired by <http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html>
