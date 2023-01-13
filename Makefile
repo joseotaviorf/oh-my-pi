@@ -246,14 +246,16 @@ validate-datamarts-metadata-files-exist:
 ###############################################################################
 ###################### Common commands ########################################
 ###############################################################################
+dag_name ?="*"
 .PHONY: create-dag-files
-## create the DAG python files
+## creates the DAG Python files from the DAG declaration YAML files, as of `{dag_name}_dag.py`.
+## May receive an optional `dag_name={dag_name}` argument to create only the Python DAG file of the provided DAG.
 create-dag-files:
 	@echo ""
 	@echo "Creating the DAGs' Python files"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/create_dag_files.py
+	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/create_dag_files.py -d $(dag_name)
 
 .PHONY: cov-badge
 ## build coverage badge
