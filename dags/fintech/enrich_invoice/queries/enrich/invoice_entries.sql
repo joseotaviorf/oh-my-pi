@@ -36,6 +36,7 @@ WITH contract_user AS (
 
 SELECT
 	e.id_external AS id,
+    e.id_external_reversed_entry,
 	COALESCE(i.id_external, -1) AS id_invoice,
 	COALESCE(c_rtsk.id_external, -1) AS id_contract,
 	CASE 

@@ -5,6 +5,9 @@ columns:
   id:
     lineage:
       - datalake_retsuko_clean.entry.id_external
+  id_external_reversed_entry:
+    lineage:
+      - datalake_retsuko_clean.entry.id_external_reversed_entry
   id_invoice:
     lineage:
       - datalake_retsuko_clean.invoice.id_external

@@ -5,6 +5,9 @@ columns:
   sk_invoice_entry:
     lineage:
       - datalake_retsuko.invoice_entry.id
+  sk_invoice_reversed_entry:
+    lineage:
+      - datalake_retsuko.invoice_entry.id_external_reversed_entry
   entry_type:
     lineage:
       - datalake_retsuko.invoice_entry.entry_type

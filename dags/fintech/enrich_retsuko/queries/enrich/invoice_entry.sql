@@ -1,6 +1,7 @@
 SELECT
     e.id_external AS id,
     e.id_invoice,
+    e.id_external_reversed_entry,
     c.id_external AS id_contract,
     e.bill_item,
     REPLACE(regexp_extract(e.bill_item, 'entry.bill-item/(.+)', 1), '-', ' ') AS entry_type,

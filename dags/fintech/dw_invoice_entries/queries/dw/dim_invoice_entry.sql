@@ -1,5 +1,6 @@
 SELECT
     ie.id AS sk_invoice_entry,
+    ie.id_external_reversed_entry AS sk_invoice_reversed_entry,
     ie.entry_type,
     ie.from_account_type,
     ie.to_account_type,

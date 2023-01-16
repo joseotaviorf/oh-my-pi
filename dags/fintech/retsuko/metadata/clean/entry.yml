@@ -21,7 +21,7 @@ columns:
       - datalake_retsuko_raw.entry.to_account_id
   id_external_reversed_entry:
     lineage:
-      - datalake_retsuko_raw.reversed_entry_external_id
+      - datalake_retsuko_raw.entry.reversed_entry_external_id
   amount:
     lineage:
       - datalake_retsuko_raw.entry.amount
