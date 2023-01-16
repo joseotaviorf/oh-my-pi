@@ -1,6 +1,7 @@
 drop table if exists payment.dim_invoice_entry;
 create table if not exists payment.dim_invoice_entry (
     sk_invoice_entry bigint primary key,
+    id_external_reversed_entry bigint,
     entry_type varchar(80),
     from_account_type varchar(50),
     to_account_type varchar(50),
