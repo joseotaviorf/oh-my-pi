@@ -445,13 +445,13 @@ listing_business_context_relisting AS (
         suspension_reason,
         ts_status_started,
         ts_status_ended,
-        row_number() over(partition by id_house, business_context order by ts_status_started DESC) as order_relisting
+        row_number() over(partition by id_house, business_context order by ts_status_started ASC) as order_relisting
     FROM
         datalake_ebdb_listing.listing_business_context_suspension_history
     WHERE
         suspension_reason = 'RELISTING'
 ),
-latest_listing_business_context_relisting AS (
+first_listing_business_context_relisting AS (
   SELECT
     id_house,
     business_context,
@@ -507,7 +507,7 @@ LEFT JOIN house_entrance_history AS heh
     ON heh.id_house_listing = hl.id_house_listing
     AND heh.is_last_status_in_listing = True
 LEFT JOIN
-    latest_listing_business_context_relisting AS lbcr
+    first_listing_business_context_relisting AS lbcr
         ON lbcr.id_house = hl.id_house
             AND lbcr.ts_status_started >= hl.ts_listing_version_start
             AND COALESCE(lbcr.ts_status_ended, CAST('2200-01-01 12:00:00' AS TIMESTAMP)) <= COALESCE(hl.ts_listing_version_end, CAST('2200-01-01 12:00:00' AS TIMESTAMP))
