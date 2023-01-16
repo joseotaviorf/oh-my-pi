@@ -3,12 +3,8 @@ tables:
   - table_name: dim_sale_event_type
     is_incremental: false
   - table_name: fact_sale_demand_event
-    is_incremental: true
+    is_incremental: false
     partitions:
       - year
       - month
       - day
-    dw_query_filters:
-      "year" : "{year}"
-      "month" : "{month}"
-      "day" : "{day}"

@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS sale.fact_sale_demand_event;
 CREATE TABLE sale.fact_sale_demand_event (
+    sk_sale_demand_event VARCHAR,
     sk_event_date BIGINT,
     sk_event_type INTEGER,
     sk_booking BIGINT,

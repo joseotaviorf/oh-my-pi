@@ -168,6 +168,7 @@ events AS (
         sk_sale_agreement_signed_date != -1
 )
 SELECT
+    MD5(sk_event_date || '-' || sk_event_type || '-' || COALESCE(NULLIF(sk_offer, -1), sk_booking)) AS sk_sale_demand_event,
     e.sk_event_date,
     e.sk_event_type,
     e.sk_booking,
@@ -190,7 +191,3 @@ FROM
 JOIN
     dw_public.dim_date AS dd
         ON e.sk_event_date = dd.sk_date
-WHERE
-    dd.year = {year}
-    AND dd.month = {month}
-    AND dd.day = {day}
