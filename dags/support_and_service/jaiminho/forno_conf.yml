@@ -1,5 +1,5 @@
 ---
 tables:
-  - table_name: user_notifications_view
+  user_notifications_view:
     date_filter_column: updated_at
 partition_cols: [year, month, day]

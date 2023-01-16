@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import os
 import pendulum
 
@@ -25,6 +26,7 @@ ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(SOURCE)
 partition_cols = config_service.get_config("partition_cols")
+tables = config_service.get_config("tables")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
@@ -36,7 +38,9 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-raw_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_into_datalake.py"
+raw_spark_jobs_path = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
+)
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 # cluster setup
@@ -84,27 +88,37 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-raw_task_groups = task_group.build_raw_task_group_for_all_tables(
-    source=SOURCE,
-    target_database_base_name=SOURCE,
-    extraction_spark_job_file=raw_spark_jobs_path,
-    raw_spark_job_extra_args=["{{ ds }}", SOURCE],
-)
+for table_name, table_info in tables.items():
+    raw_task_groups = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        table_name=table_name,
+        target_database_base_name=SOURCE,
+        extraction_spark_job_file=raw_spark_jobs_path,
+        raw_spark_job_extra_args=[
+            "{{ ds }}",
+            SOURCE,
+            table_name,
+            json.dumps(partition_cols),
+            json.dumps(table_info),
+        ],
+    )
 
-clean_task_groups = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.CLEAN,
-    source_database_base_name=SOURCE,
-    target_database_base_name=SOURCE,
-    is_incremental=True,
-    partitions=partition_cols,
-)
+    clean_task_groups = task_group.build_task_group_from_sql_files(
+        layer=LayerEnum.CLEAN,
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+        is_incremental=True,
+        partitions=partition_cols,
+    )
 
+    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
 
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_groups),
+        DatalakeTaskGroup.all_first_tasks(clean_task_groups),
+    )
 
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_groups),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
-)
-
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+    terminate_cluster_task.set_upstream(
+        DatalakeTaskGroup.all_last_tasks(clean_task_groups)
+    )
