@@ -147,6 +147,12 @@ class PostgresValidationSuite(DatabaseValidationSuitesExecutor):
         )
         self._validate_connection(db_consumer)
 
+    def validate_property_tax(self):
+        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
+            self.auth[DatabaseEnum.PROPERTY_TAX], SparkClient()
+        )
+        self._validate_connection(db_consumer)
+
     def validate_quinto_messenger(self):
         db_consumer = self.REPOSITORY_CONSUMER_CLASS(
             self.auth[DatabaseEnum.QUINTO_MESSENGER], SparkClient()
