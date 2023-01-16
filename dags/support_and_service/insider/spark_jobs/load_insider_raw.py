@@ -12,7 +12,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-JOB_NAME = "load_insider_into_datalake"
+JOB_NAME = "load_insider_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -54,13 +54,12 @@ if __name__ == "__main__":
     for table in tables:
         df = postgres_consumer.get_data_from_table(table.table_name)
         # the table names in the datalake must be lowercase
-        s3_loader.load_full_table(
+        s3_loader.load_df(
             df=df,
-            database_name=database_name,
-            table_name=table.table_name.lower(),
+            s3_path=f"{database_location}{table.table_name.lower()}",
             format_options=format_options,
-            database_location=database_location,
         )
+
         spark_metastore_loader.update_metastore(
             df,
             database_name,

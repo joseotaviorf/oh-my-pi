@@ -34,7 +34,9 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_into_datalake.py"
+raw_spark_job_path = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
+)
 base_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 # cluster setup
