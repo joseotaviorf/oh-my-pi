@@ -89,15 +89,17 @@ task_group = DatalakeTaskGroup(
 )
 
 for table_name, table_info in tables.items():
+    raw_table_name = table_info["raw_table_name"]
+
     raw_task_groups = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
-        table_name=table_name,
+        table_name=raw_table_name,
         target_database_base_name=SOURCE,
         extraction_spark_job_file=raw_spark_jobs_path,
         raw_spark_job_extra_args=[
             "{{ ds }}",
             SOURCE,
-            table_name,
+            raw_table_name,
             json.dumps(partition_cols),
             json.dumps(table_info),
         ],
