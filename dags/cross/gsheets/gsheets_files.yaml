@@ -267,10 +267,10 @@ offboarding_customer_portfolio_contract:
     sheet_name: contracts
     clean_table_name: offboarding_customer_portfolio_contract
 
-photographer_account:
-    sheet_id: 1eXKN9IQVCljTrZPQ8HEac6KwYcatr5XdQr_IiD-7RJ8
-    sheet_name: photographer_account
-    clean_table_name: photographer_account
+# photographer_account:
+#     sheet_id: 1eXKN9IQVCljTrZPQ8HEac6KwYcatr5XdQr_IiD-7RJ8
+#     sheet_name: photographer_account
+#     clean_table_name: photographer_account
 
 plaquinhas_installation_targets:
     sheet_id: 1GEaj4YMe9sgRiJmqgoJuOvkb8H8hjEcEgsTyv9GLzmg
