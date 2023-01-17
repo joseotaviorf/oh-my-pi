@@ -25,7 +25,6 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(DAG_NAME)
-spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 datalake_bucket = config_service.get_config("datalake_bucket")
 athena_query_result_location = config_service.get_config("athena_query_results_bucket")
 

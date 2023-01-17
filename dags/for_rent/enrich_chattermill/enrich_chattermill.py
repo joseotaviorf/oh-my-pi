@@ -29,8 +29,6 @@ ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_b
 
 S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
-SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
-LOGS_OUTPUT_PATH = f"{SPARK_JOBS_LOGS_PATH}/{DAG_ID}"
 DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 CLUSTER_DESCRIPTION = config_service.get_config(

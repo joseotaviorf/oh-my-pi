@@ -27,7 +27,6 @@ config_service = ConfigurationService(DAG_NAME)
 default_libraries = config_service.get_config("default_libraries")
 
 ENV = os.environ.get("ENVIRONMENT")
-SPECTRUM_IAM_ROLE = config_service.get_config("spectrum_iam_role")
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
 S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")

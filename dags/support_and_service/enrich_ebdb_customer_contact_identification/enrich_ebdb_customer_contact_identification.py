@@ -27,7 +27,6 @@ ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(dag_name=CONTEXT)
 
-spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 datalake_bucket = config_service.get_config("datalake_bucket")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
@@ -36,7 +35,6 @@ databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 base_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-logs_output_path = f"s3://{databricks_bietlejuice_repo_path}/logs/jobs/{DAG_NAME}"
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 dafult_libraries = config_service.get_config("default_libraries")
 

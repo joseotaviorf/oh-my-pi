@@ -25,7 +25,6 @@ ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(CONTEXT)
 
-SPECTRUM_IAM_ROLE = config_service.get_config("spectrum_iam_role")
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
 DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")

@@ -37,7 +37,6 @@ datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 crawlers = config_service.get_config("tables")
@@ -50,10 +49,6 @@ dag_spark_conf = config_service.get_config("spark_conf")
 cluster_description["init_scripts"].append(dag_custom_init_script[0])
 cluster_description["spark_conf"].update(dag_spark_conf)
 
-cluster_description["spark_env_vars"]["ENVIRONMENT"] = ENV
-cluster_description["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
