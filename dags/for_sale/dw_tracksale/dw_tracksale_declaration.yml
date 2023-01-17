@@ -4,7 +4,7 @@ dag:
 workflow:
   type: query
   layer: dw
-  custom_schema: sale
+  custom_schema: tracksale
 cluster:
   type: databricks_10_4_med_general_cluster
   access_control_list:
