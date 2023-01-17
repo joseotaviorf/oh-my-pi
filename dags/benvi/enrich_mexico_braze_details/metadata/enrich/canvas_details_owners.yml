@@ -1,0 +1,46 @@
+---
+database_name: datalake_mexico_braze_details
+table_name: canvas_details_owners
+columns:
+  id_canvas:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.id_canvas
+  canvas_name:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.canvas_name
+  canvas_description:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.canvas_description
+  variants:
+    lineage:
+      - datalake_braze_details_clena.canvas_details_owners.variants
+  schedule_type:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.schedule_type
+  steps:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.steps
+  tags:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.tags
+  channels:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.channels
+  is_archived:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.archived
+  is_draft:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.draft
+  ts_first_entry:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.ts_first_entry
+  ts_last_entry:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.ts_last_entry
+  ts_created:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.ts_created
+  ts_updated:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_owners.ts_updated

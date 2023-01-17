@@ -1430,6 +1430,14 @@ bietlejuice.enrich_atta:
   - bietlejuice.atta:load-clean-log-isolve-v1
   - bietlejuice.atta:load-clean-log-isolve-v2
 
+bietlejuice.enrich_mexico_braze_details:
+  - bietlejuice.braze_details:load-clean-campaign-details-indica-ai
+  - bietlejuice.braze_details:load-clean-campaign-details-owners
+  - bietlejuice.braze_details:load-clean-campaign-details-tenants
+  - bietlejuice.braze_details:load-clean-canvas-details-indica-ai
+  - bietlejuice.braze_details:load-clean-canvas-details-owners
+  - bietlejuice.braze_details:load-clean-canvas-details-tenants
+
 bietlejuice.enrich_betopera:
   - bietlejuice.betopera:load-clean-certificate
   - bietlejuice.betopera:load-clean-certificate-request

@@ -1,0 +1,46 @@
+---
+database_name: datalake_mexico_braze_details
+table_name: campaign_details_tenants
+columns:
+  id_campaign:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.id_campaign
+  campaign_name:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.campaign_name
+  campaign_description:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.campaign_description
+  schedule_type:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.schedule_type
+  tags:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.tags
+  channels:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.channels
+  conversion_behaviors:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.conversion_behaviors
+  messages:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.messages
+  is_archived:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.archived
+  is_draft:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.draft
+  ts_last_sent:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.ts_last_sent
+  ts_first_sent:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.ts_first_sent
+  ts_created:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.ts_created
+  ts_updated:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_tenants.ts_updated

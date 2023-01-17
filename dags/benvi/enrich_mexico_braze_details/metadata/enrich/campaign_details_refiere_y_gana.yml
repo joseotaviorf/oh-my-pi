@@ -1,0 +1,46 @@
+---
+database_name: datalake_mexico_braze_details
+table_name: campaign_details_refiere_y_gana
+columns:
+  id_campaign:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.id_campaign
+  campaign_name:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.campaign_name
+  campaign_description:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.campaign_description
+  schedule_type:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.schedule_type
+  tags:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.tags
+  channels:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.channels
+  conversion_behaviors:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.conversion_behaviors
+  messages:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.messages
+  is_archived:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.archived
+  is_draft:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.draft
+  ts_last_sent:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.ts_last_sent
+  ts_first_sent:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.ts_first_sent
+  ts_created:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.ts_created
+  ts_updated:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.ts_updated
