@@ -18,9 +18,9 @@ WITH invoice_replace AS (
     FROM datalake_retsuko_clean.invoice i
     LEFT JOIN datalake_retsuko_clean.entry e
             ON e.id_invoice = i.id
-    INNER JOIN datalake_retsuko_clean.account af
+    LEFT JOIN datalake_retsuko_clean.account af
         ON e.id_from_account = af.id
-    INNER JOIN datalake_retsuko_clean.account at
+    LEFT JOIN datalake_retsuko_clean.account at
         ON e.id_to_account = at.id
     GROUP BY 1,2,3,4,5,6,8,9,10,11
 )
