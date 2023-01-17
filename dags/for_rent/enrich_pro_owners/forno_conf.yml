@@ -2,9 +2,12 @@
 inner_dependencies:
   owner_houses_quantity_history:
     - house_b2b_history
+  daily_owner_houses_quantity_history:
+    - house_b2b_history
   tracking_weekly_changes:
     - owner_houses_quantity_history
 incremental_tables:
   - tracking_weekly_changes
 partition_cols:
   tracking_weekly_changes: ["year", "month", "day"]
+  daily_owner_houses_quantity_history: ["country_code"]

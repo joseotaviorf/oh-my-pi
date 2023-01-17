@@ -7,9 +7,6 @@ WITH house_portability AS (
     FROM 
         datalake_ebdb_listing.house_listing hl
     JOIN 
-        datalake_ebdb_clean.house h
-            ON h.id = hl.id_house
-    JOIN 
         datalake_ebdb_clean.portability por
             ON por.id_house = hl.id_house 
             AND por.owner_type = 'B2B'

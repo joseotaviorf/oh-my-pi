@@ -1,0 +1,16 @@
+---
+database_name: datalake_pro_owners
+table_name: daily_owner_houses_quantity_history
+columns:
+  id_owner:
+    lineage:
+      - datalake_pro_owners.house_b2b_history.id_user
+  country_code:
+    lineage:
+      - datalake_ebdb_country.user.country_code
+  rental_administrator:
+    lineage:
+      - datalake_ebdb_listing.rent_listing.rental_administrator
+  dt_houses_owned:
+    lineage:
+      - datalake_quintoandar.aux_date.date

@@ -58,8 +58,6 @@ house_portability AS (
     SELECT
         hl.id_house_listing
     FROM datalake_ebdb_listing.house_listing hl
-    JOIN datalake_ebdb_clean.house h
-        ON h.id = hl.id_house
     JOIN datalake_ebdb_clean.portability por
         ON por.id_house = hl.id_house AND por.owner_type = 'B2B'
     WHERE por.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, now())
