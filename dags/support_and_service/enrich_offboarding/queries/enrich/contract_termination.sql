@@ -272,15 +272,15 @@ pp_nps AS (
 last_inspection_synch AS(
     SELECT
         term.id,
-        MAX(insp.dt_inspected) AS dt_last_inspection_synch
+        MAX(DATE(insp.ts_inspected)) AS dt_last_inspection_synch
     FROM
         datalake_terminator_clean.termination AS term
     JOIN
-        datalake_ebdb_clean.inspection AS insp
+        datalake_inspections.inspection_history insp
             ON term.id_contract = insp.id_contract
     WHERE
         term.status <> 'CANCELED'
-        AND insp.dt_inspected IS NOT NULL
+        AND insp.ts_inspected IS NOT NULL
     GROUP BY
         term.id
 ),

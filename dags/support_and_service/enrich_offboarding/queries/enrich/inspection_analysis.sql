@@ -12,10 +12,10 @@ WITH contracts AS (
             ON turf.origin = 'Contrato'
             AND turf.id_origin = ec.id
     LEFT JOIN
-        datalake_ebdb_clean.inspection AS ev
+        datalake_inspections.inspection_history AS ev
             ON turf.origin = 'Vistoria'
-            AND turf.id_origin = ev.id
-    WHERE 
+            AND turf.id_origin = ev.id_external
+    WHERE
         turf.type = 'AnaliseVistoriaSaida'
 ),
 last_updated_task AS (
@@ -42,23 +42,23 @@ inspection_task AS (
 SELECT
     o.id_contract,
     ROW_NUMBER() OVER (PARTITION BY o.id_contract ORDER BY c.id_completed_date DESC) AS contract_rank,
-    CASE 
+    CASE
         WHEN it.is_task_auto_completed = TRUE THEN 'Automática'
         ELSE 'Manual'
     END AS task_closed_type,
     DATEDIFF(TO_DATE(CAST(c.id_completed_date AS STRING), "yyyyMMdd"), TO_DATE(CAST(c.id_start_date AS STRING), "yyyyMMdd")) AS days_leadtime,
     TO_DATE(CAST(c.id_start_date AS STRING), "yyyyMMdd") AS dt_start_date,
     TO_DATE(CAST(c.id_completed_date AS STRING), "yyyyMMdd") AS dt_completed_date
-FROM 
+FROM
     datalake_offboarding.ongoing o
-LEFT JOIN 
-    contracts c 
-        ON c.id_contract = o.id_contract 
-LEFT JOIN 
-    inspection_task it 
+LEFT JOIN
+    contracts c
+        ON c.id_contract = o.id_contract
+LEFT JOIN
+    inspection_task it
         ON it.id_task = c.id_task
-WHERE 
+WHERE
     c.action_type <> 'CANCELED'
     AND c.id_completed_date IS NOT NULL
-GROUP BY 
+GROUP BY
     1,3,4,5,6,c.id_completed_date
