@@ -1,6 +1,6 @@
 WITH house_portability AS (
     SELECT
-        h.id AS id_house,
+        hl.id_house,
         hl.id_house_listing,
         hl.ts_listing_version_start,
         hl.ts_listing_version_end AS ts_listing_version_end
