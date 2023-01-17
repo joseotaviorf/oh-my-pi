@@ -380,8 +380,8 @@ databricks_10_4_med_io-general_photon_cluster:
 
 databricks_10_4_max_io-memory_photon_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5n.4xlarge
-    node_type_id: r5n.8xlarge
+    driver_node_type_id: r5d.4xlarge
+    node_type_id: r5d.8xlarge
     runtime_engine: PHOTON
     autoscale:
         max_workers: 4
