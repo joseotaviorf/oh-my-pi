@@ -113,3 +113,5 @@ SELECT
     is_contract_b2b
 FROM
     b2b_info
+WHERE
+    contract_partner_type <> 'EXECUTIVE_FOR_RENT' --This is a temporary fix to prevent data duplication due to a product rollout
