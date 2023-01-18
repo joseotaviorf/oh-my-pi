@@ -19,3 +19,6 @@ custom_cluster:
     max_workers: 6
   aws_attributes:
     ebs_volume_size: 500
+  spark_conf:
+    spark.executor.memory: "240g"
+    spark.executor.memoryOverhead: "23g"

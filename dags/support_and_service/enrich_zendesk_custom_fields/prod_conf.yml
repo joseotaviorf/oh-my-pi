@@ -1,7 +1,8 @@
 ---
 custom_cluster:
-  driver_node_type_id: r5a.12xlarge
-  node_type_id: r5a.12xlarge
+  driver_node_type_id: r6gd.12xlarge
+  node_type_id: r6gd.12xlarge
+  runtime_engine: PHOTON
   autoscale:
     min_workers: 2
     max_workers: 6
@@ -9,3 +10,5 @@ custom_cluster:
     ebs_volume_size: 500
   spark_conf:
     spark.sql.mapKeyDedupPolicy: "LAST_WIN"
+    spark.executor.memory: "240g"
+    spark.executor.memoryOverhead: "23g"
