@@ -5,6 +5,9 @@ columns:
   id_entry:
     lineage:
       - dw_payment.fact_invoice_entries.sk_invoice_entry
+  sk_invoice_reversed_entry:
+    lineage:
+      - dw_payment.dim_invoice_entry.sk_invoice_reversed_entry
   id_invoice:
     lineage:
       - dw_payment.fact_invoice_entries.sk_invoice

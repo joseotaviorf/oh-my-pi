@@ -23,6 +23,7 @@ next_business_day AS (
 )
 SELECT
   fie.sk_invoice_entry AS id_entry,
+  ie.sk_invoice_reversed_entry,
   fie.sk_invoice AS id_invoice,
   fie.sk_contract,
   CASE
