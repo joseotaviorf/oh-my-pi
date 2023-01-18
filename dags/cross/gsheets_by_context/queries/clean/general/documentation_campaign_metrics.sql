@@ -1,0 +1,13 @@
+SELECT
+    quarter,
+    year_month,
+    line,
+    metric_name,
+    business_stage,
+    hierarchy_level,
+    created_by,
+    maturity_level,
+    comment,
+    ts_load
+FROM
+    datalake_gsheets_raw.documentation_campaign_metrics

@@ -1,0 +1,34 @@
+---
+database_name: datalake_gsheets_clean
+table_name: documentation_campaign_metabase_dashboards
+columns:
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.quarter
+  year_month:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.year_month
+  line:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.line
+  dashboard_path:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.dashboard_path
+  dashboard_title:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.dashboard_title
+  ownership:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.ownership
+  views:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.views
+  ts_last_view:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.ts_last_view
+  comment:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.comment
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.ts_load

@@ -1,0 +1,34 @@
+---
+database_name: datalake_gsheets_clean
+table_name: documentation_campaign_metrics
+columns:
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metrics.quarter
+  year_month:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metrics.year_month
+  line:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metrics.line
+  metric_name:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metrics.metric_name
+  business_stage:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metrics.business_stage
+  hierarchy_level:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metrics.hierarchy_level
+  created_by:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metrics.created_by
+  maturity_level:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metrics.maturity_level
+  comment:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metrics.comment
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_metrics.ts_load

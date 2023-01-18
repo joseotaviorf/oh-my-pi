@@ -1,0 +1,34 @@
+---
+database_name: datalake_gsheets_clean
+table_name: documentation_campaign_datasets
+columns:
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_datasets.quarter
+  year_month:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_datasets.year_month
+  line:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_datasets.line
+  layer:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_datasets.layer
+  table_name:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_datasets.table_name
+  has_description:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_datasets.has_description
+  count_columns:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_datasets.count_columns
+  pct_columns_has_description:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_datasets.pct_columns_has_description
+  comment:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_datasets.comment
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.documentation_campaign_datasets.ts_load
