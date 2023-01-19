@@ -4,16 +4,13 @@ columns:
   id:
     lineage:
       - datalake_ebdb_clean.offer.id
-  id_offer_context:
-    lineage:
-      - datalake_ebdb_clean.offer.id
   id_firestore:
     lineage:
       - datalake_ebdb_clean.offer.id_firestore
   id_godfather:
     lineage:
       - datalake_ebdb_clean.offer.id_godfather
-      - datalake_ebdb_clean.offer.id
+      - datalake_godfather_clean.offer.id
   id_country:
     lineage:
       - datalake_ebdb_country.house.id_country
@@ -55,57 +52,51 @@ columns:
       - datalake_ebdb_clean.offer.iteration
   type:
     lineage:
+      - datalake_ebdb_clean.offer.type
+      - datalake_firestore.rent_offer.type
       - datalake_godfather_clean.offer.type
   last_offered_rent:
     lineage:
       - datalake_ebdb_clean.offer.rent
   first_rent_offered_by_tenant:
     lineage:
-      - datalake_ebdb_clean.offer_aud.rev
       - datalake_ebdb_clean.offer_aud.rent
   first_rent_offered_by_owner:
     lineage:
-      - datalake_ebdb_clean.offer_aud.rev
       - datalake_ebdb_clean.offer_aud.rent
   last_rent_offered_by_tenant:
     lineage:
-      - datalake_ebdb_clean.offer_aud.rev
       - datalake_ebdb_clean.offer_aud.rent
   last_rent_offered_by_owner:
     lineage:
-      - datalake_ebdb_clean.offer_aud.rev
       - datalake_ebdb_clean.offer_aud.rent
   number_of_tenants:
     lineage:
-      - datalake_offer.offer.number_of_tenants
+      - datalake_firestore.rent_offer.resident
   number_of_kids:
     lineage:
-      - datalake_offer.offer.number_of_kids
+      - datalake_firestore.rent_offer.resident
   rental_reason:
     lineage:
-      - datalake_offer.offer.rental_reason
+      - datalake_firestore.rent_offer.tenant_intent
   rental_urgency:
     lineage:
-      - datalake_offer.offer.rental_urgency
+      - datalake_firestore.rent_offer.tenant_intent
   tenant_description:
     lineage:
-      - datalake_offer.offer.tenant_description
+      - datalake_firestore.rent_offer.resident
   tenant_pets_info:
     lineage:
-      - datalake_offer.offer.tenant_pets_info
+      - datalake_firestore.rent_offer.resident
   tenant_type:
     lineage:
-      - datalake_offer.offer.tenant_type
+      - datalake_firestore.rent_offer.resident
   has_pets:
     lineage:
-      - datalake_offer.offer.has_pets
+      - datalake_firestore.rent_offer.resident
   is_instant_offer:
     lineage:
       - datalake_firestore.rent_offer.is_instant_offer
-  is_offer_submitted:
-    lineage:
-      - datalake_godfather_clean.offer.ts_last_sent
-      - datalake_godfather_clean.offer.ts_last_sent
   ts_email_sent_to_owner:
     lineage:
       - datalake_firestore.rent_offer.ts_email_sent_to_owner
@@ -117,9 +108,11 @@ columns:
       - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_first_sent:
     lineage:
+      - datalake_firestore.rent_offer.ts_first_sent
       - datalake_godfather_clean.offer.ts_first_sent
   ts_last_sent:
     lineage:
+      - datalake_firestore.rent_offer.ts_last_sent
       - datalake_godfather_clean.offer.ts_last_sent
   ts_created:
     lineage:
