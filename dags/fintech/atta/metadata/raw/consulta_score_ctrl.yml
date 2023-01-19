@@ -1,2 +1,2 @@
 database_name: datalake_atta_raw
-table_name: pre_analysis_ctrl
+table_name: consulta_score_ctrl

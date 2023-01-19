@@ -1,19 +1,19 @@
 database_name: datalake_atta_raw
-table_name: pre_analysis_bradesco
+table_name: consulta_score_bradesco
 columns:
-  id_registration_user:
+  ID_USUARIO:
     tags:
       - PII
       - Confidential
-  client_cpf:
+  CPF:
     tags:
       - PII
       - Confidential
-  client_cpf_secondary:
+  CPF2:
     tags:
       - PII
       - Confidential
-  owner_name:
+  NomeProp1:
     tags:
       - PII
       - Confidential

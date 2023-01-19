@@ -2,7 +2,7 @@
 database_name: datalake_atta_clean
 table_name: pre_analysis_caixa
 columns:
-  id_pre_analysis_bradesco:
+  id_pre_analysis_caixa:
     lineage:
       - datalake_atta_raw.consulta_score_caixa.id
   id_registration_user:

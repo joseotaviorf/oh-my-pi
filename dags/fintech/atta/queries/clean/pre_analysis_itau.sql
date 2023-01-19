@@ -1,5 +1,5 @@
 SELECT
-    ID                          AS id_pre_analysis_bradesco,
+    ID                          AS id_pre_analysis_itau,
     IDUsuario                   AS id_registration_user,
     id_usuarioRetorno           AS id_return_user,
     IDParceiro                  AS id_partner,

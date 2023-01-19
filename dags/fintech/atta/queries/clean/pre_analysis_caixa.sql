@@ -1,5 +1,5 @@
 SELECT
-    ID                          AS id_pre_analysis_bradesco,
+    ID                          AS id_pre_analysis_caixa,
     ID_USUARIO                  AS id_registration_user,
     IDParceiro                  AS id_partner,
     IDFranquia                  AS id_franchise,

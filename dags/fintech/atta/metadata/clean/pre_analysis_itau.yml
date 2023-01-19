@@ -2,7 +2,7 @@
 database_name: datalake_atta_clean
 table_name: pre_analysis_itau
 columns:
-  id_pre_analysis_bradesco:
+  id_pre_analysis_itau:
     lineage:
       - datalake_atta_raw.consulta_score_itau.id
   id_registration_user:

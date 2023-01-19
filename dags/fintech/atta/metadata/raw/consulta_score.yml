@@ -1,7 +1,7 @@
 database_name: datalake_atta_raw
-table_name: proposal_notes
+table_name: consulta_score
 columns:
-  id_user:
+  cpf:
     tags:
       - PII
       - Confidential

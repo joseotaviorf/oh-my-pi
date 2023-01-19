@@ -1,7 +1,7 @@
 database_name: datalake_atta_raw
-table_name: pre_analysis
+table_name: proposta_observacao
 columns:
-  client_cpf:
+  IDUsuario:
     tags:
       - PII
       - Confidential

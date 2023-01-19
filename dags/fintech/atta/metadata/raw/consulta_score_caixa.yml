@@ -1,26 +1,26 @@
 database_name: datalake_atta_raw
-table_name: pre_analysis_caixa
+table_name: consulta_score_caixa
 columns:
-  id_registration_user:
+  ID_USUARIO:
     tags:
       - PII
       - Confidential
-  client_cpf:
+  CPF:
     tags:
       - PII
       - Confidential
-  client_cpf_secondary:
+  CPF2:
     tags:
       - PII
       - Confidential
-  state:
+  UF:
     tags:
       - Restricted
-  r_name:
+  R_NOME:
     tags:
       - PII
       - Confidential
-  r_score:
+  R_SCORE:
     tags:
       - PII
       - Confidential

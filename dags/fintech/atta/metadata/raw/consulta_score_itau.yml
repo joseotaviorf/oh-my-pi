@@ -1,41 +1,41 @@
 database_name: datalake_atta_raw
-table_name: pre_analysis_itau
+table_name: consulta_score_itau
 columns:
-  id_registration_user:
+  IDUsuario:
     tags:
       - PII
       - Confidential
-  client_cpf:
+  CPF:
     tags:
       - PII
       - Confidential
-  client_cpf_secondary:
+  CPF2:
     tags:
       - PII
       - Confidential
   requester_email:
     tags:
       - Confidential
-  state:
+  UF:
     tags:
       - Restricted
-  r_name:
+  R_NOME:
     tags:
       - PII
       - Confidential
-  r_score:
+  R_SCORE:
     tags:
       - PII
       - Confidential
-  r_score2:
+  R_SCORE2:
     tags:
       - PII
       - Confidential
-  r_score3:
+  R_SCORE3:
     tags:
       - PII
       - Confidential
-  r_age:
+  R_IDADE:
     tags:
       - PII
       - Confidential
