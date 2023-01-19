@@ -1,5 +1,6 @@
 import json
 from datetime import timedelta
+from typing import List, Dict
 
 from airflow.utils.helpers import chain
 from airflow.operators.dummy_operator import DummyOperator
@@ -62,6 +63,7 @@ class DWTaskGroup(BaseTaskGroup):
         partitions: list = None,
         extra_query_template_params: dict = None,
         has_load_to_redshift_task: bool = True,
+        table_custom_structure: Dict[str, Dict[str, str]] = None,
     ) -> dict:
         """
         Creates a task group containing the tasks:
@@ -81,12 +83,13 @@ class DWTaskGroup(BaseTaskGroup):
         :type partitions: list[str]
         :param extra_query_template_params: additional parameters to be supplied to query template
         :param has_load_to_redshift_task: If this table is going to be loaded into redshift
-        :type has_load_to_redshift_task: bool
+        :param table_custom_structure: table's custom metadata, when applicable
         :return: dict with initial and final tasks of the created task group
         :rtype: dict[str:list[airflow.models.BaseOperator]]
         """
+        table_database_schema = self.__get_table_schema(table_custom_structure)
         layer = LayerEnum.DW.value
-        slugged_dw_schema = StringFormatter.slugify(self.dw_schema)
+        slugged_dw_schema = StringFormatter.slugify(table_database_schema)
         slugged_table_name = StringFormatter.slugify(table_name)
         extra_query_template_params = extra_query_template_params or {}
         partitions = partitions or []
@@ -106,7 +109,7 @@ class DWTaskGroup(BaseTaskGroup):
                     "parameters": [
                         self.env,
                         self.dw_bucket,
-                        self.dw_schema,
+                        table_database_schema,
                         table_name,
                         json.dumps(partitions),
                     ]
@@ -129,7 +132,7 @@ class DWTaskGroup(BaseTaskGroup):
                             self.env,
                             spectrum_iam_role,
                             self.dw_bucket,
-                            self.dw_schema,
+                            table_database_schema,
                             table_name,
                         ],
                     }
@@ -150,7 +153,7 @@ class DWTaskGroup(BaseTaskGroup):
                     "parameters": [
                         self.dw_bucket,
                         layer,
-                        self.dw_schema,
+                        table_database_schema,
                         "--table-name",
                         table_name,
                     ],
@@ -168,7 +171,7 @@ class DWTaskGroup(BaseTaskGroup):
                     "parameters": [
                         self.dw_bucket,
                         layer,
-                        self.dw_schema,
+                        table_database_schema,
                         "--table-name",
                         table_name,
                     ],
@@ -191,7 +194,7 @@ class DWTaskGroup(BaseTaskGroup):
                         "parameters": [
                             layer,
                             MetadataTypeEnum.LINEAGE.value,
-                            self.dw_schema,
+                            table_database_schema,
                             table_name,
                         ],
                     }
@@ -227,10 +230,11 @@ class DWTaskGroup(BaseTaskGroup):
         table_name: str,
         execution_date="{{ ds }}",
         is_incremental: bool = False,
-        partitions: list = None,
+        partitions: List[str] = None,
         extra_query_template_params: dict = None,
         cluster_config_params: dict = None,
         tree_path: str = "",
+        table_custom_structure: Dict[str, Dict[str, str]] = None,
     ) -> dict:
         """
         Creates a task group containing the default loading task:
@@ -238,13 +242,13 @@ class DWTaskGroup(BaseTaskGroup):
         For full load pipelines, it builds additional task groups
 
         :param table_name: table name to be created
+        :param execution_date: execution date got from Airflow's DAG Run, via Jinja template
         :param is_incremental: if this table uses incremental load type
         :param partitions: list of columns to partition table
-        :type partitions: list[str]
         :param extra_query_template_params: additional parameters to be supplied to query template
         :param cluster_config_params: custom config parameters to be set in spark cluster
         :param tree_path: subfolder where the query is located. By default, an empty string, which means it's in the root folder "dw"
-        :type tree_path: str
+        :param table_custom_structure: table's custom metadata, when applicable
         :return: dict with initial and final tasks of the created task group
         :rtype: dict[str:list[airflow.models.BaseOperator]]
         """
@@ -252,16 +256,17 @@ class DWTaskGroup(BaseTaskGroup):
         partitions = partitions or []
         extra_query_template_params = extra_query_template_params or {}
         cluster_config_params = cluster_config_params or {}
+        table_database_schema = self.__get_table_schema(table_custom_structure)
 
         slugged_layer = StringFormatter.slugify(layer)
-        slugged_dw_schema = StringFormatter.slugify(self.dw_schema)
+        slugged_dw_schema = StringFormatter.slugify(table_database_schema)
         slugged_table_name = StringFormatter.slugify(table_name)
         table_load_mode = self._get_load_mode(is_incremental)
 
         load_table_to_dw_staging_params = [
             self.env,
             self.dw_bucket,
-            self.dw_schema,
+            table_database_schema,
             self.relative_query_path,
             table_name,
         ]
@@ -327,6 +332,7 @@ class DWTaskGroup(BaseTaskGroup):
             return self._build_dw_staging_full_load_extra_tasks(
                 load_table_to_dw_staging_schema_task=load_table_to_dw_staging_schema_task,
                 table_name=table_name,
+                table_database_schema=table_database_schema,
                 independent_tasks=quality_tasks,
             )
 
@@ -334,6 +340,7 @@ class DWTaskGroup(BaseTaskGroup):
         self,
         load_table_to_dw_staging_schema_task,
         table_name: str,
+        table_database_schema,
         independent_tasks: list = [],
     ) -> dict:
         """
@@ -343,12 +350,13 @@ class DWTaskGroup(BaseTaskGroup):
          default row with -1 in primary key column
 
         :param table_name: table name to be created
+        :param table_database_schema: table's database schema
         :return: dict with initial and final tasks of the created task group
         :rtype: dict[str:list[airflow.models.BaseOperator]]
         """
         layer = LayerEnum.DW_STAGING.value
         slugged_layer = StringFormatter.slugify(layer)
-        slugged_dw_schema = StringFormatter.slugify(self.dw_schema)
+        slugged_dw_schema = StringFormatter.slugify(table_database_schema)
         slugged_table_name = StringFormatter.slugify(table_name)
 
         # TODO: Remove this test once we decide that our Data Quality validations will block downstream tasks
@@ -358,7 +366,7 @@ class DWTaskGroup(BaseTaskGroup):
             json={
                 "spark_python_task": {
                     "python_file": f"{self.spark_jobs_path}/emptiness_test.py",
-                    "parameters": [self.dw_schema, table_name],
+                    "parameters": [table_database_schema, table_name],
                 }
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
@@ -376,7 +384,7 @@ class DWTaskGroup(BaseTaskGroup):
                         "parameters": [
                             self.env,
                             self.dw_bucket,
-                            self.dw_schema,
+                            table_database_schema,
                             layer,
                             table_name,
                         ],
@@ -397,6 +405,12 @@ class DWTaskGroup(BaseTaskGroup):
             final_tasks=test_tasks,
             independent_tasks=independent_tasks,
         )
+
+    def __get_table_schema(self, table_custom_structure):
+        if not table_custom_structure or "custom_schema" not in table_custom_structure:
+            return self.dw_schema
+
+        return table_custom_structure["custom_schema"]
 
     @staticmethod
     def is_dim(table_name: str) -> bool:

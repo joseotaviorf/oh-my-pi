@@ -1,5 +1,6 @@
 import json
 from datetime import timedelta
+from typing import Dict
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.operators.dummy_operator import DummyOperator
@@ -390,6 +391,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         tree_path="",
         execution_date="{{ ds }}",
         has_hive_sync=True,
+        table_custom_structure=None,
     ):
         """
         Create a task group containing 4 tasks:
@@ -424,6 +426,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
         :type execution_date: str
         :param has_hive_sync: if this table is going to have Hive sync
+        :param table_custom_structure: table's custom metadata, when applicable
         :return: dict with initial and final tasks of the created task group
         :rtype: dict
         """
@@ -621,6 +624,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         tree_path="",
         execution_date="{{ ds }}",
         has_hive_sync=True,
+        table_custom_structure: Dict[str, Dict[str, str]] = None,
     ):
         """
         Build a task group for clean layer
@@ -648,6 +652,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type schema: str
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
         :param has_hive_sync: if this table is going to have Hive sync
+        :param table_custom_structure: table's custom metadata, when applicable
         :type execution_date: str
         :rtype: list[BaseOperator]
         """
@@ -666,6 +671,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             tree_path,
             execution_date,
             has_hive_sync,
+            table_custom_structure,
         )
 
     def build_enrich_task_group(
@@ -681,6 +687,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         schema="",
         execution_date="{{ ds }}",
         has_hive_sync=True,
+        table_custom_structure: Dict[str, Dict[str, str]] = None,
     ):
         """
         Build a task group for enrich layer
@@ -708,6 +715,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type schema: str
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
         :param has_hive_sync: if this table is going to have Hive sync
+        :param table_custom_structure: table's custom metadata, when applicable
         :type execution_date: str
         :rtype: list[BaseOperator]
         """
@@ -724,4 +732,5 @@ class DatalakeTaskGroup(BaseTaskGroup):
             schema,
             execution_date=execution_date,
             has_hive_sync=has_hive_sync,
+            table_custom_structure=table_custom_structure,
         )

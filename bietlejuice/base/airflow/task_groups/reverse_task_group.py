@@ -64,6 +64,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         extra_query_template_params=None,
         tree_path="",
         execution_date="{{ ds }}",
+        table_custom_structure=None,
     ):
         """
         Create a task group containing the tasks:
@@ -91,6 +92,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         :type extra_query_template_params: dict
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
         :type execution_date: str
+        :param table_custom_structure: table's custom metadata, when applicable
         :return: dict with initial and final tasks of the created task group
         :rtype: dict
         """
@@ -175,6 +177,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         cluster_config_params=None,
         extra_query_template_params=None,
         execution_date="{{ ds }}",
+        table_custom_structure=None,
     ):
         """
         Build a task group for enrich layer
@@ -197,6 +200,7 @@ class ReverseTaskGroup(BaseTaskGroup):
             the query besides year, month and day
         :type extra_query_template_params: dict
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :param table_custom_structure: table's custom metadata, when applicable
         :type execution_date: str
         :rtype: list[BaseOperator]
         """
@@ -210,4 +214,5 @@ class ReverseTaskGroup(BaseTaskGroup):
             cluster_config_params,
             extra_query_template_params,
             execution_date=execution_date,
+            table_custom_structure=table_custom_structure,
         )

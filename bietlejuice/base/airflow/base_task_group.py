@@ -1,4 +1,5 @@
 from copy import copy
+from typing import Dict
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -46,16 +47,21 @@ class BaseTaskGroup(object):
         self.spark_jobs_path = spark_jobs_path
         self.execution_timeout_hours = execution_timeout_hours
 
-    def build_task_group_from_sql_files(self, layer, **kwargs):
+    def build_task_group_from_sql_files(
+        self,
+        layer: LayerEnum,
+        tables_custom_structure: Dict[str, Dict[str, str]] = None,
+        **kwargs
+    ) -> dict:
         """
         Create a task-group for each table, based on each table's respective sql file
 
         :param layer: layer Enum
-        :type layer: bietlejuice.base.pipeline.LayerEnum member
+        :param tables_custom_structure: tables metadata to customize table's execution in the Job
         :return: a dict of task groups created
-        :rtype: dict
         """
 
+        tables_custom_structure = tables_custom_structure or {}
         schema = kwargs.get("schema")
         tree_path = kwargs.get("tree_path", "")
         # To avoid legacy codes who uses full / incremental on schema variable
@@ -70,7 +76,11 @@ class BaseTaskGroup(object):
         )
         task_groups = {}
         for table_name in table_names:
-            params = {"table_name": table_name, **kwargs}
+            params = {
+                "table_name": table_name,
+                "table_custom_structure": tables_custom_structure.get(table_name, {}),
+                **kwargs,
+            }
             task_groups[table_name] = method(self, **params)
 
         return task_groups
