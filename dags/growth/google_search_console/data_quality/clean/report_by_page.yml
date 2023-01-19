@@ -1,24 +1,26 @@
 ---
-table_name: datalake_google_search_console_clean.domain_by_property
-alert_channel: "#alerts-de-airflow-dags"
+table_name: datalake_google_search_console_clean.report_by_page
+alert_channel: "#alerts-data-quality"
 column_level_validations:
   site_url:
     is_complete:
-  google_property:
+  type:
     is_complete:
-  query:
+  page:
     is_complete:
   country:
     is_complete:
-  device_category:
+  device:
     is_complete:
   clicks:
     is_complete:
-  ctr:
-    is_complete:
   impressions:
     is_complete:
+  ctr:
+    is_complete:
   position:
+    is_complete:
+  posimp:
     is_complete:
   dt_created:
     is_complete:

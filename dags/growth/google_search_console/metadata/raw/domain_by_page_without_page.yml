@@ -1,3 +1,0 @@
----
-database_name: datalake_google_search_console_raw
-table_name: domain_by_page_without_page

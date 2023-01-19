@@ -1,17 +1,22 @@
 ---
 raw_partition_cols: ["date"]
-domain_list:
+site_url_list:
   - sc-domain:quintoandar.com.br
   - sc-domain:proprietario.quintoandar.com.br
   - sc-domain:meulugar.quintoandar.com.br
   - sc-domain:conteudos.quintoandar.com.br
-url_list:
-  - https://www.quintoandar.com.br
-  - https://proprietario.quintoandar.com.br
-  - https://meulugar.quintoandar.com.br
-  - https://conteudos.quintoandar.com.br
-by_property:
-  aggregation_type: BY_PROPERTY
+by_page:
+  aggregation_type: AUTO
+  dimensions:
+    - PAGE
+    - COUNTRY
+    - DEVICE
+    - DATE
+  type_list:
+    - WEB
+  filters: []
+by_query:
+  aggregation_type: AUTO
   dimensions:
     - QUERY
     - COUNTRY
@@ -19,8 +24,9 @@ by_property:
     - DATE
   type_list:
     - WEB
-by_page:
-  aggregation_type: BY_PAGE
+  filters: []
+by_page_and_query:
+  aggregation_type: AUTO
   dimensions:
     - PAGE
     - QUERY
@@ -29,19 +35,4 @@ by_page:
     - DATE
   type_list:
     - WEB
-by_property_without_query:
-  aggregation_type: BY_PROPERTY
-  dimensions:
-    - COUNTRY
-    - DEVICE
-    - DATE
-  type_list:
-    - WEB
-by_page_without_page:
-  aggregation_type: BY_PAGE
-  dimensions:
-    - COUNTRY
-    - DEVICE
-    - DATE
-  type_list:
-    - WEB
+  filters: []

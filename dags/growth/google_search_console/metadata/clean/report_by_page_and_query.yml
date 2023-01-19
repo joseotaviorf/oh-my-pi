@@ -1,0 +1,50 @@
+---
+database_name: datalake_google_search_console_clean
+table_name: report_by_page_and_query
+columns:
+  site_url:
+    lineage:
+      - datalake_google_search_console_raw.report_by_query.site_url
+  type:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.type
+  page:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.keys
+  query:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.keys
+  country:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.keys
+  device:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.keys
+  clicks:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.clicks
+  impressions:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.impressions
+  ctr:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.ctr
+  position:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.position
+  posimp:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.position
+      - datalake_google_search_console_raw.report_by_page_and_query.impressions
+  dt_created:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.date
+  year:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.date
+  month:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.date
+  day:
+    lineage:
+      - datalake_google_search_console_raw.report_by_page_and_query.date

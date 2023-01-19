@@ -40,16 +40,15 @@ if __name__ == "__main__":
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
     parser.add_argument("table_name")
-    parser.add_argument("property_type")
-    parser.add_argument("aggregation_type")
+    parser.add_argument("report_type")
 
     args = parser.parse_args()
 
     logger.info(
         f"""
             m={JOB_NAME}, environment={args.env}, source={args.source}, table_name={args.table_name},
-            load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, aggregation_type={args.aggregation_type}
-            property_type={args.property_type}, msg=print spark jobs args
+            load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, report_type={args.report_type}, 
+            msg=print spark jobs args
         """
     )
 
@@ -59,13 +58,12 @@ if __name__ == "__main__":
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
     table_name = args.table_name
-    property_type = args.property_type
-    aggregation_type = args.aggregation_type
+    report_type = args.report_type
 
     config_service = ConfigurationService(source)
     raw_partition_cols = config_service.get_config("raw_partition_cols")
-    site_url_list = config_service.get_config(f"{property_type}_list")
-    query_request_body = config_service.get_config(aggregation_type)
+    site_url_list = config_service.get_config(f"site_url_list")
+    query_request_body = config_service.get_config(report_type)
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -114,6 +112,9 @@ if __name__ == "__main__":
                     "type": type,
                     "rowLimit": maxRows,  # Set number of rows to extract at once (max 25k)
                     "startRow": numRows,  # Start at row 0, then row 25k, then row 50k... until with all.
+                    "dimensionFilterGroups": [{
+                    'filters': query_request_body["filters"]
+                  }],
                 }
 
                 query_result = (

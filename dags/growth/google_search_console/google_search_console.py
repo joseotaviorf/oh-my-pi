@@ -25,7 +25,7 @@ CUSTOM_LIBRARIES = [{"pypi": {"package": "google-api-python-client"}}]
 
 config_service = ConfigurationService(SOURCE)
 PARTITION_COLS = config_service.get_config("partition_cols")
-PROPERTY_TYPE_LIST = config_service.get_config("property_type_list")
+REPORT_TYPE_LIST = config_service.get_config("report_type_list")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -92,53 +92,51 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-for property_type in PROPERTY_TYPE_LIST:
-    for aggregation_type in PROPERTY_TYPE_LIST[property_type]:
-        table_name = f"{property_type}_{aggregation_type}"
-        raw_task_group = datalake_task_group.build_raw_task_group_for_single_table(
-            source=SOURCE,
-            target_database_base_name=SOURCE,
-            table_name=table_name,
-            extraction_spark_job_file=raw_spark_job_file,
-            raw_spark_job_extra_args=[
-                SOURCE,
-                "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_start_date') }}",
-                "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_end_date') }}",
-                table_name,
-                property_type,
-                aggregation_type,
-            ],
-        )
+for report_type in REPORT_TYPE_LIST:
+    table_name = f"report_{report_type}"
+    raw_task_group = datalake_task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+        extraction_spark_job_file=raw_spark_job_file,
+        raw_spark_job_extra_args=[
+            SOURCE,
+            "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_start_date') }}",
+            "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_end_date') }}",
+            table_name,
+            report_type,
+        ],
+    )
 
-        clean_task_group = datalake_task_group.build_clean_task_group(
-            source_database_base_name=SOURCE,
-            target_database_base_name=SOURCE,
-            table_name=f"{property_type}_{aggregation_type}",
-            is_incremental=True,
-            has_create_external_table_task=False,
-            partitions=PARTITION_COLS,
-            execution_date="",
-            extra_query_template_params={
-                "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_start_date') }}",
-                "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_end_date') }}",
-            },
-        )
+    clean_task_group = datalake_task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+        is_incremental=True,
+        has_create_external_table_task=False,
+        partitions=PARTITION_COLS,
+        execution_date="",
+        extra_query_template_params={
+            "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_start_date') }}",
+            "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_end_date') }}",
+        },
+    )
 
-        create_cluster_task.set_downstream(
-            DatalakeTaskGroup.first_tasks(raw_task_group)
-        )
+    create_cluster_task.set_downstream(
+        DatalakeTaskGroup.first_tasks(raw_task_group)
+    )
 
-        cross_downstream(
-            DatalakeTaskGroup.last_tasks(raw_task_group),
-            DatalakeTaskGroup.first_tasks(clean_task_group),
-        )
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
 
-        terminate_cluster_task.set_upstream(
-            DatalakeTaskGroup.last_tasks(clean_task_group)
-        )
+    terminate_cluster_task.set_upstream(
+        DatalakeTaskGroup.last_tasks(clean_task_group)
+    )
 
-        # adding data quality tasks
-        independent_tasks = DatalakeTaskGroup.independent_tasks(clean_task_group)
+    # adding data quality tasks
+    independent_tasks = DatalakeTaskGroup.independent_tasks(clean_task_group)
 
-        if independent_tasks:
-            terminate_cluster_task.set_upstream(independent_tasks)
+    if independent_tasks:
+        terminate_cluster_task.set_upstream(independent_tasks)

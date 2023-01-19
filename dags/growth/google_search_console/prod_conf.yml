@@ -1,14 +1,9 @@
 ---
-property_type_list:
-  domain:
-    - by_property
-    - by_page
-    - by_property_without_query
-    - by_page_without_page
-  url:
-    - by_property
-    - by_page
-    - by_property_without_query
-    - by_page_without_page
+report_type_list:
+  - by_page
+  - by_query
+  - by_page_and_query
 partition_cols:
-  - dt_created
+  - year
+  - month
+  - day
