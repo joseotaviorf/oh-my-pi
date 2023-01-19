@@ -46,6 +46,7 @@ class DAGDeclarationValidator(Validator):
                     "allowed": LayerEnum.get_available_enum_values(),
                 },
                 "custom_schema": {"type": "string", "empty": False},
+                "tables_customization": {"type": "dict", "empty": False},
             },
         },
         "cluster": {

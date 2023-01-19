@@ -29,30 +29,35 @@ class DWQueryWorkflow(BaseWorkflow):
         self.env = os.environ.get("ENVIRONMENT")
 
     def build_dag(self):
-        dag = self.dag_instance()
+        dw_schema = self.workflow_args.get("custom_schema", self.dag_args["name"])
+        tables_custom_structure = self.workflow_args.get("tables_customization", {})
         cluster_params = self.get_cluster_params()
 
+        dw_bucket = self.config_service.get_config("dw_bucket")
+        spectrum_iam_role = self.config_service.get_config("spectrum_iam_role")
         databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"
         )
         base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
+        dag = self.dag_instance()
         task_group = DWTaskGroup(
             dag=dag,
             env=self.env,
-            dw_bucket=self.config_service.get_config("dw_bucket"),
-            dw_schema=f"{self.workflow_args.get('custom_schema', self.dag_args['name'])}",
+            dw_bucket=dw_bucket,
+            dw_schema=dw_schema,
             relative_query_path=self.dag_name,
             spark_jobs_path=base_spark_jobs_path,
         )
 
         dw_staging_task_group = task_group.build_task_group_from_sql_files(
-            layer=LayerEnum.DW_STAGING
+            layer=LayerEnum.DW_STAGING, tables_custom_structure=tables_custom_structure
         )
 
         dw_task_group = task_group.build_task_group_from_sql_files(
             layer=LayerEnum.DW,
-            spectrum_iam_role=self.config_service.get_config("spectrum_iam_role"),
+            spectrum_iam_role=spectrum_iam_role,
+            tables_custom_structure=tables_custom_structure,
         )
 
         create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
