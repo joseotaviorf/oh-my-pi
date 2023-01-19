@@ -14,6 +14,7 @@ SELECT
     sale_price AS price,
     lag_sale_price AS previous_price,
     last_price_variation AS previous_price_variation,
+    first_price_variation,
     calculator_min_sale_price AS min_predicted_price,
     calculator_p30_sale_price AS p30_predicted_price,
     calculator_sale_price AS predicted_price,

@@ -75,6 +75,7 @@ price_changes_enriched AS (
             ELSE 'first price'
         END AS change_type,
         (sale_price - lag_sale_price)/NULLIF(lag_sale_price, 0) AS last_price_variation,
+        (sale_price - MIN(IF(lag_sale_price IS NULL, sale_price, null)) OVER (PARTITION BY id_house))/NULLIF(MIN(IF(lag_sale_price IS NULL, sale_price, null)) OVER (PARTITION BY id_house), 0) AS first_price_variation,
         IF(ts_price_ended IS NULL, TRUE, FALSE) AS is_last_price,
         IF(lag_sale_price IS NULL, TRUE, FALSE) AS is_first_price,
         dt_change,
@@ -100,6 +101,11 @@ sale_price_changes AS (
         sale_price,
         lag_sale_price,
         ROUND(last_price_variation, 4) AS last_price_variation,
+        ROUND(
+            CASE
+                WHEN is_first_price THEN NULLIF(first_price_variation, 0)
+                ELSE first_price_variation
+            END, 4) AS first_price_variation,
         change_type,
         is_last_price,
         is_first_price,
@@ -179,6 +185,7 @@ SELECT
     pc.sale_price,
     pc.lag_sale_price,
     pc.last_price_variation,
+    pc.first_price_variation,
     pc.is_last_price,
     pc.is_first_price,
     pc.change_type,

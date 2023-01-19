@@ -44,6 +44,9 @@ columns:
   previous_price_variation:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.previous_price_variation
+  first_price_variation:
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.first_price_variation
   min_predicted_price:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.calculator_min_sale_price

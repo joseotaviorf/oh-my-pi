@@ -15,6 +15,7 @@ CREATE TABLE sale.fact_listing_price_changes (
     price INT,
     previous_price INT,
     previous_price_variation FLOAT,
+    first_price_variation FLOAT,
     min_predicted_price INT,
     p30_predicted_price INT,
     predicted_price INT,
