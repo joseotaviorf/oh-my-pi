@@ -3,7 +3,7 @@ import pendulum
 import os
 
 from airflow.utils.helpers import chain, cross_downstream
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -51,9 +51,8 @@ RAW_SPARK_JOB_PATH = (
     f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_{CONTEXT}_raw.py"
 )
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
-)
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,

@@ -3,7 +3,7 @@ import pendulum
 import os
 
 from airflow.utils.helpers import chain
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -23,15 +23,17 @@ CONTEXT = "sale_listings"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
-
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 config_service = ConfigurationService(CONTEXT)
+
 default_libraries = config_service.get_config("default_libraries")
+ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
+DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
+)
+DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
+SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_cluster")
 
