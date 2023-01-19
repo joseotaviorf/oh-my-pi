@@ -18,6 +18,8 @@ We load the following tables into the datalake:
 
 - `session` (incremental load)
 - `session_history` (incremental load)
+- `pendency` (incremental load)
+- `support_case` (full load)
 
 ### Responsible Data Team
 ​

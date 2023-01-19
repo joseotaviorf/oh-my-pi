@@ -16,3 +16,10 @@ tables:
     clean_table_name: session_history
     is_incremental: True
     date_column: created_at
+  support_case:
+    clean_table_name: support_case
+    is_incremental: False
+  pendency:
+    clean_table_name: pendency
+    is_incremental: True
+    date_column: created_at

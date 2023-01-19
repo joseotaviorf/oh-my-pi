@@ -1,0 +1,22 @@
+---
+database_name: datalake_saruman_clean
+table_name: support_case
+columns:
+  id:
+    lineage:
+      - datalake_saruman_raw.support_case.id
+  id_user:
+    lineage:
+      - datalake_saruman_raw.support_case.user_id
+  title:
+    lineage:
+      - datalake_saruman_raw.support_case.title
+  summary:
+    lineage:
+      - datalake_saruman_raw.support_case.summary
+  status:
+    lineage:
+      - datalake_saruman_raw.support_case.status
+  user_email:
+    lineage:
+      - datalake_saruman_raw.support_case.user_email

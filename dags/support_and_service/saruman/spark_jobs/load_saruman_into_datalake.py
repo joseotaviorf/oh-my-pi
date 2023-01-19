@@ -38,7 +38,6 @@ if __name__ == "__main__":
     max_records_per_file = args.max_records_per_file
     partition_cols = json.loads(args.partition_cols)
     execution_date = args.execution_date
-    date_column = table_details["date_column"]
 
     logger.info(
         f"""m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
@@ -73,16 +72,23 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
     metastore_service.create_database(database_name)
 
-    df = postgres_consumer.get_incremental_data_from_table(
-        raw_table_name, date_column, execution_date
-    )
+    is_incremental = table_details["is_incremental"]
+
+    if is_incremental:
+        date_column = table_details["date_column"]
+
+        df = postgres_consumer.get_incremental_data_from_table(
+            raw_table_name, date_column, execution_date
+        )
+    else:
+        df = postgres_consumer.get_data_from_table(raw_table_name)
 
     s3_loader.load_df(
         df=df,
         s3_path=f"{database_location}{raw_table_name}",
         format_options=format_options,
         max_records_per_file=max_records_per_file,
-        partitions=partition_cols,
+        partitions=partition_cols if is_incremental else None,
     )
 
     spark_metastore_loader.update_metastore(
@@ -92,12 +98,13 @@ if __name__ == "__main__":
         format_options=format_options,
         force_recreate=False,
         database_location=database_location,
-        partitions=partition_cols,
+        partitions=partition_cols if is_incremental else None,
     )
 
-    metastore_service.create_new_partitions_from_df(
-        database_name=database_name,
-        table_name=raw_table_name,
-        df=df,
-        partition_cols=partition_cols,
-    )
+    if is_incremental:
+        metastore_service.create_new_partitions_from_df(
+            database_name=database_name,
+            table_name=raw_table_name,
+            df=df,
+            partition_cols=partition_cols,
+        )
