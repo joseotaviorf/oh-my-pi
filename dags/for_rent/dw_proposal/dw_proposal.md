@@ -5,7 +5,7 @@
 Full load of the context `Proposal` models into DW
 with enriched data of docx (credit evaluation) and proposals from sorting hat and ebdb.
 
-​<details>
+<details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
 
 ### Execution Interval
@@ -19,3 +19,5 @@ Produces the following output tables:
 - `dim_proposal`
 - `quintoandar.dim_proposal_person`
 - `quintoandar.fact_proposal_people`
+
+</details>
