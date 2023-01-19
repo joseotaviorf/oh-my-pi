@@ -4,14 +4,12 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.utils.helpers import chain
 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
-from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline import LayerEnum
 
 
@@ -89,12 +87,8 @@ class DWQueryWorkflow(BaseWorkflow):
         access_control_list_from_yml = self.cluster_args["access_control_list"]
         databricks_access_control_list = [
             {
-                "group_name": DatabricksGroupNameEnum(
-                    access_control_list_from_yml["group_name"]
-                ),
-                "permission_level": ClusterPermissionEnum(
-                    access_control_list_from_yml["permission_level"]
-                ),
+                "group_name": access_control_list_from_yml["group_name"],
+                "permission_level": access_control_list_from_yml["permission_level"],
             }
         ]
         return {
@@ -123,23 +117,22 @@ class DWQueryWorkflow(BaseWorkflow):
                 dag_inner_dependencies=inner_dependencies,
             )
 
-            chain(
-                create_cluster_task,
+            create_cluster_task.set_downstream(
                 DWTaskGroup.all_first_tasks(
                     task_groups_boundaries_without_inner_dependencies
                 )
-                + DWTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
+                + DWTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries)
             )
         else:
-            chain(
-                create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group)
+            create_cluster_task.set_downstream(
+                DWTaskGroup.all_first_tasks(dw_staging_task_group)
             )
 
         TaskFlowHelper.chain_task_groups_via_common_table(
             dw_staging_task_group, dw_task_group
         )
 
-        chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)
+        terminate_cluster_task.set_upstream(DWTaskGroup.all_last_tasks(dw_task_group))
 
         # Set data quality tasks if exists
         independent_tasks = DWTaskGroup.all_independent_tasks(dw_staging_task_group)
