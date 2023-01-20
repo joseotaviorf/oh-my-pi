@@ -49,6 +49,7 @@ SELECT
     DISTINCT
     CAST(NULL AS BIGINT) AS id_entry,
     CAST(NULL AS BIGINT) AS id_invoice,
+    CAST(NULL AS BIGINT) AS sk_invoice_reversed_entry,
     COALESCE(TRY_CAST(cap.supplier_description AS INT),-1) AS sk_contract,
     COALESCE(split(c.version,'.')[1], 'no info') AS version,
     c.is_contract_b2b AS is_contract_b2b,
