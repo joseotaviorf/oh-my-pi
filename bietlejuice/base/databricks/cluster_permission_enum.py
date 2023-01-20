@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class ClusterPermissionEnum(Enum):
+class ClusterPermissionEnum:
     """
     Mapping of all permissions to interact with the clusters.
     For details of the scope of each permission type, check the official documentation
@@ -18,4 +15,8 @@ class ClusterPermissionEnum(Enum):
 
     @classmethod
     def get_available_enum_values(cls):
-        return [member.value for member in cls]
+        return [
+            v
+            for k, v in cls.__dict__.items()
+            if not k.startswith("_") and isinstance(v, str)
+        ]
