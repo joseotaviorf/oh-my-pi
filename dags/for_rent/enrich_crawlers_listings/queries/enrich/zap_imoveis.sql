@@ -30,7 +30,9 @@ WITH json_select AS(
         GET_JSON_OBJECT(address,'$.state') AS state,
         CASE
             WHEN GET_JSON_OBJECT(address,'$.city') REGEXP '\,' 
-                THEN COALESCE(REGEXP_EXTRACT(GET_JSON_OBJECT(address,'$.city'), ', +(.*)'), city)
+                THEN COALESCE(REGEXP_EXTRACT(REGEXP_REPLACE(GET_JSON_OBJECT(address,'$.city'), "\'", ""), ', +(.*)'), city)
+            WHEN GET_JSON_OBJECT(address,'$.city') REGEXP "\'" 
+                THEN REGEXP_REPLACE(GET_JSON_OBJECT(address,'$.city'), "\'", "")
             ELSE COALESCE(GET_JSON_OBJECT(address,'$.city'), city)
         END AS address_city,
         city,
