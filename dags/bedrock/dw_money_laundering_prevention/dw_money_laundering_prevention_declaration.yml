@@ -1,0 +1,12 @@
+dag:
+  name: dw_money_laundering_prevention
+  schedule_start_date: 2022,08,02
+  owner: Data Bedrock
+workflow:
+  type: query
+  layer: dw
+cluster:
+  type: databricks_10_4_min_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
