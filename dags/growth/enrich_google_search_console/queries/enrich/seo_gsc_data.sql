@@ -1,24 +1,41 @@
 WITH
 layer1 AS (
     SELECT
-        day,
-        year,
-        month,
-        country,
-        dt_created,
-        device_category,
-        google_property,
         site_url,
+        device,
         page,
         query,
-        REGEXP_EXTRACT(page, '.*ar\/imovel\/(.*\-brasil).*$') AS regiao_busca,
-        REGEXP_EXTRACT(page, '.*comprar\/imovel\/(.*)$') AS caminho_busca_compra,
-        REGEXP_EXTRACT(page, 'quintoandar\.com\.br(.*)$') AS caminho_da_pagina,
+        country,
+        dt_created,
+        year,
+        month,
+        day,
+        ctr,
+        clicks,
+        position,
+        impressions,
+        posimp,
         CASE
-            WHEN REGEXP_LIKE(query, '.*(anda).*') THEN 'Branded'
-            WHEN REGEXP_LIKE(query, '.*(quinto).*') THEN 'Branded'
-            ELSE 'Non-branded'
-        END AS branded,
+            WHEN page ILIKE '%www.proprietario.quintoandar.com.br%' THEN 'Supply'
+            WHEN page ILIKE '%www.meulugar.quintoandar.com.br%' THEN 'Content'
+            WHEN page ILIKE '%www.conteudos.quintoandar.com.br%' THEN 'Content'
+            WHEN page ILIKE '%www.help.quintoandar.com.br%' THEN 'Help'
+            ELSE 'QuintoAndar'
+        END AS domain,
+          CASE 
+            WHEN RLIKE(page,'https://conteudos.quintoandar.com.br/') OR RLIKE(page,'https://meulugar.quintoandar.com.br/')
+            THEN SPLIT(REPLACE(REPLACE(page,'https://conteudos.quintoandar.com.br/',''),'https://meulugar.quintoandar.com.br/', ''),'/')[0]
+          END as slug,
+          CASE 
+            WHEN RLIKE(page,'https://conteudos.quintoandar.com.br/') OR RLIKE(page,'https://meulugar.quintoandar.com.br/')
+            THEN SPLIT(REPLACE(REPLACE(page,'https://conteudos.quintoandar.com.br/',''),'https://meulugar.quintoandar.com.br/', ''),'/')[1]
+          END as subtitle_content,
+        REGEXP_EXTRACT(page, '.*ar\/imovel\/(.*\-brasil).*$') AS regiao_busca,
+        REGEXP_EXTRACT(page, 'quintoandar\.com\.br(.*)$') AS caminho_da_pagina,
+        CASE 
+          WHEN RLIKE(LOWER(query),r'5o andar|indica ai|quin to|quarto andar|5 a|5 andar|5A|quimto andar|quinto|quinto amdar|quinto anda|quinto andar|quintoandar|5 andas|5 abdar|5 adar|5 amdar|5 anadr|5 anar|5 anda|5 andad|5 andae|5 andart|5 andas|5 andat|5 ander|5 andr|5 andra|5 andro|5 andsr|5 ansar|4anda|5 ndar|5 qndar|5 sndar|4 andar|5°andar|5amdar|5and|5anda|5andae|5andar|5andat|5andsr|5ansar|5ºandar|5oandar') THEN TRUE
+          ELSE FALSE
+        END AS is_branded,
         CASE
             WHEN REGEXP_LIKE(page, '.*alvorada-rs.*') THEN 'alvorada-rs'
             WHEN REGEXP_LIKE(page, '.*americana-sp.*') THEN 'americana-sp'
@@ -179,16 +196,17 @@ layer1 AS (
             WHEN REGEXP_LIKE(page, '.*poa.*') THEN 'poa-sp'
             ELSE 'Other'
         END AS cidades,
-        CASE
-            WHEN REGEXP_LIKE(page, '.*\/alugar\/.*') THEN 'Busca aluguel'
-            WHEN REGEXP_LIKE(page, '.*\/comprar\/.*') THEN 'Busca compra'
-            WHEN REGEXP_LIKE(page, '.*\/regioes-atendidas.*') THEN 'Regiões atendidas'
-            WHEN REGEXP_LIKE(page, '.*\/condominio\/.*') THEN 'Condomínio'
-            WHEN REGEXP_LIKE(page, '.*br\/apartamento\/.*') THEN 'Listing'
-            WHEN REGEXP_LIKE(page, '.*br\/imovel\/.*') THEN 'Listing'
-            WHEN REGEXP_LIKE(page, '.*br\/morar\/.*') THEN 'Regiões atendidas'
-            WHEN REGEXP_LIKE(page, '.*br\/$') THEN 'Home'
-            WHEN REGEXP_LIKE(page, '.*br$') THEN 'Home'
+        CASE 
+            WHEN page LIKE '%www.proprietario.quintoandar.com.br%' THEN 'Proprietários'
+            WHEN page LIKE '%www.meulugar.quintoandar.com.br%' THEN 'MeuLugar'
+            WHEN page LIKE '%www.conteudos.quintoandar.com.br%' THEN 'Conteúdos'
+            WHEN page LIKE '%www.help.quintoandar.com.br%' THEN 'Help'
+            WHEN page LIKE '%br/alugar/%' THEN 'Busca aluguel'
+            WHEN page LIKE '%br/comprar/%' THEN 'Busca compra'
+            WHEN page LIKE '%br/imovel/%' OR page LIKE '%br/apartamento/%' THEN 'Listing'
+            WHEN page LIKE '%br/regioes-atendidas/%' OR page LIKE '%br/morar/%' THEN 'Regiões atendidas'
+            WHEN page LIKE '%br/condominio/%' THEN 'Condomínio'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br' THEN 'Home'
             ELSE 'Other'
         END AS cluster_de_paginas,
         CASE
@@ -228,32 +246,30 @@ layer1 AS (
             WHEN (REGEXP_LIKE(page, '(-go$)') OR REGEXP_LIKE(page, '(-go\/.*)')) THEN 'GO'
             ELSE 'Other'
         END AS estado,
-        CASE
-            WHEN REGEXP_LIKE(page, '.*\/alugar\/.*') THEN 'Transacional'
-            WHEN REGEXP_LIKE(page, '.*\/comprar\/.*') THEN 'Transacional'
-            WHEN REGEXP_LIKE(page, '.*br\/apartamento\/.*') THEN 'Transacional'
-            WHEN REGEXP_LIKE(page, '.*br\/imovel\/.*') THEN 'Transacional'
-            WHEN REGEXP_LIKE(page, '.*\/regioes-atendidas.*') THEN 'Informacional'
-            WHEN REGEXP_LIKE(page, '.*\/condominio\/.*') THEN 'Informacional'
-            WHEN REGEXP_LIKE(page, '.*br\/morar\/.*') THEN 'Informacional'
-            WHEN REGEXP_LIKE(page, '.*br\/$') THEN 'Home'
-            WHEN REGEXP_LIKE(page, '.*br$') THEN 'Home'
+        CASE 
+            WHEN page like '%www.proprietario.quintoandar.com.br%' THEN 'Supply'
+            WHEN page like '%www.meulugar.quintoandar.com.br%' OR page like '%www.conteudos.quintoandar.com.br%' THEN 'Content'
+            WHEN page like '%www.help.quintoandar.com.br%' THEN 'Help'
+            WHEN page LIKE '%br/alugar/%' OR page LIKE '%br/comprar/%' OR page LIKE '%br/imovel/%' OR page LIKE '%br/apartamento/%' THEN 'Transacional'
+            WHEN page LIKE '%br/regioes-atendidas%' OR page LIKE '%br/condominio/%' OR page LIKE '%br/morar/%' THEN 'Informacional'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br' THEN 'Home'
             ELSE 'Other'
         END AS estruturas,
         CASE
-            WHEN REGEXP_LIKE(page, '.*br\/$') THEN 'n/a'
-            WHEN REGEXP_LIKE(page, '.*br\/apartamento\/.*') THEN 'Imóveis'
-            WHEN REGEXP_LIKE(page, '.*br\/imovel\/.*') THEN 'Imóveis'
-            WHEN (REGEXP_LIKE(page, '.*br\/condominio\/.*') AND REGEXP_LIKE(page, '(/r.-)|(/r-)|(/rua-)|(/alameda-)|(/av.-)|(/av-)|(/avenida-)|(/tv.-)|(/tv-)|(/travessa-)|(/servidao-)|(/rod.-)|(/estrada-)|(/estr.-)|(-[0-9]-)'))  THEN 'Endereço Condomínio'
-            WHEN REGEXP_LIKE(page, '.*br\/condominio\/.*')  THEN 'Nome Condomínio'
-            WHEN REGEXP_LIKE(page, '.*br\/morar\/.*')  THEN 'Cidades'
-            WHEN REGEXP_LIKE(page, '(/r.-)|(/r-)|(/rua-)|(/alameda-)|(/av.-)|(/av-)|(/avenida-)|(/tv.-)|(/tv-)|(/travessa-)|(/servidao-)|(/rod.-)|(/estrada-)|(/estr.-)|(/sqn-)|(/sqs)|(/st.-)|(/qr-)|(/qn-)|(/qr-)|(/qs-)') THEN 'Ruas'
-            WHEN REGEXP_LIKE(page, '/zona-') THEN 'Zonas'
-            WHEN REGEXP_LIKE(page, '(/alvorada-rs-brasil)|(/americana-sp-brasil)|(/aparecida-de-goiania-go-brasil)|(/barueri-sp-brasil)|(/belford-roxo-rj-brasil)|(/belo-horizonte-mg-brasil)|(/belo-horizonte-bh-brasil)|(/belem-pa-brasil)|(/betim-mg-brasil)|(/brasilia-df-brasil)|(/campinas-sp-brasil)|(/canoas-rs-brasil)|(/carapicuiba-sp-brasil)|(/ciudad-de-mexico-cdmx-brasil)|(/contagem-mg-brasil)|(/contagem-bh-brasil)|(/cotia-sp-brasil)|(/curitiba-pr-brasil)|(/diadema-sp-brasil)|(/duque-de-caxias-rj-brasil)|(/embu-das-artes-sp-brasil)|(/ferraz-de-vasconcelos-sp-brasil)|(/florianopolis-sc-brasil)|(/fortaleza-ce-brasil)|(/goiania-go-brasil)|(/gravatai-rs-brasil)|(/guaruja-sp-brasil)|(/guarulhos-sp-brasil)|(/hortolandia-sp-brasil)|(/indaiatuba-sp-brasil)|(/itaquaquecetuba-sp-brasil)|(/jaboatao-dos-guararapes-pe-brasil)|(/jacarei-sp-brasil)|(/jundiai-sp-brasil)|(/manaus-am-brasil)|(/maua-sp-brasil)|(/mesquita-rj-brasil)|(/mogi-das-cruzes-sp-brasil)|(/naucalpan-de-juarez-em-brasil)|(/nilopolis-rj-brasil)|(/niteroi-rj-brasil)|(/nova-iguacu-rj-brasil)|(/nova-lima-mg-brasil)|(/novo-hamburgo-rs-brasil)|(/osasco-sp-brasil)|(/palhoca-sc-brasil)|(/paulinia-sp-brasil)|(/pinhais-pr-brasil)|(/porto-alegre-rs-brasil)|(/poa-sp-brasil)|(/praia-grande-sp-brasil)|(/recife-pe-brasil)|(/ribeirao-das-neves-mg-brasil)|(/ribeirao-pires-sp-brasil)|(/ribeirao-preto-sp-brasil)|(/rio-de-janeiro-rj-brasil)|(/salvador-ba-brasil)|(/santana-de-parnaiba-sp-brasil)|(/santo-andre-sp-brasil)|(/santos-sp-brasil)|(/sorocaba-sp-brasil)|(/sumare-sp-brasil)|(/suzano-sp-brasil)|(/sao-bernardo-do-campo-sp-brasil)|(/sao-caetano-do-sul-sp-brasil)|(/sao-goncalo-rj-brasil)|(/sao-jose-dos-pinhais-pr-brasil)|(/sao-jose-sc-brasil)|(/sao-jose-do-rio-preto-sp-brasil)|(/sao-jose-dos-campos-sp-brasil)|(/sao-leopoldo-rs-brasil)|(/sao-paulo-sp-brasil)|(/sao-vicente-sp-brasil)|(/taboao-da-serra-sp-brasil)|(/taubate-sp-brasil)|(/uberlandia-mg-brasil)|(/valinhos-sp-brasil)|(/viamao-rs-brasil)|(/vila-velha-es-brasil)|(/vinhedo-sp-brasil)|(/vitoria-es-brasil)|(/votorantim-sp-brasil)|(/varzea-paulista-sp-brasil)') THEN 'Cidades'
-            WHEN REGEXP_LIKE(page, '(shopping-)|(/metro-)|(escola-)|(cinema-)|(/mercado-)|(universidade-)|(academia-)|(hospital-)|(instituto-)|(/sh-)(/estacao-)|(/espaco-)|(faculdade-)|(farmacia-)|(/galeria-)|(fundacao-)|(museu-)|(loja-)|(/terminal-)|(shopping-)|(teatro-)|(universitaria)|(/unidade-de-)|(ufrj)|(uff)|(uerj)|(unb)|(unicamp)|(uerj)|(/uci-)|(drogaria-)|(ufabc-)|(ufmg-)|(supermercado)|(cozinha-)|(colegio-)|(creche-)|(conjunto-)|(lanches-)|(habitacoes-)|(sesc-)|(senac-)|(restaurante-)|(/praca-)|(condominio-)|(/conj.-hab.-)|(/conj.-res.-)|(/conj.-res.-)|(confeitaria-)|(cinema-)|(churrascaria)|(sushi)|(pizza)|(/centro-medico-)|(centro-universitario)|(centro-de-saude)|(centro-de-tradicoes)|(centro-medico)|(centro-comercial)|(/arena-)|(crossfit)|(ambulatorio)|(aeroporto-)') THEN 'Locais'
-            WHEN REGEXP_LIKE(page,'/s/') AND REGEXP_LIKE(page,'(-sao-paulo-sp)|(-fortaleza-ce)|(-rio-de-janeiro-rj)|(-campinas-sp)|(-porto-alegre-rs)|(-santo-andre-sp)|(-belo-horizonte-mg)|(-novo-hamburgo-rs)|(-salvador-ba)|(-osasco-sp)|(-niteroi-rj)|(-curitiba-pr)|(-santos-sp)|(-sao-jose-dos-pinhais-pr)|(-florianopolis-sc)|(-sao-caetano-do-sul-sp)') THEN 'Cidades'
-            WHEN (REGEXP_LIKE(page, '.*-brasil') OR REGEXP_LIKE(page, '.*-brasil/.*') OR REGEXP_LIKE(page, '.*-brasil-.*')) THEN 'Bairros'
-            ELSE 'Locais'
+            WHEN page LIKE '%www.meulugar.quintoandar.com.br%' OR page LIKE '%www.conteudos.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE '%www.proprietario.quintoandar.com.br%' OR page LIKE '%www.help.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
+            WHEN page LIKE '%.br/imovel/%' OR page LIKE '%.br/apartamento/%' THEN 'Imóveis'
+            WHEN page LIKE '%br/condominio/%' AND page REGEXP '/r.-|/r-|/rua-|/alameda-|/av.-|/av-|/avenida-|/tv.-|/tv-|/travessa-|/servidao-|/rod.-|/estrada-|/estr.-' THEN 'Endereço Condomínio'
+            WHEN page LIKE '%br/condominio/%' THEN 'Nome Condomínio'
+            WHEN page LIKE '%br/morar/%' THEN 'Cidades'
+            WHEN page REGEXP '/r.-|/r-|/rua-|/alameda-|/av.-|/av-|/avenida-|/tv.-|/tv-|/travessa-|/servidao-|/rod.-|/estrada-|/estr.-' THEN 'Ruas'
+            WHEN page LIKE '%/zona-%' THEN 'Zonas'
+            WHEN page REGEXP '/alvorada-rs-brasil|/americana-sp-brasil|/aparecida-de-goiania-go-brasil|/barueri-sp-brasil|/belford-roxo-rj-brasil|/belo-horizonte-mg-brasil|/belo-horizonte-bh-brasil|/belem-pa-brasil|/betim-mg-brasil|/brasilia-df-brasil|/campinas-sp-brasil|/canoas-rs-brasil|/carapicuiba-sp-brasil|/ciudad-de-mexico-cdmx-brasil|/contagem-mg-brasil|/contagem-bh-brasil|/cotia-sp-brasil|/curitiba-pr-brasil|/diadema-sp-brasil|/duque-de-caxias-rj-brasil|/embu-das-artes-sp-brasil|/ferraz-de-vasconcelos-sp-brasil|/florianopolis-sc-brasil|/fortaleza-ce-brasil|/goiania-go-brasil|/gravatai-rs-brasil|/guaruja-sp-brasil|/guarulhos-sp-brasil|/hortolandia-sp-brasil|/indaiatuba-sp-brasil|/itaquaquecetuba-sp-brasil|/jaboatao-dos-guararapes-pe-brasil|/jacarei-sp-brasil|/jundiai-sp-brasil|/manaus-am-brasil|/maua-sp-brasil|/mesquita-rj-brasil|/mogi-das-cruzes-sp-brasil|/naucalpan-de-juarez-em-brasil|/nilopolis-rj-brasil|/niteroi-rj-brasil|/nova-iguacu-rj-brasil|/nova-lima-mg-brasil|/novo-hamburgo-rs-brasil|/osasco-sp-brasil|/palhoca-sc-brasil|/paulinia-sp-brasil|/pinhais-pr-brasil|/porto-alegre-rs-brasil|/poa-sp-brasil|/praia-grande-sp-brasil|/recife-pe-brasil|/ribeirao-das-neves-mg-brasil|/ribeirao-pires-sp-brasil|/ribeirao-preto-sp-brasil|/rio-de-janeiro-rj-brasil|/salvador-ba-brasil|/santana-de-parnaiba-sp-brasil|/santo-andre-sp-brasil|/santos-sp-brasil|/sorocaba-sp-brasil|/sumare-sp-brasil|/suzano-sp-brasil|/sao-bernardo-do-campo-sp-brasil|/sao-caetano-do-sul-sp-brasil|/sao-goncalo-rj-brasil|/sao-jose-dos-pinhais-pr-brasil|/sao-jose-sc-brasil|/sao-jose-do-rio-preto-sp-brasil|/sao-jose-dos-campos-sp-brasil|/sao-leopoldo-rs-brasil|/sao-paulo-sp-brasil|/sao-vicente-sp-brasil|/taboao-da-serra-sp-brasil|/taubate-sp-brasil|/uberlandia-mg-brasil|/valinhos-sp-brasil|/viamao-rs-brasil|/vila-velha-es-brasil|/vinhedo-sp-brasil|/vitoria-es-brasil|/votorantim-sp-brasil|/varzea-paulista-sp-brasil' THEN 'Cidades'
+            WHEN page REGEXP 'shopping-|/metro-|escola-|cinema-|/mercado-|universidade-|academia-|hospital-|instituto-|/sh-|/estacao-|/espaco-|faculdade-|farmacia-|/galeria-|fundacao-|museu-|loja-|/terminal-|shopping-|teatro-|universitaria|/unidade-de-|ufrj|uff|uerj|unb|unicamp|uerj|/uci-|drogaria-|ufabc-|ufmg-|supermercado|cozinha-|colegio-|creche-|conjunto-|lanches-|habitacoes-|sesc-|senac-|restaurante-|/praca-|condominio-|/conj.-hab.-|/conj.-res.-|/conj.-res.-|confeitaria-|cinema-|churrascaria|sushi|pizza|/centro-medico-|centro-universitario|centro-de-saude|centro-de-tradicoes|centro-medico|centro-comercial|/arena-|crossfit|ambulatorio|aeroporto-|instituto-' THEN 'POI'
+            WHEN page LIKE '%.com.br/s/%' AND page REGEXP '-sao-paulo-sp|-fortaleza-ce|-rio-de-janeiro-rj|-campinas-sp|-porto-alegre-rs|-santo-andre-sp|-belo-horizonte-mg|-novo-hamburgo-rs|-salvador-ba|-osasco-sp|-niteroi-rj|-curitiba-pr|-santos-sp|-sao-jose-dos-pinhais-pr|-florianopolis-sc|-sao-caetano-do-sul-sp' THEN 'Cidades'
+            WHEN page LIKE '%-brasil' OR page LIKE '%-brasil/%' OR page LIKE '%-brasil-%' OR page LIKE '%-brasil?%' THEN 'Bairros'
+            ELSE 'POI'
         END AS nivel_localizacao,
         CASE
             WHEN REGEXP_LIKE(page, '(/r.-)|(/r-)') THEN '/r'
@@ -286,55 +302,80 @@ layer1 AS (
             WHEN REGEXP_LIKE(page, '(conj.-hab.-)|(conj-hab-)|(conjunto-habitacional-)|(conj.-res.-)|(conj-res-)|(conjunto-residencial-)|(condominio)|(habitacoes)|(conjunto-)') THEN 'Conjunto Residencial'
             WHEN REGEXP_LIKE(page, '(complexo-esportivo-)|(esporte)|(futebol)|(esportivo)|(coreo-danca-)|(academia)|(smart-fit)|(olimpico)|(yoga)|(fit-)|(ballet)|(velocity)|(sports)') THEN 'Complexos Esportivos'
             ELSE 'Other'
-        END AS tipo_poi,
-        position,
-        impressions,
-        clicks,
-        ctr
-    FROM 
-        datalake_google_search_console_clean.url_by_page
+        END AS tipo_poi
+    FROM
+        datalake_google_search_console_clean.report_by_page_and_query
     WHERE
         DATE(dt_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND country = 'bra'
 ),
 layer2 AS (
     SELECT
-        day,
+        site_url,
+        device,
+        page,
+        is_branded,
+        query,
+        country,
+        dt_created,
         year,
         month,
-        branded,
-        caminho_busca_compra,
+        day,
+        domain,
+        slug,
+        subtitle_content,
+        regiao_busca,
         caminho_da_pagina,
         cidades,
         cluster_de_paginas,
-        nivel_localizacao,
-        country,
-        dt_created,
-        device_category,
         estado,
         estruturas,
-        query,
-        regiao_busca,
+        nivel_localizacao,
         street_abbreviations,
         tipo_poi,
-        google_property,
-        site_url,
-        page,
+        ctr,
+        clicks,
+        position,
+        impressions,
+        posimp,
         CASE
-            WHEN estruturas = 'Informacional' THEN 'n/a'
-            WHEN cluster_de_paginas = 'Listing' THEN 'n/a'
-            WHEN REGEXP_LIKE(page, 'com.br/imovel/') THEN 'n/a'
-            WHEN (REGEXP_LIKE(page,'(/apartamento)|(/apartamento-cobertura)|(/casacondominio)|(/casa)|(/kitnet)') AND REGEXP_LIKE(page,'(/.*-quartos)|(/.*-banheiros)|(/.*-vagas)|(/de-.*-a-.*-venda)|(/de-.*-a-.*-aluguel)|(/de-.*-a-.*-m2)|(/ar-condicionado)|(/varanda)|(/varanda-gourmet)|(/mobiliado)|(/armarios-na-cozinha)|(/armarios-no-quarto)|(/aceita-pets)') AND REGEXP_LIKE(page,'(/academia)|(/elevador)|(/piscina)|(/portaria-24h)|(/proximo-ao-metro)') AND nivel_localizacao != 'Locais') THEN 'Tipo + Característica do Imóvel + Condomínio'
-            WHEN (REGEXP_LIKE(page,'(/apartamento)|(/apartamento-cobertura)|(/casacondominio)|(/casa)|(/kitnet)') AND REGEXP_LIKE(page,'(/.*-quartos)|(/.*-banheiros)|(/.*-vagas)|(/de-.*-a-.*-venda)|(/de-.*-a-.*-aluguel)|(/de-.*-a-.*-m2)|(/ar-condicionado)|(/varanda)|(/varanda-gourmet)|(/mobiliado)|(/armarios-na-cozinha)|(/armarios-no-quarto)|(/aceita-pets)')) THEN 'Tipo + Característica do Imóvel'
-            WHEN (REGEXP_LIKE(page,'(/apartamento)|(/apartamento-cobertura)|(/casacondominio)|(/casa)|(/kitnet)') AND REGEXP_LIKE(page,'(/academia)|(/elevador)|(/piscina)|(/portaria-24h)|(/proximo-ao-metro)') AND nivel_localizacao != 'Locais') THEN 'Tipo do Imóvel + Condomínio'
-            WHEN (REGEXP_LIKE(page,'(/academia)|(/elevador)|(/piscina)|(/portaria-24h)|(/proximo-ao-metro)') AND REGEXP_LIKE(page,'(/.*-quartos)|(/.*-banheiros)|(/.*-vagas)|(/de-.*-a-.*-venda)|(/de-.*-a-.*-aluguel)|(/de-.*-a-.*-m2)|(/ar-condicionado)|(/varanda)|(/varanda-gourmet)|(/mobiliado)|(/armarios-na-cozinha)|(/armarios-no-quarto)|(/aceita-pets)') AND nivel_localizacao != 'Locais') THEN 'Característica do Imóvel + Condomínio'
-            WHEN REGEXP_LIKE(page,'(/apartamento)|(/apartamento-cobertura)|(/casacondominio)|(/casa)|(/kitnet)') THEN 'Tipo do Imóvel'
-            WHEN REGEXP_LIKE(page,'(/academia)|(/elevador)|(/piscina)|(/portaria-24h)|(/proximo-ao-metro)') AND nivel_localizacao != 'Locais' THEN 'Condomínio'
-            WHEN REGEXP_LIKE(page,'(/.*-quartos)|(/.*-banheiros)|(/.*-vagas)|(/de-.*-a-.*-venda)|(/de-.*-a-.*-aluguel)|(/de-.*-a-.*-m2)|(/ar-condicionado)|(/varanda)|(/varanda-gourmet)|(/mobiliado)|(/armarios-na-cozinha)|(/armarios-no-quarto)|(/aceita-pets)') THEN 'Característica do Imóvel'
-            WHEN REGEXP_LIKE(page,'/originals') THEN 'Originals'
-            WHEN REGEXP_LIKE(page,'/s/') THEN 'Páginas com /s/'
-            ELSE 'n/a'
+            WHEN page LIKE '%www.meulugar.quintoandar.com.br%' OR page LIKE '%www.conteudos.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE '%www.proprietario.quintoandar.com.br%' OR page LIKE '%www.help.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
+            WHEN page LIKE '%/regioes-atendidas%' OR page LIKE '%br/condominio%' OR page LIKE '%br/morar%' THEN 'n/a' 
+            WHEN page LIKE '%.br/imovel/%' OR page LIKE '%.br/apartamento%' THEN 'n/a'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br' THEN 'n/a'
+            WHEN page REGEXP '/s/' THEN 'Páginas com /s/'
+            WHEN 
+                page REGEXP '/apartamento|/apartamento-cobertura|/casacondominio|/casa|/kitnet' 
+                AND page REGEXP '/academia|/elevador|/piscina|/portaria-24h|/proximo-ao-metro' 
+                AND page REGEXP '-quartos|-banheiros|-vagas|-venda|-aluguel|-m2|/ar-condicionado|/varanda|/varanda-gourmet|/mobiliado|/armarios-na-cozinha|/armarios-no-quarto|/aceita-pets' 
+                AND page NOT LIKE '%/academia-%' 
+            THEN 'Tipo + Característica do Imóvel + Condomínio'
+            WHEN 
+                page REGEXP '/apartamento|/apartamento-cobertura|/casacondominio|/casa|/kitnet' 
+                AND page REGEXP '-quartos|-banheiros|-vagas|-venda|-aluguel|-m2|/ar-condicionado|/varanda|/varanda-gourmet|/mobiliado|/armarios-na-cozinha|/armarios-no-quarto|/aceita-pets' 
+            THEN 'Tipo + Característica do Imóvel'
+            WHEN 
+                page REGEXP '/apartamento|/apartamento-cobertura|/casacondominio|/casa|/kitnet' 
+                AND page REGEXP '/academia|/elevador|/piscina|/portaria-24h|/proximo-ao-metro' 
+                AND page NOT LIKE '%/academia-%' 
+            THEN 'Tipo do Imóvel + Condomínio'
+            WHEN 
+                page REGEXP '/academia|/elevador|/piscina|/portaria-24h|/proximo-ao-metro' 
+                AND page REGEXP '-quartos|-banheiros|-vagas|-venda|-aluguel|-m2|/ar-condicionado|/varanda|/varanda-gourmet|/mobiliado|/armarios-na-cozinha|/armarios-no-quarto|/aceita-pets' 
+                AND page NOT LIKE '%/academia-%' 
+            THEN 'Característica do Imóvel + Condomínio'
+            WHEN page REGEXP '/apartamento|/apartamento-cobertura|/casacondominio|/casa|/kitnet' THEN 'Tipo do Imóvel' 
+            WHEN page REGEXP '-quartos|-banheiros|-vagas|-venda|-aluguel|-m2|/ar-condicionado|/varanda|/varanda-gourmet|/mobiliado|/armarios-na-cozinha|/armarios-no-quarto|/aceita-pets' THEN 'Característica do Imóvel' 
+            WHEN page REGEXP '/academia|/elevador|/piscina|/portaria-24h|/proximo-ao-metro' AND page NOT LIKE '%/academia-%' THEN 'Condomínio'
+            WHEN page REGEXP '/originals' THEN 'Originals'
+            ELSE 'Other'
         END AS combinacao_de_filtros,
         CASE
+            WHEN page LIKE '%www.meulugar.quintoandar.com.br%' OR page LIKE '%www.conteudos.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE '%www.proprietario.quintoandar.com.br%' OR page LIKE '%www.help.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
             WHEN REGEXP_LIKE(caminho_da_pagina, '/imovel/[0-9]/') THEN 'n/a'
             WHEN estruturas = 'Informacional' THEN 'n/a'
             WHEN estruturas = 'Listing' THEN 'n/a'
@@ -347,6 +388,9 @@ layer2 AS (
             ELSE 'n/a'
         END AS filtro,
         CASE
+            WHEN page LIKE '%www.meulugar.quintoandar.com.br%' OR page LIKE '%www.conteudos.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE '%www.proprietario.quintoandar.com.br%' OR page LIKE '%www.help.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
             WHEN estruturas = 'Informacional' THEN 'n/a'
             WHEN cluster_de_paginas = 'Listing' THEN 'n/a'
             WHEN REGEXP_LIKE(page,'/proximo-ao-metro') THEN '/proximo-ao-metro'
@@ -357,6 +401,9 @@ layer2 AS (
         ELSE 'n/a'
         END AS filtro_condo,
         CASE
+            WHEN page LIKE '%www.meulugar.quintoandar.com.br%' OR page LIKE '%www.conteudos.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE '%www.proprietario.quintoandar.com.br%' OR page LIKE '%www.help.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
             WHEN estruturas = 'Informacional' THEN 'n/a'
             WHEN cluster_de_paginas = 'Listing' THEN 'n/a'
             WHEN REGEXP_LIKE(page,'/.*-quartos') THEN '/.*-quartos'
@@ -377,6 +424,9 @@ layer2 AS (
             ELSE 'n/a'
         END AS filtro_house_char,
         CASE
+            WHEN page LIKE '%www.meulugar.quintoandar.com.br%' OR page LIKE '%www.conteudos.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE '%www.proprietario.quintoandar.com.br%' OR page LIKE '%www.help.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
             WHEN estruturas = 'Informacional' THEN 'n/a'
             WHEN cluster_de_paginas = 'Listing' THEN 'n/a'
             WHEN REGEXP_LIKE(page,'/apartamento') THEN '/apartamento'
@@ -387,35 +437,36 @@ layer2 AS (
             ELSE 'n/a'
         END AS filtro_house_type,
         CASE
-            WHEN estruturas = 'Informacional' THEN 'n/a'
-            WHEN cluster_de_paginas = 'Listing' THEN 'n/a'
-            WHEN REGEXP_LIKE(page,'/apartamento') THEN '/apartamento'
-            WHEN REGEXP_LIKE(page,'/casacondominio') THEN '/casacondominio'
-            WHEN REGEXP_LIKE(page,'/casa') THEN '/casa'
-            WHEN REGEXP_LIKE(page,'/kitnet') THEN '/kitnet'
-            WHEN REGEXP_LIKE(page,'/.*-quartos') THEN '/.*-quartos'
-            WHEN REGEXP_LIKE(page,'/.*-banheiros') THEN '/.*-banheiros'
-            WHEN REGEXP_LIKE(page,'/.*-vagas') THEN '/.*-vagas'
-            WHEN REGEXP_LIKE(page,'(/de-.*-a-.*-venda)|(/de-.*-a-.*-aluguel)') THEN '/de-.*-a-.*-aluguel|-venda'
-            WHEN REGEXP_LIKE(page,'/de-.*-a-.*-m2') THEN '/de-.*-a-.*-m2'
-            WHEN REGEXP_LIKE(page,'/armarios-no-quarto') THEN '/armarios-no-quarto'
-            WHEN REGEXP_LIKE(page,'/armarios-na-cozinha') THEN '/armarios-na-cozinha'
-            WHEN REGEXP_LIKE(page,'/mobiliado') THEN '/mobiliado'
-            WHEN REGEXP_LIKE(page,'/aceita-pets') THEN '/aceita-pets'
-            WHEN REGEXP_LIKE(page,'/proximo-ao-metro') THEN '/proximo-ao-metro'
-            WHEN REGEXP_LIKE(page,'/originals') THEN '/originals'
-            WHEN (REGEXP_LIKE(page,'/portaria-24h')) THEN '/portaria-24h'
-            WHEN (REGEXP_LIKE(page,'/piscina')) THEN '/piscina'
-            WHEN (REGEXP_LIKE(page,'/elevador')) THEN '/elevador'
-            WHEN (REGEXP_LIKE(page,'/academia') AND page != '.*/academia-.*') THEN '/academia'
-            WHEN REGEXP_LIKE(page,'/ar-condicionado') THEN '/ar-condicionado'
-            WHEN REGEXP_LIKE(page,'/apartamento-cobertura') THEN '/apartamento-cobertura'
-            WHEN REGEXP_LIKE(page,'/varanda-gourmet') THEN '/varanda-gourmet'
-            WHEN REGEXP_LIKE(page,'/varanda') THEN '/varanda'
-            WHEN REGEXP_LIKE(page,'/s/') THEN '/s/'
-            ELSE 'n/a'
+            WHEN page LIKE '%www.meulugar.quintoandar.com.br%' OR page LIKE '%www.conteudos.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE '%www.proprietario.quintoandar.com.br%' OR page LIKE '%www.help.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
+            WHEN page LIKE '%/regioes-atendidas%' OR page LIKE '%br/condominio%' OR page LIKE '%br/morar%' THEN 'n/a' 
+            WHEN page LIKE '%.br/imovel/%' OR page LIKE '%.br/apartamento%' THEN 'n/a'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br' THEN 'n/a'
+            WHEN CONTAINS(page,'/apartamento') THEN 'Apartamento'
+            WHEN CONTAINS(page,'/casacondominio') THEN 'Casa Condomínio'
+            WHEN CONTAINS(page,'/casa') THEN 'Casa'
+            WHEN CONTAINS(page,'/kitnet') THEN 'Kitnet'
+            WHEN CONTAINS(page,'-quartos') THEN 'Quartos'
+            WHEN CONTAINS(page,'-banheiros') THEN 'Banheiros' 
+            WHEN CONTAINS(page,'-vagas') THEN 'Vagas'
+            WHEN page REGEXP '-venda|-aluguel' THEN 'Valor'
+            WHEN CONTAINS(page,'-m2') THEN 'Área'
+            WHEN page REGEXP '/mobiliado|/armarios-na-cozinha|/armarios-no-quarto' THEN 'Mobílias'
+            WHEN CONTAINS(page,'/aceita-pets') THEN 'Pets'
+            WHEN CONTAINS(page,'/proximo-ao-metro') THEN 'Metro'
+            WHEN CONTAINS(page,'/originals') THEN 'QuintoAndar Originals'
+            WHEN page REGEXP '/academia|/elevador|/piscina|/portaria-24h' AND page NOT LIKE '%/academia-%' THEN 'Condomínio'
+            WHEN page REGEXP '/ar-condicionado|/varanda|/varanda-gourmet' THEN 'Comodidades'
+            WHEN CONTAINS(page,'/s/') AND page REGEXP '-apartamento|-apto' THEN 'Apartamento'
+            WHEN CONTAINS(page,'/s/') AND CONTAINS(page,'-casa') THEN 'Casa'
+            WHEN CONTAINS(page,'/s/') AND CONTAINS(page,'-kitnet-ou-studio') THEN 'Kitnet'
+            ELSE 'Other'   
         END AS filtro_1,
         CASE
+            WHEN page LIKE '%www.meulugar.quintoandar.com.br%' OR page LIKE '%www.conteudos.quintoandar.com.br%' THEN page
+            WHEN page LIKE '%www.proprietario.quintoandar.com.br%' OR page LIKE '%www.help.quintoandar.com.br%' THEN page
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN page
             WHEN REGEXP_LIKE(page, 'com.br/imovel/') THEN page
             WHEN estruturas = 'Informacional' THEN page
             WHEN cluster_de_paginas = 'Listing' THEN page
@@ -429,45 +480,42 @@ layer2 AS (
             WHEN REGEXP_LIKE(caminho_da_pagina, '/(.*)/(.*)/(.*)') THEN REGEXP_EXTRACT(page, '(^https://[^/]+/[^/]+/[^/]+/[^/]+)')
             ELSE page
         END AS lp_sem_filtro,
-
         CASE
-            WHEN REGEXP_LIKE(page, 'com.br/imovel/') THEN 'n/a'
-            WHEN estruturas = 'Informacional' THEN 'n/a'
-            WHEN cluster_de_paginas = 'Listing' THEN 'n/a'
-            WHEN page = 'https://www.quintoandar.com.br/' THEN 'sem filtro'
-            WHEN REGEXP_LIKE(caminho_da_pagina, '/s/') THEN '2 filtros'
-            WHEN REGEXP_LIKE(caminho_da_pagina, '/(.*)/(.*)/(.*)/(.*)/(.*)/(.*)/(.*)') THEN '4+ filtros'
-            WHEN REGEXP_LIKE(caminho_da_pagina, '/(.*)/(.*)/(.*)/(.*)/(.*)/(.*)') THEN '3 filtros'
-            WHEN REGEXP_LIKE(caminho_da_pagina, '/(.*)/(.*)/(.*)/(.*)/(.*)') THEN '2 filtros'
-            WHEN REGEXP_LIKE(caminho_da_pagina, '/(.*)/(.*)/(.*)/(.*)') THEN '1 filtro'
-            WHEN REGEXP_LIKE(caminho_da_pagina, '/(.*)/(.*)/(.*)') THEN 'sem filtro'
-            ELSE 'n/a'
-        END AS quantidade_de_filtros,
-        position,
-        impressions,
-        clicks,
-        ctr
+            WHEN page LIKE '%www.meulugar.quintoandar.com.br%' OR page LIKE '%www.conteudos.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE '%www.proprietario.quintoandar.com.br%' OR page LIKE '%www.help.quintoandar.com.br%' THEN 'n/a'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
+            WHEN page LIKE '%/regioes-atendidas%' OR page LIKE '%br/condominio%' OR page LIKE '%br/morar%' THEN 'n/a' 
+            WHEN page LIKE '%.br/imovel/%' OR page LIKE '%.br/apartamento%' THEN 'n/a'
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br' THEN 'n/a'
+            WHEN page LIKE '%com.br/s/%' THEN '2 filtros'
+            WHEN RLIKE(page, 'com.br/.*/.*/.*/.*/.*/.*/.*') THEN '4+ filtros'
+            WHEN RLIKE(page, 'com.br/.*/.*/.*/.*/.*/.*') THEN '3 filtros'
+            WHEN RLIKE(page, 'com.br/.*/.*/.*/.*/.*') THEN '2 filtros'
+            WHEN RLIKE(page, 'com.br/.*/.*/.*/.*') THEN '1 filtro'
+            WHEN RLIKE(page, 'com.br/.*/.*/.*') THEN 'sem filtro'
+            ELSE 'Other'
+            END AS quantidade_de_filtros
     FROM
         layer1
 )
 SELECT
-    device_category,
-    country,
-    google_property,
-    query,
     site_url,
+    device,
     page,
-    branded,
-    cluster_de_paginas AS page_cluster,
-    estruturas AS structure,
+    query,
+    country,
+    domain,
+    slug,
+    subtitle_content,
+    regiao_busca AS search_region,
     caminho_da_pagina AS page_path,
     estado AS state,
     cidades AS city,
+    cluster_de_paginas AS page_cluster,
+    estruturas AS structure,
     nivel_localizacao AS location_level,
-    regiao_busca AS search_region,
     street_abbreviations,
     tipo_poi AS poi_type,
-    quantidade_de_filtros AS filter_count,
     combinacao_de_filtros AS filter_combination,
     filtro AS filter,
     filtro_condo AS condo_filter,
@@ -498,15 +546,17 @@ SELECT
     ELSE 'n/a'
     END AS filter_2,
     lp_sem_filtro AS lp_wo_filter,
+    quantidade_de_filtros AS filter_count,
+    is_branded,
+    ctr,
+    clicks,
     position,
     impressions,
-    position*impressions AS posimp,
-    clicks,
-    ctr,
+    posimp,
     dt_created,
     year,
     month,
     day
 FROM
     layer2
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36

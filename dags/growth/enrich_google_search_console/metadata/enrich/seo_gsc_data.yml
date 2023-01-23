@@ -1,106 +1,111 @@
 database_name: datalake_google_search_console
 table_name: seo_gsc_data
 columns:
-    device_category:
-      lineage:
-        - datalake_google_search_console_clean.url_by_page.device_category
-    country:
-      lineage:
-        - datalake_google_search_console_clean.url_by_page.country
-    google_property:
-      lineage:
-        - datalake_google_search_console_clean.url_by_page.google_property
-    query:
-      lineage:
-        - datalake_google_search_console_clean.url_by_page.query
     site_url:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.site_url
+        - datalake_google_search_console_clean.report_by_page_and_query.site_url
+    device:
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.device
     page:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
-    branded:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
+    query:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.query
-    page_cluster:
+        - datalake_google_search_console_clean.report_by_page_and_query.query
+    country:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
-    structure:
+        - datalake_google_search_console_clean.report_by_page_and_query.country
+    domain:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
-    page_path:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
+    slug:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
-    state:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
+    subtitle_content:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
-    city:
-      lineage:
-        - datalake_google_search_console_clean.url_by_page.page
-    location_level:
-      lineage:
-        - datalake_google_search_console_clean.url_by_page.page
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     search_region:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
+        - datalake_google_search_console_clean.report_by_page_and_query.page
+    page_path:
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
+    state:
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
+    city:
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
+    page_cluster:
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
+    structure:
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
+    location_level:
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     street_abbreviations:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     poi_type:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
-    filter_count:
-      lineage:
-        - datalake_google_search_console_clean.url_by_page.page
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     filter_combination:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     filter:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     condo_filter:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     house_char_filter:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     house_type_filter:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     filter_1:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     filter_2:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     lp_wo_filter:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.page
-    position:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
+    filter_count:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.position
-    impressions:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
+    is_branded:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.impressions
-    posimp:
-      lineage:
-        - datalake_google_search_console_clean.url_by_page.impressions
-        - datalake_google_search_console_clean.url_by_page.position
-    clicks:
-      lineage:
-        - datalake_google_search_console_clean.url_by_page.clicks
+        - datalake_google_search_console_clean.report_by_page_and_query.query
     ctr:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.ctr
+        - datalake_google_search_console_clean.report_by_page_and_query.ctr
+    clicks:
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.clicks
+    position:
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.position
+    impressions:
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.impressions
+    posimp:
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.posimp
     dt_created:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.dt_created
+        - datalake_google_search_console_clean.report_by_page_and_query.dt_created
     year:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.year
+        - datalake_google_search_console_clean.report_by_page_and_query.year
     month:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.month
+        - datalake_google_search_console_clean.report_by_page_and_query.month
     day:
       lineage:
-        - datalake_google_search_console_clean.url_by_page.day
+        - datalake_google_search_console_clean.report_by_page_and_query.day
