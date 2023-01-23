@@ -22,6 +22,8 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `address_data_aud`
 `brokerage`
 `brokerage_aud`
+`buyer_data`
+`buyer_data_aud`
 `card_noting`
 `card_noting_aud`
 `cash_payment`
@@ -75,6 +77,8 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `sales_flow_tag_aud`
 `sales_flow_users`
 `sales_flow_users_aud`
+`seller_data`
+`seller_data_aud`
 `specialist`
 `specialist_aud`
 `status`

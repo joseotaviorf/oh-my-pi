@@ -1,0 +1,85 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: buyer_data_aud
+columns:
+  id_buyer:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.sales_flow_id
+  id_docx_folder:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.docx_folder_id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.revend
+  name:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.name
+  email:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.email
+  holding_value:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.holding_value
+  ccv_role:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.ccv_role
+  signer_status:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.signer_status
+  triage_status:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.triage_status
+  is_investor:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.investor
+  mod_investor:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.investor_mod
+  mod_id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.sales_flow_id_mod
+  mod_triage_status:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.triage_status_mod
+  mod_signer_status:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.signer_status_mod
+  mod_ccv_role:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.ccv_role_mod
+  mod_id_docx_folder:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.docx_folder_id_mod
+  mod_name:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.name_mod
+  mod_email:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.email_mod
+  mod_holding_value:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.holding_value_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.buyer_data_aud.day
