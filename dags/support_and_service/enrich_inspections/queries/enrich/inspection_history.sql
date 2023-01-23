@@ -49,6 +49,8 @@ union_inspection_history AS (
         i.ts_updated
     FROM
         datalake_inspections_clean.inspection AS i
+    QUALIFY
+        i.ts_updated = FIRST(i.ts_updated) OVER (PARTITION BY i.id_inspection ORDER BY i.ts_updated DESC)
     UNION
     SELECT
         MD5(CONCAT(i.id, 'PWA')) AS id_inspection,
