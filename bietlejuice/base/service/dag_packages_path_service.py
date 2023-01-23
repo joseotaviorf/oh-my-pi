@@ -46,26 +46,20 @@ class DAGPackagesPathService:
     }
 
     @staticmethod
-    def _get_dag_package_path(dag_name):
+    def _find_dag_in_line_folders(dag_name):
         """
-        Returns the DAG's path (considering it is inside the DAG Packages structure)
-        The path returned does not contain trailing slash like `/dags/bla/foo`
+        Finds DAG folder by traversing between all lines folders.
 
-        * Method can be used Composer (GCS) or Databricks (wheel) *
-
-        :param dag_name: the DAG name, that is expected to be unique in the entire platform
-        :return: full DAG Package path
+        :param dag_name: DAG name.
+        :return: DAG folder path.
         """
-        if not dag_name:
-            return None
-
-        dag_packges_parent_folders = os.scandir(DAG_PACKAGES_ROOT)
-        for line_folder in dag_packges_parent_folders:
+        dag_packages_parent_folders = os.scandir(DAG_PACKAGES_ROOT)
+        for line_folder in dag_packages_parent_folders:
             dag_path = join(line_folder.path, dag_name)
             if isdir(dag_path):
                 return dag_path
 
-        # Non-migrated DAGs (yet in bietlejuice module) or non-existent
+        # non-existent DAG
         return None
 
     @staticmethod
@@ -112,6 +106,23 @@ class DAGPackagesPathService:
         return query
 
     @staticmethod
+    def _transform_into_intermediate_path(dag_name: str) -> str:
+        """
+        Transform complete DAG name into intermediate path, which is
+        a structure that follows DAG Package folder structure.
+
+        :param dag_name: DAG name.
+        e.g.:
+            dw_spark_datamarts.cross
+
+        :return intermediate_path: DAG name turned into folder path structure.
+        e.g.:
+            dw_spark_datamarts/cross
+        """
+        intermediate_path = dag_name.replace(".", "/")
+        return intermediate_path
+
+    @staticmethod
     def get_dag_path(dag_name: str) -> str:
         """
         Gets the DAG's full path
@@ -123,11 +134,20 @@ class DAGPackagesPathService:
         Finds the DAG path according to its location: inside the DAG Packages or in the legacy path (bietlejuice)
         :return: full DAG's parent path
         """
-        dag_path = DAGPackagesPathService._get_dag_package_path(dag_name)
-        if not dag_path:
-            dag_path = f"{DAG_PACKAGES_ROOT}/{dag_name}"
+        if not dag_name:
+            return None
 
-        return dag_path
+        # Cases that the DAG has separated lines inside of it (Ex: dw_datamarts_spark.cross)
+        intermediate_path = DAGPackagesPathService._transform_into_intermediate_path(
+            dag_name=dag_name
+        )
+
+        dag_path = DAGPackagesPathService._find_dag_in_line_folders(intermediate_path)
+        if dag_path:
+            return dag_path
+
+        # non-existent DAG
+        return None
 
     @staticmethod
     def get_dag_parent_path(dag_name: str) -> str:
@@ -139,13 +159,11 @@ class DAGPackagesPathService:
         Finds the DAG path according to its location: inside the DAG Packages or in the legacy path (bietlejuice)
         :return: full DAG's parent path
         """
-        dag_path = DAGPackagesPathService._get_dag_package_path(dag_name)
+        dag_path = DAGPackagesPathService.get_dag_path(dag_name)
         if dag_path:
-            dag_parent_folder = dirname(dag_path)
-        else:  # TODO: remove after DAG-Packages migration
-            dag_parent_folder = DAG_PACKAGES_ROOT
+            return dirname(dag_path)
 
-        return dag_parent_folder
+        return None
 
     @staticmethod
     def get_query_file_content_in_spark_jobs(
@@ -377,6 +395,12 @@ class DAGPackagesPathService:
         :return: string
         """
         dag_path = cls.get_dag_path(dag_name=dag_name)
+
+        if not dag_path:
+            raise FileNotFoundError(
+                f"m=generate_artifact_file_path, msg= DAG path is not found, dag_name={dag_name}"
+            )
+
         file_folder = cls.__FILE_FOLDERS.get(artifact_type, "")
         file_name = cls.generate_artifact_file_name(
             artifact_type, dag_name, table_name, add_default_ext

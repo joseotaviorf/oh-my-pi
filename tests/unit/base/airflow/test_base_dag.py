@@ -1,3 +1,4 @@
+from dags import DAG_PACKAGES_ROOT
 import pytest
 from unittest import mock
 
@@ -19,12 +20,17 @@ class TestBaseDAG:
             assert BaseDAG.get_dag_doc(dag_name=dag_name)
 
     @mock.patch.object(BaseDAG, "get_dag_doc")
-    def test_exception_generate_doc_md_str(self, mocked_get_dag_doc):
+    @mock.patch.object(DAGPackagesPathService, "get_dag_path")
+    def test_exception_generate_doc_md_str(
+        self, mocked_get_dag_path, mocked_get_dag_doc
+    ):
         # arrange
         base_dag = BaseDAG()
 
         mocked_get_dag_doc.return_value = "dag_doc"
         base_dag.get_dag_doc = mocked_get_dag_doc
+
+        mocked_get_dag_path.return_value = f"{DAG_PACKAGES_ROOT}/dag_name"
 
         dag_name = "dag_name"
         doc_md_chart_url = "doc_md_chart_url"

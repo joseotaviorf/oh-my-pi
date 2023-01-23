@@ -15,6 +15,7 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from dags import DAG_PACKAGES_ROOT
 
 CRAWLER_CONTEXT = f"listings"
 CRAWLER_ORIGIN = f"em_casa"
@@ -68,9 +69,10 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(CRAWLER_ORIGIN).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
-    ),
+    doc_md=BaseDAG.get_dag_doc(
+        dag_name=CRAWLER_ORIGIN,
+        template_path=f"{DAG_PACKAGES_ROOT}/for_rent/{SOURCE}/{CRAWLER_CONTEXT}",
+    ).format(chart_url=doc_md_chart_url, dag_id=DAG_ID),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
