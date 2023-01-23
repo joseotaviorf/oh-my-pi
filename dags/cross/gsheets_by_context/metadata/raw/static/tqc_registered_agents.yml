@@ -1,0 +1,11 @@
+database_name: datalake_gsheets_raw
+table_name: tqc_registered_agents
+columns:
+  agent_email:
+    tags:
+      - PII
+      - Confidential
+  agent_cpf:
+    tags:
+      - PII
+      - Confidential

@@ -1311,6 +1311,12 @@ survival_estimation_new_version:
     clean_table_name: survival_estimation_new_version
     sheet_context: static
 
+tqc_registered_agents:
+    sheet_id: 1FuN5jlN9pDvVfwPDJAqROfqXKF3tIhXDUvR6a6RGqYg
+    sheet_name: tqc_registered_agents
+    clean_table_name: tqc_registered_agents
+    sheet_context: static
+
 users_cx_plaquinhas:
     sheet_id: 1oiUlhua9uFXbwkaSeF_EYRvaB652JIhOoWDy1bYolK0
     sheet_name: users_cx_plaquinhas

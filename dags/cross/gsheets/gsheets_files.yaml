@@ -337,11 +337,6 @@ targets_agents_engagement:
     sheet_name: targets_agents_engagement
     clean_table_name: targets_agents_engagement
 
-tqc_registered_agents:
-    sheet_id: 1FuN5jlN9pDvVfwPDJAqROfqXKF3tIhXDUvR6a6RGqYg
-    sheet_name: tqc_registered_agents
-    clean_table_name: tqc_registered_agents
-
 tv_ads:
     sheet_id: 1HEbApdK1ydVMbAPzmdmN5b850aCVVRhUyjLZp6Ny4kE
     sheet_name: base_clean

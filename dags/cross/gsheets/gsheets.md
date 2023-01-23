@@ -120,7 +120,6 @@ This pipeline produces the following output tables:
     - `tenant_negotiation_csat`
     - `tenant_reimbursement_csat`
     - `tof_supply_targets`
-    - `tqc_registered_agents`
     - `tracking_catalog_event_properties`
     - `tv_ads`
     - `unit_economics_amortization_curve`
