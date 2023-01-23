@@ -75,6 +75,9 @@ tables:
   - table_name: proposta_observacao
     extraction_type: full
     clean_table_name: proposal_notes
+  - table_name: parceiro_categoria
+    extraction_type: full
+    clean_table_name: partner_category
 
 clean_partition_columns: [year, month, day]
 lineage_product_database_name: atta
