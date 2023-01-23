@@ -11,6 +11,9 @@ columns:
   is_primary_market:
     lineage:
       - datalake_ebdb_raw.listingsalemodel.isprimarymarket
+  has_great_sale_price_tag:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel.hasGreatSalePriceTag
   ts_created:
     lineage:
       - datalake_ebdb_raw.listingsalemodel.created_at

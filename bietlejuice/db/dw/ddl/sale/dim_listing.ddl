@@ -22,6 +22,7 @@ CREATE TABLE sale.dim_listing (
 	is_for_rent BOOLEAN,
 	has_active_rental_contract BOOLEAN,
 	has_house_been_rented BOOLEAN,
+	has_great_price_tag BOOLEAN,
 	dt_consultant_started DATE,
 	ts_consultant_deleted TIMESTAMP,
 	ts_created TIMESTAMP,

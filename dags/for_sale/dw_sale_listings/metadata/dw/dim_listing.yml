@@ -68,6 +68,9 @@ columns:
   has_house_been_rented:
     lineage:
       - datalake_sale_listings.sale_listing.has_house_been_rented
+  has_great_price_tag:
+    lineage:
+      - datalake_ebdb_listing.house.has_great_sale_price_tag
   dt_consultant_started:
     lineage:
       - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started

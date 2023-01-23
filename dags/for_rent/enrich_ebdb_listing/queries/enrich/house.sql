@@ -34,26 +34,20 @@ house_aud AS (
     mod_status = 1
   GROUP BY 1
 ),
-supply_context AS (
-  SELECT
-    id_house,
-    SOME(ownership = 'THIRD_PARTY') AS is_3p_supply
-  FROM
-    datalake_ebdb_clean.listing_business_context
-  GROUP BY
-    1
-),
-sale_primary_market AS (
+listing_info AS (
   SELECT 
-    id_house,
-    is_primary_market AS is_sale_primary_market
+    lbc.id_house,
+    BOOL_OR(lbc.ownership = 'THIRD_PARTY') AS is_3p_supply,
+    BOOL_OR(lsm.is_primary_market) AS is_sale_primary_market,
+    BOOL_OR(lsm.has_great_sale_price_tag) AS has_sale_great_price_tag
   FROM
     datalake_ebdb_clean.listing_business_context AS lbc
-  JOIN 
+  LEFT JOIN 
     datalake_ebdb_clean.listing_sale_model AS lsm
       ON lbc.id = lsm.id_listing_business_context
-  WHERE 
-    is_primary_market
+      AND lbc.business_context = 'SALE'
+  GROUP BY 
+    1
 ),
 -- While we don't have 3P agencies included in datalake_company_clean.company, we need to find their name via HubSpot
 -- This is a temporary measure, and should be changed in 23Q1
@@ -185,7 +179,7 @@ SELECT
   COALESCE(
     pa.partner_3p_supply, -- should be replaced by company
     NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), ''), -- should be replaced by supply processor
-    IF(sc.is_3p_supply, 'Unknown', NULL) -- Sometimes, listing_business_context sets ownership to THIRD_PARTY, but internal_admin_info is empty
+    IF(li.is_3p_supply, 'Unknown', NULL) -- Sometimes, listing_business_context sets ownership to THIRD_PARTY, but internal_admin_info is empty
   ) AS partner_3p_supply,
   h.photo_booking_historic,
   h.default_neighborhood,
@@ -260,13 +254,13 @@ SELECT
   h.is_for_rent,
   h.is_for_sale,
   CASE
-    WHEN sc.is_3p_supply THEN TRUE -- After supply processor is in production, the ELSE part should be discarded.
+    WHEN li.is_3p_supply THEN TRUE -- After supply processor is in production, the ELSE part should be discarded.
     ELSE COALESCE(UPPER(h.internal_admin_info) LIKE '%[3P%-%]%', FALSE)
   END AS is_3p_supply,
   (pa.partner_state IS DISTINCT FROM 'MG'
     AND COALESCE(
       UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3P-%]%',
-      sc.is_3p_supply,
+      li.is_3p_supply,
       FALSE
   )) AS is_3p_supply_5a,
   (pa.partner_state IS NOT DISTINCT FROM 'MG'
@@ -280,7 +274,8 @@ SELECT
     WHEN h.id_user_registrant = 7212349 THEN TRUE -- For Casa Mineira migration, a single user was created to import the CM listings
     ELSE FALSE 
   END AS is_casa_mineira_migration,
-  COALESCE(pm.is_sale_primary_market, FALSE) AS is_sale_primary_market,
+  COALESCE(li.is_sale_primary_market, FALSE) AS is_sale_primary_market,
+  COALESCE(li.has_sale_great_price_tag, FALSE) AS has_sale_great_price_tag,
   COALESCE(r_type.name = 'Restriction', FALSE) AS has_visit_restriction,
   h.has_requested_professional_photos,
   h.has_owner_incomplete_listing_notification,
@@ -366,12 +361,10 @@ LEFT JOIN
   datalake_ebdb_clean.instant_offer AS io
     ON h.id = io.id_house
 LEFT JOIN
-  supply_context AS sc
-    ON h.id = sc.id_house
-LEFT JOIN 
-  sale_primary_market AS pm
-    ON h.id = pm.id_house
+  listing_info AS li
+    ON h.id = li.id_house
 LEFT JOIN
   partner_agencies AS pa
     ON UPPER(NULLIF(REGEXP_EXTRACT(REPLACE(h.internal_admin_info, ' ', ''), r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')) 
        IN (pa.cnpj, REPLACE(UPPER(pa.extracted_3p_tag), ' ', ''))
+

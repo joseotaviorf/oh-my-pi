@@ -351,6 +351,9 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.announced_by
       - datalake_ebdb_clean.house.id_announced_by
+  has_sale_great_price_tag:
+    lineage:
+      - datalake_ebdb_clean.listing_sale_model.has_great_sale_price_tag
   has_visit_restriction:
     lineage:
       - datalake_ebdb_clean.restriction_type.name
