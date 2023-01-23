@@ -51,8 +51,9 @@ SELECT
     l.status,
     CASE
         WHEN f.ts_previous_file_sent_by_agency IS NULL THEN 'FIRST_BATCH'
-        WHEN DATE(f.ts_previous_file_sent_by_agency) < GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP THEN 'RECURRENT'
-        ELSE 'COMPLEMENTARY'
+        WHEN f.ts_created < first_file.ts_created + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
+        WHEN GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP < first_file.ts_created THEN 'COMPLEMENTARY'
+        ELSE 'RECURRENT'
     END AS recurrency_type,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.installations'), '{{}}'), 'map<string, boolean>') AS installations,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.appliances'), '{{}}'), 'map<string, boolean>') AS house_appliances,
@@ -106,5 +107,9 @@ FROM
 LEFT JOIN
     datalake_brokers_supply_processor.file AS f
         ON l.id_file = f.id
+LEFT JOIN
+    datalake_brokers_supply_processor.file AS first_file
+        ON COALESCE(f.id_company_hubspot, SPLIT(f.file_name, '_dedup_')[0]) = COALESCE(first_file.id_company_hubspot, SPLIT(first_file.file_name, '_dedup_')[0])
+        AND first_file.ts_previous_file_sent_by_agency IS NULL
 WHERE
     rw = 1

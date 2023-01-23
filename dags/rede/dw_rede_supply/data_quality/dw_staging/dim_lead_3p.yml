@@ -20,6 +20,7 @@ column_level_validations:
     is_contained_in:
       values:
         - FIRST_BATCH
+        - FIRST_MONTH_BATCH
         - RECURRENT
         - COMPLEMENTARY
   growth_status:
