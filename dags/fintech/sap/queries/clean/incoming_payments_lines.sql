@@ -31,7 +31,7 @@ SELECT
     --     WHEN cte.manual_insert = TRUE THEN REGEXP_EXTRACT(memo_linememo, '((?:CI|CR|FC|FP|CP).*)')
     --     ELSE REGEXP_EXTRACT(memo_linememo, '^"?.*(?<clean>(?:CI|CR|FC|FP|CP)[^ -]+)[ -]?.*"?$')
     -- END AS memo_line,
-    memo_linememo,
+    memo_linememo AS memo_line,
     number_number AS source_document_number,
     series_series AS series,
     account_account AS account,
