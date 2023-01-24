@@ -1621,6 +1621,12 @@ bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
   - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
 
+bietlejuice.enrich_content_funnel:
+  - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
+  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
+  - bietlejuice.dw_datamarts_growth_cross:create-sale-performance-marketing-metrics-demand-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-performance-marketing-metrics-demand-in-datalake
+
 bietlejuice.enrich_cozy_metrics:
   - bietlejuice.cozy_metrics:load-clean-library-versions
 
