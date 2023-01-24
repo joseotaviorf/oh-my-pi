@@ -29,6 +29,9 @@ class DWQueryWorkflow(BaseWorkflow):
     def build_dag(self):
         dw_schema = self.workflow_args.get("custom_schema", self.dag_args["name"])
         tables_custom_structure = self.workflow_args.get("tables_customization", {})
+        has_load_to_redshift_task = self.workflow_args.get(
+            "has_load_to_redshift_task", True
+        )
         cluster_params = self.get_cluster_params()
 
         dw_bucket = self.config_service.get_config("dw_bucket")
@@ -56,6 +59,7 @@ class DWQueryWorkflow(BaseWorkflow):
             layer=LayerEnum.DW,
             spectrum_iam_role=spectrum_iam_role,
             tables_custom_structure=tables_custom_structure,
+            has_load_to_redshift_task=has_load_to_redshift_task,
         )
 
         create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(

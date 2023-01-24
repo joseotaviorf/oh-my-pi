@@ -5,6 +5,7 @@ dag:
 workflow:
   type: query
   layer: dw
+  has_load_to_redshift_task: false
 cluster:
   type: databricks_10_4_min_general_cluster
   access_control_list:

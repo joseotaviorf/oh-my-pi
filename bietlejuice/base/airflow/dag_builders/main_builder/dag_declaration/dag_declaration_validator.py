@@ -47,6 +47,7 @@ class DAGDeclarationValidator(Validator):
                 },
                 "custom_schema": {"type": "string", "empty": False},
                 "tables_customization": {"type": "dict", "empty": False},
+                "has_load_to_redshift_task": {"type": "boolean", "empty": False},
             },
         },
         "cluster": {
