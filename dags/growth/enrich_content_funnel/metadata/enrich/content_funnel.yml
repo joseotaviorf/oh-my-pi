@@ -1,0 +1,75 @@
+database_name: datalake_content_funnel
+table_name: content_funnel
+columns:
+  id_user:
+    lineage:
+      - datalake_online_attribution.online_attribution.id_user
+      - datalake_online_attribution.online_attribution.id_amplitude
+      - datalake_top_of_funnel_demand.user_interactions.id_user
+      - datalake_top_of_funnel_demand.user_interactions.id_amplitude
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.city_group
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.city_group
+  mkt_origin:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.mkt_origin
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_origin
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_origin
+  utm_source:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_source
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_source
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.utm_source
+  utm_medium:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_medium
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_medium
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.utm_medium
+  utm_campaign:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_campaign
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_campaign
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.utm_campaign
+  utm_content:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_content
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_content
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.utm_content
+  business_context:
+    lineage:
+      - datalake_online_attribution.online_attribution.business_context
+      - datalake_top_of_funnel_demand.user_interactions.business_context
+  structure:
+    lineage:
+      - datalake_online_attribution.online_attribution.entrance_uri
+      - datalake_top_of_funnel_demand.user_interactions.entrance_uri
+  page_cluster:
+    lineage:
+      - datalake_online_attribution.online_attribution.entrance_uri
+      - datalake_top_of_funnel_demand.user_interactions.entrance_uri
+  location_level:
+    lineage:
+      - datalake_online_attribution.online_attribution.entrance_uri
+      - datalake_top_of_funnel_demand.user_interactions.entrance_uri
+  filters_count:
+    lineage:
+      - datalake_online_attribution.online_attribution.entrance_uri
+      - datalake_top_of_funnel_demand.user_interactions.entrance_uri
+  filter_combination:
+    lineage:
+      - datalake_online_attribution.online_attribution.entrance_uri
+      - datalake_top_of_funnel_demand.user_interactions.entrance_uri
+  filter_1:
+    lineage:
+      - datalake_online_attribution.online_attribution.entrance_uri
+      - datalake_top_of_funnel_demand.user_interactions.entrance_uri
+  is_attribution:
+    lineage:
+      - datalake_online_attribution.online_attribution.referrer
+      - datalake_top_of_funnel_demand.user_interactions.referrer
+  dt_event:
+    lineage:
+      - datalake_online_attribution.online_attribution.ts_event
+      - datalake_top_of_funnel_demand.user_interactions.dt_event

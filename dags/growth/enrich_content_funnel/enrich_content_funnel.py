@@ -17,7 +17,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 # Pipeline inputs
-CONTEXT = "google_search_console"
+CONTEXT = "content_funnel"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2022, 10, 18, tzinfo=timezone("America/Sao_Paulo"))
@@ -96,8 +96,8 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     partitions=PARTITION_COLS,
     has_create_external_table_task=False,
     extra_query_template_params={
-        "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_start_date') }}",
-        "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_end_date') }}",
+        "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+        "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
     },
 )
 
