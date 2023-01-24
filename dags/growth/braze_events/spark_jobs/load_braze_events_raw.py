@@ -129,6 +129,7 @@ if __name__ == "__main__":
                 s3_path=database_location + table_name,
                 format_options=format_options,
                 partitions=partition_cols,
+                compression="gzip",
             )
 
             spark_metastore_loader.update_metastore(

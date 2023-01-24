@@ -66,6 +66,7 @@ if __name__ == "__main__":
                 df=df,
                 s3_path=f"{database_location}{table.table_name.lower()}",
                 format_options=format_options,
+                compression="gzip",
             )
 
             spark_metastore_loader.update_metastore(

@@ -58,6 +58,7 @@ if __name__ == "__main__":
                 table_name=table.table_name.lower(),
                 format_options=format_options,
                 database_location=database_location,
+                compression="gzip",
             )
             spark_metastore_loader.update_metastore(
                 df,
