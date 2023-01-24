@@ -8,7 +8,7 @@ WITH cte_most_recent AS (
     GROUP BY 1, 2
 )
 
-SELECT
+SELECT DISTINCT
     t1.id_transaction,
     t1.id_line,
     t1.id_business_entity,
