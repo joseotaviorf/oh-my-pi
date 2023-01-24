@@ -11,7 +11,7 @@ SELECT
     segments.adNetworkType AS ad_network_type,
     INT(metrics.impressions) AS impressions,
     customer.descriptiveName AS account_descriptive_name,
-    campaign.labels,
+    'Undefined' AS labels,
     report_type,
     account_snake_case,
     DATE(segments.date) AS dt_loaded,
