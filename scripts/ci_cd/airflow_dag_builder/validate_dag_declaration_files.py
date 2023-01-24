@@ -14,14 +14,11 @@ BI_ETL_EJUICE_ROOT = os.path.dirname(
 )
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration import (
-    DAG_DECLARATION_FILE_SUFIX,
-)
 from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_declaration_validator import (
     DAGDeclarationValidator,
 )
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.file_service import FileService
-from dags import DAG_PACKAGES_ROOT
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--level", "-l", required=False, default="error")
@@ -32,28 +29,46 @@ logger = QuintoAndarLogger("ValidateDAGDeclarationFiles")
 logger.setLevel(level)
 
 
-def validate_one_file(
+def dag_python_file_exists(dag_declaration_file_path):
+    dag_path = dag_declaration_file_path.rsplit("/", 1)[0]
+    dag_files = FileService.list_files(dag_path)
+    for dag_file in dag_files:
+        if dag_file.endswith(".py"):
+            raise Exception(
+                "Validation failed",
+                f"Unallowed Python file '{dag_path}/{dag_file}' in the same folder of "
+                "a DAG declaration file.\n",
+            )
+
+
+def validate_one_dag(
     validator: DAGDeclarationValidator, dag_declaration_file_path: str
 ):
     """
-    Validates a single DAG declaration YAML file. Used for multiple concurrent validations which
-    share the same DAGDeclarationValidator object.
-    Args:
-        validator (DAGDeclarationValidator): DAG Declaration validator object
-        dag_declaration_file_path (str): Local dir where the DAG Delcaration file is placed
+    Validates a single DAG, by validating its DAG declaration YAML file structure
+    and the absence of the Python DAG file. Used for multiple concurrent validations
+    which share the same DAGDeclarationValidator object.
+
+    :param validator: DAG Declaration validator object
+    :type validator: DAGDeclarationValidator
+    :param dag_declaration_file_path: Local dir where the DAG Delcaration file is placed
+    :type dag_declaration_file_path: str
     """
     logger.debug(f"Validating file '{dag_declaration_file_path}'")
     dag_declaration = FileService.get_dict_from_yaml_file(dag_declaration_file_path)
     validator.validate(dag_declaration=dag_declaration)
+    dag_python_file_exists(dag_declaration_file_path)
     logger.debug(f"Successfully validated file '{dag_declaration_file_path}'")
 
 
 validator = DAGDeclarationValidator()
-func = partial(validate_one_file, validator)
+func = partial(validate_one_dag, validator)
 
-dag_declaration_files = glob(
-    pathname=f"{DAG_PACKAGES_ROOT}/**/*{DAG_DECLARATION_FILE_SUFIX}", recursive=True
+dag_declaration_glob_path = DAGPackagesPathService.generate_artifact_file_path(
+    artifact_type="dag_declaration", dag_name="**"
 )
+dag_declaration_files = glob(pathname=dag_declaration_glob_path, recursive=True)
+
 dag_declaration_fails_msg = ""
 
 if dag_declaration_files:
