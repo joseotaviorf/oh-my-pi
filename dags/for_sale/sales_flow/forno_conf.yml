@@ -128,7 +128,7 @@ tables:
   sales_flow_tag_aud:
     extraction_type: incremental
   sales_flow_users:
-    extraction_type: incremental
+    extraction_type: full
   sales_flow_users_aud:
     extraction_type: incremental
   seller_data:

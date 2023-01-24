@@ -20,12 +20,3 @@ columns:
   ts_updated:
     lineage:
       - datalake_sales_flow_raw.sales_flow_users.updated_at
-  year:
-    lineage:
-      - datalake_sales_flow_raw.sales_flow_users.year
-  month:
-    lineage:
-      - datalake_sales_flow_raw.sales_flow_users.month
-  day:
-    lineage:
-      - datalake_sales_flow_raw.sales_flow_users.day

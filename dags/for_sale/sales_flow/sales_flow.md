@@ -75,7 +75,6 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `sales_flow_pendency`
 `sales_flow_pendency_aud`
 `sales_flow_tag_aud`
-`sales_flow_users`
 `sales_flow_users_aud`
 `seller_data`
 `seller_data_aud`
@@ -99,6 +98,7 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 This pipeline produces, in **datalake raw and clean**, tables via full load:
  - `sales_flow_contact`
  - `sales_flow_tag`
+ - `sales_flow_users`
 
 If you need to add a new table, you must update the configuration file `sales_flow_[env]_conf.yml`. By default, all incremental tables use `updated_at` as a date filter, but if you need a different one, add the property `date_filter_column`. If the date filter column isn't actually a date type, you must add the property `unixtime_measure` specifying seconds or milliseconds. If the table_name in the raw layer is different to the one in the clean layer, add the property `clean_table_name`. For an example of all of these properties, search for `revinfo` on the config file.
 
