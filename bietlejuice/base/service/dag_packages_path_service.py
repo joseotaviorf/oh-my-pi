@@ -1,8 +1,6 @@
-import os
 import re
 from glob import glob
-from os import path
-from os.path import dirname, isfile, isdir, join
+from os import path, scandir
 
 import boto3
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
@@ -53,10 +51,10 @@ class DAGPackagesPathService:
         :param dag_name: DAG name.
         :return: DAG folder path.
         """
-        dag_packages_parent_folders = os.scandir(DAG_PACKAGES_ROOT)
+        dag_packages_parent_folders = scandir(DAG_PACKAGES_ROOT)
         for line_folder in dag_packages_parent_folders:
-            dag_path = join(line_folder.path, dag_name)
-            if isdir(dag_path):
+            dag_path = path.join(line_folder.path, dag_name)
+            if path.isdir(dag_path):
                 return dag_path
 
         # non-existent DAG
@@ -161,7 +159,7 @@ class DAGPackagesPathService:
         """
         dag_path = DAGPackagesPathService.get_dag_path(dag_name)
         if dag_path:
-            return dirname(dag_path)
+            return path.dirname(dag_path)
 
         return None
 
@@ -287,7 +285,7 @@ class DAGPackagesPathService:
             f"{table_name}.yml",
         )
 
-        return isfile(data_quality_file_path)
+        return path.isfile(data_quality_file_path)
 
     @staticmethod
     def list_data_quality_tests_files_in_composer(dag_name: str, layer: str) -> list:
@@ -337,7 +335,7 @@ class DAGPackagesPathService:
                 artifact_type, dag_name, layer, table_name, add_default_ext=False
             )
             file_path_ext = "{}.{}".format(file_path, ext)
-            extensions_validation.append(isfile(file_path_ext))
+            extensions_validation.append(path.isfile(file_path_ext))
 
         return any(extensions_validation)
 
@@ -397,14 +395,12 @@ class DAGPackagesPathService:
         dag_path = cls.get_dag_path(dag_name=dag_name)
 
         if not dag_path:
-            raise FileNotFoundError(
-                f"m=generate_artifact_file_path, msg= DAG path is not found, dag_name={dag_name}"
-            )
+            dag_path = path.join(DAG_PACKAGES_ROOT, dag_name)
 
         file_folder = cls.__FILE_FOLDERS.get(artifact_type, "")
         file_name = cls.generate_artifact_file_name(
             artifact_type, dag_name, table_name, add_default_ext
         )
-        file_path = os.path.join(dag_path, file_folder, layer, file_name)
+        file_path = path.join(dag_path, file_folder, layer, file_name)
 
         return file_path

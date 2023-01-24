@@ -7,17 +7,17 @@ from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathSe
 
 
 class TestDAGPackagesPathService:
-    @mock.patch("bietlejuice.base.service.dag_packages_path_service.os.scandir")
-    @mock.patch("bietlejuice.base.service.dag_packages_path_service.isdir")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.scandir")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isdir")
     def test_find_dag_in_line_folders(
-        self, mock_isdir, mock_os_scandir, dag_package_service
+        self, mock_path_isdir, mock_scandir, dag_package_service
     ):
         # arrange
         dag_name = "my_dag"
         dir_mock = Mock()
         dir_mock.path = "/path1"
-        mock_os_scandir.return_value = [dir_mock]
-        mock_isdir.return_value = True
+        mock_scandir.return_value = [dir_mock]
+        mock_path_isdir.return_value = True
         expected_value = "/path1/my_dag"
 
         # act
