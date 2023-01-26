@@ -94,7 +94,7 @@ for table_name in table_list:
         table_name=table_name,
         target_database_base_name=SOURCE,
         extraction_spark_job_file=raw_spark_job_path,
-        raw_spark_job_extra_args=["{{ ds }}", table_name],
+        raw_spark_job_extra_args=["{{ ds }}", "{{ next_ds }}", table_name],
     )
     raw_task_groups[table_name] = raw_task_group
 

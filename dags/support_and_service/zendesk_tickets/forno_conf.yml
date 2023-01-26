@@ -22,3 +22,6 @@ custom_cluster:
   spark_conf:
     spark.executor.memory: "240g"
     spark.executor.memoryOverhead: "23g"
+    spark.driver.maxResultSize: "0"
+    spark.driver.memory: "240g"
+    spark.driver.memoryOverhead: "23g"

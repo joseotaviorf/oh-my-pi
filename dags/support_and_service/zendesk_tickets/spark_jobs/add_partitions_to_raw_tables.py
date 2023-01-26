@@ -30,13 +30,15 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("execution_date")
+    parser.add_argument("next_execution_date")
     parser.add_argument("table_name")
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
     execution_date = args.execution_date
+    next_execution_date = args.next_execution_date
     table_name = args.table_name
-    partition_cols = [{"dt": execution_date}]
+    partition_cols = [{"dt": execution_date}, {"dt": next_execution_date}]
 
     logger.info(
         f"""
@@ -55,16 +57,14 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
 
     # as Stitch loads the data, we just add partition here
-    partition_location = database_location.replace(
-        SOURCE, f"{TABLE_DB_MAPPING[table_name]}/{table_name}"
-    )
-    partitions = []
     for level in partition_cols:
-        for column, value in level.items():
-            partitions.append(f"{column}={value}")
-    partition_location += "/".join(partitions)
-
-    if s3_service.list_objects(partition_location):
-        metastore_service.add_partitions(
-            database_name, table_name.lower(), partition_cols
+        partition_location = database_location.replace(
+            SOURCE, f"{TABLE_DB_MAPPING[table_name]}/{table_name}"
         )
+        for column, value in level.items():
+            partition_location += "".join(f"{column}={value}")
+
+        if s3_service.list_objects(partition_location):
+            metastore_service.add_partitions(
+                database_name, table_name.lower(), partition_cols
+            )
