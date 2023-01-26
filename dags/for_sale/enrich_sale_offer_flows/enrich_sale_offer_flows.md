@@ -15,6 +15,7 @@ Produces the following output tables:
 - `offer_specialists`
 - `sale_offer_flows`
 - `sale_offer_status`
+- `sale_offer_users`
 
 ### Responsible Data Engineering Team
 
