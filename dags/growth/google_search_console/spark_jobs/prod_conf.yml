@@ -1,10 +1,10 @@
 ---
 raw_partition_cols: ["date"]
 site_url_list:
-  - sc-domain:quintoandar.com.br
-  - sc-domain:proprietario.quintoandar.com.br
-  - sc-domain:meulugar.quintoandar.com.br
-  - sc-domain:conteudos.quintoandar.com.br
+  - https://www.quintoandar.com.br
+  - https://proprietario.quintoandar.com.br
+  - https://meulugar.quintoandar.com.br
+  - https://conteudos.quintoandar.com.br
 by_page:
   aggregation_type: AUTO
   dimensions:

@@ -17,10 +17,10 @@ Extracted metrics:
 
 
 List of URLs retrieved in this DAG currently:
-- sc-domain:quintoandar.com.br
-- sc-domain:proprietario.quintoandar.com.br
-- sc-domain:meulugar.quintoandar.com.br
-- sc-domain:conteudos.quintoandar.com.br
+- https://www.quintoandar.com.br
+- https://proprietario.quintoandar.com.br
+- https://meulugar.quintoandar.com.br
+- https://conteudos.quintoandar.com.br
 
 ​<details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
