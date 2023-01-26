@@ -31,8 +31,6 @@ config_service = ConfigurationService(SOURCE)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 dw_bucket = config_service.get_config("dw_bucket")
-datalake_bucket_data_acc = config_service.get_config("datalake_bucket_data_acc")
-dw_bucket_data_acc = config_service.get_config("dw_bucket_data_acc")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
@@ -176,14 +174,7 @@ def create_extraction_task(table_name: str) -> PythonOperator:
 for table_name in tables:
     load_raw_to_s3_task = create_extraction_task(table_name=table_name)
 
-    extra_parameters = [
-        dw_bucket,
-        datalake_bucket_data_acc,
-        dw_bucket_data_acc,
-        SOURCE,
-        table_name,
-        "{{ ds }}",
-    ]
+    extra_parameters = [dw_bucket, SOURCE, table_name, "{{ ds }}"]
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,

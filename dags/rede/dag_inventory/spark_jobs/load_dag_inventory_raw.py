@@ -16,7 +16,9 @@ import re
 import boto3
 import logging
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
+from multiprocessing.pool import ThreadPool
+
 import pyspark.sql.functions as SF
 from pyspark.sql.utils import AnalysisException
 from pyspark.sql import Row, DataFrame
@@ -24,6 +26,7 @@ from pyspark.sql import Row, DataFrame
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.clients.db_clients import SparkClient
@@ -32,6 +35,13 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_dag_inventory_raw"
+THREAD_NUMBER = 8
+LAYERS_TO_FETCH_FILES = [
+    LayerEnum.CLEAN.value,
+    LayerEnum.ENRICH.value,
+    LayerEnum.DW.value,
+    LayerEnum.METRIC.value,
+]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -92,33 +102,42 @@ def enrich_table_dictionary_with_spark_metastore(content: dict) -> dict:
 
 
 """
-Given the dictionary with the DagBag content and the table name, enriches it appropriately.
-"""
-
-
-def enrich_dictionary(content: dict, table_name: dict) -> dict:
-    enrichments = {"table": enrich_table_dictionary_with_spark_metastore}
-    return enrichments.get(table_name, lambda x: x)(content)
-
-
-"""
 Given the bucket and the file name as given by the S3 iterator, returns it in the appropriate format of the folder.
 """
 
 
-def sanitize_file_name(prefix_layer: str, file: str) -> str:
-    if "dw" in prefix_layer:
+def sanitize_file_name(bucket: str, file: str) -> str:
+    if "dw" in bucket:
         file_sanitized = "/".join(file.split("/")[0:2])
-        sanitized_prefix_layer = prefix_layer.replace(dw_bucket_data_acc, dw_bucket)
     else:
         file_sanitized = "/".join(file.split("/")[0:3])
-        sanitized_prefix_layer = prefix_layer.replace(datalake_bucket_data_acc, datalake_bucket)
 
-    return f"s3a://{sanitized_prefix_layer}/{file_sanitized}"
+    return f"s3a://{bucket}/{file_sanitized}"
 
 
 def fetch_partition_name(file_name):
-    return re.sub('/part\-.*', '', file_name)
+    return re.sub("/part\-.*", "", file_name)
+
+
+"""
+Given the table and execution date, finds all files modified in that day, and returns a DataFrame with some metrics
+associated with file size and quantity.
+"""
+
+
+def find_recently_modified_files_by_table(
+    table_content: dict, execution_date: datetime
+) -> list:
+    bucket = table_content["files_location"].split("://")[1].split("/")[0]
+    prefix = "/".join(table_content["files_location"].split("://")[1].split("/")[1:])
+    previous_date = execution_date - timedelta(days=1)
+    incremental_prefix = f"{prefix}/year={previous_date.year}/month={previous_date.month}/day={previous_date.day}"
+    incremental_files = find_recently_modified_files_by_prefix(
+        bucket, incremental_prefix, execution_date
+    )
+    if len(incremental_files) > 0:
+        return incremental_files
+    return find_recently_modified_files_by_prefix(bucket, prefix, execution_date)
 
 
 """
@@ -127,22 +146,30 @@ associated with file size and quantity.
 """
 
 
-def find_recently_modified_files_by_layer_prefix(
-    bucket: str, layer_prefix: str, execution_date: datetime, s3_paginator
-):
-    s3_iterator = s3_paginator.paginate(Bucket=bucket, Prefix=layer_prefix)
+def find_recently_modified_files_by_prefix(
+    bucket: str, prefix: str, execution_date: datetime
+) -> list:
+    s3_client = boto3.client("s3")
+    s3_paginator = s3_client.get_paginator("list_objects_v2")
+
+    s3_iterator = s3_paginator.paginate(Bucket=bucket, Prefix=prefix)
     formatted_date = execution_date.strftime("%Y-%m-%d")
     objects = s3_iterator.search(
         f"Contents[?(to_string(LastModified)>='\"{formatted_date} 00:00:00+00:00\"'&&to_string(LastModified)<='\"{formatted_date} 23:59:59+00:00\"')].[Key,Size,LastModified]"
     )
-
     object_tuples = [
-        (sanitize_file_name(bucket, obj[0]), fetch_partition_name(obj[0]), obj[0], obj[1], obj[2])
+        (
+            sanitize_file_name(bucket, obj[0]),
+            fetch_partition_name(obj[0]),
+            obj[0],
+            obj[1],
+            obj[2],
+        )
         for obj in objects
-        if obj[0].endswith((".json", ".parquet", ".txt", ".csv"))
+        if obj is not None and obj[0].endswith((".json", ".parquet", ".txt", ".csv"))
     ]
 
-    return create_file_metrics_data_frame(object_tuples)
+    return object_tuples
 
 
 """""
@@ -153,49 +180,57 @@ metrics.
 
 def create_file_metrics_data_frame(object_tuples: list) -> DataFrame:
     df = spark.createDataFrame(
-        object_tuples, schema="table_name:string, partition_name:string, file_name:string, file_size_in_bytes:bigint, ts_modified: timestamp"
+        object_tuples,
+        schema="table_name:string, partition_name:string, file_name:string, file_size_in_bytes:bigint, ts_modified: timestamp",
     )
 
-    return df.groupBy(['table_name']).agg(
-        SF.countDistinct('partition_name').alias('qty_modified_partitions'),
-        SF.countDistinct('file_name').alias('qty_modified_files'),
-        SF.min('file_size_in_bytes').alias('min_file_size_in_bytes'),
-        SF.percentile_approx("file_size_in_bytes", 0.25, SF.lit(1000000)).alias("q25_size_in_bytes"),
-        SF.percentile_approx("file_size_in_bytes", 0.50, SF.lit(1000000)).alias("q50_size_in_bytes"),
-        SF.percentile_approx("file_size_in_bytes", 0.75, SF.lit(1000000)).alias("q75_size_in_bytes"),
-        SF.max('file_size_in_bytes').alias('max_file_size_in_bytes'),
-        SF.avg('file_size_in_bytes').alias('avg_file_size_in_bytes'),
-        SF.sum(SF.when(SF.col("file_size_in_bytes") < 1000000, 1).otherwise(0)).alias("qty_smaller_than_1mb"),
-        SF.sum(SF.when(SF.col("file_size_in_bytes") > 1000000000, 1).otherwise(0)).alias("qty_bigger_than_1gb"),
-        SF.sum('file_size_in_bytes').alias('total_modified_files_size_in_bytes')
+    return df.groupBy(["table_name"]).agg(
+        SF.countDistinct("partition_name").alias("qty_modified_partitions"),
+        SF.countDistinct("file_name").alias("qty_modified_files"),
+        SF.min("file_size_in_bytes").alias("min_file_size_in_bytes"),
+        SF.percentile_approx("file_size_in_bytes", 0.25, SF.lit(1000000)).alias(
+            "q25_size_in_bytes"
+        ),
+        SF.percentile_approx("file_size_in_bytes", 0.50, SF.lit(1000000)).alias(
+            "q50_size_in_bytes"
+        ),
+        SF.percentile_approx("file_size_in_bytes", 0.75, SF.lit(1000000)).alias(
+            "q75_size_in_bytes"
+        ),
+        SF.max("file_size_in_bytes").alias("max_file_size_in_bytes"),
+        SF.avg("file_size_in_bytes").alias("avg_file_size_in_bytes"),
+        SF.sum(SF.when(SF.col("file_size_in_bytes") < 1000000, 1).otherwise(0)).alias(
+            "qty_smaller_than_1mb"
+        ),
+        SF.sum(
+            SF.when(SF.col("file_size_in_bytes") > 1000000000, 1).otherwise(0)
+        ).alias("qty_bigger_than_1gb"),
+        SF.sum("file_size_in_bytes").alias("total_modified_files_size_in_bytes"),
     )
 
 
 """
 Finds all files modified in that day, and returns a DataFrame with some metrics associated with file size and quantity.
+The requests to S3 are done in parallel.
 """
 
 
 def find_recently_modified_files(
-    datalake_bucket: str, dw_bucket: str, execution_date: datetime
+    enriched_content_dictionary: dict, execution_date: datetime
 ) -> DataFrame:
-    layers = [
-        {"bucket": datalake_bucket_data_acc, "layer_prefix": "clean"},
-        {"bucket": datalake_bucket_data_acc, "layer_prefix": "enrich"},
-        {"bucket": dw_bucket_data_acc, "layer_prefix": ""},
-    ]
-    s3_client = boto3.client("s3")
-    s3_paginator = s3_client.get_paginator("list_objects_v2")
-    df = None
-    for layer in layers:
-        print(layer)
-        layer_df = find_recently_modified_files_by_layer_prefix(
-            layer["bucket"], layer["layer_prefix"], execution_date, s3_paginator
-        )
-        if df is None:
-            df = layer_df
-        else:
-            df = df.unionByName(layer_df)
+    inputs = []
+    for table in enriched_content_dictionary:
+        if table["layer"] not in LAYERS_TO_FETCH_FILES:
+            continue
+        inputs.append((table, execution_date))
+
+    pool = ThreadPool(processes=THREAD_NUMBER)
+    outputs = pool.starmap(find_recently_modified_files_by_table, inputs)
+    object_tuples = []
+    for output in outputs:
+        object_tuples += output
+
+    df = create_file_metrics_data_frame(object_tuples)
     return df
 
 
@@ -205,17 +240,15 @@ Adds file size and quantity data to table DataFrame.
 
 
 def enrich_table_data_frame_with_file_size_infos(
-    data_frame: DataFrame,
-    datalake_bucket: str,
-    dw_bucket: str,
-    execution_date: datetime,
+    content: dict, execution_date: datetime
 ) -> DataFrame:
-    file_info_data_frame = find_recently_modified_files(
-        datalake_bucket, dw_bucket, execution_date
+    file_info_data_frame = find_recently_modified_files(content, execution_date)
+    table_info_data_frame = transform_list_of_dicts_to_dataframe_with_partitions(
+        content, execution_date
     )
-    return data_frame.join(
+    return table_info_data_frame.join(
         file_info_data_frame,
-        file_info_data_frame.table_name == data_frame.files_location,
+        file_info_data_frame.table_name == table_info_data_frame.files_location,
         "left",
     ).select(
         "table",
@@ -241,24 +274,6 @@ def enrich_table_data_frame_with_file_size_infos(
 
 
 """
-Enriches the DagBag content DataFrame appropriately according to the table name.
-"""
-
-
-def enrich_data_frame(
-    data_frame: DataFrame,
-    table_name: str,
-    datalake_bucket: str,
-    dw_bucket: str,
-    execution_date: datetime,
-) -> DataFrame:
-    enrichments = {"table": enrich_table_data_frame_with_file_size_infos}
-    return enrichments.get(table_name, lambda x, *_: x)(
-        data_frame, datalake_bucket, dw_bucket, execution_date
-    )
-
-
-"""
 Given the DagBag content dictionary and execution date, creates a Spark DataFrame with year, month and day.
 """
 
@@ -272,13 +287,38 @@ def transform_list_of_dicts_to_dataframe_with_partitions(content, execution_date
     )
 
 
+"""
+Enriches the content for datalake_dag_inventory_raw.table and transforms it into a DataFrame
+"""
+
+
+def enrich_table(content: dict, execution_date: dict) -> DataFrame:
+    enriched_content = enrich_table_dictionary_with_spark_metastore(content)
+    return enrich_table_data_frame_with_file_size_infos(
+        enriched_content, execution_date
+    )
+
+
+"""
+Given the dictionary with the DagBag content and the table name, enriches it appropriately, transforming it into a DataFrame.
+"""
+
+
+def transform_dictionaries_to_dataframe(
+    content: dict, execution_date: datetime, table_name: str
+) -> DataFrame:
+    enrichments = {
+        "table": enrich_table,
+        "dag": transform_list_of_dicts_to_dataframe_with_partitions,
+    }
+    return enrichments.get(table_name)(content, execution_date)
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("dw_bucket")
-    parser.add_argument("datalake_bucket_data_acc")
-    parser.add_argument("dw_bucket_data_acc")
     parser.add_argument("source")
     parser.add_argument("table_name")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
@@ -287,8 +327,6 @@ if __name__ == "__main__":
     environment = args.env
     datalake_bucket = args.datalake_bucket
     dw_bucket = args.dw_bucket
-    datalake_bucket_data_acc = args.datalake_bucket_data_acc
-    dw_bucket_data_acc = args.dw_bucket_data_acc
     source = args.source
     table_name = args.table_name
     execution_date = datetime.strptime(args.execution_date, "%Y-%m-%d")
@@ -315,26 +353,19 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
 
     content_dictionary = read_dag_bag_content(table_name, execution_date)
-    enriched_content_dictionary = enrich_dictionary(content_dictionary, table_name)
-    df = transform_list_of_dicts_to_dataframe_with_partitions(
-        enriched_content_dictionary, execution_date
-    )
-    enriched_df = enrich_data_frame(
-        df,
-        table_name,
-        datalake_bucket=datalake_bucket,
-        dw_bucket=dw_bucket,
-        execution_date=execution_date,
+
+    df = transform_dictionaries_to_dataframe(
+        content_dictionary, execution_date, table_name
     )
 
     s3_loader.load_df(
-        df=enriched_df,
+        df=df,
         s3_path=f"{database_location}{table_name}",
         format_options=format_options,
         partitions=partition_cols,
     )
     spark_metastore_loader.update_metastore(
-        enriched_df,
+        df,
         database_name,
         table_name,
         format_options,
@@ -345,6 +376,6 @@ if __name__ == "__main__":
     spark_metastore_service.create_new_partitions_from_df(
         database_name=database_name,
         table_name=table_name,
-        df=enriched_df,
+        df=df,
         partition_cols=partition_cols,
     )

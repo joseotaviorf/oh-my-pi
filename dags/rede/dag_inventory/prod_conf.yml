@@ -1,4 +1,2 @@
 ---
 tables_list: ["dag", "table"]
-datalake_bucket_data_acc: "datalake.s3.data.quintoandar.com.br"
-dw_bucket_data_acc: "dw.s3.data.quintoandar.com.br"

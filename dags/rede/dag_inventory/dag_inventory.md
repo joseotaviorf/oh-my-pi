@@ -11,8 +11,8 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-1. In raw and clean layer, via incremental load:
-- `cluster`
+In raw and clean layer, via incremental load:
+- `dag`
 - `table`
 
 </details>
