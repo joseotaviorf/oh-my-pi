@@ -188,6 +188,12 @@ columns:
   is_sale_primary_market:
     lineage:
       - datalake_ebdb_listing.house.is_sale_primary_market
+  is_available_soon:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_available_soon
+  is_early_demand:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_early_demand
   dt_last_exclusive_opted_in:
     lineage:
       - datalake_ebdb_listing.house_listing.dt_last_exclusive_opted_in
@@ -227,6 +233,12 @@ columns:
   dt_last_iorent_opted_out:
     lineage:
       - datalake_ebdb_listing.house_listing.dt_last_iorent_opted_out
+  ts_available_soon_started:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_available_soon_started
+  ts_early_demand_started:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_early_demand_started
   ts_consultant_deleted:
     lineage:
       - datalake_big_agent.house_rent_listing_consultant.ts_consultant_deleted

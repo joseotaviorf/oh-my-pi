@@ -191,7 +191,11 @@ house_listings AS (
         h.is_3p_supply_bh,
         h.is_casa_mineira_migration,
         h.is_sale_primary_market,
-        rl.ts_administrator_changed
+        rl.ts_administrator_changed,
+        hl.is_available_soon,
+        hl.ts_available_soon_started,
+        hl.is_early_demand,
+        hl.ts_early_demand_started
     FROM
         datalake_ebdb_listing.house AS h
     JOIN
@@ -278,6 +282,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.is_3p_supply_bh,
     hl.is_casa_mineira_migration,
     hl.is_sale_primary_market,
+    COALESCE(hl.is_available_soon, FALSE) AS is_available_soon,
+    COALESCE(hl.is_early_demand, FALSE) AS is_early_demand,
     hlco.dt_consultant_started,
     hl.dt_last_exclusive_opted_in,
     hl.dt_last_exclusive_opted_out,
@@ -285,6 +291,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.dt_last_originals_opted_out,
     hl.dt_last_iorent_opted_in,
     hl.dt_last_iorent_opted_out,
+    hl.ts_available_soon_started,
+    hl.ts_early_demand_started,
     hlco.ts_consultant_deleted,
     hl.ts_listing_version_start,
     hl.ts_listing_version_end,
