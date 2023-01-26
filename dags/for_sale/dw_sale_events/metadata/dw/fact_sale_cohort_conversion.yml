@@ -1,0 +1,56 @@
+---
+database_name: dw_sale
+table_name: fact_sale_cohort_conversion
+columns:
+  sk_sale_cohort_conversion:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_sale_demand_event
+      - dw_sale.fact_sale_demand_event.sk_event_type
+  sk_base_date:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_event_date
+  sk_conversion_date:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_event_date
+  sk_booking:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_booking
+  sk_offer:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_offer
+  sk_house:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_house
+  sk_region:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_region
+  sk_buyer:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_buyer
+  sk_seller:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_seller
+  sk_agent:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_agent
+  sk_agent_work_contract:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_agent_work_contract
+  sk_business_unit:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_business_unit
+  sk_company_supply:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_company_supply
+  sk_company_demand:
+    lineage:
+      - dw_sale.fact_sale_demand_event.sk_company_demand
+  year:
+    lineage:
+      - dw_sale.fact_sale_demand_event.year
+  month:
+    lineage:
+      - dw_sale.fact_sale_demand_event.month
+  day:
+    lineage:
+      - dw_sale.fact_sale_demand_event.day

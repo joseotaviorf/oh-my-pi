@@ -1,0 +1,37 @@
+---
+table_name: dw_sale_staging.dim_sale_cohort_type
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 600
+    severity_level: Error
+column_level_validations:
+  sk_cohort_type:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  week_number_up_to_20:
+    is_complete:
+      severity_level: Error
+  week_number_up_to_5:
+    is_complete:
+      severity_level: Error
+  conversion_abbreviation:
+    is_complete:
+      severity_level: Error
+  conversion_name:
+    is_complete:
+      severity_level: Error
+  first_event_abbreviation:
+    is_complete:
+      severity_level: Error
+  second_event_abbreviation:
+    is_complete:
+      severity_level: Error
+  first_event_name:
+    is_complete:
+      severity_level: Error
+  second_event_name:
+    is_complete:
+      severity_level: Error

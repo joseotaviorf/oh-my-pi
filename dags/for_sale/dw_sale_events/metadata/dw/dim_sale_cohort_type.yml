@@ -1,0 +1,25 @@
+---
+database_name: dw_sale
+table_name: dim_sale_cohort_type
+columns:
+  sk_cohort_type:
+    lineage:
+      - dw_sale.dim_sale_event_type.sk_event_type
+  conversion_abbreviation:
+    lineage:
+      - dw_sale.dim_sale_event_type.abbreviation
+  conversion_name:
+    lineage:
+      - dw_sale.dim_sale_event_type.event_name
+  first_event_abbreviation:
+    lineage:
+      - dw_sale.dim_sale_event_type.abbreviation
+  second_event_abbreviation:
+    lineage:
+      - dw_sale.dim_sale_event_type.abbreviation
+  first_event_name:
+    lineage:
+      - dw_sale.dim_sale_event_type.event_name
+  second_event_name:
+    lineage:
+      - dw_sale.dim_sale_event_type.event_name
