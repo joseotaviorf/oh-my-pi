@@ -1,9 +1,0 @@
-SELECT
-    area,
-    final_hour,
-    start_hour,
-    week_day,
-    start_date,
-    end_date
-FROM
-    datalake_gsheets_raw.schedule

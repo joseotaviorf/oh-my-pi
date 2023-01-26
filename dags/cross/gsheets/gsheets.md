@@ -43,7 +43,6 @@ This pipeline produces the following output tables:
     - `casa_mineira_marketing_manual_shared_costs`
     - `ciq_costs`
     - `city_share`
-    - `contact_type_taxonomy`
     - `contract_attribution_models`
     - `criteo_abtest_rj`
     - `credit_analysis_fraudsters`
@@ -52,7 +51,6 @@ This pipeline produces the following output tables:
     - `demand_retention_ab_tests`
     - `demand_targets_replanning`
     - `department_control`
-    - `department_schedule`
     - `entrance_inspection_csat`
     - `exit_inspection_csat`
     - `extra_invoice`

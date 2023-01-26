@@ -55,11 +55,6 @@ casa_mineira_inside_sales_pipe:
     sheet_name: negocios
     clean_table_name: casa_mineira_inside_sales_pipe
 
-contact_type_tag:
-    sheet_id: 1HQaKDATgePg4oIoDBASzPm5QkEG61Dee8T-bYqdSHFM
-    sheet_name: contact_types_tree_taxonomy
-    clean_table_name: contact_type_taxonomy
-
 contract_attribution_models:
     sheet_id: 1bDOmN1K_wrfTJnvzwK-sYSdBQ3oozhf4KgO_UQrJHME
     sheet_name: contract_attribution_models
@@ -316,11 +311,6 @@ sale_rbp_targets:
     sheet_id: 1dbPJT39JNkgakOE95INVipThMe-vLDDXHZ4aOp3q4pg
     sheet_name: sale_rbp_targets
     clean_table_name: sale_rbp_targets
-
-schedule:
-    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
-    sheet_name: Schedule
-    clean_table_name: department_schedule
 
 target_supply_and_demand_autonomous_agent:
     sheet_id: 1i2cHxc4h9c8FKEORH4K_0n_ho-3haXH04fWhdDHE2nU
