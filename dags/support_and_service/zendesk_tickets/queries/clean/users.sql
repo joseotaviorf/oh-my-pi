@@ -1,10 +1,10 @@
-WITH max_stitch_data AS (
+WITH dedup_users AS (
     SELECT
-        id,
-        MAX(CAST(updated_at AS TIMESTAMP)) AS max_updated_at
+        *
     FROM
         datalake_zendesk_tickets_raw.users
-    GROUP BY 1
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1
 )
 SELECT
     usr.id AS id_user,
@@ -51,8 +51,4 @@ SELECT
     MONTH(CAST(usr.updated_at AS DATE)) AS month,
     DAY(CAST(usr.updated_at AS DATE)) AS day
 FROM
-    datalake_zendesk_tickets_raw.users usr
-JOIN
-    max_stitch_data max_sd
-        ON max_sd.id = usr.id
-        AND max_sd.max_updated_at = CAST(usr.updated_at AS TIMESTAMP)
+    dedup_users usr
