@@ -1185,6 +1185,12 @@ demand_targets_replanning:
     clean_table_name: demand_targets_replanning
     sheet_context: static
 
+espelhamento_dl:
+    sheet_id: 14sgdtouI0lnxTDHsYH0ySt_R1nvMu4W0Qa8QJmg9mVI
+    sheet_name: Espelhamento_DL
+    clean_table_name: projreparos_espelhamento_dl
+    sheet_context: static
+
 for_sale_segmentation_survey:
     sheet_id: 1rpHRTqCaI1RtwH2OY4WStWGB9uj7YPaGQsJAL2EIaCo
     sheet_name: responses

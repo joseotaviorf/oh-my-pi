@@ -87,7 +87,6 @@ This pipeline produces the following output tables:
     - `photographer_account`
     - `plaquinhas_installation_targets`
     - `plaquinhas_demand_targets`
-    - `projreparos_espelhamento_dl`
     - `promotional_bonus_cluster_targets`
     - `promotional_bonus_segmentation_targets`
     - `promotional_bonus_user_cluster_targets`

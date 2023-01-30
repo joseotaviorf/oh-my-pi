@@ -127,11 +127,6 @@ entry_agreements_discounts_expenses:
     sheet_name: agreements_discounts_expenses_created
     clean_table_name: agreements_discounts_expenses_created
 
-espelhamento_dl:
-    sheet_id: 14sgdtouI0lnxTDHsYH0ySt_R1nvMu4W0Qa8QJmg9mVI
-    sheet_name: Espelhamento_DL
-    clean_table_name: projreparos_espelhamento_dl
-
 extra_invoice:
     sheet_id: 1i4SiSro342zfv6L0wpl9B29kY8Cyg8hwsShuIDkzkfQ
     sheet_name: extra_invoice
