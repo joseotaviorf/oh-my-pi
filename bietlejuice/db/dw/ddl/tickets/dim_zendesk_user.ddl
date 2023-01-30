@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS tickets.dim_zendesk_user (
     locale VARCHAR,
     tags VARCHAR,
     role VARCHAR,
+    cost_center VARCHAR,
     is_active BOOLEAN,
     is_shared_phone_number BOOLEAN,
     ts_last_login TIMESTAMP,
