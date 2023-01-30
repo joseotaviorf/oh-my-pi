@@ -1,4 +1,5 @@
 ---
+lineage_product_database_name: rentalguaranteeplataform
 tables:
   - table_name: address
     date_filter_column: updated_at
@@ -72,8 +73,8 @@ tables:
     date_filter_column: dateupdate
   - table_name: contract
     date_filter_column: dateupdate
-  #- table_name: contract_status
-    #date_filter_column: dateupdate
+  - table_name: contract_status
+    date_filter_column: dateupdate
   - table_name: document_status
     date_filter_column: dateupdate
   - table_name: document_type
@@ -88,8 +89,8 @@ tables:
     date_filter_column: dateupdate
   - table_name: plans
     date_filter_column: dateupdate
-  #- table_name: property
-    #date_filter_column: dateupdate
+  - table_name: property_propose
+    date_filter_column: dateupdate
   - table_name: property_type
     date_filter_column: dateupdate
   - table_name: propose
@@ -103,5 +104,7 @@ tables:
   - table_name: propose_person
     date_filter_column: dateupdate
   - table_name: propose_person_type
+    date_filter_column: dateupdate
+  - table_name: propose_status
     date_filter_column: dateupdate
 partition_cols: ["year", "month", "day"]
