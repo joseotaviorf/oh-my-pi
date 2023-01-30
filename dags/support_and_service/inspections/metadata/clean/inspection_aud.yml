@@ -47,6 +47,9 @@ columns:
   type:
     lineage:
       - datalake_inspections_raw.inspection_aud.type
+  is_comparative:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.comparative
   mod_id_previous_inspection:
     lineage:
       - datalake_inspections_raw.inspection_aud.previous_inspection_id_mod
@@ -86,9 +89,18 @@ columns:
   mod_ts_created:
     lineage:
       - datalake_inspections_raw.inspection_aud.created_at_mod
+  mod_ts_schedule:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.schedule_date_mod
   mod_ts_updated:
     lineage:
       - datalake_inspections_raw.inspection_aud.updated_at_mod
+  mod_is_comparative:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.comparative_mod
+  ts_schedule:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.schedule_date
   ts_created:
     lineage:
       - datalake_inspections_raw.inspection_aud.created_at

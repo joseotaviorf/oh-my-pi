@@ -18,7 +18,7 @@ SELECT
     it.item_type,
     it.media_type,
     i.comment,
-    i.present,
+    i.is_present,
     i.count,
     i.status,
     i.ts_created,

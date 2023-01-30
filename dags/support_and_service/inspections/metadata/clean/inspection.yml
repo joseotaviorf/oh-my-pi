@@ -38,6 +38,12 @@ columns:
   type:
     lineage:
       - datalake_inspections_raw.inspection.type
+  comparative:
+    lineage:
+      - datalake_inspections_raw.inspection.comparative
+  ts_schedule:
+    lineage:
+      - datalake_inspections_raw.inspection.schedule_date
   ts_created:
     lineage:
       - datalake_inspections_raw.inspection.created_at

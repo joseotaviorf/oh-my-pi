@@ -7,6 +7,7 @@ SELECT
     severity,
     type,
     require_manual_analysis,
+    order AS number_order,
     enabled AS is_enabled,
     protected AS is_protected,
     deleted AS is_deleted,

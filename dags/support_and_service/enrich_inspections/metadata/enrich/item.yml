@@ -29,9 +29,9 @@ columns:
   comment:
     lineage:
       - datalake_inspections_clean.item.comment
-  present:
+  is_present:
     lineage:
-      - datalake_inspections_clean.item.present
+      - datalake_inspections_clean.item.is_present
   count:
     lineage:
       - datalake_inspections_clean.item.count

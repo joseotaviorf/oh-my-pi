@@ -17,12 +17,21 @@ columns:
   type:
     lineage:
       - datalake_inspections_raw.item_type.type
-  allow_comments:
+  number_order:
+    lineage:
+      - datalake_inspections_raw.item_type.order
+  is_allow_comments:
     lineage:
       - datalake_inspections_raw.item_type.allow_comments
-  allow_media:
+  is_allow_media:
     lineage:
       - datalake_inspections_raw.item_type.allow_media
+  is_deleted:
+    lineage:
+      - datalake_inspections_raw.item_type.deleted
+  is_show_label:
+    lineage:
+      - datalake_inspections_raw.item_type.show_label
   ts_created:
     lineage:
       - datalake_inspections_raw.item_type.created_at

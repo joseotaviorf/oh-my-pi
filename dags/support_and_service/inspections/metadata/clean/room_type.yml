@@ -8,12 +8,18 @@ columns:
   type:
     lineage:
       - datalake_inspections_raw.room_type.type
+  number_order:
+    lineage:
+      - datalake_inspections_raw.room_type.order
   is_deletable:
     lineage:
       - datalake_inspections_raw.room_type.deletable
   is_deleted:
     lineage:
       - datalake_inspections_raw.room_type.deleted
+  is_default:
+    lineage:
+      - datalake_inspections_raw.room_type.is_default
   ts_created:
     lineage:
       - datalake_inspections_raw.room_type.created_at

@@ -11,6 +11,8 @@ SELECT
     schedule,
     status,
     type,
+    comparative,
+    schedule_date AS ts_schedule,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

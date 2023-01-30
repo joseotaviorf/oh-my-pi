@@ -23,15 +23,15 @@ columns:
   comment:
     lineage:
       - datalake_inspections_raw.item.comment
-  present:
-    lineage:
-      - datalake_inspections_raw.item.present
   count:
     lineage:
       - datalake_inspections_raw.item.count
   status:
     lineage:
       - datalake_inspections_raw.item.status
+  is_present:
+    lineage:
+      - datalake_inspections_raw.item.present
   ts_created:
     lineage:
       - datalake_inspections_raw.item.created_at

@@ -5,6 +5,12 @@ columns:
   id_item_group_type:
     lineage:
       - datalake_inspections_raw.item_group_type.id
+  type:
+    lineage:
+      - datalake_inspections_raw.item_group_type.type
+  review_instruction:
+    lineage:
+      - datalake_inspections_raw.item_group_type.review_instruction
   is_deletable:
     lineage:
       - datalake_inspections_raw.item_group_type.deletable

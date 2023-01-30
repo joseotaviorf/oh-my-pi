@@ -26,6 +26,9 @@ columns:
   require_manual_analysis:
     lineage:
       - datalake_inspections_raw.issue_type.require_manual_analysis
+  number_order:
+    lineage:
+      - datalake_inspections_raw.issue_type.order
   is_enabled:
     lineage:
       - datalake_inspections_raw.issue_type.enabled
