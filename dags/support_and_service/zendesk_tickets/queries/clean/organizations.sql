@@ -22,8 +22,8 @@ SELECT
   CAST(updated_at AS TIMESTAMP) AS ts_updated,
   CAST(created_at AS TIMESTAMP) AS ts_created,
   CAST(deleted_at AS TIMESTAMP) AS ts_deleted,
-  YEAR(CAST(o.updated_at AS DATE)) AS year,
-  MONTH(CAST(o.updated_at AS DATE)) AS month,
-  DAY(CAST(o.updated_at AS DATE)) AS day
+  YEAR(CAST(updated_at AS DATE)) AS year,
+  MONTH(CAST(updated_at AS DATE)) AS month,
+  DAY(CAST(updated_at AS DATE)) AS day
 FROM
   dedup_orgs
