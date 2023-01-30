@@ -1,0 +1,13 @@
+dag:
+  name: dw_keys_tracking
+  schedule_start_date: 2020,02,20
+  owner: Data ForRent
+workflow:
+  type: query
+  layer: dw
+  custom_schema: keys_tracking
+cluster:
+  type: databricks_10_4_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

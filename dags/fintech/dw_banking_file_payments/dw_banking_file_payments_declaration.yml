@@ -1,0 +1,13 @@
+dag:
+  name: dw_banking_file_payments
+  schedule_start_date: 2020,08,29
+  owner: Data Fintech
+workflow:
+  type: query
+  layer: dw
+  custom_schema: payment
+cluster:
+  type: databricks_10_4_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
