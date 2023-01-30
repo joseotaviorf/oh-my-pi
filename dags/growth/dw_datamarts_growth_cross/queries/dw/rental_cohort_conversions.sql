@@ -430,6 +430,7 @@ rent_flow_adjusted AS (
         rf.sk_contract_annulment_date,
         rf.sk_booking,
         rf.sk_booking_created_date,
+        db.ts_created_local,
         rf.sk_offer,
         rf.sk_offer_submitted_date,
         rf.sk_offer_approved_date,
@@ -579,7 +580,7 @@ vb2os AS (
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
-        COUNT(DISTINCT rf.sk_booking) AS vb2os,
+        COUNT(DISTINCT CASE WHEN rf.sk_offer_submitted_date > -1 THEN rf.sk_offer ELSE NULL END) AS vb2os,
         NULL::BIGINT AS vc,
         NULL::BIGINT AS vc2os,
         NULL::BIGINT AS os2oa,
@@ -602,7 +603,7 @@ vb2os AS (
         public.dim_date dd
     JOIN
         rent_flow_adjusted rf
-            ON dd.sk_date = rf.sk_booking_created_date
+            ON dd.date = DATE(rf.ts_created_local)
                 AND rf.sk_booking_created_date > 0
     WHERE
         dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
