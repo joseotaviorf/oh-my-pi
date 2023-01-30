@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     id_person AS sk_person,
     name,
     email,
@@ -10,7 +10,6 @@ SELECT
     score_personal_value,
     declared_income,
     requested_income,
-    is_primary_person,
     dt_birth,
     NOW() AS ts_load
 FROM

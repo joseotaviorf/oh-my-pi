@@ -8,3 +8,6 @@ columns:
   sk_propose:
     lineage:
       - datalake_velo.propose_person.id_propose
+  is_primary_person:
+    lineage:
+      - datalake_velo.propose_person.is_primary_person

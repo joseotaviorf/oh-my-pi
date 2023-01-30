@@ -35,9 +35,6 @@ columns:
   requested_income:
     lineage:
       - datalake_velo.propose_person.requested_income
-  is_primary_person:
-    lineage:
-      - datalake_velo.propose_person.is_primary_person
   dt_birth:
     lineage:
       - datalake_velo.propose_person.dt_birth
