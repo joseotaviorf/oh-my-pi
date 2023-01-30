@@ -9,7 +9,7 @@ cte_demand AS (
             wc.is_3p_contract
         FROM
             datalake_ebdb_agents.agent_contract AS ac
-        JOIN 
+        JOIN
             datalake_ebdb_work_contract.work_contract AS wc
                 ON ac.id_work_contract = wc.id
         WHERE
@@ -36,7 +36,7 @@ cte_demand AS (
     LEFT JOIN
         demand_3p AS dp
             ON fo.sk_booking = dp.sk_booking
-    LEFT JOIN 
+    LEFT JOIN
         datalake_gsheets_clean.forbrokers_3p_partner_conditions pc
             ON UPPER(dp.demand_3p_partner) = UPPER(pc.partner_short_name)
     WHERE TRIM(is_3p_demand) = 'true'
@@ -51,18 +51,18 @@ cte_categoria AS (
             WHEN da.is_3p_demand = 'true' THEN '3P - Demand'
             WHEN da.is_3p_supply = 'true' THEN '3P - Supply'
         END AS tipo,
-        CASE 
-            WHEN da.is_3p_demand = 'true' THEN da.partner_3p_demand 
+        CASE
+            WHEN da.is_3p_demand = 'true' THEN da.partner_3p_demand
         END AS agents_partner,
         CASE
             WHEN da.is_3p_supply = 'true' THEN da.partner_3p_supply
         END AS partner
-    FROM 
-        dw_sale.fact_offers fo  
+    FROM
+        dw_sale.fact_offers fo
     LEFT JOIN
         dw_sale.dim_sale_agreement da
             ON da.sk_offer = fo.sk_offer
-),       
+),
 
 cte_categoria_filtro AS (
     SELECT
@@ -74,7 +74,7 @@ cte_categoria_filtro AS (
             ELSE 'QuintoAndar'
         END AS partner_types,
             CASE WHEN cc.tipo IS NOT NULL THEN 'ForBrokers'
-            ELSE 'QuintoAndar' 
+            ELSE 'QuintoAndar'
         END AS service_line,
         cc.partner,
         cc.agents_partner
@@ -86,7 +86,7 @@ cte_categoria_filtro AS (
     LEFT JOIN
         cte_demand demand
             ON demand.sk_offer = fo.sk_offer
-    
+
 ),
 
 cte_partner_demand AS (
@@ -99,7 +99,7 @@ cte_partner_demand AS (
     LEFT JOIN
         cte_categoria_filtro cc
             ON cc.sk_offer = dim.sk_offer
-    LEFT JOIN 
+    LEFT JOIN
         cte_demand demand
             ON demand.sk_offer = dim.sk_offer
             AND UPPER(demand.partner_short_name) = UPPER(cc.agents_partner)
@@ -112,8 +112,8 @@ cte_partner_supply AS (
         SELECT
             dim.sk_offer AS offer_id,
             'Imobiliária - supply' AS `role`,
-            pc_s.partner AS partner_id
-        
+            pc_s.partner_short_name AS partner_id
+
     FROM
         dw_sale.dim_offer dim
     LEFT JOIN
@@ -130,12 +130,12 @@ SELECT
     dim.sk_offer AS offer_id,
     CASE
         WHEN demand.partner_short_name IS NOT NULL THEN demand.partner_short_name
-        WHEN pc_s.partner IS NOT NULL THEN pc_s.partner
+        WHEN pc_s.partner_short_name IS NOT NULL THEN pc_s.partner_short_name
         ELSE NULL
     END AS partner_id,
     CASE
         WHEN demand.partner_short_name IS NOT NULL THEN 'Imobiliária - demand'
-        WHEN pc_s.partner IS NOT NULL THEN 'Imobiliária - supply'
+        WHEN pc_s.partner_short_name IS NOT NULL THEN 'Imobiliária - supply'
         ELSE NULL
     END AS `role`,
     YEAR(CURRENT_DATE) AS year,
@@ -146,13 +146,13 @@ FROM
 LEFT JOIN
     cte_categoria_filtro cc
         ON cc.sk_offer = dim.sk_offer
-LEFT JOIN 
+LEFT JOIN
     cte_demand demand
         ON demand.sk_offer = dim.sk_offer
         AND UPPER(demand.partner_short_name) = UPPER(cc.agents_partner)
 LEFT JOIN
     datalake_gsheets_clean.forbrokers_3p_partner_conditions pc_s
         ON UPPER(pc_s.partner_short_name) = UPPER(cc.partner)
-WHERE 
-    demand.partner_short_name IS NOT NULL 
-    OR pc_s.partner IS NOT NULL
+WHERE
+    demand.partner_short_name IS NOT NULL
+    OR pc_s.partner_short_name IS NOT NULL
