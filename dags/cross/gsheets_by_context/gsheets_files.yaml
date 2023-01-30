@@ -1151,7 +1151,7 @@ dados_docato:
 
 de_para_analistas_proowner:
     sheet_id: 1qXhl565T30pxSCrd5zkq2m9Ch6way4_p9J4v9mjKS1c
-    sheet_name: Página1
+    sheet_name: AM
     clean_table_name: pro_owner_analyst
     sheet_context: static
 
