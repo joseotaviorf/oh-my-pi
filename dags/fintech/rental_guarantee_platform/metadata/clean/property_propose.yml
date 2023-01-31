@@ -35,6 +35,6 @@ columns:
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.property_propose.month
-   day:
+  day:
     lineage:
       - datalake_rental_guarantee_platform_raw.property_propose.day
