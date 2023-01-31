@@ -32,5 +32,6 @@ More information about run time [here]({chart_url}{dag_id}).
     - `rejection_history_collector`
     - `rejection_history_event_aud`
     - `rejection_history_event`
+    - `revinfo`
 
 </details>

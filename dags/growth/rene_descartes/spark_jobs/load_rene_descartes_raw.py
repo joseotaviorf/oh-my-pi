@@ -13,7 +13,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 
 SOURCE = "rene_descartes"
 JOB_NAME = "load_rene_descartes_into_datalake"
-BLOCK_LIST = ["change_owner_control", "flyway_schema_history", "revinfo"]
+BLOCK_LIST = ["change_owner_control", "flyway_schema_history"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
