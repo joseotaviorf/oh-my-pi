@@ -1,10 +1,9 @@
 import pytest
 
 from bietlejuice.base.hive import TableStorageDescriptorEnum
-from bietlejuice.base.pipeline import LayerEnum
 
 
-class TestLayerEnum:
+class TestTableStorageDescriptorEnum:
     @pytest.mark.parametrize(
         "layer, expected_return",
         [
@@ -22,9 +21,3 @@ class TestLayerEnum:
 
         # assert
         assert returned_value == expected_return
-
-    def test_from_layer_with_invalid_layer(self):
-        # assert
-        with pytest.raises(ValueError):
-            # act
-            LayerEnum.validate_layer("invalid_layer")

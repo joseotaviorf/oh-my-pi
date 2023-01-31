@@ -17,32 +17,8 @@ class TaskGroupMethodFactory(object):
         :return: respective method for the supplied layer
         :rtype: method
         """
-        if layer_enum not in (
-            LayerEnum.CLEAN,
-            LayerEnum.ENRICH,
-            LayerEnum.DW_STAGING,
-            LayerEnum.DW,
-            LayerEnum.REVERSE,
-        ):
-            raise ValueError(
-                "m=get_method_for_build_task_group_from_sql_files,"
-                f" layer={layer_enum}, msg=invalid layer"
-            )
+        layer_enum_member = LayerEnum(layer_enum)
 
-        return TaskGroupMethodFactory._dispatch_dict_for_build_task_group_from_sql_files(
-            layer_enum
-        )
-
-    @staticmethod
-    def _dispatch_dict_for_build_task_group_from_sql_files(layer_enum):
-        """
-        Maps methods according to layer
-
-        :param layer_enum: layer Enum
-        :type layer_enum: bietlejuice.base.pipeline.LayerEnum member
-        :return: respective method for the supplied layer
-        :rtype: method
-        """
         # By adding these imports to the head of the file it raises
         # error by python circular dependency
         from bietlejuice.base.airflow.task_groups.datalake_task_group import (
@@ -59,4 +35,4 @@ class TaskGroupMethodFactory(object):
             LayerEnum.DW_STAGING: DWTaskGroup.build_dw_staging_task_group,
             LayerEnum.DW: DWTaskGroup.build_dw_task_group,
             LayerEnum.REVERSE: ReverseTaskGroup.build_reverse_task_group,
-        }.get(layer_enum)
+        }.get(layer_enum_member)

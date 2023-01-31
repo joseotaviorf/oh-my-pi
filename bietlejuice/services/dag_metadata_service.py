@@ -194,7 +194,7 @@ class DAGMetadataService:
             if ignore_staging and layer in self._STAGING_LAYERS:
                 continue
 
-            if LayerEnum.validate_layer(layer):
+            if layer in LayerEnum.get_available_enum_values():
                 layers.add(layer)
             else:
                 logger.debug(f"m=get_dag_layers, layer={layer}, msg=Invalid Layer")
@@ -289,7 +289,7 @@ class DAGMetadataService:
         if not target_db_name:
             return None
         try:
-            LayerEnum.validate_layer(layer)
+            LayerEnum(layer)
         except ValueError:
             logger.info(
                 f"m=get_dag_database_name, source={source}, context={context}, dag_name={dag_name}, layer={layer}, "

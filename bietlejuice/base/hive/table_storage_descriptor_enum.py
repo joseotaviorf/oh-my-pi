@@ -26,12 +26,12 @@ class TableStorageDescriptorEnum(Enum):
         :return: an instance of TableFormatInfo
         :rtype: TableFormatInfo
         """
-        LayerEnum.validate_layer(layer)
+        layer_enum_member = LayerEnum(layer)
         return {
-            LayerEnum.RAW.value: TableStorageDescriptorEnum.RAW_FORMAT.value,
-            LayerEnum.CLEAN.value: TableStorageDescriptorEnum.CLEAN_FORMAT.value,
-            LayerEnum.CLEAN_STAGING.value: TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT.value,
-            LayerEnum.ENRICH.value: TableStorageDescriptorEnum.ENRICH_FORMAT.value,
-            LayerEnum.DW.value: TableStorageDescriptorEnum.DW.value,
-            LayerEnum.METRIC.value: TableStorageDescriptorEnum.METRIC_FORMAT.value,
-        }.get(layer)
+            LayerEnum.RAW: TableStorageDescriptorEnum.RAW_FORMAT.value,
+            LayerEnum.CLEAN: TableStorageDescriptorEnum.CLEAN_FORMAT.value,
+            LayerEnum.CLEAN_STAGING: TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT.value,
+            LayerEnum.ENRICH: TableStorageDescriptorEnum.ENRICH_FORMAT.value,
+            LayerEnum.DW: TableStorageDescriptorEnum.DW.value,
+            LayerEnum.METRIC: TableStorageDescriptorEnum.METRIC_FORMAT.value,
+        }.get(layer_enum_member)
