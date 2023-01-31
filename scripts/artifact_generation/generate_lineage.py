@@ -74,18 +74,35 @@ if __name__ == "__main__":
 
     for file_path in file_paths:
         if "/clean/" in file_path:
-            regex = f"{path}(.*)/clean(.*)/(.*).sql"
-            database_name = re.search(regex, file_path).group(1)
-            table_name = re.search(regex, file_path).group(3)
+            layer = "clean"
+        elif "/raw/" in file_path:
+            layer = "raw"
+        elif "/enrich/" in file_path:
+            layer = "enrich"
+        elif "/dw/" in file_path:
+            layer = "dw"
+        elif "/metric/" in file_path:
+            layer = "metric"
+        else:
+            raise Exception(f"ERROR finding the layer.")
+        regex = f"{path}(.*)\/(.*)\/queries\/(.*)\/(.*).sql"
+        database_name = re.search(regex, file_path).group(2)
+        table_name = re.search(regex, file_path).group(4)
 
-            with open(file_path, "r") as stream:
-                sql = stream.read()
-                try:
-                    yml_body = create_yml_for_table(
-                        sql, f"datalake_{database_name}_clean", table_name
-                    )
-                    save_yml(file_path, yml_body)
-                except Exception:
-                    print(
-                        f"ERROR database_name={database_name}, table_name={table_name}"
-                    )
+        if layer in ("raw", "clean"):
+            db_template = f"datalake_{database_name}_{layer}"
+        elif layer == "enrich":
+            database_name = database_name.replace("enrich_", "")
+            db_template = f"datalake_{database_name}"
+        elif layer == "dw":
+            db_template = f"{database_name}"
+        elif layer == "metric":
+            db_template = f"{database_name}"
+
+        with open(file_path, "r") as stream:
+            sql = stream.read()
+            try:
+                yml_body = create_yml_for_table(sql, db_template, table_name)
+                save_yml(file_path, yml_body)
+            except Exception:
+                print(f"ERROR database_name={database_name}, table_name={table_name}")
