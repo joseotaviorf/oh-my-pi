@@ -39,7 +39,6 @@ costs AS (
         0.0 AS new_buyer_prospect_target
     FROM datalake_casa_mineira_marketing_costs_prod.daily_costs
     WHERE ((flow_type = 'automatic' AND funnel_side = 'imobiliaria') OR (flow_type = 'manual' AND funnel_side = 'demand'))
-        AND DATE(NULLIF(id_date, -1)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
 ),
 ----------------------------------------------------
@@ -101,7 +100,6 @@ info_events AS (
         datalake_casa_mineira_amplitude_clean_prod."329001_portal"
     WHERE
         event_type IN ('receive_information_clicked', 'contact_intent_clicked', 'visit_intent_clicked')
-        AND DATE(ts_event) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND CURRENT_DATE
 ),
 ------------------------------------------------------
 -- Filter the first contact flow cohort from events --
@@ -185,7 +183,6 @@ contacts as (
         order_new_contact_flow
     FROM info_contact
         WHERE id_origin NOT IN ('12', '18', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '34', '35') AND id_origin::INT < 38
-        AND DATE(date_add('hour', 3, ts_created)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
 ),
 -----------------------------------------------------------------------------------------------------------
 -- Join Contacts from Prod, Events From Amplitude and Taxonomy from Sheets and introduce NULLs for UNION --
