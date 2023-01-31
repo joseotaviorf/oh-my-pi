@@ -21,22 +21,54 @@ WITH b2b_house_contracts AS (
     LEFT JOIN datalake_ebdb_clean.partner partner
         ON partner.id = partner_agent.id_partner
 ),
-b2b_contracts AS (
-  /** This CTE checks if a contract exists in contract_partnership_data table. If so, there is a Partner involved and we may be talking about a B2B contract, depending on
-  the Partner type. This logic can cover cases where there have been house plan updates (from B2B to not, vice-versa) or user exchanges for a house, where it may led to change
-  the contract type when looking to the b2b_house_contracts information. **/
+contracts_partner_quantity AS (
+    SELECT
+        id_contract,
+        count(distinct id_partner) AS partner_quantity,
+        MAX(IF(partner_type='EXECUTIVE_FOR_RENT', TRUE, FALSE)) AS is_executive_partner
+    FROM 
+        datalake_ebdb_clean.contract_partnership_data
+    GROUP BY
+        id_contract
+), 
+contracts_partner_selection AS (
     SELECT
         cpd.id_contract,
         cpd.partner_type,
         cpd.contract_plan,
         cpd.administration_split_percentage,
         cpd.brokerage_split_percentage,
-        IF(cpd.partner_type= 'PRIME', TRUE, FALSE) AS is_contract_b2b
+        IF(cpd.partner_type= 'PRIME', TRUE, FALSE) AS is_contract_b2b,
+        pq.partner_quantity,
+        pq.is_executive_partner,
+        IF(cpd.partner_type='EXECUTIVE_FOR_RENT', 2, 1) AS partner_weight
     FROM 
         datalake_ebdb_clean.contract_partnership_data AS cpd
+    JOIN 
+        contracts_partner_quantity AS pq
+            ON pq.id_contract = cpd.id_contract
     LEFT JOIN
         datalake_ebdb_clean.contract AS c
             ON c.id = cpd.id_contract
+),
+b2b_contracts AS (
+  /** This CTE checks if a contract exists in contract_partnership_data table. If so, there is a Partner involved and we may be talking about a B2B contract, depending on
+  the Partner type. This logic can cover cases where there have been house plan updates (from B2B to not, vice-versa) or user exchanges for a house, where it may led to change
+  the contract type when looking to the b2b_house_contracts information. **/
+    SELECT
+        id_contract,
+        partner_type,
+        contract_plan,
+        administration_split_percentage,
+        brokerage_split_percentage,
+        is_contract_b2b,
+        partner_quantity,
+        is_executive_partner,
+        ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY partner_weight ASC) AS row_num
+    FROM 
+        contracts_partner_selection
+    QUALIFY
+        row_num = 1
 ),
 b2b_info AS (
     SELECT DISTINCT
@@ -69,6 +101,8 @@ b2b_info AS (
                         THEN 'batch'
                 END
         END AS b2b_prime_type,
+        COALESCE(b2b_c.partner_quantity, 0) AS partner_quantity,
+        COALESCE(b2b_c.is_executive_partner, FALSE) AS is_executive_partner,
         COALESCE(b2b_h_c.is_from_b2b_partner OR b2b_h_c.is_prime, FALSE) AS is_b2b,
         COALESCE(b2b_c.is_contract_b2b, FALSE) AS is_contract_b2b
     FROM
@@ -109,9 +143,9 @@ SELECT
     brokerage_split_percentage,
     b2b_type,
     b2b_prime_type,
+    partner_quantity,
+    is_executive_partner,
     is_b2b,
     is_contract_b2b
 FROM
     b2b_info
-WHERE
-    contract_partner_type <> 'EXECUTIVE_FOR_RENT' --This is a temporary fix to prevent data duplication due to a product rollout
