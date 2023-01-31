@@ -46,6 +46,7 @@ athena_query_results_bucket = config_service.get_config("athena_query_results_bu
 
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
+partition_cols = config_service.get_config("partition_cols")
 
 CUSTOM_LIBRARIES = [
     {
@@ -109,7 +110,7 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
     is_incremental=True,
-    partitions=["year", "month", "day"],
+    partitions=partition_cols,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
