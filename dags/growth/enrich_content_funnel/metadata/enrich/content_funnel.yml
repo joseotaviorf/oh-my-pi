@@ -17,11 +17,11 @@ columns:
       - datalake_top_of_funnel_demand.user_interactions.mkt_origin
       - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_origin
       - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_origin
-  utm_source:
+  mkt_source:
     lineage:
-      - datalake_top_of_funnel_demand.user_interactions.utm_source
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_source
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.utm_source
+      - datalake_top_of_funnel_demand.user_interactions.mkt_source
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_source
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_source
   utm_medium:
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.utm_medium

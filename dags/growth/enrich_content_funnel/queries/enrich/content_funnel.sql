@@ -15,7 +15,7 @@ visit_schedule_confirmed_events AS (
     FROM 
         datalake_online_attribution.online_attribution 
     WHERE 
-        ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND event_type_sanitized = 'visit_schedule_confirmed'
 ),
 debug_visit_schedule_confirmed_events AS (
@@ -34,7 +34,7 @@ debug_visit_schedule_confirmed_events AS (
     FROM 
         datalake_online_attribution.online_attribution 
     WHERE 
-        ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND event_type_sanitized = 'debug_visit_schedule_confirmed'
 ),
 extra_debug AS (
@@ -113,7 +113,7 @@ tof AS (
     SELECT
         ui.id_tof_user AS id_user,
         ui.id_tof_user AS id_amplitude,
-        ui.utm_source,
+        ui.mkt_source,
         ui.utm_medium,
         ui.utm_campaign,
         ui.utm_content,
@@ -131,15 +131,15 @@ tof AS (
         LEFT JOIN dw_public.dim_region AS dr
         ON CAST(ui.sk_region AS INT) = dr.sk_region
     WHERE 
-        dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND mkt_source IN ('ContentHub', 'Meu Lugar')
+        DATE(ui.dt_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND ui.mkt_source IN ('ContentHub', 'Meu Lugar')
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 rent_booking AS (
     SELECT
         av.id_user,
         av.id_amplitude,
-        av.utm_source,
+        pmmd.mkt_source,
         av.utm_medium,
         av.utm_campaign,
         av.utm_content,
@@ -172,7 +172,7 @@ sale_booking AS (
 SELECT
     av.id_user,
     av.id_amplitude,
-    av.utm_source,
+    pmmd.mkt_source,
     av.utm_medium,
     av.utm_campaign,
     av.utm_content,
@@ -221,7 +221,7 @@ funnel AS (
     SELECT
         t.id_user,
         t.id_amplitude,
-        t.utm_source,
+        t.mkt_source,
         t.utm_medium,
         t.utm_campaign,
         t.utm_content,
@@ -243,7 +243,7 @@ SELECT
     COALESCE (id_user, id_amplitude) AS id_user,
     COALESCE(city_group, 'Not Mapped') AS city_group,
     mkt_origin,
-    utm_source,
+    mkt_source,
     utm_medium,
     utm_campaign,
     utm_content,
@@ -442,7 +442,7 @@ SELECT
         ELSE 'Other'   
     END AS filter_1,
     CASE 
-        WHEN referrer LIKE '%google%' OR referrer LIKE '%bing%'THEN FALSE 
+        WHEN referrer LIKE '%meulugar%' OR referrer LIKE '%conteudos%'THEN FALSE 
         ELSE TRUE
     END AS is_attribution,
     is_tof,
@@ -454,6 +454,5 @@ SELECT
     DAY(dt_event) AS day
 FROM 
     funnel
-WHERE
-    dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
