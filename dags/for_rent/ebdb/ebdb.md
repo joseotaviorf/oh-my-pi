@@ -119,6 +119,8 @@ Produces the following output tables:
     `listing_info`
     `listing_rent_model`
     `listing_rent_model_aud`
+    `listing_sale_model`
+    `listing_sale_model_aud`
     `local`
     `map_region`
     `occupant_type`
