@@ -1,0 +1,26 @@
+---
+database_name: datalake_sale_offer_flows
+table_name: sale_offer_users_info
+columns:
+  type:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.type
+  ccv_buyer_status:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.is_ccv_buyer
+  ccv_signer_status:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.buyer_signer_status
+      - datalake_sale_offer_flows.sale_offer_users.is_seller_ccv_signer
+  user_legal_type:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.is_pj
+  original_user_status:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.is_original_user
+  is_income_partner:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.is_income_partner
+  joint_buyer_status:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.has_joint_buyer
