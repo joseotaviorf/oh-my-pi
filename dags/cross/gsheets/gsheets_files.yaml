@@ -80,11 +80,6 @@ csat_negociacao_iq:
     sheet_name: respostas_csat
     clean_table_name: tenant_negotiation_csat
 
-csat_reembolso_iq:
-    sheet_id: 1JBUSnsmnWbbH-XypQtmhdEzWEGPdWks8H4-dTTyl_Ic
-    sheet_name: respostas_csat
-    clean_table_name: tenant_reimbursement_csat
-
 # to be excluded @Set,01
 csat_vistoria_entrada:
     sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc

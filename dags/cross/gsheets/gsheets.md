@@ -113,7 +113,6 @@ This pipeline produces the following output tables:
     - `taxonomy_mkt_cost`
     - `taxonomy_portal_casa_mineira`
     - `tenant_negotiation_csat`
-    - `tenant_reimbursement_csat`
     - `tof_supply_targets`
     - `tracking_catalog_event_properties`
     - `tv_ads`

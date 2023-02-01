@@ -55,6 +55,12 @@ csat_chaves_onb_iq:
     clean_table_name: tenant_onboarding_keys_csat
     sheet_context: support_and_service
 
+csat_reembolso_iq:
+    sheet_id: 1JBUSnsmnWbbH-XypQtmhdEzWEGPdWks8H4-dTTyl_Ic
+    sheet_name: respostas_csat
+    clean_table_name: tenant_reimbursement_csat
+    sheet_context: support_and_service
+
 csat_reembolso_pos_rescisao:
     sheet_id: 1nwpNuMa0h4tChnJAc5unGT1NpuJMbY5mxIkIjx93wRE
     sheet_name: reembolso_pos_rescisao
