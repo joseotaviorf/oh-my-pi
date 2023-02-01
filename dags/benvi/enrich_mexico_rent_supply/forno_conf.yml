@@ -4,11 +4,5 @@ inner_dependencies:
     - listing_flow
   coincident_funnel:
     - listing_flow
-  monthly_supply_funnel:
-    - coincident_funnel
-    - listing_flow
-  weekly_supply_funnel:
-    - cohort_funnel
-    - coincident_funnel
 partition_cols:
   - country_code

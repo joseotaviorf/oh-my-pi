@@ -18,5 +18,3 @@ Creates the enriched tables via full load, partitioned by `country_code`:
 - `cohort_funnel`, soon to be migrated to the metric layer.
 - `coincident_funnel`, soon to be migrated to the metric layer.
 - `listing_flow`
-- `monthly_supply_funnel`, soon to be migrated to the metric layer.
-- `weekly_supply_funnel`, soon to be migrated to the metric layer.

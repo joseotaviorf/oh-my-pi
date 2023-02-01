@@ -20,4 +20,4 @@ SELECT
     budget_target,
     actual_cost
 FROM
-    datalake_mexico_rent_demand.weekly_demand_funnel
+    metric_rent_benvi.weekly_demand_funnel

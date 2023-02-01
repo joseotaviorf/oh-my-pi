@@ -28,4 +28,4 @@ SELECT
     actual_cost_comission,
     cost
 FROM 
-    datalake_mexico_rent_supply.monthly_supply_funnel
+    metric_rent_benvi.monthly_supply_funnel
