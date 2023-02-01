@@ -8,19 +8,42 @@ columns:
   ccv_buyer_status:
     lineage:
       - datalake_sale_offer_flows.sale_offer_users.is_ccv_buyer
-  ccv_signer_status:
+  seller_ccv_signer_status:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.is_seller_ccv_signer
+  buyer_ccv_signer_status:
     lineage:
       - datalake_sale_offer_flows.sale_offer_users.buyer_signer_status
-      - datalake_sale_offer_flows.sale_offer_users.is_seller_ccv_signer
   user_legal_type:
     lineage:
       - datalake_sale_offer_flows.sale_offer_users.is_pj
   original_user_status:
     lineage:
       - datalake_sale_offer_flows.sale_offer_users.is_original_user
-  is_income_partner:
+  income_partner_status:
     lineage:
       - datalake_sale_offer_flows.sale_offer_users.is_income_partner
   joint_buyer_status:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.has_joint_buyer
+  is_ccv_buyer:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.is_ccv_buyer
+  is_seller_ccv_signer:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.is_seller_ccv_signer
+  buyer_signer_status:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.buyer_signer_status
+  is_pj:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.is_pj
+  is_original_user:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.is_original_user
+  is_income_partner:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.is_income_partner
+  has_joint_buyer:
     lineage:
       - datalake_sale_offer_flows.sale_offer_users.has_joint_buyer
