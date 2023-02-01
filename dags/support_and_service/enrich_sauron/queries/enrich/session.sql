@@ -2,7 +2,7 @@ SELECT
 	id AS id_session,
 	GET_JSON_OBJECT(user_data, '$.user_id') AS id_user,
 	user_phone AS customer_phone,
-	REGEXP_REPLACE(user_phone,'(^(\\+?55)|\\D)','') AS customer_phone_formatted, -- include DDI code with '+' only if number is outside of Brazil
+	REGEXP_REPLACE(user_phone,'(^\\+?55|\\D)','') AS customer_phone_formatted,
 	agent,
 	source_environment,
 	department,
@@ -15,4 +15,5 @@ SELECT
 	ts_first_message,
 	ts_last_message,
 	ts_updated
-FROM datalake_sauron_clean.session
+FROM
+	datalake_sauron_clean.session
