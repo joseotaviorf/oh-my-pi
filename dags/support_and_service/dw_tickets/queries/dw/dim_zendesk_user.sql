@@ -21,3 +21,4 @@ FROM
     datalake_zendesk_tickets_clean.users usr
 LEFT JOIN
     datalake_zendesk_tickets_clean.organizations org
+        ON org.id = usr.id_organization
