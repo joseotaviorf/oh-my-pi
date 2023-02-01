@@ -8,7 +8,7 @@ WITH tasks AS (
 ),
 customer_identification AS (
     SELECT
-        REGEXP_REPLACE(customer_contact,'(^(\\+55)|\\D)','') AS phone,
+        REGEXP_REPLACE(customer_contact,'(^\\+55|\\D)','') AS phone,
         MAX(id_user) AS id_user,
         MAX(cpf) AS cpf
     FROM
@@ -22,15 +22,15 @@ SELECT
     c.id_source AS sk_session,
     COALESCE(ci.id_user,-1) AS sk_user,
     ci.cpf AS sk_personal_document,
-    COALESCE(CAST(date_format(c.ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_created_date,
+    COALESCE(CAST(DATE_FORMAT(c.ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_created_date,
     c.seconds_duration/60.0 AS minutes_duration,
     t.tasks,
     NOW() AS ts_load
 FROM
-    datalake_quinto_messenger.channel c
+    datalake_quinto_messenger.channel AS c
 LEFT JOIN
-    tasks t
+    tasks AS t
         ON t.id_channel = c.id_channel
 LEFT JOIN
-    customer_identification ci
-        ON ci.phone = REGEXP_REPLACE(c.from_phone_number,'(^(\\+55)|\\D)','')
+    customer_identification AS ci
+        ON ci.phone = REGEXP_REPLACE(c.from_phone_number,'(^\\+55|\\D)', '')
