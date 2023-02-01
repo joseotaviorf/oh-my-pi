@@ -80,20 +80,22 @@ csat_negociacao_iq:
     sheet_name: respostas_csat
     clean_table_name: tenant_negotiation_csat
 
-csat_negociacao_pp:
-    sheet_id: 17dFkMy8vk2jPgeMlgT0eMS06-c9-1OKBk97p74OML7A
-    sheet_name: respostas_csat
-    clean_table_name: owner_negotiation_csat
-
 csat_reembolso_iq:
     sheet_id: 1JBUSnsmnWbbH-XypQtmhdEzWEGPdWks8H4-dTTyl_Ic
     sheet_name: respostas_csat
     clean_table_name: tenant_reimbursement_csat
 
-csat_reparos_off_pp:
-    sheet_id: 1iZ4l6NVakfkSXUebhivPvGeUjmDo2X01gnDUOGnozcE
-    sheet_name: respostas_csat
-    clean_table_name: owner_offboarding_repair_csat
+# to be excluded @Set,01
+csat_vistoria_entrada:
+    sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
+    sheet_name: entrada
+    clean_table_name: entrance_inspection_csat
+
+# to be excluded @Set,01
+csat_vistoria_saida:
+    sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
+    sheet_name: saida
+    clean_table_name: exit_inspection_csat
 
 demand_channel_share:
     sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
@@ -104,11 +106,6 @@ demand_retention_ab_tests:
     sheet_id: 1l80txsBUzAAuCMalf6mfECgoULxbLHpw7J3z841aITw
     sheet_name: demand_retention_ab_tests
     clean_table_name: demand_retention_ab_tests
-
-entry_agreements_discounts_forms:
-    sheet_id: 19WtCrggLFO61vUJ8yOTFiikOLuXXWVcPzHk0grKcgbI
-    sheet_name: agreements_discounts_answer_forms
-    clean_table_name: agreements_discounts_answer_forms
 
 entry_agreements_discounts_expenses:
     sheet_id: 1sa8T17sDujZsJDrLvyPKDKJhO-mzz1KwPiiOFhRy8Qo

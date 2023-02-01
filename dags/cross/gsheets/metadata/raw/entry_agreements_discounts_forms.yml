@@ -1,7 +1,0 @@
-database_name: datalake_gsheets_raw
-table_name: entry_agreements_discounts_forms
-columns:
-  analista:
-    tags:
-    - PII
-    - Confidential
