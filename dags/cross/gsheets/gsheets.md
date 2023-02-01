@@ -51,8 +51,6 @@ This pipeline produces the following output tables:
     - `demand_retention_ab_tests`
     - `demand_targets_replanning`
     - `department_control`
-    - `entrance_inspection_csat`
-    - `exit_inspection_csat`
     - `extra_invoice`
     - `extra_invoice_created_expenses`
     - `from_to_cancellation`

@@ -95,18 +95,6 @@ csat_reparos_off_pp:
     sheet_name: respostas_csat
     clean_table_name: owner_offboarding_repair_csat
 
-# to be excluded @Set,01
-csat_vistoria_entrada:
-    sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
-    sheet_name: entrada
-    clean_table_name: entrance_inspection_csat
-
-# to be excluded @Set,01
-csat_vistoria_saida:
-    sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
-    sheet_name: saida
-    clean_table_name: exit_inspection_csat
-
 demand_channel_share:
     sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
     sheet_name: demand_channel_share
