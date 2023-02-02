@@ -9,6 +9,7 @@ WITH possible_combinations AS (
         CASE
             WHEN is_seller_ccv_signer IS TRUE THEN "Signer"
             WHEN is_seller_ccv_signer IS FALSE THEN "Not Signer"
+            ELSE "Unknown"
         END AS seller_ccv_signer_status,
         CASE
             WHEN buyer_signer_status = "SIGNER" THEN "Signer"
@@ -73,7 +74,6 @@ FROM
 LEFT JOIN
     datalake_sale_offer_flows.sale_offer_users_info AS sui
         USING (
-          sk_user_info,
           user_type,
           ccv_buyer_status,
           seller_ccv_signer_status,
