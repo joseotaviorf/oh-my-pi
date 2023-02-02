@@ -10,6 +10,9 @@ columns:
   payment_status:
     lineage:
       - datalake_retsuko_clean.invoice.status
+  substatus:
+    lineage:
+      - datalake_retsuko_clean.invoice.substatus
   negotiation_status:
     lineage:
       - datalake_retsuko_clean.invoice.negotiation_status

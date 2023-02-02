@@ -4,6 +4,7 @@ select
     account_id as id_account,
     contract_id as id_contract,
     status,
+    sub_status as substatus,
     negotiation_status,
     paid_via,
     purpose,

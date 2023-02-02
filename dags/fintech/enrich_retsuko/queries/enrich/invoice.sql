@@ -3,6 +3,8 @@ WITH invoice_replace AS (
         i.id_external AS id_invoice,
         REPLACE(i.purpose, '-', ' ') AS invoice_frequency,
         COALESCE(REPLACE(i.status, '-', ' '), 'not invoiceable') AS payment_status,
+        CASE WHEN i.substatus = 'none' THEN NULL 
+            ELSE i.substatus END AS substatus,
         i.negotiation_status,
         i.closing_mode,
         i.paid_via,
@@ -22,12 +24,13 @@ WITH invoice_replace AS (
         ON e.id_from_account = af.id
     LEFT JOIN datalake_retsuko_clean.account at
         ON e.id_to_account = at.id
-    GROUP BY 1,2,3,4,5,6,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,9,10,11,12
 )
 SELECT
     ir.id_invoice,
     ir.invoice_frequency,
     ir.payment_status,
+    ir.substatus,
     ir.negotiation_status,
     ir.closing_mode,
     ir.paid_via,
