@@ -9,10 +9,10 @@ SELECT
         'array<struct<
             value:string,
             timestamp:timestamp,
-            source_type:string,
-            source_id:string,
-            source_label:string,
-            updated_by_user_id:string
+            sourceType:string,
+            sourceId:string,
+            sourceLabel:string,
+            updatedByUserId:string
         >>'
     ) AS id_stage_history,
     FROM_JSON(
@@ -20,10 +20,10 @@ SELECT
         'array<struct<
             value:string,
             timestamp:timestamp,
-            source_type:string,
-            source_id:string,
-            source_label:string,
-            updated_by_user_id:string
+            sourceType:string,
+            sourceId:string,
+            sourceLabel:string,
+            updatedByUserId:string
         >>'
     ) AS id_pipeline_history,
     NULLIF(GET_JSON_OBJECT(properties, '$.content'), '') AS content,

@@ -11,9 +11,15 @@ columns:
   id_pipeline:
     lineage:
       - datalake_hubspot.stage.id_pipeline
+  id_user_updated_by:
+    lineage:
+      - datalake_hubspot.ticket.id_stage_history
+  source_type:
+    lineage:
+      - datalake_hubspot.ticket.id_stage_history
   ts_stage_started:
     lineage:
       - datalake_hubspot.ticket.id_stage_history
   ts_stage_ended:
     lineage:
-      - datalake_hubspot.deticketal.id_stage_history
+      - datalake_hubspot.ticket.id_stage_history

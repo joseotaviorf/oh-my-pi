@@ -8,6 +8,8 @@ WITH exploded_history AS (
 extracted_properties AS (
     SELECT
         id_contact,
+        lead_status_struct['updatedByUserId'] AS id_user_updated_by,
+        lead_status_struct['sourceType'] AS source_type,
         lead_status_struct.value AS lead_status,
         lead_status_struct.timestamp AS ts_status_started,
         LEAD(lead_status_struct.timestamp) OVER (PARTITION BY id_contact ORDER BY lead_status_struct.timestamp) AS ts_status_ended
@@ -16,6 +18,8 @@ extracted_properties AS (
 )
 SELECT
     id_contact,
+    id_user_updated_by,
+    source_type,
     lead_status,
     DATEDIFF(COALESCE(ts_status_ended, NOW()), ts_status_started) AS days_in_status,
     ts_status_started,

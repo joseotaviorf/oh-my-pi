@@ -10,10 +10,10 @@ SELECT
         'array<struct<
             value:string,
             timestamp:timestamp,
-            source_type:string,
-            source_id:string,
-            source_label:string,
-            updated_by_user_id:string
+            sourceType:string,
+            sourceId:string,
+            sourceLabel:string,
+            updatedByUserId:string
         >>'
     ) AS id_stage_history,
     FROM_JSON(
@@ -21,10 +21,10 @@ SELECT
         'array<struct<
             value:string,
             timestamp:timestamp,
-            source_type:string,
-            source_id:string,
-            source_label:string,
-            updated_by_user_id:string
+            sourceType:string,
+            sourceId:string,
+            sourceLabel:string,
+            updatedByUserId:string
         >>'
     ) AS id_pipeline_history,
     GET_JSON_OBJECT(properties, '$.dealname') AS deal_name,
@@ -37,6 +37,7 @@ SELECT
     GET_JSON_OBJECT(properties, '$.produtos') AS product,
     NULLIF(GET_JSON_OBJECT(properties, '$.priorizacao'), '') AS soft_opening_priority,
     NULLIF(GET_JSON_OBJECT(properties, '$.fase_soft_opening'), '') AS soft_opening_phase,
+    NULLIF(GET_JSON_OBJECT(properties, '$.formato_de_fechamento_comercial'), '') AS commercial_closing_format,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.com_quais_imobiliarias_tem_parceria_'), ''), ';') AS partner_agencies,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.em_quais_portais_anuncia_'), ''), ';') AS advertising_portals,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.qual_a_solucao_empresa_de_garantia_locaticia_oferece_para_os_clientes_de_locacao___clonado_'), ''), ';') AS rental_guarantee_solutions,

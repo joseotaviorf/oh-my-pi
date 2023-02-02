@@ -56,6 +56,9 @@ columns:
   soft_opening_phase:
     lineage:
       - datalake_hubspot_clean.deal.properties
+  commercial_closing_format:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
   partner_agencies:
     lineage:
       - datalake_hubspot_clean.deal.properties

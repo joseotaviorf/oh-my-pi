@@ -10,7 +10,13 @@ columns:
       - datalake_hubspot.deal.id_stage_history
   id_pipeline:
     lineage:
-      - datalake_hubspot.deal.id_pipeline_history
+      - datalake_hubspot.stage.id_pipeline
+  id_user_updated_by:
+    lineage:
+      - datalake_hubspot.deal.id_stage_history
+  source_type:
+    lineage:
+      - datalake_hubspot.deal.id_stage_history
   ts_stage_started:
     lineage:
       - datalake_hubspot.deal.id_stage_history

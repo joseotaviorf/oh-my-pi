@@ -5,6 +5,12 @@ columns:
   id_contact:
     lineage:
       - datalake_hubspot.contact.id_contact
+  id_user_updated_by:
+    lineage:
+      - datalake_hubspot.contact.lead_status_history
+  source_type:
+    lineage:
+      - datalake_hubspot.contact.lead_status_history
   lead_status:
     lineage:
       - datalake_hubspot.contact.lead_status_history

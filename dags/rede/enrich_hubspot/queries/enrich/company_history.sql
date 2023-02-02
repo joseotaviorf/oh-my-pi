@@ -37,10 +37,10 @@ SELECT
         'array<struct<
             value:string,
             timestamp:timestamp,
-            source_type:string,
-            source_id:string,
-            source_label:string,
-            updated_by_user_id:string
+            sourceType:string,
+            sourceId:string,
+            sourceLabel:string,
+            updatedByUserId:string
         >>'
     ) AS member_category_history,
     NULLIF(GET_JSON_OBJECT(properties, '$.origem_do_lead'), '') AS lead_origin,

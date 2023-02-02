@@ -36,10 +36,10 @@ SELECT
         'array<struct<
             value:string,
             timestamp:timestamp,
-            source_type:string,
-            source_id:string,
-            source_label:string,
-            updated_by_user_id:string
+            sourceType:string,
+            sourceId:string,
+            sourceLabel:string,
+            updatedByUserId:string
         >>'
     ) AS lead_status_history,
     GET_JSON_OBJECT(properties, '$.num_conversion_events')::INT AS num_conversion_events,

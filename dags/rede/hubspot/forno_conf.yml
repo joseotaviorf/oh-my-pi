@@ -192,6 +192,7 @@ tables:
         - volume_de_vendas_mensais__vgv_r__
         - quantidade_de_imoveis_a_venda
         - quantidade_de_imoveis_para_locacao
+        - formato_de_fechamento_comercial
       propertiesWithHistory:
         - dealstage
         - pipeline

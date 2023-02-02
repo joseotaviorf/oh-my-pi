@@ -17,6 +17,7 @@ SELECT
     product,
     soft_opening_priority,
     soft_opening_phase,
+    commercial_closing_format,
     partner_agencies,
     advertising_portals,
     rental_guarantee_solutions,
