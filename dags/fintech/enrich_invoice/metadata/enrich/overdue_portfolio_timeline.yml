@@ -1,0 +1,88 @@
+---
+database_name: datalake_invoice
+table_name: overdue_portfolio_timeline
+columns:
+  id_contract:
+    lineage:
+      - datalake_invoice.invoice_entries.id_contract
+  id_invoice:
+    lineage:
+      - datalake_invoice.invoice_entries.id_invoice
+  contract_version:
+    lineage:
+      - datalake_invoice.invoice_entries.version
+  contract_guarantee:
+    lineage:
+      - datalake_invoice.invoice_entries.guarantee
+  condo_payer:
+    lineage:
+      - datalake_invoice.invoice_entries.condo_payer
+  city_name:
+    lineage:
+      - datalake_region.region.city_name
+  short_region_name:
+    lineage:
+      - datalake_region.region.short_region_name
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+  invoice_type:
+    lineage:
+      - datalake_invoice.invoice_entries.invoice_type
+  user:
+    lineage:
+      - datalake_invoice.invoice_entries.user
+  bill_items:
+    lineage:
+      - datalake.table.bill_items
+  datalake_retsuko.invoice.payment_status:
+    lineage:
+      - datalake_invoice.invoice_entries.datalake_retsuko.invoice.payment_status
+  monthly_income_declared:
+    lineage:
+      - datalake_invoice.invoice_entries.monthly_income_declared
+  package_amount:
+    lineage:
+      - datalake_invoice.invoice_entries.package_amount
+  dti:
+    lineage:
+      - datalake_invoice.invoice_entries.dti
+  due_amount:
+    lineage:
+      - datalake_invoice.invoice_entries.datalake_retsuko_clean.invoice.due_amount
+  paid_amount:
+    lineage:
+      - datalake_invoice.invoice_entries.paid_amount
+  business_day:
+    lineage:
+      - datalake_invoice.invoice_entries.du
+  ts_invoice_created:
+    lineage:
+      - datalake_invoice.invoice_entries.ts_created
+  dt_contract_started:
+    lineage:
+      - datalake_invoice.invoice_entries.dt_start
+  dt_contract_annulled:
+    lineage:
+      - datalake_invoice.invoice_entries.dt_annulment
+  dt_invoice_due:
+    lineage:
+      - datalake_invoice.invoice_entries.dt_due
+  dt_invoice_due_adjust:
+    lineage:
+      - datalake_invoice.invoice_entries.dt_due_ajust
+  dt_invoice_paid:
+    lineage:
+      - datalake_invoice.invoice_entries.dt_paid
+  dt_month_start:
+    lineage:
+      - datalake_invoice.invoice_entries.month_start
+  dt_week_start:
+    lineage:
+      - datalake_invoice.invoice_entries.week_start
+  dt_week_end:
+    lineage:
+      - datalake_invoice.invoice_entries.week_end
+  dt_reference:
+    lineage:
+      - datalake_invoice.invoice_entries.reference_date
