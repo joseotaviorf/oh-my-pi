@@ -11,7 +11,7 @@
     </td>
     <td>
         <a href="https://drone.quintoandar.com.br/quintoandar/bi-etl-ejuice">
-            <img src="https://s3.amazonaws.com/5a-coverage/bi-etl-ejuice/badge-lines.svg" />
+            <img src="https://s3.amazonaws.com/5a-coverage/bi-etl-ejuice/coverage_badge.svg" />
         </a>
     </td>
   </tr>

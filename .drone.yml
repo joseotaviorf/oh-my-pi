@@ -36,6 +36,7 @@ pipeline:
       - make requirements-test
       - make requirements
       - make unit-tests
+      - make cov-badge
     when:
       event: push
 
@@ -211,6 +212,19 @@ pipeline:
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
+
+  export-coverage:
+    group: export
+    image: plugins/s3
+    pull: true
+    bucket: 5a-coverage
+    source: coverage_badge.svg
+    target: ${DRONE_REPO_NAME}/
+    acl: public-read
+    cache_control: no-cache
+    when:
+      event: [push]
+      branch: [master]
 
   create-dag-files:
     group: export

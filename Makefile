@@ -264,7 +264,7 @@ cov-badge:
 	@echo "Building Coverage Badge"
 	@echo "=========="
 	@echo ""
-	@coverage-badge -o badge-lines.svg
+	@coverage-badge -o coverage_badge.svg
 
 .PHONY: clean
 ## delete all compiled python files
