@@ -529,12 +529,6 @@ agents_payments:
     clean_table_name: agents_payments
     sheet_context: fintech
 
-agr_account:
-    sheet_id: 1GhZCQssX1zQIj1wpv5hm6iK3_4Hb2EPH251OMyOLJmQ
-    sheet_name: AGR
-    clean_table_name: agr_account
-    sheet_context: fintech
-
 associate_executive_bonus:
     sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
     sheet_name: associate_executive_bonus
