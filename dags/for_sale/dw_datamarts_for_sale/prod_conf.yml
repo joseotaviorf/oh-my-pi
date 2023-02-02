@@ -35,13 +35,6 @@ pipeline:
     dw:
       <<: *athena_anchor
       table: loft_status_listing_flows
-  neighborhood_competition:
-    dw:
-      <<: *redshift_anchor
-      table: neighborhood_competition
-      depends_on:
-        - loft_house_listing
-        - loft_status_listing_flows
   repressed_demand_sale:
     dw:
       <<: *redshift_anchor
