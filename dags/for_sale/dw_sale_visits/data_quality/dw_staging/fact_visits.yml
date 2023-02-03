@@ -7,6 +7,8 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   sk_booking:
+    is_unique:
+      severity_level: Error
     is_complete:
       severity_level: Error
   sk_sale_flow:

@@ -15,7 +15,7 @@ partners_not_found_on_hubspot AS (
         AND partner_3p_supply IS NOT NULL
     GROUP BY
         partner_3p_supply
-    UNION ALL
+    UNION
     SELECT -- 3P Work contracts without id_hubspot
         3p_partner AS partner_not_found,
         FALSE AS is_3p_bh
@@ -51,7 +51,7 @@ SELECT
 FROM
     total_partners AS tp,
     starting_value AS sv
-LEFT JOIN 
+LEFT JOIN
     datalake_rede_company.company_sks AS cs
         ON tp.id_hubspot IS NOT DISTINCT FROM cs.id_hubspot
         AND tp.extracted_3p_tag IS NOT DISTINCT FROM cs.extracted_3p_tag
