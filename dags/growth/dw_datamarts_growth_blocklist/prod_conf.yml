@@ -71,3 +71,7 @@ pipeline:
       table: marketing_allocated_costs
       # depends_on:
       #   - marketing_campaigns_costs_and_volumes
+  buyer_activation_events_combo:
+    dw:
+      <<: *athena_anchor
+      table: buyer_activation_events_combo

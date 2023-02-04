@@ -23,10 +23,6 @@ pipeline:
     dw:
       <<: *athena_anchor
       table: attribution_conversion_paths_demand
-  buyer_activation_events_combo:
-    dw:
-      <<: *athena_anchor
-      table: buyer_activation_events_combo
   casa_mineira_top_of_funnel_volumes_daily:
     dw:
       <<: *redshift_anchor
