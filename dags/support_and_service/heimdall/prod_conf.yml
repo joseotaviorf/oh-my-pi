@@ -1,0 +1,10 @@
+partition_cols: ["year", "month", "day"]
+tables:
+  # <raw_table_name>:
+  #   clean_table_name: <clean_table_name>
+  #   is_incremental: <is_incremental>
+  #   date_column: <date_column> #optional
+  #   unixtime_measure: <unixtime_measure> #optional
+  activity:
+    clean_table_name: activity
+    is_incremental: False
