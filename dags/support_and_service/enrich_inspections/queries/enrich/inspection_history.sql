@@ -32,9 +32,11 @@ main_inspection_aud_sync as(
 union_inspection_history AS (
     SELECT
         i.id_inspection,
+        i.id_previous_inspection,
         i.id_external,
         i.id_schedule AS id_booking,
         i.id_contract,
+        i.id_inspector,
         GET_JSON_OBJECT(i.house, '$.cityId') AS id_city,
         LOWER(GET_JSON_OBJECT(i.house, '$.city')) AS city_name,
         i.type AS inspection_type,
@@ -54,9 +56,11 @@ union_inspection_history AS (
     UNION
     SELECT
         MD5(CONCAT(i.id, 'PWA')) AS id_inspection,
+        NULL AS id_previous_inspection,
         i.id AS id_external,
         i.id_booking,
         i.id_contract,
+        NULL AS id_inspector,
         NULL AS id_city,
         NULL AS city_name,
         CASE
@@ -94,10 +98,12 @@ inspection_reschedule AS (
 )
 SELECT
     i.id_inspection,
+    i.id_previous_inspection,
     i.id_external,
     a.id_assessment,
     i.id_booking,
     i.id_contract,
+    i.id_inspector,
     i.id_city,
     i.city_name,
     i.inspection_type,

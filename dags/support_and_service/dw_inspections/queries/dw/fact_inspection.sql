@@ -1,6 +1,8 @@
 SELECT
     i.id_inspection AS sk_inspection,
     i.id_external AS sk_main_inspection,
+    i.id_previous_inspection AS sk_previous_inspection,
+    i.id_inspector AS sk_inspector,
     i.id_assessment AS sk_assessment,
     i.id_booking AS sk_booking,
     i.id_contract AS sk_contract,

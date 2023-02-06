@@ -8,6 +8,12 @@ columns:
     sk_main_inspection:
         lineage:
             - datalake_inspections_metrics.inspection_booking.id_external
+    sk_previous_inspection:
+        lineage:
+            - datalake_inspections_metrics.inspection_booking.id_previous_inspection
+    sk_inspector:
+        lineage:
+            - datalake_inspections_metrics.inspection_booking.id_inspector
     sk_assessment:
         lineage:
             - datalake_inspections_metrics.inspection_booking.id_assessment

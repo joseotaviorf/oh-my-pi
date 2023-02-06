@@ -12,10 +12,12 @@ WITH contract_termination AS (
 )
 SELECT DISTINCT
     i.id_inspection,
+    i.id_previous_inspection,
     i.id_external,
     i.id_assessment,
     i.id_booking,
     i.id_contract,
+    i.id_inspector,
     b.id_country,
     COALESCE(r.id_city, i.id_city) AS id_city,
     COALESCE(r.city_name, i.city_name) AS city_name,

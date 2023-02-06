@@ -5,6 +5,9 @@ columns:
   id_inspection:
     lineage:
       - datalake_inspections.inspection_history.id_inspection
+  id_previous_inspection:
+    lineage:
+      - datalake_inspections.inspection_history.id_previous_inspection
   id_external:
     lineage:
       - datalake_inspections.inspection_history.id_external
@@ -17,6 +20,9 @@ columns:
   id_contract:
     lineage:
       - datalake_inspections.inspection_history.id_contract
+  id_inspector:
+    lineage:
+      - datalake_inspections.inspection_history.id_inspector
   id_country:
     lineage:
       - datalake_booking.booking.id_country

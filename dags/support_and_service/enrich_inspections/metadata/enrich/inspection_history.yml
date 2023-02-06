@@ -5,6 +5,9 @@ columns:
   id_inspection:
     lineage:
       - datalake_inspections_clean.inspection.id_inspection
+  id_previous_inspection:
+    lineage:
+      - datalake_inspections_clean.inspection.id_previous_inspection
   id_external:
     lineage:
       - datalake_inspections_clean.inspection.id_external
@@ -20,6 +23,9 @@ columns:
     lineage:
       - datalake_inspections_clean.inspection.id_contract
       - datalake_ebdb_clean.inspection.id_contract
+  id_inspector:
+    lineage:
+      - datalake_inspections_clean.inspection.id_inspector
   id_city:
     lineage:
       - datalake_inspections_clean.inspection.house
