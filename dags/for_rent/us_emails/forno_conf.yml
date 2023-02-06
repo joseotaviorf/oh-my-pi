@@ -1,6 +1,6 @@
 ---
 custom_cluster:
-  driver_node_type_id: r5a.xlarge
+  driver_node_type_id: r5a.2xlarge
   node_type_id: m5a.xlarge
   autoscale:
     max_workers: 2
