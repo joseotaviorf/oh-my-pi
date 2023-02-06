@@ -14,9 +14,21 @@ columns:
   id_item_group:
     lineage:
       - datalake_inspections_clean.item.id_item_group
-  id_main:
+  id_external_item:
     lineage:
       - datalake_inspections_clean.item.id_main
+  id_room:
+    lineage:
+      - datalake_inspections_clean.room.id_room
+  id_assessment:
+    lineage:
+      - datalake_inspections_clean.room.id_assessment
+  id_inspection:
+    lineage:
+      - datalake_inspections.inspection_history.id_inspection
+  id_inspector:
+    lineage:
+      - datalake_inspections.inspection_history.id_inspector
   uuid:
     lineage:
       - datalake_inspections_clean.item.uuid
@@ -26,6 +38,18 @@ columns:
   media_type:
     lineage:
       - datalake_inspections_clean.item_type.media_type
+  display_type:
+    lineage:
+      - datalake_inspections_clean.item_type.display_type
+  room_name:
+    lineage:
+      - datalake_inspections_clean.room.room_name
+  item_group_name:
+    lineage:
+      - datalake_inspections.item_group.item_group_name
+  item_group_type:
+    lineage:
+      - datalake_inspections.item_group.item_group_type
   comment:
     lineage:
       - datalake_inspections_clean.item.comment

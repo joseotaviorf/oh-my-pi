@@ -1,0 +1,52 @@
+---
+database_name: datalake_inspections
+table_name: item_review
+columns:
+  id_item:
+    lineage:
+      - datalake_inspections_clean.review.id_item
+  id_review:
+    lineage:
+      - datalake_inspections_clean.review.id_review
+  id_review_media:
+    lineage:
+      - datalake_inspections_clean.review_media.id_review_media
+  id_external_media:
+    lineage:
+      - datalake_inspections_clean.review_media.id_main
+  id_user:
+    lineage:
+      - datalake_inspections_clean.review.id_user
+  user_type:
+    lineage:
+      - datalake_inspections_clean.review.user_type
+  user_comment:
+    lineage:
+      - datalake_inspections_clean.review.comment
+  media_type:
+    lineage:
+      - datalake_inspections_clean.review_media.type
+  media_path:
+    lineage:
+      - datalake_inspections_clean.review_media.path
+  ts_media_created:
+    lineage:
+      - datalake_inspections_clean.review_media.ts_created
+  ts_media_updated:
+    lineage:
+      - datalake_inspections_clean.review_media.ts_updated
+  ts_created:
+    lineage:
+      - datalake_inspections_clean.review.ts_created
+  ts_updated:
+    lineage:
+      - datalake_inspections_clean.review.ts_updated
+  year:
+    lineage:
+      - datalake_inspections_clean.review.year
+  month:
+    lineage:
+      - datalake_inspections_clean.review.month
+  day:
+    lineage:
+      - datalake_inspections_clean.review.day

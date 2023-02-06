@@ -5,7 +5,12 @@ dag_documentation:
     as well as the construction of metrics through this data."
 
 inner_dependencies:
+  item:
+    - inspection_history
+    - item_group
   item_comment_media:
+    - item
+  item_media:
     - item
 
 custom_cluster:
@@ -21,5 +26,7 @@ incremental_tables:
   - item_comment_media
   - item_group
   - item_issue
+  - item_media
+  - item_review
   - item
   - room
