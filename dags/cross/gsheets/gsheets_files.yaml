@@ -25,11 +25,6 @@ affiliates_inactive_segmentation:
     sheet_name: inativos
     clean_table_name: affiliates_inactive_segmentation
 
-agents_ranking_offboarding:
-    sheet_id: 1S69O5753T90dbw9KkXdlRMGVL9YThRT08Iae-SK3BSI
-    sheet_name: Ranking Analista x Demanda
-    clean_table_name: agents_ranking_offboarding
-
 bbb22_coupon_for_sale:
     sheet_id: 1ZnRK-EXvUVNneRtoyCZ0y1ET-Cc859JokFIEFZUfacQ
     sheet_name: users

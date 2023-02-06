@@ -80,7 +80,6 @@ This pipeline produces the following output tables:
     - `offline_manual_costs`
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
-    - `owner_negotiation_csat`
     - `owner_offboarding_repair_csat`
     - `photographer_account`
     - `plaquinhas_installation_targets`
