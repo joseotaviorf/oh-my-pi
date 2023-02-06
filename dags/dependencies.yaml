@@ -2353,6 +2353,7 @@ bietlejuice.enrich_revenue_lines:
   # and enrich_retsuko.invoice, enrich_retsuko.invoice_entry, retsuko_clean.contract, retsuko_clean.invoice, solved by
   # enrich_invoice.invoice_entries
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries
   - bietlejuice.fastforward:load-clean-anticipation
   - bietlejuice.fastforward:load-clean-contract

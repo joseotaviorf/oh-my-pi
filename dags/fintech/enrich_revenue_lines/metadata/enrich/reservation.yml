@@ -5,6 +5,12 @@ columns:
   id_reservation:
     lineage:
       - datalake_kill_queue.reservation.id_reservation
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+  id_house:
+    lineage:
+      - datalake_kill_queue.reservation.id_house
   status:
     lineage:
       - datalake_kill_queue.reservation.status
