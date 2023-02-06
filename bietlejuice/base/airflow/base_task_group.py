@@ -50,18 +50,18 @@ class BaseTaskGroup(object):
     def build_task_group_from_sql_files(
         self,
         layer: LayerEnum,
-        tables_custom_structure: Dict[str, Dict[str, str]] = None,
+        tables_customization: Dict[str, Dict[str, str]] = None,
         **kwargs
     ) -> dict:
         """
         Create a task-group for each table, based on each table's respective sql file
 
         :param layer: layer Enum
-        :param tables_custom_structure: tables metadata to customize table's execution in the Job
+        :param tables_customization: tables metadata to customize table's execution in the Job
         :return: a dict of task groups created
         """
 
-        tables_custom_structure = tables_custom_structure or {}
+        tables_customization = tables_customization or {}
         schema = kwargs.get("schema")
         tree_path = kwargs.get("tree_path", "")
         # To avoid legacy codes who uses full / incremental on schema variable
@@ -78,7 +78,7 @@ class BaseTaskGroup(object):
         for table_name in table_names:
             params = {
                 "table_name": table_name,
-                "table_custom_structure": tables_custom_structure.get(table_name, {}),
+                "table_customization": tables_customization.get(table_name, {}),
                 **kwargs,
             }
             task_groups[table_name] = method(self, **params)
@@ -310,9 +310,3 @@ class BaseTaskGroup(object):
         task_groups_copy = copy(task_groups_boundaries)
         task_groups_copy.pop(task_group_name, None)
         return task_groups_copy
-
-    def _get_load_mode(self, is_incremental: bool) -> str:
-        """
-        Identify the loading mode according to is_incremental flag
-        """
-        return "incremental" if is_incremental else "full"

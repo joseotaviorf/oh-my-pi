@@ -391,7 +391,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         tree_path="",
         execution_date="{{ ds }}",
         has_hive_sync=True,
-        table_custom_structure=None,
+        table_customization=None,
     ):
         """
         Create a task group containing 4 tasks:
@@ -426,23 +426,22 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
         :type execution_date: str
         :param has_hive_sync: if this table is going to have Hive sync
-        :param table_custom_structure: table's custom metadata, when applicable
+        :param table_customization: table's structure customization, when applicable
         :return: dict with initial and final tasks of the created task group
         :rtype: dict
         """
-        slugged_table_name = StringFormatter.slugify(table_name)
         partitions = partitions or []
         cluster_config_params = cluster_config_params or {}
         extra_query_template_params = extra_query_template_params or {}
 
-        load_table_mode = "incremental" if is_incremental else "full"
+        table_extraction_type = "incremental" if is_incremental else "full"
 
         load_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"load-{layer.value}-{slugged_table_name}",
+            task_id=StringFormatter.slugify(f"load-{layer.value}-{table_name}"),
             dag=self.dag,
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/load_table_{load_table_mode}.py",
+                    "python_file": f"{self.spark_jobs_path}/load_table_{table_extraction_type}.py",
                     "parameters": [
                         self.env,
                         self.datalake_bucket,
@@ -466,7 +465,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
         if has_hive_sync:
             sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"sync-hive-metastore-{layer.value}-{slugged_table_name}-structure",
+                task_id=StringFormatter.slugify(
+                    f"sync-hive-metastore-{layer.value}-{table_name}-structure"
+                ),
                 json={
                     "spark_python_task": {
                         "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_structure.py",
@@ -484,7 +485,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
             sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"sync-hive-metastore-{layer.value}-{slugged_table_name}-partitions",
+                task_id=StringFormatter.slugify(
+                    f"sync-hive-metastore-{layer.value}-{table_name}-partitions"
+                ),
                 json={
                     "spark_python_task": {
                         "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_partitions.py",
@@ -516,7 +519,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
             ):
                 propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
                     dag=self.dag,
-                    task_id=f"propagate-table-metadata-{layer.value}-{slugged_table_name}",
+                    task_id=StringFormatter.slugify(
+                        f"propagate-table-metadata-{layer.value}-{table_name}"
+                    ),
                     json={
                         "spark_python_task": {
                             "python_file": f"{self.spark_jobs_path}/propagate_table_metadata.py",
@@ -533,7 +538,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
                 bypass_task = DummyOperator(
                     dag=self.dag,
-                    task_id=f"propagation-bypass-{layer.value}-{slugged_table_name}",
+                    task_id=StringFormatter.slugify(
+                        f"propagation-bypass-{layer.value}-{table_name}"
+                    ),
                     trigger_rule="all_done",
                 )
 
@@ -548,7 +555,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
         if has_create_external_table_task:
             create_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"create-{layer.value}-{slugged_table_name}-external-table",
+                task_id=StringFormatter.slugify(
+                    f"create-{layer.value}-{table_name}-external-table"
+                ),
                 json={
                     "spark_python_task": {
                         "python_file": f"{self.spark_jobs_path}/create_external_table.py",
@@ -583,7 +592,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
             data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"data-quality-tests-{layer.value}-{slugged_table_name}",
+                task_id=StringFormatter.slugify(
+                    f"data-quality-tests-{layer.value}-{table_name}"
+                ),
                 json={
                     "spark_python_task": {
                         "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
@@ -624,7 +635,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         tree_path="",
         execution_date="{{ ds }}",
         has_hive_sync=True,
-        table_custom_structure: Dict[str, Dict[str, str]] = None,
+        table_customization: Dict[str, Dict[str, str]] = None,
     ):
         """
         Build a task group for clean layer
@@ -652,7 +663,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type schema: str
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
         :param has_hive_sync: if this table is going to have Hive sync
-        :param table_custom_structure: table's custom metadata, when applicable
+        :param table_customization: table's structure customization, when applicable
         :type execution_date: str
         :rtype: list[BaseOperator]
         """
@@ -671,7 +682,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             tree_path,
             execution_date,
             has_hive_sync,
-            table_custom_structure,
+            table_customization,
         )
 
     def build_enrich_task_group(
@@ -687,7 +698,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         schema="",
         execution_date="{{ ds }}",
         has_hive_sync=True,
-        table_custom_structure: Dict[str, Dict[str, str]] = None,
+        table_customization: Dict[str, Dict[str, str]] = None,
     ):
         """
         Build a task group for enrich layer
@@ -715,7 +726,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type schema: str
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
         :param has_hive_sync: if this table is going to have Hive sync
-        :param table_custom_structure: table's custom metadata, when applicable
+        :param table_customization: table's structure customization, when applicable
         :type execution_date: str
         :rtype: list[BaseOperator]
         """
@@ -732,5 +743,5 @@ class DatalakeTaskGroup(BaseTaskGroup):
             schema,
             execution_date=execution_date,
             has_hive_sync=has_hive_sync,
-            table_custom_structure=table_custom_structure,
+            table_customization=table_customization,
         )

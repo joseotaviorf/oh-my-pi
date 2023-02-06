@@ -28,7 +28,11 @@ class DWQueryWorkflow(BaseWorkflow):
 
     def build_dag(self):
         dw_schema = self.workflow_args.get("custom_schema", self.dag_args["name"])
-        tables_custom_structure = self.workflow_args.get("tables_customization", {})
+        tables_customization = self.workflow_args.get("tables_customization", {})
+        default_partitions = self.workflow_args.get("default_partitions")
+        default_is_incremental = (
+            self.workflow_args.get("default_extraction_type") == "incremental"
+        )
         has_load_to_redshift_task = self.workflow_args.get(
             "has_load_to_redshift_task", True
         )
@@ -52,13 +56,18 @@ class DWQueryWorkflow(BaseWorkflow):
         )
 
         dw_staging_task_group = task_group.build_task_group_from_sql_files(
-            layer=LayerEnum.DW_STAGING, tables_custom_structure=tables_custom_structure
+            layer=LayerEnum.DW_STAGING,
+            tables_customization=tables_customization,
+            partitions=default_partitions,
+            is_incremental=default_is_incremental,
         )
 
         dw_task_group = task_group.build_task_group_from_sql_files(
             layer=LayerEnum.DW,
             spectrum_iam_role=spectrum_iam_role,
-            tables_custom_structure=tables_custom_structure,
+            tables_customization=tables_customization,
+            partitions=default_partitions,
+            is_incremental=default_is_incremental,
             has_load_to_redshift_task=has_load_to_redshift_task,
         )
 
