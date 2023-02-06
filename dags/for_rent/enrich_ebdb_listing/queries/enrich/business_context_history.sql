@@ -23,7 +23,7 @@ lbc_history AS (
         revision_time,
         status,
         suspension_reason,
-        ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY rev) AS event_order
+        ROW_NUMBER() OVER(PARTITION BY id_house, business_context ORDER BY rev) AS event_order
     FROM 
           lbc_aud
     WHERE 
@@ -31,7 +31,7 @@ lbc_history AS (
             status <> previous_status 
             OR previous_status IS NULL
           ) 
-       OR (
+        OR (
              suspension_reason <> previous_suspension_reason 
              OR (previous_suspension_reason IS NULL AND suspension_reason IS NOT NULL) 
              OR (suspension_reason IS NULL AND previous_suspension_reason IS NOT NULL)

@@ -16,7 +16,3 @@ columns:
   status_reason:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.status_reason
-  suspension_reason:
-    lineage:
-      - datalake_ebdb_clean.listing_business_context_aud.suspension_reason
-

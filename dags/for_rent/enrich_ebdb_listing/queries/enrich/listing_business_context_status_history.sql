@@ -1,36 +1,58 @@
-WITH events AS (
-    SELECT 
+-- Table to analyse house states based on status and status_reason attributes
+WITH lbc_aud AS (
+    SELECT
+      i.id_house,
+      COALESCE(i.business_context, 'Undefined') AS business_context,
+      LAG(i.status) OVER(PARTITION BY i.id_house ORDER BY i.rev) AS previous_status, -- previous status ordered by the datetime that happened
+      i.status,
+      LAG(i.status_reason) OVER(PARTITION BY i.id_house ORDER BY i.rev) AS previous_status_reason,
+      i.status_reason,
+      FROM_UNIXTIME(CAST(rev.ts_revision AS BIGINT)/1000) AS revision_time, 
+      i.rev
+    FROM 
+        datalake_ebdb_clean.listing_business_context_aud AS i
+    INNER JOIN 
+        datalake_ebdb_clean.user_revision_entity AS rev
+          ON rev.id = i.rev
+      
+),
+lbc_history AS (
+    SELECT
         id_house,
         business_context,
+        rev,
+        revision_time,
         status,
         status_reason,
-        suspension_reason,
-        CAST(FROM_UNIXTIME(CAST(ure.ts_revision/1000 AS BIGINT)) AS TIMESTAMP) AS ts_event,
-        ROW_NUMBER() OVER(PARTITION BY id_house, business_context ORDER BY CAST(FROM_UNIXTIME(CAST(ure.ts_revision/1000 AS BIGINT)) AS TIMESTAMP)) AS event_order
+        ROW_NUMBER() OVER(PARTITION BY id_house, business_context ORDER BY rev) AS event_order
     FROM 
-        datalake_ebdb_clean.listing_business_context_aud AS aud
-    JOIN 
-        datalake_ebdb_clean.user_revision_entity AS ure 
-            ON aud.rev = ure.id
+          lbc_aud
     WHERE 
-        mod_status = 1 
+          (
+            status <> previous_status 
+            OR previous_status IS NULL
+          ) 
+        OR (
+             status_reason <> previous_status_reason 
+             OR (previous_status_reason IS NULL AND status_reason IS NOT NULL) 
+             OR (status_reason IS NULL AND previous_status_reason IS NOT NULL)
+           )
 )
 SELECT
-    e.id_house,
+    lbch.id_house,
     COALESCE(ch.country_code, 'Undefined') AS country_code,
-    COALESCE(NULLIF(e.business_context, ''), 'Undefined') AS business_context,
-    e.status,
-    e.status_reason,
-    e.suspension_reason,
-    e.ts_event AS ts_status_started,
-    e2.ts_event AS ts_status_ended
+    COALESCE(NULLIF(lbch.business_context, ''), 'Undefined') AS business_context,
+    lbch.status,
+    lbch.status_reason,
+    lbch.revision_time AS ts_state_started,
+    lbch2.revision_time AS ts_state_ended
 FROM 
-    events AS e
+    lbc_history AS lbch
 LEFT JOIN 
-    events AS e2
-        ON e2.id_house = e.id_house
-        AND e2.business_context = e.business_context
-        AND e.event_order = e2.event_order - 1
+    lbc_history AS lbch2
+        ON lbch2.id_house = lbch.id_house
+        AND lbch2.business_context = lbch.business_context
+        AND lbch.event_order = lbch2.event_order - 1
 LEFT JOIN
     datalake_ebdb_country.house AS ch
-        ON ch.id_house = e.id_house
+        ON ch.id_house = lbch.id_house
