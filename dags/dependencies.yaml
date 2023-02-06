@@ -1154,7 +1154,6 @@ bietlejuice.dw_rent_listing_flow:
 bietlejuice.dw_rental_contribution_margin:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_country:load-enrich-house
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries
   - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
   - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-fee
@@ -1164,6 +1163,7 @@ bietlejuice.dw_rental_contribution_margin:
   - bietlejuice.enrich_revenue_lines:load-enrich-long-term-rental-anticipation
   - bietlejuice.enrich_revenue_lines:load-enrich-management-fee
   - bietlejuice.enrich_revenue_lines:load-enrich-month-rental-anticipation
+  - bietlejuice.enrich_revenue_lines:load-enrich-reservation
   - bietlejuice.enrich_revenue_lines:load-enrich-service-fee
 
 # temporary

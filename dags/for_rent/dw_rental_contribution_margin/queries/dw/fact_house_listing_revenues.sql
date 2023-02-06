@@ -114,6 +114,18 @@ credit_card_payment AS (
   FROM
     datalake_revenue_lines.credit_card_payment
   GROUP BY 1,2
+),
+
+reservation AS (
+  SELECT
+    id_house_listing,
+    accrual_month,
+    SUM(monthly_value) AS reservation
+  FROM
+    datalake_revenue_lines.reservation
+  WHERE
+    NOT (status = 'FINISHED' AND cancellation_reason = 'DOCUMENTATION_REJECTED_WITH_CHARGE_BACK')
+  GROUP BY 1, 2
 )
 
 SELECT
@@ -133,6 +145,7 @@ SELECT
   COALESCE(bfi.invoice_theorical_amount, 0) as bfi,
   COALESCE(lp.invoice_theorical_amount, 0) AS lp,
   COALESCE(ccp.ccp_net, 0) AS ccp_net,
+  COALESCE(r.reservation, 0) AS reservation,
   COALESCE(bf.brokerage_partner_share, 0) AS brokerage_partner_share,
   COALESCE(mf.management_partner_share, 0) AS management_partner_share,
   dd.quarter,
@@ -176,6 +189,10 @@ LEFT JOIN
 LEFT JOIN
   datalake_ebdb_listing.house_listing AS hl
     ON mf.id_contract_ebdb = hl.id_contract
+LEFT JOIN
+  reservation AS r
+    ON hl.id_house_listing = r.id_house_listing
+    AND mf.accrual_year_month = r.accrual_month
 LEFT JOIN
   datalake_ebdb_contract.contract AS c
     ON mf.id_contract_ebdb = c.id
