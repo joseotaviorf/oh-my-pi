@@ -6,7 +6,7 @@ SELECT
 	collect_hour,
 	zipcode,
 	street,
-	`number`,
+	CAST(number AS INT) AS number,
 	complement,
 	district,
 	city,

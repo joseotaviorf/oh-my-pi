@@ -2,7 +2,7 @@ SELECT
 	id as id_address_location_key,
 	zipcode,
 	street,
-	number,
+	CAST(number AS INT) AS number,
 	complement,
 	district,
 	city,

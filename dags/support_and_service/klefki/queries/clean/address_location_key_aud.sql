@@ -5,7 +5,7 @@ SELECT
 	revtype AS rev_type,
 	zipcode,
 	street,
-	number,
+	CAST(number AS INT) AS number,
 	complement,
 	district,
 	city,
