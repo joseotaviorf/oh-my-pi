@@ -4,12 +4,12 @@ WITH last_session_channel AS (
 		id_source AS id_session,
 		MAX(c.id_channel) AS id_channel
 	FROM
-		datalake_quinto_messenger.channel c
+		datalake_quinto_messenger.channel AS c
 	GROUP BY 1
 ),
 customer_identification AS (
 	SELECT
-		REGEXP_REPLACE(customer_contact,'(^(\\+55)|\\D)','') AS formatted_phone,
+		REGEXP_REPLACE(customer_contact,'(^\\+55|\\D)','') AS formatted_phone,
 		MAX(cpf) AS cpf
 	FROM
 		datalake_ebdb_customer_contact_identification.customer_contact_identification
@@ -27,13 +27,13 @@ SELECT
 	s.seconds_duration/60.0 AS minutes_duration,
 	NOW() AS ts_load
 FROM
-	datalake_sauron.session s
+	datalake_sauron.session AS s
 LEFT JOIN
-	last_session_channel lsc
-		ON s.id_session = CAST(lsc.id_session AS bigint)
+	last_session_channel AS lsc
+		ON s.id_session = CAST(lsc.id_session AS BIGINT)
 LEFT JOIN
-	datalake_quinto_messenger.channel c
+	datalake_quinto_messenger.channel AS c
 		ON lsc.id_channel = c.id_channel
 LEFT JOIN
-	customer_identification ci
+	customer_identification AS ci
 		ON ci.formatted_phone = s.customer_phone_formatted
