@@ -23,9 +23,6 @@ columns:
   house_supplies:
     lineage:
       - datalake_inspections_raw.assessment.house_supplies
-  inspector_booked_key_retrieve_location:
-    lineage:
-      - datalake_inspections_raw.assessment.inspector_booked_key_retrieve_location
   scheduling_key_recovery:
     lineage:
       - datalake_inspections_raw.assessment.scheduling_key_recovery

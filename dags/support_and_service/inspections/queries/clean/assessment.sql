@@ -6,7 +6,6 @@ SELECT
     key_location_details,
     source,
     house_supplies,
-    inspector_booked_key_retrieve_location,
     scheduling_key_recovery,
     limit_revision_date AS dt_revision_limit,
     created_at AS ts_created,
