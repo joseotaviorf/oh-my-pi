@@ -21,7 +21,7 @@ SELECT
     monthly_administration_fee,
     condo,
     iptu,
-    tenant_service_fee,
+    CAST(tenant_service_fee AS DECIMAL(5,3)) AS tenant_service_fee,
     agent_brokerage_share,
     signature_type,
     closing_status,
@@ -54,7 +54,7 @@ SELECT
     YEAR(ts_load) AS year,
     MONTH(ts_load) AS month,
     DAY(ts_load) AS day
-FROM 
+FROM
     dw_public.dim_contract
 WHERE
     ts_load IS NOT NULL
