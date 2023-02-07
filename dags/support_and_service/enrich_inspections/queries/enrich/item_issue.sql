@@ -12,9 +12,20 @@ SELECT
     ii.id_item_issue,
     it.id_issue_type,
     ii.id_item,
+    i.id_room,
+    i.id_assessment,
+    i.id_inspection,
     ii.uuid,
     it.issue_type,
-    ii.comment,
+    i.display_type,
+    i.item_group_name,
+    i.item_group_type,
+    i.room_name,
+    i.comment AS item_comment,
+    CASE
+        WHEN ii.comment = '' THEN NULL
+        ELSE ii.comment
+    END AS issue_comment,
     it.repair_suggestion,
     ii.ts_created,
     ii.ts_updated,
@@ -26,6 +37,9 @@ FROM
 JOIN
     issue_type AS it
         ON ii.id_type = it.id_issue_type
+LEFT JOIN
+    datalake_inspections.item i
+        ON i.id_item = ii.id_item
 WHERE
     ii.year = {year}
     AND ii.month = {month}

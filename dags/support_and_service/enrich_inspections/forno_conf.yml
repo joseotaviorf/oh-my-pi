@@ -10,6 +10,8 @@ inner_dependencies:
     - item_group
   item_comment_media:
     - item
+  item_issue:
+    - item
   item_media:
     - item
 
