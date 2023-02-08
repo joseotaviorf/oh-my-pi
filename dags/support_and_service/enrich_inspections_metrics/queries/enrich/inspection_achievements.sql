@@ -56,7 +56,7 @@ SELECT
   i.ts_created,
   i.ts_updated
 FROM
-  datalake_inspections_metrics.inspection_booking AS i
+  datalake_inspections.inspection_booking AS i
 JOIN
   sla_target AS st
     ON LOWER(st.team) LIKE CONCAT("% - ", LOWER(i.city_name))

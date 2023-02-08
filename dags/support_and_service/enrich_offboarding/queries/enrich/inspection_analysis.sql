@@ -12,7 +12,7 @@ WITH contracts AS (
             ON turf.origin = 'Contrato'
             AND turf.id_origin = ec.id
     LEFT JOIN
-        datalake_inspections.inspection_history AS ev
+        datalake_inspections.inspection_booking AS ev
             ON turf.origin = 'Vistoria'
             AND turf.id_origin = ev.id_external
     WHERE

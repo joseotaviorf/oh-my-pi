@@ -4,7 +4,7 @@ table_name: fact_inspection
 columns:
     sk_inspection:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.id_inspection
+            - datalake_inspections.inspection_booking.id_inspection
     sk_main_inspection:
         lineage:
             - datalake_inspections_metrics.inspection_booking.id_external
@@ -16,25 +16,25 @@ columns:
             - datalake_inspections_metrics.inspection_booking.id_inspector
     sk_assessment:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.id_assessment
+            - datalake_inspections.inspection_booking.id_assessment
     sk_booking:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.id_booking
+            - datalake_inspections.inspection_booking.id_booking
     sk_contract:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.id_contract
+            - datalake_inspections.inspection_booking.id_contract
     sk_country:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.id_country
+            - datalake_inspections.inspection_booking.id_country
     sk_city:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.id_city
+            - datalake_inspections.inspection_booking.id_city
     country_code:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.country_code
+            - datalake_inspections.inspection_booking.country_code
     booking_type:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.booking_type
+            - datalake_inspections.inspection_booking.booking_type
     ldt_hours_execution:
         lineage:
             - datalake_inspections_metrics.inspection_achievements.ldt_hours_execution
@@ -46,34 +46,34 @@ columns:
             - datalake_inspections_metrics.inspection_achievements.is_sla_execution
     dt_contract_entrance:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.dt_contract_entrance
+            - datalake_inspections.inspection_booking.dt_contract_entrance
     dt_contract_termination:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.dt_contract_termination
+            - datalake_inspections.inspection_booking.dt_contract_termination
     dt_execution_limit:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.dt_execution_limit
+            - datalake_inspections.inspection_booking.dt_execution_limit
     ts_inspected:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.ts_inspected
+            - datalake_inspections.inspection_booking.ts_inspected
     ts_first_synced:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.ts_first_synced
+            - datalake_inspections.inspection_booking.ts_first_synced
     ts_booking_inspected:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.ts_booking_inspected_utc
+            - datalake_inspections.inspection_booking.ts_booking_inspected_utc
     ts_booking_inspected_local:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.ts_booking_inspected_local_tz
+            - datalake_inspections.inspection_booking.ts_booking_inspected_local_tz
     ts_booking_cancelled:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.ts_booking_cancelled_utc
+            - datalake_inspections.inspection_booking.ts_booking_cancelled_utc
     ts_booking_cancelled_local:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.ts_booking_cancelled_local_tz
+            - datalake_inspections.inspection_booking.ts_booking_cancelled_local_tz
     ts_termination_canceled:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.ts_termination_canceled
+            - datalake_inspections.inspection_booking.ts_termination_canceled
     ts_created:
         lineage:
             - datalake_inspections_metrics.inspection_achievements.ts_created

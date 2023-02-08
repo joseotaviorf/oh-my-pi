@@ -58,7 +58,7 @@ columns:
       - datalake_offboarding.contract_termination.dt_termination
   ts_created_inspection:
     lineage:
-      - datalake_inspections.inspection_history.ts_created
+      - datalake_inspections.inspection_booking.ts_created
   ts_termination_request:
     lineage:
       - datalake_offboarding.contract_termination.ts_created

@@ -50,7 +50,7 @@ JOIN
     datalake_inspections_clean.room r
         ON r.id_room = ig.id_room
 JOIN
-    datalake_inspections.inspection_history AS ih
+    datalake_inspections.inspection_booking AS ih
         ON ih.id_assessment = r.id_assessment
 WHERE
     i.year = {year}

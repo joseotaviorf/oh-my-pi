@@ -24,7 +24,7 @@ SELECT
 FROM
     datalake_offboarding.contract_termination ct
 LEFT JOIN
-    datalake_inspections.inspection_history insp
+    datalake_inspections.inspection_booking insp
         ON insp.id_contract = ct.id_contract
         AND insp.inspection_type IN ('offboarding','verification')
         AND insp.status <> 'cancelled'

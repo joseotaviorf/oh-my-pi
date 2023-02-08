@@ -11,17 +11,6 @@ WITH assessment AS ( --There should only be a single assessment for an inspectio
     QUALIFY
         a.ts_created = FIRST(a.ts_created) OVER (PARTITION BY a.id_inspection ORDER BY a.ts_created DESC)
 ),
-main_exception AS (
-    SELECT
-        DISTINCT i.id AS id_inspection
-    FROM
-        datalake_ebdb_clean.inspection i
-    EXCEPT
-    SELECT
-        DISTINCT i.id_external AS id_inspection
-    FROM
-        datalake_inspections_clean.inspection AS i
-),
 main_inspection_aud_sync as(
     SELECT DISTINCT
         ia.id_inspection,
@@ -30,10 +19,23 @@ main_inspection_aud_sync as(
         datalake_ebdb_clean.inspection_aud ia
 ),
 union_inspection_history AS (
+    WITH main_exception AS (
+        SELECT
+            DISTINCT i.id AS id_inspection
+        FROM
+            datalake_ebdb_clean.inspection i
+        EXCEPT
+        SELECT
+            DISTINCT i.id_external AS id_inspection
+        FROM
+            datalake_inspections_clean.inspection AS i
+    )
     SELECT
         i.id_inspection,
         i.id_previous_inspection,
         i.id_external,
+        i.id_previous_inspection,
+        i.id_inspector,
         i.id_schedule AS id_booking,
         i.id_contract,
         i.id_inspector,
@@ -58,6 +60,8 @@ union_inspection_history AS (
         MD5(CONCAT(i.id, 'PWA')) AS id_inspection,
         NULL AS id_previous_inspection,
         i.id AS id_external,
+        NULL AS id_previous_inspection,
+        NULL AS id_inspector,
         i.id_booking,
         i.id_contract,
         NULL AS id_inspector,
@@ -87,14 +91,35 @@ union_inspection_history AS (
         datalake_ebdb_clean.inspection AS i
             ON me.id_inspection = i.id
 ),
-inspection_reschedule AS (
-  SELECT
-    i.id_contract,
-    i.inspection_type,
-    COUNT(i.id_contract) AS total_rescheduling
-  FROM
-    union_inspection_history AS i
-  GROUP BY 1,2
+inspection_contract AS (
+    SELECT
+        c.id AS id_contract,
+        i.inspection_type,
+        MAX(COALESCE(r.id_city, i.id_city)) AS id_city,
+        MAX(COALESCE(r.city_name, i.city_name)) AS city_name,
+        COUNT(i.id_contract) AS total_rescheduling,
+        CASE
+            WHEN i.inspection_type = "offboarding" THEN MAX(t.dt_termination)
+            WHEN i.inspection_type = "onboarding" THEN c.dt_entered
+        END AS dt_execution_limit,
+        c.dt_entered AS dt_contract_entrance,
+        MAX(t.dt_termination) AS dt_contract_termination,
+        MAX(t.ts_canceled) AS ts_termination_canceled
+    FROM
+        union_inspection_history AS i
+    JOIN
+        datalake_ebdb_contract.contract AS c
+            ON c.id = i.id_contract
+    LEFT JOIN
+        datalake_terminator_clean.termination AS t
+            ON t.id_contract = c.id
+    LEFT JOIN
+        datalake_ebdb_clean.house AS h
+            ON c.id_house = h.id
+    LEFT JOIN
+        datalake_region.region AS r
+            ON r.id = h.id_region
+    GROUP BY 1, 2, 7
 )
 SELECT
     i.id_inspection,
@@ -104,9 +129,12 @@ SELECT
     i.id_booking,
     i.id_contract,
     i.id_inspector,
-    i.id_city,
-    i.city_name,
+    b.id_country,
+    ic.id_city,
+    ic.city_name,
+    b.country_code,
     i.inspection_type,
+    b.type AS booking_type,
     i.source,
     a.source AS assessment_source,
     i.status,
@@ -116,7 +144,7 @@ SELECT
         ELSE FALSE
     END AS is_first_schedule,
     CASE
-        WHEN ir.total_rescheduling = 1
+        WHEN ic.total_rescheduling = 1
             AND (
                 i.status = 'received'
                 OR (i.status IN ('reviewed','Comentada', 'Finalizada') AND i.source = 'PWA')
@@ -124,6 +152,22 @@ SELECT
             THEN TRUE
         ELSE FALSE
     END AS is_executed_in_first_schedule,
+    CASE
+        WHEN DATE(b.ts_first_canceled_unevaluated) = DATE(b.ts_booking_utc) THEN True
+        ELSE False
+    END AS is_d0_canceled,
+    CASE
+        WHEN DATE(b.ts_first_canceled_unevaluated) = DATE_SUB(DATE(b.ts_booking_utc), 1) THEN True
+        ELSE False
+    END AS is_d1_canceled,
+    ic.dt_contract_entrance,
+    ic.dt_contract_termination,
+    ic.dt_execution_limit,
+    b.ts_booking_utc AS ts_booking_inspected_utc,
+    b.ts_booking_local_tz AS ts_booking_inspected_local_tz,
+    b.ts_first_canceled_unevaluated AS ts_booking_cancelled_utc,
+    b.ts_first_canceled_unevaluated_local_tz AS ts_booking_cancelled_local_tz,
+    ic.ts_termination_canceled,
     a.ts_started AS ts_execution_started,
     a.ts_finished AS ts_execution_finished,
     COALESCE(a.ts_created, i.ts_inspected) AS ts_inspected,
@@ -139,9 +183,12 @@ LEFT JOIN
     assessment AS a
         ON a.id_inspection = i.id_inspection
 LEFT JOIN
-    inspection_reschedule AS ir
-        ON ir.id_contract = i.id_contract
-        AND ir.inspection_type = i.inspection_type
-LEFT JOIN
     main_inspection_aud_sync AS mias
         ON mias.id_inspection = i.id_inspection
+LEFT JOIN
+    datalake_booking.booking AS b
+        ON i.id_booking = b.id
+LEFT JOIN
+    inspection_contract AS ic
+        ON ic.id_contract = i.id_contract
+        AND ic.inspection_type = i.inspection_type

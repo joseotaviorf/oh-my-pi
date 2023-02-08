@@ -28,7 +28,7 @@ SELECT
     im.ts_created,
     NOW() AS ts_load
 FROM
-    datalake_inspections_metrics.inspection_booking i
+    datalake_inspections.inspection_booking i
 LEFT JOIN
     datalake_inspections_metrics.inspection_achievements im
         ON im.id_inspection = i.id_inspection

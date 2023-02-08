@@ -276,7 +276,7 @@ last_inspection_synch AS(
     FROM
         datalake_terminator_clean.termination AS term
     JOIN
-        datalake_inspections.inspection_history insp
+        datalake_inspections.inspection_booking insp
             ON term.id_contract = insp.id_contract
     WHERE
         term.status <> 'CANCELED'

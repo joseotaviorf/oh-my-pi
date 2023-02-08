@@ -4,37 +4,37 @@ table_name: dim_inspection
 columns:
     sk_inspection:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.id_inspection
+            - datalake_inspections.inspection_booking.id_inspection
     inspection_type:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.inspection_type
+            - datalake_inspections.inspection_booking.inspection_type
     booking_type:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.booking_type
+            - datalake_inspections.inspection_booking.booking_type
     source:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.source
+            - datalake_inspections.inspection_booking.source
     status:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.status
+            - datalake_inspections.inspection_booking.status
     has_owner_accompanying:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.has_owner_accompanying
+            - datalake_inspections.inspection_booking.has_owner_accompanying
     is_first_schedule:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.is_first_schedule
+            - datalake_inspections.inspection_booking.is_first_schedule
     is_executed_in_first_schedule:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.is_executed_in_first_schedule
+            - datalake_inspections.inspection_booking.is_executed_in_first_schedule
     is_d0_canceled:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.is_d0_canceled
+            - datalake_inspections.inspection_booking.is_d0_canceled
     is_d1_canceled:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.is_d1_canceled
+            - datalake_inspections.inspection_booking.is_d1_canceled
     ts_created:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.ts_created
+            - datalake_inspections.inspection_booking.ts_created
     ts_updated:
         lineage:
-            - datalake_inspections_metrics.inspection_booking.ts_updated
+            - datalake_inspections.inspection_booking.ts_updated

@@ -6,7 +6,7 @@ dag_documentation:
 
 inner_dependencies:
   item:
-    - inspection_history
+    - inspection_booking
     - item_group
   item_comment_media:
     - item

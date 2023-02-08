@@ -932,7 +932,7 @@ bietlejuice.dw_house:
 bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-item-group
   - bietlejuice.enrich_inspections:load-enrich-room
-  - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-booking
+  - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements
   - bietlejuice.enrich_inspections_metrics:load-enrich-item-description
   - bietlejuice.inspections:load-clean-assessment
@@ -1921,8 +1921,12 @@ bietlejuice.enrich_docato:
   - bietlejuice.gsheets.static:load-clean-legal-base-docato
 
 bietlejuice.enrich_inspections:
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-inspection-in-data-lake
   - bietlejuice.ebdb:create-clean-inspection-aud-in-data-lake
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.inspections:load-clean-assessment
   - bietlejuice.inspections:load-clean-inspection
   - bietlejuice.inspections:load-clean-item
@@ -1936,18 +1940,16 @@ bietlejuice.enrich_inspections:
   - bietlejuice.inspections:load-clean-review-media
   - bietlejuice.inspections:load-clean-room
   - bietlejuice.inspections:load-clean-room-type
+  - bietlejuice.terminator:load-clean-termination
 
 bietlejuice.enrich_inspections_metrics:
-  - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_date:load-enrich-cities-calendar
-  - bietlejuice.enrich_inspections:load-enrich-inspection-history
+  - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_inspections:load-enrich-item
   - bietlejuice.enrich_inspections:load-enrich-item-comment-media
   - bietlejuice.enrich_inspections:load-enrich-item-group
   - bietlejuice.enrich_inspections:load-enrich-item-issue
   - bietlejuice.enrich_inspections:load-enrich-room
-  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
-  - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_support_and_service_kpis_targets:load-enrich-kpis-targets
 
 bietlejuice.enrich_invoice:
@@ -2151,7 +2153,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
   - bietlejuice.enrich_ebdb_user:load-enrich-user
-  - bietlejuice.enrich_inspections:load-enrich-inspection-history
+  - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
