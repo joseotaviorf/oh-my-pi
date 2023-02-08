@@ -4,28 +4,31 @@ table_name: dim_item
 columns:
   sk_item:
     lineage:
-      - datalake_inspections_metrics.item_description.id_item
+      - datalake_inspections.item.id_item
   item_type:
     lineage:
-      - datalake_inspections_metrics.item_description.item_type
-  inspection_media_type:
+      - datalake_inspections.item.item_type
+  item_media_type:
     lineage:
-      - datalake_inspections_metrics.item_description.inspection_media_type
-  is_commented:
+      - datalake_inspections.item.media_type
+  item_comment:
     lineage:
-      - datalake_inspections_metrics.item_description.is_commented
+      - datalake_inspections.item.comment
+  item_status:
+    lineage:
+      - datalake_inspections.item.status
   ts_created:
     lineage:
-      - datalake_inspections_metrics.item_description.ts_created
+      - datalake_inspections.item.ts_created
   ts_updated:
     lineage:
-      - datalake_inspections_metrics.item_description.ts_updated
+      - datalake_inspections.item.ts_updated
   year:
     lineage:
-      - datalake_inspections_metrics.item_description.year
+      - datalake_inspections.item.year
   month:
     lineage:
-      - datalake_inspections_metrics.item_description.month
+      - datalake_inspections.item.month
   day:
     lineage:
-      - datalake_inspections_metrics.item_description.day
+      - datalake_inspections.item.day

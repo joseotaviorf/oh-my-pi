@@ -4,58 +4,40 @@ table_name: fact_item
 columns:
   sk_item:
     lineage:
-      - datalake_inspections_metrics.item_description.id_item
+      - datalake_inspections.item.id_item
   sk_previous_item:
     lineage:
-      - datalake_inspections_metrics.item_description.id_previous_item
+      - datalake_inspections.item.id_previous_item
+  sk_external_item:
+    lineage:
+      - datalake_inspections.item.id_external_item
   sk_item_group:
     lineage:
-      - datalake_inspections_metrics.item_description.id_item_group
+      - datalake_inspections.item.id_item_group
   sk_room:
     lineage:
-      - datalake_inspections_metrics.item_description.id_room
+      - datalake_inspections.item.id_room
   sk_assessment:
     lineage:
-      - datalake_inspections_metrics.item_description.id_assessment
-  total_item_issue:
+      - datalake_inspections.item.id_assessment
+  sk_inspection:
     lineage:
-      - datalake_inspections_metrics.item_description.total_item_issue
-  total_media:
+      - datalake_inspections.item.id_inspection
+  is_present:
     lineage:
-      - datalake_inspections_metrics.item_description.total_media
-  total_inspector_comment:
-    lineage:
-      - datalake_inspections_metrics.item_description.total_inspector_comment
-  total_tenant_comment:
-    lineage:
-      - datalake_inspections_metrics.item_description.total_tenant_comment
-  total_owner_comment:
-    lineage:
-      - datalake_inspections_metrics.item_description.total_owner_comment
-  has_media:
-    lineage:
-      - datalake_inspections_metrics.item_description.has_media
-  has_inspector_comment:
-    lineage:
-      - datalake_inspections_metrics.item_description.has_inspector_comment
-  has_tenant_comment:
-    lineage:
-      - datalake_inspections_metrics.item_description.has_tenant_comment
-  has_owner_comment:
-    lineage:
-      - datalake_inspections_metrics.item_description.has_owner_comment
+      - datalake_inspections.item.is_present
   ts_created:
     lineage:
-      - datalake_inspections_metrics.item_description.ts_created
+      - datalake_inspections.item.ts_created
   ts_updated:
     lineage:
-      - datalake_inspections_metrics.item_description.ts_updated
+      - datalake_inspections.item.ts_updated
   year:
     lineage:
-      - datalake_inspections_metrics.item_description.year
+      - datalake_inspections.item.year
   month:
     lineage:
-      - datalake_inspections_metrics.item_description.month
+      - datalake_inspections.item.month
   day:
     lineage:
-      - datalake_inspections_metrics.item_description.day
+      - datalake_inspections.item.day

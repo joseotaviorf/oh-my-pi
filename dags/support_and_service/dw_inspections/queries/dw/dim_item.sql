@@ -1,15 +1,16 @@
-SELECT DISTINCT
+SELECT
     i.id_item AS sk_item,
     i.item_type,
-    i.inspection_media_type,
-    i.is_commented,
+    i.media_type AS item_media_type,
+    i.comment As item_comment,
+    i.status AS item_status,
     i.ts_created,
     i.ts_updated,
     i.year,
     i.month,
     i.day
 FROM
-    datalake_inspections_metrics.item_description i
+    datalake_inspections.item i
 WHERE
     i.year = {year}
     AND i.month = {month}

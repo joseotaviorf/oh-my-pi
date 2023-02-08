@@ -8,8 +8,6 @@ inner_dependencies:
   item:
     - inspection_booking
     - item_group
-  item_comment_media:
-    - item
   item_issue:
     - item
   item_media:
@@ -25,7 +23,6 @@ custom_cluster:
 partitions_cols: [year, month, day]
 
 incremental_tables:
-  - item_comment_media
   - item_group
   - item_issue
   - item_media
