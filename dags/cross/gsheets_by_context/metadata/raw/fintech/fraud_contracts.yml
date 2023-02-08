@@ -1,0 +1,3 @@
+---
+database_name: datalake_gsheet_raw
+table_name: fraud_contracts

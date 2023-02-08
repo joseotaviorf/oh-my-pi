@@ -1,0 +1,10 @@
+---
+database_name: datalake_gsheet_clean
+table_name: fraud_contracts
+columns:
+  id_house:
+    lineage: 
+     - datalake_gsheets_raw.fraud_contracts.imovel
+  id_contract:
+    lineage: 
+     - datalake_gsheets_raw.fraud_contracts.contrato
