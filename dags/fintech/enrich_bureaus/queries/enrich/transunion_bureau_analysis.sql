@@ -384,7 +384,7 @@ WITH backtest AS (
 
 integration_report_aud AS (
   SELECT
-    rev, 
+    rev,
     CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
     integration_provider,
     REPLACE(REPLACE(REPLACE(attributes, "Valor - ", ""), "Quantidade - ", ""), "Discreta - ", "") AS attributes
@@ -413,8 +413,8 @@ integration_report_data AS (
     CAST(GET_JSON_OBJECT(attributes, "$.indic_seg_6_fin") AS FLOAT) AS transunion_index_seg_6_fin,
     CAST(GET_JSON_OBJECT(attributes, "$.indic_seg_6_tele") AS FLOAT) AS transunion_index_seg_6_tele,
     CAST(
-      CASE 
-        WHEN 
+      CASE
+        WHEN
           GET_JSON_OBJECT(attributes, "$.porte_empregador") = 'Sem informação ou empresa não possui porte' THEN 0.0
         WHEN
           GET_JSON_OBJECT(attributes, "$.porte_empregador") = 'Micro empresa' THEN 1.0
@@ -784,7 +784,7 @@ integration_report_data AS (
     CAST(GET_JSON_OBJECT(attributes, "$.flg_superior_compl_hh") AS FLOAT) AS transunion_has_household_gt_graduate,
     CAST(GET_JSON_OBJECT(attributes, "$.flag_bolsa_familia") AS FLOAT) AS transunion_has_bolsa_familia,
     revinfo.ts_created AS timestamp
-  FROM 
+  FROM
     integration_report_aud AS itr
   JOIN
     datalake_arquivo_confidencial_clean.rev_info AS revinfo
@@ -798,9 +798,11 @@ integration_report_data AS (
 last_credit_analysis AS (
   SELECT
     id_proposal,
-    MAX(ts_created) AS last_ca_timestamp
+    MAX(issued_at) AS last_ca_timestamp
   FROM
-    datalake_sorting_hat_clean.credit_analysis 
+    datalake_sorting_hat_clean.screening_result_version sr
+    JOIN datalake_sorting_hat_raw.transaction t
+      ON sr.id_transaction = t.id
   GROUP BY id_proposal
 ),
 
@@ -828,11 +830,11 @@ enriched_integration_report_data AS (
 internal_data AS (
   SELECT
     *
-  FROM 
+  FROM
     enriched_integration_report_data
   WHERE
     max_itr_timestamp = timestamp
-    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) < 30
+    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) <= 30
 )
 
 SELECT

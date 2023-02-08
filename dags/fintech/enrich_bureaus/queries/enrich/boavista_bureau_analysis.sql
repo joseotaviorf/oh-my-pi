@@ -3,7 +3,7 @@ WITH integration_report_data AS (
     CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
     GET_JSON_OBJECT(attributes, "$.score") AS boavista_score,
     revinfo.ts_created AS timestamp
-  FROM 
+  FROM
     datalake_arquivo_confidencial_clean.integration_report_aud AS itr
   JOIN
     datalake_arquivo_confidencial_clean.rev_info AS revinfo
@@ -16,9 +16,11 @@ WITH integration_report_data AS (
 last_credit_analysis AS (
   SELECT
     id_proposal,
-    MAX(ts_created) AS last_ca_timestamp
+    MAX(issued_at) AS last_ca_timestamp
   FROM
-    datalake_sorting_hat_clean.credit_analysis 
+    datalake_sorting_hat_clean.screening_result_version sr
+    JOIN datalake_sorting_hat_raw.transaction t
+      ON sr.id_transaction = t.id
   GROUP BY id_proposal
 ),
 
@@ -49,11 +51,11 @@ arq_conf_data AS (
     id_proponent,
     cpf,
     CAST(boavista_score AS FLOAT) AS boavista_score
-  FROM 
+  FROM
     enriched_integration_report_data
   WHERE
     max_itr_timestamp = timestamp
-    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) < 30
+    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) <= 30
 ),
 
 sorting_hat_data AS (
@@ -72,13 +74,13 @@ SELECT
   COALESCE(arq.cpf, sh.cpf) AS cpf,
   COALESCE(sh.boavista_score, arq.boavista_score) AS boavista_score
 FROM
-  arq_conf_data arq 
+  arq_conf_data arq
 FULL OUTER JOIN
   sorting_hat_data sh
     ON arq.id_proposal = sh.id_proposal
     AND arq.id_proponent = sh.id_proponent
     AND arq.cpf = sh.cpf
-WHERE 
-  sh.id_proponent IS NOT NULL 
-  AND sh.id_proposal IS NOT NULL 
-  AND sh.cpf IS NOT NULL 
+WHERE
+  sh.id_proponent IS NOT NULL
+  AND sh.id_proposal IS NOT NULL
+  AND sh.cpf IS NOT NULL

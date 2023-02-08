@@ -1,7 +1,7 @@
 WITH backtest AS (
   SELECT
     id_proposal,
-    id_proponent, 
+    id_proponent,
     CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
     CAST(SCORE_CSBA AS FLOAT) AS serasa_score_csba,
     CAST(SCORE_HSPN AS FLOAT) AS serasa_score_hspn
@@ -20,7 +20,7 @@ integration_report_data AS (
       WHEN integration_provider = 'SERASA_SCORE_CSBA' THEN GET_JSON_OBJECT(attributes, "$.score")
     END AS serasa_score_csba,
     revinfo.ts_created AS timestamp
-  FROM 
+  FROM
     datalake_arquivo_confidencial_clean.integration_report_aud AS itr
   JOIN
     datalake_arquivo_confidencial_clean.rev_info AS revinfo
@@ -33,9 +33,11 @@ integration_report_data AS (
 last_credit_analysis AS (
   SELECT
     id_proposal,
-    MAX(ts_created) AS last_ca_timestamp
+    MAX(issued_at) AS last_ca_timestamp
   FROM
-    datalake_sorting_hat_clean.credit_analysis 
+    datalake_sorting_hat_clean.screening_result_version sr
+    JOIN datalake_sorting_hat_raw.transaction t
+      ON sr.id_transaction = t.id
   GROUP BY id_proposal
 ),
 
@@ -66,11 +68,11 @@ integration_report_csba_data AS (
     id_proponent,
     cpf,
     CAST(serasa_score_csba AS FLOAT) AS serasa_score_csba
-  FROM 
+  FROM
     enriched_integration_report_data
   WHERE
     max_itr_timestamp = timestamp
-    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) < 30
+    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) <= 30
     AND integration_provider = 'SERASA_SCORE_CSBA'
 ),
 
@@ -105,11 +107,11 @@ internal_hspn_data AS (
     id_proponent,
     cpf,
     CAST(serasa_score_hspn AS FLOAT) AS serasa_score_hspn
-  FROM 
+  FROM
     enriched_integration_report_data
   WHERE
     max_itr_timestamp = timestamp
-    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) < 30
+    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) <= 30
     AND integration_provider = 'SERASA_SCORE_HSPI'
     AND serasa_score_hspn >= 0
 ),
@@ -121,12 +123,12 @@ internal_data AS (
     COALESCE(csba.cpf, hspn.cpf) AS cpf,
     serasa_score_csba,
     serasa_score_hspn
-  FROM 
+  FROM
     internal_csba_data AS csba
-    FULL OUTER JOIN 
+    FULL OUTER JOIN
       internal_hspn_data AS hspn
-        ON csba.id_proposal = hspn.id_proposal 
-        AND csba.id_proponent = hspn.id_proponent 
+        ON csba.id_proposal = hspn.id_proposal
+        AND csba.id_proponent = hspn.id_proponent
         AND csba.cpf = hspn.cpf
   WHERE
     csba.id_proposal IS NOT NULL

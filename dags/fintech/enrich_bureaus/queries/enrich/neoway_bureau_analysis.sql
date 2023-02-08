@@ -1,13 +1,13 @@
 WITH backtest AS (
-  SELECT 
+  SELECT
     CAST(id_proposal AS INTEGER) AS id_proposal,
     CAST(NULL AS INTEGER) AS id_proponent,
     CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
     CAST(estimated_income_neoway_low AS DOUBLE) AS neoway_estimated_income_low,
     CAST(estimated_income_neoway_midpoint AS DOUBLE) AS neoway_estimated_income_midpoint,
     CAST(estimated_income_neoway_upper AS DOUBLE) AS neoway_estimated_income_upper
-  FROM 
-    datalake_static_files_raw.bureaus_neoway_historical_raw    
+  FROM
+    datalake_static_files_raw.bureaus_neoway_historical_raw
   WHERE
     cpf IS NOT NULL
 ),
@@ -21,9 +21,9 @@ income_report_data AS (
       ELSE MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeLowerValue"))
     END AS neoway_lower_value,
     CASE
-      WHEN MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeHigherValue")) IS NULL 
+      WHEN MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeHigherValue")) IS NULL
         AND MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeLowerValue")) = 954 THEN 954
-      WHEN MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeHigherValue")) IS NULL 
+      WHEN MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeHigherValue")) IS NULL
         AND MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeLowerValue")) = 19080 THEN 19080
       ELSE MAX(GET_JSON_OBJECT(p.attributes, "$.incomeRangeHigherValue"))
     END AS neoway_upper_value
@@ -41,9 +41,11 @@ income_report_data AS (
 last_credit_analysis AS (
   SELECT
     id_proposal,
-    MAX(ts_created) AS last_ca_timestamp
+    MAX(issued_at) AS last_ca_timestamp
   FROM
-    datalake_sorting_hat_clean.credit_analysis 
+    datalake_sorting_hat_clean.screening_result_version sr
+    JOIN datalake_sorting_hat_raw.transaction t
+      ON sr.id_transaction = t.id
   GROUP BY id_proposal
 ),
 
@@ -79,10 +81,10 @@ internal_data AS (
     CAST(neoway_lower_value AS DOUBLE) AS neoway_estimated_income_low,
     (CAST(neoway_lower_value AS DOUBLE) + CAST(neoway_upper_value AS DOUBLE))/2 AS neoway_estimated_income_midpoint,
     CAST(neoway_upper_value AS DOUBLE) AS neoway_estimated_income_upper
-  FROM 
+  FROM
     enriched_income_report_data
-  WHERE 
-    (timestamp = ir_last_timestamp AND DATEDIFF(last_ca_timestamp, ir_last_timestamp) < 30)
+  WHERE
+    (timestamp = ir_last_timestamp AND DATEDIFF(last_ca_timestamp, ir_last_timestamp) <= 30)
     OR (ir_last_timestamp IS NULL)
 )
 

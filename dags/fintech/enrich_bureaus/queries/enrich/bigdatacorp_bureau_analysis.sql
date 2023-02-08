@@ -15,7 +15,7 @@ WITH backtest AS (
 integration_report_data AS (
   SELECT
     CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
-    CASE 
+    CASE
       WHEN integration_provider = 'BIGDATACORP_BASIC_DATA' THEN 'basic_data'
       WHEN integration_provider = 'BIGDATACORP_RELATED_PEOPLE' THEN 'related_people'
     END AS bigdatacorp_integration_type,
@@ -25,7 +25,7 @@ integration_report_data AS (
     GET_JSON_OBJECT(attributes, "$.TotalCoworkers") AS bigdatacorp_total_household,
     GET_JSON_OBJECT(attributes, "$.TotalRelationships") AS bigdatacorp_total_relationships,
     revinfo.ts_created AS timestamp
-  FROM 
+  FROM
     datalake_arquivo_confidencial_clean.integration_report_aud AS itr
   JOIN
     datalake_arquivo_confidencial_clean.rev_info AS revinfo
@@ -38,9 +38,11 @@ integration_report_data AS (
 last_credit_analysis AS (
   SELECT
     id_proposal,
-    MAX(ts_created) AS last_ca_timestamp
+    MAX(issued_at) AS last_ca_timestamp
   FROM
-    datalake_sorting_hat_clean.credit_analysis 
+    datalake_sorting_hat_clean.screening_result_version sr
+    JOIN datalake_sorting_hat_raw.transaction t
+      ON sr.id_transaction = t.id
   GROUP BY id_proposal
 ),
 
@@ -71,11 +73,11 @@ internal_basic_data AS (
     id_proponent,
     cpf,
     CAST(bigdatacorp_age AS FLOAT) AS bigdatacorp_age
-  FROM 
+  FROM
     enriched_integration_report_data
   WHERE
     max_itr_timestamp = timestamp
-    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) < 30
+    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) <= 30
     AND bigdatacorp_integration_type = 'basic_data'
 ),
 
@@ -88,11 +90,11 @@ internal_personal_data AS (
     CAST(bigdatacorp_total_partners AS FLOAT) AS bigdatacorp_total_partners,
     CAST(bigdatacorp_total_household AS FLOAT) AS bigdatacorp_total_household,
     CAST(bigdatacorp_total_relationships AS FLOAT) AS bigdatacorp_total_relationships
-  FROM 
+  FROM
     enriched_integration_report_data
   WHERE
     max_itr_timestamp = timestamp
-    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) < 30
+    AND DATEDIFF(last_ca_timestamp, max_itr_timestamp) <= 30
     AND bigdatacorp_integration_type = 'related_people'
 ),
 
@@ -106,12 +108,12 @@ internal_data AS (
     bigdatacorp_total_partners,
     bigdatacorp_total_household,
     bigdatacorp_total_relationships
-  FROM 
+  FROM
     internal_basic_data AS bd
-    FULL OUTER JOIN 
+    FULL OUTER JOIN
       internal_personal_data AS pd
-        ON bd.id_proposal = pd.id_proposal 
-        AND bd.id_proponent = pd.id_proponent 
+        ON bd.id_proposal = pd.id_proposal
+        AND bd.id_proponent = pd.id_proponent
         AND bd.cpf = pd.cpf
 )
 

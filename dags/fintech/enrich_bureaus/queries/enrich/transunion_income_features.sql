@@ -1,5 +1,5 @@
 WITH backtest AS (
-  SELECT 
+  SELECT
     id_proposal,
     id_proponent,
     CAST(REPLACE(REPLACE(cpf,".",""),"-","") AS BIGINT) AS cpf,
@@ -27,9 +27,11 @@ income_report_data AS (
 last_credit_analysis AS (
   SELECT
     id_proposal,
-    MAX(ts_created) AS last_ca_timestamp
+    MAX(issued_at) AS last_ca_timestamp
   FROM
-    datalake_sorting_hat_clean.credit_analysis 
+    datalake_sorting_hat_clean.screening_result_version sr
+    JOIN datalake_sorting_hat_raw.transaction t
+      ON sr.id_transaction = t.id
   GROUP BY id_proposal
 ),
 
@@ -62,11 +64,11 @@ internal_data AS (
     id_proposal,
     id_proponent,
     transunion_presumed_income
-  FROM 
+  FROM
     enriched_income_report_data
-  WHERE 
+  WHERE
     timestamp = ir_last_timestamp
-    AND DATEDIFF(last_ca_timestamp, ir_last_timestamp) < 30
+    AND DATEDIFF(last_ca_timestamp, ir_last_timestamp) <= 30
 )
 
 SELECT
