@@ -42,7 +42,7 @@ WITH fact_house_listing_flows_adjust AS (
 		CASE
             WHEN dl.sales_company = 'OLOS'
                 THEN 'QUINTO_ANDAR_OUTBOUND'
-            WHEN IFNULL(dl.sales_company, '') <> 'OLOS' AND du.sales_company = 'QUINTO_ANDAR'
+            WHEN COALESCE(dl.sales_company, '') <> 'OLOS' AND du.sales_company = 'QUINTO_ANDAR'
                 THEN 'QUINTO_ANDAR_INBOUND'
             ELSE COALESCE(du.sales_company, dl.sales_company)
         END AS sales_company
@@ -183,11 +183,11 @@ sale_fact_listing_flows_adjust AS (
 		CONVERT_TIMEZONE('Brazil/East', dl.ts_first_publication) AS ts_house_first_publication_br_tz,
 		COALESCE(dl.is_casa_mineira_migration, false) as is_casa_mineira_migration,
 		CASE
-            WHEN dl.sales_company = 'OLOS'
+            WHEN dim_lead.sales_company = 'OLOS'
                 THEN 'QUINTO_ANDAR_OUTBOUND'
-            WHEN IFNULL(dl.sales_company, '') <> 'OLOS' AND du.sales_company = 'QUINTO_ANDAR'
+            WHEN COALESCE(dim_lead.sales_company, '') <> 'OLOS' AND du.sales_company = 'QUINTO_ANDAR'
                 THEN 'QUINTO_ANDAR_INBOUND'
-            ELSE COALESCE(du.sales_company, dl.sales_company)
+            ELSE COALESCE(du.sales_company, dim_lead.sales_company)
         END AS sales_company
 	FROM
 		sale.fact_listing_flows AS hl
@@ -195,8 +195,8 @@ sale_fact_listing_flows_adjust AS (
 		sale.dim_listing AS dl
 			on left(hl.sk_house_listing,9) = dl.sk_house
     JOIN
-        dim_lead AS dl
-            ON dl.sk_lead = hl.sk_lead
+        dim_lead
+            ON dim_lead.sk_lead = hl.sk_lead
     LEFT JOIN
         quintoandar.dim_user_sales_rep AS du
             ON du.sk_user_sales_rep = hl.sk_user_house_registrant
