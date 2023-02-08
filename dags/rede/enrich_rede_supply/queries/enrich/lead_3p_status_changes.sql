@@ -1,12 +1,21 @@
 WITH partner_agencies_aux AS (
     SELECT
         id_company AS id_company_hubspot,
+        LAST(NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '')) OVER (PARTITION BY id_company ORDER BY ts_updated ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS current_tag,
+        LAST(NULLIF(GET_JSON_OBJECT(properties, '$.hs_lead_status'), '')) OVER (PARTITION BY id_company ORDER BY ts_updated ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS current_status,
         NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', ''), '') AS cnpj,
         ts_updated
     FROM
         datalake_hubspot_clean.company
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY cnpj ORDER BY ts_updated DESC) = 1
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                cnpj
+            ORDER BY
+                current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC, 
+                current_tag IS NOT NULL DESC,
+                ts_updated DESC
+        ) = 1
         AND cnpj IS NOT NULL
 ),
 first_time_for_status AS (

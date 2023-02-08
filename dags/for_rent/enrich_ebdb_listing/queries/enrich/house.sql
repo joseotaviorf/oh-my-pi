@@ -57,6 +57,22 @@ partner_agencies_aux AS (
     id_company,
     NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '') AS tag,
     NULLIF(GET_JSON_OBJECT(properties, '$.name'), '') AS name,
+    LAST(NULLIF(GET_JSON_OBJECT(properties, '$.hs_lead_status'), ''))
+    OVER (
+        PARTITION BY
+            id_company
+        ORDER BY
+            ts_updated
+        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    ) AS current_status,
+    LAST(NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), ''))
+    OVER (
+        PARTITION BY
+            id_company
+        ORDER BY
+            ts_updated
+        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    ) AS current_tag,
     NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', ''), '') AS cnpj,
     COALESCE(
         NULLIF(GET_JSON_OBJECT(properties, '$.estado'), ''),
@@ -71,6 +87,7 @@ extracted_partner_tags AS (
     id_company,
     tag,
     NULLIF(REGEXP_EXTRACT(tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') AS extracted_3p_tag,
+    NULLIF(REGEXP_EXTRACT(current_tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') AS current_extracted_3p_tag,
     name,
     cnpj,
     partner_state,
@@ -81,7 +98,14 @@ extracted_partner_tags AS (
         ts_updated
       DESC
     ) = 1 AS is_most_recent_for_tag,
-    ROW_NUMBER() OVER(PARTITION BY cnpj ORDER BY ts_updated DESC) = 1 AS is_most_recent_for_cnpj,
+    ROW_NUMBER() OVER ( -- Sometimes, more than one company in HubSpot is created with the same cnpj, so we need to deduplicate
+        PARTITION BY
+            cnpj
+        ORDER BY
+            current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC, -- First, the ones that are currently members
+            current_tag IS NOT NULL DESC, -- Then, the ones with tags
+            ts_updated DESC -- Otherwise, most recent
+    ) = 1 AS is_most_recent_for_cnpj,
     ROW_NUMBER() OVER(PARTITION BY id_company ORDER BY ts_updated DESC) = 1 AS is_most_recent_for_company
   FROM
     partner_agencies_aux
@@ -103,14 +127,10 @@ partner_agencies AS (
       WHEN ept.is_most_recent_for_cnpj THEN ept.cnpj
       ELSE NULL
     END AS cnpj,
-    COALESCE(current_ept.extracted_3p_tag, ept.extracted_3p_tag, ept.name) AS partner_3p_supply,
+    COALESCE(ept.current_extracted_3p_tag, ept.extracted_3p_tag, ept.name) AS partner_3p_supply,
     ept.partner_state
   FROM
     extracted_partner_tags AS ept
-  JOIN
-    extracted_partner_tags AS current_ept
-      ON ept.id_company = current_ept.id_company
-      AND current_ept.is_most_recent_for_company
 )
 SELECT
   h.id,
