@@ -92,13 +92,13 @@ for table in tables:
     table_name = table["table_name"]
     clean_table_name = table["clean_table_name"]
     extraction_type = table["extraction_type"]
-    parameters = [SOURCE, table_name]
+    parameters = [SOURCE, table_name, table["db"]]
 
     is_incremental = extraction_type == "incremental"
 
     if is_incremental:
         parameters.append(table["date_filter_column"])
-        parameters.append(table.get("unixtime_measure", "date"))
+        parameters.append(str(partition_columns))
         parameters.append("{{ ds }}")
 
     raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}//load_{extraction_type}_{SOURCE}_into_datalake.py"
