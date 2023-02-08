@@ -79,7 +79,7 @@ if __name__ == "__main__":
         df = None
         
         try:
-            df = spark_client.conn.read.json(file_path)
+            df = spark_client.conn.read.option("multiline",True).json(file_path)
         except Exception as e:
             logger.warning(f"""m={JOB_NAME}, table_name={table_name}, msg={e}.""")
 
