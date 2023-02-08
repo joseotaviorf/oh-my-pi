@@ -38,12 +38,25 @@ WITH fact_house_listing_flows_adjust AS (
 		END AS mkt_origin,
 		dhl.ts_house_first_publication,
 		CONVERT_TIMEZONE('Brazil/East', dhl.ts_house_first_publication) AS ts_house_first_publication_br_tz,
-		hl.country_code
+		hl.country_code,
+		CASE
+            WHEN dl.sales_company = 'OLOS'
+                THEN 'QUINTO_ANDAR_OUTBOUND'
+            WHEN IFNULL(dl.sales_company, '') <> 'OLOS' AND du.sales_company = 'QUINTO_ANDAR'
+                THEN 'QUINTO_ANDAR_INBOUND'
+            ELSE COALESCE(du.sales_company, dl.sales_company)
+        END AS sales_company
 	FROM
 		fact_house_listing_flows AS hl
 	INNER JOIN
 		dim_house_listing AS dhl
 			ON hl.sk_house_listing = dhl.sk_house_listing
+	JOIN
+        dim_lead AS dl
+            ON dl.sk_lead = hl.sk_lead
+    LEFT JOIN
+        quintoandar.dim_user_sales_rep AS du
+            ON du.sk_user_sales_rep = hl.sk_user_house_registrant
 ),
 source_ops_rent AS (
 	WITH photo_job AS (
@@ -66,6 +79,7 @@ source_ops_rent AS (
 	    hlf.sk_house_listing_flow,
 	    hlf.sk_lead,
 	    hlf.sk_house_listing,
+		hlf.sales_company,
 	    CASE
 	        WHEN hlf.mkt_origin = 'B2B'
 				AND hlf.is_b2b = TRUE THEN 'B2B'
@@ -77,10 +91,10 @@ source_ops_rent AS (
 					OR (hlf.has_isales_intervention = false))
 					AND photo_job_by_isales >= 1
 					AND sk_first_photo_job_date = hlf.sk_opportunity_date THEN 'FSS IS PhotoJob'
-	        WHEN coalesce(du.sales_company,dl.sales_company) IN ('QUINTO_ANDAR','OLOS','') THEN 'IS Int'
-	        WHEN coalesce(du.sales_company,dl.sales_company) IN ('ACTION_LINE','ATENTO','ALGAR','AEC') THEN 'IS Ext'
-	        ELSE  'Other'
-	    END  AS sourcing_ops,
+	        WHEN hlf.sales_company IN ('QUINTO_ANDAR','OLOS','QUINTO_ANDAR_INBOUND','QUINTO_ANDAR_OUTBOUND','') THEN 'IS Int'
+            WHEN hlf.sales_company IN ('ACTION_LINE','ATENTO','ALGAR','AEC') THEN 'IS Ext'
+            ELSE 'Other'
+        END AS sourcing_ops,
 	    CASE
 			WHEN hlf.sk_lead_date = ssf.sk_lead_date
 				AND hlf.sk_lead_date > 0 THEN 'Hybrid'
@@ -117,7 +131,6 @@ source_ops_rent AS (
 			WHEN hlf.sk_first_listing_date > 0  THEN 'Rent'
 			ELSE NULL
 		END AS first_listing_context,
-		COALESCE(du.sales_company, dl.sales_company) AS sales_company,
 		hlf.lead_origin,
 		hlf.rental_administrator,
 		hlf.funnel_drop_reason,
@@ -127,12 +140,6 @@ source_ops_rent AS (
 		hlf.country_code
 	FROM
 		fact_house_listing_flows_adjust AS hlf
-		JOIN
-			dim_lead AS dl
-	        	ON dl.sk_lead = hlf.sk_lead
-	    LEFT JOIN
-			quintoandar.dim_user_sales_rep AS du
-	        	ON du.sk_user_sales_rep = hlf.sk_user_house_registrant
 	    LEFT JOIN
 			photo_job AS pj
 	        	ON pj.sk_house_listing = hlf.sk_house_listing
@@ -174,12 +181,25 @@ sale_fact_listing_flows_adjust AS (
 		END AS mkt_origin,
 		dl.ts_first_publication,
 		CONVERT_TIMEZONE('Brazil/East', dl.ts_first_publication) AS ts_house_first_publication_br_tz,
-		COALESCE(dl.is_casa_mineira_migration, false) as is_casa_mineira_migration
+		COALESCE(dl.is_casa_mineira_migration, false) as is_casa_mineira_migration,
+		CASE
+            WHEN dl.sales_company = 'OLOS'
+                THEN 'QUINTO_ANDAR_OUTBOUND'
+            WHEN IFNULL(dl.sales_company, '') <> 'OLOS' AND du.sales_company = 'QUINTO_ANDAR'
+                THEN 'QUINTO_ANDAR_INBOUND'
+            ELSE COALESCE(du.sales_company, dl.sales_company)
+        END AS sales_company
 	FROM
 		sale.fact_listing_flows AS hl
 	LEFT JOIN
 		sale.dim_listing AS dl
 			on left(hl.sk_house_listing,9) = dl.sk_house
+    JOIN
+        dim_lead AS dl
+            ON dl.sk_lead = hl.sk_lead
+    LEFT JOIN
+        quintoandar.dim_user_sales_rep AS du
+            ON du.sk_user_sales_rep = hl.sk_user_house_registrant
 ),
 source_ops_sale AS (
 	with photo_job AS (
@@ -202,6 +222,7 @@ source_ops_sale AS (
 	    ssf.sk_house_listing_flow,
 	    ssf.sk_lead,
 	    ssf.sk_house_listing,
+		ssf.sales_company,
 	    CASE
 	        WHEN ssf.mkt_origin = 'B2B'
 				AND ssf.is_b2b = TRUE THEN 'B2B'
@@ -213,10 +234,10 @@ source_ops_sale AS (
 					OR (ssf.has_isales_intervention = false))
 				AND photo_job_by_isales >= 1
 				AND sk_first_photo_job_date = ssf.sk_opportunity_date THEN 'FSS IS PhotoJob'
-	        WHEN coalesce(du.sales_company,dl.sales_company) IN ('QUINTO_ANDAR','OLOS','') THEN 'IS Int'
-	        WHEN coalesce(du.sales_company,dl.sales_company) IN ('ACTION_LINE','ATENTO','ALGAR','AEC') THEN 'IS Ext'
-	        ELSE  'Other'
-	    END AS sourcing_ops,
+	        WHEN ssf.sales_company IN ('QUINTO_ANDAR','OLOS','QUINTO_ANDAR_INBOUND','QUINTO_ANDAR_OUTBOUND','') THEN 'IS Int'
+            WHEN ssf.sales_company IN ('ACTION_LINE','ATENTO','ALGAR','AEC') THEN 'IS Ext'
+            ELSE 'Other'
+        END AS sourcing_ops,
 		CASE
 			WHEN hlf.sk_lead_date = ssf.sk_lead_date
 				AND ssf.sk_lead_date > 0 THEN 'Hybrid'
@@ -253,7 +274,6 @@ source_ops_sale AS (
 			WHEN ssf.sk_first_listing_date > 0  THEN 'Sale'
 			ELSE NULL
 		END AS first_listing_context,
-		COALESCE(du.sales_company, dl.sales_company) AS sales_company,
 		ssf.lead_origin,
 		ssf.funnel_drop_reason,
 		sk_first_photo_job_date,
@@ -262,12 +282,6 @@ source_ops_sale AS (
 		dhl.rental_administrator
 	FROM
 		sale_fact_listing_flows_adjust AS ssf
-	    JOIN
-			dim_lead AS dl
-	        	ON dl.sk_lead = ssf.sk_lead
-	    LEFT JOIN
-			quintoandar.dim_user_sales_rep AS du
-	        	ON du.sk_user_sales_rep = ssf.sk_user_house_registrant
 	    LEFT JOIN
 			photo_job AS pj
 	        	ON pj.sk_house_listing = ssf.sk_house_listing
