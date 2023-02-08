@@ -1,6 +1,7 @@
 SELECT
     id,
     external_invoice_id AS id_external_invoice,
+    earning_id AS id_earning,
     installment_uuid AS uuid_installment,
     type,
     status,
