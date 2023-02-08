@@ -20,6 +20,11 @@ We incrementally load the following table into the Datalake Reverse bucket, for 
 - `backlog_metric`
 - `demand_metric`
 - `fcr_metric`
+- `csat_front`
+- `taxonomia_call`
+- `taxonomia_chat`
+- `taxonomia_email`
+- `twilio_chat_aht`
 
 This pipeline also exports results do atento bucket (`s3://atento-s3-data-quintoandar-com-br`).
 
