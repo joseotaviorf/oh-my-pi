@@ -76,7 +76,7 @@ class GsheetsDAGFactory:
         self.custom_libraries = [
             {
                 "whl": f"{artifacts_bucket}/gsheets-api-client-python/"
-                f"quintoandar_gsheets_api_client-0.6.0-py2.py3-none-any.whl"
+                f"quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
             }
         ]
 

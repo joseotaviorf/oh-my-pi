@@ -1,8 +1,13 @@
 from os.path import join, dirname
 
 from pyspark.sql.utils import AnalysisException
-from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
+from gspread.exceptions import SpreadsheetNotFound, WorksheetNotFound
 
+from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
+from quintoandar_gsheets_api_client.exceptions.exceptions import (
+    EntityNotFoundException,
+    PermissionException,
+)
 from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.validation_suites.executors.gsheets_validation_suites_executor import (
@@ -55,7 +60,13 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
             context = _sheet_info.get("sheet_context").replace("_intraday", "")
             context_owner = self._get_slack_group_from_context(context)
 
-            if e.__class__ == AnalysisException:
+            if e.__class__ in [
+                AnalysisException,
+                SpreadsheetNotFound,
+                WorksheetNotFound,
+                EntityNotFoundException,
+                PermissionException,
+            ]:
                 error_trace = str(e).split("\n")[0].replace("`", "")
                 error_trace = error_trace.replace('"', "")[slice(0, 150)]
                 self.SLACK_MSG = self.SLACK_MSG_TEMPLATE.format(

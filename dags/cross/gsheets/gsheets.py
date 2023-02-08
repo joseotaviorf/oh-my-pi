@@ -51,7 +51,7 @@ CLUSTER_DESCRIPTION = Variable.get(
 CUSTOM_LIBRARIES = [
     {
         "whl": f"{artifacts_bucket}/gsheets-api-client-python/"
-        f"quintoandar_gsheets_api_client-0.5.0-py2.py3-none-any.whl"
+        f"quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
     }
 ]
 
