@@ -18,7 +18,7 @@ SELECT
     DATE(date_stop) AS dt_stopped,
     SMALLINT(YEAR(date_start)) AS year,
     TINYINT(MONTH(date_start)) AS month,
-    TINYINT(DAY(date_start)) AS day,
+    TINYINT(DAY(date_start)) AS day
 FROM
     datalake_mexico_facebook_insights_raw.facebook_insights
 WHERE
