@@ -14,7 +14,10 @@ SELECT DISTINCT
     CAST(ft.csat_score AS INT) AS csat_score,
     DATE(ts_started) AS ts_started,
     DATE(ts_closed) AS ts_closed,
-    DATE(ts_csat_response) AS ts_response
+    DATE(ts_csat_response) AS ts_response,
+    YEAR(CURRENT_DATE) AS year,
+    MONTH(CURRENT_DATE) AS month,
+    DAY(CURRENT_DATE) AS day
 FROM
     dw_customer_support.fact_ticket AS ft
 LEFT JOIN
