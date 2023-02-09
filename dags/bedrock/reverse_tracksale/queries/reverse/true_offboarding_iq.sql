@@ -1,92 +1,151 @@
-WITH crisis_contracts AS (
-    SELECT
-        ft.sk_contract
-    FROM
-        dw_tickets.dim_ticket dt
-    INNER JOIN
-        dw_tickets.fact_tickets ft
-            ON dt.sk_ticket = ft.sk_ticket
-    INNER JOIN
-        dw_customer_support.dim_department dc
-            ON dt.group_name = dc.department
-    WHERE
-        dc.team IN ('Casos Especiais','Ouvidoria','Proteção 5A','ReclameAqui','Evictions')
-        AND ft.sk_solved_date_local = -1
-    GROUP BY 1
+WITH b2b_listings AS (
+  SELECT DISTINCT 
+    rf.sk_contract,
+    hl.is_b2b 
+  FROM
+    dw_public.fact_listing_rent_flows AS rf 
+  INNER JOIN 
+    dw_public.dim_house_listing hl 
+      ON rf.sk_house_listing = hl.sk_house_listing
+      AND hl.is_b2b = true
+  WHERE 
+    rf.sk_contract != -1
+    AND rf.sk_contract_signed_date > 0
 ),
-offboarding_contracts_wo_ticket AS (
-    WITH termination_requests_done AS (
-        SELECT
-            ct.sk_contract,
-            DATEDIFF(current_date, ct.ts_termination_finished) AS days_since_finished
-        FROM
-            dw_datamarts_for_rent.contract_termination ct
-        LEFT JOIN
-            crisis_contracts cc
-                ON cc.sk_contract = ct.sk_contract
-        LEFT JOIN
-            dw_public.fact_house_listings fhl
-                ON ct.sk_contract = fhl.sk_contract
-        LEFT JOIN
-            dw_public.dim_contract dc
-                ON ct.sk_contract = dc.sk_contract
-        WHERE ct.status = 'DONE'
-            AND cc.sk_contract IS NULL
-            AND fhl.sk_partner = -1
-            AND ct.dt_termination > dc.dt_start
-            AND dc.country_code = 'BR'
-            AND dc.rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
-    )
-    SELECT
-        sk_contract,
-        'Rescisão' AS step
-    FROM
-        termination_requests_done
-    WHERE
-        days_since_finished = 2
+contracts AS (
+  SELECT 
+    dc.sk_contract,
+    dc.dt_start,
+    ct.ts_termination_finished,
+    CURRENT_DATE() - interval '15' day AS dt_recap,
+    DATEDIFF(CURRENT_DATE(), date(ct.ts_termination_finished)) AS ndays_termination2today,
+    CASE 
+      WHEN DATEDIFF(CURRENT_DATE(), date(ct.ts_termination_finished)) = 2 THEN 'termination'
+      WHEN DATEDIFF(CURRENT_DATE(), date(ct.ts_termination_finished)) = 15 THEN 'recap_termination'
+      ELSE NULL 
+    END AS termination_type
+  FROM
+    dw_public.dim_contract AS dc 
+  INNER JOIN 
+    datalake_offboarding.contract_termination AS ct 
+      ON dc.sk_contract = ct.id_contract
+  LEFT JOIN 
+    b2b_listings AS bl 
+      ON dc.sk_contract = bl.sk_contract
+  WHERE
+    dc.country_code = 'BR'   
+    AND ct.status = 'DONE'  
+    AND bl.sk_contract IS NULL	
+    AND ct.dt_termination >= dc.dt_start
+    AND dc.rental_administrator = 'QUINTOANDAR'
 ),
-tenants_dwellers AS (
-    SELECT
-        cp.cpf,
-        cp.id_user,
-        cp.name,
-        cp.email,
-        cp.phone_number,
-        oc.sk_contract,
-        oc.step,
-        DENSE_RANK() OVER(PARTITION BY cp.id_contract, cp.email ORDER BY cp.id) AS order_diff_email
-    FROM
-        offboarding_contracts_wo_ticket oc
-    INNER JOIN
-        datalake_ebdb_clean.contract_person cp
-            ON oc.sk_contract = cp.id_contract
-            AND cp.type IN ('Inquilino','Morador')
-            AND cp.email IS NOT NULL
-)
-SELECT
-    name AS customer_name,
-    email AS customer_email,
-    phone_number AS customer_phone,
-    step AS campaign_step,
-    'Inquilino' AS customer_type,
-    cpf AS customer_cpf,
-    id_user,
-    'true' AS campaign_type,
-    'contract' AS driver_type,
-    sk_contract AS id_driver
-FROM
-    tenants_dwellers
-WHERE
-    order_diff_email = 1
-UNION ALL
-SELECT
-    'Teste Disparo' AS customer_name,
-    'testes.disparos.5a@gmail.com' AS customer_email,
-    '+5511123456789' AS customer_phone,
+status_send AS (
+  SELECT 
+    c.sk_contract,
+    ft.sk_ticket,
+    c.ndays_termination2today,
+    c.termination_type,
+    dp.department,
+    dp.team,
+    c.dt_start ,
+    c.ts_termination_finished,
+    c.dt_recap,
+    ft.ts_started,
+    ft.ts_solved,
+    CASE 
+      WHEN (dp.department IN ('Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]') 
+        OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
+        OR (c.termination_type = 'termination' 
+          AND ft.sk_ticket IS NOT NULL 
+          AND ft.ts_solved IS NULL 
+          AND dp.sk_department IS NOT NULL) THEN 1
+       ELSE 0 
+     END AS flg_not_send,
+    CASE 
+      WHEN dp.department IN ('Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]') 
+        OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions') THEN 0
+      WHEN c.termination_type = 'recap_termination' 
+        AND ft.sk_ticket IS NOT NULL 
+        AND ft.ts_started < c.dt_recap  + interval '2' day
+        AND dp.department = 'Offboarding [OFF] [POS] [BACK]'
+        AND (ft.ts_solved >= c.dt_recap + interval '2' day OR ft.ts_solved IS NULL) THEN 1
+      ELSE 0
+     END AS flg_recap_send
+  FROM 
+    contracts AS c
+  LEFT JOIN 
+    dw_customer_support.fact_ticket AS ft 
+      ON c.sk_contract = ft.sk_contract 
+      AND ft.sk_contract IS NOT NULL
+  LEFT JOIN
+    dw_customer_support.dim_department AS dp 
+      ON ft.sk_main_department = dp.sk_department 
+      AND (dp.department IN ('Offboarding [OFF] [POS] [BACK]','Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]') 
+        OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))		
+  WHERE
+    c.termination_type IS NOT NULL  --('termination', 'recap_termination')
+),
+contracts_to_send AS (
+  SELECT 
+    sk_contract,
+    ndays_termination2today,
+    MAX(termination_type) AS termination_type,
+    MAX(flg_not_send) AS flg_not_send,
+    MAX(flg_recap_send) AS flg_recap_send
+  FROM 
+    status_send
+  GROUP BY 
+    1, 2
+  HAVING 
+    (MAX(termination_type) = 'termination' AND MAX(flg_not_send) = 0)
+    OR (MAX(termination_type) = 'recap_termination' AND MAX(flg_recap_send) = 1)
+),
+people_to_send AS (
+  SELECT 
+    cp.name AS customer_name,
+    cp.email AS customer_email,
+    cp.phone_number AS customer_phone,
     'Rescisão' AS campaign_step,
     'Inquilino' AS customer_type,
-    '12345' AS customer_cpf,
-    '12345' AS id_user,
+    cp.cpf AS customer_cpf,
+    cp.id_user,
     'true' AS campaign_type,
     'contract' AS driver_type,
-    '12345' AS id_driver
+    cp.id_contract AS id_driver
+  FROM 
+    datalake_ebdb_clean.contract_person AS cp 
+  INNER JOIN 
+    contracts_to_send AS cs 
+      ON cp.id_contract = cs.sk_contract 	
+  LEFT JOIN 
+    datalake_ebdb_clean.user_pro_owner AS po 
+      ON cp.id_user = po.id_user
+      AND po.is_active = true	
+  WHERE 
+    cp.type IN ('Inquilino','Morador')
+)
+SELECT
+  customer_name,
+  customer_email,
+  customer_phone,
+  campaign_step,
+  customer_type,
+  customer_cpf,
+  id_user,
+  campaign_type,
+  driver_type,
+  id_driver
+FROM
+  people_to_send
+UNION ALL
+SELECT
+  'Teste Disparo' AS customer_name,
+  'testes.disparos.5a@gmail.com' AS customer_email,
+  '+5511123456789' AS customer_phone,
+  'Rescisão' AS campaign_step,
+  'Inquilino' AS customer_type,
+  '12345' AS customer_cpf,
+  '12345' AS id_user,
+  'true' AS campaign_type,
+  'contract' AS driver_type,
+  '12345' AS id_driver
