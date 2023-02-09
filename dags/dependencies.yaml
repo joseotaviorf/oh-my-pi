@@ -2707,6 +2707,8 @@ bietlejuice.reverse_atento:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
+  - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
+  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
 
 # bietlejuice.reverse_navent_bigquery:
 #   - bietlejuice.dw_contract:load-dw-public-dim-contract
