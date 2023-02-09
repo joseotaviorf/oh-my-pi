@@ -56,6 +56,11 @@ Produces the following output tables:
     `condo_manager`
     `condo_manager_emails`
     `condo_manager_phones`
+    `conservation_assessment`
+    `conservation_item_functional`
+    `conservation_item_status`
+    `conservation_item`
+    `conservation_room`
     `contract`
     `contract_aud`
     `contract_negotiation`

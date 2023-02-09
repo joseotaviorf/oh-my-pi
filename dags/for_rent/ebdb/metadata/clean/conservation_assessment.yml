@@ -1,0 +1,28 @@
+---
+database_name: datalake_ebdb_clean
+table_name: conservation_assessment
+columns:
+  id_conservation_assessment:
+    lineage:
+      - datalake_ebdb_raw.conservationassessment.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.conservationassessment.imovelId
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.conservationassessment.userId
+  id_job:
+    lineage:
+      - datalake_ebdb_raw.conservationassessment.jobId
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.conservationassessment.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.conservationassessment.atualizadoEm
+  ts_started:
+    lineage:
+      - datalake_ebdb_raw.conservationassessment.startedAt
+  ts_ended:
+    lineage:
+      - datalake_ebdb_raw.conservationassessment.finishedAt
