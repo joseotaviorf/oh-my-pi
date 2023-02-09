@@ -2747,6 +2747,7 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_contract:load-dw-quintoandar-dim-contract-person
   - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
@@ -2758,7 +2759,9 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
   - bietlejuice.dw_user:load-dw-public-dim-user
+  - bietlejuice.ebdb:create-clean-contract-person-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-pro-owner-in-data-lake
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
   - bietlejuice.gsheets.support_and_service:load-clean-department-control
   - bietlejuice.terminator:load-clean-termination

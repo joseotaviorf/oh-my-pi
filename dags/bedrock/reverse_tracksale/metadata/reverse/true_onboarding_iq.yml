@@ -16,7 +16,7 @@ columns:
       - datalake_ebdb_clean.contract_person.cpf
   id_user:
     lineage:
-      - datalake_ebdb_clean.contract_person.cpf.id_user
+      - datalake_ebdb_clean.contract_person.id_user
   id_driver:
     lineage:
       - dw_public.dim_contract.sk_contract

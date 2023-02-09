@@ -1,114 +1,132 @@
-WITH anniversary_contracts AS (
-	SELECT
-		dc.sk_contract,
-		CAST(((current_date - COALESCE(dc.dt_start, date(dc.ts_signature))) / 30) + ' meses' AS STRING) AS step
-	FROM
-        dw_public.dim_contract dc
-	LEFT JOIN
-        datalake_terminator_clean.termination t
-		    ON dc.sk_contract = t.id_contract
-	WHERE
-        dc.status = 'Ativo'
-		AND COALESCE(dc.dt_start, date(dc.ts_signature)) IN (ADD_MONTHS(current_date, -6), ADD_MONTHS(current_date, -12), ADD_MONTHS(current_date, -18),
-			ADD_MONTHS(current_date, -24), ADD_MONTHS(current_date, -30), ADD_MONTHS(current_date, -36), ADD_MONTHS(current_date, -42),
-			ADD_MONTHS(current_date, -48), ADD_MONTHS(current_date, -54), ADD_MONTHS(current_date, -60))
-		AND t.id_contract IS NULL
-		AND dc.country_code = 'BR'
-		AND dc.rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
-
+WITH contracts AS (--all considered contracts, but without birthday criteria applied
+  SELECT 
+    dc.sk_contract,
+    dc.dt_start,
+    CURRENT_DATE() - INTERVAL '15' day AS dt_recap,
+    INT(MONTHS_BETWEEN(CURRENT_DATE(), dc.dt_start)) AS age,
+    INT(MONTHS_BETWEEN(CURRENT_DATE() - INTERVAL '15' day, dc.dt_start)) AS age_recap,
+    CASE 
+      WHEN DAY(dt_start) = DAY(CURRENT_DATE()) 
+        AND INT(MONTHS_BETWEEN(CURRENT_DATE(), dc.dt_start)) % 6 = 0 THEN 'birthday'
+      WHEN DAY(dt_start) = DAY(CURRENT_DATE() - INTERVAL '15' day) 
+        AND INT(MONTHS_BETWEEN(CURRENT_DATE() - INTERVAL '15' day, dc.dt_start )) % 6 = 0 THEN 'recap_birthday'
+      ELSE NULL 
+    END AS birth_type
+  FROM 
+    dw_public.dim_contract AS dc
+  LEFT JOIN 
+    datalake_offboarding.contract_termination AS ct 
+      ON dc.sk_contract = ct.id_contract 
+      AND ct.status != 'CANCELED'
+  WHERE
+    dc.country_code = 'BR'
+    AND dc.status = 'Ativo'
+    AND ct.id_contract IS NULL
+    AND dc.rental_administrator = 'QUINTOANDAR'
+    AND INT(MONTHS_BETWEEN(CURRENT_DATE(), dc.dt_start)) > 5
 ),
-recovery_contracts AS (
-	SELECT
-		ft.sk_contract,
-		'Repescagem Casos Especiais' AS step
-	FROM
-        dw_tickets.dim_ticket dt
-	INNER JOIN
-        dw_tickets.fact_tickets ft
-		    ON dt.sk_ticket  = ft.sk_ticket
-	INNER JOIN
-        dw_customer_support.dim_department dc
-		    ON dt.group_name = dc.department
-	LEFT JOIN
-        dw_public.dim_contract dc_
-	        ON dc_.sk_contract = ft.sk_contract
-	WHERE
-        dc.team IN ('Casos Especiais','Ouvidoria','ReclameAqui')
-		AND DATE(ft.ts_closed_local) = DATE_ADD(current_date, -10)
-		AND dc_.status = 'Ativo'
-		AND COALESCE(dc_.dt_start, date(dc_.ts_signature)) IN (ADD_MONTHS(current_date, -6), ADD_MONTHS(current_date, -12), ADD_MONTHS(current_date, -18),
-			ADD_MONTHS(current_date, -24), ADD_MONTHS(current_date, -30), ADD_MONTHS(current_date, -36), ADD_MONTHS(current_date, -42),
-			ADD_MONTHS(current_date, -48), ADD_MONTHS(current_date, -54), ADD_MONTHS(current_date, -60))
-		AND dc_.country_code = 'BR'
-		AND dc_.rental_administrator = 'QUINTOANDAR' --Excluding brokerage only from these metrics
-	GROUP BY 1,2
+status_send AS (--Evaluat every ticket related to an birthday contract ORcontract in recap
+  SELECT 
+    c.sk_contract,
+    c.age,
+    c.age_recap,
+    c.birth_type,
+    ft.front_or_back,
+    dp.team,
+    c.dt_start,
+    c.dt_recap,
+    ft.ts_started,
+    ft.ts_solved,
+    CASE 
+      WHEN c.birth_type = 'birthday'                   
+          AND ft.sk_ticket IS NOT NULL
+          AND ft.ts_solved IS NULL 
+          AND (ft.front_or_back = 'back' OR dp.team IS NOT NULL) THEN 1 
+      ELSE 0 
+    END AS flg_not_send,                                            
+    CASE 
+      WHEN c.birth_type = 'recap_birthday' 
+        AND ft.sk_ticket IS NOT NULL
+        AND ft.ts_started < c.dt_recap  
+        AND (ft.ts_solved >= c.dt_recap OR ft.ts_solved IS NULL) 
+        AND (ft.front_or_back = 'back' OR dp.team IS NOT NULL) THEN 1
+      ELSE 0
+    END AS flg_recap_send
+  FROM 
+    contracts AS c
+  LEFT JOIN 
+    dw_customer_support.fact_ticket AS ft 
+      ON c.sk_contract = ft.sk_contract 
+      AND ft.sk_contract IS NOT NULL
+  LEFT JOIN
+    dw_customer_support.dim_department AS dp
+      ON ft.sk_main_department = dp.sk_department 
+      AND dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions') 	
+  WHERE
+    c.birth_type IS NOT NULL
 ),
-crisis_users AS (
-	SELECT
-		ft.sk_contract
-	FROM
-        dw_tickets.dim_ticket dt
-	INNER JOIN
-        dw_tickets.fact_tickets ft
-		    ON dt.sk_ticket = ft.sk_ticket
-	INNER JOIN
-        dw_customer_support.dim_department dc
-		    ON dt.group_name = dc.department
-	WHERE
-        dc.team IN ('Casos Especiais','Proteção 5A','Ouvidoria','ReclameAqui')
-		AND ft.sk_solved_date_local = -1
-	GROUP BY 1
+contracts_to_send AS (--Select all contracts that can receive the nps survey
+  SELECT 
+    sk_contract,
+    age,
+    age_recap,
+    MAX(birth_type) AS birth_type,
+    MAX(flg_not_send) AS flg_not_send,
+    MAX(flg_recap_send) AS flg_recap_send
+  FROM 
+    status_send
+  GROUP BY 
+    1, 2, 3
+  HAVING 
+    (MAX(birth_type) = 'birthday' AND MAX(flg_not_send) = 0)                                
+    OR (MAX(birth_type) = 'recap_birthday' AND MAX(flg_recap_send) = 1)
 ),
-all_contracts AS (
-	SELECT * FROM anniversary_contracts
-	UNION
-	SELECT * FROM recovery_contracts
-),
-tenants_dwellers AS (
-	SELECT
-		cp.cpf,
-		cp.id_user,
-		cp.name,
-		cp.email,
-		cp.phone_number,
-		ac.sk_contract,
-		ac.step,
-		DENSE_RANK() OVER(PARTITION BY cp.id_contract, cp.email ORDER BY cp.id) AS order_diff_email
-	FROM
-        all_contracts ac
-	INNER JOIN
-        datalake_ebdb_clean.contract_person cp
-		    ON ac.sk_contract = cp.id_contract
-		    AND cp.type IN ('Inquilino','Morador')
-		    AND cp.email IS NOT NULL
-	LEFT JOIN
-        crisis_users uc
-		    ON uc.sk_contract = ac.sk_contract
-	WHERE
-        uc.sk_contract IS NULL
+people_to_send AS (--Selected all people than can receive the nps survey
+  SELECT 
+    cp.name AS customer_name,
+    cp.email AS customer_email,
+    cp.phone_number AS customer_phone,
+    CASE 
+      WHEN cs.birth_type = 'birthday' THEN STRING(cs.age) || ' meses' 
+      ELSE STRING(cs.age_recap) || ' meses' 
+    END AS campaign_step,
+    'Inquilino' AS customer_type,
+    cp.cpf AS customer_cpf,
+    cp.id_user,
+    'true' AS campaign_type,
+    'id_contract' AS driver_type,
+    cp.id_contract AS id_driver
+  FROM 
+    datalake_ebdb_clean.contract_person AS cp 
+  INNER JOIN 
+    contracts_to_send AS cs 
+      ON cp.id_contract = cs.sk_contract 	
+  WHERE 
+    cp.type IN ('Inquilino','Morador')
+    AND cp.email IS NOT NULL		                                                        
 )
 SELECT
-	name AS customer_name,
-	email AS customer_email,
-	phone_number AS customer_phone,
-	step AS campaign_step,
-	'Inquilino' AS customer_type,
-	cpf AS customer_cpf,
-	id_user,
-	'true' AS campaign_type,
-	'id_contract' AS driver_type,
-	sk_contract AS id_driver
-FROM tenants_dwellers
-WHERE order_diff_email = 1
+  customer_name,
+  customer_email,
+  customer_phone,
+  campaign_step,
+  customer_type,
+  customer_cpf,
+  id_user,
+  campaign_type,
+  driver_type,
+  id_driver
+FROM 
+  people_to_send
 UNION ALL
 SELECT
-	'Teste Disparo' AS customer_name,
-	'testes.disparos.5a@gmail.com' AS customer_email,
-	'+5511123456789' AS customer_phone,
-	'12 meses' AS campaign_step,
-	'Inquilino' AS customer_type,
-	'1234' AS customer_cpf,
-	'1234' AS id_user,
-	'true' AS campaign_type,
-	'id_contract' AS driver_type,
-	'1234' AS id_driver
+  'Teste Disparo' AS customer_name,
+  'testes.disparos.5a@gmail.com' AS customer_email,
+  '+5511123456789' AS customer_phone,
+  '12 meses' AS campaign_step,
+  'Inquilino' AS customer_type,
+  '1234' AS customer_cpf,
+  '1234' AS id_user,
+  'true' AS campaign_type,
+  'id_contract' AS driver_type,
+  '1234' AS id_driver
