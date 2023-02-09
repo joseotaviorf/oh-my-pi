@@ -54,7 +54,26 @@ all_users AS (
     	public.dim_user
     JOIN phone_users_number
         ON phone_users_number.from_phone_number = public.dim_user.telefone_principal
+    WHERE
+        dt_interaction < DATE('2022-10-17')
     UNION ALL
+--  New CX taxonomies created to identify tickets about Plaquinhas. Effective from 17/10/2022.
+    SELECT
+      id_user AS sk_user,
+      NULL::BOOL AS is_qr_code_user,
+	  true AS is_phone_user,
+	  NULL::BOOL AS is_chat_user,
+	  DATE(ts_ticket_started) AS dt_interaction
+	FROM 
+	    datalake_customer_support_prod.call 
+	WHERE 
+	    contact_theme_detail_tag IN ( 
+	      'rental_listing_register_search_properties_sale_or_lease_signs' ,
+	      'rental_listing_register_sign_real_estate_info',
+          'house_plate_info') 
+	    AND id_user IS NOT NULL
+        AND DATE(ts_ticket_started) >= '2022-10-17'
+	UNION ALL 
 ------------------
 -- Chat users --
 ------------------
@@ -68,6 +87,23 @@ all_users AS (
     	public.dim_user
     JOIN chat_users_number
         ON chat_users_number.customer_phone = public.dim_user.telefone_principal
+	UNION ALL
+--  New CX taxonomies created to identify tickets about Plaquinhas. Effective from 17/10/2022.
+	SELECT
+	    id_user AS sk_user,
+	    NULL::BOOL AS is_qr_code_user,
+	    NULL::BOOL AS is_phone_user,
+	    true AS is_chat_user,
+	    DATE(ts_ticket_started) AS dt_interaction
+	FROM 
+	    datalake_customer_support_prod.chat 
+	WHERE 
+	    contact_theme_detail_tag IN ( 
+	      'rental_listing_register_search_properties_sale_or_lease_signs' ,
+	      'rental_listing_register_sign_real_estate_info',
+          'house_plate_info') 
+	    AND id_user IS NOT NULL
+        AND DATE(ts_ticket_started) >= '2022-10-17'
 	UNION ALL
 --------------
 -- CX users --

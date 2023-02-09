@@ -352,6 +352,8 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-listing-page-viewed-external-table
   - bietlejuice.enrich_bigfone_twilio:create-enrich-call-flex-events-external-table
+  - bietlejuice.enrich_customer_support:create-enrich-call-external-table
+  - bietlejuice.enrich_customer_support:create-enrich-chat-external-table
   - bietlejuice.enrich_rental_historical_follow_up:create-enrich-house-listings-daily-info-external-table
   - bietlejuice.enrich_top_of_funnel_demand:create-enrich-user-interactions-external-table
   - bietlejuice.gsheets.growth:create-clean-affiliates-extra-user-bonus-external-table
@@ -2531,11 +2533,8 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.casa_mineira_crm:load-clean-origin-contact
   - bietlejuice.casa_mineira_crm:load-clean-media-contact
   - bietlejuice.ebdb:create-clean-user-in-data-lake
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
-  - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
-  - bietlejuice.enrich_quinto_messenger:load-enrich-task
-  - bietlejuice.enrich_quinto_messenger:load-enrich-channel
+  - bietlejuice.enrich_customer_support:load-enrich-call
+  - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
   - bietlejuice.demand_contact_submission:load-clean-contact-submissions

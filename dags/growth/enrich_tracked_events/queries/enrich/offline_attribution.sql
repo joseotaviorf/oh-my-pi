@@ -74,6 +74,36 @@ chat_users_number AS (
   GROUP BY
     1,2
 ),
+--  New CX taxonomies created to identify tickets about Plaquinhas. Effective from 17/10/2022.	
+cx_taxonomy_phone_events AS (	
+  SELECT	
+    id_user,	
+    ts_ticket_started AS ts_event	
+  FROM 	
+     datalake_customer_support.call 	
+  WHERE 	
+	contact_theme_detail_tag IN ( 	
+	  'rental_listing_register_search_properties_sale_or_lease_signs' ,	
+	  'rental_listing_register_sign_real_estate_info',	
+    'house_plate_info') 	
+	AND id_user IS NOT NULL	
+    AND DATE(ts_ticket_started) >= DATE('2022-10-17')	
+), 	
+--  New CX taxonomies created to identify tickets about Plaquinhas. Effective from 17/10/2022.	
+cx_taxonomy_chat_events AS (	
+  SELECT	
+    id_user,	
+    ts_ticket_started AS ts_event	
+  FROM 	
+     datalake_customer_support.chat	
+  WHERE 	
+	contact_theme_detail_tag IN ( 	
+	  'rental_listing_register_search_properties_sale_or_lease_signs' ,	
+	  'rental_listing_register_sign_real_estate_info',	
+    'house_plate_info') 	
+	AND id_user IS NOT NULL	
+    AND DATE(ts_ticket_started) >= DATE('2022-10-17')	
+), 
 contact_cx AS (
   SELECT
     user.id AS id_user,
@@ -85,6 +115,14 @@ contact_cx AS (
       ON pn.from_phone_number = user.main_phone
   WHERE
     user.id > 0
+    AND DATE(ts_event) < DATE('2022-10-17')
+  UNION ALL
+  SELECT	
+    id_user,	
+    'Telefone' AS canal,	
+    ts_event	
+  FROM	
+    cx_taxonomy_phone_events	
   UNION ALL
   SELECT
     user.id AS id_user,
@@ -96,6 +134,13 @@ contact_cx AS (
       ON cn.customer_phone = user.main_phone
   WHERE
     user.id > 0
+  UNION ALL
+	SELECT	
+    id_user,	
+    'Chat' AS canal,	
+    ts_event	
+  FROM	
+    cx_taxonomy_chat_events
   UNION ALL
   SELECT
     INT(id_user) AS id_user,
