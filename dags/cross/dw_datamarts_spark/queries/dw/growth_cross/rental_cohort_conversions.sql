@@ -563,7 +563,7 @@ vb2vc AS (
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
-vb2os AS (
+vb2os_aux AS (
     SELECT
         dd.date,
         dd.sk_date,
@@ -579,11 +579,11 @@ vb2os AS (
         rf.funnel_first_touchpoint AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS INT), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS INT),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
-                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd'))) >= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS INT), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS INT),'yyyyMMdd'))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS INT), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS INT),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS INT), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS INT),'yyyyMMdd'))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
@@ -621,6 +621,97 @@ vb2os AS (
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+),
+vb_aux AS (
+    SELECT
+        date,
+        sk_date,
+        city_group,
+        country_code,
+        is_b2b,
+        supply_mkt_origin,
+        supply_mkt_channel,
+        lead_context,
+        lead_processing_operation,
+        demand_mkt_channel,
+        demand_mkt_medium,
+        first_touchpoint,
+        is_guarantee,
+        NULL as weeks_conversion,
+        vb2vc as vb,
+        NULL::BIGINT as vb2os
+    FROM vb2vc
+    UNION ALL
+    SELECT
+        date,
+        sk_date,
+        city_group,
+        country_code,
+        is_b2b,
+        supply_mkt_origin,
+        supply_mkt_channel,
+        lead_context,
+        lead_processing_operation,
+        demand_mkt_channel,
+        demand_mkt_medium,
+        first_touchpoint,
+        is_guarantee,
+        NULL as weeks_conversion,
+        NULL::BIGINT as vb,
+        vb2os
+    FROM vb2os_aux
+),
+vb_aux2 AS(
+    SELECT
+        date,
+        sk_date,
+        city_group,
+        country_code,
+        is_b2b,
+        supply_mkt_origin,
+        supply_mkt_channel,
+        lead_context,
+        lead_processing_operation,
+        demand_mkt_channel,
+        demand_mkt_medium,
+        first_touchpoint,
+        is_guarantee,
+        weeks_conversion,
+        NULL::BIGINT AS l2p,
+        NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
+        NULL::BIGINT AS q2opp,
+        NULL::BIGINT AS opp2fl,
+        NULL::BIGINT AS vb2vc,
+        SUM(vb) - SUM(vb2os) as vb2os,
+        NULL::BIGINT AS vc,
+        NULL::BIGINT AS vc2os,
+        NULL::BIGINT AS os2oa,
+        NULL::BIGINT AS oa2cei,
+        NULL::BIGINT AS oa2da,
+        NULL::BIGINT AS oa2ds,
+        NULL::BIGINT AS cei2cep,
+        NULL::BIGINT AS cei2gs,
+        NULL::BIGINT AS cep2ds,
+        NULL::BIGINT AS gs2ds,
+        NULL::BIGINT AS ds2da,
+        NULL::BIGINT AS da2cc,
+        NULL::BIGINT AS da2gp,
+        NULL::BIGINT AS gp2cc,
+        NULL::BIGINT AS da2cs,
+        NULL::BIGINT AS da_gp2cs,
+        NULL::BIGINT AS cc2cs,
+        NULL::BIGINT AS cs2ce
+    FROM vb_aux
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+),
+vb2os AS (
+    SELECT *
+    FROM vb2os_aux
+    UNION ALL
+    SELECT *
+    FROM vb_aux2
 ),
 vc AS (
     SELECT
@@ -664,12 +755,10 @@ vc AS (
         NULL::BIGINT AS da_gp2cs,
         NULL::BIGINT AS cc2cs,
         NULL::BIGINT AS cs2ce
-    FROM
-        dw_public.dim_date dd
-    JOIN
-        rent_flow_adjusted rf
-            ON dd.sk_date = rf.sk_visit_date
-                AND rf.sk_visit_date > 0 AND rf.flg_visit_completed = 1
+    FROM dw_public.dim_date dd
+    JOIN rent_flow_adjusted rf
+        ON dd.sk_date = rf.sk_visit_date
+        AND rf.sk_visit_date > 0 AND rf.flg_visit_completed = 1
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
