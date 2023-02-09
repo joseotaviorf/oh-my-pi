@@ -37,9 +37,9 @@ if __name__ == "__main__":
     parser.add_argument("partitions")
     parser.add_argument("execution_date")
     parser.add_argument(
-        "cluster_config_params",
+        "spark_session_configs",
         type=str,
-        help="custom config parameters to be set in spark cluster",
+        help="custom config parameters to be set in spark session",
     )
     parser.add_argument(
         "additional_query_template_params",
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     query_template_params = json.loads(
         args.additional_query_template_params.replace("'", '"')
     )
-    cluster_config_params = json.loads(args.cluster_config_params)
+    spark_session_configs = json.loads(args.spark_session_configs)
 
     logger.info(
         f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, layer={layer}, "
@@ -118,6 +118,6 @@ if __name__ == "__main__":
         query_template_params=query_template_params,
         target_database_name=target_database_name,
         target_database_location=target_database_location,
-        cluster_config_params=cluster_config_params,
+        spark_session_configs=spark_session_configs,
     )
     table_loader_pipeline.run()

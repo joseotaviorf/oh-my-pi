@@ -382,7 +382,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         partitions=None,
         is_incremental=False,
         has_create_external_table_task=True,
-        cluster_config_params=None,
+        spark_session_configs=None,
         extra_query_template_params=None,
         schema="",  # TODO: Remove schema param after dags are all in pattern
         # 'schema' parameter could be replaced by source or target database_base_name.
@@ -416,8 +416,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type is_incremental: bool
         :param has_create_external_table_task: if this table is going to be loaded into Athena
         :type has_create_external_table_task: bool
-        :param cluster_config_params: custom config parameters to be set in spark cluster
-        :type cluster_config_params: dict
+        :param spark_session_configs: custom config parameters to be set in spark session
+        :type spark_session_configs: dict
         :param extra_query_template_params: filter parameters applied to
             the query besides year, month and day
         :type extra_query_template_params: dict
@@ -431,7 +431,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :rtype: dict
         """
         partitions = partitions or []
-        cluster_config_params = cluster_config_params or {}
+        spark_session_configs = spark_session_configs or {}
         extra_query_template_params = extra_query_template_params or {}
 
         table_extraction_type = "incremental" if is_incremental else "full"
@@ -452,7 +452,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         table_name,
                         str(partitions),
                         execution_date,
-                        json.dumps(cluster_config_params),
+                        json.dumps(spark_session_configs),
                         str(extra_query_template_params),
                         schema,
                         tree_path,
@@ -629,7 +629,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         partitions=None,
         is_incremental=False,
         has_create_external_table_task=True,
-        cluster_config_params=None,
+        spark_session_configs=None,
         extra_query_template_params=None,
         schema="",
         tree_path="",
@@ -654,8 +654,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type is_incremental: bool
         :param has_create_external_table_task: if this table is going to be loaded into Athena
         :type has_create_external_table_task: bool
-        :param cluster_config_params: custom config parameters to be set in spark cluster
-        :type cluster_config_params: dict
+        :param spark_session_configs: custom config parameters to be set in spark session
+        :type spark_session_configs: dict
         :param extra_query_template_params: filter parameters applied to
             the query besides year, month and day
         :type extra_query_template_params: dict
@@ -676,7 +676,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             partitions,
             is_incremental,
             has_create_external_table_task,
-            cluster_config_params,
+            spark_session_configs,
             extra_query_template_params,
             schema,
             tree_path,
@@ -693,7 +693,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         partitions=None,
         is_incremental=False,
         has_create_external_table_task=True,
-        cluster_config_params=None,
+        spark_session_configs=None,
         extra_query_template_params=None,
         schema="",
         execution_date="{{ ds }}",
@@ -717,8 +717,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type is_incremental: bool
         :param has_create_external_table_task: if this table is going to be loaded into Athena
         :type has_create_external_table_task: bool
-        :param cluster_config_params: custom config parameters to be set in spark cluster
-        :type cluster_config_params: dict
+        :param spark_session_configs: custom config parameters to be set in spark session
+        :type spark_session_configs: dict
         :param extra_query_template_params: filter parameters applied to
             the query besides year, month and day
         :type extra_query_template_params: dict
@@ -738,7 +738,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             partitions,
             is_incremental,
             has_create_external_table_task,
-            cluster_config_params,
+            spark_session_configs,
             extra_query_template_params,
             schema,
             execution_date=execution_date,

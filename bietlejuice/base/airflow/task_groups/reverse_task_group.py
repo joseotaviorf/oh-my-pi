@@ -60,7 +60,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
-        cluster_config_params=None,
+        spark_session_configs=None,
         extra_query_template_params=None,
         tree_path="",
         execution_date="{{ ds }}",
@@ -85,8 +85,8 @@ class ReverseTaskGroup(BaseTaskGroup):
         :type partitions: list[str]
         :param is_incremental: if this table uses incremental load type
         :type is_incremental: bool
-        :param cluster_config_params: custom config parameters to be set in spark cluster
-        :type cluster_config_params: dict
+        :param spark_session_configs: custom config parameters to be set in spark session
+        :type spark_session_configs: dict
         :param extra_query_template_params: filter parameters applied to
             the query besides year, month and day
         :type extra_query_template_params: dict
@@ -98,7 +98,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         """
         slugged_table_name = StringFormatter.slugify(table_name)
         partitions = partitions or []
-        cluster_config_params = cluster_config_params or {}
+        spark_session_configs = spark_session_configs or {}
         extra_query_template_params = extra_query_template_params or {}
 
         load_table_mode = "incremental" if is_incremental else "full"
@@ -119,7 +119,7 @@ class ReverseTaskGroup(BaseTaskGroup):
                         table_name,
                         str(partitions),
                         execution_date,
-                        json.dumps(cluster_config_params),
+                        json.dumps(spark_session_configs),
                         str(extra_query_template_params),
                         "",
                         tree_path,
@@ -174,7 +174,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
-        cluster_config_params=None,
+        spark_session_configs=None,
         extra_query_template_params=None,
         execution_date="{{ ds }}",
         table_customization=None,
@@ -194,8 +194,8 @@ class ReverseTaskGroup(BaseTaskGroup):
         :type partitions: list[str]
         :param is_incremental: if this table uses incremental load type
         :type is_incremental: bool
-        :param cluster_config_params: custom config parameters to be set in spark cluster
-        :type cluster_config_params: dict
+        :param spark_session_configs: custom config parameters to be set in spark session
+        :type spark_session_configs: dict
         :param extra_query_template_params: filter parameters applied to
             the query besides year, month and day
         :type extra_query_template_params: dict
@@ -211,7 +211,7 @@ class ReverseTaskGroup(BaseTaskGroup):
             table_name,
             partitions,
             is_incremental,
-            cluster_config_params,
+            spark_session_configs,
             extra_query_template_params,
             execution_date=execution_date,
             table_customization=table_customization,

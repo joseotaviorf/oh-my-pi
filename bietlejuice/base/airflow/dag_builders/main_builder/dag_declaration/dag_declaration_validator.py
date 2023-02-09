@@ -1,4 +1,5 @@
 import json
+from bietlejuice.base.udfs.udf_enum import UDFEnum
 from cerberus import Validator
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
@@ -48,6 +49,17 @@ class DAGDeclarationValidator(Validator):
                 "custom_schema": {"type": "string", "empty": False},
                 "tables_customization": {"type": "dict", "empty": False},
                 "has_load_to_redshift_task": {"type": "boolean", "empty": False},
+                "spark_session_configs": {
+                    "type": "dict",
+                    "empty": False,
+                    "schema": {
+                        "udfs": {
+                            "type": "list",
+                            "empty": False,
+                            "allowed": UDFEnum.get_available_enum_values(),
+                        }
+                    },
+                },
             },
         },
         "cluster": {

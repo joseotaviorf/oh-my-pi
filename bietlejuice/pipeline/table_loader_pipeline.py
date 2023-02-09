@@ -4,9 +4,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.pipeline.abstract_pipeline import AbstractPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services.spark_services.spark_configurator_service import (
-    SparkConfiguratorService,
-)
+from bietlejuice.base.udfs.udf_enum import UDFEnum
 
 
 class TableLoaderPipeline(AbstractPipeline):
@@ -25,7 +23,7 @@ class TableLoaderPipeline(AbstractPipeline):
         query_template_params=None,
         target_database_name=None,
         target_database_location=None,
-        cluster_config_params=None,
+        spark_session_configs=None,
     ):
         """
         :param database_name: database name to create the enriched table
@@ -37,7 +35,7 @@ class TableLoaderPipeline(AbstractPipeline):
         :param query_template_params: dict of parameters to apply to query template, example: {'year':2020, 'month':1, 'day':1}
         :param target_database_name: target database name
         :param target_database_location: target database location in S3
-        :param cluster_config_params: custom config parameters to be set in spark cluster
+        :param spark_session_configs: custom config parameters to be set in spark session
         """
         self.database_name = database_name
         self.table_name = table_name
@@ -48,7 +46,7 @@ class TableLoaderPipeline(AbstractPipeline):
         self.target_database_name = target_database_name or database_name
         self.target_database_location = target_database_location or database_location
         self.partitions = partitions or []
-        self.cluster_config_params = cluster_config_params
+        self.spark_session_configs = spark_session_configs or {}
 
     def run(self):
         """
@@ -62,11 +60,8 @@ class TableLoaderPipeline(AbstractPipeline):
         for database in databases_to_be_created:
             spark_metastore_service.create_database(database)
 
-        if self.cluster_config_params:
-            spark_configurator_service = SparkConfiguratorService(
-                spark_client, self.cluster_config_params
-            )
-            spark_configurator_service.configure_spark_session()
+        for udf_identifier in self.spark_session_configs.get("udfs", []):
+            self.register_udf(spark_client, udf_identifier)
 
         conn_config = {"db": self.database_name}
         databricks_consumer = DatabricksConsumer(conn_config, spark_client)
@@ -82,3 +77,19 @@ class TableLoaderPipeline(AbstractPipeline):
     @abstractmethod
     def load_and_register(self, df, format_options):
         raise NotImplementedError()
+
+    def register_udf(self, spark_client, udf_identifier):
+        """
+        Registers a function as a UDF into Spark session, setting the `udf_indentifier`
+        as an available SQL function call. It uses the provided `udf_identifier` to
+        retrieve the function from a Enum mapping.
+
+        :param spark_client : Spark client object, whose session will be used.
+        :type spark_client: SparkClient
+        :param udf_identifier: a string representing the UDF identifier. Also used to
+                  call the respective function inside SQL queries.
+        :type udf_identifier: str
+        """
+        udf = UDFEnum.get_udf(udf_identifier=udf_identifier)
+        if udf:
+            spark_client.conn.udf.register(udf_identifier, udf)

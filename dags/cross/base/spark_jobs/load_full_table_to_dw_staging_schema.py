@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("dw_schema")
     parser.add_argument("relative_query_path")
     parser.add_argument("table_name")
-    parser.add_argument("cluster_config_params")
+    parser.add_argument("spark_session_configs")
     parser.add_argument("tree_path")
 
     args = parser.parse_args()
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     dw_schema = args.dw_schema
     relative_query_path = args.relative_query_path
     table_name = args.table_name
-    cluster_config_params = json.loads(args.cluster_config_params)
+    spark_session_configs = json.loads(args.spark_session_configs)
     tree_path = args.tree_path
 
     logger.info(
@@ -57,6 +57,6 @@ if __name__ == "__main__":
         database_location=dw_staging_db_location,
         layer=LayerEnum.DW_STAGING.value,
         query=query,
-        cluster_config_params=cluster_config_params,
+        spark_session_configs=spark_session_configs,
     )
     table_loader_pipeline.run()

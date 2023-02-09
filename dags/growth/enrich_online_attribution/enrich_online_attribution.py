@@ -94,7 +94,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     is_incremental=True,
     has_create_external_table_task=False,
     partitions=PARTITION_COLS,
-    cluster_config_params={"udfs": ["SF_ALPHANUMERIC_SNAKE_CASE"]},
+    spark_session_configs={"udfs": ["SF_ALPHANUMERIC_SNAKE_CASE"]},
 )
 
 (

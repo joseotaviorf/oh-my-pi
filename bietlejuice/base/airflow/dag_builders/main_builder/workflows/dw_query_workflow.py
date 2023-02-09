@@ -36,6 +36,7 @@ class DWQueryWorkflow(BaseWorkflow):
         has_load_to_redshift_task = self.workflow_args.get(
             "has_load_to_redshift_task", True
         )
+        spark_session_configs = self.workflow_args.get("spark_session_configs", {})
         cluster_params = self.get_cluster_params()
 
         dw_bucket = self.config_service.get_config("dw_bucket")
@@ -57,6 +58,7 @@ class DWQueryWorkflow(BaseWorkflow):
 
         dw_staging_task_group = task_group.build_task_group_from_sql_files(
             layer=LayerEnum.DW_STAGING,
+            spark_session_configs=spark_session_configs,
             tables_customization=tables_customization,
             partitions=default_partitions,
             is_incremental=default_is_incremental,

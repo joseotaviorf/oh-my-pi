@@ -26,7 +26,7 @@ if __name__ == "__main__":
     parser.add_argument("partitions")
     parser.add_argument("execution_date")
     parser.add_argument("extra_query_template_params")
-    parser.add_argument("cluster_config_params")
+    parser.add_argument("spark_session_configs")
     parser.add_argument("tree_path", type=str, help="path to reach the query place")
 
     args = parser.parse_args()
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     partitions = json.loads(args.partitions.replace("'", '"'))
     execution_date = args.execution_date
     extra_query_template_params = json.loads(args.extra_query_template_params)
-    cluster_config_params = json.loads(args.cluster_config_params)
+    spark_session_configs = json.loads(args.spark_session_configs)
     tree_path = args.tree_path
 
     logger.info(
@@ -70,7 +70,7 @@ if __name__ == "__main__":
         database_location=dw_staging_db_location,
         layer=LayerEnum.DW_STAGING.value,
         query=query,
-        cluster_config_params=cluster_config_params,
+        spark_session_configs=spark_session_configs,
         partitions=partitions,
         query_template_params=extra_query_template_params,
     )

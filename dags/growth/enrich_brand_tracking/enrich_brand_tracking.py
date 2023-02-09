@@ -107,7 +107,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     target_database_base_name=CONTEXT,
     is_incremental=True,
     partitions=PARTITION_COLS,
-    cluster_config_params={"udfs": ["SF_ALPHANUMERIC_SNAKE_CASE"]},
+    spark_session_configs={"udfs": ["SF_ALPHANUMERIC_SNAKE_CASE"]},
     extra_query_template_params={
         "year_previous_quarter": "{{ get_date_from_previous_quarter(ds).year }}",
         "previous_quarter": "{{ get_previous_quarter(ds) }}",

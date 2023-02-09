@@ -244,7 +244,7 @@ class DWTaskGroup(BaseTaskGroup):
         is_incremental: bool = False,
         partitions: List[str] = None,
         extra_query_template_params: dict = None,
-        cluster_config_params: dict = None,
+        spark_session_configs: dict = None,
         tree_path: str = "",
         table_customization: Dict[str, Dict[str, str]] = None,
     ) -> dict:
@@ -258,7 +258,7 @@ class DWTaskGroup(BaseTaskGroup):
         :param is_incremental: if this table uses incremental load type
         :param partitions: list of columns to partition table
         :param extra_query_template_params: additional parameters to be supplied to query template
-        :param cluster_config_params: custom config parameters to be set in spark cluster
+        :param spark_session_configs: custom config parameters to be set in spark session
         :param tree_path: subfolder where the query is located. By default, an empty string, which means it's in the root folder "dw"
         :param table_customization: table's structure customization, when applicable
         :return: dict with initial and final tasks of the created task group
@@ -274,7 +274,7 @@ class DWTaskGroup(BaseTaskGroup):
         partitions = self.__get_table_partitions(table_customization, partitions)
         is_incremental = table_extraction_type == "incremental"
         extra_query_template_params = extra_query_template_params or {}
-        cluster_config_params = cluster_config_params or {}
+        spark_session_configs = spark_session_configs or {}
 
         load_table_to_dw_staging_params = [
             self.env,
@@ -300,7 +300,7 @@ class DWTaskGroup(BaseTaskGroup):
                 "spark_python_task": {
                     "python_file": f"{self.spark_jobs_path}/load_{table_extraction_type}_table_to_dw_staging_schema.py",
                     "parameters": load_table_to_dw_staging_params
-                    + [json.dumps(cluster_config_params), tree_path],
+                    + [json.dumps(spark_session_configs), tree_path],
                 }
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
