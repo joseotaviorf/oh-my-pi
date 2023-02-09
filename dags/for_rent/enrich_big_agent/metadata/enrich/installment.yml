@@ -7,6 +7,9 @@ columns:
   id_external_invoice:
     lineage:
       - datalake_big_agent_clean.installment.id_external_invoice
+  id_earning:
+    lineage:
+      - datalake_big_agent_clean.installment.id_earning
   uuid_installment:
     lineage:
       - datalake_big_agent_clean.installment.uuid_installment

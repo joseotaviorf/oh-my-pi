@@ -9,6 +9,7 @@ WITH installment AS (
 SELECT
     id,
     id_external_invoice,
+    id_earning,
     uuid_installment,
     type,
     amount,
