@@ -52,33 +52,33 @@ columns:
     lineage:
       - datalake_velo_clean.fiancavelo_fianca.dt_ended
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
-  dt_propose_started:
+  ts_propose_started:
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
-  dt_waiting_new_docs:
+  ts_waiting_new_docs:
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
-  dt_evaluation_started:
+  ts_evaluation_started:
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
-  dt_rejected:
+  ts_rejected:
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
-  dt_sign_started:
+  ts_sign_started:
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
-  dt_paid:
+  ts_paid:
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
-  dt_activation:
+  ts_activation:
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
-  dt_secured:
+  ts_secured:
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
-  dt_activation_analysis:
+  ts_activation_analysis:
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
-  dt_secure_pending:
+  ts_secure_pending:
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated

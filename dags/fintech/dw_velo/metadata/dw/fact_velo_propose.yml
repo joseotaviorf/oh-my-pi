@@ -53,42 +53,51 @@ columns:
   avg_declared_income:
     lineage:
       - datalake_velo.propose.avg_declared_income
+  total_declared_income:
+    lineage:
+      - datalake_velo.propose.total_declared_income
+  dti:
+    lineage:
+      - datalake_velo.propose.dti
   is_contract:
     lineage:
       - datalake_velo.propose.is_contract
+  is_grace_period_cancelled:
+    lineage:
+      - datalake_velo.propose.is_grace_period_cancelled
   dt_contract_started:
     lineage:
       - datalake_velo.propose.dt_contract_started
   dt_ended:
     lineage:
       - datalake_velo.propose.dt_ended
-  dt_propose_started:
+  ts_propose_started:
     lineage:
-      - datalake_velo.propose.dt_propose_started
-  dt_waiting_new_docs:
+      - datalake_velo.propose.ts_propose_started
+  ts_waiting_new_docs:
     lineage:
-      - datalake_velo.propose.dt_waiting_new_docs
-  dt_evaluation_started:
+      - datalake_velo.propose.ts_waiting_new_docs
+  ts_evaluation_started:
     lineage:
-      - datalake_velo.propose.dt_evaluation_started
-  dt_rejected:
+      - datalake_velo.propose.ts_evaluation_started
+  ts_rejected:
     lineage:
-      - datalake_velo.propose.dt_rejected
-  dt_sign_started:
+      - datalake_velo.propose.ts_rejected
+  ts_sign_started:
     lineage:
-      - datalake_velo.propose.dt_sign_started
-  dt_paid:
+      - datalake_velo.propose.ts_sign_started
+  ts_paid:
     lineage:
-      - datalake_velo.propose.dt_paid
-  dt_activation:
+      - datalake_velo.propose.ts_paid
+  ts_activation:
     lineage:
-      - datalake_velo.propose.dt_activation
-  dt_secured:
+      - datalake_velo.propose.ts_activation
+  ts_secured:
     lineage:
-      - datalake_velo.propose.dt_secured
-  dt_activation_analysis:
+      - datalake_velo.propose.ts_secured
+  ts_activation_analysis:
     lineage:
-      - datalake_velo.propose.dt_activation_analysis
-  dt_secure_pending:
+      - datalake_velo.propose.ts_activation_analysis
+  ts_secure_pending:
     lineage:
-      - datalake_velo.propose.dt_secure_pending
+      - datalake_velo.propose.ts_secure_pending

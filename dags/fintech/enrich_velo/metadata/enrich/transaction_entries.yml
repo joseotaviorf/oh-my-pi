@@ -32,13 +32,13 @@ columns:
   total_expected_installments:
     lineage:
       - datalake_velo_omie.cash_flows.id_installment
-  transaction_due_amount:
+  due_amount:
     lineage:
       - datalake_velo_omie.cash_flows.due_amount
-  transaction_paid_amount:
+  paid_amount:
     lineage:
       - datalake_velo_omie.cash_flows.paid_amount
-  category_percent_amount:
+  percent_amount_from_transaction:
     lineage:
       - datalake_velo_omie.cash_flows_categories.category_percentage
   dt_issue:
@@ -47,15 +47,15 @@ columns:
   dt_register:
     lineage:
       - datalake_velo_omie.cash_flows.dt_register
-  dt_created:
-    lineage:
-      - datalake_velo_omie.cash_flows.ts_created
-  dt_modified:
-    lineage:
-      - datalake_velo_omie.cash_flows.ts_modified
   dt_due:
     lineage:
       - datalake_velo_omie.cash_flows.dt_due
   dt_paid:
     lineage:
       - datalake_velo_omie.cash_flows.dt_payment
+  ts_created:
+    lineage:
+      - datalake_velo_omie.cash_flows.ts_created
+  ts_modified:
+    lineage:
+      - datalake_velo_omie.cash_flows.ts_modified

@@ -5,16 +5,16 @@ SELECT
     id_propose AS sk_propose,
     id_bank_account AS sk_bank_account,
     id_omie_client AS sk_omie_client,
-    category_percent_amount,
-    category_due_amount,
-    category_paid_amount,
+    percent_amount_from_transaction,
+    due_amount,
+    paid_amount,
     is_occurency,
     dt_issue,
     dt_register,
-    dt_created,
-    dt_modified,
     dt_due,
     dt_paid,
+    ts_created,
+    ts_modified,
     NOW() AS ts_load
 FROM
     datalake_velo.transaction_entries

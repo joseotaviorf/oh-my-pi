@@ -32,3 +32,6 @@ columns:
   is_broker_active:
     lineage:
       - datalake_velo_clean.fiancavelo_realestate.is_active
+  ts_created:
+    lineage:
+      - datalake_velo_clean.fiancavelo_realestate.ts_inserted

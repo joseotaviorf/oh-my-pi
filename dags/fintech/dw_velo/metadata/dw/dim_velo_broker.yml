@@ -32,3 +32,6 @@ columns:
   is_broker_active:
     lineage:
       - datalake_velo.broker.is_broker_active
+  ts_created:
+    lineage:
+      - datalake_velo.broker.ts_created

@@ -1,0 +1,55 @@
+---
+database_name: datalake_velo
+table_name: omie_client
+columns:
+  id_client:
+    lineage:
+      - datalake_velo_omie_clean.clients.id_client
+  corporate_name:
+    lineage:
+      - datalake_velo_omie_clean.clients.corporate_name
+  name_doing_business_as:
+    lineage:
+      - datalake_velo_omie_clean.clients.name_doing_business_as
+  client_cpf_cnpj:
+    lineage:
+      - datalake_velo_omie_clean.clients.client_cpf_cnpj
+  email:
+    lineage:
+      - datalake_velo_omie_clean.clients.email
+  address:
+    lineage:
+      - datalake_velo_omie_clean.clients.address
+  address_number:
+    lineage:
+      - datalake_velo_omie_clean.clients.address_number
+  address_complement:
+    lineage:
+      - datalake_velo_omie_clean.clients.address_complement
+  neighborhood:
+    lineage:
+      - datalake_velo_omie_clean.clients.address_neighborhood
+  city:
+    lineage:
+      - datalake_velo_omie_clean.clients.address_city
+  state:
+    lineage:
+      - datalake_velo_omie_clean.clients.address_state
+  country_code:
+    lineage:
+      - datalake_velo_omie_clean.clients.datalake_velo_omie_clean.country.abbreviation
+  is_natural_person:
+    lineage:
+      - datalake_velo_omie_clean.clients.is_natural_person
+  is_foreign:
+    lineage:
+      - datalake_velo_omie_clean.clients.is_foreign
+  is_active:
+    lineage:
+      - datalake_velo_omie_clean.clients.is_inactive
+  datalake_velo_omie_clean.country.id_country:
+    lineage:
+      - datalake_velo_omie_clean.clients.datalake_velo_omie_clean.country.id_country
+  datalake_velo_omie_clean.clients.address_country_code:
+    lineage:
+      - datalake_velo_omie_clean.clients.datalake_velo_omie_clean.clients.address_country_code

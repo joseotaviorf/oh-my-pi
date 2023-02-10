@@ -9,6 +9,7 @@ SELECT
     creci,
     cnpj,
     is_broker_active,
+    ts_created,
     NOW() AS ts_load
 FROM
     datalake_velo.broker

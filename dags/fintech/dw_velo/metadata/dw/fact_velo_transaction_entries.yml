@@ -20,15 +20,15 @@ columns:
   sk_omie_client:
     lineage:
       - datalake_velo.transaction_entries.id_omie_client
-  category_percent_amount:
+  percent_amount_from_transaction:
     lineage:
-      - datalake_velo.transaction_entries.category_percent_amount
-  category_due_amount:
+      - datalake_velo.transaction_entries.percent_amount_from_transaction
+  due_amount:
     lineage:
-      - datalake_velo.transaction_entries.category_due_amount
-  category_paid_amount:
+      - datalake_velo.transaction_entries.due_amount
+  paid_amount:
     lineage:
-      - datalake_velo.transaction_entries.category_paid_amount
+      - datalake_velo.transaction_entries.paid_amount
   is_occurency:
     lineage:
       - datalake_velo.transaction_entries.is_occurency
@@ -38,15 +38,15 @@ columns:
   dt_register:
     lineage:
       - datalake_velo.transaction_entries.dt_register
-  dt_created:
-    lineage:
-      - datalake_velo.transaction_entries.dt_created
-  dt_modified:
-    lineage:
-      - datalake_velo.transaction_entries.dt_modified
   dt_due:
     lineage:
       - datalake_velo.transaction_entries.dt_due
   dt_paid:
     lineage:
       - datalake_velo.transaction_entries.dt_paid
+  ts_created:
+    lineage:
+      - datalake_velo.transaction_entries.ts_created
+  ts_modified:
+    lineage:
+      - datalake_velo.transaction_entries.ts_modified

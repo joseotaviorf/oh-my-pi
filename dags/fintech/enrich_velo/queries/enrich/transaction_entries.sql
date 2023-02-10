@@ -38,9 +38,9 @@ cte_transactions AS (
             WHEN c2.description IN ('Danos ao Imóvel', 'Rescisão') THEN 'rescisão'
             ELSE NULL
         END AS transaction_purpose,
-        cte_cat.category_percentage AS category_percent_amount,
-        SIGN(cf.due_amount) * cte_cat.category_value AS category_due_amount,
-        cte_cat.category_percentage/100 * cf.paid_amount AS category_paid_amount,
+        cte_cat.category_percentage AS percent_amount_from_transaction,
+        SIGN(cf.due_amount) * cte_cat.category_value AS due_amount,
+        cte_cat.category_percentage/100 * cf.paid_amount AS paid_amount,
         c2.description IN ('Alugueis', 'Condominio', 'Danos ao Imóvel', 'Rescisão', 'Ocorrências') AND cf.id_project IS NOT NULL AS is_occurency,
         COALESCE(CAST(SPLIT(cf.id_installment, '/')[0] AS DOUBLE),0) AS installment,
         COALESCE(CAST(SPLIT(cf.id_installment, '/')[1] AS DOUBLE),0) AS total_installments,
@@ -61,10 +61,10 @@ cte_transactions AS (
             AND cf.id_project IS NOT NULL AS is_project_receivable_greater_than_payable,
         cf.dt_issue,
         cf.dt_register,
-        DATE(cf.ts_created) AS dt_created,
-        DATE(cf.ts_modified) AS dt_modified,
         cf.dt_due,
-        cf.dt_payment AS dt_paid
+        cf.dt_payment AS dt_paid,
+        cf.ts_created,
+        cf.ts_modified
     FROM
         datalake_velo_omie.cash_flows AS cf
     LEFT JOIN
@@ -145,18 +145,18 @@ SELECT
     ct.transaction_purpose,
     ct.installment,
     ct.total_installments AS total_expected_installments,
-    ct.category_percent_amount,
-    ct.category_due_amount,
-    ct.category_paid_amount,
+    ct.percent_amount_from_transaction,
+    ct.due_amount,
+    ct.paid_amount,
     ct.is_occurency,
     ct.is_project_receivable_created,
     ct.is_project_receivable_greater_than_payable,
     ct.dt_issue,
     ct.dt_register,
-    ct.dt_created,
-    ct.dt_modified,
     ct.dt_due,
-    ct.dt_paid
+    ct.dt_paid,
+    ct.ts_created,
+    ct.ts_modified
 FROM
     cte_transactions AS ct
 LEFT JOIN

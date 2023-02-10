@@ -11,6 +11,9 @@ columns:
   email:
     lineage:
       - datalake_velo.propose_person.email
+  phone:
+    lineage:
+      - datalake_velo.propose_person.phone
   bureau_name:
     lineage:
       - datalake_velo.propose_person.bureau_name

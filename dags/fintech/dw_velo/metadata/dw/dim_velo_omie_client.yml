@@ -1,0 +1,49 @@
+---
+database_name: dw_velo
+table_name: dim_velo_omie_client
+columns:
+  sk_client:
+    lineage:
+      - datalake_velo.omie_client.id_client
+  corporate_name:
+    lineage:
+      - datalake_velo.omie_client.corporate_name
+  name_doing_business_as:
+    lineage:
+      - datalake_velo.omie_client.name_doing_business_as
+  client_cpf_cnpj:
+    lineage:
+      - datalake_velo.omie_client.client_cpf_cnpj
+  email:
+    lineage:
+      - datalake_velo.omie_client.email
+  address:
+    lineage:
+      - datalake_velo.omie_client.address
+  address_number:
+    lineage:
+      - datalake_velo.omie_client.address_number
+  address_complement:
+    lineage:
+      - datalake_velo.omie_client.address_complement
+  neighborhood:
+    lineage:
+      - datalake_velo.omie_client.neighborhood
+  city:
+    lineage:
+      - datalake_velo.omie_client.city
+  state:
+    lineage:
+      - datalake_velo.omie_client.state
+  country_code:
+    lineage:
+      - datalake_velo.omie_client.country_code
+  is_natural_person:
+    lineage:
+      - datalake_velo.omie_client.is_natural_person
+  is_foreign:
+    lineage:
+      - datalake_velo.omie_client.is_foreign
+  is_active:
+    lineage:
+      - datalake_velo.omie_client.is_active

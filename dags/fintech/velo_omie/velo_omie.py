@@ -81,31 +81,35 @@ tables = config_service.get_config("tables")
 partition_columns = config_service.get_config("partition_columns")
 
 for table in tables:
+    bypass_raw = table.get("bypass_raw", False)
     table_name = table["table_name"]
     extraction_type = table["extraction_type"]
-    api_consumer_id = table["api_consumer_id"]
-    consumer_args = table["consumer_args"]
-    parameters = [SOURCE, table_name, api_consumer_id, consumer_args]
-
     is_incremental = extraction_type == "incremental"
 
-    if is_incremental:
-        parameters.append(str(partition_columns))
-        parameters.append("{{ ds }}")
+    if not bypass_raw:
+        api_consumer_id = table["api_consumer_id"]
+        consumer_args = table["consumer_args"]
+        parameters = [SOURCE, table_name, api_consumer_id, consumer_args]
 
-    partitions = partition_columns if is_incremental else None
+        if is_incremental:
+            parameters.append(str(partition_columns))
+            parameters.append("{{ ds }}")
 
-    raw_task_group = task_group.build_raw_task_group_for_single_table(
-        source=SOURCE,
-        target_database_base_name=SOURCE,
-        table_name=table_name,
-        extraction_spark_job_file=RAW_SPARK_JOB_PATH.format(
-            extraction_type=extraction_type
-        ),
-        raw_spark_job_extra_args=parameters,
-    )
+        partitions = partition_columns if is_incremental else None
 
-    create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
+        raw_task_group = task_group.build_raw_task_group_for_single_table(
+            source=SOURCE,
+            target_database_base_name=SOURCE,
+            table_name=table_name,
+            extraction_spark_job_file=RAW_SPARK_JOB_PATH.format(
+                extraction_type=extraction_type
+            ),
+            raw_spark_job_extra_args=parameters,
+        )
+
+        create_cluster_task.set_downstream(
+            DatalakeTaskGroup.first_tasks(raw_task_group)
+        )
 
     clean_task_group = task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
@@ -114,10 +118,14 @@ for table in tables:
         is_incremental=is_incremental,
         partitions=partitions,
     )
-
-    cross_downstream(
-        DatalakeTaskGroup.last_tasks(raw_task_group),
-        DatalakeTaskGroup.first_tasks(clean_task_group),
-    )
+    if bypass_raw:
+        create_cluster_task.set_downstream(
+            DatalakeTaskGroup.first_tasks(clean_task_group)
+        )
+    else:
+        cross_downstream(
+            DatalakeTaskGroup.last_tasks(raw_task_group),
+            DatalakeTaskGroup.first_tasks(clean_task_group),
+        )
 
     terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))

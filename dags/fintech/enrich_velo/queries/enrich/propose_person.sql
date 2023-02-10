@@ -40,6 +40,7 @@ SELECT DISTINCT
   pp.id_propose,
   TRIM(UPPER(cp.name)) AS name,
   cp.email,
+  cp.phone,
   prs.bureau_name,
   cp.document,
   prs.score_value AS serasa_score,

@@ -1,0 +1,16 @@
+---
+database_name: dw_velo
+table_name: dim_velo_omie_bank_account
+columns:
+  sk_bank_account:
+    lineage:
+      - datalake_velo.omie_bank_account.id_bank_account
+  description:
+    lineage:
+      - datalake_velo.omie_bank_account.description
+  bank_account_number:
+    lineage:
+      - datalake_velo.omie_bank_account.bank_account_number
+  is_active:
+    lineage:
+      - datalake_velo.omie_bank_account.is_active

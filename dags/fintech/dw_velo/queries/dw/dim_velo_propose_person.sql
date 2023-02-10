@@ -2,6 +2,7 @@ SELECT DISTINCT
     id_person AS sk_person,
     name,
     email,
+    phone,
     bureau_name,
     document,
     serasa_score,

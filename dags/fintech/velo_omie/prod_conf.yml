@@ -26,3 +26,6 @@ tables:
     consumer_args: '{ "extra_body_args": { "apenas_importado_api": "N", }, }'
     extraction_type: full
     table_name: clients
+  - bypass_raw: True
+    table_name: country
+    extraction_type: full

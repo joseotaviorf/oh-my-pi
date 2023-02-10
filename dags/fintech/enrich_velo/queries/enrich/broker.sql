@@ -37,7 +37,8 @@ SELECT
   ca.geolocation,
   r.creci,
   c.document AS cnpj,
-  r.is_active AS is_broker_active
+  r.is_active AS is_broker_active,
+  r.ts_inserted AS ts_created
 FROM
   datalake_velo_clean.fiancavelo_realestate AS r
 LEFT JOIN

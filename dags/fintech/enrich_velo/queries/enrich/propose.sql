@@ -1,7 +1,7 @@
 WITH propose_canceled_date AS (
   SELECT
     id_propose,
-    MAX(DATE(CAST(ts_updated AS TIMESTAMP))) AS dt_ended
+    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_ended
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -13,7 +13,7 @@ WITH propose_canceled_date AS (
 propose_started_date AS (
   SELECT
     id_propose,
-    MAX(DATE(CAST(ts_updated AS TIMESTAMP))) AS dt_propose_started
+    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_propose_started
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -25,7 +25,7 @@ propose_started_date AS (
 propose_waiting_new_docs_date AS (
   SELECT
     id_propose,
-    MAX(DATE(CAST(ts_updated AS TIMESTAMP))) AS dt_waiting_new_docs
+    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_waiting_new_docs
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -37,7 +37,7 @@ propose_waiting_new_docs_date AS (
 propose_evaluation_started_date AS (
   SELECT
     id_propose,
-    MAX(DATE(CAST(ts_updated AS TIMESTAMP))) AS dt_evaluation_started
+    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_evaluation_started
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -49,7 +49,7 @@ propose_evaluation_started_date AS (
 propose_rejected_date AS (
   SELECT
     id_propose,
-    MAX(DATE(CAST(ts_updated AS TIMESTAMP))) AS dt_rejected
+    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_rejected
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -61,7 +61,7 @@ propose_rejected_date AS (
 propose_sign_started_date AS (
   SELECT
     id_propose,
-    MAX(DATE(CAST(ts_updated AS TIMESTAMP))) AS dt_sign_started
+    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_sign_started
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -73,7 +73,7 @@ propose_sign_started_date AS (
 propose_paid_date AS (
   SELECT
     id_propose,
-    MAX(DATE(CAST(ts_updated AS TIMESTAMP))) AS dt_paid
+    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_paid
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -85,7 +85,7 @@ propose_paid_date AS (
 propose_activation_date AS (
   SELECT
     id_propose,
-    MAX(DATE(CAST(ts_updated AS TIMESTAMP))) AS dt_activation
+    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_activation
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -97,7 +97,7 @@ propose_activation_date AS (
 propose_secured_date AS (
   SELECT
     id_propose,
-    MAX(DATE(CAST(ts_updated AS TIMESTAMP))) AS dt_secured
+    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_secured
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -109,7 +109,7 @@ propose_secured_date AS (
 propose_activation_analysis_date AS (
   SELECT
     id_propose,
-    MAX(DATE(CAST(ts_updated AS TIMESTAMP))) AS dt_activation_analysis
+    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_activation_analysis
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -121,7 +121,7 @@ propose_activation_analysis_date AS (
 propose_secure_pending_date AS (
   SELECT
     id_propose,
-    MAX(DATE(CAST(ts_updated AS TIMESTAMP))) AS dt_secure_pending
+    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_secure_pending
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -152,10 +152,23 @@ house AS (
   WHERE
     o.is_active
 ),
+pack_values AS (
+  SELECT
+    pk.id_propose AS id_propose,
+    SUM(COALESCE(pk.value,0)) AS total_package_amount
+  FROM
+    datalake_velo_clean.fiancavelo_packvalues AS pk
+  WHERE
+    pk.is_active
+  GROUP BY
+    1
+),
 propose_values AS (
   SELECT
     CONCAT(p.id, a.id, pl.id) AS id_propose_values,
-    p.id AS id_propose
+    p.id AS id_propose,
+    plt.name AS plan_type,
+    COALESCE(pk.total_package_amount*pl.percent*0.01,0) AS monthly_guarantee
   FROM
     datalake_velo_clean.fiancavelo_propose AS p
   LEFT JOIN
@@ -164,6 +177,13 @@ propose_values AS (
   LEFT JOIN
     datalake_velo_clean.fiancavelo_plans AS pl
       ON pl.id = p.id_plan
+  LEFT JOIN
+    datalake_velo_clean.fiancavelo_plantype AS plt
+      ON plt.id = pl.id_type
+      AND plt.is_active
+  LEFT JOIN
+    pack_values AS pk
+      ON pk.id_propose = p.id
 ),
 person_score AS (
   SELECT
@@ -213,7 +233,8 @@ persons_metrics AS (
       COUNT(cp.id) AS count_persons_included,
       AVG(prs.score_value) AS avg_serasa_score,
       AVG(prs.risk) AS avg_risk_score,
-      AVG(prs.declared_income) AS avg_declared_income
+      AVG(prs.declared_income) AS avg_declared_income,
+      SUM(prs.declared_income) AS total_declared_income
   FROM
       datalake_velo_clean.fiancavelo_proposeperson AS pp
   LEFT JOIN
@@ -239,7 +260,7 @@ SELECT
   pc.id_company AS id_propose_company,
   mc.id_primary_person,
   CASE
-    WHEN pc.id_propose IS NOT NULL THEN 1
+    WHEN (pv.plan_type = 'Comercial' OR pc.id_propose IS NOT NULL) THEN 1
     ELSE 2
   END AS id_origin, -- be sure to match the junk table
   jk1.id_junk AS id_propose_status,
@@ -250,19 +271,22 @@ SELECT
   pm.avg_serasa_score,
   pm.avg_risk_score,
   pm.avg_declared_income,
+  pm.total_declared_income,
+  CAST(pv.monthly_guarantee / pm.total_declared_income AS DECIMAL(32,2)) AS dti,
   f.id IS NOT NULL AS is_contract,
+  IFNULL(DATEDIFF(COALESCE(DATE(pcd.ts_ended), f.dt_ended), DATE(f.dt_begin)) <= 10, False) AS is_grace_period_cancelled,
   DATE(f.dt_begin) AS dt_contract_started,
-  COALESCE(DATE(pcd.dt_ended), f.dt_ended) AS dt_ended,
-  sd.dt_propose_started,
-  wndd.dt_waiting_new_docs,
-  esd.dt_evaluation_started,
-  rd.dt_rejected,
-  ssd.dt_sign_started,
-  pd.dt_paid,
-  ad.dt_activation,
-  sed.dt_secured,
-  aad.dt_activation_analysis,
-  spd.dt_secure_pending
+  COALESCE(DATE(pcd.ts_ended), f.dt_ended) AS dt_ended,
+  sd.ts_propose_started,
+  wndd.ts_waiting_new_docs,
+  esd.ts_evaluation_started,
+  rd.ts_rejected,
+  ssd.ts_sign_started,
+  pd.ts_paid,
+  ad.ts_activation,
+  sed.ts_secured,
+  aad.ts_activation_analysis,
+  spd.ts_secure_pending
 FROM
   datalake_velo_clean.fiancavelo_propose AS p
 LEFT JOIN
@@ -291,6 +315,10 @@ LEFT JOIN
     ON jk3.id_lvl_1 = p.id_type
       AND jk3.desc_master_type = 'Propose Type'
 LEFT JOIN
+  datalake_velo.junk AS jk4
+    ON jk4.id_lvl_1 = IF(pc.id_propose IS NOT NULL, 1, 2)
+      AND jk4.desc_master_type = 'Origin'
+LEFT JOIN
   house AS h
     ON h.id_propose = p.id
       AND h.rn = 1 -- Gets only the latest updated id
@@ -300,6 +328,7 @@ LEFT JOIN
 LEFT JOIN
   main_client AS mc
     ON mc.id_propose = p.id
+      AND mc.rn = 1 -- Gets only the latest updated id
 LEFT JOIN
   propose_started_date AS sd
     ON sd.id_propose = p.id
