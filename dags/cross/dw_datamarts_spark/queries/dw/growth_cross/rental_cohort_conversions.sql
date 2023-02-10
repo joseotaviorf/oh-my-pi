@@ -579,11 +579,11 @@ vb2os_aux AS (
         rf.funnel_first_touchpoint AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         CASE
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS INT), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS INT),'yyyyMMdd'))) < 0
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd'))) < 0
                     THEN 'W5+'
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS INT), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS INT),'yyyyMMdd'))) BETWEEN 0 AND 4
-                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS INT), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS INT),'yyyyMMdd')))
-            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS INT), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS INT),'yyyyMMdd'))) >= 5
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd'))) BETWEEN 0 AND 4
+                THEN 'W'||DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd')))
+            WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
         NULL::BIGINT AS l2p,
