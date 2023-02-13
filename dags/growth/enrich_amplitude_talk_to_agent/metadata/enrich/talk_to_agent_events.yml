@@ -3,43 +3,43 @@ table_name: talk_to_agent_events
 columns:
   id_user:
     lineage:
-      - datalake_amplitude_clean.events.id_user
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.id_user
   id_app:
     lineage:
-      - datalake_amplitude_clean.events.id_app
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.id_app
   id_house:
     lineage:
-      - datalake_amplitude_clean.events.event_properties
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.ep_id_house
   id_agent:
     lineage:
-      - datalake_amplitude_clean.events.event_properties
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.ep_id_agent
   business_context:
     lineage:
-      - datalake_amplitude_clean.events.event_properties
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.ep_business_context
   app_type:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.up_app_type
   utm_source:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.up_utm_source
   utm_medium:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.up_utm_medium
   utm_campaign:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.up_utm_campaign
   utm_content:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.up_utm_content
   utm_term:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
-  branded:
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.up_utm_term
+  message_content:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
-  is_branded:
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.ep_message_content
+  message_content_extracted: 
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.ep_message_content
   ts_event:
     lineage:
-      - datalake_amplitude_clean.events.ts_event
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.ts_event

@@ -2,34 +2,34 @@ WITH extracted_utms AS (
     SELECT
         id_user,
         id_app,
-        TRIM(GET_JSON_OBJECT(event_properties, '$.house_id')) AS id_house,
-        TRIM(GET_JSON_OBJECT(event_properties, '$.agent_id')) AS id_agent,
-        TRIM(GET_JSON_OBJECT(event_properties, '$.business_context')) AS business_context,
-        GET_JSON_OBJECT(user_properties , '$.platform') AS app_type,
-        GET_JSON_OBJECT(user_properties, '$.utm_source') AS utm_source,
-        GET_JSON_OBJECT(user_properties, '$.utm_medium') AS utm_medium,
-        GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS utm_campaign,
-        GET_JSON_OBJECT(user_properties, '$.utm_content') AS utm_content,
-        GET_JSON_OBJECT(user_properties, '$.utm_term') AS utm_term,
+        ep_id_house AS id_house,
+        ep_id_agent AS id_agent,
+        UPPER(ep_business_context) AS business_context,
+        up_app_type AS app_type,
+        up_utm_source AS utm_source,
+        up_utm_medium AS utm_medium,
+        up_utm_campaign AS utm_campaign,
+        up_utm_content AS utm_content,
+        up_utm_term AS utm_term,
         CASE
-            WHEN (UPPER(GET_JSON_OBJECT(user_properties, '$.utm_campaign')) LIKE '%BRANDED%'
-                OR UPPER(GET_JSON_OBJECT(user_properties, '$.utm_campaign')) LIKE '%INSTITUCIONAL%')
-                AND UPPER(GET_JSON_OBJECT(user_properties, '$.utm_campaign')) NOT LIKE '%NON-BRANDED%'
+            WHEN (UPPER(up_utm_campaign) LIKE '%BRANDED%'
+                OR UPPER(up_utm_campaign) LIKE '%INSTITUCIONAL%')
+                AND UPPER(up_utm_campaign) NOT LIKE '%NON-BRANDED%'
                 THEN 'Branded'
             ELSE 'Outro'
         END AS branded,
+        ep_message_content AS message_content,
+        REPLACE(TRIM(SUBSTR(REGEXP_EXTRACT(REPLACE(REGEXP_REPLACE(ep_message_content,'\n',' '),'''',' '),'(?<=(([0-9]{{9}}))).*', 0),3)), 'omprar.', '') AS message_content_extracted,
         ts_event
-    FROM datalake_amplitude_clean.events evt
-    WHERE
-        evt.event_type = 'piloto_cw_message_sent'
-        AND evt.id_app = 170698
+    FROM
+        datalake_amplitude_clean.170698_piloto_cw_message_sent_events
 )
 SELECT
     id_user,
     id_app,
     id_house,
     id_agent,
-    UPPER(business_context) AS business_context,
+    business_context,
     app_type,
     utm_source,
     utm_medium,
@@ -37,6 +37,9 @@ SELECT
     utm_content,
     utm_term,
     branded,
+    message_content,
+    message_content_extracted,
     branded = 'Branded' AS is_branded,
     ts_event
-FROM extracted_utms
+FROM
+    extracted_utms
