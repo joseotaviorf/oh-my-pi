@@ -20,8 +20,8 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 # Pipeline inputs
 SOURCE = "mexico_lifull_campaigns"
 DAG_ID = f"bietlejuice.{SOURCE}"
-MAIN_START_DATE = datetime(2021, 9, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
+MAIN_START_DATE = datetime(2022, 6, 1, tzinfo=timezone("America/Mexico_City"))
+MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
