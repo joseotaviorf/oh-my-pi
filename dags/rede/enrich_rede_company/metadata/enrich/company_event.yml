@@ -1,0 +1,57 @@
+---
+database_name: datalake_rede_company
+table_name: company_event
+columns:
+  id_company:
+    lineage:
+      - datalake_booking.booking.id_company_demand
+      - datalake_brokers_supply_processor.lead_3p.id_company_hubspot
+      - datalake_ebdb_listing.house.id_company_hubspot
+      - datalake_hubspot.company_status.id_company
+      - datalake_hubspot.deal.id_company
+  id_deal:
+    lineage:
+      - datalake_hubspot.deal.id_deal
+  id_ticket_demand_onboarding:
+    lineage:
+      - datalake_hubspot.ticket_stage.id_ticket
+  id_ticket_supply_onboarding:
+    lineage:
+      - datalake_hubspot.ticket_stage.id_ticket
+  id_user_updated_by:
+    lineage:
+      - datalake_hubspot.company_status.id_user_updated_by
+      - datalake_hubspot.deal_stage.id_user_updated_by
+      - datalake_hubspot.ticket_stage.id_user_updated_by
+  source_type:
+    lineage:
+      - datalake_hubspot.company_status.source_type
+      - datalake_hubspot.deal_stage.source_type
+      - datalake_hubspot.ticket_stage.source_type
+  hubspot_event_detail:
+    lineage:
+      - datalake_hubspot.company_status.lead_status
+      - datalake_hubspot.stage.label
+  hubspot_event_origin:
+    lineage:
+      - datalake_hubspot.pipeline.label
+  hubspot_company_status:
+    lineage:
+      - datalake_hubspot.company_status.lead_status
+  hubspot_deal_stage:
+    lineage:
+      - datalake_hubspot.stage.label
+  hubspot_demand_onboarding_ticket_stage:
+    lineage:
+      - datalake_hubspot.stage.label
+  hubspot_supply_onboarding_ticket_stage:
+    lineage:
+      - datalake_hubspot.stage.label
+  ts_event:
+    lineage:
+      - datalake_booking.booking.ts_created
+      - datalake_brokers_supply_processor.lead_3p.ts_created
+      - datalake_hubspot.company_status.ts_status_started
+      - datalake_hubspot.deal_stage.ts_stage_started
+      - datalake_hubspot.ticket_stage.ts_stage_started
+      - datalake_sale_listings.ts_first_publication

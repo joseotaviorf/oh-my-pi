@@ -2265,9 +2265,19 @@ bietlejuice.enrich_quinto_messenger:
   - bietlejuice.quinto_messenger:load-clean-task-event
 
 bietlejuice.enrich_rede_company:
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_hubspot:load-enrich-company-status
+  - bietlejuice.enrich_hubspot:load-enrich-deal
+  - bietlejuice.enrich_hubspot:load-enrich-deal-stage
+  - bietlejuice.enrich_hubspot:load-enrich-pipeline
+  - bietlejuice.enrich_hubspot:load-enrich-stage
+  - bietlejuice.enrich_hubspot:load-enrich-ticket
+  - bietlejuice.enrich_hubspot:load-enrich-ticket-stage
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
 
 bietlejuice.enrich_rede_supply:
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p-aud
