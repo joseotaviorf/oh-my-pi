@@ -68,7 +68,6 @@ events AS (
         AND db.visit_intent = 'SALE'
         AND db.type = 'Visita'
         AND db.dt_created IS NOT NULL
-        AND db.first_update_source != 'MigracaoCasaMineira'
 
     UNION ALL
 
