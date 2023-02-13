@@ -1,0 +1,47 @@
+database_name: datalake_casa_mineira_crm_raw
+table_name: proprietario_pf
+columns:
+  proprietario_id:
+    tags:
+    - PII
+    - Confidential
+  cpf:
+    tags:
+    - PII
+    - Confidential
+  rg:
+    tags:
+    - PII
+    - Confidential
+  estado_civil:
+    tags:
+    - PII
+    - Confidential
+  conjuge_nome:
+    tags:
+    - PII
+    - Confidential
+  conjuge_email:
+    tags:
+    - PII
+    - Confidential
+  conjuge_telefone:
+    tags:
+    - PII
+    - Confidential
+  conjuge_cpf:
+    tags:
+    - PII
+    - Confidential
+  conjuge_rg:
+    tags:
+    - PII
+    - Confidential
+  data_nascimento:
+    tags:
+    - PII
+    - Confidential
+  conjuge_data_nascimento:
+    tags:
+    - PII
+    - Confidential

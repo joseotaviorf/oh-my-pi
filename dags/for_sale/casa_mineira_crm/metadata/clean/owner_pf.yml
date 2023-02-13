@@ -1,0 +1,49 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: owner_pf
+columns: 
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.id
+  proprietario_id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.proprietario_id
+  cpf:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.cpf
+  rg:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.rg
+  profession:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.profissao
+  marital_status:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.estado_civil
+  spouse_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_nome
+  spouse_email:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_email
+  spouse_phone:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_telefone
+  spouse_cpf:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_cpf
+  spouse_rg:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_rg
+  spouse_profession:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_profissao
+  dt_birth:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.data_nascimento
+  dt_spouse_birth:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_data_nascimento
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pf.criado_em

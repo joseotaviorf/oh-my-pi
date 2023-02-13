@@ -5,3 +5,7 @@ columns:
     tags:
     - PII
     - Confidential
+  descricao:
+    tags:
+    - PII
+    - Confidential

@@ -3,6 +3,7 @@ SELECT
     cliente_id AS id_client,
     criado_por AS created_by, 
     tipo AS attendance_type,
+    descricao AS description,
     CAST(criado_em AS TIMESTAMP) AS ts_created, 
     CAST(atendimento_em AS TIMESTAMP) AS ts_attended
 FROM 

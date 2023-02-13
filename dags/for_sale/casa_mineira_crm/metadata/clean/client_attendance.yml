@@ -14,6 +14,9 @@ columns:
   attendance_type:
     lineage:
       - datalake_casa_mineira_crm_raw.cliente_atendimento.tipo
+  description:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_atendimento.descricao
   ts_created:
     lineage:
       - datalake_casa_mineira_crm_raw.cliente_atendimento.criado_em

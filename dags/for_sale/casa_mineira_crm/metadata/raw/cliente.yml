@@ -9,6 +9,10 @@ columns:
     tags:
     - PII
     - Confidential
+  nome:
+    tags:
+    - PII
+    - Confidential
   telefone:
     tags:
     - PII

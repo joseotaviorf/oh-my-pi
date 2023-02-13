@@ -4,6 +4,7 @@ SELECT
     imovel_id AS id_house, 
     cliente_id AS id_client, 
     comprador_email AS buyer_email,
+    comprador_nome AS buyer_name,
     comprador_telefone AS buyer_phone_number, 
     CAST(porcentagem_comissao_captacao AS FLOAT) AS acquisition_brokerage_fee,
     CAST(preco_anunciado AS FLOAT) AS listing_sale_price,

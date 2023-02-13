@@ -4,3 +4,20 @@ columns:
   criado_por:
     tags:
     - Confidential
+  indice_cadastral_do_iptu:
+    tags:
+    - PII
+    - Confidential
+  visita_telefone_principal:
+    tags:
+    - PII
+    - Confidential
+  visita_telefone_secundario:
+    tags:
+    - PII
+    - Confidential
+  visita_observacao:
+    tags:
+    - PII
+    - Confidential
+  

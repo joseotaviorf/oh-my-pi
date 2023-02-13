@@ -8,6 +8,7 @@ SELECT
     usuario_validacao_id AS id_user_validation,
     criado_por AS created_by, 
     validacao AS validation_type, 
+    observacao AS observation,
     CAST(virtual AS BOOLEAN) AS is_virtual, 
     CAST(visita_em AS TIMESTAMP) AS ts_visited, 
     CAST(validado_em AS TIMESTAMP) AS ts_validated, 

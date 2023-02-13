@@ -23,6 +23,21 @@ columns:
   owner_zip_code:
     lineage:
       - datalake_casa_mineira_crm_raw.proprietario.cep
+  name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.nome
+  email:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.email
+  phone:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.telefone
+  address:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.endereco
+  observation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.observacao
   ts_created:
     lineage:
       - datalake_casa_mineira_crm_raw.proprietario.criado_em

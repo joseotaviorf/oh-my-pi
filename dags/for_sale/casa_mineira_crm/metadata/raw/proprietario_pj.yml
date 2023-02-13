@@ -1,31 +1,39 @@
 database_name: datalake_casa_mineira_crm_raw
-table_name: contato
+table_name: proprietario_pj
 columns:
-  cliente_id:
+  proprietario_id:
     tags:
     - PII
     - Confidential
-  usuario_encaminhamento_id:
+  cnpj:
     tags:
     - PII
     - Confidential
-  usuario_atendimento_id:
+  responsavel_nome:
     tags:
     - PII
     - Confidential
-  usuario_rejeicao_id:
+  responsavel_email:
     tags:
     - PII
     - Confidential
-  email:
+  responsavel_telefone:
     tags:
     - PII
     - Confidential
-  nome:
+  responsavel_cpf:
     tags:
     - PII
     - Confidential
-  telefone:
+  responsavel_rg:
+    tags:
+    - PII
+    - Confidential
+  responsavel_estado_civil:
+    tags:
+    - PII
+    - Confidential
+  responsavel_data_nascimento:
     tags:
     - PII
     - Confidential

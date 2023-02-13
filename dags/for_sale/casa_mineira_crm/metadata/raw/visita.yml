@@ -13,3 +13,7 @@ columns:
     tags:
     - PII
     - Confidential
+  observacao:
+    tags:
+    - PII
+    - Confidential

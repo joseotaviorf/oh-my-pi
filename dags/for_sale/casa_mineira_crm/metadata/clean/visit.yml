@@ -29,6 +29,9 @@ columns:
   validation_type:
     lineage:
       - datalake_casa_mineira_crm_raw.visita.validacao
+  observation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.observacao
   is_virtual:
     lineage:
       - datalake_casa_mineira_crm_raw.visita.virtual

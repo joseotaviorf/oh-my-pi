@@ -2,6 +2,7 @@ SELECT
     id, 
     criado_por AS created_by,
     email,
+    nome AS name,
     telefone AS phone_number,
     telefone_secundario AS second_phone_number,
     CAST(criado_em AS TIMESTAMP) AS ts_created

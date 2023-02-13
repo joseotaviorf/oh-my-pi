@@ -17,6 +17,9 @@ columns:
   buyer_email:
     lineage:
       - datalake_casa_mineira_crm_raw.venda.comprador_email
+  buyer_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.comprador_nome
   buyer_phone_number:
     lineage:
       - datalake_casa_mineira_crm_raw.venda.comprador_telefone

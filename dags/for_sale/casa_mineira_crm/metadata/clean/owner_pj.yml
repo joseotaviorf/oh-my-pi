@@ -1,0 +1,43 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: owner_pj
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.id
+  id_owner:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.proprietario_id
+  cnpj:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.cnpj
+  state_registration:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.inscricao_estadual
+  responsible_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_nome
+  responsible_email:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_email
+  responsible_phone:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_telefone
+  responsible_cpf:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_cpf
+  responsible_rg:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_rg
+  responsible_profession:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_profissao
+  responsible_marital_status:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_estado_civil
+  dt_responsible_birth:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_data_nascimento
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario_pj.criado_em

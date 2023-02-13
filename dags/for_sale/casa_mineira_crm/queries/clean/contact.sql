@@ -10,6 +10,7 @@ SELECT
     url_conversao AS conversion_url,
     criado_por AS created_by,
     email,
+    nome AS name,
     telefone AS phone_number, 
     token,
     tipo AS contact_type,

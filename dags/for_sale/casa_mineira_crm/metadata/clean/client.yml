@@ -11,6 +11,9 @@ columns:
   email:
     lineage:
       - datalake_casa_mineira_crm_raw.cliente.email
+  name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente.nome
   phone_number:
     lineage:
       - datalake_casa_mineira_crm_raw.cliente.telefone

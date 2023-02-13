@@ -29,6 +29,9 @@ columns:
   address:
     lineage:
       - datalake_casa_mineira_crm_raw.imovel.logradouro
+  complement:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.complemento
   bank:
     lineage:
       - datalake_casa_mineira_crm_raw.imovel.banco
@@ -53,6 +56,9 @@ columns:
   partner_indication:
     lineage:
       - datalake_casa_mineira_crm_raw.imovel.imobiliaria_indicacao
+  iptu_cadastral_index:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.indice_cadastral_do_iptu
   store_position:
     lineage:
       - datalake_casa_mineira_crm_raw.imovel.loja_posicao
@@ -65,9 +71,36 @@ columns:
   visit_type:
     lineage:
       - datalake_casa_mineira_crm_raw.imovel.visita_forma
+  visit_phone:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.visita_telefone_principal
+  visit_phone_secondary:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.visita_telefone_secundario
+  visit_observation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.visita_observacao
   zip_code:
     lineage:
       - datalake_casa_mineira_crm_raw.imovel.cep
+  garage_info:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.garagem_informacao
+  house_details:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.detalhes_imovel
+  condo_details:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.detalhes_edificio
+  status_observation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.observacao_status
+  exchange_observation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.observacao_permuta
+  number:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.numero
   bathrooms:
     lineage:
       - datalake_casa_mineira_crm_raw.imovel.banheiros

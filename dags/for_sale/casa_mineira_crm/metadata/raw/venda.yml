@@ -13,6 +13,10 @@ columns:
     tags:
     - PII
     - Confidential
+  comprador_nome:
+    tags:
+    - PII
+    - Confidential
   comprador_telefone:
     tags:
     - PII

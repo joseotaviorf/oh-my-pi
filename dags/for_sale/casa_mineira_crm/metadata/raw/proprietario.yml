@@ -1,2 +1,15 @@
 database_name: datalake_casa_mineira_crm_raw
 table_name: proprietario
+columns:
+  nome:
+    tags:
+    - PII
+    - Confidential
+  email:
+    tags:
+    - PII
+    - Confidential
+  observacao:
+    tags:
+    - PII
+    - Confidential

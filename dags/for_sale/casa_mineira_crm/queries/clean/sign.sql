@@ -6,6 +6,7 @@ SELECT
     forma_entrada AS entry_form,
     local_instalacao AS installation_place,
     tipo AS sign_type,
+    observacao AS observation,
     CAST(manutencao AS BOOLEAN) AS has_maintenance,
     CAST(placa_exclusiva AS BOOLEAN) AS is_exclusive_sign,
     CAST(criado_em AS TIMESTAMP) AS ts_created,

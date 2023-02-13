@@ -23,6 +23,9 @@ columns:
   sign_type:
     lineage:
       - datalake_casa_mineira_crm_raw.placa.tipo
+  observation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.observacao
   has_maintenance:
     lineage:
       - datalake_casa_mineira_crm_raw.placa.manutencao
