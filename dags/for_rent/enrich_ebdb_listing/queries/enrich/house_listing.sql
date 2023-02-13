@@ -442,19 +442,21 @@ early_relisting_house_state AS (
   SELECT
       bch.id_house,
       bch.status,
+      bch.status_reason,
       bch.suspension_reason,
       bch.ts_state_started,
       bch.ts_state_ended,
       ure.id_user,
-      IF(bch.status = 'PUBLISHED', TRUE, FALSE) AS is_early_demand,
-      IF(bch.status = 'SUSPENDED', TRUE, FALSE) AS is_available_soon
-  FROM 
+      TRUE AS is_early_demand
+  FROM
     datalake_ebdb_listing.business_context_history AS bch
   JOIN 
     datalake_ebdb_clean.user_revision_entity AS ure
       ON bch.rev = ure.id
   WHERE
-      status IN ('PUBLISHED', 'SUSPENDED')
+      bch.business_context = 'RENT'
+      AND bch.status = 'PUBLISHED'
+      AND bch.status_reason LIKE 'RELISTING_%'
       AND bch.suspension_reason = 'RELISTING'
       AND ure.id_user != 4299181 --This filters data inputed by a faulty script. This rule will be replaced in the near future.
 ), early_relisting_dates AS (
@@ -462,13 +464,11 @@ early_relisting_house_state AS (
     hl.id_house_listing,
     hl.id_house,
     hs.status,
+    hs.status_reason,
     hs.suspension_reason,
     hs.is_early_demand,
     IF(hs.is_early_demand, hs.ts_state_started, NULL) AS ts_early_demand_started,
     IF(hs.is_early_demand, hs.ts_state_ended, NULL) AS ts_early_demand_ended,
-    is_available_soon,
-    IF(hs.is_available_soon, hs.ts_state_started, NULL) AS ts_available_soon_started,
-    IF(hs.is_available_soon, hs.ts_state_ended, NULL) AS ts_available_soon_ended,
     hs.ts_state_started
   FROM 
     early_relisting_house_state AS hs
@@ -482,41 +482,40 @@ early_relisting_date_selection AS (
     id_house_listing,
     id_house,
     status,
+    status_reason,
     suspension_reason,
     is_early_demand, 
     MIN(ts_early_demand_started) AS ts_early_demand_started,
-    MIN(ts_early_demand_ended) AS ts_early_demand_ended,
-    IF(LEAD(is_early_demand) OVER(PARTITION BY id_house_listing ORDER BY COALESCE(MIN(ts_early_demand_started), MIN(ts_available_soon_started))) is TRUE, FALSE, is_available_soon) AS is_available_soon,
-    MIN(ts_available_soon_started) AS ts_available_soon_started,
-    MIN(ts_available_soon_ended) AS ts_available_soon_ended
+    MIN(ts_early_demand_ended) AS ts_early_demand_ended
   FROM 
     early_relisting_dates
   GROUP BY 
     id_house_listing,
     id_house,
     status,
+    status_reason,
     suspension_reason,
-    is_early_demand, 
-    is_available_soon
+    is_early_demand
 ), 
 house_lbc_state AS (
   SELECT 
     id_house,
     status,
+    status_reason,
     suspension_reason,
     ts_state_started,
     ts_state_ended,
     ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_state_started DESC) AS state_order
   FROM 
     datalake_ebdb_listing.business_context_history 
+  WHERE 
+    business_context = 'RENT'
 ),
 lbc_early_relisting as (
   SELECT 
   ds.id_house_listing,
   ds.id_house,
-  IF(hs.status = 'SUSPENDED' and hs.suspension_reason = 'RELISTING', TRUE, FALSE) AS is_available_soon,
-  MAX(ds.ts_available_soon_started) AS ts_available_soon_started,
-  IF(hs.status = 'PUBLISHED' and hs.suspension_reason = 'RELISTING', TRUE, FALSE) AS is_early_demand,
+  IF(hs.status = 'PUBLISHED' and hs.status_reason = 'RELISTING_OFFER' and hs.suspension_reason = 'RELISTING', TRUE, FALSE) AS is_early_demand,
   MAX(ds.ts_early_demand_started) AS ts_early_demand_started
 FROM 
   early_relisting_date_selection AS ds
@@ -524,7 +523,7 @@ JOIN house_lbc_state AS hs
   ON hs.id_house = ds.id_house
     AND hs.state_order = 1
 GROUP BY 
-  1,2, hs.status, hs.suspension_reason
+  1,2, hs.status, hs.status_reason, hs.suspension_reason
 )
 SELECT
     hl.id_house_listing,
@@ -541,13 +540,11 @@ SELECT
     hl_c.order_renting,
     heh.name AS who_is_living,
     IF(lbcer.id_house_listing is not null, TRUE, FALSE) AS is_early_relisting,
-    lbcer.is_available_soon,
     lbcer.is_early_demand,
     hl.is_last_version,
     hl.is_exclusive,
     hl.is_originals_active,
     hl.is_iorent_active,
-    CAST(lbcer.ts_available_soon_started AS TIMESTAMP) AS ts_available_soon_started,
     CAST(lbcer.ts_early_demand_started AS TIMESTAMP) AS ts_early_demand_started,
     hl.ts_listing_version_start,
     hl.ts_listing_version_end,
