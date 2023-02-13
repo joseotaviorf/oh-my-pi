@@ -97,7 +97,13 @@ columns:
       - datalake_jira_clean.issues.fields
   queue:
     lineage:
-      - datalake_jira_clean.issues.fields 
+      - datalake_jira_clean.issues.fields
+  incidents_activity:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  services_activity:
+    lineage:
+      - datalake_jira_clean.issues.fields
   sla_time_first_response_hours:
     lineage:
       - datalake_jira_clean.issues.fields

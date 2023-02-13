@@ -61,11 +61,17 @@ WITH record_selection AS (
         GET_JSON_OBJECT(fields,'$.customfield_12455.value') as service_category,     
         GET_JSON_OBJECT(fields,'$.resolution.name') AS resolution,
         GET_JSON_OBJECT(fields,'$.customfield_12635.value') AS queue,
+        GET_JSON_OBJECT(fields,'$.customfield_12445.value') AS incidents_activity,
+        GET_JSON_OBJECT(fields,'$.customfield_12434.value') AS services_activity,
         ROW_NUMBER() OVER (PARTITION BY key ORDER BY GET_JSON_OBJECT(fields,'$.updated') DESC) AS row_num
     FROM
         datalake_jira_clean.issues
     WHERE 
-        KEY like 'TI-%'
+        KEY like 'TI-%' AND GET_JSON_OBJECT(fields,'$.issuetype.name') != 'Sub-task'  AND
+        KEY NOT IN ('TI-95756','TI-95753','TI-95752','TI-95755','TI-95754','TI-95669','TI-95386','TI-95365','TI-95358',
+        'TI-95367',	'TI-95362',	'TI-95379',	'TI-95079',	'TI-95096',	'TI-95060',	'TI-91223',	'TI-74439',	'TI-50257',
+        'TI-50256',	'TI-50261',	'TI-50271',	'TI-50262',	'TI-50264',	'TI-50267',	'TI-50280',	'TI-50263',	'TI-50260',
+        'TI-50273',	'TI-50272',	'TI-50266',	'TI-50249',	'TI-50268',	'TI-50248',	'TI-50265')
 )
 SELECT 
     id,
@@ -100,6 +106,8 @@ SELECT
     access_approval_groups,
     resolution,
     queue,
+    incidents_activity,
+    services_activity,
     sla_time_first_response_hours,
     sla_hours,
     sla_access_approval_hours,
