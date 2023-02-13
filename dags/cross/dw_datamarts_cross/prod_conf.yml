@@ -27,10 +27,6 @@ pipeline:
     dw:
       <<: *redshift_anchor
       table: lead_listing_flows
-  quintoandar_consultant_listings:
-    dw:
-      <<: *redshift_anchor
-      table: quintoandar_consultant_listings
   talk_to_agent:
     dw:
       <<: *athena_anchor
