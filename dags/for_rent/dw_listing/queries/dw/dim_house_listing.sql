@@ -101,13 +101,13 @@ house_listings AS (
            CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent
         FROM datalake_ebdb_listing.listing_business_context
         GROUP BY 1
-    ), 
+    ),
     rl AS (
         SELECT
             id_house,
             rental_administrator,
             MAX(ts_administrator_changed) AS ts_administrator_changed
-        FROM 
+        FROM
             datalake_ebdb_listing.rent_listing
         GROUP BY 1, 2
     )
@@ -192,8 +192,6 @@ house_listings AS (
         h.is_casa_mineira_migration,
         h.is_sale_primary_market,
         rl.ts_administrator_changed,
-        hl.is_available_soon,
-        hl.ts_available_soon_started,
         hl.is_early_demand,
         hl.ts_early_demand_started
     FROM
@@ -282,7 +280,6 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.is_3p_supply_bh,
     hl.is_casa_mineira_migration,
     hl.is_sale_primary_market,
-    COALESCE(hl.is_available_soon, FALSE) AS is_available_soon,
     COALESCE(hl.is_early_demand, FALSE) AS is_early_demand,
     hlco.dt_consultant_started,
     hl.dt_last_exclusive_opted_in,
@@ -291,7 +288,6 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.dt_last_originals_opted_out,
     hl.dt_last_iorent_opted_in,
     hl.dt_last_iorent_opted_out,
-    hl.ts_available_soon_started,
     hl.ts_early_demand_started,
     hlco.ts_consultant_deleted,
     hl.ts_listing_version_start,
@@ -304,18 +300,18 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.ts_house_update,
     hl.ts_administrator_changed,
     NOW() AS ts_load
-FROM 
+FROM
     house_listings hl
-LEFT JOIN 
+LEFT JOIN
     b2b_info bi
         ON bi.id_house_listing = hl.sk_house_listing
-LEFT JOIN 
+LEFT JOIN
     house_portability hp
         ON hp.id_house_listing = hl.sk_house_listing
-LEFT JOIN 
+LEFT JOIN
     autonomous_agent_info aa_info
         ON aa_info.sk_house_listing = hl.sk_house_listing
-LEFT JOIN 
+LEFT JOIN
     datalake_ebdb_listing.house_listing_fees AS hlf
         ON hl.sk_house_listing = hlf.id_house_listing
 LEFT JOIN
