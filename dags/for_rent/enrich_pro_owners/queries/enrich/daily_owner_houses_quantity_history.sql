@@ -51,12 +51,12 @@ owner_houses_history AS (
     datalake_pro_owners.house_b2b_history  AS hbh
       ON h.id = hbh.id_house
       AND dd.date >= DATE(hbh.ts_started)
-      AND dd.date < COALESCE(DATE(hbh.ts_ended), CURRENT_TIMESTAMP())
+      AND dd.date < DATE(COALESCE(hbh.ts_ended, CURRENT_TIMESTAMP()))
   LEFT JOIN
     datalake_ebdb_listing.house_listing_status AS hls
       ON h.id = hls.id_house
-      AND dd.date >= hls.ts_status_started
-      AND dd.date < COALESCE(hls.ts_status_ended, CURRENT_TIMESTAMP())
+      AND dd.date >= DATE(hls.ts_status_started)
+      AND dd.date < DATE(COALESCE(hls.ts_status_ended, CURRENT_TIMESTAMP()))
   LEFT JOIN
     datalake_ebdb_listing.listing_business_context AS lbc
       ON h.id = lbc.id_house
@@ -72,8 +72,8 @@ owner_houses_history AS (
   LEFT JOIN 
     house_portability AS por
       ON h.id = por.id_house
-      AND dd.date >= COALESCE(por.ts_listing_version_start, '1900-01-01 00:00:00')
-      AND dd.date < COALESCE(DATE(por.ts_listing_version_end), CURRENT_TIMESTAMP())
+      AND dd.date >= DATE(COALESCE(por.ts_listing_version_start, '1900-01-01 00:00:00'))
+      AND dd.date < DATE(COALESCE(por.ts_listing_version_end, CURRENT_TIMESTAMP()))
   LEFT JOIN 
     datalake_ebdb_country.user AS ur
       ON hbh.id_user = ur.id_user
