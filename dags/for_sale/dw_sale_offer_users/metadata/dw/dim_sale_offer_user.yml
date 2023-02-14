@@ -1,0 +1,52 @@
+---
+database_name: dw_sale
+table_name: dim_sale_offer_user
+columns:
+  sk_user_sales_flow:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.id_user
+  sk_user_external:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_users.id_external
+  name:
+    lineage:
+      - dw_public.dim_user.nome
+  gender:
+    lineage:
+      - dw_public.dim_user.sexo
+  email:
+    lineage:
+      - dw_public.dim_user.email
+  phone_number:
+    lineage:
+      - dw_public.dim_user.telefone_principal
+  address:
+    lineage:
+      - dw_public.dim_user.endereco
+  postal_code:
+    lineage:
+      - dw_public.dim_user.cep
+  city:
+    lineage:
+      - dw_public.dim_user.cidade
+  state:
+    lineage:
+      - dw_public.dim_user.estado_nome
+  houses_owned:
+    lineage:
+      - dw_public.dim_user.houses_owned
+  quintoandar_houses_owned:
+    lineage:
+      - dw_public.dim_user.quintoandar_houses_owned
+  owns_a_property:
+    lineage:
+      - dw_public.dim_user.tem_imovel
+  active_contract_status:
+    lineage:
+      - dw_public.dim_user.tem_contrato_ativo
+  user_status:
+    lineage:
+      - dw_public.dim_user.active
+  block_status:
+    lineage:
+      - dw_public.dim_user.bloqueado

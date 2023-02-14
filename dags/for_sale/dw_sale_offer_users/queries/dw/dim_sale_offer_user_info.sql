@@ -1,0 +1,12 @@
+SELECT
+    sk_user_info,
+    user_type,
+    ccv_buyer_status,
+    seller_ccv_signer_status,
+    buyer_ccv_signer_status,
+    user_legal_type,
+    original_user_status,
+    income_partner_status,
+    joint_buyer_status
+FROM
+    datalake_sale_offer_flows.sale_offer_users_info
