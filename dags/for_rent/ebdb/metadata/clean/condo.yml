@@ -49,6 +49,9 @@ columns:
   has_condo_page:
     lineage:
       - datalake_ebdb_raw.condominio.hascondominiumpage
+  construction_year:
+    lineage:
+      - datalake_ebdb_raw.condominio.anoConstrucao
   dt_expiration:
     lineage:
       - datalake_ebdb_raw.condominio.expirationday

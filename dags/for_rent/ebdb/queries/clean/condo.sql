@@ -15,6 +15,7 @@ SELECT
   c.entryAuthorization AS entry_authorization,
   c.entryAuthorizationInfo AS entry_authorization_info,
   c.hasCondominiumPage AS has_condo_page,
+  c.anoConstrucao AS construction_year,
   c.expirationDay AS dt_expiration,
   c.weekendEndMovingSchedule AS ts_weekend_moving_schedule_ended,
   c.weekendStartMovingSchedule AS ts_weekend_moving_schedule_started,
