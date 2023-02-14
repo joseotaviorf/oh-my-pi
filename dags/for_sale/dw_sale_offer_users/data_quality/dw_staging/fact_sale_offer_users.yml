@@ -6,6 +6,6 @@ table_level_validations:
     greater_than_or_equal_to: 70000
     severity_level: Error
 column_level_validations:
-  sk_user:
+  sk_sale_offer_user:
     is_complete:
       severity_level: Error

@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS sale.dim_sale_offer_user_info;
 CREATE TABLE sale.dim_sale_offer_user_info (
-	sk_user_info VARCHAR PRIMARY KEY,
+	sk_user_info BIGINT PRIMARY KEY,
 	user_type VARCHAR,
 	ccv_buyer_status VARCHAR,
 	seller_ccv_signer_status VARCHAR,

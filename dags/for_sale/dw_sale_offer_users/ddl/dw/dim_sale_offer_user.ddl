@@ -5,6 +5,7 @@ CREATE TABLE sale.dim_sale_offer_user (
 	name VARCHAR,
 	gender VARCHAR,
 	email VARCHAR,
+	alternative_email VARCHAR,
 	phone_number VARCHAR,
 	address VARCHAR,
 	postal_code VARCHAR,

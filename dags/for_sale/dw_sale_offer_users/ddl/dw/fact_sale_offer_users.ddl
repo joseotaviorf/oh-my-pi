@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS sale.fact_sale_offer_users;
 CREATE TABLE sale.fact_sale_offer_users (
 	sk_sale_offer_user VARCHAR PRIMARY KEY,
-	sk_offer BIGINT,
+	sk_offer VARCHAR,
 	sk_user_external BIGINT,
 	sk_user_sales_flow BIGINT,
 	sk_user_info BIGINT,
