@@ -144,6 +144,14 @@ if __name__ == "__main__":
         records = airtable_consumer.sync(params=extended_params)
 
         if records:
+
+            logger.info(
+                f"""
+                        m=__main__, table_name={table_config}, base_id={base_id}, table_id={table_id},
+                        params={params} msg=Records found.
+                """
+            )
+
             df = parse_records(records, spark_client, columns_to_drop=columns_to_ignore)
             df = (
                 SparkDataFrameService()
@@ -173,4 +181,11 @@ if __name__ == "__main__":
                 table_name=table_name,
                 df=df,
                 partition_cols=partitions_cols,
+            )
+        else:
+            logger.warning(
+                f"""
+                        m=__main__, table_name={table_config}, base_id={base_id}, table_id={table_id},
+                        params={params} msg=No records found.
+                """
             )

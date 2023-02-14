@@ -27,7 +27,17 @@ tables:
     table_id: tblhwdN61WJ5URbrA
     params:
       view: viwQ1cadHa9ieyfLG
-
+  wallet:
+    base_id: appp17zSDz2ovn3CT
+    table_id: tblqVNbYMrcQ329cC
+    params:
+      view: viwHENefX9frU3uah
+  wallet_history:
+    base_id: appp17zSDz2ovn3CT
+    table_id: tblSqRc4S1sK7zteP
+    params:
+      view: viw1pKmWJHZUpjuKZ
+      
 partition_cols:
   - year
   - month

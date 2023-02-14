@@ -21,6 +21,8 @@ Produces the following output table:
 - `cr_occurrences`
 - `jira_tickets`
 - `leads`
+- `wallet`
+- `wallet_history`
 
 
 </details>

@@ -1,0 +1,34 @@
+---
+database_name: datalake_airtable
+table_name: wallet
+columns:
+  id_airtable_record:
+    lineage:
+      - datalake_airtable_clean.wallet.id_airtable_record
+  id_partner:
+    lineage:
+      - datalake_airtable_clean.wallet.id_partner
+  category:
+    lineage:
+      - datalake_airtable_clean.wallet.category
+  wallet:
+    lineage:
+      - datalake_airtable_clean.wallet.wallet
+  dt_started:
+    lineage:
+      - datalake_airtable_clean.wallet.dt_started
+  dt_ended:
+    lineage:
+      - datalake_airtable_clean.wallet.dt_ended
+  ts_updated:
+    lineage:
+      - datalake_airtable_clean.wallet.ts_updated
+  year:
+    lineage:
+      - datalake_airtable_clean.wallet.year
+  month:
+    lineage:
+      - datalake_airtable_clean.wallet.month
+  day:
+    lineage:
+      - datalake_airtable_clean.wallet.day

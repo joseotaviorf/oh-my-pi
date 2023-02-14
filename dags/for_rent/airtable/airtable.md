@@ -23,5 +23,7 @@ This pipeline produces the following output incremental table in the raw and cle
     - `historical`
     - `jira_tickets`
     - `leads`
+    - `wallet`
+    - `wallet_history`
 
 </details>
