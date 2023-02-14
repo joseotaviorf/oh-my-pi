@@ -15,7 +15,7 @@ JOB_NAME = "load_cozy_metrics_raw"
 def _generate_date_range(load_start_date, load_end_date):
     start_date = dt.datetime.strptime(load_start_date, "%Y-%m-%d")
     end_date = dt.datetime.strptime(load_end_date, "%Y-%m-%d")
-    date_index = [start_date + dt.timedelta(days=x) for x in range(0, (end_date - start_date).days)]
+    date_index = [start_date + dt.timedelta(days=x) for x in range(0, (end_date - start_date).days + 1)]
 
     logger.info(
         f"""m=_generate_date_range, msg=Getting data from {start_date} to {end_date}..."""

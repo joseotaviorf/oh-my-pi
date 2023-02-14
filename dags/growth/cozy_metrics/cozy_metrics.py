@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 from airflow.models import DAG
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -118,7 +119,7 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     has_create_external_table_task=False,
 )
 
-create_cluster_task >> DatalakeTaskGroup.first_tasks(raw_task_group)
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
 TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
 terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
 

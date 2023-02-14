@@ -25,6 +25,13 @@ This DAG runs daily. More information about run time [here]({chart_url}{dag_id})
 Tables:
 
 - datalake_cozy_metrics_raw.library_versions
+- datalake_cozy_metrics_raw.count_cozy_imports
+- datalake_cozy_metrics_raw.cozy_vs_bp_coverage
+- datalake_cozy_metrics_raw.styled_usage
+
 - datalake_cozy_metrics_clean.library_versions
-  
+- datalake_cozy_metrics_clean.count_cozy_imports
+- datalake_cozy_metrics_clean.cozy_vs_bp_coverage
+- datalake_cozy_metrics_clean.styled_usage
+
 </details>

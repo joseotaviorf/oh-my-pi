@@ -3,28 +3,28 @@ table_name: library_versions
 columns:
   metric_name:
     lineage:
-      - datalake_cozy_metrics_raw.name
+      - datalake_cozy_metrics_raw.library_versions.name
   project_name:
     lineage:
-      - datalake_cozy_metrics_raw.project
+      - datalake_cozy_metrics_raw.library_versions.project
   project_version:
       lineage:
-      - datalake_cozy_metrics_raw.project_version
+      - datalake_cozy_metrics_raw.library_versions.project_version
   core:
     lineage:
-      - datalake_cozy_metrics_raw.value
+      - datalake_cozy_metrics_raw.library_versions.value
   icons:
     lineage:
-      - datalake_cozy_metrics_raw.value  
+      - datalake_cozy_metrics_raw.library_versions.value  
   theme:
     lineage:
-      - datalake_cozy_metrics_raw.value 
+      - datalake_cozy_metrics_raw.library_versions.value 
   tokens:
     lineage:
-      - datalake_cozy_metrics_raw.value 
+      - datalake_cozy_metrics_raw.library_versions.value 
   utils:
     lineage:
-      - datalake_cozy_metrics_raw.value 
+      - datalake_cozy_metrics_raw.library_versions.value 
   dt_created:
     lineage:
-      - datalake_cozy_metrics_raw.created_at
+      - datalake_cozy_metrics_raw.library_versions.created_at

@@ -1,0 +1,2 @@
+database_name: datalake_cozy_metrics_raw
+table_name: count_cozy_imports
