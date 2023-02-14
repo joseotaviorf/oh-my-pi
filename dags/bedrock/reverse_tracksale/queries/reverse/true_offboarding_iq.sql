@@ -33,8 +33,8 @@ contracts AS (
     b2b_listings AS bl 
       ON dc.sk_contract = bl.sk_contract
   WHERE
-    dc.country_code = 'BR'   
-    AND ct.status = 'DONE'  
+    dc.country_code = 'BR'
+    AND ct.status = 'DONE'
     AND bl.sk_contract IS NULL	
     AND ct.dt_termination >= dc.dt_start
     AND dc.rental_administrator = 'QUINTOANDAR'
@@ -53,7 +53,7 @@ status_send AS (
     ft.ts_started,
     ft.ts_solved,
     CASE 
-      WHEN (dp.department IN ('Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]') 
+      WHEN (dp.department = 'Rescisão - Despejo [OFF][POS][BACK]'
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
         OR (c.termination_type = 'termination' 
           AND ft.sk_ticket IS NOT NULL 
@@ -62,12 +62,12 @@ status_send AS (
        ELSE 0 
      END AS flg_not_send,
     CASE 
-      WHEN dp.department IN ('Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]') 
+      WHEN dp.department = 'Rescisão - Despejo [OFF][POS][BACK]'
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions') THEN 0
       WHEN c.termination_type = 'recap_termination' 
         AND ft.sk_ticket IS NOT NULL 
         AND ft.ts_started < c.dt_recap  + interval '2' day
-        AND dp.department = 'Offboarding [OFF] [POS] [BACK]'
+        AND dp.department IN ('Offboarding [OFF] [POS] [BACK]', 'Proteção QuintoAndar [OFF] [POS] [BACK]')
         AND (ft.ts_solved >= c.dt_recap + interval '2' day OR ft.ts_solved IS NULL) THEN 1
       ELSE 0
      END AS flg_recap_send
