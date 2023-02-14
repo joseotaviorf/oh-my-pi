@@ -1,0 +1,54 @@
+database_name: datalake_gsheets_clean
+table_name: imovelweb_customer_portfolio
+columns:
+  sk_sap:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio._id_sap
+  document_number:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio._cpf_cnpj
+  legal_entity:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio._pf_pj
+  realestate_name:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio._razao_social
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio._regiao
+  city:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio._cidade
+  neighborhood:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio._bairro
+  email:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio.email
+  phone_number:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio.telefone_1
+  realestate_segmentation:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio.equipe
+  integrator:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio.integrador
+  amount:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio._valor_mensal
+  competitiors_listings:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio._estoque_concorrencia
+  rent_listings:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio._listings_aluguel
+  sale_listings:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio.listings_venda
+  average_rent:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio.ticket_medio_rent
+  average_sale:
+    lineage:
+      - datalake_gsheets_raw.imovelweb_customer_portfolio.ticket_medio_sale

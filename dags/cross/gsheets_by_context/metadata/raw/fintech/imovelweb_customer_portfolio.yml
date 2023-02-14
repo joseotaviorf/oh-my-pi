@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_raw
+table_name: imovelweb_customer_portfolio
+columns:
+  _cpf_cnpj:
+    tags:
+    - PII
+  email:
+    tags:
+    - PII
+  telefone_1:
+    tags:
+    - PII

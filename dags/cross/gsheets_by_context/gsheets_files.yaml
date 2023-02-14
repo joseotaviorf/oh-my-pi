@@ -639,6 +639,12 @@ hub_bonus:
     clean_table_name: hub_bonus
     sheet_context: fintech
 
+imovelweb_customer_portfolio:
+    sheet_id: 1_pDCFmURUe7uYbmnkjw6GDaucfkjR-xNGJj9wKh-GMU
+    sheet_name: carteira_inicial
+    clean_table_name: imovelweb_customer_portfolio
+    sheet_context: fintech
+
 mova_lra_owners:
     sheet_id: 1Df7vmUXQpUtCrU6gDkwr49bNQTdksa9T0V_XHwIc3hQ
     sheet_name: 5A_Proprietarios_Completo
