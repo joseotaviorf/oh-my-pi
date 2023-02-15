@@ -32,7 +32,8 @@ SELECT
 	NULL::BIGINT AS opp2fl,
 	NULL::BIGINT AS q2avq,
 	NULL::BIGINT AS avq2opp,
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dim_date dd
 JOIN
@@ -48,9 +49,12 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p_prod.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 p2q AS (
 SELECT
@@ -85,7 +89,8 @@ SELECT
 	NULL::BIGINT AS opp2fl,
 	NULL::BIGINT AS q2avq,
 	NULL::BIGINT AS avq2opp,
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dim_date dd
 JOIN
@@ -101,9 +106,12 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p_prod.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 q2avq AS (
 SELECT
@@ -138,7 +146,8 @@ SELECT
 	NULL::BIGINT AS opp2fl,
 	COUNT(lf.sk_qualified_date) AS q2avq, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS avq2opp,
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dim_date dd
 JOIN
@@ -154,9 +163,12 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p_prod.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 avq2opp AS (
 SELECT
@@ -191,7 +203,8 @@ SELECT
 	NULL::BIGINT AS opp2fl,
 	NULL::BIGINT AS q2avq,
 	COUNT(lf.sk_available_qualified_date) AS avq2opp, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dim_date dd
 JOIN
@@ -207,9 +220,12 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p_prod.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 q2opp AS (
 SELECT
@@ -244,7 +260,8 @@ SELECT
 	NULL::BIGINT AS opp2fl,
 	NULL::BIGINT AS q2avq,
 	NULL::BIGINT AS avq2opp,
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dim_date dd
 JOIN
@@ -260,9 +277,12 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p_prod.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 opp2fl AS (
 SELECT
@@ -297,7 +317,8 @@ SELECT
 	COUNT(DISTINCT lf.sk_house_listing) AS opp2fl,
 	NULL::BIGINT AS q2avq,
 	NULL::BIGINT AS avq2opp,
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dim_date dd
 JOIN
@@ -313,9 +334,12 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p_prod.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -355,7 +379,8 @@ SELECT
   ua.opp2fl,
   ua.q2avq,
   ua.avq2opp,
-  ua.country_code
+  ua.country_code,
+  ua.rental_administrator
 FROM
     union_all ua
 RIGHT JOIN
@@ -398,6 +423,7 @@ SELECT
     supply_3pbh_partner,
     is_3p_supply,
     is_3pbh_supply,
+	rental_administrator,
     SUM(COALESCE(l2p,0)) AS l2p,
     SUM(COALESCE(p2q,0)) AS p2q,
     SUM(COALESCE(q2opp,0)) AS q2opp,
@@ -407,4 +433,4 @@ SELECT
     current_timestamp AS ts_load
 FROM
     union_all_date
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20

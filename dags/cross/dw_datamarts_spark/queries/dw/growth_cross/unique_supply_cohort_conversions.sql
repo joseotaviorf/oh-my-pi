@@ -20,7 +20,8 @@ SELECT
 	context_lead AS context_origin,
 	context_prospect AS context_conversion,
     CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_prospect_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_lead_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion,
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dw_public.dim_date dd
 JOIN
@@ -36,6 +37,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	dw_public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE  
 ),
@@ -72,10 +76,11 @@ SELECT
 	NULL::BIGINT AS opp2fl,
 	NULL::BIGINT AS q2avq,
 	NULL::BIGINT AS avq2opp,
-	country_code
+	country_code,
+	rental_administrator
 FROM
     l2p_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 p2q_pre AS (
 SELECT
@@ -98,7 +103,8 @@ SELECT
 	context_prospect AS context_origin,
 	context_qualified AS context_conversion,
     CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_qualified_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_prospect_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion,
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dw_public.dim_date dd
 JOIN
@@ -114,6 +120,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	dw_public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE
 ),
@@ -150,10 +159,11 @@ SELECT
 	NULL::BIGINT AS opp2fl,
 	NULL::BIGINT AS q2avq,
 	NULL::BIGINT AS avq2opp,
-	country_code
+	country_code,
+	rental_administrator
 FROM
 	p2q_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 q2avq_pre AS (
 SELECT
@@ -176,7 +186,8 @@ SELECT
 	context_qualified AS context_origin,
 	context_available_qualified AS context_conversion,
     CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_available_qualified_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_qualified_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion,
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dw_public.dim_date dd
 JOIN
@@ -192,6 +203,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	dw_public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE
 ),
@@ -228,10 +242,11 @@ SELECT
 	NULL::BIGINT AS opp2fl,
 	COUNT(sk_qualified_date) AS q2avq, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS avq2opp,
-	country_code
+	country_code,
+	rental_administrator
 FROM
 	q2avq_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 avq2opp_pre AS (
 SELECT
@@ -254,7 +269,8 @@ SELECT
 	context_available_qualified AS context_origin,
 	context_opportunity AS context_conversion,
     CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_opportunity_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_available_qualified_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion,
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dw_public.dim_date dd
 JOIN
@@ -270,6 +286,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	dw_public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE
 ),
@@ -306,10 +325,11 @@ SELECT
 	NULL::BIGINT AS opp2fl,
 	NULL::BIGINT AS q2avq,
 	COUNT(sk_available_qualified_date) AS avq2opp, -- this count is done on the available_qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
-	country_code
+	country_code,
+	rental_administrator
 FROM
 	avq2opp_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 q2opp_pre AS (
 SELECT
@@ -332,7 +352,8 @@ SELECT
 	context_qualified AS context_origin,
 	context_opportunity AS context_conversion,
     CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_opportunity_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_qualified_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion,
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dw_public.dim_date dd
 JOIN
@@ -348,6 +369,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	dw_public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE -- filter data from 4 years ago
 
@@ -385,10 +409,11 @@ SELECT
 	NULL::BIGINT AS opp2fl,
 	NULL::BIGINT AS q2avq,
 	NULL::BIGINT AS avq2opp,
-	country_code
+	country_code,
+	rental_administrator
 FROM
 	q2opp_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 opp2fl_pre AS (
 SELECT
@@ -411,7 +436,8 @@ SELECT
 	context_opportunity AS context_origin,
 	context_first_listing AS context_conversion,
     CAST(DATEDIFF(DATE_TRUNC('week',TO_DATE(lf.sk_first_listing_date::STRING,"yyyyMMdd")),DATE_TRUNC('week',TO_DATE(lf.sk_opportunity_date::STRING,"yyyyMMdd")))/7 AS INTEGER) AS quantity_weeks_conversion,
-	lf.country_code
+	lf.country_code,
+	dhl.rental_administrator
 FROM
     dw_public.dim_date dd
 JOIN
@@ -427,6 +453,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
+LEFT JOIN 
+	dw_public.dim_house_listing dhl
+		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE -- filter data from 4 years ago
 ),
@@ -463,10 +492,11 @@ SELECT
 	COUNT(DISTINCT sk_house_listing) AS opp2fl,
 	NULL::BIGINT AS q2avq,
 	NULL::BIGINT AS avq2opp,
-	country_code
+	country_code,
+	rental_administrator
 FROM
 	opp2fl_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -506,7 +536,8 @@ SELECT
   ua.opp2fl,
   ua.q2avq,
   ua.avq2opp,
-  ua.country_code
+  ua.country_code,
+  ua.rental_administrator
 FROM
     union_all ua
 RIGHT JOIN
@@ -553,6 +584,7 @@ SELECT
   supply_3pbh_partner,
   is_3p_supply,
   is_3pbh_supply,
+  rental_administrator,
   SUM(COALESCE(l2p,0)) AS l2p,
   SUM(COALESCE(p2q,0)) AS p2q,
   SUM(COALESCE(q2opp,0)) AS q2opp,
@@ -562,4 +594,4 @@ SELECT
   current_timestamp AS ts_load
 FROM
   union_all_date
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20

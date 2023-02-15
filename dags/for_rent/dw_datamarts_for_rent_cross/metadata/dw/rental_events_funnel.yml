@@ -43,3 +43,6 @@ columns:
   is_b2b_demand:
     lineage:
       - dw_datamarts_cross.quintoandar_consultant_listings.type_big_agent
+  rental_administrator:
+    lineage:
+      - dw_public.dim_house_lisrting.rental_administrator

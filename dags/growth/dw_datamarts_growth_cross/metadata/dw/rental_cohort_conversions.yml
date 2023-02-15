@@ -63,3 +63,6 @@ columns:
       - dw_public.fact_listing_rent_flows.sk_guarantee_paid_date
       - dw_public.fact_listing_rent_flows.sk_contract_signed_date
       - dw_public.fact_listing_rent_flows.sk_contract_annulment_date
+  rental_administrator:
+    lineage:
+      - dw_public.dim_house_listing.rental_administrator

@@ -30,6 +30,7 @@ WITH l2p AS (
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_lead_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_prospect_date,-1) AS STRING),'yyyyMMdd'))) >=5
                 THEN 'W5+'
         END AS weeks_conversion,
+        NULL AS rental_administrator,
         COUNT(fhlf.sk_lead_date) AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -68,7 +69,7 @@ WITH l2p AS (
     WHERE
         fhlf.origin_table = 'Rent'
         AND dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 p2q AS (
     SELECT
@@ -102,6 +103,7 @@ p2q AS (
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_prospect_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_qualified_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
+        NULL AS rental_administrator,
         NULL::BIGINT AS l2p,
         COUNT(fhlf.sk_prospect_date) AS p2q, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
         NULL::BIGINT AS q2aq,
@@ -140,7 +142,7 @@ p2q AS (
     WHERE
         fhlf.origin_table = 'Rent'
         AND dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 -- new step 1 q2aq
 q2aq AS (
@@ -175,6 +177,7 @@ q2aq AS (
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_qualified_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_available_qualified_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
+        NULL AS rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         COUNT(fhlf.sk_qualified_date) AS q2aq, -- add -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
@@ -213,7 +216,7 @@ q2aq AS (
     WHERE
         fhlf.origin_table = 'Rent'
         AND dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ), -- new aq2o step 2
 aq2o AS (
     SELECT
@@ -247,6 +250,7 @@ aq2o AS (
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_available_qualified_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_opportunity_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
+        NULL AS rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -285,7 +289,7 @@ aq2o AS (
     WHERE
         fhlf.origin_table = 'Rent'
         AND dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 q2opp AS (
     SELECT
@@ -319,6 +323,7 @@ q2opp AS (
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_qualified_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_opportunity_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
+        NULL AS rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -357,7 +362,7 @@ q2opp AS (
     WHERE
         fhlf.origin_table = 'Rent'
         AND dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 opp2fl AS (
     SELECT
@@ -391,6 +396,7 @@ opp2fl AS (
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(fhlf.sk_opportunity_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(fhlf.sk_first_listing_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
+        NULL AS rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -429,7 +435,7 @@ opp2fl AS (
     WHERE
         fhlf.origin_table = 'Rent'
         AND dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 rent_flow_adjusted AS (
     SELECT
@@ -482,7 +488,8 @@ rent_flow_adjusted AS (
         db.mkt_medium AS demand_mkt_medium_booking,
         dof.mkt_channel AS demand_mkt_channel_offer,
         dof.mkt_medium AS demand_mkt_medium_offer,
-        COALESCE(dhl.country_code, dr.country_code) AS country_code
+        COALESCE(dhl.country_code, dr.country_code) AS country_code,
+        dhl.rental_administrator
     FROM
         dw_public.fact_listing_rent_flows rf
     LEFT JOIN
@@ -527,6 +534,7 @@ vb2vc AS (
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_visit_date,-1) AS STRING),'yyyyMMdd'))) >= 5 AND rf.flg_visit_completed
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -561,7 +569,7 @@ vb2vc AS (
                 AND rf.sk_booking_created_date > 0
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 vb2os_aux AS (
     SELECT
@@ -586,6 +594,7 @@ vb2os_aux AS (
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_booking_created_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -620,7 +629,7 @@ vb2os_aux AS (
                 AND rf.sk_booking_created_date > 0
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 vb_aux AS (
     SELECT
@@ -638,6 +647,7 @@ vb_aux AS (
         first_touchpoint,
         is_guarantee,
         NULL as weeks_conversion,
+        rental_administrator,
         vb2vc as vb,
         NULL::BIGINT as vb2os
     FROM vb2vc
@@ -657,6 +667,7 @@ vb_aux AS (
         first_touchpoint,
         is_guarantee,
         NULL as weeks_conversion,
+        rental_administrator,
         NULL::BIGINT as vb,
         vb2os
     FROM vb2os_aux
@@ -677,6 +688,7 @@ vb_aux2 AS(
         first_touchpoint,
         is_guarantee,
         weeks_conversion,
+        rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -704,7 +716,7 @@ vb_aux2 AS(
         NULL::BIGINT AS cc2cs,
         NULL::BIGINT AS cs2ce
     FROM vb_aux
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 vb2os AS (
     SELECT *
@@ -729,6 +741,7 @@ vc AS (
         rf.funnel_first_touchpoint AS first_touchpoint,
         NULL::BOOLEAN AS is_guarantee,
         NULL::STRING AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -761,7 +774,7 @@ vc AS (
         AND rf.sk_visit_date > 0 AND rf.flg_visit_completed = 1
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 vc2os AS (
     SELECT
@@ -786,6 +799,7 @@ vc2os AS (
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_visit_date AS STRING), 'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_submitted_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -820,7 +834,7 @@ vc2os AS (
                 AND rf.sk_visit_date > 0 AND rf.flg_visit_completed = 1
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 os2oa AS (
     SELECT
@@ -845,6 +859,7 @@ os2oa AS (
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_submitted_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_offer_approved_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -879,7 +894,7 @@ os2oa AS (
                 AND rf.sk_offer_submitted_date > 0
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 oa2cei AS(
     SELECT
@@ -904,6 +919,7 @@ oa2cei AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_first_credit_evaluation_init,-1) AS STRING),'yyyyMMdd'))) >=5
                 THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -938,7 +954,7 @@ oa2cei AS(
                 AND rf.sk_offer_approved_date > 0
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 oa2da AS(
     SELECT
@@ -963,6 +979,7 @@ oa2da AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -997,7 +1014,7 @@ oa2da AS(
                 AND rf.sk_offer_approved_date > 0
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 oa2ds AS(
     SELECT
@@ -1022,6 +1039,7 @@ oa2ds AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_offer_approved_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                 THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1056,7 +1074,7 @@ oa2ds AS(
                 AND rf.sk_offer_approved_date > 0
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 cei2cep AS(
     SELECT
@@ -1081,6 +1099,7 @@ cei2cep AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_init AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_first_credit_evaluation_positive,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1116,7 +1135,7 @@ cei2cep AS(
     WHERE
         dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee != 'RentalGuarantee'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15
 ),
 cei2gs AS(
     SELECT
@@ -1141,6 +1160,7 @@ cei2gs AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_init AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_guarantee_date,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1176,7 +1196,7 @@ cei2gs AS(
     WHERE
         dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee = 'RentalGuarantee'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15
 ),
 cep2ds AS(
     SELECT
@@ -1201,6 +1221,7 @@ cep2ds AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_first_credit_evaluation_positive AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1236,7 +1257,7 @@ cep2ds AS(
     WHERE
         dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee != 'RentalGuarantee'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 gs2ds AS(
     SELECT
@@ -1261,6 +1282,7 @@ gs2ds AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_guarantee_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_tenant_first_doc_sent_date,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1296,7 +1318,7 @@ gs2ds AS(
     WHERE
         dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee = 'RentalGuarantee'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 ds2da AS(
     SELECT
@@ -1321,6 +1343,7 @@ ds2da AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_tenant_first_doc_sent_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1355,7 +1378,7 @@ ds2da AS(
                 AND rf.sk_tenant_first_doc_sent_date > 0
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 da2cc AS(
     SELECT
@@ -1380,6 +1403,7 @@ da2cc AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_created_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1415,7 +1439,7 @@ da2cc AS(
     WHERE
         dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee != 'RentalGuarantee'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 da2gp AS(
     SELECT
@@ -1440,6 +1464,7 @@ da2gp AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_guarantee_paid_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1475,7 +1500,7 @@ da2gp AS(
     WHERE
         dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee = 'RentalGuarantee'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 gp2cc AS(
     SELECT
@@ -1500,6 +1525,7 @@ gp2cc AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_guarantee_paid_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_created_date,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1535,7 +1561,7 @@ gp2cc AS(
     WHERE
         dd.date BETWEEN (DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year') AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
             AND rf.guarantee = 'RentalGuarantee'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15
 ),
 da2cs AS(
     SELECT
@@ -1560,6 +1586,7 @@ da2cs AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_credit_analysis_approved_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd'))) >=5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1594,7 +1621,7 @@ da2cs AS(
                 AND rf.sk_credit_analysis_approved_date_adjust > 0
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15
 ),
 da_gp2cs AS(
     SELECT
@@ -1619,6 +1646,7 @@ da_gp2cs AS(
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_da_gp_date_adjust AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd')))>= 5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1653,7 +1681,7 @@ da_gp2cs AS(
                 AND rf.sk_da_gp_date_adjust > 0
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 cc2cs AS (
     SELECT
@@ -1678,6 +1706,7 @@ cc2cs AS (
             WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_contract_created_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_signed_date,-1) AS STRING),'yyyyMMdd')))>= 5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1712,7 +1741,7 @@ cc2cs AS (
                 AND rf.sk_contract_created_date > 0
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 cs2ce AS (
     SELECT
@@ -1737,6 +1766,7 @@ cs2ce AS (
                 WHEN DATEDIFF(week,DATE_TRUNC('week',TO_DATE(CAST(rf.sk_contract_signed_date AS STRING),'yyyyMMdd')),DATE_TRUNC('week',TO_DATE(CAST(NULLIF(rf.sk_contract_annulment_date,-1) AS STRING),'yyyyMMdd'))) >= 5
                     THEN 'W5+'
         END AS weeks_conversion,
+        rf.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -1771,7 +1801,7 @@ cs2ce AS (
                 AND rf.sk_contract_signed_date > 0
     WHERE
         dd.date BETWEEN DATE_TRUNC('year',CURRENT_TIMESTAMP()) - INTERVAL '4 year' AND CURRENT_TIMESTAMP() -- filter data FROM 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -1841,6 +1871,7 @@ union_all_date AS (
         ua.first_touchpoint,
         ua.is_guarantee,
         ua.weeks_conversion,
+        ua.rental_administrator,
         ua.l2p,
         ua.p2q,
         ua.q2aq,
@@ -1900,6 +1931,7 @@ SELECT
     is_guarantee,
     is_b2b AS is_b2b_demand,
     weeks_conversion AS weeks_conversion,
+    rental_administrator,
     SUM(COALESCE(l2p,0)) AS l2p,
     SUM(COALESCE(p2q,0)) AS p2q,
     SUM(COALESCE(q2aq,0)) AS q2aq,
@@ -1929,4 +1961,4 @@ SELECT
     current_timestamp AS ts_load
 FROM
     union_all
-GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14

@@ -23,7 +23,8 @@ SELECT
 	NULL AS demand_mkt_medium,
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
-  	COUNT(fhlf.sk_lead_date) AS leads,
+  NULL AS rental_administrator,
+  COUNT(fhlf.sk_lead_date) AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS available_qualifieds,
@@ -32,19 +33,19 @@ SELECT
 	NULL::BIGINT AS messages_sent_tta,
 	NULL::BIGINT AS registered_agent_supports,
 	NULL::BIGINT AS visits_booked,
-  	NULL::BIGINT AS visits_completed,
-  	NULL::BIGINT AS offer_submitted,
-  	NULL::BIGINT AS offer_approved,
-  	NULL::BIGINT AS credit_evaluation_init,
-  	NULL::BIGINT AS credit_evaluation_positive,
-  	NULL::BIGINT AS guarantee_started,
-  	NULL::BIGINT AS doc_sent,
-  	NULL::BIGINT AS doc_approved,
-  	NULL::BIGINT AS guarantee_paid,
-  	NULL::BIGINT AS credit_approved,
-  	NULL::BIGINT AS contract_created,
-  	NULL::BIGINT AS contract_signed,
-  	NULL::BIGINT  AS contract_ended
+  NULL::BIGINT AS visits_completed,
+  NULL::BIGINT AS offer_submitted,
+  NULL::BIGINT AS offer_approved,
+  NULL::BIGINT AS credit_evaluation_init,
+  NULL::BIGINT AS credit_evaluation_positive,
+  NULL::BIGINT AS guarantee_started,
+  NULL::BIGINT AS doc_sent,
+  NULL::BIGINT AS doc_approved,
+  NULL::BIGINT AS guarantee_paid,
+  NULL::BIGINT AS credit_approved,
+  NULL::BIGINT AS contract_created,
+  NULL::BIGINT AS contract_signed,
+  NULL::BIGINT  AS contract_ended
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_lead_date
@@ -53,7 +54,7 @@ LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE origin_table = 'Rent'
 AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 prospect AS (
 SELECT
@@ -79,7 +80,8 @@ SELECT
 	NULL AS demand_mkt_medium,
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
-  	NULL::BIGINT AS leads,
+  NULL AS rental_administrator,
+  NULL::BIGINT AS leads,
 	COUNT(fhlf.sk_prospect_date) AS prospects, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS available_qualifieds,
@@ -88,19 +90,19 @@ SELECT
 	NULL::BIGINT AS messages_sent_tta,
 	NULL::BIGINT AS registered_agent_supports,
 	NULL::BIGINT AS visits_booked,
-  	NULL::BIGINT AS visits_completed,
-  	NULL::BIGINT AS offer_submitted,
-  	NULL::BIGINT AS offer_approved,
-  	NULL::BIGINT AS credit_evaluation_init,
-  	NULL::BIGINT AS credit_evaluation_positive,
-  	NULL::BIGINT AS guarantee_started,
-  	NULL::BIGINT AS doc_sent,
-  	NULL::BIGINT AS doc_approved,
-  	NULL::BIGINT AS guarantee_paid,
-  	NULL::BIGINT AS credit_approved,
-  	NULL::BIGINT AS contract_created,
-  	NULL::BIGINT AS contract_signed,
-  	NULL::BIGINT  AS contract_ended
+  NULL::BIGINT AS visits_completed,
+  NULL::BIGINT AS offer_submitted,
+  NULL::BIGINT AS offer_approved,
+  NULL::BIGINT AS credit_evaluation_init,
+  NULL::BIGINT AS credit_evaluation_positive,
+  NULL::BIGINT AS guarantee_started,
+  NULL::BIGINT AS doc_sent,
+  NULL::BIGINT AS doc_approved,
+  NULL::BIGINT AS guarantee_paid,
+  NULL::BIGINT AS credit_approved,
+  NULL::BIGINT AS contract_created,
+  NULL::BIGINT AS contract_signed,
+  NULL::BIGINT  AS contract_ended
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_prospect_date
@@ -109,7 +111,7 @@ LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE fhlf.origin_table = 'Rent'
 AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 qualified AS (
 SELECT
@@ -135,7 +137,8 @@ SELECT
 	NULL AS demand_mkt_medium,
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
-  	NULL::BIGINT AS leads,
+  NULL AS rental_administrator,
+  NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	COUNT(fhlf.sk_qualified_date) AS qualifieds, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS available_qualifieds,
@@ -144,19 +147,19 @@ SELECT
 	NULL::BIGINT AS messages_sent_tta,
 	NULL::BIGINT AS registered_agent_supports,
 	NULL::BIGINT AS visits_booked,
-  	NULL::BIGINT AS visits_completed,
-  	NULL::BIGINT AS offer_submitted,
-  	NULL::BIGINT AS offer_approved,
-  	NULL::BIGINT AS credit_evaluation_init,
-  	NULL::BIGINT AS credit_evaluation_positive,
-  	NULL::BIGINT AS guarantee_started,
-  	NULL::BIGINT AS doc_sent,
-  	NULL::BIGINT AS doc_approved,
-  	NULL::BIGINT AS guarantee_paid,
-  	NULL::BIGINT AS credit_approved,
-  	NULL::BIGINT AS contract_created,
-  	NULL::BIGINT AS contract_signed,
-  	NULL::BIGINT  AS contract_ended
+  NULL::BIGINT AS visits_completed,
+  NULL::BIGINT AS offer_submitted,
+  NULL::BIGINT AS offer_approved,
+  NULL::BIGINT AS credit_evaluation_init,
+  NULL::BIGINT AS credit_evaluation_positive,
+  NULL::BIGINT AS guarantee_started,
+  NULL::BIGINT AS doc_sent,
+  NULL::BIGINT AS doc_approved,
+  NULL::BIGINT AS guarantee_paid,
+  NULL::BIGINT AS credit_approved,
+  NULL::BIGINT AS contract_created,
+  NULL::BIGINT AS contract_signed,
+  NULL::BIGINT  AS contract_ended
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_qualified_date
@@ -165,7 +168,7 @@ LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE fhlf.origin_table = 'Rent'
 AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 available_qualified AS (
 SELECT
@@ -191,6 +194,7 @@ SELECT
 	NULL AS demand_mkt_medium,
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
+  NULL AS rental_administrator,
   NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -200,19 +204,19 @@ SELECT
 	NULL::BIGINT AS messages_sent_tta,
 	NULL::BIGINT AS registered_agent_supports,
 	NULL::BIGINT AS visits_booked,
-  	NULL::BIGINT AS visits_completed,
-  	NULL::BIGINT AS offer_submitted,
-  	NULL::BIGINT AS offer_approved,
-  	NULL::BIGINT AS credit_evaluation_init,
-  	NULL::BIGINT AS credit_evaluation_positive,
-  	NULL::BIGINT AS guarantee_started,
-  	NULL::BIGINT AS doc_sent,
-  	NULL::BIGINT AS doc_approved,
-  	NULL::BIGINT AS guarantee_paid,
-  	NULL::BIGINT AS credit_approved,
-  	NULL::BIGINT AS contract_created,
-  	NULL::BIGINT AS contract_signed,
-  	NULL::BIGINT  AS contract_ended
+  NULL::BIGINT AS visits_completed,
+  NULL::BIGINT AS offer_submitted,
+  NULL::BIGINT AS offer_approved,
+  NULL::BIGINT AS credit_evaluation_init,
+  NULL::BIGINT AS credit_evaluation_positive,
+  NULL::BIGINT AS guarantee_started,
+  NULL::BIGINT AS doc_sent,
+  NULL::BIGINT AS doc_approved,
+  NULL::BIGINT AS guarantee_paid,
+  NULL::BIGINT AS credit_approved,
+  NULL::BIGINT AS contract_created,
+  NULL::BIGINT AS contract_signed,
+  NULL::BIGINT  AS contract_ended
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_available_qualified_date
@@ -221,7 +225,7 @@ LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE fhlf.origin_table = 'Rent'
 AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 opportunity AS (
 SELECT
@@ -247,7 +251,8 @@ SELECT
 	NULL AS demand_mkt_medium,
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
-  	NULL::BIGINT AS leads,
+  NULL AS rental_administrator,
+  NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS available_qualifieds,
@@ -256,19 +261,19 @@ SELECT
 	NULL::BIGINT AS messages_sent_tta,
 	NULL::BIGINT AS registered_agent_supports,
 	NULL::BIGINT AS visits_booked,
-  	NULL::BIGINT AS visits_completed,
-  	NULL::BIGINT AS offer_submitted,
-  	NULL::BIGINT AS offer_approved,
-  	NULL::BIGINT AS credit_evaluation_init,
-  	NULL::BIGINT AS credit_evaluation_positive,
-  	NULL::BIGINT AS guarantee_started,
-  	NULL::BIGINT AS doc_sent,
-  	NULL::BIGINT AS doc_approved,
-  	NULL::BIGINT AS guarantee_paid,
-  	NULL::BIGINT AS credit_approved,
-  	NULL::BIGINT AS contract_created,
-  	NULL::BIGINT AS contract_signed,
-  	NULL::BIGINT  AS contract_ended
+  NULL::BIGINT AS visits_completed,
+  NULL::BIGINT AS offer_submitted,
+  NULL::BIGINT AS offer_approved,
+  NULL::BIGINT AS credit_evaluation_init,
+  NULL::BIGINT AS credit_evaluation_positive,
+  NULL::BIGINT AS guarantee_started,
+  NULL::BIGINT AS doc_sent,
+  NULL::BIGINT AS doc_approved,
+  NULL::BIGINT AS guarantee_paid,
+  NULL::BIGINT AS credit_approved,
+  NULL::BIGINT AS contract_created,
+  NULL::BIGINT AS contract_signed,
+  NULL::BIGINT  AS contract_ended
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_opportunity_date
@@ -277,7 +282,7 @@ LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE fhlf.origin_table = 'Rent'
 AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 listing AS (
 SELECT
@@ -303,7 +308,8 @@ SELECT
 	NULL AS demand_mkt_medium,
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
-  	NULL::BIGINT AS leads,
+  NULL AS rental_administrator,
+  NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS available_qualifieds,
@@ -312,19 +318,19 @@ SELECT
 	NULL::BIGINT AS messages_sent_tta,
 	NULL::BIGINT AS registered_agent_supports,
 	NULL::BIGINT AS visits_booked,
-  	NULL::BIGINT AS visits_completed,
-  	NULL::BIGINT AS offer_submitted,
-  	NULL::BIGINT AS offer_approved,
-  	NULL::BIGINT AS credit_evaluation_init,
-  	NULL::BIGINT AS credit_evaluation_positive,
-  	NULL::BIGINT AS guarantee_started,
-  	NULL::BIGINT AS doc_sent,
-  	NULL::BIGINT AS doc_approved,
-  	NULL::BIGINT AS guarantee_paid,
-  	NULL::BIGINT AS credit_approved,
-  	NULL::BIGINT AS contract_created,
-  	NULL::BIGINT AS contract_signed,
-  	NULL::BIGINT  AS contract_ended
+  NULL::BIGINT AS visits_completed,
+  NULL::BIGINT AS offer_submitted,
+  NULL::BIGINT AS offer_approved,
+  NULL::BIGINT AS credit_evaluation_init,
+  NULL::BIGINT AS credit_evaluation_positive,
+  NULL::BIGINT AS guarantee_started,
+  NULL::BIGINT AS doc_sent,
+  NULL::BIGINT AS doc_approved,
+  NULL::BIGINT AS guarantee_paid,
+  NULL::BIGINT AS credit_approved,
+  NULL::BIGINT AS contract_created,
+  NULL::BIGINT AS contract_signed,
+  NULL::BIGINT  AS contract_ended
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_first_listing_date
@@ -333,7 +339,7 @@ LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE fhlf.origin_table = 'Rent'
 AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 messages_sent AS (
 SELECT
@@ -355,6 +361,7 @@ SELECT
   'Other' AS demand_mkt_medium,
   NULL AS first_touchpoint,
   FALSE AS is_guarantee,
+  dhl.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -385,7 +392,7 @@ JOIN dim_house_listing dhl
 LEFT JOIN (SELECT distinct city_group, region_code, country_code FROM dim_region) dr
   ON tta.region_code = dr.region_code
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 agent_supports AS (
 SELECT
@@ -407,6 +414,7 @@ SELECT
   'Other' AS demand_mkt_medium,
   NULL AS first_touchpoint,
   FALSE AS is_guarantee,
+  dhl.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -439,7 +447,7 @@ JOIN dim_house_listing dhl
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 rent_flow_adjusted AS (
 SELECT
@@ -492,7 +500,8 @@ SELECT
     db.mkt_channel AS demand_mkt_channel_booking,
     db.mkt_medium AS demand_mkt_medium_booking,
     dof.mkt_channel AS demand_mkt_channel_offer,
-    dof.mkt_medium AS demand_mkt_medium_offer
+    dof.mkt_medium AS demand_mkt_medium_offer,
+    dhl.rental_administrator
 FROM fact_listing_rent_flows rf
 LEFT JOIN dim_proposal dp
   ON rf.sk_proposal = dp.sk_proposal
@@ -525,6 +534,7 @@ SELECT
   rf.demand_mkt_medium_booking AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   FALSE AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -552,7 +562,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_booking_created_date
   AND rf.sk_booking_created_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 visits_completed AS (
 SELECT
@@ -571,6 +581,7 @@ SELECT
   rf.demand_mkt_medium_booking AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   FALSE AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -598,7 +609,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_visit_date
   AND rf.sk_visit_date > 0 AND rf.flg_visit_completed = 1
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 offer_submitted AS (
 SELECT
@@ -617,6 +628,7 @@ SELECT
   rf.demand_mkt_medium_booking AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   FALSE AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -644,7 +656,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_offer_submitted_date
   AND rf.sk_offer_submitted_date > 0
 WHERE dd."date"between DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 offer_approved AS(
 SELECT
@@ -663,6 +675,7 @@ SELECT
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   FALSE AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -690,7 +703,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_offer_approved_date
   AND rf.sk_offer_approved_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,12, 13, 14, 15, 16
 ),
 credit_evaluation_init AS(
 SELECT
@@ -709,6 +722,7 @@ SELECT
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -736,7 +750,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_first_credit_evaluation_init
   AND rf.sk_first_credit_evaluation_init > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 credit_evaluation_positive AS(
 SELECT
@@ -755,6 +769,7 @@ SELECT
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -782,7 +797,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_first_credit_evaluation_positive
   AND rf.sk_first_credit_evaluation_positive > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 guarantee_started AS(
 SELECT
@@ -801,6 +816,7 @@ SELECT
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -828,7 +844,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_guarantee_date
   AND rf.sk_guarantee_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 doc_sent AS(
 SELECT
@@ -847,6 +863,7 @@ SELECT
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -874,7 +891,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_tenant_first_doc_sent_date
   AND rf.sk_tenant_first_doc_sent_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 doc_approved AS(
 SELECT
@@ -893,6 +910,7 @@ SELECT
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -921,7 +939,7 @@ JOIN rent_flow_adjusted rf
   AND rf.sk_last_doc_analysis_approved > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
 and sk_offer>0 -- correcting cases with doc approved date but sk_offer = -1
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 guarantee_paid AS(
 SELECT
@@ -940,6 +958,7 @@ SELECT
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -967,7 +986,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_guarantee_paid_date
   AND rf.sk_guarantee_paid_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 credit_approved AS(
 SELECT
@@ -986,6 +1005,7 @@ SELECT
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -1013,7 +1033,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_credit_analysis_approved_date
   AND rf.sk_credit_analysis_approved_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 contract_created AS (
 SELECT
@@ -1032,6 +1052,7 @@ SELECT
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -1059,7 +1080,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_contract_created_date
   AND rf.sk_contract_created_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 contract_signed AS (
 SELECT
@@ -1078,6 +1099,7 @@ SELECT
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -1108,7 +1130,7 @@ JOIN dim_contract dc
   ON rf.sk_contract = dc.sk_contract
   and dc.status in ('Ativo', 'Finalizado')
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 contract_ended AS (
 SELECT
@@ -1127,6 +1149,7 @@ SELECT
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
+  rf.rental_administrator,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -1154,7 +1177,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_contract_annulment_date
   AND rf.sk_contract_signed_date > 0 AND rf.sk_contract_annulment_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -1217,6 +1240,7 @@ SELECT
   ua.demand_mkt_medium,
   ua.first_touchpoint,
   ua.is_guarantee,
+  ua.rental_administrator,
   ua.leads,
   ua.prospects,
   ua.qualifieds,
@@ -1270,6 +1294,7 @@ SELECT
 	first_touchpoint,
 	is_guarantee,
   is_b2b AS is_b2b_demand,
+  rental_administrator,
   SUM(COALESCE(leads,0)) AS leads,
   SUM(COALESCE(prospects,0)) AS prospects,
   SUM(COALESCE(qualifieds,0)) AS qualifieds,
@@ -1296,4 +1321,4 @@ SELECT
 FROM 
   union_all_date
 GROUP BY 
-  "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
