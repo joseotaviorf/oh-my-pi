@@ -1,0 +1,19 @@
+---
+database_name: dw_rede
+table_name: fact_company_event
+columns:
+  sk_event_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_company:
+    lineage:
+      - datalake_rede_company.company_sks.sk_company
+  sk_company_event_type:
+    lineage:
+      - dw_rede.dim_company_event_type.sk_company_event_type
+  journey_number:
+    lineage:
+      - datalake_rede_company.company_event.id_journey
+  ts_event:
+    lineage:
+      - datalake_rede_company.company_event.ts_event

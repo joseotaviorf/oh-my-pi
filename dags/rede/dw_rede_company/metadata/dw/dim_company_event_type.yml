@@ -1,0 +1,31 @@
+---
+database_name: dw_rede
+table_name: dim_company_event_type
+columns:
+  event:
+    lineage:
+      - datalake_rede_company.event
+  event_type:
+    lineage:
+      - datalake_rede_company.event_type
+  source_type:
+    lineage:
+      - datalake_rede_company.source_type
+  hubspot_event_detail:
+    lineage:
+      - datalake_rede_company.hubspot_event_detail
+  hubspot_event_origin:
+    lineage:
+      - datalake_rede_company.hubspot_event_origin
+  hubspot_company_status:
+    lineage:
+      - datalake_rede_company.hubspot_company_status
+  hubspot_deal_stage:
+    lineage:
+      - datalake_rede_company.hubspot_deal_stage
+  hubspot_demand_onboarding_ticket_stage:
+    lineage:
+      - datalake_rede_company.hubspot_demand_onboarding_ticket_stage
+  hubspot_supply_onboarding_ticket_stage:
+    lineage:
+      - datalake_rede_company.hubspot_supply_onboarding_ticket_stage

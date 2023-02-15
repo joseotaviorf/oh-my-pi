@@ -1,0 +1,142 @@
+---
+database_name: dw_rede
+table_name: fact_company_journey
+columns:
+  sk_company:
+    lineage:
+      - datalake_rede_company.company_sks.sk_company
+  sk_lead_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_prospect_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_pre_qualified_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_qualified_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_opportunity_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_deal_won_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_deal_lost_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_awaiting_documents_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_term_sent_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_membership_started_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_demand_onboarding_scheduled_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_supply_onboarding_scheduled_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_first_lead_3p_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_first_listing_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_first_demand_visit_booked_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_churn_risk_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_contract_termination_analysis_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_membership_ended_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_contract_transition_started_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_contract_transition_completed_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_churn_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  sk_journey_ended_date:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  journey_number:
+    lineage:
+      - datalake_rede_company.company_event.journey_number
+  ts_lead:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_prospect:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_pre_qualified:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_qualified:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_opportunity:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_deal_won:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_deal_lost:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_awaiting_documents:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_term_sent:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_membership_started:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_demand_onboarding_scheduled:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_supply_onboarding_scheduled:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_first_lead_3p:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_first_listing:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_first_demand_visit_booked:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_churn_risk:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_contract_termination_analysis:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_membership_ended:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_contract_transition_started:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_contract_transition_completed:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_churn:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
+  ts_journey_ended:
+    lineage:
+      - datalake_rede_company.company_event.ts_event
