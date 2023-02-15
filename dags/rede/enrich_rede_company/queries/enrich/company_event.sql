@@ -6,7 +6,7 @@ WITH removed_company_status_oscillations AS (
         CASE
             WHEN cs.lead_status = 'Lead' THEN 'Lead'
             WHEN cs.lead_status = 'Prospect' THEN 'Prospect'
-            WHEN cs.lead_status IN ('Pré Contatado', 'Contatado') THEN 'Pre Qualified'
+            WHEN cs.lead_status IN ('Pré Contatado', 'Contatado', 'Pré qualificado') THEN 'Pre Qualified'
             WHEN cs.lead_status = 'Qualificado' THEN 'Qualified'
             WHEN cs.lead_status = 'Oportunidade' THEN 'Opportunity'
             WHEN cs.lead_status IN ('Parceiro', 'Membro') THEN 'Membership Started'
@@ -359,22 +359,26 @@ treated AS (
         *
     FROM
         merged_with_last_status
+    WHERE
+        -- Ignore cases when it is still a member, but marked as deal lost
+        event_type != 'Deal Lost'
+        OR last_status NOT IN ('Membership Started', 'Contract Transition Started')
     QUALIFY
-        hubspot_event_detail IS NOT NULL
-        OR was_member_before_event -- We only show lead 3p, listing or booking events if the company was already a member at that journey
+        event_type IN ('Deal', 'Status', 'Contract Transition')
+        OR was_member_before_event -- We only show ticket, lead 3p, listing or booking events if the company was already a member at that journey
 ),
 treated_with_loss AS (
     SELECT *,
-        CASE
-            WHEN is_loss AND was_member_before_event AND event_type = 'Deal' THEN FALSE
+        COALESCE(CASE
+            WHEN is_loss AND last_status IN ('Membership Started', 'Contract Transition Started') AND event_type = 'Deal' THEN FALSE
             ELSE is_loss
-        END AS is_current_loss,
-        LAG(
+        END, FALSE) AS is_current_loss,
+        LAST(
             CASE
-                WHEN is_loss AND was_member_before_event AND event_type = 'Deal' THEN FALSE
+                WHEN is_loss AND last_status IN ('Membership Started', 'Contract Transition Started') AND event_type = 'Deal' THEN FALSE
                 ELSE is_loss
-            END
-        ) OVER (PARTITION BY id_company ORDER BY ts_event) AS is_previous_loss
+            END, TRUE
+        ) OVER (PARTITION BY id_company ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS is_previous_loss
     FROM
         treated
 ),

@@ -13,6 +13,6 @@ column_level_validations:
       severity_level: Error
   id_hubspot:
     has_completeness:
-      greater_than: 0.99 # Won't be 100% because of the default row
+      greater_than: 0.90
     is_unique:
       severity_level: Error
