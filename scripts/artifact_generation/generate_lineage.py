@@ -12,6 +12,8 @@ from sql_metadata import Parser
 path = Path(__file__).absolute()
 BIETLEJUICE_ROOT = path.parent.parent.parent.absolute()
 DAG_PACKAGES_ROOT = join(BIETLEJUICE_ROOT, "dags")
+DAY_COL_STRING = """day
+"""
 
 
 def create_yml_for_table(sql, database_name, table_name):
@@ -33,6 +35,8 @@ def create_yml_for_table(sql, database_name, table_name):
         else:
             alias_columns[column] = alias
 
+    if DAY_COL_STRING in sql and "day" not in sql_parser.columns:
+        sql_parser._columns.extend(["day"])
     for column in sql_parser.columns:
         alias = alias_columns.get(column) or column
         yml_body["columns"][alias.lower()] = {
