@@ -1,6 +1,6 @@
 SELECT
     id,
-    contract_id AS id_contract,
+    propose AS id_contract,
     approved_value,
     decision_text,
     status,

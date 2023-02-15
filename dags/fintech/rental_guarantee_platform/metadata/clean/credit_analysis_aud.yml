@@ -7,7 +7,7 @@ columns:
       - datalake_rental_guarantee_platform_raw.credit_analysis_aud.id
   id_contract:
     lineage:
-      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.contract_id
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.propose
   approved_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis_aud.approved_value
@@ -37,7 +37,7 @@ columns:
       - datalake_rental_guarantee_platform_raw.credit_analysis_aud.revtype
   mod_id_contract:
     lineage:
-      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.contract_id_mod
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.propose_id_mod
   mod_approved_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis_aud.approved_value_mod

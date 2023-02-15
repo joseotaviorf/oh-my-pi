@@ -1,6 +1,6 @@
 SELECT
     id,
-    contract_id AS id_contract,
+    propose AS id_contract,
     approved_value,
     decision_text,
     status,
@@ -10,7 +10,7 @@ SELECT
     rev,
     revend AS rev_end,
     revtype AS rev_type,
-    contract_id_mod AS mod_id_contract,
+    propose_id_mod AS mod_id_contract,
     approved_value_mod AS mod_approved_value,
     decision_text_mod AS mod_decision_text,
     status_mod AS mod_status,
