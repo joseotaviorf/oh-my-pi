@@ -3,6 +3,7 @@ WITH bookings AS (
         fv.sk_booking,
         sk_booking_created_date,
         sk_visit_completed_date,
+        fv.sk_visit_canceled_date,
         fv.sk_house,
         fv.sk_region,
         fv.sk_buyer,
@@ -29,6 +30,7 @@ offers AS (
         fo.sk_offer_accepted_date,
         fo.sk_sale_agreement_created_date,
         fo.sk_sale_agreement_signed_date,
+        fo.sk_offer_dismissed_date,
         fo.sk_booking,
         fo.sk_house,
         fo.sk_region,
@@ -166,6 +168,44 @@ events AS (
         offers
     WHERE
         sk_sale_agreement_signed_date != -1
+    UNION ALL
+    SELECT -- Visit canceled
+        sk_visit_canceled_date AS sk_event_date,
+        7 AS sk_event_type,
+        sk_booking,
+        -1 AS sk_offer,
+        sk_house,
+        sk_region,
+        sk_buyer,
+        sk_seller,
+        sk_agent,
+        sk_agent_work_contract,
+        sk_business_unit,
+        sk_company_supply,
+        sk_company_demand
+    FROM
+        bookings
+    WHERE
+        sk_visit_canceled_date != -1
+    UNION ALL
+    SELECT -- Offer dismissed
+        sk_offer_dismissed_date AS sk_event_date,
+        8 AS sk_event_type,
+        sk_booking,
+        sk_offer,
+        sk_house,
+        sk_region,
+        sk_buyer,
+        sk_seller,
+        sk_agent,
+        sk_agent_work_contract,
+        sk_business_unit,
+        sk_company_supply,
+        sk_company_demand
+    FROM
+        offers
+    WHERE
+        sk_offer_dismissed_date != -1
 )
 SELECT
     MD5(sk_event_date || '-' || sk_event_type || '-' || COALESCE(NULLIF(sk_offer, -1), sk_booking)) AS sk_sale_demand_event,
