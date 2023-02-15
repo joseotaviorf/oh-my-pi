@@ -15,5 +15,9 @@ FROM
 INNER JOIN
     dw_public.fact_listing_rent_flows AS rf
         ON r.id_reservation = rf.sk_reservation
-WHERE rf.sk_contract > 0
+WHERE 
+    rf.sk_contract > 0
+    AND r.id_reservation > 0
+    AND r.is_ongoing IS NULL
+    AND (r.status IN ('FINISHED', 'CHARGED') OR (r.status = 'CANCELED' AND (r.cancellation_reason = 'TENANT_GAVE_UP' OR r.cancellation_reason LIKE '%WITHOUT_CHARGE_BACK')))
 GROUP BY 1,3,4,5,6,7,8,9,10,11

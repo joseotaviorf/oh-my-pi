@@ -23,6 +23,9 @@ columns:
   total_value:
     lineage:
       - datalake_kill_queue.reservation.value
+  is_ongoing:
+    lineage:
+      - datalake_kill_queue.reservation.is_ongoing
   accrual_month:
     lineage:
       - datalake_quintoandar.aux_date.month_start

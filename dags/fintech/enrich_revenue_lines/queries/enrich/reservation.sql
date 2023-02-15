@@ -7,6 +7,7 @@ SELECT DISTINCT
   r.installments AS total_installments,
   CAST(r.value/r.installments AS DECIMAL(19,2)) AS monthly_value,
   CAST(r.value AS DECIMAL(19,2)) AS total_value,
+  is_ongoing,
   DATE_FORMAT(dd.month_start,'yyyyMM') AS accrual_month,
   IF(r.installments <= 1, DATE(r.ts_created), ADD_MONTHS(DATE(r.ts_created), (r.installments - 1))) AS dt_end_payment,
   DATE(r.ts_created) AS dt_created
@@ -21,7 +22,3 @@ INNER JOIN
   dw_public.dim_date AS dd
     ON dd.month_start BETWEEN DATE_TRUNC('month', DATE(r.ts_created))
       AND DATE_TRUNC('month', IF(r.installments <= 1, DATE(r.ts_created), ADD_MONTHS(DATE(r.ts_created), (r.installments - 1))))
-WHERE
-  r.id_reservation > 0
-  AND r.is_ongoing IS NULL
-  AND (r.status IN ('FINISHED', 'CHARGED') OR (r.status = 'CANCELED' AND (r.cancellation_reason = 'TENANT_GAVE_UP' OR r.cancellation_reason LIKE '%WITHOUT_CHARGE_BACK')))
