@@ -934,6 +934,7 @@ bietlejuice.dw_house:
 bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-item
   - bietlejuice.enrich_inspections:load-enrich-item-group
+  - bietlejuice.enrich_inspections:load-enrich-item-issue
   - bietlejuice.enrich_inspections:load-enrich-room
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements
