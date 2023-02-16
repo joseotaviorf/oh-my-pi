@@ -3,10 +3,6 @@ from typing import Dict
 
 
 class GitService:
-
-    # list of status that indicate files being created or updated
-    UPSERT_STATUS_CODES = ["M", "A"]
-
     def __init__(self):
         self.NEW_OR_MODIFIED_FILE_STATUS = {"A", "M"}
 

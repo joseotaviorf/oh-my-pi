@@ -216,23 +216,23 @@ validate-dag-declaration-files:
 	@echo ""
 	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/validate_dag_declaration_files.py -l $(level)
 
-.PHONY: validate-metadata-files-content
-validate-metadata-files-content:
+.PHONY: validate-atlas-metadata-files
+validate-atlas-metadata-files:
 	@echo ""
-	@echo "Validating if new/modified metadata files follow the metadata file schema"
+	@echo "Validating Atlas metadata files"
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_content.py -b "$(DRONE_BRANCH)"
+	@PYTHONPATH=. python3 scripts/atlas_metadata_validation/validate_atlas_metadata.py  "$(DRONE_BRANCH)"
 
 .PHONY: validate-metadata-files-exist
 validate-metadata-files-exist:
 	@echo ""
-	@echo "Validating if new/modified query files have corresponding metadata file defined"
+	@echo "Validating if new/modified query files have corresponding tags/lineage metadata defined"
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_exist.py -b "$(DRONE_BRANCH)"
+	@PYTHONPATH=. python3 scripts/atlas_metadata_validation/validate_metadata_files_exist.py  "$(DRONE_BRANCH)"
 
 .PHONY: validate-datamarts-metadata-files-exist
 validate-datamarts-metadata-files-exist:
