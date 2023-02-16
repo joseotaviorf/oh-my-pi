@@ -1,0 +1,4 @@
+---
+alert_manager_folder: alertmanager
+raw_table_name: alerts
+raw_partition_cols: [year, month, day]

@@ -1,0 +1,48 @@
+database_name: datalake_opsgenie_clean
+table_name: alerts_databricks_cluster
+columns:
+  id:
+    lineage:
+      - datalake_alert_manager_raw.alerts.alerts
+  dag_name:
+    lineage:
+      - datalake_alert_manager_raw.alerts.alerts
+  cluster_component:
+    lineage:
+      - datalake_alert_manager_raw.alerts.alerts
+  message:
+    lineage:
+      - datalake_alert_manager_raw.alerts.commonAnnotations
+  alert_channel:
+    lineage:
+      - datalake_alert_manager_raw.alerts.alerts
+  alert_name:
+    lineage:
+      - datalake_alert_manager_raw.alerts.alerts
+  alert_qty:
+    lineage:
+      - datalake_alert_manager_raw.alerts.commonAnnotations
+  alert_unit:
+    lineage:
+      - datalake_alert_manager_raw.alerts.commonAnnotations
+  ts_alert:
+    lineage:
+      - datalake_alert_manager_raw.alerts.@timestamp
+  ts_start:
+    lineage:
+      - datalake_alert_manager_raw.alerts.alerts
+  ts_end:
+    lineage:
+      - datalake_alert_manager_raw.alerts.alerts
+  status:
+    lineage:
+      - datalake_alert_manager_raw.alerts.alerts
+  year:
+    lineage:
+      - datalake_alert_manager_raw.alerts.year
+  month:
+    lineage:
+      - datalake_alert_manager_raw.alerts.month
+  day:
+    lineage:
+      - datalake_alert_manager_raw.alerts.day
