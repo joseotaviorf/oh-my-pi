@@ -17,6 +17,8 @@ main_inspection_aud_sync as(
         FIRST_VALUE(ia.ts_last_synced) OVER (PARTITION BY ia.id_inspection, status ORDER BY ia.ts_last_synced ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ts_first_synced
     FROM
         datalake_ebdb_clean.inspection_aud ia
+    WHERE
+        ia.status = 'Revisada'
 ),
 union_inspection_history AS (
     WITH main_exception AS (
@@ -184,7 +186,7 @@ LEFT JOIN
         ON a.id_inspection = i.id_inspection
 LEFT JOIN
     main_inspection_aud_sync AS mias
-        ON mias.id_inspection = i.id_inspection
+        ON mias.id_inspection = i.id_external
 LEFT JOIN
     datalake_booking.booking AS b
         ON i.id_booking = b.id
