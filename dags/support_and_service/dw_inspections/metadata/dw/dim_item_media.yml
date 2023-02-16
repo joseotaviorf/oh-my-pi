@@ -1,0 +1,44 @@
+---
+database_name: dw_inspections
+table_name: dim_item_media
+columns:
+  sk_item_media:
+    lineage:
+      - datalake_inspections.item_media.id_item_media
+      - datalake_inspections.item_media.user_type
+      - datalake_inspections.item_media.ts_updated
+      - datalake_inspections.item_review.id_review_media
+      - datalake_inspections.item_review.user_type
+      - datalake_inspections.item_review.ts_updated
+  media_creator:
+    lineage:
+      - datalake_inspections.item_media.user_type
+      - datalake_inspections.item_review.user_type
+  media_type:
+    lineage:
+      - datalake_inspections.item_media.media_type
+      - datalake_inspections.item_review.media_type
+  media_path:
+    lineage:
+      - datalake_inspections.item_media.media_path
+      - datalake_inspections.item_review.media_path
+  ts_created:
+    lineage:
+      - datalake_inspections.item_media.ts_created
+      - datalake_inspections.item_review.ts_media_created
+  ts_updated:
+    lineage:
+      - datalake_inspections.item_media.ts_updated
+      - datalake_inspections.item_review.ts_media_updated
+  year:
+    lineage:
+      - datalake_inspections.item_media.year
+      - datalake_inspections.item_review.year
+  month:
+    lineage:
+      - datalake_inspections.item_media.month
+      - datalake_inspections.item_review.month
+  day:
+    lineage:
+      - datalake_inspections.item_media.day
+      - datalake_inspections.item_review.day

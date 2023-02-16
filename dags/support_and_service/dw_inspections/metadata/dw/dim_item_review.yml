@@ -1,0 +1,25 @@
+---
+database_name: dw_inspections
+table_name: dim_item_review
+columns:
+  sk_review:
+    lineage:
+      - datalake_inspections.item_review.id_review
+  review_comment:
+    lineage:
+      - datalake_inspections.item_review.user_comment
+  ts_created:
+    lineage:
+      - datalake_inspections.item_review.ts_created
+  ts_updated:
+    lineage:
+      - datalake_inspections.item_review.ts_updated
+  year:
+    lineage:
+      - datalake_inspections.item_review.year
+  month:
+    lineage:
+      - datalake_inspections.item_review.month
+  day:
+    lineage:
+      - datalake_inspections.item_review.day

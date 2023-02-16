@@ -4,6 +4,8 @@ SELECT
     r.id_item,
     rm.id_main AS id_external_media,
     r.id_user,
+    i.id_assessment,
+    i.id_inspection,
     r.user_type,
     CASE
         WHEN r.comment = '' THEN NULL
@@ -23,6 +25,9 @@ FROM
 LEFT JOIN
     datalake_inspections_clean.review_media rm
         ON rm.id_review = r.id_review
+JOIN
+    datalake_inspections.item i
+        ON i.id_item = r.id_item
 WHERE
     r.year = {year}
     AND r.month = {month}

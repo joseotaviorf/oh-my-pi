@@ -12,6 +12,8 @@ inner_dependencies:
     - item
   item_media:
     - item
+  item_review:
+    - item
 
 custom_cluster:
   driver_node_type_id: m5a.4xlarge
