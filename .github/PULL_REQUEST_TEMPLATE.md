@@ -20,7 +20,7 @@ _If changes are related to table modifications, a simple **count**, **select** o
 
 _If a new DAG is being created, a successful run image is a good proof to be displayed._
 
-_Else, make use of your creativity in order to add the necessary information on how well this request has been tested._ 
+_Else, make use of your creativity in order to add the necessary information on how well this request has been tested._
 
 #### Screenshots
 _Much appreciated images detailing the output of the requested change._
@@ -33,3 +33,4 @@ _Replace me for what the reviewer will need to pay attention to in the PR or jus
 - [ ] My code follows the style guidelines and [name conventions](https://docs.google.com/document/d/1mPPA716eoT3EZSqY0gA8a9ao4ObMyI9Y8QNd7CzlWWY) for DAGs, databases, columns, etc.
 - [ ] I have made corresponding changes to the documentation;
 - [ ] I have added tests that prove my fix is effective or that my feature works.
+- [ ] I have documented all new or updated tables according to our [dataset documentation guideline](https://docs.google.com/document/d/1vjyHm_bMbE0CRx0JWM3RrdRhwOgi1ZqqcGMVLfmBlxg/edit?usp=sharing)

@@ -90,17 +90,16 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
-  validate-atlas-metadata-files:
+  validate-metadata-files-content:
     group: tests
     image: python:3.7.3
     commands:
       - make requirements-scripts
-      - make validate-atlas-metadata-files
+      - make validate-metadata-files-content
     when:
       event: push
       branch:
-        exclude:
-          - hotfix/* # excluding this branch since the process validates master's code
+        exclude: [hotfix/*]
 
   validate-metadata-files-exist:
     group: tests
@@ -111,24 +110,7 @@ pipeline:
     when:
       event: push
       branch:
-        exclude:
-          - forno
-          - hotfix/* # excluding this branch since the process validates master's code
-
-  validate-datamarts-metadata-files-exist:
-    group: tests
-    image: python:3.7.3
-    environment:
-      ENVIRONMENT: forno
-    commands:
-      - make requirements-scripts
-      - make validate-datamarts-metadata-files-exist
-    when:
-      event: push
-      branch:
-        exclude:
-          - forno
-          - hotfix/* # excluding this branch since the process validates master's code
+        exclude: [forno, hotfix/*]
 
   make-package-python:
     group: package
@@ -359,22 +341,24 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
-  load-atlas-metadata-files-to-s3-forno:
+  load-governance-metadata-files-into-s3-forno:
     group: upload
     image: python:3.7.3
     commands:
-      - pip install boto3==1.24.0 PyYAML==5.1
-      - python scripts/ci_cd/upload_atlas_metadata_files_to_s3.py data-documentation.s3.forno.data.quintoandar.com.br
+      - pip install requests==2.28.1 PyYAML==5.1
+      - make requirements-scripts
+      - PYTHONPATH=. python scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${DRONE_BRANCH} --bucket "data-documentation.s3.forno.data.quintoandar.com.br" --host "https://metadata-propagator.forno.quintoandar.com.br/"
     when:
       event: push
-      branch: forno
+      branch: [forno]
 
-  load-atlas-metadata-files-to-s3-prod:
+  load-governance-metadata-files-into-s3-prod:
     group: upload
     image: python:3.7.3
     commands:
-      - pip install boto3==1.24.0 PyYAML==5.1
-      - python scripts/ci_cd/upload_atlas_metadata_files_to_s3.py data-documentation.s3.data.quintoandar.com.br
+      - pip install requests==2.28.1 PyYAML==5.1
+      - make requirements-scripts
+      - PYTHONPATH=. python scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${DRONE_BRANCH} --bucket "data-documentation.s3.data.quintoandar.com.br" --host "https://metadata-propagator.quintoandar.com.br/"
     when:
       event: push
       branch: [master, hotfix/*]
@@ -385,11 +369,12 @@ pipeline:
     environment:
       ENVIRONMENT: forno
     commands:
-      - pip install boto3==1.24.0 PyYAML==5.1 hierarchical-conf==1.0.1
-      - python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py databricks.s3.forno.data.quintoandar.com.br
+      - pip install boto3==1.24.0 PyYAML==5.4 hierarchical-conf==1.0.1
+      - make requirements-scripts
+      - PYTHONPATH=. python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py databricks.s3.forno.data.quintoandar.com.br
     when:
       event: push
-      branch: forno
+      branch: [forno]
 
   load-all-metadata-files-information-to-s3-prod:
     group: upload
@@ -397,7 +382,8 @@ pipeline:
     environment:
       ENVIRONMENT: prod
     commands:
-      - pip install boto3==1.24.0 PyYAML==5.1 hierarchical-conf==1.0.1
+      - pip install boto3==1.24.0 PyYAML==5.4 hierarchical-conf==1.0.1
+      - make requirements-scripts
       - python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py 5a-databricks
     when:
       event: push

@@ -1,7 +1,0 @@
----
-database_name: str(max=100)
-table_name: str(max=100)
-columns: map(include("column"), key=str(), required=False)
----
-column:
-  tags: list()
