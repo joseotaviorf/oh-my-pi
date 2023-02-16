@@ -1,0 +1,61 @@
+---
+database_name: datalake_sap_gateway_clean
+table_name: feature
+columns:
+  id_feature:
+    lineage:
+      - datalake_sap_gateway_raw.feature.id
+  id_source:
+    lineage:
+      - datalake_sap_gateway_raw.feature.source_id
+  id_business_entity:
+    lineage:
+      - datalake_sap_gateway_raw.feature.business_entity_id
+  id_finance_entity:
+    lineage:
+      - datalake_sap_gateway_raw.feature.finance_entity_id
+  external_payment_id:
+    lineage:
+      - datalake_sap_gateway_raw.feature.external_payment_id
+  source:
+    lineage:
+      - datalake_sap_gateway_raw.feature.source
+  transaction_type:
+    lineage:
+      - datalake_sap_gateway_raw.feature.transaction_type
+  metadata:
+    lineage:
+      - datalake_sap_gateway_raw.feature.metadata
+  request_payload:
+    lineage:
+      - datalake_sap_gateway_raw.feature.request_payload
+  sync_sap_status:
+    lineage:
+      - datalake_sap_gateway_raw.feature.sync_sap_status
+  source_client:
+    lineage:
+      - datalake_sap_gateway_raw.feature.source_client
+  user_type:
+    lineage:
+      - datalake_sap_gateway_raw.feature.user_type
+  finance_entity_type:
+    lineage:
+      - datalake_sap_gateway_raw.feature.finance_entity_type
+  ts_accrual:
+    lineage:
+      - datalake_sap_gateway_raw.feature.accrual_date
+  ts_created:
+    lineage:
+      - datalake_sap_gateway_raw.feature.created_at
+  ts_updated:
+    lineage:
+      - datalake_sap_gateway_raw.feature.updated_at
+  year:
+    lineage:
+      - datalake_sap_gateway_raw.feature.year
+  month:
+    lineage:
+      - datalake_sap_gateway_raw.feature.month
+  day:
+    lineage:
+      - datalake_sap_gateway_raw.feature.day

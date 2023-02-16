@@ -254,3 +254,9 @@ class PostgresValidationSuite(DatabaseValidationSuitesExecutor):
             self.auth[DatabaseEnum.RENE_DESCARTES], SparkClient()
         )
         self._validate_connection(db_consumer)
+
+    def validate_sap_gateway(self):
+        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
+            self.auth[DatabaseEnum.SAP_GATEWAY], SparkClient()
+        )
+        self._validate_connection(db_consumer)
