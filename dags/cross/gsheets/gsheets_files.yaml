@@ -130,20 +130,10 @@ kenshoo_configuration:
     sheet_name: Kenshoo_Configuration
     clean_table_name: marketing_kenshoo_configuration
 
-links_calls_entre_30ago_01set:
-    sheet_id: 1XUKAl5TnIO1eBDkr_kaK-8IWS9APOe02ebMkHUmVluk
-    sheet_name: links_calls_entre_30Ago_01Set
-    clean_table_name: link_call_ticket
-
 ltvoutput:
     sheet_id: 1Nf02DF6oHWUAAael_9M1g8tJfeTdq92fGt78x5_qNbg
     sheet_name: LTVOutput
     clean_table_name: affiliates_monthly_expected_results
-
-keys_logistic_funil:
-    sheet_id: 12yXccvLCYfl01OtFRFwg736_pDzz843nDhKVjf3IDZ0
-    sheet_name: keys_logistic_funil
-    clean_table_name: keys_logistic_funnel
 
 keys_logistic_pre_contract:
     sheet_id: 1ge87PnLZDt16PME8mytPOHDs1uBbBrYxuGncrpuiwrg
