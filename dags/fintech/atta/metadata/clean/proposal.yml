@@ -41,6 +41,9 @@ columns:
   id_proposal_status:
     lineage:
       - datalake_atta_raw.proposta.status
+  created_by:
+    lineage:
+      - datalake_atta_raw.proposta.CreatedBy
   client_cpf:
     lineage:
       - datalake_atta_raw.proposta.cpf
