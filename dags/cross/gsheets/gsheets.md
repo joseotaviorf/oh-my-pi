@@ -32,8 +32,6 @@ This pipeline produces the following output tables:
     - `agents_control`
     - `agents_ranking_targets`
     - `agreements_discounts_answer_forms`
-    - `agreements_discounts_expenses_created`
-    - `bandaid_off`
     - `bbb22_coupon_sale_users`
     - `bbb22_giveaway_rent_users`
     - `braze_campaign_creative`

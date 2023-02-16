@@ -80,20 +80,10 @@ demand_retention_ab_tests:
     sheet_name: demand_retention_ab_tests
     clean_table_name: demand_retention_ab_tests
 
-entry_agreements_discounts_expenses:
-    sheet_id: 1sa8T17sDujZsJDrLvyPKDKJhO-mzz1KwPiiOFhRy8Qo
-    sheet_name: agreements_discounts_expenses_created
-    clean_table_name: agreements_discounts_expenses_created
-
 extra_invoice:
     sheet_id: 1i4SiSro342zfv6L0wpl9B29kY8Cyg8hwsShuIDkzkfQ
     sheet_name: extra_invoice
     clean_table_name: extra_invoice
-
-jira_extraction_ba_sf:
-    sheet_id: 1X3RsuWBZ4NYpS5O-Ro7I1tmwBNQksrFUPtAQjbRxI8Y
-    sheet_name: bandaid_off
-    clean_table_name: bandaid_off
 
 full_taxonomy:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
