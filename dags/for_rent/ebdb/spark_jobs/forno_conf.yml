@@ -187,7 +187,6 @@ table_block_list:
   - ContratoSolicitacaoRetirada
   - CartaoPrePago
   - PaymentRules_AUD
-  - ProOwnerFee
   - Avaliacao
   - DadosOperacaoContaCorrente
   - Parametro
