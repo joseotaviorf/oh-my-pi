@@ -5,7 +5,7 @@ WITH filtered_custom_fields AS(
         -- for 'nested' custom_fields, e.g. {"id":0101010, "value":"{"is_nested": "yes"}"} and
         -- '{', '}', '[' and ']' to be present inside values. Second regex replaces a possible
         -- trailling coma for a ']', allowing the string to be converted to an array later.
-        REGEXP_REPLACE(REGEXP_REPLACE(tck.custom_fields,'(`\\{)\\{([^\n\\{\\}\\[\\]](?!value":(?!null)))*?\\}(,|\\])', ''), ',$', ']') AS custom_fields
+        REGEXP_REPLACE(REGEXP_REPLACE(tck.custom_fields,'(`\\{{)\\{{([^\n\\{{\\}}\\[\\]](?!value":(?!null)))*?\\}}(,|\\])', ''), ',$', ']') AS custom_fields
     FROM
         datalake_zendesk_tickets_clean.tickets AS tck
 ),
@@ -22,7 +22,7 @@ cleaned_custom_fields AS (
         tf.id_ticket_fields,
         tf.raw_title AS custom_field_title,
         -- removes unwanted character groups from values
-        REGEXP_REPLACE(ecf.custom_field['value'], '(\\[\\\")|(\\\"\\])|[\\[\\]\\{\\}\\\\"]', '') AS custom_field_value
+        REGEXP_REPLACE(ecf.custom_field['value'], '(\\[\\\")|(\\\"\\])|[\\[\\]\\{{\\}}\\\\"]', '') AS custom_field_value
     FROM
         exploded_custom_fields AS ecf
     JOIN
