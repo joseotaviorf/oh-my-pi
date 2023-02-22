@@ -1,0 +1,34 @@
+---
+database_name: dw_inspections
+table_name: dim_item_issue
+columns:
+  sk_item_issue:
+    lineage:
+      - datalake_inspectionss.item_issue.id_item_issue
+  issue_type:
+    lineage:
+      - datalake_inspectionss.item_issue.issue_type
+  display_type:
+    lineage:
+      - datalake_inspectionss.item_issue.display_type
+  issue_comment:
+    lineage:
+      - datalake_inspectionss.item_issue.issue_comment
+  repair_suggestion:
+    lineage:
+      - datalake_inspectionss.item_issue.repair_suggestion
+  ts_created:
+    lineage:
+      - datalake_inspectionss.item_issue.ts_created
+  ts_updated:
+    lineage:
+      - datalake_inspectionss.item_issue.ts_updated
+  year:
+    lineage:
+      - datalake_inspectionss.item_issue.year
+  month:
+    lineage:
+      - datalake_inspectionss.item_issue.month
+  day:
+    lineage:
+      - datalake_inspectionss.item_issue.day
