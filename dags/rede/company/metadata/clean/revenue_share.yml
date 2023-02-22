@@ -1,0 +1,43 @@
+---
+database_name: datalake_company_clean
+table_name: revenue_share
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.revenue_share.id
+  id_company:
+    lineage:
+      - datalake_company_raw.revenue_share.company_id
+  uuid_revenue_share:
+    lineage:
+      - datalake_company_raw.revenue_share.revenue_share_uuid
+  commission:
+    lineage:
+      - datalake_company_raw.revenue_share.commission
+  demand_fee:
+    lineage:
+      - datalake_company_raw.revenue_share.demand_fee
+  supply_fee:
+    lineage:
+      - datalake_company_raw.revenue_share.supply_fee
+  platform_fee:
+    lineage:
+      - datalake_company_raw.revenue_share.platform_fee
+  version:
+    lineage:
+      - datalake_company_raw.revenue_share.version
+  ts_created:
+    lineage:
+      - datalake_company_raw.revenue_share.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.revenue_share.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.revenue_share.year
+  month:
+    lineage:
+      - datalake_company_raw.revenue_share.month
+  day:
+    lineage:
+      - datalake_company_raw.revenue_share.day

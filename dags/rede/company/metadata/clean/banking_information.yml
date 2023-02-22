@@ -1,0 +1,43 @@
+---
+database_name: datalake_company_clean
+table_name: banking_information
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.banking_information.id
+  id_company:
+    lineage:
+      - datalake_company_raw.banking_information.company_id
+  uuid_banking_information:
+    lineage:
+      - datalake_company_raw.banking_information.banking_information_uuid
+  bank:
+    lineage:
+      - datalake_company_raw.banking_information.bank
+  agency_number:
+    lineage:
+      - datalake_company_raw.banking_information.agency_number
+  account_number:
+    lineage:
+      - datalake_company_raw.banking_information.account_number
+  type:
+    lineage:
+      - datalake_company_raw.banking_information.type
+  version:
+    lineage:
+      - datalake_company_raw.banking_information.version
+  ts_created:
+    lineage:
+      - datalake_company_raw.banking_information.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.banking_information.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.banking_information.year
+  month:
+    lineage:
+      - datalake_company_raw.banking_information.month
+  day:
+    lineage:
+      - datalake_company_raw.banking_information.day

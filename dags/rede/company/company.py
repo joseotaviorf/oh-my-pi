@@ -81,16 +81,22 @@ task_group = DatalakeTaskGroup(
 )
 
 tables = config_service.get_config("tables")
-partition_cols = config_service.get_config("partition_cols")
 
 for table in tables:
     table_name = table["table_name"]
     clean_table_name = table.get("clean_table_name", table_name)
+    extraction_type = table.get("extraction_type", "incremental")
+    partition_cols = (
+        None
+        if extraction_type == "full"
+        else config_service.get_config("partition_cols")
+    )
     parameters = [SOURCE, table_name]
 
     extended_parameters = [
         table["date_filter_column"],
         "{{ ds }}",
+        extraction_type,
         table.get("unixtime_measure", None),
     ]
 
@@ -109,7 +115,7 @@ for table in tables:
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         table_name=clean_table_name,
-        is_incremental=True,
+        is_incremental=extraction_type == "incremental",
         partitions=partition_cols,
     )
 

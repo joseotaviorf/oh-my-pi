@@ -1,0 +1,13 @@
+---
+database_name: datalake_company_clean
+table_name: company_product
+columns:
+  id_company:
+    lineage:
+      - datalake_company_raw.company_product.company_id
+  id_product:
+    lineage:
+      - datalake_company_raw.company_product.product_id
+  product_settings:
+    lineage:
+      - datalake_company_raw.company_product.product_settings

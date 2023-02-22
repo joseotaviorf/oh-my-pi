@@ -18,6 +18,8 @@ This pipeline produces, in datalake_company_raw:
 Via **incremental load**:
   - `address`
   - `address_aud`
+  - `banking_information`
+  - `banking_information_aud`
   - `company`
   - `company_aud`
   - `company_address`
@@ -34,15 +36,23 @@ Via **incremental load**:
   - `profile_aud`
   - `profile_hierarchy`
   - `profile_hierarchy_aud`
+  - `revenue_share`
+  - `revenue_share_aud`
   - `revinfo`
   - `user_requirements`
   - `user_requirements_aud`
+
+Via **full load**
+  - `company_product`
+  - `company_product_aud`
 
 This pipeline produces, in datalake_company_clean:
 
 Via **incremental load**:
   - `address`
   - `address_aud`
+  - `banking_information`
+  - `banking_information_aud`
   - `company`
   - `company_aud`
   - `company_address`
@@ -59,8 +69,14 @@ Via **incremental load**:
   - `profile_aud`
   - `profile_hierarchy`
   - `profile_hierarchy_aud`
+  - `revenue_share`
+  - `revenue_share_aud`
   - `rev_info`
   - `user_requirements`
   - `user_requirements_aud`
+
+Via **full load**
+  - `company_product`
+  - `company_product_aud`
 
 </details>
