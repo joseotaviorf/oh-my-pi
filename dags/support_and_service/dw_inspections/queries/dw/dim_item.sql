@@ -6,6 +6,7 @@ SELECT
     i.status AS item_status,
     i.ts_created,
     i.ts_updated,
+    NOW() AS ts_load,
     i.year,
     i.month,
     i.day

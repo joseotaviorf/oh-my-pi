@@ -48,6 +48,7 @@ SELECT DISTINCT
     ig.is_inferior_quality,
     ig.ts_created,
     ig.ts_updated,
+    NOW() AS ts_load,
     ig.year,
     ig.month,
     ig.day

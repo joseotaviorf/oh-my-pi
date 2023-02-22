@@ -9,6 +9,7 @@ SELECT DISTINCT
     FALSE AS is_review_media,
     im.ts_created,
     im.ts_updated,
+    NOW() AS ts_load,
     im.year,
     im.month,
     im.day
@@ -30,6 +31,7 @@ SELECT
     TRUE AS is_review_media,
     ir.ts_media_created AS ts_created,
     ir.ts_media_updated AS ts_updated,
+    NOW() AS ts_load,
     ir.year,
     ir.month,
     ir.day

@@ -5,6 +5,7 @@ SELECT
     r.comment,
     r.ts_created,
     r.ts_updated,
+    NOW() AS ts_load,
     r.year,
     r.month,
     r.day

@@ -8,6 +8,9 @@ columns:
   review_comment:
     lineage:
       - datalake_inspections.item_review.user_comment
+  review_creator:
+    lineage:
+      - datalake_inspections.item_review.user_type
   ts_created:
     lineage:
       - datalake_inspections.item_review.ts_created

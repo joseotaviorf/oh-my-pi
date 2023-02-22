@@ -10,6 +10,7 @@ SELECT
     i.is_present,
     i.ts_created,
     i.ts_updated,
+    NOW() AS ts_load,
     i.year,
     i.month,
     i.day
