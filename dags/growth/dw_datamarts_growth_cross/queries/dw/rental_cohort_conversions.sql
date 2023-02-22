@@ -626,68 +626,30 @@ vb2os_aux AS (
         dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
-
-vb_aux AS (
-    SELECT
-        date,
-        sk_date,
-        city_group,
-        country_code,
-        is_b2b,
-        supply_mkt_origin,
-        supply_mkt_channel,
-        lead_context,
-        lead_processing_operation,
-        demand_mkt_channel,
-        demand_mkt_medium,
-        first_touchpoint,
-        is_guarantee,
-        rental_administrator,
-        NULL as weeks_conversion,
-        vb2vc as vb,
-        NULL::BIGINT as vb2os
-    FROM
-        vb2vc
-    UNION ALL
-    SELECT
-        date,
-        sk_date,
-        city_group,
-        country_code,
-        is_b2b,
-        supply_mkt_origin,
-        supply_mkt_channel,
-        lead_context,
-        lead_processing_operation,
-        demand_mkt_channel,
-        demand_mkt_medium,
-        first_touchpoint,
-        is_guarantee,
-        rental_administrator,
-        NULL as weeks_conversion,
-        NULL::BIGINT as vb,
-        vb2os
-    FROM
-        vb2os_aux
+vb2os_aux2 AS (
+  SELECT *
+  FROM vb2os_aux
+  UNION ALL
+  SELECT *
+  FROM vb2vc
 ),
-
-vb_aux2 AS (
+vb2os_aux3 AS (
     SELECT
-        date,
-        sk_date,
-        city_group,
-        country_code,
-        is_b2b,
-        supply_mkt_origin,
-        supply_mkt_channel,
-        lead_context,
-        lead_processing_operation,
-        demand_mkt_channel,
-        demand_mkt_medium,
-        first_touchpoint,
-        is_guarantee,
-        weeks_conversion,
-        rental_administrator,
+        a.date,
+        a.sk_date,
+        a.city_group,
+        a.country_code,
+        a.is_b2b,
+        NULL AS supply_mkt_origin,
+        NULL AS supply_mkt_channel,
+        NULL AS lead_context,
+        NULL AS lead_processing_operation,
+        a.demand_mkt_channel,
+        a.demand_mkt_medium,
+        a.first_touchpoint,
+        NULL::BOOLEAN AS is_guarantee,
+        null as weeks_conversion,
+        a.rental_administrator,
         NULL::BIGINT AS l2p,
         NULL::BIGINT AS p2q,
         NULL::BIGINT AS q2aq,
@@ -695,7 +657,7 @@ vb_aux2 AS (
         NULL::BIGINT AS q2opp,
         NULL::BIGINT AS opp2fl,
         NULL::BIGINT AS vb2vc,
-        SUM(vb) - SUM(vb2os) as vb2os,
+        sum(a.vb2vc) - sum(a.vb2os) as vb2os,
         NULL::BIGINT AS vc,
         NULL::BIGINT AS vc2os,
         NULL::BIGINT AS os2oa,
@@ -715,19 +677,62 @@ vb_aux2 AS (
         NULL::BIGINT AS cc2cs,
         NULL::BIGINT AS cs2ce
     FROM
-        vb_aux
+        vb2os_aux2 a
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
-
+vb2os_aux4 AS (
+SELECT *
+FROM vb2os_aux
+UNION ALL
+SELECT *
+FROM vb2os_aux3
+),
 vb2os AS (
-    SELECT *
+    SELECT
+        a.date,
+        a.sk_date,
+        a.city_group,
+        a.country_code,
+        a.is_b2b,
+        NULL AS supply_mkt_origin,
+        NULL AS supply_mkt_channel,
+        NULL AS lead_context,
+        NULL AS lead_processing_operation,
+        a.demand_mkt_channel,
+        a.demand_mkt_medium,
+        a.first_touchpoint,
+        NULL AS is_guarantee,
+        a.weeks_conversion,
+        a.rental_administrator,
+        NULL::BIGINT AS l2p,
+        NULL::BIGINT AS p2q,
+        NULL::BIGINT AS q2aq,
+        NULL::BIGINT AS aq2o,
+        NULL::BIGINT AS q2opp,
+        NULL::BIGINT AS opp2fl,
+        NULL::BIGINT AS vb2vc,
+        sum(a.vb2os) as vb2os,
+        NULL::BIGINT AS vc,
+        NULL::BIGINT AS vc2os,
+        NULL::BIGINT AS os2oa,
+        NULL::BIGINT AS oa2cei,
+        NULL::BIGINT AS oa2da,
+        NULL::BIGINT AS oa2ds,
+        NULL::BIGINT AS cei2cep,
+        NULL::BIGINT AS cei2gs,
+        NULL::BIGINT AS cep2ds,
+        NULL::BIGINT AS gs2ds,
+        NULL::BIGINT AS ds2da,
+        NULL::BIGINT AS da2cc,
+        NULL::BIGINT AS da2gp,
+        NULL::BIGINT AS gp2cc,
+        NULL::BIGINT AS da2cs,
+        NULL::BIGINT AS da_gp2cs,
+        NULL::BIGINT AS cc2cs,
+        NULL::BIGINT AS cs2ce
     FROM
-        vb2os_aux
-    UNION ALL
-    SELECT *
-    FROM
-        vb_aux2
-
+        vb2os_aux4 a
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 vc AS (
     SELECT
