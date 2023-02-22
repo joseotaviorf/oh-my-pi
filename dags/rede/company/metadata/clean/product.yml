@@ -5,9 +5,6 @@ columns:
   id:
     lineage:
       - datalake_company_raw.product.id
-  id_company:
-    lineage:
-      - datalake_company_raw.product.company_id
   uuid_product:
     lineage:
       - datalake_company_raw.product.product_uuid

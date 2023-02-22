@@ -1,6 +1,5 @@
 SELECT
     id,
-    company_id AS id_company,
     product_uuid AS uuid_product,
     name,
     status,

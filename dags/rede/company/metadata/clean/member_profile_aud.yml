@@ -13,7 +13,10 @@ columns:
       - datalake_company_raw.member_profile_aud.person_uuid
   id_product:
     lineage:
-      - datalake_company_raw.member_profile_aud.product_id
+      - datalake_company_raw.member_profile_aud.company_product_product_id
+  id_company:
+    lineage:
+      - datalake_company_raw.member_profile_aud.company_product_company_id
   version:
     lineage:
       - datalake_company_raw.member_profile_aud.version
@@ -38,9 +41,12 @@ columns:
   mod_status:
     lineage:
       - datalake_company_raw.member_profile_aud.status_mod
-  mod_id_subsidiary_product:
+  mod_id_product:
     lineage:
-      - datalake_company_raw.member_profile_aud.subsidiary_product_id_mod
+      - datalake_company_raw.member_profile_aud.company_product_product_id_mod
+  mod_id_company:
+    lineage:
+      - datalake_company_raw.member_profile_aud.company_product_company_id_mod
   ts_created:
     lineage:
       - datalake_company_raw.member_profile_aud.created_at
