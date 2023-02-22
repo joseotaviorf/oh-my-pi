@@ -12,7 +12,7 @@ CREATE TABLE rede.dim_company (
     city VARCHAR,
     state VARCHAR,
     country VARCHAR,
-    domain VARCHAR,
+    domain VARCHAR(300),
     e_mail VARCHAR,
     phone VARCHAR,
     industry VARCHAR,
