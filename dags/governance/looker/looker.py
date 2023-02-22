@@ -42,7 +42,7 @@ CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{spark_jobs_logs_path}{DAG_ID}"
-EXECUTION_DATE = datetime.today().strftime("%Y-%m-%d")
+EXECUTION_DATE = "{{ ds }}"
 
 default_libraries = config_service.get_config("default_libraries")
 cluster_libs = config_service.get_config("cluster_libs")
