@@ -1,3 +1,13 @@
+WITH business_context_operation AS (
+    SELECT 
+        id_region,
+        SOME(business_context = 'RENT') AS has_rent_operation,
+        SOME(business_context = 'SALE') AS has_sale_operation
+    FROM 
+        datalake_ebdb_clean.region_business_contexts_served
+    GROUP BY 
+        1
+)
 SELECT
     CAST(COALESCE(r.id, ar.id) AS BIGINT) AS id,
     c.id AS id_city,
@@ -29,6 +39,8 @@ SELECT
       WHEN st.id_country = 2 THEN 'Mexico'
     END AS country_name,
     (r.level = 'Cidade') AS is_city,
+    COALESCE(bco.has_rent_operation, FALSE) AS has_rent_operation,
+    COALESCE(bco.has_sale_operation, FALSE) AS has_sale_operation,
     r.ts_created,
     r.ts_updated
 FROM
@@ -48,3 +60,6 @@ JOIN
 LEFT JOIN
   datalake_gsheets_clean.auxiliary_region AS ar
     ON r.id = ar.id
+LEFT JOIN 
+  business_context_operation AS bco
+    ON bco.id_region = r.id

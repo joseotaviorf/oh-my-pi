@@ -2297,6 +2297,7 @@ bietlejuice.enrich_rede_supply:
 
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:create-clean-country-in-data-lake
+  - bietlejuice.ebdb:create-clean-region-business-contexts-served-in-data-lake
   - bietlejuice.ebdb:create-clean-region-in-data-lake
   - bietlejuice.ebdb:create-clean-state-in-data-lake
   - bietlejuice.gsheets.for_rent:load-clean-auxiliary-region

@@ -154,7 +154,6 @@ table_block_list:
   - UserInfoLegalRepresentative
   - NegociacaoLocatario
   - HouseMedia_AUD
-  - Regiao_businessContextsServed
   - RelatorioConsulta
   - ContasConsumoEmAberto
   - Agentes_Regiao_Hist
@@ -166,7 +165,6 @@ table_block_list:
   - AgentWithKeysAllocationParameters
   - DadosFotografo_Regiao
   - LogNumeroImoveisPublicados
-  - Regiao_businessContextsServed_AUD
   - Negociacao_animais_AUD
   - FinalNegociacao
   - ComissaoCorretor

@@ -67,6 +67,12 @@ columns:
   country_name:
     lineage:
       - datalake_region.region.country_name
+  has_rent_operation:
+    lineage:
+      - datalake_region.region.has_rent_operation
+  has_sale_operation:
+    lineage:
+      - datalake_region.region.has_sale_operation
   dt_first_booking:
     lineage:
       - datalake_booking.booking.dt_booking

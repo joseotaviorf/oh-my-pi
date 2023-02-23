@@ -164,6 +164,8 @@ Produces the following output tables:
     `real_estate_agent_rating`
     `real_estate_agent_rating_rating_label`
     `region`
+    `region_business_contexts_served`
+    `region_business_contexts_served_aud`
     `rent_flow`
     `rent_flow_aud`
     `rental_administrator_change_request`

@@ -41,6 +41,8 @@ SELECT
     r.regional_inspection,
     r.tier,
     r.country_name,
+    r.has_rent_operation,
+    r.has_sale_operation,
     CAST(fb.dt_first_booking AS TIMESTAMP) AS dt_first_booking, -- date
     fh.ts_first_house_created AS dt_first_property_created,
     r.ts_created AS dt_created,

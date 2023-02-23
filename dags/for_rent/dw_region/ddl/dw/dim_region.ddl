@@ -22,6 +22,8 @@ create table if not exists public.dim_region (
   regional_inspection varchar,
   tier integer,
   country_name varchar,
+  has_rent_operation boolean,
+  has_sale_operation boolean,
   dt_first_booking timestamp,
   dt_first_property_created timestamp,
   dt_created timestamp without time zone,

@@ -1,0 +1,16 @@
+---
+database_name: datalake_ebdb_clean
+table_name: region_business_contexts_served_aud
+columns:
+  id_region:
+    lineage:
+      - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.region_id
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.businessContext
+  rev:
+    lineage:
+      - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.REV
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.REVTYPE

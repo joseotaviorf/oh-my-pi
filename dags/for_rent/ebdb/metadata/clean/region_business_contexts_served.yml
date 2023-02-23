@@ -1,0 +1,10 @@
+---
+database_name: datalake_ebdb_clean
+table_name: region_business_contexts_served
+columns:
+  id_region:
+    lineage:
+      - datalake_ebdb_raw.Regiao_businessContextsServed.region_id
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.Regiao_businessContextsServed.businessContext
