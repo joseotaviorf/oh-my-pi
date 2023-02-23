@@ -196,7 +196,7 @@ booking_in_rented_house AS (
     b.id,
     CASE
          WHEN c.status = 'Ativo' AND c.dt_started <= b.dt_booking THEN TRUE
-         WHEN c.status = 'Finalizado' AND b.dt_booking BETWEEN c.dt_started AND c.dt_termination THEN TRUE
+         WHEN c.status = 'Finalizado' AND b.dt_booking BETWEEN c.dt_started AND LEAST(TO_DATE(c.ts_analyst_annulment_input), c.dt_termination) THEN TRUE
          ELSE FALSE
     END AS is_house_rented
   FROM
@@ -209,7 +209,7 @@ booking_in_rented_house AS (
     AND b.dt_booking BETWEEN c.dt_started
     AND CASE
          WHEN c.status = 'Ativo' THEN NOW()
-         WHEN c.status = 'Finalizado' THEN c.dt_termination END
+         WHEN c.status = 'Finalizado' THEN LEAST(TO_DATE(c.ts_analyst_annulment_input), c.dt_termination)  END
     AND b.business_context = 'SALE'
 ),
 agent_contract_aud AS (
@@ -258,7 +258,6 @@ booking_hub_agent AS (
     -- Date that the visits in HUB flow started
     AND CAST(b.ts_created AS DATE) >= '2021-07-19'
 ),
-
 booking_3p_demand_agent AS (
   SELECT
     b.id,
@@ -276,7 +275,6 @@ booking_3p_demand_agent AS (
   WHERE
     is_3p_contract
 ),
-
 secretariat_users AS (
   SELECT
     id_user_5a
@@ -285,7 +283,6 @@ secretariat_users AS (
   GROUP BY
     id_user_5a
 ),
-
 base_booking AS (
   SELECT
     b.id,
