@@ -49,6 +49,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.listing_business_context.ts_first_publication
       - datalake_sale_flows.sale_flow.ts_first_offer_submitted
+  days_first_publication_to_first_visit_completed:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_sale_flows.sale_flow.ts_first_visit_completed
   unpublications:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id
