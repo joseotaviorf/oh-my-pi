@@ -701,7 +701,7 @@ vb2os AS (
         a.demand_mkt_channel,
         a.demand_mkt_medium,
         a.first_touchpoint,
-        NULL AS is_guarantee,
+        NULL::BOOLEAN AS is_guarantee,
         a.weeks_conversion,
         a.rental_administrator,
         NULL::BIGINT AS l2p,
