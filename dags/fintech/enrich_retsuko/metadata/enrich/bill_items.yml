@@ -1,0 +1,48 @@
+database_name: datalake_retsuko
+table_name: bill_items
+columns:
+  id_contract:
+    lineage:
+      - datalake_retsuko_clean.invoice.id_contract.id_external
+  id_invoice:
+    lineage:
+      - datalake_retsuko_clean.invoice.id_external
+  frequency:
+    lineage:
+      - datalake_retsuko_clean.invoice.purpose
+  payment_status:
+    lineage:
+      - datalake_retsuko_clean.invoice.status
+  bill_item:
+    lineage:
+      - datalake_retsuko_clean.entry.bill_item
+  bill_item_description:
+    lineage:
+      - datalake_retsuko_clean.entry.description
+  from_account_type:
+    lineage:
+      - datalake_retsuko_clean.account.type
+  to_account_type:
+    lineage:
+      - datalake_retsuko_clean.account.type
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_clean.entry.accrual_year_month
+  accrual_year_month_invoice:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+  dt_created:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_created
+  dt_sent:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_sent
+  dt_due:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_due
+  dt_paid:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_paid
+  dt_canceled:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_canceled
