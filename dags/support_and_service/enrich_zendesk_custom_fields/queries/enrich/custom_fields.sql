@@ -1,29 +1,39 @@
--- The double curly brackets (chave) had to be put to escape that character in the function .format in Python. If you test this in Databricks or somewhere else, remember to replace by a single curly bracket
-WITH filtered_custom_fields AS (
+WITH filtered_custom_fields AS(
     SELECT
         tck.id_ticket,
-        -- The double curly brackets (chave) had to be put to escape that character in the function .format in Python. If you test this in Databricks or somewhere else, remember to replace by a single curly bracket
-        EXPLODE(SPLIT(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REGEXP_REPLACE(tck.custom_fields, '"(?!")', ''), 'id:', ''), ',value', ''), '[', ''), ']', ''), '{{', ''), '}}', ''), ',')) AS custom_field
+        -- First regex removes custom_fields with 'value:null', while allowing
+        -- for 'nested' custom_fields, e.g. {"id":0101010, "value":"{"is_nested": "yes"}"} and
+        -- '{', '}', '[' and ']' to be present inside values. Second regex replaces a possible
+        -- trailling coma for a ']', allowing the string to be converted to an array later.
+        REGEXP_REPLACE(REGEXP_REPLACE(tck.custom_fields,'(`\\{)\\{([^\n\\{\\}\\[\\]](?!value":(?!null)))*?\\}(,|\\])', ''), ',$', ']') AS custom_fields
     FROM
         datalake_zendesk_tickets_clean.tickets AS tck
 ),
-parsed_custom_fields AS (
-    SELECT DISTINCT
+exploded_custom_fields AS(
+    SELECT
         id_ticket,
-        SPLIT(custom_field, ':')[0] AS id_custom_field,
-        SPLIT(custom_field, ':')[1] AS custom_field_value,
-        tf.raw_title AS custom_field_title
+        EXPLODE(from_json(custom_fields, 'ARRAY<STRUCT<id: BIGINT, value: STRING>>')) AS custom_field
     FROM
-        filtered_custom_fields AS tcf
+        filtered_custom_fields
+),
+cleaned_custom_fields AS (
+    SELECT
+        ecf.id_ticket,
+        tf.id_ticket_fields,
+        tf.raw_title AS custom_field_title,
+        -- removes unwanted character groups from values
+        REGEXP_REPLACE(ecf.custom_field['value'], '(\\[\\\")|(\\\"\\])|[\\[\\]\\{\\}\\\\"]', '') AS custom_field_value
+    FROM
+        exploded_custom_fields AS ecf
     JOIN
         datalake_zendesk_tickets_clean.ticket_fields AS tf
-            ON tf.id_ticket_fields = SPLIT(custom_field, ':')[0]
+            ON tf.id_ticket_fields = custom_field['id']
     WHERE
-        NULLIF(NULLIF(REPLACE(SPLIT(custom_field, ':')[1], '"', ''), ''), 'null') IS NOT NULL
+        NULLIF(NULLIF(custom_field['value'], ''), 'null') IS NOT NULL
 )
 SELECT
     id_ticket,
     MAP_FROM_ARRAYS(COLLECT_LIST(custom_field_title), COLLECT_LIST(custom_field_value)) AS custom_fields
 FROM
-    parsed_custom_fields
-GROUP BY 1
+    cleaned_custom_fields
+GROUP BY id_ticket
