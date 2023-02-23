@@ -39,7 +39,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_photon_cluster")
 
 # start sedona
 dag_custom_init_script = config_service.get_config("init_script")

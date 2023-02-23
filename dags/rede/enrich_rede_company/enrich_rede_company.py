@@ -36,7 +36,7 @@ DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_photon_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
