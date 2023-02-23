@@ -2763,6 +2763,7 @@ bietlejuice.reverse_nazare:
 
 bietlejuice.reverse_tracksale:
   - bietlejuice.docx:load-clean-credit-evaluation
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-public-dim-contract
   - bietlejuice.dw_contract:load-dw-quintoandar-dim-contract-person
   - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
@@ -2776,6 +2777,11 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_proposal:load-dw-public-dim-proposal
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
+  - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
+  - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
+  - bietlejuice.dw_sale_listing_flow:load-dw-sale-fact-listing-flows
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
   - bietlejuice.dw_user:load-dw-public-dim-user

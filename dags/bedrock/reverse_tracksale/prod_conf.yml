@@ -5,6 +5,11 @@ campaigns:
   # tags: the tag display name and the respective column associated
   # trigger_at_hour: the hour (in UTC) that the campaign should be triggered on Tracksale. For Brazil, is 17. For Mexico, is 19
   # trigger_at_minute: the minute of the hour that the campaign should be triggered on Tracksale. It's zero for both countries
+  - campaign_code: 400
+    query: buyer_end_of_process
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"},{"name": "Fluxo_5A","value": "business_context"}]'
+    trigger_at_hour: 17
+    trigger_at_minute: 0
   - campaign_code: 253
     query: lost_buyer_proposals
     tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"},{"name": "Fluxo_5A","value": "business_context"}]'
@@ -52,6 +57,11 @@ campaigns:
     trigger_at_minute: 0
   - campaign_code: 249
     query: lost_seller_unpublished
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"},{"name": "Fluxo_5A","value": "business_context"}]'
+    trigger_at_hour: 17
+    trigger_at_minute: 0
+  - campaign_code: 399
+    query: seller_end_of_process
     tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"},{"name": "Fluxo_5A","value": "business_context"}]'
     trigger_at_hour: 17
     trigger_at_minute: 0
