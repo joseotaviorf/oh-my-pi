@@ -370,6 +370,7 @@ pipeline:
       ENVIRONMENT: forno
     commands:
       - pip install boto3==1.24.0 PyYAML==5.1 hierarchical-conf==1.0.1
+      - make requirements-scripts
       - python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py databricks.s3.forno.data.quintoandar.com.br
     when:
       event: push
@@ -382,6 +383,7 @@ pipeline:
       ENVIRONMENT: prod
     commands:
       - pip install boto3==1.24.0 PyYAML==5.1 hierarchical-conf==1.0.1
+      - make requirements-scripts
       - PYTHONPATH=. python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py 5a-databricks
     when:
       event: push
