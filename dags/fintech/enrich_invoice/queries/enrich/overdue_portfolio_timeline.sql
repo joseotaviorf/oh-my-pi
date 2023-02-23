@@ -6,6 +6,14 @@ WITH target_invoices AS (
         c.dt_termination AS dt_annulment,
         c.contract_version AS version,
         c.guarantee_type AS guarantee,
+        CASE 
+          WHEN guarantee_type = 'RentalDeposit' then '[PAID] Caução'
+          WHEN guarantee_type = 'RentalGuarantee' then '[PAID] Seguro Fiança'
+          WHEN guarantee_type = 'PRO_GUARANTOR' then '[PAID] Fiança Garantida'
+          WHEN guarantee_type = 'Standalone' then 'Brokerage Only'
+          WHEN guarantee_type = 'SeguroFairfax' then '[FREE] Free'
+          ELSE '[FREE] Legado' 
+        END as contract_guarantee_type,
         c.paying_condo AS condo_payer,
         CAST(p.income AS INTEGER) AS monthly_income_declared,
         CAST(p.package AS INTEGER) AS package_amount,
@@ -17,7 +25,6 @@ WITH target_invoices AS (
         di.payment_status,
         di.negotiation_status,
         di.invoice_user AS user,
-        ARRAY_JOIN(collect_set(die.entry_type), ', ') AS bill_items,
         i.due_amount,
         i.paid_amount,
         i.ts_created,
@@ -32,7 +39,8 @@ WITH target_invoices AS (
                 AND dd.is_brz_holiday = 'Holiday' THEN (DATE(i.ts_due) + interval '3' day)
             ELSE DATE(i.ts_due)
         END AS dt_due_ajust,
-        DATE(i.ts_paid) AS dt_paid
+        DATE(i.ts_paid) AS dt_paid,
+        ARRAY_JOIN(collect_set(CONCAT(die.entry_type, ': ', ROUND(brl_entry_due_amount,2))), ', ') AS bill_items
     FROM
     datalake_invoice.invoice_entries AS fie
     INNER JOIN datalake_retsuko.invoice_entry AS die
@@ -60,7 +68,7 @@ WITH target_invoices AS (
         AND
             c.status != 'Cancelado' -- only active or finalized
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19,20,21,22,23,24
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 
 invoices_timeline AS (
@@ -99,19 +107,22 @@ tainted_delay AS ( -- sum all contract debts and place at the earliest due_date
     SELECT
         month_end,
         du,
+        reference_date,
         id_contract,
         user,
-        sum(due_amount*-1) AS contract_debt,
+        count(distinct case when dt_due_ajust < reference_date AND (dt_paid > reference_date OR dt_paid is null) then id_invoice end) AS contract_overdue_invoices,
+        sum(case when dt_due_ajust < reference_date AND (dt_paid > reference_date OR dt_paid is null) then due_amount*-1 end) AS contract_debt,
         min(dt_due_ajust) AS contract_due_date_min
     FROM
         invoices_timeline
     GROUP BY
-        1,2,3,4
+        1,2,3,4,5
 ),
 
 tainted_dataset as (
     SELECT
         it.*,
+        datediff(day, it.dt_due_ajust, it.reference_date) AS delay_invoice_at_reference,
         CASE
             WHEN it.dt_due_ajust <= it.month_end
                 AND it.dt_paid IS NULL THEN datediff(day, it.dt_due_ajust, it.month_end)
@@ -137,7 +148,8 @@ tainted_dataset as (
             ELSE 'Stock'
         END AS debtor_type,
         td.contract_due_date_min,
-        td.contract_debt
+        td.contract_debt,
+        td.contract_overdue_invoices
     FROM
         invoices_timeline AS it
     LEFT JOIN
@@ -146,6 +158,7 @@ tainted_dataset as (
             AND it.user = td.user
             AND it.month_end = td.month_end
             AND it.du = td.du
+            AND it.reference_date = td.reference_date
 ),
 
 tainted_dataset_range AS (
@@ -158,7 +171,7 @@ tainted_dataset_range AS (
             WHEN delay_contamined_at_closure <= 60  THEN '31-60'
             WHEN delay_contamined_at_closure <= 90  THEN '61-90'
             WHEN delay_contamined_at_closure <= 180 THEN '91-180'
-            ELSE'over 180'
+            ELSE 'over 180'
         END AS delay_contamined_range
     FROM
         tainted_dataset
@@ -172,6 +185,7 @@ SELECT
     contract_status,
     version AS contract_version,
     guarantee AS contract_guarantee,
+    contract_guarantee_type,
     contract_age,
     condo_payer,
     city_name,
@@ -187,7 +201,9 @@ SELECT
     dti,
     due_amount,
     paid_amount,
+    contract_overdue_invoices,
     contract_debt,
+    delay_invoice_at_reference,
     delay_invoice_at_closure,
     delay_contamined_at_closure,
     delay_contamined_range,
