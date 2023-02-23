@@ -1,10 +1,6 @@
 WITH filtered_custom_fields AS(
     SELECT
         tck.id_ticket,
-        -- First regex removes custom_fields with 'value:null', while allowing
-        -- for 'nested' custom_fields, e.g. {"id":0101010, "value":"{"is_nested": "yes"}"} and
-        -- '{', '}', '[' and ']' to be present inside values. Second regex replaces a possible
-        -- trailling coma for a ']', allowing the string to be converted to an array later.
         REGEXP_REPLACE(REGEXP_REPLACE(tck.custom_fields,'(`\\{)\\{([^\n\\{\\}\\[\\]](?!value":(?!null)))*?\\}(,|\\])', ''), ',$', ']') AS custom_fields
     FROM
         datalake_zendesk_tickets_clean.tickets AS tck
