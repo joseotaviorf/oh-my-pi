@@ -41,7 +41,7 @@ cte_transactions AS (
         cte_cat.category_percentage AS percent_amount_from_transaction,
         SIGN(cf.due_amount) * cte_cat.category_value AS due_amount,
         cte_cat.category_percentage/100 * cf.paid_amount AS paid_amount,
-        c2.description IN ('Alugueis', 'Condominio', 'Danos ao Imóvel', 'Rescisão', 'Ocorrências') AND cf.id_project IS NOT NULL AS is_occurency,
+        c1.account_tag = 'Garantia Locaticia' AS is_occurency,
         COALESCE(CAST(SPLIT(cf.id_installment, '/')[0] AS DOUBLE),0) AS installment,
         COALESCE(CAST(SPLIT(cf.id_installment, '/')[1] AS DOUBLE),0) AS total_installments,
         SUM(CASE
