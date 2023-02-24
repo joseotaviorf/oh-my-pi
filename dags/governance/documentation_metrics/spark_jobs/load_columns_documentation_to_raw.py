@@ -30,7 +30,6 @@ def get_documentation_from_bucket(bucket, prefix, spark_client):
     documentation_df = create_dataframe_from_contents(
         documentation_contents, spark_client
     )
-
     # reducing number of partitions
     documentation_df = documentation_df.coalesce(4)
 
@@ -49,7 +48,9 @@ def get_documentation_paths_from_bucket(bucket, prefix, s3_client):
     documentation_paths = [
         obj["Key"]
         for obj in bucket_objects
-        if "documentation/" in obj["Key"] and "/categories/" not in obj["Key"]
+        if "documentation/" in obj["Key"]
+        and "/categories/" not in obj["Key"]
+        and "documentation/atlas/" not in obj["Key"]
     ]
 
     return documentation_paths
@@ -68,11 +69,31 @@ def get_content_from_paths(bucket, documentation_paths, s3_client):
     return documentation_contents
 
 
+def reformat_new_schema_to_old_schema(doc):
+    """
+    The old documentation schema uses a list of dicts for columns
+    The new documentation schema uses a dict of dicts for columns
+    This method turns a dict of dicts into a list of dicts to keep compatibility between old and new schema
+    """
+    new_doc = {}
+    if type(doc['columns']) is dict:
+        new_doc['columns'] = [{key: doc['columns'][key]} for key in doc['columns']]
+    elif type(doc['columns']) is list:
+        new_doc['columns'] = doc['columns']
+
+    new_doc['description'] = doc.get('description')
+    new_doc['owner'] = doc.get('owner')
+    new_doc['database_name'] = doc.get('database_name')
+    new_doc['table_name'] = doc.get('name') or doc.get('table_name')
+    return new_doc
+
+
 def create_dataframe_from_contents(documentation_contents, spark_client):
+    # convert content from new metadata files to old format
+    docs = [reformat_new_schema_to_old_schema(doc) for doc in documentation_contents]
+
     # Creates df from documentation dict
-    documentation_df = spark_client.create_dataframe(
-        Row(**doc) for doc in documentation_contents
-    )
+    documentation_df = spark_client.create_dataframe(Row(**doc) for doc in docs)
 
     # Explodes field containing all the table's columns in distinct rows
     documentation_df = documentation_df.withColumn(

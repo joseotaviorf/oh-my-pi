@@ -1,6 +1,6 @@
 ---
 DOCUMENTATION_BUCKET: data-documentation.s3.forno.data.quintoandar.com.br
-DOCUMENTATION_PATH: documentation/atlas/
+DOCUMENTATION_PATH: documentation/
 PARTITION_COLUMNS:
   - year
   - month
