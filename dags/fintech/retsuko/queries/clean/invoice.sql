@@ -5,7 +5,7 @@ select
     contract_id as id_contract,
     status,
     sub_status as substatus,
-    negotiation_status,
+    NULL AS negotiation_status,
     paid_via,
     purpose,
     closing_mode,
