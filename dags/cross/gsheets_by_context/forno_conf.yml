@@ -12,7 +12,7 @@ dags:
     main_schedule_interval: 0 0 * * *
     dag_owner: Data SS
   growth:
-    main_schedule_interval: 0 0 * * *
+    main_schedule_interval: 10 21 * * *
     dag_owner: Data Growth
   growth_intraday:
     main_schedule_interval: 0 10 * * *
