@@ -27,10 +27,10 @@ columns:
       - dw_public.fact_house_listing_flows.sk_first_listing_date
   messages_sent_tta:
     lineage:
-      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - dw_datamarts.talk_to_agent.first_message_ts
   registered_agent_supports:
     lineage:
-      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - dw_datamarts.talk_to_agent.first_message_ts
   visits_booked:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_booking

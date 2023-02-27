@@ -9,7 +9,7 @@ WITH rent_flows_adap AS (
       DATE(first_message_ts) AS first_message_date,
       DATE(first_attendance_ts) AS first_attendance_date
     FROM
-      dw_datamarts_cross.talk_to_agent
+      dw_datamarts.talk_to_agent
   )
   SELECT
     rf.sk_rent_flow,
@@ -48,7 +48,7 @@ WITH rent_flows_adap AS (
   FROM
     dw_public.fact_listing_rent_flows AS rf
   LEFT JOIN
-    dw_datamarts_cross.funnel_demand_flows AS fdf
+    dw_datamarts.funnel_demand_flows AS fdf
       ON rf.sk_rent_flow = fdf.sk_rent_flow
       AND rf.sk_house_listing = fdf.sk_house_listing
   FULL OUTER JOIN

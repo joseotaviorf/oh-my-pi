@@ -10,22 +10,22 @@ columns:
       - dw_public.dim_region.city_group
   funnel_flow:
     lineage:
-      - dw_datamarts_spark.cross.funnel_demand_flows.funnel_flow
+      - dw_datamarts.funnel_demand_flows.funnel_flow
   funnel_first_touchpoint:
     lineage:
-      - dw_datamarts_spark.cross.funnel_demand_flows.funnel_first_touchpoint
+      - dw_datamarts.funnel_demand_flows.funnel_first_touchpoint
   had_flow_visit:
     lineage:
-      - dw_datamarts_spark.cross.funnel_demand_flows.had_flow_visit
+      - dw_datamarts.funnel_demand_flows.had_flow_visit
   had_flow_direct:
     lineage:
-      - dw_datamarts_spark.cross.funnel_demand_flows.had_flow_direct
+      - dw_datamarts.funnel_demand_flows.had_flow_direct
   had_flow_tta:
     lineage:
-      - dw_datamarts_spark.cross.funnel_demand_flows.had_flow_tta
+      - dw_datamarts.funnel_demand_flows.had_flow_tta
   flow_type:
     lineage:
-      - dw_datamarts_spark.cross.funnel_demand_flows.flow_type
+      - dw_datamarts.funnel_demand_flows.flow_type
   demand_channel:
     lineage:
       - dw_public.dim_offer.mkt_medium

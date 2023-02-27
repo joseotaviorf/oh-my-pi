@@ -278,8 +278,8 @@ messages_sent AS (
   FROM 
     dw_public.dim_date AS dd
   JOIN 
-    dw_datamarts_cross.talk_to_agent AS tta
-      ON date(tta.first_message_ts) = dd.date
+    dw_datamarts.talk_to_agent AS tta
+      ON DATE(tta.first_message_ts) = dd.date
   JOIN 
     dw_public.fact_listing_rent_flows AS rf
       ON tta.sk_house_listing = rf.sk_house_listing
@@ -335,7 +335,7 @@ agent_supports AS (
   FROM 
     dw_public.dim_date AS dd
   JOIN
-    dw_datamarts_cross.talk_to_agent AS tta
+    dw_datamarts.talk_to_agent AS tta
       ON DATE(tta.first_attendance_ts) = dd.date
   JOIN
     dw_public.fact_listing_rent_flows AS rf

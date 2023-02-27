@@ -51,7 +51,7 @@ WITH lead_ AS (
   FROM
     dw_public.dim_date AS dd
   JOIN
-    dw_datamarts_cross.lead_listing_flows AS fhlf
+    dw_datamarts.lead_listing_flows AS fhlf
       ON dd.sk_date = fhlf.sk_lead_date
       AND fhlf.sk_lead_date > 0
   LEFT JOIN
@@ -115,7 +115,7 @@ prospect AS (
   FROM
     dw_public.dim_date AS dd
   JOIN
-    dw_datamarts_cross.lead_listing_flows AS fhlf
+    dw_datamarts.lead_listing_flows AS fhlf
       ON dd.sk_date = fhlf.sk_prospect_date
       AND fhlf.sk_prospect_date > 0
   LEFT JOIN
@@ -178,7 +178,7 @@ qualified AS (
   FROM
     dw_public.dim_date AS dd
   JOIN
-    dw_datamarts_cross.lead_listing_flows AS fhlf
+    dw_datamarts.lead_listing_flows AS fhlf
       ON dd.sk_date = fhlf.sk_qualified_date
       AND fhlf.sk_qualified_date > 0
   LEFT JOIN
@@ -241,7 +241,7 @@ available_qualified AS (
   FROM
     dw_public.dim_date AS dd
   JOIN
-    dw_datamarts_cross.lead_listing_flows AS fhlf
+    dw_datamarts.lead_listing_flows AS fhlf
       ON dd.sk_date = fhlf.sk_available_qualified_date
       AND fhlf.sk_available_qualified_date > 0
   LEFT JOIN
@@ -304,7 +304,7 @@ opportunity AS (
   FROM
     dw_public.dim_date AS dd
   JOIN
-    dw_datamarts_cross.lead_listing_flows AS fhlf
+    dw_datamarts.lead_listing_flows AS fhlf
       ON dd.sk_date = fhlf.sk_opportunity_date
       AND fhlf.sk_opportunity_date > 0
   LEFT JOIN
@@ -367,7 +367,7 @@ listing AS (
   FROM
     dw_public.dim_date AS dd
   JOIN
-    dw_datamarts_cross.lead_listing_flows AS fhlf
+    dw_datamarts.lead_listing_flows AS fhlf
       ON dd.sk_date = fhlf.sk_first_listing_date
       AND fhlf.sk_first_listing_date > 0
   LEFT JOIN
@@ -424,8 +424,8 @@ messages_sent AS (
   FROM
     dw_public.dim_date AS dd
   JOIN
-    dw_datamarts_cross.talk_to_agent AS tta
-      ON date(tta.first_message_ts) = dd.date
+    dw_datamarts.talk_to_agent AS tta
+      ON DATE(tta.first_message_ts) = dd.date
   JOIN
     dw_public.dim_house_listing AS dhl
       ON tta.sk_house_listing = dhl.sk_house_listing
@@ -482,8 +482,8 @@ agent_supports AS (
   FROM
     dw_public.dim_date AS dd
   JOIN
-    dw_datamarts_cross.talk_to_agent AS tta
-      ON date(tta.first_attendance_ts) = dd.date
+    dw_datamarts.talk_to_agent AS tta
+      ON DATE(tta.first_attendance_ts) = dd.date
   JOIN
     dw_public.fact_listing_rent_flows AS rf
       ON tta.sk_house_listing = rf.sk_house_listing
