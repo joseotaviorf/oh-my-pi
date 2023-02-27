@@ -249,6 +249,22 @@ persons_metrics AS (
       ON mc.id_propose = pp.id_propose
       AND mc.rn = 1
   GROUP BY 1
+),
+payments_metrics AS (
+  SELECT
+    id_propose,
+    SUM(IF(dt_paid IS NOT NULL, due_amount, 0)) AS total_paid_amount,
+    SUM(due_amount) AS total_expected_amount,
+    SUM(IF(dt_paid IS NULL, due_amount, 0)) AS total_due_amount,
+    -- CAST(NULL AS DOUBLE) AS lmi,
+    COUNT(id_payment) AS total_payments,
+    COUNT(IF(dt_paid IS NOT NULL, 1, 0)) AS total_payments_paid,
+    COUNT(IF(dt_paid IS NULL AND dt_due < current_date(), 1, 0)) AS total_payments_expired,
+    MAX(dt_paid) AS dt_last_payment
+  FROM
+    datalake_velo.payment
+  GROUP BY 1
+
 )
 SELECT
   p.id AS id_propose,
@@ -259,10 +275,7 @@ SELECT
   f.id AS id_contract,
   pc.id_company AS id_propose_company,
   mc.id_primary_person,
-  CASE
-    WHEN (pv.plan_type = 'Comercial' OR pc.id_propose IS NOT NULL) THEN 1
-    ELSE 2
-  END AS id_origin, -- be sure to match the junk table
+  jk4.id_junk AS id_origin,
   jk1.id_junk AS id_propose_status,
   jk2.id_junk AS id_guarantee_status,
   jk3.id_junk AS id_propose_type,
@@ -273,8 +286,16 @@ SELECT
   pm.avg_declared_income,
   pm.total_declared_income,
   CAST(pv.monthly_guarantee / pm.total_declared_income AS DECIMAL(32,2)) AS dti,
+  pym.total_paid_amount,
+  pym.total_expected_amount,
+  pym.total_due_amount,
+  -- pym.lmi,
+  pym.total_payments,
+  pym.total_payments_paid,
+  pym.total_payments_expired,
   f.id IS NOT NULL AS is_contract,
   IFNULL(DATEDIFF(COALESCE(DATE(pcd.ts_ended), f.dt_ended), DATE(f.dt_begin)) <= 10, False) AS is_grace_period_cancelled,
+  pym.dt_last_payment,
   DATE(f.dt_begin) AS dt_contract_started,
   COALESCE(DATE(pcd.ts_ended), f.dt_ended) AS dt_ended,
   sd.ts_propose_started,
@@ -302,6 +323,9 @@ LEFT JOIN
 lEFT JOIN
   persons_metrics AS pm
     ON pm.id_propose = p.id
+lEFT JOIN
+  payments_metrics AS pym
+    ON pym.id_propose = p.id
 LEFT JOIN
   datalake_velo.junk AS jk1
     ON jk1.id_lvl_1 = p.id_status

@@ -59,12 +59,33 @@ columns:
   dti:
     lineage:
       - datalake_velo.propose.dti
+  total_paid_amount:
+    lineage:
+      - datalake_velo.propose.total_paid_amount
+  total_expected_amount:
+    lineage:
+      - datalake_velo.propose.total_expected_amount
+  total_due_amount:
+    lineage:
+      - datalake_velo.propose.total_due_amount
+  total_payments:
+    lineage:
+      - datalake_velo.propose.total_payments
+  total_payments_paid:
+    lineage:
+      - datalake_velo.propose.total_payments_paid
+  total_payments_expired:
+    lineage:
+      - datalake_velo.propose.total_payments_expired
   is_contract:
     lineage:
       - datalake_velo.propose.is_contract
   is_grace_period_cancelled:
     lineage:
       - datalake_velo.propose.is_grace_period_cancelled
+  dt_last_payment:
+    lineage:
+      - datalake_velo.propose.dt_last_payment
   dt_contract_started:
     lineage:
       - datalake_velo.propose.dt_contract_started

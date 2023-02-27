@@ -1,0 +1,95 @@
+---
+database_name: datalake_velo
+table_name: payment
+owner: athos.sampayo@quintoandar.com.br
+domain: Fintech
+description: Enriched table focused on the Payments context for Velo.
+columns:
+  id_payment:
+    description: Table's unique ID.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.id
+  id_propose_values:
+    description: ID connecting table to propose_values table.
+    lineage:
+      - datalake_velo_clean.fiancavelo_propose.id
+      - datalake_velo_clean.fiancavelo_activator.id
+      - datalake_velo_clean.fiancavelo_plans.id
+  id_propose:
+    description: ID connecting table to propose table.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.id_propose
+  id_billing_type:
+    description: ID connecting table to junk table.
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_payment_type:
+    description: ID connecting table to junk table.
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_status:
+    description: ID connecting table to junk table.
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_payment_gateway:
+    description: ID connecting table to junk table.
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_customer:
+    description: Business ID for Customer.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.customer
+  id_unicid:
+    description: Business ID for UNICID.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.unicid
+  id_subscription:
+    description: Business ID for Subscription.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.subscription
+  invoice_url:
+    description: URL of charged invoice.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.invoice_url
+  description:
+    description: Description comments for this invoice.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.description
+  due_amount:
+    description: Amount that is due.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.value
+  net_amount:
+    description: Amount that Velo receives after removing payment gateway taxes.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.netvalue
+  takerate_amount:
+    description: Amount that Velo receives from this transaction based on the Plan's percentage that Velo receives.
+  is_paid_late:
+    description: Boolean flag for when dt_paid if after dt_due.
+  is_due_modified:
+    description: Boolean flag for when dt_due has been modified.
+  dt_created:
+    description: Date that invoice was created.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.dt_created
+  dt_due:
+    description: Date that invoice was due.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.dt_due
+  dt_due_original:
+    description: Date that invoice was due originally, if was changed in the middle time.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.dt_original_due
+  dt_paid:
+    description: Date that invoice was paid.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.dt_client_payment
+  dt_payment_confirmed:
+    description: Date that invoice had it's payment confirmed by the payment gateway.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.dt_confirmed
+  ts_updated:
+    description: Timestamp that the invoice register was last updated on the database.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.ts_updated

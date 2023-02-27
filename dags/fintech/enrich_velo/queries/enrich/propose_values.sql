@@ -18,9 +18,9 @@ WITH pack_values AS (
 ),
 payments AS (
   SELECT
-    COALESCE(NULLIF(p.id_propose,0), NULLIF(CASE WHEN p.dt_created > date '2021-12-01' THEN REGEXP_EXTRACT(p.description, '(\\d{{4,8}})') END, ''), 0 ) AS id_propose,
+    NULLIF(p.id_propose,0) AS id_propose,
     p.value,
-    RANK() OVER(PARTITION BY COALESCE(NULLIF(p.id_propose,0), NULLIF(CASE WHEN p.dt_created > date '2021-12-01' THEN REGEXP_EXTRACT(p.description, '(\\d{{4,8}})') END, ''), 0 ) ORDER BY p.dt_created) AS rk
+    RANK() OVER(PARTITION BY NULLIF(p.id_propose,0) ORDER BY p.dt_created) AS rk
   FROM
     datalake_velo_clean.fiancavelo_payment AS p
 ),

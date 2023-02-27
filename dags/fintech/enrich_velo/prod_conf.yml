@@ -5,3 +5,6 @@ inner_dependencies:
     - propose_person
   propose:
     - junk
+    - payment
+  payment:
+    - junk

@@ -1,0 +1,98 @@
+---
+database_name: dw_velo
+table_name: fact_velo_payment
+owner: athos.sampayo@quintoandar.com.br
+domain: Fintech
+description: Fact table focused on the Payments context for Velo.
+columns:
+  sk_payment:
+    description: Table's unique SK.
+    lineage:
+      - datalake_velo.payment.id_payment
+  sk_propose:
+    description: SK connecting table to fact_velo_propose table.
+    lineage:
+      - datalake_velo.payment.id_propose
+  sk_propose_values:
+    description: SK connecting table to dim_velo_propose_values table.
+    lineage:
+      - datalake_velo.payment.id_propose_values
+  sk_billing_type:
+    description: SK connecting table to dim_velo_junk table.
+    lineage:
+      - datalake_velo.payment.id_billing_type
+  sk_payment_type:
+    description: SK connecting table to dim_velo_junk table.
+    lineage:
+      - datalake_velo.payment.id_payment_type
+  sk_status:
+    description: SK connecting table to dim_velo_junk table.
+    lineage:
+      - datalake_velo.payment.id_status
+  sk_payment_gateway:
+    description: SK connecting table to dim_velo_junk table.
+    lineage:
+      - datalake_velo.payment.id_payment_gateway
+  id_customer:
+    description: Business ID for Customer.
+    lineage:
+      - datalake_velo.payment.id_customer
+  id_unicid:
+    description: Business ID for UNICID.
+    lineage:
+      - datalake_velo.payment.id_unicid
+  id_subscription:
+    lineage:
+      - datalake_velo.payment.id_subscription
+  invoice_url:
+    description: URL of charged invoice.
+    lineage:
+      - datalake_velo.payment.invoice_url
+  description:
+    description: Description comments for this invoice.
+    lineage:
+      - datalake_velo.payment.description
+  due_amount:
+    description: Amount that is due.
+    lineage:
+      - datalake_velo.payment.due_amount
+  net_amount:
+    description: Amount that Velo receives after removing payment gateway taxes.
+    lineage:
+      - datalake_velo.payment.net_amount
+  takerate_amount:
+    description: Amount that Velo receives from this transaction based on the Plan's percentage that Velo receives.
+    lineage:
+      - datalake_velo.payment.takerate_amount
+  is_paid_late:
+    description: Boolean flag for when dt_paid if after dt_due.
+    lineage:
+      - datalake_velo.payment.is_paid_late
+  is_due_modified:
+    description: Boolean flag for when dt_due has been modified.
+    lineage:
+      - datalake_velo.payment.is_due_modified
+  dt_created:
+    description: Date that invoice was created.
+    lineage:
+      - datalake_velo.payment.dt_created
+  dt_due:
+    description: Date that invoice was due.
+    lineage:
+      - datalake_velo.payment.dt_due
+  dt_due_original:
+    description: Date that invoice was due originally, if was changed in the middle time.
+    lineage:
+      - datalake_velo.payment.dt_due_original
+  dt_paid:
+    description: Date that invoice was paid.
+    lineage:
+      - datalake_velo.payment.dt_paid
+  dt_payment_confirmed:
+    description: Date that invoice had it's payment confirmed by the payment gateway.
+    lineage:
+      - datalake_velo.payment.dt_payment_confirmed
+  ts_updated:
+    description: Timestamp that the invoice register was last updated on the database.
+    lineage:
+      - datalake_velo.payment.ts_updated

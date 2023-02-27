@@ -1,0 +1,25 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_gateway
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_gateway.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_gateway.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_gateway.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.fiancavelo_gateway.name
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_gateway.active
+  ts_inserted:
+    lineage:
+      - datalake_velo_raw.fiancavelo_gateway.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_velo_raw.fiancavelo_gateway.dateupdate

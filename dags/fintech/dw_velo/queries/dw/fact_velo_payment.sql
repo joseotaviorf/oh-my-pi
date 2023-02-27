@@ -1,0 +1,27 @@
+SELECT
+    id_payment AS sk_payment,
+    id_propose AS sk_propose,
+    id_propose_values AS sk_propose_values,
+    id_billing_type AS sk_billing_type,
+    id_payment_type AS sk_payment_type,
+    id_status AS sk_status,
+    id_payment_gateway AS sk_payment_gateway,
+    id_customer,
+    id_unicid,
+    id_subscription,
+    invoice_url,
+    description,
+    due_amount,
+    net_amount,
+    takerate_amount,
+    is_paid_late,
+    is_due_modified,
+    dt_created,
+    dt_due,
+    dt_due_original,
+    dt_paid,
+    dt_payment_confirmed,
+    ts_updated,
+    NOW() AS ts_load
+FROM
+    datalake_velo.payment

@@ -1,0 +1,25 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_paymentstatus
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_paymentstatus.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_paymentstatus.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_paymentstatus.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.fiancavelo_paymentstatus.name
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_paymentstatus.active
+  ts_inserted:
+    lineage:
+      - datalake_velo_raw.fiancavelo_paymentstatus.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_velo_raw.fiancavelo_paymentstatus.dateupdate
