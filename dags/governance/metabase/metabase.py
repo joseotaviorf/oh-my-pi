@@ -100,6 +100,10 @@ for table in tables:
     if extraction_type == "incremental":
         parameters.extend([table["date_filter_column"], "{{ ds }}"])
 
+    read_from_sql_file = table.get("read_from_sql_file", False)
+    if read_from_sql_file:
+        parameters.append(read_from_sql_file)
+
     raw_spark_job_path = "{s3_prefix}/spark_jobs/{context}/load_{extraction_type}_data_into_datalake_raw.py".format(
         s3_prefix=s3_prefix, context=CONTEXT, extraction_type=extraction_type
     )

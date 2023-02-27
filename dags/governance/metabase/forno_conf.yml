@@ -72,7 +72,8 @@ tables: [
    },
    {
       "table_name": "query_execution",
-      "extraction_type": "full"
+      "extraction_type": "full",
+      "read_from_sql_file": True
    },
    {
       "table_name": "revision",

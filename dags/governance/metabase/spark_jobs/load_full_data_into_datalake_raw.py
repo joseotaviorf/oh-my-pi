@@ -7,6 +7,8 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.consumers.db_consumers import PostgresConsumer
 
 from bietlejuice.base.db.database_enum import DatabaseEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -28,6 +30,7 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
     parser.add_argument("table_name", help="table name")
+    parser.add_argument("read_from_sql_file", default=False, help="read from sql file")
 
     args = parser.parse_args()
 
@@ -35,6 +38,7 @@ if __name__ == "__main__":
     source = args.source
     datalake_bucket = args.datalake_bucket
     table_name = args.table_name.lower()
+    read_from_sql_file = args.read_from_sql_file
 
     logger.info(
         f"m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, "
@@ -59,7 +63,13 @@ if __name__ == "__main__":
     metastore_service = SparkMetastoreService(SparkClient())
     metastore_service.create_database(database_name)
 
-    df = postgres_consumer.get_data_from_table(table_name)
+    if read_from_sql_file:
+        query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+            dag_name=source, layer=LayerEnum.RAW.value, table_name=table_name
+        )
+        df = postgres_consumer.get_data_from_query(query)
+    else:
+        df = postgres_consumer.get_data_from_table(table_name)
 
     s3_loader = S3Loader()
     s3_loader.load_df(

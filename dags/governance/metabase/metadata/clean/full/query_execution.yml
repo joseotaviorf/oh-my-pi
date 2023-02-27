@@ -22,6 +22,9 @@ columns:
   hash:
     lineage:
       - datalake_metabase_raw.query_execution.hash
+  hash_string:
+    lineage:
+      - datalake_metabase_raw.query_execution.hash_string
   context:
     lineage:
       - datalake_metabase_raw.query_execution.context

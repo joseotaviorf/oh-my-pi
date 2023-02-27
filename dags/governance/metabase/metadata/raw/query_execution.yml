@@ -1,0 +1,3 @@
+---
+database_name: datalake_metabase_raw
+table_name: query_execution
