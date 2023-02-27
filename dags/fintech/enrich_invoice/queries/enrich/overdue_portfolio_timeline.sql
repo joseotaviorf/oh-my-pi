@@ -7,12 +7,12 @@ WITH target_invoices AS (
         c.contract_version AS version,
         c.guarantee_type AS guarantee,
         CASE 
-          WHEN guarantee_type = 'RentalDeposit' then '[PAID] Caução'
-          WHEN guarantee_type = 'RentalGuarantee' then '[PAID] Seguro Fiança'
-          WHEN guarantee_type = 'PRO_GUARANTOR' then '[PAID] Fiança Garantida'
+          WHEN guarantee_type = 'RentalDeposit' then 'Paid'
+          WHEN guarantee_type = 'RentalGuarantee' then 'Paid'
+          WHEN guarantee_type = 'PRO_GUARANTOR' then 'Paid'
           WHEN guarantee_type = 'Standalone' then 'Brokerage Only'
-          WHEN guarantee_type = 'SeguroFairfax' then '[FREE] Free'
-          ELSE '[FREE] Legado' 
+          WHEN guarantee_type = 'SeguroFairfax' then 'Free'
+          ELSE 'Free' 
         END as contract_guarantee_type,
         c.paying_condo AS condo_payer,
         CAST(p.income AS INTEGER) AS monthly_income_declared,
