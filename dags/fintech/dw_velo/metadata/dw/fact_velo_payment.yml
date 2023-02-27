@@ -3,7 +3,7 @@ database_name: dw_velo
 table_name: fact_velo_payment
 owner: athos.sampayo@quintoandar.com.br
 domain: Fintech
-description: Fact table focused on the Payments context for Velo.
+description: Fact table focused on the Payments context for Velo
 columns:
   sk_payment:
     description: Table's unique SK.
@@ -42,6 +42,7 @@ columns:
     lineage:
       - datalake_velo.payment.id_unicid
   id_subscription:
+    description: Business ID for Subscription.
     lineage:
       - datalake_velo.payment.id_subscription
   invoice_url:
