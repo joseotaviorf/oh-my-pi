@@ -19,4 +19,4 @@ columns:
       - dw_quintoandar.fact_contract_people.sk_user
   id_driver:
     lineage:
-      - dw_public.dim_contract.sk_contract
+      - datalake_offboarding.contract_termination.id_contract

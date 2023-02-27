@@ -1,30 +1,7 @@
--- Benvi PP Offboarding
-WITH new_contracts AS (
-	SELECT
-		dc.sk_contract,
-		'Onboarding' AS step
-	FROM
-		dw_public.dim_contract AS dc
-	INNER JOIN
-		dw_public.fact_listing_rent_flows AS rf 
-			ON dc.sk_contract = rf.sk_contract
-			AND rf.sk_contract_signed_date > 0 -- SELECT only signed contracts
-			AND dc.country_code = 'MX'
-	INNER JOIN
-		dw_public.dim_house_listing AS dhl 
-			ON dhl.sk_house_listing = rf.sk_house_listing
-			AND dhl.country_code = 'MX'
-			AND dhl.is_b2b = FALSE -- excluding B2B listings
-	LEFT JOIN
-		datalake_offboarding.contract_termination AS ct
-			ON dc.sk_contract = ct.id_contract
-	WHERE
-		dc.dt_start = DATE_ADD(CURRENT_DATE(), -10) -- SELECT contracts started ON  D-10
-		AND dc.status = 'Ativo'
-		AND ((ct.dt_termination > dc.dt_start) OR (ct.dt_termination IS NULL))
-	GROUP BY 1, 2
-),
-crisis_users AS (
+-- PP Offboarding: 
+-- 2 days after termination finished and status DONE 
+-- Get all contracts that were involved in Crisis, RA or Proteção 5A
+WITH crisis_contracts AS (
 	SELECT 
 		ft.sk_contract
 	FROM
@@ -32,66 +9,86 @@ crisis_users AS (
 	INNER JOIN
 		dw_tickets.fact_tickets AS ft 
 			ON dt.sk_ticket  = ft.sk_ticket
-			AND ft.sk_closed_date_local = -1 -- consider only users with crisis tickets not closed yet
 	INNER JOIN
-		dw_customer_support.dim_department AS dc
-			ON dt.group_name = dc.department
-			AND dc.team IN ('Casos Especiais','Proteção 5A','Ouvidoria','ReclameAqui') -- exclude users from these areas (crisis)
+		dw_customer_support.dim_department AS dc 
+			ON dt.group_name = dc.department -- novo dc.aux_canal
+	WHERE
+		dc.team IN ('Casos Especiais','Ouvidoria','Proteção 5A','ReclameAqui','Evictions') -- exclude contracts from these areas
+		AND ft.sk_solved_date_local = -1
 	GROUP BY 1
 ),
-onboarding_contracts AS (
-	SELECT 
-		c.sk_contract,
-		'Onboarding' AS step
+offboarding_contracts_wo_ticket AS (
+-- Get offboarding without tickets
+    WITH termination_requests_done AS (
+		SELECT
+			ct.id_contract,
+			DATEDIFF(CURRENT_DATE(), ct.ts_termination_finished) AS days_since_finished
+		FROM
+			datalake_offboarding.contract_termination AS ct
+		LEFT JOIN
+			crisis_contracts AS cc
+				ON cc.sk_contract = ct.id_contract
+		LEFT JOIN
+			dw_public.fact_house_listings AS fhl
+				ON ct.id_contract = fhl.sk_contract
+		LEFT JOIN
+			dw_public.dim_contract AS dc
+				ON ct.id_contract = dc.sk_contract
+		WHERE
+			dc.country_code = 'MX'
+			AND ct.status = 'DONE'
+			AND cc.sk_contract IS NULL -- excluding contracts with crisis
+			AND fhl.sk_partner = -1 -- excluding B2B listings
+			AND ct.dt_termination > dc.dt_start
+    )
+	SELECT
+		id_contract,
+		'Rescisão' AS step
 	FROM
-		new_contracts AS c
-	LEFT JOIN
-		crisis_users AS uc 
-			ON uc.sk_contract = c.sk_contract
+		termination_requests_done
 	WHERE
-		uc.sk_contract IS NULL -- exclude contracts with ongoing crisis ticket
-	GROUP BY 1, 2
+		days_since_finished = 2
 ),
--- considering all owners involved in contracts
-owners AS (
+-- Considering all tenants and dwellers involved in contracts
+tenants_dwellers AS (
 	SELECT 
-    	cp.sk_user,
-		ac.sk_contract,
-		dcp.personal_document AS cpf,
-		dcp.full_name AS name,
-		dcp.email,
-		dcp.phone_number,
-		ac.step
+		cp.sk_user AS id_user,
+		oc.id_contract,
+		dcp.personal_document AS customer_cpf,
+		dcp.full_name AS customer_name,
+		dcp.email AS customer_email,
+		dcp.phone_number AS customer_phone,
+		oc.step AS campaign_step
 	FROM
-		onboarding_contracts AS ac 
+		offboarding_contracts_wo_ticket AS oc
 	INNER JOIN
 		dw_quintoandar.fact_contract_people AS cp 
-			ON ac.sk_contract = cp.sk_contract
-			AND cp.contract_role IN ('landlord')
+			ON oc.id_contract = cp.sk_contract
+			AND cp.contract_role IN ('Proprietario')
 	LEFT JOIN
 		dw_quintoandar.dim_contract_person AS dcp
 			ON cp.sk_contract_person = dcp.sk_contract_person
 )
 SELECT 
-	name AS customer_name,
-	email AS customer_email,
-	phone_number AS customer_phone,
-	step AS campaign_step,
+	customer_name,
+	customer_email,
+	customer_phone,
+	campaign_step,
 	'Proprietário' AS customer_type,
-	cpf AS customer_cpf,
-	sk_user AS id_user,
+	customer_cpf,
+	id_user,
 	'true' AS campaign_type,
 	'contract' AS driver_type,
-	sk_contract AS id_driver,
+	id_contract AS id_driver,
 	NOW() AS ts_load
 FROM
-	owners
+	tenants_dwellers
 UNION ALL
 SELECT 
 	'Teste Disparo' AS customer_name,
 	'testes.disparos.5a@gmail.com' AS customer_email,
 	'+5511123456789' AS customer_phone,
-	'Onboarding' AS campaign_step,
+	'Rescisão' AS campaign_step,
 	'Proprietário' AS customer_type,
 	'1234' AS customer_cpf,
 	'1234' AS id_user,
