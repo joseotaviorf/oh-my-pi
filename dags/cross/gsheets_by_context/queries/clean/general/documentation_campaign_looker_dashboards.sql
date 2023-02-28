@@ -3,6 +3,7 @@ SELECT
     year_month,
     line,
     dashboard_path,
+    id_dashboard,
     title as dashboard_title,
     ownership,
     CAST(views as INTEGER) as views,
