@@ -7,7 +7,7 @@ columns:
       - datalake_composer_raw.serialized_dag.dag_id
   json_data:
     lineage:
-      - datalake_composer_raw.serialized_dag.json_data
+      - datalake_composer_raw.serialized_dag.data
   ts_last_updated:
     lineage:
       - datalake_composer_raw.serialized_dag.last_updated
