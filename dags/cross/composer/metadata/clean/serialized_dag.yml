@@ -1,0 +1,13 @@
+---
+database_name: datalake_composer_clean
+table_name: serialized_dag
+columns:
+  id_dag:
+    lineage:
+      - datalake_composer_raw.serialized_dag.dag_id
+  json_data:
+    lineage:
+      - datalake_composer_raw.serialized_dag.json_data
+  ts_last_updated:
+    lineage:
+      - datalake_composer_raw.serialized_dag.last_updated
