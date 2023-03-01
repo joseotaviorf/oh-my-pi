@@ -1,0 +1,22 @@
+---
+database_name: datalake_ebdb_listing
+table_name: lbc_status_version_order
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.id_house
+  country_code:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.country_code
+  status:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.status
+  status_reason:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.status_reason
+  ts_state_started:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.ts_state_started
+  ts_state_ended:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.ts_state_ended

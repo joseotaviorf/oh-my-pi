@@ -16,6 +16,8 @@ tables:
     partitions: [country_code]
   - table_name: house_status_version_order
     partitions: [country_code]
+  - table_name: lbc_status_version_order
+    partitions: [country_code]
   - table_name: listing_business_context
     partitions: [country_code, business_context]
   - table_name: listing_business_context_status_history
@@ -49,3 +51,5 @@ inner_dependencies:
     - house_listing
   house_listing_fees:
     - house_listing
+  lbc_status_version_order:
+    - business_context_history
