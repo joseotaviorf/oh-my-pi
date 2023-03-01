@@ -15,6 +15,7 @@ WITH invoice_snapshot AS (
             ELSE 0
         END AS Flag_fechamento,
         DATE(ts_created) AS ts_created,
+        ts_snapshot AS ts_snapshot_dim,
         year,
         month,
         day
@@ -28,6 +29,8 @@ entry_snapshot AS (
     SELECT DISTINCT
         b1.sk_invoice,
         b2.accrual_year_month,
+        b2.ts_snapshot AS ts_snapshot_dim_entry,
+        b1.ts_snapshot AS ts_snapshot_fact_entries,
         b2.year,
         b2.month,
         b2.day
@@ -48,6 +51,7 @@ fact_snapshot AS (
         sk_invoice,
         sk_contract,
         sk_region,
+        ts_snapshot AS ts_snapshot_fact,
         year,
         month,
         day
@@ -86,9 +90,9 @@ base_vencimento AS (
 base_invoice AS (
     SELECT
         i.id_external AS invoice_id,
-        c.id_external AS contract_id,
-        COALESCE(DATE(c.ts_signature), DATE(c.ts_period_started)) AS contract_signature_date,
-        c.version AS contract_version,
+        dc.sk_contract AS contract_id,
+        COALESCE(DATE(dc.ts_signature), DATE(dc.dt_start)) AS contract_signature_date,
+        dc.version AS contract_version,
         CASE
             WHEN i.purpose = 'monthly' THEN 'Mensal'
             WHEN i.purpose = 'onboarding' THEN 'Onboarding'
@@ -99,8 +103,8 @@ base_invoice AS (
         i.accrual_year_month AS accrual_year_month,
         e.accrual_year_month AS competencia_invoice_renegociada,
         CASE
-            WHEN e.sk_invoice IS NOT NULL THEN coalesce(ve.due_date, i.ts_due)
-            WHEN i.purpose = 'monthly' THEN coalesce(vi.due_date, i.ts_due)
+            WHEN e.sk_invoice IS NOT NULL THEN COALESCE(ve.due_date, i.ts_due)
+            WHEN i.purpose = 'monthly' THEN COALESCE(vi.due_date, i.ts_due)
             ELSE i.ts_due
         END AS invoice_original_due_date,
         i.ts_due AS invoice_due_date,
@@ -114,7 +118,7 @@ base_invoice AS (
         END AS invoice_status,
         i.paid_amount AS invoice_paid_amount,
         i.ts_paid AS invoice_paid_date,
-        c.guarantee AS contract_guarantee,
+        dc.guarantee,
         CASE
             WHEN i.user = 'tenant' THEN 'Inquilino'
             WHEN i.user = 'landlord' THEN 'Proprietario'
@@ -124,13 +128,18 @@ base_invoice AS (
         i.ts_sent AS invoice_sent_at,
         CASE
             WHEN dr.city_name IS NULL THEN 'São Paulo'
-            ELSE c.city
+            ELSE dr.city_name
         END AS city_name,
         CASE
             WHEN dr.city_group IS NULL THEN 'RMSP'
             ELSE dr.city_group
         END AS city_group,
-        ROW_NUMBER() OVER (PARTITION BY c.id_external, i.id_external, i.year, i.month, i.day ORDER BY i.ts_created desc) AS RN,
+        i.ts_snapshot_dim,
+        f.ts_snapshot_fact,
+        e.ts_snapshot_dim_entry,
+        e.ts_snapshot_fact_entries,
+        dc.ts_snapshot AS ts_snapshot_dim_contract,
+        ROW_NUMBER() OVER (PARTITION BY dc.sk_contract, i.id_external, i.year, i.month, i.day ORDER BY i.ts_created DESC) AS RN,
         i.year,
         i.month,
         i.day
@@ -143,19 +152,21 @@ base_invoice AS (
         AND i.day = f.day
     LEFT JOIN entry_snapshot AS e
         ON i.id_external = e.sk_invoice
-        AND i.year = e.year
-        AND i.month = e.month
-        AND i.day = e.day
+        AND i.year = f.year
+        AND i.month = f.month
+        AND i.day = f.day
     LEFT JOIN base_vencimento AS vi
         ON vi.accrual_year_month = i.accrual_year_month
     LEFT JOIN base_vencimento AS ve
         ON ve.accrual_year_month = e.accrual_year_month
-    LEFT JOIN datalake_retsuko_clean.contract AS c
-        ON f.sk_contract = c.id_external
+    LEFT JOIN dw_public_snapshot.dim_contract_snapshot AS dc
+        ON f.sk_contract = dc.sk_contract
+        AND dc.year = f.year
+        AND dc.month = f.month
+        AND dc.day = f.day
     LEFT JOIN dw_public.dim_region AS dr
         ON f.sk_region = dr.sk_region
-    WHERE
-        i.Flag_fechamento = 1
+    WHERE i.flag_fechamento = 1
 ),
 atraso_contaminado AS (
     SELECT
@@ -193,7 +204,7 @@ base_tratada AS (
         a.month,
         a.day,
         EXTRACT( DAY FROM ((date_trunc('MONTH', DATE(MAKE_DATE(a.year, a.month, a.day))) - INTERVAL 1 DAY) -  CAST(a.invoice_original_due_date AS TIMESTAMP))) AS delay_invoice_at_closure,
-        EXTRACT( DAY FROM ((date_trunc('MONTH', DATE(MAKE_DATE(a.year, a.month, a.day))) - INTERVAL 1 DAY)- b.contract_due_date_min)) AS delay_contamined_at_closure
+        EXTRACT( DAY FROM ((date_trunc('MONTH', DATE(MAKE_DATE(a.year, a.month, a.day))) - INTERVAL 1 DAY) - b.contract_due_date_min)) AS delay_contamined_at_closure
     FROM
         base_invoice AS a
     LEFT JOIN atraso_contaminado AS b
@@ -239,6 +250,7 @@ base_atraso AS (
     FROM
         base_tratada
 ),
+----------- OLD RULES (until dec/2022)
 distinct_invoice_types AS (
     SELECT DISTINCT
         contract_id,
@@ -248,6 +260,7 @@ distinct_invoice_types AS (
         day
     FROM
         base_atraso
+    WHERE year < 2023
 ),
 BaseTipoBoleto AS (
     SELECT DISTINCT
@@ -313,7 +326,7 @@ cte_snapshots_final AS (
         bf.invoice_status,
         bf.invoice_paid_amount,
         NULL AS invoice_paid_via,
-        bf.contract_guarantee,
+        bf.guarantee,
         bf.invoice_account_type,
         NULL AS invoice_indentifier,
         NULL AS our_number,
@@ -338,14 +351,15 @@ cte_snapshots_final AS (
         FALSE AS is_historic_pdd
     FROM
         base_atraso AS bf
-        LEFT JOIN BaseTipoBoleto2 AS btb
-            ON bf.contract_id = btb.contract_id
-            AND bf.year = btb.year
-            AND bf.month = btb.month
-            AND bf.day = btb.day
-)
-, historic_pdd AS (
-SELECT
+    LEFT JOIN BaseTipoBoleto2 AS btb
+        ON bf.contract_id = btb.contract_id
+        AND bf.year = btb.year
+        AND bf.month = btb.month
+        AND bf.day = btb.day
+    WHERE bf.year < 2023
+),
+historic_pdd AS (
+    SELECT
         id_invoice,
         id_contract,
         qty_invoice,
@@ -379,8 +393,62 @@ SELECT
         MONTH(dt_processing) AS month,
         DAY(dt_processing) AS day,
         TRUE AS is_historic_pdd
-FROM datalake_gsheets_clean.base_pdd AS pdd
+    FROM datalake_gsheets_clean.base_pdd AS pdd
+),
+----------- NEW RULES (since jan/2023)
+cte_snapshots_new_rules_final AS (
+    SELECT
+        bf.invoice_id AS id_invoice,
+        bf.contract_id AS id_contract,
+        bf.qty_invoice,
+        bf.contract_version,
+        bf.invoice_type,
+        bf.competencia_invoice_renegociada AS invoice_competence_renegotiated,
+        bf.invoice_amount,
+        bf.invoice_status,
+        bf.invoice_paid_amount,
+        NULL AS invoice_paid_via,
+        CASE
+            WHEN bf.guarantee = 'SeguroFairfax'                              THEN 'Fairfax'
+            WHEN bf.guarantee = 'PRO_GUARANTOR'                              THEN 'Pro_Guarantor'
+            WHEN bf.guarantee = 'RentalGuarantee'                            THEN 'Rental_Guarantee'
+            WHEN bf.guarantee = 'RentalDeposit' OR bf.guarantee = 'Deposito'    THEN 'Rental_Deposit'
+            WHEN bf.guarantee = 'Standalone'                                 THEN 'Standalone'
+            ELSE 'Outros'
+        END AS contract_guarantee,
+        bf.invoice_account_type,
+        NULL AS invoice_indentifier,
+        NULL AS our_number,
+        bf.delay_invoice_at_closure,
+        bf.delay_contamined_at_closure,
+        bf.delay_invoice_range,
+        bf.delay_contamined_range,
+        bf.city_name,
+        bf.city_group,
+        CASE
+            WHEN bf.guarantee IN ('PRO_GUARANTOR', 'RentalGuarantee', 'RentalDeposit','Deposito', 'Standalone')
+            THEN 'd.Paid'
+            ELSE 'c.Free'
+        END AS provisional_group,
+        bf.accrual_year_month,
+        bf.contract_signature_date AS dt_contract_signature,
+        bf.invoice_original_due_date AS dt_invoice_original_due,
+        bf.invoice_due_date AS dt_invoice_due,
+        bf.invoice_created_at AS dt_invoice_created,
+        bf.invoice_sent_at AS dt_invoice_sent,
+        bf.invoice_paid_date,
+        bf.contract_due_date_min AS dt_contract_due_date_min,
+        bf.year,
+        bf.month,
+        bf.day,
+        FALSE AS is_historic_pdd
+    FROM
+        base_atraso AS bf
+    WHERE year >= 2023
 )
+
 SELECT * FROM cte_snapshots_final
 UNION ALL
 SELECT * FROM historic_pdd
+UNION ALL
+SELECT * FROM cte_snapshots_new_rules_final
