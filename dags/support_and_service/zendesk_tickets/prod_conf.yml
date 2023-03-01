@@ -1,14 +1,29 @@
-table_list:
-  [
-    "group_memberships",
-    "groups",
-    "organizations",
-    "satisfaction_ratings",
-    "ticket_fields",
-    "ticket_metrics",
-    "tickets",
-    "users",
-  ]
+inner_dependencies:
+  tickets:
+    - tickets_history
+tables:
+  group_memberships:
+    is_incremental: false
+  groups:
+    is_incremental: false
+  organizations:
+    is_incremental: false
+  satisfaction_ratings:
+    is_incremental: false
+  ticket_fields:
+    is_incremental: false
+  ticket_metrics:
+    is_incremental: false
+  tickets_history:
+    no_raw: true
+    is_incremental: true
+    has_create_external_table: false
+    partition_cols: ["year", "month", "day"]
+  tickets:
+    is_incremental: false
+    partition_cols: ["year", "month", "day"]
+  users:
+    is_incremental: false
 
 custom_cluster:
   driver_node_type_id: r6gd.12xlarge
