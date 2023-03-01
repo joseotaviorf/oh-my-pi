@@ -2042,6 +2042,7 @@ bietlejuice.enrich_listing_flow:
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_wololo_lead:load-enrich-lead-sales-company
+  - bietlejuice.wololo:load-clean-prospect
 
 # temporary
 bietlejuice.enrich_unified_listing_flow:

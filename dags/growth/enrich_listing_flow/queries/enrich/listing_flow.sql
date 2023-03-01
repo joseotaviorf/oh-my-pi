@@ -226,6 +226,7 @@ houses_with_lead AS (
         COALESCE(lead_aud_first_region.id_region, house.id_region) AS id_first_region,
         COALESCE(lead.ts_created, lead.dt_ad_created, lead.dt_picked_up) AS ts_lead,
         CASE
+            WHEN p.ts_created IS NOT NULL THEN p.ts_created -- first we look if it was created on Wololo Prospect
             WHEN has_aud.id_lead IS NOT NULL THEN ure.ts_revision
             ELSE COALESCE(lead.ts_updated, lead.ts_created) -- if there is no AUD records, we assume lead update or creation
         END AS ts_prospect,
@@ -292,6 +293,9 @@ houses_with_lead AS (
         END AS acquisition_source
     FROM
         datalake_lead.lead
+    LEFT JOIN	
+        datalake_wololo_clean.prospect p	
+        ON p.id_reference = lead.id
     LEFT JOIN
         datalake_lead.conversion_lead cl
         ON cl.id_converted_lead = lead.id

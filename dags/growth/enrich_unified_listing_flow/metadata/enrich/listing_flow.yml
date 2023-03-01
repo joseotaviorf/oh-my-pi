@@ -56,6 +56,7 @@ columns:
       - datalake_ebdb_user.user_revision_entity.ts_revision
       - datalake_lead.lead.ts_updated
       - datalake_lead.lead.ts_created
+      - datalake_wololo_clean.prospect.ts_created
   ts_first_contact:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
