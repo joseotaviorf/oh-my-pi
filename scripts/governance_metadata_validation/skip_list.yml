@@ -28,7 +28,6 @@ metadata_files_out_of_pattern:
   - support_and_service/reverse_atento/metadata/reverse/backlog_metric.yml
   - support_and_service/reverse_atento/metadata/reverse/fcr_metric.yml
   - support_and_service/reverse_atento/metadata/reverse/general_metric.yml
-  - for_sale/dw_datamarts_for_sale/metadata/dw/em_casa_house_listing.yml
   - for_sale/dw_sale_events/metadata/dw/dim_sale_event_type.yml
   - fintech/velo_omie/metadata/clean/country.yml
   - support_and_service/reverse_atento/metadata/reverse/taxonomia_email.yml

@@ -160,9 +160,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.ebdb:create-info-condo-amenities-clean-external-table
   - bietlejuice.ebdb:create-listing-business-context-clean-external-table
   - bietlejuice.ebdb:create-listing-business-context-aud-clean-external-table
-  - bietlejuice.ebdb:create-map-region-clean-external-table
   - bietlejuice.ebdb:create-partner-clean-external-table
-  - bietlejuice.ebdb:create-polygon-region-clean-external-table
   - bietlejuice.ebdb:create-user-aud-clean-external-table
   - bietlejuice.ebdb:create-user-clean-external-table
   - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
