@@ -6,6 +6,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatabaseEnum
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     parser.add_argument("extraction_type")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
     parser.add_argument("date_filter_column", help="Date filter column", default=None)
-
+    parser.add_argument("build_query", help="Build SQL query", default=None)
 
     args = parser.parse_args()
     environment = args.env
@@ -40,13 +41,15 @@ if __name__ == "__main__":
     extraction_type = args.extraction_type
     execution_date = args.execution_date
     date_filter_column = args.date_filter_column if args.date_filter_column != "None" else None
-
+    build_query = args.build_query if args.build_query != "None" else None
     config_service = ConfigurationService(source)
     partition_cols = (
         None
         if extraction_type == "full"
         else config_service.get_config("partition_columns")
     )
+
+
 
     logger.info(
         f"""
@@ -84,9 +87,28 @@ if __name__ == "__main__":
     table_name = table_name.lower()
 
     if extraction_type == "incremental":
-        df = postgres_consumer.get_incremental_data_by_granularity_from_table(
-            table_name, date_filter_column, execution_date
-        )
+        filter_condition = f"{date_filter_column} BETWEEN DATE('{execution_date}') AND DATE('{execution_date}') + 1 "
+
+        query = f"""
+            SELECT
+                *,
+                CAST(EXTRACT(YEAR FROM DATE({date_filter_column})) AS INT) AS year,
+                CAST(EXTRACT(MONTH FROM DATE({date_filter_column})) AS INT) AS month,
+                CAST(EXTRACT(DAY FROM DATE({date_filter_column})) AS INT) AS day
+            FROM
+                "{table_name}"
+            WHERE
+                {filter_condition}
+        """
+
+        if build_query == True:
+            query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+                dag_name=source, layer=LayerEnum.RAW.value, table_name=table_name
+            )
+            df = postgres_consumer.get_data_from_query(query)
+        else:
+            df = postgres_consumer.get_incremental_data_by_granularity_from_table(table_name, date_filter_column, execution_date)
+
         if not df.rdd.isEmpty():
             logger.info("m=__main__, msg=RDD is not empty. Loading into S3.")
             IncrementalTableLoaderPipeline(

@@ -3,7 +3,7 @@ SELECT
     source_id               AS id_source,
     business_entity_id      AS id_business_entity,
     finance_entity_id       AS id_finance_entity,
-    external_payment_id
+    external_payment_id,
     uuid,
     source,
     transaction_type,

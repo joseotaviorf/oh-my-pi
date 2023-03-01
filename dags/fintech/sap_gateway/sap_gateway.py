@@ -107,6 +107,7 @@ for table in tables:
     extended_parameters = [
         "{{ get_date_param(dag_run, ds, 'execution_date') }}",
         table.get("date_filter_column", "None"),
+        table.get("build_query", "None"),
     ]
 
     parameters.extend(extended_parameters)
