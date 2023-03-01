@@ -9,4 +9,4 @@ columns: map(include("column"), key=str(min=2, max=50))
 column:
   description: str(min=5, max=280)
   lineage: list(str(min=5, max=140), required=False)
-  categories: map(str(min=5, max=140), key=str(min=1, max=50), required=False)
+  categories: map(str(min=5, max=280), key=str(min=1, max=50), required=False)
