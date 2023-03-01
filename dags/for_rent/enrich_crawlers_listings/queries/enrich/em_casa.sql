@@ -129,8 +129,7 @@ SELECT
     NULL::DOUBLE AS avg_distance,
     el.is_platform_property,
     NULL::STRING AS is_exclusive,
-    el.ts_updated,
-    NOW() AS ts_load
+    el.ts_updated
 FROM
     em_casa_listings AS el
 LEFT JOIN

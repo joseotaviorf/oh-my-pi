@@ -74,7 +74,6 @@ SELECT
     END AS weeks_unpublished,
     ts_last_extraction,
     ts_started_date, -- This could have a better name, like dt_started or dt_status_started. However, this table comes from a migrated datamart
-    ts_ended_date, -- so renaming the columns is going to make the migration much harder for the dependent questions and looks.
-    NOW() AS ts_load
+    ts_ended_date -- so renaming the columns is going to make the migration much harder for the dependent questions and looks.
 FROM
     status_changes
