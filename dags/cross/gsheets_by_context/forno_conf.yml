@@ -8,35 +8,34 @@
 #       trigger_interval: <trigger_interval>
 #       additional_information: <additional_information>
 dags:
-  support_and_service:
-    main_schedule_interval: 0 0 * * *
-    dag_owner: Data SS
   growth:
     main_schedule_interval: 10 21 * * *
     dag_owner: Data Growth
+  bedrock:
+    main_schedule_interval: 50 21 * * *
+    dag_owner: Data Bedrock
+  fintech:
+    main_schedule_interval: 10 22 * * *
+    dag_owner: Data Fintech
+    cluster_name: databricks_10_4_med_general_cluster
+  general:
+    main_schedule_interval: 50 22 * * *
+    dag_owner: Data Engineering
+  support_and_service:
+    main_schedule_interval: 20 23 * * *
+    dag_owner: Data SS
+  for_rent:
+    main_schedule_interval: 50 23 * * *
+    dag_owner: Data ForRent
+    cluster_name: databricks_10_4_med_general_cluster
+  for_sale:
+    main_schedule_interval: 20 00 * * *
+    dag_owner: Data ForSale
+    cluster_name: databricks_10_4_med_general_cluster
   growth_intraday:
     main_schedule_interval: 0 10 * * *
     dag_owner: Data Growth
-  for_rent:
-    main_schedule_interval: 0 0 * * *
-    dag_owner: Data ForRent
-    cluster_name: databricks_10_4_med_general_cluster
-  fintech:
-    main_schedule_interval: 0 0 * * *
-    dag_owner: Data Fintech
-    cluster_name: databricks_10_4_med_general_cluster
-  bedrock:
-    main_schedule_interval: 0 0 * * *
-    dag_owner: Data Bedrock
-  for_sale:
-    main_schedule_interval: 0 0 * * *
-    dag_owner: Data ForSale
-    cluster_name: databricks_10_4_med_general_cluster
   static:
     dag_owner: Data Engineering
     dag_doc:
       trigger_interval: not automatically
-      additional_information: This DAG must be manually activated as needed to reprocess your data.
-  general:
-    main_schedule_interval: 0 0 * * *
-    dag_owner: Data Engineering
