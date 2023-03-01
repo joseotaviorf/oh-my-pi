@@ -1,52 +1,71 @@
 ---
 database_name: dw_payment_snapshot
 table_name: dim_invoice_snapshot
+owner: "@ae-finance-fintech"
+domain: "fintech"
+description: "dw_payment.dim_invoice monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
   sk_invoice:
+    description: "External_ID of invoice registered in SeuBarriga."
     lineage:
       - dw_payment.dim_invoice.sk_invoice
   frequency:
+    description: "The Invoice's type: pos rental, monthly, onboarding or extra."
     lineage:
       - dw_payment.dim_invoice.frequency
   payment_status:
+    description: "Invoice payment status."
     lineage:
       - dw_payment.dim_invoice.payment_status
-  negotiation_status:
+  sub_status:
+    description: "It's used to set negotiations/debts status."
     lineage:
-      - dw_payment.dim_invoice.negotiation_status
+      - dw_payment.dim_invoice.substatus
   closing_mode:
+    description: "If closing is automatic or manual."
     lineage:
       - dw_payment.dim_invoice.closing_mode
   paid_via:
+    description: "How invoice is paid."
     lineage:
       - dw_payment.dim_invoice.paid_via
   user:
+    description: "User to which the invoice was sent."
     lineage:
       - dw_payment.dim_invoice.user
   due_amount:
+    description: "Amount due in invoice."
     lineage:
       - dw_payment.dim_invoice.due_amount
   paid_amount:
+    description: "Amout paid on the invoice."
     lineage:
       - dw_payment.dim_invoice.paid_amount
   accrual_year_month:
+    description: "Expense reference month."
     lineage:
       - dw_payment.dim_invoice.accrual_year_month
   ts_created:
+    description: "Invoice creation date."
     lineage:
       - dw_payment.dim_invoice.ts_created
   ts_canceled:
+    description: "Invoice cancellation date."
     lineage:
       - dw_payment.dim_invoice.ts_canceled
   dt_sent:
+    description: "Invoice submission date."
     lineage:
       - dw_payment.dim_invoice.dt_sent
   dt_due:
+    description: "Invoice due date."
     lineage:
       - dw_payment.dim_invoice.dt_due
   dt_paid:
+    description: "Invoice payment date."
     lineage:
       - dw_payment.dim_invoice.dt_paid
   ts_snapshot:
+    description: "Timestamp that snapshot was taken."
     lineage:
       - dw_payment.dim_invoice.ts_load

@@ -1,34 +1,47 @@
 ---
 database_name: dw_payment_snapshot
 table_name: dim_invoice_entry_snapshot
+owner: "@ae-finance-fintech"
+domain: "fintech"
+description: "dw_payment.dim_invoice_entry monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
   sk_invoice_entry:
+    description: "Id of accounting entry (credit or debit) registered in an invoice."
     lineage:
       - dw_payment.dim_invoice_entry.sk_invoice_entry
   entry_type:
+    description: "Invoice entry type according to expense details (aka bill_item)."
     lineage:
       - dw_payment.dim_invoice_entry.entry_type
   from_account_type:
+    description: "From account type in the invoice entry (contract or stakeholder)."
     lineage:
       - dw_payment.dim_invoice_entry.from_account_type
   to_account_type:
+    description: "To account type in the invoice entry  (contract or stakeholder)."
     lineage:
       - dw_payment.dim_invoice_entry.to_account_type
   accounting_account:
+    description: "Accounting account in SAP in which entry will be destined (as defined in automatic integration)."
     lineage:
       - dw_payment.dim_invoice_entry.accounting_account
   producer:
+    description: "Rotine that produces the entry."
     lineage:
       - dw_payment.dim_invoice_entry.producer
   description:
+    description: "Invoice entry title as shown in invoice."
     lineage:
       - dw_payment.dim_invoice_entry.description
   invoice_entry_revenue:
+    description: "Entry revenue line."
     lineage:
       - dw_payment.dim_invoice_entry.invoice_entry_revenue
   accrual_year_month:
+    description: "Expense reference month."
     lineage:
       - dw_payment.dim_invoice_entry.accrual_year_month
   ts_snapshot:
+    description: "Timestamp that snapshot was taken."
     lineage:
       - dw_payment.dim_invoice_entry.ts_load
