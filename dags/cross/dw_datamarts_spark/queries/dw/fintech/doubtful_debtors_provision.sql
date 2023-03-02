@@ -356,7 +356,7 @@ cte_snapshots_final AS (
         AND bf.year = btb.year
         AND bf.month = btb.month
         AND bf.day = btb.day
-    WHERE bf.year < 2023
+    WHERE bf.year < 2023 OR (bf.year=2023 AND bf.month=1)
 ),
 historic_pdd AS (
     SELECT
@@ -444,7 +444,7 @@ cte_snapshots_new_rules_final AS (
         FALSE AS is_historic_pdd
     FROM
         base_atraso AS bf
-    WHERE year >= 2023
+    WHERE year >= 2023 OR (year >= 2023 AND month <> 1)
 )
 
 SELECT * FROM cte_snapshots_final
