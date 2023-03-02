@@ -9,3 +9,4 @@ SELECT
     REPLACE(value:["@quintoandar/cozy-utils"],'^','') AS utils,
     DATE(created_at) AS dt_created
 FROM datalake_cozy_metrics_raw.library_versions
+WHERE created_at IS NOT NULL

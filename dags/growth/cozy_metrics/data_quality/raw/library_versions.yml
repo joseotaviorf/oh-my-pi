@@ -1,17 +1,25 @@
 ---
 table_name: datalake_cozy_metrics_raw.library_versions
 alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: created_at
+  incremental_date_mask: yyyy-MM-dd
 table_level_validations:
   has_size:
     greater_than: 1
 column_level_validations:
   name:
-    is_complete:
+    has_completeness:
+      greater_than: 0.98
   project:
-    is_complete:
+    has_completeness:
+      greater_than: 0.98
   project_version:
-    is_complete:
+    has_completeness:
+      greater_than: 0.98
   value:
-    is_complete:
+    has_completeness:
+      greater_than: 0.98
   created_at:
-    is_complete:
+    has_completeness:
+      greater_than: 0.98

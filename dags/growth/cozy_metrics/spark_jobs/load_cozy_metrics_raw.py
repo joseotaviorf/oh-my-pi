@@ -3,12 +3,15 @@ from quintoandar_logger import QuintoAndarLogger
 import datetime as dt
 
 from bietlejuice.base.db import DatalakeMetastoreMapping
-from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, SparkDataFrameService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
+
+from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
+from bietlejuice.services.slack_service import SlackService
 
 JOB_NAME = "load_cozy_metrics_raw"
 
@@ -65,11 +68,24 @@ if __name__ == "__main__":
     database_name = db_info["db_raw_name"]
     database_location = db_info["db_raw_path"]
 
+    base_dbutils = BaseDBUtils()
+
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+
+    if env == 'prod':
+        key = SlackWebhooksEnum.ALERTS_DE_AIRFLW_DGS
+    else:
+        key = SlackWebhooksEnum.DE_TESTS
+
+    slack_webhook = dbutils.secrets.get(
+            scope="quintoandar", key=key
+    )
+
     spark_metastore_service.create_database(database_name)
 
     logger.info(f"""m={JOB_NAME}, source_bucket={cozy_bucket}, table_name={table_name}, msg=Getting data from bucket...""")
     metric = table_name.replace("_","-")
-
 
     for execution_date in _generate_date_range(load_start_date=load_start_date, load_end_date = load_end_date):
         
@@ -80,44 +96,63 @@ if __name__ == "__main__":
         
         try:
             df = spark_client.conn.read.option("multiline",True).json(file_path)
+
+            if df is not None:
+
+                df = (df_service
+                        .input(df)
+                        .create_year_month_day_columns_from_dataframe_column("createdat")
+                        .format_column_names()
+                        .convert_struct_type_to_json()
+                        .output()
+                    )
+
+                logger.info(f"""m={JOB_NAME}, source_bucket={cozy_bucket}, table_name={table_name}, msg=Loading raw data on bucket...""")
+                s3_loader.load_df(
+                    df=df,
+                    format_options=SparkTableStorageFormat.DEFAULT_RAW,
+                    s3_path=f"{database_location}{table_name}",
+                    partitions=raw_partition_cols,
+                    compression="gzip"
+                )
+                
+                
+                logger.info(f"""m={JOB_NAME}, source_bucket={cozy_bucket}, table_name={table_name}, msg=Update metastore...""")
+                spark_metastore_loader.update_metastore(
+                    df=df,
+                    database_name=database_name,
+                    table_name=table_name,
+                    format_options=SparkTableStorageFormat.DEFAULT_RAW,
+                    database_location=database_location,
+                    partitions=raw_partition_cols,
+                )
+
+                spark_metastore_service.create_new_partitions_from_df(
+                    df=df,
+                    database_name=database_name,
+                    table_name=table_name,
+                    partition_cols=raw_partition_cols,
+                ) 
+
+            else:
+                logger.info(f"""m={JOB_NAME}, source_bucket={cozy_bucket}, table_name={table_name}, msg=These dataframe is empty...""")
+
+                continue
+
         except Exception as e:
             logger.warning(f"""m={JOB_NAME}, table_name={table_name}, msg={e}.""")
 
-        if df is not None:
-
-            df = (df_service
-                    .input(df)
-                    .create_year_month_day_columns_from_dataframe_column("createdat")
-                    .format_column_names()
-                    .convert_struct_type_to_json()
-                    .output()
-                )
-
-            logger.info(f"""m={JOB_NAME}, source_bucket={cozy_bucket}, table_name={table_name}, msg=Loading raw data on bucket...""")
-            s3_loader.load_df(
-                df=df,
-                format_options=SparkTableStorageFormat.DEFAULT_RAW,
-                s3_path=f"{database_location}{table_name}",
-                partitions=raw_partition_cols
-            )
-            
-            
-            logger.info(f"""m={JOB_NAME}, source_bucket={cozy_bucket}, table_name={table_name}, msg=Update metastore...""")
-            spark_metastore_loader.update_metastore(
-                df=df,
-                database_name=database_name,
-                table_name=table_name,
-                format_options=SparkTableStorageFormat.DEFAULT_RAW,
-                database_location=database_location,
-                partitions=raw_partition_cols,
+            message = (
+                f":warning:\n"
+                f"DAG: *{source}*\n"
+                f"Owner: @ae-growth\n"
+                f"Report: *{table_name}*\n"
+                f"Environment: *{env}*\n"
+                f"Status: *FAILED*\n"
+                f"Existence validation failed for `{dt.datetime.now().strftime('%Y-%m-%d')}`\n"
+                f"Error:'{e}'\n"
             )
 
-            spark_metastore_service.create_new_partitions_from_df(
-                df=df,
-                database_name=database_name,
-                table_name=table_name,
-                partition_cols=raw_partition_cols,
-            ) 
+            SlackService.send_slack_errors([(message,slack_webhook)]) 
 
-        else:
-            logger.info(f"""m={JOB_NAME}, source_bucket={cozy_bucket}, table_name={table_name}, msg=These dataframe is empty...""")
+            continue
