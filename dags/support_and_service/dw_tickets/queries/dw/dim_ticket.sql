@@ -1,7 +1,7 @@
 SELECT
     CAST(id_ticket AS BIGINT) AS sk_ticket,
-    subject,
-    description,
+    if(octet_length(subject)>=65535, substring(subject,0,60000), subject) AS subject,
+    if(octet_length(description)>=65535, substring(description,0,60000), description) AS description,
     ticket_via,
     channel,
     group_name,
