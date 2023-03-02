@@ -55,6 +55,8 @@ SELECT
                 status = 'PUBLISHED'
                 AND
                 is_previous_first_status IS TRUE
+                AND 
+                previous_status <> 'EDITING'
             )
             OR
             (
@@ -105,6 +107,8 @@ SELECT
                         status = 'PUBLISHED'
                         AND
                         is_previous_first_status IS TRUE
+                        AND 
+                        previous_status <> 'EDITING'
                     )
                     OR
                     (
