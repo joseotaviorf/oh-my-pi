@@ -3,9 +3,7 @@ tables:
   itbi_sp:
     is_incremental: true
     source:
-      site_url: "https://www.prefeitura.sp.gov.br"
       site_download_page_url: "https://www.prefeitura.sp.gov.br/cidade/secretarias/fazenda/acesso_a_informacao/index.php?p=31501"
-      file_pattern: "/cidade/secretarias/upload/fazenda/arquivos/"
       format: ".xlsx"
     columns_to_rename:
       N° do Cadastro (SQL): "n_cadastro_sql"

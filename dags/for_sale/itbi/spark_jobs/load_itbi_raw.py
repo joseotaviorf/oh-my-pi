@@ -55,9 +55,7 @@ def main():
     for key, value in config_service.get_config("tables").items():
 
         table_name = key
-        source_url = value["source"]["site_url"]
         source_download_page_url = value["source"]["site_download_page_url"]
-        source_file_pattern = value["source"]["file_pattern"]
         source_format = value["source"]["format"]
         is_incremental = value["is_incremental"]
         columns_rename_mapped = value["columns_to_rename"].items()
@@ -65,15 +63,13 @@ def main():
         logger.info(
             f"""
             m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date}
-            msg=Configuration table, table_name={table_name}, source_url={source_url}, source_format={source_format}, is_incremental={is_incremental}
+            msg=Configuration table, table_name={table_name}, source_format={source_format}, is_incremental={is_incremental}
             """
         )
 
         dataframe = get_data(
-            source_url,
             source_download_page_url,
             source_format,
-            source_file_pattern,
             columns_rename_mapped,
         )
 
@@ -96,30 +92,27 @@ def main():
 
 
 def get_data(
-    source_url,
     source_download_page_url,
     source_format,
-    source_file_pattern,
     columns_rename_mapped,
 ):
     udf_transform_month_to_portuguese_relative = udf(
         transform_month_to_portuguese_relative, StringType()
     )
 
-    urls = scrap_files_url(source_download_page_url, source_file_pattern, source_format)
+    urls = scrap_files_url(source_download_page_url, source_format)
 
     dataframes = []
 
     for url in urls:
-        full_url = source_url + url
 
         logger.info(
             f"""
-            msg= Downloading url={full_url}
+            msg= Downloading url={url}
         """
         )
 
-        sheets = pd.read_excel(full_url, sheet_name=None)
+        sheets = pd.read_excel(url, sheet_name=None)
         sheets = {k: sheets[k] for k in sheets if re.match("[a-zA-Z]+-[0-9]+", k)}
 
         dfs = pd.concat([df.assign(name=n) for n, df in sheets.items()])
@@ -151,9 +144,9 @@ def get_data(
     return dataframe
 
 
-def scrap_files_url(source_url, source_file_pattern, source_format):
-    u = requests.get(source_url)
-    urls = re.findall(f"""{source_file_pattern}.+?.{source_format}""", u.text)
+def scrap_files_url(source_download_page_url, source_format):
+    u = requests.get(source_download_page_url)
+    urls = re.findall(r'<a\s+(?:[^>]*?\s+)?href="([^"]*itbi.*?\{source_format})"'.format(source_format = source_format), u.text, re.IGNORECASE)
     return urls
 
 
