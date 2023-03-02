@@ -39,10 +39,6 @@ pipeline:
     dw:
       <<: *redshift_anchor
       table: sale_agents_weekly_performance
-  sale_available_hours:
-    dw:
-      <<: *redshift_anchor
-      table: sale_available_hours
   sale_ongoing_listings_casa_mineira:
     dw:
       <<: *redshift_anchor
