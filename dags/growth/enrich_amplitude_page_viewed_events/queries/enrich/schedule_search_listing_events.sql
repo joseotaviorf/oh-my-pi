@@ -40,6 +40,27 @@ SELECT
 FROM 
     datalake_amplitude_clean.170698_search_page_viewed_events 
 UNION ALL
+SELECT  
+    ep_house_id,
+    id_user,
+    id_device,
+    business_context,
+    entrance_uri,
+    referrer,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    up_platform,
+    top5_house_id,
+    ts_event,
+    year,
+    month,
+    day
+FROM 
+    datalake_amplitude_clean.170698_search_results_page_viewed_events 
+UNION ALL
 SELECT      
     ep_house_id,
     id_user,
