@@ -31,6 +31,7 @@ tables:
   repair_request:
     is_incremental: True
     date_column: updated_at
+  repair_request_chat: {}
   repair_request_item_aud: {}
   repair_request_item:
     is_incremental: True
