@@ -8,8 +8,6 @@ column_level_validations:
   month_start:
     is_complete:
       severity_level: Error
-    is_unique:
-      severity_level: Error
   city_group:
     is_complete:
       severity_level: Error
