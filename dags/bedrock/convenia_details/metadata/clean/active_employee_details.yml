@@ -89,6 +89,9 @@ columns:
   experience_period:
     lineage:
       - datalake_convenia_raw.active_employee_details.experience_period
+  emergency_contacts:
+    lineage:
+      - datalake_convenia_raw.active_employee_details.emergency_contacts
   is_first_job:
     lineage:
       - datalake_convenia_raw.active_employee_details.first_job

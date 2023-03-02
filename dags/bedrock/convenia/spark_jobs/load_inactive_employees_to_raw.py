@@ -3,6 +3,7 @@ import logging
 from argparse import ArgumentParser
 
 from pyspark import Row
+from pyspark.sql.types import StructType, StringType, StructField
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_convenia_api_client.clients import ConveniaClient
 from quintoandar_convenia_api_client.consumers import CONSUMERS
@@ -40,9 +41,27 @@ def fetch_convenia_inactive_employees(host, token):
 def create_df_from_inactive_employees(results, spark_client):
     rows = []
     for employee in results:
-        rows.append(Row(id=employee["id"], dismissal=str(employee["dismissal"])))
+        rows.append(Row(id=str(employee["id"]), dismissal=str(employee["dismissal"])))
 
-    return spark_client.create_dataframe(rows)
+    if not rows:
+        rows = create_df_schema()
+        return rows
+    else:
+        return spark_client.create_dataframe(rows)
+
+
+def create_df_schema():
+    columns = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("dismissal", StringType(), True),
+        ]
+    )
+
+    # Create a dataframe with expected schema
+    result = spark.createDataFrame(data=[], schema=columns)
+
+    return result
 
 
 if __name__ == "__main__":
@@ -72,33 +91,36 @@ if __name__ == "__main__":
 
     json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.CONVENIA)
     credentials = json.loads(json_credentials)
-    convenia_inactive_employees_result = fetch_convenia_inactive_employees(
-        credentials["host"], credentials["token"]
-    )
 
-    spark_client = SparkClient()
-    df = create_df_from_inactive_employees(
-        convenia_inactive_employees_result, spark_client
-    )
+    result = create_df_schema()
 
-    df = SparkDataFrameService().input(df).convert_array_type_to_json().output()
+    for item, details in credentials.items():
+        host = details["host"]
+        api_token = details["token"]
+        convenia_inactive_employees_result = fetch_convenia_inactive_employees(
+            host, api_token
+        )
+        spark_client = SparkClient()
+        df = create_df_from_inactive_employees(
+            convenia_inactive_employees_result, spark_client
+        )
+        result = df.union(result)
+
+    df = SparkDataFrameService().input(result).convert_array_type_to_json().output()
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = db_info["db_raw_path"]
-
     logger.info(
         f"m={JOB_NAME}, msg=Creating database in Spark Metastore if not exists..."
     )
     metastore_service = SparkMetastoreService(spark_client)
     metastore_service.create_database(database_name)
-
     s3_loader = S3Loader()
     s3_loader.load_df(
         df=df, s3_path=f"{database_location}{table_name}", format_options=format_options
     )
-
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
     spark_metastore_loader.update_metastore(
         df, database_name, table_name, format_options, database_location
