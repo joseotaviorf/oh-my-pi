@@ -24,6 +24,23 @@ WITH funnel AS (
             'FIRST_LISTING' AS ts_first_listing
         )
     )
+),
+updates AS (
+    SELECT
+        id_house,
+        COUNT_IF(event_type = 'HOUSE_UPDATED') AS total_house_updates
+    FROM
+        datalake_rede_supply.listing_revisions
+    GROUP BY 1
+),
+first_registered AS (
+    SELECT
+        id_lead_3p,
+        MIN(CASE WHEN status = 'REGISTERED' THEN ts_status_started END) AS ts_registered,
+        MIN(CASE WHEN status = 'UNPUBLISHED' THEN ts_status_started END) AS ts_first_unpublished
+    FROM
+        datalake_rede_supply.lead_3p_status_changes
+    GROUP BY 1
 )
 SELECT
     lsk.sk_lead_3p,
@@ -35,7 +52,10 @@ SELECT
     COALESCE(BIGINT(DATE_FORMAT(f.ts_prospect, 'yyyyMMdd')), -1) AS sk_prospect_date,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_qualified, 'yyyyMMdd')), -1) AS sk_qualified_date,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_opportunity, 'yyyyMMdd')), -1) AS sk_opportunity_date,
+    COALESCE(BIGINT(DATE_FORMAT(fr.ts_registered, 'yyyyMMdd')), -1) AS sk_registered_date,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_first_listing, 'yyyyMMdd')), -1) AS sk_first_listing_date,
+    COALESCE(BIGINT(DATE_FORMAT(fr.ts_first_unpublished, 'yyyyMMdd')), -1) AS sk_first_unpublished_date,
+    total_house_updates,
     DATEDIFF(f.ts_prospect, f.ts_lead) AS days_lead_to_prospect,
     DATEDIFF(f.ts_qualified, f.ts_lead) AS days_lead_to_qualified,
     DATEDIFF(f.ts_opportunity, f.ts_lead) AS days_lead_to_opportunity,
@@ -44,16 +64,24 @@ SELECT
     f.ts_prospect,
     f.ts_qualified,
     f.ts_opportunity,
+    fr.ts_registered,
     f.ts_first_listing,
+    fr.ts_first_unpublished,
     NOW() AS ts_load
 FROM
     funnel AS f
+LEFT JOIN
+    first_registered AS fr
+        ON f.id_lead_3p = fr.id_lead_3p
 JOIN
     datalake_brokers_supply_processor.lead_3p AS l3p
         ON f.id_lead_3p = l3p.id
 LEFT JOIN
     datalake_ebdb_clean.house AS h
         ON h.id_external = l3p.uuid_lead
+LEFT JOIN
+    updates AS u
+        ON h.id = u.id_house
 JOIN
     datalake_rede_supply.lead_3p_status_changes AS lsc
         ON f.id_lead_3p = lsc.id_lead_3p

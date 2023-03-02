@@ -9,7 +9,10 @@ CREATE TABLE rede.fact_lead_3p_flows (
     sk_prospect_date BIGINT,
     sk_qualified_date BIGINT,
     sk_opportunity_date BIGINT,
+    sk_registered_date BIGINT,
     sk_first_listing_date BIGINT,
+    sk_first_unpublished_date BIGINT,
+    total_house_updates BIGINT,
     days_lead_to_prospect INTEGER,
     days_lead_to_qualified INTEGER,
     days_lead_to_opportunity INTEGER,
@@ -18,7 +21,9 @@ CREATE TABLE rede.fact_lead_3p_flows (
     ts_prospect TIMESTAMP,
     ts_qualified TIMESTAMP,
     ts_opportunity TIMESTAMP,
+    ts_registered TIMESTAMP,
     ts_first_listing TIMESTAMP,
+    ts_first_unpublished TIMESTAMP,
     ts_load TIMESTAMP
 );
 ALTER TABLE rede.fact_lead_3p_flows OWNER TO airflow;

@@ -11,10 +11,11 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 
 Produces the following output tables, fully:
- - `file_sks`:
- - `lead_3p_sks`:
- - `lead_3p_status`:
- - `lead_3p_status_changes`:
- - `lead_3p_reasons`:
- - `lead_3p_reason_changes`:
- - `simplified_lead_3p_status_changes`:
+ - `file_sks`
+ - `lead_3p_sks`
+ - `lead_3p_status`
+ - `lead_3p_status_changes`
+ - `lead_3p_reasons`
+ - `lead_3p_reason_changes`
+ - `listing_revisions`
+ - `simplified_lead_3p_status_changes`

@@ -29,7 +29,13 @@ columns:
   sk_opportunity_date:
     lineage:
       - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  sk_registered_date:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
   sk_first_listing_date:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started    
+  sk_first_unpublished_date:
     lineage:
       - datalake_rede_supply.lead_3p_status_changes.ts_status_started
   ts_lead:
@@ -44,6 +50,12 @@ columns:
   ts_opportunity:
     lineage:
       - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  ts_registered:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
   ts_first_listing:
+    lineage:
+      - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+  ts_first_unpublished:
     lineage:
       - datalake_rede_supply.lead_3p_status_changes.ts_status_started

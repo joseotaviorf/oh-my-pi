@@ -23,9 +23,14 @@ first_time_for_status AS (
     FROM (
         SELECT
             id_lead_3p,
-            status,
+            COALESCE(
+                status, 
+                CASE
+                    WHEN listing_status IN ('PUBLISHED', 'UNPUBLISHED') THEN listing_status
+                END
+            ) AS compressed_status,
             CASE
-                WHEN status != 'NOT_CONVERTED' THEN FALSE
+                WHEN status IS DISTINCT FROM 'NOT_CONVERTED' THEN FALSE
                 ELSE has_owner_info
             END AS is_not_converted_with_owner_info,
             ts_status_started
@@ -34,12 +39,14 @@ first_time_for_status AS (
     )
     PIVOT (
         MIN(ts_status_started)
-        FOR (status, is_not_converted_with_owner_info) IN (
+        FOR (
+            compressed_status, is_not_converted_with_owner_info
+        ) IN (
             ('NOT_CONVERTED', FALSE) AS ts_first_not_converted_wo_owner,
             ('WAITING', FALSE) AS ts_first_waiting,
             ('NOT_CONVERTED', TRUE) AS ts_first_not_converted_w_owner,
             ('PROCESSING', FALSE) AS ts_first_processing,
-            ('REGISTERED', FALSE) AS ts_first_registered
+            ('PUBLISHED', FALSE) AS ts_first_published
         )
     )
 ),
@@ -55,7 +62,7 @@ status_changes AS (
         sc.status,
         sc.listing_status,
         CASE
-            WHEN sc.listing_status IS NOT NULL OR sc.ts_status_started >= ts_first_registered THEN 'FIRST_LISTING'
+            WHEN sc.ts_status_started >= ts_first_published THEN 'FIRST_LISTING'
             WHEN sc.ts_status_started >= ts_first_processing THEN 'OPPORTUNITY'
             WHEN sc.ts_status_started >= ts_first_not_converted_w_owner THEN 'QUALIFIED'
             WHEN sc.ts_status_started >= ts_first_waiting THEN 'PROSPECT'

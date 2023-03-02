@@ -1120,6 +1120,7 @@ bietlejuice.dw_rede_supply:
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-sks
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
+  - bietlejuice.enrich_rede_supply:load-enrich-listing-revisions
 
 bietlejuice.dw_region:
   - bietlejuice.enrich_booking:load-enrich-booking
@@ -2288,8 +2289,12 @@ bietlejuice.enrich_rede_company:
 bietlejuice.enrich_rede_supply:
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p-aud
   - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-file
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_hubspot:load-enrich-company
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status
 
