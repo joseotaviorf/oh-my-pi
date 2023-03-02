@@ -88,40 +88,6 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-# sync_metastore_raw_events_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-#     task_id="sync-hive-metastore-raw-events-structure",
-#     dag=dag,
-#     json={
-#         "spark_python_task": {
-#             "python_file": base_spark_jobs_path + "sync_metastore_tables_structure.py",
-#             "parameters": [
-#                 datalake_bucket,
-#                 LayerEnum.RAW.value,
-#                 SOURCE,
-#                 "--table-name",
-#                 "events",
-#             ],
-#         }
-#     },
-# )
-
-sync_metastore_raw_events_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-raw-events-partitions",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": base_spark_jobs_path + "sync_metastore_tables_partitions.py",
-            "parameters": [
-                datalake_bucket,
-                LayerEnum.RAW.value,
-                SOURCE,
-                "--table-name",
-                "events",
-            ],
-        }
-    },
-)
-
 propagate_table_metadata_raw_events_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
     task_id=f"propagate-table-metadata-raw-events",
@@ -536,49 +502,6 @@ update_subpartitioned_events_clean_staging_spark_task = QuintoAndarDatabricksSub
     },
 )
 
-sync_metastore_clean_staging_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-staging-tables-structure",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": base_spark_jobs_path + "sync_metastore_tables_structure.py",
-            "parameters": [
-                datalake_bucket,
-                LayerEnum.CLEAN_STAGING.value,
-                SOURCE,
-                "--all-tables",
-            ],
-        }
-    },
-)
-
-# sync_metastore_clean_staging_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-#     task_id="sync-hive-metastore-clean-staging-tables-partitions",
-#     dag=dag,
-#     json={
-#         "spark_python_task": {
-#             "python_file": base_spark_jobs_path + "sync_metastore_tables_partitions.py",
-#             "parameters": [
-#                 datalake_bucket,
-#                 LayerEnum.CLEAN_STAGING.value,
-#                 SOURCE,
-#                 "--all-tables",
-#             ],
-#         }
-#     },
-# )
-
-propagate_tables_metadata_clean_staging_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="propagate-tables-metadata-clean-staging",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": raw_spark_jobs_path
-            + "propagate_tables_metadata_clean_staging.py",
-            "parameters": ["{{ ds }}"],
-        }
-    },
-)
 
 update_subpartitioned_events_clean_staging_athena_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="update-clean-staging-subpartitioned-tables-athena",
@@ -668,8 +591,6 @@ propagate_tables_metadata_clean_task = QuintoAndarDatabricksSubmitRunOperator(
 airflow_helpers.chain(
     create_cluster_task,
     events_to_datalake_raw_task,
-    # sync_metastore_raw_events_structure_task,
-    sync_metastore_raw_events_partitions_task,
     propagate_table_metadata_raw_events_task,
     terminate_cluster_task,
 )
@@ -732,9 +653,6 @@ airflow_helpers.chain(
 
 airflow_helpers.chain(
     update_subpartitioned_events_clean_staging_spark_task,
-    sync_metastore_clean_staging_tables_structure_task,
-    # sync_metastore_clean_staging_tables_partitions_task,
-    propagate_tables_metadata_clean_staging_task,
     terminate_cluster_task,
 )
 
