@@ -28,6 +28,7 @@ SELECT
     custom_fields,
     educations,
     experience_period,
+    emergency_contacts,
     first_job AS is_first_job,
     time_tracking AS has_time_tracking,
     birth_date AS dt_birth,
