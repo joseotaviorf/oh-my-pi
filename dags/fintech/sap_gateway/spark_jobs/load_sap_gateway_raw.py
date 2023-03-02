@@ -31,7 +31,7 @@ if __name__ == "__main__":
     parser.add_argument("extraction_type")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
     parser.add_argument("date_filter_column", help="Date filter column", default=None)
-    parser.add_argument("build_query", help="Build SQL query", default=None)
+    parser.add_argument("build_query", type=bool, help="Build SQL query", default=None)
 
     args = parser.parse_args()
     environment = args.env
@@ -48,8 +48,6 @@ if __name__ == "__main__":
         if extraction_type == "full"
         else config_service.get_config("partition_columns")
     )
-
-
 
     logger.info(
         f"""
@@ -102,9 +100,7 @@ if __name__ == "__main__":
         """
 
         if build_query == True:
-            query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
-                dag_name=source, layer=LayerEnum.RAW.value, table_name=table_name
-            )
+
             df = postgres_consumer.get_data_from_query(query)
         else:
             df = postgres_consumer.get_incremental_data_by_granularity_from_table(table_name, date_filter_column, execution_date)
