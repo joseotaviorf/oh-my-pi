@@ -44,31 +44,31 @@ sale_offer AS(
 		The new one starts on H2/2021.
 		Using CASE WHEN instead of COALESCE to don't create strange combinations.
 		*/
-		CASE 
+		CASE
 			WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_app_type
 			ELSE sor.app_type
 		END AS app_type,
-		CASE 
+		CASE
 			WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_source
 			ELSE sor.utm_source
 		END AS utm_source,
-		CASE 
+		CASE
 			WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_medium
 			ELSE sor.utm_medium
 		END AS utm_medium,
-		CASE 
+		CASE
 			WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_campaign
 			ELSE sor.utm_campaign
 		END AS utm_campaign,
-		CASE 
+		CASE
 			WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_branded
 			ELSE sor.branded
 		END AS branded,
-		CASE 
+		CASE
 			WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_branded = 'Branded'
 			ELSE sor.branded = 'Branded'
 		END AS flg_branded,
-		CASE 
+		CASE
 			WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_origin
 			ELSE 'old_attribution'
 		END AS final_attribution_origin
@@ -114,6 +114,7 @@ SELECT
     eso.agent_name,
     eso.partner_3p_supply,
     eso.partner_3p_demand,
+    eso.credit_model,
     eso.sale_price,
     eso.registry_price,
     eso.itbi_price,

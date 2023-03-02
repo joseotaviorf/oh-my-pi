@@ -47,6 +47,9 @@ columns:
   partner_3p_demand:
     lineage:
       - datalake_offer.sale_offer.partner_3p_demand
+  credit_model:
+    lineage:
+      - datalake_offer.sale_offer.credit_model
   sale_price:
     lineage:
       - datalake_offer.sale_offer.sale_price

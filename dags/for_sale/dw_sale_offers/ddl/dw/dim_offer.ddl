@@ -15,6 +15,7 @@ CREATE TABLE sale.dim_offer (
 	agent_name VARCHAR,
 	partner_3p_supply VARCHAR,
 	partner_3p_demand VARCHAR,
+	credit_model VARCHAR,
 	sale_price BIGINT,
 	registry_price BIGINT,
 	itbi_price BIGINT,
