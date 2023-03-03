@@ -1,17 +1,28 @@
 # Artifact Generation Scripts
 
-## generate_lineage.py
-   This script can be used to generate the YAML metadata files for a DAG. This works better with more simple queries, as clean and dw layers. Enrich may come out very out-of-pattern or even with misleading lineages.
+## generate_metadata.py
+   This script can be used to generate the YAML metadata files for a DAG. This works better with more simple queries, as clean and dw layers. Enrich may come out very out-of-pattern or even with misleading lineages. Also will always add the data-documentation keys.
 
    PS: THIS SCRIPT MUST BE USED "AS IS", ALWAYS CHECK THE RESULTS AND MAKE SURE NOTHING IS WRONG.
 
+
+   > You can always run `python scripts/artifact_generation/generate_metadata.py -h` to see more details of the parameters.
+
+   Possible parameters:
+      --folder, -f : DAG Name folder
+      --table, -t : [Optional] Select a specific table to create the metadata
+      --owner, -o : [Optional] Pass a owner email to all metadata created
+      --no-lineag, -nl : [Optional] Force to ignore lineage and create only data-documentation keys
+
    Some use cases:
-   1. Generate metadata for all tables on the clean layer DAG "velo" :
-      `python scripts/artifact_generation/generate_lineage.py --folder velo`
-   2. Generate metadata for all tables on the "dw_random" DAG:
-      `python scripts/artifact_generation/generate_lineage.py --folder dw_random`
-   3. Generate metadata for ONLY table "foo" on the dw_random DAG:
-      `python scripts/artifact_generation/generate_lineage.py --folder dw_random --table foo`
+   1. Generate metadata for all tables on the clean layer DAG "velo":
+      `python scripts/artifact_generation/generate_metadata.py --folder velo`
+   2. Generate metadata for all tables on the clean layer DAG "velo" but don't create lineage keys. Also pass an email to "owner" key:
+      `python scripts/artifact_generation/generate_metadata.py --folder velo -nl -o dummy@quintoandar.com.br`
+   3. Generate metadata for all tables on the "dw_random" DAG:
+      `python scripts/artifact_generation/generate_metadata.py --folder dw_random`
+   4. Generate metadata for ONLY table "foo" on the dw_random DAG:
+      `python scripts/artifact_generation/generate_metadata.py --folder dw_random --table foo`
 ## generate_data_documentation_from_lineage.py
 
   This script can be used to generate one or many [data-documentation](https://github.com/quintoandar/data-documentation) base yml structure from documented lineages.

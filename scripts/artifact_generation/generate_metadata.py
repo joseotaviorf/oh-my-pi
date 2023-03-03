@@ -16,16 +16,25 @@ DAY_COL_STRING = """day
 """
 
 
-def create_yml_for_table(sql, database_name, table_name):
+def create_yml_for_table(
+    sql, database_name, table_name, sql_file_path, dag_owner=None, do_lineage=True
+):
     sql_parser = Parser(sql)
     print(
-        '{"vendor": ["atlas"],"database_name": "'
-        + database_name
-        + '", "table_name": "'
-        + table_name
-        + '"},'
+        f'{{"vendor": ["datahub"],"database_name": "{database_name}", "table_name": "{table_name}"}},'
     )
-    yml_body = {"database_name": database_name, "table_name": table_name, "columns": {}}
+    dag_domain = None
+    for domain in os.listdir(DAG_PACKAGES_ROOT):
+        if domain in sql_file_path:
+            dag_domain = domain
+    yml_body = {
+        "database_name": database_name,
+        "table_name": table_name,
+        "owner": dag_owner if dag_owner else None,
+        "domain": dag_domain,
+        "description": None,
+        "columns": {},
+    }
 
     alias_columns = {}
     for alias, column in sql_parser.columns_aliases.items():
@@ -39,9 +48,11 @@ def create_yml_for_table(sql, database_name, table_name):
         sql_parser._columns.extend(["day"])
     for column in sql_parser.columns:
         alias = alias_columns.get(column) or column
-        yml_body["columns"][alias.lower()] = {
-            "lineage": [f"{sql_parser.tables[0].lower()}.{column.lower()}"]
-        }
+        yml_body["columns"][alias.lower()] = {"description": None}
+        if do_lineage:
+            yml_body["columns"][alias.lower()].update(
+                {"lineage": [f"{sql_parser.tables[0].lower()}.{column.lower()}"]}
+            )
 
     return yml_body
 
@@ -62,14 +73,26 @@ if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("--folder", "-f", required=True, help="dag name folder")
     arg_parser.add_argument(
-        "--table", "-t", help="Specific table to create the lineage"
+        "--table", "-t", help="Specific table to create the metadata"
+    )
+    arg_parser.add_argument("--owner", "-o", help="Owner email", required=False)
+    arg_parser.add_argument(
+        "--no-lineage",
+        "-nl",
+        help="Force script to do only descriptions",
+        default=False,
+        required=False,
+        dest="no_lineage",
+        action="store_true",
     )
 
     args = arg_parser.parse_args()
     path = DAG_PACKAGES_ROOT
 
     dag_name_path = args.folder  # use "ebdb", "godfather", for instance
+    dag_owner = args.owner
     table = args.table if args.table != None else "*"
+    do_lineage = False if args.no_lineage else True
     file_paths = list(
         glob.iglob(f"{path}/**/{dag_name_path}/**/{table}.sql", recursive=True)
     )
@@ -106,7 +129,9 @@ if __name__ == "__main__":
         with open(file_path, "r") as stream:
             sql = stream.read()
             try:
-                yml_body = create_yml_for_table(sql, db_template, table_name)
+                yml_body = create_yml_for_table(
+                    sql, db_template, table_name, file_path, dag_owner, do_lineage
+                )
                 save_yml(file_path, yml_body)
             except Exception:
                 print(f"ERROR database_name={database_name}, table_name={table_name}")
