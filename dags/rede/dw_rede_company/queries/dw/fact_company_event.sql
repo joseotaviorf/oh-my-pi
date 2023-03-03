@@ -8,7 +8,7 @@ SELECT
     ce.ts_event,
     NOW() AS ts_load
 FROM
-    datalake_rede_company.company_event AS ce
+    datalake_rede_company_event.company_event AS ce
 LEFT JOIN
     datalake_rede_company.company_sks AS csk
         ON ce.id_company = csk.id_hubspot

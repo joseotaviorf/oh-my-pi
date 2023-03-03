@@ -5,12 +5,8 @@ description: This table shows details about company leads registered in HubSpot.
   cannot have been created by Adm or Help Sales. Each row represents a partner or
   a potential partner.
 domain: Rede
-owner: gustavo.santos.dxt@quintoandar.com.br
+owner: gustavo.miller@quintoandar.com.br
 columns:
-  sk_offer:
-    lineage:
-    - datalake_offer.offer.id_offer_context
-    - datalake_ebdb_proposal.pre_proposal.id_offer_context
   sk_company:
     lineage:
     - datalake_rede_company.company_sks.sk_company
@@ -227,6 +223,7 @@ columns:
   is_archived:
     lineage:
     - datalake_hubspot.company.is_archived
+    description: Whether or not the company has been archived on HubSpot.
   ts_first_conversion:
     lineage:
     - datalake_hubspot.company.ts_first_conversion
@@ -252,6 +249,7 @@ columns:
   ts_archived:
     lineage:
     - datalake_hubspot.company.ts_archived
+    description: Time when the company was archived in HubSpot.
   ts_created:
     lineage:
     - datalake_hubspot.company.ts_created

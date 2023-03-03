@@ -10,7 +10,7 @@ WITH combinations AS (
         COALESCE(hubspot_demand_onboarding_ticket_stage, 'N/A') AS hubspot_demand_onboarding_ticket_stage,
         COALESCE(hubspot_supply_onboarding_ticket_stage, 'N/A') AS hubspot_supply_onboarding_ticket_stage
     FROM
-        datalake_rede_company.company_event
+        datalake_rede_company_event.company_event
 ),
 last_sk_values AS (
     SELECT

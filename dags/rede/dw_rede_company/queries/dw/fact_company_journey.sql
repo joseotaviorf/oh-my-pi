@@ -133,7 +133,7 @@ WITH base_dates AS (
             END
         ) AS ts_journey_ended
     FROM
-        datalake_rede_company.company_event AS ce
+        datalake_rede_company_event.company_event AS ce
     JOIN
         datalake_rede_company.company_sks AS csk
             ON ce.id_company = csk.id_hubspot

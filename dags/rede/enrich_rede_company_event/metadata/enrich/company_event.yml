@@ -1,5 +1,5 @@
 ---
-database_name: datalake_rede_company
+database_name: datalake_rede_company_event
 table_name: company_event
 columns:
   id_company:

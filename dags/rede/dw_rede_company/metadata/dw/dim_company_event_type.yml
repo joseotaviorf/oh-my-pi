@@ -5,7 +5,7 @@ description: This table details characteristics of events that happen within a c
   deal or ticket update in HubSpot, what the status was at the time of the event,
   and so on.
 domain: Rede
-owner: ata Rede@quintoandar.com.br
+owner: gustavo.miller@quintoandar.com.br
 columns:
   event:
     lineage:
