@@ -1,51 +1,129 @@
----
 database_name: dw_datamarts_growth_cross
 table_name: user_funnel
+description: First date of each demand event for users in rent flows (doesn't include
+  TTA events).
+domain: Growth
+owner: carolina.cavalcante@quintoandar.com.br
 columns:
   id_user:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_client
-      - dw_datamarts_cross.talk_to_agent.tenant_id
+    - dw_public.fact_listing_rent_flows.sk_client
+    - dw_datamarts_cross.talk_to_agent.tenant_id
+    description: ''
   first_city_group:
     lineage:
-      - dw_public.dim_region.city_group
+    - dw_public.dim_region.city_group
+    description: ''
+    categories:
+      '-1': ''
+      Belo Horizonte: ''
+      Brasília: ''
+      Campinas: ''
+      Cotia: '#N/A'
+      Curitiba: ''
+      Florianópolis: ''
+      Goiânia: ''
+      Mogi das Cruzes: '#N/A'
+      Porto Alegre: ''
+      RMSP: ''
+      Recife: '#N/A'
+      Rio de Janeiro: ''
+      Salvador: '#N/A'
+      Santos: '#N/A'
+      São José dos Campos: '#N/A'
+      Vitória: '#N/A'
   first_booking_created_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_booking_created_date
+    - dw_public.fact_listing_rent_flows.sk_booking_created_date
+    description: ''
   first_visit_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_visit_date
+    - dw_public.fact_listing_rent_flows.sk_visit_date
+    description: ''
   first_reservation_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_reservation_created_date
+    - dw_public.fact_listing_rent_flows.sk_reservation_created_date
+    description: ''
   first_offer_submitted_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_offer_submitted_date
+    - dw_public.fact_listing_rent_flows.sk_offer_submitted_date
+    description: ''
   first_offer_approved_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_offer_approved_date
+    - dw_public.fact_listing_rent_flows.sk_offer_approved_date
+    description: ''
   first_tenant_doc_sent_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
+    - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
+    description: ''
   first_tenant_doc_complete_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_tenant_doc_complete_date
-      - dw_public.fact_listing_rent_flows.sk_credit_analysis_init_date
+    - dw_public.fact_listing_rent_flows.sk_tenant_doc_complete_date
+    - dw_public.fact_listing_rent_flows.sk_credit_analysis_init_date
+    description: ''
   first_credit_analysis_init_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_credit_analysis_init_date
+    - dw_public.fact_listing_rent_flows.sk_credit_analysis_init_date
+    description: ''
   first_credit_analysis_approved_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_credit_analysis_approved_date
+    - dw_public.fact_listing_rent_flows.sk_credit_analysis_approved_date
+    description: ''
   first_credit_analysis_end_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_credit_analysis_end_date
+    - dw_public.fact_listing_rent_flows.sk_credit_analysis_end_date
+    description: ''
   first_contract_created_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_contract_created_date
+    - dw_public.fact_listing_rent_flows.sk_contract_created_date
+    description: ''
   first_contract_signed_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_contract_signed_date
+    - dw_public.fact_listing_rent_flows.sk_contract_signed_date
+    description: ''
   first_talk_to_agent_date:
     lineage:
-      - dw_datamarts_cross.talk_to_agent.first_message_ts
+    - dw_datamarts_cross.talk_to_agent.first_message_ts
+  bookings_created:
+    description: ''
+  contracts_signed:
+    description: ''
+  days_ca_cc:
+    description: ''
+  days_cc_cs:
+    description: ''
+  days_ds_ca:
+    description: ''
+  days_oa_ds:
+    description: ''
+  days_os_oa:
+    description: ''
+  days_vb_vc:
+    description: ''
+  days_vc_os:
+    description: ''
+  first_interaction:
+    description: ''
+    categories:
+      Booking: ''
+      Offer: ''
+  offers_approved:
+    description: ''
+  offers_submitted:
+    description: ''
+  reservations_created:
+    description: ''
+  visits_completed:
+    description: ''
+  week_ca_cs:
+    description: ''
+  week_ds_ca:
+    description: ''
+  week_oa_ds:
+    description: ''
+  week_os_oa:
+    description: ''
+  week_vb_vc:
+    description: ''
+  week_vc_os:
+    description: ''

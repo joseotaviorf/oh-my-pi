@@ -1,70 +1,145 @@
----
 database_name: dw_sale
 table_name: fact_listing_price_changes
+description: Fact table that centralizes all the useful information of a listing's
+  sales price change. Where, each row represents a valid price exchange for the listing.
+  By valid, we mean that we only keep the information from the last price change of
+  the day when there was a price change (if the selling price of this change is different
+  from the first price of the day. If not, it will not count as a price change).
+domain: For Sale
+owner: ata-for-sale@quintoandar.com.br
 columns:
   sk_house:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.id_house
+    - datalake_sale_listings.sale_listing_price_changes.id_house
+    description: Foreign key referring to the house ID. Can be joined with dw_quintoandar.dim_house
+      and all other sale modeling tables.
   sk_user_revision:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.id_user_revision
+    - datalake_sale_listings.sale_listing_price_changes.id_user_revision
+    description: Foreign key referring to the author who made the price change, which
+      can be equal to sk_owner or not. Can be joined with dw_public.dim_user
   sk_owner:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.id_owner
+    - datalake_sale_listings.sale_listing_price_changes.id_owner
+    description: Foreign key referring to the seller user ID. Can be joined with dw_public.dim_user
   sk_region:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.id_region
+    - datalake_sale_listings.sale_listing_price_changes.id_region
+    description: Foreign key of region where house listing is located in. Can be joined
+      with dw_public.dim_region.
   sk_price_started_date:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.ts_price_started
+    - datalake_sale_listings.sale_listing_price_changes.ts_price_started
+    description: Foreign key referring to the price change date, that is, the start
+      date of the price schema referring to the row. Can be joined with dw_public.dim_date.
   sk_price_ended_date:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.ts_price_ended
+    - datalake_sale_listings.sale_listing_price_changes.ts_price_ended
+    description: Foreign key referring to the change date for the next price (if any),
+      that is, the date of the end of the price schema for the row.
   status_history:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.status_history
+    - datalake_sale_listings.sale_listing_price_changes.status_history
+    description: 'Sale status linked to a certain point in time of the listing. Can
+      be one of these: - CCV_CANCELED - CCV_SIGNED - EDITING - OPTED_OUT - PUBLISHED
+      - SALE_COMPLETED - SUSPENDED - UNPUBLISHED'
+    categories:
+      CCV_CANCELED: If the listing is in the process of sales cancellation during
+        the change
+      CCV_SIGNED: If the listing is in the process of being sold during the change
+      EDITING: If the listing is being edited during the change
+      OPTED_OUT: If the listing has not even been published yet (probably bug)
+      PUBLISHED: If the listing is published during the change
+      SALE_COMPLETED: If the listing is already sold during the change
+      SUSPENDED: If the listing is suspended during the change
+      UNPUBLISHED: If the listing is unpublished during the change
   predict_certainty:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.calculator_certainty
+    - datalake_sale_listings.sale_listing_price_changes.calculator_certainty
+    description: 'Calculator column. Tells the certainty level of the prediction calculated
+      by the calculator. It is strongly related to the intensity of the QuintoAndar
+      performance with the listing region. Can be one of these: - HIGH - MEDIUM -
+      LOW - NONE Or null'
+    categories:
+      HIGH: If the prediction has a low confidence interval, having a high certainty
+        in the prediction.
+      MEDIUM: If the prediction has a medium confidence interval, having a medium
+        certainty in the prediction.
+      LOW: If the prediction has a high confidence interval, having a low certainty
+        in the prediction.
+      NONE: If the prediction has no certainty at all.
   change_type:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.change_type
+    - datalake_sale_listings.sale_listing_price_changes.change_type
+    description: 'Describes the type of price change. We can have the price being
+      increased or decreased. Can be one of these: - first price - price down - price
+      up'
+    categories:
+      first price: If there is no previous price
+      price down: If the sales price is lower than the previous price
+      price up: If the sales price is higher than the previous price
   change:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.change_number
+    - datalake_sale_listings.sale_listing_price_changes.change_number
+    description: Tells the number of listing price changes.
   days_with_pricing_scheme:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.days_with_pricing_scheme
+    - datalake_sale_listings.sale_listing_price_changes.days_with_pricing_scheme
+    description: Count how many days the listing stayed at that publication price.
+      If it is the most recent price, it counts up to D-1.
   price:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.sale_price
+    - datalake_sale_listings.sale_listing_price_changes.sale_price
+    description: Published price for a listing in a given time period.
   previous_price:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.previous_price
+    - datalake_sale_listings.sale_listing_price_changes.previous_price
+    description: Price previous to the price of the referenced row.
   previous_price_variation:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.previous_price_variation
+    - datalake_sale_listings.sale_listing_price_changes.previous_price_variation
+    description: Percent difference between the published price for the row and the
+      previous published price.
   first_price_variation:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.first_price_variation
+    - datalake_sale_listings.sale_listing_price_changes.first_price_variation
+    description: Percent difference between the published price for the row and the
+      first published price.
   min_predicted_price:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.calculator_min_sale_price
+    - datalake_sale_listings.sale_listing_price_changes.calculator_min_sale_price
+    description: Calculator column. Tells the minimum price estimated by the calculator
+      output. May also be referred to as 'p_10'.
   p30_predicted_price:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.calculator_p30_sale_price
+    - datalake_sale_listings.sale_listing_price_changes.calculator_p30_sale_price
+    description: Calculator column. Tells the estimated price related to the 30% percentile
+      of the calculator's output. May also be referred to as just 'p_30'.
   predicted_price:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.calculator_sale_price
+    - datalake_sale_listings.sale_listing_price_changes.calculator_sale_price
+    description: Column for calculator. Tells the most likely estimated price for
+      the listing. Can also be referred to as just 'p_50'.
   p70_predicted_price:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.calculator_p70_sale_price
+    - datalake_sale_listings.sale_listing_price_changes.calculator_p70_sale_price
+    description: Calculator column. Tells the estimated price related to the 70% percentile
+      of the calculator's output. May also be referred to as just 'p_70'.
   max_predicted_price:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.calculator_max_sale_price
+    - datalake_sale_listings.sale_listing_price_changes.calculator_max_sale_price
+    description: Calculator column. Tells the maximum price estimated by the calculator
+      output. May also be referred to as 'p_90'.
   is_last_price:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.is_last_price
+    - datalake_sale_listings.sale_listing_price_changes.is_last_price
+    description: Flag that signals the most recent publication price of the listing.
   is_first_price:
     lineage:
-      - datalake_sale_listings.sale_listing_price_changes.is_first_price
+    - datalake_sale_listings.sale_listing_price_changes.is_first_price
+    description: Flag that signals the first publication price of the listing.
+  sk_price_change:
+    description: Primary key of the table, is generated by the unique combination
+      of sk_house and sk_price_started_date.
+  ts_load:
+    description: Timestamp of when the table was last processed.

@@ -1,15 +1,33 @@
----
 database_name: datalake_ebdb_agents
 table_name: agent_coincident_business_contexts
+description: Each row of this table is a period in which the agent belonged to certain
+  business contexts, be it in SALE or RENT context. They can be in both contexts at
+  the same time, which is why each context is a flag is_agent_for_sale or is_agent_for_rent.
+  This is different from the table agent_business_context_history, since that one
+  generates a row for each different context, whereas this one merges both in a single
+  row with a specified validity period.
+domain: For Rent
+owner: gustavo.miller@quintoandar.com.br
 columns:
   id_agent_data:
     lineage:
-      - datalake_ebdb_agents.agent_business_context_history.id_agent_data
+    - datalake_ebdb_agents.agent_business_context_history.id_agent_data
+    description: Key of the agent, also known as "Dados Agente ID"
   ts_agent_business_context_started:
     lineage:
-      - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_started
-      - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_ended
+    - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_started
+    - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_ended
+    description: Beginning of the period in which that row is valid.
   ts_agent_business_context_ended:
     lineage:
-      - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_started
-      - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_ended
+    - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_started
+    - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_ended
+  is_agent_for_sale:
+    description: Boolean to tell if an agent belonged to ForSale business context
+      at that moment.
+  is_agent_for_rent:
+    description: Boolean to tell if an agent belonged to ForRent business context
+      at that moment.
+  ts_agent_business_context_end:
+    description: Ending of the period in which that row is valid. Null if it is still
+      valid.

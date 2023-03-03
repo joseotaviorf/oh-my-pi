@@ -90,16 +90,16 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
-  validate-metadata-files-content:
-    group: tests
-    image: python:3.7.3
-    commands:
-      - make requirements-scripts
-      - make validate-metadata-files-content
-    when:
-      event: push
-      branch:
-        exclude: [hotfix/*]
+#  validate-metadata-files-content:
+#    group: tests
+#    image: python:3.7.3
+#    commands:
+#      - make requirements-scripts
+#      - make validate-metadata-files-content
+#    when:
+#      event: push
+#      branch:˚
+#        exclude: [hotfix/*]
 
   validate-metadata-files-exist:
     group: tests

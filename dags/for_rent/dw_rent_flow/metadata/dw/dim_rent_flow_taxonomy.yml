@@ -1,33 +1,91 @@
 database_name: dw_public
 table_name: dim_rent_flow_taxonomy
+description: ''
+domain: For Rent
+owner: ''
 columns:
   sk_rent_flow_taxonomy:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.id
+    - datalake_gsheets_clean.taxonomy_demand.id
+    description: Id of taxonomy row
   id_rent_flow_taxonomy:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.id
+    - datalake_gsheets_clean.taxonomy_demand.id
+    description: check
   mkt_category:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.category
+    - datalake_gsheets_clean.taxonomy_demand.category
+    description: standard category from the booking
+    categories:
+      Inbound: ''
+      Not Mapped: ''
   mkt_flow:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.flow
+    - datalake_gsheets_clean.taxonomy_demand.flow
+    description: standard flow related to the booking
+    categories:
+      Non-Self Service: ''
+      Not Mapped: ''
+      Other: ''
+      Self-Service: ''
   mkt_completion:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.completion
+    - datalake_gsheets_clean.taxonomy_demand.completion
+    description: standard completion related to the booking
+    categories:
+      Full Self-Service: ''
+      Non-Self Service: ''
+      Not Mapped: ''
+      Other: ''
   mkt_origin:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.origin
+    - datalake_gsheets_clean.taxonomy_demand.origin
+    description: ''
+    categories:
+      Tenants PWA: ''
   mkt_channel:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.channel
+    - datalake_gsheets_clean.taxonomy_demand.channel
+    description: standard channel from the booking
   mkt_medium:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.medium
+    - datalake_gsheets_clean.taxonomy_demand.medium
+    description: standard medium from the booking
+    categories:
+      Agents: ''
+      Branding: ''
+      CX: ''
+      Direct: ''
+      Display: ''
+      Lost Tracking: ''
+      Not Mapped: ''
+      Notifications: ''
+      Online Classifieds: ''
+      Other: ''
+      Performance Max: ''
+      Portals: ''
+      Retargeting: ''
+      SEM branded: ''
+      SEM non-branded: ''
+      SEO branded: ''
+      SEO non-branded: ''
+      Shared: ''
   mkt_source:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.source
+    - datalake_gsheets_clean.taxonomy_demand.source
+    description: standard source from booking
   mkt_platform:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.platform
+    - datalake_gsheets_clean.taxonomy_demand.platform
+    description: standard platform from which the user has booked his visit
+    categories:
+      Amp: ''
+      App Android: ''
+      App iOS: ''
+      Lost Tracking: ''
+      Not Mapped: ''
+      Other: ''
+      Web Desktop: ''
+      Web Mobile: ''
+  ts_load:
+    description: Timestamp of data load event (UTC timezone)

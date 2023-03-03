@@ -1,97 +1,129 @@
----
 database_name: dw_sale
 table_name: fact_listings
+description: ''
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   sk_sale_listing:
     lineage:
-      - datalake_sale_listings.sale_listing.id_sale_listing
+    - datalake_sale_listings.sale_listing.id_sale_listing
+    description: Identification of the listing version, which may be in edition (version
+      0) or already published (version 1).
   sk_house:
     lineage:
-      - datalake_sale_listings.sale_listing.id_house
+    - datalake_sale_listings.sale_listing.id_house
+    description: ID of House.
   sk_owner:
     lineage:
-      - datalake_ebdb_clean.house.id_user
+    - datalake_ebdb_clean.house.id_user
+    description: Key of Seller User ID.
   sk_user_consultant:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.id_user
+    - datalake_big_agent.house_sale_listing_consultant.id_user
   sk_region:
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
+    description: Key of region where house listing is located in.
   sk_company:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+    - datalake_rede_company.company_sks.sk_company
   price:
     lineage:
-      - datalake_ebdb_clean.house.sale_price
+    - datalake_ebdb_clean.house.sale_price
   sk_first_publication_date:
     lineage:
-      - datalake_sale_listings.sale_listing.ts_first_publication
+    - datalake_sale_listings.sale_listing.ts_first_publication
+    description: Date of listing first publication.
   sk_last_publication_date:
     lineage:
-      - datalake_sale_listings.sale_listing.ts_last_publication
+    - datalake_sale_listings.sale_listing.ts_last_publication
+    description: Date of listing last publication.
   sk_first_depublication_date:
     lineage:
-      - datalake_sale_listings.sale_listing.ts_first_depublication
+    - datalake_sale_listings.sale_listing.ts_first_depublication
+    description: Date of listing first depublication.
   sk_last_depublication_date:
     lineage:
-      - datalake_sale_listings.sale_listing.ts_last_depublication
+    - datalake_sale_listings.sale_listing.ts_last_depublication
+    description: Date of listing last depublication.
   sk_first_offer_submitted_date:
     lineage:
-      - datalake_sale_listings.sale_listing.ts_first_offer_submitted
+    - datalake_sale_listings.sale_listing.ts_first_offer_submitted
   days_last_publication_to_depublication:
     lineage:
-      - datalake_sale_listings.sale_listing.days_last_publication_to_depublication
+    - datalake_sale_listings.sale_listing.days_last_publication_to_depublication
+    description: Difference of days between the last publication and the current unpublishing
+      of the listing.
   days_first_publication_to_first_depublication:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_publication_to_first_depublication
+    - datalake_sale_listings.sale_listing.days_first_publication_to_first_depublication
+    description: Difference of days between the first publication and the first unpublishing
+      of the listing.
   days_first_publication_to_last_depublication:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_publication_to_last_depublication
+    - datalake_sale_listings.sale_listing.days_first_publication_to_last_depublication
+    description: Number of days between the first publication and the last depublication
   days_first_publication_to_first_sale_flow:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_publication_to_first_sale_flow
+    - datalake_sale_listings.sale_listing.days_first_publication_to_first_sale_flow
+    description: Number of days between the first publication and listing first sale
+      flow
   days_first_publication_to_first_booking:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_publication_to_first_booking
+    - datalake_sale_listings.sale_listing.days_first_publication_to_first_booking
+    description: Number of days between the first publication and listing first booking
   days_first_publication_to_visit_completed:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_publication_to_visit_completed
+    - datalake_sale_listings.sale_listing.days_first_publication_to_visit_completed
   days_first_publication_to_first_offer_accepted:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_publication_to_first_offer_accepted
+    - datalake_sale_listings.sale_listing.days_first_publication_to_first_offer_accepted
   days_first_publication_to_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_publication_to_first_sale_agreement_signed
+    - datalake_sale_listings.sale_listing.days_first_publication_to_first_sale_agreement_signed
+    description: Number of days between the first publication and listing first sale
+      agreement signed
   days_first_publication_to_house_registry_ended:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_publication_to_house_registry_ended
+    - datalake_sale_listings.sale_listing.days_first_publication_to_house_registry_ended
+    description: Number of days between the first publication and house registry ended
   days_first_publication_to_first_offer_submitted:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_publication_to_first_offer_submitted
+    - datalake_sale_listings.sale_listing.days_first_publication_to_first_offer_submitted
+    description: Number of days between the first publication and first offer submitted
   days_first_booking_to_first_visit_completed:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_booking_to_first_visit_completed
+    - datalake_sale_listings.sale_listing.days_first_booking_to_first_visit_completed
   days_first_visit_completed_to_first_offer_submitted:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_visit_completed_to_first_offer_submitted
+    - datalake_sale_listings.sale_listing.days_first_visit_completed_to_first_offer_submitted
   days_first_offer_submitted_to_first_offer_accepted:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_offer_submitted_to_first_offer_accepted
+    - datalake_sale_listings.sale_listing.days_first_offer_submitted_to_first_offer_accepted
   days_first_offer_accepted_to_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_offer_accepted_to_first_sale_agreement_signed
+    - datalake_sale_listings.sale_listing.days_first_offer_accepted_to_first_sale_agreement_signed
   total_depublications:
     lineage:
-      - datalake_sale_listings.sale_listing.unpublications
+    - datalake_sale_listings.sale_listing.unpublications
+    description: Total sum of the number of republishings already carried out by the
+      listing.
   total_listings_visit_completed:
     lineage:
-      - datalake_sale_listings.sale_listing.total_listings_visit_completed
+    - datalake_sale_listings.sale_listing.total_listings_visit_completed
   total_listings_offer_submited:
     lineage:
-      - datalake_sale_listings.sale_listing.total_listings_offer_submited
+    - datalake_sale_listings.sale_listing.total_listings_offer_submited
   total_listings_offer_accepted:
     lineage:
-      - datalake_sale_listings.sale_listing.total_listings_offer_accepted
+    - datalake_sale_listings.sale_listing.total_listings_offer_accepted
   days_as_published:
     lineage:
-      - datalake_sale_listings.sale_listing.days_as_published
+    - datalake_sale_listings.sale_listing.days_as_published
+    description: Number of days the listing counted as published.
+  ts_load:
+    description: Timestamp of data load.
+  days_first_publication_to_depublication:
+    description: Number of days between the last publication and last depublication
+  total_depublcations:
+    description: Number of times that listings was unpublished

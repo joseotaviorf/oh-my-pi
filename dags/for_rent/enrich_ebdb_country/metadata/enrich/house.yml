@@ -1,25 +1,34 @@
----
 database_name: datalake_ebdb_country
 table_name: house
+description: Information related to the counrty of origin of a house.
+domain: For Rent
+owner: data-international@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - datalake_ebdb_clean.house.id
+    - datalake_ebdb_clean.house.id
+    description: Id of the house.
   id_country:
     lineage:
-      - datalake_ebdb_clean.country.id
+    - datalake_ebdb_clean.country.id
+    description: Id of the country of origin of the house.
   id_state:
     lineage:
-      - datalake_ebdb_clean.house.id_state
+    - datalake_ebdb_clean.house.id_state
+    description: Id of the state of the house.
   id_region:
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
+    description: Id of the region of the house.
   country_code:
     lineage:
-      - datalake_ebdb_clean.country.code
+    - datalake_ebdb_clean.country.code
+    description: Country code of the house. Also, a partition of this table.
   ts_created:
     lineage:
-      - datalake_ebdb_clean.house.dt_creation
+    - datalake_ebdb_clean.house.dt_creation
+    description: Timestamp of when the house was created.
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.house.ts_updated
+    - datalake_ebdb_clean.house.ts_updated
+    description: Timestamp of when the house suffered an update.

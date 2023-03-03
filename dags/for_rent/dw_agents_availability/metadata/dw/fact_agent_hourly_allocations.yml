@@ -1,58 +1,76 @@
----
 database_name: dw_agents_availability
 table_name: fact_agent_hourly_allocations
+description: Hour allocation on hour granularity
+domain: For Rent
+owner: eduardo.bastiani@quintoandar.com.br
 columns:
   sk_agent:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.id_agent
+    - datalake_ebdb_agents.agents_slots_hourly.id_agent
+    description: Dados Agente ID
   sk_slot_date:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    description: sk of agent allocation date
   sk_slot_date_hour:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    description: ''
   sk_agent_region:
     lineage:
-      - dw_public.dim_agent_region.sk_agent_region
+    - dw_public.dim_agent_region.sk_agent_region
+    description: sk of dados agente id and sk_region
   sk_slot_date_agent:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-      - datalake_ebdb_agents.agents_slots_hourly.id_agent
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.id_agent
+    description: table primary key, aggregate allocation sk date and dados agent id
   id_work_contract:
     lineage:
-      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+    - datalake_ebdb_clean.agent_data_aud.id_work_contract
+    description: ''
   ts_slot_hour:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    description: ''
   agent_business_context:
     lineage:
-      - datalake_ebdb_agents.agent_business_context_history.agent_business_context
+    - datalake_ebdb_agents.agent_business_context_history.agent_business_context
   is_allocation_available:
     lineage:
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_09_and_10_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_10_and_11_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_11_and_12_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_12_and_13_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_13_and_14_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_14_and_15_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_15_and_16_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_16_and_17_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_17_and_18_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_18_and_19_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_19_and_20_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_09_and_10_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_10_and_11_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_11_and_12_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_12_and_13_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_13_and_14_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_14_and_15_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_15_and_16_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_16_and_17_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_17_and_18_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_18_and_19_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_19_and_20_available
+    description: show if that hour could be made available acording to agent contract
   area:
     lineage:
-      - dw_public.dim_agent_region.area
+    - dw_public.dim_agent_region.area
+    description: macro-region that agent has the most neighborhoods available
   ts_first_visit:
     lineage:
-      - dw_public.dim_booking.dt_scheduling
+    - dw_public.dim_booking.dt_scheduling
+    description: first visit made by the agent
   year:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
   month:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
   day:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+  allocated_slots:
+    description: Number of slots allocated 24h in advance
+  allocated_slots_0:
+    description: Number of slots allocated 0h in advance
+  ts_load:
+    description: agent contract type

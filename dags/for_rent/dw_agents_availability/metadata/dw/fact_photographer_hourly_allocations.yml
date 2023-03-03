@@ -1,55 +1,73 @@
----
 database_name: dw_agents_availability
 table_name: fact_photographer_hourly_allocations
+description: ''
+domain: For Rent
+owner: eduardo.bastiani@quintoandar.com.br
 columns:
   sk_agent:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.id_agent
+    - datalake_ebdb_agents.agents_slots_hourly.id_agent
+    description: ''
   sk_slot_date:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    description: ''
   sk_slot_date_hour:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    description: ''
   sk_agent_region:
     lineage:
-      - dw_public.dim_agent_region.sk_agent_region
+    - dw_public.dim_agent_region.sk_agent_region
+    description: ''
   sk_slot_date_agent:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-      - datalake_ebdb_agents.agents_slots_hourly.id_agent
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.id_agent
+    description: ''
   id_work_contract:
     lineage:
-      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+    - datalake_ebdb_clean.agent_data_aud.id_work_contract
+    description: ''
   id_dados_fotografo:
     lineage:
-      - dw_public.dim_user.dados_fotografo_id
+    - dw_public.dim_user.dados_fotografo_id
+    description: ''
   ts_slot_hour:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    description: ''
   is_allocation_available:
     lineage:
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_09_and_10_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_10_and_11_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_11_and_12_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_12_and_13_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_13_and_14_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_14_and_15_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_15_and_16_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_16_and_17_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_17_and_18_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_18_and_19_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_19_and_20_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_09_and_10_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_10_and_11_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_11_and_12_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_12_and_13_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_13_and_14_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_14_and_15_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_15_and_16_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_16_and_17_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_17_and_18_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_18_and_19_available
+    - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_19_and_20_available
+    description: ''
   area:
     lineage:
-      - dw_public.dim_agent_region.area_deprecated
+    - dw_public.dim_agent_region.area_deprecated
+    description: ''
   year:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
   month:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
   day:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+    - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+  allocated_slots:
+    description: ''
+  allocated_slots_0:
+    description: ''
+  ts_load:
+    description: ''

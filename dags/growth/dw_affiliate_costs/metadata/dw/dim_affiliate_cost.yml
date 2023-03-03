@@ -1,28 +1,76 @@
----
 database_name: dw_quintoandar
 table_name: dim_affiliate_cost
+description: ''
+domain: Growth
+owner: ''
 columns:
   sk_rh_accounting_entry:
     lineage:
-      - datalake_robin_hood.affiliate_costs.id_rh_accounting_entry
+    - datalake_robin_hood.affiliate_costs.id_rh_accounting_entry
+    description: ''
   sk_payee:
     lineage:
-      - datalake_robin_hood.affiliate_costs.id_payee
+    - datalake_robin_hood.affiliate_costs.id_payee
+    description: ''
   city_group:
     lineage:
-      - datalake_robin_hood.affiliate_costs.city_group
+    - datalake_robin_hood.affiliate_costs.city_group
+    description: ''
+    categories:
+      Belo Horizonte: ''
+      Brasília: ''
+      Campinas: ''
+      Cotia: ''
+      Curitiba: ''
+      Curtitiba: ''
+      Florianópolis: ''
+      Goiânia: ''
+      Mogi das Cruzes: ''
+      Porto Alegre: ''
+      RMSP: ''
+      Recife: ''
+      Rio de Janeiro: ''
+      Salvador: ''
+      Santos: ''
+      São José dos Campos: ''
+      Vitória: ''
   description:
     lineage:
-      - datalake_robin_hood.affiliate_costs.description
+    - datalake_robin_hood.affiliate_costs.description
+    description: ''
   source_bill_item:
     lineage:
-      - datalake_robin_hood.affiliate_costs.source_bill_item
+    - datalake_robin_hood.affiliate_costs.source_bill_item
+    description: ''
   commission_type:
     lineage:
-      - datalake_robin_hood.affiliate_costs.commission_type
+    - datalake_robin_hood.affiliate_costs.commission_type
+    description: ''
+    categories:
+      Commission Listing: ''
+      Commission MGM: ''
+      Commission Rent: ''
+      Commission Sale: ''
   cost_center_code:
     lineage:
-      - datalake_robin_hood.affiliate_costs.cost_center_code
+    - datalake_robin_hood.affiliate_costs.cost_center_code
+    description: ''
+    categories:
+      C023: ''
+      C038: ''
+      C039: ''
+      C040: ''
+      C046: ''
+      C066: ''
+      C081: ''
+      C40: ''
   mkt_origin:
     lineage:
-      - datalake_robin_hood.affiliate_costs.mkt_origin
+    - datalake_robin_hood.affiliate_costs.mkt_origin
+    description: ''
+    categories:
+      Doorman: ''
+      Indica Aí - Agents: ''
+      Indica Aí - General: ''
+  ts_load:
+    description: ''

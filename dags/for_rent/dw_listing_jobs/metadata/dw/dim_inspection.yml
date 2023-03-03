@@ -1,45 +1,88 @@
 database_name: dw_public
 table_name: dim_inspection
+description: Inspections are realized before a tenant moves into a property and after
+  the tenant moves out. Each line is an inspection
+domain: For Rent
+owner: cassio.bastos@quintoandar.com.br
 columns:
   sk_inspection:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.id
+    - datalake_ebdb_listing_jobs.inspection.id
+    description: The key for the inspection (same as id_inspection)
   id_inspection:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.id
+    - datalake_ebdb_listing_jobs.inspection.id
+    description: The ID for the inspection
   mode:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.mode
+    - datalake_ebdb_listing_jobs.inspection.mode
+    description: ''
+    categories:
+      Light: '#N/A'
+      Portability: '#N/A'
+      Professional: '#N/A'
   status:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.status
+    - datalake_ebdb_listing_jobs.inspection.status
+    description: The current status of the inspection, if it is scheduled, done, etc.
+    categories:
+      Agendada: ''
+      Cancelada: ''
+      Comentada: ''
+      ContratoCancelado: ''
+      EmAcordo: ''
+      EmRevisao: ''
+      Nova: ''
+      Revisada: ''
   type:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.type
+    - datalake_ebdb_listing_jobs.inspection.type
+    description: The type of this inspection.  The main ones are Entrance and Exit
+      inspection
+    categories:
+      CheckUpLar: ''
+      Constatacao: ''
+      Entrada: Before the tenant moves in
+      Portabilidade: ''
+      PreSaida: ''
+      Saida: After the tenant moves out
   is_tenant_approved:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.is_tenant_approved
+    - datalake_ebdb_listing_jobs.inspection.is_tenant_approved
+    description: If the tenant approved the inspection
   is_owner_approved:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.is_owner_approved
+    - datalake_ebdb_listing_jobs.inspection.is_owner_approved
+    description: If the property owner approved the inspection
   has_inspector_comment:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.has_inspector_comment
+    - datalake_ebdb_listing_jobs.inspection.has_inspector_comment
+    description: If the inspector has made a comment on the inspection
   has_tenant_comment:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.has_tenant_comment
+    - datalake_ebdb_listing_jobs.inspection.has_tenant_comment
+    description: If the tenant has made a comment on the inspection
   has_owner_comment:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.has_owner_comment
+    - datalake_ebdb_listing_jobs.inspection.has_owner_comment
+    description: If the property owner has made a comment on the inspection
   ts_created:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.ts_created
+    - datalake_ebdb_listing_jobs.inspection.ts_created
+    description: Timestamp when the inspection booking was created. Can be used to
+      define, for example, how many days the entrance inspection is booked before
+      the contract start date
   ts_expired:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.ts_expired
+    - datalake_ebdb_listing_jobs.inspection.ts_expired
+    description: Timestamp of when the inspection expires. Users (inspectors, tenants,
+      owners) can add comments before this date. After this date the inspection will
+      be closed for comments
   ts_first_synced:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.ts_first_synced
+    - datalake_ebdb_listing_jobs.inspection.ts_first_synced
   ts_last_synced:
     lineage:
-      - datalake_ebdb_listing_jobs.inspection.ts_last_synced
+    - datalake_ebdb_listing_jobs.inspection.ts_last_synced
+  ts_load:
+    description: Timestamp of when the table was last loaded

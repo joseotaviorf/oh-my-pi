@@ -1,18 +1,32 @@
----
 database_name: datalake_pro_owners
 table_name: owner_houses_quantity_history
+description: Historical enriched table for rent context. It contains the changes of
+  owner's quantity houses, just considering rent and not b2b houses
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
 columns:
   id_owner:
     lineage:
-      - datalake_pro_owners.house_b2b_history.id_user
+    - datalake_pro_owners.house_b2b_history.id_user
+    description: Id user of the owner
   rental_administrator:
     lineage:
-      - datalake_ebdb_listing.rent_listing.rental_administrator
+    - datalake_ebdb_listing.rent_listing.rental_administrator
+    description: The rental administrator of the house
+    categories:
+      OWNER: Owner is the rental administrator, which means that the listing is brokerage-only
+      QUINTOANDAR: Default rental administrator, which is QuintoAndar
   ts_house_number_ended:
     lineage:
-      - datalake_pro_owners.house_b2b_history.ts_ended
-      - datalake_ebdb_listing.house_listing_status.ts_status_started
+    - datalake_pro_owners.house_b2b_history.ts_ended
+    - datalake_ebdb_listing.house_listing_status.ts_status_started
+    description: Timestamp of how long the changes remained
   ts_house_number_started:
     lineage:
-      - datalake_pro_owners.house_b2b_history.ts_started
-      - datalake_ebdb_listing.house_listing_status.ts_status_started
+    - datalake_pro_owners.house_b2b_history.ts_started
+    - datalake_ebdb_listing.house_listing_status.ts_status_started
+    description: Timestamp of when the owner's quantity of house changed
+  houses:
+    description: Quantity of distincts houses that the owner has
+  previous_houses:
+    description: Quantity of distincts houses that the owner had before the change

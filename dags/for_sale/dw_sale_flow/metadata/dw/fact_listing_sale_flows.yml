@@ -1,67 +1,110 @@
 database_name: dw_sale
 table_name: fact_listing_sale_flows
+description: ''
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   ods_id:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_house_rent_flow
+    - datalake_ebdb_rent_flow.rent_flow.id_house_rent_flow
+    description: ''
   sk_house_listing:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_house
-      - dw_public.dim_house_listing.version
+    - datalake_ebdb_rent_flow.rent_flow.id_house
+    - dw_public.dim_house_listing.version
+    description: ''
   sk_region:
     lineage:
-      - datalake_ebdb_listing.house.id_region
+    - datalake_ebdb_listing.house.id_region
+    description: ''
   sk_sale_flow:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_rent_flow
+    - datalake_ebdb_rent_flow.rent_flow.id_rent_flow
+    description: ''
   sk_booking:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_booking
+    - datalake_ebdb_rent_flow.rent_flow.id_booking
+    description: ''
   sk_owner:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_owner
+    - datalake_ebdb_rent_flow.rent_flow.id_owner
+    description: ''
   sk_user_agent:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_user_agent
+    - datalake_ebdb_rent_flow.rent_flow.id_user_agent
+    description: ''
   sk_client:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_client
+    - datalake_ebdb_rent_flow.rent_flow.id_client
+    description: ''
   sk_visit:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_visit
+    - datalake_ebdb_rent_flow.rent_flow.id_visit
+    description: ''
   sk_house_first_listing_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_house_first_listing
+    - datalake_ebdb_rent_flow.rent_flow.dt_house_first_listing
+    description: ''
   sk_house_listing_date:
     lineage:
-      - dw_public.dim_house_listing.ts_listing_version_start
+    - dw_public.dim_house_listing.ts_listing_version_start
+    description: ''
   sk_house_listing_de_publication_date:
     lineage:
-      - dw_public.dim_house_listing.ts_last_de_publication
+    - dw_public.dim_house_listing.ts_last_de_publication
+    description: ''
   sk_booking_created_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_booking_created
+    - datalake_ebdb_rent_flow.rent_flow.dt_booking_created
+    description: ''
   sk_visit_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_visit
+    - datalake_ebdb_rent_flow.rent_flow.dt_visit
+    description: ''
   sk_agent_review_rating_date:
     lineage:
-      - datalake_ebdb_agents.agents_review.ts_rating_created
+    - datalake_ebdb_agents.agents_review.ts_rating_created
+    description: ''
   visit_created_type:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.visit_created_type
+    - datalake_ebdb_rent_flow.rent_flow.visit_created_type
+    description: ''
+    categories:
+      Admin: ''
+      CidadeAlerta: ''
+      Corretores: ''
+      Inquilinos: ''
+      SelfServiceWeb: ''
   funnel_step_drop_reason:
     lineage:
-      - dw_public.dim_booking.cancellation_reason
+    - dw_public.dim_booking.cancellation_reason
+    description: ''
   flg_visit_completed:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_completed
+    - datalake_ebdb_rent_flow.rent_flow.is_visit_completed
+    description: ''
   flg_visit_performed:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_performed
+    - datalake_ebdb_rent_flow.rent_flow.is_visit_performed
+    description: ''
   flg_visit_created_from_app:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_created_from_app
+    - datalake_ebdb_rent_flow.rent_flow.is_visit_created_from_app
+    description: ''
   flg_visit_last_updated_from_app:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_last_updated_from_app
+    - datalake_ebdb_rent_flow.rent_flow.is_visit_last_updated_from_app
+    description: ''
+  days_booking_created_to_visit:
+    description: ''
+  days_house_listing_to_visit:
+    description: ''
+  days_user_created_to_visit:
+    description: ''
+  funnel_step:
+    description: ''
+    categories:
+      visit_booked: ''
+      visit_completed: ''
+  ts_load:
+    description: ''

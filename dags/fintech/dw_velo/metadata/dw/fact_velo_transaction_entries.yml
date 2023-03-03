@@ -1,52 +1,78 @@
----
 database_name: dw_velo
 table_name: fact_velo_transaction_entries
+description: Fact table focused on the Entries added to transactions from Velo, registered
+  on OMIE systems.
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   sk_transaction_entry:
     lineage:
-      - datalake_velo.transaction_entries.id_transaction_entry
+    - datalake_velo.transaction_entries.id_transaction_entry
+    description: ''
   sk_transaction:
     lineage:
-      - datalake_velo.transaction_entries.id_trasaction
+    - datalake_velo.transaction_entries.id_trasaction
+    description: ''
   sk_category:
     lineage:
-      - datalake_velo.transaction_entries.id_category
+    - datalake_velo.transaction_entries.id_category
+    description: ''
   sk_propose:
     lineage:
-      - datalake_velo.transaction_entries.id_propose
+    - datalake_velo.transaction_entries.id_propose
+    description: ''
   sk_bank_account:
     lineage:
-      - datalake_velo.transaction_entries.id_bank_account
+    - datalake_velo.transaction_entries.id_bank_account
+    description: ''
   sk_omie_client:
     lineage:
-      - datalake_velo.transaction_entries.id_omie_client
+    - datalake_velo.transaction_entries.id_omie_client
+    description: ''
   percent_amount_from_transaction:
     lineage:
-      - datalake_velo.transaction_entries.percent_amount_from_transaction
+    - datalake_velo.transaction_entries.percent_amount_from_transaction
   due_amount:
     lineage:
-      - datalake_velo.transaction_entries.due_amount
+    - datalake_velo.transaction_entries.due_amount
   paid_amount:
     lineage:
-      - datalake_velo.transaction_entries.paid_amount
+    - datalake_velo.transaction_entries.paid_amount
   is_occurency:
     lineage:
-      - datalake_velo.transaction_entries.is_occurency
+    - datalake_velo.transaction_entries.is_occurency
+    description: If this entry is related to a ocurrency
   dt_issue:
     lineage:
-      - datalake_velo.transaction_entries.dt_issue
+    - datalake_velo.transaction_entries.dt_issue
+    description: ''
   dt_register:
     lineage:
-      - datalake_velo.transaction_entries.dt_register
+    - datalake_velo.transaction_entries.dt_register
+    description: ''
   dt_due:
     lineage:
-      - datalake_velo.transaction_entries.dt_due
+    - datalake_velo.transaction_entries.dt_due
+    description: ''
   dt_paid:
     lineage:
-      - datalake_velo.transaction_entries.dt_paid
+    - datalake_velo.transaction_entries.dt_paid
+    description: ''
   ts_created:
     lineage:
-      - datalake_velo.transaction_entries.ts_created
+    - datalake_velo.transaction_entries.ts_created
   ts_modified:
     lineage:
-      - datalake_velo.transaction_entries.ts_modified
+    - datalake_velo.transaction_entries.ts_modified
+  category_due_amount:
+    description: Amount due of this entry
+  category_paid_amount:
+    description: Amount paid of this entry
+  category_percent_amount:
+    description: Percentage of this entry related to the whole transaction amount
+  dt_created:
+    description: ''
+  dt_modified:
+    description: ''
+  ts_load:
+    description: ''

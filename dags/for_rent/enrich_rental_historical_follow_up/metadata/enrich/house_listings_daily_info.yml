@@ -1,61 +1,107 @@
----
 database_name: datalake_rental_historical_follow_up
 table_name: house_listings_daily_info
+description: Enriched table for store the last status of the day of listings and other
+  historical informations like CIQ, entrance, and who is living.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
 columns:
   id_house_listing:
     lineage:
-      - datalake_ebdb_listing.house_listing.id_house_listing
+    - datalake_ebdb_listing.house_listing.id_house_listing
+    description: The Id that identifies a version of a house's publication.
   id_house:
     lineage:
-      - datalake_ebdb_listing.house_listing.id_house
+    - datalake_ebdb_listing.house_listing.id_house
+    description: The Id of the house.
   id_country:
     lineage:
-      - datalake_ebdb_listing.house.id_country
+    - datalake_ebdb_listing.house.id_country
+    description: The Id of the country related to the house.
   id_contract:
     lineage:
-      - datalake_ebdb_listing.house_listing.id_contract
+    - datalake_ebdb_listing.house_listing.id_contract
+    description: The Id of the last contract associated to the listing in a specific
+      day.
   id_occupant:
     lineage:
-      - datalake_ebdb_listing.house_entrance_history.id_occupant
+    - datalake_ebdb_listing.house_entrance_history.id_occupant
+    description: The Id of the occupant of the house.
   id_partner:
     lineage:
-      - datalake_pro_owners.house_b2b_history.id_partner
+    - datalake_pro_owners.house_b2b_history.id_partner
   id_partner_big_agent:
     lineage:
-      - datalake_big_agent.house_consultant_history.id_partner
+    - datalake_big_agent.house_consultant_history.id_partner
   id_region:
     lineage:
-      - datalake_ebdb_listing.house.id_region
+    - datalake_ebdb_listing.house.id_region
+    description: The Id of the region related to the house.
   consultant_type:
     lineage:
-      - datalake_big_agent.house_consultant_history.consultant_type
+    - datalake_big_agent.house_consultant_history.consultant_type
+    description: Type of consultant, from Big Agent service.
+    categories:
+      ASP: ''
+      CIQ_FULL: ''
+      CIQ_MANAGER: ''
   doorman_type:
     lineage:
-      - datalake_ebdb_listing.house_entrance_history.doorman_type
+    - datalake_ebdb_listing.house_entrance_history.doorman_type
+    description: Type of doorman of the house.
   first_key_location:
     lineage:
-      - datalake_ebdb_listing.agents_with_keys.first_key_location
+    - datalake_ebdb_listing.agents_with_keys.first_key_location
+    description: Where the listing's key was first placed.
   key_location:
     lineage:
-      - datalake_ebdb_listing.house_entrance_history.rent
+    - datalake_ebdb_listing.house_entrance_history.rent
   listing_category:
     lineage:
-      - datalake_ebdb_listing.house_listing.listing_category
+    - datalake_ebdb_listing.house_listing.listing_category
+    description: Which is this listing category.
   rent:
     lineage:
-      - datalake_ebdb_smart_price.rental_price_history.rent
+    - datalake_ebdb_smart_price.rental_price_history.rent
   status_change_reason:
     lineage:
-      - datalake_ebdb_listing.house_listing_status.status_change_reason
+    - datalake_ebdb_listing.house_listing_status.status_change_reason
+    description: The reason to a status change in this day.
   status_history:
     lineage:
-      - datalake_ebdb_listing.house_listing_status.status_history
+    - datalake_ebdb_listing.house_listing_status.status_history
+    description: The status of this listing in this day.
   is_exclusive:
     lineage:
-      - datalake_ebdb_listing.house_listing.is_exclusive
+    - datalake_ebdb_listing.house_listing.is_exclusive
+    description: Boolean that indicates the house exclusivity.
   ts_status_started:
     lineage:
-      - datalake_ebdb_listing.house_listing_status.ts_status_started
+    - datalake_ebdb_listing.house_listing_status.ts_status_started
+    description: The timestamp of when the listing status started.
   ts_status_ended:
     lineage:
-      - datalake_ebdb_listing.house_listing_status.ts_status_ended
+    - datalake_ebdb_listing.house_listing_status.ts_status_ended
+    description: The timestamp of when the listing status ended.
+  id_house_listing_day:
+    description: The primary key created by a concatenation of id_house_listing and
+      day. We should have only one listing status per day in this table.
+  is_for_rent:
+    description: Boolean that indicates if this house is for rent.
+  is_for_sale:
+    description: Boolean that indicates if this house is for sale.
+  is_month_start:
+    description: Boolean that indicates if the day is a month start.
+  is_month_end:
+    description: Boolean that indicates if the day is a month end.
+  is_week_start:
+    description: Boolean that indicates if the day is a week start.
+  is_week_end:
+    description: Boolean that indicates if the day is a week end.
+  dt_day:
+    description: The day (date) when the status was observed.
+  year:
+    description: The year when this status was observed.
+  month:
+    description: The month when this status was observed.
+  day:
+    description: The day when this status was observed.

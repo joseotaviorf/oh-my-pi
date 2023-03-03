@@ -1,49 +1,77 @@
----
 database_name: datalake_sale_offer_flows
 table_name: sale_offer_users_info
+description: Enriched table for sales flow users Junk dimension dim_sale_offer_user_info.
+  It contains the columns that will be used on the dimension table and the columns
+  used on the JOIN statement.
+domain: For Sale
+owner: herivelto.junior@quintoandar.com.br
 columns:
   type:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.type
+    - datalake_sale_offer_flows.sale_offer_users.type
   ccv_buyer_status:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.is_ccv_buyer
+    - datalake_sale_offer_flows.sale_offer_users.is_ccv_buyer
+    description: Flag from docx databases that indicates if this user will be on the
+      sale agreement document.
   seller_ccv_signer_status:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.is_seller_ccv_signer
+    - datalake_sale_offer_flows.sale_offer_users.is_seller_ccv_signer
+    description: Indicates if this seller is a sale agreement signer.
   buyer_ccv_signer_status:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.buyer_signer_status
+    - datalake_sale_offer_flows.sale_offer_users.buyer_signer_status
+    description: For buyers this column indicates if this user is a ccv signer or
+      not.
   user_legal_type:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.is_pj
+    - datalake_sale_offer_flows.sale_offer_users.is_pj
+    description: Indicates if this user is a physical or legal person.
   original_user_status:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.is_original_user
+    - datalake_sale_offer_flows.sale_offer_users.is_original_user
+    description: Indicates if this user is the one that made the offer in case of
+      buyer and for seller indicates if it's the one that accepted. It can only exists
+      1 for each user type for each offer
   income_partner_status:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.is_income_partner
+    - datalake_sale_offer_flows.sale_offer_users.is_income_partner
+    description: Indicates if this user is participating on this offer as an income
+      partner.
   joint_buyer_status:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.has_joint_buyer
+    - datalake_sale_offer_flows.sale_offer_users.has_joint_buyer
+    description: Indicates if this user has another user as buyer for this offer.
   is_ccv_buyer:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.is_ccv_buyer
+    - datalake_sale_offer_flows.sale_offer_users.is_ccv_buyer
+    description: Flag from docx databases that indicates if this user will be on the
+      sale agreement document.
   is_seller_ccv_signer:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.is_seller_ccv_signer
+    - datalake_sale_offer_flows.sale_offer_users.is_seller_ccv_signer
+    description: Indicates if this seller is a sale agreement signer.
   buyer_signer_status:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.buyer_signer_status
+    - datalake_sale_offer_flows.sale_offer_users.buyer_signer_status
+    description: Indicates if this user has another user as buyer for this offer.
   is_pj:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.is_pj
+    - datalake_sale_offer_flows.sale_offer_users.is_pj
+    description: Indicates if this user has another user as buyer for this offer.
   is_original_user:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.is_original_user
+    - datalake_sale_offer_flows.sale_offer_users.is_original_user
+    description: Indicates if this user has another user as buyer for this offer.
   is_income_partner:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.is_income_partner
+    - datalake_sale_offer_flows.sale_offer_users.is_income_partner
+    description: Indicates if this user has another user as buyer for this offer.
   has_joint_buyer:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.has_joint_buyer
+    - datalake_sale_offer_flows.sale_offer_users.has_joint_buyer
+    description: Indicates if this user has another user as buyer for this offer.
+  sk_user_info:
+    description: Unique id for each combination of user characteristics.
+  user_type:
+    description: User type, it can be BUYER or SELLER.

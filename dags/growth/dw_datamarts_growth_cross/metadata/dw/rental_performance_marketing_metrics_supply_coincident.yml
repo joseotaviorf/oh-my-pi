@@ -1,81 +1,184 @@
----
 database_name: dw_datamarts_growth_cross
 table_name: rental_performance_marketing_metrics_supply_coincident
+description: ''
+domain: Growth
+owner: ''
 columns:
   date:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: ''
   city_group:
     lineage:
-      - dw_public.dim_region.city_group
-      - datalake_gsheets_clean.daily_target_supply_rental.city_group
-      - dw_datamarts_growth_cross.daily_target_volumes_supply.city_group
-      - datalake_gsheets_clean.costs_targets.city_group
-      - datalake_marketing_costs.daily_costs.city_group
-      - datalake_gsheets_clean.provisioned_costs_import.city_group
-      - dw_quintoandar.dim_affiliate_cost.city_group
-      - datalake_affiliates_cost_attributions.affiliates_cost_attributions.city_group
-      # - datamarts.performance_marketing_promotional_bonus_costs_daily.city_group
-      # - datamarts.performance_marketing_cluster_promotional_bonus_costs.city_group
+    - dw_public.dim_region.city_group
+    - datalake_gsheets_clean.daily_target_supply_rental.city_group
+    - dw_datamarts_growth_cross.daily_target_volumes_supply.city_group
+    - datalake_gsheets_clean.costs_targets.city_group
+    - datalake_marketing_costs.daily_costs.city_group
+    - datalake_gsheets_clean.provisioned_costs_import.city_group
+    - dw_quintoandar.dim_affiliate_cost.city_group
+    - datalake_affiliates_cost_attributions.affiliates_cost_attributions.city_group
+    description: ''
+    categories:
+      Belo Horizonte: '#N/A'
+      Belém: '#N/A'
+      Brasília: '#N/A'
+      Campinas: '#N/A'
+      Cotia: '#N/A'
+      Curitiba: '#N/A'
+      Florianópolis: '#N/A'
+      Fortaleza: '#N/A'
+      Goiânia: '#N/A'
+      Mogi das Cruzes: '#N/A'
+      Not Mapped: '#N/A'
+      Porto Alegre: '#N/A'
+      RMSP: '#N/A'
+      Recife: '#N/A'
+      Ribeirão Preto: '#N/A'
+      Rio de Janeiro: '#N/A'
+      Salvador: '#N/A'
+      Santos: '#N/A'
+      Sorocaba: '#N/A'
+      São José do Rio Preto: '#N/A'
+      São José dos Campos: '#N/A'
+      Uberlândia: '#N/A'
+      Unknown: '#N/A'
+      Vitória: '#N/A'
   mkt_origin:
     lineage:
-      - dw_public.fact_house_listing_flows.mkt_origin
-      - datalake_gsheets_clean.daily_target_supply_rental.supply_origin
-      - dw_datamarts_growth_cross.daily_target_volumes_supply.supply_origin
-      - datalake_marketing_costs.daily_costs.mkt_origin
-      - dw_quintoandar.dim_affiliate_cost.mkt_origin
-      - datalake_gsheets_clean.provisioned_costs_import.mkt_origin
-      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
-      - datalake_affiliates_cost_attributions.affiliates_cost_attributions.mkt_origin
-      # - datamarts.performance_marketing_promotional_bonus_costs_daily.affiliate_type
-      # - datamarts.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
+    - dw_public.fact_house_listing_flows.mkt_origin
+    - datalake_gsheets_clean.daily_target_supply_rental.supply_origin
+    - dw_datamarts_growth_cross.daily_target_volumes_supply.supply_origin
+    - datalake_marketing_costs.daily_costs.mkt_origin
+    - dw_quintoandar.dim_affiliate_cost.mkt_origin
+    - datalake_gsheets_clean.provisioned_costs_import.mkt_origin
+    - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+    - datalake_affiliates_cost_attributions.affiliates_cost_attributions.mkt_origin
+    description: ''
+    categories:
+      B2B: '#N/A'
+      Backend: '#N/A'
+      CIQ: '#N/A'
+      Doorman: '#N/A'
+      Inbound: '#N/A'
+      Indica Aí - Agents: '#N/A'
+      Indica Aí - General: '#N/A'
+      Other: '#N/A'
+      Owner PWA: '#N/A'
+      Price Calculator: '#N/A'
   mkt_channel:
     lineage:
-      - dw_public.fact_house_listing_flows.mkt_channel
-      - datalake_gsheets_clean.daily_target_supply_rental.supply_channel
-      - dw_datamarts_growth_cross.daily_target_volumes_supply.supply_channel
-      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
-      - datalake_marketing_costs.daily_costs.mkt_channel
+    - dw_public.fact_house_listing_flows.mkt_channel
+    - datalake_gsheets_clean.daily_target_supply_rental.supply_channel
+    - dw_datamarts_growth_cross.daily_target_volumes_supply.supply_channel
+    - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+    - datalake_marketing_costs.daily_costs.mkt_channel
+    description: ''
   planning_mkt_channel:
     lineage:
-      - dw_public.fact_house_listing_flows.mkt_origin
-      - datalake_gsheets_clean.daily_target_supply_rental.supply_origin
-      - dw_datamarts_growth_cross.daily_target_volumes_supply.supply_origin
-      - datalake_marketing_costs.daily_costs.mkt_origin
-      - dw_quintoandar.dim_affiliate_cost.mkt_origin
-      - datalake_gsheets_clean.provisioned_costs_import.mkt_origin
-      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
-      - datalake_affiliates_cost_attributions.affiliates_cost_attributions.mkt_origin
-      # - datamarts.performance_marketing_promotional_bonus_costs_daily.affiliate_type
-      # - datamarts.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
+    - dw_public.fact_house_listing_flows.mkt_origin
+    - datalake_gsheets_clean.daily_target_supply_rental.supply_origin
+    - dw_datamarts_growth_cross.daily_target_volumes_supply.supply_origin
+    - datalake_marketing_costs.daily_costs.mkt_origin
+    - dw_quintoandar.dim_affiliate_cost.mkt_origin
+    - datalake_gsheets_clean.provisioned_costs_import.mkt_origin
+    - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+    - datalake_affiliates_cost_attributions.affiliates_cost_attributions.mkt_origin
+    description: ''
   mkt_medium:
     lineage:
-      - dw_public.fact_house_listing_flows.mkt_medium
-      - datalake_gsheets_clean.daily_target_supply_rental.supply_medium
-      - datalake_marketing_costs.daily_costs.mkt_medium
+    - dw_public.fact_house_listing_flows.mkt_medium
+    - datalake_gsheets_clean.daily_target_supply_rental.supply_medium
+    - datalake_marketing_costs.daily_costs.mkt_medium
+    description: ''
+    categories:
+      ? ''
+      : '#N/A'
+      Branding: '#N/A'
+      Cross Domain: '#N/A'
+      Direct: '#N/A'
+      Direct Referral: '#N/A'
+      Display: '#N/A'
+      Doorman User: '#N/A'
+      Email: '#N/A'
+      Gmail: '#N/A'
+      Lost Tracking: '#N/A'
+      Not Mapped: '#N/A'
+      Online Classifieds: '#N/A'
+      Online Networks: '#N/A'
+      Other: '#N/A'
+      Performance Max: '#N/A'
+      Pop-Up: '#N/A'
+      Push: '#N/A'
+      Retargeting: '#N/A'
+      SEM branded: '#N/A'
+      SEM non-branded: '#N/A'
+      SEO branded: '#N/A'
+      SEO non-branded: '#N/A'
+      SMS: '#N/A'
+      Support Tools: '#N/A'
+      Test: '#N/A'
+      Whatsapp: '#N/A'
   mkt_source:
     lineage:
-      - dw_public.fact_house_listing_flows.mkt_source
-      - datalake_marketing_costs.daily_costs.mkt_source
-      - datalake_gsheets_clean.daily_target_supply_rental.supply_source
+    - dw_public.fact_house_listing_flows.mkt_source
+    - datalake_marketing_costs.daily_costs.mkt_source
+    - datalake_gsheets_clean.daily_target_supply_rental.supply_source
+    description: ''
   utm_campaign:
     lineage:
-      - dw_public.dim_lead.utm_campaign
-      - datalake_marketing_costs.daily_costs.utm_campaign
+    - dw_public.dim_lead.utm_campaign
+    - datalake_marketing_costs.daily_costs.utm_campaign
+    description: ''
   utm_content:
     lineage:
-      - dw_public.dim_lead.utm_content
-      - datalake_marketing_costs.daily_costs.utm_content
+    - dw_public.dim_lead.utm_content
+    - datalake_marketing_costs.daily_costs.utm_content
+    description: ''
   utm_term:
     lineage:
-      - dw_public.dim_lead.utm_term
-      - datalake_marketing_costs.daily_costs.utm_term
+    - dw_public.dim_lead.utm_term
+    - datalake_marketing_costs.daily_costs.utm_term
+    description: ''
   origin_phone:
     lineage:
-      - datalake_wololo_clean.prospect.origin_phone
+    - datalake_wololo_clean.prospect.origin_phone
   campaign_context:
     lineage:
-      - datalake_gsheets_clean.costs_targets.campaign
+    - datalake_gsheets_clean.costs_targets.campaign
+    description: ''
+    categories:
+      Hybrid: '#N/A'
+      Organic: '#N/A'
+      Rental: '#N/A'
+      Sale: '#N/A'
   business_context:
     lineage:
-      - datalake_gsheets_clean.costs_targets.business
+    - datalake_gsheets_clean.costs_targets.business
+    description: ''
+    categories:
+      Rental: '#N/A'
+  budget:
+    description: ''
+  cost:
+    description: ''
+  first_listings:
+    description: ''
+  first_listings_target:
+    description: ''
+  hybrid_listings:
+    description: ''
+  leads:
+    description: ''
+  opportunities:
+    description: ''
+  opportunities_target:
+    description: ''
+  prospects:
+    description: ''
+  prospects_target:
+    description: ''
+  qualifieds:
+    description: ''
+  qualifieds_target:
+    description: ''

@@ -1,22 +1,36 @@
----
 database_name: datalake_ebdb_rental_administration
 table_name: rental_administrator_change_history
+description: Information about administrator changes. Each line brings the rental
+  administrator of a house and the start and end date of the administration.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - datalake_ebdb_clean.rental_administrator_change_request_aud.id_house
+    - datalake_ebdb_clean.rental_administrator_change_request_aud.id_house
+    description: Id of the house
   country_code:
     lineage:
-      - datalake_ebdb_country.house.country_code
+    - datalake_ebdb_country.house.country_code
+    description: Country code of the house
   previous_rental_administrator:
     lineage:
-      - datalake_ebdb_clean.rental_administrator_change_request_aud.old_rental_administrator
+    - datalake_ebdb_clean.rental_administrator_change_request_aud.old_rental_administrator
+    description: Rental administrator before the change
   rental_administrator:
     lineage:
-      - datalake_ebdb_clean.rental_administrator_change_request_aud.new_rental_administrator
+    - datalake_ebdb_clean.rental_administrator_change_request_aud.new_rental_administrator
+    description: Rental administrator after the change
+    categories:
+      OWNER: Owner is the rental administrator, which means that the listing is brokerage-only
+      QUINTOANDAR: Default rental administrator, which is QuintoAndar
   ts_started:
     lineage:
-      - datalake_ebdb_clean.rental_administrator_change_request_aud.ts_created
+    - datalake_ebdb_clean.rental_administrator_change_request_aud.ts_created
+    description: Start timestamp of the administration
   ts_ended:
     lineage:
-      - datalake_ebdb_clean.rental_administrator_change_request_aud.ts_created
+    - datalake_ebdb_clean.rental_administrator_change_request_aud.ts_created
+    description: End timestamp of the administration
+  id_rental_administrator_change_request:
+    description: Id of the rental administrator change request

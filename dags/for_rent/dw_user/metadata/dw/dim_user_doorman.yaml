@@ -1,66 +1,179 @@
 database_name: dw_public
 table_name: dim_user_doorman
+description: Information about doormen (a subset of all affiliates) registered at
+  QuintoAndar. Each line is a user doorma
+domain: For Rent
+owner: ''
 columns:
   sk_user_doorman:
     lineage:
-      - datalake_ebdb_user.user_doorman.id
+    - datalake_ebdb_user.user_doorman.id
+    description: Key of doorman, which is not equal to sk_user. To get sk_user, needs
+      to join with dim_user by using sk_user_affiliate key.
   sk_user_affiliate:
     lineage:
-      - datalake_ebdb_user.user_doorman.id_affiliate_data
+    - datalake_ebdb_user.user_doorman.id_affiliate_data
+    description: Key to join table with dim_user_affiliate. (dim_user_doorman.sk_user_affiliate
+      = dim_user.dados_afiliado_id)
   id_user_doorman:
     lineage:
-      - datalake_ebdb_user.user_doorman.id
+    - datalake_ebdb_user.user_doorman.id
+    description: Key of doorman
   occupation_id:
     lineage:
-      - datalake_ebdb_user.user_doorman.id_doorman_occupation
+    - datalake_ebdb_user.user_doorman.id_doorman_occupation
+    description: Doorman Occupation ID
   work_place_id:
     lineage:
-      - datalake_ebdb_user.user_doorman.id_place
+    - datalake_ebdb_user.user_doorman.id_place
+    description: Id of the place where doorman works
   country_code:
     lineage:
-      - datalake_ebdb_user.user_doorman.country_code
+    - datalake_ebdb_user.user_doorman.country_code
+    description: Country code of the doorman
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
   work_address:
     lineage:
-      - datalake_ebdb_user.user_doorman.work_address
+    - datalake_ebdb_user.user_doorman.work_address
+    description: Address where doorman works (Free-form entry)
   work_street:
     lineage:
-      - datalake_ebdb_user.user_doorman.work_street
+    - datalake_ebdb_user.user_doorman.work_street
+    description: Street name where doorman works (Standardized)
   work_house_number:
     lineage:
-      - datalake_ebdb_user.user_doorman.work_house_number
+    - datalake_ebdb_user.user_doorman.work_house_number
+    description: Street number where doorman works
   work_neighbourhood:
     lineage:
-      - datalake_ebdb_user.user_doorman.work_neighborhood
+    - datalake_ebdb_user.user_doorman.work_neighborhood
+    description: Neighborhood where doorman works
   work_city:
     lineage:
-      - datalake_ebdb_user.user_doorman.work_city
+    - datalake_ebdb_user.user_doorman.work_city
+    description: City where doorman works
+    categories:
+      ' Niterói': ''
+      ' Santo Andre': ''
+      ' São Caetano do Sul': ''
+      ' São Paulo': ''
+      ABC: ''
+      Alphaville: ''
+      Antonio: ''
+      Araras: ''
+      Atibaia: ''
+      Barueri: ''
+      Bela Vista: ''
+      Belo Horizonte: ''
+      Brasilia: ''
+      Brasília: ''
+      Brotas: ''
+      Campinas: ''
+      Canoas: ''
+      Cotia: ''
+      Crimeia Leste: ''
+      Curitiba: ''
+      Diadema: ''
+      Embu das Artes: ''
+      Florianópolis: ''
+      Goiania: ''
+      Goiânia: ''
+      Guarulhos: ''
+      Jambeiro: ''
+      Jundiaí: ''
+      Mauá: ''
+      Mogi das Cruzes: ''
+      'Niteroi ': ''
+      Niterói: ''
+      Nova Hamburgo: ''
+      Nova Lima: ''
+      Novo Hamburgo: ''
+      Osasco: ''
+      Palhoça: ''
+      Porto Alegre: ''
+      'Porto alegre ': ''
+      Poá: ''
+      Praia Grande: ''
+      RJ: ''
+      Rio Grande: ''
+      Rio de Janeiro: ''
+      'Rio de janeiro ': ''
+      SP: ''
+      Salto: ''
+      Santana de Parnaíba: ''
+      Santo André: ''
+      Sao Paulo: ''
+      São Bernardo: ''
+      São Bernardo do Campo: ''
+      São Caetano: ''
+      São Caetano do Sul: ''
+      São José: ''
+      São José dos Campos: ''
+      São Leopoldo: ''
+      São Lourenço da Serra: ''
+      São Paullo: ''
+      São Paulo: ''
+      São Pualo: ''
+      São paulo: ''
+      Taboão da Serra: ''
+      'Taboão da serra ': ''
+      Tietê: ''
+      'campinas ': ''
+      n-a: ''
+      'sao paulo ': ''
+      'são paulo ': ''
   work_state:
     lineage:
-      - datalake_ebdb_user.user_doorman.work_state
+    - datalake_ebdb_user.user_doorman.work_state
+    description: State where doorman works
   work_lat:
     lineage:
-      - datalake_ebdb_user.user_doorman.lat
+    - datalake_ebdb_user.user_doorman.lat
+    description: Latitude of the place where doorman works
   work_lng:
     lineage:
-      - datalake_ebdb_user.user_doorman.lng
+    - datalake_ebdb_user.user_doorman.lng
+    description: Longitude of the place where doorman works
   recruiter:
     lineage:
-      - datalake_ebdb_user.user_doorman.recruiter
+    - datalake_ebdb_user.user_doorman.recruiter
+    description: Name of the person who recruited doorman
   subscription_source:
     lineage:
-      - datalake_ebdb_user.user_doorman.subscription_source
+    - datalake_ebdb_user.user_doorman.subscription_source
+    description: Defines if doorman was captured offline, organic or captured by call
+      center
   occupation_name:
     lineage:
-      - datalake_ebdb_user.user_doorman.occupation_name
+    - datalake_ebdb_user.user_doorman.occupation_name
+    description: Doorman Occupation description
+    categories:
+      APARTMENT_MANAGER: ''
+      CLEANER: ''
+      DOORMAN: ''
+      GUARD: ''
+      JANITOR: ''
+      OTHER: ''
+      PROPERTY_MANAGER: ''
   is_active:
     lineage:
-      - datalake_ebdb_user.user_doorman.is_active
+    - datalake_ebdb_user.user_doorman.is_active
+    description: Flag which indicates if user joined doorman program. If ts_joined
+      program is not null, then it is true. It does not indicates whether doorman
+      is still registered in the affiliates program.
   ts_created:
     lineage:
-      - datalake_ebdb_user.user_doorman.ts_created
+    - datalake_ebdb_user.user_doorman.ts_created
+    description: Timestamp of the moment when doorman user was created
   ts_updated:
     lineage:
-      - datalake_ebdb_user.user_doorman.ts_updated
+    - datalake_ebdb_user.user_doorman.ts_updated
+    description: Timestamp of the moment when doorman user was updated
   ts_joined_program:
     lineage:
-      - datalake_ebdb_user.user_doorman.ts_joined
+    - datalake_ebdb_user.user_doorman.ts_joined
+    description: ''
+  ts_load:
+    description: Timestamp of data load event (UTC timezone)

@@ -1,11 +1,50 @@
----
 database_name: dw_datamarts_for_rent
 table_name: datamart_cohort_rentals
+description: ''
+domain: For Rent
+owner: carolina.cavalcante@quintoandar.com.br
 columns:
   city_group:
     lineage:
-      - dw_public.dim_region.city_group
+    - dw_public.dim_region.city_group
+    description: ''
+    categories:
+      Belo Horizonte: ''
+      Brasília: ''
+      Campinas: ''
+      Cotia: '#N/A'
+      Curitiba: ''
+      Florianópolis: ''
+      Goiânia: ''
+      Mogi das Cruzes: '#N/A'
+      Porto Alegre: ''
+      RMSP: ''
+      Recife: '#N/A'
+      Rio de Janeiro: ''
+      Salvador: '#N/A'
+      Santos: '#N/A'
+      São José dos Campos: '#N/A'
+      Vitória: '#N/A'
   contract_start_month:
     lineage:
-      - dw_public.dim_contract.dt_start
-      - dw_public.dim_contract.dt_entrance
+    - dw_public.dim_contract.dt_start
+    - dw_public.dim_contract.dt_entrance
+    description: ''
+  avg_admin_fee_first_rentals:
+    description: ''
+  avg_admin_fee_re_rentals:
+    description: ''
+  avg_value_rent_first_rentals:
+    description: ''
+  avg_value_rent_re_rentals:
+    description: ''
+  months_after_first_contract:
+    description: ''
+  total_ended_re_rentals:
+    description: ''
+  total_first_rentals:
+    description: ''
+  total_re_rentals:
+    description: ''
+  ts_load:
+    description: ''

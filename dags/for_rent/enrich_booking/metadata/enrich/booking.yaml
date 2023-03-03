@@ -1,266 +1,538 @@
 database_name: datalake_booking
 table_name: booking
+description: This table contains information about booking and is the main source
+  for the dim_booking. Here, id is a PK and we have only one booking per line.
+domain: For Rent
+owner: ''
 columns:
   id:
     lineage:
-      - datalake_ebdb_clean.booking.id
+    - datalake_ebdb_clean.booking.id
+    description: Its the PK for this table and the identifier of bookings. Must be
+      unique.
   id_country:
     lineage:
-      - datalake_ebdb_listing.house.id_country
+    - datalake_ebdb_listing.house.id_country
+    description: Country identifier.
   id_rescheduled_booking:
     lineage:
-      - datalake_ebdb_clean.booking.id_rescheduled_booking
+    - datalake_ebdb_clean.booking.id_rescheduled_booking
+    description: Reschedling identifier.
   id_visitor:
     lineage:
-      - datalake_ebdb_clean.booking.id_visitor
+    - datalake_ebdb_clean.booking.id_visitor
+    description: Id of user making the visit.
   id_visit:
     lineage:
-      - datalake_ebdb_clean.booking.id_visit
+    - datalake_ebdb_clean.booking.id_visit
+    description: Key of visit.
   id_user_creation:
     lineage:
-      - datalake_ebdb_clean.booking_status_change.id_user
+    - datalake_ebdb_clean.booking_status_change.id_user
+    description: An identifier for who had created the booking.
   id_user_cancelation:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.id_user
+    - datalake_ebdb_clean.user_revision_entity.id_user
+    description: An identifier for who had cancelled the booking for the first time.
+      Its value can be NULL and in this case the cancellation was made by an automatic
+      process.
   id_house:
     lineage:
-      - datalake_ebdb_clean.booking.id_house
+    - datalake_ebdb_clean.booking.id_house
+    description: Key of property/house.
   id_agent:
     lineage:
-      - datalake_ebdb_clean.booking.id_agent
+    - datalake_ebdb_clean.booking.id_agent
+    description: Key of user agent.
   id_user_sale_agent:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: Key of agent attending Sales
   id_attendant:
     lineage:
-      - datalake_ebdb_clean.booking.id_attendant
+    - datalake_ebdb_clean.booking.id_attendant
+    description: The user ID (sk_user) of the user who booked this visit, but only
+      if the booking was created by a QuintoAndar agent or a QuintoAndar employee,
+      and not by the visitor himself
   id_user_sale_attendence_5a:
     lineage:
-      - datalake_gsheets_clean.secretariat_hierarchy.id_user_5a
+    - datalake_gsheets_clean.secretariat_hierarchy.id_user_5a
+    description: ''
   id_rent_flow:
     lineage:
-      - datalake_ebdb_clean.booking.id_rent_flow
+    - datalake_ebdb_clean.booking.id_rent_flow
+    description: Key of rental flow
   id_sale_flow:
     lineage:
-      - datalake_ebdb_clean.booking.id_visitor
-      - datalake_ebdb_clean.booking.id_house
+    - datalake_ebdb_clean.booking.id_visitor
+    - datalake_ebdb_clean.booking.id_house
+    description: Key of sale flow
   id_real_estate_agent_rating:
     lineage:
-      - datalake_ebdb_clean.visit.id_real_estate_agent_rating
+    - datalake_ebdb_clean.visit.id_real_estate_agent_rating
+    description: ''
   id_sale_fixed_agent:
     lineage:
-      - datalake_ebdb_clean.preferred_fixed_agent.id_agent_data
+    - datalake_ebdb_clean.preferred_fixed_agent.id_agent_data
+    description: ''
   id_company_supply:
     lineage:
-      - datalake_ebdb_listing.house.id_company_hubspot
+    - datalake_ebdb_listing.house.id_company_hubspot
   id_company_demand:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.id_company_hubspot
+    - datalake_ebdb_work_contract.work_contract.id_company_hubspot
   country_code:
     lineage:
-      - datalake_ebdb_listing.house.country_code
+    - datalake_ebdb_listing.house.country_code
+    description: Country code of the booking
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
   default_timezone:
     lineage:
-      - datalake_ebdb_clean.country.default_timezone
+    - datalake_ebdb_clean.country.default_timezone
   dt_booking:
     lineage:
-      - datalake_ebdb_clean.booking.dt_booking
+    - datalake_ebdb_clean.booking.dt_booking
+    description: Date of booking on UTC.
   status:
     lineage:
-      - datalake_ebdb_clean.booking.status
+    - datalake_ebdb_clean.booking.status
+    description: Gives the booking status, for exemple to show if the visit is canceled
+      or not
+    categories:
+      AguardandoConfirmacao: Waiting for tenant to confirm visit (only required for
+        visits booked at least 48 hours in advance)
+      Cancelado: Visit was canceled
+      Marcado: Visit is scheduled
+      Realizado: Visit was completed
   visit_intent:
     lineage:
-      - datalake_ebdb_clean.booking.business_context
+    - datalake_ebdb_clean.booking.business_context
+    description: Lists the visitors intention for this visit (if he was looking to
+      rent or buy the property)
+    categories:
+      RENT: ''
+      SALE: ''
   buyer_intention:
     lineage:
-      - datalake_ebdb_clean.booking.buyer_intention
+    - datalake_ebdb_clean.booking.buyer_intention
+    description: ''
   type:
     lineage:
-      - datalake_ebdb_clean.booking.type
+    - datalake_ebdb_clean.booking.type
+    description: What type of booking it is Visit, Photo Session, Inspection
+    categories:
+      CheckUpLar: ''
+      SessaoFotos: ''
+      Visita: ''
+      Vistoria: ''
+      VistoriaQuarteirizada: '#N/A'
   visit_fup:
     lineage:
-      - datalake_ebdb_clean.booking.visit_fup
+    - datalake_ebdb_clean.booking.visit_fup
+    description: Agent visit follow up answered on agent app
+    categories:
+      EntradaNaoAutorizada: ''
+      ImovelAlugado: ''
+      NaoCompareceu: ''
+      NaoGostou: ''
+      Talvez: ''
+      VaiNegociar: ''
+      VisitouSozinho: ''
   slot_day:
     lineage:
-      - datalake_ebdb_clean.booking.slot_day
+    - datalake_ebdb_clean.booking.slot_day
+    description: Gives the slot to visit schedulled hour
   checkin_status:
     lineage:
-      - datalake_ebdb_clean.booking.checkin_status
+    - datalake_ebdb_clean.booking.checkin_status
+    description: Show status of whatsapp confirmation of visit. Only visits booked
+      2 days or more in advance need a whatsapp confirmation
   user_creation_email:
     lineage:
-      - datalake_ebdb_user.user.email
+    - datalake_ebdb_user.user.email
+    description: Email from who had created the booking.
   last_update_source:
     lineage:
-      - datalake_ebdb_clean.visit_origin.name
+    - datalake_ebdb_clean.visit_origin.name
+    description: Show origin of last source to alter the booking
   first_update_source:
     lineage:
-      - datalake_ebdb_clean.visit_origin.name
+    - datalake_ebdb_clean.visit_origin.name
+    description: Shows the origin from the booking, self service web, booked by agent
   is_visit_created_from_app:
     lineage:
-      - datalake_ebdb_clean.visit_origin.is_app
+    - datalake_ebdb_clean.visit_origin.is_app
+    description: ''
   is_visit_last_updated_from_app:
     lineage:
-      - datalake_ebdb_clean.visit_origin.is_app
+    - datalake_ebdb_clean.visit_origin.is_app
+    description: ''
   code:
     lineage:
-      - datalake_ebdb_clean.visit.code
+    - datalake_ebdb_clean.visit.code
+    description: ''
   last_status_change_reason:
     lineage:
-      - datalake_ebdb_clean.booking_status_change.reason
+    - datalake_ebdb_clean.booking_status_change.reason
+    description: ''
   last_status_change_reason_enum:
     lineage:
-      - datalake_ebdb_clean.booking_status_change.reason_enum
+    - datalake_ebdb_clean.booking_status_change.reason_enum
+    description: ''
   last_status_change_reason_category:
     lineage:
-      - datalake_ebdb_clean.appointment_change_reason_category.name
+    - datalake_ebdb_clean.appointment_change_reason_category.name
+    description: ''
   tenant_absence_reason:
     lineage:
-      - datalake_ebdb_clean.visitor.absence_reason
+    - datalake_ebdb_clean.visitor.absence_reason
+    description: ''
   agent_absence_reason:
     lineage:
-      - datalake_ebdb_clean.visitor.absence_reason
+    - datalake_ebdb_clean.visitor.absence_reason
+    description: ''
   landlord_absence_reason:
     lineage:
-      - datalake_ebdb_clean.visitor.absence_reason
+    - datalake_ebdb_clean.visitor.absence_reason
+    description: Describes the reason why owner did not show up
   troublesome_entrance_problem:
     lineage:
-      - datalake_ebdb_clean.entrance.problem
+    - datalake_ebdb_clean.entrance.problem
+    description: ''
   cancellation_reason:
     lineage:
-      - datalake_ebdb_clean.booking_status_change.reason_enum
+    - datalake_ebdb_clean.booking_status_change.reason_enum
+    description: Reason for the booking cancellation as in this sheets
+    categories:
+      AGENT_REQUESTED_VISIT_FROM_QUEUE: ''
+      AGENT_SCHEDULE_REALIZED: ''
+      AGENT_TRANSFER: ''
+      BAD_SCHEDULING: '#N/A'
+      BUG_IN_INSPECTION_APP: '#N/A'
+      CANCELED_AGENT_CAN_NOT_ATTEND: Corretor avisa que não conseguirá comparecer
+        cx ou pelo app de corretor com motivo 'Não poderei comparecer na visita'
+      CANCELED_AGENT_CAN_NOT_JOIN: Corretor cancela pelo app com o motivo "Não poderei
+        comparecer à visita"
+      CANCELED_AGENT_DEACTIVATED: Corretor descredenciado
+      CANCELED_AGENT_LATE_POOL: Corretor cancela visita subsequente à pool por atraso
+        na visita pool, pelo app com motivo 'Visita em grupo atrasou e não será possível
+        chegar na próxima visita'
+      CANCELED_AGENT_VISIT_TOO_FAR: Corretor cancela pelo app com o motivo "Visita
+        agendada em local muito longe"
+      CANCELED_AUTOMATICALLY_PROPERTY_UNPUBLISHED: Imóvel despublicado
+      CANCELED_BLOCKED_SCHEDULE: Visita agendada em horário bloqueado na agenda do
+        corretor e cancelada pelo app com motivo 'Agenda estava bloqueada e entrou
+        uma visita'
+      CANCELED_BY_OWNER_FROM_APP: PP cancelamento via PWA
+      CANCELED_BY_OWNER_FROM_LINK: ''
+      CANCELED_BY_PHOTOGRAPHER_FROM_APP: '#N/A'
+      CANCELED_BY_TENANT_CAN_NOT_ATTEND: Inquilino não comparecerá na visita mas ainda
+        tem interesse no imóvel
+      CANCELED_BY_TENANT_FROM_APP: Todos cancelamentos vindos do PWA
+      CANCELED_BY_TENANT_FROM_CHECK_IN: Inquilino cancela via link do check-in
+      CANCELED_BY_TENANT_NOT_BUYING: ''
+      CANCELED_BY_TENANT_NOT_BUYING_BY_5A: ''
+      CANCELED_BY_TENANT_NOT_INTERESTED: Inquilino não tem mais interesse no imóvel
+        mas continua procurando um imóvel
+      CANCELED_BY_TENANT_NOT_RENTING: Inquilino não está mais procurando imóveis
+      CANCELED_BY_TENANT_NOT_RENTING_BY_5A: Inquilino não quer mais alugar pelo QuintoAndar
+      CANCELED_BY_TENANT_OTHER_REASON: Inquilino não quer alugar por outro motivo,
+        escrito manualmente
+      CANCELED_CANT_FIND_ANOTHER_AGENT: Corretor descredenciado, e não se aloca outro
+        corretor para o booking, gerando o cancelamento
+      CANCELED_CHECKIN_NOT_DONE: Inquilino não confirmou a visita via check in
+      CANCELED_CLIENT_CAN_NOT_ATTEND: Corretor cancela pelo app com o motivo "Cliente
+        não poderá comparecer"
+      CANCELED_CLIENT_GAVE_UP: Cancelamento por ligação ao CX ou pelo app do corretor
+        com motivo "Cliente desistiu da visita"
+      CANCELED_CLIENT_GAVE_UP_APARTMENT: Não quer mais alugar atendimento CX
+      CANCELED_CLIENT_IS_REPAIRING_HOUSE: '#N/A'
+      CANCELED_CLIENT_IS_STILL_IN_PROPERTY: '#N/A'
+      CANCELED_CLIENT_NOT_BUYING: ''
+      CANCELED_CLIENT_NOT_RENTING: Inquilino liga por CX avisando que não tem mais
+        intenção de alugar o apartamento
+      CANCELED_CLIENT_NOT_RENTING_OR_BUYING: ''
+      CANCELED_CONTRACT_CANCELED: ''
+      CANCELED_HOUSE_INACCESSIBLE: ''
+      CANCELED_HOUSE_OCCUPIED: ''
+      CANCELED_HOUSE_REPAIRING: ''
+      CANCELED_HOUSE_RESERVED: Reserva do Imóvel derruba todas as visitas
+      CANCELED_INCORRECT_SCHEDULE: Corretor cancela pelo app com o motivo "Cliente
+        agendou incorretamente"
+      CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION: '#N/A'
+      CANCELED_INSPECTOR_WITHOUT_KEYS: '#N/A'
+      CANCELED_OTHER_CLIENT: cancelamento via CX sem razão especificada
+      CANCELED_OTHER_INSPECTOR: ''
+      CANCELED_OTHER_OWNER: PP cancela sem motivo explicitado
+      CANCELED_OWNER_CAN_NOT_ATTEND: Proprietário não poderá ir à visita cancelado
+        pelo corretor via app com motivo 'Proprietário não poderá comparecer'
+      CANCELED_OWNER_CAN_NOT_ATTEND_INSPECTION: Imóvel suspenso por gestão de consequência
+        do pp
+      CANCELED_OWNER_CONSEQUENCE_MANAGEMENT: Imóvel suspenso por gestão de consequência
+        do pp
+      CANCELED_OWNER_CONSEQUENCE_MANAGEMENT_SUSPENDED: Proprietário não responde as
+        offers e é despublicado, "gestão de consequências"
+      CANCELED_OWNER_DID_NOT_ATTEND: '#N/A'
+      CANCELED_OWNER_EXEMPTED_INSPECTION: '#N/A'
+      CANCELED_OWNER_IS_REPAIRING_HOUSE: '#N/A'
+      CANCELED_OWNER_NOT_RENTING: Proprietário desistiu de alugar
+      CANCELED_OWNER_NO_RETURN_NEGOTIATIONS: ''
+      CANCELED_OWNER_PROPERTY_ALREADY_RENTED_5A: Proprietário já alugou o Imóvel pelo
+        5A
+      CANCELED_OWNER_PROPERTY_ALREADY_RENTED_OTHER: Proprietário já alugou o Imóvel
+        por fora do 5A
+      CANCELED_OWNER_SUSPENDED: Imóvel suspenso por gestão de consequência do pp
+      CANCELED_OWNER_UNREACHABLE: Quando liga para confirmar a visita, o proprietário
+        não atende em imóveis onde o PP acompanha
+      CANCELED_OWNER_UNREACHABLE_UNPUBLISHED: Quando liga para confirmar se o imóvel
+        ainda está disponível, o proprietário não atende e por isso há despublicação
+      CANCELED_PROBLEM_INSPECTOR: ''
+      CANCELED_PROBLEM_OWNER_OR_TENANT_OR_HOUSE: ''
+      CANCELED_PROPERTY_SUSPENDED_ADVANCED_NEGOTIATIONS: Negociação avançada
+      CANCELED_PROPERTY_SUSPENDED_UNAVAILABLE: Imóvel suspenso cancelado pelo app
+        do corretor com o motivo 'Imóvel indisponível e/ou já alugado'
+      CANCELED_PROPERTY_UNAVAILABLE: Imóvel despublicado
+      CANCELED_RELOCATION: ''
+      CANCELED_RELOCATION_BY_BUG: ''
+      CANCELED_REQUEST_BY_OWNER_OR_TENANT: ''
+      CANCELED_SCHEDULED_OTHER_TIME: O corretor cancela a visita do inquilino com
+        o motivo 'Visita realizada em outro horário'
+      CANCELED_SELF_SERVICE_PARTIAL: Não é mais utilizado
+      CANCELED_TENANT_CAN_NOT_ATTEND_INSPECTION: ''
+      EXPECTED_TERMINATION_DATE_CHANGE: ''
+      INSPECTOR_BLOCKED_SCHEDULE: '#N/A'
+      KEY_HOLDER_AGENT_NOT_AVAILABLE: '#N/A'
+      OTHER: ''
+      PROPERTY_UNPUBLISHED: ''
+      RECYCLE_OLDER_INSPECTION: '#N/A'
+      REPORTED_BY_PHOTOGRAPHER: ''
+      REPURPOSE_BECAUSE_OF_BUG: '#N/A'
+      RESCHEDULING_BY_HIGHER_PRIORITY_INSPECTION: '#N/A'
+      RESCHEDULING_CONTRACT: '#N/A'
+      RESCHEDULING_HOUSEFUL: '#N/A'
+      SCHEDULE_CHANGE: ''
   cancellation_reason_category:
     lineage:
-      - datalake_ebdb_clean.booking_status_change.reason_enum
+    - datalake_ebdb_clean.booking_status_change.reason_enum
+    description: Cancelation category as in the sheets above
+    categories:
+      Agent: The agent cancelled the booking
+      Consequence Management: The booking was cancelled because the owner was suspended
+        because of "consequence management" reasons
+      House Reserved: The house was reserved by a tenant, thus cancelling all bookings
+        automatically
+      House Suspended: ''
+      House Unlisted: ''
+      Other: ''
+      Owner: ''
+      Reschedule_Agent: The booking was rescheduled by the agent
+      Reschedule_Tenant: The booking was rescheduled by the tenant
+      Tenant: The tenant cancelled the booking
+      Unknown: ''
   owner_missing_reason:
     lineage:
-      - datalake_ebdb_clean.entrance.problem
+    - datalake_ebdb_clean.entrance.problem
+    description: ''
   reason_category:
     lineage:
-      - datalake_gsheets_clean.from_to_cancellation.new_reason
-      - datalake_ebdb_clean.visit_origin.name
-      - datalake_ebdb_clean.booking_status_change.reason_enum
-      - datalake_ebdb_clean.appointment_change_reason_category.name
+    - datalake_gsheets_clean.from_to_cancellation.new_reason
+    - datalake_ebdb_clean.visit_origin.name
+    - datalake_ebdb_clean.booking_status_change.reason_enum
+    - datalake_ebdb_clean.appointment_change_reason_category.name
+    description: '[Deprecated] Gives the reason why visit was cancelled'
+    categories:
+      Advanced negotiation: ''
+      Agent: ''
+      Consequence Management: ''
+      House Reserved: ''
+      Inspector: ''
+      Overbooking: ''
+      Owner: ''
+      Reschedule: ''
+      Tenant: ''
+      Unknown: ''
+      Unlisted: ''
+      Unlisted apartment: ''
   partner_3p_demand:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.3p_partner
+    - datalake_ebdb_work_contract.work_contract.3p_partner
+    description: ''
   partner_3p_supply:
     lineage:
-      - datalake_ebdb_listing.house.partner_3p_supply
+    - datalake_ebdb_listing.house.partner_3p_supply
+    description: ''
   ts_visit_fup:
     lineage:
-      - datalake_ebdb_clean.booking.ts_visit_fup
+    - datalake_ebdb_clean.booking.ts_visit_fup
+    description: Date of visit follow up in Brazilian timezone
   ts_created:
     lineage:
-      - datalake_ebdb_clean.booking.ts_created
+    - datalake_ebdb_clean.booking.ts_created
+    description: Datetime of the booking creation.
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.booking.ts_updated
+    - datalake_ebdb_clean.booking.ts_updated
+    description: Datetime of the booking updating.
   ts_first_canceled:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Date time of the first cancellation.
   ts_first_canceled_unevaluated:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: ''
   ts_booking_local_tz:
     lineage:
-      - datalake_ebdb_clean.booking.dt_booking
-      - datalake_ebdb_clean.booking.slot_day
+    - datalake_ebdb_clean.booking.dt_booking
+    - datalake_ebdb_clean.booking.slot_day
+    description: ''
   ts_created_local_tz:
     lineage:
-      - datalake_ebdb_clean.booking.ts_created
+    - datalake_ebdb_clean.booking.ts_created
+    description: ''
   ts_visit_follow_up_local_tz:
     lineage:
-      - datalake_ebdb_clean.booking.ts_visit_fup
+    - datalake_ebdb_clean.booking.ts_visit_fup
+    description: ''
   is_confirmed:
     lineage:
-      - datalake_ebdb_clean.booking.is_confirmed
+    - datalake_ebdb_clean.booking.is_confirmed
+    description: ''
   is_closed:
     lineage:
-      - datalake_ebdb_clean.booking.is_closed
+    - datalake_ebdb_clean.booking.is_closed
+    description: ''
   is_agent_fixed:
     lineage:
-      - datalake_ebdb_clean.booking.is_agent_fixed
+    - datalake_ebdb_clean.booking.is_agent_fixed
+    description: ''
   is_3p_supply_5a:
     lineage:
-      - datalake_ebdb_listing.house.is_3p_supply_5a
+    - datalake_ebdb_listing.house.is_3p_supply_5a
   is_3p_supply_bh:
     lineage:
-      - datalake_ebdb_listing.house.is_3p_supply_bh
+    - datalake_ebdb_listing.house.is_3p_supply_bh
   is_virtual_visit:
     lineage:
-      - datalake_ebdb_clean.follow_up_details.visit_type
+    - datalake_ebdb_clean.follow_up_details.visit_type
+    description: ''
   is_entrance_successful:
     lineage:
-      - datalake_ebdb_clean.entrance.is_successful
+    - datalake_ebdb_clean.entrance.is_successful
+    description: ''
   is_canceled:
     lineage:
-      - datalake_ebdb_clean.booking.status
+    - datalake_ebdb_clean.booking.status
+    description: ''
   is_sale_visit:
     lineage:
-      - datalake_ebdb_clean.booking.business_context
+    - datalake_ebdb_clean.booking.business_context
+    description: ''
   is_inspection:
     lineage:
-      - datalake_ebdb_clean.booking.type
+    - datalake_ebdb_clean.booking.type
+    description: ''
   is_visit:
     lineage:
-      - datalake_ebdb_clean.booking.type
+    - datalake_ebdb_clean.booking.type
+    description: ''
   is_photo_session:
     lineage:
-      - datalake_ebdb_clean.booking.type
+    - datalake_ebdb_clean.booking.type
+    description: ''
   is_visit_performed:
     lineage:
-      - datalake_ebdb_clean.booking.visit_fup
-      - datalake_ebdb_clean.visitor.absence_reason
+    - datalake_ebdb_clean.booking.visit_fup
+    - datalake_ebdb_clean.visitor.absence_reason
+    description: ''
   is_via_reschedule:
     lineage:
-      - datalake_ebdb_clean.booking.id_rescheduled_booking
+    - datalake_ebdb_clean.booking.id_rescheduled_booking
+    description: ''
   has_reschedule:
     lineage:
-      - datalake_ebdb_clean.booking.id_rescheduled_booking
+    - datalake_ebdb_clean.booking.id_rescheduled_booking
+    description: ''
   has_tenant_attended:
     lineage:
-      - datalake_ebdb_clean.visitor.has_attended
+    - datalake_ebdb_clean.visitor.has_attended
+    description: ''
   has_agent_attended:
     lineage:
-      - datalake_ebdb_clean.visitor.has_attended
+    - datalake_ebdb_clean.visitor.has_attended
+    description: ''
   has_landlord_attended:
     lineage:
-      - datalake_ebdb_clean.visitor.has_attended
+    - datalake_ebdb_clean.visitor.has_attended
+    description: ''
   has_owner_arrived:
     lineage:
-      - datalake_ebdb_clean.entrance.problem
+    - datalake_ebdb_clean.entrance.problem
+    description: ''
   is_first_booking_auto:
     lineage:
-      - datalake_ebdb_clean.booking_status_change.id_user
+    - datalake_ebdb_clean.booking_status_change.id_user
+    description: ''
   ts_booking_utc:
     lineage:
-      - datalake_ebdb_clean.booking.dt_booking
-      - datalake_ebdb_clean.booking.slot_day
+    - datalake_ebdb_clean.booking.dt_booking
+    - datalake_ebdb_clean.booking.slot_day
+    description: ''
   ts_first_canceled_local_tz:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: ''
   ts_first_canceled_unevaluated_local_tz:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    - datalake_ebdb_clean.user_revision_entity.ts_revision
   responsible:
     lineage:
-      - datalake_ebdb_clean.booking_status_change.reason_enum
+    - datalake_ebdb_clean.booking_status_change.reason_enum
+    description: Shows who cancelled the visit
+    categories:
+      Other: ''
+      Owner: Cancelled by owner
+      QuintoAndar: Cancelled by QuintoAndar, includes agents, consequence management,
+        reservation, suspension, and unlisting
+      Reschedule: Rescheduled by agent or tenant
+      Tenant: Cancelled by tenant
+      Unknown: ''
   days_visit_booked_to_visit_cancelled:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
-      - datalake_ebdb_clean.booking.ts_created
+    - datalake_ebdb_clean.user_revision_entity.ts_revision
+    - datalake_ebdb_clean.booking.ts_created
+    description: ''
   days_visit_cancelled_to_visit:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
-      - datalake_ebdb_clean.booking.dt_booking
-      - datalake_ebdb_clean.booking.slot_day
+    - datalake_ebdb_clean.user_revision_entity.ts_revision
+    - datalake_ebdb_clean.booking.dt_booking
+    - datalake_ebdb_clean.booking.slot_day
+    description: ''
   days_visit_booked_to_visit:
     lineage:
-      - datalake_ebdb_clean.booking.dt_booking
-      - datalake_ebdb_clean.booking.slot_day
-      - datalake_ebdb_clean.booking.ts_created
+    - datalake_ebdb_clean.booking.dt_booking
+    - datalake_ebdb_clean.booking.slot_day
+    - datalake_ebdb_clean.booking.ts_created
+    description: ''
   days_visit_booked_to_visit_completed:
     lineage:
-      - datalake_ebdb_clean.booking.dt_booking
-      - datalake_ebdb_clean.booking.slot_day
-      - datalake_ebdb_clean.booking.ts_created
+    - datalake_ebdb_clean.booking.dt_booking
+    - datalake_ebdb_clean.booking.slot_day
+    - datalake_ebdb_clean.booking.ts_created
+    description: ''
+  user_sale_booking_creator:
+    description: ''
+  hub_agent_region:
+    description: ''
+  is_hub_flow:
+    description: ''
+  is_3p_demand:
+    description: ''
+  is_3p_supply:
+    description: ''
+  is_visit_completed:
+    description: ''
+  is_house_rented:
+    description: ''

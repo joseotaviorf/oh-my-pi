@@ -1,244 +1,320 @@
----
 database_name: dw_sale
 table_name: fact_closing_flows
+description: Each row of this table is a CCV, with a distinct sk_offer and key milestones
+  in the funnel.
+domain: For Sale
+owner: ae-for-sale@quintoandar.com.br
 columns:
   sk_offer:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_offer
+    - datalake_sale_closing_flows.closing_flow.id_offer
+    description: Key of Offer
   sk_buyer:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_buyer
+    - datalake_sale_closing_flows.closing_flow.id_buyer
+    description: Key of buyer
   sk_owner:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_owner
+    - datalake_sale_closing_flows.closing_flow.id_owner
+    description: Key of Owner
   sk_house:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_house
+    - datalake_sale_closing_flows.closing_flow.id_house
+    description: Key of House
   sk_company_supply:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+    - datalake_rede_company.company_sks.sk_company
   sk_company_demand:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+    - datalake_rede_company.company_sks.sk_company
   sk_sale_agreement_created_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_sale_agreement_created
+    - datalake_sale_closing_flows.closing_flow.dt_sale_agreement_created
+    description: Date key to be joined with dim_date. Sale Agreement Created Date
   sk_sale_agreement_signed_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_sale_agreement_signed
+    - datalake_sale_closing_flows.closing_flow.dt_sale_agreement_signed
+    description: Date key to be joined with dim_date. Sale Agreement Signed Date
   sk_onboarding_ended_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_onboarding_ended
+    - datalake_sale_closing_flows.closing_flow.dt_onboarding_ended
+    description: Date key to be joined with dim_date. Onboarding Ended Date
   sk_sale_agreement_cancelled_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_sale_agreement_cancelled
+    - datalake_sale_closing_flows.closing_flow.dt_sale_agreement_cancelled
+    description: Date key to be joined with dim_date. Sale Agreement Canceled Date
   sk_sale_agreement_rescued_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flows.dt_sale_agreement_rescued
+    - datalake_sale_closing_flows.closing_flows.dt_sale_agreement_rescued
   sk_legal_analysis_ended_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_legal_analysis_ended
+    - datalake_sale_closing_flows.closing_flow.dt_legal_analysis_ended
+    description: Date key to be joined with dim_date. Legal Analysis Ended Date (a.k.a.
+      Return from Buyer & Seller)
   sk_legaut_analysis_started_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_legaut_analysis_started
+    - datalake_sale_closing_flows.closing_flow.dt_legaut_analysis_started
+    description: Date key to be joined with dim_date. Legal Analysis Started Date
   sk_legaut_analysis_ended_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_legaut_analysis_ended
+    - datalake_sale_closing_flows.closing_flow.dt_legaut_analysis_ended
+    description: Date key to be joined with dim_date. Legaut Analysis Ended Date
   sk_legal_risk_started_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_legal_risk_started
+    - datalake_sale_closing_flows.closing_flow.dt_legal_risk_started
+    description: Date key to be joined with dim_date. Legal Risk Started Date
   sk_legal_risk_ended_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_legal_risk_ended
+    - datalake_sale_closing_flows.closing_flow.dt_legal_risk_ended
+    description: Date key to be joined with dim_date. Legal Risk Ended Date
   sk_bank_legal_analysis_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_bank_legal_analysis_started
+    - datalake_sale_closing_flows.closing_flow.dt_bank_legal_analysis_started
+    description: Date key to be joined with dim_date. Bank Legal Analysis Started
   sk_credit_analysis_started_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_credit_analysis_started
+    - datalake_sale_closing_flows.closing_flow.dt_credit_analysis_started
+    description: Date key to be joined with dim_date. Credit Analysis Started Date
   sk_credit_analysis_ended_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_credit_analysis_ended
+    - datalake_sale_closing_flows.closing_flow.dt_credit_analysis_ended
+    description: Date key to be joined with dim_date. Credit Analysis Ended Date
   sk_financing_started_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_financing_started
+    - datalake_sale_closing_flows.closing_flow.dt_financing_started
+    description: Date key to be joined with dim_date. Financing Started Date
   sk_financing_ended_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_financing_ended
+    - datalake_sale_closing_flows.closing_flow.dt_financing_ended
+    description: Date key to be joined with dim_date. Financing Ended Date
   sk_notes_registry_started_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_notes_registry_started
+    - datalake_sale_closing_flows.closing_flow.dt_notes_registry_started
+    description: Date key to be joined with dim_date. Notes Registry Started Date
   sk_notes_registry_ended_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_notes_registry_ended
+    - datalake_sale_closing_flows.closing_flow.dt_notes_registry_ended
+    description: Date key to be joined with dim_date. Notes Registry Ended Date
   sk_house_registry_started_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_house_registry_started
+    - datalake_sale_closing_flows.closing_flow.dt_house_registry_started
+    description: Date key to be joined with dim_date. House Registry Started Date
   sk_house_registry_ended_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_house_registry_ended
+    - datalake_sale_closing_flows.closing_flow.dt_house_registry_ended
+    description: Date key to be joined with dim_date. House Registry Ended Date
   sk_sale_key_delivered_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_sale_key_delivered
+    - datalake_sale_closing_flows.closing_flow.dt_sale_key_delivered
+    description: Date key to be joined with dim_date. Sale Key Delivered Date
   sk_sale_transaction_paid_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_sale_transacton_paid
+    - datalake_sale_closing_flows.closing_flow.dt_sale_transacton_paid
+    description: Date key to be joined with dim_date. Sale Transaction Paid Date
   sk_payment_allowed_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_payment_allowed
+    - datalake_sale_closing_flows.closing_flow.dt_payment_allowed
   sk_down_payment_date:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_down_payment
+    - datalake_sale_closing_flows.closing_flow.dt_down_payment
+    description: Date key to be joined with dim_date. Sale Down Payment Paid (a.k.a.
+      Pagamento do Sinal)
   sk_diligence_buyer_sent_at:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_diligence_buyer_sent_at
+    - datalake_sale_closing_flows.closing_flow.dt_diligence_buyer_sent_at
   sk_diligence_seller_sent_at:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.dt_diligence_seller_sent_at
+    - datalake_sale_closing_flows.closing_flow.dt_diligence_seller_sent_at
   id_closing_specialist:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_closing_specialist
+    - datalake_sale_closing_flows.closing_flow.id_closing_specialist
+    description: ID Closing Specialist
   id_legal_risk_analyst:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_legal_risk_analyst
+    - datalake_sale_closing_flows.closing_flow.id_legal_risk_analyst
+    description: ID Legal Risk Analyst
   id_pre_specialist:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_pre_specialist
+    - datalake_sale_closing_flows.closing_flow.id_pre_specialist
+    description: ID Pre Specialist
   id_post_specialist:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_post_specialist
+    - datalake_sale_closing_flows.closing_flow.id_post_specialist
+    description: ID Post Specialist
   id_start_financing_specialist:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_start_financing_specialist
+    - datalake_sale_closing_flows.closing_flow.id_start_financing_specialist
+    description: ID Start Financing Specialist
   id_follow_up_financing_specialist:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_follow_up_financing_specialist
+    - datalake_sale_closing_flows.closing_flow.id_follow_up_financing_specialist
+    description: ID Financing Follow Up Specialist
   id_end_financing_specialist:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_end_financing_specialist
+    - datalake_sale_closing_flows.closing_flow.id_end_financing_specialist
+    description: ID Financing End Specialist
   id_credit_specialist:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_credit_specialist
+    - datalake_sale_closing_flows.closing_flow.id_credit_specialist
+    description: ID Credit Specialist
   id_notes_registry_specialist:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_notes_registry_specialist
+    - datalake_sale_closing_flows.closing_flow.id_notes_registry_specialist
+    description: ID Notes Registry Specialist
   id_real_estate_register_specialist:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.id_real_estate_register_specialist
+    - datalake_sale_closing_flows.closing_flow.id_real_estate_register_specialist
+    description: ID Real Estate Register Specialist
   days_sale_agreement_created_to_legaut_analysis_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_created_to_legaut_analysis_started
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_created_to_legaut_analysis_started
+    description: Days between Sale Agreement Created and Legaut Analysis Started
   days_sale_agreement_signed_to_house_registry_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_house_registry_ended
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_house_registry_ended
+    description: Days between Sale Agreement Signed and House Registry Ended
   days_sale_agreement_signed_to_house_registry_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_house_registry_started
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_house_registry_started
+    description: Days between Sale Agreement Signed and House Registry Started
   days_sale_agreement_signed_to_sale_agreement_cancelled:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_sale_agreement_cancelled
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_sale_agreement_cancelled
+    description: Days between Sale Agreement Signed and Sale Agreement Canceled
   days_sale_agreement_signed_to_onboarding_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_onboarding_ended
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_onboarding_ended
+    description: Days between Sale Agreement Signed and Onboarding Ended
   days_sale_agreement_signed_to_credit_analysis_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_credit_analysis_started
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_credit_analysis_started
+    description: Days between Sale Agreement Signed and Credit Analysis Started
   days_sale_agreement_signed_to_credit_analysis_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_credit_analysis_ended
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_credit_analysis_ended
+    description: Days between Sale Agreement Signed and Credit Analysis Ended
   days_sale_agreement_signed_to_legaut_analysis_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legaut_analysis_started
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legaut_analysis_started
+    description: Days between Sale Agreement Signed and Legaut Analysis Started
   days_sale_agreement_signed_to_legaut_analysis_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legaut_analysis_ended
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legaut_analysis_ended
+    description: Days between Sale Agreement Signed and Legaut Analysis Ended
   days_sale_agreement_signed_to_legal_risk_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legal_risk_ended
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legal_risk_ended
+    description: Days between Sale Agreement Signed and Legal Risk Ended
   days_sale_agreement_signed_to_bank_legal_analysis_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_bank_legal_analysis_started
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_bank_legal_analysis_started
+    description: Days between Sale Agreement Signed and Bank Legal Analysis Started
   days_sale_agreement_signed_to_legal_analysis_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legal_analysis_ended
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legal_analysis_ended
+    description: Days between Sale Agreement Signed and Legal Analysis Ended
   days_sale_agreement_signed_to_financing_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_financing_started
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_financing_started
+    description: Days between Sale Agreement Signed and Financing Started
   days_sale_agreement_signed_to_financing_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_financing_ended
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_financing_ended
+    description: Days between Sale Agreement Signed and Financing Ended
   days_legal_risk_ended_to_legal_analysis_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_legal_risk_ended_to_legal_analysis_ended
+    - datalake_sale_closing_flows.closing_flow.days_legal_risk_ended_to_legal_analysis_ended
+    description: Days between Legal Risk Ended and Legal Analysis Ended
   days_sale_agreement_signed_to_notes_registry_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_notes_registry_started
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_notes_registry_started
+    description: Days between Sale Agreement Signed and Notes Registry Started
   days_sale_agreement_signed_to_notes_registry_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_notes_registry_ended
+    - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_notes_registry_ended
+    description: Days between Sale Agreement Signed and Notes Registry Ended
   days_legaut_analysis_started_to_legaut_analysis_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_legaut_analysis_started_to_legaut_analysis_ended
+    - datalake_sale_closing_flows.closing_flow.days_legaut_analysis_started_to_legaut_analysis_ended
+    description: Days between Legaut Analysis Started and Legaut Analysis Ended
   days_legaut_analysis_ended_to_legal_risk_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_legaut_analysis_ended_to_legal_risk_ended
+    - datalake_sale_closing_flows.closing_flow.days_legaut_analysis_ended_to_legal_risk_ended
+    description: Days between Legaut Analysis Ended and Legal Risk Ended
   days_legal_analysis_ended_notes_registry_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_legal_analysis_ended_notes_registry_ended
+    - datalake_sale_closing_flows.closing_flow.days_legal_analysis_ended_notes_registry_ended
+    description: Days between Legal Analysis Ended and Notes Registry Ended
   days_legal_analysis_ended_to_bank_legal_analysis_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_legal_analysis_ended_to_bank_legal_analysis_started
+    - datalake_sale_closing_flows.closing_flow.days_legal_analysis_ended_to_bank_legal_analysis_started
   days_bank_legal_analysis_started_to_financing_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_bank_legal_analysis_started_to_financing_ended
+    - datalake_sale_closing_flows.closing_flow.days_bank_legal_analysis_started_to_financing_ended
+    description: Days between Bank Legal Analysis Started and Financing Ended
   days_bank_legal_analysis_started_to_house_registry_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_bank_legal_analysis_started_to_house_registry_started
+    - datalake_sale_closing_flows.closing_flow.days_bank_legal_analysis_started_to_house_registry_started
+    description: Days between Bank Legal Analysis Started and House Registry Started
   days_legal_risk_started_to_legal_risk_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_legal_risk_started_to_legal_risk_ended
+    - datalake_sale_closing_flows.closing_flow.days_legal_risk_started_to_legal_risk_ended
+    description: Days between Legal Risk Started and Legal Risk Ended
   days_credit_analysis_started_to_credit_analysis_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_credit_analysis_started_to_credit_analysis_ended
+    - datalake_sale_closing_flows.closing_flow.days_credit_analysis_started_to_credit_analysis_ended
+    description: Days between Credit Analysis Started and Credit Analysis Ended
   days_credit_analysis_ended_to_bank_legal_analysis_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_credit_analysis_ended_to_bank_legal_analysis_started
+    - datalake_sale_closing_flows.closing_flow.days_credit_analysis_ended_to_bank_legal_analysis_started
+    description: Days between Credit Analysis Ended and Bank Legal Analysis Started
   days_credit_analysis_ended_to_financing_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_credit_analysis_ended_to_financing_started
+    - datalake_sale_closing_flows.closing_flow.days_credit_analysis_ended_to_financing_started
+    description: Days between Credit Analysis Ended and Financing Started
   days_financing_started_to_bank_legal_analysis_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_financing_started_to_bank_legal_analysis_started
+    - datalake_sale_closing_flows.closing_flow.days_financing_started_to_bank_legal_analysis_started
+    description: Days between Financing Started and Bank Legal Analysis Started
   days_financing_started_to_financing_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_financing_started_to_financing_ended
+    - datalake_sale_closing_flows.closing_flow.days_financing_started_to_financing_ended
+    description: Days between Financing Started and Financing Ended
   days_financing_ended_to_house_registry_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_financing_ended_to_house_registry_started
+    - datalake_sale_closing_flows.closing_flow.days_financing_ended_to_house_registry_started
+    description: Days between Financing Ended and House Registry Started
   days_notes_registry_started_to_notes_registry_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_notes_registry_started_to_notes_registry_ended
+    - datalake_sale_closing_flows.closing_flow.days_notes_registry_started_to_notes_registry_ended
+    description: Days between Notes Registry Started and Notes Registry Ended
   days_house_registry_started_to_house_registry_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_house_registry_started_to_house_registry_ended
+    - datalake_sale_closing_flows.closing_flow.days_house_registry_started_to_house_registry_ended
+    description: Days between House Registry Started and House Registry Ended
   days_notes_registry_ended_to_house_registry_started:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_notes_registry_ended_to_house_registry_started
+    - datalake_sale_closing_flows.closing_flow.days_notes_registry_ended_to_house_registry_started
+    description: Days between Notes Registry Ended and House Registry Started
   days_notes_registry_ended_to_house_registry_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_notes_registry_ended_to_house_registry_ended
+    - datalake_sale_closing_flows.closing_flow.days_notes_registry_ended_to_house_registry_ended
+    description: Days between Notes Registry Ended and House Registry Ended
   days_financing_ended_to_house_registry_ended:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_financing_ended_to_house_registry_ended
+    - datalake_sale_closing_flows.closing_flow.days_financing_ended_to_house_registry_ended
+    description: Days between Financing Ended and House Registry Ended
   days_house_registry_ended_to_sale_key_delivered:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_house_registry_ended_to_sale_key_delivered
+    - datalake_sale_closing_flows.closing_flow.days_house_registry_ended_to_sale_key_delivered
+    description: Days between House Registry Ended and Sale Key Delivered
   days_house_registry_ended_to_sale_transaction_paid:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.days_house_registry_ended_to_sale_transaction_paid
+    - datalake_sale_closing_flows.closing_flow.days_house_registry_ended_to_sale_transaction_paid
+    description: Days between House Registry Ended and Sale Transaction Paid
   ts_updated:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.ts_updated
+    - datalake_sale_closing_flows.closing_flow.ts_updated
   ts_monday_load:
     lineage:
-      - datalake_sale_closing_flows.closing_flow.ts_load
+    - datalake_sale_closing_flows.closing_flow.ts_load

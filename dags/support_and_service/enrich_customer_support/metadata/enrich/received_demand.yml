@@ -1,64 +1,92 @@
----
 database_name: datalake_customer_support
 table_name: received_demand
+description: Enrich table that contains data from Twilio Flex table. It has data from
+  Call, Chat and Email channels. Each row is a received demand.
+domain: Support and Service
+owner: kleber.inoue@quintoandar.com.br
 columns:
   id_external_service:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_task
-      - datalake_quinto_messenger_clean.task_event.id_task_external
-      - datalake_customer_support.email.id_ticket
+    - datalake_bigfone_twilio.call_flex_events.id_task
+    - datalake_quinto_messenger_clean.task_event.id_task_external
+    - datalake_customer_support.email.id_ticket
+    description: Segment ID of Twilio Flex platform. Each ID is a demand, it's not
+      unique because a demand can have multiples demands when there is a transfer
   id_channel:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.metadata
-      - datalake_quinto_messenger_clean.task_event.event_payload
+    - datalake_bigfone_twilio.call_flex_events.metadata
+    - datalake_quinto_messenger_clean.task_event.event_payload
+    description: ID channel of the contact
   id_task_queue:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_task_queue
-      - datalake_quinto_messenger_clean.task_event.event_payload
+    - datalake_bigfone_twilio.call_flex_events.id_task_queue
+    - datalake_quinto_messenger_clean.task_event.event_payload
+    description: ID of the task_queue_name
   id_reservation:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_reservation
-      - datalake_quinto_messenger_clean.task_event.event_payload
+    - datalake_bigfone_twilio.call_flex_events.id_reservation
+    - datalake_quinto_messenger_clean.task_event.event_payload
+    description: ID of the reservation, a new reservation created when the demand
+      is transfered. So one demand can have multiples reservations
   id_agent:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_agent
-      - datalake_quinto_messenger_clean.task_event.event_payload
+    - datalake_bigfone_twilio.call_flex_events.id_agent
+    - datalake_quinto_messenger_clean.task_event.event_payload
+    description: ID of the agent that answered the customer
   id_event:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_event
-      - datalake_quinto_messenger_clean.task_event.event_payload
+    - datalake_bigfone_twilio.call_flex_events.id_event
+    - datalake_quinto_messenger_clean.task_event.event_payload
+    description: Event ID of the demand
   id_call:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_call 
+    - datalake_bigfone_twilio.call_flex_events.id_call
+    description: ID of the call that generated a demand
   id_user:
     lineage:
-      - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
-      - datalake_customer_support.email.id_user
+    - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
+    - datalake_customer_support.email.id_user
   task_queue_name:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.task_queue_name
-      - datalake_quinto_messenger_clean.task_event.event_payload
-      - datalake_customer_support.email.department
+    - datalake_bigfone_twilio.call_flex_events.task_queue_name
+    - datalake_quinto_messenger_clean.task_event.event_payload
+    - datalake_customer_support.email.department
+    description: Department name of the demand
   agent_email:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_task_external
-      - datalake_quinto_messenger_clean.task_event.event_payload
-      - datalake_customer_support.email.agent_email
+    - datalake_bigfone_twilio.call_flex_events.id_task_external
+    - datalake_quinto_messenger_clean.task_event.event_payload
+    - datalake_customer_support.email.agent_email
+    description: Email of the agent that answered the customer
   agent_location:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.agent_email
-      - datalake_quinto_messenger_clean.task_event.event_payload
-      - datalake_customer_support.email.agent_company
+    - datalake_bigfone_twilio.call_flex_events.agent_email
+    - datalake_quinto_messenger_clean.task_event.event_payload
+    - datalake_customer_support.email.agent_company
+    description: Company that the agent works at
   customer_phone:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.customer_phone
-      - datalake_quinto_messenger_clean.task_event.event_payload
+    - datalake_bigfone_twilio.call_flex_events.customer_phone
+    - datalake_quinto_messenger_clean.task_event.event_payload
+    description: Phone number of the customer
   ts_created:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
-      - datalake_quinto_messenger_clean.task_event.ts_created
-      - datalake_customer_support.email.ts_ticket_started
+    - datalake_bigfone_twilio.call_flex_events.ts_created_local
+    - datalake_quinto_messenger_clean.task_event.ts_created
+    - datalake_customer_support.email.ts_ticket_started
+    description: Timestamp of the ticket's creation in UTC-3
   ts_updated:
     lineage:
-      - datalake_quinto_messenger_clean.task_event.ts_updated
-  
+    - datalake_quinto_messenger_clean.task_event.ts_updated
+    description: Timestamp of the ticket's update
+  channel_name:
+    description: Channel name which customer got in touch with 5A
+    categories:
+      call: channel_name receives this value when the customer get in touch with call
+        method
+      chat: channel_name receives this value when the customer get in touch with chat
+        method
+      email: channel_name receives this value when the customer get in touch with
+        email method
+  is_answered:
+    description: If the demand was answered

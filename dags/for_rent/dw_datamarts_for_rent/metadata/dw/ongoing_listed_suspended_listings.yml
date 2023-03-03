@@ -1,16 +1,31 @@
----
 database_name: dw_datamarts_for_rent
 table_name: ongoing_listed_suspended_listings
+description: Weekly snapshots of published and suspended listings and column with
+  weeks from listing publication
+domain: For Rent
+owner: carolina.cavalcante@quintoandar.com.br
 columns:
   week_start:
     lineage:
-      - dw_public.dim_date.week_start
+    - dw_public.dim_date.week_start
+    description: The start date of the week that this period refers to
   status_history:
     lineage:
-      - dw_public.fact_house_listing_status.status_history
+    - dw_public.fact_house_listing_status.status_history
+    description: If the listing was published or suspended during this row's week
+    categories:
+      publicado: ''
+      suspenso: ''
   status_change_reason:
     lineage:
-      - dw_public.fact_house_listing_status.status_change_reason
+    - dw_public.fact_house_listing_status.status_change_reason
+    description: If the listing was suspended, this shows the reason why it was suspended
   sk_house_listing:
     lineage:
-      - dw_public.fact_house_listing_status.sk_house_listing
+    - dw_public.fact_house_listing_status.sk_house_listing
+    description: The house listing unique id
+  ts_load:
+    description: ''
+  weeks_since_publication:
+    description: How many weeks have passed since the listing was published and this
+      row's week

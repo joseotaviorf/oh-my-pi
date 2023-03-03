@@ -1,11 +1,21 @@
----
 database_name: metric_rent
 table_name: new_rentals_daily_by_sk_region
+description: Table to count new rentals, which are contracts actived or finalized,
+  on daily basis. The date reference here is related to contract start or entrance.
+  In addition, we have the region dimension embedded here on the column sk_region
+  to segment this metric.
+domain: For Rent
+owner: ''
 columns:
   rental_date:
     lineage:
-      - dw_public.dim_contract.dt_start
-      - dw_public.dim_contract.dt_entrance
+    - dw_public.dim_contract.dt_start
+    - dw_public.dim_contract.dt_entrance
   sk_region:
     lineage:
-      - dw_public.fact_house_listings.sk_region
+    - dw_public.fact_house_listings.sk_region
+    description: Region identifier
+  day:
+    description: day when the contract started or the entrance happened
+  new_rentals:
+    description: Amount of new rentals on a day

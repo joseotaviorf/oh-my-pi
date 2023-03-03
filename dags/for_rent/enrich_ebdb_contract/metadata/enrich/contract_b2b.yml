@@ -1,22 +1,60 @@
----
 database_name: datalake_ebdb_contract
 table_name: contract_b2b
+description: Information related to ForRent contracts B2B. Each line is an unique
+  contract
+domain: For Rent
+owner: E ForRent@quintoandar.com.br
 columns:
   id_contract:
     lineage:
-      - datalake_ebdb_clean.contract.id
+    - datalake_ebdb_clean.contract.id
+    description: Id of the contract, which must be unique.
   country_code:
     lineage:
-      - datalake_ebdb_country.house.country_code
+    - datalake_ebdb_country.house.country_code
+    description: Country code of the contract.
   contract_plan:
     lineage:
-      - datalake_ebdb_clean.contract_partnership_data.contract_plan
+    - datalake_ebdb_clean.contract_partnership_data.contract_plan
+    description: ''
+    categories:
+      REFERRAL: ''
+      REGULAR: ''
+      PRIME: ''
   contract_partner_type:
     lineage:
-      - datalake_ebdb_clean.contract_partnership_data.partner_type
+    - datalake_ebdb_clean.contract_partnership_data.partner_type
+    description: ''
+    categories:
+      AUTONOMOUS_AGENT: ''
+      EXECUTIVE_FOR_RENT: ''
+      PRIME: ''
   administration_split_percentage:
     lineage:
-      - datalake_ebdb_clean.contract_partnership_data.administration_split_percentage
+    - datalake_ebdb_clean.contract_partnership_data.administration_split_percentage
+    description: The administrative percentage of the contract.
   brokerage_split_percentage:
     lineage:
-      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+    - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+    description: The brokerage percentage of the contract.
+  b2b_type:
+    description: ''
+    categories:
+      online: ''
+      prime: ''
+  b2b_prime_type:
+    description: ''
+    categories:
+      advanced_negotiation: ''
+      batch: ''
+      standard: ''
+  partner_quantity:
+    description: Quantity of partners responsible for this contract. It can be one
+      or zero operational partner and zero or many executive partners.
+  is_executive_partner:
+    description: Boolean that indicates if this contract had an executive partner
+      from Select Program.
+  is_b2b:
+    description: Boolean that indicates if the affiliate responsible is B2B.
+  is_contract_b2b:
+    description: Boolean that indicates if is a PRIME partner.

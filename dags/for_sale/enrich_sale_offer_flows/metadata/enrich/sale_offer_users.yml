@@ -1,96 +1,136 @@
----
 database_name: datalake_sale_offer_flows
 table_name: sale_offer_users
+description: Enriched table for sales flow users. This table contains info for each
+  users involved in the offer flow after it gets accepted and before the sale agreement
+  flow get started.
+domain: For Sale
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id_user:
     lineage:
-      - datalake_sales_flow_clean.sales_flow_users.id_user
+    - datalake_sales_flow_clean.sales_flow_users.id_user
+    description: User ID on SalesFlow platform
   id_external:
     lineage:
-      - datalake_sales_flow_clean.users.id_external
+    - datalake_sales_flow_clean.users.id_external
+    description: User ID on QuintoAndar's main database (EBDB). Compatible with dw_public.dim_user
   id_firestore:
     lineage:
-      - datalake_sales_flow_clean.offer.id_firestore
+    - datalake_sales_flow_clean.offer.id_firestore
   id_house:
     lineage:
-      - datalake_sales_flow_clean.house.id_external
+    - datalake_sales_flow_clean.house.id_external
+    description: Property ID on QuintoAndar's databases
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_clean.sales_flow_users.id_sales_flow
+    - datalake_sales_flow_clean.sales_flow_users.id_sales_flow
+    description: Offer ID on SalesFlow (Vendas) databases
   id_inviter:
     lineage:
-      - datalake_sales_flow_clean.users.id_external
+    - datalake_sales_flow_clean.users.id_external
+    description: Inviter User ID on QuintoAndar's main databases. Only exists if it's
+      an invited user.
   id_invitee:
     lineage:
-      - datalake_sales_flow_clean.sales_flow_invite_aud.id_invitee
+    - datalake_sales_flow_clean.sales_flow_invite_aud.id_invitee
+    description: User ID on Sales Flow databases. This user id_external can be found
+      on table sales_flow_clean.users
   id_house_docx_folder:
     lineage:
-      - datalake_docx_clean.folder_reference.id_target_folder
+    - datalake_docx_clean.folder_reference.id_target_folder
+    description: Property ID on Docx folder databases.
   id_user_docx_folder:
     lineage:
-      - datalake_sales_flow_clean.buyer_data.id_docx_folder
-      - datalake_sales_flow_clean.seller_data.id_docx_folder
-      - datalake_docx_clean.folder_reference.id_source_folder
+    - datalake_sales_flow_clean.buyer_data.id_docx_folder
+    - datalake_sales_flow_clean.seller_data.id_docx_folder
+    - datalake_docx_clean.folder_reference.id_source_folder
+    description: User ID on Docx folder database.
   type:
     lineage:
-      - datalake_sales_flow_clean.sales_flow_users.type
+    - datalake_sales_flow_clean.sales_flow_users.type
+    description: User type, it can be BUYER or SELLER.
   invite_status:
     lineage:
-      - datalake_sales_flow_clean.sales_flow_invite_aud.status
+    - datalake_sales_flow_clean.sales_flow_invite_aud.status
+    description: In case of an invited user this column indicates it's invite status.
   name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: User's name on SalesFlow database.
   email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: User's e-mail on SalesFlow database.
   phone:
     lineage:
-      - datalake_sales_flow_clean.users.phone
+    - datalake_sales_flow_clean.users.phone
+    description: User's phone number on SalesFlow database.
   cpf:
     lineage:
-      - datalake_sales_flow_clean.users.cpf
+    - datalake_sales_flow_clean.users.cpf
+    description: User's document number on SalesFlow database.
   buyer_signer_status:
     lineage:
-      - datalake_sales_flow_clean.buyer_data.signer_status
+    - datalake_sales_flow_clean.buyer_data.signer_status
+    description: For buyers this column indicates if this user is a ccv signer or
+      not.
   buyer_holding_value:
     lineage:
-      - datalake_sales_flow_clean.buyer_data.holding_value
+    - datalake_sales_flow_clean.buyer_data.holding_value
+    description: Indicates how much this buyer is participating on the offer value.
   seller_holding_value:
     lineage:
-      - datalake_sales_flow_clean.seller_data.holding_value
+    - datalake_sales_flow_clean.seller_data.holding_value
+    description: Indicates how much this seller will receive from 5A payment.
   seller_share_percentage:
     lineage:
-      - datalake_sales_flow_clean.seller_data.share_percentage
+    - datalake_sales_flow_clean.seller_data.share_percentage
+    description: Ownership percentage of this seller over this property.
   is_original_user:
     lineage:
-      - datalake_sales_flow_clean.sales_flow_users.is_original_user
+    - datalake_sales_flow_clean.sales_flow_users.is_original_user
+    description: Indicates if this user is the one that made the offer in case of
+      buyer and for seller indicates if it's the one that accepted. It can only exists
+      1 for each user type for each offer
   is_ccv_buyer:
     lineage:
-      - datalake_docx_clean.folder_reference.reference_properties
+    - datalake_docx_clean.folder_reference.reference_properties
+    description: Flag from docx databases that indicates if this user will be on the
+      sale agreement document.
   is_seller_ccv_signer:
     lineage:
-      - datalake_sales_flow_clean.seller_data.is_ccv_signer
+    - datalake_sales_flow_clean.seller_data.is_ccv_signer
+    description: Indicates if this seller is a sale agreement signer.
   is_income_partner:
     lineage:
-      - datalake_docx_clean.folder_reference.reference_properties
+    - datalake_docx_clean.folder_reference.reference_properties
+    description: Indicates if this user is participating on this offer as an income
+      partner.
   is_pj:
     lineage:
-      - datalake_sales_flow_clean.seller_data.is_pj
+    - datalake_sales_flow_clean.seller_data.is_pj
+    description: Indicates if this user is a physical or legal person.
   is_active:
     lineage:
-      - datalake_sales_flow_clean.seller_data.is_active
+    - datalake_sales_flow_clean.seller_data.is_active
+    description: Indicates if this user has an active invite.
   is_seller_on_register:
     lineage:
-      - datalake_sales_flow_clean.seller_data.is_on_register
+    - datalake_sales_flow_clean.seller_data.is_on_register
+    description: Indicates if this user is on the property register (Matrícula)
   is_ccv_flow:
     lineage:
-      - datalake_docx_clean.folder_reference.reference_properties
+    - datalake_docx_clean.folder_reference.reference_properties
+    description: Tells if this user is on an ongoing ccv process.
   has_joint_buyer:
     lineage:
-      - datalake_docx_clean.folder_reference.reference_properties
+    - datalake_docx_clean.folder_reference.reference_properties
+    description: Indicates if this user has another user as buyer for this offer.
   ts_user_invited:
     lineage:
-      - datalake_sales_flow_clean.sales_flow_invite_aud.ts_created
+    - datalake_sales_flow_clean.sales_flow_invite_aud.ts_created
+    description: Timestamp column indicating when the user was invited.
   ts_user_invite_accepted:
     lineage:
-      - datalake_sales_flow_clean.sales_flow_invite_aud.ts_updated
+    - datalake_sales_flow_clean.sales_flow_invite_aud.ts_updated
+    description: Timestamp indicating the moment that this user accepted the invite.

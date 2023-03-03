@@ -1,57 +1,99 @@
 database_name: dw_public
 table_name: dim_partner
+description: A company partnering with QuintoAndar in our B2B model. Each line is
+  a partner company.
+domain: For Rent
+owner: AE ForRent@quintoandar.com.br
 columns:
   sk_partner:
     lineage:
-      - datalake_ebdb_clean.partner.id
+    - datalake_ebdb_clean.partner.id
+    description: key to identify partner
   id_partner:
     lineage:
-      - datalake_ebdb_clean.partner.id
+    - datalake_ebdb_clean.partner.id
+    description: key to identify partner (the same from EBDB)
   id_amplitude_device:
     lineage:
-      - datalake_ebdb_clean.partner.id_amplitude_device
+    - datalake_ebdb_clean.partner.id_amplitude_device
+    description: ''
   country_code:
     lineage:
-      - datalake_ebdb_country.user.country_code
+    - datalake_ebdb_country.user.country_code
+    description: Country code of the partner
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
   name:
     lineage:
-      - datalake_ebdb_clean.partner.name
+    - datalake_ebdb_clean.partner.name
+    description: name of partner
   trade_name:
     lineage:
-      - datalake_ebdb_clean.partner.trade_name
+    - datalake_ebdb_clean.partner.trade_name
+    description: trade name (fictitious name) of partner company
   phone:
     lineage:
-      - datalake_ebdb_clean.partner.phone
+    - datalake_ebdb_clean.partner.phone
+    description: phone to contact partner
   email:
     lineage:
-      - datalake_ebdb_clean.partner.email
+    - datalake_ebdb_clean.partner.email
+    description: email to contact partner
   cnpj:
     lineage:
-      - datalake_ebdb_clean.partner.cnpj
+    - datalake_ebdb_clean.partner.cnpj
+    description: CNPJ (Tax Identification Number) of partner
   creci:
     lineage:
-      - datalake_ebdb_clean.partner.creci
+    - datalake_ebdb_clean.partner.creci
+    description: Partner Creci number (Regional Council for Real Estate Brokers)
   type:
     lineage:
-      - datalake_ebdb_clean.partner.type
+    - datalake_ebdb_clean.partner.type
+    description: ''
+    categories:
+      AUTONOMOUS_AGENT: '#N/A'
+      PRIME: '#N/A'
   city:
     lineage:
-      - datalake_ebdb_clean.partner.city
+    - datalake_ebdb_clean.partner.city
   utm_campaign:
     lineage:
-      - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_campaign
+    - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_campaign
+    description: ''
+    categories:
+      ZEBRA.CIQ-conversion: '#N/A'
+      ZEBRA.corretor_de_relacionamento: '#N/A'
+      ZEBRA.corretorderelacionamento-click-temp: '#N/A'
+      ZEBRA.corretorderelacionamento-conversion: '#N/A'
+      envio_lp_actionline: '#N/A'
+      nao_completou_cadastro: '#N/A'
+      p014p.CIQ-conversion: '#N/A'
+      sitelinks_RJ_branded_CR: '#N/A'
   utm_medium:
     lineage:
-      - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_medium
+    - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_medium
+    description: ''
+    categories:
+      cpc: '#N/A'
+      display: '#N/A'
+      email: '#N/A'
   utm_source:
     lineage:
-      - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_source
+    - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_source
+    description: ''
   ts_joined_partnership:
     lineage:
-      - datalake_ebdb_clean.partner.ts_partnership_started
+    - datalake_ebdb_clean.partner.ts_partnership_started
+    description: date when partnership started
   ts_created:
     lineage:
-      - datalake_ebdb_clean.partner.ts_created
+    - datalake_ebdb_clean.partner.ts_created
+    description: date when data was created
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.partner.ts_updated
+    - datalake_ebdb_clean.partner.ts_updated
+    description: date of last update
+  ts_load:
+    description: date when data was loaded

@@ -1,22 +1,33 @@
----
 database_name: dw_rede
 table_name: dim_lead_3p_reason
+description: Dimension containing all possible reasons why a lead is not converted,
+  such as enrichment, ineligibility or discard. Each row is a reason.
+domain: Rede
+owner: gustavo.santos.dxt@quintoandar.com.br
 columns:
   sk_lead_3p_reason:
     lineage:
-      - datalake_rede_supply.lead_3p_reasons.sk_lead_3p_reason
+    - datalake_rede_supply.lead_3p_reasons.sk_lead_3p_reason
+    description: Primary key of the table. Unique for each reason.
   reason:
     lineage:
-      - datalake_rede_supply.lead_3p_reasons.reason
+    - datalake_rede_supply.lead_3p_reasons.reason
+    description: Name of the reason. Standardized in camelCase.
   reason_type:
     lineage:
-      - datalake_rede_supply.lead_3p_reasons.reason_type
+    - datalake_rede_supply.lead_3p_reasons.reason_type
+    description: 'Type of reason: INELIGIBLE_REASON, DISCARD_REASON or ENRICHMENT_REASON.'
   is_ineligible_reason:
     lineage:
-      - datalake_rede_supply.lead_3p_reasons.is_ineligible_reason
+    - datalake_rede_supply.lead_3p_reasons.is_ineligible_reason
+    description: Boolean to tell if the reason is an ineligibility reason.
   is_discard_reason:
     lineage:
-      - datalake_rede_supply.lead_3p_reasons.is_discard_reason
+    - datalake_rede_supply.lead_3p_reasons.is_discard_reason
+    description: Boolean to tell if a reason is a discard reason.
   is_enrichment_reason:
     lineage:
-      - datalake_rede_supply.lead_3p_reasons.is_enrichment_reason
+    - datalake_rede_supply.lead_3p_reasons.is_enrichment_reason
+    description: Boolean to tell if a reason is an enrichment reason.
+  ts_load:
+    description: Time when the table was last processed.

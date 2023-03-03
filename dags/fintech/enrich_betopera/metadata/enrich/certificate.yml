@@ -1,48 +1,67 @@
 database_name: datalake_betopera
 table_name: certificate
+description: ' Information about insurance certificates status.'
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_betopera_clean.certificate.id
+    - datalake_betopera_clean.certificate.id
+    description: ''
   id_insurance:
     lineage:
-      - datalake_betopera_clean.certificate.id_insurance
+    - datalake_betopera_clean.certificate.id_insurance
+    description: ''
   id_certificate_request:
     lineage:
-      - datalake_betopera_clean.certificate.id_certificate_request
+    - datalake_betopera_clean.certificate.id_certificate_request
+    description: ''
   version:
     lineage:
-      - datalake_betopera_clean.certificate.version
+    - datalake_betopera_clean.certificate.version
+    description: ''
   status:
     lineage:
-      - datalake_betopera_clean.certificate.status
+    - datalake_betopera_clean.certificate.status
+    description: the current status for the insurance entity PENDING | CREATED | FAILED
+      | PENDING_CANCELLATION | CANCELED
   response_payload:
     lineage:
-      - datalake_betopera_clean.certificate.response_payload
+    - datalake_betopera_clean.certificate.response_payload
+    description: ''
   file_url:
     lineage:
-      - datalake_betopera_clean.certificate.file_url
+    - datalake_betopera_clean.certificate.file_url
+    description: ''
   dt_start:
     lineage:
-      - datalake_betopera_clean.certificate.dt_start
+    - datalake_betopera_clean.certificate.dt_start
+    description: ''
   dt_end:
     lineage:
-      - datalake_betopera_clean.certificate.dt_end
+    - datalake_betopera_clean.certificate.dt_end
+    description: ''
   dt_cancel:
     lineage:
-      - datalake_betopera_clean.certificate.dt_cancel
+    - datalake_betopera_clean.certificate.dt_cancel
+    description: ''
   ts_created:
     lineage:
-      - datalake_betopera_clean.certificate.ts_created
+    - datalake_betopera_clean.certificate.ts_created
+    description: ''
   ts_updated:
     lineage:
-      - datalake_betopera_clean.certificate.ts_updated
+    - datalake_betopera_clean.certificate.ts_updated
+    description: ''
   year:
     lineage:
-      - datalake_betopera_clean.certificate.year
+    - datalake_betopera_clean.certificate.year
+    description: ''
   month:
     lineage:
-      - datalake_betopera_clean.certificate.month
+    - datalake_betopera_clean.certificate.month
+    description: ''
   day:
     lineage:
-      - datalake_betopera_clean.certificate.day
+    - datalake_betopera_clean.certificate.day
+    description: ''

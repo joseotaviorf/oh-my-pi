@@ -1,8 +1,14 @@
----
 database_name: metric_rent
 table_name: new_rentals_daily
+description: Table to count new rentals, which are contracts actived or finalized,
+  on daily basis. The date reference here is related to contract start or entrance.
+domain: For Rent
+owner: ''
 columns:
   day:
     lineage:
-      - dw_public.dim_contract.dt_start
-      - dw_public.dim_contract.dt_entrance
+    - dw_public.dim_contract.dt_start
+    - dw_public.dim_contract.dt_entrance
+    description: day when the contract started or the entrance happened
+  new_rentals:
+    description: Amount of new rentals on a day

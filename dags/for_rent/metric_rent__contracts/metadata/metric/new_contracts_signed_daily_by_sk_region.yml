@@ -1,11 +1,21 @@
----
 database_name: metric_rent
 table_name: new_contracts_signed_daily_by_sk_region
+description: Table to count new signed contracts, which are contracts actived or finalized,
+  on daily basis. The date reference here is related to contract signature or start.
+  In addition, we have the region dimension embedded here on the column sk_region
+  to segment this metric.
+domain: For Rent
+owner: ''
 columns:
   contract_signed_date:
     lineage:
-      - dw_public.dim_contract.dt_start
-      - dw_public.dim_contract.ts_signature
+    - dw_public.dim_contract.dt_start
+    - dw_public.dim_contract.ts_signature
   sk_region:
     lineage:
-      - dw_public.fact_house_listings.sk_region
+    - dw_public.fact_house_listings.sk_region
+    description: Region identifier
+  day:
+    description: day when the contract started or was signed, segmented by region.
+  new_contracts_signed:
+    description: Amount of new signed contracts on a day by region.

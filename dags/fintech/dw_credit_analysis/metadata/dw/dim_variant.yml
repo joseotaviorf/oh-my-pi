@@ -1,19 +1,29 @@
----
 database_name: dw_credit
 table_name: dim_variant
+description: This table presents the details of each credit engine variant we have
+  along with the experiment details and proper date calculation
+domain: Fintech
+owner: fernando.araujo@quintoandar.com.br
 columns:
   id_variant:
     lineage:
-      - datalake_sorting_hat_clean.variant.id
+    - datalake_sorting_hat_clean.variant.id
+    description: Variant ID
   id_experiment:
     lineage:
-      - datalake_sorting_hat_clean.variant.id_experiment
+    - datalake_sorting_hat_clean.variant.id_experiment
+    description: Experiment ID
   variant_name:
     lineage:
-      - datalake_sorting_hat_clean.variant.name
+    - datalake_sorting_hat_clean.variant.name
+    description: Variant name
   variant_description:
     lineage:
-      - datalake_sorting_hat_clean.variant.description
+    - datalake_sorting_hat_clean.variant.description
+    description: Variant description
   variant_percentage_paticipation_on_test:
     lineage:
-      - datalake_sorting_hat_clean.variant.percentage
+    - datalake_sorting_hat_clean.variant.percentage
+    description: Indicates the percentage participation of a variant during tests
+  ts_load:
+    description: Date/time in which the row was loaded

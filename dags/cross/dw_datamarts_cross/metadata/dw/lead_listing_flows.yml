@@ -1,139 +1,303 @@
----
 database_name: dw_datamarts_cross
 table_name: lead_listing_flows
+description: ''
+domain: Cross
+owner: ''
 columns:
   sk_house_listing_flow:
     lineage:
-      - dw_sale.fact_listing_flows.sk_house_listing_flow
-      - dw_public.fact_house_listing_flows.sk_house_listing_flow
+    - dw_sale.fact_listing_flows.sk_house_listing_flow
+    - dw_public.fact_house_listing_flows.sk_house_listing_flow
+    description: ''
   sk_lead:
     lineage:
-      - dw_sale.fact_listing_flows.sk_lead
-      - dw_public.fact_house_listing_flows.sk_lead
+    - dw_sale.fact_listing_flows.sk_lead
+    - dw_public.fact_house_listing_flows.sk_lead
+    description: ''
   sk_house:
     lineage:
-      - dw_sale.fact_listing_flows.sk_house_listing
-      - dw_public.fact_house_listing_flows.sk_house_listing
+    - dw_sale.fact_listing_flows.sk_house_listing
+    - dw_public.fact_house_listing_flows.sk_house_listing
   sk_house_listing:
     lineage:
-      - dw_sale.fact_listing_flows.sk_house_listing
-      - dw_public.fact_house_listing_flows.sk_house_listing
+    - dw_sale.fact_listing_flows.sk_house_listing
+    - dw_public.fact_house_listing_flows.sk_house_listing
+    description: ''
   sk_region:
     lineage:
-      - dw_sale.fact_listing_flows.sk_region
-      - dw_public.fact_house_listing_flows.sk_region
+    - dw_sale.fact_listing_flows.sk_region
+    - dw_public.fact_house_listing_flows.sk_region
+    description: ''
   sk_lead_date:
     lineage:
-      - dw_sale.fact_listing_flows.sk_lead_date
-      - dw_public.fact_house_listing_flows.sk_lead_date
+    - dw_sale.fact_listing_flows.sk_lead_date
+    - dw_public.fact_house_listing_flows.sk_lead_date
+    description: ''
   sk_first_contact_date:
     lineage:
-      - dw_sale.fact_listing_flows.sk_first_contact_date
-      - dw_public.fact_house_listing_flows.sk_first_contact_date
+    - dw_sale.fact_listing_flows.sk_first_contact_date
+    - dw_public.fact_house_listing_flows.sk_first_contact_date
+    description: ''
   sk_prospect_date:
     lineage:
-      - dw_sale.fact_listing_flows.sk_prospect_date
-      - dw_public.fact_house_listing_flows.sk_prospect_date
+    - dw_sale.fact_listing_flows.sk_prospect_date
+    - dw_public.fact_house_listing_flows.sk_prospect_date
+    description: ''
   sk_qualified_date:
     lineage:
-      - dw_sale.fact_listing_flows.sk_qualified_date
-      - dw_public.fact_house_listing_flows.sk_qualified_date
+    - dw_sale.fact_listing_flows.sk_qualified_date
+    - dw_public.fact_house_listing_flows.sk_qualified_date
+    description: ''
   sk_available_qualified_date:
     lineage:
-      - dw_sale.fact_listing_flows.sk_available_qualified_date
-      - dw_public.fact_house_listing_flows.sk_available_qualified_date
+    - dw_sale.fact_listing_flows.sk_available_qualified_date
+    - dw_public.fact_house_listing_flows.sk_available_qualified_date
   sk_opportunity_date:
     lineage:
-      - dw_sale.fact_listing_flows.sk_opportunity_date
-      - dw_public.fact_house_listing_flows.sk_opportunity_date
+    - dw_sale.fact_listing_flows.sk_opportunity_date
+    - dw_public.fact_house_listing_flows.sk_opportunity_date
+    description: ''
   sk_first_listing_date:
     lineage:
-      - dw_sale.fact_listing_flows.sk_first_listing_date
-      - dw_public.fact_house_listing_flows.sk_first_listing_date
+    - dw_sale.fact_listing_flows.sk_first_listing_date
+    - dw_public.fact_house_listing_flows.sk_first_listing_date
+    description: ''
   sk_conversion_date:
     lineage:
-      - dw_sale.fact_listing_flows.sk_conversion_date
-      - dw_public.fact_house_listing_flows.sk_conversion_date
+    - dw_sale.fact_listing_flows.sk_conversion_date
+    - dw_public.fact_house_listing_flows.sk_conversion_date
   sk_discard_date:
     lineage:
-      - dw_sale.fact_listing_flows.sk_discard_date
-      - dw_public.fact_house_listing_flows.sk_discard_date
+    - dw_sale.fact_listing_flows.sk_discard_date
+    - dw_public.fact_house_listing_flows.sk_discard_date
   sk_first_photojob_date_fact_photo_job:
     lineage:
-      - dw_public.fact_photo_job.sk_date_job_created
+    - dw_public.fact_photo_job.sk_date_job_created
   sk_user_lead_affiliate:
     lineage:
-      - dw_sale.fact_listing_flows.sk_user_lead_affiliate
-      - dw_public.fact_house_listing_flows.sk_user_lead_affiliate
+    - dw_sale.fact_listing_flows.sk_user_lead_affiliate
+    - dw_public.fact_house_listing_flows.sk_user_lead_affiliate
   country_code:
     lineage:
-      - dw_public.fact_house_listing_flows.country_code
+    - dw_public.fact_house_listing_flows.country_code
   mkt_completion:
     lineage:
-      - dw_sale.fact_listing_flows.mkt_completion
-      - dw_public.fact_house_listing_flows.mkt_completion
+    - dw_sale.fact_listing_flows.mkt_completion
+    - dw_public.fact_house_listing_flows.mkt_completion
+    description: ''
+    categories:
+      Full Self-Service: '#N/A'
+      Non Self-Service: '#N/A'
+      Not Mapped: '#N/A'
+      Other: '#N/A'
+      Recovered Self-Service: '#N/A'
   mkt_channel:
     lineage:
-      - dw_sale.fact_listing_flows.mkt_channel
-      - dw_public.fact_house_listing_flows.mkt_channel
+    - dw_sale.fact_listing_flows.mkt_channel
+    - dw_public.fact_house_listing_flows.mkt_channel
+    description: ''
   mkt_source:
     lineage:
-      - dw_sale.fact_listing_flows.mkt_source
-      - dw_public.fact_house_listing_flows.mkt_source
+    - dw_sale.fact_listing_flows.mkt_source
+    - dw_public.fact_house_listing_flows.mkt_source
+    description: ''
   mkt_medium:
     lineage:
-      - dw_sale.fact_listing_flows.mkt_medium
-      - dw_public.fact_house_listing_flows.mkt_medium
+    - dw_sale.fact_listing_flows.mkt_medium
+    - dw_public.fact_house_listing_flows.mkt_medium
+    description: ''
+    categories:
+      Branding: '#N/A'
+      Cross Domain: '#N/A'
+      Direct: '#N/A'
+      Direct Referral: '#N/A'
+      Display: '#N/A'
+      Doorman User: '#N/A'
+      Email: '#N/A'
+      Lost Tracking: '#N/A'
+      Not Mapped: '#N/A'
+      Online Classifieds: '#N/A'
+      Online Networks: '#N/A'
+      Other: '#N/A'
+      Performance Max: '#N/A'
+      Pop-Up: '#N/A'
+      Push: '#N/A'
+      Retargeting: '#N/A'
+      SEM branded: '#N/A'
+      SEM non-branded: '#N/A'
+      SEO branded: '#N/A'
+      SEO non-branded: '#N/A'
+      SMS: '#N/A'
+      Test: '#N/A'
+      Whatsapp: '#N/A'
   sales_company:
     lineage:
-      - dw_public.dim_lead.sales_company
-      - dw_quintoandar.dim_user_sales_rep.sales_company
+    - dw_public.dim_lead.sales_company
+    - dw_quintoandar.dim_user_sales_rep.sales_company
+    description: ''
   lead_origin:
     lineage:
-      - dw_sale.fact_listing_flows.lead_origin
-      - dw_public.fact_house_listing_flows.lead_origin
+    - dw_sale.fact_listing_flows.lead_origin
+    - dw_public.fact_house_listing_flows.lead_origin
+    description: ''
+    categories:
+      App: '#N/A'
+      Crawling: '#N/A'
+      Desconhecida: '#N/A'
+      Facebook: '#N/A'
+      Form: '#N/A'
+      Inbound: '#N/A'
+      Ios: '#N/A'
+      Landing: '#N/A'
+      LeadEnrichment: '#N/A'
+      LeadOutbound: '#N/A'
+      Other: '#N/A'
+      OwnerPWA: '#N/A'
+      Planilha: '#N/A'
+      PriceSuggestion: '#N/A'
+      Reprocessado: '#N/A'
+      Trade: '#N/A'
   funnel_drop_reason:
     lineage:
-      - dw_sale.fact_listing_flows.funnel_drop_reason
-      - dw_public.fact_house_listing_flows.funnel_drop_reason
+    - dw_sale.fact_listing_flows.funnel_drop_reason
+    - dw_public.fact_house_listing_flows.funnel_drop_reason
+    description: ''
+    categories:
+      Alugado: '#N/A'
+      ApartamentoBanguncado: '#N/A'
+      BrokenLeadFlow: '#N/A'
+      CancelledPhotoJob: '#N/A'
+      DiscardedProspect: '#N/A'
+      DiscardedQualified: '#N/A'
+      Duplicado: '#N/A'
+      ForaDoPadrao: '#N/A'
+      IMOVEL_COMERCIAL: '#N/A'
+      IMOVEL_EM_CONDICAO_INSEGURA: '#N/A'
+      IMPREVISTO_FOTOGRAFO: '#N/A'
+      LOCALIZACAO_PERIGOSA: '#N/A'
+      Listed: '#N/A'
+      NaoCompareceu: '#N/A'
+      NaoProcessado: '#N/A'
+      NaoProcessadoArea: '#N/A'
+      NoPhotoJob: '#N/A'
+      NotListedYet: '#N/A'
+      NotMapped: '#N/A'
+      OnHold: '#N/A'
+      OptedOut Qualified: '#N/A'
+      Outros: '#N/A'
+      PROBLEMAS_NO_ENVIO_DE_FOTOS: '#N/A'
+      PROBLEMA_COM_ENDERECO: '#N/A'
+      PhotoJobScheduled: '#N/A'
+      ProprietarioCancelou: '#N/A'
+      Reforma: '#N/A'
+      SemAutorizacao: '#N/A'
+      SemChaves: '#N/A'
+      SemContato: '#N/A'
+      TermsNotAccepted: '#N/A'
+      Vendido: '#N/A'
   lead_context_origin:
     lineage:
-      - dw_sale.fact_listing_flows.lead_context_origin
-      - dw_public.fact_house_listing_flows.lead_context_origin
+    - dw_sale.fact_listing_flows.lead_context_origin
+    - dw_public.fact_house_listing_flows.lead_context_origin
+    description: ''
+    categories:
+      Hybrid: '#N/A'
+      Only Rent: '#N/A'
+      Only Sale: '#N/A'
+      Organic: '#N/A'
   rental_administrator:
     lineage:
-      - dw_public.dim_house_listing.rental_administrator
+    - dw_public.dim_house_listing.rental_administrator
   first_prospect_date:
     lineage:
-      - dw_public.fact_house_listing_flows.sk_prospect_date
-      - dw_sale.fact_listing_flows.sk_prospect_date
+    - dw_public.fact_house_listing_flows.sk_prospect_date
+    - dw_sale.fact_listing_flows.sk_prospect_date
   last_prospect_date:
     lineage:
-      - dw_public.fact_house_listing_flows.sk_prospect_date
-      - dw_sale.fact_listing_flows.sk_prospect_date
+    - dw_public.fact_house_listing_flows.sk_prospect_date
+    - dw_sale.fact_listing_flows.sk_prospect_date
   first_qualified_date:
     lineage:
-      - dw_public.fact_house_listing_flows.sk_qualified_date
-      - dw_sale.fact_listing_flows.sk_qualified_date
+    - dw_public.fact_house_listing_flows.sk_qualified_date
+    - dw_sale.fact_listing_flows.sk_qualified_date
   last_qualified_date:
     lineage:
-      - dw_public.fact_house_listing_flows.sk_qualified_date
-      - dw_sale.fact_listing_flows.sk_qualified_date
+    - dw_public.fact_house_listing_flows.sk_qualified_date
+    - dw_sale.fact_listing_flows.sk_qualified_date
   has_isales_intervention:
     lineage:
-      - dw_sale.fact_listing_flows.has_isales_intervention
-      - dw_public.fact_house_listing_flows.has_isales_intervention
+    - dw_sale.fact_listing_flows.has_isales_intervention
+    - dw_public.fact_house_listing_flows.has_isales_intervention
+    description: ''
   ts_first_job_scheduled:
     lineage:
-      - dw_public.dim_photo_job.dt_job_scheduled
+    - dw_public.dim_photo_job.dt_job_scheduled
   ts_first_job_scheduled_br_tz:
     lineage:
-      - dw_public.dim_photo_job.dt_job_scheduled
+    - dw_public.dim_photo_job.dt_job_scheduled
   ts_first_publication:
     lineage:
-      - dw_sale.dim_listing.ts_first_publication
-      - dw_public.dim_house_listing.ts_house_first_publication
+    - dw_sale.dim_listing.ts_first_publication
+    - dw_public.dim_house_listing.ts_house_first_publication
   ts_house_first_publication_br_tz:
     lineage:
-      - dw_sale.dim_listing.ts_first_publication
-      - dw_public.dim_house_listing.ts_house_first_publication
+    - dw_sale.dim_listing.ts_first_publication
+    - dw_public.dim_house_listing.ts_house_first_publication
+  context_first_listing:
+    description: ''
+    categories:
+      Hybrid: '#N/A'
+      Rent: '#N/A'
+      Sale: '#N/A'
+  context_lead:
+    description: ''
+    categories:
+      Hybrid: '#N/A'
+      Rent: '#N/A'
+      Sale: '#N/A'
+  context_opportunity:
+    description: ''
+    categories:
+      Hybrid: '#N/A'
+      Rent: '#N/A'
+      Sale: '#N/A'
+  context_prospect:
+    description: ''
+    categories:
+      Hybrid: '#N/A'
+      Rent: '#N/A'
+      Sale: '#N/A'
+  context_qualified:
+    description: ''
+    categories:
+      Hybrid: '#N/A'
+      Rent: '#N/A'
+      Sale: '#N/A'
+  mkt_origin:
+    description: ''
+    categories:
+      B2B: '#N/A'
+      Backend: '#N/A'
+      CIQ: '#N/A'
+      Doorman: '#N/A'
+      Inbound: '#N/A'
+      Indica Aí - Agents: '#N/A'
+      Indica Aí - General: '#N/A'
+      Other: '#N/A'
+      Owner PWA: '#N/A'
+      Price Calculator: '#N/A'
+  origin_table:
+    description: ''
+    categories:
+      Rent: '#N/A'
+      Sale: '#N/A'
+  sourcing_ops:
+    description: ''
+    categories:
+      B2B: '#N/A'
+      CIQ: '#N/A'
+      FSS: '#N/A'
+      FSS IS PhotoJob: '#N/A'
+      IS Ext: '#N/A'
+      IS Int: '#N/A'
+      Other: '#N/A'

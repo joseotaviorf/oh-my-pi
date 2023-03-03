@@ -1,67 +1,104 @@
----
 database_name: dw_velo
 table_name: dim_velo_propose_values
+description: Dimension with details of values related to the propose
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   sk_propose_values:
     lineage:
-      - datalake_velo.propose_values.id_propose_values
+    - datalake_velo.propose_values.id_propose_values
+    description: ''
   subscription_type:
     lineage:
-      - datalake_velo.propose_values.subscription_type
+    - datalake_velo.propose_values.subscription_type
+    description: Category type of the subscription. Usually monthly or annual
+    categories:
+      annual: ''
+      monthly: ''
+      no info: ''
   plan_type:
     lineage:
-      - datalake_velo.propose_values.plan_type
+    - datalake_velo.propose_values.plan_type
+    description: ''
+    categories:
+      Comercial: ''
+      Residencial: ''
   activator_type:
     lineage:
-      - datalake_velo.propose_values.activator_type
+    - datalake_velo.propose_values.activator_type
+    description: Category type of the amount paid to activate the guarantee
+    categories:
+      Avançado: ''
+      Básico: ''
+      Especialista: ''
+      Padrão: ''
   plan:
     lineage:
-      - datalake_velo.propose_values.plan
+    - datalake_velo.propose_values.plan
+    description: Name of the plan
   subscription_installments:
     lineage:
-      - datalake_velo.propose_values.subscription_installments
+    - datalake_velo.propose_values.subscription_installments
+    description: Number of installments on the subscription
   activator_amount:
     lineage:
-      - datalake_velo.propose_values.activator_amount
+    - datalake_velo.propose_values.activator_amount
+    description: Amount paid to activate the guarantee
   monthly_guarantee:
     lineage:
-      - datalake_velo.propose_values.monthly_guarantee
+    - datalake_velo.propose_values.monthly_guarantee
+    description: ''
   annual_guarantee:
     lineage:
-      - datalake_velo.propose_values.annual_guarantee
+    - datalake_velo.propose_values.annual_guarantee
+    description: ''
   rent_amount:
     lineage:
-      - datalake_velo.propose_values.rent_amount
+    - datalake_velo.propose_values.rent_amount
+    description: ''
   condo_amount:
     lineage:
-      - datalake_velo.propose_values.condo_amount
+    - datalake_velo.propose_values.condo_amount
+    description: ''
   light_amount:
     lineage:
-      - datalake_velo.propose_values.light_amount
+    - datalake_velo.propose_values.light_amount
+    description: ''
   water_amount:
     lineage:
-      - datalake_velo.propose_values.water_amount
+    - datalake_velo.propose_values.water_amount
+    description: ''
   phone_amount:
     lineage:
-      - datalake_velo.propose_values.phone_amount
+    - datalake_velo.propose_values.phone_amount
+    description: ''
   iptu_amount:
     lineage:
-      - datalake_velo.propose_values.iptu_amount
+    - datalake_velo.propose_values.iptu_amount
+    description: ''
   other_amount:
     lineage:
-      - datalake_velo.propose_values.other_amount
+    - datalake_velo.propose_values.other_amount
+    description: ''
   total_package_amount:
     lineage:
-      - datalake_velo.propose_values.total_package_amount
+    - datalake_velo.propose_values.total_package_amount
+    description: ''
   plan_percent:
     lineage:
-      - datalake_velo.propose_values.plan_percent
+    - datalake_velo.propose_values.plan_percent
+    description: Percentage of the plan in comparison to the package
   plan_coverage:
     lineage:
-      - datalake_velo.propose_values.plan_coverage
+    - datalake_velo.propose_values.plan_coverage
+    description: ''
   plan_damage:
     lineage:
-      - datalake_velo.propose_values.plan_damage
+    - datalake_velo.propose_values.plan_damage
+    description: ''
   plan_commission:
     lineage:
-      - datalake_velo.propose_values.plan_commission
+    - datalake_velo.propose_values.plan_commission
+    description: ''
+  ts_load:
+    description: ''

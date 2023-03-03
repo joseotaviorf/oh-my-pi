@@ -1,24 +1,75 @@
 database_name: dw_rental_contribution_margin
 table_name: fact_house_listing_revenues
+description: This table shows the revenues of each contract and competence month.
+  Each row represents the revenues of the contract in a month. So we can have repeated
+  ID contracs and ID house_listing
+domain: For Rent
+owner: E ForRent@quintoandar.com.br
 columns:
   id_contract:
     lineage:
-      - datalake_revenue_lines.management_fee.id_contract_ebdb
+    - datalake_revenue_lines.management_fee.id_contract_ebdb
+    description: Natural key that represents the contract ID.
   id_house_listing:
     lineage:
-      - datalake_ebdb_listing.house_listing.id_house_listing
+    - datalake_ebdb_listing.house_listing.id_house_listing
+    description: Natural key that represents the house listing ID.
   id_house:
     lineage:
-      - datalake_ebdb_contract.contract.id_house
+    - datalake_ebdb_contract.contract.id_house
+    description: Natural key that represents the house ID.
   country_code:
     lineage:
-      - datalake_ebdb_country.house.country_code
+    - datalake_ebdb_country.house.country_code
+    description: Country code of the house. We're filtering just BR houses.
   quarter:
     lineage:
-      - dw_public.dim_date.quarter
+    - dw_public.dim_date.quarter
+    description: Quarter of the revenue's competence month.
   accrual_year_month:
     lineage:
-      - datalake_revenue_lines.contract_revenues.month_start
+    - datalake_revenue_lines.contract_revenues.month_start
+    description: Competence month of the revenue
   dt_month_start:
     lineage:
-      - dw_public.dim_date.month_start
+    - dw_public.dim_date.month_start
+    description: Month start date of the revenue's compentece month.
+  administration_fee:
+    description: Administraction fee value charged from landlord.
+  agents_commission:
+    description: Agents commission share value that is passed to agents.
+  bfi:
+    description: Extra BFI (brokerage finance) revenue.
+  brokerage_fee:
+    description: First rental commission value. We receive this value just on the
+      first competence month of the contract.
+  brokerage_partner_share:
+    description: Commission paid to affiliates/B2B partners. We receive this value
+      just on the first competence month of the contract.
+  ccp_net:
+    description: Extra CCP (credit card payment) net revenue.
+  contract_lifetime:
+    description: The difference between the month when the contract started and competence
+      month of the revenue.
+  home_insurance:
+    description: Home/fire insurance value.
+  lp:
+    description: Extra LP (late payment) revenue.
+  lra:
+    description: Extra LRA (long term rental antecipation) revenue.
+  management_partner_share:
+    description: Administraction fee paid to partners when the contract is linked
+      with affiliates/B2B.
+  mra:
+    description: Extra MRA (month rental antecipation) revenue.
+  rent_value:
+    description: Rent value of the contract charged from tenant.
+  reservation:
+    description: Extra reservation revenue come from kill_queue service.
+  service_fee:
+    description: Service fee value charged from tenant.
+  sk_house_listing_revenue:
+    description: Primary key for the table. It is generated artificially in the ETL,
+      so it has no meaning or correspondence in any product.
+  ts_load:
+    description: Time when the table was loaded.

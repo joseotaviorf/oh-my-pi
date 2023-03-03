@@ -1,28 +1,41 @@
----
 database_name: dw_velo
 table_name: dim_velo_propose_company
+description: Dimension with details of the company that signed the contract (existance
+  optional)
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   sk_company:
     lineage:
-      - datalake_velo.propose_company.id_company
+    - datalake_velo.propose_company.id_company
+    description: ''
   company_name:
     lineage:
-      - datalake_velo.propose_company.company_name
+    - datalake_velo.propose_company.company_name
+    description: ''
   city:
     lineage:
-      - datalake_velo.propose_company.city
+    - datalake_velo.propose_company.city
+    description: ''
   state:
     lineage:
-      - datalake_velo.propose_company.state
+    - datalake_velo.propose_company.state
+    description: ''
   country:
     lineage:
-      - datalake_velo.propose_company.country
+    - datalake_velo.propose_company.country
+    description: ''
   zipcode:
     lineage:
-      - datalake_velo.propose_company.zipcode
+    - datalake_velo.propose_company.zipcode
+    description: ''
   geolocation:
     lineage:
-      - datalake_velo.propose_company.geolocation
+    - datalake_velo.propose_company.geolocation
+    description: ''
   cnpj:
     lineage:
-      - datalake_velo.propose_company.cnpj
+    - datalake_velo.propose_company.cnpj
+    description: ''
+  ts_load:
+    description: ''

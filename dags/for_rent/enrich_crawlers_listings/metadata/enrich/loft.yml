@@ -1,106 +1,185 @@
----
 database_name: datalake_crawlers_listings
 table_name: loft
+description: Creates a table with all the listings that have already been published
+  in Loft. Where we use the version of the last extraction in which the listing appears
+  in our crawlers. Every row represents a Loft listing, either published or unpublished.
+domain: For Rent
+owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - datalake_crawlers_listings_clean.loft.id
+    - datalake_crawlers_listings_clean.loft.id
+    description: ID with the competitor name together. In this case, <id>Loft.
   id_house_platform:
     lineage:
-      - datalake_crawlers_listings_clean.loft.id
+    - datalake_crawlers_listings_clean.loft.id
+    description: ID from platform.
   id_neighborhood:
     lineage:
-      - datalake_crawlers_listings.loft_region_mapping.id_neighborhood
+    - datalake_crawlers_listings.loft_region_mapping.id_neighborhood
+    description: ID of the house listing's region.
   3p_name:
     lineage:
-      - datalake_crawlers_listings.loft.agency_name
+    - datalake_crawlers_listings.loft.agency_name
+    description: If the listing is from a real estate partner of the competitor, it
+      will show the name of the partner.
   unit_type:
     lineage:
-      - datalake_crawlers_listings.loft.house_info
+    - datalake_crawlers_listings.loft.house_info
+    description: Tells if the listing is an apartment or a house
+    categories:
+      Apartment: If the property is an apartment.
   usage_type:
     lineage:
-      - datalake_crawlers_listings.loft.house_info
+    - datalake_crawlers_listings.loft.house_info
+    description: Tells if the use of the apartment is residential or commercial
+    categories:
+      Residential: If the use of the apartment is residential
   property_type:
     lineage:
-      - datalake_crawlers_listings.loft.property_type
+    - datalake_crawlers_listings.loft.property_type
+    description: 'Tells the type of the apartment: rooftop, garden, duplex, studio,
+      conjugate, default, triplex.'
   contract_type:
     lineage:
-      - datalake_crawlers_listings.loft.contract_type
+    - datalake_crawlers_listings.loft.contract_type
+    description: If the property has an exclusive contract with a competing platform
   business_type:
     lineage:
-      - datalake_crawlers_listings.loft.status
+    - datalake_crawlers_listings.loft.status
+    description: Tells the listing context.
   city:
     lineage:
-      - datalake_crawlers_listings.loft.address
+    - datalake_crawlers_listings.loft.address
+    description: The name for the city where listing is in.
   city_group:
     lineage:
-      - datalake_region.region.city_group
+    - datalake_region.region.city_group
+    description: 'A grouping of city or clusters of cities and neighborhoods (RMSP:
+      Região Metropolitana de São Paulo).'
   neighborhood:
     lineage:
-      - datalake_crawlers_listings.loft_region_mapping.neighborhood
+    - datalake_crawlers_listings.loft_region_mapping.neighborhood
+    description: House listing neighborhood name.
   state:
     lineage:
-      - datalake_crawlers_listings.loft.address
+    - datalake_crawlers_listings.loft.address
+    description: House listing Brazilian state acronym (SP, MG, RJ, etc.)
   address:
     lineage:
-      - datalake_crawlers_listings.loft.address
+    - datalake_crawlers_listings.loft.address
+    description: Name of the street where the listing is located
   st_number:
     lineage:
-      - datalake_crawlers_listings.loft.address
+    - datalake_crawlers_listings.loft.address
+    description: House listing street number.
   zip_code:
     lineage:
-      - datalake_crawlers_listings.loft.address
+    - datalake_crawlers_listings.loft.address
+    description: House listing zip code.
   lat:
     lineage:
-      - datalake_crawlers_listings.loft.geolocation
+    - datalake_crawlers_listings.loft.geolocation
+    description: House listing latitude.
   lng:
     lineage:
-      - datalake_crawlers_listings.loft.geolocation
+    - datalake_crawlers_listings.loft.geolocation
+    description: House listing longitude.
   floors:
     lineage:
-      - datalake_crawlers_listings.loft.house_info
+    - datalake_crawlers_listings.loft.house_info
+    description: Floor where the listing is located.
   num_floors:
     lineage:
-      - datalake_crawlers_listings.loft.house_info
+    - datalake_crawlers_listings.loft.house_info
+    description: Number of floors in the building.
   total_area:
     lineage:
-      - datalake_crawlers_listings.loft.house_info
+    - datalake_crawlers_listings.loft.house_info
+    description: House listing total area.
   bedrooms:
     lineage:
-      - datalake_crawlers_listings.loft.house_info
+    - datalake_crawlers_listings.loft.house_info
+    description: Number of bathrooms in the listing.
   suites:
     lineage:
-      - datalake_crawlers_listings.loft.house_info
+    - datalake_crawlers_listings.loft.house_info
+    description: Number of suites in the listing.
   parking_spaces:
     lineage:
-      - datalake_crawlers_listings.loft.house_info
+    - datalake_crawlers_listings.loft.house_info
+    description: Number of parking spaces released for the listing.
   bathrooms:
     lineage:
-      - datalake_crawlers_listings.loft.house_info
+    - datalake_crawlers_listings.loft.house_info
+    description: Number of bathrooms in the listing.
   year_built:
     lineage:
-      - datalake_crawlers_listings.loft.house_info
+    - datalake_crawlers_listings.loft.house_info
+    description: Year of construction of that building.
   price:
     lineage:
-      - datalake_crawlers_listings.loft.price
+    - datalake_crawlers_listings.loft.price
+    description: Published sales price on competitor site.
   installments_price:
     lineage:
-      - datalake_crawlers_listings.loft.installments_price
+    - datalake_crawlers_listings.loft.installments_price
+    description: Amount of the installment if the listing is financed.
   condo_fee:
     lineage:
-      - datalake_crawlers_listings.loft.price
+    - datalake_crawlers_listings.loft.price
+    description: Monthly condominium fee.
   iptu:
     lineage:
-      - datalake_crawlers_listings.loft.price
+    - datalake_crawlers_listings.loft.price
+    description: Monthly amount for IPTU.
   is_3p:
     lineage:
-      - datalake_crawlers_listings.loft.has_agency
+    - datalake_crawlers_listings.loft.has_agency
+    description: Tells if the property is related to a competitors partner
   is_marketplace:
     lineage:
-      - datalake_crawlers_listings.loft.is_marketplace
+    - datalake_crawlers_listings.loft.is_marketplace
+    description: Shows whether the listing is from the platforms marketplace.
   is_platform_property:
     lineage:
-      - datalake_crawlers_listings.loft.metadata
+    - datalake_crawlers_listings.loft.metadata
+    description: Tells if the property is owned by the competing platform.
   ts_created:
     lineage:
-      - datalake_crawlers_listings.loft.ts_created
+    - datalake_crawlers_listings.loft.ts_created
+    description: Timestamp when listing was created in platform.
+  platform:
+    description: Competitor name
+  status:
+    description: Tells if the listing is published or unpublished.
+    categories:
+      Publicado: If the apartment appeared in the last batch of the crawlers extraction,
+        we say that it is published.
+      Despublicado: If the apartment not appeared in the last batch of the crawlers
+        extraction, we say that it is unpublished.
+  unit_per_floor:
+    description: Number of apartments on each floor
+  price_m2:
+    description: Price divided by the total area of the listing.
+  nearby_other_platform_houses:
+    description: Regarding the uniqueness of the listing. Counts how many houses on
+      the QuintoAndar are within 50m of the location of the competitor's listing.
+  avg_nearby_price_m2:
+    description: Regarding the uniqueness of the listing. Given how many houses have
+      in the column nearby_other_platform_houses, the average m2 price of these listings
+  avg_distance:
+    description: Regarding the uniqueness of the listing. Given how many houses have
+      in the column nearby_other_platform_houses, the distance average of these listings
+  is_exclusive:
+    description: Regarding the uniqueness of the listing. If there is no property
+      published on QuintoAndar within a 50m radius, we say that this competitor's
+      listings is exclusive.
+  is_for_sale:
+    description: Tells if the property is for sale.
+  is_for_rent:
+    description: Tells if the property is for rent.
+  is_last_status:
+    description: Tells if it is the last status we received from the crawler.
+  ts_updated:
+    description: Timestamp of when that house listing showed up.

@@ -1,43 +1,68 @@
 database_name: datalake_braze_details
 table_name: canvas_step_details
+description: This enrich opens the Braze clean layer data with the details of each
+  Canvas. Each line of enrich is a step of a Canvas, and from this table it is possible
+  to extract information about what each step executes, what is the next step and
+  the information passed via Webhook to other applications, for example.
+domain: Growth
+owner: ae-growth@quintoandar.com.br
 columns:
   id_canvas:
     lineage:
-      - datalake_braze_details_clean.canvas_details_owners.id_canvas
-      - datalake_braze_details_clean.canvas_details_tenants.id_canvas
-      - datalake_braze_details_clean.canvas_details_indica_ai.id_canvas
+    - datalake_braze_details_clean.canvas_details_owners.id_canvas
+    - datalake_braze_details_clean.canvas_details_tenants.id_canvas
+    - datalake_braze_details_clean.canvas_details_indica_ai.id_canvas
+    description: Key of the Braze Canvas.
   canvas_name:
     lineage:
-      - datalake_braze_details_clean.canvas_details_owners.canvas_name
-      - datalake_braze_details_clean.canvas_details_tenants.canvas_name
-      - datalake_braze_details_clean.canvas_details_indica_ai.canvas_name
+    - datalake_braze_details_clean.canvas_details_owners.canvas_name
+    - datalake_braze_details_clean.canvas_details_tenants.canvas_name
+    - datalake_braze_details_clean.canvas_details_indica_ai.canvas_name
+    description: Canvas name.
   id_step:
     lineage:
-      - datalake_braze_details_clean.canvas_details_owners.step
-      - datalake_braze_details_clean.canvas_details_tenants.step
-      - datalake_braze_details_clean.canvas_details_indica_ai.step
+    - datalake_braze_details_clean.canvas_details_owners.step
+    - datalake_braze_details_clean.canvas_details_tenants.step
+    - datalake_braze_details_clean.canvas_details_indica_ai.step
+    description: Key of the Braze Canvas step.
   step_name:
     lineage:
-      - datalake_braze_details_clean.canvas_details_owners.step
-      - datalake_braze_details_clean.canvas_details_tenants.step
-      - datalake_braze_details_clean.canvas_details_indica_ai.step
+    - datalake_braze_details_clean.canvas_details_owners.step
+    - datalake_braze_details_clean.canvas_details_tenants.step
+    - datalake_braze_details_clean.canvas_details_indica_ai.step
+    description: Name of the Canvas step.
   step_channel:
     lineage:
-      - datalake_braze_details_clean.canvas_details_owners.step
-      - datalake_braze_details_clean.canvas_details_tenants.step
-      - datalake_braze_details_clean.canvas_details_indica_ai.step
+    - datalake_braze_details_clean.canvas_details_owners.step
+    - datalake_braze_details_clean.canvas_details_tenants.step
+    - datalake_braze_details_clean.canvas_details_indica_ai.step
+    description: Channel through which Canvas should perform the programmed action
+      programmed for that step.
   step_message:
     lineage:
-      - datalake_braze_details_clean.canvas_details_owners.step
-      - datalake_braze_details_clean.canvas_details_tenants.step
-      - datalake_braze_details_clean.canvas_details_indica_ai.step
+    - datalake_braze_details_clean.canvas_details_owners.step
+    - datalake_braze_details_clean.canvas_details_tenants.step
+    - datalake_braze_details_clean.canvas_details_indica_ai.step
+    description: Content with instructions and extra information about the actions
+      programmed for that step.
   id_next_step:
     lineage:
-      - datalake_braze_details_clean.canvas_details_owners.step
-      - datalake_braze_details_clean.canvas_details_tenants.step
-      - datalake_braze_details_clean.canvas_details_indica_ai.step
+    - datalake_braze_details_clean.canvas_details_owners.step
+    - datalake_braze_details_clean.canvas_details_tenants.step
+    - datalake_braze_details_clean.canvas_details_indica_ai.step
+    description: Id of the next step to be performed by Canvas after the current one
+      is executed.
   ts_updated:
     lineage:
-      - datalake_braze_details_clean.canvas_details_owners.ts_updated
-      - datalake_braze_details_clean.canvas_details_tenants.ts_updated
-      - datalake_braze_details_clean.canvas_details_indica_ai.ts_updated
+    - datalake_braze_details_clean.canvas_details_owners.ts_updated
+    - datalake_braze_details_clean.canvas_details_tenants.ts_updated
+    - datalake_braze_details_clean.canvas_details_indica_ai.ts_updated
+    description: Timestamp of the data update.
+  app_group:
+    description: User group that Canvas targets its actions for.
+  year:
+    description: Partition column, year of the data update.
+  month:
+    description: Partition column, month of the data update.
+  day:
+    description: Partition column, day of the data update.

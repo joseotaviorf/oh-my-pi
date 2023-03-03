@@ -1,10 +1,20 @@
----
 database_name: metric_rent
 table_name: new_first_listings_daily_by_sk_region
+description: Table to count new first listings on a montly basis. Here, we use the
+  event milestone registered on the table fact_house_listing_flows - sk_first_listing_date.
+  In addition, we have the region dimension embedded here on the column sk_region
+  to segment this metric.
+domain: For Rent
+owner: ''
 columns:
   first_listing_date:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
   sk_region:
     lineage:
-      - dw_public.fact_house_listing_flows.sk_region
+    - dw_public.fact_house_listing_flows.sk_region
+    description: Region identifier
+  day:
+    description: day when the listing started.
+  new_first_listings:
+    description: Amount of new new_first_listings.

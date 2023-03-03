@@ -1,60 +1,88 @@
 database_name: dw_supply_outbound_contacts
 table_name: fact_outbound_contacts
+description: This model table the history of contact attempts made to owners along
+  the Prospect to Opportunity conversion funnel. Contact requests are managed by Braze's
+  Canvas functionality which, based on a series of business rules, requests other
+  micro-services to carry out the communication. Each line is a contact request made
+  by Braze's Canvas to Omnichannel microservices (Wololo or Jaiminho).
+domain: Growth
+owner: ae-growth@quintoandar.com.br
 columns:
   sk_outbound_contact:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.id_outbound_contact
+    - datalake_supply_outbound_flows.supply_outbound_contacts.id_outbound_contact
+    description: The unique contact request identiier.
   sk_prospect_created_date:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.dt_prospect_created
+    - datalake_supply_outbound_flows.supply_outbound_contacts.dt_prospect_created
+    description: Date of creation of the prospect, in the bigint format.
   sk_contact_requested_date:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.ts_webhook_sent
+    - datalake_supply_outbound_flows.supply_outbound_contacts.ts_webhook_sent
+    description: Date of when Braze sent the contact request, in the bigint format.
   sk_contacted_date:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.ts_contacted
+    - datalake_supply_outbound_flows.supply_outbound_contacts.ts_contacted
+    description: Date of the contact, if the request didn't fail, in the bigint format.
   id_wololo_prospect:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.id_wololo_prospect
+    - datalake_supply_outbound_flows.supply_outbound_contacts.id_wololo_prospect
+    description: The prospect identifier in the Wololo's Prospect table.
   id_prospect:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.id_prospect
+    - datalake_supply_outbound_flows.supply_outbound_contacts.id_prospect
+    description: The proespect identifier.
   id_user_dispatch:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.id_user_dispatch
+    - datalake_supply_outbound_flows.supply_outbound_contacts.id_user_dispatch
+    description: Key of the dispacth transmitted for Braze to an user.
   id_user_braze:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.id_user_braze
+    - datalake_supply_outbound_flows.supply_outbound_contacts.id_user_braze
+    description: Key of the user on the Braze Platform. It is NOT the same sk as our
+      sk_user.
   id_canvas:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.id_canvas
+    - datalake_supply_outbound_flows.supply_outbound_contacts.id_canvas
+    description: Key of the Braze Canvas.
   id_step_canvas:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.id_step_canvas
+    - datalake_supply_outbound_flows.supply_outbound_contacts.id_step_canvas
+    description: Identifier of the Braze Canvas step.
   id_jaiminho_user_notifications:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    description: Identifier of a communication made by Jaiminho to a user.
   id_call_analyst:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    description: Identifier of the third-party call company analyst.
   canvas_name:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.canvas_name
+    - datalake_supply_outbound_flows.supply_outbound_contacts.canvas_name
+    description: Name of the Braze canvas.
   canvas_step_name:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.canvas_step_name
+    - datalake_supply_outbound_flows.supply_outbound_contacts.canvas_step_name
+    description: Name of the Braze canvas step.
   phone_number:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.phone_number
+    - datalake_supply_outbound_flows.supply_outbound_contacts.phone_number
+    description: The prospect phone number which the contact was made to.
   mkt_origin:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.mkt_origin
+    - datalake_supply_outbound_flows.supply_outbound_contacts.mkt_origin
+    description: The prospect origin.
   contact_channel:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_channel
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_channel
+    description: Channel through which contact was made.
   ts_contact_requested:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.ts_webhook_sent
+    - datalake_supply_outbound_flows.supply_outbound_contacts.ts_webhook_sent
+    description: Timestamp of the contact request made by Braze to the Jaiminho or
+      Wololo micro-services.
   ts_contacted:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.ts_contacted
+    - datalake_supply_outbound_flows.supply_outbound_contacts.ts_contacted
+    description: Timestamp of contact.

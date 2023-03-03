@@ -1,31 +1,45 @@
----
 database_name: dw_credit
 table_name: dim_guarantee_policy
+description: This table brings the guarantee policy details based on what the model
+  and user decide
+domain: Fintech
+owner: fernando.araujo@quintoandar.com.br
 columns:
   id_guarantee_category:
     lineage:
-      - datalake_rental_guarantee_clean.risk_category.category_level
+    - datalake_rental_guarantee_clean.risk_category.category_level
+    description: Indicates the ID of the guarantee category in Rental Guarantee. Should
+      be used as key to category on datalake_sorting_hat_clean.credit_analysis and
+      to score on datalake_rental_guarantee.guarantee
   id_risk_category:
     lineage:
-      - datalake_rental_guarantee_clean.risk_category.id
+    - datalake_rental_guarantee_clean.risk_category.id
+    description: Indicates the ID of the guarantee category in Risk Category
   guarantee_factor:
     lineage:
-      - datalake_rental_guarantee_clean.risk_category.guarantee_factor
+    - datalake_rental_guarantee_clean.risk_category.guarantee_factor
+    description: Indicates the guarantee factor
   deposit_factor:
     lineage:
-      - datalake_rental_guarantee_clean.risk_category.deposit_factor
+    - datalake_rental_guarantee_clean.risk_category.deposit_factor
+    description: Indicates the deposit factor
   category_description:
     lineage:
-      - datalake_rental_guarantee_clean.risk_category.category_description
+    - datalake_rental_guarantee_clean.risk_category.category_description
+    description: Indicates the guarantee description
   is_guarantee_allowed:
     lineage:
-      - datalake_rental_guarantee_clean.risk_category.is_guarantee_allowed
+    - datalake_rental_guarantee_clean.risk_category.is_guarantee_allowed
+    description: Indicates if the guarantee is allowed
   is_deposit_allowed:
     lineage:
-      - datalake_rental_guarantee_clean.risk_category.is_deposit_allowed
+    - datalake_rental_guarantee_clean.risk_category.is_deposit_allowed
+    description: Indicates if the deposit is allowed
   ts_guarantee_category_created:
     lineage:
-      - datalake_rental_guarantee_clean.risk_category.ts_created
+    - datalake_rental_guarantee_clean.risk_category.ts_created
+    description: Date/time in which the category was created
   ts_guarantee_category_updated:
     lineage:
-      - datalake_rental_guarantee_clean.risk_category.ts_updated
+    - datalake_rental_guarantee_clean.risk_category.ts_updated
+    description: Date/time in which the category was updated

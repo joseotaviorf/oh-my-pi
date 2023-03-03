@@ -1,37 +1,53 @@
----
 database_name: datalake_ebdb_listing
 table_name: rent_listing
+description: Information related to ForRent listings. Each line is an unique listing,
+  related to an unique house
+domain: For Rent
+owner: millena.giannini@quintoandar.com.br
 columns:
   id_listing_business_context:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.id
+    - datalake_ebdb_clean.listing_business_context.id
+    description: Id of the listing that the house belongs to
   id_listing_rent_model:
     lineage:
-      - datalake_ebdb_clean.listing_rent_model.id
+    - datalake_ebdb_clean.listing_rent_model.id
+    description: Id of the listing rent model
   id_house:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.id_house
+    - datalake_ebdb_clean.listing_business_context.id_house
+    description: Id of the house
   country_code:
     lineage:
-      - datalake_ebdb_country.house.country_code
+    - datalake_ebdb_country.house.country_code
   rental_administrator:
     lineage:
-      - datalake_ebdb_clean.listing_rent_model.rental_administrator
+    - datalake_ebdb_clean.listing_rent_model.rental_administrator
+    description: The rental administrator of the listing/house
+    categories:
+      OWNER: Owner is the rental administrator, which means that the listing is brokerage-only
+      QUINTOANDAR: Default rental administrator, which is QuintoAndar
   status:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.status
+    - datalake_ebdb_clean.listing_business_context.status
+    description: Status of the listing
   status_reason:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.status_reason
+    - datalake_ebdb_clean.listing_business_context.status_reason
+    description: The reason of the status
   ts_first_publication:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+    - datalake_ebdb_clean.listing_business_context.ts_first_publication
+    description: Timestamp of the first publication of listing
   ts_last_publication:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_last_publication
+    - datalake_ebdb_clean.listing_business_context.ts_last_publication
+    description: Timestamp of the last publication of listing
   ts_created:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_created
+    - datalake_ebdb_clean.listing_business_context.ts_created
+    description: Timestamp of the creation of the listing
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_updated
+    - datalake_ebdb_clean.listing_business_context.ts_updated
+    description: Timestamp of the last update of the listing

@@ -1,36 +1,51 @@
 database_name: datalake_betopera
 table_name: certificate_request
+description: Information about insurance certificates requests.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_betopera_clean.certificate_request.id
+    - datalake_betopera_clean.certificate_request.id
+    description: ''
   id_insurance:
     lineage:
-      - datalake_betopera_clean.certificate_request.id_insurance
+    - datalake_betopera_clean.certificate_request.id_insurance
+    description: ''
   version:
     lineage:
-      - datalake_betopera_clean.certificate_request.version
+    - datalake_betopera_clean.certificate_request.version
+    description: ''
   payload:
     lineage:
-      - datalake_betopera_clean.certificate_request.payload
+    - datalake_betopera_clean.certificate_request.payload
+    description: ''
   status:
     lineage:
-      - datalake_betopera_clean.certificate_request.status
+    - datalake_betopera_clean.certificate_request.status
+    description: the current status for the insurance entity PENDING | CREATED | FAILED
+      | PENDING_CANCELLATION | CANCELED
   ts_synced:
     lineage:
-      - datalake_betopera_clean.certificate_request.ts_synced
+    - datalake_betopera_clean.certificate_request.ts_synced
+    description: ''
   ts_created:
     lineage:
-      - datalake_betopera_clean.certificate_request.ts_created
+    - datalake_betopera_clean.certificate_request.ts_created
+    description: ''
   ts_updated:
     lineage:
-      - datalake_betopera_clean.certificate_request.ts_updated
+    - datalake_betopera_clean.certificate_request.ts_updated
+    description: ''
   year:
     lineage:
-      - datalake_betopera_clean.certificate_request.year
+    - datalake_betopera_clean.certificate_request.year
+    description: ''
   month:
     lineage:
-      - datalake_certificate_request_raw.certificate_request.month
+    - datalake_certificate_request_raw.certificate_request.month
+    description: ''
   day:
     lineage:
-      - datalake_certificate_request_raw.certificate_request.day
+    - datalake_certificate_request_raw.certificate_request.day
+    description: ''

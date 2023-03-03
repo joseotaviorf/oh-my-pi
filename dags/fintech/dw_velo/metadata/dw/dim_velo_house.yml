@@ -1,25 +1,44 @@
----
 database_name: dw_velo
 table_name: dim_velo_house
+description: Dimension with House realted to the contract details
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   sk_house:
     lineage:
-      - datalake_velo.house.id_house
+    - datalake_velo.house.id_house
+    description: ''
   type:
     lineage:
-      - datalake_velo.house.type
+    - datalake_velo.house.type
+    description: Property category type
+    categories:
+      Apartamento: ''
+      Casa: ''
+      Galpão: ''
+      Kitnet: ''
+      Loja: ''
+      Outros: ''
+      Sala: ''
   city:
     lineage:
-      - datalake_velo.house.city
+    - datalake_velo.house.city
+    description: ''
   state:
     lineage:
-      - datalake_velo.house.state
+    - datalake_velo.house.state
+    description: ''
   country:
     lineage:
-      - datalake_velo.house.country
+    - datalake_velo.house.country
+    description: ''
   zipcode:
     lineage:
-      - datalake_velo.house.zipcode
+    - datalake_velo.house.zipcode
+    description: ''
   geolocation:
     lineage:
-      - datalake_velo.house.geolocation
+    - datalake_velo.house.geolocation
+    description: ''
+  ts_load:
+    description: ''

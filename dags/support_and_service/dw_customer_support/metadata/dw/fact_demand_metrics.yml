@@ -1,57 +1,77 @@
----
 database_name: dw_customer_support
 table_name: fact_demand_metrics
+description: Fact table containing the demand metrics for each agent on a daily basis.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_agent:
     lineage:
-      - datalake_customer_demand.demand_metrics.id_agent
-      - datalake_customer_demand.backlog_metrics.id_agent
+    - datalake_customer_demand.demand_metrics.id_agent
+    - datalake_customer_demand.backlog_metrics.id_agent
+    description: Unique agent identifier.
   sk_demand_type:
     lineage:
-      - datalake_customer_demand.demand_metrics.type
-      - datalake_customer_demand.backlog_metrics.type
+    - datalake_customer_demand.demand_metrics.type
+    - datalake_customer_demand.backlog_metrics.type
+    description: Key generated as a MD5 from the demand string (for email tickets
+      it is the same as the zendesk department).
   sk_metric_reference_date:
     lineage:
-      - datalake_customer_demand.demand_metrics.dt_metric_reference
-      - datalake_customer_demand.backlog_metrics.dt_metric_reference
+    - datalake_customer_demand.demand_metrics.dt_metric_reference
+    - datalake_customer_demand.backlog_metrics.dt_metric_reference
+    description: Metric reference date id.
   demand_type:
     lineage:
-      - datalake_customer_demand.demand_metrics.type
-      - datalake_customer_demand.backlog_metrics.type
+    - datalake_customer_demand.demand_metrics.type
+    - datalake_customer_demand.backlog_metrics.type
+    description: Type of demand (for email tickets it is the same as the zendesk department).
   received_demand:
     lineage:
-      - datalake_customer_demand.demand_metrics.received_demand
+    - datalake_customer_demand.demand_metrics.received_demand
+    description: Number of received demand on that day.
   solved_demand:
     lineage:
-      - datalake_customer_demand.demand_metrics.solved_demand
+    - datalake_customer_demand.demand_metrics.solved_demand
+    description: Number of solved demand on that day.
   tickets_solved_within_sla:
     lineage:
-      - datalake_customer_demand.demand_metrics.tickets_solved_in_time
+    - datalake_customer_demand.demand_metrics.tickets_solved_in_time
+    description: Number of solved demand within the SLA.
   tickets_solved_with_exceed_sla:
     lineage:
-      - datalake_customer_demand.demand_metrics.tickets_not_solved_in_time
+    - datalake_customer_demand.demand_metrics.tickets_not_solved_in_time
+    description: Number of solved demand with exceed SLA.
   days_spent_on_solved_tickets_within_sla:
     lineage:
-      - datalake_customer_demand.demand_metrics.time_spent_on_tickets_solved_in_time
+    - datalake_customer_demand.demand_metrics.time_spent_on_tickets_solved_in_time
+    description: Days spent on solved tickets within SLA.
   days_spent_on_solved_tickets_with_exceed_sla:
     lineage:
-      - datalake_customer_demand.demand_metrics.time_spent_on_tickets_not_solved_in_time
+    - datalake_customer_demand.demand_metrics.time_spent_on_tickets_not_solved_in_time
+    description: Days spent on solved tickets with exceed SLA.
   total_time_spent:
     lineage:
-      - datalake_customer_demand.demand_metrics.total_days_spent
+    - datalake_customer_demand.demand_metrics.total_days_spent
   daily_backlog:
     lineage:
-      - datalake_customer_demand.backlog_metrics.daily_backlog
+    - datalake_customer_demand.backlog_metrics.daily_backlog
+    description: Number of demand in backlog.
   backlog_within_sla:
     lineage:
-      - datalake_customer_demand.backlog_metrics.backlog_in_time
+    - datalake_customer_demand.backlog_metrics.backlog_in_time
+    description: Number of demand in backlog still within the SLA.
   backlog_with_exceed_sla:
     lineage:
-      - datalake_customer_demand.backlog_metrics.backlog_not_in_time
+    - datalake_customer_demand.backlog_metrics.backlog_not_in_time
+    description: Number of demand in backlog that already exceeded the SLA.
   is_sunday:
     lineage:
-      - datalake_customer_demand.backlog_metrics.is_sunday
+    - datalake_customer_demand.backlog_metrics.is_sunday
+    description: Boolean to indicate if the metric reference day is a sunday.
   dt_metric_reference:
     lineage:
-      - datalake_customer_demand.demand_metrics.dt_metric_reference
-      - datalake_customer_demand.backlog_metrics.dt_metric_reference
+    - datalake_customer_demand.demand_metrics.dt_metric_reference
+    - datalake_customer_demand.backlog_metrics.dt_metric_reference
+    description: Metric reference date.
+  total_days_spent:
+    description: Total days spent.

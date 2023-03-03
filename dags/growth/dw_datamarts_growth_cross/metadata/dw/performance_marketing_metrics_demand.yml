@@ -1,164 +1,259 @@
----
 database_name: dw_datamarts_growth_cross
 table_name: performance_marketing_metrics_demand
+description: ''
+domain: Growth
+owner: ''
 columns:
   dt_event:
     lineage:
-      - datalake_gsheets_clean.demand_targets_replanning.dt_target
-      - datalake_gsheets_clean.mkt_cost_per_source.dt_event
-      - datalake_gsheets_clean.rental_flows_targets.date
-      - datalake_gsheets_clean.rental_ntp_source_targets.dt_target
-      - dw_datamarts_growth_cross.rent_flow_interactions.dt_event
-      - dw_datamarts_growth_cross.tenant_prospect_status.ts_start
-      - dw_public.dim_date.date
+    - datalake_gsheets_clean.demand_targets_replanning.dt_target
+    - datalake_gsheets_clean.mkt_cost_per_source.dt_event
+    - datalake_gsheets_clean.rental_flows_targets.date
+    - datalake_gsheets_clean.rental_ntp_source_targets.dt_target
+    - dw_datamarts_growth_cross.rent_flow_interactions.dt_event
+    - dw_datamarts_growth_cross.tenant_prospect_status.ts_start
+    - dw_public.dim_date.date
+    description: ''
   ts_event:
     lineage:
-      - datalake_gsheets_clean.demand_targets_replanning.dt_target
-      - datalake_gsheets_clean.mkt_cost_per_source.dt_event
-      - datalake_gsheets_clean.rental_flows_targets.date
-      - datalake_gsheets_clean.rental_ntp_source_targets.dt_target
-      - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
-      - dw_datamarts_growth_cross.tenant_prospect_status.ts_start
-      - dw_public.dim_date.date
+    - datalake_gsheets_clean.demand_targets_replanning.dt_target
+    - datalake_gsheets_clean.mkt_cost_per_source.dt_event
+    - datalake_gsheets_clean.rental_flows_targets.date
+    - datalake_gsheets_clean.rental_ntp_source_targets.dt_target
+    - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
+    - dw_datamarts_growth_cross.tenant_prospect_status.ts_start
+    - dw_public.dim_date.date
   status:
     lineage:
-      - dw_datamarts_growth_cross.tenant_prospect_status.status
+    - dw_datamarts_growth_cross.tenant_prospect_status.status
   status_detail:
     lineage:
-      - dw_datamarts_growth_cross.tenant_prospect_status.status_detail
+    - dw_datamarts_growth_cross.tenant_prospect_status.status_detail
   next_status:
     lineage:
-      - dw_datamarts_growth_cross.tenant_prospect_status.status
+    - dw_datamarts_growth_cross.tenant_prospect_status.status
   ts_status_start:
     lineage:
-      - dw_datamarts_growth_cross.tenant_prospect_status.ts_start
+    - dw_datamarts_growth_cross.tenant_prospect_status.ts_start
   ts_status_end:
     lineage:
-      - dw_datamarts_growth_cross.tenant_prospect_status.ts_end
+    - dw_datamarts_growth_cross.tenant_prospect_status.ts_end
   city_group:
     lineage:
-      - datalake_marketing_costs.daily_costs.city_group
-      - datalake_gsheets_clean.demand_targets_replanning.city_group
-      - datalake_gsheets_clean.mkt_cost_per_source.city_group
-      - datalake_gsheets_clean.rental_flows_targets.city_group
-      - datalake_gsheets_clean.rental_ntp_source_targets.city_group
-      - dw_datamarts_growth_cross.tenant_prospect_status.city_group
-      - dw_public.dim_region.city_group
+    - datalake_marketing_costs.daily_costs.city_group
+    - datalake_gsheets_clean.demand_targets_replanning.city_group
+    - datalake_gsheets_clean.mkt_cost_per_source.city_group
+    - datalake_gsheets_clean.rental_flows_targets.city_group
+    - datalake_gsheets_clean.rental_ntp_source_targets.city_group
+    - dw_datamarts_growth_cross.tenant_prospect_status.city_group
+    - dw_public.dim_region.city_group
+    description: ''
+    categories:
+      Belo Horizonte: ''
+      Brasília: ''
+      Campinas: ''
+      Cotia: '#N/A'
+      Curitiba: ''
+      Florianópolis: ''
+      Goiânia: ''
+      Mogi das Cruzes: '#N/A'
+      Not Mapped: ''
+      Porto Alegre: ''
+      RMSP: ''
+      Recife: '#N/A'
+      Ribeirão Preto: '#N/A'
+      Rio de Janeiro: ''
+      Salvador: '#N/A'
+      Santos: '#N/A'
+      Sorocaba: '#N/A'
+      São Jose dos Campos: '#N/A'
+      São José do Rio Preto: '#N/A'
+      São José dos Campos: '#N/A'
+      Uberlândia: '#N/A'
+      Vitória: '#N/A'
+      belo horizonte: ''
+      campinas: ''
+      curitiba: ''
+      florianópolis: ''
+      goiânia: ''
+      rio de janeiro: ''
   flow_event:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.flow_event
+    - dw_datamarts_growth_cross.rent_flow_interactions.flow_event
+    description: ''
+    categories:
+      Booking: '#N/A'
+      Offer: '#N/A'
+      Talk to Agent: '#N/A'
   mkt_origin:
     lineage:
-      - datalake_marketing_costs.daily_costs.mkt_origin
-      - dw_datamarts_growth_cross.rent_flow_interactions.mkt_origin
+    - datalake_marketing_costs.daily_costs.mkt_origin
+    - dw_datamarts_growth_cross.rent_flow_interactions.mkt_origin
+    description: ''
+    categories:
+      Not Mapped: ''
+      Tenants PWA: ''
   mkt_channel:
     lineage:
-      - datalake_gsheets_clean.rental_ntp_source_targets.mkt_channel
-      - datalake_gsheets_clean.mkt_cost_per_source.mkt_channel
-      - datalake_gsheets_clean.demand_targets_replanning.mkt_channel
-      - datalake_marketing_costs.daily_costs.mkt_channel
-      - dw_datamarts_growth_cross.rent_flow_interactions.mkt_channel
+    - datalake_gsheets_clean.rental_ntp_source_targets.mkt_channel
+    - datalake_gsheets_clean.mkt_cost_per_source.mkt_channel
+    - datalake_gsheets_clean.demand_targets_replanning.mkt_channel
+    - datalake_marketing_costs.daily_costs.mkt_channel
+    - dw_datamarts_growth_cross.rent_flow_interactions.mkt_channel
+    description: ''
   mkt_medium:
     lineage:
-      - datalake_gsheets_clean.rental_ntp_source_targets.mkt_medium
-      - datalake_gsheets_clean.mkt_cost_per_source.mkt_medium
-      - datalake_gsheets_clean.demand_targets_replanning.mkt_medium
-      - datalake_marketing_costs.daily_costs.mkt_medium
-      - dw_datamarts_growth_cross.rent_flow_interactions.mkt_medium
+    - datalake_gsheets_clean.rental_ntp_source_targets.mkt_medium
+    - datalake_gsheets_clean.mkt_cost_per_source.mkt_medium
+    - datalake_gsheets_clean.demand_targets_replanning.mkt_medium
+    - datalake_marketing_costs.daily_costs.mkt_medium
+    - dw_datamarts_growth_cross.rent_flow_interactions.mkt_medium
+    description: ''
+    categories:
+      Agents: ''
+      App Campaign: '#N/A'
+      Branding: ''
+      CX: ''
+      Direct: ''
+      Display: ''
+      Lost Tracking: ''
+      Not Mapped: ''
+      Not Tracked: ''
+      Notifications: ''
+      Online Classifieds: ''
+      Other: ''
+      Performance Max: '#N/A'
+      Portals: '#N/A'
+      Retargeting: ''
+      SEM branded: ''
+      SEM non-branded: ''
+      SEO: '#N/A'
+      SEO branded: ''
+      SEO non-branded: ''
+      Shared: ''
+      Social: ''
+      Support Tools: ''
   mkt_source:
     lineage:
-      - datalake_gsheets_clean.rental_ntp_source_targets.mkt_source
-      - datalake_gsheets_clean.mkt_cost_per_source.mkt_source
-      - datalake_gsheets_clean.demand_targets_replanning.mkt_source
-      - datalake_marketing_costs.daily_costs.mkt_source
-      - dw_datamarts_growth_cross.rent_flow_interactions.mkt_source
+    - datalake_gsheets_clean.rental_ntp_source_targets.mkt_source
+    - datalake_gsheets_clean.mkt_cost_per_source.mkt_source
+    - datalake_gsheets_clean.demand_targets_replanning.mkt_source
+    - datalake_marketing_costs.daily_costs.mkt_source
+    - dw_datamarts_growth_cross.rent_flow_interactions.mkt_source
+    description: ''
   utm_medium:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.utm_medium
+    - dw_datamarts_growth_cross.rent_flow_interactions.utm_medium
   utm_source:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.utm_medium
+    - dw_datamarts_growth_cross.rent_flow_interactions.utm_medium
   utm_campaign:
     lineage:
-      - datalake_marketing_costs.daily_costs.utm_campaign
-      - dw_datamarts_growth_cross.rent_flow_interactions.utm_campaign
+    - datalake_marketing_costs.daily_costs.utm_campaign
+    - dw_datamarts_growth_cross.rent_flow_interactions.utm_campaign
+    description: ''
   utm_term:
     lineage:
-      - datalake_marketing_costs.daily_costs.utm_term
-      - dw_datamarts_growth_cross.rent_flow_interactions.utm_term
+    - datalake_marketing_costs.daily_costs.utm_term
+    - dw_datamarts_growth_cross.rent_flow_interactions.utm_term
+    description: ''
   utm_content:
     lineage:
-      - datalake_marketing_costs.daily_costs.utm_content
-      - dw_datamarts_growth_cross.rent_flow_interactions.utm_content
+    - datalake_marketing_costs.daily_costs.utm_content
+    - dw_datamarts_growth_cross.rent_flow_interactions.utm_content
+    description: ''
   campaign_name:
     lineage:
-      - datalake_marketing_costs.daily_costs.campaign_name
+    - datalake_marketing_costs.daily_costs.campaign_name
+    description: ''
   sk_rf:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.sk_rf
+    - dw_datamarts_growth_cross.rent_flow_interactions.sk_rf
+    description: ''
   sk_client:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.sk_client
-      - dw_datamarts_growth_cross.tenant_prospect_status.sk_client
+    - dw_datamarts_growth_cross.rent_flow_interactions.sk_client
+    - dw_datamarts_growth_cross.tenant_prospect_status.sk_client
+    description: ''
   sk_house_listing:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.sk_house_listing
+    - dw_datamarts_growth_cross.rent_flow_interactions.sk_house_listing
+    description: ''
   id_house:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.id_house
+    - dw_datamarts_growth_cross.rent_flow_interactions.id_house
+    description: ''
   rent_flow_order:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.rent_flow_order
+    - dw_datamarts_growth_cross.rent_flow_interactions.rent_flow_order
+    description: ''
   tenant_prospect_order:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.tenant_prospect_order
+    - dw_datamarts_growth_cross.rent_flow_interactions.tenant_prospect_order
+    description: ''
   sk_booking:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_booking
+    - dw_public.fact_listing_rent_flows.sk_booking
+    description: ''
   sk_offer:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_offer
+    - dw_public.fact_listing_rent_flows.sk_offer
+    description: ''
   sk_proposal:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_proposal
+    - dw_public.fact_listing_rent_flows.sk_proposal
+    description: ''
   sk_contract:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_contract
+    - dw_public.fact_listing_rent_flows.sk_contract
+    description: ''
   dt_booking_created:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: ''
   flg_visit_completed:
     lineage:
-      - dw_public.fact_listing_rent_flows.flg_visit_completed
+    - dw_public.fact_listing_rent_flows.flg_visit_completed
+    description: ''
   dt_offer_submitted:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: ''
   dt_offer_approved:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: ''
   dt_tenant_first_doc_sent:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: ''
   dt_credit_analysis_approved:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: ''
   dt_contract_signed:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: ''
   rent_flows_target:
     lineage:
-      - datalake_gsheets_clean.rental_flows_targets.rf_target
+    - datalake_gsheets_clean.rental_flows_targets.rf_target
   new_rent_flows_target:
     lineage:
-      - datalake_gsheets_clean.demand_targets_replanning.new_rent_flows_target
+    - datalake_gsheets_clean.demand_targets_replanning.new_rent_flows_target
+    description: ''
   new_tenant_prospects_target:
     lineage:
-      - datalake_gsheets_clean.demand_targets_replanning.new_tenant_prospects_target
-      - datalake_gsheets_clean.rental_ntp_source_targets.ntp_target
+    - datalake_gsheets_clean.demand_targets_replanning.new_tenant_prospects_target
+    - datalake_gsheets_clean.rental_ntp_source_targets.ntp_target
+    description: ''
   recovered_tenant_prospects_target:
     lineage:
-      - datalake_gsheets_clean.rental_ntp_source_targets.rtp_target
+    - datalake_gsheets_clean.rental_ntp_source_targets.rtp_target
   budget:
     lineage:
-      - datalake_gsheets_clean.demand_targets_replanning.budget
-      - datalake_gsheets_clean.mkt_cost_per_source.daily_value
+    - datalake_gsheets_clean.demand_targets_replanning.budget
+    - datalake_gsheets_clean.mkt_cost_per_source.daily_value
+    description: ''
+  marketing_cost:
+    description: ''

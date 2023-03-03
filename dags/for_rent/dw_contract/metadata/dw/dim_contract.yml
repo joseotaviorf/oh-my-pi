@@ -1,156 +1,310 @@
 database_name: dw_public
 table_name: dim_contract
+description: Information about contracts. Each line is a contract
+domain: For Rent
+owner: ''
 columns:
   sk_contract:
     lineage:
-      - datalake_ebdb_contract.contract.id
+    - datalake_ebdb_contract.contract.id
+    description: ID of the contract
   id_contract:
     lineage:
-      - datalake_ebdb_contract.contract.id
+    - datalake_ebdb_contract.contract.id
+    description: key of the contract
   country_code:
     lineage:
-      - datalake_ebdb_contract.contract.country_code
+    - datalake_ebdb_contract.contract.country_code
+    description: Country code related to the contract's country of origin
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
   rent:
     lineage:
-      - datalake_ebdb_contract.contract.rent
+    - datalake_ebdb_contract.contract.rent
+    description: Monthly rent value as specified in the contract
   first_rent_charged:
     lineage:
-      - datalake_ebdb_contract.contract.first_rent_charged
+    - datalake_ebdb_contract.contract.first_rent_charged
   day_month_due:
     lineage:
-      - datalake_ebdb_contract.contract.billing_day_of_month
+    - datalake_ebdb_contract.contract.billing_day_of_month
+    description: day of month for rent collection existent in the contract
   guarantee:
     lineage:
-      - datalake_ebdb_contract.contract.guarantee_type
+    - datalake_ebdb_contract.contract.guarantee_type
+    description: company or guarantor from the contract
+    categories:
+      BrasilCap: ''
+      Deposito: ''
+      Fiador: ''
+      OutroTipoFiador: ''
+      PortoSeguro: ''
+      RentalGuarantee: '#N/A'
+      SeguroFairfax: ''
+      SeguroFiancaCardiff: ''
   type:
     lineage:
-      - datalake_ebdb_contract.contract.type
+    - datalake_ebdb_contract.contract.type
+    description: type of assurance from the contract
+    categories:
+      DealOnly: ''
+      FullService: ''
   status:
     lineage:
-      - datalake_ebdb_contract.contract.status
+    - datalake_ebdb_contract.contract.status
+    description: Current status of this contract
+    categories:
+      Ativo: The contract is active
+      Cancelado: The contract has been canceled
+      Finalizado: The contract was active for a period and has been terminated
+      Minuta: ''
+      PreAssinaturas: ''
   rental_administrator:
     lineage:
-      - datalake_ebdb_contract.contract.rental_administrator
+    - datalake_ebdb_contract.contract.rental_administrator
+    description: The rental administrator of the contract/house.
+    categories:
+      OWNER: Owner is the rental administrator, which means that the contract is brokerage-only
+      QUINTOANDAR: Default rental administrator, which is QuintoAndar
   condo_payer:
     lineage:
-      - datalake_ebdb_contract.contract.paying_condo
+    - datalake_ebdb_contract.contract.paying_condo
+    description: payer of the condominium in the contract
+    categories:
+      Inquilino: ''
+      Proprietario: ''
+      QuintoAndar: ''
   condo_responsible:
     lineage:
-      - datalake_ebdb_contract.contract.responsible_for_condo
+    - datalake_ebdb_contract.contract.responsible_for_condo
+    description: responsible for paying the condominium
+    categories:
+      Inquilino: ''
+      Proprietario: ''
   iptu_payer:
     lineage:
-      - datalake_ebdb_contract.contract.paying_iptu
+    - datalake_ebdb_contract.contract.paying_iptu
+    description: payer of the iptu from the contract
+    categories:
+      Inquilino: ''
+      Proprietario: ''
+      QuintoAndar: ''
   iptu_responsible:
     lineage:
-      - datalake_ebdb_contract.contract.responsible_for_iptu
+    - datalake_ebdb_contract.contract.responsible_for_iptu
+    description: Who is responsible in the contract for paying the IPTU tax
+    categories:
+      Inquilino: Tenant is responsible for paying the IPTU tax
+      Proprietario: Owner is responsible for paying the IPTU tax
   rental_insurance_installments:
     lineage:
-      - datalake_ebdb_contract.contract.rental_guarantee_installment
+    - datalake_ebdb_contract.contract.rental_guarantee_installment
+    description: installment number for paying the rental insurance in the contract
   rental_insurance_value:
     lineage:
-      - datalake_ebdb_contract.contract.rental_guarantee_value
+    - datalake_ebdb_contract.contract.rental_guarantee_value
+    description: Value of the rental insurance in the contract
   home_insurance_installments:
     lineage:
-      - datalake_ebdb_contract.contract.home_insurance_installment
+    - datalake_ebdb_contract.contract.home_insurance_installment
+    description: installment number for paying the home insurance in the contract
   home_insurance_value:
     lineage:
-      - datalake_ebdb_contract.contract.home_insurance_value
+    - datalake_ebdb_contract.contract.home_insurance_value
+    description: value from the home insurance existent in the contract
   first_rental_commission:
     lineage:
-      - datalake_ebdb_contract.contract.fist_rent_comission_fee
+    - datalake_ebdb_contract.contract.fist_rent_comission_fee
+    description: How many months rent are charged from the property owner as the rental
+      commission. The commission is paid in full to the real estate agent
   monthly_administration_fee:
     lineage:
-      - datalake_ebdb_contract.contract.monthly_administration_fee
+    - datalake_ebdb_contract.contract.monthly_administration_fee
+    description: The percentage QuintoAndar charges as  the monthly administration
+      fee for this contract
   condo:
     lineage:
-      - datalake_ebdb_contract.contract.condo_price
+    - datalake_ebdb_contract.contract.condo_price
+    description: Monthly condominium fee
   iptu:
     lineage:
-      - datalake_ebdb_contract.contract.iptu
+    - datalake_ebdb_contract.contract.iptu
+    description: value of the iptu existent in the contract
   tenant_service_fee:
     lineage:
-      - datalake_ebdb_contract.contract.tenant_service_fee
+    - datalake_ebdb_contract.contract.tenant_service_fee
+    description: Rent percentage paid monthly by the tenant as a Service Fee
   agent_brokerage_share:
     lineage:
-      - datalake_ebdb_contract.contract.agent_brokerage_share
+    - datalake_ebdb_contract.contract.agent_brokerage_share
   signature_type:
     lineage:
-      - datalake_ebdb_contract.contract.signature_type
+    - datalake_ebdb_contract.contract.signature_type
+    description: Type of the signature used in the contract
+    categories:
+      Eletronica: ''
   closing_status:
     lineage:
-      - datalake_ebdb_contract.contract.status_closing
+    - datalake_ebdb_contract.contract.status_closing
+    description: contract status from the process of rental
+    categories:
+      ApoliceSolicitada: ''
+      ChavesEntregues: ''
+      ContratoAssinado: ''
+      ContratoEnviado: ''
+      EntregaDeChavesAgendada: ''
+      PendenciaMinuta: ''
+      RedacaoContrato: ''
   cancellation_reason:
     lineage:
-      - datalake_ebdb_contract.contract.cancellation_reason
+    - datalake_ebdb_contract.contract.cancellation_reason
+    description: the reason why the contract was cancelled
+    categories:
+      DISAGREEMENT: ''
+      INCORRECT_INFO: ''
+      OTHERS: ''
+      OWNER_DELAY: ''
+      OWNER_DOESNT_AGREE: ''
+      OWNER_GAVE_UP_RENTING: ''
+      OWNER_PREFERS_OTHER: ''
+      OWNER_RENTING_WITH_OTHER_COMPANY: ''
+      OWNER_SELLING_HOUSE: ''
+      OWNER_UNABLE_TO_LEAVE: ''
+      PRICE_MODIFICATION: ''
+      SIG_DEADLINE_EXPIRED: ''
+      TENANT_BUYING_HOUSE: ''
+      TENANT_DELAY: ''
+      TENANT_DOESNT_AGREE: ''
+      TENANT_GAVE_UP_RENTING: ''
+      TENANT_PREFERS_OTHER: ''
+      TENANT_RENTING_WITH_OTHER_COMPANY: ''
+      TENANT_UNABLE_TO_LEAVE: ''
+      UNREACHABLE: ''
+      VALIDITY_DATES: ''
   version:
     lineage:
-      - datalake_ebdb_contract.contract.contract_version
+    - datalake_ebdb_contract.contract.contract_version
+    description: contract version according to a set of business rules
+    categories:
+      v0: ''
+      v1: ''
+      v10: ''
+      v10.1: ''
+      v10.2: ''
+      v10.3: ''
+      v10.4: ''
+      v10.5: '#N/A'
+      v10.6: '#N/A'
+      v10.7: '#N/A'
+      v2: ''
+      v3: ''
+      v4: ''
+      v5: ''
+      v6: ''
+      v7: ''
+      v8: ''
+      v8.1: ''
+      v9: ''
+      v9.1: ''
+      v9.2: ''
+      vP.1: ''
   is_b2b:
     lineage:
-      - datalake_ebdb_contract.contract_b2b.is_b2b
+    - datalake_ebdb_contract.contract_b2b.is_b2b
+    description: If the contract comes from B2B business
   is_contract_b2b:
     lineage:
-      - datalake_ebdb_contract.contract_b2b.is_contract_b2b
+    - datalake_ebdb_contract.contract_b2b.is_contract_b2b
   contract_partner_type:
     lineage:
-      - datalake_ebdb_contract.contract_b2b.contract_partner_type
+    - datalake_ebdb_contract.contract_b2b.contract_partner_type
   b2b_type:
     lineage:
-      - datalake_ebdb_contract.contract_b2b.b2b_type
+    - datalake_ebdb_contract.contract_b2b.b2b_type
+    description: type of b2b client origin from which comes the contract
+    categories:
+      online: ''
+      prime: ''
   b2b_prime_type:
     lineage:
-      - datalake_ebdb_contract.contract_b2b.b2b_prime_type
+    - datalake_ebdb_contract.contract_b2b.b2b_prime_type
+    description: type of b2b client prime from which comes the contract
+    categories:
+      advanced_negotiation: ''
+      batch: ''
+      portability: ''
+      standard: ''
   contract_plan:
     lineage:
-      - datalake_ebdb_contract.contract_b2b.contract_plan
+    - datalake_ebdb_contract.contract_b2b.contract_plan
   administration_split_percentage:
     lineage:
-      - datalake_ebdb_contract.contract_b2b.administration_split_percentage
+    - datalake_ebdb_contract.contract_b2b.administration_split_percentage
   brokerage_split_percentage:
     lineage:
-      - datalake_ebdb_contract.contract_b2b.brokerage_split_percentage
+    - datalake_ebdb_contract.contract_b2b.brokerage_split_percentage
   is_ongoing_contract:
     lineage:
-      - datalake_ebdb_contract.contract.is_ongoing_contract
+    - datalake_ebdb_contract.contract.is_ongoing_contract
+    description: ''
   is_tenant_service_fee_opt_out:
     lineage:
-      - datalake_ebdb_contract.contract.is_tenant_service_fee_opt_out
+    - datalake_ebdb_contract.contract.is_tenant_service_fee_opt_out
+    description: If the contract's tenant service fee has been opt out
   is_exit_inspection_opted_out:
     lineage:
-      - datalake_ebdb_contract.contract.is_exit_inspection_opted_out
+    - datalake_ebdb_contract.contract.is_exit_inspection_opted_out
   dt_start:
     lineage:
-      - datalake_ebdb_contract.contract.dt_started
+    - datalake_ebdb_contract.contract.dt_started
+    description: start date of contract
   dt_entrance:
     lineage:
-      - datalake_ebdb_contract.contract.dt_entered
+    - datalake_ebdb_contract.contract.dt_entered
+    description: Date of when tenant will move into the property as defined in the
+      contract
   dt_intended_end:
     lineage:
-      - datalake_ebdb_contract.contract.dt_contract_expected_end
+    - datalake_ebdb_contract.contract.dt_contract_expected_end
+    description: intended end date of contract
   dt_annulment:
     lineage:
-      - datalake_ebdb_contract.contract.dt_termination
+    - datalake_ebdb_contract.contract.dt_termination
+    description: Date of the annulment from the contract. The contract being annulment
+      means that it ended after signature, which can be between the signature and
+      start of after the start.
   ts_created:
     lineage:
-      - datalake_ebdb_contract.contract.ts_created
+    - datalake_ebdb_contract.contract.ts_created
+    description: Timestamp of when the contract was created
   ts_updated:
     lineage:
-      - datalake_ebdb_contract.contract.ts_updated
+    - datalake_ebdb_contract.contract.ts_updated
+    description: Timestamp of when the contract was last updated
   ts_expected_termination:
     lineage:
-      - datalake_ebdb_contract.contract.ts_expected_termination
+    - datalake_ebdb_contract.contract.ts_expected_termination
   ts_signature:
     lineage:
-      - datalake_ebdb_contract.contract.ts_signed
+    - datalake_ebdb_contract.contract.ts_signed
+    description: Timestamp of when the contract was signed
   ts_draft_approved:
     lineage:
-      - datalake_ebdb_contract.contract.ts_minuta_approved
+    - datalake_ebdb_contract.contract.ts_minuta_approved
+    description: Timestamp of when the contract draft was approved
   ts_canceled:
     lineage:
-      - datalake_ebdb_contract.contract.ts_canceled
+    - datalake_ebdb_contract.contract.ts_canceled
+    description: Timestamp of when the contract was cancelled. The contract being
+      canceled means that it was ended before the signature
   ts_tenant_service_fee_opt_out:
     lineage:
-      - datalake_ebdb_contract.contract.ts_tenant_service_fee_opt_out
+    - datalake_ebdb_contract.contract.ts_tenant_service_fee_opt_out
+    description: Timestamp of when tenant service fee opt out was created
   ts_analyst_annulment_input:
     lineage:
-      - datalake_ebdb_contract.contract.ts_analyst_annulment_input
+    - datalake_ebdb_contract.contract.ts_analyst_annulment_input
+    description: ''
+  ts_load:
+    description: Timestamp of when this data row was last loaded

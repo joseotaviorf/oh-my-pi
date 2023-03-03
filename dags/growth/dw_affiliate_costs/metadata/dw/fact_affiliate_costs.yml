@@ -1,19 +1,28 @@
----
 database_name: dw_quintoandar
 table_name: fact_affiliate_costs
+description: ''
+domain: Growth
+owner: ''
 columns:
   sk_rh_accounting_entry:
     lineage:
-      - datalake_robin_hood.affiliate_costs.id_rh_accounting_entry
+    - datalake_robin_hood.affiliate_costs.id_rh_accounting_entry
+    description: ''
   sk_payee:
     lineage:
-      - datalake_robin_hood.affiliate_costs.id_payee
+    - datalake_robin_hood.affiliate_costs.id_payee
+    description: ''
   sk_date:
     lineage:
-      - datalake_robin_hood.affiliate_costs.dt_transaction
+    - datalake_robin_hood.affiliate_costs.dt_transaction
+    description: ''
   sk_user:
     lineage:
-      - datalake_robin_hood.affiliate_costs.id_external
+    - datalake_robin_hood.affiliate_costs.id_external
+    description: ''
   cost:
     lineage:
-      - datalake_robin_hood.affiliate_costs.cost
+    - datalake_robin_hood.affiliate_costs.cost
+    description: ''
+  ts_load:
+    description: ''

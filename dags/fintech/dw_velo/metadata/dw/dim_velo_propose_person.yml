@@ -1,43 +1,61 @@
----
 database_name: dw_velo
 table_name: dim_velo_propose_person
+description: Details of persons related to the contract
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   sk_person:
     lineage:
-      - datalake_velo.propose_person.id_person
+    - datalake_velo.propose_person.id_person
+    description: ''
   name:
     lineage:
-      - datalake_velo.propose_person.name
+    - datalake_velo.propose_person.name
+    description: ''
   email:
     lineage:
-      - datalake_velo.propose_person.email
+    - datalake_velo.propose_person.email
+    description: ''
   phone:
     lineage:
-      - datalake_velo.propose_person.phone
+    - datalake_velo.propose_person.phone
   bureau_name:
     lineage:
-      - datalake_velo.propose_person.bureau_name
+    - datalake_velo.propose_person.bureau_name
+    description: Name of the bureau that analysed the person score
   document:
     lineage:
-      - datalake_velo.propose_person.document
+    - datalake_velo.propose_person.document
+    description: ''
   serasa_score:
     lineage:
-      - datalake_velo.propose_person.serasa_score
+    - datalake_velo.propose_person.serasa_score
+    description: ''
   risk_score:
     lineage:
-      - datalake_velo.propose_person.risk_score
+    - datalake_velo.propose_person.risk_score
+    description: ''
   risk_classification:
     lineage:
-      - datalake_velo.propose_person.risk_classification
+    - datalake_velo.propose_person.risk_classification
+    description: ''
   score_personal_value:
     lineage:
-      - datalake_velo.propose_person.score_personal_value
+    - datalake_velo.propose_person.score_personal_value
+    description: ''
   declared_income:
     lineage:
-      - datalake_velo.propose_person.declared_income
+    - datalake_velo.propose_person.declared_income
+    description: ''
   requested_income:
     lineage:
-      - datalake_velo.propose_person.requested_income
+    - datalake_velo.propose_person.requested_income
+    description: ''
   dt_birth:
     lineage:
-      - datalake_velo.propose_person.dt_birth
+    - datalake_velo.propose_person.dt_birth
+    description: ''
+  is_primary_person:
+    description: ''
+  ts_load:
+    description: ''

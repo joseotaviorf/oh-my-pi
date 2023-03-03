@@ -1,33 +1,60 @@
 database_name: datalake_betopera
 table_name: insurance
+description: 'Information about the life cycle of insurance policies: creation, cancellation
+  and renewal'
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_betopera_clean.insurance.id
+    - datalake_betopera_clean.insurance.id
+    description: ''
   id_idempotency:
     lineage:
-      - datalake_betopera_clean.insurance.id_idempotency
+    - datalake_betopera_clean.insurance.id_idempotency
   source_type_code:
     lineage:
-      - datalake_betopera_clean.insurance.source_type_code
+    - datalake_betopera_clean.insurance.source_type_code
   status:
     lineage:
-      - datalake_betopera_clean.insurance.status
+    - datalake_betopera_clean.insurance.status
+    description: the current status for the insurance entity PENDING | CREATED | FAILED
+      | PENDING_CANCELLATION | CANCELED
   version:
     lineage:
-      - datalake_betopera_clean.insurance.version
+    - datalake_betopera_clean.insurance.version
+    description: ''
   ts_created:
     lineage:
-      - datalake_betopera_clean.insurance.ts_created
+    - datalake_betopera_clean.insurance.ts_created
+    description: ''
   ts_updated:
     lineage:
-      - datalake_betopera_clean.insurance.ts_updated
+    - datalake_betopera_clean.insurance.ts_updated
+    description: ''
   year:
     lineage:
-      - datalake_betopera_clean.insurance.year
+    - datalake_betopera_clean.insurance.year
+    description: ''
   month:
     lineage:
-      - datalake_betopera_clean.insurance.month
+    - datalake_betopera_clean.insurance.month
+    description: ''
   day:
     lineage:
-      - datalake_betopera_clean.insurance.day
+    - datalake_betopera_clean.insurance.day
+    description: ''
+  id_insurance:
+    description: ''
+  id_certificate_request:
+    description: ''
+  response_payload:
+    description: ''
+  file_url:
+    description: ''
+  dt_start:
+    description: ''
+  dt_end:
+    description: ''
+  dt_cancel:
+    description: ''

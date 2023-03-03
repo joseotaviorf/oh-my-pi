@@ -1,25 +1,50 @@
----
 database_name: datalake_crawlers_listings
 table_name: loft_status_listing_flows
+description: Creates a history of publication and depublication of loft listings.
+  Every row represents a change in status, with its validity period.
+domain: For Rent
+owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - datalake_crawlers_listings.loft_region_mapping.id_house
+    - datalake_crawlers_listings.loft_region_mapping.id_house
+    description: ID with the competitor name together. In this case, <id>Loft.
   id_house_platform:
     lineage:
-      - datalake_crawlers_listings.loft_region_mapping.id_house_platform
+    - datalake_crawlers_listings.loft_region_mapping.id_house_platform
+    description: ID from platform.
   id_neighborhood:
     lineage:
-      - datalake_crawlers_listings.loft_region_mapping.id_neighborhood
+    - datalake_crawlers_listings.loft_region_mapping.id_neighborhood
+    description: ID of the house listing's region.
   neighborhood:
     lineage:
-      - datalake_crawlers_listings.loft_region_mapping.neighborhood
+    - datalake_crawlers_listings.loft_region_mapping.neighborhood
+    description: House listing neighborhood name.
   ts_last_extraction:
     lineage:
-      - datalake_crawlers_listings.loft_region_mapping.dt_updated
+    - datalake_crawlers_listings.loft_region_mapping.dt_updated
+    description: Timestamp of when the last extraction happened.
   ts_started_date:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: Timestamp of when the validity period of that status started.
   ts_ended_date:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: Timestamp of when the validity period of that status ended.
+  status_history:
+    description: Tells if that row means the listing was published or unpublished.
+      Can be either "Publicado" or "Despublicado".
+    categories:
+      Publicado: The listing has been published.
+      Despublicado: The listing has been unpublished. Or, at the very least, it didn't
+        show up that week, but did on the previous.
+  is_last_status:
+    description: If that row is the most recent status of the listing.
+  weeks_published:
+    description: How many weeks the listing has appeared in a row as published.
+  weeks_unpublished:
+    description: How many weeks the listing has been unpublished in a row.
+  ts_load:
+    description: Timestamp of when the table was last processed.

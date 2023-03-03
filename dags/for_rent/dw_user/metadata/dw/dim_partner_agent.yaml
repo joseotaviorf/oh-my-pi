@@ -1,30 +1,54 @@
 database_name: dw_public
 table_name: dim_partner_agent
+description: Real estate agents from companies partnering with QuintoAndar in our
+  B2B model (see dim_partner table). Each line is a partner company's real estate
+  agent.
+domain: For Rent
+owner: E ForRent@quintoandar.com.br
 columns:
   sk_partner_agent:
     lineage:
-      - datalake_ebdb_clean.partner_agent.id
+    - datalake_ebdb_clean.partner_agent.id
+    description: Key of the agent
   id_partner_agent:
     lineage:
-      - datalake_ebdb_clean.partner_agent.id
+    - datalake_ebdb_clean.partner_agent.id
+    description: Key of the agent
   id_user:
     lineage:
-      - datalake_ebdb_clean.partner_agent.id_user
+    - datalake_ebdb_clean.partner_agent.id_user
+    description: Key of the agent's 5A user
   id_partner:
     lineage:
-      - datalake_ebdb_clean.partner_agent.id_partner
+    - datalake_ebdb_clean.partner_agent.id_partner
+    description: Key of the agent's partner
   country_code:
     lineage:
-      - datalake_ebdb_country.user.country_code
+    - datalake_ebdb_country.user.country_code
+    description: Country code of the partner agent
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
   status_partner_agent:
     lineage:
-      - datalake_ebdb_clean.partner_agent.status
+    - datalake_ebdb_clean.partner_agent.status
+    description: Status to identify wheter the agent is active or not
+    categories:
+      ACTIVE: ''
+      INACTIVE: ''
   type:
     lineage:
-      - datalake_ebdb_clean.partner_agent.type
+    - datalake_ebdb_clean.partner_agent.type
+    description: ''
+    categories:
+      OPERATIONS_AGENT: '#N/A'
   ts_created:
     lineage:
-      - datalake_ebdb_clean.partner_agent.ts_created
+    - datalake_ebdb_clean.partner_agent.ts_created
+    description: Timestamp of record creation
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.partner_agent.ts_updated
+    - datalake_ebdb_clean.partner_agent.ts_updated
+    description: Timestamp of record last update
+  ts_load:
+    description: Timestamp of record loading

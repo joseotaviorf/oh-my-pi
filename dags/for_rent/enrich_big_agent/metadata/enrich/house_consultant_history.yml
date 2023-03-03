@@ -1,37 +1,56 @@
----
 database_name: datalake_big_agent
 table_name: house_consultant_history
+description: History information of House and CIQ by Agency
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
 columns:
   id_agency:
     lineage:
-      - datalake_big_agent_clean.agency_aud.id
+    - datalake_big_agent_clean.agency_aud.id
+    description: id from agency coming from datalake_big_agent_clean.agency_aud
   id_enrollment:
     lineage:
-      - datalake_big_agent_clean.agency_aud.id_enrollment
+    - datalake_big_agent_clean.agency_aud.id_enrollment
+    description: Version of the enrollment also coming from agency_aud
   id_house:
     lineage:
-      - datalake_big_agent.house.details
+    - datalake_big_agent.house.details
+    description: id from the house
   id_partner:
     lineage:
-      - datalake_ebdb_clean.partner_agent.id_partner
+    - datalake_ebdb_clean.partner_agent.id_partner
+    description: id from the partner assigned to the house
   id_user:
     lineage:
-      - datalake_big_agent_clean.agent.details
+    - datalake_big_agent_clean.agent.details
+    description: id of the user responsible for the house
   rev:
     lineage:
-      - datalake_big_agent_clean.agency_aud.rev
+    - datalake_big_agent_clean.agency_aud.rev
+    description: revision number from the agency_aud
   consultant_type:
     lineage:
-      - datalake_big_agent.program.name
+    - datalake_big_agent.program.name
+    description: type of the CIQ
+    categories:
+      ASP: House has an ASP manager assigned(similar to CIQ Manager)
+      CIQ_FULL: House is fully managed by the CIQ
+      CIQ_MANAGER: House has a CIQ manager assigned
   dt_consultant_started:
     lineage:
-      - datalake_big_agent_clean.agency.dt_since
+    - datalake_big_agent_clean.agency.dt_since
+    description: date of the first assignment
   ts_consultant_deleted:
     lineage:
-      - datalake_big_agent_clean.agency.ts_deleted
+    - datalake_big_agent_clean.agency.ts_deleted
+    description: removed date of the consultant
   ts_enrollment_started:
     lineage:
-      - datalake_big_agent_clean.user_revision_entity.ts_revision
+    - datalake_big_agent_clean.user_revision_entity.ts_revision
+    description: date when the enrollment version started
   ts_enrollment_ended:
     lineage:
-      - datalake_big_agent_clean.user_revision_entity.ts_revision
+    - datalake_big_agent_clean.user_revision_entity.ts_revision
+    description: date when the enrollment version ended
+  is_last_status_of_day:
+    description: true if it's the last registry from the history

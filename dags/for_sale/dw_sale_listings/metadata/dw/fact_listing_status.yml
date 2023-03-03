@@ -1,34 +1,58 @@
----
 database_name: dw_sale
 table_name: fact_listing_status
+description: ''
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   sk_sale_listing:
     lineage:
-      - datalake_sale_listings.sale_listing_status.id_sale_listing
+    - datalake_sale_listings.sale_listing_status.id_sale_listing
+    description: Identification of the listing version, which may be in edition (version
+      0) or already published (version 1).
   sk_region:
     lineage:
-      - datalake_sale_listings.sale_listing_status.id_region
+    - datalake_sale_listings.sale_listing_status.id_region
+    description: Key of region where house listing is located in.
   sk_first_publication_date:
     lineage:
-      - datalake_sale_listings.sale_listing_status.ts_first_publication
+    - datalake_sale_listings.sale_listing_status.ts_first_publication
+    description: Date of listing first publication.
   sk_status_start_date:
     lineage:
-      - datalake_sale_listings.sale_listing_status.ts_status_started
+    - datalake_sale_listings.sale_listing_status.ts_status_started
+    description: Date when status started.
   sk_status_end_date:
     lineage:
-      - datalake_sale_listings.sale_listing_status.ts_status_ended
+    - datalake_sale_listings.sale_listing_status.ts_status_ended
+    description: Date when status changed.
   ts_status_started:
     lineage:
-      - datalake_sale_listings.sale_listing_status.ts_status_started
+    - datalake_sale_listings.sale_listing_status.ts_status_started
+    description: Timestamp when status started.
   ts_status_ended:
     lineage:
-      - datalake_sale_listings.sale_listing_status.ts_status_ended
+    - datalake_sale_listings.sale_listing_status.ts_status_ended
+    description: Timestamp when status changed.
   status_history:
     lineage:
-      - datalake_sale_listings.sale_listing_status.status_history
+    - datalake_sale_listings.sale_listing_status.status_history
+    description: Status of sale listing
+    categories:
+      CCV_CANCELED: ''
+      CCV_SIGNED: ''
+      EDITING: ''
+      OPTED_OUT: ''
+      PUBLISHED: ''
+      SALE_COMPLETED: ''
+      SUSPENDED: ''
+      UNPUBLISHED: ''
   status_change_reason:
     lineage:
-      - datalake_sale_listings.sale_listing_status.status_change_reason
+    - datalake_sale_listings.sale_listing_status.status_change_reason
+    description: Reason why status changed.
   is_last_status:
     lineage:
-      - datalake_sale_listings.sale_listing_status.is_last_status
+    - datalake_sale_listings.sale_listing_status.is_last_status
+    description: Flag to highlight last status update
+  ts_load:
+    description: Timestamp of data load.

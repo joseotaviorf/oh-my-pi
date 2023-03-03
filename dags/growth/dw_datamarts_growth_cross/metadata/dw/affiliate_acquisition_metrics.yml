@@ -1,46 +1,119 @@
----
 database_name: dw_datamarts_growth_cross
 table_name: affiliate_acquisition_metrics
-columns:  
+description: ''
+domain: Growth
+owner: ''
+columns:
   date:
     lineage:
-      - dw_public.dim_date.date
-      - datalake_gsheets_clean.affiliates_acquisition_targets.dt_target
-      - dw_public.dim_user_affiliate.ts_joined_program
+    - dw_public.dim_date.date
+    - datalake_gsheets_clean.affiliates_acquisition_targets.dt_target
+    - dw_public.dim_user_affiliate.ts_joined_program
+    description: ''
   city_group:
     lineage:
-      - dw_public.dim_user_affiliate.marketing_city_group
-      - datalake_marketing_costs.daily_costs.city_group
+    - dw_public.dim_user_affiliate.marketing_city_group
+    - datalake_marketing_costs.daily_costs.city_group
+    description: ''
+    categories:
+      Belo Horizonte: '#N/A'
+      Brasília: '#N/A'
+      Campinas: '#N/A'
+      Cotia: '#N/A'
+      Curitiba: '#N/A'
+      Florianópolis: '#N/A'
+      Goiânia: '#N/A'
+      Mogi das Cruzes: '#N/A'
+      Not Mapped: '#N/A'
+      Porto Alegre: '#N/A'
+      RMSP: '#N/A'
+      Recife: '#N/A'
+      Ribeirão Preto: '#N/A'
+      Rio de Janeiro: '#N/A'
+      Salvador: '#N/A'
+      Santos: '#N/A'
+      Sorocaba: '#N/A'
+      São José dos Campos: '#N/A'
+      Vitória: '#N/A'
   mkt_origin:
     lineage:
-      - dw_public.dim_user_affiliate.mkt_origin
-      - datalake_marketing_costs.daily_costs.mkt_origin
-      - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_origin
-      - dw_quintoandar.dim_affiliate_cost.mkt_origin
+    - dw_public.dim_user_affiliate.mkt_origin
+    - datalake_marketing_costs.daily_costs.mkt_origin
+    - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_origin
+    - dw_quintoandar.dim_affiliate_cost.mkt_origin
+    description: ''
+    categories:
+      Doorman: '#N/A'
+      Indica Aí - Agents: '#N/A'
+      Indica Aí - General: '#N/A'
+      Not Mapped: '#N/A'
+      Other: '#N/A'
   mkt_channel:
     lineage:
-      - dw_public.dim_user_affiliate.mkt_channel
-      - datalake_marketing_costs.daily_costs.mkt_channel
-      - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_channel
+    - dw_public.dim_user_affiliate.mkt_channel
+    - datalake_marketing_costs.daily_costs.mkt_channel
+    - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_channel
+    description: ''
   mkt_medium:
     lineage:
-      - dw_public.dim_user_affiliate.mkt_medium
-      - datalake_marketing_costs.daily_costs.mkt_medium
-      - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_medium
+    - dw_public.dim_user_affiliate.mkt_medium
+    - datalake_marketing_costs.daily_costs.mkt_medium
+    - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_medium
+    description: ''
+    categories:
+      Cross Domain: '#N/A'
+      Direct: '#N/A'
+      Display: '#N/A'
+      Email: '#N/A'
+      Not Mapped: '#N/A'
+      Retargeting: '#N/A'
+      SEM Branded: '#N/A'
+      SEM non-branded: '#N/A'
+      SMS: '#N/A'
+      Support Tools: '#N/A'
+      Teste: '#N/A'
   mkt_source:
     lineage:
-      - dw_public.dim_user_affiliate.mkt_source
-      - datalake_marketing_costs.daily_costs.mkt_source
-      - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_source
+    - dw_public.dim_user_affiliate.mkt_source
+    - datalake_marketing_costs.daily_costs.mkt_source
+    - datalake_gsheets_clean.affiliates_acquisition_targets.mkt_source
+    description: ''
   utm_campaign:
     lineage:
-      - dw_public.dim_user_affiliate.tracking_campaign
-      - datalake_marketing_costs.daily_costs.utm_campaign
+    - dw_public.dim_user_affiliate.tracking_campaign
+    - datalake_marketing_costs.daily_costs.utm_campaign
+    description: ''
   utm_content:
     lineage:
-      - dw_public.dim_user_affiliate.tracking_campaign
-      - datalake_marketing_costs.daily_costs.utm_campaign
+    - dw_public.dim_user_affiliate.tracking_campaign
+    - datalake_marketing_costs.daily_costs.utm_campaign
+    description: ''
   utm_term:
     lineage:
-      - dw_public.dim_user_affiliate.tracking_campaign
-      - datalake_marketing_costs.daily_costs.utm_campaign
+    - dw_public.dim_user_affiliate.tracking_campaign
+    - datalake_marketing_costs.daily_costs.utm_campaign
+    description: ''
+  active_affiliate_lead_d1:
+    description: ''
+  active_affiliate_prospect_d1:
+    description: ''
+  active_affiliate_prospect_d1_target:
+    description: ''
+  active_affiliate_qualified_d1:
+    description: ''
+  affiliates:
+    description: ''
+  budget:
+    description: ''
+  cost:
+    description: ''
+  first_listings:
+    description: ''
+  leads:
+    description: ''
+  opportunities:
+    description: ''
+  prospects:
+    description: ''
+  qualifieds:
+    description: ''

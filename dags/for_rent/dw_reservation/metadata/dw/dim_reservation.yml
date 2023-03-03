@@ -1,36 +1,61 @@
 database_name: dw_public
 table_name: dim_reservation
+description: QuintoAndar allows tenants to reserve properties by making a payment.
+  Each line is a reservation attempt
+domain: For Rent
+owner: raphael.guia@quintoandar.com.br
 columns:
   sk_reservation:
     lineage:
-      - datalake_kill_queue.reservation.id_reservation
+    - datalake_kill_queue.reservation.id_reservation
+    description: Key of reservation
   id_reservation:
     lineage:
-      - datalake_kill_queue.reservation.id_reservation
+    - datalake_kill_queue.reservation.id_reservation
+    description: Id of reservation
   version:
     lineage:
-      - datalake_kill_queue.reservation.version
+    - datalake_kill_queue.reservation.version
+    description: Attempt number of payment
   attempt:
     lineage:
-      - datalake_kill_queue.reservation.attempt
+    - datalake_kill_queue.reservation.attempt
+    description: Number of tries of user
   status:
     lineage:
-      - datalake_kill_queue.reservation.status
+    - datalake_kill_queue.reservation.status
+    description: Status of the reservation
+    categories:
+      CANCELED: ''
+      CHARGED: ''
+      FAILED: ''
+      FINISHED: ''
+      RETURNED: ''
+      START: ''
+      TOKEN_RECEIVED: ''
   cancellation_reason:
     lineage:
-      - datalake_kill_queue.reservation.cancellation_reason
+    - datalake_kill_queue.reservation.cancellation_reason
+    description: Reason why reservation was cancelled if status is equal to 'CANCELED'
+      or 'RETURNED'
   value:
     lineage:
-      - datalake_kill_queue.reservation.value
+    - datalake_kill_queue.reservation.value
+    description: Value paid by tentant for the reservation fee
   installments:
     lineage:
-      - datalake_kill_queue.reservation.installments
+    - datalake_kill_queue.reservation.installments
+    description: ''
   is_ongoing:
     lineage:
-      - datalake_kill_queue.reservation.is_ongoing
+    - datalake_kill_queue.reservation.is_ongoing
+    description: Flag which indicates if reservation is still open (when status is
+      either equal to 'CHARGED' or 'TOKEN_RECEIVED')
   ts_created:
     lineage:
-      - datalake_kill_queue.reservation.ts_created
+    - datalake_kill_queue.reservation.ts_created
+    description: Timestamp of when reservation was created
   ts_updated:
     lineage:
-      - datalake_kill_queue.reservation.ts_updated
+    - datalake_kill_queue.reservation.ts_updated
+    description: Timestamp of table update

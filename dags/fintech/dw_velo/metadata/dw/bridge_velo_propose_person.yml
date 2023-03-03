@@ -1,13 +1,20 @@
----
 database_name: dw_velo
 table_name: bridge_velo_propose_person
+description: Bridge Table responsible for connecting dim_velo_propose_person with
+  fact_velo_propose.
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   sk_person:
     lineage:
-      - datalake_velo.propose_person.id_person
+    - datalake_velo.propose_person.id_person
+    description: Surrogate Key from dim_velo_propose_person.
   sk_propose:
     lineage:
-      - datalake_velo.propose_person.id_propose
+    - datalake_velo.propose_person.id_propose
+    description: Surrogate Key from fact_velo_propose.
   is_primary_person:
     lineage:
-      - datalake_velo.propose_person.is_primary_person
+    - datalake_velo.propose_person.is_primary_person
+  ts_load:
+    description: ''

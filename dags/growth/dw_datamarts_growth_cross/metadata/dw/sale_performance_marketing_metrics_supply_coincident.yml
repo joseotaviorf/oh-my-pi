@@ -1,133 +1,213 @@
----
 database_name: dw_datamarts_growth_cross
 table_name: sale_performance_marketing_metrics_supply_coincident
+description: ''
+domain: Growth
+owner: ''
 columns:
   date:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: ''
   city_group:
     lineage:
-      - datalake_gsheets_clean.costs_targets.city_group
-      - datalake_gsheets_clean.daily_target_supply_sale.city_group
-      - datalake_gsheets_clean.sale_supply_targets.city_group
-      - datalake_marketing_costs.daily_costs.city_group
-      - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.city_group
-      - dw_public.dim_region.city_group
-      - dw_quintoandar.dim_affiliate_cost.city_group
+    - datalake_gsheets_clean.costs_targets.city_group
+    - datalake_gsheets_clean.daily_target_supply_sale.city_group
+    - datalake_gsheets_clean.sale_supply_targets.city_group
+    - datalake_marketing_costs.daily_costs.city_group
+    - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.city_group
+    - dw_public.dim_region.city_group
+    - dw_quintoandar.dim_affiliate_cost.city_group
+    description: ''
+    categories:
+      RMSP: '#N/A'
+      Rio de Janeiro: '#N/A'
   mkt_origin:
     lineage:
-      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
-      - datalake_gsheets_clean.daily_target_supply_sale.supply_origin
-      - datalake_gsheets_clean.sale_supply_targets.mkt_channel
-      - datalake_gsheets_clean.sale_supply_targets.mkt_origin
-      - datalake_marketing_costs.daily_costs.mkt_origin
-      - datalake_marketing_costs.daily_costs.mkt_channel
-      - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
-      - dw_quintoandar.dim_affiliate_cost.mkt_origin
-      - dw_sale.fact_listing_flows.sk_user_lead_affiliate
-      - dw_sale.fact_listing_flows.mkt_origin
+    - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+    - datalake_gsheets_clean.daily_target_supply_sale.supply_origin
+    - datalake_gsheets_clean.sale_supply_targets.mkt_channel
+    - datalake_gsheets_clean.sale_supply_targets.mkt_origin
+    - datalake_marketing_costs.daily_costs.mkt_origin
+    - datalake_marketing_costs.daily_costs.mkt_channel
+    - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
+    - dw_quintoandar.dim_affiliate_cost.mkt_origin
+    - dw_sale.fact_listing_flows.sk_user_lead_affiliate
+    - dw_sale.fact_listing_flows.mkt_origin
+    description: ''
+    categories:
+      B2B: '#N/A'
+      Backend: '#N/A'
+      CRM/Notification: '#N/A'
+      Doorman: '#N/A'
+      Inbound: '#N/A'
+      Indica Aí - Agents: '#N/A'
+      Indica Aí - General: '#N/A'
+      Lost Tracking: '#N/A'
+      Not Mapped: '#N/A'
+      Organic: '#N/A'
+      Other: '#N/A'
+      Owner PWA: '#N/A'
+      Owner PWA - Sale: '#N/A'
+      Paid: '#N/A'
+      Price Calculator: '#N/A'
   mkt_channel:
     lineage:
-      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
-      - datalake_gsheets_clean.daily_target_supply_sale.supply_channel
-      - datalake_gsheets_clean.sale_supply_targets.mkt_channel
-      - datalake_gsheets_clean.sale_supply_targets.mkt_origin
-      - datalake_marketing_costs.daily_costs.mkt_channel
-      - dw_sale.fact_listing_flows.mkt_channel
+    - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+    - datalake_gsheets_clean.daily_target_supply_sale.supply_channel
+    - datalake_gsheets_clean.sale_supply_targets.mkt_channel
+    - datalake_gsheets_clean.sale_supply_targets.mkt_origin
+    - datalake_marketing_costs.daily_costs.mkt_channel
+    - dw_sale.fact_listing_flows.mkt_channel
+    description: ''
   planning_mkt_channel:
     lineage:
-      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
-      - datalake_gsheets_clean.daily_target_supply_sale.supply_channel
-      - datalake_gsheets_clean.daily_target_supply_sale.supply_origin
-      - datalake_gsheets_clean.sale_supply_targets.mkt_channel
-      - datalake_gsheets_clean.sale_supply_targets.mkt_origin
-      - datalake_marketing_costs.daily_costs.mkt_origin
-      - datalake_marketing_costs.daily_costs.mkt_channel
-      - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
-      - dw_quintoandar.dim_affiliate_cost.mkt_origin
-      - dw_sale.fact_listing_flows.sk_user_lead_affiliate
-      - dw_sale.fact_listing_flows.mkt_channel
-      - dw_sale.fact_listing_flows.mkt_origin
+    - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+    - datalake_gsheets_clean.daily_target_supply_sale.supply_channel
+    - datalake_gsheets_clean.daily_target_supply_sale.supply_origin
+    - datalake_gsheets_clean.sale_supply_targets.mkt_channel
+    - datalake_gsheets_clean.sale_supply_targets.mkt_origin
+    - datalake_marketing_costs.daily_costs.mkt_origin
+    - datalake_marketing_costs.daily_costs.mkt_channel
+    - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
+    - dw_quintoandar.dim_affiliate_cost.mkt_origin
+    - dw_sale.fact_listing_flows.sk_user_lead_affiliate
+    - dw_sale.fact_listing_flows.mkt_channel
+    - dw_sale.fact_listing_flows.mkt_origin
+    description: ''
   mkt_medium:
     lineage:
-      - datalake_gsheets_clean.daily_target_supply_sale.supply_medium
-      - datalake_marketing_costs.daily_costs.mkt_medium
-      - dw_sale.fact_listing_flows.mkt_medium
+    - datalake_gsheets_clean.daily_target_supply_sale.supply_medium
+    - datalake_marketing_costs.daily_costs.mkt_medium
+    - dw_sale.fact_listing_flows.mkt_medium
+    description: ''
+    categories:
+      ? ''
+      : '#N/A'
+      Branding: '#N/A'
+      Cross Domain: '#N/A'
+      Direct: '#N/A'
+      Direct Referral: '#N/A'
+      Display: '#N/A'
+      Doorman User: '#N/A'
+      Email: '#N/A'
+      Lost Tracking: '#N/A'
+      Not Mapped: '#N/A'
+      Online Classifieds: '#N/A'
+      Other: '#N/A'
+      Performance Max: '#N/A'
+      Pop-Up: '#N/A'
+      Push: '#N/A'
+      Retargeting: '#N/A'
+      SEM branded: '#N/A'
+      SEM non-branded: '#N/A'
+      SEO branded: '#N/A'
+      SEO non-branded: '#N/A'
+      SMS: '#N/A'
+      Test: '#N/A'
+      Whatsapp: '#N/A'
   mkt_source:
     lineage:
-      - datalake_gsheets_clean.daily_target_supply_sale.supply_source
-      - datalake_marketing_costs.daily_costs.mkt_source
-      - dw_sale.fact_listing_flows.sk_user_lead_affiliate
-      - dw_sale.fact_listing_flows.mkt_source
+    - datalake_gsheets_clean.daily_target_supply_sale.supply_source
+    - datalake_marketing_costs.daily_costs.mkt_source
+    - dw_sale.fact_listing_flows.sk_user_lead_affiliate
+    - dw_sale.fact_listing_flows.mkt_source
+    description: ''
   utm_campaign:
     lineage:
-      - datalake_marketing_costs.daily_costs.utm_campaign
-      - dw_public.dim_lead.utm_campaign
+    - datalake_marketing_costs.daily_costs.utm_campaign
+    - dw_public.dim_lead.utm_campaign
+    description: ''
   utm_content:
     lineage:
-      - datalake_marketing_costs.daily_costs.utm_content
-      - dw_public.dim_lead.utm_content
+    - datalake_marketing_costs.daily_costs.utm_content
+    - dw_public.dim_lead.utm_content
+    description: ''
   utm_term:
     lineage:
-      - datalake_marketing_costs.daily_costs.utm_term
-      - dw_public.dim_lead.utm_term
+    - datalake_marketing_costs.daily_costs.utm_term
+    - dw_public.dim_lead.utm_term
+    description: ''
   origin_phone:
     lineage:
-      - datalake_wololo_clean.prospect.origin_phone
+    - datalake_wololo_clean.prospect.origin_phone
   campaign_context:
     lineage:
-      - datalake_gsheets_clean.costs_targets.campaign
-      - dw_public.dim_lead.utm_campaign
-      - dw_sale.fact_listing_flows.sk_user_lead_affiliate
-      - dw_sale.fact_listing_flows.mkt_channel
-      - dw_sale.fact_listing_flows.mkt_origin
+    - datalake_gsheets_clean.costs_targets.campaign
+    - dw_public.dim_lead.utm_campaign
+    - dw_sale.fact_listing_flows.sk_user_lead_affiliate
+    - dw_sale.fact_listing_flows.mkt_channel
+    - dw_sale.fact_listing_flows.mkt_origin
+    description: ''
+    categories:
+      HYBRID: '#N/A'
+      Hybrid: '#N/A'
+      Organic: '#N/A'
+      Other: '#N/A'
+      Rental: '#N/A'
+      SALE: '#N/A'
+      Sale: '#N/A'
   business_context:
     lineage:
-      - datalake_gsheets_clean.costs_targets.business
+    - datalake_gsheets_clean.costs_targets.business
+    description: ''
+    categories:
+      Sale: '#N/A'
   leads:
     lineage:
-      - dw_sale.fact_listing_flows.sk_lead_date
-      - dw_sale.fact_listing_flows.sk_house_listing_flow
+    - dw_sale.fact_listing_flows.sk_lead_date
+    - dw_sale.fact_listing_flows.sk_house_listing_flow
+    description: ''
   prospects:
     lineage:
-      - dw_sale.fact_listing_flows.sk_prospect_date
-      - dw_sale.fact_listing_flows.sk_house_listing_flow
+    - dw_sale.fact_listing_flows.sk_prospect_date
+    - dw_sale.fact_listing_flows.sk_house_listing_flow
+    description: ''
   qualifieds:
     lineage:
-      - dw_sale.fact_listing_flows.sk_qualified_date
-      - dw_sale.fact_listing_flows.sk_house_listing_flow
+    - dw_sale.fact_listing_flows.sk_qualified_date
+    - dw_sale.fact_listing_flows.sk_house_listing_flow
+    description: ''
   opportunities:
     lineage:
-      - dw_sale.fact_listing_flows.sk_opportunity_date
-      - dw_sale.fact_listing_flows.sk_house_listing_flow
+    - dw_sale.fact_listing_flows.sk_opportunity_date
+    - dw_sale.fact_listing_flows.sk_house_listing_flow
+    description: ''
   first_listings:
     lineage:
-      - dw_sale.fact_listing_flows.sk_first_listing_date
-      - dw_sale.fact_listing_flows.sk_house_listing_flow
+    - dw_sale.fact_listing_flows.sk_first_listing_date
+    - dw_sale.fact_listing_flows.sk_house_listing_flow
+    description: ''
   hybrid_listings:
     lineage:
-      - dw_public.fact_house_listing_flows.sk_house_listing
-      - dw_sale.fact_listing_flows.sk_house_listing_flow
+    - dw_public.fact_house_listing_flows.sk_house_listing
+    - dw_sale.fact_listing_flows.sk_house_listing_flow
+    description: ''
   cost:
     lineage:
-      - datalake_marketing_costs.daily_costs.cost
-      - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.final_bonus_sale
-      - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.final_bonus_rent
+    - datalake_marketing_costs.daily_costs.cost
+    - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.final_bonus_sale
+    - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.final_bonus_rent
+    description: ''
   prospects_target:
     lineage:
-      - datalake_gsheets_clean.daily_target_supply_sale.prospects
-      - datalake_gsheets_clean.sale_supply_targets.prospects
+    - datalake_gsheets_clean.daily_target_supply_sale.prospects
+    - datalake_gsheets_clean.sale_supply_targets.prospects
+    description: ''
   qualifieds_target:
     lineage:
-      - datalake_gsheets_clean.daily_target_supply_sale.qualifieds
-      - datalake_gsheets_clean.sale_supply_targets.qualifieds
+    - datalake_gsheets_clean.daily_target_supply_sale.qualifieds
+    - datalake_gsheets_clean.sale_supply_targets.qualifieds
+    description: ''
   opportunities_target:
     lineage:
-      - datalake_gsheets_clean.sale_supply_targets.opportunities
+    - datalake_gsheets_clean.sale_supply_targets.opportunities
+    description: ''
   first_listings_target:
     lineage:
-      - datalake_gsheets_clean.sale_supply_targets.first_listings
+    - datalake_gsheets_clean.sale_supply_targets.first_listings
+    description: ''
   budget:
     lineage:
-      - datalake_gsheets_clean.costs_targets.budget_mensal
-      - datalake_gsheets_clean.daily_target_supply_sale.cost_per_source
+    - datalake_gsheets_clean.costs_targets.budget_mensal
+    - datalake_gsheets_clean.daily_target_supply_sale.cost_per_source
+    description: ''

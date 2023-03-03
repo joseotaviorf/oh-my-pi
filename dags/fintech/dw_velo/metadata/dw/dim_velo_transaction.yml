@@ -1,31 +1,57 @@
----
 database_name: dw_velo
 table_name: dim_velo_transaction
+description: Dimension with the general details of the transaction
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   sk_transaction:
     lineage:
-      - datalake_velo.transaction_entries.id_trasaction
+    - datalake_velo.transaction_entries.id_trasaction
+    description: ''
   project:
     lineage:
-      - datalake_velo.transaction_entries.project
+    - datalake_velo.transaction_entries.project
+    description: Project name on OMIE
   status:
     lineage:
-      - datalake_velo.transaction_entries.status
+    - datalake_velo.transaction_entries.status
+    description: Status of the transaction
+    categories:
+      A VENCER: ''
+      ATRASADO: ''
+      PAGO: ''
+      RECEBIDO: ''
+      VENCE HOJE: ''
   transaction_type:
     lineage:
-      - datalake_velo.transaction_entries.transaction_type
+    - datalake_velo.transaction_entries.transaction_type
+    description: ''
+    categories:
+      CONTA_A_PAGAR: ''
+      CONTA_A_RECEBER: ''
   transaction_purpose:
     lineage:
-      - datalake_velo.transaction_entries.transaction_purpose
+    - datalake_velo.transaction_entries.transaction_purpose
+    description: ''
+    categories:
+      ongoing: ''
+      rescisão: ''
   installment:
     lineage:
-      - datalake_velo.transaction_entries.installment
+    - datalake_velo.transaction_entries.installment
+    description: Wich installment the transaction relates
   total_expected_installments:
     lineage:
-      - datalake_velo.transaction_entries.total_expected_installments
+    - datalake_velo.transaction_entries.total_expected_installments
+    description: Number of total installments expected to be paid by all transctions
+      related to this one
   is_project_receivable_created:
     lineage:
-      - datalake_velo.transaction_entries.is_project_receivable_created
+    - datalake_velo.transaction_entries.is_project_receivable_created
+    description: ''
   is_project_receivable_greater_than_payable:
     lineage:
-      - datalake_velo.transaction_entries.is_project_receivable_greater_than_payable
+    - datalake_velo.transaction_entries.is_project_receivable_greater_than_payable
+    description: ''
+  ts_load:
+    description: ''

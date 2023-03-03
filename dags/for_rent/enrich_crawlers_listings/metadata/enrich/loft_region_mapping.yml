@@ -1,17 +1,27 @@
----
 database_name: datalake_crawlers_listings
 table_name: loft_region_mapping
+description: Finds the id_neighborhood given the listing's latitude and longitude.
+domain: For Rent
+owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - datalake_crawlers_listings_clean.loft.id
+    - datalake_crawlers_listings_clean.loft.id
+    description: ID with the competitor name together. In this case, <id>Loft.
   id_house_platform:
     lineage:
-      - datalake_crawlers_listings_clean.loft.id
+    - datalake_crawlers_listings_clean.loft.id
+    description: ID from platform.
   id_neighborhood:
     lineage:
-      - datalake_ebdb_clean.map_region.id
+    - datalake_ebdb_clean.map_region.id
+    description: ID of the house listing's region.
   neighborhood:
     lineage:
-      - datalake_ebdb_clean.map_region.name
-      - datalake_crawlers_listings_clean.loft.address
+    - datalake_ebdb_clean.map_region.name
+    - datalake_crawlers_listings_clean.loft.address
+    description: House listing neighborhood name.
+  dt_updated:
+    description: Date of when that house listing showed up.
+  ts_load:
+    description: Timestamp of when the row was added to the table.

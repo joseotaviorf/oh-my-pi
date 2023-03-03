@@ -1,37 +1,49 @@
----
 database_name: datalake_ebdb_country
 table_name: user
+description: Information related to the counrty of origin of a user.
+domain: For Rent
+owner: data-international@quintoandar.com.br
 columns:
   id_user:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: Id of the user.
   id_agent:
     lineage:
-      - datalake_ebdb_clean.user.id_agent
+    - datalake_ebdb_clean.user.id_agent
+    description: Id of the agent user.
   id_sales_rep:
     lineage:
-      - datalake_ebdb_clean.user.id_sales_rep
+    - datalake_ebdb_clean.user.id_sales_rep
+    description: Id of the sales rep user.
   id_affiliate:
     lineage:
-      - datalake_ebdb_clean.user.id_affiliates
+    - datalake_ebdb_clean.user.id_affiliates
+    description: Id of the affiliate user.
   id_photographer_data:
     lineage:
-      - datalake_ebdb_clean.user.id_photographer_data
+    - datalake_ebdb_clean.user.id_photographer_data
+    description: Id of the prographer user.
   id_partner_agent:
     lineage:
-      - datalake_ebdb_clean.partner_agent.id
+    - datalake_ebdb_clean.partner_agent.id
   id_country:
     lineage:
-      - datalake_ebdb_clean.user.id_country
+    - datalake_ebdb_clean.user.id_country
+    description: Id of the country of origin of the user.
   id_state:
     lineage:
-      - datalake_ebdb_clean.user.id_state
+    - datalake_ebdb_clean.user.id_state
+    description: Id of the state of the user.
   country_code:
     lineage:
-      - datalake_ebdb_clean.country.code
+    - datalake_ebdb_clean.country.code
+    description: Country code of the user. Also, a partition of this table.
   ts_created:
     lineage:
-      - datalake_ebdb_clean.user.ts_created
+    - datalake_ebdb_clean.user.ts_created
+    description: Timestamp of when the user was created.
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.user.ts_updated
+    - datalake_ebdb_clean.user.ts_updated
+    description: Timestamp of when the user suffered an update.

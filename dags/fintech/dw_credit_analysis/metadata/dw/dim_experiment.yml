@@ -1,19 +1,27 @@
----
 database_name: dw_credit
 table_name: dim_experiment
+description: This table brings informations about the experiments made with our credit
+  engine variants
+domain: Fintech
+owner: fernando.araujo@quintoandar.com.br
 columns:
   id_experiment:
     lineage:
-      - datalake_sorting_hat_clean.experiment.id
+    - datalake_sorting_hat_clean.experiment.id
+    description: Experiment ID
   experiment_name:
     lineage:
-      - datalake_sorting_hat_clean.experiment.name
+    - datalake_sorting_hat_clean.experiment.name
+    description: Experiment name
   experiment_description:
     lineage:
-      - datalake_sorting_hat_clean.experiment.description
+    - datalake_sorting_hat_clean.experiment.description
+    description: Experiment description
   ts_experiment_started:
     lineage:
-      - datalake_sorting_hat_clean.experiment.ts_started
+    - datalake_sorting_hat_clean.experiment.ts_started
+    description: Date/time in which the experiment started
   ts_experiment_ended:
     lineage:
-      - datalake_sorting_hat_clean.experiment.ts_ended
+    - datalake_sorting_hat_clean.experiment.ts_ended
+    description: Date/time in which the experiment ended

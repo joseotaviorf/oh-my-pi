@@ -1,57 +1,169 @@
----
 database_name: dw_datamarts_growth_cross
 table_name: unique_supply_events_funnel
+description: ''
+domain: Growth
+owner: ''
 columns:
   date:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: ''
   city_group:
     lineage:
-      - dw_public.dim_region.city_group
+    - dw_public.dim_region.city_group
+    description: ''
+    categories:
+      Belo Horizonte: '#N/A'
+      Brasília: '#N/A'
+      Campinas: '#N/A'
+      Cotia: '#N/A'
+      Curitiba: '#N/A'
+      Florianópolis: '#N/A'
+      Goiânia: '#N/A'
+      Mogi das Cruzes: '#N/A'
+      Porto Alegre: '#N/A'
+      RMSP: '#N/A'
+      Recife: '#N/A'
+      Ribeirão Preto: '#N/A'
+      Rio de Janeiro: '#N/A'
+      Salvador: '#N/A'
+      Santos: '#N/A'
+      Sorocaba: '#N/A'
+      São José dos Campos: '#N/A'
+      Vitória: '#N/A'
   country_code:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.country_code
+    - dw_datamarts_cross.lead_listing_flows.country_code
   supply_mkt_origin:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+    - dw_datamarts_cross.lead_listing_flows.mkt_origin
+    description: ''
+    categories:
+      B2B: '#N/A'
+      Backend: '#N/A'
+      CIQ: '#N/A'
+      Doorman: '#N/A'
+      Inbound: '#N/A'
+      Indica Aí - Agents: '#N/A'
+      Indica Aí - General: '#N/A'
+      Other: '#N/A'
+      Owner PWA: '#N/A'
+      Price Calculator: '#N/A'
   supply_mkt_origin_detailed:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.mkt_channel
-      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+    - dw_datamarts_cross.lead_listing_flows.mkt_channel
+    - dw_datamarts_cross.lead_listing_flows.mkt_origin
+    description: ''
+    categories:
+      B2B: '#N/A'
+      Backend: '#N/A'
+      CIQ: '#N/A'
+      CRM/Notification: '#N/A'
+      Doorman: '#N/A'
+      Inbound: '#N/A'
+      Indica Aí - Agents: '#N/A'
+      Indica Aí - General: '#N/A'
+      LeadEnrichment: '#N/A'
+      Organic: '#N/A'
+      Other: '#N/A'
+      Paid: '#N/A'
+      Price Calculator: '#N/A'
   lead_context:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+    - dw_datamarts_cross.lead_listing_flows.mkt_origin
+    description: ''
+    categories:
+      B2B: '#N/A'
+      CIQ: '#N/A'
+      FSS: '#N/A'
+      IS: '#N/A'
   sales_company:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sales_company
+    - dw_datamarts_cross.lead_listing_flows.sales_company
+    description: ''
   sourcing_ops:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+    - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+    description: ''
+    categories:
+      B2B: '#N/A'
+      CIQ: '#N/A'
+      FSS: '#N/A'
+      FSS IS PhotoJob: '#N/A'
+      IS Ext: '#N/A'
+      IS Int: '#N/A'
+      Other: '#N/A'
   lead_processing_operation:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+    - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+    description: ''
+    categories:
+      B2B: '#N/A'
+      CIQ: '#N/A'
+      FSS: '#N/A'
+      IS: '#N/A'
   context:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.context_first_listing
-      - dw_datamarts_cross.lead_listing_flows.context_lead
-      - dw_datamarts_cross.lead_listing_flows.context_opportunity
-      - dw_datamarts_cross.lead_listing_flows.context_prospect
-      - dw_datamarts_cross.lead_listing_flows.context_qualified
+    - dw_datamarts_cross.lead_listing_flows.context_first_listing
+    - dw_datamarts_cross.lead_listing_flows.context_lead
+    - dw_datamarts_cross.lead_listing_flows.context_opportunity
+    - dw_datamarts_cross.lead_listing_flows.context_prospect
+    - dw_datamarts_cross.lead_listing_flows.context_qualified
+    description: ''
+    categories:
+      Hybrid: '#N/A'
+      Rent: '#N/A'
+      Sale: '#N/A'
   origin_table:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.origin_table
+    - dw_datamarts_cross.lead_listing_flows.origin_table
+    description: ''
+    categories:
+      Rent: '#N/A'
+      Sale: '#N/A'
   lead_origin:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.lead_origin
+    - dw_datamarts_cross.lead_listing_flows.lead_origin
+    description: ''
+    categories:
+      App: '#N/A'
+      Crawling: '#N/A'
+      Desconhecida: '#N/A'
+      Facebook: '#N/A'
+      Form: '#N/A'
+      Inbound: '#N/A'
+      Ios: '#N/A'
+      Landing: '#N/A'
+      LeadEnrichment: '#N/A'
+      LeadOutbound: '#N/A'
+      Other: '#N/A'
+      OwnerPWA: '#N/A'
+      Planilha: '#N/A'
+      PriceSuggestion: '#N/A'
+      Reprocessado: '#N/A'
+      Trade: '#N/A'
   rental_administrator:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.rental_administrator
+    - dw_datamarts_cross.lead_listing_flows.rental_administrator
   funnel_drop_reason:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.funnel_drop_reason
+    - dw_datamarts_cross.lead_listing_flows.funnel_drop_reason
+    description: ''
   supply_3p_partner:
     lineage:
-      - datalake_3p.houses_3p.partner
+    - datalake_3p.houses_3p.partner
   supply_3pbh_partner:
     lineage:
-      - datalake_3p.houses_3p_bh.partner
+    - datalake_3p.houses_3p_bh.partner
+  first_listings:
+    description: ''
+  leads:
+    description: ''
+  opportunities:
+    description: ''
+  prospects:
+    description: ''
+  qualifieds:
+    description: ''
+  ts_load:
+    description: ''

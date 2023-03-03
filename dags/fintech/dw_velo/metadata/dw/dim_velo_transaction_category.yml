@@ -1,16 +1,24 @@
----
 database_name: dw_velo
 table_name: dim_velo_transaction_category
+description: Dimension with the details of the category of the transacion entry
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   sk_category:
     lineage:
-      - datalake_velo.transaction_category.id_category
+    - datalake_velo.transaction_category.id_category
+    description: ''
   description:
     lineage:
-      - datalake_velo.transaction_category.description
+    - datalake_velo.transaction_category.description
+    description: ''
   nature_description:
     lineage:
-      - datalake_velo.transaction_category.nature_description
+    - datalake_velo.transaction_category.nature_description
+    description: ''
   dre_description:
     lineage:
-      - datalake_velo.transaction_category.dre_description
+    - datalake_velo.transaction_category.dre_description
+    description: ''
+  ts_load:
+    description: ''

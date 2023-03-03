@@ -1,39 +1,57 @@
 database_name: dw_customer_support
 table_name: dim_ranking_targets
+description: Targets applied on top of the agent productivity to produce the agent
+  ranking.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_group:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.id_group
+    - datalake_gsheets_clean.agents_ranking_targets.id_group
+    description: Group unique identifier.
   sk_department:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.team
+    - datalake_gsheets_clean.agents_ranking_targets.team
+    description: Key generated as a MD5 from the department string.
   department:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.team
+    - datalake_gsheets_clean.agents_ranking_targets.team
+    description: Department string.
   target_resolution:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.target_resolution
+    - datalake_gsheets_clean.agents_ranking_targets.target_resolution
+    description: Resolution target.
   target_csat:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.target_csat
+    - datalake_gsheets_clean.agents_ranking_targets.target_csat
+    description: CSAT target.
   target_sla:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.target_sla
+    - datalake_gsheets_clean.agents_ranking_targets.target_sla
+    description: SLA target.
   target_productivity:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.productivity_target
+    - datalake_gsheets_clean.agents_ranking_targets.productivity_target
+    description: Productivity target.
   target_ra_score:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.ra_target_score
+    - datalake_gsheets_clean.agents_ranking_targets.ra_target_score
+    description: ReclameAqui score target.
   target_ra_solution_rate:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.ra_target_solution_rate
+    - datalake_gsheets_clean.agents_ranking_targets.ra_target_solution_rate
+    description: ReclameAqui solution rate target.
   target_reclameaqui_would_do_business_again:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.ra_would_do_business_again_target
+    - datalake_gsheets_clean.agents_ranking_targets.ra_would_do_business_again_target
   dt_start:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.dt_start
+    - datalake_gsheets_clean.agents_ranking_targets.dt_start
+    description: Start of the validity of the targets listed in this dimension.
   dt_end:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.dt_end
+    - datalake_gsheets_clean.agents_ranking_targets.dt_end
+    description: End of the validity of the targets listed in this dimension. If null
+      the target is valid until the current_date.
+  target_ra_would_do_business_again:
+    description: ReclameAqui would fo business again target.

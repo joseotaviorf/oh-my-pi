@@ -1,76 +1,120 @@
 database_name: datalake_region
 table_name: region
+description: Table that contains information to all regions that QuintoAndar has operations.
+domain: For Rent
+owner: orRent Analytics Engineering Team@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_clean.region.id
-      - datalake_gsheets_clean.auxiliary_region.id
+    - datalake_ebdb_clean.region.id
+    - datalake_gsheets_clean.auxiliary_region.id
+    description: Id of the region
   id_city:
     lineage:
-      - datalake_ebdb_clean.region.id
+    - datalake_ebdb_clean.region.id
+    description: City id of the region
   id_macro_region:
     lineage:
-      - datalake_ebdb_clean.region.id
+    - datalake_ebdb_clean.region.id
+    description: Macro region id of the region
   id_country:
     lineage:
-      - datalake_ebdb_clean.state.id_country
+    - datalake_ebdb_clean.state.id_country
+    description: Country id of the region
   country_code:
     lineage:
-      - datalake_ebdb_clean.country.code
+    - datalake_ebdb_clean.country.code
+    description: Country code of the region
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
   level:
     lineage:
-      - datalake_ebdb_clean.region.level
+    - datalake_ebdb_clean.region.level
+    description: The geopolitical subdivision that the region belongs to
+    categories:
+      Cidade: When the region is a city
+      MacroRegiao: When the region is a macroregion
+      SubRegiao: When the region is a subregion
   name:
     lineage:
-      - datalake_ebdb_clean.region.name
-      - datalake_gsheets_clean.auxiliary_region.neighbourhood
+    - datalake_ebdb_clean.region.name
+    - datalake_gsheets_clean.auxiliary_region.neighbourhood
+    description: The name of the region
   macro_region_name:
     lineage:
-      - datalake_ebdb_clean.region.name
+    - datalake_ebdb_clean.region.name
+    description: Name of the macro region of the region
   city_name:
     lineage:
-      - datalake_ebdb_clean.region.name
-      - datalake_gsheets_clean.auxiliary_region.city
+    - datalake_ebdb_clean.region.name
+    - datalake_gsheets_clean.auxiliary_region.city
+    description: City name of the region
   city_group:
     lineage:
-      - datalake_gsheets_clean.auxiliary_region.city_group
+    - datalake_gsheets_clean.auxiliary_region.city_group
+    description: City group of the region
   city_ddd:
     lineage:
-      - datalake_gsheets_clean.auxiliary_region.ddd
+    - datalake_gsheets_clean.auxiliary_region.ddd
+    description: City DDD of the region
   region_code:
     lineage:
-      - datalake_gsheets_clean.auxiliary_region.region_code
+    - datalake_gsheets_clean.auxiliary_region.region_code
+    description: Code of the region
   region_code_deprecated:
     lineage:
-      - datalake_gsheets_clean.auxiliary_region.region_code_deprecated
+    - datalake_gsheets_clean.auxiliary_region.region_code_deprecated
   region_code_inspector:
     lineage:
-      - datalake_gsheets_clean.auxiliary_region.region_code_inspector
+    - datalake_gsheets_clean.auxiliary_region.region_code_inspector
   short_region_name:
     lineage:
-      - datalake_gsheets_clean.auxiliary_region.state
+    - datalake_gsheets_clean.auxiliary_region.state
+    description: Short region name
   greater_region:
     lineage:
-      - datalake_gsheets_clean.auxiliary_region.city
-      - datalake_ebdb_clean.region.name
+    - datalake_gsheets_clean.auxiliary_region.city
+    - datalake_ebdb_clean.region.name
+    description: Greater region related to the region
   regional:
     lineage:
-      - datalake_gsheets_clean.auxiliary_region.regional
+    - datalake_gsheets_clean.auxiliary_region.regional
+    description: Regional code
   regional_deprecated:
     lineage:
-      - datalake_gsheets_clean.auxiliary_region.regional_deprecated
+    - datalake_gsheets_clean.auxiliary_region.regional_deprecated
+    description: Deprecated regional
   regional_inspection:
     lineage:
-      - datalake_gsheets_clean.auxiliary_region.regional_inspection
+    - datalake_gsheets_clean.auxiliary_region.regional_inspection
+    description: Regional inspection
   tier:
     lineage:
-      - datalake_gsheets_clean.auxiliary_region.tier
+    - datalake_gsheets_clean.auxiliary_region.tier
+    description: In which tier this region is, related to ***
   is_city:
     lineage:
-      - datalake_ebdb_clean.region.level
+    - datalake_ebdb_clean.region.level
+    description: Boolean related to if the region is or not a city
   ts_created:
     lineage:
-      - datalake_ebdb_clean.region.ts_created
+    - datalake_ebdb_clean.region.ts_created
+    description: Timestamp of when the region was created
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.region.ts_updated
+    - datalake_ebdb_clean.region.ts_updated
+    description: Timestamp of when the region was updated
+  country_name:
+    description: Coutry name of the region
+    categories:
+      Brazil: ''
+      Mexico: ''
+  has_rent_operation:
+    description: Boolean indicating if QuintoAndar operates with ForRent context in
+      the given region (a region can be exclusive to Rent, exclusive to Sale or served
+      by both contexts). If true, indicates that there is Rent operation in the region.
+  has_sale_operation:
+    description: Boolean indicating if QuintoAndar operates with ForSale context in
+      the given region (a region can be exclusive to Rent, exclusive to Sale or served
+      by both contexts). If true, indicates that there is Sale operation in the region.

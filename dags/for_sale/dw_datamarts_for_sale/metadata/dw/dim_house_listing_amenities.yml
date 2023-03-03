@@ -1,11 +1,188 @@
----
 database_name: dw_datamarts_for_sale
 table_name: dim_house_listing_amenities
+description: Table that maps all listings with their respective amenities and installations
+  (condo amenities). It brings the most recently itens and house condition checked
+  by the photographer
+domain: For Sale
+owner: helena.alves@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - datalake_ebdb_clean.info_amenities.id_house
-      - datalake_ebdb_clean.house_maintenance_condition.id_house
+    - datalake_ebdb_clean.info_amenities.id_house
+    - datalake_ebdb_clean.house_maintenance_condition.id_house
+    description: The house's unique ID, for joining with the dim_house_lisitng table
   house_condition:
     lineage:
-      - datalake_ebdb_clean.house_maintenance_condition.maintenance_condition
+    - datalake_ebdb_clean.house_maintenance_condition.maintenance_condition
+    description: The house's maintenance condition
+    categories:
+      ALMOST_PERFECT_STATE: ''
+      NEW_OR_WITHOUT_BASIC_ITENS: ''
+      OLD: ''
+      PERFECT_STATE: ''
+      POORLY_MAINTAINED: ''
+  academia:
+    description: If the condominium has a gym (1 - yes, 0 - no, null - no information)
+  acesso_sem_degraus:
+    description: If the house has no step level front entrance (1 - yes, 0 - no, null
+      - no information)
+  animais_de_estimacao:
+    description: If the owner accept pets in the house (1 - yes, 0 - no, null - no
+      information)
+  apartamento_cobertura:
+    description: If the house is a penthouse apartment (1 - yes, 0 - no, null - no
+      information)
+  ar_condicionado:
+    description: If the house has air-conditioning (1 - yes, 0 - no, null - no information)
+  armarios_na_cozinha:
+    description: If the house has at least 1 kitchen cabinets (1 - yes, 0 - no, null
+      - no information)
+  armarios_no_banheiro:
+    description: If the house has at least 1 bathroom cabinets (1 - yes, 0 - no, null
+      - no information)
+  armarios_no_quarto:
+    description: If the house has at least 1 bedroom wardrobes (1 - yes, 0 - no, null
+      - no information)
+  banheiro_de_servico:
+    description: If the house has a bathroom in the service area (1 - yes, 0 - no,
+      null - no information)
+  box_blindex:
+    description: If the at least 1 bathroom has a glass shower cabin (1 - yes, 0 -
+      no, null - no information)
+  cafeteira:
+    description: If the house has a coffee maker (1 - yes, 0 - no, null - no information)
+  cama_de_casal:
+    description: If the house has a double bed (1 - yes, 0 - no, null - no information)
+  cama_de_solteiro:
+    description: If the house has a single bed (1 - yes, 0 - no, null - no information)
+  churrasqueira:
+    description: If the house has a barbecue  (1 - yes, 0 - no, null - no information)
+  churrasqueira_no_condominio:
+    description: If the condominium has a barbecue area  (1 - yes, 0 - no, null -
+      no information)
+  churrasqueira_privativa:
+    description: If the house has a private barbecue  (1 - yes, 0 - no, null - no
+      information)
+  chuveiro_a_gas:
+    description: If the house has a gas shower  (1 - yes, 0 - no, null - no information)
+  chuveiro_eletrico:
+    description: If the house has a eletric shower  (1 - yes, 0 - no, null - no information)
+  cooktop:
+    description: If the house has a cooktop  (1 - yes, 0 - no, null - no information)
+  cortinas_black_out:
+    description: If the house has black-out curtains (1 - yes, 0 - no, null - no information)
+  cortinas_decorativas:
+    description: If the house has decorative curtains (1 - yes, 0 - no, null - no
+      information)
+  energia:
+    description: If the house has energy supply  authorized (1 - yes, 0 - no, null
+      - no information)
+  espaco_gourmet:
+    description: If the condominium has a gourmet area (1 - yes, 0 - no, null - no
+      information)
+  espelho_no_banheiro:
+    description: If the bathroom has a mirror  (1 - yes, 0 - no, null - no information)
+  fechadura_eletronica:
+    description: If the house has an eletronic door lock (1 - yes, 0 - no, null -
+      no information)
+  fogao:
+    description: If the house has a stove (1 - yes, 0 - no, null - no information)
+  fogao_geladeira:
+    description: If the house has stove and fridge (1 - yes, 0 - no, null - no information)
+  garagem_fixa:
+    description: If the house has a fixed parking space (1 - yes, 0 - no, null - no
+      information)
+  gas_encanado:
+    description: If the building has gas system (1 - yes, 0 - no, null - no information)
+  geladeira:
+    description: If the house has fridge (1 - yes, 0 - no, null - no information)
+  hidromassagem:
+    description: If the house has an hydromassage bath (1 - yes, 0 - no, null - no
+      information)
+  internet:
+    description: If the house has Wi-fi available (1 - yes, 0 - no, null - no information)
+  janela_anti_ruido:
+    description: If the house has windows with anti noise protection (1 - yes, 0 -
+      no, null - no information)
+  lava_e_seca:
+    description: If the house has a whasher dryer (1 - yes, 0 - no, null - no information)
+  lavanderia:
+    description: If the house has laundry (1 - yes, 0 - no, null - no information)
+  luminosidade_natural:
+    description: If the house receives natural light (1 - yes, 0 - no, null - no information)
+  maquina_de_lavar:
+    description: If the house has a whashing machine (1 - yes, 0 - no, null - no information)
+  mesa_e_cadeiras:
+    description: If the house has a table with chairs  (1 - yes, 0 - no, null - no
+      information)
+  microondas:
+    description: If the house has a microwave  (1 - yes, 0 - no, null - no information)
+  perto_do_metro:
+    description: If the house is at least 1 km from a subway station (1 - yes, 0 -
+      no, null - no information)
+  piscina_no_condominio:
+    description: If the condominium has a swimming pool (1 - yes, 0 - no, null - no
+      information)
+  piscina_privativa:
+    description: If the house has a private swimming pool (1 - yes, 0 - no, null -
+      no information)
+  playground:
+    description: If the condominium has a playground  (1 - yes, 0 - no, null - no
+      information)
+  portao_automatico:
+    description: If the house has an automatic garage gate  (1 - yes, 0 - no, null
+      - no information)
+  quadra_esportiva:
+    description: If the condominium has a sports court  (1 - yes, 0 - no, null - no
+      information)
+  quarto_de_servico:
+    description: If the house has a room in the service area  (1 - yes, 0 - no, null
+      - no information)
+  quarto_extra_reversivel:
+    description: If the house has a reversible room   (1 - yes, 0 - no, null - no
+      information)
+  rede_de_protecao:
+    description: If the house has windows with safety nets (1 - yes, 0 - no, null
+      - no information)
+  rua_silenciosa:
+    description: If the house is located in a silent street (1 - yes, 0 - no, null
+      - no information)
+  salao_de_festas:
+    description: If the condominium has an assembly room (1 - yes, 0 - no, null -
+      no information)
+  sauna:
+    description: If the condominium has a sauna (1 - yes, 0 - no, null - no information)
+  secadora:
+    description: If the house has a dryer machine  (1 - yes, 0 - no, null - no information)
+  sofa:
+    description: If the house has a couch (1 - yes, 0 - no, null - no information)
+  sol_da_manha:
+    description: If the house receives morning sunlight (1 - yes, 0 - no, null - no
+      information)
+  sol_da_tarde:
+    description: If the house receives afternoon sunlight (1 - yes, 0 - no, null -
+      no information)
+  tanque:
+    description: If the house has a laundry sink (1 - yes, 0 - no, null - no information)
+  televisao:
+    description: If the house has a television  (1 - yes, 0 - no, null - no information)
+  tomadas_novas:
+    description: If the house has new plugs (three-pins)   (1 - yes, 0 - no, null
+      - no information)
+  ts_load:
+    description: ''
+    categories:
+      '2021-04-27 10:31:24': '#N/A'
+  utensilios_de_cozinha:
+    description: If the house has kitchen utensils  (1 - yes, 0 - no, null - no information)
+  varal_de_roupas:
+    description: If the house has clotheslines installed  (1 - yes, 0 - no, null -
+      no information)
+  varanda:
+    description: If the house has a balcony (1 - yes, 0 - no, null - no information)
+  varanda_gourmet:
+    description: If the house has a gourmet balcony  (1 - yes, 0 - no, null - no information)
+  ventilador_de_teto:
+    description: If the house has a ceiling fan (1 - yes, 0 - no, null - no information)
+  vista_livre:
+    description: If the house has an open view  (1 - yes, 0 - no, null - no information)

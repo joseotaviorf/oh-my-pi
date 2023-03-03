@@ -1,39 +1,56 @@
 database_name: dw_public
 table_name: dim_condo
+description: Information about condos (residential condominiums). Each line is a cond
+domain: For Rent
+owner: ''
 columns:
   sk_condo:
     lineage:
-      - datalake_ebdb_clean.condo.id
+    - datalake_ebdb_clean.condo.id
+    description: The condo's ID
   id_condo:
     lineage:
-      - datalake_ebdb_clean.condo.id
+    - datalake_ebdb_clean.condo.id
+    description: The condo's ID from the Condominio table on EBDB / main
   neighborhood:
     lineage:
-      - datalake_ebdb_clean.condo.neighborhood
+    - datalake_ebdb_clean.condo.neighborhood
+    description: The neighborhood that the condo is located in
   zipcode:
     lineage:
-      - datalake_ebdb_clean.condo.zipcode
+    - datalake_ebdb_clean.condo.zipcode
+    description: The condo's address zipcode
   city:
     lineage:
-      - datalake_ebdb_clean.condo.city
+    - datalake_ebdb_clean.condo.city
+    description: The condo's city
   address:
     lineage:
-      - datalake_ebdb_clean.condo.address
+    - datalake_ebdb_clean.condo.address
+    description: The condo's street address
   lat:
     lineage:
-      - datalake_ebdb_clean.condo.lat
+    - datalake_ebdb_clean.condo.lat
+    description: The condo's latitude coordinate
   lng:
     lineage:
-      - datalake_ebdb_clean.condo.lng
+    - datalake_ebdb_clean.condo.lng
+    description: The condo's longitude coordinate
   name:
     lineage:
-      - datalake_ebdb_clean.condo.name
+    - datalake_ebdb_clean.condo.name
+    description: The condo's name
   number:
     lineage:
-      - datalake_ebdb_clean.condo.number
+    - datalake_ebdb_clean.condo.number
+    description: The condo's street address number
   ts_created:
     lineage:
-      - datalake_ebdb_clean.condo.ts_created
+    - datalake_ebdb_clean.condo.ts_created
+    description: Timestamp of when the condo was created in our database
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.condo.ts_updated
+    - datalake_ebdb_clean.condo.ts_updated
+    description: Timestamp of when the condo was updated in our database
+  ts_load:
+    description: Timestamp of when the data was last loaded in this table

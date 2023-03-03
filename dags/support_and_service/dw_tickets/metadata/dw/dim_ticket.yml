@@ -1,82 +1,465 @@
----
 database_name: dw_tickets
 table_name: dim_ticket
+description: Dimension table that contains context data on each ticket created in
+  Zendesk Support from FAQ Forms, Email, Web and Chat channels, except Whatsapp notifications
+domain: Support and Service
+owner: nathalia.paula@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+    - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+    description: Key of ticket that corresponds to the Zendesk ticket number
   subject:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.subject
+    - datalake_zendesk_ticket_funnels.ticket_funnel.subject
+    description: The value of the subject field for the ticket
   description:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.description
+    - datalake_zendesk_ticket_funnels.ticket_funnel.description
+    description: The first comment on the ticket. This is the text of the support
+      request or when an end-user submits a support request via email, the body of
+      the email request is used as the description.
   ticket_via:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.ticket_via
+    - datalake_zendesk_ticket_funnels.ticket_funnel.ticket_via
+    description: The Zendesk's default source where the ticket was created
+    categories:
+      any_channel: ''
+      api: ''
+      chat: ''
+      email: ''
+      mobile: ''
+      mobile_sdk: ''
+      sample_ticket: ''
+      web: ''
   channel:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.channel
+    - datalake_zendesk_ticket_funnels.ticket_funnel.channel
+    description: The source where the ticket was created from the company perspective
   group_name:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+    - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+    description: The group the ticket is assigned to
+    categories:
+      ' CX Negociação de aluguel [PAY] [POS] [BACK]': ''
+      ' Processo | Risk Tarefas [FRONT] [SALE] [BACK]': ''
+      Aditivos - Ativo [REP] [POS] [FRONT]: ''
+      Aditivos [REP] [POS] [BACK]: ''
+      Agendamento Fotos - FUP [IS]: ''
+      Agendamento Vistoria Saída [OFF] [POS] [BACK]: ''
+      Agendamento Vistorias [ONB] [POS] [BACK]: ''
+      Antecipação de Aluguel: ''
+      B2B [B2B]: ''
+      B2B [POS] [NEG] [BACK]: ''
+      B2B [POS] [OFF] [BACK]: ''
+      B2B [POS] [ONG] [BACK]: ''
+      B2B [POS] [PAY] [BACK]: ''
+      B2B [POS] [REP] [BACK]: ''
+      BACK [Propostas]: ''
+      BACK [Visitas]: ''
+      BizDev [B2B]: ''
+      CLosing ForSale/ Financiamento bancário [CLO] [SALE] [BACK]: ''
+      CS IQ [BACK] [POS]: ''
+      CX - Compra e Venda [CV]: ''
+      'CX ADM - IPTU ': ''
+      CX ADM - Urgente: ''
+      CX ADM Tier 1 [PAY] [POS] [FRONT]: ''
+      'CX Anúncio e Visitas Misseds ': ''
+      CX Conta Comigo [POS] [BACK]: ''
+      CX Contratos [PRO] [PRE] [FRONT]: ''
+      CX Documentação [PRO] [PRE] [FRONT]: ''
+      CX Durante a locação e Reparos [POS] [FRONT] [ATIVO]: ''
+      CX Durante a locação e reparos [POS] [FRONT]: ''
+      CX Entrada no imóvel [ONB] [POS] [FRONT]: ''
+      CX Imposto de Renda [PAY] [POS] [FRONT]: ''
+      CX Lab: ''
+      CX Mediações [ONB] [POS] [BACK]: ''
+      CX Negociação IGPM/IPCA [PAY] [POS] [BACK]: ''
+      CX ONB/PAY Missed: ''
+      CX PROPOSTAS [PRO] [PRE] [FRONT]: ''
+      CX Pagamentos Ativo [POS] [BACK] [PAY]: ''
+      CX Pagamentos N1 [PAY] [POS] [FRONT]: ''
+      CX Pagamentos N3 [PÓS] [FRONT] [PAY]: ''
+      CX Partners Tarefas [PRE] [BACK]: ''
+      CX Partners [PRE] [FRONT]: ''
+      CX Propostas Tarefas [PRE] [BACK]: ''
+      CX Rescisão e Vistoria [OFF] [POS] [FRONT]: ''
+      CX SOS Visitas [VIS] [PRE] [FRONT]: ''
+      CX Suporte ao Parceiro [VIS] [PRE] [FRONT]: ''
+      CX Visitas  Tarefas [PRE][BACK]: ''
+      CX Visitas N1 & N2 [VIS] [PRE] [FRONT] [OUT]: ''
+      CX Visitas N3 [VIS] [PRE] [FRONT]: ''
+      Captadores QuintoAndar [B2B] [PRE] [BACK]: ''
+      Casos Especiais [CE] [POS] [BACK]: ''
+      Chat PP/IQ: ''
+      Chat PP/IQ [ONB] [POS] [BACK]: ''
+      Closing - Antecipação [CLO] [PRE] [BACK]: ''
+      Closing - Front End 1 [CLO] [PRE] [BACK]: ''
+      Closing - Front End 2 [CLO] [PRE] [BACK]: ''
+      Closing - Front End 3 [CLO] [PRE] [BACK]: ''
+      Closing - Front End 4 [CLO] [PRE] [BACK]: ''
+      Closing - Portabilidade [CLO] [PRE] [BACK]: ''
+      Closing - Repescagem [CLO] [PRE] [BACK]: ''
+      Closing B2B [CLO] [PRE] [BACK]: ''
+      Closing B2C [CLO] [PRE] [BACK]: ''
+      Closing FUP (B2B) [CLO] [PRE] [BACK]: ''
+      Closing FUP (B2C) [CLO] [PRE] [BACK]: ''
+      Closing For Sale/ Pagamentos [CV] [PRE] [BACK]: ''
+      Closing For Sale/Financeiro [CV] [PRE] [BACK]: ''
+      Closing ForSale/An. de Crédito [CLO] [SALE] [BACK]: ''
+      Closing ForSale/Buyer [CLO][SALE][FRONT]: ''
+      Closing ForSale/Diligência [CLO][SALE][BACK]: ''
+      Closing ForSale/Registro Cartório[CLO][SALE][BACK]: ''
+      Closing ForSale/Seller [CLO][SALE][FRONT]: ''
+      Closing ForSale/Tarefas [CLO] [SALE] [FRONT] [BACK]: ''
+      Closing Front (B2B) [CLO] [PRE] [BACK]: ''
+      Closing Front (B2C) [CLO] [PRE] [BACK]: ''
+      Clube QuintoAndar: ''
+      Cobranças [COL] [POS] [BACK]: ''
+      Compra e Venda [CV] [BACK]: ''
+      Condomínio V0V8: ''
+      Confirmação de Visitas [VIS] [PRE] [FRONT]: ''
+      Consultores - Pré CCV [CV]: ''
+      Consultoria For Sale [MED] [SALE] [BACK]: ''
+      Credenciamento Corretores [AGE] [PRE]: ''
+      Crises Field [AGE] [PRE]: ''
+      Dados do PP [Closing_Estela]: ''
+      Deal Making: ''
+      E-mail PRÉ [SUP] [PRE] [BACK]: ''
+      Emergencial Offboarding Chaves[Pos][BACK]: ''
+      Entrada no imóvel [ONB] [POS] [BACK]: ''
+      Entrevistas UX: ''
+      Especialistas - Pós CCV [CV]: ''
+      Evictions [COL][POS][BACK]: ''
+      Exclusivos: ''
+      Finalizados [COL] [POS] [BACK]: ''
+      Gestão de Consequências PP [VIS] [PRE] [BACK]: ''
+      Gestão de Consequências [IS]: ''
+      Grupo de teste - Remediações: ''
+      IndicaAí Prestadores [REP]: ''
+      IndicaAí [SUP]: ''
+      Inside Sales - ActionLine [IS][OUT]: ''
+      Inside Sales - Atento [IS][OUT]: ''
+      Inside Sales - Compra e Venda [IS] [CV]: ''
+      Inside Sales - Prioritário [IS]: ''
+      Inside Sales [IS]: ''
+      Irent [VIS] [PRE] [BACK]: ''
+      Key Account [B2B]: ''
+      Labs Pré Vendas [LAB]: ''
+      Labs Pós Vendas [LAB]: ''
+      Lançamento - PP Paga [PAY] [POS] [BACK]: ''
+      Listing Quality [FOTOS] [POS] [BACK]: ''
+      Lockbox [AGE] [PRE]: ''
+      Log - Credenciamento [INS]: ''
+      Logística Chaves Offboarding [INS] [POS] [BACK]: ''
+      Logística Chaves Onboarding [INS] [POS] [BACK]: ''
+      Logística Offboarding [INS] [POS] [BACK]: ''
+      Logística Onboarding [INS] [POS] [BACK]: ''
+      Loyalty [BACK] [POS]: ''
+      Mediações For Sale [MED] [SALE] [BACK]: ''
+      Midias Ops [ONB] [POS] [FRONT]: ''
+      Midias Ops [POS] [BACK]: ''
+      Negociação [PAY] [POS] [FRONT]: ''
+      Novo Off - Reparos [POS] [BACK]: ''
+      Novos Produtos [POS] [BACK]: ''
+      Não Responda: ''
+      Onboarding Payments: ''
+      Onboarding Visitas [VIS] [PRE] [FRONT]: ''
+      Originals - Listing Management [LAB]: ''
+      Originals - Obras [LAB]: ''
+      Originals - Orçamento [LAB]: ''
+      Originals - Pós [LAB]: ''
+      Originals Ready [LAB]: ''
+      Ouvidoria [CE] [POS] [BACK]: ''
+      PROCON [CE] [POS] [BACK]: ''
+      Pagamentos - Ativo Self Condo [PAY] [POS] [BACK]: ''
+      Pagamentos - Check [PAY] [POS] [BACK]: ''
+      Pagamentos - Contato Ativo [PAY] [POS] [BACK]: ''
+      Pagamentos - Corretores [PAY] [POS] [BACK]: ''
+      Pagamentos - Cross [PAY] [POS] [BACK]: ''
+      Pagamentos - Faturas [PAY] [POS] [BACK]: ''
+      Pagamentos - OFF [PAY] [POS] [BACK]: ''
+      Pagamentos - Pagamentos V9 [PAY] [POS] [BACK]: ''
+      Pagamentos - Prestadores Parceiros [PAY] [POS] [BACK]: ''
+      Parceiros da Portaria [SUP]: ''
+      Piloto OFF 1 [OFF] [POS] [BACK]: ''
+      Platforms Native XP [PRODUCT TEAMS]: ''
+      Portabilidade [BACK] [POS]: ''
+      Prestadores Parceiros [REP] [POS] [BACK]: ''
+      'Privacy [INFS]  ': ''
+      Processos e Treinamentos: ''
+      Projeto Reserva: ''
+      Proteção 5A Parceiros [REP] [POS] [BACK]: ''
+      Proteção QuintoAndar [OFF] [POS] [BACK]: ''
+      Pré-Despejo [COL] [POS] [BACK]: ''
+      Qualidade de Vistorias [OFF] [POS] [BACK]: ''
+      QuintoAndar: ''
+      QuintoAndar Blue [B2B]: ''
+      RPA Team: ''
+      ReclameAqui [CE] [POS] [BACK]: ''
+      Relacionamento Fotógrafos [AGE] [PRE]: ''
+      Relacionamento com corretores - Compra e venda: ''
+      Relisting: ''
+      Reparos [REP] [POS] [BACK]: ''
+      Repescagem: ''
+      Rescisão - Despejo [CE] [POS] [BACK]: ''
+      Rescisão 1 [OFF] [POS] [BACK]: ''
+      Rescisão 2 - B2B [OFF] [B2B]: ''
+      Rescisão 2 [OFF] [POS] [BACK]: ''
+      SPAM: ''
+      Smart Pricing [Produto]: ''
+      Suporte: ''
+      Suporte ao Vistoriador [INS]: ''
+      TESTE E-mail [PRE] [SUP] [BACK]: ''
+      Teste - Treinamentos: ''
+      Teste Addon: ''
+      Visitas  Tarefas [PRE][BACK]: ''
+      Vistoria atendimento interno [INS]: ''
+      Vistoria-Self [OFF] [POS] [BACK]: ''
+      Vistoriadores - Assuntos Financeiros  [INS]: ''
+      Zendesk: ''
+      '[Desativar] CX Entrada no imóvel N3 [POS] [FRONT] [ONB]': ''
+      '[Desativar] CX IPTU [PAY] [POS] [FRONT]': ''
+      '[Lockbox] Pedidos da FAQ': ''
   priority:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.priority
+    - datalake_zendesk_ticket_funnels.ticket_funnel.priority
+    description: The urgency with which the ticket should be addressed
+    categories:
+      high: ''
+      low: ''
+      normal: ''
+      urgent: ''
   recipient:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.recipient
+    - datalake_zendesk_ticket_funnels.ticket_funnel.recipient
+    description: The original recipient e-mail address of the ticket
+    categories:
+      adm@quintoandar.com.br: ''
+      adm@quintoandar.zendesk.com: ''
+      agendamentodefoto@quintoandar.zendesk.com: ''
+      android@quintoandar.zendesk.com: ''
+      antecipacao.aluguel@quintoandar.zendesk.com: ''
+      antecipacao@quintoandar.zendesk.com: ''
+      assinaturas.contrato@quintoandar.zendesk.com: ''
+      assinaturas@quintoandar.com.br: ''
+      atendimento@quintoandar.com: ''
+      atendimento@quintoandar.com.br: ''
+      atendimento@quintoandar.zendesk.com: ''
+      ativo-selfcondo@quintoandar.zendesk.com: ''
+      aviso-rescisao@quintoandar.zendesk.com: ''
+      captadoresquintoandar@quintoandar.zendesk.com: ''
+      cartorios@quintoandar.zendesk.com: ''
+      cobranca@quintoandar.com.br: ''
+      cobrancas1_finalizados@quintoandar.zendesk.com: ''
+      compraevenda@quintoandar.zendesk.com: ''
+      comunicado.condominial@quintoandar.com.br: ''
+      condominios@quintoandar.zendesk.com: ''
+      consultor@quintoandar.zendesk.com: ''
+      contacomigo@quintoandar.zendesk.com: ''
+      credenciamentofoto@quintoandar.zendesk.com: ''
+      dataprivacy@quintoandar.zendesk.com: ''
+      denuncias@quintoandar.zendesk.com: ''
+      experiencia@quintoandar.zendesk.com: ''
+      fatura@quintoandar.zendesk.com: ''
+      financeiroclfs@quintoandar.zendesk.com: ''
+      financiamentoimobiliario@quintoandar.zendesk.com: ''
+      foto@quintoandar.zendesk.com: ''
+      gustavo.cervelin@gmail.com: ''
+      gustavo.custodio@quintoandar.com.br: ''
+      igpm@quintoandar.zendesk.com: ''
+      indicaai@quintoandar.com.br: ''
+      indicaai@quintoandar.zendesk.com: ''
+      ios@quintoandar.zendesk.com: ''
+      iptuanuncio@quintoandar.zendesk.com: ''
+      irent@quintoandar.com.br: ''
+      irent@quintoandar.zendesk.com: ''
+      lockbox@quintoandar.zendesk.com: ''
+      naoresponda-fatura@quintoandar.zendesk.com: ''
+      naoresponda-originals@quintoandar.zendesk.com: ''
+      naoresponda-repasse@quintoandar.zendesk.com: ''
+      naoresponda-wow@quintoandar.zendesk.com: ''
+      naoresponda@quintoandar.com.br: ''
+      naoresponda@quintoandar.zendesk.com: ''
+      notafiscal.fotografo@quintoandar.zendesk.com: ''
+      novosprodutos@quintoandar.zendesk.com: ''
+      orent@quintoandar.zendesk.com: ''
+      originals@quintoandar.zendesk.com: ''
+      ouvidoria@quintoandar.zendesk.com: ''
+      parceiroprime@quintoandar.com.br: ''
+      parceriasimobiliarias@quintoandar.zendesk.com: ''
+      pilotoreparos@quintoandar.zendesk.com: ''
+      portabilidade@quintoandar.com.br: ''
+      portabilidade@quintoandar.zendesk.com: ''
+      prestadoresparceiros@quintoandar.zendesk.com: ''
+      propostasn3@quintoandar.zendesk.com: ''
+      relacionamento.fotografos@quintoandar.zendesk.com: ''
+      relacionamento.parceiros@quintoandar.com.br: ''
+      relacionamento.parceiros@quintoandar.zendesk.com: ''
+      relacionamentoclientes@quintoandar.zendesk.com: ''
+      relisting@quintoandar.zendesk.com: ''
+      repairs@quintoandar.com.br: ''
+      reparos@quintoandar.com.br: ''
+      repasse@quintoandar.zendesk.com: ''
+      reply-cobrancas@quintoandar.zendesk.com: ''
+      reply-evictions@quintoandar.zendesk.com: ''
+      reply-predespejo@quintoandar.zendesk.com: ''
+      rescisao@quintoandar.zendesk.com: ''
+      sucessoinquilino@quintoandar.zendesk.com: ''
+      suporte-corretores@quintoandar.com.br: ''
+      suporte-corretores@quintoandar.zendesk.com: ''
+      suportepremium@quintoandar.zendesk.com: ''
+      support@quintoandar.zendesk.com: ''
+      time-corretores@quintoandar.com.br: ''
+      vistoriadores@quintoandar.zendesk.com: ''
   tags:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+    - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+    description: The list of all tags applied to the ticket
   status:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.status
+    - datalake_zendesk_ticket_funnels.ticket_funnel.status
+    description: The latest state of the ticket that can be set and updated either
+      manually by an agent or automatically via business rules.
+    categories:
+      closed: ''
+      deleted: ''
+      hold: ''
+      new: ''
+      open: ''
+      pending: ''
+      solved: ''
   custom_fields:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    description: The custom fields of the ticket that correspond to the Zendesk Forms
+      fields. It has JSON format with the form's field name and its value selected
+      or inputted by agent. The value equal to false is related to the field that
+      was not filled for the request
   score:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.score
+    - datalake_zendesk_ticket_funnels.ticket_funnel.score
+    description: The customer satisfaction ratings that is sent to end-user requesters
+      by an email after the ticket has been set to solved that asks them to briefly
+      evaluate their experience
+    categories:
+      bad: ''
+      good: ''
+      offered: ''
+      unoffered: ''
   reason:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.reason
+    - datalake_zendesk_ticket_funnels.ticket_funnel.reason
+    description: The reason for the rating given by the requester in a follow-up question
+    categories:
+      Demorou para me atenderem: ''
+      Demorou para minha solicitação ser atendida: ''
+      Demorou para solucionar meu problema: ''
+      Meu problema não foi resolvido: ''
+      Minha solicitação não foi resolvida: ''
+      Nenhum motivo: ''
+      No reason provided: ''
+      Não concordo com a solução proposta pelo QuintoAndar: ''
+      Não concordo com solução proposta: ''
+      'Não fiquei satisfeito(a) com a qualidade do atendimento ': ''
+      Não gostei do atendimento: ''
+      O conhecimento do atendente sobre o assunto foi insatisfatório: ''
+      Outro motivo: ''
+      Outros (comente abaixo): ''
+      Some other reason: ''
   comment:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.comment
+    - datalake_zendesk_ticket_funnels.ticket_funnel.comment
+    description: Additional (and optional) comment received with the rating
   request_type:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
+    - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
+    description: Custom field from Zendesk Form that indicates the type of that request
+      that generates a specific demand
   client_type:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+    - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+    description: Custom field from Zendesk Form that indicates the type of QuintoAndar's
+      end-user
+    categories:
+      administradora: ''
+      afiliados: ''
+      corretor: ''
+      fechamento_em_massa_clientes: ''
+      fotógrafos: ''
+      imobiliária_b2b: ''
+      indefinido: ''
+      inquilino: ''
+      inquilinob2b: ''
+      parceiros_de_portaria: ''
+      plataformas_de_serviço: ''
+      prestador_de_serviço: ''
+      proprietário: ''
   customer_type_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.customer_type_tag
+    - datalake_zendesk_ticket_funnels.ticket_funnel.customer_type_tag
+    description: ''
+    categories:
+      affiliate: ''
+      buyer: ''
+      call_problems_unknown_customer: ''
+      concessionaire: ''
+      doorman: ''
+      fechamento_em_massa_cliente: ''
+      inspector: ''
+      key_account: ''
+      photographer: ''
+      real_estate_agency: ''
+      real_estate_broker: ''
+      relationship_real_estate_broker: ''
+      rent_owner: ''
+      rent_owner_portability: ''
+      seller: ''
+      tenant: ''
+      tenant_portability: ''
+      user_does_not_apply: ''
   contact_motivation_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_motivation_tag
+    - datalake_zendesk_ticket_funnels.ticket_funnel.contact_motivation_tag
+    description: ''
+    categories:
+      call_problems_unknown_motivation: ''
+      comment: ''
+      doubt: ''
+      fechamento_em_massa_motivo: ''
+      information: ''
+      motivation_does_not_apply: ''
+      request: ''
   contact_theme_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_tag
+    - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_tag
+    description: ''
   has_public_comments:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.has_public_comments
+    - datalake_zendesk_ticket_funnels.ticket_funnel.has_public_comments
+    description: Flag that indicates true if any ticket comments are public or false
+      otherwise
   ts_created:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_created
+    - datalake_zendesk_ticket_funnels.ticket_funnel.ts_created
+    description: Timestamp of ticket's creation event (UTC timezone)
   ts_created_local:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_created_local
+    - datalake_zendesk_ticket_funnels.ticket_funnel.ts_created_local
+    description: Timestamp of ticket's creation event (UTC-3/Brasilia timezone)
   ts_updated:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated
+    - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated
+    description: Timestamp of latest ticket's update event (UTC timezone)
   ts_updated_local:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated_local
+    - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated_local
+    description: ''
   contact_theme_detail_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_detail_tag
+    - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_detail_tag
   step_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.step_tag
+    - datalake_zendesk_ticket_funnels.ticket_funnel.step_tag
+  ts_load:
+    description: Timestamp of data load from database source (UTC timezone)

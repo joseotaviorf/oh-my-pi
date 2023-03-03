@@ -1,124 +1,169 @@
----
 database_name: dw_sale
 table_name: fact_offers
+description: This table brings information about all sales offers. Each line is an
+  offer submitted. Also, it contains data about negotiation until sale agreements
+  signatures
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   sk_offer:
     lineage:
-      - datalake_offer.sale_offer.id_offer
+    - datalake_offer.sale_offer.id_offer
+    description: ID of offer
   sk_sale_flow:
     lineage:
-      - datalake_offer.sale_offer.id_sale_flow
+    - datalake_offer.sale_offer.id_sale_flow
+    description: ID of sale flow
   sk_house:
     lineage:
-      - datalake_offer.sale_offer.id_house
+    - datalake_offer.sale_offer.id_house
+    description: ID of house
   sk_buyer:
     lineage:
-      - datalake_offer.sale_offer.id_buyer
+    - datalake_offer.sale_offer.id_buyer
+    description: ID user of the buyer
   sk_owner:
     lineage:
-      - datalake_offer.sale_offer.id_owner
+    - datalake_offer.sale_offer.id_owner
+    description: ID user of the seller
   sk_business_unit:
     lineage:
-      - datalake_offer.sale_offer.id_business_unit
+    - datalake_offer.sale_offer.id_business_unit
+    description: ID of the business unit.
   sk_company_supply:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+    - datalake_rede_company.company_sks.sk_company
   sk_company_demand:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+    - datalake_rede_company.company_sks.sk_company
   sk_region:
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
+    description: ID of house region
   sk_booking:
     lineage:
-      - datalake_offer.sale_offer.id_booking
+    - datalake_offer.sale_offer.id_booking
+    description: ID of booking that originated the offer
   sk_agent:
     lineage:
-      - datalake_offer.sale_offer.id_agent
+    - datalake_offer.sale_offer.id_agent
+    description: ID user of agent related to booking
   sk_user_agent:
     lineage:
-      - datalake_offer.sale_offer.id_user_agent
+    - datalake_offer.sale_offer.id_user_agent
   sk_user_team_lead:
     lineage:
-      - datalake_offer.sale_offer.id_user_team_lead
+    - datalake_offer.sale_offer.id_user_team_lead
   sk_user_consultant:
     lineage:
-      - datalake_offer.sale_offer.id_user_consultant
+    - datalake_offer.sale_offer.id_user_consultant
   sk_consultant:
     lineage:
-      - datalake_offer.sale_offer.id_consultant
+    - datalake_offer.sale_offer.id_consultant
+    description: ID user of the consultant that managed the offer negotiation
   sk_closing_specialist:
     lineage:
-      - datalake_offer.sale_offer.id_closing_specialist
+    - datalake_offer.sale_offer.id_closing_specialist
+    description: ID user of the closing specialyst
   sk_offer_submitted_date:
     lineage:
-      - datalake_offer.sale_offer.ts_offer_submitted
+    - datalake_offer.sale_offer.ts_offer_submitted
+    description: Sk date of offer submission
   sk_offer_accepted_date:
     lineage:
-      - datalake_offer.sale_offer.dt_offer_accepted
+    - datalake_offer.sale_offer.dt_offer_accepted
+    description: Sk date of offer acceptance
   sk_offer_dismissed_date:
     lineage:
-      - datalake_offer.sale_offer.dt_offer_dismissed
+    - datalake_offer.sale_offer.dt_offer_dismissed
+    description: Sk date of offer rejection or offer dismissed
   sk_offer_rescued_date:
     lineage:
-      - datalake_offer.sale_offer.dt_offer_rescued
+    - datalake_offer.sale_offer.dt_offer_rescued
   sk_sale_agreement_created_date:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_created
+    - datalake_offer.sale_offer.dt_sale_agreement_created
+    description: Sk date of sale agreement creation
   sk_sale_agreement_signed_date:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
+    - datalake_offer.sale_offer.dt_sale_agreement_signed
+    description: Sk date of sale agreement signature
   is_buyer_first_offer:
     lineage:
-      - datalake_offer.sale_offer.is_buyer_first_offer
+    - datalake_offer.sale_offer.is_buyer_first_offer
+    description: True if the offer is the first offer of the user's life
   is_house_first_offer:
     lineage:
-      - datalake_offer.sale_offer.is_house_first_offer
+    - datalake_offer.sale_offer.is_house_first_offer
+    description: True if the offer is the first offer received by the house
   has_completed_visit_before_offer:
     lineage:
-      - datalake_offer.sale_offer.flg_visit_completed_before_offer
+    - datalake_offer.sale_offer.flg_visit_completed_before_offer
+    description: True if buyer had a visit completed in the house before offer submission
   has_booking_before_offer:
     lineage:
-      - datalake_offer.sale_offer.flg_booking_before_offer
+    - datalake_offer.sale_offer.flg_booking_before_offer
+    description: True if buyer had a visit booked in the house before offer submission
   first_price_offered_by_buyer:
     lineage:
-      - datalake_offer.sale_offer.first_price_offered_by_buyer
+    - datalake_offer.sale_offer.first_price_offered_by_buyer
+    description: First value offered by buyer
   last_price_offered_by_buyer:
     lineage:
-      - datalake_offer.sale_offer.last_price_offered_by_buyer
+    - datalake_offer.sale_offer.last_price_offered_by_buyer
+    description: Last price offered by the buyer
   first_discount_proposed:
     lineage:
-      - datalake_offer.sale_offer.first_discount_proposed
+    - datalake_offer.sale_offer.first_discount_proposed
+    description: First percentage of discount negotiated
   last_discount_proposed:
     lineage:
-      - datalake_offer.sale_offer.last_discount_proposed
+    - datalake_offer.sale_offer.last_discount_proposed
+    description: Last percentage of discount negotiated
   days_offer_submitted_to_offer_accepted:
     lineage:
-      - datalake_offer.sale_offer.days_offer_submitted_to_offer_accepted
+    - datalake_offer.sale_offer.days_offer_submitted_to_offer_accepted
+    description: Number of days between the offer submission and the offer acceptance
   days_offer_submitted_to_offer_dismissed:
     lineage:
-      - datalake_offer.sale_offer.days_offer_submitted_to_offer_dismissed
+    - datalake_offer.sale_offer.days_offer_submitted_to_offer_dismissed
+    description: Number of days between the offer submission and the offer refusal
   days_offer_submitted_to_sale_agreement_created:
     lineage:
-      - datalake_offer.sale_offer.days_offer_submitted_to_sale_agreement_created
+    - datalake_offer.sale_offer.days_offer_submitted_to_sale_agreement_created
+    description: Number of days between the offer submission and the creation of the
+      sale agreement
   days_offer_submitted_to_sale_agreement_signed:
     lineage:
-      - datalake_offer.sale_offer.days_offer_submitted_to_sale_agreement_signed
+    - datalake_offer.sale_offer.days_offer_submitted_to_sale_agreement_signed
+    description: Number of days between the offer submission and the signature of
+      the sale agreement
   days_offer_accepted_to_offer_dismissed:
     lineage:
-      - datalake_offer.sale_offer.days_offer_accepted_to_offer_dismissed
+    - datalake_offer.sale_offer.days_offer_accepted_to_offer_dismissed
+    description: Number of days between the offer acceptance and the offer refusal
   days_offer_accepted_to_sale_agreement_created:
     lineage:
-      - datalake_offer.sale_offer.days_offer_accepted_to_sale_agreement_created
+    - datalake_offer.sale_offer.days_offer_accepted_to_sale_agreement_created
+    description: Number of days between the offer acceptance and the creation of the
+      sale agreement
   days_offer_accepted_to_sale_agreement_signed:
     lineage:
-      - datalake_offer.sale_offer.days_offer_accepted_to_sale_agreement_signed
+    - datalake_offer.sale_offer.days_offer_accepted_to_sale_agreement_signed
+    description: Number of days between the offer acceptance and the signature of
+      the sale agreement
   days_sale_agreement_created_to_sale_agreement_signed:
     lineage:
-      - datalake_offer.sale_offer.days_sale_agreement_created_to_sale_agreement_signed
+    - datalake_offer.sale_offer.days_sale_agreement_created_to_sale_agreement_signed
+    description: Number of days between the creation of the sale agreement and the
+      signature of the sale agreement
   hours_booking_to_offer:
     lineage:
-      - datalake_offer.sale_offer.hours_booking_to_offer
+    - datalake_offer.sale_offer.hours_booking_to_offer
+    description: Hours between the visit booked and the offer submission
   hours_visit_completed_to_offer:
     lineage:
-      - datalake_offer.sale_offer.hours_visit_to_offer
+    - datalake_offer.sale_offer.hours_visit_to_offer
+    description: Hours between the visit completion and the offer submission
+  ts_load:
+    description: ''

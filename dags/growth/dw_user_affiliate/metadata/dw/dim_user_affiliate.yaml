@@ -1,88 +1,231 @@
 database_name: dw_public
 table_name: dim_user_affiliate
+description: Information about affiliates (a subset of all users) registered at QuintoAndar.
+  Each line is a user affiliat
+domain: Growth
+owner: ''
 columns:
   sk_user_affiliate:
     lineage:
-      - datalake_ebdb_user.affiliate_data.id
+    - datalake_ebdb_user.affiliate_data.id
+    description: Key of affiliate
   sk_user:
     lineage:
-      - datalake_ebdb_user.user.id
+    - datalake_ebdb_user.user.id
+    description: ''
   id_user_affiliate:
     lineage:
-      - datalake_ebdb_user.affiliate_data.id
+    - datalake_ebdb_user.affiliate_data.id
+    description: Key of affiliate
   sk_user_indicated_by:
     lineage:
-      - datalake_ebdb_user.affiliate_data.id_indicated_by
+    - datalake_ebdb_user.affiliate_data.id_indicated_by
+    description: ''
   origin:
     lineage:
-      - datalake_ebdb_user.affiliate_data.origin
+    - datalake_ebdb_user.affiliate_data.origin
+    description: Affiliate origin
+    categories:
+      OpenLink: ''
+      Untraced: ''
   type:
     lineage:
-      - datalake_ebdb_user.affiliate_data.affiliate_type
+    - datalake_ebdb_user.affiliate_data.affiliate_type
+    description: Classification of affiliate
+    categories:
+      Agent: ''
+      B2BPartner: ''
+      Doorman: ''
+      Doorman & Agent: ''
+      Standard: ''
   marketing_city_group:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.city_campaign
-      - datalake_region.region.city_group
+    - datalake_amplitude_user.user_affiliate_origin.city_campaign
+    - datalake_region.region.city_group
+    description: City group
+    categories:
+      Belo Horizonte: ''
+      Brasília: ''
+      Campinas: ''
+      Cotia: ''
+      Curitiba: ''
+      Florianópolis: ''
+      Goiânia: ''
+      Mogi das Cruzes: ''
+      Porto Alegre: ''
+      RMSP: ''
+      Recife: ''
+      Ribeirão Preto: ''
+      Rio de Janeiro: ''
+      Salvador: ''
+      Santos: ''
+      Sorocaba: ''
+      São José dos Campos: ''
+      Vitória: ''
   regional:
     lineage:
-      - datalake_region.region.regional
+    - datalake_region.region.regional
+    description: Regional
+    categories:
+      GFPC: ''
+      Nordeste: ''
+      RJPB: ''
+      SPMG: ''
+      Vitória: ''
   tracking_source:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.utm_source
+    - datalake_amplitude_user.user_affiliate_origin.utm_source
+    description: Affiliate origin source
   tracking_medium:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.utm_medium
+    - datalake_amplitude_user.user_affiliate_origin.utm_medium
+    description: Afiiliate origin medium
+    categories:
+      CPC: ''
+      affiliates: ''
+      b2b: ''
+      banner: ''
+      branding: ''
+      classifieds: ''
+      classifieds&utm_campaign=principal&utm_source=VivaReal: ''
+      componente-cta: ''
+      copy_share: ''
+      cpa: ''
+      cpc: ''
+      cpc?: ''
+      cpc?utm_source=google: ''
+      custom_share: ''
+      display: ''
+      display-b: ''
+      email: ''
+      email?utm_source=QuintoAndar: ''
+      email_SMS: ''
+      evento: ''
+      facebook: ''
+      faq: ''
+      grupos: ''
+      inmail: ''
+      instagram: ''
+      intercom: ''
+      landing: ''
+      landingpage: ''
+      logo: ''
+      materia: ''
+      notifications: ''
+      offline: ''
+      online: ''
+      partnership: ''
+      post: ''
+      postpatrocinado: ''
+      product: ''
+      push: ''
+      reacheferral: ''
+      referral: ''
+      retargeting: ''
+      rodape: ''
+      seo: ''
+      sms: ''
+      social: ''
+      whatsapp: ''
+      youtube: ''
   tracking_campaign:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.utm_campaign
+    - datalake_amplitude_user.user_affiliate_origin.utm_campaign
+    description: Afiiliate origin campaign
   tracking_content:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.utm_content
+    - datalake_amplitude_user.user_affiliate_origin.utm_content
+    description: ''
   tracking_term:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.utm_term
+    - datalake_amplitude_user.user_affiliate_origin.utm_term
+    description: ''
   tracking_platform:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.platform
+    - datalake_amplitude_user.user_affiliate_origin.platform
+    description: Affiliate origin platform
+    categories:
+      web_desktop: ''
+      web_mobile: ''
   tracking_device_type:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.device_type
+    - datalake_amplitude_user.user_affiliate_origin.device_type
+    description: Affiliate origin device type
+    categories:
+      Android: ''
+      Apple iPad: ''
+      Apple iPhone: ''
+      Chromium OS: ''
+      Linux: ''
+      Mac: ''
+      Windows: ''
   tracking_country:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.user_country
+    - datalake_amplitude_user.user_affiliate_origin.user_country
+    description: Affiliate origin country
   tracking_state:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.region
+    - datalake_amplitude_user.user_affiliate_origin.region
+    description: Affiliate origin state
   tracking_city:
     lineage:
-      - datalake_amplitude_user.user_affiliate_origin.city
+    - datalake_amplitude_user.user_affiliate_origin.city
+    description: Affiliate origin city
   mkt_origin:
     lineage:
-      - datalake_gsheets_clean.taxonomy_affiliates.mkt_origin
+    - datalake_gsheets_clean.taxonomy_affiliates.mkt_origin
+    description: ''
+    categories:
+      Indica Aí - General: ''
+      Not Mapped: ''
+      Other: ''
   mkt_channel:
     lineage:
-      - datalake_gsheets_clean.taxonomy_affiliates.mkt_channel
+    - datalake_gsheets_clean.taxonomy_affiliates.mkt_channel
+    description: ''
   mkt_medium:
     lineage:
-      - datalake_gsheets_clean.taxonomy_affiliates.mkt_medium
+    - datalake_gsheets_clean.taxonomy_affiliates.mkt_medium
+    description: ''
+    categories:
+      Cross Domain: ''
+      Direct: ''
+      Display: ''
+      Email: ''
+      Not Mapped: ''
+      Retargeting: ''
+      SEM Branded: ''
+      SEM non-branded: ''
+      SMS: ''
   mkt_source:
     lineage:
-      - datalake_gsheets_clean.taxonomy_affiliates.mkt_source
+    - datalake_gsheets_clean.taxonomy_affiliates.mkt_source
+    description: ''
   is_realstate_agent:
     lineage:
-      - datalake_ebdb_user.agent_data.is_realstate_agent
+    - datalake_ebdb_user.agent_data.is_realstate_agent
+    description: Flag which indicates if affiliate is real state agent
   is_photographer:
     lineage:
-      - datalake_ebdb_user.agent_data.is_photographer
+    - datalake_ebdb_user.agent_data.is_photographer
+    description: Flag which indicates if affiliate is photographer
   is_active:
     lineage:
-      - datalake_ebdb_user.affiliate_data.is_active
+    - datalake_ebdb_user.affiliate_data.is_active
+    description: Flag which indicates whether user is still registered in the affiliates
+      program. If is_active = false, it means that user has opted out from affiliates
+      program.
   ts_joined_program:
     lineage:
-      - datalake_ebdb_user.affiliate_data.ts_operation_start
+    - datalake_ebdb_user.affiliate_data.ts_operation_start
+    description: Date and time when user joined affiliate program
   ts_created:
     lineage:
-      - datalake_ebdb_user.affiliate_data.ts_created
+    - datalake_ebdb_user.affiliate_data.ts_created
+    description: Timestamp of the moment when affiliate user was created
   ts_updated:
     lineage:
-      - datalake_ebdb_user.affiliate_data.ts_updated
+    - datalake_ebdb_user.affiliate_data.ts_updated
+    description: Timestamp of the moment when affiliate user was updated
+  ts_load:
+    description: Timestamp of data load event (UTC timezone)

@@ -1,39 +1,63 @@
 database_name: dw_public
 table_name: dim_visit
+description: Information about visits, a subset of bookings. A visit is when a user
+  visits a property because she's interested in it. Each line is a visi
+domain: For Rent
+owner: ''
 columns:
   sk_visit:
     lineage:
-      - datalake_ebdb_clean.visit.id
+    - datalake_ebdb_clean.visit.id
+    description: Key of visit
   id_visit:
     lineage:
-      - datalake_ebdb_clean.visit.id
+    - datalake_ebdb_clean.visit.id
+    description: Id of visit (equal to key of visit)
   cd_visit:
     lineage:
-      - datalake_ebdb_clean.visit.code
+    - datalake_ebdb_clean.visit.code
+    description: Code of visit
   business_unit:
     lineage:
-      - datalake_sale_visit_hubs.sale_visit_hubs.business_unit
+    - datalake_sale_visit_hubs.sale_visit_hubs.business_unit
   day_visit:
     lineage:
-      - datalake_ebdb_clean.visit.dt_visit
+    - datalake_ebdb_clean.visit.dt_visit
+    description: Date of visit
   slot:
     lineage:
-      - datalake_ebdb_clean.visit.slot
+    - datalake_ebdb_clean.visit.slot
+    description: Slot time of visit (0, 1, 2, ..., 51)
   slot_count:
     lineage:
-      - datalake_ebdb_clean.visit.slot_count
+    - datalake_ebdb_clean.visit.slot_count
+    description: Number of available slots to visit
   type:
     lineage:
-      - datalake_ebdb_clean.visit.type
+    - datalake_ebdb_clean.visit.type
+    description: Useless (only 6 rows if type = 1 from 2015)
   status:
     lineage:
-      - datalake_ebdb_clean.visit.status
+    - datalake_ebdb_clean.visit.status
+    description: ''
+    categories:
+      Canceled: ''
+      Done: ''
+      Scheduled: ''
   booking_type:
     lineage:
-      - datalake_ebdb_clean.visit.booking_type
+    - datalake_ebdb_clean.visit.booking_type
+    description: ''
+    categories:
+      Booked: ''
+      Realized: ''
   dt_created:
     lineage:
-      - datalake_ebdb_clean.visit.ts_created
+    - datalake_ebdb_clean.visit.ts_created
+    description: Timestamp of booking creating
   dt_updated:
     lineage:
-      - datalake_ebdb_clean.visit.ts_updated
+    - datalake_ebdb_clean.visit.ts_updated
+    description: Timestamp of visit last status
+  dt_timestamp:
+    description: Timestamp of table loading

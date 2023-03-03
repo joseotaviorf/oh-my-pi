@@ -1,218 +1,382 @@
 database_name: dw_public
 table_name: fact_listing_rent_flows
+description: Fact table that contains each rent flow (starting on booking creation
+  or offer submitted, ending on contract signed). Each line is a rent flow from booking
+  creation to contract signature
+domain: For Rent
+owner: E ForRent@quintoandar.com.br
 columns:
   ods_id:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_house_rent_flow
+    - datalake_ebdb_rent_flow.rent_flow.id_house_rent_flow
+    description: Id of rent flow
   sk_house_listing:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_house
-      - dw_public.dim_house_listing.version
+    - datalake_ebdb_rent_flow.rent_flow.id_house
+    - dw_public.dim_house_listing.version
+    description: Key of house listing
   sk_region:
     lineage:
-      - datalake_ebdb_listing.house.id_region
+    - datalake_ebdb_listing.house.id_region
+    description: Key of house region
   sk_condo:
     lineage:
-      - datalake_ebdb_listing.house.id_condo_parent
+    - datalake_ebdb_listing.house.id_condo_parent
+    description: Key of building where house is in
   sk_rent_flow:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_rent_flow
+    - datalake_ebdb_rent_flow.rent_flow.id_rent_flow
+    description: Key of rent flow
   sk_booking:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_booking
+    - datalake_ebdb_rent_flow.rent_flow.id_booking
+    description: Key of booking (visit scheduled)
   sk_tenant_booking_review:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_booking
+    - datalake_ebdb_rent_flow.rent_flow.id_booking
+    description: Key of tenant booking review
   sk_owner:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_owner
+    - datalake_ebdb_rent_flow.rent_flow.id_owner
+    description: Key of user who's the house owner/responsible, the key can be the
+      partner's user
   sk_user_agent:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_user_agent
+    - datalake_ebdb_rent_flow.rent_flow.id_user_agent
+    description: Key of agent responsible for visit
   sk_client:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_client
+    - datalake_ebdb_rent_flow.rent_flow.id_client
+    description: Key of client that sent an offer or booked a visit
   sk_visit:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_visit
+    - datalake_ebdb_rent_flow.rent_flow.id_visit
+    description: Key of visit scheduled confirmation
   sk_offer:
     lineage:
-      - dw_public.dim_offer.sk_offer
+    - dw_public.dim_offer.sk_offer
+    description: Key of offer
   sk_reservation:
     lineage:
-      - datalake_kill_queue.reservation.id_reservation
+    - datalake_kill_queue.reservation.id_reservation
+    description: Key of reservation
   sk_proposal:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_proposal
+    - datalake_ebdb_rent_flow.rent_flow.id_proposal
+    description: Key of proposal (offer that was accepted)
   sk_contract:
     lineage:
-      - dw_public.dim_contract.sk_contract
+    - dw_public.dim_contract.sk_contract
+    description: Key of contract
   sk_rent_flow_taxonomy:
     lineage:
-      - dw_public.dim_booking.sk_rent_flow_taxonomy
+    - dw_public.dim_booking.sk_rent_flow_taxonomy
+    description: Key of rent flow taxonomy (use to join with dim_rent_flow_taxonomy)
   sk_house_first_listing_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_house_first_listing
+    - datalake_ebdb_rent_flow.rent_flow.dt_house_first_listing
+    description: Key of first house listing version date
   sk_house_listing_date:
     lineage:
-      - dw_public.dim_house_listing.ts_listing_version_start
+    - dw_public.dim_house_listing.ts_listing_version_start
+    description: Key of each house listing version date
   sk_house_listing_de_publication_date:
     lineage:
-      - dw_public.dim_house_listing.ts_last_de_publication
+    - dw_public.dim_house_listing.ts_last_de_publication
+    description: Key of each house listing unpublish date
   sk_house_listing_first_offer_submitted_date:
     lineage:
-      - dw_public.dim_offer.dt_created
+    - dw_public.dim_offer.dt_created
+    description: Key of first house listing offer submitted by tenant date
   sk_booking_created_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_booking_created
+    - datalake_ebdb_rent_flow.rent_flow.dt_booking_created
+    description: Key of date when visit was scheduled
   sk_visit_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_visit
+    - datalake_ebdb_rent_flow.rent_flow.dt_visit
+    description: Key of date when visit is intended to happen
   sk_agent_sign_up_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_agent_sign_up
+    - datalake_ebdb_rent_flow.rent_flow.dt_agent_sign_up
+    description: Key of date when agent signed up in the platform
   sk_client_sign_up_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_client_sign_up
+    - datalake_ebdb_rent_flow.rent_flow.dt_client_sign_up
+    description: Key of date when client signed up in the platform
   sk_offer_submitted_date:
     lineage:
-      - dw_public.dim_offer.dt_first_sent
+    - dw_public.dim_offer.dt_first_sent
+    description: Key of date when offer was submitted by client
   sk_min_offer_submitted_date:
     lineage:
-      - dw_public.dim_offer.dt_first_sent
+    - dw_public.dim_offer.dt_first_sent
+    description: Key of first date when a offer was submitted by client
   sk_offer_approved_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_analysis
+    - datalake_ebdb_rent_flow.rent_flow.dt_analysis
+    description: Key of date when offer was approved by owner
   sk_reservation_created_date:
     lineage:
-      - datalake_kill_queue.reservation.ts_created
+    - datalake_kill_queue.reservation.ts_created
+    description: Key of date when house was reserved by client
   sk_proposal_approved_date:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.dt_proposal_approved
+    - datalake_ebdb_rent_flow.rent_flow.dt_proposal_approved
+    description: Key of date when all steps (doc and credit) are approved
   sk_proposal_processed_date:
     lineage:
-      - dw_public.dim_proposal.ts_processed
+    - dw_public.dim_proposal.ts_processed
+    description: Key of date when all steps (doc and credit) finished
   sk_tenant_first_doc_sent_date:
     lineage:
-      - dw_public.dim_proposal.dt_tenant_first_document_sent
-      - dw_public.dim_proposal.dt_tenant_auto_first_doc_sent
+    - dw_public.dim_proposal.dt_tenant_first_document_sent
+    - dw_public.dim_proposal.dt_tenant_auto_first_doc_sent
+    description: Key of date when client sent first documentation
   sk_tenant_manual_first_doc_sent_date:
     lineage:
-      - dw_public.dim_proposal.dt_tenant_first_document_sent
+    - dw_public.dim_proposal.dt_tenant_first_document_sent
+    description: Key of date when client sent manually first documentation
   sk_tenant_auto_first_doc_sent_date:
     lineage:
-      - dw_public.dim_proposal.dt_tenant_auto_first_doc_sent
+    - dw_public.dim_proposal.dt_tenant_auto_first_doc_sent
+    description: Key of date when client sent automatically first documentation
   sk_tenant_first_doc_complete_date:
     lineage:
-      - dw_public.dim_proposal.dt_tenant_first_doc_complete
+    - dw_public.dim_proposal.dt_tenant_first_doc_complete
+    description: Key of date when tenant doc was first completed
   sk_tenant_last_doc_complete_date:
     lineage:
-      - dw_public.dim_proposal.dt_tenant_last_doc_complete
+    - dw_public.dim_proposal.dt_tenant_last_doc_complete
+    description: Key of date when tenant doc was last completed
   sk_tenant_doc_complete_date:
     lineage:
-      - dw_public.dim_proposal.dt_tenant_doc_complete
+    - dw_public.dim_proposal.dt_tenant_doc_complete
+    description: Key of date when tenant doc was completed
   sk_contract_created_date:
     lineage:
-      - dw_public.dim_contract.ts_created
+    - dw_public.dim_contract.ts_created
+    description: Key of date when contract was created
   sk_contract_signed_date:
     lineage:
-      - dw_public.dim_contract.ts_signature
+    - dw_public.dim_contract.ts_signature
+    description: Key of date when contract was signed
   sk_contract_annulment_date:
     lineage:
-      - dw_public.dim_contract.dt_annulment
+    - dw_public.dim_contract.dt_annulment
+    description: Key of date when contract was annulled
   sk_contract_canceled_date:
     lineage:
-      - dw_public.dim_contract.ts_canceled
+    - dw_public.dim_contract.ts_canceled
+    description: Key of date when contract was canceled
   sk_credit_analysis_first_init_date:
     lineage:
-      - dw_public.dim_proposal.dt_credit_analysis_first_init
+    - dw_public.dim_proposal.dt_credit_analysis_first_init
+    description: Key of date when credit analysis first was initiated
   sk_credit_analysis_last_init_date:
     lineage:
-      - dw_public.dim_proposal.dt_credit_analysis_last_init
+    - dw_public.dim_proposal.dt_credit_analysis_last_init
+    description: Key of date when credit analysis last was initiated
   sk_credit_analysis_init_date:
     lineage:
-      - dw_public.dim_proposal.dt_credit_analysis_init
+    - dw_public.dim_proposal.dt_credit_analysis_init
+    description: Key of date when credit analysis was initiated
   sk_credit_analysis_first_end_date:
     lineage:
-      - dw_public.dim_proposal.dt_credit_analysis_first_end
+    - dw_public.dim_proposal.dt_credit_analysis_first_end
+    description: Key of date when credit analysis first ended
   sk_credit_analysis_last_end_date:
     lineage:
-      - dw_public.dim_proposal.dt_credit_analysis_last_end
+    - dw_public.dim_proposal.dt_credit_analysis_last_end
+    description: Key of date when credit analysis last ended
   sk_credit_analysis_end_date:
     lineage:
-      - dw_public.dim_proposal.dt_credit_analysis_end
+    - dw_public.dim_proposal.dt_credit_analysis_end
+    description: Key of date when credit analysis ended
   sk_credit_analysis_approved_date:
     lineage:
-      - dw_public.dim_proposal.dt_credit_last_approved
+    - dw_public.dim_proposal.dt_credit_last_approved
+    description: Key of date when credit analysis was approved
   sk_first_credit_evaluation_init:
     lineage:
-      - dw_public.dim_proposal.dt_first_credit_evaluation_init
+    - dw_public.dim_proposal.dt_first_credit_evaluation_init
+    description: Key of date when credit evaluation first was initiated
   sk_last_credit_evaluation_init:
     lineage:
-      - dw_public.dim_proposal.dt_last_credit_evaluation_init
+    - dw_public.dim_proposal.dt_last_credit_evaluation_init
+    description: Key of date when credit evaluation last was initiated
   sk_first_credit_evaluation_positive:
     lineage:
-      - dw_public.dim_proposal.dt_first_credit_evaluation_positive
+    - dw_public.dim_proposal.dt_first_credit_evaluation_positive
+    description: Key of date when credit evaluation first was positive
   sk_last_credit_evaluation_positive:
     lineage:
-      - dw_public.dim_proposal.dt_last_credit_evaluation_positive
+    - dw_public.dim_proposal.dt_last_credit_evaluation_positive
+    description: Key of date when credit evaluation last was positive
   sk_first_credit_evaluation_negative:
     lineage:
-      - dw_public.dim_proposal.dt_first_credit_evaluation_negative
+    - dw_public.dim_proposal.dt_first_credit_evaluation_negative
+    description: Key of date when credit evaluation first was negative
   sk_last_credit_evaluation_negative:
     lineage:
-      - dw_public.dim_proposal.dt_last_credit_evaluation_negative
+    - dw_public.dim_proposal.dt_last_credit_evaluation_negative
+    description: Key of date when credit evaluation last was negative
   sk_guarantee_date:
     lineage:
-      - dw_public.dim_proposal.dt_guarantee
+    - dw_public.dim_proposal.dt_guarantee
+    description: Key of date of guarantee
   sk_first_doc_analysis_approved:
     lineage:
-      - dw_public.dim_proposal.dt_first_doc_analysis_approved
+    - dw_public.dim_proposal.dt_first_doc_analysis_approved
+    description: Key of date when first doc analysis was approved
   sk_last_doc_analysis_approved:
     lineage:
-      - dw_public.dim_proposal.dt_last_doc_analysis_approved
+    - dw_public.dim_proposal.dt_last_doc_analysis_approved
+    description: Key of date when last doc analysis was approved
   sk_first_doc_analysis_rejected:
     lineage:
-      - dw_public.dim_proposal.dt_first_doc_analysis_rejected
+    - dw_public.dim_proposal.dt_first_doc_analysis_rejected
+    description: Key of date when first doc analysis was rejected
   sk_last_doc_analysis_rejected:
     lineage:
-      - dw_public.dim_proposal.dt_last_doc_analysis_rejected
+    - dw_public.dim_proposal.dt_last_doc_analysis_rejected
+    description: Key of date when last doc analysis was rejected
   sk_guarantee_paid_date:
     lineage:
-      - dw_public.dim_proposal.dt_guarantee_paid
+    - dw_public.dim_proposal.dt_guarantee_paid
+    description: Key of date of guarantee paid
   sk_agent_review_rating_date:
     lineage:
-      - datalake_ebdb_agents.agents_review.ts_rating_created
+    - datalake_ebdb_agents.agents_review.ts_rating_created
+    description: Key of agent review rating date
   country_code:
     lineage:
-      - datalake_ebdb_listing.house.country_code
+    - datalake_ebdb_listing.house.country_code
+    description: Country code of the listing
   visit_created_type:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.visit_created_type
+    - datalake_ebdb_rent_flow.rent_flow.visit_created_type
+    description: Source where visit was created
+    categories:
+      Admin: ''
+      CidadeAlerta: ''
+      Corretores: ''
+      Encaixe: ''
+      Inquilinos: ''
+      SelfServiceWeb: ''
   booking_utm_campaign:
     lineage:
-      - dw_public.dim_booking.utm_campaign
+    - dw_public.dim_booking.utm_campaign
+    description: Campaign where booking was from
   booking_utm_content:
     lineage:
-      - dw_public.dim_booking.utm_content
+    - dw_public.dim_booking.utm_content
+    description: Content where booking was from
   booking_utm_term:
     lineage:
-      - dw_public.dim_booking.utm_term
+    - dw_public.dim_booking.utm_term
+    description: Term where booking was from
   funnel_step_drop_reason:
     lineage:
-      - dw_public.dim_contract.cancellation_reason
-      - dw_public.dim_offer.rejection_reason
-      - dw_public.dim_proposal.rejection_reason
-      - dw_public.dim_booking.cancellation_reason
+    - dw_public.dim_contract.cancellation_reason
+    - dw_public.dim_offer.rejection_reason
+    - dw_public.dim_proposal.rejection_reason
+    - dw_public.dim_booking.cancellation_reason
+    description: The reason why this flow was stop in this funnel step
   flg_visit_completed:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_completed
+    - datalake_ebdb_rent_flow.rent_flow.is_visit_completed
+    description: Flag that indicates when client and agent were in the visit (visit
+      was realized)
   flg_visit_performed:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_performed
+    - datalake_ebdb_rent_flow.rent_flow.is_visit_performed
+    description: Flag that indicates when only agent was in the visit, or owner no-show
+      on a house with entrance restrictions (visit wasn't realized)
   flg_visit_created_from_app:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_created_from_app
+    - datalake_ebdb_rent_flow.rent_flow.is_visit_created_from_app
+    description: Flag that indicates when visit was created from app
   flg_visit_last_updated_from_app:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_last_updated_from_app
+    - datalake_ebdb_rent_flow.rent_flow.is_visit_last_updated_from_app
+    description: Flag that indicates that last update was from app
+  days_booking_created_to_contract_signed:
+    description: Number of days between booking created to contract signed
+  days_booking_created_to_offer_submitted:
+    description: Number of days between booking created to offer submitted
+  days_booking_created_to_visit:
+    description: Number of days between booking was created to visit completed
+  days_contract_created_to_contract_signed:
+    description: Number of days between contract created to contract signed
+  days_credit_approved_to_closing_processed:
+    description: Number of days between credit analysis approved and closing processed
+  days_credit_approved_to_contract_created:
+    description: Number of days between client credit analysis approved to contract
+      created
+  days_credit_approved_to_contract_signed:
+    description: Number of days between client credit analysis approved to contract
+      signed
+  days_doc_completed_to_credit_processed:
+    description: Number of days between client completed doc sent to credit analysis
+      processed
+  days_first_doc_sent_to_credit_processed:
+    description: Number of days between client first doc sent to credit analysis processed
+  days_first_doc_sent_to_doc_completed:
+    description: Number of days between client first doc sent to client completed
+      doc sent
+  days_house_listing_to_contract_signed:
+    description: Number of days between house listing and contract signed
+  days_house_listing_to_visit:
+    description: Number of days between house listing and visit completed
+  days_insurance_approved_to_contract_signed:
+    description: Number of days between insurance approved to contract signed
+  days_offer_approved_to_contract_signed:
+    description: Number of days between offer approved to contract signed
+  days_offer_approved_to_credit_init:
+    description: Number of days between offer approved to credit analysis initiated
+  days_offer_approved_to_doc_contact:
+    description: Number of days between offer approved and proposal processed/doc
+      sent
+  days_offer_approved_to_doc_first_sent:
+    description: Number of days between offer approved to client first doc sent
+  days_offer_approved_to_owner_doc_sent:
+    description: Number of days between offer approved to owner doc sent
+  days_offer_approved_to_tenant_first_doc_sent:
+    description: Number of days between offer approved to client first doc sent
+  days_offer_submitted_to_contract_signed:
+    description: Number of days between offer was submitted to contract signed
+  days_offer_submitted_to_internal_analysis:
+    description: Number of days between offer was submitted to internal analysis
+  days_offer_submitted_to_offer_approved:
+    description: Number of days between offer was submitted to offer approved
+  days_tenant_doc_completed_to_credit_approved:
+    description: Number of days between client completed doc sent to credit analysis
+      approved
+  days_tenant_first_doc_sent_to_doc_completed:
+    description: Number of days between client first doc sent and client completed
+      doc sent
+  days_tenant_first_doc_sent_to_insurance_approved:
+    description: Number of days between client doc sent to insurance approved
+  days_user_created_to_visit:
+    description: Number of days between user signed up to visit completed
+  days_visit_to_contract_signed:
+    description: Number of days between visit completed to contract signed
+  days_visit_to_offer_submitted:
+    description: Number of days between visit completed to offer submitted
+  funnel_step:
+    description: The funnel step where this flow is in/ has stoppped
+    categories:
+      contract_created: ''
+      contract_signed: ''
+      credit_approved: ''
+      document_completed: ''
+      document_sent: ''
+      offer_aproved: ''
+      offer_submitted: ''
+      visit_booked: ''
+      visit_completed: ''
+  reservation_attempts:
+    description: Number of client attempts to reserve the house
+  ts_load:
+    description: Timestamp of data recorded in the table

@@ -1,27 +1,45 @@
 database_name: dw_quintoandar
 table_name: dim_user_sales_rep
+description: ''
+domain: For Rent
+owner: ''
 columns:
   sk_user_sales_rep:
     lineage:
-      - datalake_ebdb_user.user_sales_rep.id_user_sales_rep
+    - datalake_ebdb_user.user_sales_rep.id_user_sales_rep
+    description: ''
   name:
     lineage:
-      - datalake_ebdb_user.user_sales_rep.name
+    - datalake_ebdb_user.user_sales_rep.name
+    description: ''
   email:
     lineage:
-      - datalake_ebdb_user.user_sales_rep.email
+    - datalake_ebdb_user.user_sales_rep.email
+    description: ''
   phone_number:
     lineage:
-      - datalake_ebdb_user.user_sales_rep.phone_number
+    - datalake_ebdb_user.user_sales_rep.phone_number
+    description: ''
   admin_type:
     lineage:
-      - datalake_ebdb_user.user_sales_rep.admin_type
+    - datalake_ebdb_user.user_sales_rep.admin_type
+    description: ''
+    categories:
+      Admin: ''
+      AtendimentoParceiros: ''
+      Normal: ''
+      Sudo: ''
   sales_company:
     lineage:
-      - datalake_ebdb_user.user_sales_rep.sales_company
+    - datalake_ebdb_user.user_sales_rep.sales_company
+    description: ''
   is_sales_rep_active:
     lineage:
-      - datalake_ebdb_user.user_sales_rep.is_sales_rep_active
+    - datalake_ebdb_user.user_sales_rep.is_sales_rep_active
+    description: ''
   dt_sales_rep_started:
     lineage:
-      - datalake_ebdb_user.user_sales_rep.dt_sales_rep_started
+    - datalake_ebdb_user.user_sales_rep.dt_sales_rep_started
+    description: ''
+  ts_load:
+    description: ''

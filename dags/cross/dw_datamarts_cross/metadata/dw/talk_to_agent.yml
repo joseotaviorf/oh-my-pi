@@ -1,50 +1,227 @@
----
 database_name: dw_datamarts_cross
 table_name: talk_to_agent
+description: Contains messages sent from tenants to agents through listings pages.
+  Each line is a Talk to Agent Started (when the message is sent), on house-tenant-agent
+  triad. Talk to Agent Completed is considered when there is a visit booked by agent
+  and/or completed support
+domain: Cross
+owner: eduardo.bastiani@quintoandar.com.br
 columns:
   tenant_id:
     lineage:
-      - datalake_amplitude_clean.events.id_user
+    - datalake_amplitude_clean.events.id_user
+    description: Key of tenant who sent the message
   sk_house_listing:
     lineage:
-      - dw_public.dim_house_listing.sk_house_listing
+    - dw_public.dim_house_listing.sk_house_listing
+    description: Key of listing version
   tenant_name:
     lineage:
-      - dw_public.dim_user.nome
+    - dw_public.dim_user.nome
+    description: Name of tenant who sent the message
   tenant_phone:
     lineage:
-      - dw_public.dim_user.telefone_principal
+    - dw_public.dim_user.telefone_principal
+    description: Phone of tenant who sent the message
   tenant_email:
     lineage:
-      - dw_public.dim_user.email
+    - dw_public.dim_user.email
+    description: Email address of the tenant who sent the message
   region_code:
     lineage:
-      - dw_public.dim_region.region_code
+    - dw_public.dim_region.region_code
+    description: Region from the property which received the message
   first_attendance_ts:
     lineage:
-      - dw_public.dim_booking.dt_created
-      - datalake_ebdb_clean.agent_support.ts_created
+    - dw_public.dim_booking.dt_created
+    - datalake_ebdb_clean.agent_support.ts_created
+    description: Date of first attendance, for the Talk to Agent which have been completed
   mkt_category:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.category
+    - datalake_gsheets_clean.taxonomy_demand.category
+    description: ''
+    categories:
+      Inbound: '#N/A'
+      Not Mapped: '#N/A'
   mkt_flow:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.flow
+    - datalake_gsheets_clean.taxonomy_demand.flow
+    description: ''
+    categories:
+      Not Mapped: '#N/A'
+      Other: '#N/A'
+      Self-Service: '#N/A'
   mkt_completion:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.completion
+    - datalake_gsheets_clean.taxonomy_demand.completion
+    description: ''
+    categories:
+      Full Self-Service: '#N/A'
+      Not Mapped: '#N/A'
+      Other: '#N/A'
   mkt_channel:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.channel
+    - datalake_gsheets_clean.taxonomy_demand.channel
+    description: ''
   mkt_medium:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.medium
+    - datalake_gsheets_clean.taxonomy_demand.medium
+    description: ''
+    categories:
+      Branding: '#N/A'
+      Direct: '#N/A'
+      Display: '#N/A'
+      Lost Tracking: '#N/A'
+      Not Mapped: '#N/A'
+      Notifications: '#N/A'
+      Online Classifieds: '#N/A'
+      Other: '#N/A'
+      Portals: '#N/A'
+      Retargeting: '#N/A'
+      SEM branded: '#N/A'
+      SEM non-branded: '#N/A'
+      SEO branded: '#N/A'
+      SEO non-branded: '#N/A'
+      Shared: '#N/A'
   mkt_origin:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.origin
+    - datalake_gsheets_clean.taxonomy_demand.origin
+    description: ''
+    categories:
+      Not Mapped: '#N/A'
+      Tenants PWA: '#N/A'
   mkt_source:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.source
+    - datalake_gsheets_clean.taxonomy_demand.source
+    description: ''
   mkt_platform:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand.platform
+    - datalake_gsheets_clean.taxonomy_demand.platform
+    description: ''
+    categories:
+      Amp: '#N/A'
+      App Android: '#N/A'
+      App iOS: '#N/A'
+      Lost Tracking: '#N/A'
+      Not Mapped: '#N/A'
+      Web Desktop: '#N/A'
+      Web Mobile: '#N/A'
+  agent_id:
+    description: Key of agent who received the message
+  app_type:
+    description: ''
+    categories:
+      amp: '#N/A'
+      android: '#N/A'
+      android_flutter: '#N/A'
+      ios: '#N/A'
+      web_desktop: '#N/A'
+      web_mobile: '#N/A'
+  attendances_by_agent:
+    description: How many completed "AgentSupport" this message has associated (this
+      is an indicative of TTA Completed)
+  attended:
+    description: Flag to indicate if the Talk to Agent Started has been Completed
+    categories:
+      'FALSE': ''
+      'TRUE': ''
+  bookings_by_agent:
+    description: How many completed "Bookings" this message has associated (this is
+      an indicative of TTA Completed)
+  branded:
+    description: ''
+    categories:
+      Branded: '#N/A'
+      Outro: '#N/A'
+  business_context:
+    description: Flag to indicate if the context which the message was sent (Rent
+      or Sale)
+    categories:
+      RENT: ''
+      SALE: ''
+  delta_hours_attended:
+    description: If the Talk to Agent was attended, how much time has passed from
+      TTA Started to Completed (hours)
+  delta_hours_elapsed:
+    description: If the Talk to Agent was not attended, how much time has passed from
+      TTA Started to current moment
+  first_message_ts:
+    description: Date of the first message
+  house_id:
+    description: Key of property
+  message:
+    description: Content of the message which was sent. If there is more than one
+      message on house-agent-tenant triad, they will be aggregated
+  msg_sent:
+    description: Number of messages sent. They are aggregated when there is more than
+      one message on house-agent-tenant triad
+  ts_load:
+    description: ''
+    categories:
+      '2021-04-27 10:31:54': '#N/A'
+  utm_campaign:
+    description: ''
+  utm_content:
+    description: ''
+  utm_medium:
+    description: ''
+    categories:
+      5d27abdf2297a400119df49c: '#N/A'
+      CPC: '#N/A'
+      affiliates: '#N/A'
+      b2b: '#N/A'
+      c: '#N/A'
+      classifieds: '#N/A'
+      classifieds&utm_campaign=principal&utm_source=Facebook: '#N/A'
+      classifieds&utm_campaign=principal&utm_source=ImovelWeb: '#N/A'
+      classifieds&utm_campaign=principal&utm_source=MercadoLivre: '#N/A'
+      classifieds&utm_campaign=principal&utm_source=VivaReal: '#N/A'
+      classifieds&utm_campaign=principal&utm_source=Zap: '#N/A'
+      classifieds&utm_campaign=recomendado&utm_source=MercadoLivre: '#N/A'
+      classifieds&utm_campaign=recomendado&utm_source=VivaReal: '#N/A'
+      classifieds&utm_campaign=recomendado&utm_source=Zap: '#N/A'
+      componente-cta: '#N/A'
+      content: '#N/A'
+      copy_shar: '#N/A'
+      copy_share: '#N/A'
+      copy_share1: '#N/A'
+      copy_sharem: '#N/A'
+      cpc: '#N/A'
+      cpc?: '#N/A'
+      cu: '#N/A'
+      custom_: '#N/A'
+      custom_sha: '#N/A'
+      custom_shar: '#N/A'
+      custom_share: '#N/A'
+      custom_sharec: '#N/A'
+      custom_shared: '#N/A'
+      custom_sharefilha: '#N/A'
+      custom_sharehttps://quintoandar.com.br/imovel/893056135?utm_source=shared: '#N/A'
+      custom_sharr: '#N/A'
+      custon_share: '#N/A'
+      digital: '#N/A'
+      display: '#N/A'
+      display-b: '#N/A'
+      email: '#N/A'
+      listingOriginals: '#N/A'
+      logo: '#N/A'
+      materia: '#N/A'
+      non-subscribed: '#N/A'
+      notification: '#N/A'
+      notifications: '#N/A'
+      'null': '#N/A'
+      post: '#N/A'
+      product: '#N/A'
+      push: '#N/A'
+      referrer: '#N/A'
+      retargeting: '#N/A'
+      retargeting}: '#N/A'
+      seo: '#N/A'
+      sms: '#N/A'
+      social: '#N/A'
+      video-c: '#N/A'
+      whatsapp: '#N/A'
+  utm_source:
+    description: ''
+  utm_term:
+    description: ''

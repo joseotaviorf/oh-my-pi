@@ -1,29 +1,52 @@
----
 database_name: dw_payment
 table_name: dim_occurrence_code
+description: Catalog with the meaning of occurrences codes
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
 columns:
   sk_occurrence_code:
     lineage:
-      - datalake_vans_clean.boleto.occurrence_code
-      - datalake_vans_clean.payment.occurrence_code
-      - datalake_vans_clean.payment_boleto.occurrence_code
+    - datalake_vans_clean.boleto.occurrence_code
+    - datalake_vans_clean.payment.occurrence_code
+    - datalake_vans_clean.payment_boleto.occurrence_code
+    description: ''
   name:
     lineage:
-      - datalake_vans_clean.boleto.occurrence_code
-      - datalake_vans_clean.payment.occurrence_code
-      - datalake_vans_clean.payment_boleto.occurrence_code
+    - datalake_vans_clean.boleto.occurrence_code
+    - datalake_vans_clean.payment.occurrence_code
+    - datalake_vans_clean.payment_boleto.occurrence_code
+    description: Name of occurrence code such as described in banking file guides
+      provided by corresponding bank institutions
   last_code:
     lineage:
-      - datalake_vans_clean.boleto.occurrence_code
-      - datalake_vans_clean.payment.occurrence_code
-      - datalake_vans_clean.payment_boleto.occurrence_code
+    - datalake_vans_clean.boleto.occurrence_code
+    - datalake_vans_clean.payment.occurrence_code
+    - datalake_vans_clean.payment_boleto.occurrence_code
+    description: The last occurrence code for combined returns from SISPAG, which
+      represents the higher detail level of errors
   second_last_code:
     lineage:
-      - datalake_vans_clean.boleto.occurrence_code
-      - datalake_vans_clean.payment.occurrence_code
-      - datalake_vans_clean.payment_boleto.occurrence_code
+    - datalake_vans_clean.boleto.occurrence_code
+    - datalake_vans_clean.payment.occurrence_code
+    - datalake_vans_clean.payment_boleto.occurrence_code
+    description: The second last occurrence code for combined returns from SISPAG,
+      which represents the second higher detail level of errors
   third_last_code:
     lineage:
-      - datalake_vans_clean.boleto.occurrence_code
-      - datalake_vans_clean.payment.occurrence_code
-      - datalake_vans_clean.payment_boleto.occurrence_code
+    - datalake_vans_clean.boleto.occurrence_code
+    - datalake_vans_clean.payment.occurrence_code
+    - datalake_vans_clean.payment_boleto.occurrence_code
+  description:
+    description: ''
+  source_file_type:
+    description: Type of the source file responsible for translating occurrence code
+      into status, such as Cobrança and SISPAG from Itaú
+    categories:
+      cnab: ''
+      sispag: ''
+  hird_last_code:
+    description: The third last occurrence code for combined returns from SISPAG,
+      which represents the third higher detail level of errors and probably the first
+      in sequence
+  ts_load:
+    description: ''

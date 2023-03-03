@@ -1,112 +1,229 @@
----
 database_name: dw_sale
 table_name: dim_listing
+description: ''
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   sk_sale_listing:
     lineage:
-      - datalake_sale_listings.sale_listing.id_sale_listing
+    - datalake_sale_listings.sale_listing.id_sale_listing
+    description: Identification of the listing version, which may be in edition (version
+      0) or already published (version 1).
   sk_house:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.id_house
+    - datalake_ebdb_listing.listing_business_context.id_house
+    description: ID of House.
   consultant_type:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.consultant_type
+    - datalake_big_agent.house_sale_listing_consultant.consultant_type
   first_consultant_type:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.first_consultant_type
+    - datalake_big_agent.house_sale_listing_consultant.first_consultant_type
   status:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.status
+    - datalake_ebdb_listing.listing_business_context.status
+    description: Current status of listing
+    categories:
+      EDITING: ''
+      OPTED_OUT: ''
+      PUBLISHED: ''
+      SUSPENDED: ''
+      UNPUBLISHED: ''
   price:
     lineage:
-      - datalake_ebdb_clean.house.sale_price
+    - datalake_ebdb_clean.house.sale_price
+    description: Listing sale price.
   predicted_price:
     lineage:
-      - datalake_ebdb_clean.house_predicted_price.p_50
+    - datalake_ebdb_clean.house_predicted_price.p_50
+    description: Price that was suggested from the official calculator used in the
+      context of ForSale, developed by QuintoAndar.
   predicted_price_certainty:
     lineage:
-      - datalake_ebdb_clean.house_predicted_price.certainty
+    - datalake_ebdb_clean.house_predicted_price.certainty
+    description: 'Suggested price certainty level by the ForSale calculator, can range
+      from: NONE, LOW, MEDIUM and HIGH.'
+    categories:
+      NONE: It means that we have no confidence in the prediction, because we lack
+        data to support it, and the result may be far from reality.
+      LOW: It means that we have low confidence in the prediction, and the result
+        may be far from reality.
+      MEDIUM: It means that we have medium confidence in the prediction, and the result
+        can reflect reality.
+      HIGH: It means that we have a high prediction, and the result probably reflects
+        the reality.
   closing_status:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.status_closing
+    - datalake_ebdb_listing.listing_business_context.status_closing
+    description: Describes at which point in the closing stage the listing is allocated,
+      which may be in the CCV step or sale completed.
+    categories:
+      CCV_CANCELED: ''
+      CCV_SIGNED: ''
+      SALE_COMPLETED: ''
   stranded_status:
     lineage:
-      - datalake_sale_stranded_listings.stranded_status.stranded_status
+    - datalake_sale_stranded_listings.stranded_status.stranded_status
+    description: 'Identifies which stranded group the listing is in. When we talk
+      about Stranded Listings, we want to segment the listings that have been published
+      long enough or longer to have received either a visit or an offer, i.e., are
+      longer published and without an event than 95% of the listings that have had
+      that event. Learn more: https://docs.google.com/presentation/d/1I7oPsrLn9u4UIEvRhGPucTD21_VsJo1-L4rSvFahMEU/edit
+      This could be: NA, HEALTH_LISTING, VISIT_STRANDED, RECURRENCE_VISIT_STRANDED,
+      OFFER_STRANDED and RECURRENCE_OFFER_STRANDED.'
+    categories:
+      HEALTH_LISTING: Listings that have not fit into any other segment or have not
+        been published long enough.
+      VISIT_STRANDED: A listing that has been published for a certain period of time
+        and has not yet received its first visit.
+      RECURRENCE_VISIT_STRANDED: 'A listing that has been published for a certain
+        period of time and has received one or more visits, but has not received a
+        visit for a longer time than expected. '
+      OFFER_STRANDED: A listing that has already passed the expected time of receiving
+        an offer. The property has already received its first visit and has not been
+        without a visit long enough for it to be considered RECURRENCE_VISIT_STRANDED.
+      RECURRENCE_OFFER_STRANDED: A listing that has already received an offer, but
+        is waiting longer than expected to receive another offer.
   registration_abandoned_reason:
     lineage:
-      - datalake_ebdb_clean.house_registration_status.registration_abandoned_reason
+    - datalake_ebdb_clean.house_registration_status.registration_abandoned_reason
+    description: Reason why the owner did not complete the listing registration.
+    categories:
+      HOUSE_ALREADY_PUBLISHED: ''
+      HOUSE_PRICE_WAS_OUT_OF_BOUNDS: ''
+      HOUSE_WAS_A_BUSINESS_REAL_ESTATE: ''
+      HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS: ''
+      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS: ''
+      HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: ''
+      HOUSE_WAS_SOLD: ''
+      ISSUES_WITH_HOUSE_DOCUMENTATION: ''
+      OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH: ''
+      OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH: ''
+      OWNER_DIDNT_ACCEPT_ONLINE_PROCESS: ''
+      OWNER_DIDNT_ANSWER_PHONE: ''
+      OWNER_DIDNT_WANT_ADMINISTRATION: ''
+      OWNER_DIDNT_WANT_TO_LIST_ON_QUINTOANDAR: ''
+      OWNER_DISAGREE_CHARGES_PAYMENTS: ''
+      OWNER_GAVE_UP_RENTING: ''
+      OWNER_HAD_NEGATIVE_PHOTOGRAPHER_EXPERIENCE: ''
+      OWNER_RENTED_EXTERNALLY: ''
   unpublished_reason:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.status_reason
+    - datalake_ebdb_listing.listing_business_context.status_reason
+    description: Listing unpublishing reason (UNKNOWN_NULL_VALUE = null in EBDB /  OTHER
+      = does not fit to any pre-defined category).
+    categories:
+      Admin: ''
+      ContractDraft: ''
+      DUPLICATED_HOUSE: ''
+      HOUSE_NOT_AVAILABLE: ''
+      HOUSE_NOT_REACHABLE: ''
+      HouseReserved: ''
+      NotifiedByAgent: ''
+      OWNER_ALREADY_SOLD_HOUSE: ''
+      OWNER_CONSEQUENCES_MANAGEMENT: ''
+      OWNER_DOESNT_AGREE: ''
+      OWNER_GAVE_UP_RENTING: ''
+      OWNER_GAVE_UP_SALE: ''
+      OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED: ''
+      OWNER_OTHER: ''
+      OWNER_RENTED_HOUSE: ''
+      OWNER_RENTING_DIRECT_WITH_TENANT: ''
+      OWNER_RENTING_FOR_SHORT_PERIOD: ''
+      OWNER_RENTING_WITH_OTHER_COMPANY: ''
+      OWNER_REQUESTED_TERMINATION: ''
+      OWNER_SELLING_HOUSE: ''
+      OwnerConsequencesManagement: ''
+      OwnerReforming: ''
+      OwnerTemporarilySuspended: ''
+      OwnerTraveling: ''
+      REMOVED_FROM_CONTEXT_BEFORE_PUBLISHING: ''
+      RENTAL_GUARANTEE: ''
+      RENTED: ''
   short_url:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.short_url
+    - datalake_ebdb_listing.listing_business_context.short_url
+    description: Link to access the listing on the platform.
   partner_3p_supply:
     lineage:
-      - datalake_ebdb_listing.house.partner_3p_supply
+    - datalake_ebdb_listing.house.partner_3p_supply
+    description: 3P supply partner name
   is_3p_supply:
     lineage:
-      - datalake_ebdb_listing.house.is_3p_supply
+    - datalake_ebdb_listing.house.is_3p_supply
+    description: Flag if supply belongs to a 3P partner
   is_3p_supply_5a:
     lineage:
-      - datalake_ebdb_listing.house.is_3p_supply_5a
+    - datalake_ebdb_listing.house.is_3p_supply_5a
   is_3p_supply_bh:
     lineage:
-      - datalake_ebdb_listing.house.is_3p_supply_bh
+    - datalake_ebdb_listing.house.is_3p_supply_bh
   is_casa_mineira_migration:
     lineage:
-      - datalake_ebdb_listing.house.is_casa_mineira_migration
+    - datalake_ebdb_listing.house.is_casa_mineira_migration
   is_primary_market:
     lineage:
-      - datalake_ebdb_listing.house.is_sale_primary_market
+    - datalake_ebdb_listing.house.is_sale_primary_market
   is_for_rent:
     lineage:
-      - datalake_sale_listings.sale_listing.is_for_rent
+    - datalake_sale_listings.sale_listing.is_for_rent
+    description: Describes whether the listing is also or has belonged to the rental
+      funnel.
   has_active_rental_contract:
     lineage:
-      - datalake_sale_listings.sale_listing.has_active_rental_contract
+    - datalake_sale_listings.sale_listing.has_active_rental_contract
+    description: True if the house has a rental active contract in 5A
   has_house_been_rented:
     lineage:
-      - datalake_sale_listings.sale_listing.has_house_been_rented
+    - datalake_sale_listings.sale_listing.has_house_been_rented
+    description: True if the house had at least one rental contract in 5A
   has_great_price_tag:
     lineage:
-      - datalake_ebdb_listing.house.has_great_sale_price_tag
+    - datalake_ebdb_listing.house.has_great_sale_price_tag
   dt_consultant_started:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+    - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
   ts_consultant_deleted:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.ts_consultant_deleted
+    - datalake_big_agent.house_sale_listing_consultant.ts_consultant_deleted
   ts_created:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_created
+    - datalake_ebdb_listing.listing_business_context.ts_created
+    description: Date when house listing was created.
   ts_first_publication:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+    - datalake_ebdb_listing.listing_business_context.ts_first_listing
+    description: Timestamp when house listing was first published.
   ts_last_publication:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_last_listing
+    - datalake_ebdb_listing.listing_business_context.ts_last_listing
+    description: Timestamp of the last publication of the listing.
   ts_first_depublication:
     lineage:
-      - datalake_sale_listings.sale_listing.ts_first_depublication
+    - datalake_sale_listings.sale_listing.ts_first_depublication
+    description: Timestamp when house listing was unpublished for the first time
   ts_last_depublication:
     lineage:
-      - datalake_sale_listings.sale_listing.ts_last_depublication
+    - datalake_sale_listings.sale_listing.ts_last_depublication
+    description: Timestamp of the last unpublishing of the listing.
   ts_first_booking:
     lineage:
-      - datalake_sale_listings.sale_listing.ts_first_booking
+    - datalake_sale_listings.sale_listing.ts_first_booking
   ts_first_visit_completed:
     lineage:
-      - datalake_sale_listings.sale_listing.ts_first_visit_completed
+    - datalake_sale_listings.sale_listing.ts_first_visit_completed
   ts_first_offer_submitted:
     lineage:
-      - datalake_sale_listings.sale_listing.ts_first_offer_submitted
+    - datalake_sale_listings.sale_listing.ts_first_offer_submitted
   dt_first_offer_accepted:
     lineage:
-      - datalake_sale_listings.sale_listing.dt_first_offer_accepted
+    - datalake_sale_listings.sale_listing.dt_first_offer_accepted
   dt_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_listings.sale_listing.dt_first_sale_agreement_signed
+    - datalake_sale_listings.sale_listing.dt_first_sale_agreement_signed
   ts_updated:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_updated
+    - datalake_ebdb_listing.listing_business_context.ts_updated
+    description: Timestamp of listing last update.
+  ts_load:
+    description: Timestamp when data was loaded.

@@ -1,8 +1,14 @@
----
 database_name: metric_rent
 table_name: new_contracts_signed_monthly
+description: Table to count new signed contracts, which are contracts actived or finalized,
+  on monthly basis. The date reference here is related to contract signature or start.
+domain: For Rent
+owner: ''
 columns:
   month:
     lineage:
-      - dw_public.dim_contract.dt_start
-      - dw_public.dim_contract.ts_signature
+    - dw_public.dim_contract.dt_start
+    - dw_public.dim_contract.ts_signature
+    description: month when the contract started or was signed.
+  new_contracts_signed:
+    description: Amount of new signed contracts on a month

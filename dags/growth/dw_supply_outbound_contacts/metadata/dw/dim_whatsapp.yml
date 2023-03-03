@@ -1,18 +1,30 @@
 database_name: dw_supply_outbound_contacts
 table_name: dim_whatsapp
+description: This table details the Whatsapp's High Structured Message (HSM) sent
+  to a owner along the Prospect to Opportunity conversion funnel.
+domain: Growth
+owner: ae-growth@quintoandar.com.br
 columns:
   sk_outbound_contact:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.id_outbound_contact
+    - datalake_supply_outbound_flows.supply_outbound_contacts.id_outbound_contact
+    description: The unique contact request identiier.
   message_template:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    description: The Comms Manager's message template name used in the message.
   tags:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    description: Extra tags used by Jaiminho.
   message_status:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    description: The message delivery status.
   has_opted_in:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    description: True if the prospect opted to accept the first message sent by the
+      company.
+  ts_load:
+    description: Timestamp of when the new data was loaded.

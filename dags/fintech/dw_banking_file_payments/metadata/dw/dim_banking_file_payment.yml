@@ -1,66 +1,144 @@
----
 database_name: dw_payment
 table_name: dim_banking_file_payment
+description: Gathers information about vans communications - bank compensation.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
 columns:
   sk_banking_file_payment:
     lineage:
-      - datalake_vans_clean.boleto.id
-      - datalake_vans_clean.payment.id
-      - datalake_vans_clean.payment_boleto.id
-      - datalake_vans_clean.boleto.company_use
-      - datalake_vans_clean.payment.company_use
-      - datalake_vans_clean.payment_boleto.company_use
+    - datalake_vans_clean.boleto.id
+    - datalake_vans_clean.payment.id
+    - datalake_vans_clean.payment_boleto.id
+    - datalake_vans_clean.boleto.company_use
+    - datalake_vans_clean.payment.company_use
+    - datalake_vans_clean.payment_boleto.company_use
+    description: Banking file payment id from three transaction types recorded in
+      Vans DB
   bank_name:
     lineage:
-      - datalake_vans_clean.bank.name
+    - datalake_vans_clean.bank.name
+    description: ''
   related_document_type:
     lineage:
-      - datalake_vans_clean.boleto.related_document_type
-      - datalake_vans_clean.payment.related_document_type
-      - datalake_vans_clean.payment_boleto.related_document_type
+    - datalake_vans_clean.boleto.related_document_type
+    - datalake_vans_clean.payment.related_document_type
+    - datalake_vans_clean.payment_boleto.related_document_type
+    description: Type of the document related to the banking file payment, such as
+      invoice or payment request from SeuBarriga
+    categories:
+      invoice: ''
+      outcome: ''
+      payment-request: ''
+      teste: ''
   invoice_status:
     lineage:
-      - datalake_vans_clean.boleto.related_document_type
-      - datalake_vans_clean.payment.related_document_type
-      - datalake_vans_clean.payment_boleto.related_document_type
+    - datalake_vans_clean.boleto.related_document_type
+    - datalake_vans_clean.payment.related_document_type
+    - datalake_vans_clean.payment_boleto.related_document_type
+    description: Invoice paid status when the document related to the payment is from
+      type invoice
+    categories:
+      boleto_created: ''
+      boleto_written_down: ''
+      boleto_written_down_error: ''
+      chargeback: ''
+      confirmed_delayed_payment: ''
+      confirmed_payment: ''
+      invoice_already_paid: ''
+      invoice_not_found: ''
+      not applicable: ''
+      paid_amount_divergent: ''
+      payment_has_error: ''
   payment_request_status:
     lineage:
-      - datalake_vans_clean.boleto.related_document_type
-      - datalake_vans_clean.payment.related_document_type
-      - datalake_vans_clean.payment_boleto.related_document_type
+    - datalake_vans_clean.boleto.related_document_type
+    - datalake_vans_clean.payment.related_document_type
+    - datalake_vans_clean.payment_boleto.related_document_type
+    description: Payment request status when the document related to the payment is
+      from type payment request
+    categories:
+      not applicable: ''
   status:
     lineage:
-      - datalake_vans_clean.boleto.status
-      - datalake_vans_clean.payment.status
-      - datalake_vans_clean.payment_boleto.status
+    - datalake_vans_clean.boleto.status
+    - datalake_vans_clean.payment.status
+    - datalake_vans_clean.payment_boleto.status
+    description: ''
+    categories:
+      changed: ''
+      chargeback: ''
+      created: ''
+      error: ''
+      paid: ''
+      processed: ''
+      requested: ''
+      scheduled: ''
+      write: ''
+      written: ''
   accrual_year_month:
     lineage:
-      - datalake_vans_clean.boleto.company_use
-      - datalake_vans_clean.payment.company_use
-      - datalake_vans_clean.payment_boleto.company_use
+    - datalake_vans_clean.boleto.company_use
+    - datalake_vans_clean.payment.company_use
+    - datalake_vans_clean.payment_boleto.company_use
+    description: Expense reference month
   ts_created:
     lineage:
-      - datalake_vans_clean.boleto.ts_created
-      - datalake_vans_clean.payment.ts_created
-      - datalake_vans_clean.payment_boleto.ts_created
+    - datalake_vans_clean.boleto.ts_created
+    - datalake_vans_clean.payment.ts_created
+    - datalake_vans_clean.payment_boleto.ts_created
+    description: ''
   ts_issued:
     lineage:
-      - datalake_vans_clean.boleto.ts_issued
-      - datalake_vans_clean.payment.ts_issued
+    - datalake_vans_clean.boleto.ts_issued
+    - datalake_vans_clean.payment.ts_issued
+    description: Date in which the banking file will was issued
   ts_updated:
     lineage:
-      - datalake_vans_clean.boleto.ts_updated
-      - datalake_vans_clean.payment.ts_updated
-      - datalake_vans_clean.payment_boleto.ts_updated
+    - datalake_vans_clean.boleto.ts_updated
+    - datalake_vans_clean.payment.ts_updated
+    - datalake_vans_clean.payment_boleto.ts_updated
+    description: ''
   dt_due:
     lineage:
-      - datalake_vans_clean.boleto.dt_due
-      - datalake_vans_clean.payment.dt_dued
+    - datalake_vans_clean.boleto.dt_due
+    - datalake_vans_clean.payment.dt_dued
+    description: ''
   dt_fine_due:
     lineage:
-      - datalake_vans_clean.boleto.dt_fine_due
+    - datalake_vans_clean.boleto.dt_fine_due
+    description: ''
   dt_paid:
     lineage:
-      - datalake_vans_clean.boleto.dt_paid
-      - datalake_vans_clean.payment.dt_paid
-      - datalake_vans_clean.payment_boleto.dt_paid
+    - datalake_vans_clean.boleto.dt_paid
+    - datalake_vans_clean.payment.dt_paid
+    - datalake_vans_clean.payment_boleto.dt_paid
+    description: ''
+  format:
+    description: Name format of id according to company use syntax (default or custom)
+    categories:
+      CUSTOM: ''
+      DEFAULT: ''
+      INVALID: ''
+  payment_type:
+    description: Type of the banking file payment according to invoice payment destination
+    categories:
+      condominium: ''
+      early termination: ''
+      landlord: ''
+      monthly: ''
+      onboarding: ''
+  ts_load:
+    description: ''
+  type:
+    description: Type of banking file payment according to source table in Vans DB,
+      such as charge, transfer or account payable
+    categories:
+      account payable: ''
+      charge: ''
+      transfer: ''
+  user_type:
+    description: ''
+    categories:
+      unknown: ''
+  version:
+    description: ''

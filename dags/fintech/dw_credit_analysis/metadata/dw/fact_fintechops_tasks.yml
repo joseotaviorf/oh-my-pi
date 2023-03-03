@@ -1,16 +1,30 @@
----
 database_name: dw_credit
 table_name: fact_fintechops_tasks
+description: This table presents the task resolution SLAs for the FintechOps team
+domain: Fintech
+owner: fernando.araujo@quintoandar.com.br
 columns:
   sk_task:
     lineage:
-      - dw_crm.fact_credit_tasks.sk_task
+    - dw_crm.fact_credit_tasks.sk_task
+    description: Task key
   sk_proposal:
     lineage:
-      - dw_crm.fact_credit_tasks.sk_proposal
+    - dw_crm.fact_credit_tasks.sk_proposal
+    description: Proposal key
   action_user_name:
-    lineage: 
-      - dw_crm.fact_credit_tasks.action_user_name
+    lineage:
+    - dw_crm.fact_credit_tasks.action_user_name
+    description: Contains the analyst name of a given task
   documentation_policy:
-    lineage: 
-      - datalake_sorting_hat_clean.credit_analysis.type
+    lineage:
+    - datalake_sorting_hat_clean.credit_analysis.type
+    description: Indicates what documentation policy was applied to a given entry
+  task_total_min:
+    description: Indicates the total minutes elapsed since task creation
+  task_working_min:
+    description: Indicates the working minutes elapsed since task creation
+  ts_task_finished:
+    description: Timestamp of task ending
+  ts_task_started:
+    description: Timestamp of task start

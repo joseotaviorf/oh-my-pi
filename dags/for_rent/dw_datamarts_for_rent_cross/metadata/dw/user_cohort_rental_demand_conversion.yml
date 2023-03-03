@@ -1,16 +1,57 @@
----
 database_name: dw_datamarts_for_rent_cross
 table_name: user_cohort_rental_demand_conversion
+description: ''
+domain: For Rent
+owner: ''
 columns:
   week_start:
     lineage:
-      - dw_public.dim_date.week_start
+    - dw_public.dim_date.week_start
+    description: ''
   month:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: ''
   quarter:
     lineage:
-      - dw_public.dim_date.quarter
+    - dw_public.dim_date.quarter
+    description: ''
+    categories:
+      Q1: '#N/A'
+      Q2: '#N/A'
+      Q3: '#N/A'
+      Q4: '#N/A'
   funnel_first_touchpoint:
     lineage:
-      - dw_datamarts_cross.funnel_demand_flows.funnel_first_touchpoint
+    - dw_datamarts_cross.funnel_demand_flows.funnel_first_touchpoint
+    description: ''
+    categories:
+      DIRECT: '#N/A'
+      TTA: '#N/A'
+      UNKNOWN: '#N/A'
+      VISIT: '#N/A'
+  users_w_contract_signed:
+    description: ''
+  users_w_credit_evaluation_init:
+    description: ''
+  users_w_credit_evaluation_positive:
+    description: ''
+  users_w_doc_approved:
+    description: ''
+  users_w_doc_sent:
+    description: ''
+  users_w_offer_approved:
+    description: ''
+  users_w_offer_submitted:
+    description: ''
+  users_w_visit_completed:
+    description: ''
+  weeks_conversion:
+    description: ''
+    categories:
+      W0: '#N/A'
+      W1: '#N/A'
+      W2: '#N/A'
+      W3: '#N/A'
+      W4: '#N/A'
+      W5+: '#N/A'

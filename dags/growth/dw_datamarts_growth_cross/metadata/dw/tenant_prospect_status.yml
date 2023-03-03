@@ -1,36 +1,77 @@
----
 database_name: dw_datamarts_growth_cross
 table_name: tenant_prospect_status
+description: ''
+domain: Growth
+owner: ''
 columns:
   sk_client:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.sk_client
-      - dw_public.fact_listing_rent_flows.sk_client
-      - dw_quintoandar.fact_contract_people.sk_user
+    - dw_datamarts_growth_cross.rent_flow_interactions.sk_client
+    - dw_public.fact_listing_rent_flows.sk_client
+    - dw_quintoandar.fact_contract_people.sk_user
+    description: ''
   city_group:
     lineage:
-      - dw_public.dim_region.city_group
+    - dw_public.dim_region.city_group
+    description: ''
+    categories:
+      Belo Horizonte: '#N/A'
+      Brasília: '#N/A'
+      Campinas: '#N/A'
+      Cotia: '#N/A'
+      Curitiba: '#N/A'
+      Florianópolis: '#N/A'
+      Goiânia: '#N/A'
+      Mogi das Cruzes: '#N/A'
+      Porto Alegre: '#N/A'
+      RMSP: '#N/A'
+      Recife: '#N/A'
+      Rio de Janeiro: '#N/A'
+      Salvador: '#N/A'
+      Santos: '#N/A'
+      São José dos Campos: '#N/A'
+      Vitória: '#N/A'
   ts_start:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
-      - dw_public.dim_contract.ts_signature
+    - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
+    - dw_public.dim_contract.ts_signature
+    description: ''
   ts_end:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
-      - dw_public.dim_contract.ts_signature
+    - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
+    - dw_public.dim_contract.ts_signature
+    description: ''
   sk_start_date:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
-      - dw_public.dim_contract.ts_signature
+    - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
+    - dw_public.dim_contract.ts_signature
+    description: ''
   sk_end_date:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
-      - dw_public.dim_contract.ts_signature
+    - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
+    - dw_public.dim_contract.ts_signature
+    description: ''
   ts_first_activation:
     lineage:
-      - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
-      - dw_public.dim_contract.ts_signature
-      - dw_public.dim_contract.dt_annulment
+    - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
+    - dw_public.dim_contract.ts_signature
+    - dw_public.dim_contract.dt_annulment
   city_group_first_activation:
     lineage:
-      - dw_public.dim_region.city_group
+    - dw_public.dim_region.city_group
+  status:
+    description: ''
+    categories:
+      ACTIVE: '#N/A'
+      CHURNED: '#N/A'
+      RENTED: '#N/A'
+  status_detail:
+    description: ''
+    categories:
+      Contract ended: '#N/A'
+      First activation: '#N/A'
+      Inactive by renting (dweller): '#N/A'
+      Inactive by renting (tenant): '#N/A'
+      Inactivity: '#N/A'
+      Recovered after churn: '#N/A'
+      Recovered after renting: '#N/A'

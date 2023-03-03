@@ -1,248 +1,515 @@
 database_name: dw_public
 table_name: dim_user
+description: Information about users registered at QuintoAndar. Each line is a use
+domain: For Rent
+owner: ''
 columns:
   sk_user:
     lineage:
-      - datalake_ebdb_user.user.id
+    - datalake_ebdb_user.user.id
+    description: Key of user
   sk_doorman_joined_date:
     lineage:
-      - datalake_ebdb_user.affiliate_data.ts_doorman_joined
+    - datalake_ebdb_user.affiliate_data.ts_doorman_joined
+    description: Date when doorman joined, if user is affiliate of type doorman
   id:
     lineage:
-      - datalake_ebdb_user.user.id
+    - datalake_ebdb_user.user.id
+    description: Key of user
   dados_agente_id:
     lineage:
-      - datalake_ebdb_user.user.id_agent
+    - datalake_ebdb_user.user.id_agent
+    description: Key of agent, if user is agent
   dados_fotografo_id:
     lineage:
-      - datalake_ebdb_user.user.id_photographer_data
+    - datalake_ebdb_user.user.id_photographer_data
+    description: Key of photographer, if user is photographer
   dados_vendedor_id:
     lineage:
-      - datalake_ebdb_user.user.id_sales_rep
+    - datalake_ebdb_user.user.id_sales_rep
+    description: Key of Inside Sales Analyst, if user is Inside Sales Analyst
   dados_afiliado_id:
     lineage:
-      - datalake_ebdb_user.user.id_affiliates
+    - datalake_ebdb_user.user.id_affiliates
+    description: Key of affiliate, if user is affiliate
   facebook_id:
     lineage:
-      - datalake_ebdb_user.user.id_facebook
+    - datalake_ebdb_user.user.id_facebook
+    description: Facebook ID of user
   linkedin_id:
     lineage:
-      - datalake_ebdb_user.user.id_linkedin
+    - datalake_ebdb_user.user.id_linkedin
+    description: LinkedIn ID of user
+    categories:
+      EhWmGP4rhP: ''
   google_id:
     lineage:
-      - datalake_ebdb_user.user.id_google
+    - datalake_ebdb_user.user.id_google
+    description: ''
   id_partner:
     lineage:
-      - datalake_big_agent.agent_current_program.id_partner
+    - datalake_big_agent.agent_current_program.id_partner
   country_code:
     lineage:
-      - datalake_ebdb_user.user.country_code
+    - datalake_ebdb_user.user.country_code
+    description: Country code of the user
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
   active:
     lineage:
-      - datalake_ebdb_user.user.is_active
+    - datalake_ebdb_user.user.is_active
+    description: Active or not
   bloqueado:
     lineage:
-      - datalake_ebdb_user.user.is_blocked
+    - datalake_ebdb_user.user.is_blocked
+    description: ''
   consultant_type:
     lineage:
-      - datalake_big_agent.agent_current_program.consultant_type
+    - datalake_big_agent.agent_current_program.consultant_type
   dadosafiliado_ativo:
     lineage:
-      - datalake_ebdb_user.affiliate_data.is_active
+    - datalake_ebdb_user.affiliate_data.is_active
+    description: If user is affiliate, flag indicates whether user is still registered
+      in the affiliates program (same field as dim_user_affiliate.is_active)
   dadosagente_ativo:
     lineage:
-      - datalake_ebdb_user.agent_data.is_active
+    - datalake_ebdb_user.agent_data.is_active
+    description: Active or not, if user is an agent
   dadosfotografo_ativo:
     lineage:
-      - datalake_ebdb_clean.photographer_data.is_active
+    - datalake_ebdb_clean.photographer_data.is_active
+    description: Active or not, if user is photographer
   flg_doorman_affiliate:
     lineage:
-      - datalake_ebdb_user.affiliate_data.is_doorman_affiliate
+    - datalake_ebdb_user.affiliate_data.is_doorman_affiliate
+    description: If user is an affiliate of type doorman
   inquilino:
     lineage:
-      - datalake_ebdb_user.user.is_tenant
+    - datalake_ebdb_user.user.is_tenant
+    description: Is user is a tenant with QuintoAndar
   is_sale_agent:
     lineage:
-      - datalake_ebdb_user.agent_data.is_sale_agent
+    - datalake_ebdb_user.agent_data.is_sale_agent
+    description: If user is an Agent with QuintoAndar working with Sales
   is_rent_agent:
     lineage:
-      - datalake_ebdb_user.agent_data.is_rent_agent
+    - datalake_ebdb_user.agent_data.is_rent_agent
+    description: If user is an Agent with QuintoAndar working with Rentals
   dadosbancarios_outro_titular:
     lineage:
-      - datalake_ebdb_user.user.bank_another_holder
+    - datalake_ebdb_user.user.bank_another_holder
+    description: If user's bank account has another person associated to it (e.g.,
+      spouse)
   tem_imovel:
     lineage:
-      - datalake_ebdb_user.user.has_house
+    - datalake_ebdb_user.user.has_house
+    description: If user is the owner of a house listed with QuintoAndar
   tem_app_inquilino:
     lineage:
-      - datalake_ebdb_user.user.has_tenant_app
+    - datalake_ebdb_user.user.has_tenant_app
+    description: If user has tenant app
   tem_contrato_ativo:
     lineage:
-      - datalake_ebdb_user.user.has_active_contract
+    - datalake_ebdb_user.user.has_active_contract
+    description: If user has an active rental contract
   aceita_sms:
     lineage:
-      - datalake_ebdb_user.user.has_accepted_sms
+    - datalake_ebdb_user.user.has_accepted_sms
+    description: Aceita Sms
   nome:
     lineage:
-      - datalake_ebdb_user.user.name
+    - datalake_ebdb_user.user.name
+    description: Full name of user
   cpf:
     lineage:
-      - datalake_ebdb_user.user.cpf
+    - datalake_ebdb_user.user.cpf
+    description: CPF (Tax Identification Number) of user, with dot and hyphen formatting
   rg:
     lineage:
-      - datalake_ebdb_user.user.rg
+    - datalake_ebdb_user.user.rg
+    description: RG (Brazilian national lD) of user
   sexo:
     lineage:
-      - datalake_ebdb_user.user.gender
+    - datalake_ebdb_user.user.gender
+    description: Sex of user
+    categories:
+      Feminino: ''
+      Masculino: ''
   email:
     lineage:
-      - datalake_ebdb_user.user.email
+    - datalake_ebdb_user.user.email
+    description: Email of user
   email_alternativo:
     lineage:
-      - datalake_ebdb_user.user.alternative_email
+    - datalake_ebdb_user.user.alternative_email
+    description: Alternative email of user
   telefone_principal:
     lineage:
-      - datalake_ebdb_user.user.main_phone
+    - datalake_ebdb_user.user.main_phone
+    description: Main contact phone of user
   endereco:
     lineage:
-      - datalake_ebdb_user.user.address
+    - datalake_ebdb_user.user.address
+    description: Street name of user's address
   numero:
     lineage:
-      - datalake_ebdb_user.user.number
+    - datalake_ebdb_user.user.number
+    description: Street number of user's address
   complemento:
     lineage:
-      - datalake_ebdb_user.user.complement
+    - datalake_ebdb_user.user.complement
+    description: Complement of user's address
   bairro:
     lineage:
-      - datalake_ebdb_user.user.neighborhood
+    - datalake_ebdb_user.user.neighborhood
+    description: Neighborhood of user's address
   cep:
     lineage:
-      - datalake_ebdb_user.user.zip_code
+    - datalake_ebdb_user.user.zip_code
+    description: Zip code of user's address
   cidade:
     lineage:
-      - datalake_ebdb_user.user.city
+    - datalake_ebdb_user.user.city
+    description: City of user's address
   estado_nome:
     lineage:
-      - datalake_ebdb_clean.state.name
+    - datalake_ebdb_clean.state.name
+    description: Full state name of user's address
+    categories:
+      Alagoas: ''
+      Amapá: ''
+      Amazonas: ''
+      Bahia: ''
+      Ceará: ''
+      Distrito Federal: ''
+      Espírito Santo: ''
+      Goiás: ''
+      Maranhão: ''
+      Mato Grosso: ''
+      Mato Grosso do Sul: ''
+      Minas Gerais: ''
+      Paraná: ''
+      Paraíba: ''
+      Pará: ''
+      Pernambuco: ''
+      Rio Grande do Norte: ''
+      Rio Grande do Sul: ''
+      Rio de Janeiro: ''
+      Rondônia: ''
+      Roraima: ''
+      Santa Catarina: ''
+      Sergipe: ''
+      São Paulo: ''
+      Tocantins: ''
   estado_abreviacao:
     lineage:
-      - datalake_ebdb_clean.state.abbreviation
+    - datalake_ebdb_clean.state.abbreviation
+    description: State acronym of user's address
+    categories:
+      AL: ''
+      AM: ''
+      AP: ''
+      BA: ''
+      CE: ''
+      DF: ''
+      ES: ''
+      GO: ''
+      MA: ''
+      MG: ''
+      MS: ''
+      MT: ''
+      PA: ''
+      PB: ''
+      PE: ''
+      PR: ''
+      RJ: ''
+      RN: ''
+      RO: ''
+      RR: ''
+      RS: ''
+      SC: ''
+      SE: ''
+      SP: ''
+      TO: ''
   tipo_admin:
     lineage:
-      - datalake_ebdb_user.user.admin_type
+    - datalake_ebdb_user.user.admin_type
+    description: Admin type of user, defining permissions
+    categories:
+      Admin: ''
+      AtendimentoParceiros: ''
+      Contratos: ''
+      Financeiro: ''
+      Growth: ''
+      Integracao: ''
+      Normal: ''
+      Sudo: ''
+      VISTORIA_OPS: ''
   dadosbancarios_banco_codigo:
     lineage:
-      - datalake_ebdb_clean.bank.code
+    - datalake_ebdb_clean.bank.code
+    description: Bank code of user's bank account
+    categories:
+      082-5: ''
+      083-3: ''
+      122-8: ''
+      712-9: ''
   dadosbancarios_banco:
     lineage:
-      - datalake_ebdb_clean.bank.name
+    - datalake_ebdb_clean.bank.name
+    description: Bank name of user's bank account
+    categories:
+      A.J.Renner: ''
+      ABC Brasil: ''
+      ABN: ''
+      Agibank: ''
+      Alfa: ''
+      Alvorada: ''
+      AndBank (Brasil): ''
+      Azteca do Brasil: ''
+      BERJ: ''
+      BMG: ''
+      BNP Paribas Brasil: ''
+      BRB - Banco de Brasília: ''
+      BTG Pactual: ''
+      Banco Internacional do Funchal: ''
+      Banco XP: ''
+      Banco da Amazônia: ''
+      Banco da China Brasil: ''
+      Banco do Brasil: ''
+      Banco do Estado de Sergipe: ''
+      Banco do Estado do Espírito Santo: ''
+      Banco do Estado do Pará: ''
+      Banco do Estado do Rio Grande do Sul: ''
+      Banco do Nordeste do Brasil: ''
+      Banerj: ''
+      Bonsucesso: ''
+      Bradesco: ''
+      Bradesco BBI: ''
+      Bradesco Cartões: ''
+      Bradesco Financiamentos: ''
+      C6 Bank: ''
+      Cacique: ''
+      Caixa Econômica Federal: ''
+      Caixa Geral - Brasil: ''
+      Capital: ''
+      Cetelem: ''
+      Citibank: ''
+      Clássico: ''
+      Cooperativo Sicredi: ''
+      Cooperativo do Brasil - BANCOOB: ''
+      HSBC Bank Brasil: ''
+      Hipercard: ''
+      Indusval: ''
+      Intercap: ''
+      Intermedium: ''
+      Investcred Unibanco: ''
+      Itaú BBA: ''
+      Itaú Unibanco: ''
+      Itaú Unibanco Holding: ''
+      ItaúBank: ''
+      J. P. Morgan: ''
+      J. Safra: ''
+      John Deere: ''
+      MercadoPago: ''
+      Mercantil do Brasil: ''
+      Mizuho do Brasil: ''
+      Modal: ''
+      Morgan Stanley: ''
+      Máxima: ''
+      NBC Bank Brasil: ''
+      Natixis Brasil: ''
+      Nubank: ''
+      Original: ''
+      Original do Agronegócio: ''
+      Ourinvest: ''
+      PAN: ''
+      Pagseguro: ''
+      Paraná Banco: ''
+      Pecúnia: ''
+      Pine: ''
+      Pottencial: ''
+      Rabobank International Brasil: ''
+      Rendimento: ''
+      Safra: ''
+      Santander: ''
+      Sofisa: ''
+      Topázio: ''
+      Triângulo: ''
+      Unicred: ''
+      VR: ''
+      Votorantim: ''
   dadosbancarios_agencia:
     lineage:
-      - datalake_ebdb_user.user.bank_agency
+    - datalake_ebdb_user.user.bank_agency
+    description: Bank branch code of user's bank account
   dadosbancarios_conta_corrente:
     lineage:
-      - datalake_ebdb_user.user.bank_account
+    - datalake_ebdb_user.user.bank_account
+    description: Bank account number of user's bank account
   dadosbancarios_cpf_cnpj:
     lineage:
-      - datalake_ebdb_user.user.bank_cpf_cnpj
+    - datalake_ebdb_user.user.bank_cpf_cnpj
+    description: CPF (Tax Identification Number) of user in user's bank account
   dadosbancarios_nome:
     lineage:
-      - datalake_ebdb_user.user.bank_name
+    - datalake_ebdb_user.user.bank_name
+    description: Full name of user in users's bank account
   dadosbancarios_tipo_conta:
     lineage:
-      - datalake_ebdb_user.user.bank_account_type
+    - datalake_ebdb_user.user.bank_account_type
+    description: Type of user's bank account
+    categories:
+      ContaCorrenteConjunta: ''
+      ContaCorrenteIndividual: ''
+      Poupanca: ''
   dadosagente_perfil:
     lineage:
-      - datalake_ebdb_user.agent_data.profile
+    - datalake_ebdb_user.agent_data.profile
+    description: ''
+    categories:
+      BUS_LONG_DISTANCE: ''
+      CARRO: ''
+      CAR_LONG_DISTANCE: ''
+      CAR_TEMP_COVID: ''
+      CAR_USING_HIGHWAYS: ''
+      ONIBUS: ''
   dadosagente_numero_creci:
     lineage:
-      - datalake_ebdb_user.agent_data.creci_number
+    - datalake_ebdb_user.agent_data.creci_number
+    description: Creci number (Regional Council for Real Estate Brokers) of user,
+      if user is an agent
   dadosfotografo_tipo_contrato:
     lineage:
-      - datalake_ebdb_clean.photographer_data.contract_type
+    - datalake_ebdb_clean.photographer_data.contract_type
+    description: Type of contract with photographer, if user is photographer
+    categories:
+      CLT: ''
+      Freelancer: ''
   dadosafiliado_cidade_atuacao:
     lineage:
-      - datalake_ebdb_user.affiliate_data.work_city
+    - datalake_ebdb_user.affiliate_data.work_city
+    description: City name of affiliate activity, if user is an affiliate
   dadosafiliado_preferencia_pagamento:
     lineage:
-      - datalake_ebdb_user.affiliate_data.payment_preference
+    - datalake_ebdb_user.affiliate_data.payment_preference
+    description: Payment preference for affiliate, if user is an affiliate
+    categories:
+      CartaoPrePago: ''
+      NaoTem: ''
   dadosafiliado_numero_creci:
     lineage:
-      - datalake_ebdb_user.affiliate_data.creci_number
+    - datalake_ebdb_user.affiliate_data.creci_number
+    description: Creci number (Regional Council for Real Estate Brokers) of affiliate,
+      if user is an affiliate
   dadosafiliado_semana_ultima_comunicacao_balanco:
     lineage:
-      - datalake_ebdb_user.affiliate_data.last_week_balance_communication
+    - datalake_ebdb_user.affiliate_data.last_week_balance_communication
+    description: ''
   visits_booked:
     lineage:
-      - datalake_booking.booking.id_visitor
+    - datalake_booking.booking.id_visitor
+    description: ''
   visits_realized:
     lineage:
-      - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.is_visit_completed
+    description: ''
   visits_expected_to_happen:
     lineage:
-      - datalake_booking.booking.visit_fup
+    - datalake_booking.booking.visit_fup
+    description: ''
   houses_owned:
     lineage:
-      - datalake_pro_owners.owner_houses_quantity_history.houses
+    - datalake_pro_owners.owner_houses_quantity_history.houses
   brokerage_only_houses_owned:
     lineage:
-      - datalake_pro_owners.owner_houses_quantity_history.houses
+    - datalake_pro_owners.owner_houses_quantity_history.houses
   quintoandar_houses_owned:
     lineage:
-      - datalake_pro_owners.owner_houses_quantity_history.houses
+    - datalake_pro_owners.owner_houses_quantity_history.houses
   data_nascimento:
     lineage:
-      - datalake_ebdb_user.user.dt_birth
+    - datalake_ebdb_user.user.dt_birth
+    description: Birth date of user
   first_visit_date:
     lineage:
-      - datalake_ebdb_clean.visit.dt_visit
+    - datalake_ebdb_clean.visit.dt_visit
+    description: ''
   first_visit_confirmed_date:
     lineage:
-      - datalake_booking.booking.status
-      - datalake_ebdb_clean.visit.dt_visit
+    - datalake_booking.booking.status
+    - datalake_ebdb_clean.visit.dt_visit
+    description: ''
   data_clickanuncie:
     lineage:
-      - datalake_ebdb_user.user.ts_click_anuncie
+    - datalake_ebdb_user.user.ts_click_anuncie
+    description: ''
   dadosfotografo_inicio_contrato:
     lineage:
-      - datalake_ebdb_clean.photographer_data.ts_contract_started
+    - datalake_ebdb_clean.photographer_data.ts_contract_started
+    description: Start date of contract with photographer, if user is photographer
   dadosvendedor_inicio_contrato:
     lineage:
-      - datalake_ebdb_clean.sales_rep.ts_contract_started
+    - datalake_ebdb_clean.sales_rep.ts_contract_started
+    description: Start date of contract with Inside Sales Analyst, if user is Inside
+      Sales Analyst
   dadosafiliado_inicio_atuacao:
     lineage:
-      - datalake_ebdb_user.affiliate_data.ts_first_operation_start
+    - datalake_ebdb_user.affiliate_data.ts_first_operation_start
+    description: Start date of activity as affiliate, if user is an affiliate
   first_booking_date:
     lineage:
-      - datalake_booking.booking.ts_created
+    - datalake_booking.booking.ts_created
+    description: Date when the user first created a booking to visit a listing
   first_booking_confirmed_date:
     lineage:
-      - datalake_booking.booking.status
-      - datalake_booking.booking.ts_created
+    - datalake_booking.booking.status
+    - datalake_booking.booking.ts_created
+    description: Date when the user had a first booking confirmed to visit a listing
   first_pre_proposal_date:
     lineage:
-      - datalake_ebdb_clean.pre_proposal.ts_created
+    - datalake_ebdb_clean.pre_proposal.ts_created
+    description: ''
   first_proposal_accepted_date:
     lineage:
-      - datalake_ebdb_clean.proposal.ts_created
+    - datalake_ebdb_clean.proposal.ts_created
+    description: ''
   first_contract_date:
     lineage:
-      - datalake_ebdb_clean.contract.ts_created
+    - datalake_ebdb_clean.contract.ts_created
+    description: Date when the user signed his first contract
   first_signed_contract:
     lineage:
-      - datalake_ebdb_clean.contract.ts_signed
+    - datalake_ebdb_clean.contract.ts_signed
+    description: ''
   first_dt_document_sent:
     lineage:
-      - datalake_ebdb_user.user.ts_first_document_sent
+    - datalake_ebdb_user.user.ts_first_document_sent
+    description: ''
   last_dt_document_sent:
     lineage:
-      - datalake_ebdb_user.user.ts_last_document_sent
+    - datalake_ebdb_user.user.ts_last_document_sent
+    description: ''
   first_dt_sent_to_insurance:
     lineage:
-      - datalake_ebdb_user.user.ts_first_sent_to_insurance
+    - datalake_ebdb_user.user.ts_first_sent_to_insurance
+    description: ''
   criado_em:
     lineage:
-      - datalake_ebdb_user.user.ts_created
+    - datalake_ebdb_user.user.ts_created
+    description: Timestamp of when user was created
   atualizado_em:
     lineage:
-      - datalake_ebdb_user.user.ts_updated
+    - datalake_ebdb_user.user.ts_updated
+    description: Timestamp of when user was last updated
+  load_timestamp:
+    description: ''
+  network:
+    description: ''
+    categories:
+      Facebook Installs: ''
+      Organic: ''
+      email: ''
+      facebook: ''
+      quintoandar: ''

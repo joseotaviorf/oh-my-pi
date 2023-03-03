@@ -1,17 +1,25 @@
 database_name: datalake_ebdb_listing
 table_name: house_listing_fees
+description: Information related to ForRent listings. Each line is an unique listing
+  with the information about the administration fee
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
 columns:
   id_house_listing:
     lineage:
-      - datalake_ebdb_listing.house_listing.id_house_listing
+    - datalake_ebdb_listing.house_listing.id_house_listing
+    description: House listing Id
   id_house:
     lineage:
-      - datalake_ebdb_listing.house_listing.id_house
+    - datalake_ebdb_listing.house_listing.id_house
+    description: Id of the house
   country_code:
     lineage:
-      - datalake_ebdb_listing.house_listing.country_code
+    - datalake_ebdb_listing.house_listing.country_code
   administration_fee:
     lineage:
-      - datalake_ebdb_clean.full_contract.monthly_administration_fee
-      - datalake_ebdb_clean.property_fee_aud.fee
-      - datalake_ebdb_clean.property_fee.fee
+    - datalake_ebdb_clean.full_contract.monthly_administration_fee
+    - datalake_ebdb_clean.property_fee_aud.fee
+    - datalake_ebdb_clean.property_fee.fee
+    description: Administration fee of when the house was published or when a contract
+      was created.

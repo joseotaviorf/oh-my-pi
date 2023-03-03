@@ -1,31 +1,48 @@
----
 database_name: dw_revenue_lines
 table_name: dim_late_payments
+description: 'Fines for late payment of the rent invoice: 10% for late payment, plus
+  1% a.m. charged daily'
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
 columns:
   sk_late_payments:
     lineage:
-      - datalake_revenue_lines.late_payments.id_late_payments
+    - datalake_revenue_lines.late_payments.id_late_payments
+    description: ''
   id_contract:
     lineage:
-      - datalake_revenue_lines.late_payments.id_contract
+    - datalake_revenue_lines.late_payments.id_contract
+    description: Id of the contract in main
   type_late:
     lineage:
-      - datalake_revenue_lines.late_payments.type_late
+    - datalake_revenue_lines.late_payments.type_late
+    description: Rental or condo late
+    categories:
+      condo: Bill-item 'property damage fine' and description ilike '%quebra contratual%'
+      payment: Bill-item 'fine and interest'
   invoice_theorical_amount:
     lineage:
-      - datalake_revenue_lines.late_payments.invoice_theorical_amount
+    - datalake_revenue_lines.late_payments.invoice_theorical_amount
+    description: Total amount that appears on the invoice
   invoice_paid_amount:
     lineage:
-      - datalake_revenue_lines.late_payments.invoice_paid_amount
+    - datalake_revenue_lines.late_payments.invoice_paid_amount
+    description: Invoice total amount was paid
   accrual_year_month:
     lineage:
-      - datalake_revenue_lines.late_payments.accrual_year_month
+    - datalake_revenue_lines.late_payments.accrual_year_month
+    description: Reference year-month
   dt_created:
     lineage:
-      - datalake_revenue_lines.late_payments.dt_created
+    - datalake_revenue_lines.late_payments.dt_created
+    description: Entry created date
   dt_due:
     lineage:
-      - datalake_revenue_lines.late_payments.dt_due
+    - datalake_revenue_lines.late_payments.dt_due
+    description: Invoice's due date
   dt_paid:
     lineage:
-      - datalake_revenue_lines.late_payments.dt_paid
+    - datalake_revenue_lines.late_payments.dt_paid
+    description: Invoice's paid date
+  ts_load:
+    description: ''

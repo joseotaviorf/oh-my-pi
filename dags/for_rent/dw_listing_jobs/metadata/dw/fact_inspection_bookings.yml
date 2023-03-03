@@ -1,46 +1,70 @@
 database_name: dw_public
 table_name: fact_inspection_bookings
+description: Information about house inspections. Each line is a house inspection
+  flow, from booking to approva
+domain: For Rent
+owner: E S&S@quintoandar.com.br
 columns:
   sk_inspection:
     lineage:
-      - datalake_ebdb_clean.inspection.id
+    - datalake_ebdb_clean.inspection.id
+    description: The id of the inspection
   sk_booking:
     lineage:
-      - datalake_ebdb_clean.inspection.id_booking
+    - datalake_ebdb_clean.inspection.id_booking
+    description: The booking id associated with this inspection
   sk_house_listing:
     lineage:
-      - datalake_ebdb_clean.inspection.id_house
-      - datalake_ebdb_listing.house_listing.version
+    - datalake_ebdb_clean.inspection.id_house
+    - datalake_ebdb_listing.house_listing.version
+    description: The id of the house listing that was inspected
   sk_inspector:
     lineage:
-      - datalake_ebdb_clean.inspection.id_user_inspector
+    - datalake_ebdb_clean.inspection.id_user_inspector
+    description: The inspector's user id
   sk_contract:
     lineage:
-      - datalake_ebdb_clean.inspection.id_contract
+    - datalake_ebdb_clean.inspection.id_contract
+    description: The id of the contract associated with this inspection
   sk_booking_inspected_date:
     lineage:
-      - datalake_booking.booking.dt_booking_utc
+    - datalake_booking.booking.dt_booking_utc
+    description: Date when the inspection was expected to happen
   sk_booking_inspected_date_local:
     lineage:
-      - datalake_booking.booking.ts_booking_local_tz
+    - datalake_booking.booking.ts_booking_local_tz
   sk_booking_cancelled_date:
     lineage:
-      - datalake_booking.booking.ts_first_canceled_unevaluated
+    - datalake_booking.booking.ts_first_canceled_unevaluated
   sk_booking_cancelled_date_local:
     lineage:
-      - datalake_booking.booking.ts_first_canceled_unevaluated_local_tz
+    - datalake_booking.booking.ts_first_canceled_unevaluated_local_tz
   sk_inspected_date:
     lineage:
-      - datalake_ebdb_clean.inspection.dt_inspected
+    - datalake_ebdb_clean.inspection.dt_inspected
+    description: The date when the inspection was done and the photos were uploaded
+      by the inspector
   sk_expired_date:
     lineage:
-      - datalake_ebdb_clean.inspection.ts_expired
+    - datalake_ebdb_clean.inspection.ts_expired
+    description: ''
   sk_tenant_approved_date:
     lineage:
-      - datalake_ebdb_clean.inspection.ts_tenant_approved
+    - datalake_ebdb_clean.inspection.ts_tenant_approved
+    description: Date when tenant approved the inspection
   sk_owner_approved_date:
     lineage:
-      - datalake_ebdb_clean.inspection.ts_owner_approved
+    - datalake_ebdb_clean.inspection.ts_owner_approved
+    description: Date when owner approved the inspection
   country_code:
     lineage:
-      - datalake_booking.booking.country_code
+    - datalake_booking.booking.country_code
+    description: Country code of the inspection (based on the country code of the
+      booking).
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
+  booking_retry_rank_by_inspection_type:
+    description: ''
+  ts_load:
+    description: Date when the table was last loaded

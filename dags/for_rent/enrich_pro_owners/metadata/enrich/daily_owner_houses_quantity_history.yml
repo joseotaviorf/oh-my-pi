@@ -1,16 +1,40 @@
----
 database_name: datalake_pro_owners
 table_name: daily_owner_houses_quantity_history
+description: Historical enriched table for rent context (PP Multi - Pro owner). Each
+  row contains the changes of owner's quantity houses per day, just considering rent
+  and not b2b houses.
+domain: For Rent
+owner: E ForRent@quintoandar.com.br
 columns:
   id_owner:
     lineage:
-      - datalake_pro_owners.house_b2b_history.id_user
+    - datalake_pro_owners.house_b2b_history.id_user
+    description: Id user of the owner
   country_code:
     lineage:
-      - datalake_ebdb_country.user.country_code
+    - datalake_ebdb_country.user.country_code
   rental_administrator:
     lineage:
-      - datalake_ebdb_listing.rent_listing.rental_administrator
+    - datalake_ebdb_listing.rent_listing.rental_administrator
   dt_houses_owned:
     lineage:
-      - datalake_quintoandar.aux_date.date
+    - datalake_quintoandar.aux_date.date
+    description: The date of the PP's house quantity
+  brokerage_only_houses:
+    description: Quantity of distincts houses that the owner had before the change
+      and the house is managed by the owner (rental_administration = owner, which
+      means it's a Brokerage Only house)
+  brokerage_only_previous_houses:
+    description: Quantity of distincts houses that the owner had before the change
+      and the house is managed by the owner (rental_administration = owner, which
+      means it's a Brokerage Only house)
+  houses:
+    description: Quantity of distincts houses that the owner has on a respective day
+  is_merged_user:
+    description: Check if the user is merged from another user
+  quintoandar_houses:
+    description: Quantity of distincts houses that the owner had before the change
+      and the house is managed by QuintoAndar (rental_administration = quintoandar)
+  quintoandar_previous_houses:
+    description: Quantity of distincts houses that the owner has and the house is
+      managed by QuintoAndar (rental_administration = quintoandar)

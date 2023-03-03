@@ -1,17 +1,34 @@
----
 database_name: dw_datamarts_growth
 table_name: attribution_conversion_paths_demand
+description: Information about the touchpoints a tenant user make until book a visit,
+  it's the base data for attribution modelling. Each line is a path that a user made
+  until conversion.
+domain: Growth
+owner: gabriel.gomes@quintoandar.com.br
 columns:
   sk_conversion_date:
     lineage:
-      - datalake_amplitude_page_viewed_events.contract_docusign_signed_events.ts_event
+    - datalake_amplitude_page_viewed_events.contract_docusign_signed_events.ts_event
+    description: The date that the visit was booked for the determined touchpoint
+      path.
   sk_region:
     lineage:
-      - dw_public.fact_house_listings.sk_region
+    - dw_public.fact_house_listings.sk_region
+    description: ''
   unique_conversion_id:
     lineage:
-      - datalake_amplitude_page_viewed_events.listing_page_viewed.id_amplitude
-      - datalake_amplitude_page_viewed_events.home_page_viewed.id_amplitude
-      - datalake_amplitude_page_viewed_events.search_results_page_viewed.id_amplitude
-      - datalake_amplitude_page_viewed_events.schedule_page_viewed.id_amplitude
-      - datalake_amplitude_page_viewed_events.contract_docusign_signed_events.id_amplitude
+    - datalake_amplitude_page_viewed_events.listing_page_viewed.id_amplitude
+    - datalake_amplitude_page_viewed_events.home_page_viewed.id_amplitude
+    - datalake_amplitude_page_viewed_events.search_results_page_viewed.id_amplitude
+    - datalake_amplitude_page_viewed_events.schedule_page_viewed.id_amplitude
+    - datalake_amplitude_page_viewed_events.contract_docusign_signed_events.id_amplitude
+    description: A unique identifier for each conversion made by a specific path.
+      Is used to understand the total volume when modelling the attribution model.
+  path_utm_source_medium_branded:
+    description: The sequence of utm_source and utm concatenated (with a flag indicating
+      if the utm_campaign contains branded content) of each touchpoint in the Tenants
+      App at Amplitude until a visit is booked. With a lookback window of 180 days.
+  ts_load:
+    description: The timestamp when data was loaded into the table
+    categories:
+      '2021-04-27 10:31:10': '#N/A'

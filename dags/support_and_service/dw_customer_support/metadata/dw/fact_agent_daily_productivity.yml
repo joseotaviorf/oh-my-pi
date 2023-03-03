@@ -1,54 +1,79 @@
 database_name: dw_customer_support
 table_name: fact_agent_daily_productivity
+description: Fact containing the agent productivity (includes not only zendesk tickets
+  but CRM, ReclameAqui and Stilingue).
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_agent:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.id_agent
+    - datalake_analyst_ranking.analyst_metrics.id_agent
+    description: Unique agent identifier.
   sk_department:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.department
+    - datalake_analyst_ranking.analyst_metrics.department
+    description: Key generated as a MD5 from the department string.
   sk_date:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.dt_metric_reference
+    - datalake_analyst_ranking.analyst_metrics.dt_metric_reference
+    description: Date id.
   closed_demand:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.closed_demand
+    - datalake_analyst_ranking.analyst_metrics.closed_demand
+    description: Number of closed demands.
   solved_demand:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.solved_demand
+    - datalake_analyst_ranking.analyst_metrics.solved_demand
+    description: Number of solved demands.
   tickets_solved_in_time:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.tickets_solved_in_time
+    - datalake_analyst_ranking.analyst_metrics.tickets_solved_in_time
+    description: Number of solved demands within the SLA.
   tickets_not_solved_in_time:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.tickets_not_solved_in_time
+    - datalake_analyst_ranking.analyst_metrics.tickets_not_solved_in_time
+    description: Number of solved demands not within the SLA.
   sum_csat_satisfied_score:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.sum_csat_satisfied_score
+    - datalake_analyst_ranking.analyst_metrics.sum_csat_satisfied_score
+    description: Number of tickets with satisfied csat score (csat_score >= 4).
   sum_csat_dissatisfied_score:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.sum_csat_dissatisfied_score
+    - datalake_analyst_ranking.analyst_metrics.sum_csat_dissatisfied_score
+    description: Number of tickets with satisfied csat score (csat_score <= 2).
   total_tickets_resolution:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.total_tickets_resolution
+    - datalake_analyst_ranking.analyst_metrics.total_tickets_resolution
+    description: Number of tickets that answered that their problem were solved during
+      our CSAT survey.
   total_tickets_answered_resolution:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.total_tickets_answered_resolution
+    - datalake_analyst_ranking.analyst_metrics.total_tickets_answered_resolution
+    description: Number of tickets that answered the question if their problem were
+      solved during our CSAT survey.
   total_tickets_with_csat_score:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.total_tickets_with_csat_score
+    - datalake_analyst_ranking.analyst_metrics.total_tickets_with_csat_score
+    description: Number of tickets that answered the CSAT survey with a valid CSAT
+      score.
   ra_score_sum:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.ra_score_sum
+    - datalake_analyst_ranking.analyst_metrics.ra_score_sum
+    description: Sum of reclameaqui score.
   ra_would_do_business_again:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.ra_would_do_business_again
+    - datalake_analyst_ranking.analyst_metrics.ra_would_do_business_again
+    description: Sum of tickets that answered that they would do business again with
+      QuintoAndar.
   ra_solved_tickets:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.ra_solved_tickets
+    - datalake_analyst_ranking.analyst_metrics.ra_solved_tickets
+    description: Number of solved tickets in ReclameAqui.
   ra_total_tickets_rated:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.ra_total_tickets_rated
+    - datalake_analyst_ranking.analyst_metrics.ra_total_tickets_rated
+    description: Total tickets rated in ReclameAqui
   dt_metric_reference:
     lineage:
-      - datalake_analyst_ranking.analyst_metrics.dt_metric_reference
+    - datalake_analyst_ranking.analyst_metrics.dt_metric_reference
+    description: Date reference for metrics in this table.

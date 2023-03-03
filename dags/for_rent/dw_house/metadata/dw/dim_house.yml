@@ -1,129 +1,223 @@
 database_name: dw_quintoandar
 table_name: dim_house
+description: ''
+domain: For Rent
+owner: ''
 columns:
   sk_house:
     lineage:
-      - datalake_ebdb_listing.house.id
+    - datalake_ebdb_listing.house.id
+    description: ''
   id_short_house:
     lineage:
-      - datalake_ebdb_listing.house.id
+    - datalake_ebdb_listing.house.id
+    description: ''
   condo:
     lineage:
-      - datalake_ebdb_listing.house.condo
+    - datalake_ebdb_listing.house.condo
+    description: ''
   land_area:
     lineage:
-      - datalake_ebdb_listing.house.land_area
+    - datalake_ebdb_listing.house.land_area
+    description: ''
   total_area:
     lineage:
-      - datalake_ebdb_listing.house.total_area
+    - datalake_ebdb_listing.house.total_area
+    description: ''
   iptu:
     lineage:
-      - datalake_ebdb_listing.house.iptu
+    - datalake_ebdb_listing.house.iptu
+    description: ''
   bathrooms:
     lineage:
-      - datalake_ebdb_listing.house.bathrooms
+    - datalake_ebdb_listing.house.bathrooms
+    description: ''
   bedrooms:
     lineage:
-      - datalake_ebdb_listing.house.bedrooms
+    - datalake_ebdb_listing.house.bedrooms
+    description: ''
   parking_slots:
     lineage:
-      - datalake_ebdb_listing.house.parking_slots
+    - datalake_ebdb_listing.house.parking_slots
+    description: ''
   suites:
     lineage:
-      - datalake_ebdb_listing.house.suites
+    - datalake_ebdb_listing.house.suites
+    description: ''
   lat:
     lineage:
-      - datalake_ebdb_listing.house.lat
+    - datalake_ebdb_listing.house.lat
+    description: ''
   lng:
     lineage:
-      - datalake_ebdb_listing.house.lng
+    - datalake_ebdb_listing.house.lng
+    description: ''
   number:
     lineage:
-      - datalake_ebdb_listing.house.number
+    - datalake_ebdb_listing.house.number
+    description: ''
   address:
     lineage:
-      - datalake_ebdb_listing.house.address
+    - datalake_ebdb_listing.house.address
+    description: ''
   city:
     lineage:
-      - datalake_ebdb_listing.house.city
+    - datalake_ebdb_listing.house.city
+    description: ''
   complement:
     lineage:
-      - datalake_ebdb_listing.house.complement
+    - datalake_ebdb_listing.house.complement
+    description: ''
   neighborhood:
     lineage:
-      - datalake_ebdb_listing.house.neighborhood
+    - datalake_ebdb_listing.house.neighborhood
+    description: ''
   zipcode:
     lineage:
-      - datalake_ebdb_listing.house.zipcode
+    - datalake_ebdb_listing.house.zipcode
+    description: ''
   geo_hash:
     lineage:
-      - datalake_ebdb_listing.house.geo_hash
+    - datalake_ebdb_listing.house.geo_hash
+    description: ''
   registry:
     lineage:
-      - datalake_ebdb_listing.house.registry
+    - datalake_ebdb_listing.house.registry
+    description: ''
   built_period:
     lineage:
-      - datalake_ebdb_listing.house.dt_built
+    - datalake_ebdb_listing.house.dt_built
+    description: ''
   condo_type:
     lineage:
-      - datalake_ebdb_listing.house.condo_type
+    - datalake_ebdb_listing.house.condo_type
+    description: ''
+    categories:
+      IncluidoNoAluguel: ''
+      NaoExiste: ''
+      NaoInformado: ''
+      Normal: ''
   conservation_status:
     lineage:
-      - datalake_ebdb_listing.house.conservation_status
+    - datalake_ebdb_listing.house.conservation_status
+    description: ''
+    categories:
+      BomEstado: ''
+      Novo: ''
+      PrecisaPequenosReparos: ''
+      PrecisaReforma: ''
+      RecentementeReformado: ''
   doorman_type:
     lineage:
-      - datalake_ebdb_listing.house.doorman_type
+    - datalake_ebdb_listing.house.doorman_type
+    description: ''
+    categories:
+      Diurno: ''
+      NaoHaPorteiro: ''
+      Noturno: ''
+      horas24: ''
   iptu_type:
     lineage:
-      - datalake_ebdb_listing.house.iptu_type
+    - datalake_ebdb_listing.house.iptu_type
+    description: ''
+    categories:
+      IncluidoNoAluguel: ''
+      NaoExiste: ''
+      NaoInformado: ''
+      Normal: ''
   key_location:
     lineage:
-      - datalake_ebdb_listing.house.key_location
+    - datalake_ebdb_listing.house.key_location
+    description: ''
+    categories:
+      FrontDoor: ''
+      KeysLocker: ''
+      LockBox: ''
+      None: ''
+      OwnerPresent: ''
+      Password: ''
   key_type:
     lineage:
-      - datalake_ebdb_listing.house.key_type
+    - datalake_ebdb_listing.house.key_type
+    description: ''
+    categories:
+      Biometry: ''
+      Common: ''
+      None: ''
+      Password: ''
   occupant_type:
     lineage:
-      - datalake_ebdb_listing.house.occupant_type
+    - datalake_ebdb_listing.house.occupant_type
+    description: ''
+    categories:
+      Empty: ''
+      None: ''
+      Owner: ''
+      Tenant: ''
   parking_slot_type:
     lineage:
-      - datalake_ebdb_listing.house.parking_slot_type
+    - datalake_ebdb_listing.house.parking_slot_type
+    description: ''
+    categories:
+      Ambos: ''
+      Cobertas: ''
+      NaoCobertas: ''
   type:
     lineage:
-      - datalake_ebdb_listing.house.type
+    - datalake_ebdb_listing.house.type
+    description: ''
+    categories:
+      Apartamento: ''
+      Casa: ''
+      CasaCondominio: ''
+      StudioOuKitchenette: ''
   does_photographer_fill_information:
     lineage:
-      - datalake_ebdb_listing.house.does_photographer_fill_information
+    - datalake_ebdb_listing.house.does_photographer_fill_information
+    description: ''
   has_elevator:
     lineage:
-      - datalake_ebdb_listing.house.has_elevator
+    - datalake_ebdb_listing.house.has_elevator
+    description: ''
   has_service_bathroom:
     lineage:
-      - datalake_ebdb_listing.house.has_service_bathroom
+    - datalake_ebdb_listing.house.has_service_bathroom
+    description: ''
   has_service_bedroom:
     lineage:
-      - datalake_ebdb_listing.house.has_service_bedroom
+    - datalake_ebdb_listing.house.has_service_bedroom
+    description: ''
   has_visit_restriction:
     lineage:
-      - datalake_ebdb_listing.house.has_visit_restriction
+    - datalake_ebdb_listing.house.has_visit_restriction
+    description: ''
   is_furnished:
     lineage:
-      - datalake_ebdb_listing.house.is_furnished
+    - datalake_ebdb_listing.house.is_furnished
+    description: ''
   is_iptu_included:
     lineage:
-      - datalake_ebdb_listing.house.is_iptu_included
+    - datalake_ebdb_listing.house.is_iptu_included
+    description: ''
   is_verified:
     lineage:
-      - datalake_ebdb_listing.house.is_verified
+    - datalake_ebdb_listing.house.is_verified
+    description: ''
   is_warn_owner_of_visits_needed:
     lineage:
-      - datalake_ebdb_listing.house.is_warn_owner_of_visits_needed
+    - datalake_ebdb_listing.house.is_warn_owner_of_visits_needed
+    description: ''
   ts_first_verified:
     lineage:
-      - datalake_ebdb_listing.house.ts_first_verified
+    - datalake_ebdb_listing.house.ts_first_verified
+    description: ''
   ts_created:
     lineage:
-      - datalake_ebdb_listing.house.dt_creation
+    - datalake_ebdb_listing.house.dt_creation
+    description: ''
   ts_updated:
     lineage:
-      - datalake_ebdb_listing.house.ts_updated
+    - datalake_ebdb_listing.house.ts_updated
+    description: ''
+  ts_load:
+    description: ''

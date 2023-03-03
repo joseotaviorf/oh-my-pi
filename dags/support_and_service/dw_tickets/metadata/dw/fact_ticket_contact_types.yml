@@ -1,25 +1,69 @@
----
 database_name: dw_tickets
 table_name: fact_ticket_contact_types
+description: ''
+domain: Support and Service
+owner: ''
 columns:
   sk_ticket:
     lineage:
-      - datalake_zendesk_tickets.ticket_contact_types.id_ticket
+    - datalake_zendesk_tickets.ticket_contact_types.id_ticket
+    description: Key of ticket that corresponds to the Zendesk ticket number
   sk_updated:
     lineage:
-      - datalake_zendesk_tickets.ticket_contact_types.ts_updated
+    - datalake_zendesk_tickets.ticket_contact_types.ts_updated
+    description: Key of date of latest ticket custom field from where the contact
+      type (Motivo de Contato) came from
   contact_type_tag:
     lineage:
-      - datalake_zendesk_tickets.ticket_contact_types.contact_type_tag
+    - datalake_zendesk_tickets.ticket_contact_types.contact_type_tag
+    description: The contact type taxonomy  defined in ‘Mapa do Maroto’ and gathered
+      in ‘Motivo do Contato’  field in Zendesk Custom Fields
   client_taxonomy:
     lineage:
-      - datalake_zendesk_tickets.ticket_contact_types.client_taxonomy
+    - datalake_zendesk_tickets.ticket_contact_types.client_taxonomy
+    description: Client who opens the request or someone who QuintoAndar made contact
+      with (i.e. PP = Proprietário, IQ = Inquilino, PO = Porteiro)
+    categories:
+      AF: ''
+      CD: ''
+      CR: ''
+      FT: ''
+      IQ: ''
+      PO: ''
+      PP: ''
+      PS: ''
+      VT: ''
   category_taxonomy:
     lineage:
-      - datalake_zendesk_tickets.ticket_contact_types.category_taxonomy
+    - datalake_zendesk_tickets.ticket_contact_types.category_taxonomy
+    description: The higher-level contact subject taxonomy (i.e. CH = chaves, AG =
+      AGENDA, AC = ANALISE DE CRÉDITO, etc.)
+    categories:
+      AC: ''
+      AG: ''
+      AN: ''
+      CH: ''
+      CM: ''
+      CT: ''
+      IS: ''
+      LC: ''
+      OB: ''
+      OG: ''
+      PG: ''
+      PR: ''
+      QA: ''
+      RP: ''
+      SF: ''
+      VI: ''
+      VS: ''
   is_contact_type_taxonomy:
     lineage:
-      - datalake_zendesk_tickets.ticket_contact_types.has_valid_prefix
+    - datalake_zendesk_tickets.ticket_contact_types.has_valid_prefix
+    description: ''
   ts_updated:
     lineage:
-      - datalake_zendesk_tickets.ticket_contact_types.ts_updated
+    - datalake_zendesk_tickets.ticket_contact_types.ts_updated
+    description: Timestamp of latest custom field from where the contact type (Motivo
+      de Contato) came from. (UTC timezone)
+  ts_load:
+    description: Timestamp of data load from database source (UTC timezone)

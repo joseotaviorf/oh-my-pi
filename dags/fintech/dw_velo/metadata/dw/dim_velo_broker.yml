@@ -1,37 +1,51 @@
----
 database_name: dw_velo
 table_name: dim_velo_broker
+description: Dimension with Brokers companies details.
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   sk_broker:
     lineage:
-      - datalake_velo.broker.id_broker
+    - datalake_velo.broker.id_broker
+    description: ''
   broker_name:
     lineage:
-      - datalake_velo.broker.broker_name
+    - datalake_velo.broker.broker_name
+    description: ''
   city:
     lineage:
-      - datalake_velo.broker.city
+    - datalake_velo.broker.city
+    description: ''
   state:
     lineage:
-      - datalake_velo.broker.state
+    - datalake_velo.broker.state
+    description: ''
   country:
     lineage:
-      - datalake_velo.broker.country
+    - datalake_velo.broker.country
+    description: ''
   zipcode:
     lineage:
-      - datalake_velo.broker.zipcode
+    - datalake_velo.broker.zipcode
+    description: ''
   geolocation:
     lineage:
-      - datalake_velo.broker.geolocation
+    - datalake_velo.broker.geolocation
+    description: ''
   creci:
     lineage:
-      - datalake_velo.broker.creci
+    - datalake_velo.broker.creci
+    description: ''
   cnpj:
     lineage:
-      - datalake_velo.broker.cnpj
+    - datalake_velo.broker.cnpj
+    description: ''
   is_broker_active:
     lineage:
-      - datalake_velo.broker.is_broker_active
+    - datalake_velo.broker.is_broker_active
+    description: ''
   ts_created:
     lineage:
-      - datalake_velo.broker.ts_created
+    - datalake_velo.broker.ts_created
+  ts_load:
+    description: ''

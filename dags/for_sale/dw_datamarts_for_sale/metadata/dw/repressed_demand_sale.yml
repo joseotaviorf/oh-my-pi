@@ -1,19 +1,109 @@
----
 database_name: dw_datamarts_for_sale
 table_name: repressed_demand_sale
+description: ''
+domain: For Sale
+owner: ''
 columns:
   region_code:
     lineage:
-      - dw_public.dim_region.region_code
+    - dw_public.dim_region.region_code
+    description: ''
+    categories:
+      BAR 01: '#N/A'
+      DIA 01: '#N/A'
+      GRU 01: '#N/A'
+      NIT 01: '#N/A'
+      OSA 01: '#N/A'
+      RIO 01: '#N/A'
+      RIO 02: '#N/A'
+      RIO 03: '#N/A'
+      RIO 04: '#N/A'
+      RIO 05: '#N/A'
+      RIO 06: '#N/A'
+      RIO 07: '#N/A'
+      RIO 08: '#N/A'
+      RIO 09: '#N/A'
+      RIO 10: '#N/A'
+      RIO 11: '#N/A'
+      SBE 01: '#N/A'
+      SCA 01: '#N/A'
+      SPO 01: '#N/A'
+      SPO 02: '#N/A'
+      SPO 03: '#N/A'
+      SPO 04: '#N/A'
+      SPO 05: '#N/A'
+      SPO 06: '#N/A'
+      SPO 07: '#N/A'
+      SPO 08: '#N/A'
+      SPO 09: '#N/A'
+      SPO 10: '#N/A'
+      SPO 11: '#N/A'
+      STA 01: '#N/A'
   city_group:
     lineage:
-      - dw_public.dim_region.city_group
+    - dw_public.dim_region.city_group
+    description: ''
+    categories:
+      RMSP: ''
+      Rio de Janeiro: '#N/A'
   city_name:
     lineage:
-      - dw_public.dim_region.city_name
+    - dw_public.dim_region.city_name
+    description: ''
+    categories:
+      Barueri: '#N/A'
+      Diadema: '#N/A'
+      Guarulhos: '#N/A'
+      Niterói: '#N/A'
+      Osasco: '#N/A'
+      Rio de Janeiro: '#N/A'
+      Santo André: '#N/A'
+      São Bernardo do Campo: '#N/A'
+      São Caetano do Sul: '#N/A'
+      São Paulo: ''
   week_start:
     lineage:
-      - dw_public.dim_date.week_start
+    - dw_public.dim_date.week_start
+    description: ''
   date:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
+    description: ''
+  faixa:
+    description: ''
+    categories:
+      1) Weekday 8-9h: ''
+      2) Weekday 9-13h: ''
+      3) Weekday 13-16h: ''
+      4) Weekday 16-17h: ''
+      5) Extended hours: ''
+      6) Saturday all hours: ''
+      7) Sunday all hours: ''
+  hour:
+    description: ''
+  slot:
+    description: ''
+  sum_bookings:
+    description: ''
+  sum_encaixes:
+    description: ''
+  sum_encaixes_em_imovel_sem_slot_disponivel_target_date:
+    description: ''
+  sum_encaixes_nao_realizados_por_agenda:
+    description: ''
+  sum_encaixes_nao_realizados_por_agent:
+    description: ''
+  sum_encaixes_nao_realizados_por_bloqueio:
+    description: ''
+  sum_encaixes_nao_realizados_por_bloqueio_suspensao:
+    description: ''
+  sum_encaixes_nao_realizados_por_bloqueio_suspensao_agenda:
+    description: ''
+  sum_encaixes_nao_realizados_por_suspensao:
+    description: ''
+  sum_encaixes_nao_realizados_por_visita_rent:
+    description: ''
+  sum_encaixes_not_realized:
+    description: ''
+  sum_encaixes_realized:
+    description: ''

@@ -1,19 +1,36 @@
----
 database_name: dw_rede
 table_name: fact_company_event
+description: Every row in this table corresponds to an event that happened within
+  a company journey from Rede. This is mostly collected from HubSpot.
+domain: Rede
+owner: ata Rede@quintoandar.com.br
 columns:
   sk_event_date:
     lineage:
-      - datalake_rede_company.company_event.ts_event
+    - datalake_rede_company.company_event.ts_event
+    description: Date key of when the event happened.
   sk_company:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+    - datalake_rede_company.company_sks.sk_company
+    description: Key of the company associated with the event. Can be joined with
+      dw_rede.dim_company.
   sk_company_event_type:
     lineage:
-      - dw_rede.dim_company_event_type.sk_company_event_type
+    - dw_rede.dim_company_event_type.sk_company_event_type
+    description: Key of the event type. Can be joined with dw_rede.dim_company_event_type.
   journey_number:
     lineage:
-      - datalake_rede_company.company_event.id_journey
+    - datalake_rede_company.company_event.id_journey
+    description: Number of the journey when the event happened for that company, starting
+      from 0. A journey ends when a deal is lost or a membership ends.
   ts_event:
     lineage:
-      - datalake_rede_company.company_event.ts_event
+    - datalake_rede_company.company_event.ts_event
+    description: Time when the event happened.
+  sk_company_event:
+    description: Primary key of the table.
+  sk_company_journey:
+    description: Unique identifier of the journey, formed by concatenating the sk_company
+      with the journey number.
+  ts_load:
+    description: Time when the table was loaded.

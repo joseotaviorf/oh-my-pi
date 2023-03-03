@@ -1,50 +1,85 @@
 database_name: dw_quintoandar
 table_name: dim_smart_price
+description: dim table containing all information to listing smart price
+domain: For Rent
+owner: pedro.domingos@quintoandar.com.br
 columns:
   sk_smart_price:
     lineage:
-      - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
+    - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
+    description: key of smartprice
   id_smart_price:
     lineage:
-      - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
+    - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
+    description: key of smartprice
   is_enabled:
     lineage:
-      - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
+    - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
+    description: is enabled signals if smart price is able to act as soon as the listing
+      has status = published
   operation_mode:
     lineage:
-      - datalake_ebdb_clean.dynamic_pricing_house_aud.operation_mode
+    - datalake_ebdb_clean.dynamic_pricing_house_aud.operation_mode
+    description: indicates from whom the initial rent value was taken
+    categories:
+      AUTO: ''
+      MANUAL: ''
+      MANUAL_INSIDE_SALES: ''
   status:
     lineage:
-      - datalake_ebdb_clean.dynamic_pricing_house_aud.status
+    - datalake_ebdb_clean.dynamic_pricing_house_aud.status
+    description: last smart price status in the smaart price flow
+    categories:
+      ACTIVE: ''
+      INACTIVE: ''
+      PAUSED: ''
+      PENDING: ''
   house_last_status:
     lineage:
-      - datalake_ebdb_clean.dynamic_pricing_house.status
+    - datalake_ebdb_clean.dynamic_pricing_house.status
+    description: Actual House status
+    categories:
+      ACTIVE: ''
+      INACTIVE: ''
+      PAUSED: ''
+      PENDING: ''
   house_min_rent:
     lineage:
-      - datalake_ebdb_clean.dynamic_pricing_house.min_rent
+    - datalake_ebdb_clean.dynamic_pricing_house.min_rent
+    description: Actual min rent price
   house_max_rent:
     lineage:
-      - datalake_ebdb_clean.dynamic_pricing_house.initial_rent
+    - datalake_ebdb_clean.dynamic_pricing_house.initial_rent
+    description: Actual max rent price
   min_rent_percentile:
     lineage:
-      - datalake_ebdb_clean.dynamic_pricing_parameters.min_rent_percentile
+    - datalake_ebdb_clean.dynamic_pricing_parameters.min_rent_percentile
+    description: minimum percentile from calculator predicted range
   max_rent_percentile:
     lineage:
-      - datalake_ebdb_clean.dynamic_pricing_parameters.initial_rent_percentile
+    - datalake_ebdb_clean.dynamic_pricing_parameters.initial_rent_percentile
+    description: maximum percentile from calculator predicted range
   offers_threshold:
     lineage:
-      - datalake_ebdb_clean.dynamic_pricing_parameters.offers_threshold
+    - datalake_ebdb_clean.dynamic_pricing_parameters.offers_threshold
+    description: number of offers to avoid price drop
   days_threshold:
     lineage:
-      - datalake_ebdb_clean.dynamic_pricing_parameters.days_threshold
+    - datalake_ebdb_clean.dynamic_pricing_parameters.days_threshold
+    description: number of days between visit and the price drop
   visits_days_threshold:
     lineage:
-      - datalake_ebdb_clean.dynamic_pricing_parameters.visits_days_threshold
+    - datalake_ebdb_clean.dynamic_pricing_parameters.visits_days_threshold
+    description: number of visits to avoid price drop
   ts_first_activation:
     lineage:
-      - datalake_ebdb_smart_price.smart_price_versioning.status
-      - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+    - datalake_ebdb_smart_price.smart_price_versioning.status
+    - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+    description: first smartprice activation timestamp
   ts_last_deactivation:
     lineage:
-      - datalake_ebdb_smart_price.smart_price_versioning.status
-      - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+    - datalake_ebdb_smart_price.smart_price_versioning.status
+    - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+    description: Last smartprice deactivation date
+  ts_load:
+    description: timestamp to load data

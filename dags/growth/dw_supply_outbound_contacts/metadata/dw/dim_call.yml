@@ -1,21 +1,34 @@
 database_name: dw_supply_outbound_contacts
 table_name: dim_call
+description: This table details the phone calls made to a owner along the Prospect
+  to Opportunity conversion funnel.
+domain: Growth
+owner: ae-growth@quintoandar.com.br
 columns:
   sk_outbound_contact:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.id_outbound_contact
+    - datalake_supply_outbound_flows.supply_outbound_contacts.id_outbound_contact
+    description: The unique contact request identiier.
   call_output:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    description: Information recorded by the analyst that indicates the result of
+      the phone call attempt.
   round_number:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    description: Number of the call round within which the call was made..
   round_max_tries:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    description: Maximum number of call attempts to be made within that call round.
   call_number_in_round:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    description: Call identifier within the call round.
   ts_call_round_started:
     lineage:
-      - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    - datalake_supply_outbound_flows.supply_outbound_contacts.contact_extra_info
+    description: Timestamp of the moment when that round of calls started.
+  ts_load:
+    description: Timestamp of when the new data was loaded.

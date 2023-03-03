@@ -1,34 +1,64 @@
----
 database_name: dw_revenue_lines
 table_name: dim_reservation
+description: This is a For Rent addon that make it possible to IQ pay to have a reservation
+  of a certain property. This property has all the visits e offers canceled. We're
+  considering just the FINISHED, CHARGED and CANCELED status, which the money was
+  not charge back.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
 columns:
   sk_reservation:
     lineage:
-      - datalake_revenue_lines.reservation.id_reservation
+    - datalake_revenue_lines.reservation.id_reservation
+    description: Key of reservation transaction
   id_contract:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_contract
+    - dw_public.fact_listing_rent_flows.sk_contract
+    description: Id of the contract
   status:
     lineage:
-      - datalake_revenue_lines.reservation.status
+    - datalake_revenue_lines.reservation.status
+    description: Status of the reservation. If tenant has concluded or cancelled for
+      example
+    categories:
+      CANCELED: ''
+      FINISHED: ''
   cancellation_reason:
     lineage:
-      - datalake_revenue_lines.reservation.cancellation_reason
+    - datalake_revenue_lines.reservation.cancellation_reason
+    description: Reason why reservation was cancelled if status is equal to 'CANCELED'
+      or 'RETURNED'
+    categories:
+      CONTRACT_CANCELED_WITHOUT_CHARGE_BACK: ''
+      DOCUMENTATION_REJECTED_WITHOUT_CHARGE_BACK: ''
+      DOCUMENTATION_REJECTED_WITH_CHARGE_BACK: ''
+      OTHER_WITHOUT_CHARGE_BACK: ''
+      RENTAL_GUARANTEE_PAID: ''
+      TENANT_DECLINED_ON_CREDIT_ANALYSIS: ''
+      TENANT_GAVE_UP: ''
   total_installments:
     lineage:
-      - datalake_revenue_lines.reservation.total_installments
+    - datalake_revenue_lines.reservation.total_installments
+    description: Number of installments that the reserve value was divided
   monthly_value:
     lineage:
-      - datalake_revenue_lines.reservation.monthly_value
+    - datalake_revenue_lines.reservation.monthly_value
+    description: Monthly value paid by the tenant
   total_value:
     lineage:
-      - datalake_revenue_lines.reservation.total_value
+    - datalake_revenue_lines.reservation.total_value
+    description: Value to be paid by the tenant to confirm that house is reserved
   accrual_month:
     lineage:
-      - datalake_revenue_lines.reservation.accrual_month
+    - datalake_revenue_lines.reservation.accrual_month
+    description: Reference month
   dt_end_payment:
     lineage:
-      - datalake_revenue_lines.reservation.dt_end_payment
+    - datalake_revenue_lines.reservation.dt_end_payment
+    description: Date of the last installment payment
   dt_created:
     lineage:
-      - datalake_revenue_lines.reservation.dt_created
+    - datalake_revenue_lines.reservation.dt_created
+    description: Date of reserve creation
+  ts_load:
+    description: ''

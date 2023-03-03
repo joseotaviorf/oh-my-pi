@@ -1,30 +1,158 @@
----
 database_name: dw_public
 table_name: dim_agent_region
+description: Macro regions which agent is allocated
+domain: For Rent
+owner: eduardo.bastiani@quintoandar.com.br
 columns:
   sk_agent_region:
     lineage:
-      - datalake_ebdb_agents.agent_region_group.dt
-      - datalake_ebdb_agents.agent_region_group.dadosagente_id
+    - datalake_ebdb_agents.agent_region_group.dt
+    - datalake_ebdb_agents.agent_region_group.dadosagente_id
+    description: ID of this Agent Region
   sk_regions_date:
     lineage:
-      - datalake_ebdb_agents.agent_region_group.dt
+    - datalake_ebdb_agents.agent_region_group.dt
+    description: Sk date of when agent was allocated to this region
   sk_agent:
     lineage:
-      - datalake_ebdb_agents.agent_region_group.dadosagente_id
+    - datalake_ebdb_agents.agent_region_group.dadosagente_id
+    description: ID for the agent
   regioes:
     lineage:
-      - datalake_ebdb_agents.agent_region_group.regioes
+    - datalake_ebdb_agents.agent_region_group.regioes
   area:
     lineage:
-      - datalake_ebdb_agents.agent_region_group.area
+    - datalake_ebdb_agents.agent_region_group.area
+    description: Region codes (region_code) of neighborhoods that agent is allocated
+      on that day. You can find these regions in the dim_region table
   secondary_area:
     lineage:
-      - datalake_ebdb_agents.agent_region_group.secondary_area
+    - datalake_ebdb_agents.agent_region_group.secondary_area
+    description: If the regions where the agent works in span multiple region_code,
+      the secondary region_code will be listed here
+    categories:
+      BHZ 02: '#N/A'
+      BHZ 03: '#N/A'
+      BHZ 04: '#N/A'
+      BHZ 05: '#N/A'
+      BHZ 06: '#N/A'
+      BHZ 07: '#N/A'
+      BSB 02: '#N/A'
+      BSB 03: '#N/A'
+      BSB 04: '#N/A'
+      CAM 02: '#N/A'
+      CAM 03: '#N/A'
+      CWB 02: '#N/A'
+      CWB 03: '#N/A'
+      DIA 01: '#N/A'
+      FLN 02: '#N/A'
+      FLN 03: '#N/A'
+      FLN 04: '#N/A'
+      GOI 01: '#N/A'
+      GOI 02: '#N/A'
+      GRU 01: '#N/A'
+      JUI 01: '#N/A'
+      NHB 01: '#N/A'
+      NIT 01: '#N/A'
+      OSA 01: '#N/A'
+      PLH 01: '#N/A'
+      POA 01: '#N/A'
+      POA 02: '#N/A'
+      POA 03: '#N/A'
+      RIB 03: '#N/A'
+      RIO 01: '#N/A'
+      RIO 02: '#N/A'
+      RIO 03: '#N/A'
+      RIO 04: '#N/A'
+      RIO 05: '#N/A'
+      RIO 06: '#N/A'
+      RIO 07: '#N/A'
+      RIO 08: '#N/A'
+      RIO 09: '#N/A'
+      RIO 10: '#N/A'
+      RIO 11: '#N/A'
+      SAL 02: '#N/A'
+      SBE 01: '#N/A'
+      SCA 01: '#N/A'
+      SLO 01: '#N/A'
+      SOR 02: '#N/A'
+      SPO 02: '#N/A'
+      SPO 03: '#N/A'
+      SPO 04: '#N/A'
+      SPO 05: '#N/A'
+      SPO 06: '#N/A'
+      SPO 07: '#N/A'
+      SPO 08: '#N/A'
+      SPO 09: '#N/A'
+      SPO 10: '#N/A'
+      SPO 11: '#N/A'
+      STA 01: '#N/A'
   area_deprecated:
     lineage:
-      - datalake_ebdb_agents.agent_region_group.area_deprecated
+    - datalake_ebdb_agents.agent_region_group.area_deprecated
+    description: Deprecated region codes (region_code_deprecated) of neighborhoods
+      that agent is allocated on that day. You can find these regions in the dim_region
+      table
   secondary_area_deprecated:
     lineage:
-      - datalake_ebdb_agents.agent_region_group.secondary_area_deprecated
-  
+    - datalake_ebdb_agents.agent_region_group.secondary_area_deprecated
+    description: If the regions where the agent works in span multiple region_code_deprecated,
+      the secondary region_code_deprecated will be listed here
+    categories:
+      BAR 01: '#N/A'
+      BHZ 01: '#N/A'
+      BHZ 02: '#N/A'
+      BHZ 03: '#N/A'
+      BHZ 04: '#N/A'
+      BHZ 05: '#N/A'
+      BHZ 06: '#N/A'
+      BHZ 07: '#N/A'
+      BSB 01: '#N/A'
+      BSB 02: '#N/A'
+      BSB 03: '#N/A'
+      CAM 02: '#N/A'
+      CAM 03: '#N/A'
+      CWB 02: '#N/A'
+      FLN 01: '#N/A'
+      FLN 02: '#N/A'
+      FLN 03: '#N/A'
+      GOI 01: '#N/A'
+      GRU 01: '#N/A'
+      JUI 01: '#N/A'
+      NHB 01: '#N/A'
+      NIT 01: '#N/A'
+      OSA 01: '#N/A'
+      POA 01: '#N/A'
+      POA 02: '#N/A'
+      RIO 01: '#N/A'
+      RIO 02: '#N/A'
+      RIO 03: '#N/A'
+      RIO 04: '#N/A'
+      RIO 05: '#N/A'
+      RIO 06: '#N/A'
+      RIO 07: '#N/A'
+      RIO 08: '#N/A'
+      RIO 09: '#N/A'
+      RIO 10: '#N/A'
+      SAL 02: '#N/A'
+      SBE 01: '#N/A'
+      SCA 01: '#N/A'
+      SPO 01: '#N/A'
+      SPO 03: '#N/A'
+      SPO 05: '#N/A'
+      SPO 06: '#N/A'
+      SPO 07: '#N/A'
+      SPO 08: '#N/A'
+      SPO 09: '#N/A'
+      SPO 10: '#N/A'
+      SPO 11: '#N/A'
+      SPO 12: '#N/A'
+      SPO 13: '#N/A'
+      SPO 14: '#N/A'
+      STA 01: '#N/A'
+      TBS 01: '#N/A'
+  dt_timestamp:
+    description: Date when the data in this table was last updated
+  regions:
+    description: IDs (sk_region) of neighborhoods that agent is allocated on that
+      day. You can find these regions in the dim_region table

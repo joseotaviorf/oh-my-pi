@@ -1,194 +1,395 @@
----
 database_name: dw_public
 table_name: dim_lead
+description: A lead is a contact for a potential property owner who might list with
+  QuintoAndar. Each line is a lead
+domain: For Rent
+owner: marcus.pinto@quintoandar.com.br
 columns:
   sk_lead:
     lineage:
-      - datalake_lead.lead.id
+    - datalake_lead.lead.id
+    description: key of lead
   id:
     lineage:
-      - datalake_lead.lead.id
+    - datalake_lead.lead.id
+    description: key of lead
   external_id:
     lineage:
-      - datalake_lead.lead.id_external
+    - datalake_lead.lead.id_external
+    description: external id from unbounce
   region_id:
     lineage:
-      - datalake_lead.lead.id_region
+    - datalake_lead.lead.id_region
+    description: key of region
   country_code:
     lineage:
-      - datalake_lead.lead.country_code
+    - datalake_lead.lead.country_code
+    description: Country code related to the lead's country of origin
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
   area_total:
     lineage:
-      - datalake_lead.lead.total_area
+    - datalake_lead.lead.total_area
+    description: Total area of listing in square meters
   bairro:
     lineage:
-      - datalake_lead.lead.neighborhood
+    - datalake_lead.lead.neighborhood
+    description: neighborhood of listing
   cep:
     lineage:
-      - datalake_lead.lead.zip_code
+    - datalake_lead.lead.zip_code
+    description: cep of listing
   cidade:
     lineage:
-      - datalake_lead.lead.city
+    - datalake_lead.lead.city
+    description: city of listing
   complemento:
     lineage:
-      - datalake_lead.lead.complement
+    - datalake_lead.lead.complement
+    description: address complement of listing
   endereco:
     lineage:
-      - datalake_lead.lead.address
+    - datalake_lead.lead.address
+    description: address of listing
   numero:
     lineage:
-      - datalake_lead.lead.house_number
+    - datalake_lead.lead.house_number
+    description: Street number of the listing's address
   nome_anunciante:
     lineage:
-      - datalake_lead.lead.advertiser_name
+    - datalake_lead.lead.advertiser_name
+    description: full name of owner
   numero_banheiros:
     lineage:
-      - datalake_lead.lead.bathrooms
+    - datalake_lead.lead.bathrooms
+    description: Number of bathrooms reported in the listing
   numero_quartos:
     lineage:
-      - datalake_lead.lead.bedrooms
+    - datalake_lead.lead.bedrooms
+    description: Number of bedrooms reported in the listing
   numero_suites:
     lineage:
-      - datalake_lead.lead.suites
+    - datalake_lead.lead.suites
+    description: Number of suites (bedrooms with private bathroom) reported in the
+      listing
   url_anuncio:
     lineage:
-      - datalake_lead.lead.ad_url
+    - datalake_lead.lead.ad_url
+    description: url of the listing publication
   telefone_anunciante:
     lineage:
-      - datalake_lead.lead.advertiser_phone
+    - datalake_lead.lead.advertiser_phone
+    description: phone number of owner
   tipo:
     lineage:
-      - datalake_lead.lead.type
+    - datalake_lead.lead.type
+    description: type of lead source
+    categories:
+      Afiliado: ''
+      Agente: ''
+      B2BOpenLink: ''
+      BrokenOpenLink: ''
+      CadastroImobiliario: ''
+      CanalDoImovel: ''
+      Inbound: '#N/A'
+      LandingMarketing: ''
+      LandingOpenLink: ''
+      Marketing: ''
+      OLX: ''
+      OpenLink: ''
+      Organic: ''
+      Porteiro: ''
+      Proporparceria: ''
+      Repechage: '#N/A'
   email:
     lineage:
-      - datalake_lead.lead.email
+    - datalake_lead.lead.email
+    description: email of property owner
   email_captador:
     lineage:
-      - datalake_lead.lead.pick_up_email
+    - datalake_lead.lead.pick_up_email
+    description: email inside sales
   telefone_captador:
     lineage:
-      - datalake_lead.lead.pick_up_phone
+    - datalake_lead.lead.pick_up_phone
+    description: phone inside sales
   lat:
     lineage:
-      - datalake_lead.lead.lat
+    - datalake_lead.lead.lat
+    description: latitude of listing
   lng:
     lineage:
-      - datalake_lead.lead.lng
+    - datalake_lead.lead.lng
+    description: longitute of listing
   condominio:
     lineage:
-      - datalake_lead.lead.condo_price
+    - datalake_lead.lead.condo_price
+    description: value of monthly condominum fee
   iptu:
     lineage:
-      - datalake_lead.lead.iptu
+    - datalake_lead.lead.iptu
+    description: value of iptu
   ub_page_variant:
     lineage:
-      - datalake_lead.lead.unbounce_page_variant
+    - datalake_lead.lead.unbounce_page_variant
+    description: unbounce variant from calculator page to measure conversion from
+      a/b test
   ub_page_name:
     lineage:
-      - datalake_lead.lead.unbounce_page_name
+    - datalake_lead.lead.unbounce_page_name
+    description: ''
   reason:
     lineage:
-      - datalake_lead.lead.reason
+    - datalake_lead.lead.reason
+    description: reason of lead discard
+    categories:
+      Blocklist: ''
+      Contato: ''
+      ContatoIncorreto: ''
+      Deprecated: ''
+      Duplicado: ''
+      EmProspeccao: ''
+      EnderecoIncorreto: ''
+      Exclusivo: ''
+      FaltaDados: ''
+      ForaArea: ''
+      ForaDoModelo: ''
+      ForaDoPadrao5A: ''
+      ForaPreco: ''
+      ImovelIndisponivel: ''
+      ImovelOcupado: ''
+      ImovelParaVenda: ''
+      ImovelRepetido: ''
+      Outros: ''
+      ProprietarioAvaliando: ''
+      ProprietarioNaoAtende: ''
+      ProprietarioNuncaAtende: ''
+      ProprietarioRecusou: ''
+      RepetidoPublicacao: ''
+      TipoInvalido: ''
   reason_detail:
     lineage:
-      - datalake_lead.lead.reason_detail
+    - datalake_lead.lead.reason_detail
+    description: reason detailed for lead discard
+    categories:
+      CONTACT_DIDNT_EXIST: ''
+      CONTACT_KNOW_OWNER: ''
+      CONTACT_ON_BLOCK_LIST: ''
+      CONTACT_WASNT_THE_HOUSE_OWNER: ''
+      CONTACT_WAS_FROM_HOUSE_TENANT: ''
+      CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT: ''
+      CONTACT_WAS_NO_LONGER_THE_HOUSE_OWNER: ''
+      DUPLICATED_LEAD: ''
+      HOUSE_ALREADY_PUBLISHED: ''
+      HOUSE_ALREADY_RENTED: ''
+      HOUSE_ALREADY_SOLD: ''
+      HOUSE_ONLY_FOR_SELLING: ''
+      HOUSE_PRICE_WAS_OUT_OF_BOUNDS: ''
+      HOUSE_UNDER_EXCLUSIVITY_CONTRACT: ''
+      HOUSE_UNDER_MAJOR_RENOVATION: ''
+      HOUSE_UNDER_RENOVATION: ''
+      HOUSE_WAS_A_BUSINESS_REAL_ESTATE: ''
+      HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS: ''
+      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS: ''
+      HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: ''
+      HOUSE_WITH_BAD_CONDITIONS: ''
+      ISSUES_WITH_HOUSE_DOCUMENTATION: ''
+      ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS: ''
+      ONLY_PART_OF_THE_HOUSE_WAS_AVAILABLE_FOR_RENTING: ''
+      OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH: ''
+      OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH: ''
+      OWNER_DIDNT_ACCEPT_ONLINE_PROCESS: ''
+      OWNER_DIDNT_ACCEPT_SELF_CONDO_PAYMENT_MODEL: ''
+      OWNER_DIDNT_ANSWER_PHONE: ''
+      OWNER_DIDNT_LISTEN_TO_PITCH: ''
+      OWNER_DIDNT_WANT_ADMINISTRATION: ''
+      OWNER_DIDNT_WANT_RECEIVE_CALL: ''
+      OWNER_DISAGREE_CHARGES_PAYMENTS: ''
+      OWNER_EVALUATING: ''
+      OWNER_FINISHING_SELFSERVICE: ''
+      OWNER_GAVE_UP_RENTING: ''
+      OWNER_NEED_SCHEDULE_PHOTOS: ''
+      OWNER_REQUESTING_ASSISTANCE: ''
+      OWNER_UNAVAILABLE: ''
+      OWNER_WITH_PRIME_PROFILE: ''
+      OWNER_WONT_ANSWER_PHONE: ''
+      PROPERTY_IN_OFFPLANT: '#N/A'
+      ProprietarioVaiAnunciar: ''
+      SEASONAL_RENT: ''
   deadline_of_new_contact:
     lineage:
-      - datalake_lead.lead.deadline_of_new_contact
+    - datalake_lead.lead.deadline_of_new_contact
+    description: Based on the discard reason, interval of time to be able to contact
+      again the pp
   status:
     lineage:
-      - datalake_lead.lead.status
+    - datalake_lead.lead.status
+    description: lead processing status https://drive.google.com/file/d/1I54dV68P3XmiIlGQhASkwbNArCAuM-cj/view?usp=sharing
+    categories:
+      Convertido: Lead convertido
+      Descartado: Lead contactado que foi descartado por um analista ou lead descartado
+        automaticamente pelo algoritmo de descarte e não contactado
+      Novo: Lead que ainda não teve interação com um anaista
+      Prospeccao: Lead que teve tentativa de contato
   origem:
     lineage:
-      - datalake_lead.lead.source
+    - datalake_lead.lead.source
+    description: origin of lead
+    categories:
+      App: ''
+      Crawling: ''
+      Desconhecida: ''
+      Facebook: ''
+      Form: ''
+      Inbound: '#N/A'
+      Ios: ''
+      Landing: ''
+      LeadEnrichment: ''
+      LeadOutbound: ''
+      Other: '#N/A'
+      OwnerPWA: ''
+      Planilha: ''
+      PriceSuggestion: ''
+      Reprocessado: ''
+      Trade: ''
   proprietario_nome:
     lineage:
-      - datalake_lead.lead.lead_owner_name
+    - datalake_lead.lead.lead_owner_name
+    description: name of owner
   proprietario_email:
     lineage:
-      - datalake_lead.lead.lead_owner_email
+    - datalake_lead.lead.lead_owner_email
+    description: email of owner
   affiliate_type:
     lineage:
-      - datalake_lead.lead.affiliate_type
+    - datalake_lead.lead.affiliate_type
+    description: type of affiliate
+    categories:
+      Agent: ''
+      B2BPartner: ''
+      Doorman: ''
+      Standard: ''
   dados_afiliado_cidade_atuacao:
     lineage:
-      - datalake_lead.lead.affiliate_operation_city
+    - datalake_lead.lead.affiliate_operation_city
+    description: city of affiliate who referred this lead
   utm_source:
     lineage:
-      - datalake_lead.lead.utm_source
-      - datalake_lead_tracking.lead_first_event_tracking.tracking_source
+    - datalake_lead.lead.utm_source
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_source
+    description: utm source value
   utm_medium:
     lineage:
-      - datalake_lead.lead.utm_medium
-      - datalake_lead_tracking.lead_first_event_tracking.tracking_medium
+    - datalake_lead.lead.utm_medium
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_medium
+    description: utm medium value
   utm_campaign:
     lineage:
-      - datalake_lead.lead.utm_campaign
-      - datalake_lead_tracking.lead_first_event_tracking.tracking_campaign
+    - datalake_lead.lead.utm_campaign
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_campaign
+    description: utm campaign value
   utm_content:
     lineage:
-      - datalake_lead_tracking.lead_first_event_tracking.tracking_content
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_content
+    description: utm content value
   utm_term:
     lineage:
-      - datalake_lead_tracking.lead_first_event_tracking.tracking_term
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_term
+    description: utm term value
   tracking_platform:
     lineage:
-      - datalake_lead_tracking.lead_first_event_tracking.tracking_platform
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_platform
+    description: amplitude platform value
+    categories:
+      android: '#N/A'
+      ios: '#N/A'
+      web_desktop: '#N/A'
+      web_mobile: '#N/A'
   tracking_region:
     lineage:
-      - datalake_lead_tracking.lead_first_event_tracking.tracking_region
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_region
+    description: amplitude region value
   tracking_city:
     lineage:
-      - datalake_lead_tracking.lead_first_event_tracking.tracking_city
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_city
+    description: amplitude city value
   network:
     lineage:
-      - datalake_lead.lead.utm_source
-      - datalake_static_files_raw.historical_lead_app_network.network
+    - datalake_lead.lead.utm_source
+    - datalake_static_files_raw.historical_lead_app_network.network
+    description: source network of lead
   usuario_que_indicou_id:
     lineage:
-      - datalake_lead.lead.id_user_has_indicated
+    - datalake_lead.lead.id_user_has_indicated
+    description: id of affiliate
   score_factor:
     lineage:
-      - datalake_crm_lead.lead_score_factor.score_factor
+    - datalake_crm_lead.lead_score_factor.score_factor
+    description: lead priorization score
   sales_company:
     lineage:
-      - datalake_wololo_lead.lead_sales_company.sales_company
+    - datalake_wololo_lead.lead_sales_company.sales_company
+    description: sales company
   sale_price:
     lineage:
-      - datalake_lead.lead.sale_price
+    - datalake_lead.lead.sale_price
+    description: The sale price for the listing (if listing is for sale)
   automatically_discarded:
     lineage:
-      - datalake_lead.lead.has_automatically_discarded
+    - datalake_lead.lead.has_automatically_discarded
+    description: lead automatically discarded true/false
   processado:
     lineage:
-      - datalake_lead.lead.has_processed
+    - datalake_lead.lead.has_processed
+    description: lead processed true/false
   is_for_rent:
     lineage:
-      - datalake_lead.lead.is_for_rent
+    - datalake_lead.lead.is_for_rent
+    description: If the lead is for rent
   is_for_sale:
     lineage:
-      - datalake_lead.lead.is_for_sale
+    - datalake_lead.lead.is_for_sale
+    description: If the lead is for sale
   dentro_area_atuacao:
     lineage:
-      - datalake_lead.lead.is_inside_operation_area
+    - datalake_lead.lead.is_inside_operation_area
+    description: If the lead's address was inside QuintoAndar service area at the
+      time when the lead was submitted
   is_enriched_data:
     lineage:
-      - datalake_lead.lead.is_enriched_data
+    - datalake_lead.lead.is_enriched_data
+    description: ''
   mencionar:
     lineage:
-      - datalake_lead.lead.is_to_be_mentioned
+    - datalake_lead.lead.is_to_be_mentioned
+    description: quintoandar allowed to mention affiliate true/false
   captado_em:
     lineage:
-      - datalake_lead.lead.dt_picked_up
+    - datalake_lead.lead.dt_picked_up
+    description: date of lead creation
   dados_afiliado_inicio_atuacao:
     lineage:
-      - datalake_lead.lead.ts_affiliate_operation_start
+    - datalake_lead.lead.ts_affiliate_operation_start
+    description: Date when affiliate submitted his first lead
   ts_sales_company_sent:
     lineage:
-      - datalake_wololo_lead.lead_sales_company.ts_sales_company_sent
+    - datalake_wololo_lead.lead_sales_company.ts_sales_company_sent
+    description: date of lead sent to sales company
   criado_em:
     lineage:
-      - datalake_lead.lead.ts_created
+    - datalake_lead.lead.ts_created
+    description: timestamp of lead creation
   atualizado_em:
     lineage:
-      - datalake_lead.lead.ts_updated
+    - datalake_lead.lead.ts_updated
+    description: timestamp of last update
+  b2b_type:
+    description: type of b2b channel
+    categories:
+      online: ''
+      prime: ''
+  is_b2b:
+    description: is lead from b2b true/false
+  load_timestamp:
+    description: timestamp of data load

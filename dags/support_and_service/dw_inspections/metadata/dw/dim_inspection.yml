@@ -1,40 +1,70 @@
----
 database_name: dw_inspections
 table_name: dim_inspection
+description: This dimension brings data from each inspection scheduled through the
+  Inspection Service and historical data from the PWA.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
-    sk_inspection:
-        lineage:
-            - datalake_inspections.inspection_booking.id_inspection
-    inspection_type:
-        lineage:
-            - datalake_inspections.inspection_booking.inspection_type
-    booking_type:
-        lineage:
-            - datalake_inspections.inspection_booking.booking_type
-    source:
-        lineage:
-            - datalake_inspections.inspection_booking.source
-    status:
-        lineage:
-            - datalake_inspections.inspection_booking.status
-    has_owner_accompanying:
-        lineage:
-            - datalake_inspections.inspection_booking.has_owner_accompanying
-    is_first_schedule:
-        lineage:
-            - datalake_inspections.inspection_booking.is_first_schedule
-    is_executed_in_first_schedule:
-        lineage:
-            - datalake_inspections.inspection_booking.is_executed_in_first_schedule
-    is_d0_canceled:
-        lineage:
-            - datalake_inspections.inspection_booking.is_d0_canceled
-    is_d1_canceled:
-        lineage:
-            - datalake_inspections.inspection_booking.is_d1_canceled
-    ts_created:
-        lineage:
-            - datalake_inspections.inspection_booking.ts_created
-    ts_updated:
-        lineage:
-            - datalake_inspections.inspection_booking.ts_updated
+  sk_inspection:
+    lineage:
+    - datalake_inspections.inspection_booking.id_inspection
+    description: Unique id to identify a survey. If its origin is the Inspection Service
+      (IS), the sk will correspond to the id generated in the product. If the inspection
+      source is still the PWA, the sk will correspond to the id generated in the enrich_inspection
+      by the MD5 function.
+  inspection_type:
+    lineage:
+    - datalake_inspections.inspection_booking.inspection_type
+    description: Type of inspection.
+    categories:
+      onboarding: Inspection carried out before the entry of the tenant.
+      offboarding: Inspection carried out at the end of the contract with the tenant.
+      verification: Inspection carried out to verify/find any error that may have
+        occurred in a previous inspection, or in exceptional cases.
+  booking_type:
+    lineage:
+    - datalake_inspections.inspection_booking.booking_type
+  source:
+    lineage:
+    - datalake_inspections.inspection_booking.source
+    description: Data source.
+    categories:
+      IS: Inspection Service.
+      PWA: PWA/main.
+  status:
+    lineage:
+    - datalake_inspections.inspection_booking.status
+    description: Inspection follow-up status.
+  has_owner_accompanying:
+    lineage:
+    - datalake_inspections.inspection_booking.has_owner_accompanying
+    description: Indicates whether the owner will be accompanying the inspection.
+  is_first_schedule:
+    lineage:
+    - datalake_inspections.inspection_booking.is_first_schedule
+    description: An inspection request can be canceled and rescheduled multiple times,
+      and each rescheduling will generate a new inspection. Therefore, this column
+      indicates whether the inspection itself was the first appointment in a sequence.
+  is_executed_in_first_schedule:
+    lineage:
+    - datalake_inspections.inspection_booking.is_executed_in_first_schedule
+    description: An inspection request can be canceled and rescheduled multiple times,
+      and each rescheduling will generate a new inspection. Therefore, this column
+      indicates whether the inspection was carried out at the first scheduled time.
+  is_d0_canceled:
+    lineage:
+    - datalake_inspections.inspection_booking.is_d0_canceled
+  is_d1_canceled:
+    lineage:
+    - datalake_inspections.inspection_booking.is_d1_canceled
+  ts_created:
+    lineage:
+    - datalake_inspections.inspection_booking.ts_created
+    description: Timestamp of when the inspection request was synchronized in the
+      product.
+  ts_updated:
+    lineage:
+    - datalake_inspections.inspection_booking.ts_updated
+    description: Inspection information update timestamp.
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_inspection.
