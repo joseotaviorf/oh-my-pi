@@ -99,7 +99,7 @@ pipeline:
     when:
       event: push
       branch:
-        exclude: [hotfix/*]
+        exclude: [forno, hotfix/*]
 
   validate-metadata-files-exist:
     group: tests
