@@ -2,11 +2,11 @@ WITH lbc_aud AS (
     SELECT
       i.id_house,
       COALESCE(i.business_context, 'Undefined') AS business_context,
-      LAG(i.status) OVER(PARTITION BY i.id_house ORDER BY i.rev) AS previous_status, -- previous status ordered by the datetime that happened
+      LAG(i.status) OVER(PARTITION BY i.id_house, i.business_context ORDER BY i.rev) AS previous_status, -- previous status ordered by the datetime that happened
       i.status,
-      LAG(i.status_reason) OVER(PARTITION BY i.id_house ORDER BY i.rev) AS previous_status_reason, -- previous status_reason ordered by the datetime that happened
+      LAG(i.status_reason) OVER(PARTITION BY i.id_house, i.business_context ORDER BY i.rev) AS previous_status_reason, -- previous status_reason ordered by the datetime that happened
       i.status_reason,
-      LAG(i.suspension_reason) OVER(PARTITION BY i.id_house ORDER BY i.rev) AS previous_suspension_reason, -- previous suspension_reason ordered by the datetime that happened
+      LAG(i.suspension_reason) OVER(PARTITION BY i.id_house, i.business_context ORDER BY i.rev) AS previous_suspension_reason, -- previous suspension_reason ordered by the datetime that happened
       i.suspension_reason,
       FROM_UNIXTIME(CAST(rev.ts_revision AS BIGINT)/1000) AS revision_time, 
       i.rev
