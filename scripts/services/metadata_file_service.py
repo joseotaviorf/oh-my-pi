@@ -26,14 +26,6 @@ class MetadataFileService:
             f"{base_path}/raw_metadata_file_schema.yml"
         )
 
-        # TODO: remove legacy schemas after metadata files migration
-        self.legacy_file_schema = yamale.make_schema(
-            f"{base_path}/legacy_metadata_file_schema.yml"
-        )
-        self.legacy_raw_file_schema = yamale.make_schema(
-            f"{base_path}/legacy_raw_metadata_schema.yml"
-        )
-
     @staticmethod
     def filter_metadata_files(files) -> List[str]:
         """
@@ -158,18 +150,7 @@ class MetadataFileService:
         yaml_content, _ = yaml_data[0]
         table_info = MetadataFileService._get_info_from_path(file_path)
 
-        # TODO: remove this check and remove legacy validations after metadata files migration
-        if (
-            "owner" not in yaml_content.keys()
-            and "description" not in yaml_content.keys()
-            and "domain" not in yaml_content.keys()
-        ):
-            if table_info["layer"] == "raw":
-                return yamale.validate(self.legacy_raw_file_schema, yaml_data)
-            else:
-                return yamale.validate(self.legacy_file_schema, yaml_data)
+        if table_info["layer"] == "raw":
+            return yamale.validate(self.raw_file_schema, yaml_data)
         else:
-            if table_info["layer"] == "raw":
-                return yamale.validate(self.raw_file_schema, yaml_data)
-            else:
-                return yamale.validate(self.file_schema, yaml_data)
+            return yamale.validate(self.file_schema, yaml_data)
