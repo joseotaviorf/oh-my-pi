@@ -135,6 +135,10 @@ tables:
     extraction_type: incremental
   seller_data_aud:
     extraction_type: incremental
+  seller_documentation:
+    extraction_type: incremental
+  seller_documentation_aud:
+    extraction_type: incremental
   specialist:
     extraction_type: full
   specialist_aud:
