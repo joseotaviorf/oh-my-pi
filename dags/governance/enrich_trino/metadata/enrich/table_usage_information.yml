@@ -1,0 +1,19 @@
+---
+database_name: datalake_trino
+table_name: table_usage_information
+owner: augusto.torres@quintoandar.com.br
+domain: Data Ops & Governance
+description: This table contains information about the number of visualization a table has according to Trino usage events
+columns:
+  database_name:
+    description: Name of the schema
+  table_name:
+    description: Name of the table
+  count_visualization:
+    description: Number of times this table was accessed in Trino during the day
+  year:
+    description: ingestion year 
+  month:
+    description: ingestion month 
+  day:
+    description: ingestion day 
