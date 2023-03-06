@@ -25,21 +25,31 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables in `datalake_hubspot`:
 
 **Incrementally:**
+- `call_history`
 - `company_history`
+- `communication_history`
 - `contact_history`
 - `deal_history`
 - `email_history`
+- `meeting_history`
+- `note_history`
+- `task_history`
 - `ticket_history`
 - `owner_history`
 
 **Fully:**
+- `call_history`
 - `company`
 - `company_status`
+- `communication_history`
 - `contact`
 - `contact_status`
 - `deal`
 - `deal_stage`
 - `email`
+- `meeting`
+- `note`
+- `task`
 - `ticket`
 - `ticket_stage`
 - `pipeline`

@@ -1,9 +1,13 @@
 ---
 inner_dependencies:
+  call:
+    - call_history
   company:
     - company_history
   company_status:
     - company
+  communication:
+    - communication_history
   contact:
     - contact_history
   contact_status:
@@ -15,6 +19,12 @@ inner_dependencies:
     - stage
   email:
     - email_history
+  meeting:
+    - meeting_history
+  note:
+    - note_history
+  task:
+    - task_history
   ticket:
     - ticket_history
   ticket_stage:
@@ -27,6 +37,11 @@ inner_dependencies:
     - owner_history
 
 tables:
+  call:
+    is_incremental: false
+  call_history:
+    is_incremental: true
+    partition_cols: ['year', 'month', 'day']
   company:
     is_incremental: false
   company_history:
@@ -34,6 +49,11 @@ tables:
     partition_cols: ['year', 'month', 'day']
   company_status:
     is_incremental: false
+  communication:
+    is_incremental: false
+  communication_history:
+    is_incremental: true
+    partition_cols: ['year', 'month', 'day']
   contact:
     is_incremental: false
   contact_history:
@@ -55,6 +75,21 @@ tables:
     partition_cols: ['year', 'month', 'day']
   ticket:
     is_incremental: false
+  meeting:
+    is_incremental: false
+  meeting_history:
+    is_incremental: true
+    partition_cols: ['year', 'month', 'day']
+  note:
+    is_incremental: false
+  note_history:
+    is_incremental: true
+    partition_cols: ['year', 'month', 'day']
+  task:
+    is_incremental: false
+  task_history:
+    is_incremental: true
+    partition_cols: ['year', 'month', 'day']
   ticket_history:
     is_incremental: true
     partition_cols: ['year', 'month', 'day']
