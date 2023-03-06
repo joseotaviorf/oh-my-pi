@@ -20,6 +20,7 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_country.house.country_code
+    description: Country code related to the house's country.
   rental_administrator:
     lineage:
     - datalake_ebdb_clean.listing_rent_model.rental_administrator

@@ -27,6 +27,7 @@ columns:
   id_partner_agent:
     lineage:
     - datalake_ebdb_clean.partner_agent.id
+    description: Id of the partner agent user.
   id_country:
     lineage:
     - datalake_ebdb_clean.user.id_country
