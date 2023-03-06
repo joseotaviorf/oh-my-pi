@@ -1,0 +1,15 @@
+---
+database_name: datalake_sale_journey
+table_name: sale_amplitude_contact
+columns:
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user_aud.id_user
+      - datalake_sale_lead_flows.hub_services_lead_flow.id_visitor
+      - datalake_hub_services_clean.lead_aud.id_visitor
+  dt_event:
+    lineage:
+      - datalake_hub_services_clean.lead_aud.ts_updated
+  ts_event:
+    lineage:
+      - datalake_hub_services_clean.lead_aud.ts_updated

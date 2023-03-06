@@ -1,0 +1,50 @@
+---
+database_name: datalake_sale_journey
+table_name: sale_journey
+columns:
+  id_user:
+    lineage:
+      - datalake_sale_journey.sale_amplitude_contact.id_user
+      - datalake_sale_journey.hub_services_contact.id_user
+      - datalake_booking.booking.id_visitor
+      - datalake_offer.sale_offer.id_buyer
+  id_house:
+    lineage:
+      - datalake_booking.booking.id_house
+      - datalake_offer.sale_offer.id_house
+  action:
+    lineage:
+      - datalake_sale_journey.sale_amplitude_contact.action
+      - datalake_sale_journey.hub_services_contact.action
+  active_search_date:
+    lineage:
+      - datalake_sale_journey.sale_amplitude_contact.date
+  dt_secretary_action:
+    lineage:
+      - datalake_sale_journey.sale_amplitude_contact.date
+      - datalake_sale_journey.hub_services_contact.date
+      - datalake_booking.booking.ts_booking_local_tz
+      - datalake_booking.booking.ts_created
+  dt_agent_action:
+    lineage:
+      - datalake_booking.booking.date
+  dt_buyer_action:
+    lineage:
+      - datalake_sale_journey.hub_services_contact.date
+      - datalake_booking.booking.date
+  dt_event:
+    lineage:
+      - datalake_sale_journey.sale_amplitude_contact.date
+      - datalake_sale_journey.hub_services_contact.date
+      - datalake_booking.booking.ts_booking_local_tz
+      - datalake_booking.booking.ts_created
+      - datalake_offer.sale_offer.ts_offer_submitted
+  ts_event:
+    lineage:
+      - datalake_sale_journey.sale_amplitude_contact.ts_event
+      - datalake_sale_journey.hub_services_contact.ts_event
+      - datalake_booking.booking.ts_booking_local_tz
+      - datalake_booking.booking.ts_created
+      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_offer.sale_offer.dt_offer_dismissed

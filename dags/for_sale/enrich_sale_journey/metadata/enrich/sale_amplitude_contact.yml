@@ -1,0 +1,15 @@
+---
+database_name: datalake_sale_journey
+table_name: sale_amplitude_contact
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_user
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_tts_success_page_viewed_events.ts_event
+  dt_event:
+    lineage:
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events
+      - datalake_amplitude_clean.170698_tts_success_page_viewed_events
