@@ -1,43 +1,55 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: installment
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: "Installment table from Trato Feito product"
 columns:
   id:
+    description: "Main ID for installment"
     lineage:
       - datalake_trato_feito_raw.installment.id
   id_external:
+    description: "External ID"
     lineage:
       - datalake_trato_feito_raw.installment.external_id
   id_negotiation:
+    description: "ID that connects with negotiation table"
     lineage:
       - datalake_trato_feito_raw.installment.negotiation_id
-  id_bill:
-    lineage:
-      - datalake_trato_feito_raw.installment.bill_id
   status:
+    description: "Status of installment"
     lineage:
       - datalake_trato_feito_raw.installment.status
   adm_fee_amount:
+    description: "Amount charged of Administration Fee"
     lineage:
       - datalake_trato_feito_raw.installment.adm_fee_amount
   installment_fee_amount:
+    description: "Installment Fee"
     lineage:
       - datalake_trato_feito_raw.installment.installment_fee_amount
   debts_fee_amount:
+    description: "Debts Fee"
     lineage:
       - datalake_trato_feito_raw.installment.debts_fee_amount
   discount_amount:
+    description: "Discount Amount"
     lineage:
       - datalake_trato_feito_raw.installment.discount_amount
   total_amount:
+    description: "Total Amount"
     lineage:
       - datalake_trato_feito_raw.installment.total_amount
   dt_due:
+    description: "Date Due"
     lineage:
       - datalake_trato_feito_raw.installment.due_date
   ts_created:
+    description: "Timestamp of creation"
     lineage:
       - datalake_trato_feito_raw.installment.created_at
   ts_updated:
+    description: "Timestamp of last update"
     lineage:
       - datalake_trato_feito_raw.installment.updated_at
