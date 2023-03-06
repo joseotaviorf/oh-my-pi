@@ -174,6 +174,10 @@ Produces the following output tables:
     `restriction_type_aud`
     `sales_rep`
     `sales_rep_aud`
+    `shop_window`
+    `shop_window_aud`
+    `shop_window_listing_business_context`
+    `shop_window_listing_business_context_aud`
     `signature`
     `special_condition`
     `special_condition_aud`

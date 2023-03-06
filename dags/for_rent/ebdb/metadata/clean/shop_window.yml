@@ -1,0 +1,37 @@
+---
+database_name: datalake_ebdb_clean
+table_name: shop_window
+columns:
+  id_shop_window:
+    lineage:
+      - datalake_ebdb_raw.shopwindow.id
+  id_shop_window_creator:
+    lineage:
+      - datalake_ebdb_raw.shopwindow.shopwindowcreatorid
+  id_demand_contact_submission:
+    lineage:
+      - datalake_ebdb_raw.shopwindow.demandcontactsubmissionid
+  id_external:
+    lineage:
+      - datalake_ebdb_raw.shopwindow.externalid
+  shop_window_name:
+    lineage:
+      - datalake_ebdb_raw.shopwindow.name
+  shop_window_creator_user_type:
+    lineage:
+      - datalake_ebdb_raw.shopwindow.shopwindowcreatorusertype
+  short_url:
+    lineage:
+      - datalake_ebdb_raw.shopwindow.shorturl
+  cover_image_uri:
+    lineage:
+      - datalake_ebdb_raw.shopwindow.coverimageuri
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.shopwindow.isactive
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.shopwindow.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.shopwindow.atualizadoem
