@@ -1,0 +1,37 @@
+---
+database_name: datalake_hubspot_clean
+table_name: meeting
+columns:
+  id_meeting:
+    lineage:
+      - datalake_hubspot_raw.meeting.id
+  properties:
+    lineage:
+      - datalake_hubspot_raw.meeting.properties
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_raw.meeting.properties_with_history
+  associations:
+    lineage:
+      - datalake_hubspot_raw.meeting.associations
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.meeting.archived
+  ts_archived:
+    lineage:
+      - datalake_hubspot_raw.meeting.archived_at
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.meeting.created_at
+  ts_updated:
+    lineage:
+      - datalake_hubspot_raw.meeting.updated_at
+  year:
+    lineage:
+      - datalake_hubspot_raw.meeting.year
+  month:
+    lineage:
+      - datalake_hubspot_raw.meeting.month
+  day:
+    lineage:
+      - datalake_hubspot_raw.meeting.day

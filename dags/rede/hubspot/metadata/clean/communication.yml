@@ -1,0 +1,37 @@
+---
+database_name: datalake_hubspot_clean
+table_name: communication
+columns:
+  id_communication:
+    lineage:
+      - datalake_hubspot_raw.communication.id
+  properties:
+    lineage:
+      - datalake_hubspot_raw.communication.properties
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_raw.communication.properties_with_history
+  associations:
+    lineage:
+      - datalake_hubspot_raw.communication.associations
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.communication.archived
+  ts_archived:
+    lineage:
+      - datalake_hubspot_raw.communication.archived_at
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.communication.created_at
+  ts_updated:
+    lineage:
+      - datalake_hubspot_raw.communication.updated_at
+  year:
+    lineage:
+      - datalake_hubspot_raw.communication.year
+  month:
+    lineage:
+      - datalake_hubspot_raw.communication.month
+  day:
+    lineage:
+      - datalake_hubspot_raw.communication.day

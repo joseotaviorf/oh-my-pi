@@ -1,0 +1,37 @@
+---
+database_name: datalake_hubspot_clean
+table_name: task
+columns:
+  id_task:
+    lineage:
+      - datalake_hubspot_raw.task.id
+  properties:
+    lineage:
+      - datalake_hubspot_raw.task.properties
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_raw.task.properties_with_history
+  associations:
+    lineage:
+      - datalake_hubspot_raw.task.associations
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.task.archived
+  ts_archived:
+    lineage:
+      - datalake_hubspot_raw.task.archived_at
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.task.created_at
+  ts_updated:
+    lineage:
+      - datalake_hubspot_raw.task.updated_at
+  year:
+    lineage:
+      - datalake_hubspot_raw.task.year
+  month:
+    lineage:
+      - datalake_hubspot_raw.task.month
+  day:
+    lineage:
+      - datalake_hubspot_raw.task.day

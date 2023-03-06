@@ -1,0 +1,37 @@
+---
+database_name: datalake_hubspot_clean
+table_name: note
+columns:
+  id_note:
+    lineage:
+      - datalake_hubspot_raw.note.id
+  properties:
+    lineage:
+      - datalake_hubspot_raw.note.properties
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_raw.note.properties_with_history
+  associations:
+    lineage:
+      - datalake_hubspot_raw.note.associations
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.note.archived
+  ts_archived:
+    lineage:
+      - datalake_hubspot_raw.note.archived_at
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.note.created_at
+  ts_updated:
+    lineage:
+      - datalake_hubspot_raw.note.updated_at
+  year:
+    lineage:
+      - datalake_hubspot_raw.note.year
+  month:
+    lineage:
+      - datalake_hubspot_raw.note.month
+  day:
+    lineage:
+      - datalake_hubspot_raw.note.day

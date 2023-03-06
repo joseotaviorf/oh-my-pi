@@ -331,3 +331,110 @@ tables:
     ids_list:
       endpoint: marketing_email_campaign_id
       key: id
+  call:
+    is_incremental: true
+    bring_archived: false
+    encode_inner_dictionaries: true
+    schema: object
+    date_filter_column: updated_at
+    params:
+      properties: 
+        - hs_timestamp
+        - hs_call_body
+        - hs_call_callee_object_id
+        - hs_call_callee_object_type_id
+        - hs_call_direction
+        - hs_call_disposition
+        - hs_call_duration
+        - hs_call_from_number
+        - hs_call_recording_url
+        - hs_call_status
+        - hs_call_title
+        - hs_call_to_number
+        - hubspot_owner_id
+        - hs_activity_type
+        - hs_attachment_ids
+      associations:
+        - company
+        - contact
+        - deal
+        - ticket
+  communication:
+    is_incremental: true
+    bring_archived: false
+    encode_inner_dictionaries: true
+    schema: object
+    date_filter_column: updated_at
+    params:
+      properties: 
+        - hs_communication_channel_type
+        - hs_communication_logged_from
+        - hs_communication_body
+        - hs_timestamp
+      associations:
+        - company
+        - contact
+        - deal
+        - ticket
+  meeting:
+    is_incremental: true
+    bring_archived: false
+    encode_inner_dictionaries: true
+    schema: object
+    date_filter_column: updated_at
+    params:
+      properties: 
+        - hs_timestamp
+        - hs_meeting_title
+        - hubspot_owner_id
+        - hs_meeting_body
+        - hs_internal_meeting_notes
+        - hs_meeting_external_URL
+        - hs_meeting_location
+        - hs_meeting_start_time
+        - hs_meeting_end_time
+        - hs_meeting_outcome
+        - hs_activity_type
+        - hs_attachment_ids
+      associations:
+        - company
+        - contact
+        - deal
+        - ticket
+  note:
+    is_incremental: true
+    bring_archived: false
+    encode_inner_dictionaries: true
+    schema: object
+    date_filter_column: updated_at
+    params:
+      properties: 
+        - hs_timestamp
+        - hs_note_body
+        - hubspot_owner_id
+        - hs_attachment_ids
+      associations:
+        - company
+        - contact
+        - deal
+        - ticket
+  task:
+    is_incremental: true
+    bring_archived: false
+    encode_inner_dictionaries: true
+    schema: object
+    date_filter_column: updated_at
+    params:
+      properties: 
+        - hs_timestamp
+        - hs_task_body
+        - hubspot_owner_id
+        - hs_task_subject
+        - hs_task_status
+        - hs_task_priority
+        - hs_task_type
+      associations:
+        - company
+        - contact
+        - deal
+        - ticket

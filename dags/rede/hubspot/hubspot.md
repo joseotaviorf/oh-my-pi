@@ -16,7 +16,9 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces, in datalake_hubspot_raw and datalake_hubspot_clean:
 
 Via **incremental load**:
+    - `call`
     - `company`
+    - `communication`
     - `contact`
     - `deal`
     - `deal_pipeline`
@@ -24,7 +26,10 @@ Via **incremental load**:
     - `marketing_campaign`
     - `marketing_email`
     - `marketing_email_event`
+    - `meeting`
+    - `note`
     - `owner`
+    - `task`
     - `team`
     - `ticket`
     - `ticket_pipeline`

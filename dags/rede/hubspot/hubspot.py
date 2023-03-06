@@ -37,7 +37,7 @@ artifacts_default_bucket = config_service.get_config("artifacts_bucket")
 custom_libraries = [
     {
         "whl": f"{artifacts_default_bucket}/hubspot-api-client-python/"
-        f"quintoandar_hubspot_api_client-0.1.0-py2.py3-none-any.whl"
+        f"quintoandar_hubspot_api_client-0.2.0-py2.py3-none-any.whl"
     }
 ]
 
