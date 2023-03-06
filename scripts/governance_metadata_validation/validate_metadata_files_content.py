@@ -10,17 +10,16 @@ from scripts.services.metadata_file_service import (
 )
 
 from scripts.services.git_service import GitService
-from dags import DAG_PACKAGES_ROOT
 
 with open(f"{Path(__file__).parent}/skip_list.yml") as f:
     SKIP_LIST = yaml.safe_load(f)["metadata_files_out_of_pattern"]
 
 metadata_file_service = MetadataFileService()
 
-DAGS_METADATA_PATHS_REGEX = re.compile(
-    rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<context>\w+)/metadata/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.yml"
+
+SKIP_LIST_PATH_REGEX = re.compile(
+    rf"(?:.*/)?dags/(?P<path>.*)"
 )
-DAG_FILES_PREFIX = f"{DAG_PACKAGES_ROOT}/"
 
 
 def parse_args():
@@ -96,18 +95,20 @@ def output_results(results, verbose):
                 for error in result.errors:
                     print(error)
         print()
+    if results["skipped"]:
+        print("Files skipped:")
+        for file in results["skipped"]:
+            print(file)
 
 
-def remove_prefix(input_string, prefix=DAG_FILES_PREFIX):
-    if prefix and input_string.startswith(prefix):
-        return input_string[len(prefix) :]
-    return input_string
+def remove_prefix(input_string):
+    return re.match(SKIP_LIST_PATH_REGEX, input_string).groupdict()['path']
 
 
 def main():
     mode, input, verbose = parse_args()
     files = get_metadata_file_paths(mode, input)
-    results = {"passed": [], "failed": []}
+    results = {"passed": [], "failed": [], "skipped": []}
 
     for file in files:
         if remove_prefix(file) not in SKIP_LIST:
@@ -116,6 +117,8 @@ def main():
                 results["passed"].append(result[0])
             except YamaleError as error:
                 results["failed"].append(error.results[0])
+        else:
+            results["skipped"].append(file)
 
     output_results(results, verbose)
 

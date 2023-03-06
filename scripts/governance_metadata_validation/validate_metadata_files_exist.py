@@ -13,7 +13,7 @@ from pathlib import Path
 SQL_PATH_REGEX = re.compile(
     rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<context>\w+)/queries/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.sql"
 )
-DAG_FILES_PREFIX = f"{DAG_PACKAGES_ROOT}/"
+SKIP_LIST_PATH_REGEX = re.compile(rf"(?:.*/)?dags/(?P<path>.*)")
 
 with open(f"{Path(__file__).parent}/skip_list.yml") as f:
     SKIP_LIST = yaml.safe_load(f)["queries_without_metadata_files"]
@@ -86,10 +86,8 @@ def metadata_file_exists(query_file):
     )
 
 
-def remove_prefix(input_string, prefix=DAG_FILES_PREFIX):
-    if prefix and input_string.startswith(prefix):
-        return input_string[len(prefix) :]
-    return input_string
+def remove_prefix(input_string):
+    return re.match(SKIP_LIST_PATH_REGEX, input_string).groupdict()["path"]
 
 
 def output_results(results):
@@ -104,12 +102,16 @@ def output_results(results):
         for result in results["failed"]:
             print(f"file={result}")
         print()
+    if results["skipped"]:
+        print("Files skipped:")
+        for file in results["skipped"]:
+            print(file)
 
 
 def main():
     mode, input, verbose = parse_args()
     query_files = get_query_file_paths(mode, input)
-    results = {"passed": [], "failed": []}
+    results = {"passed": [], "failed": [], "skipped": []}
 
     for file in query_files:
         if remove_prefix(file) not in SKIP_LIST:
@@ -117,6 +119,8 @@ def main():
                 results["passed"].append(file)
             else:
                 results["failed"].append(file)
+        else:
+            results["skipped"].append(file)
 
     output_results(results)
 
