@@ -13,6 +13,9 @@ columns:
   reason:
     lineage:
       - datalake_rene_descartes_raw.lead_rejection_aud.reason
+  origin:
+    lineage:
+      - datalake_rene_descartes_raw.lead_rejection_aud.origin
   rev:
     lineage:
       - datalake_rene_descartes_raw.lead_rejection_aud.rev

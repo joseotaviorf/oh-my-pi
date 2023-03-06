@@ -13,6 +13,9 @@ columns:
   reason:
     lineage:
       - datalake_rene_descartes_raw.lead_rejection.reason
+  origin:
+    lineage:
+      - datalake_rene_descartes_raw.lead_rejection.origin
   ts_created:
     lineage:
       - datalake_rene_descartes_raw.lead_rejection.created_at

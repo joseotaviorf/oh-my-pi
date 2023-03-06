@@ -11,6 +11,7 @@ WITH context_rene AS (
         END AS is_rent
     FROM
         datalake_rene_descartes_clean.lead_rejection
+    WHERE origin != 'PROSPECT'
 ),
 discard_rene AS (
     SELECT

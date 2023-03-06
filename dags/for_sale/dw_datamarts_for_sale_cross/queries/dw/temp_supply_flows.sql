@@ -12,6 +12,8 @@ SELECT
     END AS is_rent
 FROM
     datalake_rene_descartes_clean_prod.lead_rejection
+WHERE 
+    origin != 'PROSPECT'
 ),
 discard_rene AS (
 SELECT

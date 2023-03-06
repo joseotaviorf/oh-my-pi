@@ -82,6 +82,7 @@ rene_tasks AS (
         ON hl.id = lr.id_house_lead
     WHERE rt.task_id IS NOT NULL
         AND rt.task_id <> ''
+        AND lr.origin != 'PROSPECT'
     GROUP BY 1, 2, 3, 4
 ),
 inbound_leads AS (

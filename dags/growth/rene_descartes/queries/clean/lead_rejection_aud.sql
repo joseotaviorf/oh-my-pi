@@ -3,6 +3,7 @@ SELECT
     house_lead_id AS id_house_lead,
     business_context,
     reason,
+    origin,
     rev,
     revtype AS rev_type,
     revend AS rev_end,
