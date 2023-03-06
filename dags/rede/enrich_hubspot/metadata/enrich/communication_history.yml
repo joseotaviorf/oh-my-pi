@@ -1,0 +1,63 @@
+---
+database_name: datalake_hubspot
+table_name: communication_history
+description: This table has one row per day that has a modification or creation of a communication in HubSpot. If you want one row per communication, use datalake_hubspot.communication. 
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  id_communication:
+    lineage:
+      - datalake_hubspot_clean.communication.id_communication
+    description: Id of the object. Not a primary key, since there is a new row for each update (limited to the most recent per day).
+  ids_associated_tickets:
+    lineage:
+      - datalake_hubspot_clean.communication.associations
+    description: List of ids of associated tickets.
+  ids_associated_contacts:
+    lineage:
+      - datalake_hubspot_clean.communication.associations
+    description: List of ids of associated contacts.
+  ids_associated_companies:
+    lineage:
+      - datalake_hubspot_clean.communication.associations
+    description: List of ids of associated companies.
+  ids_associated_deals:
+    lineage:
+      - datalake_hubspot_clean.communication.associations
+    description: List of ids of associated deals.
+  communication_channel_type:
+    lineage:
+      - datalake_hubspot_clean.communication.properties
+    description: The channel type of the message that you sent or received from the contact. Supported values are WHATS_APP, LINKEDIN_MESSAGE, or SMS. Comes from the internal field hs_communication_channel_type.
+  communication_logged_from:
+    lineage:
+      - datalake_hubspot_clean.communication.properties
+    description: Enum used to differentiate between conversations objects. Comes from the internal field hs_communication_logged_from.
+  communication_body:
+    lineage:
+      - datalake_hubspot_clean.communication.properties
+    description: The text body of the engagement. Comes from the internal field hs_communication_body.
+  ts_communication:
+    lineage:
+      - datalake_hubspot_clean.communication.properties
+    description: This field marks the message''s time of creation and determines where the message appears on the record timeline. Comes from the internal field hs_timestamp.
+  ts_created:
+    lineage:
+      - datalake_hubspot_clean.communication.ts_created
+    description: Timestamp of when the object was created.
+  ts_updated:
+    lineage:
+      - datalake_hubspot_clean.communication.ts_updated
+    description: Timestamp of when the object was updated.
+  year:
+    lineage:
+      - datalake_hubspot_clean.communication.year
+    description: Year when the object was updated.
+  month:
+    lineage:
+      - datalake_hubspot_clean.communication.month
+    description: Month when the object was updated.
+  day:
+    lineage:
+      - datalake_hubspot_clean.communication.day
+    description: Day when the object was updated.
