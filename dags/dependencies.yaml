@@ -990,12 +990,12 @@ bietlejuice.enrich_dashboard_governance:
   - bietlejuice.looker:load-clean-dashboards
   - bietlejuice.looker:load-clean-users
 
-bietlejuice.enrich_documentation_metrics:
-  - bietlejuice.documentation_metrics:load-clean-categories-documentation
-  - bietlejuice.documentation_metrics:load-clean-columns-documentation
-  - bietlejuice.documentation_metrics:load-clean-columns-metastore
-  - bietlejuice.documentation_metrics:load-clean-dag-metadata
-  - bietlejuice.documentation_metrics:load-clean-lineage-and-tags
+#bietlejuice.enrich_documentation_metrics:
+#  - bietlejuice.documentation_metrics:load-clean-categories-documentation
+#  - bietlejuice.documentation_metrics:load-clean-columns-documentation
+#  - bietlejuice.documentation_metrics:load-clean-columns-metastore
+#  - bietlejuice.documentation_metrics:load-clean-dag-metadata
+#  - bietlejuice.documentation_metrics:load-clean-lineage-and-tags
 
 # bietlejuice.dw_debt_recovery:
 #   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
