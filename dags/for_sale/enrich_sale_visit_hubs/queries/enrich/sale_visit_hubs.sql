@@ -171,6 +171,7 @@ visit_relation AS (
            AND bur.id_hub IS NOT NULL
     WHERE
         b.visit_intent = 'SALE'
+        AND b.id_user_sale_agent IS NOT NULL
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_booking ORDER BY tr.ts_started ASC) = 1
 )
