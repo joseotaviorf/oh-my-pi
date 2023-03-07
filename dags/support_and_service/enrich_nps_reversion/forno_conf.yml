@@ -1,0 +1,70 @@
+offboarding_tenant_input_table_name: offboarding_tenant_input
+offboarding_tenant_output_table_name: offboarding_tenant_predictions
+offboarding_tenant_model_filename: /dbfs/FileStore/models/nps_reversion/offboarding/tenant/nps_reversion_off_tenant_reglog_v0.pkl
+offboarding_tenant_input_columns: [
+        "iq_first_contract",
+        "total_tickets_especiais",
+        "csat_disatisfied_jornada",
+        "reason_MOVING_OWN_HOUSE",
+        "reason_NEEDS_CHANGE",
+        "contract_lifetime",
+        "reason_DISLIKES_QUINTOANDAR",
+        "reason_PROBLEMS_WITH_HOUSE",
+        "csat_satisfied_jornada",
+        "reason_MOVING_TO_FRIENDS_OR_FAMILY",
+        "back_tickets_not_sla_jornada",
+        "type_of_termination_fine_WITHOUT_NOTICE",
+        "last_nps_promotor",
+        "house_bedrooms",
+        "house_type_Casa",
+        "reason_OTHER",
+        "iq_nps_detrator_jornada",
+        "complaint_tickets_jornada",
+        "iq_nps_promotor_jornada",
+        "front_tickets_jornadav",
+        "reason_JOB_TRANSFER"
+    ]
+
+offboarding_tenant_landlord_table_name: offboarding_landlord_input
+offboarding_landlord_output_table_name: offboarding_landlord_predictions
+offboarding_landlord_model_filename: /dbfs/FileStore/models/nps_reversion/offboarding/landlord/nps_reversion_off_landlord_rf_v0.pkl
+offboarding_landlord_input_columns : [
+        "has_one_year_fine",
+        "utility_bill_in_condominium",
+        "contract_lifetime",
+        "has_24hdoorman",
+        "house_total_value_per_m2",
+        "is_house_furnished",
+        "has_tenant_comment_inpection",
+        "has_ongoing_repairs",
+        "first_contract",
+        "actual_contracts",
+        "total_contracts",
+        "back_tickets_jornada",
+        "complaint_tickets_jornada",
+        "total_tickets_especiais",
+        "csat_disatisfied_jornada",
+        "csat_satisfied_jornada",
+        "total_segments_not_sla",
+        "total_segments",
+        "avg_minutes_talk_time",
+        "avg_minutes_waiting_time",
+        "resolution_survey_jornada",
+        "avg_assignee_stations",
+        "total_nps_promotor",
+        "total_nps_detractor",
+        "prob_answer_nps",
+        "last_nps_detractor",
+        "is_apartment",
+        "perfect_state_condition"
+    ]
+
+offboarding_input_query: SELECT * FROM datalake_nps_reversion.{table_name} WHERE dt_termination_request = CAST('{execution_date}' AS DATE)
+offboarding_input_partitions: ["dt_termination_request"]
+output_partitions: ["dt_prediction"]
+custom_libraries: [{ pypi: { "package": "scikit-learn>=1.1.1" } }]
+
+
+
+
+

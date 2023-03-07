@@ -2149,6 +2149,30 @@ bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
 
+bietlejuice.enrich_nps_reversion:
+  - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
+  - bietlejuice.dw_contract:load-dw-public-dim-contract
+  - bietlejuice.dw_contract:load-dw-quintoandar-dim-contract-person
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket-tags
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-segment
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
+  - bietlejuice.dw_listing_jobs:load-public-fact-inspection
+  - bietlejuice.dw_listing_jobs:load-public-fact-inspection-bookings
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
+  - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
+  - bietlejuice.dw_tracksale:load-tracksale-dim-nps-campaign-into-redshift
+  - bietlejuice.dw_tracksale:load-tracksale-fact-nps-dispatches-into-redshift
+  - bietlejuice.ebdb:create-clean-house-maintenance-condition-in-data-lake
+  - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.enrich_pro_owners:load-enrich-pro-owner-history
+  - bietlejuice.repairs:load-clean-repair-request
+  - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-inspection
+
 bietlejuice.enrich_offboarding:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
