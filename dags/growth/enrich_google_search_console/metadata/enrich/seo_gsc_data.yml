@@ -1,111 +1,155 @@
 database_name: datalake_google_search_console
 table_name: seo_gsc_data
+owner: henrique.miamoto@quintoandar.com.br
+domain: Growth
+description: This table contains information about SEO (Search Engine Optimization). It compiles the GSC (Google Search Console) data with our bussiness information.
 columns:
     site_url:
+      description: Main URL that are being queried.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.site_url
     device:
+      description: device type where the search was made.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.device
     page:
+      description: Full page address.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     query:
+      description: search words performed on Google.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.query
     country:
+      description: country where the search was made.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.country
     domain:
+      description: Generic reffering domain.
+      categories:
+        Supply: proprietario.quintoandar pages
+        Content: meulugar.quintoandar and conteudos.quintoandar pages
+        Help: help.quintoandar pages
+        QuintoAndar: Other quintoandar pages
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     slug:
+      description: The URL content that comes after a website's domain
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     subtitle_content:
+      description: The URL content that comes after the first slug
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     search_region:
+      description: Region that was searched.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     page_path:
+      description: Identifies the page path
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     state:
+      description: Brazilian State for page showed
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     city:
+      description: Brazilian City for page showed
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     page_cluster:
+      description: Identifies the page cluster based on a bussiness rule.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     structure:
+      description: Identifies the page structure based on a bussiness rule.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     location_level:
+      description: Level of Location of the page showed - neighborhood, city, etc
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     street_abbreviations:
+      description: Different names and abbreviations for streets
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     poi_type:
+      description: Type of point of interest present on search
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     filter_combination:
+      description: How many filters where combined at the search page
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     filter:
+      description: If there was any filter used on search pages
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     condo_filter:
+      description: If there was any condo amenities filtering on search page
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     house_char_filter:
+      description: If there was any house amenities filtering on search page
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     house_type_filter:
+      description: If there was any house type filtering on search page
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     filter_1:
+      description: First filter used on page
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     filter_2:
+      description: Second filter used on page
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     lp_wo_filter:
+      description: Landing page withou the filter
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     filter_count:
+      description: Count of the filters
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     is_branded:
+      description: If the search query is branded or non-branded
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.query
     ctr:
+      description: Click Through Rate - times it was clicked over times it was showed
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.ctr
     clicks:
+      description: Times it was clicked on SERP page organically
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.clicks
     position:
+      description: Relative ranking of the position of the link on Google.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.position
     impressions:
+      description: Times it was showed on SERP page
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.impressions
     posimp:
+      description: Average position X Impressions
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.posimp
     dt_created:
+      description: Search date.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.dt_created
     year:
+      description: Search year.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.year
     month:
+      description: Search month.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.month
     day:
+      description: Search day.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.day
