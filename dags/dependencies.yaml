@@ -8,6 +8,9 @@
 
 ############### Place the dependencies sorted alphabetically ##################
 ---
+bietlejuice.convenia_inactive_employee_details:
+  - bietlejuice.convenia_active_employee_details:load-clean-active-employee-details
+
 bietlejuice.dw_datamarts_cross:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift

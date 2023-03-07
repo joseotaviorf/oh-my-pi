@@ -19,10 +19,9 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 
 ENV = os.environ.get("ENVIRONMENT")
-SOURCE = "convenia_details"
+SOURCE = "convenia_inactive_employee_details"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2022, 5, 6, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
 config_service = ConfigurationService(SOURCE)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -62,7 +61,7 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    schedule_interval=None,
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
@@ -89,7 +88,7 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-table_names = ["active_employee_details", "inactive_employee_details"]
+table_names = ["inactive_employee_details"]
 
 raw_task_groups = {}
 for table_name in table_names:
@@ -97,7 +96,7 @@ for table_name in table_names:
         source=SOURCE,
         table_name=table_name,
         target_database_base_name=SOURCE,
-        extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}load_{table_name}_to_raw.py",
+        extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}load_{SOURCE}_to_raw.py",
         has_hive_sync=False,
         raw_spark_job_extra_args=[SOURCE, table_name],
     )

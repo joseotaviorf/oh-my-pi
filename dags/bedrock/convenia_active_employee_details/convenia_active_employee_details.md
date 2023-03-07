@@ -12,18 +12,17 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ## Sources
 The data retrieved are from the following API keys:
-- Quinto Andar SP
-- Quinto Andar MG
-- Quinto Andar SC
-- Atta
-- Benvi Mx
-- Benv Pt
+- `Quinto Andar SP`
+- `Quinto Andar MG`
+- `Quinto Andar SC`
+- `Atta`
+- `Benvi Mx`
+- `Benvi Pt`
 
 ### Outputs
 We fully load the following tables into the datalake Raw and Clean:
 
 - `active_employee_details`
-- `inactive_employee_details`
 
 ### Responsible Data Team
 For any questions or concerns about this DAG, please contact the Data Engineering team responsible.
