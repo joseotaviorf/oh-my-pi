@@ -1,0 +1,10 @@
+database_name: datalake_nps_reversion
+table_name: contract_people
+description: " "
+domain: Support and Service
+owner: vinicius.araujo@quintoandar.com.br
+columns:
+  sk_contract:
+    lineage:
+      - dw_quintoandar.fact_contract_people.sk_contract
+    description: Key assigned to a conract

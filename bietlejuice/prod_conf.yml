@@ -50,6 +50,7 @@ dags_out_of_pattern:
         "ebdb",
         "enrich_lost_listings",
         "enrich_marketing_costs_offline",
+        "enrich_nps_reversion",
         "gsheets.fintech",
         "gsheets.for_rent",
         "gsheets.for_sale",
