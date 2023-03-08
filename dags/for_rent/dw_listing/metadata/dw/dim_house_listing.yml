@@ -1,9 +1,8 @@
 database_name: dw_public
 table_name: dim_house_listing
-description: Information about property listings and some properties may be only available
-  for sale. Each line is a listing version.
+description: Information about property listings and some properties may be only available for sale. Each line is a listing version.
 domain: For Rent
-owner: E For Rent@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   sk_house_listing:
     lineage:
@@ -45,18 +44,20 @@ columns:
     - datalake_ebdb_listing.house_listing.status
     description: House listing status.
     categories:
-      aguardando_publicacao: ''
-      alugado: ''
-      despublicado: ''
-      edicao: ''
-      edicaoSemUsuario: ''
-      edicaoUsuarioNaoConfirmado: ''
-      excluido: ''
-      publicado: ''
-      suspenso: ''
+      aguardando_publicacao: Waiting publication
+      alugado: Rented
+      despublicado: Unpublished. If this house is published again in up to 12 weeks, the
+        listing will have the same sk_house_listing. Otherwise, it will have a new sk_house_listing.
+      edicao: Editing
+      edicaoSemUsuario: No user editing
+      edicaoUsuarioNaoConfirmado: Unconfirmed user editing
+      excluido: Deleted
+      publicado: Published
+      suspenso: Suspended
   is_keys_with_agent_eligible:
     lineage:
     - datalake_ebdb_listing.agents_with_keys.is_keys_with_agent_eligible
+    description: Boolean indicating if this house is eligible to have keys with agent. 
   ts_listing_version_start:
     lineage:
     - datalake_ebdb_listing.house_listing.ts_listing_version_start
@@ -158,20 +159,17 @@ columns:
     - datalake_ebdb_listing.house.status
     description: Current house status.
     categories:
-      aguardando_publicacao: ''
-      alugado: ''
-      despublicado: Unpublished - when the house listing has been removed after some
-        period published. If this house is published again in up to 12 weeks, the
-        listing will have the same sk_house_listing. If this house is published again
-        after 12 weeks, the listing will have a new sk_house_listing, but attached
-        to the same house_id.
-      edicao: ''
-      edicaoSemUsuario: ''
-      edicaoUsuarioNaoConfirmado: ''
+      aguardando_publicacao: Waiting publication
+      alugado: Rented
+      despublicado: Unpublished. If this house is published again in up to 12 weeks, the
+        listing will have the same sk_house_listing. Otherwise, it will have a new sk_house_listing.
+      edicao: Editing
+      edicaoSemUsuario: No user editing
+      edicaoUsuarioNaoConfirmado: Unconfirmed user editing
       excluido: Excluded - when the house listing has been removed when it was in
         the "edicao" status (no photos).
-      publicado: ''
-      suspenso: ''
+      publicado: Published
+      suspenso: Suspended
   house_type:
     lineage:
     - datalake_ebdb_listing.house.type
@@ -251,53 +249,53 @@ columns:
     - datalake_ebdb_listing.house.registration_abandoned_reason
     description: Reason why the registration was abandoned.
     categories:
-      HOUSE_ALREADY_PUBLISHED: ''
-      HOUSE_PRICE_WAS_OUT_OF_BOUNDS: ''
-      HOUSE_WAS_A_BUSINESS_REAL_ESTATE: ''
-      HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS: ''
-      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS: ''
-      HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: ''
-      HOUSE_WAS_SOLD: ''
-      ISSUES_WITH_HOUSE_DOCUMENTATION: ''
-      OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH: ''
-      OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH: ''
-      OWNER_DIDNT_ACCEPT_ONLINE_PROCESS: ''
-      OWNER_DIDNT_ANSWER_PHONE: ''
-      OWNER_DIDNT_WANT_ADMINISTRATION: ''
-      OWNER_DIDNT_WANT_TO_LIST_ON_QUINTOANDAR: ''
-      OWNER_DISAGREE_CHARGES_PAYMENTS: ''
-      OWNER_GAVE_UP_RENTING: ''
-      OWNER_HAD_NEGATIVE_PHOTOGRAPHER_EXPERIENCE: ''
-      OWNER_RENTED_EXTERNALLY: ''
+      HOUSE_ALREADY_PUBLISHED: House is already published
+      HOUSE_PRICE_WAS_OUT_OF_BOUNDS: House price was out of bounds
+      HOUSE_WAS_A_BUSINESS_REAL_ESTATE: House was a business real estate
+      HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS: House was out of apartment renting regions
+      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS: House was out of house renting regions
+      HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: House was out of house sale regions
+      HOUSE_WAS_SOLD: House was sold
+      ISSUES_WITH_HOUSE_DOCUMENTATION: Issues with house documentation
+      OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH: Owner considered administration fee too high
+      OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH: Owner considered brokerage fee too high
+      OWNER_DIDNT_ACCEPT_ONLINE_PROCESS: Owner didn't accept online process
+      OWNER_DIDNT_ANSWER_PHONE: Owner didn't answer phone
+      OWNER_DIDNT_WANT_ADMINISTRATION: Owner didn't want administration
+      OWNER_DIDNT_WANT_TO_LIST_ON_QUINTOANDAR: Owner didn't want to list on Quinto Andar
+      OWNER_DISAGREE_CHARGES_PAYMENTS: Owner disagree with charges payment
+      OWNER_GAVE_UP_RENTING: Owner gave up renting
+      OWNER_HAD_NEGATIVE_PHOTOGRAPHER_EXPERIENCE: Owner had negative photographer experience
+      OWNER_RENTED_EXTERNALLY: Owner rented externally
   house_unpublished_reason:
     lineage:
     - datalake_ebdb_listing.house.unpublished_reason
     description: House listing unpublishing reason (UNKNOWN_NULL_VALUE = null in EBDB
       /  OTHER = does not fit to any pre-defined category).
     categories:
-      AUTO_CONTRACT_END_DEPUBLICATION: ''
-      AUTO_OWNER_CONFIRMED_UNAVAILABILITY: ''
-      AUTO_OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED: ''
-      DUPLICATED_HOUSE: ''
-      HOUSE_NOT_AVAILABLE: ''
-      HOUSE_NOT_REACHABLE: ''
-      OTHER: ''
-      OWNER_ALREADY_SOLD_HOUSE: ''
-      OWNER_CONSEQUENCES_MANAGEMENT: ''
-      OWNER_DOESNT_AGREE: ''
-      OWNER_GAVE_UP_RENTING: ''
-      OWNER_GAVE_UP_SALE: ''
+      AUTO_CONTRACT_END_DEPUBLICATION: AUTO_CONTRACT_END_DEPUBLICATION
+      AUTO_OWNER_CONFIRMED_UNAVAILABILITY: AUTO_OWNER_CONFIRMED_UNAVAILABILITY
+      AUTO_OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED: AUTO_OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED
+      DUPLICATED_HOUSE: Duplicated house
+      HOUSE_NOT_AVAILABLE: House not available
+      HOUSE_NOT_REACHABLE: House not reachable
+      OTHER: Other
+      OWNER_ALREADY_SOLD_HOUSE: Owner already sold the house
+      OWNER_CONSEQUENCES_MANAGEMENT: Owner consequences management
+      OWNER_DOESNT_AGREE: Owner does't agree
+      OWNER_GAVE_UP_RENTING: Owner gave up renting
+      OWNER_GAVE_UP_SALE: Owner gave up sale
       OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED: A house is unpublished after the owner
         doesn't answer 3 proposals within the deadline for responding/sending documents
-      OWNER_OTHER: ''
-      OWNER_RENTED_HOUSE: '#N/A'
-      OWNER_RENTING_DIRECT_WITH_TENANT: ''
-      OWNER_RENTING_FOR_SHORT_PERIOD: ''
-      OWNER_RENTING_WITH_OTHER_COMPANY: ''
-      OWNER_REQUESTED_TERMINATION: '#N/A'
-      OWNER_SELLING_HOUSE: ''
-      REMOVED_FROM_CONTEXT_BEFORE_PUBLISHING: ''
-      UNKNOWN_NULL_VALUE: ''
+      OWNER_OTHER: Other reason presented by owner
+      OWNER_RENTED_HOUSE: Owner rented the house
+      OWNER_RENTING_DIRECT_WITH_TENANT: Owner is renting directly with tenant
+      OWNER_RENTING_FOR_SHORT_PERIOD: Owner is renting for short period
+      OWNER_RENTING_WITH_OTHER_COMPANY: Owner is renting with other company
+      OWNER_REQUESTED_TERMINATION: Owner requested termination
+      OWNER_SELLING_HOUSE: Owner is selling the house
+      REMOVED_FROM_CONTEXT_BEFORE_PUBLISHING: Removed from context before publishing
+      UNKNOWN_NULL_VALUE: Unknown or null value
   partner_3p_supply:
     lineage:
     - datalake_ebdb_listing.house.partner_3p_supply
@@ -307,9 +305,9 @@ columns:
     - datalake_ebdb_listing.house_listing.listing_category
     description: Category that house listing started as.
     categories:
-      First Listing: ''
-      Re-Listing: ''
-      Recovered: ''
+      First Listing: The house is being listed for the first time
+      Re-Listing: Has had a previous listing
+      Recovered: Has had a previous listing and is being listed again after more than 84 days of being unpublished
   is_last_version:
     lineage:
     - datalake_ebdb_listing.house_listing.is_last_version
@@ -323,30 +321,30 @@ columns:
     - datalake_ebdb_listing.house_listing.who_is_living
     description: Who is living in this house listing.
     categories:
-      Empty: ''
-      None: ''
-      Owner: ''
-      Tenant: ''
+      Empty: The house is empty
+      None: Unknown
+      Owner: Owner is living
+      Tenant: Tenant is living
   key_type:
     lineage:
     - datalake_ebdb_listing.house.key_type
     description: What type of key is necessary to access the house.
     categories:
-      Biometry: ''
-      Common: ''
-      None: ''
-      Password: ''
+      Biometry: Biometry
+      Common: Regular key
+      None: Unknown
+      Password: Password
   key_location:
     lineage:
     - datalake_ebdb_listing.house.key_location
     description: Where the key is located.
     categories:
-      FrontDoor: ''
-      KeysLocker: ''
-      LockBox: ''
-      None: ''
-      OwnerPresent: ''
-      Password: ''
+      FrontDoor: Front door
+      KeysLocker: Keys Locker
+      LockBox: Lockbox
+      None: Unknown
+      OwnerPresent: Owner present
+      Password: Password
   house_predicted_price:
     lineage:
     - datalake_ebdb_listing.house.predicted_price
@@ -410,8 +408,8 @@ columns:
     description: Whether the listing is or was OriginalsReady, OriginalsReno or neither
       of them (null).
     categories:
-      OriginalsReady: ''
-      OriginalsReno: ''
+      OriginalsReady: OriginalsReady type
+      OriginalsReno: OriginalsReno type
   dt_consultant_started:
     lineage:
     - datalake_big_agent.house_rent_listing_consultant.dt_consultant_started
@@ -434,8 +432,8 @@ columns:
     - datalake_ebdb_listing.house_listing.last_iorent_type
     description: Whether the listing is or was IRent, ORent or neither of them (null).
     categories:
-      IRent: ''
-      ORent: ''
+      IRent: IRent type
+      ORent: ORent type
   dt_last_iorent_opted_in:
     lineage:
     - datalake_ebdb_listing.house_listing.dt_last_iorent_opted_in
@@ -469,17 +467,16 @@ columns:
     description: Case it's a b2b prime listing, it says whether it's standard, batch
       or advanced negotiation.
     categories:
-      advanced_negotiation: ''
-      batch: ''
-      portability: ''
-      standard: ''
+      advanced_negotiation: Advanced negotiation
+      batch: Batch
+      portability: Portability
+      standard: Standard
   b2b_type:
     description: Case is_b2b columns is true, it says whether the listing is b2b prime
-      or online. If it's null, then the listing is from a inactive partner or it's
-      not from b2b.
+      or online. If it's null, then the listing is from a inactive partner or it's not from b2b.
     categories:
-      online: ''
-      prime: ''
+      online: Online type
+      prime: Prime type
   has_visit_restriction:
     description: Is house listing with restriction.
   is_b2b:
