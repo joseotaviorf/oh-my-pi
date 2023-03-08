@@ -1,22 +1,45 @@
 ---
 database_name: datalake_ebdb_listing
 table_name: lbc_status_version_order
+description: Information related to ForRent listings. Each line represent a state of a house in time and identify the states that should trigger a new listing version.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_house:
     lineage:
       - datalake_ebdb_listing.business_context_history.id_house
+    description: Id of the house.
   country_code:
     lineage:
       - datalake_ebdb_listing.business_context_history.country_code
+    description: Country code of the house.
+  days_in_state:
+    description: Number of days in this specific state, characterized by a combination of status and status_reason.
+  days_in_status:
+    description: Number of days in this specific status.
+  listing_version:
+    description: Number of the listing version.
+  max_state_order:
+    description: Number of states registered of this house.
+  state_order:
+    description: Position of this particular state in the house history.
   status:
     lineage:
       - datalake_ebdb_listing.business_context_history.status
+    description: Status of the house in that specific time period.
   status_reason:
     lineage:
       - datalake_ebdb_listing.business_context_history.status_reason
+    description: Status reason of the house in that specific time period.
+  trigger_new_version:
+    description: Number indicating if this state should trigger a new version (1 if it should and 0 if not).
+  is_first_status:
+    description: Boolean indicating if this is the first status registered of the house.
   ts_state_started:
     lineage:
       - datalake_ebdb_listing.business_context_history.ts_state_started
+    description: Timestamp when this house state started, characterized by a combination of status and status_reason.
   ts_state_ended:
     lineage:
       - datalake_ebdb_listing.business_context_history.ts_state_ended
+    description: Timestamp when this house state ended, characterized by a combination of status and status_reason.

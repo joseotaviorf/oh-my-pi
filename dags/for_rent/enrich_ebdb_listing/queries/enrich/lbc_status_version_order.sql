@@ -22,7 +22,16 @@ business_context_history AS (
         bch.status,
         bch.status_reason,
         bch.suspension_reason,
-        CAST((CAST(CAST(COALESCE(bch.ts_state_ended, now()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_in_state,
+        CAST((CAST(CAST(COALESCE(bch.ts_state_ended, now()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_in_state, 
+        IF(
+          status = LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started),
+          LAG(
+              CAST((CAST(CAST(COALESCE(bch.ts_state_ended, now()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
+          ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) 
+          +
+          CAST((CAST(CAST(COALESCE(bch.ts_state_ended, now()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER),
+          CAST((CAST(CAST(COALESCE(bch.ts_state_ended, now()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
+        ) AS days_in_status,
         LEAD(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS next_status,
         LEAD(bch.status_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS next_status_reason,
         LEAD(bch.suspension_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS next_suspension_reason,
@@ -39,123 +48,101 @@ business_context_history AS (
         ON h_aud.id_house = bch.id_house
     WHERE
         bch.business_context = 'RENT'
-)
-SELECT 
+),
+trigger AS (
+  SELECT
     id_house,
     country_code,
     status,
     status_reason,
     ts_state_started,
-    ts_state_ended,
-    days_in_state, 
-    IF(previous_status IS NULL, TRUE, FALSE) AS is_first_status,
     IF(
         ( --First Listing
             (
-                status = 'PUBLISHED'
+                bch.status = 'PUBLISHED'
                 AND
-                is_previous_first_status IS TRUE
+                bch.is_previous_first_status IS TRUE
                 AND 
-                previous_status <> 'EDITING'
+                bch.previous_status <> 'EDITING'
             )
             OR
             (
-                status = 'EDITING'
+                bch.status = 'EDITING'
                 AND
-                next_status = 'PUBLISHED'
+                bch.next_status = 'PUBLISHED'
             )
             OR
             (
-                status = 'PUBLISHED'
+                bch.status = 'PUBLISHED'
                 AND
-                previous_status IS NULL
+                bch.previous_status IS NULL
+            )
+            OR
+            (
+              bch.previous_status = 'EDITING'
+              AND
+              bch.status = 'UNPUBLISHED'
+              AND
+              bch.next_status = 'PUBLISHED'
             )
         )
         OR 
         ( --Recovered
-            next_status = 'PUBLISHED' 
-            AND status = 'UNPUBLISHED' 
-            AND days_in_state >= 84
+            bch.next_status = 'PUBLISHED' 
+            AND bch.status = 'UNPUBLISHED' 
+            AND bch.days_in_status >= 84
         )
         OR
         ( --Relisting
-            next_status = 'PUBLISHED'
-            AND (next_status_reason <> 'RELISTING' OR next_status_reason IS NULL) --Remove available_soon cases
-            AND status = 'SUSPENDED'
-            AND status_reason = 'RENTED'
+            bch.next_status = 'PUBLISHED'
+            AND (bch.next_status_reason <> 'RELISTING' OR bch.next_status_reason IS NULL) --Remove available_soon cases
+            AND bch.status = 'SUSPENDED'
+            AND bch.status_reason = 'RENTED'
         )
         OR
         ( --Relisting?
-            status = 'UNPUBLISHED'
-            AND next_status = 'PUBLISHED'
-            AND previous_status = 'SUSPENDED'
-            AND previous_status_reason = 'RENTED'
+            bch.status = 'UNPUBLISHED'
+            AND bch.next_status = 'PUBLISHED'
+            AND bch.previous_status = 'SUSPENDED'
+            AND bch.previous_status_reason = 'RENTED'
         )
         OR --Early demand
         (
-            next_status = 'PUBLISHED'
-            AND next_status_reason LIKE 'RELISTING_%'
+            bch.next_status = 'PUBLISHED'
+            AND bch.next_status_reason LIKE 'RELISTING_%'
         ),
         1,
         0
-    ) AS trigger_new_version,
+    ) AS trigger_new_version
+  FROM
+    business_context_history AS bch
+)
+SELECT 
+    bch.id_house,
+    bch.country_code,
+    bch.status,
+    bch.status_reason,
+    bch.ts_state_started,
+    bch.ts_state_ended,
+    bch.days_in_state, 
+    bch.days_in_status,
+    IF(bch.previous_status IS NULL, TRUE, FALSE) AS is_first_status,
+    t.trigger_new_version,
     COALESCE(
         SUM(
-            IF(
-                ( --First Listing
-                    (
-                        status = 'PUBLISHED'
-                        AND
-                        is_previous_first_status IS TRUE
-                        AND 
-                        previous_status <> 'EDITING'
-                    )
-                    OR
-                    (
-                        status = 'EDITING'
-                        AND
-                        next_status = 'PUBLISHED'
-                    )
-                    OR
-                    (
-                        status = 'PUBLISHED'
-                        AND
-                        previous_status IS NULL
-                    )
-                )
-                OR 
-                ( --Recovered
-                    next_status = 'PUBLISHED' 
-                    AND status = 'UNPUBLISHED' 
-                    AND days_in_state >= 84
-                )
-                OR
-                ( --Relisting
-                    next_status = 'PUBLISHED'
-                    AND (next_status_reason <> 'RELISTING' OR next_status_reason IS NULL) --Vitrine
-                    AND status = 'SUSPENDED'
-                    AND status_reason = 'RENTED'
-                )
-                OR
-                ( --Relisting?
-                    status = 'UNPUBLISHED'
-                    AND next_status = 'PUBLISHED'
-                    AND previous_status = 'SUSPENDED'
-                    AND previous_status_reason = 'RENTED'
-                )
-                OR --Early demand
-                (
-                    next_status = 'PUBLISHED'
-                    AND next_status_reason LIKE 'RELISTING_%'
-                ),
-                1,
-                0
-            )
-        ) OVER (PARTITION BY id_house ORDER BY ts_state_started ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
-        , IF(previous_status IS NULL AND status = 'PUBLISHED', 1, 0)
+            t.trigger_new_version
+        ) OVER (PARTITION BY bch.id_house ORDER BY bch.ts_state_started ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+        , IF(bch.previous_status IS NULL AND bch.status = 'PUBLISHED', 1, 0)
         , 0
     ) AS listing_version,
-    state_order,
-    MAX(state_order) OVER(PARTITION BY id_house) AS max_state_order
+    bch.state_order,
+    MAX(bch.state_order) OVER(PARTITION BY bch.id_house) AS max_state_order
 FROM
-    business_context_history
+    business_context_history AS bch
+LEFT JOIN 
+  trigger AS t
+  ON t.id_house = bch.id_house
+    AND t.country_code = bch.country_code
+    AND t.status = bch.status
+    AND COALESCE(t.status_reason, '') = COALESCE(bch.status_reason, '')
+    AND t.ts_state_started = bch.ts_state_started
