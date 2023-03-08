@@ -4,8 +4,8 @@ WITH base_amplitude AS (
     id_user,
     NULL AS id_house,
     action,
-    IF(action='Active Search', date, NULL) AS active_search_date,
-    IF(action='TALK_TO_SECRETARY', date, NULL) AS secretary_action_date,
+    IF(action='Active Search', dt_event, NULL) AS active_search_date,
+    IF(action='TALK_TO_SECRETARY', dt_event, NULL) AS secretary_action_date,
     NULL AS agent_action_date,
     NULL AS buyer_action_date,
     dt_event,
@@ -20,9 +20,9 @@ hub_services_contact AS (
     NULL AS id_house,
     action,
     NULL AS active_search_date,
-    IF(action='SV contact TTS', date, NULL) AS secretary_action_date,
+    IF(action='SV contact TTS', dt_event, NULL) AS secretary_action_date,
     NULL AS agent_action_date,
-    IF(action='SV contact', date, NULL) AS buyer_action_date,
+    IF(action='SV contact', dt_event, NULL) AS buyer_action_date,
     dt_event,
     ts_event
   FROM
@@ -35,7 +35,7 @@ base_booking AS (
     id_house,
     CASE
       WHEN user_sale_booking_creator = 'Secretaria'
-        THEN 'Booking Secretaria'
+        THEN 'Booking Secretary'
       WHEN user_sale_booking_creator = 'Agent'
         THEN 'Booking Agent'
       WHEN user_sale_booking_creator = 'Buyer'
@@ -69,7 +69,7 @@ booking AS (
     id_house,
     action,
     active_search_date,
-    IF(action='Booking Secretaria', dt_event, NULL) AS secretary_action_date,
+    IF(action='Booking Secretary', dt_event, NULL) AS secretary_action_date,
     IF(action='Booking Agent', dt_event, NULL) AS agent_action_date,
     IF(action='Booking Buyer', dt_event, NULL) AS buyer_action_date,
     dt_event,
@@ -89,7 +89,7 @@ base_visit AS (
       WHEN status='Realizado' AND user_sale_booking_creator='Buyer'
         THEN 'Visit Cancelled by Buyer'
       WHEN status='Cancelado' AND user_sale_booking_creator='Secretaria'
-        THEN 'Visit Cancelled by Secretaria'
+        THEN 'Visit Cancelled by Secretary'
       WHEN status='Cancelado' AND user_sale_booking_creator='Agent'
         THEN 'Visit Cancelled by Agent'
       WHEN status='Cancelado' AND user_sale_booking_creator='Buyer'
