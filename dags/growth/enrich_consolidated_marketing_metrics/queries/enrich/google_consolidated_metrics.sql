@@ -240,13 +240,10 @@ videos_metrics AS (
         1,2,3,4,5,6,7,8
 )
 
-SELECT * FROM keywords_metrics
+SELECT * FROM keywords_metrics WHERE account_name NOT ILIKE '%mx%'
 UNION ALL
-SELECT *
-FROM ads_metrics
+SELECT * FROM ads_metrics WHERE account_name NOT ILIKE '%mx%'
 UNION ALL
-SELECT *
-FROM campaigns_metrics
+SELECT * FROM campaigns_metrics WHERE account_name NOT ILIKE '%mx%'
 UNION ALL
-SELECT *
-FROM videos_metrics
+SELECT * FROM videos_metrics WHERE account_name NOT ILIKE '%mx%'
