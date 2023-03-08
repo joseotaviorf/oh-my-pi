@@ -1449,6 +1449,12 @@ bietlejuice.enrich_mexico_braze_details:
   - bietlejuice.braze_details:load-clean-canvas-details-owners
   - bietlejuice.braze_details:load-clean-canvas-details-tenants
 
+bietlejuice.enrich_mexico_google_ads:
+  - bietlejuice.google_ads:load-clean-ads-performance
+  - bietlejuice.google_ads:load-clean-campaigns-performance
+  - bietlejuice.google_ads:load-clean-keywords-performance
+  - bietlejuice.google_ads:load-clean-videos-performance
+
 bietlejuice.enrich_betopera:
   - bietlejuice.betopera:load-clean-certificate
   - bietlejuice.betopera:load-clean-certificate-request
