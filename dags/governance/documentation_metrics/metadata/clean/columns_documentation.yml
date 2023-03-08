@@ -1,34 +1,47 @@
 ---
 database_name: datalake_documentation_metrics_clean
 table_name: columns_documentation
+owner: rafael.augusto@quintoandar.com.br
+domain: Data Ops & Governance
+description: Provides documentation info about each column we have in the data-documentation bucket
 columns:
   database_name:
+    description: The database name
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.database_name
   table_name:
+    description: The table name
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.table_name
   table_description:
+    description: The table description
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.table_description
   owner:
+    description: user who's responsible for the table
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.owner
   column_name:
+    description: the column name
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.column_name
   column_description:
+    description: the column description
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.column_description
   has_joins_with_column:
+    description: if the column has the joins with column field
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.has_joins_with_column
   year:
+    description: ingestion year
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.year
   month:
+    description: ingestion month
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.month
   day:
+    description: ingestion day
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.day

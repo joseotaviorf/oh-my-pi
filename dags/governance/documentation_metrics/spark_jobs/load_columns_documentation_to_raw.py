@@ -5,7 +5,6 @@ import yaml
 from datetime import datetime
 from argparse import ArgumentParser
 from pyspark.sql import Row
-from pyspark.sql.functions import explode_outer, map_keys, map_values
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -25,11 +24,13 @@ def get_documentation_from_bucket(bucket, prefix, spark_client):
     s3_client = boto3.client("s3")
     documentation_paths = get_documentation_paths_from_bucket(bucket, prefix, s3_client)
     documentation_contents = get_content_from_paths(
-        bucket, documentation_paths, s3_client
+        documentation_bucket, documentation_paths, s3_client
     )
-    documentation_df = create_dataframe_from_contents(
-        documentation_contents, spark_client
-    )
+    documentation_content = extract_rows_from_docs(documentation_contents)
+
+    # Creates df from documentation dict
+    documentation_df = spark_client.create_dataframe(Row(**doc) for doc in documentation_content)
+
     # reducing number of partitions
     documentation_df = documentation_df.coalesce(4)
 
@@ -49,8 +50,8 @@ def get_documentation_paths_from_bucket(bucket, prefix, s3_client):
         obj["Key"]
         for obj in bucket_objects
         if "documentation/" in obj["Key"]
-        and "/categories/" not in obj["Key"]
-        and "documentation/atlas/" not in obj["Key"]
+           and "/categories/" not in obj["Key"]
+           and "documentation/atlas/" not in obj["Key"]
     ]
 
     return documentation_paths
@@ -69,57 +70,52 @@ def get_content_from_paths(bucket, documentation_paths, s3_client):
     return documentation_contents
 
 
-def reformat_new_schema_to_old_schema(doc):
+def extract_rows_from_docs(docs):
     """
-    The old documentation schema uses a list of dicts for columns
-    The new documentation schema uses a dict of dicts for columns
-    This method turns a dict of dicts into a list of dicts to keep compatibility between old and new schema
+    flattens the content of the documentation files to a list of dicts, each representing a
+    row of the columns_documentation table
     """
-    new_doc = {}
-    if type(doc['columns']) is dict:
-        new_doc['columns'] = [{key: doc['columns'][key]} for key in doc['columns']]
-    elif type(doc['columns']) is list:
-        new_doc['columns'] = doc['columns']
+    rows = []
+    for doc in docs:
+        doc_description = doc.get('description')
+        doc_owner = doc.get('owner')
+        doc_database_name = doc.get('database_name')
+        doc_table_name = doc.get('name') or doc.get('table_name')
+        columns = doc.get('columns')
+        if columns:
+            if type(columns) is list:
+                # legacy schema
+                for column in columns:
+                    column_name = list(column.keys())[0]
+                    column_description = column[column_name].get('description')
+                    column_joins_with = column[column_name].get('joins_with_column')
+                    rows.append({
+                        "database_name": doc_database_name,
+                        "table_name": doc_table_name,
+                        "owner": doc_owner,
+                        "table_description": doc_description,
+                        "column_name": column_name,
+                        "column_description": column_description,
+                        "joins_with_column": column_joins_with
+                    })
+            elif type(columns) is dict:
+                # new schema
+                for column_name, column_values in columns.items():
+                    column_description = column_values.get('description')
+                    column_joins_with = column_values.get('joins_with_column')
+                    rows.append({
+                        "database_name": doc_database_name,
+                        "table_name": doc_table_name,
+                        "owner": doc_owner,
+                        "table_description": doc_description,
+                        "column_name": column_name,
+                        "column_description": column_description,
+                        "joins_with_column": column_joins_with
+                    })
+        else:
+            continue
 
-    new_doc['description'] = doc.get('description')
-    new_doc['owner'] = doc.get('owner')
-    new_doc['database_name'] = doc.get('database_name')
-    new_doc['table_name'] = doc.get('name') or doc.get('table_name')
-    return new_doc
-
-
-def create_dataframe_from_contents(documentation_contents, spark_client):
-    # convert content from new metadata files to old format
-    docs = [reformat_new_schema_to_old_schema(doc) for doc in documentation_contents]
-
-    # Creates df from documentation dict
-    documentation_df = spark_client.create_dataframe(Row(**doc) for doc in docs)
-
-    # Explodes field containing all the table's columns in distinct rows
-    documentation_df = documentation_df.withColumn(
-        "column", explode_outer(documentation_df["columns"])
-    )
-
-    # Separates the column's name from its documentation fields
-    documentation_df = documentation_df.withColumn(
-        "column_name", map_keys(documentation_df["column"])[0]
-    ).withColumn("column_doc", map_values(documentation_df["column"])[0])
-
-    documentation_df = (
-        documentation_df.withColumn(
-            "column_description", documentation_df.column_doc["description"]
-        )
-        .withColumn(
-            "joins_with_column", documentation_df.column_doc["joins_with_column"]
-        )
-        .withColumnRenamed("description", "table_description")
-        .withColumnRenamed("name", "table_name")
-        .drop("columns")
-        .drop("column")
-        .drop("column_doc")
-    )
-
-    return documentation_df
+    return rows
 
 
 if __name__ == "__main__":
@@ -160,16 +156,14 @@ if __name__ == "__main__":
     database_name = datalake_info["db_raw_databricks"]
     spark_metastore_service.create_database(database_name)
 
-    # Creating metrics dataframe
-    documentation_df = get_documentation_from_bucket(
-        documentation_bucket, documentation_prefix, spark_client
-    )
+    documentation_df = get_documentation_from_bucket(documentation_bucket, documentation_prefix, spark_client)
+
     documentation_df = (
         SparkDataFrameService()
-        .input(documentation_df)
-        .create_year_month_day_columns_from_date(execution_date)
-        .optimize_partitions_by_partition_columns(partition_cols)
-        .output()
+            .input(documentation_df)
+            .create_year_month_day_columns_from_date(execution_date)
+            .optimize_partitions_by_partition_columns(partition_cols)
+            .output()
     )
 
     # loaders
