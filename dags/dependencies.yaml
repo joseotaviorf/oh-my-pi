@@ -2159,7 +2159,6 @@ bietlejuice.enrich_nps_reversion:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-segment
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
-  - bietlejuice.dw_listing_jobs:load-public-fact-inspection
   - bietlejuice.dw_listing_jobs:load-public-fact-inspection-bookings
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
