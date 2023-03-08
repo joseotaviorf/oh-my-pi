@@ -9,9 +9,10 @@ WITH business_context_operation AS (
         1
 )
 SELECT
-    CAST(COALESCE(r.id, ar.id) AS BIGINT) AS id,
+    CAST(r.id AS BIGINT) AS id,
     c.id AS id_city,
     mr.id AS id_macro_region,
+    COALESCE(r.id_state, mr.id_state, c.id_state) AS id_state,
     CAST(st.id_country AS INTEGER) AS id_country,
     ct.code AS country_code,
     r.level,

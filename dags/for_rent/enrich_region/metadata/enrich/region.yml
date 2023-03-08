@@ -7,7 +7,6 @@ columns:
   id:
     lineage:
     - datalake_ebdb_clean.region.id
-    - datalake_gsheets_clean.auxiliary_region.id
     description: Unique id that identifies the region.
   id_city:
     lineage:
@@ -17,6 +16,10 @@ columns:
     lineage:
     - datalake_ebdb_clean.region.id
     description: Macro region id of the region.
+  id_state:
+    lineage:
+      - datalake_ebdb_clean.region.id_state
+    description: Id of the region's state. It only comes from the region (itself or associated) that is at level = Cidade (city).
   id_country:
     lineage:
     - datalake_ebdb_clean.state.id_country
