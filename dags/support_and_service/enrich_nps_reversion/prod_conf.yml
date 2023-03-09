@@ -1,3 +1,5 @@
+input_partitions: ["dt_termination_request"]
+
 offboarding_tenant_input_table_name: offboarding_tenant_input
 offboarding_tenant_output_table_name: offboarding_tenant_predictions
 offboarding_tenant_model_filename: /dbfs/FileStore/models/nps_reversion/offboarding/tenant/nps_reversion_off_tenant_reglog_v0.pkl
@@ -62,7 +64,6 @@ offboarding_landlord_input_columns:
     ]
 
 offboarding_input_query: SELECT * FROM datalake_nps_reversion.{table_name} WHERE dt_termination_request = CAST('{execution_date}' AS DATE)
-offboarding_input_partitions: ["dt_termination_request"]
 model_output_column: ["model_output"]
 model_predicted_date_column: ["dt_predicted"]
 output_partitions: ["dt_prediction"]

@@ -144,7 +144,7 @@ SELECT DISTINCT
     sk_user,
     model_name,
     model_version,
-    dt_reference,
+    dt_reference AS dt_termination_request,
     ts_tickets_search_range_max,
     ts_tickets_search_range_min
 FROM
@@ -155,7 +155,7 @@ SELECT DISTINCT
     sk_user,
     model_name,
     model_version,
-    dt_reference,
+    dt_reference AS dt_termination_request,
     ts_tickets_search_range_max,
     ts_tickets_search_range_min
 FROM

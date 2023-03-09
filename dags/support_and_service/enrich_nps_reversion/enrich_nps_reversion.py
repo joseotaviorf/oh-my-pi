@@ -50,7 +50,7 @@ output_landlord_table_name = config_service.get_config(
 slugged_landlord_table_name = StringFormatter.slugify(output_landlord_table_name)
 enrich_landlord_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}/load_nps_reversion_landlord_enrich.py"
 
-partitions = config_service.get_config("offboarding_input_partitions")
+partitions = config_service.get_config("input_partitions")
 cluster_configuration = config_service.get_config("databricks_10_4_med_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
 custom_libraries = config_service.get_config("custom_libraries")

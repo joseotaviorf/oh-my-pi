@@ -1,6 +1,5 @@
 import pickle
 from datetime import datetime
-import pandas as pd
 
 from quintoandar_logger import QuintoAndarLogger
 from argparse import ArgumentParser
@@ -36,15 +35,23 @@ if __name__ == "__main__":
     execution_date = args.execution_date
 
     config_service = ConfigurationService(f"enrich_{source}")
-    output_table_name = config_service.get_config("offboarding_landlord_output_table_name")
-    input_table_name = config_service.get_config("offboarding_landlord_input_table_name")
+    output_table_name = config_service.get_config(
+        "offboarding_landlord_output_table_name"
+    )
+    input_table_name = config_service.get_config(
+        "offboarding_landlord_input_table_name"
+    )
     partition_cols = config_service.get_config("output_partitions")
     model_filename = config_service.get_config("offboarding_landlord_model_filename")
     input_query = config_service.get_config("offboarding_input_query")
-    input_query_columns = config_service.get_config("offboarding_landlord_input_columns")
+    input_query_columns = config_service.get_config(
+        "offboarding_landlord_input_columns"
+    )
     model_output_column = config_service.get_config("model_output_column")
-    model_predicted_date_column = config_service.get_config("model_predicted_date_column")
-    offboarding_landlord_output_columns = config_service.get_config("offboarding_landlord_output_columns")
+    model_predicted_date_column = config_service.get_config(
+        "model_predicted_date_column"
+    )
+    offboarding_output_columns = config_service.get_config("offboarding_output_columns")
 
     logger.info(
         f"""m=__main__, environment={env}, source={source}, context={context},
@@ -63,12 +70,18 @@ if __name__ == "__main__":
 
     rf = pickle.load(open(model_filename, "rb"))
 
-    input_query = input_query.format(table_name=input_table_name, execution_date=execution_date)
+    input_query = input_query.format(
+        table_name=input_table_name, execution_date=execution_date
+    )
     df_predict = spark_client.conn.sql(input_query).toPandas()
 
-    df_predict[model_output_column] = rf.predict_proba(df_predict[input_query_columns])[:,1]
-    df_predict[model_predicted_date_column] = datetime.strptime(execution_date, "%Y-%m-%d").date()
-    df_predict = df_predict[offboarding_landlord_output_columns]
+    df_predict[model_output_column] = rf.predict_proba(df_predict[input_query_columns])[
+        :, 1
+    ]
+    df_predict[model_predicted_date_column] = datetime.strptime(
+        execution_date, "%Y-%m-%d"
+    ).date()
+    df_predict = df_predict[offboarding_output_columns]
     df = spark_client.create_dataframe(df_predict)
 
     s3_loader = S3Loader()
