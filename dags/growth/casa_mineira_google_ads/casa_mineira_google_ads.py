@@ -105,6 +105,7 @@ for report_type in REPORTS_LIST:
             "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
             report_type,
         ],
+        has_hive_sync=False,
     )
 
     clean_task_group = datalake_task_group.build_clean_task_group(
