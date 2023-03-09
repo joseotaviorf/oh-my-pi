@@ -1,0 +1,2 @@
+---
+partition_cols: ["id_date"]
