@@ -35,47 +35,36 @@ cte_recurrent AS (
 ),
 cte_renegotiated AS (
     SELECT
-        n.`id` as id_negotiation,
-        BOOLEAN(SUM(CASE WHEN b.status = 'offset' THEN 1 ELSE 0 END)) AS renegotiated
+        d.id_negotiation,
+        BOOLEAN(SUM(IF(ac.id IS NOT NULL, 1, 0))) AS renegotiated
     FROM
-        datalake_trato_feito_clean.negotiation AS n
+        datalake_trato_feito_clean.debt AS d
     LEFT JOIN
-        datalake_trato_feito_clean.installment AS i
-            ON n.id = i.id_negotiation
-    LEFT JOIN
-        datalake_trato_feito_clean.bill AS b
-            ON i.id_bill = b.id
+        datalake_trato_feito_clean.accounting_installment AS ac
+            ON ac.id_external = d.id_external
     GROUP BY 1
 ),
 cte_breach AS (
     WITH cte_ts_breach AS (
         SELECT
             n.`id` as id_negotiation,
-            MIN(b.ts_created) AS ts_breach
+            MIN(i.ts_expired) AS ts_breach
         FROM
             datalake_trato_feito_clean.negotiation AS n
         LEFT JOIN
             datalake_trato_feito_clean.installment AS i
                 ON n.id = i.id_negotiation
-        RIGHT JOIN
-            datalake_trato_feito_clean.bill AS b
-                ON i.id_bill = b.id
         WHERE
-            b.status <> 'paid'
+            i.status <> 'paid'
         GROUP BY 1
     ),
     cte_installment_order AS (
         SELECT
             i.id_negotiation,
-            i.id,
-            i.dt_due,
             ROW_NUMBER() OVER(PARTITION BY i.id_negotiation ORDER BY i.dt_due ASC) AS installment_number,
-            b.ts_created
+            i.ts_expired
         FROM
             datalake_trato_feito_clean.installment AS i
-        LEFT JOIN
-            datalake_trato_feito_clean.bill AS b
-                ON i.id_bill = b.id
     )
     SELECT
         cb.id_negotiation,
@@ -86,7 +75,7 @@ cte_breach AS (
     LEFT JOIN
         cte_installment_order AS co
             ON cb.id_negotiation = co.id_negotiation
-            AND cb.ts_breach = co.ts_created
+            AND cb.ts_breach = co.ts_expired
 ),
 cte_debts AS (
     SELECT

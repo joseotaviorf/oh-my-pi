@@ -28,7 +28,6 @@ SELECT
     cp.id,
     cp.id_external,
     cp.id_negotiation,
-    cp.id_bill,
     cp.status,
     cp.adm_fee_amount,
     cp.installment_fee_amount,
@@ -39,6 +38,7 @@ SELECT
     cpu.purpose,
     cp.dt_due,
     cp.ts_paid_diff as ts_paid_difference,
+    cp.ts_expired,
     cp.ts_created,
     cp.ts_updated,
     cp.ts_payment_updated AS ts_paid

@@ -45,6 +45,10 @@ columns:
     description: "Date Due"
     lineage:
       - datalake_trato_feito_raw.installment.due_date
+  ts_expired:
+    description: "Timestamp of expiration"
+    lineage:
+      - datalake_trato_feito_raw.installment.expired_at
   ts_created:
     description: "Timestamp of creation"
     lineage:

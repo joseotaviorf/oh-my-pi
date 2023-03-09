@@ -1,16 +1,23 @@
 ---
 database_name: datalake_debt_recovery
 table_name: negotiation
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: "Enrich table focused on Negotiation context for Debt Recovery"
 columns:
-  id_contract:
-    lineage:
-      - datalake_trato_feito_clean.negotiation.id_debtor_external
   id_negotiation:
+    description: "Negotiation unique ID"
     lineage:
       - datalake_trato_feito_clean.negotiation.id
+  id_contract:
+    description: "Contract unique ID"
+    lineage:
+      - datalake_trato_feito_clean.negotiation.id_debtor_external
   status:
+    description: "Status of the negotiation"
     lineage:
       - datalake_trato_feito_clean.negotiation.status
   ts_created_at:
+    description: "Timestamp for when negotiation was created"
     lineage:
       - datalake_trato_feito_clean.negotiation.ts_created

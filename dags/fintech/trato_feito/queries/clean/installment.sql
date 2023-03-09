@@ -9,6 +9,7 @@ SELECT
     discount_amount,
     total_amount,
     due_date AS dt_due,
+    expired_at AS ts_expired,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

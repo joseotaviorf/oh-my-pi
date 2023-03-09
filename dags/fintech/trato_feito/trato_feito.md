@@ -15,7 +15,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Load the following tables into the datalake clean (via full load):
 
 - `accounting_installment`
-- `bill`
 - `collector`
 - `debt`
 - `debtor`
