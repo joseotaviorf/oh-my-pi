@@ -1,7 +1,8 @@
 offboarding_tenant_input_table_name: offboarding_tenant_input
 offboarding_tenant_output_table_name: offboarding_tenant_predictions
 offboarding_tenant_model_filename: /dbfs/FileStore/models/nps_reversion/offboarding/tenant/nps_reversion_off_tenant_reglog_v0.pkl
-offboarding_tenant_input_columns: [
+offboarding_tenant_input_columns:
+    [
         "iq_first_contract",
         "total_tickets_especiais",
         "csat_disatisfied_jornada",
@@ -21,14 +22,15 @@ offboarding_tenant_input_columns: [
         "iq_nps_detrator_jornada",
         "complaint_tickets_jornada",
         "iq_nps_promotor_jornada",
-        "front_tickets_jornadav",
-        "reason_JOB_TRANSFER"
+        "front_tickets_jornada",
+        "reason_JOB_TRANSFER",
     ]
 
-offboarding_tenant_landlord_table_name: offboarding_landlord_input
+offboarding_landlord_input_table_name: offboarding_landlord_input
 offboarding_landlord_output_table_name: offboarding_landlord_predictions
 offboarding_landlord_model_filename: /dbfs/FileStore/models/nps_reversion/offboarding/landlord/nps_reversion_off_landlord_rf_v0.pkl
-offboarding_landlord_input_columns : [
+offboarding_landlord_input_columns:
+    [
         "has_one_year_fine",
         "utility_bill_in_condominium",
         "contract_lifetime",
@@ -56,15 +58,10 @@ offboarding_landlord_input_columns : [
         "prob_answer_nps",
         "last_nps_detractor",
         "is_apartment",
-        "perfect_state_condition"
+        "perfect_state_condition",
     ]
 
 offboarding_input_query: SELECT * FROM datalake_nps_reversion.{table_name} WHERE dt_termination_request = CAST('{execution_date}' AS DATE)
 offboarding_input_partitions: ["dt_termination_request"]
 output_partitions: ["dt_prediction"]
 custom_libraries: [{ pypi: { "package": "scikit-learn>=1.1.1" } }]
-
-
-
-
-

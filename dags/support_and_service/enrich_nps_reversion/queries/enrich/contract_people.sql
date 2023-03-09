@@ -4,7 +4,7 @@ WITH tenants AS (
         sk_user
     FROM
         dw_quintoandar.fact_contract_people
-    WHERE 
+    WHERE
         contract_role = 'tenant'
     UNION
     SELECT DISTINCT
@@ -12,8 +12,8 @@ WITH tenants AS (
         ft.sk_user
     FROM
         dw_customer_support.fact_ticket AS ft
-    LEFT JOIN 
-        dw_customer_support.dim_taxonomy AS dt 
+    LEFT JOIN
+        dw_customer_support.dim_taxonomy AS dt
             ON ft.sk_taxonomy = dt.sk_taxonomy
     WHERE
         sk_contract IS NOT NULL
@@ -21,7 +21,7 @@ WITH tenants AS (
 ),
 tenants_adjusted AS (
     SELECT
-        ct.id_contract,
+        ct.id_contract AS sk_contract,
         tenants.sk_user,
         DATE(ct.ts_created) AS dt_reference,
         'offboarding_tenant' AS model_name,
@@ -43,7 +43,7 @@ tenants_adjusted AS (
         AND sk_user <> -1
 ),
 people AS (
-    SELECT 
+    SELECT
         fcp.sk_contract,
         fcp.sk_contract_person,
         dcp.personal_document,
@@ -74,12 +74,12 @@ contract_people_togather AS (
     WHERE
         people.sk_user <> -1
     UNION ALL
-    SELECT 
+    SELECT
         people.sk_contract,
         people.sk_contract_person,
         cci.id_user AS sk_user,
         people.contract_role
-    FROM 
+    FROM
         people
     LEFT JOIN
         datalake_ebdb_customer_contact_identification.customer_contact_identification AS cci
@@ -88,12 +88,12 @@ contract_people_togather AS (
     WHERE
         people.sk_user = -1
     UNION ALL
-    SELECT 
+    SELECT
         people.sk_contract,
         people.sk_contract_person,
         cci.id_user AS sk_user,
         people.contract_role
-    FROM 
+    FROM
         people
     LEFT JOIN
         datalake_ebdb_customer_contact_identification.customer_contact_identification AS cci
@@ -102,30 +102,30 @@ contract_people_togather AS (
     WHERE
         people.sk_user = -1
     UNION ALL
-    SELECT 
+    SELECT
         people.sk_contract,
         people.sk_contract_person,
         cci.id_user AS sk_user,
         people.contract_role
-    FROM 
+    FROM
         people
     LEFT JOIN
         datalake_ebdb_customer_contact_identification.customer_contact_identification AS cci
             ON cci.customer_contact = people.phone_number
             AND cci.id_user IS NOT NULL
     WHERE
-        people.sk_user = -1   
+        people.sk_user = -1
 ),
 landlords AS (
-    SELECT DISTINCT 
-        clientes.sk_contract, 
-        clientes.sk_user,  
+    SELECT DISTINCT
+        clientes.sk_contract,
+        clientes.sk_user,
         DATE(ct.ts_created) AS dt_reference,
         'offboarding_landlord' AS model_name,
         'nps_reversion_off_landlord_rf_v0' AS model_version,
         dc.ts_created AS ts_tickets_search_range_min,
         ct.ts_created AS ts_tickets_search_range_max
-    FROM 
+    FROM
         datalake_offboarding.contract_termination AS ct
     LEFT JOIN
         contract_people_togather AS clientes
@@ -139,7 +139,7 @@ landlords AS (
         AND ct.status <> 'CANCELED'
         AND sk_user IS NOT NULL
 )
-SELECT DISTINCT 
+SELECT DISTINCT
     sk_contract,
     sk_user,
     model_name,
@@ -147,10 +147,10 @@ SELECT DISTINCT
     dt_reference,
     ts_tickets_search_range_max,
     ts_tickets_search_range_min
-FROM 
+FROM
     tenants_adjusted
-UNION ALL 
-SELECT DISTINCT 
+UNION ALL
+SELECT DISTINCT
     sk_contract,
     sk_user,
     model_name,
@@ -158,6 +158,5 @@ SELECT DISTINCT
     dt_reference,
     ts_tickets_search_range_max,
     ts_tickets_search_range_min
-FROM 
+FROM
     landlords
-
