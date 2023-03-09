@@ -22,7 +22,16 @@ WITH amplitude_active_search AS (
       AND lpv.month = apf.month
       AND lpv.day = apf.day
   WHERE
-      NULLIF(srp.id_user, '') IS NOT NULL
+      srp.year = {year}
+      AND apf.year = {year}
+      AND lpv.year = {year}
+      AND srp.month = {month}
+      AND apf.month = {month}
+      AND lpv.month = {month}
+      AND srp.day = {day}
+      AND apf.day = {day}
+      AND lpv.day = {day}
+      AND NULLIF(srp.id_user, '') IS NOT NULL
       AND LOWER(GET_JSON_OBJECT(srp.event_properties, '$.business_context')) = 'sale'
 ),
 amplitude_sale_tts_events AS (
@@ -37,7 +46,10 @@ amplitude_sale_tts_events AS (
   FROM
     datalake_amplitude_clean.170698_tts_success_page_viewed_events AS tts
   WHERE
-    NULLIF(tts.id_user, '') IS NOT NULL
+    year = {year}
+    AND month = {month}
+    AND day = {day}
+    AND NULLIF(tts.id_user, '') IS NOT NULL
     AND LOWER(GET_JSON_OBJECT(tts.event_properties, '$.business_context')) = 'sale'
 ),
 union_base AS (
@@ -78,7 +90,3 @@ SELECT
   day
 FROM
   union_base
-WHERE
-  year = {year}
-  AND month = {month}
-  AND day = {day}
