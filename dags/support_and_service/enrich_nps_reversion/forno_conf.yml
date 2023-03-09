@@ -64,8 +64,8 @@ offboarding_landlord_input_columns:
     ]
 
 offboarding_input_query: SELECT * FROM datalake_nps_reversion.{table_name} WHERE dt_termination_request = CAST('{execution_date}' AS DATE)
-model_output_column: ["model_output"]
-model_predicted_date_column: ["dt_predicted"]
+model_output_column: "model_output"
+model_predicted_date_column: "dt_predicted"
 output_partitions: ["dt_prediction"]
 custom_libraries: [{ pypi: { "package": "scikit-learn>=1.1.1" } }]
 offboarding_output_columns:

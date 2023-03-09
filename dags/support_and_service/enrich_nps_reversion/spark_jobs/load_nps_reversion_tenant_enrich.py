@@ -1,8 +1,9 @@
 import pickle
+from argparse import ArgumentParser
 from datetime import datetime
 
+import pandas as pd
 from quintoandar_logger import QuintoAndarLogger
-from argparse import ArgumentParser
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
