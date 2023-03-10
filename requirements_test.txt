@@ -11,3 +11,4 @@ pytest==4.6.3
 pytest-cov==2.7.1
 pytest-html==1.22.0
 quintoandar-logger>=0.4.0
+responses<=0.22.0
