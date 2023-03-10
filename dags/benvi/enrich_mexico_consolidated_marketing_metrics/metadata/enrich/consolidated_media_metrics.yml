@@ -59,6 +59,11 @@ columns:
       - datalake_mexico_consolidated_marketing_metrics.facebook_consolidated_metrics.utm_content
       - datalake_mexico_consolidated_marketing_metrics.google_consolidated_metrics.utm_content
     description: The UTM content.
+  currency:
+    description: The currency abbreviation related to the source's cost.
+    categories:
+      MXN: Mexican peso.
+      USD: United States dollar.
   desktop_cost:
     lineage:
       - datalake_mexico_consolidated_marketing_metrics.facebook_consolidated_metrics.desktop_cost
