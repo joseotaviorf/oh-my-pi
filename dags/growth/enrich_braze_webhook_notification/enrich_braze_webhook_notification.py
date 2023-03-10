@@ -22,7 +22,7 @@ PARTITION_COLS = ["dt_webhook_sent"]
 MAIN_START_DATE = datetime(2022, 8, 17, tzinfo=timezone("America/Sao_Paulo"))
 
 config_service = ConfigurationService(DAG_NAME)
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config("databricks_10_4_med_general_photon_cluster")
 default_libraries = config_service.get_config("default_libraries")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")

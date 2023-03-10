@@ -22,7 +22,7 @@ DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2022, 10, 18, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_general_photon_cluster"
 PARTITION_COLS = ["year", "month", "day"]
 
 config_service = ConfigurationService(DAG_NAME)
