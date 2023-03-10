@@ -7,11 +7,11 @@ class ReverseMetastoreMapping(MetastoreMapping):
 
     def get_full_database_name(self, _: LayerEnum = None) -> str:
         """Following the pattern according to the layer and the source (given in the constructor), returns the full database name used in Spark."""
-        return f"reverse_{self.schema}"
+        return f"reverse_{self.source}"
 
     def get_full_database_path(self, _: LayerEnum = None):
         """Following the pattern according to the layer, source and bucket (given in the constructor), returns the full file path."""
-        return f"s3://{self.bucket}/reverse/{self.schema}/"
+        return f"s3://{self.bucket}/reverse/{self.source}/"
 
     def get_all_reverse_info(self):
         """
