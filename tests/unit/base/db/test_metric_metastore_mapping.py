@@ -10,7 +10,7 @@ class TestMetricMetastoreMapping:
 
         # act
         db_info = MetricMetastoreMapping(
-            bucket=metric_bucket, schema=schema
+            bucket=metric_bucket, source=schema
         ).get_metric_info()
 
         # assert

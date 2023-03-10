@@ -1,17 +1,17 @@
-class ReverseMetastoreMapping:
+from bietlejuice.base.db import MetastoreMapping
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+
+
+class ReverseMetastoreMapping(MetastoreMapping):
     """Reverse properties mapping for Hive Metastore."""
 
-    def __init__(self, schema, bucket):
-        """
-        Constructor.
+    def get_full_database_name(self, _: LayerEnum = None) -> str:
+        """Following the pattern according to the layer and the source (given in the constructor), returns the full database name used in Spark."""
+        return f"reverse_{self.schema}"
 
-        :param schema: the source name or context
-        :type schema: str
-        :param bucket: the data lake bucket name
-        :type bucket: str
-        """
-        self.schema = schema
-        self.bucket = bucket
+    def get_full_database_path(self, _: LayerEnum = None):
+        """Following the pattern according to the layer, source and bucket (given in the constructor), returns the full file path."""
+        return f"s3://{self.bucket}/reverse/{self.schema}/"
 
     def get_all_reverse_info(self):
         """
@@ -19,11 +19,9 @@ class ReverseMetastoreMapping:
 
         :rtype: dict
         """
-        database_name = {"reverse_schema_name": f"reverse_{self.schema}"}
+        database_name = {"reverse_schema_name": self.get_full_database_name()}
 
-        s3_file_path = {
-            "reverse_schema_path": f"s3://{self.bucket}/reverse/{self.schema}/"
-        }
+        s3_file_path = {"reverse_schema_path": self.get_full_database_path()}
 
         metastore_info = {}
         metastore_info.update(database_name)

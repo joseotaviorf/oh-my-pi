@@ -1,22 +1,28 @@
+from bietlejuice.base.db import MetastoreMapping
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 import re
 
 DW_DATABASE_PATTERN = re.compile("(?<=^dw_)(?P<schema>[\w|_]*?)(?:_staging)?$")
 
 
-class DwMetastoreMapping:
+class DwMetastoreMapping(MetastoreMapping):
     """DW properties mapping for Hive Metastore."""
 
-    def __init__(self, schema, bucket):
-        """
-        Constructor.
+    def get_full_database_name(self, layer: LayerEnum = None) -> str:
+        """Following the pattern according to the layer and the source (given in the constructor), returns the full database name used in Spark."""
+        database_info = DwMetastoreMapping.get_database_dw_info(self.source)
+        if layer == LayerEnum.DW:
+            return database_info["dw_schema_databricks"]
+        else:
+            return database_info["dw_staging_databricks"]
 
-        :param schema: the source name or context
-        :type schema: str
-        :param bucket: the data lake bucket name
-        :type bucket: str
-        """
-        self.schema = schema
-        self.bucket = bucket
+    def get_full_database_path(self, layer: LayerEnum = None):
+        """Following the pattern according to the layer, source and bucket (given in the constructor), returns the full file path."""
+        path_info = DwMetastoreMapping.get_path_dw_info(self.source, self.bucket)
+        if layer == LayerEnum.DW:
+            return path_info["dw_schema_path"]
+        else:
+            return path_info["dw_staging_path"]
 
     def get_all_dw_info(self):
         """
@@ -26,8 +32,8 @@ class DwMetastoreMapping:
         """
 
         metastore_info = {}
-        metastore_info.update(self.get_database_dw_info(self.schema))
-        metastore_info.update(self.get_path_dw_info(self.schema, self.bucket))
+        metastore_info.update(self.get_database_dw_info(self.source))
+        metastore_info.update(self.get_path_dw_info(self.source, self.bucket))
 
         return metastore_info
 

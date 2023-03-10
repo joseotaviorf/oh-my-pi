@@ -56,11 +56,11 @@ if __name__ == "__main__":
 
     if layer == LayerEnum.DW.value:
         dw_ms_mapping = DwMetastoreMapping(
-            schema=db_name_part, bucket=""
+            source=db_name_part, bucket=""
         ).get_all_dw_info()
         database_name = dw_ms_mapping["dw_schema_databricks"]
     elif layer == LayerEnum.METRIC.value:
-        metric_ms_mapping = MetricMetastoreMapping(schema=db_name_part, bucket="")
+        metric_ms_mapping = MetricMetastoreMapping(source=db_name_part, bucket="")
         database_name, _ = metric_ms_mapping.get_metric_info()
     else:
         dl_ms_mapping = DatalakeMetastoreMapping(source=db_name_part, bucket="")

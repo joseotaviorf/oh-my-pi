@@ -1,17 +1,27 @@
-class DatalakeMetastoreMapping:
+from bietlejuice.base.db import MetastoreMapping
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+
+
+class DatalakeMetastoreMapping(MetastoreMapping):
     """Datalake properties mapping for Hive Metastore."""
 
-    def __init__(self, source, bucket):
-        """
-        Constructor.
+    def get_full_database_name(self, layer: LayerEnum = None) -> str:
+        """Following the pattern according to the layer and the source (given in the constructor), returns the full database name used in Spark."""
+        return {
+            "raw": f"datalake_{self.source}_raw",
+            "clean": f"datalake_{self.source}_clean",
+            "clean_staging": f"datalake_{self.source}_clean_staging",
+            "enrich": f"datalake_{self.source}",
+        }[layer.value]
 
-        :param source: the source name or context in metastore
-        :type source: str
-        :param bucket: the data lake bucket name
-        :type bucket: str
-        """
-        self.source = source
-        self.bucket = bucket
+    def get_full_database_path(self, layer: LayerEnum = None):
+        """Following the pattern according to the layer, source and bucket (given in the constructor), returns the full file path."""
+        return {
+            "raw": f"s3a://{self.bucket}/raw/{self.source}/",
+            "clean": f"s3a://{self.bucket}/clean/{self.source}/",
+            "clean_staging": f"s3a://{self.bucket}/clean_staging/{self.source}/",
+            "enrich": f"s3a://{self.bucket}/enrich/{self.source}/",
+        }[layer.value]
 
     def get_all_datalake_info(self):
         """
@@ -20,17 +30,22 @@ class DatalakeMetastoreMapping:
         :rtype: dict
         """
         database_name = {
-            "db_raw_name": f"datalake_{self.source}_raw",
-            "db_clean_name": f"datalake_{self.source}_clean",
-            "db_enrich_name": f"datalake_{self.source}",
-            "db_clean_staging_name": f"datalake_{self.source}_clean_staging",
+            f"db_{layer.value}_name": self.get_full_database_name(layer)
+            for layer in (
+                LayerEnum.RAW,
+                LayerEnum.CLEAN,
+                LayerEnum.CLEAN_STAGING,
+                LayerEnum.ENRICH,
+            )
         }
-
         s3_files_path = {
-            "db_raw_path": f"s3a://{self.bucket}/raw/{self.source}/",
-            "db_clean_path": f"s3a://{self.bucket}/clean/{self.source}/",
-            "db_enrich_path": f"s3a://{self.bucket}/enrich/{self.source}/",
-            "db_clean_staging_path": f"s3a://{self.bucket}/clean_staging/{self.source}/",
+            f"db_{layer.value}_path": self.get_full_database_path(layer)
+            for layer in (
+                LayerEnum.RAW,
+                LayerEnum.CLEAN,
+                LayerEnum.CLEAN_STAGING,
+                LayerEnum.ENRICH,
+            )
         }
 
         metastore_info = {}

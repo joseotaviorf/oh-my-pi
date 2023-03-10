@@ -3,9 +3,7 @@ from collections import OrderedDict
 from pyspark.sql.functions import split
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatalakeMetastoreMapping, MetricMetastoreMapping
-from bietlejuice.base.db.dw_metastore_mapping import DwMetastoreMapping
-from bietlejuice.base.db.reverse_metastore_mapping import ReverseMetastoreMapping
+from bietlejuice.base.db import MetastoreMappingFactory
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers.databricks_consumer import DatabricksConsumer
@@ -33,34 +31,15 @@ class SparkMetastoreHelper:
 
         :return: the spark database name and the database location
         """
-        if self.layer == LayerEnum.DW.value:
-            dw_ms_mapping = DwMetastoreMapping(
-                schema=self.db_name_part, bucket=self.bucket
-            ).get_all_dw_info()
-
-            spark_database_name = dw_ms_mapping["dw_schema_databricks"]
-            database_location = dw_ms_mapping["dw_schema_path"]
-        elif self.layer == LayerEnum.REVERSE.value:
-            reverse_ms_mapping = ReverseMetastoreMapping(
-                schema=self.db_name_part, bucket=self.bucket
-            ).get_all_reverse_info()
-
-            spark_database_name = reverse_ms_mapping["reverse_schema_name"]
-            database_location = reverse_ms_mapping["reverse_schema_path"]
-        elif self.layer == LayerEnum.METRIC.value:
-            metric_ms_mapping = MetricMetastoreMapping(
-                bucket=self.bucket, schema=self.db_name_part
-            )
-            spark_database_name, database_location = metric_ms_mapping.get_metric_info()
-        else:
-            dl_ms_mapping = DatalakeMetastoreMapping(
-                source=self.db_name_part, bucket=self.bucket
-            )
-
-            (
-                spark_database_name,
-                database_location,
-            ) = dl_ms_mapping.get_datalake_info_from_layer(self.layer)
+        metastore_mapping_factory = MetastoreMappingFactory.get_mapper_by_layer(
+            LayerEnum(self.layer), self.db_name_part, self.bucket
+        )
+        spark_database_name = metastore_mapping_factory.get_full_database_name(
+            LayerEnum(self.layer)
+        )
+        database_location = metastore_mapping_factory.get_full_database_path(
+            LayerEnum(self.layer)
+        )
 
         return spark_database_name, database_location
 

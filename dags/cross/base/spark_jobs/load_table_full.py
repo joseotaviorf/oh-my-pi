@@ -94,12 +94,12 @@ if __name__ == "__main__":
 
     if layer == LayerEnum.METRIC.value:
         metric_ms_mapping = MetricMetastoreMapping(
-            bucket=datalake_bucket, schema=database_base_name
+            bucket=datalake_bucket, source=database_base_name
         )
         database_name, database_location = metric_ms_mapping.get_metric_info()
 
         metric_ms_mapping = MetricMetastoreMapping(
-            bucket=datalake_bucket, schema=target_database_base_name
+            bucket=datalake_bucket, source=target_database_base_name
         )
         target_database_name, target_database_location = (
             metric_ms_mapping.get_metric_info()

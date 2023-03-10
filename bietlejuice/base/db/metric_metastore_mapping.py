@@ -1,9 +1,9 @@
-class MetricMetastoreMapping:
-    """Metric properties mapping for Hive metastore"""
+from bietlejuice.base.db import MetastoreMapping
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
-    def __init__(self, bucket: str, schema: str) -> None:
-        self.bucket = bucket
-        self.schema = schema
+
+class MetricMetastoreMapping(MetastoreMapping):
+    """Metric properties mapping for Hive metastore"""
 
     @staticmethod
     def get_database_path(bucket: str, schema: str) -> str:
@@ -16,13 +16,21 @@ class MetricMetastoreMapping:
         db_metric_name = f"metric_{schema}"
         return db_metric_name
 
+    def get_full_database_name(self, _: LayerEnum = None) -> str:
+        """Following the pattern according to the layer and the source (given in the constructor), returns the full database name used in Spark."""
+        return MetricMetastoreMapping.get_database_schema(self.source)
+
+    def get_full_database_path(self, _: LayerEnum = None):
+        """Following the pattern according to the layer, source and bucket (given in the constructor), returns the full file path."""
+        return MetricMetastoreMapping.get_database_path(self.bucket, self.source)
+
     def get_metric_info(self):
         """
         Gets database info for metric layer.
 
         :return: database_name and database_location
         """
-        database_name = self.get_database_schema(self.schema)
-        database_location = self.get_database_path(self.bucket, self.schema)
+        database_name = self.get_database_schema(self.source)
+        database_location = self.get_database_path(self.bucket, self.source)
 
         return database_name, database_location
