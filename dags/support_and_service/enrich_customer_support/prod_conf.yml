@@ -5,8 +5,8 @@ inner_dependencies:
     - email
 
 custom_cluster:
-  driver_node_type_id: r5.12xlarge
-  node_type_id: r5.12xlarge
+  driver_node_type_id: r5d.12xlarge
+  node_type_id: r5d.12xlarge
   runtime_engine: PHOTON
   autoscale:
     min_workers: 2
