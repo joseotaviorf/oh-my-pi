@@ -141,7 +141,7 @@ trigger AS (
         )
         OR
         ( --Relisting
-            so.next_status = 'PUBLISHED'
+            bch.next_status = 'PUBLISHED'
             AND ( --Remove available_soon cases
                     bch.next_status_reason <> 'RELISTING' 
                     OR bch.next_status_reason IS NULL
