@@ -1,5 +1,5 @@
 SELECT
-    INT(DATE_FORMAT(dt_attribution,"YYYYMMdd")) AS id_date,
+    INT(DATE_FORMAT(dt_attribution,"yyyyMMdd")) AS id_date,
     campaign_name,
     advertiser_name AS account_name,
     campaign_name AS utm_campaign,
