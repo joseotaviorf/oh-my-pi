@@ -12,7 +12,9 @@ SELECT
         rca.type = 'contract'
         AND rcab.type <> 'contract') THEN (-1.0) * rce.amount
       ELSE 1.0 * rce.amount
-    END AS valor_sinal_bill_item,
+    END AS value_sign_bill_item,
+    rce.amount,
+    rci.due_amount,
     rce.accrual_year_month AS accrual_year_month,
     rci.accrual_year_month AS accrual_year_month_invoice,
     CAST(rci.ts_created AS DATE) AS dt_created,

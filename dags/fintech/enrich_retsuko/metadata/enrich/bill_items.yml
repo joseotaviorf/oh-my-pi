@@ -1,48 +1,74 @@
+---
 database_name: datalake_retsuko
 table_name: bill_items
+owner: leticia.silveira@quintoandar.com.br
+domain: fintech
+description: "Granular table by bill items with data from the last 3 years"
 columns:
   id_contract:
+    description: "contract identification"
     lineage:
-      - datalake_retsuko_clean.invoice.id_contract.id_external
+      - datalake_retsuko_clean.contract.id_external
+      - datalake_retsuko_clean.invoice.id_contract
+      - datalake_retsuko_clean.contract.id
   id_invoice:
+    description: "invoice identification"
     lineage:
       - datalake_retsuko_clean.invoice.id_external
+      - datalake_retsuko_clean.entry.id_invoice
   frequency:
+    description: "frequency, that is, how often the tenant receives this invoice item"
     lineage:
       - datalake_retsuko_clean.invoice.purpose
   payment_status:
+    description: "payment status"
     lineage:
       - datalake_retsuko_clean.invoice.status
   bill_item:
+    description: "name of the bill item, that is, what the item of invoice refers to"
     lineage:
       - datalake_retsuko_clean.entry.bill_item
   bill_item_description:
+    description: "bill item description"
     lineage:
       - datalake_retsuko_clean.entry.description
-  from_account_type:
+  value_sign_bill_item:
+    description: "sign value of bill item"
     lineage:
       - datalake_retsuko_clean.account.type
-  to_account_type:
+  amount:
+    description: "invoice amount"
     lineage:
-      - datalake_retsuko_clean.account.type
+      - datalake_retsuko_clean.entry.amount
+  due_amount:
+    description: "due amount, that is, the amount that remains to be paid"
+    lineage:
+      - datalake_retsuko_clean.invoice.due_amount
   accrual_year_month:
+    description: "accumulate bill item month and year"
     lineage:
       - datalake_retsuko_clean.entry.accrual_year_month
   accrual_year_month_invoice:
+    description: "accumulate invoice month and year"
     lineage:
       - datalake_retsuko_clean.invoice.accrual_year_month
   dt_created:
+    description: "creation date"
     lineage:
       - datalake_retsuko_clean.invoice.ts_created
   dt_sent:
+    description: "sent date"
     lineage:
       - datalake_retsuko_clean.invoice.ts_sent
   dt_due:
+    description: "due date"
     lineage:
       - datalake_retsuko_clean.invoice.ts_due
   dt_paid:
+    description: "paid date"
     lineage:
       - datalake_retsuko_clean.invoice.ts_paid
   dt_canceled:
+    description: "invoice cancellation date"
     lineage:
       - datalake_retsuko_clean.invoice.ts_canceled
