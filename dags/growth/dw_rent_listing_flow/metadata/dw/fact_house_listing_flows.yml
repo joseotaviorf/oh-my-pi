@@ -1,0 +1,606 @@
+database_name: dw_public
+table_name: fact_house_listing_flows
+description: Fact table that contains each listing flow, which is a flow from the lead creation to a property being listed in our platform. Each line is a listing flow.
+domain: Growth
+owner: ana.araujo@quintoandar.com.br
+columns:
+  sk_house_listing_flow:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.id
+    description: Unique id related to the house listing flow, it's the primary key of the table.
+  sk_condo:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_b2b.id_condo
+    description: Key of the condominium/building where the property of the listing flow is located.
+  sk_lead:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_lead
+    description: Id of the lead related to the listing flow. A same lead can be related to different listing flows.
+  sk_lead_conversion:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_conversion
+    description: Key to identify the registration of a lead into a property, which means that the lead was converted.
+  sk_first_photo_job:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_photo_job
+    description: Key to identify the property's first photo job.
+  sk_house_listing:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_b2b.id_house_listing
+    description: Key of the house listing related to the listing flow.
+  sk_user_house_registrant:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_rep
+    description: Key to identify the Sales Rep that either registered the property or scheduled its first photo job.
+  sk_user_sales_rep:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_lead_tasks.id_user_sales_rep
+    description: Key to identify the Sales Rep related to the lead of the listing flow.
+  sk_user_lead_affiliate:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_affiliate
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_user_has_indicated
+    description: Key to identify the affiliate user that referred the lead related to the listing flow.
+  sk_user_first_task_assignee:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_lead_tasks.id_user_first_task_assignee
+    description: Key to identify the first assignee user from the Inside Sales team that had a task related to the lead of the listing flow.
+  sk_user_last_task_assignee:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_lead_tasks.id_user_last_task_assignee
+    description: Key to identify the last assignee user from the Inside Sales team that had a task related to the lead of the listing flow.
+  sk_region:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_region
+    description: Key of the region related to the listing flow's property or lead.
+  sk_city:
+    lineage:
+    - dw_public.dim_region.city_id
+    - datalake_lead.lead_city_region.id_region
+    description: Key to identify the city associated to the listing flow's property or lead.
+  sk_partner:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_b2b.id_partner
+    description: Key to identify the real estate partner company that is related to the lead/property, if we acquired from them.
+  sk_autonomous_agent:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_b2b.id_autonomous_agent
+    description: Key to identify the partner agent related to the lead, if it has one.
+  sk_lead_date:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_lead
+    description: Key to identify the date of the lead creation. It's the lead creation date transformed into a number.
+  sk_sales_company_lead_sent_date:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_sales_company_sent
+    description: Key to identify the date that a lead was sent to the Inside Sales company. It's the date that the lead was sent to the IS company transformed into a number.
+  sk_prospect_date:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_prospect
+    description: Key to identify the date that a lead turned into a prospect, which means that it has passed through the discard algorithm with success. It's the lead's prospect date transformed into a number.
+  sk_first_task_created_date:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_lead_tasks.dt_first_task_created_date
+    description: Key to identify the date that the first task related to the listing flow was created. It's the listing flow's first task creation date transformed into a number.
+  sk_first_task_closed_date:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_lead_tasks.dt_first_task_closed_date
+    description: Key to identify the date that the first task related to the listing flow was closed. It's the listing flow's first task closed date transformed into a number.
+  sk_last_task_created_date:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_lead_tasks.dt_last_task_created_date
+    description: Key to identify the date that the last task related to the listing flow was created. It's the listing flow's last task creation date transformed into a number.
+  sk_last_task_closed_date:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_lead_tasks.dt_last_task_closed_date
+    description: Key to identify the date that the last task related to the listing flow was closed. It's the listing flow's last task closed date transformed into a number.
+  sk_first_contact_date:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_first_contact
+    description: Key to identify the date that the lead passed through the first revision by an Insides Sales rep, which made contact. It's the first contact date transformed into a number.
+  sk_conversion_date:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_conversion
+    description: Key to identify the date of the lead's conversion, which means that a house registration related to the lead happened. It's the lead's conversion date transformed into a number.
+  sk_qualified_date:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_qualified
+    description: Key to identify the date of the lead's qualification, according to our internal criteria. It's the lead's qualified date transformed into a number.
+  sk_available_qualified_date:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_qualified
+    description: Key to identify the date of the lead's qualification as available for a business context (Rent and/or Sale), according to our internal criteria. It's the lead's available qualified date transformed into a number.
+  sk_opportunity_date:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_opportunity
+    description: Key to identify the date of opportunity, which means that the first house's photo job of was scheduled. It's the lead's opportunity date transformed into a number.
+  sk_first_listing_date:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_first_listing
+    description: Key to identify the date of the house's first listing version was created in our platform. It's the lead's first listing date transformed into a number.
+  sk_discard_date:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_discarded
+    description: Key to identify the date of a lead discard, if it has one. It's the lead's discard date transformed into a number.
+  sk_user_lead_first_discarder:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_user_lead_first_discarder
+    description: Key to identify the first user that discarded the lead related to the listing flow.
+  sk_user_lead_last_discarder:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_user_lead_last_discarder
+    description: Key to identify the last user that discarded the lead related to the listing flow.
+  country_code:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.country_code
+    description: Country code of origin related to the lead or the property of the listing flow, depends on the listing flow step.
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
+  funnel_step:
+    description: The funnel step where the listing flow is in or has stoppped.
+    categories:
+      first contact: The listing flow is at the first contact step.
+      lead: The listing flow is at the lead step.
+      listing: The listing flow is at the listing step.
+      opportunity: The listing flow is at the opportunity step.
+      prospect: The listing flow is at the prospect step.
+      qualified: The listing flow is at the qualified step.
+  funnel_drop_reason:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.funnel_step
+    description: The reason of why the listing flow has stopped in the actual funnel step.
+    categories:
+      Alugado: The lead's property is rented.
+      ApartamentoBanguncado: The lead's property is messy.
+      BrokenLeadFlow: The lead's flow is broken.
+      CancelledPhotoJob: The lead's property has a cancelled photo job.
+      DiscardedProspect: The lead was discarded at the prospect step.
+      DiscardedQualified: The lead was discarded at the qualified step.
+      Duplicado: The lead is duplicated.
+      ForaDoPadrao: The lead is out of pattern.
+      IMOVEL_COMERCIAL: The lead's property is a commercial property.
+      IMOVEL_EM_CONDICAO_INSEGURA: The lead's property is in unsafe condition.
+      IMPREVISTO_FOTOGRAFO: The photographer related to the lead's property photo job had an unexpected situation.
+      LOCALIZACAO_PERIGOSA: The lead's property is in a dangerous location.
+      Listed: The lead's property is already listed.
+      NaoCompareceu: The agent/photographer related to the lead's property didn't show up.
+      NaoProcessado: The lead was not processed.
+      NaoProcessadoArea: The lead's property is in a not processed location.
+      NoPhotoJob: The lead's property has no photo job.
+      NotListedYet: The lead's property is not listed yet.
+      NotMapped: The lead is unmapped.
+      OnHold: The lead is on hold.
+      OptedOut Qualified: The lead has been opted out at the qualified step.
+      Outros: The lead has another drop reason.
+      PROBLEMAS_NO_ENVIO_DE_FOTOS: The protographer related to the lead's property had a problem sending the photos.
+      PROBLEMA_COM_ENDERECO: The lead's property has a problem with the address.
+      PhotoJobScheduled: The lead's property has a photo job scheduled.
+      ProprietarioCancelou: The lead's property owner canceled.
+      Reforma: The lead's property is under renovation.
+      SemAutorizacao: The lead is without authorization.
+      SemChaves: The lead's property is without keys.
+      SemContato: The lead's property is with no contact.
+      TermsNotAccepted: The lead's property owner has not accepted the terms.
+      Vendido: The lead's property is sold.
+  hours_lead_to_prospect:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_lead_to_prospect
+    description: Hours between the lead creation timestamp and lead passing through the discard algorithm.
+  hours_prospect_to_qualified:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_prospect_to_qualified
+    description: Hours between the lead passing through the discard algorithm and the lead's qualification, according to our internal criteria.
+  hours_lead_to_first_contact:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_lead_to_first_contact
+    description: Hours between the lead creation and the lead's first revision by an Inside Sales rep, which made contact.
+  hours_prospect_to_first_contact:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_prospect_to_first_contact
+    description: Hours between the lead's conversion to prospect and the lead's first revision by an Inside Sales rep, which made contact.
+  hours_qualified_to_opportunity:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_qualified_to_opportunity
+    description: Hours between the lead's qualified conversion and the lead's opportunity conversion, which means that the first photo job was scheduled.
+  hours_opportunity_to_listing:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_opportunity_to_listing
+    description: Hours between the lead's conversion to opportunity, which means that the first photo job was scheduled, and the lead's listing.
+  hours_lead_to_listing:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_lead_to_listing
+    description: Hours between the lead creation and the lead's listing.
+  days_lead_to_prospect:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_lead_to_prospect
+    description: Days between the lead creation and the lead's conversion to prospect.
+  days_prospect_to_qualified:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_prospect_to_qualified
+    description: Days between the lead's conversion to prospect and lead's conversion to qualified, according to our internal criteria.
+  days_lead_to_first_contact:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_lead_to_first_contact
+    description: Days between the lead creation and the lead's first revision by an Inside Sales rep, which made contact.
+  days_prospect_to_first_contact:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_prospect_to_first_contact
+    description: Days between the lead's conversion to prospect and lead's first revision by an Inside Sales rep, which made contact.
+  days_qualified_to_opportunity:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_qualified_to_opportunity
+    description: Days between the lead's conversion to qualified and lead's conversion to opportunity, which means that the lead's first photo job was created.
+  days_opportunity_to_listing:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_opportunity_to_listing
+    description: Days between the lead's opportunity conversion and lead's conversion to a listing.
+  days_lead_to_listing:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_lead_to_listing
+    description: Days between the lead creation and the lead's listing.
+  days_lead_to_processing:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_lead_to_processing
+    description: Days between the lead creation and the lead's discard or conversion.
+  is_exclusive:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_b2b.is_exclusive
+    description: Flag that indicates if a house is exclusive to our platform. 1 indicates true and 0 indicates false.
+  first_isales_intervention:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_lead_tasks.first_isales_intervention
+    description: Identification in which step an Inside Sales rep intervention occurred, which could be during lead or photo's steps.
+    categories:
+      Lead: The intervention occured at the lead step.
+      Photojob: The intervention occured only at the photo job step.
+  lead_type:
+    lineage:
+    - datalake_rent_potential_listing.potential_listings_reprocessed_leads.lead_type
+    description: The lead type, according to the Main (EBDB).
+    categories:
+      Afiliado: The lead came from an affiliate.
+      Agente: The lead came from an agent.
+      B2BOpenLink: The lead came from B2B Open Link.
+      BrokenOpenLink: The lead came from Broken Open Link.
+      CadastroImobiliario: The lead came from a real estate registration.
+      CanalDoImovel: The lead came from the property channel.
+      Inbound: The lead came from inbound.
+      LandingMarketing: The lead came from the Marketing Landing Page.
+      LandingOpenLink: The lead came from the Open Link Landing Page.
+      Marketing: The lead came from marketing.
+      OLX: The lead came from OLX.
+      OpenLink: The lead came from Open Link.
+      Organic: The lead is organic.
+      Porteiro: The lead came from a doorman.
+      Proporparceria: The lead came from proposed partnership.
+      Repechage: The lead is a repechage.
+  lead_origin:
+    lineage:
+    - datalake_rent_potential_listing.potential_listings_reprocessed_leads.lead_origin
+    description: The lead origin, according to the Main (EBDB).
+    categories:
+      App: The lead originated from the app.
+      Crawling: The lead originated from a crawling.
+      Desconhecida: The lead has an unknown origin.
+      Facebook: The lead originated from Facebook.
+      Form: The lead originated from form.
+      Inbound: The lead originated from inbound.
+      Ios: The lead originated from an iOS app.
+      Landing: The lead originated from the landing page.
+      LeadEnrichment: The lead originated from lead enrichment.
+      LeadOutbound: The lead originated from outbound.
+      Other: The lead originated from another origin.
+      OwnerPWA: The lead originated from Owner PWA.
+      Planilha: The lead originated from a sheet.
+      PriceSuggestion: The lead originated from price suggestion.
+      Reprocessado: The lead originated from a reprocessing.
+      Trade: The lead originated from a trade.
+  lead_tracking_source:
+    lineage:
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_source
+    - datalake_rent_potential_listing.potential_listings_reprocessed_leads.utm_source
+    description: The lead tracking source from Amplitude or the lead UTM source from Main (EBDB).
+  lead_tracking_medium:
+    lineage:
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_medium
+    - datalake_rent_potential_listing.potential_listings_reprocessed_leads.utm_medium
+    description: The lead tracking medium from Ampltiude or the lead UTM medium from Main (EBDB).
+    categories:
+      CPC: CPC.
+      Notifications: Notifications.
+      SMS: SMS.
+      ad: Ad.
+      ads: Ads.
+      ads,ads: Ads ads.
+      aether: Aether.
+      affiliates: Affiliates.
+      affiliates,affiliates: Affiliates affiliates.
+      affiliates,email: Affiliates email.
+      affiliates/: Affiliates /.
+      appcues: Appcues.
+      b2b: B2B.
+      banner: Banner.
+      bastos: Bastos.
+      bemnomeio: Bem no meio.
+      bloblo: Bloblo.
+      branding: Branding.
+      braze_email: Braze email.
+      classifieds: Classifieds.
+      componente-cta: Component CTA.
+      content: Content.
+      copy_share: Copy share.
+      cpc: CPC.
+      cpc,cpc: CPC CPC.
+      cpc-b: CPC B.
+      cpc?: CPC?
+      cpc?utm_source=bing: CPC bing.
+      cpc?utm_source=google: CPC google.
+      cpv: CPV.
+      cta: CTA.
+      custom_share: Custom share.
+      description: Description.
+      digital: Digital.
+      display: Display.
+      display,: Display.
+      display,display: Display display.
+      display,display,cpc: Display display CPC.
+      display,display,display: Display display display.
+      display-b: Display B.
+      display-r: Display R.
+      email: Email.
+      email_SMS: Email SMS.
+      ethereum: Ethereum.
+      evento: Event.
+      facebook: Facebook.
+      faq: FAQ.
+      feriados: Holidays.
+      folha: Folha de São Paulo journey.
+      footer: Footer.
+      fourmidia: Four midia.
+      gazetadopovo: Gazeta do Povo journey.
+      gpa: GPA.
+      header: Header.
+      home: Home.
+      igp-m-reajuste-de-aluguel: IGPM rental readjustment.
+      igpm: IGPM.
+      igpm-previa-reajuste-de-aluguel: IGPM rental readjustment preview.
+      inbound: Inbound.
+      influenciadores: Influencers.
+      inhame: Inhame.
+      inmail: Inmail.
+      instagram: Instagram.
+      intercom: Intercom.
+      landing: Landing.
+      landingpage: Landing page.
+      logo: Logo.
+      mail: Mail.
+      março: March.
+      materia: Materia
+      medium: Medium
+      medium.com: Medium.com
+      moneylab: Money Lab.
+      notification: Notification.
+      notifications: Notifications.
+      offline: Offline.
+      online: Online.
+      paid_ads desktopfeed,rightcolumn: Paid ads desktop feed right column.
+      partnership: Partnership.
+      performance_max: Performance max.
+      photo: Photo.
+      pop_up: Pop up.
+      porta_dos_fundos: Porta dos fundos.
+      portal: Portal.
+      post: Post.
+      post,post: Post post.
+      post123top4: Post 123 top 4.
+      postpatrocinado: Sponsored post.
+      product: Product.
+      product,email: Product email.
+      profilepage: Profile page.
+      push: Push.
+      referral: Referral.
+      referrer: Referrer.
+      rest: Rest.
+      retargeting: Retargeting.
+      rodape: Rodape.
+      romao: Romao.
+      search-c: Search C.
+      seo: SEO.
+      sitelinks: Site links.
+      sms: SMS.
+      social: Social.
+      social,display: Social display.
+      social?utm_source=facebook?utm_campaign=story: Facebook.
+      source: Source.
+      test: Test.
+      test-m-seo5: Test m seo5.
+      teste-medium: Test medium.
+      teste_medium: Test medium.
+      unbounce: Unbounce.
+      video: Video.
+      webpush: Web push.
+      whatsapp: WhatsApp.
+      wpp: WhatsApp.
+      youtube: Youtube.
+      yt: Yt.
+  lead_tracking_platform:
+    lineage:
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_platform
+    description: The lead tracking platform from Amplitude.
+    categories:
+      android: Android platform.
+      ios: iOS platform.
+      web_desktop: Web desktop platform.
+      web_mobile: Web mobile platform.
+  is_b2b:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.is_b2b
+    description: Boolean flag which identifies if the lead/house is from a business partner.
+  is_branded:
+    description: Boolean flag which identifies if the UTM campaign is branded.
+  is_autonomous_agent:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_b2b.is_autonomous_agent
+    description: Boolean flag indicating if there is an autonomous partner agent related to the listing flow.
+  is_doorman:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.is_doorman
+    description: Boolean flag which identifies if the lead/house was referred by a doorman.
+  has_isales_intervention:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_lead_tasks.has_isales_intervention
+    description: Boolean flag which identifies if an Inside Sales rep intervention occurred.
+  has_fup_photo_task:
+    lineage:
+    - datalake_rent_potential_listing.potential_listing_lead_tasks.has_fup_photo_task
+    description: Boolean flag which identifies if the house had a fup related to the photo job.
+  is_lead_reprocessed:
+    lineage:
+    - datalake_rent_potential_listing.potential_listings_reprocessed_leads.is_reprocessed
+    description: Boolean flag which identifies if the lead was reprocessed, which means that was originated from a plea revisionist discarded lead.
+  affiliate_type:
+    lineage:
+    - datalake_ebdb_clean.affiliate_data.affiliate_type
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.affiliate_type
+    description: The type of the affiliate who referred the lead/property, if it has one.
+    categories:
+      Agent: Affiliate is in the agent program.
+      B2BPartner: Affiliate is a B2B partner program.
+      Doorman: Affiliate is in the doorman program
+      Standard: Affiliate is in the standard program.
+  is_agent_referral:
+    lineage:
+    - datalake_gsheets_clean.taxonomy_growth.is_agent_referral
+    description: Boolean flag which identifies if the lead/property was an agent referral. It's related to the Growth's taxonomy.
+  lead_referring_domain:
+    lineage:
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_referring_domain
+    description: Domain of the website from which the lead was referred.
+  lead_referring_category:
+    lineage:
+    - datalake_gsheets_clean.taxonomy_growth.lead_referring_category
+    description: The lead's reference category. It's related to the Growth's taxonomy.
+    categories:
+      Agents: Agents category.
+      Indica Ai: Indica Ai category.
+      Other: Other category.
+      Owner: Owner category.
+  subscription_source:
+    lineage:
+    - datalake_ebdb_user.user_doorman.subscription_source
+    description: The lead's subscription source related to doorman referral, if it has one.
+  mkt_origin:
+    lineage:
+    - datalake_gsheets_clean.taxonomy_growth.mkt_origin
+    description: The lead's marketing origin as defined by the lead taxonomy.
+    categories:
+      B2B: B2B origin.
+      Backend: Backend origin.
+      CIQ: CIQ origin.
+      Doorman: Doorman origin.
+      Inbound: Inbound origin.
+      Indica Aí - Agents: Indica Ai Agents program.
+      Indica Aí - General: Indica Ai General program.
+      Other: Other origin.
+      Owner PWA: Owner PWA app origin.
+      Price Calculator: Price Calculator origin.
+  mkt_channel:
+    lineage:
+    - datalake_gsheets_clean.taxonomy_growth.mkt_channel
+    description: The lead's marketing channel as defined by the lead taxonomy.
+  mkt_medium:
+    lineage:
+    - datalake_gsheets_clean.taxonomy_growth.mkt_medium
+    description: The lead's marketing medium as defined by the lead taxonomy.
+    categories:
+      Branding: Branding.
+      Cross Domain: Cross domain.
+      Direct: Direct.
+      Direct Referral: Direct referral.
+      Display: Display.
+      Doorman User: Doorman user.
+      Email: Email.
+      Lost Tracking: Lost tracking.
+      Not Mapped: Not mapped.
+      Online Classifieds: Online Classifieds.
+      Online Networks: Online networks.
+      Other: Other.
+      Performance Max: Performance max.
+      Pop-Up: Pop up.
+      Push: Push.
+      Retargeting: Retargeting.
+      SEM branded: SEM branded.
+      SEM non-branded: SEM non-branded.
+      SEO branded: SEO branded.
+      SEO non-branded: SEO non-branded.
+      SMS: SMS.
+      Test: Test.
+      Whatsapp: WhatsApp.
+  mkt_source:
+    lineage:
+    - datalake_gsheets_clean.taxonomy_growth.mkt_source
+    description: The lead's marketing source as defined by the lead taxonomy.
+  lead_context_origin:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.lead_context_origin
+    description: The lead's business context origin.
+    categories:
+      Hybrid: Lead is for rent and sale.
+      Only Rent: Lead is exclusively for rent.
+      Only Sale: Lead is exclusively for sale.
+      Organic: Lead is organic (no information for any context).
+  listing_sale_status:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.listing_sale_status
+    description: The lead's status related to the Sale operation, which means if it qualified or not yet, if it was once pulished, if it's editing or has opted out.
+    categories:
+      Editing: Listing is under edition.
+      Not Qualified Yet: Listing is not qualified yet.
+      Once Published: Listing was once published.
+      Opted Out: Listing was opted out for Sale.
+  ts_opted_out_rent:
+    lineage:
+    - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_opt_out_rent
+    description: The lead's timestamp of when it was opted out from Rent operation.
+  is_call_center:
+    description: Boolean flag which identifies if the lead was sent to a call center test in 2018.
+  is_cx_direct_register:
+    description: Boolean flag which identifies if the house was directly registered in the platform by CS team.
+  is_isales_direct_register:
+    description: Boolean flag which identifies if the house was directly registered in the platform by the Inside Sales team.
+  is_ops_direct_register:
+    description: Boolean flag which identifies if the house was directly registered via Admin by the Ops team.
+  mkt_branded:
+    description: The lead's marketing label of a branded campaign as defined by the lead taxonomy.
+    categories:
+      Branded: Lead is branded.
+      Other: Lead is other.
+  mkt_category:
+    description: The lead's marketing category as defined by the lead taxonomy.
+    categories:
+      Inbound: Inbound category.
+      Other: Other category.
+      Outbound: Outbound category.
+  mkt_completion:
+    description: The lead's marketing completion as defined by the lead taxonomy.
+    categories:
+      Full Self-Service: The owner has done the entire listing process through Owner PWA App (including photo job scheduling), with no contact from Inside Sales.
+      Non Self-Service: The lead went directly to the Inside Sales team and suffered convertions there.
+      Not Mapped: Not mapped completion.
+      Other: Other completion.
+      Recovered Self-Service: The owner dropped at some point beforing scheduling the photo job, so Inside Sales contacted the owner.
+  mkt_flow:
+    description: The lead's marketing flow as defined by the lead taxonomy.
+    categories:
+      Non Self-Service: The lead went directly to the Inside Sales team.
+      Other: Other flow.
+      Self-Service: The lead started at Owner PWA app.
+  mkt_platform:
+    description: The lead's marketing platform as defined by the lead taxonomy.
+    categories:
+      Not Mapped: Not mapped platform.
+      Web Desktop: Web desktop platform.
+      Web Mobile: Web mobile platform.
+  ts_load:
+    description: Timestamp indicating the data load into our system. It has nothing related to the listing flow itself.
