@@ -573,7 +573,7 @@ LEFT JOIN
         ON tac.id_contract = ct.id_contract
 LEFT JOIN
     tbl_final_tickets AS tft
-        ON tbl_final_tickets.id_termination = ct.id_termination
+        ON tft.id_termination = ct.id_termination
 LEFT JOIN
     total_nps_answered AS nps
         ON nps.id_termination = ct.id_termination
