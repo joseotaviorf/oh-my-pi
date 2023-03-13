@@ -1,0 +1,15 @@
+---
+database_name: datalake_retsuko
+table_name: retsuko_junk
+owner: leticia.silveira@quintoandar.com.br
+domain: fintech
+description: "Junk Enrich for the model"
+columns:
+  id_lvl_1:
+    description: "Level 1 object ID"
+  desc_lvl_1:
+    description: "Level 1 object description"
+  id_master_type:
+    description: "Master Type ID"
+  id_junk:
+    description: "Junk ID"

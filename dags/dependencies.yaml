@@ -1190,6 +1190,9 @@ bietlejuice.dw_unified_listing_flow:
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
 
+bietlejuice.dw_retsuko:
+  - bietlejuice.enrich_retsuko:load-enrich-retsuko-junk
+
 bietlejuice.dw_revenue_lines:
   - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-finance
   - bietlejuice.enrich_revenue_lines:load-enrich-credit-card-payment
