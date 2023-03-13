@@ -46,6 +46,7 @@ columns:
     lineage:
     - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
     - datalake_customer_support.email.id_user
+    description: ID of the user that generated the demand
   task_queue_name:
     lineage:
     - datalake_bigfone_twilio.call_flex_events.task_queue_name
