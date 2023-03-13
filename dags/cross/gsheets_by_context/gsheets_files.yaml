@@ -508,6 +508,18 @@ marketing_name_convention_shared_costs:
     clean_table_name: marketing_name_convention_shared_costs
     sheet_context: growth_intraday
 
+mexico_marketing_manual_shared_costs:
+    sheet_id: 16mK3QXun__iihh13NGJW0B10Q71l-obpMLj0jwMnpYQ
+    sheet_name: mexico_rateio_manual
+    clean_table_name: mexico_marketing_manual_shared_costs
+    sheet_context: growth_intraday
+
+mexico_marketing_name_convention_shared_costs:
+    sheet_id: 16mK3QXun__iihh13NGJW0B10Q71l-obpMLj0jwMnpYQ
+    sheet_name: mexico_rateio_name_convention
+    clean_table_name: mexico_marketing_name_convention_shared_costs
+    sheet_context: growth_intraday
+
 casa_mineira_marketing_manual_shared_costs:
     sheet_id: 1IRBcIhdi7V0gXtvoImz7-sA5P38FALN_CgXcpAORzYY
     sheet_name: rateio_manual
