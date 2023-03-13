@@ -2858,3 +2858,8 @@ bietlejuice.enrich_zipcodes:
 
 bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
+
+bietlejuice.enrich_sap_gateway:
+  - bietlejuice.sap_gateway:load-clean-feature
+  - bietlejuice.sap_gateway:load-clean-operation
+  - bietlejuice.sap_gateway:load-clean-sync-sap-job

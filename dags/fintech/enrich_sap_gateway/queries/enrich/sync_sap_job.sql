@@ -1,0 +1,21 @@
+SELECT
+    id_sync_sap_job,
+    id_feature,
+    `hash`,
+    response,
+    `type`,
+    `status`,
+    sap_payload,
+    charge_back_of,
+    error,
+    retryable,
+    ts_synced,
+    ts_created,
+    ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_sap_gateway_clean.sync_sap_job
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_sync_sap_job ORDER BY ts_updated DESC) = 1
