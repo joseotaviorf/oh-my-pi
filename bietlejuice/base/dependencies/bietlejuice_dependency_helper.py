@@ -93,3 +93,17 @@ class BietlejuiceDependencyHelper:
         table_name = f"{layer}:{table_name}"
 
         return dag_name, table_name
+
+    @staticmethod
+    def subtract_dependencies(
+        original_dependencies: dict, dependencies_to_subtract: dict
+    ) -> dict:
+        """Given two dependency dictionaries, returns a new dictionary consisting of the second one subtracted from the original one"""
+        new_dependencies = {}
+        for dag_name, dependency_list in original_dependencies.items():
+            new_dependencies[dag_name] = list(
+                set(dependency_list) - set(dependencies_to_subtract.get(dag_name, []))
+            )
+            if len(new_dependencies[dag_name]) == 0:
+                new_dependencies.pop(dag_name)
+        return new_dependencies
