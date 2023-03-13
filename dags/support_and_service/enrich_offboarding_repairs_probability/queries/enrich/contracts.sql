@@ -1,21 +1,17 @@
 WITH booked_inspections AS (
   SELECT
-    fi.sk_inspection,
-    fi.sk_main_inspection,
-    fi.sk_contract,
-    di.status,
-    di.inspection_type,
-    CAST(di.ts_created AS DATE) AS dt_booked,
-    ROW_NUMBER() OVER(PARTITION BY fi.sk_main_inspection ORDER BY di.ts_created ASC) AS asc_ordered_status
+    i.id_inspection AS sk_inspection,
+    i.id_external AS sk_main_inspection,
+    i.id_contract AS sk_contract,
+    i.status,
+    i.inspection_type,
+    CAST(i.ts_created AS DATE) AS dt_booked
   FROM
-    dw_inspections.fact_inspection AS fi
-  JOIN
-    dw_inspections.dim_inspection AS di
-      ON fi.sk_inspection = di.sk_inspection
+    datalake_inspections.inspection_booking i
   WHERE
-    di.inspection_type IN ('offboarding', 'verification')
-    AND di.status != 'cancelled'
-    AND CAST(di.ts_created AS DATE) = '{execution_date}'
+    i.inspection_type IN ('offboarding', 'verification')
+    AND i.status != 'cancelled'
+    AND CAST(i.ts_created AS DATE) = '{execution_date}'
 ),
 booking_review AS (
   SELECT
@@ -73,28 +69,38 @@ house_consideration_infos AS (
 ),
 onb_inspection_infos AS (
   SELECT DISTINCT
-    fi.sk_inspection,
-    fi.sk_main_inspection,
-    fi.sk_contract,
-    di.status,
-    ROW_NUMBER() OVER(PARTITION BY fi.sk_main_inspection ORDER BY di.ts_created DESC) AS desc_ordered_status
+    i.id_inspection AS sk_inspection,
+    i.id_external AS sk_main_inspection,
+    i.id_contract AS sk_contract,
+    i.status
   FROM
-    dw_inspections.fact_inspection AS fi
-  JOIN
-    dw_inspections.dim_inspection AS di
-      ON fi.sk_inspection = di.sk_inspection
-      AND di.inspection_type = 'onboarding'
-      AND di.status != 'cancelled'
+    datalake_inspections.inspection_booking i
+  WHERE
+    i.inspection_type = 'onboarding'
+    AND i.status != 'cancelled'
+  QUALIFY
+    FIRST(i.ts_created) OVER(PARTITION BY i.id_external ORDER BY i.ts_created DESC) = i.ts_created
 ),
 inspection_counts AS (
   SELECT
-    id_inspection AS sk_inspection,
-    COUNT(id) AS contract_qty_inspection_itens,
-    COUNT(tenant_comment) AS tenant_qty_entry_comment
+    i.id_external AS sk_inspection,
+    COUNT(DISTINCT it.id_item_group) + COUNT(DISTINCT it2.id) AS contract_qty_inspection_itens,
+    COUNT(DISTINCT ir.id_item) FILTER(WHERE ir.user_type = 'TENANT' AND ir.user_comment IS NOT NULL)
+    + COUNT(it2.tenant_comment) AS tenant_qty_entry_comment
   FROM
-    datalake_ebdb_clean.inspection_item
-  GROUP BY
-    1
+    datalake_inspections.inspection_booking i
+  LEFT JOIN
+    datalake_inspections.item it
+      ON it.id_inspection = i.id_inspection
+      AND i.source = 'IS'
+  LEFT JOIN
+    datalake_inspections.item_review ir
+      ON ir.id_item = it.id_item
+  LEFT JOIN
+    datalake_ebdb_clean.inspection_item it2
+      ON it2.id_inspection = i.id_external
+      AND i.source = 'PWA'
+  GROUP BY 1, 2
 ),
 onb_inspections AS (
   SELECT
@@ -106,8 +112,6 @@ onb_inspections AS (
   LEFT JOIN
     inspection_counts AS ic
       ON oii.sk_main_inspection = ic.sk_inspection
-  WHERE
-    desc_ordered_status = 1
 ),
 rent_flow AS (
   SELECT DISTINCT

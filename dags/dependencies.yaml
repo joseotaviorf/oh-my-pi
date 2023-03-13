@@ -2227,12 +2227,12 @@ bietlejuice.enrich_offboarding_repairs_probability:
   - bietlejuice.dw_contract:load-dw-public-dim-contract
   - bietlejuice.dw_contract:load-quintoandar-fact-contract-people-into-redshift
   - bietlejuice.dw_datamarts_for_sale:create-dim-house-listing-amenities-in-datalake
-  - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection
-  - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   - bietlejuice.ebdb:create-clean-inspection-item-in-data-lake
+  - bietlejuice.enrich_inspections:load-enrich-inspection-booking
+  - bietlejuice.enrich_inspections:load-enrich-item-review
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
   - bietlejuice.repairs:load-clean-repair-request
   - bietlejuice.sorting_hat:load-clean-proponent
