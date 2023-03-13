@@ -13,9 +13,6 @@ tables:
   #   is_incremental: <is_incremental> #optional
   #   date_column: <date_column> #optional
   #   unixtime_measure: <unixtime_measure> #optional
-  access_info:
-    is_incremental: True
-    date_column: updated_at
   assessment:
     is_incremental: True
     date_column: updated_at
