@@ -23,6 +23,8 @@ MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
+
+partition_cols = config_service.get_config("partition_cols")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
@@ -45,6 +47,13 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 ENV = os.environ.get("ENVIRONMENT")
 
+def get_date_param(dag_run, ds, date_param_name):
+    date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
+    if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
+        return date_param
+    return ds
+
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -57,6 +66,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+    user_defined_macros={"get_date_param": get_date_param},    
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -84,12 +94,18 @@ raw_task_group = datalake_task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
     extraction_spark_job_file=raw_spark_job_file,
+    raw_spark_job_extra_args=[
+            SOURCE,
+            "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",
+            "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+        ],
+    has_hive_sync=False,
 )
 
 clean_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE,
-    target_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,    
 )
 
 create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
@@ -99,4 +115,4 @@ cross_downstream(
     DatalakeTaskGroup.all_first_tasks(clean_task_groups),
 )
 
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups)) 

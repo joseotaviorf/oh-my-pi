@@ -1,2 +1,3 @@
 ---
 lineage_product_database_name: renedescartes
+partition_cols: [year, month, day]

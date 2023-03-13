@@ -3,6 +3,11 @@ SELECT
     owner_id AS id_owner,
     phone_nr AS phone_number,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
 FROM
     datalake_rene_descartes_raw.phone
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id ORDER BY dt DESC) = 1    

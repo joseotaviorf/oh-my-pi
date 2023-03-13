@@ -10,6 +10,11 @@ SELECT
     revend AS rev_end,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    rejected_at AS ts_rejected
+    rejected_at AS ts_rejected,
+    year,
+    month,
+    day
 FROM
     datalake_rene_descartes_raw.rejection_history_event_aud
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id, rev ORDER BY dt DESC) = 1
