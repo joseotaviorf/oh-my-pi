@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime
 from pendulum import timezone
 
@@ -20,7 +21,7 @@ SOURCE = "rene_descartes"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2020, 7, 27, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_io-general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 
