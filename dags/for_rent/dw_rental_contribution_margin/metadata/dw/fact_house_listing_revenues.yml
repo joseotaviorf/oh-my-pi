@@ -4,24 +4,72 @@ description: This table shows the revenues of each contract and competence month
   Each row represents the revenues of the contract in a month. So we can have repeated
   ID contracs and ID house_listing
 domain: For Rent
-owner: E ForRent@quintoandar.com.br
+owner: kleber.inoue@quintoandar.com.br
 columns:
+  sk_house_listing_revenue:
+    description: Primary key for the table. It is generated artificially in the ETL,
+      so it has no meaning or correspondence in any product.
   id_contract:
     lineage:
     - datalake_revenue_lines.management_fee.id_contract_ebdb
+    - dw_public.fact_listing_rent_flows.sk_contract
     description: Natural key that represents the contract ID.
   id_house_listing:
     lineage:
+    - datalake_revenue_lines.reservation.id_house_listing
     - datalake_ebdb_listing.house_listing.id_house_listing
     description: Natural key that represents the house listing ID.
   id_house:
     lineage:
+    - datalake_revenue_lines.reservation.id_house
     - datalake_ebdb_contract.contract.id_house
     description: Natural key that represents the house ID.
   country_code:
     lineage:
     - datalake_ebdb_country.house.country_code
     description: Country code of the house. We're filtering just BR houses.
+  contract_lifetime:
+    description: The difference between the month when the contract started and competence
+      month of the revenue.
+  rent_value:
+    description: Rent value of the contract charged from tenant.
+  management_fee:
+    description: Management fee value charged from landlord.
+  brokerage_fee:
+    description: First rental commission value. We receive this value just on the
+      first competence month of the contract.
+  home_insurance:
+    description: Home/fire insurance value.
+  service_fee:
+    description: Service fee value charged from tenant.
+  mra:
+    description: Extra MRA (month rental anticipation) revenue.
+  lra:
+    description: Extra LRA (long term rental anticipation) revenue.
+  bfi:
+    description: Extra BFI (brokerage finance) revenue.
+  lp:
+    description: Extra LP (late payment) revenue.
+  ccp_net:
+    description: Extra CCP (credit card payment) net revenue.
+  reservation:
+    description: Extra reservation revenue comes from kill_queue service.
+  agents_commission:
+    description: Agents commission share value that is passed to agents. (Negative value).
+  brokerage_partner_share:
+    description: Commission paid to affiliates/B2B partners. We receive this value
+      just on the first competence month of the contract. (Negative value).
+  management_partner_share:
+    description: Administration fee paid to partners when the contract is linked
+      with affiliates/B2B. (Negative value).
+  net_revenue:
+    description: The net revenue calculated from all the revenues (gross_revenue + addons_revenue + total_revenue_discounts).
+  gross_revenue:
+    description: Gross revenue calculated by adding the rent_value, management_fee, brokerage_fee, home_insurance columns.
+  addons_revenue:
+    description: Addons revenue calculated by adding the service_fee, mra, lra, bfi, lp, ccp_net, reservation columns.
+  total_revenue_discounts:
+    description: Discount revenue calculated by adding the agents_commission, brokerage_partner_share, management_partner_share columns. This column has negative value.
   quarter:
     lineage:
     - dw_public.dim_date.quarter
@@ -34,42 +82,5 @@ columns:
     lineage:
     - dw_public.dim_date.month_start
     description: Month start date of the revenue's compentece month.
-  administration_fee:
-    description: Administraction fee value charged from landlord.
-  agents_commission:
-    description: Agents commission share value that is passed to agents.
-  bfi:
-    description: Extra BFI (brokerage finance) revenue.
-  brokerage_fee:
-    description: First rental commission value. We receive this value just on the
-      first competence month of the contract.
-  brokerage_partner_share:
-    description: Commission paid to affiliates/B2B partners. We receive this value
-      just on the first competence month of the contract.
-  ccp_net:
-    description: Extra CCP (credit card payment) net revenue.
-  contract_lifetime:
-    description: The difference between the month when the contract started and competence
-      month of the revenue.
-  home_insurance:
-    description: Home/fire insurance value.
-  lp:
-    description: Extra LP (late payment) revenue.
-  lra:
-    description: Extra LRA (long term rental antecipation) revenue.
-  management_partner_share:
-    description: Administraction fee paid to partners when the contract is linked
-      with affiliates/B2B.
-  mra:
-    description: Extra MRA (month rental antecipation) revenue.
-  rent_value:
-    description: Rent value of the contract charged from tenant.
-  reservation:
-    description: Extra reservation revenue come from kill_queue service.
-  service_fee:
-    description: Service fee value charged from tenant.
-  sk_house_listing_revenue:
-    description: Primary key for the table. It is generated artificially in the ETL,
-      so it has no meaning or correspondence in any product.
   ts_load:
     description: Time when the table was loaded.

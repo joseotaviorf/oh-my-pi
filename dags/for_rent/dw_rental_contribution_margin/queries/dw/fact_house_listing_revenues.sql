@@ -54,7 +54,7 @@ brokerage_fees AS (
 management_fees AS (
   SELECT
     id_contract_ebdb,
-    SUM(invoice_theorical_amount) AS administration_fee,
+    SUM(invoice_theorical_amount) AS management_fee,
     SUM(IF(management_fee_share = 'partner', invoice_theorical_amount, 0)) AS management_partner_share,
     accrual_year_month
   FROM
@@ -126,6 +126,7 @@ reservation AS (
   SELECT
     id_house_listing,
     id_house,
+    id_reservation,
     DATE_FORMAT(dt_created, 'yyyyMM') AS created_accrual_year_month,
     SUM(monthly_value) AS reservation
   FROM
@@ -134,7 +135,7 @@ reservation AS (
     id_reservation > 0
     AND is_ongoing IS NULL
     AND (status IN ('FINISHED', 'CHARGED') OR (status = 'CANCELED' AND (cancellation_reason = 'TENANT_GAVE_UP' OR cancellation_reason LIKE '%WITHOUT_CHARGE_BACK')))
-  GROUP BY 1, 2, 3
+  GROUP BY 1, 2, 3, 4
 ),
 
 revenue_with_contract AS (
@@ -145,7 +146,7 @@ revenue_with_contract AS (
     hl.id_house,
     INT(MONTHS_BETWEEN(dd.month_start, dd_contract.month_start)) AS contract_lifetime,
     iv.rent_value,
-    COALESCE(mf.administration_fee, 0) AS administration_fee,
+    COALESCE(mf.management_fee, 0) AS management_fee,
     COALESCE(bf.brokerage_fee, 0) AS brokerage_fee,
     COALESCE(iv.home_insurance, 0) AS home_insurance,
     COALESCE(sf.service_fee, 0) AS service_fee,
@@ -155,8 +156,8 @@ revenue_with_contract AS (
     COALESCE(lp.lp, 0) AS lp,
     COALESCE(ccp.ccp_net, 0) AS ccp_net,
     COALESCE(-1 * bf.agents_commission, 0) AS agents_commission,
-    COALESCE(bf.brokerage_partner_share, 0) AS brokerage_partner_share,
-    COALESCE(mf.management_partner_share, 0) AS management_partner_share,
+    COALESCE(-1 * bf.brokerage_partner_share, 0) AS brokerage_partner_share,
+    COALESCE(-1 * mf.management_partner_share, 0) AS management_partner_share,
     dd.quarter,
     cc.accrual_year_month,
     dd.month_start AS dt_month_start
@@ -210,17 +211,18 @@ revenue_with_contract AS (
   INNER JOIN
     dw_public.dim_date AS dd_contract
       ON c.dt_started = dd_contract.date
-)
-  
+),
+
+revenues_calculation AS (
 SELECT 
   MONOTONICALLY_INCREASING_ID() AS sk_house_listing_revenue,
-  COALESCE(revenue.id_contract, hl.id_contract) AS id_contract,
+  COALESCE(revenue.id_contract, rf.sk_contract) AS id_contract,
   COALESCE(r.id_house_listing, revenue.id_house_listing) AS id_house_listing,
   COALESCE(r.id_house, revenue.id_house) AS id_house,
   COALESCE(hl.country_code, 'Undefined') AS country_code,
   contract_lifetime,
   COALESCE(rent_value, 0) AS rent_value,
-  COALESCE(administration_fee, 0) AS administration_fee,
+  COALESCE(management_fee, 0) AS management_fee,
   COALESCE(brokerage_fee, 0) AS brokerage_fee,
   COALESCE(home_insurance, 0) AS home_insurance,
   COALESCE(service_fee, 0) AS service_fee,
@@ -233,9 +235,9 @@ SELECT
   COALESCE(agents_commission, 0) AS agents_commission,
   COALESCE(brokerage_partner_share, 0) AS brokerage_partner_share,
   COALESCE(management_partner_share, 0) AS management_partner_share,
-  quarter,
+  COALESCE(dd.quarter, revenue.quarter) AS quarter,
   COALESCE(r.created_accrual_year_month, revenue.accrual_year_month) AS accrual_year_month,
-  dt_month_start,
+  COALESCE(dd.month_start, revenue.dt_month_start) AS dt_month_start,
   NOW() AS ts_load
 FROM
   revenue_with_contract AS revenue
@@ -244,7 +246,48 @@ FULL OUTER JOIN
     ON revenue.id_house_listing = r.id_house_listing
     AND revenue.accrual_year_month = r.created_accrual_year_month
 LEFT JOIN
+   dw_public.fact_listing_rent_flows AS rf
+     ON r.id_reservation = rf.sk_reservation
+LEFT JOIN
   datalake_ebdb_listing.house_listing AS hl
     ON COALESCE(r.id_house_listing, revenue.id_house_listing) = hl.id_house_listing
+LEFT JOIN
+  dw_public.dim_date AS dd
+    ON TO_DATE(STRING(r.created_accrual_year_month), 'yyyyMM') = dd.date
 WHERE
-  COALESCE(r.created_accrual_year_month, revenue.accrual_year_month) <= DATE_FORMAT(CURRENT_DATE(), 'yyyyMM')
+  COALESCE(r.created_accrual_year_month, revenue.accrual_year_month) <= DATE_FORMAT(CURRENT_TIMESTAMP(), 'yyyyMM')
+)
+
+SELECT
+  sk_house_listing_revenue,
+  id_contract,
+  id_house_listing,
+  id_house,
+  country_code,
+  contract_lifetime,
+  rent_value,
+  management_fee,
+  brokerage_fee,
+  home_insurance,
+  service_fee,
+  mra,
+  lra,
+  bfi,
+  lp,
+  ccp_net,
+  reservation,
+  agents_commission,
+  brokerage_partner_share,
+  management_partner_share,
+  (rent_value + management_fee + brokerage_fee + home_insurance) + 
+    (service_fee + mra + lra + bfi + lp + ccp_net + reservation) +
+    (agents_commission + brokerage_partner_share + management_partner_share) AS net_revenue,
+  rent_value + management_fee + brokerage_fee + home_insurance AS gross_revenue,
+  service_fee + mra + lra + bfi + lp + ccp_net + reservation AS addons_revenue,
+  agents_commission + brokerage_partner_share + management_partner_share AS total_revenue_discounts,
+  quarter,
+  accrual_year_month,
+  dt_month_start,
+  ts_load
+FROM
+  revenues_calculation
