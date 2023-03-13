@@ -100,7 +100,7 @@ inspection_counts AS (
     datalake_ebdb_clean.inspection_item it2
       ON it2.id_inspection = i.id_external
       AND i.source = 'PWA'
-  GROUP BY 1, 2
+  GROUP BY 1
 ),
 onb_inspections AS (
   SELECT
