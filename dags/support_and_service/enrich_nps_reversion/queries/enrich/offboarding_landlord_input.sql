@@ -139,7 +139,7 @@ tbl_actual_contracts AS (
         ct.id_contract,
         actual.contract_role
 ),
-tbl_actual_contracts_adjusted AS (
+tbl_first_contracts_adjusted AS (
 SELECT
     fcp.sk_contract,
     fcp.contract_role,
@@ -449,8 +449,16 @@ last_nps_answered AS (
 total_nps_answered AS (
     SELECT
         id_termination,
-        COUNT(score BETWEEN 9 AND 10) AS total_nps_promotor,
-        COUNT(score BETWEEN 0 AND 6) AS total_nps_detractor,
+        SUM(CASE
+                WHEN score BETWEEN 9 AND 10 THEN 1
+                ELSE 0
+            END
+        ) AS total_nps_promotor,
+        SUM(CASE
+                WHEN score BETWEEN 0 AND 6 THEN 1
+                ELSE 0
+            END
+        ) AS total_nps_detractor,
         CASE
             WHEN COUNT(sk_contract) > 0
                 THEN SUM(
@@ -511,60 +519,60 @@ SELECT
     ct.has_one_year_fine,
     ct.utility_bill_in_condominium,
     ct.contract_lifetime,
-    house_listing.has_24hdoorman,
-    house_listing.house_total_value_per_m2,
-    house_listing.is_house_furnished,
-    house_listing.is_apartment,
-    house_listing.perfect_state_condition,
-    base_comment_adj.has_tenant_comment_inpection,
-    tbl_repair_request_adjusted.has_ongoing_repairs,
-    final.first_contract,
+    hl.has_24hdoorman,
+    hl.house_total_value_per_m2,
+    hl.is_house_furnished,
+    hl.is_apartment,
+    hl.perfect_state_condition,
+    bca.has_tenant_comment_inpection,
+    tra.has_ongoing_repairs,
+    COALESCE(tfca.first_contract, 0) AS first_contract,
     CASE
-        WHEN tbl_actual_contracts.actual_contracts > 1 THEN 1
+        WHEN tac.actual_contracts > 1 THEN 1
         ELSE 0
     END AS actual_contracts,
-    tbl_actual_contracts.total_contracts,
-    COALESCE(tbl_final_tickets.back_tickets_jornada, 0) AS back_tickets_jornada,
+    COALESCE(tac.total_contracts, 0) AS total_contracts,
+    COALESCE(tft.back_tickets_jornada, 0) AS back_tickets_jornada,
     CASE
-        WHEN tbl_final_tickets.complaint_tickets_jornada > 0 THEN 1
+        WHEN tft.complaint_tickets_jornada > 0 THEN 1
         ELSE 0
     END AS complaint_tickets_jornada,
     CASE
-        WHEN tbl_final_tickets.total_tickets_especiais > 0 THEN 1
+        WHEN tft.total_tickets_especiais > 0 THEN 1
         ELSE 0
     END AS total_tickets_especiais,
-    COALESCE(tbl_final_tickets.csat_disatisfied_jornada, 0) AS csat_disatisfied_jornada,
-    COALESCE(tbl_final_tickets.csat_satisfied_jornada, 0) AS csat_satisfied_jornada,
-    COALESCE(tbl_final_tickets.total_segments_not_sla, 0) AS total_segments_not_sla,
-    COALESCE(tbl_final_tickets.total_segments, 0) AS total_segments,
-    COALESCE(tbl_final_tickets.avg_minutes_talk_time, 0) AS avg_minutes_talk_time,
-    COALESCE(tbl_final_tickets.avg_minutes_waiting_time, 0) AS avg_minutes_waiting_time,
-    COALESCE(tbl_final_tickets.resolution_survey_jornada, 0) AS resolution_survey_jornada,
-    COALESCE(tbl_final_tickets.avg_assignee_stations, 0) AS avg_assignee_stations,
+    COALESCE(tft.csat_disatisfied_jornada, 0) AS csat_disatisfied_jornada,
+    COALESCE(tft.csat_satisfied_jornada, 0) AS csat_satisfied_jornada,
+    COALESCE(tft.total_segments_not_sla, 0) AS total_segments_not_sla,
+    COALESCE(tft.total_segments, 0) AS total_segments,
+    COALESCE(tft.avg_minutes_talk_time, 0) AS avg_minutes_talk_time,
+    COALESCE(tft.avg_minutes_waiting_time, 0) AS avg_minutes_waiting_time,
+    COALESCE(tft.resolution_survey_jornada, 0) AS resolution_survey_jornada,
+    COALESCE(tft.avg_assignee_stations, 0) AS avg_assignee_stations,
     COALESCE(nps.total_nps_promotor, 0) AS total_nps_promotor,
     COALESCE(nps.total_nps_detractor, 0) AS total_nps_detractor,
     COALESCE(nps.prob_answer_nps, 0.11) AS prob_answer_nps,
     COALESCE(tbl_last.last_nps_detractor, 0) AS last_nps_detractor,
-    COALESCE(pp_multi_adjusted.is_pro_owner, 0) AS is_pro_owner
+    COALESCE(pma.is_pro_owner, 0) AS is_pro_owner
 FROM
     contract_termination ct
 LEFT JOIN
-    house_listing
-        ON house_listing.id_termination = ct.id_termination
+    house_listing AS hl
+        ON hl.id_termination = ct.id_termination
 LEFT JOIN
-    base_comment_adj
-        ON base_comment_adj.id_termination = ct.id_termination
+    base_comment_adj AS bca
+        ON bca.id_termination = ct.id_termination
 LEFT JOIN
-    tbl_repair_request_adjusted
-        ON tbl_repair_request_adjusted.id_termination = ct.id_termination
+    tbl_repair_request_adjusted AS tra
+        ON tra.id_termination = ct.id_termination
 LEFT JOIN
-    tbl_actual_contracts_adjusted AS final
-        ON ct.id_contract = final.sk_contract
+    tbl_first_contracts_adjusted AS tfca
+        ON ct.id_contract = tfca.sk_contract
 LEFT JOIN
-    tbl_actual_contracts
-        ON tbl_actual_contracts.id_contract = final.sk_contract
+    tbl_actual_contracts AS tac
+        ON tac.id_contract = ct.id_contract
 LEFT JOIN
-    tbl_final_tickets
+    tbl_final_tickets AS tft
         ON tbl_final_tickets.id_termination = ct.id_termination
 LEFT JOIN
     total_nps_answered AS nps
@@ -573,7 +581,8 @@ LEFT JOIN
     last_nps_answered AS tbl_last
         ON tbl_last.id_termination = ct.id_termination
 LEFT JOIN
-    pp_multi_adjusted
-        ON pp_multi_adjusted.id_termination = ct.id_termination
+    pp_multi_adjusted AS pma
+        ON pma.id_termination = ct.id_termination
 WHERE
-    pp_multi_adjusted.is_pro_owner = 0
+    pma.is_pro_owner = 0
+    AND tac.total_contracts IS NOT NULL

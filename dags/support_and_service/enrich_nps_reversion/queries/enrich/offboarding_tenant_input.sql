@@ -132,7 +132,7 @@ tbl_all_nps_info AS (
         1
 ),
 tenants AS (
-    SELECT DISTINCT
+    SELECT
         sk_contract,
         sk_user,
         CASE
@@ -144,7 +144,7 @@ tenants AS (
         dw_quintoandar.fact_contract_people
     WHERE
         contract_role = 'tenant'
-    UNION
+    UNION ALL
     SELECT DISTINCT
         ft.sk_contract,
         ft.sk_user,
@@ -230,6 +230,13 @@ tickets_by_contract AS (
     GROUP BY
         1
 ),
+unique_tenants_by_contract AS (
+    SELECT DISTINCT
+        sk_contract,
+        sk_user
+    FROM 
+        tenants
+),
 tickets_by_tenant AS (
     SELECT
         ct.id_termination,
@@ -265,7 +272,7 @@ tickets_by_tenant AS (
     FROM
         contract_termination AS ct
     LEFT JOIN
-        tenants AS tn
+        unique_tenants_by_contract AS tn
             ON ct.id_contract = tn.sk_contract
     LEFT JOIN
         tbl_tickets_refined AS tickets
