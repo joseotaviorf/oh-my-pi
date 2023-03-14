@@ -13,7 +13,7 @@ create table if not exists public.dim_lead
  complemento varchar(500),
  endereco varchar(300),
  numero varchar(200),
- nome_anunciante varchar(255),
+ nome_anunciante varchar(300),
  numero_banheiros integer,
  numero_quartos integer,
  numero_suites integer,
