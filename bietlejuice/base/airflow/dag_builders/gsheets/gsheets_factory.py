@@ -209,8 +209,6 @@ class GsheetsDAGFactory:
                     source,
                     table_name,
                     json.dumps(sheet_details),
-                    execution_date,
-                    dag_context,
                 ],
                 pool=task_pool,
                 tree_path=f"{dag_context}/",

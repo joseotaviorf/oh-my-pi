@@ -2,6 +2,7 @@ import logging
 import json
 
 from argparse import ArgumentParser
+
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
 
@@ -22,9 +23,6 @@ JOB_NAME = "load_gsheets_by_context_into_datalake"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-SLACK_MSG_HEADER = ":alert: *Gsheet ingestion failures*\n>The following sheet have errors have not been ingested on this Run."
-TIMEOUT_LIMIT = 5 * 60
-
 
 def __get_auth(dbutils):
     """
@@ -37,6 +35,10 @@ def __get_auth(dbutils):
     )
     scope = credentials.pop("scope")
     return credentials, scope
+
+
+SLACK_MSG_HEADER = ":alert: *Gsheet ingestion failures*\n>The following sheet have errors have not been ingested on this Run."
+TIMEOUT_LIMIT = 5 * 60
 
 
 def __alert_not_ingesting_sheet(sheet_details, exeption, slack_channel):
@@ -78,12 +80,10 @@ if __name__ == "__main__":
     sheet_details = json.loads(args.sheet_details)
     partitions_cols = ["year", "month", "day"]
 
-    is_able_to_load = True
-
     logger.info(
         f"""
-            m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
-            table_name={table_name}, execution_date=execution_date msg=Starting spark job...
+                m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
+                table_name={table_name}, execution_date=execution_date msg=Starting spark job...
         """
     )
 
@@ -93,10 +93,8 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     credentials, scope = __get_auth(dbutils)
-
     gsheets_client = GoogleSheetsClient(credentials, scope, timeout=TIMEOUT_LIMIT)
     spark_client = SparkClient()
-    s3_loader = S3Loader()
     gsheets_consumer = GsheetsConsumer(gsheets_client, spark_client)
 
     datalake_info = DatalakeMetastoreService.get_db_info(
@@ -110,6 +108,10 @@ if __name__ == "__main__":
     database_location = datalake_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
+    s3_loader = S3Loader()
+
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    is_able_to_load = True
     try:
         df = gsheets_consumer.get_sheet_df(
             sheet_details["sheet_name"],
@@ -133,6 +135,7 @@ if __name__ == "__main__":
                 m={JOB_NAME}, table_name={table_name}, msg=sheet is able to be loaded!"
             """
         )
+
     except Exception as e:
         is_able_to_load = False
         slack_channel = dbutils.secrets.get(
@@ -152,8 +155,6 @@ if __name__ == "__main__":
             format_options=format_options,
             partitions=partitions_cols if sheet_details.get("partitioned") else None,
         )
-
-        logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
 
         spark_metastore_loader.update_metastore(
             df, database_name, table_name, format_options, database_location
