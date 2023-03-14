@@ -229,12 +229,12 @@ class GsheetsDAGFactory:
         done_task_groups = {}
 
         for table_name, sheet_details in google_files:
-            sheet_details["raw_table_name"] = table_name
-            task_id = f"done-clean-{table_name}".replace("_", "-")
+            clean_table_name = sheet_details["clean_table_name"]
+            task_id = f"done-clean-{clean_table_name}".replace("_", "-")
 
             done_task_group = [DummyOperator(task_id=task_id, trigger_rule="all_done")]
             done_task_groups[
-                sheet_details["clean_table_name"]
+                clean_table_name
             ] = DatalakeTaskGroup.format_tasks_boundaries(
                 done_task_group, done_task_group
             )
