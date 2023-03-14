@@ -5,7 +5,9 @@ import re
 import time
 from datetime import datetime, timedelta
 from os.path import join
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Dict
+
+from gspread.exceptions import SpreadsheetNotFound, WorksheetNotFound
 
 import pandas as pd
 import pendulum
@@ -41,9 +43,10 @@ class GsheetsService:
     GSHEETS_DATA_LAKE_CLEAN_SCHEMA = "datalake_gsheets_clean"
     TEMPORARY_TABLE_PREFIX = "temp_"
 
-    def get_sheets_are_dependencies(self) -> List[str]:
+    @staticmethod
+    def get_sheets_are_dependencies() -> List[str]:
         """
-        Return the gsheets clean tables that are dependencies to other DAGs on depencencies.yaml
+        Return the gsheets clean tables that are dependencies to other DAGs on dependencies.yaml
         """
         dependencies_dict = FileService.get_dict_from_yaml_file(DEPS_YAML_PATH)
         all_deps = []
@@ -87,7 +90,8 @@ class GsheetsService:
                 dependencies_sheets.append(row["clean_table_name"])
         return dependencies_sheets
 
-    def get_recently_modified_gsheet(self, drive_service) -> List:
+    @staticmethod
+    def get_recently_modified_gsheet(drive_service) -> Dict:
         """
         Get the sheet ids for the Gsheets modified until the DAG run.
 
@@ -137,7 +141,8 @@ class GsheetsService:
 
         return files
 
-    def __has_import_range(self, sheet_data: list) -> bool:
+    @staticmethod
+    def __has_import_range(sheet_data: list) -> bool:
         regex_pattern = re.compile("IMPORTRANGE")
         for row in sheet_data:
             for column_value in row:
@@ -165,17 +170,26 @@ class GsheetsService:
 
             if sheet.get("sheet_context") == "static":
                 continue
+            try:
+                sheet_data = gsheets_consumer.read_sheet_rows(
+                    sheet_id=sheet_id,
+                    sheet_name=sheet_name,
+                    value_render_option="FORMULA",
+                )
 
-            sheet_data = gsheets_consumer.read_sheet_rows(
-                sheet_id=sheet_id, sheet_name=sheet_name, value_render_option="FORMULA"
-            )
-
-            if (
-                self.__has_import_range(sheet_data)
-                and sheet_id not in import_range_sheets_ids
-            ):
-                import_range_sheets_ids.append(sheet_id)
-
+                if (
+                    self.__has_import_range(sheet_data)
+                    and sheet_id not in import_range_sheets_ids
+                ):
+                    import_range_sheets_ids.append(sheet_id)
+            except WorksheetNotFound as e:
+                logger.error(
+                    f"m=get_gsheets_with_import_range, msg=spreadsheet {raw_table_name} not found, e={e}"
+                )
+            except SpreadsheetNotFound as e:
+                logger.error(
+                    f"m=get_gsheets_with_import_range, msg=sheet {sheet_name} not found, e={e}"
+                )
             gsheets_count += 1
 
         logger.info("m=get_gsheets_with_import_range, msg=Finished executing")
@@ -262,7 +276,7 @@ class GsheetsService:
         """
         Drops temp table, JVM dataframe and python runtime variables to release cluster memory
         :param spark_client: A client to handle the Spark connection
-        :param dataframe: Spark Dataframe with google sheets data.
+        :param dataframe: Spark Dataframe with Google sheets data.
         :param clean_table_name: Table name for sheet on clean layer
         """
         spark_client.conn.catalog.dropTempView(
@@ -282,11 +296,11 @@ class GsheetsService:
         clean_table_name: str,
     ) -> None:
         """
-        Loads raw Dataframe into an temporary view and validates clean query against it
+        Loads raw Dataframe into a temporary view and validates clean query against it
         :param dag_name: Used to find the query file according to the DAG Package
         :param spark_client: A client to handle the Spark connection
-        :param df: Spark Dataframe with google sheets data.
-        :param gsheets_context: Sheet Context. Optional.
+        :param df: Spark Dataframe with Google sheets data
+        :param gsheet_context: Sheet Context. Optional
         :param raw_table_name: Table name for sheet on raw layer
         :param clean_table_name: Table name for sheet on clean layer
         """

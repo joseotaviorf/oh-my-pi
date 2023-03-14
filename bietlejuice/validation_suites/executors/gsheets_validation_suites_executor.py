@@ -44,6 +44,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         self.credentials, self.scope = self.get_credentials_and_scope()
         self.drive_service = self.build_drive_api_service()
         self.gsheets_service = GsheetsService()
+        self.spark_client = SparkClient()
 
         self.all_sheets = self.get_all_sheets_info()
         self.delta = self.gsheets_service.get_recently_modified_gsheet(
@@ -128,8 +129,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         preload_time_in_seconds: Union[int, None] = None,
     ) -> None:
         gsheets_client = self.get_gsheet_client()
-        spark_client = SparkClient()
-        gsheets_consumer = GsheetsConsumer(gsheets_client, spark_client)
+        gsheets_consumer = GsheetsConsumer(gsheets_client, self.spark_client)
 
         df = gsheets_consumer.get_sheet_df(
             sheet_name,
@@ -141,7 +141,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
 
         self.gsheets_service.validate_clean_query_against_raw(
             dag_name,
-            spark_client,
+            self.spark_client,
             df,
             gsheets_context,
             raw_table_name,

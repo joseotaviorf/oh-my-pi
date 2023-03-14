@@ -26,8 +26,14 @@ This pipeline produces the following output tables:
   {clean_tables}
 
 ### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact its owner.
 
 {additional_information}
+
+### How to force run a gsheet
+
+If you need to bypass the check for updated on a specific sheet, pass the following JSON to the DAG Config arguments, but change the example table names for the clean table name of your sheet:
+
+```
+{{'bypass_update_check_list':['events_aud','ciq_table']}}
+```
 </details>

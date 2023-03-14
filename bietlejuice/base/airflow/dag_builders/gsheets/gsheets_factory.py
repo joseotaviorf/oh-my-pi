@@ -1,4 +1,5 @@
 import os
+from typing import List, Dict
 from datetime import datetime
 import json
 
@@ -6,7 +7,11 @@ import pendulum
 from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
+    QuintoAndarDatabricksSubmitRunOperator,
+    QuintoAndarDatabricksTerminateClusterOperator,
 )
+
+from airflow.operators.dummy_operator import DummyOperator
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -67,9 +72,14 @@ class GsheetsDAGFactory:
             self.config_service.get_config("default_libraries"),
         )
 
-        self.raw_spark_job_path, self.base_spark_jobs_path = (
+        (
+            self.raw_spark_job_path,
+            self.base_spark_jobs_path,
+            self.load_ids_to_be_ingested_info_spark_job,
+        ) = (
             f"{databricks_bietlejuice_repo_path}/spark_jobs/{source_with_context}/load_{source_with_context}_into_datalake.py",
             f"{databricks_bietlejuice_repo_path}/spark_jobs/base/",
+            f"{databricks_bietlejuice_repo_path}/spark_jobs/{source_with_context}/load_modified_gsheets_id.py",
         )
 
         # GSHEETS CONFIG
@@ -77,10 +87,12 @@ class GsheetsDAGFactory:
             {
                 "whl": f"{artifacts_bucket}/gsheets-api-client-python/"
                 f"quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
-            }
+            },
+            {"pypi": {"package": "google-auth==2.13.0"}},
+            {"pypi": {"package": "google-api-python-client==2.55.0"}},
         ]
 
-    def _get_cluster_description(self, cluster_name):
+    def _get_cluster_description(self, cluster_name: str) -> Dict:
         """
         Obtains a dictionary with information about the cluster, using ConfigurationService.
 
@@ -90,9 +102,11 @@ class GsheetsDAGFactory:
         """
         return self.config_service.get_config(cluster_name)
 
-    def __get_dag_doc_md(self, google_files, dag_context, dag_id, dag_doc_details):
+    def __get_dag_doc_md(
+        self, google_files, dag_context: str, dag_id: str, dag_doc_details: Dict
+    ) -> str:
         """
-        Format the markdown document for the specified context.
+        Format the Markdown document for the specified context.
         @param google_files: the dict_items with the general information of the
         context sheets.
         @param dag_context: a str with the name of the context/DAG.
@@ -132,7 +146,7 @@ class GsheetsDAGFactory:
         )
 
     @staticmethod
-    def __filtering_gsheets_from_context(google_file, dag_context):
+    def __filtering_gsheets_from_context(google_file, dag_context: str) -> Dict:
         """
         This method filters and returns the sheets added for the specified context.
         @param google_file: a dict_items with the general information of the sheets.
@@ -145,7 +159,7 @@ class GsheetsDAGFactory:
             return google_file
 
     @staticmethod
-    def __get_table_name(google_file, layer="raw"):
+    def __get_table_name(google_file, layer="raw") -> str:
         """
         Get the raw/clean table name from the specified gsheets file.
         @param google_file: a dict_items with the general information of the sheets.
@@ -166,9 +180,9 @@ class GsheetsDAGFactory:
         source,
         task_pool,
         raw_spark_job_path,
-        create_cluster_task,
         task_group,
-        tree_path,
+        dag_context,
+        execution_date,
     ):
         """
         This method creates the raw task for each worksheet associated with the DAG
@@ -178,7 +192,6 @@ class GsheetsDAGFactory:
         @param source: a str with source name.
         @param task_pool: a str with airflow's pool name
         @param raw_spark_job_path: full filepath for the extraction spark job.
-        @param create_cluster_task: QuintoAndarDatabricksCreateClusterOperator.
         @param task_group: BaseTaskGroup.
         @return: dict
         """
@@ -196,21 +209,70 @@ class GsheetsDAGFactory:
                     source,
                     table_name,
                     json.dumps(sheet_details),
+                    execution_date,
+                    dag_context,
                 ],
                 pool=task_pool,
-                tree_path=tree_path,
+                tree_path=f"{dag_context}/",
             )
             raw_task_groups[sheet_details["clean_table_name"]] = raw_task_group
 
-            create_cluster_task >> DatalakeTaskGroup.first_tasks(raw_task_group)
+        return raw_task_groups
 
-        return raw_task_groups, create_cluster_task
+    @staticmethod
+    def __create_done_tasks(google_files):
+        """
+        This method creates the done task for each worksheet associated with the DAG
+        context.
+        @param google_files: the dict_items with the general information of the
+        context sheets.
+        @return: dict
+        """
+        done_task_groups = {}
 
-    def build_dag(self, dag_context, dag_details):
+        for table_name, sheet_details in google_files:
+            sheet_details["raw_table_name"] = table_name
+            task_id = f"done-clean-{table_name}-run".replace("_", "-")
+
+            done_task_group = [DummyOperator(task_id=task_id, trigger_rule="all_done")]
+            done_task_groups[
+                sheet_details["clean_table_name"]
+            ] = DatalakeTaskGroup.format_tasks_boundaries(
+                done_task_group, done_task_group
+            )
+
+        return done_task_groups
+
+    def __create_load_ingestion_ids_info_task(
+        self, task_pool, google_files_context: List[Dict], execution_date, dag
+    ):
+        return QuintoAndarDatabricksSubmitRunOperator(
+            task_id="ingested-gsheets-id-info",
+            dag=dag,
+            pool=task_pool,
+            json={
+                "spark_python_task": {
+                    "python_file": self.load_ids_to_be_ingested_info_spark_job,
+                    "parameters": [
+                        self.ENV,
+                        self.datalake_bucket,
+                        json.dumps(google_files_context),
+                        execution_date,
+                    ],
+                }
+            },
+            do_output_xcom_push=True,
+        )
+
+    def build_dag(
+        self, dag_context, dag_details, execution_date, user_defined_macros=None
+    ):
         """
         This method builds a DAG from the given context and details.
         @param dag_context: str. DAG name.
         @param dag_details: json. Details about the DAG.
+        @param execution_date: str. DAG execution date.
+        @param user_defined_macros: dict. DAG macros to be defined.
         """
 
         dag_name = f"{self.source}.{dag_context}"
@@ -243,6 +305,7 @@ class GsheetsDAGFactory:
             doc_md=self.__get_dag_doc_md(
                 google_files_context, dag_context, dag_id, dag_details.get("dag_doc")
             ),
+            user_defined_macros=user_defined_macros,
         )
 
         create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -262,14 +325,21 @@ class GsheetsDAGFactory:
             athena_query_result_location=self.athena_query_results_bucket,
         )
 
-        raw_task_groups, create_cluster_task = self.__create_raw_tasks(
+        load_ids_to_be_ingested_task_group = self.__create_load_ingestion_ids_info_task(
+            task_pool=self.task_pool,
+            google_files_context=google_files_context,
+            execution_date=execution_date,
+            dag=dag,
+        )
+
+        raw_task_groups = self.__create_raw_tasks(
             google_files_context,
             self.source,
             self.task_pool,
             self.raw_spark_job_path,
-            create_cluster_task,
             task_group,
-            f"{dag_context}/",
+            dag_context,
+            execution_date,
         )
 
         task_group.relative_query_path = self.source_with_context
@@ -281,4 +351,18 @@ class GsheetsDAGFactory:
             tree_path=f"{dag_context}/",
         )
 
-        return dag, raw_task_groups, clean_task_groups
+        done_task_groups = self.__create_done_tasks(google_files_context)
+
+        terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+            dag=dag, task_id="terminate-cluster"
+        )
+
+        return (
+            dag,
+            create_cluster_task,
+            load_ids_to_be_ingested_task_group,
+            raw_task_groups,
+            clean_task_groups,
+            done_task_groups,
+            terminate_cluster_task,
+        )

@@ -78,6 +78,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         pool=AIRFLOW_DEFAULT_POOL,
         has_hive_sync=True,
         tree_path="",
+        do_output_xcom_push=False,
     ):
         """
         Create a task group containing 2 tasks:
@@ -102,6 +103,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type pool: str
         :param has_hive_sync: if this table is going to have Hive sync
         :param tree_path: partial path used in some DAGs off of our pattern
+        :param do_output_xcom_push: flag indicating if the job result should be pushed into xcom.
         :return: initial and final tasks of the created task group
         :rtype: dict
         """
@@ -130,6 +132,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                     + raw_spark_job_extra_args,
                 }
             },
+            do_output_xcom_push=do_output_xcom_push,
         )
 
         config_service = ConfigurationService(source)
@@ -339,6 +342,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         pool=AIRFLOW_DEFAULT_POOL,
         has_hive_sync=True,
         tree_path="",
+        do_output_xcom_push=False,
     ):
         """
         Build a task group for raw layer to extract a specific table from source
@@ -359,6 +363,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type pool: str
         :param has_hive_sync: if this table is going to have Hive sync
         :param tree_path: partial path used in some DAGs off of our pattern
+        :param do_output_xcom_push: flag indicating if the job result should be pushed into xcom.
         :return: initial and final tasks of the created task group
         :rtype: dict
         """
@@ -371,6 +376,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             pool=pool,
             has_hive_sync=has_hive_sync,
             tree_path=tree_path,
+            do_output_xcom_push=do_output_xcom_push,
         )
 
     def _build_task_group(
@@ -392,6 +398,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         execution_date="{{ ds }}",
         has_hive_sync=True,
         table_customization=None,
+        do_output_xcom_push=False,
     ):
         """
         Create a task group containing 4 tasks:
@@ -427,6 +434,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type execution_date: str
         :param has_hive_sync: if this table is going to have Hive sync
         :param table_customization: table's structure customization, when applicable
+        :param do_output_xcom_push: flag indicating if the job result should be pushed into xcom.
         :return: dict with initial and final tasks of the created task group
         :rtype: dict
         """
@@ -460,6 +468,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 }
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            do_output_xcom_push=do_output_xcom_push,
         )
 
         if has_hive_sync:
@@ -636,6 +645,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         execution_date="{{ ds }}",
         has_hive_sync=True,
         table_customization: Dict[str, Dict[str, str]] = None,
+        do_output_xcom_push=False,
     ):
         """
         Build a task group for clean layer
@@ -664,6 +674,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
         :param has_hive_sync: if this table is going to have Hive sync
         :param table_customization: table's structure customization, when applicable
+        :param do_output_xcom_push: flag indicating if the job result should be pushed into xcom.
         :type execution_date: str
         :rtype: list[BaseOperator]
         """
@@ -683,6 +694,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             execution_date,
             has_hive_sync,
             table_customization,
+            do_output_xcom_push,
         )
 
     def build_enrich_task_group(
@@ -699,6 +711,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         execution_date="{{ ds }}",
         has_hive_sync=True,
         table_customization: Dict[str, Dict[str, str]] = None,
+        do_output_xcom_push=False,
     ):
         """
         Build a task group for enrich layer
@@ -727,6 +740,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
         :param has_hive_sync: if this table is going to have Hive sync
         :param table_customization: table's structure customization, when applicable
+        :param do_output_xcom_push: flag indicating if the job result should be pushed into xcom.
         :type execution_date: str
         :rtype: list[BaseOperator]
         """
@@ -744,4 +758,5 @@ class DatalakeTaskGroup(BaseTaskGroup):
             execution_date=execution_date,
             has_hive_sync=has_hive_sync,
             table_customization=table_customization,
+            do_output_xcom_push=do_output_xcom_push,
         )

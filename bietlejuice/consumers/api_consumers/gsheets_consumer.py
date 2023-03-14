@@ -121,6 +121,7 @@ class GsheetsConsumer(GoogleSheetsReader):
         """
         :param sheet_name: Sheet name for data
         :param sheet_id: Sheet ID for data
+        :param table_name: Sheet clean table name
         :param is_partitioned: If data needs to be partitioned
         :param preload_time_in_seconds: If data needs to be preloaded before fetching
         """
