@@ -50,7 +50,7 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.enrich_big_agent:create-enrich-house-external-table
   - bietlejuice.enrich_big_agent:create-enrich-program-external-table
   - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
-  - bietlejuice.gsheets.growth:create-clean-taxonomy-demand-external-table
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
 
 bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -170,7 +170,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.enrich_firestore:create-enrich-monday-external-table
   - bietlejuice.enrich_firestore:create-enrich-sale-offer-external-table
   - bietlejuice.enrich_sale_lead_flows:load-enrich-lead-flow
-  - bietlejuice.gsheets.for_sale:create-clean-offers-hub-central-external-table
+  - bietlejuice.gsheets.for_sale:done-clean-offers-hub-central
   - bietlejuice.sales_flow:create-clean-ccv-flow-external-table
   - bietlejuice.sales_flow:create-clean-offer-external-table
   - bietlejuice.sales_flow:create-clean-sales-flow-external-table
@@ -214,13 +214,13 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.ebdb:create-house-clean-external-table
   # casa_mineira_top_of_funnel_volumes_daily
-  - bietlejuice.gsheets.growth:create-clean-targets-casa-mineira-tof-daily-external-table
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-daily
   #plaquinhas_houses
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
-  - bietlejuice.gsheets.growth:create-clean-branding-where-is-plaquinha-external-table
+  - bietlejuice.gsheets.growth:done-clean-branding-where-is-plaquinha
   - bietlejuice.ebdb:create-polygon-region-clean-external-table
   # performance_marketing_metrics_*_casa_mineira
   - bietlejuice.casa_mineira_portal:create-clean-house-external-table
@@ -239,12 +239,12 @@ bietlejuice.dw_datamarts_growth:
   # sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
   # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
-  - bietlejuice.gsheets.growth:create-clean-city-share-external-table
-  - bietlejuice.gsheets.growth:create-clean-local-holidays-external-table
-  - bietlejuice.gsheets.growth:create-clean-weekday-holiday-share-supply-external-table
-  - bietlejuice.gsheets.growth:create-clean-weekday-supply-channel-share-external-table
-  - bietlejuice.gsheets.growth:create-clean-week-volumes-supply-external-table
-  - bietlejuice.gsheets.for_sale:create-clean-sale-supply-targets-external-table
+  - bietlejuice.gsheets.growth:done-clean-city-share
+  - bietlejuice.gsheets.growth:done-clean-local-holidays
+  - bietlejuice.gsheets.growth:done-clean-weekday-holiday-share-supply
+  - bietlejuice.gsheets.growth:done-clean-weekday-supply-channel-share
+  - bietlejuice.gsheets.growth:done-clean-week-volumes-supply
+  - bietlejuice.gsheets.for_sale:done-clean-sale-supply-targets
   # users_online_metrics, listings-online-metrics
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   # sale_performance_marketing_metrics_supply_cohort
@@ -253,8 +253,8 @@ bietlejuice.dw_datamarts_growth:
   # sale_performance_marketing_metrics_supply_cohort
   # performance_marketing_metrics_portal_casa_mineira, performance_marketing_metrics_imobiliaria_casa_mineira
   - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
-  - bietlejuice.gsheets.growth:create-clean-taxonomy-portal-casa-mineira-external-table
-  - bietlejuice.gsheets.growth:create-clean-targets-casa-mineira-nbp-external-table
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-portal-casa-mineira
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-nbp
   - bietlejuice.casa_mineira_crm:load-clean-city
   - bietlejuice.casa_mineira_crm:load-clean-house
   - bietlejuice.casa_mineira_crm:load-clean-house-type
@@ -265,12 +265,12 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.casa_mineira_amplitude:create-clean-329001-portal-external-table
   - bietlejuice.casa_mineira_portal:create-clean-contact-external-table
   - bietlejuice.casa_mineira_portal:create-clean-neighborhood-external-table
-  - bietlejuice.gsheets.growth:create-clean-targets-portal-casa-mineira-cost-cf-external-table
+  - bietlejuice.gsheets.growth:done-clean-targets-portal-casa-mineira-cost-cf
   # casa_mineira_top_of_funnel_volumes_monthly
   - bietlejuice.enrich_top_of_funnel_portal_cm:create-enrich-top-of-funnel-users-portal-casa-mineira-external-table
-  - bietlejuice.gsheets.growth:create-clean-targets-casa-mineira-tof-monthly-external-table
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-monthly
   # casa_mineira_top_of_funnel_volumes_weekly
-  - bietlejuice.gsheets.growth:create-clean-targets-casa-mineira-tof-weekly-external-table
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-weekly
   # performance_marketing_metrics_imobiliaria_casa_mineira
   - bietlejuice.casa_mineira_crm:create-clean-city-external-table
   - bietlejuice.casa_mineira_crm:create-clean-house-external-table
@@ -280,15 +280,15 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.casa_mineira_crm:create-clean-origin-contact-external-table
   - bietlejuice.casa_mineira_crm:create-clean-uf-external-table
   - bietlejuice.casa_mineira_crm:create-clean-visit-external-table
-  - bietlejuice.gsheets.growth:create-clean-targets-casa-mineira-cost-external-table
-  - bietlejuice.gsheets.growth:create-clean-targets-casa-mineira-ncp-external-table
-  - bietlejuice.gsheets.growth:create-clean-taxonomy-crm-casa-mineira-external-table
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-cost
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-ncp
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-crm-casa-mineira
   - bietlejuice.enrich_lost_listings:create-enrich-lost-listings-external-table
 
 bietlejuice.dw_datamarts_growth_cross:
   # Removed dependency with dw_region, dw_rent_listing_flow.fact_house_listing_flows and dw_sale_listing_flow.fact_listing_flows since dw_datamarts_cross already satisfies
   # affiliate_acquisition_metrics
-  - bietlejuice.gsheets.growth:create-clean-provisioned-costs-import-external-table
+  - bietlejuice.gsheets.growth:done-clean-provisioned-costs-import
   # affiliate_acquisition_metrics, rent_flow_interactions
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
   - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
@@ -353,43 +353,43 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.enrich_customer_support:create-enrich-chat-external-table
   - bietlejuice.enrich_rental_historical_follow_up:create-enrich-house-listings-daily-info-external-table
   - bietlejuice.enrich_top_of_funnel_demand:create-enrich-user-interactions-external-table
-  - bietlejuice.gsheets.growth:create-clean-affiliates-extra-user-bonus-external-table
-  - bietlejuice.gsheets.growth:create-clean-branding-where-is-plaquinha-external-table
-  - bietlejuice.gsheets.growth:create-clean-ciq-costs-external-table
-  - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
-  - bietlejuice.gsheets.growth:create-clean-daily-target-supply-rental-external-table
-  - bietlejuice.gsheets.for_sale:create-clean-offers-hub-central-external-table
-  - bietlejuice.gsheets.growth:create-clean-promotional-bonus-cluster-targets-external-table
-  - bietlejuice.gsheets.growth:create-clean-promotional-bonus-user-cluster-targets-external-table
-  - bietlejuice.gsheets.growth:create-clean-rental-tof-daily-targets-external-table
-  - bietlejuice.gsheets.growth:create-clean-rental-tof-weekly-targets-external-table
-  - bietlejuice.gsheets.growth:create-clean-sale-flows-targets-external-table
+  - bietlejuice.gsheets.growth:done-clean-affiliates-extra-user-bonus
+  - bietlejuice.gsheets.growth:done-clean-branding-where-is-plaquinha
+  - bietlejuice.gsheets.growth:done-clean-ciq-costs
+  - bietlejuice.gsheets.growth:done-clean-costs-targets
+  - bietlejuice.gsheets.growth:done-clean-daily-target-supply-rental
+  - bietlejuice.gsheets.for_sale:done-clean-offers-hub-central
+  - bietlejuice.gsheets.growth:done-clean-promotional-bonus-cluster-targets
+  - bietlejuice.gsheets.growth:done-clean-promotional-bonus-user-cluster-targets
+  - bietlejuice.gsheets.growth:done-clean-rental-tof-daily-targets
+  - bietlejuice.gsheets.growth:done-clean-rental-tof-weekly-targets
+  - bietlejuice.gsheets.growth:done-clean-sale-flows-targets
   # - bietlejuice.gsheets.growth:create-clean-sale-nbp-source-targets-external-table
-  - bietlejuice.gsheets.for_sale:create-clean-secretariat-hierarchy-external-table
-  - bietlejuice.gsheets.growth:create-clean-unit-economics-amortization-curve-external-table
-  - bietlejuice.gsheets.for_sale:create-clean-sale-supply-targets-external-table
-  - bietlejuice.gsheets.for_sale:create-clean-sale-tof-daily-targets-external-table
-  - bietlejuice.gsheets.for_sale:create-clean-sale-tof-monthly-targets-external-table
-  - bietlejuice.gsheets.for_sale:create-clean-sale-tof-weekly-targets-external-table
+  - bietlejuice.gsheets.for_sale:done-clean-secretariat-hierarchy
+  - bietlejuice.gsheets.growth:done-clean-unit-economics-amortization-curve
+  - bietlejuice.gsheets.for_sale:done-clean-sale-supply-targets
+  - bietlejuice.gsheets.for_sale:done-clean-sale-tof-daily-targets
+  - bietlejuice.gsheets.for_sale:done-clean-sale-tof-monthly-targets
+  - bietlejuice.gsheets.for_sale:done-clean-sale-tof-weekly-targets
   # rent_flow_interactions, performance_marketing_metrics_imobiliaria_casa_mineira
   # daily_target_volumes_supply
-  - bietlejuice.gsheets.growth:create-clean-city-share-external-table
-  - bietlejuice.gsheets.growth:create-clean-local-holidays-external-table
-  - bietlejuice.gsheets.growth:create-clean-weekday-holiday-share-supply-external-table
-  - bietlejuice.gsheets.growth:create-clean-weekday-supply-channel-share-external-table
-  - bietlejuice.gsheets.growth:create-clean-week-volumes-supply-external-table
+  - bietlejuice.gsheets.growth:done-clean-city-share
+  - bietlejuice.gsheets.growth:done-clean-local-holidays
+  - bietlejuice.gsheets.growth:done-clean-weekday-holiday-share-supply
+  - bietlejuice.gsheets.growth:done-clean-weekday-supply-channel-share
+  - bietlejuice.gsheets.growth:done-clean-week-volumes-supply
   # - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
-  - bietlejuice.gsheets.growth:create-clean-daily-target-supply-sale-external-table
+  - bietlejuice.gsheets.growth:done-clean-daily-target-supply-sale
   - bietlejuice.wololo:create-clean-prospect-external-table
   # performance_marketing_metrics_demand
-  - bietlejuice.gsheets.growth:create-clean-mkt-cost-per-source-external-table
-  - bietlejuice.gsheets.growth:create-clean-rental-ntp-source-targets-external-table
-  - bietlejuice.gsheets.growth:create-clean-rental-flows-targets-external-table
+  - bietlejuice.gsheets.growth:done-clean-mkt-cost-per-source
+  - bietlejuice.gsheets.growth:done-clean-rental-ntp-source-targets
+  - bietlejuice.gsheets.growth:done-clean-rental-flows-targets
   # - bietlejuice.gsheets:create-clean-provisioned-costs-import-external-table mysterious sheet that doesnt exist anymore, but is used in some datamarts
   - bietlejuice.wololo:create-clean-context-discard-external-table
   - bietlejuice.wololo:create-clean-conversion-external-table
   # plaquinhas_users_demand
-  - bietlejuice.gsheets.growth:create-clean-plaquinhas-demand-targets-external-table
+  - bietlejuice.gsheets.growth:done-clean-plaquinhas-demand-targets
   # performance_marketing_metrics_imobiliaria_casa_mineira
   - bietlejuice.enrich_affiliates_cost_attributions:create-enrich-affiliates-cost-attributions-external-table
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
@@ -398,7 +398,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.enrich_3p:create-enrich-houses-3p-bh-external-table
   # unique_performance_marketing_metrics_supply_coincident
   - bietlejuice.enrich_top_of_funnel_supply:create-enrich-top-of-funnel-supply-external-table
-  - bietlejuice.gsheets.growth:create-clean-tof-supply-targets-external-table
+  - bietlejuice.gsheets.growth:done-clean-tof-supply-targets
 
 # bietlejuice.dw_datamarts_growth_blocklist:
 #   # marketplace_intelligence_metrics, marketing_allocated_costs
@@ -498,7 +498,7 @@ bietlejuice.dw_booking:
   - bietlejuice.enrich_booking:load-enrich-booking-cancellation
   - bietlejuice.enrich_booking:load-enrich-booking-review
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-demand
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
 
 bietlejuice.dw_braze_events_user_centric:
   - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-same-week
@@ -523,7 +523,7 @@ bietlejuice.dw_buyer_prospect:
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect
 
 bietlejuice.dw_business_unit_region:
-  - bietlejuice.gsheets.for_sale:load-clean-business-unit-region
+  - bietlejuice.gsheets.for_sale:done-clean-business-unit-region
 
 bietlejuice.dw_call:
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-agents
@@ -558,8 +558,8 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_customer_resolution:load-enrich-customer-resolution-static
-  - bietlejuice.gsheets.support_and_service:load-clean-agents-ranking-targets
-  - bietlejuice.gsheets.support_and_service:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:done-clean-agents-ranking-targets
+  - bietlejuice.gsheets.support_and_service:done-clean-department-control
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 
 bietlejuice.dw_datamarts_spark.cross:
@@ -592,7 +592,7 @@ bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.enrich_big_agent:load-enrich-house
   - bietlejuice.enrich_big_agent:load-enrich-program
     # talk_to_agent aditionals
-  - bietlejuice.gsheets.growth:create-clean-taxonomy-demand-external-table
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.ebdb:create-clean-agent-support-in-data-lake
 
@@ -734,14 +734,14 @@ bietlejuice.dw_datamarts_spark.growth:
   # - bietlejuice.dw_listing:load-dw-public-fact-house-listings # DUPLICATED
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   # casa_mineira_top_of_funnel_volumes_daily
-  - bietlejuice.gsheets.growth:load-clean-targets-casa-mineira-tof-daily
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-daily
   #plaquinhas_houses
   - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks
-  - bietlejuice.gsheets.growth:load-clean-branding-where-is-plaquinha
+  - bietlejuice.gsheets.growth:done-clean-branding-where-is-plaquinha
   - bietlejuice.ebdb:create-clean-polygon-region-in-data-lake
   # performance_marketing_metrics_*_casa_mineira
   - bietlejuice.casa_mineira_portal:load-clean-house
@@ -759,20 +759,20 @@ bietlejuice.dw_datamarts_spark.growth:
   # sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
   # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
-  - bietlejuice.gsheets.growth:load-clean-city-share
-  - bietlejuice.gsheets.growth:load-clean-local-holidays
-  - bietlejuice.gsheets.growth:load-clean-weekday-holiday-share-supply
-  - bietlejuice.gsheets.growth:load-clean-weekday-supply-channel-share
-  - bietlejuice.gsheets.growth:load-clean-week-volumes-supply
-  - bietlejuice.gsheets.for_sale:load-clean-sale-supply-targets
+  - bietlejuice.gsheets.growth:done-clean-city-share
+  - bietlejuice.gsheets.growth:done-clean-local-holidays
+  - bietlejuice.gsheets.growth:done-clean-weekday-holiday-share-supply
+  - bietlejuice.gsheets.growth:done-clean-weekday-supply-channel-share
+  - bietlejuice.gsheets.growth:done-clean-week-volumes-supply
+  - bietlejuice.gsheets.for_sale:done-clean-sale-supply-targets
   # users_online_metrics, listings-online-metrics
   # - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean # DUPLICATED
   # sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
   # performance_marketing_metrics_portal_casa_mineira, performance_marketing_metrics_imobiliaria_casa_mineira
   - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:load-enrich-daily-costs
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-portal-casa-mineira
-  - bietlejuice.gsheets.growth:load-clean-targets-casa-mineira-nbp
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-portal-casa-mineira
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-nbp
   - bietlejuice.casa_mineira_crm:load-clean-city
   - bietlejuice.casa_mineira_crm:load-clean-house
   - bietlejuice.casa_mineira_crm:load-clean-house-type
@@ -783,12 +783,12 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.casa_mineira_amplitude:load-clean-329001-portal
   - bietlejuice.casa_mineira_portal:load-clean-contact
   - bietlejuice.casa_mineira_portal:load-clean-neighborhood
-  - bietlejuice.gsheets.growth:load-clean-targets-portal-casa-mineira-cost-cf
+  - bietlejuice.gsheets.growth:done-clean-targets-portal-casa-mineira-cost-cf
   # casa_mineira_top_of_funnel_volumes_monthly
   - bietlejuice.enrich_top_of_funnel_portal_cm:load-enrich-top-of-funnel-users-portal-casa-mineira
-  - bietlejuice.gsheets.growth:load-clean-targets-casa-mineira-tof-monthly
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-monthly
   # casa_mineira_top_of_funnel_volumes_weekly
-  - bietlejuice.gsheets.growth:load-clean-targets-casa-mineira-tof-weekly
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-weekly
   # performance_marketing_metrics_imobiliaria_casa_mineira
   # - bietlejuice.casa_mineira_crm:load-clean-city # DUPLICATED
   # - bietlejuice.casa_mineira_crm:load-clean-house # DUPLICATED
@@ -798,15 +798,15 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.casa_mineira_crm:load-clean-origin-contact
   # - bietlejuice.casa_mineira_crm:load-clean-uf # DUPLICATED
   # - bietlejuice.casa_mineira_crm:load-clean-visit # DUPLICATED
-  - bietlejuice.gsheets.growth:load-clean-targets-casa-mineira-cost
-  - bietlejuice.gsheets.growth:load-clean-targets-casa-mineira-ncp
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-crm-casa-mineira
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-cost
+  - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-ncp
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-crm-casa-mineira
   - bietlejuice.enrich_lost_listings:load-enrich-lost-listings
 
 bietlejuice.dw_datamarts_spark.growth_cross:
   # Removed dependency with dw_region, dw_rent_listing_flow.fact_house_listing_flows and dw_sale_listing_flow.fact_listing_flows since dw_datamarts_cross already satisfies
   # affiliate_acquisition_metrics
-  - bietlejuice.gsheets.growth:load-clean-provisioned-costs-import
+  - bietlejuice.gsheets.growth:done-clean-provisioned-costs-import
   # affiliate_acquisition_metrics, rent_flow_interactions
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
@@ -869,43 +869,43 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
-  - bietlejuice.gsheets.growth:load-clean-affiliates-extra-user-bonus
-  - bietlejuice.gsheets.growth:load-clean-branding-where-is-plaquinha
-  - bietlejuice.gsheets.growth:load-clean-ciq-costs
-  - bietlejuice.gsheets.growth:load-clean-costs-targets
-  - bietlejuice.gsheets.growth:load-clean-daily-target-supply-rental
-  - bietlejuice.gsheets.for_sale:load-clean-offers-hub-central
-  - bietlejuice.gsheets.growth:load-clean-promotional-bonus-cluster-targets
-  - bietlejuice.gsheets.growth:load-clean-promotional-bonus-user-cluster-targets
-  - bietlejuice.gsheets.growth:load-clean-rental-tof-daily-targets
-  - bietlejuice.gsheets.growth:load-clean-rental-tof-weekly-targets
-  - bietlejuice.gsheets.growth:load-clean-sale-flows-targets
-  # - bietlejuice.gsheets.growth:load-clean-sale-nbp-source-targets
-  - bietlejuice.gsheets.for_sale:load-clean-secretariat-hierarchy
-  - bietlejuice.gsheets.growth:load-clean-unit-economics-amortization-curve
-  - bietlejuice.gsheets.for_sale:load-clean-sale-supply-targets
-  - bietlejuice.gsheets.for_sale:load-clean-sale-tof-daily-targets
-  - bietlejuice.gsheets.for_sale:load-clean-sale-tof-monthly-targets
-  - bietlejuice.gsheets.for_sale:load-clean-sale-tof-weekly-targets
+  - bietlejuice.gsheets.growth:done-clean-affiliates-extra-user-bonus
+  - bietlejuice.gsheets.growth:done-clean-branding-where-is-plaquinha
+  - bietlejuice.gsheets.growth:done-clean-ciq-costs
+  - bietlejuice.gsheets.growth:done-clean-costs-targets
+  - bietlejuice.gsheets.growth:done-clean-daily-target-supply-rental
+  - bietlejuice.gsheets.for_sale:done-clean-offers-hub-central
+  - bietlejuice.gsheets.growth:done-clean-promotional-bonus-cluster-targets
+  - bietlejuice.gsheets.growth:done-clean-promotional-bonus-user-cluster-targets
+  - bietlejuice.gsheets.growth:done-clean-rental-tof-daily-targets
+  - bietlejuice.gsheets.growth:done-clean-rental-tof-weekly-targets
+  - bietlejuice.gsheets.growth:done-clean-sale-flows-targets
+  # - bietlejuice.gsheets.growth:done-clean-sale-nbp-source-targets
+  - bietlejuice.gsheets.for_sale:done-clean-secretariat-hierarchy
+  - bietlejuice.gsheets.growth:done-clean-unit-economics-amortization-curve
+  - bietlejuice.gsheets.for_sale:done-clean-sale-supply-targets
+  - bietlejuice.gsheets.for_sale:done-clean-sale-tof-daily-targets
+  - bietlejuice.gsheets.for_sale:done-clean-sale-tof-monthly-targets
+  - bietlejuice.gsheets.for_sale:done-clean-sale-tof-weekly-targets
   # rent_flow_interactions, performance_marketing_metrics_imobiliaria_casa_mineira
   # daily_target_volumes_supply
-  - bietlejuice.gsheets.growth:load-clean-city-share
-  - bietlejuice.gsheets.growth:load-clean-local-holidays
-  - bietlejuice.gsheets.growth:load-clean-weekday-holiday-share-supply
-  - bietlejuice.gsheets.growth:load-clean-weekday-supply-channel-share
-  - bietlejuice.gsheets.growth:load-clean-week-volumes-supply
+  - bietlejuice.gsheets.growth:done-clean-city-share
+  - bietlejuice.gsheets.growth:done-clean-local-holidays
+  - bietlejuice.gsheets.growth:done-clean-weekday-holiday-share-supply
+  - bietlejuice.gsheets.growth:done-clean-weekday-supply-channel-share
+  - bietlejuice.gsheets.growth:done-clean-week-volumes-supply
   # - bietlejuice.enrich_marketing_manual_daily_costs:load-enrich-daily-costs
-  - bietlejuice.gsheets.growth:load-clean-daily-target-supply-sale
+  - bietlejuice.gsheets.growth:done-clean-daily-target-supply-sale
   - bietlejuice.wololo:load-clean-prospect
   # performance_marketing_metrics_demand
-  - bietlejuice.gsheets.growth:load-clean-mkt-cost-per-source
-  - bietlejuice.gsheets.growth:load-clean-rental-ntp-source-targets
-  - bietlejuice.gsheets.growth:load-clean-rental-flows-targets
-  # - bietlejuice.gsheets:load-clean-provisioned-costs-import mysterious sheet that doesnt exist anymore, but is used in some datamarts
+  - bietlejuice.gsheets.growth:done-clean-mkt-cost-per-source
+  - bietlejuice.gsheets.growth:done-clean-rental-ntp-source-targets
+  - bietlejuice.gsheets.growth:done-clean-rental-flows-targets
+  # - bietlejuice.gsheets:done-clean-provisioned-costs-import mysterious sheet that doesnt exist anymore, but is used in some datamarts
   - bietlejuice.wololo:load-clean-context-discard
   - bietlejuice.wololo:load-clean-conversion
   # plaquinhas_users_demand
-  - bietlejuice.gsheets.growth:load-clean-plaquinhas-demand-targets
+  - bietlejuice.gsheets.growth:done-clean-plaquinhas-demand-targets
   # performance_marketing_metrics_imobiliaria_casa_mineira
   - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliates-cost-attributions
   # - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate # DUPLICATED
@@ -914,7 +914,7 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.enrich_3p:load-enrich-houses-3p-bh
   # unique_performance_marketing_metrics_supply_coincident
   - bietlejuice.enrich_top_of_funnel_supply:load-enrich-top-of-funnel-supply
-  - bietlejuice.gsheets.growth:load-clean-tof-supply-targets
+  - bietlejuice.gsheets.growth:done-clean-tof-supply-targets
 
 bietlejuice.dw_datamarts_spark.support_and_service:
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
@@ -937,7 +937,7 @@ bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements
   - bietlejuice.inspections:load-clean-assessment
-  - bietlejuice.gsheets.support_and_service:load-clean-inspectors-control
+  - bietlejuice.gsheets.support_and_service:done-clean-inspectors-control
 
 bietlejuice.dw_invoice_entries:
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries
@@ -1089,7 +1089,7 @@ bietlejuice.dw_offer:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-demand
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
 
 bietlejuice.dw_proposal:
   - bietlejuice.ebdb:create-clean-user-in-data-lake
@@ -1143,7 +1143,7 @@ bietlejuice.dw_rent_flow:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_offer:load-dw-public-dim-offer
   - bietlejuice.dw_proposal:load-dw-public-dim-proposal
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-demand
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
 
 bietlejuice.dw_rent_listing_flow:
   - bietlejuice.dw_region:load-dw-public-dim-region
@@ -1156,7 +1156,7 @@ bietlejuice.dw_rent_listing_flow:
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-growth
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-growth
 
 bietlejuice.dw_rental_contribution_margin:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -1185,7 +1185,7 @@ bietlejuice.dw_unified_listing_flow:
   - bietlejuice.enrich_unified_potential_listing:load-enrich-potential-listing-b2b
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-growth
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-growth
 
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
@@ -1234,7 +1234,7 @@ bietlejuice.dw_sale_flows:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-demand
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
 
 bietlejuice.dw_sale_listing_flow:
   - bietlejuice.dw_region:load-dw-public-dim-region
@@ -1247,7 +1247,7 @@ bietlejuice.dw_sale_listing_flow:
   - bietlejuice.enrich_sale_potential_listing:load-enrich-potential-listing-b2b
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-growth
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-growth
 
 bietlejuice.dw_sale_listing_price_changes:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
@@ -1273,7 +1273,7 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-demand
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
 
 bietlejuice.dw_sale_visits:
   # Removed dependency with enrich_booking.booking since is already satisfied by enrich_offer
@@ -1357,7 +1357,7 @@ bietlejuice.dw_user_affiliate:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
   - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-affiliates
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-affiliates
 
 bietlejuice.dw_user_sales_rep:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-sales-rep
@@ -1389,15 +1389,15 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
   - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.gsheets.fintech:load-clean-cod-locale
+  - bietlejuice.gsheets.fintech:done-clean-cod-locale
   - bietlejuice.payable_accounts_transactions:load-clean-accounts-payable
 
 bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.enrich_ebdb_affiliates_cost:load-enrich-affiliates-engagement-cost
   - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.gsheets.growth:load-clean-affiliates-cost-tradecom-configuration
-  - bietlejuice.gsheets.growth:load-clean-affiliates-manual-cost-engagement-history
-  - bietlejuice.gsheets.growth:load-clean-affiliates-manual-cost-engagement
+  - bietlejuice.gsheets.growth:done-clean-affiliates-cost-tradecom-configuration
+  - bietlejuice.gsheets.growth:done-clean-affiliates-manual-cost-engagement-history
+  - bietlejuice.gsheets.growth:done-clean-affiliates-manual-cost-engagement
 
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated
@@ -1408,8 +1408,8 @@ bietlejuice.enrich_amplitude_lead:
 
 bietlejuice.enrich_amplitude_magic_link:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.gsheets.support_and_service:load-clean-agents-control
-  - bietlejuice.gsheets.support_and_service:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:done-clean-agents-control
+  - bietlejuice.gsheets.support_and_service:done-clean-department-control
   - bietlejuice.zendesk_tickets:load-clean-groups
   - bietlejuice.zendesk_tickets:load-clean-users
 
@@ -1435,10 +1435,10 @@ bietlejuice.enrich_analyst_ranking:
   - bietlejuice.enrich_customer_demand:load-enrich-demand-metrics
   - bietlejuice.enrich_customer_demand:load-enrich-quality-metrics
   - bietlejuice.enrich_customer_demand:load-enrich-ra-metrics
-  - bietlejuice.gsheets.support_and_service:load-clean-agents-control
-  - bietlejuice.gsheets.support_and_service:load-clean-agents-ranking-targets
-  - bietlejuice.gsheets.support_and_service:load-clean-support-agents-department
-  - bietlejuice.gsheets.support_and_service:load-clean-ranking-rules
+  - bietlejuice.gsheets.support_and_service:done-clean-agents-control
+  - bietlejuice.gsheets.support_and_service:done-clean-agents-ranking-targets
+  - bietlejuice.gsheets.support_and_service:done-clean-support-agents-department
+  - bietlejuice.gsheets.support_and_service:done-clean-ranking-rules
 
 bietlejuice.enrich_atta:
   - bietlejuice.atta:load-clean-log-isolve-v1
@@ -1523,7 +1523,7 @@ bietlejuice.enrich_booking:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.gsheets.for_sale:load-clean-secretariat-hierarchy
+  - bietlejuice.gsheets.for_sale:done-clean-secretariat-hierarchy
   - bietlejuice.insider:load-clean-review-feature
   - bietlejuice.insider:load-clean-review
 
@@ -1607,10 +1607,10 @@ bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
 
 bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:
   - bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
-  - bietlejuice.gsheets.growth:load-clean-casa-mineira-marketing-cost-taxonomy
+  - bietlejuice.gsheets.growth:done-clean-casa-mineira-marketing-cost-taxonomy
 
 bietlejuice.enrich_casa_mineira_marketing_manual_daily_costs:
-  - bietlejuice.gsheets.growth_intraday:load-clean-casa-mineira-marketing-manual-shared-costs
+  - bietlejuice.gsheets.growth_intraday:done-clean-casa-mineira-marketing-manual-shared-costs
 
 bietlejuice.enrich_casa_mineira_portal:
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
@@ -1697,18 +1697,18 @@ bietlejuice.enrich_crm_tasks_transitions:
 
 bietlejuice.enrich_date:
   - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.gsheets.support_and_service:load-clean-service-city-holidays
+  - bietlejuice.gsheets.support_and_service:done-clean-service-city-holidays
 
 bietlejuice.enrich_customer_demand:
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.enrich_customer_support:load-enrich-email
-  - bietlejuice.gsheets.support_and_service:load-clean-agents-control
-  - bietlejuice.gsheets.support_and_service:load-clean-department-control
-  - bietlejuice.gsheets.support_and_service:load-clean-tag-sla-target
-  - bietlejuice.gsheets.support_and_service:load-clean-taxonomy-sla
-  - bietlejuice.gsheets.support_and_service:load-clean-service-city-holidays
+  - bietlejuice.gsheets.support_and_service:done-clean-agents-control
+  - bietlejuice.gsheets.support_and_service:done-clean-department-control
+  - bietlejuice.gsheets.support_and_service:done-clean-tag-sla-target
+  - bietlejuice.gsheets.support_and_service:done-clean-taxonomy-sla
+  - bietlejuice.gsheets.support_and_service:done-clean-service-city-holidays
   - bietlejuice.reclameaqui:load-clean-tickets
 
 bietlejuice.enrich_docx:
@@ -1745,7 +1745,7 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
-  - bietlejuice.gsheets.for_rent:load-clean-auxiliary-region
+  - bietlejuice.gsheets.for_rent:done-clean-auxiliary-region
 
 bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
@@ -1920,8 +1920,8 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.enrich_survicate:load-enrich-surveys
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
-  - bietlejuice.gsheets.support_and_service:load-clean-agents-control
-  - bietlejuice.gsheets.support_and_service:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:done-clean-agents-control
+  - bietlejuice.gsheets.support_and_service:done-clean-department-control
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review
   - bietlejuice.insider:load-clean-review-feature
@@ -1939,7 +1939,7 @@ bietlejuice.enrich_dai_report:
 
 bietlejuice.enrich_docato:
   # The gsheet is static, but it's the only source of this enrich. So if the gsheet is updated and we need to run the task, the enrich will be updated.
-  - bietlejuice.gsheets.static:load-clean-legal-base-docato
+  - bietlejuice.gsheets.static:done-clean-legal-base-docato
 
 bietlejuice.enrich_inspections:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
@@ -2097,7 +2097,7 @@ bietlejuice.enrich_losses:
 
 bietlejuice.enrich_marketing_automatic_daily_costs:
   - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
-  - bietlejuice.gsheets.growth:load-clean-marketing-cost-taxonomy
+  - bietlejuice.gsheets.growth:done-clean-marketing-cost-taxonomy
 
 bietlejuice.enrich_marketing_costs_offline:
   - bietlejuice.marketing_offline_costs:load-clean-marketing-offline-budget
@@ -2120,8 +2120,8 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
   - bietlejuice.enrich_region:load-enrich-region
 
 bietlejuice.enrich_marketing_manual_daily_costs:
-  - bietlejuice.gsheets.growth_intraday:load-clean-marketing-name-convention-shared-costs
-  - bietlejuice.gsheets.growth_intraday:load-clean-marketing-manual-shared-costs
+  - bietlejuice.gsheets.growth_intraday:done-clean-marketing-name-convention-shared-costs
+  - bietlejuice.gsheets.growth_intraday:done-clean-marketing-manual-shared-costs
 
 bietlejuice.enrich_mexico_consolidated_marketing_metrics:
   - bietlejuice.enrich_mexico_google_ads:load-enrich-ads-performance
@@ -2129,7 +2129,7 @@ bietlejuice.enrich_mexico_consolidated_marketing_metrics:
   - bietlejuice.enrich_mexico_google_ads:load-enrich-keywords-performance
   - bietlejuice.enrich_mexico_google_ads:load-enrich-videos-performance
   - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.gsheets:load-clean-marketing-costs-google-ad-type-flags
+  - bietlejuice.gsheets:done-clean-marketing-costs-google-ad-type-flags
   - bietlejuice.mexico_facebook_insights:load-clean-facebook-insights
   - bietlejuice.mexico_lifull_campaigns:load-clean-mitula-campaigns
   - bietlejuice.mexico_lifull_campaigns:load-clean-trovit-campaigns
@@ -2146,10 +2146,10 @@ bietlejuice.enrich_mexico_rent_supply:
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listings-reprocessed-leads
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
-  - bietlejuice.gsheets.for_rent:load-clean-mexico-supply-targets-2022
-  - bietlejuice.gsheets.growth:load-clean-mexico-costs-targets
-  - bietlejuice.gsheets.growth:load-clean-mexico-supply-costs-financial-and-actual
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-growth
+  - bietlejuice.gsheets.for_rent:done-clean-mexico-supply-targets-2022
+  - bietlejuice.gsheets.growth:done-clean-mexico-costs-targets
+  - bietlejuice.gsheets.growth:done-clean-mexico-supply-costs-financial-and-actual
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-growth
 
 bietlejuice.enrich_money_laundering_prevention:
   # Removed dependencies with ebdb in order to avoid loopings since enrich_booking already satisfies.
@@ -2214,8 +2214,8 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_tracksale:load-enrich-dispatch
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-  - bietlejuice.gsheets.support_and_service:load-clean-department-control
-  - bietlejuice.gsheets.support_and_service:load-clean-inspection-analysis-forms
+  - bietlejuice.gsheets.support_and_service:done-clean-department-control
+  - bietlejuice.gsheets.support_and_service:done-clean-inspection-analysis-forms
   - bietlejuice.terminator:load-clean-application-user
   - bietlejuice.terminator:load-clean-negotiation
   - bietlejuice.terminator:load-clean-termination
@@ -2260,7 +2260,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
   - bietlejuice.godfather:load-clean-offer
-  - bietlejuice.gsheets.for_sale:load-clean-offers-hub-central
+  - bietlejuice.gsheets.for_sale:done-clean-offers-hub-central
   - bietlejuice.hub_services:load-clean-business-unit
 
 bietlejuice.enrich_online_attribution:
@@ -2354,7 +2354,7 @@ bietlejuice.enrich_region:
   - bietlejuice.ebdb:create-clean-region-business-contexts-served-in-data-lake
   - bietlejuice.ebdb:create-clean-region-in-data-lake
   - bietlejuice.ebdb:create-clean-state-in-data-lake
-  - bietlejuice.gsheets.for_rent:load-clean-auxiliary-region
+  - bietlejuice.gsheets.for_rent:done-clean-auxiliary-region
 
 bietlejuice.enrich_rent_potential_listing:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
@@ -2405,7 +2405,7 @@ bietlejuice.enrich_rental_guarantee:
 bietlejuice.enrich_repair_services:
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-  - bietlejuice.gsheets.support_and_service:load-clean-service-city-holidays
+  - bietlejuice.gsheets.support_and_service:done-clean-service-city-holidays
 
 bietlejuice.enrich_rental_listing_metrics:
   - bietlejuice.dw_contract:load-dw-staging-public-dim-contract
@@ -2497,7 +2497,7 @@ bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
-  - bietlejuice.gsheets.for_sale:load-clean-business-unit-region
+  - bietlejuice.gsheets.for_sale:done-clean-business-unit-region
   - bietlejuice.hub_services:load-clean-business-unit
   - bietlejuice.hub_services:load-clean-business-unit-aud
   - bietlejuice.hub_services:load-clean-lead-aud
@@ -2534,7 +2534,7 @@ bietlejuice.enrich_sale_visit_hubs:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_user:load-enrich-user
-  - bietlejuice.gsheets.for_sale:load-clean-business-unit-region
+  - bietlejuice.gsheets.for_sale:done-clean-business-unit-region
 
 bietlejuice.enrich_sap:
   - bietlejuice.sap:load-clean-incoming-payments
@@ -2567,12 +2567,12 @@ bietlejuice.enrich_sorting_hat:
 
 # bietlejuice.enrich_stilingue_metrics:
 #   - bietlejuice.enrich_stilingue:load-enrich-service-interactions
-#   - bietlejuice.gsheets.support_and_service:load-clean-agents-control
-#   - bietlejuice.gsheets.support_and_service:load-clean-stilingue-agents
+#   - bietlejuice.gsheets.support_and_service:done-clean-agents-control
+#   - bietlejuice.gsheets.support_and_service:done-clean-stilingue-agents
 
 bietlejuice.enrich_survicate:
-  - bietlejuice.gsheets.support_and_service:load-clean-owner-offboarding-keys-csat
-  - bietlejuice.gsheets.support_and_service:load-clean-tenant-onboarding-keys-csat
+  - bietlejuice.gsheets.support_and_service:done-clean-owner-offboarding-keys-csat
+  - bietlejuice.gsheets.support_and_service:done-clean-tenant-onboarding-keys-csat
   - bietlejuice.survicate:load-clean-surveys
 
 bietlejuice.enrich_supply_outbound_flows:
@@ -2583,22 +2583,22 @@ bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.wololo:load-clean-whatsapp
 
 bietlejuice.enrich_support_and_service_kpis_targets:
-  - bietlejuice.gsheets.support_and_service:load-clean-target-service-kpis
-  - bietlejuice.gsheets.support_and_service:load-clean-target-support-kpis
+  - bietlejuice.gsheets.support_and_service:done-clean-target-service-kpis
+  - bietlejuice.gsheets.support_and_service:done-clean-target-support-kpis
 
 bietlejuice.enrich_terminator:
   - bietlejuice.terminator:load-clean-termination-aud
 
 bietlejuice.enrich_top_of_funnel_affiliates:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-affiliates
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-affiliates
 
 bietlejuice.enrich_top_of_funnel_demand:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events
 
 bietlejuice.enrich_top_of_funnel_portal_cm:
-  - bietlejuice.gsheets.growth:load-clean-taxonomy-portal-casa-mineira
+  - bietlejuice.gsheets.growth:done-clean-taxonomy-portal-casa-mineira
   - bietlejuice.casa_mineira_amplitude:load-clean-329001-portal
   - bietlejuice.casa_mineira_portal:load-clean-house
   - bietlejuice.casa_mineira_portal:load-clean-neighborhood
@@ -2609,7 +2609,7 @@ bietlejuice.enrich_top_of_funnel_supply:
   # Removed dependency with enrich_region since enrich_consolidated_marketing_metrics (that depends on enrich_marketing_costs_sharing_rules) already satisfies
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
-  - bietlejuice.gsheets.growth:load-clean-marketing-cost-taxonomy
+  - bietlejuice.gsheets.growth:done-clean-marketing-cost-taxonomy
 
 bietlejuice.enrich_tracked_events:
   - bietlejuice.casa_mineira_crm:load-clean-contact
@@ -2708,12 +2708,12 @@ bietlejuice.enrich_customer_resolution:
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_ebdb_user:load-enrich-user
-  - bietlejuice.gsheets.support_and_service:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:done-clean-department-control
 
 bietlejuice.enrich_gsheets:
-  - bietlejuice.gsheets.for_sale:load-clean-offers-hub-central
-  - bietlejuice.gsheets.for_rent:load-clean-demand-targets-2022
-  - bietlejuice.gsheets.for_rent:load-clean-supply-targets-2022
+  - bietlejuice.gsheets.for_sale:done-clean-offers-hub-central
+  - bietlejuice.gsheets.for_rent:done-clean-demand-targets-2022
+  - bietlejuice.gsheets.for_rent:done-clean-supply-targets-2022
 
 bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.docx:load-clean-folder
@@ -2767,9 +2767,9 @@ bietlejuice.metric_rent_benvi__demand:
   - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-top-of-funnel-volumes-weekly
   - bietlejuice.dw_datamarts_spark.for_rent_cross:load-dw-datamarts-rental-events-funnel
   - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
-  - bietlejuice.gsheets.for_rent:load-clean-mexico-demand-targets-2022
-  - bietlejuice.gsheets.growth:load-clean-mexico-demand-marketing-cost-per-source-actual
-  - bietlejuice.gsheets.growth:load-clean-mexico-marketing-cost-per-source
+  - bietlejuice.gsheets.for_rent:done-clean-mexico-demand-targets-2022
+  - bietlejuice.gsheets.growth:done-clean-mexico-demand-marketing-cost-per-source-actual
+  - bietlejuice.gsheets.growth:done-clean-mexico-marketing-cost-per-source
 
 bietlejuice.metric_rent_benvi__supply:
   - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-rental-marketplace-flows
@@ -2780,9 +2780,9 @@ bietlejuice.metric_rent_benvi__supply:
   - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
-  - bietlejuice.gsheets.for_rent:load-clean-mexico-supply-targets-2022
-  - bietlejuice.gsheets.growth:load-clean-mexico-costs-targets
-  - bietlejuice.gsheets.growth:load-clean-mexico-supply-costs-financial-and-actual
+  - bietlejuice.gsheets.for_rent:done-clean-mexico-supply-targets-2022
+  - bietlejuice.gsheets.growth:done-clean-mexico-costs-targets
+  - bietlejuice.gsheets.growth:done-clean-mexico-supply-costs-financial-and-actual
 
 bietlejuice.reverse_atento:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
@@ -2818,14 +2818,14 @@ bietlejuice.reverse_nazare:
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
-  - bietlejuice.gsheets.for_sale:load-clean-sale-payments-tiers
-  - bietlejuice.gsheets.fintech:load-clean-advance-base
-  - bietlejuice.gsheets.fintech:load-clean-associate-executive-bonus
-  - bietlejuice.gsheets.fintech:load-clean-business-rules-bonus
-  - bietlejuice.gsheets.fintech:load-clean-campaign-bonus
-  - bietlejuice.gsheets.for_sale:load-clean-forbrokers-3p-partner-conditions
-  - bietlejuice.gsheets.fintech:load-clean-hub-bonus
-  - bietlejuice.gsheets.fintech:load-clean-negotiation-executive-bonus
+  - bietlejuice.gsheets.for_sale:done-clean-sale-payments-tiers
+  - bietlejuice.gsheets.fintech:done-clean-advance-base
+  - bietlejuice.gsheets.fintech:done-clean-associate-executive-bonus
+  - bietlejuice.gsheets.fintech:done-clean-business-rules-bonus
+  - bietlejuice.gsheets.fintech:done-clean-campaign-bonus
+  - bietlejuice.gsheets.for_sale:done-clean-forbrokers-3p-partner-conditions
+  - bietlejuice.gsheets.fintech:done-clean-hub-bonus
+  - bietlejuice.gsheets.fintech:done-clean-negotiation-executive-bonus
   - bietlejuice.hub_services:load-clean-business-unit
 
 bietlejuice.reverse_tracksale:
@@ -2856,7 +2856,7 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-user-pro-owner-in-data-lake
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
-  - bietlejuice.gsheets.support_and_service:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:done-clean-department-control
   - bietlejuice.terminator:load-clean-termination
 
 bietlejuice.enrich_zipcodes:

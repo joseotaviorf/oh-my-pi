@@ -29,13 +29,16 @@ class BietlejuiceDependencyHelper:
             return BietlejuiceDependencyHelper._extract_dag_and_table_from_redshift_task(
                 task_name
             )
-
+        table_group_number = 4
         if task_name.endswith("-external-table"):
             task_name_pattern = (
                 "bietlejuice\.(.*):create-(enrich|raw|clean|dw)*-(.*)-external-table"
             )
+            table_group_number = 3
         else:
-            task_name_pattern = "bietlejuice\.(.*):load-(enrich|raw|clean|dw)*-(.*)"
+            task_name_pattern = (
+                "bietlejuice\.(.*):(load|done)-(enrich|raw|clean|dw)*-(.*)"
+            )
 
         match = re.search(task_name_pattern, task_name)
         if match is None:
@@ -52,10 +55,10 @@ class BietlejuiceDependencyHelper:
         layer = match_layer.group(1)
         if layer == "dw":
             table_name = BietlejuiceDependencyHelper._get_table_name_from_dw_task(
-                dag_name, layer, match.group(3)
+                dag_name, layer, match.group(table_group_number)
             )
         else:
-            table_name = match.group(3).replace("-", "_")
+            table_name = match.group(table_group_number).replace("-", "_")
 
         table_name = f"{layer}:{table_name}"
         return dag_name, table_name

@@ -54,6 +54,8 @@ dags_out_of_pattern:
         "gsheets.fintech",
         "gsheets.for_rent",
         "gsheets.for_sale",
+        "gsheets.general",
+        "gsheets.bedrock",
         "gsheets.growth",
         "gsheets.growth_intraday",
         "gsheets.support_and_service",
