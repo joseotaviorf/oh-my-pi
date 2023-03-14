@@ -21,7 +21,7 @@ SOURCE = "rene_descartes"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2020, 7, 27, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_med_io-general_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_max_io-general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 
@@ -40,6 +40,8 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 
+tables_names = config_service.get_config("tables")
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -53,7 +55,6 @@ def get_date_param(dag_run, ds, date_param_name):
     if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
         return date_param
     return ds
-
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -91,29 +92,39 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-raw_task_group = datalake_task_group.build_raw_task_group_for_all_tables(
-    source=SOURCE,
-    target_database_base_name=SOURCE,
-    extraction_spark_job_file=raw_spark_job_file,
-    raw_spark_job_extra_args=[
-            SOURCE,
-            "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",
-            "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
-        ],
-    has_hive_sync=False,
-)
+for table_name in tables_names:
 
-clean_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.CLEAN,
-    source_database_base_name=SOURCE,
-    target_database_base_name=SOURCE,    
-)
+    raw_task_group = datalake_task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+        extraction_spark_job_file=raw_spark_job_file,
+        raw_spark_job_extra_args=[
+                SOURCE,
+                table_name,
+                "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",
+                "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+            ],
+        has_hive_sync=False,
+    )
 
-create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
+    clean_task_group = datalake_task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+    )
 
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_group),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
-)
+    create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
 
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups)) 
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
+
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
+
+    # adding data quality tasks
+    independent_tasks = DatalakeTaskGroup.independent_tasks(clean_task_group)
+
+    if independent_tasks:
+        terminate_cluster_task.set_upstream(independent_tasks)
