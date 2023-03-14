@@ -230,7 +230,7 @@ class GsheetsDAGFactory:
 
         for table_name, sheet_details in google_files:
             sheet_details["raw_table_name"] = table_name
-            task_id = f"done-clean-{table_name}-run".replace("_", "-")
+            task_id = f"done-clean-{table_name}".replace("_", "-")
 
             done_task_group = [DummyOperator(task_id=task_id, trigger_rule="all_done")]
             done_task_groups[
