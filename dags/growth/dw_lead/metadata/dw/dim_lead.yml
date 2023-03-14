@@ -1,0 +1,391 @@
+database_name: dw_public
+table_name: dim_lead
+description: A lead is a potential property owner who might list with QuintoAndar group. A lead can be related to none, one or more properties.
+  Each line is a lead.
+domain: Growth
+owner: ana.araujo@quintoandar.com.br
+columns:
+  sk_lead:
+    lineage:
+    - datalake_lead.lead.id
+    description: Unique id that identifies the lead on Main (EBDB), it's the primary key of the table.
+  id:
+    lineage:
+    - datalake_lead.lead.id
+    description: Unique id that identifies the lead on Main (EBDB), it's the same as the primary key of the table.
+  external_id:
+    lineage:
+    - datalake_lead.lead.id_external
+    description: Unique external id that also identifies the lead. It's the lead id on Rene Descartes product.
+  region_id:
+    lineage:
+    - datalake_lead.lead.id_region
+    description: Id of the lead's region. Since a lead can be related to many properties, it doesn't mean that all properties related to the lead will have the same region id.
+  country_code:
+    lineage:
+    - datalake_lead.lead.country_code
+    description: Country code related to the lead's country of origin.
+    categories:
+      BR: Brazil's country code.
+      MX: Mexico's country code.
+  area_total:
+    lineage:
+    - datalake_lead.lead.total_area
+    description: Total area of a lead's property, in square meters.
+  bairro:
+    lineage:
+    - datalake_lead.lead.neighborhood
+    description: Neighborhood of a lead's property.
+  cep:
+    lineage:
+    - datalake_lead.lead.zip_code
+    description: Zip code of a lead's property.
+  cidade:
+    lineage:
+    - datalake_lead.lead.city
+    description: City of a lead's property.
+  complemento:
+    lineage:
+    - datalake_lead.lead.complement
+    description: Address complement of a lead's property.
+  endereco:
+    lineage:
+    - datalake_lead.lead.address
+    description: Address of a lead's property.
+  numero:
+    lineage:
+    - datalake_lead.lead.house_number
+    description: Street number of a lead's property address.
+  nome_anunciante:
+    lineage:
+    - datalake_lead.lead.advertiser_name
+    description: Full name of the property owner, partner or affiliate related to the lead.
+  numero_banheiros:
+    lineage:
+    - datalake_lead.lead.bathrooms
+    description: Number of bathrooms reported in a lead's property.
+  numero_quartos:
+    lineage:
+    - datalake_lead.lead.bedrooms
+    description: Number of bedrooms reported in a lead's property.
+  numero_suites:
+    lineage:
+    - datalake_lead.lead.suites
+    description: Number of suites (bedrooms with private bathroom) reported in a lead's property.
+  url_anuncio:
+    lineage:
+    - datalake_lead.lead.ad_url
+    description: URL of a lead's property publication in our platform.
+  telefone_anunciante:
+    lineage:
+    - datalake_lead.lead.advertiser_phone
+    description: Phone number of the property owner, partner or affiliate related to the lead.
+  tipo:
+    lineage:
+    - datalake_lead.lead.type
+    description: Type of lead's source.
+    categories:
+      Afiliado: Lead came through an affiliate.
+      Agente: Lead came through an agent.
+      B2BOpenLink: Lead came through a B2B link.
+      BrokenOpenLink: Lead came through a broken open link.
+      CadastroImobiliario: Lead came through a partner.
+      CanalDoImovel: Lead came through Canal do Imovel.
+      Inbound: Lead came through an inbound campaign.
+      LandingMarketing: Lead came through the Marketing landing page.
+      LandingOpenLink: Lead came through the Marketing open link.
+      Marketing: Lead came through a marketing campaign.
+      OLX: Lead came through OLX site.
+      OpenLink: Lead came through an open link.
+      Organic: Lead came through organically.
+      Porteiro: Lead came through a doorman.
+      Proporparceria: Lead came through a partnership.
+      Repechage: Lead came through a repechage.
+  email:
+    lineage:
+    - datalake_lead.lead.email
+    description: Email of the property owner, partner or affiliate related to the lead.
+  email_captador:
+    lineage:
+    - datalake_lead.lead.pick_up_email
+    description: Email of the Inside Sales person related to the lead capture.
+  telefone_captador:
+    lineage:
+    - datalake_lead.lead.pick_up_phone
+    description: Phone of the Inside Sales person related to the lead capture.
+  lat:
+    lineage:
+    - datalake_lead.lead.lat
+    description: Latitude of a property related to the lead.
+  lng:
+    lineage:
+    - datalake_lead.lead.lng
+    description: Longitude of a property related to the lead.
+  condominio:
+    lineage:
+    - datalake_lead.lead.condo_price
+    description: Value of the monthly condominium fee related to a lead's property.
+  iptu:
+    lineage:
+    - datalake_lead.lead.iptu
+    description: Value of the IPTU (a property and urband land tax, in Brazil) related to a lead's property.
+  ub_page_variant:
+    lineage:
+    - datalake_lead.lead.unbounce_page_variant
+    description: Unbounce variant from Calculator page to measure conversion from A/B tests.
+      a/b test
+  ub_page_name:
+    lineage:
+    - datalake_lead.lead.unbounce_page_name
+    description: Unbounce page name from where the lead arrived to our platform.
+  reason:
+    lineage:
+    - datalake_lead.lead.reason
+    description: Reason related to the lead, if discarded at some flow (it can be related to Rent or Sale operations).
+    categories:
+      Blocklist: The contact related to the lead is in our block list.
+      Contato: The contact knows the owner.
+      ContatoIncorreto: The lead's contact was incorrect.
+      Deprecated: The lead is deprecated.
+      Duplicado: The lead is duplicated.
+      EmProspeccao: The lead is in prospection.
+      EnderecoIncorreto: The lead has an incorrect address.
+      Exclusivo: The lead is an exclusive.
+      FaltaDados: The lead is missing data.
+      ForaArea: The lead is out of our operation area.
+      ForaDoModelo: The lead is out of our models.
+      ForaDoPadrao5A: The lead is out of QuintoAndar's standards.
+      ForaPreco: The lead is out of our price of operation.
+      ImovelIndisponivel: The lead's property is unavailable.
+      ImovelOcupado: The lead's property is occupied. 
+      ImovelParaVenda: The lead's property is for Sale.
+      ImovelRepetido: The lead's property is duplicated.
+      Outros: Other reason.
+      ProprietarioAvaliando: The lead's property owner is evaluating.
+      ProprietarioNaoAtende: The lead's property owner is not answering the phone.
+      ProprietarioNuncaAtende: The lead's property owner has never answered the phone.
+      ProprietarioRecusou: The lead's property owner refused.
+      RepetidoPublicacao: The lead's property is duplicated in our platform.
+      TipoInvalido: The lead has an invalid type.
+  reason_detail:
+    lineage:
+    - datalake_lead.lead.reason_detail
+    description: Details of the lead's reason.
+    categories:
+      CONTACT_DIDNT_EXIST: Lead's contact didn't exist.
+      CONTACT_KNOW_OWNER: The contact knows the owner.
+      CONTACT_ON_BLOCK_LIST: Lead's contact is in the block list.
+      CONTACT_WASNT_THE_HOUSE_OWNER: Lead's contact wasn't the property owner.
+      CONTACT_WAS_FROM_HOUSE_TENANT: Lead's contact was from the tenant related to the property.
+      CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT: Lead's contact was from a real estate broker or agent.
+      CONTACT_WAS_NO_LONGER_THE_HOUSE_OWNER: Lead's contact was no longe the property owner.
+      DUPLICATED_LEAD: Lead is duplicated.
+      HOUSE_ALREADY_PUBLISHED: Lead's property is already published.
+      HOUSE_ALREADY_RENTED: Lead's property is already rented.
+      HOUSE_ALREADY_SOLD: Lead's property is already sold.
+      HOUSE_ONLY_FOR_SELLING: Lead's property is only for Sale.
+      HOUSE_PRICE_WAS_OUT_OF_BOUNDS: Lead's property price is out of our bounds.
+      HOUSE_UNDER_EXCLUSIVITY_CONTRACT: Lead's property is under exclusivity contract.
+      HOUSE_UNDER_MAJOR_RENOVATION: Lead's property is under manjor renovation.
+      HOUSE_UNDER_RENOVATION: Lead's property is under renovation.
+      HOUSE_WAS_A_BUSINESS_REAL_ESTATE: Lead's property is a business real estate.
+      HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS: Lead's property is out of apartment renting regions.
+      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS: Lead's property is out of renting regions.
+      HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: Lead's property is out of our sales regions.
+      HOUSE_WITH_BAD_CONDITIONS: Lead's property is in bad conditions.
+      ISSUES_WITH_HOUSE_DOCUMENTATION: Lead's property has documentation issues.
+      ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS: Lead's property has entrance conditions.
+      ONLY_PART_OF_THE_HOUSE_WAS_AVAILABLE_FOR_RENTING: Lead's property is half available for renting.
+      OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH: Lead's property owner considered adminstration fee too high.
+      OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH: Lead's property owner considered brokeragee fee too high.
+      OWNER_DIDNT_ACCEPT_ONLINE_PROCESS: Lead's property owner didn't accept the online process.
+      OWNER_DIDNT_ACCEPT_SELF_CONDO_PAYMENT_MODEL: Lead's property owner didn't accept self condo payment model.
+      OWNER_DIDNT_ANSWER_PHONE: Lead's property owner didn't answer the phone.
+      OWNER_DIDNT_LISTEN_TO_PITCH: Lead's property owner didn't listen to the pitch.
+      OWNER_DIDNT_WANT_ADMINISTRATION: Lead's property owner didn't want our administration.
+      OWNER_DIDNT_WANT_RECEIVE_CALL: Lead's property owner didn't want to receive calls.
+      OWNER_DISAGREE_CHARGES_PAYMENTS: Lead's property owner disagree about the charges payments.
+      OWNER_EVALUATING: Lead's property owner is evaluating.
+      OWNER_FINISHING_SELFSERVICE: Lead's property owner is finishing the Self Service.
+      OWNER_GAVE_UP_RENTING: Lead's property owner gave up renting.
+      OWNER_NEED_SCHEDULE_PHOTOS: Lead's property owner needs to schedule a photo job.
+      OWNER_REQUESTING_ASSISTANCE: Lead's property owner is requesting assistance.
+      OWNER_UNAVAILABLE: Lead's property owner is unavailable.
+      OWNER_WITH_PRIME_PROFILE: Lead's property owner is with prime profile.
+      OWNER_WONT_ANSWER_PHONE: Lead's property owner won't answer the phone.
+      PROPERTY_IN_OFFPLANT: Lead's property is off plant.
+      ProprietarioVaiAnunciar: Lead's property owner is going to publish.
+      SEASONAL_RENT: Lead's property is a seasonal rent.
+  deadline_of_new_contact:
+    lineage:
+    - datalake_lead.lead.deadline_of_new_contact
+    description: Based on the discard reason, it's the interval of time to the Inside Sales team be able to recontact the property owner.
+  status:
+    lineage:
+    - datalake_lead.lead.status
+    description: Lead's processing status [https://drive.google.com/file/d/1I54dV68P3XmiIlGQhASkwbNArCAuM-cj/view?usp=sharing].
+    categories:
+      Convertido: A lead that was converted.
+      Descartado: A lead that was automatically discarded or contacted but then discarded by an analyst.
+      Novo: New lead, with no interactions with an analyst yet.
+      Prospeccao: A lead that had an attempt of contact, with interactions through an analyst.
+  origem:
+    lineage:
+    - datalake_lead.lead.source
+    description: Origin of the lead.
+    categories:
+      App: Lead came through the App.
+      Crawling: Lead came through a crawler.
+      Desconhecida: Lead source is unknown.
+      Facebook: Lead came through Facebook.
+      Form: Lead came through a form.
+      Inbound: Lead came through an inbound campaign.
+      Ios: Lead came through the iOS system.
+      Landing: Lead came through the landing page.
+      LeadEnrichment: Lead came through enrichment.
+      LeadOutbound: Lead came trough an outbound campaign.
+      Other: Lead came through some other source.
+      OwnerPWA: Lead came through our Owner PWA.
+      Planilha: Lead came through a sheet.
+      PriceSuggestion: Lead came through a price suggestion.
+      Reprocessado: Lead came through a lead reprocessing.
+      Trade: Lead came through trade.
+  proprietario_nome:
+    lineage:
+    - datalake_lead.lead.lead_owner_name
+    description: Name of the property owner related to the lead.
+  proprietario_email:
+    lineage:
+    - datalake_lead.lead.lead_owner_email
+    description: Email of the property owner related to the lead.
+  affiliate_type:
+    lineage:
+    - datalake_lead.lead.affiliate_type
+    description: Type of the affiliate related to the lead, if it has one.
+    categories:
+      Agent: The affiliate is an agent.
+      B2BPartner: The affiliate is a B2B partner.
+      Doorman: The affiliate is a doorman.
+      Standard: The affiliate is a standard affiliate.
+  dados_afiliado_cidade_atuacao:
+    lineage:
+    - datalake_lead.lead.affiliate_operation_city
+    description: City in which the affiliate who referred this lead opperates.
+  utm_source:
+    lineage:
+    - datalake_lead.lead.utm_source
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_source
+    description: UTM source value, related to the lead's origin of traffic.
+  utm_medium:
+    lineage:
+    - datalake_lead.lead.utm_medium
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_medium
+    description: UTM medium value, related to the lead's advertising or marketing media origin of traffic.
+  utm_campaign:
+    lineage:
+    - datalake_lead.lead.utm_campaign
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_campaign
+    description: UTM campaign value, related to the lead's advertising campaign origin of traffic.
+  utm_content:
+    lineage:
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_content
+    description: UTM content value, related to the lead's content parameter of the advertising campaign origin of traffic.
+  utm_term:
+    lineage:
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_term
+    description: UTM term value, related to the lead's key words of the advertising campaign origin of traffic.
+  tracking_platform:
+    lineage:
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_platform
+    description: Amplitude's tracking platform value related to the lead origin.
+    categories:
+      android: Lead's event happened in an Android app.
+      ios: Lead's event happened in an iOS app.
+      web_desktop: Lead's event happened in our website through a desktop computer.
+      web_mobile: Lead's event happened in our website through a mobile phone.
+  tracking_region:
+    lineage:
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_region
+    description: Amplitude's tracking platform region value related to the lead origin.
+  tracking_city:
+    lineage:
+    - datalake_lead_tracking.lead_first_event_tracking.tracking_city
+    description: Amplitude's tracking platform city value related to the lead origin.
+  network:
+    lineage:
+    - datalake_lead.lead.utm_source
+    - datalake_static_files_raw.historical_lead_app_network.network
+    description: Lead's network source, it can be the UTM Source itself.
+  usuario_que_indicou_id:
+    lineage:
+    - datalake_lead.lead.id_user_has_indicated
+    description: Id of the affiliate user that indicated the property related to the lead, if it has one.
+  score_factor:
+    lineage:
+    - datalake_crm_lead.lead_score_factor.score_factor
+    description: Lead's priorization score.
+  sales_company:
+    lineage:
+    - datalake_wololo_lead.lead_sales_company.sales_company
+    description: Inside Sales company related to the communication with the lead's property owner.
+  sale_price:
+    lineage:
+    - datalake_lead.lead.sale_price
+    description: The sale price of a lead's property, if it is for sale.
+  automatically_discarded:
+    lineage:
+    - datalake_lead.lead.has_automatically_discarded
+    description: Flag indicating if the lead had or not an automatically discard. 1 indicates true and 0 indicates false.
+  processado:
+    lineage:
+    - datalake_lead.lead.has_processed
+    description: Boolean indicating if the lead was processed or not.
+  is_for_rent:
+    lineage:
+    - datalake_lead.lead.is_for_rent
+    description: Boolean indicating if the lead is available for Rent operation. It's important to remind that all leads are born hybrid, serving both contexts.
+  is_for_sale:
+    lineage:
+    - datalake_lead.lead.is_for_sale
+    description: Boolean indicating if the lead is available for Sale operation. It's important to remind that all leads are born hybrid, serving both contexts.
+  dentro_area_atuacao:
+    lineage:
+    - datalake_lead.lead.is_inside_operation_area
+    description: Flag indicating if the lead's address is inside QuintoAndar's service area at the time when the lead was submitted. 1 indicates true and 0 indicates false.
+  is_enriched_data:
+    lineage:
+    - datalake_lead.lead.is_enriched_data
+    description: Boolean indicating if the lead has enriched data.
+  mencionar:
+    lineage:
+    - datalake_lead.lead.is_to_be_mentioned
+    description: Flag indicating if QuintoAndar is allowed to mention the affiliate. 1 indicates true and 0 indicates false.
+  captado_em:
+    lineage:
+    - datalake_lead.lead.dt_picked_up
+    description: Date of the lead's capture.
+  dados_afiliado_inicio_atuacao:
+    lineage:
+    - datalake_lead.lead.ts_affiliate_operation_start
+    description: Timestamp of when the affiliate submitted its first lead. It could not be related to the actual lead.
+  ts_sales_company_sent:
+    lineage:
+    - datalake_wololo_lead.lead_sales_company.ts_sales_company_sent
+    description: Timestamp of when the lead was sent to the Inside Sales company.
+  criado_em:
+    lineage:
+    - datalake_lead.lead.ts_created
+    description: Timestamp of the lead creation in QuintoAndar's system.
+  atualizado_em:
+    lineage:
+    - datalake_lead.lead.ts_updated
+    description: Timestamp of the last update that the lead suffered.
+  b2b_type:
+    description: Type of the B2B program related to the affiliate.
+    categories:
+      online: Online program.
+      prime: Prime program.
+  is_b2b:
+    description: Boolean indicating if the lead is from the affiliate's B2B program.
+  load_timestamp:
+    description: Timestamp indicating the data load into our system. It has nothing related to the lead itself.
