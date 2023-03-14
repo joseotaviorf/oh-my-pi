@@ -27,37 +27,40 @@ columns:
     description: Guarantee (BrasilCap, Deposito, Fiador, OutroTipoFiador, PortoSeguro,
       SeguroFairfax, SeguroFiancaCardiff / today only SeguroFairFax)
     categories:
-      BrasilCap: ''
-      Deposito: ''
-      Fiador: ''
-      OutroTipoFiador: ''
-      PortoSeguro: ''
-      RentalGuarantee: '#N/A'
-      SeguroFairfax: ''
-      SeguroFiancaCardiff: ''
+      BrasilCap: '-'
+      Deposito: '-'
+      Fiador: '-'
+      OutroTipoFiador: '-'
+      PortoSeguro: '-'
+      RentalGuarantee: '-'
+      SeguroFairfax: '-'
+      SeguroFiancaCardiff: '-'
+      Standalone: '-'
+      RentalDeposit: '-'
+      PRO_GUARANTOR: '-'
   status:
     lineage:
     - datalake_proposal.proposal.status
     description: Proposal Status (PreMinuta, EmAnalise, Aprovada, Rejeitada, Nova)
     categories:
-      Aprovada: ''
-      EmAnalise: ''
-      Nova: ''
-      PreMinuta: ''
-      Rejeitada: ''
+      Aprovada: 'Approved'
+      EmAnalise: 'Analysis'
+      Nova: 'New'
+      PreMinuta: 'Draft'
+      Rejeitada: 'Rejected'
   status_doc_tenant:
     lineage:
     - datalake_proposal.proposal.tenant_documentation_status
     description: Tenant document status (Analise5a, AnaliseCredito, Aprovado, NaoEnviado,
       RecusadoCredito, ReenvioDocumentos, StandBy)
     categories:
-      Analise5a: ''
-      AnaliseCredito: ''
-      Aprovado: ''
-      NaoEnviado: ''
-      RecusadoCredito: ''
-      ReenvioDocumentos: ''
-      StandBy: ''
+      Analise5a: 'QuintoAndar analysis (credit desk / mesa de crédito)'
+      AnaliseCredito: 'Credit evaluation'
+      Aprovado: 'Approved'
+      NaoEnviado: 'Docs not sent'
+      RecusadoCredito: 'Credit evaluation rejected'
+      ReenvioDocumentos: 'Docs resent'
+      StandBy: 'Stand by'
   status_doc_owner:
     lineage:
     - datalake_proposal.proposal.owner_documentation_status
@@ -67,46 +70,48 @@ columns:
     - datalake_proposal.proposal.rejection_reason
     description: Reason for rejecting the proposal
     categories:
-      CreditEvaluationRejected: ''
-      HouseReserved: ''
-      NDA: ''
-      OwnerGaveUpOffer: ''
-      OwnerGaveUpRenting: ''
-      OwnerGaveUpTenant: ''
-      OwnerNoContact: ''
-      OwnerRentedForAnotherTenant5A: ''
-      OwnerRentedForAnotherTenantOutside: ''
-      OwnerSoldApartment: ''
-      OwnerStalled: ''
-      TenantDocumentationRejected: ''
-      TenantFailedPayment: '#N/A'
-      TenantGaveUpApartment: ''
-      TenantGaveUpRenting: ''
-      TenantNewOffer: ''
-      TenantNoContact: ''
-      TenantNoReserved: ''
-      TenantRentedAnother5A: ''
-      TenantRentedAnotherOutside: ''
-      TenantStalled: ''
+      CreditEvaluationRejected: Credit evaluation rejected
+      HouseReserved: House was reserved
+      NDA: NDA
+      OwnerGaveUpOffer: Owner gave up offer
+      OwnerGaveUpRenting: Owner gave up renting
+      OwnerGaveUpTenant: Owner gave up tenant
+      OwnerNoContact: Owner did not make contact
+      OwnerRentedForAnotherTenant5A: The owner ended up renting for another QuintoAndar 
+        tenant
+      OwnerRentedForAnotherTenantOutside: The owner ended up renting for another tenant
+        outside of QuintoAndar
+      OwnerSoldApartment: Owner sold the propoerty
+      OwnerStalled: Owner stalled
+      TenantDocumentationRejected: Tenant docs rejected
+      TenantFailedPayment: Tenant failed guarantee payment
+      TenantGaveUpApartment: Tenant gave up apartment
+      TenantGaveUpRenting: Tenant gave up renting
+      TenantNewOffer: '-'
+      TenantNoContact: Tenant did not make contact
+      TenantNoReserved: '-'
+      TenantRentedAnother5A: Tenant rented another house in QuintoAndar
+      TenantRentedAnotherOutside: Tenant rented outside of QuintoAndar
+      TenantStalled: Tenant stalled
   result_credit_evaluation:
     lineage:
     - datalake_proposal.proposal.last_result
     description: '[New column to consider the credit evaluation step which started
       in ''2020-06-08''] Status of the last credit evaluation'
     categories:
-      PRE_APPROVED: '#N/A'
-      PRE_REJECTED: '#N/A'
-      REGULAR: ''
+      PRE_APPROVED: Pre approved
+      PRE_REJECTED: Pre rejected
+      REGULAR: Regular
   status_sortinghat:
     lineage:
     - datalake_proposal.proposal.status_sorting_hat
     description: Credit analysis status (ADVISABLE, APPROVED, INADVISABLE, NEW, REJECTED)
     categories:
-      ADVISABLE: ''
-      APPROVED: ''
-      INADVISABLE: ''
-      NEW: ''
-      REJECTED: ''
+      ADVISABLE: Advisable
+      APPROVED: Approved
+      INADVISABLE: Inadvisable
+      NEW: New
+      REJECTED: Rejected
   renting_proposal_value:
     lineage:
     - datalake_proposal.proposal.rent_proposal
@@ -299,7 +304,27 @@ columns:
   ts_entrance:
     lineage:
     - datalake_proposal.proposal.ts_entrance
+    description: Date of entrance
   dt_timestamp:
-    description: Date of table freshing (ts_load)
+    description: Timestamp of when the table was last processed.
   ts_load:
-    description: Date of table freshing (dt_timestamp)
+    description: Timestamp of when the table was last processed.
+  dti:
+    lineage:
+    - datalake_proposal.proposal.dti
+    description: Rent-to-Income Ratio (= package_amount / monthly_income_declared)
+  monthly_income_declared:
+    lineage:
+    - datalake_proposal.proposal.income
+    description: Income declared by proponent, in local currency
+  package_amount:
+    lineage:
+    - datalake_proposal.proposal.package
+    description: Proposal package amount (rent + condo + iptu + insurance), in local currency
+  country_code:
+    lineage:
+    - datalake_proposal.proposal.country_code
+    description: Country of origin
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code

@@ -4,13 +4,13 @@ description: Tenants make offers to owners when they want to rent the properties
   If an offer is accepted, it becomes a proposal (see dim_proposal table). Each line
   is an offer
 domain: For Rent
-owner: sayuri.matsumoto@quintoandar.com.br
+owner: matheus.baroni@quintoandar.com.br
 columns:
   sk_offer:
     lineage:
     - datalake_offer.offer.id_offer_context
     - datalake_ebdb_proposal.pre_proposal.id_offer_context
-    description: key of offer
+    description: Key of offer (id_offer)
   id_offer:
     lineage:
     - datalake_offer.offer.id
@@ -70,34 +70,34 @@ columns:
     categories:
       HouseReserved: The house was reserved by another tenant, dropping all other
         offers for the same house
-      NDA: ''
-      OwnerCustomReason: ''
-      OwnerDoesntAcceptPets: ''
-      OwnerDoesntAgreeNumberOfResidents: ''
-      OwnerDoesntAgreeWithConditions: ''
-      OwnerDoesntAgreeWithValue: ''
-      OwnerGaveUpRenting: ''
-      OwnerHasOtherOngoingFlows: ''
-      OwnerMissedLimitReached: ''
-      OwnerRejected: ''
-      OwnerRentedForAnotherTenant5A: The owner ended up renting for another QuintoAndar
+      NDA: 'NDA'
+      OwnerCustomReason: Owner custom reason
+      OwnerDoesntAcceptPets: The owner does not accept pets
+      OwnerDoesntAgreeNumberOfResidents: Owner does not agree with the number of residents
+      OwnerDoesntAgreeWithConditions: Owner does not agree with conditions
+      OwnerDoesntAgreeWithValue: Owner does not agree with value (price)
+      OwnerGaveUpRenting: Owner gave up renting
+      OwnerHasOtherOngoingFlows: Owner has other ongoing flows
+      OwnerMissedLimitReached: Limit for owner missed was reached
+      OwnerRejected: Owner rejected
+      OwnerRentedForAnotherTenant5A: The owner ended up renting for another QuintoAndar 
         tenant
       OwnerRentedForAnotherTenantOutside: The owner ended up renting for another tenant
         outside of QuintoAndar
       OwnerSoldHouse: The owner sold the house
-      OwnerStalled: ''
-      PropertyRented5A: ''
-      StartOffer: ''
-      TenantDoesntAgreeWithConditions: ''
-      TenantDoesntAgreeWithValue: ''
-      TenantGaveUpApartment: ''
-      TenantGaveUpRenting: ''
-      TenantRejected: ''
-      TenantRented5A: ''
-      TenantRentedAnother5A: ''
-      TenantRentedAnotherOutside: ''
-      TenantStalled: ''
-      UnpublishedHouse: ''
+      OwnerStalled: Owner stalled
+      PropertyRented5A: House was already rented in QuintoAndar
+      StartOffer: Start offer
+      TenantDoesntAgreeWithConditions: Tenant does not agree with conditions
+      TenantDoesntAgreeWithValue: Tenant does not agree with value (price)
+      TenantGaveUpApartment: Tenant gave up apartment
+      TenantGaveUpRenting: Tenant gave up renting
+      TenantRejected: Tenant was rejected
+      TenantRented5A: '-'
+      TenantRentedAnother5A: Tenant rented another house in QuintoAndar
+      TenantRentedAnotherOutside: Tenant rented outside of QuintoAndar
+      TenantStalled: Tenant stalled
+      UnpublishedHouse: Unpublished house
   type:
     lineage:
     - datalake_offer.offer.type
@@ -107,7 +107,7 @@ columns:
         type (example: painting, removing furniture, doing renovations, etc.)'
       Express: When the tenant accepts the price and all conditions asked by the owner
         and makes no other requests
-      Other: ''
+      Other: Other
       Price: When the tenant accepts all the conditions asked by the owner but wants
         to negotiate the rental price
   app_type:
@@ -118,12 +118,12 @@ columns:
     - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
     description: Amplitude's app type
     categories:
-      amp: ''
-      android: ''
-      android_flutter: '#N/A'
-      ios: ''
-      web_desktop: ''
-      web_mobile: ''
+      amp: amp
+      android: android
+      android_flutter: android (flutter)
+      ios: ios
+      web_desktop: web (desktop)
+      web_mobile: web (mobile)
   utm_source:
     lineage:
     - datalake_amplitude_clean.170698_offer_submitted_events.up_utm_source
@@ -164,6 +164,12 @@ columns:
   final_attribution_origin:
     lineage:
     - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
+    description: Final attribution origin
+    categories:
+      CX: CX
+      Secretaria: Secretaria
+      Web: Web
+      old_attribution: Old attribution (not mapped)
   mkt_category:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.category
@@ -237,27 +243,51 @@ columns:
   number_of_tenants:
     lineage:
     - datalake_offer.offer.number_of_tenants
+    description: Number of tenants in the offer
   number_of_kids:
     lineage:
     - datalake_offer.offer.number_of_kids
+    description: Number of kids
   rental_reason:
     lineage:
     - datalake_offer.offer.rental_reason
+    description: Rental reason
+    categories:
+      LeavingHome: Leaving home
+      Job: Job relocation
+      IncreasingFamily: Increasing family
+      Independency: Independency
+      FamilyOrFriendsProximity: Proximity to family or friends
+      Other: Other
   rental_urgency:
     lineage:
     - datalake_offer.offer.rental_urgency
+    description: Rental urgency
+    categories:
+      NotHurry: Not in a hurry
+      AsSoonAsPossible: As soon as possible
+      NextThreeMonths: In the next three months
+      NextMonth: In the next month
   tenant_description:
     lineage:
     - datalake_offer.offer.tenant_description
+    description: Offer's description
   tenant_pets_info:
     lineage:
     - datalake_offer.offer.tenant_pets_info
+    description: Description of tenent's pets
   tenant_type:
     lineage:
     - datalake_offer.offer.tenant_type
+    description: Tenant type (Friends, Family or Alone)
+    categories:
+      Friends: 'Friends'
+      Family: 'Family'
+      Alone: 'Alone'
   has_pets:
     lineage:
     - datalake_offer.offer.has_pets
+    description: True if tenant has pets
   ts_email_sent_to_owner:
     lineage:
     - datalake_offer.offer.ts_email_sent_to_owner
