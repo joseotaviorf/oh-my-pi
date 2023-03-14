@@ -272,6 +272,7 @@ pp_nps AS (
 last_inspection_synch AS(
     SELECT
         term.id,
+        MAX(insp.id_external) FILTER(WHERE insp.inspection_type = 'offboarding') AS id_exit_inspection,
         MAX(DATE(insp.ts_inspected)) AS dt_last_inspection_synch
     FROM
         datalake_terminator_clean.termination AS term
@@ -355,10 +356,12 @@ contract_info AS (
         ctr.id AS id_contract,
         ctr.id_house,
         hl.id_house_listing,
+        ctr.status AS contract_status,
         contract_b2b.b2b_type,
         contract_b2b.b2b_prime_type,
         contract_b2b.is_contract_b2b,
         (hp.id_house_listing IS NOT NULL) OR contract_b2b.is_b2b AS is_b2b,
+        ctr.is_exit_inspection_opted_out,
         ctr.dt_started AS dt_start,
         ctr.dt_entered AS dt_entrance,
         TO_TIMESTAMP(ctr.ts_analyst_annulment_input) AS ts_analyst_annulment_input,
@@ -390,7 +393,7 @@ SELECT
     term.id AS id_termination,
     aui.id_external AS id_application_user,
     term.id_contract,
-    term.id_exit_inspection,
+    COALESCE(term.id_exit_inspection, lis.id_exit_inspection) AS id_exit_inspection,
     ci.id_house,
     ci.id_house_listing,
     COALESCE(house.id_region, -1) AS id_region,
@@ -402,6 +405,7 @@ SELECT
     cc.customer_phone,
     cc.nps_comment,
     cc.status AS dispatch_status,
+    ci.contract_status,
     cmp.customer_type,
     cmp.campaign_name,
     term.cancellation_info,
@@ -464,6 +468,7 @@ SELECT
     (tw.id IS NOT NULL) AS is_workflow,
     term.is_relisting,
     cc.is_answered,
+    ci.is_exit_inspection_opted_out,
     tw.has_automatically_closed_task,
     term.dt_termination,
     tm.dt_last_updated AS dt_last_rescheduled,

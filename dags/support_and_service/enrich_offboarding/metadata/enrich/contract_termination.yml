@@ -1,6 +1,11 @@
 ---
 database_name: datalake_offboarding
 table_name: contract_termination
+description:
+  It consolidates each step that occurs during the termination of a contract, including
+  termination data, output inspection, repairs, related customer support and NPS metrics.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_termination:
     lineage:
@@ -14,6 +19,7 @@ columns:
   id_exit_inspection:
     lineage:
       - datalake_terminator_clean.termination.id_exit_inspection
+      - datalake_inspections.inspection_booking.id_external
   id_house:
     lineage:
       - datalake_ebdb_contract.contract.id_house
@@ -26,9 +32,48 @@ columns:
   id_workflow_assignee:
     lineage:
       - datalake_terminator_clean.termination_workflow.id_current_assignee
+  id_nps_answer:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_answer
+      - datalake_casa_mineira_tracksale.customer_conversions.id_answer
+  id_dispatch_lot:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_dispatch_lot
+      - datalake_casa_mineira_tracksale.customer_conversions.id_dispatch_lot
+  score_category:
+    lineage:
+      - datalake_tracksale.answer.score_category
+      - datalake_casa_mineira_tracksale.answer.score_category
+  customer_email:
+    lineage:
+      - datalake_tracksale.customer_conversions.customer_email
+      - datalake_casa_mineira_tracksale.customer_conversions.customer_email
+  customer_phone:
+    lineage:
+      - datalake_tracksale.customer_conversions.customer_phone
+      - datalake_casa_mineira_tracksale.customer_conversions.customer_phone
+  nps_comment:
+    lineage:
+      - datalake_tracksale.answer.nps_comment
+      - datalake_casa_mineira_tracksale.answer.nps_comment
+  dispatch_status:
+    lineage:
+      - datalake_tracksale.dispatch.status
+      - datalake_casa_mineira_tracksale.dispatch.status
+  contract_status:
+    lineage:
+      - datalake_ebdb_contract.contract.status
+  customer_type:
+    lineage:
+      - datalake_tracksale.campaign.customer_type
+      - datalake_casa_mineira_tracksale.campaign.customer_type
+  campaign_name:
+    lineage:
+      - datalake_tracksale.campaign.campaign_name
+      - datalake_casa_mineira_tracksale.campaign.campaign_name
   cancellation_info:
     lineage:
-      - datalake_terminator_clean.termination.source
+      - datalake_terminator_clean.termination.cancellation_info
   category:
     lineage:
       - datalake_terminator_clean.termination.category
@@ -59,15 +104,6 @@ columns:
   source:
     lineage:
       - datalake_terminator_clean.termination.source
-  type:
-    lineage:
-      - datalake_terminator_clean.termination.feedback
-      - datalake_terminator_clean.termination.source
-      - datalake_terminator_clean.termination.dt_termination
-      - datalake_terminator_clean.termination.ts_created
-      - datalake_ebdb_contract.contract.dt_entered
-      - datalake_ebdb_contract.contract_b2b.is_b2b
-      - datalake_ebdb_listing.house_listing.id_house_listing
   tenant_key_location:
     lineage:
       - datalake_terminator_clean.termination.tenant_keys_location
@@ -113,29 +149,6 @@ columns:
   workflow_current_step:
     lineage:
       - datalake_terminator_clean.termination_workflow.current_step
-  nps:
-    lineage:
-      - datalake_tracksale.answer.nps_answer
-      - datalake_tracksale.campaign.metric_group
-      - datalake_casa_mineira_tracksale.answer.nps_answer
-      - datalake_casa_mineira_tracksale.campaign.metric_group
-      - datalake_terminator_clean.termination.status
-  iq_nps:
-    lineage:
-      - datalake_tracksale.answer.nps_answer
-      - datalake_tracksale.campaign.metric_group
-      - datalake_casa_mineira_tracksale.answer.nps_answer
-      - datalake_casa_mineira_tracksale.campaign.customer_type
-      - datalake_casa_mineira_tracksale.campaign.metric_group
-      - datalake_terminator_clean.termination.status
-  pp_nps:
-    lineage:
-      - datalake_tracksale.answer.nps_answer
-      - datalake_tracksale.campaign.metric_group
-      - datalake_casa_mineira_tracksale.answer.nps_answer
-      - datalake_casa_mineira_tracksale.campaign.customer_type
-      - datalake_casa_mineira_tracksale.campaign.metric_group
-      - datalake_terminator_clean.termination.status
   repair_cost:
     lineage:
       - datalake_terminator_clean.negotiation.repair_cost
@@ -151,25 +164,12 @@ columns:
   fee_number_of_installments:
     lineage:
       - datalake_terminator_clean.termination_fee.tenant_payment_method
-  leadtime_request_to_vacancy:
-    lineage:
-      - datalake_terminator_clean.termination.dt_termination
-      - datalake_terminator_clean.termination.ts_created
-  leadtime_vacancy_to_finish:
-    lineage:
-      - datalake_terminator_clean.termination.dt_termination
-      - datalake_terminator_clean.termination_aud.ts_termination_finished
-      - datalake_terminator_clean.negotiation.ts_updated
   is_b2b:
     lineage:
       - datalake_ebdb_contract.contract_b2b.is_b2b
   is_contract_b2b:
     lineage:
       - datalake_ebdb_contract.contract_b2b.is_contract_b2b
-  is_before_contract_start:
-    lineage:
-      - datalake_terminator_clean.termination.ts_created
-      - datalake_ebdb_clean.contract.dt_started
   has_exit_inspection:
     lineage:
       - datalake_terminator_clean.termination.has_exit_inspection
@@ -179,26 +179,12 @@ columns:
   is_repair_tenant_duty:
     lineage:
       - datalake_terminator_clean.negotiation.needs_repair_by_tenant
-  has_prior_notice_fine:
-    lineage:
-      - datalake_terminator_clean.termination.dt_termination
-      - datalake_terminator_clean.termination.ts_created
-  has_one_year_fine:
-    lineage:
-      - datalake_terminator_clean.termination.dt_termination
-      - datalake_ebdb_contract.contract.dt_started
-  has_been_rescheduled:
-    lineage:
-      - datalake_terminator_clean.termination_aud.id
-  is_termination_canceled:
-    lineage:
-      - datalake_terminator_clean.termination.ts_canceled
-  is_workflow:
-    lineage:
-      - datalake_terminator_clean.termination_workflow.has_automatically_closed_task
   is_relisting:
     lineage:
       - datalake_terminator_clean.termination.is_relisting
+  is_exit_inspection_opted_out:
+    lineage:
+      - datalake_ebdb_contract.contract.is_exit_inspection_opted_out
   has_automatically_closed_task:
     lineage:
       - datalake_terminator_clean.termination_workflow.has_automatically_closed_task
@@ -242,7 +228,7 @@ columns:
   ts_termination_finished:
     lineage:
       - datalake_terminator_clean.negotiation.ts_updated
-      - datalake_terminator_clean.termination.ts_canceled
+      - datalake_terminator_clean.termination_aud.ts_updated
   ts_updated:
     lineage:
       - datalake_terminator_clean.termination.ts_updated

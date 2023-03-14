@@ -11,6 +11,9 @@ columns:
   id_house:
     lineage:
       - datalake_offboarding.contract_termination.id_house
+  id_exit_inspection:
+    lineage:
+      - datalake_offboarding.contract_termination.id_exit_inspection
   category:
     lineage:
       - datalake_offboarding.contract_termination.category
@@ -29,6 +32,12 @@ columns:
   repair_cost:
     lineage:
       - datalake_offboarding.contract_termination.repair_cost
+  contract_status:
+    lineage:
+      - datalake_offboarding.contract_termination.contract_status
+  b2b_type:
+    lineage:
+      - datalake_offboarding.contract_termination.b2b_type
   has_repairs:
     lineage:
       - datalake_offboarding.contract_termination.has_repairs
@@ -44,6 +53,9 @@ columns:
   is_contract_b2b:
     lineage:
       - datalake_offboarding.contract_termination.is_contract_b2b
+  is_exit_inspection_opted_out:
+    lineage:
+      - datalake_offboarding.contract_termination.is_exit_inspection_opted_out
   dt_contract_started:
     lineage:
       - datalake_offboarding.contract_termination.dt_contract_started

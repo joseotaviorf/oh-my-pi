@@ -32,6 +32,9 @@ metadata_files_out_of_pattern:
   - support_and_service/reverse_atento/metadata/reverse/general_metric.yml
   - for_sale/dw_sale_events/metadata/dw/dim_sale_event_type.yml
   - fintech/velo_omie/metadata/clean/country.yml
+  - support_and_service/enrich_offboarding/metadata/enrich/contract_termination.yml
+  - support_and_service/enrich_offboarding/metadata/enrich/ongoing.yml
+  - support_and_service/enrich_offboarding/metadata/enrich/tickets.yml
   - support_and_service/reverse_atento/metadata/reverse/taxonomia_email.yml
   - support_and_service/reverse_atento/metadata/reverse/twilio_chat_aht.yml
   - support_and_service/reverse_atento/metadata/reverse/taxonomia_call.yml

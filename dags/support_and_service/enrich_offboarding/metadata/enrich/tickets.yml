@@ -11,6 +11,9 @@ columns:
   group_name:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+  protection_agreement:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
   lead_time_activation:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed
@@ -31,3 +34,6 @@ columns:
   dt_completed:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed
+  dt_completed_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed_local
