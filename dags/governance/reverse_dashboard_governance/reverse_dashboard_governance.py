@@ -40,8 +40,7 @@ reverse_spark_job_path = (
     f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_dashboard_governance_into_mp.py"
 )
 
-cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
-
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_min_general_photon_cluster")
 default_libraries = config_service.get_config("default_libraries")
 
 dag = DAG(
@@ -61,7 +60,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=cluster_description,
+    cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=default_libraries,
 )
 
