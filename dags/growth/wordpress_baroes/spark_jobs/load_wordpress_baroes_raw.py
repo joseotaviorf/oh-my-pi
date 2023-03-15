@@ -229,7 +229,8 @@ if __name__ == "__main__":
             
 
         ## Loader
-        dfs.remove(None)
+        if None in dfs:
+            dfs.remove(None)
         if dfs:
             df = reduce(DataFrame.unionAll, dfs)
 
