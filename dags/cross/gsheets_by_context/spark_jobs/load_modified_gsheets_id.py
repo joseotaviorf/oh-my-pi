@@ -1,11 +1,13 @@
 import logging
 import json
+import os
 from typing import Any
 from argparse import ArgumentParser
-from datetime import datetime
 
 from bietlejuice.base.api import APIEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.services import FileService
 from bietlejuice.services.gsheets_service import GsheetsService
 
 from quintoandar_logger import QuintoAndarLogger
@@ -23,6 +25,12 @@ SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets.readonly",
     "https://www.googleapis.com/auth/drive.readonly",
 ]
+
+
+def filtering_gsheets_from_context(google_file, dag_context: str):
+    sheet_details = list(google_file)[1]
+    if sheet_details["sheet_context"] == dag_context:
+        return google_file
 
 
 def build_scoped_credentials(credentials) -> Credentials:
@@ -55,18 +63,21 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket")
-    parser.add_argument(
-        "sheet_details",
-        help="gsheets sheet name, sheet id, and (optional) preload time in seconds",
-    )
-    parser.add_argument("execution_date")
+    parser.add_argument("dag_context")
 
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
-    sheet_details = json.loads(args.sheet_details)
-    execution_date_str = args.execution_date
+    dag_context = args.dag_context
+
+    gsheets_by_context_path = DAGPackagesPathService.get_dag_path(
+        dag_name="gsheets_by_context"
+    )
+    gsheets_by_context_path = os.path.join(
+        gsheets_by_context_path, "gsheets_files.yaml"
+    )
+    sheet_details = FileService.get_dict_from_yaml_file(gsheets_by_context_path)
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -75,12 +86,19 @@ if __name__ == "__main__":
     credentials, scope = __get_auth(dbutils)
     gsheets_client = GoogleSheetsClient(credentials, scope)
 
-    execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
-
     scoped_credentials = build_scoped_credentials(credentials)
     drive_service = build_drive_api_service(scoped_credentials)
 
     gsheets_service = GsheetsService()
+
+    sheet_details = list(
+        filter(
+            lambda google_file: filtering_gsheets_from_context(
+                google_file, dag_context
+            ),
+            sheet_details.items(),
+        )
+    )
 
     sheet_details_dict = {}
     sheets_to_be_ingested = []

@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict
+from typing import Dict
 from datetime import datetime
 import json
 
@@ -241,9 +241,7 @@ class GsheetsDAGFactory:
 
         return done_task_groups
 
-    def __create_load_ingestion_ids_info_task(
-        self, task_pool, google_files_context: List[Dict], execution_date, dag
-    ):
+    def __create_load_ingestion_ids_info_task(self, task_pool, dag_context, dag):
         return QuintoAndarDatabricksSubmitRunOperator(
             task_id="ingested-gsheets-id-info",
             dag=dag,
@@ -251,12 +249,7 @@ class GsheetsDAGFactory:
             json={
                 "spark_python_task": {
                     "python_file": self.load_ids_to_be_ingested_info_spark_job,
-                    "parameters": [
-                        self.ENV,
-                        self.datalake_bucket,
-                        json.dumps(google_files_context),
-                        execution_date,
-                    ],
+                    "parameters": [self.ENV, self.datalake_bucket, dag_context],
                 }
             },
             do_output_xcom_push=True,
@@ -324,10 +317,7 @@ class GsheetsDAGFactory:
         )
 
         load_ids_to_be_ingested_task_group = self.__create_load_ingestion_ids_info_task(
-            task_pool=self.task_pool,
-            google_files_context=google_files_context,
-            execution_date=execution_date,
-            dag=dag,
+            task_pool=self.task_pool, dag_context=dag_context, dag=dag
         )
 
         raw_task_groups = self.__create_raw_tasks(
