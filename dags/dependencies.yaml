@@ -1236,6 +1236,9 @@ bietlejuice.dw_sale_flows:
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
 
+bietlejuice.dw_sale_journey:
+  - bietlejuice.enrich_sale_journey:load-enrich-sale-journey
+
 bietlejuice.dw_sale_listing_flow:
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
