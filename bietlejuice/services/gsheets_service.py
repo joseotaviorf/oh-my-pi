@@ -143,7 +143,7 @@ class GsheetsService:
 
     @staticmethod
     def __has_import_range(sheet_data: list) -> bool:
-        regex_pattern = re.compile("IMPORTRANGE")
+        regex_pattern = re.compile("IMPORTRANGE", re.IGNORECASE)
         for row in sheet_data:
             for column_value in row:
                 if re.search(regex_pattern, str(column_value)) is not None:
