@@ -13,5 +13,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output tables, via full load:
 
+- `business_context_detail`
 - `file`
 - `lead_3p`

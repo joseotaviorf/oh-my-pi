@@ -1,0 +1,67 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: business_context_detail
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
+description: 'In the product, each row represents a business context associated with a lead 3p. However, this table is INCREMENTAL,
+so each row represents a creation or an update, limited to the most recent per day. To have the same as the product, use datalake_brokers_supply_processor.'
+columns:
+  id:
+    description: 'Unique identifier of the business context details.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.id
+  id_listing:
+    description: 'Unique identifier of the listing.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.listing_id
+  id_file:
+    description: 'Unique identifier of the file where the lead was last updated.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.file_id
+  id_partner:
+    description: 'Unique identifier of the partner that sent the lead.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.partner_id
+  id_lead:
+    description: 'Unique identifier of the the lead.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.lead_id
+  business_context:
+    description: 'Either SALE or RENT.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.business_context
+    categories:
+      SALE: 'Sale context'
+      RENT: 'Rent context'
+  status:
+    description: 'Status of the lead in that context'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.status
+  status_reason:
+    description: 'Reason why the status is not converted. Json in which keys are reasons and values are booleans.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.status_reason
+  version:
+    description: Version of the row for that id.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.version
+  ts_created:
+    description: When the row was created.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.created_at
+  ts_updated:
+    description: When the row was updated.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.updated_at
+  year:
+    description: Year in which the row was created.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.year
+  month:
+    description: Month in which the row was created.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.month
+  day:
+    description: Day in which the row was created.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.day

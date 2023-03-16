@@ -1,0 +1,51 @@
+---
+database_name: datalake_brokers_supply_processor
+table_name: business_context_detail
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
+description: 'Each row represents a business context associated with a lead 3p. For example, if a lead is for both rent and sale, there is only one
+row in the lead_3p table, but two rows here.'
+columns:
+  id:
+    description: 'Unique identifier of the business context details.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.id
+  id_listing:
+    description: 'Unique identifier of the listing.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.id_listing
+  id_file:
+    description: 'Unique identifier of the file where the lead was last updated.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.id_file
+  id_partner:
+    description: 'Unique identifier of the partner that sent the lead.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.id_partner
+  id_lead:
+    description: 'Unique identifier of the lead.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.id_lead
+  business_context:
+    description: 'Either SALE or RENT.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.business_context
+    categories:
+      SALE: 'Sale context'
+      RENT: 'Rent context'
+  status:
+    description: 'Status of the lead in that context'
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.status
+  status_reason:
+    description: 'Reason why the status is not converted. Map in which keys are reasons and values are booleans.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.status_reason
+  ts_created:
+    description: When the row was created.
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.ts_created
+  ts_updated:
+    description: When the row was updated.
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.ts_updated

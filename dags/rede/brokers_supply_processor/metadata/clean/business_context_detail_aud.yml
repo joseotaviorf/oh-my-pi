@@ -1,0 +1,111 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: business_context_detail_aud
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
+description: 'Audit table of business_context_detail.'
+columns:
+  id:
+    description: 'Unique identifier of the business context details.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.id
+  id_listing:
+    description: 'Unique identifier of the listing.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.listing_id
+  id_file:
+    description: 'Unique identifier of the file where the lead was last updated.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.file_id
+  id_partner:
+    description: 'Unique identifier of the partner that sent the lead.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.partner_id
+  id_lead:
+    description: 'Unique identifier of the lead.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.lead_id
+  business_context:
+    description: 'Either SALE or RENT.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.business_context
+    categories:
+      SALE: 'Sale context'
+      RENT: 'Rent context'
+  status:
+    description: 'Status of the lead in that context'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.status
+  status_reason:
+    description: 'Reason why the status is not converted. Json in which keys are reasons and values are booleans.'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.status_reason
+  version:
+    description: Version of the row for that id.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.version
+  rev:
+    description: Revision number.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.rev
+  rev_end:
+    description: Number of the next revision of this id.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.revend
+  rev_type:
+    description: Revision type.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.revtype
+    categories:
+      "0" : "Create"
+      "1" : "Update"
+      "2" : "Delete"
+  mod_id_listing:
+    description: Flag indicating if the column mod_id_listing has changed.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.listing_id_mod
+  mod_id_file:
+    description: Flag indicating if the column mod_id_file has changed.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.file_id_mod
+  mod_id_partner:
+    description: Flag indicating if the column mod_id_partner has changed.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.partner_id_mod
+  mod_id_lead:
+    description: Flag indicating if the column mod_id_lead has changed.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.lead_id_mod
+  mod_business_context:
+    description: Flag indicating if the column mod_business_context has changed.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.business_context_mod
+  mod_status:
+    description: Flag indicating if the column mod_status has changed.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.status_mod
+  mod_status_reason:
+    description: Flag indicating if the column mod_status_reason has changed.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.status_reason_mod
+  ts_created:
+    description: When the row was created.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.created_at
+  ts_updated:
+    description: When the row was updated.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.updated_at
+  year:
+    description: Year in which the row was created.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.year
+  month:
+    description: Month in which the row was created.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.month
+  day:
+    description: Day in which the row was created.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.day
+

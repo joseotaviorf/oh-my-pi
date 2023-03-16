@@ -2,3 +2,4 @@
 inner_dependencies:
   lead_3p:
     - file
+    - business_context_detail

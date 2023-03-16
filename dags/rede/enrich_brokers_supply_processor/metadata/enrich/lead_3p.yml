@@ -1,241 +1,469 @@
 ---
 database_name: datalake_brokers_supply_processor
 table_name: lead_3p
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
+description: Each row in this table represents a lead3p, a house sent to us by member real estate agencies in Rede.
 columns:
   id:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.id
+    description: 'Unique identifier of the lead.'
   id_partner:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.id_partner
+      - datalake_brokers_supply_processor.business_context_detail.id_partner
+    description: 'Unique identifier of the partner that sent the lead. This field is going to be deprecated soon,
+    split into id_sale_partner and id_rent_partner.'
+  id_sale_partner:
+    lineage:
+      - datalake_brokers_supply_processor.business_context_detail.id_partner
+    description: 'Unique identifier of the partner that sent the lead in the context of ForSale.'
+  id_rent_partner:
+    lineage:
+      - datalake_brokers_supply_processor.business_context_detail.id_partner
+    description: 'Unique identifier of the partner that sent the lead in the context of ForRent.'
   id_file:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.id_file
+      - datalake_brokers_supply_processor.business_context_detail.id_file
+    description: 'Unique identifier of the file the lead came from. This field is going to be deprecated soon,
+    split into id_sale_file and id_rent_file.'
+  id_sale_file:
+    lineage:
+      - datalake_brokers_supply_processor.business_context_detail.id_file
+    description: 'Unique identifier of the file the lead came from, in the context of ForSale'
+  id_rent_file:
+    lineage:
+      - datalake_brokers_supply_processor.business_context_detail.id_file
+    description: 'Unique identifier of the file the lead came from, in the context of ForSale'
   id_listing:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.id_listing
+      - datalake_brokers_supply_processor.business_context_detail.id_listing
+    description: 'Unique identifier of the listing. This field is going to be deprecated soon,
+    split into id_sale_listing and id_rent_listing.'
+  id_sale_listing:
+    lineage:
+      - datalake_brokers_supply_processor.business_context_detail.id_listing
+    description: 'Unique identifier of the listing, in the context of ForSale.'
+  id_rent_listing:
+    lineage:
+      - datalake_brokers_supply_processor.business_context_detail.id_listing
+    description: 'Unique identifier of the listing, in the context of ForRent.'
   uuid_lead:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.uuid_lead
+    description: 'Unique identifier of the lead, in uuid format. Can be joined with datalake_ebdb_clean.house.id_external.'
   id_real_estate:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.id_real_estate
+    description: 'Unique identifier of the real estate agency.'
   id_by_real_estate:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.id_by_real_estate
+    description: 'Identifier of the lead within the real estate agency.'
   id_house_partner:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: 'Identifier of the lead within the real estate agency.'
   id_region:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: 'Identifier of the lead region.'
   id_company_hubspot:
     lineage:
       - datalake_brokers_supply_processor.file.id_company_hubspot
+    description: 'Identifier of the lead company in HubSpot. This field is going to be deprecated soon,
+    split into id_sale_company_hubspot and id_rent_company_hubspot.'
+  id_sale_company_hubspot:
+    lineage:
+      - datalake_brokers_supply_processor.file.id_company_hubspot
+    description: 'Identifier of the lead company in HubSpot, in the context of ForSale.'
+  id_rent_company_hubspot:
+    lineage:
+      - datalake_brokers_supply_processor.file.id_company_hubspot
+    description: 'Identifier of the lead company in HubSpot, in the context of ForRent.'
   lead_hash:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.lead_hash
+    description: 'Hash of the lead.'
   block:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: 'Block where the house is located.'
   tower:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: 'Tower where the house is located.'
   info_key:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: 'Information about the key location. As of March 2023, completely null.'
   condominium:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: 'Condominium where the house is located.'
   house_category:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: 'Category of the house. As of March 2023, completely null.'
   house_type:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+    description: House type.
+    categories:
+      APARTAMENTO: 'Apartment'
+      CASA: 'House'
+      OUTRO: 'Other'
+      COBERTURA: 'Penthouse'
+      SOBRADO: 'Two-story house'
+      KITNET: 'Kitnet'
   house_subtype:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: House subtype. As of March 2023, this field is completely null.
   construction_year:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: Construction year. As of March 2023, this field is completely null.
   front_door_type:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.details
+    description: Time of day for the front door.
+    categories:
+      ALL_DAY: 'House is available all day.'
   house_description:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.details
+    description: Description of the house.
   country:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: Country where the house is located.
   state:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: State where the house is located.
   city:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: City where the house is located.
   neighborhood:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: Neighborhood where the house is located.
   region_slug:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: Slug of the region where the house is located.
   zip_code:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: Zip code of where the house is located.
   address:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: Address of where the house is located.
   number:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: Number of the house.
   floor:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: Floor of the apartment.
   complement:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: Complement of the adress.
   reference_point:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: Reference point of the address.
   owner_email:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.owner
+    description: Email of the house owner.
   owner_name:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.owner
+    description: Name of the house owner.
   owner_phone:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.owner
+    description: Phone number of the house owner.
   owner_person_type:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.owner
+    description: Person type of the house owner.
+    categories:
+      NATURAL_PERSON: 'Natural person.'
   access_type:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.access
+    description: Access type of the property. As of March 2023, this field is completely null.
   authorization_type:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.access
+    description: Authorization type of the property.
+    categories:
+      FRONT_DOOR: 'Authorized on the front door.'
+      OWNER_PRESENT: 'Owner will be present.'
   occupant_type:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.access
+    description: Occupant type.
+    categories:
+      OWNER: 'Occupied by owner.'
   additional_access_info:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.access
+    description: Additional access information for the property. As of March 2023, completely null.
   locker_address:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.access
+    description: Locker address for the property. As of March 2023, completely null.
   password:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.access
+    description: Password for property access. As of March 2023, completely null.
   cnpj:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.cnpj
+    description: CNPJ of the real estate agency.
   status:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.status
+    description: 'Status of the lead. This field is going to be deprecated soon,
+    split into sale_status and rent_status.'
+    categories:
+      REGISTERED: 'Registered in Main for publication'
+      SUSPENDED: 'Lead suspended'
+      WAITING: 'Lead eligible and waiting for owner information'
+      PROCESSING: 'Lead in image processing'
+      QUEUE: 'Lead awaiting in the duplicate queue'
+      NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
+  status:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.status
+      - datalake_brokers_supply_processor.business_context_detail.status
+    description: 'Status of the lead. This field is going to be deprecated soon,
+    split into sale_status and rent_status.'
+    categories:
+      REGISTERED: 'Registered in Main for publication'
+      SUSPENDED: 'Lead suspended'
+      WAITING: 'Lead eligible and waiting for owner information'
+      PROCESSING: 'Lead in image processing'
+      QUEUE: 'Lead awaiting in the duplicate queue'
+      NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
+  sale_status:
+    lineage:
+      - datalake_brokers_supply_processor.business_context_detail.status
+    description: 'Status of the lead, in the context of ForSale.'
+    categories:
+      REGISTERED: 'Registered in Main for publication'
+      SUSPENDED: 'Lead suspended'
+      WAITING: 'Lead eligible and waiting for owner information'
+      PROCESSING: 'Lead in image processing'
+      QUEUE: 'Lead awaiting in the duplicate queue'
+      NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
+  rent_status:
+    lineage:
+      - datalake_brokers_supply_processor.business_context_detail.status
+    description: 'Status of the lead, in the context of ForSale.'
+    categories:
+      REGISTERED: 'Registered in Main for publication'
+      SUSPENDED: 'Lead suspended'
+      WAITING: 'Lead eligible and waiting for owner information'
+      PROCESSING: 'Lead in image processing'
+      QUEUE: 'Lead awaiting in the duplicate queue'
+      NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
+  recurrency_type:
+    description: 'Classifies whether the lead came from the first batch, first month, is recurrent, or is complementary (captured before first batch).
+    This field is going to be deprecated soon, split into sale_recurrency_type and rent_recurrency_type.'
+    categories:
+      FIRST_BATCH: 'Lead sent along with the first file'
+      FIRST_MONTH_BATCH: 'Lead was sent up to 30 days after the first batch'
+      RECURRENT: 'Lead was captured and sent AFTER the first 30 days'
+      COMPLEMENTARY: 'Lead was captured BEFORE the first batch, but sent AFTER the first 30 days'
+  sale_recurrency_type:
+    description: 'Classifies whether the sale lead came from the first batch, first month, is recurrent, or is complementary (captured before first batch).'
+    categories:
+      FIRST_BATCH: 'Lead sent along with the first file in the ForSale context'
+      FIRST_MONTH_BATCH: 'Lead was sent up to 30 days after the first ForSale batch'
+      RECURRENT: 'Lead was captured and sent AFTER the first 30 days of the ForSale batch'
+      COMPLEMENTARY: 'Lead was captured BEFORE the first batch, but sent AFTER the first 30 days of the ForSale batch'
+      'N/A': 'Not a sale lead'
+  rent_recurrency_type:
+    description: 'Classifies whether the rent lead came from the first batch, first month, is recurrent, or is complementary (captured before first batch).'
+    categories:
+      FIRST_BATCH: 'Lead sent along with the first file in the ForRent context'
+      FIRST_MONTH_BATCH: 'Lead was sent up to 30 days after the first ForRent batch'
+      RECURRENT: 'Lead was captured and sent AFTER the first 30 days of the ForRent batch'
+      COMPLEMENTARY: 'Lead was captured BEFORE the first batch, but sent AFTER the first 30 days of the ForRent batch'
+      'N/A': 'Not a rent lead'
   installations:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.details
+    description: 'Map of string to boolean with installations in the house.'
   house_appliances:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.details
+    description: 'Map of string to boolean with appliances in the house.'
   accessibility_items:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.details
+    description: 'Map of string to boolean with accessibility items in the house.'
   status_reason:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.status_reason
+      - datalake_brokers_supply_processor.business_context_detail.status_reason
+    description: 'Map of string to boolean with reasons of why the status is not converted. This field is going to be deprecated soon,
+    split into sale_status_reason and rent_status_reason.'
+  sale_status_reason:
+    lineage:
+      - datalake_brokers_supply_processor.business_context_detail.status_reason
+    description: 'Map of string to boolean with reasons of why the status is not converted, in the context of ForSale.'
+  rent_status_reason:
+    lineage:
+      - datalake_brokers_supply_processor.business_context_detail.status_reason
+    description: 'Map of string to boolean with reasons of why the status is not converted, in the context of ForRent.'
   photos:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.photos
+    description: 'Array of photos sent for analysis.'
   administrators:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.administrators
+    description: 'Array of house administrators.'
   iptu_installment_informations:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.pricing
+    description: 'Array of IPTU installment informations.'
   special_conditions:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.pricing
+    description: 'Array of special conditions of the house.'
   total_area:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+    description: 'Total area of the house.'
   bedrooms:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+    description: 'Amount of bedrooms in the house.'
   suites:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+    description: 'Amount of suites in the house.'
   bathrooms:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+    description: 'Amount of bathrooms in the house.'
   garages:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.blueprint
+    description: 'Amount of garages in the house.'
   latitude:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: 'Latitude of garages in the house.'
   longitude:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: 'Longitude of garages in the house.'
   rent_price:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.pricing
+    description: 'House rent price.'
   sale_price:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.pricing
+    description: 'House sale price.'
   condo_price:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.pricing
+    description: 'House condo price.'
   version:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.version
+    description: 'Version of the lead row.'
+  is_for_sale:
+    description: 'True if the lead has been sent in the context of ForSale. It is not exclusive with is_for_rent, as both can be true.'
+  is_for_rent:
+    description: 'True if the lead has been sent in the context of ForRent. It is not exclusive with is_for_sale, as both can be true.'
   has_opted_keys_with_agent:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.access
+    description: 'If the lead has keys with agent. As of March 2023, this field is
+      completely null.'
   has_access_restriction:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.access
+    description: 'If the property has any access restriction. As of March 2023, this
+      field is completely null.'
   is_furnished:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.details
+    description: 'If the property is furnished. As of August 2022, this field is completely
+      null.'
   is_penthouse:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.details
+    description: If the property is a penthouse.
   is_pet_friendly:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.details
+    description: If the property is pet friendly. As of March 2023, this field is
+      completely null.
   is_iptu_not_paid:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.pricing
+    description: If the IPTU is not paid. As of March 2023, this field is
+      completely null.
   is_out_of_area:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.location
+    description: If the lead is out of area. As of March 2023, this field is
+      completely null.
   is_habitat:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: If the property is habitat. As of March 2023, this field is
+      completely false.
   has_balcony:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: If the property has a balcony. As of March 2023, this field is
+      completely false.
   has_agency_key:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: If the real estate agency has a key. As of March 2023, this field
+      is completely false.
   has_concierge:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: If the property has a concierge. As of March 2023, this field is
+      completely false.
   is_sent_to_main:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.is_sent_to_main
+    description: If the lead was sent to main.
   ts_house_created:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: Timestamp of when the house was captured by the real estate agency.
   ts_house_updated:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
+    description: Timestamp of when the house was last updated in the real estate agency.
   ts_created:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.ts_created
+    description: Timestamp of when the lead was created.
   ts_updated:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.ts_updated
+    description: Timestamp of when the lead was last updated.

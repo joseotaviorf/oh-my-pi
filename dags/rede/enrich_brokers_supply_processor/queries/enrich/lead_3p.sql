@@ -1,20 +1,36 @@
-WITH leads AS (
-    SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS rw
+WITH first_files AS (
+    SELECT
+        f.id_company_hubspot,
+        SPLIT(f.file_name, '_dedup_')[0] AS company_file_name_part,
+        bcd.business_context,
+        MIN(f.ts_created) AS ts_created
     FROM
-        datalake_brokers_supply_processor_clean.lead_3p
+        datalake_brokers_supply_processor.business_context_detail AS bcd
+    JOIN
+        datalake_brokers_supply_processor.file AS f
+            ON bcd.id_file = f.id
+    GROUP BY
+        1,2,3
 )
 SELECT
     l.id,
-    l.id_partner,
-    l.id_file,
-    l.id_listing,
+    COALESCE(l.id_partner, sale_bcd.id_partner, rent_bcd.id_partner) AS id_partner,
+    sale_bcd.id_partner AS id_sale_partner,
+    rent_bcd.id_partner AS id_rent_partner,
+    COALESCE(l.id_file, sale_bcd.id_file, rent_bcd.id_file) AS id_file,
+    sale_bcd.id_file AS id_sale_file,
+    rent_bcd.id_file AS id_rent_file,
+    COALESCE(l.id_listing, sale_bcd.id_listing, rent_bcd.id_listing) AS id_listing,
+    sale_bcd.id_listing AS id_sale_listing,
+    rent_bcd.id_listing AS id_rent_listing,
     l.uuid_lead,
     l.id_real_estate,
     l.id_by_real_estate,
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.housePartnerId'), '') AS id_house_partner,
     GET_JSON_OBJECT(l.location, '$.regionId')::BIGINT AS id_region,
-    f.id_company_hubspot,
+    COALESCE(f.id_company_hubspot, sale_file.id_company_hubspot, rent_file.id_company_hubspot) AS id_company_hubspot,
+    COALESCE(sale_file.id_company_hubspot) AS id_sale_company_hubspot,
+    COALESCE(rent_file.id_company_hubspot) AS id_rent_company_hubspot,
     l.lead_hash,
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.block'), '') AS block,
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.tower'), '') AS tower,
@@ -48,17 +64,35 @@ SELECT
     NULLIF(GET_JSON_OBJECT(l.access, '$.lockerAddress'), '') AS locker_address,
     NULLIF(GET_JSON_OBJECT(l.access, '$.password'), '') AS password,
     l.cnpj,
-    l.status,
+    COALESCE(l.status, sale_bcd.status, rent_bcd.status) AS status,
+    sale_bcd.status AS sale_status,
+    rent_bcd.status_reason AS rent_status,
     CASE
         WHEN f.ts_previous_file_sent_by_agency IS NULL THEN 'FIRST_BATCH'
         WHEN f.ts_created < first_file.ts_created + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
         WHEN GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP < first_file.ts_created THEN 'COMPLEMENTARY'
         ELSE 'RECURRENT'
     END AS recurrency_type,
+    CASE
+        WHEN sale_file.ts_created IS NULL THEN 'N/A'
+        WHEN sale_file.ts_created = first_sale_file.ts_created THEN 'FIRST_BATCH'
+        WHEN sale_file.ts_created < first_sale_file.ts_created + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
+        WHEN GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP < first_sale_file.ts_created THEN 'COMPLEMENTARY'
+        ELSE 'RECURRENT'
+    END AS sale_recurrency_type,
+    CASE
+        WHEN rent_file.ts_created IS NULL THEN 'N/A'
+        WHEN rent_file.ts_created = first_rent_file.ts_created THEN 'FIRST_BATCH'
+        WHEN rent_file.ts_created < first_rent_file.ts_created + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
+        WHEN GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP < first_rent_file.ts_created THEN 'COMPLEMENTARY'
+        ELSE 'RECURRENT'
+    END AS rent_recurrency_type,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.installations'), '{{}}'), 'map<string, boolean>') AS installations,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.appliances'), '{{}}'), 'map<string, boolean>') AS house_appliances,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.accessibilityItems'), '{{}}'), 'map<string, boolean>') AS accessibility_items,
-    FROM_JSON(NULLIF(status_reason, '{{}}'), 'map<string, string>') AS status_reason,
+    COALESCE(FROM_JSON(NULLIF(l.status_reason, '{{}}'), 'map<string, string>'), sale_bcd.status_reason) AS status_reason,
+    sale_bcd.status_reason AS sale_status_reason,
+    rent_bcd.status_reason AS rent_status_reason,
     FROM_JSON(
         NULLIF(photos, '[]'),
         'array<struct<url: string, description: string>>'
@@ -86,6 +120,8 @@ SELECT
     GET_JSON_OBJECT(l.pricing, '$.salePrice')::INT AS sale_price,
     GET_JSON_OBJECT(l.pricing, '$.condoPrice')::INT AS condo_price,
     l.version,
+    sale_bcd.id IS NOT NULL AS is_for_sale,
+    rent_bcd.id IS NOT NULL AS is_for_rent,
     GET_JSON_OBJECT(l.access, '$.optedKeysWithAgent')::BOOLEAN AS has_opted_keys_with_agent,
     GET_JSON_OBJECT(l.access, '$.hasRestriction')::BOOLEAN AS has_access_restriction,
     GET_JSON_OBJECT(l.details, '$.isFurnished')::BOOLEAN AS is_furnished,
@@ -103,7 +139,7 @@ SELECT
     l.ts_created,
     l.ts_updated
 FROM
-    leads AS l
+    datalake_brokers_supply_processor_clean.lead_3p AS l
 LEFT JOIN
     datalake_brokers_supply_processor.file AS f
         ON l.id_file = f.id
@@ -111,5 +147,27 @@ LEFT JOIN
     datalake_brokers_supply_processor.file AS first_file
         ON COALESCE(f.id_company_hubspot, SPLIT(f.file_name, '_dedup_')[0]) = COALESCE(first_file.id_company_hubspot, SPLIT(first_file.file_name, '_dedup_')[0])
         AND first_file.ts_previous_file_sent_by_agency IS NULL
-WHERE
-    rw = 1
+LEFT JOIN
+    datalake_brokers_supply_processor.business_context_detail AS sale_bcd
+        ON sale_bcd.id_lead = l.id
+        AND sale_bcd.business_context = 'SALE'
+LEFT JOIN
+    datalake_brokers_supply_processor.business_context_detail AS rent_bcd
+        ON sale_bcd.id_lead = l.id
+        AND sale_bcd.business_context = 'RENT'
+LEFT JOIN
+    datalake_brokers_supply_processor.file AS sale_file
+        ON sale_bcd.id_file = sale_file.id
+LEFT JOIN
+    datalake_brokers_supply_processor.file AS rent_file
+        ON rent_bcd.id_file = rent_file.id
+LEFT JOIN
+    first_files AS first_sale_file
+        ON COALESCE(sale_file.id_company_hubspot, SPLIT(sale_file.file_name, '_dedup_')[0]) = COALESCE(first_sale_file.id_company_hubspot, first_sale_file.company_file_name_part)
+        AND first_sale_file.business_context = 'SALE'
+LEFT JOIN
+    first_files AS first_rent_file
+        ON COALESCE(rent_file.id_company_hubspot, SPLIT(rent_file.file_name, '_dedup_')[0]) = COALESCE(first_rent_file.id_company_hubspot, first_rent_file.company_file_name_part)
+        AND first_sale_file.business_context = 'RENT'
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY l.id ORDER BY l.ts_updated DESC) = 1

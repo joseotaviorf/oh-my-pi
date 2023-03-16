@@ -16,6 +16,8 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces, in datalake_brokers_supply_processor_raw:
 
 Via **incremental load**:
+    - `business_context_detail`
+    - `business_context_detail_aud`
     - `file`
     - `file_aud`
     - `lead3p`
@@ -25,6 +27,8 @@ Via **incremental load**:
 This pipeline produces, in datalake_brokers_supply_processor_clean:
 
 Via **incremental load**:
+    - `business_context_detail`
+    - `business_context_detail_aud`
     - `file`
     - `file_aud`
     - `lead_3p`
