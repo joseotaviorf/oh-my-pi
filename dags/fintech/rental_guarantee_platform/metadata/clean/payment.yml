@@ -1,6 +1,8 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: payment
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
 columns:
   id:
     lineage:
@@ -8,12 +10,12 @@ columns:
   id_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.propose
+  id_subscription:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.subscription
   customer:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.customer
-  subscription:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.payment.subscription
   payment_link:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.payment_link
@@ -41,9 +43,9 @@ columns:
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.value
-  net_value:
+  tax:
     lineage:
-      - datalake_rental_guarantee_platform_raw.payment.net_value
+      - datalake_rental_guarantee_platform_raw.payment.tax
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.active
