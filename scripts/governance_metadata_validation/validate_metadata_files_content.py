@@ -7,6 +7,7 @@ from yamale import YamaleError
 
 from scripts.services.metadata_file_service import (
     MetadataFileService,
+    ReverseMetadataFileException,
 )
 
 from scripts.services.git_service import GitService
@@ -17,9 +18,7 @@ with open(f"{Path(__file__).parent}/skip_list.yml") as f:
 metadata_file_service = MetadataFileService()
 
 
-SKIP_LIST_PATH_REGEX = re.compile(
-    rf"(?:.*/)?dags/(?P<path>.*)"
-)
+SKIP_LIST_PATH_REGEX = re.compile(rf"(?:.*/)?dags/(?P<path>.*)")
 
 
 def parse_args():
@@ -61,7 +60,7 @@ def parse_args():
 def get_metadata_file_paths(mode, input):
     files = []
     if mode == "file":
-        files = [input]
+        files = [(input, "A")]
     elif mode == "all_files":
         files = metadata_file_service.list_metadata_files()
     elif mode == "branch":
@@ -71,11 +70,10 @@ def get_metadata_file_paths(mode, input):
         else:
             from_branch = "origin/master"
         files = [
-            file
+            (file, status)
             for file, status in git_service.get_modified_files_from_diff(
                 from_branch, "HEAD"
             ).items()
-            if status in git_service.UPSERT_STATUS_CODES
         ]
     return list(metadata_file_service.filter_metadata_files(files))
 
@@ -102,7 +100,7 @@ def output_results(results, verbose):
 
 
 def remove_prefix(input_string):
-    return re.match(SKIP_LIST_PATH_REGEX, input_string).groupdict()['path']
+    return re.match(SKIP_LIST_PATH_REGEX, input_string).groupdict()["path"]
 
 
 def main():
@@ -110,13 +108,15 @@ def main():
     files = get_metadata_file_paths(mode, input)
     results = {"passed": [], "failed": [], "skipped": []}
 
-    for file in files:
+    for file, status in files:
         if remove_prefix(file) not in SKIP_LIST:
             try:
-                result = metadata_file_service.validate_file(file)
+                result = metadata_file_service.validate_file(file, status)
                 results["passed"].append(result[0])
             except YamaleError as error:
                 results["failed"].append(error.results[0])
+            except ReverseMetadataFileException as error:
+                results["failed"].append(error)
         else:
             results["skipped"].append(file)
 

@@ -4,19 +4,18 @@ import re
 
 import yaml
 
-from bietlejuice.services import FileService
 from scripts.services.git_service import GitService
-from dags import DAG_PACKAGES_ROOT
 
 from pathlib import Path
 
-SQL_PATH_REGEX = re.compile(
-    rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<context>\w+)/queries/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.sql"
-)
-SKIP_LIST_PATH_REGEX = re.compile(rf"(?:.*/)?dags/(?P<path>.*)")
+from scripts.services.metadata_file_service import MetadataFileService
 
 with open(f"{Path(__file__).parent}/skip_list.yml") as f:
     SKIP_LIST = yaml.safe_load(f)["queries_without_metadata_files"]
+
+SKIP_LIST_PATH_REGEX = re.compile(rf"(?:.*/)?dags/(?P<path>.*)")
+
+metadata_file_service = MetadataFileService()
 
 
 def parse_args():
@@ -58,9 +57,9 @@ def parse_args():
 def get_query_file_paths(mode, input):
     files = []
     if mode == "file":
-        files = [input]
+        files = [(input, "A")]
     elif mode == "all_files":
-        files = list(FileService.list_all_files_recursively(DAG_PACKAGES_ROOT, "sql"))
+        files = metadata_file_service.list_metadata_files()
     elif mode == "branch":
         git_service = GitService()
         if input == "master":
@@ -68,14 +67,12 @@ def get_query_file_paths(mode, input):
         else:
             from_branch = "origin/master"
         files = [
-            file
+            (file, status)
             for file, status in git_service.get_modified_files_from_diff(
                 from_branch, "HEAD"
             ).items()
-            if status in git_service.UPSERT_STATUS_CODES
-            and re.match(SQL_PATH_REGEX, file)
         ]
-    return files
+    return list(metadata_file_service.filter_query_files(files))
 
 
 def metadata_file_exists(query_file):
@@ -87,7 +84,7 @@ def metadata_file_exists(query_file):
 
 
 def remove_prefix(input_string):
-    return re.match(SKIP_LIST_PATH_REGEX, input_string).groupdict()["path"]
+    return re.match(SKIP_LIST_PATH_REGEX, input_string).groupdict().get("path")
 
 
 def output_results(results):
@@ -113,9 +110,11 @@ def main():
     query_files = get_query_file_paths(mode, input)
     results = {"passed": [], "failed": [], "skipped": []}
 
-    for file in query_files:
+    for file, status in query_files:
         if remove_prefix(file) not in SKIP_LIST:
-            if metadata_file_exists(file):
+            if metadata_file_service.sql_file_has_equivalent_metadata_file(
+                file, status
+            ):
                 results["passed"].append(file)
             else:
                 results["failed"].append(file)

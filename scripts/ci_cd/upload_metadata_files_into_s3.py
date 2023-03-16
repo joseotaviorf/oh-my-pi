@@ -46,15 +46,13 @@ def get_metadata_files(all_files, branch):
         else:
             from_branch = "origin/master"
         changed_files = [
-            f"{file}"
+            (file, status)
             for file, status in git_service.get_modified_files_from_diff(
                 from_branch, "HEAD"
             ).items()
             if status in git_service.UPSERT_STATUS_CODES
         ]
-        metadata_files = list(
-            metadata_file_service.filter_metadata_files(changed_files)
-        )
+        metadata_files = metadata_file_service.filter_metadata_files(changed_files)
         return metadata_files
 
 
@@ -123,7 +121,7 @@ def main():
         print("m=main, msg=No files found to upload.")
         exit(0)
 
-    files_info = [MetadataFileService.get_info(file) for file in files]
+    files_info = [MetadataFileService.get_info(file) for file, status in files]
 
     print("m=main, msg=Files to be uploaded:")
     for file_info in files_info:

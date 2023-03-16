@@ -1,13 +1,25 @@
+import os
 import re
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 import yaml
-from yamale import yamale
+from yamale import yamale, YamaleError
 
 from bietlejuice.services import FileService
 from scripts.services.metadata_file_info import MetadataFileInfo
 from dags import DAG_PACKAGES_ROOT
+
+
+class ReverseMetadataFileException(Exception):
+    def __init__(self, file, layer):
+        self.data = file
+        self.errors = [
+            f"Error: Reverse layer do not need metadata files. Remove this file"
+        ]
+        super().__init__(
+            f"file={file}, layer={layer}, msg=Reverse layer do not need metadata files. Remove this file"
+        )
 
 
 class MetadataFileService:
@@ -18,41 +30,84 @@ class MetadataFileService:
     DAGS_METADATA_PATHS_REGEX = re.compile(
         rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/metadata/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?:yml|yaml)"
     )
+    DAGS_SQL_PATHS_REGEX = re.compile(
+        rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/queries/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?:sql)"
+    )
 
     def __init__(self):
         base_path = f"{Path(__file__).parent}/metadata_file_schemas"
-        self.file_schema = yamale.make_schema(f"{base_path}/metadata_file_schema.yml")
-        self.raw_file_schema = yamale.make_schema(
-            f"{base_path}/raw_metadata_file_schema.yml"
-        )
+        self.schemas = {
+            "raw": yamale.make_schema(f"{base_path}/raw_schema.yml"),
+            "clean": yamale.make_schema(f"{base_path}/clean_schema.yml"),
+            "enrich_dw_new_files": yamale.make_schema(
+                f"{base_path}/enrich_dw_new_files_schema.yml"
+            ),
+            "enrich_dw_modified_files": yamale.make_schema(
+                f"{base_path}/enrich_dw_modified_files_schema.yml"
+            ),
+            "metric": yamale.make_schema(f"{base_path}/metric_schema.yml"),
+        }
 
     @staticmethod
-    def filter_metadata_files(files) -> List[str]:
+    def filter_metadata_files(files_and_status) -> List[Tuple[str, str]]:
         """
-        Given a list of files, returns a list consisting only of metadata files
+        Given a list of files_and_status tuples, returns a list consisting only of metadata files
         :param files: list of files to be filtered
         :type files: List[str]
         :return: list of filtered files
         :rtype: List[str]
         """
-        return list(
-            filter(
-                lambda file: re.match(
-                    MetadataFileService.DAGS_METADATA_PATHS_REGEX, file
-                ),
-                files,
-            )
-        )
+        filtered_files = []
+        for file, status in files_and_status:
+            if re.match(MetadataFileService.DAGS_METADATA_PATHS_REGEX, file):
+                filtered_files.append((file, status))
+        return filtered_files
 
     @staticmethod
-    def list_metadata_files() -> List[str]:
+    def filter_query_files(files_and_status) -> List[Tuple[str, str]]:
+        """
+        Given a list of files_and_status tuples, returns a list consisting only of metadata files
+        :param files: list of files to be filtered
+        :type files: List[str]
+        :return: list of filtered files
+        :rtype: List[str]
+        """
+        filtered_files = []
+        for file, status in files_and_status:
+            if re.match(MetadataFileService.DAGS_SQL_PATHS_REGEX, file):
+                filtered_files.append((file, status))
+        return filtered_files
+
+    @staticmethod
+    def list_metadata_files() -> List[Tuple[str, str]]:
         """
         Scans DAG_PACKAGES_ROOT and returns all metadata files
         :return: list of paths to metadata files
         :rtype: List[str]
         """
         return MetadataFileService.filter_metadata_files(
-            list(FileService.list_all_files_recursively(DAG_PACKAGES_ROOT, "yml"))
+            [
+                (file, "M")
+                for file in FileService.list_all_files_recursively(
+                    DAG_PACKAGES_ROOT, "yml"
+                )
+            ]
+        )
+
+    @staticmethod
+    def list_query_files() -> List[Tuple[str, str]]:
+        """
+        Scans DAG_PACKAGES_ROOT and returns all metadata files
+        :return: list of paths to metadata files
+        :rtype: List[str]
+        """
+        return MetadataFileService.filter_metadata_files(
+            [
+                (file, "M")
+                for file in FileService.list_all_files_recursively(
+                    DAG_PACKAGES_ROOT, "sql"
+                )
+            ]
         )
 
     @staticmethod
@@ -138,19 +193,63 @@ class MetadataFileService:
 
         return file_info
 
-    def validate_file(self, file_path: str) -> List[Any]:
+    def validate_file(self, file_path: str, status: str) -> List[Any]:
         """
         Given the path to a metadata file, validates if it conforms to the metadata files schemas
         :param file_path: path to a metadata file
         :type file_path: str
+        :param status: Github file status.
+        :type status: str
         :return: List of validations results from Yamale
         :rtype: List[Any]
         """
         yaml_data = yamale.make_data(file_path)
         yaml_content, _ = yaml_data[0]
         table_info = MetadataFileService._get_info_from_path(file_path)
+        layer = table_info["layer"]
 
-        if table_info["layer"] == "raw":
-            return yamale.validate(self.raw_file_schema, yaml_data)
+        if layer == "raw":
+            return yamale.validate(self.schemas["raw"], yaml_data)
+        elif layer == "clean":
+            return yamale.validate(self.schemas["clean"], yaml_data)
+        elif status == "A" and layer in ["enrich", "dw"]:
+            return yamale.validate(self.schemas["enrich_dw_new_files"], yaml_data)
+        elif status == "M" and layer in ["enrich", "dw"]:
+            return yamale.validate(self.schemas["enrich_dw_modified_files"], yaml_data)
+        elif layer == "metric":
+            return yamale.validate(self.schemas["metric"], yaml_data)
+        elif layer == "reverse":
+            raise ReverseMetadataFileException(file_path, layer)
+
+    def sql_file_has_equivalent_metadata_file(
+        self, file_path: str, status: str
+    ) -> bool:
+        """
+        Given the path to a bi-etl-ejuice sql file, checks if the file has a corresponding metadata file
+        :param file_path: path to the sql file
+        :type file_path: str
+        :param status: the git status of the file. A for new file, M for modified file, D for deleted, etc
+        :type status: str
+        :return: true if the metadata file exists, otherwise false
+        :rtype: false
+        """
+        table_info = MetadataFileService._get_info_from_path(file_path)
+        layer = table_info.get("layer")
+
+        if layer in {"raw", "clean", "enrich", "dw", "metric"}:
+            return os.path.isfile(
+                file_path.replace("/queries/", "/metadata/").replace("sql", "yml")
+            ) or os.path.isfile(
+                file_path.replace("/queries/", "/metadata/").replace("sql", "yaml")
+            )
         else:
-            return yamale.validate(self.file_schema, yaml_data)
+            if layer:
+                print(
+                    f"m=sql_file_has_equivalent_metadata_file, file_path={file_path}, layer={layer}, msg=This layer does not requires a metadata file"
+                )
+                return True
+            else:
+                print(
+                    f"m=sql_file_has_equivalent_metadata_file, file_path={file_path}, msg=Could not infer layer, skipping file"
+                )
+                return True

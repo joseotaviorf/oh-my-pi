@@ -26,7 +26,7 @@ ALL_METADATA_S3_FILE_NAME = "all_lineage_tags_data.yml"
 def get_lineage_and_tags_data():
     yamls_data = []
     files = MetadataFileService.list_metadata_files()
-    for file in files:
+    for file, status in files:
         file_info = MetadataFileService.get_info(file)
         yamls_data.append(
             {

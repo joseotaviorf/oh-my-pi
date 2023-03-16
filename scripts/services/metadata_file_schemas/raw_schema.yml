@@ -1,9 +1,9 @@
 ---
 database_name: str(min=1, max=100)
 table_name: str(min=1, max=100)
-owner: regex('(?:[\.-]?\w+)*@\w+(?:[\.-]?\w+)*')
-domain: str(min=1, max=100)
-description: str(min=1, max=280)
+owner: regex('(?:[\.-]?\w+)*@\w+(?:[\.-]?\w+)*', required=False)
+domain: str(min=1, max=100, required=False)
+description: str(required=False)
 columns: map(include("column"), key=str(min=2, max=50), required=False)
 ---
 column:
