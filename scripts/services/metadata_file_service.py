@@ -28,13 +28,13 @@ class MetadataFileService:
     """
 
     INFO_FROM_PATHS_REGEX = re.compile(
-        rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/(?P<metadata_or_queries>metadata|queries)/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?P<extension>\w{3,4})"
+        r"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/(?P<metadata_or_queries>metadata|queries)/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?P<extension>\w{3,4})"
     )
     DAGS_SQL_PATHS_REGEX = re.compile(
-        rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/queries/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?:sql)"
+        r"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/queries/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?:sql)"
     )
     DAGS_METADATA_PATHS_REGEX = re.compile(
-        rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/queries/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?:yml|yaml)"
+        r"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/queries/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?:yml|yaml)"
     )
 
     def __init__(self):
