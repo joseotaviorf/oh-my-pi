@@ -43,9 +43,6 @@ services:
       - ENVIRONMENT=forno
     ports:
       - "8080:8080"
-    volumes:
-      - ../../bietlejuice:/bi-etl-ejuice/local/bietlejuice
-      - ../../dags:/bi-etl-ejuice/local/bietlejuice/dags/dags
     entrypoint: ./entrypoint.sh ${DATABRICKS_TOKEN}
     depends_on:
       postgres:
@@ -67,9 +64,6 @@ services:
       - ENVIRONMENT=forno
     depends_on:
       - airflow
-    volumes:
-      - ../../bietlejuice:/bi-etl-ejuice/local/bietlejuice
-      - ../../dags:/bi-etl-ejuice/local/bietlejuice/dags/dags
     entrypoint: airflow worker -cn worker_1
     healthcheck:
       test:
@@ -99,7 +93,6 @@ services:
       - airflow
     volumes:
       - ../../bietlejuice:/bi-etl-ejuice/local/bietlejuice
-      - ../../dags:/bi-etl-ejuice/local/bietlejuice/dags/dags
     entrypoint: airflow worker -cn worker_2
     healthcheck:
       test:

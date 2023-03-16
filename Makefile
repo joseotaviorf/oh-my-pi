@@ -1,11 +1,12 @@
 ###############################################################################
 ###################### Local Airflow Docker environment #######################
 ###############################################################################
+branch ?= forno
 .PHONY: _clone-airflow-plugins
 _clone-airflow-plugins:
 	@rm -fR ./local/airflow/plugins || true
 	@rm -fR ./local/airflow/plugins_temp || true
-	@git clone --quiet --depth 1 https://github.com/quintoandar/airflow-plugins.git ./local/airflow/plugins_temp
+	@git clone -b $(branch) --quiet --depth 1 https://github.com/quintoandar/airflow-plugins.git ./local/airflow/plugins_temp
 	@cp -Rf ./local/airflow/plugins_temp/quintoandar_airflow_plugins/ ./local/airflow/plugins
 	@rm -fR ./local/airflow/plugins_temp
 
@@ -28,9 +29,12 @@ setup-local-variables:
 	@echo "All variables set!"
 	@echo "~> Restart your shell to apply changes!"
 
+branch ?= forno
 .PHONY: run-local-environment
+## runs a local Airflow environment containing both bi-etl-ejuice DAGs and QuintoAndar's custom Airflow Plugins.
+## May receive an optional `branch={branch}` argument to clone a specified branch of Airflow Plugins repo. Defaults to `forno`.
 run-local-environment:
-	@make _clone-airflow-plugins
+	@make _clone-airflow-plugins branch=$(branch)
 	@docker-compose -f local/docker/docker-compose.yml up -d --build --force-recreate
 
 .PHONY: restart-local-environment

@@ -14,8 +14,13 @@ do
   conn_password=$(echo ${row} | jq -r ${1} '.password')
   conn_extra=$(echo ${row} | jq -c ${1} '.extra[]')
 
-  airflow connections -d --conn_id $conn_id
-  airflow connections -a --conn_id $conn_id --conn_type $conn_type --conn_host $conn_host --conn_login $conn_login --conn_password $conn_password --conn_extra ${conn_extra/\{DATABRICKS_TOKEN\}/$1}
+  airflow connections delete $conn_id
+  airflow connections add $conn_id \
+    --conn-type $conn_type \
+    --conn-host $conn_host \
+    --conn-login $conn_login \
+    --conn-password $conn_password \
+    --conn-extra ${conn_extra/\{DATABRICKS_TOKEN\}/$1}
 done
 
 airflow variables -i $AIRFLOW_HOME/variables.json
