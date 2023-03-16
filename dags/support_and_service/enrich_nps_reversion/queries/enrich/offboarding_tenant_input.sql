@@ -159,6 +159,19 @@ tenants AS (
         sk_contract IS NOT NULL
         AND dt.customer_type_tag = 'tenant'
 ),
+tickets_segments AS (
+    SELECT
+        fs.sk_ticket,
+        SUM(CASE
+                WHEN is_sla = false THEN 1
+                ELSE 0
+            END
+        ) AS segments_not_sla
+    FROM
+        dw_customer_support.fact_segment fs
+    GROUP BY
+        1
+),
 tbl_tickets_refined AS (
     SELECT
         ft.sk_ticket,
@@ -169,7 +182,8 @@ tbl_tickets_refined AS (
         dd.journey_step,
         ft.ts_started,
         dt.motivation,
-        CAST(dmt.is_ticket_solved_within_sla AS INTEGER) AS is_ticket_solved_within_sla
+        CAST(dmt.is_ticket_solved_within_sla AS INTEGER) AS is_ticket_solved_within_sla,
+        COALESCE(ts.segments_not_sla,0) AS segments_not_sla
     FROM
         dw_customer_support.fact_ticket AS ft
     LEFT JOIN
@@ -185,6 +199,9 @@ tbl_tickets_refined AS (
         dw_customer_support.fact_demand_metrics_tasks AS dmt
             ON dmt.sk_task = CAST(ft.sk_ticket AS STRING)
             AND dmt.ts_solved IS NOT NULL
+    LEFT JOIN
+        tickets_segments AS ts
+            ON ts.sk_ticket = ft.sk_ticket
     WHERE
         dd.area = 'CX'
         AND dd.journey_step IN ('Ongoing', 'Onboarding', 'Cross')
@@ -221,7 +238,8 @@ tickets_by_contract AS (
                 WHEN tickets.is_ticket_solved_within_sla = 0 AND tickets.journey_step <> 'Cross' THEN 1
                 ELSE 0
             END
-        ) AS back_tickets_not_sla_jornada
+        ) AS back_tickets_not_sla_jornada,
+        SUM(tickets.segments_not_sla) AS total_segments_not_sla
     FROM
         contract_termination AS ct
     LEFT JOIN
@@ -234,7 +252,7 @@ unique_tenants_by_contract AS (
     SELECT DISTINCT
         sk_contract,
         sk_user
-    FROM 
+    FROM
         tenants
 ),
 tickets_by_tenant AS (
@@ -268,7 +286,8 @@ tickets_by_tenant AS (
                 WHEN tickets.is_ticket_solved_within_sla = 0 AND tickets.journey_step <> 'Cross' THEN 1
                 ELSE 0
             END
-        ) AS back_tickets_not_sla_jornada
+        ) AS back_tickets_not_sla_jornada,
+        SUM(tickets.segments_not_sla) AS total_segments_not_sla
     FROM
         contract_termination AS ct
     LEFT JOIN

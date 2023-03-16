@@ -172,7 +172,10 @@ people AS (
         fcp.sk_contract,
         fcp.sk_contract_person,
         dcp.personal_document,
-        fcp.contract_role,
+        CASE
+            WHEN fcp.contract_role = 'landlord' THEN 'landlord'
+            ELSE 'tenant'
+        END AS contract_role,
         fcp.sk_user,
         dcp.phone_number,
         dcp.email,
