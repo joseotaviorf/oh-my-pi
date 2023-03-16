@@ -244,19 +244,6 @@ columns:
       PROCESSING: 'Lead in image processing'
       QUEUE: 'Lead awaiting in the duplicate queue'
       NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
-  status:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.status
-      - datalake_brokers_supply_processor.business_context_detail.status
-    description: 'Status of the lead. This field is going to be deprecated soon,
-    split into sale_status and rent_status.'
-    categories:
-      REGISTERED: 'Registered in Main for publication'
-      SUSPENDED: 'Lead suspended'
-      WAITING: 'Lead eligible and waiting for owner information'
-      PROCESSING: 'Lead in image processing'
-      QUEUE: 'Lead awaiting in the duplicate queue'
-      NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
   sale_status:
     lineage:
       - datalake_brokers_supply_processor.business_context_detail.status

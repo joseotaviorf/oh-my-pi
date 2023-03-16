@@ -2,16 +2,28 @@ WITH exploded_reasons AS (
     SELECT
         id,
         id_file,
+        'SALE' AS business_context,
         EXPLODE(FROM_JSON(status_reason, 'map<string, string>')) AS (reason, value),
         TO_UTC_TIMESTAMP(ts_updated, 'America/Sao_Paulo') AS ts_reason_started
     FROM
         datalake_brokers_supply_processor_clean.lead_3p_aud
     WHERE
         mod_status_reason
+    UNION ALL
+    SELECT
+        id_lead AS id,
+        id_file,
+        business_context,
+        EXPLODE(FROM_JSON(status_reason, 'map<string, string>')) AS (reason, value),
+        TO_UTC_TIMESTAMP(ts_updated, 'America/Sao_Paulo') AS ts_reason_started
+    FROM
+        datalake_brokers_supply_processor_clean.business_context_detail_aud
+    WHERE
+        mod_status_reason
 ),
 previous_value_aux AS (
     SELECT *,
-        LAG(value) OVER (PARTITION BY id, reason ORDER BY ts_reason_started) AS previous_value
+        LAG(value) OVER (PARTITION BY id, business_context, reason ORDER BY ts_reason_started) AS previous_value
     FROM
         exploded_reasons
 ),
@@ -21,7 +33,7 @@ reason_ended_aux AS (
         reason_type = 'INELIGIBLE_REASON' AS is_ineligible_reason,
         reason_type = 'DISCARD_REASON' AS is_discard_reason,
         reason_type = 'ENRICHMENT_REASON' AS is_enrichment_reason,
-        LEAD(ts_reason_started) OVER(PARTITION BY id, reason ORDER BY ts_reason_started) AS ts_reason_ended
+        LEAD(ts_reason_started) OVER(PARTITION BY id, business_context, reason ORDER BY ts_reason_started) AS ts_reason_ended
     FROM
         previous_value_aux AS pva
     JOIN
@@ -35,6 +47,7 @@ forced_end_aux AS (
         rea.id AS id_lead_3p,
         sc.id_company_hubspot,
         rea.id_file,
+        rea.business_context,
         reason,
         reason_type,
         sc.status AS status_when_reason_started,
@@ -44,7 +57,7 @@ forced_end_aux AS (
         DATEDIFF(COALESCE(ts_reason_ended, ll.ts_status_started), ts_reason_started) AS days_in_reason,
         -- The last left join with lead_3p_status_changes can bring more than one result
         -- We only want the most recent one
-        ROW_NUMBER() OVER(PARTITION BY rea.id, reason, ts_reason_started ORDER BY ll.ts_status_started NULLS LAST) AS rw,
+        ROW_NUMBER() OVER(PARTITION BY rea.id, rea.business_context, reason, ts_reason_started ORDER BY ll.ts_status_started NULLS LAST) AS rw,
         sc.is_waiting_for_enrichment AS is_waiting_for_enrichment_when_reason_started,
         sc.is_ineligible AS is_ineligible_when_reason_started,
         sc.is_discarded AS is_discarded_when_reason_started,
@@ -62,16 +75,19 @@ forced_end_aux AS (
     LEFT JOIN
         datalake_rede_supply.lead_3p_status_changes AS sc
             ON rea.id = sc.id_lead_3p
+            AND rea.business_context = sc.business_context
             AND rea.ts_reason_started >= sc.ts_status_started
             AND rea.ts_reason_started < COALESCE(sc.ts_status_ended, NOW())
     LEFT JOIN
         datalake_rede_supply.lead_3p_status_changes AS sc_end
             ON rea.id = sc_end.id_lead_3p
+            AND rea.business_context = sc_end.business_context
             AND rea.ts_reason_ended >= sc_end.ts_status_started
             AND rea.ts_reason_ended < COALESCE(sc_end.ts_status_ended, NOW())
     LEFT JOIN
         datalake_rede_supply.lead_3p_status_changes AS ll -- this is meant to find the next times when the lead was discarded or not eligible
             ON is_enrichment_reason
+            AND rea.business_context = ll.business_context
             AND ts_reason_ended IS NULL
             AND rea.id = ll.id_lead_3p
             AND rea.ts_reason_started <= ll.ts_status_started
@@ -83,6 +99,7 @@ SELECT
     id_lead_3p,
     id_company_hubspot,
     id_file,
+    business_context,
     reason,
     reason_type,
     status_when_reason_started,

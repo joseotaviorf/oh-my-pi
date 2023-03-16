@@ -1579,6 +1579,8 @@ bietlejuice.enrich_braze_webhook_notification:
 bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.brokers_supply_processor:load-clean-file
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p
+  - bietlejuice.brokers_supply_processor:load-clean-business-context-detail
+  - bietlejuice.hubspot:load-clean-company
 
 bietlejuice.enrich_bureaus:
   - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
@@ -2341,6 +2343,7 @@ bietlejuice.enrich_rede_company_event:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
 
 bietlejuice.enrich_rede_supply:
+  - bietlejuice.brokers_supply_processor:load-clean-business-context-detail-aud
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p-aud
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
@@ -2349,8 +2352,8 @@ bietlejuice.enrich_rede_supply:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-file
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_hubspot:load-enrich-company
-  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.hubspot:load-clean-company
 
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:create-clean-country-in-data-lake

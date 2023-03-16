@@ -3,6 +3,7 @@ WITH status_changes AS (
         la.id,
         la.id_file,
         NULL AS id_house,
+        'SALE' AS business_context,
         la.status,
         NULL AS listing_status,
         MAP_KEYS(MAP_FILTER(FROM_JSON(status_reason, 'map<string, string>'), (k,v) -> v = 'true')) AS status_reasons,
@@ -18,6 +19,33 @@ WITH status_changes AS (
         AND year = {year}
         AND month = {month}
         AND day = {day}
+    UNION ALL
+    SELECT
+        bcda.id_lead,
+        bcda.id_file,
+        NULL AS id_house,
+        bcda.business_context,
+        bcda.status,
+        NULL AS listing_status,
+        MAP_KEYS(MAP_FILTER(FROM_JSON(bcda.status_reason, 'map<string, string>'), (k,v) -> v = 'true')) AS status_reasons,
+        GET_JSON_OBJECT(la.owner, '$.phone') IS NOT NULL AS has_owner_info,
+        TO_UTC_TIMESTAMP(bcda.ts_updated, 'America/Sao_Paulo') AS ts_status_started,
+        bcda.year,
+        bcda.month,
+        bcda.day
+    FROM
+        datalake_brokers_supply_processor_clean.business_context_detail_aud AS bcda
+    LEFT JOIN
+        datalake_brokers_supply_processor_clean.lead_3p_aud AS la
+            ON la.id = bcda.id_lead
+            AND la.ts_updated <= bcda.ts_updated
+    WHERE
+        bcda.mod_status
+        AND bcda.year = {year}
+        AND bcda.month = {month}
+        AND bcda.day = {day}
+    QUALIFY -- We find the most recent row of lead_3p_aud at the time of the revision in business_context_detail
+        ROW_NUMBER() OVER (PARTITION BY bcda.id, bcda.rev ORDER BY la.ts_updated DESC) = 1
 ),
 enrichment_reasons AS (
     SELECT
@@ -48,6 +76,7 @@ status_and_publications AS (
         id,
         id_file,
         id_house,
+        business_context,
         status,
         listing_status,
         COALESCE(ARRAYS_OVERLAP(sc.status_reasons, er.reasons), FALSE) AS is_waiting_for_enrichment,
@@ -67,29 +96,40 @@ status_and_publications AS (
     SELECT DISTINCT
         l.id,
         NULL AS id_file,
-        sls.id_house,
+        lbca.id_house,
+        lbca.business_context,
         NULL AS status,
-        sls.status_history AS listing_status,
+        IF(lbca.mod_status_closing = 1, lbca.status_closing, lbca.status) AS listing_status,
         FALSE AS is_waiting_for_enrichment,
         FALSE AS is_ineligible,
         FALSE AS is_discarded,
         TRUE AS has_owner_info,
-        sls.ts_status_started,
-        {year} AS year,
-        {month} AS month,
-        {day} AS day
+        ts_revision AS ts_status_started,
+        YEAR(ts_revision) AS year_revision,
+        MONTH(ts_revision) AS month_revision,
+        DAY(ts_revision) AS day_revision
     FROM
         datalake_brokers_supply_processor.lead_3p AS l
     JOIN
         datalake_ebdb_clean.house AS h
             ON h.id_external = l.uuid_lead
     JOIN
-        datalake_sale_listings.sale_listing_status AS sls
-            ON sls.id_house = h.id
+        datalake_ebdb_clean.listing_business_context_aud AS lbca
+            ON lbca.id_house = h.id
+    JOIN 
+        datalake_ebdb_user.user_revision_entity AS rev
+            ON rev.id = lbca.rev
     WHERE
-        YEAR(ts_status_started) = {year}
-        AND MONTH(ts_status_started) = {month}
-        AND DAY(ts_status_started) = {day}
+        (lbca.business_context = 'SALE' AND (l.is_for_sale OR NOT l.is_for_rent))
+        OR (lbca.business_context = 'RENT' AND l.is_for_rent)
+    QUALIFY
+        LAG(listing_status) OVER (
+            PARTITION BY lbca.id_house,
+            business_context ORDER BY lbca.rev
+        ) IS DISTINCT FROM listing_status
+        AND year_revision = {year}
+        AND month_revision = {month}
+        AND day_revision = {day}
 ),
 last_id AS (
     SELECT
@@ -106,6 +146,7 @@ SELECT
     sea.id AS id_lead_3p,
     COALESCE(sea.id_file, l.id_file) AS id_file,
     sea.id_house,
+    sea.business_context,
     sea.status,
     sea.listing_status,
     sea.is_waiting_for_enrichment,

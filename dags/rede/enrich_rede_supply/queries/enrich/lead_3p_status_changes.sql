@@ -59,6 +59,7 @@ status_changes AS (
             WHEN sc.status = 'REGISTERED' THEN FIRST(id_house, TRUE) OVER (PARTITION BY sc.id_lead_3p ORDER BY sc.ts_status_started)
             ELSE id_house 
         END AS id_house,
+        sc.business_context,
         sc.status,
         sc.listing_status,
         CASE
@@ -84,6 +85,7 @@ status_ended_aux AS (
         id_lead_3p,
         LAST(id_file, TRUE) OVER (PARTITION BY id_lead_3p ORDER BY ts_status_started) AS id_file,
         LAST(id_house, TRUE) OVER (PARTITION BY id_lead_3p ORDER BY ts_status_started) AS id_house,
+        business_context,
         COALESCE(status, listing_status) AS status,
         growth_status,
         is_waiting_for_enrichment,
@@ -103,6 +105,7 @@ SELECT
     paa.id_company_hubspot,
     sea.id_file,
     sea.id_house,
+    sea.business_context,
     sea.status,
     sea.growth_status,
     DATEDIFF(sea.ts_status_ended, sea.ts_status_started) AS days_in_status,
@@ -119,3 +122,6 @@ JOIN
 LEFT JOIN
     partner_agencies_aux AS paa
         ON paa.cnpj = l.cnpj
+QUALIFY
+    LAG(sea.status) OVER (PARTITION BY sea.id_lead_3p, sea.business_context ORDER BY sea.ts_status_started) IS DISTINCT FROM sea.status
+    OR LAG(sea.growth_status) OVER (PARTITION BY sea.id_lead_3p, sea.business_context ORDER BY sea.ts_status_started) IS DISTINCT FROM sea.growth_status

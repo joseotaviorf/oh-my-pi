@@ -1,7 +1,9 @@
 WITH first_files AS (
     SELECT
         f.id_company_hubspot,
-        SPLIT(f.file_name, '_dedup_')[0] AS company_file_name_part,
+        CASE
+            WHEN f.id_company_hubspot IS NULL THEN SPLIT(f.file_name, '_dedup_')[0]
+        END AS company_file_name_part,
         bcd.business_context,
         MIN(f.ts_created) AS ts_created
     FROM
@@ -11,6 +13,13 @@ WITH first_files AS (
             ON bcd.id_file = f.id
     GROUP BY
         1,2,3
+),
+deduplicated_leads AS (
+    SELECT *
+    FROM
+        datalake_brokers_supply_processor_clean.lead_3p
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id ORDER BY ts_updated DESC) = 1
 )
 SELECT
     l.id,
@@ -139,7 +148,7 @@ SELECT
     l.ts_created,
     l.ts_updated
 FROM
-    datalake_brokers_supply_processor_clean.lead_3p AS l
+    deduplicated_leads AS l
 LEFT JOIN
     datalake_brokers_supply_processor.file AS f
         ON l.id_file = f.id
@@ -168,6 +177,4 @@ LEFT JOIN
 LEFT JOIN
     first_files AS first_rent_file
         ON COALESCE(rent_file.id_company_hubspot, SPLIT(rent_file.file_name, '_dedup_')[0]) = COALESCE(first_rent_file.id_company_hubspot, first_rent_file.company_file_name_part)
-        AND first_sale_file.business_context = 'RENT'
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY l.id ORDER BY l.ts_updated DESC) = 1
+        AND first_rent_file.business_context = 'RENT'
