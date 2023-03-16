@@ -8,8 +8,8 @@ WITH contracts AS (
         turf.id_origin AS sk_origin,
         turf.id_assignee AS sk_assignee,
         turf.id_user_action AS sk_user_action,
-        COALESCE(ec.id, ev.id_contract, -1) AS sk_contract,
-        COALESCE(ev.id, -1) AS sk_inspection,
+        COALESCE(ec.id, ib.id_contract, -1) AS sk_contract,
+        COALESCE(ib.id_external, -1) AS sk_inspection,
         turf.id_action_date AS sk_action_date,
         turf.id_task_user_start_date AS sk_task_action_start_date,
         turf.id_task_user_end_date AS sk_task_action_end_date,
@@ -31,9 +31,9 @@ WITH contracts AS (
                 ON turf.origin = 'Contrato'
                     AND turf.id_origin = ec.id
         LEFT JOIN
-            datalake_ebdb_clean.inspection AS ev
+            datalake_inspections.inspection_booking AS ib
                 ON turf.origin = 'Vistoria'
-                    AND turf.id_origin = ev.id
+                    AND turf.id_origin = ib.id_external
     WHERE
         (
         turf.type IN (
@@ -55,7 +55,7 @@ WITH contracts AS (
             'InspectionRescheduled',
             'PrimeiraAnaliseVistoriaSaida',
             'SegundaAnaliseVistoriaSaida'
-        ) 
+        )
         OR (
             turf.type = 'Manual'
             AND turf.id_workgroup IN (

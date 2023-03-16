@@ -19,9 +19,9 @@ contracts AS (
     turf.id_assignee AS sk_assignee,
     turf.id_user_action AS sk_user_action,
     turf.id_action_date AS sk_action_date,
-    CAST(COALESCE(dc.sk_contract, CAST(eo.id_contrato AS STRING), CAST(ev.id_contract AS STRING), CAST(co.id AS STRING), '-1') as BIGINT) AS sk_contract,
+    CAST(COALESCE(dc.sk_contract, CAST(eo.id_contrato AS STRING), CAST(ib.id_contract AS STRING), CAST(co.id AS STRING), '-1') as BIGINT) AS sk_contract,
     turf.id_task_user_start_date AS sk_task_user_start_date,
-    turf.id_task_user_end_date AS sk_task_user_end_date,    
+    turf.id_task_user_end_date AS sk_task_user_end_date,
     turf.action_user_name,
     turf.ts_action,
     turf.action_type,
@@ -34,26 +34,26 @@ contracts AS (
     turf.day
   FROM
     datalake_crm_tasks_flows.tasks_users_resolutions_flow turf
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_contract dc
       ON turf.origin = 'Contrato'
       AND turf.id_origin = dc.sk_contract
-  LEFT JOIN 
+  LEFT JOIN
     datalake_ebdb_clean.onboarding eo
       ON turf.origin = 'Onboarding'
       AND turf.id_origin  = eo.id
-  LEFT JOIN 
-    datalake_ebdb_clean.inspection ev
+  LEFT JOIN
+    datalake_inspections.inspection_booking AS ib
       ON turf.origin = 'Vistoria'
-      AND turf.id_origin = ev.id
-  LEFT JOIN 
+      AND turf.id_origin = ib.id_external
+  LEFT JOIN
     offers o
       ON turf.origin = 'Offer'
       AND o.id_firestore = turf.id_origin
-  LEFT JOIN 
+  LEFT JOIN
     datalake_ebdb_clean.proposal p
       ON o.id = p.id_offer
-  LEFT JOIN 
+  LEFT JOIN
     datalake_ebdb_clean.contract co
       ON p.id = co.id
   WHERE
@@ -80,7 +80,7 @@ contracts AS (
         'VerificarContrato'
       )
     OR (
-      turf.type = 'Manual' 
+      turf.type = 'Manual'
       AND turf.id_workgroup IN (
         'DEP_ONBOARDING_INQUILINO',
         'DEP_KEY_TRAVEL_AFTER_EXIT'

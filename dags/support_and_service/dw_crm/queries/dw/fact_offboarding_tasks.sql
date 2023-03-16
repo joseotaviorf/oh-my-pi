@@ -8,7 +8,7 @@ WITH contracts AS (
     turf.id_assignee AS sk_assignee,
     turf.id_user_action AS sk_user_action,
     turf.id_action_date AS sk_action_date,
-    CAST(COALESCE(ec.id, ev.id_contract, -1) AS BIGINT) AS sk_contract,
+    CAST(COALESCE(ec.id, ib.id_contract, -1) AS BIGINT) AS sk_contract,
     CAST(COALESCE(eo.id, -1) AS BIGINT) AS sk_rent_flow,
     turf.id_task_user_start_date AS sk_task_action_start_date,
     turf.id_task_user_end_date AS sk_task_action_end_date,
@@ -33,13 +33,13 @@ WITH contracts AS (
       ON turf.origin = 'FluxoLocacao'
       AND turf.id_origin = eo.id
   LEFT JOIN
-    datalake_ebdb_clean.inspection ev
+    datalake_inspections.inspection_booking AS ib
       ON turf.origin = 'Vistoria'
-      AND turf.id_origin = ev.id
+      AND turf.id_origin = ib.id_external
   WHERE
     (
         turf.type IN (
-            'DataDeRescisaoAlterada', 
+            'DataDeRescisaoAlterada',
             'EncerrarContrato',
             'FollowUpReparosRescisao',
             'OrientarInquilinoRescisao',
@@ -51,7 +51,7 @@ WITH contracts AS (
             'RevisarCancelamentoDeRescisao',
             'RevisarPagamentosRescisao',
             'VerificarDesocupacaoImovel'
-        ) 
+        )
         OR (
             turf.type = 'Manual'
             AND turf.id_workgroup IN (
@@ -113,7 +113,7 @@ LEFT JOIN
   contract_house_listing chl_contract
     ON c.sk_contract = chl_contract.sk_contract
     AND c.sk_contract != -1
-LEFT JOIN 
+LEFT JOIN
   contract_house_listing chl_rent_flow
     ON c.sk_rent_flow = chl_rent_flow.sk_rent_flow
     AND c.sk_rent_flow != -1
