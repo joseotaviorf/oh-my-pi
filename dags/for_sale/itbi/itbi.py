@@ -38,10 +38,6 @@ MAIN_START_DATE = datetime(2020, 12, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 11 15,30 * *"
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = (
-    f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_{CONTEXT}_raw.py"
-)
-
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
@@ -86,20 +82,23 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-raw_task_group = task_group.build_raw_task_group_for_all_tables(
+for table_name, table_config in tables.items():
+    
+    RAW_SPARK_JOB_PATH = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_{table_name}_raw.py"
+    )
+
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
     source=SOURCE,
     target_database_base_name=CONTEXT,
+    table_name=table_name,
     extraction_spark_job_file=RAW_SPARK_JOB_PATH,
     raw_spark_job_extra_args=[
         CONTEXT,
         "{{ ds }}",
-        "{{ dag_run.conf['execution_date'] }}",
     ],
-)
+    )
 
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
-
-for table_name, table_config in tables.items():
     is_incremental = table_config.get("is_incremental")
     partitions = clean_partition_cols if is_incremental else None
 
@@ -110,6 +109,8 @@ for table_name, table_config in tables.items():
         is_incremental=is_incremental,
         partitions=partitions,
     )
+
+    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
 
     cross_downstream(
         DatalakeTaskGroup.last_tasks(raw_task_group),

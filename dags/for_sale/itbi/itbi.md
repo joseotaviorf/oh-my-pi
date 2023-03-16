@@ -18,7 +18,8 @@ Can we use the execution_date variable to send a specific date to run the DAG
 
 This pipeline produces, in datalake_itbi_raw and datalake_itbi_clean:
 
-Via **incremental load**:
+Via **full load**:
+    - `itbi_bh`
     - `itbi_sp`
 
 </details>

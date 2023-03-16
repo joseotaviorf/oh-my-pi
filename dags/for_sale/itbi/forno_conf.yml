@@ -4,4 +4,6 @@ custom_libraries:
         package: openpyxl
 tables:
   itbi_sp:
-    is_incremental: true
+    is_incremental: false
+  itbi_bh:
+    is_incremental: false

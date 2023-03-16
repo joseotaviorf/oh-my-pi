@@ -1,8 +1,8 @@
+import re
 import logging
 import requests
-import re
 import pandas as pd
-
+from datetime import date, datetime
 from functools import reduce
 from argparse import ArgumentParser
 
@@ -12,18 +12,15 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
-from pyspark.sql.types import IntegerType, StringType
-from pyspark.sql.functions import lit, expr, udf
+from pyspark.sql.functions import lit, to_date, to_timestamp, coalesce, year, month
 
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from datetime import datetime
-from datetime import date
+ITBI_REGION = "itbi_bh"
+JOB_NAME = f"load_{ITBI_REGION}_raw"
 
-
-JOB_NAME = "load_itbi_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -31,76 +28,61 @@ spark_client = SparkClient()
 
 
 def main():
-    (
-        environment,
-        datalake_bucket,
-        source,
-        execution_date,
-        full_load_execution_date,
-    ) = parse_arguments()
+    (environment, datalake_bucket, source, execution_date) = parse_arguments()
 
     logger.info(
         f"""
         m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source},
-         execution_date={execution_date}, full_load_execution_date={full_load_execution_date}
+         execution_date={execution_date}
          msg=Starting Spark job...
         """
     )
 
-    if full_load_execution_date:
-        execution_date = full_load_execution_date
-
     config_service = ConfigurationService(source)
+    itbi_configs = config_service.get_config("tables")[ITBI_REGION]
 
-    for key, value in config_service.get_config("tables").items():
+    table_name = ITBI_REGION
+    source_download_page_url = itbi_configs["source"]["site_download_page_url"]
+    source_format = itbi_configs["source"]["format"]
+    source_blacklist_urls = itbi_configs["source"]["blacklist_urls"]
+    is_incremental = itbi_configs["is_incremental"]
+    columns_rename_mapped = itbi_configs["columns_to_rename"].items()
 
-        table_name = key
-        source_download_page_url = value["source"]["site_download_page_url"]
-        source_format = value["source"]["format"]
-        is_incremental = value["is_incremental"]
-        columns_rename_mapped = value["columns_to_rename"].items()
+    logger.info(
+        f"""
+        m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date}
+        msg=Configuration table, table_name={table_name}, source_format={source_format}, is_incremental={is_incremental}
+        """
+    )
 
+    dataframe = get_data(
+        source_download_page_url,
+        source_format,
+        source_blacklist_urls,
+        columns_rename_mapped,
+    )
+
+    if dataframe:
         logger.info(
             f"""
             m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date}
-            msg=Configuration table, table_name={table_name}, source_format={source_format}, is_incremental={is_incremental}
+            msg=Dataframe imported with sucess.
             """
         )
 
-        dataframe = get_data(
-            source_download_page_url,
-            source_format,
-            columns_rename_mapped,
+        load_dataframe_into_datalake(
+            dataframe, table_name, is_incremental, environment, source, datalake_bucket
         )
-
-        if dataframe:
-            logger.info(
-                f"""
-                m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date}
-                msg=Dataframe imported with sucess.
-                """
-            )
-
-            load_dataframe_into_datalake(
-                dataframe,
-                table_name,
-                is_incremental,
-                environment,
-                source,
-                datalake_bucket,
-            )
 
 
 def get_data(
     source_download_page_url,
     source_format,
+    source_blacklist_urls,
     columns_rename_mapped,
 ):
-    udf_transform_month_to_portuguese_relative = udf(
-        transform_month_to_portuguese_relative, StringType()
-    )
-
     urls = scrap_files_url(source_download_page_url, source_format)
+    urls = [url for url in urls if url not in source_blacklist_urls]
 
     dataframes = []
 
@@ -112,24 +94,28 @@ def get_data(
         """
         )
 
-        sheets = pd.read_excel(url, sheet_name=None)
-        sheets = {k: sheets[k] for k in sheets if re.match("[a-zA-Z]+-[0-9]+", k)}
-
-        dfs = pd.concat([df.assign(name=n) for n, df in sheets.items()])
-        df = spark_client.conn.createDataFrame(dfs.astype(str))
+        df = pd.read_csv(url, encoding='utf-8', sep = ';', thousands = '.', decimal=',', skip_blank_lines=True)
+        df.columns = df.columns.str.strip()
+        df = spark_client.conn.createDataFrame(df.astype(str))
 
         df = df.replace("nan", None)
-        df = df.withColumnRenamed("name", "source_tab")
         df = df.withColumn("source_file", lit(url))
-        df = df.withColumn("year", expr("substring(source_tab, 5, length(source_tab))"))
-        df = df.withColumn("year", df.year.cast(IntegerType()))
-        df = df.withColumn("month", expr("substring(source_tab, 0, 3)"))
-        df = df.withColumn("month", udf_transform_month_to_portuguese_relative("month"))
-        df = df.withColumn("month", df.month.cast(IntegerType()))
         df = df.withColumn("dt_load", lit(date.today()))
 
         if columns_rename_mapped:
             df = rename_columns(df, columns_rename_mapped)
+
+        df = df.withColumn(
+            "data_inclusao_transacao",
+            coalesce(
+                to_timestamp("data_inclusao_transacao", "dd/MM/yyyy HH:mm"),
+                to_timestamp("data_inclusao_transacao", "yyyy/MM/dd HH:mm:ss"),
+                to_date("data_inclusao_transacao", "dd/MM/yyyy"),
+            ),
+        )
+        df = df.withColumn("month", month("data_inclusao_transacao"))
+        df = df.withColumn("year", year("data_inclusao_transacao"))
+        df = df.filter("year IS NOT NULL AND month IS NOT NULL")
 
         dataframes.append(df)
 
@@ -139,14 +125,22 @@ def get_data(
     """
     )
 
-    dataframe = reduce(lambda df1, df2: df1.unionByName(df2), dataframes)
+    dataframe = reduce(
+        lambda df1, df2: df1.unionByName(df2, allowMissingColumns=True), dataframes
+    )
 
     return dataframe
 
 
 def scrap_files_url(source_download_page_url, source_format):
     u = requests.get(source_download_page_url)
-    urls = re.findall(r'<a\s+(?:[^>]*?\s+)?href="([^"]*itbi.*?\{source_format})"'.format(source_format = source_format), u.text, re.IGNORECASE)
+    urls = re.findall(
+        r'<a\s+(?:[^>]*?\s+)?href="([^"]*itbi.*?\{source_format})"'.format(
+            source_format=source_format
+        ),
+        u.text,
+        re.IGNORECASE,
+    )
     return urls
 
 
@@ -156,38 +150,6 @@ def rename_columns(dataframe, columns_rename_mapped):
         dataframe = dataframe.withColumnRenamed(old_name, new_name)
 
     return dataframe
-
-
-def get_year_to_execute(execution_date):
-    """This function will return the year and month of the last month"""
-
-    execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
-    year = execution_date.year
-
-    return int(year)
-
-
-def transform_month_to_portuguese_relative(month, reverse=True):
-
-    months = {
-        "1": "JAN",
-        "2": "FEV",
-        "3": "MAR",
-        "4": "ABR",
-        "5": "MAI",
-        "6": "JUN",
-        "7": "JUL",
-        "8": "AGO",
-        "9": "SET",
-        "10": "OUT",
-        "11": "NOV",
-        "12": "DEZ",
-    }
-
-    if reverse:
-        months = dict(zip(months.values(), months.keys()))
-
-    return months[str(month)]
 
 
 def load_dataframe_into_datalake(
@@ -236,7 +198,6 @@ def parse_arguments():
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("execution_date")
-    parser.add_argument("full_load_execution_date")
 
     args = parser.parse_args()
 
@@ -245,7 +206,6 @@ def parse_arguments():
         args.datalake_bucket,
         args.source,
         args.execution_date,
-        args.full_load_execution_date,
     )
 
 

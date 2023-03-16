@@ -1,7 +1,7 @@
 ---
 tables:
   itbi_sp:
-    is_incremental: true
+    is_incremental: false
     source:
       site_download_page_url: "https://www.prefeitura.sp.gov.br/cidade/secretarias/fazenda/acesso_a_informacao/index.php?p=31501"
       format: ".xlsx"
@@ -35,3 +35,31 @@ tables:
       Descrição do padrão (IPTU): "descricao_padrao_iptu"
       ACC (IPTU): "descricao_padrao_iptu"
       ACC (IPTU).1: "acc_iptu"
+    
+  itbi_bh:
+    is_incremental: false
+    source:
+      site_download_page_url: "https://dados.pbh.gov.br/dataset/relatorio-itbi"
+      format: ".csv" 
+      blacklist_urls: [
+                'https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/c98e75c0-fe00-4b0c-98c9-a30e45ee76dd/download/relatorioitbi2009_julho2021.csv',
+                'https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/e4c455ea-86ae-40ea-932c-fbf914a0e286/download/relatorioitbi.csv'
+            ]
+    columns_to_rename:
+      Endereco Completo: endereco_completo 
+      Endereco: endereco_completo
+      Bairro: bairro
+      Ano de Construcao (Unidade): ano_construcao_unidade
+      Ano Construcao (Unidade): ano_construcao_unidade
+      Area Terreno Total: area_terreno_total
+      Area Construida Adquirida: area_construida_adquirida
+      Area Adquirida (Unidades Somadas): area_adquirida_unidades_somadas
+      Padrao Acabamento (Unidade): padrao_acabamento_unidade
+      Fracao Ideal Adquirida: fracao_ideal_adquirida
+      Tipo Construtivo Preponderante: tipo_construtivo_preponderante
+      Descrição Tipo Ocupacao (Unidade): descricao_tipo_ocupacao_unidade
+      Valor Base Calculo: valor_base_calculo
+      " Valor Base Calculo ": valor_base_calculo
+      Zona Uso ITBI: zona_uso_itbi
+      Data Inclusao Transacao: data_inclusao_transacao
+      Valor Imposto Cobrado (sumarizado): valor_imposto_cobrado_sumarizado
