@@ -87,7 +87,6 @@ This pipeline produces the following output tables:
     - `rental_flows_targets`
     - `rental_ntp_source_targets`
     - `rental_rtp_targets`
-    - `retention_exclusivity_active_contact`
     - `sale_criteo_eng_ab_test`
     - `sale_flows_targets`
     - `sale_rbp_targets`

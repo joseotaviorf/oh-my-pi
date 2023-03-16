@@ -215,11 +215,6 @@ rental_rtp_targets:
     sheet_name: rental_rtp_targets
     clean_table_name: rental_rtp_targets
 
-retencao_exclusividade_contato_ativo:
-    sheet_id: 1VT9AgLJYbGq5ftcBvSY2C-M99bVmpnmO7XFeueh_fmI
-    sheet_name: bases_cruzadas
-    clean_table_name: retention_exclusivity_active_contact
-
 sale_criteo_eng_ab_test:
     sheet_id: 1_Lbgnyz8-1BMs3eq6KteLCND1uvLbidzE1hXLAiVFmI
     sheet_name: sale_criteo_eng_ab_test
