@@ -11,3 +11,12 @@ columns:
   ts_last_updated:
     lineage:
       - datalake_composer_raw.serialized_dag.last_updated
+  year:
+    lineage:
+      - datalake_composer_raw.serialized_dag.year
+  month:
+    lineage:
+      - datalake_composer_raw.serialized_dag.month
+  day:
+    lineage:
+      - datalake_composer_raw.serialized_dag.day
