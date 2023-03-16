@@ -71,6 +71,7 @@ def get_query_file_paths(mode, input):
             for file, status in git_service.get_modified_files_from_diff(
                 from_branch, "HEAD"
             ).items()
+            if status in GitService.UPSERT_STATUS_CODES
         ]
     return list(metadata_file_service.filter_query_files(files))
 
