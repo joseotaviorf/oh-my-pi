@@ -27,11 +27,14 @@ class MetadataFileService:
     Class used to validate and extract information from metadata files
     """
 
-    DAGS_METADATA_PATHS_REGEX = re.compile(
-        rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/metadata/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?:yml|yaml)"
+    INFO_FROM_PATHS_REGEX = re.compile(
+        rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/(?P<metadata_or_queries>metadata|queries)/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?P<extension>\w{3,4})"
     )
     DAGS_SQL_PATHS_REGEX = re.compile(
         rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/queries/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?:sql)"
+    )
+    DAGS_METADATA_PATHS_REGEX = re.compile(
+        rf"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/queries/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?:yml|yaml)"
     )
 
     def __init__(self):
@@ -119,7 +122,7 @@ class MetadataFileService:
         :return: dict with domain, dag, layer and table_name
         :rtype: dict
         """
-        return re.match(MetadataFileService.DAGS_METADATA_PATHS_REGEX, path).groupdict()
+        return re.match(MetadataFileService.INFO_FROM_PATHS_REGEX, path).groupdict()
 
     @staticmethod
     def _get_info_from_content(content: Dict[str, Any], layer: str) -> MetadataFileInfo:
