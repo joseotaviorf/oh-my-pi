@@ -6,6 +6,7 @@ WITH cte_explode AS (
                 'CONDOMINIO',
                 'MULTA-RECISORIA',
                 'MULTAS ONGOING',
+                'RENTAL-CORE',
                 'REPAROS',
                 'UTILIDADES'
             )
