@@ -55,7 +55,6 @@ This pipeline produces the following output tables:
     - `google_searches_share_of_interest`
     - `households_per_city_ibge`
     - `inside_sale_supply_targets`
-    - `inspection_bugs`
     - `ipsos_brandtracking_questions`
     - `keys_logistic_onboarding_tenant`
     - `keys_logistic_pre_contract`

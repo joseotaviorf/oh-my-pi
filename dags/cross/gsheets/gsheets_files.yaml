@@ -250,12 +250,6 @@ tv_ads:
     sheet_name: base_clean
     clean_table_name: tv_ads
 
-# to be excluded @Set,01
-vistoria_bugs:
-    sheet_id: 1-cuOGaxOf4hfqs1rhz6XUGv4y8r-0HbJv6YHGMRMkyc
-    sheet_name: vistoria_bugs
-    clean_table_name: inspection_bugs
-
 week_volumes_demand:
     sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
     sheet_name: week_volumes_demand
