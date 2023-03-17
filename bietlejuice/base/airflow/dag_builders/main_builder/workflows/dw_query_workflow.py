@@ -37,6 +37,7 @@ class DWQueryWorkflow(BaseWorkflow):
             "has_load_to_redshift_task", True
         )
         spark_session_configs = self.workflow_args.get("spark_session_configs", {})
+        inner_dependencies = self.workflow_args.get("inner_dependencies")
         cluster_params = self.get_cluster_params()
 
         dw_bucket = self.config_service.get_config("dw_bucket")
@@ -85,6 +86,7 @@ class DWQueryWorkflow(BaseWorkflow):
         )
 
         self.set_dependencies(
+            inner_dependencies,
             task_group,
             create_cluster_task,
             terminate_cluster_task,
@@ -114,13 +116,13 @@ class DWQueryWorkflow(BaseWorkflow):
 
     def set_dependencies(
         self,
+        inner_dependencies,
         task_group,
         create_cluster_task,
         terminate_cluster_task,
         dw_staging_task_group,
         dw_task_group,
     ):
-        inner_dependencies = self.workflow_args.get("inner_dependencies", None)
 
         if inner_dependencies:
             (

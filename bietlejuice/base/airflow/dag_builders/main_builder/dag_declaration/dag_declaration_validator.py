@@ -47,7 +47,9 @@ class DAGDeclarationValidator(Validator):
                     "allowed": LayerEnum.get_available_enum_values(),
                 },
                 "custom_schema": {"type": "string", "empty": False},
+                "default_partitions": {"type": "list", "empty": False},
                 "tables_customization": {"type": "dict", "empty": False},
+                "inner_dependencies": {"type": "dict", "empty": False},
                 "has_load_to_redshift_task": {"type": "boolean", "empty": False},
                 "spark_session_configs": {
                     "type": "dict",

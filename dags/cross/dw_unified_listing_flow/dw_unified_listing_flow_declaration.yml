@@ -1,0 +1,22 @@
+dag:
+  name: dw_unified_listing_flow
+  schedule_start_date: 2021,11,14
+  owner: Data ForRent
+workflow:
+  type: query
+  layer: dw
+  custom_schema: unified_listing_flow
+  default_partitions: [country_code]
+  inner_dependencies:
+    fact_house_listing_flows:
+      - fact_rent_sale_house_listing_flows
+    fact_listing_flows:
+      - fact_rent_sale_house_listing_flows
+  tables_customization:
+    fact_rent_sale_house_listing_flows:
+      partitions: [country_code, listing_flow_business_context]
+cluster:
+  type: databricks_10_4_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
