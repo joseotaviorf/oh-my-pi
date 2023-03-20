@@ -111,6 +111,7 @@ for entity in ENTITIES:
         target_database_base_name=SOURCE,
         table_name=entity,
         is_incremental=False,
+        has_create_external_table_task=False,
     )
 
     create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))

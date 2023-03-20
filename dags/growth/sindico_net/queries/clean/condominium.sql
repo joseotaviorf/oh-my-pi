@@ -1,5 +1,13 @@
+WITH dedup AS (
+  SELECT
+    keyword,
+    MIN(INT(id)) AS first_id
+  FROM datalake_sindico_net_raw.condominium
+  GROUP BY 1
+
+)
 SELECT 
-    id,
+    INT(id) as id,
     condominio AS condo,
     cnpj,
     keyword,
@@ -43,3 +51,4 @@ SELECT
     CAST(sauna AS BOOLEAN) AS has_sauna,
     load_date
 FROM datalake_sindico_net_raw.condominium
+WHERE INT(id) IN (SELECT first_id FROM dedup)
