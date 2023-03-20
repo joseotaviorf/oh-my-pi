@@ -1,6 +1,8 @@
 ---
 database_name: datalake_nazare_clean
 table_name: partner
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
 columns:
   id_partner:
     lineage:
@@ -11,9 +13,6 @@ columns:
   short_name:
     lineage:
       - datalake_nazare_raw.partner.short_name
-  current_revision:
-    lineage:
-      - datalake_nazare_raw.partner.current_revision
   ts_created:
     lineage:
       - datalake_nazare_raw.partner.created_at
