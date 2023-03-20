@@ -41,6 +41,6 @@ SELECT
     GREATEST(12*(YEAR(dt_due)-YEAR(dt_due))+(MONTH(dt_due)-MONTH(dt_due)),0) AS  mob_due_by_due_date
 FROM
     bill_items_cohort_rules AS cr
-LEFT JOIN enrich_retsuko_junk AS jk
+LEFT JOIN datalake_retsuko.retsuko_junk AS jk
     ON jk.desc_master_type = 'bill_item_cluster_name'
     AND jk.desc_lvl_1 = cr.bill_item_cluster_name
