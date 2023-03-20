@@ -52,4 +52,5 @@ FROM
     LEFT JOIN datalake_retsuko_clean.contract AS rcc
       ON rcc.id = rci.id_contract
 WHERE
-    CAST(rci.ts_created AS DATE) >= DATE('2020-01-01')
+    DATE(rci.ts_created) >= DATE_TRUNC('YEAR', CURRENT_DATE - INTERVAL '3 YEARS')
+    OR DATE(rci.ts_due) >= DATE_TRUNC('YEAR', CURRENT_DATE - INTERVAL '3 YEARS')
