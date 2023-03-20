@@ -1,99 +1,88 @@
 database_name: dw_public
 table_name: dim_partner
-description: A company partnering with QuintoAndar in our B2B model. Each line is
-  a partner company.
+description: A company partnering with QuintoAndar in our B2B model. Each line is a partner company.
 domain: For Rent
-owner: AE ForRent@quintoandar.com.br
+owner: felipe.chies@quintoandar.com.br
 columns:
   sk_partner:
     lineage:
     - datalake_ebdb_clean.partner.id
-    description: key to identify partner
+    description: Key to identify the partner.
   id_partner:
     lineage:
     - datalake_ebdb_clean.partner.id
-    description: key to identify partner (the same from EBDB)
+    description: Key to identify the partner (the same from EBDB).
   id_amplitude_device:
     lineage:
     - datalake_ebdb_clean.partner.id_amplitude_device
-    description: ''
+    description: Key to identify the amplitude device related to the partner.
   country_code:
     lineage:
     - datalake_ebdb_country.user.country_code
-    description: Country code of the partner
+    description: Country code of the partner.
     categories:
-      BR: Brazil's country code
-      MX: Mexico's country code
+      BR: Brazil's country code.
+      MX: Mexico's country code.
   name:
     lineage:
     - datalake_ebdb_clean.partner.name
-    description: name of partner
+    description: Name of the partner.
   trade_name:
     lineage:
     - datalake_ebdb_clean.partner.trade_name
-    description: trade name (fictitious name) of partner company
+    description: Trade name (fictitious name) of the partner's company.
   phone:
     lineage:
     - datalake_ebdb_clean.partner.phone
-    description: phone to contact partner
+    description: Partner's phone number.
   email:
     lineage:
     - datalake_ebdb_clean.partner.email
-    description: email to contact partner
+    description: Partner's email address.
   cnpj:
     lineage:
     - datalake_ebdb_clean.partner.cnpj
-    description: CNPJ (Tax Identification Number) of partner
+    description: CNPJ (Tax Identification Number) of the partner.
   creci:
     lineage:
     - datalake_ebdb_clean.partner.creci
-    description: Partner Creci number (Regional Council for Real Estate Brokers)
+    description: Partner's Creci number (Regional Council for Real Estate Brokers).
   type:
     lineage:
     - datalake_ebdb_clean.partner.type
-    description: ''
+    description: Type of the partner.
     categories:
-      AUTONOMOUS_AGENT: '#N/A'
-      PRIME: '#N/A'
+      AUTONOMOUS_AGENT: Partner is an Autonomous agent.
+      PRIME: Partner is a Prime agent.
+      EXECUTIVE_FOR_RENT: Partner is an Executive for rent.
+      AFFILIATE_PRO: Partner is an Affiliate Pro.
   city:
     lineage:
     - datalake_ebdb_clean.partner.city
+    description: City of the partner.
   utm_campaign:
     lineage:
     - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_campaign
-    description: ''
-    categories:
-      ZEBRA.CIQ-conversion: '#N/A'
-      ZEBRA.corretor_de_relacionamento: '#N/A'
-      ZEBRA.corretorderelacionamento-click-temp: '#N/A'
-      ZEBRA.corretorderelacionamento-conversion: '#N/A'
-      envio_lp_actionline: '#N/A'
-      nao_completou_cadastro: '#N/A'
-      p014p.CIQ-conversion: '#N/A'
-      sitelinks_RJ_branded_CR: '#N/A'
+    description: Identifies the promotion of an specific campaign.
   utm_medium:
     lineage:
     - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_medium
-    description: ''
-    categories:
-      cpc: '#N/A'
-      display: '#N/A'
-      email: '#N/A'
+    description: Identifies the type of strategy used on the campaign.
   utm_source:
     lineage:
     - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_source
-    description: ''
+    description: Identifies which url sent the traffic.
   ts_joined_partnership:
     lineage:
     - datalake_ebdb_clean.partner.ts_partnership_started
-    description: date when partnership started
+    description: Timestamp of when the partnership started.
   ts_created:
     lineage:
     - datalake_ebdb_clean.partner.ts_created
-    description: date when data was created
+    description: Timestamp of when the partner was registered in our system.
   ts_updated:
     lineage:
     - datalake_ebdb_clean.partner.ts_updated
-    description: date of last update
+    description: Timestamp of when the partner was updated in our system.
   ts_load:
-    description: date when data was loaded
+    description: imestamp of when the data was loaded.
