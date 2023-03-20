@@ -1,54 +1,52 @@
 database_name: dw_public
 table_name: dim_partner_agent
-description: Real estate agents from companies partnering with QuintoAndar in our
-  B2B model (see dim_partner table). Each line is a partner company's real estate
-  agent.
+description: Real estate agents from companies partnering with QuintoAndar in our B2B model (see dim_partner table). Each line is a partner company's real estate agent.
 domain: For Rent
-owner: E ForRent@quintoandar.com.br
+owner: felipe.chies@quintoandar.com.br
 columns:
   sk_partner_agent:
     lineage:
     - datalake_ebdb_clean.partner_agent.id
-    description: Key of the agent
+    description: Key of the partner agent.
   id_partner_agent:
     lineage:
     - datalake_ebdb_clean.partner_agent.id
-    description: Key of the agent
+    description: Key of the partner agent.
   id_user:
     lineage:
     - datalake_ebdb_clean.partner_agent.id_user
-    description: Key of the agent's 5A user
+    description: Key of the agent's 5A user.
   id_partner:
     lineage:
     - datalake_ebdb_clean.partner_agent.id_partner
-    description: Key of the agent's partner
+    description: Key of the agent's partner.
   country_code:
     lineage:
     - datalake_ebdb_country.user.country_code
-    description: Country code of the partner agent
+    description: Country code of the partner agent.
     categories:
-      BR: Brazil's country code
-      MX: Mexico's country code
+      BR: Brazil's country code.
+      MX: Mexico's country code.
   status_partner_agent:
     lineage:
     - datalake_ebdb_clean.partner_agent.status
-    description: Status to identify wheter the agent is active or not
+    description: Status to identify wheter the agent is active or not.
     categories:
-      ACTIVE: ''
-      INACTIVE: ''
+      ACTIVE: Active.
+      INACTIVE: Inactive.
   type:
     lineage:
     - datalake_ebdb_clean.partner_agent.type
-    description: ''
+    description: Partner agent's type.
     categories:
-      OPERATIONS_AGENT: '#N/A'
+      OPERATIONS_AGENT: Type of the agent is Operations.
   ts_created:
     lineage:
     - datalake_ebdb_clean.partner_agent.ts_created
-    description: Timestamp of record creation
+    description: Timestamp of the partner agent's creation/register in our system.
   ts_updated:
     lineage:
     - datalake_ebdb_clean.partner_agent.ts_updated
-    description: Timestamp of record last update
+    description: Timestamp of the partner agent's register last update.
   ts_load:
-    description: Timestamp of record loading
+    description: Timestamp of record loading.
