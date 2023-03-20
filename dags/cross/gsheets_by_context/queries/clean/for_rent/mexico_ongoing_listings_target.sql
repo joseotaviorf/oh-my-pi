@@ -1,6 +1,7 @@
 SELECT
     business_context,
     city_group,
+    rental_administrator,
     CAST(REPLACE(tier, ',', '') AS INT) AS tier,
     CAST(REPLACE(depublications, ',', '') AS DECIMAL(14,6)) AS depublications,  
     CAST(REPLACE(ongoing_listings, ',', '') AS DECIMAL(14,6)) AS ongoing_listings,  

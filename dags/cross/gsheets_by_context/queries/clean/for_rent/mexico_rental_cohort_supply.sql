@@ -4,6 +4,7 @@ SELECT
     mkt_channel,
     mkt_origin,
     operacao,
+    rental_administrator,
     opportunities,
     prospect,
     qualified,

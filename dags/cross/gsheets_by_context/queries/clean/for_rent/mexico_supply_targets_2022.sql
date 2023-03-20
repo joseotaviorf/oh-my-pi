@@ -1,5 +1,6 @@
 SELECT
     city_group,
+    rental_administrator,
     available_qualifieds,
     first_listings,
     lead_context,

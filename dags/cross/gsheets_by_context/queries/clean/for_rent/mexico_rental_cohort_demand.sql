@@ -1,6 +1,7 @@
 SELECT
     city_group,
     funnel_flow,
+    rental_administrator,
     target_ca,
     target_cep,
     target_cs,
