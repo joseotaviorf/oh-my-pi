@@ -1192,6 +1192,7 @@ bietlejuice.dw_reservation:
 
 bietlejuice.dw_retsuko:
   - bietlejuice.enrich_retsuko:load-enrich-retsuko-junk
+  - bietlejuice.enrich_retsuko:load-enrich-bill-items
 
 bietlejuice.dw_revenue_lines:
   - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-finance
