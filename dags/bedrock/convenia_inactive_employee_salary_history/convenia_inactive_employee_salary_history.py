@@ -20,11 +20,11 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 ENV = os.environ.get("ENVIRONMENT")
 SOURCE = "convenia"
-DAG_ID = f"bietlejuice.{SOURCE}"
+CONTEXT = "convenia_inactive_employee_salary_history"
+DAG_ID = f"bietlejuice.{CONTEXT}"
 MAIN_START_DATE = datetime(2022, 5, 6, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
-config_service = ConfigurationService(SOURCE)
+config_service = ConfigurationService(CONTEXT)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("people_bucket")
@@ -35,7 +35,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
+RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/"
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -62,8 +62,8 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+    schedule_interval=None,
+    doc_md=BaseDAG.get_dag_doc(CONTEXT).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
@@ -84,20 +84,20 @@ task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
-    relative_query_path=SOURCE,
+    relative_query_path=CONTEXT,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=athena_query_results_bucket,
 )
 
-table_names = ["active_employees", "inactive_employees"]
+table_names = ["inactive_employee_salary_history"]
 
 raw_task_groups = {}
 for table_name in table_names:
     raw_task_group = task_group.build_raw_task_group_for_single_table(
-        source=SOURCE,
+        source=CONTEXT,
         table_name=table_name,
         target_database_base_name=SOURCE,
-        extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}load_{table_name}_to_raw.py",
+        extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}load_{CONTEXT}_to_raw.py",
         has_hive_sync=False,
         raw_spark_job_extra_args=[SOURCE, table_name],
     )

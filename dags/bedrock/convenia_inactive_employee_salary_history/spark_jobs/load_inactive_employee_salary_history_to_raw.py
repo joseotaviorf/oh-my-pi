@@ -22,7 +22,7 @@ from bietlejuice.base.spark import (
 )
 
 DATABRICKS_SCOPE = "quintoandar"
-JOB_NAME = "load_employee_salary_history_to_raw"
+JOB_NAME = "load_inactive_employee_salary_history_to_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -31,33 +31,37 @@ logger = QuintoAndarLogger(JOB_NAME)
 def fetch_convenia_employee_salary_history(host, token):
     client = ConveniaClient(api_token=token, api_base_url=host)
 
-    active_employees = CONSUMERS["ActiveEmployees"](client=client)
+    inactive_employees = CONSUMERS["InactiveEmployees"](client=client)
 
-    active_employees_results = active_employees.sync()
+    inactive_employees_results = inactive_employees.sync()
 
     rows = []
-    for employee in active_employees_results:
+    for employee in inactive_employees_results:
         rows.append(Row(id=employee["id"]))
 
-    spark_client = SparkClient()
-    active_employees = spark_client.create_dataframe(rows)
+    if not rows:
+        employees_salary = create_df_schema()
+    else:
+        spark_client = SparkClient()
+        employees_salary = spark_client.create_dataframe(rows)
 
     employee_salary_history = CONSUMERS["SalaryHistory"](client=client)
 
     results = employee_salary_history.sync(
-        list(active_employees.select("id").toPandas()["id"])
+        list(employees_salary.select("id").toPandas()["id"])
     )
 
     return results
 
 
-def create_df_from_employee_salary_history(results, spark_client):
+def create_df_from_employee_salary_history(results, spark_client, token_name):
     rows = []
     for employee in results:
         for details in employee:
             rows.append(
                 Row(
                     id=str(details["id"]),
+                    id_employee=str(details["id_employee"]),
                     salary=details["salary"],
                     relationship_id=str(details["relationship_id"]),
                     relationship=str(details["relationship"]),
@@ -75,6 +79,7 @@ def create_df_from_employee_salary_history(results, spark_client):
                     description=str(details["description"]),
                     created_at=str(details["created_at"]),
                     updated_at=str(details["updated_at"]),
+                    source=str(token_name),
                 )
             )
 
@@ -89,6 +94,7 @@ def create_df_schema():
     columns = StructType(
         [
             StructField("id", StringType(), True),
+            StructField("id_employee", StringType(), True),
             StructField("salary", LongType(), True),
             StructField("relationship_id", StringType(), True),
             StructField("relationship", StringType(), True),
@@ -106,6 +112,7 @@ def create_df_schema():
             StructField("description", StringType(), True),
             StructField("created_at", StringType(), True),
             StructField("updated_at", StringType(), True),
+            StructField("source", StringType(), True),
         ]
     )
 
@@ -145,7 +152,7 @@ if __name__ == "__main__":
 
     result = create_df_schema()
 
-    for item, details in credentials.items():
+    for token_name, details in credentials.items():
         host = details["host"]
         api_token = details["token"]
 
@@ -154,7 +161,7 @@ if __name__ == "__main__":
         )
         spark_client = SparkClient()
         df = create_df_from_employee_salary_history(
-            convenia_employee_salary_history_result, spark_client
+            convenia_employee_salary_history_result, spark_client, token_name
         )
         result = df.union(result)
 

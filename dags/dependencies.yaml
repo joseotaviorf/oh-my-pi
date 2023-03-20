@@ -11,6 +11,9 @@
 bietlejuice.convenia_inactive_employee_details:
   - bietlejuice.convenia_active_employee_details:load-clean-active-employee-details
 
+bietlejuice.convenia_inactive_employee_salary_history:
+  - bietlejuice.convenia_employee_salary_history:load-clean-employee-salary-history
+
 bietlejuice.dw_datamarts_cross:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift

@@ -64,7 +64,7 @@ def create_df_from_active_employee_details(results, spark_client):
                 last_name=str(employee["last_name"]),
                 email=str(employee["email"]),
                 hiring_date=str(employee["hiring_date"]),
-                salary=employee["salary"],
+                salary=str(employee["salary"]),
                 alternative_email=str(employee["alternative_email"]),
                 phone=str(employee["phone"]),
                 cellphone=str(employee["cellphone"]),

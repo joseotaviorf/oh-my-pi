@@ -1,5 +1,6 @@
 SELECT
     id,
+    id_employee,
     relationship_id AS id_relationship,
     department_id AS id_department,
     job_description_id AS id_job_description,
@@ -13,6 +14,7 @@ SELECT
     motive,
     description,
     is_active,
+    source,
     date_from AS dt_from,
     date_to AS dt_to,
     created_at AS dt_created,
