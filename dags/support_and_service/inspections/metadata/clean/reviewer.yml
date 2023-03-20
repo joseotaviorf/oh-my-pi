@@ -1,0 +1,40 @@
+---
+database_name: datalake_inspections_clean
+table_name: reviewer
+description: Data referring to the reviewers of the inspection report.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_reviewer:
+    lineage:
+      - datalake_inspections_raw.reviewer.id
+  id_user:
+    lineage:
+      - datalake_inspections_raw.reviewer.user_id
+  uuid:
+    lineage:
+      - datalake_inspections_raw.reviewer.uuid
+  reviewer_type:
+    lineage:
+      - datalake_inspections_raw.reviewer.reviewer_type
+  id_assessment:
+    lineage:
+      - datalake_inspections_raw.reviewer.assessment_id
+  is_approved:
+    lineage:
+      - datalake_inspections_raw.reviewer.approved
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.reviewer.created_at
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.reviewer.updated_at
+  year:
+    lineage:
+      - datalake_inspections_raw.reviewer.year
+  month:
+    lineage:
+      - datalake_inspections_raw.reviewer.month
+  day:
+    lineage:
+      - datalake_inspections_raw.reviewer.day

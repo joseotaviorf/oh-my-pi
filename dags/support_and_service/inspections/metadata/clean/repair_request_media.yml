@@ -1,0 +1,40 @@
+---
+database_name: datalake_inspections_clean
+table_name: repair_request_media
+description: Media data regarding the repair request after inspection.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_repair_request_media:
+    lineage:
+      - datalake_inspections_raw.repair_request_media.id
+  id_repair_request:
+    lineage:
+      - datalake_inspections_raw.repair_request_media.repair_request_id
+  id_main:
+    lineage:
+      - datalake_inspections_raw.repair_request_media.main_id
+  uuid:
+    lineage:
+      - datalake_inspections_raw.repair_request_media.uuid
+  type:
+    lineage:
+      - datalake_inspections_raw.repair_request_media.type
+  name:
+    lineage:
+      - datalake_inspections_raw.repair_request_media.name
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.repair_request_media.created_at
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.repair_request_media.updated_at
+  year:
+    lineage:
+      - datalake_inspections_raw.repair_request_media.year
+  month:
+    lineage:
+      - datalake_inspections_raw.repair_request_media.month
+  day:
+    lineage:
+      - datalake_inspections_raw.repair_request_media.day
