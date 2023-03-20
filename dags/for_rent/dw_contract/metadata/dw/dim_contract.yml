@@ -2,7 +2,7 @@ database_name: dw_public
 table_name: dim_contract
 description: Information about contracts. Each line is a contract
 domain: For Rent
-owner: ''
+owner: data-for-rent@quintoandar.com.br
 columns:
   sk_contract:
     lineage:
@@ -22,10 +22,11 @@ columns:
   rent:
     lineage:
     - datalake_ebdb_contract.contract.rent
-    description: Monthly rent value as specified in the contract
+    description: Monthly rent value as specified in the contract (this value is updated if the contract is adjusted)
   first_rent_charged:
     lineage:
     - datalake_ebdb_contract.contract.first_rent_charged
+    description: Value of the first rent charged
   day_month_due:
     lineage:
     - datalake_ebdb_contract.contract.billing_day_of_month
@@ -35,21 +36,21 @@ columns:
     - datalake_ebdb_contract.contract.guarantee_type
     description: company or guarantor from the contract
     categories:
-      BrasilCap: ''
-      Deposito: ''
-      Fiador: ''
-      OutroTipoFiador: ''
-      PortoSeguro: ''
-      RentalGuarantee: '#N/A'
-      SeguroFairfax: ''
-      SeguroFiancaCardiff: ''
+      BrasilCap: Company BrasilCap responsible for the contract guarantee
+      Deposito: Responsible for the contract guarantee
+      Fiador: Responsible for the contract guarantee
+      OutroTipoFiador: Responsible for the contract guarantee
+      PortoSeguro: Company PortoSeguro responsible for the contract guarantee
+      RentalGuarantee: Responsible for the contract guarantee
+      SeguroFairfax: Company Fairfax responsible for the contract guarantee
+      SeguroFiancaCardiff: Company Cardiff responsible for the contract guarantee
   type:
     lineage:
     - datalake_ebdb_contract.contract.type
     description: type of assurance from the contract
     categories:
-      DealOnly: ''
-      FullService: ''
+      DealOnly: Contract without QuintoAndar administration and services (old product)
+      FullService: Standard contract with QuintoAndar administration and services
   status:
     lineage:
     - datalake_ebdb_contract.contract.status
@@ -58,8 +59,8 @@ columns:
       Ativo: The contract is active
       Cancelado: The contract has been canceled
       Finalizado: The contract was active for a period and has been terminated
-      Minuta: ''
-      PreAssinaturas: ''
+      Minuta: The contract is in draft
+      PreAssinaturas: Pre signature phase
   rental_administrator:
     lineage:
     - datalake_ebdb_contract.contract.rental_administrator
@@ -72,24 +73,24 @@ columns:
     - datalake_ebdb_contract.contract.paying_condo
     description: payer of the condominium in the contract
     categories:
-      Inquilino: ''
-      Proprietario: ''
-      QuintoAndar: ''
+      Inquilino: The tenant is set as responsible for paying the condominium fee in the contract
+      Proprietario: The owner is set as responsible for paying the condominium fee in the contract
+      QuintoAndar: QuintoAndar is set as responsible for paying the condominium fee in the contract
   condo_responsible:
     lineage:
     - datalake_ebdb_contract.contract.responsible_for_condo
     description: responsible for paying the condominium
     categories:
-      Inquilino: ''
-      Proprietario: ''
+      Inquilino: The tenant is set as responsible for condominium
+      Proprietario: The owner is set as responsible for condominium
   iptu_payer:
     lineage:
     - datalake_ebdb_contract.contract.paying_iptu
     description: payer of the iptu from the contract
     categories:
-      Inquilino: ''
-      Proprietario: ''
-      QuintoAndar: ''
+      Inquilino: The tenant is set as responsible for paying the IPTU fee in the contract
+      Proprietario: The owner is set as responsible for paying the IPTU fee in the contract
+      QuintoAndar: QuintoAndar is set as responsible for paying the IPTU fee in the contract
   iptu_responsible:
     lineage:
     - datalake_ebdb_contract.contract.responsible_for_iptu
@@ -138,77 +139,78 @@ columns:
   agent_brokerage_share:
     lineage:
     - datalake_ebdb_contract.contract.agent_brokerage_share
+    description: The monthly value splitted between QuintoAndar/Brokerage Partners (CIQ and Partner), in decimals
   signature_type:
     lineage:
     - datalake_ebdb_contract.contract.signature_type
     description: Type of the signature used in the contract
     categories:
-      Eletronica: ''
+      Eletronica: Eletronic signature (e.g. Docusign)
   closing_status:
     lineage:
     - datalake_ebdb_contract.contract.status_closing
     description: contract status from the process of rental
     categories:
-      ApoliceSolicitada: ''
-      ChavesEntregues: ''
-      ContratoAssinado: ''
-      ContratoEnviado: ''
-      EntregaDeChavesAgendada: ''
-      PendenciaMinuta: ''
-      RedacaoContrato: ''
+      ApoliceSolicitada: Insurance policy requested
+      ChavesEntregues: The keys were delivered to the tenant
+      ContratoAssinado: The contract is signed
+      ContratoEnviado: The contract was sent
+      EntregaDeChavesAgendada: The key's delivery is scheduled
+      PendenciaMinuta: The contract draft has a pendency
+      RedacaoContrato: The contract is being created
   cancellation_reason:
     lineage:
     - datalake_ebdb_contract.contract.cancellation_reason
     description: the reason why the contract was cancelled
     categories:
-      DISAGREEMENT: ''
-      INCORRECT_INFO: ''
-      OTHERS: ''
-      OWNER_DELAY: ''
-      OWNER_DOESNT_AGREE: ''
-      OWNER_GAVE_UP_RENTING: ''
-      OWNER_PREFERS_OTHER: ''
-      OWNER_RENTING_WITH_OTHER_COMPANY: ''
-      OWNER_SELLING_HOUSE: ''
-      OWNER_UNABLE_TO_LEAVE: ''
-      PRICE_MODIFICATION: ''
-      SIG_DEADLINE_EXPIRED: ''
-      TENANT_BUYING_HOUSE: ''
-      TENANT_DELAY: ''
-      TENANT_DOESNT_AGREE: ''
-      TENANT_GAVE_UP_RENTING: ''
-      TENANT_PREFERS_OTHER: ''
-      TENANT_RENTING_WITH_OTHER_COMPANY: ''
-      TENANT_UNABLE_TO_LEAVE: ''
-      UNREACHABLE: ''
-      VALIDITY_DATES: ''
+      DISAGREEMENT: The parts disagree
+      INCORRECT_INFO: Some info was incorret
+      OTHERS: Other reason
+      OWNER_DELAY: Owner delayed the response
+      OWNER_DOESNT_AGREE: Owner does not agree with the contract
+      OWNER_GAVE_UP_RENTING: Owner does not want to rent anymore
+      OWNER_PREFERS_OTHER: Owner prefers other contract option
+      OWNER_RENTING_WITH_OTHER_COMPANY: Owner started renting with another company
+      OWNER_SELLING_HOUSE: Owner does not want to rent anymore because is selling the property
+      OWNER_UNABLE_TO_LEAVE: Owner can't leave the property
+      PRICE_MODIFICATION: The rental price has changed
+      SIG_DEADLINE_EXPIRED: The deadline to sign the contract has expired
+      TENANT_BUYING_HOUSE: The tenant is buying a property and gave up renting
+      TENANT_DELAY: Tenant delayed the response
+      TENANT_DOESNT_AGREE: Tenant does not agree with the contract
+      TENANT_GAVE_UP_RENTING: Tenant does not want to rent anymore
+      TENANT_PREFERS_OTHER: Tenant prefers other contract option
+      TENANT_RENTING_WITH_OTHER_COMPANY: Tenant started renting with another company
+      TENANT_UNABLE_TO_LEAVE: Tenant can't leave the property
+      UNREACHABLE: One of the parts was unreachable
+      VALIDITY_DATES: Validity dates
   version:
     lineage:
     - datalake_ebdb_contract.contract.contract_version
     description: contract version according to a set of business rules
     categories:
-      v0: ''
-      v1: ''
-      v10: ''
-      v10.1: ''
-      v10.2: ''
-      v10.3: ''
-      v10.4: ''
+      v0: Version V0
+      v1: Version V1
+      v10: Version V10
+      v10.1: Version V10.1
+      v10.2: Version V10.2
+      v10.3: Version V10.3
+      v10.4: Version V10.4
       v10.5: '#N/A'
       v10.6: '#N/A'
       v10.7: '#N/A'
-      v2: ''
-      v3: ''
-      v4: ''
-      v5: ''
-      v6: ''
-      v7: ''
-      v8: ''
-      v8.1: ''
-      v9: ''
-      v9.1: ''
-      v9.2: ''
-      vP.1: ''
+      v2: Version V2
+      v3: Version V3
+      v4: Version V4
+      v5: Version V5
+      v6: Version V6
+      v7: Version V7
+      v8: Version V8
+      v8.1: Version V8.1
+      v9: Version V9
+      v9.1: Version V9.1
+      v9.2: Version V9.2
+      vP.1: Version VP.1
   is_b2b:
     lineage:
     - datalake_ebdb_contract.contract_b2b.is_b2b
@@ -216,38 +218,43 @@ columns:
   is_contract_b2b:
     lineage:
     - datalake_ebdb_contract.contract_b2b.is_contract_b2b
+    description: If the partner is PRIME
   contract_partner_type:
     lineage:
     - datalake_ebdb_contract.contract_b2b.contract_partner_type
+    description: type of partner from which comes the contract
   b2b_type:
     lineage:
     - datalake_ebdb_contract.contract_b2b.b2b_type
     description: type of b2b client origin from which comes the contract
     categories:
-      online: ''
-      prime: ''
+      online: The B2B client makes a recommendation of a property to be listed at QuintoAndar (referral)
+      prime: The B2B client registers the property at QuintoAndar
   b2b_prime_type:
     lineage:
     - datalake_ebdb_contract.contract_b2b.b2b_prime_type
     description: type of b2b client prime from which comes the contract
     categories:
-      advanced_negotiation: ''
-      batch: ''
-      portability: ''
-      standard: ''
+      advanced_negotiation: The B2B client sends QuintoAndar the properties and tenants (advanced negotiation), the properties are listed and the contract process continues
+      batch: The B2B client sends QuintoAndar properties in batches, they are listed and the contract process continues
+      portability: The B2B client transfers active contracts to be renewed with QuintoAndar
+      standard: The B2B client registers property by property at QuintoAndar
   contract_plan:
     lineage:
     - datalake_ebdb_contract.contract_b2b.contract_plan
+    description: type of contract plan
   administration_split_percentage:
     lineage:
     - datalake_ebdb_contract.contract_b2b.administration_split_percentage
+    description: The administrative percentage of the contract
   brokerage_split_percentage:
     lineage:
     - datalake_ebdb_contract.contract_b2b.brokerage_split_percentage
+    description: The brokerage percentage of the contract
   is_ongoing_contract:
     lineage:
     - datalake_ebdb_contract.contract.is_ongoing_contract
-    description: ''
+    description: If the contract is still ongoing (active)
   is_tenant_service_fee_opt_out:
     lineage:
     - datalake_ebdb_contract.contract.is_tenant_service_fee_opt_out
@@ -255,6 +262,7 @@ columns:
   is_exit_inspection_opted_out:
     lineage:
     - datalake_ebdb_contract.contract.is_exit_inspection_opted_out
+    description: If the exit inspection is opted out
   dt_start:
     lineage:
     - datalake_ebdb_contract.contract.dt_started
@@ -285,6 +293,7 @@ columns:
   ts_expected_termination:
     lineage:
     - datalake_ebdb_contract.contract.ts_expected_termination
+    description: Timestamp of when the tenant expects to leave the property
   ts_signature:
     lineage:
     - datalake_ebdb_contract.contract.ts_signed
@@ -305,6 +314,6 @@ columns:
   ts_analyst_annulment_input:
     lineage:
     - datalake_ebdb_contract.contract.ts_analyst_annulment_input
-    description: ''
+    description: Timestamp of the analyst's annulment input
   ts_load:
     description: Timestamp of when this data row was last loaded
