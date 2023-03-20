@@ -65,7 +65,7 @@ columns:
   net_revenue:
     description: The net revenue calculated from all the revenues (gross_revenue + addons_revenue + total_revenue_discounts).
   gross_revenue:
-    description: Gross revenue calculated by adding the rent_value, management_fee, brokerage_fee, home_insurance columns.
+    description: Gross revenue calculated by adding the management_fee, brokerage_fee, home_insurance columns.
   addons_revenue:
     description: Addons revenue calculated by adding the service_fee, mra, lra, bfi, lp, ccp_net, reservation columns.
   total_revenue_discounts:

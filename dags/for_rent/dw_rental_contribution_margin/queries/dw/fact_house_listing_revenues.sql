@@ -75,11 +75,12 @@ late_payments AS (
 long_term_rental_anticipation AS (
   SELECT
     id_contract_ebdb,
-    SUM(invoice_theorical_amount) AS lra,
-    accrual_year_month
+    SUM(mova_interest_value/total_installments) AS lra,
+    DATE_FORMAT(dt_due, 'yyyyMM') AS due_accrual_year_month,
+    dt_due
   FROM
     datalake_revenue_lines.long_term_rental_anticipation
-  GROUP BY 1, 3
+  GROUP BY 1, 3, 4
 ),
 
 service_fee AS (
@@ -151,7 +152,6 @@ revenue_with_contract AS (
     COALESCE(iv.home_insurance, 0) AS home_insurance,
     COALESCE(sf.service_fee, 0) AS service_fee,
     COALESCE(mra.mra, 0) AS mra,
-    COALESCE(lra.lra, 0) AS lra,
     COALESCE(bfi.bfi, 0) as bfi,
     COALESCE(lp.lp, 0) AS lp,
     COALESCE(ccp.ccp_net, 0) AS ccp_net,
@@ -184,10 +184,6 @@ revenue_with_contract AS (
       ON cc.id_contract = mra.id_contract_ebdb
       AND cc.accrual_year_month = mra.accrual_year_month
   LEFT JOIN
-    long_term_rental_anticipation AS lra
-      ON cc.id_contract = lra.id_contract_ebdb
-      AND cc.accrual_year_month = lra.accrual_year_month
-  LEFT JOIN
     late_payments AS lp
       ON cc.id_contract = lp.id_contract
       AND cc.accrual_year_month = lp.paid_accrual_year_month
@@ -216,10 +212,10 @@ revenue_with_contract AS (
 revenues_calculation AS (
 SELECT 
   MONOTONICALLY_INCREASING_ID() AS sk_house_listing_revenue,
-  COALESCE(revenue.id_contract, rf.sk_contract) AS id_contract,
-  COALESCE(r.id_house_listing, revenue.id_house_listing) AS id_house_listing,
-  COALESCE(r.id_house, revenue.id_house) AS id_house,
-  COALESCE(hl.country_code, 'Undefined') AS country_code,
+  COALESCE(revenue.id_contract, rf.sk_contract, ltra.id_contract_ebdb) AS id_contract,
+  COALESCE(r.id_house_listing, revenue.id_house_listing, hl_contract.id_house_listing) AS id_house_listing,
+  COALESCE(r.id_house, revenue.id_house, hl_contract.id_house) AS id_house,
+  COALESCE(hl.country_code, hl_contract.country_code, 'Undefined') AS country_code,
   contract_lifetime,
   COALESCE(rent_value, 0) AS rent_value,
   COALESCE(management_fee, 0) AS management_fee,
@@ -236,7 +232,7 @@ SELECT
   COALESCE(brokerage_partner_share, 0) AS brokerage_partner_share,
   COALESCE(management_partner_share, 0) AS management_partner_share,
   COALESCE(dd.quarter, revenue.quarter) AS quarter,
-  COALESCE(r.created_accrual_year_month, revenue.accrual_year_month) AS accrual_year_month,
+  COALESCE(revenue.accrual_year_month, ltra.due_accrual_year_month, r.created_accrual_year_month) AS accrual_year_month,
   COALESCE(dd.month_start, revenue.dt_month_start) AS dt_month_start,
   NOW() AS ts_load
 FROM
@@ -246,16 +242,25 @@ FULL OUTER JOIN
     ON revenue.id_house_listing = r.id_house_listing
     AND revenue.accrual_year_month = r.created_accrual_year_month
 LEFT JOIN
-   dw_public.fact_listing_rent_flows AS rf
-     ON r.id_reservation = rf.sk_reservation
+  dw_public.fact_listing_rent_flows AS rf
+   ON r.id_reservation = rf.sk_reservation
 LEFT JOIN
   datalake_ebdb_listing.house_listing AS hl
     ON COALESCE(r.id_house_listing, revenue.id_house_listing) = hl.id_house_listing
+FULL OUTER JOIN
+  long_term_rental_anticipation AS ltra
+    ON revenue.id_contract = ltra.id_contract_ebdb
+    AND revenue.accrual_year_month = ltra.due_accrual_year_month
+LEFT JOIN
+  datalake_ebdb_listing.house_listing AS hl_contract
+    ON ltra.id_contract_ebdb = hl_contract.id_contract
+    AND ltra.dt_due >= DATE(COALESCE(hl_contract.ts_listing_version_start, '1900-01-01 00:00:00'))
+    AND ltra.dt_due < DATE(COALESCE(hl_contract.ts_listing_version_end, NOW()))
 LEFT JOIN
   dw_public.dim_date AS dd
-    ON TO_DATE(STRING(r.created_accrual_year_month), 'yyyyMM') = dd.date
+    ON TO_DATE(STRING(COALESCE(r.created_accrual_year_month, ltra.due_accrual_year_month)), 'yyyyMM') = dd.date
 WHERE
-  COALESCE(r.created_accrual_year_month, revenue.accrual_year_month) <= DATE_FORMAT(CURRENT_TIMESTAMP(), 'yyyyMM')
+  COALESCE(r.created_accrual_year_month, revenue.accrual_year_month, ltra.due_accrual_year_month) <= DATE_FORMAT(CURRENT_TIMESTAMP(), 'yyyyMM')
 )
 
 SELECT
@@ -279,10 +284,10 @@ SELECT
   agents_commission,
   brokerage_partner_share,
   management_partner_share,
-  (rent_value + management_fee + brokerage_fee + home_insurance) + 
+  (management_fee + brokerage_fee + home_insurance) + 
     (service_fee + mra + lra + bfi + lp + ccp_net + reservation) +
     (agents_commission + brokerage_partner_share + management_partner_share) AS net_revenue,
-  rent_value + management_fee + brokerage_fee + home_insurance AS gross_revenue,
+  management_fee + brokerage_fee + home_insurance AS gross_revenue,
   service_fee + mra + lra + bfi + lp + ccp_net + reservation AS addons_revenue,
   agents_commission + brokerage_partner_share + management_partner_share AS total_revenue_discounts,
   quarter,
