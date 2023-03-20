@@ -1,182 +1,159 @@
 database_name: dw_public
 table_name: dim_region
-description: Cities and regions where QuintoAndar operates. Each line is either a
-  city or a sub-region (similar to a neighborhood). To see a map, follow this link
-  http://carto.data.quintoandar.com.br/user/dev/builder/34726ccd-aa13-4722-81d7-cb62daa583e5/embe
+description: Cities and regions where QuintoAndar operates. Each line is either a city or a sub-region (similar to a neighborhood).
 domain: For Rent
-owner: E ForRent@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   sk_region:
     lineage:
     - datalake_region.region.id
-    description: Key of region
+    description: Key of the region.
   id:
     lineage:
     - datalake_region.region.id
-    description: Region id (equal to sk_region)
+    description: Region id (equal to sk_region).
   id_country:
     lineage:
     - datalake_region.region.id_country
-    description: Country id of the region
+    description: Country id of the region.
   macro_id:
     lineage:
     - datalake_region.region.id_macro_region
-    description: macro region id
+    description: Macro region id.
   city_id:
     lineage:
     - datalake_region.region.id_city
-    description: The ID for the city where this region is in
+    description: The ID for the city where this region is in.
   country_code:
     lineage:
     - datalake_region.region.country_code
-    description: Code related to the country of the region
+    description: Code related to the country of the region.
     categories:
-      BR: Brazil's country code
-      MX: Mexico's country code
+      BR: Brazil's country code.
+      MX: Mexico's country code.
   level:
     lineage:
     - datalake_region.region.level
-    description: Either SubRegiao (sub-region) or Cidade (city). If level is Cidade,
-      macro_id, macro_name, city_id, long_region_name are null because they are not
-      applicable
+    description: Either SubRegiao (sub-region) or Cidade (city). If level is Cidade, macro_id, macro_name, city_id, long_region_name are null because they are not applicable.
     categories:
-      Cidade: ''
-      SubRegiao: ''
+      Cidade: Region level is city.
+      SubRegiao: Region level is SubRegion.
   name:
     lineage:
     - datalake_region.region.name
-    description: The name of the region. If level is Cidade, it is the same as city_name
+    description: The name of the region. If level is Cidade, it is the same as city_name.
       field
   macro_name:
     lineage:
     - datalake_region.region.macro_region_name
-    description: macro region name (may be city name or clusters of neighborhood)
+    description: Macro region name (may be city name or clusters of neighborhood).
   city_name:
     lineage:
     - datalake_region.region.city_name
-    description: The name for the city where this region is in
+    description: The name for the city where this region is in.
   city_group:
     lineage:
     - datalake_region.region.city_group
-    description: 'A grouping of city or clusters of cities and neighborhoods (RMSP:
-      Região Metropolitana de São Paulo)'
+    description: A grouping of city or clusters of cities and neighborhoods (RMSP - Região Metropolitana de São Paulo).
   city_ddd:
     lineage:
     - datalake_region.region.city_ddd
-    description: The 2-digit telephone prefix for the city the region is in
+    description: The 2-digit telephone prefix for the city the region is in.
   region_code:
     lineage:
     - datalake_region.region.region_code
-    description: Used mainly by agents team. A region code is a grouping of several
-      sub-regions. This field is used by the agents team, for agent allocation and
-      other purposes
+    description: Used mainly by agents team. A region code is a grouping of several sub-regions. This field is used by the agents team, for agent allocation and other purposes.
   region_code_deprecated:
     lineage:
     - datalake_region.region.region_code_deprecated
-    description: Used mainly by photos team. A region code is a grouping of several
-      sub-regions. This field is used by the photos team, for photographer allocation
-      and other purposes
+    description: Used mainly by photos team. A region code is a grouping of several sub-regions. This field is used by the photos team, for photographer allocation and other purposes.
   region_code_inspector:
     lineage:
     - datalake_region.region.region_code_inspector
-    description: Used mainly by inspections team. A region code is a grouping of several
-      sub-regions. This field is used by the inspections team, for inspector allocation
-      and other purposes
+    description: Used mainly by inspections team. A region code is a grouping of several sub-regions. This field is used by the inspections team, for inspector allocation and other purposes.
   short_region_name:
     lineage:
     - datalake_region.region.short_region_name
-    description: Brazilian state acronym (SP, MG, RJ, etc.)
+    description: State acronym related to the region.
     categories:
-      BA: ''
-      BH: ''
-      DF: ''
-      ES: ''
-      GO: ''
-      MG: ''
-      PE: ''
-      PR: ''
-      RJ: ''
-      RS: ''
-      SC: ''
-      SP: ''
+      BA: Bahia.
+      BH: Belo Horizonte.
+      CDMX: Ciudad de México.
+      DF: Distrito Federal.
+      ES: Espírito Santo.
+      GO: Goiás.
+      MG: Minas Gerais.
+      PE: Pernanbuco.
+      PR: Paraná.
+      RJ: Rio de Janeiro.
+      RS: Rio Grande do Sul.
+      SC: Santa Catarina.
+      SP: São Paulo.
   greater_region:
     lineage:
     - datalake_region.region.greater_region
-    description: Deprecated. City names of cluster of cities/neighborhoods (Grande
-      São Paulo)
-    categories:
-      Campinas: ''
-      Grande São Paulo: ''
-      Rio de Janeiro: ''
+    description: Deprecated. City names of cluster of cities/neighborhoods (e.g. Grande São Paulo).
   regional:
     lineage:
     - datalake_region.region.regional
-    description: Regionals is a grouping of cities for operational purposes. Used
-      by the regionals operation team
+    description: Regionals is a grouping of cities for operational purposes. Used by the regionals operation team.
     categories:
-      GFPC: ''
-      Nordeste: ''
-      RJPB: ''
-      SPMG: ''
-      Vitória: ''
+      GFPC: City/Sub-Region is from GFPC Region.
+      International: City/Sub-Region is from International Region.
+      Nordeste: City/Sub-Region is from Nordeste Region.
+      Norte: City/Sub-Region is from Nordeste Region.
+      RJPB: City/Sub-Region is from RJPB Region.
+      SPMG: City/Sub-Region is from SPMG Region.
+      Vitória: City/Sub-Region is from Vitória Region.
   regional_deprecated:
     lineage:
     - datalake_region.region.regional_deprecated
     description: Deprecated. Regionals is a grouping of cities for operational purposes
-    categories:
-      Center: ''
-      Nordeste: ''
-      Rio South: ''
-      SPMG: ''
-      São Paulo Metro: ''
-      Vitória: ''
   regional_inspection:
     lineage:
     - datalake_region.region.regional_inspection
-    description: ''
+    description: The regional related to the inspections' operation.
     categories:
-      GSP: ''
-      MG DF NE: ''
-      RJ: ''
-      SPC: ''
-      SPI Sul: ''
+      CNN+: Inspection operation is from CNN+ Region.
+      GSP: Inspection operation is from GSP Region.
+      International: Inspection operation is from International Region.
+      MG DF NE: Inspection operation is from MG DF NE Region.
+      RIOSUL: Inspection operation is from RIOSUL Region.
+      RMSP: Inspection operation is from RMSP Region.
+      RJ: Inspection operation is from RJ Region.
+      SPC: Inspection operation is from SPC Region.
+      SPI Sul: Inspection operation is from SPI Sul Region.
   tier:
     lineage:
     - datalake_region.region.tier
-    description: Used by the regionals operation team. Cities are grouped into tiers
-      mostly by size and importance. More important cities are tier 1, follow by 2
-      and 3
+    description: Used by the regionals operation team. Cities are grouped into tiers mostly by size and importance. More important cities are tier 1, followed by 2 and 3.
   country_name:
     lineage:
     - datalake_region.region.country_name
-    description: Country name of the region
+    description: Country name of the region.
   has_rent_operation:
     lineage:
     - datalake_region.region.has_rent_operation
-    description: Boolean indicating if QuintoAndar operates with ForRent context in
-      the given region (a region can be exclusive to Rent, exclusive to Sale or served
-      by both contexts). If true, indicates that there is Rent operation in the region.
+    description: Boolean indicating if QuintoAndar operates with ForRent context in the given region (a region can be exclusive to Rent, Sale or served by both contexts). If true, indicates that there is Rent operation in the region.
   has_sale_operation:
     lineage:
     - datalake_region.region.has_sale_operation
-    description: Boolean indicating if QuintoAndar operates with ForSale context in
-      the given region (a region can be exclusive to Rent, exclusive to Sale or served
-      by both contexts). If true, indicates that there is Sale operation in the region.
+    description: Boolean indicating if QuintoAndar operates with ForSale context in the given region (a region can be exclusive to Rent, Sale or served by both contexts). If true, indicates that there is Sale operation in the region.
   dt_first_booking:
     lineage:
     - datalake_booking.booking.dt_booking
-    description: Date of the first booking in this region
+    description: Date of the first booking in this region.
   dt_first_property_created:
     lineage:
     - datalake_ebdb_listing.house.dt_creation
-    description: Date of the first QuintoAndar property listing created in this region
+    description: Date of the first QuintoAndar property listing created in this region.
   dt_created:
     lineage:
     - datalake_region.region.ts_created
-    description: Date when region was created
+    description: Date when region was created.
   dt_updated:
     lineage:
     - datalake_region.region.ts_updated
-    description: Date when region was last updated
+    description: Date when region was last updated.
   dt_timestamp:
-    description: Timestamp of when table was last loaded
+    description: Timestamp of when table was last loaded.
