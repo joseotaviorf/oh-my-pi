@@ -36,6 +36,7 @@ columns:
       - datalake_jaiminho_clean.user_notifications.channel
       - datalake_wololo_prospect.prospect_calls.channel
   contact_extra_info:
+    lineage:
       - datalake_jaiminho_clean.user_notifications.id
       - datalake_jaiminho_clean.user_notifications.template
       - datalake_jaiminho_clean.user_notifications.tags

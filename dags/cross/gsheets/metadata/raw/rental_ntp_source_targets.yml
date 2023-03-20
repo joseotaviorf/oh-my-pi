@@ -3,27 +3,3 @@ table_name: rental_ntp_source_targets
 owner: '@data-growth'
 domain: Growth
 description: Table created from a Google Sheets file in order to input new tenant prospects and recovered tenant prospects targets into datalake
-columns:
-- tier:
-    description: Group of city groups related to ***
-    category: tier
-- city_group:
-    description: City group of the target
-- mkt_origin:
-    description: Level of the Growth Marketing Taxonomy
-- mkt_channel:
-    description: Level of the Growth Marketing Taxonomy
-- mkt_medium:
-    description: Level of the Growth Marketing Taxonomy
-- mkt_source:
-    description: Level of the Growth Marketing Taxonomy
-- ntp_target:
-    description: nTP target
-- rtp_target:
-    description: rTP target
-- date:
-    description: Date of the target
-- month:
-    description: Month of the target
-- year: 
-    description: Year of the target
