@@ -1,0 +1,37 @@
+database_name: datalake_quinto_messenger
+table_name: chat
+description: " "
+domain: Support and Service
+owner: william.angelo@quintoandar.com.br
+columns:
+  id_chat:
+    lineage:
+      - datalake_quinto_messenger_clean.chat.id
+    description: ID of the chat on QuintoMessenger
+  id_channel:
+    lineage:
+      - datalake_quinto_messenger_clean.chat.attributes
+    description: Twilio's channel ID
+  id_session:
+    lineage:
+      - datalake_quinto_messenger_clean.chat.source_id
+    description: Sauron's session ID
+  source:
+    lineage:
+      - datalake_quinto_messenger_clean.chat.source
+    description: Origin of the chat session
+  session_status:
+    lineage:
+      - datalake_quinto_messenger_clean.chat.status
+    description: Status of the chat session
+    categories:
+      active: "Session is still active, customer can still contact support through the same session"
+      closed: "Session closed, a new contact by the customer will create a new session"
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger_clean.chat.ts_created
+    description: "Date and time representing when the task was created"
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_clean.chat.ts_updated
+    description: "Date and time of the last update to the task"
