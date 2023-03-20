@@ -1,2 +1,21 @@
 database_name: datalake_gsheets_raw
 table_name: sale_flows_targets
+owner: '@data-growth'
+domain: Growth
+description: Table created from a Google Sheets file in order to input sale_flows targets into datalake
+columns:
+- city_group:
+    description: City group of the rent flow target
+- sf_target: 
+    description: Sale flow target
+- sf_type:
+    description: Sale flow specification
+    category: sf_type
+- week_start:
+    description: Week start of the sale flow target
+- month: 
+    description: Month of the sale flow target
+- year: 
+    description: Year of the sale flow target
+- date:
+    description: Date of the sale flow target

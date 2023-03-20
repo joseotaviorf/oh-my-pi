@@ -1,36 +1,50 @@
 database_name: datalake_gsheets_clean
 table_name: rental_ntp_source_targets
+owner: '@data-growth'
+domain: Growth
+description: Transformed table created from a Google Sheets file in order to input new tenant prospects and recovered tenant prospects targets into datalake
 columns:
   tier:
+    description: Group of city groups related to ***
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.tier
   city_group:
+    description: City group of the target
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.city_group
   mkt_channel:
+    description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.mkt_channel
   mkt_medium:
+    description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.mkt_medium
   mkt_source:
+    description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.mkt_source
   ntp_target:
+    description: nTP target
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.ntp_target
   rtp_target:
+    description: rTP target
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.rtp_target
   week_start:
+    description: Week of the target
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.week_start
   month:
+    description: Month of the target
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.month
   year:
+    description: Year of the target
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.year
   dt_target:
+    description: Date of the target
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.date

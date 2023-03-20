@@ -1,22 +1,31 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: rental_tof_weekly_targets
+owner: '@data-growth'
+domain: Growth
+description: Trasnformed table created from a Google Sheets file in order to input weekly top of funnel targets into datalake
 columns:
   city_group:
+    description: City group of the target
     lineage:
       - datalake_gsheets_raw.rental_tof_weekly_targets.city_group
   mkt_channel:
+    description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_raw.rental_tof_weekly_targets.mkt_channel
   mkt_medium:
+    description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_raw.rental_tof_weekly_targets.mkt_medium
   mkt_source:
+    description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_raw.rental_tof_weekly_targets.mkt_source
   tof_users_target:
+    description: ToF users target
     lineage:
       - datalake_gsheets_raw.rental_tof_weekly_targets.tof_users_target
   dt_week_started:
+    description: Week start of the target
     lineage:
       - datalake_gsheets_raw.rental_tof_weekly_targets.week_start

@@ -1,31 +1,42 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: rental_tof_daily_targets
+owner: '@data-growth'
+domain: Growth
+description: Transformed table created from a Google Sheets file in order to input daily top of funnel targets into datalake
 columns:
   daily_tof_target:
+    description: ToF users target
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.daily_tof_target
   city_group:
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.city_group
   mkt_channel:
+    description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.mkt_channel
   mkt_medium:
+    description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.mkt_medium
   mkt_source:
+    description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.mkt_source
   day:
+    description: Day of the target
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.dia
   dt_week_started:
+    description: Week start of the target
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.week_start
   month:
+    description: Month of the target
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.month
   dt_target:
+    description: Date of the target
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.date

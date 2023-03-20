@@ -1,5 +1,5 @@
-database_name: dw_datamarts_growth_cross
-table_name: performance_marketing_metrics_demand
+database_name: dw_datamarts_growth
+table_name: sale_performance_marketing_metrics_demand
 owner: '@data-growth'
 domain: Growth
 description: Table that contains data from tenant prospects, targets and marketing cost by growth marketing Taxonomy
