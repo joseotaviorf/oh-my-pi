@@ -1,3 +1,11 @@
+/**
+We are filtering out the account names MX - Demand, MX - Institucional and MX - Supply  because they were created
+using mexican pesos (MXD) as a currency, which was conflicting with the rest of the sources (e.g. Facebook, Lifull, etc.).
+
+On march/2023, the Growth Benvi team decided to create new Google Ads accounts in order to update the currency to dollars (USD).
+The old accounts should not be counted inside the automatic costs' pipeline, since it was decided to be manually inputed through
+sheets on the manual costs' pipeline, and that's why we're filtering here.
+**/
 WITH campaign_reports AS (
         SELECT
             DISTINCT campaign_name,
@@ -9,7 +17,8 @@ WITH campaign_reports AS (
         FROM
             datalake_mexico_google_ads.ads_performance
         WHERE
-            dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+            account_snake_case NOT IN ('mx_demand', 'mx_institucional', 'mx_supply')
+            AND dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         UNION ALL
         SELECT
             DISTINCT campaign_name,
@@ -21,7 +30,8 @@ WITH campaign_reports AS (
         FROM
             datalake_mexico_google_ads.keywords_performance
         WHERE
-            dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+            account_snake_case NOT IN ('mx_demand', 'mx_institucional', 'mx_supply')
+            AND dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
             AND id_keyword NOT BETWEEN 3000000 AND 3000006 -- these campaigns should be extracted from ADS report
         UNION ALL
         SELECT
@@ -34,7 +44,8 @@ WITH campaign_reports AS (
         FROM
             datalake_mexico_google_ads.campaigns_performance
         WHERE
-            dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+            account_snake_case NOT IN ('mx_demand', 'mx_institucional', 'mx_supply')
+            AND dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         UNION ALL
         SELECT
             DISTINCT campaign_name,
@@ -46,7 +57,8 @@ WITH campaign_reports AS (
         FROM
             datalake_mexico_google_ads.videos_performance
         WHERE
-            dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+            account_snake_case NOT IN ('mx_demand', 'mx_institucional', 'mx_supply')
+            AND dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     ),
     report_type_mapping AS (
         SELECT
@@ -104,7 +116,8 @@ keywords_metrics AS (
             AND rtm.device = gkpr.device
             AND rtm.ad_network_type = gkpr.ad_network_type
     WHERE
-        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        account_snake_case NOT IN ('mx_demand', 'mx_institucional', 'mx_supply')
+        AND dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
         1,2,3,4,5,6,7,8
 ),
@@ -161,7 +174,8 @@ ads_metrics AS (
         ad_type_flags AS ad_types
             ON ad_types.ad_type = gapr.ad_type
     WHERE
-        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        account_snake_case NOT IN ('mx_demand', 'mx_institucional', 'mx_supply')
+        AND dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
         1, 2, 3, 4, 5, 6, 7, 8
 ),
@@ -198,7 +212,8 @@ campaigns_metrics AS (
             AND rtm.device = gcpr.device
             AND rtm.ad_network_type = gcpr.ad_network_type
     WHERE
-        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        account_snake_case NOT IN ('mx_demand', 'mx_institucional', 'mx_supply')
+        AND dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
         1, 2, 3, 4, 5, 6, 7, 8
 ),
@@ -235,7 +250,8 @@ videos_metrics AS (
             AND rtm.device = gvpr.device
             AND rtm.ad_network_type = gvpr.ad_network_type
     WHERE
-        dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        account_snake_case NOT IN ('mx_demand', 'mx_institucional', 'mx_supply')
+        AND dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
         1, 2, 3, 4, 5, 6, 7, 8
 )
