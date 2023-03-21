@@ -65,8 +65,9 @@ SELECT
 FROM
     datalake_itbi_clean.itbi_sp AS i
 LEFT JOIN 
-    datalake_zipcodes.zipcodes_sp AS c 
+    datalake_zipcodes.zipcodes AS c 
         ON c.zipcode = CAST((LEFT(i.address_zipcode, 5) || '-' || RIGHT(i.address_zipcode, 3)) AS STRING) 
+        AND c.city_name = 'São Paulo'
 WHERE 
     transaction_nature = '1.Compra e venda'
     AND ((TRIM(iptu_standard_description) = 'COMERCIAL HORIZONTAL' AND TRIM(iptu_use_description) IN ('RESIDÊNCIA','RESIDÊNCIA COLETIVA, EXCLUSIVE CORTIÇO (MAIS DE UMA RESIDÊNCIA NO LOTE)', 'RESIDÊNCIA E OUTRO USO (PREDOMINÂNCIA RESIDENCIAL)')) 

@@ -10,7 +10,7 @@ columns:
       - datalake_itbi_clean.itbi_sp.house_registry_number
   id_region:
     lineage:
-      - datalake_zipcodes.zipcodes_sp.id_region
+      - datalake_zipcodes.zipcodes.id_region
   address_complement:
     lineage:
       - datalake_itbi_clean.itbi_sp.complement

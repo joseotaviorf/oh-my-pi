@@ -1896,7 +1896,7 @@ bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.hubspot:load-clean-company
 
 bietlejuice.enrich_open_external_data:
-  - bietlejuice.enrich_zipcodes:load-enrich-zipcodes-sp
+  - bietlejuice.enrich_zipcodes:load-enrich-zipcodes
 
 bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-monday

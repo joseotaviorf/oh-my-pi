@@ -2,7 +2,7 @@
 
 ### Purpose
 
-Creates enriched tables for `zipcode_sp`.
+Creates enriched tables for `zipcode`.
 
 ​<details>
 
@@ -18,6 +18,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables in `datalake_zipcodes`:
 
 **Fully:**
-- `zipcodes_sp`
+- `zipcodes`
 
 </details>

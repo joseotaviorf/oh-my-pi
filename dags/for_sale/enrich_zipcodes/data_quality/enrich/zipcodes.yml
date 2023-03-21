@@ -1,5 +1,5 @@
 ---
-table_name: datalake_zipcodes.zipcodes_sp
+table_name: datalake_zipcodes.zipcodes
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
