@@ -69,7 +69,8 @@ columns:
   buyer_intention:
     lineage:
     - datalake_booking.booking.buyer_intention
-    description: ''
+    description: Lists the buyers intention for the property (if the person was buying to
+      live in the property or as an investment)
   type:
     lineage:
     - datalake_booking.booking.type
@@ -90,7 +91,8 @@ columns:
   performed:
     lineage:
     - datalake_booking.booking.is_visit_performed
-    description: ''
+    description: If the visit was performed by the agent. A visit can be performed but
+      not completed (e.g. unauthorized entry or the visitor didn't show up)
     categories:
       'FALSE': '#N/A'
       'TRUE': '#N/A'
@@ -109,6 +111,8 @@ columns:
   is_first_booking_auto:
     lineage:
     - datalake_booking.booking.is_first_booking_auto
+    description: If the booking was originaly created through planner (program that
+      allocates 5A personnel to inspections and jobs)
   flg_branded:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.is_branded
@@ -135,11 +139,11 @@ columns:
   is_visit_created_from_app:
     lineage:
     - datalake_booking.booking.is_visit_created_from_app
-    description: ''
+    description: If the visit was created using the app
   is_visit_last_updated_from_app:
     lineage:
     - datalake_booking.booking.is_visit_last_updated_from_app
-    description: ''
+    description: If the visit was last updated using the app
   visit_follow_up:
     lineage:
     - datalake_booking.booking.visit_fup
@@ -380,12 +384,15 @@ columns:
   user_sale_booking_creator:
     lineage:
     - datalake_booking.booking.user_sale_booking_creator
+    description: Type of user that created the booking (for sale)
   partner_3p_supply:
     lineage:
     - datalake_booking.booking.partner_3p_supply
+    description: Name of the partner that supplied the property
   partner_3p_demand:
     lineage:
     - datalake_booking.booking.partner_3p_demand
+    description: Name of the partner from which comes the demand
   app_type:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.app_type
@@ -403,7 +410,7 @@ columns:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.media_source
     - datalake_tracked_events.attribution_cross_channel.final_attribution_media_source
-    description: ''
+    description: Type of media source from which comes the booking
   utm_source:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.utm_source
@@ -624,6 +631,7 @@ columns:
   final_attribution_origin:
     lineage:
     - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
+    description: Final attribution origin of the booking
   mkt_category:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.id
@@ -711,15 +719,19 @@ columns:
   is_3p_supply:
     lineage:
     - datalake_booking.booking.is_3p_supply
+    description: If the property was supplied by a partner
   is_3p_supply_5a:
     lineage:
     - datalake_booking.booking.is_3p_supply_5a
+    description: If the property was supplied by a QuintoAndar partner (except from Belo Horizonte city, in Brazil)
   is_3p_supply_bh:
     lineage:
     - datalake_booking.booking.is_3p_supply_bh
+    description: If the property was supplied by a Belo Horizonte partner (BH is a city from Brazil).
   is_3p_demand:
     lineage:
     - datalake_booking.booking.is_3p_demand
+    description: If the demand comes from a partner
   dt_visit_follow_up:
     lineage:
     - datalake_booking.booking.ts_visit_fup
