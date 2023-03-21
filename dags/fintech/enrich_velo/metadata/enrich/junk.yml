@@ -1,13 +1,29 @@
+---
 database_name: datalake_velo
 table_name: junk
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: Junk table to Velo model
 columns:
+  id_junk:
+    description: Table's unique ID.
+  id_master_type:
+    description: Table's Master Type ID.
   id_lvl_1:
+    description: First level category ID.
     lineage:
       - datalake_velo_clean.fiancavelo_proposestatus.id
       - datalake_velo_clean.fiancavelo_status.id
       - datalake_velo_clean.fiancavelo_proposetype.id
+      - datalake_velo_clean.fiancavelo_occurrencestatus.id
+      - datalake_velo_clean.fiancavelo_occurrencetype.id
+  desc_master_type:
+    description: Master Type description.
   desc_lvl_1:
+    description: First level category description.
     lineage:
       - datalake_velo_clean.fiancavelo_proposestatus.name
       - datalake_velo_clean.fiancavelo_status.name
       - datalake_velo_clean.fiancavelo_proposetype.name
+      - datalake_velo_clean.fiancavelo_occurrencestatus.name
+      - datalake_velo_clean.fiancavelo_occurrencetype.name

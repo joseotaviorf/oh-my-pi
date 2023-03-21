@@ -14,10 +14,12 @@ Produces the following output tables, via full load:
 
 - `broker`
 - `house`
+- `payment`
 - `propose`
 - `propose_company`
 - `propose_person`
 - `propose_values`
+- `occurrence`
 - `user`
 - `transaction_entries`
 - `transaction_category`

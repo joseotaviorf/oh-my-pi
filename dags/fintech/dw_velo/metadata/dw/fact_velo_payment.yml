@@ -73,6 +73,10 @@ columns:
     description: Boolean flag for when dt_due has been modified.
     lineage:
       - datalake_velo.payment.is_due_modified
+  is_occurrence:
+    description: Boolean flag for when the is an occurrence linked to this invoice.
+    lineage:
+      - datalake_velo.payment.is_occurrence
   dt_created:
     description: Date that invoice was created.
     lineage:

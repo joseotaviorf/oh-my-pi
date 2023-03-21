@@ -76,6 +76,24 @@ WITH cte_join AS (
     FROM
         datalake_velo_clean.fiancavelo_gateway
     )
+    UNION ALL
+    (
+    SELECT
+        'Occurrence Status' AS desc_master_type,
+        id AS id_lvl_1,
+        name AS desc_lvl_1
+    FROM
+        datalake_velo_clean.fiancavelo_occurrencestatus
+    )
+    UNION ALL
+    (
+    SELECT
+        'Occurrence Type' AS desc_master_type,
+        id AS id_lvl_1,
+        name AS desc_lvl_1
+    FROM
+        datalake_velo_clean.fiancavelo_occurrencetype
+    )
 ),
 cte_id_master_type AS (
     SELECT

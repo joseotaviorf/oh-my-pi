@@ -31,7 +31,9 @@ This pipeline produces the following output model, in DW schema `velo`, via full
 - `dim_velo_transaction_category`
 - `dim_velo_transaction`
 - `dim_velo_user`
+- `fact_velo_payment`
 - `fact_velo_propose`
 - `fact_velo_transaction_entries`
+- `fact_velo_occurrence`
 ​
 </details>

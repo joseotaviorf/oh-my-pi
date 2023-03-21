@@ -69,6 +69,8 @@ columns:
     description: Boolean flag for when dt_paid if after dt_due.
   is_due_modified:
     description: Boolean flag for when dt_due has been modified.
+  is_occurrence:
+    description: Boolean flag for when there is an occurrence related to this invoice.
   dt_created:
     description: Date that invoice was created.
     lineage:

@@ -264,7 +264,17 @@ payments_metrics AS (
   FROM
     datalake_velo.payment
   GROUP BY 1
-
+),
+occurrence_metrics AS (
+  SELECT
+    id_propose,
+    SUM(IF(paid_amount IS NOT NULL, paid_amount, 0)) AS total_occurrences_paid_amount,
+    SUM(due_amount) AS total_occurrences_due_amount,
+    COUNT(id_occurrence) AS total_occurrences,
+    COUNT(ts_paid) AS occurrences_solved
+  FROM
+    datalake_velo.occurrence AS o
+  GROUP BY 1
 )
 SELECT
   p.id AS id_propose,
@@ -290,9 +300,13 @@ SELECT
   pym.total_expected_amount,
   pym.total_due_amount,
   -- pym.lmi,
+  om.total_occurrences_due_amount,
+  om.total_occurrences_paid_amount,
   pym.total_payments,
   pym.total_payments_paid,
   pym.total_payments_expired,
+  om.total_occurrences,
+  om.occurrences_solved,
   f.id IS NOT NULL AS is_contract,
   IFNULL(DATEDIFF(COALESCE(DATE(pcd.ts_ended), f.dt_ended), DATE(f.dt_begin)) <= 10, False) AS is_grace_period_cancelled,
   pym.dt_last_payment,
@@ -326,6 +340,9 @@ lEFT JOIN
 lEFT JOIN
   payments_metrics AS pym
     ON pym.id_propose = p.id
+lEFT JOIN
+  occurrence_metrics AS om
+    ON om.id_propose = p.id
 LEFT JOIN
   datalake_velo.junk AS jk1
     ON jk1.id_lvl_1 = p.id_status

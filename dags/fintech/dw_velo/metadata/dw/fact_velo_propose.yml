@@ -88,6 +88,12 @@ columns:
   total_due_amount:
     lineage:
     - datalake_velo.propose.total_due_amount
+  total_occurrences_due_amount:
+    lineage:
+    - datalake_velo.propose.total_occurrences_due_amount
+  total_occurrences_paid_amount:
+    lineage:
+    - datalake_velo.propose.total_occurrences_paid_amount
   total_payments:
     lineage:
     - datalake_velo.propose.total_payments
@@ -97,6 +103,12 @@ columns:
   total_payments_expired:
     lineage:
     - datalake_velo.propose.total_payments_expired
+  total_occurrences:
+    lineage:
+    - datalake_velo.propose.total_occurrences
+  occurrences_solved:
+    lineage:
+    - datalake_velo.propose.occurrences_solved
   is_contract:
     lineage:
     - datalake_velo.propose.is_contract

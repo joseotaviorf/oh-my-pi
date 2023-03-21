@@ -1,0 +1,67 @@
+---
+database_name: datalake_velo
+table_name: occurrence
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: Enriched table responsible for the occurrence context of Velo
+columns:
+  id_occurrence:
+    description: Table's unique ID.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.id
+  id_propose:
+    description: ID connecting table to propose table.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.id_propose
+  id_payment:
+    description: ID connecting table to payment table, if relation exists.
+    lineage:
+      - datalake_velo_clean.fiancavelo_payment.id
+  id_client:
+    description: ID connecting table to propose_person table.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.id_tenant
+  id_occurrence_type:
+    description: ID connecting table to junk table.
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_occurrence_status:
+    description: ID connecting table to junk table.
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_unicid:
+    description: Business ID for UNICID.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.unicid
+  description:
+    description: Description comments for this occurrence.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.description
+  invoice_url:
+    description: URL of charged invoice.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.invoice_url
+  due_amount:
+    description: Amount that is due.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.value
+  due_amount_original:
+    description: Amount that was originally due.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.original_value
+  paid_amount:
+    description: Amount that was paid.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.paid_value
+  is_valid:
+    description: Boolean flag for when this occurrence is valid to be used on any business process. Usually a visible register but that does not follows a specific business flow yet.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.is_valid
+  dt_due:
+    description: Date that occurrence is/was due.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.dt_due
+  ts_created:
+    description: Timestamp that the occurrence was created.
+    lineage:
+      - datalake_velo_clean.fiancavelo_occurrence.ts_inserted

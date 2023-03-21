@@ -6,5 +6,9 @@ inner_dependencies:
   propose:
     - junk
     - payment
+    - occurrence
   payment:
+    - junk
+    - occurrence
+  occurrence:
     - junk

@@ -16,6 +16,7 @@ SELECT
     takerate_amount,
     is_paid_late,
     is_due_modified,
+    is_occurrence,
     dt_created,
     dt_due,
     dt_due_original,

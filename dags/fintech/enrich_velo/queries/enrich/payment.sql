@@ -46,6 +46,13 @@ propose_values AS (
     LEFT JOIN
         datalake_velo_clean.fiancavelo_plans AS pl
         ON pl.id = p.id_plan
+),
+occurrence AS (
+    SELECT DISTINCT
+        id_occurrence,
+        id_payment
+    FROM
+        datalake_velo.occurrence
 )
 SELECT
     p.id_payment,
@@ -65,6 +72,7 @@ SELECT
     p.net_amount * (pv.plan_percent/100) AS takerate_amount,
     p.dt_paid > p.dt_due AS is_paid_late,
     p.dt_due_original IS NOT NULL AND p.dt_due_original <> p.dt_due AS is_due_modified,
+    ISNOTNULL(o.id_occurrence) AS is_occurrence,
     p.dt_created,
     p.dt_due,
     p.dt_due_original,
@@ -85,6 +93,9 @@ LEFT JOIN
 LEFT JOIN
     pack_values AS pk
         ON pk.id_propose = fp.id
+LEFT JOIN
+    occurrence AS o
+        ON o.id_occurrence = p.id_payment
 LEFT JOIN
     datalake_velo_raw.fiancavelo_plans AS pl
         ON pl.id = fp.plan
