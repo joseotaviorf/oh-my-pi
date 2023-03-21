@@ -38,10 +38,16 @@ def fetch_convenia_inactive_employees(host, token):
     return results
 
 
-def create_df_from_inactive_employees(results, spark_client):
+def create_df_from_inactive_employees(results, spark_client, token_name):
     rows = []
     for employee in results:
-        rows.append(Row(id=str(employee["id"]), dismissal=str(employee["dismissal"])))
+        rows.append(
+            Row(
+                id=str(employee["id"]),
+                dismissal=str(employee["dismissal"]),
+                source=token_name,
+            )
+        )
 
     if not rows:
         rows = create_df_schema()
@@ -55,6 +61,7 @@ def create_df_schema():
         [
             StructField("id", StringType(), True),
             StructField("dismissal", StringType(), True),
+            StructField("source", StringType(), True),
         ]
     )
 
@@ -94,7 +101,7 @@ if __name__ == "__main__":
 
     result = create_df_schema()
 
-    for item, details in credentials.items():
+    for token_name, details in credentials.items():
         host = details["host"]
         api_token = details["token"]
         convenia_inactive_employees_result = fetch_convenia_inactive_employees(
@@ -102,7 +109,7 @@ if __name__ == "__main__":
         )
         spark_client = SparkClient()
         df = create_df_from_inactive_employees(
-            convenia_inactive_employees_result, spark_client
+            convenia_inactive_employees_result, spark_client, token_name
         )
         result = df.union(result)
 

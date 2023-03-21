@@ -125,6 +125,10 @@ columns:
     description: Employee's emergency contacts (can be more than one)
     lineage:
       - datalake_convenia_details_raw.active_employee_details.emergency_contacts
+  source:
+    description: API Key source
+    lineage:
+      - datalake_convenia_details_raw.active_employee_details.source
   is_first_job:
     description: Binary data if this is the employee's first job
     lineage:

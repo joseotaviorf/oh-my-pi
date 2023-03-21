@@ -14,3 +14,7 @@ columns:
     tags:
       - Confidential
       - PII
+  source:
+    tags:
+      - Confidential
+      - PII

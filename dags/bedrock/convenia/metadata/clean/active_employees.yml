@@ -1,19 +1,31 @@
 ---
 database_name: datalake_convenia_clean
 table_name: active_employees
+owner: matheus.ferreira@quintoandar.com.br
+domain: bedrock
+description: General information from active employees
 columns:
   id:
+    description: Employee's id in convenia system
     lineage:
       - datalake_convenia_raw.active_employees.id
   name:
+    description: Employee's name
     lineage:
       - datalake_convenia_raw.active_employees.name
   last_name:
+    description: Employee's last name
     lineage:
       - datalake_convenia_raw.active_employees.last_name
   email:
+    description: Employee's email
     lineage:
       - datalake_convenia_raw.active_employees.email
+  source:
+    description: API Key source
+    lineage:
+      - datalake_convenia_raw.active_employees.source
   dt_hiring:
+    description: Employee's hiring date
     lineage:
       - datalake_convenia_raw.active_employees.dt_hiring

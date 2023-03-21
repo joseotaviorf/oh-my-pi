@@ -38,7 +38,7 @@ def fetch_convenia_active_employees(host, token):
     return results
 
 
-def create_df_from_active_employees(results, spark_client):
+def create_df_from_active_employees(results, spark_client, token_name):
     rows = []
     for employee in results:
         rows.append(
@@ -48,6 +48,7 @@ def create_df_from_active_employees(results, spark_client):
                 last_name=employee["last_name"],
                 email=employee["email"],
                 dt_hiring=employee["hiring_date"],
+                source=token_name,
             )
         )
 
@@ -66,6 +67,7 @@ def create_df_schema():
             StructField("last_name", StringType(), True),
             StructField("email", StringType(), True),
             StructField("dt_hiring", StringType(), True),
+            StructField("source", StringType(), True),
         ]
     )
 
@@ -105,13 +107,15 @@ if __name__ == "__main__":
 
     result = create_df_schema()
 
-    for item, details in credentials.items():
+    for token_name, details in credentials.items():
         host = details.get("host")
         api_token = details.get("token")
 
         active_employees_response = fetch_convenia_active_employees(host, api_token)
         spark_client = SparkClient()
-        df = create_df_from_active_employees(active_employees_response, spark_client)
+        df = create_df_from_active_employees(
+            active_employees_response, spark_client, token_name
+        )
         result = df.union(result)
 
     df = SparkDataFrameService().input(result).convert_array_type_to_json().output()

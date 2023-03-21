@@ -29,6 +29,7 @@ SELECT
     educations,
     experience_period,
     emergency_contacts,
+    source,
     first_job AS is_first_job,
     time_tracking AS has_time_tracking,
     birth_date AS dt_birth,

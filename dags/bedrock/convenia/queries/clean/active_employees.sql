@@ -3,6 +3,7 @@ SELECT
     name,
     last_name,
     email,
+    source,
     dt_hiring
 FROM
     datalake_convenia_raw.active_employees
