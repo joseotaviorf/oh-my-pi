@@ -1,6 +1,8 @@
 SELECT
     id_status_change AS sk_status_event,
+    lsk.sk_lead_3p * 100 + IF(lsc.business_context = 'SALE', 0, 1) AS sk_lead_3p_flow, -- For now, Sale will be version 0, and Rent will be version 1
     lsk.sk_lead_3p AS sk_lead_3p,
+    COALESCE(dl3c.sk_lead_3p_context, -1) AS sk_lead_3p_context,
     COALESCE(fsk.sk_file, -1) AS sk_file,
     COALESCE(csk.sk_company, -1) AS sk_company,
     COALESCE(lsc.id_house, -1) AS sk_house,
@@ -33,3 +35,7 @@ LEFT JOIN
     datalake_rede_company.company_sks AS csk
     ON (lsc.id_company_hubspot IS NOT NULL AND csk.id_hubspot = lsc.id_company_hubspot)
     OR (lsc.id_company_hubspot IS NULL AND csk.extracted_3p_tag = COALESCE(NULLIF(l3p.cnpj, 'Não informado'), 'Unknown'))
+LEFT JOIN
+    dw_rede.dim_lead_3p_context AS dl3c
+        ON lsc.business_context = dl3c.business_context
+        AND IF(lsc.business_context = 'SALE', l3p.sale_recurrency_type, l3p.rent_recurrency_type) = dl3c.recurrency_type

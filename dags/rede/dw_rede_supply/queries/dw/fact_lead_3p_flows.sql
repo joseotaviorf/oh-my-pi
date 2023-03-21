@@ -1,6 +1,7 @@
 WITH funnel AS (
     SELECT
         id_lead_3p,
+        business_context,
         LEAST(ts_lead, ts_prospect, ts_qualified, ts_opportunity, ts_first_listing) AS ts_lead,
         LEAST(ts_prospect, ts_qualified, ts_opportunity, ts_first_listing) AS ts_prospect,
         LEAST(ts_qualified, ts_opportunity, ts_first_listing) AS ts_qualified,
@@ -9,6 +10,7 @@ WITH funnel AS (
     FROM (
         SELECT
             id_lead_3p,
+            business_context,
             growth_status,
             ts_status_started
         FROM
@@ -36,14 +38,17 @@ updates AS (
 first_registered AS (
     SELECT
         id_lead_3p,
+        business_context,
         MIN(CASE WHEN status = 'REGISTERED' THEN ts_status_started END) AS ts_registered,
         MIN(CASE WHEN status = 'UNPUBLISHED' THEN ts_status_started END) AS ts_first_unpublished
     FROM
         datalake_rede_supply.lead_3p_status_changes
-    GROUP BY 1
+    GROUP BY 1, 2
 )
 SELECT
+    lsk.sk_lead_3p * 100 + IF(f.business_context = 'SALE', 0, 1) AS sk_lead_3p_flow, -- For now, Sale will be version 0, and Rent will be version 1
     lsk.sk_lead_3p,
+    COALESCE(dl3c.sk_lead_3p_context, -1) AS sk_lead_3p_context,
     COALESCE(fsk.sk_file, -1) AS sk_file,
     COALESCE(csk.sk_company, -1) AS sk_company,
     ls.sk_lead_3p_status,
@@ -73,6 +78,7 @@ FROM
 LEFT JOIN
     first_registered AS fr
         ON f.id_lead_3p = fr.id_lead_3p
+        AND f.business_context = fr.business_context
 JOIN
     datalake_brokers_supply_processor.lead_3p AS l3p
         ON f.id_lead_3p = l3p.id
@@ -85,6 +91,7 @@ LEFT JOIN
 JOIN
     datalake_rede_supply.lead_3p_status_changes AS lsc
         ON f.id_lead_3p = lsc.id_lead_3p
+        AND f.business_context = lsc.business_context
         AND lsc.ts_status_ended IS NULL
 JOIN
     datalake_rede_supply.lead_3p_sks AS lsk
@@ -103,3 +110,7 @@ LEFT JOIN
     datalake_rede_company.company_sks AS csk
         ON (lsc.id_company_hubspot IS NOT NULL AND csk.id_hubspot = lsc.id_company_hubspot)
         OR (lsc.id_company_hubspot IS NULL AND csk.extracted_3p_tag = COALESCE(NULLIF(l3p.cnpj, 'Não informado'), 'Unknown'))
+LEFT JOIN
+    dw_rede.dim_lead_3p_context AS dl3c
+        ON f.business_context = dl3c.business_context
+        AND IF(f.business_context = 'SALE', l3p.sale_recurrency_type, l3p.rent_recurrency_type) = dl3c.recurrency_type

@@ -23,6 +23,7 @@ first_time_for_status AS (
     FROM (
         SELECT
             id_lead_3p,
+            business_context,
             COALESCE(
                 status, 
                 CASE
@@ -56,7 +57,7 @@ status_changes AS (
         sc.id_lead_3p,
         sc.id_file,
          CASE
-            WHEN sc.status = 'REGISTERED' THEN FIRST(id_house, TRUE) OVER (PARTITION BY sc.id_lead_3p ORDER BY sc.ts_status_started)
+            WHEN sc.status = 'REGISTERED' THEN FIRST(id_house, TRUE) OVER (PARTITION BY sc.id_lead_3p, sc.business_context ORDER BY sc.ts_status_started)
             ELSE id_house 
         END AS id_house,
         sc.business_context,
@@ -78,13 +79,21 @@ status_changes AS (
     JOIN
         first_time_for_status AS ft
             ON ft.id_lead_3p = sc.id_lead_3p
+            AND ft.business_context = sc.business_context
+    QUALIFY
+        LAG(
+            COALESCE(sc.status, sc.listing_status)
+        ) OVER (
+            PARTITION BY sc.id_lead_3p, sc.business_context ORDER BY sc.ts_status_started
+        ) IS DISTINCT FROM COALESCE(sc.status, sc.listing_status)
+        OR LAG(growth_status) OVER (PARTITION BY sc.id_lead_3p, sc.business_context ORDER BY sc.ts_status_started) IS DISTINCT FROM growth_status
 ),
 status_ended_aux AS (
     SELECT
         id_status_change,
         id_lead_3p,
-        LAST(id_file, TRUE) OVER (PARTITION BY id_lead_3p ORDER BY ts_status_started) AS id_file,
-        LAST(id_house, TRUE) OVER (PARTITION BY id_lead_3p ORDER BY ts_status_started) AS id_house,
+        LAST(id_file, TRUE) OVER (PARTITION BY id_lead_3p, business_context ORDER BY ts_status_started) AS id_file,
+        LAST(id_house, TRUE) OVER (PARTITION BY id_lead_3p, business_context ORDER BY ts_status_started) AS id_house,
         business_context,
         COALESCE(status, listing_status) AS status,
         growth_status,
@@ -92,7 +101,7 @@ status_ended_aux AS (
         is_ineligible,
         is_discarded,
         ts_status_started,
-        LEAD(ts_status_started) OVER (PARTITION BY id_lead_3p ORDER BY ts_status_started) AS ts_status_ended
+        LEAD(ts_status_started) OVER (PARTITION BY id_lead_3p, business_context ORDER BY ts_status_started) AS ts_status_ended
     FROM
         status_changes
     WHERE
@@ -122,6 +131,3 @@ JOIN
 LEFT JOIN
     partner_agencies_aux AS paa
         ON paa.cnpj = l.cnpj
-QUALIFY
-    LAG(sea.status) OVER (PARTITION BY sea.id_lead_3p, sea.business_context ORDER BY sea.ts_status_started) IS DISTINCT FROM sea.status
-    OR LAG(sea.growth_status) OVER (PARTITION BY sea.id_lead_3p, sea.business_context ORDER BY sea.ts_status_started) IS DISTINCT FROM sea.growth_status

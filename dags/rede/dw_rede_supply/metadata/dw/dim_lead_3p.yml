@@ -1,3 +1,4 @@
+---
 database_name: dw_rede
 table_name: dim_lead_3p
 description: A Lead 3P is a property from a real estate agency in Rede QuintoAndar,
@@ -18,20 +19,75 @@ columns:
   status:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.status
-    description: Status of the lead in Supply Processor, such as "NOT_CONVERTED",
-      "WAITING", "PROCESSING" or "REGISTERED". Can also be the status of the listing
-      after publication, such as "PUBLISHED" or "UNPUBLISHED".
+    description: 'Status of the lead or its listing. This is soon going to be deprecated, and split into sale_status and rent_status.'
+    categories:
+      REGISTERED: 'Registered in Main for publication'
+      SUSPENDED: 'Lead suspended'
+      WAITING: 'Lead eligible and waiting for owner information'
+      PROCESSING: 'Lead in image processing'
+      QUEUE: 'Lead awaiting in the duplicate queue'
+      NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
+      PUBLISHED: 'Published in Main'
+      UNPUBLISHED: 'Unpublished from Main'
+  sale_status:
+    lineage:
+    - datalake_rede_supply.lead_3p_status_changes.status
+    description: 'Status of the lead or its listing, in the context of ForSale.'
+    categories:
+      REGISTERED: 'Registered in Main for publication'
+      SUSPENDED: 'Lead suspended'
+      WAITING: 'Lead eligible and waiting for owner information'
+      PROCESSING: 'Lead in image processing'
+      QUEUE: 'Lead awaiting in the duplicate queue'
+      NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
+      PUBLISHED: 'Published in Main'
+      UNPUBLISHED: 'Unpublished from Main'
+  rent_status:
+    lineage:
+    - datalake_rede_supply.lead_3p_status_changes.status
+    description: 'Status of the lead or its listing, in the context of ForRent.'
+    categories:
+      REGISTERED: 'Registered in Main for publication'
+      SUSPENDED: 'Lead suspended'
+      WAITING: 'Lead eligible and waiting for owner information'
+      PROCESSING: 'Lead in image processing'
+      QUEUE: 'Lead awaiting in the duplicate queue'
+      NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
+      PUBLISHED: 'Published in Main'
+      UNPUBLISHED: 'Unpublished from Main'
   growth_status:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.growth_status
-    description: 'Status of the lead in the growth funnel. There are five categories:
-      - LEAD: first stage. The lead was just created, but was not approved in the
-      eligibility analysis. - PROSPECT: second stage. The lead was approved in the
-      eligibility analysis. - QUALIFIED: third stage. The real estate agency provided
-      information about the owner of the prospect, but it was not approved in analyisis.
-      - OPPORTUNITY: fourth stage. A qualified lead that was sent to image processing.
-      - FIRST_LISTING: fifth and final stage. The opportunity was approved, and registered
-      in Main for publication.'
+    description: 'Status of the lead in the growth funnel. This is soon going to be deprecated, and split into sale_growth_status and rent_growth_status.'
+    categories:
+      LEAD: first stage. The lead was just created, but was not approved in the eligibility analysis.
+      PROSPECT: second stage. The lead was approved in the eligibility analysis.
+      QUALIFIED: third stage. The real estate agency provided information about the owner of the prospect, but it was not approved in analyisis.
+      OPPORTUNITY: fourth stage. A qualified lead that was sent to image processing.
+      FIRST_LISTING: fifth and final stage. The opportunity was approved, and registered
+      in Main for publication.
+  sale_growth_status:
+    lineage:
+    - datalake_rede_supply.lead_3p_status_changes.growth_status
+    description: 'Status of the lead in the growth funnel, in the context of ForSale.'
+    categories:
+      LEAD: first stage. The lead was just created, but was not approved in the eligibility analysis.
+      PROSPECT: second stage. The lead was approved in the eligibility analysis.
+      QUALIFIED: third stage. The real estate agency provided information about the owner of the prospect, but it was not approved in analyisis.
+      OPPORTUNITY: fourth stage. A qualified lead that was sent to image processing.
+      FIRST_LISTING: fifth and final stage. The opportunity was approved, and registered
+      in Main for publication.
+  rent_growth_status:
+    lineage:
+    - datalake_rede_supply.lead_3p_status_changes.growth_status
+    description: 'Status of the lead in the growth funnel, in the context of ForRent.'
+    categories:
+      LEAD: first stage. The lead was just created, but was not approved in the eligibility analysis.
+      PROSPECT: second stage. The lead was approved in the eligibility analysis.
+      QUALIFIED: third stage. The real estate agency provided information about the owner of the prospect, but it was not approved in analyisis.
+      OPPORTUNITY: fourth stage. A qualified lead that was sent to image processing.
+      FIRST_LISTING: fifth and final stage. The opportunity was approved, and registered
+      in Main for publication.
   company_name:
     lineage:
     - datalake_hubspot.company.name
@@ -48,7 +104,31 @@ columns:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.recurrency_type
     description: Useful to know if the lead was sent in the first batch or first month,
-      if it was captured too long ago but not sent, or captured recently
+      if it was captured too long ago but not sent, or captured recently. This will be deprecated soon, and split into sale_recurrency_type and rent_recurrency_type.
+    categories:
+      FIRST_BATCH: The lead was sent in the first file by the real estate agency
+      FIRST_MONTH_BATCH: The lead was sent up to 30 days after the first batch
+      COMPLEMENTARY: The lead was sent after the first 30 days, but captured before
+        the first batch
+      RECURRENT: The lead was captured after the first batch, and sent after the first
+        30 days
+  sale_recurrency_type:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.sale_recurrency_type
+    description: Useful to know if the lead, in the context of ForSale, was sent in the first batch or first month,
+      if it was captured too long ago but not sent, or captured recently.
+    categories:
+      FIRST_BATCH: The lead was sent in the first file by the real estate agency
+      FIRST_MONTH_BATCH: The lead was sent up to 30 days after the first batch
+      COMPLEMENTARY: The lead was sent after the first 30 days, but captured before
+        the first batch
+      RECURRENT: The lead was captured after the first batch, and sent after the first
+        30 days
+  rent_recurrency_type:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.rent_recurrency_type
+    description: Useful to know if the lead, in the context of ForRent, was sent in the first batch or first month,
+      if it was captured too long ago but not sent, or captured recently.
     categories:
       FIRST_BATCH: The lead was sent in the first file by the real estate agency
       FIRST_MONTH_BATCH: The lead was sent up to 30 days after the first batch
@@ -222,6 +302,14 @@ columns:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.garages
     description: Amount of garages in the property.
+  is_for_sale:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.is_for_sale
+    description: True if the lead is for sale. This is not exclusive with is_for_rent, as both can happen simultaneously.
+  is_for_rent:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.is_for_rent
+    description: True if the lead is for rent. This is not exclusive with is_for_sale, as both can happen simultaneously.
   has_opted_keys_with_agent:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.has_opted_keys_with_agent
@@ -277,15 +365,42 @@ columns:
   is_waiting_for_enrichment:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.is_waiting_for_enrichment
-    description: If the lead has any enrichment reason for not being converted.
+    description: If the lead has any enrichment reason for not being converted. This is soon going to be deprecated, and split into is_waiting_for_enrichment_in_sale
+    and is_waiting_for_enrichment_in_rent.
+  is_waiting_for_enrichment_in_sale:
+    lineage:
+    - datalake_rede_supply.lead_3p_status_changes.is_waiting_for_enrichment
+    description: If the lead has any enrichment reason for not being converted, in the context of ForSale.
+  is_waiting_for_enrichment_in_rent:
+    lineage:
+    - datalake_rede_supply.lead_3p_status_changes.is_waiting_for_enrichment
+    description: If the lead has any enrichment reason for not being converted, in the context of ForRent.
   is_ineligible:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.is_ineligible
-    description: If the lead has any ineligibility reason for not being converted.
+    description: If the lead has any ineligibility reason for not being converted. This is soon going to be deprecated, and split into is_ineligible_in_sale
+    and is_ineligible_in_rent.
+  is_ineligible_in_sale:
+    lineage:
+    - datalake_rede_supply.lead_3p_status_changes.is_ineligible
+    description: If the lead has any ineligibility reason for not being converted, in the context of ForSale.
+  is_ineligible_in_rent:
+    lineage:
+    - datalake_rede_supply.lead_3p_status_changes.is_ineligible
+    description: If the lead has any ineligibility reason for not being converted, in the context of ForRent.
   is_discarded:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.is_discarded
-    description: If the lead has any discard reason for not being converted.
+    description: If the lead has any discard reason for not being converted. This is soon going to be deprecated, and split into is_discarded_in_sale
+    and is_discarded_in_rent.
+  is_discarded_in_sale:
+    lineage:
+    - datalake_rede_supply.lead_3p_status_changes.is_discarded
+    description: If the lead has any discard reason for not being converted, in the context of ForSale.
+  is_discarded_in_rent:
+    lineage:
+    - datalake_rede_supply.lead_3p_status_changes.is_discarded
+    description: If the lead has any discard reason for not being converted, in the context of ForRent.
   is_sent_to_main:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.is_sent_to_main

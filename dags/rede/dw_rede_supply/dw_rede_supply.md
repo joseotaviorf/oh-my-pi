@@ -15,6 +15,7 @@ This pipeline is responsible for creating the following tables in the DW schema 
 
 - `dim_file`
 - `dim_lead_3p`
+- `dim_lead_3p_context`
 - `dim_lead_3p_status`
 - `dim_lead_3p_reason`
 - `fact_lead_3p_flows`

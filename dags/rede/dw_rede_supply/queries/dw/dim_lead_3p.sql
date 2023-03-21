@@ -10,12 +10,18 @@ WITH houses AS (
 SELECT
     lsk.sk_lead_3p,
     l.id AS id_lead_3p, 
-    COALESCE(lsc.status, 'Unknown') AS status, 
-    COALESCE(lsc.growth_status, 'Unknown') AS growth_status,
+    COALESCE(lsc_sale.status, lsc_rent.status, 'Unknown') AS status,
+    COALESCE(lsc_sale.status, 'N/A') AS sale_status,
+    COALESCE(lsc_rent.status, 'N/A') AS rent_status,
+    COALESCE(lsc_sale.growth_status, lsc_rent.growth_status, 'N/A') AS growth_status,
+    COALESCE(lsc_sale.growth_status, 'N/A') AS sale_growth_status,
+    COALESCE(lsc_rent.growth_status, 'N/A') AS rent_growth_status,
     COALESCE(c.name, 'Unknown') AS company_name,
     COALESCE(c.tag_real_estate_agency, 'Unknown') AS company_tag,
     COALESCE(C.extracted_3p_tag, 'Unknown') AS extracted_3p_tag,
     COALESCE(l.recurrency_type, 'Unknown') AS recurrency_type,
+    COALESCE(l.sale_recurrency_type, 'N/A') AS sale_recurrency_type,
+    COALESCE(l.rent_recurrency_type, 'N/A') AS rent_recurrency_type,
     COALESCE(l.house_category, 'Unknown') AS house_category,
     COALESCE(l.house_type, 'Unknown') AS house_type, 
     COALESCE(l.house_subtype, 'Unknown') AS house_subtype, 
@@ -56,6 +62,8 @@ SELECT
     l.suites, 
     l.bathrooms, 
     l.garages,
+    l.is_for_sale,
+    l.is_for_rent,
     l.has_opted_keys_with_agent,
     l.has_access_restriction,
     l.is_furnished,
@@ -67,9 +75,15 @@ SELECT
     l.has_balcony,
     l.has_agency_key,
     l.has_concierge,
-    lsc.is_waiting_for_enrichment,
-    lsc.is_ineligible,
-    lsc.is_discarded,
+    GREATEST(lsc_sale.is_waiting_for_enrichment, lsc_rent.is_waiting_for_enrichment) AS is_waiting_for_enrichment,
+    COALESCE(lsc_sale.is_waiting_for_enrichment, FALSE) AS is_waiting_for_enrichment_in_sale,
+    COALESCE(lsc_rent.is_waiting_for_enrichment, FALSE) AS is_waiting_for_enrichment_in_rent,
+    GREATEST(lsc_sale.is_ineligible, lsc_rent.is_ineligible) AS is_ineligible,
+    COALESCE(lsc_sale.is_ineligible, FALSE) AS is_ineligible_in_sale,
+    COALESCE(lsc_rent.is_ineligible, FALSE) AS is_ineligible_in_rent,
+    GREATEST(lsc_sale.is_discarded, lsc_rent.is_discarded) AS is_discarded,
+    COALESCE(lsc_sale.is_discarded, FALSE) AS is_discarded_in_sale,
+    COALESCE(lsc_rent.is_discarded, FALSE) AS is_discarded_in_rent,
     l.is_sent_to_main,
     l.ts_house_created,
     l.ts_house_updated,
@@ -84,10 +98,16 @@ JOIN
 JOIN
     datalake_rede_supply.lead_3p_sks AS lsk
         ON l.id = lsk.id_lead_3p
-JOIN
-    datalake_rede_supply.lead_3p_status_changes AS lsc
-        ON lsc.id_lead_3p = l.id
-        AND lsc.ts_status_ended IS NULL
+LEFT JOIN
+    datalake_rede_supply.lead_3p_status_changes AS lsc_sale
+        ON lsc_sale.id_lead_3p = l.id
+        AND lsc_sale.business_context = 'SALE'
+        AND lsc_sale.ts_status_ended IS NULL
+LEFT JOIN
+    datalake_rede_supply.lead_3p_status_changes AS lsc_rent
+        ON lsc_rent.id_lead_3p = l.id
+        AND lsc_rent.business_context = 'RENT'
+        AND lsc_rent.ts_status_ended IS NULL
 LEFT JOIN
     datalake_hubspot.company AS c
-        ON c.id_company = COALESCE(l.id_company_hubspot, lsc.id_company_hubspot)
+        ON c.id_company = COALESCE(l.id_company_hubspot, lsc_sale.id_company_hubspot, lsc_rent.id_company_hubspot)

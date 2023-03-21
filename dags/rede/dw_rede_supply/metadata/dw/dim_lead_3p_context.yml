@@ -1,0 +1,36 @@
+---
+database_name: dw_rede
+table_name: dim_lead_3p_context
+description: Dimension containing all possible contexts of a lead flow, including business context and recurrency type
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  sk_lead_3p_context:
+    description: 'Unique identifier of the lead context'
+  business_context:
+    description: 'If the lead flow is in the context of SALE or RENT'
+    categories:
+      SALE: 'Indicates lead flow is SALE'
+      RENT: 'Indicates lead flow is RENT'
+  recurrency_type:
+    description: 'Classifies whether the lead came from the first batch, first month, is recurrent, or is complementary (captured before first batch).'
+    categories:
+      FIRST_BATCH: 'Lead sent along with the first file'
+      FIRST_MONTH_BATCH: 'Lead was sent up to 30 days after the first batch'
+      RECURRENT: 'Lead was captured and sent AFTER the first 30 days'
+      COMPLEMENTARY: 'Lead was captured BEFORE the first batch, but sent AFTER the first 30 days'
+      'N/A': 'Does not apply'
+  is_for_sale:
+    description: 'True if the lead flow is in the context of ForSale.'
+  is_for_rent:
+    description: 'True if the lead flow is in the context of ForRent.'
+  is_first_batch:
+    description: 'True if the lead is from the first batch, i.e., was sent along with the first file.'
+  is_first_month_batch:
+    description: 'True if the lead is from a first month batch, i.e., was sent up to 30 days after the first batch.'
+  is_complementary:
+    description: 'True if the lead is complementary, i.e., captured BEFORE the first batch, but sent AFTER the first 30 days.'
+  is_recurrent:
+    description: 'True if the lead is recurrent, i.e., captured and sent AFTER the first 30 days.'
+  ts_load:
+    description: 'Timestamp of when this table loaded last'
