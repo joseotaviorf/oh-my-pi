@@ -7,23 +7,23 @@ owner: fernando.araujo@quintoandar.com.br
 columns:
   id_variant:
     lineage:
-    - datalake_sorting_hat_clean.variant.id
-    description: Variant ID
+      - datalake_sorting_hat_clean.variant.id
+    description: "Credit model+policy Variant ID."
   id_experiment:
     lineage:
-    - datalake_sorting_hat_clean.variant.id_experiment
-    description: Experiment ID
+      - datalake_sorting_hat_clean.variant.id_experiment
+    description: "Credit experiment ID. There always a experiment on with as many variants as desired."
   variant_name:
     lineage:
-    - datalake_sorting_hat_clean.variant.name
-    description: Variant name
+      - datalake_sorting_hat_clean.variant.name
+    description: "Variant name."
   variant_description:
     lineage:
-    - datalake_sorting_hat_clean.variant.description
-    description: Variant description
+      - datalake_sorting_hat_clean.variant.description
+    description: "Variant description"
   variant_percentage_paticipation_on_test:
     lineage:
-    - datalake_sorting_hat_clean.variant.percentage
-    description: Indicates the percentage participation of a variant during tests
+      - datalake_sorting_hat_clean.variant.percentage
+    description: "Indicates the percentage participation of a variant during tests."
   ts_load:
-    description: Date/time in which the row was loaded
+    description: "Date/time in which the row was loaded"

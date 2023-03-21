@@ -8,99 +8,101 @@ owner: fernando.araujo@quintoandar.com.br
 columns:
   sk_client:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_client
-    description: Key of client that sent an offer or booked a visit
+      - dw_public.fact_listing_rent_flows.sk_client
+    description: "Key of client that sent an offer or booked a visit."
   sk_house_listing:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_house_listing
+      - dw_public.fact_listing_rent_flows.sk_house_listing
+    description: "Listining identification, created by data team. A new version is given to a house after it was rented or unpublished."
   sk_contract_signed_date:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_contract_signed_date
-    description: Key of date when contract was signed
+      - dw_public.fact_listing_rent_flows.sk_contract_signed_date
+    description: "Key of date when contract was signed."
   sk_credit_analysis:
     lineage:
-    - datalake_credit_analysis.credit_analysis.id_credit_analysis
-    description: Key of the credit analysis
+      - datalake_credit_analysis.credit_analysis.id_credit_analysis
+    description: "Key of the credit analysis."
   sk_credit_analysis_approved_date:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_credit_analysis_approved_date
-    description: Key of date when credit analysis was approved
+      - dw_public.fact_listing_rent_flows.sk_credit_analysis_approved_date
+    description: "Key of date when credit analysis was approved."
   sk_credit_evaluation_approved_date:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_negative
-    description: Key of the date when credit evaluation was approved. This field should
+      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_negative
+    description: "Key of the date when credit evaluation was approved. This field should
       be used on Evaluation Positive (EP) on credit funnel as it contains the logic
-      for paid guarantees as well as for free guarantee
+      for paid guarantees as well as for free guarantee."
   sk_first_credit_analysis:
     lineage:
-    - datalake_credit_analysis.credit_analysis_proposals.id_first_credit_analysis
-    description: Key for the first credit analysis to a given proposal
+      - datalake_credit_analysis.credit_analysis_proposals.id_first_credit_analysis
+    description: "Key for the first credit analysis to a given proposal."
   sk_first_variant:
     lineage:
-    - datalake_credit_analysis.credit_analysis_proposals.id_first_variant
-    description: Key for the first model variant to a given proposal
+      - datalake_credit_analysis.credit_analysis_proposals.id_first_variant
+    description: "Key for the first model variant to a given proposal."
   sk_last_variant_not_null:
     lineage:
-    - datalake_credit_analysis.credit_analysis_proposals.id_last_variant_not_null
+      - datalake_credit_analysis.credit_analysis_proposals.id_last_variant_not_null
+    description: "Key for the last model variant to a given proposal."
   sk_guarantee_category:
     lineage:
-    - datalake_credit_analysis.credit_analysis.category
-    description: Key for the guarantee category presented
+      - datalake_credit_analysis.credit_analysis.category
+    description: "Key for the guarantee category presented."
   sk_guarantee_paid_date:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_guarantee_paid_date
-    description: Key of date of guarantee paid
+      - dw_public.fact_listing_rent_flows.sk_guarantee_paid_date
+    description: "Key of date of guarantee paid."
   sk_last_credit_analysis:
     lineage:
-    - datalake_credit_analysis.credit_analysis_proposals.id_last_credit_analysis
-    description: Key for the last credit analysis to a given proposal
+      - datalake_credit_analysis.credit_analysis_proposals.id_last_credit_analysis
+    description: "Key for the last credit analysis to a given proposal."
   sk_last_credit_evaluation_init:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_contract_signed_date
-    description: Key of date when credit evaluation last was initiated
+      - dw_public.fact_listing_rent_flows.sk_contract_signed_date
+    description: "Key of date when credit evaluation last was initiated."
   sk_last_credit_evaluation_negative:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_negative
-    description: Key of date when credit evaluation last was negative
+      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_negative
+    description: "Key of date when credit evaluation last was negative."
   sk_last_credit_evaluation_positive:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_positive
-    description: Key of date when credit evaluation last was positive
+      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_positive
+    description: "Key of date when credit evaluation last was positive."
   sk_offer:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_offer
-    description: Key of offer
+      - dw_public.fact_listing_rent_flows.sk_offer
+    description: "Key of offer."
   sk_offer_approved_date:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_offer_approved_date
-    description: Key of date when offer was approved by owner
+      - dw_public.fact_listing_rent_flows.sk_offer_approved_date
+    description: "Key of date when offer was approved by owner."
   sk_offer_submitted_date:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_offer_submitted_date
-    description: Key of date when offer was submitted by client
+      - dw_public.fact_listing_rent_flows.sk_offer_submitted_date
+    description: "Key of date when offer was submitted by client."
   sk_proposal:
     lineage:
-    - datalake_credit_analysis.credit_analysis_proposals.id_proposal
-    description: Key of proposal (offer that was accepted)
+      - datalake_credit_analysis.credit_analysis_proposals.id_proposal
+    description: "Key of proposal (offer that was accepted)."
   sk_region:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_region
-    description: Key of house region
+      - dw_public.fact_listing_rent_flows.sk_region
+    description: "Key of house region."
   sk_tenant_doc_complete_date:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_tenant_doc_complete_date
-    description: Key of date when tenant doc was completed
+      - dw_public.fact_listing_rent_flows.sk_tenant_doc_complete_date
+    description: "Key of date when tenant doc was completed."
   sk_tenant_first_doc_sent_date:
     lineage:
-    - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
-    description: Key of date when client sent first documentation
+      - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
+    description: "Key of date when client sent first documentation."
   funnel_step:
     lineage:
-    - dw_public.fact_listing_rent_flows.funnel_step
-    description: The funnel step where this flow is in/has stoppped
+      - dw_public.fact_listing_rent_flows.funnel_step
+    description: "The funnel step where this flow is in/has stoppped."
   is_first_credit_evaluation:
-    description: Indicates if the row presents the first credit evaluation
+    description: "Indicates if the row presents the first credit evaluation."
   is_last_credit_evaluation:
-    description: Indicates if the row presents the last credit evaluation
+    description: "Indicates if the row presents the last credit evaluation."
   ts_load:
-    description: Timestamp of data recorded in the table
+    description: "Timestamp of data recorded in the table"

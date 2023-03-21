@@ -1,27 +1,52 @@
 database_name: dw_credit
 table_name: dim_experiment
-description: This table brings informations about the experiments made with our credit
-  engine variants
+description: "This table brings informations about the experiments made with our credit
+  engine variants."
 domain: Fintech
 owner: fernando.araujo@quintoandar.com.br
 columns:
   id_experiment:
     lineage:
-    - datalake_sorting_hat_clean.experiment.id
-    description: Experiment ID
+      - datalake_sorting_hat_clean.experiment.id
+    description: "Experiment ID."
   experiment_name:
     lineage:
-    - datalake_sorting_hat_clean.experiment.name
-    description: Experiment name
+      - datalake_sorting_hat_clean.experiment.name
+    description: "Experiment name."
   experiment_description:
     lineage:
-    - datalake_sorting_hat_clean.experiment.description
-    description: Experiment description
+      - datalake_sorting_hat_clean.experiment.description
+    description: "Experiment description."
+  is_experiment_running:
+    lineage:
+      - datalake_sorting_hat_clean.experiment.ts_started
+      - datalake_sorting_hat_clean.experiment.ts_ended
+    description: "Checks if a particular experiment is on or off."
+  has_experiment_ran_last_month:
+    lineage:
+      - datalake_sorting_hat_clean.experiment.ts_started
+      - datalake_sorting_hat_clean.experiment.ts_ended
+    description: "Checks if a particular experiment has runned at least a month ago."
+  has_experiment_ran_last_3_months:
+    lineage:
+      - datalake_sorting_hat_clean.experiment.ts_started
+      - datalake_sorting_hat_clean.experiment.ts_ended
+    description: "Checks if a particular experiment has runned at least 3 months ago."
+  has_experiment_ran_last_6_months:
+    lineage:
+      - datalake_sorting_hat_clean.experiment.ts_started
+      - datalake_sorting_hat_clean.experiment.ts_ended
+    description: "Checks if a particular experiment has runned at least 6 months ago."
+  has_experiment_ran_last_year:
+    lineage:
+      - datalake_sorting_hat_clean.experiment.ts_started
+      - datalake_sorting_hat_clean.experiment.ts_ended
+    description: "Checks if a particular experiment has runned at least a year ago."
   ts_experiment_started:
     lineage:
-    - datalake_sorting_hat_clean.experiment.ts_started
-    description: Date/time in which the experiment started
+      - datalake_sorting_hat_clean.experiment.ts_started
+    description: "Date/time in which the experiment started."
   ts_experiment_ended:
     lineage:
-    - datalake_sorting_hat_clean.experiment.ts_ended
-    description: Date/time in which the experiment ended
+      - datalake_sorting_hat_clean.experiment.ts_ended
+    description: "Date/time in which the experiment ended."
