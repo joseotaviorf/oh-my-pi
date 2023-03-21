@@ -14,7 +14,7 @@ columns:
     lineage:
     - datalake_rede_supply.lead_3p_sks.sk_lead_3p
     description: Foreign key to the lead. Can be joined with dw_rede.dim_lead_3p.
-sk_lead_3p_context:
+  sk_lead_3p_context:
     lineage:
     - dw_rede.dim_lead_3p_context.sk_lead_3p_context
     description: Surrogate key of dw_rede.dim_lead_3p_context. There, you can find the business context of the lead flow (SALE or RENT), and the recurrency type.
