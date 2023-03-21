@@ -1,7 +1,10 @@
 from argparse import ArgumentParser
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from pyspark.sql import DataFrame
+from functools import reduce
 
 import opsgenie_sdk
 
@@ -21,9 +24,78 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 
-JOB_NAME = "load_google_ads_raw"
+JOB_NAME = "load_opsgenie_raw"
 
 logger = QuintoAndarLogger(JOB_NAME)
+
+def _get_date_range(auth_token: str, start_date: str, end_date: str) -> list:
+    """
+    Function to generate a list of tuples like (AUTH TOKEN, START DATE, END DATE). 
+    The start_date and end_date are the global parameters and the function return
+    tuples, day by day, between the range. 
+    """    
+    if end_date > start_date:
+        date_times = []
+        date_time = start_date
+
+        while date_time <= end_date:
+            date_times.append(date_time.strftime("%d-%m-%Y"))
+            date_time += timedelta(days=1)
+
+        time_ranges = list(zip(*(iter(date_times),) * 2))
+        time_ranges_list = [(auth_token, *time_range) for time_range in time_ranges]  
+        
+        return time_ranges_list
+    
+    else:
+      return [(auth_token, start_date.strftime("%d-%m-%Y"), end_date.strftime("%d-%m-%Y"))]
+  
+def _fetch_alerts(auth_token: str, start_date: str, end_date: str) -> dict:
+  
+    OpsgenieConf = opsgenie_sdk.configuration.Configuration()
+    OpsgenieConf.api_key['Authorization'] = auth_token
+
+    OpsgenieClient = opsgenie_sdk.api_client.ApiClient(configuration=OpsgenieConf)
+    OpsgenieAlertApi = opsgenie_sdk.AlertApi(api_client=OpsgenieClient)
+    
+    query = f"teams: 'Analytics Engineering' AND createdAt >= {start_date} AND createdAt <= {end_date}"
+    alerts = OpsgenieAlertApi.list_alerts(limit=100, query=query)
+    
+    try:
+        data = alerts.data
+
+        if len(data) > 0:         
+              return spark.createDataFrame(
+                  [item.to_dict() for item in data],
+                  schema="""
+                      acknowledged boolean,
+                      alias string,
+                      count bigint,
+                      created_at timestamp,
+                      id string,
+                      integration struct<name:string, id:string, type:string>,
+                      is_seen boolean,
+                      last_occurred_at timestamp,
+                      message string,
+                      owner string,
+                      priority string,
+                      report struct<ack_time:bigint, acknowledged_by:string, close_time:bigint, closed_by:string>,
+                      responders array<struct<type:string, id:string>>,
+                      snoozed boolean,
+                      snoozed_until timestamp,
+                      source string,
+                      status string,
+                      tags string,
+                      tiny_id string,
+                      updated_at timestamp
+                  """
+              )
+        else:
+            logging.error(f"No data found for date range: {start_date} to {end_date}.")      
+      
+    except Exception as exception:
+        logging.error(f"Fail to extract data. Error:{exception}")
+        raise exception
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -57,49 +129,22 @@ if __name__ == "__main__":
         dbutils.secrets.get('quintoandar', APIEnum.OPSGENIE)
     )
 
+    auth_token = credentials['token']
+
     """
     Fetch OpsGenie alerts data.
     """    
-    OpsgenieConf = opsgenie_sdk.configuration.Configuration()
-    OpsgenieConf.api_key['Authorization'] = credentials['token']
 
-    OpsgenieClient = opsgenie_sdk.api_client.ApiClient(configuration=OpsgenieConf)
-    OpsgenieAlertApi = opsgenie_sdk.AlertApi(api_client=OpsgenieClient)
+    time_ranges = _get_date_range(auth_token, start_date, end_date)
+    alerts_data = [_fetch_alerts(*auth_and_time) for auth_and_time in time_ranges]
+    filtered_alerts_data = list(filter(None, alerts_data))
 
-    start_date_str = start_date.strftime("%d-%m-%Y")
-    end_date_str = end_date.strftime("%d-%m-%Y")
-
-    query = f"teams: 'Analytics Engineering' AND createdAt >= {start_date_str} AND createdAt <= {end_date_str}"
-    alerts = OpsgenieAlertApi.list_alerts(query=query)
-    
     """
     Creating dataframe.
     """
-    if len(alerts.data) > 0:         
-        df = spark.createDataFrame(
-            [item.to_dict() for item in alerts.data],
-            schema="""
-                acknowledged boolean,
-                alias string,
-                count int,
-                created_at timestamp,
-                id string,
-                integration struct<name:string, id:string, type:string>,
-                is_seen boolean,
-                last_occurred_at timestamp,
-                message string,
-                owner string,
-                priority string,
-                report struct<ack_time:int, acknowledged_by:string, close_time:int, closed_by:string>,
-                responders array<struct<type:string, id:string>>,
-                snoozed boolean,
-                snoozed_until timestamp,
-                source string,
-                status string,
-                tags string,
-                tiny_id string,
-                updated_at timestamp
-            """
+    if len(filtered_alerts_data) > 0:         
+        df = reduce(
+            DataFrame.unionAll, filtered_alerts_data
         )
 
         df = (
@@ -157,4 +202,4 @@ if __name__ == "__main__":
         )
 
     else:
-        logging.error(f"No data found from {start_date} to {end_date}.")        
+        logging.error(f"No data found from {start_date} to {end_date}.")
