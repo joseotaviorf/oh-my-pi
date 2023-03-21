@@ -6,7 +6,7 @@ This DAG is intended to handle tables retrieved from public data (eg. taxes, int
 
 ​<details>
 
-Creates enriched tables for `itbi_sp`.
+Creates enrich tables for ITBI data extracted from public databases.
 
 ### Execution Interval
 
@@ -18,5 +18,6 @@ Produces the following output tables in `datalake_open_external_data`:
 
 **Fully:**
 - `itbi_sp_residential_transactions`
+- `itbi_bh_residential_transactions`
 
 </details>

@@ -1,21 +1,45 @@
----
-database_name: datalake_itbi_clean
-table_name: itbi_bh
-description: ITBI - Belo Horizonte
+database_name: datalake_open_external_data
+table_name: itbi_bh_residential_transactions
+description: "Table enriched with ITBI data from BH. In this table, we applied some business rules, such as normalizing the address, 
+  filtering for residential properties only and adding the id_region."
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br / guilherme.ventura@quintoandar.com.br
+owner: data-for-sale@quintoandar.com.br
 columns:
-  neighborhood:
+  id_region:
     lineage:
-      - datalake_itbi_raw.itbi_bh.bairro
-    description: 'Neighborhood where the property is located.'
+      - datalake_zipcodes.zipcodes 
+    description: "Given all the listings that have passed through QuintoAndar, it is the id_region with the highest probability of having that zipcode in its extension."
   address:
     lineage:
-      - datalake_itbi_raw.itbi_bh.endereco_completo
+      - datalake_itbi_clean.itbi_bh.address
     description: 'Address where the property is located.'
+  number:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: 'Number of the unit where the property is located'
+  complement:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: 'Completion of the property address.'
+  zipcode:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: 'Property zipcode.'
+  neighborhood:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: 'Neighborhood where the property is located.'
+  city:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: 'City of the property, where in the case of this table, it is Belo Horizonte.'
+  state:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: 'State of the property, where in the case of this table, it is Minas Gerais.'
   occupation_description:
     lineage:
-      - datalake_itbi_raw.itbi_bh.descricao_tipo_ocupacao_unidade
+      - datalake_itbi_clean.itbi_bh.ocupation_description
     description: 'Whether the occupancy type is residential, non-residential or territorial.'
     categories:
       RESIDENCIAL: 'If the occupation is residential (used for living).'
@@ -24,55 +48,59 @@ columns:
       VALOR NULO: 'No information.'
   standard_finish:
     lineage:
-      - datalake_itbi_raw.itbi_bh.standard_finish
+      - datalake_itbi_clean.itbi_bh.standard_finish
     description: 'Finishing Standard of the unit according to the score received from the constructive characteristics.'
   urban_zoning_code:
     lineage:
-      - datalake_itbi_raw.itbi_bh.urban_zoning_code
+      - datalake_itbi_clean.itbi_bh.urban_zoning_code
     description: 'Urban zoning coding for the property, assigned by the Use and Occupancy Law in effect at the time of the transaction.'
   predominant_construction_type:
     lineage:
-      - datalake_itbi_raw.itbi_bh.predominant_construction_type
+      - datalake_itbi_clean.itbi_bh.predominant_construction_type
     description: 'Building type with the largest area.'
+  raw_source_address:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: 'Address as it was in the source file.'
   source_file:
     lineage:
-      - datalake_itbi_raw.itbi_bh.source_file
+      - datalake_itbi_clean.itbi_bh.source_file
     description: 'URL of the CSV downloaded for ingesting the data from the BH municipality.'
   land_area_m2:
     lineage:
-      - datalake_itbi_raw.itbi_bh.area_terreno_total
+      - datalake_itbi_clean.itbi_bh.land_area_m2
     description: 'Land area in square meters'
   built_area_m2:
     lineage:
-      - datalake_itbi_raw.itbi_bh.area_construida_adquirida
+      - datalake_itbi_clean.itbi_bh.built_area_m2
     description: 'Result of the application of the percentage acquired by the unit construction area.'
   all_units_area_m2:
     lineage:
-      - datalake_itbi_raw.itbi_bh.area_adquirida_unidades_somadas
+      - datalake_itbi_clean.itbi_bh.all_units_area_m2
     description: "Sum of the units in cases where we have several building types. 
       It occurs when the units represent distinct blocks because they are not contiguous or because they constitute different savings."
   ideal_fraction:
     lineage:
-      - datalake_itbi_raw.itbi_bh.fracao_ideal_adquirida
+      - datalake_itbi_clean.itbi_bh.ideal_fraction
     description: Incidence of the acquisition percentage over the ideal fraction original.
   adopted_calculation_basis:
     lineage:
-      - datalake_itbi_raw.itbi_bh.valor_base_calculo
+      - datalake_itbi_clean.itbi_bh.adopted_calculation_basis
     description: 'Value determined by the tax administration through an appraisal based on the elements contained in the
       Cadastro Imobiliário or the value declared by the taxpayer, if the latter is higher'
   amount_tax_paid_summarized:
     lineage:
-      - datalake_itbi_raw.itbi_bh.valor_imposto_cobrado_sumarizado
+      - datalake_itbi_clean.itbi_bh.amount_tax_paid_summarized
     description: 'Total amount of tax collected and summarized (only available for the year 2021).'
   year_built:
     lineage:
-      - datalake_itbi_raw.itbi_bh.ano_construcao_unidade
+      - datalake_itbi_clean.itbi_bh.year_built
     description: 'Year that the construction of the property was finished.'
   dt_transaction:
     lineage:
-      - datalake_itbi_raw.itbi_bh.data_inclusao_transacao
+      - datalake_itbi_clean.itbi_bh.dt_transaction
     description: 'Date the transaction was created.'
   dt_load:
     lineage:
-      - datalake_itbi_raw.itbi_bh.dt_load
+      - datalake_itbi_clean.itbi_bh.dt_load
     description: 'Date we updated the ITBI BH data.'
