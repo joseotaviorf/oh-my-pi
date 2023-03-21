@@ -138,7 +138,7 @@ if __name__ == "__main__":
                 logger.info(f"""m={JOB_NAME}, source_bucket={cozy_bucket}, table_name={table_name}, msg=These dataframe is empty...""")
 
                 continue
-
+            
         except Exception as e:
             logger.warning(f"""m={JOB_NAME}, table_name={table_name}, msg={e}.""")
 
@@ -153,6 +153,7 @@ if __name__ == "__main__":
                 f"Error:'{e}'\n"
             )
 
-            SlackService.send_slack_errors([(message,slack_webhook)]) 
+            if execution_date.weekday() < 5:
+                SlackService.send_slack_errors([(message,slack_webhook)])
 
             continue
