@@ -1,9 +1,10 @@
 database_name: dw_public
 table_name: dim_visit
-description: Information about visits, a subset of bookings. A visit is when a user
-  visits a property because she's interested in it. Each line is a visi
+description: Information about Rent and Sale visits, which is a subset of bookings. 
+  A visit is when a tenant prospect/buyer prospect visits a property because it's interested in it. 
+  Each line is an unique visit.
 domain: For Rent
-owner: ''
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   sk_visit:
     lineage:
@@ -20,6 +21,7 @@ columns:
   business_unit:
     lineage:
     - datalake_sale_visit_hubs.sale_visit_hubs.business_unit
+    description: Business unit name, already standardized with Teams data.
   day_visit:
     lineage:
     - datalake_ebdb_clean.visit.dt_visit
@@ -39,7 +41,7 @@ columns:
   status:
     lineage:
     - datalake_ebdb_clean.visit.status
-    description: ''
+    description: Visit status
     categories:
       Canceled: ''
       Done: ''
@@ -47,7 +49,7 @@ columns:
   booking_type:
     lineage:
     - datalake_ebdb_clean.visit.booking_type
-    description: ''
+    description: Type of the booking
     categories:
       Booked: ''
       Realized: ''
