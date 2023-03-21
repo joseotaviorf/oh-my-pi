@@ -1,5 +1,8 @@
 database_name: datalake_braze_events_raw
 table_name: events_tenants
+owner: data-growth
+domain: growth
+description: This table contains details about event related/realized by tenants, e.g. disptaches or clicks.
 columns:
   id:
     tags:

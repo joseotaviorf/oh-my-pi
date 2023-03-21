@@ -1,25 +1,37 @@
 ---
 database_name: datalake_braze_dispatches
 table_name: webhook_tenants
+owner: data-growth
+domain: growth
+description: Table with details about communications sent through webhook.
 columns:
+  id_user:
+    description: Unique code to identify an user created here at QuintoAndar.
   id_user_dispatch:
+    description: The combination of id_dispatch and id_user.
     lineage:
       - datalake_braze.events_tenants.id_user_dispatch
   id_user_braze:
+    description: Unique code to identify an user created by Braze.
     lineage:
       - datalake_braze.events_tenants.id_user_braze
   event_channel:
+    description: Through where the event occurred. In this table it's going to be only webhook.
     lineage:
       - datalake_braze.events_tenants.event_channel
   ts_webhook_sent:
+    description: Timestamp of when the webhook was sent.
     lineage:
       - datalake_braze.events_tenants.ts_event
   year:
+    description: Year of when the information was updated.
     lineage:
       - datalake_braze.events_tenants.year
   month:
+    description: Month of when the information was updated.
     lineage:
       - datalake_braze.events_tenants.month
   day:
+    description: Day of when the information was updated.
     lineage:
       - datalake_braze.events_tenants.day

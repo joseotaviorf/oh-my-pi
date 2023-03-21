@@ -1,56 +1,91 @@
 ---
 database_name: datalake_braze
 table_name: events_tenants
+owner: data-growth
+domain: growth
+description: This table contains details about event related/realized by tenants, e.g. disptaches or clicks.
 columns:
   id_event:
+    description: Unique code to identify an event (dispatch or interaction of the user with the communication).
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
   id_dispatch:
+    description: Unique code to identify a communication transmitted to the user by Braze.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
   id_user_dispatch:
+    description: The combination of id_dispatch and id_user.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
       - datalake_braze_events_clean.events_tenants.event_type
   id_user_braze:
+    description: Unique code to identify an user created by Braze.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
   id_user:
+    description: Unique code to identify an user created here at QuintoAndar.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
   id_campaign:
+    description: Unique code to identify a campaign.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
   id_variant_campaign:
+    description: Unique code to identify a campaign variant.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
   id_canvas:
+    description: Unique code to identify a canvas.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
   id_variant_canvas:
+    description: Unique code to identify a canvas variant.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
   id_step_canvas:
+    description: Unique code to identify to which step the event related to.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
   event_channel:
+    description: Through where the event occurred.
+    categories:
+      email: It's a message sent via email.
+      inappmessage: It's a message that's not delivered outside of the user's app i.e. it's delivered when the user is active within the app.
+      pushnotification: It's a message sent via push.
+      webhook: It's a message sent via webhook.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_type
   event_action:
+    description: Type of event that occured (simplified).
+    categories:
+      bounce: Occurs when there is not a valid push token, the email addresses were incorrect or deactivated, or the user unsubscribed after the campaign was launched.
+      click: Occurs when the user clicks on the message.
+      delivery: Occurs when the message is accepted by the receiving email server.
+      impression: Occurs when the in-app message has been viewed.
+      markasspam: Occurs when the email is marked as "spam". 
+      newsfeedimpression: Occurs when the News Feed has been viewed.
+      open: Occurs when the message is opened.
+      send: Occurs when a message is sent in a campaign. This number is received from Braze.
+      softbounce: Soft bounces occur when your recipient’s email address is valid or when the email message reaches the recipient’s email server, but the message was rejected for a temporary issue.
+      unsubscribe: Occurs when the subscription state changed to unsubscribed as a result of clicking the Braze provided unsubscribe URL.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_type
   event_type:
+    description: Type of event that occured (complete).
     lineage:
       - datalake_braze_events_clean.events_tenants.event_type
   ts_event:
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
   year:
+    description: Year of when the event occurred.
     lineage:
       - datalake_braze_events_clean.events_tenants.year
   month:
+    description: Month of when the event occurred.
     lineage:
       - datalake_braze_events_clean.events_tenants.month
   day:
+    description: Day of when the event occurred.
     lineage:
       - datalake_braze_events_clean.events_tenants.day

@@ -1,64 +1,94 @@
 database_name: datalake_braze_dispatches_user
 table_name: tenants_events
+owner: data-growth
+domain: growth
+description: This table contains details about event related/realized by tenants, e.g. disptaches or clicks.
 columns:
   id_user_dispatch:
+    description: The combination of id_dispatch and id_user.
     lineage:
       - datalake_braze.events_tenants.id_user_dispatch
   id_user_braze:
+    description: Unique code to identify an user created by Braze.
     lineage:
       - datalake_braze.events_tenants.id_user_braze
   id_campaign:
+    description: Unique code to identify a campaign.
     lineage:
       - datalake_braze.events_tenants.id_campaign
   id_variant_campaign:
+    description: Unique code to identify a campaign variant.
     lineage:
       - datalake_braze.events_tenants.id_variant_campaign
   id_canvas:
+    description: Unique code to identify a canvas.
     lineage:
       - datalake_braze.events_tenants.id_canvas
   id_variant_canvas:
+    description: Unique code to identify a canvas variant.
     lineage:
       - datalake_braze.events_tenants.id_variant_canvas
   id_step_canvas:
+    description: Unique code to identify to which step the event related to.
     lineage:
       - datalake_braze.events_tenants.id_step_canvas
+  user_type:
+    description: Which type of user received/interacted with the message. In this case, will be only tenants.
   event_channel:
+    description: Through where the event occurred.
+    categories:
+      email: It's a message sent via email.
+      inappmessage: It's a message that's not delivered outside of the user's app i.e. it's delivered when the user is active within the app.
+      pushnotification: It's a message sent via push.
+      webhook: It's a message sent via webhook.
     lineage:
       - datalake_braze.events_tenants.event_channel
   ts_email_sent:
+    description: Timestamp of when the email was sent.
     lineage:
       - datalake_braze_dispatches.email_tenants.ts_email_sent
   ts_email_delivered:
+    description: Timestamp of when the email was delivered.
     lineage:
       - datalake_braze_dispatches.email_tenants.ts_email_delivered
   ts_email_opened:
+    description: Timestamp of when the email was opened by the tenant.
     lineage:
       - datalake_braze_dispatches.email_tenants.ts_email_opened
   ts_email_clicked:
+    description: Timestamp of when the email was clicked by the tenant.
     lineage:
       - datalake_braze_dispatches.email_tenants.ts_email_clicked
   ts_email_bounced:
+    description: Timestamp of when the email was bounced.
     lineage:
       - datalake_braze_dispatches.email_tenants.ts_email_bounced
   ts_email_spammed:
+    description: Timestamp of when the email was marked as a spam.
     lineage:
       - datalake_braze_dispatches.email_tenants.ts_email_spammed
   ts_email_unsubscribed:
+    description: Timestamp of when the user clicked on the unsubscribed with the email link.
     lineage:
       - datalake_braze_dispatches.email_tenants.ts_email_unsubscribed
   ts_push_sent:
+    description: Timestamp of when the push was sent.
     lineage:
       - datalake_braze_dispatches.push_tenants.ts_push_sent
   ts_push_opened:
+    description: Timestamp of when the push was oppened.
     lineage:
       - datalake_braze_dispatches.push_tenants.ts_push_opened
   ts_push_bounced:
+    description: Timestamp of when the push bounced.
     lineage:
       - datalake_braze_dispatches.push_tenants.ts_push_bounced
   ts_webhook_sent:
+    description: Timestamp of when the webhook was sent.
     lineage:
       - datalake_braze_dispatches.webhook_tenants.ts_webhook_sent
   ts_inapp_impressioned:
+    description: Timestamp of when the in-app communication was visualized.
     lineage:
       - datalake_braze_dispatches.inapp_tenants.ts_inapp_impressioned
   ts_sms_sent:
@@ -77,11 +107,14 @@ columns:
     lineage:
       - datalake_braze_dispatches.sms_tenants.ts_sms_delivery_failed
   year:
+    description: Year of when the information was updated.
     lineage:
       - datalake_braze.events_tenants.year
   month:
+    description: Month of when the information was updated.
     lineage:
       - datalake_braze.events_tenants.month
   day:
+    description: Day of when the information was updated.
     lineage:
       - datalake_braze.events_tenants.day
