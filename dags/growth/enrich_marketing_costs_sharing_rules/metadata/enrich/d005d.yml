@@ -1,10 +1,26 @@
 ---
 database_name: datalake_marketing_costs_sharing_rules
 table_name: d005d
+owner: '@data-growth'
+domain: Growth
+description: Allocation of classified ad campaign costs - divides the costs resulting from these campaigns according to the number of rental ongoing listings (properties that are currently published) among the cities Belo Horizonte, Brasília, Curitiba, Florianópolis, Goiânia, Porto Alegre, RMSP, Rio de Janeiro
 columns:
   id_date:
+    description: Date of applied share
     lineage:
       - datalake_quintoandar.aux_date.id_date
+  id_rule: 
+    description: Id rule
+    categories: 
+      d005d: ''
   city_group:
+    description: city_group segmentation
     lineage:
       - datalake_region.region.city_group
+  share: 
+    description: Percentage of cost that will be applied to specific city_group
+  funnel_side: 
+    description: Marketplace side of business
+    categories: 
+      demand: ''
+      supply: ''

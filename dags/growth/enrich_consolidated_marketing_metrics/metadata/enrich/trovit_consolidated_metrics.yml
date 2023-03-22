@@ -1,25 +1,37 @@
 ---
 database_name: datalake_consolidated_marketing_metrics
 table_name: trovit_consolidated_metrics
+owner: '@data-growth'
+domain: Growth
+description: Table that consolidates metrics extracted from trovit platform
 columns:
   campaign_name:
+    description: Name of campaign segmentation
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.campaign_name
   account_name:
+    description: Accont name at mitula platform
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.account_name
   utm_campaign:
+    description: utm_campaign applied on growth marketing platform
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.campaign_name
   desktop_cost:
+    description: Cost spent on desktop plataform
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.desktop_cost
   mobile_cost:
+    description: Cost spent on mobile plataform
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.mobile_cost
   total_cost:
+    description: Total cost
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.total_cost
   clicks:
+    description: Clicks from mitula platform
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.clicks
+  id_date:
+    description: Date segmentation

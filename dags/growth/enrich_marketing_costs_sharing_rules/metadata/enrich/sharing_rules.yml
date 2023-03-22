@@ -1,8 +1,12 @@
 ---
 database_name: datalake_marketing_costs_sharing_rules
 table_name: sharing_rules
+owner: '@data-growth'
+domain: Growth
+description: 
 columns:
   id_date:
+    description: Date segmentation
     lineage:
       - datalake_marketing_costs_sharing_rules.a002a.id_date
       - datalake_marketing_costs_sharing_rules.a003a.id_date
@@ -35,6 +39,7 @@ columns:
       - datalake_marketing_costs_sharing_rules.s031s.id_date
       - datalake_marketing_costs_sharing_rules.s032s.id_date
   id_rule:
+    description: Id rule
     lineage:
       - datalake_marketing_costs_sharing_rules.a002a.id_rule
       - datalake_marketing_costs_sharing_rules.a003a.id_rule
@@ -67,6 +72,7 @@ columns:
       - datalake_marketing_costs_sharing_rules.s031s.id_rule
       - datalake_marketing_costs_sharing_rules.s032s.id_rule
   city_group:
+    description: city_group segmentation
     lineage:
       - datalake_marketing_costs_sharing_rules.a002a.city_group
       - datalake_marketing_costs_sharing_rules.a003a.city_group
@@ -99,6 +105,7 @@ columns:
       - datalake_marketing_costs_sharing_rules.s031s.city_group
       - datalake_marketing_costs_sharing_rules.s032s.city_group
   share:
+    description: Percentage of cost that will be applied to specific city_group
     lineage:
       - datalake_marketing_costs_sharing_rules.a002a.share
       - datalake_marketing_costs_sharing_rules.a003a.share
@@ -131,6 +138,7 @@ columns:
       - datalake_marketing_costs_sharing_rules.s031s.share
       - datalake_marketing_costs_sharing_rules.s032s.share
   funnel_side:
+    description: Marketplace side of business
     lineage:
       - datalake_marketing_costs_sharing_rules.a002a.funnel_side
       - datalake_marketing_costs_sharing_rules.a003a.funnel_side

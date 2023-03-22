@@ -1,70 +1,97 @@
 ---
 database_name: datalake_consolidated_marketing_metrics
 table_name: google_consolidated_metrics
+owner: '@data-growth'
+domain: Growth
+description: Table that consolidates metrics extracted from google ads platform
 columns:
   id_date:
+    description: Date segmentation
     lineage:
       - datalake_google_ads_clean.ads_performance.dt_loaded
       - datalake_google_ads_clean.campaigns_performance.dt_loaded
       - datalake_google_ads_clean.keywords_performance.dt_loaded
       - datalake_google_ads_clean.videos_performance.dt_loaded
   campaign_name:
+    description: Name of campaign segmentation
     lineage:
       - datalake_google_ads_clean.ads_performance.campaign_name
       - datalake_google_ads_clean.campaigns_performance.campaign_name
       - datalake_google_ads_clean.keywords_performance.campaign_name
       - datalake_google_ads_clean.videos_performance.campaign_name
   account_name:
+    description: Accont name at google ads platform
     lineage:
       - datalake_google_ads_clean.ads_performance.account_descriptive_name
       - datalake_google_ads_clean.campaigns_performance.account_descriptive_name
       - datalake_google_ads_clean.keywords_performance.account_descriptive_name
       - datalake_google_ads_clean.videos_performance.account_descriptive_name
   report_type:
+    description: Type of report extracted from google ads platform
     lineage:
       - datalake_google_ads_clean.ads_performance.report_type
       - datalake_google_ads_clean.campaigns_performance.report_type
       - datalake_google_ads_clean.keywords_performance.report_type
       - datalake_google_ads_clean.videos_performance.report_type
+    categories: 
+      VIDEO_PERFORMANCE_REPORT: ''
+      CAMPAIGN_PERFORMANCE_REPORT: ''
+      AD_PERFORMANCE_REPORT: ''
+      KEYWORDS_PERFORMANCE_REPORT: ''
   ad_type:
+    description: Type of ad report extracted from google ads platform
     lineage:
       - datalake_gsheets_clean.marketing_costs_google_ad_type_flags.flag
+    categories: 
+      display_ad: ''
+      other: ''
+      dsa_ad: ''
+      resp_search_ad: ''
+      exp_text_ad: ''
   utm_term:
+    description: utm_term applied on growth marketing platform
     lineage:
       - datalake_google_ads_clean.ads_performance.ad_group_name
       - datalake_google_ads_clean.keywords_performance.criteria
       - datalake_google_ads_clean.keywords_performance.match_type
   utm_content:
+    description: utm_content applied on growth marketing platform
     lineage:
       - datalake_google_ads_clean.ads_performance.id_ad
   utm_campaign:
+    description: utm_campaign applied on growth marketing platform
     lineage:
       - datalake_google_ads_clean.ads_performance.campaign_name
   desktop_cost:
+    description: Cost spent on desktop plataform
     lineage:
       - datalake_google_ads_clean.ads_performance.cost
       - datalake_google_ads_clean.campaigns_performance.cost
       - datalake_google_ads_clean.keywords_performance.cost
       - datalake_google_ads_clean.videos_performance.cost
   mobile_cost:
+    description: Cost spent on mobile plataform
     lineage:
       - datalake_google_ads_clean.ads_performance.cost
       - datalake_google_ads_clean.campaigns_performance.cost
       - datalake_google_ads_clean.keywords_performance.cost
       - datalake_google_ads_clean.videos_performance.cost
   total_cost:
+    description: Total cost
     lineage:
       - datalake_google_ads_clean.ads_performance.cost
       - datalake_google_ads_clean.campaigns_performance.cost
       - datalake_google_ads_clean.keywords_performance.cost
       - datalake_google_ads_clean.videos_performance.cost
   impressions:
+    description: Impressions from google ads platform
     lineage:
       - datalake_google_ads_clean.ads_performance.impressions
       - datalake_google_ads_clean.campaigns_performance.impressions
       - datalake_google_ads_clean.keywords_performance.impressions
       - datalake_google_ads_clean.videos_performance.impressions
   clicks:
+    description: Clicks from google ads platform
     lineage:
       - datalake_google_ads_clean.ads_performance.clicks
       - datalake_google_ads_clean.campaigns_performance.clicks

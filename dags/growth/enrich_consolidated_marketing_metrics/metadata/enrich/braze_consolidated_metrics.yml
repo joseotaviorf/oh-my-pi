@@ -1,23 +1,50 @@
 ---
 database_name: datalake_consolidated_marketing_metrics
 table_name: braze_consolidated_metrics
+owner: '@data-growth'
+domain: Growth
+description: Table that consolidates metrics extracted from braze platform
 columns:
   id_date:
+    description: Date segmentation
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.dt_webhook_sent
   campaign_name:
+    description: Name of campaign segmentation
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.canvas_name
       - datalake_braze_webhook_notification.webhook_notification_volumes.rule_status
   ia_general:
+    description: ''
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.rule_status
+    categories: 
+      SMS: ''
   context:
+    description: Supply operation channel belloging to Referals origin
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.rule_status
+    categories: 
+      Indica Aí - General: ''
+      Doorman: ''
+      Indica Aí - Agents: ''
   city_group:
+    description: City group segmentation
     lineage:
       - datalake_marketing_costs_sharing_rules.a028a.city_group
   cost:
+    description: Segmented
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.notification_count
+  origin: 
+    description: Growth marketing platform
+    categories: 
+      braze: ''
+  account_name: 
+    description: Accont name at braze platform
+  utm_campaign: 
+    description: utm_campaign applied on growth marketing platform
+  utm_term: 
+    description: utm_term applied on growth marketing platform
+  utm_content: 
+    description: utm_content applied on growth marketing platform

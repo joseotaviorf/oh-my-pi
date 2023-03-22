@@ -1,78 +1,109 @@
 ---
 database_name: datalake_marketing_costs
 table_name: daily_costs
+owner: '@data-growth'
+domain: Growth
+description: Table that consolidates costs extract from manual growth marketing input
 columns:
   id_date:
+    description: Date segmentation
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.id_date
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.dt_cost
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.dt_cost
   origin:
+    description: Growth marketing platform
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.origin
+    categories: 
+      mitula: ''
+      trovit: ''
+      criteo: ''
+      facebook: ''
+      google: ''
   account_name:
+    description: Accont name at braze platform
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.account_name
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.account_name
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.account_name
   campaign_name:
+    description: Name of campaign segmentation
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.campaign_name
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.campaign_name
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.campaign_name
   utm_campaign:
+    description: utm_campaign applied on growth marketing platform
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_campaign
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.campaign_name
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.campaign_name
   utm_term:
+    description: utm_term applied on growth marketing platfor
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_term
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.utm_term
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.utm_term
   utm_content:
+    description: utm_content applied on growth marketing platform
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_content
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.utm_content
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.utm_content
   city_group:
+    description: City group segmentation
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.city_group
       - datalake_marketing_costs_sharing_rules.sharing_rules.city_group
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.city_group
   campaign_origin_acquisition:
+    description: mkt_origin which marketing campaign was intent to destiate effort
     lineage:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.campaign_origin_acquisition
+    categories: 
+      Agents: ''
+      New Channels: ''
+      Other: ''
+      Doorman: ''
   mkt_category:
+    description: Level of growth marketing taxonomy
     lineage:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.mkt_category
   mkt_flow:
+    description: Level of growth marketing taxonomy
     lineage:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.mkt_flow
   mkt_completion:
+    description: Level of growth marketing taxonomy
     lineage:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.mkt_completion
   mkt_origin:
+    description: Level of growth marketing taxonomy
     lineage:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.mkt_origin
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_origin
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_origin
   mkt_channel:
+    description: Level of growth marketing taxonomy
     lineage:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.mkt_channel
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_channel
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_channel
   mkt_medium:
+    description: Level of growth marketing taxonomy
     lineage:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.mkt_medium
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_medium
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_medium
   mkt_source:
+    description: Level of growth marketing taxonomy
     lineage:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.mkt_source
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_source
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_source
   cost:
+    description: Cost
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.desktop_cost
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.mobile_cost
@@ -89,7 +120,14 @@ columns:
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.cost_share_mobile
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.cost_share_other
   funnel_side:
+    description: Squad resposible for that cost
     lineage:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.side
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.side
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.side
+    categories: 
+        demand: ''
+        affiliates: ''
+        partners: ''
+        branding: ''
+        social: ''
