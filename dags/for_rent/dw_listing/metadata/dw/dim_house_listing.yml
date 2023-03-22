@@ -299,7 +299,15 @@ columns:
   partner_3p_supply:
     lineage:
     - datalake_ebdb_listing.house.partner_3p_supply
-    description: Third party partner responsible for this supply (For Sale).
+    description: Third party partner in Rede QuintoAndar responsible for this supply.
+  partner_sale_3p_supply:
+    lineage:
+    - datalake_ebdb_listing.house.partner_3p_supply
+    description: Third party partner in Rede QuintoAndar responsible for this supply, in the context of ForSale.
+  partner_rent_3p_supply:
+    lineage:
+    - datalake_ebdb_listing.house.partner_3p_supply
+    description: Third party partner in Rede QuintoAndar responsible for this supply, in the context of ForRent.
   listing_category_start:
     lineage:
     - datalake_ebdb_listing.house_listing.listing_category
@@ -353,26 +361,32 @@ columns:
   is_3p_supply:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply
+    description: Boolean indicating if this is from Rede 3P supply.
+  is_sale_3p_supply:
+    lineage:
+    - datalake_ebdb_listing.house.is_sale_3p_supply
     description: Boolean indicating if this is from Rede 3P supply (For Sale).
+  is_rent_3p_supply:
+    lineage:
+    - datalake_ebdb_listing.house.is_rent_3p_supply
+    description: Boolean indicating if this is from Rede 3P supply (For Rent).
   is_3p_supply_5a:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_5a
-    description: Boolean indicating if this is from Quinto Andar's Rede 3P supply
-      (For Sale).
+    description: Boolean indicating if this is from Quinto Andar's Rede 3P supply.
   is_3p_supply_bh:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_bh
-    description: Boolean indicating if this is from Casa Mineira's Rede 3P supply
-      (For Sale).
+    description: Boolean indicating if this is from Casa Mineira's Rede 3P supply.
   is_casa_mineira_migration:
     lineage:
     - datalake_ebdb_listing.house.is_casa_mineira_migration
-    description: Booblean indicating if this listing came from Casa Mineira's data
+    description: Boolean indicating if this listing came from Casa Mineira's data
       migration.
   is_sale_primary_market:
     lineage:
     - datalake_ebdb_listing.house.is_sale_primary_market
-    description: Booblean indicating if this is a sale primary market's house.
+    description: Boolean indicating if this is a sale primary market's house.
   is_early_demand:
     lineage:
     - datalake_ebdb_listing.house_listing.is_early_demand

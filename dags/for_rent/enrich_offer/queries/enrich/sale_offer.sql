@@ -757,11 +757,13 @@ business_rules AS (
         COALESCE(vo_days_offer_accepted_to_offer_dismissed, mo_days_offer_accepted_to_offer_dismissed) AS days_offer_accepted_to_offer_dismissed,
         ds.ts_updated,
         vo_ts_last_updated_pendency AS ts_last_updated_pendency,
-        h.partner_3p_supply,
+        CASE
+            WHEN h.is_sale_3p_supply THEN h.partner_3p_supply
+        END AS partner_3p_supply,
         ds.partner_3p_demand,
-        COALESCE(h.is_3p_supply, FALSE) AS is_3p_supply,
-        COALESCE(h.is_3p_supply_5a, FALSE) AS is_3p_supply_5a,
-        COALESCE(h.is_3p_supply_bh, FALSE) AS is_3p_supply_bh,
+        COALESCE(h.is_sale_3p_supply, FALSE) AS is_3p_supply,
+        COALESCE(h.is_3p_supply_5a AND h.is_sale_3p_supply, FALSE) AS is_3p_supply_5a,
+        COALESCE(h.is_3p_supply_bh AND h.is_sale_3p_supply, FALSE) AS is_3p_supply_bh,
         ds.is_3p_demand,
         ds.flg_booking_before_offer,
         ds.flg_visit_completed_before_offer,

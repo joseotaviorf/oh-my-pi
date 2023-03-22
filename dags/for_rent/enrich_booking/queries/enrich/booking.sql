@@ -419,7 +419,13 @@ base_booking AS (
     ) AS user_sale_booking_creator,
     bha.contract_name AS hub_agent_region,
     b3pa.partner_3p_demand,
-    hl.partner_3p_supply,
+    CASE
+      WHEN COALESCE(
+        (hl.is_sale_3p_supply AND b.business_context = 'SALE')
+        OR (hl.is_rent_3p_supply AND b.business_context = 'RENT'),
+        FALSE
+      ) THEN hl.partner_3p_supply
+    END AS partner_3p_supply,
     b.ts_visit_fup,
     b.ts_created,
     b.ts_updated,
@@ -439,9 +445,27 @@ base_booking AS (
     b.is_agent_fixed,
     IF(bha.id IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
     IF(b3pa.id IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
-    COALESCE(hl.is_3p_supply, FALSE) AS is_3p_supply,
-    COALESCE(hl.is_3p_supply_5a, FALSE) AS is_3p_supply_5a,
-    COALESCE(hl.is_3p_supply_bh, FALSE) AS is_3p_supply_bh,
+    COALESCE(
+      (hl.is_sale_3p_supply AND b.business_context = 'SALE')
+      OR (hl.is_rent_3p_supply AND b.business_context = 'RENT'),
+      FALSE
+    ) AS is_3p_supply,
+    CASE
+      WHEN COALESCE(
+        (hl.is_sale_3p_supply AND b.business_context = 'SALE')
+        OR (hl.is_rent_3p_supply AND b.business_context = 'RENT'),
+        FALSE
+      ) THEN COALESCE(hl.is_3p_supply_5a, FALSE)
+      ELSE FALSE
+    END AS is_3p_supply_5a,
+    CASE
+      WHEN COALESCE(
+        (hl.is_sale_3p_supply AND b.business_context = 'SALE')
+        OR (hl.is_rent_3p_supply AND b.business_context = 'RENT'),
+        FALSE
+      ) THEN COALESCE(hl.is_3p_supply_bh, FALSE)
+      ELSE FALSE
+    END AS is_3p_supply_bh,
     IF(fud.visit_type = 'VIDEO', TRUE, FALSE) AS is_virtual_visit,
     e.is_successful AS is_entrance_successful,
     (b.status = 'Cancelado') AS is_canceled,

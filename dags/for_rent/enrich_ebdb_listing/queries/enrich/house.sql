@@ -38,6 +38,8 @@ listing_info AS (
   SELECT 
     lbc.id_house,
     BOOL_OR(lbc.ownership = 'THIRD_PARTY') AS is_3p_supply,
+    BOOL_OR(lbc.ownership = 'THIRD_PARTY' AND lbc.business_context = 'SALE') AS is_sale_3p_supply,
+    BOOL_OR(lbc.ownership = 'THIRD_PARTY' AND lbc.business_context = 'RENT') AS is_rent_3p_supply,
     BOOL_OR(lsm.is_primary_market) AS is_sale_primary_market,
     BOOL_OR(lsm.has_great_sale_price_tag) AS has_sale_great_price_tag
   FROM
@@ -196,11 +198,13 @@ SELECT
   h.listing_type,
   h.admin_info,
   h.internal_admin_info,
-  COALESCE(
-    pa.partner_3p_supply, -- should be replaced by company
-    NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), ''), -- should be replaced by supply processor
-    IF(li.is_3p_supply, 'Unknown', NULL) -- Sometimes, listing_business_context sets ownership to THIRD_PARTY, but internal_admin_info is empty
-  ) AS partner_3p_supply,
+  CASE
+    WHEN li.is_3p_supply THEN COALESCE(
+      pa.partner_3p_supply,
+      NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), ''),
+      'Unknown' -- Sometimes, listing_business_context sets ownership to THIRD_PARTY, but internal_admin_info is empty
+    )
+  END AS partner_3p_supply,
   h.photo_booking_historic,
   h.default_neighborhood,
   h.condo_type,
@@ -273,10 +277,9 @@ SELECT
   h.is_visit_information_confirmed,
   h.is_for_rent,
   h.is_for_sale,
-  CASE
-    WHEN li.is_3p_supply THEN TRUE -- After supply processor is in production, the ELSE part should be discarded.
-    ELSE COALESCE(UPPER(h.internal_admin_info) LIKE '%[3P%-%]%', FALSE)
-  END AS is_3p_supply,
+  COALESCE(li.is_3p_supply, FALSE) AS is_3p_supply,
+  COALESCE(li.is_sale_3p_supply, FALSE) AS is_sale_3p_supply,
+  COALESCE(li.is_rent_3p_supply, FALSE) AS is_rent_3p_supply,
   (pa.partner_state IS DISTINCT FROM 'MG'
     AND COALESCE(
       UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3P-%]%',
@@ -387,4 +390,3 @@ LEFT JOIN
   partner_agencies AS pa
     ON UPPER(NULLIF(REGEXP_EXTRACT(REPLACE(h.internal_admin_info, ' ', ''), r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')) 
        IN (pa.cnpj, REPLACE(UPPER(pa.extracted_3p_tag), ' ', ''))
-

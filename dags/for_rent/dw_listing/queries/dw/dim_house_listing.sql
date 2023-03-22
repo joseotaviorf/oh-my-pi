@@ -160,6 +160,12 @@ house_listings AS (
         h.registration_abandoned_reason AS registration_abandoned_reason,
         h.unpublished_reason AS house_unpublished_reason,
         h.partner_3p_supply,
+        CASE
+            WHEN h.is_sale_3p_supply THEN h.partner_3p_supply
+        END AS partner_sale_3p_supply,
+        CASE
+            WHEN h.is_rent_3p_supply THEN h.partner_3p_supply
+        END AS partner_rent_3p_supply,
         hl.listing_category,
         hl.is_last_version,
         hl.is_exclusive,
@@ -187,6 +193,8 @@ house_listings AS (
         COALESCE(lbc.is_for_sale, FALSE) AS is_for_sale,
         h.has_instant_offer_enabled,
         h.is_3p_supply,
+        h.is_sale_3p_supply,
+        h.is_rent_3p_supply,
         h.is_3p_supply_5a,
         h.is_3p_supply_bh,
         h.is_casa_mineira_migration,
@@ -276,6 +284,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.is_for_rent,
     hl.is_for_sale,
     hl.is_3p_supply,
+    hl.is_sale_3p_supply,
+    hl.is_rent_3p_supply,
     hl.is_3p_supply_5a,
     hl.is_3p_supply_bh,
     hl.is_casa_mineira_migration,

@@ -12,10 +12,12 @@ SELECT
   hrs.registration_abandoned_reason,
   lbc.status_reason AS unpublished_reason,
   lbc.short_url,
-  h.partner_3p_supply,
-  h.is_3p_supply,
-  h.is_3p_supply_5a,
-  h.is_3p_supply_bh,
+  CASE
+    WHEN h.is_sale_3p_supply THEN h.partner_3p_supply
+  END AS partner_3p_supply,
+  h.is_sale_3p_supply AS is_3p_supply,
+  h.is_3p_supply_5a AND h.is_sale_3p_supply AS is_3p_supply_5a,
+  h.is_3p_supply_bh AND h.is_sale_3p_supply AS is_3p_supply_bh,
   h.is_casa_mineira_migration,
   h.is_sale_primary_market AS is_primary_market,
   sl.is_for_rent,

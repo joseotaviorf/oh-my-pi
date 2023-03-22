@@ -4,7 +4,12 @@ SELECT
   h.id_user AS sk_owner,
   CAST(hslc.id_user AS BIGINT) AS sk_user_consultant,
   h.id_region AS sk_region, 
-  COALESCE(cs_supply.sk_company, -1) AS sk_company,
+  COALESCE(
+    CASE
+      WHEN h.is_sale_3p_supply THEN cs_supply.sk_company
+    END,
+    -1
+  ) AS sk_company,
   NULLIF(h.sale_price, 0) AS price,
   h.sale_price/h.total_area AS price_m2,
   COALESCE(BIGINT(DATE_FORMAT(sl.ts_first_publication, 'yyyyMMdd')), -1) AS sk_first_publication_date,
