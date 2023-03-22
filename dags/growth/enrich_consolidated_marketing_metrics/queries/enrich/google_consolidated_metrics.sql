@@ -95,6 +95,10 @@ keywords_metrics AS (
             WHEN gkpr.device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
+        SUM(CASE
+            WHEN gkpr.device NOT IN ('MOBILE', 'TABLET',  'DESKTOP') THEN cost/1000000
+            ELSE 0
+        END) AS other_cost,
         SUM(cost/1000000) AS total_cost,
         SUM(impressions) AS impressions,
         SUM(clicks) AS clicks
@@ -148,6 +152,10 @@ ads_metrics AS (
             WHEN gapr.device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
+        SUM(CASE
+            WHEN gapr.device NOT IN ('MOBILE', 'TABLET',  'DESKTOP') THEN cost/1000000
+            ELSE 0
+        END) AS other_cost,
         SUM(cost/1000000) AS total_cost,
         SUM(impressions) AS impressions,
         SUM(clicks) AS clicks
@@ -187,6 +195,10 @@ campaigns_metrics AS (
             WHEN gcpr.device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
+        SUM(CASE
+            WHEN gcpr.device NOT IN ('MOBILE', 'TABLET',  'DESKTOP') THEN cost/1000000
+            ELSE 0
+        END) AS other_cost,
         SUM(cost/1000000) AS total_cost,
         SUM(impressions) AS impressions,
         SUM(clicks) AS clicks
@@ -222,6 +234,10 @@ videos_metrics AS (
             WHEN gvpr.device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
+        SUM(CASE
+            WHEN gvpr.device NOT IN ('MOBILE', 'TABLET',  'DESKTOP') THEN cost/1000000
+            ELSE 0
+        END) AS other_cost,
         SUM(cost/1000000) AS total_cost,
         SUM(impressions) AS impressions,
         SUM(clicks) AS clicks

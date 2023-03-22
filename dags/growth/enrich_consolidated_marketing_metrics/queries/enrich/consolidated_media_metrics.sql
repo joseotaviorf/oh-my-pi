@@ -12,7 +12,7 @@ WITH consolidated_sources AS (
         utm_campaign,
         desktop_cost,
         mobile_cost,
-        0.0 AS other_cost,
+        other_cost,
         total_cost,
         impressions,
         clicks

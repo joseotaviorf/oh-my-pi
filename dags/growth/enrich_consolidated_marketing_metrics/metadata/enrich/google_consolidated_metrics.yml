@@ -76,6 +76,13 @@ columns:
       - datalake_google_ads_clean.campaigns_performance.cost
       - datalake_google_ads_clean.keywords_performance.cost
       - datalake_google_ads_clean.videos_performance.cost
+  other_cost:
+    description: Cost spent on other devices, such as connected tv.
+    lineage:
+      - datalake_google_ads_clean.ads_performance.cost
+      - datalake_google_ads_clean.campaigns_performance.cost
+      - datalake_google_ads_clean.keywords_performance.cost
+      - datalake_google_ads_clean.videos_performance.cost
   total_cost:
     description: Total cost
     lineage:

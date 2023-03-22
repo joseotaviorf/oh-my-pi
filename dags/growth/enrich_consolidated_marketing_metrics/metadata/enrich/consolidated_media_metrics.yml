@@ -110,6 +110,7 @@ columns:
     lineage:
       - datalake_consolidated_marketing_metrics.criteo_consolidated_metrics.other_cost
       - datalake_consolidated_marketing_metrics.facebook_consolidated_metrics.other_cost
+      - datalake_consolidated_marketing_metrics.google_consolidated_metrics.other_cost
       - datalake_consolidated_marketing_metrics.rtb_consolidated_metrics.other_cost
       - datalake_marketing_costs_sharing_rules.sharing_rules.share
   total_cost:
