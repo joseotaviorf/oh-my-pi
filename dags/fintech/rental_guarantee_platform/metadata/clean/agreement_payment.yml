@@ -1,0 +1,48 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: agreement_payment
+owner: athos.sampayo@quintoandar.com.br
+domain: platform
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.id
+  id_agreement:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.agreement_id
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.status
+  billing_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.billing_type
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.version
+  value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.value
+  paid_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.paid_value
+  dt_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.due_date
+  dt_paid:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.paid_date
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.agreement_payment.day

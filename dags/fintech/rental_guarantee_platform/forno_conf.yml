@@ -107,4 +107,10 @@ tables:
     date_filter_column: dateupdate
   - table_name: propose_status
     date_filter_column: dateupdate
+  - table_name: delinquency
+    date_filter_column: updated_at
+  - table_name: agreement
+    date_filter_column: updated_at
+  - table_name: agreement_payment
+    date_filter_column: updated_at
 partition_cols: ["year", "month", "day"]

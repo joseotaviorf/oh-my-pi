@@ -1,0 +1,69 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: delinquency
+owner: athos.sampayo@quintoandar.com.br
+domain: platform
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.id
+  id_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.propose
+  id_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.status
+  id_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.type
+  id_tenant:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.tenant
+  id_user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.userinsert
+  id_user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.userupdate
+  subcategory:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.subcategory
+  value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.value
+  original_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.original_value
+  amount_paid:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.amount_paid
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.active
+  is_valid:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.valid
+  dt_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.due_date
+  dt_paid:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.payment_date
+  dt_payment_scheduled:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.schedule_payment_date
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.day
