@@ -13,7 +13,7 @@ Daily after enrich layers. More information about run time [here]({chart_url}{da
 ### Outputs
 This DAG creates, via incremental load:
 
-- `datalake_mexico_marketing_automatic_daily_costs.daily_costs`
+- `datalake_mexico_marketing_costs.daily_costs`
 
 ### Responsible Data Team
 ​

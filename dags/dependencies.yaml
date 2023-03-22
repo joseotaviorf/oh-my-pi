@@ -2128,7 +2128,7 @@ bietlejuice.enrich_mexico_google_ads:
 
 bietlejuice.enrich_mexico_marketing_automatic_daily_costs:
   - bietlejuice.enrich_mexico_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
-  - bietlejuice.gsheets.growth:load-clean-marketing-cost-taxonomy
+  - bietlejuice.gsheets.growth:done-clean-marketing-cost-taxonomy
 
 bietlejuice.enrich_mexico_rent_supply:
   - bietlejuice.dw_datamarts_growth_cross:create-rental-marketplace-flows-in-datalake

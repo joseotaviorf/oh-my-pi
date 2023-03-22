@@ -1,5 +1,5 @@
 ---
-database_name: datalake_mexico_marketing_automatic_daily_costs
+database_name: mexico_marketing_costs
 table_name: daily_costs
 description: Table that consolidates all the automatic daily costs metrics related to Mexico operation. 
 domain: International
