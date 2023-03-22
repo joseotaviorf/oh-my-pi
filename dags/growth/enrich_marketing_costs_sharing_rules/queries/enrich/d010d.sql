@@ -20,3 +20,4 @@ INNER JOIN
     datalake_region.region AS rgn
         ON rgn.id = COALESCE(hls.id_region, -1)
         AND rgn.city_group IS NOT NULL
+        AND rgn.country_code = 'BR'

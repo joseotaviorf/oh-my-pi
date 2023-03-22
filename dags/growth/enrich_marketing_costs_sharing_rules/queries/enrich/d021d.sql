@@ -19,3 +19,4 @@ FROM
         AND dr.city_group IS NOT NULL
 WHERE
     city_group != 'Belo Horizonte'
+    AND country_code = 'BR'

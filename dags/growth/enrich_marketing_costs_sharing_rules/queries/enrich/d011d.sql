@@ -17,3 +17,4 @@ FROM
     JOIN dw_public.dim_region AS dr
         ON dr.sk_region = fhs.sk_region
         AND dr.city_group IS NOT NULL
+        AND dr.country_code = 'BR'
