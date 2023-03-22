@@ -1620,6 +1620,7 @@ bietlejuice.enrich_cozy_metrics:
 
 bietlejuice.enrich_credit_analysis:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-contract-person-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
   - bietlejuice.enrich_docx:load-enrich-credit-evaluation
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
@@ -2304,6 +2305,9 @@ bietlejuice.enrich_property_tax:
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-aud-in-data-lake
+  - bietlejuice.docx:load-clean-folder
+  - bietlejuice.docx:load-clean-folder-reference
+  - bietlejuice.docx:load-clean-document
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity

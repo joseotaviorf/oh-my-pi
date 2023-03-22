@@ -1,174 +1,265 @@
 database_name: datalake_proposal
 table_name: proposal
+owner: giuseppe.giovanelli@quintoandar.com.br
+domain: Fintech
+description: "Enrich table that brings proposal information from many sources and it is the base for dim_proposal."
 columns:
   id:
     lineage:
       - datalake_ebdb_clean.proposal.id
+    description: "Proposal identifier on EBDB, same on Sorting Hat ans Rental Guarantee microsservices."
   id_pre_proposal:
     lineage:
       - datalake_ebdb_clean.proposal.id_pre_proposal
+    description: "Pre Proposal identifier on EBDB."
   id_country:
     lineage:
       - datalake_ebdb_country.house.id_country
+    description: "Country identifier on EBDB."
   id_offer:
     lineage:
       - datalake_ebdb_clean.proposal.id_offer
+    description: "Offer identifier on EBDB."
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
+    description: "Country code identifier from EBDB."
   guarantee:
     lineage:
       - datalake_ebdb_clean.proposal.guarantee
+    description: "Proposal guarantee name."
   income:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.income
+    description: "Total income declared by tenants prospects."
   last_result:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.last_result
+    description: "Docx last cret credit evaluation result for a given proposal, such as pre approved, pre rejected,etc."
   motivation:
     lineage:
       - datalake_ebdb_clean.proposal.motivation
+    description: "Location motivation declared on proposal."
   rent_proposal:
     lineage:
       - datalake_ebdb_clean.proposal.rent_proposal
+    description: "Rent value on proposal."
   status:
     lineage:
       - datalake_ebdb_clean.proposal.status
+    description: "Latest proposal status on EBDB."
   status_sorting_hat:
     lineage:
       - datalake_sorting_hat_clean.proposal.status
+    description: "Proposal status on Sorting Hat microsservice."
   tenant_documentation_status:
     lineage:
       - datalake_ebdb_clean.proposal.tenant_documentation_status
+    description: "Tenant documentation status on EBDB."
   owner_documentation_status:
     lineage:
       - datalake_ebdb_clean.proposal.owner_documentation_status
+    description: "Owner documentation status on EBDB."
   package:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.package
+    description: "Total package value, rent + condominium + iptu + home_insurance."
   rejection_reason:
     lineage:
       - datalake_ebdb_clean.proposal.rejection_reason
+    description: "Rejection type marked on EBDB."
   dti:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.dti
+    description: "Debt-to-income, fraction between package value over tenants' total declared revenue."
   number_evaluations:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.number_evaluations
+    description: "Evaluations done on docx for a given proposal."
   has_tenant_sent_documentation:
     lineage:
       - datalake_ebdb_clean.proposal.has_tenant_sent_documentation
+    description: "Flag to signal if tenant has already sent the documentation." 
   has_owner_sent_documentation:
     lineage:
       - datalake_ebdb_clean.proposal.has_owner_sent_documentation
+    description: "Flag to signal if owner has already sent the documentation."
   has_tenant_accepted_contract:
     lineage:
       - datalake_ebdb_clean.proposal.has_tenant_accepted_contract
+    description: "Flag to signal if tenant has accepted contract." # REDO
   has_owner_accepted_contract:
     lineage:
       - datalake_ebdb_clean.proposal.has_owner_accepted_contract
+    description: "Flag to signal if tenant has accepted contract." # REDO
   has_additive_term:
     lineage:
       - datalake_ebdb_clean.proposal.has_additive_term
+    description: "Flag to signal if there are any terms on proposal besides the default."
   is_doc_reused:
     lineage:
       - datalake_ebdb_clean.proposal_aud.is_tenant_auto_submission
+    description: "Flag to signal if the docuemnts used were from an earlier submission."
   ts_to_scheduling:
     lineage:
       - datalake_ebdb_clean.proposal.ts_to_scheduling
+    description: "Timestamp of rescheduling" # REDO
   ts_proposal:
     lineage:
       - datalake_ebdb_clean.proposal.ts_proposal
+    description: "Timestamp of proposal creation on EBDB."
   ts_approved:
     lineage:
       - datalake_ebdb_clean.proposal.ts_approved
+    description: "Timestamp of proposal approval on EBDB."
   ts_documentation_sent:
     lineage:
       - datalake_ebdb_clean.proposal.ts_documentation_sent
+    description: "Timestamp of last tenant documentation was sent."
   ts_owner_documentation_sent:
     lineage:
       - datalake_ebdb_clean.proposal.ts_owner_documentation_sent
+    description: "Flag to signal if owner has accepted contract." # REDO
   ts_processed:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "Last timestamp marking when the proposal is approved or rejected."
   ts_created:
     lineage:
       - datalake_ebdb_clean.proposal.ts_created
+    description: "Timestamp of proposal creation on EBDB."
   ts_updated:
     lineage:
       - datalake_ebdb_clean.proposal.ts_updated
+    description: "Timestamp of the last update on proposal."
   ts_tenant_first_doc_sent:
     lineage:
       - datalake_ebdb_clean.proposal_aud.ts_documentation_sent
+    description: "First timestamp of ts_documentation_sent."
   ts_tenant_auto_first_doc_sent:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "First timestamp of ts_documentation_sent, considering if the documentation was already sent on a earlier proposal."
   ts_tenant_first_doc_complete:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "First timestamp of ts_documentation_complete. Deprecated at 2020." 
   ts_tenant_last_doc_complete:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "Last timestamp of ts_documentation_complete. Deprecated at 2020."
   ts_credit_analysis_first_init:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "First timestamp of tenant documentation status is set to AnaliseCredito or Analise5a."
   dt_credit_analysis_last_init:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "First timestamp of tenant documentation status is set to AnaliseCredito or Analise5a."
   ts_credit_analysis_last_init:
     lineage:
       - datalake_sorting_hat_clean.proposal_version.ts_analyzed
       - datalake_sorting_hat_clean.proposal.ts_analyzed
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "First timestamp of Sorting Hat analyzed signal or tenant documentation status is set to AnaliseCredito or Analise5a." # should go together with previous column
   ts_credit_analysis_first_end:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "First timestamp of EBDB's tenant documentation status is set to Aprovado, RecusadoCredito or Standby."
   dt_credit_analysis_last_end:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "Last timestamp of EBDB's tenant documentation status is set to Aprovado, RecusadoCredito or Standby."
   ts_credit_analysis_last_end:
     lineage:
       - datalake_sorting_hat_clean.proposal.ts_processed
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "Last timestamp of EBDB's tenant documentation status is set to Aprovado, RecusadoCredito or Standby or Sorting Hat has finished analysis."
   ts_credit_approved_last:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "Last timestamp when EBDB's proposal status is set to Aprovada."
   ts_credit_evaluation_first_init:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "First timestamp after 2020-06-07 when the EBDB's tenant documentation status is set to AnaliseCredito. Also, it is the column used to build Evaluation Started (ES) step on credit funnel."
   ts_credit_evaluation_last_init:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "Last timestamp after 2020-06-07 when the EBDB's tenant documentation status is set to AnaliseCredito."
   ts_credit_evaluation_first_negative:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "First timestamp when EBDB's tenant_documentation_status = RecusadoCredito and proposal rejection reason is set to CreditEvaluationRejected."
   ts_credit_evaluation_last_negative:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "Last timestamp when EBDB's tenant_documentation_status = RecusadoCredito and proposal rejection reason is set to CreditEvaluationRejected."
+  ts_automatic_model_evaluation_positive:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_credit_analysis.credit_analysis_proposals.ts_last_credit_evaluation_positive
+    description: "Timestamp that indicates if the proposal has received any guarantee option to proceed within the flux."
+  ts_guarantee_chosen:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.proposal.is_tenant_auto_submission
+    description: " Timestamp that indicates if the proposal has a guarantee chosen, be it Free or Paid."
+  ts_tenant_first_document_sent:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_credit_analysis.credit_analysis_proposals.ts_last_credit_evaluation_positive
+    description: "Timestamp that indicates if the tentant's docs were sent, checking the first time doc flow or doc reuse flow. It is the date used to mark Document Sent (DS) step on Credit funnel."
+  ts_docx_first_doc_sent:
+    lineage:
+      - datalake_docx_clean.folder_reference_aud.ts_documentation_sent
+    description: "Timestamp indicating the first time the tenant's documentation was sent on DOCX microsservice."
+  ts_guarantee_validated:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.ts_guarantee_paid
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "Timestamp indicating that there is a valid guarantee to proceed to contract step, be it Free or Paid. It is the data used to mark the Guarantee Validated step on Credit funnel."
   ts_guarantee:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "Timestamp which the paid guarantee was created. Deprecated since its logic is fragile and does not cover the new paid guarantees."
   ts_doc_analysis_first_approved:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "First timestamp when EBDB's tenant_documentation_status = Aprovado."
   ts_doc_analysis_last_approved:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "Last timestamp when EBDB's tenant_documentation_status = Aprovado."
   ts_doc_analysis_first_rejected:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "First timestamp when EBDB's tenant_documentation_status = RecusadoCredito and proposal rejection reason is set to TenantDocumentationRejected."
   ts_doc_analysis_last_rejected:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: "Last timestamp when EBDB's tenant_documentation_status = RecusadoCredito and proposal rejection reason is set to TenantDocumentationRejected."
   ts_first_credit_evaluation_positive:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.ts_first_credit_evaluation_positive
+    description: "First timestamp indicating if proposal's last credit evaluation has been approved. It is part of the Evaluation Positive (EP) step on the credit funnel."
   ts_guarantee_paid:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.ts_guarantee_paid
+    description: "Timestamp indicating when the paid guarantee was actually paid, originated from Rental Guarantee microsservice."
   ts_last_credit_evaluation_positive:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.ts_last_credit_evaluation_positive
+    description: "Last timestamp indicating if proposal's last credit evaluation has been approved."
   ts_entrance:
     lineage:
       - datalake_ebdb_clean.proposal.ts_entrance
+    description: "Expected entrance date, created automatically."
+  is_guarantee_from_crm:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.guarantee_source
+    description: "Indicates if the paid guarantee was created via CRM or if it was done via the regular client flow."
+  is_retenant:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.is_retenant
+    description: "Indicates if the proposal has a proponent that once has had a contract here."
