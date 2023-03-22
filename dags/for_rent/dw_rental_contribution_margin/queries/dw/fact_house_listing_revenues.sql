@@ -212,7 +212,7 @@ revenue_with_contract AS (
 revenues_calculation AS (
 SELECT 
   MONOTONICALLY_INCREASING_ID() AS sk_house_listing_revenue,
-  COALESCE(revenue.id_contract, rf.sk_contract, ltra.id_contract_ebdb) AS id_contract,
+  COALESCE(revenue.id_contract, rf.sk_contract, ltra.id_contract_ebdb, -1) AS id_contract,
   COALESCE(r.id_house_listing, revenue.id_house_listing, hl_contract.id_house_listing) AS id_house_listing,
   COALESCE(r.id_house, revenue.id_house, hl_contract.id_house) AS id_house,
   COALESCE(hl.country_code, hl_contract.country_code, 'Undefined') AS country_code,
