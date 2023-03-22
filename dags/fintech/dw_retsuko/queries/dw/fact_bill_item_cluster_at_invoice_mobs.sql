@@ -41,8 +41,8 @@ SELECT
     ) AS mob_canceled_by_due_date,
     GREATEST(12*(YEAR(dt_due)-YEAR(dt_created))+(MONTH(dt_due)-MONTH(dt_created)),0) AS  mob_due_by_created_date,
     GREATEST(12*(YEAR(dt_due)-YEAR(dt_due))+(MONTH(dt_due)-MONTH(dt_due)),0) AS  mob_due_by_due_date,
-    DATE_TRUNC('MONTH', dt_due) AS safra_per_dt_due,
-    DATE_TRUNC('MONTH', dt_created) AS safra_per_dt_created
+    DATE_TRUNC('MONTH', dt_due) AS ts_safra_per_dt_due,
+    DATE_TRUNC('MONTH', dt_created) AS ts_safra_per_dt_created
 FROM
     bill_items_cohort_rules AS cr
 LEFT JOIN datalake_retsuko.retsuko_junk AS jk

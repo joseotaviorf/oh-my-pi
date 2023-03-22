@@ -1,0 +1,66 @@
+database_name: dw_retsuko
+table_name: fact_bill_item_cluster_at_invoice_mobs_derived
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "This is a derived fact table that materializes the temporal monthly evolution of a given status of an invoice and the value financial value of that status"
+columns:
+  sk_invoice:
+    description: Identification of invoices and key to join with invoice granularity tables
+    lineage:
+      - fact_bill_item_cluster_at_invoice_mobs.sk_invoice
+  sk_contract:
+    description: Identification of contracts and key to join with contracts granularity tables
+    lineage:
+      - fact_bill_item_cluster_at_invoice_mobs.sk_contract
+  sk_junk_bill_items_cluster:
+    description: ID of the cluster to which the bill items belong and key to join with enrich and dim junks
+    lineage:
+      - fact_bill_item_cluster_at_invoice_mobs.sk_junk_bill_items_cluster
+  col_mob:
+    description: Auxiliary field to cluster by mob
+  reference_date_mob:
+    description: Two options to filter the mob by payment date or by due date
+  status_temporal:
+    description: Invoice status at a given point in time
+  mobs_possible_invoice_by_created_date:
+    description: Age in months of the invoice based on creation date
+  mobs_possible_invoice_by_due_date:
+    description: Age in months of the invoice based on due date
+  mob_paid_by_created_date:
+    description: Number of months that took for the invoice to be paid based on the creation date
+  mob_canceled_by_created_date:
+    description: Number of months that took for the invoice to be cancelled based on the creation date
+  mob_paid_by_due_date:
+    description: Number of months that took for the invoice to be paid based on the due date
+  mob_canceled_by_due_date:
+    description: Number of months that took for the invoice to be cancelled based on the creation date
+  mob_due_by_created_date:
+    description: Number of months until expiration of the invoice based on the creation date
+  mob_due_by_due_date:
+    description: Number of months until expiration of the invoice based on the due date
+  signal_paid_mob:
+    description: Auxiliary column to indicate if that col_mob value is corresponded to a PAID STATUS
+  signal_canceled_mob:
+    description: Auxiliary column to indicate if that col_mob value is corresponded to a CANCELED STATUS
+  signal_due_mob:
+    description: Auxiliary column to indicate if that col_mob value is corresponded to a DUE STATUS
+  signal_to_due_mob:
+    description: Auxiliary column to indicate if that col_mob value is corresponded to a TO DUE STATUS
+  value_bill_item_cluster:
+    description: Financial value of the bill item cluster based on the amount of the bill items of the cluster in the invoice
+  value_canceled:
+    description: Auxiliary columns to indicate the financial value of the CANCELED STATUS in that given mob (col_mob)
+  value_paid:
+    description: Auxiliary columns to indicate the financial value of the PAID STATUS in that given mob (col_mob)
+  value_due:
+    description: Auxiliary columns to indicate the financial value of the DUE STATUS in that given mob (col_mob)
+  value_to_due:
+    description: Auxiliary columns to indicate the financial value of the TO DUE STATUS in that given mob (col_mob)
+  due_amount:
+    description: Invoice amount, negative means its a due value TO 5A, and positive means its a due value FROM 5A
+    lineage:
+      - fact_bill_item_cluster_at_invoice_mobs.due_amount
+  safra_per_dt_due:
+    description: Monthly group by due date
+  safra_per_dt_created:
+    description: Monthly group by created date
