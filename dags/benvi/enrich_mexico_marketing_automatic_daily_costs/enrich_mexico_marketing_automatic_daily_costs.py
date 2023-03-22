@@ -17,8 +17,11 @@ from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 # Pipeline inputs
-CONTEXT = "mexico_marketing_automatic_daily_costs"
-DAG_NAME = f"enrich_{CONTEXT}"
+
+# We load in a database different of the DAG name since the daily_costs table consolidates
+# automatic + manual costs (which is running during the middle of the day).
+CONTEXT = "mexico_marketing_costs" 
+DAG_NAME = f"enrich_mexico_marketing_automatic_daily_costs"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2022, 6, 1, tzinfo=timezone("America/Mexico_City"))
 MAIN_SCHEDULE_INTERVAL = None
