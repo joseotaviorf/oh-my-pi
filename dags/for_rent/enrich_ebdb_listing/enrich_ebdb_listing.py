@@ -40,6 +40,7 @@ SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 
 
 cluster_description = config_service.get_config("custom_cluster")
+cluster_description['spark_conf']['spark.sql.sources.partitionOverwriteMode'] = 'static'
 default_libraries = config_service.get_config("default_libraries")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
