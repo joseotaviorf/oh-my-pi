@@ -93,6 +93,7 @@ def _fetch_condominium_data(auth_token:str, condominium_url:str, execution_date:
                         "lavanderia": int(row['lavanderia']),
                         "gas_encanado": int(row['gasEncanado']),
                         "total_blocos": str(row['totalBlocos']),
+                        "areaGourmet": str(row['areaGourmet']),
                         "caracteristicas_condominio": str(row['caracteristicasCondominio']),
                         "quantidade_funcionarios": str(row['quantidadeFuncionarios']),
                         "arrecadacao_mensal": str(row['arrecadacaoMensal']),

@@ -44,6 +44,10 @@ columns:
     lineage:
       - datalake_sindico_net_raw.condominium.cep
     description: "The zip code of the condo location."
+  has_gourmet_area:
+    lineage:
+      - datalake_sindico_net_raw.condominium.areaGourmet
+    description: "Boolean value to indicate if the condo has a gourmet area."
   has_grill_area:
     lineage:
       - datalake_sindico_net_raw.condominium.churrasqueira

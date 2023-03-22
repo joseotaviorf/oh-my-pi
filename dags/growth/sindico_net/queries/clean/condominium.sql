@@ -39,6 +39,7 @@ SELECT
     total_portarias AS total_ordinances,
     total_unidades AS total_units,
     CAST(academia AS BOOLEAN) AS has_gym,
+    CAST(areaGourmet AS BOOLEAN) AS has_gourmet_area,
     CAST(churrasqueira AS BOOLEAN) AS has_grill_area,
     CAST(elevador AS BOOLEAN) AS has_elevator,
     CAST(gas_encanado AS BOOLEAN) AS has_piped_gas,
