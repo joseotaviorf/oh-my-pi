@@ -33,10 +33,6 @@ custom_libraries = [
     {"maven": {"coordinates": "mysql:mysql-connector-java:5.1.47"}},
     {"pypi": {"package": "hubspot-api-client==5.0.0"}},
     {
-        "whl": f"{artifacts_bucket}/pipedrive-api-client-python/"
-        f"quintoandar_pipedrive_api_client-0.1.0-py2.py3-none-any.whl"
-    },
-    {
         "whl": f"{artifacts_bucket}/gsheets-api-client-python/"
         f"quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
     },

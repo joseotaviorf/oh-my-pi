@@ -63,7 +63,6 @@ dags_out_of_pattern:
         "marketing_costs",
         "metric_rent_benvi__demand",
         "metric_rent_benvi__supply",
-        "portal_casa_mineira_pipedrive",
         "quintoandar",
         "regions_polygon",
         "reverse_atento",
