@@ -3,6 +3,7 @@ block_list:
   - change_owner_control
   - flyway_schema_history
   - message
+  - mortgage_aud
   - mortgage_options_aud
   - credit_application_aud
 tables:
@@ -68,8 +69,8 @@ tables:
     extraction_type: incremental
   mortgage:
     extraction_type: incremental
-  mortgage_aud:
-    extraction_type: incremental
+  ##mortgage_aud:
+  ##  extraction_type: incremental
   negotiation:
     extraction_type: incremental
   negotiation_aud:
