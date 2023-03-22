@@ -1,10 +1,12 @@
 ---
-database_name: str(min=1, max=100)
-table_name: str(min=1, max=100)
+database_name: str(min=1, max=280)
+table_name: str(min=1, max=280)
 owner: regex('(?:[\.-]?\w+)*@\w+(?:[\.-]?\w+)*', required=False)
-domain: str(min=1, max=100, required=False)
+domain: str(min=1, max=280, required=False)
 description: str(required=False)
-columns: map(include("column"), key=str(min=2, max=50), required=False)
+columns: map(include("column"), key=str(min=1, max=280), required=False)
 ---
 column:
-  tags: list(str(max=50))
+  description: str(required=False)
+  categories: map(str(), key=str(), required=False)
+  tags: list(str(max=50), required=False)
