@@ -23,7 +23,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `repressed_demand_sale`
 - `sale_agents_weekly_performance`
 - `sale_lead_flow`
-- `sale_ongoing_listings_casa_mineira`
 
 ### Responsible Data Engineering Team
 
