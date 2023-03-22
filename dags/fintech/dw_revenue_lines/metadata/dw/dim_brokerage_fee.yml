@@ -1,37 +1,51 @@
 ---
 database_name: dw_revenue_lines
 table_name: dim_brokerage_fee
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing brokerage fee and payment data by contract"
 columns:
   id_contract_ebdb:
+    description: "Contract ID on EBDB"
     lineage:
       - datalake_revenue_lines.brokerage_fee.id_contract_ebdb
   invoice_payment_status:
+    description: "Description of the invoice payment status"
     lineage:
       - datalake_revenue_lines.brokerage_fee.invoice_payment_status
   first_rental_commission:
+    description: "Commission value from first rental"
     lineage:
       - datalake_revenue_lines.brokerage_fee.first_rental_commission
   agent_brokerage_share:
+    description: "Share of brokerage agent"
     lineage:
       - datalake_revenue_lines.brokerage_fee.agent_brokerage_share
   brokerage_split_percentage:
+    description: "Split Percentage for the brokerage fee"
     lineage:
       - datalake_revenue_lines.brokerage_fee.brokerage_split_percentage
   prod_theorical_amount:
+    description: "Total amount that appears on the invoice"
     lineage:
       - datalake_revenue_lines.brokerage_fee.prod_theorical_amount
   invoice_paid_amount:
+    description: "Paid amount in BRL"
     lineage:
       - datalake_revenue_lines.brokerage_fee.invoice_paid_amount
   accrual_year_month:
+    description: "Reference year-month"
     lineage:
       - datalake_revenue_lines.brokerage_fee.accrual_year_month
   dt_due:
+    description: "Invoice's due date"
     lineage:
       - datalake_revenue_lines.brokerage_fee.dt_due
   dt_paid:
+    description: "Invoice's paid date"
     lineage:
       - datalake_revenue_lines.brokerage_fee.dt_paid
   dt_contract_start:
+    description: "Contract start date"
     lineage:
       - datalake_revenue_lines.brokerage_fee.dt_contract_start

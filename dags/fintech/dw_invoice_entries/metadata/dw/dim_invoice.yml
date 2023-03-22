@@ -1,117 +1,121 @@
 database_name: dw_payment
 table_name: dim_invoice
-description: Information about invoices issued by SeuBarriga for ForRent contracts
-domain: Fintech
+domain: fintech
 owner: ae-finance-fintech@quintoandar.com.br
+description: "Information about invoices issued by SeuBarriga for ForRent contracts"
 columns:
   sk_invoice:
+    description: "Id of invoice registered in SeuBarriga"
     lineage:
-    - datalake_retsuko.invoice.id_invoice
-    description: Id of invoice registered in SeuBarriga
+      - datalake_retsuko.invoice.id_invoice
   frequency:
+    description: "Invoice frequency type to be sent, such as monthly, extra or pos"
     lineage:
-    - datalake_retsuko.invoice.invoice_frequency
-    description: Invoice frequency type to be sent, such as monthly, extra or pos
-      rental
+      - datalake_retsuko.invoice.invoice_frequency
+        rental
     categories:
-      early termination: ''
-      estate agent services: ''
-      extra: ''
-      monthly: ''
-      onboarding: ''
-      pos rental: ''
+      early termination: ""
+      estate agent services: ""
+      extra: ""
+      monthly: ""
+      onboarding: ""
+      pos rental: ""
   payment_status:
+    description: "Invoice payment status"
     lineage:
-    - datalake_retsuko.invoice.payment_status
-    description: Invoice payment status
+      - datalake_retsuko.invoice.payment_status
     categories:
       canceled: The invoice is canceled, and there's no more values to be paid
-      divergent payment: The invoice was paid with a different value than the due
+      divergent payment:
+        The invoice was paid with a different value than the due
         amount in an invoice_paid_date
-      not payable: The net invoice value of all the entries is zero, therefore the
+      not payable:
+        The net invoice value of all the entries is zero, therefore the
         invoice can not be paid. Yet the invoice has an invoice_due_date. In onboarding
         and monthly invoices, this status can appear when a postponed value is created
         in order to the tenant invoice not to become a payable or to the landlord
         invoice not to become a receivable
       open: The invoice is not yet paid
       paid: The invoice was paid in an dt_paid
-      written down: The invoice was not paid and it was written down, the invoice_paid_date
+      written down:
+        The invoice was not paid and it was written down, the invoice_paid_date
         is the written down date. The process is done in general to not consider anymore
         the due amount (it's not going to be paid anymore or it has a negotiation)
   substatus:
+    description: "It's used to set negotiations/debts status"
     lineage:
-    - datalake_retsuko.invoice.substatus
+      - datalake_retsuko.invoice.substatus
   negotiation_status:
+    description: "Description of negotiation status"
     lineage:
-    - datalake_retsuko.invoice.negotiation_status
-    description: ''
+      - datalake_retsuko.invoice.negotiation_status
     categories:
-      active: ''
-      expired: ''
+      active: ""
+      expired: ""
   closing_mode:
+    description: "Description that shows if closing is automatic or manual"
     lineage:
-    - datalake_retsuko.invoice.closing_mode
-    description: If closing is automatic or manual
+      - datalake_retsuko.invoice.closing_mode
     categories:
-      auto: ''
-      manual: ''
-      non-specified: ''
+      auto: ""
+      manual: ""
+      non-specified: ""
   paid_via:
+    description: "How invoice is paid"
     lineage:
-    - datalake_retsuko.invoice.paid_via
-    description: How invoice is paid
+      - datalake_retsuko.invoice.paid_via
     categories:
-      bank-transfer: ''
-      cardif: ''
-      cnab: ''
-      credit-card: ''
-      internet-banking: ''
-      mercado-pago: ''
-      non-specified: ''
-      paypal: ''
-      recupera: ''
-      robin-hood: ''
-      unknown: ''
+      bank-transfer: ""
+      cardif: ""
+      cnab: ""
+      credit-card: ""
+      internet-banking: ""
+      mercado-pago: ""
+      non-specified: ""
+      paypal: ""
+      recupera: ""
+      robin-hood: ""
+      unknown: ""
   user:
+    description: "User to which the invoice was sent"
     lineage:
-    - datalake_retsuko.invoice.invoice_user
-    description: User to which the invoice was sent
+      - datalake_retsuko.invoice.invoice_user
     categories:
-      landlord: ''
-      personal estate agent: ''
-      quinto andar: ''
-      tenant: ''
+      landlord: ""
+      personal estate agent: ""
+      quinto andar: ""
+      tenant: ""
   due_amount:
+    description: "Invoice amount, negative means its a due value TO 5A, and positive means its a due value FROM 5A"
     lineage:
-    - datalake_retsuko_clean.invoice.due_amount
-    description: Amount due in invoice
+      - datalake_retsuko_clean.invoice.due_amount
   paid_amount:
+    description: "Amout paid on the invoice"
     lineage:
-    - datalake_retsuko_clean.invoice.paid_amount
-    description: Amout paid on the invoice
+      - datalake_retsuko_clean.invoice.paid_amount
   accrual_year_month:
+    description: "Expense reference month"
     lineage:
-    - datalake_retsuko_clean.invoice.accrual_year_month
-    description: Expense reference month
+      - datalake_retsuko_clean.invoice.accrual_year_month
   ts_created:
+    description: "Invoice creation timestamp"
     lineage:
-    - datalake_retsuko_clean.invoice.ts_created
-    description: ''
+      - datalake_retsuko_clean.invoice.ts_created
   ts_canceled:
+    description: "Invoice cancellation timestamp"
     lineage:
-    - datalake_retsuko.invoice.ts_canceled
-    description: ''
+      - datalake_retsuko.invoice.ts_canceled
   dt_sent:
+    description: "Date in which invoice was sent to user charged"
     lineage:
-    - datalake_retsuko.invoice.ts_sent
-    description: Date in which invoice was sent to user charged
+      - datalake_retsuko.invoice.ts_sent
   dt_due:
+    description: "Date in which invoice will be due"
     lineage:
-    - datalake_retsuko.invoice.ts_due
-    description: Date in which invoice will be due
+      - datalake_retsuko.invoice.ts_due
   dt_paid:
+    description: "Date in which invoice was paid, for payable invoices"
     lineage:
-    - datalake_retsuko.invoice.ts_paid
-    description: Date in which invoice was paid, for payable invoices
+      - datalake_retsuko.invoice.ts_paid
   ts_load:
-    description: ''
+    description: "Timestamp which the data was loaded"
