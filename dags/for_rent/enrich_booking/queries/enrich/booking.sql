@@ -194,11 +194,13 @@ booking_in_rented_house AS (
 -- Track if the sale visit was in a house with rental contract active
   SELECT
     b.id,
-    CASE
+    BOOL_OR(
+      CASE
          WHEN c.status = 'Ativo' AND c.dt_started <= b.dt_booking THEN TRUE
          WHEN c.status = 'Finalizado' AND b.dt_booking BETWEEN c.dt_started AND LEAST(TO_DATE(c.ts_analyst_annulment_input), c.dt_termination) THEN TRUE
          ELSE FALSE
-    END AS is_house_rented
+      END
+    ) AS is_house_rented
   FROM
     datalake_ebdb_clean.booking AS b
   JOIN
@@ -211,6 +213,8 @@ booking_in_rented_house AS (
          WHEN c.status = 'Ativo' THEN NOW()
          WHEN c.status = 'Finalizado' THEN LEAST(TO_DATE(c.ts_analyst_annulment_input), c.dt_termination)  END
     AND b.business_context = 'SALE'
+  GROUP BY
+    b.id
 ),
 agent_contract_aud AS (
   SELECT
