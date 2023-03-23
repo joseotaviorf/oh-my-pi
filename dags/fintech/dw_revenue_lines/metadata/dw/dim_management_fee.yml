@@ -5,10 +5,16 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
 description: "Table containing management fee and payment data by contract"
 columns:
+  sk_management_fee:
+    description: "Distinct ID for management fee"
   id_contract_ebdb:
     description: "Contract ID on EBDB"
     lineage:
       - datalake_revenue_lines.management_fee.id_contract_ebdb
+  management_fee_share:
+    description: "Share of management fee"
+    lineage:
+      - datalake_revenue_lines.management_fee.management_fee_share
   payment_status:
     description: "Description of the invoice payment status"
     lineage:
