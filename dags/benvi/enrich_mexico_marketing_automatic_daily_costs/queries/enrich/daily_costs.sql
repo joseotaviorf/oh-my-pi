@@ -22,9 +22,7 @@ WITH taxonomy_by_platform AS (
     FROM
         datalake_gsheets_clean.marketing_cost_taxonomy
 )
-SELECT 
-    cmm.id_date,
-    'automatic' AS flow_type,
+SELECT
     cmm.origin,
     cmm.account_name,
     cmm.campaign_name,
@@ -50,7 +48,9 @@ SELECT
             WHEN tbp.mkt_platform = 'Other' THEN cmm.other_cost
             ELSE cmm.total_cost
         END
-    ) AS cost
+    ) AS cost,
+    cmm.id_date,
+    'automatic' AS flow_type
 FROM 
     datalake_mexico_consolidated_marketing_metrics.consolidated_media_metrics AS cmm
 LEFT JOIN
