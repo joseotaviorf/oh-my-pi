@@ -1,0 +1,21 @@
+inner_dependencies:
+  item_interaction:
+    - recommendation_catalog
+  recommendation_flow:
+    - item_interaction
+    - recommendation
+
+tables:
+  recommendation_catalog:
+    is_incremental: false
+  item_interaction:
+    is_incremental: false
+    partition_cols:
+      - year
+      - month
+      - day
+      - interaction_type
+  recommendation:
+    is_incremental: false
+  recommendation_flow:
+    is_incremental: false
