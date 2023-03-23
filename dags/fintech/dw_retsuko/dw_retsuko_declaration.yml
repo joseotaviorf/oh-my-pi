@@ -10,6 +10,8 @@ workflow:
   inner_dependencies:
     fact_bill_item_cluster_at_invoice_mobs_derived:
       - fact_bill_item_cluster_at_invoice_mobs
+    fact_invoice_mobs_derived:
+      - fact_bill_item_cluster_at_invoice_mobs
 cluster:
   type: databricks_10_4_min_io-general_cluster
   access_control_list:

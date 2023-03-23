@@ -12,10 +12,6 @@ columns:
     description: Identification of contracts and key to join with contracts granularity tables
     lineage:
       - fact_bill_item_cluster_at_invoice_mobs.sk_contract
-  sk_junk_bill_items_cluster:
-    description: ID of the cluster to which the bill items belong and key to join with enrich and dim junks
-    lineage:
-      - fact_bill_item_cluster_at_invoice_mobs.sk_junk_bill_items_cluster
   col_mob:
     description: Auxiliary field to cluster by mob
   reference_date_mob:
@@ -46,8 +42,6 @@ columns:
     description: Auxiliary column to indicate if that col_mob value is corresponded to a DUE STATUS
   signal_to_due_mob:
     description: Auxiliary column to indicate if that col_mob value is corresponded to a TO DUE STATUS
-  value_bill_item_cluster:
-    description: Financial value of the bill item cluster based on the amount of the bill items of the cluster in the invoice
   value_canceled:
     description: Auxiliary columns to indicate the financial value of the CANCELED STATUS in that given mob (col_mob)
   value_paid:
