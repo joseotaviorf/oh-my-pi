@@ -29,6 +29,9 @@ columns:
   rev_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account_aud.revtype
+  agent_split_fee:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.agent_split_fee
   mod_id_user_account:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account_aud.user_account_id_mod
@@ -41,6 +44,9 @@ columns:
   mod_id_company:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account_aud.company_id_mod
+  mod_agent_split_fee:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.agent_split_fee_mod
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account_aud.created_at

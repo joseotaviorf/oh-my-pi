@@ -35,6 +35,9 @@ columns:
   external_ref:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.externalref
+  agent_split_fee:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.agent_split_fee
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.active

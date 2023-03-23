@@ -5,6 +5,7 @@ SELECT
     productuuid AS uuid_product,
     status,
     version,
+    agent_split_fee,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

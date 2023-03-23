@@ -20,6 +20,9 @@ columns:
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.company.version
+  agent_split_fee:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.agent_split_fee
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.company.created_at

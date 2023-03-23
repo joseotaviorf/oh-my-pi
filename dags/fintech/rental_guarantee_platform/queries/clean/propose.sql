@@ -10,6 +10,7 @@ SELECT
     realtor,
     `hash`,
     externalref AS external_ref,
+    agent_split_fee,
     active AS is_active,
     dateinsert AS ts_inserted,
     dateupdate AS ts_updated,

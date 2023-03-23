@@ -4,6 +4,7 @@ SELECT
     profile_account_id AS id_profile_account,
     company_id AS id_company,
     version,
+    agent_split_fee,
     active AS is_active,
     created_at AS ts_created,
     updated_at AS ts_updated,
