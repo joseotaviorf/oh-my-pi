@@ -257,6 +257,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.registration_abandoned_reason,
     hl.house_unpublished_reason,
     hl.partner_3p_supply,
+    hl.partner_sale_3p_supply,
+    hl.partner_rent_3p_supply,
     hl.listing_category AS listing_category_start,
     hl.who_is_living,
     hl.key_type,

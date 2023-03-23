@@ -37,9 +37,9 @@ house_aud AS (
 listing_info AS (
   SELECT 
     lbc.id_house,
-    BOOL_OR(lbc.ownership = 'THIRD_PARTY') AS is_3p_supply,
+    BOOL_OR(lbc.ownership = 'THIRD_PARTY' OR COALESCE(lrm.rental_administrator = 'THIRD_PARTY', FALSE)) AS is_3p_supply,
     BOOL_OR(lbc.ownership = 'THIRD_PARTY' AND lbc.business_context = 'SALE') AS is_sale_3p_supply,
-    BOOL_OR(lbc.ownership = 'THIRD_PARTY' AND lbc.business_context = 'RENT') AS is_rent_3p_supply,
+    BOOL_OR(lrm.rental_administrator = 'THIRD_PARTY') AS is_rent_3p_supply,
     BOOL_OR(lsm.is_primary_market) AS is_sale_primary_market,
     BOOL_OR(lsm.has_great_sale_price_tag) AS has_sale_great_price_tag
   FROM
@@ -48,6 +48,10 @@ listing_info AS (
     datalake_ebdb_clean.listing_sale_model AS lsm
       ON lbc.id = lsm.id_listing_business_context
       AND lbc.business_context = 'SALE'
+  LEFT JOIN
+    datalake_ebdb_clean.listing_rent_model AS lrm
+        ON lbc.id = lrm.id_listing_business_context
+        AND lbc.business_context = 'RENT'
   GROUP BY 
     1
 ),
