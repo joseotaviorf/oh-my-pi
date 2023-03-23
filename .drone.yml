@@ -428,6 +428,7 @@ pipeline:
           -Dsonar.host.url=https://sonarqube.quintoandar.com.br \
           -Dsonar.login=$${SONARQUBE_TOKEN} \
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
+          -Dsonar.ws.timeout=240
     secrets: [sonarqube_token]
     when:
       event: push
