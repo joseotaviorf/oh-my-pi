@@ -172,6 +172,7 @@ for table_name, table_config in tables.items():
             extraction_type=extraction_type
         ),
         raw_spark_job_extra_args=parameters,
+        has_hive_sync=False,
     )
 
     partitions = clean_partition_cols if is_partitioned else None
@@ -181,6 +182,7 @@ for table_name, table_config in tables.items():
         table_name=table_name,
         is_incremental=is_incremental,
         partitions=partitions,
+        has_create_external_table_task=False,
     )
 
     create_cluster_task.set_upstream(load_raw_to_s3_task)
