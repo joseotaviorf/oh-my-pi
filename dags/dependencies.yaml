@@ -1114,6 +1114,9 @@ bietlejuice.dw_region:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_region:load-enrich-region
 
+bietlejuice.dw_rent_demand_events:
+  - bietlejuice.enrich_rent_demand_event:load-enrich-rent-demand-event
+
 bietlejuice.dw_rent_fact_listing_owners:
   - bietlejuice.enrich_listing_owners:load-enrich-rental-metrics
 

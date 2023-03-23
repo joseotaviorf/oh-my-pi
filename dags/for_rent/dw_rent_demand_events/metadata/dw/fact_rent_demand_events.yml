@@ -1,0 +1,71 @@
+database_name: dw_rent_demand_events
+table_name: fact_rent_demand_events
+description: This table shows the demand events of For Rent, each line is the most recent update of an event related to the scope.
+domain: For Rent
+owner: felipe.chies@quintoandar.com.br
+columns:
+  pk_rent_demand_event:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_event
+    - datalake_rent_demand_event.rent_demand_event.id_event_type
+    - datalake_rent_demand_event.rent_demand_event.id_tenant_prospect
+    description: Id of the rent demand event (generated on the query using id_event, id_event_type and id_tenant_prospect, each value separated by a dot).
+  sk_event:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_event
+    description: Id of the event.
+  sk_event_type:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_event_type
+    description: Id of the event type.
+  sk_tenant_prospect:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_tenant_prospect
+    description: Id of the tenant prospect.
+  sk_house:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_house
+    description: Id of the house.
+  sk_agent:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_agent
+    description: Id of the agent.
+  sk_rent_flow:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_rent_flow
+    description: Id of the rent flow.
+  sk_house_listing:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_house_listing
+    description: Id of the house listing.
+  sk_region:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_region
+    description: Id of the region.
+  sk_owner:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_owner
+    description: Id of the owner.
+  sk_event_date:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.ts_event
+    description: Id of the event date.
+  country_code:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.country_code
+    description: Country code information.
+  year:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.year
+    description: Year information of the event date.
+  month:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.month
+    description: Month information of the event date.
+  day:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.day
+    description: Day information of the event date.
+  ts_load:
+    description: Load date.
+    
