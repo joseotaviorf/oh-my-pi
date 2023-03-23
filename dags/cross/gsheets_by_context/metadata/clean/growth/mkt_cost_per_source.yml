@@ -1,34 +1,52 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: mkt_cost_per_source
+owner: '@data-growth'
+domain: Growth
+description: Table extracted from Gsheets where Planning Team input Growth Marketing Budget. 
 columns:
   business:
+    description: Business context segmentation
+    categories: 
+      rent: '' 
+      sale: ''
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.business
   city_group:
+    description: City group segmentation
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.city
   daily_value:
+    description: Budget inserted by Planning for each segmentation
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.daily_value
   mkt_channel:
+    description: Level of Growth Taxonomy
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.mkt_channel
   mkt_medium:
+    description: Level of Growth Taxonomy
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.mkt_medium
   mkt_source:
+    description: Level of Growth Taxonomy
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.mkt_source
   dt_event:
+    description: Date segmentation
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.date
   dt_week_start:
+    description: Week start segmentation
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.week_start
   month:
+    description: Month segmentation
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.month
   year:
+    description: Year segmentation
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.year
+  ts_load: 
+    description: Timestamp of loaded data

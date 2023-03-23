@@ -1,60 +1,82 @@
 database_name: datalake_facebook_insights_clean
 table_name: facebook_social_insights
+owner: '@data-growth'
+domain: Growth
+description: Table load Facebook Insigths Performance Report from Facebook Ads API extraction. Documentation can be found at https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/insights/
 columns:
   id_ad:
+    description: The unique ID of the ad you're viewing in reporting
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.ad_id
   id_account:
+    description: The ID number of your ad account, which groups your advertising activity. Your ad account includes your campaigns, ads and billing
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.account_id
   id_adset:
+    description: The unique ID of the ad set you're viewing in reporting. An ad set is a group of ads that share the same budget, schedule, delivery optimization and targeting
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.adset_id
   id_campaign:
+    description: The unique ID number of the ad campaign you're viewing in reporting. Your campaign contains ad sets and ads
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.campaign_id
   ad_name:
+    description: The name of the ad you're viewing in reporting
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.ad_name
   adset_name:
+    description: The name of the ad set you're viewing in reporting. An ad set is a group of ads that share the same budget, schedule, delivery optimization and targeting
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.adset_name
   campaign_name:
+    description: The name of the ad campaign you're viewing in reporting. Your campaign contains ad sets and ads
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.campaign_name
   clicks:
+    description: The number of clicks on your ads
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.clicks
   cpc:
+    description: The average cost for each click (all)
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.cpc
   cpm:
+    description: The average cost for 1,000 impressions
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.cpm
   impressions:
+    description: The number of times your ads were on screen
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.impressions
   platform_position:
+    description: platform_position
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.platform_position
   publisher_platform:
+    description: publisher_platform
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.publisher_platform
   reach:
+    description: The number of people who saw your ads at least once. Reach is different from impressions, which may include multiple views of your ads by the same people. This metric is estimated
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.reach
   dt_start:
+    description: The start date for your data. This is controlled by the date range you've selected for your reporting view
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.date_start
   dt_stop:
+    description: The end date for your data. This is controlled by the date range you've selected for your reporting view
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.date_stop
   year:
+    description: Year of dt_start
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.date_start
   month:
+    description: Month of dt_start
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.date_start
   day:
+    description: Day of dt_start
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.date_start

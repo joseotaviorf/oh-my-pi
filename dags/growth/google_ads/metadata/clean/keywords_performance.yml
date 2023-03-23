@@ -1,58 +1,84 @@
 ---
 database_name: datalake_google_ads_clean
 table_name: keywords_performance
+owner: '@data-growth'
+domain: Growth
+description: Table load Keywords Performance Report from Google Ads API extraction. Documentation can be found at https://developers.google.com/google-ads/api/reference/rpc/v13/overview
 columns:
   id_keyword:
+    description: The ID of the criterion
     lineage:
       - datalake_google_ads_raw.keywords_performance.adGroupCriterion
   id_external_customer:
+    description: Customer identificator
     lineage:
       - datalake_google_ads_raw.keywords_performance.customer
   id_ad_group:
+    description: Ad group identificator
     lineage:
       - datalake_google_ads_raw.keywords_performance.adGroup
   id_campaign:
+    description: Campaign identificator
     lineage:
       - datalake_google_ads_raw.keywords_performance.campaign
   campaign_name:
+    description: Campagin name from google ads platform where metrics should be attributed
     lineage:
       - datalake_google_ads_raw.keywords_performance.campaign
   ad_group_name:
+    description: Name of ad group
     lineage:
       - datalake_google_ads_raw.keywords_performance.adGroup
   clicks:
+    description: Number of clicks from google ads platform
     lineage:
       - datalake_google_ads_raw.keywords_performance.adGroup
   cost:
+    description: Cost from google ads platform
     lineage:
       - datalake_google_ads_raw.keywords_performance.metrics
   device:
+    description: Device to which metrics apply
     lineage:
       - datalake_google_ads_raw.keywords_performance.segments
   ad_network_type:
+    description: Ad network type
     lineage:
       - datalake_google_ads_raw.keywords_performance.segments
   impressions:
+    description: Number of impressions from google ads platform
     lineage:
       - datalake_google_ads_raw.keywords_performance.metrics
   match_type:
+    description: The match type of the keyword
     lineage:
       - datalake_google_ads_raw.keywords_performance.adGroupCriterion
   criteria:
+    description: The text of the keyword (at most 80 characters and 10 words)
     lineage:
       - datalake_google_ads_raw.keywords_performance.adGroupCriterion
   account_descriptive_name:
+    description: Optional, non-unique descriptive name of the customer.
     lineage:
       - datalake_google_ads_raw.keywords_performance.customer
   account_snake_case:
+    description: Account name pos string transformation
     lineage:
       - datalake_google_ads_raw.keywords_performance.account_snake_case
   report_type:
+    description: Type of report extracted from Google API.
     lineage:
       - datalake_google_ads_raw.keywords_performance.report_type
+    categories:
+      AD_PERFORMANCE_REPORT: Ads report type
+      VIDEO_PERFORMANCE_REPORT: Video report type
+      CAMPAIGN_PERFORMANCE_REPORT: Campaign report type
+      KEYWORDS_PERFORMANCE_REPORT: Keywords report type
   dt_loaded:
+    description: Date of loaded data
     lineage:
       - datalake_google_ads_raw.keywords_performance.segments
   dt_created:
+    description: Date of creation of each raw
     lineage:
       - datalake_google_ads_raw.keywords_performance.dt_created

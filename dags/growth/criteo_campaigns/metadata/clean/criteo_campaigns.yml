@@ -1,46 +1,63 @@
 ---
 database_name: datalake_criteo_campaigns_clean
 table_name: criteo_campaigns
+owner: '@data-growth'
+domain: Growth
+description: Table load Criteo Performance Report from Criteo Ads API extraction. 
 columns:
   id_advertiser:
+    description: Advertiser id of the campaign
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.advertiserid
   id_campaign:
+    description: Unique identifier of the campaign. Can be retrieved from Criteo Management Center
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.adsetid
   advertiser_name:
+    description: Name of the Advertiser
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.advertiser
   all_sales:
+    description: The total amount of sales generated both post-click and post-view non-deduplicated
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.salesallpc1d
   audience:
+    description: Number of distinct cookies to which Criteo had the opportunity to make a display
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.audience
   cost_per_click:
+    description: The price you pay each time a user clicks your Criteo ad. Depending on your campaign's business model, you can change the CPC on the Campaigns tab for each campaign
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.ecpc
   campaign_name:
+    description: Name of the campaign
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.adset
   clicks:
+    description: Number of times that your Criteo ads have been clicked
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.clicks
   competition_win:
+    description: Percentage of impressions/ad placements won, out of all impressions/ad placements that were bid on. For example, Criteo bid on 10 ad placements and won 2, so the Overall Competition Win is 20%. Higher CPC bids result in increased competition win
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.overallcompetitionwin
   cost:
+    description: Total cost of your campaigns
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.advertisercost
   currency:
+    description: Cost currency
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.currency
   impressions:
+    description: Number of times your Criteo ad is displayed to a user on publishers websites
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.displays
   revenue:
+    description: Total revenue of your campaigns generated
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.revenuegeneratedpc1d
   dt_attribution:
+    description: Date of attribution
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.attributiondate

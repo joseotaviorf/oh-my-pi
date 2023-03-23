@@ -1,5 +1,5 @@
 ---
-database_name: dw_datamarts_growth_cross
+database_name: dw_datamarts_growth
 table_name: performance_marketing_metrics_demand
 owner: '@data-growth'
 domain: Growth
@@ -62,7 +62,7 @@ columns:
     lineage:
       - dw_public.dim_date.dt_credit_analysis_approved
   dt_contract_signed:
-    description: Date of the flow event or status available
+    description: Date of contract signed
     lineage:
       - dw_public.dim_date.dt_contract_signed
   dt_event:
@@ -113,6 +113,7 @@ columns:
       - datalake_gsheets_clean.rental_ntp_source_targets.city_group
       - datalake_gsheets_clean.rental_flows_targets.city_group
   country_name:
+    description: Name of country
     lineage:
       - dw_public.dim_region.country_name
   flow_event:

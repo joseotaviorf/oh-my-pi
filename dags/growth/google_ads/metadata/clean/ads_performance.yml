@@ -1,61 +1,88 @@
 ---
 database_name: datalake_google_ads_clean
 table_name: ads_performance
+owner: '@data-growth'
+domain: Growth
+description: Table load Ads Performance Report from Google Ads API extraction. Documentation can be found at https://developers.google.com/google-ads/api/reference/rpc/v13/overview
 columns:
   id_ad:
+    description: Ad identificator
     lineage:
       - datalake_google_ads_raw.ads_performance.adGroupAd
   id_external_customer:
+    description: Customer identificator
     lineage:
       - datalake_google_ads_raw.ads_performance.customer
   id_ad_group:
+    description: Ad group identificator
     lineage:
       - datalake_google_ads_raw.ads_performance.adGroup
   id_campaign:
+    description: Campaign identificator
     lineage:
       - datalake_google_ads_raw.ads_performance.campaign
   ad_group_name:
+    description: Name of ad group
     lineage:
       - datalake_google_ads_raw.ads_performance.adGroup
   ad_type:
+    description: Type of ad
     lineage:
       - datalake_google_ads_raw.ads_performance.adGroupAd
   campaign_name:
+    description: Campagin name from google ads platform where metrics should be attributed
     lineage:
       - datalake_google_ads_raw.ads_performance.campaign
   clicks:
+    description: Number of clicks from google ads platform
     lineage:
       - datalake_google_ads_raw.ads_performance.metrics
   cost:
+    description: Cost from google ads platform
     lineage:
       - datalake_google_ads_raw.ads_performance.metrics
   description:
+    description: Details pertaining to an expanded text ad.
     lineage:
       - datalake_google_ads_raw.ads_performance.adGroupAd
   device:
+    description: Device to which metrics apply
     lineage:
       - datalake_google_ads_raw.ads_performance.segments
   ad_network_type:
+    description: Ad network type
     lineage:
       - datalake_google_ads_raw.ads_performance.segments
   display_url:
+    description: The URL that appears in the ad description for some ad formats
     lineage:
       - datalake_google_ads_raw.ads_performance.adGroupAd
   impressions:
+    description: Number of impressions from google ads platform
     lineage:
       - datalake_google_ads_raw.ads_performance.metrics
   account_descriptive_name:
+    description: Optional, non-unique descriptive name of the customer.
     lineage:
       - datalake_google_ads_raw.ads_performance.customer
   report_type:
+    description: Type of report extracted from Google API.
     lineage:
       - datalake_google_ads_raw.ads_performance.report_type
+    categories:
+      AD_PERFORMANCE_REPORT: Ads report type
+      VIDEO_PERFORMANCE_REPORT: Video report type
+      CAMPAIGN_PERFORMANCE_REPORT: Campaign report type
+      KEYWORDS_PERFORMANCE_REPORT: Keywords report type
   account_snake_case:
+    description: Account name pos string transformation
     lineage:
       - datalake_google_ads_raw.ads_performance.account_snake_case
   dt_loaded:
+    description: Date of loaded data
     lineage:
       - datalake_google_ads_raw.ads_performance.segments
   dt_created:
+    description: Date of creation of each raw
     lineage:
       - datalake_google_ads_raw.ads_performance.dt_created
