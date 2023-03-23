@@ -16,8 +16,9 @@ SELECT
   COALESCE(ca.category, cav.max_ca_category) AS category_within_ca,
   COALESCE(COALESCE(ca.category, cav.max_ca_category), cap.last_category_not_null) AS category_within_proposal,
   ca.type AS documentation_policy,
-  cap.rental_guarantee_category,
+  cap.guarantee_category,
   ca.level,
+  cap.liquidity,
   cap.paid_guarantee_type,
   CASE
     WHEN rsc.category_level = 40 
@@ -67,4 +68,4 @@ LEFT JOIN
     ON ca.id_credit_analysis = cav.id_credit_analysis
 LEFT JOIN
   datalake_rental_guarantee_clean.risk_category AS rsc
-    ON rsc.category_level = COALESCE(cap.rental_guarantee_category, COALESCE(COALESCE(ca.category, cav.max_ca_category), cap.last_category_not_null))
+    ON rsc.category_level = COALESCE(cap.guarantee_category, COALESCE(COALESCE(ca.category, cav.max_ca_category), cap.last_category_not_null))
