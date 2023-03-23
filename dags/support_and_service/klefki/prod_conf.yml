@@ -1,6 +1,11 @@
 ---
 lineage_product_database_name: klefki
 partition_cols: [year, month, day]
+dag_documentation:
+  dag_purpose:
+    Retrieve data from Klefki database (postgresql). [Klefiki](https://github.com/quintoandar/klefiki-api) is related to delivering and receiving keys during the renting period.
+    Please note that, even though this is an PostgreSQL database, you'll find it named 'klefiki_api' on some locations.
+
 tables:
   address_location_key:
     partitioned: True
@@ -10,6 +15,9 @@ tables:
     incremental_col: updated_at
   change_owner_control:
     partitioned: False
+  inspection_key_retrieval_confirmation:
+    partitioned: True
+    incremental_col: updated_at
   inspector_booking_retrieve_key:
     partitioned: True
     incremental_col: updated_at
