@@ -113,4 +113,6 @@ tables:
     date_filter_column: updated_at
   - table_name: agreement_payment
     date_filter_column: updated_at
+  - table_name: delinquency_has_agreement
+    date_filter_column: created_at
 partition_cols: ["year", "month", "day"]
