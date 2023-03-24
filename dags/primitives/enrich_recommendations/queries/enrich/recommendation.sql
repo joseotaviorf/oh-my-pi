@@ -62,8 +62,15 @@ SELECT
     id_item,
     id_subjects,
     id_anchors,
-    ts_rec_created,
-    ts_rec_received,
+    SHA2(
+        CONCAT(
+            id_user, id_item, ts_rec_created, business_context, display_type
+        ),
+        256
+    ) AS id_rec,
+    SHA2(
+        CONCAT(id_user, ts_rec_created, business_context, display_type), 256
+    ) AS id_recset,
     business_context,
     type_subject,
     type_item,
@@ -75,26 +82,19 @@ SELECT
     device_family,
     platform,
     language,
+    item_rank + 1 AS item_rank,
+    ts_rec_created,
+    ts_rec_received,
     year,
     month,
-    day,
-    item_rank + 1 AS item_rank,
-    SHA2(
-        CONCAT(
-            id_user, id_item, ts_rec_created, business_context, display_type
-        ),
-        256
-    ) AS id_rec,
-    SHA2(
-        CONCAT(id_user, ts_rec_created, business_context, display_type), 256
-    ) AS id_recset
+    day
 FROM
     carousel_recommendations
 WHERE
     id_item IS NOT NULL
-    AND id_house IS NOT NULL
+    AND id_subjects IS NOT NULL
     AND id_anchors IS NOT NULL
     AND business_context IS NOT NULL
-    AND year = 2023 AND YEAR(ts_event) = 2023
+    AND year = 2023 AND YEAR(ts_rec_created) = 2023
 
 /* TODO: email recommendations from Braze */
