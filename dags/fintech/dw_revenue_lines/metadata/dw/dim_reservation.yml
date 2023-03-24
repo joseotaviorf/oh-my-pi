@@ -61,4 +61,4 @@ columns:
     - datalake_revenue_lines.reservation.dt_created
     description: Date of reserve creation
   ts_load:
-    description: ''
+    description: Timestamp of when the data was loaded to this table

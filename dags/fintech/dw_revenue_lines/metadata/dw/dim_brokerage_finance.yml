@@ -71,4 +71,4 @@ columns:
     - datalake_revenue_lines.brokerage_finance.dt_paid_fee
     description: Date of fee payment
   ts_load:
-    description: ''
+    description: Timestamp of when the data was loaded to this table

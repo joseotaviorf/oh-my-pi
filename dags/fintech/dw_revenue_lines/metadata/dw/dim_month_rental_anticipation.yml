@@ -66,4 +66,4 @@ columns:
     - datalake_revenue_lines.month_rental_anticipation.dt_paid_fee
     description: Invoice's paid date
   ts_load:
-    description: ''
+    description: Timestamp of when the data was loaded to this table

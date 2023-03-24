@@ -24,10 +24,10 @@ columns:
   type_paid:
     lineage:
     - datalake_revenue_lines.credit_card_payment.type_paid
-    description: ''
+    description: Payment type choose, sight or installments
     categories:
-      installments: ''
-      sight: ''
+      installments: Payments divided into monthly installments
+      sight: Only one payment, full payment
   installments:
     lineage:
     - datalake_revenue_lines.credit_card_payment.installments
@@ -61,4 +61,4 @@ columns:
     - datalake_revenue_lines.credit_card_payment.dt_paid
     description: Date when it was paid by a credit card
   ts_load:
-    description: ''
+    description: Timestamp of when the data was loaded to this table
