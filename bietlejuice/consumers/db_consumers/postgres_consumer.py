@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatabaseTypeEnum
+from bietlejuice.base.db.database_driver_enum import DatabaseDriverEnum
 from bietlejuice.consumers.db_consumers.db_consumer import DBConsumer
 
 logger = QuintoAndarLogger("PostgresConsumer")
@@ -23,25 +23,32 @@ class PostgresConsumer(DBConsumer):
     :type fetch_size: int
     """
 
+    _DATABASE_DRIVERS = [DatabaseDriverEnum.POSTGRES, DatabaseDriverEnum.REDSHIFT]
+    _JDBC_URL_MAPPING = {
+        DatabaseDriverEnum.POSTGRES: "postgresql",
+        DatabaseDriverEnum.REDSHIFT: "redshift",
+    }
+
     # todo: rename this class in a way we can allow other Postgres consumer types (e.g.,
     #  Pandas consumer, PETL consumer). Examples of the new class names could be
     #  PostgresSparkConsumer or SparkPostgresConsumer.
     def __init__(self, conn_config, spark_client, fetch_size=50000):
-        # todo: investigate further about an optimal value for the fetch_size param
-        if conn_config["dbtype"].lower() != DatabaseTypeEnum.POSTGRESQL:
-            raise RuntimeError(
-                "m=__init__, con_type={}, msg=Connection is not a PostgreSql"
-                "connection".format(conn_config.get("dbtype"))
-            )
+        dbtype = conn_config["dbtype"]
+        driver_enum = DatabaseDriverEnum[dbtype.upper()]
 
+        if driver_enum not in self._DATABASE_DRIVERS:
+            raise RuntimeError(
+                f"m=__init__, db_type={dbtype}, msg=Connection is not a "
+                "PostgreSql connection"
+            )
         self.conn_config = conn_config
-        if "schema" not in self.conn_config:
-            self.conn_config["schema"] = "public"
+        self.conn_config["schema"] = self.conn_config.get("schema", "public")
         self.spark_client = spark_client
         self.spark_common_options = {
-            "driver": "org.postgresql.Driver",
+            "driver": driver_enum.value,
             "fetchsize": fetch_size,
-            "url": "jdbc:postgresql://{}:{}/{}".format(
+            "url": "jdbc:{}://{}:{}/{}".format(
+                self._JDBC_URL_MAPPING[driver_enum],
                 self.conn_config["host"],
                 self.conn_config["port"],
                 self.conn_config["db"],

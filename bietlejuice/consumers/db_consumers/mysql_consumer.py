@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatabaseTypeEnum
+from bietlejuice.base.db.database_driver_enum import DatabaseDriverEnum
 from bietlejuice.consumers.db_consumers.db_consumer import DBConsumer
 
 logger = QuintoAndarLogger("MySqlConsumer")
@@ -22,23 +22,28 @@ class MySqlConsumer(DBConsumer):
     :type fetch_size: int
     """
 
+    _DATABASE_DRIVERS = [DatabaseDriverEnum.MYSQL]
+
     # todo: rename this class in a way we can allow other MySql consumer types (e.g.,
     #  Pandas consumer, PETL consumer). Examples of the new class names could be
     #  MySqlSparkConsumer or SparkMySqlConsumer.
 
     def __init__(self, conn_config, spark_client, fetch_size=50000):
-        # todo: investigate further about an optimal value for the fetch_size param
-        if conn_config["dbtype"].lower() != DatabaseTypeEnum.MYSQL:
+        dbtype = conn_config["dbtype"]
+        driver_enum = DatabaseDriverEnum[dbtype.upper()]
+
+        if driver_enum not in self._DATABASE_DRIVERS:
             raise RuntimeError(
-                "m=__init__, con_type={}, msg=Connection is not a MySql"
-                "connection".format(conn_config.get("dbtype"))
+                f"m=__init__, db_type={dbtype}, msg=Connection is not a "
+                "MySQL connection"
             )
         self.conn_config = conn_config
         self.spark_client = spark_client
         self.spark_common_options = {
-            "driver": "com.mysql.jdbc.Driver",
+            "driver": driver_enum.value,
             "fetchsize": fetch_size,
-            "url": "jdbc:mysql://{}:{}/{}".format(
+            "url": "jdbc:{}://{}:{}/{}".format(
+                driver_enum.name.lower(),
                 self.conn_config["host"],
                 self.conn_config["port"],
                 self.conn_config["db"],

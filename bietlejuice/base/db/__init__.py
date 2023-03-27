@@ -2,7 +2,7 @@ import os
 
 from bietlejuice.base.db.metastore_mapping import MetastoreMapping
 from bietlejuice.base.db.datalake_metastore_mapping import DatalakeMetastoreMapping
-from bietlejuice.base.db.database_enum import DatabaseEnum, DatabaseTypeEnum
+from bietlejuice.base.db.database_enum import DatabaseEnum
 
 from bietlejuice.base.db.database_client_factory import DatabaseClientFactory
 from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService

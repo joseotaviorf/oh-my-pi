@@ -72,16 +72,3 @@ class DatabaseEnum:
     VELO = "VELO_DB"
     WALL_STREET = "WALL_STREET_DB"
     WOLOLO = "WOLOLO"
-
-
-# TODO: This DatabaseType enum should be placed into a separate file
-class DatabaseTypeEnum:
-    """
-    Mapping of existent database types extracted by our extraction jobs.
-    """
-
-    FIRESTORE = "firestore"
-    MONGO = "mongo"
-    MYSQL = "mysql"
-    POSTGRESQL = "postgres"
-    REDSHIFT = "postgres"
