@@ -2577,14 +2577,6 @@ bietlejuice.enrich_sirena:
 bietlejuice.enrich_sorting_hat:
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis
 
-# bietlejuice.enrich_stilingue:
-#   - bietlejuice.stilingue:load-clean-calls-report
-
-# bietlejuice.enrich_stilingue_metrics:
-#   - bietlejuice.enrich_stilingue:load-enrich-service-interactions
-#   - bietlejuice.gsheets.support_and_service:done-clean-agents-control
-#   - bietlejuice.gsheets.support_and_service:done-clean-stilingue-agents
-
 bietlejuice.enrich_survicate:
   - bietlejuice.gsheets.support_and_service:done-clean-owner-offboarding-keys-csat
   - bietlejuice.gsheets.support_and_service:done-clean-tenant-onboarding-keys-csat
