@@ -7,45 +7,45 @@ columns:
   sk_broker:
     lineage:
     - datalake_velo.broker.id_broker
-    description: ''
+    description: Broker's identification number (ID)
   broker_name:
     lineage:
     - datalake_velo.broker.broker_name
-    description: ''
+    description: Broker's name
   city:
     lineage:
     - datalake_velo.broker.city
-    description: ''
+    description: Broker's establishment city
   state:
     lineage:
     - datalake_velo.broker.state
-    description: ''
+    description: Broker's establishment state
   country:
     lineage:
     - datalake_velo.broker.country
-    description: ''
+    description: Broker's establishment country
   zipcode:
     lineage:
     - datalake_velo.broker.zipcode
-    description: ''
+    description: Broker's establishment zipcode
   geolocation:
     lineage:
     - datalake_velo.broker.geolocation
-    description: ''
+    description: Broker's establishment geolocation
   creci:
     lineage:
     - datalake_velo.broker.creci
-    description: ''
+    description: Broker's certification number (CRECI)
   cnpj:
     lineage:
     - datalake_velo.broker.cnpj
-    description: ''
+    description: Broker's document number (CNPJ)
   is_broker_active:
     lineage:
     - datalake_velo.broker.is_broker_active
-    description: ''
+    description: Identify if the broker is active in Velo's platform
   ts_created:
     lineage:
     - datalake_velo.broker.ts_created
   ts_load:
-    description: ''
+    description: Moment (timestamp) when the broker was created in Velo's platform
