@@ -40,6 +40,8 @@ WITH fact_house_listing_flows_adjust AS (
         FROM_UTC_TIMESTAMP(dhl.ts_house_first_publication,'Brazil/East') AS ts_house_first_publication_br_tz,
 		hl.country_code,
         CASE
+            WHEN olc.sales_company IS NOT NULL
+                THEN olc.sales_company
             WHEN dl.sales_company = 'OLOS'
                 THEN 'QUINTO_ANDAR_OUTBOUND'
             WHEN IFNULL(dl.sales_company, '') <> 'OLOS' AND du.sales_company = 'QUINTO_ANDAR'
@@ -57,6 +59,9 @@ WITH fact_house_listing_flows_adjust AS (
     LEFT JOIN
         dw_quintoandar.dim_user_sales_rep AS du
             ON du.sk_user_sales_rep = hl.sk_user_house_registrant
+    LEFT JOIN
+        datalake_olos_dialer.outbound_last_contact olc
+            ON olc.id_lead = hl.sk_lead
 ),
 source_ops_rent AS (
     WITH photo_job AS (
@@ -183,6 +188,8 @@ sale_fact_listing_flows_adjust AS (
         FROM_UTC_TIMESTAMP(dl.ts_first_publication,'Brazil/East') AS ts_house_first_publication_br_tz,
         COALESCE(dl.is_casa_mineira_migration, false) as is_casa_mineira_migration,
         CASE
+            WHEN olc.sales_company IS NOT NULL
+                THEN olc.sales_company
             WHEN dl.sales_company = 'OLOS'
                 THEN 'QUINTO_ANDAR_OUTBOUND'
             WHEN IFNULL(dl.sales_company, '') <> 'OLOS' AND du.sales_company = 'QUINTO_ANDAR'
@@ -200,6 +207,9 @@ sale_fact_listing_flows_adjust AS (
     LEFT JOIN
         dw_quintoandar.dim_user_sales_rep AS du
             ON du.sk_user_sales_rep = hl.sk_user_house_registrant
+    LEFT JOIN
+        datalake_olos_dialer.outbound_last_contact olc
+            ON olc.id_lead = hl.sk_lead
 ),
 source_ops_sale AS (
     with photo_job AS (
