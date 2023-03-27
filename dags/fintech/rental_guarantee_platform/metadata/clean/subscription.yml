@@ -1,0 +1,42 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: subscription
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.id
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.version
+  subscription_code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.subscription_code
+  subscription_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.subscription_status
+  card_brand:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.card_brand
+  card_last_four_digits:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.card_last_four_digits
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.active
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription.day

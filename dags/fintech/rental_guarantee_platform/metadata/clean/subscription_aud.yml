@@ -1,0 +1,66 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: subscription_aud
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.id
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.version
+  subscription_code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.subscription_code
+  subscription_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.subscription_status
+  card_brand:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.card_brand
+  card_last_four_digits:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.card_last_four_digits
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.revtype
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.active
+  mod_subscription_code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.subscription_code_mod
+  mod_subscription_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.subscription_status_mod
+  mod_card_brand:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.card_brand_mod
+  mod_card_last_four_digits:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.card_last_four_digits_mod
+  mod_is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.active_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.subscription_aud.day
