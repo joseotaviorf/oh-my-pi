@@ -4,6 +4,7 @@ reports_list:
   - campaigns_performance
   - keywords_performance
   - videos_performance
+  - search_term_performance
 partition_cols:
   - account_snake_case
   - dt_loaded

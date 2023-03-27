@@ -1,0 +1,86 @@
+---
+database_name: datalake_google_ads_clean
+table_name: search_term_performance
+owner: henrique.miamoto@quintoandar.com.br
+domain: Growth
+columns:
+  id_adgroup:
+    description: Ad Group identificator
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.adGroup
+  id_campaign:
+    description: Campaign identificator
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.campaign
+  id_external_customer:
+    description: Customer (account) identificator
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.customer
+  adgroup_name:
+    description: Name of ad group
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.adGroup
+  campaign_name:
+    description: Campagin name from google ads platform where metrics should be attributed
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.campaign
+  search_term:
+    description: Term used in the search engine
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.searchTermView
+  search_term_status:
+    description: Status of the term in the google ads
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.searchTermView
+  ad_network_type:
+    description: Ad network type
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.segments
+  device:
+    description: Device to which metrics apply
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.segments
+  keyword_info_text:
+    description: Keyword text
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.segments
+  account_descriptive_name:
+    description: Name of the google account
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.customer
+  account_snake_case:
+    description: Name of the google account (snake case)
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.account_snake_case
+  report_type:
+    description: Type of report extracted from Google API.
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.report_type
+  clicks:
+    description: Number of clicks from google ads platform
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.metrics
+  cost:
+    description: Cost from google ads platform
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.metrics
+  impressions:
+    description: Number of impressions from google ads platform
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.metrics
+  interactions:
+    description: Number of interactions from google ads platform
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.metrics
+  interaction_event_types:
+    description: Interactions event types from google ads platform
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.metrics
+  dt_loaded:
+    description: Date of loaded data
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.segments
+  dt_created:
+    description: Date of creation of each row
+    lineage:
+      - datalake_google_ads_raw.search_term_performance.dt_created
