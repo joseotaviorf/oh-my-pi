@@ -33,8 +33,6 @@ columns:
     description: Status reason of the house in that specific time period.
   trigger_new_version:
     description: Number indicating if this state should trigger a new version (1 if it should and 0 if not).
-  is_first_status:
-    description: Boolean indicating if this is the first status registered of the house.
   ts_state_started:
     lineage:
       - datalake_ebdb_listing.business_context_history.ts_state_started
