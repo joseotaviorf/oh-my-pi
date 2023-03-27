@@ -1,64 +1,94 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: business_unit_aud
+description: Audit table, used to keep changes to business unit records as historical data.
+domain: For Sale
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.id
+    description: Unique identifier for each performance hub.
   rev:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.rev
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
   rev_type:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.revtype
+    description: Modification type.
+    categories:
+      '0': Create
+      '1': Update
+      '2': Delete
   rev_end:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.revend
+    description: ID of the revision that replaced the current entry.
   version:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.version
+    description: Record version, identifies which records are older or newer.
   hub_name:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.name
+    description: Identification name of each performance hub.
   business_context:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.business_context
+    description: Type of performance of each hub.
+    categories:
+      'sale': Working in sales operations.
+      'rent': Working in rent operations.
   sdr_type:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.sdr_type
+    description: Type of work of the secretariat.
   negotiation_type:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.negotiation_type
+    description: Type of negotiation done by the hub.
   lead_types:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.lead_types
+    description: Types of leads the hub serves.
   mod_hub_name:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.name_mod
+    description: Boolean that tells us if the hub_name record has been modified
   mod_business_context:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.business_context_mod
+    description: Boolean that tells us if the business_context record has been modified
   mod_sdr_type:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.sdr_type_mod
+    description: Boolean that tells us if the sdr_type record has been modified
   mod_negotiation_type:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.negotiation_type_mod
+    description: Boolean that tells us if the negociation_type record has been modified
   mod_lead_type:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.lead_type_mod
+    description: Boolean that tells us if the lead_type record has been modified
   ts_created:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.created_at
+    description: Date the hub record was created
   ts_updated:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.updated_at
+    description: Date the hub record was updated.
   year:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.year
+    description: Year partition value.
   month:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.month
+    description: Month partition value.
   day:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.day
+    description: Day partition value.

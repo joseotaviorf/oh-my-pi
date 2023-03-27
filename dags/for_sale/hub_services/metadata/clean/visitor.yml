@@ -1,37 +1,51 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: visitor
+description: With this table we get the data of the user who made a visit, containing the record of the user id related to main. Since this is an incremental table, it must be filtered with a row_number to avoid duplicates.
+domain: For Sale
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_hub_services_raw.visitor.id
+    description: Visitor's unique identifier within the services hub.
   id_external:
     lineage:
       - datalake_hub_services_raw.visitor.external_id
+    description: User identifier in the main table.
   version:
     lineage:
       - datalake_hub_services_raw.visitor.version
+    description: Record version, identifies which records are older or newer.
   visitor_name:
     lineage:
       - datalake_hub_services_raw.visitor.name
+    description: User name registration.
   email:
     lineage:
       - datalake_hub_services_raw.visitor.email
+    description: User email registered in hub services.
   phone_number:
     lineage:
       - datalake_hub_services_raw.visitor.phone_number
+    description: User's phone number.
   ts_created:
     lineage:
       - datalake_hub_services_raw.visitor.created_at
+    description: Date the visitor record was generated.
   ts_updated:
     lineage:
       - datalake_hub_services_raw.visitor.updated_at
+    description: Date the visitor record was updated.
   year:
     lineage:
       - datalake_hub_services_raw.visitor.year
+    description: Year partition value.
   month:
     lineage:
       - datalake_hub_services_raw.visitor.month
+    description: Month partition value.
   day:
     lineage:
       - datalake_hub_services_raw.visitor.day
+    description: Day partition value.

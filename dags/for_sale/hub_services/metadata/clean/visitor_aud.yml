@@ -1,58 +1,83 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: visitor_aud
+description: Audit table, used to keep changes to visitors records as historical data.
+domain: For Sale
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_hub_services_raw.visitor_aud.id
+    description: Visitor's unique identifier within the services hub.
   id_external:
     lineage:
       - datalake_hub_services_raw.visitor_aud.external_id
+    description: User identifier in the main table.
   rev:
     lineage:
       - datalake_hub_services_raw.visitor_aud.rev
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
   rev_type:
     lineage:
       - datalake_hub_services_raw.visitor_aud.revtype
+    description: Modification type.
+    categories:
+      '0': Create
+      '1': Update
+      '2': Delete
   rev_end:
     lineage:
       - datalake_hub_services_raw.visitor_aud.revend
+    description: ID of the revision that replaced the current entry.
   version:
     lineage:
       - datalake_hub_services_raw.visitor_aud.version
+    description: Record version, identifies which records are older or newer.
   visitor_name:
     lineage:
       - datalake_hub_services_raw.visitor_aud.name
+    description: User name registration.
   email:
     lineage:
       - datalake_hub_services_raw.visitor_aud.email
+    description: User email registered in hub services.
   phone_number:
     lineage:
       - datalake_hub_services_raw.visitor_aud.phone_number
+    description: User's phone number.
   mod_id:
     lineage:
       - datalake_hub_services_raw.visitor_aud.id_mod
+    description: Boolean that tells us if the id record has been modified
   mod_visitor_name:
     lineage:
       - datalake_hub_services_raw.visitor_aud.name_mod
+    description: Boolean that tells us if the visitor name record has been modified
   mod_email:
     lineage:
       - datalake_hub_services_raw.visitor_aud.email_mod
+    description: Boolean that tells us if the visitor email record has been modified
   mod_phone_number:
     lineage:
       - datalake_hub_services_raw.visitor_aud.phone_number_mod
+    description: Boolean that tells us visitor phone the id record has been modified
   ts_created:
     lineage:
       - datalake_hub_services_raw.visitor_aud.created_at
+    description: Date the visitor record was generated.
   ts_updated:
     lineage:
       - datalake_hub_services_raw.visitor_aud.updated_at
+    description: Date the visitor record was updated.
   year:
     lineage:
       - datalake_hub_services_raw.visitor_aud.year
+    description: Year partition value.
   month:
     lineage:
       - datalake_hub_services_raw.visitor_aud.month
+    description: Month partition value.
   day:
     lineage:
       - datalake_hub_services_raw.visitor_aud.day
+    description: Day partition value.

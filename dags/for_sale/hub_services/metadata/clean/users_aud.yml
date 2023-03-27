@@ -1,58 +1,83 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: users_aud
+description: Audit table, used to keep changes to users records as historical data.
+domain: For Sale
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_hub_services_raw.users_aud.id
+    description: User's unique identifier within the services hub base.
   rev:
     lineage:
       - datalake_hub_services_raw.users_aud.rev
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
   rev_end:
     lineage:
       - datalake_hub_services_raw.users_aud.revend
+    description: ID of the revision that replaced the current entry.
   rev_type:
     lineage:
       - datalake_hub_services_raw.users_aud.revtype
+    description: Modification type.
+    categories:
+      '0': Create
+      '1': Update
+      '2': Delete
   version:
     lineage:
       - datalake_hub_services_raw.users_aud.version
+    description: Record version, identifies which records are older or newer.
   id_external:
     lineage:
       - datalake_hub_services_raw.users_aud.external_id
+    description: User identifier in the main table.
   name:
     lineage:
       - datalake_hub_services_raw.users_aud.name
+    description: User name registration.
   email:
     lineage:
       - datalake_hub_services_raw.users_aud.email
+    description: User email registered in hub services.
   phone_number:
     lineage:
       - datalake_hub_services_raw.users_aud.phone_number
+    description: User's phone number.
   mod_email:
     lineage:
       - datalake_hub_services_raw.users_aud.email_mod
+    description: Boolean that tells us if the email record has been modified
   mod_name:
     lineage:
       - datalake_hub_services_raw.users_aud.name_mod
+    description: Boolean that tells us if the name record has been modified
   mod_phone_number:
     lineage:
       - datalake_hub_services_raw.users_aud.phone_number_mod
+    description: Boolean that tells us if the phone number record has been modified
   mod_id_external:
     lineage:
       - datalake_hub_services_raw.users_aud.external_id_mod
+    description: Boolean that tells us if the external id record has been modified
   ts_created:
     lineage:
       - datalake_hub_services_raw.users_aud.created_at
+    description: Date the hub record was created.
   ts_updated:
     lineage:
       - datalake_hub_services_raw.users_aud.updated_at
+    description: Date the hub record was updated.
   year:
     lineage:
       - datalake_hub_services_raw.users_aud.year
+    description: Year partition value.
   month:
     lineage:
       - datalake_hub_services_raw.users_aud.month
+    description: Month partition value.
   day:
     lineage:
       - datalake_hub_services_raw.users_aud.day
+    description: Day partition value.

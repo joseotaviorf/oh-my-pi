@@ -1,40 +1,62 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: business_unit_region_aud
+description: Audit table, used to keep changes to business unit region records as historical data.
+domain: For Sale
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.id
+    description: Unique id that identifies the record of the table itself.
   id_business_unit:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.business_unit_id
+    description: Identification id of the business unit that relates to the regions.
   id_region:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.region_id
+    description: Identifier of regions related to a given business unit.
   rev:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.rev
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
   rev_type:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.revtype
+    description: Modification type.
+    categories:
+      '0': Create
+      '1': Update
+      '2': Delete
   rev_end:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.revend
+    description: ID of the revision that replaced the current entry.
   version:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.version
+    description: Record version, identifies which records are older or newer.
   business_context:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.business_context
+    description: business context served by the business unit.
+    categories:
+      'sale': Working in sales operations.
+      'rent': Working in rent operations.
   mod_id_business_unit:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.business_unit_id_mod
+    description: Boolean that tells us if the id_business_unit record has been modified
   mod_id_region:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.region_id_mod
+    description: Boolean that tells us if the id_region record has been modified
   ts_created:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.created_at
+    description: Date the hub record was created
   ts_updated:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.updated_at
+    description: Date the hub record was updated.

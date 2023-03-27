@@ -1,40 +1,58 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: business_unit
+description: With this table, we aim to keep data from the hubs where we operate in a standardized way. Since this is an incremental table, it must be filtered with a row_number to avoid duplicates.
+domain: For Sale
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_hub_services_raw.business_unit.id
+    description: Unique identifier for each performance hub.
   version:
     lineage:
       - datalake_hub_services_raw.business_unit.version
+    description: Record version, identifies which records are older or newer.
   hub_name:
     lineage:
       - datalake_hub_services_raw.business_unit.name
+    description: Identification name of each performance hub.
   business_context:
     lineage:
       - datalake_hub_services_raw.business_unit.business_context
+    description: Type of performance of each hub.
+    categories:
+      sale: Acting on sales.
+      rent: Acting on rent.
   sdr_type:
     lineage:
       - datalake_hub_services_raw.business_unit.sdr_type
+    description: Type of work of the secretariat.
   negotiation_type:
     lineage:
       - datalake_hub_services_raw.business_unit.negotiation_type
+    description: Type of negotiation done by the hub.
   lead_types:
     lineage:
       - datalake_hub_services_raw.business_unit.lead_types
+    description: Types of leads the hub serves.
   ts_created:
     lineage:
       - datalake_hub_services_raw.business_unit.created_at
+    description: Date the hub record was created.
   ts_updated:
     lineage:
       - datalake_hub_services_raw.business_unit.updated_at
+    description: Date the hub record was updated.
   year:
     lineage:
       - datalake_hub_services_raw.business_unit.year
+    description: Year partition value.
   month:
     lineage:
       - datalake_hub_services_raw.business_unit.month
+    description: Month partition value.
   day:
     lineage:
       - datalake_hub_services_raw.business_unit.day
+    description: Day partition value.
