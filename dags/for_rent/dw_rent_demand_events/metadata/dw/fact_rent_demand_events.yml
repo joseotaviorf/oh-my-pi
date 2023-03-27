@@ -14,6 +14,22 @@ columns:
     lineage:
     - datalake_rent_demand_event.rent_demand_event.id_event
     description: Id of the event.
+  sk_booking:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_booking
+    description: Id of the booking.
+  sk_offer:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_offer
+    description: Id of the offer. 
+  sk_proposal:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_proposal
+    description: Id of the proposal.
+  sk_contract:
+    lineage:
+    - datalake_rent_demand_event.rent_demand_event.id_contract
+    description: Id of the contract.
   sk_event_type:
     lineage:
     - datalake_rent_demand_event.rent_demand_event.id_event_type

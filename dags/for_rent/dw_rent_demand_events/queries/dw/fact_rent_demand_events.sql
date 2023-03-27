@@ -1,6 +1,10 @@
 SELECT
     id_event || '.' || id_event_type || '.' || id_tenant_prospect AS pk_rent_demand_event,
     id_event AS sk_event,
+    id_booking AS sk_booking,
+    id_offer AS sk_offer,
+    id_proposal AS sk_proposal,
+    id_contract AS sk_contract,
     id_event_type AS sk_event_type,
     COALESCE(id_tenant_prospect, -1) AS sk_tenant_prospect,
     COALESCE(id_house, -1) AS sk_house,
