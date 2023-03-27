@@ -47,7 +47,11 @@ WITH rent_flow_house_listing AS (
 
 rent_demand_events AS (                                                                  
   SELECT --visits_booked
-    bk.id AS id_event,                                                                              
+    bk.id AS id_event,
+    bk.id AS id_booking,
+    rf.id_offer,
+    rf.id_proposal,
+    rf.id_contract,                                                                          
     1 AS id_event_type,                                                                                  
     bk.id_visitor AS id_client,                                                                      
     bk.id_house,                                                                        
@@ -73,7 +77,11 @@ rent_demand_events AS (
     AND DAY(ts_created) = {day}
   UNION ALL
   SELECT --visits_completed 
-    bk.id AS id_event,                                                                              
+    bk.id AS id_event,
+    bk.id AS id_booking,
+    rf.id_offer,
+    rf.id_proposal,
+    rf.id_contract,                                                                           
     2 AS id_event_type,                                                                                   
     bk.id_visitor AS id_client,                                                                       
     bk.id_house,                                                                        
@@ -104,7 +112,11 @@ rent_demand_events AS (
     AND DAY(dt_booking) = {day}
   UNION ALL
   SELECT --offer_submitted 
-    off.id AS id_event,                                                                            
+    off.id AS id_event,
+    rf.id_booking,
+    off.id AS id_offer,
+    rf.id_proposal,
+    rf.id_contract,                                                                         
     3 AS id_event_type,                                                                                   
     off.id_client,                                                                      
     off.id_house,                                                                       
@@ -129,7 +141,11 @@ rent_demand_events AS (
     AND DAY(ts_first_sent) = {day}
   UNION ALL
   SELECT --offer_accepted
-    off.id AS id_event,                                                                             
+    off.id AS id_event,
+    rf.id_booking,
+    off.id AS id_offer,
+    rf.id_proposal,
+    rf.id_contract,                                                                           
     4 AS id_event_type,                                                                                 
     off.id_client,                                                                      
     off.id_house,                                                                       
@@ -154,7 +170,11 @@ rent_demand_events AS (
     AND DAY(ts_analyzed) = {day}
   UNION ALL
   SELECT --evaluation_started
-    pp.id AS id_event,                                                                            
+    pp.id AS id_event,
+    rf.id_booking,
+    rf.id_offer,
+    pp.id AS id_proposal,
+    rf.id_contract,                                                                          
     5 AS id_event_type,                                                                                 
     off.id_client,                                                                      
     off.id_house,                                                                       
@@ -181,7 +201,11 @@ rent_demand_events AS (
     AND DAY(ts_credit_evaluation_first_init) = {day}
   UNION ALL
   SELECT --evaluation_positive
-    pp.id AS id_event,                                                                             
+    pp.id AS id_event,
+    rf.id_booking,
+    rf.id_offer,
+    pp.id AS id_proposal,
+    rf.id_contract,                                                                              
     6 AS id_event_type,                                                                                 
     off.id_client,                                                                      
     off.id_house,                                                                       
@@ -208,7 +232,11 @@ rent_demand_events AS (
     AND DAY(ts_first_credit_evaluation_positive) = {day}
   UNION ALL
   SELECT --document_sent
-    pp.id AS id_event,                                                                            
+    pp.id AS id_event,
+    rf.id_booking,
+    rf.id_offer,
+    pp.id AS id_proposal,
+    rf.id_contract,                                                                           
     7 AS id_event_type,                                                                                 
     off.id_client,                                                                      
     off.id_house,                                                                       
@@ -235,7 +263,11 @@ rent_demand_events AS (
     AND DAY(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) = {day}
   UNION ALL
   SELECT --credit_approved 
-    pp.id AS id_event,                                                                            
+    pp.id AS id_event,
+    rf.id_booking,
+    rf.id_offer,
+    pp.id AS id_proposal,
+    rf.id_contract,                                                                             
     8 AS id_event_type,                                                                                   
     off.id_client,                                                                      
     off.id_house,                                                                       
@@ -262,7 +294,11 @@ rent_demand_events AS (
     AND DAY(ts_credit_approved_last) = {day}
   UNION ALL
   SELECT --contract_signed
-    ct.id AS id_event,                                                                             
+    ct.id AS id_event,
+    rf.id_booking,
+    rf.id_offer,
+    rf.id_proposal,
+    ct.id AS id_contract,                                                                           
     9 AS id_event_type,                                                                                  
     off.id_client,                                                                      
     ct.id_house,                                                                        
@@ -293,6 +329,10 @@ rent_demand_events AS (
 
 SELECT
   id_event,
+  id_booking,
+  id_offer,
+  id_proposal,
+  id_contract,  
   id_event_type,
   id_client AS id_tenant_prospect,                                              
   id_house,                                                       

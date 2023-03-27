@@ -12,6 +12,22 @@ columns:
     - datalake_proposal.proposal.id
     - datalake_ebdb_contract.contract.id
     description: Id of the event.
+  id_booking:
+    lineage:
+    - datalake_booking.booking.id
+    description: Id of the booking.
+  id_offer:
+    lineage:
+    - datalake_offer.offer.id
+    description: Id of the offer.
+  id_proposal:
+    lineage:
+    - datalake_proposal.proposal.id
+    description: Id of the proposal.
+  id_contract: 
+    lineage:
+    - datalake_ebdb_contract.contract.id
+    description: Id of the contract.
   id_event_type:
     description: Id of the event type.
   id_tenant_prospect:
