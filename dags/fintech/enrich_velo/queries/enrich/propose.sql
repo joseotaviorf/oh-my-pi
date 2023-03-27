@@ -13,7 +13,7 @@ WITH propose_canceled_date AS (
 propose_started_date AS (
   SELECT
     id_propose,
-    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_propose_started
+    MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_propose_started
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -25,7 +25,7 @@ propose_started_date AS (
 propose_waiting_new_docs_date AS (
   SELECT
     id_propose,
-    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_waiting_new_docs
+    MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_waiting_new_docs
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -37,7 +37,7 @@ propose_waiting_new_docs_date AS (
 propose_evaluation_started_date AS (
   SELECT
     id_propose,
-    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_evaluation_started
+    MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_evaluation_started
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -49,7 +49,7 @@ propose_evaluation_started_date AS (
 propose_rejected_date AS (
   SELECT
     id_propose,
-    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_rejected
+    MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_rejected
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -61,7 +61,7 @@ propose_rejected_date AS (
 propose_sign_started_date AS (
   SELECT
     id_propose,
-    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_sign_started
+    MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_sign_started
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -73,7 +73,7 @@ propose_sign_started_date AS (
 propose_paid_date AS (
   SELECT
     id_propose,
-    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_paid
+    MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_paid
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -85,7 +85,7 @@ propose_paid_date AS (
 propose_activation_date AS (
   SELECT
     id_propose,
-    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_activation
+    MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -97,7 +97,7 @@ propose_activation_date AS (
 propose_secured_date AS (
   SELECT
     id_propose,
-    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_secured
+    MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secured
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -109,7 +109,7 @@ propose_secured_date AS (
 propose_activation_analysis_date AS (
   SELECT
     id_propose,
-    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_activation_analysis
+    MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation_analysis
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
@@ -121,7 +121,7 @@ propose_activation_analysis_date AS (
 propose_secure_pending_date AS (
   SELECT
     id_propose,
-    MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_secure_pending
+    MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secure_pending
   FROM
     datalake_velo_clean.fiancavelo_proposehistory
   WHERE
