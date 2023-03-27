@@ -81,7 +81,7 @@ SELECT
     mkt_source,
     mkt_platform,
     funnel_side,
-    raw_cost * cost_factor AS cost,
+    CAST(raw_cost * cost_factor AS FLOAT) AS cost,
     id_date,
     flow_type
 FROM

@@ -40,7 +40,7 @@ SELECT
     COALESCE(tbp.mkt_source, 'Not Mapped') AS mkt_source,
     COALESCE(tbp.mkt_platform, 'Not Mapped') AS mkt_platform,
     COALESCE(tbp.side, 'Not Mapped') AS funnel_side,
-    COALESCE(
+    CAST(COALESCE(
         cmm.total_cost * FLOAT(tbp.platform_cost_factor),
         CASE
             WHEN tbp.mkt_platform = 'Mobile' THEN cmm.mobile_cost
@@ -48,7 +48,7 @@ SELECT
             WHEN tbp.mkt_platform = 'Other' THEN cmm.other_cost
             ELSE cmm.total_cost
         END
-    ) AS cost,
+    ) AS FLOAT) AS cost,
     cmm.id_date,
     'automatic' AS flow_type
 FROM 
