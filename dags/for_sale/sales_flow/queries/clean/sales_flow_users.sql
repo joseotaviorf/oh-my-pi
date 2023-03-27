@@ -1,4 +1,5 @@
 SELECT
+    id,
     sales_flow_id AS id_sales_flow,
     user_id AS id_user,
     type,

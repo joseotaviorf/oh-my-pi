@@ -6,6 +6,7 @@ SELECT
     hub_id AS id_hub,
     offer_price,
     sale_price,
+    final_price,
     discard_reason,
     status,
     proposal_date AS dt_proposed,
