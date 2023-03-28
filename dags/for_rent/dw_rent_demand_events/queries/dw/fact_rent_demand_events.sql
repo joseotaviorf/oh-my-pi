@@ -1,10 +1,10 @@
 SELECT
     id_event || '.' || id_event_type || '.' || id_tenant_prospect AS pk_rent_demand_event,
     id_event AS sk_event,
-    id_booking AS sk_booking,
-    id_offer AS sk_offer,
-    id_proposal AS sk_proposal,
-    id_contract AS sk_contract,
+    COALESCE(id_booking, -1) AS sk_booking,
+    COALESCE(id_offer, -1) AS sk_offer,
+    COALESCE(id_proposal, -1) AS sk_proposal,
+    COALESCE(id_contract, -1) AS sk_contract,
     id_event_type AS sk_event_type,
     COALESCE(id_tenant_prospect, -1) AS sk_tenant_prospect,
     COALESCE(id_house, -1) AS sk_house,
@@ -23,3 +23,4 @@ FROM
     datalake_rent_demand_event.rent_demand_event
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_event ORDER BY ts_updated DESC) = 1
+    
