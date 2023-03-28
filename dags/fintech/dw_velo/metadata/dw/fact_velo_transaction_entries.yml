@@ -8,36 +8,39 @@ columns:
   sk_transaction_entry:
     lineage:
     - datalake_velo.transaction_entries.id_transaction_entry
-    description: ''
+    description: Transaction entry's identification number (ID)
   sk_transaction:
     lineage:
     - datalake_velo.transaction_entries.id_trasaction
-    description: ''
+    description: Transaction's identification number (ID). This key connects to the table dw_velo.dim_velo_transaction
   sk_category:
     lineage:
     - datalake_velo.transaction_entries.id_category
-    description: ''
+    description: Category's identification number (ID). This key connects to the table dw_velo.dim_velo_transaction_category
   sk_propose:
     lineage:
     - datalake_velo.transaction_entries.id_propose
-    description: ''
+    description: Propose's identification number (ID). This key connects to the table dw_velo.fact_velo_propose
   sk_bank_account:
     lineage:
     - datalake_velo.transaction_entries.id_bank_account
-    description: ''
+    description: Bank account's identification number (ID). This key connects to the table dw_velo.dim_velo_omie_bank_account
   sk_omie_client:
     lineage:
     - datalake_velo.transaction_entries.id_omie_client
-    description: ''
+    description: Omie client's identification number (ID). This key connects to the table dw_velo.dim_velo_omie_client
   percent_amount_from_transaction:
     lineage:
     - datalake_velo.transaction_entries.percent_amount_from_transaction
+    description: Ratio between the entry due amount by the transaction's total due amount
   due_amount:
     lineage:
     - datalake_velo.transaction_entries.due_amount
+    description: Entry's due amount
   paid_amount:
     lineage:
     - datalake_velo.transaction_entries.paid_amount
+    description: Entry's paid amount
   is_occurency:
     lineage:
     - datalake_velo.transaction_entries.is_occurency
@@ -45,34 +48,32 @@ columns:
   dt_issue:
     lineage:
     - datalake_velo.transaction_entries.dt_issue
-    description: ''
+    description: Date when the transaction was issued
   dt_register:
     lineage:
     - datalake_velo.transaction_entries.dt_register
-    description: ''
+    description: Date when the transaction was registered
   dt_due:
     lineage:
     - datalake_velo.transaction_entries.dt_due
-    description: ''
+    description: Transaction due date. Expected date that the transaction will be received in the bank account. For PIX it is instantly, for bank ticket usually takes 1 business day and for credit card takes 30 running days (compared to the bank slip due date)
   dt_paid:
     lineage:
     - datalake_velo.transaction_entries.dt_paid
-    description: ''
+    description: Transaction payment date. It indicates when the transaction was received in the bank account. For PIX it is instantly, for bank ticket usually takes 1 business day and for credit card takes 30 running days
   ts_created:
     lineage:
     - datalake_velo.transaction_entries.ts_created
+    description: Moment (timestamp) when the transaction was created
   ts_modified:
     lineage:
     - datalake_velo.transaction_entries.ts_modified
+    description: Moment (timestamp) when the transaction was modified last
   category_due_amount:
     description: Amount due of this entry
   category_paid_amount:
     description: Amount paid of this entry
   category_percent_amount:
     description: Percentage of this entry related to the whole transaction amount
-  dt_created:
-    description: ''
-  dt_modified:
-    description: ''
   ts_load:
-    description: ''
+    description: Moment (timestamp) when the table was last loaded

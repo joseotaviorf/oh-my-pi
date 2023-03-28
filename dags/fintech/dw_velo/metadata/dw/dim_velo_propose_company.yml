@@ -8,34 +8,34 @@ columns:
   sk_company:
     lineage:
     - datalake_velo.propose_company.id_company
-    description: ''
+    description: Company's identification number (ID) when the propose is for a business
   company_name:
     lineage:
     - datalake_velo.propose_company.company_name
-    description: ''
+    description: Company's name when the propose is for a business
   city:
     lineage:
     - datalake_velo.propose_company.city
-    description: ''
+    description: Company's city when the propose is for a business
   state:
     lineage:
     - datalake_velo.propose_company.state
-    description: ''
+    description: Company's state when the propose is for a business
   country:
     lineage:
     - datalake_velo.propose_company.country
-    description: ''
+    description: Company's country when the propose is for a business
   zipcode:
     lineage:
     - datalake_velo.propose_company.zipcode
-    description: ''
+    description: Company's zipcode when the propose is for a business
   geolocation:
     lineage:
     - datalake_velo.propose_company.geolocation
-    description: ''
+    description: Company's geolocation when the propose is for a business
   cnpj:
     lineage:
     - datalake_velo.propose_company.cnpj
-    description: ''
+    description: Company's document number (CNPJ) when the propose is for a business
   ts_load:
-    description: ''
+    description: Moment (timestamp) when the table was last loaded

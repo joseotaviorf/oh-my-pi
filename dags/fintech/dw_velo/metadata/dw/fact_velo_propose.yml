@@ -7,51 +7,51 @@ columns:
   sk_propose:
     lineage:
     - datalake_velo.propose.id_propose
-    description: ''
+    description: Propose's identification number (ID)
   sk_propose_values:
     lineage:
     - datalake_velo.propose.id_propose_values
-    description: ''
+    description: Propose values' identification number (ID). This key connects to the table dw_velo.dim_velo_propose_values
   sk_broker:
     lineage:
     - datalake_velo.propose.id_broker
-    description: ''
+    description: Broker's identification number (ID). This key connects to the table dw_velo.dim_velo_broker
   sk_house:
     lineage:
     - datalake_velo.propose.id_house
-    description: ''
+    description: House's identification number (ID). This key connects to the table dw_velo.dim_velo_house
   sk_propose_company:
     lineage:
     - datalake_velo.propose.id_propose_company
-    description: ''
+    description: Company's identification number (ID). This key connects to the table dw_velo.dim_velo_propose_company
   sk_agent:
     lineage:
     - datalake_velo.propose.id_agent
-    description: ''
+    description: Agent's identification number (ID). This key connects to the table dw_velo.dim_velo_user
   sk_contract:
     lineage:
     - datalake_velo.propose.id_contract
-    description: ''
+    description: Contract's identification number (ID)
   sk_primary_person:
     lineage:
     - datalake_velo.propose.id_primary_person
-    description: ''
+    description: Primary person's identification number (ID). This key connects to the table dw_velo.dim_velo_propose_person considering only propose's primary person
   sk_origin:
     lineage:
     - datalake_velo.propose.id_origin
-    description: ''
+    description: Origin's identification number (ID). It indicates if the the propose was made by a person or by a business and this key connects to the table dw_velo.dim_velo_junk
   sk_propose_status:
     lineage:
     - datalake_velo.propose.id_propose_status
-    description: ''
+    description: Propose status' identification number (ID). This key connects to the table dw_velo.dim_velo_junk
   sk_guarantee_status:
     lineage:
     - datalake_velo.propose.id_guarantee_status
-    description: ''
+    description: Guarantee status' identification number (ID). This key connects to the table dw_velo.dim_velo_junk
   sk_propose_type:
     lineage:
     - datalake_velo.propose.id_propose_type
-    description: ''
+    description: Propose type's identification number (ID). It indicates if the propose is residential or commercial this key connects to the table dw_velo.dim_velo_junk
   count_persons_included:
     lineage:
     - datalake_velo.propose.count_persons_included
@@ -64,61 +64,75 @@ columns:
   avg_serasa_score:
     lineage:
     - datalake_velo.propose.avg_serasa_score
-    description: Avarage serasa score of the persons included on the propose
+    description: Average serasa score of the persons included on the propose
   avg_risk_score:
     lineage:
     - datalake_velo.propose.avg_risk_score
-    description: Avarage risk score of the persons included on the propose
+    description: Average risk score of the persons included on the propose
   avg_declared_income:
     lineage:
     - datalake_velo.propose.avg_declared_income
-    description: Avarage declared income of the persons included on the propose
+    description: Average declared income of the persons included on the propose
   total_declared_income:
     lineage:
     - datalake_velo.propose.total_declared_income
+    description: Total declared income of the persons included on the propose
   dti:
     lineage:
     - datalake_velo.propose.dti
+    description: Debt-to-income ratio. Indicates the ratio between the debt value by all the gross monthly income declared
   total_paid_amount:
     lineage:
     - datalake_velo.propose.total_paid_amount
+    description: Propose's total paid value
   total_expected_amount:
     lineage:
     - datalake_velo.propose.total_expected_amount
+    description: Propose's total payable value
   total_due_amount:
     lineage:
     - datalake_velo.propose.total_due_amount
+    description: Propose's total due value (not paid)
   total_occurrences_due_amount:
     lineage:
     - datalake_velo.propose.total_occurrences_due_amount
+    description: Propose's total payable occurrences value
   total_occurrences_paid_amount:
     lineage:
     - datalake_velo.propose.total_occurrences_paid_amount
+    description: Propose's total paid occurrences value
   total_payments:
     lineage:
     - datalake_velo.propose.total_payments
+    description: Propose's quantity of invoices
   total_payments_paid:
     lineage:
     - datalake_velo.propose.total_payments_paid
+    description: Propose's quantity of payments (paid invoices)
   total_payments_expired:
     lineage:
     - datalake_velo.propose.total_payments_expired
+    description: Propose's quantity of overdue invoices
   total_occurrences:
     lineage:
     - datalake_velo.propose.total_occurrences
+    description: Propose's quantity of occurrences
   occurrences_solved:
     lineage:
     - datalake_velo.propose.occurrences_solved
+    description: Propose's quantity of occurrences solved (paid)
   is_contract:
     lineage:
     - datalake_velo.propose.is_contract
-    description: If the propose has being turned into a contract
+    description: If the propose has been turned into a contract
   is_grace_period_cancelled:
     lineage:
     - datalake_velo.propose.is_grace_period_cancelled
+    description: If the propose's grace period has expired
   dt_last_payment:
     lineage:
     - datalake_velo.propose.dt_last_payment
+    description: Propose's last payment date
   dt_contract_started:
     lineage:
     - datalake_velo.propose.dt_contract_started
@@ -130,33 +144,43 @@ columns:
   ts_propose_started:
     lineage:
     - datalake_velo.propose.ts_propose_started
+    description: Timestamp of when the propose has started
   ts_waiting_new_docs:
     lineage:
     - datalake_velo.propose.ts_waiting_new_docs
+    description: Timestamp of when the propose has started waiting for new docs
   ts_evaluation_started:
     lineage:
     - datalake_velo.propose.ts_evaluation_started
+    description: Timestamp of when the propose's evaluation has started
   ts_rejected:
     lineage:
     - datalake_velo.propose.ts_rejected
+    description: Timestamp of when the propose has been rejected
   ts_sign_started:
     lineage:
     - datalake_velo.propose.ts_sign_started
+    description: Timestamp of when the propose has been signed
   ts_paid:
     lineage:
     - datalake_velo.propose.ts_paid
+    description: Timestamp of when the propose has been paid (to turn into a contract)
   ts_activation:
     lineage:
     - datalake_velo.propose.ts_activation
+    description: Timestamp of when the propose has been activated
   ts_secured:
     lineage:
     - datalake_velo.propose.ts_secured
+    description: Timestamp of when the propose has been secured
   ts_activation_analysis:
     lineage:
     - datalake_velo.propose.ts_activation_analysis
+    description: Timestamp of when the propose had been activated, but was still in analysis
   ts_secure_pending:
     lineage:
     - datalake_velo.propose.ts_secure_pending
+    description: Timestamp of when the propose has started waiting to be secured
   dt_activation:
     description: Date of when status of the propose was set to "Ativada"
   dt_activation_analysis:
@@ -178,4 +202,4 @@ columns:
   dt_waiting_new_docs:
     description: Date of when status of the propose was set to "Aguardando Complementos"
   ts_load:
-    description: ''
+    description: Moment (timestamp) when the table was last loaded

@@ -7,18 +7,19 @@ columns:
   sk_person:
     lineage:
     - datalake_velo.propose_person.id_person
-    description: ''
+    description: Person's identification number (ID)
   name:
     lineage:
     - datalake_velo.propose_person.name
-    description: ''
+    description: Person's name
   email:
     lineage:
     - datalake_velo.propose_person.email
-    description: ''
+    description: Person's email
   phone:
     lineage:
     - datalake_velo.propose_person.phone
+    description: Person's phone
   bureau_name:
     lineage:
     - datalake_velo.propose_person.bureau_name
@@ -26,36 +27,36 @@ columns:
   document:
     lineage:
     - datalake_velo.propose_person.document
-    description: ''
+    description: Person's document number (CPF)
   serasa_score:
     lineage:
     - datalake_velo.propose_person.serasa_score
-    description: ''
+    description: Person's Serasa Score in the moment of propose's credit score evaluation
   risk_score:
     lineage:
     - datalake_velo.propose_person.risk_score
-    description: ''
+    description: Person's risk score cluster ID
   risk_classification:
     lineage:
     - datalake_velo.propose_person.risk_classification
-    description: ''
+    description: Person's risk score cluster description
   score_personal_value:
     lineage:
     - datalake_velo.propose_person.score_personal_value
-    description: ''
+    description: Person's bureau score in the moment of propose's credit score evaluation
   declared_income:
     lineage:
     - datalake_velo.propose_person.declared_income
-    description: ''
+    description: Person's declared income
   requested_income:
     lineage:
     - datalake_velo.propose_person.requested_income
-    description: ''
+    description: Person's requested income
   dt_birth:
     lineage:
     - datalake_velo.propose_person.dt_birth
-    description: ''
+    description: Person's date of birth
   is_primary_person:
-    description: ''
+    description: Identification if the person is the main person of the propose
   ts_load:
-    description: ''
+    description: Moment (timestamp) when the table was last loaded

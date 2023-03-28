@@ -8,19 +8,19 @@ columns:
   sk_user:
     lineage:
     - datalake_velo.user.id_user
-    description: ''
+    description: User's identification number (ID)
   name:
     lineage:
     - datalake_velo.user.name
-    description: ''
+    description: User's name
   email:
     lineage:
     - datalake_velo.user.email
-    description: ''
+    description: User's email
   user_role:
     lineage:
     - datalake_velo.user.user_role
-    description: ''
+    description: User's role in Velo's platform
     categories:
       Administrador: ''
       Administrador Rede: ''
@@ -44,10 +44,10 @@ columns:
   phone:
     lineage:
     - datalake_velo.user.phone
-    description: ''
+    description: User's phone
   ts_created:
     lineage:
     - datalake_velo.user.ts_created
-    description: ''
+    description: Moment (timestamp) when the user was created in Velo's platform
   ts_load:
-    description: ''
+    description: Moment (timestamp) when the table was last loaded

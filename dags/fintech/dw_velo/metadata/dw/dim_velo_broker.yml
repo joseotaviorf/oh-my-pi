@@ -47,5 +47,6 @@ columns:
   ts_created:
     lineage:
     - datalake_velo.broker.ts_created
-  ts_load:
     description: Moment (timestamp) when the broker was created in Velo's platform
+  ts_load:
+    description: Moment (timestamp) when the table was last loaded
