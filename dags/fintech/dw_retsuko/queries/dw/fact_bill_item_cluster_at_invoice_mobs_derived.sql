@@ -10,7 +10,7 @@ invoice_status_sign AS (
     IF(col_mob>=mob_due_by_created_date,1,0) AS signal_due_mob,
     IF(col_mob<mob_due_by_created_date,1,0) AS signal_to_due_mob,
     'CREATED DATE' AS reference_date_mob
-  FROM fact_bill_item_cluster_at_invoice_mobs as ic
+  FROM dw_retsuko.fact_bill_item_cluster_at_invoice_mobs as ic
   CROSS JOIN mob_array AS mac
   WHERE mac.col_mob <= ic.mobs_possible_invoice_by_created_date
   UNION ALL
@@ -21,7 +21,7 @@ invoice_status_sign AS (
     IF(col_mob>=mob_due_by_due_date,1,0) AS signal_due_mob,
     IF(col_mob<mob_due_by_due_date,1,0) AS signal_to_due_mob,
     'DUE DATE' AS reference_date_mob
-  FROM fact_bill_item_cluster_at_invoice_mobs as ic
+  FROM dw_retsuko.fact_bill_item_cluster_at_invoice_mobs as ic
   CROSS JOIN mob_array AS mad
   WHERE mad.col_mob <= ic.mobs_possible_invoice_by_due_date
 ),
