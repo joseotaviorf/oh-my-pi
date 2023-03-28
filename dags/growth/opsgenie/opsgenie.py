@@ -20,7 +20,7 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 SOURCE = "opsgenie"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 8, 21, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "10 21 * * *"
+MAIN_SCHEDULE_INTERVAL = "00 06 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 
 CUSTOM_LIBRARIES = [{"pypi": {"package": "opsgenie_sdk"}}]
