@@ -50,3 +50,5 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.experiment.ts_ended
     description: "Date/time in which the experiment ended."
+  ts_load:
+    description: "Timestamp when row was loaded."

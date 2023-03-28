@@ -1,76 +1,158 @@
 ---
 database_name: dw_datamarts
 table_name: credit_proposal_attribute
+owner: giuseppe.giovanelli@quintoandar.com.br
+domain: Fintech
+description: "Table with main credit variables attached to Proposal."
 columns:
   sk_proposal:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_proposal
+    description: "Proposal's identification from EBDB."
   status_proposal:
     lineage:
       - dw_public.dim_proposal.status
+    description: "Proposal's last status on EBDB."
   status_sortinghat:
     lineage:
       - dw_public.dim_proposal.status_sortinghat
+    description: "Proposal's last status on Sorting Hat."
   status_doc_tenant:
     lineage:
       - dw_public.dim_proposal.status_doc_tenant
+    description: "Proposal's last documentation status on EBDB."
   proposal_rejection_reason:
     lineage:
       - dw_public.dim_proposal.rejection_reason
+    description: "Proposal's last rejection reason."
   proposal_guarantee:
     lineage:
       - dw_public.dim_proposal.guarantee
+    description: "Proposal's guarantee on EBDB."
   contract_cancellation_reason:
     lineage:
       - dw_public.dim_contract.cancellation_reason
+    description: "Contract's cancellation on EBDB."
   type:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.type
+    description: "Indicates what documentation policy was applied to a given credit
+      analysis."
+    categories:
+      FULL_CONTROL_GROUP: "Cases in which a FULL documentation policy is requested
+        to remove the bias on Credit Decision ML models."
+      FULL: "Documentation is requested and fully analyzed. This is the option that
+        might result in more bias as it requests documentation and a thorough analysis
+        is made, thus eliminating people with insufficient income, invalid informed
+        income, income that is difficult to validate (informal workers) and etc."
+      FLEX: "Documentation is requested, but is not thoroughly analyzed. This reduces
+        a bit the conversion when compared with LIGHT_APPROVAL, as it requires documents
+        to be sent. It has a certain level of analysis and helps to filter some income
+        outliers."
+      LIGHT_APPROVAL: "It includes a personal document check and sometimes a manual
+        analysis is made."
   level:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.level
+    description: "Level of analysis required by the credit table."
+    categories:
+      LEVEL_1: "It's the default level and any analyst can evaluate"
+      LEVEL_2: "Indicates a more problematic situation that should be evaluated by an experienced analyst."
   result:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.result
+    description: "Indicates the result applied to a given credit analysis."
+    categories:
+      ADVISABLE: "status given when a manual evaluator requests a doument resend, but
+        leaves the recommendation to approve."
+      APPROVED: "Approved"
+      INADVISABLE: "status given when a manual evaluator requests a doument resend,
+        but leaves the recommendation to reject"
+      NEW: "usually indicates a new proposal. If it got to closing, look for other
+        clues to approved or rejected"
+      REJECTED: "Rejected"
   reason:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.reason
+    description: "Indicates the reason that led to a credit analysis disapproval."
   id_analyst:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_analyst
+    description: "Analyst ID on Sorting Hat."
   analyst_name:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.analyst_name
+    description: "Analyst name on Sorting Hat."
   automatic_decision_reason:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.automatic_decision_reason
+    description: "Type of decision taken automatically by model."
   bypass:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.bypass
+    description: "Indicate the reason that led a credit analysis to receive the bypass
+      treatment (if conditions apply)."
+    categories:
+      FOREIGNER: "Indicates when a proposal contains a proponent from another country."
+      HIGH_INCOME: "Indicates when the total income from subset is above the defined
+        threshold (25k)."
+      LOW_DTI: "Indicates when the DTI is less then the defined threshold (0.1)."
+      MANUAL: "Indicates the case in which was made a bypass via manual credit analysis."
+      MISSING_5A_SCORE: "Indicates when the proposal does not have an internal score
+        available."
+      MISSING_EXTERNAL_SCORE: "Indicates when one or more proponents does not have
+        scores available on Serasa/Boavista."
+      OCCUPATION_AREA: "Indicates when some proponent have occupation_area = COMMUNICATION
+        and one or more proponents have income nature defined as AUTONOMOUS or BUSINESSMAN."
+      RECENT_TENANT: "Indicates when one or more proponents have a contract with 5A
+        in the last 6 months."
+      RELIABLE_EX_TENANT: "Indicates when one or more proponents was classified as
+        a reliable ex-tenant."
+      RELIABLE_TENANT: "Indicates when one or more proponents was classified as a reliable
+        tenant."
+      RENTAL_GUARANTEE: "Indicates when the proposal have a guarantee from Rental Guarantee
+        product."
   is_a_potential_interview:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.is_a_potential_interview
+    description: "Flag that indicated if credit analysis is deemed to have an interview to approve."
   category:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.category
+    description: "Guarantee policy identification. 0 marks a Free guarantee, null indicates a Clear No reject and all others are accessible via dim_credit.dim_guarantee_policy."
   city_group:
     lineage:
       - dw_public.dim_region.city_group
+    description: "House's city group, indicating which tier the city belongs."
   city_name:
     lineage:
       - dw_public.dim_region.city_name
+    description: "House's city name."
   risk_category:
     lineage:
       - datalake_sorting_hat_clean.screening_result.risk_category
+    description: "Indicates the risk category defined to a given credit analysis. The
+      definition of each letter is done by the Credit Ops team."
+    categories:
+      A: "Best people evaluated"
+      B: "Riskier people, but enough to have access to free guarantee"
+      C: "Riskier than B, it's given the cheapest paid options dependending on the city."
+      D: "Riskier than C, it's given more expensive paid options. Also depends on the city."
+      E: 'Riskier than D, its given the deposit option, factor dependending on the city.'
+      F: 'Riskier than E, clear-no.'
   score:
     lineage:
       - datalake_sorting_hat_clean.screening_result.score
+    description: "Model score. Not reliable after 2020."
   is_instant_offer:
     lineage:
       - dw_public.dim_offer.is_instant_offer
+    description: "Flag indicating if the offer is on an accepted value agreed by owner to be approved automatically or higher."
   offer_type:
     lineage:
       - dw_public.dim_offer.type
+    description: "Offer type."
   house_origin_type:
     lineage:
       - dw_public.dim_house_listing.consultant_type
+    description: "Type of consultant attending the house."
