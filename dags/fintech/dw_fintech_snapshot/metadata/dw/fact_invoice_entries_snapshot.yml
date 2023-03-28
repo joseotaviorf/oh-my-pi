@@ -1,40 +1,55 @@
 ---
 database_name: dw_payment_snapshot
 table_name: fact_invoice_entries_snapshot
+owner: "@ae-finance-fintech"
+domain: "fintech"
+description: "dw_payment.fact_invoice_entries monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
   sk_invoice_entry:
     lineage:
       - dw_payment.fact_invoice_entries.sk_invoice_entry
+    description: "Invoice entry (credit or debit) registered in an invoice"
   sk_invoice:
     lineage:
       - dw_payment.fact_invoice_entries.sk_invoice
+    description: "Invoice registered in SeuBarriga"
   sk_contract:
     lineage:
       - dw_payment.fact_invoice_entries.sk_contract
+    description: "Contract related to an invoice"
   sk_contract_user:
     lineage:
       - dw_payment.fact_invoice_entries.sk_contract_user
+    description: "User id related to the invoice rather than contract"
   sk_region:
     lineage:
       - dw_payment.fact_invoice_entries.sk_region
+    description: "House region id from the contract related to an invoice"
   sk_created_date:
     lineage:
       - dw_payment.fact_invoice_entries.sk_created_date
+    description: "Key for invoice entry creation date"
   sk_due_date:
     lineage:
       - dw_payment.fact_invoice_entries.sk_due_date
+    description: "Key for invoice entry due date"
   sk_paid_date:
     lineage:
       - dw_payment.fact_invoice_entries.sk_paid_date
+    description: "Key for invoice entry paid date"
   brl_entry_due_amount:
     lineage:
       - dw_payment.fact_invoice_entries.brl_entry_due_amount
+    description: "Invoice entry due value, considering debit or credit related to the contract cash flow"
   brl_entry_paid_amount:
     lineage:
       - dw_payment.fact_invoice_entries.brl_entry_paid_amount
+    description: "Invoice entry paid value, considering debit or credit related to the contract cash flow. Be aware that the amount is distributed proportionally in cases of invoice delays"
   ts_created:
     lineage:
       - dw_payment.fact_invoice_entries.ts_created
+    description: "Invoice creation date."
   ts_snapshot:
     lineage:
       - dw_payment.fact_invoice_entries.ts_load
+    description: "Timestamp that snapshot was taken."

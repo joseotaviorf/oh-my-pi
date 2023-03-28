@@ -17,4 +17,4 @@ columns:
     lineage:
     - datalake_velo.propose_person.is_primary_person
   ts_load:
-    description: ''
+    description: Timestamp when the data was loaded.
