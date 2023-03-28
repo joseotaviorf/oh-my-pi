@@ -1,8 +1,8 @@
 ---
 database_name: dw_payment_snapshot
 table_name: fact_invoice_entries_snapshot
-owner: "@ae-finance-fintech"
-domain: "fintech"
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
 description: "dw_payment.fact_invoice_entries monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
   sk_invoice_entry:
