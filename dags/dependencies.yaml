@@ -1433,6 +1433,9 @@ bietlejuice.enrich_analyst_ranking:
   - bietlejuice.gsheets.support_and_service:done-clean-support-agents-department
   - bietlejuice.gsheets.support_and_service:done-clean-ranking-rules
 
+bietlejuice.enrich_arquivo_confidencial:
+  -  bietlejuice.arquivo_confidencial:load-clean-integration-report
+
 bietlejuice.enrich_atta:
   - bietlejuice.atta:load-clean-log-isolve-v1
   - bietlejuice.atta:load-clean-log-isolve-v2

@@ -1,0 +1,50 @@
+database_name: datalake_arquivo_confidencial
+table_name: scr
+owner: giuseppe.giovanelli@quintoandar.com.br
+domain: fintech
+description: "Table with SCR data broken by Months on Booking (mob) and version."
+columns:
+  id:
+    description: "Identification from integration report table."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.id
+  cpf:
+    description: "Personal identification from main proponent."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.cpf
+  version:
+    description: "Numer of times certain cpf data were registered on the table for a particular provider."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.version
+  mob:
+    description: "Months on Booking. Commom name for designating number of months before an event."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.mob
+  reference_date:
+    description: "Year month of the credit limits data."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.reference_date
+  value:
+    description: "SCR property value."
+  domain:
+    description: "SCR data identification regarding type and time."
+  modality:
+    description: "SCR data identification of balance operation group."
+  submodality:
+    description: "SCR data identification of balance operation detail."
+  domain_group:
+    description: "SCR domain grouping based on status."
+  modality_description:
+    description: "SCR data balance operation group."
+  submodality_description:
+    description: "SCR data balance operation detail."
+  linked_to_foreign_currency:
+    description: "If data is informed on foreign currency."
+  ts_created:
+    description: "Date information was created"
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.ts_created
+  ts_updated:
+    description: "Date information was last updated."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.ts_updated
