@@ -2577,6 +2577,22 @@ bietlejuice.enrich_sirena:
 bietlejuice.enrich_sorting_hat:
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis
 
+bietlejuice.enrich_proponent:
+  - bietlejuice.ebdb:create-clean-proposal-in-data-lake
+  - bietlejuice.ebdb:create-clean-proponent-proposal-in-data-lake
+  - bietlejuice.sorting_hat:create-clean-proponent-external-table
+  - bietlejuice.sorting_hat:create-clean-proposal-external-table
+  - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
+  - bietlejuice.arquivo_confidencial:load-clean-documentation-report
+  - bietlejuice.arquivo_confidencial:load-clean-rev-info
+  - bietlejuice.arquivo_confidencial:load-clean-emailage-result-aud
+  - bietlejuice.arquivo_confidencial:load-clean-unico-check-process
+  - bietlejuice.docx:load-clean-credit-evaluation
+  - bietlejuice.docx:load-clean-credit-evaluation-proponent
+  - bietlejuice.docx:load-clean-document
+  - bietlejuice.docx:load-clean-folder
+  - bietlejuice.docx:load-clean-folder-reference
+
 bietlejuice.enrich_survicate:
   - bietlejuice.gsheets.support_and_service:done-clean-owner-offboarding-keys-csat
   - bietlejuice.gsheets.support_and_service:done-clean-tenant-onboarding-keys-csat
