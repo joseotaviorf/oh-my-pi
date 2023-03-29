@@ -28,4 +28,5 @@ columns:
     lineage:
       - datalake_docx_clean.credit_evaluation.ts_updated
     description: "Credit evaluation last update date on DOCX."
-  
+  ts_load:
+    description: "Date when the row was loaded."

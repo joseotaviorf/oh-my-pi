@@ -84,6 +84,46 @@ columns:
       DIRECT: "Flow started with a direct offer, without any visit previously."
       TTA: "Talk to agent. Flow started with a message to an agent, used on the 2020 pandemic."
       VISIT: "Flow started with a visit."
+  days_offer_submitted_to_offer_approved:
+    lineage:
+      - dw_public.dim_date.date
+    description: "Days between offer approved and offer submitted."
+  days_offer_approved_to_evaluation_started:
+    lineage:
+      - dw_public.dim_date.date
+    description: "Days between credit evaluation first started and offer approved."
+  days_offer_approved_to_evaluation_approved:
+    lineage:
+      - dw_public.dim_date.date
+    description: "Days between credit evaluation first approved by model and offer approved."
+  days_offer_approved_to_document_first_sent:
+    lineage:
+      - dw_public.dim_date.date
+    description: "Days between tenant documents first sent and offer approved."
+  days_offer_approved_to_document_approved:
+    lineage:
+      - dw_public.dim_date.date
+    description: "Days between tenant documents approved (deprecated as 2020) and offer approved."
+  days_offer_approved_to_contract_signed:
+    lineage:
+      - dw_public.dim_date.date
+    description: "Days between offer approved and contract signed."
+  days_evaluation_started_to_evaluation_approved:
+    lineage:
+      - dw_public.dim_date.date
+    description: "Days between credit evaluation first started and credit evaluation first approved by model."
+  days_evaluation_started_to_contract_signed:
+    lineage:
+      - dw_public.dim_date.date
+    description: "Days between credit evaluation first started and contract signed."
+  days_document_first_sent_to_document_approved:
+    lineage:
+      - dw_public.dim_date.date
+    description: "Days between tenant documents sent to approved (deprecated as 2020)."
+  days_document_approved_to_contract_signed:
+    lineage:
+      - dw_public.dim_date.date
+    description: "Days between tenant documents approved (deprecated as 2020) and contract signed."
   funnel_step:
     lineage:
       - dw_public.fact_listing_rent_flows.funnel_step

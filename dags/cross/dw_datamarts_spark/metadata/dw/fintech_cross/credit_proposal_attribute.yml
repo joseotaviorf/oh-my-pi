@@ -33,6 +33,25 @@ columns:
     lineage:
       - dw_public.dim_contract.cancellation_reason
     description: "Contract's cancellation on EBDB."
+  job_type:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.income_nature
+    description: "Checks if any proponents has a clt job."
+  income:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.monthly_income
+    description: "Monthly income declared by propoennt."
+  package:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.monthly_income
+      - datalake_sorting_hat_clean.proponent.iptu_value
+      - datalake_sorting_hat_clean.proponent.condo_value
+      - datalake_sorting_hat_clean.proponent.home_insurance_value
+    description: "Sum of rent, iptu, condominium, and insurance value."
+  dti:
+    lineage:
+      - dw_public.dim_proposal.rejection_reason
+    description: "Debt-to-income. Monthly income divided by the package value."
   type:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.type
@@ -74,7 +93,7 @@ columns:
   reason:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.reason
-    description: "Indicates the reason that led to a credit analysis disapproval."
+    description: "Indicates the reason that led to a credit analysis approval or disapproval."
   id_analyst:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_analyst
@@ -120,6 +139,18 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.category
     description: "Guarantee policy identification. 0 marks a Free guarantee, null indicates a Clear No reject and all others are accessible via dim_credit.dim_guarantee_policy."
+  classification:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.category
+    description: ""
+  tenants:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id
+    description: "Count of proponents in a proposal."
+  solidarity_tenant:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.will_live
+    description: "[Wrong definition] Here it counts how many proponent have marked that will live"
   city_group:
     lineage:
       - dw_public.dim_region.city_group
@@ -128,6 +159,14 @@ columns:
     lineage:
       - dw_public.dim_region.city_name
     description: "House's city name."
+  bv_score:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.boavista_score
+    description: "Propoent's score on Boavista checked at the proposal start."
+  serasa_score:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.serasa_score
+    description: "Propoent's score on Serasa CSBA checked at the proposal start."
   risk_category:
     lineage:
       - datalake_sorting_hat_clean.screening_result.risk_category
@@ -144,6 +183,10 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.screening_result.score
     description: "Model score. Not reliable after 2020."
+  fx_score_5a:
+    lineage:
+      - datalake_sorting_hat_clean.screening_result.score
+    description: "Hard coded classification of model score in 5 buckets."
   is_instant_offer:
     lineage:
       - dw_public.dim_offer.is_instant_offer
