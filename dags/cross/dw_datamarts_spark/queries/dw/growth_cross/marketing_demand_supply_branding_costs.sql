@@ -235,12 +235,12 @@ affiliates AS (
             'engagement' AS vertical,
             'Promotional Bonus' AS source,
             'rent' AS business_context,
-            SUM(CASE WHEN eb.business_context = 'rent' THEN bonus WHEN eb.business_context = 'hybrid' THEN 0.5 * bonus ELSE 0 END) AS cost
+            SUM(CASE WHEN LOWER(eb.business_context) = 'rent' THEN bonus WHEN LOWER(eb.business_context) = 'hybrid' THEN 0.5 * bonus ELSE 0 END) AS cost
         FROM
             datalake_gsheets_clean.affiliates_extra_user_bonus eb
         LEFT JOIN dw_public.dim_user_affiliate dua
             ON dua.sk_user = eb.sk_user
-        WHERE eb.business_context IN ('rent', 'hybrid')
+        WHERE LOWER(eb.business_context) IN ('rent', 'hybrid')
         GROUP BY 1,2,3,4,5,6,7
     ),
     extra_promotional_bonus_sale AS(
@@ -256,12 +256,12 @@ affiliates AS (
             'engagement' AS vertical,
             'Promotional Bonus' AS source,
             'sale' AS business_context,
-            SUM(CASE WHEN eb.business_context = 'sale' THEN bonus WHEN eb.business_context = 'hybrid' THEN 0.5 * bonus ELSE 0 END) AS cost
+            SUM(CASE WHEN LOWER(eb.business_context) = 'sale' THEN bonus WHEN LOWER(eb.business_context) = 'hybrid' THEN 0.5 * bonus ELSE 0 END) AS cost
         FROM
             datalake_gsheets_clean.affiliates_extra_user_bonus eb
         LEFT JOIN dw_public.dim_user_affiliate dua
             ON dua.sk_user = eb.sk_user
-        WHERE eb.business_context IN ('sale', 'hybrid')
+        WHERE LOWER(eb.business_context) IN ('sale', 'hybrid')
         GROUP BY 1,2,3,4,5,6,7
     )
         SELECT * FROM segmentation_promo_bonus
