@@ -1,6 +1,10 @@
 ---
 database_name: datalake_open_external_data
 table_name: itbi_sp_residential_transactions
+description: "Table enriched with ITBI data from SP. In this table, we applied some business rules, such as normalizing the address, 
+  filtering for residential properties only and adding the id_region."
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   iptu_sql_registration_number:
     lineage:
