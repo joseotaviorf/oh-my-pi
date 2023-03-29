@@ -1,0 +1,23 @@
+---
+table_name: datalake_open_external_data.itbi_all_residential_transactions
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 330000
+    severity_level: Error
+column_level_validations:
+  id_itbi_transaction:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_region:
+    is_complete:
+      severity_level: Error
+  itbi_region:
+    is_complete:
+      severity_level: Error
+  zipcode:
+    is_complete:
+      severity_level: Error
+  

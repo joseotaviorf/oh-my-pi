@@ -19,5 +19,6 @@ Produces the following output tables in `datalake_open_external_data`:
 **Fully:**
 - `itbi_sp_residential_transactions`
 - `itbi_bh_residential_transactions`
+- `itbi_all_residential_transactions`
 
 </details>

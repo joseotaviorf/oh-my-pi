@@ -1,0 +1,97 @@
+database_name: datalake_open_external_data
+table_name: itbi_all_residential_transactions
+description: "Table with the sum of all ITBI transactions available at QuintoAndar. The source is indicated in the column itbi_region."
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id_itbi_transaction:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.id_itbi_transaction
+      - datalake_open_external_data.itbi_bh_residential_transactions.id_itbi_transaction
+    description: 'Unique identifier for each transaction. The way the ID is created changes from source to source (consult the ITBI of the desired region).'
+  id_region:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.id_region
+      - datalake_open_external_data.itbi_bh_residential_transactions.id_region
+    description: "Given all the listings that have passed through QuintoAndar, it is the id_region with the highest probability of having that zipcode in its extension."
+  address:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_street_name
+      - datalake_open_external_data.itbi_bh_residential_transactions.address
+    description: 'Address where the property is located.'
+  number:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_number
+      - datalake_open_external_data.itbi_bh_residential_transactions.number
+    description: 'Number of the unit where the property is located'
+  complement:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_complement
+      - datalake_open_external_data.itbi_bh_residential_transactions.complement
+    description: 'Completion of the property address.'
+  reference:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_reference
+    description: 'Reference of the property address.'
+  zipcode:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_zipcode
+      - datalake_open_external_data.itbi_bh_residential_transactions.zipcode
+    description: 'Property zipcode.'
+  neighborhood:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_neighborhood
+      - datalake_open_external_data.itbi_bh_residential_transactions.neighborhood
+    description: 'Neighborhood where the property is located.'
+  city:
+    lineage:
+      - datalake_open_external_data.itbi_bh_residential_transactions.city
+    description: 'City of the property.'
+  state:
+    lineage:
+      - datalake_open_external_data.itbi_bh_residential_transactions.state
+    description: 'State of the property.'
+  raw_source_address:
+    lineage:
+      - datalake_open_external_data.itbi_bh_residential_transactions.raw_source_address
+    description: 'Address as it was in the source file.'
+  source_file:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.source_file
+      - datalake_open_external_data.itbi_bh_residential_transactions.source_file
+    description: 'URL of the CSV downloaded for ingesting the data from the municipality.'
+  land_area_m2:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.land_area_m2
+      - datalake_open_external_data.itbi_bh_residential_transactions.land_area_m2
+    description: 'Land area in square meters'
+  built_area_m2:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.built_area_m2
+      - datalake_open_external_data.itbi_bh_residential_transactions.built_area_m2
+    description: 'Result of the application of the percentage acquired by the unit construction area.'
+  ideal_fraction:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.ideal_fraction
+      - datalake_open_external_data.itbi_bh_residential_transactions.ideal_fraction
+    description: Incidence of the acquisition percentage over the ideal fraction original.
+  declared_transaction_value:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.declared_transaction_value
+    description: 'Value declared by the taxpayer.'
+  adopted_calculation_basis:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.adopted_calculation_basis
+      - datalake_open_external_data.itbi_bh_residential_transactions.adopted_calculation_basis
+    description: 'Value determined by the tax administration through an appraisal based on the elements contained in the
+      Cadastro Imobiliário or the value declared by the taxpayer, if the latter is higher'
+  year_built:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.iptu_registration_year
+      - datalake_open_external_data.itbi_bh_residential_transactions.year_built
+    description: 'Year that the construction of the property was finished.'
+  dt_transaction:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.dt_transaction
+      - datalake_open_external_data.itbi_bh_residential_transactions.dt_transaction
+    description: 'Date the transaction was created.'

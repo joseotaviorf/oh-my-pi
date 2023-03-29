@@ -1,0 +1,13 @@
+---
+tables:
+  itbi_sp_residential_transactions:
+    is_incremental: false
+  itbi_bh_residential_transactions:
+    is_incremental: false
+  itbi_all_residential_transactions:
+    is_incremental: false
+    
+inner_dependencies:
+  itbi_all_residential_transactions:
+    - itbi_sp_residential_transactions
+    - itbi_bh_residential_transactions
