@@ -1,24 +1,34 @@
 database_name: datalake_velo
 table_name: house
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table with House realted to the contract details"
 columns:
   id_house:
+    description: "House identification number (ID)"
     lineage:
       - datalake_velo_clean.fiancavelo_property.id
   type:
+    description: "Property type description"
     lineage:
       - datalake_velo_clean.fiancavelo_propertytype.name
   city:
+    description: "City where the property is located"
     lineage:
       - datalake_velo_clean.fiancavelo_property.city
   state:
+    description: "State where the property is located"
     lineage:
       - datalake_velo_clean.fiancavelo_property.state
   country:
+    description: "Country where the property is located"
     lineage:
       - datalake_velo_clean.fiancavelo_property.country
   zipcode:
+    description: "ZIPCODE"
     lineage:
       - datalake_velo_clean.fiancavelo_property.zipcode
   geolocation:
+    description: "Geolocation coordenates"
     lineage:
       - datalake_velo_clean.fiancavelo_property.geolocation

@@ -1,37 +1,51 @@
 database_name: datalake_velo
 table_name: broker
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing brokers companies details"
 columns:
   id_broker:
+    description: "Broker's identification number (ID)"
     lineage:
       - datalake_velo_clean.fiancavelo_realestate.id
   broker_name:
+    description: "Broker's name"
     lineage:
       - datalake_velo_clean.clientes_company.comercial_name
       - datalake_velo_clean.clientes_company.name
   city:
+    description: "Broker's establishment city"
     lineage:
       - datalake_velo_clean.clientes_address.city
   state:
+    description: "Broker's establishment state"
     lineage:
       - datalake_velo_clean.fiancavelo_property.state
   country:
+    description: "Broker's establishment country"
     lineage:
       - datalake_velo_clean.clientes_address.country
   zipcode:
+    description: "Broker's establishment zipcode"
     lineage:
       - datalake_velo_clean.clientes_address.zipcode
   geolocation:
+    description: "Broker's establishment geolocation"
     lineage:
       - datalake_velo_clean.clientes_address.geolocation
   creci:
+    description: "Broker's certification number (CRECI)"
     lineage:
       - datalake_velo_clean.fiancavelo_realestate.creci
   cnpj:
+    description: "Broker's document number (CNPJ)"
     lineage:
       - datalake_velo_clean.clientes_company.document
   is_broker_active:
+    description: "Identify if the broker is active in Velo's platform"
     lineage:
       - datalake_velo_clean.fiancavelo_realestate.is_active
   ts_created:
+    description: "Moment (timestamp) when the broker was created in Velo's platform"
     lineage:
       - datalake_velo_clean.fiancavelo_realestate.ts_inserted

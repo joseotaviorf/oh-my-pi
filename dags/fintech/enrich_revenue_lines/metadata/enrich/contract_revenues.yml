@@ -1,37 +1,65 @@
 ---
 database_name: datalake_revenue_lines
 table_name: contract_revenues
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table cointaining data from contract revenues"
 columns:
   month_start:
+    description: "Year and month of start"
     lineage:
       - dw_public.dim_date.month_start
   id_contract:
+    description: "Contract ID"
     lineage:
       - datalake_ebdb_clean.contract.id
   id_lpf_rent:
+    description: "LPF rent ID"
     lineage:
       - dw_payment.fact_invoice_entries.sk_invoice_entry
   id_lpf_condo:
+    description: "LPF condo ID"
     lineage:
       - dw_payment.fact_invoice_entries.sk_invoice_entry
   id_mra:
+    description: "MRA ID"
     lineage:
       - datalake_fastforward_clean.anticipation.id
   id_lra:
+    description: "LRA ID"
     lineage:
       - datalake_fastforward_clean.long_term_anticipation.id
   id_bfi:
+    description: "BFI ID"
     lineage:
       - datalake_owner_fees_clean.contract_brokerage_fee.id
   id_reservation:
+    description: "Reservation ID"
     lineage:
       - dw_public.dim_reservation.sk_reservation
   id_ccp:
+    description: "CCP ID"
     lineage:
       - datalake_retsuko_clean.credit_card_payment.id
   id_guarantee:
+    description: "Guarantee ID"
     lineage:
       - datalake_rental_guarantee_clean.guarantee.id
   id_guarantee_charge:
+    description: "Guarantee charge ID"
     lineage:
       - datalake_rental_guarantee_clean.charge.id
+  due_monthly_revenue:
+    description: "Due monthly revenue amount"
+  paid_monthly_revenue:
+    description: "Paid monthly revenue amount"
+  due_rental_amount:
+    description: "Due rental amount"
+  paid_rental_amount:
+    description: "Paid rental amount"
+  reservation_monthly_value:
+    description: "Reservation monthly amount"
+  credit_card_value:
+    description: "Credit card amount"
+  guarantee_monthly_revenue:
+    description: "Guarantee monthly revenue amount"
