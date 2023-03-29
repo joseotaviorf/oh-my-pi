@@ -3,7 +3,7 @@ table_name: dim_tenant_booking_review
 description: After a visit, tenants review the agent accompanying the visit and the
   property they visited. Each line is a tenant review for a specific visit.
 domain: For Rent
-owner: ''
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   sk_tenant_booking_review:
     lineage:
@@ -16,7 +16,7 @@ columns:
   review_status:
     lineage:
     - datalake_booking.booking_review.review_status
-    description: ''
+    description: Status of the tenant booking review
     categories:
       DISMISSED: ''
       DONE: ''
@@ -89,7 +89,7 @@ columns:
   is_listing_accurate:
     lineage:
     - datalake_booking.booking_review.is_listing_accurate
-    description: ''
+    description: If the listing info is corresponding with the actual property characteristics
   is_offer_intent:
     lineage:
     - datalake_booking.booking_review.is_offer_intent
@@ -98,3 +98,4 @@ columns:
     lineage:
     - datalake_booking.booking_review.does_want_same_agent
     description: If tenant wants to be attended by the same agent on  future visits
+    
