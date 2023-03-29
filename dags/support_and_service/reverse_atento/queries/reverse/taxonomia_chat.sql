@@ -1,5 +1,5 @@
 WITH agents_info AS (
-    SELECT
+    SELECT DISTINCT
         ac.id_assignee AS assignee_id,
         ac.email,
         ac.agent_name AS nome,
@@ -11,56 +11,6 @@ WITH agents_info AS (
         END AS centro_de_custo
     FROM
         datalake_gsheets_clean.agents_control AS ac
-    GROUP BY 1, 2, 3, 4, 5
-),
-automatically_closed_emails AS (
-    SELECT DISTINCT
-        tt.sk_ticket
-    FROM
-        dw_tickets.fact_ticket_tags AS tt
-    INNER JOIN
-        dw_tickets.dim_ticket AS dt
-        ON dt.sk_ticket = tt.sk_ticket
-    WHERE
-        dt.channel IN ('email', 'form_faq', 'web', 'other')
-        AND tt.ticket_tag IN (
-            'resolve_ticket_acompanhamento','fechado_automaticamente_noreply', 'redirecionado_atendimento_2',
-            'closed_by_merge', 'zapdesk', 'ticket_via_call', 'call_contato_receptivo', 'call_contato_ativo',
-            'resolve_ticket_acompanhamento', 'redirecionado_adm_v1', 'robotserviceaccount02'
-        )
-),
-ticket_calls AS (
-    SELECT
-        dc.sk_call,
-        dc.sk_ticket
-    FROM
-        dw_teravoz.fact_calls AS  dc
-    WHERE
-        dc.sk_ticket IS NOT NULL
-    GROUP BY 1, 2
-),
-last_queue AS (
-    SELECT
-        fc.sk_call,
-        MAX(fc.ts_queue_joined_local) AS last_queue
-    FROM
-        dw_teravoz.fact_call_queues AS fc
-    GROUP BY 1
-),
-calls_tickets AS (
-    SELECT
-        tc.sk_ticket,
-        CAST(fc.queue_number AS VARCHAR(10)) AS dept
-    FROM
-        dw_teravoz.fact_call_queues AS fc
-    INNER JOIN
-        last_queue AS lq
-            ON lq.sk_call = fc.sk_call
-            AND lq.last_queue = fc.ts_queue_joined_local
-    INNER JOIN
-        ticket_calls AS tc
-            ON tc.sk_call = fc.sk_call
-    GROUP BY 1, 2
 ),
 last_task AS (
     SELECT
@@ -71,7 +21,7 @@ last_task AS (
     GROUP BY 1
 ),
 chat_tickets AS (
-    SELECT
+    SELECT DISTINCT
         fc.sk_ticket,
         fc.last_chat_department AS dept
     FROM
@@ -81,7 +31,6 @@ chat_tickets AS (
             ON dc.sk_chat = fc.sk_chat
     WHERE
         DATE(dc.ts_started_local) <= '2020-08-20'
-    GROUP BY 1, 2
     UNION
     SELECT
         ft.sk_ticket,
@@ -113,47 +62,20 @@ chat_tickets AS (
         AND DATE(dt.ts_created_local) >= '2020-08-21'
     GROUP BY 1,2
 ),
-email_tickets AS (
-    SELECT
-        dt.sk_ticket,
-        dt.group_name AS dept
-    FROM
-        dw_tickets.dim_ticket AS dt
-    WHERE
-        dt.channel NOT IN ('call', 'chat')
-    GROUP BY 1, 2
-),
-dept_tickets AS (
-    SELECT
-        *
-    FROM
-        email_tickets
-    UNION
-    SELECT
-        *
-    FROM
-        chat_tickets
-    UNION
-    SELECT
-        *
-    FROM
-        calls_tickets
-),
 tickets_areas AS (
-    SELECT
+    SELECT DISTINCT
         dt.sk_ticket,
         gdc.team AS ticket_area,
         dt.dept
     FROM
-        dept_tickets AS dt
+        chat_tickets AS dt
     INNER JOIN
         datalake_gsheets_clean.department_control AS gdc
             ON dt.dept = gdc.department
     WHERE
         team <> '-'
-    GROUP BY 1,2,3
 )
-SELECT
+SELECT DISTINCT
     dt.ts_created_local AS `Data - Hora Local`,
     ft.sk_ticket AS `Ticket Id`,
     dt.channel AS Canal,
@@ -171,6 +93,9 @@ SELECT
 FROM
     dw_tickets.fact_tickets AS ft
 INNER JOIN
+    datalake_zendesk_custom_fields.custom_fields cf
+      ON CAST(cf.id_ticket AS BIGINT) = ft.sk_ticket
+INNER JOIN
     dw_public.dim_date AS dd
         ON ft.sk_created_date_local = dd.sk_date
 INNER JOIN
@@ -181,13 +106,10 @@ INNER JOIN
         ON dt.sk_ticket = gdc.sk_ticket
 INNER JOIN
     agents_info AS ai
-        ON ai.assignee_id = ft.sk_zendesk_assignee_user
+        ON ai.email = cf.custom_fields['[AUTO] Email do Agente']
 WHERE
     DATE(dd.date) = CURRENT_DATE() - 1
-    AND dt.sk_ticket NOT IN (SELECT * FROM automatically_closed_emails)
     AND customer_type_tag IS NOT NULL
     AND contact_motivation_tag IS NOT NULL
     AND contact_theme_tag IS NOT NULL
     AND ai.centro_de_custo = 'atento'
-    AND dt.channel = 'chat'
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11

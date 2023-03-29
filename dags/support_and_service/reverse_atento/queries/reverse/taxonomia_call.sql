@@ -1,5 +1,5 @@
 WITH agents_info AS (
-    SELECT
+    SELECT DISTINCT
         ac.id_assignee AS assignee_id,
         ac.email,
         ac.agent_name AS nome,
@@ -11,17 +11,15 @@ WITH agents_info AS (
         END AS centro_de_custo
     FROM
         datalake_gsheets_clean.agents_control AS ac
-    GROUP BY 1, 2, 3, 4, 5
 ),
 ticket_calls AS (
-    SELECT
+    SELECT DISTINCT
         dc.sk_call,
         dc.sk_ticket
     FROM
         dw_teravoz.fact_calls AS dc
     WHERE
         dc.sk_ticket IS NOT NULL
-    GROUP BY 1, 2
 ),
 last_queue AS (
     SELECT
@@ -32,7 +30,7 @@ last_queue AS (
     GROUP BY 1
 ),
 calls_tickets AS (
-    SELECT
+    SELECT DISTINCT
         tc.sk_ticket,
         CAST(fc.queue_number AS VARCHAR(10)) AS dept
     FROM
@@ -44,7 +42,6 @@ calls_tickets AS (
     INNER JOIN
         ticket_calls AS tc
             ON tc.sk_call = fc.sk_call
-    GROUP BY 1, 2
     UNION
     SELECT
         ft.sk_ticket,
@@ -67,27 +64,20 @@ calls_tickets AS (
         has_ended_in_ura = FALSE
         AND is_answered = TRUE
 ),
-dept_tickets AS (
-    SELECT
-        *
-    FROM
-        calls_tickets
-),
 tickets_areas AS (
-    SELECT
+    SELECT DISTINCT
         dt.sk_ticket,
         gdc.team AS ticket_area,
         dt.dept
     FROM
-        dept_tickets AS dt
+        calls_tickets AS dt
     INNER JOIN
         datalake_gsheets_clean.department_control AS gdc
             ON dt.dept = gdc.department
     WHERE
         team <> '-'
-    GROUP BY 1,2,3
 )
-SELECT
+SELECT DISTINCT
     dt.ts_created_local AS `Data - Hora Local`,
     ft.sk_ticket AS `Ticket Id`,
     dt.channel AS Canal,
@@ -105,6 +95,9 @@ SELECT
 FROM
     dw_tickets.fact_tickets AS ft
 INNER JOIN
+    datalake_zendesk_custom_fields.custom_fields cf
+      ON CAST(cf.id_ticket AS BIGINT) = ft.sk_ticket
+INNER JOIN
     dw_public.dim_date AS dd
         ON ft.sk_created_date_local = dd.sk_date
 INNER JOIN
@@ -115,7 +108,7 @@ INNER JOIN
         ON dt.sk_ticket = gdc.sk_ticket
 INNER JOIN
     agents_info AS ai
-        ON ai.assignee_id = ft.sk_zendesk_assignee_user
+        ON ai.email = cf.custom_fields["[AUTO] Email do Agente"]
 WHERE
     DATE(dd.date) = CURRENT_DATE() - 1
     AND customer_type_tag IS NOT NULL
@@ -123,4 +116,3 @@ WHERE
     AND contact_theme_tag IS NOT NULL
     AND ai.centro_de_custo = 'atento'
     AND dt.channel = 'call'
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
