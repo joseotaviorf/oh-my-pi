@@ -81,8 +81,10 @@ columns:
   ts_first_synced:
     lineage:
     - datalake_ebdb_listing_jobs.inspection.ts_first_synced
+    description: First time that inspection was reviewed i.e. first time its status changed to ‘Revisada’
   ts_last_synced:
     lineage:
     - datalake_ebdb_listing_jobs.inspection.ts_last_synced
+    description: Last time that inspection was reviewed i.e. last time its status changed to ‘Revisada’
   ts_load:
     description: Timestamp of when the table was last loaded
