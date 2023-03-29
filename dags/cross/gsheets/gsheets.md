@@ -56,8 +56,6 @@ This pipeline produces the following output tables:
     - `households_per_city_ibge`
     - `inside_sale_supply_targets`
     - `ipsos_brandtracking_questions`
-    - `keys_logistic_onboarding_tenant`
-    - `keys_logistic_pre_contract`
     - `local_holidays`
     - `marketing_costs_campaign_city`
     - `marketing_costs_google_ad_type_flags`
@@ -74,7 +72,6 @@ This pipeline produces the following output tables:
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
     - `owner_offboarding_repair_csat`
-    - `photographer_account`
     - `plaquinhas_installation_targets`
     - `plaquinhas_demand_targets`
     - `promotional_bonus_cluster_targets`
@@ -103,7 +100,6 @@ This pipeline produces the following output tables:
     - `taxonomy_demand`
     - `taxonomy_mkt_cost`
     - `taxonomy_portal_casa_mineira`
-    - `tenant_negotiation_csat`
     - `tof_supply_targets`
     - `tracking_catalog_event_properties`
     - `tv_ads`

@@ -65,11 +65,6 @@ crm_iptu_wave4:
     sheet_name: crm_iptu_wave4
     clean_table_name: crm_iptu_wave4
 
-csat_negociacao_iq:
-    sheet_id: 1zhk4z4aCnysNpWfi3VIT153nU7joHiX3toE_Tw3oXZk
-    sheet_name: respostas_csat
-    clean_table_name: tenant_negotiation_csat
-
 demand_channel_share:
     sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
     sheet_name: demand_channel_share
@@ -125,11 +120,6 @@ ltvoutput:
     sheet_name: LTVOutput
     clean_table_name: affiliates_monthly_expected_results
 
-keys_logistic_pre_contract:
-    sheet_id: 1ge87PnLZDt16PME8mytPOHDs1uBbBrYxuGncrpuiwrg
-    sheet_name: keys_logistic_pre_contract
-    clean_table_name: keys_logistic_pre_contract
-
 marketing_costs_manual_costs_google:
     sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
     sheet_name: Google Costs
@@ -174,16 +164,6 @@ media_plan:
     sheet_id: 1aief4f2Iu0vEZ68ZOxq7cRjkzdz1ePOhZf2lN6rcITQ
     sheet_name: media_plan
     clean_table_name: media_plan_current_quarter
-
-offboarding_customer_portfolio_contract:
-    sheet_id: 1x2dgpr3eemxnYft80JKRr3K_zlvgjvc-BjpIKaT2fe8
-    sheet_name: contracts
-    clean_table_name: offboarding_customer_portfolio_contract
-
-# photographer_account:
-#     sheet_id: 1eXKN9IQVCljTrZPQ8HEac6KwYcatr5XdQr_IiD-7RJ8
-#     sheet_name: photographer_account
-#     clean_table_name: photographer_account
 
 plaquinhas_installation_targets:
     sheet_id: 1GEaj4YMe9sgRiJmqgoJuOvkb8H8hjEcEgsTyv9GLzmg

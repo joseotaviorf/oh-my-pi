@@ -55,6 +55,12 @@ csat_chaves_onb_iq:
     clean_table_name: tenant_onboarding_keys_csat
     sheet_context: support_and_service
 
+csat_negociacao_iq:
+    sheet_id: 1zhk4z4aCnysNpWfi3VIT153nU7joHiX3toE_Tw3oXZk
+    sheet_name: respostas_csat
+    clean_table_name: tenant_negotiation_csat
+    sheet_context: support_and_service
+
 csat_reembolso_iq:
     sheet_id: 1JBUSnsmnWbbH-XypQtmhdEzWEGPdWks8H4-dTTyl_Ic
     sheet_name: respostas_csat
