@@ -69,3 +69,5 @@ FROM
 LEFT JOIN 
     sale_status AS sst
         USING(sk_house, day, month, year)
+WHERE
+    status_history IS NOT NULL
