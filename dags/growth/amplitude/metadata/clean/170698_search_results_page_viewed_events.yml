@@ -170,12 +170,36 @@ columns:
   ep_house_id:
     lineage:
       - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.event_properties
+  id_search:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.event_properties
+  ids_search_results_list:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.event_properties
   top5_house_id:
     lineage:
-      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.user_properties
+      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.event_properties
   business_context:
     lineage:
-      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.user_properties
+      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.event_properties
+  search_context:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.event_properties
+  search_query_context:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.event_properties
+  uri:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.event_properties
+  search_location_slug:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.event_properties
+  view_mode:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.event_properties
+  sort_order:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.event_properties
   utm_source:
     lineage:
       - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.user_properties
