@@ -7,18 +7,18 @@ columns:
   sk_category:
     lineage:
     - datalake_velo.transaction_category.id_category
-    description: ''
+    description: SK of the category on Omie ERP
   description:
     lineage:
     - datalake_velo.transaction_category.description
-    description: ''
+    description: Description of the category
   nature_description:
     lineage:
     - datalake_velo.transaction_category.nature_description
-    description: ''
+    description: Financial Nature associated with the category
   dre_description:
     lineage:
     - datalake_velo.transaction_category.dre_description
-    description: ''
+    description: Description of the category when used on DRE Report
   ts_load:
-    description: ''
+    description: Timestamp of the load into datalake
