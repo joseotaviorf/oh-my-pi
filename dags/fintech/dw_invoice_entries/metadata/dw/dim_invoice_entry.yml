@@ -12,6 +12,7 @@ columns:
   sk_invoice_reversed_entry:
     lineage:
     - datalake_retsuko.invoice_entry.id_external_reversed_entry
+    description: When a entry is created to cancel another entry, this field is filled with the Id of the canceled one
   entry_type:
     lineage:
     - datalake_retsuko.invoice_entry.entry_type
@@ -71,18 +72,18 @@ columns:
       fine and interest: Fines and charges related to collections of agreements made
         in Collections
       home insurance: Use for home fire/protection insurance charges
-      igpm adm fee: ''
-      igpm adm partner adm fee: ''
-      igpm rental: ''
+      igpm adm fee: Additional IGPM in 5A administration fee
+      igpm adm partner adm fee: Additional IGPM in partner administration fee
+      igpm rental: Additional IGPM in collection and transfer of rent
       improvement work: Amounts posted for repairs carried out on the property in
         agreement with those involved (IQ and PP)
       installment lra: Collection of advance rent requested by the PP - LRA Addon
       insurance guarantee: Originally used to launch surety bonds. It is a wildcard
         tag for adjustments and releases that will later be adjusted by the controller.
         Use carefully!
-      ipca adm fee: ''
-      ipca adm partner adm fee: ''
-      ipca rental: ''
+      ipca adm fee: Additional IPCA in 5A administration fee
+      ipca adm partner adm fee: Additional IPCA in partner administration fee
+      ipca rental: Additional IPCA in collection and transfer of rent
       iptu: Monthly IPTU collection (Only used manually when it is necessary to launch
         a against, that is, cancel the amount already posted)
       iptu adjustment: For any type of adjustment related to IPTU
@@ -93,8 +94,8 @@ columns:
         of the condominium should not be here, since they are launched as a condominium)
       lockin: Launches of iRent/oRent
       loss: Application of 5A loss bandaids on invoices
-      non protection 5a: ''
-      others: ''
+      non protection 5a: Charges that are no in protection 5a package
+      others: If not contemplated in others bill-items
       payment adjustment: ''
       postponement: 'Deferred expense: It serves to make adjustments to monthly invoices
         to ensure that billing invoices can be issued only to tenants and transfer
@@ -264,4 +265,4 @@ columns:
     - datalake_retsuko.invoice_entry.accrual_year_month
     description: Expense reference month
   ts_load:
-    description: ''
+    description: Timestamp which the data was loaded

@@ -69,3 +69,9 @@ columns:
     description: "Timestamp that snapshot was taken."
     lineage:
       - dw_payment.dim_invoice.ts_load
+  year:
+    description: "Year from ts_snapshot."
+  month:
+    description: "Month from ts_snapshot."
+  day:
+    description: "Day from ts_snapshot."  
