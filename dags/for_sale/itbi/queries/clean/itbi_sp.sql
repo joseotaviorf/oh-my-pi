@@ -6,7 +6,7 @@ SELECT
     complemento AS address_complement,
     bairro AS address_neighborhood,
     referencia AS address_reference,
-    LPAD(TRIM(cep), 8, '0') AS address_zipcode,
+    LPAD(TRIM(REPLACE(cep, '.', '')), 8, '0') AS address_zipcode,
     TRIM(natureza_transacao) AS transaction_nature,
     TRIM(tipo_financiamento) AS financing_type,
     TRIM(cartorio_registro) AS house_registry_office,
