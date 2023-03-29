@@ -64,9 +64,14 @@ canvas_step_details_last_update AS (
     app_group = 'OWNERS' 
     AND step_name != 'Discard'
     AND (
+          -- OLD CANVAS
           id_canvas = '9e5e5e97-dce0-41c2-84e2-ddda5f47db5d' -- P20 Price-Calculator PROD
           OR id_canvas = 'ee490d54-e056-46c4-9084-407db97615cf' -- P20 Owner-PWA PROD
           OR id_canvas = '37c43def-dee7-4df6-bd76-5fa2adc0b71a' -- P20 Indica-Aí PROD
+          -- NEW CANVAS
+          OR id_canvas = '67988bb1-a9c8-4d25-838d-a94b0aa8aa6d' -- P20 Price-Calculator PROD
+          OR id_canvas = 'c004235d-e3f8-48aa-9f32-c93abcd25f75' -- P20 Owner-PWA PROD
+          OR id_canvas = '9364ace4-a1ff-44f3-a938-fdc8a8338507' -- P20 Indica-Aí PROD
         )
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_step ORDER BY ts_updated DESC) = 1
