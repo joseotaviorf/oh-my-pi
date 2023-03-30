@@ -35,6 +35,8 @@ columns:
     description: "Total amount that appears on the invoice"
   invoice_theorical_amount:
     description: "Amortization amount that appears on the invoice"
+  invoice_paid_amount:
+    description: "Paid amount in BRL"
   accrual_year_month:
     description: "Accural year-month"
     lineage:

@@ -1,18 +1,33 @@
 database_name: datalake_velo_omie
 table_name: cash_flows_categories
+description: tables with values by cash flow category
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   id_securities:
+    description: transaction identification number. Its the sk_transaction - DW
     lineage:
       - datalake_velo_omie.cash_flows.id_securities
   id_group:
+    description: Category group description
+    categories:
+      CONTA_A_PAGAR: ""
+      CONTA_CORRENTE_PAG: ""
+      CONTA_A_RECEBER: ""
+      CONTA_CORRENTE_REC: ""
     lineage:
       - datalake_velo_omie_clean.cash_flows.id_group
   id_category:
+    description: Category's identification number (ID). This key connects to the table velo_transaction_entries
     lineage:
       - datalake_velo_omie.cash_flows.categories
   category_percentage:
+    description: Percentage of this entry related to the whole transaction amount
     lineage:
       - datalake_velo_omie.cash_flows.categories
   category_value:
+    description: Amount paid of this entry
     lineage:
       - datalake_velo_omie.cash_flows.categories
+  is_category_fixed_value:
+    description: Boolean that indicated if category is a fixed value

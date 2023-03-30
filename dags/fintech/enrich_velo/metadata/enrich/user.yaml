@@ -1,21 +1,50 @@
 database_name: datalake_velo
 table_name: user
+description: Dimension with details of the user of the Velo Platform system. Sometimes the user is the agent of the purpose.
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   id_user:
+    description: user identification number
     lineage:
       - datalake_velo_clean.users_users.id
   name:
+    description: username
     lineage:
       - datalake_velo_clean.users_users.name
   email:
+    description: user email
     lineage:
       - datalake_velo_clean.users_users.email
   user_role:
+    description: User's role in Velo's platform
+    categories:
+      Administrador: ""
+      Administrador Rede: ""
+      Administrador Velo: ""
+      Analista de propostas: ""
+      Aprovador: ""
+      Assinatura: ""
+      Cobrança: ""
+      Colaborador: ""
+      Coordenador BDR: ""
+      Corretor: ""
+      Customer Success: ""
+      Executivo: ""
+      Financeiro: ""
+      Juridico: ""
+      Marketing: ""
+      Pré-cadastro: ""
+      Sistema: ""
+      Suporte l: ""
+      Suporte lll: ""
     lineage:
       - datalake_velo_clean.users_profile.name
   phone:
+    description: user phone
     lineage:
       - datalake_velo_clean.users_users.phone
   ts_created:
+    description: Moment (timestamp) when the user was created in Velo's platform
     lineage:
       - datalake_velo_clean.users_users.ts_inserted

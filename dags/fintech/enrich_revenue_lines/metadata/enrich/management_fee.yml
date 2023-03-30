@@ -12,6 +12,7 @@ columns:
   management_fee_share:
     description: "Share of management fee"
   payment_status:
+    description: "Payment status"
     lineage:
       - datalake_retsuko.invoice.id
   monthly_administration_fee:

@@ -1,45 +1,64 @@
 database_name: datalake_velo
 table_name: propose_person
+description: Details of persons related to the contract
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   id_person:
+    description: Person's identification number (ID)
     lineage:
       - datalake_velo_clean.clientes_person.id
   id_propose:
+    description: Propose identification number (ID)
     lineage:
       - datalake_velo_clean.fiancavelo_proposeperson.id_propose
   name:
+    description: Person's name
     lineage:
       - datalake_velo_clean.clientes_person.name
   email:
+    description: Person's email
     lineage:
       - datalake_velo_clean.clientes_person.email
   phone:
+    description: Person's phone
     lineage:
       - datalake_velo_clean.clientes_person.phone
   bureau_name:
+    description: Name of the bureau that analysed the person score
     lineage:
       - datalake_velo_clean.veloscore_bureau.name
   document:
+    description: Person's document number (CPF)
     lineage:
       - datalake_velo_clean.clientes_person.document
   serasa_score:
+    description: Person's Serasa Score in the moment of propose's credit score evaluation
     lineage:
       - datalake_velo_clean.veloscore_consultations.value
   risk_score:
+    description: Person's risk score cluster ID
     lineage:
       - datalake_velo_clean.veloscore_consultations.risk
   risk_classification:
+    description: Person's risk score cluster description
     lineage:
       - datalake_velo_clean.veloscore_risk.name
   score_personal_value:
+    description: Person's bureau score in the moment of propose's credit score evaluation
     lineage:
       - datalake_velo_clean.veloscore_personal.value
   declared_income:
+    description: Person's declared income
     lineage:
       - datalake_velo_clean.veloscore_personal.declared
   requested_income:
+    description: Person's requested income
     lineage:
       - datalake_velo_clean.veloscore_personal.requested
+  is_primary_person:
+    description: Flag to indicate if the person is the primary on propose
   dt_birth:
+    description: Person's date of birth
     lineage:
       - datalake_velo_clean.clientes_person.dt_birth

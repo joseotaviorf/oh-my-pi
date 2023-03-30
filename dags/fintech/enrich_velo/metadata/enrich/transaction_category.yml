@@ -1,21 +1,22 @@
 database_name: datalake_velo
-table_name: transaction_categories
+table_name: transaction_category
+owner: "@ae-finance-fintech"
+domain: "fintech"
+description: Dimension with the details of the category
 columns:
-  id_trasaction:
-    lineage:
-      -  datalake_velo_omie.cash_flows_categories.id_securities
-      -  datalake_velo_omie.cash_flows.id_securities
   id_category:
+    description: Category's identification number (ID). This key connects to the table velo_transaction_entries
     lineage:
-      -  datalake_velo_omie.cash_flows_categories.id_category
-      -  datalake_velo_omie.cash_flows.id_category
-  category:
+      - datalake_velo_omie_clean.categories.id_category
+  description:
+    description: category description
     lineage:
-      -  datalake_velo_omie_clean.categories.description
-  category_type:
+      - datalake_velo_omie_clean.categories.description
+  nature_description:
+    description: category use recommendation
     lineage:
-      -  datalake_velo_omie_clean.categories.description
-  category_percent_amount:
+      - datalake_velo_omie_clean.categories.nature_description
+  dre_description:
+    description: description used in the DRE
     lineage:
-      -  datalake_velo_omie.cash_flows_categories.category_percentage
-      -  datalake_velo_omie.cash_flows.category_percentage
+      - datalake_velo_omie_clean.categories.dre_description

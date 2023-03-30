@@ -1,28 +1,39 @@
 database_name: datalake_velo
 table_name: propose_company
+description: Dimension with details of the company that signed the contract (existance optional)
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
 columns:
   id_company:
+    description: Company's identification number (ID) when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_company.id
   company_name:
+    description: Company's name when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_company.comercial_name
       - datalake_velo_clean.clientes_company.name
   city:
+    description: Company's city when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.city
   state:
+    description: Company's state when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.state
   country:
+    description: Company's country when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.country
   zipcode:
+    description: Company's zipcode when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.zipcode
   geolocation:
+    description: latitude and longitude - Company's geolocation when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.geolocation
   cnpj:
+    description: Company's document number (CNPJ) when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_company.document

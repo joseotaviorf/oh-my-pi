@@ -1,34 +1,49 @@
 ---
 database_name: datalake_revenue_lines
 table_name: rental_guarantee
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing rental guarantee details"
 columns:
   id_guarantee:
+    description: "Guarantee identification number"
     lineage:
       - datalake_rental_guarantee_clean.guarantee.id
   id_contract_ebdb:
+    description: "Contract identification number"
     lineage:
       - datalake_rental_guarantee_clean.guarantee.id_contract_ebdb
   id_charge:
+    description: "Charge identification number"
     lineage:
       - datalake_rental_guarantee_clean.charge.id
-  status:
+  contract_status:
+    description: "Contract status description"
     lineage:
       - dw_public.dim_contract.status
   guarantee_status:
+    description: "Guarantee status description"
     lineage:
       - datalake_rental_guarantee_clean.guarantee.guarantee_status
   charge_status:
+    description: "Charge status description"
     lineage:
       - datalake_rental_guarantee_clean.charge.charge_status
   charge_type:
+    description: "Charge type description"
     lineage:
       - datalake_rental_guarantee_clean.charge.charge_type
   total_installments:
+    description: "Number of total installments"
     lineage:
       - datalake_rental_guarantee_clean.charge.installments
+  monthly_revenue:
+    description: "Monthly revenue amount"
   accrual_year_month:
+    description: "Year and month of reference"
     lineage:
       - datalake_quintoandar.aux_date.month_start
   ts_guarantee_created:
+    description: "Timestamp in which guarantee was created"
     lineage:
       - datalake_rental_guarantee_clean.guarantee.ts_created

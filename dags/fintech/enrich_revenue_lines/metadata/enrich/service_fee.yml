@@ -26,8 +26,10 @@ columns:
   accrual_year_month:
     description: "Reference year-month"
   dt_due:
+    description: "Due date"
     lineage:
       - datalake_retsuko.invoice.ts_due
   dt_paid:
+    description: "Payment date"
     lineage:
       - datalake_retsuko.invoice.ts_paid
