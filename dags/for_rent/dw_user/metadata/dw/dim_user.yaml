@@ -1,515 +1,413 @@
 database_name: dw_public
 table_name: dim_user
-description: Information about users registered at QuintoAndar. Each line is a use
+description: Information about users registered at QuintoAndar. Each line is an unique user.
 domain: For Rent
-owner: ''
+owner: kleber.inoue@quintoandar.com.br
 columns:
   sk_user:
     lineage:
     - datalake_ebdb_user.user.id
-    description: Key of user
+    description: Unique ID of user, it's the primary key of this table.
   sk_doorman_joined_date:
     lineage:
     - datalake_ebdb_user.affiliate_data.ts_doorman_joined
-    description: Date when doorman joined, if user is affiliate of type doorman
+    description: Date when doorman joined, if user is affiliate of type doorman.
   id:
     lineage:
     - datalake_ebdb_user.user.id
-    description: Key of user
+    description: Unique ID of user, it's the primary key of this table. It has the same value of sk_user.
   dados_agente_id:
     lineage:
     - datalake_ebdb_user.user.id_agent
-    description: Key of agent, if user is agent
+    description: Key of agent, if user is agent.
   dados_fotografo_id:
     lineage:
     - datalake_ebdb_user.user.id_photographer_data
-    description: Key of photographer, if user is photographer
+    description: Key of photographer, if user is photographer.
   dados_vendedor_id:
     lineage:
     - datalake_ebdb_user.user.id_sales_rep
-    description: Key of Inside Sales Analyst, if user is Inside Sales Analyst
+    description: Key of Inside Sales Analyst, if user is Inside Sales Analyst.
   dados_afiliado_id:
     lineage:
     - datalake_ebdb_user.user.id_affiliates
-    description: Key of affiliate, if user is affiliate
+    description: Key of affiliate, if user is affiliate.
   facebook_id:
     lineage:
     - datalake_ebdb_user.user.id_facebook
-    description: Facebook ID of user
+    description: Facebook ID registered when the user signs up using Facebook account.
   linkedin_id:
     lineage:
     - datalake_ebdb_user.user.id_linkedin
-    description: LinkedIn ID of user
-    categories:
-      EhWmGP4rhP: ''
+    description: Linkedin ID registered when the user signs up using Linkedin account.
   google_id:
     lineage:
     - datalake_ebdb_user.user.id_google
-    description: ''
+    description: Google ID registered when the user signs up using Google account.
   id_partner:
     lineage:
     - datalake_big_agent.agent_current_program.id_partner
+    description: Id of the partner.
   country_code:
     lineage:
     - datalake_ebdb_user.user.country_code
-    description: Country code of the user
+    description: Country code of the user.
     categories:
-      BR: Brazil's country code
-      MX: Mexico's country code
+      BR: Brazil's country code.
+      MX: Mexico's country code.
   active:
     lineage:
     - datalake_ebdb_user.user.is_active
-    description: Active or not
+    description: Integer flag that indicates if the user is active.
+    categories:
+      '1': True.
+      '0': False.
   bloqueado:
     lineage:
     - datalake_ebdb_user.user.is_blocked
-    description: ''
+    description: Integer flag that indicates if the user is blocked.
+    categories:
+      '1': True.
+      '0': False.
   consultant_type:
     lineage:
     - datalake_big_agent.agent_current_program.consultant_type
+    description: Type of the consultant (CIQ).
+    categories:
+      ASP: Owner advisor, it works a lot like CIQ Manage.
+      CIQ_FULL: Agent fully responsible for the property, publication and management.
+      CIQ_MANAGER: House belongs to a client but is managed by a CIQ.
   dadosafiliado_ativo:
     lineage:
     - datalake_ebdb_user.affiliate_data.is_active
-    description: If user is affiliate, flag indicates whether user is still registered
-      in the affiliates program (same field as dim_user_affiliate.is_active)
+    description: Boolean flag that indicates if the user is affiliate, flag indicates whether user is still registered
+      in the affiliates program (same field as dim_user_affiliate.is_active).
   dadosagente_ativo:
     lineage:
     - datalake_ebdb_user.agent_data.is_active
-    description: Active or not, if user is an agent
+    description: Integer flag that indicates if the user is an active agent or not.
+    categories:
+      '1': Active.
+      '0': Not active.
   dadosfotografo_ativo:
     lineage:
     - datalake_ebdb_clean.photographer_data.is_active
-    description: Active or not, if user is photographer
+    description: Integer flag that indicates if the user is an active photographer or not.
+    categories:
+      '1': Active.
+      '0': Not active.
   flg_doorman_affiliate:
     lineage:
     - datalake_ebdb_user.affiliate_data.is_doorman_affiliate
-    description: If user is an affiliate of type doorman
+    description: Integer flag that indicates if the user is an affiliate of type doorman.
+    categories:
+      '1': True.
+      '0': False.
   inquilino:
     lineage:
     - datalake_ebdb_user.user.is_tenant
-    description: Is user is a tenant with QuintoAndar
+    description: Integer flag that indicates if the user is a tenant with QuintoAndar.
+    categories:
+      '1': True.
+      '0': False.
   is_sale_agent:
     lineage:
     - datalake_ebdb_user.agent_data.is_sale_agent
-    description: If user is an Agent with QuintoAndar working with Sales
+    description: Boolean flag that indicates if the user is an Agent in QuintoAndar working with Sales.
   is_rent_agent:
     lineage:
     - datalake_ebdb_user.agent_data.is_rent_agent
-    description: If user is an Agent with QuintoAndar working with Rentals
+    description: Boolean flag that indicates if the user is an Agent in QuintoAndar working with Rentals.
   dadosbancarios_outro_titular:
     lineage:
     - datalake_ebdb_user.user.bank_another_holder
-    description: If user's bank account has another person associated to it (e.g.,
-      spouse)
+    description: Integer flag that indicates if the user's bank account has another person associated to it (e.g., spouse).
+    categories:
+      '1': True.
+      '0': False.
   tem_imovel:
     lineage:
     - datalake_ebdb_user.user.has_house
-    description: If user is the owner of a house listed with QuintoAndar
+    description: Integer flag that indicates if the user is the owner of a house listed with QuintoAndar.
+    categories:
+      '1': True.
+      '0': False.
   tem_app_inquilino:
     lineage:
     - datalake_ebdb_user.user.has_tenant_app
-    description: If user has tenant app
+    description: Integer flag that indicates if the user has tenant app.
+    categories:
+      '1': True.
+      '0': False.
   tem_contrato_ativo:
     lineage:
     - datalake_ebdb_user.user.has_active_contract
-    description: If user has an active rental contract
+    description: Integer flag that indicates if the user has or had an active rental contract.
+    categories:
+      '1': True.
+      '0': False.
   aceita_sms:
     lineage:
     - datalake_ebdb_user.user.has_accepted_sms
-    description: Aceita Sms
+    description: Integer flag that indicates if the user has accepted to receive SMS. 
+    categories:
+      '1': True.
+      '0': False.
   nome:
     lineage:
     - datalake_ebdb_user.user.name
-    description: Full name of user
+    description: Full name of user.
   cpf:
     lineage:
     - datalake_ebdb_user.user.cpf
-    description: CPF (Tax Identification Number) of user, with dot and hyphen formatting
+    description: CPF (Tax Identification Number) of user or the CNPJ (Brazilian National Registry of Legal Entities) if the user is a legal entity, 
+      with dot and hyphen formatting.
   rg:
     lineage:
     - datalake_ebdb_user.user.rg
-    description: RG (Brazilian national lD) of user
+    description: RG (Brazilian national lD) of user. 
+      In most cases the RG is linked with a non entity user, but there's no rule that an entity user can't fill the RG field.
   sexo:
     lineage:
     - datalake_ebdb_user.user.gender
-    description: Sex of user
+    description: User's gender.
     categories:
-      Feminino: ''
-      Masculino: ''
+      Feminino: Female gender.
+      Masculino: Male gender.
   email:
     lineage:
     - datalake_ebdb_user.user.email
-    description: Email of user
+    description: Email of user.
   email_alternativo:
     lineage:
     - datalake_ebdb_user.user.alternative_email
-    description: Alternative email of user
+    description: Alternative email of user.
   telefone_principal:
     lineage:
     - datalake_ebdb_user.user.main_phone
-    description: Main contact phone of user
+    description: Main contact phone of user.
   endereco:
     lineage:
     - datalake_ebdb_user.user.address
-    description: Street name of user's address
+    description: Street name of user's address.
   numero:
     lineage:
     - datalake_ebdb_user.user.number
-    description: Street number of user's address
+    description: Street number of user's address.
   complemento:
     lineage:
     - datalake_ebdb_user.user.complement
-    description: Complement of user's address
+    description: Complement of user's address.
   bairro:
     lineage:
     - datalake_ebdb_user.user.neighborhood
-    description: Neighborhood of user's address
+    description: Neighborhood of user's address.
   cep:
     lineage:
     - datalake_ebdb_user.user.zip_code
-    description: Zip code of user's address
+    description: Zip code of user's address.
   cidade:
     lineage:
     - datalake_ebdb_user.user.city
-    description: City of user's address
+    description: City of user's address.
   estado_nome:
     lineage:
     - datalake_ebdb_clean.state.name
-    description: Full state name of user's address
-    categories:
-      Alagoas: ''
-      Amapá: ''
-      Amazonas: ''
-      Bahia: ''
-      Ceará: ''
-      Distrito Federal: ''
-      Espírito Santo: ''
-      Goiás: ''
-      Maranhão: ''
-      Mato Grosso: ''
-      Mato Grosso do Sul: ''
-      Minas Gerais: ''
-      Paraná: ''
-      Paraíba: ''
-      Pará: ''
-      Pernambuco: ''
-      Rio Grande do Norte: ''
-      Rio Grande do Sul: ''
-      Rio de Janeiro: ''
-      Rondônia: ''
-      Roraima: ''
-      Santa Catarina: ''
-      Sergipe: ''
-      São Paulo: ''
-      Tocantins: ''
+    description: Full state name of user's address.
   estado_abreviacao:
     lineage:
     - datalake_ebdb_clean.state.abbreviation
-    description: State acronym of user's address
-    categories:
-      AL: ''
-      AM: ''
-      AP: ''
-      BA: ''
-      CE: ''
-      DF: ''
-      ES: ''
-      GO: ''
-      MA: ''
-      MG: ''
-      MS: ''
-      MT: ''
-      PA: ''
-      PB: ''
-      PE: ''
-      PR: ''
-      RJ: ''
-      RN: ''
-      RO: ''
-      RR: ''
-      RS: ''
-      SC: ''
-      SE: ''
-      SP: ''
-      TO: ''
+    description: State acronym of user's address.
   tipo_admin:
     lineage:
     - datalake_ebdb_user.user.admin_type
-    description: Admin type of user, defining permissions
+    description: Admin type of user, defining permissions.
     categories:
-      Admin: ''
-      AtendimentoParceiros: ''
-      Contratos: ''
-      Financeiro: ''
-      Growth: ''
-      Integracao: ''
-      Normal: ''
-      Sudo: ''
-      VISTORIA_OPS: ''
+      Admin: The user has administrator permission.
+      AtendimentoParceiros: The user has partner services permission.
+      CRM_ONLY: The user has only CRM permission.
+      Contratos: The user has contracts permission.
+      Financeiro: The user has financial permission.
+      Growth: The user has financial permission.
+      Integracao: The user has integration permission.
+      Normal: The user has normal permission.
+      Sudo: The user has sudo permissions.
+      VISTORIA_OPS: The user has financial permission.
   dadosbancarios_banco_codigo:
     lineage:
     - datalake_ebdb_clean.bank.code
-    description: Bank code of user's bank account
-    categories:
-      082-5: ''
-      083-3: ''
-      122-8: ''
-      712-9: ''
+    description: Bank code of user's bank account.
   dadosbancarios_banco:
     lineage:
     - datalake_ebdb_clean.bank.name
-    description: Bank name of user's bank account
-    categories:
-      A.J.Renner: ''
-      ABC Brasil: ''
-      ABN: ''
-      Agibank: ''
-      Alfa: ''
-      Alvorada: ''
-      AndBank (Brasil): ''
-      Azteca do Brasil: ''
-      BERJ: ''
-      BMG: ''
-      BNP Paribas Brasil: ''
-      BRB - Banco de Brasília: ''
-      BTG Pactual: ''
-      Banco Internacional do Funchal: ''
-      Banco XP: ''
-      Banco da Amazônia: ''
-      Banco da China Brasil: ''
-      Banco do Brasil: ''
-      Banco do Estado de Sergipe: ''
-      Banco do Estado do Espírito Santo: ''
-      Banco do Estado do Pará: ''
-      Banco do Estado do Rio Grande do Sul: ''
-      Banco do Nordeste do Brasil: ''
-      Banerj: ''
-      Bonsucesso: ''
-      Bradesco: ''
-      Bradesco BBI: ''
-      Bradesco Cartões: ''
-      Bradesco Financiamentos: ''
-      C6 Bank: ''
-      Cacique: ''
-      Caixa Econômica Federal: ''
-      Caixa Geral - Brasil: ''
-      Capital: ''
-      Cetelem: ''
-      Citibank: ''
-      Clássico: ''
-      Cooperativo Sicredi: ''
-      Cooperativo do Brasil - BANCOOB: ''
-      HSBC Bank Brasil: ''
-      Hipercard: ''
-      Indusval: ''
-      Intercap: ''
-      Intermedium: ''
-      Investcred Unibanco: ''
-      Itaú BBA: ''
-      Itaú Unibanco: ''
-      Itaú Unibanco Holding: ''
-      ItaúBank: ''
-      J. P. Morgan: ''
-      J. Safra: ''
-      John Deere: ''
-      MercadoPago: ''
-      Mercantil do Brasil: ''
-      Mizuho do Brasil: ''
-      Modal: ''
-      Morgan Stanley: ''
-      Máxima: ''
-      NBC Bank Brasil: ''
-      Natixis Brasil: ''
-      Nubank: ''
-      Original: ''
-      Original do Agronegócio: ''
-      Ourinvest: ''
-      PAN: ''
-      Pagseguro: ''
-      Paraná Banco: ''
-      Pecúnia: ''
-      Pine: ''
-      Pottencial: ''
-      Rabobank International Brasil: ''
-      Rendimento: ''
-      Safra: ''
-      Santander: ''
-      Sofisa: ''
-      Topázio: ''
-      Triângulo: ''
-      Unicred: ''
-      VR: ''
-      Votorantim: ''
+    description: Bank name of user's bank account.
   dadosbancarios_agencia:
     lineage:
     - datalake_ebdb_user.user.bank_agency
-    description: Bank branch code of user's bank account
+    description: Bank branch code of user's bank account.
   dadosbancarios_conta_corrente:
     lineage:
     - datalake_ebdb_user.user.bank_account
-    description: Bank account number of user's bank account
+    description: Bank account number of user's bank account.
   dadosbancarios_cpf_cnpj:
     lineage:
     - datalake_ebdb_user.user.bank_cpf_cnpj
-    description: CPF (Tax Identification Number) of user in user's bank account
+    description: CPF (Tax Identification Number) or CNPJ (Brazilian National Registry of Legal Entities) of user/entity in user's bank account.
   dadosbancarios_nome:
     lineage:
     - datalake_ebdb_user.user.bank_name
-    description: Full name of user in users's bank account
+    description: Full name of user in users's bank account.
   dadosbancarios_tipo_conta:
     lineage:
     - datalake_ebdb_user.user.bank_account_type
-    description: Type of user's bank account
+    description: Type of user's bank account.
     categories:
-      ContaCorrenteConjunta: ''
-      ContaCorrenteIndividual: ''
-      Poupanca: ''
+      ContaCorrenteConjunta: Joint banking account.
+      ContaCorrenteIndividual: Individual banking account.
+      Poupanca: Saving account.
   dadosagente_perfil:
     lineage:
     - datalake_ebdb_user.agent_data.profile
-    description: ''
+    description: User's profile shift (deslocamento), if user is an agent.
     categories:
-      BUS_LONG_DISTANCE: ''
-      CARRO: ''
-      CAR_LONG_DISTANCE: ''
-      CAR_TEMP_COVID: ''
-      CAR_USING_HIGHWAYS: ''
-      ONIBUS: ''
+      BUS_LONG_DISTANCE: The agent goes to the place by bus, but it's not near.
+      CARRO: The agent goes to the place by car.
+      CAR_LONG_DISTANCE: The agent goes to the place by car, but it's not near.
+      CAR_TEMP_COVID: The agent goes to the place by car, used in Covid times.
+      CAR_USING_HIGHWAYS: The agent goes to the place crossing highways by car.
+      ONIBUS: The agent goes to the place by bus.
   dadosagente_numero_creci:
     lineage:
     - datalake_ebdb_user.agent_data.creci_number
     description: Creci number (Regional Council for Real Estate Brokers) of user,
-      if user is an agent
+      if user is an agent.
   dadosfotografo_tipo_contrato:
     lineage:
     - datalake_ebdb_clean.photographer_data.contract_type
-    description: Type of contract with photographer, if user is photographer
+    description: Type of contract with photographer, if user is photographer.
     categories:
-      CLT: ''
-      Freelancer: ''
+      CLT: The contract is CLT (Consolidation of Labor Laws)
+      Freelancer: The photographer is a freelancer, which is autonomous.
   dadosafiliado_cidade_atuacao:
     lineage:
     - datalake_ebdb_user.affiliate_data.work_city
-    description: City name of affiliate activity, if user is an affiliate
+    description: City name of affiliate activity, if user is an affiliate.
   dadosafiliado_preferencia_pagamento:
     lineage:
     - datalake_ebdb_user.affiliate_data.payment_preference
-    description: Payment preference for affiliate, if user is an affiliate
+    description: Payment preference for affiliate, if user is an affiliate.
     categories:
-      CartaoPrePago: ''
-      NaoTem: ''
+      CartaoPrePago: The payment preference is prepaid card.
+      NaoTem: User doesn't have payment preference.
   dadosafiliado_numero_creci:
     lineage:
     - datalake_ebdb_user.affiliate_data.creci_number
     description: Creci number (Regional Council for Real Estate Brokers) of affiliate,
-      if user is an affiliate
+      if user is an affiliate.
   dadosafiliado_semana_ultima_comunicacao_balanco:
     lineage:
     - datalake_ebdb_user.affiliate_data.last_week_balance_communication
-    description: ''
+    description: Integer value of the last week balance communication.
   visits_booked:
     lineage:
     - datalake_booking.booking.id_visitor
-    description: ''
+    description: Amount of booked visit by user.
   visits_realized:
     lineage:
     - datalake_booking.booking.is_visit_completed
-    description: ''
+    description: Amount of visits that happened.
   visits_expected_to_happen:
     lineage:
     - datalake_booking.booking.visit_fup
-    description: ''
+    description: Amount of visits that were booked and were supposed to happen.
   houses_owned:
     lineage:
     - datalake_pro_owners.owner_houses_quantity_history.houses
+    description: Total amount of houses owned by user.
   brokerage_only_houses_owned:
     lineage:
     - datalake_pro_owners.owner_houses_quantity_history.houses
+    description: Amount of houses owned by user and it's managed by the owner (Brokerage Only program).
   quintoandar_houses_owned:
     lineage:
     - datalake_pro_owners.owner_houses_quantity_history.houses
+    description: Amount of houses owned by user and it's managed by QuintoAndar.
   data_nascimento:
     lineage:
     - datalake_ebdb_user.user.dt_birth
-    description: Birth date of user
+    description: Birth date of user.
   first_visit_date:
     lineage:
     - datalake_ebdb_clean.visit.dt_visit
-    description: ''
+    description: Timestamp of when the user had the first visit.
   first_visit_confirmed_date:
     lineage:
     - datalake_booking.booking.status
     - datalake_ebdb_clean.visit.dt_visit
-    description: ''
+    description: Timestamp of when the user had the first visit confirmed.
   data_clickanuncie:
     lineage:
     - datalake_ebdb_user.user.ts_click_anuncie
-    description: ''
+    description: Timestamp of when the click anuncie happened.
   dadosfotografo_inicio_contrato:
     lineage:
     - datalake_ebdb_clean.photographer_data.ts_contract_started
-    description: Start date of contract with photographer, if user is photographer
+    description: Start date of contract with photographer, if user is photographer.
   dadosvendedor_inicio_contrato:
     lineage:
     - datalake_ebdb_clean.sales_rep.ts_contract_started
-    description: Start date of contract with Inside Sales Analyst, if user is Inside
+    description: Start date of contract with Inside Sales Analyst, if user is Inside.
       Sales Analyst
   dadosafiliado_inicio_atuacao:
     lineage:
     - datalake_ebdb_user.affiliate_data.ts_first_operation_start
-    description: Start date of activity as affiliate, if user is an affiliate
+    description: Start date of activity as affiliate, if user is an affiliate.
   first_booking_date:
     lineage:
     - datalake_booking.booking.ts_created
-    description: Date when the user first created a booking to visit a listing
+    description: Date when the user first created a booking to visit a listing.
   first_booking_confirmed_date:
     lineage:
     - datalake_booking.booking.status
     - datalake_booking.booking.ts_created
-    description: Date when the user had a first booking confirmed to visit a listing
+    description: Date when the user had a first booking confirmed to visit a listing.
   first_pre_proposal_date:
     lineage:
     - datalake_ebdb_clean.pre_proposal.ts_created
-    description: ''
+    description: Date of when the user's first pre proposal.
   first_proposal_accepted_date:
     lineage:
     - datalake_ebdb_clean.proposal.ts_created
-    description: ''
+    description: Date of when the user's first proposal accepted.
   first_contract_date:
     lineage:
     - datalake_ebdb_clean.contract.ts_created
-    description: Date when the user signed his first contract
+    description: Date when the user signed his first contract.
   first_signed_contract:
     lineage:
     - datalake_ebdb_clean.contract.ts_signed
-    description: ''
+    description: Timestamp of when user's contract signed for the first time.
   first_dt_document_sent:
     lineage:
     - datalake_ebdb_user.user.ts_first_document_sent
-    description: ''
+    description: Timestamp of when user sent the documentation for the first time.
   last_dt_document_sent:
     lineage:
     - datalake_ebdb_user.user.ts_last_document_sent
-    description: ''
+    description: Timestamp of when user sent the documentation for the last time.
   first_dt_sent_to_insurance:
     lineage:
     - datalake_ebdb_user.user.ts_first_sent_to_insurance
-    description: ''
+    description: Timestamp of when user's documentation was in analysis for the first time.
   criado_em:
     lineage:
     - datalake_ebdb_user.user.ts_created
-    description: Timestamp of when user was created
+    description: Timestamp of when user was created.
   atualizado_em:
     lineage:
     - datalake_ebdb_user.user.ts_updated
-    description: Timestamp of when user was last updated
-  load_timestamp:
-    description: ''
+    description: Timestamp of when user was updated.
   network:
-    description: ''
-    categories:
-      Facebook Installs: ''
-      Organic: ''
-      email: ''
-      facebook: ''
-      quintoandar: ''
+    description: It was used when the table was in ODS, but now it contains just null value.
+  load_timestamp:
+    description: Timestamp of when the data was loaded.
