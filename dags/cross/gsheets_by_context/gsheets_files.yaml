@@ -216,22 +216,10 @@ ecglobal_active_users:
     clean_table_name: ecglobal_active_users
     sheet_context: growth
 
-full_taxonomy:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Full_Taxonomy
-    clean_table_name: taxonomy_mkt_cost
-    sheet_context: growth
-
 full_taxonomy_new_test:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Full_Taxonomy_New_Test
     clean_table_name: taxonomy_mkt_cost_new_test
-    sheet_context: growth
-
-google_costs:
-    sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
-    sheet_name: Google Costs
-    clean_table_name: marketing_manual_costs_google
     sheet_context: growth
 
 historic_national_costs:
@@ -244,12 +232,6 @@ indicaai_tax_costs:
     sheet_id: 1-ivCkEwGfATx6sza4t5LlPPjStH_CgPgBbR4aGwfLZ4
     sheet_name: Output
     clean_table_name: indicaai_tax_costs
-    sheet_context: growth
-
-kenshoo_configuration:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Kenshoo_Configuration
-    clean_table_name: marketing_kenshoo_configuration
     sheet_context: growth
 
 local_holidays:
@@ -270,46 +252,10 @@ manual_cost_engagement_history:
     clean_table_name: affiliates_manual_cost_engagement_history
     sheet_context: growth
 
-marketing_costs_campaign_city:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Campaign_City
-    clean_table_name: marketing_costs_campaign_city
-    sheet_context: growth
-
-marketing_costs_manual_costs_google:
-    sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
-    sheet_name: Google Costs
-    clean_table_name: marketing_costs_manual_costs_google
-    sheet_context: growth
-
-marketing_costs_google_ad_type_flags:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: ad_type_flags
-    clean_table_name: marketing_costs_google_ad_type_flags
-    sheet_context: growth
-
-marketing_costs_kenshoo_configuration:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Kenshoo_Configuration
-    clean_table_name: marketing_costs_kenshoo_configuration
-    sheet_context: growth
-
 marketing_cost_taxonomy:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Oficial Taxonomy Composer
     clean_table_name: marketing_cost_taxonomy
-    sheet_context: growth
-
-marketing_manual_campaign_cities:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Campaign_City
-    clean_table_name: marketing_manual_campaign_cities
-    sheet_context: growth
-
-marketing_social_media_costs:
-    sheet_id: 1yleDGeVtbzrT5rM0zo9AomOZKIGTOiYm-FK0_GNnGNs
-    sheet_name: social_media_costs
-    clean_table_name: marketing_social_media_costs
     sheet_context: growth
 
 mexico_costs_targets:
@@ -378,12 +324,6 @@ plaquinhas_demand_targets:
     clean_table_name: plaquinhas_demand_targets
     sheet_context: growth
 
-plaquinhas_installation_targets:
-    sheet_id: 1GEaj4YMe9sgRiJmqgoJuOvkb8H8hjEcEgsTyv9GLzmg
-    sheet_name: targets
-    clean_table_name: plaquinhas_installation_targets
-    sheet_context: growth
-
 promotional_bonus_cluster_targets:
     sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
     sheet_name: promotional_bonus_cluster_targets
@@ -426,22 +366,10 @@ rental_tof_weekly_targets:
     clean_table_name: rental_tof_weekly_targets
     sheet_context: growth
 
-rental_tof_monthly_targets:
-    sheet_id: 1fMYV90b5hkmkRFspX6JRT9_yc4OjLB9AdPPGDvmu-Iw
-    sheet_name: rental_tof_monthly_targets
-    clean_table_name: rental_tof_monthly_targets
-    sheet_context: growth
-
 sale_flows_targets:
     sheet_id: 1V316dJUIlf4xv3tOBVRIGdSn38NqKRPcS1emTCQlBYE
     sheet_name: sale_flows_targets
     clean_table_name: sale_flows_targets
-    sheet_context: growth
-
-sale_nbp_source_targets:
-    sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
-    sheet_name: sale_nbp_source_targets
-    clean_table_name: sale_nbp_source_targets
     sheet_context: growth
 
 targets_casa_mineira_cost:
@@ -1359,10 +1287,22 @@ regional_inspection_q1_2022:
     clean_table_name: regional_inspection_q1_2022
     sheet_context: static
 
+rental_tof_monthly_targets:
+    sheet_id: 1fMYV90b5hkmkRFspX6JRT9_yc4OjLB9AdPPGDvmu-Iw
+    sheet_name: rental_tof_monthly_targets
+    clean_table_name: rental_tof_monthly_targets
+    sheet_context: static
+
 sale_business_unit_standardization:
     sheet_id: 1-Rxvtw0cgEk8WoZtnaFWTMchN6e6cNrsU8h06kRghBI
     sheet_name: sale_business_unit_standardization
     clean_table_name: sale_business_unit_standardization
+    sheet_context: static
+
+sale_nbp_source_targets:
+    sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
+    sheet_name: sale_nbp_source_targets
+    clean_table_name: sale_nbp_source_targets
     sheet_context: static
 
 supply_processor_status_reasons:

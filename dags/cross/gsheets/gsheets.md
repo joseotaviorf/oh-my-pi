@@ -57,6 +57,14 @@ This pipeline produces the following output tables:
     - `inside_sale_supply_targets`
     - `ipsos_brandtracking_questions`
     - `local_holidays`
+    - `marketing_costs_campaign_city`
+    - `marketing_costs_google_ad_type_flags`
+    - `marketing_costs_kenshoo_configuration`
+    - `marketing_costs_manual_costs_google`
+    - `marketing_kenshoo_configuration`
+    - `marketing_manual_campaign_cities`
+    - `marketing_manual_costs_google`
+    - `marketing_social_media_costs`
     - `marketshare_units_and_tenants`
     - `marketshare_seasonality`
     - `media_plan_current_quarter`
@@ -64,12 +72,8 @@ This pipeline produces the following output tables:
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
     - `owner_offboarding_repair_csat`
-<<<<<<< HEAD
-    - `photographer_account`
-=======
     - `plaquinhas_installation_targets`
     - `plaquinhas_demand_targets`
->>>>>>> master
     - `promotional_bonus_cluster_targets`
     - `promotional_bonus_segmentation_targets`
     - `promotional_bonus_user_cluster_targets`
@@ -93,6 +97,7 @@ This pipeline produces the following output tables:
     - `targets_portal_casa_mineira_cost_cf`
     - `target_supply_and_demand_autonomous_agent`
     - `taxonomy_crm_casa_mineira`
+    - `taxonomy_demand`
     - `taxonomy_mkt_cost`
     - `taxonomy_portal_casa_mineira`
     - `tof_supply_targets`
