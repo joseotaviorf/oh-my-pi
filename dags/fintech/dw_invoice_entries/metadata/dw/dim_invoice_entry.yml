@@ -251,7 +251,7 @@ columns:
   invoice_entry_revenue:
     lineage:
     - datalake_invoice.invoice_revenues.invoice_entry_revenue
-    description: ''
+    description: Indicates which revenue line the entry belongs to
     categories:
       brokerage_financing_fee: ''
       partner_revenue_share_brokerage: ''

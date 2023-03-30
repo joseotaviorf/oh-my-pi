@@ -17,8 +17,8 @@ columns:
     description: "Invoice payment status."
     lineage:
       - dw_payment.dim_invoice.payment_status
-  sub_status:
-    description: "It's used to set negotiations/debts status."
+  negotiation_status:
+    description: "It was used to set negotiations status. It's depracated."
     lineage:
       - dw_payment.dim_invoice.substatus
   closing_mode:
