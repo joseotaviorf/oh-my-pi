@@ -24,7 +24,7 @@ WITH invoice_replace AS (
         ON e.id_from_account = af.id
     LEFT JOIN datalake_retsuko_clean.account at
         ON e.id_to_account = at.id
-    GROUP BY 1,2,3,4,5,6,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,9,10,11,12
 )
 SELECT
     ir.id_invoice,
