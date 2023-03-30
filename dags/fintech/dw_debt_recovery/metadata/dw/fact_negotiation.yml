@@ -21,11 +21,11 @@ columns:
   id_contract:
     lineage:
     - datalake_debt_recovery.negotiation.id_contract
-    description: ''
+    description: Contract ID
   id_negotiation:
     lineage:
     - datalake_debt_recovery.negotiation.id_negotiation
-    description: ''
+    description: Negotiation ID
   is_contract_recurrent_debtor:
     lineage:
     - datalake_debt_recovery.negotiation.is_contract_recurrent_debtor
@@ -49,15 +49,15 @@ columns:
   qt_installments:
     lineage:
     - datalake_debt_recovery.negotiation.qt_installments
-    description: ''
+    description: Count of all installments from this negotiation
   qt_installments_paid:
     lineage:
     - datalake_debt_recovery.negotiation.qt_installments_paid
-    description: ''
+    description: Count of all PAID installments from this negotiation
   status:
     lineage:
     - datalake_debt_recovery.negotiation.status
-    description: ''
+    description: Status of the negotiation
     categories:
       broken: ''
       finished: ''

@@ -1,6 +1,6 @@
 database_name: dw_revenue_lines
 table_name: dim_rental_guarantee
-description: ''
+description: Rental guarantees
 domain: Fintech
 owner: ae-finance-fintech@quintoandar.com.br
 columns:
@@ -15,7 +15,7 @@ columns:
   id_charge:
     lineage:
     - datalake_revenue_lines.rental_guarantee.id_charge
-    description: ''
+    description: Charge ID
   status:
     lineage:
     - datalake_revenue_lines.rental_guarantee.guarantee_status
@@ -32,13 +32,13 @@ columns:
   charge_status:
     lineage:
     - datalake_revenue_lines.rental_guarantee.charge_status
-    description: ''
+    description:  Only CAPTURE charges (valid ones) are here because it's a revenue model. 
     categories:
       CAPTURED: ''
   charge_type:
     lineage:
     - datalake_revenue_lines.rental_guarantee.charge_type
-    description: ''
+    description: How charge was paid
     categories:
       BILL: ''
       CREDIT_CARD: ''
@@ -54,7 +54,7 @@ columns:
   monthly_revenue:
     lineage:
     - datalake_revenue_lines.rental_guarantee.monthly_revenue
-    description: ''
+    description: Monthly calculated revenue
   accrual_year_month:
     lineage:
     - datalake_revenue_lines.rental_guarantee.accrual_year_month
@@ -64,8 +64,8 @@ columns:
     - datalake_revenue_lines.rental_guarantee.ts_guarantee_created
     description: Timestamp of guarantee created
   ts_charge_created:
-    description: ''
+    description: Charge created timestamp
   ts_guarantee_paid:
-    description: ''
+    description: Guarantee paid timestamp
   ts_load:
-    description: ''
+    description: Load timestamp
