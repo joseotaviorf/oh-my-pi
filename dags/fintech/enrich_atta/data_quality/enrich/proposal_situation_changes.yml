@@ -1,5 +1,5 @@
 ---
-table_name: datalake_atta.proposal_situation_leadtime
+table_name: datalake_atta.proposal_situation_changes
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
@@ -7,11 +7,5 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   id_proposal:
-    is_complete:
-      severity_level: Error
-  id_status:
-    is_complete:
-      severity_level: Error
-  id_proposal_situation:
     is_complete:
       severity_level: Error

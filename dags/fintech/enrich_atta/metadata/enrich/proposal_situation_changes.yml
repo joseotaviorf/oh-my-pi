@@ -1,5 +1,5 @@
 database_name: datalake_atta
-table_name: proposal_situation_leadtime
+table_name: proposal_situation_changes
 owner: juliana.hocihara@quintoandar.com.br
 domain: fintech
 description: "Table containing the leadtime for each proposal situation"
@@ -9,21 +9,26 @@ columns:
     lineage:
       - datalake_atta_clean.log_isolve_v1.id_proposal
       - datalake_atta_clean.log_isolve_v2.id_proposal
-  id_status:
-    description: "ID to identify the status"
+  id_partner:
+    description: "ID to identify the partner"
     lineage:
       - datalake_atta_clean.log_isolve_v1.id_current_status
       - datalake_atta_clean.log_isolve_v2.to
-  id_proposal_situation:
-    description: "ID to identify the situation"
-    lineage:
-      - datalake_atta_clean.log_isolve_v1.id_previous_proposal_situation
-      - datalake_atta_clean.log_isolve_v2.from
+  proposal_order:
+    description: "Number to identify the order of situation"
   proposal_status:
     description: "Status description"
     lineage:
       - datalake_atta_clean.track_step_detail.proposal_status
-  proposal_situation:
+  situation_history:
     description: "Situation description"
+  next_situation:
+    description: "Next situation description"
+  ts_proposal_registration:
+    description: "Proposal registration timestamp"
+  ts_start_situation:
+    description: "Start current situation timestamp"
+  ts_end_situation:
+    description: "End current situation timestamp"
   leadtime_situation_in_hour:
     description: "Situation leadtime in hours"
