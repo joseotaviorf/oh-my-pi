@@ -110,7 +110,7 @@ columns:
       retroactively. The data team recommends Ended Rentals for more granular monitoring
       (daily and weekly) | additive metric.
   listing_to_contract_signed_weekly:
-    description: ''
+    description: Sum of contracts signed divided by listings
   new_bookers_weekly:
     description: Number of clients who booked their first visit ever on the week |
       additive metric.
@@ -145,4 +145,4 @@ columns:
   ts_load:
     description: ''
   visits_booked_per_ongoing_listings_weekly:
-    description: ''
+    description: Sum of visits booked divided by the total of ongoing listings
