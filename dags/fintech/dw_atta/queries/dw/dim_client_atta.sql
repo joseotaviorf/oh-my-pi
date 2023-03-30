@@ -1,0 +1,6 @@
+SELECT DISTINCT
+    COALESCE(id_client,-1)   AS sk_client,
+    client_cpf,
+    client_name AS client_financing_name
+FROM
+    datalake_atta_clean.client_info

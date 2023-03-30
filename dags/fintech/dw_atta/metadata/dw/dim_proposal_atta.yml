@@ -1,0 +1,54 @@
+database_name: dw_atta
+table_name: dim_proposal_atta
+description: dimension with the details from atta partners
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+    sk_proposal:
+        lineage:
+            - datalake_atta_clean.proposal.id_proposal
+        description: "Proposal identification number"
+    sk_product:
+        lineage:
+            - datalake_atta_clean.product_info.id_product
+        description: "Product identification number"
+    sk_proposal_status:
+        lineage:
+            - datalake_atta_clean.proposal.id_proposal_status
+        description: "Proposal status identification number"
+    sk_proposal_situation:
+        lineage:
+            - datalake_atta_clean.proposal.id_proposal_situation
+        description: "Proposal situation identification number"
+    product_name:
+        lineage:
+            - datalake_atta_clean.product_info.product_name
+        description: "Product name"
+    financing_bank:
+        lineage:
+            - datalake_atta_clean.providers_info.provider_name
+        description: "Product name"
+    credit_application_status:
+        description: "Credit application status"
+    proposal_status:
+        lineage:
+            - datalake_atta_clean.track_step_detail.proposal_status
+        description: "Description of proposal status"
+    proposal_situation:
+        description: "Description of proposal situation"
+    send_backoffice:
+        lineage:
+            - datalake_atta_clean.proposal.send_backoffice
+        description: "Send backoffice"
+    house_value:
+        description: "House value"
+    house_value_bank_evaluation:
+        description: "House value according to bank evaluation"
+    down_payment_amount:
+        description: "Down payment amount in BRL"
+    financing_value:
+        description: "Financing amouint in BRL"
+    is_automatic_proposal:
+        description: "Flag to identify automatic or manual proposals"
+    is_offer_canceled:
+        description: "Flag to identify canceled offers"

@@ -108,6 +108,10 @@ tables:
     date_filter_column: CreatedAt
     clean_table_name: system_logs
     db: guardian
+  - table_name: cliente
+    extraction_type: full
+    clean_table_name: client_info
+    db: maxfinancas01
 
 clean_partition_columns: [year, month, day]
 lineage_product_database_name: atta

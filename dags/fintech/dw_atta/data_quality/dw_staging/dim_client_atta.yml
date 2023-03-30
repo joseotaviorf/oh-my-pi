@@ -1,0 +1,11 @@
+---
+table_name: dw_atta_staging.dim_client_atta
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+    has_size:
+        greater_than: 0
+        severity_level: Error
+column_level_validations:
+    sk_client:
+        is_unique:
+            severity_level: Error

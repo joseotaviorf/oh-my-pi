@@ -1,0 +1,18 @@
+database_name: dw_atta
+table_name: dim_client_atta
+description: dimension with the details from atta clients
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+    sk_client:
+        lineage:
+            - datalake_atta_clean.client.id_client
+        description: "Client's identification number"
+    client_cpf:
+        lineage:
+            - datalake_atta_clean.client.client_cpf
+        description: "Client's name"
+    client_financing_name:
+        lineage:
+            - datalake_atta_clean.client.client_name
+        description: "Client's email"

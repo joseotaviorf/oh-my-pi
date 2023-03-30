@@ -1,0 +1,60 @@
+database_name: dw_atta
+table_name: dim_franchise_atta
+description: dimension with the details from atta franchises
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  sk_franchise:
+    lineage:
+      - datalake_atta_clean.franchise_info.id_franchise
+    description: "Franchise's identification number"
+  sk_registration_user:
+    lineage:
+      - datalake_atta_clean.franchise_info.id_registration_user
+    description: "User's identification number"
+  sk_franchise_status:
+    lineage:
+      - datalake_atta_clean.franchise_info.id_franchise_status
+    description: "Identification number for franchise status"
+  franchise_name:
+    lineage:
+      - datalake_atta_clean.franchise_info.franchise_name
+    description: "Franchise's name"
+  sk_franchise_category:
+    lineage:
+      - datalake_atta_clean.franchise_info.franchise_category
+    description: "Franchise's category identification number"
+  sk_franchise_type:
+    lineage:
+      - datalake_atta_clean.franchise_info.franchise_type
+    description: "Identification number for franchise type"
+  franchise_category:
+    description: "Franchise's category description"
+  royalties_percentage_value:
+    lineage:
+      - datalake_atta_clean.franchise_info.royalties_percentage_value
+    description: "Percentage value for royalties"
+  martketing_fund_percentage:
+    lineage:
+      - datalake_atta_clean.franchise_info.martketing_fund_percentage
+    description: "Percentagem value for marketing fund"
+  grace_period_royalties:
+    lineage:
+      - datalake_atta_clean.franchise_info.grace_period_royalties
+    description: "Grace period royalties"
+  grace_period_tec:
+    lineage:
+      - datalake_atta_clean.franchise_info.grace_period_tec
+    description: "Grace period tec"
+  ts_contract_deadline:
+    lineage:
+      - datalake_atta_clean.franchise_info.ts_contract_deadline
+    description: "Contract deadline timestamp"
+  ts_registration:
+    lineage:
+      - datalake_atta_clean.franchise_info.ts_registration
+    description: "Registration timestamp"
+  ts_franchise_signature:
+    lineage:
+      - datalake_atta_clean.franchise_info.ts_franchise_signature
+    description: "Franchise signature timestamp"

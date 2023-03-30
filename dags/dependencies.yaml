@@ -467,6 +467,24 @@ bietlejuice.dw_agents_availability:
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-slots-hourly
   - bietlejuice.dw_booking:load-dw-public-dim-booking
 
+bietlejuice.dw_atta:
+  - bietlejuice.enrich_atta:load-enrich-proposal-dates
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
+  - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
+  - bietlejuice.atta:load-clean-client-info
+  - bietlejuice.atta:load-clean-users-info
+  - bietlejuice.atta:load-clean-franchise-info
+  - bietlejuice.atta:load-clean-partner-info
+  - bietlejuice.atta:load-clean-product-info
+  - bietlejuice.atta:load-clean-providers-info
+  - bietlejuice.atta:load-clean-proposal
+  - bietlejuice.atta:load-clean-pre-analysis
+  - bietlejuice.atta:load-clean-track-step-detail
+  - bietlejuice.atta:load-clean-financing-proposal
+  - bietlejuice.atta:load-clean-financing-proposal-check
+  - bietlejuice.risk_and_mortgage:load-clean-offer-pre-analysis
+
 bietlejuice.dw_banking:
   - bietlejuice.ebdb:create-clean-bank-in-data-lake
   - bietlejuice.ebdb:create-clean-account-in-data-lake
