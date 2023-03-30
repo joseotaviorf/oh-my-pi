@@ -62,7 +62,7 @@ def create_df_from_employee_salary_history(results, spark_client, token_name):
                 Row(
                     id=str(details["id"]),
                     id_employee=str(details["id_employee"]),
-                    salary=details["salary"],
+                    salary=str(details["salary"]),
                     relationship_id=str(details["relationship_id"]),
                     relationship=str(details["relationship"]),
                     department_id=str(details["department_id"]),
