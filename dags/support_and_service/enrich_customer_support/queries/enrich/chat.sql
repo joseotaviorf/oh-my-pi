@@ -242,7 +242,7 @@ quinto_messenger_tasks AS (
     t.seconds_to_first_response AS seconds_first_reply,
     t.seconds_to_first_response/60.0 AS task_minutes_wait_time,
     t.department,
-    to.task_completion_reason AS completion_reason,
+    t.completion_reason,
     t.transferred_from_dept,
     t.transferred_to_dept,
     t.transference_type,
@@ -282,9 +282,6 @@ quinto_messenger_tasks AS (
   LEFT JOIN
     chat_metrics AS cm
       ON cm.id_conversation = c5a.id_session
-  LEFT JOIN
-    task_outcome AS to
-      ON to.id_task = t.id_task
   LEFT JOIN
     task_transfer_reason AS ttr
       ON ttr.id_task = t.id_task

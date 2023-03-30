@@ -1,5 +1,7 @@
 database_name: datalake_quinto_messenger
 table_name: task
+owner: data-ae-ss@quintoandar.com.br
+domain: Support and Service
 columns:
   id_task:
     lineage:
@@ -25,6 +27,9 @@ columns:
   task_status:
     lineage:
       - datalake_quinto_messenger_clean.task.task_status
+  completion_reason:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_resources
   channel_status:
     lineage:
       - datalake_quinto_messenger_clean.task.task_attributes

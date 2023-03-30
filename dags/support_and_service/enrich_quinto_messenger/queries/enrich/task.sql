@@ -16,6 +16,7 @@ SELECT
 	GET_JSON_OBJECT(t.task_attributes,'$.channelType') AS channel_type_twilio,
 	GET_JSON_OBJECT(t.task_attributes,'$.channel_type') AS channel_type_internal,
 	t.task_status,
+	GET_JSON_OBJECT(t.task_resource, '$.reason') AS completion_reason,
 	GET_JSON_OBJECT(t.task_attributes,'$.status') AS channel_status,
 	GET_JSON_OBJECT(t.task_attributes,'$.target') AS ticket_group_name,
 	REGEXP_EXTRACT(GET_JSON_OBJECT(t.task_attributes,'$.from'),'(\\w+:)(.+)',2) AS from_phone_number,
