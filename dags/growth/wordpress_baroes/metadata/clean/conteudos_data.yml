@@ -12,7 +12,7 @@ columns:
   id_author:
     description: Post author identifier
     lineage: 
-      - datalake_wordpress_baroes_raw.conteudos_data.id_author
+      - datalake_wordpress_baroes_raw.conteudos_data.author
   guid:
     description: Complementar post identifier
     lineage: 
