@@ -1,9 +1,9 @@
 database_name: dw_public
 table_name: dim_photo_job
-description: A photo job is when QuintoAndar sends a photographer to take photos of
-  a property for listing. Each line is a photo job
-domain: Support and Service
-owner: ae-ssS@quintoandar.com.br
+description: A photo job is when QuintoAndar sends a photographer to take photos of a property for listing. Each line is a photo job
+domain: For Rent
+owner: gustavo.geiger@quintoandar.com.br
+
 columns:
   sk_photo_job:
     lineage:
@@ -66,7 +66,7 @@ columns:
   scheduling_instructions:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.booking_instructions
-    description: ''
+    description: Instructions for the photojob who ordered, if the owner will be present or not
   photo_shoot_contact_name:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.photo_session_contact_name
@@ -113,7 +113,7 @@ columns:
   photographer_problem_reason:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.problem
-    description: ''
+    description: Problem that the photographer encountered in the job
     categories:
       Alugado: ''
       ApartamentoBanguncado: ''
@@ -136,7 +136,7 @@ columns:
   user_sender_type:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.photo_sender_user_type
-    description: ''
+    description: User type who sent the photojob
     categories:
       OWNER: ''
       PHOTOGRAPHER: ''
@@ -227,7 +227,7 @@ columns:
   is_anticipated:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.is_job_anticipated
-    description: ''
+    description: Boolean indicating if the job was anticipated
   dt_photographer_accepted:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.ts_photographer_accepted
@@ -259,15 +259,15 @@ columns:
   dt_updated:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.ts_updated
-    description: ''
+    description: Date when the job was updated
   dt_problem_reported:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.ts_canceled
-    description: ''
+    description: Date when the job was canceled
   dt_photographer_start:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.dt_photographer_started
-    description: ''
+    description: Date of when the photographer started a contract with QuintoAndar
   user_cancel_dt:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.ts_problem_reported
@@ -284,3 +284,5 @@ columns:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.creation_to_scheduling_diff_minutes
     description: days between date job creation and date it was scheduled to happen
+  ts_load:
+    description: Timestamp in which the register was loaded in database
