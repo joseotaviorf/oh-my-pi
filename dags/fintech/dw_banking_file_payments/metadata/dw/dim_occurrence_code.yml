@@ -9,7 +9,7 @@ columns:
     - datalake_vans_clean.boleto.occurrence_code
     - datalake_vans_clean.payment.occurrence_code
     - datalake_vans_clean.payment_boleto.occurrence_code
-    description: ''
+    description: ID of occurrence code
   name:
     lineage:
     - datalake_vans_clean.boleto.occurrence_code
@@ -37,7 +37,8 @@ columns:
     - datalake_vans_clean.payment.occurrence_code
     - datalake_vans_clean.payment_boleto.occurrence_code
   description:
-    description: ''
+    description: The third last occurrence code for combined returns from SISPAG,
+      which represents the third higher detail level of errors
   source_file_type:
     description: Type of the source file responsible for translating occurrence code
       into status, such as Cobrança and SISPAG from Itaú
@@ -49,4 +50,4 @@ columns:
       which represents the third higher detail level of errors and probably the first
       in sequence
   ts_load:
-    description: ''
+    description: Load Timestamp
