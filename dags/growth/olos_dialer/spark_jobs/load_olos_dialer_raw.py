@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
     times_range = [(start_date + timedelta(n)) for n in range((end_date - start_date).days + 1)]
 
-    table_data = [create_dataframe(s3_source_bucket, raw_table_name, dt) for dt in times_range]
+    table_data = [create_dataframe(s3_source_bucket, s3_folder, raw_table_name, dt) for dt in times_range]
     table_data = [i for i in table_data if i is not None]
   
 
