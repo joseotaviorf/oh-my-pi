@@ -1359,12 +1359,6 @@ regional_inspection_q1_2022:
     clean_table_name: regional_inspection_q1_2022
     sheet_context: static
 
-rental_tof_monthly_targets:
-    sheet_id: 1fMYV90b5hkmkRFspX6JRT9_yc4OjLB9AdPPGDvmu-Iw
-    sheet_name: rental_tof_monthly_targets
-    clean_table_name: rental_tof_monthly_targets
-    sheet_context: static
-
 reference_sla_days:
     sheet_id: 1SvZD4v4GC81IOVrALn5jr31pNOajp2Nxtqn-5Isvtvg
     sheet_name: reference_sla_days
