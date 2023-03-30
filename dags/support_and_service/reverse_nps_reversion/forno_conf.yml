@@ -1,0 +1,6 @@
+minority_report_endpoint: http://minority-report-api.forno.quintoandar.com.br/profile
+
+tables_to_send:
+  offboarding_tenant_predictions:
+    key_name: contractId
+    type: PREDICTION_NPS_DETRACTOR_TENANT
