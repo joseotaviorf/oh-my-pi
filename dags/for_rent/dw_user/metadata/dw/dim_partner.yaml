@@ -7,82 +7,82 @@ columns:
   sk_partner:
     lineage:
     - datalake_ebdb_clean.partner.id
-    description: Key to identify the partner.
+    description: 'Key to identify the partner.'
   id_partner:
     lineage:
     - datalake_ebdb_clean.partner.id
-    description: Key to identify the partner (the same from EBDB).
+    description: 'Key to identify the partner (the same from EBDB).'
   id_amplitude_device:
     lineage:
     - datalake_ebdb_clean.partner.id_amplitude_device
-    description: Key to identify the amplitude device related to the partner.
+    description: 'Key to identify the amplitude device related to the partner.'
   country_code:
     lineage:
     - datalake_ebdb_country.user.country_code
-    description: Country code of the partner.
+    description: 'Country code of the partner.'
     categories:
-      BR: Brazil's country code.
-      MX: Mexico's country code.
+      BR: 'Brazil country code.'
+      MX: 'Mexico country code.'
   name:
     lineage:
     - datalake_ebdb_clean.partner.name
-    description: Name of the partner.
+    description: 'Name of the partner.'
   trade_name:
     lineage:
     - datalake_ebdb_clean.partner.trade_name
-    description: Trade name (fictitious name) of the partner's company.
+    description: 'Trade name (fictitious name) of the partners company.'
   phone:
     lineage:
     - datalake_ebdb_clean.partner.phone
-    description: Partner's phone number.
+    description: 'Partners phone number.'
   email:
     lineage:
     - datalake_ebdb_clean.partner.email
-    description: Partner's email address.
+    description: 'Partners email address.'
   cnpj:
     lineage:
     - datalake_ebdb_clean.partner.cnpj
-    description: CNPJ (Tax Identification Number) of the partner.
+    description: 'CNPJ (Tax Identification Number) of the partner.'
   creci:
     lineage:
     - datalake_ebdb_clean.partner.creci
-    description: Partner's Creci number (Regional Council for Real Estate Brokers).
+    description: 'Partners Creci number (Regional Council for Real Estate Brokers).'
   type:
     lineage:
     - datalake_ebdb_clean.partner.type
-    description: Type of the partner.
+    description: 'Type of the partner.'
     categories:
-      AUTONOMOUS_AGENT: Partner is an Autonomous agent.
-      PRIME: Partner is a Prime agent.
-      EXECUTIVE_FOR_RENT: Partner is an Executive for rent.
-      AFFILIATE_PRO: Partner is an Affiliate Pro.
+      AUTONOMOUS_AGENT: 'Partner is an Autonomous agent.'
+      PRIME: 'Partner is a Prime agent.'
+      EXECUTIVE_FOR_RENT: 'Partner is an Executive for rent.'
+      AFFILIATE_PRO: 'Partner is an Affiliate Pro.'
   city:
     lineage:
     - datalake_ebdb_clean.partner.city
-    description: City of the partner.
+    description: 'City of the partner.'
   utm_campaign:
     lineage:
     - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_campaign
-    description: Identifies the promotion of an specific campaign.
+    description: 'Identifies the promotion of an specific campaign.'
   utm_medium:
     lineage:
     - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_medium
-    description: Identifies the type of strategy used on the campaign.
+    description: 'Identifies the type of strategy used on the campaign.'
   utm_source:
     lineage:
     - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_source
-    description: Identifies which url sent the traffic.
+    description: 'Identifies which url sent the traffic.'
   ts_joined_partnership:
     lineage:
     - datalake_ebdb_clean.partner.ts_partnership_started
-    description: Timestamp of when the partnership started.
+    description: 'Timestamp of when the partnership started.'
   ts_created:
     lineage:
     - datalake_ebdb_clean.partner.ts_created
-    description: Timestamp of when the partner was registered in our system.
+    description: 'Timestamp of when the partner was registered in our system.'
   ts_updated:
     lineage:
     - datalake_ebdb_clean.partner.ts_updated
-    description: Timestamp of when the partner was updated in our system.
+    description: 'Timestamp of when the partner was updated in our system.'
   ts_load:
-    description: imestamp of when the data was loaded.
+    description: 'Timestamp of when the data was loaded.'
