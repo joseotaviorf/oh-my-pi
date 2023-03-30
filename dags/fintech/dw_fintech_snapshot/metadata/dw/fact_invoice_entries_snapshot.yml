@@ -45,6 +45,22 @@ columns:
     lineage:
       - dw_payment.fact_invoice_entries.brl_entry_paid_amount
     description: "Invoice entry paid value, considering debit or credit related to the contract cash flow. Be aware that the amount is distributed proportionally in cases of invoice delays"
+  invoice_entry_revenue:
+    description: "Indicates which revenue line the entry belongs to."
+  description:
+    description: "Invoice entry title as shown in invoice."
+  accounting_account:
+    description: "Accounting account in SAP in which entry will be destined (as defined in automatic integration)."
+  to_account_type:
+    description: "To account type in the invoice entry  (contract or stakeholder)."
+  entry_type:
+    description: "Invoice entry type according to expense details (tag)."
+  producer:
+    description: "Rotine that produces the entry."
+  from_account_type:
+    description: "From account type in the invoice entry (contract or stakeholder)."
+  accrual_year_month:
+    description: "Expense reference month."
   ts_created:
     lineage:
       - dw_payment.fact_invoice_entries.ts_created
@@ -53,3 +69,15 @@ columns:
     lineage:
       - dw_payment.fact_invoice_entries.ts_load
     description: "Timestamp that snapshot was taken."
+  day:
+    lineage:
+      - dw_payment.fact_invoice_entries.ts_load
+    description: "Day of the date the snapshot was taken."
+  month:
+    lineage:
+      - dw_payment.fact_invoice_entries.ts_load
+    description: "Month of the date the snapshot was taken"
+  year:
+    lineage:
+      - dw_payment.fact_invoice_entries.ts_load
+    description: "Year of the date the snapshot was taken"

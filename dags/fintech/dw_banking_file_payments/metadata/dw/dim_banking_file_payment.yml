@@ -17,7 +17,7 @@ columns:
   bank_name:
     lineage:
     - datalake_vans_clean.bank.name
-    description: ''
+    description: Name of the bank
   related_document_type:
     lineage:
     - datalake_vans_clean.boleto.related_document_type
@@ -63,15 +63,15 @@ columns:
     - datalake_vans_clean.boleto.status
     - datalake_vans_clean.payment.status
     - datalake_vans_clean.payment_boleto.status
-    description: ''
+    description: Bill status.
     categories:
       changed: ''
       chargeback: ''
-      created: ''
-      error: ''
-      paid: ''
+      created: Created bill
+      error: Payment error
+      paid: Paid bill
       processed: ''
-      requested: ''
+      requested: Bill required for the bank
       scheduled: ''
       write: ''
       written: ''
@@ -86,7 +86,7 @@ columns:
     - datalake_vans_clean.boleto.ts_created
     - datalake_vans_clean.payment.ts_created
     - datalake_vans_clean.payment_boleto.ts_created
-    description: ''
+    description: File payment creation date.
   ts_issued:
     lineage:
     - datalake_vans_clean.boleto.ts_issued
@@ -97,22 +97,22 @@ columns:
     - datalake_vans_clean.boleto.ts_updated
     - datalake_vans_clean.payment.ts_updated
     - datalake_vans_clean.payment_boleto.ts_updated
-    description: ''
+    description: Date the last status was updated.
   dt_due:
     lineage:
     - datalake_vans_clean.boleto.dt_due
     - datalake_vans_clean.payment.dt_dued
-    description: ''
+    description: Expiration date of the invoice sent to the tenant.
   dt_fine_due:
     lineage:
     - datalake_vans_clean.boleto.dt_fine_due
-    description: ''
+    description: Cut-off date for applying the fine after expiration.
   dt_paid:
     lineage:
     - datalake_vans_clean.boleto.dt_paid
     - datalake_vans_clean.payment.dt_paid
     - datalake_vans_clean.payment_boleto.dt_paid
-    description: ''
+    description: Date of payment of the invoice.
   format:
     description: Name format of id according to company use syntax (default or custom)
     categories:
@@ -128,7 +128,7 @@ columns:
       monthly: ''
       onboarding: ''
   ts_load:
-    description: ''
+    description: Timestamp when the data was loaded.
   type:
     description: Type of banking file payment according to source table in Vans DB,
       such as charge, transfer or account payable
@@ -137,8 +137,8 @@ columns:
       charge: ''
       transfer: ''
   user_type:
-    description: ''
+    description: Boleto contract identifier.
     categories:
       unknown: ''
   version:
-    description: ''
+    description: File payment version when in default format.
