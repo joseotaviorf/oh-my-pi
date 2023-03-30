@@ -87,8 +87,6 @@ tables:
     date_filter_column: dateupdate
   - table_name: person_documents # missing on forno
     date_filter_column: dateupdate
-  - table_name: plans
-    date_filter_column: dateupdate
   - table_name: property_propose
     date_filter_column: dateupdate
   - table_name: property_type
