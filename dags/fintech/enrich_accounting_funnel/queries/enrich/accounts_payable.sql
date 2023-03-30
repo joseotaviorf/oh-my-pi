@@ -31,7 +31,9 @@ cap_formated AS (
         WHEN UPPER(payment_reason) LIKE 'PROTEÇÃO 5A%' THEN 'Proteção 5A - Parceiro'
         WHEN UPPER(payment_reason) LIKE 'CONDOM%' THEN 'Condomínio'
         WHEN UPPER(payment_reason) LIKE 'ANTECIPA%' THEN 'MRA'  
-        WHEN regexp_like(UPPER(payment_reason),'^MULTA RESCISÓRIA|^CONTAS DE CONSUMO|^ALUGUEL|^CORRETORES|^IPTU|^REPASSE B2B|^ONGOING|^BAND-AID') THEN payment_reason
+        WHEN UPPER(payment_reason) LIKE 'LRA%' THEN 'LRA'  
+        WHEN UPPER(payment_reason) LIKE 'BFI%' THEN 'BFI'  
+        WHEN regexp_like(UPPER(payment_reason),'^MULTA RESCISÓRIA|^MULTA-RESCISÓRIA|^CONTAS DE CONSUMO|^CONTAS-DE-CONSUMO|^CONTA-CONSUMO|^ALUGUEL|^CORRETOR|^3P|^IPTU|^REPASSE B2B|ˆREPASSE-B2B|^ONGOING|^BAND-AID') THEN payment_reason
         WHEN regexp_like(UPPER(payment_reason),'^CRÉDITO A SALDAR|^DEVOLUÇÃO|^EXTRA') THEN 'Repasse Extra'
         ELSE NULL
       END AS payment_reason_classification,
@@ -58,7 +60,7 @@ vans_formated AS ( --Change columns name to match CAP layout
       WHEN UPPER(pagamento) LIKE 'ANTECIPA%' THEN 'MRA'  
       WHEN UPPER(pagamento) LIKE 'CIQ%' THEN 'CIQ' 
       WHEN UPPER(pagamento) LIKE 'ONG%' THEN 'Aluguel' 
-      WHEN regexp_like(UPPER(pagamento),'^MULTA RESCISÓRIA|^CONTAS DE CONSUMO|^ALUGUEL|^CORRETORES|^IPTU|^REPASSE B2B|^BAND-AID|^CRÉDITO A SALDAR|^EARLY TERMINATION') THEN pagamento
+      WHEN regexp_like(UPPER(pagamento),'^MULTA RESCISÓRIA|^CONTAS DE CONSUMO|^ALUGUEL|^CORRETORES|^IPTU|^REPASSE B2B|ˆREPASSE-B2B|^BAND-AID|^CRÉDITO A SALDAR|^EARLY TERMINATION') THEN pagamento
       WHEN regexp_like(UPPER(pagamento),'^DEVOLUÇÃO|^EXTRA') THEN 'Repasse Extra'
       ELSE NULL
     END AS payment_reason_classification, 
@@ -142,7 +144,7 @@ SELECT
   CAST(NULL AS BIGINT) AS id_invoice,
   CAST(NULL AS BIGINT) AS sk_invoice_reversed_entry,
   COALESCE(TRY_CAST(cap.supplier_description AS INT),-1) AS sk_contract,
-  COALESCE(SPLIT(REPLACE(REPLACE(version,'.','P'), 'v', ''),'P')[0], 'no info') AS version,
+    COALESCE(SPLIT(REPLACE(version,'.','P'),'P')[0], 'no info') AS version,
   c.is_contract_b2b AS is_contract_b2b,
   r.city_name AS locale,
   cl.id_locale AS localidade,
@@ -204,7 +206,7 @@ vans_final AS (
     CAST(NULL AS BIGINT) AS id_invoice,
     CAST(NULL AS BIGINT) AS sk_invoice_reversed_entry,
     COALESCE(TRY_CAST(vans.supplier_description AS INT),-1) AS sk_contract,
-    COALESCE(SPLIT(REPLACE(REPLACE(version,'.','P'), 'v', ''),'P')[0], 'no info') AS version,
+    COALESCE(SPLIT(REPLACE(version,'.','P'),'P')[0], 'no info') AS version,
     c.is_contract_b2b AS is_contract_b2b,
     r.city_name AS locale,
     cl.id_locale AS localidade,
