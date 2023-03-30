@@ -7,7 +7,7 @@ columns:
   sk_transaction:
     lineage:
     - datalake_velo.transaction_entries.id_trasaction
-    description: ''
+    description: Transaction ID
   project:
     lineage:
     - datalake_velo.transaction_entries.project
@@ -17,25 +17,25 @@ columns:
     - datalake_velo.transaction_entries.status
     description: Status of the transaction
     categories:
-      A VENCER: ''
-      ATRASADO: ''
-      PAGO: ''
-      RECEBIDO: ''
-      VENCE HOJE: ''
+      A VENCER: transaction to be due
+      ATRASADO: overdue transaction
+      PAGO: paid transaction
+      RECEBIDO: Receivable transaction
+      VENCE HOJE: transaction that expires today
   transaction_type:
     lineage:
     - datalake_velo.transaction_entries.transaction_type
-    description: ''
+    description: Transaction type
     categories:
-      CONTA_A_PAGAR: ''
-      CONTA_A_RECEBER: ''
+      CONTA_A_PAGAR: Payable account
+      CONTA_A_RECEBER: Receivable account
   transaction_purpose:
     lineage:
     - datalake_velo.transaction_entries.transaction_purpose
-    description: ''
+    description: Purpose of transaction
     categories:
-      ongoing: ''
-      rescisão: ''
+      ongoing: transaction from an unfinished account
+      rescisão: transaction from an finished account
   installment:
     lineage:
     - datalake_velo.transaction_entries.installment
@@ -43,15 +43,15 @@ columns:
   total_expected_installments:
     lineage:
     - datalake_velo.transaction_entries.total_expected_installments
-    description: Number of total installments expected to be paid by all transctions
+    description: Number of total installments expected to be paid by all transactions
       related to this one
   is_project_receivable_created:
     lineage:
     - datalake_velo.transaction_entries.is_project_receivable_created
-    description: ''
+    description: Has a transaction receivable created
   is_project_receivable_greater_than_payable:
     lineage:
     - datalake_velo.transaction_entries.is_project_receivable_greater_than_payable
-    description: ''
+    description: Transaction has the received amount greater than the amount payable
   ts_load:
-    description: ''
+    description: Load timestamp

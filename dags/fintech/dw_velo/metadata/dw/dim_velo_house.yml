@@ -7,38 +7,38 @@ columns:
   sk_house:
     lineage:
     - datalake_velo.house.id_house
-    description: ''
+    description: ID house
   type:
     lineage:
     - datalake_velo.house.type
     description: Property category type
     categories:
-      Apartamento: ''
-      Casa: ''
-      Galpão: ''
-      Kitnet: ''
-      Loja: ''
-      Outros: ''
-      Sala: ''
+      Apartamento: apartament
+      Casa: house
+      Galpão: warehouse
+      Kitnet: kitnet
+      Loja: store
+      Outros: other
+      Sala: business room
   city:
     lineage:
     - datalake_velo.house.city
-    description: ''
+    description: Property city
   state:
     lineage:
     - datalake_velo.house.state
-    description: ''
+    description: Property state
   country:
     lineage:
     - datalake_velo.house.country
-    description: ''
+    description: Property country
   zipcode:
     lineage:
     - datalake_velo.house.zipcode
-    description: ''
+    description: Property zipcode
   geolocation:
     lineage:
     - datalake_velo.house.geolocation
-    description: ''
+    description: Property geolocation
   ts_load:
-    description: ''
+    description: Load timestamp
