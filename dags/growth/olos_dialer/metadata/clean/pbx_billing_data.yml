@@ -1,0 +1,135 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: pbx_billing_data
+owner: ana.araujo@quintoandar.com.br
+domain: growth
+description:
+columns:
+  id_pbx_billing_data:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.pbxbillingdataid
+  id_pbx_disposition:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.pbxdispositionid
+  id_agent:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.agentid
+  id_campaign:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.campaignid
+  id_call_direction:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.calldirectionid
+  id_customer:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.customerid
+  id_phone_humber:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.phonenumberid
+  id_record:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.recordid
+  id_session:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.sessionid
+  id_telecom_call:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.telecomcallid
+  total_time:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.totaltime
+  trunk_number:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.trunknumber
+  signaling:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.signaling
+  signaling_extra_info:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.signalingextrainfo
+  signaling_time:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.signalingtime
+  route:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.route
+  pbx_name:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.pbxname
+  campaign_code:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.campaigncode
+  channel:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.channel
+  company:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.company
+  alerting_time:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.alertingtime
+  analysis_time:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.analysistime
+  ani:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.ani
+  billing_code:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.billingcode
+  board:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.board
+  conversation_time:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.conversationtime
+  device_name:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.devicename
+  dnis:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.dnis
+  link:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.link
+  mailing_name:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.mailingname
+  original_phone_number:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.originalphonenumber
+  ts_started:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.startdate

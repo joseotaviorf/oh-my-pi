@@ -1,0 +1,15 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: info_pbx_disposition
+owner: ana.araujo@quintoandar.com.br
+domain: growth
+description:
+columns:
+  id_pbx_disposition:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.info_pbxdisposition.pbxdispositionid
+  description:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.info_pbxdisposition.description

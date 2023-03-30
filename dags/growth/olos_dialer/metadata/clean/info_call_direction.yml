@@ -1,0 +1,15 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: info_call_direction
+owner: ana.araujo@quintoandar.com.br
+domain: growth
+description:
+columns:
+  id_call_direction:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.info_calldirection.calldirectionid
+  description:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.info_calldirection.description

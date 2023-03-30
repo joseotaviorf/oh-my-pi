@@ -1,0 +1,59 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: users
+owner: ana.araujo@quintoandar.com.br
+domain: growth
+description:
+columns:
+  id_user:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.userid
+  id_agent:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.agentid
+  id_user_permission:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.userpermissionid
+  user_name:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.username
+  email:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.email
+  login:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.login
+  agent_profile:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.permissiondesc
+  is_activated:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.activated
+  is_enable_personal_transfer:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.enablepersonaltransfer
+  is_agent:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.flag_agent
+  is_manager:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.flag_manager
+  is_supervisor:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.flag_supervisor
+  ts_last_login:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.users.lastlogin

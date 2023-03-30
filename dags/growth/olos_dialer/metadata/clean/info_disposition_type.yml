@@ -1,0 +1,15 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: info_disposition_type
+owner: ana.araujo@quintoandar.com.br
+domain: growth
+description:
+columns:
+  id_disposition_type:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.info_dispositiontype.dispositiontypeid
+  description:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.info_dispositiontype.description

@@ -1,0 +1,27 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: disposition_plan
+owner: ana.araujo@quintoandar.com.br
+domain: growth
+description:
+columns:
+  id_disposition_plan:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.dispositionplan.dispositionplanid
+  id_last_modified_user:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.dispositionplan.lastmodifieduserid
+  description:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.dispositionplan.description
+  is_activated:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.dispositionplan.activated
+  ts_last_modified:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.dispositionplan.lastmodified

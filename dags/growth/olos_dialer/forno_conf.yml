@@ -1,0 +1,29 @@
+---
+tables_list:
+  - AgentSupervisor
+  - AgentStateRawData
+  - Campaign
+  - CampaignCustomer
+  - ConfigReasons
+  - Customer
+  - Disposition
+  - DispositionDetail
+  - DispositionPlan
+  - InboundRawData
+  - Info_AgentStatus
+  - Info_CallDirection
+  - Info_CampaignType
+  - Info_DispositionType
+  - Info_PbxDisposition
+  - Info_ReasonType
+  - Info_StatusId
+  - LoginRawData
+  - MailingInformation
+  - AttemptsRawData
+  - Reason
+  - Users
+  - PbxBillingData
+partition_cols:
+  - year
+  - month
+  - day

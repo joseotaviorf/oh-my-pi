@@ -1,0 +1,75 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: attempts_raw_data
+owner: ana.araujo@quintoandar.com.br
+domain: growth
+description:
+columns:
+  id_agent:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.agentid
+  id_attempts_raw_data:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.attemptsrawdataid
+  id_call:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.callid
+  id_call_telecom:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.callidtelecom
+  id_campaign:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.campaignid
+  id_lead:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.customerid
+  id_disposition:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.dispositionid
+  id_mailing_phone_number:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.mailingphonenumberid
+  id_mailing_record:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.mailingrecordid
+  id_phone_type:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.phonetypeid
+  dnis:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.dnis
+  original_phone_number:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.originalphonenumber
+  route:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.route
+  table_name:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.tablename
+  ts_started:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.startdate
+  ts_call_ended:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.endcall
+  ts_wrap_ended:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.endwrap

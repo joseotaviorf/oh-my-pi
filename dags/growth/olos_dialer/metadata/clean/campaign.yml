@@ -1,0 +1,35 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: campaign
+owner: ana.araujo@quintoandar.com.br
+domain: growth
+description:
+columns:
+  id_campaign:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.campaign.campaignid
+  id_campaign_type:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.campaign.campaigntypeid
+  id_customer:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.campaign.dispositionplanid
+  description:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.campaign.description
+  campaign_code:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.campaign.campaigncode
+  billing_code:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.campaign.billingcode
+  is_activated:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.campaign.activated

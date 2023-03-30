@@ -1,0 +1,23 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: config_reasons
+owner: ana.araujo@quintoandar.com.br
+domain: growth
+description:
+columns:
+  id_campaign:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.configreasons.campaignid
+  id_reason:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.configreasons.reasonid
+  id_reason_type:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.configreasons.reasontypeid
+  description:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.configreasons.description
