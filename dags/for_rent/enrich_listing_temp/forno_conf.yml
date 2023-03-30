@@ -1,0 +1,11 @@
+---
+tables:
+  - table_name: lbc_house_listing
+    partitions: [country_code]
+
+custom_cluster:
+  driver_node_type_id: m4.xlarge
+  node_type_id: m4.2xlarge
+  autoscale:
+    min_workers: 1
+    max_workers: 3

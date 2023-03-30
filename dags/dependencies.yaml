@@ -2039,6 +2039,11 @@ bietlejuice.enrich_listing_flow:
   - bietlejuice.wololo:load-clean-prospect
 
 # temporary
+bietlejuice.enrich_listing_temp:
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-enrich-lbc-status-version-order
+
+# temporary
 bietlejuice.enrich_unified_listing_flow:
   - bietlejuice.ebdb:create-clean-lead-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-lead-reason-in-data-lake
