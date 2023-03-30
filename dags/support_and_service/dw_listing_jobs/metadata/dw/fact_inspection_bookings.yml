@@ -2,7 +2,7 @@ database_name: dw_public
 table_name: fact_inspection_bookings
 description: Information about house inspections. Each line is a house inspection
   flow, from booking to approva
-domain: For Rent
+domain: Support and Service
 owner: ae-ss@quintoandar.com.br
 columns:
   sk_inspection:

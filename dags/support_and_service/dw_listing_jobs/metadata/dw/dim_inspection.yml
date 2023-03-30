@@ -2,7 +2,7 @@ database_name: dw_public
 table_name: dim_inspection
 description: Inspections are realized before a tenant moves into a property and after
   the tenant moves out. Each line is an inspection
-domain: For Rent
+domain: Support and Service
 owner: cassio.bastos@quintoandar.com.br
 columns:
   sk_inspection:
