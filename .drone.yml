@@ -217,7 +217,7 @@ pipeline:
       event: push
       branch: [forno, master, hotfix/*]
 
-  load-dags-composer-forno:
+  upload-bi-etl-ejuice-modules-gcs-forno:
     group: upload
     image: quintoandar/drone-gcs-sync
     pull: true
@@ -233,7 +233,7 @@ pipeline:
       event: push
       branch: [forno]
 
-  load-dags-composer-prod:
+  upload-bi-etl-ejuice-modules-gcs-prod:
     group: upload
     image: quintoandar/drone-gcs-sync
     pull: true

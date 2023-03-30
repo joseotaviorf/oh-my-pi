@@ -5,7 +5,6 @@ from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathSe
 import pytest
 
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.dags import COMPOSER_DAGS_PATH
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 from dags import DAG_PACKAGES_ROOT
 
@@ -65,38 +64,16 @@ class TestDAGMetadataService:
         # assert
         assert result == expected_intermediate_path
 
-    @pytest.mark.parametrize(
-        "source, context, dag_name, intermediate_path, expected_path",
-        [
-            (
-                "dag_source",
-                "dag_source",
-                "dag_name",
-                None,
-                f"{COMPOSER_DAGS_PATH}/dag_source/dag_name.py",
-            ),
-            (
-                "dag_source",
-                "dag_context",
-                "dag_name",
-                "dag_source/dag_context",
-                f"{COMPOSER_DAGS_PATH}/dag_source/dag_context/dag_name.py",
-            ),
-        ],
-    )
-    def test__get_dag_file_path(
-        self,
-        source: str,
-        context: str,
-        dag_name: str,
-        intermediate_path: str,
-        expected_path: str,
-    ):
+    @pytest.mark.parametrize("dag_name", ("any_dag_name"))
+    @mock.patch("bietlejuice.services.dag_metadata_service.glob")
+    def test__get_dag_file_path(self, mocked_glob, dag_name):
         # arrange
+        expected_path = f"{DAG_PACKAGES_ROOT}/example/{dag_name}.py"
+        mocked_glob.glob.return_value = [expected_path]
         service = DAGMetadataService()
 
         # act
-        result = service._get_dag_file_path(source, context, dag_name)
+        result = service._get_dag_file_path(dag_name)
 
         # assert
         assert result == expected_path

@@ -7,7 +7,6 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.paths import DATALAKE_METADATA_PATH
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.dags import COMPOSER_DAGS_PATH
 from bietlejuice.services import ConfigurationService
 from dags import DAG_PACKAGES_ROOT
 
@@ -76,22 +75,14 @@ class DAGMetadataService:
             intermediate_path = f"{source}/{context}"
         return intermediate_path
 
-    def _get_dag_file_path(self, source: str, context: str, dag_name: str):
-        intermediate_path = self._get_intermediate_path(source, context)
+    def _get_dag_file_path(self, dag_name: str):
         dag_packages_path = glob.glob(
             f"{DAG_PACKAGES_ROOT}/**/{dag_name}.py", recursive=True
         )
+        return dag_packages_path[0]
 
-        if dag_packages_path:
-            return dag_packages_path[0]
-
-        if intermediate_path:
-            return f"{COMPOSER_DAGS_PATH}/{intermediate_path}/{dag_name}.py"
-        else:
-            return f"{COMPOSER_DAGS_PATH}/{source}/{dag_name}.py"
-
-    def _read_dag_file(self, source: str, context: str, dag_name: str):
-        path = self._get_dag_file_path(source, context, dag_name)
+    def _read_dag_file(self, dag_name: str):
+        path = self._get_dag_file_path(dag_name)
         with open(path) as fp:
             dag_code = fp.read()
         return dag_code
@@ -131,14 +122,13 @@ class DAGMetadataService:
         return source, context, dag
 
     def dag_has_lineage_from_product_config(
-        self, source: str, context: str, dag_name: str, env: str
+        self, source: str, context: str, dag_name: str
     ) -> bool:
         """
         Checks if a dag has a valid lineage from product configuration
         :param source: The DAG source
         :param context: The DAG context
         :param dag_name:  The DAG name
-        :param env: The environment to check for the variable
         :return: True if it has a confif, else False
         :rtype: bool
         """
@@ -151,15 +141,13 @@ class DAGMetadataService:
         except IndexError:
             return False
 
-    def get_dag_owner(self, source: str, context: str, dag_name: str) -> Optional[str]:
+    def get_dag_owner(self, dag_name: str) -> Optional[str]:
         """
         Finds the dag owner defined in a dag source code
-        :param source: dag source
-        :param context: dag context
         :param dag_name: dag name
         :return: a string representing the dag owner or none, if not found
         """
-        source_code = self._read_dag_file(source, context, dag_name)
+        source_code = self._read_dag_file(dag_name)
         match = re.search(self._DAG_OWNER_REGEX, source_code)
         if match:
             return match.group(1)
@@ -200,13 +188,9 @@ class DAGMetadataService:
                 logger.debug(f"m=get_dag_layers, layer={layer}, msg=Invalid Layer")
         return layers
 
-    def get_dag_layers(
-        self, source: str, context: str, dag_name: str, ignore_staging: bool = True
-    ) -> List[str]:
+    def get_dag_layers(self, dag_name: str, ignore_staging: bool = True) -> List[str]:
         """
         Finds all layers used in a dag. May extract information simply from dag name or read the source code
-        :param source: dag source
-        :param context: dag context
         :param dag_name: dag name
         :param ignore_staging: if true, does not returns staging layers (clean_staging and dw_staging)
         :return: a set with strings representing all layers used in dag
@@ -219,20 +203,16 @@ class DAGMetadataService:
         elif dag_name.startswith("enrich_"):
             return ["enrich"]
         else:
-            source_code = self._read_dag_file(source, context, dag_name)
+            source_code = self._read_dag_file(dag_name)
             return list(self._get_layer_from_source_code(source_code, ignore_staging))
 
-    def _get_dag_target_database_name(
-        self, source: str, context: str, dag_name: str
-    ) -> Optional[str]:
+    def _get_dag_target_database_name(self, dag_name: str) -> Optional[str]:
         """
         Finds the string value used as target_database_name in a dag. If more than one is found, returns only the first.
-        :param source: dag source
-        :param context: dag context
         :param dag_name: dag name
         :return: the string value used as target_database_name
         """
-        source_code = self._read_dag_file(source, context, dag_name)
+        source_code = self._read_dag_file(dag_name)
 
         datalake_dbs_vars = set(
             re.findall(self._GENERIC_TARGET_DATABASE_NAME, source_code)
@@ -263,7 +243,7 @@ class DAGMetadataService:
         if target_dbs:
             if len(target_dbs) > 1:
                 logger.info(
-                    f"m=_get_dag_target_database_name, source={source}, context={context}, dag_name={dag_name}, "
+                    f"m=_get_dag_target_database_name, dag_name={dag_name}, "
                     f"target_dbs={target_dbs}, msg=Found more than 1 target db name "
                 )
 
@@ -271,13 +251,9 @@ class DAGMetadataService:
         else:
             return None
 
-    def get_dag_database_name(
-        self, source: str, context: str, dag_name: str, layer: str
-    ) -> Optional[str]:
+    def get_dag_database_name(self, dag_name: str, layer: str) -> Optional[str]:
         """
         Find the spark database name used in a dag for a given layer.
-        :param source: dag source
-        :param context: dag context
         :param dag_name: dag name
         :param layer: the datalake layer of interest
         :return: a string with the database name or None if not found
@@ -285,14 +261,14 @@ class DAGMetadataService:
         if dag_name in self._DAG_MANUAL_MAPPING:
             return self._DAG_MANUAL_MAPPING[dag_name][layer]["database_name"]
 
-        target_db_name = self._get_dag_target_database_name(source, context, dag_name)
+        target_db_name = self._get_dag_target_database_name(dag_name)
         if not target_db_name:
             return None
         try:
             LayerEnum(layer)
         except ValueError:
             logger.info(
-                f"m=get_dag_database_name, source={source}, context={context}, dag_name={dag_name}, layer={layer}, "
+                f"m=get_dag_database_name, dag_name={dag_name}, layer={layer}, "
                 f"msg=Invalid layer "
             )
             return None

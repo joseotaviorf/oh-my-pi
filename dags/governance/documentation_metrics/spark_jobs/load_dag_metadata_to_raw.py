@@ -26,26 +26,26 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def get_dag_metadata(
-    lineage_from_product_skip_list: Set[str], dag_manual_mapping: Dict, environment: str
+    lineage_from_product_skip_list: Set[str], dag_manual_mapping: Dict
 ) -> List[Dict[str, str]]:
     dags = []
     metadata_service = DAGMetadataService(dag_manual_mapping)
     for file in FileService.list_dag_files():
         source, context, dag = metadata_service.get_dag_info_from_path(file)
         if source not in lineage_from_product_skip_list:
-            layers = metadata_service.get_dag_layers(source, context, dag)
+            layers = metadata_service.get_dag_layers(dag)
             for layer in layers:
                 dags.append(
                     {
                         "layer": layer,
                         "dag_name": f"bietlejuice.{dag}",
                         "database_name": metadata_service.get_dag_database_name(
-                            source, context, dag, layer
+                            dag, layer
                         ),
                         "has_lineage_from_product": metadata_service.dag_has_lineage_from_product_config(
-                            source, context, dag, environment
+                            source, context, dag
                         ),
-                        "owner": metadata_service.get_dag_owner(source, context, dag),
+                        "owner": metadata_service.get_dag_owner(dag),
                     }
                 )
     return dags
@@ -55,15 +55,14 @@ def get_dag_metadata_df(
     spark_client: SparkClient,
     lineage_from_product_skip_list: Set[str],
     dag_manual_mapping: Dict,
-    env: str,
 ) -> DataFrame:
     dag_metadata_data = get_dag_metadata(
-        lineage_from_product_skip_list, dag_manual_mapping, env
+        lineage_from_product_skip_list, dag_manual_mapping
     )
 
     metadata_df = spark_client.create_dataframe(
         [Row(**row) for row in dag_metadata_data],
-        schema="layer string, dag_name string, database_name string, has_lineage_from_product boolean, owner string"
+        schema="layer string, dag_name string, database_name string, has_lineage_from_product boolean, owner string",
     ).drop("columns")
 
     return metadata_df
@@ -86,7 +85,7 @@ if __name__ == "__main__":
     execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
 
     logger.info(
-        f"""m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, source={source},
+        f"""m={JOB_NAME}, datalake_bucket={datalake_bucket}, source={source},
         table_name={table_name}, execution_date_str={execution_date_str}
         msg=Job execution started."""
     )
@@ -111,7 +110,7 @@ if __name__ == "__main__":
 
     # Creating metrics dataframe
     dag_metadata_df = get_dag_metadata_df(
-        spark_client, lineage_from_product_source_skip_list, dag_manual_mapping, env
+        spark_client, lineage_from_product_source_skip_list, dag_manual_mapping
     )
     dag_metadata_df = (
         SparkDataFrameService()
