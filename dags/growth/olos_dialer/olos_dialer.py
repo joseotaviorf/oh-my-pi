@@ -2,6 +2,7 @@ import os
 import re
 from datetime import datetime
 from pendulum import timezone
+from functools import reduce
 
 from airflow.models import DAG
 from airflow.utils.helpers import cross_downstream
@@ -54,6 +55,9 @@ def get_date_param(dag_run, ds, date_param_name):
         return date_param
     return ds
 
+def change_case(table_name):
+    table_name = table_name.replace('_', '')
+    return reduce(lambda x, y: x + ('_' if y.isupper() else '') + y, table_name).lower()
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -67,7 +71,10 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
-    user_defined_macros={"get_date_param": get_date_param},
+    user_defined_macros={
+        "get_date_param": get_date_param,
+        "change_case": change_case
+    },
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -110,7 +117,7 @@ for table_name in TABLES_LIST:
     clean_task_group = datalake_task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
-        table_name=table_name,
+        table_name="{{ change_case(table_name) }}",
         is_incremental=True,
         has_create_external_table_task=False,
         partitions=PARTITION_COLS,
