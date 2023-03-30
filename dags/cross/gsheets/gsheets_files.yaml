@@ -80,16 +80,6 @@ extra_invoice:
     sheet_name: extra_invoice
     clean_table_name: extra_invoice
 
-full_taxonomy:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Full_Taxonomy
-    clean_table_name: taxonomy_mkt_cost
-
-google_costs:
-    sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
-    sheet_name: Google Costs
-    clean_table_name: marketing_manual_costs_google
-
 google_searches_share_of_interest:
     sheet_id: 1eDqOTxQqgQOJVA6CnPa8ZuuriCaYe5MrUpFYni2BpeM
     sheet_name: google_searches_share_of_interest
@@ -110,16 +100,17 @@ ipsos_brandtracking_questions:
     sheet_name: ipsos_brandtracking_questions
     clean_table_name: ipsos_brandtracking_questions
 
-kenshoo_configuration:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Kenshoo_Configuration
-    clean_table_name: marketing_kenshoo_configuration
-
 ltvoutput:
     sheet_id: 1Nf02DF6oHWUAAael_9M1g8tJfeTdq92fGt78x5_qNbg
     sheet_name: LTVOutput
     clean_table_name: affiliates_monthly_expected_results
 
+<<<<<<< HEAD
+keys_logistic_pre_contract:
+    sheet_id: 1ge87PnLZDt16PME8mytPOHDs1uBbBrYxuGncrpuiwrg
+    sheet_name: keys_logistic_pre_contract
+    clean_table_name: keys_logistic_pre_contract
+=======
 marketing_costs_manual_costs_google:
     sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
     sheet_name: Google Costs
@@ -149,6 +140,7 @@ marketing_social_media_costs:
     sheet_id: 1yleDGeVtbzrT5rM0zo9AomOZKIGTOiYm-FK0_GNnGNs
     sheet_name: social_media_costs
     clean_table_name: marketing_social_media_costs
+>>>>>>> master
 
 marketshare_units_and_tenants:
     sheet_id: 1VGMK09ibXDkB85srTUbD8a4JsX6iA90BFmKWpon5nsE
@@ -165,10 +157,22 @@ media_plan:
     sheet_name: media_plan
     clean_table_name: media_plan_current_quarter
 
+<<<<<<< HEAD
+offboarding_customer_portfolio_contract:
+    sheet_id: 1x2dgpr3eemxnYft80JKRr3K_zlvgjvc-BjpIKaT2fe8
+    sheet_name: contracts
+    clean_table_name: offboarding_customer_portfolio_contract
+
+# photographer_account:
+#     sheet_id: 1eXKN9IQVCljTrZPQ8HEac6KwYcatr5XdQr_IiD-7RJ8
+#     sheet_name: photographer_account
+#     clean_table_name: photographer_account
+=======
 plaquinhas_installation_targets:
     sheet_id: 1GEaj4YMe9sgRiJmqgoJuOvkb8H8hjEcEgsTyv9GLzmg
     sheet_name: targets
     clean_table_name: plaquinhas_installation_targets
+>>>>>>> master
 
 promotional_bonus_segmentation_targets:
     sheet_id: 15SKrchR92WDs0I4Ia5_qmfkYl8jS6sutsAiX2HB445E
