@@ -1,5 +1,7 @@
 ---
 tables:
+  - table_name: dim_house_listing_lbc
+    partitions: [country_code]
   - table_name: lbc_house_listing
     partitions: [country_code]
 
@@ -9,3 +11,7 @@ custom_cluster:
   autoscale:
     min_workers: 1
     max_workers: 3
+
+inner_dependencies:
+  dim_house_listing_lbc:
+    - lbc_house_listing

@@ -1,0 +1,334 @@
+WITH b2b_info AS (
+    SELECT DISTINCT
+        h.id AS id_house,
+        hl.id_house_listing,
+        -- TODO [ODS]: centralize rules like these ones
+        COALESCE(
+            (COALESCE(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
+                OR (partner_agent.id IS NOT NULL AND partner.type = 'PRIME'))
+                AND partner_agent.status = 'ACTIVE',
+            FALSE
+            )
+        AS is_b2b,
+        CASE
+          WHEN partner_agent.status = 'INACTIVE'
+            THEN NULL
+          WHEN COALESCE(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
+            THEN 'online'
+          WHEN (partner_agent.id IS NOT NULL AND partner.type = 'PRIME')
+            THEN 'prime'
+        END AS b2b_type,
+        CASE
+            WHEN
+                -- because a lead can have both 'affiliate_type' = 'B2BPartner' AND 'partner_agent.id' not null AND we need to
+                -- prioritize the first type (online), the following check must be done
+                partner_agent.id IS NOT NULL
+                AND partner.type = 'PRIME'
+                AND COALESCE(lo.affiliate_type, l.affiliate_type, '') != 'B2BPartner'
+            THEN
+              CASE
+                WHEN pj.id IS NULL AND h.dt_first_publication IS NOT NULL
+                  THEN 'advanced_negotiation'
+                WHEN h.id_external IS NULL OR h.id_external RLIKE '^([a-zA-Z0-9]+-){{4}}[a-zA-Z0-9]+$'
+                  THEN 'standard'
+                WHEN h.id_external IS NOT NULL
+                  THEN 'batch'
+              END
+        END AS b2b_prime_type
+    FROM datalake_ebdb_clean.house h
+    LEFT JOIN datalake_ebdb_clean.conversion_lead cl
+        ON cl.id_house = h.id
+    LEFT JOIN datalake_ebdb_clean.lead l
+        ON l.id = cl.id_converted_lead
+    LEFT JOIN datalake_lead.reprocessed_lead rl
+        ON rl.id = l.id
+    LEFT JOIN datalake_lead.lead lo
+        ON lo.id = rl.id_origin_lead
+    LEFT JOIN datalake_ebdb_clean.partner_agent partner_agent
+        ON partner_agent.id_user = h.id_user
+    LEFT JOIN datalake_ebdb_clean.partner partner
+        ON partner.id = partner_agent.id_partner
+    LEFT JOIN datalake_listing_temp.lbc_house_listing hl
+        ON h.id = hl.id_house
+    LEFT JOIN datalake_ebdb_clean.photographer_job pj
+        ON pj.id_house = h.id
+    AND pj.ts_created BETWEEN hl.ts_listing_version_start AND hl.ts_listing_version_end
+),
+house_portability AS (
+    SELECT
+        hl.id_house_listing
+    FROM datalake_listing_temp.lbc_house_listing hl
+    JOIN datalake_ebdb_clean.portability por
+        ON por.id_house = hl.id_house AND por.owner_type = 'B2B'
+    WHERE por.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, now())
+),
+autonomous_agent_info AS (
+    SELECT
+        h.id AS id_house,
+        hl.id_house_listing AS sk_house_listing,
+        partner_agent.id_user AS sk_partner_agent,
+        partner_agent.id_partner AS sk_partner
+    FROM datalake_ebdb_clean.partner_agent partner_agent
+    JOIN datalake_ebdb_clean.partner partner
+        ON partner_agent.id_partner = partner.id
+    JOIN datalake_ebdb_clean.house h
+        ON partner_agent.id_user = h.id_user_registrant
+    LEFT JOIN datalake_listing_temp.lbc_house_listing hl
+        ON h.id = hl.id_house
+    LEFT JOIN datalake_ebdb_listing.listing_business_context lbc
+        ON lbc.id_house = h.id
+    WHERE
+        lbc.business_context <> 'SALE'
+        AND partner.type = 'AUTONOMOUS_AGENT'
+        AND partner.id <> '257' -- Test User
+        AND h.dt_creation >= partner_agent.ts_created --This rule might change WHEN we start to consider migration
+        AND h.id_external IS NOT NULL --This rule might change WHEN we start to consider migration
+),
+agents_with_keys AS (
+    SELECT
+        id_house_listing,
+        MIN(first_key_location) AS first_key_location,
+        MIN(is_keys_with_agent_eligible) AS is_keys_with_agent_eligible
+    FROM
+        datalake_ebdb_listing.agents_with_keys
+    GROUP BY 1
+),
+house_listings AS (
+    WITH lbc AS (
+        SELECT
+           id_house,
+           CAST(MAX(CAST((business_context = 'SALE') AS INTEGER)) AS BOOLEAN) AS is_for_sale,
+           CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent
+        FROM datalake_ebdb_listing.listing_business_context
+        GROUP BY 1
+    ),
+    rl AS (
+        SELECT
+            id_house,
+            rental_administrator,
+            MAX(ts_administrator_changed) AS ts_administrator_changed
+        FROM
+            datalake_ebdb_listing.rent_listing
+        GROUP BY 1, 2
+    )
+    SELECT
+        hl.id_house_listing AS sk_house_listing,
+        h.id AS id_house,
+        h.id % 892700000 AS short_id_house,
+        h.country_code,
+        hl.version,
+        awk.first_key_location,
+        CAST(hl.status AS STRING) AS status,
+        hl.status_reason,
+        awk.is_keys_with_agent_eligible,
+        hl.ts_listing_version_start,
+        hl.ts_listing_version_end,
+        h.dt_first_publication AS ts_house_first_publication,
+        h.ts_last_publication AS ts_house_last_publication,
+        CAST(hl.ts_listing_version_start AS DATE) AS ts_publication,
+        hl.ts_last_unpublished,
+        hl.rent,
+        rl.rental_administrator,
+        h.rent AS house_rent,
+        h.neighborhood AS house_neighborhood,
+        h.zipcode AS house_zipcode,
+        h.city AS house_city,
+        h.complement AS house_complement,
+        h.condo AS house_condo,
+        h.has_elevator AS house_elevator,
+        h.address AS house_address,
+        h.iptu AS house_iptu,
+        h.lat AS house_lat,
+        h.lng AS house_lng,
+        h.is_furnished AS is_house_furnished,
+        h.number AS house_number,
+        h.bathrooms AS house_bathrooms,
+        h.bedrooms AS house_bedrooms,
+        h.suites AS house_suites,
+        h.parking_slots AS house_garages,
+        h.status AS house_status,
+        h.type AS house_type,
+        h.doorman_type AS house_entrance,
+        h.parking_slot_type AS house_garage_type,
+        h.is_verified AS is_house_registration_verified,
+        h.total_value AS house_total_value,
+        h.total_area AS house_total_area,
+        h.land_area AS house_construction_area,
+        h.condo_type AS house_condo_type,
+        h.iptu_type AS house_iptu_type,
+        h.dt_creation AS ts_house_create,
+        h.ts_updated AS ts_house_update,
+        h.registration_abandoned_reason AS registration_abandoned_reason,
+        h.unpublished_reason AS house_unpublished_reason,
+        h.partner_3p_supply,
+        CASE
+            WHEN h.is_sale_3p_supply THEN h.partner_3p_supply
+        END AS partner_sale_3p_supply,
+        CASE
+            WHEN h.is_rent_3p_supply THEN h.partner_3p_supply
+        END AS partner_rent_3p_supply,
+        hl.listing_category,
+        hl.is_last_version,
+        hl.is_exclusive,
+        hl.who_is_living,
+        h.key_type,
+        h.key_location,
+        COALESCE(h.visit_restriction = 'Restriction', FALSE) AS has_visit_restriction,
+        h.predicted_price AS house_predicted_price,
+        hl.dt_last_exclusive_opted_in,
+        hl.dt_last_exclusive_opted_out,
+        hl.is_originals_active,
+        hl.last_originals_type,
+        hl.dt_last_originals_opted_in,
+        hl.dt_last_originals_opted_out,
+        hl.is_iorent_active,
+        hl.last_iorent_type,
+        hl.dt_last_iorent_opted_in,
+        hl.dt_last_iorent_opted_out,
+        h.sale_price,
+        CASE
+            WHEN lbc.id_house IS NULL
+                THEN TRUE -- When house is not in listing_business_context, it is for rent
+            ELSE COALESCE(lbc.is_for_rent, FALSE)
+        END AS is_for_rent,
+        COALESCE(lbc.is_for_sale, FALSE) AS is_for_sale,
+        h.has_instant_offer_enabled,
+        h.is_3p_supply,
+        h.is_sale_3p_supply,
+        h.is_rent_3p_supply,
+        h.is_3p_supply_5a,
+        h.is_3p_supply_bh,
+        h.is_casa_mineira_migration,
+        h.is_sale_primary_market,
+        rl.ts_administrator_changed,
+        hl.is_early_demand,
+        hl.ts_early_demand_started
+    FROM
+        datalake_ebdb_listing.house AS h
+    JOIN
+        datalake_listing_temp.lbc_house_listing AS hl
+            ON hl.id_house = h.id
+    LEFT JOIN lbc
+        ON lbc.id_house = h.id
+    LEFT JOIN rl
+        ON rl.id_house = lbc.id_house
+    LEFT JOIN
+        agents_with_keys AS awk
+            ON hl.id_house_listing = awk.id_house_listing
+)
+SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
+    hl.sk_house_listing,
+    COALESCE(aa_info.sk_partner_agent, -1) AS sk_autonomous_agent,
+    hl.id_house,
+    hl.short_id_house,
+    hl.country_code,
+    CAST(hl.version AS SMALLINT) AS version,
+    hlco.consultant_type,
+    hlco.first_consultant_type,
+    hl.first_key_location,
+    hl.status,
+    hl.status_reason,
+    CAST(hl.rent AS DECIMAL(14, 2)) AS rent,
+    IF(is_for_rent = TRUE, COALESCE(hl.rental_administrator, 'QUINTOANDAR'), rental_administrator) AS rental_administrator,
+    CAST(hl.house_rent AS DECIMAL(14, 2)) AS house_rent,
+    NULLIF(hl.house_neighborhood, '') AS house_neighborhood,
+    hl.house_zipcode,
+    hl.house_city,
+    NULLIF(hl.house_complement, '') AS house_complement,
+    CAST(hl.house_condo AS DECIMAL(14, 2)) AS house_condo,
+    CAST(hl.house_elevator AS SMALLINT) AS house_elevator,
+    hl.house_address,
+    CAST(hl.house_iptu AS DECIMAL(14, 2)) AS house_iptu,
+    CAST(hl.house_lat AS DECIMAL(14, 7)) AS house_lat,
+    CAST(hl.house_lng AS DECIMAL(14, 7)) AS house_lng,
+    hl.house_number,
+    CAST(hl.house_bathrooms AS SMALLINT) AS house_bathrooms,
+    CAST(hl.house_bedrooms AS SMALLINT) AS house_bedrooms,
+    CAST(hl.house_suites AS SMALLINT) AS house_suites,
+    CAST(hl.house_garages AS SMALLINT) AS house_garages,
+    hl.house_status,
+    hl.house_type,
+    hl.house_entrance,
+    hl.house_garage_type,
+    CAST(hlf.administration_fee AS FLOAT) AS administration_fee,
+    CAST(hl.house_total_value AS DECIMAL(14, 2)) AS house_total_value,
+    CAST(hl.house_total_area AS DECIMAL(14, 2)) AS house_total_area,
+    CAST(hl.house_construction_area AS DECIMAL(14, 2)) AS house_construction_area,
+    hl.house_condo_type,
+    hl.house_iptu_type,
+    hl.registration_abandoned_reason,
+    hl.house_unpublished_reason,
+    hl.partner_3p_supply,
+    hl.partner_sale_3p_supply,
+    hl.partner_rent_3p_supply,
+    hl.listing_category AS listing_category_start,
+    hl.who_is_living,
+    hl.key_type,
+    hl.key_location,
+    CAST(hl.house_predicted_price AS DECIMAL(14, 2)) AS house_predicted_price,
+    bi.b2b_type,
+    CASE
+      WHEN hp.id_house_listing IS NOT NULL THEN 'portability'
+      ELSE bi.b2b_prime_type
+    END AS b2b_prime_type,
+    hl.last_originals_type,
+    hl.last_iorent_type,
+    CAST(hl.sale_price AS LONG) AS sale_price,
+    hl.has_visit_restriction,
+    hl.has_instant_offer_enabled,
+    hl.is_house_furnished,
+    hl.is_house_registration_verified,
+    hl.is_keys_with_agent_eligible,
+    hl.is_last_version,
+    hl.is_exclusive,
+    (bi.is_b2b OR hp.id_house_listing IS NOT NULL) AS is_b2b,
+    COALESCE(aa_info.sk_partner_agent IS NOT NULL, FALSE) AS is_autonomous_agent,
+    hl.is_originals_active,
+    hl.is_iorent_active,
+    hl.is_for_rent,
+    hl.is_for_sale,
+    hl.is_3p_supply,
+    hl.is_sale_3p_supply,
+    hl.is_rent_3p_supply,
+    hl.is_3p_supply_5a,
+    hl.is_3p_supply_bh,
+    hl.is_casa_mineira_migration,
+    hl.is_sale_primary_market,
+    COALESCE(hl.is_early_demand, FALSE) AS is_early_demand,
+    hlco.dt_consultant_started,
+    hl.dt_last_exclusive_opted_in,
+    hl.dt_last_exclusive_opted_out,
+    hl.dt_last_originals_opted_in,
+    hl.dt_last_originals_opted_out,
+    hl.dt_last_iorent_opted_in,
+    hl.dt_last_iorent_opted_out,
+    hl.ts_early_demand_started,
+    hlco.ts_consultant_deleted,
+    hl.ts_listing_version_start,
+    hl.ts_listing_version_end,
+    CAST(hl.ts_publication AS TIMESTAMP) AS ts_publication,
+    hl.ts_house_first_publication,
+    hl.ts_house_last_publication,
+    hl.ts_last_unpublished AS ts_last_de_publication,
+    hl.ts_house_create,
+    hl.ts_house_update,
+    hl.ts_administrator_changed,
+    NOW() AS ts_load
+FROM
+    house_listings hl
+LEFT JOIN
+    b2b_info bi
+        ON bi.id_house_listing = hl.sk_house_listing
+LEFT JOIN
+    house_portability hp
+        ON hp.id_house_listing = hl.sk_house_listing
+LEFT JOIN
+    autonomous_agent_info aa_info
+        ON aa_info.sk_house_listing = hl.sk_house_listing
+LEFT JOIN
+    datalake_ebdb_listing.house_listing_fees AS hlf
+        ON hl.sk_house_listing = hlf.id_house_listing
+LEFT JOIN
+    datalake_big_agent.house_rent_listing_consultant AS hlco
+        ON hlco.id_house_listing = hl.sk_house_listing
+        AND hlco.is_last_ciq_on_listing IS TRUE

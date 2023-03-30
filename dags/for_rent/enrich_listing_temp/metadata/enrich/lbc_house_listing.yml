@@ -31,6 +31,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.status
     description: Listing status.
+  status_reason:
+    lineage:
+      - datalake_ebdb_listing.lbc_status_version_order.status_reason
+    description: Listing status reason.
   rent:
     lineage:
       - datalake_ebdb_clean.house_aud.rent

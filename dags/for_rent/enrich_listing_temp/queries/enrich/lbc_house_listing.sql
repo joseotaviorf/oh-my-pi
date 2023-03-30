@@ -1,6 +1,3 @@
--- Criar coluna com o último status da versão?
--- Criar coluna 
-
 WITH house_aud AS (
 --------------------------------------------------------------------------------------------------------
 -- Bring to IMOVEL_AUD datetime for each revision made                                                --
@@ -62,6 +59,7 @@ house_status_version_last_status AS (
           END
         ) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS ts_last_unpublished,
         IF(ms_o.max_order_status IS NOT NULL, lbc_vo.status, NULL) AS last_status,
+        IF(ms_o.max_order_status IS NOT NULL, lbc_vo.status_reason, NULL) AS last_status_reason,
         MAX(lbc_vo.state_order) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS max_order_status_version
     FROM 
       datalake_ebdb_listing.lbc_status_version_order lbc_vo
@@ -98,11 +96,12 @@ house_listing_plain as (
         hs_v.listing_version AS version,
         sc_v.category_change AS change_version_status,
         hs_v.ts_last_unpublished,
-        MAX(hs_v.previous_status) AS status_history,
-        MAX(hs_v.ts_state_started) AS ts_status_changed,
-        MAX(hs_v.last_status) AS status,
-        MIN(hs_v.ts_state_started) AS ts_listing_version_start,
-        MAX(COALESCE(hs_v.ts_state_ended, CAST('2200-01-01 12:00:00' AS TIMESTAMP))) AS ts_listing_version_end
+        MAX(hs_v.previous_status)/* OVER(PARTITION BY hs_v.id_house, hs_v.listing_version ORDER BY hs_v.ts_state_started)*/ AS status_history, --TODO: Checar a razão desse MAX
+        MAX(hs_v.ts_state_started)/* OVER(PARTITION BY hs_v.id_house, hs_v.listing_version)*/ AS ts_status_changed, --TODO: Checar a razão disso
+        MAX(hs_v.last_status)/* OVER(PARTITION BY hs_v.id_house, hs_v.listing_version ORDER BY hs_v.ts_state_started)*/ AS status, --TODO: Checar a razão desse MAX
+        MAX(hs_v.last_status_reason) AS status_reason,
+        MIN(hs_v.ts_state_started)/* OVER(PARTITION BY hs_v.id_house, hs_v.listing_version)*/ AS ts_listing_version_start,
+        MAX(COALESCE(hs_v.ts_state_ended, CAST('2200-01-01 12:00:00' AS TIMESTAMP)))/* OVER(PARTITION BY hs_v.id_house, hs_v.listing_version)*/ AS ts_listing_version_end
     FROM
       house_status_version_last_status AS hs_v
     LEFT JOIN 
@@ -127,6 +126,7 @@ house_listing_full AS (
              ELSE NULL 
         END AS listing_category,
         status,
+        status_reason,
         status_history,
         ts_status_changed,
         ts_listing_version_start,
@@ -309,6 +309,7 @@ house_listing AS (
         hl.country_code,
         hl.version,
         hl.status,
+        hl.status_reason,
         rent_last.rent,
         hl.listing_category,
         lsc_originals.special_condition_type as last_originals_type,
@@ -559,6 +560,7 @@ SELECT
     hl.country_code,
     hl.version,
     hl.status,
+    hl.status_reason,
     hl.rent,
     hl.listing_category,
     hl.last_originals_type,
