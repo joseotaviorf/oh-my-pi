@@ -7,7 +7,7 @@ columns:
   sk_propose_values:
     lineage:
     - datalake_velo.propose_values.id_propose_values
-    description: ''
+    description: Propose values id 
   subscription_type:
     lineage:
     - datalake_velo.propose_values.subscription_type
@@ -19,7 +19,7 @@ columns:
   plan_type:
     lineage:
     - datalake_velo.propose_values.plan_type
-    description: ''
+    description: Category type of the real estate
     categories:
       Comercial: ''
       Residencial: ''
@@ -47,43 +47,43 @@ columns:
   monthly_guarantee:
     lineage:
     - datalake_velo.propose_values.monthly_guarantee
-    description: ''
+    description: Monthly total amount of the guarantee
   annual_guarantee:
     lineage:
     - datalake_velo.propose_values.annual_guarantee
-    description: ''
+    description: Annual total amount of the guarantee 
   rent_amount:
     lineage:
     - datalake_velo.propose_values.rent_amount
-    description: ''
+    description: Rent amount
   condo_amount:
     lineage:
     - datalake_velo.propose_values.condo_amount
-    description: ''
+    description: Condo amount
   light_amount:
     lineage:
     - datalake_velo.propose_values.light_amount
-    description: ''
+    description: Light amount
   water_amount:
     lineage:
     - datalake_velo.propose_values.water_amount
-    description: ''
+    description: Water amount
   phone_amount:
     lineage:
     - datalake_velo.propose_values.phone_amount
-    description: ''
+    description: Phone amount
   iptu_amount:
     lineage:
     - datalake_velo.propose_values.iptu_amount
-    description: ''
+    description: IPTU amount
   other_amount:
     lineage:
     - datalake_velo.propose_values.other_amount
-    description: ''
+    description: Other amount
   total_package_amount:
     lineage:
     - datalake_velo.propose_values.total_package_amount
-    description: ''
+    description: Total package amount
   plan_percent:
     lineage:
     - datalake_velo.propose_values.plan_percent
@@ -91,14 +91,14 @@ columns:
   plan_coverage:
     lineage:
     - datalake_velo.propose_values.plan_coverage
-    description: ''
+    description: Plan coverage
   plan_damage:
     lineage:
     - datalake_velo.propose_values.plan_damage
-    description: ''
+    description: Plan damage
   plan_commission:
     lineage:
     - datalake_velo.propose_values.plan_commission
-    description: ''
+    description: Plan commission
   ts_load:
-    description: ''
+    description: load date
