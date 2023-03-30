@@ -14,7 +14,7 @@ columns:
     description: Twilio's channel ID
   id_session:
     lineage:
-      - datalake_quinto_messenger_clean.chat.source_id
+      - datalake_quinto_messenger_clean.chat.id_source
     description: Sauron's session ID
   source:
     lineage:

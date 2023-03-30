@@ -10,7 +10,7 @@ WITH last_updated_chat AS (
 SELECT
     id AS id_chat,
     GET_JSON_OBJECT(attributes,'$.channel_sid') AS id_channel,
-    source_id AS id_session,
+    id_source AS id_session,
     source,
     status AS session_status,
     ts_created,
