@@ -2906,6 +2906,7 @@ bietlejuice.reverse_nazare:
 
 bietlejuice.reverse_nps_reversion:
   - bietlejuice.enrich_nps_reversion:load-enrich-offboarding-tenant-predictions
+  - bietlejuice.enrich_nps_reversion:load-enrich-offboarding-landlord-predictions
 
 bietlejuice.reverse_tracksale:
   - bietlejuice.docx:load-clean-credit-evaluation

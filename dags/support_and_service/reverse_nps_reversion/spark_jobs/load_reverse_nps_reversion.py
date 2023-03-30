@@ -10,7 +10,7 @@ JOB_NAME = "load_reverse_nps_reversion"
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
-    logger = QuintoAndarLogger("AmplitudeAPIClient")
+    logger = QuintoAndarLogger("MinorityReportAPIClient")
 
     parser.add_argument("environment")
     parser.add_argument("datalake_bucket")
@@ -54,6 +54,6 @@ if __name__ == "__main__":
             data=json.dumps(data),
         )
         if resp.status_code == 200:
-            logger.info(f"Succesfully loaded row {row}")
+            logger.info(f" Succesfully loaded row {row}")
         else:
             logger.info(resp.raise_for_status())

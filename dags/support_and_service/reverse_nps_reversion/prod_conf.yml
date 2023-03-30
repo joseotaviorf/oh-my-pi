@@ -4,3 +4,6 @@ tables_to_send:
   offboarding_tenant_predictions:
     key_name: contractId
     type: PREDICTION_NPS_DETRACTOR_TENANT
+  offboarding_landlord_predictions:
+    key_name: contractId
+    type: PREDICTION_NPS_DETRACTOR_LANDLORD
