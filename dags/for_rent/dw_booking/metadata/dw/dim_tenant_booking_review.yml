@@ -98,4 +98,5 @@ columns:
     lineage:
     - datalake_booking.booking_review.does_want_same_agent
     description: If tenant wants to be attended by the same agent on  future visits
-    
+  ts_load:
+    description: Timestamp in which the register was loaded in database

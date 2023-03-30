@@ -1,8 +1,9 @@
 database_name: dw_public
 table_name: fact_photo_job
-description: Fact table that contains each photo job created and keys associated with.
-domain: Support and Service
-owner: ae-ss@quintoandar.com.br
+description: Fact table that contains each photo job created and keys associated with
+domain: For Rent
+owner: gustavo.geiger@quintoandar.com.br
+
 columns:
   id_photo_job:
     lineage:
@@ -172,7 +173,7 @@ columns:
   is_anticipated:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.is_job_anticipated
-    description: ''
+    description: Boolean indicating if the job was anticipated
   flg_job_on_time:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.is_job_on_time
@@ -180,11 +181,11 @@ columns:
   approved:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.is_approved
-    description: ''
+    description: Boolean indicating if the job was approved
   confirmed:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.is_confirmed
-    description: ''
+    description: Boolean indicating if the job was confirmed
   lockbox:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.has_lockbox
@@ -205,7 +206,7 @@ columns:
   sk_date_job_issued:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.ts_photo_job_requested
-    description: ''
+    description: Date when the job was requested
   sk_date_shoot_started:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.ts_session_started
@@ -221,11 +222,11 @@ columns:
   sk_date_updated:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.ts_updated
-    description: ''
+    description: Update date of photojob
   sk_date_photographer_start:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.dt_photographer_started
-    description: ''
+    description: Date when photographer has started working in QuintoAndar
   sk_date_user_cancel:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.ts_problem_reported
@@ -233,7 +234,7 @@ columns:
   sk_date_problem_reported:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.ts_canceled
-    description: ''
+    description: Date when the job was canceled
   creation_to_scheduling_diff_minutes:
     lineage:
     - datalake_ebdb_listing_jobs.photo_job.creation_to_scheduling_diff_minutes

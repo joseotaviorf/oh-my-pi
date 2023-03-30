@@ -143,6 +143,6 @@ columns:
     description: Count of New Rentals, on the week, in houses which already had a
       previous contract signed | additive.
   ts_load:
-    description: ''
+    description: Timestamp in which the register was loaded in database
   visits_booked_per_ongoing_listings_weekly:
     description: Sum of visits booked divided by the total of ongoing listings
