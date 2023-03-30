@@ -4,9 +4,26 @@ table_name: str(min=1, max=280)
 owner: regex('(?:[\.-]?\w+)*@\w+(?:[\.-]?\w+)*')
 domain: str(min=1, max=280)
 description: str()
-columns: map(include("column"), key=str(min=1, max=280))
+columns: map(include("column_with_dimension"), include("column_with_metric"), key=str(min=1, max=280))
 ---
-column:
+column_with_dimension:
   description: str()
   lineage: list(str(min=1, max=280), required=False)
   categories: map(str(), key=str(), required=False)
+  dimension: bool()
+---
+column_with_metric:
+  description: str()
+  lineage: list(str(min=1, max=280), required=False)
+  categories: map(str(), key=str(), required=False)
+  metric: include("metric")
+---
+metric:
+  name: str(min=1, max=280)
+  description: str()
+  acronym: str()
+  is_additive: bool()
+  business_stage: str()
+  hierarchy: str()
+  approved_by: regex('(?:[\.-]?\w+)*@\w+(?:[\.-]?\w+)*')
+  link_to_metric: str(required=False)
