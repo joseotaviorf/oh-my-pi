@@ -64,7 +64,7 @@ task AS (
     t.id_chat,
     t.agent_email,
     tt.department,
-    t.task_completion_reason,
+    t.completion_reason,
     LAG(tt.department, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) AS transferred_from_dept,
     LEAD(tt.department, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) AS transferred_to_dept,
     CASE
