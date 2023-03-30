@@ -1,7 +1,7 @@
 {
   "DOC_MD_BASE_URL": "DOC_MD_BASE_URL",
   "environment": "forno",
-  "artifacts_bucket": " s3://artifacts.s3.forno.data.quintoandar.com.br",
+  "artifacts_bucket": "s3://artifacts.s3.forno.data.quintoandar.com.br",
   "databricks_s3_bucket": "databricks.s3.forno.data.quintoandar.com.br",
   "datalake_bucket": "datalake.s3.forno.data.quintoandar.com.br",
   "dw_bucket": "dw.s3.forno.data.quintoandar.com.br",

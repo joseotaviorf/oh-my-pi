@@ -12,17 +12,19 @@ _clone-airflow-plugins:
 
 .PHONY: setup-local-variables
 setup-local-variables:
+## receives and sets up local shell variables to store token credentials used in the local Airflow environment.
+## Variables are set either into ~/.zshrc or into ~/.bashrc, according to the default shell terminal used.
 	@echo "Setting up local variables"
 	@echo "=========="
 	@if [ -z "${GITHUB_TOKEN}" ]; then\
 		if [ -f $$HOME/.zshrc ]; then SHELL_RC="$$HOME/.zshrc"; else SHELL_RC="$$HOME/.bashrc"; fi;\
-		printf 'Enter your GitHub token \e]8;;https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\e\\[more info]\e]8;;\e\\: ';\
+		printf 'Enter your GitHub token \e]8;;https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\e\\[click here for info]\e]8;;\e\\: ';\
 		read -r GITHUB_TOKEN;\
 		echo export GITHUB_TOKEN=$$GITHUB_TOKEN >> $$SHELL_RC;\
 	fi
 	@if [ -z "${DATABRICKS_TOKEN}" ]; then\
 		if [ -f $$HOME/.zshrc ]; then SHELL_RC="$$HOME/.zshrc"; else SHELL_RC="$$HOME/.bashrc"; fi;\
-		printf 'Enter your Databricks token \e]8;;https://docs.databricks.com/dev-tools/api/latest/authentication.html#generate-a-personal-access-token\e\\[more info]\e]8;;\e\\: ';\
+		printf 'Enter your Databricks token \e]8;;https://docs.databricks.com/dev-tools/api/latest/authentication.html#generate-a-personal-access-token\e\\[click here for info]\e]8;;\e\\: ';\
 		read -r DATABRICKS_TOKEN;\
 		echo export DATABRICKS_TOKEN=$$DATABRICKS_TOKEN >> $$SHELL_RC;\
 	fi
