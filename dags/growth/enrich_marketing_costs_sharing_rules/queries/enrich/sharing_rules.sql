@@ -245,3 +245,59 @@ SELECT
     share,
     funnel_side
 FROM datalake_marketing_costs_sharing_rules.s032s
+UNION ALL
+SELECT
+    id_date,
+    id_rule,
+    city_group,
+    share,
+    funnel_side
+FROM datalake_marketing_costs_sharing_rules.d038d
+UNION ALL
+SELECT
+    id_date,
+    id_rule,
+    city_group,
+    share,
+    funnel_side
+FROM datalake_marketing_costs_sharing_rules.d039d
+UNION ALL
+SELECT
+    id_date,
+    id_rule,
+    city_group,
+    share,
+    funnel_side
+FROM datalake_marketing_costs_sharing_rules.d040d
+UNION ALL
+SELECT
+    id_date,
+    id_rule,
+    city_group,
+    share,
+    funnel_side
+FROM datalake_marketing_costs_sharing_rules.d041d
+UNION ALL
+SELECT
+    id_date,
+    id_rule,
+    city_group,
+    share,
+    funnel_side
+FROM datalake_marketing_costs_sharing_rules.d042d
+UNION ALL
+SELECT
+    id_date,
+    id_rule,
+    city_group,
+    share,
+    funnel_side
+FROM datalake_marketing_costs_sharing_rules.d043d
+UNION ALL
+SELECT
+    id_date,
+    id_rule,
+    city_group,
+    share,
+    funnel_side
+FROM datalake_marketing_costs_sharing_rules.d044d

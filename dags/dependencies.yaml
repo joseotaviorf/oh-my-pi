@@ -2145,6 +2145,7 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
 
 bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.gsheets.growth_intraday:done-clean-marketing-name-convention-shared-costs

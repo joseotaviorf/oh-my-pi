@@ -1,0 +1,26 @@
+---
+database_name: datalake_marketing_costs_sharing_rules
+table_name: d038d
+owner: '@data-growth'
+domain: Growth
+description: Cost allocation among nTPs for the cities of RMSP, Rio de Janeiro, Porto Alegre, Belo Horizonte, Ribeirão Preto, Santos, Brasília, and Campinas assigned to UTM d038d.D.ACQ.Rent.App.Android.Firebase
+columns:
+  id_date:
+    description: Date of applied share
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  id_rule: 
+    description: Id rule
+    categories: 
+      d023d: ''
+  city_group:
+    description: city_group segmentation
+    lineage:
+      - datalake_region.region.city_group
+  share: 
+    description: Percentage of cost that will be applied to specific city_group
+  funnel_side: 
+    description: Marketplace side of business
+    categories: 
+      demand: ''
+      supply: ''
