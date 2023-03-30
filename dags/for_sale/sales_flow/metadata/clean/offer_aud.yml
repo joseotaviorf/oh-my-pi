@@ -51,7 +51,19 @@ columns:
   final_price:
     description: Sale price agreed between buyer and seller.
     lineage:
-      - datalake_sales_flow_raw.offer.final_price
+      - datalake_sales_flow_raw.offer_aud.final_price
+  itbi_price:
+    description: Value on registered on ITBI.
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.itbi_price
+  registry_price:
+    description: Property registry price.
+    lineage:
+      - datalake_sales_flow_raw.offer.registry_price
+  deed_price:
+    description: Property price in the deed.
+    lineage:
+      - datalake_sales_flow_raw.offer.deed_price
   discard_reason:
     description: Reason why this offer was discarded.
     lineage:
@@ -60,6 +72,10 @@ columns:
     description: Offer status.
     lineage:
       - datalake_sales_flow_raw.offer_aud.status
+  has_used_offer_suggestion:
+    description: Flag that indicates if this user came from a carrousel showing properties with porperties like the one he is looking for.
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.used_offer_suggestion
   mod_id_sales_flow:
     description:  Flag indicating if the column id_sales_flow has changed.
     lineage:
@@ -108,6 +124,18 @@ columns:
     description: Flag indicating if the final_price phone has changed.
     lineage:
       - datalake_sales_flow_raw.offer_aud.final_price_mod
+  mod_itbi_price:
+    description: Flag indicating if the itbi_price phone has changed.
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.itbi_price_mod
+  mod_registry_price:
+    description: Flag indicating if the registry_price phone has changed.
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.registry_price_mod
+  mod_deed_price:
+    description: Flag indicating if the itbi_price phone has changed.
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.deed_price_mod
   mod_discard_reason:
     description: Flag indicating if the discard_reason phone has changed.
     lineage:
@@ -116,6 +144,10 @@ columns:
     description: Flag indicating if the mod_discard_reason phone has changed.
     lineage:
       - datalake_sales_flow_raw.offer_aud.status_mod
+  mod_has_used_offer_suggestion:
+    description: Flag indicating if the column has_used_offer_suggestion has changed.
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.used_offer_suggestion_mod
   dt_proposed:
     description: Offer proposal date.
     lineage:

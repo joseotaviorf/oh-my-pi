@@ -48,6 +48,14 @@ columns:
     description: Reason why this offer was canceled.
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.closing_canceled_reason
+  buyer_canceled_reason:
+    description: Reason why the buyer canceled the offer.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.buyer_canceled_reason
+  buyer_canceled_comment:
+    description: Buyer comment on why the the offer was canceled.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.buyer_canceled_comment
   rev:
     description: Unique id for this modification and can be joined with table rev_info to get more details.
     lineage:
@@ -108,6 +116,14 @@ columns:
     description: Flag indicating if the column closing_canceled_reason has changed.
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.closing_canceled_reason_mod
+  mod_buyer_canceled_reason:
+    description: Reason why the buyer canceled the offer.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.mod_buyer_canceled_reason
+  mod_buyer_canceled_comment:
+    description: Buyer comment on why the the offer was canceled.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.mod_buyer_canceled_comment
   mod_is_canceled:
     description: Flag indicating if the column is_canceled has changed.
     lineage:

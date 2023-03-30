@@ -6,7 +6,7 @@ SELECT
     total,
     deposit,
     entry,
-    fgts,
+    fgts_value,
     financing,
     brokerage,
     status,

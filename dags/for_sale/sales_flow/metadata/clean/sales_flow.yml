@@ -44,6 +44,14 @@ columns:
     description: Which macro status this offer currently is.
     lineage:
       - datalake_sales_flow_raw.sales_flow.status
+  buyer_canceled_reason:
+    description: Reason why the buyer canceled the offer.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.buyer_canceled_reason
+  buyer_canceled_comment:
+    description: Buyer comment on why the the offer was canceled.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.buyer_canceled_comment
   closing_canceled_reason:
     description: Reason why this offer was canceled.
     lineage:

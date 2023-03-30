@@ -30,6 +30,8 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `cash_payment_aud`
 `ccv`
 `ccv_aud`
+`ccv_edition_reason`
+`ccv_edition_reason_aud`
 `closing_type`
 `closing_type_aud`
 `ccv_flow`

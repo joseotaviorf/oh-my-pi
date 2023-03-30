@@ -31,9 +31,9 @@ columns:
   entry:
     lineage:
       - datalake_sales_flow_raw.payment_aud.entry
-  fgts:
+  fgts_value:
     lineage:
-      - datalake_sales_flow_raw.payment_aud.fgts
+      - datalake_sales_flow_raw.payment_aud.fgts_value
   financing:
     lineage:
       - datalake_sales_flow_raw.payment_aud.financing
@@ -61,9 +61,9 @@ columns:
   mod_entry:
     lineage:
       - datalake_sales_flow_raw.payment_aud.entry_mod
-  mod_fgts:
+  mod_fgts_value:
     lineage:
-      - datalake_sales_flow_raw.payment_aud.fgts_mod
+      - datalake_sales_flow_raw.payment_aud.fgts_value_mod
   mod_financing:
     lineage:
       - datalake_sales_flow_raw.payment_aud.financing_mod

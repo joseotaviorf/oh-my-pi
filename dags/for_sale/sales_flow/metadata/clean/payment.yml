@@ -22,9 +22,9 @@ columns:
   entry:
     lineage:
       - datalake_sales_flow_raw.payment.entry
-  fgts:
+  fgts_value:
     lineage:
-      - datalake_sales_flow_raw.payment.fgts
+      - datalake_sales_flow_raw.payment.fgts_value
   financing:
     lineage:
       - datalake_sales_flow_raw.payment.financing

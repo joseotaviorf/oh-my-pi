@@ -36,6 +36,18 @@ columns:
     description: Sale price agreed between buyer and seller.
     lineage:
       - datalake_sales_flow_raw.offer.final_price
+  itbi_price:
+    description: Value on registered on ITBI.
+    lineage:
+      - datalake_sales_flow_raw.offer.itbi_price
+  registry_price:
+    description: Property registry price.
+    lineage:
+      - datalake_sales_flow_raw.offer.registry_price
+  deed_price:
+    description: Property price in the deed.
+    lineage:
+      - datalake_sales_flow_raw.offer.deed_price
   discard_reason:
     description: Reason why this offer was discarded.
     lineage:
@@ -44,6 +56,10 @@ columns:
     description: Offer status.
     lineage:
       - datalake_sales_flow_raw.offer.status
+  has_used_offer_suggestion:
+    description: Flag that indicates if this user came from a carrousel showing properties with porperties like the one he is looking for.
+    lineage:
+      - datalake_sales_flow_raw.offer.used_offer_suggestion
   dt_proposed:
     description: Offer proposal date.
     lineage:
