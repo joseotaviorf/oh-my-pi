@@ -1,0 +1,46 @@
+database_name: datalake_health_metrics
+table_name: dag_execution_metrics
+owner: marcio.gomes@quintoandar.com.br
+domain: Data Growth
+description: WIP
+columns:
+  dag_name:
+    description: WIP
+    lineage:
+      - datalake_composer_clean.log.id_dag
+  dag_owner:
+    description: WIP
+    lineage:
+      - datalake_composer_clean.dag.owners
+  dag_layer:
+    description: WIP
+    lineage:
+      - datalake_dag_inventory_clean.table
+  dt_executed:
+    description: WIP
+    lineage:
+      - datalake_composer_clean.log.ts_executed
+  ts_dag_started:
+    description: WIP
+    lineage:
+      - datalake_composer_clean.log.ts_event
+  ts_dag_ended:
+    description: WIP
+    lineage:
+      - datalake_composer_clean.log.ts_event
+  duration_in_minutes:
+    description: WIP
+    lineage:
+      - datalake_composer_clean.log.ts_event
+  ts_median_started:
+    description: WIP
+    lineage:
+      - datalake_composer_clean.log.ts_event
+  ts_median_ended:
+    description: WIP
+    lineage:
+      - datalake_composer_clean.log.ts_event
+  duration_median_in_minutes:
+    description: WIP
+    lineage:
+      - datalake_composer_clean.log.ts_event
