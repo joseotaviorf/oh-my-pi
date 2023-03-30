@@ -1,0 +1,57 @@
+---
+table_name: datalake_search_session_event.search_session_event
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_amplitude:
+    is_complete:
+      severity_level: Error
+  event_type:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - Search
+        - Listing Page Viewed
+  search_rendering_type:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - Client Search
+        - Server-Side Rendering (SSR)
+        - N/A
+  business_context:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - sale
+        - rent
+        - unknown
+  utm_source:
+    is_complete:
+      severity_level: Error
+  utm_medium:
+    is_complete:
+      severity_level: Error
+  platform:
+    is_complete:
+      severity_level: Error
+  base_referrer_url:
+    is_complete:
+      severity_level: Error
+  search_location_type:
+    is_complete:
+      severity_level: Error
+  search_view_mode:
+    is_complete:
+      severity_level: Error
+  search_sort_order:
+    is_complete:
+      severity_level: Error
+  nr_session_for_user_on_day:
+    is_complete:
+      severity_level: Error
+  ts_event:
+    is_complete:
+      severity_level: Error

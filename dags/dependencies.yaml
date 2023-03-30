@@ -2607,6 +2607,10 @@ bietlejuice.enrich_sap:
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
 
+bietlejuice.enrich_search_session_event:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.ebdb:create-clean-region-in-data-lake
+
 bietlejuice.enrich_seo_funnel:
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
