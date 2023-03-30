@@ -34,7 +34,7 @@ columns:
   accrual_year_month:
     description: "Reference year-month"
     lineage:
-      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko.invoice.accrual_year_month
   dt_created:
     description: "Date of when anticipation was created"
     lineage:

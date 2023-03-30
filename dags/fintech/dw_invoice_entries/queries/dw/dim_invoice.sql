@@ -17,7 +17,7 @@ SELECT
     DATE(il.ts_paid) AS dt_paid,
     NOW() AS ts_load
 FROM
-    datalake_retsuko.invoice il
+    datalake_retsuko.invoice_info il
 LEFT JOIN
-    datalake_retsuko_clean.invoice i
+    datalake_retsuko.invoice i
         ON il.id_invoice = i.id_external

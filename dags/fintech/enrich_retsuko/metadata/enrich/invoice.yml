@@ -1,39 +1,83 @@
+---
 database_name: datalake_retsuko
 table_name: invoice
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: "TODO FINISH DESCRIPTIONS"
 columns:
-  id_invoice:
+  id:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko_clean.invoice.id
+  id_external:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.invoice.id_external
-  invoice_frequency:
+  id_account:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.invoice.purpose
-  payment_status:
+      - datalake_retsuko_clean.invoice.id_account
+  id_contract:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko_clean.invoice.id_contract
+  status:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.invoice.status
   substatus:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.invoice.substatus
   negotiation_status:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.invoice.negotiation_status
-  closing_mode:
-    lineage:
-      - datalake_retsuko_clean.invoice.closing_mode
   paid_via:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.invoice.paid_via
-  invoice_user:
+  purpose:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.account.type
-  ts_sent:
+      - datalake_retsuko_clean.invoice.purpose
+  closing_mode:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.invoice.ts_sent
-  ts_due:
+      - datalake_retsuko_clean.invoice.closing_mode
+  due_amount:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.invoice.ts_due
+      - datalake_retsuko_clean.invoice.due_amount
+  paid_amount:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko_clean.invoice.paid_amount
+  accrual_year_month:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
   ts_paid:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.invoice.ts_paid
   ts_canceled:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.invoice.ts_canceled
+  ts_sent:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_sent
+  ts_due:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_due
+  ts_created:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_created
+  ts_retsuko_updated:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_retsuko_updated

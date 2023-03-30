@@ -1,6 +1,6 @@
 WITH brokerage_fee AS (
     WITH rental_brokerage_fee AS (
-        SELECT 
+        SELECT
             c.sk_contract AS id_contract_ebdb,
             die.id AS id_invoice_entry,
             'quintoandar' AS brokerage_share,
@@ -16,21 +16,21 @@ WITH brokerage_fee AS (
             DATE(di.ts_paid) AS dt_paid,
             c.dt_start AS dt_contract_start
         FROM datalake_invoice.invoice_entries fie
-        INNER JOIN datalake_retsuko.invoice_entry die 
+        INNER JOIN datalake_retsuko.invoice_entry die
             ON fie.id = die.id
-        LEFT JOIN datalake_retsuko.invoice di 
+        LEFT JOIN datalake_retsuko.invoice_info di
             ON di.id_invoice = fie.id_invoice
-        LEFT JOIN datalake_retsuko_clean.invoice i
+        LEFT JOIN datalake_retsuko.invoice i
             ON di.id_invoice = i.id_external
-        LEFT JOIN dw_public.dim_contract c 
+        LEFT JOIN dw_public.dim_contract c
             ON c.sk_contract = fie.id_contract
-        LEFT JOIN datalake_ebdb_clean.contract_partnership_data p 
+        LEFT JOIN datalake_ebdb_clean.contract_partnership_data p
             ON c.sk_contract = p.id_contract
-        LEFT JOIN datalake_ebdb_clean.contract ct 
+        LEFT JOIN datalake_ebdb_clean.contract ct
             ON c.sk_contract = ct.id
-        WHERE 
+        WHERE
             die.from_account_type NOT IN ('quinto andar', 'contract expenses')
-        AND 
+        AND
             di.payment_status <> 'canceled'
         AND
             die.entry_type IN ('brokerage quinto andar')
@@ -38,7 +38,7 @@ WITH brokerage_fee AS (
         1,2,3,4,5,6,7,8,11,12,13,14
     ),
     rental_agents_commission AS (
-        SELECT 
+        SELECT
             c.sk_contract AS id_contract_ebdb,
             die.id AS id_invoice_entry,
             'rental agents' AS brokerage_share,
@@ -54,21 +54,21 @@ WITH brokerage_fee AS (
             DATE(di.ts_paid) AS dt_paid,
             c.dt_start AS dt_contract_start
         FROM datalake_invoice.invoice_entries fie
-        INNER JOIN datalake_retsuko.invoice_entry die 
+        INNER JOIN datalake_retsuko.invoice_entry die
             ON fie.id = die.id
-        LEFT JOIN datalake_retsuko.invoice di 
+        LEFT JOIN datalake_retsuko.invoice_info di
             ON di.id_invoice = fie.id_invoice
-        LEFT JOIN datalake_retsuko_clean.invoice i
+        LEFT JOIN datalake_retsuko.invoice i
             ON di.id_invoice = i.id_external
-        LEFT JOIN dw_public.dim_contract c 
+        LEFT JOIN dw_public.dim_contract c
             ON c.sk_contract = fie.id_contract
-        LEFT JOIN datalake_ebdb_clean.contract_partnership_data p 
+        LEFT JOIN datalake_ebdb_clean.contract_partnership_data p
             ON c.sk_contract = p.id_contract
-        LEFT JOIN datalake_ebdb_clean.contract ct 
+        LEFT JOIN datalake_ebdb_clean.contract ct
             ON c.sk_contract = ct.id
-        WHERE 
+        WHERE
             die.from_account_type NOT IN ('quinto andar', 'contract expenses')
-        AND 
+        AND
             di.payment_status <> 'canceled'
         AND
             die.entry_type IN ('brokerage estate agent')
@@ -78,7 +78,7 @@ WITH brokerage_fee AS (
         1,2,3,4,5,6,7,8,11,12,13,14
     ),
     partner_revenue_share_brokerage AS (
-        SELECT 
+        SELECT
             c.sk_contract AS id_contract_ebdb,
             die.id AS id_invoice_entry,
             'partner' AS brokerage_share,
@@ -94,21 +94,21 @@ WITH brokerage_fee AS (
             DATE(di.ts_paid) AS dt_paid,
             c.dt_start AS dt_contract_start
         FROM datalake_invoice.invoice_entries fie
-        INNER JOIN datalake_retsuko.invoice_entry die 
+        INNER JOIN datalake_retsuko.invoice_entry die
             ON fie.id = die.id
-        LEFT JOIN datalake_retsuko.invoice di 
+        LEFT JOIN datalake_retsuko.invoice_info di
             ON di.id_invoice = fie.id_invoice
-        LEFT JOIN datalake_retsuko_clean.invoice i
+        LEFT JOIN datalake_retsuko.invoice i
             ON di.id_invoice = i.id_external
-        LEFT JOIN dw_public.dim_contract c 
+        LEFT JOIN dw_public.dim_contract c
             ON c.sk_contract = fie.id_contract
-        LEFT JOIN datalake_ebdb_clean.contract_partnership_data p 
+        LEFT JOIN datalake_ebdb_clean.contract_partnership_data p
             ON c.sk_contract = p.id_contract
-        LEFT JOIN datalake_ebdb_clean.contract ct 
+        LEFT JOIN datalake_ebdb_clean.contract ct
             ON c.sk_contract = ct.id
-        WHERE 
+        WHERE
             die.from_account_type NOT IN ('quinto andar', 'contract expenses')
-        AND 
+        AND
             di.payment_status <> 'canceled'
         AND
             die.entry_type IN ('brokerage adm partner')
@@ -118,7 +118,7 @@ WITH brokerage_fee AS (
         1,2,3,4,5,6,7,8,11,12,13,14
     ),
     rental_ciq_commission AS (
-        SELECT 
+        SELECT
             c.sk_contract AS id_contract_ebdb,
             die.id AS id_invoice_entry,
             'ciq' AS brokerage_share,
@@ -134,21 +134,21 @@ WITH brokerage_fee AS (
             DATE(di.ts_paid) AS dt_paid,
             c.dt_start AS dt_contract_start
         FROM datalake_invoice.invoice_entries fie
-        INNER JOIN datalake_retsuko.invoice_entry die 
+        INNER JOIN datalake_retsuko.invoice_entry die
             ON fie.id = die.id
-        LEFT JOIN datalake_retsuko.invoice di 
+        LEFT JOIN datalake_retsuko.invoice_info di
             ON di.id_invoice = fie.id_invoice
-        LEFT JOIN datalake_retsuko_clean.invoice i
+        LEFT JOIN datalake_retsuko.invoice i
             ON di.id_invoice = i.id_external
-        LEFT JOIN dw_public.dim_contract c 
+        LEFT JOIN dw_public.dim_contract c
             ON c.sk_contract = fie.id_contract
-        LEFT JOIN datalake_ebdb_clean.contract_partnership_data p 
+        LEFT JOIN datalake_ebdb_clean.contract_partnership_data p
             ON c.sk_contract = p.id_contract
-        LEFT JOIN datalake_ebdb_clean.contract ct 
+        LEFT JOIN datalake_ebdb_clean.contract ct
             ON c.sk_contract = ct.id
-        WHERE 
+        WHERE
             die.from_account_type NOT IN ('quinto andar', 'contract expenses')
-        AND 
+        AND
             di.payment_status <> 'canceled'
         AND
             die.entry_type IN ('brokerage adm partner')
@@ -166,9 +166,9 @@ rental_brokerage_fee_desconto AS (
             fie.ts_created,
             ROW_NUMBER() OVER(PARTITION BY fie.id_invoice, die.description ORDER BY fie.ts_created) AS rn
         FROM datalake_invoice.invoice_entries fie
-        INNER JOIN datalake_retsuko.invoice_entry die 
+        INNER JOIN datalake_retsuko.invoice_entry die
             ON fie.id = die.id
-        WHERE 
+        WHERE
             die.description LIKE '%Desconto por cadastro com link de indicação%'
     )
     SELECT id_invoice_entry
@@ -184,12 +184,12 @@ rental_brokerage_fee_parcelamento AS (
             fie.ts_created,
             ROW_NUMBER() OVER(PARTITION BY fie.id_invoice, die.description ORDER BY fie.ts_created) AS rn
         FROM datalake_invoice.invoice_entries fie
-        INNER JOIN datalake_retsuko.invoice_entry die 
+        INNER JOIN datalake_retsuko.invoice_entry die
             ON fie.id = die.id
-        WHERE 
+        WHERE
             die.description LIKE '%Crédito - Parcelamento corretagem - QuintoAndar%'
     )
-    SELECT 
+    SELECT
         id_invoice_entry
     FROM rental_brokerage_fee_parcelamento_gds
     WHERE rn = 1
@@ -198,14 +198,14 @@ rental_brokerage_fee_parcelamento AS (
 rental_brokerage_fee_parcela AS (
     SELECT
         die.id AS id_invoice_entry
-    FROM datalake_retsuko.invoice_entry die 
-    WHERE 
+    FROM datalake_retsuko.invoice_entry die
+    WHERE
         die.description LIKE 'Parcela%'
 )
 SELECT
   *
 FROM rental_brokerage_fee
-WHERE 
+WHERE
   id_invoice_entry NOT IN (SELECT * FROM rental_brokerage_fee_desconto)
 AND
   id_invoice_entry NOT IN (SELECT * FROM rental_brokerage_fee_parcelamento)
@@ -215,17 +215,17 @@ UNION
 SELECT
   *
 FROM rental_agents_commission
-WHERE 
+WHERE
   id_invoice_entry NOT IN (SELECT * FROM rental_brokerage_fee_desconto)
 AND
   id_invoice_entry NOT IN (SELECT * FROM rental_brokerage_fee_parcelamento)
 AND
-  id_invoice_entry NOT IN (SELECT * FROM rental_brokerage_fee_parcela) 
+  id_invoice_entry NOT IN (SELECT * FROM rental_brokerage_fee_parcela)
 UNION
 SELECT
   *
 FROM partner_revenue_share_brokerage
-WHERE 
+WHERE
   id_invoice_entry NOT IN (SELECT * FROM rental_brokerage_fee_desconto)
 AND
   id_invoice_entry NOT IN (SELECT * FROM rental_brokerage_fee_parcelamento)
@@ -235,14 +235,14 @@ UNION
 SELECT
   *
 FROM rental_ciq_commission
-WHERE 
+WHERE
   id_invoice_entry NOT IN (SELECT * FROM rental_brokerage_fee_desconto)
 AND
   id_invoice_entry NOT IN (SELECT * FROM rental_brokerage_fee_parcelamento)
 AND
   id_invoice_entry NOT IN (SELECT * FROM rental_brokerage_fee_parcela)
 )
-SELECT 
+SELECT
   id_contract_ebdb,
   id_invoice_entry,
   brokerage_share,

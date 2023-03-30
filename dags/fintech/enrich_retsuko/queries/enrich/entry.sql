@@ -1,0 +1,20 @@
+SELECT
+    id,
+    id_external,
+    id_invoice,
+    id_contract,
+    id_from_account,
+    id_to_account,
+    id_external_reversed_entry,
+    amount,
+    bill_item,
+    description,
+    producer,
+    accrual_year_month,
+    due_year_month,
+    ts_created,
+    ts_retsuko_updated
+FROM
+    datalake_retsuko_clean.entry
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_retsuko_updated DESC) = 1

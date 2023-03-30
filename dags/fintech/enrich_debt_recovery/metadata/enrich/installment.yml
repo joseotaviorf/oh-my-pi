@@ -48,7 +48,7 @@ columns:
   purpose:
     description: "Purpose of the invoice"
     lineage:
-      - datalake_retsuko_clean.invoice.purpose
+      - datalake_retsuko.invoice.purpose
   dt_due:
     description: "Date Due"
     lineage:

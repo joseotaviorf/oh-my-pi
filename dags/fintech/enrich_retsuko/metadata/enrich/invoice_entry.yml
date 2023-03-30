@@ -1,43 +1,59 @@
 ---
 database_name: datalake_retsuko
 table_name: invoice_entry
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: "TODO FINISH DESCRIPTIONS"
 columns:
   id:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.entry.id_external
+      - datalake_retsuko.entry.id_external
   id_invoice:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.entry.id_invoice
+      - datalake_retsuko.entry.id_invoice
   id_external_reversed_entry:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.entry.id_external_reversed_entry
+      - datalake_retsuko.entry.id_external_reversed_entry
   id_contract:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.contract.id_external
   bill_item:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.entry.bill_item
+      - datalake_retsuko.entry.bill_item
   entry_type:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.entry.bill_item
+      - datalake_retsuko.entry.entry_type
   from_account_type:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.account.type
   to_account_type:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.account.type
   accounting_account:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.entry.bill_item
+      - datalake_retsuko.entry.bill_item
   is_rental_paid_in_advance:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.contract.is_rental_paid_in_advance
   producer:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.entry.producer
+      - datalake_retsuko.entry.producer
   description:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.entry.description
+      - datalake_retsuko.entry.description
   accrual_year_month:
+    description: "TODO FINISH DESCRIPTIONS"
     lineage:
-      - datalake_retsuko_clean.entry.accrual_year_month
+      - datalake_retsuko.entry.accrual_year_month

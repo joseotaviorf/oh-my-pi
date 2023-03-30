@@ -3,7 +3,7 @@ WITH cte_split_bill_item AS (
     e.id,
     UPPER(REVERSE(SPLIT(e.bill_item, '/'))[0]) AS bill_item
     FROM
-    datalake_retsuko_clean.entry AS e
+    datalake_retsuko.entry AS e
 )
 
 SELECT
@@ -40,10 +40,10 @@ SELECT
     CAST(rci.ts_paid AS DATE) AS dt_paid,
     CAST(rci.ts_canceled AS DATE) AS dt_canceled
 FROM
-    datalake_retsuko_clean.entry AS rce
+    datalake_retsuko.entry AS rce
     INNER JOIN cte_split_bill_item AS bi
       ON bi.id = rce.id
-    LEFT JOIN datalake_retsuko_clean.invoice AS rci
+    LEFT JOIN datalake_retsuko.invoice AS rci
       ON rce.id_invoice = rci.id
     LEFT JOIN datalake_retsuko_clean.account AS rca
       ON rca.id = rce.id_from_account

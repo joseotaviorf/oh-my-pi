@@ -4,8 +4,7 @@ table_name: brokerage_finance
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
 description:
-  "This For Rent addon makes it possible to our clients to split brokerage
-  fee - BFI"
+  "This For Rent addon makes it possible to our clients to split brokeragefee - BFI"
 columns:
   id_bfi:
     description: "BFI ID"
@@ -47,7 +46,7 @@ columns:
   accrual_year_month:
     description: "Reference year-month"
     lineage:
-      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko.invoice.accrual_year_month
   dt_bf_created:
     description: "Date of brokerage payment opted to be divided"
     lineage:

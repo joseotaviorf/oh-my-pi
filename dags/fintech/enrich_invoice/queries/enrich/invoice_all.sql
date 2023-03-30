@@ -1,10 +1,10 @@
-WITH 
+WITH
     business_day_count AS (
         SELECT
             DATE_TRUNC('month', date) AS year_month,
             date AS business_day,
-            ROW_NUMBER() OVER (PARTITION BY DATE_TRUNC('month', date) ORDER BY date) AS row_num 
-        FROM datalake_quintoandar.aux_date        
+            ROW_NUMBER() OVER (PARTITION BY DATE_TRUNC('month', date) ORDER BY date) AS row_num
+        FROM datalake_quintoandar.aux_date
         WHERE
             weekend = 'Weekday'
     ),
@@ -12,22 +12,22 @@ WITH
         SELECT
             year_month,
             business_day AS third_business_day
-        FROM 
+        FROM
             business_day_count
-        WHERE 
+        WHERE
             row_num = 3
     ), house_b2b_portability AS ( -- TODO [ODS] Move to an enrich
         SELECT
             hl.id_house_listing
-        FROM 
+        FROM
             datalake_ebdb_listing.house_listing hl
-        JOIN 
+        JOIN
             datalake_ebdb_clean.house h
                 ON h.id = hl.id_house
-        JOIN 
+        JOIN
             datalake_ebdb_listing.portability p
                 ON p.id_house = hl.id_house AND p.is_owner_b2b
-        WHERE 
+        WHERE
             p.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, NOW())
     ), contracts as (
         SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
@@ -70,16 +70,16 @@ WITH
             CAST(c.ts_canceled AS TIMESTAMP) as ts_canceled,
             c.ts_tenant_service_fee_opt_out,
             CAST(c.ts_analyst_annulment_input AS TIMESTAMP) as ts_analyst_annulment_input
-        FROM 
+        FROM
             datalake_ebdb_contract.contract c
-        LEFT JOIN 
+        LEFT JOIN
             datalake_ebdb_contract.contract_b2b contract_b2b
                 ON contract_b2b.id_contract = c.id
-        LEFT JOIN 
+        LEFT JOIN
             datalake_ebdb_listing.house_listing hl
                 ON  hl.id_house = c.id_house
                     AND c.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01') AND COALESCE(hl.ts_listing_version_end, NOW())
-        LEFT JOIN 
+        LEFT JOIN
             house_b2b_portability hp
                 ON hp.id_house_listing = hl.id_house_listing
 
@@ -88,7 +88,7 @@ WITH
 SELECT
     fie.id AS id_invoice_entry,
     fie.id_region,
-    c.id_contract,  
+    c.id_contract,
     c.rent,
     c.version,
     c.guarantee,
@@ -98,25 +98,25 @@ SELECT
     COALESCE(il.payment_status, 'not-invoiceable') AS status,
     COALESCE(il.invoice_user, 'quinto-andar') AS invoice_account_type,
     CASE
-        WHEN (ie.from_account_type = 'contract' 
+        WHEN (ie.from_account_type = 'contract'
             AND ie.to_account_type <> 'contract') THEN (-1.0) * fie.brl_entry_due_amount
         ELSE 1.0 * fie.brl_entry_due_amount
     END AS sb_value,
     CASE
-        WHEN (ie.from_account_type = 'contract' 
+        WHEN (ie.from_account_type = 'contract'
             AND ie.to_account_type = 'tenant') THEN (-1.0) *    (CASE
-                                                                    WHEN (ie.from_account_type = 'contract' 
+                                                                    WHEN (ie.from_account_type = 'contract'
                                                                         AND ie.to_account_type <> 'contract') THEN (-1.0) * fie.brl_entry_due_amount
                                                                     ELSE 1.0 * fie.brl_entry_due_amount
                                                                 END)
-        WHEN (ie.from_account_type = 'contract' 
+        WHEN (ie.from_account_type = 'contract'
             AND ie.to_account_type = 'landlord') THEN (-1.0) *  (CASE
-                                                                    WHEN (ie.from_account_type = 'contract' 
+                                                                    WHEN (ie.from_account_type = 'contract'
                                                                         AND ie.to_account_type <> 'contract') THEN (-1.0) * fie.brl_entry_due_amount
                                                                     ELSE 1.0 * fie.brl_entry_due_amount
                                                                 END)
         ELSE 1.0 * (CASE
-                        WHEN (ie.from_account_type = 'contract' 
+                        WHEN (ie.from_account_type = 'contract'
                             AND ie.to_account_type <> 'contract') THEN (-1.0) * fie.brl_entry_due_amount
                         ELSE 1.0 * fie.brl_entry_due_amount
                     END)
@@ -137,21 +137,21 @@ SELECT
     ADD_MONTHS(TO_DATE(CAST(ie.accrual_year_month AS STRING), 'yyyyMM'), 1) AS dt_next_accrual,
     COALESCE(i.ts_created, TO_DATE(CAST(fie.id_created_date AS STRING), 'yyyyMMdd')) AS ts_created,
     TO_DATE(CAST(fie.id_created_date AS STRING), 'yyyyMMdd') AS dt_created_for_filter
-FROM 
+FROM
     datalake_invoice.invoice_entries fie
-LEFT JOIN 
+LEFT JOIN
     datalake_retsuko.invoice_entry ie
         ON fie.id = ie.id
-LEFT JOIN 
-    datalake_retsuko.invoice il
+LEFT JOIN
+    datalake_retsuko.invoice_info il
         ON il.id_invoice = fie.id_invoice
-LEFT JOIN 
-    datalake_retsuko_clean.invoice i
+LEFT JOIN
+    datalake_retsuko.invoice i
         ON i.id_external = il.id_invoice
-LEFT JOIN 
+LEFT JOIN
     contracts c
         ON c.id_contract = fie.id_contract
-LEFT JOIN 
+LEFT JOIN
     third_business_day td
         ON ADD_MONTHS(TO_DATE(CAST(ie.accrual_year_month AS STRING), 'yyyyMM'), 1) = td.year_month
 WHERE

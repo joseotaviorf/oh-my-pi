@@ -8,15 +8,15 @@ columns:
   id:
     description: "Invoice entry ID"
     lineage:
-      - datalake_retsuko_clean.entry.id_external
+      - datalake_retsuko.entry.id_external
   id_external_reversed_entry:
     description: "External reversed entry ID"
     lineage:
-      - datalake_retsuko_clean.entry.id_external_reversed_entry
+      - datalake_retsuko.entry.id_external_reversed_entry
   id_invoice:
     description: "Invoice ID"
     lineage:
-      - datalake_retsuko_clean.invoice.id_external
+      - datalake_retsuko.invoice.id_external
   id_contract:
     description: "Contract ID"
     lineage:
@@ -35,22 +35,22 @@ columns:
   id_created_date:
     description: "Creation date ID"
     lineage:
-      - datalake_retsuko_clean.entry.ts_created
+      - datalake_retsuko.entry.ts_created
   id_due_date:
     description: "Due date ID"
     lineage:
-      - datalake_retsuko_clean.invoice.ts_due
+      - datalake_retsuko.invoice.ts_due
   id_paid_date:
     description: "Pay date ID"
     lineage:
-      - datalake_retsuko_clean.invoice.ts_paid
+      - datalake_retsuko.invoice.ts_paid
   brl_entry_due_amount:
     description: "Entry due amount in BRL"
     lineage:
-      - datalake_retsuko_clean.entry.amount
+      - datalake_retsuko.entry.amount
   brl_entry_paid_amount:
     description: "Entry paid amount in BRL"
   ts_created:
     description: "Timestamp of creation"
     lineage:
-      - datalake_retsuko_clean.entry.ts_created
+      - datalake_retsuko.entry.ts_created

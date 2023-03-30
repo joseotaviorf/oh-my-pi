@@ -5,9 +5,9 @@ WITH recurrence_acceptance AS (
         ts_created,
         ts_accepted,
         ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_accepted) AS nbr_transactions_accepted
-    FROM 
-        datalake_fastforward_clean.anticipation 
-    WHERE 
+    FROM
+        datalake_fastforward_clean.anticipation
+    WHERE
         ts_accepted IS NOT NULL
     ),
 contract_first_last_accepted AS (
@@ -15,9 +15,9 @@ contract_first_last_accepted AS (
         id_contract,
         MIN(ts_accepted) AS ts_first_accepted,
         MAX(ts_accepted) AS ts_last_accepted
-    FROM 
-        datalake_fastforward_clean.anticipation 
-    WHERE 
+    FROM
+        datalake_fastforward_clean.anticipation
+    WHERE
         ts_accepted IS NOT NULL
     GROUP BY 1
     ),
@@ -35,21 +35,21 @@ invoice_entries AS (
         ie.from_account_type,
         ie.to_account_type,
         ie.entry_type
-    FROM 
+    FROM
         datalake_invoice.invoice_entries AS ies
-    INNER JOIN 
+    INNER JOIN
         datalake_retsuko.invoice_entry AS ie
             ON ies.id = ie.id
-    INNER JOIN 
-        datalake_retsuko.invoice AS i
+    INNER JOIN
+        datalake_retsuko.invoice_info AS i
             ON ies.id_invoice = i.id_invoice
     LEFT JOIN
-        datalake_retsuko_clean.invoice ri 
+        datalake_retsuko.invoice ri
             ON i.id_invoice = ri.id_external
-    LEFT JOIN 
+    LEFT JOIN
         datalake_quintoandar.aux_date AS dddue
             ON dddue.id_date = ies.id_due_date
-    LEFT JOIN 
+    LEFT JOIN
         datalake_quintoandar.aux_date AS ddpaid
             ON ddpaid.id_date = ies.id_paid_date
     WHERE
@@ -66,21 +66,21 @@ anticipation_fee AS (
         MAX(dt_due) AS dt_due_fee,
         MAX(CASE
                 WHEN payment_status = 'not payable' THEN dt_due
-                ELSE dt_paid 
+                ELSE dt_paid
             END) AS dt_paid_fee,
         MAX(ts_created) AS ts_created,
         SUM(brl_entry_due_amount) AS fee_brl_entry_due_amount,
         SUM(CASE
-                WHEN payment_status = 'not payable' THEN brl_entry_due_amount 
-                ELSE brl_entry_paid_amount 
+                WHEN payment_status = 'not payable' THEN brl_entry_due_amount
+                ELSE brl_entry_paid_amount
             END) AS fee_brl_entry_paid_amount
-    FROM 
+    FROM
         invoice_entries
     WHERE
         entry_type = 'rental anticipation fee'
     GROUP BY 1,2,3
     ),
-anticipation_amount AS (  
+anticipation_amount AS (
     SELECT
         id_contract,
         id_invoice,
@@ -91,7 +91,7 @@ anticipation_amount AS (
                 WHEN payment_status = 'not payable' THEN brl_entry_due_amount
                 ELSE brl_entry_paid_amount
             END) AS amount_brl_entry_paid_amount
-    FROM 
+    FROM
         invoice_entries
     WHERE
         entry_type = 'rental anticipation'
@@ -115,12 +115,12 @@ DISTINCT
     DATE(fla.ts_first_accepted) AS dt_first_accepted,
     af.dt_due_fee,
     af.dt_paid_fee
-FROM 
+FROM
     datalake_fastforward_clean.anticipation AS a
-INNER JOIN 
+INNER JOIN
     datalake_fastforward_clean.contract AS c
         ON a.id_contract = c.id
-INNER JOIN 
+INNER JOIN
     recurrence_acceptance AS ra
         ON a.id = ra.id
 INNER JOIN
@@ -128,9 +128,9 @@ INNER JOIN
         ON a.id_contract = fla.id_contract
 LEFT JOIN
     anticipation_fee AS af
-        ON af.id_contract = c.id_external 
+        ON af.id_contract = c.id_external
         AND DATE_FORMAT(a.dt_reference, 'yyyyMM') = af.accrual_year_month
 LEFT JOIN
     anticipation_amount AS aa
-        ON aa.id_contract = c.id_external 
+        ON aa.id_contract = c.id_external
         AND DATE(aa.ts_created) = DATE(a.ts_accepted)

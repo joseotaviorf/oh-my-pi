@@ -10,7 +10,7 @@ WITH invoices AS (
   FROM
     datalake_invoice.invoice_entries AS ies
   INNER JOIN
-    datalake_retsuko_clean.invoice
+    datalake_retsuko.invoice
       ON ies.id_invoice = invoice.id_external
   LEFT JOIN
     datalake_retsuko.invoice_entry AS ie
@@ -23,7 +23,7 @@ invoices_values AS (
     SUM(IF(entry_type = 'rental', brl_entry_due_amount, 0)) AS rent_value,
     SUM(IF(entry_type = 'home insurance', brl_entry_due_amount, 0)) AS home_insurance,
     accrual_year_month
-  FROM 
+  FROM
     invoices
   WHERE
     from_account_type = 'tenant'
@@ -210,7 +210,7 @@ revenue_with_contract AS (
 ),
 
 revenues_calculation AS (
-SELECT 
+SELECT
   MONOTONICALLY_INCREASING_ID() AS sk_house_listing_revenue,
   COALESCE(revenue.id_contract, rf.sk_contract, ltra.id_contract_ebdb, -1) AS id_contract,
   COALESCE(r.id_house_listing, revenue.id_house_listing, hl_contract.id_house_listing) AS id_house_listing,
@@ -284,7 +284,7 @@ SELECT
   agents_commission,
   brokerage_partner_share,
   management_partner_share,
-  (management_fee + brokerage_fee + home_insurance) + 
+  (management_fee + brokerage_fee + home_insurance) +
     (service_fee + mra + lra + bfi + lp + ccp_net + reservation) +
     (agents_commission + brokerage_partner_share + management_partner_share) AS net_revenue,
   management_fee + brokerage_fee + home_insurance AS gross_revenue,

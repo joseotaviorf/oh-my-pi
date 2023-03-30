@@ -1,0 +1,8 @@
+---
+inner_dependencies:
+  bill_items:
+    - invoice
+  invoice_entry:
+    - entry
+  invoice_info:
+    - invoice

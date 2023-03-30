@@ -1,6 +1,8 @@
 ---
 database_name: datalake_invoice
 table_name: overdue_portfolio_timeline
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
 columns:
   id_contract:
     lineage:
@@ -49,7 +51,7 @@ columns:
       - datalake_invoice.invoice_entries.dti
   due_amount:
     lineage:
-      - datalake_invoice.invoice_entries.datalake_retsuko_clean.invoice.due_amount
+      - datalake_invoice.invoice_entries.datalake_retsuko.invoice.due_amount
   paid_amount:
     lineage:
       - datalake_invoice.invoice_entries.paid_amount

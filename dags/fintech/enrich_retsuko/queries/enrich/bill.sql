@@ -1,0 +1,19 @@
+SELECT
+    id,
+    id_external,
+    id_invoice,
+    identifier,
+    due_amount,
+    our_number,
+    our_number_digit,
+    wallet_number,
+    barcode,
+    inputtable_line,
+    ts_due,
+    ts_issued,
+    ts_created,
+    ts_retsuko_updated
+FROM
+    datalake_retsuko_clean.boleto
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_retsuko_updated DESC) = 1

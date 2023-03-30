@@ -1,4 +1,4 @@
-SELECT 
+SELECT
   c.sk_contract AS id_contract_ebdb,
   'quintoandar' AS management_fee_share,
   di.payment_status,
@@ -10,21 +10,21 @@ SELECT
   i.accrual_year_month,
   DATE(di.ts_due) AS dt_due,
   DATE(di.ts_paid) AS dt_paid
-FROM 
+FROM
     datalake_invoice.invoice_entries fie
-INNER JOIN datalake_retsuko.invoice_entry die 
+INNER JOIN datalake_retsuko.invoice_entry die
     ON fie.id = die.id
-LEFT JOIN datalake_retsuko.invoice di 
+LEFT JOIN datalake_retsuko.invoice_info di
     ON di.id_invoice = fie.id_invoice
-LEFT JOIN datalake_retsuko_clean.invoice i
+LEFT JOIN datalake_retsuko.invoice i
     ON di.id_invoice = i.id_external
-LEFT JOIN dw_public.dim_contract c 
+LEFT JOIN dw_public.dim_contract c
     ON c.sk_contract = fie.id_contract
 LEFT JOIN datalake_ebdb_clean.contract_partnership_data p
     ON c.sk_contract = p.id_contract
-WHERE 
+WHERE
     die.from_account_type NOT IN ('quinto andar', 'contract expenses')
-AND 
+AND
     di.payment_status <> 'canceled'
 AND
     die.entry_type IN ('adm fee', 'igpm adm fee', 'ipca adm fee', 'lockin', 'adjustment agreement adm fee')
@@ -33,7 +33,7 @@ AND
 GROUP BY
     1,2,3,4,5,6,9,10,11
 UNION
-SELECT 
+SELECT
   c.sk_contract AS id_contract_ebdb,
   'partner' AS management_fee_share,
   di.payment_status,
@@ -45,21 +45,21 @@ SELECT
   i.accrual_year_month,
   DATE(di.ts_due) AS dt_due,
   DATE(di.ts_paid) AS dt_paid
-FROM 
+FROM
     datalake_invoice.invoice_entries fie
-INNER JOIN datalake_retsuko.invoice_entry die 
+INNER JOIN datalake_retsuko.invoice_entry die
     ON fie.id = die.id
-LEFT JOIN datalake_retsuko.invoice di 
+LEFT JOIN datalake_retsuko.invoice_info di
     ON di.id_invoice = fie.id_invoice
-LEFT JOIN datalake_retsuko_clean.invoice i
+LEFT JOIN datalake_retsuko.invoice i
     ON di.id_invoice = i.id_external
-LEFT JOIN dw_public.dim_contract c 
+LEFT JOIN dw_public.dim_contract c
     ON c.sk_contract = fie.id_contract
 LEFT JOIN datalake_ebdb_clean.contract_partnership_data p
     ON c.sk_contract = p.id_contract
-WHERE 
+WHERE
     die.from_account_type NOT IN ('quinto andar', 'contract expenses')
-AND 
+AND
     di.payment_status <> 'canceled'
 AND
     die.entry_type IN ('adm fee adm partner','igpm adm partner adm fee', 'ipca adm partner adm fee', 'adjustment agreement adm partner adm fee')

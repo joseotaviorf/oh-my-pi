@@ -54,7 +54,7 @@ SELECT
     e.description,
     e.accrual_year_month
 FROM
-    datalake_retsuko_clean.entry AS e
+    datalake_retsuko.entry AS e
 INNER JOIN
     datalake_retsuko_clean.account AS af
         ON e.id_from_account = af.id

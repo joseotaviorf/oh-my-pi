@@ -16,6 +16,8 @@ select
     timestamp(canceled_at) as ts_canceled,
     timestamp(sent_at) as ts_sent,
     timestamp(due_date) as ts_due,
-    timestamp(created_at) as ts_created
+    timestamp(created_at) as ts_created,
+    retsuko_created_at AS ts_retsuko_created,
+    retsuko_updated_at AS ts_retsuko_updated
 from
     datalake_retsuko_raw.invoice

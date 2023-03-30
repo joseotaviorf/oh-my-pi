@@ -107,7 +107,7 @@ WITH credit_holidays AS (
         inv.purpose,
         acc.type AS account_type
     FROM
-        datalake_retsuko_clean.invoice AS inv
+        datalake_retsuko.invoice AS inv
     LEFT JOIN
         credit_holidays AS hl
     ON

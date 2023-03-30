@@ -20,7 +20,7 @@ cte_purpose AS (
         datalake_trato_feito_clean.accounting_installment AS ai
             ON i.`id` = ai.id_installment
     LEFT JOIN
-        datalake_retsuko_clean.invoice inv
+        datalake_retsuko.invoice inv
             ON ai.id_external = inv.id_external
 )
 

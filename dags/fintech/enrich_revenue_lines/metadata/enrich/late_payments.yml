@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_invoice.invoice_entries.id_invoice_entry
       - datalake_invoice.invoice_entries.id_contract
-      - datalake_invoice.invoice_entries.datalake_retsuko_clean.invoice
+      - datalake_invoice.invoice_entries.datalake_retsuko.invoice
   id_contract:
     description: "Id of the contract in main"
     lineage:
@@ -29,7 +29,7 @@ columns:
   accrual_year_month:
     description: "Reference year-month"
     lineage:
-      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko.invoice.accrual_year_month
   dt_created:
     description: "Entry created date"
     lineage:

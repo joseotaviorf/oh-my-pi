@@ -15,9 +15,16 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-This pipeline produces the following output table on enrich layer:
+This pipeline produces the following output tables deduplicated on enrich layer:
 
+- `bill`
+- `entry`
 - `invoice`
+
+
+This pipeline produces the following output tables enriched on enrich layer:
+- `bill_items`
 - `invoice_entry`
+- `invoice_info`
 
 ​</details>

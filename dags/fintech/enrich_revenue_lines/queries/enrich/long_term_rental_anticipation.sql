@@ -4,9 +4,9 @@ WITH mova_recurrence_signed AS (
     sk_base_proposal AS id_base_proposal,
     DATE(ts_created_at) AS dt_created,
     DENSE_RANK() OVER(PARTITION BY sk_contract ORDER BY ts_created_at) AS nbr_transactions_signed
-  FROM 
+  FROM
     datalake_gsheets_clean.mova_lra_owners
-  WHERE 
+  WHERE
     dt_signed_contract IS NOT NULL
 ),
 fastforward_recurrence_signed AS (
@@ -68,13 +68,13 @@ SELECT
   mova.dt_payment AS dt_paid,
   DATE(mova.ts_created_at) AS dt_created,
   mova.dt_signed_contract AS dt_signed
-FROM 
+FROM
   datalake_gsheets_clean.mova_lra_owners AS mova
 LEFT JOIN
   mova_recurrence_signed AS mrs
     ON mova.sk_contract = mrs.id_contract
     AND mova.sk_base_proposal = mrs.id_base_proposal
-LEFT JOIN 
+LEFT JOIN
   fastforward AS lra
     ON mova.sk_contract = lra.id_contract_ebdb
     AND mova.main_value = lra.total_rent
@@ -82,7 +82,7 @@ LEFT JOIN
     AND mova.installment_number = lra.installment
     AND mrs.nbr_transactions_signed = lra.nbr_transactions_signed
 LEFT JOIN
-  datalake_fastforward_clean.gateway_loan_installment bfi 
+  datalake_fastforward_clean.gateway_loan_installment bfi
     ON mova.sk_installment = CAST(bfi.id_partner_reference AS BIGINT)
 WHERE
   bfi.id IS NULL --excluding bfi data

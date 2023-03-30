@@ -64,7 +64,7 @@ base_venc_full AS (
         DATE(ts_due) AS due_date,
         COUNT(*) AS incidencias
     FROM
-        datalake_retsuko_clean.boleto
+        datalake_retsuko.bill
     WHERE
         identifier LIKE '%B%'
     GROUP BY 1, 2

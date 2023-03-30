@@ -10,8 +10,10 @@ select
     bill_item,
     description,
     producer,
-    accrual_year_month, 
+    accrual_year_month,
     due_year_month,
-    timestamp(created_at) as ts_created
+    timestamp(created_at) as ts_created,
+    retsuko_created_at AS ts_retsuko_created,
+    retsuko_updated_at AS ts_retsuko_updated
 from
     datalake_retsuko_raw.entry

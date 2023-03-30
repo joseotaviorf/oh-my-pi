@@ -32,12 +32,12 @@ columns:
   accrual_year_month:
     description: "Reference year-month"
     lineage:
-      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko.invoice.accrual_year_month
   dt_due:
     description: "Invoice's due date"
     lineage:
-      - datalake_retsuko.invoice.ts_due
+      - datalake_retsuko.invoice_info.ts_due
   dt_paid:
     description: "Invoice's paid date"
     lineage:
-      - datalake_retsuko.invoice.ts_paid
+      - datalake_retsuko.invoice_info.ts_paid

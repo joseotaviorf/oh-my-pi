@@ -40,15 +40,15 @@ columns:
   frequency:
     description: "Frequency description"
     lineage:
-      - datalake_retsuko.invoice.invoice_frequency
+      - datalake_retsuko.invoice_info.invoice_frequency
   status:
     description: "Status description"
     lineage:
-      - datalake_retsuko.invoice.payment_status
+      - datalake_retsuko.invoice_info.payment_status
   invoice_account_type:
     description: "Invoice account type description"
     lineage:
-      - datalake_retsuko.invoice.user
+      - datalake_retsuko.invoice_info.user
   sb_value:
     description: "SB amount"
   sign_value:

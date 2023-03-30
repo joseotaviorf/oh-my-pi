@@ -6,13 +6,13 @@ WITH target_invoices AS (
         c.dt_termination AS dt_annulment,
         c.contract_version AS version,
         c.guarantee_type AS guarantee,
-        CASE 
+        CASE
           WHEN guarantee_type = 'RentalDeposit' then 'Paid'
           WHEN guarantee_type = 'RentalGuarantee' then 'Paid'
           WHEN guarantee_type = 'PRO_GUARANTOR' then 'Paid'
           WHEN guarantee_type = 'Standalone' then 'Brokerage Only'
           WHEN guarantee_type = 'SeguroFairfax' then 'Free'
-          ELSE 'Free' 
+          ELSE 'Free'
         END as contract_guarantee_type,
         c.paying_condo AS condo_payer,
         CAST(p.income AS INTEGER) AS monthly_income_declared,
@@ -45,9 +45,9 @@ WITH target_invoices AS (
     datalake_invoice.invoice_entries AS fie
     INNER JOIN datalake_retsuko.invoice_entry AS die
         ON die.id = fie.id
-    LEFT JOIN datalake_retsuko.invoice AS di
+    LEFT JOIN datalake_retsuko.invoice_info AS di
         ON di.id_invoice = fie.id_invoice
-    LEFT JOIN datalake_retsuko_clean.invoice AS i
+    LEFT JOIN datalake_retsuko.invoice AS i
         ON i.id_external = di.id_invoice
     LEFT JOIN datalake_ebdb_contract.contract AS c
         ON c.id = fie.id_contract

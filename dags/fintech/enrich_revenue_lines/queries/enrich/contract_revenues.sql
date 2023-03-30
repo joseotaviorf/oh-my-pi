@@ -5,31 +5,31 @@ WITH contracts AS (
         dt_started,
         COALESCE(dt_termination,current_date) AS last_month_vigency,
         ROUND(MONTHS_BETWEEN(COALESCE(dt_termination,current_date),dt_started)) AS total_months_vigency
-    FROM 
+    FROM
         datalake_ebdb_clean.contract
     WHERE
         ts_signed IS NOT NULL
-        AND status IN ('Ativo','Finalizado') 
+        AND status IN ('Ativo','Finalizado')
 ),
 payments AS (
-    SELECT 
+    SELECT
         fie.sk_contract,
         di.accrual_year_month,
         SUM(fie.brl_entry_due_amount) AS brl_entry_due_amount,
         SUM(CASE
                 WHEN di.payment_status = 'not payable' THEN fie.brl_entry_due_amount
                 ELSE fie.brl_entry_paid_amount END)
-        AS brl_entry_paid_amount 
-    FROM 
+        AS brl_entry_paid_amount
+    FROM
         dw_payment.fact_invoice_entries AS fie
-    INNER JOIN 
+    INNER JOIN
         dw_payment.dim_invoice_entry AS dentry
             ON fie.sk_invoice_entry = dentry.sk_invoice_entry
-    INNER JOIN 
+    INNER JOIN
         dw_payment.dim_invoice AS di
             ON fie.sk_invoice = di.sk_invoice
     WHERE
-        dentry.entry_type IN ('rental anticipation fee','brokerage installment fee', 'installment lra', 'fine and interest','property damage fine') 
+        dentry.entry_type IN ('rental anticipation fee','brokerage installment fee', 'installment lra', 'fine and interest','property damage fine')
         AND from_account_type IN ('tenant','landlord')
         AND to_account_type = 'contract'
     GROUP BY 1,2
@@ -41,12 +41,12 @@ mra AS (
         mra.id AS id_mra,
         mra.ts_accepted,
         mra.dt_reference
-    FROM 
+    FROM
         datalake_fastforward_clean.anticipation AS mra
-    INNER JOIN 
+    INNER JOIN
         datalake_fastforward_clean.contract AS c
             ON c.id = mra.id_contract
-    WHERE 
+    WHERE
         mra.ts_accepted is not NULL
 ),
 lra AS (
@@ -56,28 +56,28 @@ lra AS (
         lra.id AS id_lra,
         lra.ts_signed,
         li.ts_expected_due
-    FROM 
+    FROM
         datalake_fastforward_clean.long_term_anticipation AS lra
-    INNER JOIN 
+    INNER JOIN
         datalake_fastforward_clean.contract AS c
             ON lra.id_contract = c.id
-    INNER JOIN 
+    INNER JOIN
         datalake_fastforward_clean.lra_installment AS li
             ON lra.id = li.id_long_term_anticipation
     WHERE
         lra.ts_signed IS NOT NULL
 ),
 bfi AS (
-    WITH 
+    WITH
     brokerage_finance AS (
         SELECT
             bfi.id AS id_bfi,
             DATE_TRUNC('month', c.dt_validity) AS month_validity_start,
             ADD_MONTHS(DATE_TRUNC('month', c.dt_validity), bfi.installment_number) AS month_validity_end,
             c.id_external
-        FROM 
+        FROM
             datalake_owner_fees_clean.contract_brokerage_fee AS bfi
-        INNER JOIN 
+        INNER JOIN
             datalake_owner_fees_clean.contract AS c
                 ON c.id = bfi.id_contract
         WHERE
@@ -102,12 +102,12 @@ lpf_rent AS (
         f.sk_contract,
         f.sk_invoice_entry AS id_lpf_rent,
         di.accrual_year_month
-    FROM 
+    FROM
         dw_payment.fact_invoice_entries AS f
-    INNER JOIN 
+    INNER JOIN
         dw_payment.dim_invoice_entry AS d
             ON f.sk_invoice_entry = d.sk_invoice_entry
-    INNER JOIN 
+    INNER JOIN
         dw_payment.dim_invoice AS di
             ON f.sk_invoice = di.sk_invoice
     WHERE
@@ -120,12 +120,12 @@ lpf_condo AS (
         f.sk_contract,
         f.sk_invoice_entry AS id_lpf_condo,
         di.accrual_year_month
-    FROM 
+    FROM
         dw_payment.fact_invoice_entries AS f
-    INNER JOIN 
+    INNER JOIN
         dw_payment.dim_invoice_entry AS d
             ON f.sk_invoice_entry = d.sk_invoice_entry
-    INNER JOIN 
+    INNER JOIN
         dw_payment.dim_invoice AS di
             ON f.sk_invoice = di.sk_invoice
     WHERE
@@ -136,19 +136,19 @@ lpf_condo AS (
 ),
 reservation AS (
     WITH base_r AS (
-        SELECT 
-            rf.sk_contract AS id_contract, 
+        SELECT
+            rf.sk_contract AS id_contract,
             dr.sk_reservation AS id_reservation,
             DATE(dr.ts_created) AS dt_created,
             CASE
                 WHEN dr.installments <= 1 THEN DATE(dr.ts_created)
-                ELSE ADD_MONTHS(DATE(dr.ts_created), (dr.installments - 1)) 
+                ELSE ADD_MONTHS(DATE(dr.ts_created), (dr.installments - 1))
             END AS dt_end_payment,
             dr.value AS total_value,
             dr.value/dr.installments AS monthly_value
         FROM
             dw_public.dim_reservation AS dr
-        INNER JOIN 
+        INNER JOIN
             dw_public.fact_listing_rent_flows AS rf
                 ON dr.sk_reservation = rf.sk_reservation
         WHERE
@@ -165,7 +165,7 @@ reservation AS (
         br.monthly_value
     FROM
          base_r AS br
-    INNER JOIN 
+    INNER JOIN
         dw_public.dim_date AS dd
             ON dd.month_start BETWEEN DATE_TRUNC('month',br.dt_created) AND DATE_TRUNC('month',br.dt_end_payment)
 ),
@@ -176,23 +176,23 @@ ccp AS (
         ccp.id AS id_ccp,
         i.accrual_year_month,
         (i.paid_amount + i.due_amount) AS value
-    FROM 
+    FROM
         datalake_retsuko_clean.credit_card_payment AS ccp
-    INNER JOIN 
-        datalake_retsuko_clean.invoice AS i
+    INNER JOIN
+        datalake_retsuko.invoice AS i
             ON ccp.id_invoice = i.id
-    INNER JOIN 
+    INNER JOIN
         datalake_retsuko_clean.contract AS c
             ON i.id_contract = c.id
-    WHERE 
+    WHERE
         ccp.status = 'paid'
 ),
 guarantee AS (
     WITH last_charge_created AS (
-        SELECT 
+        SELECT
             id,
             MAX(ts_created) AS ts_last_created
-        FROM 
+        FROM
             datalake_rental_guarantee_clean.charge
         GROUP BY 1
         ),
@@ -208,13 +208,13 @@ guarantee AS (
             c.ts_created
         FROM
             datalake_rental_guarantee_clean.charge AS c
-        INNER JOIN 
+        INNER JOIN
             last_charge_created AS lcu
                 ON c.id = lcu.id
                 AND c.ts_created = lcu.ts_last_created
             ),
     guarantee_base AS (
-        SELECT 
+        SELECT
             g.id_contract_ebdb as id_contract,
             g.id AS id_guarantee,
             ci.ts_created AS ts_charge_created,
@@ -223,16 +223,16 @@ guarantee AS (
             DATE_TRUNC('month',ci.ts_created) AS dt_charge_started,
             ci.installments,
             ((g.final_value/100/installments)/1.0738)*0.825 AS monthly_revenue
-        FROM 
+        FROM
             datalake_rental_guarantee_clean.guarantee AS g
-        INNER JOIN 
+        INNER JOIN
             charge_info AS ci
                 ON g.id = ci.id_guarantee
         WHERE
             g.id_contract_ebdb IS NOT NULL
             AND g.ts_paid IS NOT NULL
             AND g.guarantee_status IN ('ACTIVE','CANCELED')
-            AND ci.charge_status = 'CAPTURED' 
+            AND ci.charge_status = 'CAPTURED'
         )
     SELECT DISTINCT
         gb.id_contract,
@@ -241,9 +241,9 @@ guarantee AS (
         dd.month_start AS accrual_year_month,
         (1+ROUND(MONTHS_BETWEEN(dd.month_start, ts_charge_created))) AS installment_number,
         gb.monthly_revenue
-    FROM 
+    FROM
         guarantee_base AS gb
-    INNER JOIN 
+    INNER JOIN
         dw_public.dim_date AS dd
             ON dd.date BETWEEN dt_charge_started AND dt_charge_end
     WHERE
@@ -269,16 +269,16 @@ SELECT DISTINCT
     r.monthly_value AS reservation_monthly_value,
     ccp.value AS credit_card_value,
     g.monthly_revenue AS guarantee_monthly_revenue
-FROM 
+FROM
     contracts AS b
-INNER JOIN 
+INNER JOIN
     dw_public.dim_date AS dd
         ON dd.month_start BETWEEN DATE_TRUNC('month',b.dt_started) AND b.last_month_vigency
-LEFT JOIN 
+LEFT JOIN
     payments AS p
         ON p.sk_contract = b.id_contract
         AND p.accrual_year_month = DATE_FORMAT(dd.month_start,'yyyyMM')
-LEFT JOIN 
+LEFT JOIN
     mra
         ON mra.id_contract = b.id_contract
         AND p.accrual_year_month = DATE_FORMAT(mra.dt_reference,'yyyyMM')

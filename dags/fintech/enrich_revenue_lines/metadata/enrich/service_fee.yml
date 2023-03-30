@@ -12,7 +12,7 @@ columns:
   invoice_payment_status:
     description: "Description of the invoice payment status"
     lineage:
-      - datalake_retsuko.invoice.id
+      - datalake_retsuko.invoice_info.id
   tenant_service_fee:
     description: "Value for tenant service fee"
     lineage:
@@ -28,8 +28,8 @@ columns:
   dt_due:
     description: "Due date"
     lineage:
-      - datalake_retsuko.invoice.ts_due
+      - datalake_retsuko.invoice_info.ts_due
   dt_paid:
     description: "Payment date"
     lineage:
-      - datalake_retsuko.invoice.ts_paid
+      - datalake_retsuko.invoice_info.ts_paid

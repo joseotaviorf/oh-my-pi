@@ -10,7 +10,7 @@ WITH vans_payments(
       dt_paid,
       ts_created,
       ts_issued
-    FROM 
+    FROM
       datalake_vans_clean.boleto
   ),
   payment AS (
@@ -24,7 +24,7 @@ WITH vans_payments(
       dt_paid,
       ts_created,
       ts_issued
-    FROM 
+    FROM
       datalake_vans_clean.payment
     ),
     consolidation_table AS (
@@ -35,21 +35,21 @@ WITH vans_payments(
   delete_documents_repeated AS (
     SELECT
       MAX(id) AS max_id,
-      NULLIF(REGEXP_EXTRACT(company_use, '(\\d+\\D\\d{{4}})', 1), '') AS id_company_use, 
+      NULLIF(REGEXP_EXTRACT(company_use, '(\\d+\\D\\d{{4}})', 1), '') AS id_company_use,
       company_use,
       ts_created,
       ts_issued,
       dt_paid
-    FROM 
+    FROM
       consolidation_table
     GROUP BY 2,3,4,5,6
   ),
   vans_payments AS (
-    SELECT 
+    SELECT
       cons.*
-    FROM 
+    FROM
       consolidation_table cons
-    JOIN 
+    JOIN
       delete_documents_repeated del
         ON cons.id = del.max_id
           AND del.company_use <=> cons.company_use
@@ -57,18 +57,18 @@ WITH vans_payments(
           AND del.ts_issued <=> cons.ts_issued
           AND del.dt_paid <=> cons.dt_paid
   )
-  
+
   SELECT
-    CASE 
+    CASE
       WHEN related_document_type = 'invoice' THEN COALESCE(CAST(id_related_document AS BIGINT), -1)
       ELSE -1
     END AS id_invoice,
-    CASE 
+    CASE
       WHEN type = 'charge' THEN due_amount
       WHEN type = 'transfer' THEN (-1)*due_amount
       WHEN type = 'account payable' THEN due_amount
     END AS brl_due_amount
-  FROM 
+  FROM
     vans_payments
 ),
 
@@ -88,18 +88,18 @@ invoices_data AS (
     CAST(ts_paid AS date) AS dt_paid,
     rci.ts_canceled,
     rci.ts_created
-  FROM 
-    datalake_retsuko_clean.invoice AS rci
-  LEFT JOIN 
-    datalake_retsuko_clean.account AS rca 
+  FROM
+    datalake_retsuko.invoice AS rci
+  LEFT JOIN
+    datalake_retsuko_clean.account AS rca
       ON rca.id = rci.id_account
-  LEFT JOIN 
-    datalake_retsuko_clean.contract AS rcc 
+  LEFT JOIN
+    datalake_retsuko_clean.contract AS rcc
       ON rcc.id = rci.id_contract
-  LEFT JOIN 
-    vans_payments AS vp 
+  LEFT JOIN
+    vans_payments AS vp
       ON vp.id_invoice = rci.id_external
-  WHERE 
+  WHERE
     rci.due_amount <= 0
     AND ((rci.ts_paid IS NULL) OR (rci.ts_paid >= DATE('2022-01-01')))
     AND (rci.due_amount < 0 OR (rci.due_amount <= 0 AND rci.status = 'canceled'))
@@ -107,18 +107,18 @@ invoices_data AS (
 ),
 
 contracts_retsuko AS (
-  SELECT 
-    e.id_contract, 
+  SELECT
+    e.id_contract,
     i.id_external AS id_invoice,
     e.accrual_year_month
-  FROM 
+  FROM
     datalake_retsuko.invoice_entry AS e
-  LEFT JOIN 
-    datalake_retsuko_clean.invoice AS i 
+  LEFT JOIN
+    datalake_retsuko.invoice AS i
       ON i.id = e.id_invoice
   WHERE
     i.id_external IS NOT NULL
-    AND UPPER(e.description) LIKE '%ACORDO COBRAN%' 
+    AND UPPER(e.description) LIKE '%ACORDO COBRAN%'
     AND UPPER(e.bill_item) LIKE '%ENTRY.BILL-ITEM/INSURANCE-GUARANTEE%'
 ),
 
@@ -219,19 +219,19 @@ invoices_to_receive_adjusted AS (
 ),
 
 invoices_at_closing AS (
-  SELECT 
+  SELECT
     *,
     CASE
       WHEN dt_due >= DATE('{year}-{month}-{day}') THEN DATEDIFF(dt_due, DATE('{year}-{month}-{day}'))
       WHEN dt_paid IS NOT NULL THEN DATEDIFF(dt_due, IF(dt_paid < DATE('{year}-{month}-{day}'), dt_paid, DATE('{year}-{month}-{day}')))
       ELSE -1*(DATEDIFF(DATE('{year}-{month}-{day}'), dt_due))
     END AS delta_days
-  FROM 
+  FROM
     invoices_to_receive_adjusted
-  WHERE 
+  WHERE
     payment_status != 'canceled'
-    AND (dt_paid IS NULL OR dt_paid >= DATE('{year}-{month}-{day}')) 
-    AND ts_created < DATE_ADD('{year}-{month}-{day}', 1) 
+    AND (dt_paid IS NULL OR dt_paid >= DATE('{year}-{month}-{day}'))
+    AND ts_created < DATE_ADD('{year}-{month}-{day}', 1)
 ),
 
 late_contracts AS (
@@ -243,7 +243,7 @@ late_contracts AS (
     invoices_at_closing
   WHERE
     delta_days < 0 AND
-    (payment_status != 'paid' OR dt_paid >= DATE('{year}-{month}-{day}')) 
+    (payment_status != 'paid' OR dt_paid >= DATE('{year}-{month}-{day}'))
   GROUP BY 1, 2
 ),
 
@@ -251,7 +251,7 @@ invoices_at_closing_with_minimum_date AS (
   SELECT
     closing.*,
     IF(lc.dt_min_contract_due IS NULL, closing.dt_due, lc.dt_min_contract_due) AS dt_min_contract_due
-  FROM 
+  FROM
     invoices_at_closing AS closing
   LEFT JOIN
     late_contracts AS lc
@@ -292,19 +292,19 @@ invoices_at_closing_with_minimum_date_w_deal AS (
     closing.dt_created,
     closing.dt_probable_created,
     closing.dt_probable_due,
-    CASE 
+    CASE
       WHEN due.dt_min_contract_due_dealed IS NULL THEN closing.dt_min_contract_due
       WHEN due.dt_min_contract_due_dealed <= closing.dt_min_contract_due THEN due.dt_min_contract_due_dealed
       ELSE closing.dt_min_contract_due
     END AS dt_min_contract_due,
     CASE
-      WHEN dt_min_contract_due >= DATE('{year}-{month}-{day}') THEN DATEDIFF(dt_min_contract_due, DATE('{year}-{month}-{day}')) 
-      WHEN dt_paid IS NOT NULL THEN DATEDIFF(dt_min_contract_due, IF(dt_paid <= DATE('{year}-{month}-{day}'), dt_paid, DATE('{year}-{month}-{day}'))) 
+      WHEN dt_min_contract_due >= DATE('{year}-{month}-{day}') THEN DATEDIFF(dt_min_contract_due, DATE('{year}-{month}-{day}'))
+      WHEN dt_paid IS NOT NULL THEN DATEDIFF(dt_min_contract_due, IF(dt_paid <= DATE('{year}-{month}-{day}'), dt_paid, DATE('{year}-{month}-{day}')))
       ELSE -1 * DATEDIFF(DATE('{year}-{month}-{day}'), dt_min_contract_due)
     END AS delta_days_contaminated
-  FROM 
+  FROM
     invoices_at_closing_with_minimum_date AS closing
-  LEFT JOIN 
+  LEFT JOIN
     old_due_dates AS due
       ON closing.id_invoice = due.id_invoice
 ),
@@ -315,14 +315,14 @@ contaminated_contracts AS (
     'HR'AS flag_risk
   FROM
     invoices_at_closing_with_minimum_date_w_deal
-  WHERE 
+  WHERE
     frequency IN ('extra','pos rental', 'pos-rental')
 ),
 
 pd_range AS (
   SELECT
     closing.*,
-    CASE 
+    CASE
       WHEN delta_days_contaminated <= -181 THEN 'TotalM +6 (>181 days)'
       WHEN delta_days_contaminated BETWEEN -180 AND -151 THEN 'TotalM +5 (151-180 days)'
       WHEN delta_days_contaminated BETWEEN -150 AND -121 THEN 'TotalM +4 (121-150 days)'
@@ -351,7 +351,7 @@ SELECT
   due_amount,
   paid_amount,
   original_amount,
-  CAST(-1*(CASE 
+  CAST(-1*(CASE
     WHEN flag_risk = 'LR' AND pd_range = 'TotalCurrent' THEN due_amount * 0.61/100
     WHEN flag_risk = 'LR' AND pd_range = 'TotalM +0 (1-30 days)' THEN due_amount * 23/100
     WHEN flag_risk = 'LR' AND pd_range = 'TotalM +1 (31-60 days)' THEN due_amount * 54.09/100

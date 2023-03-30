@@ -7,12 +7,11 @@ columns:
   sk_invoice:
     description: "Id of invoice registered in SeuBarriga"
     lineage:
-      - datalake_retsuko.invoice.id_invoice
+      - datalake_retsuko.invoice_info.id_invoice
   frequency:
     description: "Invoice frequency type to be sent, such as monthly, extra or pos"
     lineage:
-      - datalake_retsuko.invoice.invoice_frequency
-        rental
+      - datalake_retsuko.invoice_info.invoice_frequency
     categories:
       early termination: ""
       estate agent services: ""
@@ -23,7 +22,7 @@ columns:
   payment_status:
     description: "Invoice payment status"
     lineage:
-      - datalake_retsuko.invoice.payment_status
+      - datalake_retsuko.invoice_info.payment_status
     categories:
       canceled: The invoice is canceled, and there's no more values to be paid
       divergent payment:
@@ -44,18 +43,18 @@ columns:
   substatus:
     description: "It's used to set negotiations/debts status"
     lineage:
-      - datalake_retsuko.invoice.substatus
+      - datalake_retsuko.invoice_info.substatus
   negotiation_status:
     description: "Description of negotiation status"
     lineage:
-      - datalake_retsuko.invoice.negotiation_status
+      - datalake_retsuko.invoice_info.negotiation_status
     categories:
       active: ""
       expired: ""
   closing_mode:
     description: "Description that shows if closing is automatic or manual"
     lineage:
-      - datalake_retsuko.invoice.closing_mode
+      - datalake_retsuko.invoice_info.closing_mode
     categories:
       auto: ""
       manual: ""
@@ -63,7 +62,7 @@ columns:
   paid_via:
     description: "How invoice is paid"
     lineage:
-      - datalake_retsuko.invoice.paid_via
+      - datalake_retsuko.invoice_info.paid_via
     categories:
       bank-transfer: ""
       cardif: ""
@@ -79,7 +78,7 @@ columns:
   user:
     description: "User to which the invoice was sent"
     lineage:
-      - datalake_retsuko.invoice.invoice_user
+      - datalake_retsuko.invoice_info.invoice_user
     categories:
       landlord: ""
       personal estate agent: ""
@@ -88,19 +87,19 @@ columns:
   due_amount:
     description: "Invoice amount, negative means its a due value TO 5A, and positive means its a due value FROM 5A"
     lineage:
-      - datalake_retsuko_clean.invoice.due_amount
+      - datalake_retsuko.invoice.due_amount
   paid_amount:
     description: "Amout paid on the invoice"
     lineage:
-      - datalake_retsuko_clean.invoice.paid_amount
+      - datalake_retsuko.invoice.paid_amount
   accrual_year_month:
     description: "Expense reference month"
     lineage:
-      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko.invoice.accrual_year_month
   ts_created:
     description: "Invoice creation timestamp"
     lineage:
-      - datalake_retsuko_clean.invoice.ts_created
+      - datalake_retsuko.invoice.ts_created
   ts_canceled:
     description: "Invoice cancellation timestamp"
     lineage:
@@ -108,14 +107,14 @@ columns:
   dt_sent:
     description: "Date in which invoice was sent to user charged"
     lineage:
-      - datalake_retsuko.invoice.ts_sent
+      - datalake_retsuko.invoice_info.ts_sent
   dt_due:
     description: "Date in which invoice will be due"
     lineage:
-      - datalake_retsuko.invoice.ts_due
+      - datalake_retsuko.invoice_info.ts_due
   dt_paid:
     description: "Date in which invoice was paid, for payable invoices"
     lineage:
-      - datalake_retsuko.invoice.ts_paid
+      - datalake_retsuko.invoice_info.ts_paid
   ts_load:
     description: "Timestamp which the data was loaded"

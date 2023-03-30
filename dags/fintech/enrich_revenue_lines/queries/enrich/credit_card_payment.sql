@@ -11,12 +11,12 @@ SELECT
     i.due_amount AS invoice_theorical_amount,
     i.paid_amount AS invoice_paid_amount,
     (paid_amount + due_amount) AS invoice_paid_fee,
-    ROUND(charged_amount * (CASE 
+    ROUND(charged_amount * (CASE
                         WHEN ccp.installments = 1 THEN 0.012
                         WHEN ccp.installments <= 6 THEN 0.016
                         WHEN ccp.installments <= 12 THEN 0.019
                         ELSE NULL END), 2) AS acquirer_cost,
-    ROUND(charged_amount * (1- CASE 
+    ROUND(charged_amount * (1- CASE
                             WHEN installments = 1 THEN 0.012
                             WHEN installments <= 6 THEN 0.016
                             WHEN installments <= 12 THEN 0.019
@@ -28,8 +28,8 @@ SELECT
 FROM
     datalake_retsuko_clean.credit_card_payment AS ccp
 INNER JOIN
-    datalake_retsuko_clean.invoice AS i
+    datalake_retsuko.invoice AS i
         ON ccp.id_invoice = i.id
-INNER JOIN 
+INNER JOIN
     datalake_retsuko_clean.contract AS c
         ON i.id_contract = c.id

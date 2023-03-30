@@ -1,5 +1,5 @@
 WITH bill_items_clean AS (
-  SELECT 
+  SELECT
     bill_items.id,
     bill_items.id_external,
     bill_items.id_invoice,
@@ -12,7 +12,7 @@ WITH bill_items_clean AS (
     bill_items.description,
     from_acc.type as from_acc_type,
     to_acc.type as to_acc_type,
-    CASE 
+    CASE
       WHEN REPLACE(from_acc.type, '-', ' ') LIKE '%contract%' AND REPLACE(to_acc.type, '-', ' ') NOT LIKE '%contract%' THEN REPLACE(to_acc.type, '-', ' ')
       WHEN REPLACE(from_acc.type, '-', ' ') NOT LIKE '%contract%' AND REPLACE(to_acc.type, '-', ' ') LIKE '%contract%' THEN REPLACE(from_acc.type, '-', ' ')
       WHEN REPLACE(from_acc.type, '-', ' ') LIKE '%contract%' AND REPLACE(to_acc.type, '-', ' ') LIKE '%contract%' THEN 'contract'
@@ -21,15 +21,15 @@ WITH bill_items_clean AS (
     CASE
       WHEN (from_acc.type='contract' AND to_acc.type='tenant') THEN (-1.0) * bill_items.amount
       WHEN (from_acc.type='contract' AND to_acc.type='landlord') THEN (-1.0) * bill_items.amount
-      ELSE bill_items.amount 
+      ELSE bill_items.amount
     END AS amount_corrected_signal
-  FROM 
-    datalake_retsuko_clean.entry AS bill_items
-  INNER JOIN 
-    datalake_retsuko_clean.account AS from_acc 
+  FROM
+    datalake_retsuko.entry AS bill_items
+  INNER JOIN
+    datalake_retsuko_clean.account AS from_acc
       ON bill_items.id_from_account = from_acc.id
-  INNER JOIN 
-    datalake_retsuko_clean.account AS to_acc 
+  INNER JOIN
+    datalake_retsuko_clean.account AS to_acc
       ON bill_items.id_to_account = to_acc.id
 ),
 
@@ -38,14 +38,14 @@ filtered_bill_items AS (
     *
   FROM
     bill_items_clean
-  WHERE 
+  WHERE
     invoice_user = 'tenant'
     AND id_invoice IS NOT NULL
 ),
 
 pre_pivot_items as (
-  SELECT 
-    id, 
+  SELECT
+    id,
     CASE clean_bill_item
       WHEN 'condominium' THEN 'pacote'
       WHEN 'iptu' THEN 'pacote'
@@ -61,19 +61,19 @@ pre_pivot_items as (
       ELSE 'outros'
     END AS item_group,
     amount_corrected_signal
-  FROM 
+  FROM
     filtered_bill_items
 ),
 
 pivoted_items AS (
-  SELECT 
-    * 
+  SELECT
+    *
   FROM
     pre_pivot_items
   PIVOT(
     SUM(amount_corrected_signal)
     FOR item_group IN ( 'pacote', 'protecao5a', 'early-termination', 'danos', 'outros')
-  ) 
+  )
 ),
 
 grouped_bill_items AS (
@@ -87,16 +87,16 @@ grouped_bill_items AS (
     SUM(COALESCE(pivot.`early-termination`,0)) AS early_termination,
     SUM(COALESCE(pivot.danos,0)) AS danos,
     SUM(COALESCE(pivot.outros,0)) AS outros
-  FROM 
+  FROM
     filtered_bill_items item
-  LEFT JOIN 
+  LEFT JOIN
     pivoted_items AS pivot
       ON item.id = pivot.id
-  GROUP BY 1 
+  GROUP BY 1
 ),
 
 clean_invoices AS (
-  SELECT 
+  SELECT
     inv.id_contract,
     inv.id AS id_invoice,
     inv.id_external AS id_invoice_main,
@@ -120,22 +120,22 @@ clean_invoices AS (
     entries.danos,
     entries.early_termination,
     entries.outros
-  FROM 
-    datalake_retsuko_clean.invoice AS inv
-  LEFT JOIN 
+  FROM
+    datalake_retsuko.invoice AS inv
+  LEFT JOIN
     grouped_bill_items AS entries
       ON entries.id_invoice = inv.id
-  WHERE 
-    inv.status NOT IN ('canceled', 'not-payable', 'written-down') 
+  WHERE
+    inv.status NOT IN ('canceled', 'not-payable', 'written-down')
     AND NOT (inv.ts_sent IS NULL AND inv.status = 'open' AND inv.purpose = 'extra' AND entries.pacote > 0)
-    AND inv.purpose IN ('monthly', 'early-termination', 'extra', 'onboarding') 
+    AND inv.purpose IN ('monthly', 'early-termination', 'extra', 'onboarding')
     AND DATEDIFF(ts_due, current_date()) NOT BETWEEN -60 and 31
     AND inv.due_amount < 0
   ORDER BY inv.id_contract, inv.ts_due ASC
 ),
 
 contracts_payment AS (
-  SELECT 
+  SELECT
     inv.id_contract,
     FIRST(contract.id_external) AS id_contract_main,
     FIRST(contract_ebdb.id_proposal) AS id_proposal,
@@ -162,12 +162,12 @@ contracts_payment AS (
     FIRST(INT(ISNOTNULL(contract_ebdb.dt_termination))) AS is_terminated,
     FIRST(CAST(contract_ebdb.dt_started AS TIMESTAMP)) AS dt_started,
     FIRST(CAST(contract_ebdb.dt_termination AS TIMESTAMP)) AS dt_termination
-  FROM 
+  FROM
     clean_invoices inv
-  LEFT JOIN 
+  LEFT JOIN
     datalake_retsuko_clean.contract AS contract
       ON contract.id = inv.id_contract
-  LEFT JOIN 
+  LEFT JOIN
     datalake_ebdb_clean.contract AS contract_ebdb
       ON contract_ebdb.id = contract.id_external
   WHERE
@@ -176,13 +176,13 @@ contracts_payment AS (
 ),
 
 first_package AS (
-  SELECT 
+  SELECT
     id_contract,
     FIRST(rent) AS rent_price_first,
     FIRST(rent + iptu + home_insurance_value + condo_price) AS package_price_first
-  FROM 
+  FROM
     datalake_ebdb_clean.contract_aud
-  WHERE 
+  WHERE
     ts_signed IS NOT NULL
   GROUP BY id_contract
 )
@@ -219,11 +219,11 @@ SELECT
   contracts_payment.is_terminated,
   contracts_payment.dt_started,
   contracts_payment.dt_termination
-FROM 
+FROM
   contracts_payment
-LEFT JOIN 
+LEFT JOIN
   datalake_retsuko_clean.contract AS contract
     ON contract.id = contracts_payment.id_contract
-LEFT JOIN 
+LEFT JOIN
   first_package AS first_package
     ON contracts_payment.id_contract_main = first_package.id_contract

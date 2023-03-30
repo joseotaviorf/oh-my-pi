@@ -1,0 +1,55 @@
+---
+database_name: datalake_retsuko
+table_name: invoice_info
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: "TODO FINISH DESCRIPTIONS"
+columns:
+  id_invoice:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko.invoice.id_external
+  invoice_frequency:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko.invoice.purpose
+  payment_status:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko.invoice.status
+  substatus:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko.invoice.substatus
+  negotiation_status:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko.invoice.negotiation_status
+  closing_mode:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko.invoice.closing_mode
+  paid_via:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko.invoice.paid_via
+  invoice_user:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko_clean.account.type
+  ts_sent:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko.invoice.ts_sent
+  ts_due:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+  ts_paid:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko.invoice.ts_paid
+  ts_canceled:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko.invoice.ts_canceled
