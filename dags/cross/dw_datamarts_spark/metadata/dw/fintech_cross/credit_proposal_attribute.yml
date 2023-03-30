@@ -33,7 +33,7 @@ columns:
     lineage:
       - dw_public.dim_contract.cancellation_reason
     description: "Contract's cancellation on EBDB."
-  job_type:
+  jobtype:
     lineage:
       - datalake_sorting_hat_clean.proponent.income_nature
     description: "Checks if any proponents has a clt job."
@@ -142,7 +142,7 @@ columns:
   classification:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.category
-    description: ""
+    description: "Guarantee grouping."
   tenants:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.id
