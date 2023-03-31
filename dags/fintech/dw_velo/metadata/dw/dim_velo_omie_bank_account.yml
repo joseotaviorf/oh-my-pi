@@ -1,16 +1,25 @@
 ---
 database_name: dw_velo
 table_name: dim_velo_omie_bank_account
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: Dimension with Bank Account from Velo, registered on OMIE systems.
 columns:
   sk_bank_account:
+    description: Bank Account's internal identification number (SK)
     lineage:
       - datalake_velo.omie_bank_account.id_bank_account
   description:
+    description: Bank Account's description/name
     lineage:
       - datalake_velo.omie_bank_account.description
   bank_account_number:
+    description: Bank Account's number
     lineage:
       - datalake_velo.omie_bank_account.bank_account_number
   is_active:
+    description: If this Bank Account is active on OMIE systems.
     lineage:
       - datalake_velo.omie_bank_account.is_active
+  ts_load:
+    description: Load timestamp

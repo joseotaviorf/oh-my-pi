@@ -69,3 +69,5 @@ columns:
     description: Timestamp that the occurrence was created.
     lineage:
       - datalake_velo.occurrence.ts_created
+  ts_load:
+    description: Load timestamp

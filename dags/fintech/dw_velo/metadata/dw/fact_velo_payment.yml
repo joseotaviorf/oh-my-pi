@@ -101,3 +101,5 @@ columns:
     description: Timestamp that the invoice register was last updated on the database.
     lineage:
       - datalake_velo.payment.ts_updated
+  ts_load:
+    description: Load timestamp

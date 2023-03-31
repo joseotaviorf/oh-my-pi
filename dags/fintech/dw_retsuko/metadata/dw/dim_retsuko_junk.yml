@@ -25,3 +25,5 @@ columns:
     lineage:
       - datalake_retsuko.retsuko_junk.desc_lvl_1
     description: "Level 1 object description"
+  ts_load:
+    description: Load timestamp

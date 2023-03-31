@@ -56,10 +56,6 @@ columns:
     description: Auxiliary columns to indicate the financial value of the DUE STATUS in that given mob (col_mob)
   value_to_due:
     description: Auxiliary columns to indicate the financial value of the TO DUE STATUS in that given mob (col_mob)
-  due_amount:
-    description: Invoice amount, negative means its a due value TO 5A, and positive means its a due value FROM 5A
-    lineage:
-      - fact_bill_item_cluster_at_invoice_mobs.due_amount
   dt_safra_per_dt_due:
     description: Monthly group by due date
   dt_safra_per_dt_created:
