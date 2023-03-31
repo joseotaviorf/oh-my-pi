@@ -1,4 +1,3 @@
-%sql
 WITH dag_layer AS (
     SELECT DISTINCT 
         dag, 
