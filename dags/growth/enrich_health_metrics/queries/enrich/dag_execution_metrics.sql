@@ -1,3 +1,4 @@
+%sql
 WITH dag_layer AS (
     SELECT DISTINCT 
         dag, 
@@ -89,7 +90,7 @@ historical_execution_metrics AS (
     JOIN
         datalake_gsheets_clean.reference_sla_days AS rs
     ON
-        DATE(em.dt_executed) = DATE(rs.reference_date)
+        DATE(em.dt_executed) = DATE(rs.dt_reference_date)
     GROUP BY
         1, 2
 )
