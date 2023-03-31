@@ -1,0 +1,28 @@
+---
+database_name: datalake_nazare_job_cluster_clean
+table_name: partner_revision
+columns:
+  id_partner:
+    lineage:
+      - datalake_nazare_job_cluster_raw.partner_revision.id
+  revision:
+    lineage:
+      - datalake_nazare_job_cluster_raw.partner_revision.revision
+  brokerage:
+    lineage:
+      - datalake_nazare_job_cluster_raw.partner_revision.brokerage
+  quintoandar_administration_fee:
+    lineage:
+      - datalake_nazare_job_cluster_raw.partner_revision.quintoandar_administration_fee
+  demand_partner_fee:
+    lineage:
+      - datalake_nazare_job_cluster_raw.partner_revision.demand_partner_fee
+  supply_partner_fee:
+    lineage:
+      - datalake_nazare_job_cluster_raw.partner_revision.supply_partner_fee
+  ts_invalidated:
+    lineage:
+      - datalake_nazare_job_cluster_raw.partner_revision.invalidated_at
+  ts_created:
+    lineage:
+      - datalake_nazare_job_cluster_raw.partner_revision.created_at

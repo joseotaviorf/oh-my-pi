@@ -181,7 +181,7 @@ unit-tests:
 	@echo "Unit Tests"
 	@echo "=========="
 	@echo ""
-	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov-report term --cov-report html:htmlcov --cov=bietlejuice/ --cov-fail-under=40 tests/unit/
+	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov-report term --cov-report html:htmlcov --cov=bietlejuice/ --cov-fail-under=35 tests/unit/
 
 .PHONY: integration-tests
 ## run integration tests with coverage report

@@ -1,0 +1,19 @@
+---
+database_name: datalake_nazare_job_cluster_clean
+table_name: brokerage_fee_baseline_revision
+columns:
+  id_brokerage_fee_baseline:
+    lineage:
+      - datalake_nazare_job_cluster_raw.brokerage_fee_baseline_revision.id
+  revision:
+    lineage:
+      - datalake_nazare_job_cluster_raw.brokerage_fee_baseline_revision.revision
+  gross_advance:
+    lineage:
+      - datalake_nazare_job_cluster_raw.brokerage_fee_baseline_revision.bonus_fee
+  ts_invalidated:
+    lineage:
+      - datalake_nazare_job_cluster_raw.brokerage_fee_baseline_revision.invalidated_at
+  ts_created:
+    lineage:
+      - datalake_nazare_job_cluster_raw.brokerage_fee_baseline_revision.created_at

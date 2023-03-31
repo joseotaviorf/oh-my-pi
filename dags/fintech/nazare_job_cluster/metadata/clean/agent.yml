@@ -1,0 +1,22 @@
+---
+database_name: datalake_nazare_job_cluster_clean
+table_name: agent
+columns:
+  id_agent:
+    lineage:
+      - datalake_nazare_job_cluster_raw.agent.id
+  id_external:
+    lineage:
+      - datalake_nazare_job_cluster_raw.agent.external_id
+  name:
+    lineage:
+      - datalake_nazare_job_cluster_raw.agent.name
+  document_number:
+    lineage:
+      - datalake_nazare_job_cluster_raw.agent.document_number
+  ts_created:
+    lineage:
+      - datalake_nazare_job_cluster_raw.agent.created_at
+  ts_updated:
+    lineage:
+      - datalake_nazare_job_cluster_raw.agent.updated_at
