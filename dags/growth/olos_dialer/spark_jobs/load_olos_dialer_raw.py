@@ -39,8 +39,8 @@ def create_dataframe(source_bucket: str, s3_folder: str, table: str, dt: datetim
       .json(f"s3://{source_bucket}/{file_path}")
     )
     
-    if df.isEmpty():
-      logger.warning(f"m=__main__, msg=Empty dataframe for {table} in {dt}.")
+    if len(df.head(1)) == 0:
+      logger.warning(f"m=__main__, msg=Empty dataframe for {table}.")
       return None
     
     return (
