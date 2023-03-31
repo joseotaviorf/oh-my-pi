@@ -36,7 +36,6 @@ columns:
     - datalake_vans_clean.boleto.occurrence_code
     - datalake_vans_clean.payment.occurrence_code
     - datalake_vans_clean.payment_boleto.occurrence_code
-  description:
     description: The third last occurrence code for combined returns from SISPAG,
       which represents the third higher detail level of errors
   source_file_type:
@@ -45,9 +44,7 @@ columns:
     categories:
       cnab: ''
       sispag: ''
-  hird_last_code:
-    description: The third last occurrence code for combined returns from SISPAG,
-      which represents the third higher detail level of errors and probably the first
-      in sequence
+  description:
+    description: description of occurrence code
   ts_load:
     description: Load Timestamp

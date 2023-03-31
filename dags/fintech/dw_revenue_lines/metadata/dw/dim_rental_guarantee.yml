@@ -16,9 +16,6 @@ columns:
     lineage:
     - datalake_revenue_lines.rental_guarantee.id_charge
     description: Charge ID
-  status:
-    lineage:
-    - datalake_revenue_lines.rental_guarantee.guarantee_status
   guarantee_status:
     lineage:
     - datalake_revenue_lines.rental_guarantee.guarantee_status
@@ -47,10 +44,6 @@ columns:
     lineage:
     - datalake_revenue_lines.rental_guarantee.total_installments
     description: Number of installments that the guarantee value was divided
-  installment_number:
-    lineage:
-    - datalake_revenue_lines.rental_guarantee.installment_number
-    description: Number of the installment given a specific month
   monthly_revenue:
     lineage:
     - datalake_revenue_lines.rental_guarantee.monthly_revenue
@@ -59,13 +52,16 @@ columns:
     lineage:
     - datalake_revenue_lines.rental_guarantee.accrual_year_month
     description: Reference year-month
+  contract_status:
+    lineage:
+    - datalake_revenue_lines.rental_guarantee.contract_status
+    description: Contract Status
+    categories:
+      ATIVO: ''
+      FINALIZADO: ''
   ts_guarantee_created:
     lineage:
     - datalake_revenue_lines.rental_guarantee.ts_guarantee_created
     description: Timestamp of guarantee created
-  ts_charge_created:
-    description: Charge created timestamp
-  ts_guarantee_paid:
-    description: Guarantee paid timestamp
   ts_load:
     description: Load timestamp
