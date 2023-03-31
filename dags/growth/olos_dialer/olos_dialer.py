@@ -108,7 +108,7 @@ for table_name in TABLES_LIST:
         raw_spark_job_extra_args=[
             SOURCE,
             "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}",
-            "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+            "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}",
             table_name,
         ],
         has_hive_sync=False,
@@ -117,13 +117,13 @@ for table_name in TABLES_LIST:
     clean_task_group = datalake_task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
-        table_name="{{ change_case(table_name) }}",
+        table_name=change_case(table_name),
         is_incremental=True,
         has_create_external_table_task=False,
         partitions=PARTITION_COLS,
         extra_query_template_params={
             "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}",
-            "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+            "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}",
         },
     )
 
