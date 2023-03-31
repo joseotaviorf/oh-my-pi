@@ -12,7 +12,9 @@ from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.airflow.task_groups.datalake_task_group_job_cluster import (
+    DatalakeTaskGroupJobCluster,
+)
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
@@ -77,7 +79,7 @@ execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
     libraries=default_libraries,
 )
 
-task_group = DatalakeTaskGroup(
+task_group = DatalakeTaskGroupJobCluster(
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
@@ -99,9 +101,9 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     target_database_base_name=CONTEXT,
 )
 
-chain(execute_job_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+chain(execute_job_cluster_task, DatalakeTaskGroupJobCluster.first_tasks(raw_task_group))
 
 cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_group),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
+    DatalakeTaskGroupJobCluster.last_tasks(raw_task_group),
+    DatalakeTaskGroupJobCluster.all_first_tasks(clean_task_groups),
 )
