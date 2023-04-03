@@ -218,7 +218,7 @@ sale_flows_funnel_events AS (
                     OR LOWER(sf.utm_campaign) LIKE '%girafa%'
                     OR LOWER(sf.utm_campaign) LIKE '%vender%'
                     OR LOWER(sf.utm_campaign) = 'whatsapp_s'
-                    OR LOWER(CONCAT(sf.utm_source, sf.utm_campaign, sf.utm_medium, sf.utm_term)) IN 
+                    OR LOWER(sf.utm_source || sf.utm_campaign || sf.utm_medium || sf.utm_term) IN 
                             ('subscribedpush.whatsapp.produto.frfs.homes.canaiswhatsapponly.whatsapp.sale',
                             'subscribedpush.whatsapp.produto.frfs.homeswhatsappsale')
                 THEN 'Sale'
