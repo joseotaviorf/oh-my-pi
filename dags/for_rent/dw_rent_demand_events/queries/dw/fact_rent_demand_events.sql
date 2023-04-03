@@ -12,7 +12,7 @@ SELECT
     COALESCE(id_rent_flow, -1) AS sk_rent_flow,
     COALESCE(id_house_listing, -1) AS sk_house_listing,
     COALESCE(id_region, -1) AS sk_region,
-    COALESCE(id_owner -1) AS sk_owner,
+    COALESCE(id_owner, -1) AS sk_owner,
     COALESCE(CAST(DATE_FORMAT(ts_event, "yyyyMMdd") AS BIGINT), -1) AS sk_event_date,
     country_code,
     year,
