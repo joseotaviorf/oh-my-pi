@@ -31,6 +31,8 @@ from bietlejuice.metadata_propagator_pipeline.atlas_quality_metrics_pipeline imp
 
 from pyspark.sql.functions import col, to_timestamp
 
+from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
+from bietlejuice.services.slack_service import SlackService
 from bietlejuice.services import ConfigurationService
 
 JOB_NAME = "data_quality_tests"
@@ -228,6 +230,20 @@ if __name__ == "__main__":
         f"relative_file_path={relative_file_path}, table_name={table_name},  msg=Job execution started."
     )
 
+    base_dbutils = BaseDBUtils()
+
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+
+    if env == 'prod':
+        key = SlackWebhooksEnum.ALERTS_AIRFLOW_DE_DAGS_INMETRO
+    else:
+        key = SlackWebhooksEnum.DE_TESTS
+
+    slack_webhook = dbutils.secrets.get(
+            scope="quintoandar", key=key
+    )
+
     # ############################# Getting Validation Results ###############################
     validation_file_content = DAGPackagesPathService.get_data_quality_file_content_in_spark_jobs(
         dag_name=relative_file_path,
@@ -275,76 +291,83 @@ if __name__ == "__main__":
     PyDeequValidator fails when try to execute 'column_level_validations' with an empty dataframe.
     """
     if df.rdd.isEmpty():
-        input_configs.pop("column_level_validations", None)
 
-        if "table_level_validations" in input_configs.keys():
-            input_configs["table_level_validations"].update(
-                {"has_size": {"greater_than": 1}}
+        message = (
+            f":warning:\n"
+            f"Validation suite: `Pipeline Validations:`\n"
+            f"`{database_name}.{table_name}`\n"
+            f"Status: `ERROR`\n\n"
+            f"*The dataframe is empty*."
+        )
+
+        if is_incremental:
+            message += f" No data found for the date {execution_date}."
+
+        SlackService.send_slack_errors([(message,slack_webhook)])
+
+    else:
+
+        pydeequ_validator = PyDeequValidator(
+            suite_name=f"Pipeline Validations: {database_name}.{table_name}",
+            validation_suite=validation_suite,
+            client=spark_client,
+        )
+
+        validation_results = pydeequ_validator.execute_and_parse(df)
+
+        # ################################ Writing to Inmetro's S3 Bucket ##################################
+
+        s3_client = InmetroS3Client()
+        s3_loader = InmetroS3Loader(bucket=inmetro_bucket, file_name=f"{table_name}.json")
+        destination_directory = f"bietlejuice/{database_name}/{table_name}/validation"
+
+        s3_loader.upload(
+            client=s3_client,
+            output_parser=validation_results,
+            path_name=destination_directory,
+        )
+
+        # ################################ Mapping from DW_STAGING to DW  #################################
+        # In this case, tests will run on dw_staging, but metadata will associated to dw entities.
+
+        if layer == "dw_staging":
+            database_name = mapping_dw_schema(database=database_name)
+
+        # ############################## Metadata Propagator Call ################################
+
+        base_dbutils = BaseDBUtils()
+        if base_dbutils.get_dbutils() is not None:
+            dbutils = base_dbutils.get_dbutils()
+
+        metadata_propagator_credentials = json.loads(
+            dbutils.secrets.get(
+                scope="quintoandar", key=ServiceEnum.METADATA_PROPAGATOR.value
             )
-        else:
-            input_configs["table_level_validations"] = {"has_size": {"greater_than": 1}}
-
-    pydeequ_validator = PyDeequValidator(
-        suite_name=f"Pipeline Validations: {database_name}.{table_name}",
-        validation_suite=validation_suite,
-        client=spark_client,
-    )
-
-    validation_results = pydeequ_validator.execute_and_parse(df)
-
-    # ################################ Writing to Inmetro's S3 Bucket ##################################
-
-    s3_client = InmetroS3Client()
-    s3_loader = InmetroS3Loader(bucket=inmetro_bucket, file_name=f"{table_name}.json")
-    destination_directory = f"bietlejuice/{database_name}/{table_name}/validation"
-
-    s3_loader.upload(
-        client=s3_client,
-        output_parser=validation_results,
-        path_name=destination_directory,
-    )
-
-    # ################################ Mapping from DW_STAGING to DW  #################################
-    # In this case, tests will run on dw_staging, but metadata will associated to dw entities.
-
-    if layer == "dw_staging":
-        database_name = mapping_dw_schema(database=database_name)
-
-    # ############################## Metadata Propagator Call ################################
-
-    base_dbutils = BaseDBUtils()
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
-
-    metadata_propagator_credentials = json.loads(
-        dbutils.secrets.get(
-            scope="quintoandar", key=ServiceEnum.METADATA_PROPAGATOR.value
         )
-    )
-    AtlasQualityMetricsPipeline(
-        metadata_propagator_host=metadata_propagator_credentials["host"],
-        database_name=database_name,
-        table_name=table_name,
-        metadata_type=MetadataTypeEnum.QUALITY_METRICS,
-        validation_results=validation_results,
-    ).run()
+        AtlasQualityMetricsPipeline(
+            metadata_propagator_host=metadata_propagator_credentials["host"],
+            database_name=database_name,
+            table_name=table_name,
+            metadata_type=MetadataTypeEnum.QUALITY_METRICS,
+            validation_results=validation_results,
+        ).run()
 
-    # #################################### Slack Alert ######################################
-    config_service = ConfigurationService()
-    webhook_key = config_service.get_config("notification_webhooks_keys")[
-        "data_quality"
-    ]
-    datahub_host = config_service.get_config("datahub_host")
+        # #################################### Slack Alert ######################################
+        config_service = ConfigurationService()
+        webhook_key = config_service.get_config("notification_webhooks_keys")[
+            "data_quality"
+        ]
+        datahub_host = config_service.get_config("datahub_host")
 
-    if validation_results["metadata"]["suite_result"] != "SUCCESS":
-        slack_webhook = dbutils.secrets.get(scope="quintoandar", key=webhook_key)
+        if validation_results["metadata"]["suite_result"] != "SUCCESS":
+            slack_webhook = dbutils.secrets.get(scope="quintoandar", key=webhook_key)
 
-        messenger = SlackMessenger(slack_webhook)
-        message = create_message_from_validation_results(
-            datahub_host, database_name, table_name, validation_results
+            messenger = SlackMessenger(slack_webhook)
+            message = create_message_from_validation_results(
+                datahub_host, database_name, table_name, validation_results
+            )
+            messenger.send_message(message)
+
+        logger.info(
+            f"m={JOB_NAME}, msg=Data quality tests executed for table {table_name}."
         )
-        messenger.send_message(message)
-
-    logger.info(
-        f"m={JOB_NAME}, msg=Data quality tests executed for table {table_name}."
-    )
