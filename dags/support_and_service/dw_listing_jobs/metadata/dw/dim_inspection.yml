@@ -16,7 +16,7 @@ columns:
   mode:
     lineage:
     - datalake_ebdb_listing_jobs.inspection.mode
-    description: ''
+    description: "Deprecated Column"
     categories:
       Light: '#N/A'
       Portability: '#N/A'
