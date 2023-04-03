@@ -41,7 +41,7 @@ RUN python3 -m pip install -qq --upgrade pip && \
 RUN git config --global url.https://${GITHUB_TOKEN}:@github.com/.insteadOf https://github.com/ && \
     pip install -qq -r requirements_local_custom_libs.txt --extra-index-url https://quintoandar.github.io/python-package-server/ --no-deps
 
-COPY ./dags /bi-etl-ejuice/local/bietlejuice/dags
+COPY ./dags /bi-etl-ejuice/local/bietlejuice/dags/dags
 COPY ./local/docker/entrypoint.sh ./entrypoint.sh
 COPY ./bietlejuice ./bietlejuice
 COPY ./local/airflow ./airflow
