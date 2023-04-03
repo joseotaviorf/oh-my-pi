@@ -61,12 +61,15 @@ columns:
     - dw_public.dim_booking.dt_scheduling
     description: first visit made by the agent
   year:
+    description: year (partition)
     lineage:
     - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
   month:
+    description: month (partition)
     lineage:
     - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
   day:
+    description: day (partition)
     lineage:
     - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
   allocated_slots:

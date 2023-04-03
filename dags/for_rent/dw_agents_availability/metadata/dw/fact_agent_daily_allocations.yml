@@ -52,12 +52,15 @@ columns:
     - dw_agents_availability.fact_agent_hourly_allocations.ts_first_visit
     description: first visit made by the agent
   year:
+    description: year (partition)
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.year
   month:
+    description: month (partition)
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.month
   day:
+    description: day (partition)
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.day
   allocated_slots:
