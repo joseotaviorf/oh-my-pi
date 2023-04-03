@@ -34,19 +34,19 @@ houses_w_plaquinhas AS (
 condo_w_plaquinhas_rent AS (
     SELECT
         f.sk_condo,
-        hp.id_house,
         hp.dt_plaquinha,
         hp.installation_type,
         hp.listing_type
     FROM
-        houses_w_plaquinhas AS hp
-    INNER JOIN 
-        dw_public.fact_house_listing_flows AS f
-            ON hp.id_house = INT(f.sk_house_listing/1000)
+        houses_w_plaquinhas hp
+    JOIN dw_public.dim_house_listing dhl
+        ON hp.id_house = dhl.id_house
+    JOIN dw_public.fact_house_listing_flows f
+        ON f.sk_house_listing = dhl.sk_house_listing
     WHERE
         f.sk_condo > 0
     GROUP BY
-        1,2,3,4,5
+        1,2,3,4
 ),
 daily_published_listings_rent AS (
 ----------------------------
@@ -59,7 +59,8 @@ daily_published_listings_rent AS (
         d.week_start,
         d.weekday_name,
         d.month_start,
-        d.month_end 
+        d.month_end,
+        ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start DESC NULLS FIRST) AS order_status -- daily order status
     FROM
         dw_public.fact_house_listing_status f
     JOIN dw_public.dim_date d
@@ -68,8 +69,6 @@ daily_published_listings_rent AS (
         f.status_history = 'publicado' -- consider only published status
         AND SUBSTRING(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
         AND date >= DATE('2021-02-01') -- Month when the campaign started
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start DESC NULLS FIRST)  = 1 -- daily order status
 ),
 plaquinhas_rent AS (
     ----------------------------------------
@@ -82,6 +81,7 @@ plaquinhas_rent AS (
         fhs.weekday_name,
         fhs.month_start,
         fhs.month_end,
+        fhs.order_status,
         fhs.status_history,
         fhl.sk_region,
         COALESCE(hp.dt_plaquinha,cp.dt_plaquinha) AS dt_plaquinha,
@@ -98,16 +98,15 @@ plaquinhas_rent AS (
         ON (fhl.sk_house_listing/1000)::INTEGER = hp.id_house
     LEFT JOIN condo_w_plaquinhas_rent cp
         ON fhl.sk_condo = cp.sk_condo
-        AND (fhl.sk_house_listing/1000)::INTEGER = cp.id_house
     WHERE
-        fhl.sk_region > 0
+        fhs.order_status = 1
+        AND fhl.sk_region > 0
 ),
 plaquinhas_sale AS (
     WITH
     condo_w_plaquinhas_sale AS (
         SELECT
             flf.sk_condo,
-            hp.id_house,
             hp.dt_plaquinha,
             hp.installation_type,
             hp.listing_type
@@ -118,7 +117,7 @@ plaquinhas_sale AS (
         WHERE
             flf.sk_condo > 0
         GROUP BY
-            1,2,3,4,5
+            1,2,3,4
     ),
     daily_published_listings_sale AS (
     ----------------------------
@@ -131,7 +130,8 @@ plaquinhas_sale AS (
             d.week_start,
             d.weekday_name,
             d.month_start,
-            d.month_end 
+            d.month_end,
+            ROW_NUMBER() OVER(PARTITION BY f.sk_sale_listing, d.date ORDER BY f.ts_status_started DESC) AS order_status -- daily order status
         FROM
             dw_sale.fact_listing_status f
         JOIN dw_public.dim_date d
@@ -139,8 +139,6 @@ plaquinhas_sale AS (
         WHERE
             f.status_history = 'PUBLISHED' -- consider only published status
             AND date >= DATE('2021-09-01') -- Month when the campaign started
-        QUALIFY
-            ROW_NUMBER() OVER(PARTITION BY f.sk_sale_listing, d.date ORDER BY f.ts_status_started DESC) = 1 -- daily order status
     )
     ----------------------------------------
     -- Joining OL and plaquinhas FS infos --
@@ -152,6 +150,7 @@ plaquinhas_sale AS (
         fhs.weekday_name,
         fhs.month_start,
         fhs.month_end,
+        fhs.order_status,
         fhs.status_history,
         flf.sk_region,
         COALESCE(hp.dt_plaquinha,cps.dt_plaquinha) AS dt_plaquinha,
@@ -168,9 +167,9 @@ plaquinhas_sale AS (
         ON substring(fhs.sk_house_listing,0,9) = hp.id_house
     LEFT JOIN condo_w_plaquinhas_sale cps
         ON flf.sk_condo = cps.sk_condo
-        AND INT(fhs.sk_house_listing/1000) = cps.id_house
     WHERE
-        flf.sk_region > 0
+        fhs.order_status = 1
+        AND flf.sk_region > 0
 ),
 metrics_base AS (
     SELECT
