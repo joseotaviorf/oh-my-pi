@@ -1,13 +1,13 @@
 database_name: dw_agents_availability
 table_name: fact_agent_daily_allocations
-description: Hour allocation on day granularity
+description: Agents hour allocation on day granularity
 domain: For Rent
-owner: eduardo.bastiani@quintoandar.com.br
+owner: gutavo.alencar@quintoandar.com.br
 columns:
   sk_agent:
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.sk_agent
-    description: Dados Agente ID
+    description: sk of agent (agent id)
   sk_slot_date:
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.sk_slot_date
@@ -15,7 +15,7 @@ columns:
   sk_agent_region:
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.sk_agent_region
-    description: sk of dados agente id and sk_region
+    description: Concatenation of agent id and sk_region
   sk_slot_date_agent:
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.sk_slot_date_agent
@@ -23,10 +23,11 @@ columns:
   id_work_contract:
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.id_work_contract
-    description: Total slots that agent could made available acording to its contract
+    description: Total slots that agent could make available according to its contract
   agent_business_context:
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.agent_business_context
+    description: Business context of the agent
   max_slots_allocation_available:
     lineage:
     - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
