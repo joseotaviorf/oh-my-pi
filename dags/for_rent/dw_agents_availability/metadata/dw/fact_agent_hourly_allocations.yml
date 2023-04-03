@@ -1,13 +1,13 @@
 database_name: dw_agents_availability
 table_name: fact_agent_hourly_allocations
-description: Hour allocation on hour granularity
+description: Agent hour allocation on hour granularity
 domain: For Rent
-owner: eduardo.bastiani@quintoandar.com.br
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   sk_agent:
     lineage:
     - datalake_ebdb_agents.agents_slots_hourly.id_agent
-    description: Dados Agente ID
+    description: sk of agent (agent id)
   sk_slot_date:
     lineage:
     - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
@@ -15,11 +15,11 @@ columns:
   sk_slot_date_hour:
     lineage:
     - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-    description: ''
+    description: sk of agent allocation date and hour
   sk_agent_region:
     lineage:
     - dw_public.dim_agent_region.sk_agent_region
-    description: sk of dados agente id and sk_region
+    description: Concatenation of agent id and sk_region
   sk_slot_date_agent:
     lineage:
     - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
@@ -28,14 +28,15 @@ columns:
   id_work_contract:
     lineage:
     - datalake_ebdb_clean.agent_data_aud.id_work_contract
-    description: ''
+    description: Total slots that agent could make available according to its contract
   ts_slot_hour:
     lineage:
     - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-    description: ''
+    description: Timestamp of the agent allocation
   agent_business_context:
     lineage:
     - datalake_ebdb_agents.agent_business_context_history.agent_business_context
+    description: Business context of the agent
   is_allocation_available:
     lineage:
     - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
