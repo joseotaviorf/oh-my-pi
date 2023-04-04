@@ -32,13 +32,17 @@ default_libraries = config_service.get_config("default_libraries")
 custom_libraries = [
     {"maven": {"coordinates": "mysql:mysql-connector-java:5.1.47"}},
     {"pypi": {"package": "hubspot-api-client==5.0.0"}},
+    {"pypi": {"package": "google-auth==2.13.0"}},
+    {"pypi": {"package": "google-api-python-client==2.55.0"}},
+    {"pypi": {"package": "validations-engine==1.0.1"}},
+    {
+        "whl": f"{artifacts_bucket}/facebook-api-client-python/"
+        f"quintoandar_facebook_api_client-0.1.2-py2.py3-none-any.whl"
+    },
     {
         "whl": f"{artifacts_bucket}/gsheets-api-client-python/"
         f"quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
     },
-    {"pypi": {"package": "google-auth==2.13.0"}},
-    {"pypi": {"package": "google-api-python-client==2.55.0"}},
-    {"pypi": {"package": "validations-engine==1.0.1"}},
 ]
 
 dag = DAG(
