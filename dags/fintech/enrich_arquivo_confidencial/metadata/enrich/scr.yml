@@ -26,20 +26,36 @@ columns:
         - datalake_arquivo_confidencial_clean.integration_report.reference_date
   value:
     description: "SCR property value."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.raw_data
   domain:
     description: "SCR data identification regarding type and time."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.raw_data
   modality:
     description: "SCR data identification of balance operation group."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.raw_data
   submodality:
     description: "SCR data identification of balance operation detail."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.raw_data
   domain_group:
     description: "SCR domain grouping based on status."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.raw_data
   modality_description:
     description: "SCR data balance operation group."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.raw_data
   submodality_description:
     description: "SCR data balance operation detail."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.raw_data
   linked_to_foreign_currency:
     description: "If data is informed on foreign currency."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.raw_data
   ts_created:
     description: "Date information was created"
     lineage:

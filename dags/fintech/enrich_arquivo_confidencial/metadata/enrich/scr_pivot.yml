@@ -1,0 +1,100 @@
+database_name: datalake_arquivo_confidencial
+table_name: scr
+owner: giuseppe.giovanelli@quintoandar.com.br
+domain: fintech
+description: "Table with SCR data broken by Months on Booking (mob) and version."
+columns:
+  cpf:
+    description: "Personal identification number"
+  version:
+    description: "Ranking indicating how many times we executed a consultation for a given cpf."
+  mob:
+    description: "Months on Booking."
+  reference_date:
+    description: "Year month indicating to when the data is relevant."
+  "Saldo a vencer de Cartões (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Cartões (31 a 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Cartões (acima de 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Imobiliário (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Imobiliário (31 a 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Imobiliário (acima de 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Consignado (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Consignado (31 a 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Consignado (acima de 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Veículos PF (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Veículos PF (31 a 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Veículos PF (acima de 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Home Equity (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Home Equity (31 a 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Home Equity (acima de 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Crédito Pessoal (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Crédito Pessoal (31 a 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Crédito Pessoal (acima de 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Cheque Especial (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Cheque Especial (31 a 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo a vencer de Cheque Especial (acima de 180 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Cartões (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Cartões (acima de 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Imobiliário (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Imobiliário (acima de 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Consignado (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Consignado (acima de 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Veículos PF (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Veículos PF (acima de 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Home Equity (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Home Equity (acima de 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Crédito Pessoal (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Crédito Pessoal (acima de 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Cheque Especial (até 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Saldo vencido de Cheque Especial (acima de 30 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Limite Global (vencimento até 360 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Limite de Cheque Especial (vencimento até 360 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Limite de Cartão de Crédito (vencimento até 360 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Limite de Crédito Pessoal (vencimento até 360 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Limite Global (vencimento acima de 360 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Limite de Cheque Especial (vencimento acima de 360 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Limite de Cartão de Crédito (vencimento acima de 360 dias)":
+    description: "Credit card balance amount due to the next 30 days for a given month."
+  "Limite de Crédito Pessoal (vencimento acima de 360 dias":
+    description: "Credit card balance amount due to the next 30 days for a given month."

@@ -2,7 +2,7 @@ WITH scr_data AS (
     SELECT
     id,
     cpf,
-    version,
+    `version`,
     EXPLODE(FROM_JSON(raw_data:analysis_output:scr.scr_data,
         'array<
         struct<
@@ -38,14 +38,14 @@ WITH scr_data AS (
 mobs AS (
   SELECT
     *,
-    ROW_NUMBER() OVER (PARTITION BY cpf, VERSION ORDER BY scr_data.reference_date DESC) mob
+    ROW_NUMBER() OVER (PARTITION BY cpf, `version` ORDER BY scr_data.reference_date DESC) mob
   FROM scr_data
 ),
 operation_items_exploded AS (
   SELECT
     id,
     cpf,
-    version,
+    `version`,
     mob,
     scr_data.reference_date,
     EXPLODE(scr_data.operation_items) AS dat,
@@ -57,10 +57,17 @@ FROM mobs
 SELECT
     id,
     cpf,
-    version,
+    `version`,
     mob,
     reference_date,
-    dat.*,
+    0.01*dat.value AS `value`,
+    dat.domain,
+    dat.modality,
+    dat.submodality,
+    dat.domain_group,
+    dat.modality_description,
+    dat.submodality_description,
+    dat.linked_to_foreign_currency,
     ts_created,
     ts_updated
 FROM operation_items_exploded

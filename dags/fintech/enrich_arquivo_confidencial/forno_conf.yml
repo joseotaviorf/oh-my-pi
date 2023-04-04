@@ -1,2 +1,4 @@
 ---
-inner_dependencies: {}
+inner_dependencies:
+  scr_pivot:
+    - scr
