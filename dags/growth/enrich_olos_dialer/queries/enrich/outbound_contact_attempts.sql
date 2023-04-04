@@ -22,6 +22,30 @@ disposition_last_register AS (
     datalake_olos_dialer_clean.disposition
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_disposition ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+),
+info_campaign_type_last_register AS (
+  SELECT
+    *
+  FROM
+    datalake_olos_dialer_clean.info_campaign_type
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_campaign_type ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+),
+campaign_customer_last_register AS (
+  SELECT
+    *
+  FROM
+    datalake_olos_dialer_clean.campaign_customer
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_campaign, id_customer ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+),
+customer_last_register AS (
+  SELECT
+    *
+  FROM
+    datalake_olos_dialer_clean.customer
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_customer ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
 )
 SELECT
   outbound.id_call AS id_call,
@@ -60,7 +84,7 @@ LEFT JOIN
   campaign_last_register AS campaign
     ON campaign.id_campaign = outbound.id_campaign
 LEFT JOIN
-  datalake_olos_dialer_clean.info_campaign_type
+  info_campaign_type_last_register AS info_campaign_type
     ON info_campaign_type.id_campaign_type = campaign.id_campaign_type
 LEFT JOIN
   disposition_last_register AS disposition
@@ -69,10 +93,10 @@ LEFT JOIN
   datalake_olos_dialer.phone_output_olos_wololo_mapping
     ON phone_output_olos_wololo_mapping.id_wololo_disposition = disposition.id_disposition
 LEFT JOIN
-  datalake_olos_dialer_clean.campaign_customer
+  campaign_customer_last_register AS campaign_customer
     ON campaign_customer.id_campaign = outbound.id_campaign
 LEFT JOIN
-  datalake_olos_dialer_clean.customer
+  customer_last_register AS customer
     ON customer.id_customer = campaign_customer.id_customer
 WHERE
   DATE(CONCAT(outbound.year, '-', outbound.month, '-', outbound.day)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
