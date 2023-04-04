@@ -23,7 +23,6 @@ This pipeline produces the following output tables:
     - All gsheets defined in `gsheets_files.yaml`
 
 2. Data lake clean:
-    - `acquisition_target_per_source`
     - `affiliate_type_targets`
     - `affiliates_extra_user_bonus`
     - `affiliates_active_segmentation`
@@ -43,13 +42,11 @@ This pipeline produces the following output tables:
     - `city_share`
     - `contract_attribution_models`
     - `criteo_abtest_rj`
-    - `credit_analysis_fraudsters`
     - `crm_iptu_wave4`
     - `demand_channel_share`
     - `demand_retention_ab_tests`
     - `demand_targets_replanning`
     - `department_control`
-    - `extra_invoice`
     - `extra_invoice_created_expenses`
     - `from_to_cancellation`
     - `google_searches_share_of_interest`

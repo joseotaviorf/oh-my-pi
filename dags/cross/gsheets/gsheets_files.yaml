@@ -55,11 +55,6 @@ criteo_abtest_rj:
     sheet_name: criteo_abtest_rj
     clean_table_name: criteo_abtest_rj
 
-credit_analysis_fraudsters:
-    sheet_id: 11rRz5SwpqCq2pCqyOOydOIKGMzc9NPPufnaAWX5Lmho
-    sheet_name: gsheet_fraud
-    clean_table_name: credit_analysis_fraudsters
-
 crm_iptu_wave4:
     sheet_id: 1jz2kwgaE4qCi9aL1UaK2osdVv30ryWQI_sJ9qZARIqM
     sheet_name: crm_iptu_wave4
@@ -74,11 +69,6 @@ demand_retention_ab_tests:
     sheet_id: 1l80txsBUzAAuCMalf6mfECgoULxbLHpw7J3z841aITw
     sheet_name: demand_retention_ab_tests
     clean_table_name: demand_retention_ab_tests
-
-extra_invoice:
-    sheet_id: 1i4SiSro342zfv6L0wpl9B29kY8Cyg8hwsShuIDkzkfQ
-    sheet_name: extra_invoice
-    clean_table_name: extra_invoice
 
 google_searches_share_of_interest:
     sheet_id: 1eDqOTxQqgQOJVA6CnPa8ZuuriCaYe5MrUpFYni2BpeM
