@@ -18,4 +18,4 @@ SELECT
 FROM
     datalake_olos_dialer_raw.Users
 WHERE
-    DATE('{year}-{month}-{day}') BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(CONCAT(year,'-',month,'-',day)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

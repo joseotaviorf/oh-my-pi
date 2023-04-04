@@ -29,7 +29,7 @@ SELECT
     Dnis AS dnis,
     Link AS link,
     MailingName AS mailing_name,
-    OriginalPhoneNumber AS original_phone_number
+    OriginalPhoneNumber AS original_phone_number,
     StartDate AS ts_started,
     year,
     month,
@@ -37,4 +37,4 @@ SELECT
 FROM
     datalake_olos_dialer_raw.PbxBillingData
 WHERE
-    DATE('{year}-{month}-{day}') BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(CONCAT(year,'-',month,'-',day)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

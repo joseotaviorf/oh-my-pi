@@ -9,7 +9,6 @@ tables_list:
   - Disposition
   - DispositionDetail
   - DispositionPlan
-  - InboundRawData
   - Info_AgentStatus
   - Info_CallDirection
   - Info_CampaignType
