@@ -46,9 +46,9 @@ tables:
   repair_request:
     is_incremental: True
     date_column: updated_at
-  # repair_request_media:
-  #   is_incremental: True
-  #   date_column: updated_at
+  repair_request_media:
+    is_incremental: True
+    date_column: updated_at
   review:
     is_incremental: True
     date_column: updated_at
