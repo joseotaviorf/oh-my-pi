@@ -24,6 +24,8 @@ MAIN_SCHEDULE_INTERVAL = "00 06 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
+EXTRA_SPARK_CONF = config_service.get_config("spark_conf")
+
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 dw_bucket = config_service.get_config("dw_bucket")
@@ -36,6 +38,7 @@ raw_spark_job_file = (
 )
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+cluster_configuration["spark_conf"].update(EXTRA_SPARK_CONF)
 default_libraries = config_service.get_config("default_libraries")
 partition_cols = config_service.get_config("partition_cols")
 
