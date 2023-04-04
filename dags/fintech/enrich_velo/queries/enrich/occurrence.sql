@@ -23,8 +23,8 @@ LEFT JOIN
         AND jk1.desc_master_type = 'Occurrence Type'
 LEFT JOIN
     datalake_velo.junk AS jk2
-        ON jk1.id_lvl_1 = o.id_status
-        AND jk1.desc_master_type = 'Occurrence Status'
+        ON jk2.id_lvl_1 = o.id_status
+        AND jk2.desc_master_type = 'Occurrence Status'
 LEFT JOIN
     datalake_velo_clean.fiancavelo_payment AS p
         ON TRIM(p.invoice_url) = TRIM(o.invoice_url)

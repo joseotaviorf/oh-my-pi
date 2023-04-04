@@ -131,6 +131,7 @@ client_last_propose AS(
     WHERE
         pp_doc.id_propose IS NOT NULL
         AND p_doc.id_propose IS NOT NULL
+        AND p_doc.is_contract IS TRUE
 )
 SELECT
     CAST(CONCAT(ct.id_securities, REPLACE(ct.id_category, '.', '')) AS BIGINT) AS id_transaction_entry,

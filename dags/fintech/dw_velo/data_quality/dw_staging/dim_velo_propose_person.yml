@@ -12,11 +12,14 @@ column_level_validations:
     is_unique:
       severity_level: Error
   name:
-    is_complete:
+    has_completeness:
+      greater_than: 0.95
       severity_level: Error
   document:
-    is_complete:
+    has_completeness:
+      greater_than: 0.95
       severity_level: Error
   ts_load:
-    is_complete:
+    has_completeness:
+      greater_than: 0.95  # Won't be 100% because of the default row
       severity_level: Error

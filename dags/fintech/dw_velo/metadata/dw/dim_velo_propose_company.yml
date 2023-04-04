@@ -13,6 +13,22 @@ columns:
     lineage:
     - datalake_velo.propose_company.company_name
     description: Company's name when the propose is for a business
+  street:
+    lineage:
+      - datalake_velo.propose_company.street
+    description: Company's street when the propose is for a business
+  number:
+    lineage:
+      - datalake_velo.propose_company.number
+    description: Company's address number when the propose is for a business
+  complement:
+    lineage:
+      - datalake_velo.propose_company.complement
+    description: Company's address complement when the propose is for a business
+  neighborhood:
+    lineage:
+      - datalake_velo.propose_company.neighborhood
+    description: Company's neighborhood when the propose is for a business
   city:
     lineage:
     - datalake_velo.propose_company.city
@@ -21,9 +37,9 @@ columns:
     lineage:
     - datalake_velo.propose_company.state
     description: Company's state when the propose is for a business
-  country:
+  country_code:
     lineage:
-    - datalake_velo.propose_company.country
+    - datalake_velo.propose_company.country_code
     description: Company's country when the propose is for a business
   zipcode:
     lineage:
@@ -37,5 +53,13 @@ columns:
     lineage:
     - datalake_velo.propose_company.cnpj
     description: Company's document number (CNPJ) when the propose is for a business
+  ts_created:
+    lineage:
+    - datalake_velo.propose_company.ts_created
+    description: Moment (timestamp) when the company was created
+  ts_updated:
+    lineage:
+    - datalake_velo.propose_company.ts_updated
+    description: Moment (timestamp) when the company was last updated
   ts_load:
     description: Moment (timestamp) when the table was last loaded

@@ -1,9 +1,13 @@
 SELECT
     id_house As sk_house,
     `type`,
+    street,
+    `number`,
+    complement,
+    neighborhood,
     city,
     state,
-    country,
+    country_code,
     zipcode,
     geolocation,
     NOW() AS ts_load

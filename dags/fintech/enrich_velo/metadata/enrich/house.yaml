@@ -12,6 +12,22 @@ columns:
     description: "Property type description"
     lineage:
       - datalake_velo_clean.fiancavelo_propertytype.name
+  street:
+    description: Property address street
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.street
+  number:
+    description: Property address number
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.number
+  complement:
+    description: Property address complement
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.complement
+  neighborhood:
+    description: Property address neighborhood
+    lineage:
+      - datalake_velo_clean.fiancavelo_property.neighborhood
   city:
     description: "City where the property is located"
     lineage:
@@ -19,11 +35,12 @@ columns:
   state:
     description: "State where the property is located"
     lineage:
+      - datalake_ebdb_clean.state.abbreviation
       - datalake_velo_clean.fiancavelo_property.state
-  country:
-    description: "Country where the property is located"
+  country_code:
+    description: "Country Code where the property is located"
     lineage:
-      - datalake_velo_clean.fiancavelo_property.country
+      - datalake_ebdb_clean.country.code
   zipcode:
     description: "ZIPCODE"
     lineage:

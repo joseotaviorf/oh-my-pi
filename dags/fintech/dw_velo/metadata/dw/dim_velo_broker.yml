@@ -8,10 +8,30 @@ columns:
     lineage:
     - datalake_velo.broker.id_broker
     description: Broker's identification number (ID)
+  broker_comercial_name:
+    lineage:
+    - datalake_velo.broker.broker_comercial_name
+    description: Broker's comercial name
   broker_name:
     lineage:
     - datalake_velo.broker.broker_name
     description: Broker's name
+  street:
+    lineage:
+      - datalake_velo.broker.street
+    description: Broker's establishment street
+  number:
+    lineage:
+      - datalake_velo.broker.number
+    description: Broker's establishment address number
+  complement:
+    lineage:
+      - datalake_velo.broker.complement
+    description: Broker's establishment address complement
+  neighborhood:
+    lineage:
+      - datalake_velo.broker.neighborhood
+    description: Broker's establishment address neighborhood
   city:
     lineage:
     - datalake_velo.broker.city
@@ -20,9 +40,9 @@ columns:
     lineage:
     - datalake_velo.broker.state
     description: Broker's establishment state
-  country:
+  country_code:
     lineage:
-    - datalake_velo.broker.country
+    - datalake_velo.broker.country_code
     description: Broker's establishment country
   zipcode:
     lineage:

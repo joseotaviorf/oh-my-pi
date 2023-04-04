@@ -279,7 +279,7 @@ occurrence_metrics AS (
 SELECT
   p.id AS id_propose,
   pv.id_propose_values AS id_propose_values,
-  f.id_realestate AS id_broker,
+  COALESCE(f.id_realestate, c.id_realestate) AS id_broker,
   h.id_house,
   p.id_realtor AS id_agent,
   f.id AS id_contract,
@@ -327,6 +327,9 @@ FROM
 LEFT JOIN
   datalake_velo_clean.fiancavelo_fianca AS f
     ON f.id_propose = p.id
+LEFT JOIN
+  datalake_velo_clean.fiancavelo_colaborador AS c
+    ON c.id_user = p.id_realtor
 LEFT JOIN
   propose_canceled_date AS pcd
     ON pcd.id_propose = p.id

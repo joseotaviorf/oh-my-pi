@@ -20,6 +20,22 @@ columns:
       Loja: store
       Outros: other
       Sala: business room
+  street:
+    description: Property address street
+    lineage:
+      - datalake_velo.house.street
+  number:
+    description: Property address number
+    lineage:
+      - datalake_velo.house.number
+  complement:
+    description: Property address complement
+    lineage:
+      - datalake_velo.house.complement
+  neighborhood:
+    description: Property address neighborhood
+    lineage:
+      - datalake_velo.house.neighborhood
   city:
     lineage:
     - datalake_velo.house.city
@@ -28,9 +44,9 @@ columns:
     lineage:
     - datalake_velo.house.state
     description: Property state
-  country:
+  country_code:
     lineage:
-    - datalake_velo.house.country
+    - datalake_velo.house.country_code
     description: Property country
   zipcode:
     lineage:

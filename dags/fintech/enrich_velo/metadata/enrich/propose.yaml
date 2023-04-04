@@ -1,5 +1,8 @@
 database_name: datalake_velo
 table_name: propose
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing Velo's proposes and contracts"
 columns:
   id_propose:
     lineage:
@@ -12,6 +15,7 @@ columns:
   id_broker:
     lineage:
       - datalake_velo_clean.fiancavelo_fianca.id_realestate
+      - datalake_velo_clean.fiancavelo_colaborador.id_realestate
   id_house:
     lineage:
       - datalake_velo_clean.fiancavelo_property.id

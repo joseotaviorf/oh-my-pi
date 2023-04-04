@@ -13,6 +13,22 @@ columns:
     lineage:
       - datalake_velo_clean.clientes_company.comercial_name
       - datalake_velo_clean.clientes_company.name
+  street:
+    description: Company's street address when the propose is for a business
+    lineage:
+      - datalake_velo_clean.clientes_address.street
+  number:
+    description: Company's number address when the propose is for a business
+    lineage:
+      - datalake_velo_clean.clientes_address.number
+  complement:
+    description: Company's complement address when the propose is for a business
+    lineage:
+      - datalake_velo_clean.clientes_address.complement
+  neighborhood:
+    description: Company's neighborhood address when the propose is for a business
+    lineage:
+      - datalake_velo_clean.clientes_address.neighborhood
   city:
     description: Company's city when the propose is for a business
     lineage:
@@ -21,10 +37,10 @@ columns:
     description: Company's state when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.state
-  country:
-    description: Company's country when the propose is for a business
+  country_code:
+    description: Company's country code when the propose is for a business
     lineage:
-      - datalake_velo_clean.clientes_address.country
+      - datalake_ebdb_clean.country.code
   zipcode:
     description: Company's zipcode when the propose is for a business
     lineage:
@@ -37,3 +53,9 @@ columns:
     description: Company's document number (CNPJ) when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_company.document
+  ts_created:
+    lineage:
+      - datalake_velo_clean.clientes_company.ts_inserted
+  ts_updated:
+    lineage:
+      - datalake_velo_clean.clientes_company.ts_updated

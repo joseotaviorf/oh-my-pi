@@ -2737,6 +2737,8 @@ bietlejuice.enrich_velo:
   - bietlejuice.velo:load-clean-fiancavelo-status
   - bietlejuice.velo:load-clean-users-users
   - bietlejuice.velo:load-clean-users-profile
+  - bietlejuice.ebdb:create-clean-country-in-data-lake
+  - bietlejuice.ebdb:create-clean-state-in-data-lake
 
 bietlejuice.enrich_velo_omie:
   - bietlejuice.velo_omie:load-clean-cash-flows
