@@ -93,6 +93,8 @@ def create_df_from_active_employee_details(results, spark_client, token_name):
                 educations=str(employee["educations"]),
                 experience_period=str(employee["experience_period"]),
                 emergency_contacts=str(employee["emergency_contacts"]),
+                main_bank_account=str(employee["bank_account"]),
+                all_bank_accounts=str(employee["bank_accounts"]),
                 source=token_name,
             )
         )
