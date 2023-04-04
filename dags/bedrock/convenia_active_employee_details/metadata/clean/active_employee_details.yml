@@ -129,6 +129,14 @@ columns:
     description: API Key source
     lineage:
       - datalake_convenia_details_raw.active_employee_details.source
+  main_bank_account:
+    description: Employee's main bank account
+    lineage:
+      - datalake_convenia_details_raw.active_employee_details.main_bank_account
+  all_bank_accounts:
+    description: List of employee's bank accounts
+    lineage:
+      - datalake_convenia_details_raw.active_employee_details.all_bank_accounts
   is_first_job:
     description: Binary data if this is the employee's first job
     lineage:

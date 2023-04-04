@@ -141,6 +141,8 @@ def create_df_schema():
             StructField("educations", StringType(), True),
             StructField("experience_period", StringType(), True),
             StructField("emergency_contacts", StringType(), True),
+            StructField("main_bank_account", StringType(), True),
+            StructField("all_bank_accounts", StringType(), True),
             StructField("source", StringType(), True),
         ]
     )

@@ -30,6 +30,8 @@ SELECT
     experience_period,
     emergency_contacts,
     source,
+    main_bank_account,
+    all_bank_accounts,
     first_job AS is_first_job,
     time_tracking AS has_time_tracking,
     birth_date AS dt_birth,

@@ -95,7 +95,7 @@ def create_df_schema():
         [
             StructField("id", StringType(), True),
             StructField("id_employee", StringType(), True),
-            StructField("salary", LongType(), True),
+            StructField("salary", StringType(), True),
             StructField("relationship_id", StringType(), True),
             StructField("relationship", StringType(), True),
             StructField("department_id", StringType(), True),

@@ -125,6 +125,14 @@ columns:
     description: Employee's emergency contacts (can be more than one)
     lineage:
       - datalake_convenia_details_raw.inactive_employee_details.emergency_contacts
+  main_bank_account:
+    description: Employee's main bank account
+    lineage:
+      - datalake_convenia_details_raw.inactive_employee_details.main_bank_account
+  all_bank_accounts:
+    description: List of employee's bank accounts
+    lineage:
+      - datalake_convenia_details_raw.inactive_employee_details.all_bank_accounts
   source:
     description: API Key source
     lineage:
