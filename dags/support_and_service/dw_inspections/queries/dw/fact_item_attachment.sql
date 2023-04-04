@@ -1,6 +1,8 @@
 SELECT DISTINCT
-    MD5(CONCAT(im.id_item_media, im.user_type, im.ts_updated)) AS sk_item_media,
-    NULL AS sk_review,
+    MD5(CONCAT(im.id_item, im.id_item_media, "item_media")) AS sk_item_attachment,
+    MD5(CONCAT(im.id_item_media, "item_media")) AS sk_item_media,
+    im.id_item_media AS sk_origin_media,
+    NULL AS sk_item_review,
     im.id_item AS sk_item,
     im.id_external_media AS sk_external_media,
     im.id_assessment AS sk_assessment,
@@ -16,13 +18,16 @@ SELECT DISTINCT
 FROM
     datalake_inspections.item_media im
 WHERE
-    im.year = {year}
+    im.id_item_media IS NOT NULL
+    AND im.year = {year}
     AND im.month = {month}
     AND im.day = {day}
 UNION ALL
 SELECT
-    MD5(CONCAT(ir.id_review_media, ir.user_type, ir.ts_updated)) AS sk_item_media,
-    ir.id_review AS sk_review,
+    MD5(CONCAT(ir.id_item, ir.id_review, ir.id_review_media, "review_media")) AS sk_item_attachment,
+    MD5(CONCAT(ir.id_review_media, "review_media")) AS sk_item_media,
+    ir.id_review_media AS sk_origin_media,
+    ir.id_review AS sk_item_review,
     ir.id_item AS sk_item,
     ir.id_external_media AS sk_external_media,
     ir.id_assessment AS sk_assessment,

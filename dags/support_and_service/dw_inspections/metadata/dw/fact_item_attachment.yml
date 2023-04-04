@@ -1,55 +1,80 @@
 ---
 database_name: dw_inspections
-table_name: fact_item_media
+table_name: fact_item_attachment
+description:
+  This table brings data from the item's attachments, which can be a review with media,
+  a review without media or just a media without a linked review.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
+  sk_item_attachment:
+    description: Unique identifier of item attachment.
+    lineage:
+      - datalake_inspections.item_media.id_item
+      - datalake_inspections.item_media.id_item_media
+      - datalake_inspections.item_review.id_item
+      - datalake_inspections.item_review.id_review_media
   sk_item_media:
+    description: Unique identifier of media.
     lineage:
       - datalake_inspections.item_media.id_item_media
-      - datalake_inspections.item_media.user_type
-      - datalake_inspections.item_media.ts_updated
       - datalake_inspections.item_review.id_review_media
-      - datalake_inspections.item_review.user_type
-      - datalake_inspections.item_review.ts_updated
-  sk_review:
+  sk_origin_media:
+    description: Original media identifier, as it is in the product database. It's not unique.
+    lineage:
+      - datalake_inspections.item_media.id_item_media
+      - datalake_inspections.item_review.id_review_media
+  sk_item_review:
+    description: Unique identifier of review.
     lineage:
       - datalake_inspections.item_review.id_review
   sk_item:
+    description: Unique identifier of item.
     lineage:
       - datalake_inspections.item_media.id_item
       - datalake_inspections.item_review.id_item
   sk_external_media:
+    description: Unique identifier of item media in the PWA database.
     lineage:
       - datalake_inspections.item_media.id_external_media
       - datalake_inspections.item_review.id_external_media
   sk_assessment:
+    description: Unique identifier of assessment.
     lineage:
       - datalake_inspections.item_media.id_assessment
       - datalake_inspections.item_review.id_assessment
   sk_inspection:
+    description: Unique identifier of inspection.
     lineage:
       - datalake_inspections.item_media.id_inspection
       - datalake_inspections.item_review.id_inspection
   sk_user:
+    description: Unique identifier of attachment creator/responsable
     lineage:
       - datalake_inspections.item_media.id_user
       - datalake_inspections.item_review.id_user
   ts_created:
+    description: Item media datetime creation.
     lineage:
       - datalake_inspections.item_media.ts_created
       - datalake_inspections.item_review.ts_created
   ts_updated:
+    description: Item media datetime updated.
     lineage:
       - datalake_inspections.item_media.ts_updated
       - datalake_inspections.item_review.ts_updated
   year:
+    description: Year from the item media last update.
     lineage:
       - datalake_inspections.item_media.year
       - datalake_inspections.item_review.year
   month:
+    description: Month from the item media last update.
     lineage:
       - datalake_inspections.item_media.month
       - datalake_inspections.item_review.month
   day:
+    description: Day from the item media last update.
     lineage:
       - datalake_inspections.item_media.day
       - datalake_inspections.item_review.day

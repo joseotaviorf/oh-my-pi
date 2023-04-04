@@ -25,7 +25,7 @@ SELECT
     i.ts_booking_cancelled_utc AS ts_booking_cancelled,
     i.ts_booking_cancelled_local_tz AS ts_booking_cancelled_local,
     i.ts_termination_canceled,
-    im.ts_created,
+    i.ts_created,
     NOW() AS ts_load
 FROM
     datalake_inspections.inspection_booking i

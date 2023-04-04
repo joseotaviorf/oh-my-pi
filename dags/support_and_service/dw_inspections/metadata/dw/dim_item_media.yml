@@ -1,15 +1,13 @@
 ---
 database_name: dw_inspections
 table_name: dim_item_media
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_item_media:
     lineage:
       - datalake_inspections.item_media.id_item_media
-      - datalake_inspections.item_media.user_type
-      - datalake_inspections.item_media.ts_updated
       - datalake_inspections.item_review.id_review_media
-      - datalake_inspections.item_review.user_type
-      - datalake_inspections.item_review.ts_updated
   media_creator:
     lineage:
       - datalake_inspections.item_media.user_type

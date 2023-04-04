@@ -14,7 +14,7 @@ incremental_tables:
   - dim_item_issue
   - dim_room
   - fact_item
-  - fact_item_media
+  - fact_item_attachment
   - fact_item_issue
 
 partitions_cols: [year, month, day]
