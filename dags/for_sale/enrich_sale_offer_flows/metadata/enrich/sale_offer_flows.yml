@@ -1,6 +1,9 @@
 ---
 database_name: datalake_sale_offer_flows
 table_name: sale_offer_flows
+owner: gabriel.firmino@quintoandar.com.br
+domain: For Sale
+description: Enriched table to sales flow database. The purpose of this table is to consolidate all offer information from the sales base.
 columns:
   id_offer:
     lineage:
@@ -228,6 +231,21 @@ columns:
   payment_status:
     lineage:
       - datalake_sales_flow_clean.payment.status
+  fgts_value:
+    lineage:
+      - datalake_sales_flow_clean.payment.fgts_value
+    description: Fgts value used in the purchase.
+  financing_value:
+    lineage:
+      - datalake_sales_flow_clean.offer.offer_price
+      - datalake_sales_flow_clean.payment.down_payment_value
+      - datalake_sales_flow_clean.payment.entry_amount
+      - datalake_sales_flow_clean.payment.fgts_value
+    description: Financing value (sale_price_agreed - down_payment_value - entry_amount - fgts_value)
+  entry_amount:
+    lineage:
+      - datalake_sales_flow_clean.payment.entry_amount
+    description: Value paid by the buyer on the beginning of the contract.
   credit_status:
     lineage:
       - datalake_sales_flow_clean.mortgage.credit_status
@@ -243,9 +261,18 @@ columns:
   tags_from_salesflow:
     lineage:
       - datalake_sales_flow_clean.tag.label
-  sale_price_agreed:
+  sale_listing_price:
     lineage:
       - datalake_sales_flow_clean.offer.sale_price
+    description: House price sent in the publication by the seller.
+  offer_price:
+    lineage:
+      - datalake_sales_flow_clean.offer.offer_price
+    description: Bid value sent by the buyer.
+  sale_price_agreed:
+    lineage:
+      - datalake_sales_flow_clean.offer.final_price
+    description: Final value, where the buyer and seller reached a negotiation agreement.
   has_seller_debt_payments:
     lineage:
       - datalake_sales_flow_clean.house.has_seller_debt_payments
@@ -329,6 +356,10 @@ columns:
   dt_sale_key_delivered:
     lineage:
       - datalake_sales_flow_clean.notary.ts_buyer_received_keys
+  ts_offer_created:
+    lineage:
+      - datalake_sales_flow_clean.offer.ts_created
+    description: Date of creation of the offer in the sales base.
   ts_accepted:
     lineage:
       - datalake_sales_flow_clean.offer.ts_accepted

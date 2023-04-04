@@ -28,31 +28,41 @@ WITH flow_type AS (
 ),
 -- OFFERS CTE
 offers AS (
-    WITH last_offer_entry AS (
+    WITH first_offer_entry AS (
         SELECT
-            ROW_NUMBER() OVER (
-                PARTITION BY
-                id_firestore
-                ORDER BY
-                ts_updated DESC
-            ) AS ROW,
             *
         FROM
             datalake_sales_flow_clean.offer
+        QUALIFY
+            ROW_NUMBER() OVER (PARTITION BY id_firestore ORDER BY ts_updated) = 1
+    ),
+    last_offer_entry AS (
+        SELECT
+            *
+        FROM
+            datalake_sales_flow_clean.offer
+        QUALIFY
+            ROW_NUMBER() OVER (PARTITION BY id_firestore ORDER BY ts_updated DESC) = 1
     )
     SELECT
-        id_firestore AS id_offer,
-        id_sales_flow,
-        id_hub,
-        sale_price,
-        status,
-        discard_reason,
-        ts_accepted,
-        ts_discarded
+        l.id_firestore AS id_offer,
+        l.id_sales_flow,
+        l.id_hub,
+        l.sale_price,
+        f.offer_price AS first_price_offered_by_buyer,
+        l.offer_price AS last_price_offered_by_buyer,
+        l.final_price,
+        l.status,
+        l.discard_reason,
+        l.ts_created,
+        l.ts_accepted,
+        l.ts_discarded
     FROM
-        last_offer_entry
-    WHERE
-        ROW = 1
+        last_offer_entry AS l
+    LEFT JOIN
+        first_offer_entry AS f
+            ON l.id_firestore = f.id_firestore
+    
 ),
 -- SALES FLOW CTE
 last_update_sales_flow AS (
@@ -266,13 +276,16 @@ last_update_payment AS (
         ROW_NUMBER() OVER (PARTITION BY id_sales_flow ORDER BY ts_updated DESC) AS ROW
     FROM
         datalake_sales_flow_clean.payment
-    ),
+),
 payment AS (
     SELECT
         p.id as id_payment,
         p.id_sales_flow,
         p.status,
-        p.payment_model
+        p.payment_model,
+        p.fgts_value,
+        p.entry_amount,
+        p.down_payment_value
     FROM
         last_update_payment AS p
     INNER JOIN
@@ -687,12 +700,28 @@ SELECT
     d.step AS report_dilligence_status,
     mg.status AS bank_analysis_status,
     p.status AS payment_status,
+    p.fgts_value,
+    (off.final_price - p.down_payment_value - p.entry_amount - p.fgts_value) AS financing_value,
+    p.entry_amount,
     mg.credit_status AS credit_status,
     n.status AS real_estate_register_office_status,
     cp.status_notary_notes AS notary_office_status,
     cp.crn_details AS notary_office_details,
     tag.label AS tags_from_salesflow,
-    off.sale_price AS sale_price_agreed,
+    off.sale_price AS sale_listing_price,
+    off.first_price_offered_by_buyer,
+    off.last_price_offered_by_buyer,
+    CASE
+        WHEN off.sale_price IS NULL OR off.first_price_offered_by_buyer IS NULL
+            THEN NULL
+        ELSE 1-1.00*off.first_price_offered_by_buyer/off.sale_price
+    END AS first_discount_proposed,
+    CASE
+        WHEN off.sale_price IS NULL OR off.last_price_offered_by_buyer IS NULL
+            THEN NULL
+        ELSE 1-1.00*off.last_price_offered_by_buyer/off.sale_price
+    END AS last_discount_proposed,
+    off.final_price AS sale_price_agreed,
     CASE
         WHEN DATE(off.ts_accepted) <= DATE(off.ts_discarded)
         THEN DATEDIFF(DATE(off.ts_discarded), DATE(off.ts_accepted))
@@ -749,6 +778,7 @@ SELECT
     NULLIF(n.dt_ended, '0001-01-1') AS dt_house_registry_ended,
     NULLIF(COALESCE(mg.dt_seller_paid, n.dt_seller_paid), '0001-01-1') AS dt_sale_transacton_paid,
     NULLIF(n.dt_buyer_received_keys, '0001-01-1') AS dt_sale_key_delivered,
+    NULLIF(off.ts_created, '0001-01-1') AS ts_offer_created,
     NULLIF(off.ts_accepted, '0001-01-1') AS ts_accepted,
     NULLIF(off.ts_discarded, '0001-01-1') AS ts_discarded,
     ccv.ts_signed,
