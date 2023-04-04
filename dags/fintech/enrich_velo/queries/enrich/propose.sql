@@ -275,6 +275,13 @@ occurrence_metrics AS (
   FROM
     datalake_velo.occurrence AS o
   GROUP BY 1
+),
+fiancavelo_fianca_last_updated AS (
+  SELECT *
+  FROM
+    datalake_velo_clean.fiancavelo_fianca AS f
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_propose ORDER BY ts_updated DESC) = 1
 )
 SELECT
   p.id AS id_propose,
@@ -325,7 +332,7 @@ SELECT
 FROM
   datalake_velo_clean.fiancavelo_propose AS p
 LEFT JOIN
-  datalake_velo_clean.fiancavelo_fianca AS f
+  fiancavelo_fianca_last_updated AS f
     ON f.id_propose = p.id
 LEFT JOIN
   datalake_velo_clean.fiancavelo_colaborador AS c
