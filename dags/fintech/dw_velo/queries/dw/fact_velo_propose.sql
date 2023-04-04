@@ -1,6 +1,6 @@
 SELECT
     id_propose AS sk_propose,
-    COALESCE(CAST(sk_propose_values AS BIGINT), -1) AS sk_propose_values,
+    COALESCE(CAST(id_propose_values AS BIGINT), -1) AS sk_propose_values,
     COALESCE(id_broker, -1) AS sk_broker,
     COALESCE(id_house, -1) AS sk_house,
     COALESCE(id_propose_company, -1) AS sk_propose_company,
