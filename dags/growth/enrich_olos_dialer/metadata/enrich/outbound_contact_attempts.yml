@@ -1,0 +1,78 @@
+---
+database_name: datalake_olos_dialer
+table_name: outbound_contact_attempts
+owner: ana.araujo@quintoandar.com.br
+domain: growth
+description: A compilation of all contacts attempts realized with our prospects through Olos Dialer.
+columns:
+  id_call:
+    description: Unique identifier of the contact attempt. It's the primary key of the table, inherited from datalake_olos_dialer_clean.attempts_raw_data.id_call 
+    lineage:
+      - datalake_olos_dialer_clean.attempts_raw_data.id_call
+  id_lead:
+    description: Identifier of the customer we are trying to contact. Equivalent to our internal sk_lead.
+    lineage:
+      - datalake_olos_dialer_clean.attempts_raw_data.id_lead
+  agent_user_name:
+    description: Agent's username in the Olos Dialer system. The agent is the analyst allocated to a contact attempt.
+    lineage:
+      - datalake_olos_dialer_clean.users.user_name
+  agent_email:
+    description: Agent's email in the Olos Dialer system. The agent is the analyst allocated to a contact attempt.
+    lineage:
+      - datalake_olos_dialer_clean.users.email
+  agent_profile:
+    description: Agent's profile in the Olos Dialer system. The agent profile can indicate the agent's role and company.
+    lineage:
+      - datalake_olos_dialer_clean.users.agent_profile
+  sales_company:
+    description: For which company was the agent working during that contact attempt. This is extracted from the campaign name, which is fullfilled manually by the operations team.
+    lineage:
+      - datalake_olos_dialer_clean.campaign.description
+  campaign_name:
+    description: Name of the campaign. The campaign is where we allocate the analyst to perform the marketing action within the dialer.
+    lineage:
+      - datalake_olos_dialer_clean.campaign.description
+  campaign_type:
+    description: Campaign type identifier.
+    lineage:
+      - datalake_olos_dialer_clean.info_campaign_type.description
+  olos_disposition:
+    description: The disposition is the record of the interaction between the customer and the agent (analyst). This is the value we receive from Olos. The values we receive for this column from Olos is different from the values we have mapped in Wololo, so we have to do a mapping (proxy).
+    lineage:
+      - datalake_olos_dialer_clean.disposition.description
+  wololo_disposition:
+    description: The disposition is the record of the interaction between the customer and the agent (analyst). This is the value we extract from Wololo based on the Olos disposition we receive. 
+    lineage:
+      - datalake_olos_dialer.phone_output_olos_wololo_mapping.wololo_disposition_description
+  phone_number:
+    description: The customer's phone number.
+    lineage:
+      - datalake_olos_dialer_clean.attempts_raw_data.original_phone_number
+  dnis:
+    description: The customer's phone number associated with the record in the format in which it was dialed.
+    lineage:
+      - datalake_olos_dialer_clean.attempts_raw_data.dnis
+  phone_type:
+    description: Identifier of the phone field type from the import layout that imported the number related to the record, if applicable.
+    categories:
+      Residential Fixed Phone: '#N/A'
+      Business Fixed Phone: '#N/A'
+      Personal Mobile Phone: '#N/A'
+      Business Mobile Phone: '#N/A'
+      Generic Phone: '#N/A'
+      MsBot: '#N/A'
+    lineage:
+      - datalake_olos_dialer_clean.attempts_raw_data.id_phone_type
+  organization:
+    description: The campaigns are divided in organizations. This table only contains data for the organization Inside Sales.
+    lineage:
+      - datalake_olos_dialer_clean.customer.name
+  ts_call_started:
+    description: Date and time when the contact attempt started.
+    lineage:
+      - datalake_olos_dialer_clean.attempts_raw_data.ts_started
+  ts_call_ended:
+    description: Date and time when the contact attempt ended.
+    lineage:
+      - datalake_olos_dialer_clean.attempts_raw_data.ts_call_ended

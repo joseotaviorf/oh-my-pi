@@ -2312,6 +2312,15 @@ bietlejuice.enrich_offer:
   - bietlejuice.gsheets.for_sale:done-clean-offers-hub-central
   - bietlejuice.hub_services:load-clean-business-unit
 
+bietlejuice.enrich_olos_dialer:
+  - bietlejuice.olos_dialer:load-clean-users
+  - bietlejuice.olos_dialer:load-clean-campaign
+  - bietlejuice.olos_dialer:load-clean-disposition
+  - bietlejuice.olos_dialer:load-clean-attempts-raw-data
+  - bietlejuice.olos_dialer:load-clean-info-campaign-type
+  - bietlejuice.olos_dialer:load-clean-campaign-customer
+  - bietlejuice.olos_dialer:load-clean-customer
+
 bietlejuice.enrich_online_attribution:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 
