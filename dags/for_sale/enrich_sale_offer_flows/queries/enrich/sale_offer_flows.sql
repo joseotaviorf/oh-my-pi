@@ -701,7 +701,6 @@ SELECT
     mg.status AS bank_analysis_status,
     p.status AS payment_status,
     p.fgts_value,
-    (off.final_price - p.down_payment_value - p.entry_amount - p.fgts_value) AS financing_value,
     p.entry_amount,
     mg.credit_status AS credit_status,
     n.status AS real_estate_register_office_status,

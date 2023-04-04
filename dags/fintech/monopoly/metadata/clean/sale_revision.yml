@@ -22,3 +22,24 @@ columns:
   fgts_amount_preview:
     lineage:
       - datalake_monopoly_raw.sale_revision.fgts_amount_preview
+  financed_amount:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.financed_amount
+  total_payment_amount:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.total_payment_amount
+  payment_method:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.payment_method
+  brokerage_fee:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.brokerage_fee
+  ts_payment_allowed:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.payment_allowed_at
+  ts_event:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.event_date_time
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.created_at

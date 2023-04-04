@@ -235,13 +235,6 @@ columns:
     lineage:
       - datalake_sales_flow_clean.payment.fgts_value
     description: Fgts value used in the purchase.
-  financing_value:
-    lineage:
-      - datalake_sales_flow_clean.offer.offer_price
-      - datalake_sales_flow_clean.payment.down_payment_value
-      - datalake_sales_flow_clean.payment.entry_amount
-      - datalake_sales_flow_clean.payment.fgts_value
-    description: Financing value (sale_price_agreed - down_payment_value - entry_amount - fgts_value)
   entry_amount:
     lineage:
       - datalake_sales_flow_clean.payment.entry_amount
