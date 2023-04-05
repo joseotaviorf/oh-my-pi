@@ -6,7 +6,7 @@ WITH page_view_events AS (
     FROM
         datalake_amplitude_clean.183047_price_suggestion_page_viewed_events
     WHERE
-        DATE(ts_event) = DATE('{year}-{month}-{day}')
+        DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND up_utm_source IN ('google', 'facebook')
         AND up_utm_medium IN ('cpc', 'display', 'performance_max')
         AND LOWER(up_utm_campaign) NOT LIKE '%branded%'
@@ -19,7 +19,7 @@ WITH page_view_events AS (
     FROM
         datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events
     WHERE
-        DATE(ts_event) = DATE('{year}-{month}-{day}')
+        DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND up_utm_source IN ('google', 'facebook')
         AND up_utm_medium IN ('cpc', 'display', 'performance_max')
         AND LOWER(up_utm_campaign) NOT LIKE '%branded%'
@@ -32,7 +32,7 @@ WITH page_view_events AS (
     FROM
         datalake_amplitude_clean.183047_landing_page_viewed_events
     WHERE
-        DATE(ts_event) = DATE('{year}-{month}-{day}')
+        DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND up_utm_source IN ('google', 'facebook')
         AND up_utm_medium IN ('cpc', 'display', 'performance_max')
         AND LOWER(up_utm_campaign) NOT LIKE '%branded%'
