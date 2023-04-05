@@ -11,13 +11,16 @@ WITH exploded_reasons AS (
         mod_status_reason
     UNION ALL
     SELECT
-        id_lead AS id,
-        id_file,
-        business_context,
-        EXPLODE(FROM_JSON(status_reason, 'map<string, string>')) AS (reason, value),
-        TO_UTC_TIMESTAMP(ts_updated, 'America/Sao_Paulo') AS ts_reason_started
+        bcd.id_lead AS id,
+        bcd.id_file,
+        bcd.business_context,
+        EXPLODE(FROM_JSON(bcda.status_reason, 'map<string, string>')) AS (reason, value),
+        TO_UTC_TIMESTAMP(bcda.ts_updated, 'America/Sao_Paulo') AS ts_reason_started
     FROM
-        datalake_brokers_supply_processor_clean.business_context_detail_aud
+        datalake_brokers_supply_processor_clean.business_context_detail_aud AS bcda
+    JOIN
+        datalake_brokers_supply_processor.business_context_detail AS bcd
+            ON bcda.id = bcd.id
     WHERE
         mod_status_reason
 ),

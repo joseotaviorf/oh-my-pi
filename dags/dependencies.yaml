@@ -2402,6 +2402,7 @@ bietlejuice.enrich_rede_supply:
   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  - bietlejuice.enrich_brokers_supply_processor:load-enrich-business-context-detail
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-file
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_ebdb_listing:load-enrich-house

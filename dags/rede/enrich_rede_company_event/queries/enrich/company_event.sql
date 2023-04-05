@@ -38,7 +38,7 @@ deal_won_probability AS (
         datalake_hubspot.pipeline AS p
             ON p.id_pipeline = s.id_pipeline
     WHERE
-        p.label = 'Negociações'
+        p.id = 5160960
         AND s.label = 'Negócio Ganho'
 ),
 deal_stage_renamed AS (
@@ -86,7 +86,7 @@ deal_stage_renamed AS (
         datalake_hubspot.pipeline AS p
             ON p.id_pipeline = ds.id_pipeline
     WHERE
-        p.label = 'Negociações'
+        p.id = 5160960
     QUALIFY 
         LAST(event, TRUE) OVER (PARTITION BY id_company ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) IS DISTINCT FROM event
         AND event IS NOT NULL
@@ -156,7 +156,7 @@ removed_ticket_stage_oscillations AS (
         datalake_hubspot.pipeline AS dp
             ON dp.id_pipeline = d.id_pipeline
     WHERE
-        dp.label = 'Negociações'
+        dp.id = 5160960
     QUALIFY 
         event IS NOT NULL -- Ignore events that were not treated
         AND (next_status IS NULL -- Ignore events that go back and forth to the same status within the same 24h

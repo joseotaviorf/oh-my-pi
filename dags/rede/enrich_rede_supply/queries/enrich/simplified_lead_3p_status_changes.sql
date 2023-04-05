@@ -21,10 +21,10 @@ WITH status_changes AS (
         AND day = {day}
     UNION ALL
     SELECT
-        bcda.id_lead,
-        bcda.id_file,
+        bcd.id_lead,
+        bcd.id_file,
         NULL AS id_house,
-        bcda.business_context,
+        bcd.business_context,
         bcda.status,
         NULL AS listing_status,
         MAP_KEYS(MAP_FILTER(FROM_JSON(bcda.status_reason, 'map<string, string>'), (k,v) -> v = 'true')) AS status_reasons,
@@ -35,6 +35,9 @@ WITH status_changes AS (
         bcda.day
     FROM
         datalake_brokers_supply_processor_clean.business_context_detail_aud AS bcda
+    JOIN
+        datalake_brokers_supply_processor.business_context_detail AS bcd
+            ON bcda.id = bcd.id
     LEFT JOIN
         datalake_brokers_supply_processor_clean.lead_3p_aud AS la
             ON la.id = bcda.id_lead

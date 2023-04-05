@@ -20,6 +20,26 @@ deduplicated_leads AS (
         datalake_brokers_supply_processor_clean.lead_3p
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id ORDER BY ts_updated DESC) = 1
+),
+partner_agencies_aux AS (
+    SELECT
+        id_company AS id_company_hubspot,
+        LAST(NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '')) OVER (PARTITION BY id_company ORDER BY ts_updated ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS current_tag,
+        LAST(NULLIF(GET_JSON_OBJECT(properties, '$.hs_lead_status'), '')) OVER (PARTITION BY id_company ORDER BY ts_updated ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS current_status,
+        NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', ''), '') AS cnpj,
+        ts_updated
+    FROM
+        datalake_hubspot_clean.company
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                cnpj
+            ORDER BY
+                current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC, 
+                current_tag IS NOT NULL DESC,
+                ts_updated DESC
+        ) = 1
+        AND cnpj IS NOT NULL
 )
 SELECT
     l.id,
@@ -37,9 +57,13 @@ SELECT
     l.id_by_real_estate,
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.housePartnerId'), '') AS id_house_partner,
     GET_JSON_OBJECT(l.location, '$.regionId')::BIGINT AS id_region,
-    COALESCE(f.id_company_hubspot, sale_file.id_company_hubspot, rent_file.id_company_hubspot) AS id_company_hubspot,
-    COALESCE(sale_file.id_company_hubspot) AS id_sale_company_hubspot,
-    COALESCE(rent_file.id_company_hubspot) AS id_rent_company_hubspot,
+    COALESCE(pa.id_company_hubspot, f.id_company_hubspot, sale_file.id_company_hubspot, rent_file.id_company_hubspot) AS id_company_hubspot,
+    CASE
+        WHEN sale_bcd.id IS NOT NULL THEN COALESCE(sale_file.id_company_hubspot, pa.id_company_hubspot)
+    END AS id_sale_company_hubspot,
+    CASE
+        WHEN rent_bcd.id IS NOT NULL THEN COALESCE(rent_file.id_company_hubspot, pa.id_company_hubspot)
+    END AS id_rent_company_hubspot,
     l.lead_hash,
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.block'), '') AS block,
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.tower'), '') AS tower,
@@ -75,7 +99,7 @@ SELECT
     l.cnpj,
     COALESCE(l.status, sale_bcd.status, rent_bcd.status) AS status,
     sale_bcd.status AS sale_status,
-    rent_bcd.status_reason AS rent_status,
+    rent_bcd.status AS rent_status,
     CASE
         WHEN f.ts_previous_file_sent_by_agency IS NULL THEN 'FIRST_BATCH'
         WHEN f.ts_created < first_file.ts_created + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
@@ -178,3 +202,6 @@ LEFT JOIN
     first_files AS first_rent_file
         ON COALESCE(rent_file.id_company_hubspot, SPLIT(rent_file.file_name, '_dedup_')[0]) = COALESCE(first_rent_file.id_company_hubspot, first_rent_file.company_file_name_part)
         AND first_rent_file.business_context = 'RENT'
+LEFT JOIN
+    partner_agencies_aux AS pa
+        ON pa.cnpj = l.cnpj
