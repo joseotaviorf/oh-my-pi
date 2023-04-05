@@ -70,8 +70,8 @@ SELECT
   END AS phone_type,
   customer.name AS organization,
   DATEDIFF(SECOND, outbound.ts_started, outbound.ts_call_ended) AS duration_in_seconds,
-  TIMESTAMP(outbound.ts_started) AS ts_call_started,
-  TIMESTAMP(outbound.ts_call_ended) AS ts_call_ended,
+  outbound.ts_started AS ts_call_started,
+  outbound.ts_call_ended AS ts_call_ended,
   outbound.year AS year,
   outbound.month AS month,
   outbound.day AS day

@@ -2,7 +2,7 @@ database_name: dw_datamarts_cross
 table_name: lead_listing_flows
 description: ''
 domain: Cross
-owner: ''
+owner: '@data-growth'
 columns:
   sk_house_listing_flow:
     lineage:
@@ -132,6 +132,7 @@ columns:
       Whatsapp: '#N/A'
   sales_company:
     lineage:
+    - datalake_olos_dialer.outbound_last_contact
     - dw_public.dim_lead.sales_company
     - dw_quintoandar.dim_user_sales_rep.sales_company
     description: ''

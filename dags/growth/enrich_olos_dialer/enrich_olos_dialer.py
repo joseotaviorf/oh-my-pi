@@ -101,7 +101,6 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
     is_incremental=True,
-    has_create_external_table_task=False,
     partitions=PARTITION_COLS,
     extra_query_template_params={
         "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
