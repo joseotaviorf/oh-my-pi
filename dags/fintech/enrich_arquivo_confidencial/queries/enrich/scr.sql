@@ -41,6 +41,12 @@ mobs AS (
     ROW_NUMBER() OVER (PARTITION BY cpf, `version` ORDER BY scr_data.reference_date DESC) mob
   FROM scr_data
 ),
+next_up AS (
+  SELECT 
+    *,
+    LEAD(ts_updated) OVER (PARTITION BY cpf, mob ORDER BY `version`) ts_next_updated
+  FROM mobs
+),
 operation_items_exploded AS (
   SELECT
     id,
@@ -50,8 +56,9 @@ operation_items_exploded AS (
     scr_data.reference_date,
     EXPLODE(scr_data.operation_items) AS dat,
     ts_created,
-    ts_updated
-FROM mobs
+    ts_updated,
+    ts_next_updated
+FROM next_up
 )
 
 SELECT
@@ -69,5 +76,6 @@ SELECT
     dat.submodality_description,
     dat.linked_to_foreign_currency,
     ts_created,
-    ts_updated
+    ts_updated,
+    ts_next_updated
 FROM operation_items_exploded

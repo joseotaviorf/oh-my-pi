@@ -320,6 +320,9 @@ SELECT
   `version`,
   mob,
   reference_date, 
+  ts_created,
+  ts_updated,
+  ts_next_updated,
   `value`, 
   custom_categories
 FROM 
@@ -375,7 +378,10 @@ SELECT
   `Limite Global (vencimento acima de 360 dias)`,
   `Limite de Cheque Especial (vencimento acima de 360 dias)`,
   `Limite de Cartão de Crédito (vencimento acima de 360 dias)`,
-  `Limite de Crédito Pessoal (vencimento acima de 360 dias)`
+  `Limite de Crédito Pessoal (vencimento acima de 360 dias)`,
+  ts_created,
+  ts_updated,
+  ts_next_updated
 FROM base
 PIVOT(SUM(`value`) AS `value` FOR custom_categories IN ('Saldo a vencer de Cartões (até 30 dias)',
 'Saldo a vencer de Cartões (31 a 180 dias)',

@@ -64,3 +64,7 @@ columns:
     description: "Date information was last updated."
     lineage:
         - datalake_arquivo_confidencial_clean.integration_report.ts_updated
+  ts_next_updated:
+    description: "Next date the cpf had its data updated"
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.ts_updated
