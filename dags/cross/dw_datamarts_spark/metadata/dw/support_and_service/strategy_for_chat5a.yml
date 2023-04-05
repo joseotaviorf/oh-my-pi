@@ -1,0 +1,140 @@
+---
+database_name: dw_datamarts
+table_name: strategy_for_chat5a
+description: " "
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_session:
+    lineage:
+      - datalake_greenseer_clean.session.id_session
+    description: ID of session on Greenseer.
+  id_user:
+    lineage:
+      - datalake_greenseer_clean.session.id_user
+    description: ID of user on Greenseer.
+  ts_started:
+    lineage:
+      - datalake_greenseer_clean.session.ts_started
+    description: Date and time of session started.
+  session_ordem:
+    lineage:
+      - datalake_greenseer_clean.session.id_session
+    description: Sorting of sessions on the same user.
+  has_chat5a_access:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+    description: If user has chat5a available.
+  migration_strategy:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+    description: Type of migration strategy to chat5a available.
+  total_strategy:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+    description: Strategies count per user received.
+  migration_strategy_adjusted:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+    description: Adjustment in migration strategy.
+  id_pipeline:
+    lineage:
+      - datalake_greenseer_clean.session.id_pipeline
+    description: ID of the pipeline on Greenseer.
+  contract_role:
+    lineage:
+      - dw_quintoandar.fact_contract_people.contract_role
+    description: Role that person performs in contract, such as owner, tenant, dweller
+      (resident), sponsor ("fiador").
+  is_retention:
+    lineage:
+      - datalake_greenseer_clean.session.is_retention
+    description: Flag to indicate if session retention in bot or no.
+  tag:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+    description: Tagging done by the bot.
+  houve_conversao:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+    description: Flag to indicate if user migration to chat 5A.
+  grade_bot:
+    lineage:
+      - datalake_chat_fup_clean.rating.grade
+    description: Satisfaction score for the service performed in the bot.
+  comment_bot:
+    lineage:
+      - datalake_chat_fup_clean.rating.comment
+    description: Satisfaction comment for the service performed in the bot
+  grade_human:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.rating 
+    description: Satisfaction score for the service performed in the human.
+  comment_human:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.comment
+    description: Satisfaction comment for the service performed in the human.
+  is_solved_human:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.is_solved
+    description: Flag to indicate if ID ticket resolve in human service.
+  has_installed_app:
+    lineage:
+      - datalake_amplitude_clean.event.platform
+    description: Describes which platform the user used in this event.
+  id_ticket:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_ticket
+    description: Zendesk funnel ticket ID.
+  id_segment:
+    lineage:
+      - datalake_customer_support.chat.id_segment
+    description: ID of segment.
+  ticket_origin:
+    lineage:
+      - datalake_customer_support.chat.ticket_origin
+    description: Origin of ticket chat5a or whatsapp.
+  is_solved:
+    lineage:
+      - datalake_customer_support.chat.is_solved
+    description: Flag that ticket was solved.
+  ts_ticket_started:
+    lineage:
+      - datalake_customer_support.chat.ts_ticket_started
+    description: Date and time of ticket started.
+  id_conversation:
+    lineage:
+      - datalake_customer_support.chat.id_conversation
+    description: ID of the conversation on twilio.
+  id_segment:
+    lineage:
+      - datalake_customer_support.chat.id_segment
+    description: ID of the segment on twilio.
+  completion_reason:
+    lineage:
+      - datalake_customer_support.chat.completion_reason
+    description: Resources about task.
+  department:
+    lineage:
+      - datalake_customer_support.chat.department
+    description: Name of queue that task was in.
+  seconds_first_reply:
+    lineage:
+      - datalake_customer_support.chat.seconds_first_reply
+    description: First response time (in minutes).
+  total_minutes_queue_time:
+    lineage:
+      - datalake_customer_support.chat.total_minutes_queue_time
+    description: Total queue time to service human (in minutes).
+  total_minutes_talk_time:
+    lineage:
+      - datalake_customer_support.chat.total_minutes_talk_time
+    description: Total minutes of human service conversation (in minutes).
+  total_minutes_wrap_up_time:
+    lineage:
+      - datalake_customer_support.chat.total_minutes_wrap_up_time
+    description: Total minutes of human service to waiting time (in minutes).
+  total_minutes_handling_time:
+    lineage:
+      - datalake_customer_support.chat.total_minutes_handling_time
+    description: Total minutes of human service handling (in minutes).
