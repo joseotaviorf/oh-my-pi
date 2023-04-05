@@ -1,20 +1,24 @@
 WITH 
 house AS (
   SELECT 
-    id_house,
-    status_history AS status,
-    reason AS status_reason,
-    ts_status_changed AS ts_state_started,
-    ts_status_changed_next AS ts_state_ended,
-    order_version AS listing_version,
-    order_status AS state_order,
-    events_change_status,
-    IF((events_change_status IS NOT NULL OR ts_status_changed = ts_first_publication), 1, 0) AS trigger_new_version,
-    MAX(order_status) OVER(PARTITION BY id_house) AS max_house_state_order,
-    country_code,
-    ts_first_publication
+    house.id_house,
+    house.status_history AS status,
+    house.reason AS status_reason,
+    house.ts_status_changed AS ts_state_started,
+    house.ts_status_changed_next AS ts_state_ended,
+    house.order_version AS listing_version,
+    house.order_status AS state_order,
+    house.events_change_status,
+    IF((house.events_change_status IS NOT NULL OR house.ts_status_changed = house.ts_first_publication), 1, 0) AS trigger_new_version,
+    MAX(house.order_status) OVER(PARTITION BY house.id_house) AS max_house_state_order,
+    house.country_code,
+    house.ts_first_publication,
+    MAX(rev.reason) OVER(PARTITION BY house.id_house, house.status_history, house.ts_status_changed) AS revision_reason
   FROM 
     datalake_ebdb_listing.house_status_version_order AS house
+  LEFT JOIN
+    datalake_ebdb_clean.user_revision_entity AS rev
+      ON rev.id = house.rev
   WHERE
     ts_status_changed < '2020-01-06 19:04:25' --Timestamp when table listing_business_context was created
 ),
@@ -88,12 +92,16 @@ business_context_history AS (
         lhs.state_order IS NOT NULL
         , lhs.state_order + ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC)
         , ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC)
-      ) AS state_order
+      ) AS state_order,
+      MAX(rev.reason) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS revision_reason
   FROM 
       datalake_ebdb_listing.business_context_history AS bch
   LEFT JOIN 
     last_house_state AS lhs
       ON lhs.id_house = bch.id_house
+  LEFT JOIN
+    datalake_ebdb_clean.user_revision_entity AS rev
+      ON rev.id = bch.rev
   WHERE
       bch.business_context = 'RENT'
 ), 
@@ -304,7 +312,8 @@ trigger AS (
     trigger_new_version,
     listing_version,
     state_order,
-    max_house_state_order AS max_state_order
+    max_house_state_order AS max_state_order,
+    revision_reason
   FROM 
     house
 
@@ -331,7 +340,8 @@ trigger AS (
           , 0
       ) AS listing_version,
       bch.state_order,
-      MAX(bch.state_order) OVER(PARTITION BY bch.id_house) AS max_state_order
+      MAX(bch.state_order) OVER(PARTITION BY bch.id_house) AS max_state_order,
+      bch.revision_reason
   FROM
     business_context_history AS bch
   LEFT JOIN 
@@ -350,6 +360,7 @@ SELECT
   country_code,
   status,
   status_reason,
+  revision_reason,
   ts_state_started,
   ts_state_ended,
   days_in_state,

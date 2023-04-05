@@ -31,6 +31,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.business_context_history.status_reason
     description: Status reason of the house in that specific time period.
+  revision_reason:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.reason
+    description: Reason why an user changed some aspect of the house state.
   trigger_new_version:
     description: Number indicating if this state should trigger a new version (1 if it should and 0 if not).
   ts_state_started:
