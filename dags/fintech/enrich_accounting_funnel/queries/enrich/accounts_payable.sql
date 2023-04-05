@@ -25,6 +25,7 @@ cap_contract_info AS (
 cap_formated AS (
     SELECT
       supplier_description,
+      dt_paid AS dt_paid,
       accrual_year_month,
       CASE
         WHEN UPPER(payment_reason) LIKE 'PROTEÇÃO 5A%' AND UPPER(payment_source) LIKE 'MANUAL%' THEN 'Proteção 5A - PP'
@@ -37,8 +38,7 @@ cap_formated AS (
         WHEN regexp_like(UPPER(payment_reason),'^CRÉDITO A SALDAR|^DEVOLUÇÃO|^EXTRA') THEN 'Repasse Extra'
         ELSE NULL
       END AS payment_reason_classification,
-      SUM(paid_amount) AS paid_amount,
-      MAX(dt_paid) AS dt_paid
+      SUM(paid_amount) AS paid_amount
     FROM 
       datalake_payable_accounts_transactions_clean.accounts_payable
     WHERE
@@ -46,12 +46,14 @@ cap_formated AS (
   GROUP BY
       1,
       2,
-      3
+      3,
+      4
 ),
 
 vans_formated AS ( --Change columns name to match CAP layout
   SELECT 
     SPLIT(SPLIT(SPLIT(SPLIT(SPLIT(c.company_use, 'T')[0], 'P')[0], '!')[0], 'L')[0], 'I')[0] as supplier_description,
+    c.dt_paid AS dt_paid,
     CAST(extract(YEAR from c.dt_paid) AS varchar(4)) || LPAD(CAST(extract(MONTH from c.dt_paid) AS varchar(2)), 2, '0') as accrual_year_month,
     CASE
       WHEN UPPER(pagamento) LIKE 'PROTEÇÃO 5A%' AND UPPER(our_number) LIKE 'MANUAL%' THEN 'Repasse Extra'
@@ -64,8 +66,7 @@ vans_formated AS ( --Change columns name to match CAP layout
       WHEN regexp_like(UPPER(pagamento),'^DEVOLUÇÃO|^EXTRA') THEN 'Repasse Extra'
       ELSE NULL
     END AS payment_reason_classification, 
-    SUM(paid_amount) AS paid_amount,
-    MAX(c.dt_paid) AS dt_paid
+    SUM(paid_amount) AS paid_amount
   FROM 
     (SELECT 
       p.our_number,
@@ -134,7 +135,8 @@ AND
 GROUP BY 
   1,
   2,
-  3
+  3,
+  4
 ),
 
 cap_final AS (
