@@ -27,4 +27,5 @@ tables:
     is_incremental: false
   recommendation_metrics_agg_recset:
     is_incremental: false
-    partition_cols: dt_rec_received
+    partition_cols:
+      - dt_rec_received
