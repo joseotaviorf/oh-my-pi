@@ -4,6 +4,10 @@ inner_dependencies:
   recommendation_flow:
     - item_interaction
     - recommendation
+  recommendation_metrics_agg_recset:
+    - recommendation_flow
+  recommendation_metrics_agg_display_type_business_context:
+    - recommendation_metrics_agg_recset
 
 tables:
   recommendation_catalog:
@@ -19,3 +23,8 @@ tables:
     is_incremental: false
   recommendation_flow:
     is_incremental: false
+  recommendation_metrics_agg_display_type_business_context:
+    is_incremental: false
+  recommendation_metrics_agg_recset:
+    is_incremental: false
+    partition_cols: dt_rec_received
