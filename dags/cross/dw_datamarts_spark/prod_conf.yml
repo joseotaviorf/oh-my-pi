@@ -89,3 +89,4 @@ dags:
       - spark.driver.cores: 5
   support_and_service:
     owner: Data SS
+    cluster_name: databricks_10_4_max_memory_cluster
