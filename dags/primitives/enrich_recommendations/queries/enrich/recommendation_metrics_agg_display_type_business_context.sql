@@ -151,7 +151,7 @@ SELECT
     MIN(rec_to_rent_flow_seven_days_at_10) AS min_rec_to_rent_flow_seven_days_at_10,
     MAX(rec_to_rent_flow_seven_days_at_10) AS max_rec_to_rent_flow_seven_days_at_10,
 
-    DATE(ts_rec_received) AS dt_rec_received
+    dt_rec_received
 
 FROM
     datalake_recommendations.recommendation_metrics_agg_recset

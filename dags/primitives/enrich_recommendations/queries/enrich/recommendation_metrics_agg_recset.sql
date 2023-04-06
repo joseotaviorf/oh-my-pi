@@ -17,7 +17,9 @@ WITH base AS (
         platform,
         language,
         ts_rec_created,
+        DATE(ts_rec_created) AS dt_rec_created,
         ts_rec_received,
+        DATE(ts_rec_received) AS dt_rec_received,
         year,
         month,
         day
