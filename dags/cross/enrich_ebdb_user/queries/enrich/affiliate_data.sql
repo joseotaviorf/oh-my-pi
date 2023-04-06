@@ -1,48 +1,60 @@
-with first_operation_start (
-    with min_operation_start_rev (
-        select
-            id_affiliate_data,
-            min(REV) as REV
-        from datalake_ebdb_clean.affiliate_data_aud
-        where ts_operation_start is not null
-        group by 1
-	)
-	select
+WITH user_affiliates AS (
+  SELECT 
+    u.id, 
+    u.id_affiliates, 
+    u.id_agent,
+    u.main_phone_ddd,
+    u.ts_updated
+  FROM datalake_ebdb_user.user AS u
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY u.id_affiliates ORDER BY u.ts_updated DESC) = 1    
+),
+
+min_operation_start_rev (
+    SELECT
+        id_affiliate_data,
+        MIN(REV) AS REV
+    FROM datalake_ebdb_clean.affiliate_data_aud
+    WHERE ts_operation_start IS NOT NULL
+    GROUP BY 1
+),
+
+first_operation_start (
+	SELECT
 	    ada.id_affiliate_data,
 	    ada.ts_operation_start
-	from min_operation_start_rev mosr
-    left join datalake_ebdb_clean.affiliate_data_aud ada
-        on mosr.id_affiliate_data = ada.id_affiliate_data
-        and mosr.REV = ada.REV
+	FROM min_operation_start_rev mosr
+    LEFT JOIN datalake_ebdb_clean.affiliate_data_aud ada
+        ON mosr.id_affiliate_data = ada.id_affiliate_data
+        AND mosr.REV = ada.REV
 )
-select
+
+SELECT
     ad.id,
     ad.id_indicated_by,
     ad.id_doorman_affiliate_data,
     COALESCE(ur.country_code, 'Undefined') AS country_code,
     ad.is_active,
-    (ad.id_doorman_affiliate_data is not null) as is_doorman_affiliate,
+    (ad.id_doorman_affiliate_data IS NOT NULL) AS is_doorman_affiliate,
     ad.origin,
-    case when ad.affiliate_type = 'Doorman' and u.id_agent is not null then 'Doorman & Agent'
-         when u.id_agent is not null then 'Agent'
-         else ad.affiliate_type
-    end as affiliate_type,
+    CASE WHEN ad.affiliate_type = 'Doorman' AND u.id_agent IS NOT NULL THEN 'Doorman & Agent'
+         WHEN u.id_agent IS NOT NULL THEN 'Agent'
+         ELSE ad.affiliate_type
+    END AS affiliate_type,
     ad.payment_preference,
     ad.creci_number,
-    coalesce(ad.operation_city, dad.work_city) as work_city,
+    COALESCE(ad.operation_city, dad.work_city) AS work_city,
     ad.last_week_balance_communication,
-    dad.ts_joined as ts_doorman_joined,
-    coalesce(fos.ts_operation_start, ad.ts_operation_start) as ts_first_operation_start,
+    dad.ts_joined AS ts_doorman_joined,
+    COALESCE(fos.ts_operation_start, ad.ts_operation_start) AS ts_first_operation_start,
     ad.ts_operation_start,
     ad.ts_created,
     ad.ts_updated
-from datalake_ebdb_clean.affiliate_data ad
-left join datalake_ebdb_clean.user u    -- A left join is being applied because not all affiliates are on the user table.
-    on u.id_affiliates = ad.id          
-LEFT JOIN
-    datalake_ebdb_country.user AS ur
+FROM datalake_ebdb_clean.affiliate_data AS ad
+LEFT JOIN user_affiliates AS u    -- Adding an CTE to deduplicate some affiliates id
+    ON u.id_affiliates = ad.id          
+LEFT JOIN datalake_ebdb_country.user AS ur
         ON u.id = ur.id_user
-left join datalake_ebdb_clean.doorman_affiliate_data dad
-    on dad.id = ad.id_doorman_affiliate_data
-left join first_operation_start fos
-    on fos.id_affiliate_data = ad.id
+LEFT JOIN datalake_ebdb_clean.doorman_affiliate_data AS dad
+    ON dad.id = ad.id_doorman_affiliate_data
+LEFT JOIN first_operation_start AS fos
+    ON fos.id_affiliate_data = ad.id
