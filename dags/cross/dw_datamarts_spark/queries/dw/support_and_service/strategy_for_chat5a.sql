@@ -550,13 +550,15 @@ tags_users AS (
 SELECT
   tu.id_session,
   tu.id_user,
-  tu.ts_started,
+  tu.id_pipeline,
+  atc.id_conversation,
+  tu.id_ticket,
+  atc.id_segment,
   tu.session_ordem,
   tu.has_chat5a_access,
   tu.migration_strategy,
   tu.total_strategy,
   tu.migration_strategy_adjusted,
-  tu.id_pipeline,
   tu.contract_role,
   tu.is_retention,
   tu.tag,
@@ -567,20 +569,17 @@ SELECT
   tu.comment_human,
   tu.is_solved_human,
   tu.has_installed_app,
-  tu.id_ticket,
-  atc.id_segment,
   atc.ticket_origin,
   atc.is_solved,
-  atc.ts_ticket_started,
-  atc.id_conversation,
-  atc.id_segment,
   atc.completion_reason,
   atc.department,
   atc.seconds_first_reply,
   atc.total_minutes_queue_time,
   atc.total_minutes_talk_time,
   atc.total_minutes_wrap_up_time,
-  atc.total_minutes_handling_time
+  atc.total_minutes_handling_time,
+  tu.ts_started,
+  atc.ts_ticket_started
 FROM
   tags_users tu
 LEFT JOIN
