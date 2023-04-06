@@ -156,6 +156,6 @@ SELECT
 FROM
     datalake_recommendations.recommendation_metrics_agg_recset
 GROUP BY
-    DATE(ts_rec_received),
+    dt_rec_received,
     business_context,
     display_type
