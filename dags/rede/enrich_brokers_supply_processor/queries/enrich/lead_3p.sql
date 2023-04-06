@@ -186,8 +186,8 @@ LEFT JOIN
         AND sale_bcd.business_context = 'SALE'
 LEFT JOIN
     datalake_brokers_supply_processor.business_context_detail AS rent_bcd
-        ON sale_bcd.id_lead = l.id
-        AND sale_bcd.business_context = 'RENT'
+        ON rent_bcd.id_lead = l.id
+        AND rent_bcd.business_context = 'RENT'
 LEFT JOIN
     datalake_brokers_supply_processor.file AS sale_file
         ON sale_bcd.id_file = sale_file.id
