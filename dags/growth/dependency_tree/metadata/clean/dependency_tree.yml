@@ -1,0 +1,26 @@
+database_name: datalake_dependency_tree_clean
+table_name: dependency_tree
+owner: marcio.gomes@quintoandar.com.br
+domain: growth
+description: Dependency relation between DAGs.
+columns:
+  dag:
+    description: DAG's name.
+    lineage:
+      - datalake_dependency_tree_raw.dependency_tree.dag
+  level_dag_dependency:
+    description: First level (or simple direct) dependencies of a DAG.
+    lineage:
+      - datalake_dependency_tree_raw.dependency_tree.level_dag_dependency
+  up_level_dag_dependency:
+    description: Second level (or simple indirect) dependencies of a DAG.
+    lineage:
+      - datalake_dependency_tree_raw.dependency_tree.up_level_dag_dependency
+  up_level_task_dependency:
+    description: Second level (or simple indirect) dependencies of a DAG at task level.
+    lineage:
+      - datalake_dependency_tree_raw.dependency_tree.up_level_task_dependency
+  level:
+    description: Depth level of dependency.
+    lineage:
+      - datalake_dependency_tree_raw.dependency_tree.level
