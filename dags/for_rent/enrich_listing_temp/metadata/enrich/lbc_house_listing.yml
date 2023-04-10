@@ -35,6 +35,9 @@ columns:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.status_reason
     description: Listing status reason.
+  rent_type:
+    description: Indicates if a re-listing resulted in a re-rental or the termination 
+      was canceled and the listing was rented with the old contract or it wasn't rented at all.
   rent:
     lineage:
       - datalake_ebdb_clean.house_aud.rent

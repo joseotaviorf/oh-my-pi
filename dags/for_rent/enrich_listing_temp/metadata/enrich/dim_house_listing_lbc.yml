@@ -60,6 +60,15 @@ columns:
     lineage:
     - datalake_listing_temp.lbc_house_listing.status_reason
     description: House listing status reason.
+  rent_type:
+    lineage:
+    - datalake_listing_temp.lbc_house_listing.rent_type
+    description: Indicates if a re-listing resulted in a re-rental or the termination 
+      was canceled and the listing was rented with the old contract or it wasn't rented at all.
+    categories:
+      OLD_CONTRACT_RESUMED: Termination was canceled and the old rent contract was resumed.
+      NEW_CONTRACT_STARTED: Relisting resulted in a re-rental.
+      NOT_RENTED: House wasn't rented.
   is_keys_with_agent_eligible:
     lineage:
     - datalake_ebdb_listing.agents_with_keys.is_keys_with_agent_eligible

@@ -17,7 +17,8 @@ WITH house_aud AS (
         h.rev,
         h.mod_status,
         h.mod_rent,
-        h.dt_first_publication
+        h.dt_first_publication,
+        rev.reason AS revision_reason
     FROM
       datalake_ebdb_clean.house_aud AS h
     INNER JOIN 
@@ -43,6 +44,7 @@ house_status_version_last_status AS (
         lbc_vo.status,
         LAG(status) OVER(PARTITION BY lbc_vo.id_house ORDER BY lbc_vo.ts_state_started) AS previous_status,
         lbc_vo.status_reason,
+        lbc_vo.revision_reason,
         lbc_vo.ts_state_started,
         lbc_vo.ts_state_ended,
         lbc_vo.days_in_state,
@@ -96,12 +98,13 @@ house_listing_plain as (
         hs_v.listing_version AS version,
         sc_v.category_change AS change_version_status,
         hs_v.ts_last_unpublished,
-        MAX(hs_v.previous_status)/* OVER(PARTITION BY hs_v.id_house, hs_v.listing_version ORDER BY hs_v.ts_state_started)*/ AS status_history, --TODO: Checar a razão desse MAX
-        MAX(hs_v.ts_state_started)/* OVER(PARTITION BY hs_v.id_house, hs_v.listing_version)*/ AS ts_status_changed, --TODO: Checar a razão disso
-        MAX(hs_v.last_status)/* OVER(PARTITION BY hs_v.id_house, hs_v.listing_version ORDER BY hs_v.ts_state_started)*/ AS status, --TODO: Checar a razão desse MAX
+        MAX(hs_v.previous_status) AS status_history,
+        MAX(hs_v.ts_state_started) AS ts_status_changed,
+        MAX(hs_v.last_status) AS status,
         MAX(hs_v.last_status_reason) AS status_reason,
-        MIN(hs_v.ts_state_started)/* OVER(PARTITION BY hs_v.id_house, hs_v.listing_version)*/ AS ts_listing_version_start,
-        MAX(COALESCE(hs_v.ts_state_ended, CAST('2200-01-01 12:00:00' AS TIMESTAMP)))/* OVER(PARTITION BY hs_v.id_house, hs_v.listing_version)*/ AS ts_listing_version_end
+        MAX(hs_v.revision_reason) AS revision_reason,
+        MIN(hs_v.ts_state_started) AS ts_listing_version_start,
+        MAX(COALESCE(hs_v.ts_state_ended, CAST('2200-01-01 12:00:00' AS TIMESTAMP))) AS ts_listing_version_end
     FROM
       house_status_version_last_status AS hs_v
     LEFT JOIN 
@@ -127,6 +130,7 @@ house_listing_full AS (
         END AS listing_category,
         status,
         status_reason,
+        revision_reason,
         status_history,
         ts_status_changed,
         ts_listing_version_start,
@@ -310,6 +314,7 @@ house_listing AS (
         hl.version,
         hl.status,
         hl.status_reason,
+        hl.revision_reason,
         rent_last.rent,
         hl.listing_category,
         lsc_originals.special_condition_type as last_originals_type,
@@ -561,6 +566,22 @@ SELECT
     hl.version,
     hl.status,
     hl.status_reason,
+    CASE
+      WHEN
+        hl.status = 'SUSPENDED' 
+        AND status_reason = 'RENTED' 
+        AND hl.revision_reason = 'TERMINATION_CANCELED'
+      THEN 'OLD_CONTRACT_RESUMED'
+      WHEN
+        (
+          hl.status = 'SUSPENDED' 
+          AND status_reason = 'RENTED' 
+          AND (hl.revision_reason <> 'TERMINATION_CANCELED' OR hl.revision_reason IS NULL)
+        )
+        OR hl.status = 'alugado'
+      THEN 'NEW_CONTRACT_STARTED'
+      ELSE 'NOT_RENTED'
+    END AS rent_type,
     hl.rent,
     hl.listing_category,
     hl.last_originals_type,
