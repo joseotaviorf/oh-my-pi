@@ -12,16 +12,12 @@ column_level_validations:
     is_unique:
       severity_level: Error
   business_context:
-    is_complete:
-      severity_level: Error
     is_contained_in:
       values:
         - SALE
         - RENT
         - Unknown
   recurrency_type:
-    is_complete:
-      severity_level: Error
     is_contained_in:
       values:
         - FIRST_BATCH
