@@ -40,7 +40,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
 
 # cluster setup
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_min_general_photon_cluster"
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 
 ENV = os.environ.get("ENVIRONMENT")

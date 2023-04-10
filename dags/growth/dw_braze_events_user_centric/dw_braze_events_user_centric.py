@@ -21,7 +21,7 @@ DW_SCHEMA = "braze"
 CONTEXT = "braze_events_user_centric"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_photon_cluster"
 
 ENV = os.environ.get("ENVIRONMENT")
 
