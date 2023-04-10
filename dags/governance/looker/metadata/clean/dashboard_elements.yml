@@ -35,14 +35,14 @@ columns:
     lineage:
       - datalake_looker_raw.dashboard_elements.query_id
   year:
-    description: ingestion year
+    description: Ingestion year
     lineage:
       - datalake_looker_raw.dashboard_elements.year
   month:
-    description: ingestion month
+    description: Ingestion month
     lineage:
       - datalake_looker_raw.dashboard_elements.month
   day:
-    description: ingestion day
+    description: Ingestion day
     lineage:
       - datalake_looker_raw.dashboard_elements.day

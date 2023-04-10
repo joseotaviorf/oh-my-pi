@@ -23,9 +23,9 @@ class GitService:
         https://git-scm.com/docs/git-diff-tree#Documentation/git-diff-tree.txt---diff-filterACDMRTUXB82308203
         :rtype: Dict[str, str]
         """
-        diff_branches = f"{from_branch}..{to_branch}"
+        diff_branches = f"{from_branch}...{to_branch}"
 
-        bash_command = f"git diff-tree --no-commit-id --name-status -r {diff_branches}"
+        bash_command = f"git diff --no-commit-id --name-status -r {diff_branches}"
         process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
         output, _ = process.communicate()
         decoded_output = output.decode("utf-8").splitlines()
