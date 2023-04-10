@@ -45,7 +45,7 @@ LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH = (
 )
 
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster ", deserialize_json=True
+    "databricks_9_1_med_general_cluster", deserialize_json=True
 )
 
 CUSTOM_LIBRARIES = [

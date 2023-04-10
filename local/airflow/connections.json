@@ -11,6 +11,18 @@
           "token": "{DATABRICKS_TOKEN}"
         }
       ]
+    },
+    {
+      "conn_id": "databricks_job_cluster",
+      "conn_type": "databricks",
+      "host": "https://dbc-eea99378-83b2.cloud.databricks.com",
+      "login": null,
+      "password": null,
+      "extra": [
+        {
+          "token": "{DATABRICKS_TOKEN}"
+        }
+      ]
     }
   ]
 }

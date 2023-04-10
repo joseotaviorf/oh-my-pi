@@ -45,3 +45,5 @@ COPY ./dags /bi-etl-ejuice/local/bietlejuice/dags/dags
 COPY ./local/docker/entrypoint.sh ./entrypoint.sh
 COPY ./bietlejuice ./bietlejuice
 COPY ./local/airflow ./airflow
+COPY ./scripts /bi-etl-ejuice/local/bietlejuice/scripts
+
