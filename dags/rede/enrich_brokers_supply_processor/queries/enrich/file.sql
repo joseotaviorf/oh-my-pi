@@ -22,7 +22,7 @@ files_with_company AS (
     SELECT
         f.id,
         f.id_partner,
-        pa.id_company_hubspot,
+        l.cnpj,
         f.hash,
         f.file_name,
         f.type,
@@ -34,19 +34,19 @@ files_with_company AS (
     FROM
         datalake_brokers_supply_processor_clean.file AS f
     LEFT JOIN
-        datalake_brokers_supply_processor_clean.lead_3p AS l
-            ON f.id = l.id_file
-            AND l.cnpj != 'Não informado'
+        datalake_brokers_supply_processor_clean.business_context_detail AS bcd
+            ON bcd.id_file = f.id
     LEFT JOIN
-        partner_agencies_aux AS pa
-            ON pa.cnpj = l.cnpj
+        datalake_brokers_supply_processor_clean.lead_3p AS l
+            ON bcd.id_lead = l.id
+            AND l.cnpj != 'Não informado'
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY f.id ORDER BY f.ts_updated DESC, l.ts_updated DESC) = 1
 )
 SELECT
     fwc.id,
     fwc.id_partner,
-    fwc.id_company_hubspot,
+    pa.id_company_hubspot,
     fwc.hash,
     fwc.file_name,
     fwc.type,
@@ -55,7 +55,7 @@ SELECT
     fwc.version,
     LAG(fwc.ts_created) OVER (
         PARTITION BY
-            COALESCE(fwc.id_company_hubspot, SPLIT(fwc.file_name, '_dedup_')[0])
+            COALESCE(pa.id_company_hubspot, SPLIT(fwc.file_name, '_dedup_')[0])
         ORDER BY
             fwc.ts_created
     ) AS ts_previous_file_sent_by_agency,
@@ -63,3 +63,6 @@ SELECT
     fwc.ts_updated
 FROM
     files_with_company AS fwc
+LEFT JOIN
+    partner_agencies_aux AS pa
+        ON pa.cnpj = fwc.cnpj
