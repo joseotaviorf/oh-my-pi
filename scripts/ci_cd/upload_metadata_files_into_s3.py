@@ -1,8 +1,10 @@
 import argparse
-from typing import List
+from typing import List, Dict
 
 import boto3
 import requests
+import json
+import yaml
 
 from scripts.services.git_service import GitService
 from scripts.services.metadata_file_info import MetadataFileInfo
@@ -89,17 +91,68 @@ def upload_files(files: List[MetadataFileInfo], bucket):
         )
 
 
-def generate_payloads(files_info: List[MetadataFileInfo]):
-    doc_payloads = []
-    for file_info in files_info:
-        if file_info.has_documentation:
-            doc_payloads.append(
+def metric_qualculation_method(metric_path: str) -> str:
+    sql_file_path = metric_path.replace("metadata", "queries").replace(".ymal", ".sql").replace(".yml", ".sql")
+    with open(sql_file_path, "r") as sql_file:
+        return json.dumps(sql_file.read())
+
+
+def generate_metric_payload(file_info: MetadataFileInfo) -> List[Dict]:
+
+    optional_args = [
+        "acronym",
+        "business_stage",
+        "company_line",
+        "is_additive",
+        "hierarchy_level",
+        "link_to_metric",
+        "approved_by",
+        "observations",
+    ]
+
+    with open(file_info.local_path, "r") as metric_file:
+        metric_data = yaml.safe_load(metric_file)
+
+    payload = []
+    for column, doc in metric_data["columns"].items():
+        metric = doc.get("metric")
+        if metric:
+            payload.append(
                 {
                     "vendor": ["datahub"],
-                    "database_name": file_info.database_name,
-                    "table_name": file_info.table_name,
+                    "name": metric["name"],
+                    "description": metric["description"],
+                    "company_line": metric_data["domain"],
+                    "created_by": metric_data["owner"],
+                    "maturity_level": "Official",
+                    "calculation": metric_qualculation_method(file_info.local_path),
+                    **{key: value for key, value in metric.items() if key in optional_args}
                 }
             )
+
+    return payload
+
+
+def generate_documentation_payload(file_info: MetadataFileInfo) -> Dict:
+    return {
+        "vendor": ["datahub"],
+        "database_name": file_info.database_name,
+        "table_name": file_info.table_name,
+    }
+
+
+def generate_payloads(files_info: List[MetadataFileInfo]):
+    doc_payloads = {
+        "documentation": [],
+        "metricEntity": []
+    }
+    
+    for file_info in files_info:
+        if file_info.has_documentation:
+            doc_payloads["documentation"].append(generate_documentation_payload(file_info))
+        if file_info.has_metric:
+            doc_payloads["metricEntity"] += generate_metric_payload(file_info)
+
     return doc_payloads
 
 
@@ -109,8 +162,9 @@ def call_mp(payloads, host, endpoint, items_per_call=100):
 
 
 def send_metadata_to_mp(files_info, host):
-    doc_payloads = generate_payloads(files_info)
-    call_mp(doc_payloads, host, "documentation")
+    payloads = generate_payloads(files_info)
+    for path, payload in payloads.items():
+        call_mp(payload, host, path)
 
 
 def main():

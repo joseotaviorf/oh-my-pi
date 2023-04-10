@@ -141,6 +141,7 @@ class MetadataFileService:
         has_lineage = False
         has_documentation = False
         has_tags = False
+        has_metric = False
 
         if content.get("columns"):
             for column_name, column_data in content["columns"].items():
@@ -157,6 +158,8 @@ class MetadataFileService:
                     has_tags = True
                 if "description" in keys:
                     has_documentation = True
+                if "metric" in keys:
+                    has_metric = True
         else:
             if layer == "raw":
                 has_tags = True
@@ -168,6 +171,7 @@ class MetadataFileService:
             has_lineage=has_lineage,
             has_tags=has_tags,
             has_documentation=has_documentation,
+            has_metric=has_metric,
             layer=layer,
         )
 

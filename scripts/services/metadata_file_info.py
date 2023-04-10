@@ -8,6 +8,7 @@ class MetadataFileInfo:
         has_lineage=None,
         has_tags=None,
         has_documentation=None,
+        has_metric=None,
         layer=None,
         domain=None,
         dag=None,
@@ -19,6 +20,7 @@ class MetadataFileInfo:
         self.has_lineage = has_lineage
         self.has_tags = has_tags
         self.has_documentation = has_documentation
+        self.has_metric = has_metric
         self.layer = layer
         self.domain = domain
         self.dag = dag

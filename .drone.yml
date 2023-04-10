@@ -341,7 +341,7 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
-  load-atlas-metadata-files-to-s3-forno:
+  load-metadata-files-to-s3-forno:
     group: upload
     image: python:3.7.3
     commands:
@@ -352,7 +352,7 @@ pipeline:
       event: push
       branch: forno
 
-  load-atlas-metadata-files-to-s3-prod:
+  load-metadata-files-to-s3-prod:
     group: upload
     image: python:3.7.3
     commands:
