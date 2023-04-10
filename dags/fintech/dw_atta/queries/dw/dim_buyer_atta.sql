@@ -6,3 +6,4 @@ FROM
     dw_sale.fact_offers fo
 LEFT JOIN
     dw_public.dim_user du ON fo.sk_buyer = du.sk_user
+WHERE fo.sk_buyer IS NOT NULL
