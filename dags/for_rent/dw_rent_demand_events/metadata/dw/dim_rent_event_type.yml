@@ -1,0 +1,14 @@
+database_name: dw_rent_demand_events
+table_name: dim_rent_event_type
+description: This table shows the events of the rent funnel.
+domain: For Rent
+owner: felipe.chies@quintoandar.com.br
+columns:
+  sk_event_type:
+    description: Id of the event.
+  event_name:
+    description: Name of the event.
+  abbreviation:
+    description: Abbreviation of the event.
+  stage:
+    description: stage of the event.
