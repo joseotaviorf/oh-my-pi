@@ -5,7 +5,7 @@ dag:
 workflow:
   type: query
   layer: dw
-  custom_schema: rent_demand_events
+  custom_schema: rent
   has_load_to_redshift_task: false
 cluster:
   type: databricks_10_4_med_general_photon_cluster

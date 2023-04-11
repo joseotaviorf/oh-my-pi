@@ -14,5 +14,5 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 This pipeline produces the following output table in DW, via full load :
 
-- `dw_rent_demand_events.fact_rent_demand_events`
-- `dw_rent_demand_events.dim_rent_event_type`
+- `dw_rent.fact_rent_demand_events`
+- `dw_rent.dim_rent_event_type`

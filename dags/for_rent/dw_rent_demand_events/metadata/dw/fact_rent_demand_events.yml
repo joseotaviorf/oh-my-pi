@@ -1,4 +1,4 @@
-database_name: dw_rent_demand_events
+database_name: dw_rent
 table_name: fact_rent_demand_events
 description: This table shows the demand events of For Rent, each line is the most recent update of an event related to the scope.
 domain: For Rent

@@ -1,4 +1,4 @@
-database_name: dw_rent_demand_events
+database_name: dw_rent
 table_name: dim_rent_event_type
 description: This table shows the events of the rent funnel.
 domain: For Rent
