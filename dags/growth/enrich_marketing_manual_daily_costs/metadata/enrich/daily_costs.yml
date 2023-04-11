@@ -102,6 +102,8 @@ columns:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.mkt_source
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_source
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_source
+  mkt_platform:
+    description: Level of growth marketing taxonomy
   cost:
     description: Cost
     lineage:
@@ -131,3 +133,8 @@ columns:
         partners: ''
         branding: ''
         social: ''
+  flow_type:
+    description: Indicates if data came from a manual or automatic input in costs pipeline
+    categories: 
+        manual: ''
+        automatic: ''

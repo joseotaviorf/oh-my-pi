@@ -93,8 +93,6 @@ columns:
       - dw_datamarts.tenant_prospect_status.status_detail
   next_status:
     description: Status after the status at that dt_event
-    lineage:
-      - dw_datamarts.tenant_prospect_status.next_status
   ts_status_start:
     description: Timestamp that started prospect status
     lineage:

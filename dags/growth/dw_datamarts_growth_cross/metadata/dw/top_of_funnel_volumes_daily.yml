@@ -5,6 +5,17 @@ domain: Growth
 description: Table that contains data from tof users, tof events, tenant prospects, buyer prospects, targets and marketing cost by growth marketing Taxonomy by day.
   Once ToF users is not a additive metric, we have 1 table for each kind of groupping (daily, weekly and monthly)
 columns:
+  pkey: 
+    description: Artificial key that count number of rows
+  rent_flows: 
+    description: Sum of rent_flows 
+    lineage: 
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.sk_rf
+  tenant_prospect_deactivations_by_renting: 
+    description: Tenant prospects that has the current status as Rented
+    lineage: 
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.status
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.sk_client
   city_group:
     description: City group
     lineage:

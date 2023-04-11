@@ -2,63 +2,57 @@ database_name: dw_datamarts_growth
 table_name: sale_performance_marketing_metrics_demand
 owner: '@data-growth'
 domain: Growth
-description: Table that contains data from tenant prospects, targets and marketing cost by growth marketing Taxonomy
+description: Table that contains data from buyer prospects, targets and marketing cost by growth marketing Taxonomy
 columns:
   dt_event:
     description: Date of the flow event or status available
     lineage:
-    - datalake_gsheets_clean.demand_targets_replanning.dt_target
-    - datalake_gsheets_clean.mkt_cost_per_source.dt_event
-    - datalake_gsheets_clean.rental_flows_targets.date
-    - datalake_gsheets_clean.rental_ntp_source_targets.dt_target
-    - dw_datamarts_growth_cross.rent_flow_interactions.dt_event
-    - dw_datamarts_growth_cross.tenant_prospect_status.ts_start
-    - dw_public.dim_date.date
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - dw_datamarts_cross.buyer_prospect_status.ts_start
   ts_event:
     description: Timestamp of the flow event or status available
     lineage:
-    - datalake_gsheets_clean.demand_targets_replanning.dt_target
-    - datalake_gsheets_clean.mkt_cost_per_source.dt_event
-    - datalake_gsheets_clean.rental_flows_targets.date
-    - datalake_gsheets_clean.rental_ntp_source_targets.dt_target
-    - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
-    - dw_datamarts_growth_cross.tenant_prospect_status.ts_start
-    - dw_public.dim_date.date
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - datalake_gsheets_clean.mkt_cost_per_source.dt_event
+      - datalake_gsheets_clean.sale_nbp_source_targets.dt_target
+      - datalake_gsheets_clean.sale_flows_targets.date
+      - dw_public.dim_date.date
+      - dw_datamarts_cross.buyer_prospect_status.ts_start
   status:
     description: Prospect status
     lineage:
-    - dw_datamarts_growth_cross.tenant_prospect_status.status
+     - dw_datamarts_cross.buyer_prospect_status.status
+  next_status:
+    description: Status after the status at that dt_event
   status_detail:
     description: Detail of the prospects status at that dt_event
     lineage:
-    - dw_datamarts_growth_cross.tenant_prospect_status.status_detail
-  next_status:
-    description: Status after the status at that dt_event
-    lineage:
-    - dw_datamarts_growth_cross.tenant_prospect_status.status
+     - dw_datamarts_cross.buyer_prospect_status.status_detail
   ts_status_start:
     description: Timestamp that started prospect status
     lineage:
-    - dw_datamarts_growth_cross.tenant_prospect_status.ts_start
+     - dw_datamarts_cross.buyer_prospect_status.ts_start
   ts_status_end:
     description: Timestamp that ended prospect status
     lineage:
-    - dw_datamarts_growth_cross.tenant_prospect_status.ts_end
+      - dw_datamarts_cross.buyer_prospect_status.ts_end
   city_group:
     description: city_group of the prospect intent
     lineage:
-    - datalake_marketing_costs.daily_costs.city_group
-    - datalake_gsheets_clean.demand_targets_replanning.city_group
-    - datalake_gsheets_clean.mkt_cost_per_source.city_group
-    - datalake_gsheets_clean.rental_flows_targets.city_group
-    - datalake_gsheets_clean.rental_ntp_source_targets.city_group
-    - dw_datamarts_growth_cross.tenant_prospect_status.city_group
-    - dw_public.dim_region.city_group
+      - dw_public.dim_region.city_group
+      - dw_datamarts_cross.buyer_prospect_status.city_group
+      - datalake_gsheets_clean.mkt_cost_per_source.city_group
+      - datalake_gsheets_clean.sale_nbp_source_targets.city_group
+      - datalake_gsheets_clean.sale_flows_targets.city_group
+      - datalake_marketing_costs.daily_costs.city_group
     categories:
       Belo Horizonte: ''
       Brasília: ''
       Campinas: ''
-      Cotia: ''
       Curitiba: ''
       Florianópolis: ''
       Goiânia: ''
@@ -67,182 +61,212 @@ columns:
       Porto Alegre: ''
       RMSP: ''
       Recife: ''
-      Ribeirão Preto: ''
       Rio de Janeiro: ''
       Salvador: ''
       Santos: ''
-      Sorocaba: ''
-      São Jose dos Campos: ''
-      São José do Rio Preto: ''
       São José dos Campos: ''
-      Uberlândia: ''
-      Vitória: ''
-      belo horizonte: ''
-      campinas: ''
-      curitiba: ''
-      florianópolis: ''
-      goiânia: ''
-      rio de janeiro: ''
+  mkt_origin:
+    description: Level of the Growth Marketing Taxonomy
+    lineage:
+      - dw_sale.dim_offer.mkt_origin
+      - dw_datamarts_cross.talk_to_agent.mkt_origin
+    categories:
+      Not Mapped: ''
+      Tenants PWA: ''
+      Secretaria: ''
+  mkt_channel:
+    description: Level of the Growth Marketing Taxonomy
+    lineage:
+      - dw_public.dim_booking.mkt_channel
+      - dw_sale.dim_offer.mkt_channel
+      - dw_datamarts_cross.talk_to_agent.mkt_channel
+      - datalake_gsheets_clean.mkt_cost_per_source.mkt_channel
+      - datalake_gsheets_clean.sale_nbp_source_targets.mkt_channel
+      - datalake_marketing_costs.daily_costs.mkt_channel
+  mkt_medium:
+    description: Level of the Growth Marketing Taxonomy
+    lineage:
+      - dw_public.dim_booking.mkt_medium
+      - dw_sale.dim_offer.mkt_medium
+      - dw_datamarts_cross.talk_to_agent.mkt_medium
+      - datalake_gsheets_clean.mkt_cost_per_source.mkt_medium
+      - datalake_gsheets_clean.sale_nbp_source_targets.mkt_medium
+      - datalake_marketing_costs.daily_costs.mkt_medium
+    categories:
+      Agents: ''
+      Branding: ''
+      CX: ''
+      Direct: ''
+      Display: ''
+      For Rent: ''
+      Lost Tracking: ''
+      Not Mapped: ''
+      Notifications: ''
+      Online Classifieds: ''
+      Organic: ''
+      Other: ''
+      Performance Max: ''
+      Portals: ''
+      Retargeting: ''
+      SEM branded: ''
+      SEM non-branded: ''
+      SEO branded: ''
+      SEO non-branded: ''
+      Shared: ''
+  mkt_source:
+    description: Level of the Growth Marketing Taxonomy
+    lineage:
+      - dw_public.dim_booking.mkt_source
+      - dw_sale.dim_offer.mkt_source
+      - dw_datamarts_cross.talk_to_agent.mkt_source
+      - datalake_gsheets_clean.mkt_cost_per_source.mkt_source
+      - datalake_gsheets_clean.sale_nbp_source_targets.mkt_source
+      - datalake_marketing_costs.daily_costs.mkt_source
+  utm_medium:
+    description: Returns utm_medium parameter defined at campaing configuration at marketing platforms
+    lineage:
+      - dw_public.dim_booking.utm_medium
+      - dw_sale.dim_offer.utm_medium
+      - dw_datamarts_cross.talk_to_agent.utm_medium
+  utm_source:
+    description: Returns utm_source parameter defined at campaing configuration at marketing platforms
+    lineage:
+      - dw_public.dim_booking.utm_source
+      - dw_sale.dim_offer.utm_source
+      - dw_datamarts_cross.talk_to_agent.utm_source
+  campaign_name:
+    description: Returns the name of the campaign setted at the marketing plataform
+    lineage:
+      - dw_public.dim_booking.utm_campaign
+      - dw_sale.dim_offer.utm_campaign
+      - dw_datamarts_cross.talk_to_agent.utm_campaign
+      - datalake_marketing_costs.daily_costs.campaign_name
+  utm_campaign:
+    description: Returns utm_campaign parameter defined at campaing configuration at marketing platforms
+    lineage:
+      - dw_public.dim_booking.utm_campaign
+      - dw_sale.dim_offer.utm_campaign
+      - dw_datamarts_cross.talk_to_agent.utm_campaign
+      - datalake_marketing_costs.daily_costs.utm_campaign
+  utm_term:
+    description: Returns the utm_term parameter defined at campaing configuration at marketing platforms
+    lineage:
+      - dw_public.dim_booking.utm_term
+      - dw_datamarts_cross.talk_to_agent.utm_term
+      - datalake_marketing_costs.daily_costs.utm_term
+  utm_content:
+    description: Returns the utm_content parameter defined at campaing configuration at marketing platforms
+    lineage:
+      - dw_public.dim_booking.utm_content
+      - dw_datamarts_cross.talk_to_agent.utm_content
+      - datalake_marketing_costs.daily_costs.utm_content
+  sk_sale_flow:
+    description: Sale flow id
+    lineage:
+      - dw_sale.fact_sale_flows.sk_sale_flow
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+      - dw_datamarts_cross.talk_to_agent.house_id
+  sk_buyer:
+    description: Client/user id
+    lineage:
+      - dw_datamarts_cross.buyer_prospect_status.sk_buyer
+      - dw_sale.fact_sale_flows.sk_buyer
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+  sk_house:
+    description: Id of the house associated with the flow
+    lineage:
+      - datalake_ebdb_clean.house.id
+      - dw_sale.fact_sale_flows.sk_house
+  sk_offer:
+    description: Offer id
+    lineage:
+      - dw_sale.fact_offers.sk_offer
+  sk_booking:
+    description: Booking id
+    lineage:
+     - dw_sale.fact_visits.sk_booking
+  dt_offer_submitted:
+    description: Date of offer submitted
+    lineage:
+     - dw_public.dim_date.date
+  dt_offer_accepted:
+    description: Date of accepted
+    lineage:
+     - dw_public.dim_date.date
+  dt_sale_agreement_signed:
+    description: Date of ccv was signed
+    lineage:
+      - dw_public.dim_date.date
+  dt_booking_created:
+    description: Date of boooking creation
+    lineage:
+     - dw_public.dim_date.date
+  dt_visit_completed:
+    description: Date of booking realized
+    lineage:
+     - dw_public.dim_date.date
+  sale_flow_order: 
+    description: Sale flow ordered by ascending date by unique sk_buyer and sk_house
+    lineage:
+      - dw_sale.fact_sale_flows.sk_sale_flow
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+      - dw_datamarts_cross.talk_to_agent.house_id
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+  buyer_prospect_order:
+    description: Buyer prospect ordered by ascending date by unique sk_buyer
+    lineage:
+      - dw_datamarts_cross.buyer_prospect_status.sk_buyer
+      - dw_sale.fact_sale_flows.sk_buyer
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+  budget:
+    description: Budget that growth marketing team has to invest in each growth marketing channel
+    lineage: 
+      - datalake_gsheets_clean_prod.mkt_cost_per_source.daily_value
+  campaign_context:
+    description: Business context that growth marketing campaign was intented to aim
+    lineage: 
+      - dw_public.dim_booking.utm_campaign
+      - dw_sale.dim_offer.utm_campaign
+      - datalake_gsheets_clean_prod.sale_nbp_source_targets.context
+      - dw_datamarts.talk_to_agent.utm_campaign
+    categories:
+      Agents: ''
+      Organic: ''
+      Rental: ''
+      Sale: ''
+      CM: ''
   flow_event:
     description: Type of flow
-    lineage:
-    - dw_datamarts_growth_cross.rent_flow_interactions.flow_event
     categories:
       Booking: ''
       Offer: ''
       Talk to Agent: ''
-  mkt_origin:
-    description: Level of the Growth Marketing Taxonomy
-    lineage:
-    - datalake_marketing_costs.daily_costs.mkt_origin
-    - dw_datamarts_growth_cross.rent_flow_interactions.mkt_origin
-    categories:
-      Not Mapped: ''
-      Tenants PWA: ''
-  mkt_channel:
-    description: Level of the Growth Marketing Taxonomy
-    lineage:
-    - datalake_gsheets_clean.rental_ntp_source_targets.mkt_channel
-    - datalake_gsheets_clean.mkt_cost_per_source.mkt_channel
-    - datalake_gsheets_clean.demand_targets_replanning.mkt_channel
-    - datalake_marketing_costs.daily_costs.mkt_channel
-    - dw_datamarts_growth_cross.rent_flow_interactions.mkt_channel
-  mkt_medium:
-    descripition: Level of the Growth Marketing Taxonomy
-    lineage:
-    - datalake_gsheets_clean.rental_ntp_source_targets.mkt_medium
-    - datalake_gsheets_clean.mkt_cost_per_source.mkt_medium
-    - datalake_gsheets_clean.demand_targets_replanning.mkt_medium
-    - datalake_marketing_costs.daily_costs.mkt_medium
-    - dw_datamarts_growth_cross.rent_flow_interactions.mkt_medium
-  mkt_source:
-    description: Level of the Growth Marketing Taxonomy
-    lineage:
-    - datalake_gsheets_clean.rental_ntp_source_targets.mkt_source
-    - datalake_gsheets_clean.mkt_cost_per_source.mkt_source
-    - datalake_gsheets_clean.demand_targets_replanning.mkt_source
-    - datalake_marketing_costs.daily_costs.mkt_source
-    - dw_datamarts_growth_cross.rent_flow_interactions.mkt_source
-  utm_medium:
-    description: Returns utm_medium parameter defined at campaing configuration at marketing platforms
-    lineage:
-    - dw_datamarts_growth_cross.rent_flow_interactions.utm_medium
-  utm_source:
-    description: Returns utm_source parameter defined at campaing configuration at marketing platforms
-    lineage: 
-    - dw_datamarts_growth_cross.rent_flow_interactions.utm_medium
-  utm_campaign: 
-    description: Returns utm_campaign parameter defined at campaing configuration at marketing platforms
-    lineage:
-    - datalake_marketing_costs.daily_costs.utm_campaign
-    - dw_datamarts_growth_cross.rent_flow_interactions.utm_campaign
-  utm_term:
-    description: Returns the utm_term parameter defined at campaing configuration at marketing platforms
-    lineage:
-    - datalake_marketing_costs.daily_costs.utm_term
-    - dw_datamarts_growth_cross.rent_flow_interactions.utm_term
-  utm_content:
-    description: Returns the utm_content parameter defined at campaing configuration at marketing platforms
-    lineage:
-    - datalake_marketing_costs.daily_costs.utm_content
-    - dw_datamarts_growth_cross.rent_flow_interactions.utm_content
-  campaign_name:
-    description: Returns the name of the campaign setted at the marketing plataform
-    lineage:
-    - datalake_marketing_costs.daily_costs.campaign_name
-  sk_rf:
-    description: Rent flow id
-    lineage:
-    - dw_datamarts_growth_cross.rent_flow_interactions.sk_rf
-  sk_client:
-    description: Client/user id
-    lineage:
-    - dw_datamarts_growth_cross.rent_flow_interactions.sk_client
-    - dw_datamarts_growth_cross.tenant_prospect_status.sk_client
-  sk_house_listing:
-    description: Id of the house listings associated with the flow
-    lineage:
-    - dw_datamarts_growth_cross.rent_flow_interactions.sk_house_listing
-  id_house:
-    description: Id of the house associated with the flow
-    lineage:
-    - dw_datamarts_growth_cross.rent_flow_interactions.id_house
-  rent_flow_order:
-    description: Rent flow ordered by ascending date by unique sk_client and id_house
-    lineage:
-    - dw_datamarts_growth_cross.rent_flow_interactions.rent_flow_order
-    description: ''
-  tenant_prospect_order:
-    description: Tenant prospect ordered by ascending date by unique sk_client
-    lineage:
-    - dw_datamarts_growth_cross.rent_flow_interactions.tenant_prospect_order
-  sk_booking:
-    description: Booking id
-    lineage:
-    - dw_public.fact_listing_rent_flows.sk_booking
-  sk_offer:
-    description: Offer id
-    lineage:
-    - dw_public.fact_listing_rent_flows.sk_offer
-  sk_proposal:
-    description: Proposal id
-    lineage:
-    - dw_public.fact_listing_rent_flows.sk_proposal
-  sk_contract:
-    description: Contract id
-    lineage:
-    - dw_public.fact_listing_rent_flows.sk_contract
-  dt_booking_created:
-    description: Date of the booking creation
-    lineage:
-    - dw_public.dim_date.date
-  flg_visit_completed:
-    description: States if the visit booking was realized
-    lineage:
-    - dw_public.fact_listing_rent_flows.flg_visit_completed
-  dt_offer_submitted:
-    description: Date of offer submitted
-    lineage:
-    - dw_public.dim_date.date
-  dt_offer_approved:
-    description: Date of offer approved
-    lineage:
-    - dw_public.dim_date.date
-  dt_tenant_first_doc_sent:
-    description: Date of the first document sent
-    lineage:
-    - dw_public.dim_date.date
-  dt_credit_analysis_approved:
-    description: Date of the credit analysis approved
-    lineage:
-    - dw_public.dim_date.date
-  dt_contract_signed:
-    description: Date of the contract signed
-    lineage:
-    - dw_public.dim_date.date
-  rent_flows_target:
-    description: Rent flow target
-    lineage:
-    - datalake_gsheets_clean.rental_flows_targets.rf_target
-  new_rent_flows_target:
-    description: New rent flow target
-    lineage:
-    - datalake_gsheets_clean.demand_targets_replanning.new_rent_flows_target
-  new_tenant_prospects_target:
-    description: New tenant prospects target
-    lineage:
-    - datalake_gsheets_clean.demand_targets_replanning.new_tenant_prospects_target
-    - datalake_gsheets_clean.rental_ntp_source_targets.ntp_target
-  recovered_tenant_prospects_target:
-    description: Recovered tenant prospects target
-    lineage:
-    - datalake_gsheets_clean.rental_ntp_source_targets.rtp_target
-  budget:
-    description: Budget that growth marketing team has to invest in each growth marketing channel
-    lineage:
-    - datalake_gsheets_clean.demand_targets_replanning.budget
-    - datalake_gsheets_clean.mkt_cost_per_source.daily_value
   marketing_cost:
     description: Cost of growth-marketing to achieve interested flows
     lineage:
-    - datalake_marketing_costs_prod.daily_costs.cost
+      - datalake_marketing_costs_prod.daily_costs.cost
+  new_buyer_prospects_target:
+    description: New buyer prospects target
+    lineage: 
+      - datalake_gsheets_clean_prod.sale_nbp_source_targets.nbp_target
+  recovered_buyer_prospects_target:
+    description: Recovered buyer prospects target
+    lineage: 
+      - datalake_gsheets_clean_prod.sale_nbp_source_targets.rbp_target
+  sale_flows_target:
+    description: Sale flow target
+    lineage: 
+     - datalake_gsheets_clean_prod.sale_flows_targets.sf_target
+  is_3p: 
+    description: Indicates if the listing from the flow belongs do 3P - Rede
+    lineage: 
+      - datalake_ebdb_listing_prod.house.is_3p_supply
+  is_3p_bh: 
+    description: Indicates if the listing from the flow belongs do 3P - Rede BH
+    lineage: 
+       - datalake_ebdb_listing_prod.house.is_3p_supply_bh

@@ -14,6 +14,8 @@ columns:
       - datalake_consolidated_marketing_metrics.mitula_consolidated_metrics.id_date
       - datalake_consolidated_marketing_metrics.rtb_consolidated_metrics.id_date
       - datalake_consolidated_marketing_metrics.trovit_consolidated_metrics.id_date
+  origin:
+    description: Marketing platform where data were extracted from
   account_name:
     description: Accont name segmentation
     lineage:

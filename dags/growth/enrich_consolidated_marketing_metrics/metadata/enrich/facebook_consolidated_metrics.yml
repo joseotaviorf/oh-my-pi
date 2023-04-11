@@ -5,6 +5,12 @@ owner: '@data-growth'
 domain: Growth
 description: Table that consolidates metrics extracted from facebook ads platform
 columns:
+  id_date:
+    description: Date segmentation
+    lineage:
+      - datalake_facebook_insights_clean.facebook_insights.day
+      - datalake_facebook_insights_clean.facebook_insights.month
+      - datalake_facebook_insights_clean.facebook_insights.year
   campaign_name:
     description: Name of campaign segmentation
     lineage:

@@ -3,7 +3,7 @@ database_name: datalake_marketing_costs_sharing_rules
 table_name: sharing_rules
 owner: '@data-growth'
 domain: Growth
-description: 
+description: This table concat all share rules by date
 columns:
   id_date:
     description: Date segmentation
