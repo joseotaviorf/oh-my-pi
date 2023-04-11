@@ -31,12 +31,13 @@ class IncrementalTableLoaderPipeline(TableLoaderPipeline):
             force_recreate=False,
         )
 
-        spark_metastore_service.create_new_partitions_from_df(
-            df=df,
-            database_name=self.target_database_name,
-            table_name=self.table_name,
-            partition_cols=self.partitions,
-        )
+        if self.partitions:
+            spark_metastore_service.create_new_partitions_from_df(
+                df=df,
+                database_name=self.target_database_name,
+                table_name=self.table_name,
+                partition_cols=self.partitions,
+            )
 
         spark_metastore_service.refresh_table(
             self.target_database_name, self.table_name
