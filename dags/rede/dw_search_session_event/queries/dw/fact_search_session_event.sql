@@ -45,3 +45,7 @@ LEFT JOIN
         AND rhh.id_company_hubspot = cs_supply.id_hubspot)
         OR (rhh.id_company_hubspot IS NULL
         AND rhh.partner_3p_supply = cs_supply.extracted_3p_tag)
+WHERE
+    sse.year = {year}
+    AND sse.month = {month}
+    AND sse.day = {day}

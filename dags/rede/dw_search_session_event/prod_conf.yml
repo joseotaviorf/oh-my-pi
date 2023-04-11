@@ -12,3 +12,7 @@ tables:
       - year
       - month
       - day
+    dw_query_filters:
+      "year" : "{year}"
+      "month" : "{month}"
+      "day" : "{day}"
