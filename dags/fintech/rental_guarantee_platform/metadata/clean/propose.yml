@@ -20,9 +20,9 @@ columns:
   id_real_estate:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.realestate
-  id_plan:
+  id_company_plan:
     lineage:
-      - datalake_rental_guarantee_platform_raw.propose.plan
+      - datalake_rental_guarantee_platform_raw.propose.company_plan
   id_activator:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.activator

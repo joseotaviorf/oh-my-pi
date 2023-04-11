@@ -117,4 +117,8 @@ tables:
     date_filter_column: updated_at
   - table_name: subscription_aud
     date_filter_column: created_at
+  - table_name: company_plan
+    date_filter_column: updated_at
+  - table_name: company_plan_aud
+    date_filter_column: created_at
 partition_cols: ["year", "month", "day"]

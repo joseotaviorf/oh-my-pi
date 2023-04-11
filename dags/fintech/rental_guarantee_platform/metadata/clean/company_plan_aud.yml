@@ -1,0 +1,99 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: company_plan_aud
+owner: athos.sampayo@quintoandar.com.br
+domain: platform
+description:
+columns:
+  id:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.id
+  id_plan:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.plan_id
+  id_company:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.company_id
+  pricing:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.pricing
+  coverage:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.coverage
+  damage:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.damage
+  commission:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.commission
+  version:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.version
+  rev:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.rev
+  rev_end:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.revend
+  rev_type:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.revtype
+  is_active:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.active
+  mod_id_company:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.company_id_mod
+  mod_princing:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.pricing_mod
+  mod_coverage:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.coverage_mod
+  mod_damage:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.damage_mod
+  mod_comission:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.commission_mod
+  mod_id_plan:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.plan_id_mod
+  mod_is_active:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.active_mod
+  ts_created:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.created_at
+  year:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.year
+  month:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.month
+  day:
+    description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan_aud.day

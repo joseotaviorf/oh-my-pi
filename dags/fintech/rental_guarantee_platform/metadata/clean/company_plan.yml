@@ -1,0 +1,48 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: company_plan
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.id
+  id_plan:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.plan_id
+  id_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.company_id
+  pricing:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.pricing
+  coverage:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.coverage
+  damage:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.damage
+  commission:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.commission
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.version
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.active
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_plan.day

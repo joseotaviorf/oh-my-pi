@@ -5,7 +5,7 @@ SELECT
     type AS id_business_type,
     status AS id_propose_status,
     realestate AS id_real_estate,
-    plan AS id_plan,
+    company_plan AS id_company_plan,
     activator AS id_activator,
     realtor,
     `hash`,
