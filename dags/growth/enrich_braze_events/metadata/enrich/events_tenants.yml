@@ -1,7 +1,7 @@
 ---
 database_name: datalake_braze
 table_name: events_tenants
-owner: data-growth
+owner: leticia.lima@quintoandar.com.br
 domain: growth
 description: This table contains details about event related/realized by tenants, e.g. disptaches or clicks.
 columns:
@@ -75,6 +75,7 @@ columns:
     lineage:
       - datalake_braze_events_clean.events_tenants.event_type
   ts_event:
+    description: Timestamp of when the event occurred.
     lineage:
       - datalake_braze_events_clean.events_tenants.event_info
   year:

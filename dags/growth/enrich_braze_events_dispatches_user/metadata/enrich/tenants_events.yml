@@ -1,9 +1,11 @@
 database_name: datalake_braze_dispatches_user
 table_name: tenants_events
-owner: data-growth
+owner: leticia.lima@quintoandar.com.br
 domain: growth
 description: This table contains details about event related/realized by tenants, e.g. disptaches or clicks.
 columns:
+  id_user:
+    description: Unique code to identify an user created here at QuintoAndar.
   id_user_dispatch:
     description: The combination of id_dispatch and id_user.
     lineage:
@@ -92,18 +94,23 @@ columns:
     lineage:
       - datalake_braze_dispatches.inapp_tenants.ts_inapp_impressioned
   ts_sms_sent:
+    description: Timestamp of when the sms was sent.
     lineage:
       - datalake_braze_dispatches.sms_tenants.ts_sms_sent
   ts_sms_send_to_carried:
+    description: Timestamp of when the sms was sent to the carrier.
     lineage:
       - datalake_braze_dispatches.sms_tenants.ts_sms_send_to_carried
   ts_sms_delivered:
+    description: Timestamp of when the sms was delivered to the user.
     lineage:
       - datalake_braze_dispatches.sms_tenants.ts_sms_delivered
   ts_sms_rejected:
+    description: Timestamp of when the sms was rejected by the user.
     lineage:
       - datalake_braze_dispatches.sms_tenants.ts_sms_rejected
   ts_sms_delivery_failed:
+    description: Timestamp of when the sms was not delivered due to fail.
     lineage:
       - datalake_braze_dispatches.sms_tenants.ts_sms_delivery_failed
   year:
