@@ -63,21 +63,85 @@ tenant_prospects AS (
 	INNER JOIN
     	datalake_region.region AS rgn
         	ON rgn.id = tpe.sk_region
-)
-SELECT
-	adt.id_date,
-	'{id_rule}' AS id_rule,
-	tp.city_group,
-	FLOAT(COUNT(DISTINCT tp.sk_client)/NULLIF(SUM(COUNT(DISTINCT tp.sk_client)) OVER(PARTITION BY adt.id_date), 0)) AS share,
-	'demand' AS funnel_side
-FROM
+),
+----------------------------------------------------------------------------
+-- In case of get 0 results on that day a fall back share will be applied --
+----------------------------------------------------------------------------
+fall_back(city_group, share) AS (
+    SELECT 'RMSP', 0.50 UNION ALL
+    SELECT 'Rio de Janeiro', 0.17 UNION ALL
+    SELECT 'Porto Alegre', 0.07 UNION ALL
+    SELECT 'Belo Horizonte', 0.12 UNION ALL 
+    SELECT 'Ribeirão Preto', 0.03 UNION ALL 
+    SELECT 'Santos', 0.05 UNION ALL 
+    SELECT 'Brasília', 0.02 UNION ALL 
+    SELECT 'Campinas', 0.04
+), 
+fall_back_dated AS ( 
+	SELECT 
+		adt.id_date,
+		'{id_rule}' AS id_rule,
+		city_group, 
+		share, 
+		'demand' AS funnel_side
+	FROM fall_back AS fb 
+	CROSS JOIN datalake_quintoandar.aux_date AS adt
+),
+---------------------------------------------------------
+-- Getting the real share based on the previous result --
+---------------------------------------------------------
+real AS (
+	SELECT
+		adt.id_date,
+		'{id_rule}' AS id_rule,
+		tp.city_group,
+		FLOAT(COUNT(DISTINCT tp.sk_client)/NULLIF(SUM(COUNT(DISTINCT tp.sk_client)) OVER(PARTITION BY adt.id_date), 0)) AS share,
+		'demand' AS funnel_side
+	FROM
+		tenant_prospects AS tp
+	INNER JOIN
+		datalake_quintoandar.aux_date AS adt
+			ON DATE(tp.ts_interaction) = adt.date
+	WHERE
+		tp.interactions_order = 1
+		AND tp.utm_campaign = 'd041d.D.ACQ.Rent.App.Activation.iOS.Firebase'
+		AND tp.city_group IN ('RMSP', 'Rio de Janeiro', 'Porto Alegre', 'Belo Horizonte', 'Ribeirão Preto', 'Santos', 'Brasília', 'Campinas')
+	GROUP BY
+		1,2,3
+), 
+-------------------------------------------------------------------------------------------
+-- Creating a validator metric that will set which table the share value will come from --
+-------------------------------------------------------------------------------------------
+validacao AS (
+SELECT 
+	adt.id_date, 
+	COUNT(DISTINCT sk_client) AS validador
+FROM datalake_quintoandar.aux_date AS adt
+LEFT JOIN
 	tenant_prospects AS tp
-INNER JOIN
-	datalake_quintoandar.aux_date AS adt
 		ON DATE(tp.ts_interaction) = adt.date
-WHERE
-	tp.interactions_order = 1
-	AND tp.utm_campaign = 'd041d.D.ACQ.Rent.App.Activation.iOS.Firebase'
-	AND tp.city_group IN ('RMSP', 'Rio de Janeiro', 'Porto Alegre', 'Belo Horizonte', 'Ribeirão Preto', 'Santos', 'Brasília', 'Campinas')
-GROUP BY
-	1,2,3
+		AND tp.interactions_order = 1
+		AND tp.utm_campaign = 'd041d.D.ACQ.Rent.App.Activation.iOS.Firebase'
+  		AND tp.city_group IN ('RMSP', 'Rio de Janeiro', 'Porto Alegre', 'Belo Horizonte', 'Ribeirão Preto', 'Santos', 'Brasília', 'Campinas')	
+GROUP BY 1 
+) 
+-------------------------------------------------------------------------------------------------------
+-- Applying share factor from the correct table based on status: it has or hasn't result on that day --
+-------------------------------------------------------------------------------------------------------
+SELECT DISTINCT 
+	v.id_date, 
+	'{id_rule}' AS id_rule,
+	CASE
+		WHEN validador > 0 THEN r.city_group
+		ELSE fb.city_group
+	END AS city_group, 
+	CASE
+		WHEN validador > 0 THEN r.share
+		ELSE fb.share
+	END AS share, 
+	'demand' AS funnel_side
+FROM validacao v
+LEFT JOIN real AS r 
+	ON r.id_date = v.id_date 
+LEFT JOIN fall_back_dated AS fb 
+	ON fb.id_date = v.id_date 
