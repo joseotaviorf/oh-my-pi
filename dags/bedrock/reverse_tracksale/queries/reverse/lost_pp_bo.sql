@@ -59,8 +59,13 @@ owners AS (
     LEFT JOIN 
         crisis_users AS uc 
             ON uc.sk_user = dl.sk_owner
+    LEFT JOIN 
+        datalake_ebdb_clean.user_pro_owner AS po 
+            ON dl.sk_owner = po.id_user
+            AND po.is_active = true	
     WHERE
         uc.sk_user IS NULL
+        AND po.is_active IS NULL
 )
 SELECT
     u.nome AS customer_name,

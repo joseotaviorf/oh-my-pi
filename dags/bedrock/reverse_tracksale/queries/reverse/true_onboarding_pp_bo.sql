@@ -12,8 +12,8 @@ WITH new_contracts AS (
         dw_public.dim_house_listing AS dhl
             ON dhl.sk_house_listing = rf.sk_house_listing
     LEFT JOIN
-        dw_datamarts_for_rent.contract_termination AS ct
-            ON dc.sk_contract = ct.sk_contract
+        datalake_offboarding.contract_termination ct
+    	    ON dc.sk_contract = ct.id_contract
     WHERE
         dc.dt_start = DATE_ADD(current_date,-10)
         AND dhl.is_b2b = false
@@ -35,7 +35,8 @@ crisis_users AS (
         datalake_gsheets_clean.department_control AS dc
             ON dt.group_name = dc.department
     WHERE
-        dc.team IN ('Casos Especiais','Proteção 5A','Ouvidoria','ReclameAqui')
+        (dc.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]') 
+            OR dc.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
         AND ft.sk_closed_date_local = -1
     GROUP BY 1
 ),
@@ -67,6 +68,12 @@ owners AS (
         datalake_ebdb_clean.contract_person AS cp
             ON ac.sk_contract = cp.id_contract
             AND cp.type in ('Proprietario')
+    LEFT JOIN 
+        datalake_ebdb_clean.user_pro_owner AS po 
+            ON cp.id_user = po.id_user
+            AND po.is_active = true
+    WHERE
+        po.id_user IS NULL
 )
 SELECT
     name AS customer_name,

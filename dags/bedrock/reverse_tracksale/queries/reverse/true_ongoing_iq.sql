@@ -39,9 +39,9 @@ status_send AS (--Evaluat every ticket related to an birthday contract ORcontrac
     ft.ts_solved,
     CASE 
       WHEN c.birth_type = 'birthday'                   
-          AND ft.sk_ticket IS NOT NULL
-          AND ft.ts_solved IS NULL 
-          AND (ft.front_or_back = 'back' OR dp.team IS NOT NULL) THEN 1 
+        AND ft.sk_ticket IS NOT NULL
+        AND ft.ts_solved IS NULL 
+        AND (ft.front_or_back = 'back' OR dp.team IS NOT NULL) THEN 1 
       ELSE 0 
     END AS flg_not_send,                                            
     CASE 
@@ -61,7 +61,8 @@ status_send AS (--Evaluat every ticket related to an birthday contract ORcontrac
   LEFT JOIN
     dw_customer_support.dim_department AS dp
       ON ft.sk_main_department = dp.sk_department 
-      AND dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions') 	
+      AND (dp.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]') 
+        OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
   WHERE
     c.birth_type IS NOT NULL
 ),

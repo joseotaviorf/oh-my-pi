@@ -79,7 +79,8 @@ status_send AS (--Evaluat every ticket related to an birthday contract or contra
   LEFT JOIN
     dw_customer_support.dim_department AS dp 
       ON ft.sk_main_department = dp.sk_department 
-      AND dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions')
+      AND (dp.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]') 
+        OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
   WHERE
     c.birth_type IS NOT NULL
 ),
@@ -118,7 +119,7 @@ people_to_send AS (--Selected all people than can receive the nps survey
     datalake_ebdb_clean.contract_person AS cp 
   INNER JOIN 
     contracts_to_send AS cs 
-      ON cp.id_contract = cs.sk_contract 	
+      ON cp.id_contract = cs.sk_contract
   LEFT JOIN 
     datalake_ebdb_clean.user_pro_owner AS po 
       ON cp.id_user = po.id_user

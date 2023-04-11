@@ -3,19 +3,19 @@ WITH new_contracts AS (
 		dc.sk_contract,
 		'Onboarding' AS step
 	FROM
-        dw_public.dim_contract dc
+		dw_public.dim_contract dc
 	INNER JOIN
-        dw_public.fact_listing_rent_flows rf
+		dw_public.fact_listing_rent_flows rf
 			ON dc.sk_contract = rf.sk_contract
 			AND rf.sk_contract_signed_date > 0
 	INNER JOIN
-        dw_public.dim_house_listing dhl
+		dw_public.dim_house_listing dhl
 			ON dhl.sk_house_listing = rf.sk_house_listing
 	LEFT JOIN
-        dw_datamarts_for_rent.contract_termination ct
-			ON dc.sk_contract = ct.sk_contract
-    WHERE
-        dc.dt_start = DATE_ADD(current_date, -10)
+		datalake_offboarding.contract_termination ct
+			ON dc.sk_contract = ct.id_contract
+	WHERE
+		dc.dt_start = DATE_ADD(current_date, -10)
 		AND dc.status = 'Ativo'
 		AND ((ct.dt_termination > dc.dt_start) OR (ct.dt_termination is null))
 		AND dhl.country_code = 'BR'
@@ -26,15 +26,16 @@ crisis_users AS (
 	SELECT
 		ft.sk_contract
 	FROM
-        dw_tickets.dim_ticket dt
+		dw_tickets.dim_ticket dt
 	INNER JOIN
-        dw_tickets.fact_tickets ft
+		dw_tickets.fact_tickets ft
 			ON dt.sk_ticket = ft.sk_ticket
 	INNER JOIN
-        dw_customer_support.dim_department dc
+		dw_customer_support.dim_department dc
 			ON dt.group_name = dc.department
 	WHERE
-        dc.team IN ('Casos Especiais','Proteção 5A','Ouvidoria','ReclameAqui')
+		(dc.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]') 
+			OR dc.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
 		AND ft.sk_closed_date_local = -1
 	GROUP BY 1
 ),
@@ -43,12 +44,12 @@ onboarding_contracts AS (
 		c.sk_contract,
 		'Onboarding' AS step
 	FROM
-        new_contracts c
+		new_contracts c
 	LEFT JOIN
-        crisis_users uc
+		crisis_users uc
 			ON uc.sk_contract = c.sk_contract
 	WHERE
-        uc.sk_contract IS NULL
+		uc.sk_contract IS NULL
 	GROUP BY 1,2
 ),
 tenants_dwellers AS (
@@ -62,9 +63,9 @@ tenants_dwellers AS (
 		ac.step,
 		DENSE_RANK() OVER(PARTITION BY cp.id_contract, cp.email ORDER BY cp.id) AS order_diff_email
 	FROM
-        onboarding_contracts ac
+		onboarding_contracts ac
 	INNER JOIN
-        datalake_ebdb_clean.contract_person cp
+		datalake_ebdb_clean.contract_person cp
 			ON ac.sk_contract = cp.id_contract
 			AND cp.type IN ('Inquilino','Morador')
 			AND cp.email IS NOT NULL

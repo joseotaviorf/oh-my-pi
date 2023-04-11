@@ -20,9 +20,9 @@ contracts AS (
     CURRENT_DATE() - INTERVAL '15' day AS dt_recap,
     DATEDIFF(DATE(ct.ts_termination_finished), CURRENT_DATE()) AS ndays_termination2today,
     CASE 
-        WHEN DATEDIFF(CURRENT_DATE(), DATE(ct.ts_termination_finished)) = 2 THEN 'termination'
-        WHEN DATEDIFF(CURRENT_DATE(), DATE(ct.ts_termination_finished)) = 15 THEN 'recap_termination'
-        ELSE NULL 
+      WHEN DATEDIFF(CURRENT_DATE(), DATE(ct.ts_termination_finished)) = 2 THEN 'termination'
+      WHEN DATEDIFF(CURRENT_DATE(), DATE(ct.ts_termination_finished)) = 15 THEN 'recap_termination'
+      ELSE NULL 
     END AS termination_type
   FROM
     dw_public.dim_contract AS dc 
@@ -53,7 +53,7 @@ status_send AS (
     ft.ts_started,
     ft.ts_solved,
     CASE 
-      WHEN (dp.department = 'Rescisão - Despejo [OFF][POS][BACK]'
+      WHEN (dp.department IN ('Rescisão - Despejo [OFF][POS][BACK]','Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
         OR (c.termination_type = 'termination' 
         AND ft.sk_ticket IS NOT NULL 
@@ -62,8 +62,8 @@ status_send AS (
       ELSE 0 
     END AS flg_not_send,                                                     
     CASE 
-      WHEN dp.department = 'Rescisão - Despejo [OFF][POS][BACK]'
-        OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions') THEN 0
+      WHEN (dp.department IN ('Rescisão - Despejo [OFF][POS][BACK]','Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
+        OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions')) THEN 0
       WHEN c.termination_type = 'recap_termination' 
         AND ft.sk_ticket IS NOT NULL 
         AND ft.ts_started < c.dt_recap + INTERVAL '2' day
@@ -80,7 +80,7 @@ status_send AS (
   LEFT JOIN
     dw_customer_support.dim_department AS dp 
       ON ft.sk_main_department = dp.sk_department 
-      AND (dp.department IN ('Offboarding [OFF] [POS] [BACK]','Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]') 
+      AND (dp.department IN ('Offboarding [OFF] [POS] [BACK]','Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]','Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
   WHERE
     c.termination_type IS NOT NULL  --('termination', 'recap_termination')
@@ -116,7 +116,7 @@ people_to_send AS (
     datalake_ebdb_clean.contract_person AS cp 
   INNER JOIN 
     contracts_to_send AS cs 
-      ON cp.id_contract = cs.sk_contract 	
+      ON cp.id_contract = cs.sk_contract
   LEFT JOIN 
     datalake_ebdb_clean.user_pro_owner AS po 
       ON cp.id_user = po.id_user

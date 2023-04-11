@@ -53,17 +53,17 @@ status_send AS (
     ft.ts_started,
     ft.ts_solved,
     CASE 
-      WHEN (dp.department = 'Rescisão - Despejo [OFF][POS][BACK]'
+      WHEN (dp.department IN ('Rescisão - Despejo [OFF][POS][BACK]','Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
         OR (c.termination_type = 'termination' 
-          AND ft.sk_ticket IS NOT NULL 
-          AND ft.ts_solved IS NULL 
-          AND dp.sk_department IS NOT NULL) THEN 1
+        AND ft.sk_ticket IS NOT NULL 
+        AND ft.ts_solved IS NULL 
+        AND dp.sk_department IS NOT NULL) THEN 1
        ELSE 0 
      END AS flg_not_send,
     CASE 
-      WHEN dp.department = 'Rescisão - Despejo [OFF][POS][BACK]'
-        OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions') THEN 0
+      WHEN (dp.department IN ('Rescisão - Despejo [OFF][POS][BACK]','Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
+        OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions')) THEN 0
       WHEN c.termination_type = 'recap_termination' 
         AND ft.sk_ticket IS NOT NULL 
         AND ft.ts_started < c.dt_recap  + interval '2' day
@@ -80,7 +80,7 @@ status_send AS (
   LEFT JOIN
     dw_customer_support.dim_department AS dp 
       ON ft.sk_main_department = dp.sk_department 
-      AND (dp.department IN ('Offboarding [OFF] [POS] [BACK]','Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]') 
+      AND (dp.department IN ('Offboarding [OFF] [POS] [BACK]','Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]','Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]') 
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))		
   WHERE
     c.termination_type IS NOT NULL  --('termination', 'recap_termination')

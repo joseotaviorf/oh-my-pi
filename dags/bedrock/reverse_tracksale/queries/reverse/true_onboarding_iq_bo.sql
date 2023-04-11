@@ -12,8 +12,8 @@ WITH new_contracts AS (
         dw_public.dim_house_listing AS dhl
             ON dhl.sk_house_listing = rf.sk_house_listing
     LEFT JOIN
-        dw_datamarts_for_rent.contract_termination AS ct
-            ON dc.sk_contract = ct.sk_contract
+        datalake_offboarding.contract_termination ct
+    	    ON dc.sk_contract = ct.id_contract
     WHERE
         dc.dt_start = DATE_ADD(current_date, -10)
         AND dc.status = 'Ativo'
@@ -34,7 +34,8 @@ crisis_users AS (
         dw_customer_support.dim_department AS dc
             ON dt.group_name = dc.department
     WHERE
-        dc.team IN ('Casos Especiais','Proteção 5A','Ouvidoria','ReclameAqui')
+        (dc.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]') 
+            OR dc.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
         AND ft.sk_closed_date_local = -1
     GROUP BY 1
 ),
