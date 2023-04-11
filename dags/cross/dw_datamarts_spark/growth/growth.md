@@ -18,7 +18,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline creates the tables in the schema `dw_datamart` of data lake and `datamarts` of DW:
 
 - attribution_conversion_paths_demand
-- buyer_activation_events_combo
 - casa_mineira_top_of_funnel_volumes_daily
 - casa_mineira_top_of_funnel_volumes_monthly
 - casa_mineira_top_of_funnel_volumes_weekly

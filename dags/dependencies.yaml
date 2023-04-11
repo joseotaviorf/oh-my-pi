@@ -197,7 +197,6 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-listing-page-viewed-external-table
   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-schedule-page-viewed-external-table
   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-search-results-page-viewed-external-table
-  # buyer_activation_events_combo
   - bietlejuice.amplitude:update-clean-events-daily-partition-athena # TO-DO: Can be set bietlejuice.amplitude:events-raw-to-clean when buyer_activation_events_combo will be deprecated.
   - bietlejuice.casa_mineira_crm:create-clean-contact-external-table
   - bietlejuice.dw_user:load-dw-public-dim-user
@@ -730,7 +729,6 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-page-viewed
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-search-results-page-viewed
-  # buyer_activation_events_combo
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.casa_mineira_crm:load-clean-contact
   - bietlejuice.dw_user:load-dw-public-dim-user

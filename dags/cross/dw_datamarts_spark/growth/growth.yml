@@ -11,7 +11,6 @@
 
 growth:
   attribution_conversion_paths_demand: {}
-  buyer_activation_events_combo: {}
   casa_mineira_top_of_funnel_volumes_daily:
     depends_on:
       - performance_marketing_metrics_imobiliaria_casa_mineira 
