@@ -3,7 +3,14 @@ import logging
 from argparse import ArgumentParser
 
 from pyspark import Row
-from pyspark.sql.types import StructType, StringType, StructField, LongType
+from pyspark.sql.types import (
+    StructType,
+    StringType,
+    StructField,
+    LongType,
+    ArrayType,
+    MapType,
+)
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_convenia_api_client.clients import ConveniaClient
 from quintoandar_convenia_api_client.consumers import CONSUMERS
@@ -92,9 +99,22 @@ def create_df_from_active_employee_details(results, spark_client, token_name):
                 time_tracking=str(employee["time_tracking"]),
                 educations=str(employee["educations"]),
                 experience_period=str(employee["experience_period"]),
-                emergency_contacts=str(employee["emergency_contacts"]),
+                emergency_contacts=[
+                    {
+                        "id": "None",
+                        "relation_id": "None",
+                        "relation": {"id": "None", "name": "None"},
+                        "name": "None",
+                        "phone": "None",
+                        "cellphone": "None",
+                        "work_phone": "None",
+                        "email": "None",
+                    }
+                ]
+                if not employee["emergency_contacts"]
+                else employee["emergency_contacts"],
                 main_bank_account=str(employee["bank_account"]),
-                all_bank_accounts=str(employee["bank_accounts"]),
+                all_bank_accounts=employee["bank_accounts"],
                 source=token_name,
             )
         )
@@ -142,9 +162,13 @@ def create_df_schema():
             StructField("time_tracking", StringType(), True),
             StructField("educations", StringType(), True),
             StructField("experience_period", StringType(), True),
-            StructField("emergency_contacts", StringType(), True),
+            StructField(
+                "emergency_contacts", ArrayType(MapType(StringType(), StringType()))
+            ),
             StructField("main_bank_account", StringType(), True),
-            StructField("all_bank_accounts", StringType(), True),
+            StructField(
+                "all_bank_accounts", ArrayType(MapType(StringType(), StringType()))
+            ),
             StructField("source", StringType(), True),
         ]
     )
