@@ -1,0 +1,10 @@
+---
+table_name: dw_public_staging.dim_search_session_event_type
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+column_level_validations:
+  sk_event_type:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error

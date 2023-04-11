@@ -1302,6 +1302,12 @@ bietlejuice.dw_sauron:
   - bietlejuice.enrich_quinto_messenger:load-enrich-channel
   - bietlejuice.enrich_sauron:load-enrich-session
 
+bietlejuice.dw_search_session_event:
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
+  - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history
+  - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
+
 bietlejuice.dw_smart_price:
   - bietlejuice.enrich_ebdb_smart_price:load-enrich-smart-price-versioning
   - bietlejuice.ebdb:create-clean-dynamic-pricing-house-in-data-lake
@@ -2396,6 +2402,15 @@ bietlejuice.enrich_rede_company_event:
   - bietlejuice.enrich_hubspot:load-enrich-ticket
   - bietlejuice.enrich_hubspot:load-enrich-ticket-stage
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
+
+bietlejuice.enrich_rede_house_history:
+  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
+  - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-listing-rent-model-aud-in-data-lake
+  - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.enrich_hubspot:load-enrich-company
 
 bietlejuice.enrich_rede_supply:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail-aud

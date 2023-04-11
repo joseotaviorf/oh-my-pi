@@ -1,0 +1,37 @@
+---
+database_name: datalake_rede_house_history
+table_name: rede_house_history
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
+description: Every row in this table asserts whether or not a listing belonged to Rede in a given business context (SALE or RENT), in a given validity period
+  (between ts_status_started and ts_status_ended).
+columns:
+  id_house:
+    description: Identifier of the house.
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_clean.listing_business_context_aud.id_house
+  id_company_hubspot:
+    description: Id of the company in HubSpot, if the listing is from Rede.
+    lineage:
+      - datalake_hubspot.company_history.id_company
+  business_context:
+    description: Specifies the business context (SALE or RENT) being evaluated.
+    categories:
+      SALE: 'ForSale context.'
+      RENT: 'ForRent context.'
+  partner_3p_supply:
+    description: Short name of the company in HubSpot, if the listing is from Rede.
+    lineage:
+      - datalake_hubspot.company_history.extracted_3p_tag
+      - datalake_ebdb_clean.house_aud.internal_admin_info
+  is_3p_supply:
+    description: True if the listing is from Rede in that business context, in that validity period
+  ts_status_started:
+    description: When the assertion about the listing being or not from Rede at that business context started being valid.
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+  ts_status_ended:
+    description: When the assertion about the listing being or not from Rede at that business context stopped being valid. Can be null if valid until today.
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
