@@ -81,6 +81,8 @@ def list_metastore_tables(spark_client, database):
 def extract_layer_from_database_name(database_name):
     if database_name.startswith("dw_"):
         return LayerEnum.DW.value
+    elif database_name.startswith("metric_"):
+        return LayerEnum.METRIC.value
     elif database_name.startswith("datalake_"):
         if database_name.endswith("_raw"):
             return LayerEnum.RAW.value
