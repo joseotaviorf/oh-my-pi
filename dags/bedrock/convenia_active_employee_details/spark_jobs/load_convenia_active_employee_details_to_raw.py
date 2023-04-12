@@ -224,7 +224,6 @@ if __name__ == "__main__":
 
         result = df.union(result)
 
-    df = SparkDataFrameService().input(result).convert_array_type_to_json().output()
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
@@ -236,10 +235,12 @@ if __name__ == "__main__":
     metastore_service.create_database(database_name)
     s3_loader = S3Loader()
     s3_loader.load_df(
-        df=df, s3_path=f"{database_location}{table_name}", format_options=format_options
+        df=result,
+        s3_path=f"{database_location}{table_name}",
+        format_options=format_options,
     )
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
     spark_metastore_loader.update_metastore(
-        df, database_name, table_name, format_options, database_location
+        result, database_name, table_name, format_options, database_location
     )
     metastore_service.refresh_table(database_name, table_name)
