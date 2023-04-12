@@ -107,8 +107,8 @@ for table_name in TABLES_LIST:
         extraction_spark_job_file=raw_spark_job_file,
         raw_spark_job_extra_args=[
             SOURCE,
-            "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}",
-            "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}",
+            "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+            "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
             table_name,
         ],
         has_hive_sync=False,
@@ -122,8 +122,8 @@ for table_name in TABLES_LIST:
         has_create_external_table_task=False,
         partitions=PARTITION_COLS,
         extra_query_template_params={
-            "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}",
-            "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}",
+            "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+            "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
         },
     )
 
