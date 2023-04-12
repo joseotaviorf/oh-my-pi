@@ -22,5 +22,4 @@ SELECT
 FROM
     datalake_rent_demand_event.rent_demand_event
 QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_event ORDER BY ts_updated DESC) = 1
-    
+    ROW_NUMBER() OVER(PARTITION BY id_event, id_event_type, id_tenant_prospect ORDER BY ts_updated DESC) = 1
