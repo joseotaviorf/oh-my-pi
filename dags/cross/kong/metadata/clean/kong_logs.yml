@@ -36,6 +36,10 @@ columns:
     lineage:
       - datalake_kong_raw.kong_logs.stream
     description: "The log stream type."
+  ts_event:
+    lineage:
+      - datalake_kong_raw.kong_logs.time
+    description: "The event time."
   year:
     lineage:
       - datalake_kong_raw.kong_logs.year

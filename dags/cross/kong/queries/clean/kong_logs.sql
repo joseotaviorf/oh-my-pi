@@ -7,6 +7,7 @@ SELECT
     kl.namespace,
     kl.pod_name,
     kl.stream,
+    kl.time AS ts_event,
     kl.year,
     kl.month,
     kl.day,
