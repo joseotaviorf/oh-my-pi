@@ -3,6 +3,7 @@ import logging
 from argparse import ArgumentParser
 
 from pyspark import Row
+from pyspark.sql.functions import explode, col, from_json
 from pyspark.sql.types import (
     StructType,
     StringType,
@@ -179,6 +180,92 @@ def create_df_schema():
     return result
 
 
+def explode_emergency_contacts(input):
+    df = (
+        input.select("id", "emergency_contacts")
+        .withColumn("emergency_contacts", explode("emergency_contacts"))
+        .createOrReplaceTempView("df")
+    )
+
+    df = spark.sql(
+        """
+        select id
+        , to_json(emergency_contacts) as emergency_contacts
+        from df
+        """
+    )
+
+    schema = StructType(
+        [
+            StructField("id", StringType()),
+            StructField("relation_id", StringType()),
+            StructField("relation", StringType()),
+            StructField("name", StringType()),
+            StructField("phone", StringType()),
+            StructField("cellphone", StringType()),
+            StructField("work_phone", StringType()),
+            StructField("email", StringType()),
+        ]
+    )
+
+    result = df.withColumn(
+        "emergency_contacts", from_json("emergency_contacts", schema)
+    ).select(col("id").alias("id_employee"), col("emergency_contacts.*"))
+
+    return result
+
+
+def explode_all_bank_accounts(input):
+    df = (
+        input.select("id", "all_bank_accounts")
+        .withColumn("all_bank_accounts", explode("all_bank_accounts"))
+        .createOrReplaceTempView("df")
+    )
+
+    df = spark.sql(
+        """
+        select id
+        , to_json(all_bank_accounts) as all_bank_accounts
+        from df
+        """
+    )
+
+    schema = StructType(
+        [
+            StructField("account_type", StringType()),
+            StructField("bank", StringType()),
+            StructField("modality", StringType()),
+            StructField("agency", StringType()),
+            StructField("bank_id", StringType()),
+            StructField("account_type_id", StringType()),
+            StructField("id", StringType()),
+            StructField("pix", StringType()),
+            StructField("acount", StringType()),
+            StructField("digit", StringType()),
+        ]
+    )
+
+    result = df.withColumn(
+        "all_bank_accounts", from_json("all_bank_accounts", schema)
+    ).select(col("id").alias("id_employee"), col("all_bank_accounts.*"))
+
+    return result
+
+
+def load_dataframe_into_datalake(
+    df, database_name, database_location, table_name, format_options
+):
+    s3_loader = S3Loader()
+    s3_loader.load_df(
+        df=df, s3_path=f"{database_location}{table_name}", format_options=format_options
+    )
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
+    spark_metastore_loader.update_metastore(
+        df, database_name, table_name, format_options, database_location
+    )
+    metastore_service.refresh_table(database_name, table_name)
+
+
 if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
@@ -224,7 +311,7 @@ if __name__ == "__main__":
 
         result = df.union(result)
 
-    df = SparkDataFrameService().input(result).convert_array_type_to_json().output()
+    # df = SparkDataFrameService().input(result).convert_array_type_to_json().output()
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
@@ -234,12 +321,34 @@ if __name__ == "__main__":
     )
     metastore_service = SparkMetastoreService(spark_client)
     metastore_service.create_database(database_name)
-    s3_loader = S3Loader()
-    s3_loader.load_df(
-        df=df, s3_path=f"{database_location}{table_name}", format_options=format_options
+
+    # load active_employee_details
+    load_dataframe_into_datalake(
+        result,
+        database_name,
+        database_location,
+        "active_employee_details",
+        format_options,
     )
-    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
-    spark_metastore_loader.update_metastore(
-        df, database_name, table_name, format_options, database_location
+
+    # load emergency_contacts
+    df_emergency_contacts = explode_emergency_contacts(result)
+
+    load_dataframe_into_datalake(
+        df_emergency_contacts,
+        database_name,
+        database_location,
+        "emergency_contacts",
+        format_options,
     )
-    metastore_service.refresh_table(database_name, table_name)
+
+    # load bank_accounts
+    df_bank_accounts = explode_all_bank_accounts(result)
+
+    load_dataframe_into_datalake(
+        df_bank_accounts,
+        database_name,
+        database_location,
+        "bank_accounts",
+        format_options,
+    )

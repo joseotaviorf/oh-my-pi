@@ -1,0 +1,43 @@
+---
+database_name: datalake_convenia_details_clean
+table_name: inactive_emergency_contacts
+owner: matheus.ferreira@quintoandar.com.br
+domain: bedrock
+description:
+columns:
+  id_employee:
+    description: Convenia employee id
+    lineage:
+      - datalake_convenia_details_raw.inactive_emergency_contacts.id_employee
+  id_emergency_contacts:
+    description: Convenia emergency_contact id
+    lineage:
+      - datalake_convenia_details_raw.inactive_emergency_contacts.id
+  id_relation:
+    description: Convenia relationship id
+    lineage:
+      - datalake_convenia_details_raw.inactive_emergency_contacts.relation_id
+  relation:
+    description: Kind of relationship (friend, family, etc.)
+    lineage:
+      - datalake_convenia_details_raw.inactive_emergency_contacts.relation
+  name:
+    description: Emergency contact name
+    lineage:
+      - datalake_convenia_details_raw.inactive_emergency_contacts.name
+  phone:
+    description: Emergency contact phone number
+    lineage:
+      - datalake_convenia_details_raw.inactive_emergency_contacts.phone
+  cellphone:
+    description: Emergency contact cellphone number
+    lineage:
+      - datalake_convenia_details_raw.inactive_emergency_contacts.cellphone
+  work_phone:
+    description: Emergency contact work phone
+    lineage:
+      - datalake_convenia_details_raw.inactive_emergency_contacts.work_phone
+  email:
+    description: Emergency contact email
+    lineage:
+      - datalake_convenia_details_raw.inactive_emergency_contacts.email
