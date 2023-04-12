@@ -1,6 +1,0 @@
----
-database_name: datalake_convenia_details_raw
-table_name: emergency_contacts
-owner: matheus.ferreira@quintoandar.com.br
-domain: bedrock
-description: Emergency contacts from active employees
