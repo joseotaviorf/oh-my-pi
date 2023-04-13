@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_ticket (
     sk_main_session BIGINT,
     sk_next_ticket BIGINT,
     channel VARCHAR(5),
+    ticket_origin VARCHAR(100),
     csat_score INTEGER,
     status VARCHAR(20),
     first_department VARCHAR(100),
