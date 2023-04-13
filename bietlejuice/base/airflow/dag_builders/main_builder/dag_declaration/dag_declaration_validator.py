@@ -47,6 +47,7 @@ class DAGDeclarationValidator(Validator):
                     "allowed": LayerEnum.get_available_enum_values(),
                 },
                 "custom_schema": {"type": "string", "empty": False},
+                "default_extraction_type": {"type": "string", "empty": False},
                 "default_partitions": {"type": "list", "empty": False},
                 "tables_customization": {"type": "dict", "empty": False},
                 "inner_dependencies": {"type": "dict", "empty": False},

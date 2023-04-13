@@ -1,0 +1,67 @@
+---
+database_name: dw_sale
+table_name: fact_daily_ongoing_listing
+description: Every row of this table is a snapshot of one sale ongoing listing per day. If it had the status="PUBLISHED" at that day, no matter
+  for how long, it will appear here, along with some metrics such as search, listing page viewed, visit booked, and other demand data.
+domain: For Sale
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  sk_snapshot:
+    description: Primary key of the table, formed by concatenating sk_house to sk_snapshot_date.
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_house
+      - dw_public.dim_date.sk_date
+  sk_snapshot_date:
+    description: Date key of the snapshot. Can be joined with dw_public.dim_date.
+    lineage:
+      - dw_public.dim_date.sk_date
+  sk_sale_listing:
+    description: Key of the sale listing. Can be joined with dw_sale.dim_listing.
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_sale_listing
+  sk_house:
+    description: Key of the house. Can be joined with dw_quintoandar.dim_house.
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_house
+  sk_region:
+    description: Key of the region of the house. Can be joined with dw_public.dim_region.
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_region
+  sk_company:
+    description: Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company.
+    lineage:
+      - datalake_rede_company.company_sks.sk_company
+  sale_price:
+    description: Price of the sale listing at the end of that day.
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.sale_price
+  qt_search_result_page_viewed:
+    description: Amount of times the house was shown in the search results in that day.
+  qt_listing_page_viewed:
+    description: Amount of times the listing page was viewed in that day.
+  qt_visits_booked:
+    description: Amount of visits booked in that day.
+  qt_visits_completed:
+    description: Amount of visits completed in that day.
+  qt_offers_submitted:
+    description: Amount of offers submitted in that day.
+  qt_offers_accepted:
+    description: Amount of offers accepted in that day.
+  qt_sale_agreements_created:
+    description: Amount of sale agreements created in that day.
+  qt_sale_agreements_signed:
+    description: Amount of sale agreements signed in that day.
+  year:
+    description: Year of the snapshot.
+    lineage:
+      - dw_public.dim_date.year
+  month:
+    description: Month of the snapshot.
+    lineage:
+      - dw_public.dim_date.month
+  day:
+    description: Day of the snapshot.
+    lineage:
+      - dw_public.dim_date.day
+  ts_load:
+    description: Timestamp of when the table was last processed.

@@ -100,6 +100,7 @@ bietlejuice.dw_datamarts_cross: # Legacy datamarts are not parsed by the Depende
     - bietlejuice.enrich_big_agent:create-enrich-house-external-table
     - bietlejuice.enrich_big_agent:create-enrich-program-external-table
     - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
+    - bietlejuice.enrich_olos_dialer:create-enrich-outbound-last-contact-external-table
     - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
 bietlejuice.dw_datamarts_for_rent: # Legacy datamarts are not parsed by the Dependency Generator
   add:
@@ -237,92 +238,93 @@ bietlejuice.dw_datamarts_for_sale_cross: # Legacy datamarts are not parsed by th
     - bietlejuice.wololo:create-clean-prospect-external-table
 
 bietlejuice.dw_datamarts_growth: # Legacy datamarts are not parsed by the Dependency Generator
-  add:
-    # attribution_conversion_paths_demand, listings-online-metrics
-    - bietlejuice.dw_listing:load-dw-public-fact-house-listings
-    - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-contract-docusign-signed-events-external-table
-    - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-home-page-viewed-external-table
-    - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-listing-page-viewed-external-table
-    - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-schedule-page-viewed-external-table
-    - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-search-results-page-viewed-external-table
-    # buyer_activation_events_combo
-    - bietlejuice.amplitude:update-clean-events-daily-partition-athena # TO-DO: Can be set bietlejuice.amplitude:events-raw-to-clean when buyer_activation_events_combo will be deprecated.
-    - bietlejuice.casa_mineira_crm:create-clean-contact-external-table
-    - bietlejuice.dw_user:load-dw-public-dim-user
-    - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
-    - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
-    - bietlejuice.ebdb:create-house-clean-external-table
-    # casa_mineira_top_of_funnel_volumes_daily
-    - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-daily
-    #plaquinhas_houses
-    - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
-    - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
-    - bietlejuice.dw_region:load-public-dim-region-into-redshift
-    - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
-    - bietlejuice.gsheets.growth:done-clean-branding-where-is-plaquinha
-    - bietlejuice.ebdb:create-polygon-region-clean-external-table
-    # performance_marketing_metrics_*_casa_mineira
-    - bietlejuice.casa_mineira_portal:create-clean-house-external-table
-    - bietlejuice.casa_mineira_portal:create-clean-city-external-table
-    - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-budget-external-table
-    - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-external-table
-    - bietlejuice.casa_mineira_portal:create-clean-uf-external-table
-    # plaquinhas_houses, sale_performance_marketing_metrics_supply_cohort
-    - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
-    - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
-    - bietlejuice.dw_user:load-public-dim-user-into-redshift
-    # tof_demand_online_events
-    - bietlejuice.amplitude:events-raw-to-clean
-    - bietlejuice.dw_listing:load-dw-public-dim-house-listing
-    # sale_performance_marketing_metrics_supply_cohort
-    # sale_performance_marketing_metrics_supply_cohort
-    - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
-    # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
-    - bietlejuice.gsheets.growth:done-clean-city-share
-    - bietlejuice.gsheets.growth:done-clean-local-holidays
-    - bietlejuice.gsheets.growth:done-clean-weekday-holiday-share-supply
-    - bietlejuice.gsheets.growth:done-clean-weekday-supply-channel-share
-    - bietlejuice.gsheets.growth:done-clean-week-volumes-supply
-    - bietlejuice.gsheets.for_sale:done-clean-sale-supply-targets
-    # users_online_metrics, listings-online-metrics
-    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-    # sale_performance_marketing_metrics_supply_cohort
-    - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
-    # sale_performance_marketing_metrics_supply_cohort
-    # sale_performance_marketing_metrics_supply_cohort
-    # performance_marketing_metrics_portal_casa_mineira, performance_marketing_metrics_imobiliaria_casa_mineira
-    - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
-    - bietlejuice.gsheets.growth:done-clean-taxonomy-portal-casa-mineira
-    - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-nbp
-    - bietlejuice.casa_mineira_crm:load-clean-city
-    - bietlejuice.casa_mineira_crm:load-clean-house
-    - bietlejuice.casa_mineira_crm:load-clean-house-type
-    - bietlejuice.casa_mineira_crm:load-clean-neighborhood
-    - bietlejuice.casa_mineira_crm:load-clean-uf
-    - bietlejuice.casa_mineira_crm:load-clean-visit
-    # performance_marketing_metrics_portal_casa_mineira
-    - bietlejuice.casa_mineira_amplitude:create-clean-329001-portal-external-table
-    - bietlejuice.casa_mineira_portal:create-clean-contact-external-table
-    - bietlejuice.casa_mineira_portal:create-clean-neighborhood-external-table
-    - bietlejuice.gsheets.growth:done-clean-targets-portal-casa-mineira-cost-cf
-    # casa_mineira_top_of_funnel_volumes_monthly
-    - bietlejuice.enrich_top_of_funnel_portal_cm:create-enrich-top-of-funnel-users-portal-casa-mineira-external-table
-    - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-monthly
-    # casa_mineira_top_of_funnel_volumes_weekly
-    - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-weekly
-    # performance_marketing_metrics_imobiliaria_casa_mineira
-    - bietlejuice.casa_mineira_crm:create-clean-city-external-table
-    - bietlejuice.casa_mineira_crm:create-clean-house-external-table
-    - bietlejuice.casa_mineira_crm:create-clean-house-type-external-table
-    - bietlejuice.casa_mineira_crm:create-clean-media-contact-external-table
-    - bietlejuice.casa_mineira_crm:create-clean-neighborhood-external-table
-    - bietlejuice.casa_mineira_crm:create-clean-origin-contact-external-table
-    - bietlejuice.casa_mineira_crm:create-clean-uf-external-table
-    - bietlejuice.casa_mineira_crm:create-clean-visit-external-table
-    - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-cost
-    - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-ncp
-    - bietlejuice.gsheets.growth:done-clean-taxonomy-crm-casa-mineira
-    - bietlejuice.enrich_lost_listings:create-enrich-lost-listings-external-table
+  override: []
+  # add:
+  #   # attribution_conversion_paths_demand, listings-online-metrics
+  #   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+  #   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-contract-docusign-signed-events-external-table
+  #   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-home-page-viewed-external-table
+  #   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-listing-page-viewed-external-table
+  #   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-schedule-page-viewed-external-table
+  #   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-search-results-page-viewed-external-table
+  #   # buyer_activation_events_combo
+  #   - bietlejuice.amplitude:update-clean-events-daily-partition-athena # TO-DO: Can be set bietlejuice.amplitude:events-raw-to-clean when buyer_activation_events_combo will be deprecated.
+  #   - bietlejuice.casa_mineira_crm:create-clean-contact-external-table
+  #   - bietlejuice.dw_user:load-dw-public-dim-user
+  #   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  #   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
+  #   - bietlejuice.ebdb:create-house-clean-external-table
+  #   # casa_mineira_top_of_funnel_volumes_daily
+  #   - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-daily
+  #   #plaquinhas_houses
+  #   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
+  #   - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
+  #   - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  #   - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
+  #   - bietlejuice.gsheets.growth:done-clean-branding-where-is-plaquinha
+  #   - bietlejuice.ebdb:create-polygon-region-clean-external-table
+  #   # performance_marketing_metrics_*_casa_mineira
+  #   - bietlejuice.casa_mineira_portal:create-clean-house-external-table
+  #   - bietlejuice.casa_mineira_portal:create-clean-city-external-table
+  #   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-budget-external-table
+  #   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-external-table
+  #   - bietlejuice.casa_mineira_portal:create-clean-uf-external-table
+  #   # plaquinhas_houses, sale_performance_marketing_metrics_supply_cohort
+  #   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
+  #   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+  #   - bietlejuice.dw_user:load-public-dim-user-into-redshift
+  #   # tof_demand_online_events
+  #   - bietlejuice.amplitude:events-raw-to-clean
+  #   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  #   # sale_performance_marketing_metrics_supply_cohort
+  #   # sale_performance_marketing_metrics_supply_cohort
+  #   - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+  #   # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
+  #   - bietlejuice.gsheets.growth:done-clean-city-share
+  #   - bietlejuice.gsheets.growth:done-clean-local-holidays
+  #   - bietlejuice.gsheets.growth:done-clean-weekday-holiday-share-supply
+  #   - bietlejuice.gsheets.growth:done-clean-weekday-supply-channel-share
+  #   - bietlejuice.gsheets.growth:done-clean-week-volumes-supply
+  #   - bietlejuice.gsheets.for_sale:done-clean-sale-supply-targets
+  #   # users_online_metrics, listings-online-metrics
+  #   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  #   # sale_performance_marketing_metrics_supply_cohort
+  #   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+  #   # sale_performance_marketing_metrics_supply_cohort
+  #   # sale_performance_marketing_metrics_supply_cohort
+  #   # performance_marketing_metrics_portal_casa_mineira, performance_marketing_metrics_imobiliaria_casa_mineira
+  #   - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+  #   - bietlejuice.gsheets.growth:done-clean-taxonomy-portal-casa-mineira
+  #   - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-nbp
+  #   - bietlejuice.casa_mineira_crm:load-clean-city
+  #   - bietlejuice.casa_mineira_crm:load-clean-house
+  #   - bietlejuice.casa_mineira_crm:load-clean-house-type
+  #   - bietlejuice.casa_mineira_crm:load-clean-neighborhood
+  #   - bietlejuice.casa_mineira_crm:load-clean-uf
+  #   - bietlejuice.casa_mineira_crm:load-clean-visit
+  #   # performance_marketing_metrics_portal_casa_mineira
+  #   - bietlejuice.casa_mineira_amplitude:create-clean-329001-portal-external-table
+  #   - bietlejuice.casa_mineira_portal:create-clean-contact-external-table
+  #   - bietlejuice.casa_mineira_portal:create-clean-neighborhood-external-table
+  #   - bietlejuice.gsheets.growth:done-clean-targets-portal-casa-mineira-cost-cf
+  #   # casa_mineira_top_of_funnel_volumes_monthly
+  #   - bietlejuice.enrich_top_of_funnel_portal_cm:create-enrich-top-of-funnel-users-portal-casa-mineira-external-table
+  #   - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-monthly
+  #   # casa_mineira_top_of_funnel_volumes_weekly
+  #   - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-tof-weekly
+  #   # performance_marketing_metrics_imobiliaria_casa_mineira
+  #   - bietlejuice.casa_mineira_crm:create-clean-city-external-table
+  #   - bietlejuice.casa_mineira_crm:create-clean-house-external-table
+  #   - bietlejuice.casa_mineira_crm:create-clean-house-type-external-table
+  #   - bietlejuice.casa_mineira_crm:create-clean-media-contact-external-table
+  #   - bietlejuice.casa_mineira_crm:create-clean-neighborhood-external-table
+  #   - bietlejuice.casa_mineira_crm:create-clean-origin-contact-external-table
+  #   - bietlejuice.casa_mineira_crm:create-clean-uf-external-table
+  #   - bietlejuice.casa_mineira_crm:create-clean-visit-external-table
+  #   - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-cost
+  #   - bietlejuice.gsheets.growth:done-clean-targets-casa-mineira-ncp
+  #   - bietlejuice.gsheets.growth:done-clean-taxonomy-crm-casa-mineira
+  #   - bietlejuice.enrich_lost_listings:create-enrich-lost-listings-external-table
 bietlejuice.dw_datamarts_growth_cross: # Legacy datamarts are not parsed by the Dependency Generator
   add:
     # Removed dependency with dw_region, dw_rent_listing_flow.fact_house_listing_flows and dw_sale_listing_flow.fact_listing_flows since dw_datamarts_cross already satisfies
@@ -450,7 +452,7 @@ bietlejuice.dw_datamarts_growth_dep_manual_costs: # Legacy datamarts are not par
     - bietlejuice.dw_datamarts_growth_cross:create-sale-performance-marketing-metrics-demand-in-datalake
     - bietlejuice.dw_datamarts_growth_cross:create-sale-performance-marketing-metrics-supply-coincident-in-datalake
     - bietlejuice.dw_datamarts_growth_cross:create-unique-performance-marketing-metrics-supply-coincident-in-datalake
-    - bietlejuice.dw_datamarts_growth:create-sale-performance-marketing-metrics-supply-cohort-in-datalake
+    # - bietlejuice.dw_datamarts_growth:create-sale-performance-marketing-metrics-supply-cohort-in-datalake
 bietlejuice.dw_datamarts_spark.cross:
   add:
   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
@@ -475,7 +477,6 @@ bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
-  - bietlejuice.enrich_olos_dialer:load-enrich-outbound-last-contact
 bietlejuice.dw_datamarts_spark.fintech:
   add:
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
@@ -1127,13 +1128,7 @@ bietlejuice.enrich_quinto_messenger:
   remove:
   - bietlejuice.quinto_messenger:load-clean-chat
 bietlejuice.enrich_recommendations:
-  remove:
-  - bietlejuice.amplitude:events-raw-to-clean
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
-  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
-  - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
-  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
+  override: [] # Not in dependencies.yaml yet
 bietlejuice.enrich_rede_company_event:
   add:
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
