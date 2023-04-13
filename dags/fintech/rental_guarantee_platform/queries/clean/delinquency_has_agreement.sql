@@ -7,6 +7,3 @@ SELECT
     day
 FROM
     datalake_rental_guarantee_platform_raw.delinquency_has_agreement
-
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1
