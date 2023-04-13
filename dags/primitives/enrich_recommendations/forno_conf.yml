@@ -14,11 +14,11 @@ tables:
     is_incremental: false
   embeddings:
     is_incremental: false
-  partition_cols:
-    - year
-    - month
-    - day
-    - ml_model
+    partition_cols:
+      - year
+      - month
+      - day
+      - ml_model
   item_interaction:
     is_incremental: false
     partition_cols:
