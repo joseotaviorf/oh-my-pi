@@ -2157,6 +2157,13 @@ bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.gsheets.growth_intraday:done-clean-marketing-name-convention-shared-costs
   - bietlejuice.gsheets.growth_intraday:done-clean-marketing-manual-shared-costs
 
+bietlejuice.enrich_metric_rent_demand_event:
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.dw_proposal:load-dw-public-dim-proposal
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
+
 bietlejuice.enrich_mexico_braze_details:
   - bietlejuice.braze_details:load-clean-campaign-details-indica-ai
   - bietlejuice.braze_details:load-clean-campaign-details-owners

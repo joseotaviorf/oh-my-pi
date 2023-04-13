@@ -33,6 +33,7 @@ dags_out_of_pattern:
         "dw_quinto_messenger",
         "dw_rede_company",
         "dw_region",
+        "dw_rent_demand_events",
         "dw_rent_flow",
         "dw_rent_listing_flow",
         "dw_sale_available_booking_hours",
