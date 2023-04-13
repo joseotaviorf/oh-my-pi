@@ -12,7 +12,6 @@ SELECT
     day
 FROM
     datalake_rental_guarantee_platform_raw.person_documents
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY dateupdate DESC) = 1

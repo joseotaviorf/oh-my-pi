@@ -108,7 +108,6 @@ for table in tables:
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         table_name=clean_table_name,
-        is_incremental=True,
         partitions=partition_cols,
     )
 

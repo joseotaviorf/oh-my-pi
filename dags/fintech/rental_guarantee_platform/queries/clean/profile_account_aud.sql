@@ -12,7 +12,3 @@ SELECT
     day
 FROM
     datalake_rental_guarantee_platform_raw.profile_account_aud
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
