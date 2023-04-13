@@ -1,0 +1,6 @@
+---
+table_name: metric_rent.demand_events
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  dt_event:
+    is_complete:

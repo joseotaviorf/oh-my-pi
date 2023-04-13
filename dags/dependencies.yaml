@@ -2333,6 +2333,8 @@ bietlejuice.metric_rent__contracts:
 - bietlejuice.dw_offer:load-dw-public-dim-offer
 - bietlejuice.dw_region:load-dw-public-dim-region
 - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
+bietlejuice.metric_rent__demand_events:
+- bietlejuice.enrich_metric_rent_demand_event:load-enrich-metric-rent-demand-event
 bietlejuice.metric_rent__listings:
 - bietlejuice.dw_listing:load-dw-public-dim-house-listing
 - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows

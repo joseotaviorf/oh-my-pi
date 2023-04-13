@@ -1,0 +1,4 @@
+---
+custom_cluster:
+  node_type_id: m5.4xlarge
+  num_workers: 2
