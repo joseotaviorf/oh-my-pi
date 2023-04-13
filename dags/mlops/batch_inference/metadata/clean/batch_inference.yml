@@ -1,0 +1,31 @@
+---
+database_name: datalake_batch_inference_clean
+table_name: batch_inference
+columns:
+  model_name:
+    lineage:
+      - datalake_batch_inference_raw.batch_inference.model_name
+  model_service:
+    lineage:
+      - datalake_batch_inference_raw.batch_inference.model_service
+  input_data:
+    lineage:
+      - datalake_batch_inference_raw.batch_inference.input_data
+  output_data:
+    lineage:
+      - datalake_batch_inference_raw.batch_inference.output_data
+  metadata:
+    lineage:
+      - datalake_batch_inference_raw.batch_inference.metadata
+  ts_inference:
+    lineage:
+      - datalake_batch_inference_raw.batch_inference.timestamp
+  year:
+    lineage:
+      - datalake_batch_inference_raw.batch_inference.year
+  month:
+    lineage:
+      - datalake_batch_inference_raw.batch_inference.month
+  day:
+    lineage:
+      - datalake_batch_inference_raw.batch_inference.day

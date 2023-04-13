@@ -1,0 +1,10 @@
+---
+source_root_path: s3://data-science.s3.data.quintoandar.com.br/batch-prediction/data/
+format: parquet
+table_name: batch_inference
+partition_cols:
+  - year
+  - month
+  - day
+  - model_name
+  - model_version
