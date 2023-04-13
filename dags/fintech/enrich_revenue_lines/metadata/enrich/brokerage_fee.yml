@@ -31,6 +31,10 @@ columns:
     description: "Split Percentage for the brokerage fee"
     lineage:
       - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+  select_agent_brokerage_split_percentage:
+    description: "Split Percentage for the brokerage fee, just for SELECT agent (partner_type = EXECUTIVE_FOR_RENT)"
+    lineage:
+      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
   prod_theorical_amount:
     description: "Total amount that appears on the invoice"
   invoice_theorical_amount:
