@@ -1,4 +1,3 @@
-
 ---------SELECAO DE USER COM CONTRATO ATIVO, INQUILINO/MORADOR
 WITH pos_list as (
   SELECT DISTINCT
@@ -686,7 +685,7 @@ SELECT
   tu.grade_human,
   tu.comment_human,
   tu.is_solved_human,
-  tu.has_installed_app,
+  tu.app_instalado as has_installed_app,
   atc.ticket_origin,
   atc.is_solved,
   atc.completion_reason,
