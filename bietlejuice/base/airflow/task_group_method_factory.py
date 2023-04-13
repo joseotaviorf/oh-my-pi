@@ -34,5 +34,6 @@ class TaskGroupMethodFactory(object):
             LayerEnum.ENRICH: DatalakeTaskGroup.build_enrich_task_group,
             LayerEnum.DW_STAGING: DWTaskGroup.build_dw_staging_task_group,
             LayerEnum.DW: DWTaskGroup.build_dw_task_group,
+            LayerEnum.METRIC: DatalakeTaskGroup.build_metric_task_group,
             LayerEnum.REVERSE: ReverseTaskGroup.build_reverse_task_group,
         }.get(layer_enum_member)

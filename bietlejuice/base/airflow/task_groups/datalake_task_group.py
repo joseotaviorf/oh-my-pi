@@ -760,3 +760,67 @@ class DatalakeTaskGroup(BaseTaskGroup):
             table_customization=table_customization,
             do_output_xcom_push=do_output_xcom_push,
         )
+
+    def build_metric_task_group(
+        self,
+        source_database_base_name,
+        target_database_base_name,
+        table_name,
+        partitions=None,
+        is_incremental=False,
+        has_create_external_table_task=False,
+        spark_session_configs=None,
+        extra_query_template_params=None,
+        schema="",
+        execution_date="{{ ds }}",
+        has_hive_sync=True,
+        table_customization: Dict[str, Dict[str, str]] = None,
+        do_output_xcom_push=False,
+    ):
+        """
+        Build a task group for metric layer
+
+        :param source_database_base_name: database base name for the source
+            table database
+        :type source_database_base_name: str
+        :param target_database_base_name database base name for the target
+            table database
+        :type target_database_base_name: str
+        :param table_name: table name to be created
+        :type table_name: str
+        :param partitions: list of columns to partition table
+        :type partitions: list[str]
+        :param is_incremental: if this table uses incremental load type
+        :type is_incremental: bool
+        :param has_create_external_table_task: if this table is going to be loaded into Athena
+        :type has_create_external_table_task: bool
+        :param spark_session_configs: custom config parameters to be set in spark session
+        :type spark_session_configs: dict
+        :param extra_query_template_params: filter parameters applied to
+            the query besides year, month and day
+        :type extra_query_template_params: dict
+        :param schema: db schema where the table is at. Used in the query path
+        :type schema: str
+        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :param has_hive_sync: if this table is going to have Hive sync
+        :param table_customization: table's structure customization, when applicable
+        :param do_output_xcom_push: flag indicating if the job result should be pushed into xcom.
+        :type execution_date: str
+        :rtype: list[BaseOperator]
+        """
+        return self._build_task_group(
+            LayerEnum.METRIC,
+            source_database_base_name,
+            target_database_base_name,
+            table_name,
+            partitions,
+            is_incremental,
+            has_create_external_table_task,
+            spark_session_configs,
+            extra_query_template_params,
+            schema,
+            execution_date=execution_date,
+            has_hive_sync=has_hive_sync,
+            table_customization=table_customization,
+            do_output_xcom_push=do_output_xcom_push,
+        )
