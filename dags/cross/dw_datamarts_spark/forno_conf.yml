@@ -89,6 +89,8 @@ dags:
       - spark.yarn.executor.memoryOverhead: 5g
       - spark.driver.memory: 37g
       - spark.driver.cores: 5
+    load_to_redshift: True
+    custom_schema: datamarts
   support_and_service:
     owner: Data SS
     cluster_name: databricks_10_4_max_memory_cluster
