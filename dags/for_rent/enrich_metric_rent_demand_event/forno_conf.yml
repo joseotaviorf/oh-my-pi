@@ -1,5 +1,5 @@
 ---
 partition_cols:
-  rent_demand_event: ["year", "month", "day", "country_code"]
+  metric_rent_demand_event: ["year", "month", "day", "country_code"]
 incremental_tables:
   - metric_rent_demand_event
