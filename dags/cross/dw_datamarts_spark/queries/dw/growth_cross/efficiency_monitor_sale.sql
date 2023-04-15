@@ -520,7 +520,7 @@ SELECT
     COALESCE(sv.dt_ccv, st.month_start, mc.dt_month_start, sa.dt_month_start, da.dt_month_start, ab.dt_month_start, abd.dt_month_start) AS dt_month_start,
     TRIM(COALESCE(sv.city_group, st.city_group, mc.city_group, sa.city_group, da.city_group, ab.city_group, abd.city_group)) AS city_group,
     sv.ccv,
-    sv.potential_closed_deals,
+    CAST(sv.potential_closed_deals AS DECIMAL(38,18)) AS potential_closed_deals,
     sv.sale_price_agreed,
     CAST(st.ccv_target AS DECIMAL(38,18)) AS ccv_target,
     CAST(st.potential_closed_deals_target AS DECIMAL(38,18)) AS potential_closed_deals_target,
