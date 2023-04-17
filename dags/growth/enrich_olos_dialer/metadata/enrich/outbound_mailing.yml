@@ -1,0 +1,55 @@
+---
+database_name: datalake_olos_dialer
+table_name: outbound_mailing
+owner: ana.araujo@quintoandar.com.br
+domain: growth
+description: Contains information about the contacts that will be dialed by the system. This table contains the list of leads and which sales_company will contact them.
+columns:
+  id_lead:
+    description: Identifier of the customer that the dialer will contact. Equivalent to our internal sk_lead.
+    lineage:
+      - datalake_discador_olos_clean.mailing.id_lead
+  campaign_name:
+    description: Name of the campaign. The campaign is where we allocate the analyst to perform the marketing action within the dialer.
+    lineage:
+      - datalake_olos_dialer_clean.campaign.description
+  organization:
+    description: The campaigns are divided in organizations. This table only contains data for the organization Inside Sales.
+    lineage:
+      - datalake_olos_dialer_clean.customer.name
+  sales_company:
+    description: For which company the lead was sent/imported.
+    lineage:
+      - datalake_olos_dialer_clean.campaign.description
+  phone1:
+    description: Customer's phone 1.
+    lineage:
+      - datalake_discador_olos_clean.mailing.phone1
+  phone2:
+    description: Customer's phone 2.
+    lineage:
+      - datalake_discador_olos_clean.mailing.phone2
+  phone3:
+    description: Customer's phone 3.
+    lineage:
+      - datalake_discador_olos_clean.mailing.phone3
+  ts_created:
+    description: Timestamp of creation.
+    lineage:
+      - datalake_discador_olos_clean.mailing.ts_created
+  ts_imported:
+    description: Timestamp of import.
+    lineage:
+      - datalake_discador_olos_clean.mailing.ts_imported
+  year:
+    description: Year when the data was generated.
+    lineage:
+      - datalake_discador_olos_clean.mailing.year
+  month:
+    description: Month when the data was generated.
+    lineage:
+      - datalake_discador_olos_clean.mailing.month
+  day:
+    description: Day when the data was generated.
+    lineage:
+      - datalake_discador_olos_clean.mailing.day

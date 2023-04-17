@@ -88,6 +88,7 @@ columns:
       - dw_public.fact_house_listing_flows.mkt_medium
   sales_company:
     lineage:
+      - datalake_olos_dialer.outbound_mailing
       - datalake_olos_dialer.outbound_last_contact
       - dw_public.dim_lead.sales_company
       - dw_quintoandar.dim_user_sales_rep.sales_company

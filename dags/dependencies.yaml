@@ -186,6 +186,7 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.enrich_big_agent:create-enrich-program-external-table
   - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
   - bietlejuice.enrich_olos_dialer:create-enrich-outbound-last-contact-external-table
+  - bietlejuice.enrich_olos_dialer:create-enrich-outbound-mailing-external-table
   - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
 bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -345,6 +346,7 @@ bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.enrich_big_agent:load-enrich-house
   - bietlejuice.enrich_big_agent:load-enrich-program
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-last-contact
+  - bietlejuice.enrich_olos_dialer:load-enrich-outbound-mailing
   - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
 bietlejuice.dw_datamarts_spark.fintech:
   - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-entry-snapshot

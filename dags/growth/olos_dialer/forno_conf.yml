@@ -22,6 +22,7 @@ tables_list:
   - Reason
   - Users
   - PbxBillingData
+  - QUINTO_ANDAR_20200505_Mailing
 partition_cols:
   - year
   - month
