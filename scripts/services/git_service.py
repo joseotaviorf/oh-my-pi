@@ -25,7 +25,7 @@ class GitService:
         """
         diff_branches = f"{from_branch}...{to_branch}"
 
-        bash_command = f"git diff --no-commit-id --name-status -r {diff_branches}"
+        bash_command = f"git diff --no-commit-id --name-status --no-renames -r {diff_branches}"
         process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
         output, _ = process.communicate()
         decoded_output = output.decode("utf-8").splitlines()
