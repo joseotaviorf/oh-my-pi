@@ -51,4 +51,4 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_ticket (
     ts_survey TIMESTAMP,
     ts_load TIMESTAMP
 );
-ALTER TABLE customer_support.fact_ticket OWNER TO airflow;
+ALTER TABLE customer_support.fact_ticket OWNER TO databricks;
