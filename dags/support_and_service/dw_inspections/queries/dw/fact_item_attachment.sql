@@ -24,7 +24,7 @@ WHERE
     AND im.day = {day}
 UNION ALL
 SELECT
-    MD5(CONCAT(ir.id_item, ir.id_review, ir.id_review_media, "review_media")) AS sk_item_attachment,
+    MD5(CONCAT(ir.id_item, ir.id_review, COALESCE(ir.id_review_media, ""), "review_media")) AS sk_item_attachment,
     MD5(CONCAT(ir.id_review_media, "review_media")) AS sk_item_media,
     ir.id_review_media AS sk_origin_media,
     ir.id_review AS sk_item_review,
@@ -33,7 +33,7 @@ SELECT
     ir.id_assessment AS sk_assessment,
     ir.id_inspection AS sk_inspection,
     ir.id_user AS sk_user,
-    TRUE AS is_review_media,
+    ir.id_review_media IS NOT NULL AS is_review_media,
     ir.ts_media_created AS ts_created,
     ir.ts_media_updated AS ts_updated,
     NOW() AS ts_load,

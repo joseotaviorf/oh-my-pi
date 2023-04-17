@@ -19,9 +19,6 @@ tables:
   inspection:
     is_incremental: True
     date_column: updated_at
-  inspection_aud:
-    is_incremental: True
-    date_column: updated_at
   issue_type:
     is_incremental: True
     date_column: updated_at
@@ -58,8 +55,6 @@ tables:
   reviewer:
     is_incremental: True
     date_column: updated_at
-  revinfo:
-    clean_table_name: rev_info
   room:
     is_incremental: True
     date_column: updated_at
