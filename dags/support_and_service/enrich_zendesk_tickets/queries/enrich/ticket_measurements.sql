@@ -89,7 +89,7 @@ SELECT DISTINCT
     COALESCE(CAST(t.id_submitter AS BIGINT), -1) AS id_zendesk_submitter_user,
     COALESCE(CAST(t.id_assignee AS BIGINT), -1) AS id_zendesk_assignee_user,
     t.ts_created AS ts_created,
-    DATE_FORMAT(t.ts_created, '%Y-%m-%d') AS str_created_date,
+    DATE(t.ts_created) AS str_created_date,
     t.ts_created_local AS ts_created_local,
     t.ts_updated AS ts_updated,
     FROM_UTC_TIMESTAMP(t.ts_updated, 'Brazil/East') AS ts_updated_local,
