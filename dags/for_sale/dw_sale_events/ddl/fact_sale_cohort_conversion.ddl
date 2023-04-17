@@ -20,6 +20,8 @@ CREATE TABLE sale.fact_sale_cohort_conversion (
     year INT,
     month INT,
     day INT,
+    ts_base_event TIMESTAMP,
+    ts_conversion_event TIMESTAMP,
     ts_load TIMESTAMP
 )
 SORTKEY(sk_base_date)

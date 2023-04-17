@@ -17,6 +17,7 @@ CREATE TABLE sale.fact_sale_demand_event (
     year INT,
     month INT,
     day INT,
+    ts_event TIMESTAMP,
     ts_load TIMESTAMP
 )
 SORTKEY(sk_event_date)

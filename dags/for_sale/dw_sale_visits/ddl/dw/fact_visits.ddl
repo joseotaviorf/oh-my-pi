@@ -37,6 +37,13 @@ CREATE TABLE sale.fact_visits (
     days_visit_booked_to_visit_completed INTEGER,
     hours_booking_to_offer FLOAT,
     hours_visit_to_offer FLOAT,
+    ts_booking_created TIMESTAMP,
+    ts_visit TIMESTAMP,
+    ts_visit_canceled TIMESTAMP,
+    ts_visit_completed TIMESTAMP,
+    ts_visit_follow_up TIMESTAMP,
+    ts_agent_review_rating TIMESTAMP,
+    ts_buyer_review_rating TIMESTAMP,
     ts_load TIMESTAMP
 );
 ALTER TABLE sale.fact_visits OWNER TO airflow;

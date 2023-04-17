@@ -24,6 +24,8 @@ SELECT
     fee_1.year,
     fee_1.month,
     fee_1.day,
+    fee_1.ts_event AS ts_base_event,
+    fee_2.ts_event AS ts_conversion_event,
     NOW() AS ts_load
 FROM
     dw_sale.fact_sale_demand_event AS fee_1

@@ -12,7 +12,10 @@ WITH bookings AS (
         fac.sk_work_contract AS sk_agent_work_contract,
         fv.sk_business_unit,
         fv.sk_company_supply,
-        fv.sk_company_demand
+        fv.sk_company_demand,
+        fv.ts_booking_created,
+        fv.ts_visit_completed,
+        fv.ts_visit_canceled
     FROM
         dw_sale.fact_visits AS fv
     JOIN
@@ -40,7 +43,12 @@ offers AS (
         fac.sk_work_contract AS sk_agent_work_contract,
         fo.sk_business_unit,
         fo.sk_company_supply,
-        fo.sk_company_demand
+        fo.sk_company_demand,
+        fo.ts_offer_submitted,
+        fo.ts_offer_accepted,
+        fo.ts_sale_agreement_created,
+        fo.ts_sale_agreement_signed,
+        fo.ts_offer_dismissed
     FROM
         dw_sale.fact_offers AS fo
     JOIN
@@ -68,7 +76,8 @@ events AS (
         sk_agent_work_contract,
         sk_business_unit,
         sk_company_supply,
-        sk_company_demand
+        sk_company_demand,
+        ts_booking_created AS ts_event
     FROM
         bookings
     WHERE
@@ -87,7 +96,8 @@ events AS (
         sk_agent_work_contract,
         sk_business_unit,
         sk_company_supply,
-        sk_company_demand
+        sk_company_demand,
+        ts_visit_completed AS ts_event
     FROM
         bookings
     WHERE
@@ -106,7 +116,8 @@ events AS (
         sk_agent_work_contract,
         sk_business_unit,
         sk_company_supply,
-        sk_company_demand
+        sk_company_demand,
+        ts_offer_submitted AS ts_event
     FROM
         offers
     WHERE
@@ -125,7 +136,8 @@ events AS (
         sk_agent_work_contract,
         sk_business_unit,
         sk_company_supply,
-        sk_company_demand
+        sk_company_demand,
+        ts_offer_accepted AS ts_event
     FROM
         offers
     WHERE
@@ -144,7 +156,8 @@ events AS (
         sk_agent_work_contract,
         sk_business_unit,
         sk_company_supply,
-        sk_company_demand
+        sk_company_demand,
+        ts_sale_agreement_created AS ts_event
     FROM
         offers
     WHERE
@@ -163,7 +176,8 @@ events AS (
         sk_agent_work_contract,
         sk_business_unit,
         sk_company_supply,
-        sk_company_demand
+        sk_company_demand,
+        ts_sale_agreement_signed AS ts_event
     FROM
         offers
     WHERE
@@ -182,7 +196,8 @@ events AS (
         sk_agent_work_contract,
         sk_business_unit,
         sk_company_supply,
-        sk_company_demand
+        sk_company_demand,
+        ts_visit_canceled AS ts_event
     FROM
         bookings
     WHERE
@@ -201,7 +216,8 @@ events AS (
         sk_agent_work_contract,
         sk_business_unit,
         sk_company_supply,
-        sk_company_demand
+        sk_company_demand,
+        ts_offer_dismissed AS ts_event
     FROM
         offers
     WHERE
@@ -225,6 +241,7 @@ SELECT
     dd.year,
     dd.month,
     dd.day,
+    e.ts_event,
     NOW() AS ts_load
 FROM
     events AS e

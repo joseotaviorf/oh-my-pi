@@ -39,6 +39,12 @@ SELECT
 	eso.days_sale_agreement_created_to_sale_agreement_signed,
 	eso.hours_booking_to_offer,
 	eso.hours_visit_to_offer AS hours_visit_completed_to_offer,
+	eso.ts_offer_submitted,
+	eso.dt_offer_accepted::TIMESTAMP AS ts_offer_accepted,
+	eso.dt_offer_dismissed::TIMESTAMP AS ts_offer_dismissed,
+	eso.dt_offer_rescued::TIMESTAMP AS ts_offer_rescued,
+	eso.dt_sale_agreement_created::TIMESTAMP AS ts_sale_agreement_created,
+	eso.dt_sale_agreement_signed::TIMESTAMP AS ts_sale_agreement_signed,
 	NOW() AS ts_load
 FROM
     datalake_offer.sale_offer AS eso

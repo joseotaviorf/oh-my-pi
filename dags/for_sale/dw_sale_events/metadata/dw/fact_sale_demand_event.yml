@@ -1,3 +1,4 @@
+---
 database_name: dw_sale
 table_name: fact_sale_demand_event
 description: 'Transactional fact table that registers a row for each key event in
@@ -10,6 +11,10 @@ description: 'Transactional fact table that registers a row for each key event i
 domain: For Sale
 owner: ae-for-sale@quintoandar.com.br
 columns:
+  sk_sale_demand_event:
+    description: Primary key of the table, formed by an MD5.
+  sk_event_type:
+    description: Key of the type of event. Can be joined with dw_sale.dim_sale_event_type.
   sk_event_date:
     lineage:
     - dw_sale.fact_visits.sk_booking_created_date
@@ -89,21 +94,25 @@ columns:
   year:
     lineage:
     - dw_public.dim_date.year
-    description: Year of when the event happened. It is a partition key, so it is
-      performatic to filter or join by this column.
+    description: Year of when the event happened.
   month:
     lineage:
     - dw_public.dim_date.month
-    description: Month of when the event happened. It is a partition key, so it is
-      performatic to filter or join by this column.
+    description: Month of when the event happened.
   day:
     lineage:
     - dw_public.dim_date.day
-    description: Day of when the event happened. It is a partition key, so it is performatic
-      to filter or join by this column.
-  sk_sale_demand_event:
-    description: Primary key of the table.
-  sk_event_type:
-    description: Key of the type of event. Can be joined with dw_sale.dim_sale_event_type.
+    description: Day of when the event happened.
+  ts_event:
+    lineage:
+    - dw_sale.fact_visits.ts_booking_created
+    - dw_sale.fact_visits.ts_visit_canceled
+    - dw_sale.fact_visits.ts_visit_completed
+    - dw_sale.fact_offers.ts_offer_submitted
+    - dw_sale.fact_offers.ts_offer_accepted
+    - dw_sale.fact_offers.ts_sale_agreement_created
+    - dw_sale.fact_offers.ts_sale_agreement_signed
+    - dw_sale.fact_offers.ts_offer_dismissed
+    description: Timestamp of when the event happened, in UTC.
   ts_load:
     description: Timestamp of when the table loaded a given row.

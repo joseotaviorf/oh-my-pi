@@ -59,6 +59,13 @@ SELECT
   b.days_visit_booked_to_visit_completed,
   so.hours_booking_to_offer,
   so.hours_visit_to_offer,
+  b.ts_created AS ts_booking_created,
+  b.ts_booking_utc AS ts_visit,
+  b.ts_first_canceled AS ts_visit_canceled,
+  IF(b.is_visit_completed, b.ts_booking_utc, NULL) AS ts_visit_completed,
+  b.ts_visit_fup AS ts_visit_follow_up,
+  ar.ts_created AS ts_agent_review_rating,
+  br.dt_creation AS ts_buyer_review_rating,
   NOW() AS ts_load
 FROM
   datalake_booking.booking AS b

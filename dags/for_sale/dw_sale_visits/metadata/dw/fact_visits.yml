@@ -1,6 +1,7 @@
+---
 database_name: dw_sale
 table_name: fact_visits
-description: ''
+description: 'Every row in this fact table is a ForSale visit booking.'
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
@@ -11,51 +12,59 @@ columns:
   sk_sale_flow:
     lineage:
     - datalake_booking.booking.id_sale_flow
-    description: ID of the sale flow. Is the concatenation of ID buyer and ID house
+    description: ID of the sale flow. Is the concatenation of ID buyer and ID house.
   sk_house:
     lineage:
     - datalake_booking.booking.id_house
-    description: ID of the house
+    description: ID of the house.
   sk_region:
     lineage:
     - datalake_ebdb_clean.house.id_region
-    description: ID of the region where house is located
+    description: ID of the region where house is located.
   sk_business_unit:
     lineage:
     - datalake_sale_visit_hubs.sale_visit_hubs.id_business_unit
+    description: ID of the business unit associated with the booking. Can be joined with datalake_hub_services_clean.business_unit.
   sk_company_supply:
     lineage:
     - datalake_rede_company.company_sks.sk_company
+    description: Surrogate Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company.
   sk_company_demand:
     lineage:
     - datalake_rede_company.company_sks.sk_company
+    description: Surrogate Key of the company in Rede QuintoAndar associated with the agent. Can be joined with dw_rede.dim_company.
   sk_agent:
     lineage:
     - datalake_booking.booking.id_agent
-    description: ''
+    description: 'ID of the agent associated with the booking. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id'
   sk_user_agent:
     lineage:
     - datalake_ebdb_clean.user.id
+    description: 'ID of the agent''s user associated with the booking. Can be joined with dw_public.dim_agent.id_user or dw_public.dim_user.sk_user'
   sk_user_en:
     lineage:
     - datalake_sale_visit_hubs.sale_visit_hubs.id_user_en
+    description: ID of the user of the trading executive.
   sk_fixed_agent:
     lineage:
     - datalake_booking.booking.id_sale_fixed_agent
+    description: 'ID of the fixed agent associated with the buyer when the booking was created. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id'
   sk_buyer:
     lineage:
     - datalake_booking.booking.id_visitor
-    description: ID user of the buyer that started the sale flow
+    description: ID user of the buyer that started the sale flow.
   sk_seller:
     lineage:
     - datalake_ebdb_clean.house.id_user
-    description: ID user of the listing owner
+    description: ID user of the listing owner.
   sk_user_creation:
     lineage:
     - datalake_booking.booking.id_user_creation
+    description: ID of the user who created the booking.
   sk_user_cancelation:
     lineage:
     - datalake_booking.booking.id_user_cancelation
+    description: ID of the user who canceled the booking.
   sk_visit:
     lineage:
     - datalake_booking.booking.id_visit
@@ -63,56 +72,59 @@ columns:
   sk_visit_code:
     lineage:
     - datalake_booking.booking.code
+    description: Code of the visit.
   sk_offer:
     lineage:
     - datalake_offer.sale_offer.id_offer
-    description: ''
+    description: ID of the first offer associated with this booking.
   sk_agent_booking_review:
     lineage:
     - datalake_ebdb_clean.real_estate_agent_rating.id
-    description: ID of the visit review completed by the agent
+    description: ID of the visit review completed by the agent.
   sk_buyer_booking_review:
     lineage:
     - datalake_booking.booking.id
-    description: ID of the visit review completed by the buyer
+    description: ID of the visit review completed by the buyer.
   sk_booking_created_date:
     lineage:
     - datalake_booking.booking.ts_created
-    description: Date key to be joined with dim_date. Key to identify date of booking
+    description: Date key to be joined with dim_date. Key to identify date of booking.
       creation
   sk_visit_date:
     lineage:
     - datalake_booking.booking.ts_booking_utc
-    description: Date key to be joined with dim_date. Key to identify date of visit
+    description: Date key to be joined with dim_date. Key to identify date of visit.
       completed
   sk_visit_canceled_date:
     lineage:
     - datalake_booking.booking.ts_first_canceled
-    description: Date key to be joined with dim_date. Key to identify date of visit
+    description: Date key to be joined with dim_date. Key to identify date of visit.
       canceled
   sk_visit_completed_date:
     lineage:
     - datalake_booking.booking.is_visit_completed
     - datalake_booking.booking.ts_booking_utc
     description: Date key to be joined with dim_date. Key to identify date of visit
-      completed
+      completed.
   sk_visit_follow_up_date:
     lineage:
     - datalake_booking.booking.ts_visit_fup
     description: Date key to be joined with dim_date. Key to identify date of visit
-      follow up
+      follow up.
   sk_agent_review_rating_date:
     lineage:
     - datalake_ebdb_clean.real_estate_agent_rating.ts_created
-    description: ''
+    description: Date key to be joined with dim_date. Key to identify date of agent
+      booking review.
   sk_buyer_review_rating_date:
     lineage:
     - datalake_insider_clean.review.dt_creation
     description: Date key to be joined with dim_date. Key to identify date of buyer
-      booking review
+      booking review.
   hub_agent_region:
     lineage:
     - datalake_booking.booking.hub_agent_region
+    description: Name of the contract of the agent associated with the booking, if the contract is from a hub.
   is_hub_flow:
     lineage:
     - datalake_booking.booking.is_hub_flow
@@ -125,12 +137,15 @@ columns:
   is_virtual_visit:
     lineage:
     - datalake_booking.booking.is_virtual_visit
+    description: True if the visit is a virtual visit.
   days_visit_cancelled_to_visit:
     lineage:
     - datalake_booking.booking.days_visit_cancelled_to_visit
+    description: Days between the visit cancelled and the visit.
   days_visit_booked_to_visit:
     lineage:
     - datalake_booking.booking.days_visit_booked_to_visit
+    description: Days between the visit booked and the visit.
   days_visit_booked_to_visit_cancelled:
     lineage:
     - datalake_booking.booking.days_visit_booked_to_visit_cancelled
@@ -142,8 +157,38 @@ columns:
   hours_booking_to_offer:
     lineage:
     - datalake_offer.sale_offer.hours_booking_to_offer
+    description: Hours between the booking created and the first offer.
   hours_visit_to_offer:
     lineage:
     - datalake_offer.sale_offer.hours_visit_to_offer
+    description: Hours between the visit completed and the first offer.
+  ts_booking_created:
+    lineage:
+    - datalake_booking.booking.ts_created
+    description: Timestamp of the booking creation.
+  ts_visit:
+    lineage:
+    - datalake_booking.booking.ts_booking_utc
+    description: Timestamp of when visit was scheduled for.
+  ts_visit_canceled:
+    lineage:
+    - datalake_booking.booking.ts_first_canceled
+    description: Timestamp of the visit canceled.
+  ts_visit_completed:
+    lineage:
+    - datalake_booking.booking.ts_booking_utc
+    description: Timestamp of the visit completed.
+  ts_visit_follow_up:
+    lineage:
+    - datalake_booking.booking.ts_visit_fup
+    description: Timestamp of the visit follow up.
+  ts_agent_review_rating:
+    lineage:
+    - datalake_ebdb_clean.real_estate_agent_rating.ts_created
+    description: 'Timestamp of the agent booking review.'
+  ts_buyer_review_rating:
+    lineage:
+    - datalake_insider_clean.review.dt_creation
+    description: Timestamp of the buyer booking review.
   ts_load:
-    description: ''
+    description: 'Timestamp of when the data was last loaded in this table.'

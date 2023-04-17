@@ -1,3 +1,4 @@
+---
 database_name: dw_sale
 table_name: fact_sale_cohort_conversion
 description: 'Transactional fact table that registers a row for each conversion in
@@ -23,6 +24,8 @@ columns:
   sk_conversion_date:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_event_date
+    description: Date key of when the conversion event happened. For example, if it
+      is a VB2VC, this would be the VC date. Can be joined with dw_public.dim_date.
   sk_booking:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_booking
@@ -94,9 +97,6 @@ columns:
     - dw_sale.fact_sale_demand_event.day
     description: Day of when the base event happened. It is a partition key, so it
       is performatic to filter or join by this column.
-  sk_event_date:
-    description: Date key of when the conversion event happened. For example, if it
-      is a VB2VC, this would be the VC date. Can be joined with dw_public.dim_date.
   sk_cohort_type:
     description: Key of the type of conversion. Can be joined with dw_sale.dim_sale_cohort_type.
   days_to_conversion:
@@ -106,5 +106,15 @@ columns:
     description: Number of weeks in the conversion range. Not in calendar days! 0
       means it converted within the same week (Monday-Sunday), 1 means it converted
       on the following week, and so on.
+  ts_base_event:
+    lineage:
+    - dw_sale.fact_sale_demand_event.ts_event
+    description: Timestamp when the base event happened, in UTC. For example, if it is a
+      VB2VC, this would be the VB timestamp.
+  ts_conversion_event:
+    lineage:
+    - dw_sale.fact_sale_demand_event.ts_event
+    description: Timestamp when the conversion event happened, in UTC. For example, if it
+      is a VB2VC, this would be the VC timestamp.
   ts_load:
     description: Timestamp of when the table loaded a given row.
