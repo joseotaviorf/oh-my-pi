@@ -1,7 +1,7 @@
 WITH base_dates AS (
     SELECT
-        csk.sk_company * 1000 + ce.id_journey AS sk_company_journey,
-        csk.sk_company,
+        dc.sk_company * 1000 + ce.id_journey AS sk_company_journey,
+        dc.sk_company,
         ce.id_company,
         id_journey AS journey_number,
         MIN(ts_event) AS ts_lead,
@@ -135,8 +135,8 @@ WITH base_dates AS (
     FROM
         datalake_rede_company_event.company_event AS ce
     JOIN
-        datalake_rede_company.company_sks AS csk
-            ON ce.id_company = csk.id_hubspot
+        dw_rede.dim_company AS dc
+            ON ce.id_company = dc.id_hubspot
     GROUP BY 1,2,3,4
 ),
 lead_3p_count_per_journey AS (

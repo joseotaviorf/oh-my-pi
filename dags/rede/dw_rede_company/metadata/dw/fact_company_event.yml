@@ -11,7 +11,7 @@ columns:
     description: Date key of when the event happened.
   sk_company:
     lineage:
-    - datalake_rede_company.company_sks.sk_company
+    - dw_rede.dim_company.sk_company
     description: Key of the company associated with the event. Can be joined with
       dw_rede.dim_company.
   sk_company_event_type:

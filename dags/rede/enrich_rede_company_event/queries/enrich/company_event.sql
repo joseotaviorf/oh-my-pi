@@ -361,7 +361,7 @@ treated AS (
         merged_with_last_status
     WHERE
         -- Ignore cases when it is still a member, but marked as deal lost
-        event_type != 'Deal Lost'
+        event != 'Deal Lost'
         OR last_status NOT IN ('Membership Started', 'Contract Transition Started')
     QUALIFY
         event_type IN ('Deal', 'Status', 'Contract Transition')
