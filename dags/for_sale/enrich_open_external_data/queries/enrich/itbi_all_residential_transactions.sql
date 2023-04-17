@@ -11,7 +11,12 @@ WITH sao_paulo AS (
     address_neighborhood AS neighborhood,
     'São Paulo' AS city,
     'SP' AS state,
-    CONCAT(REPLACE(raw_source_address, '-', ' '), ' - ', REPLACE(raw_source_complement, '-', ' '), ' - ', REPLACE(raw_source_reference, '-', ' ')) AS raw_source_address,
+    CASE 
+      WHEN raw_source_complement IS NOT NULL AND raw_source_reference IS NOT NULL THEN CONCAT(REPLACE(raw_source_address, '-', ' '), ' ', IFNULL(address_number, ''), ' - ', REPLACE(raw_source_complement, '-', ' '), ' - ', REPLACE(raw_source_reference, '-', ' ')) 
+      WHEN raw_source_complement IS NULL AND raw_source_reference IS NOT NULL THEN CONCAT(REPLACE(raw_source_address, '-', ' '), ' ', IFNULL(address_number, ''), ' - ', REPLACE(raw_source_reference, '-', ' '))
+      WHEN raw_source_complement IS NOT NULL AND raw_source_reference IS NULL THEN CONCAT(REPLACE(raw_source_address, '-', ' '), ' ', IFNULL(address_number, ''), ' - ', REPLACE(raw_source_complement, '-', ' '))
+      WHEN raw_source_complement IS NULL AND raw_source_reference IS NULL THEN CONCAT(REPLACE(raw_source_address, '-', ' '), ' ', IFNULL(address_number, ''))
+    END AS raw_source_address,
     source_file,
     land_area_m2,
     built_area_m2,

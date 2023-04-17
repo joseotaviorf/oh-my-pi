@@ -54,6 +54,10 @@ columns:
   raw_source_address:
     lineage:
       - datalake_open_external_data.itbi_bh_residential_transactions.raw_source_address
+      - datalake_open_external_data.itbi_sp_residential_transactions.raw_source_address
+      - datalake_open_external_data.itbi_sp_residential_transactions.raw_source_reference
+      - datalake_open_external_data.itbi_sp_residential_transactions.raw_source_complement
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_number
     description: 'Address as it was in the source file.'
   source_file:
     lineage:
