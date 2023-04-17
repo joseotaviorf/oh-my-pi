@@ -3,6 +3,7 @@ from bietlejuice.base.udfs.udf_enum import UDFEnum
 from cerberus import Validator
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.pipeline.short_circuit_enum import ShortCircuitEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum import (
     WorkflowEnum,
@@ -50,6 +51,17 @@ class DAGDeclarationValidator(Validator):
                 "default_extraction_type": {"type": "string", "empty": False},
                 "default_partitions": {"type": "list", "empty": False},
                 "tables_customization": {"type": "dict", "empty": False},
+                "short_circuit_customization": {
+                    "type": "dict",
+                    "empty": False,
+                    "schema": {
+                        "method": {
+                            "type": "string",
+                            "empty": False,
+                            "allowed": ShortCircuitEnum.get_available_enum_values(),
+                        }
+                    },
+                },
                 "inner_dependencies": {"type": "dict", "empty": False},
                 "has_load_to_redshift_task": {"type": "boolean", "empty": False},
                 "spark_session_configs": {

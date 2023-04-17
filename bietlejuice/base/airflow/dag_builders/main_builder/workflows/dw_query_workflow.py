@@ -4,6 +4,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.operators.python_operator import ShortCircuitOperator
+from airflow.utils.helpers import chain
 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
@@ -11,6 +13,7 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.pipeline.short_circuit_enum import ShortCircuitEnum
 
 
 class DWQueryWorkflow(BaseWorkflow):
@@ -29,6 +32,9 @@ class DWQueryWorkflow(BaseWorkflow):
     def build_dag(self):
         dw_schema = self.workflow_args.get("custom_schema", self.dag_args["name"])
         tables_customization = self.workflow_args.get("tables_customization", {})
+        short_circuit_customization = self.workflow_args.get(
+            "short_circuit_customization", {}
+        )
         default_partitions = self.workflow_args.get("default_partitions")
         default_is_incremental = (
             self.workflow_args.get("default_extraction_type") == "incremental"
@@ -74,6 +80,17 @@ class DWQueryWorkflow(BaseWorkflow):
             has_load_to_redshift_task=has_load_to_redshift_task,
         )
 
+        skip_run_task = (
+            ShortCircuitOperator(
+                task_id=f"check-day-to-skip-execution",
+                python_callable=ShortCircuitEnum.get_validate_type(
+                    short_circuit_customization.get("method", None), "{{ds}}"
+                ),
+            )
+            if short_circuit_customization
+            else None
+        )
+
         create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
             dag=dag,
             task_id="create-cluster",
@@ -86,6 +103,7 @@ class DWQueryWorkflow(BaseWorkflow):
         )
 
         self.set_dependencies(
+            skip_run_task,
             inner_dependencies,
             task_group,
             create_cluster_task,
@@ -116,6 +134,7 @@ class DWQueryWorkflow(BaseWorkflow):
 
     def set_dependencies(
         self,
+        skip_run_task,
         inner_dependencies,
         task_group,
         create_cluster_task,
@@ -123,6 +142,9 @@ class DWQueryWorkflow(BaseWorkflow):
         dw_staging_task_group,
         dw_task_group,
     ):
+
+        if skip_run_task:
+            chain(skip_run_task, create_cluster_task)
 
         if inner_dependencies:
             (
@@ -140,6 +162,7 @@ class DWQueryWorkflow(BaseWorkflow):
                 )
                 + DWTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries)
             )
+
         else:
             create_cluster_task.set_downstream(
                 DWTaskGroup.all_first_tasks(dw_staging_task_group)
