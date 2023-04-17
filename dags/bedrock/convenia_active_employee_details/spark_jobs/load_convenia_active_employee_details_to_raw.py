@@ -97,7 +97,7 @@ def create_df_from_active_employee_details(results, spark_client, token_name):
                 benefits=str(employee["benefits"]),
                 custom_fields=str(employee["custom_fields"]),
                 time_tracking=str(employee["time_tracking"]),
-                educations=str(employee["educations"]),
+                educations=employee["educations"],
                 experience_period=str(employee["experience_period"]),
                 emergency_contacts=[
                     {
@@ -115,6 +115,7 @@ def create_df_from_active_employee_details(results, spark_client, token_name):
                 else employee["emergency_contacts"],
                 main_bank_account=str(employee["bank_account"]),
                 all_bank_accounts=employee["bank_accounts"],
+                social_name=str(employee["social_name"]),
                 source=token_name,
             )
         )
@@ -160,7 +161,7 @@ def create_df_schema():
             StructField("benefits", StringType(), True),
             StructField("custom_fields", StringType(), True),
             StructField("time_tracking", StringType(), True),
-            StructField("educations", StringType(), True),
+            StructField("educations", ArrayType(MapType(StringType(), StringType()))),
             StructField("experience_period", StringType(), True),
             StructField(
                 "emergency_contacts", ArrayType(MapType(StringType(), StringType()))
@@ -169,6 +170,7 @@ def create_df_schema():
             StructField(
                 "all_bank_accounts", ArrayType(MapType(StringType(), StringType()))
             ),
+            StructField("social_name", StringType(), True),
             StructField("source", StringType(), True),
         ]
     )

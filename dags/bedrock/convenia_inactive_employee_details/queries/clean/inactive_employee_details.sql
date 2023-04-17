@@ -4,6 +4,7 @@ SELECT
     gender_identity_id AS id_gender_identity,
     name,
     last_name,
+    social_name,
     email,
     salary,
     alternative_email,
