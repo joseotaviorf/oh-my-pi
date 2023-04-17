@@ -1,15 +1,19 @@
 ---
 database_name: dw_sale
 table_name: fact_daily_ongoing_listing
-description: Every row of this table is a snapshot of one sale ongoing listing per day. If it had the status="PUBLISHED" at that day, no matter
+description: 'Every row of this table is a snapshot of one sale ongoing listing per day. If it had the status="PUBLISHED" at that day, no matter
   for how long, it will appear here, along with some metrics such as search, listing page viewed, visit booked, and other demand data.
+  Important:
+  if you add up the metrics from this table such as visit booked or visit completed, they might not be equal to the total that actually happened. This
+  is because some events happen when the listing is unpublished, so the rows will not appear in this table. To see all ForSale demand events, please use
+  the table dw_sale.fact_sale_demand_event.'
 domain: For Sale
 owner: gustavo.miller@quintoandar.com.br
 columns:
   sk_snapshot:
     description: Primary key of the table, formed by concatenating sk_house to sk_snapshot_date.
     lineage:
-      - datalake_sale_listings.sale_listing_status.id_house
+      - datalake_ebdb_clean.listing_business_context_aud.id_house
       - dw_public.dim_date.sk_date
   sk_snapshot_date:
     description: Date key of the snapshot. Can be joined with dw_public.dim_date.
@@ -18,11 +22,11 @@ columns:
   sk_sale_listing:
     description: Key of the sale listing. Can be joined with dw_sale.dim_listing.
     lineage:
-      - datalake_sale_listings.sale_listing_status.id_sale_listing
+      - datalake_sale_listings.sale_listing.id_sale_listing
   sk_house:
     description: Key of the house. Can be joined with dw_quintoandar.dim_house.
     lineage:
-      - datalake_sale_listings.sale_listing_status.id_house
+      - datalake_ebdb_clean.listing_business_context_aud.id_house
   sk_region:
     description: Key of the region of the house. Can be joined with dw_public.dim_region.
     lineage:

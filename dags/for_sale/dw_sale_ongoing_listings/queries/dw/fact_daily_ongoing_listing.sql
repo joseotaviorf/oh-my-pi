@@ -38,28 +38,62 @@ demand_data AS (
         AND fsde.day = {day}
     GROUP BY 1, 2, 3, 4
 ),
+status_changes_aux AS (
+    SELECT
+        sl.id_sale_listing AS sk_sale_listing,
+        lbc.id_house AS sk_house,
+        h.id_region AS sk_region,
+        lbc.status,
+        ure.ts_revision
+    FROM
+        datalake_ebdb_clean.listing_business_context_aud AS lbc
+    JOIN
+        datalake_ebdb_user.user_revision_entity AS ure
+            ON lbc.rev = ure.id
+    JOIN
+        datalake_sale_listings.sale_listing AS sl
+            ON lbc.id_house = sl.id_house
+    JOIN
+        datalake_ebdb_clean.house AS h
+            ON lbc.id_house = h.id
+    WHERE
+        lbc.business_context = 'SALE'
+    QUALIFY
+        LAG(lbc.status) OVER (PARTITION BY lbc.id_house ORDER BY ure.ts_revision) IS DISTINCT FROM lbc.status
+),
+status_changes AS (
+    SELECT
+        sk_sale_listing,
+        sk_house,
+        sk_region,
+        status,
+        ts_revision AS ts_status_started,
+        LEAD(ts_revision) OVER (PARTITION BY sk_house ORDER BY ts_revision) AS ts_status_ended
+    FROM
+        status_changes_aux
+),
 daily_ongoing_listings AS (
     SELECT
         dd.sk_date AS sk_snapshot_date,
-        sls.id_sale_listing AS sk_sale_listing,
-        sls.id_house AS sk_house,
-        sls.id_region AS sk_region,
+        sc.sk_sale_listing,
+        sc.sk_house,
+        sc.sk_region,
         dd.date AS dt_snapshot,
         dd.year,
         dd.month,
         dd.day
     FROM
-        datalake_sale_listings.sale_listing_status AS sls
+        status_changes AS sc
     JOIN
         dw_public.dim_date AS dd
-            ON dd.`date` BETWEEN sls.ts_status_started::DATE AND COALESCE(sls.ts_status_ended::DATE, NOW())
+            ON dd.`date` BETWEEN sc.ts_status_started::DATE AND COALESCE(sc.ts_status_ended::DATE, NOW())
     WHERE
-        sls.status_history = 'PUBLISHED'
+        sc.status = 'PUBLISHED'
         AND dd.year = {year}
         AND dd.month = {month}
         AND dd.day = {day}
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY sls.id_house, dd.`date` ORDER BY sls.ts_status_started DESC)
+        ROW_NUMBER() OVER (PARTITION BY sc.sk_house, dd.`date` ORDER BY sc.ts_status_started DESC)
 )
 SELECT
     dol.sk_house * 100000000 + dol.sk_snapshot_date AS sk_snapshot, 
