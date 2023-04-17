@@ -42,7 +42,7 @@ contracts_competences as (
 brokerage_fees AS (
   SELECT
     id_contract_ebdb,
-    SUM(invoice_theorical_amount) AS brokerage_fee,
+    SUM(IF(brokerage_share = 'quintoandar', invoice_theorical_amount, 0)) AS brokerage_fee,
     SUM(IF(brokerage_share = 'partner' AND invoice_payment_status = 'paid', invoice_theorical_amount, 0)) AS brokerage_partner_share,
     SUM(IF(brokerage_share = 'rental agents', prod_theorical_amount, 0)) AS agents_commission,
     accrual_year_month
