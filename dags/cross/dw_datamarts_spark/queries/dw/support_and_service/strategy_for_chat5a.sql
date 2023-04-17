@@ -60,7 +60,7 @@ fix_count_strategy_2 AS (
   where 
     GET_JSON_OBJECT(memory, '$.business_rules.internal_chat.has_access') is not  null
     and date(ts_started) >= date('2023-04-01')
-    and date(ts_started) <= date('2023-04-10')
+    and date(ts_started) <= date(current_date)
   group by 1
 ),
 --CONCATENA AS TABELAS E ATRIBUI UMA ORDEM PARA A CRIAÇÃO DE SESSÕES, FILTRA POR id_user AQUELES QUE SÃO IQ_PÓS E TRAZ SE HOUVE RETENÇÃO
@@ -382,13 +382,24 @@ ajuste_estrategia as (
       id_pipeline = 'in_app_main' and
       marcador_mais_estrategia_2 is null and
       date(ts_started) >= date('2023-04-01') and
-      migration_strategy is null  	 
+      migration_strategy is null  
+      or
+      has_chat5a_access is null and
+      total_strategy_2 is not null and
+      total_strategy is not null and
+      id_pipeline = 'in_app_main' and
+      marcador_mais_estrategia_2 is not null and
+      marcador_mais_estrategia is null and
+      date(ts_started) >= date('2023-02-01') and
+      date(ts_started) < date('2023-04-01') and
+      migration_strategy is null
     then 'organic'
     when has_chat5a_access is null and
       migration_strategy is null and
       total_strategy is not null and
       id_pipeline = 'in_app_main' and
       date(ts_started) >= date('2023-02-01') and
+      date(ts_started) < date('2023-04-01') and
       marcador_mais_estrategia = 'open'
       or
       date(ts_started) < date('2023-02-01')
@@ -501,8 +512,7 @@ ajuste_estrategia as (
       date(ts_started) >= date('2023-02-01') and
       date(ts_started) < date('2023-04-01') and
       marcador_mais_estrategia = 'last_open + suggest'
-    then 'last_open'
-      
+    then 'last_open'   
     when has_chat5a_access is not null  
         then
           case 
