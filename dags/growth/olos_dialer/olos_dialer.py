@@ -56,6 +56,8 @@ def get_date_param(dag_run, ds, date_param_name):
     return ds
 
 def change_case(table_name):
+    if table_name == "QUINTO_ANDAR_20200505_Mailing":
+        return "mailing"
     table_name = table_name.replace('_', '')
     return reduce(lambda x, y: x + ('_' if y.isupper() else '') + y, table_name).lower()
 
