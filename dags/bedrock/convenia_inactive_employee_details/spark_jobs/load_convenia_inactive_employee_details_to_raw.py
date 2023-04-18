@@ -95,7 +95,7 @@ def create_df_from_inactive_employee_details(results, spark_client, token_name):
                 cost_center=str(employee["cost_center"]),
                 salary_type=str(employee["salary_type"]),
                 benefits=str(employee["benefits"]),
-                custom_fields=str(employee["custom_fields"]),
+                custom_fields=employee["custom_fields"],
                 time_tracking=str(employee["time_tracking"]),
                 educations=employee["educations"],
                 experience_period=str(employee["experience_period"]),
@@ -159,7 +159,9 @@ def create_df_schema():
             StructField("cost_center", StringType(), True),
             StructField("salary_type", StringType(), True),
             StructField("benefits", StringType(), True),
-            StructField("custom_fields", StringType(), True),
+            StructField(
+                "custom_fields", ArrayType(MapType(StringType(), StringType()))
+            ),
             StructField("time_tracking", StringType(), True),
             StructField("educations", ArrayType(MapType(StringType(), StringType()))),
             StructField("experience_period", StringType(), True),
