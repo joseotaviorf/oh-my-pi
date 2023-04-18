@@ -1,6 +1,7 @@
 WITH cte_split_bill_item AS (
     SELECT
     e.id,
+    e.id_invoice,
     UPPER(REVERSE(SPLIT(e.bill_item, '/'))[0]) AS bill_item
     FROM
     datalake_retsuko.entry AS e
@@ -21,7 +22,7 @@ SELECT
       WHEN bi.bill_item IN ('RESIDENTIAL-PROTECTION-5A-ACQUITTANCE','RESIDENTIAL-PROTECTION-5A-FUND-TRANSFER') THEN 'REPAROS'
       WHEN bi.bill_item IN ('FINE-AND-INTEREST','PROPERTY-DAMAGE-FINE') THEN 'MULTAS ONGOING'
       WHEN bi.bill_item IN ('LIGHT-WATER-OR-GAS','UTILITIES-DEFAULTING') THEN 'UTILIDADES'
-      ELSE NULL
+      ELSE 'OUTROS'
     END AS bill_item_cluster_name,
     rca.type AS from_account_type,
     rcab.type AS to_account_type,
@@ -40,11 +41,11 @@ SELECT
     CAST(rci.ts_paid AS DATE) AS dt_paid,
     CAST(rci.ts_canceled AS DATE) AS dt_canceled
 FROM
-    datalake_retsuko.entry AS rce
+    datalake_retsuko.invoice AS rci 
     INNER JOIN cte_split_bill_item AS bi
+      ON bi.id_invoice = rci.id
+    LEFT JOIN datalake_retsuko.entry AS rce
       ON bi.id = rce.id
-    LEFT JOIN datalake_retsuko.invoice AS rci
-      ON rce.id_invoice = rci.id
     LEFT JOIN datalake_retsuko_clean.account AS rca
       ON rca.id = rce.id_from_account
     LEFT JOIN datalake_retsuko_clean.account AS rcab

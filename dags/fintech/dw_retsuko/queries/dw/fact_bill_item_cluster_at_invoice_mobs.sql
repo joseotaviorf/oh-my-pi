@@ -12,7 +12,6 @@ WITH bill_items_cohort_rules AS (
     FROM datalake_retsuko.bill_items AS bi
     WHERE bi.payment_status IN ('open','paid','canceled')
         AND bi.due_amount <= 0
-        AND bi.bill_item_cluster_name IS NOT NULL
     GROUP BY 1,2,3,4,6,7,8,9
 )
 SELECT
