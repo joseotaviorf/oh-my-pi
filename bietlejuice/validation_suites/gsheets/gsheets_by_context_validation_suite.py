@@ -5,7 +5,10 @@ from gspread.exceptions import SpreadsheetNotFound, WorksheetNotFound
 
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
 from quintoandar_gsheets_api_client.exceptions.exceptions import (
+    QuotaExceededException,
     EntityNotFoundException,
+    ServiceUnavailableException,
+    InternalErrorException,
     PermissionException,
 )
 from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
@@ -23,67 +26,108 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
     GSHEETS_FILES_PATH = join(
         dirname(DAG_PACKAGES_ROOT), gsheets_path, "gsheets_files.yaml"
     )
-    SLACK_MSG_TEMPLATE = """:sheets: Sheet: <{}|{}> (ID: {})\n\t_Last modifier: {} - <@{}> - {}. Owner team: {}._\n\tError: ```{}```"""
-    SLACK_MSG_TEMPLATE_SMALL = """:sheets: Sheet: <{}|{}> (ID: {})\n _Owner team: {}._\n\tError: *Other related errors, please contact the Analytics Engineering owner team.*"""
+    GSHEETS_BASE_URL = "https://docs.google.com/spreadsheets/d/"
+    SLACK_MSG_TEMPLATE = """
+    :sheets: Sheet: <{sheet_url}|{sheet_name}> (ID: {sheet_id})
+    *Last modifier*: {mod_user_name} - <@{mod_user_slack}> - {mod_user_email}.
+    *Sharing user*: {sharing_user_name} - <@{sharing_user_slack}> - {sharing_user_email}.
+    *Owner team*: {context_owner}
+    Error: {error_message}
+    ```{error_trace}```
+    """
+    SLACK_SMALL_TEMPLATE = """
+    :sheets: Sheet: <{sheet_url}|{sheet_name}> (ID: {sheet_id})
+    *Owner team*: {context_owner}
+    Error: {error_message}
+    ```{error_trace}```
+    """
 
     def __init__(self, auth) -> None:
         super().__init__(auth, self.GSHEETS_FILES_PATH)
         self.append_validations_for_each_sheet()
         self.SLACK_CHANNEL = auth[SlackWebhooksEnum.DATA_ALERTS]
-        self.SLACK_MSG_HEADER = ":alert: *Gsheet validations failures*\n>_The following sheets have errors and will not be ingested on the next pipeline run if the issues are not resolved._"
+        self.SLACK_MSG_HEADER = (
+            ":alert: *Gsheet validations failures*\n"
+            ">The following sheets have errors and will not be ingested on the next pipeline run if the issues are not resolved."
+        )
 
     def _validate_sheet(self, _sheet_info: dict) -> None:
         """
         Main validation method of the sheets.
         Will be called by the lambda associated to each sheet's method.
 
-        :param sheet_id: the sheet id, got via lambda default value
-        :param sheet_name: the sheet name, got via lambda default value
+        :param: _sheet_info: sheet dict with its info.
         """
+        sheet_url = f"{self.GSHEETS_BASE_URL}{_sheet_info['sheet_id']}"
+        context = _sheet_info.get("sheet_context", "general").replace("_intraday", "")
+        context_owner = self._get_slack_group_from_context(context)
         try:
             self._run_sheet_validation(
-                self.DAG_NAME,
-                _sheet_info["sheet_id"],
-                _sheet_info["sheet_name"],
-                _sheet_info.get("sheet_context"),
-                _sheet_info.get("clean_table_name"),
-                _sheet_info.get("raw_table_name"),
-                _sheet_info.get("partitioned", False),
-                _sheet_info.get("preload_time_in_seconds", None),
+                dag_name=self.DAG_NAME,
+                sheet_id=_sheet_info["sheet_id"],
+                sheet_name=_sheet_info["sheet_name"],
+                gsheets_context=_sheet_info.get("sheet_context"),
+                clean_table_name=_sheet_info.get("clean_table_name"),
+                raw_table_name=_sheet_info.get("raw_table_name"),
+                is_partitioned=_sheet_info.get("partitioned", False),
+                preload_time_in_seconds=_sheet_info.get(
+                    "preload_time_in_seconds", None
+                ),
             )
+        except (
+            AnalysisException,
+            QuotaExceededException,
+            ServiceUnavailableException,
+            InternalErrorException,
+            WorksheetNotFound,
+        ) as e:
+            sheet_modification_info = self.delta.get(_sheet_info["sheet_id"])
+            error_trace = str(e).split("\n")[0].replace("`", "")
+            error_trace = error_trace.replace('"', "")[slice(0, 150)]
+            error_message = e.__doc__
+            self.SLACK_MSG = self.SLACK_MSG_TEMPLATE.format(
+                sheet_url=sheet_url,
+                sheet_name=_sheet_info.get("sheet_name"),
+                sheet_id=_sheet_info["sheet_id"],
+                mod_user_name=sheet_modification_info.get("modifier_user_name"),
+                mod_user_slack=sheet_modification_info.get("modifier_user_email").split(
+                    "@"
+                )[0],
+                mod_user_email=sheet_modification_info.get("modifier_user_email"),
+                sharing_user_name=sheet_modification_info.get("sharing_user_name"),
+                sharing_user_slack=sheet_modification_info.get(
+                    "sharing_user_email"
+                ).split("@")[0],
+                sharing_user_email=sheet_modification_info.get("sharing_user_email"),
+                context_owner=context_owner,
+                error_message=error_message,
+                error_trace=error_trace,
+            )
+            raise e
+        except (PermissionException, EntityNotFoundException, SpreadsheetNotFound) as e:
+            error_trace = str(e).split("\n")[0].replace("`", "")
+            error_trace = error_trace.replace('"', "")[slice(0, 150)]
+            error_message = e.__doc__
+            self.SLACK_MSG = self.SLACK_SMALL_TEMPLATE.format(
+                sheet_url=sheet_url,
+                sheet_name=_sheet_info.get("sheet_name"),
+                sheet_id=_sheet_info["sheet_id"],
+                context_owner=context_owner,
+                error_message=error_message,
+                error_trace=error_trace,
+            )
+            raise e
         except Exception as e:
-            sheet_info = self.delta.get(_sheet_info["sheet_id"])
-            sheet_url = (
-                f"https://docs.google.com/spreadsheets/d/{_sheet_info['sheet_id']}"
+            # Added this broad exception to notify unexpected cases.
+            error_trace = str(e).split("\n")[0].replace("`", "")
+            error_trace = error_trace.replace('"', "")[slice(0, 150)]
+            error_message = e.__doc__
+            self.SLACK_MSG = self.SLACK_SMALL_TEMPLATE.format(
+                sheet_url=sheet_url,
+                sheet_name=_sheet_info.get("sheet_name"),
+                sheet_id=_sheet_info["sheet_id"],
+                context_owner=context_owner,
+                error_message=error_message,
+                error_trace=error_trace,
             )
-
-            context = _sheet_info.get("sheet_context").replace("_intraday", "")
-            context_owner = self._get_slack_group_from_context(context)
-
-            if e.__class__ in [
-                AnalysisException,
-                SpreadsheetNotFound,
-                WorksheetNotFound,
-                EntityNotFoundException,
-                PermissionException,
-            ]:
-                error_trace = str(e).split("\n")[0].replace("`", "")
-                error_trace = error_trace.replace('"', "")[slice(0, 150)]
-                self.SLACK_MSG = self.SLACK_MSG_TEMPLATE.format(
-                    sheet_url,
-                    _sheet_info.get("sheet_name"),
-                    _sheet_info["sheet_id"],
-                    sheet_info.get("modifier_user_name"),
-                    sheet_info.get("modifier_user_email").split("@")[0],
-                    sheet_info.get("modifier_user_email"),
-                    context_owner,
-                    error_trace,
-                )
-            else:
-                self.SLACK_MSG = self.SLACK_MSG_TEMPLATE_SMALL.format(
-                    sheet_url,
-                    _sheet_info.get("sheet_name"),
-                    _sheet_info["sheet_id"],
-                    context_owner,
-                )
             raise e

@@ -14,6 +14,10 @@ import pendulum
 from pyspark.sql import DataFrame
 from quintoandar_gsheets_api_client import GoogleSheetsClient
 from quintoandar_gsheets_api_client.consumer import GoogleSheetsReader
+from quintoandar_gsheets_api_client.exceptions.exceptions import (
+    PermissionException,
+    EntityNotFoundException,
+)
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
@@ -105,6 +109,13 @@ class GsheetsService:
         time_zone = pendulum.timezone("America/Sao_Paulo")
         execution_time = datetime.now(tz=time_zone) - timedelta(hours=24)
         query = f"mimeType='application/vnd.google-apps.spreadsheet' and modifiedTime > '{execution_time.isoformat()}'"
+        file_info_fields = [
+            "id",
+            "modifiedTime",
+            "lastModifyingUser(displayName, emailAddress)",
+            "sharingUser(displayName, emailAddress)",
+        ]
+        fields = f"nextPageToken, files({', '.join(file_info_fields)})"
 
         while True:
             response = (
@@ -112,7 +123,7 @@ class GsheetsService:
                 .list(
                     q=query,
                     spaces="drive",
-                    fields="nextPageToken, files(id, modifiedTime, lastModifyingUser(displayName, emailAddress))",
+                    fields=fields,
                     supportsAllDrives=True,
                     includeItemsFromAllDrives=True,
                     pageToken=page_token,
@@ -127,9 +138,15 @@ class GsheetsService:
                             "modified_time": file.get("modifiedTime"),
                             "modifier_user_email": file.get(
                                 "lastModifyingUser", {}
-                            ).get("emailAddress", "User email unkown"),
+                            ).get("emailAddress", "Last modifying user email unknown"),
                             "modifier_user_name": file.get("lastModifyingUser", {}).get(
-                                "displayName", "User name unkown"
+                                "displayName", "Last modifying user name unknown"
+                            ),
+                            "sharing_user_name": file.get("sharingUser", {}).get(
+                                "displayName", "Sharing user name unknown"
+                            ),
+                            "sharing_user_email": file.get("sharingUser", {}).get(
+                                "emailAddress", "Sharing user email unknown"
                             ),
                         }
                     }
@@ -186,10 +203,20 @@ class GsheetsService:
                 logger.error(
                     f"m=get_gsheets_with_import_range, msg=spreadsheet {raw_table_name} not found, e={e}"
                 )
-            except SpreadsheetNotFound as e:
+            except (SpreadsheetNotFound, EntityNotFoundException) as e:
                 logger.error(
                     f"m=get_gsheets_with_import_range, msg=sheet {sheet_name} not found, e={e}"
                 )
+                import_range_sheets_ids.append(sheet_id)
+                # We have to add it here, so it get validated later, otherwise it won't be validated because it won't be
+                # found since the service account has no permission to access it.
+            except PermissionException as e:
+                logger.error(
+                    f"m=get_gsheets_with_import_range, msg=Caller has no permission on {sheet_name} , e={e}"
+                )
+                import_range_sheets_ids.append(sheet_id)
+                # We have to add it here, so it get validated later, otherwise it won't be validated because it won't be
+                # found since the service account has no permission to access it.
             gsheets_count += 1
 
         logger.info("m=get_gsheets_with_import_range, msg=Finished executing")
