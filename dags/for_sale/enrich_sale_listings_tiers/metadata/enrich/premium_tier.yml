@@ -1,4 +1,4 @@
-database_name: datalake_sale_listings_scores
+database_name: datalake_sale_listings_tiers
 table_name: premium_tier
 description: 'An enriched table that aims to create the Premium score of the ForSale listings, where we would be able to understand what type of supply is a given listing. 
   This score is totally linked to the price changes of a listing. If it changes its price and changes its score, a new row will be created.
