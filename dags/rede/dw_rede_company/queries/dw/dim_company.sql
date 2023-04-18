@@ -14,6 +14,8 @@ SELECT
             THEN '3P BH'
         ELSE '3P 5A' 
     END AS product,
+    COALESCE(c.member_category, 'Unknown') AS member_category,
+    COALESCE(c.member_type, 'Unknown') AS member_type,
     COALESCE(c.address, 'Unknown') AS address,
     COALESCE(c.zip_code, 'Unknown') AS zip_code,
     COALESCE(TRIM(UPPER(c.city)), 'Unknown') AS city,

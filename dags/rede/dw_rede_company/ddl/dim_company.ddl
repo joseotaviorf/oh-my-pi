@@ -7,6 +7,8 @@ CREATE TABLE rede.dim_company (
     extracted_3p_tag VARCHAR,
     lead_status VARCHAR,
     product VARCHAR,
+    member_category VARCHAR,
+    member_type VARCHAR,
     address VARCHAR,
     zip_code VARCHAR,
     city VARCHAR,

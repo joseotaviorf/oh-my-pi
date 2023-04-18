@@ -1,250 +1,356 @@
 ---
 database_name: datalake_hubspot
 table_name: company
+description: Each row is a company lead registered in HubSpot.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
 columns:
   id_company:
     lineage:
       - datalake_hubspot.company_history.id_company
+    description: ID of the company.
   id_hubspot_owner:
     lineage:
       - datalake_hubspot.company_history.id_hubspot_owner
+    description: ID of the HubSpot owner associated with the company.
   id_hubspot_team:
     lineage:
       - datalake_hubspot.company_history.id_hubspot_team
+    description: ID of the HubSpot team associated with the company.
   id_parent_company:
     lineage:
       - datalake_hubspot.company_history.id_parent_company
+    description: ID of the parent company associated with the company.
   fields_of_business:
     lineage:
       - datalake_hubspot.company_history.fields_of_business
+    description: Areas in which the company works.
   address:
     lineage:
       - datalake_hubspot.company_history.address
+    description: Address of the company.
   zip_code:
     lineage:
       - datalake_hubspot.company_history.zip_code
+    description: ZIP code of the company.
   city:
     lineage:
       - datalake_hubspot.company_history.city
+    description: City where the company is located.
   state:
     lineage:
       - datalake_hubspot.company_history.state
+    description: State where the company is located.
   country:
     lineage:
       - datalake_hubspot.company_history.country
+    description: Country where the company is located.
   domain:
     lineage:
       - datalake_hubspot.company_history.domain
+    description: Domain (website) of the company.
   e_mail:
     lineage:
       - datalake_hubspot.company_history.e_mail
+    description: e_mail of the representative of the company.
   hs_analytics_source:
     lineage:
       - datalake_hubspot.company_history.hs_analytics_source
+    description: Original source. First visit or interaction with the business.
   hs_analytics_source_data_1:
     lineage:
       - datalake_hubspot.company_history.hs_analytics_source_data_1
+    description: 'Original source, drill-down 1. Adds more insight about the first
+      visit or interaction with the business.'
   hs_analytics_source_data_2:
     lineage:
       - datalake_hubspot.company_history.hs_analytics_source_data_2
+    description: 'Original source, drill-down 2. Adds more insight about the first
+      visit or interaction with the business.'
   industry:
     lineage:
       - datalake_hubspot.company_history.industry
+    description: What type of industry the company works with.
   inside_sales:
     lineage:
       - datalake_hubspot.company_history.inside_sales
+    description: Identifier of the inside sales associated with the company.
   life_cycle_stage:
     lineage:
       - datalake_hubspot.company_history.life_cycle_stage
+    description: In which stage the company is in HubSpot.
   mkt_campain:
     lineage:
       - datalake_hubspot.company_history.mkt_campain
+    description: Name of the marketing campaign.
   mkt_channel:
     lineage:
       - datalake_hubspot.company_history.mkt_channel
+    description: Channel level of the Taxonomy (used to describe the type of the channel).
   mkt_content:
     lineage:
       - datalake_hubspot.company_history.mkt_content
+    description: Content of the advertisement.
   mkt_medium:
     lineage:
       - datalake_hubspot.company_history.mkt_medium
+    description: Medium level of the taxonomy (used to describe the media strategy).
   mkt_origin:
     lineage:
       - datalake_hubspot.company_history.mkt_origin
+    description: Origin of the lead in the marketing funnel.
   mkt_source:
     lineage:
       - datalake_hubspot.company_history.mkt_source
+    description: Source level of the taxonomy (used to describe the media used)
   discard_reason:
     lineage:
       - datalake_hubspot.company_history.discard_reason
+    description: Reason why the lead was discarded.
   unified_discard_reasons:
     lineage:
       - datalake_hubspot.company_history.unified_discard_reasons
+    description: Unified reasons of why the lead was discarded.
   name:
     lineage:
       - datalake_hubspot.company_history.name
+    description: Name of the company.
   tag_real_estate_agency:
     lineage:
       - datalake_hubspot.company_history.tag_real_estate_agency
+    description: 'Tag of the real estate agency, in the format "[3P-shortname]"'
   extracted_3p_tag:
     lineage:
       - datalake_hubspot.company_history.extracted_3p_tag
+    description: 'Represents the real estate agency. It is extracted from the tag
+      column, like "[3P-<extracted_3p_tag>]"'
+  member_type:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: 'Type of the member, as in ForSale or ForRent.'
+    categories:
+      'B2B Sales': ForSale
   member_category:
     lineage:
       - datalake_hubspot.company_history.member_category
+    description: Category of the member.
+    categories:
+      Prata: 'Silver'
+      Ouro: 'Gold'
+      Diamante: 'Diamond'
   member_category_history:
     lineage:
       - datalake_hubspot.company_history.member_category_history
+    description: History of the member category.
   lead_origin:
     lineage:
       - datalake_hubspot.company_history.lead_origin
+    description: Origin of the lead.
   phone:
     lineage:
       - datalake_hubspot.company_history.phone
+    description: Main phone number for the company.
   partnership_type:
     lineage:
       - datalake_hubspot.company_history.partnership_type
+    description: 'Type of partnership with the company. Example: "Imobiliária" or
+      "Assessoria"'
   first_conversion_event_name:
     lineage:
       - datalake_hubspot.company_history.first_conversion_event_name
+    description: Name of the first form sent to all contacts associated to this company.
   hs_analytics_first_touch_converting_campaign:
     lineage:
       - datalake_hubspot.company_history.hs_analytics_first_touch_converting_campaign
+    description: Campaign responsible for the creation of the first contact associated
+      with this company.
   crm:
     lineage:
       - datalake_hubspot.company_history.crm
+    description: Which CRM the Company uses.
   partner_agencies:
     lineage:
       - datalake_hubspot.company_history.partner_agencies
+    description: Other real estate agencies the company is partner with.
   advertising_portals:
     lineage:
       - datalake_hubspot.company_history.advertising_portals
+    description: Advertising portals the company uses.
   rental_guarantee_solutions:
     lineage:
       - datalake_hubspot.company_history.rental_guarantee_solutions
+    description: Rental guarantee solutions the company uses.
   real_estate_agency_focus:
     lineage:
       - datalake_hubspot.company_history.real_estate_agency_focus
+    description: 'Focus of the real estate agency, such as "Venda" (Sale), "Locação"
+      (Rent) or "Venda e Locação"'
   financing_banks:
     lineage:
       - datalake_hubspot.company_history.financing_banks
+    description: Financing banks associated with the company.
   cnpj:
     lineage:
       - datalake_hubspot.company_history.cnpj
+    description: CNPJ of the company.
   creci:
     lineage:
       - datalake_hubspot.company_history.creci
+    description: CRECI of the real estate agent in contact.
   products_of_interest:
     lineage:
       - datalake_hubspot.company_history.products_of_interest
+    description: Products the company is interested in.
   lead_status:
     lineage:
       - datalake_hubspot.company_history.lead_status
+    description: Status of the company lead in HubSpot.
   lead_status_history:
     lineage:
       - datalake_hubspot.company_history.lead_status_history
+    description: History of the company lead status in HubSpot.
   num_associated_deals:
     lineage:
       - datalake_hubspot.company_history.num_associated_deals
+    description: Number of deals associated with the company.
   num_associated_contacts:
     lineage:
       - datalake_hubspot.company_history.num_associated_contacts
+    description: Number of contacts associated with the company.
   monthly_average_new_rental_contracts:
     lineage:
       - datalake_hubspot.company_history.monthly_average_new_rental_contracts
+    description: Monthly average of new rental contracts.
   num_managers:
     lineage:
       - datalake_hubspot.company_history.num_managers
+    description: Number of managers.
   num_managed_properties:
     lineage:
       - datalake_hubspot.company_history.num_managed_properties
+    description: Number of managed properties.
   num_monthly_leads:
     lineage:
       - datalake_hubspot.company_history.num_monthly_leads
+    description: Number of monthly leads.
   average_sale_property_ticket:
     lineage:
       - datalake_hubspot.company_history.average_sale_property_ticket
+    description: Average ticket of a property for sale (R$)
   average_rent_property_ticket:
     lineage:
       - datalake_hubspot.company_history.average_rent_property_ticket
+    description: Average ticket of a property for rent (R$)
   monthly_repayment_volume_in_real:
     lineage:
       - datalake_hubspot.company_history.monthly_repayment_volume_in_real
+    description: Monthly repayment volume (VGV R$)
   monthly_sale_volume_in_real:
     lineage:
       - datalake_hubspot.company_history.monthly_sale_volume_in_real
+    description: Monthly sale volume (R$)
   num_real_estate_agents:
     lineage:
       - datalake_hubspot.company_history.num_real_estate_agents
+    description: Number of real estate agents.
   num_properties_for_sale:
     lineage:
       - datalake_hubspot.company_history.num_properties_for_sale
+    description: Number of properties for sale.
   num_properties_for_rent:
     lineage:
       - datalake_hubspot.company_history.num_properties_for_rent
+    description: Number of properties for rent.
   has_crm:
     lineage:
       - datalake_hubspot.company_history.has_crm
+    description: True if the company has a CRM.
   has_property_advertisement_online:
     lineage:
       - datalake_hubspot.company_history.has_property_advertisement_online
+    description: Whether or not the company advertises properties online.
   is_correspondent_bank:
     lineage:
       - datalake_hubspot.company_history.is_correspondent_bank
+    description: Whether or not the company acts as a correspondent bank.
   is_lost:
     lineage:
       - datalake_hubspot.company_history.is_lost
+    description: Whether or not the lead is lost.
   has_financing:
     lineage:
       - datalake_hubspot.company_history.has_financing
+    description: Whether or not the company works with financing.
   is_for_sale:
     lineage:
       - datalake_hubspot.company_history.is_for_sale
+    description: 'Whether or not the company works with sale. Not the same as member_type!
+      The company might work with sale, but only send rent leads, for example.'
   is_for_rent:
     lineage:
       - datalake_hubspot.company_history.is_for_rent
+    description: 'Whether or not the company works with rent. Not the same as member_type!
+      The company might work with rent, but only send sale leads, for example.'
   has_partnerships_with_other_agencies:
     lineage:
       - datalake_hubspot.company_history.has_partnerships_with_other_agencies
+    description: Whether or not the company has partnerships with other real estate
+      agencies.
   is_natural_person:
     lineage:
       - datalake_hubspot.company_history.is_natural_person
+    description: If the company is a natural person (PF).
   is_juridical_person:
     lineage:
       - datalake_hubspot.company_history.is_juridical_person
+    description: If the company is a juridical person (PJ).
   is_archived:
     lineage:
       - datalake_hubspot.company_history.is_archived
+    description: Whether or not the company has been archived on HubSpot.
   ts_first_conversion:
     lineage:
       - datalake_hubspot.company_history.ts_first_conversion
+    description: Time when the first form was sent to all contacts associated to this
+      company.
   ts_recent_deal_close:
     lineage:
       - datalake_hubspot.company_history.ts_recent_deal_close
+    description: Time when the last deal was closed with this company.
   ts_hubspot_owner_assigned:
     lineage:
       - datalake_hubspot.company_history.ts_hubspot_owner_assigned
+    description: Time when the HubSpot owner was assigned to this company.
   ts_last_logged_call:
     lineage:
       - datalake_hubspot.company_history.ts_last_logged_call
+    description: Time of the last logged call associated with this company.
   ts_notes_last_updated:
     lineage:
       - datalake_hubspot.company_history.ts_notes_last_updated
+    description: 'Time when the last note, call, meeting or task was registered for
+      this company.'
   ts_archived:
     lineage:
       - datalake_hubspot.company_history.ts_archived
+    description: Time when the company was archived in HubSpot.
   ts_created:
     lineage:
       - datalake_hubspot.company_history.ts_created
+    description: Time when the company lead was created in HubSpot.
   ts_updated:
     lineage:
       - datalake_hubspot.company_history.ts_updated
+    description: Time when the row was last updated.
   year:
     lineage:
       - datalake_hubspot.company_history.year
+    description: Year of the update.
   month:
     lineage:
       - datalake_hubspot.company_history.month
+    description: Month of the update.
   day:
     lineage:
       - datalake_hubspot.company_history.day
+    description: Day of the update.

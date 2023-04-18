@@ -87,6 +87,7 @@ tables:
         - quantidade_de_imoveis_a_venda
         - hs_parent_company_id
         - categoria_do_membro
+        - tipo_de_membro
       propertiesWithHistory:
         - hs_lead_status
         - categoria_do_membro

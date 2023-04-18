@@ -37,6 +37,22 @@ columns:
     lineage:
     - datalake_hubspot.company.lead_status
     description: Status of the company lead in HubSpot.
+  product:
+    description: Product of interest in Rede QuintoAndar, which can be "3P BH" or
+      "3P 5A". It will only be "3P BH" if the team responsible for the deal is "BH
+      Sul" or "BH Norte". Otherwise, it will be "3P 5A".
+  member_category:
+    lineage:
+      - datalake_hubspot.company_history.member_category
+    description: Category of the member.
+    categories:
+      Prata: 'Silver'
+      Ouro: 'Gold'
+      Diamante: 'Diamond'
+  member_type:
+    description: 'Type of the member, as in ForSale or ForRent.'
+    categories:
+      'B2B Sales': ForSale
   address:
     lineage:
     - datalake_hubspot.company.address
@@ -258,10 +274,6 @@ columns:
     lineage:
     - datalake_hubspot.company.ts_updated
     description: Time when the row was last updated.
-  product:
-    description: Product of interest in Rede QuintoAndar, which can be "3P BH" or
-      "3P 5A". It will only be "3P BH" if the team responsible for the deal is "BH
-      Sul" or "BH Norte". Otherwise, it will be "3P 5A".
   is_partner:
     description: Whether or not the company is currently a partner. This means the
       lead status is either "Membro", "Parceiro" or "Em processo tombamento".

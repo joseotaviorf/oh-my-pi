@@ -31,6 +31,7 @@ SELECT
     NULLIF(GET_JSON_OBJECT(properties, '$.name'), '') AS name,
     NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '') AS tag_real_estate_agency,
     NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') AS extracted_3p_tag,
+    NULLIF(GET_JSON_OBJECT(properties, '$.tipo_de_membro'), '') AS member_type,
     NULLIF(GET_JSON_OBJECT(properties, '$.categoria_do_membro'), '') AS member_category,
     FROM_JSON(
         GET_JSON_OBJECT(properties_with_history, '$.categoria_do_membro'),
