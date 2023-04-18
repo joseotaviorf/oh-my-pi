@@ -1,0 +1,68 @@
+database_name: datalake_sale_listings_scores
+table_name: premium_tier
+description: 'An enriched table that aims to create the Premium score of the ForSale listings, where we would be able to understand what type of supply is a given listing. 
+  This score is totally linked to the price changes of a listing. If it changes its price and changes its score, a new row will be created.
+  Where, each row of this table represents the score for a given listings pricing. ' 
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.id_house
+    description:  Column referring to the house ID. Can be joined with dw_quintoandar.dim_house
+      and all other sale modeling tables.
+  id_region:
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.id_region
+    description: ID column of region where house listing is located in. Can be joined
+      with dw_public.dim_region.
+  price_bins:
+    description: This column represents a segmentation of the properties based on the price at which they were published. That is, grouping the properties by price range.
+    categories:
+      T00 [120k-300k): Represents the price range from minimum price to 300K.
+      T01 [300k-500k): Represents the price range from 300K to 500K.
+      T02 [500k-700k): Represents the price range from 500K to 700K.
+      T03 [700k-900k):  Represents the price range from 700K to 900K.
+      T04 [900k-1.2M):  Represents the price range from 900K to 1.2M.
+      T05 [1.2M-1.6M): Represents the price range from 1.2M to 1.6M.
+      T06 [1.6M-2M): Represents the price range from 1.6M to 2M.
+      T07 [2M-2.5M): Represents the price range from 2M to 2.5M.
+      T08 [2.5M,20M]: Represents the price range from 2.5M to 20M.
+      TXX Undefined: Unidentified range (price null or out of bounds.).
+  price_m2_bins:
+    description: This column represents the segmentation of the listings in relation to their price per square meter. Analogously to the segmentation by price, this one also considers the square footage to understand if the price charged makes sense.
+    categories:
+      TA00 [0k-5k): Represents the price range per square meter from 0 to 5K.
+      TA01 [5k-10k): Represents the price range per square meter from 5K to 10K.
+      TA02 [10k-15k): Represents the price range per square meter from 10K to 15K.
+      TA03 [15k-20k): Represents the price range per square meter from 15K to 20K.
+      TA04 >20k: Represents the price range per square meter greater than 20K.
+  tier: 
+    description: 'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level". In other words, we use two components to define the tier, the price and the price per square meter, so we understand which level of the property we are dealing with. 
+    E. g: A 3KK property with 1000m2 will have a m2 price of 3K. Where it will have a high price tier and a very low price m2. With that, we can think that if the square meter is not so expensive, it is not so premium, just a big property.'
+    categories:
+      P0: The highest tier in the Premium concept (High End Premium). It can have either a very high price, or a very high price per square meter, or a combination of both.
+      P1: Represents High Premium listing niche. It has a high combination of value and price per square meter.
+      P2: Represent  Standards Listings. These are properties with average price and average price per square meter as well.
+      P3: Represent Simple Listings. These are properties with a combination of price and price per square meter between low and medium.
+      P4:  Represent the Basic Listings. Where are the listings with a combination of low price and a low price per square meter.
+  tier_name: 
+    description: Just a long name for the expensive Tier segment.
+    categories:
+      High End Premium: It represents the P0 category of the tier. Listings with a combination of high price and a high price per square meter.
+      High Premium: It represents the P1 tier category. Listings with a combination of a relatively high price and a high price per square meter in the same proportions.
+      Standard Premium: It represents the tier P2 category. Listings with an average combination of price and price per square meter.
+      Simple Premium: It represents the tier P3 category. Listings with a relatively low combination of price and price per square meter.
+      Basic Premium: It represents the tier P4 category. Listings with a low combination of price and price per square meter.
+  tier_disclaimer:
+    description: Column that shows us, in full, the combination of factors/bins concerning the listing, where with this, we classify it within a tier.
+  is_last_tier:
+    description: This column represents a Boolean flag that indicates whether the tier referring to the observed row is the current tier or a tier that is part of a listing's history.
+  ts_score_started:
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.ts_price_started
+    description: Date of the price change that caused the change in the Listing Premium score.
+  ts_score_ended:
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.ts_price_started
+    description: Date of the second-to-last price change (for the observed row) that caused the Listing Premium Score to change.

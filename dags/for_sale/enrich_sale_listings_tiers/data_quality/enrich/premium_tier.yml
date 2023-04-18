@@ -1,0 +1,22 @@
+---
+table_name: datalake_sale_listings_scores.premium_tier
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 90000
+column_level_validations:
+  id_house:
+    is_complete:
+      severity_level: Error
+  id_region:
+    is_complete:
+      severity_level: Error
+  price_bins:
+    is_complete:
+      severity_level: Error
+  price_m2_bins:
+    is_complete:
+      severity_level: Error
+  score:
+    is_complete:
+      severity_level: Error
