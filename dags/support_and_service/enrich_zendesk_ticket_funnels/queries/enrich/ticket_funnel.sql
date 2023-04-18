@@ -115,7 +115,7 @@ union_historical_chat_with_zendesk AS (
                 ) THEN 'call'
             WHEN t.ticket_via IN ('api')
                 AND tags LIKE '%form%' THEN 'form_faq'
-            WHEN t.ticket_via IN ('web', 'email', 'chat') THEN t.ticket_via
+            WHEN t.ticket_via IN ('web', 'email', 'chat', 'whatsapp') THEN t.ticket_via
             ELSE 'other'
         END AS channel,
         NULL AS department_name,
