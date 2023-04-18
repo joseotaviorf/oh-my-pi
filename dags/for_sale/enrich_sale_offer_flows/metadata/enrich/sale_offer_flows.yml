@@ -132,6 +132,10 @@ columns:
   payment_model:
     lineage:
       - datalake_sales_flow_clean.payment.payment_model
+  payment_method:
+    description: Offer payment method.
+    lineage:
+      - datalake_sales_flow_clean.payment.payment_method
   consultant_name:
     lineage:
       - datalake_sales_flow.offer_specialists.consultant_name
@@ -240,8 +244,10 @@ columns:
       - datalake_sales_flow_clean.payment.entry_amount
     description: Value paid by the buyer on the beginning of the contract.
   credit_status:
+    description: Credit analysis status.
     lineage:
       - datalake_sales_flow_clean.mortgage.credit_status
+      - datalake_sale_offer_flows.sale_offer_status.credit_analysis_status_name
   real_estate_register_office_status:
     lineage:
       - datalake_sales_flow_clean.notary.status

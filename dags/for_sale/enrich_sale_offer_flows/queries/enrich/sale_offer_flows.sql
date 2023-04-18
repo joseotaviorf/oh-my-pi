@@ -1,4 +1,4 @@
--- FLOW TYPE CTE
+  -- FLOW TYPE CTE
 WITH flow_type AS (
     WITH last_sf_entry AS (
         SELECT
@@ -62,7 +62,7 @@ offers AS (
     LEFT JOIN
         first_offer_entry AS f
             ON l.id_firestore = f.id_firestore
-    
+
 ),
 -- SALES FLOW CTE
 last_update_sales_flow AS (
@@ -283,6 +283,7 @@ payment AS (
         p.id_sales_flow,
         p.status,
         p.payment_model,
+        p.payment_method,
         p.fgts_value,
         p.entry_amount,
         p.down_payment_value
@@ -463,6 +464,19 @@ onboarding_status AS (
   WHERE
       macro_status_name = 'ONBOARDING'
       AND DATE(ts_macro_status_end) > DATE('2022-04-12')
+),
+credit_analysis_status AS (
+    SELECT
+        id_sales_flow,
+        id_firestore AS id_offer,
+        last_micro_status_name AS credit_analysis_status_name
+    FROM
+        datalake_sale_offer_flows.sale_offer_status
+    WHERE
+        macro_status_name = "CREDIT_ANALYSIS"
+        AND DATE(ts_macro_status_end) > DATE('2022-04-12')
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_sales_flow, macro_status_name ORDER BY ts_micro_status_last_update DESC) = 1
 ),
 -- TAG CTE
 last_update_tag AS (
@@ -667,6 +681,7 @@ SELECT
     END AS drop_reason_responsible,
     mg.credit_model AS credit_model,
     p.payment_model,
+    p.payment_method,
     sp.consultant_name,
     sp.consultant_email,
     sp.team_lead_name,
@@ -702,7 +717,7 @@ SELECT
     p.status AS payment_status,
     p.fgts_value,
     p.entry_amount,
-    mg.credit_status AS credit_status,
+    COALESCE(cas.credit_analysis_status_name, mg.credit_status) AS credit_status,
     n.status AS real_estate_register_office_status,
     cp.status_notary_notes AS notary_office_status,
     cp.crn_details AS notary_office_details,
@@ -842,6 +857,9 @@ LEFT JOIN
 LEFT JOIN
     rescue_flow AS rf
         ON off.id_sales_flow = rf.id_sales_flow
+LEFT JOIN
+    credit_analysis_status AS cas
+        ON cas.id_sales_flow = sf.id
 WHERE
     tag.label IS NULL
     OR tag.label NOT LIKE '%#offertestedeproduto%'
