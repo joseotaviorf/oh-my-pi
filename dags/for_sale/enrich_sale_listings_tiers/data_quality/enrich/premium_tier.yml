@@ -17,6 +17,6 @@ column_level_validations:
   price_m2_bins:
     is_complete:
       severity_level: Error
-  score:
+  tier:
     is_complete:
       severity_level: Error
