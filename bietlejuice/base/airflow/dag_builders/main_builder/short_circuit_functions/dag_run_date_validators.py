@@ -40,10 +40,7 @@ class DAGRunDateValidators:
         return business_date_in_month
 
     def first_business_day_of_month(self):
-        business_days = self.business_days()
-        first_day_validate = business_days[0]
-
         return (
-            self.dag_execution_date not in self.holidays
-            and self.dag_execution_date == first_day_validate
+            self.dag_execution_date in self.business_days()
+            and self.dag_execution_date not in self.holidays
         )
