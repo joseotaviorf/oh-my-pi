@@ -51,7 +51,6 @@ SELECT
     Coringa_35 AS joker_35,
     Coringa_36 AS joker_36,
     Coringa_37 AS joker_37,
-    Coringa_38 AS joker_38,
     Coringa_38R AS joker_38r,
     Coringa_39 AS joker_39,
     Coringa_40 AS joker_40,
