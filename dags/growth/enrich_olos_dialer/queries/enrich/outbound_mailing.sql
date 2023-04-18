@@ -37,7 +37,7 @@ SELECT
     mailing.month,
     mailing.day
 FROM
-    datalake_discador_olos_clean.mailing
+    datalake_olos_dialer_clean.mailing
 LEFT JOIN
     campaign_last_register AS campaign
         ON campaign.id_campaign = mailing.id_campaign
@@ -48,5 +48,5 @@ LEFT JOIN
     customer_last_register AS customer
         ON customer.id_customer = campaign_customer.id_customer
 WHERE
-    DATE(CONCAT(m.year, '-', m.month, '-', m.day)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(CONCAT(mailing.year, '-', mailing.month, '-', mailing.day)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND customer.name = 'Inside Sales'
