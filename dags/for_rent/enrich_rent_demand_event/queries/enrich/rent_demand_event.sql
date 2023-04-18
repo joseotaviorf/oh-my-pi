@@ -35,7 +35,9 @@ WITH rent_flow_house_listing AS (
   LEFT JOIN datalake_ebdb_listing.listing_business_context lbc
     ON lbc.id_house = h.id
   WHERE 
-    lbc.business_context = 'RENT'
+    (lbc.business_context = 'RENT'
+    OR lbc.business_context IS NULL) -- Some properties exists on the House table but not on LBC. In order to keep the same rule/results
+      -- that we have on the fact_listing_rent_flows, we decided to add another filter considering the business context as null. 
     AND (
       COALESCE(bk.visit_intent, '') <> 'SALE'
       OR (
