@@ -16,9 +16,6 @@ columns:
   id_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.type
-  id_tenant:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.delinquency.tenant
   id_user_insert:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.userinsert

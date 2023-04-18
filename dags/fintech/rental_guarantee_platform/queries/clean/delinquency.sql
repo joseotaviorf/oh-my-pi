@@ -3,7 +3,6 @@ SELECT
     CAST(propose AS BIGINT) AS id_propose,
     status AS id_status,
     type AS id_type,
-    tenant AS id_tenant,
     userinsert AS id_user_insert,
     userupdate AS id_user_update,
     subcategory,
