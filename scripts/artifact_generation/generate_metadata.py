@@ -5,9 +5,9 @@ import re
 from os.path import join
 from pathlib import Path
 
-import pyaml
+import yaml
 
-from sql_metadata import Parser
+from sqlglot import parse_one, exp
 
 path = Path(__file__).absolute()
 BIETLEJUICE_ROOT = path.parent.parent.parent.absolute()
@@ -19,7 +19,7 @@ DAY_COL_STRING = """day
 def create_yml_for_table(
     sql, database_name, table_name, sql_file_path, dag_owner=None, do_lineage=True
 ):
-    sql_parser = Parser(sql)
+    # sql_parser = Parser(sql)
     print(
         f'{{"vendor": ["datahub"],"database_name": "{database_name}", "table_name": "{table_name}"}},'
     )
@@ -36,23 +36,15 @@ def create_yml_for_table(
         "columns": {},
     }
 
-    alias_columns = {}
-    for alias, column in sql_parser.columns_aliases.items():
-        if isinstance(column, list):
-            if len(column) > 0:
-                alias_columns[column[0]] = alias
-        else:
-            alias_columns[column] = alias
-
-    if DAY_COL_STRING in sql and "day" not in sql_parser.columns:
-        sql_parser._columns.extend(["day"])
-    for column in sql_parser.columns:
-        alias = alias_columns.get(column) or column
-        yml_body["columns"][alias.lower()] = {"description": None}
-        if do_lineage:
-            yml_body["columns"][alias.lower()].update(
-                {"lineage": [f"{sql_parser.tables[0].lower()}.{column.lower()}"]}
-            )
+    sql_parser = parse_one(sql)
+    for column in sql_parser.expressions:
+        yml_body["columns"][column.output_name] = {"description": ""}
+        if do_lineage: ## TODO review how to treat lineage for more complex cases
+            first_table_name = sql_parser.find(exp.Table).db + "." + sql_parser.find(exp.Table).name
+            yml_body["columns"][column.output_name].update(
+                        {"lineage": [f"{first_table_name}.{column.this}"]}
+                        )
+    
 
     return yml_body
 
@@ -62,13 +54,13 @@ def save_yml(file_path, yml_body):
 
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w+") as f:
-        pyaml.dump(yml_body, f, sort_keys=False, explicit_start=True)
+        yaml.dump(yml_body, f, sort_keys=False, explicit_start=True)
 
 
 if __name__ == "__main__":
     """
     To use the script, first run the following command:
-    make requirements-scripts-python3
+    make requirements-scripts
     """
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("--folder", "-f", required=True, help="dag name folder")
