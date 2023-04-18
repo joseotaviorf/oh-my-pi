@@ -28,7 +28,7 @@ create_business_bins AS (
       WHEN sale_price >= 1200000 AND sale_price < 1600000 THEN "T05 [1.2M-1.6M)"
       WHEN sale_price >= 1600000 AND sale_price < 2000000 THEN "T06 [1.6M-2M)"
       WHEN sale_price >= 2000000 AND sale_price < 2500000 THEN "T07 [2M-2.5M)"
-      WHEN sale_price >= 2500000 AND sale_price <= 20000000  "T08 [2.5M,20M]"
+      WHEN sale_price >= 2500000 AND sale_price <= 20000000  THEN "T08 [2.5M,20M]"
       ELSE "TXX Undefined" 
     END AS sale_price_bins,
     CASE 
