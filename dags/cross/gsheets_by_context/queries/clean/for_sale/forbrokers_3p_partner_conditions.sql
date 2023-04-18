@@ -3,6 +3,7 @@ SELECT
     NULLIF(partner_short_name, '') AS partner_short_name,
     NULLIF(category, '') AS category,
     NULLIF(state, '') AS state,
+    NULLIF(city_group, '') AS city_group,
     NULLIF(city, '') AS city,
     CAST(NULLIF(brokerage, '') AS FLOAT) AS brokerage,
     CAST(NULLIF(platform_fee, '') AS FLOAT) AS platform_fee,

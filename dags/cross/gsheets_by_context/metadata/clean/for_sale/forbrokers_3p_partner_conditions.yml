@@ -13,6 +13,9 @@ columns:
   state:
     lineage:
       - datalake_gsheets_raw.forbrokers_3p_partner_conditions.state
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.city_group
   city:
     lineage:
       - datalake_gsheets_raw.forbrokers_3p_partner_conditions.city
