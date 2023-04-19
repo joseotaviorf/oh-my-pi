@@ -1524,6 +1524,8 @@ bietlejuice.enrich_jira:
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-clean-house
   - bietlejuice.kill_queue:load-clean-reservation
+bietlejuice.enrich_kong_ss:
+  - bietlejuice.kong:load-clean-kong-logs
 bietlejuice.enrich_label_studio:
   - bietlejuice.label_studio:load-clean-annotations
 bietlejuice.enrich_lead:
