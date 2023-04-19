@@ -1,30 +1,45 @@
 ---
 tables:
   image_inspection:
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
     date_filter_column: updated_at
   image_inspection_raw:
-    extraction_type: full
+    raw_extraction_type: full
+    clean_extraction_type: full
   image_inspection_group:
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
+    date_filter_column: updated_at
+  image_inspection_group_result:
+    raw_extraction_type: incremental
+    clean_extraction_type: full
     date_filter_column: updated_at
   image_inspection_group_raw:
-    extraction_type: full
+    raw_extraction_type: full
+    clean_extraction_type: full
   photo:
-    extraction_type: full
+    raw_extraction_type: full
+    clean_extraction_type: full
   photo_aud:
-    extraction_type: full
+    raw_extraction_type: full
+    clean_extraction_type: full
   photosphere:
-    extraction_type: full
+    raw_extraction_type: full
+    clean_extraction_type: full
     clean_table_name: photo_sphere
   photosphere_aud:
-    extraction_type: full
+    raw_extraction_type: full
+    clean_extraction_type: full
     clean_table_name: photo_sphere_aud
   userrevisionentity:
-    extraction_type: full
+    raw_extraction_type: full
+    clean_extraction_type: full
     clean_table_name: user_revision_entity
   video:
-    extraction_type: full
+    raw_extraction_type: full
+    clean_extraction_type: full
   video_aud:
-    extraction_type: full
+    raw_extraction_type: full
+    clean_extraction_type: full
 partition_cols: ["year", "month", "day"]

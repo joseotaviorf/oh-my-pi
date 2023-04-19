@@ -89,12 +89,11 @@ task_group = DatalakeTaskGroup(
 
 for table_name, table_config in tables.items():
     clean_table_name = table_config.get("clean_table_name", table_name)
-    is_incremental = table_config["extraction_type"] == "incremental"
     parameters = [SOURCE, table_name]
 
     extended_parameters = [
         "{{ ds }}",
-        table_config["extraction_type"],
+        table_config["raw_extraction_type"],
         table_config.get("date_filter_column", "updated_at"),
     ]
 
@@ -109,12 +108,13 @@ for table_name, table_config in tables.items():
         raw_spark_job_extra_args=parameters,
     )
 
+    is_incremental_clean = table_config["clean_extraction_type"] == "incremental"
     clean_task_group = task_group.build_clean_task_group(
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         table_name=clean_table_name,
-        is_incremental=is_incremental,
-        partitions=partition_cols if is_incremental else None,
+        is_incremental=is_incremental_clean,
+        partitions=partition_cols if is_incremental_clean else None,
     )
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))

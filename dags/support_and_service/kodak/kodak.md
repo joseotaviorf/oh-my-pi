@@ -44,9 +44,11 @@ This pipeline produces the following output tables, via **incremental** load:
 1. In datalake raw:
     - `image_inspection`
     - `image_inspection_group`
+    - `image_inspection_group_result`
 
 1. In datalake clean:
     - `image_inspection`
     - `image_inspection_group`
+    - `image_inspection_group_result`
 ​
 </details>

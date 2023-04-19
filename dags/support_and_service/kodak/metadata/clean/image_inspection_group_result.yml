@@ -1,0 +1,95 @@
+---
+database_name: datalake_kodak_clean
+table_name: image_inspection_group_result
+owner: gustavo.miller@quintoandar.com.br
+domain: support_and_service
+description: Every row of this table is an image inspection group result, which associates inspection group and business context.
+  The result can be different between Sale and Rent.
+columns:
+  id:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.id
+    description: 'Primary key of the table. Id of the result.'
+  id_group:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.id_group
+    description: 'ID of the image inspection group.'
+  business_context:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.business_context
+    description: 'Business context of the result.'
+    categories:
+      SALE: Result of the image inspection group in the context of Sale.
+      RENT: Result of the image inspection group in the context of Rent.
+  has_red_flags:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.red_flags
+    description: True if there are red flags in the result.
+  has_bonus_good_sharpness:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.bonus_good_sharpness
+    description: True if there is a bonus for good sharpness of the images.
+  has_bonus_aspect_ratio:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.bonus_aspect_ratio
+    description: True if there is a bonus for aspect ratio of the images.
+  has_bonus_images_per_room:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.bonus_images_per_room
+    description: True if there is a bonus for images per room.
+  has_bonus_view:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.bonus_view
+    description: True if there is a bonus for the view identified in the images.
+  has_bonus_external:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.bonus_external
+    description: True if there is any external bonus identified for the images.
+  has_red_flag_images_per_room:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.red_flag_images_per_room
+    description: True if there is a red flag due to images per room.
+  has_red_flag_property_condition:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.red_flag_property_condition
+    description: True if there is a red flag due to the property condition.
+  has_red_flag_primary_risk:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.red_flag_primary_risk
+    description: True if there is a red flag due to primary risk.
+  is_approved:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.approved
+    description: True if the image inspection group is approved in this context.
+  total_faults:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.total_faults
+    description: Number of faults identified in the inspection.
+  score:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.score
+    description: Score of the inspection group.
+  approval_score_threshold:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.approval_score_threshold
+    description: Minimum score necessary for approval of the inspection group.
+  ts_created:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.created_at
+    description: Timestamp of when the image inspection group result was created.
+  ts_updated:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.updated_at
+    description: Timestamp of when the image inspection group result was last updated.
+  year:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.year
+    description: Year of when the image inspection group result was last updated.
+  month:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.month
+    description: Month of when the image inspection group result was last updated.
+  day:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.day
+    description: Day of when the image inspection group result was last updated.
