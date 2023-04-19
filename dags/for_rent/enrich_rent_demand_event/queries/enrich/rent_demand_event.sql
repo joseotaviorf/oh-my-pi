@@ -13,7 +13,7 @@ WITH rent_flow_house_listing AS (
     h.id_region,
     h.id_user,
     rf.id_booking,   
-    rf.id_offer,
+    rf.id_offer_context AS id_offer,
     rf.id_proposal,
     COALESCE(h.country_code, 'Undefined') AS country_code
   FROM
@@ -122,9 +122,9 @@ rent_demand_events AS (
     AND DAY(dt_booking) = {day}
   UNION ALL
   SELECT --offer_submitted 
-    off.id AS id_event,
+    off.id_offer_context AS id_event,
     rf.id_booking,
-    off.id AS id_offer,
+    off.id_offer_context AS id_offer,
     rf.id_proposal,
     rf.id_contract,                                                                         
     3 AS id_event_type,                                                                                   
@@ -144,7 +144,7 @@ rent_demand_events AS (
     datalake_offer.offer AS off
   JOIN
     rent_flow_house_listing AS rf
-      ON rf.id_offer= off.id
+      ON rf.id_offer = off.id_offer_context
   WHERE 
     off.is_offer_submitted = TRUE
     AND ts_first_sent IS NOT NULL
@@ -153,9 +153,9 @@ rent_demand_events AS (
     AND DAY(ts_first_sent) = {day}
   UNION ALL
   SELECT --offer_accepted
-    off.id AS id_event,
+    off.id_offer_context AS id_event,
     rf.id_booking,
-    off.id AS id_offer,
+    off.id_offer_context AS id_offer,
     rf.id_proposal,
     rf.id_contract,                                                                           
     4 AS id_event_type,                                                                                 
@@ -175,7 +175,7 @@ rent_demand_events AS (
     datalake_offer.offer AS off
   JOIN
     rent_flow_house_listing AS rf
-      ON rf.id_offer = off.id
+      ON rf.id_offer = off.id_offer_context
   WHERE 
     off.status = 'Aprovada'
     AND ts_analyzed IS NOT NULL
@@ -206,7 +206,7 @@ rent_demand_events AS (
     datalake_proposal.proposal AS pp
   JOIN
     datalake_offer.offer AS off
-      ON off.id = pp.id_offer 
+      ON off.id = pp.id_offer
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_proposal = pp.id
