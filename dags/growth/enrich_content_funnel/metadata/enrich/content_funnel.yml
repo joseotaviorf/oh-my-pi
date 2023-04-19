@@ -30,6 +30,12 @@ columns:
       - datalake_top_of_funnel_demand.user_interactions.mkt_source
       - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_source
       - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_source
+  utm_source:
+    description: Source of URL parameters
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_source
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_source
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.utm_source
   utm_medium:
     description: Medium of URL parameters
     lineage:
@@ -95,7 +101,19 @@ columns:
   is_first_booking:
     description: Identifies whether it is a tof user
   dt_event:
-    description: ToF, Tenant/Buyer Prospects date
+    description: ToF, Tenant/Buyer Prospects date.
     lineage:
       - datalake_online_attribution.online_attribution.ts_event
+      - datalake_top_of_funnel_demand.user_interactions.dt_event
+  year:
+    description: Event year.
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.dt_event
+  month:
+    description: Event month.
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.dt_event
+  day:
+    description: Event day.
+    lineage:
       - datalake_top_of_funnel_demand.user_interactions.dt_event

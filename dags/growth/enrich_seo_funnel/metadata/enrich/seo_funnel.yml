@@ -74,3 +74,15 @@ columns:
     lineage:
       - datalake_online_attribution.online_attribution.ts_event
       - datalake_top_of_funnel_demand.user_interactions.dt_event
+  year:
+    description: Event year.
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.dt_event
+  month:
+    description: Event month.
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.dt_event
+  day:
+    description: Event day.
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.dt_event

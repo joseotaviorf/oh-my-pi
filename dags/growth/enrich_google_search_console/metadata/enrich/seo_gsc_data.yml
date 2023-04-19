@@ -34,7 +34,7 @@ columns:
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     slug:
-      description: The URL content that comes after a website's domain
+      description: The URL content that comes after a website's domain.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     subtitle_content:
