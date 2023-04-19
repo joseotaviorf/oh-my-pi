@@ -1,13 +1,13 @@
 WITH log_union AS (
     (
         SELECT
-            't1' as origin_table,
+            't1' AS origin_table,
             CAST(id AS STRING) AS id,
             id_proposal,
             id_current_status,
             id_previous_proposal_situation,
             id_current_proposal_situation,
-            lag(ts_current_log) over(partition by id_proposal,id_current_status order by ts_current_log) as ts_previous_log,
+            lag(ts_current_log) OVER(PARTITION BY id_proposal,id_current_status ORDER BY ts_current_log) AS ts_previous_log,
             ts_current_log
         FROM
             datalake_atta_clean.log_isolve_v1
@@ -15,22 +15,22 @@ WITH log_union AS (
     UNION
     (
         SELECT
-            't2' as origin_table,
+            't2' AS origin_table,
             id,
             CAST(id_proposal AS INTEGER) AS id_proposal,
-            CAST(GET_JSON_OBJECT(to, '$.Status') AS INTEGER) AS id_current_status,
-            CAST(GET_JSON_OBJECT(from, '$.Situacao') AS INTEGER) AS id_previous_proposal_situation,
-            CAST(GET_JSON_OBJECT(to, '$.Situacao') AS INTEGER) AS id_current_proposal_situation,
-            CAST(GET_JSON_OBJECT(from, '$.DtUltAtu') AS TIMESTAMP) AS ts_previous_log,
+            CAST(GET_JSON_OBJECT(TO, '$.Status') AS INTEGER) AS id_current_status,
+            CAST(GET_JSON_OBJECT(FROM, '$.Situacao') AS INTEGER) AS id_previous_proposal_situation,
+            CAST(GET_JSON_OBJECT(TO, '$.Situacao') AS INTEGER) AS id_current_proposal_situation,
+            CAST(GET_JSON_OBJECT(FROM, '$.DtUltAtu') AS TIMESTAMP) AS ts_previous_log,
             to_utc_timestamp(GET_JSON_OBJECT(to, '$.DtUltAtu') , 'UTC+3') AS ts_current_log
         FROM
             datalake_atta_clean.log_isolve_v2
         WHERE
-            GET_JSON_OBJECT(to, '$.Status') IS NOT NULL
+            GET_JSON_OBJECT(TO, '$.Status') IS NOT NULL
             AND type_operation = 'Proposta'
     )
     ),
-base AS (
+    base AS (
 SELECT
         origin_table,
         log.id_proposal,
@@ -50,6 +50,7 @@ SELECT
             WHEN 11 THEN 'Não Passível de Defesa'
             WHEN 12 THEN 'Revisão'
             WHEN 13 THEN 'Não Processado Banco'
+            WHEN 14 THEN 'Divergência de Cadastro'
         END AS proposal_previous_situation,
         CASE log.id_current_proposal_situation
             WHEN 1 THEN 'Andamento'
@@ -65,14 +66,16 @@ SELECT
             WHEN 11 THEN 'Não Passível de Defesa'
             WHEN 12 THEN 'Revisão'
             WHEN 13 THEN 'Não Processado Banco'
+            WHEN 14 THEN 'Divergência de Cadastro'
         END AS proposal_next_situation,
         pp.ts_registration AS ts_proposal_registration,
         log.ts_previous_log AS ts_start_situation,
         log.ts_current_log AS ts_end_situation,
-        datediff(hour,COALESCE(log.ts_previous_log,pp.ts_registration),log.ts_current_log) AS leadtime_situation_in_hour,
+        DATEDIFF(HOUR,COALESCE(log.ts_previous_log,pp.ts_registration),log.ts_current_log) AS leadtime_situation_in_hour,
+        DATEDIFF(DAY,COALESCE(log.ts_previous_log,pp.ts_registration),log.ts_current_log) AS leadtime_situation_in_day,
         MIN(log.ts_current_log) OVER (PARTITION BY log.id_proposal, pre.proposal_status ORDER BY log.id_proposal, pre.proposal_status) AS min_ts_step,
         MAX(log.ts_current_log) OVER (PARTITION BY log.id_proposal, pre.proposal_status ORDER BY log.id_proposal, pre.proposal_status) AS max_ts_step,
-        row_number() OVER(PARTITION BY log.id_proposal ORDER BY log.ts_previous_log) AS proposal_order
+        ROW_NUMBER() OVER(PARTITION BY log.id_proposal ORDER BY log.ts_previous_log) AS proposal_order
     FROM
         log_union AS log
     LEFT JOIN
@@ -89,13 +92,13 @@ SELECT
         pp.id_product IN (1, 11)
 ),
 last_situation AS (
-  SELECT distinct
+  SELECT DISTINCT
     id_proposal,
     CASE WHEN proposal_order = MAX(proposal_order) OVER(PARTITION BY base.id_proposal) THEN proposal_next_situation END AS last_situation
   FROM base
 ),
 aux AS (
-SELECT distinct
+SELECT DISTINCT
   base.id_proposal,
   base.id_partner,
   proposal_order,
@@ -108,7 +111,10 @@ SELECT distinct
   ts_proposal_registration,
   COALESCE(ts_start_situation,ts_proposal_registration) AS ts_start_situation,
   ts_end_situation,
-  leadtime_situation_in_hour
+  lead_time_situation_in_hour,
+  lead_time_situation_in_day,
+  min_ts_step,
+  max_ts_step
 FROM base
 LEFT JOIN
     last_situation ls
@@ -126,7 +132,9 @@ SELECT
   ts_proposal_registration,
   ts_start_situation,
   ts_end_situation,
-  leadtime_situation_in_hour
+  lead_time_situation_in_hour,
+  lead_time_situation_in_day,
+    DATEDIFF(DAY, date_trunc('day', min_ts_step),date_trunc('day',  max_ts_step)) AS lead_time_status_in_day
 FROM aux
 ),
 adj_last_situation AS ( -- add line for last proposal situation
@@ -140,7 +148,9 @@ SELECT
   ts_proposal_registration,
   ts_end_situation AS ts_start_situation,
   NULL AS ts_end_situation,
-  datediff(hour,ts_end_situation,current_date) AS leadtime_situation_in_hour
+  DATEDIFF(HOUR,ts_end_situation,current_date) AS lead_time_situation_in_hour,
+  DATEDIFF(DAY,ts_end_situation,current_date) AS lead_time_situation_in_day,
+  DATEDIFF(DAY, date_trunc('day', min_ts_step),date_trunc('day',  max_ts_step)) AS lead_time_status_in_day
 FROM aux
 WHERE is_last_situation = TRUE
 ),
@@ -153,6 +163,6 @@ SELECT
 *
 FROM union_all
 ORDER BY
-   id_proposal desc,
+   id_proposal DESC,
    ts_start_situation,
    ts_end_situation
