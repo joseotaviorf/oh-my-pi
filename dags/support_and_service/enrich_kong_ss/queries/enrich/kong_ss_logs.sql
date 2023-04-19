@@ -1,7 +1,7 @@
 WITH filtered_logs AS (
   SELECT
     kl.*,
-    NULLIF(REGEXP_EXTRACT(kl.message, '(\\\\d+\.\\\\d+\.\\\\d+\.\\\\d+)', 0), '') AS ip_address,
+    NULLIF(REGEXP_EXTRACT(kl.message, '(\\d+\.\\d+\.\\d+\.\\d+)', 0), '') AS ip_address,
     NULLIF(REGEXP_EXTRACT(kl.message, '\- (.*) \-'), '') AS request_user,
     NULLIF(REGEXP_EXTRACT(kl.message, '"(.*) \/'), '') AS method,
     NULLIF(REGEXP_EXTRACT(kl.message, '] (.*) "'), '') AS host,
@@ -29,12 +29,12 @@ entities_extract AS (
       NULL
     END AS entity,
     CASE
-      WHEN RLIKE(fl.endpoint, "^/api/tasks") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/tasks/(\\\\w+)'), '')
-      WHEN RLIKE(fl.endpoint, "^/api/property-bills/property") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/property-bills/property/(\\\\d+)'), '')
-      WHEN RLIKE(fl.endpoint, "^/api/offer/client") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/offer/client/(\\\\d+)'), '')
-      WHEN RLIKE(fl.endpoint, "^/api/offer/rental") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/offer/rental/(\\\\w+)'), '')
-      WHEN RLIKE(fl.endpoint, "^/api/offer/") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/offer/(\\\\w+)/[a-zA-Z+]'), '')
-      WHEN RLIKE(fl.endpoint, "^/api/") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/[^/?]+/(\\\\d+)'), '')
+      WHEN RLIKE(fl.endpoint, "^/api/tasks") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/tasks/(\\w+)'), '')
+      WHEN RLIKE(fl.endpoint, "^/api/property-bills/property") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/property-bills/property/(\\d+)'), '')
+      WHEN RLIKE(fl.endpoint, "^/api/offer/client") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/offer/client/(\\d+)'), '')
+      WHEN RLIKE(fl.endpoint, "^/api/offer/rental") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/offer/rental/(\\w+)'), '')
+      WHEN RLIKE(fl.endpoint, "^/api/offer/") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/offer/(\\w+)/[a-zA-Z+]'), '')
+      WHEN RLIKE(fl.endpoint, "^/api/") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/[^/?]+/(\\d+)'), '')
     ELSE
       NULL
     END AS entity_code
