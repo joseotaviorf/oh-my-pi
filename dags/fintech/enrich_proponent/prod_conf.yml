@@ -6,8 +6,8 @@ custom_cluster:
   autoscale:
     min_workers: 1
     max_workers: 3
-spark_conf:
-  spark.driver.maxResultSize: "0"
+  spark_conf:
+    spark.driver.maxResultSize: "0"
 inner_dependencies:
   main_proponent_proposal:
     - proponent
