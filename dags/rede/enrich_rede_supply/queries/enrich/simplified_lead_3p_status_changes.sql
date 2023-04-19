@@ -147,7 +147,7 @@ last_id AS (
 SELECT
     id_last_status_change + MONOTONICALLY_INCREASING_ID() + 1 AS id_status_change,
     sea.id AS id_lead_3p,
-    COALESCE(sea.id_file, l.id_file) AS id_file,
+    COALESCE(sea.id_file, bcd.id_file) AS id_file,
     sea.id_house,
     sea.business_context,
     sea.status,
@@ -164,6 +164,7 @@ SELECT
 FROM
     status_and_publications AS sea,
     last_id AS li
-JOIN
-    datalake_brokers_supply_processor.lead_3p AS l
-        ON l.id = sea.id
+LEFT JOIN
+    datalake_brokers_supply_processor.business_context_detail AS bcd
+        ON bcd.id_lead = sea.id
+        AND sea.business_context = bcd.business_context
