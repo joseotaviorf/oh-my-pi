@@ -1,5 +1,4 @@
-WITH
-tenant_prospect_status as (
+WITH tenant_prospect_status as (
     SELECT
         sk_client,
         city_group,
@@ -348,29 +347,77 @@ deactivations AS (
     WHERE
         status IN ('CHURNED', 'RENTED')
         AND last_status = 'ACTIVE'
+), 
+final_table AS (
+    SELECT
+        rf.*
+    FROM
+        fact_rent_flows AS rf
+
+    UNION ALL
+
+    SELECT
+        dds.*
+    FROM
+        demand_daily_spent AS dds
+
+    UNION ALL
+
+    SELECT
+        ddt.*
+    FROM
+        demand_daily_targets AS ddt
+
+    UNION ALL
+
+    SELECT
+        d.*
+    FROM
+        deactivations AS d
 )
 SELECT
-    rf.*
+    dt_event,
+    ts_event,
+    status,
+    status_detail,
+    next_status,
+    ts_status_start,
+    ts_status_end,
+    city_group,
+    NULL::TEXT AS country_name,
+    flow_event,
+    mkt_origin,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    utm_medium,
+    utm_source,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    campaign_name,
+    sk_rf,
+    sk_client,
+    sk_house_listing,
+    id_house,
+    rent_flow_order,
+    tenant_prospect_order,
+    sk_booking,
+    sk_offer,
+    sk_proposal,
+    sk_contract,
+    dt_booking_created,
+    flg_visit_completed,
+    dt_offer_submitted,
+    dt_offer_approved,
+    dt_tenant_first_doc_sent,
+    dt_credit_analysis_approved,
+    dt_contract_signed,
+    marketing_cost,
+    rent_flows_target,
+    new_rent_flows_target,
+    new_tenant_prospects_target,
+    recovered_tenant_prospects_target,
+    budget
 FROM
-    fact_rent_flows AS rf
-
-UNION ALL
-
-SELECT
-    dds.*
-FROM
-    demand_daily_spent AS dds
-
-UNION ALL
-
-SELECT
-    ddt.*
-FROM
-    demand_daily_targets AS ddt
-
-UNION ALL
-
-SELECT
-    d.*
-FROM
-    deactivations AS d
+    final_table    
