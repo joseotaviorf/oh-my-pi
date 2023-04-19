@@ -36,6 +36,9 @@ tables:
   repair_request_item:
     is_incremental: True
     date_column: updated_at
+  repair_request_tenant_negotiation_follow_up:
+    is_incremental: True
+    date_column: updated_at
   revinfo:
     clean_table_name: rev_info
     is_incremental: True
