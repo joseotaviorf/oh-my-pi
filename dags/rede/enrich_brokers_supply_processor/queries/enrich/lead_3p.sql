@@ -43,13 +43,10 @@ partner_agencies_aux AS (
 )
 SELECT
     l.id,
-    COALESCE(l.id_partner, sale_bcd.id_partner, rent_bcd.id_partner) AS id_partner,
     sale_bcd.id_partner AS id_sale_partner,
     rent_bcd.id_partner AS id_rent_partner,
-    COALESCE(l.id_file, sale_bcd.id_file, rent_bcd.id_file) AS id_file,
     sale_bcd.id_file AS id_sale_file,
     rent_bcd.id_file AS id_rent_file,
-    COALESCE(l.id_listing, sale_bcd.id_listing, rent_bcd.id_listing) AS id_listing,
     sale_bcd.id_listing AS id_sale_listing,
     rent_bcd.id_listing AS id_rent_listing,
     l.uuid_lead,
@@ -57,7 +54,7 @@ SELECT
     l.id_by_real_estate,
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.housePartnerId'), '') AS id_house_partner,
     GET_JSON_OBJECT(l.location, '$.regionId')::BIGINT AS id_region,
-    COALESCE(pa.id_company_hubspot, f.id_company_hubspot, sale_file.id_company_hubspot, rent_file.id_company_hubspot) AS id_company_hubspot,
+    COALESCE(pa.id_company_hubspot, sale_file.id_company_hubspot, rent_file.id_company_hubspot) AS id_company_hubspot,
     CASE
         WHEN sale_bcd.id IS NOT NULL THEN COALESCE(sale_file.id_company_hubspot, pa.id_company_hubspot)
     END AS id_sale_company_hubspot,
@@ -97,15 +94,8 @@ SELECT
     NULLIF(GET_JSON_OBJECT(l.access, '$.lockerAddress'), '') AS locker_address,
     NULLIF(GET_JSON_OBJECT(l.access, '$.password'), '') AS password,
     l.cnpj,
-    COALESCE(l.status, sale_bcd.status, rent_bcd.status) AS status,
     sale_bcd.status AS sale_status,
     rent_bcd.status AS rent_status,
-    CASE
-        WHEN f.ts_previous_file_sent_by_agency IS NULL THEN 'FIRST_BATCH'
-        WHEN f.ts_created < first_file.ts_created + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
-        WHEN GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP < first_file.ts_created THEN 'COMPLEMENTARY'
-        ELSE 'RECURRENT'
-    END AS recurrency_type,
     CASE
         WHEN sale_file.ts_created IS NULL THEN 'N/A'
         WHEN sale_file.ts_created = first_sale_file.ts_created THEN 'FIRST_BATCH'
@@ -123,7 +113,6 @@ SELECT
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.installations'), '{{}}'), 'map<string, boolean>') AS installations,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.appliances'), '{{}}'), 'map<string, boolean>') AS house_appliances,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.accessibilityItems'), '{{}}'), 'map<string, boolean>') AS accessibility_items,
-    COALESCE(FROM_JSON(NULLIF(l.status_reason, '{{}}'), 'map<string, string>'), sale_bcd.status_reason) AS status_reason,
     sale_bcd.status_reason AS sale_status_reason,
     rent_bcd.status_reason AS rent_status_reason,
     FROM_JSON(
@@ -173,13 +162,6 @@ SELECT
     l.ts_updated
 FROM
     deduplicated_leads AS l
-LEFT JOIN
-    datalake_brokers_supply_processor.file AS f
-        ON l.id_file = f.id
-LEFT JOIN
-    datalake_brokers_supply_processor.file AS first_file
-        ON COALESCE(f.id_company_hubspot, SPLIT(f.file_name, '_dedup_')[0]) = COALESCE(first_file.id_company_hubspot, SPLIT(first_file.file_name, '_dedup_')[0])
-        AND first_file.ts_previous_file_sent_by_agency IS NULL
 LEFT JOIN
     datalake_brokers_supply_processor.business_context_detail AS sale_bcd
         ON sale_bcd.id_lead = l.id

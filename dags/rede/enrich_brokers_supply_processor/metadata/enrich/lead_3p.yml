@@ -9,12 +9,6 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.id
     description: 'Unique identifier of the lead.'
-  id_partner:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.id_partner
-      - datalake_brokers_supply_processor.business_context_detail.id_partner
-    description: 'Unique identifier of the partner that sent the lead. This field is going to be deprecated soon,
-    split into id_sale_partner and id_rent_partner.'
   id_sale_partner:
     lineage:
       - datalake_brokers_supply_processor.business_context_detail.id_partner
@@ -23,12 +17,6 @@ columns:
     lineage:
       - datalake_brokers_supply_processor.business_context_detail.id_partner
     description: 'Unique identifier of the partner that sent the lead in the context of ForRent.'
-  id_file:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.id_file
-      - datalake_brokers_supply_processor.business_context_detail.id_file
-    description: 'Unique identifier of the file the lead came from. This field is going to be deprecated soon,
-    split into id_sale_file and id_rent_file.'
   id_sale_file:
     lineage:
       - datalake_brokers_supply_processor.business_context_detail.id_file
@@ -37,12 +25,6 @@ columns:
     lineage:
       - datalake_brokers_supply_processor.business_context_detail.id_file
     description: 'Unique identifier of the file the lead came from, in the context of ForSale'
-  id_listing:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.id_listing
-      - datalake_brokers_supply_processor.business_context_detail.id_listing
-    description: 'Unique identifier of the listing. This field is going to be deprecated soon,
-    split into id_sale_listing and id_rent_listing.'
   id_sale_listing:
     lineage:
       - datalake_brokers_supply_processor.business_context_detail.id_listing
@@ -74,8 +56,7 @@ columns:
   id_company_hubspot:
     lineage:
       - datalake_brokers_supply_processor.file.id_company_hubspot
-    description: 'Identifier of the lead company in HubSpot. This field is going to be deprecated soon,
-    split into id_sale_company_hubspot and id_rent_company_hubspot.'
+    description: 'Identifier of the lead company in HubSpot.'
   id_sale_company_hubspot:
     lineage:
       - datalake_brokers_supply_processor.file.id_company_hubspot
@@ -232,18 +213,6 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.cnpj
     description: CNPJ of the real estate agency.
-  status:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.status
-    description: 'Status of the lead. This field is going to be deprecated soon,
-    split into sale_status and rent_status.'
-    categories:
-      REGISTERED: 'Registered in Main for publication'
-      SUSPENDED: 'Lead suspended'
-      WAITING: 'Lead eligible and waiting for owner information'
-      PROCESSING: 'Lead in image processing'
-      QUEUE: 'Lead awaiting in the duplicate queue'
-      NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
   sale_status:
     lineage:
       - datalake_brokers_supply_processor.business_context_detail.status
@@ -266,14 +235,6 @@ columns:
       PROCESSING: 'Lead in image processing'
       QUEUE: 'Lead awaiting in the duplicate queue'
       NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
-  recurrency_type:
-    description: 'Classifies whether the lead came from the first batch, first month, is recurrent, or is complementary (captured before first batch).
-    This field is going to be deprecated soon, split into sale_recurrency_type and rent_recurrency_type.'
-    categories:
-      FIRST_BATCH: 'Lead sent along with the first file'
-      FIRST_MONTH_BATCH: 'Lead was sent up to 30 days after the first batch'
-      RECURRENT: 'Lead was captured and sent AFTER the first 30 days'
-      COMPLEMENTARY: 'Lead was captured BEFORE the first batch, but sent AFTER the first 30 days'
   sale_recurrency_type:
     description: 'Classifies whether the sale lead came from the first batch, first month, is recurrent, or is complementary (captured before first batch).'
     categories:
@@ -302,12 +263,6 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.details
     description: 'Map of string to boolean with accessibility items in the house.'
-  status_reason:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.status_reason
-      - datalake_brokers_supply_processor.business_context_detail.status_reason
-    description: 'Map of string to boolean with reasons of why the status is not converted. This field is going to be deprecated soon,
-    split into sale_status_reason and rent_status_reason.'
   sale_status_reason:
     lineage:
       - datalake_brokers_supply_processor.business_context_detail.status_reason
