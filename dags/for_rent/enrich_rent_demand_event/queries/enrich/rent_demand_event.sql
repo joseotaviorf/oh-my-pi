@@ -16,28 +16,35 @@ WITH rent_flow_house_listing AS (
     rf.id_offer,
     rf.id_proposal,
     COALESCE(h.country_code, 'Undefined') AS country_code
-  FROM datalake_ebdb_rent_flow.rent_flow rf
-  JOIN datalake_ebdb_listing.house_listing hl
-    ON hl.id_house = rf.id_house
-    AND COALESCE(rf.dt_rent_flow_created, '1900-01-01') BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01')
-      AND COALESCE(hl.ts_listing_version_end, NOW())
-  LEFT JOIN datalake_ebdb_listing.house h
-    ON hl.id_house = h.id
-  LEFT JOIN datalake_ebdb_clean.contract AS con
-    ON con.id_house = rf.id_house
-    AND con.id = rf.id_contract
-  LEFT JOIN datalake_ebdb_listing.house_listing AS hl_contract
-    ON con.id_house = hl_contract.id_house 
-    AND con.ts_created BETWEEN COALESCE(hl_contract.ts_listing_version_start, '2000-01-01 00:00:00') 
-      AND COALESCE(hl_contract.ts_listing_version_end, CURRENT_DATE)
-  LEFT JOIN datalake_booking.booking bk
-    ON bk.id = rf.id_booking  
-  LEFT JOIN datalake_ebdb_listing.listing_business_context lbc
-    ON lbc.id_house = h.id
+  FROM
+    datalake_ebdb_rent_flow.rent_flow AS rf
+  JOIN
+    datalake_ebdb_listing.house_listing AS hl
+      ON hl.id_house = rf.id_house
+      AND COALESCE(rf.dt_rent_flow_created, '1900-01-01') BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01')
+        AND COALESCE(hl.ts_listing_version_end, NOW())
+  LEFT JOIN
+    datalake_ebdb_listing.house AS h
+      ON hl.id_house = h.id
+  LEFT JOIN
+    datalake_ebdb_clean.contract AS con
+      ON con.id_house = rf.id_house
+      AND con.id = rf.id_contract
+  LEFT JOIN
+    datalake_ebdb_listing.house_listing AS hl_contract
+      ON con.id_house = hl_contract.id_house 
+      AND con.ts_created BETWEEN COALESCE(hl_contract.ts_listing_version_start, '2000-01-01 00:00:00') 
+        AND COALESCE(hl_contract.ts_listing_version_end, CURRENT_DATE)
+  LEFT JOIN
+    datalake_booking.booking AS bk
+      ON bk.id = rf.id_booking  
+  LEFT JOIN
+    datalake_ebdb_listing.listing_business_context AS lbc
+      ON lbc.id_house = h.id
   WHERE 
     (lbc.business_context = 'RENT'
     OR lbc.business_context IS NULL) -- Some properties exists on the House table but not on LBC. In order to keep the same rule/results
-      -- that we have on the fact_listing_rent_flows, we decided to add another filter considering the business context as null. 
+      -- that we have on the fact_listing_rent_flows, we decided to add another filter considering the business context as null
     AND (
       COALESCE(bk.visit_intent, '') <> 'SALE'
       OR (
@@ -46,7 +53,6 @@ WITH rent_flow_house_listing AS (
       )
     )
 ),
-
 rent_demand_events AS (                                                                  
   SELECT --visits_booked
     bk.id AS id_event,
@@ -68,12 +74,13 @@ rent_demand_events AS (
     MONTH(ts_created) AS month,
     DAY(ts_created) AS day
   FROM
-    datalake_booking.booking bk
-  JOIN rent_flow_house_listing rf
-    ON rf.id_booking = bk.id
+    datalake_booking.booking AS bk
+  JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_booking = bk.id
   WHERE 
     bk.type = 'Visita'
-    AND bk.ts_created is not null
+    AND bk.ts_created IS NOT NULL
     AND YEAR(ts_created) = {year} 
     AND MONTH(ts_created) = {month} 
     AND DAY(ts_created) = {day}
@@ -98,17 +105,18 @@ rent_demand_events AS (
     MONTH(dt_booking) AS month,
     DAY(dt_booking) AS day
   FROM
-    datalake_booking.booking bk
-  JOIN rent_flow_house_listing rf
-    ON rf.id_booking = bk.id
+    datalake_booking.booking AS bk
+  JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_booking = bk.id
   WHERE 
-    bk.is_visit_completed = true 
+    bk.is_visit_completed = TRUE 
     AND bk.type = 'Visita'
     AND bk.visit_fup IN ('VaiNegociar',
           'NaoGostou',
           'VisitouSozinho',
           'Talvez')
-    AND bk.dt_booking is not null
+    AND bk.dt_booking IS NOT NULL
     AND YEAR(dt_booking) = {year} 
     AND MONTH(dt_booking) = {month} 
     AND DAY(dt_booking) = {day}
@@ -133,11 +141,13 @@ rent_demand_events AS (
     MONTH(ts_first_sent) AS month,
     DAY(ts_first_sent) AS day
   FROM
-    datalake_offer.offer off
-  JOIN rent_flow_house_listing rf
-    ON rf.id_offer= off.id
+    datalake_offer.offer AS off
+  JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_offer= off.id
   WHERE 
-    off.is_offer_submitted = true
+    off.is_offer_submitted = TRUE
+    AND ts_first_sent IS NOT NULL
     AND YEAR(ts_first_sent) = {year} 
     AND MONTH(ts_first_sent) = {month} 
     AND DAY(ts_first_sent) = {day}
@@ -162,11 +172,13 @@ rent_demand_events AS (
     MONTH(ts_analyzed) AS month,
     DAY(ts_analyzed) AS day
   FROM
-    datalake_offer.offer off
-  JOIN rent_flow_house_listing rf
-    ON rf.id_offer = off.id
+    datalake_offer.offer AS off
+  JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_offer = off.id
   WHERE 
     off.status = 'Aprovada'
+    AND ts_analyzed IS NOT NULL
     AND YEAR(ts_analyzed) = {year} 
     AND MONTH(ts_analyzed) = {month}
     AND DAY(ts_analyzed) = {day}
@@ -191,13 +203,15 @@ rent_demand_events AS (
     MONTH(ts_credit_evaluation_first_init) AS month,
     DAY(ts_credit_evaluation_first_init) AS day
   FROM
-    datalake_proposal.proposal pp
-  JOIN datalake_offer.offer off
-    ON off.id = pp.id_offer 
-  JOIN rent_flow_house_listing rf
-    ON rf.id_proposal = pp.id
+    datalake_proposal.proposal AS pp
+  JOIN
+    datalake_offer.offer AS off
+      ON off.id = pp.id_offer 
+  JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_proposal = pp.id
   WHERE 
-    pp.ts_credit_evaluation_first_init is not null
+    pp.ts_credit_evaluation_first_init IS NOT NULL
     AND YEAR(ts_credit_evaluation_first_init) = {year} 
     AND MONTH(ts_credit_evaluation_first_init) = {month}
     AND DAY(ts_credit_evaluation_first_init) = {day}
@@ -222,13 +236,15 @@ rent_demand_events AS (
     MONTH(ts_first_credit_evaluation_positive) AS month,
     DAY(ts_first_credit_evaluation_positive) AS day
   FROM
-    datalake_proposal.proposal pp
-   JOIN datalake_offer.offer off
-    ON off.id = pp.id_offer 
-  JOIN rent_flow_house_listing rf
-    ON rf.id_proposal = pp.id
+    datalake_proposal.proposal AS pp
+   JOIN
+    datalake_offer.offer AS off
+      ON off.id = pp.id_offer 
+  JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_proposal = pp.id
   WHERE 
-    pp.ts_first_credit_evaluation_positive is not null
+    pp.ts_first_credit_evaluation_positive IS NOT NULL
     AND YEAR(ts_first_credit_evaluation_positive) = {year} 
     AND MONTH(ts_first_credit_evaluation_positive) = {month}
     AND DAY(ts_first_credit_evaluation_positive) = {day}
@@ -253,13 +269,17 @@ rent_demand_events AS (
     MONTH(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) AS month,
     DAY(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) AS day
   FROM
-    datalake_proposal.proposal pp
-  JOIN datalake_offer.offer off
-    ON off.id = pp.id_offer 
-  JOIN rent_flow_house_listing rf
-    ON rf.id_proposal = pp.id
+    datalake_proposal.proposal AS pp
+  JOIN
+    datalake_offer.offer AS off
+      ON off.id = pp.id_offer 
+  JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_proposal = pp.id
   WHERE 
-    pp.has_tenant_sent_documentation is not null
+    pp.has_tenant_sent_documentation IS NOT NULL
+    AND (pp.ts_tenant_auto_first_doc_sent IS NOT NULL
+      OR pp.ts_tenant_first_doc_sent IS NOT NULL)
     AND YEAR(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) = {year} 
     AND MONTH(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) = {month}
     AND DAY(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) = {day}
@@ -284,13 +304,15 @@ rent_demand_events AS (
     MONTH(ts_credit_approved_last) AS month,
     DAY(ts_credit_approved_last) AS day
   FROM
-    datalake_proposal.proposal pp
-  JOIN datalake_offer.offer off
-    ON off.id = pp.id_offer 
-  JOIN rent_flow_house_listing rf
-    ON rf.id_proposal = pp.id
+    datalake_proposal.proposal AS pp
+  JOIN
+    datalake_offer.offer AS off
+      ON off.id = pp.id_offer 
+  JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_proposal = pp.id
   WHERE 
-    pp.ts_credit_approved_last is not null
+    pp.ts_credit_approved_last IS NOT NULL
     AND YEAR(ts_credit_approved_last) = {year} 
     AND MONTH(ts_credit_approved_last) = {month}
     AND DAY(ts_credit_approved_last) = {day}
@@ -315,20 +337,22 @@ rent_demand_events AS (
     MONTH(ts_signed) AS month,
     DAY(ts_signed) AS day
   FROM
-    datalake_ebdb_contract.contract ct
-  JOIN datalake_proposal.proposal pp
-    ON ct.id_proposal = pp.id
-  JOIN datalake_offer.offer off
-    ON off.id = pp.id_offer 
-  JOIN rent_flow_house_listing rf
-    ON rf.id_contract = ct.id
+    datalake_ebdb_contract.contract AS ct
+  JOIN
+    datalake_proposal.proposal AS pp
+      ON ct.id_proposal = pp.id
+  JOIN
+    datalake_offer.offer AS off
+      ON off.id = pp.id_offer 
+  JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_contract = ct.id
   WHERE 
-    ct.ts_signed is not null
+    ct.ts_signed IS NOT NULL
     AND YEAR(ts_signed) = {year} 
     AND MONTH(ts_signed) = {month}
     AND DAY(ts_signed) = {day}
 )
-
 SELECT
   id_event,
   id_booking,
