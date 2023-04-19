@@ -8,7 +8,7 @@ Assumptions:
 */
 
 WITH carousel_recommendations AS (
-    SELECT DISTINCT
+    SELECT
         "house" AS type_subject,
         "similar-carousel" AS display_type,
         "house-similarity-embeddings" AS ml_model,
