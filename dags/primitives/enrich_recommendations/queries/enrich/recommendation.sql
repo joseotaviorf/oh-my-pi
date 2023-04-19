@@ -8,7 +8,7 @@ Assumptions:
 */
 
 WITH carousel_recommendations AS (
-    SELECT
+    SELECT DISTINCT
         "house" AS type_subject,
         "similar-carousel" AS display_type,
         "house-similarity-embeddings" AS ml_model,
@@ -19,8 +19,8 @@ WITH carousel_recommendations AS (
         device_family,
         platform,
         language,
-        ts_event AS ts_rec_created,
-        ts_event AS ts_rec_received,
+        ts_client_event AS ts_rec_created,
+        ts_client_event AS ts_rec_received,
         year,
         month,
         day,
