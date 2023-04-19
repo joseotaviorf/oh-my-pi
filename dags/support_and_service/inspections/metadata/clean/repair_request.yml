@@ -1,55 +1,85 @@
 ---
 database_name: datalake_inspections_clean
 table_name: repair_request
-description: This table provides information on repair requests after the inspection process.
+description:
+  This table provides information on repair requests after the inspection
+  process.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_repair_request:
     lineage:
       - datalake_inspections_raw.repair_request.id
+    description: Repair Request unique identifier (number)
   id_reviewer:
     lineage:
       - datalake_inspections_raw.repair_request.reviewer_id
+    description: Author of repair request
   id_main:
     lineage:
       - datalake_inspections_raw.repair_request.main_id
+    description: Item id in Main monolith
   is_exempted:
     lineage:
       - datalake_inspections_raw.repair_request.exempted
+    description:
+      Indicates whether the repair suggested by the AN1 team was exempted
+      by the owner or a member of AN1
   id_item_group:
     lineage:
       - datalake_inspections_raw.repair_request.item_group_id
+    description: Object that will need repairs
   id_granted_by:
     lineage:
       - datalake_inspections_raw.repair_request.granted_by_id
+    description:
+      Reviewer who assessed whether a repair was exempted. Being an owner
+      or member of AN1
   uuid:
     lineage:
       - datalake_inspections_raw.repair_request.uuid
+    description: Repair Request unique identifier (uuid)
   type:
     lineage:
       - datalake_inspections_raw.repair_request.type
+    description: A repair request type.
+    categories:
+      REPAIR: Make item repair.
+      CLEAN: Clean the item.
+      TAKE AWAY: Remove item left in the property.
+      GIVE BACK: Replace item that was in the property.
+      OTHER: Other types not listed.
   comment:
     lineage:
       - datalake_inspections_raw.repair_request.comment
+    description: Commentary detailing the repair needed
   is_from_analysis:
     lineage:
       - datalake_inspections_raw.repair_request.from_analysis
+    description: Indicates whether the repair request was created by AN1
   ts_granted:
     lineage:
       - datalake_inspections_raw.repair_request.granted_at
+    description:
+      Indicates the time at which the repair request exempted assessment
+      was made
   ts_created:
     lineage:
       - datalake_inspections_raw.repair_request.created_at
+    description: Creation date
   ts_updated:
     lineage:
       - datalake_inspections_raw.repair_request.updated_at
+    description: Update date
   year:
     lineage:
       - datalake_inspections_raw.repair_request.year
+    description: Year of update date.
   month:
     lineage:
       - datalake_inspections_raw.repair_request.month
+    description: Month of update date.
   day:
     lineage:
       - datalake_inspections_raw.repair_request.day
+    description: Day of update date.
