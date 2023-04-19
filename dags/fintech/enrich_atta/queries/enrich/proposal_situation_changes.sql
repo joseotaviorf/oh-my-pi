@@ -71,8 +71,8 @@ SELECT
         pp.ts_registration AS ts_proposal_registration,
         log.ts_previous_log AS ts_start_situation,
         log.ts_current_log AS ts_end_situation,
-        DATEDIFF(HOUR,COALESCE(log.ts_previous_log,pp.ts_registration),log.ts_current_log) AS leadtime_situation_in_hour,
-        DATEDIFF(DAY,COALESCE(log.ts_previous_log,pp.ts_registration),log.ts_current_log) AS leadtime_situation_in_day,
+        DATEDIFF(HOUR,COALESCE(log.ts_previous_log,pp.ts_registration),log.ts_current_log) AS lead_time_situation_in_hour,
+        DATEDIFF(DAY,COALESCE(log.ts_previous_log,pp.ts_registration),log.ts_current_log) AS lead_time_situation_in_day,
         MIN(log.ts_current_log) OVER (PARTITION BY log.id_proposal, pre.proposal_status ORDER BY log.id_proposal, pre.proposal_status) AS min_ts_step,
         MAX(log.ts_current_log) OVER (PARTITION BY log.id_proposal, pre.proposal_status ORDER BY log.id_proposal, pre.proposal_status) AS max_ts_step,
         ROW_NUMBER() OVER(PARTITION BY log.id_proposal ORDER BY log.ts_previous_log) AS proposal_order
