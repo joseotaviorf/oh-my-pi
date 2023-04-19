@@ -7,3 +7,6 @@ SELECT
     day
 FROM
     datalake_rental_guarantee_platform_raw.delinquency_has_agreement
+
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY delinquency_id, agreement_id ORDER BY created_at DESC) = 1
