@@ -1,19 +1,20 @@
 WITH amplitude_data AS (
-  SELECT
-      sse.id_house,
-      sse.year,
-      sse.month,
-      sse.day,
-      COUNT_IF(sse.event_type = 'Search') AS qt_search_result_page_viewed,
-      COUNT_IF(sse.event_type = 'Listing Page Viewed') AS qt_listing_page_viewed
-  FROM
-      datalake_search_session_event.search_session_event AS sse
-  WHERE
-    sse.year = {year}
-    AND sse.month = {month}
-    AND sse.day = {day}
-  GROUP BY
-      1, 2, 3, 4
+    SELECT
+        sse.id_house,
+        sse.year,
+        sse.month,
+        sse.day,
+        COUNT_IF(sse.event_type = 'Search') AS qt_search_result_page_viewed,
+        COUNT_IF(sse.event_type = 'Listing Page Viewed') AS qt_listing_page_viewed
+    FROM
+        datalake_search_session_event.search_session_event AS sse
+    WHERE
+        sse.business_context = 'sale'
+        AND sse.year = {year}
+        AND sse.month = {month}
+        AND sse.day = {day}
+    GROUP BY
+        1, 2, 3, 4
 ),
 demand_data AS (
     SELECT
