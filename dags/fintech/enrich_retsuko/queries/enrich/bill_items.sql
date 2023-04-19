@@ -42,7 +42,7 @@ SELECT
     CAST(rci.ts_canceled AS DATE) AS dt_canceled
 FROM
     datalake_retsuko.invoice AS rci 
-    INNER JOIN cte_split_bill_item AS bi
+    LEFT JOIN cte_split_bill_item AS bi
       ON bi.id_invoice = rci.id
     LEFT JOIN datalake_retsuko.entry AS rce
       ON bi.id = rce.id
