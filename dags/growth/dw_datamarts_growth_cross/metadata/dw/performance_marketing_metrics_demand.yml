@@ -108,7 +108,7 @@ columns:
     - datalake_marketing_costs.daily_costs.mkt_channel
     - dw_datamarts_growth_cross.rent_flow_interactions.mkt_channel
   mkt_medium:
-    descripition: Level of the Growth Marketing Taxonomy
+    description: Level of the Growth Marketing Taxonomy
     lineage:
     - datalake_gsheets_clean.rental_ntp_source_targets.mkt_medium
     - datalake_gsheets_clean.mkt_cost_per_source.mkt_medium
@@ -171,7 +171,6 @@ columns:
     description: Rent flow ordered by ascending date by unique sk_client and id_house
     lineage:
     - dw_datamarts_growth_cross.rent_flow_interactions.rent_flow_order
-    description: ''
   tenant_prospect_order:
     description: Tenant prospect ordered by ascending date by unique sk_client
     lineage:
