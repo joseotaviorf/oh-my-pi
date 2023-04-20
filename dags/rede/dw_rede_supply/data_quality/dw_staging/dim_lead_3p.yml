@@ -16,19 +16,3 @@ column_level_validations:
       greater_than: 0.99 # Won't be 100% because of the default row
     is_unique:
       severity_level: Error
-  recurrency_type:
-    is_contained_in:
-      values:
-        - FIRST_BATCH
-        - FIRST_MONTH_BATCH
-        - RECURRENT
-        - COMPLEMENTARY
-  growth_status:
-    is_contained_in:
-      values:
-        - Unknown
-        - LEAD
-        - PROSPECT
-        - QUALIFIED
-        - OPPORTUNITY
-        - FIRST_LISTING
