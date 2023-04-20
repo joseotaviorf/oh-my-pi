@@ -34,6 +34,9 @@ WITH listing_page_views AS (
         GET_JSON_OBJECT(event_properties, '$.business_context') IS NOT NULL
         AND ts_event BETWEEN recommendation_catalog.ts_status_started AND recommendation_catalog.ts_status_ended
         AND year = 2023
+        AND YEAR(ts_event) = year
+        AND MONTH(ts_event) = month
+        AND DAY(ts_event) = day
 ),
 
 similar_carousel_house_clicks AS (
@@ -62,6 +65,9 @@ similar_carousel_house_clicks AS (
         AND GET_JSON_OBJECT(event_properties, '$.business_context') IS NOT NULL
         AND GET_JSON_OBJECT(event_properties, '$.house_id_target') IS NOT NULL
         AND year = 2023
+        AND YEAR(ts_event) = year
+        AND MONTH(ts_event) = month
+        AND DAY(ts_event) = day
 ),
 
 house_favorited AS (
@@ -85,6 +91,9 @@ house_favorited AS (
         AND id_app = 170698
         AND GET_JSON_OBJECT(event_properties, '$.business_context') IS NOT NULL
         AND year = 2023
+        AND YEAR(ts_event) = year
+        AND MONTH(ts_event) = month
+        AND DAY(ts_event) = day
 ),
 
 rent_flows AS (
@@ -99,6 +108,7 @@ rent_flows AS (
         EXTRACT(MONTH FROM ts_created) AS month,
         EXTRACT(DAY FROM ts_created) AS day
     FROM datalake_ebdb_clean.rent_flow
+    WHERE EXTRACT(YEAR FROM ts_created) = 2023
 ),
 
 sale_flows AS (
@@ -113,6 +123,7 @@ sale_flows AS (
         EXTRACT(MONTH FROM ts_first_event) AS month,
         EXTRACT(DAY FROM ts_first_event) AS day
     FROM datalake_sale_flows.sale_flow
+    WHERE EXTRACT(YEAR FROM ts_first_event) = 2023
 )
 
 SELECT

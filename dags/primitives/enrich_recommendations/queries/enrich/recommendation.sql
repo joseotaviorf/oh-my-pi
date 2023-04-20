@@ -54,6 +54,10 @@ WITH carousel_recommendations AS (
             "similar_carousel_viewed",
             "similar_carousel_viewed_native"
         )
+        AND year = 2023
+        AND YEAR(ts_client_event) = year
+        AND MONTH(ts_client_event) = month
+        AND DAY(ts_client_event) = day
 )
 
 
@@ -95,6 +99,5 @@ WHERE
     AND id_subjects IS NOT NULL
     AND id_anchors IS NOT NULL
     AND business_context IS NOT NULL
-    AND year = 2023 AND YEAR(ts_rec_created) = 2023
 
 /* TODO: email recommendations from Braze */
