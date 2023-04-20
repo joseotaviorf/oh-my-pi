@@ -7,6 +7,8 @@ block_list:
   - mortgage_options_aud
   - credit_application_aud
   - buffer
+  - payment_rules_aud
+  - payment_rules
 tables:
   address_data:
     extraction_type: incremental
