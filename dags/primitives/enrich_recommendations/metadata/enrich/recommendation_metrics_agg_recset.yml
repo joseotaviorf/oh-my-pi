@@ -106,6 +106,22 @@ columns:
     lineage:
       - datalake_recommendations.recommendation_flow.rec_to_favorite
       - datalake_recommendations.recommendation_flow.item_rank
+  hit_rec_to_sale_flow_one_day_at_3:
+    description: Hit rate of Rec to sale flow one day @3
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_sale_flow_one_day
+  hit_rec_to_sale_flow_fourteen_days_at_3:
+    description: Hit rate of Rec to sale flow fourteen days @3
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_sale_flow_fourteen_days
+  hit_rec_to_rent_flow_one_day_at_3:
+    description: Hit rate of Rec to rent flow one day @3
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_rent_flow_one_day
+  hit_rec_to_rent_flow_seven_days_at_3:
+    description: Hit rate of Rec to rent flow seven days @3
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_rent_flow_seven_days
   rec_to_sale_flow_one_day_at_3:
     description: Rec to sale flow one day @3
     lineage:
@@ -167,6 +183,22 @@ columns:
     lineage:
       - datalake_recommendations.recommendation_flow.rec_to_favorite
       - datalake_recommendations.recommendation_flow.item_rank
+  hit_rec_to_sale_flow_one_day_at_5:
+    description: Hit rate of Rec to sale flow one day @5
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_sale_flow_one_day
+  hit_rec_to_sale_flow_fourteen_days_at_5:
+    description: Hit rate of Rec to sale flow fourteen days @5
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_sale_flow_fourteen_days
+  hit_rec_to_rent_flow_one_day_at_5:
+    description: Hit rate of Rec to rent flow one day @5
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_rent_flow_one_day
+  hit_rec_to_rent_flow_seven_days_at_5:
+    description: Hit rate of Rec to rent flow seven days @5
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_rent_flow_seven_days
   rec_to_sale_flow_one_day_at_5:
     description: Rec to sale flow one day @5
     lineage:
@@ -228,6 +260,22 @@ columns:
     lineage:
       - datalake_recommendations.recommendation_flow.rec_to_favorite
       - datalake_recommendations.recommendation_flow.item_rank
+  hit_rec_to_sale_flow_one_day_at_10:
+    description: Hit rate of Rec to sale flow one day @10
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_sale_flow_one_day
+  hit_rec_to_sale_flow_fourteen_days_at_10:
+    description: Hit rate of Rec to sale flow fourteen days @10
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_sale_flow_fourteen_days
+  hit_rec_to_rent_flow_one_day_at_10:
+    description: Hit rate of Rec to rent flow one day @10
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_rent_flow_one_day
+  hit_rec_to_rent_flow_seven_days_at_10:
+    description: Hit rate of Rec to rent flow seven days @10
+    lineage:
+      - datalake_recommendations.recommendation_flow.rec_to_rent_flow_seven_days
   rec_to_sale_flow_one_day_at_10:
     description: Rec to sale flow one day @10
     lineage:

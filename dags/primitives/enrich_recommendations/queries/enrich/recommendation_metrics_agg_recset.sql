@@ -55,10 +55,14 @@ metrics_at_3 AS (
         COALESCE(SUM((INT(true_positive) * cum_true_positive) / item_rank) / LEAST(MAX(count_relevant_items), COUNT(item_rank)), 0) AS ap_at_3,
         SUM(INT(true_positive) / log2(item_rank+1)) / MAX(idcg_k) AS ndcg_at_3,
         SUM(INT(rec_to_favorite)) / COUNT(item_rank) AS rec_to_favorite_at_3,
-        MAX(INT(rec_to_sale_flow_one_day)) AS rec_to_sale_flow_one_day_at_3,
-        MAX(INT(rec_to_sale_flow_fourteen_days)) AS rec_to_sale_flow_fourteen_days_at_3,
-        MAX(INT(rec_to_rent_flow_one_day)) AS rec_to_rent_flow_one_day_at_3,
-        MAX(INT(rec_to_rent_flow_seven_days)) AS rec_to_rent_flow_seven_days_at_3
+        MAX(INT(rec_to_sale_flow_one_day)) AS hit_rec_to_sale_flow_one_day_at_3,
+        MAX(INT(rec_to_sale_flow_fourteen_days)) AS hit_rec_to_sale_flow_fourteen_days_at_3,
+        MAX(INT(rec_to_rent_flow_one_day)) AS hit_rec_to_rent_flow_one_day_at_3,
+        MAX(INT(rec_to_rent_flow_seven_days)) AS hit_rec_to_rent_flow_seven_days_at_3,
+        SUM(INT(rec_to_sale_flow_one_day)) / COUNT(item_rank) AS rec_to_sale_flow_one_day_at_3,
+        SUM(INT(rec_to_sale_flow_fourteen_days)) / COUNT(item_rank) AS rec_to_sale_flow_fourteen_days_at_3,
+        SUM(INT(rec_to_rent_flow_one_day)) / COUNT(item_rank) AS rec_to_rent_flow_one_day_at_3,
+        SUM(INT(rec_to_rent_flow_seven_days)) / COUNT(item_rank) AS rec_to_rent_flow_seven_days_at_3
     FROM
         datalake_recommendations.recommendation_flow AS recommendation_flow
     LEFT JOIN
@@ -79,10 +83,14 @@ metrics_at_5 AS (
         COALESCE(SUM((INT(true_positive) * cum_true_positive) / item_rank) / LEAST(MAX(count_relevant_items), COUNT(item_rank)), 0) AS ap_at_5,
         SUM(INT(true_positive) / log2(item_rank+1)) / MAX(idcg_k) AS ndcg_at_5,
         SUM(INT(rec_to_favorite)) / COUNT(item_rank) AS rec_to_favorite_at_5,
-        MAX(INT(rec_to_sale_flow_one_day)) AS rec_to_sale_flow_one_day_at_5,
-        MAX(INT(rec_to_sale_flow_fourteen_days)) AS rec_to_sale_flow_fourteen_days_at_5,
-        MAX(INT(rec_to_rent_flow_one_day)) AS rec_to_rent_flow_one_day_at_5,
-        MAX(INT(rec_to_rent_flow_seven_days)) AS rec_to_rent_flow_seven_days_at_5
+        MAX(INT(rec_to_sale_flow_one_day)) AS hit_rec_to_sale_flow_one_day_at_5,
+        MAX(INT(rec_to_sale_flow_fourteen_days)) AS hit_rec_to_sale_flow_fourteen_days_at_5,
+        MAX(INT(rec_to_rent_flow_one_day)) AS hit_rec_to_rent_flow_one_day_at_5,
+        MAX(INT(rec_to_rent_flow_seven_days)) AS hit_rec_to_rent_flow_seven_days_at_5,
+        SUM(INT(rec_to_sale_flow_one_day)) / COUNT(item_rank) AS rec_to_sale_flow_one_day_at_5,
+        SUM(INT(rec_to_sale_flow_fourteen_days)) / COUNT(item_rank) AS rec_to_sale_flow_fourteen_days_at_5,
+        SUM(INT(rec_to_rent_flow_one_day)) / COUNT(item_rank) AS rec_to_rent_flow_one_day_at_5,
+        SUM(INT(rec_to_rent_flow_seven_days)) / COUNT(item_rank) AS rec_to_rent_flow_seven_days_at_5
    FROM
         datalake_recommendations.recommendation_flow AS recommendation_flow
     LEFT JOIN
@@ -104,10 +112,14 @@ metrics_at_10 AS
         COALESCE(SUM((INT(true_positive) * cum_true_positive) / item_rank) / LEAST(MAX(count_relevant_items), COUNT(item_rank)), 0) AS ap_at_10,
         SUM(INT(true_positive) / log2(item_rank+1)) / MAX(idcg_k) AS ndcg_at_10,
         SUM(INT(rec_to_favorite)) / COUNT(item_rank) AS rec_to_favorite_at_10,
-        MAX(INT(rec_to_sale_flow_one_day)) AS rec_to_sale_flow_one_day_at_10,
-        MAX(INT(rec_to_sale_flow_fourteen_days)) AS rec_to_sale_flow_fourteen_days_at_10,
-        MAX(INT(rec_to_rent_flow_one_day)) AS rec_to_rent_flow_one_day_at_10,
-        MAX(INT(rec_to_rent_flow_seven_days)) AS rec_to_rent_flow_seven_days_at_10
+        MAX(INT(rec_to_sale_flow_one_day)) AS hit_rec_to_sale_flow_one_day_at_10,
+        MAX(INT(rec_to_sale_flow_fourteen_days)) AS hit_rec_to_sale_flow_fourteen_days_at_10,
+        MAX(INT(rec_to_rent_flow_one_day)) AS hit_rec_to_rent_flow_one_day_at_10,
+        MAX(INT(rec_to_rent_flow_seven_days)) AS hit_rec_to_rent_flow_seven_days_at_10,
+        SUM(INT(rec_to_sale_flow_one_day)) / COUNT(item_rank) AS rec_to_sale_flow_one_day_at_10,
+        SUM(INT(rec_to_sale_flow_fourteen_days)) / COUNT(item_rank) AS rec_to_sale_flow_fourteen_days_at_10,
+        SUM(INT(rec_to_rent_flow_one_day)) / COUNT(item_rank) AS rec_to_rent_flow_one_day_at_10,
+        SUM(INT(rec_to_rent_flow_seven_days)) / COUNT(item_rank) AS rec_to_rent_flow_seven_days_at_10
     FROM
         datalake_recommendations.recommendation_flow AS recommendation_flow
     LEFT JOIN
@@ -133,6 +145,10 @@ rec_to_sale_flow_one_day_at_3,
 rec_to_sale_flow_fourteen_days_at_3,
 rec_to_rent_flow_one_day_at_3,
 rec_to_rent_flow_seven_days_at_3,
+hit_rec_to_sale_flow_one_day_at_3,
+hit_rec_to_sale_flow_fourteen_days_at_3,
+hit_rec_to_rent_flow_one_day_at_3,
+hit_rec_to_rent_flow_seven_days_at_3,
 
 --k_5
 precision_at_5,
@@ -147,6 +163,10 @@ rec_to_sale_flow_one_day_at_5,
 rec_to_sale_flow_fourteen_days_at_5,
 rec_to_rent_flow_one_day_at_5,
 rec_to_rent_flow_seven_days_at_5,
+hit_rec_to_sale_flow_one_day_at_5,
+hit_rec_to_sale_flow_fourteen_days_at_5,
+hit_rec_to_rent_flow_one_day_at_5,
+hit_rec_to_rent_flow_seven_days_at_5,
 
 --k_10
 precision_at_10,
@@ -160,7 +180,11 @@ rec_to_favorite_at_10,
 rec_to_sale_flow_one_day_at_10,
 rec_to_sale_flow_fourteen_days_at_10,
 rec_to_rent_flow_one_day_at_10,
-rec_to_rent_flow_seven_days_at_10
+rec_to_rent_flow_seven_days_at_10,
+hit_rec_to_sale_flow_one_day_at_10,
+hit_rec_to_sale_flow_fourteen_days_at_10,
+hit_rec_to_rent_flow_one_day_at_10,
+hit_rec_to_rent_flow_seven_days_at_10
 FROM
     base
 LEFT JOIN

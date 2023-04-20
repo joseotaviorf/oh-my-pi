@@ -7,6 +7,8 @@ SELECT
     business_context,
     display_type,
 
+    COUNT(1) AS count_recsets,
+
     MEAN(precision_at_3) AS mean_precision_at_3,
     MIN(precision_at_3) AS min_precision_at_3,
     MAX(precision_at_3) AS max_precision_at_3,
@@ -150,6 +152,54 @@ SELECT
     MEAN(rec_to_rent_flow_seven_days_at_10) AS mean_rec_to_rent_flow_seven_days_at_10,
     MIN(rec_to_rent_flow_seven_days_at_10) AS min_rec_to_rent_flow_seven_days_at_10,
     MAX(rec_to_rent_flow_seven_days_at_10) AS max_rec_to_rent_flow_seven_days_at_10,
+    
+    MEAN(hit_rec_to_sale_flow_one_day_at_3) AS mean_hit_rec_to_sale_flow_one_day_at_3,
+    MIN(hit_rec_to_sale_flow_one_day_at_3) AS min_hit_rec_to_sale_flow_one_day_at_3,
+    MAX(hit_rec_to_sale_flow_one_day_at_3) AS max_hit_rec_to_sale_flow_one_day_at_3,
+
+    MEAN(hit_rec_to_sale_flow_one_day_at_5) AS mean_hit_rec_to_sale_flow_one_day_at_5,
+    MIN(hit_rec_to_sale_flow_one_day_at_5) AS min_hit_rec_to_sale_flow_one_day_at_5,
+    MAX(hit_rec_to_sale_flow_one_day_at_5) AS max_hit_rec_to_sale_flow_one_day_at_5,
+
+    MEAN(hit_rec_to_sale_flow_one_day_at_10) AS mean_hit_rec_to_sale_flow_one_day_at_10,
+    MIN(hit_rec_to_sale_flow_one_day_at_10) AS min_hit_rec_to_sale_flow_one_day_at_10,
+    MAX(hit_rec_to_sale_flow_one_day_at_10) AS max_hit_rec_to_sale_flow_one_day_at_10,
+
+    MEAN(hit_rec_to_sale_flow_fourteen_days_at_3) AS mean_hit_rec_to_sale_flow_fourteen_days_at_3,
+    MIN(hit_rec_to_sale_flow_fourteen_days_at_3) AS min_hit_rec_to_sale_flow_fourteen_days_at_3,
+    MAX(hit_rec_to_sale_flow_fourteen_days_at_3) AS max_hit_rec_to_sale_flow_fourteen_days_at_3,
+
+    MEAN(hit_rec_to_sale_flow_fourteen_days_at_5) AS mean_hit_rec_to_sale_flow_fourteen_days_at_5,
+    MIN(hit_rec_to_sale_flow_fourteen_days_at_5) AS min_hit_rec_to_sale_flow_fourteen_days_at_5,
+    MAX(hit_rec_to_sale_flow_fourteen_days_at_5) AS max_hit_rec_to_sale_flow_fourteen_days_at_5,
+
+    MEAN(hit_rec_to_sale_flow_fourteen_days_at_10) AS mean_hit_rec_to_sale_flow_fourteen_days_at_10,
+    MIN(hit_rec_to_sale_flow_fourteen_days_at_10) AS min_hit_rec_to_sale_flow_fourteen_days_at_10,
+    MAX(hit_rec_to_sale_flow_fourteen_days_at_10) AS max_hit_rec_to_sale_flow_fourteen_days_at_10,
+
+    MEAN(hit_rec_to_rent_flow_one_day_at_3) AS mean_hit_rec_to_rent_flow_one_day_at_3,
+    MIN(hit_rec_to_rent_flow_one_day_at_3) AS min_hit_rec_to_rent_flow_one_day_at_3,
+    MAX(hit_rec_to_rent_flow_one_day_at_3) AS max_hit_rec_to_rent_flow_one_day_at_3,
+
+    MEAN(hit_rec_to_rent_flow_one_day_at_5) AS mean_hit_rec_to_rent_flow_one_day_at_5,
+    MIN(hit_rec_to_rent_flow_one_day_at_5) AS min_hit_rec_to_rent_flow_one_day_at_5,
+    MAX(hit_rec_to_rent_flow_one_day_at_5) AS max_hit_rec_to_rent_flow_one_day_at_5,
+
+    MEAN(hit_rec_to_rent_flow_one_day_at_10) AS mean_hit_rec_to_rent_flow_one_day_at_10,
+    MIN(hit_rec_to_rent_flow_one_day_at_10) AS min_hit_rec_to_rent_flow_one_day_at_10,
+    MAX(hit_rec_to_rent_flow_one_day_at_10) AS max_hit_rec_to_rent_flow_one_day_at_10,
+
+    MEAN(hit_rec_to_rent_flow_seven_days_at_3) AS mean_hit_rec_to_rent_flow_seven_days_at_3,
+    MIN(hit_rec_to_rent_flow_seven_days_at_3) AS min_hit_rec_to_rent_flow_seven_days_at_3,
+    MAX(hit_rec_to_rent_flow_seven_days_at_3) AS max_hit_rec_to_rent_flow_seven_days_at_3,
+
+    MEAN(hit_rec_to_rent_flow_seven_days_at_5) AS mean_hit_rec_to_rent_flow_seven_days_at_5,
+    MIN(hit_rec_to_rent_flow_seven_days_at_5) AS min_hit_rec_to_rent_flow_seven_days_at_5,
+    MAX(hit_rec_to_rent_flow_seven_days_at_5) AS max_hit_rec_to_rent_flow_seven_days_at_5,
+
+    MEAN(hit_rec_to_rent_flow_seven_days_at_10) AS mean_hit_rec_to_rent_flow_seven_days_at_10,
+    MIN(hit_rec_to_rent_flow_seven_days_at_10) AS min_hit_rec_to_rent_flow_seven_days_at_10,
+    MAX(hit_rec_to_rent_flow_seven_days_at_10) AS max_hit_rec_to_rent_flow_seven_days_at_10,
 
     dt_rec_received
 
