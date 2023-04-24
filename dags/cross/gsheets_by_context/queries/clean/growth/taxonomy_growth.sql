@@ -8,6 +8,7 @@ SELECT
     mkt_channel,
     mkt_medium,
     mkt_origin,
+    mkt_origin_suggestion,
     mkt_source,
     CAST(is_agent_referral AS BOOLEAN) AS is_agent_referral,
     CAST(is_branded AS BOOLEAN) AS is_branded,
