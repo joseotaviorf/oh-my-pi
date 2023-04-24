@@ -442,18 +442,19 @@ bietlejuice.dw_datamarts_growth_cross: # Legacy datamarts are not parsed by the 
     # - bietlejuice.enrich_top_of_funnel_supply:create-enrich-top-of-funnel-supply-external-table
     # - bietlejuice.gsheets.growth:done-clean-tof-supply-targets
 bietlejuice.dw_datamarts_growth_dep_manual_costs: # Legacy datamarts are not parsed by the Dependency Generator
-  add:
-    - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
-    # dependencies to avoid same datamarts updating at the same time
-    - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-affiliate-acquisition-metrics
-    - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-marketing-campaigns-costs-and-volumes
-    - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-marketing-demand-supply-branding-costs
-    - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-performance-marketing-metrics-demand
-    - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-rental-performance-marketing-metrics-supply-coincident
-    - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand
-    - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-supply-coincident
-    - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-unique-performance-marketing-metrics-supply-coincident
-    - bietlejuice.dw_datamarts_spark.growth:load-dw-datamarts-sale-performance-marketing-metrics-supply-cohort
+  override:
+    []
+    # - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
+    # # dependencies to avoid same datamarts updating at the same time
+    # - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-affiliate-acquisition-metrics
+    # - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-marketing-campaigns-costs-and-volumes
+    # - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-marketing-demand-supply-branding-costs
+    # - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-performance-marketing-metrics-demand
+    # - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-rental-performance-marketing-metrics-supply-coincident
+    # - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand
+    # - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-supply-coincident
+    # - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-unique-performance-marketing-metrics-supply-coincident
+    # - bietlejuice.dw_datamarts_spark.growth:load-dw-datamarts-sale-performance-marketing-metrics-supply-cohort
 bietlejuice.dw_datamarts_spark.cross:
   add:
     - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status

@@ -311,16 +311,6 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.wololo:create-clean-context-discard-external-table
   - bietlejuice.wololo:create-clean-conversion-external-table
   - bietlejuice.wololo:create-clean-prospect-external-table
-bietlejuice.dw_datamarts_growth_dep_manual_costs:
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-datamarts-affiliate-acquisition-metrics-into-redshift
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-datamarts-marketing-campaigns-costs-and-volumes-into-redshift
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-datamarts-marketing-demand-supply-branding-costs-into-redshift
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-datamarts-performance-marketing-metrics-demand-into-redshift
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-datamarts-rental-performance-marketing-metrics-supply-coincident-into-redshift
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-datamarts-sale-performance-marketing-metrics-demand-into-redshift
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-datamarts-sale-performance-marketing-metrics-supply-coincident-into-redshift
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-datamarts-unique-performance-marketing-metrics-supply-coincident-into-redshift
-  - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
 bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.dw_booking:load-dw-public-dim-tenant-booking-review
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
@@ -840,16 +830,16 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.gsheets.growth:done-clean-taxonomy-demand
 bietlejuice.dw_sale_ongoing_listings:
-- bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type
-- bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event
-- bietlejuice.ebdb:create-clean-house-in-data-lake
-- bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
-- bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
-- bietlejuice.enrich_rede_company:load-enrich-company-sks
-- bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history
-- bietlejuice.enrich_sale_listings:load-enrich-sale-listing
-- bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
-- bietlejuice.enrich_search_session_event:load-enrich-search-session-event
+  - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type
+  - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
+  - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
+  - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
 bietlejuice.dw_sale_visits:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-real-estate-agent-rating-in-data-lake
@@ -2035,12 +2025,12 @@ bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.hub_services:load-clean-lead-aud
   - bietlejuice.hub_services:load-clean-visitor
 bietlejuice.enrich_sale_listings:
-- bietlejuice.ebdb:create-clean-house-predicted-price-aud-in-data-lake
-- bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-- bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.ebdb:create-clean-house-predicted-price-aud-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_sale_listings_tiers:
-- bietlejuice.ebdb:create-clean-house-in-data-lake
-- bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
 bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.docx:load-clean-folder
   - bietlejuice.docx:load-clean-folder-reference
