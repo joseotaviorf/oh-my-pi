@@ -5,7 +5,7 @@ clone:
 pipeline:
   check-style-python:
     group: tests
-    image: python:3.7.3
+    image: python:3.7.16
     commands:
       - apt-get update
       - apt-get install -y git > /dev/null
@@ -16,7 +16,7 @@ pipeline:
 
   files-validation-python:
     group: tests
-    image: python:3.7.3
+    image: python:3.7.16
     pull: true
     commands:
       - apt-get update
@@ -55,7 +55,7 @@ pipeline:
 
   validate-dag-declaration-files:
     group: tests
-    image: python:3.7.3
+    image: python:3.7.16
     commands:
       - pip install tqdm==4.64.1 Cerberus==1.3.4
       - make requirements-scripts
@@ -65,7 +65,7 @@ pipeline:
 
   validate-dags-dependencies-forno:
     group: tests
-    image: python:3.7.3
+    image: python:3.7.16
     environment:
       ENVIRONMENT: forno
     commands:
@@ -80,7 +80,7 @@ pipeline:
 
   validate-dags-dependencies-prod:
     group: tests
-    image: python:3.7.3
+    image: python:3.7.16
     environment:
       ENVIRONMENT: prod
     commands:
@@ -92,7 +92,7 @@ pipeline:
 
   validate-metadata-files-content:
     group: tests
-    image: python:3.7.3
+    image: python:3.7.16
     commands:
       - make requirements-scripts
       - make validate-metadata-files-content
@@ -114,7 +114,7 @@ pipeline:
 
   make-package-python:
     group: package
-    image: python:3.7.3
+    image: python:3.7.16
     commands:
       - make package
     when:
@@ -210,7 +210,7 @@ pipeline:
 
   create-dag-files:
     group: export
-    image: python:3.7.3
+    image: python:3.7.16
     commands:
       - make create-dag-files
     when:
@@ -283,7 +283,7 @@ pipeline:
 
   upload-dag-packages-spark-jobs-s3-forno:
     group: upload
-    image: python:3.7.3
+    image: python:3.7.16
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br spark_jobs
@@ -293,7 +293,7 @@ pipeline:
 
   upload-dag-packages-spark-jobs-s3-prod:
     group: upload
-    image: python:3.7.3
+    image: python:3.7.16
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks spark_jobs
@@ -303,7 +303,7 @@ pipeline:
 
   upload-dag-packages-queries-s3-forno:
     group: upload
-    image: python:3.7.3
+    image: python:3.7.16
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br queries
@@ -313,7 +313,7 @@ pipeline:
 
   upload-dag-packages-queries-s3-prod:
     group: upload
-    image: python:3.7.3
+    image: python:3.7.16
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks queries
@@ -323,7 +323,7 @@ pipeline:
 
   upload-dag-packages-data-quality-s3-forno:
     group: upload
-    image: python:3.7.3
+    image: python:3.7.16
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br data_quality
