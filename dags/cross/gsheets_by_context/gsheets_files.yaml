@@ -156,6 +156,12 @@ taxonomy_sla:
 #########################
 # GROWTH SHEETS
 ###################
+affiliates_active_segmentation:
+    sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
+    sheet_name: ativos
+    clean_table_name: affiliates_active_segmentation
+    sheet_context: growth
+
 affiliate_pro_registration:
     sheet_id: 196BCLJ7rwRAgb50IEdYB_b4KGnilleeCU8WMKghxddY
     sheet_name: affiliate_pro
@@ -418,6 +424,12 @@ rental_flows_targets:
     sheet_id: 1_-_V3Js51s88opC8aZVc7SAzXT-OC7huQ1I-rsqpdlU
     sheet_name: rental_flows_targets
     clean_table_name: rental_flows_targets
+    sheet_context: growth
+
+rental_rtp_targets:
+    sheet_id: 1VZW41499YJO3Im--velqKWEblCLjxOqZIqNaaizMB_U
+    sheet_name: rental_rtp_targets
+    clean_table_name: rental_rtp_targets
     sheet_context: growth
 
 rental_ntp_source_targets:

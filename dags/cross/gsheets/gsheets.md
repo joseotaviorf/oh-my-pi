@@ -25,7 +25,6 @@ This pipeline produces the following output tables:
 2. Data lake clean:
     - `affiliate_type_targets`
     - `affiliates_extra_user_bonus`
-    - `affiliates_active_segmentation`
     - `affiliates_inactive_segmentation`
     - `affiliates_monthly_expected_results`
     - `agents_control`
@@ -44,7 +43,6 @@ This pipeline produces the following output tables:
     - `criteo_abtest_rj`
     - `crm_iptu_wave4`
     - `demand_channel_share`
-    - `demand_retention_ab_tests`
     - `demand_targets_replanning`
     - `department_control`
     - `extra_invoice_created_expenses`
@@ -67,10 +65,8 @@ This pipeline produces the following output tables:
     - `promotional_bonus_user_targets`
     - `provisioned_costs_import`
     - `rent_criteo_eng_ab_test`
-    - `rental_cohort_supply`
     - `rental_flows_targets`
     - `rental_ntp_source_targets`
-    - `rental_rtp_targets`
     - `sale_criteo_eng_ab_test`
     - `sale_flows_targets`
     - `sale_rbp_targets`

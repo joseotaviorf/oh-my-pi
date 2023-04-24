@@ -10,11 +10,6 @@ affiliate_type_targets:
     sheet_name: affiliate_type_targets
     clean_table_name: affiliate_type_targets
 
-affiliates_active_segmentation:
-    sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
-    sheet_name: ativos
-    clean_table_name: affiliates_active_segmentation
-
 affiliates_inactive_segmentation:
     sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
     sheet_name: inativos
@@ -119,11 +114,6 @@ rent_criteo_eng_ab_test:
     sheet_id: 17PonK69vjOYru-xD0acbVqD0bkl_LPuGodhR2AHmn5I
     sheet_name: rent_criteo_eng_ab_test
     clean_table_name: rent_criteo_eng_ab_test
-
-rental_rtp_targets:
-    sheet_id: 1VZW41499YJO3Im--velqKWEblCLjxOqZIqNaaizMB_U
-    sheet_name: rental_rtp_targets
-    clean_table_name: rental_rtp_targets
 
 sale_criteo_eng_ab_test:
     sheet_id: 1_Lbgnyz8-1BMs3eq6KteLCND1uvLbidzE1hXLAiVFmI
