@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: kong_ss_endpoints
+columns:
+  host:
+    lineage:
+      - datalake_gsheets_raw.kong_ss_endpoints.host
+  endpoint:
+    lineage:
+      - datalake_gsheets_raw.kong_ss_endpoints.endpoint
+  description:
+    lineage:
+      - datalake_gsheets_raw.kong_ss_endpoints.description

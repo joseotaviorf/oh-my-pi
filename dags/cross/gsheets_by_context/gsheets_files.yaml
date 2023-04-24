@@ -1299,6 +1299,12 @@ great_price_tag_test_groups:
     clean_table_name: great_price_tag_test_groups
     sheet_context: static
 
+kong_ss_endpoints:
+    sheet_id: 1uHWW90GUAxXHKI27EGtde7bkP-wK948Nt7YlfunadZI
+    sheet_name: kong_ss_endpoints
+    clean_table_name: kong_ss_endpoints
+    sheet_context: static
+
 legacy_doorman:
     sheet_id: 19N4-pSsxcdQZVYSiCValrqYo8CYDATMrcmKtOO_P1mI
     sheet_name: legacy_doorman
