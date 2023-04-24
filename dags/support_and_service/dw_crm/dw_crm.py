@@ -38,7 +38,7 @@ spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-cluster_description = config_service.get_config("databricks_10_4_med_memory_cluster")
+cluster_description = config_service.get_config("databricks_10_4_med_memory_photon_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -129,7 +129,6 @@ for table in dw_task_group:
     task_groups_boundaries=dw_task_group_boundaries,
     dag_inner_dependencies=inner_dependencies,
 )
-
 
 chain(
     create_cluster_task,
