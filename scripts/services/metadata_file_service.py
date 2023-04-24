@@ -42,12 +42,7 @@ class MetadataFileService:
         self.schemas = {
             "raw": yamale.make_schema(f"{base_path}/raw_schema.yml"),
             "clean": yamale.make_schema(f"{base_path}/clean_schema.yml"),
-            "enrich_dw_new_files": yamale.make_schema(
-                f"{base_path}/enrich_dw_new_files_schema.yml"
-            ),
-            "enrich_dw_modified_files": yamale.make_schema(
-                f"{base_path}/enrich_dw_modified_files_schema.yml"
-            ),
+            "enrich_dw": yamale.make_schema(f"{base_path}/enrich_dw_schema.yml"),
             "metric": yamale.make_schema(f"{base_path}/metric_schema.yml"),
         }
 
@@ -219,10 +214,8 @@ class MetadataFileService:
             return yamale.validate(self.schemas["raw"], yaml_data)
         elif layer == "clean":
             return yamale.validate(self.schemas["clean"], yaml_data)
-        elif status == "A" and layer in ["enrich", "dw"]:
-            return yamale.validate(self.schemas["enrich_dw_new_files"], yaml_data)
-        elif status == "M" and layer in ["enrich", "dw"]:
-            return yamale.validate(self.schemas["enrich_dw_modified_files"], yaml_data)
+        elif layer in ["enrich", "dw"]:
+            return yamale.validate(self.schemas["enrich_dw"], yaml_data)
         elif layer == "metric":
             return yamale.validate(self.schemas["metric"], yaml_data)
         elif layer == "reverse":

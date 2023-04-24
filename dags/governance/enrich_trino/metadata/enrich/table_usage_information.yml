@@ -12,8 +12,8 @@ columns:
   count_visualization:
     description: Number of times this table was accessed in Trino during the day
   year:
-    description: ingestion year 
+    description: ingestion year.
   month:
-    description: ingestion month 
+    description: ingestion month.
   day:
-    description: ingestion day 
+    description: ingestion day.
