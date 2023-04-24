@@ -277,7 +277,7 @@ rent_demand_events AS (
     rent_flow_house_listing AS rf
       ON rf.id_proposal = pp.id
   WHERE 
-    pp.has_tenant_sent_documentation IS NOT NULL
+    pp.has_tenant_sent_documentation = TRUE
     AND (pp.ts_tenant_auto_first_doc_sent IS NOT NULL
       OR pp.ts_tenant_first_doc_sent IS NOT NULL)
     AND YEAR(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) = {year} 
