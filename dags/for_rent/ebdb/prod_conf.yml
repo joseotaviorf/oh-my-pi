@@ -1,6 +1,9 @@
 ---
 custom_cluster:
-  driver_node_type_id: c5.4xlarge
+  driver_node_type_id: r3.2xlarge
   node_type_id: m5.2xlarge
   num_workers: 6
- 
+  runtime_engine: PHOTON
+  spark_version: 10.4.x-scala2.12
+  aws_attributes:
+    availability: ON_DEMAND
