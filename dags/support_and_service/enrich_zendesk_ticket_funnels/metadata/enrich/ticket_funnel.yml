@@ -1,5 +1,9 @@
 database_name: datalake_zendesk_ticket_funnels
 table_name: ticket_funnel
+description: This enrichment table is intended to gather data from each ticket created in Zendesk Support, 
+  coming from FAQ Forms, Email, Web and Chat channels and Whatsapp notifications
+domain: Support and Service
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_ticket:
     lineage:
@@ -11,6 +15,10 @@ columns:
   id_job:
     lineage:
       - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  id_problem_ticket:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+    description: Problem ticket identification key.
   subject:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.subject
@@ -43,6 +51,15 @@ columns:
   status:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.status
+  ticket_type:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.type
+    description: Descriptive data about the type of ticket.
+    categories:
+      task: ''
+      problem: ''
+      question: ''
+      incident: ''
   has_public_comments:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.is_public

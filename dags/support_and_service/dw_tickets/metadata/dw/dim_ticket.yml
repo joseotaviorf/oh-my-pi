@@ -9,6 +9,10 @@ columns:
     lineage:
     - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
     description: Key of ticket that corresponds to the Zendesk ticket number
+  sk_problem_ticket:
+    lineage: 
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_problem_ticket
+    description: Problem ticket identification key.
   subject:
     lineage:
     - datalake_zendesk_ticket_funnels.ticket_funnel.subject
@@ -329,6 +333,15 @@ columns:
       open: ''
       pending: ''
       solved: ''
+  ticket_type:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ticket_type
+    description: Descriptive data about the type of ticket.
+    categories:
+      task: ''
+      problem: ''
+      question: ''
+      incident: ''
   custom_fields:
     lineage:
     - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields

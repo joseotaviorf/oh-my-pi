@@ -1,5 +1,6 @@
 SELECT
     CAST(id_ticket AS BIGINT) AS sk_ticket,
+    CAST(COALESCE(id_problem_ticket) AS BIGINT) AS sk_problem_ticket,
     if(octet_length(subject)>=65535, substring(subject,0,60000), subject) AS subject,
     if(octet_length(description)>=65535, substring(description,0,60000), description) AS description,
     ticket_via,
@@ -9,6 +10,7 @@ SELECT
     recipient,
     tags,
     status,
+    ticket_type,
     custom_fields,
     score,
     reason,

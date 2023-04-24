@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS tickets.dim_ticket;
 CREATE TABLE IF NOT EXISTS tickets.dim_ticket (
 	sk_ticket BIGINT PRIMARY KEY,
+	sk_problem_ticket BIGINT,
 	subject VARCHAR(MAX),
 	description VARCHAR(MAX),
 	ticket_via VARCHAR(15),
@@ -10,6 +11,7 @@ CREATE TABLE IF NOT EXISTS tickets.dim_ticket (
 	recipient VARCHAR,
 	tags VARCHAR(MAX),
 	status VARCHAR(20),
+	ticket_type VARCHAR,
 	custom_fields VARCHAR(MAX),
 	score VARCHAR(20),
 	reason VARCHAR,

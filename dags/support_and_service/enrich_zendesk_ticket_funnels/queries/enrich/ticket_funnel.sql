@@ -2,7 +2,7 @@ WITH tickets_filter AS (
     SELECT DISTINCT
         t.*
     FROM
-        datalake_zendesk_tickets_clean.tickets t
+        datalake_zendesk_tickets_clean.tickets AS t
     WHERE
         (
             t.ticket_via <> 'api'
@@ -16,9 +16,9 @@ historical_zendesk_chat AS (
     SELECT DISTINCT
         c.*
     FROM
-        historical_datalake_zendesk_clean.chats c
+        historical_datalake_zendesk_clean.chats AS c
     LEFT JOIN
-        tickets_filter t
+        tickets_filter AS t
             ON t.id_ticket = c.id_ticket
     WHERE
         t.id_ticket IS NULL
@@ -52,9 +52,9 @@ distinct_groups AS (
         g.name,
         g.url_group
     FROM
-        datalake_zendesk_tickets_clean.groups g
+        datalake_zendesk_tickets_clean.groups AS g
     INNER JOIN
-        last_updated_group ge
+        last_updated_group AS ge
             ON ge.id_group = g.id_group
             AND ge.ts_last_updated = g.ts_updated
     GROUP BY 1, 2, 3
@@ -88,6 +88,7 @@ union_historical_chat_with_zendesk AS (
         NULL AS recipient,
         c.tags,
         "closed" AS status,
+        NULL AS ticket_type,
         c.id_department AS id_group,
         NULL AS has_public_comments,
         c.rating AS score,
@@ -101,7 +102,7 @@ union_historical_chat_with_zendesk AS (
         MONTH(c.ts_updated) AS month,
         DAY(c.ts_updated) AS day
     FROM
-        historical_zendesk_chat c
+        historical_zendesk_chat AS c
     UNION ALL
     SELECT DISTINCT
         t.id_ticket,
@@ -123,6 +124,7 @@ union_historical_chat_with_zendesk AS (
         t.recipient,
         t.tags,
         t.status,
+        t.type AS ticket_type,
         t.id_group,
         COALESCE(CAST(t.is_public AS BOOLEAN), FALSE) AS has_public_comments,
         CAST(GET_JSON_OBJECT(t.satisfaction_rating,'$.score') AS STRING) AS score,
@@ -136,12 +138,13 @@ union_historical_chat_with_zendesk AS (
         MONTH(t.ts_updated) AS month,
         DAY(t.ts_updated) AS day
     FROM
-        tickets_filter t
+        tickets_filter AS t
 )
 SELECT DISTINCT
     te.id_ticket,
     sok.id_offer AS id_sale_offer,
     cf.custom_fields['[AQ] ID do Job '] AS id_job,
+    cf.custom_fields['Ticket Problema ID'] AS id_problem_ticket,
     t.subject,
     t.description,
     t.ticket_via,
@@ -151,6 +154,7 @@ SELECT DISTINCT
     t.recipient,
     t.tags,
     t.status,
+    t.ticket_type,
     t.has_public_comments,
     t.score,
     t.reason,
@@ -189,16 +193,16 @@ SELECT DISTINCT
     t.month,
     t.day
 FROM
-    last_updated_ticket te
+    last_updated_ticket AS te
 INNER JOIN
-    union_historical_chat_with_zendesk t
+    union_historical_chat_with_zendesk AS t
         ON te.id_ticket = t.id_ticket
         AND te.ts_last_updated = t.ts_updated
 LEFT JOIN
-    distinct_groups g
+    distinct_groups AS g
         ON t.id_group = g.id_group
 LEFT JOIN
-    datalake_zendesk_custom_fields.custom_fields cf
+    datalake_zendesk_custom_fields.custom_fields AS cf
         ON te.id_ticket = cf.id_ticket
 LEFT JOIN
     sale_offers_keys AS sok
