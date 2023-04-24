@@ -26,16 +26,38 @@ offers AS (
 fact_listing_status AS (
 /* We will track every visit of the sale listings */
     SELECT
-        id_sale_listing,
-        id_house,
-        id_region,
-        COALESCE(BIGINT(DATE_FORMAT(ts_status_started, 'yyyyMMdd')), -1) AS id_status_start_date,
-        COALESCE(BIGINT(DATE_FORMAT(ts_status_ended, 'yyyyMMdd')), -1) AS id_status_end_date,
-        BIGINT(DATE_FORMAT(ts_first_publication, 'yyyyMMdd')) AS id_first_publication_date,
-        ts_status_started,
-        status_history
+        l.id_sale_listing,
+        l.id_house,
+        l.id_region,
+        COALESCE(BIGINT(DATE_FORMAT(l.ts_status_started, 'yyyyMMdd')), -1) AS id_status_start_date,
+        COALESCE(BIGINT(DATE_FORMAT(l.ts_status_ended, 'yyyyMMdd')), -1) AS id_status_end_date,
+        BIGINT(DATE_FORMAT(l.ts_first_publication, 'yyyyMMdd')) AS id_first_publication_date,
+        CASE 
+            WHEN h.sale_price IS NULL OR h.sale_price < 150000 THEN NULL
+            WHEN h.sale_price < 300000 THEN '150-300k'
+            WHEN h.sale_price < 500000 THEN '300-500k'
+            WHEN h.sale_price < 900000 THEN '500-900k'
+            WHEN h.sale_price < 1500000 THEN '900-1500k'
+            WHEN h.sale_price >= 1500000  THEN '1500k+'
+        END AS bedrooms_price_bins,
+        CASE 
+            WHEN r.city_group = 'RMSP' THEN 'RMSP'
+            WHEN r.city_group = 'Rio de Janeiro' THEN 'Rio de Janeiro'
+            WHEN r.city_group = 'Porto Alegre' THEN 'Porto Alegre'
+            ELSE 'Other City Group'
+        END AS city_group,
+        l.ts_status_started
     FROM 
-        datalake_sale_listings.sale_listing_status
+        datalake_sale_listings.sale_listing_status AS l
+    LEFT JOIN 
+        datalake_ebdb_listing.house AS h 
+            ON BIGINT(LEFT(l.id_sale_listing, 9)) = h.id
+    LEFT JOIN 
+        datalake_region.region AS r 
+            ON l.id_region = r.id
+            AND r.level IN ('SubRegiao', 'Cidade')
+    WHERE 
+        l.status_history = 'PUBLISHED' 
 ),
 ongoing_listings AS (
 /*
@@ -48,29 +70,10 @@ In addition, we group into price bins and region
         f.id_region,
         d.id_date,
         f.id_first_publication_date,
-        CASE 
-            WHEN r.city_group = 'RMSP' THEN 'RMSP'
-            WHEN r.city_group = 'Rio de Janeiro' THEN 'Rio de Janeiro'
-            WHEN r.city_group = 'Porto Alegre' THEN 'Porto Alegre'
-            ELSE 'Other City Group'
-        END AS city_group,
-        CASE 
-            WHEN h.sale_price IS NULL OR h.sale_price < 150000 THEN NULL
-            WHEN h.sale_price < 300000 THEN '150-300k'
-            WHEN h.sale_price < 500000 THEN '300-500k'
-            WHEN h.sale_price < 900000 THEN '500-900k'
-            WHEN h.sale_price < 1500000 THEN '900-1500k'
-            WHEN h.sale_price >= 1500000  THEN '1500k+'
-        END AS bedrooms_price_bins,
-        CASE
-            WHEN h.sale_price < 300000 THEN 1
-            WHEN h.sale_price < 500000 THEN 2
-            WHEN h.sale_price < 900000 THEN 3
-            WHEN h.sale_price < 1500000 THEN 4
-            WHEN h.sale_price >= 1500000 THEN 5
-        END AS bins_order,
         v.id_booking_created_date AS visits, 
         o.id_offer_submitted_date AS offers,
+        f.bedrooms_price_bins,
+        f.city_group,
         LAST_VALUE(v.id_booking_created_date, TRUE) OVER (PARTITION BY f.id_house ORDER BY date) AS lag_visits,
         LAST_VALUE(o.id_offer_submitted_date, TRUE) OVER (PARTITION BY f.id_house ORDER BY date) AS lag_offers,
         MIN(v.id_booking_created_date) OVER (PARTITION BY f.id_sale_listing) AS first_visit,
@@ -97,12 +100,6 @@ In addition, we group into price bins and region
         offers AS o 
             ON h.id = o.id_house
             AND d.id_date = o.id_offer_submitted_date
-    LEFT JOIN 
-        datalake_region.region AS r 
-            ON f.id_region = r.id
-            AND r.level IN ('SubRegiao', 'Cidade')
-    WHERE 
-        f.status_history = 'PUBLISHED' 
     QUALIFY 
         ROW_NUMBER() OVER (PARTITION BY f.id_sale_listing, d.date ORDER BY f.ts_status_started DESC) = 1
 ),
@@ -142,7 +139,6 @@ as well as apply logic to check which listings are stranded in each category.
         datalake_sale_stranded_listings.thresholds AS t
             ON ol.bedrooms_price_bins = t.bedrooms_price_bins
             AND ol.city_group = t.city_group
-            AND ol.bins_order = t.bins_order
             AND ol.month_start = t.month_start
     QUALIFY 
         MAX(t.month_start) OVER (PARTITION BY 1) >= ol.month_start

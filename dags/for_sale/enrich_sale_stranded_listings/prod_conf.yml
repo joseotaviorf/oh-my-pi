@@ -9,8 +9,8 @@ tables:
     is_incremental: false
 
 custom_cluster: # Same as med general, but has a minimum of two workers
-  driver_node_type_id: m5a.xlarge
-  node_type_id: m5a.xlarge
+  driver_node_type_id: m5a.2xlarge
+  node_type_id: m5a.2xlarge
   autoscale:
     max_workers: 3
     min_workers: 2
