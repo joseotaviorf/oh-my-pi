@@ -65,11 +65,6 @@ demand_channel_share:
     sheet_name: demand_channel_share
     clean_table_name: demand_channel_share
 
-demand_retention_ab_tests:
-    sheet_id: 1l80txsBUzAAuCMalf6mfECgoULxbLHpw7J3z841aITw
-    sheet_name: demand_retention_ab_tests
-    clean_table_name: demand_retention_ab_tests
-
 google_searches_share_of_interest:
     sheet_id: 1eDqOTxQqgQOJVA6CnPa8ZuuriCaYe5MrUpFYni2BpeM
     sheet_name: google_searches_share_of_interest
@@ -124,11 +119,6 @@ rent_criteo_eng_ab_test:
     sheet_id: 17PonK69vjOYru-xD0acbVqD0bkl_LPuGodhR2AHmn5I
     sheet_name: rent_criteo_eng_ab_test
     clean_table_name: rent_criteo_eng_ab_test
-
-rental_cohort_supply:
-    sheet_id: 1qz4QZD4OYSfXV_mMiAUH9okYT5hodlwfP3edmeyldO4
-    sheet_name: rental_cohort_supply
-    clean_table_name: rental_cohort_supply
 
 rental_rtp_targets:
     sheet_id: 1VZW41499YJO3Im--velqKWEblCLjxOqZIqNaaizMB_U

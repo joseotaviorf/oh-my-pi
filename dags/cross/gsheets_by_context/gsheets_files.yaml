@@ -210,6 +210,12 @@ costs_targets:
     clean_table_name: costs_targets
     sheet_context: growth
 
+demand_retention_ab_tests:
+    sheet_id: 1l80txsBUzAAuCMalf6mfECgoULxbLHpw7J3z841aITw
+    sheet_name: demand_retention_ab_tests
+    clean_table_name: demand_retention_ab_tests
+    sheet_context: growth
+
 ecglobal_active_users:
     sheet_id: 1S4QBYxMLTAfjre0xd5jS9kaT5YjL4KsE3sRKmvHFNjM
     sheet_name: base
@@ -400,6 +406,12 @@ provisioned_costs_import:
     sheet_id: 1KZWx_b3tn754ImagBnGj4rJo16kXgxzg-lQFpYTolOs
     sheet_name: provisioned_costs_import
     clean_table_name: provisioned_costs_import
+    sheet_context: growth
+
+rental_cohort_supply:
+    sheet_id: 1qz4QZD4OYSfXV_mMiAUH9okYT5hodlwfP3edmeyldO4
+    sheet_name: rental_cohort_supply
+    clean_table_name: rental_cohort_supply
     sheet_context: growth
 
 rental_flows_targets:
