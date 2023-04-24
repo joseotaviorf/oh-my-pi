@@ -118,11 +118,11 @@ SELECT
   price_m2_bins,
   tier,
   CASE    
-    WHEN tier = 'P0' THEN 'High End Premium'
+    WHEN tier = 'P0' THEN 'Very High End Premium'
     WHEN tier = 'P1' THEN 'High Premium'
     WHEN tier = 'P2' THEN 'Standard Premium'
     WHEN tier = 'P3' THEN 'Simple Premium'
-    WHEN tier = 'P4' THEN 'Basic Premium'
+    WHEN tier = 'P4' THEN 'Modest Premium'
   END AS tier_name,
   tier_disclaimer,
   ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_tier_started DESC) = 1 AS is_last_tier,

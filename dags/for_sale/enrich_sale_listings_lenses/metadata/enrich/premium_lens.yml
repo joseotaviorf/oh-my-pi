@@ -1,5 +1,5 @@
-database_name: datalake_sale_listings_tiers
-table_name: premium_tier
+database_name: datalake_sale_listings_lenses
+table_name: premium_lens
 description: 'An enriched table that aims to create the Premium score of the ForSale listings, where we would be able to understand what type of supply is a given listing. 
   This score is totally linked to the price changes of a listing. If it changes its price and changes its score, a new row will be created.
   Where, each row of this table represents the score for a given listings pricing. ' 
@@ -41,19 +41,19 @@ columns:
     description: 'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level". In other words, we use two components to define the tier, the price and the price per square meter, so we understand which level of the property we are dealing with. 
     E. g: A 3KK property with 1000m2 will have a m2 price of 3K. Where it will have a high price tier and a very low price m2. With that, we can think that if the square meter is not so expensive, it is not so premium, just a big property.'
     categories:
-      P0: The highest tier in the Premium concept (High End Premium). It can have either a very high price, or a very high price per square meter, or a combination of both.
+      P0: The highest tier in the Premium concept (Very High End Premium). It can have either a very high price, or a very high price per square meter, or a combination of both.
       P1: Represents High Premium listing niche. It has a high combination of value and price per square meter.
-      P2: Represent  Standards Listings. These are properties with average price and average price per square meter as well.
-      P3: Represent Simple Listings. These are properties with a combination of price and price per square meter between low and medium.
-      P4:  Represent the Basic Listings. Where are the listings with a combination of low price and a low price per square meter.
+      P2: Represents Standards Listings. These are properties with average price and average price per square meter as well.
+      P3: Represents Simple Listings. These are properties with a combination of price and price per square meter between low and medium.
+      P4:  Represents the Basic Listings. Where are the listings with a combination of low price and a low price per square meter.
   tier_name: 
     description: Just a long name for the expensive Tier segment.
     categories:
-      High End Premium: It represents the P0 category of the tier. Listings with a combination of high price and a high price per square meter.
+      Very High End Premium: It represents the P0 category of the tier. Listings with a combination of high price and a high price per square meter.
       High Premium: It represents the P1 tier category. Listings with a combination of a relatively high price and a high price per square meter in the same proportions.
       Standard Premium: It represents the tier P2 category. Listings with an average combination of price and price per square meter.
       Simple Premium: It represents the tier P3 category. Listings with a relatively low combination of price and price per square meter.
-      Basic Premium: It represents the tier P4 category. Listings with a low combination of price and price per square meter.
+      Modest Premium: It represents the tier P4 category. Listings with a low combination of price and price per square meter.
   tier_disclaimer:
     description: Column that shows us, in full, the combination of factors/bins concerning the listing, where with this, we classify it within a tier.
   is_last_tier:
