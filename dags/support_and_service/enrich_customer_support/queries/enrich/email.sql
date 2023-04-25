@@ -254,7 +254,7 @@ LEFT JOIN
   last_back_ticket bt
     ON bt.front_ticket = ze.id_ticket
 WHERE
-  ze.channel IN ('email', 'form_faq', 'web', 'other')
+  ze.channel IN ('email', 'form_faq', 'web', 'other', 'whatsapp')
   -- emails with the tags below are not new demands or automatically closed, therefore, they should not be considered
   AND ze.tags NOT LIKE '%resolve_ticket_acompanhamento%'
   AND ze.tags NOT LIKE '%fechado_automaticamente_noreply%'

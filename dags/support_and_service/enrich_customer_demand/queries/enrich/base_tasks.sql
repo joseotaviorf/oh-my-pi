@@ -65,6 +65,7 @@ ticket_tasks AS (
       MAX(e.id_user) AS id_user,
       MD5(MAX(e.tags)) AS id_tags,
       MAX(e.tags) AS tags,
+      e.channel,
       e.department,
       e.csat_score,
       e.status,
@@ -149,6 +150,7 @@ ticket_tasks AS (
     t.id_taxonomy,
     t.id_tags,
     t.id_main_department,
+    t.channel,
     t.department AS type,
     t.csat_score,
     t.status,
@@ -230,7 +232,10 @@ SELECT
   id_main_department,
   type,
   sla_target,
-  'email' AS origin,
+  CASE
+    WHEN channel IN ('email', 'form_faq', 'web', 'other') THEN 'email'
+    ELSE channel
+  END AS origin,
   status,
   csat_score,
   is_solved,
