@@ -40,6 +40,9 @@ columns:
   is_valid:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.valid
+  is_legacy_agreement:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.legacy_agreement
   dt_due:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.due_date

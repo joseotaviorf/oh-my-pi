@@ -11,6 +11,7 @@ SELECT
     amount_paid,
     active AS is_active,
     valid AS is_valid,
+    legacy_agreement AS is_legacy_agreement,
     due_date AS dt_due,
     payment_date AS dt_paid,
     schedule_payment_date AS dt_payment_scheduled,
