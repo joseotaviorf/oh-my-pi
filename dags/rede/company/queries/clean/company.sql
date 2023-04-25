@@ -14,7 +14,5 @@ SELECT
     day
 FROM
     datalake_company_raw.company
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id ORDER BY ts_updated DESC) = 1

@@ -9,7 +9,5 @@ SELECT
     day
 FROM
     datalake_company_raw.company_address
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_address, id_company ORDER BY ts_updated DESC) = 1

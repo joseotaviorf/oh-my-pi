@@ -85,10 +85,11 @@ tables = config_service.get_config("tables")
 for table in tables:
     table_name = table["table_name"]
     clean_table_name = table.get("clean_table_name", table_name)
-    extraction_type = table.get("extraction_type", "incremental")
+    raw_extraction_type = table.get("raw_extraction_type", "incremental")
+    clean_extraction_type = table.get("clean_extraction_type", "incremental")
     partition_cols = (
         None
-        if extraction_type == "full"
+        if raw_extraction_type == "full"
         else config_service.get_config("partition_cols")
     )
     parameters = [SOURCE, table_name]
@@ -96,7 +97,7 @@ for table in tables:
     extended_parameters = [
         table["date_filter_column"],
         "{{ ds }}",
-        extraction_type,
+        raw_extraction_type,
         table.get("unixtime_measure", None),
     ]
 
@@ -115,7 +116,7 @@ for table in tables:
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         table_name=clean_table_name,
-        is_incremental=extraction_type == "incremental",
+        is_incremental=clean_extraction_type == "incremental",
         partitions=partition_cols,
     )
 

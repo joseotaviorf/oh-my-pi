@@ -2,86 +2,113 @@
 tables:
   - table_name: address
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: address_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: banking_information
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: banking_information_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: company
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: company_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: company_address
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: company_address_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: company_document
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: company_document_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: company_product
     date_filter_column: updated_at
-    extraction_type: full
+    raw_extraction_type: full
+    clean_extraction_type: full
   - table_name: company_product_aud
     date_filter_column: created_at
-    extraction_type: full
+    raw_extraction_type: full
+    clean_extraction_type: full
   - table_name: document
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: document_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: member_profile
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: member_profile_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: product
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: product_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: profile
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: profile_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: profile_hierarchy
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: profile_hierarchy_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: revenue_share
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: revenue_share_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: revinfo
     clean_table_name: rev_info
     date_filter_column: revtstmp
     unixtime_measure: milliseconds
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
   - table_name: user_requirements
     date_filter_column: updated_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: full
   - table_name: user_requirements_aud
     date_filter_column: created_at
-    extraction_type: incremental
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
 
 partition_cols: ["year", "month", "day"]
