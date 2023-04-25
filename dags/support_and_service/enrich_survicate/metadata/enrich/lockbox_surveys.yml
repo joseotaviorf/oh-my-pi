@@ -1,7 +1,7 @@
 ---
 database_name: datalake_survicate
-table_name: keys_surveys
-description: Responses to key service forms
+table_name: lockbox_surveys
+description: Responses to forms relating to the key lockbox service
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
@@ -13,19 +13,9 @@ columns:
     lineage:
       - datalake_survicate_clean.surveys.id
     description: Survey unique identifier
-  id_contract:
-    lineage:
-      - datalake_survicate_clean.surveys.page_url
-    description: Contract unique identifier
-  id_ticket:
-    lineage:
-      - datalake_survicate_clean.surveys.page_url
-    description: Zendesk ticket unique identifier
-  email:
-    lineage:
-      - datalake_survicate_clean.surveys.page_url
-    description: Respondent's email
   respondent_type:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
     description:
       "Respondent role/type, for example: owner, tenant, surveyor, photographer,
       broker"
@@ -33,33 +23,27 @@ columns:
     description:
       "For which flow/service we are evaluating satisfaction. For example:
       inspections, repairs, customer support, etc."
-  survey_type:
+  service_context:
     description:
       "For which context are we evaluating satisfaction. Here we can refer
       to the journey, for example: onboarding, offboarding. Or we can refer to the
       related microservice, for example: lockbox."
-  survey_source:
+  source_name:
     description: Data source
-  satisfaction_rating:
-    lineage:
-      - datalake_survicate_clean.surveys.answers
-      - datalake_gsheets_clean.tenant_onboarding_keys_csat.score
-      - datalake_gsheets_clean.owner_offboarding_keys_csat.score
-    description: Main satisfaction response score
-  score_description:
-    description: Main satisfaction response description
   improvement_tags:
     lineage:
       - datalake_survicate_clean.surveys.answers
-      - datalake_gsheets_clean.tenant_onboarding_keys_csat.improvement_tags
-      - datalake_gsheets_clean.owner_offboarding_keys_csat.improvement_tags
     description: Predefined tags to categorize respondent satisfaction
-  user_comment:
+  respondent_comments:
     lineage:
       - datalake_survicate_clean.surveys.answers
-      - datalake_gsheets_clean.tenant_onboarding_keys_csat.comments
-      - datalake_gsheets_clean.owner_offboarding_keys_csat.comments
     description: Respondent open comment
+  satisfaction_score:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
+    description: Main satisfaction response score
+  score_description:
+    description: Main satisfaction response description
   custom_attributes:
     lineage:
       - datalake_survicate_clean.surveys.custom_attributes
@@ -67,30 +51,20 @@ columns:
   ts_first_seen:
     lineage:
       - datalake_survicate_clean.surveys.ts_first_seen
-      - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
-      - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
     description: Date and time of first time visitor encountered any of your surveys
-  ts_first_response:
+  ts_submitted:
     lineage:
       - datalake_survicate_clean.surveys.ts_first_response
-      - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
-      - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
     description: Date and time of first time visitor responded to a survey
   year:
     lineage:
       - datalake_survicate_clean.surveys.year
-      - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
-      - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
     description: "Year of response submission date "
   month:
     lineage:
       - datalake_survicate_clean.surveys.month
-      - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
-      - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
     description: Month of response submission date
   day:
     lineage:
       - datalake_survicate_clean.surveys.day
-      - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
-      - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
     description: Day of response submission date

@@ -1,34 +1,67 @@
 ---
 database_name: datalake_survicate
 table_name: photo_surveys
+description: Answers to photo service forms
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_response:
     lineage:
       - datalake_survicate_clean.surveys.response_uuid
+    description: Answer unique identifier (uuid)
+  id_survey:
+    lineage:
+      - datalake_survicate_clean.surveys.id
+    description: Survey unique identifier
   id_owner:
     lineage:
       - datalake_survicate_clean.surveys.page_url
-  satisfaction_rating:
-    lineage:
-      - datalake_survicate_clean.surveys.answers
+    description: User unique identifier
+  respondent_type:
+    description:
+      "Respondent role/type, for example: owner, tenant, surveyor, photographer,
+      broker"
+  service_type:
+    description:
+      "For which flow/service we are evaluating satisfaction. For example:
+      inspections, repairs, customer support, etc."
+  survey_source:
+    description: Data source
   improvement_tags:
     lineage:
       - datalake_survicate_clean.surveys.answers
+    description: Predefined tags to categorize respondent satisfaction
   user_comment:
     lineage:
       - datalake_survicate_clean.surveys.answers
+    description: Respondent open comment
+  satisfaction_rating:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
+    description: Main satisfaction response score
+  score_description:
+    description: Main satisfaction response description
+  custom_attributes:
+    lineage:
+      - datalake_survicate_clean.surveys.custom_attributes
+    description: List of all custom attributes, along with their values
   ts_first_seen:
     lineage:
       - datalake_survicate_clean.surveys.ts_first_seen
+    description: Date and time of first time visitor encountered any of your surveys
   ts_first_response:
     lineage:
       - datalake_survicate_clean.surveys.ts_first_response
+    description: Date and time of first time visitor responded to a survey
   year:
     lineage:
       - datalake_survicate_clean.surveys.year
+    description: "Year of response submission date "
   month:
     lineage:
       - datalake_survicate_clean.surveys.month
+    description: Month of response submission date
   day:
     lineage:
       - datalake_survicate_clean.surveys.day
+    description: Day of response submission date
