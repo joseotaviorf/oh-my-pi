@@ -13,10 +13,6 @@ SELECT
     rt.id_room_type,
     r.room_name,
     rt.room_type,
-    CASE
-        WHEN r.comment = '' THEN NULL
-        ELSE r.comment
-    END AS comment,
     r.ts_created,
     r.ts_updated,
     r.year,

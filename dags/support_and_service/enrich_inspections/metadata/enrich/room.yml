@@ -1,37 +1,47 @@
 ---
 database_name: datalake_inspections
 table_name: room
+description: Data about the room being inspected.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_room:
+    description: Room unique identifier.
     lineage:
       - datalake_inspections_clean.room.id_room
   id_assessment:
+    description: Assessment unique identifier.
     lineage:
       - datalake_inspections_clean.room.id_assessment
   id_room_type:
+    description: Room Type unique identifier.
     lineage:
       - datalake_inspections_clean.room_type.id_room_type
   room_name:
+    description: Descriptive name of the room (typed by inspector).
     lineage:
       - datalake_inspections_clean.room.room_name
   room_type:
+    description: Room type name, for example kitchen bedroom, etc.
     lineage:
       - datalake_inspections_clean.room_type.type
-  comment:
-    lineage:
-      - datalake_inspections_clean.room.comment
   ts_created:
+    description: Creation date and time.
     lineage:
       - datalake_inspections_clean.room.ts_created
   ts_updated:
+    description: Update date and time.
     lineage:
       - datalake_inspections_clean.room.ts_updated
   year:
+    description: Year referring to date of update.
     lineage:
       - datalake_inspections_clean.room.year
   month:
+    description: Month referring to date of update.
     lineage:
       - datalake_inspections_clean.room.month
   day:
+    description: Day referring to date of update.
     lineage:
       - datalake_inspections_clean.room.day

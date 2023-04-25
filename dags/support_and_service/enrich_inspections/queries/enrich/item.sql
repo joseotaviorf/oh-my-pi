@@ -32,7 +32,6 @@ SELECT DISTINCT
     END AS comment,
     i.is_present,
     i.count,
-    i.status,
     i.ts_created,
     i.ts_updated,
     i.year,

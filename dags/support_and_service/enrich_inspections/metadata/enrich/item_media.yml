@@ -1,46 +1,65 @@
 ---
 database_name: datalake_inspections
 table_name: item_media
+description: When inspecting an item, the inspector may photograph or record video to demonstrate the condition of the item.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_item:
+    description: Item unique identifier.
     lineage:
       - datalake_inspections_clean.item_media.id_item
   id_item_media:
+    description: Item Media unique identifier.
     lineage:
       - datalake_inspections_clean.item_media.id_item_media
   id_external_media:
+    description: Item Media correlational unique identifier in the PWA database.
     lineage:
       - datalake_inspections_clean.item_media.id_main
   id_room:
+    description: Room unique identifier.
     lineage:
       - datalake_inspections.item.id_room
   id_assessment:
+    description: Assessment unique identifier.
     lineage:
       - datalake_inspections.item.id_assessment
   id_inspection:
+    description: Inspection unique identifier.
     lineage:
       - datalake_inspections.item.id_inspection
   id_user:
+    description: Unique identifier of the media creator user.
     lineage:
       - datalake_inspections.item.id_inspector
+  user_type:
+    description: Indicates the type of user creating the media.
   media_type:
+    description: Indicates whether the media is a photo or a video.
     lineage:
       - datalake_inspections_clean.item_media.type
   media_path:
+    description: It is the email address of the media.
     lineage:
       - datalake_inspections_clean.item_media.url
   ts_created:
+    description: Creation date and time.
     lineage:
       - datalake_inspections_clean.item_media.ts_created
   ts_updated:
+    description: Update date and time.
     lineage:
       - datalake_inspections_clean.item_media.ts_updated
   year:
+    description: Year referring to date of update.
     lineage:
       - datalake_inspections_clean.item_media.year
   month:
+    description: Month referring to date of update.
     lineage:
       - datalake_inspections_clean.item_media.month
   day:
+    description: Day referring to date of update.
     lineage:
       - datalake_inspections_clean.item_media.day
