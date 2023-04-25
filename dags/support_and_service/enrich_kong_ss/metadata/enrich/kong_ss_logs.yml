@@ -25,7 +25,7 @@ columns:
     description: "The endpoint generic form, such as api/contract/id."
   description:
     lineage:
-      - datalake_gsheets_clean.kong_ss_endpoints
+      - datalake_gsheets_clean.kong_ss_endpoints.description
     description: "S&S endpoints description."
   entity:
     lineage:
