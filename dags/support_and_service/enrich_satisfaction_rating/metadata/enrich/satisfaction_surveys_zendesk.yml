@@ -1,0 +1,67 @@
+---
+database_name: datalake_satisfaction_rating
+table_name: satisfaction_surveys_zendesk
+description: Unifies and enriches form satisfaction responses coming from Zendesk.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_answer:
+    description: Unique identifier of the satisfaction response.
+    lineage:
+      - datalake_zendesk_tickets_clean.satisfaction_ratings.id
+  id_contract:
+    description: Identifier of the contract linked to the satisfaction response.
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+  id_ticket:
+    description:
+      If the satisfaction form was requested after a service, this, in general,
+      will be linked to a service identifier in Zendesk.
+    lineage:
+      - datalake_zendesk_tickets_clean.satisfaction_ratings.id_ticket
+  id_respondent:
+    description: Identifier of the person who answered the form.
+    lineage:
+      - datalake_zendesk_tickets_clean.satisfaction_ratings.id_assignee
+  respondent_email:
+    description: Email of the person who answered the form.
+    lineage:
+      - datalake_zendesk_tickets.zendesk_users_contact.email
+  respondent_type:
+    description:
+      Position which the respondent assumed when filling out the form.
+      It can be a tenant, landlord, the attendant itself, or other service providers.
+    lineage:
+      - datalake_zendesk_tickets.zendesk_users_contact.role
+  service_type:
+    description: Indicates the service that originated the satisfaction response.
+  service_context:
+    description: The context in which this service occurred.
+  source_name:
+    description: Satisfaction form source.
+  improvement_tags:
+    description: Process improvement tags, which are indicated by the respondent.
+    lineage:
+      - datalake_zendesk_tickets_clean.satisfaction_ratings.reason
+  satisfaction_score:
+    description: Main satisfaction form responses.
+    lineage:
+      - datalake_zendesk_tickets_clean.satisfaction_ratings.score
+  score_description:
+    description: Main satisfaction score description.
+  ts_submitted:
+    description: Date the satisfaction response was submitted.
+    lineage:
+      - datalake_zendesk_tickets_clean.satisfaction_ratings.ts_created
+  year:
+    description: Year referring to the data loading day.
+    lineage:
+      - datalake_zendesk_tickets_clean.satisfaction_ratings.year
+  month:
+    description: Month referring to the data loading day.
+    lineage:
+      - datalake_zendesk_tickets_clean.satisfaction_ratings.month
+  day:
+    description: Day referring to the data loading day.
+    lineage:
+      - datalake_zendesk_tickets_clean.satisfaction_ratings.day

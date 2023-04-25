@@ -1,0 +1,28 @@
+---
+dag_documentation:
+  dag_purpose:
+    "This DAG unifies various sources of satisfaction survey data, so that it is possible to stack
+    and enrich these sources in a single view for the Support and Service line."
+
+inner_dependencies:
+  satisfaction_answers:
+    - satisfaction_surveys_gsheets
+    - satisfaction_surveys_zendesk
+    - satisfaction_surveys_bigfone
+    - satisfaction_surveys_chat_fup
+
+custom_cluster:
+  driver_node_type_id: m5a.4xlarge
+  node_type_id: m5a.2xlarge
+  autoscale:
+    max_workers: 3
+    min_workers: 1
+
+partitions_cols: [year, month, day]
+
+incremental_tables:
+  - satisfaction_answers
+  - satisfaction_surveys_gsheets
+  - satisfaction_surveys_zendesk
+  - satisfaction_surveys_bigfone
+  - satisfaction_surveys_chat_fup

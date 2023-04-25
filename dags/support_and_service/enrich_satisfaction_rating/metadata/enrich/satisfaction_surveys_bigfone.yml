@@ -1,0 +1,54 @@
+---
+database_name: datalake_satisfaction_rating
+table_name: satisfaction_surveys_bigfone
+description: Unifies and enriches form satisfaction responses coming from Bigfone.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_answer:
+    description: Unique identifier of the satisfaction response.
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.id_call
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+  id_contract:
+    description: Identifier of the contract linked to the satisfaction response.
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+  id_ticket:
+    description: If the satisfaction form was requested after a service, this, in general, will be linked to a service identifier in Zendesk.
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_ticket
+  service_type:
+    description: Indicates the service that originated the satisfaction response.
+  service_context:
+    description: The context in which this service occurred.
+  source_name:
+    description: Satisfaction form source.
+  satisfaction_score:
+    description: Main satisfaction form responses.
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.csat_2
+  score_description:
+    description: Main satisfaction score description.
+  secondary_satisfaction_score:
+    description: Secondary satisfaction form responses.
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.csat_2
+  secondary_score_description:
+    description: Secondary satisfaction score description.
+  ts_submitted:
+    description: Date the satisfaction response was submitted.
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+  year:
+    description: Year referring to the data loading day.
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.year
+  month:
+    description: Month referring to the data loading day.
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.month
+  day:
+    description: Day referring to the data loading day.
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.day

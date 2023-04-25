@@ -1,0 +1,126 @@
+---
+database_name: datalake_satisfaction_rating
+table_name: satisfaction_surveys_gsheets
+description: Unifies and enriches form satisfaction responses coming from Gsheets.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_answer:
+    description: Unique identifier of the satisfaction response.
+    lineage:
+      - datalake_gsheets_clean.owner_exit_inspection_csat.id_contract
+      - datalake_gsheets_clean.owner_exit_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.id_contract
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.owner_entrance_inspection_csat.id_contract
+      - datalake_gsheets_clean.owner_entrance_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.tenant_reimbursement_csat.id_contract
+      - datalake_gsheets_clean.tenant_reimbursement_csat.ts_submitted
+      - datalake_gsheets_clean.csat_reimbursement_true.id_contract
+      - datalake_gsheets_clean.csat_reimbursement_true.ts_submitted
+  id_survey:
+    description: Unique identifier of the satisfaction survey.
+  id_contract:
+    description: Identifier of the contract linked to the satisfaction response.
+    lineage:
+      - datalake_gsheets_clean.owner_exit_inspection_csat.id_contract
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.id_contract
+      - datalake_gsheets_clean.owner_entrance_inspection_csat.id_contract
+      - datalake_gsheets_clean.tenant_reimbursement_csat.id_contract
+  id_respondent:
+    description: Identifier of the person who answered the form.
+    lineage:
+      - datalake_gsheets_clean.tenant_reimbursement_csat.id_user
+      - datalake_ebdb_user.user.id
+  respondent_email:
+    description: Email of the person who answered the form.
+    lineage:
+      - datalake_gsheets_clean.owner_exit_inspection_csat.email
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.email
+      - datalake_gsheets_clean.owner_entrance_inspection_csat.email
+      - datalake_ebdb_user.user.email
+  respondent_type:
+    description: Position which the respondent assumed when filling out the form. It can be a tenant, landlord, the attendant itself, or other service providers.
+  service_type:
+    description: Indicates the service that originated the satisfaction response.
+  service_context:
+    description: The context in which this service occurred.
+  source_name:
+    description: Satisfaction form source.
+  survey_name:
+    description: Name of the satisfaction form, used to identify different forms from the same source, if they have a description.
+  improvement_tags:
+    description: Process improvement tags, which are indicated by the respondent.
+    lineage:
+      - datalake_gsheets_clean.owner_exit_inspection_csat.improvement_tags
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.improvement_tags
+      - datalake_gsheets_clean.owner_entrance_inspection_csat.improvement_tags
+      - datalake_gsheets_clean.tenant_reimbursement_csat.improvement_tags
+      - datalake_gsheets_clean.csat_reimbursement_true.improvement_suggestions
+  respondent_comments:
+    description: Respondent's comment/justification on the satisfaction assessment.
+    lineage:
+      - datalake_gsheets_clean.owner_exit_inspection_csat.comments
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.comments
+      - datalake_gsheets_clean.owner_entrance_inspection_csat.comments
+      - datalake_gsheets_clean.tenant_reimbursement_csat.comments
+      - datalake_gsheets_clean.csat_reimbursement_true.satisfation_level_reason
+  satisfaction_score:
+    description: Main satisfaction form responses.
+    lineage:
+      - datalake_gsheets_clean.owner_exit_inspection_csat.general_satisfaction_evaluation
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.general_satisfaction_evaluation
+      - datalake_gsheets_clean.owner_entrance_inspection_csat.general_satisfaction_evaluation
+      - datalake_gsheets_clean.tenant_reimbursement_csat.score
+      - datalake_gsheets_clean.tenant_reimbursement_csat.score_text
+      - datalake_gsheets_clean.csat_reimbursement_true.satisfation_level
+      - datalake_gsheets_clean.csat_reimbursement_true.satisfation_level_description
+  score_description:
+    description: Main satisfaction score description.
+  secondary_satisfaction_score:
+    description: Secondary satisfaction form responses.
+    lineage:
+      - datalake_gsheets_clean.owner_exit_inspection_csat.general_satisfaction_house
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.house_satisfation
+  secondary_score_description:
+    description: Secondary satisfaction score description.
+  custom_attributes:
+    description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
+    lineage:
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.id_csat
+      - datalake_gsheets_clean.tenant_reimbursement_csat.id_csat_answer
+      - datalake_gsheets_clean.csat_reimbursement_true.token
+      - datalake_gsheets_clean.csat_reimbursement_true.cid
+      - datalake_gsheets_clean.csat_reimbursement_true.uid
+  ts_submitted:
+    description: Date the satisfaction response was submitted.
+    lineage:
+      - datalake_gsheets_clean.owner_exit_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.owner_entrance_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.tenant_reimbursement_csat.ts_submitted
+      - datalake_gsheets_clean.csat_reimbursement_true.ts_submitted
+  year:
+    description: Year referring to the data loading day.
+    lineage:
+      - datalake_gsheets_clean.owner_exit_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.owner_entrance_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.tenant_reimbursement_csat.ts_submitted
+      - datalake_gsheets_clean.csat_reimbursement_true.ts_submitted
+  month:
+    description: Month referring to the data loading day.
+    lineage:
+      - datalake_gsheets_clean.owner_exit_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.owner_entrance_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.tenant_reimbursement_csat.ts_submitted
+      - datalake_gsheets_clean.csat_reimbursement_true.ts_submitted
+  day:
+    description: Day referring to the data loading day.
+    lineage:
+      - datalake_gsheets_clean.owner_exit_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.tenant_entrance_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.owner_entrance_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.tenant_reimbursement_csat.ts_submitted
+      - datalake_gsheets_clean.csat_reimbursement_true.ts_submitted

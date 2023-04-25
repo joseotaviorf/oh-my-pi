@@ -1,0 +1,96 @@
+---
+database_name: datalake_satisfaction_rating
+table_name: satisfaction_surveys_chat_fup
+description: Unifies and enriches form satisfaction responses coming from Chat FUP.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_answer:
+    description: Unique identifier of the satisfaction response.
+    lineage:
+      - datalake_chat_fup_clean.rating.id_rating
+      - datalake_chat_fup_clean.surveys_answer.id
+  id_survey:
+    description: Unique identifier of the satisfaction survey.
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.id_survey
+  id_contract:
+    description: Identifier of the contract linked to the satisfaction response.
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+  id_ticket:
+    description: If the satisfaction form was requested after a service, this, in general, will be linked to a service identifier in Zendesk.
+    lineage:
+      - datalake_chat_fup_clean.chats_chat.id_ticket
+  id_respondent:
+    description: Identifier of the person who answered the form.
+    lineage:
+      - datalake_chat_fup_clean.rating.id_user
+      - datalake_zendesk_tickets.zendesk_users_contact.id_user
+  respondent_email:
+    description: Email of the person who answered the form.
+    lineage:
+      - datalake_zendesk_tickets.zendesk_users_contact.email
+      - datalake_chat_fup_clean.chats_chat.customer_email
+  respondent_type:
+    description: Position which the respondent assumed when filling out the form. It can be a tenant, landlord, the attendant itself, or other service providers.
+    lineage:
+      - datalake_zendesk_tickets.zendesk_users_contact.role
+  service_type:
+    description: Indicates the service that originated the satisfaction response.
+  service_context:
+    description: The context in which this service occurred.
+    lineage:
+      - datalake_chat_fup_clean.rating.channel
+  source_name:
+    description: Satisfaction form source.
+  improvement_tags:
+    description: Process improvement tags, which are indicated by the respondent.
+    lineage:
+      - datalake_chat_fup_clean.rating.meta
+  respondent_comments:
+    description: Respondent's comment/justification on the satisfaction assessment.
+    lineage:
+      - datalake_chat_fup_clean.rating.comment
+      - datalake_chat_fup_clean.surveys_answer.comment
+  satisfaction_score:
+    description: Main satisfaction form responses.
+    lineage:
+      - datalake_chat_fup_clean.rating.grade
+      - datalake_chat_fup_clean.surveys_answer.rating
+  score_description:
+    description: Main satisfaction score description.
+  secondary_satisfaction_score:
+    description: Secondary satisfaction form responses.
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.is_solved
+  secondary_score_description:
+    description: Secondary satisfaction score description.
+  custom_attributes:
+    description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
+    lineage:
+      - datalake_chat_fup_clean.rating.id_origin
+      - datalake_chat_fup_clean.rating.evaluated_tool
+      - datalake_chat_fup_clean.rating.csat_version
+      - datalake_chat_fup_clean.surveys_survey.id_chat
+      - datalake_chat_fup_clean.chats_chat.attendant_email
+  ts_submitted:
+    description: Date the satisfaction response was submitted.
+    lineage:
+      - datalake_chat_fup_clean.rating.ts_created
+      - datalake_chat_fup_clean.surveys_answer.ts_created
+  year:
+    description: Year referring to the data loading day.
+    lineage:
+      - datalake_chat_fup_clean.rating.year
+      - datalake_chat_fup_clean.surveys_answer.year
+  month:
+    description: Month referring to the data loading day.
+    lineage:
+      - datalake_chat_fup_clean.rating.month
+      - datalake_chat_fup_clean.surveys_answer.month
+  day:
+    description: Day referring to the data loading day.
+    lineage:
+      - datalake_chat_fup_clean.rating.day
+      - datalake_chat_fup_clean.surveys_answer.day
