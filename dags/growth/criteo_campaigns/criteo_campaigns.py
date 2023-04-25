@@ -22,7 +22,7 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 PARTITION_COLS = ["dt_attribution"]
-CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_io-memory_cluster"
 
 config_service = ConfigurationService(SOURCE)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -104,9 +104,10 @@ raw_task_group = task_group.build_raw_task_group_for_all_tables(
     extraction_spark_job_file=raw_spark_job_file,
     raw_spark_job_extra_args=[
         SOURCE,
-        "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+        "{{ get_date_param(dag_run,  macros.ds_add(ds, -6), 'load_start_date') }}",
         "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
     ],
+    has_hive_sync=False,
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
@@ -118,7 +119,7 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     partitions=PARTITION_COLS,
     execution_date="",
     extra_query_template_params={
-        "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+        "load_start_date": "{{ get_date_param(dag_run,  macros.ds_add(ds, -6), 'load_start_date') }}",
         "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
     },
 )

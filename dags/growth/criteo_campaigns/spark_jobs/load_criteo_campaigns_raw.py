@@ -90,7 +90,7 @@ if __name__ == "__main__":
             format_options,
             database_location,
             raw_partition_cols,
-            force_recreate=False,
+            force_recreate=True,
         )
         spark_metastore_service.create_new_partitions_from_df(
             database_name=database_name,
