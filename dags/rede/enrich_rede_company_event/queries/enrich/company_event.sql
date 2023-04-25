@@ -29,53 +29,50 @@ WITH removed_company_status_oscillations AS (
         OR UNIX_TIMESTAMP(ts_next_status_started) - UNIX_TIMESTAMP(ts_event) > 60 * 60 * 24
         OR next_status IS DISTINCT FROM previous_status)
 ),
-deal_won_probability AS (
-    SELECT
-        s.metadata.probability AS won_probability
-    FROM
-        datalake_hubspot.stage AS s
-    JOIN
-        datalake_hubspot.pipeline AS p
-            ON p.id_pipeline = s.id_pipeline
-    WHERE
-        p.id_pipeline = 5160960
-        AND s.label = 'Negócio Ganho'
-),
 deal_stage_renamed AS (
     SELECT
         d.id_company,
         d.id_deal,
         ds.id_user_updated_by,
         ds.source_type,
-        CASE TRIM(s.label)
-            WHEN 'Nutrição Growth Mkt' THEN 'Growth Mkt Nutrition'
-            WHEN 'Pendente Reunião - Inside Sales' THEN 'Negotiation Meeting Pending'
-            WHEN 'Negociação Pendente - Field Sales' THEN 'Negotiation Meeting Pending'
-            WHEN 'Reunião Agendada' THEN 'Negotiation Meeting Scheduled'
-            WHEN 'Reunião Realizada' THEN 'Negotiation Meeting Completed'
-            WHEN 'Negociação em Andamento' THEN 'Negotiation In Progress'
-            WHEN 'Negociação - Inside Sales' THEN 'Negotiation In Progress'
-            WHEN 'Negócio Ganho' THEN 'Deal Won'
-            WHEN 'Aguardando Documentos' THEN 'Awaiting Documents'
-            WHEN 'Documentos Recebidos' THEN 'Documents Received'
-            WHEN 'Termo Enviado' THEN 'Term Sent'
-            WHEN 'Termo Assinado' THEN 'Membership Started'
-            WHEN 'Risco de Churn' THEN 'Churn Risk'
-            WHEN 'Análise de Distrato' THEN 'Contract Termination Analysis'
-            WHEN 'Negócio Perdido' THEN 'Deal Lost'
-            WHEN 'Churn' THEN 'Churn'
+        CASE TRIM(s.id_stage)
+            WHEN 16603552 THEN 'Growth Mkt Nutrition' -- Nutrição Growth Mkt (NG)
+            WHEN 69265218 THEN 'Prioritized' -- Imobiliárias Priorizadas (IP)
+            WHEN 69242389 THEN 'Contact Attempt' -- Tentativa de Contato (TC)
+            WHEN 69272715 THEN 'Successful Contact' -- Contato Realizado (CR)
+            WHEN 36160399 THEN 'Negotiation Meeting Pending' -- Pendente Reunião - Inside Sales
+            WHEN 52253368 THEN 'Negotiation Meeting Pending' -- Negociação Pendente - Field Sales
+            WHEN 29546857 THEN 'Negotiation Meeting Scheduled' -- Reunião Agendada (RA)
+            WHEN 31313774 THEN 'Negotiation Meeting Completed' -- Reunião Realizada
+            WHEN 36160400 THEN 'Negotiation In Progress' -- Negociação em Andamento
+            WHEN 36247092 THEN 'Negotiation In Progress' -- Negociação - Inside Sales
+            WHEN 26378054 THEN 'Deal Won' -- Negócio Ganho
+            WHEN 69301115 THEN 'Deal Won' -- Negócio Fechado (NF)
+            WHEN 16603553 THEN 'Awaiting Documents' -- Aguardando Documentos (AD)
+            WHEN 26410914 THEN 'Documents Received' -- Documentos Recebidos (DR)
+            WHEN 26410915 THEN 'Term Sent' -- Termo Enviado (TE)
+            WHEN 16603554 THEN 'Membership Started' -- Termo Assinado (TA)
+            WHEN 39565081 THEN 'Churn Risk' -- Risco de Churn
+            WHEN 50084225 THEN 'Contract Termination Analysis' -- Análise de Distrato
+            WHEN 16603555 THEN 'Deal Lost' -- Negócio Perdido (NP)
+            WHEN 37137462 THEN 'Churn' -- Churn
         END AS event,
         s.label AS hubspot_event_detail,
         'Deal' AS hubspot_event_origin,
-        s.label IN ('Negócio Perdido') AS is_loss,
-        ( -- We need to know this in order to identify when something goes from Deal Won to a previous stage
-            s.label IN ('Risco de Churn', 'Análise de Distrato')
-            OR s.metadata.probability >= dwp.won_probability
+        s.id_stage = 16603555 AS is_loss, -- Negócio Perdido (NP)
+        s.id_stage IN ( -- We need to know this in order to identify when something goes from Deal Won to a previous stage
+            26378054, -- Negócio Ganho
+            69301115, -- Negócio Fechado (NF)
+            16603553, -- Aguardando Documentos (AD)
+            26410914, -- Documentos Recebidos (DR)
+            26410915, -- Termo Enviado (TE)
+            16603554, -- Termo Assinado (TA)
+            39565081, -- Risco de Churn
+            50084225 -- Análise de Distrato
         ) AS is_after_deal_won,
         ds.ts_stage_started AS ts_event
     FROM
-        datalake_hubspot.deal_stage AS ds,
-        deal_won_probability AS dwp
+        datalake_hubspot.deal_stage AS ds
     JOIN
         datalake_hubspot.deal AS d
             ON ds.id_deal = d.id_deal
@@ -115,15 +112,22 @@ removed_ticket_stage_oscillations AS (
         ts.id_user_updated_by,
         ts.source_type,
         CASE
-            WHEN s.id_pipeline IN (5137154, 9317192) AND s.label = 'Onboarding Agendado' THEN 'Demand Onboarding Scheduled'
-            WHEN s.id_pipeline IN (5137154, 9317192) AND s.label = 'Onboarding Realizado' THEN 'Demand Onboarding Completed'
-            WHEN s.id_pipeline = 9317747 AND s.label IN ('Corretor finalizou onboarding', 'Agendou primeira visita') THEN 'Demand Onboarding Completed'
-            WHEN s.id_pipeline = 7784309 AND s.label = 'Reunião Agendada' THEN 'Supply Onboarding Scheduled'
-            WHEN s.id_pipeline = 7784309 AND s.label = 'Leads Enviados para a Rede' THEN 'First Lead 3P'
-            WHEN s.id_pipeline = 7784309 AND s.label = 'Imóveis Publicados' THEN 'First Listing'
-            WHEN s.id_pipeline = 9505972 AND s.label = 'Assinado' THEN 'Contract Transition Completed'
-            WHEN s.id_pipeline IN (5137154, 9317192) AND s.label = 'Desistência' THEN 'Demand Onboarding Given Up'
-            WHEN s.id_pipeline IN (7784309) AND s.label = 'Desistência'THEN 'Supply Onboarding Given Up'
+            WHEN s.id_stage IN (27195509, 26557112) THEN 'Welcome Email' -- E-mail de Boas Vindas Enviado
+            WHEN s.id_stage = 22048412 THEN 'Supply Onboarding Meeting Pending' -- Pendente Reunião
+            WHEN s.id_stage = 24339603 THEN 'Supply Onboarding Scheduled' -- Reunião Agendada
+            WHEN s.id_stage = 38678440 THEN 'Supply Onboarding Meeting Completed' -- Reunião Realizada
+            WHEN s.id_stage = 24339605 THEN 'CRM Settings' -- Configuração CRM
+            WHEN s.id_stage = 38678441 THEN 'Dedup Received' -- Recebimento Dedup
+            WHEN s.id_stage = 22677053 THEN 'Listings Validated' -- Validação da Listagem
+            WHEN s.id_stage = 22677054 THEN 'First Lead 3P' -- Leads Enviados para a Rede
+            WHEN s.id_stage = 25122068 THEN 'First Listing' -- Imóveis Publicados
+            WHEN s.id_stage IN (16620599, 26653758) THEN 'Demand Onboarding Scheduled' -- Onboarding Agendado
+            WHEN s.id_stage IN (16620600, 26647645) THEN 'Demand Onboarding Completed' -- Onboarding Realizado
+            -- Corretor finalizou onboarding, Agendou primeira visita
+            WHEN s.id_stage IN (29531712, 26557189) THEN 'Demand Onboarding Completed'
+            WHEN s.id_stage = 27834401 THEN 'Contract Transition Completed' -- Assinado
+            WHEN s.id_stage IN (20894770, 26557190, 26647646) THEN 'Demand Onboarding Given Up' -- Desistência
+            WHEN s.id_stage = 22677055 THEN 'Supply Onboarding Given Up' -- Desistência
         END AS event,
         s.label AS hubspot_event_detail,
         tp.label AS hubspot_event_origin,

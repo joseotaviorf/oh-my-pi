@@ -19,7 +19,7 @@ last_sk_values AS (
         dw_rede.dim_company_event_type
 )
 SELECT
-    MONOTONICALLY_INCREASING_ID() + 1 AS sk_company_event_type,
+    COALESCE(dcet.sk_company_event_type, MONOTONICALLY_INCREASING_ID() + 1) AS sk_company_event_type,
     event,
     event_type,
     source_type,
@@ -29,11 +29,11 @@ SELECT
     hubspot_deal_stage,
     hubspot_demand_onboarding_ticket_stage,
     hubspot_supply_onboarding_ticket_stage,
-    NOW() AS ts_load
+    COALESCE(dcet.ts_load, NOW()) AS ts_load
 FROM
     combinations AS c,
     last_sk_values
-LEFT JOIN
+FULL OUTER JOIN
     dw_rede.dim_company_event_type AS dcet
         USING (
             event,
@@ -46,3 +46,5 @@ LEFT JOIN
             hubspot_demand_onboarding_ticket_stage,
             hubspot_supply_onboarding_ticket_stage
         )
+WHERE
+    dcet.sk_company_event_type IS DISTINCT FROM -1
