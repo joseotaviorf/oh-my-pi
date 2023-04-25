@@ -1,0 +1,14 @@
+database_name: datalake_app_installed
+table_name: user_app_installed_event
+description: Table containing the latest app_opened_event from Amplitude for every id_user
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_user:
+    lineage:
+      - dw_public.dim_user.id_user
+    description: ID of the user
+  dt_last_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_af_app_opened_events.ts_client_event
+    description: Latest timestamp registered for this event

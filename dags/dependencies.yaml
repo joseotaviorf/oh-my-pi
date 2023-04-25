@@ -996,6 +996,9 @@ bietlejuice.enrich_analyst_ranking:
   - bietlejuice.gsheets.support_and_service:done-clean-agents-ranking-targets
   - bietlejuice.gsheets.support_and_service:done-clean-ranking-rules
   - bietlejuice.gsheets.support_and_service:done-clean-support-agents-department
+bietlejuice.enrich_app_installed:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
 bietlejuice.enrich_arquivo_confidencial:
   - bietlejuice.arquivo_confidencial:load-clean-integration-report
 bietlejuice.enrich_atta:
@@ -2025,13 +2028,13 @@ bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.hub_services:load-clean-lead-aud
   - bietlejuice.hub_services:load-clean-visitor
 bietlejuice.enrich_sale_listings:
-- bietlejuice.ebdb:create-clean-house-predicted-price-aud-in-data-lake
-- bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-- bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.ebdb:create-clean-house-predicted-price-aud-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_sale_listings_lenses:
-- bietlejuice.ebdb:create-clean-house-in-data-lake
-- bietlejuice.ebdb:create-clean-listing-sale-model-in-data-lake
-- bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-listing-sale-model-in-data-lake
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
 bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.docx:load-clean-folder
   - bietlejuice.docx:load-clean-folder-reference
