@@ -2099,6 +2099,13 @@ bietlejuice.enrich_sap_gateway:
   - bietlejuice.sap_gateway:load-clean-feature
   - bietlejuice.sap_gateway:load-clean-operation
   - bietlejuice.sap_gateway:load-clean-sync-sap-job
+bietlejuice.enrich_satisfaction_rating:
+  - bietlejuice.enrich_survicate:load-enrich-inspections-surveys
+  - bietlejuice.enrich_survicate:load-enrich-keys-surveys
+  - bietlejuice.enrich_survicate:load-enrich-lockbox-surveys
+  - bietlejuice.enrich_survicate:load-enrich-photo-surveys
+  - bietlejuice.enrich_survicate:load-enrich-repairs-surveys
+  - bietlejuice.enrich_survicate:load-enrich-scheduling-surveys
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_search_session_event:
