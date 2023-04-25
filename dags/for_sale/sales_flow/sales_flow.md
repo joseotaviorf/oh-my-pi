@@ -58,8 +58,6 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `notary_aud`
 `offer`
 `offer_aud`
-`onboarding`
-`onboarding_aud`
 `payment`
 `payment_aud`
 `reject_reason`

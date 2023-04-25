@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import datetime
 
 import pendulum
@@ -15,16 +16,14 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 
-# dag vars
 SOURCE = "sales_flow"
 CONTEXT = SOURCE
 
 DAG_ID = f"bietlejuice.{CONTEXT}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 3, 2, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 21 * * *"
 
-# airflow vars
 ENV = os.environ.get("ENVIRONMENT")
 
 CONFIG_SERVICE = ConfigurationService(SOURCE)
@@ -87,21 +86,28 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
 
-raw_task_group = task_group.build_raw_task_group_for_all_tables(
-    source=SOURCE,
-    target_database_base_name=CONTEXT,
-    extraction_spark_job_file=RAW_LOAD_SPARK_JOB_PATH,
-    raw_spark_job_extra_args=[SOURCE, "{{ds}}"],
-)
-
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
-
 for table_name, table_config in TABLES.items():
+
     extraction_type = table_config["extraction_type"]
     clean_table_name = table_config.get("clean_table_name", table_name)
 
     is_incremental = table_config.get("extraction_type") == "incremental"
     partitions = PARTITION_COLS if is_incremental else None
+    parameters = [
+        SOURCE,
+        table_name,
+        json.dumps(table_config),
+        json.dumps(PARTITION_COLS),
+        "{{ds}}"
+    ]
+
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=CONTEXT,
+        table_name=table_name,
+        extraction_spark_job_file=RAW_LOAD_SPARK_JOB_PATH,
+        raw_spark_job_extra_args=parameters,
+    )
 
     clean_task_group = task_group.build_clean_task_group(
         source_database_base_name=CONTEXT,
@@ -109,6 +115,12 @@ for table_name, table_config in TABLES.items():
         table_name=clean_table_name,
         is_incremental=is_incremental,
         partitions=partitions,
+    )
+    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
     )
 
     cross_downstream(
