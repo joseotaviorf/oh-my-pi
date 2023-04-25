@@ -23,6 +23,10 @@ columns:
     description: "The endpoint requested."
   generic_endpoint:
     description: "The endpoint generic form, such as api/contract/id."
+  description:
+    lineage:
+      - datalake_gsheets_clean.kong_ss_endpoints
+    description: "S&S endpoints description."
   entity:
     lineage:
       - datalake_kong_clean.kong_logs.message

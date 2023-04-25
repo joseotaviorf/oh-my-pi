@@ -55,6 +55,7 @@ SELECT
   ee.container_name,
   ee.endpoint,
   NULLIF(REGEXP_REPLACE(ee.endpoint, CAST(ee.entity_code AS STRING), 'id'), '') AS generic_endpoint,
+  kse.description,
   ee.entity,
   ee.entity_code,
   ee.env,
@@ -74,3 +75,7 @@ SELECT
   ee.hour
 FROM
   entities_extract AS ee
+LEFT JOIN
+  datalake_gsheets_clean.kong_ss_endpoints AS kse
+    ON kse.host = ee.host
+    AND kse.endpoint = NULLIF(REGEXP_REPLACE(ee.endpoint, CAST(ee.entity_code AS STRING), 'id'), '')
