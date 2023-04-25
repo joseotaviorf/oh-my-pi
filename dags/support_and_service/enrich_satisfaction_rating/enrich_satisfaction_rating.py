@@ -25,6 +25,7 @@ ENV = os.environ.get("ENVIRONMENT")
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2022, 1, 19, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = None
+CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_photon_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 
@@ -36,7 +37,7 @@ s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-cluster_description = config_service.get_config("custom_cluster")
+cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -74,7 +75,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=cluster_description,
+    cluster_configuration=cluster_configuration,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries,
 )
