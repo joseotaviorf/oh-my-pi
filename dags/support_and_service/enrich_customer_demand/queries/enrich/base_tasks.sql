@@ -90,7 +90,7 @@ ticket_tasks AS (
     LEFT JOIN
       datalake_zendesk_ticket_funnels.ticket_funnel AS tf
         ON e.id_ticket = tf.id_ticket
-    GROUP BY 1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19
+    GROUP BY 1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20
   ),
   unique_theme_detail_sla_target AS (
     SELECT DISTINCT
