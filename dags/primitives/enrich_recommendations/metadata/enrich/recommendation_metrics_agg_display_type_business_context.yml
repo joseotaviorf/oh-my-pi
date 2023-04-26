@@ -63,6 +63,10 @@ columns:
     description: Mean Rec to rent flow seven days @3
     lineage:
       - datalake_recommendations.recommendation_metrics_agg_recset.rec_to_rent_flow_seven_days_at_3
+  coverage_at_3:
+    description: Catalog coverage @3
+    lineage:
+      - datalake_recommendations.coverage.coverage_at_3
   mean_precision_at_5:
     description: Mean Precision @5
     lineage:
@@ -109,6 +113,10 @@ columns:
     description: Mean Rec to rent flow seven days @5
     lineage:
       - datalake_recommendations.recommendation_metrics_agg_recset.rec_to_rent_flow_seven_days_at_5
+  coverage_at_5:
+    description: Catalog coverage @5
+    lineage:
+      - datalake_recommendations.coverage.coverage_at_5
   mean_precision_at_10:
     description: Mean Precision @10
     lineage:
@@ -155,3 +163,7 @@ columns:
     description: Mean Rec to rent flow seven days @10
     lineage:
       - datalake_recommendations.recommendation_metrics_agg_recset.rec_to_rent_flow_seven_days_at_10
+  coverage_at_10:
+    description: Catalog coverage @10
+    lineage:
+      - datalake_recommendations.coverage.coverage_at_10

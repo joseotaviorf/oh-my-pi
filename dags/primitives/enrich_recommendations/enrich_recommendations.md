@@ -24,6 +24,7 @@ This pipeline produces the following output table on enrich layer:
 - `item_interaction`
 - `recommendation`
 - `recommendation_flow`
+- `coverage`
 - `recommendation_metrics_agg_recset`
 - `recommendation_metrics_agg_display_type_business_context`
 
