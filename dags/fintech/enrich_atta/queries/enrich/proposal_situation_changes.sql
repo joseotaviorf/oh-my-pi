@@ -128,7 +128,7 @@ SELECT
   proposal_status,
   situation_history,
   next_situation,
-  datediff(hour,ts_start_situation,ts_end_situation) AS leadtime_situation_in_hour,
+  datediff(hour,ts_start_situation,ts_end_situation) AS lead_time_situation_in_hour,
   datediff(day,ts_start_situation,ts_end_situation) AS lead_time_situation_in_day,
   DATEDIFF(DAY, date_trunc('day', min_ts_step),date_trunc('day',  max_ts_step)) AS lead_time_status_in_day,
   ts_proposal_registration,
