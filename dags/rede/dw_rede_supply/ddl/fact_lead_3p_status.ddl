@@ -7,6 +7,7 @@ CREATE TABLE rede.fact_lead_3p_status (
     sk_file BIGINT,
     sk_company BIGINT,
     sk_house BIGINT,
+    sk_region BIGINT,
     sk_lead_3p_status BIGINT,
     sk_status_started_date BIGINT,
     sk_status_ended_date BIGINT,

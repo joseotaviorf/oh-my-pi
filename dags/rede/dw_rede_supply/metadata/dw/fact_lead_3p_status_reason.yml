@@ -6,6 +6,8 @@ description: Each row in this table represents a reason why a certain lead is no
 domain: Rede
 owner: gustavo.miller@quintoandar.com.br
 columns:
+  sk_reason_event:
+    description: Primary key of the table.
   sk_lead_3p_flow:
     lineage:
     - datalake_rede_supply.lead_3p_sks.sk_lead_3p
@@ -33,6 +35,10 @@ columns:
     - datalake_rede_supply.lead_3p_reasons.sk_lead_3p_reason
     description: Foreign Key to the reason why the lead is not converted. Can be joined
       with dw_rede.dim_lead_3p_reason
+  sk_region:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.id_region
+    description: Foreign Key to the region of the lead. Can be joined with dw_public.dim_region.
   sk_reason_started_date:
     lineage:
     - datalake_rede_supply.lead_3p_reason_changes.ts_reason_started

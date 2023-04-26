@@ -1,10 +1,18 @@
+WITH max_sk AS (
+    SELECT
+        MAX(sk_reason_event) AS max_sk_reason_event
+    FROM
+        dw_rede.fact_lead_3p_status_reason
+)
 SELECT
+    COALESCE(flsr.sk_reason_event, max_sk_reason_event + MONOTONICALLY_INCREASING_ID() + 1) AS sk_reason_event,
     lsk.sk_lead_3p * 100 + IF(lrc.business_context = 'SALE', 0, 1) AS sk_lead_3p_flow, -- For now, Sale will be version 0, and Rent will be version 1
     lsk.sk_lead_3p,
     COALESCE(dl3c.sk_lead_3p_context, -1) AS sk_lead_3p_context,
     COALESCE(csk.sk_company, -1) AS sk_company,
     COALESCE(fsk.sk_file, -1) AS sk_file,
     lr.sk_lead_3p_reason,
+    COALESCE(l3p.id_region, -1) AS sk_region,
     COALESCE(BIGINT(DATE_FORMAT(lrc.ts_reason_started, 'yyyyMMdd')), -1) AS sk_reason_started_date,
     COALESCE(BIGINT(DATE_FORMAT(lrc.ts_reason_ended, 'yyyyMMdd')), -1) AS sk_reason_ended_date,
     lsrs.sk_lead_3p_status AS sk_status_when_reason_started,
@@ -15,7 +23,8 @@ SELECT
     lrc.ts_reason_ended,
     NOW() AS ts_load
 FROM
-    datalake_rede_supply.lead_3p_reason_changes AS lrc
+    datalake_rede_supply.lead_3p_reason_changes AS lrc,
+    max_sk
 JOIN
     datalake_brokers_supply_processor.lead_3p AS l3p
         ON lrc.id_lead_3p = l3p.id
@@ -50,3 +59,9 @@ LEFT JOIN
     dw_rede.dim_lead_3p_context AS dl3c
         ON lrc.business_context = dl3c.business_context
         AND IF(lrc.business_context = 'SALE', l3p.sale_recurrency_type, l3p.rent_recurrency_type) = dl3c.recurrency_type
+LEFT JOIN
+    dw_rede.fact_lead_3p_status_reason AS flsr
+        ON flsr.sk_lead_3p = lsk.sk_lead_3p
+        AND flsr.sk_lead_3p_context = COALESCE(dl3c.sk_lead_3p_context, -1)
+        AND flsr.sk_lead_3p_reason = lr.sk_lead_3p_reason
+        AND flsr.ts_reason_started = lrc.ts_reason_started

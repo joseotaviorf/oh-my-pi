@@ -41,6 +41,10 @@ columns:
     - datalake_ebdb_clean.house.id
     description: Foreign Key to the house in Main, if the lead was published. Can
       be joined with dw_public.dim_house.
+  sk_region:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.id_region
+    description: Foreign Key to the region of the lead. Can be joined with dw_public.dim_region.
   sk_lead_date:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.ts_status_started
@@ -60,13 +64,15 @@ columns:
   sk_registered_date:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+    description: Date key for when the lead was registered in Main.
   sk_first_listing_date:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.ts_status_started
-    description: Date key for when the lead was registered in Main.
+    description: Date key for when the lead was first published.
   sk_first_unpublished_date:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+    description: Date key for when the lead was first unpublished.
   ts_lead:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.ts_status_started

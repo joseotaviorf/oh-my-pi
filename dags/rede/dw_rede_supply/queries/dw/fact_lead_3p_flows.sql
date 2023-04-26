@@ -53,6 +53,7 @@ SELECT
     COALESCE(csk.sk_company, -1) AS sk_company,
     ls.sk_lead_3p_status,
     COALESCE(h.id, -1) AS sk_house,
+    COALESCE(l3p.id_region, -1) AS sk_region,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_lead, 'yyyyMMdd')), -1) AS sk_lead_date,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_prospect, 'yyyyMMdd')), -1) AS sk_prospect_date,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_qualified, 'yyyyMMdd')), -1) AS sk_qualified_date,

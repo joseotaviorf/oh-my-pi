@@ -7,6 +7,7 @@ CREATE TABLE rede.fact_lead_3p_flows (
     sk_company BIGINT,
     sk_lead_3p_status BIGINT,
     sk_house BIGINT,
+    sk_region BIGINT,
     sk_lead_date BIGINT,
     sk_prospect_date BIGINT,
     sk_qualified_date BIGINT,

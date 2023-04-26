@@ -6,6 +6,7 @@ SELECT
     COALESCE(fsk.sk_file, -1) AS sk_file,
     COALESCE(csk.sk_company, -1) AS sk_company,
     COALESCE(lsc.id_house, -1) AS sk_house,
+    COALESCE(l3p.id_region, -1) AS sk_region,
     ls.sk_lead_3p_status AS sk_lead_3p_status,
     COALESCE(BIGINT(DATE_FORMAT(lsc.ts_status_started, 'yyyyMMdd')), -1) AS sk_status_started_date,
     COALESCE(BIGINT(DATE_FORMAT(lsc.ts_status_ended, 'yyyyMMdd')), -1) AS sk_status_ended_date,
