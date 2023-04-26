@@ -52,3 +52,5 @@ columns:
         description: "Flag to identify automatic or manual proposals"
     is_offer_canceled:
         description: "Flag to identify canceled offers"
+    ts_load:
+        description: "Load date"

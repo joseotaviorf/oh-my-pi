@@ -15,6 +15,7 @@ SELECT DISTINCT
   grace_period_tec,
   ts_contract_deadline,
   ts_registration,
-  ts_franchise_signature
+  ts_franchise_signature,
+    NOW()       AS ts_load
 FROM
   datalake_atta_clean.franchise_info

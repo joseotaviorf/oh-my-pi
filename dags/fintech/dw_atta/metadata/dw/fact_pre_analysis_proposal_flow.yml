@@ -27,6 +27,7 @@ columns:
     sk_client:
         lineage:
             - datalake_atta_clean.proposal.id_client
+            - datalake_atta_clean.pre_analysis.id_client
         description: "Client's identification number"
     sk_buyer:
         lineage:
@@ -70,6 +71,7 @@ columns:
         description: "Pre analysis registration user's identification number"
     sk_consultant:
         lineage:
+            - datalake_atta_clean.proposal.id_consultant
             - datalake_atta_clean.pre_analysis.id_consultant
         description: "Consultant's identification number"
     registration_user_name:
@@ -225,3 +227,5 @@ columns:
         lineage:
             - datalake_atta_clean.proposal.ts_last_updated
         description: "Timestamp in which data was updated"
+    ts_load:
+        description: "Load date"

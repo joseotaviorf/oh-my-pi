@@ -16,3 +16,5 @@ columns:
         lineage:
             - datalake_atta_clean.client.client_name
         description: "Client's email"
+    ts_load:
+        description: "Load date"

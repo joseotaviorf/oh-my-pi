@@ -34,3 +34,5 @@ columns:
     lineage:
       - datalake_atta_clean.partner_info.ts_inactive_user
     description: "Timestamp when user became inactive"
+  ts_load:
+    description: "Load date"

@@ -58,3 +58,5 @@ columns:
     lineage:
       - datalake_atta_clean.franchise_info.ts_franchise_signature
     description: "Franchise signature timestamp"
+  ts_load:
+    description: "Load date"

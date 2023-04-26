@@ -2,6 +2,8 @@ SELECT
     id                          AS id_pre_analysis,
     idfranquia                  AS id_franchise,
     idparceiro                  AS id_partner,
+    id_cliente                  AS id_client,
+    attributedconsultant        AS id_consultant,
     idpreanaliseext             AS id_offer,
     idusuario                   AS id_registration_user,
     cpf                         AS client_cpf,

@@ -11,5 +11,6 @@ SELECT DISTINCT
         ELSE 'Other partnerships'
   END AS wallet,
   ts_registration,
-  ts_inactive_user
+  ts_inactive_user,
+  NOW()       AS ts_load
 FROM datalake_atta_clean.partner_info

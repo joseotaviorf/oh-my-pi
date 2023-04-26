@@ -41,7 +41,8 @@ SELECT
         WHEN fo.sk_offer_rescued_date > fo.sk_offer_dismissed_date THEN false
         WHEN fo.sk_offer_dismissed_date > 0 THEN true
         WHEN fo.sk_offer_dismissed_date < 0 THEN false
-    END AS is_offer_canceled
+    END AS is_offer_canceled,
+    NOW()       AS ts_load
 FROM datalake_atta_clean.proposal AS pp
 LEFT JOIN
     datalake_atta_clean.pre_analysis AS cs ON pp.id_pre_analysis = cs.id_pre_analysis

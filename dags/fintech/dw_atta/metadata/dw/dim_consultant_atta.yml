@@ -17,3 +17,5 @@ columns:
         lineage:
             - datalake_atta_clean.users_info.user_email
         description: "Consultant's email"
+    ts_load:
+        description: "Load date"

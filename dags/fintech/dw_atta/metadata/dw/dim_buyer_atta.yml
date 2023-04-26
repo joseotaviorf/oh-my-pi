@@ -16,3 +16,5 @@ columns:
         lineage:
             - dw_public.dim_user.nome
         description: "Buyer's name"
+    ts_load:
+        description: "Load date"

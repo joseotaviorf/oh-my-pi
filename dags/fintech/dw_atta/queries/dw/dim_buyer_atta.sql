@@ -1,7 +1,8 @@
 SELECT DISTINCT
     COALESCE(fo.sk_buyer,-1) AS sk_buyer,
     du.cpf      AS buyer_cpf,
-    du.nome     AS buyer_name
+    du.nome     AS buyer_name,
+    NOW()       AS ts_load
 FROM
     dw_sale.fact_offers fo
 LEFT JOIN
