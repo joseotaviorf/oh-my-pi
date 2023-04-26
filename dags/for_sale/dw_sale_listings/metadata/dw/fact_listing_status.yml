@@ -1,6 +1,8 @@
 database_name: dw_sale
 table_name: fact_listing_status
-description: ''
+description: This table keeps track of every status change of For Sale listings. 
+  Therefore, a listing can have multiple rows in this table, one for each status change, with its start and end date (if any). 
+  An example would be the first row of a listing where the first status is editing (pre-publication) and the second is published (post-publication).
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
@@ -12,47 +14,49 @@ columns:
   sk_region:
     lineage:
     - datalake_sale_listings.sale_listing_status.id_region
-    description: Key of region where house listing is located in.
+    description: Foreign key of region where house listing is located in. Can be joined
+      with dw_public.dim_region.
   sk_first_publication_date:
     lineage:
     - datalake_sale_listings.sale_listing_status.ts_first_publication
-    description: Date of listing first publication.
+    description: Foreign key referring to the date of the first publication in the Sale context of this listing. Can be joined with dw_public.dim_date to retrieve in date format.
   sk_status_start_date:
     lineage:
     - datalake_sale_listings.sale_listing_status.ts_status_started
-    description: Date when status started.
+    description: Foreign key referring to the status start date in the Sale context of this listing. Can be joined with dw_public.dim_date to retrieve in date format.
   sk_status_end_date:
     lineage:
     - datalake_sale_listings.sale_listing_status.ts_status_ended
-    description: Date when status changed.
+    description: Foreign key referring to the status ended date in the Sale context of this listing. Can be joined with dw_public.dim_date to retrieve in date format.
   ts_status_started:
     lineage:
     - datalake_sale_listings.sale_listing_status.ts_status_started
-    description: Timestamp when status started.
+    description: Timestamp on which the start of the row-related status occurred.
   ts_status_ended:
     lineage:
     - datalake_sale_listings.sale_listing_status.ts_status_ended
-    description: Timestamp when status changed.
+    description: Timestamp that the status change to the next status occurred.
   status_history:
     lineage:
     - datalake_sale_listings.sale_listing_status.status_history
-    description: Status of sale listing
+    description: 'Sale status linked to a certain point in time of the listing.'
     categories:
-      CCV_CANCELED: ''
-      CCV_SIGNED: ''
-      EDITING: ''
-      OPTED_OUT: ''
-      PUBLISHED: ''
-      SALE_COMPLETED: ''
-      SUSPENDED: ''
-      UNPUBLISHED: ''
+      CCV_CANCELED: If the listing is in the process of sales cancellation.
+      CCV_SIGNED: If the listing is in the process of being sold.
+      EDITING: If the listing is being edited.
+      OPTED_OUT: If a listing has opted out of the funnel before being published.
+      PUBLISHED: If the listing is published.
+      SALE_COMPLETED: If the listing is already sold.
+      SUSPENDED: If the listing is suspended.
+      UNPUBLISHED: If the listing is unpublished.
   status_change_reason:
     lineage:
     - datalake_sale_listings.sale_listing_status.status_change_reason
-    description: Reason why status changed.
+    description: Descriptive column that shows the cause of the status change for the row.
   is_last_status:
     lineage:
     - datalake_sale_listings.sale_listing_status.is_last_status
-    description: Flag to highlight last status update
+    description: Boolean column indicating the current listing status. If True, it
+      means that the listing is in the last status.
   ts_load:
-    description: Timestamp of data load.
+    description: Timestamp when the data was processed.
