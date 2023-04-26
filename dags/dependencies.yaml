@@ -2099,19 +2099,19 @@ bietlejuice.enrich_sap_gateway:
   - bietlejuice.sap_gateway:load-clean-feature
   - bietlejuice.sap_gateway:load-clean-operation
   - bietlejuice.sap_gateway:load-clean-sync-sap-job
-bietlejuice.enrich_satisfaction_rating:
-  - bietlejuice.chat_fup:load-clean-chats-chat
-  - bietlejuice.chat_fup:load-clean-rating
-  - bietlejuice.chat_fup:load-clean-surveys-answer
-  - bietlejuice.chat_fup:load-clean-surveys-survey
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-  - bietlejuice.gsheets.fintech:done-clean-owner-exit-inspection-csat
-  - bietlejuice.gsheets.fintech:done-clean-owner-entrance-inspection-csat
-  - bietlejuice.gsheets.fintech:done-clean-tenant-entrance-inspection-csat
-  - bietlejuice.gsheets.support_and_service:done-clean-csat-reimbursement-true
-  - bietlejuice.gsheets.support_and_service:done-clean-tenant-reimbursement-csat
-  - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
+# bietlejuice.enrich_satisfaction_rating:
+#   - bietlejuice.chat_fup:load-clean-chats-chat
+#   - bietlejuice.chat_fup:load-clean-rating
+#   - bietlejuice.chat_fup:load-clean-surveys-answer
+#   - bietlejuice.chat_fup:load-clean-surveys-survey
+#   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
+#   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
+#   - bietlejuice.gsheets.fintech:done-clean-owner-exit-inspection-csat
+#   - bietlejuice.gsheets.fintech:done-clean-owner-entrance-inspection-csat
+#   - bietlejuice.gsheets.fintech:done-clean-tenant-entrance-inspection-csat
+#   - bietlejuice.gsheets.support_and_service:done-clean-csat-reimbursement-true
+#   - bietlejuice.gsheets.support_and_service:done-clean-tenant-reimbursement-csat
+#   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_search_session_event:
