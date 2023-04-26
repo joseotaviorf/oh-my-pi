@@ -20,11 +20,3 @@ pipeline:
     dw:
       <<: *redshift_anchor
       table: rental_events_funnel
-  rental_events_funnel_partners:
-    dw:
-      <<: *redshift_anchor
-      table: rental_events_funnel_partners
-  user_cohort_rental_demand_conversion:
-    dw:
-      <<: *redshift_anchor
-      table: user_cohort_rental_demand_conversion

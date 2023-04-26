@@ -13,9 +13,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline creates the following full tables in the schema `dw_datamart` of data lake and `datamarts` of DW.
 
 - `rental_demand_events_funnel_flows`
-- `rental_events_funnel_partners`
 - `rental_events_funnel`
-- `user_cohort_rental_demand_conversion`
 
 ### Additional Information
 
