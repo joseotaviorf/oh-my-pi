@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS rede.dim_company;
 CREATE TABLE rede.dim_company (
     sk_company BIGINT PRIMARY KEY,
     id_hubspot BIGINT,
+    uuid_company VARCHAR,
     company_name VARCHAR,
     "tag" VARCHAR,
     extracted_3p_tag VARCHAR,

@@ -9,6 +9,10 @@ columns:
     lineage:
       - datalake_hubspot.company_history.id_company
     description: ID of the company.
+  uuid_company:
+    lineage:
+      - datalake_company_clean.company.uuid_company
+    description: Unique identifier (UUID) of a company generated in the Company Database.
   id_hubspot_owner:
     lineage:
       - datalake_hubspot.company_history.id_hubspot_owner

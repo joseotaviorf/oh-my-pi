@@ -16,6 +16,10 @@ columns:
     lineage:
     - datalake_hubspot.company.id_hubspot
     description: Natural key that represents the company lead, coming from HubSpot.
+  uuid_company:
+    lineage:
+    - datalake_hubspot.company.uuid_company
+    description: Unique identifier (UUID) of a company generated in the Company Database.
   company_name:
     lineage:
     - datalake_hubspot.company.name

@@ -1,6 +1,7 @@
 SELECT
     cs.sk_company,
     cs.id_hubspot,
+    c.uuid_company,
     COALESCE(c.name, cs.extracted_3p_tag, 'Unknown') AS company_name,
     COALESCE(c.tag_real_estate_agency, cs.extracted_3p_tag, 'Unknown') AS tag,
     COALESCE(c.extracted_3p_tag, cs.extracted_3p_tag, 'Unknown') AS extracted_3p_tag,

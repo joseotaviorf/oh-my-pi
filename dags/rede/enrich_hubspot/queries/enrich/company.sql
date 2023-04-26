@@ -1,88 +1,146 @@
+WITH hubspot_companies AS (
+    SELECT
+        id_company,
+        cnpj,
+        ts_updated,
+        LAST(lead_status)
+        OVER (
+            PARTITION BY
+                id_company
+            ORDER BY
+                ts_updated
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS current_status,
+        LAST(tag_real_estate_agency)
+        OVER (
+            PARTITION BY
+                id_company
+            ORDER BY
+                ts_updated
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS current_tag
+    FROM
+        datalake_hubspot.company_history
+),
+company_matches AS (
+    SELECT
+        c.uuid_company,
+        ch.id_company AS id_company_hubspot
+    FROM
+        datalake_company_clean.company_document AS cd
+    JOIN
+        datalake_company_clean.company AS c
+            ON cd.id_company = c.id
+    JOIN
+        datalake_company_clean.document AS d
+            ON cd.id_document = d.id
+            AND d.document_type = 'CNPJ'
+    JOIN
+        datalake_company_clean.company_product AS cp
+            ON c.id = cp.id_company
+            AND cp.id_product = 27
+    LEFT JOIN
+        hubspot_companies AS ch
+            ON d.identification_number = ch.cnpj
+    QUALIFY
+        ROW_NUMBER() OVER (
+        PARTITION BY
+            d.identification_number
+        ORDER BY
+            ch.current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC, -- First, the ones that are currently members
+            ch.current_tag IS NOT NULL DESC, -- Then, the ones with tags
+            ch.ts_updated DESC -- Otherwise, most recent
+        ) = 1
+)
 SELECT
-    id_company,
-    id_hubspot_owner,
-    id_hubspot_team,
-    id_parent_company,
-    fields_of_business,
-    address,
-    zip_code,
-    city,
-    state,
-    country,
-    domain,
-    e_mail,
-    hs_analytics_source,
-    hs_analytics_source_data_1,
-    hs_analytics_source_data_2,
-    industry,
-    inside_sales,
-    life_cycle_stage,
-    mkt_campain,
-    mkt_channel,
-    mkt_content,
-    mkt_medium,
-    mkt_origin,
-    mkt_source,
-    discard_reason,
-    unified_discard_reasons,
-    name,
-    tag_real_estate_agency,
-    extracted_3p_tag,
-    member_type,
-    member_category,
-    member_category_history,
-    lead_origin,
-    phone,
-    partnership_type,
-    first_conversion_event_name,
-    hs_analytics_first_touch_converting_campaign,
-    crm,
-    partner_agencies,
-    advertising_portals,
-    rental_guarantee_solutions,
-    real_estate_agency_focus,
-    financing_banks,
-    cnpj,
-    creci,
-    products_of_interest,
-    lead_status,
-    lead_status_history,
-    num_associated_deals,
-    num_associated_contacts,
-    monthly_average_new_rental_contracts,
-    num_managers,
-    num_managed_properties,
-    num_monthly_leads,
-    average_sale_property_ticket,
-    average_rent_property_ticket,
-    monthly_repayment_volume_in_real,
-    monthly_sale_volume_in_real,
-    num_real_estate_agents,
-    num_properties_for_sale,
-    num_properties_for_rent,
-    has_crm,
-    has_property_advertisement_online,
-    is_correspondent_bank,
-    is_lost,
-    has_financing,
-    is_for_sale,
-    is_for_rent,
-    has_partnerships_with_other_agencies,
-    is_natural_person,
-    is_juridical_person,
-    is_archived,
-    ts_first_conversion,
-    ts_recent_deal_close,
-    ts_hubspot_owner_assigned,
-    ts_last_logged_call,
-    ts_notes_last_updated,
-    ts_archived,
-    ts_created,
-    ts_updated,
-    year,
-    month,
-    day
+    ch.id_company,
+    cm.uuid_company,
+    ch.id_hubspot_owner,
+    ch.id_hubspot_team,
+    ch.id_parent_company,
+    ch.fields_of_business,
+    ch.address,
+    ch.zip_code,
+    ch.city,
+    ch.state,
+    ch.country,
+    ch.domain,
+    ch.e_mail,
+    ch.hs_analytics_source,
+    ch.hs_analytics_source_data_1,
+    ch.hs_analytics_source_data_2,
+    ch.industry,
+    ch.inside_sales,
+    ch.life_cycle_stage,
+    ch.mkt_campain,
+    ch.mkt_channel,
+    ch.mkt_content,
+    ch.mkt_medium,
+    ch.mkt_origin,
+    ch.mkt_source,
+    ch.discard_reason,
+    ch.unified_discard_reasons,
+    ch.name,
+    ch.tag_real_estate_agency,
+    ch.extracted_3p_tag,
+    ch.member_type,
+    ch.member_category,
+    ch.member_category_history,
+    ch.lead_origin,
+    ch.phone,
+    ch.partnership_type,
+    ch.first_conversion_event_name,
+    ch.hs_analytics_first_touch_converting_campaign,
+    ch.crm,
+    ch.partner_agencies,
+    ch.advertising_portals,
+    ch.rental_guarantee_solutions,
+    ch.real_estate_agency_focus,
+    ch.financing_banks,
+    ch.cnpj,
+    ch.creci,
+    ch.products_of_interest,
+    ch.lead_status,
+    ch.lead_status_history,
+    ch.num_associated_deals,
+    ch.num_associated_contacts,
+    ch.monthly_average_new_rental_contracts,
+    ch.num_managers,
+    ch.num_managed_properties,
+    ch.num_monthly_leads,
+    ch.average_sale_property_ticket,
+    ch.average_rent_property_ticket,
+    ch.monthly_repayment_volume_in_real,
+    ch.monthly_sale_volume_in_real,
+    ch.num_real_estate_agents,
+    ch.num_properties_for_sale,
+    ch.num_properties_for_rent,
+    ch.has_crm,
+    ch.has_property_advertisement_online,
+    ch.is_correspondent_bank,
+    ch.is_lost,
+    ch.has_financing,
+    ch.is_for_sale,
+    ch.is_for_rent,
+    ch.has_partnerships_with_other_agencies,
+    ch.is_natural_person,
+    ch.is_juridical_person,
+    ch.is_archived,
+    ch.ts_first_conversion,
+    ch.ts_recent_deal_close,
+    ch.ts_hubspot_owner_assigned,
+    ch.ts_last_logged_call,
+    ch.ts_notes_last_updated,
+    ch.ts_archived,
+    ch.ts_created,
+    ch.ts_updated,
+    ch.year,
+    ch.month,
+    ch.day
 FROM
-    datalake_hubspot.company_history
+    datalake_hubspot.company_history AS ch
+LEFT JOIN
+    company_matches AS cm
+        ON ch.id_company = cm.id_company_hubspot
 QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_company ORDER BY ts_updated DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY ch.id_company ORDER BY ch.ts_updated DESC) = 1

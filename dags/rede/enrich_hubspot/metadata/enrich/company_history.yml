@@ -9,7 +9,7 @@ columns:
   id_company:
     lineage:
       - datalake_hubspot_clean.company.id_company
-    description: ID of the company.
+    description: ID of the company in HubSpot.
   id_hubspot_owner:
     lineage:
       - datalake_hubspot_clean.company.properties

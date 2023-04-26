@@ -1473,6 +1473,7 @@ bietlejuice.enrich_gsheets:
 bietlejuice.enrich_heimdall:
   - bietlejuice.heimdall:load-clean-activity
 bietlejuice.enrich_hubspot:
+  - bietlejuice.company:load-clean-company
   - bietlejuice.hubspot:load-clean-company
   - bietlejuice.hubspot:load-clean-contact
   - bietlejuice.hubspot:load-clean-deal
