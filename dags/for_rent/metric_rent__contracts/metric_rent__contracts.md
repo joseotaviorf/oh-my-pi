@@ -25,3 +25,7 @@ Currently, there is the following output table for both our raw and clean layers
 - `new_rentals_monthly`
 - `new_rentals_weekly`
 - `new_tenant_prospect_to_contract_signed_4w`
+- `re_rentals_daily`
+- `re_rentals_daily_by_sk_region`
+- `re_rentals_monthly`
+- `re_rentals_weekly`

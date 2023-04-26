@@ -1,0 +1,6 @@
+---
+table_name: metric_rent.re_rentals_daily_by_sk_region
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  rental_date:
+    is_complete:

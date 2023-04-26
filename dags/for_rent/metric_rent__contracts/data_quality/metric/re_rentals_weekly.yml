@@ -1,0 +1,6 @@
+---
+table_name: metric_rent.re_rentals_weekly
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  week:
+    is_unique:
