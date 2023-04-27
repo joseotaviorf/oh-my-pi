@@ -8,6 +8,7 @@ from yamale import YamaleError
 from scripts.services.metadata_file_service import (
     MetadataFileService,
     ReverseMetadataFileException,
+    MetricValidateLayerException,
 )
 
 from scripts.services.git_service import GitService
@@ -117,6 +118,8 @@ def main():
             except YamaleError as error:
                 results["failed"].append(error.results[0])
             except ReverseMetadataFileException as error:
+                results["failed"].append(error)
+            except MetricValidateLayerException as error:
                 results["failed"].append(error)
         else:
             results["skipped"].append(file)

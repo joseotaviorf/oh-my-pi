@@ -5,6 +5,7 @@ from typing import List, Dict, Any, Tuple
 
 import yaml
 from yamale import yamale, YamaleError
+from sqlglot import parse_one, exp
 
 from bietlejuice.services import FileService
 from scripts.services.metadata_file_info import MetadataFileInfo
@@ -19,6 +20,17 @@ class ReverseMetadataFileException(Exception):
         ]
         super().__init__(
             f"file={file}, layer={layer}, msg=Reverse layer do not need metadata files. Remove this file"
+        )
+
+class MetricValidateLayerException(Exception):
+    def __init__(self, file, table, layer):
+        self.data = file
+        self.errors = [
+            f"Error: Metric layer does not allow datamarts or tables from raw and clean layers in sql file. Table={table}"
+        ]
+
+        super().__init__(
+            f"file={file}, layer={layer}, msg=Metric layer does not allow datamarts or tables from raw and clean layers in sql file. Table={table}"
         )
 
 
@@ -195,6 +207,59 @@ class MetadataFileService:
 
         return file_info
 
+    def get_table_layer(self, schema: str):
+        """
+        Read the schema and return the table layer.
+
+        :param schema: Schema name
+        :type schema: str
+        :rtype: str
+        """
+
+        if re.match(r".*_raw$", schema):
+            return "raw"
+        elif re.match(r".*_clean$", schema):
+            return "clean"
+        elif re.match(r"^dw_datamarts_.*", schema):
+            return "dw_datamarts"
+        elif re.match(r"^dw_.*", schema):
+            return "dw"
+        elif re.match(r"^metric_.*", schema):
+            return "metric" 
+        else:
+            return "enrich"
+
+    def validate_metric_file(self, file_path: str, yaml_data: Dict):
+        """
+        Given the metric metadata, validate if it use only tables in enrich and dw layer.
+
+        :param file_path: Metric metadata file path.
+        :type file_path: str
+        :param yaml_data: Metric metadata.
+        :type yaml_data: Dict
+        :rtype: List[Any]
+        """
+
+        sql_file_path = file_path.replace("metadata", "queries").replace(".ymal", ".sql").replace(".yml", ".sql")
+        with open(sql_file_path, "r") as sql_file:
+            tables = [
+                table
+                for table in parse_one(sql_file.read()).find_all(exp.Table)
+            ]
+
+        for table in tables:
+            if self.get_table_layer(table.db) in ["raw", "clean", "dw_datamarts"]:
+                raise MetricValidateLayerException(
+                    file_path,
+                    f"{table.db}.{table.name}",
+                    "metric",
+                )
+
+
+        return yamale.validate(self.schemas["metric"], yaml_data)
+
+
+
     def validate_file(self, file_path: str, status: str) -> List[Any]:
         """
         Given the path to a metadata file, validates if it conforms to the metadata files schemas
@@ -206,7 +271,6 @@ class MetadataFileService:
         :rtype: List[Any]
         """
         yaml_data = yamale.make_data(file_path)
-        yaml_content, _ = yaml_data[0]
         table_info = MetadataFileService._get_info_from_path(file_path)
         layer = table_info["layer"]
 
@@ -217,7 +281,7 @@ class MetadataFileService:
         elif layer in ["enrich", "dw"]:
             return yamale.validate(self.schemas["enrich_dw"], yaml_data)
         elif layer == "metric":
-            return yamale.validate(self.schemas["metric"], yaml_data)
+            return self.validate_metric_file(file_path, yaml_data)
         elif layer == "reverse":
             raise ReverseMetadataFileException(file_path, layer)
 
