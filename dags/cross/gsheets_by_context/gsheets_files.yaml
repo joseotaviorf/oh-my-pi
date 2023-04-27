@@ -336,22 +336,10 @@ marketing_social_media_costs:
     clean_table_name: marketing_social_media_costs
     sheet_context: growth
 
-mexico_costs_targets:
-    sheet_id: 1bPwti9OY4s7k44uQof7GIyBjMs9_l1JBnuAIv8oOEFo
-    sheet_name: costs_targets_mx
-    clean_table_name: mexico_costs_targets
-    sheet_context: growth
-
 mexico_demand_marketing_cost_per_source_actual:
     sheet_id: 17p7m9Kk04LXKMvEV6KawPVaw52uMROFvfqiT69o_oFQ
     sheet_name: mkt_cost_per_source
     clean_table_name: mexico_demand_marketing_cost_per_source_actual
-    sheet_context: growth
-
-mexico_marketing_cost_per_source:
-    sheet_id: 1eIjPgBuUYojHGW8JwVVnOvMRU0a9jwYb9QQtIejyPAc
-    sheet_name: mkt_cost_per_source
-    clean_table_name: mexico_marketing_cost_per_source
     sheet_context: growth
 
 mexico_rental_flows_targets:
@@ -959,12 +947,6 @@ mexico_rental_cohort_supply:
     sheet_id: 1y7cXmEgj6cQzTLJJFMhHIJT9reO5rhl-UdNyztoc9Bw
     sheet_name: mexico_rental_cohort_supply
     clean_table_name: mexico_rental_cohort_supply
-    sheet_context: for_rent
-
-mexico_supply_targets_2022:
-    sheet_id: 1sEl5H0PpnoRrKB4JmGGLq9WG-sWrGIfA1n4Cs4vDz1Q
-    sheet_name: supply_targets_2022_mx
-    clean_table_name: mexico_supply_targets_2022
     sheet_context: for_rent
 
 ongoing_listings_targets:
