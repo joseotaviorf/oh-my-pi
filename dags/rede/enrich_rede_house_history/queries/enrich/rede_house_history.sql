@@ -116,7 +116,7 @@ house_history AS (
             ON h.id_external = l.uuid_lead
 ),
 sale_united AS (
-    SELECT
+    (SELECT
         lbca.id_house,
         NULL::BIGINT AS id_company_hubspot_extracted,
         'LBC' AS source,
@@ -127,6 +127,7 @@ sale_united AS (
         NULL::BOOLEAN AS has_3p_bh_in_tag,
         CASE -- Some migrations incorrectly set the revision timestamp to the year 2610. We're fixing them here.
             WHEN DATE(ure.ts_revision) = '2610-10-12' THEN '2022-10-25T23:53:18.764+0000'::TIMESTAMP
+            WHEN DATE(ure.ts_revision) = '2610-10-07' THEN '2022-06-14T05:04:41.716+0000'::TIMESTAMP
             ELSE ure.ts_revision
         END AS ts_status_started
     FROM
@@ -136,10 +137,12 @@ sale_united AS (
             ON lbca.rev = ure.id
     WHERE
         lbca.business_context = 'SALE'
-        AND ure.ts_revision >= '2022-08-01' -- We won't trust revisions before this date, since the column ownership had just been added.
-        AND DATE(ure.ts_revision) != '2610-10-07'
+        AND (lbca.ownership = 'THIRD_PARTY'
+        OR(ure.ts_revision >= '2022-08-01' -- We won't trust revisions before this date, since the column ownership had just been added.
+        AND DATE(ure.ts_revision) != '2610-10-07'))
     QUALIFY
         LAG(lbca.ownership) OVER (PARTITION BY lbca.id_listing_business_context ORDER BY lbca.rev) IS DISTINCT FROM lbca.ownership
+    )
     UNION ALL
     SELECT
         id_house,
@@ -184,55 +187,13 @@ sale_fetching_last AS (
     FROM
         sale_united AS su
 ),
-sale_final AS (
-    SELECT
-        sfl.id_house,
-        -- Business rules to consider a listing Sale 3P supply:
-        -- 3P BH was migrated incorrectly to the ownership column, so we will consider the tag instead (until 2023).
-        -- We prioritize whatever came from listing_business_context, then house
-        -- If the house was inputed manually, we will consider the tag (until 2023)
-        CASE
-            WHEN ( 
-                (has_3p_bh_in_tag AND sfl.ts_status_started < '2023-01-01')
-                OR COALESCE(sfl.is_3p_supply_lbc_aud, sfl.is_3p_supply_house_aud)
-                OR (NOT sfl.is_in_supply_processor AND sfl.is_3p_supply_house_aud AND sfl.ts_status_started < '2023-01-01')
-            ) THEN sfl.id_company_hubspot_extracted
-        END AS id_company_hubspot,
-        'SALE' AS business_context,
-        CASE
-            WHEN (
-                (has_3p_bh_in_tag AND sfl.ts_status_started < '2023-01-01')
-                OR COALESCE(sfl.is_3p_supply_lbc_aud, sfl.is_3p_supply_house_aud)
-                OR (NOT sfl.is_in_supply_processor AND sfl.is_3p_supply_house_aud AND sfl.ts_status_started < '2023-01-01')
-            ) THEN partner_3p_supply_extracted
-        END AS partner_3p_supply,
-        (
-            (has_3p_bh_in_tag AND sfl.ts_status_started < '2023-01-01')
-            OR COALESCE(sfl.is_3p_supply_lbc_aud, sfl.is_3p_supply_house_aud)
-            OR (NOT sfl.is_in_supply_processor AND sfl.is_3p_supply_house_aud AND sfl.ts_status_started < '2023-01-01')
-        ) AS is_3p_supply,
-        CASE
-            WHEN (
-                (has_3p_bh_in_tag AND sfl.ts_status_started < '2023-01-01')
-                OR COALESCE(sfl.is_3p_supply_lbc_aud, sfl.is_3p_supply_house_aud)
-                OR (NOT sfl.is_in_supply_processor AND sfl.is_3p_supply_house_aud AND sfl.ts_status_started < '2023-01-01')
-            ) THEN is_3p_supply_bh
-            ELSE FALSE
-        END AS is_3p_supply_bh,
-        sfl.ts_status_started
-    FROM
-        sale_fetching_last AS sfl
-    QUALIFY
-        LAG(is_3p_supply) OVER(PARTITION BY id_house ORDER BY ts_status_started) IS DISTINCT FROM is_3p_supply
-        OR LAG(id_company_hubspot) OVER(PARTITION BY id_house ORDER BY ts_status_started) IS DISTINCT FROM id_company_hubspot
-        OR LAG(partner_3p_supply) OVER(PARTITION BY id_house ORDER BY ts_status_started) IS DISTINCT FROM partner_3p_supply
-),
 rent_united AS (
     (SELECT
         lbc.id_house,
         NULL::BIGINT AS id_company_hubspot_extracted,
         NULL::STRING AS partner_3p_supply_extracted,
         lrma.rental_administrator = 'THIRD_PARTY' AS is_3p_supply,
+        NULL::BOOLEAN AS is_3p_supply_bh,
         ure.ts_revision AS ts_status_started
     FROM
         datalake_ebdb_clean.listing_rent_model_aud AS lrma
@@ -251,6 +212,7 @@ rent_united AS (
         id_company_hubspot_extracted,
         partner_3p_supply_extracted,
         NULL AS is_3p_supply,
+        is_3p_supply_bh,
         ts_status_started
     FROM
         house_history
@@ -266,28 +228,161 @@ rent_fetching_last AS (
             ORDER BY
                 ts_status_started
         ), FALSE) AS is_3p_supply,
+        COALESCE(LAST(is_3p_supply_bh, TRUE) OVER (PARTITION BY id_house ORDER BY ts_status_started), FALSE) AS is_3p_supply_bh,
         ts_status_started
     FROM
         rent_united
 ),
-rent_final AS (
+sale_plus_rent AS (
     SELECT
         id_house,
-        CASE
-            WHEN is_3p_supply THEN id_company_hubspot_extracted
-        END AS id_company_hubspot,
+        id_company_hubspot_extracted,
+        'SALE' AS business_context,
+        partner_3p_supply_extracted,
+        -- Business rules to consider a listing Sale 3P supply:
+        -- 3P BH was migrated incorrectly to the ownership column, so we will consider the tag instead
+        -- We prioritize whatever came from listing_business_context, and then house
+        -- If the house was inputed manually, we will consider the tag (until 2023)
+        (
+            has_3p_bh_in_tag
+            OR COALESCE(is_3p_supply_lbc_aud, is_3p_supply_house_aud)
+            OR (NOT is_in_supply_processor AND is_3p_supply_house_aud AND ts_status_started < '2023-01-01')
+        ) AS is_3p_supply,
+        is_3p_supply_bh,
+        ts_status_started
+    FROM
+        sale_fetching_last
+    UNION ALL
+    SELECT
+        id_house,
+        id_company_hubspot_extracted,
         'RENT' AS business_context,
-        CASE
-            WHEN is_3p_supply THEN partner_3p_supply_extracted
-        END AS partner_3p_supply,
+        partner_3p_supply_extracted,
         is_3p_supply,
+        is_3p_supply_bh,
         ts_status_started
     FROM
         rent_fetching_last
+),
+add_status_changes AS (
+    SELECT
+        id_house,
+        IF(is_3p_supply, id_company_hubspot_extracted, NULL) AS id_company_hubspot_extracted,
+        business_context,
+        IF(is_3p_supply, COALESCE(partner_3p_supply_extracted, 'Unknown'), NULL) AS partner_3p_supply_extracted,
+        is_3p_supply,
+        COALESCE(is_3p_supply AND is_3p_supply_bh, FALSE) AS is_3p_supply_bh,
+        FALSE AS is_publication,
+        ts_status_started
+    FROM
+        sale_plus_rent
+    UNION ALL
+    SELECT -- We add every time the status went to published or unpublished. This is going to be used for retroactive fixes.
+        id_house,
+        NULL AS id_company_hubspot,
+        business_context,
+        NULL AS partner_3p_supply,
+        NULL AS is_3p_supply,
+        NULL AS is_3p_supply_bh,
+        TRUE AS is_publication,
+        ure.ts_revision AS ts_status_started
+    FROM
+        datalake_ebdb_clean.listing_business_context_aud AS lbca
+    JOIN
+        datalake_ebdb_user.user_revision_entity AS ure
+            ON lbca.rev = ure.id
     QUALIFY
-        LAG(is_3p_supply) OVER(PARTITION BY id_house ORDER BY ts_status_started) IS DISTINCT FROM is_3p_supply
-        OR LAG(id_company_hubspot) OVER(PARTITION BY id_house ORDER BY ts_status_started) IS DISTINCT FROM id_company_hubspot
-        OR LAG(partner_3p_supply) OVER(PARTITION BY id_house ORDER BY ts_status_started) IS DISTINCT FROM partner_3p_supply
+        LAG(status) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) IS DISTINCT FROM status
+        AND status IN ('PUBLISHED', 'UNPUBLISHED')
+),
+-- Sometimes, mainly for leads published manually, the listing is published and then a little later it is marked as 3P Supply
+-- We can retroactively fix that: if it ever became 3P supply before it was unpublished, then it should be 3P Supply since the moment it was published.
+-- In other words, if the next time it was marked as 3P Supply is before the next time it was published or unpublished, it is 3P Supply
+add_next AS (
+    SELECT 
+        id_house,
+        NULLIF(LAST(
+            CASE WHEN is_3p_supply IS NOT NULL THEN COALESCE(id_company_hubspot_extracted, -1) END, TRUE
+        ) OVER(
+            PARTITION BY id_house, business_context ORDER BY ts_status_started
+        ), -1) AS id_company_hubspot_current,
+        NULLIF(LAST(
+            CASE WHEN is_3p_supply IS NOT NULL THEN COALESCE(partner_3p_supply_extracted, -1) END, TRUE
+        ) OVER(
+            PARTITION BY id_house, business_context ORDER BY ts_status_started
+        ), -1) AS partner_3p_supply_current,
+        business_context,
+        LAST(is_3p_supply, TRUE) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) AS is_3p_supply_current,
+        LAST(is_3p_supply_bh, TRUE) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) AS is_3p_supply_bh_current,
+        NULLIF(FIRST(
+            CASE WHEN is_3p_supply THEN COALESCE(id_company_hubspot_extracted, -1) END, TRUE
+        ) OVER (
+            PARTITION BY id_house, business_context ORDER BY ts_status_started, NOT is_publication
+            ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING
+        ), -1) AS id_next_company_hubspot,
+        NULLIF(FIRST(
+            CASE WHEN is_3p_supply THEN partner_3p_supply_extracted END, TRUE
+        ) OVER (
+            PARTITION BY id_house, business_context ORDER BY ts_status_started, NOT is_publication
+            ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING
+        ), -1) AS next_partner_3p_supply,
+        FIRST(
+            CASE WHEN is_3p_supply THEN is_3p_supply_bh END, TRUE
+        ) OVER (
+            PARTITION BY id_house, business_context ORDER BY ts_status_started, NOT is_publication
+            ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING
+        ) AS is_next_3p_supply_bh,
+        FIRST(
+            CASE WHEN is_3p_supply THEN ts_status_started END, TRUE
+        ) OVER (
+            PARTITION BY id_house, business_context ORDER BY ts_status_started, NOT is_publication
+            ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING
+        ) AS ts_next_3p_supply,
+        FIRST(
+            CASE WHEN is_publication THEN ts_status_started END, TRUE
+        ) OVER (
+            PARTITION BY id_house, business_context ORDER BY ts_status_started, NOT is_publication
+            ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING
+        ) AS ts_next_publication,
+        ts_status_started
+    FROM
+        add_status_changes
+),
+final_deduplicated AS (
+    SELECT
+        id_house,
+        CASE
+            WHEN (ts_next_publication IS NULL OR ts_next_publication > ts_next_3p_supply)
+            AND NOT is_3p_supply_current
+                THEN id_next_company_hubspot
+            ELSE id_company_hubspot_current
+        END AS id_company_hubspot,
+        business_context,
+        CASE
+            WHEN (ts_next_publication IS NULL OR ts_next_publication > ts_next_3p_supply)
+            AND NOT is_3p_supply_current
+                THEN next_partner_3p_supply
+            ELSE partner_3p_supply_current
+        END AS partner_3p_supply,
+        CASE
+            WHEN (ts_next_publication IS NULL OR ts_next_publication > ts_next_3p_supply)
+            AND NOT is_3p_supply_current
+                THEN (ts_next_3p_supply IS NOT NULL)
+            ELSE is_3p_supply_current
+        END AS is_3p_supply,
+        CASE
+            WHEN (ts_next_publication IS NULL OR ts_next_publication > ts_next_3p_supply)
+            AND NOT is_3p_supply_current
+                THEN is_next_3p_supply_bh
+            ELSE is_3p_supply_bh_current
+        END AS is_3p_supply_bh,
+        ts_status_started
+    FROM
+        add_next
+    QUALIFY
+        LAG(id_company_hubspot) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) IS DISTINCT FROM id_company_hubspot
+        OR LAG(partner_3p_supply) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) IS DISTINCT FROM partner_3p_supply
+        OR LAG(is_3p_supply) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) IS DISTINCT FROM is_3p_supply
 )
 SELECT
     id_house,
@@ -295,18 +390,8 @@ SELECT
     business_context,
     partner_3p_supply,
     is_3p_supply,
+    is_3p_supply_bh,
     ts_status_started,
-    LEAD(ts_status_started) OVER(PARTITION BY id_house ORDER BY ts_status_started) AS ts_status_ended
+    LEAD(ts_status_started) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) AS ts_status_ended
 FROM
-    sale_final
-UNION ALL
-SELECT
-    id_house,
-    id_company_hubspot,
-    business_context,
-    partner_3p_supply,
-    is_3p_supply,
-    ts_status_started,
-    LEAD(ts_status_started) OVER(PARTITION BY id_house ORDER BY ts_status_started) AS ts_status_ended
-FROM
-    rent_final
+    final_deduplicated

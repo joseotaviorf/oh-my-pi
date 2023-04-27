@@ -27,6 +27,8 @@ columns:
       - datalake_ebdb_clean.house_aud.internal_admin_info
   is_3p_supply:
     description: True if the listing is from Rede in that business context, in that validity period
+  is_3p_supply_bh:
+    description: True if the listing is from Rede in that business context, in that validity period, for a company from 3P BH.
   ts_status_started:
     description: When the assertion about the listing being or not from Rede at that business context started being valid.
     lineage:

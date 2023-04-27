@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS sale.fact_listing_status;
 CREATE TABLE sale.fact_listing_status (
 	sk_sale_listing BIGINT PRIMARY KEY,
 	sk_region BIGINT,
+	sk_company BIGINT,
 	sk_first_publication_date BIGINT,
 	sk_status_start_date BIGINT,
 	sk_status_end_date BIGINT,

@@ -2030,6 +2030,7 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.ebdb:create-clean-house-predicted-price-aud-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history
 bietlejuice.enrich_sale_listings_lenses:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-sale-model-in-data-lake

@@ -1,32 +1,79 @@
 ---
 database_name: datalake_sale_listings
 table_name: sale_listing_status
+description: This table keeps track of every status change of For Sale listings. 
+  Therefore, a listing can have multiple rows in this table, one for each status change, with its start and end date (if any). 
+  An example would be the first row of a listing where the first status is editing (pre-publication) and the second is published (post-publication).
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   id_sale_listing:
     lineage:
       - datalake_sale_listings.sale_status_version_order.id_house
       - datalake_sale_listings.sale_status_version_order.order_version
+    description: >
+      The id of the sale listing.
   id_house:
     lineage:
       - datalake_sale_listings.sale_status_version_order.id_house
+    description: >
+      The id of the house.
   id_region:
     lineage:
       - datalake_sale_listings.sale_status_version_order.id_region
+    description: >
+      The id of the region.
+  id_company_hubspot:
+    lineage:
+      - datalake_rede_house_history.rede_house_history.id_company_hubspot
+    description: >
+      The id of the Rede company in Hubspot.
+  partner_3p_supply:
+    lineage:
+      - datalake_rede_house_history.rede_house_history.partner_3p_supply
+    description: >
+      Short name of the Rede partner.
   status_history:
     lineage:
       - datalake_sale_listings.sale_status_version_order.status_history_new
+    description: >
+      The status of the sale listing at the time of the change.
+    categories:
+      CCV_CANCELED: If the listing is in the process of sales cancellation.
+      CCV_SIGNED: If the listing is in the process of being sold.
+      EDITING: If the listing is being edited.
+      OPTED_OUT: If a listing has opted out of the funnel before being published.
+      PUBLISHED: If the listing is published.
+      SALE_COMPLETED: If the listing is already sold.
+      SUSPENDED: If the listing is suspended.
+      UNPUBLISHED: If the listing is unpublished.
   status_change_reason:
     lineage:
       - datalake_sale_listings.sale_status_version_order.reason
+    description: >
+      The reason for the status change.
   is_last_status:
     lineage:
       - datalake_sale_listings.sale_status_version_order.ts_status_changed_new
+    description: >
+      Whether the status is the last one for the sale listing.
+  is_3p_supply:
+    lineage:
+      - datalake_rede_house_history.rede_house_history.is_3p_supply
+    description: >
+      Whether the listing is from a 3rd party supply.
   ts_first_publication:
     lineage:
       - datalake_sale_listings.sale_status_version_order.ts_first_publication
+    description: >
+      The timestamp of the first publication of the sale listing.
   ts_status_started:
     lineage:
       - datalake_sale_listings.sale_status_version_order.ts_status_changed_new
+    description: >
+      The timestamp of the start of the status.
   ts_status_ended:
     lineage:
       - datalake_sale_listings.sale_status_version_order.ts_status_changed_next
+    description: >
+      The timestamp of the end of the status.
