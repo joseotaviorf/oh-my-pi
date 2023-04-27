@@ -8,7 +8,7 @@ report_list:
         database: br
         display_sort: tg_desc,nr_desc,kd_desc
         export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      display_limit: 2
+      display_limit: 153600
   ape11_organic_search_kw:
     configs:
       type: domain_organic
@@ -16,7 +16,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 55200
   arboimoveis_organic_search_kw:
     configs:
       type: domain_organic
@@ -24,7 +24,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 114000
   auxiliadorapredial_organic_search_kw:
     configs:
       type: domain_organic
@@ -32,7 +32,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 14400
   casamineira_organic_search_kw:
     configs:
       type: domain_organic
@@ -40,7 +40,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 247200
   chavesnamao_organic_search_kw:
     configs:
       type: domain_organic
@@ -48,7 +48,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 5
+    display_limit: 576000
   direcional_organic_search_kw:
     configs:
       type: domain_organic
@@ -56,7 +56,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 21600
   emcasa_organic_search_kw:
     configs:
       type: domain_organic
@@ -64,7 +64,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 21600
   imoveisestadao_organic_search_kw:
     configs:
       type: domain_organic
@@ -72,7 +72,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 26400
   imoveismercadolivre_organic_search_kw:
     configs:
       type: domain_organic
@@ -80,7 +80,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 68400
   imovelguide_organic_search_kw:
     configs:
       type: domain_organic
@@ -88,7 +88,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 123600
   imovelweb_organic_search_kw:
     configs:
       type: domain_organic
@@ -96,7 +96,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 298800
   loft_organic_search_kw:
     configs:
       type: domain_organic
@@ -104,7 +104,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 192000
   lopes_organic_search_kw:
     configs:
       type: domain_organic
@@ -112,7 +112,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 232800
   quintoandar_organic_search_kw:
     configs:
       type: domain_organic
@@ -120,7 +120,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 315600
   secovi_organic_search_kw:
     configs:
       type: domain_organic
@@ -128,7 +128,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 8400
   trisul_organic_search_kw:
     configs:
       type: domain_organic
@@ -136,7 +136,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 7200
   vivareal_organic_search_kw:
     configs:
       type: domain_organic
@@ -144,7 +144,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 708000
   wimoveis_organic_search_kw:
     configs:
       type: domain_organic
@@ -152,7 +152,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 202800
   zapimoveis_organic_search_kw:
     configs:
       type: domain_organic
@@ -160,7 +160,7 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 628800
   olximoveis_organic_search_kw:
     configs:
       type: domain_organic
@@ -168,4 +168,4 @@ report_list:
       database: br
       display_sort: tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 2
+    display_limit: 207600

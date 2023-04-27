@@ -20,7 +20,7 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 SOURCE = "semrush"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 4, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 10 30 * *"
+MAIN_SCHEDULE_INTERVAL = "0 10 01 * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_max_io-memory_cluster"
 
 
