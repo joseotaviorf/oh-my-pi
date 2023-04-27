@@ -67,7 +67,7 @@ SELECT DISTINCT
     tfm.id_contract,
     cfs.id_ticket,
     COALESCE(cfs.id_respondent, zuc.id_user) AS id_respondent,
-    COALESCE(zuc.email, cfs.respondent_email) AS respondent_email,
+    COALESCE(cfs.respondent_email, zuc.email) AS respondent_email,
     zuc.role AS respondent_type,
     cfs.service_type,
     cfs.service_context,
@@ -86,9 +86,8 @@ SELECT DISTINCT
 FROM
     chat_fup_surveys AS cfs
 LEFT JOIN
-    datalake_zendesk_ticket_funnels.tickets_funnel_metrics tfm
-        ON cfs.id_ticket = cfs.id_ticket
+    datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
+        ON tfm.id_ticket = cfs.id_ticket
 LEFT JOIN
     datalake_zendesk_tickets.zendesk_users_contact AS zuc
-        ON zuc.id_user = cfs.id_respondent
-        OR LOWER(zuc.email) = LOWER(cfs.respondent_email)
+      ON COALESCE(cfs.id_respondent, tfm.id_user) = zuc.id_user

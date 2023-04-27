@@ -2,7 +2,7 @@ SELECT
     sr.id AS id_answer,
     tfm.id_contract,
     sr.id_ticket,
-    sr.id_assignee AS id_respondent,
+    zuc.id_user AS id_respondent,
     zuc.email AS respondent_email,
     zuc.role AS respondent_type,
     "customer support" AS service_type,
@@ -22,11 +22,11 @@ SELECT
 FROM
     datalake_zendesk_tickets_clean.satisfaction_ratings AS sr
 LEFT JOIN
-    datalake_zendesk_tickets.zendesk_users_contact AS zuc
-        ON zuc.id_user = sr.id_assignee
-LEFT JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
         ON tfm.id_ticket = sr.id_ticket
+LEFT JOIN
+    datalake_zendesk_tickets.zendesk_users_contact AS zuc
+        ON zuc.id_zendesk_user = tfm.id_zendesk_requester_user
 WHERE
     sr.year = {year}
     AND sr.month = {month}
