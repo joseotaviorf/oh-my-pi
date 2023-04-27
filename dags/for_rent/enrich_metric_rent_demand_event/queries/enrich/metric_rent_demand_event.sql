@@ -28,30 +28,30 @@ SELECT
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 7) AS documentation_sent,
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 8) AS credit_approved,
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 9) AS contracts_signed,
-  TO_DATE(dt.date,'yyyy-mm-dd') AS dt_event,  
-  TO_DATE(date_trunc('week',dt.date),'yyyy-mm-dd') AS dt_week_started,
+  TO_DATE(dt.date, 'yyyy-mm-dd') AS dt_event,  
+  TO_DATE(date_trunc('week', dt.date), 'yyyy-mm-dd') AS dt_week_started,
   fde.year,
   fde.month,
   fde.day,
   fde.country_code,
   CURRENT_TIMESTAMP AS ts_updated
 FROM 
-  dw_rent.fact_rent_demand_events fde
-LEFT JOIN 
-  dw_public.dim_date dt --event date
+  dw_rent.fact_rent_demand_events AS fde
+JOIN 
+  dw_public.dim_date AS dt --event date
     ON (dt.sk_date = fde.sk_event_date)
 LEFT JOIN 
-  dw_public.dim_region dr --city_groups
+  dw_public.dim_region AS dr --city_groups
     ON (dr.sk_region = fde.sk_region)
 LEFT JOIN 
-  dw_public.dim_house_listing dhl --listings info
+  dw_public.dim_house_listing AS dhl --listings info
     ON fde.sk_house_listing = dhl.sk_house_listing 
 LEFT JOIN 
-  dw_datamarts.funnel_demand_flows fdf --first touchpoint
+  dw_datamarts.funnel_demand_flows AS fdf --first touchpoint
     ON fde.sk_rent_flow = fdf.sk_rent_flow        
     AND fde.sk_house_listing = fdf.sk_house_listing
 LEFT JOIN 
-  dw_public.dim_proposal dp --guarantee
+  dw_public.dim_proposal AS dp --guarantee
     ON fde.sk_proposal = dp.sk_proposal
 WHERE 
   fde.year = {year} 
