@@ -18,3 +18,9 @@ Currently, there is the following output table for both our raw and clean layers
 - `new_first_listings_daily_by_sk_region`
 - `new_first_listings_monthly`
 - `new_first_listings_weekly`
+- `ongoing_listings_daily`
+- `ongoing_listings_daily_by_sk_region`
+- `ongoing_listings_monthly`
+- `ongoing_listings_monthly_by_sk_region`
+- `ongoing_listings_weekly`
+- `ongoing_listings_weekly_by_sk_region`
