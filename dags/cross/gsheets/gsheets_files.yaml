@@ -20,11 +20,6 @@ bbb22_coupon_for_sale:
     sheet_name: users
     clean_table_name: bbb22_coupon_sale_users
 
-bbb22_giveaway_for_rent:
-    sheet_id: 1O1vB9XgOsaI3ORga8suJmHO8ukA-tf_2iNxH9Uof8S0
-    sheet_name: users
-    clean_table_name: bbb22_giveaway_rent_users
-
 braze_campaign_creative:
     sheet_id: 1i3Vlk5JcFinW5p0uGr3AJeL60KaVh9XkfhckVweGkSg
     sheet_name: campaign_dimensions
@@ -64,11 +59,6 @@ google_searches_share_of_interest:
     sheet_id: 1eDqOTxQqgQOJVA6CnPa8ZuuriCaYe5MrUpFYni2BpeM
     sheet_name: google_searches_share_of_interest
     clean_table_name: google_searches_share_of_interest
-
-households_per_city_ibge:
-    sheet_id: 1pziUrjcQhYv0JGdbv9SDaimgn1Wg9uCxNMba-bGzhkY
-    sheet_name: Domicilios_por_Municipio_Censo_2010
-    clean_table_name: households_per_city_ibge
 
 inside_sale_supply_targets:
     sheet_id: 1AMY3biIPE8bD32xaYVv7lh-LbSZNGhA8P9L7kse3Poc

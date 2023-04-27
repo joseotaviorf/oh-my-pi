@@ -186,6 +186,12 @@ base_supply_souce_for_sale:
     clean_table_name: daily_target_supply_sale
     sheet_context: growth
 
+bbb22_giveaway_for_rent:
+    sheet_id: 1O1vB9XgOsaI3ORga8suJmHO8ukA-tf_2iNxH9Uof8S0
+    sheet_name: users
+    clean_table_name: bbb22_giveaway_rent_users
+    sheet_context: growth
+
 branding_where_is_plaquinha:
     sheet_id: 1_jHpsbQx1J24l7TNxoMgHH-FgAgQMphVLW9_HVgQi-4
     sheet_name: branding_where_is_plaquinha
@@ -244,6 +250,12 @@ google_costs:
     sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
     sheet_name: Google Costs
     clean_table_name: marketing_manual_costs_google
+    sheet_context: growth
+
+households_per_city_ibge:
+    sheet_id: 1pziUrjcQhYv0JGdbv9SDaimgn1Wg9uCxNMba-bGzhkY
+    sheet_name: Domicilios_por_Municipio_Censo_2010
+    clean_table_name: households_per_city_ibge
     sheet_context: growth
 
 historic_national_costs:

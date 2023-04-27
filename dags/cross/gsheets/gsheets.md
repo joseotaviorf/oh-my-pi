@@ -31,7 +31,6 @@ This pipeline produces the following output tables:
     - `agents_ranking_targets`
     - `agreements_discounts_answer_forms`
     - `bbb22_coupon_sale_users`
-    - `bbb22_giveaway_rent_users`
     - `braze_campaign_creative`
     - `braze_canvas_creative`
     - `casa_mineira_inside_sales_pipe`
@@ -48,7 +47,6 @@ This pipeline produces the following output tables:
     - `extra_invoice_created_expenses`
     - `from_to_cancellation`
     - `google_searches_share_of_interest`
-    - `households_per_city_ibge`
     - `inside_sale_supply_targets`
     - `ipsos_brandtracking_questions`
     - `local_holidays`
