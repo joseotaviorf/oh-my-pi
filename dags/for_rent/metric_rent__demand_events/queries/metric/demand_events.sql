@@ -26,7 +26,3 @@ SELECT
   NOW() AS ts_load
 FROM 
   datalake_metric_rent_demand_event.metric_rent_demand_event
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY year,month,day ORDER BY ts_updated DESC) = 1
-
-
