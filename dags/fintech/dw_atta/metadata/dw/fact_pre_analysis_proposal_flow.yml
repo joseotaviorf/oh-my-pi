@@ -82,6 +82,12 @@ columns:
         description: "Send backoffice"
     is_offer_canceled:
         description: "Flag to identify if proposal is canceled"
+    is_most_advanced_canc:
+        description: "Flag to identify the pre analysis' most advanced proposal with the canceled/reproved status"
+    is_most_advanced_og:
+        description: "Flag to identify the pre analysis' most advanced proposal with the ongoing status"
+    is_most_advanced:
+        description: "Flag to identify the pre analysis' most advanced proposal. If there is any ongoing proposal related to the pre analysis, it will select the most advanced ongoing, if there is only canceled/reproved proposals, it will select the most advanced overall"
     dt_offer_submitted:
         lineage:
             - dw_sale.fact_offers.sk_offer_submitted_date
@@ -205,6 +211,10 @@ columns:
         lineage:
             - datalake_atta.proposal_dates.ts_last_approved_log
         description: "Timestamp of last approval"
+    ts_filled_credit_form:
+        lineage:
+            - datalake_sales_flow_clean.negotiation.ts_buyer_credit_submitted
+        description: "Timestamp in which the credit form was filled"
     days_pre_analysis_registration_to_credit_application_started:
         description: "Number of days the proposal took to turn from pre analysis registration to start credit application"
     days_pre_analysis_registration_to_credit_application_ended:
