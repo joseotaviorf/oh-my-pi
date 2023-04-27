@@ -1,61 +1,83 @@
 ---
 database_name: datalake_robin_hood
 table_name: accounting_entry
+owner: ae-fintech@quintoandar.com.br
+domain: Fintech
+description: Accounting entry enriched data from Robin Hood.
 columns:
   id:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id
+    description: Accounting entry id.
   id_external:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id_external
+    description: External id.
   id_source:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id_source
+    description: Source id.
   id_payee:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id_payee
+    description: Payee id.
   id_lead:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.metadata
+    description: Lead id.
   id_house:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.metadata
+    description: House id.
   id_contract:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.metadata
+    description: Contract id.
   id_offer:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.metadata
+    description: Offer id.
   cost_center_code:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.cost_center_code
+    description: Cost center code.
   source_bill_item:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.source_bill_item
+    description: Source bill item.
   description:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.description
+    description: Description.
   type:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.type
+    description: Type.
   locale:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.locale
+    description: Locale.
   due_amount:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.due_amount
+    description: Due amount.
   accrual_year_month:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.accrual_year_month
+    description: Accrual year month.
   accounting_year_month:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.accounting_year_month
+    description: Accounting year month.
   dt_occurrence:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.dt_occurrence
+    description: Occurrence date.
   ts_blocked:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.ts_blocked
+    description: Blocked timestamp.
   ts_created:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.ts_created
+    description: Creation timestamp.
