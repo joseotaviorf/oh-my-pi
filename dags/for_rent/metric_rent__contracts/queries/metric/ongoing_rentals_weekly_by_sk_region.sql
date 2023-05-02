@@ -1,5 +1,5 @@
 SELECT
-  dd.week_start AS day,
+  dd.week_start,
   hl.sk_region,
   dc.country_code,
   COUNT(DISTINCT dc.sk_contract) AS ongoing_rentals
