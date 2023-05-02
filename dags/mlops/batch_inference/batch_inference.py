@@ -32,7 +32,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2023, 3, 13, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "7 0 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 7 * * *"
 
 SOURCE_ROOT_PATH = config_service.get_config("source_root_path")
 TABLE_NAME = config_service.get_config("table_name")
