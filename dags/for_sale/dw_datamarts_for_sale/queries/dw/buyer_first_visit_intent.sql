@@ -1,6 +1,6 @@
 WITH base AS (
     SELECT
-        CAST(e.id_user AS BIGINT) AS id_user,
+        e.id_user AS id_user,
         CAST(e.ts_event AS TIMESTAMP) AS ts_visit_intent,
         dr.sk_region,
         dr.city_name,
@@ -19,9 +19,10 @@ WITH base AS (
         AND e.id_app = 170698
         AND CAST(e.ts_event AS DATE) >= CAST('2020-01-01' AS DATE)
         AND e.id_user IS NOT NULL
+        AND e.id_user NOT LIKE '%.%'
 )
 SELECT
-    id_user,
+    CAST(id_user AS BIGINT) AS id_user,
     sk_region,
     city_name,
     ts_visit_intent AS ts_first_visit_intent,
