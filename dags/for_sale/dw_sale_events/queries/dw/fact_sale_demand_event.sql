@@ -222,9 +222,18 @@ events AS (
         offers
     WHERE
         sk_offer_dismissed_date != -1
+),
+last_sk_values AS (
+    SELECT
+        COALESCE(MAX(sk_sale_demand_event), 0) AS max_sk_sale_demand_event
+    FROM
+        dw_sale.fact_sale_demand_event
 )
 SELECT
-    MD5(sk_event_date || '-' || sk_event_type || '-' || COALESCE(NULLIF(sk_offer, -1), sk_booking)) AS sk_sale_demand_event,
+    COALESCE(
+        f.sk_sale_demand_event,
+        lsv.max_sk_sale_demand_event + MONOTONICALLY_INCREASING_ID() + 1
+    ) AS sk_sale_demand_event,
     e.sk_event_date,
     e.sk_event_type,
     e.sk_booking,
@@ -244,7 +253,13 @@ SELECT
     e.ts_event,
     NOW() AS ts_load
 FROM
-    events AS e
+    events AS e,
+    last_sk_values AS lsv
 JOIN
     dw_public.dim_date AS dd
         ON e.sk_event_date = dd.sk_date
+LEFT JOIN
+    dw_sale.fact_sale_demand_event AS f
+        ON e.sk_event_date = f.sk_event_date
+        AND e.sk_event_type = f.sk_event_type
+        AND COALESCE(NULLIF(e.sk_offer, -1), e.sk_booking) = COALESCE(NULLIF(f.sk_offer, -1), f.sk_booking)
