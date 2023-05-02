@@ -20,7 +20,7 @@ demand_funnel AS (
         COUNT(DISTINCT sk_event) FILTER (WHERE sk_event_type = 4) AS offers_accepted,
         COUNT(DISTINCT sk_event) FILTER (WHERE sk_event_type = 8) AS credits_approved,
         COUNT(DISTINCT sk_event) FILTER (WHERE sk_event_type = 9) AS contracts_signed,
-        DATE(DATE_TRUNC('week', TO_DATE(sk_event_date, 'yyyyMMdd'))) AS dt_week_started
+        DATE(DATE_TRUNC('week', TO_DATE(STRING(sk_event_date), 'yyyyMMdd'))) AS dt_week_started
     FROM 
         dw_rent.fact_rent_demand_events AS fr
     LEFT JOIN
@@ -58,7 +58,7 @@ demand_actual_costs AS (
     SELECT
         COALESCE(city_group, 'Undefined') AS city_group,
         SUM(cost) AS actual_cost,
-        DATE(DATE_TRUNC('WEEK', TO_DATE(id_date, 'yyyyMMdd'))) AS dt_week_started
+        DATE(DATE_TRUNC('WEEK', TO_DATE(STRING(id_date), 'yyyyMMdd'))) AS dt_week_started
     FROM
         datalake_mexico_marketing_costs.daily_costs
     GROUP BY 1, 3
