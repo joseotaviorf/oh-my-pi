@@ -2288,12 +2288,12 @@ bietlejuice.metric_rent__listings:
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
 bietlejuice.metric_rent_benvi__demand:
-  - bietlejuice.dw_datamarts_spark.for_rent_cross:load-dw-datamarts-rental-events-funnel
   - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-top-of-funnel-volumes-monthly
   - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-top-of-funnel-volumes-weekly
+  - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
+  - bietlejuice.enrich_mexico_marketing_automatic_daily_costs:load-enrich-daily-costs
   - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
   - bietlejuice.gsheets.for_rent:done-clean-mexico-demand-targets-2022
-  - bietlejuice.gsheets.growth:done-clean-mexico-demand-marketing-cost-per-source-actual
 bietlejuice.metric_rent_benvi__supply:
   - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-rental-marketplace-flows
   - bietlejuice.enrich_lead:load-enrich-lead

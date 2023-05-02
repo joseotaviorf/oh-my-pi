@@ -13,19 +13,22 @@ WITH tof_demand_funnel AS (
 ),
 demand_funnel AS (
     SELECT 
-        COALESCE(ref.city_group, 'Undefined') AS city_group,
-        SUM(ref.visits_booked) AS visits_booked,
-        SUM(ref.visits_completed) AS visits_completed,
-        SUM(ref.offer_submitted) AS offers_submitted,
-        SUM(ref.offer_approved) AS offers_accepted,
-        SUM(ref.credit_approved) AS credits_approved,
-        SUM(ref.contract_signed) AS contracts_signed,
-        DATE(DATE_TRUNC('week', ref.date)) AS dt_week_started
+        COALESCE(dr.city_group, 'Undefined') AS city_group,
+        COUNT(DISTINCT sk_event) FILTER (WHERE sk_event_type = 1) AS visits_booked,
+        COUNT(DISTINCT sk_event) FILTER (WHERE sk_event_type = 2) AS visits_completed,
+        COUNT(DISTINCT sk_event) FILTER (WHERE sk_event_type = 3) AS offers_submitted,
+        COUNT(DISTINCT sk_event) FILTER (WHERE sk_event_type = 4) AS offers_accepted,
+        COUNT(DISTINCT sk_event) FILTER (WHERE sk_event_type = 8) AS credits_approved,
+        COUNT(DISTINCT sk_event) FILTER (WHERE sk_event_type = 9) AS contracts_signed,
+        DATE(DATE_TRUNC('week', TO_DATE(sk_event_date, 'yyyyMMdd'))) AS dt_week_started
     FROM 
-        dw_datamarts.rental_events_funnel AS ref
+        dw_rent.fact_rent_demand_events AS fr
+    LEFT JOIN
+        dw_public.dim_region AS dr
+            ON dr.sk_region = fr.sk_region
     WHERE
-        ref.country_code = 'MX'
-        AND ref.date >= DATE('2022-06-01')
+        fr.country_code = 'MX'
+        AND fr.sk_event_date >= 20220601
     GROUP BY 1, 8
 ),
 demand_funnel_targets AS (
@@ -53,11 +56,11 @@ demand_target_costs AS (
 ),
 demand_actual_costs AS (
     SELECT
-        COALESCE(mdm.city, 'Undefined') AS city,
-        SUM(mdm.week_value) AS actual_cost,
-        mdm.dt_week_started
+        COALESCE(city_group, 'Undefined') AS city_group,
+        SUM(cost) AS actual_cost,
+        DATE(DATE_TRUNC('WEEK', TO_DATE(id_date, 'yyyyMMdd'))) AS dt_week_started
     FROM
-        datalake_gsheets_clean.mexico_demand_marketing_cost_per_source_actual AS mdm
+        datalake_mexico_marketing_costs.daily_costs
     GROUP BY 1, 3
 ),
 periods_dimension AS (
@@ -107,7 +110,7 @@ LEFT JOIN
         AND dtc.dt_week_started = dim.dt_week_started
 LEFT JOIN
     demand_actual_costs AS dac
-        ON dac.city = dim.city_group
+        ON dac.city_group = dim.city_group
         AND dac.dt_week_started = dim.dt_week_started
 LEFT JOIN
     tof_demand_funnel AS tdf
