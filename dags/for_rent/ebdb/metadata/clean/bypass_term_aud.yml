@@ -1,0 +1,58 @@
+database_name: datalake_ebdb_clean
+table_name: bypass_term_aud
+description: Aud table that has the data related to the bypass term signed by the owner on the first VB (visit booked).
+owner: herivelto.junior@quintoandar.com.br
+domain: Data ForSale
+columns:
+  id:
+    description: Unique ID for this record.
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.id
+  id_user:
+    description: User ID on main tables.
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.usuario_id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.REV
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.REVTYPE
+  confirmation_code:
+    description: Unique code generated when the owner signs the term.
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.confirmation_code
+  mod_id_user:
+    description: Flag indicating if the id_user phone has changed.
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.usuario_id_MOD
+  mod_confirmation_code:
+    description: Flag indicating if the confirmation_code phone has changed.
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.confirmation_code_MOD
+  mod_is_term_signed:
+    description: Flag indicating if the is_term_signed phone has changed.
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.signed_term_MOD
+  mod_ts_term_signed:
+    description: Flag indicating if the ts_term_signed phone has changed.
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.signed_time_mod
+  is_term_signed:
+    description: Boolean indicating if the owner signed the term.
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.signed_term
+  ts_term_signed:
+    description: Timestamp inidicating when the code was signed.
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.signed_time
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_ebdb_raw.bypass_term_aud.created_at
