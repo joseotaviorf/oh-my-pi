@@ -1,19 +1,35 @@
 ---
 database_name: datalake_date
 table_name: cities_calendar
+description:
+  Calculates the interval of working days after a referenced date, indicating whether they are working days or not.
+  The granularity of the table is given by id_date and id_city.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_date:
+    description: Date identifier.
     lineage:
       - datalake_quintoandar.aux_date.id_date
   id_city:
+    description: City unique identifier.
     lineage:
       - datalake_region.region.id
   city:
+    description:
+      Name of the city to which the dates refer, this consideration is important
+      because of the variation of holidays and working days in each city.
     lineage:
       - datalake_region.region.name
+  count_workdays:
+    description: Number of days after the initial one will be considered for calculating the dt_workday.
+  is_workday:
+    description: Identifies whether the calculated date (dt_workday) is a working day or not.
   dt_reference:
+    description: The reference date for calculating the working day window.
     lineage:
       - datalake_quintoandar.aux_date.date
   dt_workday:
+    description: Determined business day after the initial reference business day.
     lineage:
       - datalake_quintoandar.aux_date.date
