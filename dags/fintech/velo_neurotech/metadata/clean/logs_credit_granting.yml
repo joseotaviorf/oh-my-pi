@@ -8,6 +8,9 @@ columns:
   id_operation:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.codigo_operacao
+  id_business_unit:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_business_unit_uid
   analysis_result:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.resultado
@@ -26,12 +29,36 @@ columns:
   bigdata_age_bureau:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_idade_bureau
+  bigdata_entities_employed_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_entidades_empregadas_amin
+  bigdata_entities_employed_sum:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_entidades_empregadas_sum
+  bigdata_entities_employed_bureau:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_entidades_empregadas_bureau
+  bigdata_professional_phones_amax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_tel_profissionais_amax
+  bigdata_professional_phones_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_tel_profissionais_amin
+  bigdata_professional_phones_bureau:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_tel_profissionais_bureau
   bigdata_total_addresses_sum:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_total_enderecos_sum
   bigdata_total_addresses_bureau:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_total_enderecos_bureau
+  bigdata_origin_charges_amax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_origens_cobrancas_amax
+  bigdata_origin_charges_bureau:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_origens_cobrancas_bureau
   bigdata_total_tickets_emails_mean:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_total_passagens_emails_mean
@@ -71,6 +98,9 @@ columns:
   serasa_score_hspn_amin:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_serasa_score_hspn_amin
+  serasa_score_hspn_mean:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_serasa_score_hspn_mean
   serasa_score_hspn_sum:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_serasa_score_hspn_sum
@@ -85,6 +115,15 @@ columns:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_dist_fronteira_m_bureau
   transunion_indic_seg_24_sum:
     lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_indic_seg_6_amax
+  transunion_indic_seg_6_amax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_indic_seg_6_amin
+  transunion_indic_seg_6_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_indic_seg_6_bureau
+  transunion_indic_seg_6_bureau:
+    lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_indic_seg_24_sum
   transunion_indic_seg_24_bureau:
     lineage:
@@ -95,12 +134,48 @@ columns:
   transunion_percent_decl_10_01_bureau:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_percent_decl_10_01_bureau
+  transunion_decl_rest_3_amax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_decl_rest_3_amax
+  transunion_decl_rest_3_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_decl_rest_3_amin
+  transunion_decl_rest_3_bureau:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_decl_rest_3_bureau
+  transunion_percent_escol_04_amax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_percent_escol_04_amax
+  transunion_percent_escol_04_mean:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_percent_escol_04_mean
+  transunion_percent_escol_04_bureau:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_percent_escol_04_bureau
   transunion_percent_escol_10_amin:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_percent_escol_10_amin
   transunion_percent_escol_10_bureau:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_percent_escol_10_bureau
+  transunion_employer_size_amax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_porte_empregador_amax
+  transunion_employer_size_mean:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_porte_empregador_mean
+  transunion_employer_size_bureau:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_porte_empregador_bureau
+  transunion_number_addresses_amin:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_qtd_endereco_amin
+  transunion_number_addresses_sum:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_qtd_endereco_sum
+  transunion_number_addresses_bureau:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_qtd_endereco_bureau
   neoway_income_bureau:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_neoway_income_bureau
@@ -110,6 +185,9 @@ columns:
   proposal_state:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.prop_estado
+  proposal_name_real_state_company:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_nome_imob
   proposal_real_state_tax:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.prop_taxa_imobiliaria
@@ -122,6 +200,9 @@ columns:
   proposal_property_type:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.prop_tipo_imovel
+  matrix_type:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_tipo_matriz
   proposal_city:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.prop_cidade
