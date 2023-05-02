@@ -40,7 +40,7 @@ visits_booked AS (
   JOIN 
     dw_public.dim_date AS dd
       on dd.sk_date = rf.sk_booking_created_date
-  LEFT JOIN 
+  JOIN 
     dw_public.dim_region AS dr
       on dr.sk_region = rf.sk_region
   WHERE 
