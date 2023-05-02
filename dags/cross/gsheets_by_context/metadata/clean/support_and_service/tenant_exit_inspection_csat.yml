@@ -1,0 +1,47 @@
+---
+database_name: datalake_gsheets_clean
+table_name: tenant_exit_inspection_csat
+description: The CSAT for exit inspections.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_saida.contractid
+    description: The contract unique identifier.
+  id_csat_answer:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_saida.token
+    description: The CSAT unique identifier.
+  email:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_saida.email
+    description: User email.
+  comment:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_saida.comment
+    description: CSAT optional comment.
+  tags:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_saida.tags
+    description: Improvement points for the exit inspection.
+  house_satisfaction_history:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_saida.house_satisfaction_history
+    description: Historical CSAT score related with the house condition after the tenant exit.
+  house_satisfaction:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_saida.house_satisfaction
+    description: CSAT score related with the house condition after the tenant exit.
+  inspection_satisfaction_history:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_saida.inspection_satisfaction_history
+    description: Historical CSAT score related with the exit inspection.
+  inspection_satisfaction:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_saida.inspection_satisfaction
+    description: CSAT score related with the exit inspection.
+  ts_submitted:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_saida.submitted_at
+    description: Timestamp that shows when the CSAT answer was submitted.
