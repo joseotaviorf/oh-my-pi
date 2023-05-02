@@ -1,0 +1,36 @@
+---
+database_name: metric_rent
+table_name: visits_booked_per_ongoing_listings_monthly_by_sk_region
+description: Monthly table with the amount of Visits Booked divided by the Ongoing Listing segmented by sk_region.
+  Metric used to connect the supply and demand funnels.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  month_start:
+    lineage:
+      - dw_public.dim_date.month_start
+    description: Month date when a listing was with status published and date when a visit was booked.
+    dimension: True
+  sk_region:
+    lineage:
+      - dw_public.dim_region.sk_region
+    description: Region identifier.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_public.fact_listing_rent_flows.country_code
+    description: Country code of the house
+    dimension: True
+  visits_booked_per_ongoing_listings:
+    description: Total of Visits Booked divided by the Ongoing Listing on a month segmented by region.
+      Metric used to connect the supply and demand funnels.
+    metric:
+      name: Visits Booked per Ongoing Listings Monthly by SK Region
+      description: Total of Visits Booked divided by the Ongoing Listing on a month segmented by region.
+        Metric used to connect the supply and demand funnels.
+      acronym: VB2OL
+      is_additive: False
+      business_stage: Suply/Demand
+      hierarchy: User analisys
+      approved_by: augusto.torres@quintoandar.com.br
+      link_to_metric: ''

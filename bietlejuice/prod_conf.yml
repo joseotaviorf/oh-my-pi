@@ -63,6 +63,7 @@ dags_out_of_pattern:
         "gsheets.support_and_service",
         "gsheets.static",
         "marketing_costs",
+        "metric_rent__bookings",
         "metric_rent_benvi__demand",
         "metric_rent_benvi__supply",
         "quintoandar",

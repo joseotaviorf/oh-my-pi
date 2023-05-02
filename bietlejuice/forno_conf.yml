@@ -62,6 +62,7 @@ dags_out_of_pattern:
         "gsheets.growth_intraday",
         "gsheets.support_and_service",
         "gsheets.static",
+        "metric_rent__bookings",
         "metric_rent_benvi__demand",
         "metric_rent_benvi__supply",
         "marketing_costs",
