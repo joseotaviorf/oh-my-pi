@@ -1,0 +1,32 @@
+---
+database_name: metric_rent
+table_name: ongoing_contracts_weekly
+description: Count of unique contracts that were signed and were active on each week.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  week:
+    lineage:
+      - dw_public.dim_date.week_start
+    description: Date when the contract was signed and active.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_public.dim_contract.country_code
+    description: Country code identifier.
+    dimension: True
+  ongoing_contracts:
+    description: Count of unique contracts that were signed and were active on each week.
+    metric:
+      name: Ongoing Contracts Weekly
+      description: Count of unique contracts that were signed and were active at the last
+        day of the period (week). Attention to the contracts of type DealOnly
+        (we only had contracts with this type until 2016). It was a service only for contracts,
+        without the administration of the rent, therefore only generated brokerage but no
+        administration fees and will be accounted once on the day/week/month of contract signed.
+      acronym: OC
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: augusto.torres@quintoandar.com.br
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/4904'
