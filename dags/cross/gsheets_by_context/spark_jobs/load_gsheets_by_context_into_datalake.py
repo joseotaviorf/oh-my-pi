@@ -144,7 +144,8 @@ if __name__ == "__main__":
         message_sent = __alert_not_ingesting_sheet(sheet_details, e, slack_channel)
         logger.error(
             f"""
-                m={JOB_NAME}, table_name={table_name}, msg=Sheet was not loaded, message_sending_result={message_sent}"
+                m={JOB_NAME}, table_name={table_name}, msg=Sheet was not loaded, message_sending_result={message_sent},
+                exception={e}"
             """
         )
 
