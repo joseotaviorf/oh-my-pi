@@ -14,12 +14,15 @@ WITH combinations AS (
 ),
 last_sk_values AS (
     SELECT
-        COALESCE(MAX(sk_company_event_type), 0) AS sk_user_info
+        COALESCE(MAX(sk_company_event_type), 0) AS sk_company_event_type
     FROM
         dw_rede.dim_company_event_type
 )
 SELECT
-    COALESCE(dcet.sk_company_event_type, MONOTONICALLY_INCREASING_ID() + 1) AS sk_company_event_type,
+    COALESCE(
+        dcet.sk_company_event_type,
+        last_sk_values.sk_company_event_type + MONOTONICALLY_INCREASING_ID() + 1
+    ) AS sk_company_event_type,
     event,
     event_type,
     source_type,
