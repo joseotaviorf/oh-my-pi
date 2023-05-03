@@ -3,6 +3,10 @@ SELECT
     GET_JSON_OBJECT(properties, '$.hubspot_owner_id')::BIGINT AS id_hubspot_owner,
     GET_JSON_OBJECT(properties, '$.hubspot_team_id')::BIGINT AS id_hubspot_team,
     GET_JSON_OBJECT(properties, '$.hs_parent_company_id')::BIGINT AS id_parent_company,
+    TRANSFORM(
+        SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.hs_merged_object_ids'), ''), ';'),
+        x -> x::BIGINT
+    ) AS ids_merged_companies,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.atuacao_da_imobiliaria'), ''), ';') AS fields_of_business,
     NULLIF(GET_JSON_OBJECT(properties, '$.address'), '') AS address,
     NULLIF(GET_JSON_OBJECT(properties, '$.zip'), '') AS zip_code,

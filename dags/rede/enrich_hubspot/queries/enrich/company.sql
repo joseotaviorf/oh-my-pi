@@ -51,6 +51,20 @@ company_matches AS (
             ch.current_tag IS NOT NULL DESC, -- Then, the ones with tags
             ch.ts_updated DESC -- Otherwise, most recent
         ) = 1
+),
+merged_companies_aux AS (
+    SELECT
+        ids_merged_companies
+    FROM
+        datalake_hubspot.company_history
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_company ORDER BY ts_updated DESC) = 1
+),
+merged_companies AS (
+    SELECT
+        EXPLODE(ids_merged_companies) AS id_merged_company
+    FROM
+        merged_companies_aux
 )
 SELECT
     ch.id_company,
@@ -58,6 +72,7 @@ SELECT
     ch.id_hubspot_owner,
     ch.id_hubspot_team,
     ch.id_parent_company,
+    ch.ids_merged_companies,
     ch.fields_of_business,
     ch.address,
     ch.zip_code,
@@ -100,7 +115,10 @@ SELECT
     ch.cnpj,
     ch.creci,
     ch.products_of_interest,
-    ch.lead_status,
+    CASE
+        WHEN mc.id_merged_company IS NOT NULL OR ch.is_archived THEN 'Archived'
+        ELSE ch.lead_status
+    END AS lead_status,
     ch.lead_status_history,
     ch.num_associated_deals,
     ch.num_associated_contacts,
@@ -125,13 +143,14 @@ SELECT
     ch.has_partnerships_with_other_agencies,
     ch.is_natural_person,
     ch.is_juridical_person,
-    ch.is_archived,
+    mc.id_merged_company IS NOT NULL OR ch.is_archived AS is_archived,
+    mc.id_merged_company IS NOT NULL AS is_merged_into_other_company,
     ch.ts_first_conversion,
     ch.ts_recent_deal_close,
     ch.ts_hubspot_owner_assigned,
     ch.ts_last_logged_call,
     ch.ts_notes_last_updated,
-    ch.ts_archived,
+    IF(mc.id_merged_company IS NOT NULL, ch.ts_updated, ch.ts_archived) AS ts_archived,
     ch.ts_created,
     ch.ts_updated,
     ch.year,
@@ -142,5 +161,8 @@ FROM
 LEFT JOIN
     company_matches AS cm
         ON ch.id_company = cm.id_company_hubspot
+LEFT JOIN
+    merged_companies AS mc
+        ON ch.id_company = mc.id_merged_company
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY ch.id_company ORDER BY ch.ts_updated DESC) = 1

@@ -22,6 +22,10 @@ columns:
     lineage:
       - datalake_hubspot.company.properties
     description: ID of the parent company associated with the company.
+  ids_merged_companies:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: IDs of the companies that were merged into this one.
   fields_of_business:
     lineage:
       - datalake_hubspot_clean.company.properties

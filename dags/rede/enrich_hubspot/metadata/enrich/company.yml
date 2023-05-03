@@ -25,6 +25,10 @@ columns:
     lineage:
       - datalake_hubspot.company_history.id_parent_company
     description: ID of the parent company associated with the company.
+  ids_merged_companies:
+    lineage:
+      - datalake_hubspot.company_history.ids_merged_companies
+    description: IDs of the companies that were merged into this one.
   fields_of_business:
     lineage:
       - datalake_hubspot.company_history.fields_of_business
@@ -309,9 +313,9 @@ columns:
       - datalake_hubspot.company_history.is_juridical_person
     description: If the company is a juridical person (PJ).
   is_archived:
-    lineage:
-      - datalake_hubspot.company_history.is_archived
     description: Whether or not the company has been archived on HubSpot.
+  is_merged_into_other_company:
+    description: Whether or not the company has been merged into another company.
   ts_first_conversion:
     lineage:
       - datalake_hubspot.company_history.ts_first_conversion
@@ -337,6 +341,7 @@ columns:
   ts_archived:
     lineage:
       - datalake_hubspot.company_history.ts_archived
+      - datalake_hubspot.company_history.ts_updated
     description: Time when the company was archived in HubSpot.
   ts_created:
     lineage:

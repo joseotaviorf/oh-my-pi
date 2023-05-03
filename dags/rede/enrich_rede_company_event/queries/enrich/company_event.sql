@@ -189,6 +189,25 @@ status_changes AS (
     UNION ALL
     SELECT
         id_company,
+        NULL::BIGINT AS id_deal,
+        NULL::BIGINT AS id_ticket_demand_onboarding,
+        NULL::BIGINT AS id_ticket_supply_onboarding,
+        NULL::BIGINT AS id_user_updated_by,
+        'Archivation' AS source_type,
+        'Membership Ended' AS event,
+        NULL AS hubspot_event_detail,
+        NULL AS hubspot_event_origin,
+        'Status' AS event_type,
+        TRUE AS is_loss,
+        NULL::BOOLEAN AS is_after_deal_won,
+        ts_archived AS ts_event
+    FROM
+        datalake_hubspot.company
+    WHERE
+        is_archived -- Artificially add membership end for archived companies. If it is not a member, the event will be renamed to 'Deal Lost' later.
+    UNION ALL
+    SELECT
+        id_company,
         id_deal,
         NULL::BIGINT AS id_ticket_demand_onboarding,
         NULL::BIGINT AS id_ticket_supply_onboarding,
@@ -288,31 +307,36 @@ status_changes AS (
 ),
 merged_with_last_status AS (
     SELECT
-        *,
+        sc.*,
         LAST(
             CASE
-                WHEN event_type = 'Status' THEN event
+                WHEN sc.event_type = 'Status' THEN sc.event
             END, TRUE
         ) OVER(
             PARTITION BY
-                id_company
+                sc.id_company
             ORDER BY
-                ts_event
+                sc.ts_event
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
         ) AS last_status,
         LAST(
             CASE
-                WHEN event_type = 'Deal' THEN event
+                WHEN sc.event_type = 'Deal' THEN sc.event
             END, TRUE
         ) OVER(
             PARTITION BY
-                id_company
+                sc.id_company
             ORDER BY
-                ts_event
+                sc.ts_event
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
         ) AS last_deal_stage
     FROM
-        status_changes
+        status_changes AS sc
+    JOIN
+        datalake_hubspot.company AS c
+            ON sc.id_company = c.id_company
+    WHERE
+        NOT c.is_merged_into_other_company -- Remove companies that were merged into others, since their journey is already represented there
 ),
 treated AS (
     SELECT

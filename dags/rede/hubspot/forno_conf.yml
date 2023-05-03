@@ -88,6 +88,7 @@ tables:
         - hs_parent_company_id
         - categoria_do_membro
         - tipo_de_membro
+        - hs_merged_object_ids
       propertiesWithHistory:
         - hs_lead_status
         - categoria_do_membro
