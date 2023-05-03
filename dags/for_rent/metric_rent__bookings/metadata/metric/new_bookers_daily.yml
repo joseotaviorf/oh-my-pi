@@ -1,0 +1,30 @@
+---
+database_name: metric_rent
+table_name: new_bookers_daily
+description: Daily table that contains the amount of the users that made their first booking.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  day:
+    lineage:
+      - dw_public.dim_booking.dt_created
+    description: Date when the users made their first booking.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_public.fact_listing_rent_flows.country_code
+    description: Country code
+    dimension: True
+  new_bookers:
+    description: Amount of users that made their first booking.
+    metric:
+      name: TP New Bookers Daily
+      description: Amount of users that made their first booking.
+        This amount is calculated by the count distinct of sk_client from fact_listing_rent_flows,
+        segmented by country_code and we're filtering just the first booking of this sk_client.
+      acronym: TP NB
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analisys
+      approved_by: augusto.torres@quintoandar.com.br
+      link_to_metric: https://quintoandar.sa.looker.com/looks/4743
