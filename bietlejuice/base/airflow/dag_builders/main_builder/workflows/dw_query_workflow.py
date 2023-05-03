@@ -12,8 +12,10 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
 )
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
+from bietlejuice.base.airflow.short_circuit_function_enum import (
+    ShortCircuitFunctionEnum,
+)
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.pipeline.short_circuit_enum import ShortCircuitEnum
 
 
 class DWQueryWorkflow(BaseWorkflow):
@@ -82,10 +84,12 @@ class DWQueryWorkflow(BaseWorkflow):
 
         skip_run_task = (
             ShortCircuitOperator(
+                dag=dag,
                 task_id=f"check-day-to-skip-execution",
-                python_callable=ShortCircuitEnum.get_validate_type(
-                    short_circuit_customization.get("method", None), "{{ds}}"
+                python_callable=ShortCircuitFunctionEnum.get_function(
+                    short_circuit_customization["function"]
                 ),
+                op_args=["{{ ds }}"],
             )
             if short_circuit_customization
             else None

@@ -2,8 +2,10 @@ import json
 from bietlejuice.base.udfs.udf_enum import UDFEnum
 from cerberus import Validator
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.short_circuit_function_enum import (
+    ShortCircuitFunctionEnum,
+)
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.pipeline.short_circuit_enum import ShortCircuitEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum import (
     WorkflowEnum,
@@ -55,10 +57,10 @@ class DAGDeclarationValidator(Validator):
                     "type": "dict",
                     "empty": False,
                     "schema": {
-                        "method": {
+                        "function": {
                             "type": "string",
                             "empty": False,
-                            "allowed": ShortCircuitEnum.get_available_enum_values(),
+                            "allowed": ShortCircuitFunctionEnum.get_available_enum_values(),
                         }
                     },
                 },

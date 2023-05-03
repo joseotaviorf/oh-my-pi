@@ -1,0 +1,24 @@
+dag:
+  name: dw_fintech_snapshot
+  schedule_start_date: 2023,03,20
+  owner: Data Fintech
+workflow:
+  type: query
+  layer: dw
+  custom_schema: payment_snapshot
+  short_circuit_customization:
+    function: CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH
+  tables_customization:
+    dim_invoice_entry_snapshot:
+      custom_schema: payment_snapshot
+    dim_invoice_snapshot:
+      custom_schema: payment_snapshot
+    fact_invoice_entries_snapshot:
+      custom_schema: payment_snapshot
+    dim_contract_snapshot:
+      custom_schema: public_snapshot
+cluster:
+  type: databricks_10_4_min_io-general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
