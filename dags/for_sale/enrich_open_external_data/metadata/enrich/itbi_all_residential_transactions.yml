@@ -14,6 +14,8 @@ columns:
       - datalake_open_external_data.itbi_sp_residential_transactions.id_region
       - datalake_open_external_data.itbi_bh_residential_transactions.id_region
     description: "Given all the listings that have passed through QuintoAndar, it is the id_region with the highest probability of having that zipcode in its extension."
+  itbi_region:
+    description: ITBI identification column. Represents which municipality the data comes from.
   address:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.address_street_name
