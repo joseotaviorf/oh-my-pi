@@ -137,7 +137,7 @@ rent_booking AS (
             ON v.code = av.visit_code    
         LEFT JOIN dw_public.dim_booking AS b
             ON b.id_visit = v.id
-        LEFT JOIN dw_datamarts_growth_cross.performance_marketing_metrics_demand AS pmmd --TENTAR SUBSTITUIR
+        LEFT JOIN dw_datamarts.performance_marketing_metrics_demand AS pmmd --TENTAR SUBSTITUIR
             ON b.sk_booking = pmmd.sk_booking
     WHERE 
         av.business_context IN ('rent', 'RENT')
@@ -167,7 +167,7 @@ SELECT
             ON v.code = av.visit_code    
         LEFT JOIN dw_public.dim_booking AS b
             ON b.id_visit = v.id
-        LEFT JOIN dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand AS pmmd --TENTAR SUBSTITUIR
+        LEFT JOIN dw_datamarts.sale_performance_marketing_metrics_demand AS pmmd --TENTAR SUBSTITUIR
             ON b.sk_booking = pmmd.sk_booking
 WHERE 
     av.business_context IN ('sale', 'SALE')

@@ -20,14 +20,14 @@ columns:
     description: A grouping of city or clusters of cities and neighborhoods
     lineage:
       - dw_public.dim_region.city_group
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.city_group
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.city_group
+      - dw_datamarts.performance_marketing_metrics_demand.city_group
+      - dw_datamarts.sale_performance_marketing_metrics_demand.city_group
   mkt_origin:
     description: Origin of the lead in the marketing funnel
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.mkt_origin
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_origin
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_origin
+      - dw_datamarts.performance_marketing_metrics_demand.mkt_origin
+      - dw_datamarts.sale_performance_marketing_metrics_demand.mkt_origin
   structure:
     description: Identifies the entrance urls structure (home, transactional, informational or other)
     lineage:

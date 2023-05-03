@@ -16,44 +16,44 @@ columns:
     description: A grouping of city or clusters of cities and neighborhoods
     lineage:
       - dw_public.dim_region.city_group
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.city_group
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.city_groups
+      - dw_datamarts.performance_marketing_metrics_demand.city_group
+      - dw_datamarts.sale_performance_marketing_metrics_demand.city_groups
   mkt_origin:
     description: Origin of the user in the marketing funnel
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.mkt_origin
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_origin
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_origin
+      - dw_datamarts.performance_marketing_metrics_demand.mkt_origin
+      - dw_datamarts.sale_performance_marketing_metrics_demand.mkt_origin
   mkt_source:
     description: Source of the user in the marketing funnel
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.mkt_source
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_source
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_source
+      - dw_datamarts.performance_marketing_metrics_demand.mkt_source
+      - dw_datamarts.sale_performance_marketing_metrics_demand.mkt_source
   utm_source:
     description: Source of URL parameters
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.utm_source
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_source
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.utm_source
+      - dw_datamarts.performance_marketing_metrics_demand.utm_source
+      - dw_datamarts.sale_performance_marketing_metrics_demand.utm_source
   utm_medium:
     description: Medium of URL parameters
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.utm_medium
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_medium
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.utm_medium
+      - dw_datamarts.performance_marketing_metrics_demand.utm_medium
+      - dw_datamarts.sale_performance_marketing_metrics_demand.utm_medium
   utm_campaign:
     description: Campaign of URL parameters
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.utm_campaign
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_campaign
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.utm_campaign
+      - dw_datamarts.performance_marketing_metrics_demand.utm_campaign
+      - dw_datamarts.sale_performance_marketing_metrics_demand.utm_campaign
   utm_content:
     description: Content of URL parameters
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.utm_content
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_content
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.utm_content
+      - dw_datamarts.performance_marketing_metrics_demand.utm_content
+      - dw_datamarts.sale_performance_marketing_metrics_demand.utm_content
   business_context:
     description: Identifies what is the business context (rent or sale)
     lineage:
