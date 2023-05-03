@@ -5,6 +5,8 @@ description: "Table enriched with ITBI data from BH. In this table, we applied s
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
+  id_itbi_transaction:
+    description: Unique table key, created from the transaction extract file and the IPTU number.
   id_region:
     lineage:
       - datalake_zipcodes.zipcodes 
@@ -103,4 +105,12 @@ columns:
   dt_load:
     lineage:
       - datalake_itbi_clean.itbi_bh.dt_load
-    description: 'Date we updated the ITBI BH data.'
+    description: Date when ITBI BH data was updated for the last time.
+  month:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.month
+    description: Month referring to the date the data was extracted. Used for partitioning.
+  year:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.year
+    description: Year referring to the date the data was extracted. Used for partitioning.
