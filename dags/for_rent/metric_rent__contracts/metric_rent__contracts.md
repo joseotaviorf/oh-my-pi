@@ -16,6 +16,10 @@ Currently, there is the following output table for both our raw and clean layers
 - `ended_rentals_confirmed_daily_by_sk_region`
 - `ended_rentals_confirmed_monthly`
 - `ended_rentals_confirmed_weekly`
+- `ended_rentals_daily`
+- `ended_rentals_daily_by_sk_region`
+- `ended_rentals_monthly`
+- `ended_rentals_weekly`
 - `new_contracts_signed_daily`
 - `new_contracts_signed_daily_by_sk_region`
 - `new_contracts_signed_monthly`
