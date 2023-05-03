@@ -11,6 +11,8 @@ inner_dependencies:
     - recommendation_flow
   recommendation_metrics_agg_display_type_business_context:
     - recommendation_metrics_agg_recset
+    - coverage
+    - personalization
 
 tables:
   recommendation_catalog:
@@ -32,6 +34,8 @@ tables:
   recommendation:
     is_incremental: false
   recommendation_flow:
+    is_incremental: false
+  personalization:
     is_incremental: false
   coverage:
     is_incremental: false

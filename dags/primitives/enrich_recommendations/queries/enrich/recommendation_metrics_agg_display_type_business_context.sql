@@ -207,6 +207,10 @@ SELECT
     MEAN(coverage_at_5) AS mean_coverage_at_5,
     MEAN(coverage_at_10) AS mean_coverage_at_10,
 
+    MEAN(personalization_at_3) AS mean_personalization_at_3,
+    MEAN(personalization_at_5) AS mean_personalization_at_5,
+    MEAN(personalization_at_10) AS mean_personalization_at_10,
+
     r.dt_rec_received
 
 FROM
@@ -216,6 +220,11 @@ LEFT JOIN
     ON r.dt_rec_received = c.dt_rec_received
         AND r.business_context = c.business_context
         AND r.display_type = c.display_type
+LEFT JOIN
+    datalake_recommendations.personalization AS p
+    ON r.dt_rec_received = p.dt
+        AND r.business_context = p.business_context
+        AND r.display_type = p.display_type
 GROUP BY
     r.dt_rec_received,
     r.business_context,

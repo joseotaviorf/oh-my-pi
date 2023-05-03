@@ -67,6 +67,10 @@ columns:
     description: Catalog coverage @3
     lineage:
       - datalake_recommendations.coverage.coverage_at_3
+  personalization_at_3:
+    description: Personalization @3
+    lineage:
+      - datalake_recommendations.personalization.personalization_at_3
   mean_precision_at_5:
     description: Mean Precision @5
     lineage:
@@ -117,6 +121,10 @@ columns:
     description: Catalog coverage @5
     lineage:
       - datalake_recommendations.coverage.coverage_at_5
+  personalization_at_5:
+    description: Personalization @5
+    lineage:
+      - datalake_recommendations.personalization.personalization_at_5
   mean_precision_at_10:
     description: Mean Precision @10
     lineage:
@@ -167,3 +175,7 @@ columns:
     description: Catalog coverage @10
     lineage:
       - datalake_recommendations.coverage.coverage_at_10
+  personalization_at_10:
+    description: Personalization @10
+    lineage:
+      - datalake_recommendations.personalization.personalization_at_10
