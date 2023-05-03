@@ -16,8 +16,4 @@ Load the following tables into the datalake clean (via incremental load):
 
 - `user_notifications`
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact its owner.
-
 </details>

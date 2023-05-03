@@ -17,8 +17,4 @@ This DAG runs Spark jobs that execute requests using our [survicate python clien
 This pipeline produces, via incremental load (layers raw and clean):
     - `surveys`
 
-### Responsible Data Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
-
 </details>

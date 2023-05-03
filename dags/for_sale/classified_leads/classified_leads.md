@@ -19,7 +19,4 @@ Currently, there are the following output tables for both our raw and clean laye
 - `leads_reply_email`
 - `leads_reply_whatsapp`
 
-### Responsible Data Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

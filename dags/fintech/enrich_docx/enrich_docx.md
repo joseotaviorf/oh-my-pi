@@ -22,9 +22,4 @@ Produces the following output table:
 - `income_documentation`
 - `personal_documentation`
 
-### Responsible Data Teams
-​
-For any questions or concerns about this DAG, please contact the Data Engineering Team or 
-the Data Analytics Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 ​</details>

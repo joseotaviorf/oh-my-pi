@@ -28,8 +28,4 @@ We load the following tables into the datalake:
    - `non_payment_report`
    - `non_payment_report_invoice`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.
-
 </details>

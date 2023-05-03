@@ -24,10 +24,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `sale_agents_weekly_performance`
 - `sale_lead_flow`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data For Sale team.
-
 ### Additional Information
 
 The file [for_sale.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/for_sale/for_sale.yml)

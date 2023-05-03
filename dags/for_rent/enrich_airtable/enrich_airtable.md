@@ -3,7 +3,7 @@
 ### Purpose
 
 Creates enriched tables for airtable. For now, it is only deduplicating data from the
-clean layer and bringing the last state of agents information. 
+clean layer and bringing the last state of agents information.
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -23,6 +23,5 @@ Produces the following output table:
 - `leads`
 - `wallet`
 - `wallet_history`
-
 
 </details>

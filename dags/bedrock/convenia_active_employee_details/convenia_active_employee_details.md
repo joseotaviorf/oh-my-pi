@@ -24,6 +24,4 @@ We fully load the following tables into the datalake Raw and Clean:
 
 - `active_employee_details`
 
-### Responsible Data Team
-For any questions or concerns about this DAG, please contact the Data Engineering team responsible.
 </details>

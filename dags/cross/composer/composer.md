@@ -23,9 +23,4 @@ We are not dumping all Airflow tables. This currently produces the following out
  - `task_instance` - Information about the task run (like duration, try_numbers, etc)
  - `serialized_dag` - Snapshot of DAG files synchronized by scheduler
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
-
 </details>

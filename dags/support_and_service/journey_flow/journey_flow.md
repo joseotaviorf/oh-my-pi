@@ -24,14 +24,10 @@ We load the following tables into the datalake:
     * t_rule
 
 2. In datalake clean
-    
+
     * journey_flow
     * dialog
     * journey_content
     * rule
-    
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in airflow DAG owners
 
 </details>

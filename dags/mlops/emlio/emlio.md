@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This DAG is responsible for loading machine learning models inputs and associated outputs into our Data Lake. 
+This DAG is responsible for loading machine learning models inputs and associated outputs into our Data Lake.
 
 Emlio is a logging python library used in machine learning models and services. More info about this process in [this doc](https://www.notion.so/productquintoandar/RFC-ML-model-features-and-predictions-logging-3c6d7680719b4121ad5bb6e1c73d90b1).
 
@@ -23,8 +23,4 @@ This DAG produces, via incremental load, the following tables in Raw and Clean l
 
 - `emlio_logs`
 
-### Responsible Data Teams
-
-For any questions or concerns about this DAG, please contact the Data Engineering or MLOps team that owns it.
-  
 </details>

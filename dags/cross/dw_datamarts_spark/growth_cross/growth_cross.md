@@ -44,10 +44,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `unique_supply_events_funnel`
 - `user_funnel`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data For Sale team.
-
 ### Additional Information
 
 The file [growth_cross.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/growth_cross/growth_cross.yml)

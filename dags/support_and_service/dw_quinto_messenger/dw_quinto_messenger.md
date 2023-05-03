@@ -22,8 +22,4 @@ This pipeline produces the following output tables:
 - `fact_chats`
 - `fact_tasks`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.
-
 </details>

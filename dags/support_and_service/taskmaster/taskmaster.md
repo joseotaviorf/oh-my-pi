@@ -16,8 +16,3 @@ This pipeline produces, via full load:
 
 2. In datalake clean:
     - `task`
-
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.
-

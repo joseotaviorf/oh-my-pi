@@ -15,7 +15,3 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table on enrich layer (via full load):
 
 - `kpis_targets`
-
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the DAG owners

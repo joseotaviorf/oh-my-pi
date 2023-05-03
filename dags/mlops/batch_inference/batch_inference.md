@@ -23,8 +23,4 @@ This DAG produces, via incremental load, the following tables in Raw layer:
 
 - `batch_inference`
 
-### Responsible Data Teams
-
-For any questions or concerns about this DAG, please contact the Data Engineering or MLOps team that owns it.
-
 </details>

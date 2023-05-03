@@ -19,10 +19,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `funnel_credit_event_flows`
 - `credit_proposal_attribute`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Fintech team.
-
 ### Additional Information
 
 The file [fintech_cross.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/fintech_cross/fintech_cross.yml)

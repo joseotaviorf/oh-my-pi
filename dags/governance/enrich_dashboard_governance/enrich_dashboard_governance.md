@@ -21,8 +21,4 @@ The following tables are created incrementally:
 - `chart_metadata`
 - `dashboard_metadata`
 
-### Responsible Data Team
-
-For any questions or concerns about this DAG, please contact its owner.
-
 </details>

@@ -18,10 +18,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `house_media`
 - `offboarding_repairs`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Support and Service team.
-
 ### Additional Information
 
 The file [support_and_service.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/dags/dw_datamarts_spark/support_and_service/support_and_service.yml)

@@ -21,8 +21,4 @@ We load the following tables into the datalake:
 - `pendency` (incremental load)
 - `support_case` (full load)
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact its owner.
-
 </details>

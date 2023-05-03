@@ -12,7 +12,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces, via incremental load:
 
 - In datalake raw:
-    - All tables available in database, except for the operationals. 
+    - All tables available in database, except for the operationals.
 
 - In datalake clean:
     - `agency`
@@ -32,7 +32,3 @@ This pipeline produces, via incremental load:
     - `program`
     - `program_aud`
     - `user_revision_entity`
-
-### Responsible Data Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).

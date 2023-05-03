@@ -16,8 +16,4 @@ This pipeline produces the following output table on Enrich layer:
 
 - `magic_link_events` (incremental load)
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data Engineering team responsible.
-
 </details>

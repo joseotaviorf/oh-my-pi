@@ -19,10 +19,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `rental_events_funnel`
 - `rental_events_funnel_partners`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data For Rent team.
-
 ### Additional Information
 
 The file [for_rent_cross.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/for_rent_cross/for_rent_cross.yml)

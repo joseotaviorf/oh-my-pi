@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This DAG extracts data from our spark metastore and documentation bucket, so we can create metrics about documentation, 
+This DAG extracts data from our spark metastore and documentation bucket, so we can create metrics about documentation,
 lineage and tags coverage.
 
 
@@ -28,8 +28,5 @@ The following tables are created incrementally in the Raw and Clean layers:
 - `columns_metastore`
 - `lineage_and_tags`
 - `dag_metadata`
-
-### Responsible Data Team
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 
 </details>

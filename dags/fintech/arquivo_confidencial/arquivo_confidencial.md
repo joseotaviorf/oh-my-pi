@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This DAG imports the tables from [Arquivo Confidencial](https://github.com/quintoandar/arquivo-confidencial), a service responsible to track user personal info using SaaS platforms. 
+This DAG imports the tables from [Arquivo Confidencial](https://github.com/quintoandar/arquivo-confidencial), a service responsible to track user personal info using SaaS platforms.
 
 
 <details>
@@ -31,12 +31,6 @@ In datalake raw and clean, via incremental load:
 - `unico_check_document_aud`
 - `unico_check_process`
 - `unico_check_process_aud`
-
-### Responsible Data Teams
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team or 
-the Data Analytics Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 
 ### Additional Information
 

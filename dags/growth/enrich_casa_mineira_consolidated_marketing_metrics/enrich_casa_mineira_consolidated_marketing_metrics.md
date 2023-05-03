@@ -13,7 +13,7 @@ Each media has a consolidated table, which aggregates metrics. All consolidated 
 > 2. KEYWORDS_PERFORMANCE_REPORT
 > 3. AD_PERFORMANCE_REPORT
 > 4. CAMPAIGN_PERFORMANCE_REPORT
-> 
+>
 > Report type names are based in this [Google Ads API doc](https://developers.google.com/adwords/api/docs/appendix/reports), **and must be the same used in taxonomy mappings**.
 
 More information about marketing data flow architecture can be found at [this diagram](https://viewer.diagrams.net/?page-id=XMpkxgjBueLUIo4w7sMd&highlight=0000ff&nav=1&hide-pages=1#G1aM-IGy6JcG1rxB0IyDxOJpyCU6GMoFzm), also shown in details below.
@@ -42,7 +42,4 @@ This pipeline produces, via incremental load:
     - `datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics`
     - `datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics`
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

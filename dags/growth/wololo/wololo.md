@@ -7,27 +7,25 @@ This DAG imports the tables from [Wololo](https://github.com/quintoandar/wololo)
   <summary><strong> > DAG details (click to expand)</strong></summary>
 
 ### Execution Interval
-This DAG is triggered daily. 
+This DAG is triggered daily.
 
 More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
+
 This pipeline produces, via full load:
 
 1. In datalake raw:
     - All tables available in source's database.
-  
+
 2. In datalake clean:
-    - `contract` 
+    - `contract`
     - `context_discard`
-    - `conversion` 
+    - `conversion`
     - `prospect_aud`
     - `prospect_dimension_aud`
     - `prospect_dimension`
     - `prospect`
     - `rev_info`
-
-### Responsible Data Engineering Team
-For any questions or concerns about this DAG, please contact its owner.
 
 </details>

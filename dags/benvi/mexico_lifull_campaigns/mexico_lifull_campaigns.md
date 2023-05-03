@@ -3,7 +3,7 @@
 ### Purpose
 
 This DAG creates incremental RAW and CLEAN tables with data extracted by a crawler from Thribee/Lifull reports related to Benvi's Mexico operation, which summarize performance of classified ads campaigns from Mitula and Trovit platforms.
-It runs a crawler to make a POST request in Thribee platform, fetch authentication tokens from the response cookies and make authenticated requests to scrape data into datalake. 
+It runs a crawler to make a POST request in Thribee platform, fetch authentication tokens from the response cookies and make authenticated requests to scrape data into datalake.
 
 The current solution substitutes an old implementation that was been executed outside our pipeline. Using an [AWSBatchOperator](https://airflow.apache.org/docs/apache-airflow/1.10.15/_api/airflow/contrib/operators/awsbatch_operator/index.html), it ran an [AWS Batch](https://docs.aws.amazon.com/batch/latest/userguide/what-is-batch.html) script stored at [trovit-spider repo](https://github.com/quintoandar/trovit-spider).
 All AWS Batch resources were created using [Terraform structure](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/batch_compute_environment) in Infrastructure repo, available for [Forno](https://github.com/quintoandar/infrastructure/tree/master/cloud/aws-accounts/forno-data/batch) and [Production](https://github.com/quintoandar/infrastructure/tree/master/cloud/aws-accounts/data/batch) environments.
@@ -19,13 +19,9 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-This pipeline produces the following output tables in each layer: 
+This pipeline produces the following output tables in each layer:
 * raw:
     - campaigns_overview_report
 * clean:
     - trovit_campaigns
     - mitula_campaigns
-
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data International team.

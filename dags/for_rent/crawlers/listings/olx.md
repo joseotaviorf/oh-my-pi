@@ -6,7 +6,7 @@ This DAG ingests data from OLX crawled data made by our partners. The data is pl
   <summary><strong> > DAG details (click to expand)</strong></summary>
 
 ### Execution Interval
-This DAG is triggered weekly, at Saturday. 
+This DAG is triggered weekly, at Saturday.
 
 More information about run time [here]({chart_url}{dag_id}).
 
@@ -18,7 +18,4 @@ This pipeline produces, via **incremental load**, on raw layer:
 And on clean layer:
     - `datalake_crawlers_listings_clean.olx`
 
-### Responsible Data Teams
-For any questions or concerns about this DAG and data, please contact the Data Engineering Team or
-Data Analytics Team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

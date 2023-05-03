@@ -17,5 +17,4 @@ We incrementally load the following tables into the datalake Raw and Clean:
 
 For further information, please read [this documentation](https://docs.google.com/document/d/15YEa41mdZ2YRUgpKpMNK63sIrHhCSXAYuf2QbW_Df7E).
 
-
 </details>

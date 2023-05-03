@@ -45,7 +45,4 @@ This pipeline produces the following output tables in each layer:
   * `datalake_google_search_console_clean.report_by_query`
   * `datalake_google_search_console_clean.report_by_page_and_query`
 
-## Responsible Data Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

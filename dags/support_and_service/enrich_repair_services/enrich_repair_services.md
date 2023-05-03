@@ -18,8 +18,4 @@ This pipeline produces the following output table on Enrich layer:
 - `repair_tickets_metrics` (full load)
 - `repair_tickets_follow_up` (full load)
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.
-
 </details>

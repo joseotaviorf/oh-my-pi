@@ -24,9 +24,5 @@ Produces the following output table on Enrich layer (via full load):
 - `nps_agg`
 - `ongoing`
 - `tickets`
-  
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.
 
 </details>

@@ -17,9 +17,4 @@ Produces the following output table:
 
 - `supply_outbound_contacts` - a compilation of all the request of contacts made to the prospect along the Prospect-to-Oportunity flow.
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
-
 </details>

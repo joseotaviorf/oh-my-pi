@@ -2,7 +2,7 @@
 ​
 ### Purpose
 ​
-This DAG creates the incremental modelings for Braze Events, context User Dispatch. 
+This DAG creates the incremental modelings for Braze Events, context User Dispatch.
 ​
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -22,8 +22,4 @@ This pipeline produces in DW schema `braze`:
         - `dim_campaign`
         - `dim_canvas`
 ​
-### Responsible Data Teams
-​
-For any questions or concerns about this DAG, please contact the Data Engineering Team or Data Analytics Team
-responsibles listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 ​</details>

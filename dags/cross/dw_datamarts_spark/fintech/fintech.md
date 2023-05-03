@@ -18,10 +18,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 
 - `doubtful_debtors_provision`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Fintech team.
-
 ### Additional Information
 
 The file [fintech.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/fintech/fintech.yml)

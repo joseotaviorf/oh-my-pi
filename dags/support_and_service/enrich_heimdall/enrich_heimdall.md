@@ -20,8 +20,4 @@ Produces the following output table on Enrich layer (via full load):
 - `expenses`
 - `ongoing_refund_requests`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.
-
 </details>

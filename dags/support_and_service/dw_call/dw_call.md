@@ -23,8 +23,4 @@ This pipeline produces the following output tables:
 - `fact_call_tasks`
 - `fact_ivr_paths`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.
-
 </details>

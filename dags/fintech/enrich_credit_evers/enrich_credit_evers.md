@@ -1,7 +1,7 @@
 ## Enrich Credit Evers
 
 ### Purpose
-Creates the enriched tables for Credit Evers context, which runs every month at day 15. 
+Creates the enriched tables for Credit Evers context, which runs every month at day 15.
 
 The Ever concept determines whether a tenant on 5A is a delinquent or not. A given contract is considered an EverXMobY if it has at least one invoice overdue by X days in the first Y months of the contract.
 
@@ -19,8 +19,4 @@ Produces the following output table in enrich layer, via full load:
     - `credit_evers`
     - `credit_evers_original_due_date`
 
-### Responsible Data Teams
-For any questions or concerns about this DAG, please contact the Data Engineering Team or 
-the Data Analytics Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

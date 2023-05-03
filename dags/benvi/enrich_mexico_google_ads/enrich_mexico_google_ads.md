@@ -20,7 +20,4 @@ This pipeline produces the following output tables in each layer, via incrementa
   * `datalake_mexico_google_ads.keywords_performance`
   * `datalake_mexico_google_ads.videos_performance`
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the DAG Owner.
 </details>

@@ -17,15 +17,9 @@ More information about run time [here]({chart_url}{dag_id}).
 
 1. In datalake raw:
     - `datalake_opsgenie_raw.incidents`
-    
+
 
 2. In datalake clean:
     - `datalake_opsgenie_clean.incidents`
 
-### Responsible Data Teams
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team or 
-the Data Analytics Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
-  
 </details>

@@ -20,8 +20,4 @@ This pipeline produces the following output tables:
 - `fact_session_tags`
 - `fact_sessions`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.
-
 </details>

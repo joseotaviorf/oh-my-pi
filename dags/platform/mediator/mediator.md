@@ -15,11 +15,6 @@ Runs at every 15 minutes, starting at minute 0 of each hour. More information ab
 
 *Dies (timeout) after 13 minutes.*
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
-
 ### Additional Information
 
 - [Mediator documentation page](https://www.notion.so/productquintoandar/Mediator-8c1bf75670bf4dc2999d17b12a3b2ec1)

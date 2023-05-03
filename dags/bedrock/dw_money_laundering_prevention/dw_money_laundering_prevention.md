@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This DAG loads to DW our model related to money laundering prevention. 
+This DAG loads to DW our model related to money laundering prevention.
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -12,7 +12,7 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 ### Outputs
 
-This pipeline produces the following output table in DW, via full load: 
+This pipeline produces the following output table in DW, via full load:
 
 - `fact_transaction`
 - `fact_transaction_client`
@@ -22,6 +22,5 @@ This pipeline produces the following output table in DW, via full load:
 - `dim_listing`
 - `dim_suspicion`
 - `dim_visit`
-
 
 </details>

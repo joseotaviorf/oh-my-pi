@@ -22,5 +22,4 @@ Load the following tables into the datalake clean (via full load):
 - `negotiation`
 - `payment`
 
-
 </details>

@@ -16,8 +16,4 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Currently, there is the following output table for both our raw, staging (clean) and clean layers, by incremental load:
 
-- `facebook_insights`, which has data from the following accounts: MX - Performance - Demand (539892317592968), MX - Performance - Supply (728657465218917) 
-
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data International team.
+- `facebook_insights`, which has data from the following accounts: MX - Performance - Demand (539892317592968), MX - Performance - Supply (728657465218917)

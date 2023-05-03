@@ -16,7 +16,4 @@ This pipeline produces the following output tables in DW layer, created in `quin
 - `quintoandar.fact_owner_conversion_metrics`
 - `quintoandar.fact_tenant_conversion_metrics`
 
-### Responsible Data Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

@@ -16,7 +16,3 @@ Produces the following output tables:
 - `hub_services_lead_flow`
 - `lead_flow`
 - `quintoandar_lead_flow`
-
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data For Sale team.

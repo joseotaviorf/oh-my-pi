@@ -19,8 +19,4 @@ This pipeline produces the following output table on enrich layer:
 - `events` (incremental load)
 - `events_bigfone_teravoz` (incremental load)
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact its owner.
-
 </details>

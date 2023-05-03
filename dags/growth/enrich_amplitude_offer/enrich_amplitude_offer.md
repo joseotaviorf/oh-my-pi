@@ -18,8 +18,4 @@ Produces the following output tables, via full load:
 - `offer_submitted_events`
 - `sale_offer_raw_events`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

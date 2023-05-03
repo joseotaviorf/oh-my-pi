@@ -17,14 +17,10 @@ This DAG is triggered daily.
 More information about run time [here]({chart_url}{dag_id})
 
 ### Outputs
-​
+
 This pipeline produces the following output table:
 ​
 
 - `library_version`: Contains core versions split (in major, minor and patches) and type of pwa.
 
-### Responsible Data Teams
-
-For any questions or concerns about this DAG, please contact the AE Growth Team. This DAG is under Brand context.
-  
 </details>

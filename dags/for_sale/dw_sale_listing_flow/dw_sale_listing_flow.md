@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This DAG loads to DW our models of sale listing flow. 
+This DAG loads to DW our models of sale listing flow.
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -12,12 +12,8 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 ### Outputs
 
-This pipeline produces the following output table in DW: 
+This pipeline produces the following output table in DW:
 
 - `fact_listing_flows`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

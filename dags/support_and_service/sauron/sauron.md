@@ -26,8 +26,3 @@ We load the following tables into the datalake:
    - incoming_message_status
    - incoming_messages
    - session
-
-### Responsible Data Team
-
-​
-For any questions or concerns about this DAG, please contact the Data Engineering team responsible.

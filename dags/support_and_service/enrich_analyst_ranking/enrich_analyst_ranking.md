@@ -19,8 +19,4 @@ This pipeline produces the following output table on Enrich layer (incremental l
 - `analyst_metrics`
 - `ranking`
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data Engineering team responsible listed in the DAG owners.
-
 </details>

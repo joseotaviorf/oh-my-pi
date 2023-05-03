@@ -15,7 +15,7 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 ​
-This pipeline produces the following output table: 
+This pipeline produces the following output table:
 ​
 - `campaign_details_owners`
 - `campaign_details_refiere_y_gana`
@@ -23,8 +23,3 @@ This pipeline produces the following output table:
 - `canvas_details_owners`
 - `canvas_details_refiere_y_gana`
 - `canvas_details_tenants`
-
-
-### Responsible Data Teams
-​
-For any questions or concerns about this DAG, please contact the DAG owner.

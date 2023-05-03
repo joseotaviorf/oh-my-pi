@@ -22,8 +22,4 @@ This pipeline produces the following output table on Enrich layer:
 - `quality_metrics` (full load)
 - `ra_metrics` (full load)
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data Engineering team responsible.
-
 </details>

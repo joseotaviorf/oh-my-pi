@@ -26,7 +26,4 @@ This pipeline produces the following output tables in each layer:
   * `datalake_google_ads_clean.campaigns_performance`
   * `datalake_google_ads_clean.videos_performance`
 
-## Responsible Data Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

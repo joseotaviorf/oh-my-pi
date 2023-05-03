@@ -66,7 +66,5 @@ This pipeline produces the following incremental output tables in each layer:
   * `datalake_olos_dialer_clean.pbx_billing_data`
   * `datalake_olos_dialer_clean.reason`
   * `datalake_olos_dialer_clean.users`
-## Responsible Data Team
 
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

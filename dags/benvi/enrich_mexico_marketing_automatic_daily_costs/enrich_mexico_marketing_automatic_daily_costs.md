@@ -17,8 +17,4 @@ This DAG creates, via incremental load:
 
 - `datalake_mexico_marketing_costs.daily_costs`
 
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data International team.
-
 </details>

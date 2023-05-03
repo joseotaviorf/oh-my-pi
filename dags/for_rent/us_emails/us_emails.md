@@ -9,7 +9,7 @@ This DAG imports the tables from [US Emails](https://github.com/quintoandar/us-e
 
 ### Execution Interval
 
-This DAG is triggered daily. 
+This DAG is triggered daily.
 
 More information about run time [here]({chart_url}{dag_id}).
 
@@ -26,7 +26,4 @@ Via **incremental load**:
     - `messages`
     - `unsubscriptions`
 
-### Responsible Data Teams
-For any questions or concerns about this DAG and data, please contact the Data Engineering Team or
-Data Analytics Team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

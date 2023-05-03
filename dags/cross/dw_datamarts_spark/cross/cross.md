@@ -20,10 +20,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `talk_to_agent`
 - `lead_listing_flows`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering team.
-
 ### Additional Information
 
 The file [cross.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/cross/cross.yml)

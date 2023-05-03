@@ -21,16 +21,10 @@ More information about run time [here]({chart_url}{dag_id}).
 1. In datalake raw:
 - datalake_brand_tracking_raw.brandtracking
 - datalake_brand_tracking_raw.brandtracking_unpivoted
-    
+
 
 2. In datalake clean:
 - datalake_brand_tracking_clean.brandtracking
 - datalake_brand_tracking_clean.brandtracking_unpivoted
 
-### Responsible Data Teams
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team or 
-the Data Analytics Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
-  
 </details>

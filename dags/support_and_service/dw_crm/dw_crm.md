@@ -1,7 +1,7 @@
 ## DW CRM
 ### Purpose
 
-Creates DW fact and dimension tables for CRM context. 
+Creates DW fact and dimension tables for CRM context.
 
 <details>
     <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -12,7 +12,7 @@ This DAG is triggered once per day via Mediator.
 More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
-This pipeline produces the following output tables in DW layer, via incremental load: 
+This pipeline produces the following output tables in DW layer, via incremental load:
 
 
 - `crm.dim_closing_task_transition`
@@ -41,8 +41,4 @@ This pipeline produces the following output tables in DW layer, via incremental 
 - `crm.fact_visit_tasks`
 - `crm.fact_lead_task_actions`
 
-
-### Responsible Data Teams
-
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

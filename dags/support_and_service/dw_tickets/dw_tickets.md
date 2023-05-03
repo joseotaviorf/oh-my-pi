@@ -24,8 +24,4 @@ This pipeline produces the following output tables:
 - `fact_ticket_tags`
 - `fact_tickets`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.
-
 </details>

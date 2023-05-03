@@ -14,7 +14,3 @@ Produces the following output tables:
 
 - `house_photo_job_tasks`
 - `listing_quality_tasks`
-
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible.

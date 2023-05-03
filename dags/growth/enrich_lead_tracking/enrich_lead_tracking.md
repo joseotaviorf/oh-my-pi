@@ -18,9 +18,4 @@ Produces the following output tables:
 1. In data lake enrich:
     - `lead_first_event_tracking`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
-
 </details>

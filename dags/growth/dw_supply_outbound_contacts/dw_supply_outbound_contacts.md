@@ -12,13 +12,12 @@ Creates DW dimensional model tables for the Outbound flow of Supply, Inside Sale
 Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
+
 This pipeline produces the following output tables in DW layer:
 
 - `dw_supply_outbound_contacts.fact_outbound_contacts`
 - `dw_supply_outbound_contacts.dim_call`
 - `dw_supply_outbound_contacts.dim_whatsapp`
 - `dw_supply_outbound_contacts.dim_sms`
-### Responsible Data Engineering Team
 
-For any questions or concerns about this DAG, please contact its owner.
 </details>

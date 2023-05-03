@@ -1,7 +1,7 @@
 ## Enrich Survicate
 ### Purpose
 
-Transform survey response collected from [Survicate](https://developers.survicate.com/data-export/#get-the-list-of-surveys). 
+Transform survey response collected from [Survicate](https://developers.survicate.com/data-export/#get-the-list-of-surveys).
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -19,9 +19,5 @@ This pipeline produces the following output table on enrich layer (via increment
 - `keys_surveys`
 - `photo_surveys`
 - `surveys`
-
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact its owner.
 
 </details>

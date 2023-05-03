@@ -24,10 +24,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `repressed_demand_booking_fit_in`
 - `weekly_demand_metrics`
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data For Rent team.
-
 ### Additional Information
 
 The file [for_rent.yml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/cross/dw_datamarts_spark/for_rent/for_rent.yml)

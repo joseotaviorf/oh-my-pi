@@ -28,9 +28,4 @@ This pipeline produces the following output tables in `customer_support` schema
 - `fact_segment` (full load)
 - `fact_ticket` (full load)
 
-​
-### Responsible Data Team
-​
-For any questions or concerns about this DAG, please contact the Data Engineering team responsible.
-
 </details>
