@@ -6,6 +6,8 @@ workflow:
   type: query
   layer: dw
   custom_schema: payment_snapshot
+  default_partitions: ["year", "month", "day"]
+  default_extraction_type: incremental
   short_circuit_customization:
     function: CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH
   tables_customization:
