@@ -17,7 +17,9 @@ class S3Service:
 
     @staticmethod
     def _split_s3_path(s3_path):
-        if not isinstance(s3_path, str) or not re.match("s3://.+/.*", s3_path):
+        if not isinstance(s3_path, str) or not re.match(
+            "s3[a|n]{0,1}://.+\/.*", s3_path
+        ):
             raise ValueError(
                 "m=_split_s3_path, s3_path={}, msg=given s3_path is not a valid s3 path".format(
                     s3_path
