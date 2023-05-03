@@ -34,9 +34,6 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 DEPS_YAML_PATH = os.path.join(DAG_PACKAGES_ROOT, "dependencies.yaml")
 
-GENERIC_GSHEETS_FILES_YAML_PATH = join(
-    DAGPackagesPathService.get_dag_path("gsheets"), "gsheets_files.yaml"
-)
 CONTEXT_GSHEETS_FILES_YAML_PATH = join(
     DAGPackagesPathService.get_dag_path("gsheets_by_context"), "gsheets_files.yaml"
 )
@@ -65,24 +62,17 @@ class GsheetsService:
             if "bietlejuice.gsheets" in dep:
                 gsheets_deps.append(dep)
 
-        gsheets_dict = FileService.get_dict_from_yaml_file(
-            GENERIC_GSHEETS_FILES_YAML_PATH
-        )
         context_gsheets_dict = FileService.get_dict_from_yaml_file(
             CONTEXT_GSHEETS_FILES_YAML_PATH
         )
-        df_generic = (
-            pd.DataFrame.from_dict(gsheets_dict, orient="index")
-            .reset_index(drop=False)
-            .rename(columns={"index": "raw_table_name"})
-        )
+
         df_context = (
             pd.DataFrame.from_dict(context_gsheets_dict, orient="index")
             .reset_index(drop=False)
             .rename(columns={"index": "raw_table_name"})
         )
-        df = df_generic.append(df_context, ignore_index=True, sort="raw_table_name")
-        df = df.drop(
+
+        df = df_context.drop(
             ["preload_time_in_seconds", "partitioned", "sheet_context", "sheet_id"],
             axis=1,
         )
