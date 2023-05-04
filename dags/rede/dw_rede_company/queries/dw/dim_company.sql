@@ -92,17 +92,3 @@ FROM
 LEFT JOIN
     datalake_hubspot.company AS c
         ON c.id_company = cs.id_hubspot
-LEFT JOIN
-    datalake_hubspot.deal AS d
-        ON d.id_company = c.id_company
-        AND d.id_pipeline = 5160960 -- We only want companies in the negotiation pipeline for Rede QuintoAndar.
-        AND (d.id_hubspot_team IS NULL OR d.id_hubspot_team NOT IN (6194580,5795941)) -- With a deal not made by adm or help sales
-LEFT JOIN
-    datalake_hubspot.team AS t 
-        ON t.id_team = d.id_hubspot_team
-WHERE
-    c.extracted_3p_tag IS NOT NULL
-    OR cs.extracted_3p_tag IS NOT NULL
-    OR d.id_deal IS NOT NULL
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY cs.sk_company ORDER BY d.ts_created DESC) = 1 -- There may be more than one deal. We want the most recent one.

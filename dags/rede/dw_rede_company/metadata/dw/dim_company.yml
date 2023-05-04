@@ -1,8 +1,6 @@
 database_name: dw_rede
 table_name: dim_company
-description: This table shows details about company leads registered in HubSpot. Specifically,
-  the ones with a deal in the Negotiation Pipeline of Rede QuintoAndar, and the deal
-  cannot have been created by Adm or Help Sales. Each row represents a partner or
+description: This table shows details about company leads registered in HubSpot. Each row represents a partner or
   a potential partner.
 domain: Rede
 owner: gustavo.miller@quintoandar.com.br
