@@ -33,4 +33,5 @@ SELECT
 FROM
     datalake_zendesk_tickets_raw.tickets
 WHERE
-    dt = DATE('{year}-{month}-{day}')
+-- we also filter by current partition beucase of the extraction behaviour, for more info contact data S&S team
+    dt IN (CAST('{year}-{month}-{day}' AS DATE), CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY)
