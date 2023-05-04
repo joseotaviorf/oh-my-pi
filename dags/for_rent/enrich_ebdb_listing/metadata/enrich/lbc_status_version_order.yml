@@ -8,40 +8,49 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_listing.business_context_history.id_house
-    description: Id of the house.
+    description: "Id of the house."
   country_code:
     lineage:
       - datalake_ebdb_listing.business_context_history.country_code
-    description: Country code of the house.
+    description: "Country code of the house."
   days_in_state:
-    description: Number of days in this specific state, characterized by a combination of status and status_reason.
+    description: "Number of days in this specific state, characterized by a combination of status and status_reason."
   days_in_status:
-    description: Number of days in this specific status.
+    description: "Number of days in this specific status."
   listing_version:
-    description: Number of the listing version.
+    description: "Number of the listing version."
   max_state_order:
-    description: Number of states registered of this house.
-  state_order:
-    description: Position of this particular state in the house history.
-  status:
+    description: "Number of states registered of this house."
+  rev:
     lineage:
-      - datalake_ebdb_listing.business_context_history.status
-    description: Status of the house in that specific time period.
-  status_reason:
-    lineage:
-      - datalake_ebdb_listing.business_context_history.status_reason
-    description: Status reason of the house in that specific time period.
+      - datalake_ebdb_listing.business_context_history.rev
+      - datalake_ebdb_listing.house_status_version_order.rev
+    description: "Indicates the user revision responsible for the house state change."
   revision_reason:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.reason
-    description: Reason why an user changed some aspect of the house state.
+    description: "Reason why an user changed some aspect of the house state."
+  state_order:
+    description: "Position of this particular state in the house history."
+  status:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.status
+    description: "Status of the house in that specific time period."
+  status_reason:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.status_reason
+    description: "Status reason of the house in that specific time period."
   trigger_new_version:
-    description: Number indicating if this state should trigger a new version (1 if it should and 0 if not).
+    description: "Number indicating if this state should trigger a new version (1 if it should and 0 if not)."
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.ts_state_started
+    description: "Timestamp of the house first publication."
   ts_state_started:
     lineage:
       - datalake_ebdb_listing.business_context_history.ts_state_started
-    description: Timestamp when this house state started, characterized by a combination of status and status_reason.
+    description: "Timestamp when this house state started, characterized by a combination of status and status_reason."
   ts_state_ended:
     lineage:
       - datalake_ebdb_listing.business_context_history.ts_state_ended
-    description: Timestamp when this house state ended, characterized by a combination of status and status_reason.
+    description: "Timestamp when this house state ended, characterized by a combination of status and status_reason."

@@ -13,6 +13,7 @@ house AS (
     MAX(house.order_status) OVER(PARTITION BY house.id_house) AS max_house_state_order,
     house.country_code,
     house.ts_first_publication,
+    house.rev,
     MAX(rev.reason) OVER(PARTITION BY house.id_house, house.status_history, house.ts_status_changed) AS revision_reason
   FROM 
     datalake_ebdb_listing.house_status_version_order AS house
@@ -39,10 +40,21 @@ last_house_state AS (
     h.country_code,
     h.ts_first_publication
   FROM
-    house h
+    house AS h
   WHERE 
     state_order = max_house_state_order
-), 
+),
+first_publication AS (
+  SELECT
+    id_house,
+    MIN(ts_state_started) AS ts_first_publication
+  FROM
+    datalake_ebdb_listing.business_context_history
+  WHERE
+    status = 'PUBLISHED'
+  GROUP BY
+    id_house
+),
 business_context_history AS (
   SELECT 
       bch.id_house,
@@ -93,7 +105,9 @@ business_context_history AS (
         , lhs.state_order + ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC)
         , ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC)
       ) AS state_order,
-      MAX(rev.reason) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS revision_reason
+      MAX(bch.rev) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS rev,
+      MAX(rev.reason) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS revision_reason,
+      COALESCE(lhs.ts_first_publication, fp.ts_first_publication) AS ts_first_publication
   FROM 
       datalake_ebdb_listing.business_context_history AS bch
   LEFT JOIN 
@@ -102,6 +116,9 @@ business_context_history AS (
   LEFT JOIN
     datalake_ebdb_clean.user_revision_entity AS rev
       ON rev.id = bch.rev
+  LEFT JOIN
+    first_publication AS fp
+      ON fp.id_house = bch.id_house
   WHERE
       bch.business_context = 'RENT'
 ), 
@@ -313,7 +330,9 @@ trigger AS (
     listing_version,
     state_order,
     max_house_state_order AS max_state_order,
-    revision_reason
+    rev,
+    revision_reason,
+    ts_first_publication
   FROM 
     house
 
@@ -341,7 +360,9 @@ trigger AS (
       ) AS listing_version,
       bch.state_order,
       MAX(bch.state_order) OVER(PARTITION BY bch.id_house) AS max_state_order,
-      bch.revision_reason
+      bch.rev,
+      bch.revision_reason,
+      bch.ts_first_publication
   FROM
     business_context_history AS bch
   LEFT JOIN 
@@ -360,7 +381,9 @@ SELECT
   country_code,
   status,
   status_reason,
+  rev,
   revision_reason,
+  ts_first_publication,
   ts_state_started,
   ts_state_ended,
   days_in_state,
