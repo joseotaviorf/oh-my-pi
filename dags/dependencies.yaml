@@ -168,7 +168,7 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
-  - bietlejuice.dw_user_sales_rep:load-quintoandar-dim-user-sales-rep-into-redshift
+  - bietlejuice.dw_user:load-quintoandar-dim-user-sales-rep-into-redshift
   - bietlejuice.ebdb:create-agent-data-clean-external-table
   - bietlejuice.ebdb:create-agent-support-clean-external-table
   - bietlejuice.ebdb:create-booking-clean-external-table
