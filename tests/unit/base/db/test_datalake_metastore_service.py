@@ -9,7 +9,7 @@ class TestDatalakeMetastoreService:
         # arrange
         env = "forno"
         source = "_my_src_"
-        datalake_bucket = "datalake.s3.forno.data.quintoandar.com.br"
+        datalake_bucket = "5a-datalake-forno"
 
         # act
         db_info_dict = DatalakeMetastoreService.get_db_info(
@@ -20,16 +20,16 @@ class TestDatalakeMetastoreService:
         assert db_info_dict == {
             "db_clean_athena": "datalake__my_src__clean",
             "db_clean_databricks": "datalake__my_src__clean",
-            "db_clean_path": "s3://datalake.s3.forno.data.quintoandar.com.br/clean/_my_src_/",
+            "db_clean_path": "s3://5a-datalake-forno/clean/_my_src_/",
             "db_clean_staging_athena": "datalake__my_src__clean_staging",
             "db_clean_staging_databricks": "datalake__my_src__clean_staging",
-            "db_clean_staging_path": "s3://datalake.s3.forno.data.quintoandar.com.br/clean_staging/_my_src_/",
+            "db_clean_staging_path": "s3://5a-datalake-forno/clean_staging/_my_src_/",
             "db_raw_athena": "datalake__my_src__raw",
             "db_raw_databricks": "datalake__my_src__raw",
-            "db_raw_path": "s3://datalake.s3.forno.data.quintoandar.com.br/raw/_my_src_/",
+            "db_raw_path": "s3://5a-datalake-forno/raw/_my_src_/",
             "db_enrich_athena": "datalake__my_src_",
             "db_enrich_databricks": "datalake__my_src_",
-            "db_enrich_path": "s3://datalake.s3.forno.data.quintoandar.com.br/enrich/_my_src_/",
+            "db_enrich_path": "s3://5a-datalake-forno/enrich/_my_src_/",
         }
 
     def test_get_db_info_for_prod(self):

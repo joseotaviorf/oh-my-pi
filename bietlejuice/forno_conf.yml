@@ -79,7 +79,7 @@ dags_out_of_pattern:
 databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice
 databricks_bucket: databricks.s3.forno.data.quintoandar.com.br
 dags_packages_files_path_in_s3: "github-repos/bi-etl-ejuice/"
-datalake_bucket: datalake.s3.forno.data.quintoandar.com.br
+datalake_bucket: 5a-datalake-forno
 people_bucket: people-s3-data-quintoandar-com-br
 doc_md_chart_url: https://qb343dade3ecd6cd6p-tp.appspot.com/admin/airflow/chart?chart_id=3&iteration_no=0&dag_id=
 dw_bucket: dw.s3.forno.data.quintoandar.com.br

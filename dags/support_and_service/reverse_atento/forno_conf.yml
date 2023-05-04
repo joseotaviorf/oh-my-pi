@@ -1,5 +1,5 @@
 ---
-external_s3_bucket: datalake.s3.forno.data.quintoandar.com.br
+external_s3_bucket: 5a-datalake-forno
 
 partition_cols: ["year", "month", "day"]
 
