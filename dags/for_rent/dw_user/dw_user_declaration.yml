@@ -5,8 +5,18 @@ dag:
 workflow:
   type: query
   layer: dw
-  custom_schema: public
   default_partitions: [country_code]
+  tables_customization:
+    dim_partner:
+      custom_schema: public
+    dim_partner_agent:
+      custom_schema: public
+    dim_user_doorman:
+      custom_schema: public
+    dim_user:
+      custom_schema: public
+    dim_user_sales_rep:
+      custom_schema: quintoandar
 cluster:
   type: databricks_10_4_med_general_cluster
   access_control_list:

@@ -1,5 +1,6 @@
 SELECT
     id_user_sales_rep AS sk_user_sales_rep,
+    country_code,
     name,
     email,
     phone_number,

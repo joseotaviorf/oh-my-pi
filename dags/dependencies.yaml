@@ -923,6 +923,7 @@ bietlejuice.dw_user:
   - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-sales-rep
   - bietlejuice.enrich_pro_owners:load-enrich-owner-houses-quantity-history
 bietlejuice.dw_user_affiliate:
   - bietlejuice.enrich_amplitude_user:load-enrich-user-affiliate-origin
@@ -931,8 +932,6 @@ bietlejuice.dw_user_affiliate:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets.growth:done-clean-taxonomy-affiliates
-bietlejuice.dw_user_sales_rep:
-  - bietlejuice.enrich_ebdb_user:load-enrich-user-sales-rep
 bietlejuice.dw_velo:
   - bietlejuice.enrich_velo:load-enrich-broker
   - bietlejuice.enrich_velo:load-enrich-house

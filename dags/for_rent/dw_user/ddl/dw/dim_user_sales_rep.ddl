@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS quintoandar.dim_user_sales_rep;
 CREATE TABLE quintoandar.dim_user_sales_rep (
     sk_user_sales_rep BIGINT PRIMARY KEY,
+    country_code VARCHAR,
     name VARCHAR,
     email VARCHAR,
     phone_number VARCHAR,
@@ -10,4 +11,4 @@ CREATE TABLE quintoandar.dim_user_sales_rep (
     dt_sales_rep_started DATE,
     ts_load TIMESTAMP
 );
-ALTER TABLE quintoandar.dim_user_sales_rep OWNER TO airflow;
+ALTER TABLE quintoandar.dim_user_sales_rep OWNER TO databricks;

@@ -1,0 +1,49 @@
+database_name: dw_quintoandar
+table_name: dim_user_sales_rep
+description: Information about Sales Rep users from Inside Sales companies. Each line is an unique user sales rep, identified by the sk_user_sales_rep.
+domain: Growth
+owner: ae-growth@quintoandar.com.br
+columns:
+  sk_user_sales_rep:
+    lineage:
+    - datalake_ebdb_user.user_sales_rep.id_user_sales_rep
+    description: "Unique identifier of the user sales rep from the Main/EBDB database."
+  country_code:
+    lineage:
+      - datalake_ebdb_user.user_sales_rep.country_code
+    description: "Country code related to the user."
+  name:
+    lineage:
+    - datalake_ebdb_user.user_sales_rep.name
+    description: "Name of the sales rep."
+  email:
+    lineage:
+    - datalake_ebdb_user.user_sales_rep.email
+    description: "Email of the sales rep."
+  phone_number:
+    lineage:
+    - datalake_ebdb_user.user_sales_rep.phone_number
+    description: "Phone number of the sales rep."
+  admin_type:
+    lineage:
+    - datalake_ebdb_user.user_sales_rep.admin_type
+    description: "Admin type that the sales rep user has."
+    categories:
+      Admin: ''
+      AtendimentoParceiros: ''
+      Normal: ''
+      Sudo: ''
+  sales_company:
+    lineage:
+    - datalake_ebdb_user.user_sales_rep.sales_company
+    description: "Inside Sales company of the user."
+  is_sales_rep_active:
+    lineage:
+    - datalake_ebdb_user.user_sales_rep.is_sales_rep_active
+    description: "Boolean indicating if the sales rep is active in our company."
+  dt_sales_rep_started:
+    lineage:
+    - datalake_ebdb_user.user_sales_rep.dt_sales_rep_started
+    description: "Date of then when the sales rep started working with us."
+  ts_load:
+    description: "Timestamp indicating the load of the data into our system."

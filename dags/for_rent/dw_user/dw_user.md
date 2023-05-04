@@ -20,4 +20,5 @@ Produces the following output tables, partitioned by `country_code`:
 - `dim_partner_agent`
 - `dim_user`
 - `dim_user_doorman`
+- `dim_user_sales_rep`
 
