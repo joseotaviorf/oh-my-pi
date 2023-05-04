@@ -71,6 +71,10 @@ columns:
     description: Personalization @3
     lineage:
       - datalake_recommendations.personalization.personalization_at_3
+  diversity_at_3:
+    description: Diversity @3
+    lineage:
+      - datalake_recommendations.diversity.diversity_at_3
   mean_precision_at_5:
     description: Mean Precision @5
     lineage:
@@ -125,6 +129,10 @@ columns:
     description: Personalization @5
     lineage:
       - datalake_recommendations.personalization.personalization_at_5
+  diversity_at_5:
+    description: Diversity @5
+    lineage:
+      - datalake_recommendations.diversity.diversity_at_5
   mean_precision_at_10:
     description: Mean Precision @10
     lineage:
@@ -179,3 +187,7 @@ columns:
     description: Personalization @10
     lineage:
       - datalake_recommendations.personalization.personalization_at_10
+  diversity_at_10:
+    description: Diversity @10
+    lineage:
+      - datalake_recommendations.diversity.diversity_at_10

@@ -191,7 +191,11 @@ SELECT
     COALESCE(recommendation_to_sale_flow.rec_to_sale_flow_fourteen_days, FALSE) AS rec_to_sale_flow_fourteen_days,
     COALESCE(recommendation_to_rent_flow.rec_to_rent_flow_one_day, FALSE) AS rec_to_rent_flow_one_day,
     COALESCE(recommendation_to_rent_flow.rec_to_rent_flow_seven_days, FALSE) AS rec_to_rent_flow_seven_days,
-    COALESCE(recommendation_to_relevant_interaction.count_relevant_items, 0) AS count_relevant_items
+    COALESCE(recommendation_to_relevant_interaction.count_relevant_items, 0) AS count_relevant_items,
+    -- adding 3 cases for diversity (@3, @5, @10) because it is a complicated filter in this metric
+    COALESCE(diversity.diversity_at_3, 0) AS diversity_at_3,
+    COALESCE(diversity.diversity_at_5, 0) AS diversity_at_5,
+    COALESCE(diversity.diversity_at_10, 0) AS diversity_at_10
 FROM datalake_recommendations.recommendation AS recommendation
 LEFT JOIN
     recommendation_to_click
@@ -208,3 +212,6 @@ LEFT JOIN
 LEFT JOIN
     recommendation_to_relevant_interaction
     ON recommendation.id_recset = recommendation_to_relevant_interaction.id_recset
+LEFT JOIN
+    datalake_recommendations.diversity AS diversity
+        ON base.id_recset = diversity.id_recset

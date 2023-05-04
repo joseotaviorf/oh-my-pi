@@ -101,6 +101,10 @@ columns:
       - datalake_recommendations.recommendation_flow.cum_true_positive
       - datalake_recommendations.recommendation_flow.count_relevant_items
       - datalake_recommendations.recommendation_flow.item_rank
+  diversity_at_3:
+    description: Diversity @3
+    lineage:
+      - datalake_recommendations.diversity.diversity_at_3
   rec_to_favorite_at_3:
     description: Rec to favorite @3
     lineage:
@@ -178,6 +182,10 @@ columns:
       - datalake_recommendations.recommendation_flow.cum_true_positive
       - datalake_recommendations.recommendation_flow.count_relevant_items
       - datalake_recommendations.recommendation_flow.item_rank
+  diversity_at_5:
+    description: Diversity @5
+    lineage:
+      - datalake_recommendations.diversity.diversity_at_5
   rec_to_favorite_at_5:
     description: Rec to favorite @5
     lineage:
@@ -255,6 +263,10 @@ columns:
       - datalake_recommendations.recommendation_flow.cum_true_positive
       - datalake_recommendations.recommendation_flow.count_relevant_items
       - datalake_recommendations.recommendation_flow.item_rank
+  diversity_at_10:
+    description: Diversity @10
+    lineage:
+      - datalake_recommendations.diversity.diversity_at_10
   rec_to_favorite_at_10:
     description: Rec to favorite @10
     lineage:

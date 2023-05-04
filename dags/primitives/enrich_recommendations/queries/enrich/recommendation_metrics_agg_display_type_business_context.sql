@@ -93,6 +93,18 @@ SELECT
     MIN(ndcg_at_10) AS min_ndcg_at_10,
     MAX(ndcg_at_10) AS max_ndcg_at_10,
 
+    MEAN(diversity_at_3) AS mean_diversity_at_3,
+    MIN(diversity_at_3) AS min_diversity_at_3,
+    MAX(diversity_at_3) AS max_diversity_at_3,
+
+    MEAN(diversity_at_5) AS mean_diversity_at_5,
+    MIN(diversity_at_5) AS min_diversity_at_5,
+    MAX(diversity_at_5) AS max_diversity_at_5,
+
+    MEAN(diversity_at_10) AS mean_diversity_at_10,
+    MIN(diversity_at_10) AS min_diversity_at_10,
+    MAX(diversity_at_10) AS max_diversity_at_10,
+
     MEAN(rec_to_favorite_at_3) AS mean_rec_to_favorite_at_3,
     MIN(rec_to_favorite_at_3) AS min_rec_to_favorite_at_3,
     MAX(rec_to_favorite_at_3) AS max_rec_to_favorite_at_3,

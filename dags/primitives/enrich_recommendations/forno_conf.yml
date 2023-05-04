@@ -7,8 +7,12 @@ inner_dependencies:
   coverage:
     - recommendation
     - recommendation_catalog
+  diversity:
+    - embeddings
+    - recommendation
   recommendation_metrics_agg_recset:
     - recommendation_flow
+    - diversity
   recommendation_metrics_agg_display_type_business_context:
     - recommendation_metrics_agg_recset
     - coverage
@@ -38,6 +42,8 @@ tables:
   personalization:
     is_incremental: false
   coverage:
+    is_incremental: false
+  diversity:
     is_incremental: false
   recommendation_metrics_agg_display_type_business_context:
     is_incremental: false
