@@ -5,6 +5,7 @@ from datetime import datetime
 from argparse import ArgumentParser
 from pyspark.sql import DataFrame
 import pyspark.sql.functions as SF
+from functools import reduce
 
 import logging
 from quintoandar_logger import QuintoAndarLogger
@@ -54,76 +55,90 @@ def _fetch_condominium_data(auth_token:str, condominium_url:str, execution_date:
         "Accept": "application/json", 
         "Authorization": auth_token
     }
-    
-    try:
-        response = requests.get(condominium_url, headers=headers)
-        if response.status_code == 200:
-            try:
-                data = json.loads(response.text)
-                
-                if len(data) > 0:
-                    return spark.createDataFrame([
-                    {
-                        "id": str(row['id']), 
-                        "keyword": str(row['keyWord']),
-                        "data_construcao": str(row['dataConstrucao']),
-                        "cnpj": str(row['cnpj']), 
-                        "condominio": str(row['condominio']), 
-                        "cep": str(row['cep']), 
-                        "rua": str(row['rua']),
-                        "numero": str(row['numero']),
-                        "bairro": str(row['bairro']),
-                        "estado": str(row['estado']),
-                        "cidade": str(row['cidade']),
-                        "latitude": str(row['latitude']),
-                        "longitude": str(row['longitude']),
-                        "total_unidades": str(row['totalUnidades']),
-                        "elevador": int(row['elevador']),
-                        "total_elevadores": int(row['totalElevadores']),
-                        "portaria": int(row['portaria']),
-                        "total_portarias": int(row['totalPortarias']),
-                        "piscina": int(row['piscina']),
-                        "churrasqueira": int(row['churrasqueira']),
-                        "quadra_esportiva": int(row['quadraEsportiva']),
-                        "piscina": int(row['piscina']),
-                        "academia": int(row['academia']),
-                        "salao_festa": int(row['salaoFesta']),
-                        "sauna": int(row['sauna']),
-                        "salao_festa": int(row['salaoFesta']),
-                        "lavanderia": int(row['lavanderia']),
-                        "gas_encanado": int(row['gasEncanado']),
-                        "total_blocos": str(row['totalBlocos']),
-                        "areaGourmet": str(row['areaGourmet']),
-                        "caracteristicas_condominio": str(row['caracteristicasCondominio']),
-                        "quantidade_funcionarios": str(row['quantidadeFuncionarios']),
-                        "arrecadacao_mensal": str(row['arrecadacaoMensal']),
-                        "indice_inadimplencia": str(row['indiceInadimplencia']),
-                        "quantidade_vagas_garagem": str(row['quantidadeVagasGaragem']),
-                        "quantidade_pavimentos_garagem": str(row['quantidadePavimentosGaragem']),
-                        "quantidade_andares": str(row['quantidadeAndares']),
-                        "quantidade_portoes_garagem": str(row['quantidadePortoesGaragem']),
-                        "possui_sindico_morador_ou_profissional": str(row['possuiSindicoMoradorOuProfissional']),
-                        "possui_conta_corrente_ou_conta_pool": str(row['possuiContaCorrenteOuContaPool']),
-                        "administraco_propria_ou_terceirizada": str(row['administracoPropriaOuTerceirizada']),
-                        "quantidade_caixas_agua": str(row['quantidadeCaixasAgua']),
-                        "funcionarios_terceirizados": str(row['funcionariosTerceirizados']),
-                        "realizam_reuso_agua": str(row['realizamReusoAgua']),
-                        "origem": str(row['origem']),
-                        } for row in data
-                    ])
-                else:
-                    logging.error(f"No data found for account to date {execution_date}.")
-            except Exception as exception:
-                logging.error(f"Fail to extract data. Schema error:{exception}")
-                raise exception
-        else:
-            logging.error(f"Unsuccessful request to fetch campaign data from {condominium_url}. Status code: {response.status_code}")
-            raise Exception(f"Network error. status code response: {response.status_code}")
-        
-    except Exception as exception:
-        logging.error(f"Fail to fetch campaign data from Thribee plataform. error:{exception}")
-        raise exception              
-        
+
+    page = 1
+    result = []
+
+    while True:
+        try:
+            response = requests.get(f"{condominium_url}?page={page}", headers=headers)
+            if response.status_code == 200:
+                try:
+                    data = json.loads(response.text)
+                    
+                    if data['total'] > 0:
+                        page += 1
+
+                        api_page_df = spark.createDataFrame([
+                        {
+                            "id": str(row['id']), 
+                            "keyword": str(row['keyWord']),
+                            "date_updated": str(row['dateUpdated']),
+                            "data_construcao": str(row['dataConstrucao']),
+                            "cnpj": str(row['cnpj']), 
+                            "condominio": str(row['condominio']), 
+                            "cep": str(row['cep']), 
+                            "rua": str(row['rua']),
+                            "numero": str(row['numero']),
+                            "bairro": str(row['bairro']),
+                            "estado": str(row['estado']),
+                            "cidade": str(row['cidade']),
+                            "latitude": str(row['latitude']),
+                            "longitude": str(row['longitude']),
+                            "total_unidades": str(row['totalUnidades']),
+                            "elevador": int(row['elevador']),
+                            "total_elevadores": int(row['totalElevadores']),
+                            "portaria": int(row['portaria']),
+                            "total_portarias": str(row['totalPortarias']),
+                            "piscina": int(row['piscina']),
+                            "churrasqueira": int(row['churrasqueira']),
+                            "quadra_esportiva": int(row['quadraEsportiva']),
+                            "piscina": int(row['piscina']),
+                            "academia": int(row['academia']),
+                            "salao_festa": int(row['salaoFesta']),
+                            "sauna": int(row['sauna']),
+                            "salao_festa": int(row['salaoFesta']),
+                            "lavanderia": int(row['lavanderia']),
+                            "gas_encanado": int(row['gasEncanado']),
+                            "total_blocos": str(row['totalBlocos']),
+                            "areaGourmet": str(row['areaGourmet']),
+                            "caracteristicas_condominio": str(row['caracteristicasCondominio']),
+                            "quantidade_funcionarios": str(row['quantidadeFuncionarios']),
+                            "arrecadacao_mensal": str(row['arrecadacaoMensal']),
+                            "indice_inadimplencia": str(row['indiceInadimplencia']),
+                            "quantidade_vagas_garagem": str(row['quantidadeVagasGaragem']),
+                            "quantidade_pavimentos_garagem": str(row['quantidadePavimentosGaragem']),
+                            "quantidade_andares": str(row['quantidadeAndares']),
+                            "quantidade_portoes_garagem": str(row['quantidadePortoesGaragem']),
+                            "possui_sindico_morador_ou_profissional": str(row['possuiSindicoMoradorOuProfissional']),
+                            "possui_conta_corrente_ou_conta_pool": str(row['possuiContaCorrenteOuContaPool']),
+                            "administraco_propria_ou_terceirizada": str(row['administracoPropriaOuTerceirizada']),
+                            "quantidade_caixas_agua": str(row['quantidadeCaixasAgua']),
+                            "funcionarios_terceirizados": str(row['funcionariosTerceirizados']),
+                            "realizam_reuso_agua": str(row['realizamReusoAgua']),
+                            "origem": str(row['origem']),
+                            } for row in data['items']
+                        ])
+
+                        result.append(api_page_df)
+                    else:
+                        break
+                except Exception as exception:
+                    logging.error(f"Fail to extract data. Schema error:{exception}")
+                    raise exception
+            else:
+                logging.error(f"Unsuccessful request to fetch campaign data from {condominium_url}. Status code: {response.status_code}")
+                raise Exception(f"Network error. status code response: {response.status_code}")
+            
+        except Exception as exception:
+            logging.error(f"Fail to fetch campaign data from Thribee plataform. error:{exception}")
+            raise exception
+
+    if len(result) > 0:
+        return reduce(DataFrame.unionAll, result)
+
+    logging.error(f"No data found for account to date {execution_date}.")
+
 if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)

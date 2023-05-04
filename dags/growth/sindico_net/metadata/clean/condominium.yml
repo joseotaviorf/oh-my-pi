@@ -176,6 +176,10 @@ columns:
     lineage:
     - datalake_sindiconet_raw.condominium.total_unidades
     description: "Total number of units in the condominium."
+  ts_updated:
+    lineage:
+    - datalake_sindiconet_raw.condominium.date_updated
+    description: "Timestamp of condominium data last update"
   load_date:
     lineage:
     - datalake_sindiconet_raw.condominium.load_date

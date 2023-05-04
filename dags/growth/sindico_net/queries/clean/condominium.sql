@@ -1,11 +1,3 @@
-WITH dedup AS (
-  SELECT
-    keyword,
-    MIN(INT(id)) AS first_id
-  FROM datalake_sindico_net_raw.condominium
-  GROUP BY 1
-
-)
 SELECT 
     INT(id) as id,
     condominio AS condo,
@@ -50,6 +42,7 @@ SELECT
     CAST(salao_festa AS BOOLEAN) AS has_party_hall,
     realizam_reuso_agua AS has_water_reuse,
     CAST(sauna AS BOOLEAN) AS has_sauna,
+    TIMESTAMP(date_updated) AS ts_updated,
     load_date
-FROM datalake_sindico_net_raw.condominium
-WHERE INT(id) IN (SELECT first_id FROM dedup)
+FROM
+    datalake_sindico_net_raw.condominium
