@@ -1,0 +1,17 @@
+---
+dag_documentation:
+  dag_purpose:
+    "This DAG main responsibility is to provide all the QuintoAndar Personas, \n
+    by Personas, the user type, which can be a property owner, tenant, broker, \n
+    photographer, pp multi, prospect, among others. It provides a daily snapshot."
+
+inner_dependencies:
+  persona_type:
+    - broker_user
+    - tenant_user
+    - photographer_user
+    - property_owner
+
+partition_cols: [country_code, year, month, day]
+
+datalake_bucket: "datalake-old.s3.forno.data.quintoandar.com.br"

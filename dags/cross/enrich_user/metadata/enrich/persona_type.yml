@@ -1,0 +1,112 @@
+---
+database_name: datalake_user
+table_name: persona_type
+description: Ebdb Users daily snapshot unifying all personas types.
+domain: Cross
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_user:
+    lineage:
+      - datalake_user.broker_user.id_user
+      - datalake_user.tenant_user.id_user
+      - datalake_user.photographer_user.id_user
+      - datalake_user.property_owner.id_user
+    description: The user id in the main.
+  id_country:
+    lineage:
+      - datalake_user.broker_user.id_country
+      - datalake_user.tenant_user.id_country
+      - datalake_user.photographer_user.id_country
+      - datalake_user.property_owner.id_country
+    description: The user country id.
+  client_type:
+    lineage:
+      - datalake_user.broker_user.client_type
+      - datalake_user.tenant_user.client_type
+      - datalake_user.photographer_user.client_type
+      - datalake_user.property_owner.client_type
+    description: Client type assumed by the user.
+  country_code:
+    lineage:
+      - datalake_user.broker_user.country_code
+      - datalake_user.tenant_user.country_code
+      - datalake_user.photographer_user.country_code
+      - datalake_user.property_owner.country_code
+    description: Country code of the user. Also, a partition of this table.
+  main_phone:
+    lineage:
+      - datalake_user.broker_user.main_phone
+      - datalake_user.tenant_user.main_phone
+      - datalake_user.photographer_user.main_phone
+      - datalake_user.property_owner.main_phone
+    description: The user main_phone.
+  name:
+    lineage:
+      - datalake_user.broker_user.name
+      - datalake_user.tenant_user.name
+      - datalake_user.photographer_user.name
+      - datalake_user.property_owner.name
+    description: The user full_name.
+  email:
+    lineage:
+      - datalake_user.broker_user.email
+      - datalake_user.tenant_user.email
+      - datalake_user.photographer_user.email
+      - datalake_user.property_owner.email
+    description: The user email.
+  is_active:
+    lineage:
+      - datalake_user.broker_user.is_active
+      - datalake_user.tenant_user.is_active
+      - datalake_user.photographer_user.is_active
+      - datalake_user.property_owner.is_active
+    description: If the user is active or not.
+  is_blocked:
+    lineage:
+      - datalake_user.broker_user.is_blocked
+      - datalake_user.tenant_user.is_blocked
+      - datalake_user.photographer_user.is_blocked
+      - datalake_user.property_owner.is_blocked
+    description: If the user is blocked or not.
+  dt_birth:
+    lineage:
+      - datalake_user.broker_user.dt_birth
+      - datalake_user.tenant_user.dt_birth
+      - datalake_user.photographer_user.dt_birth
+      - datalake_user.property_owner.dt_birth
+    description: The user birth date.
+  ts_user_created:
+    lineage:
+      - datalake_user.broker_user.ts_user_created
+      - datalake_user.tenant_user.ts_user_created
+      - datalake_user.photographer_user.ts_user_created
+      - datalake_user.property_owner.ts_user_created
+    description: The user creation date in the system.
+  ts_user_updated:
+    lineage:
+      - datalake_user.broker_user.ts_user_updated
+      - datalake_user.tenant_user.ts_user_updated
+      - datalake_user.photographer_user.ts_user_updated
+      - datalake_user.property_owner.ts_user_updated
+    description: The user last updated date in the system.
+  year:
+    lineage:
+      - datalake_user.broker_user.year
+      - datalake_user.tenant_user.year
+      - datalake_user.photographer_user.year
+      - datalake_user.property_owner.year
+    description: Snapshot year, partition column.
+  month:
+    lineage:
+      - datalake_user.broker_user.month
+      - datalake_user.tenant_user.month
+      - datalake_user.photographer_user.month
+      - datalake_user.property_owner.month
+    description: Snapshot month, partition column.
+  day:
+    lineage:
+      - datalake_user.broker_user.day
+      - datalake_user.tenant_user.day
+      - datalake_user.photographer_user.day
+      - datalake_user.property_owner.day
+    description: Snapshot day, partition column.

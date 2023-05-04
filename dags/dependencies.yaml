@@ -2203,6 +2203,15 @@ bietlejuice.enrich_unified_potential_listing:
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_listing_jobs:load-enrich-house-photo-job-tasks
   - bietlejuice.enrich_unified_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
+bietlejuice.enrich_user:
+  - bietlejuice.ebdb:create-clean-agent-data-business-contexts-served-in-data-lake
+  - bietlejuice.ebdb:create-clean-agent-data-in-data-lake
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-country-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
+  - bietlejuice.ebdb:create-clean-photographer-data-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
 bietlejuice.enrich_velo:
   - bietlejuice.ebdb:create-clean-country-in-data-lake
   - bietlejuice.ebdb:create-clean-state-in-data-lake
