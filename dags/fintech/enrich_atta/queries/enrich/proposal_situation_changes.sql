@@ -50,6 +50,7 @@ SELECT
             WHEN 11 THEN 'Não Passível de Defesa'
             WHEN 12 THEN 'Revisão'
             WHEN 13 THEN 'Não Processado Banco'
+            WHEN 14 THEN 'Divergência de Cadastro'
         END AS proposal_previous_situation,
         CASE log.id_current_proposal_situation
             WHEN 1 THEN 'Andamento'
@@ -65,6 +66,7 @@ SELECT
             WHEN 11 THEN 'Não Passível de Defesa'
             WHEN 12 THEN 'Revisão'
             WHEN 13 THEN 'Não Processado Banco'
+            WHEN 14 THEN 'Divergência de Cadastro'
         END AS proposal_next_situation,
         pp.ts_registration AS ts_proposal_registration,
         log.ts_previous_log AS ts_start_situation,
@@ -128,9 +130,9 @@ SELECT
   proposal_status,
   situation_history,
   next_situation,
-  datediff(hour,ts_start_situation,ts_end_situation) AS lead_time_situation_in_hour,
-  datediff(day,ts_start_situation,ts_end_situation) AS lead_time_situation_in_day,
-  DATEDIFF(DAY, date_trunc('day', min_ts_step),date_trunc('day',  max_ts_step)) AS lead_time_status_in_day,
+  DATEDIFF(HOUR,ts_start_situation,ts_end_situation) AS lead_time_situation_in_hour,
+  DATEDIFF(DAY,ts_start_situation,ts_end_situation) AS lead_time_situation_in_day,
+  DATEDIFF(DAY, date_trunc('day', min_ts_step),COALESCE(date_trunc('day',  max_ts_step),current_date)) AS lead_time_status_in_day,
   ts_proposal_registration,
   ts_start_situation,
   ts_end_situation
@@ -146,7 +148,7 @@ SELECT
   NULL AS next_situation,
   DATEDIFF(HOUR,ts_end_situation,current_date) AS lead_time_situation_in_hour,
   DATEDIFF(DAY,ts_end_situation,current_date) AS lead_time_situation_in_day,
-  DATEDIFF(DAY, date_trunc('day', min_ts_step),date_trunc('day',  max_ts_step)) AS lead_time_status_in_day,
+  DATEDIFF(DAY, date_trunc('day', min_ts_step),COALESCE(date_trunc('day',  max_ts_step),current_date)) AS lead_time_status_in_day,
   ts_proposal_registration,
   ts_end_situation AS ts_start_situation,
   NULL AS ts_end_situation
@@ -162,5 +164,5 @@ SELECT
 *
 FROM union_all
 ORDER BY
-   id_proposal desc,
+   id_proposal DESC,
    proposal_order
