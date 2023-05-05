@@ -6,10 +6,12 @@ The embeddings are scaled (from [-1, 1] to [0, 1]) and normalized (l2 norm) to f
 WITH embeddings_from_emlio_logs AS (
     SELECT id_service AS ml_model,
         service_version AS ml_model_version,
-        CASE id_service
-            WHEN 'house-similarity-embeddings' THEN GET_JSON_OBJECT(service_keys, '$.model_type')
-            WHEN 'house-user-embeddings' THEN SPLIT(GET_JSON_OBJECT(service_keys, '$.model_type'), "_")[0]
-            END AS business_context,
+        LOWER(
+            CASE id_service
+                WHEN 'house-similarity-embeddings' THEN GET_JSON_OBJECT(service_keys, '$.model_type')
+                WHEN 'house-user-embeddings' THEN SPLIT(GET_JSON_OBJECT(service_keys, '$.model_type'), "_")[0]
+                END
+        ) AS business_context,
         CASE id_service
             WHEN 'house-similarity-embeddings' THEN 'house'
             WHEN 'house-user-embeddings' THEN SPLIT(GET_JSON_OBJECT(service_keys, '$.model_type'), "_")[1]

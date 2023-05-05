@@ -63,15 +63,20 @@ columns:
     description: Mean Rec to rent flow seven days @3
     lineage:
       - datalake_recommendations.recommendation_metrics_agg_recset.rec_to_rent_flow_seven_days_at_3
-  coverage_at_3:
+  mean_coverage_at_3:
     description: Catalog coverage @3
     lineage:
       - datalake_recommendations.coverage.coverage_at_3
-  personalization_at_3:
+  mean_popularity_3:
+    description: |
+      Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
+    lineage:
+      - datalake_recommendations.recommendation_metrics_agg_recset.popularity_at_3
+  mean_personalization_at_3:
     description: Personalization @3
     lineage:
       - datalake_recommendations.personalization.personalization_at_3
-  diversity_at_3:
+  mean_diversity_at_3:
     description: Diversity @3
     lineage:
       - datalake_recommendations.diversity.diversity_at_3
@@ -121,15 +126,20 @@ columns:
     description: Mean Rec to rent flow seven days @5
     lineage:
       - datalake_recommendations.recommendation_metrics_agg_recset.rec_to_rent_flow_seven_days_at_5
-  coverage_at_5:
+  mean_coverage_at_5:
     description: Catalog coverage @5
     lineage:
       - datalake_recommendations.coverage.coverage_at_5
-  personalization_at_5:
+  mean_popularity_5:
+    description: |
+      Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
+    lineage:
+      - datalake_recommendations.recommendation_metrics_agg_recset.popularity_at_5
+  mean_personalization_at_5:
     description: Personalization @5
     lineage:
       - datalake_recommendations.personalization.personalization_at_5
-  diversity_at_5:
+  mean_diversity_at_5:
     description: Diversity @5
     lineage:
       - datalake_recommendations.diversity.diversity_at_5
@@ -179,15 +189,20 @@ columns:
     description: Mean Rec to rent flow seven days @10
     lineage:
       - datalake_recommendations.recommendation_metrics_agg_recset.rec_to_rent_flow_seven_days_at_10
-  coverage_at_10:
+  mean_coverage_at_10:
     description: Catalog coverage @10
     lineage:
       - datalake_recommendations.coverage.coverage_at_10
-  personalization_at_10:
+  mean_popularity_10:
+    description: |
+      Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
+    lineage:
+      - datalake_recommendations.recommendation_metrics_agg_recset.popularity_at_10
+  mean_personalization_at_10:
     description: Personalization @10
     lineage:
       - datalake_recommendations.personalization.personalization_at_10
-  diversity_at_10:
+  mean_diversity_at_10:
     description: Diversity @10
     lineage:
       - datalake_recommendations.diversity.diversity_at_10

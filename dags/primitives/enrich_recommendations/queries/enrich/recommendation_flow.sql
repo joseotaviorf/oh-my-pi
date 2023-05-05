@@ -195,7 +195,8 @@ SELECT
     -- adding 3 cases for diversity (@3, @5, @10) because it is a complicated filter in this metric
     COALESCE(diversity.diversity_at_3, 0) AS diversity_at_3,
     COALESCE(diversity.diversity_at_5, 0) AS diversity_at_5,
-    COALESCE(diversity.diversity_at_10, 0) AS diversity_at_10
+    COALESCE(diversity.diversity_at_10, 0) AS diversity_at_10,
+    COALESCE(popularity, 0) AS popularity
 FROM datalake_recommendations.recommendation AS recommendation
 LEFT JOIN
     recommendation_to_click
@@ -215,3 +216,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_recommendations.diversity AS diversity
         ON base.id_recset = diversity.id_recset
+LEFT JOIN
+    datalake_recommendations.popularity AS popularity
+    ON recommendation.id_rec = popularity.id_rec

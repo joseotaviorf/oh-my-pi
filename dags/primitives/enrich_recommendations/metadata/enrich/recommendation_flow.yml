@@ -123,3 +123,6 @@ columns:
       Number of items that would be considered a relevant rec if they where included in the recset.
       We assume the interactions similar-house-clicked, listing-page-viewed, house-favorited
       as a proxy for relevance.
+  popularity:
+    description: |
+      Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.

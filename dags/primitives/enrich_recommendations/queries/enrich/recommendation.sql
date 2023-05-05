@@ -28,8 +28,10 @@ WITH carousel_recommendations AS (
         ARRAY(
             CAST(GET_JSON_OBJECT(event_properties, "$.house_id") AS INT)
         ) AS id_subjects,
-        GET_JSON_OBJECT(
-            event_properties, "$.business_context"
+        LOWER(
+            GET_JSON_OBJECT(
+                event_properties, "$.business_context"
+            )
         ) AS business_context,
         ARRAY(
             CAST(GET_JSON_OBJECT(event_properties, "$.house_id") AS INT)

@@ -146,6 +146,11 @@ columns:
     lineage:
       - datalake_recommendations.recommendation_flow.rec_to_rent_flow_seven_days
       - datalake_recommendations.recommendation_flow.item_rank
+  popularity_3:
+    description: |
+      Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
+    lineage:
+      - datalake_recommendations.recommendation_flow.popularity
   precision_at_5:
     description: Precision @5
     lineage:
@@ -227,6 +232,11 @@ columns:
     lineage:
       - datalake_recommendations.recommendation_flow.rec_to_rent_flow_seven_days
       - datalake_recommendations.recommendation_flow.item_rank
+  popularity_5:
+    description: |
+      Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
+    lineage:
+      - datalake_recommendations.recommendation_flow.popularity
   precision_at_10:
     description: Precision @10
     lineage:
@@ -308,3 +318,8 @@ columns:
     lineage:
       - datalake_recommendations.recommendation_flow.rec_to_rent_flow_seven_days
       - datalake_recommendations.recommendation_flow.item_rank
+  popularity_10:
+    description: |
+      Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
+    lineage:
+      - datalake_recommendations.recommendation_flow.popularity

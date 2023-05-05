@@ -223,6 +223,10 @@ SELECT
     MEAN(personalization_at_5) AS mean_personalization_at_5,
     MEAN(personalization_at_10) AS mean_personalization_at_10,
 
+    MEAN(popularity_at_3) AS mean_popularity_at_3,
+    MEAN(popularity_at_5) AS mean_popularity_at_5,
+    MEAN(popularity_at_10) AS mean_popularity_at_10,
+
     r.dt_rec_received
 
 FROM

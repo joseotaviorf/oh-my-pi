@@ -17,8 +17,10 @@ WITH listing_page_views AS (
         month,
         day,
         COALESCE(id_user, id_amplitude) AS id_user,
-        GET_JSON_OBJECT(
-            event_properties, '$.business_context'
+        LOWER(
+            GET_JSON_OBJECT(
+                event_properties, '$.business_context'
+            )
         ) AS business_context
     FROM
         datalake_amplitude_clean.170698_listing_page_viewed_events
@@ -26,8 +28,7 @@ WITH listing_page_views AS (
         datalake_recommendations.recommendation_catalog AS recommendation_catalog
         ON
             recommendation_catalog.business_context
-            = GET_JSON_OBJECT(event_properties, '$.business_context'
-            )
+            = LOWER(GET_JSON_OBJECT(event_properties, '$.business_context'))
             AND recommendation_catalog.id_item = ep_house_id
             AND recommendation_catalog.type_item = 'house'
     WHERE
@@ -51,8 +52,10 @@ similar_carousel_house_clicks AS (
         CAST(
             GET_JSON_OBJECT(event_properties, '$.house_id_target') AS INT
         ) AS id_item,
-        GET_JSON_OBJECT(
-            event_properties, '$.business_context'
+        LOWER(
+            GET_JSON_OBJECT(
+                event_properties, '$.business_context'
+            )
         ) AS business_context
     FROM
         datalake_amplitude_clean.events
@@ -82,8 +85,10 @@ house_favorited AS (
         CAST(
             GET_JSON_OBJECT(event_properties, '$.house_id') AS INT
         ) AS id_item,
-        GET_JSON_OBJECT(
-            event_properties, '$.business_context'
+        LOWER(
+            GET_JSON_OBJECT(
+                event_properties, '$.business_context'
+            )
         ) AS business_context
     FROM datalake_amplitude_clean.events
     WHERE

@@ -4,12 +4,16 @@ inner_dependencies:
   recommendation_flow:
     - item_interaction
     - recommendation
+    - popularity
   coverage:
     - recommendation
     - recommendation_catalog
   diversity:
     - embeddings
+  popularity:
     - recommendation
+    - recommendation_catalog
+    - item_interaction
   recommendation_metrics_agg_recset:
     - recommendation_flow
     - diversity
@@ -39,11 +43,13 @@ tables:
     is_incremental: false
   recommendation_flow:
     is_incremental: false
+  personalization:
+    is_incremental: false
   coverage:
     is_incremental: false
   diversity:
     is_incremental: false
-  personalization:
+  popularity:
     is_incremental: false
   recommendation_metrics_agg_display_type_business_context:
     is_incremental: false

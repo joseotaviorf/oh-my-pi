@@ -27,7 +27,12 @@ This pipeline produces the following output table on enrich layer:
 - `coverage`
 - `diversity`
 - `personalization`
+- `popularity`
 - `recommendation_metrics_agg_recset`
 - `recommendation_metrics_agg_display_type_business_context`
+
+### Responsible Data Team
+​
+For any questions or concerns about this DAG, please contact the Recommendations team in Data Products.
 
 </details>
