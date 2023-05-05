@@ -397,4 +397,7 @@ WHERE
     recommendations.id_item IS NOT NULL
     AND recommendations.id_anchors IS NOT NULL
     AND recommendations.business_context IS NOT NULL
-    AND recommendations.year = 2023 AND YEAR(recommendations.ts_rec_created) = 2023
+    AND recommendations.year = 2023
+    AND recommendations.month >= 4
+    AND YEAR(recommendations.ts_rec_created) = 2023
+    AND MONTH(recommendations.ts_rec_created) >= 4

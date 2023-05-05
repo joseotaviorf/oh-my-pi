@@ -44,7 +44,9 @@ WITH embeddings_from_emlio_logs AS (
     WHERE id_service IN ('house-user-embeddings', 'house-similarity-embeddings')
         AND inference_type = 'online'
         AND year = 2023
+        AND month >= 4
         AND year(ts_log) = 2023
+        AND month(ts_log) >= 4
 ),
 
 dedup_embeddings_from_emlio_logs AS (

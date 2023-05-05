@@ -68,6 +68,7 @@ similar_carousel_house_clicks AS (
         AND GET_JSON_OBJECT(event_properties, '$.business_context') IS NOT NULL
         AND GET_JSON_OBJECT(event_properties, '$.house_id_target') IS NOT NULL
         AND year = 2023
+        AND month >= 4
         AND YEAR(ts_event) = year
         AND MONTH(ts_event) = month
         AND DAY(ts_event) = day
