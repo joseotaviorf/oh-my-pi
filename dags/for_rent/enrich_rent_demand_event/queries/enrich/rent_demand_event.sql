@@ -148,9 +148,9 @@ rent_demand_events AS (
   WHERE 
     off.is_offer_submitted = TRUE
     AND ts_first_sent IS NOT NULL
-    AND YEAR(ts_first_sent) = {year} 
-    AND MONTH(ts_first_sent) = {month} 
-    AND DAY(ts_first_sent) = {day}
+    -- We're not implementing the incremental load for OS since this date information comes from Firestore.
+    -- We noticed that the data is extracted in a certain day but the offer's first sent date is from days before,
+    -- which lead to not being able to load it by incremental load.
   UNION ALL
   SELECT --offer_accepted
     off.id_offer_context AS id_event,
