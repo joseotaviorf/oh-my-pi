@@ -57,6 +57,7 @@ WITH carousel_recommendations AS (
             "similar_carousel_viewed_native"
         )
         AND year = 2023
+        AND month >= 4
         AND YEAR(ts_client_event) = year
         AND MONTH(ts_client_event) = month
         AND DAY(ts_client_event) = day
@@ -114,6 +115,7 @@ yellow_pages_recommendation_logs AS (
                 emlio_logs.id_service = "yellow-pages"
                 AND GET_JSON_OBJECT(emlio_logs.inputs, "$.anchor_ids") != "[]"
                 AND year = 2023
+                AND month >= 4
         )
     )
 
@@ -201,7 +203,10 @@ email_user_sessions AS (
         FIRST(user_properties) AS user_properties,
         MIN(ts_event) AS ts_session
     FROM datalake_amplitude_clean.170698_listing_page_viewed_events
-    WHERE id_user IS NOT NULL AND year = 2023
+    WHERE
+        id_user IS NOT NULL
+        AND year = 2023
+        AND month >= 4
     GROUP BY id_user, id_session
 ),
 
