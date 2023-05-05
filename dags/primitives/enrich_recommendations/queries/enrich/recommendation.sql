@@ -167,9 +167,9 @@ email_recommendation_delivered AS (
                 OR LOWER(campaign_name) LIKE "%daily-feed%"
                 OR LOWER(campaign_name) LIKE "%favorites%"
             )
-            AND (CAST(ts_email_sent as long) - CAST(ts_email_first_opened  as long)) / 3600 <= 24
+            AND (CAST(ts_email_first_opened as long) - CAST(ts_email_sent as long)) / 3600 <= 24
             AND (
-                (CAST(ts_email_sent as long) - CAST(ts_email_first_clicked as long)) / 3600 <= 24
+                (CAST(ts_email_first_clicked as long) - CAST(ts_email_sent as long)) / 3600 <= 24
                 OR ts_email_first_clicked IS NULL
             )
     )
