@@ -134,7 +134,9 @@ recommendation_to_click AS (
                 = item_interaction.business_context
                 AND recommendation.ts_rec_received
                 < item_interaction.ts_interaction
-        WHERE interaction_type = 'similar-house-clicked'
+        WHERE
+            (interaction_type = 'similar-house-clicked' AND  recommendation.display_type = 'similar-carousel')
+            OR (interaction_type = 'listing-page-viewed')
     )
     /*
        We only keep the first interaction after each
