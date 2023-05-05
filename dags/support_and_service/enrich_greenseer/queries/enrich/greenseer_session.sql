@@ -43,20 +43,36 @@ greenseer_sessions AS (
     GET_JSON_OBJECT(g.memory, '$.basic.session.created_by_hsm') AS created_by_hsm,
     GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added') AS tags_added,
     GET_JSON_OBJECT(g.memory, '$.basic.flags') AS flags,
-    GET_JSON_OBJECT(g.memory, '$.basic.user.more_help_required') AS more_help_required,
-    NULLIF(
-      GET_JSON_OBJECT(g.memory,'$.business_rules.menu_taxonomies.response_key'), ''
+    CAST(
+      COALESCE(
+        GET_JSON_OBJECT(g.memory, '$.business_rules.more_help_required.no_answer_needed.value'), 
+        GET_JSON_OBJECT(g.memory, '$.business_rules.more_help_required.before_reception.value'),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.more_help_required.confirm_bypass_hsm.value')
+      ) AS BOOLEAN
+    ) AS more_help_required, 
+    CAST(
+      COALESCE(
+        GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.before_reception.value'), 
+        GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.after_reception.value'), 
+        GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.direct_answer.value')
+      ) AS BOOLEAN
+    ) AS problem_solved, 
+      NULLIF(GET_JSON_OBJECT(g.memory,'$.business_rules.menu_taxonomies.selected_taxonomy'),''),
+      NULLIF(GET_JSON_OBJECT(g.memory,'$.business_rules.menu_theme_details.selected_theme_detail'),'')
     ) AS response_key,
     (
       COALESCE(
-        GET_JSON_OBJECT(g.memory, '$.business_rules.menu_taxonomies.message'), ''
+        GET_JSON_OBJECT(g.memory, '$.business_rules.menu_taxonomies.message'),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.menu_theme_details.message'),
+        ''
       ) <> ''
     ) AS is_menu_available,
-    (
-      COALESCE(
-        GET_JSON_OBJECT(g.memory, '$.experiments.experiment_merge_dialogflow_and_menu'), ''
-      ) = 'merged_retention_attempt_block'
-    ) AS menu_new_style,
+    CASE
+      WHEN CONTAINS((GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added')), 'bot_menu_automatic_selection_intent') THEN 'bot_automatic_selection_intent'
+      WHEN CONTAINS((GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added')), 'bot_menu_automatic_selection_taxonomy') THEN 'bot_menu_automatic_selection_taxonomy'
+      WHEN CONTAINS((GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added')), 'bot_automatic_selection_theme_detail') THEN 'bot_menu_automatic_selection_taxonomy_v4'
+      ELSE NULL
+    END AS automatic_selection,
     g.current_state,
     g.ts_started,
     g.ts_ended
@@ -70,19 +86,13 @@ greenseer_tried_retention AS (
   SELECT
     id_session,
     id_pipeline,
-    CASE
-      WHEN menu_new_style OR DATE_TRUNC('DD', ts_started) > '2022-06-27' THEN (
-        COALESCE(NULLIF(before_reception, 'fallback'), response_key, fired_response) IS NOT NULL
-      )
-      ELSE (
-        COALESCE(
-          NULLIF(before_reception, 'fallback'),
-          NULLIF(after_reception, 'fallback'),
-          response_key,
-          fired_response
-        ) IS NOT NULL
-      )
-    END AS tried_retention
+    COALESCE(
+      NULLIF(before_reception, 'fallback'),
+      NULLIF(after_reception, 'fallback'),
+      response_key,
+      automatic_selection,
+      fired_response
+    ) IS NOT NULL AS tried_retention
   FROM
     greenseer_sessions
 ),
@@ -135,6 +145,7 @@ SELECT
   before_reception,
   after_reception,
   response_key,
+  automatic_selection,
   context_message,
   created_by_hsm,
   tags_added,
@@ -142,9 +153,10 @@ SELECT
   current_state,
   is_menu_available,
   more_help_required AS is_more_help_required,
+  problem_solved as is_problem_solved,
   is_retention,
   CASE
-    WHEN greenseer_sessions.ts_ended > greenseer_sessions.ts_started + INTERVAL '72 hour' THEN TRUE
+    WHEN greenseer_sessions.ts_ended > greenseer_sessions.ts_started + INTERVAL '12 hour' THEN TRUE
     ELSE FALSE
   END AS has_exceeded_session_timeout,
   greenseer_sessions.ts_started,
