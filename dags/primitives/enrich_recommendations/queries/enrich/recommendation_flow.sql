@@ -217,7 +217,7 @@ LEFT JOIN
     ON recommendation.id_recset = recommendation_to_relevant_interaction.id_recset
 LEFT JOIN
     datalake_recommendations.diversity AS diversity
-        ON base.id_recset = diversity.id_recset
+        ON recommendation.id_recset = diversity.id_recset
 LEFT JOIN
     datalake_recommendations.popularity AS popularity
     ON recommendation.id_rec = popularity.id_rec
