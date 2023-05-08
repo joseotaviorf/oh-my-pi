@@ -11,17 +11,16 @@ from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import PostgresConsumer
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-
 JOB_NAME = "load_kodak_raw"
+
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-def _parse_arguments():
-    """
-    This method aims to get the arguments passed from the dag.
-    """
+
+def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod environment")
     parser.add_argument("datalake_bucket", type=str)
@@ -35,35 +34,38 @@ def _parse_arguments():
         help="If incremental, filter by this column",
         default=None,
     )
-    parser.add_argument("partition_cols", type=str)
 
     return parser.parse_args()
 
+
 def get_conn_config():
-    """
-    This method is intended to return the database connection settings.
-    """
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         global dbutils
         dbutils = base_dbutils.get_dbutils()
 
     conn_config_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.KODAK)
+
     return json.loads(conn_config_json)
 
-def _load_dataframe_into_datalake(args, force_recreate=True):
-    """
-    This method takes the data from the table in the Postgres database, considering the
-    parameters if it is incremental or full load. In addition to also loading this data into the datalake.
-    @param args: Detailing parameters of the tables..
-    @param force_recreate: bool. Indicates if it must force table recreation in metastore.
-    """
-    partition_cols = json.loads(args.partition_cols) if args.partition_cols else None
-    
+
+def main():
+    args = parse_arguments()
+
+    config_service = ConfigurationService(args.source)
+    partition_cols = config_service.get_config("partition_cols")
+
+    logger.info(
+        f"""
+        m=__main__, environment={args.env}, source={args.source}, datalake_bucket={args.datalake_bucket},
+        execution_date={args.execution_date}, table_name={args.table_name}, extraction_type={args.extraction_type},
+        date_filter_column={args.date_filter_column}, msg=Starting spark job...
+        """
+    )
+
     conn_config = get_conn_config()
     spark_client = SparkClient()
     postgres_consumer = PostgresConsumer(conn_config, spark_client)
-
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
     db_info = DatalakeMetastoreService.get_db_info(
@@ -82,31 +84,19 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
             args.table_name, args.date_filter_column, args.execution_date
         )
         IncrementalTableLoaderPipeline(
-            database_name=database_name,
-            table_name=args.table_name,
-            database_location=database_location,
-            layer=LayerEnum.RAW,
-            partitions=partition_cols,
-            query=None
-        ).load_and_register(df, format_options, force_recreate)
+            database_name,
+            args.table_name,
+            database_location,
+            LayerEnum.RAW,
+            None,
+            partition_cols,
+        ).load_and_register(df, format_options)
     else:
         df = postgres_consumer.get_data_from_table(args.table_name)
         FullTableLoaderPipeline(
-            database_name=database_name,
-            table_name=args.table_name,
-            database_location=database_location,
-            layer=LayerEnum.RAW,
-            query=None
+            database_name, args.table_name, database_location, LayerEnum.RAW, None
         ).load_and_register(df, format_options)
 
+
 if __name__ == "__main__":
-    args = _parse_arguments()
-
-    logger.info(
-        f"""
-        m={JOB_NAME}, environment={args.env}, datalake_bucket={args.datalake_bucket}, execution_date={args.execution_date},
-        table_name={args.table_name}, partition_cols={args.partition_cols}, msg=Starting spark job...
-        """
-    )
-
-    _load_dataframe_into_datalake(args=args)
+    main()

@@ -1,6 +1,5 @@
 import pendulum
 import os
-import json
 from datetime import datetime
 
 from airflow.models import DAG
@@ -43,11 +42,9 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2020, 3, 19, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
-DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
-dag_documentation = config_service.get_config("dag_documentation")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -58,18 +55,14 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAG_OWNER,
+        "owner": DAGOwnerEnum.DATA_SS,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.generate_doc_md_str(
-        dag_name=SOURCE,
-        doc_md_chart_url=doc_md_chart_url,
-        dag_documentation=dag_documentation,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        dag_owner=DAG_OWNER,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 
@@ -101,8 +94,7 @@ for table_name, table_config in tables.items():
     extended_parameters = [
         "{{ ds }}",
         table_config["raw_extraction_type"],
-        table_config.get("date_filter_column", None),
-        json.dumps(partition_cols),
+        table_config.get("date_filter_column", "updated_at"),
     ]
 
     extended_parameters = list(filter(None, extended_parameters))
