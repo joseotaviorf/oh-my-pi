@@ -20,7 +20,7 @@ DW_SCHEMA = "metrics"
 CONTEXT = "shared_metrics"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-EXECUTION_TIMEOUT_HOURS = 3.0
+EXECUTION_TIMEOUT_HOURS = 4.0
 
 
 configs_service = ConfigurationService(DAG_NAME)
