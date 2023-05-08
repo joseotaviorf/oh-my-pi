@@ -8,73 +8,73 @@ columns:
   sk_booking:
     lineage:
     - datalake_booking.booking.id
-    description: Key to booking on fact table
+    description: "Key to booking on fact table."
   sk_rent_flow_taxonomy:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.id
-    description: Key to identify the rent flow taxonomy relative to this booking
+    description: "Key to identify the rent flow taxonomy relative to this booking."
   id_booking:
     lineage:
     - datalake_booking.booking.id
-    description: Key of booking on EBDB "Agendamento" table
+    description: "Key of booking on EBDB 'Agendamento' table."
   id_visitor:
     lineage:
     - datalake_booking.booking.id_visitor
-    description: Id of user making the visit
+    description: "Id of user making the visit."
   id_visit:
     lineage:
     - datalake_booking.booking.id_visit
-    description: Key of visit
+    description: "Key of visit."
   id_property:
     lineage:
     - datalake_booking.booking.id_house
-    description: Key of property
+    description: "Key of property."
   id_agent:
     lineage:
     - datalake_booking.booking.id_agent
-    description: Key of user agent
+    description: "Key of user agent."
   id_attendant:
     lineage:
     - datalake_booking.booking.id_attendant
-    description: The user ID (sk_user) of the user who booked this visit, but only
+    description: "The user ID (sk_user) of the user who booked this visit, but only
       if the booking was created by a QuintoAndar agent or a QuintoAndar employee,
-      and not by the visitor himself
+      and not by the visitor himself."
   id_rental_flow:
     lineage:
     - datalake_booking.booking.id_rent_flow
-    description: Key of rental flow
+    description: "Key of rental flow."
   id_user_cancellation:
     lineage:
     - datalake_booking.booking_cancellation.id_user_cancellation
-    description: Identifier of who had cancelled the booking.
+    description: "Identifier of who had cancelled the booking."
   rescheduled_from_id:
     lineage:
     - datalake_booking.booking.id_rescheduled_booking
-    description: If the booking came from a reschedule, shows the id from the booking
+    description: "If the booking came from a reschedule, shows the id from the booking."
   country_code:
     lineage:
     - datalake_booking.booking.country_code
-    description: Country code related to the booking's country of origin
+    description: "Country code related to the booking's country of origin."
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
   visit_intent:
     lineage:
     - datalake_booking.booking.visit_intent
-    description: Lists the visitors intention for this visit (if he was looking to
-      rent or buy the property)
+    description: "Lists the visitors intention for this visit (if he was looking to
+      rent or buy the property)."
     categories:
       RENT: ''
       SALE: ''
   buyer_intention:
     lineage:
     - datalake_booking.booking.buyer_intention
-    description: Lists the buyers intention for the property (if the person was buying to
-      live in the property or as an investment)
+    description: "Lists the buyers intention for the property (if the person was buying to
+      live in the property or as an investment)."
   type:
     lineage:
     - datalake_booking.booking.type
-    description: What type of booking it is Visit, Photo Session, Inspection
+    description: "What type of booking it is Visit, Photo Session, Inspection."
     categories:
       CheckUpLar: ''
       SessaoFotos: ''
@@ -84,70 +84,70 @@ columns:
   confirmed:
     lineage:
     - datalake_booking.booking.is_visit_completed
-    description: If the visit was confirmed by the visitor
+    description: "If the visit was completed by the visitor. The confirmation event is not registered yet."
     categories:
       'FALSE': ''
       'TRUE': ''
   performed:
     lineage:
     - datalake_booking.booking.is_visit_performed
-    description: If the visit was performed by the agent. A visit can be performed but
-      not completed (e.g. unauthorized entry or the visitor didn't show up)
+    description: "If the visit was performed by the agent. A visit can be performed but
+      not completed (e.g. unauthorized entry or the visitor didn't show up)."
     categories:
       'FALSE': '#N/A'
       'TRUE': '#N/A'
   closed:
     lineage:
     - datalake_booking.booking.is_closed
-    description: '[Deprecated] This column is not used anymore'
+    description: "[Deprecated] This column is not used anymore."
   is_rescheduled:
     lineage:
     - datalake_booking.booking.has_reschedule
-    description: True when the booking was cancelled to be reschedule
+    description: "True when the booking was cancelled to be reschedule."
   flg_via_reschedule:
     lineage:
     - datalake_booking.booking.is_via_reschedule
-    description: True when this booking came from another booking as a reschedule
+    description: "True when this booking came from another booking as a reschedule."
   is_first_booking_auto:
     lineage:
     - datalake_booking.booking.is_first_booking_auto
-    description: If the booking was originaly created through planner (program that
-      allocates 5A personnel to inspections and jobs)
+    description: "If the booking was originaly created through planner (program that
+      allocates 5A personnel to inspections and jobs)."
   flg_branded:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.is_branded
     - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
-    description: If this booking came from a branded campaign as defined by the lead
-      taxonomy
+    description: "If this booking came from a branded campaign as defined by the lead
+      taxonomy."
   visitor_arrived:
     lineage:
     - datalake_booking.booking.has_tenant_attended
-    description: Flag indicating if visitor arrived
+    description: "Flag indicating if visitor arrived."
   agent_arrived:
     lineage:
     - datalake_booking.booking.has_agent_attended
-    description: Flag indicating if agent arrived
+    description: "Flag indicating if agent arrived."
   owner_arrived:
     lineage:
     - datalake_booking.booking.has_owner_arrived
-    description: Flag indicating if owner arrived
+    description: "Flag indicating if owner arrived."
   successful_entrance:
     lineage:
     - datalake_booking.booking.is_entrance_successful
-    description: Flag indicating if it was possible or not to enter the property to
-      visit
+    description: "Flag indicating if it was possible or not to enter the property to
+      visit."
   is_visit_created_from_app:
     lineage:
     - datalake_booking.booking.is_visit_created_from_app
-    description: If the visit was created using the app
+    description: "If the visit was created using the app."
   is_visit_last_updated_from_app:
     lineage:
     - datalake_booking.booking.is_visit_last_updated_from_app
-    description: If the visit was last updated using the app
+    description: "If the visit was last updated using the app."
   visit_follow_up:
     lineage:
     - datalake_booking.booking.visit_fup
-    description: Agent visit follow up answered on agent app
+    description: "Agent visit follow up answered on agent app."
     categories:
       EntradaNaoAutorizada: ''
       ImovelAlugado: ''
@@ -159,8 +159,8 @@ columns:
   status:
     lineage:
     - datalake_booking.booking.status
-    description: Gives the booking status, for exemple to show if the visit is canceled
-      or not
+    description: "Gives the booking status, for exemple to show if the visit is canceled
+      or not."
     categories:
       AguardandoConfirmacao: Waiting for tenant to confirm visit (only required for
         visits booked at least 48 hours in advance)
@@ -170,17 +170,17 @@ columns:
   slot_dia:
     lineage:
     - datalake_booking.booking.slot_day
-    description: Gives the slot to visit schedulled hour
+    description: "Gives the slot to visit schedulled hour."
   reason:
     lineage:
     - datalake_booking.booking.last_status_change_reason
-    description: Gives the commented reason, written by the agent, to explain why
-      the visit did not happen
+    description: "Gives the commented reason, written by the agent, to explain why
+      the visit did not happen."
   cancelled_by:
     lineage:
     - datalake_booking.booking_cancellation.cancelled_by
-    description: Taxonomy assigned to a group for who had cancelled the booking. Currently,
-      it can be Owner, Agent, Tenant, QuintoAndar or Automatic.
+    description: "Taxonomy assigned to a group for who had cancelled the booking. Currently,
+      it can be Owner, Agent, Tenant, QuintoAndar or Automatic."
     categories:
       Owner: A house's owner had cancelled the booking.
       Agent: An agent had cancelled the booking.
@@ -192,7 +192,7 @@ columns:
   cancellation_reason:
     lineage:
     - datalake_booking.booking.cancellation_reason
-    description: Reason for the booking cancellation as in this sheets
+    description: "Reason for the booking cancellation as in this sheets."
     categories:
       AGENT_REQUESTED_VISIT_FROM_QUEUE: ''
       AGENT_SCHEDULE_REALIZED: ''
@@ -304,7 +304,7 @@ columns:
   cancellation_reason_category:
     lineage:
     - datalake_booking.booking.cancellation_reason_category
-    description: Cancelation category as in the sheets above
+    description: "Cancelation category as in the sheets above."
     categories:
       Agent: The agent cancelled the booking
       Consequence Management: The booking was cancelled because the owner was suspended
@@ -322,7 +322,7 @@ columns:
   reason_category:
     lineage:
     - datalake_booking.booking.reason_category
-    description: '[Deprecated] Gives the reason why visit was cancelled'
+    description: "[Deprecated] Gives the reason why visit was cancelled."
     categories:
       Advanced negotiation: ''
       Agent: ''
@@ -339,7 +339,7 @@ columns:
   responsible:
     lineage:
     - datalake_booking.booking.responsible
-    description: Shows who cancelled the visit
+    description: "Shows who cancelled the visit."
     categories:
       Other: ''
       Owner: Cancelled by owner
@@ -351,53 +351,53 @@ columns:
   last_update_source:
     lineage:
     - datalake_booking.booking.last_update_source
-    description: Show origin of last source to alter the booking
+    description: "Show origin of last source to alter the booking."
   first_update_source:
     lineage:
     - datalake_booking.booking.first_update_source
-    description: Shows the origin from the booking, self service web, booked by agent
+    description: "Shows the origin from the booking, self service web, booked by agent."
   visitor_missing_reason:
     lineage:
     - datalake_booking.booking.tenant_absence_reason
-    description: '[Deprecated] Describes the reason why visitor did not show up (by
-      agent app follow up)'
+    description: "[Deprecated] Describes the reason why visitor did not show up (by
+      agent app follow up)."
   agent_missing_reason:
     lineage:
     - datalake_booking.booking.agent_absence_reason
-    description: '[Deprecated] Describes the reason why agent did not show up (by
-      agent app follow up)'
+    description: "[Deprecated] Describes the reason why agent did not show up (by
+      agent app follow up)."
   owner_missing_reason:
     lineage:
     - datalake_booking.booking.owner_missing_reason
-    description: '[Deprecated] Describes the reason why owner did not show up (by
-      agent app follow up)'
+    description: "[Deprecated] Describes the reason why owner did not show up (by
+      agent app follow up)."
   troublesome_entrance:
     lineage:
     - datalake_booking.booking.troublesome_entrance_problem
-    description: If it was not possible to enter the property to visit (succesful_entrance
-      = 0), then this column lists the reason why it was not possible to enter
+    description: "If it was not possible to enter the property to visit (succesful_entrance
+      = 0), then this column lists the reason why it was not possible to enter."
   checkin_status:
     lineage:
     - datalake_booking.booking.checkin_status
-    description: Show status of whatsapp confirmation of visit. Only visits booked
-      2 days or more in advance need a whatsapp confirmation
+    description: "Show status of whatsapp confirmation of visit. Only visits booked
+      2 days or more in advance need a whatsapp confirmation."
   user_sale_booking_creator:
     lineage:
     - datalake_booking.booking.user_sale_booking_creator
-    description: Type of user that created the booking (for sale)
+    description: "Type of user that created the booking (for sale)."
   partner_3p_supply:
     lineage:
     - datalake_booking.booking.partner_3p_supply
-    description: Name of the partner that supplied the property
+    description: "Name of the partner that supplied the property."
   partner_3p_demand:
     lineage:
     - datalake_booking.booking.partner_3p_demand
-    description: Name of the partner from which comes the demand
+    description: "Name of the partner from which comes the demand."
   app_type:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.app_type
     - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
-    description: App used to book the visit
+    description: "App used to book the visit."
     categories:
       amp: ''
       android: ''
@@ -410,17 +410,17 @@ columns:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.media_source
     - datalake_tracked_events.attribution_cross_channel.final_attribution_media_source
-    description: Type of media source from which comes the booking
+    description: "Type of media source from which comes the booking."
   utm_source:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.utm_source
     - datalake_tracked_events.attribution_cross_channel.final_attribution_source
-    description: UTM used to track the advertising source
+    description: "UTM used to track the advertising source."
   utm_medium:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.utm_medium
     - datalake_tracked_events.attribution_cross_channel.final_attribution_medium
-    description: UTM used to track the advertising medium
+    description: "UTM used to track the advertising medium."
     categories:
       5d27abdf2297a400119df49c: '#N/A'
       '#NAME?': '#N/A'
@@ -615,28 +615,28 @@ columns:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.utm_campaign
     - datalake_tracked_events.attribution_cross_channel.final_attribution_campaign
-    description: UTM used to identify the campaign in the media
+    description: "UTM used to identify the campaign in the media."
   utm_content:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.utm_content
     - datalake_tracked_events.attribution_cross_channel.final_attribution_content
-    description: Identifies what specifically was clicked to bring the user to the
+    description: "Identifies what specifically was clicked to bring the user to the
       site, such as a banner ad or a text link. It is often used for A/B testing and
-      content-targeted ads
+      content-targeted ads."
   utm_term:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.utm_term
     - datalake_tracked_events.attribution_cross_channel.final_attribution_term
-    description: Identifies search terms that brought the lead
+    description: "Identifies search terms that brought the lead."
   final_attribution_origin:
     lineage:
     - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
-    description: Final attribution origin of the booking
+    description: "Final attribution origin of the booking."
   mkt_category:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.id
     - datalake_gsheets_clean.taxonomy_demand.category
-    description: standard category from the booking
+    description: "Standard category from the booking."
     categories:
       Inbound: ''
       Not Mapped: ''
@@ -644,7 +644,7 @@ columns:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.id
     - datalake_gsheets_clean.taxonomy_demand.flow
-    description: Type of flow in the marketing funnel by the lead
+    description: "Type of flow in the marketing funnel by the lead."
     categories:
       Non-Self Service: ''
       Not Mapped: ''
@@ -654,7 +654,7 @@ columns:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.id
     - datalake_gsheets_clean.taxonomy_demand.completion
-    description: Type of completion of marketing funnel by the lead
+    description: "Type of completion of marketing funnel by the lead."
     categories:
       Full Self-Service: ''
       Non-Self Service: ''
@@ -664,7 +664,7 @@ columns:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.id
     - datalake_gsheets_clean.taxonomy_demand.origin
-    description: Origin of the lead in the marketing funnel
+    description: "Origin of the lead in the marketing funnel."
     categories:
       Not Mapped: ''
       Tenants PWA: ''
@@ -672,12 +672,12 @@ columns:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.id
     - datalake_gsheets_clean.taxonomy_demand.channel
-    description: Channel level of the Taxonomy (used to describe the type of the channel)
+    description: "Channel level of the Taxonomy (used to describe the type of the channel)."
   mkt_medium:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.id
     - datalake_gsheets_clean.taxonomy_demand.medium
-    description: Medium level of the taxonomy (used to describe the midia strategy)
+    description: "Medium level of the taxonomy (used to describe the midia strategy)."
     categories:
       Agents: ''
       Branding: ''
@@ -701,12 +701,12 @@ columns:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.id
     - datalake_gsheets_clean.taxonomy_demand.source
-    description: Source level of the taxonomy (used to describe the midia used)
+    description: "Source level of the taxonomy (used to describe the midia used)."
   mkt_platform:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.id
     - datalake_gsheets_clean.taxonomy_demand.platform
-    description: Platform use by the lead in the marketing funnel
+    description: "Platform use by the lead in the marketing funnel."
     categories:
       Amp: ''
       App Android: ''
@@ -719,60 +719,60 @@ columns:
   is_3p_supply:
     lineage:
     - datalake_booking.booking.is_3p_supply
-    description: If the property was supplied by a partner
+    description: "If the property was supplied by a partner."
   is_3p_supply_5a:
     lineage:
     - datalake_booking.booking.is_3p_supply_5a
-    description: If the property was supplied by a QuintoAndar partner (except from Belo Horizonte city, in Brazil)
+    description: "If the property was supplied by a QuintoAndar partner (except from Belo Horizonte city, in Brazil)."
   is_3p_supply_bh:
     lineage:
     - datalake_booking.booking.is_3p_supply_bh
-    description: If the property was supplied by a Belo Horizonte partner (BH is a city from Brazil).
+    description: "If the property was supplied by a Belo Horizonte partner (BH is a city from Brazil)."
   is_3p_demand:
     lineage:
     - datalake_booking.booking.is_3p_demand
-    description: If the demand comes from a partner
+    description: "If the demand comes from a partner."
   dt_visit_follow_up:
     lineage:
     - datalake_booking.booking.ts_visit_fup
-    description: Date of agent follow up
+    description: "Date of agent follow up."
   ts_visit_follow_up_local:
     lineage:
     - datalake_booking.booking.ts_visit_follow_up_local_tz
-    description: Date of visit follow up in local timezone, based on the country of
-      the booking
+    description: "Date of visit follow up in local timezone, based on the country of
+      the booking."
   dt_scheduling:
     lineage:
     - datalake_booking.booking.ts_booking_utc
-    description: Date of when visit was scheduled on UTC
+    description: "Date of when visit was scheduled on UTC."
   ts_scheduling_local:
     lineage:
     - datalake_booking.booking.ts_booking_local_tz
-    description: Date of the booking on the local timezone, based on the booking date
-      and the chosen slot
+    description: "Date of the booking on the local timezone, based on the booking date
+      and the chosen slot."
   dt_cancel:
     lineage:
     - datalake_booking.booking.ts_first_canceled
-    description: Date of cancellation on UTC
+    description: "Date of cancellation on UTC."
   ts_cancel_local:
     lineage:
     - datalake_booking.booking.ts_first_canceled_local_tz
-    description: Date of visit cancelation on local timezone, based on the country
-      of the booking
+    description: "Date of visit cancelation on local timezone, based on the country
+      of the booking."
   dt_created:
     lineage:
     - datalake_booking.booking.ts_created
-    description: Date of visit creation on UTC
+    description: "Date of visit creation on UTC."
   ts_created_local:
     lineage:
     - datalake_booking.booking.ts_created_local_tz
-    description: Date of visit creation on local timezone, based on the country of
-      the booking
+    description: "Date of visit creation on local timezone, based on the country of
+      the booking."
   dt_updated:
     lineage:
     - datalake_booking.booking.ts_updated
-    description: Date when this visit was last updated in UTL
+    description: "Date when this visit was last updated in UTL."
   adjust_network:
-    description: Network attribution for net effect
+    description: "Network attribution for net effect."
   ts_load:
-    description: Timestamp of when the data in this table was last loaded
+    description: "Timestamp of when the data in this table was last loaded."
