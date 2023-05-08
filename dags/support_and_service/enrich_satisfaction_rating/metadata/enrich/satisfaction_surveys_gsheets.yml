@@ -10,6 +10,8 @@ columns:
     lineage:
       - datalake_gsheets_clean.owner_exit_inspection_csat.id_contract
       - datalake_gsheets_clean.owner_exit_inspection_csat.ts_submitted
+      - datalake_gsheets_clean.tenant_exit_inspection_csat.id_contract
+      - datalake_gsheets_clean.tenant_exit_inspection_csat.ts_submitted
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.id_contract
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.ts_submitted
       - datalake_gsheets_clean.owner_entrance_inspection_csat.id_contract
@@ -24,6 +26,7 @@ columns:
     description: Identifier of the contract linked to the satisfaction response.
     lineage:
       - datalake_gsheets_clean.owner_exit_inspection_csat.id_contract
+      - datalake_gsheets_clean.tenant_exit_inspection_csat.id_contract
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.id_contract
       - datalake_gsheets_clean.owner_entrance_inspection_csat.id_contract
       - datalake_gsheets_clean.tenant_reimbursement_csat.id_contract
@@ -36,6 +39,7 @@ columns:
     description: Email of the person who answered the form.
     lineage:
       - datalake_gsheets_clean.owner_exit_inspection_csat.email
+      - datalake_gsheets_clean.tenant_exit_inspection_csat.email
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.email
       - datalake_gsheets_clean.owner_entrance_inspection_csat.email
       - datalake_ebdb_user.user.email
@@ -53,6 +57,7 @@ columns:
     description: Process improvement tags, which are indicated by the respondent.
     lineage:
       - datalake_gsheets_clean.owner_exit_inspection_csat.improvement_tags
+      - datalake_gsheets_clean.tenant_exit_inspection_csat.tags
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.improvement_tags
       - datalake_gsheets_clean.owner_entrance_inspection_csat.improvement_tags
       - datalake_gsheets_clean.tenant_reimbursement_csat.improvement_tags
@@ -61,6 +66,7 @@ columns:
     description: Respondent's comment/justification on the satisfaction assessment.
     lineage:
       - datalake_gsheets_clean.owner_exit_inspection_csat.comments
+      - datalake_gsheets_clean.tenant_exit_inspection_csat.comment
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.comments
       - datalake_gsheets_clean.owner_entrance_inspection_csat.comments
       - datalake_gsheets_clean.tenant_reimbursement_csat.comments
@@ -69,6 +75,9 @@ columns:
     description: Main satisfaction form responses.
     lineage:
       - datalake_gsheets_clean.owner_exit_inspection_csat.general_satisfaction_evaluation
+      - datalake_gsheets_clean.tenant_exit_inspection_csat.inspection_satisfaction
+      - datalake_gsheets_clean.tenant_exit_inspection_csat.inspection_satisfaction_history_first
+      - datalake_gsheets_clean.tenant_exit_inspection_csat.inspection_satisfaction_history_second
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.general_satisfaction_evaluation
       - datalake_gsheets_clean.owner_entrance_inspection_csat.general_satisfaction_evaluation
       - datalake_gsheets_clean.tenant_reimbursement_csat.score

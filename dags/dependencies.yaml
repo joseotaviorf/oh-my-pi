@@ -2109,6 +2109,7 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.gsheets.fintech:done-clean-owner-entrance-inspection-csat
   - bietlejuice.gsheets.fintech:done-clean-tenant-entrance-inspection-csat
   - bietlejuice.gsheets.support_and_service:done-clean-csat-reimbursement-true
+  - bietlejuice.gsheets.support_and_service:done-clean-tenant-exit-inspection-csat
   - bietlejuice.gsheets.support_and_service:done-clean-tenant-reimbursement-csat
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.enrich_sauron:

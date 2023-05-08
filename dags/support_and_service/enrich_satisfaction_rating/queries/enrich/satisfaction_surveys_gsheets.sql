@@ -30,6 +30,31 @@ WITH gsheets_surveys AS (
         email AS respondent_email,
         'TENANT' AS respondent_type,
         'inspection' AS service_type,
+        'offboarding' AS service_context,
+        'gsheets' AS source_name,
+        'tenant_exit_inspection_csat' AS survey_name,
+        tags AS improvement_tags,
+        comment AS respondent_comments,
+        COALESCE(inspection_satisfaction, inspection_satisfaction_history_first, inspection_satisfaction_history_second) AS satisfaction_score,
+        'satisfaction evaluation' AS score_description,
+        NULL AS secondary_satisfaction_score,
+        NULL AS secondary_score_description,
+        TO_JSON(NAMED_STRUCT('id_csat', id_csat_answer)) AS custom_attributes,
+        ts_submitted,
+        YEAR(ts_submitted) AS year,
+        MONTH(ts_submitted) AS month,
+        DAY(ts_submitted) AS day
+    FROM
+        datalake_gsheets_clean.tenant_exit_inspection_csat
+    WHERE
+        DATE(ts_submitted) = DATE('{year}-{month}-{day}')
+    UNION ALL
+    SELECT
+        id_contract,
+        NULL AS id_respondent,
+        email AS respondent_email,
+        'TENANT' AS respondent_type,
+        'inspection' AS service_type,
         'onboarding' AS service_context,
         'gsheets' AS source_name,
         'tenant_entrance_inspection_csat' AS survey_name,

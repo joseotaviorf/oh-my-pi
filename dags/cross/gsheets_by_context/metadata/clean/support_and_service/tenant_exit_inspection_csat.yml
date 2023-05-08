@@ -25,17 +25,13 @@ columns:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_saida.tags
     description: Improvement points for the exit inspection.
-  house_satisfaction_history:
-    lineage:
-      - datalake_gsheets_raw.csat_vistoria_iq_saida.house_satisfaction_history
-    description: Historical CSAT score related with the house condition after the tenant exit.
-  house_satisfaction:
-    lineage:
-      - datalake_gsheets_raw.csat_vistoria_iq_saida.house_satisfaction
-    description: CSAT score related with the house condition after the tenant exit.
-  inspection_satisfaction_history:
+  inspection_satisfaction_history_first:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_saida.inspection_satisfaction_history
+    description: Historical CSAT score related with the exit inspection.
+  inspection_satisfaction_history_second:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_iq_saida.inspection_satisfaction_history_second
     description: Historical CSAT score related with the exit inspection.
   inspection_satisfaction:
     lineage:

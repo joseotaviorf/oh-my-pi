@@ -80,7 +80,7 @@ csat_reembolso_true:
     sheet_context: support_and_service
 
 csat_vistoria_iq_saida:
-    sheet_id: 1SWFU--Ts95OILugnki55Szk15xFMO57PmB5eCknYiqQ
+    sheet_id: 1wIeiiL1MpEPYQxF-XZtaINQpZwExnBS9Wemb9soLLTY
     sheet_name: AE - Data Ingestion
     clean_table_name: tenant_exit_inspection_csat
     sheet_context: support_and_service
