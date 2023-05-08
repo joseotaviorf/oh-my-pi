@@ -116,8 +116,9 @@ rent_flows AS (
         EXTRACT(MONTH FROM ts_created) AS month,
         EXTRACT(DAY FROM ts_created) AS day
     FROM datalake_ebdb_clean.rent_flow
-    WHERE EXTRACT(YEAR FROM ts_created) = 2023
-    EXTRACT(MONTH FROM ts_created) >= 4
+    WHERE
+        EXTRACT(YEAR FROM ts_created) = 2023
+        AND EXTRACT(MONTH FROM ts_created) >= 4
 ),
 
 sale_flows AS (
@@ -132,8 +133,9 @@ sale_flows AS (
         EXTRACT(MONTH FROM ts_first_event) AS month,
         EXTRACT(DAY FROM ts_first_event) AS day
     FROM datalake_sale_flows.sale_flow
-    WHERE EXTRACT(YEAR FROM ts_first_event) = 2023
-    AND EXTRACT(MONTH FROM ts_first_event) >= 4
+    WHERE
+        EXTRACT(YEAR FROM ts_first_event) = 2023
+        AND EXTRACT(MONTH FROM ts_first_event) >= 4
 )
 
 SELECT
