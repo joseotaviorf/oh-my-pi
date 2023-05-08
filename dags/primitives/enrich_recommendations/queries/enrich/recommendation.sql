@@ -19,6 +19,8 @@ WITH carousel_recommendations AS (
         device_family,
         platform,
         language,
+        NULL as experiment,
+        NULL as experiment_variant,
         ts_client_event AS ts_rec_created,
         ts_client_event AS ts_rec_received,
         year,
@@ -143,6 +145,12 @@ email_recommendation_delivered AS (
                     (
                         LOWER(campaign_name) LIKE "%dailyfeed%"
                         OR LOWER(campaign_name) LIKE "%daily-feed%"
+                        /*
+                          The following is a temporary solution for the change in recent campaign names.
+                          The long-term solution will be to define a standard naming scheme for campaigns
+                          such as personalization.<BUSINESS_CONTEXT>.<DISPLAY_TYPE>.<EXPERIMENT>.<VARIANT>
+                        */
+                        OR campaign_name LIKE "%NEW[CAMPAIGNS.DEMAND] forsale.listing.7day.similar_algorithm%"
                     )
                     THEN "daily_feed"
                 WHEN
@@ -155,6 +163,19 @@ email_recommendation_delivered AS (
                     THEN "rent"
                 WHEN LOWER(campaign_name) LIKE "%sale%" THEN "sale"
             END AS business_context,
+            CASE
+                WHEN
+                    campaign_name LIKE "%NEW[CAMPAIGNS.DEMAND] forsale.listing.7day.similar_algorithm%"
+                    THEN "hue-for-sale-v1-experiment"
+            END as experiment,
+            CASE
+                WHEN
+                    campaign_name LIKE "%NEW[CAMPAIGNS.DEMAND] forsale.listing.7day.similar_algorithm.HUE.v1.sale.variant%"
+                    THEN "treatment"
+                WHEN
+                    campaign_name LIKE "%NEW[CAMPAIGNS.DEMAND] forsale.listing.7day.similar_algorithm.baseline%"
+                    THEN "control"
+            END as experiment_variant,
             DATE(ts_email_sent) AS dt_email_sent,
             ts_email_first_opened AS ts_rec_created,
             COALESCE(ts_email_first_clicked, ts_email_first_opened) AS ts_rec_received
@@ -168,6 +189,8 @@ email_recommendation_delivered AS (
                 LOWER(campaign_name) LIKE "%dailyfeed%"
                 OR LOWER(campaign_name) LIKE "%daily-feed%"
                 OR LOWER(campaign_name) LIKE "%favorites%"
+                -- Temporary workaround for recent changes on campaign names
+                OR campaign_name LIKE "%NEW[CAMPAIGNS.DEMAND] forsale.listing.7day.similar_algorithm%"
             )
             AND (CAST(ts_email_first_opened as long) - CAST(ts_email_sent as long)) / 3600 <= 24
             AND (
@@ -181,11 +204,13 @@ email_recommendation_delivered AS (
       id_user,
       display_type,
       business_context,
+      experiment,
+      experiment_variant,
       dt_email_sent,
       MAX(ts_rec_created) AS ts_rec_created,
       MAX(ts_rec_received) AS ts_rec_received
     FROM emails_sent
-    GROUP BY id_email, id_user, display_type, business_context, dt_email_sent
+    GROUP BY id_email, id_user, display_type, business_context, experiment, experiment_variant, dt_email_sent
 ),
 
 email_user_sessions AS (
@@ -283,6 +308,8 @@ email_recommendations AS (
         email_delivered.ts_rec_received,
         email_delivered.display_type,
         email_delivered.business_context,
+        email_delivered.experiment,
+        email_delivered.experiment_variant,
         "house" AS type_item,
         email_closest_session.country,
         email_closest_session.region,
@@ -347,7 +374,9 @@ recommendations AS (
         year,
         month,
         day,
-        item_rank + 1 AS item_rank
+        item_rank + 1 AS item_rank,
+        experiment,
+        experiment_variant
     FROM
         carousel_recommendations
     UNION ALL
@@ -372,7 +401,9 @@ recommendations AS (
         year,
         month,
         day,
-        item_rank + 1 AS item_rank
+        item_rank + 1 AS item_rank,
+        experiment,
+        experiment_variant
     FROM email_recommendations
 )
 

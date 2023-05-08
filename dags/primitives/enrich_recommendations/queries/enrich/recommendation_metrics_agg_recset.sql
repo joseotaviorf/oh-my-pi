@@ -16,6 +16,8 @@ WITH base AS (
         device_family,
         platform,
         language,
+        experiment,
+        experiment_variant,
         ts_rec_created,
         DATE(ts_rec_created) AS dt_rec_created,
         ts_rec_received,

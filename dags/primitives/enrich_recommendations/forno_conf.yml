@@ -56,6 +56,10 @@ tables:
     is_incremental: false
     partition_cols:
       - dt_rec_received
+  recommendation_metrics_agg_display_type_business_context_experiment:
+    is_incremental: false
+    partition_cols:
+      - dt_rec_received
   recommendation_metrics_agg_recset:
     is_incremental: false
     partition_cols:
