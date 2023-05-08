@@ -52,7 +52,7 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
     table_info = json.loads(args.table_info)
     incremental_col = table_info.get("incremental_col", None)
     partition_cols = json.loads(args.partition_cols)
-    is_incremental = True if partition_cols else False
+    is_incremental = table_info.get("partitioned")
 
     conn_config = get_conn_config()
     spark_client = SparkClient()
