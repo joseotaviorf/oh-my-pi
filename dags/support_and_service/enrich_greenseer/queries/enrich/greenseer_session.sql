@@ -57,6 +57,7 @@ greenseer_sessions AS (
         GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.direct_answer.value')
       ) AS BOOLEAN
     ) AS problem_solved, 
+    COALESCE(
       NULLIF(GET_JSON_OBJECT(g.memory,'$.business_rules.menu_taxonomies.selected_taxonomy'),''),
       NULLIF(GET_JSON_OBJECT(g.memory,'$.business_rules.menu_theme_details.selected_theme_detail'),'')
     ) AS response_key,
