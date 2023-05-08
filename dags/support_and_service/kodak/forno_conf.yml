@@ -1,4 +1,7 @@
 ---
+dag_documentation:
+  dag_purpose: This flow is intended to retrieve data related to images and videos used on our platforms.
+
 tables:
   image_inspection:
     raw_extraction_type: incremental

@@ -1,5 +1,6 @@
 import pendulum
 import os
+import json
 from datetime import datetime
 
 from airflow.models import DAG
@@ -34,7 +35,7 @@ partition_cols = config_service.get_config("partition_cols")
 
 # s3 paths setup
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
-raw_spark_job_path = f"{s3_prefix}/spark_jobs/{SOURCE}/load_kodak_into_datalake.py"
+raw_spark_job_path = f"{s3_prefix}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 
 # dag params
@@ -42,9 +43,11 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2020, 3, 19, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
+dag_documentation = config_service.get_config("dag_documentation")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -55,14 +58,18 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 
@@ -94,7 +101,8 @@ for table_name, table_config in tables.items():
     extended_parameters = [
         "{{ ds }}",
         table_config["raw_extraction_type"],
-        table_config.get("date_filter_column", "updated_at"),
+        table_config.get("date_filter_column", None),
+        json.dumps(partition_cols),
     ]
 
     extended_parameters = list(filter(None, extended_parameters))
