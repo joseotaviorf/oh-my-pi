@@ -49,7 +49,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 
 # spark and databricks vars
 base_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_into_datalake.py"
+raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 
 default_libraries = config_service.get_config("default_libraries")
 dag_documentation = config_service.get_config("dag_documentation")

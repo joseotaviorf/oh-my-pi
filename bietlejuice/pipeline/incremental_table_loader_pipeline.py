@@ -6,7 +6,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 
 
 class IncrementalTableLoaderPipeline(TableLoaderPipeline):
-    def load_and_register(self, df, format_options):
+    def load_and_register(self, df, format_options, force_recreate=False):
 
         spark_client = SparkClient()
 
@@ -28,7 +28,7 @@ class IncrementalTableLoaderPipeline(TableLoaderPipeline):
             format_options=format_options,
             database_location=self.target_database_location,
             partitions=self.partitions,
-            force_recreate=False,
+            force_recreate=force_recreate,
         )
 
         if self.partitions:
