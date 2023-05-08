@@ -4,11 +4,13 @@ inner_dependencies:
   recommendation_flow:
     - item_interaction
     - recommendation
+    - diversity
     - popularity
   coverage:
     - recommendation
     - recommendation_catalog
   diversity:
+    - recommendation
     - embeddings
   popularity:
     - recommendation
@@ -16,7 +18,6 @@ inner_dependencies:
     - item_interaction
   recommendation_metrics_agg_recset:
     - recommendation_flow
-    - diversity
   recommendation_metrics_agg_display_type_business_context:
     - recommendation_metrics_agg_recset
     - coverage
