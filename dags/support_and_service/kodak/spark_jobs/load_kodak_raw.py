@@ -86,7 +86,8 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
             table_name=args.table_name,
             database_location=database_location,
             layer=LayerEnum.RAW,
-            partitions=partition_cols
+            partitions=partition_cols,
+            query=None
         ).load_and_register(df, format_options, force_recreate)
     else:
         df = postgres_consumer.get_data_from_table(args.table_name)
@@ -94,7 +95,8 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
             database_name=database_name,
             table_name=args.table_name,
             database_location=database_location,
-            layer=LayerEnum.RAW
+            layer=LayerEnum.RAW,
+            query=None
         ).load_and_register(df, format_options)
 
 if __name__ == "__main__":
