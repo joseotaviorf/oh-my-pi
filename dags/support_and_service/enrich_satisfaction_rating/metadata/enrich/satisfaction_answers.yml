@@ -5,152 +5,170 @@ description: It unifies and enriches the satisfaction responses of the Support a
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
-  id_answer:
-    description: Unique identifier of the satisfaction response.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.id_answer
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.id_answer
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.id_answer
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.id_answer
-  id_survey:
-    description: Unique identifier of the satisfaction survey.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.id_survey
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.source_name
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.source_name
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.id_survey
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.source_name
-  id_contract:
-    description: Identifier of the contract linked to the satisfaction response.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.id_contract
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.id_contract
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.id_contract
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.id_contract
-  id_ticket:
-    description: If the satisfaction form was requested after a service, this, in general, will be linked to a service identifier in Zendesk.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.id_ticket
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.id_ticket
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.id_ticket
-  id_respondent:
-    description: Identifier of the person who answered the form.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.id_respondent
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.id_respondent
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.id_respondent
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.id_respondent
-  respondent_email:
-    description: Email of the person who answered the form.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.respondent_email
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.respondent_email
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.respondent_email
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.respondent_email
-  respondent_type:
-    description:
-      Position which the respondent assumed when filling out the form. It can be a
-      tenant, landlord, the attendant itself, or other service providers.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.respondent_type
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.respondent_type
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.respondent_type
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.respondent_type
-  service_type:
-    description: Indicates the service that originated the satisfaction response.
-    categories:
-      customer support: Responses generated after customer service.
-      inspection: Responses generated after the property inspection service.
-      keys: Responses generated after the key service, which is an evaluation
-        of the service performed during the transit of the property keys from
-        the owner/responsible to the inspectors, visitors, brokers, etc.
-      photos:
-        Responses generated after the photo service, which is an evaluation
-        of the service performed by the photographer.
-      reimbursement: Satisfaction response generated after refund service.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.service_type
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.service_type
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.service_type
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.service_type
-  service_context:
-    description: The context in which this service occurred.
-    categories:
-      call: Support and customer service through a call registered by Bigfone.
-      chat: Support and customer service through a chat registered  by Chat FUP.
-      email: Support and customer service via an email registered by Zendesk.
-      offboarding: Provision of service and/or support within after or during termination of the contract.
-      onboarding: Provision of service and/or support after generating a new contract.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.service_context
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.service_context
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.service_context
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.service_context
-  source_name:
-    description: Satisfaction form source.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.source_name
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.source_name
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.source_name
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.source_name
-  survey_name:
-    description: Name of the satisfaction form, used to identify different forms from the same source, if they have a description.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.survey_name
-  improvement_tags:
-    description: Process improvement tags, which are indicated by the respondent.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.improvement_tags
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.improvement_tags
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.improvement_tags
-  respondent_comments:
-    description: Respondent's comment/justification on the satisfaction assessment.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.respondent_comments
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.respondent_comments
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.respondent_comments
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.respondent_comments
-  satisfaction_answer:
-    description: Satisfaction form responses. It can count numeric, descriptive and array data, depending on the source of the data.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.satisfaction_answer
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.satisfaction_answer
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.satisfaction_answer
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.satisfaction_answer
-  custom_attributes:
-    description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.custom_attributes
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.custom_attributes
-  ts_first_seen:
-    description: Date when the form was first viewed by the respondent.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.ts_first_seen
-  ts_submitted:
-    description: Date the satisfaction response was submitted.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.ts_submitted
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.ts_submitted
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.ts_submitted
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.ts_submitted
-  year:
-    description: Year referring to the data loading day.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.year
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.year
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.year
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.year
-  month:
-    description: Month referring to the data loading day.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.month
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.month
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.month
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.month
-  day:
-    description: Day referring to the data loading day.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.day
-      - datalake_satisfaction_rating.satisfaction_surveys_zendesk.day
-      - datalake_satisfaction_rating.satisfaction_surveys_bigfone.day
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.day
+      id_answer:
+            description: Unique identifier of the satisfaction response.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.id_answer
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.id_answer
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.id_answer
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.id_answer
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.id_answer
+      id_survey:
+            description: Unique identifier of the satisfaction survey.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.id_survey
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.source_name
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.source_name
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.id_survey
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.id_survey
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.source_name
+      id_contract:
+            description: Identifier of the contract linked to the satisfaction response.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.id_contract
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.id_contract
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.id_contract
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.id_contract
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.id_contract
+      id_ticket:
+            description: If the satisfaction form was requested after a service, this, in general, will be linked to a service identifier in Zendesk.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.id_ticket
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.id_ticket
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.id_ticket
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.id_ticket
+      id_respondent:
+            description: Identifier of the person who answered the form.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.id_respondent
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.id_respondent
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.id_respondent
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.id_respondent
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.id_respondent
+      respondent_email:
+            description: Email of the person who answered the form.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.respondent_email
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.respondent_email
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.respondent_email
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.respondent_email
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.respondent_email
+      respondent_type:
+            description:
+                  Position which the respondent assumed when filling out the form. It can be a
+                  tenant, landlord, the attendant itself, or other service providers.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.respondent_type
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.respondent_type
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.respondent_type
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.respondent_type
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.respondent_type
+      service_type:
+            description: Indicates the service that originated the satisfaction response.
+            categories:
+                  customer support: Responses generated after customer service.
+                  inspection: Responses generated after the property inspection service.
+                  keys:
+                        Responses generated after the key service, which is an evaluation
+                        of the service performed during the transit of the property keys from
+                        the owner/responsible to the inspectors, visitors, brokers, etc.
+                  photos:
+                        Responses generated after the photo service, which is an evaluation
+                        of the service performed by the photographer.
+                  reimbursement: Satisfaction response generated after refund service.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.service_type
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.service_type
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.service_type
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.service_type
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.service_type
+      service_context:
+            description: The context in which this service occurred.
+            categories:
+                  call: Support and customer service through a call registered by Bigfone.
+                  chat: Support and customer service through a chat registered  by Chat FUP.
+                  email: Support and customer service via an email registered by Zendesk.
+                  offboarding: Provision of service and/or support within after or during termination of the contract.
+                  onboarding: Provision of service and/or support after generating a new contract.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.service_context
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.service_context
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.service_context
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.service_context
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.service_context
+      source_name:
+            description: Satisfaction form source.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.source_name
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.source_name
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.source_name
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.source_name
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.source_name
+      survey_name:
+            description: Name of the satisfaction form, used to identify different forms from the same source, if they have a description.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.survey_name
+      improvement_tags:
+            description: Process improvement tags, which are indicated by the respondent.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.improvement_tags
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.improvement_tags
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.improvement_tags
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.improvement_tags
+      respondent_comments:
+            description: Respondent's comment/justification on the satisfaction assessment.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.respondent_comments
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.respondent_comments
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.respondent_comments
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.respondent_comments
+      satisfaction_answer:
+            description: Satisfaction form responses. It can count numeric, descriptive and array data, depending on the source of the data.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.satisfaction_answer
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.satisfaction_answer
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.satisfaction_answer
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.satisfaction_answer
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.satisfaction_answer
+      custom_attributes:
+            description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.custom_attributes
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.custom_attributes
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.custom_attributes
+      ts_first_seen:
+            description: Date when the form was first viewed by the respondent.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.ts_first_seen
+      ts_submitted:
+            description: Date the satisfaction response was submitted.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.ts_submitted
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.ts_submitted
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.ts_submitted
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.ts_submitted
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.ts_submitted
+      year:
+            description: Year referring to the data loading day.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.year
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.year
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.year
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.year
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.year
+      month:
+            description: Month referring to the data loading day.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.month
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.month
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.month
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.month
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.month
+      day:
+            description: Day referring to the data loading day.
+            lineage:
+                  - datalake_satisfaction_rating.satisfaction_surveys_gsheets.day
+                  - datalake_satisfaction_rating.satisfaction_surveys_zendesk.day
+                  - datalake_satisfaction_rating.satisfaction_surveys_bigfone.day
+                  - datalake_satisfaction_rating.satisfaction_surveys_survicate.day
+                  - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.day

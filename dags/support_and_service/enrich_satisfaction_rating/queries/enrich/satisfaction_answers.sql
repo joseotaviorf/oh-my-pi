@@ -17,6 +17,7 @@ SELECT
     ssg.secondary_satisfaction_score,
     ssg.secondary_score_description,
     ssg.custom_attributes,
+    NULL AS ts_first_seen,
     ssg.ts_submitted,
     ssg.year,
     ssg.month,
@@ -47,6 +48,7 @@ SELECT
     NULL AS secondary_satisfaction_score,
     NULL AS secondary_score_description,
     NULL AS custom_attributes,
+    NULL AS ts_first_seen,
     ssz.ts_submitted,
     ssz.year,
     ssz.month,
@@ -77,6 +79,7 @@ SELECT
     ssb.secondary_satisfaction_score,
     ssb.secondary_score_description,
     NULL AS custom_attributes,
+    NULL AS ts_first_seen,
     ssb.ts_submitted,
     ssb.year,
     ssb.month,
@@ -107,6 +110,7 @@ SELECT
     sscf.secondary_satisfaction_score,
     sscf.secondary_score_description,
     sscf.custom_attributes,
+    NULL AS ts_first_seen,
     sscf.ts_submitted,
     sscf.year,
     sscf.month,
@@ -117,3 +121,34 @@ WHERE
     sscf.year = {year}
     AND sscf.month = {month}
     AND sscf.day = {day}
+UNION ALL
+SELECT
+    sss.id_answer,
+    sss.id_survey,
+    sss.id_contract,
+    sss.id_ticket,
+    sss.id_respondent,
+    sss.respondent_email,
+    sss.respondent_type,
+    sss.service_type,
+    sss.service_context,
+    sss.source_name,
+    NULL AS survey_name,
+    sss.improvement_tags,
+    sss.respondent_comments,
+    sss.satisfaction_score,
+    sss.score_description,
+    sss.secondary_satisfaction_score,
+    sss.secondary_score_description,
+    TO_JSON(sss.custom_attributes) AS custom_attributes,
+    sss.ts_first_seen,
+    sss.ts_submitted,
+    sss.year,
+    sss.month,
+    sss.day
+FROM
+    datalake_satisfaction_rating.satisfaction_surveys_survicate AS sss
+WHERE
+    sss.year = {year}
+    AND sss.month = {month}
+    AND sss.day = {day}

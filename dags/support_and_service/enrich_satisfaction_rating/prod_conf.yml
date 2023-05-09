@@ -9,6 +9,7 @@ inner_dependencies:
     - satisfaction_surveys_gsheets
     - satisfaction_surveys_zendesk
     - satisfaction_surveys_bigfone
+    - satisfaction_surveys_survicate
     - satisfaction_surveys_chat_fup
 
 partitions_cols: [year, month, day]
@@ -18,4 +19,5 @@ incremental_tables:
   - satisfaction_surveys_gsheets
   - satisfaction_surveys_zendesk
   - satisfaction_surveys_bigfone
+  - satisfaction_surveys_survicate
   - satisfaction_surveys_chat_fup

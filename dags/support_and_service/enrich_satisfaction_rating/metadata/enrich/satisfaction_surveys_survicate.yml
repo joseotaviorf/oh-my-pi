@@ -1,0 +1,184 @@
+---
+database_name: datalake_satisfaction_rating
+table_name: satisfaction_surveys_survicate
+description: Unifies and enriches form satisfaction responses coming from Survicate.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_answer:
+    description: Unique identifier of the satisfaction response.
+    lineage:
+      - datalake_survicate.inspections_surveys.id_answer
+      - datalake_survicate.repairs_surveys.id_answer
+      - datalake_survicate.lockbox_surveys.id_answer
+      - datalake_survicate.scheduling_surveys.id_answer
+      - datalake_survicate.keys_surveys.id_answer
+      - datalake_survicate.photo_surveys.id_response
+  id_survey:
+    description: Unique identifier of the satisfaction survey.
+    lineage:
+      - datalake_survicate.inspections_surveys.id_survey
+      - datalake_survicate.repairs_surveys.id_survey
+      - datalake_survicate.lockbox_surveys.id_survey
+      - datalake_survicate.scheduling_surveys.id_survey
+      - datalake_survicate.keys_surveys.id_survey
+      - datalake_survicate.photo_surveys.id_survey
+  id_contract:
+    description: Identifier of the contract linked to the satisfaction response.
+    lineage:
+      - datalake_survicate.inspections_surveys.id_contract
+      - datalake_survicate.scheduling_surveys.id_contract
+      - datalake_survicate.keys_surveys.id_contract
+  id_ticket:
+    description:
+      If the satisfaction form was requested after a service, this, in general,
+      will be linked to a service identifier in Zendesk.
+    lineage:
+      - datalake_survicate.repairs_surveys.id_ticket
+      - datalake_survicate.keys_surveys.id_ticket
+  id_respondent:
+    description: Identifier of the person who answered the form.
+    lineage:
+      - datalake_survicate.inspections_surveys.id_respondent
+      - datalake_survicate.photo_surveys.id_owner
+  respondent_email:
+    description: Email of the person who answered the form.
+    lineage:
+      - datalake_survicate.repairs_surveys.respondent_email
+      - datalake_survicate.keys_surveys.email
+  respondent_type:
+    description:
+      Position which the respondent assumed when filling out the form.
+      It can be a tenant, landlord, the attendant itself, or other service providers.
+    lineage:
+      - datalake_survicate.inspections_surveys.respondent_type
+      - datalake_survicate.repairs_surveys.respondent_type
+      - datalake_survicate.lockbox_surveys.respondent_type
+      - datalake_survicate.scheduling_surveys.respondent_type
+      - datalake_survicate.photo_surveys.respondent_type
+  service_type:
+    description: Indicates the service that originated the satisfaction response.
+    lineage:
+      - datalake_survicate.inspections_surveys.service_type
+      - datalake_survicate.repairs_surveys.service_type
+      - datalake_survicate.lockbox_surveys.service_type
+      - datalake_survicate.scheduling_surveys.service_type
+      - datalake_survicate.keys_surveys.service_type
+      - datalake_survicate.photo_surveys.service_type
+  service_context:
+    description: The context in which this service occurred.
+    lineage:
+      - datalake_survicate.inspections_surveys.service_context
+      - datalake_survicate.repairs_surveys.service_context
+      - datalake_survicate.lockbox_surveys.service_context
+      - datalake_survicate.scheduling_surveys.service_context
+      - datalake_survicate.keys_surveys.survey_type
+  source_name:
+    description: Satisfaction form source.
+    lineage:
+      - datalake_survicate.inspections_surveys.source_name
+      - datalake_survicate.repairs_surveys.source_name
+      - datalake_survicate.lockbox_surveys.source_name
+      - datalake_survicate.scheduling_surveys.source_name
+      - datalake_survicate.keys_surveys.survey_source
+      - datalake_survicate.photo_surveys.survey_source
+  improvement_tags:
+    description: Process improvement tags, which are indicated by the respondent.
+    lineage:
+      - datalake_survicate.inspections_surveys.improvement_tags
+      - datalake_survicate.repairs_surveys.improvement_tags
+      - datalake_survicate.lockbox_surveys.improvement_tags
+      - datalake_survicate.scheduling_surveys.improvement_tags
+      - datalake_survicate.keys_surveys.improvement_tags
+      - datalake_survicate.photo_surveys.improvement_tags
+  respondent_comments:
+    description: Respondent's comment/justification on the satisfaction assessment.
+    lineage:
+      - datalake_survicate.inspections_surveys.respondent_comments
+      - datalake_survicate.repairs_surveys.respondent_comments
+      - datalake_survicate.lockbox_surveys.respondent_comments
+      - datalake_survicate.scheduling_surveys.respondent_comments
+      - datalake_survicate.keys_surveys.user_comment
+      - datalake_survicate.photo_surveys.user_comment
+  satisfaction_score:
+    description: Main satisfaction form responses.
+    lineage:
+      - datalake_survicate.inspections_surveys.satisfaction_score
+      - datalake_survicate.repairs_surveys.satisfaction_score
+      - datalake_survicate.lockbox_surveys.satisfaction_score
+      - datalake_survicate.scheduling_surveys.satisfaction_score
+      - datalake_survicate.keys_surveys.satisfaction_rating
+      - datalake_survicate.photo_surveys.satisfaction_rating
+  score_description:
+    description: Main satisfaction score description.
+    lineage:
+      - datalake_survicate.inspections_surveys.score_description
+      - datalake_survicate.repairs_surveys.score_description
+      - datalake_survicate.lockbox_surveys.score_description
+      - datalake_survicate.scheduling_surveys.score_description
+      - datalake_survicate.keys_surveys.score_description
+      - datalake_survicate.photo_surveys.score_description
+  secondary_satisfaction_score:
+    description: Secondary satisfaction form responses.
+    lineage:
+      - datalake_survicate.inspections_surveys.secondary_satisfaction_score
+      - datalake_survicate.repairs_surveys.secondary_satisfaction_score
+  secondary_score_description:
+    description: Secondary satisfaction score description.
+    lineage:
+      - datalake_survicate.inspections_surveys.secondary_score_description
+      - datalake_survicate.repairs_surveys.secondary_score_description
+  custom_attributes:
+    description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
+    lineage:
+      - datalake_survicate.inspections_surveys.custom_attributes
+      - datalake_survicate.repairs_surveys.custom_attributes
+      - datalake_survicate.lockbox_surveys.custom_attributes
+      - datalake_survicate.scheduling_surveys.custom_attributes
+      - datalake_survicate.keys_surveys.custom_attributes
+      - datalake_survicate.photo_surveys.custom_attributes
+  ts_first_seen:
+    description: Date when the form was first viewed by the respondent.
+    lineage:
+      - datalake_survicate.inspections_surveys.ts_first_seen
+      - datalake_survicate.repairs_surveys.ts_first_seen
+      - datalake_survicate.lockbox_surveys.ts_first_seen
+      - datalake_survicate.scheduling_surveys.ts_first_seen
+      - datalake_survicate.keys_surveys.ts_first_seen
+      - datalake_survicate.photo_surveys.ts_first_seen
+  ts_submitted:
+    description: Date the satisfaction response was submitted.
+    lineage:
+      - datalake_survicate.inspections_surveys.ts_submitted
+      - datalake_survicate.repairs_surveys.ts_submitted
+      - datalake_survicate.lockbox_surveys.ts_submitted
+      - datalake_survicate.scheduling_surveys.ts_submitted
+      - datalake_survicate.keys_surveys.ts_first_response
+      - datalake_survicate.photo_surveys.ts_first_response
+  year:
+    description: Year referring to the data loading day.
+    lineage:
+      - datalake_survicate.inspections_surveys.year
+      - datalake_survicate.repairs_surveys.year
+      - datalake_survicate.lockbox_surveys.year
+      - datalake_survicate.scheduling_surveys.year
+      - datalake_survicate.keys_surveys.year
+      - datalake_survicate.photo_surveys.year
+  month:
+    description: Month referring to the data loading day.
+    lineage:
+      - datalake_survicate.inspections_surveys.month
+      - datalake_survicate.repairs_surveys.month
+      - datalake_survicate.lockbox_surveys.month
+      - datalake_survicate.scheduling_surveys.month
+      - datalake_survicate.keys_surveys.month
+      - datalake_survicate.photo_surveys.month
+  day:
+    description: Day referring to the data loading day.
+    lineage:
+      - datalake_survicate.inspections_surveys.day
+      - datalake_survicate.repairs_surveys.day
+      - datalake_survicate.lockbox_surveys.day
+      - datalake_survicate.scheduling_surveys.day
+      - datalake_survicate.keys_surveys.day
+      - datalake_survicate.photo_surveys.day
