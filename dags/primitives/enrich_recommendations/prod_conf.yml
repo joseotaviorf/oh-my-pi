@@ -22,6 +22,8 @@ inner_dependencies:
     - recommendation_metrics_agg_recset
     - coverage
     - personalization
+  recommendation_metrics_agg_display_type_business_context_experiment:
+    - recommendation_metrics_agg_recset
 
 tables:
   recommendation_catalog:

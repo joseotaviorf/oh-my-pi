@@ -203,21 +203,10 @@ SELECT
     MIN(hit_rec_to_rent_flow_seven_days_at_10) AS min_hit_rec_to_rent_flow_seven_days_at_10,
     MAX(hit_rec_to_rent_flow_seven_days_at_10) AS max_hit_rec_to_rent_flow_seven_days_at_10,
 
-    -- mean, min, max are the same for coverage
-    -- because it is calculated at dt_rec_received, display_type, business_context agg level
-    MEAN(coverage_at_3) AS mean_coverage_at_3,
-    MEAN(coverage_at_5) AS mean_coverage_at_5,
-    MEAN(coverage_at_10) AS mean_coverage_at_10,
-
     r.dt_rec_received
 
 FROM
     datalake_recommendations.recommendation_metrics_agg_recset AS r
-LEFT JOIN
-    datalake_recommendations.coverage AS c
-    ON r.dt_rec_received = c.dt_rec_received
-        AND r.business_context = c.business_context
-        AND r.display_type = c.display_type
 GROUP BY
     r.dt_rec_received,
     r.business_context,
