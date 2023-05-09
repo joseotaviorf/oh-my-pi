@@ -53,11 +53,11 @@ def _load_table_data(db_table_name, raw_table_name, table_details):
         date_column = table_details["date_column"]
         unixtime_measure = table_details.get("unixtime_measure")
 
-        df = postgres_consumer.get_incremental_data_by_granularity_from_table(
+        df = postgres_consumer.get_incremental_data_from_table(
             table_name=db_table_name,
             date_filter_column=date_column,
             date_filter_value=execution_date,
-            unixtime_measure=unixtime_measure,
+            is_unixtime_col=True if unixtime_measure else False,
         )
 
         _load_dataframe_in_datalake(
