@@ -398,4 +398,4 @@ LEFT JOIN
     work_contract AS wc_off
         ON v.id_offer = wc_off.id_offer
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY sr.id_external_offer ORDER BY revision DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY v.id_offer ORDER BY revision DESC) = 1
