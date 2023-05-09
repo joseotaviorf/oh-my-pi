@@ -48,6 +48,8 @@ Produces the following output tables:
     `booking`
     `booking_aud`
     `booking_status_change`
+    `category_house`
+    `category`
     `cep`
     `city`
     `condo`

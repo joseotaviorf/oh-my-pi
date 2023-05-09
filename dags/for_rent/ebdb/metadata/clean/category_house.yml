@@ -1,0 +1,12 @@
+---
+database_name: datalake_ebdb_clean
+table_name: category_house
+columns:
+  id_category:
+    lineage:
+      - datalake_ebdb_raw.categoryimovel.categoryId
+    description: Category id.
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.categoryimovel.imovelId
+    description: House id.

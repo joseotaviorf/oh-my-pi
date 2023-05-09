@@ -1,0 +1,28 @@
+---
+database_name: datalake_ebdb_clean
+table_name: category
+columns:
+  id_category:
+    lineage:
+      - datalake_ebdb_raw.category.categoryId
+    description: Category id.
+  category_name:
+    lineage:
+      - datalake_ebdb_raw.category.name
+    description: Category name.
+  version:
+    lineage:
+      - datalake_ebdb_raw.category.version
+    description: Category version.
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.category.active
+    description: Boolean indicating if the category is active.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.category.criadoEm
+    description: Timestamp when the category was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.category.atualizadoEm
+    description: Timestamp when the category was updated.
