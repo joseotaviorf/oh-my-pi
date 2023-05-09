@@ -539,6 +539,11 @@ SELECT
     COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
     hl_c.order_renting,
     heh.name AS who_is_living,
+    COALESCE(adm_house.rental_administrator, 'QUINTOANDAR') AS house_rental_administrator,
+    COALESCE(
+        LAST(adm_listing.rental_administrator) OVER(PARTITION BY hl.id_house_listing ORDER BY adm_listing.ts_started), 
+        'QUINTOANDAR'
+    ) AS rental_administrator,
     IF(lbcer.id_house_listing is not null, TRUE, FALSE) AS is_early_relisting,
     lbcer.is_early_demand,
     hl.is_last_version,
@@ -572,3 +577,16 @@ LEFT JOIN house_entrance_history AS heh
     AND heh.is_last_status_in_listing = True
 LEFT JOIN lbc_early_relisting AS lbcer
     ON lbcer.id_house_listing = hl.id_house_listing
+LEFT JOIN
+  datalake_ebdb_rental_administration.rental_administrator_change_history AS adm_house
+    ON adm_house.id_house = hl.id_house
+    AND adm_house.ts_ended IS NULL
+LEFT JOIN 
+  datalake_ebdb_rental_administration.rental_administrator_change_history AS adm_listing
+    ON adm_listing.id_house = hl.id_house
+    AND adm_listing.ts_started >= hl.ts_listing_version_start
+    AND (
+            (adm_listing.ts_ended <= hl.ts_listing_version_end)
+            OR
+            (adm_listing.ts_ended IS NULL AND hl.ts_listing_version_end IS NULL)
+        )
