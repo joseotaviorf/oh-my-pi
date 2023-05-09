@@ -1,0 +1,28 @@
+---
+table_name: datalake_sale_listings_lenses.demand_lens
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 1800000
+column_level_validations:
+  id_house:
+    is_complete:
+      severity_level: Error
+  highest_funnel_step_achieved_last_15_days:
+    is_complete:
+      severity_level: Error
+  highest_funnel_step_achieved_last_30_days:
+    is_complete:
+      severity_level: Error
+  highest_funnel_step_achieved_last_60_days:
+    is_complete:
+      severity_level: Error
+  highest_funnel_step_achieved_last_90_days:
+    is_complete:
+      severity_level: Error
+  days_as_published:
+    is_complete:
+      severity_level: Error
+  tier:
+    is_complete:
+      severity_level: Error
