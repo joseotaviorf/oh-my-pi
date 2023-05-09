@@ -1,6 +1,7 @@
 SELECT 
     CAST(id AS INT) AS id,
-    CAST(user_id AS BIGINT) AS id_user,
+    user_id AS id_user,
+    account_manager_id AS id_account_manager,
     active AS is_active,
     created_at AS ts_created,
     updated_at AS ts_updated

@@ -4,16 +4,25 @@ columns:
   id:
     lineage:
       - datalake_ebdb_raw.userproowner.id
+    description: Unique table's id.
   id_user:
     lineage:
       - datalake_ebdb_raw.userproowner.user_id
+    description: User ID that joined the PP Multi program.
+  id_account_manager:
+    lineage:
+      - datalake_ebdb_raw.userproowner.account_manager_id
+    description: Account manager ID that supports the PP Multi customer.
   is_active:
     lineage:
       - datalake_ebdb_raw.userproowner.active
+    description: Boolean flag indicating if the customer is active on PP Multi program.
   ts_created:
     lineage:
       - datalake_ebdb_raw.userproowner.created_at
+    description: Timestamp when the user was registered.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.userproowner.updated_at
+    description: Timestamp when the user was updated.
       
