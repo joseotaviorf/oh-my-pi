@@ -1,7 +1,9 @@
 ---
 database_name: datalake_user
 table_name: photographer_user
-description: Ebdb Users daily snapshot classified as active photographers, considering photographers that are active.
+description:
+  Ebdb Users daily snapshot classified as active photographers, considering
+  photographers that are active.
 domain: Cross
 owner: data-ae-ss@quintoandar.com.br
 columns:
@@ -31,6 +33,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.email
     description: The user email.
+  cpf:
+    lineage:
+      - datalake_ebdb_clean.user.cpf
+    description: The user individual brazilian registry.
   is_active:
     lineage:
       - datalake_ebdb_clean.user.is_active

@@ -2229,6 +2229,7 @@ bietlejuice.enrich_user:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-photographer-data-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-pro-owner-in-data-lake
 bietlejuice.enrich_velo:
   - bietlejuice.ebdb:create-clean-country-in-data-lake
   - bietlejuice.ebdb:create-clean-state-in-data-lake

@@ -1,7 +1,9 @@
 ---
 database_name: datalake_user
 table_name: broker_user
-description: Ebdb Users daily snapshot classified as active brokers, considering agents that are in the sale or rental context.
+description:
+  Ebdb Users daily snapshot classified as active brokers, considering agents that are
+  in the sale or rental context.
 domain: Cross
 owner: data-ae-ss@quintoandar.com.br
 columns:
@@ -31,6 +33,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.email
     description: The user email.
+  cpf:
+    lineage:
+      - datalake_ebdb_clean.user.cpf
+    description: The user individual brazilian registry.
   is_active:
     lineage:
       - datalake_ebdb_clean.user.is_active

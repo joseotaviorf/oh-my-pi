@@ -6,8 +6,13 @@ SELECT DISTINCT
     u.main_phone,
     u.name,
     u.email,
+    u.cpf,
     u.is_active,
     u.is_blocked,
+    CASE
+        WHEN upo.id_user IS NOT NULL THEN TRUE
+        ELSE FALSE
+    END AS is_pp_multi,
     DATE(u.dt_birth) AS dt_birth,
     u.ts_created AS ts_user_created,
     u.ts_updated AS ts_user_updated,
@@ -29,6 +34,11 @@ INNER JOIN
 LEFT JOIN
     datalake_ebdb_clean.partner_agent AS pa
         ON h.id_user = pa.id_user
+        AND pa.status = 'ACTIVE'
+LEFT JOIN
+    datalake_ebdb_clean.user_pro_owner AS upo
+        ON h.id_user = upo.id_user
+        AND upo.is_active IS TRUE
 LEFT JOIN
     datalake_ebdb_clean.country AS ct
         ON ct.id = u.id_country

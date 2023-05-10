@@ -54,6 +54,13 @@ columns:
       - datalake_user.photographer_user.email
       - datalake_user.property_owner.email
     description: The user email.
+  cpf:
+    lineage:
+      - datalake_user.broker_user.cpf
+      - datalake_user.tenant_user.cpf
+      - datalake_user.photographer_user.cpf
+      - datalake_user.property_owner.cpf
+    description: The user individual brazilian registry.
   is_active:
     lineage:
       - datalake_user.broker_user.is_active
@@ -68,6 +75,12 @@ columns:
       - datalake_user.photographer_user.is_blocked
       - datalake_user.property_owner.is_blocked
     description: If the user is blocked or not.
+  is_pp_multi:
+    lineage:
+      - datalake_user.property_owner.is_pp_multi
+    description:
+      If the user is part of pp_multi program or not. Assumes TRUE or FALSE for only
+      the property owner client type.
   dt_birth:
     lineage:
       - datalake_user.broker_user.dt_birth

@@ -20,6 +20,7 @@ SELECT DISTINCT
     u.main_phone,
     u.name,
     u.email,
+    u.cpf,
     u.is_active,
     u.is_blocked,
     DATE(u.dt_birth) AS dt_birth,
