@@ -92,9 +92,12 @@ columns:
   year:
     lineage:
     - dw_public.dim_date.year
+    description: Year of the snapshot.
   month:
     lineage:
     - dw_public.dim_date.month
+    description: Month of the snapshot.
   day:
     lineage:
     - dw_public.dim_date.day
+    description: Day of the snapshot.
