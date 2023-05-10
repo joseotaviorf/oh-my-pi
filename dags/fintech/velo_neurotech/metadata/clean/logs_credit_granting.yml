@@ -182,6 +182,15 @@ columns:
   neoway_income_mean:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_neoway_income_mean
+  proposal_cpfs:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_cpf_titular
+  proposal_business_unit_uid:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_business_unit_uid
+  proposal_broker_name:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_nome_imob
   proposal_state:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.prop_estado
