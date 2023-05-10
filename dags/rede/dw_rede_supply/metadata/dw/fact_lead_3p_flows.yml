@@ -73,6 +73,8 @@ columns:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.ts_status_started
     description: Date key for when the lead was first unpublished.
+  total_house_updates:
+    description: Total number of times the house was updated in Main.
   ts_lead:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.ts_status_started

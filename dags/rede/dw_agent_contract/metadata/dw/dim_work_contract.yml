@@ -1,25 +1,49 @@
 ---
 database_name: dw_agent
 table_name: dim_work_contract
+description: 'Dimension that centers information associated with the agent''s work contract.
+Note that the granularity of this table is not each row per work contract, but each row
+per possible combination of data associated with it.
+This includes the work contract, but also the information if the agent user is marked as active or not
+on Main, as well as the business context (Sale or Rent). That is because these last two are low-cardinality
+flags, and having them as separate dimensions or flags in fact tables would not be good for simplicity
+(in the first case) or good practice (second case).'
+owner: 'gustavo.miller@quintoandar.com.br'
+domain: Rede
 columns:
   sk_work_contract:
     lineage:
       - datalake_ebdb_work_contract.work_contract.id
+    description: Primary key of the table. It is formed by concatenating id_work_contract, is_active, is_sale_contract and is_rent_contract
   id_work_contract:
     lineage:
       - datalake_ebdb_work_contract.work_contract.id
+    description: Natural key coming from EBDB. It is not a primary key, because it shows up in 8 different combinations of the flags.
   contract_name:
     lineage:
       - datalake_ebdb_work_contract.work_contract.contract_name
+    description: Name of the contract.
   rede_partner:
     lineage:
       - datalake_ebdb_work_contract.work_contract.3p_partner
+    description: Name of the partner if this is a Rede contract. Otherwise, N/A.
+  is_active:
+    description: Tells if the agent is active or not, as specified by Main's agent data.
   is_rede_contract:
     lineage:
       - datalake_ebdb_work_contract.work_contract.is_3p_contract
+    description: Tells if the contract is a Rede contract.
+  is_for_sale_contract:
+    description: Tells if the contract is a Sale contract. This will come from the agent's business context.
+  is_for_rent_contract:
+    description: Tells if the contract is a Rent contract. This will come from the agent's business context.
   ts_created:
     lineage:
       - datalake_ebdb_work_contract.work_contract.ts_created
+    description: Timestamp of when the contract was created.
   ts_updated:
     lineage:
       - datalake_ebdb_work_contract.work_contract.ts_updated
+    description: Timestamp of when the contract was last updated.
+  ts_load:
+    description: Timestamp of when the table was last processed.

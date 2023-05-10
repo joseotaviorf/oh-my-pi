@@ -238,8 +238,7 @@ columns:
   rent_price:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.rent_price
-    description: Rent price for the lead. As of August 2022, this field is completely
-      null.
+    description: Rent price for the lead.
   sale_price:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.sale_price
@@ -309,6 +308,7 @@ columns:
   is_habitat:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.is_habitat
+    description: If the property is a habitat. As of May 2023, this field is completely false.
   has_balcony:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.has_balcony
