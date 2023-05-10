@@ -82,3 +82,15 @@ columns:
     lineage:
       - datalake_analyst_ranking.analyst_metrics.dt_metric_reference
     description: Date reference for metrics in this table.
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.year
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.month
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.day

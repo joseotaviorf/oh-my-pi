@@ -6,79 +6,94 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_agent:
     lineage:
-    - datalake_analyst_ranking.ranking.id_agent
+      - datalake_analyst_ranking.ranking.id_agent
     description: Unique agent identifier.
   sk_department:
     lineage:
-    - datalake_analyst_ranking.ranking.department
+      - datalake_analyst_ranking.ranking.department
     description: Key generated as a MD5 from the department string.
   sk_group:
     lineage:
-    - datalake_analyst_ranking.ranking.id_group
+      - datalake_analyst_ranking.ranking.id_group
     description: Group unique identifier.
   sk_date:
     lineage:
-    - datalake_analyst_ranking.ranking.dt_ranking_week
+      - datalake_analyst_ranking.ranking.dt_ranking_week
     description: Date id.
   agent_age_in_months:
     lineage:
-    - datalake_analyst_ranking.ranking.agent_age_in_months
+      - datalake_analyst_ranking.ranking.agent_age_in_months
     description: How many months this agent have worked for QuintoAndar.
   productivity_achievement:
     lineage:
-    - datalake_analyst_ranking.ranking.productivity_achievement
+      - datalake_analyst_ranking.ranking.productivity_achievement
     description: Productivity achievement based on agent productivity and its target.
   sla_achievement:
     lineage:
-    - datalake_analyst_ranking.ranking.sla_achievement
+      - datalake_analyst_ranking.ranking.sla_achievement
     description: SLA achievement based on agent SLA and its target.
   csat_achievement:
     lineage:
-    - datalake_analyst_ranking.ranking.csat_achievement
+      - datalake_analyst_ranking.ranking.csat_achievement
     description: CSAT achievement based on agent CSAT and its target.
   resolution_achievement:
     lineage:
-    - datalake_analyst_ranking.ranking.resolution_achievement
+      - datalake_analyst_ranking.ranking.resolution_achievement
     description: Resolution achievement based on agent resolution and its target.
   ra_would_do_business_again_achievement:
     lineage:
-    - datalake_analyst_ranking.ranking.ra_would_do_business_again_achievement
-    description: ReclameAqui would do business again achievement based on agent ReclameAqui
+      - datalake_analyst_ranking.ranking.ra_would_do_business_again_achievement
+    description:
+      ReclameAqui would do business again achievement based on agent ReclameAqui
       target.
   ra_score_achievement:
     lineage:
-    - datalake_analyst_ranking.ranking.ra_score_achievement
+      - datalake_analyst_ranking.ranking.ra_score_achievement
     description: ReclameAqui score achievement based on agent ReclameAqui target.
   ra_solution_achievement:
     lineage:
-    - datalake_analyst_ranking.ranking.ra_solution_achievement
-    description: ReclameAqui solution rate achievement based on agent ReclameAqui
+      - datalake_analyst_ranking.ranking.ra_solution_achievement
+    description:
+      ReclameAqui solution rate achievement based on agent ReclameAqui
       target.
   multiplication_factor:
     lineage:
-    - datalake_analyst_ranking.ranking.multiplication_factor
-    description: Multiplication factor applied to calculate the ranking_score final
+      - datalake_analyst_ranking.ranking.multiplication_factor
+    description:
+      Multiplication factor applied to calculate the ranking_score final
       number. if productivity has weight then 1 if productivity_achievement >= 1 then
       1 if productivity_achievement => 0.8 and productivity_achievement < 1 then 0.9
       if productivity_achievement => 0.6 and productivity_achievement < 0.8 then 0.75
       if productivity_achievement < 0.6 then 0.
   ranking_score:
     lineage:
-    - datalake_analyst_ranking.ranking.ranking_score
+      - datalake_analyst_ranking.ranking.ranking_score
     description: Ranking score.
   ranking_quartile:
     lineage:
-    - datalake_analyst_ranking.ranking.ranking_quartile
+      - datalake_analyst_ranking.ranking.ranking_quartile
     description: Ranking quartile.
   ranking_percent_position:
     lineage:
-    - datalake_analyst_ranking.ranking.ranking_percent_position
+      - datalake_analyst_ranking.ranking.ranking_percent_position
     description: Ranking percent position.
   ranking_position:
     lineage:
-    - datalake_analyst_ranking.ranking.ranking_position
+      - datalake_analyst_ranking.ranking.ranking_position
     description: Ranking position.
   dt_ranking_week:
     lineage:
-    - datalake_analyst_ranking.ranking.dt_ranking_week
+      - datalake_analyst_ranking.ranking.dt_ranking_week
     description: Date in which this rank was calculated.
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_analyst_ranking.ranking.dt_ranking_week
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_analyst_ranking.ranking.dt_ranking_week
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_analyst_ranking.ranking.dt_ranking_week

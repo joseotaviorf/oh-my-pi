@@ -6,13 +6,13 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_channel:
     lineage:
-    - datalake_customer_support.call.direction
-    - datalake_customer_support.email.direction
+      - datalake_customer_support.call.direction
+      - datalake_customer_support.email.direction
     description: Key generated to identify the channel of this ticket.
   direction:
     lineage:
-    - datalake_customer_support.call.direction
-    - datalake_customer_support.email.direction
+      - datalake_customer_support.call.direction
+      - datalake_customer_support.email.direction
     description: Support direction.
   channel:
     description: Channel the support ocurred (call, chat, email).
@@ -23,3 +23,5 @@ columns:
       teravoz: Legacy tool call support. Deprecated in august 2020.
       twilio: Current tool for chat and call support. Started in august 2020.
       zendesk: Current tool for email support.
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_customer_support.
