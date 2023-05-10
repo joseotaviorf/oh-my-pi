@@ -8,7 +8,7 @@ Assumptions:
 */
 
 WITH carousel_recommendations AS (
-    SELECT
+    SELECT DISTINCT
         "house" AS type_subject,
         "similar-carousel" AS display_type,
         "house-similarity-embeddings" AS ml_model,
@@ -39,16 +39,18 @@ WITH carousel_recommendations AS (
             CAST(GET_JSON_OBJECT(event_properties, "$.house_id") AS INT)
         ) AS id_anchors,
         POSEXPLODE(
-            CAST(
-                SPLIT(
-                    REGEXP_REPLACE(
-                        GET_JSON_OBJECT(event_properties, "$.similar_listings"),
-                        '\\[|\\]|"',
-                        ""
-                    ),
-                    ",",
-                    -1
-                ) AS ARRAY <INT>
+            ARRAY_DISTINCT(
+                CAST(
+                    SPLIT(
+                        REGEXP_REPLACE(
+                            GET_JSON_OBJECT(event_properties, "$.similar_listings"),
+                            '\\[|\\]|"',
+                            ""
+                        ),
+                        ",",
+                        -1
+                    ) AS ARRAY <INT>
+                )
             )
         ) AS (item_rank, id_item)
     FROM
@@ -88,27 +90,31 @@ yellow_pages_recommendation_logs AS (
                 LOWER(
                     GET_JSON_OBJECT(emlio_logs.inputs, "$.display_type")
                 ) AS display_type,
-                CAST(
-                    SPLIT(
-                        REGEXP_REPLACE(
-                            GET_JSON_OBJECT(emlio_logs.inputs, "$.anchor_ids"),
-                            '\\[|\\]|"',
-                            ""
-                        ),
-                        ",",
-                        -1
-                    ) AS ARRAY <INT>
+                ARRAY_DISTINCT(
+                    CAST(
+                        SPLIT(
+                            REGEXP_REPLACE(
+                                GET_JSON_OBJECT(emlio_logs.inputs, "$.anchor_ids"),
+                                '\\[|\\]|"',
+                                ""
+                            ),
+                            ",",
+                            -1
+                        ) AS ARRAY <INT>
+                    )
                 ) AS id_anchors,
-                CAST(
-                    SPLIT(
-                        REGEXP_REPLACE(
-                            GET_JSON_OBJECT(emlio_logs.outputs, "$.house_ids"),
-                            '\\[|\\]|"',
-                            ""
-                        ),
-                        ",",
-                        -1
-                    ) AS ARRAY <INT>
+                ARRAY_DISTINCT(
+                    CAST(
+                        SPLIT(
+                            REGEXP_REPLACE(
+                                GET_JSON_OBJECT(emlio_logs.outputs, "$.house_ids"),
+                                '\\[|\\]|"',
+                                ""
+                            ),
+                            ",",
+                            -1
+                        ) AS ARRAY <INT>
+                    )
                 ) AS similar_listings,
                 DATE(ts_log) AS dt_email_sent,
                 ts_log
