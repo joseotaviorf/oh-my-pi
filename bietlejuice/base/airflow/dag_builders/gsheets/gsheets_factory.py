@@ -313,7 +313,7 @@ class GsheetsDAGFactory:
             dag=dag,
             env=self.ENV,
             datalake_bucket=self.datalake_bucket,
-            relative_query_path=self.source,
+            relative_query_path=self.source_with_context,
             spark_jobs_path=self.base_spark_jobs_path,
             athena_query_result_location=self.athena_query_results_bucket,
         )
