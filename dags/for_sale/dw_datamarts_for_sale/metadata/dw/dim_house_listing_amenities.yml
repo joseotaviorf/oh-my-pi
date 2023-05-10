@@ -4,7 +4,7 @@ description: Table that maps all listings with their respective amenities and in
   (condo amenities). It brings the most recently itens and house condition checked
   by the photographer
 domain: For Sale
-owner: helena.alves@quintoandar.com.br
+owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:
     lineage:
@@ -16,11 +16,11 @@ columns:
     - datalake_ebdb_clean.house_maintenance_condition.maintenance_condition
     description: The house's maintenance condition
     categories:
-      ALMOST_PERFECT_STATE: ''
-      NEW_OR_WITHOUT_BASIC_ITENS: ''
-      OLD: ''
-      PERFECT_STATE: ''
-      POORLY_MAINTAINED: ''
+      ALMOST_PERFECT_STATE: Listing with almost perfect condition.
+      NEW_OR_WITHOUT_BASIC_ITENS: Listing new or missing only basic items.
+      OLD:  Old property, with some maintenance needs.
+      PERFECT_STATE:  Listing with perfect condition.
+      POORLY_MAINTAINED: Listing with poor maintenance condition.
   academia:
     description: If the condominium has a gym (1 - yes, 0 - no, null - no information)
   acesso_sem_degraus:
@@ -170,9 +170,7 @@ columns:
     description: If the house has new plugs (three-pins)   (1 - yes, 0 - no, null
       - no information)
   ts_load:
-    description: ''
-    categories:
-      '2021-04-27 10:31:24': '#N/A'
+    description: Timestamp when the data was processed.
   utensilios_de_cozinha:
     description: If the house has kitchen utensils  (1 - yes, 0 - no, null - no information)
   varal_de_roupas:
