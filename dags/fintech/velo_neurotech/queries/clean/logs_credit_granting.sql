@@ -60,8 +60,6 @@ SELECT
     calc_neoway_income_bureau AS neoway_income_bureau,
     calc_neoway_income_mean AS neoway_income_mean,
     SPLIT(prop_cpf_titular, '#@#') AS proposal_cpfs,
-    prop_business_unit_uid AS proposal_business_unit_uid,
-    prop_nome_imob AS proposal_broker_name,
     prop_estado AS proposal_state,
     prop_nome_imob AS proposal_name_real_state_company,
     prop_taxa_imobiliaria AS proposal_real_state_tax,
