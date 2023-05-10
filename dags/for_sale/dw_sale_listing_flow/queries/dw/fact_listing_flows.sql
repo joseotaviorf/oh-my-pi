@@ -158,6 +158,7 @@ taxonomy AS (
         CAST(is_branded AS BOOLEAN) AS is_branded,
         CAST(is_ops_direct_register AS BOOLEAN) AS is_ops_direct_register,
         mkt_origin,
+        mkt_origin_suggestion,
         mkt_channel,
         mkt_medium,
         mkt_source
@@ -177,7 +178,7 @@ applied_taxonomy AS (
             WHEN pl.is_b2b THEN 'B2B'
             WHEN pl.is_autonomous_agent AND t.mkt_origin = 'Backend' THEN 'CIQ' --In a few cases, the flag may change and consequently the result will retroactively change back to backend
             WHEN pl.affiliate_type = 'Doorman' THEN 'Doorman'
-            WHEN t.mkt_origin IS NULL THEN 'Other'
+            WHEN (t.mkt_origin IS NULL) OR (t.mkt_origin = '') OR (t.mkt_origin = 'Other') THEN t.mkt_origin_suggestion 
             ELSE t.mkt_origin
         END AS mkt_origin,
         CASE
