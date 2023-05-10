@@ -13,10 +13,10 @@ columns:
       - datalake_hubspot_raw.owner.email
   first_name:
     lineage:
-      - datalake_hubspot_raw.owner.first_name
+      - datalake_hubspot_raw.owner.firstname
   last_name:
     lineage:
-      - datalake_hubspot_raw.owner.last_name
+      - datalake_hubspot_raw.owner.lastname
   teams:
     lineage:
       - datalake_hubspot_raw.owner.teams

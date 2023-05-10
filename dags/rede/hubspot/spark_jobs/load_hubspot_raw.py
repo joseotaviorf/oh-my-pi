@@ -93,8 +93,8 @@ class HubSpotSchemaEnum(Enum):
         [
             StructField("id", StringType(), True),
             StructField("email", StringType(), True),
-            StructField("first_name", StringType(), True),
-            StructField("last_name", StringType(), True),
+            StructField("firstName", StringType(), True),
+            StructField("lastName", StringType(), True),
             StructField("user_id", IntegerType(), True),
             StructField("created_at", TimestampType(), True),
             StructField("updated_at", TimestampType(), True),

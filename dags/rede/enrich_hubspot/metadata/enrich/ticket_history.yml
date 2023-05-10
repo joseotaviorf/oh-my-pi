@@ -1,73 +1,107 @@
 ---
 database_name: datalake_hubspot
 table_name: ticket_history
+description: This table shows the history about tickets registered in HubSpot. Each row is one change in a ticket, limited to the most
+  recent per day. If you want the current row, use datalake_hubspot.ticket.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
 columns:
   id_ticket:
     lineage:
       - datalake_hubspot_clean.ticket.id_ticket
+    description: Unique identifier of the ticket.
   id_deal:
     lineage:
       - datalake_hubspot_clean.ticket.associations
+    description: Unique identifier of the deal associated with the ticket. Can be joined with datalake_hubspot.deal.id_deal.
+  id_company:
+    lineage:
+      - datalake_hubspot_clean.ticket.associations
+    description: Unique identifier of the main company associated with the ticket. Can be joined with datalake_hubspot.company.id_company.
   id_stage:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Unique identifier of the stage. Can be joined with datalake_hubspot.stage.id_stage.
   id_pipeline:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Unique identifier of the pipeline. Can be joined with datalake_hubspot.pipeline.id_pipeline.
   id_hubspot_owner:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Unique identifier of the owner responsible for the ticket. Can be joined with datalake_hubspot.owner.id_owner.
   id_stage_history:
     lineage:
       - datalake_hubspot_clean.ticket.properties_with_history
+    description: History of the the stage ID.
   id_pipeline_history:
     lineage:
       - datalake_hubspot_clean.ticket.properties_with_history
+    description: History of the the pipeline ID.
   content:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Content of the ticket.
   subject:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Subject of the ticket.
   onboarding_type:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Onboarding type of the company. Not used often.
+    categories:
+      'Ao Vivo': Live
+      'Digital': Remote
   field_sales:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Id of the field sales responsible for the ticket. Can be joined with datalake_hubspot.owner.id_owner.
   has_accepted_contact_with_agents:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Whether the company has accepted contact with agents.
   is_archived:
     lineage:
       - datalake_hubspot_clean.ticket.is_archived
+    description: Whether the ticket is archived.
   dt_term_signed:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Date of the term signed.
   dt_term_sent:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Date of the term sent.
   dt_documents_received:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Date of the documents received.
   dt_onboarding:
     lineage:
       - datalake_hubspot_clean.ticket.properties
+    description: Date of the onboarding.
   ts_archived:
     lineage:
       - datalake_hubspot_clean.ticket.ts_archived
+    description: Timestamp of the ticket archived.
   ts_created:
     lineage:
       - datalake_hubspot_clean.ticket.ts_created
+    description: Timestamp of the ticket created.
   ts_updated:
     lineage:
       - datalake_hubspot_clean.ticket.ts_updated
+    description: Timestamp of the ticket updated.
   year:
     lineage:
       - datalake_hubspot_clean.ticket.year
+    description: Year of the last update of the ticket.
   month:
     lineage:
       - datalake_hubspot_clean.ticket.month
+    description: Month of the last update of the ticket.
   day:
     lineage:
       - datalake_hubspot_clean.ticket.day
+    description: Day of the last update of the ticket.

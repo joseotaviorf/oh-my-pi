@@ -1,172 +1,249 @@
 ---
 database_name: datalake_hubspot
 table_name: deal
+description: Each row is one deal registered in HubSpot.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
 columns:
   id_deal:
     lineage:
       - datalake_hubspot.deal_history.id_deal
+    description: Unique identifier of the deal.
   id_stage:
     lineage:
       - datalake_hubspot.deal_history.id_stage
+    description: Unique identifier of the stage. Can be joined with datalake_hubspot.stage.id_stage.
+      Comes from the field dealstage.
   id_pipeline:
     lineage:
       - datalake_hubspot.deal_history.id_pipeline
+    description: Unique identifier of the pipeline. Can be joined with datalake_hubspot.pipeline.id_pipeline.
+      Comes from the field pipeline.
   id_hubspot_owner:
     lineage:
       - datalake_hubspot.deal_history.id_hubspot_owner
+    description: Unique identifier of the owner responsible for the deal. Can be joined
+      with datalake_hubspot.owner.id_owner. Comes from the field hubspot_owner_id.
   id_hubspot_team:
     lineage:
       - datalake_hubspot.deal_history.id_hubspot_team
+    description: Unique identifier of the team responsible for the deal. Can be joined
+      with datalake_hubspot.team.id_team. Comes from the field hubspot_team_id.
   id_company:
     lineage:
       - datalake_hubspot.deal_history.id_company
+    description: Unique identifier of the main company associated with the deal. Can
+      be joined with datalake_hubspot.company.id_company. Comes from the main company
+      association.
   id_stage_history:
     lineage:
       - datalake_hubspot.deal_history.id_stage_history
+    description: History of the the stage ID.
   id_pipeline_history:
     lineage:
       - datalake_hubspot.deal_history.id_pipeline_history
+    description: History of the the pipeline ID.
   deal_name:
     lineage:
       - datalake_hubspot.deal_history.deal_name
+    description: Name of the deal. Comes from the field dealname.
   state:
     lineage:
       - datalake_hubspot.deal_history.state
+    description: State of the company associated with the deal. Comes from the field
+      estado.
   hs_priority:
     lineage:
       - datalake_hubspot.deal_history.hs_priority
+    description: Priority of the deal in HubSpot. Comes from the field hs_priority.
   partnership_model:
     lineage:
       - datalake_hubspot.deal_history.partnership_model
+    description: Partnership model of the deal. Comes from the field modelo_da_parceria.
   unqualification_reason:
     lineage:
       - datalake_hubspot.deal_history.unqualification_reason
+    description: Reason why the deal was unqualified. Comes from the field motivo_de_desqualificacao.
   gain_reason:
     lineage:
       - datalake_hubspot.deal_history.gain_reason
+    description: Reason why the deal was won. Comes from the field motivo_de_ganho.
   loss_reason:
     lineage:
       - datalake_hubspot.deal_history.loss_reason
+    description: Reason why the deal was lost. Comes from the field motivo_de_perda.
   product:
     lineage:
       - datalake_hubspot.deal_history.product
+    description: Product of the deal. Comes from the field produtos.
   soft_opening_priority:
     lineage:
       - datalake_hubspot.deal_history.soft_opening_priority
+    description: Priority of the deal in the soft opening phase. Comes from the field
+      priorizacao.
   soft_opening_phase:
     lineage:
       - datalake_hubspot.deal_history.soft_opening_phase
+    description: Phase of the deal in the soft opening phase. Comes from the field
+      fase_soft_opening.
+  negotiation_responsible_team:
+    lineage:
+      - datalake_hubspot.deal_history.negotiation_responsible_team
+    description: Team responsible for the negotiation. Comes from the field equipe_responsavel_negociacao.
   commercial_closing_format:
     lineage:
       - datalake_hubspot.deal_history.commercial_closing_format
+    description: Format of the commercial closing. Comes from the field formato_de_fechamento_comercial.
   partner_agencies:
     lineage:
       - datalake_hubspot.deal_history.partner_agencies
+    description: List of other real estate agencies the company is partnered with.
+      Comes from the field com_quais_imobiliarias_tem_parceria_.
   advertising_portals:
     lineage:
       - datalake_hubspot.deal_history.advertising_portals
+    description: List of advertising portals the company uses. Comes from the field
+      em_quais_portais_anuncia_.
   rental_guarantee_solutions:
     lineage:
       - datalake_hubspot.deal_history.rental_guarantee_solutions
+    description: List of rental guarantee solutions the company uses. Comes from the
+      field qual_a_solucao_empresa_de_garantia_locaticia_oferece_para_os_clientes_de_locacao___clonado_.
   financing_banks:
     lineage:
       - datalake_hubspot.deal_history.financing_banks
+    description: List of financing banks the company uses. Comes from the field trabalha_com_financiamento__se_sim__quais_bancos_.
   amount:
     lineage:
       - datalake_hubspot.deal_history.amount
+    description: Amount of the deal. Not used often. Comes from the field amount.
   brokerage_fee:
     lineage:
       - datalake_hubspot.deal_history.brokerage_fee
+    description: Brokerage fee of the deal. Comes from the field taxa_de_corretagem.
   platform_fee:
     lineage:
       - datalake_hubspot.deal_history.platform_fee
+    description: Platform fee of the deal. Comes from the field taxa_de_plataforma.
   revenue_share_demand:
     lineage:
       - datalake_hubspot.deal_history.revenue_share_demand
+    description: Revenue share of the deal for Demand. Comes from the field revenue_share___demanda_.
   revenue_share_supply:
     lineage:
       - datalake_hubspot.deal_history.revenue_share_supply
+    description: Revenue share of the deal for Supply. Comes from the field revenue_share___supply_.
   revenue_share_total:
     lineage:
       - datalake_hubspot.deal_history.revenue_share_total
+    description: Total revenue share of the deal. Comes from the field revenue_share_total.
   monthly_average_new_rental_contracts:
     lineage:
       - datalake_hubspot.deal_history.monthly_average_new_rental_contracts
+    description: Monthly average of new rental contracts. Comes from the field qual_a_media_de_novos_contratos_de_locacao_mes_.
   num_managed_properties:
     lineage:
       - datalake_hubspot.deal_history.num_managed_properties
+    description: Number of managed properties. Comes from the field qual_a_quantidade_de_imoveis_administrados_.
   num_monthly_leads:
     lineage:
       - datalake_hubspot.deal_history.num_monthly_leads
+    description: Number of monthly leads. Comes from the field quantos_leads_recebem_por_mes.
   average_sale_property_ticket:
     lineage:
       - datalake_hubspot.deal_history.average_sale_property_ticket
+    description: Average ticket of sale properties. Comes from the field ticket_medio_de_imoveis_de_venda.
   average_rent_property_ticket:
     lineage:
       - datalake_hubspot.deal_history.average_rent_property_ticket
+    description: Average ticket of rent properties. Comes from the field ticket_medio_de_imoveis_para_locacao.
   monthly_repayment_volume_in_real:
     lineage:
       - datalake_hubspot.deal_history.monthly_repayment_volume_in_real
+    description: Monthly repayment volume in BRL. Comes from the field volume_de_repasse_mensal__vgv_r__.
   monthly_sale_volume_in_real:
     lineage:
       - datalake_hubspot.deal_history.monthly_sale_volume_in_real
+    description: Monthly sale volume in BRL. Comes from the field volume_de_vendas_mensais__vgv_r__.
   num_properties_for_sale:
     lineage:
       - datalake_hubspot.deal_history.num_properties_for_sale
+    description: Number of properties for sale. Comes from the field quantidade_de_imoveis_a_venda.
   num_properties_for_rent:
     lineage:
       - datalake_hubspot.deal_history.num_properties_for_rent
+    description: Number of properties for rent. Comes from the field quantidade_de_imoveis_para_locacao.
   has_property_advertisement_online:
     lineage:
       - datalake_hubspot.deal_history.has_property_advertisement_online
+    description: Whether the company has property advertisement online. Comes from
+      the field anuncia_os_imoveis_online_.
   has_crm:
     lineage:
       - datalake_hubspot.deal_history.has_crm
+    description: Whether the company has CRM. Comes from the field utiliza_algum_crm_.
   is_correspondent_bank:
     lineage:
       - datalake_hubspot.deal_history.is_correspondent_bank
+    description: Whether the company is correspondent bank. Comes from the field atua_como_correspondente_bancario_.
   has_financing:
     lineage:
       - datalake_hubspot.deal_history.has_financing
+    description: Whether the company has financing. Comes from the field trabalha_com_financiamento_.
   is_for_sale:
     lineage:
       - datalake_hubspot.deal_history.is_for_sale
+    description: Whether the company works with sale. Comes from the field trabalha_com_venda_e_locacao_.
   is_for_rent:
     lineage:
       - datalake_hubspot.deal_history.is_for_rent
+    description: Whether the company works with rent. Comes from the field trabalha_com_venda_e_locacao_.
   has_partnerships_with_other_agencies:
     lineage:
       - datalake_hubspot.deal_history.has_partnerships_with_other_agencies
+    description: Whether the company has partnerships with other agencies. Comes from
+      the field trabalha_em_parceria_com_outras_imobiliarias_.
   is_archived:
     lineage:
       - datalake_hubspot.deal_history.is_archived
+    description: Whether the deal is archived.
   ts_closed:
     lineage:
       - datalake_hubspot.deal_history.ts_closed
+    description: Timestamp of the deal closed. Comes from the field closedate.
   ts_engagements_last_meeting_booked:
     lineage:
       - datalake_hubspot.deal_history.ts_engagements_last_meeting_booked
+    description: Timestamp of the last meeting booked. Comes from the field engagements_last_meeting_booked.
   ts_hubspot_owner_assigned:
     lineage:
       - datalake_hubspot.deal_history.ts_hubspot_owner_assigned
+    description: Timestamp of the deal owner assigned. Comes from the field hubspot_owner_assigneddate.
   ts_notes_last_updated:
     lineage:
       - datalake_hubspot.deal_history.ts_notes_last_updated
+    description: Timestamp of the last note updated. Comes from the field notes_last_updated.
   ts_archived:
     lineage:
       - datalake_hubspot.deal_history.ts_archived
+    description: Timestamp of the deal archived.
   ts_created:
     lineage:
       - datalake_hubspot.deal_history.ts_created
+    description: Timestamp of the deal created.
   ts_updated:
     lineage:
       - datalake_hubspot.deal_history.ts_updated
+    description: Timestamp of the deal updated.
   year:
     lineage:
       - datalake_hubspot.deal_history.year
+    description: Year of the last update.
   month:
     lineage:
       - datalake_hubspot.deal_history.month
+    description: Month of the last update.
   day:
     lineage:
       - datalake_hubspot.deal_history.day
+    description: Day of the last update.

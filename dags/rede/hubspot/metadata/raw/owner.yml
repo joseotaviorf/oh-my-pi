@@ -6,11 +6,11 @@ columns:
     tags:
       - PII
       - Confidential
-  first_name:
+  firstname:
     tags:
       - PII
       - Confidential
-  last_name:
+  lastname:
     tags:
       - PII
       - Confidential

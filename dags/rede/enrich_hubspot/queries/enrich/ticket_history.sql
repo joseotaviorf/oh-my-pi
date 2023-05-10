@@ -1,6 +1,13 @@
 SELECT
     id_ticket::BIGINT,
     GET_JSON_OBJECT(associations, '$.deals.results[0].id')::BIGINT AS id_deal,
+    FILTER( -- There can be more than one company, but we only want the main one (type = "ticket_to_company")
+        FROM_JSON(
+            GET_JSON_OBJECT(associations, '$.companies.results'),
+            'array<struct<id: string, type: string>>'
+        ),
+        x -> x["type"] = "ticket_to_company"
+    )[0]["id"]::BIGINT AS id_company,
     GET_JSON_OBJECT(properties, '$.hs_pipeline_stage')::BIGINT AS id_stage,
     GET_JSON_OBJECT(properties, '$.hs_pipeline')::BIGINT AS id_pipeline,
     GET_JSON_OBJECT(properties, '$.hubspot_owner_id')::BIGINT AS id_hubspot_owner,

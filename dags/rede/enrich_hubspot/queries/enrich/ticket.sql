@@ -1,6 +1,7 @@
 SELECT
     id_ticket,
     id_deal,
+    id_company,
     id_stage,
     id_pipeline,
     id_hubspot_owner,

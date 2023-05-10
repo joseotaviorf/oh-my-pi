@@ -37,6 +37,7 @@ SELECT
     GET_JSON_OBJECT(properties, '$.produtos') AS product,
     NULLIF(GET_JSON_OBJECT(properties, '$.priorizacao'), '') AS soft_opening_priority,
     NULLIF(GET_JSON_OBJECT(properties, '$.fase_soft_opening'), '') AS soft_opening_phase,
+    NULLIF(GET_JSON_OBJECT(properties, '$.equipe_responsavel_negociacao'), '') AS negotiation_responsible_team,
     NULLIF(GET_JSON_OBJECT(properties, '$.formato_de_fechamento_comercial'), '') AS commercial_closing_format,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.com_quais_imobiliarias_tem_parceria_'), ''), ';') AS partner_agencies,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.em_quais_portais_anuncia_'), ''), ';') AS advertising_portals,

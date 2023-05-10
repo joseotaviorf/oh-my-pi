@@ -195,6 +195,7 @@ tables:
         - quantidade_de_imoveis_a_venda
         - quantidade_de_imoveis_para_locacao
         - formato_de_fechamento_comercial
+        - equipe_responsavel_negociacao
       propertiesWithHistory:
         - dealstage
         - pipeline
@@ -226,6 +227,7 @@ tables:
         - hs_pipeline_stage
         - hs_pipeline
       associations:
+        - company
         - deal
   deal_pipeline:
     is_incremental: true
