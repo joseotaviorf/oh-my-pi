@@ -162,6 +162,10 @@ columns:
     lineage:
     - datalake_ebdb_contract.contract.ts_signed
     description: "Timestamp of when this house's next contract was signed."
+  ts_rental_administrator_changed:
+    lineage:
+    - datalake_ebdb_rental_administration.rental_administrator_change_history.ts_started
+    description: "Timestamp when the rental administrator has changed during the corresponding listing period."
   version:
     lineage:
     - datalake_ebdb_listing.house_status_version_order.order_version

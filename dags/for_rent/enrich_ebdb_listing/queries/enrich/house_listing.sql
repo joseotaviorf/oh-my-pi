@@ -555,6 +555,7 @@ SELECT
     hl.ts_listing_version_end,
     heh.ts_entrance_started,
     hl.ts_last_unpublished,
+    MAX(adm_listing.ts_started) OVER(PARTITION BY hl.id_house_listing) AS ts_rental_administrator_changed,
     hl.dt_last_exclusive_opted_in,
     hl.dt_last_exclusive_opted_out,
     hl.dt_last_originals_opted_in,
