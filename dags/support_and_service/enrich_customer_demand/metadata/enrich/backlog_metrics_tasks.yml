@@ -1,62 +1,159 @@
 ---
 database_name: datalake_customer_demand
 table_name: backlog_metrics_tasks
+description:
+  This table contains all back-office tasks that are considered part of the backlog.
+  The tasks are obtained from the base_tasks table. The table tracks the SLA compliance
+  of each task day by day until it is solved. It stores the historical record of each
+  task, and its content is incremental, capturing the information on a day-by-day basis.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_task:
     lineage:
       - datalake_customer_demand.base_tasks.id_task
+    description: The id task, which is the crm task or the zendesk e-mail ticket.
   id_agent:
     lineage:
       - datalake_customer_demand.base_tasks.id_agent
+    description:
+      The id agent responsible for the task comes from the agents_control gsheets for
+      CRM tasks, and from the tickets id_assignee for Zendesk e-mail tickets.
   id_user:
     lineage:
       - datalake_customer_demand.base_tasks.id_user
+    description:
+      The id user associated with the task is NULL for CRM tasks, but for Zendesk e-mail
+      tickets, it is the same as the ticket id_user.
   id_taxonomy:
     lineage:
       - datalake_customer_demand.base_tasks.id_taxonomy
+    description:
+      The id taxonomy is used to represent the task taxonomy. For CRM tasks, the
+      id_taxonomy is NULL. However, for zendesk e-mail tickets, it is a MD5 applied to
+      some taxonomy fields, including "step_tag", "customer_type_tag", "client_type",
+      "request_type", "contact_motivation_tag", "contact_theme_tag", and
+      "contact_theme_detail_tag". The system considers the fields from left to right,
+      and if the first field is NULL, it moves on to the next one until a
+      non-NULL field is found.
   id_tags:
     lineage:
       - datalake_customer_demand.base_tasks.id_tags
+    description:
+      The id tag is used to represent the task tag. For CRM tasks, the id_tag is NULL.
+      However, for Zendesk e-mail tickets, it is a MD5 applied to the ticket tag
+      description field.
   id_main_department:
     lineage:
       - datalake_customer_demand.base_tasks.id_main_department
+    description:
+      The id_department associated with the task is the task type for CRM tasks,
+      and a MD5 applied to the ticket department description field for
+      Zendesk e-mail tickets.
   type:
     lineage:
       - datalake_customer_demand.base_tasks.type
+    description: The department name.
   sla_target:
     lineage:
       - datalake_customer_demand.base_tasks.sla_target
+    description:
+      Each task has a SLA target. For CRM tasks, the default SLA target is 5 days.
+      For Zendesk Tickets, it first considers the "tag sla target". If there is no
+      return, it then considers the "unique_theme_detail_sla_target", followed by the
+      "unique_theme_sla_target", and finally the "unique_journey_sla_target".
   origin:
     lineage:
       - datalake_customer_demand.base_tasks.origin
+    description: The task origin.
+    categories:
+      crm: For CRM tasks.
+      email: For Zendesk E-mail Tickets.
+      whatsapp: For backoffice whatsapp tickets.
   status:
     lineage:
       - datalake_customer_demand.base_tasks.status
+    description:
+      The task status differs for CRM tasks and Zendesk e-mail tickets. For CRM tasks,
+      it is null. However, for Zendesk e-mail tickets, it can take on other values.
+    categories:
+      new: If a ticket was created.
+      deleted: If a ticket was deleted.
+      pending: If there is a pendency for the ticket.
+      closed: If a ticket was closed.
+      solved: If a ticket was solved.
+      open: If a ticket is open.
+      hold: If a ticket is on hold.
+  days_worked:
+    description:
+      It considers the difference between the dt_metric_reference and the task
+      started_date. Then, it subtracts the days_off from the previous difference.
+  days_worked_with_days_offs:
+    description:
+      It considers the difference between the dt_metric_reference and the task
+      started_date, but considering the days_off.
+  days_off:
+    description:
+      Total days off in the interval between the dt_metric_reference and the
+      started_date. It considers as days off Brazil national holidays and weekends,
+      such as saturday and sunday.
+  is_daily_backlog:
+    description:
+      It is a boolean column, that assumes only TRUE value to indicate that the task
+      in this table is a daily backlog task.
+  is_backlog_in_time:
+    description:
+      If the total days_worked is minor or equal the task sla_target, then assumes
+      TRUE value, otherwise, it is FALSE.
+  is_backlog_not_in_time:
+    description:
+      If the total days_worked is greater than the task sla_target, then assumes
+      TRUE value, otherwise, it is FALSE.
   ts_started:
     lineage:
       - datalake_customer_demand.base_tasks.ts_started
+    description:
+      This timestamp indicates when the task started. For Zendesk E-mail tickets, if a
+      ticket has a budget executed, it considers the budget date, otherwise, it
+      considers the ticket creation date in America/Sao_Paulo timestamp.
   ts_completed:
     lineage:
       - datalake_customer_demand.base_tasks.ts_completed
+    description:
+      The task solved date. For Zendesk E-mail ticket, it is the ticket solved date
+      in America/Sao_Paulo timestamp.
   ts_zendesk_started:
     lineage:
       - datalake_customer_demand.base_tasks.ts_zendesk_started
+    description:
+      This timestamp field assumes value only for zendesk e-mail tickets. It is the
+      ticket creation date in America/Sao_Paulo timestamp.
   ts_budget:
     lineage:
       - datalake_customer_demand.base_tasks.ts_budget
+    description:
+      This timestamp field assumes value only for zendesk e-mail tickets. It is the
+      budget execution date.
   dt_metric_reference:
     lineage:
       - datalake_customer_demand.base_tasks.ts_started
       - datalake_customer_demand.base_tasks.ts_completed
+    description:
+      Metric-Reference Date. The date interval between the task started_date and the
+      tasks completed_date or the current_date (if the task was not solved yet). It
+      considers the days when task remained unsolved in the backlog.
   year:
     lineage:
       - datalake_customer_demand.base_tasks.ts_started
       - datalake_customer_demand.base_tasks.ts_completed
+    description: Metric-Reference date year, partition column.
   month:
     lineage:
       - datalake_customer_demand.base_tasks.ts_started
       - datalake_customer_demand.base_tasks.ts_completed
+    description: Metric-Reference date month, partition column.
   day:
     lineage:
       - datalake_customer_demand.base_tasks.ts_started
       - datalake_customer_demand.base_tasks.ts_completed
+    description: Metric Reference date day, partition column.

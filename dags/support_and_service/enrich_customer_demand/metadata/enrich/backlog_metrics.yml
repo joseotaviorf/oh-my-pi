@@ -1,14 +1,39 @@
 ---
 database_name: datalake_customer_demand
 table_name: backlog_metrics
+description:
+  This table contains the backlog demands for each agent on a daily basis.
+  It is updated on a daily basis, without freezing the historical metric-reference data.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_agent:
     lineage:
       - datalake_customer_demand.base_tasks.id_agent
+    description:
+      The id agent responsible for the task comes from the agents_control gsheets for
+      CRM tasks, and from the tickets id_assignee for Zendesk e-mail tickets.
   type:
     lineage:
       - datalake_customer_demand.base_tasks.type
+    description: The department name.
+  is_sunday:
+    description: Boolean to indicate if the metric-reference date is sunday or not.
+  daily_backlog:
+    description: Total daily backlog for each agent.
+  backlog_in_time:
+    description:
+      Total backlog_in_time tasks. It considers only tasks that are backlog in time,
+      so the total days_worked is minor or equal the task sla_target.
+  backlog_not_in_time:
+    description:
+      Total backlog_not_in_time tasks. It considers only tasks that are not
+      backlog in time, so, the total days_worked is greater than the task sla_target.
   dt_metric_reference:
     lineage:
       - datalake_customer_demand.base_tasks.ts_started
       - datalake_customer_demand.base_tasks.ts_completed
+    description:
+      Metric-Reference Date. The date interval between the task started_date and the
+      tasks completed_date or the current_date (if the task was not solved yet). It
+      considers the days when task remained unsolved in the backlog.

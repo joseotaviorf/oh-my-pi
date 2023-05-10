@@ -46,7 +46,7 @@ days_off AS (
         dt_interval
     FROM
         exploded_backlog AS eb
-    JOIN
+    INNER JOIN
         weekends_and_holidays AS nw
             ON nw.dt_non_working BETWEEN DATE(eb.ts_started) AND eb.dt_interval
     GROUP BY 1,3

@@ -13,10 +13,7 @@ WITH csat AS (
   WHERE
     csat_score IS NOT NULL
     OR is_solved IS NOT NULL
-  GROUP BY 
-    id_agent, 
-    type, 
-    DATE(ts_csat_answer)
+  GROUP BY id_agent, type, DATE(ts_csat_answer)
 )
 SELECT
   id_agent,

@@ -1,13 +1,38 @@
 ---
 database_name: datalake_customer_demand
 table_name: quality_metrics
+description:
+  This table provides quality metrics for the tasks in the base tasks table, with a
+  focus on the CSAT metric. It provides insights into both answered resolution and
+  customer satisfaction rating.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_agent:
     lineage:
       - datalake_customer_demand.base_tasks.id_agent
+    description:
+      For CRM tasks, the ID of the agent responsible is obtained from the
+      agents_control gsheets, while for Zendesk email tickets it is obtained from the
+      tickets id_assignee field.
   type:
     lineage:
       - datalake_customer_demand.base_tasks.type
+    description: The name of the department associated with the task.
+  sum_csat_satisfied_score:
+    description: Total number of tasks that have a CSAT score greater than or equal to 4.
+  sum_csat_dissatisfied_score:
+    description: Total number of tasks that have a CSAT score less than 3.
+  total_tickets_resolution:
+    description:
+      This field refers to the total number of tasks that have been solved in accordance
+      with the CSAT answer, indicating that the resolution provided was satisfactory
+      to the customer.
+  total_tickets_answered_resolution:
+    description: Total tasks that have the csat answered.
+  total_tickets_with_csat_score:
+    description: Total number of tasks with a non-null CSAT score.
   dt_metric_reference:
     lineage:
       - datalake_customer_demand.base_tasks.ts_csat_answer
+    description: The csat answered date.

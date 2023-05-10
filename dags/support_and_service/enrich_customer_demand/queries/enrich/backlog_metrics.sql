@@ -2,14 +2,14 @@ WITH weekends_and_holidays AS (
   SELECT
     ad.date AS dt_non_working
   FROM
-    datalake_quintoandar.aux_date ad
+    datalake_quintoandar.aux_date AS ad
   WHERE
     ad.weekend = 'Weekend'
   UNION
   SELECT
     sch.dt_holiday AS dt_non_working
   FROM
-    datalake_gsheets_clean.service_city_holidays sch
+    datalake_gsheets_clean.service_city_holidays AS sch
   WHERE
     sch.category = 'Nacional'
 ),
@@ -21,7 +21,7 @@ exploded_backlog AS (
     sla_target,
     EXPLODE(
       SEQUENCE(
-        DATE(ts_started), 
+        DATE(ts_started),
         DATE(COALESCE(ts_completed, NOW()))
       )
     ) AS dt_interval,
@@ -37,9 +37,9 @@ days_off AS (
     dt_interval,
     COUNT(1) AS days_off
   FROM
-    exploded_backlog eb
-  JOIN
-    weekends_and_holidays nw
+    exploded_backlog AS eb
+  INNER JOIN
+    weekends_and_holidays AS nw
       ON nw.dt_non_working BETWEEN DATE(eb.ts_started) AND eb.dt_interval
   GROUP BY 1,2
 )
@@ -49,26 +49,26 @@ SELECT
   DAYOFWEEK(eb.dt_interval) = 1 AS is_sunday,
   COUNT(1) AS daily_backlog,
   SUM(
-    CASE 
+    CASE
       WHEN DATEDIFF(DATE(eb.dt_interval), DATE(ts_started)) - COALESCE(do.days_off, 0) <= sla_target THEN 1
-      ELSE 0 
+      ELSE 0
     END
   ) AS backlog_in_time,
   SUM(
-    CASE 
+    CASE
       WHEN DATEDIFF(DATE(eb.dt_interval), DATE(ts_started)) - COALESCE(do.days_off, 0) > sla_target THEN 1
       ELSE 0
     END
   ) AS backlog_not_in_time,
   eb.dt_interval AS dt_metric_reference
 FROM
-  exploded_backlog eb
+  exploded_backlog AS eb
 LEFT JOIN
-  days_off do
+  days_off AS do
     ON eb.id_task = do.id_task
     AND eb.dt_interval = do.dt_interval
 WHERE
-    eb.dt_interval IS NOT NULL 
+    eb.dt_interval IS NOT NULL
     AND (
       dt_final IS NULL
       OR eb.dt_interval <> dt_final

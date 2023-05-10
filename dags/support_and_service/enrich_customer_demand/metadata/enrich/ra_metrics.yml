@@ -1,19 +1,32 @@
 ---
 database_name: datalake_customer_demand
 table_name: ra_metrics
+description:
+  This table presents metrics for Reclame Aqui Tickets, specifically considering tickets
+  that have been rated, have a moderation status other than "Não Aceita", and have a
+  non-null ticket agent assigned.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_agent:
     lineage:
       - datalake_gsheets_clean.agents_control.id_assignee
+    description: The agent ID responsible for the Reclame Aqui ticket, which must exist in the agent control Google Sheets.
   ra_score_sum:
     lineage:
       - datalake_reclameaqui_clean.tickets.rating
+    description: Total number of ratings received, considering only non-null ratings.
   ra_would_do_business_again:
     lineage:
       - datalake_reclameaqui_clean.tickets.would_do_business_again
+    description: Number of RA tickets where the client would do business again.
   ra_solved_tickets:
     lineage:
       - datalake_reclameaqui_clean.tickets.is_resolved_issue
+    description: Number of RA tickets that were solved.
+  ra_total_tickets_rated:
+    description: Total number of tickets rated for each agent.
   dt_metric_reference:
     lineage:
       - datalake_reclameaqui_clean.tickets.ts_rating
+    description: The date when the rating was submitted/recorded.

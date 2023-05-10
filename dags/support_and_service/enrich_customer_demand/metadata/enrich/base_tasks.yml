@@ -1,18 +1,36 @@
 ---
 database_name: datalake_customer_demand
 table_name: base_tasks
+description:
+  This table manages backoffice tasks, encompassing both CRM tasks and Zendesk E-mail
+  Tickets. For CRM tasks, it includes only those from the "Revisar Pagamentos Rescisão"
+  and "Rescisão Pre Vigência" departments. For Zendesk E-mail Tickets, it excludes those
+  with "robot service account" tags, and includes only those from the
+  "Offboarding Reparos [OFF] [POS] [BACK]" department that have the
+  "orçamentação realizada" tag, or from the "Midias Ops [POS] [BACK]" department that
+  have either the "escalar back video" tag or the "escalar ouvidoria hard cases" tag.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_task:
     lineage:
       - datalake_customer_support.email.id_ticket
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.id_task
+    description: The task ID, which can be the CRM task ID or the Zendesk email ticket ID.
   id_agent:
     lineage:
       - datalake_gsheets_clean.agents_control.id_assignee
       - datalake_customer_support.email.id_agent
+    description:
+      The agent ID responsible for the task. For CRM tasks, the agent ID is obtained
+      from the agents_control gsheets. For Zendesk email tickets, it is obtained from
+      the ticket's id_assignee.
   id_user:
     lineage:
       - datalake_customer_support.email.id_user
+    description:
+      The user ID related to the task. For CRM tasks, the user ID is NULL. For Zendesk
+      email tickets, it is the ticket's id_user.
   id_taxonomy:
     lineage:
       - datalake_customer_support.email.step_tag
@@ -22,49 +40,107 @@ columns:
       - datalake_customer_support.email.contact_motivation_tag
       - datalake_customer_support.email.contact_theme_tag
       - datalake_customer_support.email.contact_theme_detail_tag
+    description:
+      The taxonomy ID used to represent the task's taxonomy. For CRM tasks, the taxonomy
+      ID is NULL. For Zendesk email tickets, it is a MD5 hash applied to some taxonomy
+      fields such as "step_tag", "customer_type_tag", "client_type", "request_type",
+      "contact_motivation_tag", "contact_theme_tag", and "contact_theme_detail_tag".
+      If a field is NULL, it moves on to the next field in the order listed.
   id_tags:
     lineage:
       - datalake_customer_support.email.tags
+    description:
+      The tag ID used to represent the task tag. For CRM tasks, the tag ID is NULL.
+      For Zendesk email tickets, it is a MD5 hash applied to the ticket's tag
+      description field.
   id_main_department:
     lineage:
       - datalake_customer_support.email.department
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
+    description:
+      The department ID related to the task. For CRM tasks, it is the task type.
+      For Zendesk email tickets, it is a MD5 hash applied to the ticket's department
+      description field.
   type:
     lineage:
       - datalake_customer_support.email.department
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
+    description: The department name.
   sla_target:
     lineage:
       - datalake_gsheets_clean.taxonomy_sla.sla_in_days
       - datalake_gsheets_clean.tag_sla_target.sla
+    description:
+      Each task has an SLA target. For CRM tasks, the default SLA target is 5 days.
+      For Zendesk email tickets, it first considers the "tag sla target". If there is
+      no return, it then considers the "unique_theme_detail_sla_target", followed by
+      the "unique_theme_sla_target", and finally the "unique_journey_sla_target".
+  origin:
+    description: The task origin.
+    categories:
+      crm: For CRM tasks.
+      email: For Zendesk E-mail Tickets.
+      whatsapp: For backoffice whatsapp tickets.
   status:
     lineage:
       - datalake_customer_support.email.status
+    description:
+      The task status differs for CRM tasks and Zendesk e-mail tickets. For CRM tasks,
+      it is null. However, for Zendesk e-mail tickets, it can take on other values.
+    categories:
+      new: If a ticket was created.
+      deleted: If a ticket was deleted.
+      pending: If there is a pendency for the ticket.
+      closed: If a ticket was closed.
+      solved: If a ticket was solved.
+      open: If a ticket is open.
+      hold: If a ticket is on hold.
   csat_score:
     lineage:
       - datalake_customer_support.email.csat_score
+    description:
+      The task's CSAT score. For CRM tasks, it is NULL. For Zendesk email tickets,
+      it is the CSAT score for the last answered survey.
   is_solved:
     lineage:
       - datalake_customer_support.email.is_solved
+    description:
+      Whether the task was solved or not. In this case, it is determined by whether the
+      satisfaction survey was answered or not. For CRM tasks, it is NULL.
   ts_zendesk_started:
     lineage:
       - datalake_customer_support.email.ts_ticket_started
+    description:
+      This timestamp field assumes a value only for Zendesk email tickets. It is the
+      ticket creation date in the America/Sao_Paulo timezone.
   ts_budget:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    description:
+      This timestamp field assumes a value only for Zendesk email tickets. It is the
+      budget execution date.
   ts_started:
     lineage:
       - datalake_customer_support.email.ts_ticket_started
       - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
+    description:
+      This timestamp indicates when the task started. For Zendesk email tickets, if a
+      ticket has a budget executed, it considers the budget date; otherwise, it
+      considers the ticket creation date in the America/Sao_Paulo timezone.
   ts_completed:
     lineage:
       - datalake_customer_support.email.ts_ticket_solved
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
+    description:
+      The task's solved date. For Zendesk email tickets, it is the ticket solved date
+      in the America/Sao_Paulo timezone.
   ts_closed:
     lineage:
       - datalake_customer_support.email.ts_ticket_closed
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
+    description: The task's closed date. For CRM tasks, it is the same as the solved date.
   ts_csat_answer:
     lineage:
       - datalake_customer_support.email.ts_csat_first_response
+    description: The CSAT answer date. For CRM tasks, it is null.

@@ -5,12 +5,12 @@ WITH base_crm_analyst_info AS (
     action_type
   FROM
     datalake_crm_tasks_flows.tasks_users_resolutions_flow AS turf
-  JOIN
+  INNER JOIN
     datalake_ebdb_user.user AS du
       ON du.id = turf.id_assignee
-  JOIN
+  INNER JOIN
     datalake_gsheets_clean.agents_control AS ac
-      ON ac.email = du.email
+      ON LOWER(ac.email) = du.email
 ),
 crm_tasks AS (
   WITH last_updated_task AS (
@@ -30,10 +30,10 @@ crm_tasks AS (
     tarf.ts_completed
   FROM
     datalake_crm_tasks_flows.tasks_actions_resolutions_flow AS tarf
-  JOIN
+  INNER JOIN
     last_updated_task AS lut
       ON tarf.id_task = lut.id_task
-      AND DATE(CONCAT(year, '-', month, '-', day)) = lut.dt_last_updated
+      AND DATE(CONCAT(year, '-', month, '-', day)) = DATE(lut.dt_last_updated)
   LEFT JOIN
     base_crm_analyst_info AS bca
       ON tarf.id_task = bca.id_task

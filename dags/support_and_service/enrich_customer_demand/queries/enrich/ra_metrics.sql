@@ -4,9 +4,8 @@ WITH last_ticket_modified AS (
         FIRST(COALESCE(rat.historical.user.email[ARRAY_POSITION(rat.historical.user.name, rat.user.name)])) AS email,
         MAX(ts_last_modification) AS ts_last_ticket_modified
     FROM
-        datalake_reclameaqui_clean.tickets rat
-    GROUP BY 
-        1
+        datalake_reclameaqui_clean.tickets AS rat
+    GROUP BY 1
 ),
 distinct_ticket AS (
     SELECT DISTINCT
@@ -17,17 +16,17 @@ distinct_ticket AS (
         rat.is_resolved_issue,
         DATE(ts_rating) AS dt_metric_reference
     FROM
-        datalake_reclameaqui_clean.tickets rat
-    JOIN
-        last_ticket_modified ltm
+        datalake_reclameaqui_clean.tickets AS rat
+    INNER JOIN
+        last_ticket_modified AS ltm
             ON rat.id = ltm.id
             AND rat.ts_last_modification = ltm.ts_last_ticket_modified
-    JOIN
-        datalake_gsheets_clean.agents_control ac
+    INNER JOIN
+        datalake_gsheets_clean.agents_control AS ac
             ON ltm.email = ac.email
     WHERE
-        ts_rating IS NOT NULL 
-        AND NULLIF(moderation.status, 'Não Aceita') IS NULL 
+        ts_rating IS NOT NULL
+        AND NULLIF(moderation.status, 'Não Aceita') IS NULL
         AND ac.id_assignee <> ''
 )
 SELECT
@@ -39,5 +38,4 @@ SELECT
     dt_metric_reference
 FROM
     distinct_ticket
-GROUP BY
-    1,6
+GROUP BY 1, 6
