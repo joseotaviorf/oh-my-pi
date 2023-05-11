@@ -180,6 +180,12 @@ affiliates_inactive_segmentation:
     clean_table_name: affiliates_inactive_segmentation
     sheet_context: growth
 
+affiliates_inactive_segmentation_older:
+    sheet_id: 1rlgC3ChQv0Qu9J9BFdK8ZMsWaTBlRIPQHOdokKKnTe4
+    sheet_name: since_2022
+    clean_table_name: affiliates_inactive_segmentation_older
+    sheet_context: growth
+
 affiliate_pro_registration:
     sheet_id: 196BCLJ7rwRAgb50IEdYB_b4KGnilleeCU8WMKghxddY
     sheet_name: affiliate_pro
