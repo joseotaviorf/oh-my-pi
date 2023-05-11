@@ -20,15 +20,15 @@ columns:
     description: Booking identification key linked to an offer.
   id_buyer:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_buyer
+      - datalake_sale_offer_flows.sale_offer_users.id_buyer
     description: Identification key of the user who sent the offer.
   id_house:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_house
+      - datalake_sale_offer_flows.sale_offer_users.id_house
     description: Identification key of the house linked to the offer.
   id_owner:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_seller
+      - datalake_sale_offer_flows.sale_users_users.id_seller
     description: House owner to whom an offer has been sent.
   id_user_agent:
     lineage:
@@ -183,7 +183,7 @@ columns:
   first_discount_proposed:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.first_discount_proposed
-    description: First dicount offered
+    description: First discount offered
   last_discount_proposed:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.last_discount_proposed
@@ -239,7 +239,7 @@ columns:
   days_sale_agreement_created_to_sale_agreement_signed:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.days_sale_agreement_created_to_sale_agreement_signed
-    description: Date diffrence between sale agreement created and sale agreement signed
+    description: Date difference between sale agreement created and sale agreement signed
   days_offer_accepted_to_sale_agreement_signed:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.days_offer_accepted_to_sale_agreement_signed

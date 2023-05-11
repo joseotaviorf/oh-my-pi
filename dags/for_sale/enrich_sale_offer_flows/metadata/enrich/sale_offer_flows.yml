@@ -1,135 +1,183 @@
----
 database_name: datalake_sale_offer_flows
 table_name: sale_offer_flows
-owner: gabriel.firmino@quintoandar.com.br
+owner: herivelto.macedo@quintoandar.com.br
 domain: For Sale
-description: Enriched table to sales flow database. The purpose of this table is to consolidate all offer information from the sales base.
+description: Enriched table to sales flow database. The purpose of this table is to
+  consolidate all offer information from the sales base.
 columns:
   id_offer:
     lineage:
       - datalake_sales_flow_clean.offer.id_firestore
+    description: Offer unique identifier.
   id_user_consultant:
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_consultant
+    description: Deal Maker user ID on main (EBDB) tables
   id_consultant:
     lineage:
       - datalake_sales_flow.offer_specialists.id_consultant
+    description: Deal Maker user ID on SalesFlow tables
   id_sales_flow:
     lineage:
       - datalake_sales_flow_clean.offer.id_sales_flow
+    description: Identification key for the sales flow linked to an offer.
   sk_user_team_lead:
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_team_lead
+    description: Team lead ID user on main (EBDB) tables
   sk_team_lead:
     lineage:
       - datalake_sales_flow.offer_specialists.id_team_lead
+    description: Team lead ID user on SalesFlow tables
   id_user_pre_specialist:
+    description: ID user on main (EBDB) tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'PRE'
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_pre_specialist
   id_pre_specialist:
+    description: ID user on SalesFlow tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'PRE'
     lineage:
       - datalake_sales_flow.offer_specialists.id_pre_specialist
   id_user_post_specialist:
+    description: ID user on main (EBDB) tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'POST'
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_post_specialist
   id_post_specialist:
+    description: ID user on SalesFlow tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'POST'
     lineage:
       - datalake_sales_flow.offer_specialists.id_post_specialist
   id_user_credit_specialist:
+    description: ID user on main (EBDB) tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'CREDIT'
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_credit_specialist
   id_credit_specialist:
+    description: ID user on SalesFlow tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'CREDIT'
     lineage:
       - datalake_sales_flow.offer_specialists.id_credit_specialist
   id_user_start_financing_specialist:
+    description: ID user on main (EBDB) tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'MORTGAGE_START'
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_start_financing_specialist
   id_start_financing_specialist:
+    description: ID user on SalesFlow tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'MORTGAGE_START'
     lineage:
       - datalake_sales_flow.offer_specialists.id_start_financing_specialist
   id_user_follow_up_financing_specialist:
+    description: ID user on main (EBDB) tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'MORTGAGE_FUP'
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_follow_up_financing_specialist
   id_follow_up_financing_specialist:
+    description: ID user on SalesFlow tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'MORTGAGE_FUP'
     lineage:
       - datalake_sales_flow.offer_specialists.id_follow_up_financing_specialist
   id_user_end_financing_specialist:
+    description: ID user on main (EBDB) tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'MORTGAGE_END'
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_end_financing_specialist
   id_end_financing_specialist:
+    description: ID user on SalesFlow tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'MORTGAGE_END'
     lineage:
       - datalake_sales_flow.offer_specialists.id_end_financing_specialist
   id_user_notes_registry_specialist:
+    description: ID user on main (EBDB) tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'CRN'
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_notes_registry_specialist
   id_notes_registry_specialist:
+    description: ID user on SalesFlow tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'CRN'
     lineage:
       - datalake_sales_flow.offer_specialists.id_notes_registry_specialist
   id_user_real_estate_register_specialist:
+    description: ID user on main (EBDB) tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'CRI'
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_real_estate_register_specialist
   id_real_estate_register_specialist:
+    description: ID user on SalesFlow tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'CRI'
     lineage:
       - datalake_sales_flow.offer_specialists.id_real_estate_register_specialist
   id_user_legal_risk_analyst:
+    description: ID user on main (EBDB) tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'LEGAL_RISK'
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_legal_risk_analyst
   id_legal_risk_analyst:
+    description: ID user on SalesFlow tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'LEGAL_RISK'
     lineage:
       - datalake_sales_flow.offer_specialists.id_legal_risk_analyst
   id_user_agent:
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_agent
+    description: Broker identification key linked to the offer on main tables (EBDB)
   id_agent:
+    description: Broker identification key linked to the offer on SalesFlow specialist table.
     lineage:
       - datalake_sales_flow.offer_specialists.id_agent
   id_user_post_dd_specialist:
+    description: ID user on main (EBDB) tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'POST_DD'
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_post_dd_specialist
   id_post_dd_specialist:
+    description: ID user on SalesFlow tables which the specialist type on datalake_sales_flow_clean.specialist is equal to 'POST_DD'
     lineage:
       - datalake_sales_flow.offer_specialists.id_post_dd_specialist
   id_pendency:
     lineage:
       - datalake_sales_flow_clean.sales_flow_pendency.id
+    description: Identification key for this offer pendencies on table pendency
   id_hub:
+    description: ID to get more information abou the HUB on HubServices tables.
     lineage:
       - datalake_sales_flow_clean.offer.id_hub
   pendency_type:
+    description: Pendency type
     lineage:
       - datalake_sales_flow_clean.sales_flow_pendency.type
   financing_bank:
     lineage:
       - datalake_sales_flow_clean.mortgage.bank
+    description: Bank name used on this offer financing
   opportunities_of_the_week:
+    description: In For Sale it's every lead qualified in the week for the CRI or MA process. In Rent is every listing published,
+      with at least one scheduled in the week. This information is not used by the For Sale operation team,
+      because of the new business model of Closing Assistance.
     lineage:
       - datalake_sales_flow_clean.sales_flow_details.opportunities_of_the_week
   flow_step:
+    description: Which step this offer is on the sale process.
     lineage:
       - datalake_sales_flow_clean.sales_flow.flow_step
   vendas_offer_status:
     lineage:
       - datalake_sales_flow_clean.offer.status
+    description: SalesFlow offer status
   sale_agreement_status:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.status
+    description: CCV status
   negotiation_model:
-    lineage:
-      - datalake_sales_flow_clean.sales_flow.status
-  flow_type:
+    description: Where this offer started.
     lineage:
       - datalake_sales_flow_clean.sales_flow.flow_type
+  flow_type:
+    description: Where this offer started.
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.flow_type
+  vendas_offer_flow:
+    description: Information about which flow this offer is following
   sale_agreement_cancellation_reason:
     lineage:
       - datalake_sales_flow_clean.rescission.comment
       - datalake_sales_flow_clean.sales_flow.closing_canceled_reason
+    description: Reason why a sales contract was cancelled.
   drop_reason:
     lineage:
       - datalake_sales_flow_clean.offer.discard_reason
+    description: Reason why an offer was discarded.
+  drop_reason_responsible:
+    description: Information about which type of user rejected the offer.
   credit_model:
     lineage:
       - datalake_sales_flow_clean.mortgage.credit_model
+    description: Offer credit model
   payment_model:
+    description: Payment model used in the purchase of the property (CCV_ASSISTANCE, INSTANT_MORTGAGE, etc)
     lineage:
       - datalake_sales_flow_clean.payment.payment_model
   payment_method:
@@ -137,104 +185,137 @@ columns:
     lineage:
       - datalake_sales_flow_clean.payment.payment_method
   consultant_name:
+    description: Consultant Name
     lineage:
       - datalake_sales_flow.offer_specialists.consultant_name
   consultant_email:
+    description: Consultant e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.consultant_email
   team_lead_name:
+    description: Team Lead name
     lineage:
       - datalake_sales_flow.offer_specialists.team_lead_name
   team_lead_email:
+    description: Team Lead e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.team_lead_email
   pre_specialist_name:
+    description: Pre Specialist name
     lineage:
       - datalake_sales_flow.offer_specialists.pre_specialist_name
   pre_specialist_email:
+    description: Pre Specialist e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.pre_specialist_email
   post_specialist_name:
+    description: Post Specialist name
     lineage:
       - datalake_sales_flow.offer_specialists.post_specialist_name
   post_specialist_email:
+    description: Post Specialist e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.post_specialist_email
   credit_specialist_name:
+    description: Credit Specialist name
     lineage:
       - datalake_sales_flow.offer_specialists.credit_specialist_name
   credit_specialist_email:
+    description: Credit Specialist e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.credit_specialist_email
   start_financing_specialist_name:
+    description: Start Financing Specialist name
     lineage:
       - datalake_sales_flow.offer_specialists.start_financing_specialist_name
   start_financing_specialist_email:
+    description: Start Financing Specialist e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.start_financing_specialist_email
   follow_up_financing_specialist_name:
+    description: FUP Financing Specialist name
     lineage:
       - datalake_sales_flow.offer_specialists.follow_up_financing_specialist_name
   follow_up_financing_specialist_email:
+    description: FUP Financing Specialist e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.follow_up_financing_specialist_email
   end_financing_specialist_name:
+    description: Start Financing Specialist name
     lineage:
       - datalake_sales_flow.offer_specialists.end_financing_specialist_name
   end_financing_specialist_email:
+    description: End Financing Specialist e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.end_financing_specialist_email
   notes_registry_specialist_name:
+    description: Notes Registry Specialist name
     lineage:
       - datalake_sales_flow.offer_specialists.notes_registry_specialist_name
   notes_registry_specialist_email:
+    description: Notes Registry Specialist e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.notes_registry_specialist_email
   real_estate_register_specialist_name:
+    description: Real State Register Specialist name
     lineage:
       - datalake_sales_flow.offer_specialists.real_estate_register_specialist_name
   real_estate_register_specialist_email:
+    description: Real State Register Specialist e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.real_estate_register_specialist_email
   legal_risk_analyst_name:
+    description: Legal Risk Specialist name
     lineage:
       - datalake_sales_flow.offer_specialists.legal_risk_analyst_name
   legal_risk_analyst_email:
+    description: Legal Risk Specialist e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.legal_risk_analyst_email
   agent_name:
+    description: Agent name
     lineage:
       - datalake_sales_flow.offer_specialists.agent_name
   agent_email:
+    description: Agent e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.agent_email
   post_dd_specialist_name:
+    description: Post DD Specialist name
     lineage:
       - datalake_sales_flow.offer_specialists.post_dd_specialist_name
   post_dd_specialist_email:
+    description: Post DD Specialist e-mail
     lineage:
       - datalake_sales_flow.offer_specialists.post_dd_specialist_email
   closing_status:
+    description: Offer status, like canceled or credit_analysis.
     lineage:
       - datalake_sales_flow_clean.sales_flow.status_closing
   house_dilligence_status:
     lineage:
       - datalake_sales_flow_clean.house.house_registration_status
+    description: House Diligence status
   diligence_appointment_reason:
+    description: Diligence appointment reason
     lineage:
       - datalake_sales_flow_clean.diligence_appointment.appointment
   seller_dilligence_status:
     lineage:
       - datalake_sales_flow_clean.diligence.classification
+    description: Seller Diligence status
   report_dilligence_status:
+    description: Report Diligence status
     lineage:
       - datalake_sales_flow_clean.diligence.step
   bank_analysis_status:
+    description: Bank Analysis status
     lineage:
       - datalake_sales_flow_clean.mortgage.status
   payment_status:
     lineage:
       - datalake_sales_flow_clean.payment.status
+    description: Offer payment status
   fgts_value:
     lineage:
       - datalake_sales_flow_clean.payment.fgts_value
@@ -249,21 +330,37 @@ columns:
       - datalake_sales_flow_clean.mortgage.credit_status
       - datalake_sale_offer_flows.sale_offer_status.credit_analysis_status_name
   real_estate_register_office_status:
+    description: Real estate register status
     lineage:
       - datalake_sales_flow_clean.notary.status
   notary_office_status:
+    description: Notary office status
     lineage:
-      - datalake_sales_flow_clean.notary.status_notary_notes
+      - datalake_sales_flow_clean.cash_payment.status_notary_notes
   notary_office_details:
+    description: Notary office status details
     lineage:
       - datalake_sales_flow_clean.cash_payment.crn_details
   tags_from_salesflow:
+    description: SalesFlow tags for this offer.
     lineage:
       - datalake_sales_flow_clean.tag.label
   sale_listing_price:
     lineage:
       - datalake_sales_flow_clean.offer.sale_price
     description: House price sent in the publication by the seller.
+  first_price_offered_by_buyer:
+    lineage:
+      - datalake_sales_flow_clean.offer.offer_price
+    description: First value offered by the buyer
+  last_price_offered_by_buyer:
+    lineage:
+      - datalake_sales_flow_clean.offer.offer_price
+    description: Last value offered by the buyer
+  first_discount_proposed:
+    description: First discount offered
+  last_discount_proposed:
+    description: Last discount offered
   offer_price:
     lineage:
       - datalake_sales_flow_clean.offer.offer_price
@@ -272,87 +369,144 @@ columns:
     lineage:
       - datalake_sales_flow_clean.offer.final_price
     description: Final value, where the buyer and seller reached a negotiation agreement.
+  days_sale_agreement_created_to_sale_agreement_signed:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.ts_confection_started
+      - datalake_sales_flow_clean.ccv_flow.ts_signed
+    description: Date difference between sale agreement created and sale agreement
+      signed
+  days_offer_accepted_to_sale_agreement_signed:
+    lineage:
+      - datalake_sales_flow_clean.offer.ts_accepted
+      - datalake_sales_flow_clean.ccv_flow.ts_signed
+    description: Date difference between offer accepted and sale agreement signed
+  days_offer_accepted_to_sale_agreement_created:
+    lineage:
+      - datalake_sales_flow_clean.offer.ts_accepted
+      - datalake_sales_flow_clean.ccv_flow.ts_confection_started
+    description: Date difference between offer accepted and sale agreement created
+  days_offer_accepted_to_offer_dismissed:
+    lineage:
+      - datalake_sales_flow_clean.offer.ts_discarded
+      - datalake_sales_flow_clean.offer.ts_accepted
+    description: Date difference between offer accepted and offer dismissed
   has_seller_debt_payments:
+    description: Flag indicating if there are seller payment debts
     lineage:
       - datalake_sales_flow_clean.house.has_seller_debt_payments
   is_ccv_canceled:
     lineage:
       - datalake_sales_flow_clean.sales_flow.is_canceled
+    description: Boolean to identify if the cvv is cancelled.
+  is_a_rescued_ccv:
+    description: Boolean to identify if this offer has an rescued ccv (A ccv that
+      was cancelled and opened again)
+  is_a_rescued_offer:
+    description: Boolean to identify if this offer is a rescued one (An offer that
+      was cancelled and opened again)
   is_ccv_5a_model:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.is_5a_model
+    description: Final price agreed for this offer
   dt_sale_agreement_created:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.ts_confection_started
+    description: Date when the CCV was created
   dt_sale_agreement_signed:
+    description: Date when the CCV was signed
     lineage:
       - datalake_sales_flow_clean.ccv_flow.ts_signed
   dt_sale_agreement_cancelled:
     lineage:
       - datalake_sales_flow_clean.sales_flow_aud.ts_updated
+    description: Date when the CCV was cancelled
   dt_offer_rescued:
     lineage:
       - datalake_sales_flow_clean.sales_flow_aud.ts_updated
+    description: Date when the offer as rescued.
   dt_sale_agreement_rescued:
     lineage:
       - datalake_sales_flow_clean.sales_flow_aud.ts_updated
+    description: Date when the CCV was rescued
   dt_onboarding_ended:
+    description: Date when the onboarding process ended
     lineage:
       - datalake_sales_flow_clean.sales_flow_aud.ts_updated
       - datalake_sale_offer_flows.sale_offer_status.ts_macro_status_end
   dt_diligence_buyer_sent_at:
+    description: Date of submission of due diligence document for Buyer's signature. The Seller is the first to
+      receive the document for signature.
     lineage:
       - datalake_sales_flow_clean.diligence.ts_buyer_sent
   dt_diligence_seller_sent_at:
+    description: Date of submission of due diligence document for Seller.
     lineage:
       - datalake_sales_flow_clean.diligence.ts_seller_sent
   dt_legal_analysis_ended:
+    description: Date when the legal  analysis ended
     lineage:
       - datalake_sales_flow_clean.diligence.ts_buyer_seller_ended
   dt_legaut_analysis_started:
+    description: Date when Legaut legal analysis started
     lineage:
       - datalake_sales_flow_clean.diligence.ts_partner_started
   dt_legaut_analysis_ended:
+    description: Date when Legaut legal risk analysis ended
     lineage:
       - datalake_sales_flow_clean.diligence.ts_partner_ended
   dt_legal_risk_started:
+    description: Date when the legal risk analysis started
     lineage:
       - datalake_sales_flow_clean.diligence.ts_legal_risk_started
   dt_legal_risk_ended:
+    description: Date when the legal risk analysis ended
     lineage:
       - datalake_sales_flow_clean.diligence.ts_legal_risk_ended
   dt_bank_legal_analysis_started:
+    description: Date when the Bank legal risk analysis started
     lineage:
       - datalake_sales_flow_clean.mortgage.dt_bank_started
   dt_credit_analysis_started:
+    description: Date when the credit analysis started
     lineage:
       - datalake_sales_flow_clean.mortgage.dt_credit_started
   dt_credit_analysis_ended:
+    description: Date when the credit analysis ended
     lineage:
       - datalake_sales_flow_clean.mortgage.dt_credit_ended
   dt_financing_started:
+    description: Date when financing started
     lineage:
       - datalake_sales_flow_clean.mortgage.dt_started
   dt_financing_ended:
+    description: Date when financing ended
     lineage:
       - datalake_sales_flow_clean.mortgage.dt_ended
   dt_notes_registry_started:
+    description: Date when CRN registration started
     lineage:
       - datalake_sales_flow_clean.cash_payment.ts_crn_started
   dt_notes_registry_ended:
+    description: Date when CRN registration ended
     lineage:
       - datalake_sales_flow_clean.cash_payment.ts_crn_ended
   dt_house_registry_started:
+    description: Date house registration started
     lineage:
       - datalake_sales_flow_clean.notary.ts_started
   dt_house_registry_ended:
+    description: Date house registration ended
     lineage:
       - datalake_sales_flow_clean.notary.ts_ended
   dt_sale_transacton_paid:
     lineage:
       - datalake_sales_flow_clean.mortgage.ts_seller_paid
       - datalake_sales_flow_clean.notary.ts_seller_paid
+    description: Date when the seller received the payment from the financing company.
+      In Closing Assistance model, the full closing process is not monitored. After
+      July 2022 there is no date.
   dt_sale_key_delivered:
+    description: Date when the keys were delivered
     lineage:
       - datalake_sales_flow_clean.notary.ts_buyer_received_keys
   ts_offer_created:
@@ -362,15 +516,20 @@ columns:
   ts_accepted:
     lineage:
       - datalake_sales_flow_clean.offer.ts_accepted
+    description: Date when the offer was accepted by the owner
   ts_discarded:
     lineage:
       - datalake_sales_flow_clean.offer.ts_discarded
+    description: Date when the offer was rejected by the owner
   ts_signed:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.ts_signed
+    description: Date when the CCV was signed
   ts_created:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.ts_created
+    description: Date when the CCV was created.
   ts_last_updated_pendency:
+    description: Date when the pendency was last updated
     lineage:
       - datalake_sales_flow_clean.sales_flow_pendency.ts_updated
