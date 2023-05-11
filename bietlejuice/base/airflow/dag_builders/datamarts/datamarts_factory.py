@@ -41,9 +41,6 @@ class DatamartsDAGFactory:
 
         self.default_libraries = self.config_service.get_config("default_libraries")
         self.doc_md_chart_url = self.config_service.get_config("doc_md_chart_url")
-        self.spark_jobs_logs_path = self.config_service.get_config(
-            "spark_jobs_logs_path"
-        )
         self.dw_bucket = self.config_service.get_config("dw_bucket")
         self.databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"

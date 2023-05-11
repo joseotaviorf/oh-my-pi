@@ -33,7 +33,6 @@ MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 config_service = ConfigurationService(SOURCE)
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
@@ -45,10 +44,6 @@ RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 CLUSTER_DESCRIPTION = Variable.get(
     f"databricks_minimum_resources_cluster", deserialize_json=True
 )
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {

@@ -36,12 +36,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 CUSTOM_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 
-LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    databricks_bietlejuice_repo_path, DAG_ID
-)
-
 cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 
 LIBRARIES_DESCRIPTION = config_service.get_config("default_libraries")
 artifacts_bucket = config_service.get_config("artifacts_bucket")

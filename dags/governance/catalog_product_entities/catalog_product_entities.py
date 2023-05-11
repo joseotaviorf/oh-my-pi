@@ -24,14 +24,15 @@ MAIN_SCHEDULE_INTERVAL = "0 13 * * wed"
 
 config_service = ConfigurationService(CONTEXT)
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 
 SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_min_general_photon_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "databricks_10_4_min_general_photon_cluster"
+)
 
 DEFAULT_LIBRARIES = config_service.get_config("default_libraries")
 

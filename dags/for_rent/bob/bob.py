@@ -33,7 +33,6 @@ doc_md_base_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
 
 # spark and databricks vars
-logs_output_path = config_service.get_config("spark_jobs_logs_path")
 BASE_SPARK_JOBS_PATH = f"{s3_prefix}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{s3_prefix}/spark_jobs/{CONTEXT}/load_{{extraction_type}}_{CONTEXT}_into_datalake.py"
 

@@ -35,7 +35,6 @@ SPARK_JOBS_PATH = f"{s3_prefix}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = (
     f"{s3_prefix}/spark_jobs/{CONTEXT}/load_full_data_into_datalake_raw.py"
 )
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 cluster_description = config_service.get_config("custom_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {

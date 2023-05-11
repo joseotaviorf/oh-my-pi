@@ -26,7 +26,6 @@ config_service = ConfigurationService(DAG_NAME)
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket_reverse")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"

@@ -25,7 +25,6 @@ datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 tables = config_service.get_config("tables")
 clean_partition_cols = ["year", "month"]
@@ -83,20 +82,15 @@ task_group = DatalakeTaskGroup(
 )
 
 for table_name, table_config in tables.items():
-    
-    RAW_SPARK_JOB_PATH = (
-    f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_{table_name}_raw.py"
-    )
+
+    RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_{table_name}_raw.py"
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
-    source=SOURCE,
-    target_database_base_name=CONTEXT,
-    table_name=table_name,
-    extraction_spark_job_file=RAW_SPARK_JOB_PATH,
-    raw_spark_job_extra_args=[
-        CONTEXT,
-        "{{ ds }}",
-    ],
+        source=SOURCE,
+        target_database_base_name=CONTEXT,
+        table_name=table_name,
+        extraction_spark_job_file=RAW_SPARK_JOB_PATH,
+        raw_spark_job_extra_args=[CONTEXT, "{{ ds }}"],
     )
 
     is_incremental = table_config.get("is_incremental")

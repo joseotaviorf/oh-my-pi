@@ -32,12 +32,13 @@ databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 spectrum_iam_role = config_service.get_config("spectrum_iam_role")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_photon_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "databricks_10_4_med_general_photon_cluster"
+)
 
 dag = DAG(
     dag_id=DAG_ID,

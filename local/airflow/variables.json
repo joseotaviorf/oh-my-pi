@@ -13,7 +13,7 @@
     "databricks_bietlejuice_s3_prefix": "s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice",
     "artifacts_bucket": "s3://artifacts.s3.forno.data.quintoandar.com.br",
     "databricks_s3_bucket": "databricks.s3.forno.data.quintoandar.com.br",
-    "datalake_bucket": "5a-datalake-forno",
+    "datalake_bucket": "datalake.s3.forno.data.quintoandar.com.br",
     "dw_bucket": "dw.s3.forno.data.quintoandar.com.br",
     "spectrum_iam_role": "arn:aws:iam::713278628093:role/SpectrumAccess",
     "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
@@ -130,7 +130,7 @@
         },
         "cluster_log_conf": {
             "s3": {
-                "destination": "LOGS_OUTPUT_PATH",
+                "destination": "s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id }}",
                 "region": "us-east-1"
             }
         },
@@ -508,7 +508,7 @@
         },
         "cluster_log_conf": {
             "s3": {
-                "destination": "LOGS_OUTPUT_PATH",
+                "destination": "s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id }}",
                 "region": "us-east-1"
             }
         },

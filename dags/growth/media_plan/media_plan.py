@@ -37,7 +37,6 @@ DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 
 PARTITION_COLS = config_service.get_config("partition_cols")
 TABLE_NAME = config_service.get_config("table_name")

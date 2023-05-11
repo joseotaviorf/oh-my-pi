@@ -42,8 +42,6 @@ SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
 LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH = (
     f"{BASE_SPARK_JOBS_PATH}load_gsheets_into_datalake_raw.py"
 )
-BASE_LOG_PATH = config_service.get_config("spark_jobs_logs_path")
-LOGS_OUTPUT_PATH = f"{BASE_LOG_PATH}{DAG_ID}"
 
 # cluster setup
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)

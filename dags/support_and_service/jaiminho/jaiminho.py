@@ -31,7 +31,6 @@ tables = config_service.get_config("tables")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 # s3 paths setup

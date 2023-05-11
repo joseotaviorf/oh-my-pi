@@ -33,10 +33,8 @@ ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_b
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
-SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
-LOGS_OUTPUT_PATH = f"{SPARK_JOBS_LOGS_PATH}/{DAG_ID}"
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
 

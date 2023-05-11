@@ -27,7 +27,6 @@ databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 artifacts_default_bucket = config_service.get_config("artifacts_bucket")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 clean_partition_cols = config_service.get_config("clean_partition_cols")

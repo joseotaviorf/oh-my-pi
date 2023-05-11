@@ -3,7 +3,7 @@ import pendulum
 import os
 
 from airflow.utils.helpers import chain, cross_downstream
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -21,7 +21,6 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(SOURCE)
@@ -34,7 +33,6 @@ default_libraries = config_service.get_config("default_libraries")
 
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 SPARK_JOBS_PATH = f"{s3_prefix}/spark_jobs/base/"
-DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 LOAD_WOLOLO_INTO_DATALAKE_RAW_FILE_PATH = (
     s3_prefix + "/spark_jobs/{}/load_wololo_into_datalake.py".format(SOURCE)
 )
@@ -56,7 +54,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(

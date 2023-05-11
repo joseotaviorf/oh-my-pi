@@ -37,9 +37,6 @@ base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
 cluster_configuration = Variable.get(CLUSTER_DESCRIPTION, deserialize_json=True)
-cluster_configuration["cluster_log_conf"]["s3"][
-    "destination"
-] = f"s3://{databricks_bietlejuice_repo_path}/logs/jobs/{DAG_ID}"
 
 EBDB_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 RAW_SPARK_JOB_FILE = EBDB_SPARK_JOBS_PATH + "load_ebdb_raw.py"

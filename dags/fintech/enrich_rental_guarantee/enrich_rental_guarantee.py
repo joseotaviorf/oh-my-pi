@@ -37,7 +37,6 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_9_1_min_memory_cluster", deserialize_json=True
 )
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {

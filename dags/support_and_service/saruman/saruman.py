@@ -36,7 +36,6 @@ athena_query_results_bucket = config_service.get_config("athena_query_results_bu
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 
 # Spark and Databricks Inputs
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"

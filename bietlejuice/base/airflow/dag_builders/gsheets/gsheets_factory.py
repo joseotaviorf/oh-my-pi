@@ -62,13 +62,11 @@ class GsheetsDAGFactory:
             self.datalake_bucket,
             self.athena_query_results_bucket,
             self.doc_md_chart_url,
-            self.spark_jobs_logs_path,
             self.default_libraries,
         ) = (
             self.config_service.get_config("datalake_bucket"),
             self.config_service.get_config("athena_query_results_bucket"),
             self.config_service.get_config("doc_md_chart_url"),
-            self.config_service.get_config("spark_jobs_logs_path"),
             self.config_service.get_config("default_libraries"),
         )
 

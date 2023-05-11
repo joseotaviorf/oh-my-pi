@@ -45,7 +45,6 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 
-logs_output_path = f"s3://{databricks_bietlejuice_repo_path}/logs/jobs/{DAG_NAME}"
 base_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_survicate_into_datalake.py"
 

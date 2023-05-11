@@ -32,7 +32,6 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 dw_bucket = config_service.get_config("dw_bucket")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 
 incremental_load_parameters = config_service.get_config("incremental_load_parameters")

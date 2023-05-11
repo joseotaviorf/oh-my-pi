@@ -34,7 +34,6 @@ partition_cols = config_service.get_config("partition_cols")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 # s3 paths setup
@@ -43,7 +42,9 @@ raw_spark_job_path = s3_prefix + f"/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 
 # cluster setup
-cluster_description = config_service.get_config("databricks_10_4_med_general_photon_cluster")
+cluster_description = config_service.get_config(
+    "databricks_10_4_med_general_photon_cluster"
+)
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,

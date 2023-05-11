@@ -30,10 +30,7 @@ databricks_bietlejuice_repo_path = configs_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 metrics_path = configs_service.get_config("metrics_path")
-spark_jobs_logs_path = configs_service.get_config("spark_jobs_logs_path")
-
 spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
-logs_output_path = "{}{}".format(spark_jobs_logs_path, DAG_ID)
 
 cluster_description = configs_service.get_config("databricks_10_4_med_general_cluster")
 default_libraries = configs_service.get_config("default_libraries")
