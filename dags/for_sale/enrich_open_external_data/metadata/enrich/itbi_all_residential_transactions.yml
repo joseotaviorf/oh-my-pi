@@ -53,6 +53,16 @@ columns:
     lineage:
       - datalake_open_external_data.itbi_bh_residential_transactions.state
     description: 'State of the property.'
+  property_type:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.iptu_standard_description
+      - datalake_open_external_data.itbi_bh_residential_transactions.property_type
+    description: It represents the type of property and what use is addressed to that property.
+    categories:
+      Residencial Horizontal: If the property is a residential apartment.
+      Residencial Vertical: If it is a residential house.
+      Comercial Vertical: If the property is one for commercial use in a vertical building.
+      Comercial Horizontal: If the property is one for commercial use in a horizontal building.
   raw_source_address:
     lineage:
       - datalake_open_external_data.itbi_bh_residential_transactions.raw_source_address

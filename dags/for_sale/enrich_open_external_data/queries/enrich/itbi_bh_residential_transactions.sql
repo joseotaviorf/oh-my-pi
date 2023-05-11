@@ -43,7 +43,10 @@ WITH transactions_raw AS (
     occupation_description,
     standard_finish,
     urban_zoning_code,
-    predominant_construction_type,
+    CASE 
+      WHEN predominant_construction_type = 'AP' THEN 'Residencial Vertical' 
+      ELSE 'Residencial Horizontal' 
+    END AS property_type,
     address AS raw_source_address,
     source_file,
     land_area_m2,
@@ -73,7 +76,7 @@ transactions_clean AS (
     INITCAP(occupation_description) AS occupation_description,
     standard_finish,
     urban_zoning_code,
-    predominant_construction_type,
+    property_type,
     raw_source_address,
     source_file,
     land_area_m2,
@@ -103,7 +106,7 @@ SELECT
   t.occupation_description,
   t.standard_finish,
   t.urban_zoning_code,
-  t.predominant_construction_type,
+  t.property_type,
   t.raw_source_address,
   t.source_file,
   t.land_area_m2,

@@ -56,10 +56,11 @@ columns:
     lineage:
       - datalake_itbi_clean.itbi_bh.urban_zoning_code
     description: 'Urban zoning coding for the property, assigned by the Use and Occupancy Law in effect at the time of the transaction.'
-  predominant_construction_type:
-    lineage:
-      - datalake_itbi_clean.itbi_bh.predominant_construction_type
-    description: 'Building type with the largest area.'
+  property_type:
+    description: 'Type of property ownership, which can be residential or commercial.'
+    categories:
+      Residencial Vertical: If the property is a residential apartment.
+      Residencial Horizontal: If it is a residential house.
   raw_source_address:
     lineage:
       - datalake_itbi_clean.itbi_bh.address
