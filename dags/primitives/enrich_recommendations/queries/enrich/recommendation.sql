@@ -417,6 +417,8 @@ SELECT
     SHA2(
         CONCAT(
             recommendations.id_user,
+            concat_ws(',', recommendations.id_subjects),
+            concat_ws(',', recommendations.id_anchors),
             recommendations.id_item,
             recommendations.ts_rec_created,
             recommendations.business_context,
@@ -427,6 +429,8 @@ SELECT
     SHA2(
         CONCAT(
             recommendations.id_user,
+            concat_ws(',', recommendations.id_subjects),
+            concat_ws(',', recommendations.id_anchors),
             recommendations.ts_rec_created,
             recommendations.business_context,
             recommendations.display_type
