@@ -8,10 +8,9 @@ SELECT
     mkt_channel,
     mkt_medium,
     mkt_origin,
-    mkt_origin_suggestion,
     mkt_source,
     mkt_origin_suggestion AS mkt_origin_suggestion_gsheet,
-    CASE 
+    CASE
         WHEN affiliate_type = 'Agent' THEN 'Indica Aí - Agents'
         WHEN affiliate_type = 'Standard' THEN 'Indica Aí - General'
         WHEN COALESCE(affiliate_type,'') = '' AND lead_origin = 'PriceSuggestion' THEN 'Price Calculator'
