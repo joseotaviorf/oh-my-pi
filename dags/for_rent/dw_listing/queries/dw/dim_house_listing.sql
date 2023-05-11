@@ -101,15 +101,6 @@ house_listings AS (
            CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent
         FROM datalake_ebdb_listing.listing_business_context
         GROUP BY 1
-    ),
-    rl AS (
-        SELECT
-            id_house,
-            rental_administrator,
-            MAX(ts_administrator_changed) AS ts_administrator_changed
-        FROM
-            datalake_ebdb_listing.rent_listing
-        GROUP BY 1, 2
     )
     SELECT
         hl.id_house_listing AS sk_house_listing,
@@ -127,7 +118,6 @@ house_listings AS (
         CAST(hl.ts_listing_version_start AS DATE) AS ts_publication,
         hl.ts_last_unpublished,
         hl.rent,
-        rl.rental_administrator,
         h.rent AS house_rent,
         h.neighborhood AS house_neighborhood,
         h.zipcode AS house_zipcode,
@@ -199,7 +189,6 @@ house_listings AS (
         h.is_3p_supply_bh,
         h.is_casa_mineira_migration,
         h.is_sale_primary_market,
-        rl.ts_administrator_changed,
         hl.is_early_demand,
         hl.ts_early_demand_started
     FROM
@@ -209,8 +198,6 @@ house_listings AS (
             ON hl.id_house = h.id
     LEFT JOIN lbc
         ON lbc.id_house = h.id
-    LEFT JOIN rl
-        ON rl.id_house = lbc.id_house
     LEFT JOIN
         agents_with_keys AS awk
             ON hl.id_house_listing = awk.id_house_listing
@@ -227,7 +214,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.first_key_location,
     hl.status,
     CAST(hl.rent AS DECIMAL(14, 2)) AS rent,
-    IF(is_for_rent = TRUE, COALESCE(hl.rental_administrator, 'QUINTOANDAR'), rental_administrator) AS rental_administrator,
+    IF(is_for_rent = TRUE, hlg.rental_administrator, NULL) AS rental_administrator,
+    IF(is_for_rent = TRUE, hlg.house_rental_administrator, NULL) AS house_rental_administrator,
     CAST(hl.house_rent AS DECIMAL(14, 2)) AS house_rent,
     NULLIF(hl.house_neighborhood, '') AS house_neighborhood,
     hl.house_zipcode,
@@ -310,10 +298,13 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.ts_last_unpublished AS ts_last_de_publication,
     hl.ts_house_create,
     hl.ts_house_update,
-    hl.ts_administrator_changed,
+    hlg.ts_rental_administrator_changed AS ts_administrator_changed,
     NOW() AS ts_load
 FROM
     house_listings hl
+JOIN
+    datalake_ebdb_listing.house_listing AS hlg
+        ON hlg.id_house_listing = hl.sk_house_listing
 LEFT JOIN
     b2b_info bi
         ON bi.id_house_listing = hl.sk_house_listing
