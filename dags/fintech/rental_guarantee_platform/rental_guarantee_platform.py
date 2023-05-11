@@ -80,7 +80,6 @@ task_group = DatalakeTaskGroup(
 )
 
 tables = config_service.get_config("tables")
-partition_cols = config_service.get_config("partition_cols")
 
 for table in tables:
     table_name = table["table_name"]
@@ -108,7 +107,6 @@ for table in tables:
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         table_name=clean_table_name,
-        partitions=partition_cols,
     )
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
