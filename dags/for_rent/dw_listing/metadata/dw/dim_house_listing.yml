@@ -358,12 +358,6 @@ columns:
     - datalake_ebdb_listing.house.predicted_price
     description: "House predicted rental price by the QuintoAndar price calculator,
       in Brazilian Reais."
-  house_rental_administrator:
-    description: "The current rental administrator of the house."
-    categories:
-      OWNER: "Owner is the rental administrator, which means that the contract is brokerage-only."
-      QUINTOANDAR: "Default rental administrator, which is QuintoAndar."
-      THIRD_PARTY: "The rental administrator is a third party real estate agency."
   is_3p_supply:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply
@@ -480,8 +474,8 @@ columns:
     description: "Indicates if the instant offer is enabled on the house."
   ts_administrator_changed:
     lineage:
-    - datalake_ebdb_listing.house_listing.ts_rental_administrator_changed
-    description: "Timestamp when the house's rental administrator within the listing period changed (OWNER, QUINTOANDAR
+    - datalake_ebdb_listing.rent_listing.ts_administrator_changed
+    description: "Timestamp when the house administrator changed (OWNER, QUINTOANDAR
       or THIRD_PARTY)."
   b2b_prime_type:
     description: "Case it's a b2b prime listing, it says whether it's standard, batch
