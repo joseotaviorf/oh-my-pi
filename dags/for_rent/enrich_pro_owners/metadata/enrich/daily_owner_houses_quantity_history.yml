@@ -2,39 +2,49 @@ database_name: datalake_pro_owners
 table_name: daily_owner_houses_quantity_history
 description: Historical enriched table for rent context (PP Multi - Pro owner). Each
   row contains the changes of owner's quantity houses per day, just considering rent
-  and not b2b houses.
+  and excluding b2b houses.
 domain: For Rent
-owner: E ForRent@quintoandar.com.br
+owner: data-for-rent@quintoandar.com.br
 columns:
   id_owner:
     lineage:
     - datalake_pro_owners.house_b2b_history.id_user
-    description: Id user of the owner
+    description: Id user of the owner.
+  id_account_manager:
+    lineage:
+    - datalake_ebdb_clean.user_pro_owner_aud.id_account_manager
+    description: Id user of the account manager associated to an id_owner of a specific day.
   country_code:
     lineage:
     - datalake_ebdb_country.user.country_code
+    description: Country code of the user.
   rental_administrator:
     lineage:
     - datalake_ebdb_listing.rent_listing.rental_administrator
-  dt_houses_owned:
-    lineage:
-    - datalake_quintoandar.aux_date.date
-    description: The date of the PP's house quantity
-  brokerage_only_houses:
-    description: Quantity of distincts houses that the owner had before the change
-      and the house is managed by the owner (rental_administration = owner, which
-      means it's a Brokerage Only house)
+    description: The rental administrator of the house.
+  total_houses:
+    description: Quantity of distincts houses that the owner has on a respective day independent of the status.
+  ongoing_houses:
+    description: Quantity of distincts houses that the owner has on a respective day with status 'publicado', 'alugado' and 'suspenso'.
   brokerage_only_previous_houses:
     description: Quantity of distincts houses that the owner had before the change
       and the house is managed by the owner (rental_administration = owner, which
-      means it's a Brokerage Only house)
-  houses:
-    description: Quantity of distincts houses that the owner has on a respective day
-  is_merged_user:
-    description: Check if the user is merged from another user
-  quintoandar_houses:
+      means it's a Brokerage Only house).
+  brokerage_only_houses:
     description: Quantity of distincts houses that the owner had before the change
-      and the house is managed by QuintoAndar (rental_administration = quintoandar)
+      and the house is managed by the owner (rental_administration = owner, which
+      means it's a Brokerage Only house).
   quintoandar_previous_houses:
     description: Quantity of distincts houses that the owner has and the house is
-      managed by QuintoAndar (rental_administration = quintoandar)
+      managed by QuintoAndar (rental_administration = quintoandar).
+  quintoandar_houses:
+    description: Quantity of distincts houses that the owner had before the change
+      and the house is managed by QuintoAndar (rental_administration = quintoandar).
+  is_merged_user:
+    description: Boolean flag to check if the user is merged from another user.
+  is_pp_multi_active:
+    description: Boolean flag to check if the customer is a PP Multi and is active.
+  dt_houses_owned:
+    lineage:
+    - datalake_quintoandar.aux_date.date
+    description: The date of the PP's house quantity.

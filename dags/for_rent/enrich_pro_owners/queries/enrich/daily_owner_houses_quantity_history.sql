@@ -14,22 +14,22 @@ WITH b2b_user AS (
 ),
 
 house_portability AS (
-    SELECT
-      hl.id_house,
-      hl.ts_listing_version_start,
-      hl.ts_listing_version_end
-    FROM 
-      datalake_ebdb_listing.house_listing hl
-    JOIN 
-      datalake_ebdb_clean.portability por
-        ON por.id_house = hl.id_house 
-        AND por.owner_type = 'B2B'
-        AND por.ts_created >= COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00') 
-        AND por.ts_created < COALESCE(hl.ts_listing_version_end, NOW())
+  SELECT
+    hl.id_house,
+    hl.ts_listing_version_start,
+    hl.ts_listing_version_end
+  FROM 
+    datalake_ebdb_listing.house_listing hl
+  JOIN 
+    datalake_ebdb_clean.portability por
+      ON por.id_house = hl.id_house 
+      AND por.owner_type = 'B2B'
+      AND por.ts_created >= COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00') 
+      AND por.ts_created < COALESCE(hl.ts_listing_version_end, NOW())
 ),
 
 owner_houses_history AS (
-  SELECT
+  SELECT /*+ RANGE_JOIN(hbh, 2000) */
     h.id AS id_house,
     hbh.id_user AS id_owner,
     ur.country_code,
@@ -79,7 +79,6 @@ owner_houses_history AS (
       ON hbh.id_user = ur.id_user
   WHERE 
     dd.date < CURRENT_DATE()
-    AND status_history IN ('alugado', 'publicado', 'suspenso')
     AND ur.country_code = 'BR'
 ),
 
@@ -87,7 +86,8 @@ owner_qtd_houses_rental_administrator AS (
   SELECT
     id_owner,
     country_code,
-    COUNT(DISTINCT id_house) AS houses,
+    COUNT(DISTINCT IF(status_history IN ('alugado', 'publicado', 'suspenso'), id_house, NULL)) AS ongoing_houses,
+    COUNT(DISTINCT id_house) AS total_houses,
     IF(rental_administrator = 'OWNER', COUNT(DISTINCT id_house), 0) AS brokerage_only_houses,
     IF(rental_administrator = 'QUINTOANDAR', COUNT(DISTINCT id_house), 0) AS quintoandar_houses,
     is_merged_user,
@@ -97,32 +97,55 @@ owner_qtd_houses_rental_administrator AS (
   WHERE 
     is_for_rent = True
     AND is_b2b = False
-  GROUP BY 1,2,6,7,rental_administrator
+  GROUP BY 1,2,7,8,rental_administrator
 ),
 
 owner_qtd_houses AS (
   SELECT
     id_owner,
     country_code,
-    SUM(houses) AS houses,
+    SUM(ongoing_houses) AS ongoing_houses,
+    SUM(total_houses) AS total_houses,
     SUM(brokerage_only_houses) AS brokerage_only_houses,
     SUM(quintoandar_houses) AS quintoandar_houses,
     is_merged_user,
     dt_houses_owned
   FROM 
     owner_qtd_houses_rental_administrator
-  GROUP BY 1,2,6,7
+  GROUP BY 1,2,7,8
+),
+
+pp_multi_history AS (
+SELECT /*+ RANGE_JOIN(aud, 50000) */
+  aud.id_user AS id_owner,
+  aud.id_account_manager,
+  aud.is_active,
+  TIMESTAMP(FROM_UNIXTIME(ure.ts_revision/1000)) AS ts_event,
+  LEAD(TIMESTAMP(FROM_UNIXTIME(ure.ts_revision/1000))) OVER (PARTITION BY aud.id_user ORDER BY aud.rev) AS ts_next_event
+FROM 
+  datalake_ebdb_clean.user_pro_owner_aud AS aud
+LEFT JOIN 
+  datalake_ebdb_clean.user_revision_entity AS ure 
+    ON aud.rev = ure.id
 )
   
-SELECT
-  id_owner,
-  country_code,
-  houses,
-  LAG(brokerage_only_houses) OVER (PARTITION BY id_owner ORDER BY dt_houses_owned) AS brokerage_only_previous_houses,
-  brokerage_only_houses,
-  LAG(quintoandar_houses) OVER (PARTITION BY id_owner ORDER BY dt_houses_owned) AS quintoandar_previous_houses,
-  quintoandar_houses,
-  is_merged_user,
-  dt_houses_owned
+SELECT /*+ RANGE_JOIN(oqh, 800) */
+  oqh.id_owner,
+  ppm.id_account_manager,
+  oqh.country_code,
+  oqh.total_houses,
+  oqh.ongoing_houses,
+  LAG(oqh.brokerage_only_houses) OVER (PARTITION BY oqh.id_owner ORDER BY oqh.dt_houses_owned) AS brokerage_only_previous_houses,
+  oqh.brokerage_only_houses,
+  LAG(oqh.quintoandar_houses) OVER (PARTITION BY oqh.id_owner ORDER BY oqh.dt_houses_owned) AS quintoandar_previous_houses,
+  oqh.quintoandar_houses,
+  oqh.is_merged_user,
+  IF(ppm.id_owner IS NOT NULL AND ppm.is_active, TRUE, FALSE) AS is_pp_multi_active,
+  oqh.dt_houses_owned
 FROM 
-  owner_qtd_houses
+  owner_qtd_houses AS oqh
+LEFT JOIN
+  pp_multi_history AS ppm
+    ON oqh.id_owner = ppm.id_owner
+    AND oqh.dt_houses_owned >= DATE(ppm.ts_event)
+    AND oqh.dt_houses_owned < COALESCE(DATE(ppm.ts_next_event), CURRENT_DATE())
