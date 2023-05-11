@@ -36,6 +36,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 partition_cols = config_service.get_config("partition_cols")
+clean_partition_cols = config_service.get_config("clean_partition_cols")
 datalake_bucket = config_service.get_config("datalake_bucket")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 
@@ -112,7 +113,7 @@ load_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
                 datalake_bucket,
                 SOURCE,
                 TABLE_NAME,
-                json.dumps(partition_cols),
+                json.dumps(clean_partition_cols),
             ],
         }
     },

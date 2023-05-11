@@ -3,3 +3,8 @@ partition_cols:
   - year
   - month
   - day
+clean_partition_cols:
+  - id_service
+  - year
+  - month
+  - day
