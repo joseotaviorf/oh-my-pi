@@ -2,8 +2,8 @@
 database_name: dw_agent
 table_name: fact_agent_contract
 description: 'Transactional fact table about the agent, such as the work contract and the company, accompanied by a validity period of the information.
-Every change in the agent''s contract, activation, business context, or company creates a new row in this table.
-Note that contract, activation and business context are contained in the dimension table dw_agent.dim_work_contract.'
+  Every change in the agent''s contract, activation, business context, or company creates a new row in this table.
+  Note that contract, activation and business context are contained in the dimension table dw_agent.dim_work_contract.'
 owner: 'gustavo.miller@quintoandar.com.br'
 domain: Rede
 columns:
@@ -20,6 +20,18 @@ columns:
     lineage:
       - datalake_rede_company.company_sks.sk_company
     description: Foreign key of the company. Can be joined with dw_rede.dim_company.
+  sk_last_contract_changed_date:
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+    description: Foreign key of the date in which the agent''s contract was last changed. Can be joined with dw_public.dim_date.
+  sk_last_activation_changed_date:
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+    description: Foreign key of the date in which the agent''s activation was last changed. Can be joined with dw_public.dim_date.
+  sk_last_business_context_changed_date:
+    lineage:
+      - datalake_ebdb_agents.agent_coincident_business_contexts.ts_agent_business_context_started
+    description: Foreign key of the date in which the agent''s business context was last changed. Can be joined with dw_public.dim_date.
   sk_status_started_date:
     lineage:
       - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
@@ -34,15 +46,27 @@ columns:
     lineage:
       - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.action
     description: 'Description of what changed between the previous line and the current one. Can be one of these:
-    - REACTIVATED
-    - ACTIVATED
-    - DEACTIVATED
-    - SUSPENDED
-    - UNSUSPENDED
-    - ALTERED_CONTRACT
-    - BUSINESS_CONTEXT_CHANGED'
+      - REACTIVATED
+      - ACTIVATED
+      - DEACTIVATED
+      - SUSPENDED
+      - UNSUSPENDED
+      - ALTERED_CONTRACT
+      - BUSINESS_CONTEXT_CHANGED'
   days_in_status:
     description: Number of days between the start and end of the validity period. Null if the validity period is still ongoing.
+  ts_last_contract_changed:
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+    description: Timestamp of when the agent''s contract was last changed.
+  ts_last_activation_changed:
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+    description: Timestamp of when the agent''s activation was last changed.
+  ts_last_business_context_changed:
+    lineage:
+      - datalake_ebdb_agents.agent_coincident_business_contexts.ts_agent_business_context_started
+    description: Timestamp of when the agent''s business context was last changed.
   ts_status_started:
     lineage:
       - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision

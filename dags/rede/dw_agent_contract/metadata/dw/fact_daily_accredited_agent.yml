@@ -2,11 +2,10 @@
 database_name: dw_agent
 table_name: fact_daily_accredited_agent
 description: 'Periodic snapshot fact table. Every day it registers every contract an agent had. Therefore, if an agent changes contract at the middle of the day,
-the agent will have TWO different rows, one for each contract, at that day.
-If you want the stock view, (i.e., how the agent was at the end of the day), you can filter the table using the flag is_last_status_of_day, resulting
-in a single row per agent with a contract per day.
-Along with the contract, the activation and the business context can also be obtained by joining this table with dw_agent.dim_work_contract.
-'
+  the agent will have TWO different rows, one for each contract, at that day.
+  If you want the stock view, (i.e., how the agent was at the end of the day), you can filter the table using the flag is_last_status_of_day, resulting
+  in a single row per agent with a contract per day.
+  Along with the contract, the activation and the business context can also be obtained by joining this table with dw_agent.dim_work_contract.'
 owner: 'gustavo.miller@quintoandar.com.br'
 domain: Rede
 columns:
@@ -28,8 +27,26 @@ columns:
     description: Foreign key of the company. Can be joined with dw_rede.dim_company.
   allocated_slots:
     description: Number of available slots on that day for the given contract.
+  days_since_last_contract_changed:
+    description: Number of days since the agent''s last contract change.
+  days_since_last_activation_changed:
+    description: Number of days since the agent''s last activation change.
+  days_since_last_business_context_changed:
+    description: Number of days since the agent''s last business context change.
   is_last_status_of_day:
-    description: True only if the row presents the agent's last status of that day. False if the contract has changed at that same day.
+    description: True only if the row presents the agent''s last status of that day. False if the contract has changed at that same day.
+  ts_validity_started:
+    lineage:
+      - dw_agent.fact_agent_contract.ts_status_started
+      - dw_public.dim_date.date
+    description: Timestamp of when the row starts being valid (inclusive).
+  ts_validity_ended:
+    lineage:
+      - dw_agent.fact_agent_contract.ts_status_ended
+      - dw_public.dim_date.date
+    description: Timestamp of when the row stops being valid (exclusive).
+  ts_load:
+    description: Timestamp of when the table was last processed.
   year:
     lineage:
       - dw_public.dim_date.year
@@ -42,5 +59,3 @@ columns:
     lineage:
       - dw_public.dim_date.day
     description: Day of the snapshot.
-  ts_load:
-    description: Timestamp of when the table was last processed.
