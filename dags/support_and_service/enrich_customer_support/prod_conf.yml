@@ -13,3 +13,8 @@ custom_cluster:
     max_workers: 6
   aws_attributes:
     ebs_volume_size: 300
+  spark_conf:
+    spark.databricks.io.cache.maxDiskUsage: 110
+    spark.databricks.io.cache.maxMetaDataCache: 30
+    spark.databricks.io.cache.compression.enabled: false
+    spark.databricks.io.cache.enabled: true

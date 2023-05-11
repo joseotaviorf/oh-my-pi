@@ -21,7 +21,6 @@ CONTEXT = "crm_tasks_history_flows"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2015, 10, 29, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
-CLUSTER_DESCRIPTION = "custom_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -31,7 +30,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-cluster_description = config_service.get_config(CLUSTER_DESCRIPTION)
+cluster_description = config_service.get_config("databricks_10_4_med_general_photon_cluster")
 default_libraries = config_service.get_config("default_libraries")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
