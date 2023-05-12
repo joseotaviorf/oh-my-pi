@@ -498,7 +498,7 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.dw_call:load-dw-call-fact-calls
   - bietlejuice.dw_contract:load-dw-public-dim-contract
   - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
-  - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-buyer-prospect-status
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent

@@ -437,7 +437,7 @@ costs_targets_results_combined AS (
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS budget_rental
     FROM
-        dw_datamarts_cross.lead_listing_flows AS f
+        dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
         ON dl.sk_lead = f.sk_lead
     JOIN dw_public.dim_region AS dr
