@@ -1594,13 +1594,16 @@ bietlejuice.enrich_listing_temp:
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
-bietlejuice.enrich_losses:
+bietlejuice.enrich_losses: #This dag has a table from the DW as dependency
+  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-snapshot
   - bietlejuice.ebdb:create-clean-contract-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_retsuko:load-enrich-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.retsuko:load-clean-invoice
 bietlejuice.enrich_lost_listings:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings

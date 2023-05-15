@@ -1,0 +1,37 @@
+---
+database_name: datalake_losses
+table_name: closing
+description: "Enrich table with the losses model informations for the fact tables"
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
+columns:
+  id_invoice:
+    lineage:
+    - dw_payment_snapshot.dim_invoice_snapshot.sk_invoice
+    description: Id of the invoice. 
+  id_contract:
+    lineage:   
+      - datalake_ebdb_contract.contract.id
+    description: Id of the contract. 
+  is_guarantee_paid:
+    description: Flag to show if the guarantee is paid. 
+  is_before_started:
+    description: Flag to show if the date is before started. 
+  is_before_started_raw:
+    description: Flag to show if the date is before started. 
+  is_canceled_in_dead_time:
+    description: Flag to show if the invoice is canceled in dead time. 
+  is_international:
+    description: Flag to show if the invoice is international.
+  is_paid_in_closing_day:
+    description: Flag to show if the invoice is paid within the closing day.
+  is_writtendown_in_dead_time:
+    description: Flag to show if the invoice is writtendown in the deadtime.
+  dt_closing:
+    lineage:
+      - dw_public.dim_date.month_end
+    description: Last day of the month.
+  dt_snapshot:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.ts_snapshot
+    description: Date of the snapshot.

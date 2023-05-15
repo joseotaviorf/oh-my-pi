@@ -52,6 +52,7 @@ dags_out_of_pattern:
         "dw_user_affiliate",
         "dw_user_sales_rep",
         "ebdb",
+        "enrich_losses",   
         "enrich_lost_listings",
         "enrich_marketing_costs_offline",
         "enrich_nps_reversion",
