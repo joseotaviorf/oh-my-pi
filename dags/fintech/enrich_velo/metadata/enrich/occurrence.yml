@@ -61,6 +61,8 @@ columns:
     description: Date that occurrence is/was due.
     lineage:
       - datalake_velo_clean.fiancavelo_occurrence.dt_due
+  ts_paid:
+    description: Timestamp that the occurrence was completed paid.
   ts_created:
     description: Timestamp that the occurrence was created.
     lineage:

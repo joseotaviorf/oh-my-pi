@@ -69,11 +69,5 @@ columns:
     lineage:
     - datalake_velo.transaction_entries.ts_modified
     description: Moment (timestamp) when the transaction was modified last
-  category_due_amount:
-    description: Amount due of this entry
-  category_paid_amount:
-    description: Amount paid of this entry
-  category_percent_amount:
-    description: Percentage of this entry related to the whole transaction amount
   ts_load:
     description: Moment (timestamp) when the table was last loaded

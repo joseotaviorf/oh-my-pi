@@ -53,6 +53,8 @@ columns:
     description: "Date Due"
     lineage:
       - datalake_trato_feito_clean.installment.dt_due
+  ts_paid_difference:
+    description: "Difference in days between payment date and due date"
   ts_expired:
     description: "Timestamp of expiration"
     lineage:

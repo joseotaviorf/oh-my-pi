@@ -1,61 +1,105 @@
 database_name: datalake_velo
-table_name: transaction
+table_name: transaction_entries
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: Enriched table responsible for the transaction entries (itens in a transaction) for the Velo context.
 columns:
+  id_transaction_entry:
+    description: Transaction entry's identification number (ID)
   id_trasaction:
+    description: Transaction's identification number (ID).
     lineage:
       - datalake_velo_omie.cash_flows.id_securities
   id_category:
+    description: Category's identification number (ID). This key connects to the table datalake_velo.transaction_category
     lineage:
       - datalake_velo_omie.cash_flows.id_category
       - datalake_velo_omie.cash_flows_categories.id_category
   id_propose:
+    description: Propose's identification number (ID). This key connects to the table datalake_velo.propose
     lineage:
       - datalake_velo.propose_person.id_propose
   id_bank_account:
+    description: Bank account's identification number (ID). This key connects to the table datalake_velo.omie_bank_account
     lineage:
       - datalake_velo_omie.cash_flows.id_bank_account
   id_omie_client:
+    description: Omie client's identification number (ID). This key connects to the table datalake_velo.omie_client
     lineage:
       - datalake_velo_omie.cash_flows.id_client
   project:
+    description: Project name on OMIE
     lineage:
       - datalake_velo_omie_clean.projects.project_name
   status:
+    description: Status of the transaction
+    categories:
+      A VENCER: transaction to be due
+      ATRASADO: overdue transaction
+      PAGO: paid transaction
+      RECEBIDO: Receivable transaction
+      VENCE HOJE: transaction that expires today
     lineage:
       - datalake_velo_omie.cash_flows.status
   transaction_type:
+    description: Transaction type
+    categories:
+      CONTA_A_PAGAR: Payable account
+      CONTA_A_RECEBER: Receivable account
     lineage:
       - datalake_velo_omie.cash_flows.id_group
+  transaction_purpose:
+    description: Purpose of transaction
+    categories:
+      ongoing: transaction from an unfinished account
+      rescisão: transaction from an finished account
   installment:
+    description: Wich installment the transaction relates
     lineage:
       - datalake_velo_omie.cash_flows.id_installment
   total_expected_installments:
+    description: Number of total installments expected to be paid by all transactions related to this one
     lineage:
       - datalake_velo_omie.cash_flows.id_installment
+  percent_amount_from_transaction:
+    description: Ratio between the entry due amount by the transaction's total due amount
+    lineage:
+      - datalake_velo_omie.cash_flows_categories.category_percentage
   due_amount:
+    description: Entry's due amount
     lineage:
       - datalake_velo_omie.cash_flows.due_amount
   paid_amount:
+    description: Entry's paid amount
     lineage:
       - datalake_velo_omie.cash_flows.paid_amount
-  percent_amount_from_transaction:
-    lineage:
-      - datalake_velo_omie.cash_flows_categories.category_percentage
+  is_occurrency:
+    description: If this entry is related to a ocurrency
+  is_project_receivable_created:
+    description: Has a transaction receivable created
+  is_project_receivable_greater_than_payable:
+    description: Transaction has the received amount greater than the amount payable
   dt_issue:
+    description: Date when the transaction was issued
     lineage:
       - datalake_velo_omie.cash_flows.dt_issue
   dt_register:
+    description: Date when the transaction was registered
     lineage:
       - datalake_velo_omie.cash_flows.dt_register
   dt_due:
+    description: Transaction due date. Expected date that the transaction will be received in the bank account. For PIX it is instantly, for bank ticket usually takes 1 business day and for credit card takes 30 running days (compared to the bank slip due date)
     lineage:
       - datalake_velo_omie.cash_flows.dt_due
   dt_paid:
+    description: Transaction payment date. It indicates when the transaction was received in the bank account. For PIX it is instantly, for bank ticket usually takes 1 business day and for credit card takes 30 running days
     lineage:
       - datalake_velo_omie.cash_flows.dt_payment
   ts_created:
+    description: Moment (timestamp) when the transaction was created
     lineage:
       - datalake_velo_omie.cash_flows.ts_created
   ts_modified:
+    description: Moment (timestamp) when the transaction was modified last
     lineage:
       - datalake_velo_omie.cash_flows.ts_modified

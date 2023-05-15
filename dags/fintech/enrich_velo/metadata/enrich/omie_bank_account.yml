@@ -1,16 +1,23 @@
 ---
 database_name: datalake_velo
 table_name: omie_bank_account
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: Enriched table responsible for the details of Bank Accounts registered on Velo's Omie systems
 columns:
   id_bank_account:
+    description: Table's unique ID.
     lineage:
       - datalake_velo_omie_clean.bank_account.id_account
   description:
+    description: Description of the bank account
     lineage:
       - datalake_velo_omie_clean.bank_account.description
   bank_account_number:
+    description: Bank Account Number informations
     lineage:
       - datalake_velo_omie_clean.bank_account.bank_account_number
   is_active:
+    description: Boolean flag if account is active on Omie
     lineage:
       - datalake_velo_omie_clean.bank_account.is_inactive
