@@ -1,6 +1,6 @@
 ---
 database_name: datalake_listing_temp
-table_name: lbc_house_listing
+table_name: dim_house_listing_lbc
 description: Information related to ForRent listings. Each line is an unique listing 
   related to a house. The tuple [id_house_listing, id_house] must be unique.
 domain: For Rent
