@@ -1,8 +1,9 @@
 database_name: dw_rent
 table_name: fact_rent_demand_events
-description: This table shows the demand events of For Rent, each line is the most recent update of an event related to the scope.
+description: This factless table is related to the demand events of For Rent, used to stablish event trackings relations.
+  Each line is the most recent update of an event related to the scope.
 domain: For Rent
-owner: felipe.chies@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   pk_rent_demand_event:
     lineage:
@@ -70,18 +71,6 @@ columns:
     lineage:
     - datalake_rent_demand_event.rent_demand_event.country_code
     description: Country code information.
-  year:
-    lineage:
-    - datalake_rent_demand_event.rent_demand_event.year
-    description: Year information of the event date.
-  month:
-    lineage:
-    - datalake_rent_demand_event.rent_demand_event.month
-    description: Month information of the event date.
-  day:
-    lineage:
-    - datalake_rent_demand_event.rent_demand_event.day
-    description: Day information of the event date.
   ts_load:
     description: Load date.
     

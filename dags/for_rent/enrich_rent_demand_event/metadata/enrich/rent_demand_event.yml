@@ -1,7 +1,7 @@
 ---
 database_name: datalake_rent_demand_event
 table_name: rent_demand_event 
-description: This table shows the demand events of For Rent, each line is an event related to the scope.
+description: This table shows the demand events of For Rent, each line is an event related to the scope and its partitioned by the country_code.
 domain: For Rent
 owner: isadora.gallerani@quintoandar.com.br
 columns:
@@ -84,12 +84,12 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_listing.house.country_code
-    description: Country code information.
+    description: Country code information. Also, a partition of the table.
   year:
     description: Year information of the date.
   month:
     description: Month information of the date.
   day:
     description: Day information of the date.
-  ts_updated:
+  ts_event_load_updated:
     description: Load date.

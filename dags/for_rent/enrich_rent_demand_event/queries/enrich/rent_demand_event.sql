@@ -81,9 +81,6 @@ rent_demand_events AS (
   WHERE 
     bk.type = 'Visita'
     AND bk.ts_created IS NOT NULL
-    AND YEAR(ts_created) = {year} 
-    AND MONTH(ts_created) = {month} 
-    AND DAY(ts_created) = {day}
   UNION ALL
   SELECT --visits_completed 
     bk.id AS id_event,
@@ -117,9 +114,6 @@ rent_demand_events AS (
           'VisitouSozinho',
           'Talvez')
     AND bk.dt_booking IS NOT NULL
-    AND YEAR(dt_booking) = {year} 
-    AND MONTH(dt_booking) = {month} 
-    AND DAY(dt_booking) = {day}
   UNION ALL
   SELECT --offer_submitted 
     off.id_offer_context AS id_event,
@@ -178,9 +172,6 @@ rent_demand_events AS (
   WHERE 
     off.status = 'Aprovada'
     AND ts_analyzed IS NOT NULL
-    AND YEAR(ts_analyzed) = {year} 
-    AND MONTH(ts_analyzed) = {month}
-    AND DAY(ts_analyzed) = {day}
   UNION ALL
   SELECT --evaluation_started
     pp.id AS id_event,
@@ -211,9 +202,6 @@ rent_demand_events AS (
       ON rf.id_proposal = pp.id
   WHERE 
     pp.ts_credit_evaluation_first_init IS NOT NULL
-    AND YEAR(ts_credit_evaluation_first_init) = {year} 
-    AND MONTH(ts_credit_evaluation_first_init) = {month}
-    AND DAY(ts_credit_evaluation_first_init) = {day}
   UNION ALL
   SELECT --evaluation_positive
     pp.id AS id_event,
@@ -244,9 +232,6 @@ rent_demand_events AS (
       ON rf.id_proposal = pp.id
   WHERE 
     pp.ts_first_credit_evaluation_positive IS NOT NULL
-    AND YEAR(ts_first_credit_evaluation_positive) = {year} 
-    AND MONTH(ts_first_credit_evaluation_positive) = {month}
-    AND DAY(ts_first_credit_evaluation_positive) = {day}
   UNION ALL
   SELECT --document_sent
     pp.id AS id_event,
@@ -279,9 +264,6 @@ rent_demand_events AS (
     pp.has_tenant_sent_documentation = TRUE
     AND (pp.ts_tenant_auto_first_doc_sent IS NOT NULL
       OR pp.ts_tenant_first_doc_sent IS NOT NULL)
-    AND YEAR(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) = {year} 
-    AND MONTH(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) = {month}
-    AND DAY(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) = {day}
   UNION ALL
   SELECT --credit_approved 
     pp.id AS id_event,
@@ -312,9 +294,6 @@ rent_demand_events AS (
       ON rf.id_proposal = pp.id
   WHERE 
     pp.ts_credit_approved_last IS NOT NULL
-    AND YEAR(ts_credit_approved_last) = {year} 
-    AND MONTH(ts_credit_approved_last) = {month}
-    AND DAY(ts_credit_approved_last) = {day}
   UNION ALL
   SELECT --contract_signed
     ct.id AS id_event,
@@ -348,9 +327,6 @@ rent_demand_events AS (
       ON rf.id_contract = ct.id
   WHERE 
     ct.ts_signed IS NOT NULL
-    AND YEAR(ts_signed) = {year} 
-    AND MONTH(ts_signed) = {month}
-    AND DAY(ts_signed) = {day}
 )
 SELECT
   id_event,
@@ -371,6 +347,6 @@ SELECT
   year,
   month,
   day,
-  NOW() AS ts_updated
+  NOW() AS ts_event_load_updated
 FROM
   rent_demand_events     

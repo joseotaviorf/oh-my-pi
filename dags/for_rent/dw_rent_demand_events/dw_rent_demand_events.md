@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This DAG loads to DW the fact table for the rent demand events: fact_rent_demand_events. And the dim table used to map the funnel events: dim_rent_event_type
+This DAG loads to DW the models related to rent demand events on schema `dw_rent`.
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -12,7 +12,7 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 ### Outputs
 
-This pipeline produces the following output table in DW, via full load :
+This pipeline produces the following output tables in DW, via full load on `dw_rent` schema:
 
-- `dw_rent.fact_rent_demand_events`
 - `dw_rent.dim_rent_event_type`
+- `dw_rent.fact_rent_demand_events`
