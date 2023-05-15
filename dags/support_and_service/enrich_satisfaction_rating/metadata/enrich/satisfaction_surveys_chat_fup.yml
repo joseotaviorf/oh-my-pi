@@ -12,8 +12,6 @@ columns:
       - datalake_chat_fup_clean.surveys_answer.id
   id_survey:
     description: Unique identifier of the satisfaction survey.
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.id_survey
   id_contract:
     description: Identifier of the contract linked to the satisfaction response.
     lineage:

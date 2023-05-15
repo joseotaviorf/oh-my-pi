@@ -2,6 +2,7 @@ WITH zendesk_tickets_unique AS (
     --this CTE fix the error of multiple tickets openned for a single call
   SELECT
       tfm.id_call,
+      MAX(tfm.id_zendesk_requester_user) AS id_respondent,
       MAX(tfm.id_ticket) AS id_ticket,
       MAX(tfm.id_contract) AS id_contract
   FROM
@@ -14,6 +15,7 @@ SELECT
     MD5(CONCAT(cie.id_call, MAX(cie.ts_created_local))) AS id_answer,
     tfm.id_contract,
     tfm.id_ticket,
+    tfm.id_respondent,
     'customer support' AS service_type,
     'call' AS service_context,
     'bigfone' AS source_name,
@@ -40,4 +42,4 @@ WHERE
     AND cie.year = {year}
     AND cie.month = {month}
     AND cie.day = {day}
-GROUP BY cie.id_call, 2, 3, 4, 5, 6, 8, 10, 12, 13, 14
+GROUP BY cie.id_call, 2, 3, 4, 5, 6, 7, 9, 11, 13, 14, 15

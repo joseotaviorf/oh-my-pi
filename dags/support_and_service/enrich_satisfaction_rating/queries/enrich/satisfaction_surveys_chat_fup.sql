@@ -1,7 +1,6 @@
 WITH chat_fup_surveys AS (
     SELECT
         r.id_rating AS id_answer,
-        NULL AS id_survey,
         NULL AS id_ticket,
         r.id_user AS id_respondent,
         NULL AS respondent_email,
@@ -28,7 +27,6 @@ WITH chat_fup_surveys AS (
     UNION ALL
     SELECT DISTINCT
         sa.id AS id_answer,
-        sa.id_survey,
         cc.id_ticket,
         NULL AS id_respondent,
         cc.customer_email AS respondent_email,
@@ -44,7 +42,7 @@ WITH chat_fup_surveys AS (
           WHEN sa.is_solved IS FALSE THEN 1
         END AS secondary_satisfaction_score,
         "resolution survey" AS secondary_score_description,
-        TO_JSON(NAMED_STRUCT('id_chat', ss.id_chat, "attendant_email", cc.attendant_email)) AS custom_attributes,
+        TO_JSON(NAMED_STRUCT('id_survey', sa.id_survey, 'id_chat', ss.id_chat, "attendant_email", cc.attendant_email)) AS custom_attributes,
         sa.ts_created AS ts_submitted,
         YEAR(sa.ts_updated) AS year,
         MONTH(sa.ts_updated) AS month,
@@ -63,7 +61,7 @@ WITH chat_fup_surveys AS (
 )
 SELECT DISTINCT
     cfs.id_answer,
-    COALESCE(cfs.id_survey, MD5(cfs.source_name)) AS id_survey,
+    MD5(cfs.source_name) AS id_survey,
     tfm.id_contract,
     cfs.id_ticket,
     COALESCE(cfs.id_respondent, zuc.id_user) AS id_respondent,

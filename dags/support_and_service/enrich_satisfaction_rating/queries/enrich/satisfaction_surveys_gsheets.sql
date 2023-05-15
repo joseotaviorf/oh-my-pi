@@ -148,22 +148,13 @@ WITH gsheets_surveys AS (
         datalake_gsheets_clean.csat_reimbursement_true
     WHERE
         DATE(ts_submitted) = DATE('{year}-{month}-{day}')
-),
-users AS (
-  SELECT
-    id AS id_user,
-    LOWER(email) AS email
-  FROM
-    datalake_ebdb_user.user u
-  QUALIFY
-    ts_updated = FIRST(ts_updated) OVER(PARTITION BY LOWER(email) ORDER BY ts_updated DESC)
 )
 SELECT DISTINCT
-    MD5(CONCAT(gs.id_contract, gs.source_name, gs.survey_name, gs.ts_submitted)) AS id_answer,
+    MD5(CONCAT(COALESCE(gs.id_contract, ''), gs.source_name, gs.survey_name, COALESCE(gs.ts_submitted, ''))) AS id_answer,
     MD5(CONCAT(gs.source_name, gs.survey_name)) AS id_survey,
     gs.id_contract,
-    COALESCE(gs.id_respondent, u.id_user) AS id_respondent,
-    COALESCE(gs.respondent_email, u.email) AS respondent_email,
+    gs.id_respondent,
+    gs.respondent_email,
     gs.respondent_type,
     gs.service_type,
     gs.service_context,
@@ -182,7 +173,3 @@ SELECT DISTINCT
     gs.day
 FROM
     gsheets_surveys AS gs
-LEFT JOIN
-    users u
-        ON u.email = LOWER(gs.respondent_email)
-        OR u.id_user = gs.id_respondent

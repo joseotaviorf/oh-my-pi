@@ -34,7 +34,6 @@ columns:
     description: Identifier of the person who answered the form.
     lineage:
       - datalake_gsheets_clean.tenant_reimbursement_csat.id_user
-      - datalake_ebdb_user.user.id
   respondent_email:
     description: Email of the person who answered the form.
     lineage:
@@ -42,7 +41,6 @@ columns:
       - datalake_gsheets_clean.tenant_exit_inspection_csat.email
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.email
       - datalake_gsheets_clean.owner_entrance_inspection_csat.email
-      - datalake_ebdb_user.user.email
   respondent_type:
     description: Position which the respondent assumed when filling out the form. It can be a tenant, landlord, the attendant itself, or other service providers.
   service_type:
