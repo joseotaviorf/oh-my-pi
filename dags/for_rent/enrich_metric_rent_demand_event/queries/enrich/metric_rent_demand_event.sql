@@ -8,7 +8,7 @@ SELECT
   dr.city_group,
   dp.guarantee,
   CASE 
-    WHEN MONTH(TO_DATE(sk_event_date, 'yyyyMMdd')) <= 6 THEN 1
+    WHEN MONTH(TO_DATE(CAST(sk_event_date AS STRING), 'yyyyMMdd')) <= 6 THEN 1
     ELSE 2
   END AS halfyear,
   dhl.listing_category_start,
