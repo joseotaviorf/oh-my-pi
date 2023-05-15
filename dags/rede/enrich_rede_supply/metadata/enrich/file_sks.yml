@@ -1,7 +1,13 @@
 ---
 database_name: datalake_rede_supply
 table_name: file_sks
+description: 'Generates surrogate keys for files from Supply Processor.'
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
 columns:
+  sk_file:
+    description: 'Surrogate key for the file, generated incrementally.'
   id_file:
     lineage:
       - datalake_brokers_supply_processor.file.id
+    description: Natural key of the file, which comes from Supply Processor.

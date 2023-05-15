@@ -5,6 +5,8 @@ domain: Rede
 owner: gustavo.miller@quintoandar.com.br
 description: 'Unifies all events of lead 3p status changes associated with the business context, calculating everything that CAN be incremental.'
 columns:
+  id_status_change:
+    description: 'Unique identifier of the status change.'
   id_lead_3p:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p_aud.id
@@ -43,6 +45,14 @@ columns:
       - datalake_ebdb_clean.listing_business_context_aud.status
       - datalake_ebdb_clean.listing_business_context_aud.status_closing
     description: 'Status of the listing'
+  has_owner_info:
+    description: 'Whether the lead has owner information at the time of the event'
+  is_waiting_for_enrichment:
+    description: 'Whether the lead is waiting for enrichment at the time of the event'
+  is_ineligible:
+    description: 'Whether the lead is ineligible at the time of the event'
+  is_discarded:
+    description: 'Whether the lead is discarded at the time of the event'
   ts_status_started:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p_aud.ts_updated
@@ -63,3 +73,5 @@ columns:
       - datalake_brokers_supply_processor_clean.lead_3p_aud.day
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: 'Day of when the status started'
+  ts_load:
+    description: 'Timestamp of when the row was loaded in the table.'

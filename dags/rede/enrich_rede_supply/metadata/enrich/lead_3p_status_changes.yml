@@ -46,6 +46,16 @@ columns:
       NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
       PUBLISHED: 'Published in Main'
       UNPUBLISHED: 'Unpublished from Main'
+  growth_status:
+    description: 'Status of the lead in the growth funnel.'
+    categories:
+      LEAD: First stage. The lead was just created, but was not approved in the eligibility analysis.
+      PROSPECT: Second stage. The lead was approved in the eligibility analysis.
+      QUALIFIED: Third stage. The real estate agency provided information about the owner of the prospect, but it was not approved in analyisis.
+      OPPORTUNITY: Fourth stage. A qualified lead that was sent to image processing.
+      FIRST_LISTING: Fifth and final stage. The opportunity was approved, and registered in Main for publication.
+  days_in_status:
+    description: 'Number of days the lead stayed in the status. Null if the status is still ongoing.'
   is_waiting_for_enrichment:
     lineage:
       - datalake_rede_supply.simplified_lead_3p_status_changes.is_waiting_for_enrichment
@@ -53,7 +63,7 @@ columns:
   is_ineligible:
     lineage:
       - datalake_rede_supply.simplified_lead_3p_status_changes.is_ineligible
-    description: 'True if the lead is not converted at this point due to an inegibility reason.'
+    description: 'True if the lead is not converted at this point due to an ineligibility reason.'
   is_discarded:
     lineage:
       - datalake_rede_supply.simplified_lead_3p_status_changes.is_discarded

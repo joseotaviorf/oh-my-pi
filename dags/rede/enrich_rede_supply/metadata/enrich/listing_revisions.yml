@@ -1,32 +1,53 @@
 ---
 database_name: datalake_rede_supply
 table_name: listing_revisions
+description: Updates or depublications of Rede ForSale listings.
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
 columns:
   id_house:
     lineage:
       - datalake_ebdb_listing.house.id
+    description: 'ID of the house in Main.'
   id_company_hubspot:
     lineage:
       - datalake_ebdb_listing.house.id_company_hubspot
+    description: 'ID of the real estate agency in Hubspot.'
   id_user:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user
+    description: 'ID of the user who made the revision.'
+  event_type:
+    description: 'Type of revision event.'
+    categories:
+      LISTING_UNPUBLISHED: 'Listing unpublished.'
+      HOUSE_UPDATED: 'House updated.'
   user_email:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.email
+    description: 'Email of the user who made the revision.'
   partner_3p_supply:
     lineage:
       - datalake_ebdb_listing.house.partner_3p_supply
+    description: 'Short name of the real estate agency.'
   revision_reason:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.reason
+    description: 'Reason for the revision.'
   status_reason:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.status_reason
+    description: 'Reason for the status change.'
   rev:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.rev
       - datalake_ebdb_clean.house_aud.rev
+    description: 'Revision number.'
+  is_manual:
+    description: True if the revision was made by a user.
+  is_mass_update:
+    description: True if more than one house was updated by the same revision.
   ts_revision:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: 'Timestamp of the revision.'

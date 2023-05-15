@@ -52,6 +52,15 @@ columns:
     lineage:
       - datalake_rede_supply.lead_3p_status_changes.growth_status
     description: 'Growth status of the lead when the validity of this reason ended.'
+  days_in_reason:
+    description: How many days between reason started and reason ended, rounded down.
+      Null if the reason has not ended.
+  is_ineligible_reason:
+    description: 'True if the reason is an ineligible reason.'
+  is_discard_reason:
+    description: 'True if the reason is a discard reason.'
+  is_enrichment_reason:
+    description: 'True if the reason is an enrichment reason.'
   is_waiting_for_enrichment_when_reason_started:
     lineage:
       - datalake_rede_supply.lead_3p_status_changes.is_waiting_for_enrichment
@@ -76,6 +85,10 @@ columns:
     lineage:
       - datalake_rede_supply.lead_3p_status_changes.is_discarded
     description: 'True if the lead was discarded when the validity of this reason ended.'
+  is_requirement_met:
+    description: True exclusively if the reason has ended because the requirement
+      has been met. For example, if there was an enrichment reason for poor quality
+      photos, and the real estate agency sent new ones with better quality.
   ts_reason_started:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p_aud.ts_updated
@@ -84,5 +97,10 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p_aud.ts_updated
       - datalake_rede_supply.lead_3p_status_changes.ts_status_started
-    description: 'Timestamp of when the reason ended. This can be either due to the requisite being fulfilled, or (in case of enrichment reasons) the lead was discarded
-    or considered ineligible afterwards.'
+    description: 'Timestamp for when the reason ended. This can happen for two reasons:
+      1. The requirement has been met and the condition does not apply anymore. 2.
+      It is an enrichment reason, but the lead has been discarded or considered ineligible,
+      so it makes no sense to wait for enrichment. To differentiate between the two,
+      consult the flag is_requirement_met.'
+  ts_load:
+    description: 'Timestamp of when the row was loaded in the table.'
