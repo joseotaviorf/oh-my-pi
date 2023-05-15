@@ -27,6 +27,14 @@ data-growth:
 data-international:
   - "**/dags/benvi/**"
 data-ingestion:
+  - "**/bietlejuice/base/airflow/**"
+  - "**/bietlejuice/base/athena/**"
+  - "**/bietlejuice/base/hive/**"
+  - "**/bietlejuice/base/service/**"
+  - "**/bietlejuice/base/spark/**"
+  - "**/bietlejuice/loaders/**"
+  - "**/bietlejuice/metastore_pipeline/**"
+  - "**/bietlejuice/pipeline/**"
   - "**/dags/platform/**"
 data-rede:
   - "**/dags/rede/**"
