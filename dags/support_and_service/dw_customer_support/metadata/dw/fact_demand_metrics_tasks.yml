@@ -142,3 +142,5 @@ columns:
     description: The task closed date.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.ts_closed
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_customer_support.

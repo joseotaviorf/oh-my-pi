@@ -1,5 +1,10 @@
 database_name: datalake_customer_support
 table_name: csat
+description:
+  The customer support CSAT table consolidates all CSAT answers from tickets across
+  chat, call, and email channels.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_ticket:
     lineage:
@@ -7,27 +12,55 @@ columns:
       - datalake_zendesk_tickets_clean.tickets.id_ticket
       - datalake_survicate.surveys.id_ticket
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_ticket
+    description:
+      This unique identifier for Zendesk Tickets considers all tickets that have a chat
+      survey, email survey, or call survey associated with them. In the case of call
+      tickets, it considers the last ticket created for a specific Twilio Call ID.
+  channel:
+    description:
+      The ticket channel indicates the method by which the customer contacted support
+      and can be classified as either "chat", "call", or "email".
   csat_comment:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.comment
       - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
       - datalake_survicate.surveys.user_comment
+    description:
+      This field contains the comment provided by the customer in response to the first
+      CSAT question of the survey. Note that for surveys originating from the Bigfone
+      source, this field will have a null value.
+  source:
+    description:
+      This field indicates the source of the CSAT score and can have different values
+      depending on the ticket channel.
+    categories:
+      chat_fup: For chat tickets.
+      zendesk: For email tickets.
+      survicate: For email ticket.
+      bigfone: For call tickets.
   resolution_survey:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.is_solved
       - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
       - datalake_survicate.surveys.is_solved
       - datalake_bigfone_twilio.call_ivr_events.csat_1
+    description: This boolean value indicates whether the ticket has been solved or not.
   csat_score:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.rating
       - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
       - datalake_survicate.surveys.csat_score
       - datalake_bigfone_twilio.call_ivr_events.csat_2
+    description:
+      This field represents the CSAT score or rating for the respective chat and
+      considers the last CSAT score received (rated from 1 to 5).
   ts_survey:
     lineage:
       - datalake_chat_fup_clean.surveys_survey.ts_created
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+    description:
+      Timestamp indicating when the survey was created. If this information is not
+      available, the field will be null.
   ts_response:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.ts_created
@@ -35,5 +68,6 @@ columns:
       - datalake_zendesk_tickets_clean.tickets.id_ticket
       - datalake_survicate.surveys.ts_first_response
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      
-    
+    description:
+      Timestamp indicating when the user answered the survey. If this information is not
+      available, the field will be null.

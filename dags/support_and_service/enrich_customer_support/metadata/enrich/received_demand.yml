@@ -1,93 +1,161 @@
 database_name: datalake_customer_support
 table_name: received_demand
-description: Enrich table that contains data from Twilio Flex table. It has data from
-  Call, Chat and Email channels. Each row is a received demand.
+description:
+  Enrich table that contains data from Twilio Flex table. It has data from
+  Call, Chat and Email channels. Each row is a received demand. For chat and call,
+  it uses Twilio Events IDs created for Tasks that were sent to an assigned queue
+  and waiting for acceptance. For email, it considers all the Zendesk E-mail Tickets.
 domain: Support and Service
-owner: kleber.inoue@quintoandar.com.br
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_external_service:
     lineage:
-    - datalake_bigfone_twilio.call_flex_events.id_task
-    - datalake_quinto_messenger_clean.task_event.id_task_external
-    - datalake_customer_support.email.id_ticket
-    description: Segment ID of Twilio Flex platform. Each ID is a demand, it's not
-      unique because a demand can have multiples demands when there is a transfer
+      - datalake_bigfone_twilio.call_flex_events.id_task
+      - datalake_quinto_messenger_clean.task_event.id_task_external
+      - datalake_customer_support.email.id_ticket
+    description:
+      Segment ID of Twilio Flex platform. Each ID is a demand, it's not unique because
+      a demand can have multiples demands when there is a transfer. In the case of chat
+      and call channels, the received demand is identified by the Twilio Task ID,
+      whereas the email channel is identified by the Zendesk Ticket ID. For call tasks,
+      it considers all inbound tasks, whereas for chat tasks, it takes into account
+      all tasks that have generated a reservation. Similarly, for email, all Zendesk
+      E-mail Tickets are considered.
   id_channel:
     lineage:
-    - datalake_bigfone_twilio.call_flex_events.metadata
-    - datalake_quinto_messenger_clean.task_event.event_payload
-    description: ID channel of the contact
+      - datalake_bigfone_twilio.call_flex_events.metadata
+      - datalake_quinto_messenger_clean.task_event.event_payload
+    description:
+      The Twilio Channel ID is associated with Twilio Tasks and is NULL for Zendesk
+      E-mail Tickets. In the case of chat channels, the Channel ID identifies a
+      unique conversation between one or more participants. Similarly, for call
+      channels, the Channel ID represents a distinct voice call conversation involving
+      one or more participants.
   id_task_queue:
     lineage:
-    - datalake_bigfone_twilio.call_flex_events.id_task_queue
-    - datalake_quinto_messenger_clean.task_event.event_payload
-    description: ID of the task_queue_name
+      - datalake_bigfone_twilio.call_flex_events.id_task_queue
+      - datalake_quinto_messenger_clean.task_event.event_payload
+    description:
+      In Twilio, a queue is a holding area for tasks that are waiting to be assigned to
+      workers for processing, and it is identified by a unique identifier called
+      Queue SID. Typically, the name of the queue corresponds to the department for
+      which the task reservation is intended to be routed. However, for Zendesk E-mail
+      Tickets, the Queue SID field is NULL since they are not routed to a queue
+      in Twilio.
   id_reservation:
     lineage:
-    - datalake_bigfone_twilio.call_flex_events.id_reservation
-    - datalake_quinto_messenger_clean.task_event.event_payload
-    description: ID of the reservation, a new reservation created when the demand
-      is transfered. So one demand can have multiples reservations
+      - datalake_bigfone_twilio.call_flex_events.id_reservation
+      - datalake_quinto_messenger_clean.task_event.event_payload
+    description:
+      In Twilio, a Reservation ID is a unique identifier that represents a worker's
+      acceptance of a task, either for a chat or a call. It is generated when a worker
+      accepts a task and is used to track the task's status and outcome. The Reservation
+      ID is specific to the worker and the task they have accepted, and it is used to
+      identify the task and any related events, such as completion or cancellation.
+      For calls and chats, only accepted reservations are considered, while for Zendesk
+      E-mail Tickets, this field is null. A new reservation created when the demand
+      is transfered. So one demand can have multiples reservations.
   id_agent:
     lineage:
-    - datalake_bigfone_twilio.call_flex_events.id_agent
-    - datalake_quinto_messenger_clean.task_event.event_payload
-    description: ID of the agent that answered the customer
+      - datalake_bigfone_twilio.call_flex_events.id_agent
+      - datalake_quinto_messenger_clean.task_event.event_payload
+    description:
+      For tasks handledTwilio, the Agent ID is a unique identifier assigned to the
+      agent responsible for handling the task. It is not applicable for
+      Zendesk E-mail Tickets.
   id_event:
     lineage:
-    - datalake_bigfone_twilio.call_flex_events.id_event
-    - datalake_quinto_messenger_clean.task_event.event_payload
-    description: Event ID of the demand
+      - datalake_bigfone_twilio.call_flex_events.id_event
+      - datalake_quinto_messenger_clean.task_event.event_payload
+    description:
+      For tasks handled by Twilio, the Agent ID is a unique identifier assigned to the
+      agent responsible for handling the task. It is not applicable for Zendesk
+      E-mail Tickets.
   id_call:
     lineage:
-    - datalake_bigfone_twilio.call_flex_events.id_call
-    description: ID of the call that generated a demand
+      - datalake_bigfone_twilio.call_flex_events.id_call
+    description:
+      The Twilio call ID is a unique identifier that represents a single phone call
+      initiated on the Twilio platform. When a call is made, it can be routed to
+      available agents or workers, and a corresponding task is created to represent the
+      incoming call. The task is then assigned to one or more workers, and a reservation
+      is generated for each worker who is considered for the task. For the purpose of
+      our analysis, we only consider call IDs associated with reservations that have
+      been accepted, and exclude Zendesk E-mail Tickets and Twilio Chat Tasks.
   id_user:
     lineage:
-    - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
-    - datalake_customer_support.email.id_user
-    description: ID of the user that generated the demand
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
+      - datalake_customer_support.email.id_user
+    description:
+      The user unique identifier is used to associate the customer or ticket requester
+      with their respective call or chat tasks. For call and chat tasks, the
+      customer's phone number serves as their unique identifier, while for Zendesk
+      E-mail Tickets, the unique identifier is the ticket requester.
   task_queue_name:
     lineage:
-    - datalake_bigfone_twilio.call_flex_events.task_queue_name
-    - datalake_quinto_messenger_clean.task_event.event_payload
-    - datalake_customer_support.email.department
-    description: Department name of the demand
-  agent_email:
-    lineage:
-    - datalake_bigfone_twilio.call_flex_events.id_task_external
-    - datalake_quinto_messenger_clean.task_event.event_payload
-    - datalake_customer_support.email.agent_email
-    description: Email of the agent that answered the customer
-  agent_location:
-    lineage:
-    - datalake_bigfone_twilio.call_flex_events.agent_email
-    - datalake_quinto_messenger_clean.task_event.event_payload
-    - datalake_customer_support.email.agent_company
-    description: Company that the agent works at
-  customer_phone:
-    lineage:
-    - datalake_bigfone_twilio.call_flex_events.customer_phone
-    - datalake_quinto_messenger_clean.task_event.event_payload
-    description: Phone number of the customer
-  ts_created:
-    lineage:
-    - datalake_bigfone_twilio.call_flex_events.ts_created_local
-    - datalake_quinto_messenger_clean.task_event.ts_created
-    - datalake_customer_support.email.ts_ticket_started
-    description: Timestamp of the ticket's creation in UTC-3
-  ts_updated:
-    lineage:
-    - datalake_quinto_messenger_clean.task_event.ts_updated
-    description: Timestamp of the ticket's update
+      - datalake_bigfone_twilio.call_flex_events.task_queue_name
+      - datalake_quinto_messenger_clean.task_event.event_payload
+      - datalake_customer_support.email.department
+    description:
+      The department name for a Twilio task is defined as the queue name, while for
+      Zendesk E-mail Tickets, it is the group name associated with the ticket.
   channel_name:
     description: Channel name which customer got in touch with 5A
     categories:
-      call: channel_name receives this value when the customer get in touch with call
+      call:
+        channel_name receives this value when the customer get in touch with call
         method
-      chat: channel_name receives this value when the customer get in touch with chat
+      chat:
+        channel_name receives this value when the customer get in touch with chat
         method
-      email: channel_name receives this value when the customer get in touch with
+      email:
+        channel_name receives this value when the customer get in touch with
         email method
+  agent_email:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.id_task_external
+      - datalake_quinto_messenger_clean.task_event.event_payload
+      - datalake_customer_support.email.agent_email
+    description: The agent email.
+  agent_location:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.agent_email
+      - datalake_quinto_messenger_clean.task_event.event_payload
+      - datalake_customer_support.email.agent_company
+    description: The agent location, which is the company name.
+  customer_phone:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.customer_phone
+      - datalake_quinto_messenger_clean.task_event.event_payload
+    description: The user customer phone. It is NULL for Zendesk E-mail Tickets.
   is_answered:
-    description: If the demand was answered
+    description:
+      The status of the demand, whether it was answered or not, is determined
+      differently based on the channel. For call, the Twilio Reservation ID is
+      considered to determine if the demand was accepted by a worker or not.
+      For chat, the demand is considered answered if the corresponding Event Task
+      has a conversation_measure_1 attribute NOT NULL. The conversation measure 1
+      indicates the time elapsed between the moment the task was assigned to a worker
+      and the moment the worker accepted the task and started working on it.
+      This metric is also known as the "acceptance time" or "task acceptance time".
+      It is used to track how quickly workers are able to start working on tasks once
+      they are assigned to them, which can help optimize workflows and improve customer
+      satisfaction. For Zendesk E-mail Tickets, the demand is always considered answered.
+  ts_created:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+      - datalake_quinto_messenger_clean.task_event.ts_created
+      - datalake_customer_support.email.ts_ticket_started
+    description:
+      For Twilio Events, the creation timestamp represents the date and time when the
+      event was created. For Zendesk E-mail Tickets, the creation timestamp corresponds
+      to the ticket creation date in UTC-3.
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_updated
+    description:
+      For Twilio chat tasks, the Twilio Event is updated when there is a change in
+      the chat conversation, such as a new message being sent or a participant joining
+      or leaving the chat. However, for email and call channels, there are no updates
+      to the event after it is created. In the case of Zendesk E-mail Tickets, the
+      creation date represents the only time stamp available.

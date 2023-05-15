@@ -129,3 +129,5 @@ columns:
       in America/Sao_Paulo timestamp.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.ts_completed
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_customer_support.
