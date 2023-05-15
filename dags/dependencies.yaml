@@ -2335,6 +2335,8 @@ bietlejuice.metric_rent_benvi__supply:
 bietlejuice.regions_polygon:
   - bietlejuice.ebdb:create-clean-polygon-region-in-data-lake
   - bietlejuice.enrich_region:load-enrich-region
+bietlejuice.reverse_app_installed:
+  - bietlejuice.enrich_app_installed:load-enrich-user-app-installed-event
 bietlejuice.reverse_atento:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
