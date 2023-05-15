@@ -22,6 +22,7 @@ MAIN_START_DATE = datetime(2021, 12, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 CONTEXT = "sale_lead_flows"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+DAG_OWNER = DAGOwnerEnum.DATA_FOR_SALE
 
 ENV = os.environ.get("ENVIRONMENT")
 
@@ -34,6 +35,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+dag_documentation = config_service.get_config("dag_documentation")
 
 inner_dependencies = config_service.get_config("inner_dependencies")
 
@@ -49,14 +51,17 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_SALE,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=DAG_NAME,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        dag_owner=DAG_OWNER,
     ),
 )
 
