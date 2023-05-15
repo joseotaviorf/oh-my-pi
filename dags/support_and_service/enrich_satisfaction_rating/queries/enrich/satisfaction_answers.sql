@@ -168,8 +168,8 @@ SELECT
     usa.id_survey,
     usa.id_contract,
     usa.id_ticket,
-    COALESCE(usa.id_respondent, u.id_user) AS id_respondent,
-    COALESCE(usa.respondent_email, u.email) AS respondent_email,
+    COALESCE(usa.id_respondent, ue.id_user) AS id_respondent,
+    COALESCE(usa.respondent_email, ui.email) AS respondent_email,
     usa.respondent_type,
     usa.service_type,
     usa.service_context,
@@ -190,6 +190,8 @@ SELECT
 FROM
     union_surveys_answers AS usa
 LEFT JOIN
-    users AS u
-        ON u.email = LOWER(usa.respondent_email)
-        OR u.id_user = usa.id_respondent
+    users AS ue
+        ON ue.email = LOWER(usa.respondent_email)
+LEFT JOIN
+    users AS ui
+        ON ui.id_user = usa.id_respondent
