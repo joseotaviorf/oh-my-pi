@@ -1,0 +1,28 @@
+---
+database_name: datalake_gsheets_clean
+table_name: test_data_analytics_training_quiz_1
+columns:
+  date:
+    lineage:
+      - datalake_gsheets_raw.test_data_analytics_training_quiz_1.date
+  email:
+    lineage:
+      - datalake_gsheets_raw.test_data_analytics_training_quiz_1.email
+  points:
+    lineage:
+      - datalake_gsheets_raw.test_data_analytics_training_quiz_1.points
+  question_1:
+    lineage:
+      - datalake_gsheets_raw.test_data_analytics_training_quiz_1.question_1
+  question_2:
+    lineage:
+      - datalake_gsheets_raw.test_data_analytics_training_quiz_1.question_2
+  question_3:
+    lineage:
+      - datalake_gsheets_raw.test_data_analytics_training_quiz_1.question_3
+  line:
+    lineage:
+      - datalake_gsheets_raw.test_data_analytics_training_quiz_1.line
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.test_data_analytics_training_quiz_1.ts_load

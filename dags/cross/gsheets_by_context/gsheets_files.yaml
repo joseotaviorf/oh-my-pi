@@ -1693,6 +1693,30 @@ domain_management_metrics:
     clean_table_name: domain_management_metrics
     sheet_context: general
 
+test_data_analytics_training_quiz_1:
+    sheet_id: 1juXa5RunGJW8Pwrv9NBihL6ZgAeZHQtQePPZvDDKnPI
+    sheet_name: quiz_1
+    clean_table_name: test_data_analytics_training_quiz_1
+    sheet_context: general
+
+test_data_analytics_training_quiz_2:
+    sheet_id: 1juXa5RunGJW8Pwrv9NBihL6ZgAeZHQtQePPZvDDKnPI
+    sheet_name: quiz_2
+    clean_table_name: test_data_analytics_training_quiz_2
+    sheet_context: general
+
+test_data_analytics_training_quiz_3:
+    sheet_id: 1juXa5RunGJW8Pwrv9NBihL6ZgAeZHQtQePPZvDDKnPI
+    sheet_name: quiz_3
+    clean_table_name: test_data_analytics_training_quiz_3
+    sheet_context: general
+
+test_data_analytics_training_gabarito:
+    sheet_id: 1juXa5RunGJW8Pwrv9NBihL6ZgAeZHQtQePPZvDDKnPI
+    sheet_name: gabarito
+    clean_table_name: test_data_analytics_training_gabarito
+    sheet_context: general
+
 tracking_catalog_projects:
     sheet_id: 1vczbGi8fyT1AhuCkejL9xROs3d-87WToqUYBMAtoAKU
     sheet_name: projects
