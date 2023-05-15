@@ -176,21 +176,6 @@ columns:
     - datalake_metric_rent_demand_event.metric_rent_demand_event.dt_week_started
     description: Week date of the event.
     dimension: True
-  year:
-    lineage:
-    - datalake_metric_rent_demand_event.metric_rent_demand_event.year
-    description: Year information of the event date.
-    dimension: True
-  month:
-    lineage:
-    - datalake_metric_rent_demand_event.metric_rent_demand_event.month
-    description: Month information of the event date.
-    dimension: True
-  day:
-    lineage:
-    - datalake_metric_rent_demand_event.metric_rent_demand_event.day
-    description: Day information of the event date.
-    dimension: True
   country_code: 
     lineage:
     - datalake_metric_rent_demand_event.metric_rent_demand_event.country_code

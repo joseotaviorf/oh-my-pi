@@ -67,17 +67,5 @@ columns:
     lineage:
     - dw_public.dim_date.date
     description: Week date of the event.
-  year:
-    lineage:
-    - dw_rent.fact_rent_demand_events.year
-    description: Year information of the event date.
-  month:
-    lineage:
-    - dw_rent.fact_rent_demand_events.month
-    description: Month information of the event date.
-  day:
-    lineage:
-    - dw_rent.fact_rent_demand_events.day
-    description: Day information of the event date.
   ts_updated:
     description: Load date.

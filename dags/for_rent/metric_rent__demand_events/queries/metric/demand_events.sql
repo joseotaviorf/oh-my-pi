@@ -19,9 +19,6 @@ SELECT
   contracts_signed,
   dt_event,  
   dt_week_started,
-  year,
-  month,
-  day,
   country_code,
   NOW() AS ts_load
 FROM 
