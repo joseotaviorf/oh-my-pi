@@ -1,5 +1,6 @@
 import pendulum
 import os
+import json
 from datetime import datetime
 
 from airflow.models import DAG
@@ -27,6 +28,7 @@ athena_query_results_bucket = config_service.get_config("athena_query_results_bu
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+dag_documentation = config_service.get_config("dag_documentation")
 default_libraries = config_service.get_config("default_libraries")
 tables = config_service.get_config("tables")
 partition_cols = config_service.get_config("partition_cols")
@@ -43,7 +45,6 @@ MAIN_START_DATE = datetime(2020, 3, 19, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
-default_libraries = config_service.get_config("default_libraries")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -60,8 +61,12 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAGOwnerEnum.DATA_SS,
     ),
 )
 
@@ -94,6 +99,7 @@ for table_name, table_config in tables.items():
         "{{ ds }}",
         table_config["raw_extraction_type"],
         table_config.get("date_filter_column", "updated_at"),
+        json.dumps(partition_cols),
     ]
 
     extended_parameters = list(filter(None, extended_parameters))
