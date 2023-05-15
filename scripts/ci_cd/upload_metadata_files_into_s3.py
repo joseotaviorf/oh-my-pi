@@ -120,6 +120,7 @@ def generate_metric_payload(file_info: MetadataFileInfo) -> List[Dict]:
             payload.append(
                 {
                     "vendor": ["datahub"],
+                    "metric_source": "METRIC LAYER",
                     "name": metric["name"],
                     "description": metric["description"],
                     "company_line": metric_data["domain"],
@@ -146,7 +147,7 @@ def generate_payloads(files_info: List[MetadataFileInfo]):
         "documentation": [],
         "metricEntity": []
     }
-    
+
     for file_info in files_info:
         if file_info.has_documentation:
             doc_payloads["documentation"].append(generate_documentation_payload(file_info))
