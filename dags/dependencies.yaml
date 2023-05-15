@@ -661,6 +661,8 @@ bietlejuice.dw_listing_owners:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user
+bietlejuice.dw_losses: 
+  - bietlejuice.enrich_losses:load-enrich-closing
 bietlejuice.dw_money_laundering_prevention:
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-client
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-document

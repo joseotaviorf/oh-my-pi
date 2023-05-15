@@ -1,0 +1,15 @@
+SELECT 
+    COALESCE(id_invoice, -1) AS sk_invoice,
+    COALESCE(id_contract, -1) AS sk_contract,
+    is_before_started,
+    is_before_started_raw,
+    is_canceled_in_dead_time,
+    is_guarantee_paid,
+    is_international,
+    is_paid_in_closing_day,
+    is_writtendown_in_dead_time,
+    dt_closing,
+    dt_snapshot,
+    NOW() AS ts_load
+FROM 
+    datalake_losses.closing
