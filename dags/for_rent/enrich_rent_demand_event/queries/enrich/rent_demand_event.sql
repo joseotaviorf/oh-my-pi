@@ -146,8 +146,7 @@ rent_demand_events AS (
     rent_flow_house_listing AS rf
       ON rf.id_offer = off.id_offer_context
   WHERE 
-    off.is_offer_submitted = TRUE
-    AND ts_first_sent IS NOT NULL
+    ts_first_sent IS NOT NULL
     -- We're not implementing the incremental load for OS since this date information comes from Firestore.
     -- We noticed that the data is extracted in a certain day but the offer's first sent date is from days before,
     -- which lead to not being able to load it by incremental load.
