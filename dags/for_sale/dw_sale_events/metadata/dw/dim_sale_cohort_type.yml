@@ -74,3 +74,5 @@ columns:
   calendar_days_by_month:
     description: Number of calendar days the conversion took, grouped by 30 day ranges.
       E.g., 0-29, 90-119, 120+.
+  ts_load:
+    description: Timestamp indicating when this table was loaded.

@@ -125,6 +125,10 @@ columns:
     description: ID to get more information abou the HUB on HubServices tables.
     lineage:
       - datalake_sales_flow_clean.offer.id_hub
+  pendency:
+    description: Pendency name
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_pendency.pendency
   pendency_type:
     description: Pendency type
     lineage:
@@ -361,10 +365,6 @@ columns:
     description: First discount offered
   last_discount_proposed:
     description: Last discount offered
-  offer_price:
-    lineage:
-      - datalake_sales_flow_clean.offer.offer_price
-    description: Bid value sent by the buyer.
   sale_price_agreed:
     lineage:
       - datalake_sales_flow_clean.offer.final_price

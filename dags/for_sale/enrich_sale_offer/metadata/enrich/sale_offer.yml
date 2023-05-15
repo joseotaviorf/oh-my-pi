@@ -40,6 +40,10 @@ columns:
       - datalake_ebdb_user.user.id_agent
       - datalake_booking.booking.id_agent
     description: Broker identification key linked to the offer.
+  id_hub:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_hub
+    description: ID to get more information abou the HUB on HubServices tables.
   id_consultant:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_consultant
@@ -212,6 +216,10 @@ columns:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.sale_agreement_status
     description: CCV status
+  payment_model:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.payment_model
+    description: Payment model used in the purchase of the property (CCV_ASSISTANCE, INSTANT_MORTGAGE, etc)
   credit_model:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.credit_model

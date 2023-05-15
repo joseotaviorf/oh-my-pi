@@ -290,8 +290,6 @@ columns:
     - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
     description: Amplitude's app type
     categories:
-      ? ''
-      : ''
       android: ''
       android_flutter: ''
       ios: ''
@@ -356,6 +354,7 @@ columns:
     description: If the sale flow came from a branded campaign as defined by the lead
       taxonomy
   final_attribution_origin:
+    description: Final origin assigned.
     lineage:
     - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
   mkt_category:
@@ -429,8 +428,4 @@ columns:
       Web Desktop: ''
       Web Mobile: ''
   ts_load:
-    description: ''
-  is_buyer_first_offer:
-    description: Sale flow ordering in relation to the buyer
-  is_house_first_offer:
-    description: Sale flow ordering in relation to the house
+    description: Timestamp indicating when this table was loaded.

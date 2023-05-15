@@ -15,6 +15,7 @@ columns:
     - datalake_sales_flow_clean.users.id_external
     description: User ID on QuintoAndar's main database (EBDB). Compatible with dw_public.dim_user
   id_firestore:
+    description: Offer ID generated on Firestore.
     lineage:
     - datalake_sales_flow_clean.offer.id_firestore
   id_house:
@@ -134,3 +135,7 @@ columns:
     lineage:
     - datalake_sales_flow_clean.sales_flow_invite_aud.ts_updated
     description: Timestamp indicating the moment that this user accepted the invite.
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_users.ts_updated
+    description: Timestamp indicating the last user update.

@@ -73,6 +73,8 @@ columns:
     lineage:
       - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_sale_agreement
     description: Key that identifies the property where the buyer closed their first CCV.
+  first_touch:
+    description: Flag of the first source/prospecting event of the contact.
   first_classified_partner:
     lineage:
       - datalake_sale_lead_flows.classified_lead_flow.origin_partner
@@ -143,6 +145,8 @@ columns:
       - datalake_sale_lead_flows.casa_mineira_lead_flow.first_ccv_business_unit
       - datalake_sale_lead_flows.quintoandar_lead_flow.first_ccv_business_unit
     description: Business unit that serves the region of the property where the first cvv of the buyer prospect was created.
+  further_funnel_step:
+    description: Next step of the conversion funnel foreseen for the contact prospect's journey.
   first_booking_creator_5a:
     lineage:
       - datalake_sale_lead_flows.quintoandar_lead_flow.first_booking_creator_5a
@@ -152,6 +156,8 @@ columns:
       - datalake_sale_lead_flows.casa_mineira_lead_flow.has_secretariat_contact_created
       - datalake_sale_lead_flows.hub_services_lead_flow.has_secretariat_contact_created
     description: Boolean variable that signals whether the contact was created in SCM or HS.
+  has_booking_before_secretariat_contact:
+    description: Boolean variable that indicates if the user booked a visit before talking to the secretariat.
   has_first_booking:
     lineage:
       - datalake_sale_lead_flows.casa_mineira_lead_flow.has_first_booking
@@ -183,6 +189,8 @@ columns:
     lineage:
       - datalake_sale_lead_flows.quintoandar_lead_flow.total_visits_completed_by_secretariat
     description: Total number of visits identified as completed by the secretariat.
+  total_visits_completed:
+    description: Total visits completed by the buyer prospect.
   total_bookings_canceled:
     description: Total canceled bookings (we don't look at who created them)
   total_offer_submitted:
