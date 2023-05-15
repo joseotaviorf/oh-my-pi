@@ -22,10 +22,10 @@ users AS (
         v.ts_updated
     FROM
         datalake_hub_services_clean.visitor AS v
-    FULL OUTER JOIN
+    LEFT JOIN
         main_users AS u_email
             ON UPPER(TRIM(u_email.email)) = UPPER(TRIM(v.email)) AND COALESCE(v.id_external,0) = 0
-    FULL OUTER JOIN
+    LEFT JOIN
         main_users AS u_phone
             ON TRIM(u_phone.main_phone) = TRIM(REPLACE(phone_number,'+','')) AND COALESCE(v.id_external, 0) = 0
     QUALIFY
