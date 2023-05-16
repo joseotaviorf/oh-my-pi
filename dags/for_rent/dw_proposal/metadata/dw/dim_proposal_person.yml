@@ -1,5 +1,5 @@
 ---
-database_name: dw_proposal
+database_name: dw_quintoandar
 table_name: dim_proposal_person
 columns:
   sk_proposal_person:

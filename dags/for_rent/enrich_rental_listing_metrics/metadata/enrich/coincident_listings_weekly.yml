@@ -1,5 +1,5 @@
 ---
-database_name: rental_listing_metrics
+database_name: datalake_rental_listing_metrics
 table_name: coincident_listings_weekly
 columns:
   listing_category_start:

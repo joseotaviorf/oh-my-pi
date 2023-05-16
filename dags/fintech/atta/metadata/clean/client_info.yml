@@ -1,6 +1,6 @@
 ---
 database_name: datalake_atta_clean
-table_name: financing_proposal_check
+table_name: client_info
 columns:
   id_client:
     lineage:

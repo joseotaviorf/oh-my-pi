@@ -1,5 +1,5 @@
 database_name: dw_retsuko
-table_name: fact_bill_item_cluster_at_invoice_mobs_derived
+table_name: fact_invoice_mobs_derived
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
 description: "This is a derived fact table that materializes the temporal monthly evolution of a given status of an invoice and the value financial value of that status"

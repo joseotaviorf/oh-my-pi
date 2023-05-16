@@ -1,5 +1,5 @@
 database_name: datalake_arquivo_confidencial
-table_name: scr
+table_name: scr_pivot
 owner: giuseppe.giovanelli@quintoandar.com.br
 domain: fintech
 description: "Table with SCR data broken by Months on Booking (mob) and version."

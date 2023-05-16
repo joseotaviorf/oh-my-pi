@@ -1,6 +1,6 @@
 ---
 database_name: datalake_proponent
-table_name: proponent
+table_name: main_proponent_proposal
 owner: giuseppe.giovanelli@quintoandar.com.br
 domain: Fintech
 description: "Table that brings only the main proponent for each proposal."

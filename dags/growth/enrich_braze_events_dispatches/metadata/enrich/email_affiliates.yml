@@ -1,0 +1,7 @@
+---
+database_name: datalake_braze_dispatches
+table_name: email_affiliates
+owner: data-growth@quintoandar.com
+domain: growth
+description: Table with details about communications sent through email to affiliates.
+columns: {}

@@ -1,6 +1,6 @@
 ---
-database_name: datalake_dashboard_documentation
-table_name: chart_documentation
+database_name: datalake_dashboard_governance
+table_name: chart_metadata
 columns:
   chart_path:
     lineage:

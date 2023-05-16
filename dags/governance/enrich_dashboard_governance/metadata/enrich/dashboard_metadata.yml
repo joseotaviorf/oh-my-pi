@@ -1,6 +1,6 @@
 ---
-database_name: datalake_dashboard_documentation
-table_name: dashboard_documentation
+database_name: datalake_dashboard_governance
+table_name: dashboard_metadata
 columns:
   id_dashboard:
     lineage:

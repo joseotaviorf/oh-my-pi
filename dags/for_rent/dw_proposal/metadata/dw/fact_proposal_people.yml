@@ -1,4 +1,4 @@
-database_name: dw_proposal
+database_name: dw_quintoandar
 table_name: fact_proposal_people
 description: Table with events and metrics about people involved in an offer accepted,
   also called proposal (users or not). Each line is a register of a person, not necessarily

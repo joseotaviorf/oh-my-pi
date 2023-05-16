@@ -1,4 +1,4 @@
-database_name: dw_agents_availability
+database_name: dw_agent
 table_name: fact_agent_hourly_allocations
 description: Agent hour allocation on hour granularity
 domain: For Rent
