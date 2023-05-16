@@ -9,16 +9,21 @@ columns:
   day:
     lineage:
     - dw_public.dim_date.date
-    description: day when the listing started.
+    description: Day when the listing started.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_public.fact_house_listing_flows.country_code
+    description: Country code of the house.
     dimension: True
   new_first_listings:
     description: Amount of new new_first_listings.
     metric:
       name: New First Listings (Daily)
-      description: Amount of new first listings per day
+      description: Daily amount of new first listings.
       acronym: FR NFL D
       is_additive: True
-      business_stage: supply
+      business_stage: Supply
       hierarchy: operations mgmt
       approved_by: fernando.paiva@quintoandar.com.br
       link_to_metric: https://datahub.quintoandar.com.br/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.metric_rent.new_first_listings_daily,PROD)/Schema?is_lineage_mode=false

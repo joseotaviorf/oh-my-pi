@@ -1,5 +1,6 @@
 SELECT
     DATE_TRUNC('week', dd.date) AS week,
+    lf.country_code,
     COUNT(DISTINCT lf.sk_house_listing) AS new_first_listings
 FROM 
     dw_public.fact_house_listing_flows AS lf
@@ -9,4 +10,4 @@ JOIN
         AND DATE_TRUNC('week', dd.date) < DATE_TRUNC('week', CURRENT_DATE)
 WHERE 
     lf.sk_first_listing_date > 0
-GROUP BY 1
+GROUP BY 1, 2

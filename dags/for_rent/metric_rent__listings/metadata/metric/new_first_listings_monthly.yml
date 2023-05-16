@@ -9,7 +9,12 @@ columns:
   month:
     lineage:
     - dw_public.dim_date.date
-    description: month when the listing started.
+    description: Month when the listing started.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_public.fact_house_listing_flows.country_code
+    description: Country code of the house.
     dimension: True
   new_first_listings:
     description: Amount of new new_first_listings.
