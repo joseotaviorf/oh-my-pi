@@ -1,0 +1,57 @@
+---
+database_name: dw_satisfaction_rating
+table_name: fact_answer
+description: This table contains information about satisfaction responses. Its granularity is given by the sk_answer column.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_answer:
+    description: Unique identifier of the satisfaction response.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.id_answer
+  sk_survey:
+    description: Unique identifier of the satisfaction survey.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.id_survey
+  sk_contract:
+    description: Identifier of the contract linked to the satisfaction response.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.id_contract
+  sk_ticket:
+    description: If the satisfaction form was requested after a service, this, in general, will be linked to a service identifier in Zendesk.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.id_ticket
+  sk_user:
+    description: Identifier of the person who answered the form.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.id_respondent
+  satisfaction_score:
+    description: Main satisfaction form responses.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.satisfaction_score
+  secondary_satisfaction_score:
+    description: Secondary satisfaction form responses.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.secondary_satisfaction_score
+  ts_first_seen:
+    description: Date when the form was first viewed by the respondent.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.ts_first_seen
+  ts_submitted:
+    description: Date the satisfaction response was submitted.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.ts_submitted
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_satisfaction_rating.
+  year:
+    description: Year referring to the data loading day.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.year
+  month:
+    description: Month referring to the data loading day.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.month
+  day:
+    description: Day referring to the data loading day.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.day

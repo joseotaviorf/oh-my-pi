@@ -1,0 +1,52 @@
+---
+database_name: dw_satisfaction_rating
+table_name: dim_survey
+description:
+  "This table contains information about the satisfaction surveys. Its granularity is given by the sk_survey column.
+  Query notes: The data source table is at answer granularity, not survey granularity. A survey can have several
+  answers, that's why we apply the distinct function, avoiding the duplication of the same id_survey."
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_survey:
+    description: Unique identifier of the satisfaction survey.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.id_survey
+  service_type:
+    description: Indicates the service that originated the satisfaction response.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.service_type
+  service_context:
+    description: The context in which this service occurred.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.service_context
+  source_name:
+    description: Satisfaction form source.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.source_name
+  survey_name:
+    description: Name of the satisfaction form, used to identify different forms from the same source, if they have a description.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.survey_name
+  ts_first_seen:
+    description: Date when the survey was first viewed by the respondent.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.ts_first_seen
+      - datalake_satisfaction_rating.satisfaction_answers.ts_submitted
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_satisfaction_rating.
+  year:
+    description: Year referring to the data loading day.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.ts_first_seen
+      - datalake_satisfaction_rating.satisfaction_answers.ts_submitted
+  month:
+    description: Month referring to the data loading day.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.ts_first_seen
+      - datalake_satisfaction_rating.satisfaction_answers.ts_submitted
+  day:
+    description: Day referring to the data loading day.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.ts_first_seen
+      - datalake_satisfaction_rating.satisfaction_answers.ts_submitted

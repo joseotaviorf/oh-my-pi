@@ -849,6 +849,8 @@ bietlejuice.dw_sale_visits:
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
   - bietlejuice.insider:load-clean-review
+bietlejuice.dw_satisfaction_rating:
+  - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers
 bietlejuice.dw_sauron:
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
   - bietlejuice.enrich_quinto_messenger:load-enrich-channel

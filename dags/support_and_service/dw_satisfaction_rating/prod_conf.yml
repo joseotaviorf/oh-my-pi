@@ -1,0 +1,10 @@
+---
+dag_documentation:
+  dag_purpose: This data modeling refers to customer satisfaction data with the services provided by the QuintoAndar group.
+
+incremental_tables:
+  - dim_answer
+  - dim_survey
+  - fact_answer
+
+partitions_cols: [year, month, day]
