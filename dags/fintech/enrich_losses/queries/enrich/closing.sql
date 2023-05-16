@@ -83,6 +83,8 @@ BASE_CLOSING_DRAFT AS (
 SELECT 
       sk_invoice as id_invoice,
       id as id_contract,
+      due_amount, 
+      frequency, 
       guarantee_type as is_guarantee_paid,
       flag_is_before_started as is_before_started,
       flag_is_before_started_raw as is_before_started_raw,
@@ -90,7 +92,11 @@ SELECT
       flag_is_international as is_international,
       flag_paid_in_closing_day as is_paid_in_closing_day,
       flag_writtendown_in_dead_time as is_writtendown_in_dead_time,
+      payment_status, 
+      user,
       closing_day as dt_closing,
+      dt_due, 
+      dt_paid, 
       dt_snapshot
 FROM 
       BASE_CLOSING_DRAFT

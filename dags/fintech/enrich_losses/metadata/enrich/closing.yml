@@ -11,8 +11,16 @@ columns:
     description: Id of the invoice. 
   id_contract:
     lineage:   
-      - datalake_ebdb_contract.contract.id
+    - datalake_ebdb_contract.contract.id
     description: Id of the contract. 
+  due_amount:
+    lineage:   
+    - dw_payment_snapshot.dim_invoice_snapshot.due_amount
+    description: Total value of the invoice. 
+  frequency: 
+    lineage:   
+    - dw_payment_snapshot.dim_invoice_snapshot.frequency
+    description: Frequency of the payment. 
   is_guarantee_paid:
     description: Flag to show if the guarantee is paid. 
   is_before_started:
@@ -27,11 +35,27 @@ columns:
     description: Flag to show if the invoice is paid within the closing day.
   is_writtendown_in_dead_time:
     description: Flag to show if the invoice is writtendown in the deadtime.
+  payment_status:
+    lineage:   
+    - dw_payment_snapshot.dim_invoice_snapshot.payment_status
+    description: Status of the invoice payment. 
+  user:
+    lineage:   
+    - dw_payment_snapshot.dim_invoice_snapshot.user
+    description: User information related to the invoice. 
   dt_closing:
     lineage:
       - dw_public.dim_date.month_end
     description: Last day of the month.
+  dt_due: 
+    lineage:   
+    - dw_payment_snapshot.dim_invoice_snapshot.dt_due
+    description: Due date of the invoice. 
+  dt_paid: 
+    lineage:   
+    - dw_payment_snapshot.dim_invoice_snapshot.dt_paid
+    description: Payment completed date of the invoice. 
   dt_snapshot:
     lineage:
-      - dw_payment_snapshot.dim_invoice_snapshot.ts_snapshot
+    - dw_payment_snapshot.dim_invoice_snapshot.ts_snapshot
     description: Date of the snapshot.
