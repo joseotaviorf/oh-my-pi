@@ -230,7 +230,7 @@ ongoing_listings_weekly AS (
                 ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) 
                 AND COALESCE(CAST(DATE_FORMAT(TO_DATE(CAST(NULLIF(sk_status_end_date,-1) AS STRING),'yyyyMMdd') - 1, 'yyyyMMdd') AS BIGINT), CAST(DATE_FORMAT(CURRENT_DATE -1, 'yyyyMMdd') AS BIGINT))
         WHERE
-            f.status_history = 'publicado' -- consider only published status
+            f.status_history IN ('publicado', 'PUBLISHED') -- consider only published status
             AND SUBSTRING(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
     ),
     daily_published_listings_adjusted AS (
@@ -314,7 +314,7 @@ visits_booked_per_ongoing_listings AS (
                     ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) 
                     AND COALESCE(CAST(DATE_FORMAT(TO_DATE(CAST(NULLIF(sk_status_end_date,-1) AS STRING),'yyyyMMdd') - 1, 'yyyyMMdd') AS BIGINT), CAST(DATE_FORMAT(CURRENT_DATE -1, 'yyyyMMdd') AS BIGINT))
             WHERE
-                f.status_history = 'publicado' -- consider only published status
+                f.status_history IN ('publicado', 'PUBLISHED') -- consider only published status
                 AND SUBSTRING(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
         ),
         daily_published_listings_adjusted AS (
