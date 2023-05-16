@@ -1,5 +1,5 @@
 SELECT
-    to_timestamp(date, "dd/MM/yyyy HH:mm:ss") AS answer_date,,
+    to_timestamp(date, "dd/MM/yyyy HH:mm:ss") AS answer_date,
     email,
     points,
     question_1,
