@@ -13,6 +13,10 @@ columns:
     lineage:   
     - datalake_losses.closing.id_contract
     description: Id of the contract. 
+  due_amount:
+    lineage:   
+    - datalake_losses.closing.due_amount
+    description: Total value of the invoice. 
   is_before_started:
     lineage:   
     - datalake_losses.closing.is_before_started

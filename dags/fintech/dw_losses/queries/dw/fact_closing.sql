@@ -1,6 +1,7 @@
 SELECT 
     COALESCE(id_invoice, -1) AS sk_invoice,
     COALESCE(id_contract, -1) AS sk_contract,
+    due_amount,
     is_before_started,
     is_before_started_raw,
     is_canceled_in_dead_time,
