@@ -141,6 +141,10 @@ columns:
     description: List of employee's bank accounts
     lineage:
       - datalake_convenia_details_raw.active_employee_details.all_bank_accounts
+  disability:
+    description: List of employee's disablities (if any)
+    lineage:
+      - datalake_convenia_details_raw.active_employee_details.disability
   is_first_job:
     description: Binary data if this is the employee's first job
     lineage:

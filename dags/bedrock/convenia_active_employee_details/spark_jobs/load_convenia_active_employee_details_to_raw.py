@@ -116,6 +116,7 @@ def create_df_from_active_employee_details(results, spark_client, token_name):
                 main_bank_account=str(employee["bank_account"]),
                 all_bank_accounts=employee["bank_accounts"],
                 social_name=str(employee["social_name"]),
+                disability=str(employee["disability"]),
                 source=token_name,
             )
         )
@@ -173,6 +174,7 @@ def create_df_schema():
                 "all_bank_accounts", ArrayType(MapType(StringType(), StringType()))
             ),
             StructField("social_name", StringType(), True),
+            StructField("disability", StringType(), True),
             StructField("source", StringType(), True),
         ]
     )
@@ -184,7 +186,6 @@ def create_df_schema():
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -217,8 +218,8 @@ if __name__ == "__main__":
         host = details["host"]
         api_token = details["token"]
 
-        convenia_active_employee_details_result = fetch_convenia_active_employee_details(
-            host, api_token
+        convenia_active_employee_details_result = (
+            fetch_convenia_active_employee_details(host, api_token)
         )
 
         spark_client = SparkClient()

@@ -33,6 +33,7 @@ SELECT
     source,
     main_bank_account,
     all_bank_accounts,
+    disability,
     first_job AS is_first_job,
     time_tracking AS has_time_tracking,
     birth_date AS dt_birth,

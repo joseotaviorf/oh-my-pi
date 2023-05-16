@@ -137,6 +137,10 @@ columns:
     description: List of employee's bank accounts
     lineage:
       - datalake_convenia_details_raw.inactive_employee_details.all_bank_accounts
+  disability:
+    description: List of employee's disablities (if any)
+    lineage:
+      - datalake_convenia_details_raw.inactive_employee_details.disability
   source:
     description: API Key source
     lineage:
