@@ -4,117 +4,94 @@ tables:
     extraction_type: incremental
   address_data_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   brokerage:
     extraction_type: incremental
   brokerage_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   buyer_data:
     extraction_type: incremental
   buyer_data_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   card_noting:
     extraction_type: incremental
   card_noting_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   cash_payment:
     extraction_type: incremental
   cash_payment_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   ccv:
     extraction_type: incremental
   ccv_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   ccv_edition_reason:
     extraction_type: incremental
   ccv_edition_reason_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   closing_type:
     extraction_type: incremental
   closing_type_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   ccv_flow:
     extraction_type: incremental
   ccv_flow_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   ccv_party:
     extraction_type: incremental
   ccv_party_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   ccv_rule:
     extraction_type: incremental
   ccv_rule_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   contact:
     extraction_type: incremental
   contact_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   diligence:
     extraction_type: incremental
   diligence_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   diligence_appointment:
     extraction_type: incremental
   diligence_appointment_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   house:
     extraction_type: incremental
   house_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   microstatus_order:
     extraction_type: incremental
   microstatus_order_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   mortgage:
     extraction_type: incremental
   mortgage_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   negotiation:
     extraction_type: incremental
   negotiation_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   notary:
     extraction_type: incremental
   notary_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   offer:
     extraction_type: incremental
   offer_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   payment:
     extraction_type: incremental
   payment_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   reject_reason:
     extraction_type: incremental
   reject_reason_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   rescission:
     extraction_type: incremental
   rescission_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   revinfo:
     clean_table_name: rev_info
     extraction_type: incremental
@@ -124,85 +101,68 @@ tables:
     extraction_type: incremental
   sales_flow_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   sales_flow_contact:
     extraction_type: full
   sales_flow_contact_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   sales_flow_details:
     extraction_type: incremental
   sales_flow_details_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   sales_flow_invite:
     extraction_type: incremental
   sales_flow_invite_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   sales_flow_pendency:
     extraction_type: incremental
   sales_flow_pendency_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   sales_flow_tag:
     extraction_type: full
   sales_flow_tag_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   sales_flow_users:
     extraction_type: full
   sales_flow_users_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   seller_data:
     extraction_type: incremental
   seller_data_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   seller_documentation:
     extraction_type: incremental
   seller_documentation_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   specialist:
     extraction_type: full
   specialist_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   status:
     extraction_type: incremental
   status_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   status_order:
     extraction_type: incremental
   status_order_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   status_record:
     extraction_type: incremental
   status_record_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   tag:
     extraction_type: incremental
   tag_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   user_sample:
     extraction_type: incremental
   user_sample_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   users:
     extraction_type: incremental
   users_aud:
     extraction_type: incremental
-    date_filter_column: created_at
   visit_lead:
     extraction_type: incremental
   visit_lead_aud:
     extraction_type: incremental
-    date_filter_column: created_at
 partition_cols: ["year", "month", "day"]
