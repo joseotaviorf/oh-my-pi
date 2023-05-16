@@ -5,17 +5,32 @@ description: Table to count new rentals, which are contracts actived or finalize
   In addition, we have the region dimension embedded here on the column sk_region
   to segment this metric.
 domain: For Rent
-owner: ''
+owner: data-for-rent@quintoandar.com.br
 columns:
   rental_date:
     lineage:
     - dw_public.dim_contract.dt_start
     - dw_public.dim_contract.dt_entrance
+    description: Day when the contract started or the entrance happened
+    dimension: True
   sk_region:
     lineage:
     - dw_public.fact_house_listings.sk_region
     description: Region identifier
-  day:
-    description: day when the contract started or the entrance happened
+    dimension: True
+  country_code:
+    lineage:
+      - dw_public.dim_contract.country_code
+    description: Country code of the house.
+    dimension: True
   new_rentals:
-    description: Amount of new rentals on a day
+    description: Amount of new signed contracts on a day segmented by sk_region.
+    metric:
+      name: New Rentals Daily
+      description: Daily accumulated sum of signed contracts that started (generated revenue)
+      acronym: NR
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: augusto.torres@quintoandar.com.br
+      link_to_metric: ''

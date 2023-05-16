@@ -1,5 +1,6 @@
 SELECT
     DATE_TRUNC('month', COALESCE(dc.ts_signature, dc.dt_start)) AS month,
+    dc.country_code,
     COUNT(DISTINCT dc.sk_contract) AS new_contracts_signed
 FROM
     dw_public.dim_contract AS dc
@@ -9,4 +10,4 @@ LEFT JOIN
 WHERE
     dc.status IN ('Ativo', 'Finalizado') -- consider only contracts that are active or were active and ended
     AND DATE_TRUNC('month', DATE(COALESCE(dc.ts_signature, dc.dt_start))) < DATE_TRUNC('month', CURRENT_DATE)
-GROUP BY 1
+GROUP BY 1, 2

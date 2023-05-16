@@ -3,12 +3,28 @@ table_name: ended_rentals_confirmed_monthly
 description: Table to count ended rentals, which are finalized contracts, on monthly
   basis. The date reference here is related to contract analyst anullment or anullment.
 domain: For Rent
-owner: ''
+owner: data-for-rent@quintoandar.com.br
 columns:
   month:
     lineage:
     - dw_public.dim_contract.ts_analyst_annulment_input
     - dw_public.dim_contract.dt_anullment
-    description: month when the contract was anulled.
+    description: Month when the contract was anulled.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_public.dim_contract.country_code
+    description: Country code of the house.
+    dimension: True
   ended_rentals_confirmed:
-    description: Amount of anulled contracts on a month
+    description: Amount of anulled contracts on a month.
+    metric:
+      name: Ended Rentals Confirmed Monthly
+      description: Monthly accumulated sum of the contracts that were annulled
+        (based on the date which the offboarding analyst inputs the annulment in the system)
+      acronym: ERC
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: augusto.torres@quintoandar.com.br
+      link_to_metric: https://quintoandar.sa.looker.com/looks/4750

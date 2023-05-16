@@ -1,5 +1,6 @@
 SELECT
   DATE_TRUNC('month',COALESCE(dc.dt_start, dc.dt_entrance)) AS month,
+  dc.country_code,
   COUNT(DISTINCT dc.sk_contract) AS new_rentals
 FROM 
     dw_public.dim_contract dc
@@ -8,4 +9,4 @@ WHERE
     AND DATE_TRUNC('month',COALESCE(dc.dt_start, dc.dt_entrance)) < DATE_TRUNC('month',current_date) -- we know we may have future dates for dt_start
     AND (DATE(COALESCE(dc.dt_start, dc.dt_entrance)) < dc.dt_annulment
         OR dc.dt_annulment IS NULL) -- consider only contracts that weren't annulled before start DATE
-GROUP BY 1
+GROUP BY 1, 2
