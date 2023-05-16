@@ -42,11 +42,11 @@ task_timestamps AS (
     type LIKE 'reservation.%'
   GROUP BY 1
 ),
-chat_metrics AS (
+whatsapp_metrics AS (
   SELECT
     id_conversation,
     COUNT(DISTINCT t.id_task) AS number_of_tasks,
-    COUNT(DISTINCT task_queue_name) AS number_of_departments,
+    COUNT(DISTINCT te.task_queue_name) AS number_of_departments,
     MAX(te.ts_created_local) AS ts_last_event,
     MIN(te.ts_created_local) AS ts_first_event
   FROM
@@ -54,6 +54,23 @@ chat_metrics AS (
   INNER JOIN
     datalake_quinto_messenger.task_event AS te
       ON t.id_task = te.id_task
+  GROUP BY 1
+),
+chat5a_metrics AS (
+  SELECT
+    c.id_session,
+    COUNT(DISTINCT t.id_task) AS number_of_tasks,
+    COUNT(DISTINCT te.task_queue_name) AS number_of_departments,
+    MAX(te.ts_created_local) AS ts_last_event,
+    MIN(te.ts_created_local) AS ts_first_event
+  FROM
+    datalake_quinto_messenger.task AS t
+  INNER JOIN
+    datalake_quinto_messenger.task_event AS te
+      ON t.id_task = te.id_task
+  INNER JOIN
+    datalake_quinto_messenger.chat c
+      ON c.id_chat = t.id_chat
   GROUP BY 1
 ),
 task AS (
@@ -178,9 +195,9 @@ quinto_messenger_tasks AS (
     t.transferred_to_dept,
     t.transference_type,
     ttr.transference_reason,
-    CAST(COALESCE(cm.number_of_departments,0) AS INT) AS number_of_departments,
-    CAST(COALESCE(cm.number_of_tasks,0) AS INT) AS number_of_tasks,
-    cm.number_of_tasks > 1 AS has_transfers,
+    CAST(COALESCE(wm.number_of_departments,0) AS INT) AS number_of_departments,
+    CAST(COALESCE(wm.number_of_tasks,0) AS INT) AS number_of_tasks,
+    wm.number_of_tasks > 1 AS has_transfers,
     CASE
         WHEN t.seconds_to_first_response / 60 <= 15 THEN TRUE
         WHEN t.seconds_to_first_response / 60 > 15 THEN FALSE
@@ -200,8 +217,8 @@ quinto_messenger_tasks AS (
     t.ts_updated,
     t.ts_task_closed,
     t.ts_task_created,
-    cm.ts_first_event,
-    cm.ts_last_event
+    wm.ts_first_event,
+    wm.ts_last_event
   FROM
     datalake_quinto_messenger.channel AS c
   INNER JOIN
@@ -211,8 +228,8 @@ quinto_messenger_tasks AS (
     chatbot_time_metrics_whatsapp AS bot
       ON c.id_source = bot.id_session
   LEFT JOIN
-    chat_metrics AS cm
-      ON cm.id_conversation = c.id_source
+    whatsapp_metrics AS wm
+      ON wm.id_conversation = c.id_source
   LEFT JOIN
     task_outcome AS to
       ON to.id_task = t.id_task
@@ -281,8 +298,8 @@ quinto_messenger_tasks AS (
     chatbot_time_metrics_chat_inapp AS bot
       ON c5a.id_session = bot.id_session
   LEFT JOIN
-    chat_metrics AS cm
-      ON cm.id_conversation = c5a.id_session
+    chat5a_metrics AS cm
+      ON cm.id_session = c5a.id_session
   LEFT JOIN
     task_transfer_reason AS ttr
       ON ttr.id_task = t.id_task
