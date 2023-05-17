@@ -1,11 +1,13 @@
 SELECT
     BIGINT(STRING(ssvo.id_house)||'00'||STRING(ssvo.order_version)) AS id_sale_listing,
     ssvo.id_house,
+    ssvo.id_user_revision,
     ssvo.id_region,
     rhh.id_company_hubspot,
     rhh.partner_3p_supply,
     ssvo.status_history_new AS status_history,
-    REGEXP_REPLACE(reason, '\n', '') AS status_change_reason,
+    ssvo.status_reason AS status_change_reason,
+    REGEXP_REPLACE(ssvo.status_reason_detail, '\n', '') AS status_change_reason_detail,
     COALESCE(
       -- get max ts per id_house_listings per day
       MAX(ssvo.ts_status_changed_new) OVER(

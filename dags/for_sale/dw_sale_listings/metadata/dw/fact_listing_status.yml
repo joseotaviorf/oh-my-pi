@@ -11,11 +11,14 @@ columns:
     - datalake_sale_listings.sale_listing_status.id_sale_listing
     description: Identification of the listing version, which may be in edition (version
       0) or already published (version 1).
+  sk_user_revision:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_user_revision
+    description: Identification of the user who made the listing status change for that row. Can be joined with dw_public.dim_user.
   sk_region:
     lineage:
     - datalake_sale_listings.sale_listing_status.id_region
-    description: Foreign key of region where house listing is located in. Can be joined
-      with dw_public.dim_region.
+    description: Foreign key of region where house listing is located in. Can be joined with dw_public.dim_region.
   sk_company:
     lineage:
     - datalake_rede_company.company_sks.sk_company
@@ -32,14 +35,6 @@ columns:
     lineage:
     - datalake_sale_listings.sale_listing_status.ts_status_ended
     description: Foreign key referring to the status ended date in the Sale context of this listing. Can be joined with dw_public.dim_date to retrieve in date format.
-  ts_status_started:
-    lineage:
-    - datalake_sale_listings.sale_listing_status.ts_status_started
-    description: Timestamp on which the start of the row-related status occurred.
-  ts_status_ended:
-    lineage:
-    - datalake_sale_listings.sale_listing_status.ts_status_ended
-    description: Timestamp that the status change to the next status occurred.
   status_history:
     lineage:
     - datalake_sale_listings.sale_listing_status.status_history
@@ -56,11 +51,23 @@ columns:
   status_change_reason:
     lineage:
     - datalake_sale_listings.sale_listing_status.status_change_reason
+    description: Descriptive column that shows the code of the cause of the line status change.
+  status_change_reason_detail:
+    lineage:
+    - datalake_sale_listings.sale_listing_status.status_change_reason_detail
     description: Descriptive column that shows the cause of the status change for the row.
   is_last_status:
     lineage:
     - datalake_sale_listings.sale_listing_status.is_last_status
     description: Boolean column indicating the current listing status. If True, it
       means that the listing is in the last status.
+  ts_status_started:
+    lineage:
+    - datalake_sale_listings.sale_listing_status.ts_status_started
+    description: Timestamp on which the start of the row-related status occurred.
+  ts_status_ended:
+    lineage:
+    - datalake_sale_listings.sale_listing_status.ts_status_ended
+    description: Timestamp that the status change to the next status occurred.
   ts_load:
     description: Timestamp when the data was processed.

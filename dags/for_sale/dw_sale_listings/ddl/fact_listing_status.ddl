@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS sale.fact_listing_status;
 CREATE TABLE sale.fact_listing_status (
 	sk_sale_listing BIGINT PRIMARY KEY,
+	sk_user_revision BIGINT,
 	sk_region BIGINT,
 	sk_company BIGINT,
 	sk_first_publication_date BIGINT,
@@ -9,7 +10,8 @@ CREATE TABLE sale.fact_listing_status (
 	ts_status_started TIMESTAMP,
 	ts_status_ended TIMESTAMP,
 	status_history VARCHAR,
-	status_change_reason VARCHAR(2000),
+	status_change_reason VARCHAR(1000),
+	status_change_reason_detail VARCHAR(2000),
 	is_last_status BOOLEAN,
 	ts_load TIMESTAMP
 );

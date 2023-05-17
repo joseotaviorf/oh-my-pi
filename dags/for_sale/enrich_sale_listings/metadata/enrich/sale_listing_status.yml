@@ -18,6 +18,11 @@ columns:
       - datalake_sale_listings.sale_status_version_order.id_house
     description: >
       The id of the house.
+  id_user_revision:
+    lineage:
+      - datalake_sale_listings.sale_status_version_order.id_user_revision
+    description: >
+      The id of the user who made the listing status change for that row.
   id_region:
     lineage:
       - datalake_sale_listings.sale_status_version_order.id_region
@@ -49,9 +54,14 @@ columns:
       UNPUBLISHED: If the listing is unpublished.
   status_change_reason:
     lineage:
-      - datalake_sale_listings.sale_status_version_order.reason
+      - datalake_sale_listings.sale_status_version_order.status_reason
     description: >
-      The reason for the status change.
+      The code of reason for the status change.
+  status_change_reason_detail:
+    lineage:
+      - datalake_sale_listings.sale_status_version_order.status_reason_detail
+    description: >
+      The detail of the reason for the status change.
   is_last_status:
     lineage:
       - datalake_sale_listings.sale_status_version_order.ts_status_changed_new
