@@ -1,9 +1,9 @@
 SELECT
+  halfyear,
+  quarter,
   business_type,
   city_group,
   guarantee,
-  halfyear,
-  quarter,
   listing_category_start,
   rent_flow_origin,
   rental_administrator,
@@ -22,7 +22,7 @@ SELECT
   country_code,
   NOW() AS ts_load
 FROM 
-  dw_rent_snapshot.rent_demand_events
+  dw_rent_snapshot.rent_demand_events_snapshot
 WHERE
   year = YEAR(NOW())
   AND month = MONTH(NOW())

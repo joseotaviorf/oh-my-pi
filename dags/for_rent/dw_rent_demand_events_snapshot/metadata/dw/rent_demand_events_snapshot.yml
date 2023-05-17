@@ -9,6 +9,10 @@ owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_snapshot:
     description: "Date of the snapshot transformed into a number."
+  halfyear:
+    description: "1 if the event month is from the first half of the year and 2 if it is from the last half."
+  quarter:
+    description: "Quarter information of the event date."
   business_type:
     lineage:
     - dw_public.dim_house_listing.first_consultant_type
@@ -21,14 +25,10 @@ columns:
     lineage:
     - dw_public.dim_proposal.guarantee
     description: "Guarantee information related to the event."
-  halfyear:
-    description: "1 if the event month is from the first half of the year and 2 if it is from the last half."
   listing_category_start:
     lineage:
     - dw_public.dim_house_listing.listing_category_start
     description: "Listing category start information coming from the house listing."
-  quarter:
-    description: "Quarter information of the event date."
   rent_flow_origin:
     lineage:
     - dw_datamarts.funnel_demand_flows.funnel_first_touchpoint

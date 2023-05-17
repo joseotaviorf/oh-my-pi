@@ -1,6 +1,11 @@
 SELECT
   DATE_FORMAT(CURRENT_DATE, 'yyyyMMdd') AS id_snapshot,
   CASE 
+    WHEN MONTH(TO_DATE(CAST(sk_event_date AS STRING), 'yyyyMMdd')) <= 6 THEN 1
+    ELSE 2
+  END AS halfyear,
+  EXTRACT(quarter FROM dt.date) AS quarter,
+  CASE 
     WHEN dhl.is_b2b = TRUE THEN 'B2B'
     WHEN dhl.first_consultant_type = 'CIQ_MANAGER' THEN 'ASP'
     WHEN dhl.is_for_rent = TRUE AND (dhl.first_consultant_type IS NOT NULL AND dhl.first_consultant_type <> 'Core') THEN dhl.first_consultant_type
@@ -8,11 +13,6 @@ SELECT
   END AS business_type,
   dr.city_group,
   dp.guarantee,
-  CASE 
-    WHEN MONTH(TO_DATE(CAST(sk_event_date AS STRING), 'yyyyMMdd')) <= 6 THEN 1
-    ELSE 2
-  END AS halfyear,
-  EXTRACT(quarter FROM dt.date) AS quarter,
   dhl.listing_category_start,
   CASE 
     WHEN funnel_first_touchpoint = 'DIRECT' THEN funnel_first_touchpoint

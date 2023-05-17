@@ -4,6 +4,16 @@ description: This table contains the aggregated sum of demand events of For Rent
 domain: For Rent
 owner: isadora.gallerani@quintoandar.com.br
 columns:
+  halfyear:
+    lineage:
+    - dw_rent_snapshot.rent_demand_events.halfyear
+    description: 1 if the event month is from the first half of the year and 2 if it is from the last half.
+    dimension: True
+  quarter:
+    lineage:
+    - dw_rent_snapshot.rent_demand_events.quarter
+    description: Quarter information of the event date.
+    dimension: True
   business_type:
     lineage:
     - dw_rent_snapshot.rent_demand_events.business_type
@@ -19,20 +29,10 @@ columns:
     - dw_rent_snapshot.rent_demand_events.guarantee
     description: Guarantee information related to the event.
     dimension: True
-  halfyear:
-    lineage:
-    - dw_rent_snapshot.rent_demand_events.halfyear
-    description: 1 if the event month is from the first half of the year and 2 if it is from the last half.
-    dimension: True
   listing_category_start:
     lineage:
     - dw_rent_snapshot.rent_demand_events.listing_category_start
     description: Listing category start information of the event.
-    dimension: True
-  quarter:
-    lineage:
-    - dw_rent_snapshot.rent_demand_events.quarter
-    description: Quarter information of the event date.
     dimension: True
   rent_flow_origin:
     lineage:
