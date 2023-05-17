@@ -4,6 +4,7 @@ import json
 from datetime import datetime, timedelta
 
 from pyspark.sql import DataFrame
+from pyspark.sql.functions import *
 from functools import reduce
 
 import opsgenie_sdk
@@ -50,7 +51,7 @@ def _get_date_range(auth_token: str, start_date: str, end_date: str) -> list:
     else:
       return [(auth_token, start_date.strftime("%d-%m-%Y"), end_date.strftime("%d-%m-%Y"))]
   
-def _fetch_alerts(auth_token: str, start_date: str, end_date: str) -> dict:
+def _fetch_alerts(auth_token: str, start_date: str, end_date: str) -> DataFrame:
   
     OpsgenieConf = opsgenie_sdk.configuration.Configuration()
     OpsgenieConf.api_key['Authorization'] = auth_token
@@ -97,6 +98,83 @@ def _fetch_alerts(auth_token: str, start_date: str, end_date: str) -> dict:
         logging.error(f"Fail to extract data. Error:{exception}")
         raise exception
 
+def _fetch_logs(auth_token: str, log_id: str) -> DataFrame:
+
+    OpsgenieConf = opsgenie_sdk.configuration.Configuration()
+    OpsgenieConf.api_key['Authorization'] = auth_token
+
+    OpsgenieClient = opsgenie_sdk.api_client.ApiClient(configuration=OpsgenieConf)
+    OpsgenieAlertApi = opsgenie_sdk.AlertApi(api_client=OpsgenieClient)
+    
+    logs = OpsgenieAlertApi.list_logs(identifier=log_id)
+
+    try:
+        data = logs.data
+
+        if len(data) > 0:
+            df = spark.createDataFrame(
+                    [item.to_dict() for item in data],
+                    schema="""
+                        created_at timestamp,
+                        log string,
+                        offset string,
+                        owner string,
+                        type string
+                    """
+                )
+            
+            return df.withColumn("id",lit(log_id))
+
+        else:
+            logging.error(f"No data found for log id: {log_id}.")      
+      
+    except Exception as exception:
+        logging.error(f"Fail to extract data. Error:{exception}")
+        raise exception
+
+def _load_dataframe_into_datalake(df: DataFrame, raw_table_name: str, raw_partition_cols: list):
+    """
+    Load dataframe into datalake and update metastore.
+    """
+    spark_client = SparkClient()
+    
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    database_name = db_info["db_raw_databricks"]
+    database_location = db_info["db_raw_path"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+
+    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service.create_database(database_name)
+
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    s3_loader = S3Loader()
+
+    s3_loader.load_df(
+        df=df,
+        s3_path=f"{database_location}{raw_table_name}",
+        format_options=format_options,
+        partitions=raw_partition_cols,
+        optimize_dataframe=False,
+        compression="gzip",
+    )
+
+    """
+    Update metastore.
+    """
+    spark_metastore_loader.update_metastore(
+        df,
+        database_name,
+        raw_table_name,
+        format_options,
+        database_location,
+        raw_partition_cols,
+        force_recreate=True,
+    )
+
+    spark_metastore_service.create_new_partitions_from_df(
+        database_name, raw_table_name, df, raw_partition_cols
+    )    
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
@@ -115,7 +193,8 @@ if __name__ == "__main__":
     end_date = datetime.strptime(args.load_end_date, "%Y-%m-%d")
 
     config_service = ConfigurationService(source)
-    raw_table_name = config_service.get_config("raw_table_name")
+    raw_alerts_table_name = config_service.get_config("raw_alerts_table_name")
+    raw_logs_table_name = config_service.get_config("raw_logs_table_name")
     raw_partition_cols = config_service.get_config("raw_partition_cols")
 
     """
@@ -134,72 +213,57 @@ if __name__ == "__main__":
     """
     Fetch OpsGenie alerts data.
     """    
-
     time_ranges = _get_date_range(auth_token, start_date, end_date)
     alerts_data = [_fetch_alerts(*auth_and_time) for auth_and_time in time_ranges]
-    filtered_alerts_data = list(filter(None, alerts_data))
+    filtered_alerts_data = [df for df in alerts_data if df is not None]
 
-    """
-    Creating dataframe.
-    """
+    dataframe_service = SparkDataFrameService()
+
     if len(filtered_alerts_data) > 0:         
-        df = reduce(
+        """
+        Creating alerts dataframe.
+        """        
+        alerts_df = reduce(
             DataFrame.unionAll, filtered_alerts_data
         )
 
-        df = (
+        alerts_df = (
             SparkDataFrameService()
-            .input(df)
+            .input(alerts_df)
             .format_column_names()
             .create_year_month_day_columns_from_dataframe_column("created_at")
             .output()
         )        
 
-        df = df.na.drop(subset=raw_partition_cols)
+        alerts_df = alerts_df.na.drop(subset=raw_partition_cols)
+
+        _load_dataframe_into_datalake(alerts_df, raw_alerts_table_name, raw_partition_cols)
 
         """
-        Load data to datalake.
+        Fetch OpsGenie alert logs data.
         """
-        spark_client = SparkClient()
-        spark_context = spark_client.conn.sparkContext
-        dataframe_service = SparkDataFrameService()
+        alert_ids = [row['id'] for row in alerts_df.select('id').collect()]
+        logs_data = [_fetch_logs(auth_token, id) for id in alert_ids]
+        filtered_logs_data = [df for df in logs_data if df is not None]
 
-        db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
-        database_name = db_info["db_raw_databricks"]
-        database_location = db_info["db_raw_path"]
-        format_options = SparkTableStorageFormat.DEFAULT_RAW
-
-        spark_metastore_service = SparkMetastoreService(spark_client)
-        spark_metastore_service.create_database(database_name)
-
-        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-        s3_loader = S3Loader()
-
-        s3_loader.load_df(
-            df=df,
-            s3_path=f"{database_location}{raw_table_name}",
-            format_options=format_options,
-            partitions=raw_partition_cols,
-            optimize_dataframe=False,
-            compression="gzip",
+        """
+        Creating logs dataframe.
+        """        
+        logs_df = reduce(
+            DataFrame.unionAll, filtered_logs_data
         )
 
-        """
-        Update metastore.
-        """
-        spark_metastore_loader.update_metastore(
-            df,
-            database_name,
-            raw_table_name,
-            format_options,
-            database_location,
-            raw_partition_cols,
-            force_recreate=True,
-        )
+        logs_df = (
+            SparkDataFrameService()
+            .input(logs_df)
+            .format_column_names()
+            .create_year_month_day_columns_from_dataframe_column("created_at")
+            .output()
+        )        
 
-        spark_metastore_service.create_new_partitions_from_df(
-            database_name, raw_table_name, df, raw_partition_cols
-        )
+        logs_df = logs_df.na.drop(subset=raw_partition_cols)
+
+        _load_dataframe_into_datalake(logs_df, raw_logs_table_name, raw_partition_cols)
 
     else:
         logging.error(f"No data found from {start_date} to {end_date}.")
