@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+import json
 import pendulum
 
 from airflow.models import DAG
@@ -25,9 +26,12 @@ ENV = os.environ.get("ENVIRONMENT")
 config_service = ConfigurationService(SOURCE)
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
-artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+dag_documentation = config_service.get_config("dag_documentation")
+default_libraries = config_service.get_config("default_libraries")
+
+tables_config = config_service.get_config("tables")
 
 # s3 paths setup
 databricks_bietlejuice_repo_path = config_service.get_config(
@@ -48,8 +52,6 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
-default_libraries = config_service.get_config("default_libraries")
-
 
 # dag params
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
@@ -65,8 +67,12 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAGOwnerEnum.DATA_SS,
     ),
 )
 
@@ -95,7 +101,11 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
     extraction_spark_job_file=raw_spark_job_path,
-    raw_spark_job_extra_args=[SOURCE],
+    raw_spark_job_extra_args=[
+        "{{ ds }}", 
+        SOURCE, 
+        json.dumps(tables_config),
+    ],
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
