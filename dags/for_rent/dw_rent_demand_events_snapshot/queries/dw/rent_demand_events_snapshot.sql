@@ -54,4 +54,4 @@ LEFT JOIN
 LEFT JOIN 
   dw_public.dim_proposal AS dp -- guarantee
     ON fde.sk_proposal = dp.sk_proposal
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 19, 20, 21
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 21, 22, 23, 24, 25, 26
