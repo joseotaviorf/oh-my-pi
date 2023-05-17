@@ -30,13 +30,16 @@ tables:
     partitions: [country_code]
 
 custom_cluster:
-  driver_node_type_id: m5.2xlarge
-  node_type_id: r4.2xlarge
+  driver_node_type_id: m5d.2xlarge
+  node_type_id: r5d.2xlarge
+  runtime_engine: PHOTON
   autoscale:
     min_workers: 1
     max_workers: 3
   spark_conf:
     spark.sql.broadcastTimeout: 1200
+  aws_attributes:
+    ebs_volume_size: 200
 
 
 inner_dependencies:
