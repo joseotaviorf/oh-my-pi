@@ -62,7 +62,8 @@ if __name__ == "__main__":
                 day
                 from 
                 datalake_emlio_raw.{table_name}
-                where year={year} AND month={month} AND day={day}""".format(table_name=table_name, year=year, month=month, day=day)
+                where year={year} AND month={month} AND day={day} 
+                and service_id is not null """.format(table_name=table_name, year=year, month=month, day=day)
 
     df = spark_client.get_records(query)
 
