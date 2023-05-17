@@ -16,8 +16,8 @@ columns:
     lineage:
       - datalake_retsuko.invoice.id_external
       - datalake_retsuko.entry.id_invoice
-  frequency:
-    description: "frequency, that is, how often the tenant receives this invoice item"
+  purpose:
+    description: "purpose of this invoice item"
     lineage:
       - datalake_retsuko.invoice.purpose
   payment_status:
@@ -46,10 +46,6 @@ columns:
     description: "sign value of bill item, positive means its a due value TO 5A, and negative means its a due value FROM 5A"
     lineage:
       - datalake_retsuko_clean.account.type
-  amount:
-    description: "invoice amount"
-    lineage:
-      - datalake_retsuko.entry.amount
   from_account_type:
     description: "type of account being billed, i.e type of account from where the debt is charged"
   to_account_type:

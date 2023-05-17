@@ -69,5 +69,5 @@ SELECT DISTINCT
   value_to_due,
   DATE(ts_safra_per_dt_due) AS dt_safra_per_dt_due,
   DATE(ts_safra_per_dt_created) AS dt_safra_per_dt_created,
-  ABS(due_amount) AS
+  ABS(due_amount) AS due_amount
 FROM building_status_invoices_values

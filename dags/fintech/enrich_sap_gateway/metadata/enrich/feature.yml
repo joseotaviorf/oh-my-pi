@@ -24,6 +24,10 @@ columns:
     description: "External payment ID"
     lineage:
       - datalake_sap_gateway_clean.feature.id_external_payment
+  uuid:
+    description: "Unique ID in uuid format"
+    lineage:
+      - datalake_sap_gateway_clean.feature.uuid
   source:
     description: "Source description"
     lineage:

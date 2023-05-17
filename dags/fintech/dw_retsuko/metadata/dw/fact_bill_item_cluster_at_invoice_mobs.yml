@@ -57,11 +57,11 @@ columns:
     description: Invoice amount, negative means its a due value TO 5A, and positive means its a due value FROM 5A
     lineage:
       - datalake_retsuko.bill_items.due_amount
-  safra_per_dt_due:
+  ts_safra_per_dt_due:
     description: Monthly group by due date
     lineage:
       - datalake_retsuko.bill_items.dt_due
-  safra_per_dt_created:
+  ts_safra_per_dt_created:
     description: Monthly group by created date
     lineage:
       - datalake_retsuko.bill_items.dt_created
