@@ -2,7 +2,46 @@
 Recommendation metrics aggregated by Recset
 */
 
-WITH base AS (
+
+/*
+Calculate the ideal discounted cumulative gain
+*/
+WITH idcg AS (
+    WITH _k AS (
+        SELECT * FROM (VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)) AS DE(k)
+    )
+
+    SELECT
+        k1.k,
+        SUM(1/log2(k2.k+1)) AS idcg_k
+    FROM _k AS k1
+    LEFT JOIN
+        _k AS k2
+            ON k2.k <= k1.k
+    GROUP BY 1
+),
+
+recommendation_feats AS
+(
+SELECT recommendation_flow.*,
+    COALESCE(diversity.diversity_at_3, 0) AS diversity_at_3,
+    COALESCE(diversity.diversity_at_5, 0) AS diversity_at_5,
+    COALESCE(diversity.diversity_at_10, 0) AS diversity_at_10,
+    COALESCE(popularity.popularity, 0) AS popularity,
+    idcg_k
+FROM datalake_recommendations.recommendation_flow AS recommendation_flow
+LEFT JOIN
+    datalake_recommendations.diversity AS diversity
+        ON recommendation_flow.id_recset = diversity.id_recset
+LEFT JOIN
+    datalake_recommendations.popularity AS popularity
+    ON recommendation_flow.id_rec = popularity.id_rec
+LEFT JOIN
+    idcg
+        ON idcg.k = recommendation_flow.item_rank
+),
+
+base AS (
     SELECT DISTINCT
         id_recset,
         business_context,
@@ -20,31 +59,12 @@ WITH base AS (
         experiment_variant,
         ts_rec_created,
         DATE(ts_rec_created) AS dt_rec_created,
-        ts_rec_received,
-        DATE(ts_rec_received) AS dt_rec_received,
+        dt_rec_received,
         year,
         month,
         day
     FROM
         datalake_recommendations.recommendation_flow AS recommendation_flow
-),
-
-/*
-Calculate the ideal discounted cumulative gain
-*/
-idcg AS (
-    WITH _k AS (
-        SELECT * FROM (VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)) AS DE(k)
-    )
-
-    SELECT
-        k1.k,
-        SUM(1/log2(k2.k+1)) AS idcg_k
-    FROM _k AS k1
-    LEFT JOIN
-        _k AS k2
-            ON k2.k <= k1.k
-    GROUP BY 1
 ),
 
 metrics_at_3 AS (
@@ -68,10 +88,7 @@ metrics_at_3 AS (
         SUM(INT(rec_to_rent_flow_seven_days)) / COUNT(item_rank) AS rec_to_rent_flow_seven_days_at_3,
         MEAN(popularity) AS popularity_at_3
     FROM
-        datalake_recommendations.recommendation_flow AS recommendation_flow
-    LEFT JOIN
-        idcg
-            ON idcg.k = recommendation_flow.item_rank
+        recommendation_feats
     WHERE
         item_rank <= 3
     GROUP BY 1
@@ -98,10 +115,7 @@ metrics_at_5 AS (
         SUM(INT(rec_to_rent_flow_seven_days)) / COUNT(item_rank) AS rec_to_rent_flow_seven_days_at_5,
         MEAN(popularity) AS popularity_at_5
    FROM
-        datalake_recommendations.recommendation_flow AS recommendation_flow
-    LEFT JOIN
-        idcg
-            ON idcg.k = recommendation_flow.item_rank
+        recommendation_feats
     WHERE
         item_rank <= 5
     GROUP BY 1
@@ -129,10 +143,7 @@ metrics_at_10 AS
         SUM(INT(rec_to_rent_flow_seven_days)) / COUNT(item_rank) AS rec_to_rent_flow_seven_days_at_10,
         MEAN(popularity) AS popularity_at_10
     FROM
-        datalake_recommendations.recommendation_flow AS recommendation_flow
-    LEFT JOIN
-        idcg
-            ON idcg.k = recommendation_flow.item_rank
+        recommendation_feats
     WHERE
         item_rank <= 10
     GROUP BY 1

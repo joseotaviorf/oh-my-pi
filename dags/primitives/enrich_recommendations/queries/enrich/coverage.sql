@@ -8,7 +8,7 @@ Assumptions:
 
 WITH dates AS (
     SELECT DISTINCT
-        DATE(ts_rec_received) as dt_rec_received,
+        dt_rec_received,
         business_context,
         display_type
     FROM
@@ -36,7 +36,7 @@ catalog_id_item AS (
     UNION ALL
 
     SELECT
-        DATE(ts_rec_received) as dt_rec_received,
+        dt_rec_received,
         business_context,
         display_type,
         id_item
@@ -58,7 +58,7 @@ catalog AS (
 
 recommended AS (
 SELECT
-    DATE(ts_rec_received) AS dt_rec_received,
+    dt_rec_received,
     business_context,
     display_type,
     COUNT(DISTINCT CASE WHEN item_rank <= 3 THEN id_item END ) AS distinct_recommended_items_per_day_at_3,
@@ -70,7 +70,7 @@ SELECT
 FROM
     datalake_recommendations.recommendation
 GROUP BY
-    DATE(ts_rec_received), business_context, display_type
+    dt_rec_received, business_context, display_type
 )
 
 SELECT

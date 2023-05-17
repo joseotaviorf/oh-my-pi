@@ -26,10 +26,11 @@ This pipeline produces the following output table on enrich layer:
 - `recommendation_flow`
 - `coverage`
 - `diversity`
-- `personalization`
 - `popularity`
 - `recommendation_metrics_agg_recset`
+- `recommendation_metrics_agg_dimensions`
 - `recommendation_metrics_agg_display_type_business_context`
+- `recommendation_metrics_agg_display_type_business_context_experiment`
 
 ### Responsible Data Team
 ​

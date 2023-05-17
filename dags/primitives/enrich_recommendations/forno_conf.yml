@@ -4,8 +4,6 @@ inner_dependencies:
   recommendation_flow:
     - item_interaction
     - recommendation
-    - diversity
-    - popularity
   coverage:
     - recommendation
     - recommendation_catalog
@@ -18,11 +16,14 @@ inner_dependencies:
     - item_interaction
   recommendation_metrics_agg_recset:
     - recommendation_flow
+    - diversity
+    - popularity
   recommendation_metrics_agg_display_type_business_context:
     - recommendation_metrics_agg_recset
     - coverage
-    - personalization
   recommendation_metrics_agg_display_type_business_context_experiment:
+    - recommendation_metrics_agg_recset
+  recommendation_metrics_agg_dimensions:
     - recommendation_metrics_agg_recset
 
 tables:
@@ -46,14 +47,20 @@ tables:
     is_incremental: false
   recommendation_flow:
     is_incremental: false
-  personalization:
-    is_incremental: false
+    partition_cols:
+      - dt_rec_received
   coverage:
     is_incremental: false
+    partition_cols:
+      - dt_rec_received
   diversity:
     is_incremental: false
+    partition_cols:
+      - dt_rec_received
   popularity:
     is_incremental: false
+    partition_cols:
+      - dt_rec_received
   recommendation_metrics_agg_display_type_business_context:
     is_incremental: false
     partition_cols:
@@ -63,6 +70,10 @@ tables:
     partition_cols:
       - dt_rec_received
   recommendation_metrics_agg_recset:
+    is_incremental: false
+    partition_cols:
+      - dt_rec_received
+  recommendation_metrics_agg_dimensions:
     is_incremental: false
     partition_cols:
       - dt_rec_received

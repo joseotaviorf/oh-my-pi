@@ -158,7 +158,7 @@ columns:
     description: |
       Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
     lineage:
-      - datalake_recommendations.recommendation_flow.popularity
+      - datalake_recommendations.popularity.popularity
   precision_at_5:
     description: Precision @5
     lineage:
@@ -244,7 +244,7 @@ columns:
     description: |
       Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
     lineage:
-      - datalake_recommendations.recommendation_flow.popularity
+      - datalake_recommendations.popularity.popularity
   precision_at_10:
     description: Precision @10
     lineage:
@@ -330,4 +330,4 @@ columns:
     description: |
       Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
     lineage:
-      - datalake_recommendations.recommendation_flow.popularity
+      - datalake_recommendations.popularity.popularity

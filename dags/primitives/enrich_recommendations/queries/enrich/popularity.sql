@@ -1,7 +1,7 @@
 
 WITH dates AS (
     SELECT DISTINCT
-        DATE(ts_rec_received) as dt,
+        dt_rec_received as dt,
         business_context AS business_context
     FROM
         datalake_recommendations.recommendation
@@ -32,11 +32,11 @@ _catalog AS (
         UNION ALL
 
         SELECT
-            DATE(ts_rec_received) as dt,
+            dt_rec_received as dt,
             business_context,
             id_item
         FROM
-            datalake_recommendations.recommendation
+            datalake_recommendations.recommendation AS recommendation
     )
     GROUP BY dt, business_context
 ),
@@ -79,11 +79,12 @@ item_popularity_rank_per_day_normalize AS (
 
 SELECT
     id_rec,
-    COALESCE(popularity, 0) AS popularity
+    COALESCE(popularity, 0) AS popularity,
+    dt_rec_received
 FROM
     datalake_recommendations.recommendation AS recommendation
 LEFT JOIN
     item_popularity_rank_per_day_normalize
-    ON item_popularity_rank_per_day_normalize.dt = DATE(recommendation.ts_rec_received)
+    ON item_popularity_rank_per_day_normalize.dt = dt_rec_received
     AND item_popularity_rank_per_day_normalize.business_context = recommendation.business_context
     AND item_popularity_rank_per_day_normalize.id_item = recommendation.id_item

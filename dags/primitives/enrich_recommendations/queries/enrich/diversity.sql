@@ -1,5 +1,6 @@
 WITH base AS (
     SELECT DISTINCT
+        dt_rec_received,
         id_recset
     FROM
         datalake_recommendations.recommendation AS recommendation
@@ -112,7 +113,8 @@ SELECT
     base.id_recset,
     COALESCE(diversity_at_3, 0) AS diversity_at_3,
     COALESCE(diversity_at_5, 0) AS diversity_at_5,
-    COALESCE(diversity_at_10, 0) AS diversity_at_10
+    COALESCE(diversity_at_10, 0) AS diversity_at_10,
+    base.dt_rec_received
 FROM
     base
 LEFT JOIN diversity_at_3
