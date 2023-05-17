@@ -2277,6 +2277,13 @@ bietlejuice.enrich_velo:
   - bietlejuice.velo_omie:load-clean-projects
 bietlejuice.enrich_velo_omie:
   - bietlejuice.velo_omie:load-clean-cash-flows
+bietlejuice.enrich_vespucio:
+  - bietlejuice.ebdb:create-clean-condo-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-info-condo-amenities-in-data-lake
+  - bietlejuice.ebdb:create-clean-condo-amenities-in-data-lake
+  - bietlejuice.ebdb:create-clean-condo-contact-in-data-lake
+  - bietlejuice.sindico_net:load-clean-condominium
 bietlejuice.enrich_wololo_lead:
   - bietlejuice.wololo:load-clean-prospect-aud
   - bietlejuice.wololo:load-clean-prospect-dimension-aud

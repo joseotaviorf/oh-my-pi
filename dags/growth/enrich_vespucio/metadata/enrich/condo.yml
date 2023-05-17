@@ -1,0 +1,167 @@
+---
+database_name: datalake_vespucio
+table_name: condo
+owner: '@data-growth'
+domain: growth
+description: Contains ebdb and sindiconet enrich data about condominiums.
+columns:
+  id:
+    description: "The unique identifier of the condo from the source origin."
+    lineage:
+      - datalake_vespucio.condo_incremental.id
+  condo:
+    description: "The name of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.name
+  cnpj:
+    description: "The CNPJ (National Registry of Legal Entities) of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.cnpj
+  address:
+    description: "The address of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.address
+  number:
+    description: "The address number of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.number
+  neighborhood:
+    description: "The address neighborhood of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.neighborhood
+  zip_code:
+    description: "The address zipcode of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.zipcode
+  city:
+    description: "The address city of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.city
+  state:
+    description: "The address state of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.state
+  lat:
+    description: "The latitude coordinate of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.lat
+  lng:
+    description: "The longitude coordinate of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.lng
+  phone_number:
+    description: "The phone number of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.phone_number
+  type_sindic:
+    description: "The type of condominium manager (resident or professional)."
+    lineage:
+      - datalake_vespucio.condo_incremental.type_sindic
+  account_type:
+    description: "The type of account the condominium has (current or pool)."
+    lineage:
+      - datalake_vespucio.condo_incremental.account_type
+  type_of_administration:
+    description: "Indicates the type of administration (own or outsourced)."
+    lineage:
+      - datalake_vespucio.condo_incremental.type_of_administration
+  origin:
+    description: "The origin of the condominium data."
+    lineage:
+      - datalake_vespucio.condo_incremental.origin
+  total_blocks:
+    description: "Total number of blocks in the condominium."
+    lineage:
+      - datalake_vespucio.condo_incremental.total_blocks
+  total_ordinances:
+    description: "Total number of ordinances in the condominium."
+    lineage:
+      - datalake_vespucio.condo_incremental.total_ordinances
+  total_units:
+    description: "Total number of units in the condominium."
+    lineage:
+      - datalake_vespucio.condo_incremental.total_units
+  total_elevators:
+    description: "Total number of elevators in the condominium."
+    lineage:
+      - datalake_vespucio.condo_incremental.total_elevators
+  number_of_employees:
+    description: "The number of employees in the condominium."
+    lineage:
+      - datalake_vespucio.condo_incremental.number_of_employees
+  outsourced_employees:
+    description: "Boolean value to indicate if the condo has outsourced employees."
+    lineage:
+      - datalake_vespucio.condo_incremental.outsourced_employees
+  monthly_tax_revenues:
+    description: "The monthly tax revenues of the condo."
+    lineage:
+      - datalake_vespucio.condo_incremental.monthly_tax_revenues
+  number_of_garage_parking_slots:
+    description: "The number of parking slots in the condominium garage."
+    lineage:
+      - datalake_vespucio.condo_incremental.number_of_garage_parking_slots
+  number_of_garage_floors:
+    description: "The number of floors in the condominium garage."
+    lineage:
+      - datalake_vespucio.condo_incremental.number_of_garage_floors
+  number_of_garage_gates:
+    description: "The number of gates in the condominium garage."
+    lineage:
+      - datalake_vespucio.condo_incremental.number_of_garage_gates
+  number_of_water_tanks:
+    description: "The number of water tanks in the condominium."
+    lineage:
+      - datalake_vespucio.condo_incremental.number_of_water_tanks
+  has_elevator:
+    description: "Boolean value to indicate if the condo has an elevator."
+    lineage:
+      - datalake_vespucio.condo_incremental.has_elevator
+  has_entrance_hall:
+    description: "Boolean value to indicate if the condominium has a concierge/ordinance."
+    lineage:
+      - datalake_vespucio.condo_incremental.has_entrance_hall
+  has_grill_area:
+    description: "Boolean value to indicate if the condo has a barbecue area."
+    lineage:
+      - datalake_vespucio.condo_incremental.has_grill_area
+  has_swim_pool:
+    description: "Boolean value to indicate if the condominium has a pool."
+    lineage:
+      - datalake_vespucio.condo_incremental.has_swim_pool
+  has_sports_court:
+    description: "Boolean value to indicate if the condominium has a sports court."
+    lineage:
+      - datalake_vespucio.condo_incremental.has_sports_court
+  has_party_hall:
+    description: "Boolean value to indicate if the condominium has a party hall."
+    lineage:
+      - datalake_vespucio.condo_incremental.has_party_hall
+  has_sauna:
+    description: "Boolean value to indicate if the condo has a sauna."
+    lineage:
+      - datalake_vespucio.condo_incremental.has_sauna
+  has_laundry:
+    description: "Boolean value to indicate if the condo has laundry."
+    lineage:
+      - datalake_vespucio.condo_incremental.has_laundry
+  has_piped_gas:
+    description: "Boolean value to indicate if the condo has piped gas."
+    lineage:
+      - datalake_vespucio.condo_incremental.has_piped_gas
+  has_water_reuse:
+    description: "Boolean value to indicate if the condominium has a water reuse system."
+    lineage:
+      - datalake_vespucio.condo_incremental.has_water_reuse
+  construction_year:
+    description: "The year when the condo was built."
+    lineage:
+      - datalake_vespucio.condo_incremental.construction_year
+  updated_year:
+    description: "The year of the timestamp of condominium data last update"
+    lineage:
+      - datalake_vespucio.condo_incremental.ts_updated
+  ts_updated:
+    description: "Timestamp of condominium data last update"
+    lineage:
+      - datalake_vespucio.condo_incremental.ts_updated

@@ -1,0 +1,9 @@
+---
+cluster_description: databricks_10_4_min_general_photon_cluster
+external_s3_bucket: 5a-vespucio-prod
+tables_to_reverse:
+  - condo
+partition_cols:
+  - year
+  - month
+  - day
