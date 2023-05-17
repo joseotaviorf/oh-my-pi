@@ -16,7 +16,6 @@ SELECT
     proposal_date AS dt_proposed,
     accepted_at AS ts_accepted,
     validated_at AS ts_validated,
-    rejected_at AS ts_rejected,
     discarded_at AS ts_discarded,
     created_at AS ts_created,
     updated_at AS ts_updated,

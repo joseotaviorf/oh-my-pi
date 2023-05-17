@@ -104,10 +104,6 @@ columns:
     description: Flag indicating if the column ts_validated has changed.
     lineage:
       - datalake_sales_flow_raw.offer_aud.validated_at_mod
-  mod_ts_rejected:
-    description: Flag indicating if the column ts_rejected has changed.
-    lineage:
-      - datalake_sales_flow_raw.offer_aud.rejected_at_mod
   mod_ts_discarded:
     description: Flag indicating if the column ts_discarded has changed.
     lineage:
@@ -160,10 +156,6 @@ columns:
     description: Deprecated field. Do not use.
     lineage:
       - datalake_sales_flow_raw.offer_aud.validated_at
-  ts_rejected:
-    description: Timestamp which the seller reject the buyer's offer.
-    lineage:
-      - datalake_sales_flow_raw.offer_aud.rejected_at
   ts_discarded:
     description: Timestamp which the seller discarded the buyer's offer.
     lineage:
