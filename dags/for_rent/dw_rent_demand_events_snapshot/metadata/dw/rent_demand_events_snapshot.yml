@@ -1,0 +1,87 @@
+---
+database_name: dw_rent_snapshot
+table_name: rent_demand_events_snapshot
+description: "This table has the dailies snapshots data based on the fact_rent_demand_events, creating a full historical of the changes, allowing to understand
+  data updates through time. The table has aggregated sums of demand events of the rental funnel, which is also the base used to build the rent demand event metric.
+  Each line has the total volume of the aggregation by its dimensions on a daily snapshot."
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_snapshot:
+    description: "Date of the snapshot transformed into a number."
+  business_type:
+    lineage:
+    - dw_public.dim_house_listing.first_consultant_type
+    description: "Business type related to the listing of the event."
+  city_group:
+    lineage:
+    - dw_public.dim_region.city_group
+    description: "Group which the city of the event belongs."
+  guarantee:
+    lineage:
+    - dw_public.dim_proposal.guarantee
+    description: "Guarantee information related to the event."
+  halfyear:
+    description: "1 if the event month is from the first half of the year and 2 if it is from the last half."
+  listing_category_start:
+    lineage:
+    - dw_public.dim_house_listing.listing_category_start
+    description: "Listing category start information coming from the house listing."
+  quarter:
+    description: "Quarter information of the event date."
+  rent_flow_origin:
+    lineage:
+    - dw_datamarts.funnel_demand_flows.funnel_first_touchpoint
+    description: "Funnel first touchpoint information based on the information available on the column with the same name from funnel_demand_flows."
+  rental_administrator:
+    lineage:
+    - dw_public.dim_house_listing.rental_administrator
+    description: "Rental administrator related to the event."
+  tier:
+    lineage:
+    - dw_public.dim_region.city_group
+    description: "Tier information based on the city group of the event."
+  visits_booked:
+    description: "Total volume of visits booked within the aggregation."
+  visits_completed:
+    description: "Total volume of visits completed within the aggregation."
+  offers_submitted:
+    description: "Total volume of offers submitted within the aggregation."
+  offers_accepted:
+    description: "Total volume of offers accepted within the aggregation."
+  evaluation_started:
+    description: "Total volume of evaluations started within the aggregation."
+  evaluation_positive:
+    description: "Total volume of evaluations positive within the aggregation."
+  documentation_sent:
+    description: "Total volume of documentations sent within the aggregation."
+  credit_approved:
+    description: "Total volume of credits approved within the aggregation."
+  contracts_signed:
+    description: "Total volume of contracts signed within the aggregation."
+  dt_event:
+    lineage:
+    - dw_public.dim_date.date
+    description: "Date of the event."
+  dt_week_started:
+    lineage:
+    - dw_public.dim_date.date
+    description: "Week date of the event."
+  ts_snapshot:
+    description: "Load timestamp, which is the snapshot timestamp."
+  country_code: 
+    lineage:
+    - dw_rent.fact_rent_demand_events.country_code
+    description: "Country code information, also a partition."
+  year:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_load
+    description: "Year related to the load of the data into our system in order to create the snapshot. It's also a partition."
+  month:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_load
+    description: "Month related to the load of the data into our system in order to create the snapshot. It's also a partition."
+  day:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_load
+    description: "Day related to the load of the data into our system in order to create the snapshot. It's also a partition."

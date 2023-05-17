@@ -3,8 +3,8 @@ SELECT
   city_group,
   guarantee,
   halfyear,
-  listing_category_start,
   quarter,
+  listing_category_start,
   rent_flow_origin,
   rental_administrator,
   tier,
@@ -22,4 +22,8 @@ SELECT
   country_code,
   NOW() AS ts_load
 FROM 
-  datalake_metric_rent_demand_event.metric_rent_demand_event
+  dw_rent_snapshot.rent_demand_events
+WHERE
+  year = YEAR(NOW())
+  AND month = MONTH(NOW())
+  AND day = DAY(NOW())
