@@ -4,6 +4,7 @@ SELECT
 	dd.date,
 	dd.sk_date,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -31,18 +32,21 @@ JOIN dw_datamarts.lead_listing_flows lf
   AND lf.sk_lead_date > 0
 LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
+LEFT JOIN dw_datamarts.affiliates_clusters ac 
+  ON ac.sk_user = lf.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
 LEFT JOIN datalake_3p.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
 ),
 prospect AS (
 SELECT
 	dd.date,
 	dd.sk_date,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -70,18 +74,21 @@ JOIN dw_datamarts.lead_listing_flows lf
   AND lf.sk_prospect_date > 0
 LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
+LEFT JOIN dw_datamarts.affiliates_clusters ac 
+  ON ac.sk_user = lf.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
 LEFT JOIN datalake_3p.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE-- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
 ),
 qualified AS (
 SELECT
 	dd.date,
 	dd.sk_date,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -109,18 +116,21 @@ JOIN dw_datamarts.lead_listing_flows lf
   AND lf.sk_qualified_date > 0
 LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
+LEFT JOIN dw_datamarts.affiliates_clusters ac 
+  ON ac.sk_user = lf.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
 LEFT JOIN datalake_3p.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
 ),
 available_qualified AS (
 SELECT
 	dd.date,
 	dd.sk_date,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -148,18 +158,21 @@ JOIN dw_datamarts.lead_listing_flows lf
   AND lf.sk_available_qualified_date > 0
 LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
+LEFT JOIN dw_datamarts.affiliates_clusters ac 
+  ON ac.sk_user = lf.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
 LEFT JOIN datalake_3p.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
 ),
 opportunity AS (
 SELECT
 	dd.date,
 	dd.sk_date,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -187,18 +200,21 @@ JOIN dw_datamarts.lead_listing_flows lf
   AND lf.sk_opportunity_date > 0
 LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
+LEFT JOIN dw_datamarts.affiliates_clusters ac 
+  ON ac.sk_user = lf.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
 LEFT JOIN datalake_3p.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
 ),
 listing AS (
 SELECT
 	dd.date,
 	dd.sk_date,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -226,12 +242,14 @@ JOIN dw_datamarts.lead_listing_flows lf
   AND lf.sk_first_listing_date > 0
 LEFT JOIN dw_public.dim_region dr
   ON dr.sk_region = lf.sk_region
+LEFT JOIN dw_datamarts.affiliates_clusters ac 
+  ON ac.sk_user = lf.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
 LEFT JOIN datalake_3p.houses_3p AS hp
   ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -250,6 +268,7 @@ union_all_date AS (
 SELECT
   dd.date,
   ua.city_group,
+  ua.affiliate_volumetry,
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
   ua.supply_mkt_completion,
@@ -280,6 +299,7 @@ SELECT
 	date,
 	country_code,
 	city_group,
+	affiliate_volumetry,
 	supply_mkt_origin,
   	CASE WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
   	   when supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
@@ -312,4 +332,4 @@ SELECT
     SUM(COALESCE(first_listings,0)) AS first_listings,
     current_timestamp AS ts_load
 FROM union_all_date
-GROUP BY 1, 3, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+GROUP BY 1, 3, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19

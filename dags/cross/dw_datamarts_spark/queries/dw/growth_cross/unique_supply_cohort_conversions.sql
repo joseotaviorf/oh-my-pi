@@ -5,6 +5,7 @@ SELECT
 	dd.date,
 	dd.sk_date,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -32,6 +33,10 @@ LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
 LEFT JOIN
+	dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = lf.sk_user_lead_affiliate
+		AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+LEFT JOIN
     datalake_3p.houses_3p AS hp
         ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN
@@ -48,6 +53,7 @@ SELECT
 	date,
 	sk_date,
 	city_group,
+	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
 	supply_mkt_completion,
@@ -80,7 +86,7 @@ SELECT
 	rental_administrator
 FROM
     l2p_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
 ),
 p2q_pre AS (
 SELECT
@@ -88,6 +94,7 @@ SELECT
 	dd.sk_date,
 	lf.sk_prospect_date,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -115,6 +122,10 @@ LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
 LEFT JOIN
+	dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = lf.sk_user_lead_affiliate
+		AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+LEFT JOIN
     datalake_3p.houses_3p AS hp
         ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN
@@ -131,6 +142,7 @@ SELECT
 	date,
 	sk_date,
 	city_group,
+	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
 	supply_mkt_completion,
@@ -163,7 +175,7 @@ SELECT
 	rental_administrator
 FROM
 	p2q_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
 ),
 q2avq_pre AS (
 SELECT
@@ -171,6 +183,7 @@ SELECT
 	dd.sk_date,
 	lf.sk_qualified_date,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -198,6 +211,10 @@ LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
 LEFT JOIN
+	dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = lf.sk_user_lead_affiliate
+		AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+LEFT JOIN
     datalake_3p.houses_3p AS hp
         ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN
@@ -214,6 +231,7 @@ SELECT
 	date,
 	sk_date,
 	city_group,
+	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
 	supply_mkt_completion,
@@ -246,7 +264,7 @@ SELECT
 	rental_administrator
 FROM
 	q2avq_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
 ),
 avq2opp_pre AS (
 SELECT
@@ -254,6 +272,7 @@ SELECT
 	dd.sk_date,
 	lf.sk_available_qualified_date,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -281,6 +300,10 @@ LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
 LEFT JOIN
+	dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = lf.sk_user_lead_affiliate
+		AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+LEFT JOIN
     datalake_3p.houses_3p AS hp
         ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN
@@ -297,6 +320,7 @@ SELECT
 	date,
 	sk_date,
 	city_group,
+	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
 	supply_mkt_completion,
@@ -329,7 +353,7 @@ SELECT
 	rental_administrator
 FROM
 	avq2opp_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
 ),
 q2opp_pre AS (
 SELECT
@@ -337,6 +361,7 @@ SELECT
 	dd.sk_date,
     lf.sk_qualified_date,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -364,6 +389,10 @@ LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
 LEFT JOIN
+	dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = lf.sk_user_lead_affiliate
+		AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+LEFT JOIN
     datalake_3p.houses_3p AS hp
         ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN
@@ -381,6 +410,7 @@ SELECT
 	date,
 	sk_date,
 	city_group,
+	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
 	supply_mkt_completion,
@@ -413,7 +443,7 @@ SELECT
 	rental_administrator
 FROM
 	q2opp_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
 ),
 opp2fl_pre AS (
 SELECT
@@ -421,6 +451,7 @@ SELECT
 	dd.sk_date,
     lf.sk_house_listing,
 	dr.city_group,
+	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -448,6 +479,10 @@ LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
 LEFT JOIN
+	dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = lf.sk_user_lead_affiliate
+		AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+LEFT JOIN
     datalake_3p.houses_3p AS hp
         ON hp.id_house = lf.sk_house_listing / 1000
 LEFT JOIN
@@ -464,6 +499,7 @@ SELECT
 	date,
 	sk_date,
 	city_group,
+	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
 	supply_mkt_completion,
@@ -496,7 +532,7 @@ SELECT
 	rental_administrator
 FROM
 	opp2fl_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -515,6 +551,7 @@ union_all_date AS (
 SELECT
   dd.date,
   ua.city_group,
+  ua.affiliate_volumetry,
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
   ua.supply_mkt_completion,
@@ -551,6 +588,7 @@ SELECT
  date,
   country_code,
   city_group,
+  affiliate_volumetry,
   supply_mkt_origin,
   CASE
       WHEN supply_mkt_origin = 'Owner PWA'
@@ -594,4 +632,4 @@ SELECT
   current_timestamp AS ts_load
 FROM
   union_all_date
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21

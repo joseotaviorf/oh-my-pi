@@ -6,6 +6,7 @@ costs_targets_results_combined AS (
     SELECT 
         CAST(DATE_FORMAT(dt_event, 'yyyyMMdd') as BIGINT) AS sk_date,
         COALESCE(city_group, 'Not Mapped') AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
         COALESCE(mkt_origin,'') AS mkt_origin,
         COALESCE(mkt_channel,'') AS mkt_channel,
         COALESCE(mkt_medium,'') AS mkt_medium,
@@ -54,7 +55,7 @@ costs_targets_results_combined AS (
     WHERE 
         mkt_origin IN ('Owner PWA - Sale', 'Price Calculator - Sale')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
         
     UNION ALL
 
@@ -64,6 +65,7 @@ costs_targets_results_combined AS (
     SELECT 
         CAST(DATE_FORMAT(dt_event, 'yyyyMMdd') as BIGINT) AS sk_date,
         COALESCE(city_group, 'Not Mapped') AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
         COALESCE(mkt_origin,'') AS mkt_origin,
         COALESCE(mkt_channel,'') AS mkt_channel,
         COALESCE(mkt_medium,'') AS mkt_medium,
@@ -112,7 +114,7 @@ costs_targets_results_combined AS (
     WHERE 
         mkt_origin NOT IN ('Owner PWA - Sale', 'Price Calculator - Sale')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
         
     UNION ALL
 
@@ -122,6 +124,7 @@ costs_targets_results_combined AS (
     SELECT 
         CAST(DATE_FORMAT(dt_target, 'yyyyMMdd') as BIGINT) AS sk_date,
         COALESCE(city_group, 'Not Mapped') AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
         COALESCE(supply_origin,'') AS mkt_origin,
         COALESCE(supply_channel,'') AS mkt_channel,
         COALESCE(supply_medium,'') AS mkt_medium,
@@ -168,7 +171,7 @@ costs_targets_results_combined AS (
     FROM 
         datalake_gsheets_clean.tof_supply_targets
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -178,6 +181,7 @@ costs_targets_results_combined AS (
     SELECT
 		f.sk_lead_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
+        ac.affiliate_volumetry,
         CASE
             WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
             ELSE COALESCE(f.mkt_origin,'')
@@ -235,10 +239,12 @@ costs_targets_results_combined AS (
         ON f.sk_region = dr.sk_region
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
+    LEFT JOIN dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
     WHERE
         f.sk_lead_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -248,6 +254,7 @@ costs_targets_results_combined AS (
     SELECT
 		f.sk_prospect_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
+        ac.affiliate_volumetry,
         CASE
             WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
             ELSE COALESCE(f.mkt_origin,'')
@@ -305,10 +312,12 @@ costs_targets_results_combined AS (
         ON f.sk_region = dr.sk_region
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
+    LEFT JOIN dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
     WHERE
         f.sk_prospect_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
     --------------------------------------
@@ -317,6 +326,7 @@ costs_targets_results_combined AS (
     SELECT
 		f.sk_qualified_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
+        ac.affiliate_volumetry,
         CASE
             WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
             ELSE COALESCE(f.mkt_origin,'')
@@ -374,10 +384,12 @@ costs_targets_results_combined AS (
         ON f.sk_region = dr.sk_region
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
+    LEFT JOIN dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
     WHERE
         f.sk_qualified_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -387,6 +399,7 @@ costs_targets_results_combined AS (
     SELECT
 		f.sk_available_qualified_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
+        ac.affiliate_volumetry,
         CASE
             WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
             ELSE COALESCE(f.mkt_origin,'')
@@ -444,10 +457,12 @@ costs_targets_results_combined AS (
         ON f.sk_region = dr.sk_region
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
+    LEFT JOIN dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
     WHERE
         f.sk_available_qualified_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -457,6 +472,7 @@ costs_targets_results_combined AS (
     SELECT
 		f.sk_opportunity_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
+        ac.affiliate_volumetry,
         CASE
             WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
             ELSE COALESCE(f.mkt_origin,'')
@@ -514,10 +530,12 @@ costs_targets_results_combined AS (
         ON f.sk_region = dr.sk_region
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
+    LEFT JOIN dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
     WHERE
         f.sk_opportunity_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -527,6 +545,7 @@ costs_targets_results_combined AS (
     SELECT
 		f.sk_first_listing_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
+        ac.affiliate_volumetry,
         CASE
             WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
             ELSE COALESCE(f.mkt_origin,'')
@@ -586,10 +605,12 @@ costs_targets_results_combined AS (
         ON f.sk_first_listing_date = dd.sk_date
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
+    LEFT JOIN dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
     WHERE
         f.sk_first_listing_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -977,6 +998,7 @@ costs_targets_results_combined AS (
             SELECT
                 sk_date,
                 city_group,
+                CAST(NULL AS STRING) AS affiliate_volumetry,
                 replace(mkt_origin,' Sale','') AS mkt_origin,
                 mkt_channel,
                 mkt_medium,
@@ -1026,12 +1048,13 @@ costs_targets_results_combined AS (
                 business_context = 'Sale'
                 OR (business_context is NULL AND mkt_origin IN ('Doorman Sale','Indica Aí - Agents Sale','Indica Aí - General Sale'))
             GROUP BY
-                1,2,3,4,5,6,7,8,9,10
+                1,2,3,4,5,6,7,8,9,10,11
         ),
         supply_affiliates_cost AS (
             SELECT
                 sk_date,
                 city_group,
+                CAST(NULL AS STRING) AS affiliate_volumetry,
                 mkt_origin,
                 mkt_channel,
                 mkt_medium,
@@ -1081,12 +1104,13 @@ costs_targets_results_combined AS (
                 business_context = 'Rent'
                 OR (business_context is NULL AND mkt_origin IN ('Doorman','Indica Aí - Agents','Indica Aí - General'))
             GROUP BY
-                1,2,3,4,5,6,7,8,9,10
+                1,2,3,4,5,6,7,8,9,10,11
         ),
         supply_landlords_cost AS (
             SELECT
                 dbt.sk_date AS sk_date,
                 co.city_group,
+                CAST(NULL AS STRING) AS affiliate_volumetry,
                 CASE WHEN co.mkt_origin = 'Owner PWA' THEN 'PWA - '||co.mkt_channel ELSE co.mkt_origin END AS mkt_origin,
                 co.mkt_channel AS mkt_channel,
                 co.mkt_medium AS mkt_medium,
@@ -1141,12 +1165,13 @@ costs_targets_results_combined AS (
                 AND co.mkt_origin IN ('Owner PWA','Price Calculator','New Channels')
                 AND co.mkt_channel != 'Girafa'
             GROUP BY
-                1,2,3,4,5,6,7,8,9,10
+                1,2,3,4,5,6,7,8,9,10,11
         ),
         supply_sale_cost AS (
             SELECT
                 dbt.sk_date AS sk_date,
                 co.city_group AS city_group,
+                CAST(NULL AS STRING) AS affiliate_volumetry,
                 co.mkt_origin AS mkt_origin,
                 co.mkt_channel AS mkt_channel,
                 co.mkt_medium AS mkt_medium,
@@ -1199,12 +1224,13 @@ costs_targets_results_combined AS (
                 co.account_name IN ('quintoandar_supply_sale_display', 'quintoandar_supply_sale', 'supply_landlords_sale', 'supply_landlords', 'imovelweb_supply')
                 AND co.mkt_origin IN ('Owner PWA - Sale', 'Price Calculator - Sale')
             GROUP BY
-                1,2,3,4,5,6,7,8,9,10
+                1,2,3,4,5,6,7,8,9,10,11
         ),
         supply_ciq_cost AS (
             SELECT
                 dbt.sk_date AS sk_date,
                 co.city_group AS city_group,
+                CAST(NULL AS STRING) AS affiliate_volumetry,
                 co.mkt_origin AS mkt_origin,
                 co.mkt_channel AS mkt_channel,
                 co.mkt_medium AS mkt_medium,
@@ -1256,7 +1282,7 @@ costs_targets_results_combined AS (
             WHERE
                 co.mkt_origin = 'CIQ'
             GROUP BY
-                1,2,3,4,5,6,7,8,9,10
+                1,2,3,4,5,6,7,8,9,10,11
         ),
         cost_union AS (
             SELECT * FROM supply_affiliates_cost
@@ -1288,6 +1314,7 @@ costs_targets_results_combined AS (
     SELECT
         str.id_date AS sk_date,
         CAST(COALESCE(NULLIF(str.city_group, ''),'Not Mapped') AS STRING) AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
         str.supply_origin AS mkt_origin,
         str.supply_channel AS mkt_channel,
         str.supply_medium AS mkt_medium,
@@ -1336,7 +1363,7 @@ costs_targets_results_combined AS (
     WHERE
         str.dt_target >= DATE('2021-04-01')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -1346,6 +1373,7 @@ costs_targets_results_combined AS (
     SELECT
         str.id_date AS sk_date,
         CAST(COALESCE(NULLIF(str.city_group, ''),'Not Mapped') AS STRING) AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
         str.supply_origin AS mkt_origin,
         str.supply_channel AS mkt_channel,
         str.supply_medium AS mkt_medium,
@@ -1394,7 +1422,7 @@ costs_targets_results_combined AS (
     WHERE
         str.dt_target >= DATE('2021-04-01')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -1405,6 +1433,7 @@ costs_targets_results_combined AS (
     (SELECT
         CAST(DATE_FORMAT(str.date, 'yyyyMMdd') as BIGINT) AS sk_date,
         CAST(COALESCE(NULLIF(str.city_group, ''),'Not Mapped') AS STRING) AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
         CASE
             WHEN str.mkt_channel = 'Spinver' THEN 'Partners'
             WHEN str.mkt_origin = 'All' AND str.mkt_channel IN ('Organic', 'Paid', 'CRM/Notification') THEN 'Owner PWA'
@@ -1457,7 +1486,7 @@ costs_targets_results_combined AS (
         datalake_gsheets_clean.sale_supply_targets str
     WHERE str.mkt_channel NOT IN ('All', 'Branded')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
     )
     SELECT
         *
@@ -1476,6 +1505,7 @@ costs_targets_results_combined AS (
     SELECT
         CAST(DATE_FORMAT(str.date, 'yyyyMMdd') as BIGINT) AS sk_date,
         CAST(COALESCE(NULLIF(str.city_group, ''),'Not Mapped') AS STRING) AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
         CASE
             WHEN str.mkt_channel = 'Spinver' THEN 'Partners'
             WHEN str.mkt_origin = 'All' AND str.mkt_channel IN ('Organic', 'Paid', 'CRM/Notification') THEN 'Owner PWA'
@@ -1528,7 +1558,7 @@ costs_targets_results_combined AS (
         datalake_gsheets_clean.sale_supply_targets str
     WHERE str.mkt_channel NOT IN ('All', 'Branded')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
   -------------------------------------------
@@ -1537,6 +1567,7 @@ costs_targets_results_combined AS (
     SELECT
         CAST(DATE_FORMAT(str.date, 'yyyyMMdd') as BIGINT) AS sk_date,
         CAST(COALESCE(NULLIF(str.city_group,''),'Not Mapped') AS STRING) AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
         CAST(NULLIF(str.supply_origin,'') AS STRING) AS mkt_origin,
         CAST(NULLIF(str.supply_channel,'') AS STRING) AS mkt_channel,
         CAST(NULL AS STRING) AS mkt_medium,
@@ -1588,7 +1619,7 @@ costs_targets_results_combined AS (
         AND str.supply_origin NOT IN ('Price Calculator', 'Price Calculator - Sale', 'New Channels')
         AND NOT(str.supply_origin='Owner PWA' AND str.supply_channel='Paid'))
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -1598,6 +1629,7 @@ costs_targets_results_combined AS (
     SELECT
         CAST(DATE_FORMAT(str.date, 'yyyyMMdd') as BIGINT) AS sk_date,
         CAST(COALESCE(NULLIF(str.city_group,''),'Not Mapped') AS STRING) AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
         CAST(NULLIF(str.supply_origin,'') AS STRING) AS mkt_origin,
         CAST(NULLIF(str.supply_channel,'') AS STRING) AS mkt_channel,
         CAST(NULL AS STRING) AS mkt_medium,
@@ -1644,7 +1676,7 @@ costs_targets_results_combined AS (
     FROM
         dw_datamarts.daily_target_volumes_supply str
    GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -1654,6 +1686,7 @@ costs_targets_results_combined AS (
     SELECT
         CAST(DATE_FORMAT(sct.dt_created, 'yyyyMMdd') as BIGINT) AS sk_date,
         CAST(COALESCE(NULLIF(sct.city_group,''),'Not Mapped') AS STRING) AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
         CASE
             WHEN sct.planning_mkt_level3 = 'PWA - Paid'
                 THEN 'Owner PWA'
@@ -1718,7 +1751,7 @@ costs_targets_results_combined AS (
             AND business = 'Sale'
             AND planning_mkt_level3 NOT IN ('PWA - Paid', 'Price Calculator', 'New Channels'))
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -1728,6 +1761,7 @@ costs_targets_results_combined AS (
     SELECT
         CAST(DATE_FORMAT(sct.dt_created, 'yyyyMMdd') as BIGINT) AS sk_date,
         CAST(COALESCE(nullif(sct.city_group,''),'Not Mapped') AS STRING) AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
         CASE
             WHEN sct.planning_mkt_level3 = 'PWA - Paid'
                 THEN 'Owner PWA'
@@ -1792,13 +1826,14 @@ costs_targets_results_combined AS (
             AND business = 'Rental'
             AND planning_mkt_level3 NOT IN ('PWA - Paid', 'Price Calculator', 'New Channels'))
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10
+        1,2,3,4,5,6,7,8,9,10,11
 
 )
 
 SELECT
     date,
     city_group,
+    affiliate_volumetry,
     CASE
         WHEN mkt_origin = 'PWA - Paid' THEN 'Owner PWA'
 	WHEN mkt_origin = 'Owner PWA - Sale' THEN 'Owner PWA'
@@ -1863,4 +1898,4 @@ JOIN
     dw_public.dim_date AS dd
     USING(sk_date)
 GROUP BY
-    1,2,3,4,5,6,7,8,9,10,11
+    1,2,3,4,5,6,7,8,9,10,11,12
