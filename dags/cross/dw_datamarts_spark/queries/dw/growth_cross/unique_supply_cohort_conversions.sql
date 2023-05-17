@@ -86,7 +86,7 @@ SELECT
 	rental_administrator
 FROM
     l2p_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
 ),
 p2q_pre AS (
 SELECT
@@ -175,7 +175,7 @@ SELECT
 	rental_administrator
 FROM
 	p2q_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
 ),
 q2avq_pre AS (
 SELECT
@@ -264,7 +264,7 @@ SELECT
 	rental_administrator
 FROM
 	q2avq_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
 ),
 avq2opp_pre AS (
 SELECT
@@ -353,7 +353,7 @@ SELECT
 	rental_administrator
 FROM
 	avq2opp_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
 ),
 q2opp_pre AS (
 SELECT
@@ -443,7 +443,7 @@ SELECT
 	rental_administrator
 FROM
 	q2opp_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
 ),
 opp2fl_pre AS (
 SELECT
@@ -532,7 +532,7 @@ SELECT
 	rental_administrator
 FROM
 	opp2fl_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
 ),
 union_all AS (
     SELECT * FROM l2p
