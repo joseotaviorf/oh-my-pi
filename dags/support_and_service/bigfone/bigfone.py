@@ -1,7 +1,6 @@
 from datetime import datetime
 import pendulum
 import os
-import json
 
 from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
@@ -26,11 +25,7 @@ athena_query_results_bucket = config_service.get_config("athena_query_results_bu
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-dag_documentation = config_service.get_config("dag_documentation")
 default_libraries = config_service.get_config("default_libraries")
-
-tables_info = config_service.get_config("tables")
-partition_cols = config_service.get_config("partition_cols")
 
 # s3 paths setup
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
@@ -48,6 +43,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
+default_libraries = config_service.get_config("default_libraries")
 
 # dag vars
 DAG_ID = f"bietlejuice.{SOURCE}"
@@ -66,12 +62,8 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.generate_doc_md_str(
-        dag_name=SOURCE,
-        doc_md_chart_url=doc_md_chart_url,
-        dag_documentation=dag_documentation,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        dag_owner=DAGOwnerEnum.DATA_SS,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 
@@ -100,12 +92,7 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
     extraction_spark_job_file=raw_spark_job_path,
-    raw_spark_job_extra_args=[
-        SOURCE,
-        "{{ ds }}",
-        json.dumps(tables_info),
-        json.dumps(partition_cols),
-    ],
+    raw_spark_job_extra_args=["{{ ds }}"],
 )
 
 full_clean_task_groups = task_group.build_task_group_from_sql_files(
