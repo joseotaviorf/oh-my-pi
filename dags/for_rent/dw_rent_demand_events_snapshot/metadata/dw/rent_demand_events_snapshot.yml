@@ -13,18 +13,18 @@ columns:
     description: "1 if the event month is from the first half of the year and 2 if it is from the last half."
   quarter:
     description: "Quarter information of the event date."
-  business_type:
-    lineage:
-    - dw_public.dim_house_listing.first_consultant_type
-    description: "Business type related to the listing of the event."
   city_group:
     lineage:
     - dw_public.dim_region.city_group
     description: "Group which the city of the event belongs."
-  guarantee:
+  tier:
     lineage:
-    - dw_public.dim_proposal.guarantee
-    description: "Guarantee information related to the event."
+    - dw_public.dim_region.city_group
+    description: "Tier information based on the city group of the event."
+  business_type:
+    lineage:
+    - dw_public.dim_house_listing.first_consultant_type
+    description: "Business type related to the listing of the event."
   listing_category_start:
     lineage:
     - dw_public.dim_house_listing.listing_category_start
@@ -37,10 +37,6 @@ columns:
     lineage:
     - dw_public.dim_house_listing.rental_administrator
     description: "Rental administrator related to the event."
-  tier:
-    lineage:
-    - dw_public.dim_region.city_group
-    description: "Tier information based on the city group of the event."
   visits_booked:
     description: "Total volume of visits booked within the aggregation."
   visits_completed:
@@ -59,6 +55,10 @@ columns:
     description: "Total volume of credits approved within the aggregation."
   contracts_signed:
     description: "Total volume of contracts signed within the aggregation."
+  has_guarantee:
+    description: "Boolean indicating if the event has a guarantee related.
+      It's important to notice that if the event type is from 1 to 4 (VB til OA), the guarantee flag is automatically false.
+      If the event type is equal or bigger than 5 (EA til CS), the flag is related to the proposal's guarantee type if it's RentalGuarantee."
   dt_event:
     lineage:
     - dw_public.dim_date.date

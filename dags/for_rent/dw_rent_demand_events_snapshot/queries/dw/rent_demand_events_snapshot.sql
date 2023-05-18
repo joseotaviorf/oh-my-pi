@@ -5,21 +5,20 @@ SELECT
     ELSE 2
   END AS halfyear,
   EXTRACT(quarter FROM dt.date) AS quarter,
+  dr.city_group,
+  dr.tier,
   CASE 
     WHEN dhl.is_b2b = TRUE THEN 'B2B'
     WHEN dhl.first_consultant_type = 'CIQ_MANAGER' THEN 'ASP'
     WHEN dhl.is_for_rent = TRUE AND (dhl.first_consultant_type IS NOT NULL AND dhl.first_consultant_type <> 'Core') THEN dhl.first_consultant_type
     WHEN dhl.is_b2b = FALSE OR (dhl.first_consultant_type IS NULL OR dhl.first_consultant_type = 'Core') THEN 'CORE'
   END AS business_type,
-  dr.city_group,
-  dp.guarantee,
   dhl.listing_category_start,
   CASE 
     WHEN funnel_first_touchpoint = 'DIRECT' THEN funnel_first_touchpoint
     ELSE 'VISIT' 
   END AS rent_flow_origin,
   dhl.rental_administrator,
-  dr.tier,
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 1) AS visits_booked,
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 2) AS visits_completed,
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 3) AS offers_submitted,
@@ -29,6 +28,11 @@ SELECT
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 7) AS documentation_sent,
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 8) AS credit_approved,
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 9) AS contracts_signed,
+  CASE
+    WHEN fde.sk_event_type BETWEEN 1 AND 4 THEN FALSE
+    WHEN fde.sk_event_type > 4 AND dp.guarantee = 'RentalGuarantee' THEN TRUE
+    ELSE FALSE
+  END AS has_guarantee,
   TO_DATE(dt.date, 'yyyy-mm-dd') AS dt_event,  
   TO_DATE(DATE_TRUNC('week', dt.date), 'yyyy-mm-dd') AS dt_week_started,
   NOW() AS ts_snapshot,
@@ -54,4 +58,4 @@ LEFT JOIN
 LEFT JOIN 
   dw_public.dim_proposal AS dp -- guarantee
     ON fde.sk_proposal = dp.sk_proposal
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 21, 22, 23, 24, 25, 26
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 19, 20, 21, 22, 23, 24, 25, 26
