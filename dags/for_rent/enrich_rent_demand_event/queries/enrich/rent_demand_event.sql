@@ -317,14 +317,14 @@ rent_demand_events AS (
   FROM
     datalake_ebdb_contract.contract AS ct
   JOIN
-    datalake_proposal.proposal AS pp
-      ON ct.id_proposal = pp.id
-  JOIN
-    datalake_offer.offer AS off
-      ON off.id = pp.id_offer 
-  JOIN
     rent_flow_house_listing AS rf
       ON rf.id_contract = ct.id
+  LEFT JOIN -- We noticed that we may have several contracts without offer and proposal. In order to don't lose track of them, we're applying a left join.
+    datalake_proposal.proposal AS pp
+      ON ct.id_proposal = pp.id
+  LEFT JOIN
+    datalake_offer.offer AS off
+      ON off.id = pp.id_offer 
   WHERE 
     ct.ts_signed IS NOT NULL
 )
