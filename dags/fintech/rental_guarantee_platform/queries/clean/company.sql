@@ -6,6 +6,7 @@ SELECT
     status,
     version,
     agent_split_fee,
+    is_legacy,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

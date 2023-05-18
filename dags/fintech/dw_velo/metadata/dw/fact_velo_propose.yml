@@ -181,25 +181,5 @@ columns:
     lineage:
     - datalake_velo.propose.ts_secure_pending
     description: Timestamp of when the propose has started waiting to be secured
-  dt_activation:
-    description: Date of when status of the propose was set to "Ativada"
-  dt_activation_analysis:
-    description: Date of when status of the propose was set to "Ativada - Em Conferencia"
-  dt_evaluation_started:
-    description: Date of when status of the propose was set to "Em avaliacao"
-  dt_paid:
-    description: Date of when status of the propose was set to "Pagamento"
-  dt_propose_started:
-    description: Date of when status of the propose was set to "Iniciada"
-  dt_rejected:
-    description: Date of when status of the propose was set to "Reprovado"
-  dt_secure_pending:
-    description: Date of when status of the propose was set to "Afiancamento Pendente"
-  dt_secured:
-    description: Date of when status of the propose was set to "Afiançado"
-  dt_sign_started:
-    description: Date of when status of the propose was set to "Em assinatura"
-  dt_waiting_new_docs:
-    description: Date of when status of the propose was set to "Aguardando Complementos"
   ts_load:
     description: Moment (timestamp) when the table was last loaded

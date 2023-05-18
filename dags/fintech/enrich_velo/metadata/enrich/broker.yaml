@@ -8,10 +8,12 @@ columns:
     description: "Broker's identification number (ID)"
     lineage:
       - datalake_velo_clean.fiancavelo_realestate.id
+      - datalake_rental_guarantee_platform_clean.company.id
   broker_comercial_name:
     description: "Broker's comercial name"
     lineage:
       - datalake_velo_clean.clientes_company.comercial_name
+      - datalake_company_clean.company.trade_name
   broker_name:
     description: "Broker's name"
     lineage:
@@ -20,26 +22,33 @@ columns:
     description: "Broker's establishment street"
     lineage:
       - datalake_velo_clean.clientes_address.street
+      - datalake_company_clean.company.company_name
   number:
     description: "Broker's establishment address number"
     lineage:
       - datalake_velo_clean.clientes_address.number
+      - datalake_company_clean.address.number
   complement:
     description: "Broker's establishment address complement"
     lineage:
       - datalake_velo_clean.clientes_address.complement
+      - datalake_company_clean.address.complement
   neighborhood:
     description: "Broker's establishment address neighborhood"
     lineage:
       - datalake_velo_clean.clientes_address.neighborhood
+      - datalake_company_clean.address.neighborhood
   city:
     description: "Broker's establishment city"
     lineage:
       - datalake_velo_clean.clientes_address.city
+      - datalake_company_clean.address.city
   state:
     description: "Broker's establishment state"
     lineage:
+      - datalake_ebdb_clean.country.abbreviation
       - datalake_velo_clean.clientes_address.state
+      - datalake_company_clean.address.city
   country_code:
     description: "Broker's establishment country code"
     lineage:
@@ -48,6 +57,7 @@ columns:
     description: "Broker's establishment zipcode"
     lineage:
       - datalake_velo_clean.clientes_address.zipcode
+      - datalake_company_clean.address.zip_code
   geolocation:
     description: "Broker's establishment geolocation"
     lineage:
@@ -56,10 +66,12 @@ columns:
     description: "Broker's certification number (CRECI)"
     lineage:
       - datalake_velo_clean.fiancavelo_realestate.creci
+      - datalake_company_clean.document.identification_number
   cnpj:
     description: "Broker's document number (CNPJ)"
     lineage:
       - datalake_velo_clean.clientes_company.document
+      - datalake_company_clean.document.identification_number
   is_broker_active:
     description: "Identify if the broker is active in Velo's platform"
     lineage:
@@ -68,3 +80,4 @@ columns:
     description: "Moment (timestamp) when the broker was created in Velo's platform"
     lineage:
       - datalake_velo_clean.fiancavelo_realestate.ts_inserted
+      - datalake_rental_guarantee_platform_clean.company.ts_created

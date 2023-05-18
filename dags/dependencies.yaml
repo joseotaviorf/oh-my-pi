@@ -661,7 +661,7 @@ bietlejuice.dw_listing_owners:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user
-bietlejuice.dw_losses: 
+bietlejuice.dw_losses:
   - bietlejuice.enrich_losses:load-enrich-closing
 bietlejuice.dw_money_laundering_prevention:
   - bietlejuice.enrich_money_laundering_prevention:load-enrich-client
@@ -2275,6 +2275,16 @@ bietlejuice.enrich_velo:
   - bietlejuice.velo_omie:load-clean-bank-account
   - bietlejuice.velo_omie:load-clean-categories
   - bietlejuice.velo_omie:load-clean-projects
+  - bietlejuice.rental_guarantee_platform:load-clean-propose-history
+  - bietlejuice.rental_guarantee_platform:load-clean-propose-person
+  - bietlejuice.rental_guarantee_platform:load-clean-property-propose
+  - bietlejuice.rental_guarantee_platform:load-clean-propose
+  - bietlejuice.rental_guarantee_platform:load-clean-contract
+  - bietlejuice.rental_guarantee_platform:load-clean-propose-status
+  - bietlejuice.rental_guarantee_platform:load-clean-company
+  - bietlejuice.company:load-clean-address
+  - bietlejuice.company:load-clean-company
+  - bietlejuice.company:load-clean-document
 bietlejuice.enrich_velo_omie:
   - bietlejuice.velo_omie:load-clean-cash-flows
 bietlejuice.enrich_vespucio:

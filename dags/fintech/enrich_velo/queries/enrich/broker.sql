@@ -1,28 +1,138 @@
+WITH activation AS (
 SELECT
-  r.id AS id_broker,
-  c.comercial_name AS broker_comercial_name,
-  c.name AS broker_name,
-  ca.street,
-  ca.number,
-  ca.complement,
-  ca.neighborhood,
-  UPPER(ca.city) AS city,
-  UPPER(ca.state) AS state, -- this comes already as abbreviation
-  ct.code AS country_code,
-  ca.zipcode,
-  ca.geolocation,
-  r.creci,
-  c.document AS cnpj,
-  r.is_active AS is_broker_active,
-  r.ts_inserted AS ts_created
+    p.id_real_estate,
+    DATE(MIN(ph.ts_inserted)) AS dt_first_propose,
+    DATE(MIN(CASE WHEN ps.id  IN (13,14) THEN ph.ts_inserted END)) AS dt_first_contract
 FROM
-  datalake_velo_clean.fiancavelo_realestate AS r
+    datalake_rental_guarantee_platform_clean.propose_history AS ph
 LEFT JOIN
-  datalake_velo_clean.clientes_company AS c
-    ON c.id = r.id_company
+    datalake_rental_guarantee_platform_clean.propose_status AS ps
+        ON ph.value = ps.name
 LEFT JOIN
-  datalake_velo_clean.clientes_address AS ca
-    ON ca.id = c.address
-LEFT JOIN
-  datalake_ebdb_clean.country AS ct
-    ON IF(REPLACE(ca.country, '\'', '') = '', NULL, UPPER(REPLACE(ca.country, '\'', ''))) = UPPER(ct.name)
+    datalake_rental_guarantee_platform_clean.propose AS p
+        ON p.id = ph.id_propose
+GROUP BY
+    p.id_real_estate
+),
+address AS (
+    SELECT
+        a.*
+    FROM
+        datalake_rental_guarantee_platform_clean.company AS c
+    LEFT JOIN
+        datalake_company_clean.address AS a
+            ON c.uuid_company = a.uuid_company
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY c.id ORDER BY a.ts_updated DESC) = 1
+),
+company_info AS (
+    SELECT
+        comp.*
+    FROM
+        datalake_rental_guarantee_platform_clean.company AS c
+    LEFT JOIN
+        datalake_company_clean.company AS comp
+            ON c.uuid_company = comp.uuid_company
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY c.id ORDER BY comp.ts_updated DESC) = 1
+),
+cte_union AS (
+(
+  SELECT
+      c.id AS id_broker,
+      comp.trade_name AS broker_comercial_name,
+      comp.company_name AS broker_name,
+      a.public_area AS street,
+      a.`number`,
+      a.complement,
+      a.neighborhood,
+      a.city,
+      COALESCE(st.abbreviation, IF(a.state = '', NULL, UPPER(a.state))) AS state,
+      ct.code AS country_code,
+      a.zip_code AS zipcode,
+      NULL AS geolocation,
+      d.identification_number AS creci,
+      d2.identification_number AS cnpj,
+      activation.dt_first_contract IS NOT NULL AS is_broker_active,
+      c.ts_created
+  FROM
+      datalake_rental_guarantee_platform_clean.company AS c
+  LEFT JOIN
+      company_info AS comp
+          ON c.uuid_company = comp.uuid_company
+  LEFT JOIN
+      address AS a
+          ON c.uuid_company = a.uuid_company
+  LEFT JOIN
+      datalake_company_clean.document AS d
+          ON c.uuid_company = d.uuid_company
+          AND d.document_type = 'CRECI'
+  LEFT JOIN
+      datalake_company_clean.document AS d2
+          ON c.uuid_company = d2.uuid_company
+          AND d2.document_type = 'CNPJ'
+  LEFT JOIN
+      activation
+          ON c.id = activation.id_real_estate
+  LEFT JOIN
+      datalake_ebdb_clean.country AS ct
+          ON IF(REPLACE(a.country, '\'', '') = '', NULL, UPPER(REPLACE(a.country, '\'', ''))) = UPPER(ct.name)
+  LEFT JOIN
+      datalake_ebdb_clean.state AS st
+          ON UPPER(a.state) = UPPER(st.name)
+          AND ct.id = st.id_country
+  WHERE
+      c.id >= 5000000
+)
+UNION ALL
+(
+  SELECT
+    r.id AS id_broker,
+    c.comercial_name AS broker_comercial_name,
+    c.name AS broker_name,
+    ca.street,
+    ca.number,
+    ca.complement,
+    ca.neighborhood,
+    UPPER(ca.city) AS city,
+    UPPER(ca.state) AS state, -- this comes already as abbreviation
+    ct.code AS country_code,
+    ca.zipcode,
+    ca.geolocation,
+    r.creci,
+    c.document AS cnpj,
+    r.is_active AS is_broker_active,
+    r.ts_inserted AS ts_created
+  FROM
+    datalake_velo_clean.fiancavelo_realestate AS r
+  LEFT JOIN
+    datalake_velo_clean.clientes_company AS c
+      ON c.id = r.id_company
+  LEFT JOIN
+    datalake_velo_clean.clientes_address AS ca
+      ON ca.id = c.address
+  LEFT JOIN
+    datalake_ebdb_clean.country AS ct
+      ON IF(REPLACE(ca.country, '\'', '') = '', NULL, UPPER(REPLACE(ca.country, '\'', ''))) = UPPER(ct.name)
+)
+ORDER BY 1
+)
+SELECT
+    id_broker,
+    broker_comercial_name,
+    broker_name,
+    street,
+    `number`,
+    complement,
+    neighborhood,
+    city,
+    state,
+    country_code,
+    zipcode,
+    geolocation,
+    creci,
+    cnpj,
+    is_broker_active,
+    ts_created
+FROM
+    cte_union
