@@ -83,6 +83,7 @@ BASE_CLOSING_DRAFT AS (
 SELECT 
       sk_invoice as id_invoice,
       id as id_contract,
+      accrual_year_month,
       due_amount, 
       frequency, 
       guarantee_type as is_guarantee_paid,

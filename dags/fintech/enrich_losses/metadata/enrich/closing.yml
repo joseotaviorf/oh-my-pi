@@ -13,6 +13,10 @@ columns:
     lineage:   
     - datalake_ebdb_contract.contract.id
     description: Id of the contract. 
+  accrual_year_month:
+    lineage:   
+    - dw_payment_snapshot.dim_invoice_snapshot.accrual_year_month
+    description: String with Year number and Month number 'yyyymm' related to the sent date.
   due_amount:
     lineage:   
     - dw_payment_snapshot.dim_invoice_snapshot.due_amount
