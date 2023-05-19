@@ -22,7 +22,7 @@ More information about run time [here]({chart_url}{dag_id})
 
 This pipeline produces the following output table:
 ​
-
-- `condo`: Contains ebdb and sindiconet enrich data about condominiums.
+- `condo_incremental`: Contains ebdb and sindiconet enrich data about condominiums (duplicated data).
+- `condo`: Contains ebdb and sindiconet enrich data about condominiums (deduplicated data).
 
 </details>

@@ -45,7 +45,7 @@ reverse_spark_job_path = (
 )
 
 external_s3_bucket = config_service.get_config("external_s3_bucket")
-tables_to_reverse = config_service.get_config("tables_to_reverse")
+tables_to_reverse = str(config_service.get_config("tables_to_reverse"))
 partition_cols = config_service.get_config("partition_cols")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [

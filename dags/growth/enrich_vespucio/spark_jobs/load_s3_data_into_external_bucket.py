@@ -1,4 +1,5 @@
 import io
+import ast
 import logging
 from datetime import datetime
 from argparse import ArgumentParser
@@ -40,7 +41,7 @@ if __name__ == "__main__":
 
     parser.add_argument("environment", help="forno/prod values ")
     parser.add_argument("datalake_bucket", help="bucket for forno/prod datalake")
-    parser.add_argument("source", help="source name")
+    parser.add_argument("context", help="context name")
     parser.add_argument("external_bucket", help="bucket destination for files")
     parser.add_argument("tables", help="tables list to export to destination")
 
@@ -50,7 +51,7 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     context = args.context
     external_bucket = args.external_bucket
-    tables = args.tables
+    tables = ast.literal_eval(args.tables)
 
     logger.info(
         f"""m=__main__, environment={environment}, context={context},
