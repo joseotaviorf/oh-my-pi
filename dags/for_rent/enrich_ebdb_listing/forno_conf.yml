@@ -10,6 +10,8 @@ tables:
     partitions: [country_code]
   - table_name: house_listing
     partitions: [country_code]
+  - table_name: house_listing_category
+    partitions: [country_code]
   - table_name: house_listing_fees
     partitions: [country_code]
   - table_name: house_listing_status
@@ -41,13 +43,14 @@ custom_cluster:
   aws_attributes:
     ebs_volume_size: 200
 
-
 inner_dependencies:
   house_listing:
     - house_status_version_order
     - house_listing_status
     - listing_business_context_status_history
     - business_context_history
+  house_listing_category:
+    - lbc_status_version_order
   house_listing_status:
     - house_status_version_order
   agents_with_keys:

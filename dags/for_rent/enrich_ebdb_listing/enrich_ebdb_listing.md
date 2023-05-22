@@ -2,7 +2,7 @@
 
 ### Purpose
 
-Creates enriched tables for the context `Listing` of ebdb.
+Creates enriched tables for the context `Listing` of EBDB.
 
 ### Execution Interval
 
@@ -17,6 +17,7 @@ Produces the following output tables:
 - `house`
 - `house_entrance_history`
 - `house_listing`
+- `house_listing_category`
 - `house_listing_fees`
 - `house_listing_status`
 - `house_status_version_order`
