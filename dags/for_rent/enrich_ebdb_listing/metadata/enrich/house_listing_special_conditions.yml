@@ -1,0 +1,37 @@
+database_name: datalake_ebdb_listing
+table_name: house_listing_special_conditions
+description: Information related to ForRent listings special conditions. 
+  Each line is an unique tuple of listing and special condition type and opt-in and/or opt-out of the special condition.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  country_code:
+    lineage:
+      - datalake_ebdb_listing.house_listing_category.country_code
+    description: "Code of the country where the house is."
+  dt_opted_in:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+    description: "Date when the owner has opted in to the special condition."
+  dt_opted_out:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_out
+    description: "Date when the owner has opted out from the special condition."
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing_category.id_house_listing
+    description: "Id of the house listing."
+  rn_last_special_condition:
+    description: "Row number of the special condition type (the number 1 is the last listing's special condition)."
+  rn_first_special_condition:
+    description: "Row number of the special condition type (the number 1 is the first listing's special condition)."
+  special_condition_type:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.special_condition_type
+    description: "Type of the special condition negotiated and selected by the owner."
+    categories:
+      Exclusivity: "QuintoAndar has exclusivity over this house."
+      OriginalsReady: "House is ready to be part of the Originals Program."
+      OriginalsReno: "House needs a remodeling to be part of the Originals Program."
+      ORent: "Type related to I/ORent program (this program was deprecated in 2021 for new houses)."
+      IRent: "Type related to I/ORent program (this program was deprecated in 2021 for new houses)."
