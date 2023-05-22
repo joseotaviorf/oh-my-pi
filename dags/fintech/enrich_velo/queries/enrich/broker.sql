@@ -87,7 +87,7 @@ cte_union AS (
 UNION ALL
 (
   SELECT
-    r.id AS id_broker,
+    c.id AS id_broker,
     c.comercial_name AS broker_comercial_name,
     c.name AS broker_name,
     ca.street,
