@@ -19,7 +19,7 @@ WITH new_system AS (
         FROM
             datalake_rental_guarantee_platform_clean.propose_history
         WHERE
-            value = 'Rascunho'
+            value IN ('Rascunho','Pendente')
             AND id_history_type = 5 -- Status update type
         GROUP BY
             1 -- some proposes can have multiple same status
