@@ -4,7 +4,7 @@ WITH union_surveys_answers AS (
         ssg.id_survey,
         ssg.id_contract,
         NULL AS id_ticket,
-        ssg.id_respondent,
+        NULL AS id_respondent,
         ssg.respondent_email,
         ssg.respondent_type,
         ssg.service_type,

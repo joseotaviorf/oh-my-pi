@@ -1,7 +1,6 @@
 WITH gsheets_surveys AS (
     SELECT
         id_contract,
-        NULL AS id_respondent,
         email AS respondent_email,
         'OWNER' AS respondent_type,
         'inspection' AS service_type,
@@ -26,7 +25,6 @@ WITH gsheets_surveys AS (
     UNION ALL
     SELECT
         id_contract,
-        NULL AS id_respondent,
         email AS respondent_email,
         'TENANT' AS respondent_type,
         'inspection' AS service_type,
@@ -51,7 +49,6 @@ WITH gsheets_surveys AS (
     UNION ALL
     SELECT
         id_contract,
-        NULL AS id_respondent,
         email AS respondent_email,
         'TENANT' AS respondent_type,
         'inspection' AS service_type,
@@ -76,7 +73,6 @@ WITH gsheets_surveys AS (
     UNION ALL
     SELECT
         id_contract,
-        NULL AS id_respondent,
         email AS respondent_email,
         'OWNER' AS respondent_type,
         'inspection' AS service_type,
@@ -100,8 +96,7 @@ WITH gsheets_surveys AS (
         DATE(ts_submitted) = DATE('{year}-{month}-{day}')
     UNION ALL
     SELECT
-        NULL AS id_contract,
-        NULL AS id_respondent,
+        cid AS id_contract,
         NULL AS respondent_email,
         'TENANT' AS respondent_type,
         'keys' AS service_type,
@@ -128,7 +123,6 @@ SELECT DISTINCT
     MD5(CONCAT(COALESCE(gs.id_contract, ''), gs.source_name, gs.survey_name, COALESCE(gs.ts_submitted, ''))) AS id_answer,
     MD5(CONCAT(gs.source_name, gs.survey_name)) AS id_survey,
     gs.id_contract,
-    gs.id_respondent,
     gs.respondent_email,
     gs.respondent_type,
     gs.service_type,

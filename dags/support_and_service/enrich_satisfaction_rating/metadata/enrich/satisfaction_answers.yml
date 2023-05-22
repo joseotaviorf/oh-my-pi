@@ -41,7 +41,6 @@ columns:
     description: Identifier of the person who answered the form.
     lineage:
       - datalake_ebdb_user.user.id
-      - datalake_satisfaction_rating.satisfaction_surveys_gsheets.id_respondent
       - datalake_satisfaction_rating.satisfaction_surveys_zendesk.id_respondent
       - datalake_satisfaction_rating.satisfaction_surveys_bigfone.id_respondent
       - datalake_satisfaction_rating.satisfaction_surveys_survicate.id_respondent

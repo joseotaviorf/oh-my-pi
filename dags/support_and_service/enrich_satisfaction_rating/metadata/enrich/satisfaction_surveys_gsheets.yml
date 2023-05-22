@@ -27,9 +27,7 @@ columns:
       - datalake_gsheets_clean.tenant_exit_inspection_csat.id_contract
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.id_contract
       - datalake_gsheets_clean.owner_entrance_inspection_csat.id_contract
-  id_respondent:
-    description: Identifier of the person who answered the form.
-    lineage:
+      - datalake_gsheets_clean.csat_reimbursement_true.cid
   respondent_email:
     description: Email of the person who answered the form.
     lineage:
