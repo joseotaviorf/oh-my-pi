@@ -3,7 +3,7 @@ SELECT
     fsse.sk_house_region AS location_id,
     dc.uuid_company AS company_uuid,
     UPPER(dsset.business_context) AS business_context,
-    COUNT(*) AS count,
+    COUNT(*) AS traffic_count,
     MAX(ts_event) AS ts_event,
     fsse.year,
     fsse.month,

@@ -17,7 +17,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline exports the following tables from the reverse_listings_report schema to an SNS topic:
 
 - `sale_listing_traffic`
-- `sale_lead_not_converted`
 - `sale_listing_published`
 - `sale_listing_visit_scheduled`
 - `sale_listing_visit_confirmed`

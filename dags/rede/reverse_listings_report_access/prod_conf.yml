@@ -4,8 +4,6 @@ database_name: reverse_listings_report
 tables:
   sale_listing_traffic:
     event_type: NEW_LISTING_TRAFFIC
-  sale_lead_not_converted:
-    event_type: NEW_LEAD_NOT_CONVERTED
   sale_listing_published:
     event_type: NEW_LISTING_PUBLISHED
   sale_listing_visit_scheduled:
