@@ -31,12 +31,6 @@ agents_control:
     clean_table_name: agents_control
     sheet_context: support_and_service
 
-agents_ranking_targets:
-    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
-    sheet_name: Agents Ranking Targets
-    clean_table_name: agents_ranking_targets
-    sheet_context: support_and_service
-
 aux_payments_photos:
     sheet_id: 1-I_TRK051HkgvY7OH09x5quCwn0K6mTbOFQIwlROsC8
     sheet_name: aux_payments_photos
@@ -111,12 +105,6 @@ keys_logistic_control:
     sheet_context: support_and_service
     preload_time_in_seconds: 30
 
-ranking_rules:
-    sheet_id: 1NgN-C7CUZxXAVSnqyC8IUFCEo3d0ROwo8lYDLaAJAuo
-    sheet_name: Regras por time
-    clean_table_name: ranking_rules
-    sheet_context: support_and_service
-
 recuperacao_fachada_e_area_comum:
     sheet_id: 1DB63rTGhu5b_x6fUzgUEzIAKdQ-O52hly2D7hIa10CI
     sheet_name: recovery_common_area_facade
@@ -127,12 +115,6 @@ service_city_holidays:
     sheet_id: 1wSYZjHde5RuFJQRigRFFIDiW4hpSOAtk88i6bkuwocI
     sheet_name: data_extraction
     clean_table_name: service_city_holidays
-    sheet_context: support_and_service
-
-support_agents_department:
-    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
-    sheet_name: Agents Main Department
-    clean_table_name: support_agents_department
     sheet_context: support_and_service
 
 tag_sla_target:
