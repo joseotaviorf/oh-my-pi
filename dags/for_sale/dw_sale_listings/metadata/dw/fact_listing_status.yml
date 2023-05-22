@@ -40,14 +40,22 @@ columns:
     - datalake_sale_listings.sale_listing_status.status_history
     description: 'Sale status linked to a certain point in time of the listing.'
     categories:
-      CCV_CANCELED: If the listing is in the process of sales cancellation.
-      CCV_SIGNED: If the listing is in the process of being sold.
       EDITING: If the listing is being edited.
       OPTED_OUT: If a listing has opted out of the funnel before being published.
       PUBLISHED: If the listing is published.
-      SALE_COMPLETED: If the listing is already sold.
       SUSPENDED: If the listing is suspended.
       UNPUBLISHED: If the listing is unpublished.
+  status_closing_history:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.status_closing_history
+    description: Sale closing status linked to a certain point in time of the listing.
+    categories:
+      CCV_CANCELED: >
+        If the listing is in the process of sales cancellation during the change
+      CCV_SIGNED: >
+        If the listing is in the process of being sold during the change
+      SALE_COMPLETED: >
+        If the listing is already sold during the change
   status_change_reason:
     lineage:
     - datalake_sale_listings.sale_listing_status.status_change_reason

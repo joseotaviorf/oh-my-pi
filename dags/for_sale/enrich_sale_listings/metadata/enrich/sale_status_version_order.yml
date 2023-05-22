@@ -27,27 +27,32 @@ columns:
       Unique id for this modification and can be joined with table rev_info to get more details.
   status_history:
     lineage:
-      - datalake_ebdb_clean.listing_business_context_aud.status
       - datalake_ebdb_clean.listing_business_context_aud.status_closing
     description: >
       Sale status linked to a certain point in time of the listing.
     categories:
-      CCV_CANCELED: >
-        If the listing is in the process of sales cancellation during the change
-      CCV_SIGNED: >
-        If the listing is in the process of being sold during the change
       EDITING: >
         If the listing is being edited during the change
       OPTED_OUT: > 
         If the listing has not even been published yet (probably bug)
       PUBLISHED: >
         If the listing is published during the change
-      SALE_COMPLETED: >
-        If the listing is already sold during the change
       SUSPENDED: >
         If the listing is suspended during the change
       UNPUBLISHED: >
         If the listing is unpublished during the change
+  status_closing_history:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.status_closing
+    description: >
+      The sale closing status of the sale listing at the time of the change.
+    categories:
+      CCV_CANCELED: >
+        If the listing is in the process of sales cancellation during the change
+      CCV_SIGNED: >
+        If the listing is in the process of being sold during the change
+      SALE_COMPLETED: >
+        If the listing is already sold during the change
   status_reason:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.status_reason
@@ -62,18 +67,12 @@ columns:
     description: >
       Sale status linked to a certain point in time of the listing. However, if the status is null, it will be considered as published.
     categories:
-      CCV_CANCELED: >
-        If the listing is in the process of sales cancellation during the change
-      CCV_SIGNED: >
-        If the listing is in the process of being sold during the change
       EDITING: >
         If the listing is being edited during the change
       OPTED_OUT: > 
         If the listing has not even been published yet (probably bug)
       PUBLISHED: >
         If the listing is published during the change
-      SALE_COMPLETED: >
-        If the listing is already sold during the change
       SUSPENDED: >
         If the listing is suspended during the change
       UNPUBLISHED: >

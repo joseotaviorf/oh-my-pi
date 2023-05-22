@@ -6,6 +6,7 @@ SELECT
     rhh.id_company_hubspot,
     rhh.partner_3p_supply,
     ssvo.status_history_new AS status_history,
+    ssvo.status_closing_history,
     ssvo.status_reason AS status_change_reason,
     REGEXP_REPLACE(ssvo.status_reason_detail, '\n', '') AS status_change_reason_detail,
     COALESCE(

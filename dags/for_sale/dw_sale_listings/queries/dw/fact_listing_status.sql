@@ -7,6 +7,7 @@ SELECT
   COALESCE(BIGINT(DATE_FORMAT(sls.ts_status_started, 'yyyyMMdd')), -1) AS sk_status_start_date,
   COALESCE(BIGINT(DATE_FORMAT(sls.ts_status_ended, 'yyyyMMdd')), -1) AS sk_status_end_date,
   sls.status_history,
+  sls.status_closing_history,
   sls.status_change_reason,
   LEFT(sls.status_change_reason_detail, 5000) AS status_change_reason_detail,
   sls.is_last_status,

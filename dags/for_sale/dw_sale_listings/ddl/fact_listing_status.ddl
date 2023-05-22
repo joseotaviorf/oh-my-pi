@@ -8,6 +8,7 @@ CREATE TABLE sale.fact_listing_status (
 	sk_status_start_date BIGINT,
 	sk_status_end_date BIGINT,
 	status_history VARCHAR,
+	status_closing_history VARCHAR,
 	status_change_reason VARCHAR(1000),
 	status_change_reason_detail VARCHAR(2000),
 	is_last_status BOOLEAN,

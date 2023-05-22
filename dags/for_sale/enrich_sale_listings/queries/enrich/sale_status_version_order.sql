@@ -2,48 +2,41 @@ WITH lbc_aud AS (
     SELECT
         lbc_aud.id_house,
         lbc_aud.rev,
-        IF(lbc_aud.mod_status_closing = 1, 
-          status_closing, 
-          status) AS status,
+        lbc_aud.status,
+        lbc_aud.status_closing,
+        LAG(lbc_aud.status) OVER (PARTITION BY lbc_aud.id_house ORDER BY rev) AS previous_status,
+        LAG(lbc_aud.status_closing) OVER (PARTITION BY lbc_aud.id_house ORDER BY rev) AS previous_status_closing,
         lbc_aud.status_reason,
         lbc_aud.ts_first_publication
     FROM 
       datalake_ebdb_clean.listing_business_context_aud AS lbc_aud
     WHERE
         lbc_aud.business_context = 'SALE'
+    QUALIFY -- (status_MOD = 1 may not work sometimes)    
+        status IS DISTINCT FROM previous_status
+        OR (lbc_aud.mod_status_closing IS NOT NULL AND status_closing IS DISTINCT FROM previous_status_closing)
 ),
 house_aud AS (
---------------------------------------------------------------------------------------------------------
--- Bring to LBC_AUD datetime for each revision made                                                   --
--- Also creates previous_status column so we can identify status changes                              --
--- (status_MOD = 1 may not work sometimes)                                                            --
---------------------------------------------------------------------------------------------------------
     SELECT
-        h_aud.id_house,
+        lbc_aud.id_house,
         rev.id_user,
         h.id_region,
         lbc_aud.status,
-        LAG(lbc_aud.status) OVER(PARTITION BY lbc_aud.id_house ORDER BY lbc_aud.rev) AS previous_status,
+        lbc_aud.status_closing,
         lbc_aud.status_reason,
         rev.reason,
         lbc_aud.rev,
-        DATE(FROM_UNIXTIME(BIGINT(rev.ts_revision)/1000)) AS status_date,
+        DATE(rev.ts_revision) AS status_date,
         lbc_aud.ts_first_publication,
-        rev2.ts_revision AS revision_time
+        rev.ts_revision AS revision_time
     FROM 
-        datalake_ebdb_clean.house_aud AS h_aud
+        lbc_aud
     JOIN 
         datalake_ebdb_clean.house AS h
-            ON h.id = h_aud.id_house
+            ON h.id = lbc_aud.id_house
     JOIN 
-        lbc_aud
-            ON lbc_aud.id_house = h.id
-    JOIN 
-        datalake_ebdb_clean.user_revision_entity AS rev
+        datalake_ebdb_user.user_revision_entity AS rev
             ON rev.id = lbc_aud.rev
-    JOIN 
-        datalake_ebdb_user.user_revision_entity AS rev2
-            ON rev2.id = lbc_aud.rev
 ),
 house_status_history AS (
 --------------------------------------------------------------------------------------------------------
@@ -55,6 +48,7 @@ house_status_history AS (
         id_region,
         rev,
         status AS status_history,
+        status_closing AS status_closing_history,
         status_reason,
         reason AS status_reason_detail,
         revision_time AS ts_status_changed,
@@ -63,8 +57,6 @@ house_status_history AS (
         ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY rev) AS order_status
     FROM 
         house_aud
-    WHERE 
-        status <> COALESCE(previous_status, '')
 ),
 house_new_status_new_date AS (
 -----------------------------------------------------------------------------------------------------------------
@@ -77,6 +69,7 @@ house_new_status_new_date AS (
         id_region,
         rev,
         status_history,
+        status_closing_history,
         status_reason,
         status_reason_detail,
         COALESCE(status_history, 'PUBLISHED') AS status_history_new,
@@ -104,6 +97,7 @@ house_status_version_first_publi AS (
         id_region,
         rev,
         status_history,
+        status_closing_history,
         status_reason,
         status_reason_detail,
         status_history_new,
@@ -130,6 +124,7 @@ house_status_version_order_null_publi_date AS (
         id_region,
         rev,
         status_history,
+        status_closing_history,
         status_reason,
         status_reason_detail,
         status_history_new,
@@ -157,6 +152,7 @@ house_status_version_order_not_null_publi_date AS (
         id_region,
         rev,
         status_history,
+        status_closing_history,
         status_reason,
         status_reason_detail,
         status_history_new,
@@ -181,6 +177,7 @@ aux AS (
         id_region,
         rev,
         status_history,
+        status_closing_history,
         status_reason,
         status_reason_detail,
         status_history_new,
@@ -202,6 +199,7 @@ aux AS (
         id_region,
         rev,
         status_history,
+        status_closing_history,
         status_reason,
         status_reason_detail,
         status_history_new,
@@ -223,6 +221,7 @@ SELECT
     id_region,
     rev,
     status_history,
+    status_closing_history,
     status_reason,
     status_reason_detail,
     status_history_new,
