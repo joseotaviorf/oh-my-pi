@@ -48,3 +48,5 @@ columns:
     lineage:
       - datalake_ebdb_clean.account_transaction.ts_created
     description: "Timestamp when the register was created"
+  ts_load:
+    description: "Date when the data was loaded"
