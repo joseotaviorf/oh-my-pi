@@ -16,8 +16,6 @@ columns:
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.ts_submitted
       - datalake_gsheets_clean.owner_entrance_inspection_csat.id_contract
       - datalake_gsheets_clean.owner_entrance_inspection_csat.ts_submitted
-      - datalake_gsheets_clean.tenant_reimbursement_csat.id_contract
-      - datalake_gsheets_clean.tenant_reimbursement_csat.ts_submitted
       - datalake_gsheets_clean.csat_reimbursement_true.id_contract
       - datalake_gsheets_clean.csat_reimbursement_true.ts_submitted
   id_survey:
@@ -29,11 +27,9 @@ columns:
       - datalake_gsheets_clean.tenant_exit_inspection_csat.id_contract
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.id_contract
       - datalake_gsheets_clean.owner_entrance_inspection_csat.id_contract
-      - datalake_gsheets_clean.tenant_reimbursement_csat.id_contract
   id_respondent:
     description: Identifier of the person who answered the form.
     lineage:
-      - datalake_gsheets_clean.tenant_reimbursement_csat.id_user
   respondent_email:
     description: Email of the person who answered the form.
     lineage:
@@ -58,7 +54,6 @@ columns:
       - datalake_gsheets_clean.tenant_exit_inspection_csat.tags
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.improvement_tags
       - datalake_gsheets_clean.owner_entrance_inspection_csat.improvement_tags
-      - datalake_gsheets_clean.tenant_reimbursement_csat.improvement_tags
       - datalake_gsheets_clean.csat_reimbursement_true.improvement_suggestions
   respondent_comments:
     description: Respondent's comment/justification on the satisfaction assessment.
@@ -67,7 +62,6 @@ columns:
       - datalake_gsheets_clean.tenant_exit_inspection_csat.comment
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.comments
       - datalake_gsheets_clean.owner_entrance_inspection_csat.comments
-      - datalake_gsheets_clean.tenant_reimbursement_csat.comments
       - datalake_gsheets_clean.csat_reimbursement_true.satisfation_level_reason
   satisfaction_score:
     description: Main satisfaction form responses.
@@ -78,8 +72,6 @@ columns:
       - datalake_gsheets_clean.tenant_exit_inspection_csat.inspection_satisfaction_history_second
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.general_satisfaction_evaluation
       - datalake_gsheets_clean.owner_entrance_inspection_csat.general_satisfaction_evaluation
-      - datalake_gsheets_clean.tenant_reimbursement_csat.score
-      - datalake_gsheets_clean.tenant_reimbursement_csat.score_text
       - datalake_gsheets_clean.csat_reimbursement_true.satisfation_level
       - datalake_gsheets_clean.csat_reimbursement_true.satisfation_level_description
   score_description:
@@ -95,7 +87,6 @@ columns:
     description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
     lineage:
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.id_csat
-      - datalake_gsheets_clean.tenant_reimbursement_csat.id_csat_answer
       - datalake_gsheets_clean.csat_reimbursement_true.token
       - datalake_gsheets_clean.csat_reimbursement_true.cid
       - datalake_gsheets_clean.csat_reimbursement_true.uid
@@ -105,7 +96,6 @@ columns:
       - datalake_gsheets_clean.owner_exit_inspection_csat.ts_submitted
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.ts_submitted
       - datalake_gsheets_clean.owner_entrance_inspection_csat.ts_submitted
-      - datalake_gsheets_clean.tenant_reimbursement_csat.ts_submitted
       - datalake_gsheets_clean.csat_reimbursement_true.ts_submitted
   year:
     description: Year referring to the data loading day.
@@ -113,7 +103,6 @@ columns:
       - datalake_gsheets_clean.owner_exit_inspection_csat.ts_submitted
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.ts_submitted
       - datalake_gsheets_clean.owner_entrance_inspection_csat.ts_submitted
-      - datalake_gsheets_clean.tenant_reimbursement_csat.ts_submitted
       - datalake_gsheets_clean.csat_reimbursement_true.ts_submitted
   month:
     description: Month referring to the data loading day.
@@ -121,7 +110,6 @@ columns:
       - datalake_gsheets_clean.owner_exit_inspection_csat.ts_submitted
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.ts_submitted
       - datalake_gsheets_clean.owner_entrance_inspection_csat.ts_submitted
-      - datalake_gsheets_clean.tenant_reimbursement_csat.ts_submitted
       - datalake_gsheets_clean.csat_reimbursement_true.ts_submitted
   day:
     description: Day referring to the data loading day.
@@ -129,5 +117,4 @@ columns:
       - datalake_gsheets_clean.owner_exit_inspection_csat.ts_submitted
       - datalake_gsheets_clean.tenant_entrance_inspection_csat.ts_submitted
       - datalake_gsheets_clean.owner_entrance_inspection_csat.ts_submitted
-      - datalake_gsheets_clean.tenant_reimbursement_csat.ts_submitted
       - datalake_gsheets_clean.csat_reimbursement_true.ts_submitted

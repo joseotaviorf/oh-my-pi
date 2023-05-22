@@ -100,37 +100,12 @@ WITH gsheets_surveys AS (
         DATE(ts_submitted) = DATE('{year}-{month}-{day}')
     UNION ALL
     SELECT
-        id_contract,
-        id_user AS id_respondent,
+        NULL AS id_contract,
+        NULL AS id_respondent,
         NULL AS respondent_email,
         'TENANT' AS respondent_type,
         'keys' AS service_type,
         'onboarding' AS service_context,
-        'gsheets' AS source_name,
-        'tenant_reimbursement_csat' AS survey_name,
-        improvement_tags,
-        comments AS respondent_comments,
-        score AS satisfaction_score,
-        score_text AS score_description,
-        NULL AS secondary_satisfaction_score,
-        NULL AS secondary_score_description,
-        TO_JSON(NAMED_STRUCT('id_csat_answer', id_csat_answer)) AS custom_attributes,
-        ts_submitted,
-        YEAR(ts_submitted) AS year,
-        MONTH(ts_submitted) AS month,
-        DAY(ts_submitted) AS day
-    FROM
-        datalake_gsheets_clean.tenant_reimbursement_csat
-    WHERE
-        DATE(ts_submitted) = DATE('{year}-{month}-{day}')
-    UNION ALL
-    SELECT
-        NULL AS id_contract,
-        NULL AS id_respondent,
-        NULL AS respondent_email,
-        NULL AS respondent_type,
-        'reimbursement' AS service_type,
-        NULL AS service_context,
         'gsheets' AS source_name,
         'csat_reimbursement_true' AS survey_name,
         improvement_suggestions AS improvement_tags,
