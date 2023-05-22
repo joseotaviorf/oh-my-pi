@@ -114,6 +114,10 @@ UNION ALL
   LEFT JOIN
     datalake_ebdb_clean.country AS ct
       ON IF(REPLACE(ca.country, '\'', '') = '', NULL, UPPER(REPLACE(ca.country, '\'', ''))) = UPPER(ct.name)
+  WHERE
+        r.is_active IS TRUE
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY c.id ORDER BY c.ts_updated, r.ts_updated DESC) = 1
 )
 ORDER BY 1
 )

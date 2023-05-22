@@ -194,7 +194,7 @@ WITH new_system AS (
             NULL AS dt_last_payment,
             DATE(c.ts_began) AS dt_contract_started,
             COALESCE(DATE(pcd.ts_ended), c.ts_done) AS dt_ended,
-            sd.ts_propose_started,
+            COALESCE(sd.ts_propose_started, p.ts_inserted) AS ts_propose_started,
             wndd.ts_waiting_new_docs,
             esd.ts_evaluation_started,
             rd.ts_rejected,
