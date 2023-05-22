@@ -20,9 +20,3 @@ class MongoValidationSuite(DatabaseValidationSuitesExecutor):
         mongo_client = MongoClient(conn_config)
         db_consumer = self.REPOSITORY_CONSUMER_CLASS(mongo_client, SparkClient())
         self._validate_connection(db_consumer)
-
-    def validate_us_emails(self):
-        conn_config = self.auth[DatabaseEnum.US_EMAILS]
-        mongo_client = MongoClient(conn_config)
-        db_consumer = self.REPOSITORY_CONSUMER_CLASS(mongo_client, SparkClient())
-        self._validate_connection(db_consumer)
