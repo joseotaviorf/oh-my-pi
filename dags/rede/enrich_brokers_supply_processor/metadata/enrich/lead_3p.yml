@@ -56,14 +56,17 @@ columns:
   id_company_hubspot:
     lineage:
       - datalake_brokers_supply_processor.file.id_company_hubspot
+      - datalake_hubspot.company_history.id_company
     description: 'Identifier of the lead company in HubSpot.'
   id_sale_company_hubspot:
     lineage:
       - datalake_brokers_supply_processor.file.id_company_hubspot
+      - datalake_hubspot.company_history.id_company
     description: 'Identifier of the lead company in HubSpot, in the context of ForSale.'
   id_rent_company_hubspot:
     lineage:
       - datalake_brokers_supply_processor.file.id_company_hubspot
+      - datalake_hubspot.company_history.id_company
     description: 'Identifier of the lead company in HubSpot, in the context of ForRent.'
   lead_hash:
     lineage:

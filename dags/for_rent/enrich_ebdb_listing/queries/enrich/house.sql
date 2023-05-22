@@ -56,68 +56,41 @@ listing_info AS (
     1
 ),
 -- While we don't have 3P agencies included in datalake_company_clean.company, we need to find their name via HubSpot
--- This is a temporary measure, and should be changed in 23Q1
--- Also, the reason we are not using the enriched HubSpot tables is because they run later than this query, so we can't simplify it
-partner_agencies_aux AS (
-  SELECT
-    id_company,
-    NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '') AS tag,
-    NULLIF(GET_JSON_OBJECT(properties, '$.name'), '') AS name,
-    LAST(NULLIF(GET_JSON_OBJECT(properties, '$.hs_lead_status'), ''))
-    OVER (
-        PARTITION BY
-            id_company
-        ORDER BY
-            ts_updated
-        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-    ) AS current_status,
-    LAST(NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), ''))
-    OVER (
-        PARTITION BY
-            id_company
-        ORDER BY
-            ts_updated
-        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-    ) AS current_tag,
-    NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', ''), '') AS cnpj,
-    COALESCE(
-        NULLIF(GET_JSON_OBJECT(properties, '$.estado'), ''),
-        NULLIF(GET_JSON_OBJECT(properties, '$.state'), '')
-    ) AS partner_state,
-    ts_updated
-  FROM
-    datalake_hubspot_clean.company
-),
+-- This is a temporary measure, and should be changed in 23Q2
 extracted_partner_tags AS (
   SELECT
-    id_company,
-    tag,
-    NULLIF(REGEXP_EXTRACT(tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') AS extracted_3p_tag,
-    NULLIF(REGEXP_EXTRACT(current_tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') AS current_extracted_3p_tag,
-    name,
-    cnpj,
-    partner_state,
+    ch.id_company,
+    ch.tag_real_estate_agency AS tag,
+    ch.extracted_3p_tag,
+    c.extracted_3p_tag AS current_extracted_3p_tag,
+    ch.name,
+    ch.cnpj,
+    ch.state AS partner_state,
     ROW_NUMBER() OVER(
       PARTITION BY
-        REPLACE(UPPER(NULLIF(REGEXP_EXTRACT(tag, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')), ' ', '')
+        REPLACE(UPPER(ch.extracted_3p_tag), ' ', '')
       ORDER BY
-        ts_updated
+        ch.ts_updated
       DESC
     ) = 1 AS is_most_recent_for_tag,
     ROW_NUMBER() OVER ( -- Sometimes, more than one company in HubSpot is created with the same cnpj, so we need to deduplicate
         PARTITION BY
-            cnpj
+            ch.cnpj
         ORDER BY
-            current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC, -- First, the ones that are currently members
-            current_tag IS NOT NULL DESC, -- Then, the ones with tags
-            ts_updated DESC -- Otherwise, most recent
+            NOT c.is_archived DESC, -- First, not-archived companies have more preference
+            c.lead_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC, -- Then, the ones that are currently members
+            c.extracted_3p_tag IS NOT NULL DESC, -- Then, the ones with tags
+            ch.ts_updated DESC -- Otherwise, most recent
     ) = 1 AS is_most_recent_for_cnpj,
-    ROW_NUMBER() OVER(PARTITION BY id_company ORDER BY ts_updated DESC) = 1 AS is_most_recent_for_company
+    ROW_NUMBER() OVER(PARTITION BY ch.id_company ORDER BY ch.ts_updated DESC) = 1 AS is_most_recent_for_company
   FROM
-    partner_agencies_aux
+    datalake_hubspot.company_history AS ch
+  JOIN
+    datalake_hubspot.company AS c
+      ON ch.id_company = c.id_company
   QUALIFY
     (is_most_recent_for_tag OR is_most_recent_for_cnpj OR is_most_recent_for_company)
-    AND (tag IS NOT NULL or cnpj IS NOT NULL)
+    AND (tag IS NOT NULL OR ch.cnpj IS NOT NULL)
 ),
 --- We're getting the most recent row in datalake_hubspot_clean.company for each tag and CNPJ.
 --- Since they are merged, extracted_3p_tag only shows up if that row is the most recent company for the given tag. Same for the CNPJ.

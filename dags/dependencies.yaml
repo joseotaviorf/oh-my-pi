@@ -1097,7 +1097,8 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail
   - bietlejuice.brokers_supply_processor:load-clean-file
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p
-  - bietlejuice.hubspot:load-clean-company
+  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_hubspot:load-enrich-company-history
 bietlejuice.enrich_bureaus:
   - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud
@@ -1386,7 +1387,8 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_country:load-enrich-user
   - bietlejuice.enrich_ebdb_rental_administration:load-enrich-rental-administrator-change-history
-  - bietlejuice.hubspot:load-clean-company
+  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_hubspot:load-enrich-company-history
 bietlejuice.enrich_ebdb_listing_jobs:
   - bietlejuice.ebdb:create-clean-country-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
@@ -1874,6 +1876,7 @@ bietlejuice.enrich_rede_house_history:
   - bietlejuice.ebdb:create-clean-listing-rent-model-aud-in-data-lake
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.enrich_hubspot:load-enrich-company
   - bietlejuice.enrich_hubspot:load-enrich-company-history
 bietlejuice.enrich_rede_supply:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail-aud
@@ -1887,7 +1890,8 @@ bietlejuice.enrich_rede_supply:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
-  - bietlejuice.hubspot:load-clean-company
+  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_hubspot:load-enrich-company-history
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:create-clean-country-in-data-lake
   - bietlejuice.ebdb:create-clean-region-business-contexts-served-in-data-lake

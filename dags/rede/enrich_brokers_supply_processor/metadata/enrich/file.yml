@@ -1,40 +1,60 @@
 ---
 database_name: datalake_brokers_supply_processor
 table_name: file
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
+description: Each row in this table represents a batch of leads sent by the real estate agency to Supply Processor.
 columns:
   id:
     lineage:
       - datalake_brokers_supply_processor_clean.file.id
+    description: Unique identifier for each row in the table.
   id_partner:
     lineage:
       - datalake_brokers_supply_processor_clean.file.id_partner
+    description: Unique identifier for each partner (not the original real estate agency, but the one who sent the leads to Supply Processor, like Iconatus).
   id_company_hubspot:
     lineage:
-      - datalake_hubspot_clean.company.id_company
+      - datalake_hubspot.company_history.id_company
+    description: Unique identifier for the real estate agency that sent the leads to Supply Processor, in HubSpot.
   hash:
     lineage:
       - datalake_brokers_supply_processor_clean.file.hash
+    description: Hash of the file.
   file_name:
     lineage:
       - datalake_brokers_supply_processor_clean.file.file_name
+    description: Name of the file.
   type:
     lineage:
       - datalake_brokers_supply_processor_clean.file.type
+    description: Status of the file.
+    categories:
+      PROCESSED: The file was processed successfully.
+      FAILED: The file failed to be processed.
+      IN_PROCESS: The file is being processed.
+      CREATED: The file was created and is waiting to be processed.
   url:
     lineage:
       - datalake_brokers_supply_processor_clean.file.url
+    description: URL of the file.
   file_byte:
     lineage:
       - datalake_brokers_supply_processor_clean.file.file_byte
+    description: File byte. Completely null.
   version:
     lineage:
       - datalake_brokers_supply_processor_clean.file.version
+    description: Version of the file.
   ts_previous_file_sent_by_agency:
     lineage:
       - datalake_brokers_supply_processor_clean.file.ts_created
+    description: Timestamp of the previous file sent by the real estate agency.
   ts_created:
     lineage:
       - datalake_brokers_supply_processor_clean.file.ts_created
+    description: Timestamp of the file creation.
   ts_updated:
     lineage:
       - datalake_brokers_supply_processor_clean.file.ts_updated
+    description: Timestamp of the last file update.

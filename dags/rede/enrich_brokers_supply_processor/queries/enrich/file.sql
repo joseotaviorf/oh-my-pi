@@ -1,22 +1,26 @@
 WITH partner_agencies_aux AS (
     SELECT
-        id_company AS id_company_hubspot,
-        LAST(NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '')) OVER (PARTITION BY id_company ORDER BY ts_updated ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS current_tag,
-        LAST(NULLIF(GET_JSON_OBJECT(properties, '$.hs_lead_status'), '')) OVER (PARTITION BY id_company ORDER BY ts_updated ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS current_status,
-        NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', ''), '') AS cnpj,
-        ts_updated
+        ch.id_company AS id_company_hubspot,
+        c.tag_real_estate_agency AS current_tag,
+        c.lead_status AS current_status,
+        ch.cnpj,
+        ch.ts_updated
     FROM
-        datalake_hubspot_clean.company
+        datalake_hubspot.company_history AS ch
+    JOIN
+        datalake_hubspot.company AS c
+            ON ch.id_company = c.id_company
     QUALIFY
         ROW_NUMBER() OVER (
             PARTITION BY
-                cnpj
+                ch.cnpj
             ORDER BY
-                current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC, 
-                current_tag IS NOT NULL DESC,
-                ts_updated DESC
+                NOT c.is_archived DESC, -- Give preference to non-archived companies when we find duplicates
+                current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC,  -- Then, members
+                current_tag IS NOT NULL DESC, -- Then, those that have a tag
+                ch.ts_updated DESC -- Finally, most recent
         ) = 1
-        AND cnpj IS NOT NULL
+        AND ch.cnpj IS NOT NULL
 ),
 files_with_company AS (
     SELECT

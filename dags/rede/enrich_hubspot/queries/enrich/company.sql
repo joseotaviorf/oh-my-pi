@@ -1,4 +1,18 @@
-WITH hubspot_companies AS (
+WITH merged_companies_aux AS (
+    SELECT
+        ids_merged_companies
+    FROM
+        datalake_hubspot.company_history
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_company ORDER BY ts_updated DESC) = 1
+),
+merged_companies AS (
+    SELECT
+        EXPLODE(ids_merged_companies) AS id_merged_company
+    FROM
+        merged_companies_aux
+),
+hubspot_companies AS (
     SELECT
         id_company,
         cnpj,
@@ -18,7 +32,15 @@ WITH hubspot_companies AS (
             ORDER BY
                 ts_updated
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-        ) AS current_tag
+        ) AS current_tag,
+        LAST(is_archived)
+        OVER (
+            PARTITION BY
+                id_company
+            ORDER BY
+                ts_updated
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS is_currently_archived
     FROM
         datalake_hubspot.company_history
 ),
@@ -39,32 +61,22 @@ company_matches AS (
         datalake_company_clean.company_product AS cp
             ON c.id = cp.id_company
             AND cp.id_product = 27
-    LEFT JOIN
+    JOIN
         hubspot_companies AS ch
             ON d.identification_number = ch.cnpj
+    LEFT JOIN
+        merged_companies AS mc
+            ON ch.id_company = mc.id_merged_company
     QUALIFY
         ROW_NUMBER() OVER (
         PARTITION BY
             d.identification_number
         ORDER BY
-            ch.current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC, -- First, the ones that are currently members
+            NOT ch.is_currently_archived AND mc.id_merged_company IS NULL DESC, -- First, not archived nor merged
+            ch.current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC, -- Then, the ones that are currently members
             ch.current_tag IS NOT NULL DESC, -- Then, the ones with tags
             ch.ts_updated DESC -- Otherwise, most recent
         ) = 1
-),
-merged_companies_aux AS (
-    SELECT
-        ids_merged_companies
-    FROM
-        datalake_hubspot.company_history
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_company ORDER BY ts_updated DESC) = 1
-),
-merged_companies AS (
-    SELECT
-        EXPLODE(ids_merged_companies) AS id_merged_company
-    FROM
-        merged_companies_aux
 )
 SELECT
     ch.id_company,
