@@ -18,6 +18,7 @@ Produces the following output tables:
 - `house_entrance_history`
 - `house_listing`
 - `house_listing_category`
+- `house_listing_early_demand`
 - `house_listing_fees`
 - `house_listing_special_conditions`
 - `house_listing_status`

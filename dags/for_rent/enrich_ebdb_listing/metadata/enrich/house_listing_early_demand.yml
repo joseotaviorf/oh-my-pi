@@ -1,0 +1,26 @@
+---
+database_name: datalake_ebdb_listing
+table_name: house_listing_early_demand
+description: Information related to ForRent listings. Each line is an unique listing
+  with early demand information.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  country_code:
+    lineage:
+    - datalake_ebdb_listing.business_context_history.country_code
+    description: Country code of the house. Also, it's a partition of this table.
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house_listing_category.id_house
+    description: Id of the house.
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing_category.id_house_listing
+    description: Id of the listing.
+  is_early_demand:
+    description: Boolean indicating if this listing participated on the Early Demand Program.
+  ts_early_demand_started:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.ts_state_started
+    description: Timestamp when this listing started on Early Demand Program.
