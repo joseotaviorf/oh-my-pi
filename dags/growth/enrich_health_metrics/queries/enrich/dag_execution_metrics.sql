@@ -106,7 +106,7 @@ SELECT
     he.duration_median_in_minutes
 FROM 
     execution_metrics AS em
-JOIN 
+LEFT JOIN 
     historical_execution_metrics AS he    
 ON
     em.dag_name = he.dag_name

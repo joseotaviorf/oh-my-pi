@@ -35,17 +35,24 @@ airflow_failed_tasks AS (
 opsgenie_alerts AS (
     SELECT 
         dag_name,
-        DATE(ts_created) AS dt_executed,
-        COUNT(DISTINCT id) AS qt_opsgenie_alerts,
+        DATE(a.ts_created) AS dt_executed,
+        COUNT(DISTINCT a.id) AS qt_opsgenie_alerts,
         COUNT( DISTINCT 
             CASE
-                WHEN DAYOFWEEK(ts_created) IN (2,3,4,5,6) AND HOUR(ts_created) <= 12 THEN id
-                WHEN DAYOFWEEK(ts_created) IN (1,7) AND HOUR(ts_created) >= 12 AND HOUR(ts_created) <= 15 THEN id
+                WHEN DAYOFWEEK(a.ts_created) IN (2,3,4,5,6) AND HOUR(a.ts_created) <= 12 AND is_call_notification_made = true THEN a.id
+                WHEN DAYOFWEEK(a.ts_created) IN (1,7) AND HOUR(a.ts_created) >= 12 AND HOUR(a.ts_created) <= 15 AND is_call_notification_made = true THEN a.id
                 ELSE NULL
             END
-        ) AS qt_opsgenie_on_call_alerts
+        ) AS qt_opsgenie_on_call_alerts        
     FROM
-        datalake_opsgenie_clean.alerts
+        datalake_opsgenie_clean.alerts AS a
+    LEFT JOIN
+        datalake_opsgenie_clean.logs AS l
+    ON
+        a.id = l.id
+        AND a.year = l.year
+        AND a.month = l.month
+        AND a.day = l.day
     GROUP BY 
         1, 2
 ),
