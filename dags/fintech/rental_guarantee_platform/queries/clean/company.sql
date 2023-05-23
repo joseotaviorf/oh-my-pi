@@ -3,6 +3,7 @@ SELECT
     companyuuid AS uuid_company,
     businessunituuid AS uuid_business_unit,
     productuuid AS uuid_product,
+    billing_model,
     status,
     version,
     agent_split_fee,

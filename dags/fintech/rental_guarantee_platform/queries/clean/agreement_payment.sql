@@ -1,8 +1,11 @@
 SELECT
     id,
     agreement_id AS id_agreement,
+    bank_payment_id AS id_bank_payment,
     status,
     billing_type,
+    payment_code,
+    source_system,
     version,
     value,
     paid_value,

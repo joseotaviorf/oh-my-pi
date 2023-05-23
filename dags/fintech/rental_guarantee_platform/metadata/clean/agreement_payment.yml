@@ -10,6 +10,9 @@ columns:
   id_agreement:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment.agreement_id
+  id_bank_payment:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.bank_payment_id
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment.status
@@ -22,6 +25,12 @@ columns:
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment.value
+  payment_code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment_code
+  source_system:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.source_system
   paid_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment.paid_value

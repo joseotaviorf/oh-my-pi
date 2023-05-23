@@ -23,7 +23,7 @@ columns:
   id_company_plan:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.company_plan
-  id_activator:
+  activator_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.activator
   realtor:
@@ -32,6 +32,9 @@ columns:
   hash:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.hash
+  billing_model:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose.billing_model
   external_ref:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.externalref
