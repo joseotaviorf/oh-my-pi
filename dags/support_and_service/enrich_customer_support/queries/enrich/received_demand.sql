@@ -1,17 +1,12 @@
-WITH call AS(
+WITH call AS (
   WITH twilio_call_flex_events AS (
     SELECT
-      id_task,
       id_call,
+      id_task,
       id_task_queue,
       id_reservation,
-      id_agent,
-      id_event,
-      GET_JSON_OBJECT(metadata,'$.event_data.TaskChannelSid') AS id_channel,
       event_type,
-      GET_JSON_OBJECT(metadata,'$.channelType') AS channel_name,
       agent_email,
-      location,
       task_queue_name,
       IFNULL(LAG(task_queue_name) OVER (PARTITION BY id_task ORDER BY ts_created_local), '-') AS previous_task_queue_name,
       customer_phone,
@@ -22,32 +17,25 @@ WITH call AS(
       direction = 'inbound'
   ),
   reservations_ts AS (
-    SELECT 
-      tcfe.id_task,
+    SELECT
       tcfe.id_call,
+      tcfe.id_task,
       tcfe.id_task_queue,
       tcfe.id_reservation,
-      tcfe.id_agent,
-      tcfe.id_event,
-      tcfe.id_channel,
-      tcfe.channel_name,
       tcfe.agent_email,
-      tcfe.location,
       tcfe.previous_task_queue_name,
       tcfe.task_queue_name,
       tcfe.customer_phone,
-      tcfe.ts_created AS ts_created
-    FROM 
+      tcfe.ts_created
+    FROM
       twilio_call_flex_events AS tcfe
-    WHERE 
+    WHERE
       tcfe.task_queue_name != tcfe.previous_task_queue_name
   ),
-  /*
-    To check when the reservation/department ended we're adding this CTE to get the next timestamp
-      of the department, this way we can attribute the right id_reservation checking the timestamps.
-      This check is made in call_received_demand CTE, joining reservations_ts_ended with reservations.
-  */
-  reservations_ts_ended AS(
+  /* To check when the reservation/department ended we're adding this CTE to get the next timestamp
+  of the department, this way we can attribute the right id_reservation checking the timestamps.
+  This check is made in call_received_demand CTE, joining reservations_ts_ended with reservations.*/
+  reservations_ts_ended AS (
     SELECT
       *,
       LEAD(ts_created) OVER (PARTITION BY id_task ORDER BY ts_created) AS ts_created_ended
@@ -59,206 +47,154 @@ WITH call AS(
       id_task,
       id_task_queue,
       id_reservation,
-      id_agent,
       agent_email,
-      location,
       ts_created
     FROM
       twilio_call_flex_events
-    WHERE 
-      event_type = 'reservation.accepted'
-  ),
-  customer_identification AS (
-    SELECT
-      REGEXP_REPLACE(customer_contact,'(^\\+?55)|(\\D*)','') AS formatted_phone,
-      MAX(id_user) AS id_user
-    FROM
-      datalake_ebdb_customer_contact_identification.customer_contact_identification
     WHERE
-      channel = 'phone'
-    GROUP BY 1
+      event_type = 'reservation.accepted'
   ),
   call_received_demand AS(
     SELECT
-      rts.id_task AS id_external_service,
-      rts.id_channel,
-      rts.id_task_queue,
-      r.id_reservation,
-      r.id_agent,
-      rts.id_event,
       rts.id_call,
-      ci.id_user,
+      rts.id_task,
+      r.id_reservation,
       rts.task_queue_name,
-      'call' AS channel_name,
       r.agent_email,
-      r.location AS agent_location,
       rts.customer_phone,
-      rts.ts_created,
-      NULL AS ts_updated
+      rts.ts_created
     FROM
       reservations_ts_ended AS rts
     LEFT JOIN
       reservations AS r
         ON rts.id_task = r.id_task
         AND rts.id_task_queue = r.id_task_queue
-        and r.ts_created >= rts.ts_created 
+        and r.ts_created >= rts.ts_created
         AND r.ts_created < COALESCE(rts.ts_created_ended, CURRENT_TIMESTAMP())
-    LEFT JOIN 
-      customer_identification AS ci
-        ON ci.formatted_phone = rts.customer_phone
     WHERE
       task_queue_name <> previous_task_queue_name
   )
   SELECT
-    crd.id_external_service,
-    crd.id_channel,
-    crd.id_task_queue,
-    crd.id_reservation,
-    crd.id_agent,
-    crd.id_event,
     crd.id_call,
-    crd.id_user,
-    crd.task_queue_name,
-    crd.channel_name,
+    NULL AS id_session,
+    NULL AS id_ticket,
+    crd.id_task,
     crd.agent_email,
-    crd.agent_location,
+    'call' AS channel,
     crd.customer_phone,
+    crd.task_queue_name AS department,
     call.id_external_service IS NOT NULL AS is_answered,
     crd.ts_created,
-    crd.ts_updated
+    NULL AS ts_updated
   FROM
     call_received_demand AS crd
-  LEFT JOIN 
+  LEFT JOIN
     datalake_customer_support.call
-      ON crd.id_external_service = call.id_external_service
+      ON crd.id_task = call.id_external_service
       AND crd.id_reservation = call.id_segment
 ),
 
-chat AS(
+chat AS (
   WITH task_event as (
     SELECT
-      te.id_task_external AS id_external_service,
-      GET_JSON_OBJECT(te.event_payload,'$.TaskChannelSid') AS id_channel,
-      GET_JSON_OBJECT(te.event_payload,'$.TaskQueueSid') AS id_task_queue,
-      GET_JSON_OBJECT(te.event_payload,'$.ReservationSid') AS id_reservation,
-      GET_JSON_OBJECT(te.event_payload,'$.WorkerSid') AS id_agent,
-      GET_JSON_OBJECT(te.event_payload,'$.Sid') AS id_event,
-      te.event_type AS type,
+      te.id_task_external,
+      t.id_channel_external,
+      GET_JSON_OBJECT(t.task_attributes,'$.chat_id') AS id_chat,
+      te.event_type,
       GET_JSON_OBJECT(te.event_payload,'$.TaskQueueName') AS task_queue_name,
-      GET_JSON_OBJECT(GET_JSON_OBJECT(event_payload,'$.WorkerAttributes'), '$.email') AS agent_email,
-      GET_JSON_OBJECT(GET_JSON_OBJECT(event_payload,'$.WorkerAttributes'), '$.location') AS agent_location,
-      GET_JSON_OBJECT(GET_JSON_OBJECT(te.event_payload,'$.TaskAttributes'),'$.originalNumber') AS customer_phone,
-      GET_JSON_OBJECT(GET_JSON_OBJECT(te.event_payload,'$.TaskAttributes'), '$.conversations') AS conversations,
+      GET_JSON_OBJECT(event_payload,'$.WorkerAttributes.email') AS agent_email,
+      REGEXP_REPLACE(REGEXP_EXTRACT(GET_JSON_OBJECT(t.task_attributes,'$.from'), '(\\w+:)(.+)', 2), '^(\+)(.*)', '') AS customer_phone,
+      GET_JSON_OBJECT(te.event_payload,'$.TaskAttributes.conversations.conversation_measure_1') IS NOT NULL AS is_answered,
       te.ts_created,
       te.ts_updated
     FROM
+      datalake_quinto_messenger_clean.task AS t
+    INNER JOIN
       datalake_quinto_messenger_clean.task_event AS te
+        ON te.id_task_external = t.id_external
   ),
   created_events as (
     SELECT
-      id_external_service,
-      id_reservation,
-      agent_location,
+      id_task_external,
       customer_phone,
       ts_created
     FROM
       task_event
     WHERE
-      type = 'reservation.created'
+      event_type = 'reservation.created'
   ),
   chat_received_demand AS (
     SELECT
-      ce.id_external_service,
-      te.id_channel,
-      te.id_task_queue,
-      ce.id_reservation,
-      te.id_agent,
-      te.id_event,
-      te.conversations,
+      ce.id_task_external,
+      chn.id_source AS id_session_whats,
+      c.id_session AS id_session_inapp,
+      te.is_answered,
       te.task_queue_name,
-      IFNULL(LEAD(te.task_queue_name) OVER (PARTITION BY te.id_external_service ORDER BY te.ts_created), '-') AS next_task_queue_name,
+      IFNULL(LEAD(te.task_queue_name) OVER (PARTITION BY te.id_task_external ORDER BY te.ts_created), '-') AS next_task_queue_name,
       te.agent_email,
-      ce.agent_location,
       ce.customer_phone,
       ce.ts_created,
       te.ts_updated
     FROM
       created_events AS ce
-    JOIN
+    INNER JOIN
       task_event AS te
-        ON ce.id_external_service = te.id_external_service
-    WHERE
-      GET_JSON_OBJECT(te.conversations, '$.conversation_attribute_2') = true
-  ),
-  customer_identification AS (
-    SELECT
-      customer_contact,
-      MAX(id_user) AS id_user
-    FROM
-      datalake_ebdb_customer_contact_identification.customer_contact_identification
-    WHERE
-      channel = 'phone'
-    GROUP BY 1
+        ON ce.id_task_external = te.id_task_external
+    LEFT JOIN
+      datalake_quinto_messenger.channel AS chn
+        ON chn.id_channel = te.id_channel_external
+    LEFT JOIN
+      datalake_quinto_messenger.chat AS c
+        ON c.id_chat = te.id_chat
   )
-    SELECT
-    crd.id_external_service,
-    crd.id_channel,
-    crd.id_task_queue,
-    crd.id_reservation,
-    crd.id_agent,
-    crd.id_event,
+  SELECT
     NULL AS id_call,
-    ci.id_user,
-    crd.task_queue_name,
-    'chat' AS channel_name,
+    COALESCE(crd.id_session_whats, crd.id_session_inapp) AS id_session,
+    NULL AS id_ticket,
+    crd.id_task_external AS id_task,
     crd.agent_email,
-    crd.agent_location,
+    'chat' AS channel,
     crd.customer_phone,
-    GET_JSON_OBJECT(crd.conversations, '$.conversation_measure_1') IS NOT NULL AS is_answered,
+    crd.task_queue_name AS department,
+    crd.is_answered,
     crd.ts_created,
     crd.ts_updated
   FROM
     chat_received_demand AS crd
-  LEFT JOIN 
-    customer_identification AS ci
-      ON ci.customer_contact = crd.customer_phone
   WHERE
-    task_queue_name <> next_task_queue_name
+    task_queue_name != next_task_queue_name
 ),
 
-email AS(
+email AS (
   SELECT
-    id_ticket AS id_external_service,
-    NULL AS id_channel,
-    NULL AS id_task_queue,
-    NULL AS id_reservation,
-    NULL AS id_agent,
-    NULL AS id_event,
     NULL AS id_call,
-    id_user,
-    department AS task_queue_name,
-    'email' AS channel_name,
+    NULL AS id_session,
+    id_ticket,
+    NULL AS id_task,
     agent_email,
-    agent_company AS agent_location,
+    'email' AS channel,
     NULL AS customer_phone,
+    department,
     true AS is_answered,
     ts_ticket_started AS ts_created,
     NULL AS ts_updated
-  FROM 
+  FROM
     datalake_customer_support.email
+  WHERE
+    direction = 'inbound'
+    AND front_or_back = 'front'
 )
-
-SELECT 
-  * 
-FROM 
+SELECT
+  *
+FROM
   call
 UNION ALL
-SELECT 
-  * 
-FROM 
+SELECT
+  *
+FROM
   chat
 UNION ALL
-SELECT 
-  * 
-FROM 
+SELECT
+  *
+FROM
   email
