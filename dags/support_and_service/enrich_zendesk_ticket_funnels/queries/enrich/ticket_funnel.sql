@@ -163,7 +163,8 @@ SELECT DISTINCT
     cf.custom_fields['Tipo de Solicitação'] AS request_type,
     COALESCE(
         cf.custom_fields['Tipo de Cliente'],
-        REPLACE(REPLACE(REPLACE(cf.custom_fields['[CC] - Tipo de Cliente'], 'cc_',''), 'er_', 'er'), 'serviços', 'serviço')
+        REPLACE(REPLACE(REPLACE(cf.custom_fields['[CC] - Tipo de Cliente'], 'cc_',''), 'er_', 'er'), 'serviços', 'serviço'),
+        cf.custom_fields['Tipo de Cliente [PRE-SAIDA]']
     ) AS client_type,
     SPLIT(cf.custom_fields['Classificação do atendimento (Tags)'], '__')[0] AS step_tag,
     COALESCE(
