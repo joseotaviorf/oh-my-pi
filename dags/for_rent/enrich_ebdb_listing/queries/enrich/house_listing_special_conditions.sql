@@ -32,13 +32,11 @@ special_conditions AS (
         scp.dt_opted_in,
         MAX(scp.dt_opted_out) AS dt_opted_out
     FROM 
-        datalake_ebdb_clean.house_special_condition hsc
-    JOIN 
-        datalake_ebdb_clean.special_condition AS sc
-            ON hsc.id_special_condition = sc.id
-    JOIN 
-        special_conditions_prev AS scp
-            ON scp.id_special_condition = sc.id
+        datalake_ebdb_clean.house_special_condition AS hsc
+    JOIN datalake_ebdb_clean.special_condition AS sc
+        ON hsc.id_special_condition = sc.id
+    JOIN special_conditions_prev AS scp
+        ON scp.id_special_condition = sc.id
     GROUP BY 1, 2, 3
 ),
 listing_special_conditions AS (
@@ -61,10 +59,10 @@ listing_special_conditions AS (
     JOIN 
         special_conditions AS sc
             ON hl.id_house = sc.id_house
-                AND GREATEST(sc.dt_opted_in, DATE(hl.ts_listing_version_start)) >= DATE(hl.ts_listing_version_start)
-                AND GREATEST(sc.dt_opted_in, DATE(hl.ts_listing_version_start)) < COALESCE(DATE(hl.ts_listing_version_end), DATE(NOW()))
-                AND GREATEST(COALESCE(sc.dt_opted_out, DATE(NOW() - INTERVAL '1' DAY)), COALESCE(DATE(hl.ts_listing_version_end), DATE((NOW() - INTERVAL '1' DAY)))) >= COALESCE(DATE(hl.ts_listing_version_end), DATE(NOW() - INTERVAL '1' DAY))
-                AND GREATEST(COALESCE(sc.dt_opted_out, DATE(NOW() - INTERVAL '1' DAY)), COALESCE(DATE(hl.ts_listing_version_end), DATE((NOW() - INTERVAL '1' DAY)))) >= DATE(hl.ts_listing_version_start)
+            AND GREATEST(sc.dt_opted_in, DATE(hl.ts_listing_version_start)) >= DATE(hl.ts_listing_version_start)
+            AND GREATEST(sc.dt_opted_in, DATE(hl.ts_listing_version_start)) < COALESCE(DATE(hl.ts_listing_version_end), DATE(NOW()))
+            AND GREATEST(COALESCE(sc.dt_opted_out, DATE(NOW() - INTERVAL '1' DAY)), COALESCE(DATE(hl.ts_listing_version_end), DATE((NOW() - INTERVAL '1' DAY)))) >= COALESCE(DATE(hl.ts_listing_version_end), DATE(NOW() - INTERVAL '1' DAY))
+            AND GREATEST(COALESCE(sc.dt_opted_out, DATE(NOW() - INTERVAL '1' DAY)), COALESCE(DATE(hl.ts_listing_version_end), DATE((NOW() - INTERVAL '1' DAY)))) >= DATE(hl.ts_listing_version_start)
     GROUP BY 1, 2, 3
 )
 -- in case a house listing has more than one Special Condition types: exclusivity, ready and reno on the same version
@@ -72,24 +70,28 @@ SELECT
     id_house_listing,
     country_code,
     special_condition_type,
+    dt_opted_in,
+    dt_opted_out,
     -- selecting the maximum opt-in/out of a house listing, not considering the Originals' type and ioRents' type
     ROW_NUMBER() OVER (
                         PARTITION BY 
                             id_house_listing,
-                            CASE WHEN special_condition_type LIKE 'Originals%' THEN 'Originals'
-                                    WHEN special_condition_type LIKE '%Rent' THEN 'ioRent'
-                                    ELSE special_condition_type
-                            END ORDER BY dt_opted_in DESC, COALESCE(dt_opted_out, DATE('2100-01-01')) DESC
+                            CASE 
+                                WHEN special_condition_type LIKE 'Originals%' THEN 'Originals'
+                                WHEN special_condition_type LIKE '%Rent' THEN 'ioRent'
+                                ELSE special_condition_type
+                            END 
+                        ORDER BY dt_opted_in DESC, COALESCE(dt_opted_out, DATE('2100-01-01')) DESC
     ) AS rn_last_special_condition,
     ROW_NUMBER() OVER (
                         PARTITION BY 
                             id_house_listing,
-                            CASE WHEN special_condition_type LIKE 'Originals%' THEN 'Originals'
-                                    WHEN special_condition_type LIKE '%Rent' THEN 'ioRent'
-                                    ELSE special_condition_type
-                            END ORDER BY dt_opted_in ASC, COALESCE(dt_opted_out, DATE('2100-01-01')) ASC
-    ) AS rn_first_special_condition,
-    dt_opted_in,
-    dt_opted_out
+                            CASE 
+                                WHEN special_condition_type LIKE 'Originals%' THEN 'Originals'
+                                WHEN special_condition_type LIKE '%Rent' THEN 'ioRent'
+                                ELSE special_condition_type
+                            END
+                        ORDER BY dt_opted_in ASC, COALESCE(dt_opted_out, DATE('2100-01-01')) ASC
+    ) AS rn_first_special_condition
 FROM 
-  listing_special_conditions
+    listing_special_conditions

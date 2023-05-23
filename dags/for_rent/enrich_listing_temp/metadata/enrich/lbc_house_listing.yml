@@ -146,6 +146,8 @@ columns:
     description: Date when this listing was stranded. A listing is considered stranded
       after at least 8 week published and no contract signed.
   is_early_demand:
+    lineage:
+      - datalake_ebdb_listing.house_listing_early_demand.is_early_demand
     description: Flag indicating if the listing is available for early demand, that
       means it is available for visit/offer during contract termination.
   is_early_relisting:
@@ -154,6 +156,8 @@ columns:
   is_last_version:
     description: Flag indicating if this is the listing last version.
   listing_category:
+    lineage:
+      - datalake_ebdb_listing.house_listing_category.listing_category
     description: Inform the relationship history of this house with the company.
     categories:
       First Listing: Is the first time this listing is being published on the platform
@@ -163,4 +167,6 @@ columns:
   order_renting:
     description: Is the position of this renting contract in this house's lifecycle.
   ts_early_demand_started:
+    lineage:
+      - datalake_ebdb_listing.house_listing_early_demand.ts_early_demand_started
     description: Timestamp when the listing became early demand.

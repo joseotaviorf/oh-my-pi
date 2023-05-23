@@ -1,4 +1,4 @@
-WITH 
+WITH
   max_status_order AS ( 
   --------------------------------------------------------------------------------------------------------
   -- Identify the last status to each version                                                           --
@@ -44,7 +44,6 @@ WITH
         ON lbc_vo.id_house = ms_o.id_house
         AND lbc_vo.listing_version = ms_o.listing_version
         AND lbc_vo.state_order = ms_o.max_order_status
-      
   ),
   status_change_version AS (
   --------------------------------------------------------------------------------------------------------
