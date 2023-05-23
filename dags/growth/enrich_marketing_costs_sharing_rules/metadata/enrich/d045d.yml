@@ -1,0 +1,26 @@
+---
+database_name: datalake_marketing_costs_sharing_rules
+table_name: d045d
+owner: '@data-growth'
+domain: Growth
+description: Cost allocation among ToF Events for the cities of Rio de Janeiro, Belo Horizonte, Porto Alegre and Campinas assigned to UTM d045d.D.RET.Sale.Strategic_Cities.churnedBPs_[RJ_BH_POA_CAM].
+columns:
+  id_date:
+    description: Date of applied share
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  id_rule: 
+    description: Id rule
+    categories: 
+      d023d: ''
+  city_group:
+    description: city_group segmentation
+    lineage:
+      - datalake_region.region.city_group
+  share: 
+    description: Percentage of cost that will be applied to specific city_group
+  funnel_side: 
+    description: Marketplace side of business
+    categories: 
+      demand: ''
+      supply: ''
