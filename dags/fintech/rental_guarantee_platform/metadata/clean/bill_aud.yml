@@ -1,0 +1,92 @@
+database_name: datalake_rental_guarantee_platform_clean
+table_name: bill_aud
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.id
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.revtype
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.version
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.created_at
+  code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.code
+  mod_code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.code_mod
+  file_url:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.file_url
+  mod_file_url:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.file_url_mod
+  due_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.due_amount
+  mod_due_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.due_amount_mod
+  dt_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.due_date
+  mod_due_date:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.due_date_mod
+  dt_paid:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.paid_at
+  mod_paid_at:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.paid_at_mod
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.status
+  mod_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.status_mod
+  business_context:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.business_context
+  mod_business_context:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.business_context_mod
+  raw_request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.raw_request
+  mod_raw_request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.raw_request_mod
+  raw_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.raw_response
+  mod_raw_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.raw_response_mod
+  external_id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.external_id
+  mod_external_id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.external_id_mod
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto_aud.day

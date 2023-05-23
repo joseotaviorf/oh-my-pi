@@ -1,0 +1,71 @@
+database_name: datalake_rental_guarantee_platform_clean
+table_name: cancellation_aud
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.id
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.revtype
+  cancellation_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.type
+  user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.userinsert
+  user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.userupdate
+  propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.propose
+  return_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.return_value
+  return_value_interest:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.return_value_interest
+  mod_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.type_mod
+  mod_return_value_interest:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.return_value_interest_mod
+  mod_return_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.return_value_mod
+  mod_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.propose_mod
+  mod_request_date:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.request_date_mod
+  mod_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.active_mod
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.active
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.created_at
+  ts_requested:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.request_date
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.day

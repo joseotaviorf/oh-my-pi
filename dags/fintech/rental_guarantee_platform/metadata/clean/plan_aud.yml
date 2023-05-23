@@ -1,0 +1,94 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: plan_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.id
+  id_legacy:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.legacy_id
+  id_user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.userinsert
+  id_user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.userupdate
+  id_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.type
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.rev
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.revend
+  name:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.name
+  mod_pricing:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.name_mod
+  mod_coverage:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.coverage_mod
+  mod_damage:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.damage_mod
+  mod_commission:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.commission_mod
+  mod_user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.userinsert_mod
+  mod_user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.userupdate_mod
+  mod_date_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.dateinsert_mod
+  mod_date_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.dateupdate_mod
+  mod_legacy_id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.legacy_id_mod
+  active_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.mod_active
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.active
+  pricing:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.pricing
+  coverage:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.coverage
+  damage:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.damage
+  commission:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.commission
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.created_at
+  ts_inserted:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.dateupdate
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan_aud.day

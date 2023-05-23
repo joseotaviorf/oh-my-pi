@@ -1,0 +1,52 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: plan
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.id
+  id_legacy:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.legacy_id
+  id_user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.userinsert
+  id_user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.userupdate
+  id_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.type
+  plan_name:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.name
+  pricing:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.pricing
+  coverage:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.coverage
+  damage:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.damage
+  commission:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.commission
+  active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.is_active
+  ts_inserted:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.dateupdate
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.plan.day

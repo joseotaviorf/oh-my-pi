@@ -1,0 +1,54 @@
+database_name: datalake_rental_guarantee_platform_clean
+table_name: entry_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.id
+  type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.type
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.revtype
+  invoice:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.invoice
+  propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.propose
+  amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.amount
+  mod_created_at:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.created_at_mod
+  mod_invoice:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.invoice_mod
+  mod_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.propose_mod
+  mod_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.amount_mod
+  mod_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.type_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry_aud.day

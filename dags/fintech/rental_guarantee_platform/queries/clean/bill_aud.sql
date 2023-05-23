@@ -1,0 +1,33 @@
+SELECT
+    id,
+    external_id             AS id_external,
+    rev,
+    revend                  AS rev_end,
+    revtype                 AS rev_type,
+    status,
+    business_context,
+    raw_request,
+    raw_response,
+    file_url,
+    version,
+    code,
+    due_amount,
+    code_mod                AS mod_code,
+    file_url_mod            AS mod_file_url,
+    due_amount_mod          AS mod_due_amount,
+    due_date_mod            AS mod_due_date,
+    paid_at_mod             AS mod_paid_at,
+    status_mod              AS mod_status,
+    business_context_mod    AS mod_business_context,
+    raw_request_mod         AS mod_raw_request,
+    raw_response_mod        AS mod_raw_response,
+    external_id_mod         AS mod_external_id,
+    due_date                AS dt_due,
+    paid_at                 AS ts_paid,
+    created_at              AS ts_created,
+    year,
+    month,
+    day
+
+FROM
+    datalake_rental_guarantee_platform_raw.boleto_aud

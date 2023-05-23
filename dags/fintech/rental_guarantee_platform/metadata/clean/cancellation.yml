@@ -1,0 +1,47 @@
+database_name: datalake_rental_guarantee_platform_clean
+table_name: cancellation
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.id
+  cancellation_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.type
+  propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.propose
+  user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.userinsert
+  user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.userupdate
+  return_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.return_value
+  return_value_interest:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.return_value_interest
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.active
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.updated_at
+  ts_requested:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.request_date
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.day

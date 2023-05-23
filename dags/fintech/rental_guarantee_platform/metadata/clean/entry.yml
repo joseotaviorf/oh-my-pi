@@ -1,0 +1,34 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: entry
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.id
+  type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.type
+  invoice:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.invoice
+  propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.propose
+  amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.amount
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.day

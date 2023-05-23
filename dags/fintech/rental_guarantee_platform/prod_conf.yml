@@ -121,4 +121,26 @@ tables:
     date_filter_column: updated_at
   - table_name: company_plan_aud
     date_filter_column: created_at
+  - table_name: cancellation_aud
+    date_filter_column: created_at
+  - table_name: cancellation
+    date_filter_column: updated_at
+  - table_name: plan_aud
+    date_filter_column: dateinsert
+  - table_name: plan
+    date_filter_column: dateupdate
+  - table_name: boleto_aud
+    clean_table_name: bill_aud
+    date_filter_column: created_at
+  - table_name: boleto
+    clean_table_name: bill
+    date_filter_column: updated_at
+  - table_name: entry_aud
+    date_filter_column: created_at
+  - table_name: entry
+    date_filter_column: updated_at
+  - table_name: invoice_aud
+    date_filter_column: created_at
+  - table_name: invoice
+    date_filter_column: updated_at
 partition_cols: ["year", "month", "day"]

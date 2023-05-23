@@ -1,0 +1,56 @@
+database_name: datalake_rental_guarantee_platform_clean
+table_name: bill
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.id
+  id_external:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.external_id
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.version
+  code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.code
+  file_url:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.file_url
+  due_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.due_amount
+  due_date:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.due_date
+  ts_paid:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.paid_at
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.status
+  business_context:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.business_context
+  raw_request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.raw_request
+  raw_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.raw_response
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.day
