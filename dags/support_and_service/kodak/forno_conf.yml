@@ -7,7 +7,7 @@ tables:
     raw_extraction_type: incremental
     clean_extraction_type: full
     date_filter_column: updated_at
-  image_inspection_raw:
+  image_analysis:
     raw_extraction_type: full
     clean_extraction_type: full
   image_inspection_group:
@@ -18,7 +18,7 @@ tables:
     raw_extraction_type: incremental
     clean_extraction_type: full
     date_filter_column: updated_at
-  image_inspection_group_raw:
+  group_analysis:
     raw_extraction_type: full
     clean_extraction_type: full
   photo:

@@ -3,4 +3,4 @@ SELECT
     id_inspection,
     result
 FROM
-    datalake_kodak_raw.image_inspection_raw
+    datalake_kodak_raw.image_analysis

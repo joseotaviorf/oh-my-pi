@@ -1,6 +1,9 @@
 ---
 database_name: datalake_kodak_clean
 table_name: image_inspection
+description: This table contains the results of the image inspection.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -23,6 +26,9 @@ columns:
   status:
     lineage:
       - datalake_kodak_raw.image_inspection.status
+  description:
+    lineage:
+      - datalake_kodak_raw.image_inspection.description
   width:
     lineage:
       - datalake_kodak_raw.image_inspection.width

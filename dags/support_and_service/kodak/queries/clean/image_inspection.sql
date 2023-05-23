@@ -6,6 +6,7 @@ SELECT
     house_place,
     room_type,
     status,
+    description,
     width,
     height,
     ratio,
