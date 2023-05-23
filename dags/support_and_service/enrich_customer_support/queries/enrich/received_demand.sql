@@ -103,7 +103,7 @@ chat AS (
       te.event_type,
       GET_JSON_OBJECT(te.event_payload,'$.TaskQueueName') AS task_queue_name,
       GET_JSON_OBJECT(event_payload,'$.WorkerAttributes.email') AS agent_email,
-      REGEXP_REPLACE(REGEXP_EXTRACT(GET_JSON_OBJECT(t.task_attributes,'$.from'), '(\\w+:)(.+)', 2), '^(\+)(.*)', '') AS customer_phone,
+      REGEXP_REPLACE(REGEXP_EXTRACT(GET_JSON_OBJECT(t.task_attributes,'$.from'), '(\\w+:)(.+)', 2), '^(\\+)(.*)', '') AS customer_phone,
       GET_JSON_OBJECT(te.event_payload,'$.TaskAttributes.conversations.conversation_measure_1') IS NOT NULL AS is_answered,
       te.ts_created,
       te.ts_updated
