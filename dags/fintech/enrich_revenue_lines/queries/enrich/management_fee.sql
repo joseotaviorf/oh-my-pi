@@ -22,6 +22,7 @@ LEFT JOIN dw_public.dim_contract c
     ON c.sk_contract = fie.id_contract
 LEFT JOIN datalake_ebdb_clean.contract_partnership_data p
     ON c.sk_contract = p.id_contract
+    AND p.administration_split_percentage IS NOT NULL
 WHERE
     die.from_account_type NOT IN ('quinto andar', 'contract expenses')
 AND
@@ -57,6 +58,7 @@ LEFT JOIN dw_public.dim_contract c
     ON c.sk_contract = fie.id_contract
 LEFT JOIN datalake_ebdb_clean.contract_partnership_data p
     ON c.sk_contract = p.id_contract
+    AND p.administration_split_percentage IS NOT NULL
 WHERE
     die.from_account_type NOT IN ('quinto andar', 'contract expenses')
 AND
