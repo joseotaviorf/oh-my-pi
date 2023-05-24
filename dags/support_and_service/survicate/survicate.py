@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pendulum
 import os
+import json
 from airflow.utils.helpers import chain, cross_downstream
 from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
@@ -28,7 +29,6 @@ MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "30 2 * * *"
 
 config_service = ConfigurationService(dag_name=SOURCE)
-partition_cols = config_service.get_config("partition_cols")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
@@ -38,6 +38,9 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
+tables_config = config_service.get_config("tables")
+partition_cols = config_service.get_config("partition_cols")
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -46,7 +49,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 
 base_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_survicate_into_datalake.py"
+raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 custom_libraries = [
@@ -95,7 +98,12 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
     extraction_spark_job_file=raw_spark_job_path,
-    raw_spark_job_extra_args=[SOURCE, "{{ ds }}"],
+    raw_spark_job_extra_args=[
+        SOURCE, 
+        "{{ ds }}",
+        json.dumps(tables_config),
+        json.dumps(partition_cols)
+    ],
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(

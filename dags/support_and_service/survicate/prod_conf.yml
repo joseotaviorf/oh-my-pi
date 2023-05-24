@@ -1,1 +1,11 @@
+---
+dag_documentation:
+  dag_purpose:
+    Retrieves surveys from [Survicate](https://developers.survicate.com/data-export/#get-the-list-of-surveys). 
+    Today we are using this tool to create surveys to collect user CSAT for email tickets
+
+tables:
+  surveys:
+    flattened_key: id
+
 partition_cols: ["year", "month", "day"]
