@@ -5,4 +5,6 @@ tables:
   - table_name: invoice_all
     schema: datalake_accounting_funnel_snapshot
 
+partition_cols: [year, month, day]
+
 inner_dependencies: {}
