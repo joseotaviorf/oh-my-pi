@@ -77,6 +77,10 @@ columns:
     description: Diversity @3
     lineage:
       - datalake_recommendations.recommendation_metrics_agg_dimensions.sum_diversity_at_3
+  mean_repetition_at_3:
+    description: Repetition @3
+    lineage:
+      - datalake_recommendations.recommendation_metrics_agg_dimensions.sum_repetition_at_3
   mean_precision_at_5:
     description: Mean Precision @5
     lineage:
@@ -136,6 +140,10 @@ columns:
     description: Diversity @5
     lineage:
       - datalake_recommendations.recommendation_metrics_agg_dimensions.sum_diversity_at_5
+  mean_repetition_at_5:
+    description: Repetition @5
+    lineage:
+      - datalake_recommendations.recommendation_metrics_agg_dimensions.sum_repetition_at_5
   mean_precision_at_10:
     description: Mean Precision @10
     lineage:
@@ -195,3 +203,7 @@ columns:
     description: Diversity @10
     lineage:
       - datalake_recommendations.recommendation_metrics_agg_dimensions.sum_diversity_at_10
+  mean_repetition_at_10:
+    description: Repetition @10
+    lineage:
+      - datalake_recommendations.recommendation_metrics_agg_dimensions.sum_repetition_at_10

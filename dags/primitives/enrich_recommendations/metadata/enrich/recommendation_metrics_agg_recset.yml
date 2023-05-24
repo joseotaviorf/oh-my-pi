@@ -113,6 +113,11 @@ columns:
     description: Diversity @3
     lineage:
       - datalake_recommendations.diversity.diversity_at_3
+  repetition_at_3:
+    description: Repetition @3
+    lineage:
+      - datalake_recommendations.recommendation_flow.repeated_rec
+      - datalake_recommendations.recommendation_flow.item_rank
   rec_to_favorite_at_3:
     description: Rec to favorite @3
     lineage:
@@ -199,6 +204,11 @@ columns:
     description: Diversity @5
     lineage:
       - datalake_recommendations.diversity.diversity_at_5
+  repetition_at_5:
+    description: Repetition @5
+    lineage:
+      - datalake_recommendations.recommendation_flow.repeated_rec
+      - datalake_recommendations.recommendation_flow.item_rank
   rec_to_favorite_at_5:
     description: Rec to favorite @5
     lineage:
@@ -285,6 +295,11 @@ columns:
     description: Diversity @10
     lineage:
       - datalake_recommendations.diversity.diversity_at_10
+  repetition_at_10:
+    description: Repetition @10
+    lineage:
+      - datalake_recommendations.recommendation_flow.repeated_rec
+      - datalake_recommendations.recommendation_flow.item_rank
   rec_to_favorite_at_10:
     description: Rec to favorite @10
     lineage:
