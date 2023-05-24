@@ -53,7 +53,8 @@ WITH
     SELECT
       id_house,
       listing_version,
-      MAX(status) OVER(PARTITION BY id_house, listing_version) AS category_change
+      MAX(status) OVER(PARTITION BY id_house, listing_version) AS category_change,
+      MAX(status_reason) OVER(PARTITION BY id_house, listing_version) AS category_change_reason
     FROM 
       house_status_version_last_status
     WHERE 
@@ -70,6 +71,7 @@ WITH
         hs_v.country_code,
         hs_v.listing_version AS version,
         sc_v.category_change AS change_version_status,
+        sc_v.category_change_reason AS change_version_status_reason,
         hs_v.ts_last_unpublished,
         MAX(hs_v.previous_status) AS status_history,
         MAX(hs_v.ts_state_started) AS ts_status_changed,
@@ -84,7 +86,7 @@ WITH
       status_change_version AS sc_v
         ON hs_v.id_house = sc_v.id_house
         AND hs_v.listing_version = sc_v.listing_version
-    GROUP BY 1, 2, 3, 4, 5
+    GROUP BY 1, 2, 3, 4, 5, 6
   )
 --------------------------------------------------------------------------------------------------------
 -- Create category                                                                                    --
@@ -97,8 +99,21 @@ SELECT
   CASE 
     WHEN version = 0 THEN NULL
     WHEN version = 1 THEN 'First Listing'
-    WHEN version <> 0 AND LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('alugado', 'RENTED') THEN 'Re-Listing'
-    WHEN version <> 0 AND LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('despublicado', 'UNPUBLISHED') THEN 'Recovered'
+    WHEN 
+      version <> 0 
+      AND (
+        LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('alugado') 
+        OR (
+          LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('SUSPENDED') 
+          AND
+          LAG(change_version_status_reason) OVER(PARTITION BY id_house ORDER BY version) IN ('RENTED') 
+        )
+      )
+    THEN 'Re-Listing'
+    WHEN 
+      version <> 0 
+      AND LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('despublicado', 'UNPUBLISHED') 
+    THEN 'Recovered'
     ELSE NULL 
   END AS listing_category,
   status,
