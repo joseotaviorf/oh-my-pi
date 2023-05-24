@@ -1,8 +1,8 @@
 WITH locale_ids AS (
-  SELECT 
-    DISTINCT city, 
-    min(id_locale) AS id_locale 
-  FROM 
+  SELECT
+    DISTINCT city,
+    min(id_locale) AS id_locale
+  FROM
     datalake_gsheets_clean.cod_locale
   GROUP BY 1
 ),
@@ -12,12 +12,12 @@ cap_contract_info AS (
         DISTINCT
         c.sk_contract,
         ie.is_rental_paid_in_advance
-    FROM 
+    FROM
         dw_public.dim_contract AS c
-    LEFT JOIN 
+    LEFT JOIN
         dw_payment.fact_invoice_entries AS fie
             ON fie.sk_contract = c.sk_contract
-    LEFT JOIN 
+    LEFT JOIN
         dw_payment.dim_invoice_entry AS ie
             ON ie.sk_invoice_entry = fie.sk_invoice_entry
 ),
@@ -31,15 +31,15 @@ cap_formated AS (
         WHEN UPPER(payment_reason) LIKE 'PROTEÇÃO 5A%' AND UPPER(payment_source) LIKE 'MANUAL%' THEN 'Proteção 5A - PP'
         WHEN UPPER(payment_reason) LIKE 'PROTEÇÃO 5A%' THEN 'Proteção 5A - Parceiro'
         WHEN UPPER(payment_reason) LIKE 'CONDOM%' THEN 'Condomínio'
-        WHEN UPPER(payment_reason) LIKE 'ANTECIPA%' THEN 'MRA'  
-        WHEN UPPER(payment_reason) LIKE 'LRA%' THEN 'LRA'  
-        WHEN UPPER(payment_reason) LIKE 'BFI%' THEN 'BFI'  
+        WHEN UPPER(payment_reason) LIKE 'ANTECIPA%' THEN 'MRA'
+        WHEN UPPER(payment_reason) LIKE 'LRA%' THEN 'LRA'
+        WHEN UPPER(payment_reason) LIKE 'BFI%' THEN 'BFI'
         WHEN regexp_like(UPPER(payment_reason),'^MULTA RESCISÓRIA|^MULTA-RESCISÓRIA|^CONTAS DE CONSUMO|^CONTAS-DE-CONSUMO|^CONTA-CONSUMO|^ALUGUEL|^CORRETOR|^3P|^IPTU|^REPASSE B2B|ˆREPASSE-B2B|^ONGOING|^BAND-AID') THEN payment_reason
         WHEN regexp_like(UPPER(payment_reason),'^CRÉDITO A SALDAR|^DEVOLUÇÃO|^EXTRA') THEN 'Repasse Extra'
         ELSE NULL
       END AS payment_reason_classification,
       SUM(paid_amount) AS paid_amount
-    FROM 
+    FROM
       datalake_payable_accounts_transactions_clean.accounts_payable
     WHERE
       dt_paid IS NOT NULL
@@ -51,7 +51,7 @@ cap_formated AS (
 ),
 
 vans_formated AS ( --Change columns name to match CAP layout
-  SELECT 
+  SELECT
     SPLIT(SPLIT(SPLIT(SPLIT(SPLIT(c.company_use, 'T')[0], 'P')[0], '!')[0], 'L')[0], 'I')[0] as supplier_description,
     c.dt_paid AS dt_paid,
     CAST(extract(YEAR from c.dt_paid) AS varchar(4)) || LPAD(CAST(extract(MONTH from c.dt_paid) AS varchar(2)), 2, '0') as accrual_year_month,
@@ -59,16 +59,16 @@ vans_formated AS ( --Change columns name to match CAP layout
       WHEN UPPER(pagamento) LIKE 'PROTEÇÃO 5A%' AND UPPER(our_number) LIKE 'MANUAL%' THEN 'Repasse Extra'
       WHEN UPPER(pagamento) LIKE 'PROTEÇÃO 5A%' THEN 'Repasse Extra'
       WHEN UPPER(pagamento) LIKE 'CONDOM%' THEN 'Condomínio'
-      WHEN UPPER(pagamento) LIKE 'ANTECIPA%' THEN 'MRA'  
-      WHEN UPPER(pagamento) LIKE 'CIQ%' THEN 'CIQ' 
-      WHEN UPPER(pagamento) LIKE 'ONG%' THEN 'Aluguel' 
+      WHEN UPPER(pagamento) LIKE 'ANTECIPA%' THEN 'MRA'
+      WHEN UPPER(pagamento) LIKE 'CIQ%' THEN 'CIQ'
+      WHEN UPPER(pagamento) LIKE 'ONG%' THEN 'Aluguel'
       WHEN regexp_like(UPPER(pagamento),'^MULTA RESCISÓRIA|^CONTAS DE CONSUMO|^ALUGUEL|^CORRETORES|^IPTU|^REPASSE B2B|ˆREPASSE-B2B|^BAND-AID|^CRÉDITO A SALDAR|^EARLY TERMINATION') THEN pagamento
       WHEN regexp_like(UPPER(pagamento),'^DEVOLUÇÃO|^EXTRA') THEN 'Repasse Extra'
       ELSE NULL
-    END AS payment_reason_classification, 
+    END AS payment_reason_classification,
     SUM(paid_amount) AS paid_amount
-  FROM 
-    (SELECT 
+  FROM
+    (SELECT
       p.our_number,
       p.company_use,
       p.status,
@@ -76,8 +76,8 @@ vans_formated AS ( --Change columns name to match CAP layout
       if (status = ':payment.status/chargeback', p.paid_amount, p.paid_amount*(-1)) as paid_amount,
       p.requested_by,
       p.id_bank_payment as codigo,
-      p.ts_updated, 
-      CASE 
+      p.ts_updated,
+      CASE
             WHEN p.requested_by = 'sb-corretores' THEN 'Corretores'
             WHEN p.requested_by = 'rh-corretores' THEN 'Corretores'
             WHEN p.requested_by in ('indica-ai', 'indica-ai-agents') THEN 'IndicaAi'
@@ -92,9 +92,9 @@ vans_formated AS ( --Change columns name to match CAP layout
             WHEN regexp_like((p.company_use), '^[0-9]+!MO[0-9]+$') THEN 'Ongoing'
             WHEN regexp_like((p.company_use), '^[0-9]+Corretor$') THEN 'Corretores'
         END as pagamento
-    FROM 
+    FROM
       datalake_vans_clean.payment p
-    WHERE 
+    WHERE
       p.dt_paid >= '2022-12-01'
 
     UNION ALL
@@ -108,7 +108,7 @@ vans_formated AS ( --Change columns name to match CAP layout
       pb.requested_by,
       CAST((if(pb.id_bank_payment = null, '0', '1')) AS decimal(20,0)) as codigo,
       pb.ts_updated,
-      CASE 
+      CASE
         WHEN pb.company_use = '00000000000000000000' THEN 'Ongoing - Boleto'
         WHEN regexp_like((company_use),'^[0-9]+P[0-9]+$') THEN 'Condomínio V8'
         WHEN regexp_like((company_use),'^00000000000000+[0-9]+$') THEN 'Condomínio V9'
@@ -117,22 +117,22 @@ vans_formated AS ( --Change columns name to match CAP layout
         WHEN regexp_like((company_use),'^[0-9]+![0-9]+MCD[0-9]+$') THEN 'Condominio v9 - Despejo'
       END as pagamento
 
-    FROM 
+    FROM
       datalake_vans_clean.payment_boleto pb
-    WHERE 
+    WHERE
       pb.dt_paid >= '2022-12-01'
     ) c
-LEFT JOIN 
-  datalake_vans_clean.bank_payment bp 
+LEFT JOIN
+  datalake_vans_clean.bank_payment bp
       on c.codigo = bp.id
-LEFT JOIN 
-  datalake_vans_clean.bank b 
+LEFT JOIN
+  datalake_vans_clean.bank b
       on bp.id_bank = b.id
-WHERE 
+WHERE
   pagamento IS NOT NULL
-AND 
+AND
   ((status = ':payment.status/paid') OR (status = ':payment.status/chargeback'))
-GROUP BY 
+GROUP BY
   1,
   2,
   3,
@@ -155,7 +155,7 @@ SELECT
   cci.is_rental_paid_in_advance,
   'cap' AS bill_item,
   CONCAT(cap.payment_reason_classification,' CAP') AS description,
-  0 AS has_negotiation, 
+  0 AS has_negotiation,
   0 AS has_installments,
   'monthly' AS purpose,
   CAST(NULL AS STRING) AS invoice_account_type,
@@ -169,7 +169,7 @@ SELECT
   cap.paid_amount AS invoice_due_amount,
   CAST(cap.accrual_year_month AS INT) AS accrual_year_month,
   CAST(cap.accrual_year_month AS INT) AS entry_accrual_year_month,
-  CAST(cap.accrual_year_month AS INT) AS entry_creation_accrual_year_month,    
+  CAST(cap.accrual_year_month AS INT) AS entry_creation_accrual_year_month,
   DATE_FORMAT(cap.dt_paid, 'yyyy-MM-dd')  AS entry_created_date,
   CAST(NULL AS STRING) AS invoice_created_date,
   CAST(NULL AS STRING) AS invoice_due_date,
@@ -178,27 +178,27 @@ SELECT
   CAST(NULL AS STRING) AS invoice_canceled_date,
   c.dt_start AS contract_start,
   c.dt_annulment AS contract_annulment,
-  CASE WHEN c.dt_start <= c.dt_annulment THEN false ELSE true END AS ended_before_started, 
+  CASE WHEN c.dt_start <= c.dt_annulment THEN false ELSE true END AS ended_before_started,
   FALSE AS pp_pays,
   CAST(NULL AS INT) AS entry_sort_ascend,
   CAST(NULL AS INT) AS entry_by_accrual_sort_ascend,
   TRUE is_cap
-FROM 
+FROM
     cap_formated as cap
-LEFT JOIN 
+LEFT JOIN
     dw_public.dim_contract AS c
         ON c.sk_contract = CAST(try_cast(cap.supplier_description AS REAL) AS INT)
 LEFT JOIN
     cap_contract_info AS cci
         ON cci.sk_contract = c.sk_contract
 LEFT JOIN
-    dw_public.fact_house_listings AS rf 
-        ON rf.sk_contract = c.sk_contract 
+    dw_public.fact_house_listings AS rf
+        ON rf.sk_contract = c.sk_contract
 LEFT JOIN
-    dw_public.dim_region AS r 
-        ON r.sk_region = rf.sk_region 
-LEFT JOIN 
-    locale_ids AS cl 
+    dw_public.dim_region AS r
+        ON r.sk_region = rf.sk_region
+LEFT JOIN
+    locale_ids AS cl
         ON  r.city_name = cl.city
 ),
 
@@ -217,7 +217,7 @@ vans_final AS (
     cci.is_rental_paid_in_advance,
     'cap' AS bill_item,
     CONCAT(vans.payment_reason_classification,' CAP') AS description,
-    0 AS has_negotiation, 
+    0 AS has_negotiation,
     0 AS has_installments,
     'monthly' AS purpose,
     CAST(NULL AS STRING) AS invoice_account_type,
@@ -231,7 +231,7 @@ vans_final AS (
     vans.paid_amount AS invoice_due_amount,
     CAST(vans.accrual_year_month AS INT) AS accrual_year_month,
     CAST(vans.accrual_year_month AS INT) AS entry_accrual_year_month,
-    CAST(vans.accrual_year_month AS INT) AS entry_creation_accrual_year_month,    
+    CAST(vans.accrual_year_month AS INT) AS entry_creation_accrual_year_month,
     DATE_FORMAT(vans.dt_paid, 'yyyy-MM-dd')  AS entry_created_date,
     CAST(NULL AS STRING) AS invoice_created_date,
     CAST(NULL AS STRING) AS invoice_due_date,
@@ -240,38 +240,40 @@ vans_final AS (
     CAST(NULL AS STRING) AS invoice_canceled_date,
     c.dt_start AS contract_start,
     c.dt_annulment AS contract_annulment,
-    CASE WHEN c.dt_start <= c.dt_annulment THEN false ELSE true END AS ended_before_started, 
+    CASE WHEN c.dt_start <= c.dt_annulment THEN false ELSE true END AS ended_before_started,
     FALSE AS pp_pays,
     CAST(NULL AS INT) AS entry_sort_ascend,
     CAST(NULL AS INT) AS entry_by_accrual_sort_ascend,
     TRUE is_cap
-  FROM 
+  FROM
       vans_formated as vans
-  LEFT JOIN 
+  LEFT JOIN
       dw_public.dim_contract AS c
           ON c.sk_contract = CAST(try_cast(vans.supplier_description AS REAL) AS INT)
   LEFT JOIN
       cap_contract_info AS cci
           ON cci.sk_contract = c.sk_contract
   LEFT JOIN
-      dw_public.fact_house_listings AS rf 
-          ON rf.sk_contract = c.sk_contract 
+      dw_public.fact_house_listings AS rf
+          ON rf.sk_contract = c.sk_contract
   LEFT JOIN
-      dw_public.dim_region AS r 
-          ON r.sk_region = rf.sk_region 
-  LEFT JOIN 
-      locale_ids AS cl 
+      dw_public.dim_region AS r
+          ON r.sk_region = rf.sk_region
+  LEFT JOIN
+      locale_ids AS cl
           ON  r.city_name = cl.city
 )
 
-SELECT 
-  *
-FROM 
+SELECT
+  *,
+  NOW()       AS ts_load
+FROM
   vans_final
 
 UNION ALL
 
 SELECT
-  *
-FROM 
+  *,
+  NOW()       AS ts_load
+FROM
   cap_final

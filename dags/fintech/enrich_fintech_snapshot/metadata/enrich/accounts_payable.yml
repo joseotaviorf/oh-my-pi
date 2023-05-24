@@ -1,9 +1,9 @@
 ---
-database_name: datalake_accounting_funnel
+database_name: datalake_accounting_funnel_snapshot
 table_name: accounts_payable
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: "Table containing accounts payable data"
+description: "datalake_accounting_funnel.accounts_payable monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
   sk_contract:
     lineage:
@@ -61,5 +61,19 @@ columns:
     lineage:
       - dw_public.dim_contract.dt_annulment
     description: "Annulment of contract date"
-  ts_load:
+  ts_snapshot:
+    lineage:
+      - datalake_accounting_funnel.accounts_payable.ts_load
     description: "Timestamp when the data was loaded"
+  year:
+    lineage:
+      - datalake_accounting_funnel.accounts_payable.ts_load
+    description: "Year when the data was loaded"
+  month:
+    lineage:
+      - datalake_accounting_funnel.accounts_payable.ts_load
+    description: "Month when the data was loaded"
+  day:
+    lineage:
+      - datalake_accounting_funnel.accounts_payable.ts_load
+    description: "Day when the data was loaded"

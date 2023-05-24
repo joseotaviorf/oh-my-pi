@@ -1450,6 +1450,9 @@ bietlejuice.enrich_ebdb_user:
 bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.hubspot:load-clean-company
+bietlejuice.enrich_fintech_snapshot:
+  - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all
+  - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable
 bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-monday
   - bietlejuice.firestore:load-clean-rent-offer
