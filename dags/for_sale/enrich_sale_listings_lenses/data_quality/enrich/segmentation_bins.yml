@@ -1,0 +1,4 @@
+---
+table_name: datalake_sale_listings_lenses.segmentation_bins
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations: {}

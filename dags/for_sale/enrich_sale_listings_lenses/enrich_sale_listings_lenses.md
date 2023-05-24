@@ -22,8 +22,8 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following tables in enrich layer:
 
 Via **Full Load**:
-    - `premium_lens`
-    - `pricing_lens`
     - `demand_lens`
+    - `pricing_lens`
+    - `segmentation_bins`
 
 </details>
