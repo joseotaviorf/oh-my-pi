@@ -1021,11 +1021,11 @@ aux_regiao:
     clean_table_name: auxiliary_region
     sheet_context: for_rent
 
-base_bandaids:
-    sheet_id: 1CtK7QtPaai_mtuPKM4u2SWMT0gQ8wJoxNYCVaYW6w_E
-    sheet_name: Página1
-    clean_table_name: base_bandaids
-    sheet_context: for_rent
+# base_bandaids:
+#     sheet_id: 1CtK7QtPaai_mtuPKM4u2SWMT0gQ8wJoxNYCVaYW6w_E
+#     sheet_name: Página1
+#     clean_table_name: base_bandaids
+#     sheet_context: for_rent
 
 base_hunter:
     sheet_id: 1gFxBxHVnmIveohw9fmRspW4ImPYSglH7dEITpFc17DI
