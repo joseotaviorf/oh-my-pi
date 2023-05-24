@@ -3,7 +3,7 @@ table_name: booking
 description: This table contains information about booking and is the main source
   for the dim_booking. Here, id is a PK and we have only one booking per line.
 domain: For Rent
-owner: ''
+owner: data-for-rent@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -78,9 +78,11 @@ columns:
   id_company_supply:
     lineage:
     - datalake_ebdb_listing.house.id_company_hubspot
+    description: Id of the supply partner
   id_company_demand:
     lineage:
     - datalake_ebdb_work_contract.work_contract.id_company_hubspot
+    description: Id of the demand partner
   country_code:
     lineage:
     - datalake_ebdb_listing.house.country_code
@@ -91,6 +93,7 @@ columns:
   default_timezone:
     lineage:
     - datalake_ebdb_clean.country.default_timezone
+    description: Default timezone referring to the country where the visit was booked.
   dt_booking:
     lineage:
     - datalake_ebdb_clean.booking.dt_booking
@@ -161,6 +164,10 @@ columns:
     lineage:
     - datalake_ebdb_clean.visit_origin.name
     description: Shows the origin from the booking, self service web, booked by agent
+  first_cancelation_source:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.name
+    description: Shows the source of the exact action where the cancellation of the visit occurred.
   is_visit_created_from_app:
     lineage:
     - datalake_ebdb_clean.visit_origin.is_app
@@ -411,9 +418,13 @@ columns:
   is_3p_supply_5a:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_5a
+    description: > 
+      Boolean column that identifies if the listing is from a real estate partner (Rede Supply) of QuintoAndar.
   is_3p_supply_bh:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_bh
+    description: > 
+      Boolean column that points if the listing is from a real estate partner (Rede Supply) in Belo Horizonte. 
   is_virtual_visit:
     lineage:
     - datalake_ebdb_clean.follow_up_details.visit_type
@@ -487,6 +498,7 @@ columns:
   ts_first_canceled_unevaluated_local_tz:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the cancellation time, referring to the timezone of the country in which the visit was booked.
   responsible:
     lineage:
     - datalake_ebdb_clean.booking_status_change.reason_enum

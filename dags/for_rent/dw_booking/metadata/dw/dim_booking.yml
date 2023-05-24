@@ -356,6 +356,10 @@ columns:
     lineage:
     - datalake_booking.booking.first_update_source
     description: "Shows the origin from the booking, self service web, booked by agent."
+  first_cancelation_source:
+    lineage:
+    - datalake_booking.booking.first_cancelation_source
+    description: Shows the source of the exact action where the cancellation of the visit occurred.
   visitor_missing_reason:
     lineage:
     - datalake_booking.booking.tenant_absence_reason

@@ -27,18 +27,24 @@ WITH status_change AS (
 canceled_date AS (
   WITH min_canceled_date AS (
     SELECT
-        id AS id_booking,
-        MIN(REV) AS rev_canceled
+        b_aud.id AS id_booking,
+        vo.name AS first_cancelation_source,
+        b_aud.REV AS rev_canceled
     FROM
-      datalake_ebdb_clean.booking_aud
+      datalake_ebdb_clean.booking_aud AS b_aud
+    LEFT JOIN 
+      datalake_ebdb_clean.visit_origin AS vo
+        ON b_aud.id_last_update_origin = vo.id
     WHERE
-        status = 'Cancelado'
-        AND mod_status = 1
-    GROUP BY 1
+        b_aud.status = 'Cancelado'
+        AND b_aud.mod_status = 1
+    QUALIFY
+      MIN(b_aud.REV) OVER (PARTITION BY b_aud.id) = b_aud.REV
   )
   SELECT
     mcd.id_booking,
     ure.id_user AS id_user_cancelation,
+    mcd.first_cancelation_source,
     -- TODO [ODS] check if milliseconds is really needed for this column
     CAST(FROM_UNIXTIME(ure.ts_revision/1000) AS TIMESTAMP)
       + (ure.ts_revision % 1000) * INTERVAL 1 MILLISECONDS
@@ -323,6 +329,7 @@ base_booking AS (
     u.email AS user_creation_email,
     vo.last_update_source,
     vo.first_update_source,
+    cd.first_cancelation_source,
     vo.is_visit_created_from_app,
     vo.is_visit_last_updated_from_app,
     vo.code,

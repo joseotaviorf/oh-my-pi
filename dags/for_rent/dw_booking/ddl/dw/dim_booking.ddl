@@ -40,6 +40,7 @@ create table if not exists public.dim_booking
   responsible varchar(255) encode lzo,
   last_update_source varchar(255) encode lzo,
   first_update_source varchar(255) encode lzo,
+  first_cancelation_source varchar(255) encode lzo,
   visitor_missing_reason varchar(255) encode lzo,
   agent_missing_reason varchar(255) encode lzo,
   owner_missing_reason varchar(255) encode lzo,

@@ -188,6 +188,7 @@ SELECT
     b.responsible,
     b.last_update_source,
     b.first_update_source,
+    b.first_cancelation_source,
     b.visitor_missing_reason,
     b.agent_missing_reason,
     b.owner_missing_reason,
