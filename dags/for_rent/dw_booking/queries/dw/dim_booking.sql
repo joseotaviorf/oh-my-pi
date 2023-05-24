@@ -74,6 +74,7 @@ booking AS (
     b.responsible,
     b.last_update_source,
     b.first_update_source,
+    b.first_cancelation_source,
     b.tenant_absence_reason AS visitor_missing_reason,
     b.agent_absence_reason AS agent_missing_reason,
     b.owner_missing_reason,
