@@ -198,6 +198,8 @@ tables:
     extraction_type: full
   - table_name: clientes_persongateway
     extraction_type: full
+  - table_name: fiancavelo_realestatehistory
+    extraction_type: full
 
 partition_columns: [year, month, day]
 lineage_product_database_name: velo
