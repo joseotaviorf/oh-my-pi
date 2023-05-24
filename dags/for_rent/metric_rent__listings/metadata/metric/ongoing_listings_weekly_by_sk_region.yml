@@ -12,12 +12,12 @@ columns:
     dimension: True
   sk_region:
     lineage:
-      - dw_public.dim_region.sk_region
+      - dw_public.fact_house_listing_status.sk_region
     description: Region identifier.
     dimension: True
   country_code:
     lineage:
-      - datalake_ebdb_country.house.country_code
+      - dw_public.fact_house_listing_status.country_code
     description: Country code of the house.
     dimension: True
   ongoing_listings:
