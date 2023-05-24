@@ -1,8 +1,6 @@
 import json
 import logging
 from argparse import ArgumentParser
-import multiprocessing
-import concurrent.futures
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -120,10 +118,4 @@ if __name__ == "__main__":
         """
     )
 
-    max_cores = multiprocessing.cpu_count()
-    with concurrent.futures.ProcessPoolExecutor(max_workers=max_cores) as executor:
-        future = executor.submit(_load_dataframe_into_datalake, args)
-        try:
-            future.result()
-        except Exception as e:
-            print(f"Loading raw layer into datalake threw exception: {e}")
+    _load_dataframe_into_datalake(args=args)
