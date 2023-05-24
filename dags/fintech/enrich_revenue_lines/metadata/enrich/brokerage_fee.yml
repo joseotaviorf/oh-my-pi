@@ -15,6 +15,10 @@ columns:
       - ddatalake_retsuko.invoice_entry.id_invoice_entry
   brokerage_share:
     description: "Share of brokerage fee"
+  contract_guarantee:
+    description: "Type of the contract guarantee."
+    lineage:
+      - dw_public.dim_contract.guarantee
   invoice_payment_status:
     description: "Description of the invoice payment status"
     lineage:

@@ -1957,6 +1957,7 @@ bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-invoice
 bietlejuice.enrich_revenue_lines:
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
+  - bietlejuice.ebdb:create-clean-contract-partnership-data-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries
   - bietlejuice.fastforward:load-clean-anticipation
