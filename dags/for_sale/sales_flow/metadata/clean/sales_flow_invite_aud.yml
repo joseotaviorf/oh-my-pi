@@ -58,35 +58,35 @@ columns:
     lineage:
       - datalake_sales_flow_raw.sales_flow_invite_aud.status
   mod_id_sales_flow:
-    description:
+    description: Flag indicating if the column id_sales_flow has changed.
     lineage:
       - datalake_sales_flow_raw.sales_flow_invite_aud.sales_flow_id_mod
   mod_id_inviter:
-    description:
+    description: Flag indicating if the column id_inviter has changed.
     lineage:
       - datalake_sales_flow_raw.sales_flow_invite_aud.id_inviter_mod
   mod_id_invitee:
-    description:
+    description: Flag indicating if the column id_invitee has changed.
     lineage:
       - datalake_sales_flow_raw.sales_flow_invite_aud.id_invitee_mod
   mod_id_folder:
-    description:
+    description: Flag indicating if the column id_folder has changed.
     lineage:
       - datalake_sales_flow_raw.sales_flow_invite_aud.id_folder_mod
   mod_type:
-    description:
+    description: Flag indicating if the column type has changed.
     lineage:
       - datalake_sales_flow_raw.sales_flow_invite_aud.type_mod
   mod_name:
-    description:
+    description: Flag indicating if the column name has changed.
     lineage:
       - datalake_sales_flow_raw.sales_flow_invite_aud.name_mod
   mod_email:
-    description:
+    description: Flag indicating if the column email has changed.
     lineage:
       - datalake_sales_flow_raw.sales_flow_invite_aud.email_mod
   mod_status:
-    description:
+    description: Flag indicating if the column status has changed.
     lineage:
       - datalake_sales_flow_raw.sales_flow_invite_aud.status_mod
   ts_created:

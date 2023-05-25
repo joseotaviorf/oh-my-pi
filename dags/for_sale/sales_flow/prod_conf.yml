@@ -12,6 +12,10 @@ tables:
     extraction_type: incremental
   buyer_data_aud:
     extraction_type: incremental
+  bypass:
+    extraction_type: incremental
+  bypass_aud:
+    extraction_type: incremental
   card_noting:
     extraction_type: incremental
   card_noting_aud:
@@ -59,6 +63,10 @@ tables:
   house:
     extraction_type: incremental
   house_aud:
+    extraction_type: incremental
+  house_registration_order:
+    extraction_type: incremental
+  house_registration_order_aud:
     extraction_type: incremental
   microstatus_order:
     extraction_type: incremental
