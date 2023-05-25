@@ -24,6 +24,8 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `brokerage_aud`
 `buyer_data`
 `buyer_data_aud`
+`bypass`
+`bypass_aud`
 `card_noting`
 `card_noting_aud`
 `cash_payment`
@@ -48,6 +50,8 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `dilligence_appointment_aud`
 `house`
 `house_aud`
+`house_registration_order`
+`house_registration_order_aud`
 `microstatus_order`
 `microstatus_order_aud`
 `mortgage`

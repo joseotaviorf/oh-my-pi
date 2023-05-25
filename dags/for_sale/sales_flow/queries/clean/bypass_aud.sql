@@ -22,7 +22,10 @@ SELECT
     bypass_confirmation_mod AS mod_is_bypass,
     processing_date AS dt_processing,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
 FROM
     datalake_sales_flow_raw.bypass_aud
 WHERE
