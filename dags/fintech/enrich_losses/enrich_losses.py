@@ -42,6 +42,8 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 
+inner_dependencies = config_service.get_config("inner_dependencies")
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={

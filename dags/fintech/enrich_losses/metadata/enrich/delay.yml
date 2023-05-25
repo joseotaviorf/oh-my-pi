@@ -1,0 +1,95 @@
+---
+database_name: datalake_losses
+table_name: delay
+description: "Enrich table with the losses model informations for the fact tables"
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
+columns:
+  id_invoice:
+    lineage:
+    - datalake_losses.closing.id_invoice
+    description: Id of the invoice. 
+  id_contract:
+    lineage:   
+    - datalake_losses.closing.id_contract
+    description: Id of the contract. 
+  accrual_year_month:
+    lineage:   
+    - datalake_losses.closing.accrual_year_month
+    description: String with Year number and Month number 'yyyymm' related to the sent date.
+  deal_delay_rule_A:
+    description: Rule A related to the delay of the payment.
+  deal_delay_rule_B:
+    description: Rule B related to the delay of the payment.
+  deal_delay_rule_C:
+    description: Rule C related to the delay of the payment.
+  deal_delay_rule_D:
+    description: Rule D related to the delay of the payment.
+  deal_order:
+    description: Information related to the deal position.
+  deal_status:
+    description: Status of the deal.
+  delay_at_deal_creation:
+    description: Date difference between deal_anchor_due_date and dt_created_deal.
+  delay_contaminated_range_rule_A:
+    description: Minimun value for deal_delay_rule_A.
+  delay_contaminated_range_rule_B:
+    description: Minimun value for deal_delay_rule_B.
+  delay_contaminated_range_rule_C:
+    description: Minimun value for deal_delay_rule_C.
+  delay_contaminated_range_rule_D:
+    description: Minimun value for deal_delay_rule_D.
+  delta_days:
+    description: Date difference between dt_due_adjs and dt_closing.
+  due_amount:
+    lineage:   
+    - datalake_losses.closing.due_amount
+    description: Total value of the invoice. 
+  frequency: 
+    lineage:   
+    - datalake_losses.closing.frequency
+    description: Frequency of the payment. 
+  full_delay_at_deal:
+    description:  Date difference between deal_anchor_due_date and dt_closing.
+  pd_range_rule_A:
+    description: Range of the delay in days related to Rule A.
+  pd_range_rule_B:
+    description: Range of the delay in days related to Rule B.
+  pd_range_rule_C:
+    description: Range of the delay in days related to Rule C.
+  pd_range_rule_D:
+    description: Range of the delay in days related to Rule D.
+  risk_type:
+    description: Risk type of the deal.
+  is_before_started:
+    lineage:   
+    - datalake_losses.closing.is_before_started
+    description: Flag to show if the date is before started. 
+  is_contract_with_deal:
+    description: Flag to show if the contract had deal. 
+  is_guarantee_paid:
+    lineage:   
+    - datalake_losses.closing.is_guarantee_paid
+    description: Flag to show if the guarantee is paid. 
+  is_hr:
+    description: Flag to identify if the deal is high risk.
+  is_invoice_deal:
+    description: Flag to identify if the invoice has deal.
+  dt_closing:
+    lineage:
+    - datalake_losses.closing.dt_closing
+    description: Last day of the month.
+  dt_created_deal:
+    description: Date of the deal creation.
+  dt_due_adjs:
+    description: Due date of the deal.
+  dt_due_deal_anchor:
+    description: Due date of the deal anchor.
+  dt_due_general_accrual:
+    description: Due date accrual.
+  dt_paid_adjs:
+    description: Payment date of the deal.
+  dt_snapshot:
+    lineage:
+    - datalake_losses.closing.dt_snapshot
+    description: Date of the snapshot.

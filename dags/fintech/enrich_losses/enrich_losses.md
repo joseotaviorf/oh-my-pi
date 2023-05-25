@@ -15,3 +15,4 @@ Produces the following output tables, via full load:
 
 - `contract_rental_losses_npv`
 - `closing`
+- `delay`

@@ -1601,7 +1601,12 @@ bietlejuice.enrich_losses: #This dag has a table from the DW as dependency
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.retsuko:load-clean-entry
   - bietlejuice.retsuko:load-clean-invoice
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.trato_feito:load-clean-installment
+  - bietlejuice.trato_feito:load-clean-negotiation
 bietlejuice.enrich_lost_listings:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
