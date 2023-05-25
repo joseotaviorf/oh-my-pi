@@ -104,6 +104,7 @@ for table in tables:
         is_incremental=is_incremental,
         spectrum_iam_role=spectrum_iam_role,
         partitions=partitions,
+        has_load_to_redshift_task=False if table == "fact_received_contact" else True,
     )
 
 dw_task_group_boundaries = {}
