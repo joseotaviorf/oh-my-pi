@@ -2377,6 +2377,14 @@ bietlejuice.reverse_atento:
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
 bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
+bietlejuice.reverse_listings_report_access:
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-sent
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-published
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-signed-contract
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-traffic
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-confirmed
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-scheduled
 bietlejuice.reverse_listings_report_load:
   - bietlejuice.dw_rede_company:load-dw-rede-dim-company
   - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-context
