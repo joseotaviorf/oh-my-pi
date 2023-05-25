@@ -54,7 +54,7 @@ INNER_DEPENDENCIES = {
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_SALE,
+        "owner": DAGOwnerEnum.DATA_SS,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

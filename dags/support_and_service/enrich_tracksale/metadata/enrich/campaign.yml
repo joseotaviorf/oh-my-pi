@@ -1,0 +1,56 @@
+---
+database_name: datalake_tracksale
+table_name: campaign
+description:
+  With this table we are concentrating and cleaning information about campaigns, 
+  it combines information about campaign names and customer journey for example.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_tracksale_clean.campaign.id
+    description: Key of NPS campaign, which is a definition of a certain customer
+      experience survey.
+  campaign_name:
+    lineage:
+      - datalake_tracksale_clean.campaign.campaign_name
+    description: Name of the NPS campaign, such as registered in Tracksale.
+  business_context:
+    lineage:
+      - datalake_tracksale_clean.campaign.description
+    description: Business context in which the NPS campaign is involved, such as forRent,
+      B2B or forSale, if defined in Tracksale.
+  customer_journey:
+    lineage:
+      - datalake_tracksale_clean.campaign.description
+    description: Step of customer's journey in the NPS campaign, such as lost (churned)
+      or true (client), if defined in Tracksale.
+  purpose:
+    lineage:
+      - datalake_tracksale_clean.campaign.description
+    description: Purpose of use of the NPS campaign, such as main, test, internal,
+      if defined in Tracksale.
+  customer_type:
+    lineage:
+      - datalake_tracksale_clean.campaign.description
+    description: Segment of the customer tracked in the NPS campaign, such IQ, PP,
+      buyer, seller, if defined in Tracksale.
+  partner_name:
+    lineage:
+      - datalake_tracksale_clean.campaign.campaign_name
+    description: Name of the B2B partner associated to the NPS campaign, if identified
+      in Tracksale.
+  metric_group:
+    lineage:
+      - datalake_tracksale_clean.campaign.description
+    description: Main group in which the NPS campaign composes the final score, such
+      as onboarding, ongoing, offboarding if defined in Tracksale.
+  main_channel:
+    lineage:
+      - datalake_tracksale_clean.campaign.main_channel
+    description: Group filter for metrics, segmented by campaign registered in Tracksale.
+  ts_created:
+    lineage:
+      - datalake_tracksale_clean.campaign.ts_created
+    description: Timestamp in which the NPS campaign was created in Tracksale.

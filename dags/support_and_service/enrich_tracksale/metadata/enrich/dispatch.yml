@@ -1,0 +1,37 @@
+---
+database_name: datalake_tracksale
+table_name: dispatch
+description:
+  In this table, we clean the dispatch data bringing only the most up-to-date ones.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_tracksale_clean.dispatch.id
+    description: Key of each individual NPS dispatch to a customer in a campaign.
+  id_campaign:
+    lineage:
+      - datalake_tracksale_clean.dispatch.campaign
+    description: Key of NPS campaign, which is a definition of a certain customer
+      experience survey.
+  campaign_name:
+    lineage:
+      - datalake_tracksale_clean.dispatch.campaign
+    description: Name of the NPS campaign, such as registered in Tracksale.
+  customers:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+    description: Dispatch attributes sent in array format.
+  status:
+    lineage:
+      - datalake_tracksale_clean.dispatch.status
+    description: Dispatch tracking information.
+  ts_created:
+    lineage:
+      - datalake_tracksale_clean.dispatch.ts_created
+    description: Timestamp in which the NPS survey was dispatched to the customers.
+  dt_updated:
+    lineage:
+      - datalake_tracksale_clean.dispatch.dt_updated
+    description: Date the NPS survey was updated.

@@ -1,0 +1,24 @@
+---
+database_name: datalake_tracksale
+table_name: answer_tags
+description:
+  With this table we apply business rules to provide information about the tagging of nps responses.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_answer:
+    lineage:
+      - datalake_tracksale.answer.id
+    description: Response identifier (related to the trigger) sent by the user.
+  ts_answer_sent_local:
+    lineage:
+      - datalake_tracksale.answer.ts_answer_sent_local
+    description: Timestamp in which the customer answered the survey.
+  tag_name:
+    lineage:
+      - datalake_tracksale.answer.tags
+    description: Information related to the responding user.
+  tag_value:
+    lineage:
+      - datalake_tracksale.answer.tags
+    description: Tags related to the process step covered by the dispatch.

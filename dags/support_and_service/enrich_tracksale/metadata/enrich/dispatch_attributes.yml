@@ -1,0 +1,52 @@
+---
+database_name: datalake_tracksale
+table_name: dispatch_attributes
+description:
+  Table that unifies information about attributes of dispatches. 
+  Each dispatch has its own attributes, here we only want information about these attributes.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_tracksale_clean.dispatch.id
+    description: Key of each individual NPS dispatch to a customer in a campaign.
+  name:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+    description: Name of the customer to whom the dispatch is intended.
+  identification:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+    description: ''
+  email:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+    description: Email of the customer to whom the dispatch is intended.
+  phone:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+    description: Phone of the customer to whom the dispatch is intended.
+  status:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+    description: Information related to the trigger stage, whether it is in the queue
+      or a reminder sent, for example.
+  has_answered:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+    description: Boolean indicating whether the NPS survey was answered.
+  survey_opened:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+    description: Boolean that indicates whether the NPS survey is open.
+  dispatch_time:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+    description: Date in which the NPS survey was dispatched to the customers.
+  ts_created:
+    lineage:
+      - datalake_tracksale_clean.dispatch.ts_created
+    description: Timestamp related to sending the dispatch.
+  dt_updated:
+    description: Date indicating dispatch update.

@@ -131,6 +131,7 @@ columns:
     lineage:
     - datalake_tracksale.answer_cities.city
     - datalake_casa_mineira_tracksale.answer_cities.city
+    description: City referring to the respondent.
   is_survey_opened:
     lineage:
     - datalake_tracksale.dispatch_attributes.survey_opened

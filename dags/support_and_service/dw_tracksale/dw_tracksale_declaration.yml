@@ -1,6 +1,6 @@
 dag:
   name: dw_tracksale
-  owner: Data ForSale
+  owner: Data SS
 workflow:
   type: query
   layer: dw

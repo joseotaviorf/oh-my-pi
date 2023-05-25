@@ -1,85 +1,123 @@
 ---
 database_name: datalake_tracksale
 table_name: answer
+description:
+  This table concentrates general information from nps responses, gathering both respondent information and information from the response itself.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_tracksale_clean.answer.id
+    description: Response identifier (related to the trigger) sent by the user.
   id_campaign:
     lineage:
       - datalake_tracksale_clean.answer.id_campaign
+    description: Key of the NPS campaign from which the dispatch was sent to target
+      customers.
   campaign_name:
     lineage:
       - datalake_tracksale_clean.answer.campaign_name
+    description: Name of the NPS campaign, such as registered in Tracksale.
   name:
     lineage:
       - datalake_tracksale_clean.answer.name
+    description: Respondent name.
   identification:
     lineage:
       - datalake_tracksale_clean.answer.identification
+    description: ''
   email:
     lineage:
       - datalake_tracksale_clean.answer.email
+    description: Respondent user's email.
   alternative_email:
     lineage:
       - datalake_tracksale_clean.answer.alternative_email
+    description: Respondent user's secondary email.
   phone:
     lineage:
       - datalake_tracksale_clean.answer.phone
+    description: Respondent user's phone.
   alternative_phone:
     lineage:
       - datalake_tracksale_clean.answer.alternative_phone
+    description: Respondent user's secondary phone.
   priority:
     lineage:
       - datalake_tracksale_clean.answer.priority
+    description: ''
   type:
     lineage:
       - datalake_tracksale_clean.answer.type
+    description: How to send the response (sent by email, for example).
   status:
     lineage:
       - datalake_tracksale_clean.answer.status
+    description: Response step check (if it's a new response for example).
   nps_answer:
     lineage:
       - datalake_tracksale_clean.answer.nps_answer
+    description: Average score of responses provided by NPS customers, ranging from
+      0 to 10.
   score_category:
     lineage:
       - datalake_tracksale_clean.answer.nps_answer
+    description: Score category of the answer score, defined by theory as promoter,
+      passive or detractor.
   last_nps_answer:
     lineage:
       - datalake_tracksale_clean.answer.last_nps_answer
+    description: ''
   nps_comment:
     lineage:
       - datalake_tracksale_clean.answer.nps_comment
+    description: Comment written by customer in some answers, which is an optional
+      custom field in survey.
   justifications:
     lineage:
       - datalake_tracksale_clean.answer.justifications
+    description: The answer rationale provided by the customer, which can be multiple
+      for answers and comes from a list.
   lot_code:
     lineage:
       - datalake_tracksale_clean.answer.lot_code
+    description: Key of each individual NPS dispatch to a customer in a campaign.
   assignee:
     lineage:
       - datalake_tracksale_clean.answer.assignee
+    description: ''
   tags:
     lineage:
       - datalake_tracksale_clean.answer.tags
+    description: Tags related to the process step covered by the dispatch.
   categories:
     lineage:
       - datalake_tracksale_clean.answer.categories
+    description: ''
   seconds_spent_answering:
     lineage:
       - datalake_tracksale_clean.answer.seconds_spent_answering
+    description: Response time spent by the NPS client during their responses in seconds.
   ts_deadline:
     lineage:
       - datalake_tracksale_clean.answer.ts_deadline
+    description: ''
   ts_reminder:
     lineage:
       - datalake_tracksale_clean.answer.ts_reminder
+    description: Timestamp of the date the reminder to reply was sent.
   ts_dispatch:
     lineage:
       - datalake_tracksale_clean.answer.ts_dispatch
+    description: Timestamp of the date the trigger related to the response was sent.
   ts_answer_sent_utc:
     lineage:
       - datalake_tracksale_clean.answer.ts_answer_sent
+    description: Utc timestamp in which the customer answered the survey.
   ts_answer_sent_local:
     lineage:
       - datalake_tracksale_clean.answer.ts_answer_sent
+    description: Local timestamp in which the customer answered the survey.
+  dt_updated:
+    description: Date the answer was updated.
