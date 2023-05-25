@@ -24,10 +24,10 @@ columns:
     - dw_rent_snapshot.rent_demand_events.city_group
     description: Group which the city of the event belongs.
     dimension: True
-  guarantee:
+  tier:
     lineage:
-    - dw_rent_snapshot.rent_demand_events.guarantee
-    description: Guarantee information related to the event.
+    - dw_rent_snapshot.rent_demand_events.tier
+    description: Tier information based on the city group of the event.
     dimension: True
   listing_category_start:
     lineage:
@@ -43,11 +43,6 @@ columns:
     lineage:
     - dw_rent_snapshot.rent_demand_events.rental_administrator
     description: Rental administrator related to the event.
-    dimension: True
-  tier:
-    lineage:
-    - dw_rent_snapshot.rent_demand_events.tier
-    description: Tier information based on the city group of the event.
     dimension: True
   visits_booked:
     lineage:
@@ -166,6 +161,11 @@ columns:
       hierarchy: Executive
       approved_by: bruno.choumar@quintoandar.com.br
       link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  has_guarantee:
+    lineage:
+    - dw_rent_snapshot.rent_demand_events.has_guarantee
+    description: Boolean indicating if there's a guarantee related to the event.
+    dimension: True
   dt_event:
     lineage:
     - dw_rent_snapshot.rent_demand_events.dt_event
