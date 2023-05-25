@@ -18,7 +18,7 @@ columns:
       incoming call. The task is then assigned to one or more workers, and a reservation
       is generated for each worker who is considered for the task. For the purpose of
       our analysis, we only consider call IDs associated with reservations that have
-      been accepted. This column is filles exclusively for call data
+      been accepted. This column is filled exclusively for call data
   id_session:
     lineage:
       - datalake_quinto_messenger.chat.id_session

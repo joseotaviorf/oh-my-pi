@@ -141,6 +141,7 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_customer_support:load-enrich-received-demand
   - bietlejuice.gsheets.support_and_service:done-clean-department-control
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.dw_datamarts_cross:

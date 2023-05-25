@@ -1,4 +1,26 @@
-WITH call AS (
+WITH customer_phone AS (
+  SELECT
+    REGEXP_REPLACE(customer_contact, '(^\\+?55)|(\\D*)', '') AS phone_number,
+    id_user
+  FROM
+    datalake_ebdb_customer_contact_identification.customer_contact_identification
+  WHERE
+    channel = 'phone'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY phone_number ORDER BY id_user DESC) = 1
+),
+customer_email AS (
+  SELECT
+    customer_contact AS email,
+    id_user
+  FROM
+    datalake_ebdb_customer_contact_identification.customer_contact_identification
+  WHERE
+      channel = 'email'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY email ORDER BY id_user DESC) = 1
+),
+call AS (
   WITH twilio_call_flex_events AS (
     SELECT
       id_call,
@@ -77,12 +99,22 @@ WITH call AS (
   SELECT
     crd.id_call,
     NULL AS id_session,
-    NULL AS id_ticket,
+    call.id_ticket AS id_ticket,
+    cp.id_user,
+    crd.id_reservation,
     crd.id_task,
     crd.agent_email,
     'call' AS channel,
     crd.customer_phone,
+    NULL AS customer_email,
     crd.task_queue_name AS department,
+    call.client_type,
+    call.customer_type_tag,
+    call.contact_motivation_tag,
+    call.contact_theme_tag,
+    call.contact_theme_detail_tag,
+    call.step_tag,
+    call.request_type,
     call.id_external_service IS NOT NULL AS is_answered,
     crd.ts_created,
     NULL AS ts_updated
@@ -92,6 +124,9 @@ WITH call AS (
     datalake_customer_support.call
       ON crd.id_task = call.id_external_service
       AND crd.id_reservation = call.id_segment
+  LEFT JOIN
+    customer_phone AS cp
+      ON cp.phone_number = crd.customer_phone
 ),
 
 chat AS (
@@ -103,7 +138,7 @@ chat AS (
       te.event_type,
       GET_JSON_OBJECT(te.event_payload,'$.TaskQueueName') AS task_queue_name,
       GET_JSON_OBJECT(event_payload,'$.WorkerAttributes.email') AS agent_email,
-      REGEXP_REPLACE(REGEXP_EXTRACT(GET_JSON_OBJECT(t.task_attributes,'$.from'), '(\\w+:)(.+)', 2), '^(\\+)(.*)', '') AS customer_phone,
+      REGEXP_REPLACE(REGEXP_EXTRACT(GET_JSON_OBJECT(t.task_attributes,'$.from'), '(\\w+:)(.+)', 2), '^\\+(?=.*)', '') AS customer_phone,
       GET_JSON_OBJECT(te.event_payload,'$.TaskAttributes.conversations.conversation_measure_1') IS NOT NULL AS is_answered,
       te.ts_created,
       te.ts_updated
@@ -147,39 +182,70 @@ chat AS (
       datalake_quinto_messenger.chat AS c
         ON c.id_chat = te.id_chat
   )
-  SELECT
+  SELECT DISTINCT
     NULL AS id_call,
     COALESCE(crd.id_session_whats, crd.id_session_inapp) AS id_session,
-    NULL AS id_ticket,
+    chat.id_ticket AS id_ticket,
     crd.id_task_external AS id_task,
+    cp.id_user,
+    NULL AS id_reservation,
     crd.agent_email,
     'chat' AS channel,
     crd.customer_phone,
+    NULL AS customer_email,
     crd.task_queue_name AS department,
+    chat.client_type,
+    chat.customer_type_tag,
+    chat.contact_motivation_tag,
+    chat.contact_theme_tag,
+    chat.contact_theme_detail_tag,
+    chat.step_tag,
+    chat.request_type,
     crd.is_answered,
     crd.ts_created,
     crd.ts_updated
   FROM
     chat_received_demand AS crd
+  LEFT JOIN
+    customer_phone AS cp
+      ON cp.phone_number = crd.customer_phone
+  LEFT JOIN
+    datalake_customer_support.chat
+      ON chat.id_segment = crd.id_task_external
   WHERE
     task_queue_name != next_task_queue_name
 ),
-
 email AS (
-  SELECT
+  SELECT DISTINCT
     NULL AS id_call,
     NULL AS id_session,
     id_ticket,
     NULL AS id_task,
+    ce.id_user,
+    NULL AS id_reservation,
     agent_email,
     'email' AS channel,
     NULL AS customer_phone,
+    ce.email AS customer_email,
     department,
+    client_type,
+    customer_type_tag,
+    contact_motivation_tag,
+    contact_theme_tag,
+    contact_theme_detail_tag,
+    step_tag,
+    request_type,
     true AS is_answered,
     ts_ticket_started AS ts_created,
     NULL AS ts_updated
   FROM
-    datalake_customer_support.email
+    datalake_customer_support.email AS e
+  LEFT JOIN
+    datalake_zendesk_tickets_clean.users AS usr
+      ON usr.id_user = e.id_requester
+  LEFT JOIN
+    customer_email AS ce
+      ON ce.email = usr.email
   WHERE
     direction = 'inbound'
     AND front_or_back = 'front'
