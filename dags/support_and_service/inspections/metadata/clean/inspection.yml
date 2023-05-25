@@ -59,12 +59,14 @@ columns:
       - datalake_inspections_raw.inspection.status
     description: Identifies the stage of the inspection from scheduling to review.
     categories:
-      scheduled: When the inspection is waiting to be executed.
-      received: When the inspection is received by the backend and is waiting for processing.
-      sent_to_analysis: When the offboarding inspection is forwarded to the Analysis 1 stream.
-      sent_to_review: When the offboarding inspection is sent for owner review.
-      review_started: When the offboarding inspection receives some intervention made by the owner.
-      reviewed: When the review is completed.
+      scheduled: Inspection scheduled and awaiting execution
+      received: Inspection sent by the inspector, waiting for synchronization with the Main
+      sent_to_analysis: Inspection available for operations team interventions
+      sent_to_owner_review: Review available for owner review
+      review_started_by_owner: Survey whose owner has already done some intervention
+      sent_to_tenant_review: Survey available for tenant review
+      review_started_by_tenant: Survey whose tenant has already done some intervention
+      reviewed: Survey sent to the Operations team to validate interventions proposed by owner/tenant
   type:
     lineage:
       - datalake_inspections_raw.inspection.type
