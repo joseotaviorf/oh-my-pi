@@ -37,12 +37,14 @@ columns:
   id_tenant_prospect:
     lineage:
       - datalake_booking.booking.id_visitor
+      - datalake_ebdb_rent_flow.rent_flow.id_client
       - datalake_offer.offer.id_client
     description: Id of the tenant prospect.
   id_house:
     lineage:
       - datalake_booking.booking.id_house
       - datalake_ebdb_contract.contract.id_house
+      - datalake_ebdb_rent_flow.rent_flow.id_house
       - datalake_offer.offer.id_house
     description: Id of the house.
   id_agent:
