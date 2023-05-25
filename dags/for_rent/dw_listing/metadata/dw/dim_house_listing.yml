@@ -54,6 +54,9 @@ columns:
       excluido: "Deleted."
       publicado: "Published."
       suspenso: "Suspended."
+  status_reason:
+    description: "Status reason (it's initially empty to facilitate the questions migration. 
+      It will be filled when versioning 2.0 is up and running)."
   is_keys_with_agent_eligible:
     lineage:
     - datalake_ebdb_listing.agents_with_keys.is_keys_with_agent_eligible

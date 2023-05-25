@@ -227,6 +227,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hlco.first_consultant_type,
     hl.first_key_location,
     hl.status,
+    CAST(NULL AS VARCHAR) AS status_reason,
     CAST(hl.rent AS DECIMAL(14, 2)) AS rent,
     IF(is_for_rent = TRUE, COALESCE(hl.rental_administrator, 'QUINTOANDAR'), rental_administrator) AS rental_administrator,
     CAST(hl.house_rent AS DECIMAL(14, 2)) AS house_rent,
