@@ -1112,16 +1112,16 @@ bietlejuice.enrich_buyer_prospect:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
-bietlejuice.enrich_b2b:
-  - bietlejuice.enrich_lead:load-enrich-lead
-  - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
-  - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
-  - bietlejuice.ebdb:create-clean-lead-in-data-lake
-  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
-  - bietlejuice.ebdb:create-clean-partner-in-data-lake
-  - bietlejuice.ebdb:create-clean-photographer-job-in-data-lake
-  - bietlejuice.ebdb:create-clean-portability-in-data-lake
+# bietlejuice.enrich_b2b:
+#   - bietlejuice.enrich_lead:load-enrich-lead
+#   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
+#   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+#   - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
+#   - bietlejuice.ebdb:create-clean-lead-in-data-lake
+#   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
+#   - bietlejuice.ebdb:create-clean-partner-in-data-lake
+#   - bietlejuice.ebdb:create-clean-photographer-job-in-data-lake
+#   - bietlejuice.ebdb:create-clean-portability-in-data-lake
 bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
   - bietlejuice.casa_mineira_criteo_campaigns:load-clean-criteo-campaigns
   - bietlejuice.casa_mineira_google_ads:load-clean-ads-performance
