@@ -1835,21 +1835,21 @@ bietlejuice.enrich_pro_owners:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_property_tax:
   - bietlejuice.property_tax:load-clean-tax-report
-bietlejuice.enrich_proponent:
-  - bietlejuice.arquivo_confidencial:load-clean-documentation-report
-  - bietlejuice.arquivo_confidencial:load-clean-emailage-result-aud
-  - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
-  - bietlejuice.arquivo_confidencial:load-clean-rev-info
-  - bietlejuice.arquivo_confidencial:load-clean-unico-check-process
-  - bietlejuice.docx:load-clean-credit-evaluation
-  - bietlejuice.docx:load-clean-credit-evaluation-proponent
-  - bietlejuice.docx:load-clean-document
-  - bietlejuice.docx:load-clean-folder
-  - bietlejuice.docx:load-clean-folder-reference
-  - bietlejuice.ebdb:create-clean-proponent-proposal-in-data-lake
-  - bietlejuice.ebdb:create-clean-proposal-in-data-lake
-  - bietlejuice.sorting_hat:create-clean-proponent-external-table
-  - bietlejuice.sorting_hat:create-clean-proposal-external-table
+##bietlejuice.enrich_proponent: ##This dag will be disabled until further investigation.
+##  - bietlejuice.arquivo_confidencial:load-clean-documentation-report
+##  - bietlejuice.arquivo_confidencial:load-clean-emailage-result-aud
+##  - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
+##  - bietlejuice.arquivo_confidencial:load-clean-rev-info
+##  - bietlejuice.arquivo_confidencial:load-clean-unico-check-process
+##  - bietlejuice.docx:load-clean-credit-evaluation
+##  - bietlejuice.docx:load-clean-credit-evaluation-proponent
+##  - bietlejuice.docx:load-clean-document
+##  - bietlejuice.docx:load-clean-folder
+##  - bietlejuice.docx:load-clean-folder-reference
+##  - bietlejuice.ebdb:create-clean-proponent-proposal-in-data-lake
+##  - bietlejuice.ebdb:create-clean-proposal-in-data-lake
+##  - bietlejuice.sorting_hat:create-clean-proponent-external-table
+##  - bietlejuice.sorting_hat:create-clean-proposal-external-table
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
