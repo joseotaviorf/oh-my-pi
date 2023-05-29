@@ -1,7 +1,7 @@
 ---
 database_name: datalake_rent_demand_event
 table_name: rent_demand_event 
-description: This table shows the demand events of For Rent, each line is an event related to the scope and its partitioned by the country_code.
+description: "This table shows the demand events of For Rent, each line is an event related to the scope and its partitioned by the country_code."
 domain: For Rent
 owner: isadora.gallerani@quintoandar.com.br
 columns:
@@ -11,69 +11,80 @@ columns:
       - datalake_ebdb_contract.contract.id
       - datalake_offer.offer.id_offer_context
       - datalake_proposal.proposal.id
-    description: Id of the event.
+    description: "Id of the event."
   id_booking:
     lineage:
       - datalake_booking.booking.id
       - datalake_ebdb_rent_flow.rent_flow.id_booking
-    description: Id of the booking.
+    description: "Id of the booking."
   id_offer:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_offer_context
       - datalake_offer.offer.id
-    description: Id of the offer (related to the id_offer_context, created on the offer's pipeline).
+    description: "Id of the offer (it's the id_offer_context, created on the offer's pipeline)."
   id_proposal:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_proposal
       - datalake_proposal.proposal.id
-    description: Id of the proposal.
+    description: "Id of the proposal."
   id_contract: 
     lineage:
       - datalake_ebdb_contract.contract.id
       - datalake_ebdb_rent_flow.rent_flow.id_contract
-    description: Id of the contract.
+    description: "Id of the contract."
   id_event_type:
-    description: Id of the event type.
+    description: "Id of the event type."
+    categories:
+      '1': "Id of the visit booked (VB) event."
+      '2': "Id of the visit completed (VC) event."
+      '3': "Id of the offer submitted (OS) event."
+      '4': "Id of the offer accepted/approved (OA) event."
+      '5': "Id of the evaluation started (ES) event."
+      '6': "Id of the evaluation positive (EP) event."
+      '7': "Id of the documentation sent (DS) event."
+      '8': "Id of the credit approved (CA) event."
+      '9': "Id of the contract signed (CS) event."
   id_tenant_prospect:
     lineage:
       - datalake_booking.booking.id_visitor
       - datalake_ebdb_rent_flow.rent_flow.id_client
       - datalake_offer.offer.id_client
-    description: Id of the tenant prospect.
+    description: "Id of the tenant prospect (TP)."
   id_house:
     lineage:
       - datalake_booking.booking.id_house
       - datalake_ebdb_contract.contract.id_house
       - datalake_ebdb_rent_flow.rent_flow.id_house
       - datalake_offer.offer.id_house
-    description: Id of the house.
+    description: "Id of the property."
   id_agent:
     lineage:
       - datalake_booking.booking.id_agent
       - datalake_ebdb_rent_flow.rent_flow.id_user_agent
-    description: Id of the agent.
+    description: "Id of the agent."
   id_rent_flow:
     lineage:
       - datalake_booking.booking.id_rent_flow
       - datalake_ebdb_rent_flow.rent_flow.id_rent_flow
       - datalake_offer.offer.id_rent_flow
-    description: Id of the rent flow.
+    description: "Id of the rent flow."
   id_house_listing:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_house
-    description: Id of the house listing. The id is generated inside the query to assure the right contract to the listing.
+    description: "Id of the house listing. The id is generated inside the query to assure the right contract to the listing."
   id_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
-    description: Id of the region.
+    description: "Id of the region."
   id_owner:
     lineage:
       - datalake_ebdb_listing.house.id_user
-    description: Id of the owner.
+    description: "Id of the property owner."
   ts_event:
     lineage:
       - datalake_booking.booking.ts_created
       - datalake_booking.booking.dt_booking
+      - datalake_ebdb_contract.contract.ts_signed
       - datalake_offer.offer.ts_first_sent
       - datalake_offer.offer.ts_analyzed
       - datalake_proposal.proposal.ts_credit_evaluation_first_init
@@ -81,17 +92,16 @@ columns:
       - datalake_proposal.proposal.ts_tenant_auto_first_doc_sent
       - datalake_proposal.proposal.ts_tenant_first_doc_sent         
       - datalake_proposal.proposal.ts_credit_approved_last         
-      - datalake_ebdb_contract.contract.ts_signed
-    description: Id of the event date.
+    description: "Id of the event date."
   country_code:
     lineage:
       - datalake_ebdb_listing.house.country_code
-    description: Country code information. Also, a partition of the table.
+    description: "Country code information. Also, a partition of the table."
   year:
-    description: Year information of the date.
+    description: "Year information of the date."
   month:
-    description: Month information of the date.
+    description: "Month information of the date."
   day:
-    description: Day information of the date.
+    description: "Day information of the date."
   ts_event_load_updated:
-    description: Load date.
+    description: "Load date."

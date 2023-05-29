@@ -242,10 +242,10 @@ rent_demand_events AS (
     pp.id AS id_proposal,
     rf.id_contract,                                                                           
     7 AS id_event_type,                                                                                 
-    off.id_client,                                                                      
-    off.id_house,                                                                       
+    COALESCE(off.id_client, rf.id_client) AS id_client,
+    COALESCE(off.id_house, rf.id_house) AS id_house,
     rf.id_user_agent,                                                                   
-    off.id_rent_flow,                                                                   
+    COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
     COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent) AS ts_event,             
     rf.id_house_listing,                                                                
     rf.id_region,                                                                       
@@ -257,11 +257,11 @@ rent_demand_events AS (
   FROM
     datalake_proposal.proposal AS pp
   JOIN
-    datalake_offer.offer AS off
-      ON off.id = pp.id_offer 
-  JOIN
     rent_flow_house_listing AS rf
       ON rf.id_proposal = pp.id
+  LEFT JOIN -- We have properties from portability that don't have an offer but have a proposal and contract signed
+    datalake_offer.offer AS off
+      ON off.id = pp.id_offer 
   WHERE 
     pp.has_tenant_sent_documentation = TRUE   -- Some proposals already had a documentation sent (which will be marked by the ts_tenant_first_doc_sent)
     OR (pp.ts_tenant_auto_first_doc_sent IS NOT NULL  -- but the boolean flag could turn into false. This behavior is mostly seen from 2022 backwards
@@ -329,6 +329,7 @@ rent_demand_events AS (
       ON off.id = pp.id_offer 
   WHERE 
     ct.ts_signed IS NOT NULL
+    AND ct.status IN ("Ativo", "Finalizado")
 )
 SELECT
   id_event,
