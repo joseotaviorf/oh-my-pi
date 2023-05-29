@@ -25,5 +25,6 @@ We incrementally load the following tables into the Datalake:
 - `sale_listing_offer_sent`
 - `sale_listing_offer_accepted`
 - `sale_listing_signed_contract`
+- `sale_ongoing_listings`
 
 </details>

@@ -6,6 +6,8 @@ tables:
     event_type: NEW_LISTING_TRAFFIC
   sale_listing_published:
     event_type: NEW_LISTING_PUBLISHED
+  sale_ongoing_listings:
+    event_type: ONGOING_LISTINGS
   sale_listing_visit_scheduled:
     event_type: NEW_LISTING_VISIT_SCHEDULED
   sale_listing_visit_confirmed:

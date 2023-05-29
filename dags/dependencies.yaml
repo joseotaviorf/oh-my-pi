@@ -2387,6 +2387,7 @@ bietlejuice.reverse_listings_report_access:
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-traffic
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-confirmed
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-scheduled
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-ongoing-listings
 bietlejuice.reverse_listings_report_load:
   - bietlejuice.dw_rede_company:load-dw-rede-dim-company
   - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-context
@@ -2396,6 +2397,7 @@ bietlejuice.reverse_listings_report_load:
   - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
+  - bietlejuice.dw_sale_ongoing_listings:oad-dw-sale-fact-daily-ongoing-listing
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
   - bietlejuice.dw_search_session_event:load-dw-public-dim-search-session-event-type
   - bietlejuice.dw_search_session_event:load-dw-public-fact-search-session-event

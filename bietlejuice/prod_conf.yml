@@ -47,6 +47,7 @@ dags_out_of_pattern:
         "dw_sale_listing_flow",
         "dw_sale_listing_price_changes",
         "dw_sale_offers",
+        "dw_sale_ongoing_listings",
         "dw_sale_visits",
         "dw_search_session_event",
         "dw_user",
