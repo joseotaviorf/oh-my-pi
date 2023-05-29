@@ -1803,6 +1803,7 @@ bietlejuice.enrich_open_external_data:
   - bietlejuice.enrich_zipcodes:load-enrich-zipcodes
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
+  - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
 bietlejuice.enrich_pdd_payments:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
   - bietlejuice.retsuko:load-clean-contract
