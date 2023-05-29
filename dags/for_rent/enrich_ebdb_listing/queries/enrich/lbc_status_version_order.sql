@@ -383,7 +383,7 @@ SELECT
   status_reason,
   rev,
   revision_reason,
-  ts_first_publication,
+  IF(listing_version > 0,ts_first_publication, NULL) AS ts_first_publication,
   ts_state_started,
   ts_state_ended,
   days_in_state,
