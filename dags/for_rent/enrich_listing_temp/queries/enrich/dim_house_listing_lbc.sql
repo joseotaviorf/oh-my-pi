@@ -126,7 +126,7 @@ house_listings AS (
         hl.ts_listing_version_end,
         h.dt_first_publication AS ts_house_first_publication,
         h.ts_last_publication AS ts_house_last_publication,
-        CAST(hl.ts_listing_version_start AS DATE) AS ts_publication,
+        IF(hl.version > 0, CAST(hl.ts_listing_version_start AS DATE), NULL) AS ts_publication,
         hl.ts_last_unpublished,
         hl.rent,
         rl.rental_administrator,

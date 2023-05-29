@@ -103,11 +103,8 @@ SELECT
       version <> 0 
       AND (
         LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('alugado') 
-        OR (
-          LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('SUSPENDED') 
-          AND
-          LAG(change_version_status_reason) OVER(PARTITION BY id_house ORDER BY version) IN ('RENTED') 
-        )
+        OR
+        LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('SUSPENDED') 
       )
     THEN 'Re-Listing'
     WHEN 
