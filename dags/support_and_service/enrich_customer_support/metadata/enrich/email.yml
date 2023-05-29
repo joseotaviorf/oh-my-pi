@@ -117,21 +117,21 @@ columns:
   csat_score:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
-      - datalake_survicate.surveys.csat_score
+      - datalake_survicate.zendesk_email_surveys.csat_score
     description:
       The CSAT score or rating for the respective call. It considers the last CSAT
       score (values range from 1 to 5).
   is_answered:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
-      - datalake_survicate.surveys.user_comment
-      - datalake_survicate.surveys.csat_score
-      - datalake_survicate.surveys.is_solved
+      - datalake_survicate.zendesk_email_surveys.user_comment
+      - datalake_survicate.zendesk_email_surveys.csat_score
+      - datalake_survicate.zendesk_email_surveys.is_solved
     description: A boolean that indicates if the user has answered the CSAT survey.
   is_solved:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
-      - datalake_survicate.surveys.is_solved
+      - datalake_survicate.zendesk_email_surveys.is_solved
     description:
       If the call CSAT IVR event has a value equal to 1 for the satisfaction survey for
       the respective call.
@@ -142,7 +142,7 @@ columns:
   csat_comment:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
-      - datalake_survicate.surveys.user_comment
+      - datalake_survicate.zendesk_email_surveys.user_comment
     description: The last CSAT survey comment for the Zendesk Email Ticket.
   channel:
     lineage:
@@ -257,11 +257,11 @@ columns:
     description: Date agent start working for QuintoAndar.
   ts_csat_first_seen:
     lineage:
-      - datalake_survicate.surveys.ts_first_seen
+      - datalake_survicate.zendesk_email_surveys.ts_first_seen
     description: Timestamp indicating when the survey was first viewed.
   ts_csat_first_response:
     lineage:
-      - datalake_survicate.surveys.ts_first_response
+      - datalake_survicate.zendesk_email_surveys.ts_first_response
     description: Timestamp indicating when the survey was first answered.
   ts_initially_assigned_local:
     lineage:

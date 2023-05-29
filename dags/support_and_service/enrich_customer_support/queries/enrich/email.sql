@@ -117,7 +117,7 @@ csat AS (
       ts_first_seen,
       ts_first_response
     FROM
-      datalake_survicate.surveys
+      datalake_survicate.zendesk_email_surveys
     WHERE
       id_ticket IS NOT NULL
       AND COALESCE(CAST(user_comment AS STRING),CAST(csat_score AS STRING),CAST(is_solved AS STRING)) IS NOT NULL

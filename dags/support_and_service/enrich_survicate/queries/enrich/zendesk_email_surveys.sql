@@ -12,9 +12,10 @@ SELECT
   year,
   month,
   day
-FROM 
+FROM
   datalake_survicate_clean.surveys
 WHERE
-  year = {year}
+  custom_attributes.ticket_id IS NOT NULL
+  AND year = {year}
   AND month = {month}
   AND day = {day}

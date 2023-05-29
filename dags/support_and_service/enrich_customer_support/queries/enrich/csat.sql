@@ -76,10 +76,10 @@ email_total AS (
       ts_first_seen,
       ts_first_response
     FROM
-      datalake_survicate.surveys
+      datalake_survicate.zendesk_email_surveys
     WHERE
       id_ticket IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10    
+    GROUP BY 1,2,3,4,5,6,7,8,9,10
   )
   SELECT
     csat.id_ticket,
