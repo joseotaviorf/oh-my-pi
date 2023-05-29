@@ -124,21 +124,24 @@ BASE_ACORDOS_METODOLOGIA_NOVA AS(
 ),
 BASE_ACORDOS_GLOBAL AS(
   SELECT 
-    * 
+    bama.*,
+    'bill-item' as deal_detection_method 
   FROM 
-    BASE_ACORDOS_METODOLOGIA_ANTIGA
+    BASE_ACORDOS_METODOLOGIA_ANTIGA as bama
   UNION ALL
   SELECT 
-    * 
+    bamn.*,
+    'trato-feito' as deal_detection_method 
   FROM 
-    BASE_ACORDOS_METODOLOGIA_NOVA
+    BASE_ACORDOS_METODOLOGIA_NOVA as bamn
 ),
 base_step0_delay AS(
   SELECT 
     fc.*,
-    CASE WHEN payment_status = 'paid' AND dt_paid > dt_closing THEN NULL ELSE dt_paid END AS dt_paid_adjs,
+    CASE WHEN payment_status = 'paid' AND dt_paid > dt_closing THEN NULL ELSE dt_paid END AS dt_paid_adjs, 
     CASE WHEN fc.frequency = 'monthly' THEN v.dt_due ELSE fc.dt_due END AS dt_due_adjs,
     d.dt_created_deal,
+    d.deal_detection_method,
     d.dt_min_due_date_at_deal AS deal_anchor_due_date,
     v.dt_due as dt_due_general_accrual
   FROM 
@@ -149,11 +152,20 @@ base_step0_delay AS(
   LEFT JOIN
     BASE_VENCIMENTOS_PADRONIZADOS v 
       ON v.accrual_year_month = fc.accrual_year_month
+  WHERE 
+    TRUE
+    AND is_international is FALSE
+    AND is_before_started is FALSE
+  -- There`s an exception of deals on january balance due to the accounting window on the moment of the emission of this closing, there`s an alignment between MIS and controlling regarding this.
+    AND (is_paid_in_closing_day is FALSE or dt_closing = '2023-01-31')
+    AND (payment_status <> 'canceled' and (is_canceled_in_dead_time is FALSE or is_canceled_in_dead_time IS TRUE))
+  
 ),
 base_step1_delay AS(
   SELECT
     *,
-    CASE WHEN deal_anchor_due_date IS NOT NULL THEN 1 ELSE 0 END AS flag_is_invoice_deal,
+    -- There`s an exception of deals on january balance due to the accounting window on the moment of the emission of this closing, there`s an alignment between MIS and controlling regarding this.
+    CASE WHEN (deal_anchor_due_date IS NOT NULL AND ((deal_detection_method='bill-item') AND (dt_closing=date('2023-1-31')))) OR (deal_anchor_due_date IS NOT NULL AND NOT(dt_closing=date('2023-1-31'))) THEN 1 ELSE 0 END AS flag_is_invoice_deal,
     datediff(dt_due_adjs, dt_closing) AS delta_days,
     datediff(deal_anchor_due_date, dt_created_deal) AS delay_at_deal_creation,
     datediff(deal_anchor_due_date, dt_closing) AS full_delay_at_deal
