@@ -1,0 +1,41 @@
+---
+database_name: dw_losses
+table_name: fact_delay
+description: This table is the fact table for the delay information regarding the losses modelation.
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
+columns:
+  sk_invoice:
+    lineage:
+    - datalake_losses.delay.id_invoice
+    description: Id of the invoice. 
+  sk_contract:
+    lineage:   
+    - datalake_losses.delay.id_contract
+    description: Id of the contract. 
+  due_amount:
+    lineage:   
+    - datalake_losses.delay.due_amount
+    description: Total value of the invoice. 
+  pd_range_rule_A:
+    lineage:
+    - datalake_losses.delay.pd_range_rule_A
+    description: Range of the delay in days related to Rule A.
+  pd_range_rule_B:
+    lineage:
+    - datalake_losses.delay.pd_range_rule_B
+    description: Range of the delay in days related to Rule B.
+  pd_range_rule_C:
+    lineage:
+    - datalake_losses.delay.pd_range_rule_C
+    description: Range of the delay in days related to Rule C.
+  pd_range_rule_D:
+    lineage:
+    - datalake_losses.delay.pd_range_rule_D
+    description: Range of the delay in days related to Rule D.
+  dt_closing:
+    lineage:
+    - datalake_losses.delay.dt_closing
+    description: Last day of the month.
+  ts_load:
+    description: Load date.
