@@ -1,0 +1,55 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: renewal
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.id
+  id_payment:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.payment_id
+  price_index_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.price_index_type
+  price_index:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.price_index
+  step:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.step
+  cycle:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.cycle
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.version
+  propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.propose
+  previous_monthly_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.previous_monthly_amount
+  updated_monthly_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.updated_monthly_amount
+  dt_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.due_date
+  dt_paid:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.paid_date
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_aud.day

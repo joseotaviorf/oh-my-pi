@@ -145,4 +145,8 @@ tables:
     date_filter_column: created_at
   - table_name: invoice
     date_filter_column: updated_at
+  - table_name: renewal_aud
+    date_filter_column: created_at
+  - table_name: renewal
+    date_filter_column: updated_at
 partition_cols: ["year", "month", "day"]

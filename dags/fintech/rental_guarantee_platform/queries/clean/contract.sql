@@ -11,6 +11,7 @@ SELECT
     active AS is_active,
     begin AS ts_began,
     done AS ts_done,
+    next_renewal_date AS dt_next_renewal,
     dateinsert AS ts_inserted,
     dateupdate AS ts_updated,
     year,
