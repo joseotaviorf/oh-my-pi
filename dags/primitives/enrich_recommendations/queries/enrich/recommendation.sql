@@ -121,7 +121,10 @@ yellow_pages_recommendation_logs AS (
             FROM datalake_emlio_clean.emlio_logs AS emlio_logs
             WHERE
                 emlio_logs.id_service = "yellow-pages"
-                AND GET_JSON_OBJECT(emlio_logs.inputs, "$.anchor_ids") != "[]"
+                AND (
+                    GET_JSON_OBJECT(emlio_logs.inputs, "$.anchor_ids") != "[]" OR
+                    LOWER(GET_JSON_OBJECT(emlio_logs.inputs, "$.display_type")) = 'daily_feed'
+                )
                 AND year = 2023
                 AND month >= 4
         )
@@ -183,7 +186,7 @@ email_recommendation_delivered AS (
                     THEN "control"
             END as experiment_variant,
             DATE(ts_email_sent) AS dt_email_sent,
-            ts_email_first_opened AS ts_rec_created,
+            CASE WHEN ts_email_first_opened IS NOT NULL THEN least(ts_email_first_opened, ts_email_first_clicked) END AS ts_rec_created,
             COALESCE(ts_email_first_clicked, ts_email_first_opened) AS ts_rec_received
         FROM dw_braze.fact_campaign_user_dispatch AS fact_campaign_user_dispatch
         INNER JOIN
