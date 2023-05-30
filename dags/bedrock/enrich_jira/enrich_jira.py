@@ -32,7 +32,7 @@ ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_b
 DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 REPO_PATH = config_service.get_config("databricks_bietlejuice_repo_path")
-SPARK_JOBS_PATH = f"{REPO_PATH}/spark_jobs/base"
+SPARK_JOBS_PATH = f"{REPO_PATH}/spark_jobs/base/"
 
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
 

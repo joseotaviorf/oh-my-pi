@@ -26,7 +26,7 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_10_4_min_general_cluster", deserialize_json=True

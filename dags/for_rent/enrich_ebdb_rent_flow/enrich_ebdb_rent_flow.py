@@ -32,7 +32,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
+SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 
 cluster_description = config_service.get_config("databricks_10_4_med_memory_cluster")

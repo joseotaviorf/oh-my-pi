@@ -37,7 +37,7 @@ default_libraries = config_service.get_config("default_libraries")
 
 tables = config_service.get_config("tables")
 
-SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
+SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_9_1_med_memory_cluster", deserialize_json=True

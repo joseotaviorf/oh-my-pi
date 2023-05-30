@@ -30,7 +30,7 @@ ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_b
 DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 
 inner_dependencies = config_service.get_config("inner_dependencies")
