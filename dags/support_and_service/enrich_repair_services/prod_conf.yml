@@ -1,6 +1,0 @@
----
-inner_dependencies:
-  repair_tickets_metrics:
-    - repair_tickets
-  repair_tickets_follow_up:
-    - repair_tickets_metrics
