@@ -1,6 +1,6 @@
 database_name: dw_crm
 table_name: dim_visit_task
-description: ''
+description: Information about CRM tasks from Visit workgroups. Each line is a CRM task.
 domain: Support and Service
 owner: cassio.bastos@quintoandar.com.br
 columns:

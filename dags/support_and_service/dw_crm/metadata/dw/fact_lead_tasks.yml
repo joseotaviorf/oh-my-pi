@@ -35,3 +35,5 @@ columns:
     description: Key of first user resolver for a specific task
   is_closed:
     description: Boolean if the task is closed or not
+  ts_load:
+    description: Timestamp of when data was loaded into this table (UTC timezone)

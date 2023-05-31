@@ -63,7 +63,7 @@ columns:
   subject:
     lineage:
     - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.subject
-    description: ''
+    description: Main subject of the task
   titles:
     lineage:
     - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.titles
@@ -98,7 +98,8 @@ columns:
   is_task_auto_completed:
     lineage:
     - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_task_auto_completed
-    description: ''
+    description: Boolean column which indicates whether a task was automatically closed
+      by system or not.
   ts_start:
     lineage:
     - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started

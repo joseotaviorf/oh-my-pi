@@ -47,7 +47,7 @@ columns:
   subject:
     lineage:
     - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.subject
-    description: ''
+    description: Main subject of the task
   titles:
     lineage:
     - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.titles
