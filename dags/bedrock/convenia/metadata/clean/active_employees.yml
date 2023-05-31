@@ -21,6 +21,14 @@ columns:
     description: Employee's email
     lineage:
       - datalake_convenia_raw.active_employees.email
+  intern:
+    description: Information from employed interns
+    lineage:
+      - datalake_convenia_raw.active_employees.intern
+  foreign:
+    description: Information from foreign employees
+    lineage:
+      - datalake_convenia_raw.active_employees.foreign
   source:
     description: API Key source
     lineage:

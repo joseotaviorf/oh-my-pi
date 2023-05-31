@@ -72,7 +72,6 @@ def create_df_schema():
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")

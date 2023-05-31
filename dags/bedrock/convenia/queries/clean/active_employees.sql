@@ -3,6 +3,8 @@ SELECT
     name,
     last_name,
     email,
+    intern,
+    foreign,
     source,
     dt_hiring
 FROM
