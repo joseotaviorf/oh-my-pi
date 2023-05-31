@@ -19,12 +19,12 @@ columns:
     description: Range of difference between the published price and the calculator's predicted price for the property.
     categories: 
       TXX Undefined: Listing that did not have a calculator information at the time of the price change.
-      T0 < -25%: The published price is 25% lower than the predicted price for the listing.
-      T1 (-25% | 0%]: The published price is between 0% and 25% lower than the predicted price for the listing.
-      T2 (0% | 15%]: The published price is between 0% and 15% higher than the predicted price for the listing.
+      T6 < -25%: The published price is 25% lower than the predicted price for the listing.
+      T5 (-25% | 0%]: The published price is between 0% and 25% lower than the predicted price for the listing.
+      T4 (0% | 15%]: The published price is between 0% and 15% higher than the predicted price for the listing.
       T3 (15% | 25%]: The published price is between 15% and 25% higher than the predicted price for the listing.
-      T4 (25% | 50%]: The published price is between 25% and 50% higher than the predicted price for the listing.
-      T5 > 50%: The published price is 50% higher than the predicted price for the listing.
+      T2 (25% | 50%]: The published price is between 25% and 50% higher than the predicted price for the listing.
+      T1 > 50%: The published price is 50% higher than the predicted price for the listing.
   certainty_calculator_bins:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.
@@ -43,21 +43,21 @@ columns:
   tier: 
     description: 'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its level. 
       We use two components to define this tier: the difference from the published price to the calculator price, and the degree of certainty of the prediction. With this, we were able to understand the pricing tier of a listing by its seller and how this would affect demand
-      Example: A listing with the publication price exactly equal to the calculator price and with a high degree of prediction will be classified as P0 - Excellent Price.'
+      Example: A listing with the publication price exactly equal to the calculator price and with a high degree of prediction will be classified as P5 - Great Price.'
     categories:
-      P0: It means that QuintoAndar has a high degree of certainty that the property in question is worth less than it actually is.
-      P1: It means that the listing may be either overpriced or even cheaper than the real value of the property.
-      P2: It means that the price is OK in relation to the calculator. A little higher than the calculator, but nothing out of the normal.
-      P3: It means that the property is reasonably above the price estimated by the calculator.
-      P4:  Listing that is way above the calculated price, over 50% of the published price. Extremely overpriced .
+      P5: It means that QuintoAndar has a high degree of certainty that the property in question is worth less than it actually is.
+      P4: It means that the listing may be either overpriced or even cheaper than the real value of the property.
+      P3: It means that the price is OK in relation to the calculator. A little higher than the calculator, but nothing out of the normal.
+      P2: It means that the property is reasonably above the price estimated by the calculator.
+      P1: Listing that is way above the calculated price, over 50% of the published price. Extremely overpriced .
   tier_name: 
     description: Just a long name for the expensive Tier segment.
     categories: 
-      Excellent Price: It represents P0. Listings that are below the value calculated by QuintoAndar.
-      Great Price: It represents P1. Listings that are well priced.
-      Fair Price: It represents P2. Listings are slightly above the price indicated by the calculator.
-      Slightly Overpriced:  It represents P3. Listings that are above the price indicated by the calculator.
-      Significantly Overpriced:  It represents P4. Listings are way above the price of the calculator.
+      Great Price: It represents P5. Listings that are below the value calculated by QuintoAndar.
+      Good Price: It represents P4. Listings that are well priced.
+      Fair Price: It represents P3. Listings are slightly above the price indicated by the calculator.
+      Slightly Overpriced:  It represents P2. Listings that are above the price indicated by the calculator.
+      Significantly Overpriced:  It represents P1. Listings are way above the price of the calculator.
   tier_disclaimer:
     description: Column that shows us, in full, the combination of factors/bins concerning the listing, where with this, we classify it within a tier.
   has_great_price_tag:

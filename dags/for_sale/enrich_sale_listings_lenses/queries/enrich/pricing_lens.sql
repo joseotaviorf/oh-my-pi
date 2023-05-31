@@ -47,12 +47,12 @@ create_business_bins AS (
     END AS certainty_calculator_bins, 
     CASE 
       WHEN hp.calculator_sale_price IS NULL THEN 'TXX Undefined'
-      WHEN hp.diff_calculator_price < -0.25 THEN 'T0 < -25%'
-      WHEN hp.diff_calculator_price BETWEEN -0.25 AND 0.00 THEN 'T1 (-25% | 0%]'
-      WHEN hp.diff_calculator_price BETWEEN 0.00 AND 0.15 THEN 'T2 (0% | 15%]'
+      WHEN hp.diff_calculator_price < -0.25 THEN 'T6 < -25%'
+      WHEN hp.diff_calculator_price BETWEEN -0.25 AND 0.00 THEN 'T5 (-25% | 0%]'
+      WHEN hp.diff_calculator_price BETWEEN 0.00 AND 0.15 THEN 'T4 (0% | 15%]'
       WHEN hp.diff_calculator_price BETWEEN 0.15 AND 0.25 THEN 'T3 (15% | 25%]'
-      WHEN hp.diff_calculator_price BETWEEN 0.25 AND 0.50 THEN 'T4 (25% | 50%]'
-      WHEN hp.diff_calculator_price > 0.50 THEN 'T5 > 50%'
+      WHEN hp.diff_calculator_price BETWEEN 0.25 AND 0.50 THEN 'T2 (25% | 50%]'
+      WHEN hp.diff_calculator_price > 0.50 THEN 'T1 > 50%'
     END AS pricing_bins,
     has_great_sale_price_tag AS has_great_price_tag,
     hp.ts_price_started
@@ -72,36 +72,37 @@ score_business_logic AS (
     certainty_calculator_bins,
     pricing_bins,
     CASE 
-      WHEN has_great_price_tag = TRUE THEN 'P0'    
+      WHEN has_great_price_tag = TRUE THEN 'P5'    
       WHEN pricing_bins = 'TXX Undefined' THEN 'P Undefined'
-      WHEN pricing_bins IN ('T0 < -25%', 'T1 (-25% | 0%]') AND certainty_calculator_bins = 'HIGH' THEN 'P0'
-      WHEN pricing_bins IN ('T0 < -25%', 'T1 (-25% | 0%]') AND certainty_calculator_bins = 'MEDIUM' THEN 'P1'
-      WHEN pricing_bins IN ('T0 < -25%', 'T1 (-25% | 0%]') THEN 'P2'
-      WHEN pricing_bins = 'T2 (0% | 15%]' AND certainty_calculator_bins = 'HIGH' THEN 'P1'
-      WHEN pricing_bins = 'T2 (0% | 15%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'P2'
-      WHEN pricing_bins = 'T2 (0% | 15%]' THEN 'P3'
-      WHEN pricing_bins = 'T3 (15% | 25%]' AND certainty_calculator_bins = 'HIGH' THEN 'P2'
-      WHEN pricing_bins = 'T3 (15% | 25%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'P3'
-      WHEN pricing_bins = 'T3 (15% | 25%]' THEN 'P4'
-      WHEN pricing_bins = 'T4 (25% | 50%]' AND certainty_calculator_bins = 'HIGH' THEN 'P3'
-      WHEN pricing_bins = 'T4 (25% | 50%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'P4'
-      ELSE 'P4'
+      WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') AND certainty_calculator_bins = 'HIGH' THEN 'P5'
+      WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') AND certainty_calculator_bins = 'MEDIUM' THEN 'P4'
+      WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') THEN 'P3'
+      WHEN pricing_bins = 'T4 (0% | 15%]' AND certainty_calculator_bins = 'HIGH' THEN 'P4'
+      WHEN pricing_bins = 'T4 (0% | 15%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'P3'
+      WHEN pricing_bins = 'T4 (0% | 15%]' THEN 'P2'
+      WHEN pricing_bins = 'T3 (15% | 25%]' AND certainty_calculator_bins = 'HIGH' THEN 'P3'
+      WHEN pricing_bins = 'T3 (15% | 25%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'P2'
+      WHEN pricing_bins = 'T3 (15% | 25%]' THEN 'P1'
+      WHEN pricing_bins = 'T2 (25% | 50%]' AND certainty_calculator_bins = 'HIGH' THEN 'P2'
+      WHEN pricing_bins = 'T2 (25% | 50%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'P1'
+      ELSE 'P1'
     END AS tier,
     CASE 
-      WHEN has_great_price_tag = TRUE THEN 'The listing has great price tag active'  
+      WHEN has_great_price_tag = TRUE THEN 'The listing has the great price tag currently active.'  
       WHEN pricing_bins = 'TXX Undefined' THEN 'The property does not have a set price in our calculator, we cannot rate a tier on it'   
-      WHEN pricing_bins IN ('T0 < -25%', 'T1 (-25% | 0%]') AND certainty_calculator_bins = 'HIGH' THEN 'The property is up to 25%-0% below P50 and the predicted price certainty is high'
-      WHEN pricing_bins IN ('T0 < -25%', 'T1 (-25% | 0%]') AND certainty_calculator_bins = 'MEDIUM' THEN 'The property is up to 25%-0% below P50 and the predicted price certainty is medium'
-      WHEN pricing_bins IN ('T0 < -25%', 'T1 (-25% | 0%]') THEN 'The property is up to 25%-0% below P50 and the predicted price certainty is low'
-      WHEN pricing_bins = 'T2 (0% | 15%]' AND certainty_calculator_bins = 'HIGH' THEN 'The property is up to 0%-15% above P50 and the predicted price certainty is high'
-      WHEN pricing_bins = 'T2 (0% | 15%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'The property is up to 0%-15% above P50 and the predicted price certainty is medium'
-      WHEN pricing_bins = 'T2 (0% | 15%]' THEN 'The property is up to 0%-15% above P50 and the predicted price certainty is low'
-      WHEN pricing_bins = 'T3 (15% | 25%]' AND certainty_calculator_bins = 'HIGH' THEN 'The property is up to 15%-25% above P50 and the predicted price certainty is high'
-      WHEN pricing_bins = 'T3 (15% | 25%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'The property is up to 15%-25% above P50 and the predicted price certainty is medium'
-      WHEN pricing_bins = 'T3 (15% | 25%]' THEN 'The property is up to 15%-25% above P50 and the predicted price certainty is low'
-      WHEN pricing_bins = 'T4 (25% | 50%]' AND certainty_calculator_bins = 'HIGH' THEN 'The property is up to 25%-50% above P50 and the predicted price certainty is high'
-      WHEN pricing_bins = 'T4 (25% | 50%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'The property is up to 25%-50% above P50 and the predicted price certainty is medium'
-      ELSE 'The property is up to 50% above P50'
+      WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') AND certainty_calculator_bins = 'HIGH' THEN 'The listings price is up to 25% below the calculators p50 predicted price and the prediction certainty is high.'
+      WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') AND certainty_calculator_bins = 'MEDIUM' THEN 'The listings price is up to 25% below the calculators p50 predicted price and the prediction certainty is medium.'
+      WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') THEN 'The listings price is up to 25% below the calculators p50 predicted price and the prediction certainty is low.'
+      WHEN pricing_bins = 'T4 (0% | 15%]' AND certainty_calculator_bins = 'HIGH' THEN 'The property is up to 0%-15% above P50 and the predicted price certainty is high.'
+      WHEN pricing_bins = 'T4 (0% | 15%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'The property is up to 0%-15% above P50 and the predicted price certainty is medium.'
+      WHEN pricing_bins = 'T4 (0% | 15%]' THEN 'The property is up to 0%-15% above P50 and the predicted price certainty is low.'
+      WHEN pricing_bins = 'T3 (15% | 25%]' AND certainty_calculator_bins = 'HIGH' THEN 'The listings price is between 15% to 25% over the calculators p50 predicted price and the prediction certainty is high.'
+      WHEN pricing_bins = 'T3 (15% | 25%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'The listings price is between 15% to 25% over the calculators p50 predicted price and the prediction certainty is medium.'
+      WHEN pricing_bins = 'T3 (15% | 25%]' THEN 'The listings price is between 15% to 25% over the calculators p50 predicted price and the prediction certainty is low.'
+      WHEN pricing_bins = 'T2 (25% | 50%]' AND certainty_calculator_bins = 'HIGH' THEN 'The listings price is between 25% to 50% over the calculators p50 predicted price and the prediction certainty is high.'
+      WHEN pricing_bins = 'T2 (25% | 50%]' AND certainty_calculator_bins = 'MEDIUM' THEN 'The listings price is between 25% to 50% over the calculators p50 predicted price and the prediction certainty is medium.'
+      WHEN pricing_bins = 'T2 (25% | 50%]' THEN 'The listings price is between 25% to 50% over the calculators p50 predicted price and the prediction certainty is low.'
+      ELSE 'The listings price is 50% or more over the calculators p50 predicted price.'
     END AS tier_disclaimer,
     has_great_price_tag,
     ts_price_started
@@ -131,11 +132,11 @@ SELECT
   certainty_calculator_bins,
   tier,
   CASE  
-    WHEN tier = 'P0' THEN 'Excellent Price'
-    WHEN tier = 'P1' THEN 'Great Price'
-    WHEN tier = 'P2' THEN 'Fair Price'
-    WHEN tier = 'P3' THEN 'Slightly Overpriced '
-    WHEN tier = 'P4' THEN 'Significantly Overpriced'
+    WHEN tier = 'P5' THEN 'Great Price'
+    WHEN tier = 'P4' THEN 'Good Price'
+    WHEN tier = 'P3' THEN 'Fair Price'
+    WHEN tier = 'P2' THEN 'Slightly Overpriced '
+    WHEN tier = 'P1' THEN 'Significantly Overpriced'
     WHEN tier = 'P Undefined' THEN 'Undefined'
   END AS tier_name,
   tier_disclaimer,
