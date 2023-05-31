@@ -1757,10 +1757,10 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.terminator:load-clean-termination-workflow
   - bietlejuice.terminator:load-clean-utility-bill
 bietlejuice.enrich_offboarding_repairs_probability:
-  - bietlejuice.dw_booking:load-into-redshift-dw-public-dim-tenant-booking-review
+  - bietlejuice.dw_booking:load-dw-public-dim-tenant-booking-review
   - bietlejuice.dw_contract:load-dw-public-dim-contract
   - bietlejuice.dw_contract:load-into-redshift-dw-quintoandar-fact-contract-people
-  - bietlejuice.dw_datamarts_for_sale:create-dim-house-listing-amenities-in-datalake
+  - bietlejuice.dw_datamarts_spark.for_sale:load-dw-datamarts-dim-house-listing-amenities
   - bietlejuice.dw_listing:load-into-redshift-dw-public-dim-house-listing
   - bietlejuice.dw_region:load-into-redshift-dw-public-dim-region
   - bietlejuice.dw_rent_flow:load-into-redshift-dw-public-fact-listing-rent-flows
