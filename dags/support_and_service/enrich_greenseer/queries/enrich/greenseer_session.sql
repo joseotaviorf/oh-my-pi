@@ -19,7 +19,7 @@ journeys_uniques AS (
   FROM
     datalake_journey_flow_clean.journey_flow
   WHERE
-    fired_response
+    fired_response AND journey_name IS NULL
   QUALIFY
     RANK() OVER (PARTITION BY id_correlation ORDER BY ts_created, ts_updated DESC) = 1
 ),
@@ -52,18 +52,19 @@ greenseer_sessions AS (
     ) AS more_help_required, 
     CAST(
       COALESCE(
-        GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.before_reception.value'), 
         GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.after_reception.value'), 
         GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.direct_answer.value')
       ) AS BOOLEAN
     ) AS problem_solved, 
     COALESCE(
       NULLIF(GET_JSON_OBJECT(g.memory,'$.business_rules.menu_taxonomies.selected_taxonomy'),''),
+      NULLIF(GET_JSON_OBJECT(g.memory,'$.business_rules.confused_class.selected_theme_detail'),''),
       NULLIF(GET_JSON_OBJECT(g.memory,'$.business_rules.menu_theme_details.selected_theme_detail'),'')
     ) AS response_key,
     (
       COALESCE(
         GET_JSON_OBJECT(g.memory, '$.business_rules.menu_taxonomies.message'),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.confused_class.message'),
         GET_JSON_OBJECT(g.memory, '$.business_rules.menu_theme_details.message'),
         ''
       ) <> ''
@@ -157,7 +158,7 @@ SELECT
   problem_solved as is_problem_solved,
   is_retention,
   CASE
-    WHEN greenseer_sessions.ts_ended > greenseer_sessions.ts_started + INTERVAL '12 hour' THEN TRUE
+    WHEN greenseer_sessions.ts_ended > greenseer_sessions.ts_started + INTERVAL '4 hour' THEN TRUE
     ELSE FALSE
   END AS has_exceeded_session_timeout,
   greenseer_sessions.ts_started,
