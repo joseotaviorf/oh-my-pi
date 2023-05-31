@@ -41,7 +41,7 @@ SELECT
         WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN dr.city_group
     END AS city_group
 FROM
-    dw_datamarts_cross.lead_listing_flows AS lf
+    dw_datamarts.lead_listing_flows AS lf
 LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
@@ -271,7 +271,7 @@ SELECT
 	tta.first_message_ts,
 	tta.first_attendance_ts
 FROM
-    dw_datamarts_cross.talk_to_agent AS tta
+    dw_datamarts.talk_to_agent AS tta
 WHERE
     tta.business_context = 'SALE'
 ),

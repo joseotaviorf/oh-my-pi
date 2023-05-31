@@ -44,7 +44,7 @@ WITH sale_listing_flows_adjust AS (
             WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN dr.city_group
         END AS city_group
     FROM
-        dw_datamarts_cross.lead_listing_flows AS lf
+        dw_datamarts.lead_listing_flows AS lf
     LEFT JOIN
         dw_public.dim_region AS dr
             ON dr.sk_region = lf.sk_region

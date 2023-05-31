@@ -14,40 +14,10 @@ metadata_files_out_of_pattern:
   - support_and_service/enrich_offboarding/metadata/enrich/contract_termination.yml
   - support_and_service/enrich_offboarding/metadata/enrich/ongoing.yml
   - support_and_service/enrich_offboarding/metadata/enrich/tickets.yml
-  # The following files are being added only temporarily to skip list, with permission from the Data Governance team.
-  # They will be removed on the next PR.
-  - cross/enrich_unified_potential_listing/metadata/enrich/potential_listing_b2b.yml
-  - cross/enrich_unified_potential_listing/metadata/enrich/potential_listing_lead_tasks.yml
-  - cross/enrich_unified_potential_listing/metadata/enrich/potential_listing_reprocessed_leads.yml
-  - cross/gsheets_by_context/metadata/clean/fintech/fraud_contracts.yml
-  - fintech/atta/metadata/clean/client_info.yml
-  - fintech/dw_retsuko/metadata/dw/fact_invoice_mobs_derived.yml
-  - fintech/enrich_arquivo_confidencial/metadata/enrich/scr_pivot.yml
-  - fintech/enrich_proponent/metadata/enrich/main_proponent_proposal.yml
-  - fintech/enrich_velo/metadata/enrich/transaction_entries.yml
-  - for_rent/dw_agents_availability/metadata/dw/fact_agent_daily_allocations.yml
-  - for_rent/dw_agents_availability/metadata/dw/fact_agent_hourly_allocations.yml
-  - for_rent/dw_agents_availability/metadata/dw/fact_photographer_daily_allocations.yml
-  - for_rent/dw_agents_availability/metadata/dw/fact_photographer_hourly_allocations.yml
-  - for_rent/dw_proposal/metadata/dw/dim_proposal_person.yml
-  - for_rent/dw_proposal/metadata/dw/fact_proposal_people.yml
-  - for_rent/enrich_crawlers_listings/metadata/enrich/em_casa_status_listing_flows.yml
-  - for_rent/enrich_listing_temp/metadata/enrich/dim_house_listing_lbc.yml
-  - for_rent/enrich_rental_listing_metrics/metadata/enrich/cohort_listings_weekly.yml
-  - for_rent/enrich_rental_listing_metrics/metadata/enrich/coincident_listings_weekly.yml
-  - for_rent/metric_rent__contracts/metadata/metric/new_contracts_signed_weekly.yml
-  - governance/enrich_dashboard_governance/metadata/enrich/chart_metadata.yml
-  - governance/enrich_dashboard_governance/metadata/enrich/dashboard_metadata.yml
-  - growth/alert_manager/metadata/clean/alerts_databricks_cluster.yml
-  - growth/amplitude/metadata/clean/170698_appsflyer_install_events.yml
-  - growth/enrich_braze_events/metadata/enrich/events_affiliates.yml
-  - growth/enrich_braze_events_dispatches/metadata/enrich/email_affiliates.yml
-  - growth/enrich_braze_events_dispatches/metadata/enrich/inapp_affiliates.yml
-  - growth/enrich_braze_events_dispatches/metadata/enrich/push_affiliates.yml
-  - growth/enrich_braze_events_dispatches/metadata/enrich/sms_affiliates.yml
-  - growth/enrich_braze_events_dispatches/metadata/enrich/webhook_affiliates.yml
-  - growth/enrich_braze_events_dispatches_user/metadata/enrich/affiliates_events.yml
-  - growth/enrich_health_metrics/metadata/enrich/dag_alerts_metrics.yml
+# The following files are being added only temporarily to skip list, with permission from the Data Governance team
+  - cross/dw_datamarts_spark/metadata/dw/for_sale_cross/sale_cohort_conversions.yml
+  - cross/dw_datamarts_spark/metadata/dw/for_sale_cross/sale_events_funnel.yml
+  - cross/dw_datamarts_spark/metadata/dw/for_sale_cross/temp_supply_flows.yml
 queries_without_metadata_files:
   - for_rent/regions_polygon/queries/enrich_for_looker/regions_polygon.sql
   - for_rent/property_tax/queries/raw/tax_report.sql

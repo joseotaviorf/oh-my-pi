@@ -28,22 +28,22 @@ columns:
       - dw_sale.dim_offer.is_3p_supply
   lead_context:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+      - dw_datamarts.lead_listing_flows.mkt_origin
   mkt_campaign_context:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.lead_context_origin
+      - dw_datamarts.lead_listing_flows.lead_context_origin
   mkt_origin:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+      - dw_datamarts.lead_listing_flows.mkt_origin
   mkt_channel:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.mkt_channel
+      - dw_datamarts.lead_listing_flows.mkt_channel
   sales_company:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sales_company
+      - dw_datamarts.lead_listing_flows.sales_company
   lead_processing_operation:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+      - dw_datamarts.lead_listing_flows.sourcing_ops
   first_origin_demand:
     lineage:
       - dw_sale.fact_sale_flows.first_event

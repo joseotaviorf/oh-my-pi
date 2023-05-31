@@ -260,7 +260,7 @@ dates_by_context AS (
             ELSE NULL
         END AS context_first_listing_sale
     FROM
-        dw_datamarts_cross.lead_listing_flows
+        dw_datamarts.lead_listing_flows
 ),
 max_dates AS (
     SELECT
