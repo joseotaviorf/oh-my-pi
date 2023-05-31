@@ -82,6 +82,54 @@ customer_keys AS (
         AND cci_e.channel = 'email'
      WHERE cc.id_customer IS NOT NULL
      GROUP BY 1
+),
+attributes_union AS (
+     SELECT *
+     FROM
+          datalake_tracksale.dispatch_attributes
+     UNION ALL
+     SELECT *
+     FROM
+          datalake_casa_mineira_tracksale.dispatch_attributes
+),
+customer_last_rent_event AS (
+     SELECT
+          cc.id_dispatch,
+          au.id AS id_dispatch_lot,
+          rd.id_tenant_prospect,
+          au.dispatch_time AS ts_dispatch_sent,
+          MAX(ts_event) FILTER(WHERE ts_event < dispatch_time) AS ts_rent_last_event
+     FROM
+          customer_conversions AS cc
+     LEFT JOIN
+          customer_keys AS ck 
+               ON ck.id_customer = cc.id_customer
+     LEFT JOIN
+          attributes_union AS au
+               ON cc.id_dispatch_lot = au.id
+               AND COALESCE(cc.customer_email, cc.customer_phone) = COALESCE(au.email, au.phone)
+     LEFT JOIN
+          datalake_rent_demand_event.rent_demand_event AS rd
+               ON rd.id_tenant_prospect = ck.id_user
+               AND rd.ts_event < au.dispatch_time
+     GROUP BY 1, 2, 3, 4
+),
+customer_event AS (
+     SELECT
+          cl.id_dispatch,
+          cl.id_dispatch_lot,
+          cl.id_tenant_prospect,
+          MAX(rd.id_event) AS id_event,
+          MAX(rd.id_event_type) AS id_event_type,
+          cl.ts_dispatch_sent,
+          cl.ts_rent_last_event
+     FROM
+          customer_last_rent_event AS cl
+     JOIN
+          datalake_rent_demand_event.rent_demand_event AS rd
+               ON rd.id_tenant_prospect = cl.id_tenant_prospect
+               AND rd.ts_event = cl.ts_rent_last_event
+     GROUP BY 1, 2, 3, 6, 7
 )
 SELECT
      COALESCE(cc.id_dispatch,-1) AS sk_nps_dispatch,
@@ -96,32 +144,46 @@ SELECT
      COALESCE(ad.id_tta, -1) AS sk_tta,
      COALESCE(ad.id_offer_context, -1) AS sk_offer,
      COALESCE(ad.id_contract, -1) AS sk_contract,
-     COALESCE(CAST(date_format(cc.ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_created_date,
-     COALESCE(CAST(date_format(da.dispatch_time, 'yyyyMMdd') AS BIGINT), -1) AS sk_sent_date,
-     COALESCE(CAST(date_format(cc.ts_answer_sent_local, 'yyyyMMdd') AS BIGINT), -1) AS sk_answered_date,
+     COALESCE(ce.id_event, -1) AS sk_last_rent_event,
+     COALESCE(ce.id_event_type, -1) AS sk_last_rent_event_type,
+     COALESCE(CAST(DATE_FORMAT(cc.ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_created_date,
+     COALESCE(CAST(DATE_FORMAT(at.dispatch_time, 'yyyyMMdd') AS BIGINT), -1) AS sk_sent_date,
+     COALESCE(CAST(DATE_FORMAT(cc.ts_answer_sent_local, 'yyyyMMdd') AS BIGINT), -1) AS sk_answered_date,
+     COALESCE(CAST(DATE_FORMAT(ce.ts_rent_last_event, 'yyyyMMdd') AS BIGINT), -1) AS sk_last_rent_event_date,
      cc.nps_answer AS score,
      minutes_spent_answering AS minutes_response_time,
-     da.status AS dispatch_status,
+     at.status AS dispatch_status,
      COALESCE(ac.city, 'NÃO INFORMADO') AS city,
-     CAST(COALESCE(da.survey_opened, 'false') AS BOOLEAN) as is_survey_opened,
+     CAST(COALESCE(at.survey_opened, 'false') AS BOOLEAN) AS is_survey_opened,
      cc.status <> 'Finalizado' AS is_pending_survey,
      cc.id_answer IS NOT NULL AS is_answered,
      cc.nps_comment IS NOT NULL AS has_comment,
      cc.is_customer_identified,
-     current_timestamp as ts_load
-FROM customer_conversions cc
-LEFT JOIN customer_keys ck 
-     ON ck.id_customer = cc.id_customer
-LEFT JOIN datalake_nps_answer_drivers.answer_drivers ad
-     ON cc.id_answer = ad.id_answer
+     CURRENT_TIMESTAMP AS ts_load
+FROM
+     customer_conversions AS cc
+LEFT JOIN
+     customer_keys AS ck 
+          ON ck.id_customer = cc.id_customer
+LEFT JOIN
+     datalake_nps_answer_drivers.answer_drivers AS ad
+          ON cc.id_answer = ad.id_answer
+LEFT JOIN
+     attributes_union AS at
+          ON at.id = cc.id_dispatch_lot
+          AND (COALESCE(cc.customer_email, cc.customer_phone) = COALESCE(at.email, at.phone))
 LEFT JOIN 
-     (SELECT * FROM datalake_tracksale.dispatch_attributes
+     (SELECT *
+     FROM
+          datalake_tracksale.answer_cities 
      UNION ALL
-     SELECT * FROM datalake_casa_mineira_tracksale.dispatch_attributes) da
-     ON cc.id_dispatch_lot = da.id
-     AND (COALESCE(cc.customer_email, cc.customer_phone) = COALESCE(da.email, da.phone))
-LEFT JOIN 
-     (SELECT * FROM datalake_tracksale.answer_cities 
-     UNION ALL
-     SELECT * FROM datalake_casa_mineira_tracksale.answer_cities) ac
-     ON ac.id_answer = cc.id_answer
+     SELECT *
+     FROM
+          datalake_casa_mineira_tracksale.answer_cities) AS ac
+               ON ac.id_answer = cc.id_answer
+LEFT JOIN
+     customer_event AS ce
+          ON ce.id_dispatch = cc.id_dispatch
+          AND ce.id_dispatch_lot = cc.id_dispatch_lot
+          AND ce.ts_dispatch_sent = at.dispatch_time
+          AND ce.id_tenant_prospect = ck.id_user

@@ -884,6 +884,7 @@ bietlejuice.dw_tracksale:
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
+  - bietlejuice.enrich_rent_demand_event:load-enrich-rent-demand-event
   - bietlejuice.enrich_tracksale:load-enrich-answer
   - bietlejuice.enrich_tracksale:load-enrich-answer-cities
   - bietlejuice.enrich_tracksale:load-enrich-answer-justifications
