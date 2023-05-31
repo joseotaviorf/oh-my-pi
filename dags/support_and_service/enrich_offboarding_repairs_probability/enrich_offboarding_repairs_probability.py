@@ -44,7 +44,7 @@ enrich_spark_job_path = (
     f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}/load_{CONTEXT}_enrich.py"
 )
 partitions = config_service.get_config("partitions")
-cluster_configuration = config_service.get_config("databricks_10_4_min_general_cluster")
+cluster_configuration = config_service.get_config("databricks_10_4_med_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
 custom_libraries = config_service.get_config("custom_libraries")
 
