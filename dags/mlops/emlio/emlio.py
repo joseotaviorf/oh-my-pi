@@ -102,7 +102,12 @@ raw_task_group = task_group.build_raw_task_group_for_all_tables(
 )
 
 load_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="load-clean-emlio-logs",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name=TABLE_NAME,
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -121,7 +126,12 @@ load_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
 
 sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
-    task_id=f"sync-hive-metastore-{LayerEnum.CLEAN.value}-{TABLE_NAME}-structure",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name=TABLE_NAME,
+    ),
     json={
         "spark_python_task": {
             "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
@@ -138,7 +148,12 @@ sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
 
 sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
-    task_id=f"sync-hive-metastore-{LayerEnum.CLEAN.value}-{TABLE_NAME}-partitions",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name=TABLE_NAME,
+    ),
     json={
         "spark_python_task": {
             "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_partitions.py",
@@ -155,7 +170,12 @@ sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
 
 propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
-    task_id=f"propagate-table-metadata-{LayerEnum.CLEAN.value}-{TABLE_NAME}",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name=TABLE_NAME,
+    ),
     json={
         "spark_python_task": {
             "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_table_metadata.py",
@@ -171,7 +191,12 @@ propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
 
 bypass_task = DummyOperator(
     dag=dag,
-    task_id=f"propagation-bypass-{LayerEnum.CLEAN.value}-{TABLE_NAME}",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.PROPAGATION_BYPASS_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name=TABLE_NAME,
+    ),
     trigger_rule="all_done",
 )
 

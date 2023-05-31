@@ -14,7 +14,6 @@ from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.formatters import StringFormatter
 from bietlejuice.services import ConfigurationService
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 
@@ -109,21 +108,25 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         """
 
         table_name_arg = []
-        tasks_name_suffix = ""
         sync_mode = self.ALL_TABLES
-        layer = LayerEnum.RAW.value
+        layer_enum = LayerEnum.RAW
+        layer = layer_enum.value
 
         if table_name:
             sync_mode = self.SINGLE_TABLE
             table_name_arg = [table_name]
-            tasks_name_suffix = StringFormatter.slugify(f"-{table_name}")
 
         if raw_spark_job_extra_args is None:
             raw_spark_job_extra_args = []
 
         load_table_task = QuintoAndarDatabricksCheckJobTaskOperator(
             databricks_conn_id="databricks_job_cluster",
-            task_id=f"load-{layer}-{source}{tasks_name_suffix}",
+            task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                task_prefix=DatalakeTaskGroupJobCluster.LOAD_TASK_PREFIX,
+                layer=layer_enum,
+                schema=source,
+                table_name=table_name,
+            ),
             pool=pool,
             dag=self.dag,
             json={
@@ -141,7 +144,12 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         if has_hive_sync:
             sync_metastore_tables_structure_task = QuintoAndarDatabricksCheckJobTaskOperator(
                 databricks_conn_id="databricks_job_cluster",
-                task_id=f"sync-hive-metastore-{layer}{tasks_name_suffix}-structure",
+                task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                    task_prefix=DatalakeTaskGroupJobCluster.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+                    layer=layer_enum,
+                    schema=source,
+                    table_name=table_name,
+                ),
                 dag=self.dag,
                 json={
                     "spark_python_task": {
@@ -160,7 +168,12 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
 
             sync_metastore_tables_partitions_task = QuintoAndarDatabricksCheckJobTaskOperator(
                 databricks_conn_id="databricks_job_cluster",
-                task_id=f"sync-hive-metastore-{layer}{tasks_name_suffix}-partitions",
+                task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                    task_prefix=DatalakeTaskGroupJobCluster.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
+                    layer=layer_enum,
+                    schema=source,
+                    table_name=table_name,
+                ),
                 dag=self.dag,
                 json={
                     "spark_python_task": {
@@ -209,7 +222,12 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
                 propagate_table_lineage_task = QuintoAndarDatabricksCheckJobTaskOperator(
                     databricks_conn_id="databricks_job_cluster",
                     dag=self.dag,
-                    task_id=f"propagate-table-metadata-{layer}-{source}{tasks_name_suffix}",
+                    task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                        task_prefix=DatalakeTaskGroupJobCluster.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+                        layer=layer_enum,
+                        schema=source,
+                        table_name=table_name,
+                    ),
                     json={
                         "spark_python_task": {
                             "python_file": f"{self.spark_jobs_path}/propagate_raw_tables_metadata.py",
@@ -230,7 +248,12 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
 
                 bypass_task = DummyOperator(
                     dag=self.dag,
-                    task_id=f"propagation-bypass-{layer}-{source}{tasks_name_suffix}",
+                    task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                        task_prefix=DatalakeTaskGroupJobCluster.PROPAGATION_BYPASS_TASK_PREFIX,
+                        layer=layer_enum,
+                        schema=source,
+                        table_name=table_name,
+                    ),
                     trigger_rule="all_done",
                 )
 
@@ -268,12 +291,16 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         quality_tasks = []
         for tb_name in tb_names:
             inmetro_bucket = config_service.get_config("inmetro_bucket")
-            table_name_suffix = StringFormatter.slugify(f"-{tb_name}")
 
             data_quality_tests_task = QuintoAndarDatabricksCheckJobTaskOperator(
                 databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
-                task_id=f"data-quality-tests-{layer}-{source}{table_name_suffix}",
+                task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                    task_prefix=DatalakeTaskGroupJobCluster.DATA_QUALITY_TESTS_TASK_PREFIX,
+                    layer=layer_enum,
+                    schema=source,
+                    table_name=table_name,
+                ),
                 json={
                     "spark_python_task": {
                         "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
@@ -451,7 +478,12 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
 
         load_table_task = QuintoAndarDatabricksCheckJobTaskOperator(
             databricks_conn_id="databricks_job_cluster",
-            task_id=StringFormatter.slugify(f"load-{layer.value}-{table_name}"),
+            task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                task_prefix=DatalakeTaskGroupJobCluster.LOAD_TASK_PREFIX,
+                layer=layer,
+                schema=source_database_base_name,
+                table_name=table_name,
+            ),
             dag=self.dag,
             json={
                 "spark_python_task": {
@@ -481,8 +513,11 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
             sync_metastore_table_structure_task = QuintoAndarDatabricksCheckJobTaskOperator(
                 databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
-                task_id=StringFormatter.slugify(
-                    f"sync-hive-metastore-{layer.value}-{table_name}-structure"
+                task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                    task_prefix=DatalakeTaskGroupJobCluster.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+                    layer=layer,
+                    schema=source_database_base_name,
+                    table_name=table_name,
                 ),
                 json={
                     "spark_python_task": {
@@ -502,8 +537,11 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
             sync_metastore_table_partitions_task = QuintoAndarDatabricksCheckJobTaskOperator(
                 databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
-                task_id=StringFormatter.slugify(
-                    f"sync-hive-metastore-{layer.value}-{table_name}-partitions"
+                task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                    task_prefix=DatalakeTaskGroupJobCluster.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
+                    layer=layer,
+                    schema=source_database_base_name,
+                    table_name=table_name,
                 ),
                 json={
                     "spark_python_task": {
@@ -537,8 +575,11 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
                 propagate_table_metadata_task = QuintoAndarDatabricksCheckJobTaskOperator(
                     databricks_conn_id="databricks_job_cluster",
                     dag=self.dag,
-                    task_id=StringFormatter.slugify(
-                        f"propagate-table-metadata-{layer.value}-{table_name}"
+                    task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                        task_prefix=DatalakeTaskGroupJobCluster.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+                        layer=layer,
+                        schema=source_database_base_name,
+                        table_name=table_name,
                     ),
                     json={
                         "spark_python_task": {
@@ -556,8 +597,11 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
 
                 bypass_task = DummyOperator(
                     dag=self.dag,
-                    task_id=StringFormatter.slugify(
-                        f"propagation-bypass-{layer.value}-{table_name}"
+                    task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                        task_prefix=DatalakeTaskGroupJobCluster.PROPAGATION_BYPASS_TASK_PREFIX,
+                        layer=layer,
+                        schema=source_database_base_name,
+                        table_name=table_name,
                     ),
                     trigger_rule="all_done",
                 )
@@ -574,8 +618,11 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
             create_external_table_task = QuintoAndarDatabricksCheckJobTaskOperator(
                 databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
-                task_id=StringFormatter.slugify(
-                    f"create-{layer.value}-{table_name}-external-table"
+                task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                    task_prefix=DatalakeTaskGroupJobCluster.CREATE_EXTERNAL_TABLE_TASK_PREFIX,
+                    layer=layer,
+                    schema=source_database_base_name,
+                    table_name=table_name,
                 ),
                 json={
                     "spark_python_task": {
@@ -612,8 +659,11 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
             data_quality_tests_task = QuintoAndarDatabricksCheckJobTaskOperator(
                 databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
-                task_id=StringFormatter.slugify(
-                    f"data-quality-tests-{layer.value}-{table_name}"
+                task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
+                    task_prefix=DatalakeTaskGroupJobCluster.DATA_QUALITY_TESTS_TASK_PREFIX,
+                    layer=layer,
+                    schema=source_database_base_name,
+                    table_name=table_name,
                 ),
                 json={
                     "spark_python_task": {

@@ -80,3 +80,11 @@
     `python3 generate_skip_list.py -j <skip_list_path> -d <dag_list_path> -l <last_updater>`
 
     _The name of the last updater must be in quotes_
+
+# validate_dependencies_exist.py
+
+  The goal of this script is to make sure that every dependency declared in dependencies.yaml actually exists in Airflow.
+  This is useful for local tests of changes that affect several dependencies in the yaml.
+  
+  It cannot be run outside of an Airflow container, because it collects the parsed DAGs from the database. Therefore, you need
+  the local environment to do so.

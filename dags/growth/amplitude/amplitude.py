@@ -12,6 +12,9 @@ from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.task_groups.datalake_task_group import (
+    DatalakeTaskGroup,
+)
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
@@ -107,7 +110,12 @@ propagate_table_metadata_raw_events_task = QuintoAndarDatabricksSubmitRunOperato
 )
 
 events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="events-raw-to-clean",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="events",
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -126,7 +134,12 @@ events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
 )
 
 sync_metastore_clean_events_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-events-structure",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="events",
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -143,7 +156,12 @@ sync_metastore_clean_events_structure_task = QuintoAndarDatabricksSubmitRunOpera
 )
 
 sync_metastore_clean_events_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-events-partitions",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="events",
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -161,7 +179,12 @@ sync_metastore_clean_events_partitions_task = QuintoAndarDatabricksSubmitRunOper
 
 propagate_table_metadata_clean_events_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
-    task_id=f"propagate-table-metadata-clean-events",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="events",
+    ),
     json={
         "spark_python_task": {
             "python_file": base_spark_jobs_path + "propagate_table_metadata.py",
@@ -176,7 +199,12 @@ propagate_table_metadata_clean_events_task = QuintoAndarDatabricksSubmitRunOpera
 )
 # 170698_user_merge
 user_merge_170698_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="170698-user-merge-raw-to-clean",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="170698_user_merge"
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -195,7 +223,12 @@ user_merge_170698_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
 )
 
 sync_metastore_clean_170698_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-170698-user-merge-structure",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="170698_user_merge"
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -212,7 +245,12 @@ sync_metastore_clean_170698_user_merge_structure_task = QuintoAndarDatabricksSub
 )
 
 sync_metastore_clean_170698_user_merge_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-170698-user-merge-partitions",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="170698_user_merge"
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -230,7 +268,12 @@ sync_metastore_clean_170698_user_merge_partitions_task = QuintoAndarDatabricksSu
 
 propagate_table_metadata_clean_170698_user_merge_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
-    task_id=f"propagate-table-metadata-clean-170698-user-merge",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="170698_user_merge"
+    ),
     json={
         "spark_python_task": {
             "python_file": base_spark_jobs_path + "propagate_table_metadata.py",
@@ -246,7 +289,12 @@ propagate_table_metadata_clean_170698_user_merge_task = QuintoAndarDatabricksSub
 
 # 183047_user_merge
 user_merge_183047_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="183047-user-merge-raw-to-clean",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="183047_user_merge"
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -265,7 +313,12 @@ user_merge_183047_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
 )
 
 sync_metastore_clean_183047_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-183047-user-merge-structure",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="183047_user_merge"
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -282,7 +335,12 @@ sync_metastore_clean_183047_user_merge_structure_task = QuintoAndarDatabricksSub
 )
 
 sync_metastore_clean_183047_user_merge_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-183047-user-merge-partitions",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="183047_user_merge"
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -300,7 +358,12 @@ sync_metastore_clean_183047_user_merge_partitions_task = QuintoAndarDatabricksSu
 
 propagate_table_metadata_clean_183047_user_merge_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
-    task_id=f"propagate-table-metadata-clean-183047-user-merge",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="183047_user_merge"
+    ),
     json={
         "spark_python_task": {
             "python_file": base_spark_jobs_path + "propagate_table_metadata.py",
@@ -316,7 +379,12 @@ propagate_table_metadata_clean_183047_user_merge_task = QuintoAndarDatabricksSub
 
 # 205027_user_merge
 user_merge_205027_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="205027-user-merge-raw-to-clean",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="205027_user_merge"
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -335,7 +403,12 @@ user_merge_205027_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
 )
 
 sync_metastore_clean_205027_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-205027-user-merge-structure",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="205027_user_merge"
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -352,7 +425,12 @@ sync_metastore_clean_205027_user_merge_structure_task = QuintoAndarDatabricksSub
 )
 
 sync_metastore_clean_205027_user_merge_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-205027-user-merge-partitions",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="205027_user_merge"
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -370,7 +448,12 @@ sync_metastore_clean_205027_user_merge_partitions_task = QuintoAndarDatabricksSu
 
 propagate_table_metadata_clean_205027_user_merge_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
-    task_id=f"propagate-table-metadata-clean-205027-user-merge",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+        layer=LayerEnum.CLEAN,
+        schema=SOURCE,
+        table_name="205027_user_merge"
+    ),
     json={
         "spark_python_task": {
             "python_file": base_spark_jobs_path + "propagate_table_metadata.py",

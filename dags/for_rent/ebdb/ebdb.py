@@ -12,6 +12,9 @@ from airflow.utils.helpers import cross_downstream, chain
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.task_groups.datalake_task_group import (
+    DatalakeTaskGroup,
+)
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
@@ -81,7 +84,12 @@ def clean_tasks(table_name):
     slugged_table_name = table_name.replace("_", "-")
     clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
         dag=dag,
-        task_id=f"create-clean-{slugged_table_name}-in-data-lake",
+        task_id=DatalakeTaskGroup.generate_default_task_id(
+            task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+            layer=LayerEnum.CLEAN,
+            schema=SOURCE,
+            table_name=table_name
+        ),
         json={
             "spark_python_task": {
                 "python_file": CLEAN_SPARK_JOB_PATH,
@@ -92,7 +100,12 @@ def clean_tasks(table_name):
 
     create_clean_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
         dag=dag,
-        task_id=f"create-{slugged_table_name}-clean-external-table",
+        task_id=DatalakeTaskGroup.generate_default_task_id(
+            task_prefix=DatalakeTaskGroup.CREATE_EXTERNAL_TABLE_TASK_PREFIX,
+            layer=LayerEnum.CLEAN,
+            schema=SOURCE,
+            table_name=table_name
+        ),
         pool="athena",
         json={
             "spark_python_task": {

@@ -1,11 +1,12 @@
 from copy import copy
-from typing import Dict
+from typing import Dict, Optional
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.airflow.task_group_method_factory import TaskGroupMethodFactory
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.formatters import StringFormatter
 
 logger = QuintoAndarLogger("BaseTaskGroup")
 
@@ -19,6 +20,15 @@ class BaseTaskGroup(object):
     TASK_GROUP_INITIAL_TASKS_DICT_KEY = "initial_tasks"
     TASK_GROUP_FINAL_TASKS_DICT_KEY = "final_tasks"
     TASK_GROUP_INDEPENDENT_TASKS_DICT_KEY = "independent_tasks"
+
+    CREATE_EXTERNAL_TABLE_TASK_PREFIX = "create-external-table"
+    DATA_QUALITY_TESTS_TASK_PREFIX = "data-quality-tests"
+    DONE_TASK_PREFIX = "done"
+    LOAD_TASK_PREFIX = "load"
+    PROPAGATE_TABLE_METADATA_TASK_PREFIX = "propagate-table-metadata"
+    PROPAGATION_BYPASS_TASK_PREFIX = "propagation-bypass"
+    SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX = "sync-hive-metastore-partitions"
+    SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX = "sync-hive-metastore-structure"
 
     def __init__(
         self,
@@ -51,7 +61,7 @@ class BaseTaskGroup(object):
         self,
         layer: LayerEnum,
         tables_customization: Dict[str, Dict[str, str]] = None,
-        **kwargs
+        **kwargs,
     ) -> dict:
         """
         Create a task-group for each table, based on each table's respective sql file
@@ -310,3 +320,40 @@ class BaseTaskGroup(object):
         task_groups_copy = copy(task_groups_boundaries)
         task_groups_copy.pop(task_group_name, None)
         return task_groups_copy
+
+    @staticmethod
+    def generate_default_task_id(
+        task_prefix: str,
+        layer: LayerEnum,
+        schema: Optional[str] = None,
+        table_name: Optional[str] = None,
+    ):
+        """
+        Build a standard task id for a given layer, task type, source and table name
+
+        :param task_prefix: prefix of the task name
+        :type task_prefix: str
+        :param layer: layer name
+        :type layer: LayerEnum
+        :param schema: schema/source name
+        :type schema: str
+        :param table_name: table name
+        :type table_name: str
+        :rtype: str
+        """
+
+        task_id = f"{task_prefix}-{layer.value}"
+
+        is_load_task = task_prefix in (
+            BaseTaskGroup.LOAD_TASK_PREFIX,
+            BaseTaskGroup.CREATE_EXTERNAL_TABLE_TASK_PREFIX,
+        )
+        is_dw_task = layer in (LayerEnum.DW_STAGING, LayerEnum.DW)
+
+        # Load tasks from layers other than DW, by default, don't have schema in the task name
+        if schema and (not is_load_task or is_dw_task):
+            task_id += f"-{schema}"
+        if table_name:
+            task_id += f"-{table_name}"
+
+        return StringFormatter.slugify(task_id)

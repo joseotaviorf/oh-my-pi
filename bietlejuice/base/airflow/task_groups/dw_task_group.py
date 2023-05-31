@@ -12,7 +12,6 @@ from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.formatters import StringFormatter
 from bietlejuice.services import ConfigurationService
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 
@@ -21,6 +20,11 @@ class DWTaskGroup(BaseTaskGroup):
     """
     Responsible for creating task groups related to dw operations
     """
+
+    ADD_DEFAULT_ROW_TASK_PREFIX = "add-default-row-to"
+    BRIDGE_TASK_PREFIX = "bridge"
+    LOAD_INTO_REDSHIFT_TASK_PREFIX = "load-into-redshift"
+    TEST_EMPTINESS_TASK_PREFIX = "test-emptiness"
 
     def __init__(
         self,
@@ -87,7 +91,8 @@ class DWTaskGroup(BaseTaskGroup):
         :return: dict with initial and final tasks of the created task group
         :rtype: dict[str:list[airflow.models.BaseOperator]]
         """
-        layer = LayerEnum.DW.value
+        layer_enum = LayerEnum.DW
+        layer = layer_enum.value
         table_customization = table_customization or {}
 
         table_database_schema = self.__get_table_schema(table_customization)
@@ -104,8 +109,11 @@ class DWTaskGroup(BaseTaskGroup):
 
         load_table_to_dw_final_schema_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
-            task_id=StringFormatter.slugify(
-                f"load-{layer}-{table_database_schema}-{table_name}"
+            task_id=DWTaskGroup.generate_default_task_id(
+                task_prefix=DWTaskGroup.LOAD_TASK_PREFIX,
+                layer=layer_enum,
+                schema=table_database_schema,
+                table_name=table_name,
             ),
             json={
                 "spark_python_task": {
@@ -128,8 +136,11 @@ class DWTaskGroup(BaseTaskGroup):
         if has_load_to_redshift_task:
             load_table_to_redshift_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=StringFormatter.slugify(
-                    f"load-{table_database_schema}-{table_name}-into-redshift"
+                task_id=DWTaskGroup.generate_default_task_id(
+                    task_prefix=DWTaskGroup.LOAD_INTO_REDSHIFT_TASK_PREFIX,
+                    layer=layer_enum,
+                    schema=table_database_schema,
+                    table_name=table_name,
                 ),
                 json={
                     "spark_python_task": {
@@ -152,8 +163,11 @@ class DWTaskGroup(BaseTaskGroup):
 
         sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
-            task_id=StringFormatter.slugify(
-                f"sync-hive-metastore-{layer}-{table_name}-structure"
+            task_id=DWTaskGroup.generate_default_task_id(
+                task_prefix=DWTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+                layer=layer_enum,
+                schema=table_database_schema,
+                table_name=table_name,
             ),
             json={
                 "spark_python_task": {
@@ -172,8 +186,11 @@ class DWTaskGroup(BaseTaskGroup):
 
         sync_metastore_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
-            task_id=StringFormatter.slugify(
-                f"sync-hive-metastore-{layer}-{table_name}-partitions"
+            task_id=DWTaskGroup.generate_default_task_id(
+                task_prefix=DWTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
+                layer=layer_enum,
+                schema=table_database_schema,
+                table_name=table_name,
             ),
             json={
                 "spark_python_task": {
@@ -197,8 +214,11 @@ class DWTaskGroup(BaseTaskGroup):
         ):
             propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=StringFormatter.slugify(
-                    f"propagate-table-metadata-{layer}-{table_name}"
+                task_id=DWTaskGroup.generate_default_task_id(
+                    task_prefix=DWTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+                    layer=layer_enum,
+                    schema=table_database_schema,
+                    table_name=table_name,
                 ),
                 json={
                     "spark_python_task": {
@@ -216,7 +236,12 @@ class DWTaskGroup(BaseTaskGroup):
 
             dummy_task = DummyOperator(
                 dag=self.dag,
-                task_id=f"bridge-{layer}-{table_name}",
+                task_id=DWTaskGroup.generate_default_task_id(
+                    task_prefix=DWTaskGroup.BRIDGE_TASK_PREFIX,
+                    layer=layer_enum,
+                    schema=table_database_schema,
+                    table_name=table_name,
+                ),
                 trigger_rule="all_done",
             )
 
@@ -264,7 +289,8 @@ class DWTaskGroup(BaseTaskGroup):
         :return: dict with initial and final tasks of the created task group
         :rtype: dict[str:list[airflow.models.BaseOperator]]
         """
-        layer = LayerEnum.DW_STAGING.value
+        layer_enum = LayerEnum.DW_STAGING
+        layer = layer_enum.value
         table_customization = table_customization or {}
 
         table_database_schema = self.__get_table_schema(table_customization)
@@ -293,8 +319,11 @@ class DWTaskGroup(BaseTaskGroup):
 
         load_table_to_dw_staging_schema_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
-            task_id=StringFormatter.slugify(
-                f"load-{layer}-{table_database_schema}-{table_name}"
+            task_id=DWTaskGroup.generate_default_task_id(
+                task_prefix=DWTaskGroup.LOAD_TASK_PREFIX,
+                layer=layer_enum,
+                schema=table_database_schema,
+                table_name=table_name,
             ),
             json={
                 "spark_python_task": {
@@ -315,8 +344,11 @@ class DWTaskGroup(BaseTaskGroup):
 
             data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=StringFormatter.slugify(
-                    f"data-quality-tests-{layer}-{table_database_schema}-{table_name}"
+                task_id=DWTaskGroup.generate_default_task_id(
+                    task_prefix=DWTaskGroup.DATA_QUALITY_TESTS_TASK_PREFIX,
+                    layer=layer_enum,
+                    schema=table_database_schema,
+                    table_name=table_name,
                 ),
                 json={
                     "spark_python_task": {
@@ -371,13 +403,17 @@ class DWTaskGroup(BaseTaskGroup):
         :return: dict with initial and final tasks of the created task group
         :rtype: dict[str:list[airflow.models.BaseOperator]]
         """
-        layer = LayerEnum.DW_STAGING.value
+        layer_enum = LayerEnum.DW_STAGING
+        layer = layer_enum.value
 
         # TODO: Remove this test once we decide that our Data Quality validations will block downstream tasks
         emptiness_test_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
-            task_id=StringFormatter.slugify(
-                f"test-{layer}-{table_database_schema}-{table_name}-emptiness"
+            task_id=DWTaskGroup.generate_default_task_id(
+                task_prefix=DWTaskGroup.TEST_EMPTINESS_TASK_PREFIX,
+                layer=layer_enum,
+                schema=table_database_schema,
+                table_name=table_name,
             ),
             json={
                 "spark_python_task": {
@@ -393,8 +429,11 @@ class DWTaskGroup(BaseTaskGroup):
         if self.is_dim(table_name):
             add_default_row_to_dim_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=StringFormatter.slugify(
-                    f"add-default-row-to-{layer}-{table_database_schema}-{table_name}"
+                task_id=DWTaskGroup.generate_default_task_id(
+                    task_prefix=DWTaskGroup.ADD_DEFAULT_ROW_TASK_PREFIX,
+                    layer=layer_enum,
+                    schema=table_database_schema,
+                    table_name=table_name,
                 ),
                 json={
                     "spark_python_task": {

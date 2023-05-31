@@ -1,6 +1,5 @@
 import json
 from datetime import timedelta
-
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
@@ -9,7 +8,6 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.formatters import StringFormatter
 from bietlejuice.services import ConfigurationService
 
 logger = QuintoAndarLogger("ReverseTaskGroup")
@@ -96,7 +94,6 @@ class ReverseTaskGroup(BaseTaskGroup):
         :return: dict with initial and final tasks of the created task group
         :rtype: dict
         """
-        slugged_table_name = StringFormatter.slugify(table_name)
         partitions = partitions or []
         spark_session_configs = spark_session_configs or {}
         extra_query_template_params = extra_query_template_params or {}
@@ -104,7 +101,12 @@ class ReverseTaskGroup(BaseTaskGroup):
         load_table_mode = "incremental" if is_incremental else "full"
 
         load_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"load-{layer.value}-{slugged_table_name}",
+            task_id=ReverseTaskGroup.generate_default_task_id(
+                task_prefix=ReverseTaskGroup.LOAD_TASK_PREFIX,
+                layer=LayerEnum.REVERSE,
+                schema=source_database_base_name,
+                table_name=table_name,
+            ),
             dag=self.dag,
             json={
                 "spark_python_task": {
@@ -140,7 +142,12 @@ class ReverseTaskGroup(BaseTaskGroup):
 
             data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"data-quality-tests-{layer.value}-{slugged_table_name}",
+                task_id=ReverseTaskGroup.generate_default_task_id(
+                    task_prefix=ReverseTaskGroup.DATA_QUALITY_TESTS_TASK_PREFIX,
+                    layer=LayerEnum.REVERSE,
+                    schema=source_database_base_name,
+                    table_name=table_name,
+                ),
                 json={
                     "spark_python_task": {
                         "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",

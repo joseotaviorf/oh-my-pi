@@ -25,14 +25,14 @@ class BietlejuiceDependencyHelper:
         """
         Parses the DAG and table name from task name
         """
-        if task_name.endswith("-into-redshift"):
+        if ":load-into-redshift" in task_name:
             return BietlejuiceDependencyHelper._extract_dag_and_table_from_redshift_task(
                 task_name
             )
         table_group_number = 4
-        if task_name.endswith("-external-table"):
+        if ":create-external-table" in task_name:
             task_name_pattern = (
-                "bietlejuice\.(.*):create-(enrich|raw|clean|dw)*-(.*)-external-table"
+                "bietlejuice\.(.*):create-external-table-(enrich|raw|clean|dw)*-(.*)"
             )
             table_group_number = 3
         else:
@@ -77,9 +77,7 @@ class BietlejuiceDependencyHelper:
         """
         Parses the DAG and table name from load into redshift tasks
         """
-        match = re.search(
-            "bietlejuice\.(.*):load-(public)?(.*)-into-redshift", task_name
-        )
+        match = re.search("bietlejuice\.(.*):load-into-redshift-dw-(.*)", task_name)
 
         if not match:
             match_dag_name = re.search(DEPENDENCIES_PATTERN, task_name)
@@ -88,7 +86,7 @@ class BietlejuiceDependencyHelper:
 
         layer = "dw"
         dag_name = match.group(1)
-        redshift_task = match.group(3)
+        redshift_task = match.group(2)
 
         table_name = BietlejuiceDependencyHelper._get_table_name_from_dw_task(
             dag_name, layer, redshift_task

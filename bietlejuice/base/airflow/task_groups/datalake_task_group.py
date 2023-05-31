@@ -13,7 +13,6 @@ from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.formatters import StringFormatter
 from bietlejuice.services import ConfigurationService
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 
@@ -74,7 +73,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
     def _build_load_task(
         self,
-        task_id_suffix: str,
+        task_id: str,
         extraction_spark_job_file: str,
         do_output_xcom_push: bool,
         pool: str = AIRFLOW_DEFAULT_POOL,
@@ -82,7 +81,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
     ) -> QuintoAndarDatabricksSubmitRunOperator:
 
         load_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"load-{task_id_suffix}",
+            task_id=task_id,
             pool=pool,
             dag=self.dag,
             json={
@@ -100,7 +99,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
     def _build_hive_sync_tasks(
         self,
-        task_id_suffix: str,
+        source: str,
         sync_mode: str,
         layer: str,
         database_name: str,
@@ -108,7 +107,12 @@ class DatalakeTaskGroup(BaseTaskGroup):
     ) -> list:
 
         sync_metastore_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"sync-hive-metastore-{task_id_suffix}-structure",
+            task_id=DatalakeTaskGroup.generate_default_task_id(
+                task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+                layer=LayerEnum(layer),
+                schema=source,
+                table_name=table_name,
+            ),
             dag=self.dag,
             json={
                 "spark_python_task": {
@@ -128,7 +132,12 @@ class DatalakeTaskGroup(BaseTaskGroup):
         )
 
         sync_metastore_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"sync-hive-metastore-{task_id_suffix}-partitions",
+            task_id=DatalakeTaskGroup.generate_default_task_id(
+                task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
+                layer=LayerEnum(layer),
+                schema=source,
+                table_name=table_name,
+            ),
             dag=self.dag,
             json={
                 "spark_python_task": {
@@ -152,7 +161,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
     # TODO: This method requires a refactor ASAP due to the quantity of conditions
     def _build_metadata_propagator_tasks(
         self,
-        task_id_suffix: str,
         layer: str,
         database_name: str,
         table_name: str,
@@ -195,7 +203,12 @@ class DatalakeTaskGroup(BaseTaskGroup):
             )
             propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"propagate-table-metadata-{task_id_suffix}",
+                task_id=DatalakeTaskGroup.generate_default_task_id(
+                    task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+                    layer=LayerEnum(layer),
+                    schema=source,
+                    table_name=table_name,
+                ),
                 json={
                     "spark_python_task": {
                         "python_file": path.join(
@@ -212,7 +225,12 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
             bypass_task = DummyOperator(
                 dag=self.dag,
-                task_id=f"propagation-bypass-{task_id_suffix}",
+                task_id=DatalakeTaskGroup.generate_default_task_id(
+                    task_prefix=DatalakeTaskGroup.PROPAGATION_BYPASS_TASK_PREFIX,
+                    layer=LayerEnum(layer),
+                    schema=source,
+                    table_name=table_name,
+                ),
                 trigger_rule="all_done",
             )
 
@@ -253,13 +271,14 @@ class DatalakeTaskGroup(BaseTaskGroup):
             return data_quality_tasks
 
         for table in tables_names:
-            task_id_suffix = StringFormatter.slugify(
-                "-".join(id_part for id_part in [layer, source, table] if id_part)
-            )
-
             data_quality_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"data-quality-tests-{task_id_suffix}",
+                task_id=DatalakeTaskGroup.generate_default_task_id(
+                    task_prefix=DatalakeTaskGroup.DATA_QUALITY_TESTS_TASK_PREFIX,
+                    layer=LayerEnum(layer),
+                    schema=source,
+                    table_name=table_name,
+                ),
                 json={
                     "spark_python_task": {
                         "python_file": path.join(
@@ -323,15 +342,18 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :rtype: dict
         """
 
-        layer = LayerEnum.RAW.value
-        tasks_id_suffix = StringFormatter.slugify(
-            "-".join(id_part for id_part in [layer, source, table_name] if id_part)
-        )
+        layer_enum = LayerEnum.RAW
+        layer = layer_enum.value
         sync_mode = self.SINGLE_TABLE if table_name else self.ALL_TABLES
 
         load_table_task = self._build_load_task(
             pool=pool,
-            task_id_suffix=tasks_id_suffix,
+            task_id=DatalakeTaskGroup.generate_default_task_id(
+                task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+                layer=layer_enum,
+                schema=source,
+                table_name=table_name,
+            ),
             extraction_spark_job_file=extraction_spark_job_file,
             spark_job_extra_args=raw_spark_job_extra_args or [],
             do_output_xcom_push=do_output_xcom_push,
@@ -339,7 +361,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         if has_hive_sync:
             hive_sync_tasks = self._build_hive_sync_tasks(
-                task_id_suffix=tasks_id_suffix,
+                source=source,
                 sync_mode=sync_mode,
                 layer=layer,
                 database_name=database_name,
@@ -347,7 +369,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
             )
 
             propagate_table_metadata_tasks = self._build_metadata_propagator_tasks(
-                task_id_suffix=tasks_id_suffix,
                 layer=layer,
                 database_name=database_name,
                 table_name=table_name,
@@ -440,17 +461,20 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :rtype: dict
         """
 
-        layer = layer.value
+        layer_enum = layer
+        layer = layer_enum.value
         partitions = partitions or []
         spark_session_configs = spark_session_configs or {}
         extra_query_template_params = extra_query_template_params or {}
         table_extraction_type = "incremental" if is_incremental else "full"
-        tasks_id_suffix = StringFormatter.slugify(
-            "-".join(id_part for id_part in [layer, table_name] if id_part)
-        )
 
         load_table_task = self._build_load_task(
-            task_id_suffix=tasks_id_suffix,
+            task_id=DatalakeTaskGroup.generate_default_task_id(
+                task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+                layer=layer_enum,
+                schema=source_database_base_name,
+                table_name=table_name,
+            ),
             extraction_spark_job_file=path.join(
                 self.spark_jobs_path, f"load_table_{table_extraction_type}.py"
             ),
@@ -472,7 +496,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         if has_hive_sync:
             hive_sync_tasks = self._build_hive_sync_tasks(
-                task_id_suffix=tasks_id_suffix,
+                source=source_database_base_name,
                 sync_mode=self.SINGLE_TABLE,
                 layer=layer,
                 database_name=target_database_base_name,
@@ -480,10 +504,10 @@ class DatalakeTaskGroup(BaseTaskGroup):
             )
 
             propagate_table_metadata_tasks = self._build_metadata_propagator_tasks(
-                task_id_suffix=tasks_id_suffix,
                 layer=layer,
                 database_name=target_database_base_name,
                 table_name=table_name,
+                source=source_database_base_name,
                 metadata_type=MetadataTypeEnum.LINEAGE.value,
             )
 
@@ -499,7 +523,12 @@ class DatalakeTaskGroup(BaseTaskGroup):
         if has_create_external_table_task:
             create_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"create-{tasks_id_suffix}-external-table",
+                task_id=DatalakeTaskGroup.generate_default_task_id(
+                    task_prefix=DatalakeTaskGroup.CREATE_EXTERNAL_TABLE_TASK_PREFIX,
+                    layer=layer_enum,
+                    schema=source_database_base_name,
+                    table_name=table_name,
+                ),
                 json={
                     "spark_python_task": {
                         "python_file": path.join(

@@ -22,7 +22,7 @@ class TestBietlejuiceRedundantDependencyFinder:
         e_redundancies = finder.find_redundant_dependencies("bietlejuice.dw_e")
 
         c_expected_redundancies = [
-            "bietlejuice.enrich_a:create-enrich-table-one-external-table"
+            "bietlejuice.enrich_a:create-external-table-enrich-table-one"
         ]
         e_expected_redundancies = [
             "bietlejuice.enrich_a:load-enrich-table-one",
