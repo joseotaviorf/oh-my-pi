@@ -4,8 +4,7 @@ WITH invoices AS (
     ies.id_contract,
     ie.entry_type,
     brl_entry_due_amount,
-    ie.from_account_type,
-    ie.to_account_type,
+    ii.invoice_user,
     invoice.accrual_year_month
   FROM
     datalake_invoice.invoice_entries AS ies
@@ -15,6 +14,9 @@ WITH invoices AS (
   LEFT JOIN
     datalake_retsuko.invoice_entry AS ie
       ON ies.id = ie.id
+  LEFT JOIN
+    datalake_retsuko.invoice_info AS ii
+      ON invoice.id_external = ii.id_invoice
 ),
 
 invoices_values AS (
@@ -26,8 +28,7 @@ invoices_values AS (
   FROM
     invoices
   WHERE
-    from_account_type = 'tenant'
-    AND to_account_type = 'contract'
+    invoice_user = 'tenant'
   GROUP BY 1,4
 ),
 
