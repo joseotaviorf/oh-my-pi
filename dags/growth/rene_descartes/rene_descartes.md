@@ -21,6 +21,8 @@ More information about run time [here]({chart_url}{dag_id}).
     - `acquisition_misc_data`
     - `address_aud`
     - `address`
+    - `house_lead_conversion_aud`
+    - `house_lead_conversion`
     - `house_lead_aud`
     - `house_lead`
     - `lead_rejection_aud`

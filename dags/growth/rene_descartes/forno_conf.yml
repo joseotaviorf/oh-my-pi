@@ -7,6 +7,8 @@ tables:
   - address
   - house_lead_aud
   - house_lead
+  - house_lead_conversion_aud
+  - house_lead_conversion
   - lead_rejection_aud
   - lead_rejection
   - owner_aud
