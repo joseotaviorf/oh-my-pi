@@ -7,16 +7,12 @@ inner_dependencies:
   coverage:
     - recommendation
     - recommendation_catalog
-  diversity:
-    - recommendation
-    - embeddings
   popularity:
     - recommendation
     - recommendation_catalog
     - item_interaction
   recommendation_metrics_agg_recset:
     - recommendation_flow
-    - diversity
     - popularity
   recommendation_metrics_agg_display_type_business_context:
     - recommendation_metrics_agg_recset
@@ -50,10 +46,6 @@ tables:
     partition_cols:
       - dt_rec_received
   coverage:
-    is_incremental: false
-    partition_cols:
-      - dt_rec_received
-  diversity:
     is_incremental: false
     partition_cols:
       - dt_rec_received

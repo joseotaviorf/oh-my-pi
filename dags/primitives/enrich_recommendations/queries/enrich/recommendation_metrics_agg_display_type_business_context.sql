@@ -37,9 +37,9 @@ SELECT
     SUM(sum_ndcg_at_5) / SUM(count_recsets) AS mean_ndcg_at_5,
     SUM(sum_ndcg_at_10) / SUM(count_recsets) AS mean_ndcg_at_10,
 
-    SUM(sum_diversity_at_3) / SUM(count_recsets) AS mean_diversity_at_3,
-    SUM(sum_diversity_at_5) / SUM(count_recsets) AS mean_diversity_at_5,
-    SUM(sum_diversity_at_10) / SUM(count_recsets) AS mean_diversity_at_10,
+    -- SUM(sum_diversity_at_3) / SUM(count_recsets) AS mean_diversity_at_3,
+    -- SUM(sum_diversity_at_5) / SUM(count_recsets) AS mean_diversity_at_5,
+    -- SUM(sum_diversity_at_10) / SUM(count_recsets) AS mean_diversity_at_10,
 
     SUM(sum_repetition_at_3) / SUM(count_recsets) AS mean_repetition_at_3,
     SUM(sum_repetition_at_5) / SUM(count_recsets) AS mean_repetition_at_5,

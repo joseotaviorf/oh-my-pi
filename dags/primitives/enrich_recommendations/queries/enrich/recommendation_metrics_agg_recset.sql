@@ -24,15 +24,15 @@ WITH idcg AS (
 recommendation_feats AS
 (
 SELECT recommendation_flow.*,
-    COALESCE(diversity.diversity_at_3, 0) AS diversity_at_3,
-    COALESCE(diversity.diversity_at_5, 0) AS diversity_at_5,
-    COALESCE(diversity.diversity_at_10, 0) AS diversity_at_10,
-    COALESCE(popularity.popularity, 0) AS popularity,
+    -- COALESCE(diversity.diversity_at_3, 0) AS diversity_at_3,
+    -- COALESCE(diversity.diversity_at_5, 0) AS diversity_at_5,
+    -- COALESCE(diversity.diversity_at_10, 0) AS diversity_at_10,
+    -- COALESCE(popularity.popularity, 0) AS popularity,
     idcg_k
 FROM datalake_recommendations.recommendation_flow AS recommendation_flow
-LEFT JOIN
-    datalake_recommendations.diversity AS diversity
-        ON recommendation_flow.id_recset = diversity.id_recset
+-- LEFT JOIN
+    -- datalake_recommendations.diversity AS diversity
+        -- ON recommendation_flow.id_recset = diversity.id_recset
 LEFT JOIN
     datalake_recommendations.popularity AS popularity
     ON recommendation_flow.id_rec = popularity.id_rec
@@ -76,7 +76,7 @@ metrics_at_3 AS (
         MAX(INT(true_positive) / item_rank) AS rr_at_3,
         COALESCE(SUM((INT(true_positive) * cum_true_positive) / item_rank) / LEAST(MAX(count_relevant_items), COUNT(item_rank)), 0) AS ap_at_3,
         SUM(INT(true_positive) / log2(item_rank+1)) / MAX(idcg_k) AS ndcg_at_3,
-        MEAN(diversity_at_3) AS diversity_at_3,
+        -- MEAN(diversity_at_3) AS diversity_at_3,
         SUM(INT(repeated_rec)) / COUNT(item_rank) AS repetition_at_3,
         SUM(INT(rec_to_favorite)) / COUNT(item_rank) AS rec_to_favorite_at_3,
         MAX(INT(rec_to_sale_flow_one_day)) AS hit_rec_to_sale_flow_one_day_at_3,
@@ -104,7 +104,7 @@ metrics_at_5 AS (
         MAX(INT(true_positive) / item_rank) AS rr_at_5,
         COALESCE(SUM((INT(true_positive) * cum_true_positive) / item_rank) / LEAST(MAX(count_relevant_items), COUNT(item_rank)), 0) AS ap_at_5,
         SUM(INT(true_positive) / log2(item_rank+1)) / MAX(idcg_k) AS ndcg_at_5,
-        MEAN(diversity_at_5) AS diversity_at_5,
+        -- MEAN(diversity_at_5) AS diversity_at_5,
         SUM(INT(repeated_rec)) / COUNT(item_rank) AS repetition_at_5,
         SUM(INT(rec_to_favorite)) / COUNT(item_rank) AS rec_to_favorite_at_5,
         MAX(INT(rec_to_sale_flow_one_day)) AS hit_rec_to_sale_flow_one_day_at_5,
@@ -133,7 +133,7 @@ metrics_at_10 AS
         MAX(INT(true_positive) / item_rank) AS rr_at_10,
         COALESCE(SUM((INT(true_positive) * cum_true_positive) / item_rank) / LEAST(MAX(count_relevant_items), COUNT(item_rank)), 0) AS ap_at_10,
         SUM(INT(true_positive) / log2(item_rank+1)) / MAX(idcg_k) AS ndcg_at_10,
-        MEAN(diversity_at_10) AS diversity_at_10,
+        -- MEAN(diversity_at_10) AS diversity_at_10,
         SUM(INT(repeated_rec)) / COUNT(item_rank) AS repetition_at_10,
         SUM(INT(rec_to_favorite)) / COUNT(item_rank) AS rec_to_favorite_at_10,
         MAX(INT(rec_to_sale_flow_one_day)) AS hit_rec_to_sale_flow_one_day_at_10,
@@ -162,7 +162,7 @@ hit_rate_at_3,
 rr_at_3,
 ap_at_3,
 ndcg_at_3,
-diversity_at_3,
+-- diversity_at_3,
 repetition_at_3,
 rec_to_favorite_at_3,
 rec_to_sale_flow_one_day_at_3,
@@ -183,7 +183,7 @@ hit_rate_at_5,
 rr_at_5,
 ap_at_5,
 ndcg_at_5,
-diversity_at_5,
+-- diversity_at_5,
 repetition_at_5,
 rec_to_favorite_at_5,
 rec_to_sale_flow_one_day_at_5,
@@ -204,7 +204,7 @@ hit_rate_at_10,
 rr_at_10,
 ap_at_10,
 ndcg_at_10,
-diversity_at_10,
+-- diversity_at_10,
 repetition_at_10,
 rec_to_favorite_at_10,
 rec_to_sale_flow_one_day_at_10,
