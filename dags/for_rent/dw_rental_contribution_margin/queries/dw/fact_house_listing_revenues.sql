@@ -107,7 +107,7 @@ month_rental_anticipation AS (
 brokerage_finance AS (
   SELECT
     id_contract_ebdb,
-    SUM(invoice_paid_fee) AS bfi,
+    SUM(invoice_theorical_fee) AS bfi,
     accrual_year_month
   FROM
     datalake_revenue_lines.brokerage_finance

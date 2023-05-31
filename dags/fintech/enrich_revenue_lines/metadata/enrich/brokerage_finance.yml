@@ -13,7 +13,11 @@ columns:
   id_contract_ebdb:
     description: "Id of the contract in main"
     lineage:
-      - datalake_owner_fees_clean.contract.id_external
+      - datalake_invoice.invoice_entries.id_contract
+  rent:
+    description: Rent value of the contract.
+    lineage:
+      - datalake_ebdb_contract.contract.rent
   prod_theorical_amount:
     description: "Amortization amount calculated by the BFI product"
   prod_theorical_fee:
@@ -26,8 +30,6 @@ columns:
     description: "Interest amount that appears on the invoice"
   invoice_paid_fee:
     description: "Interest amount that whas paid"
-  installment:
-    description: "Number of the installment"
   total_installments:
     description: "Number of total installments"
     lineage:

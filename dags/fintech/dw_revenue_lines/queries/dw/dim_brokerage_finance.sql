@@ -7,7 +7,6 @@ SELECT
     invoice_paid_amount,
     invoice_theorical_fee,
     invoice_paid_fee,
-    installment,
     total_installments,
     premium_fee,
     real_state_agent_share,

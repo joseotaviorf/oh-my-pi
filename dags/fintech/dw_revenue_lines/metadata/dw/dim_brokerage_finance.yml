@@ -37,10 +37,6 @@ columns:
     lineage:
     - datalake_revenue_lines.brokerage_finance.invoice_paid_fee
     description: Interest amount that whas paid
-  installment:
-    lineage:
-    - datalake_revenue_lines.brokerage_finance.installment
-    description: Number of the installment
   total_installments:
     lineage:
     - datalake_revenue_lines.brokerage_finance.total_installments
