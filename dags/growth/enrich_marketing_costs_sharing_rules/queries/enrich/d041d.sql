@@ -39,7 +39,7 @@ tenant_prospect_events AS (
 		tta.utm_campaign,
 		TIMESTAMP(tta.first_message_ts) AS ts_interaction
 	FROM
-		dw_datamarts_cross.talk_to_agent AS tta
+		dw_datamarts.talk_to_agent AS tta
 	INNER JOIN
         dw_public.fact_house_listings AS fhl
             USING(sk_house_listing)

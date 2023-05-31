@@ -1625,7 +1625,7 @@ bietlejuice.enrich_marketing_costs_offline:
   - bietlejuice.marketing_offline_costs:load-clean-marketing-offline-manual-share-city-group
   - bietlejuice.marketing_offline_costs:load-clean-marketing-offline-manual-share-cost-center
 bietlejuice.enrich_marketing_costs_sharing_rules:
-  - bietlejuice.dw_datamarts_cross:create-talk-to-agent-in-datalake
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
