@@ -411,8 +411,8 @@ bietlejuice.dw_datamarts_spark.for_sale:
 bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region
-  - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
-  - bietlejuice.dw_datamarts_cross:create-talk-to-agent-in-datalake
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
   - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
