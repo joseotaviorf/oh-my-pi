@@ -1,0 +1,57 @@
+---
+database_name: datalake_inspections_clean
+table_name: contestation
+description:
+  When an repair of an object is requested and the tenant understand it
+  as improper, it is possible to contest the repair request.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_contestation:
+    lineage:
+      - datalake_inspections_raw.contestation.id
+    description: Auto-incrementing internal ID
+  id_repair_request:
+    lineage:
+      - datalake_inspections_raw.contestation.repair_request_id
+    description: ID of the repair the dispute is referring to
+  id_reviewer:
+    lineage:
+      - datalake_inspections_raw.contestation.reviewer_id
+    description: Creator of the contestation. For this case, it will be the tenant
+  uuid:
+    lineage:
+      - datalake_inspections_raw.contestation.uuid
+    description: Auto-incrementing external ID
+  comment:
+    lineage:
+      - datalake_inspections_raw.contestation.comment
+    description: Contestation description
+  reason:
+    lineage:
+      - datalake_inspections_raw.contestation.reason
+    description: "Reason/Justification for dispute"
+    categories:
+      DISAGREE: ""
+      SAME: ""
+      REPAIR_NEGOTIATED: ""
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.contestation.created_at
+    description: Record creation date
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.contestation.updated_at
+    description: Record update date
+  year:
+    lineage:
+      - datalake_inspections_raw.contestation.year
+    description: Year of update date
+  month:
+    lineage:
+      - datalake_inspections_raw.contestation.month
+    description: Month of update date
+  day:
+    lineage:
+      - datalake_inspections_raw.contestation.day
+    description: Day of update date

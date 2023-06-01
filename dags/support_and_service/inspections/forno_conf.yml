@@ -16,7 +16,16 @@ tables:
   assessment:
     is_incremental: True
     date_column: updated_at
+  contestation:
+    is_incremental: True
+    date_column: updated_at
+  contestation_media:
+    is_incremental: True
+    date_column: updated_at
   inspection:
+    is_incremental: True
+    date_column: updated_at
+  inspection_aud:
     is_incremental: True
     date_column: updated_at
   issue_type:

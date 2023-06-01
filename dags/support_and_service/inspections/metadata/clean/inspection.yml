@@ -77,7 +77,7 @@ columns:
       change in the property, such as the creation of rooms, for example - offboarding:
       Inspection carried out after the tenant leaves the property, to certify the
       conditions of the house"
-  comparative:
+  is_comparative:
     lineage:
       - datalake_inspections_raw.inspection.comparative
     description:
