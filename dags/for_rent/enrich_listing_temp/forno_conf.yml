@@ -2,6 +2,8 @@
 tables:
   - table_name: dim_house_listing_lbc
     partitions: [country_code]
+  - table_name: fact_listing_rent_flows_lbc
+    partitions: [country_code]
   - table_name: fact_house_listings_lbc
     partitions: [country_code]
   - table_name: fact_house_listing_status_lbc
@@ -21,6 +23,8 @@ custom_cluster:
 inner_dependencies:
   dim_house_listing_lbc:
     - lbc_house_listing
+  fact_listing_rent_flows_lbc:
+    - dim_house_listing_lbc
   fact_house_listings_lbc:
     - lbc_house_listing
     - house_listing_status_lbc

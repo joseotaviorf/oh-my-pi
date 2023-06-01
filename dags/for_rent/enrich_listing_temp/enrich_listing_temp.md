@@ -16,5 +16,6 @@ Produces the following output tables, via full load:
 - `dim_house_listing_lbc`
 - `fact_house_listings_lbc`
 - `fact_house_listing_status_lbc`
+- `fact_listing_rent_flows_lbc`
 - `house_listing_status_lbc`
 - `lbc_house_listing`
