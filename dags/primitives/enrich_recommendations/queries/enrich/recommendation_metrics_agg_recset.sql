@@ -27,7 +27,7 @@ SELECT recommendation_flow.*,
     -- COALESCE(diversity.diversity_at_3, 0) AS diversity_at_3,
     -- COALESCE(diversity.diversity_at_5, 0) AS diversity_at_5,
     -- COALESCE(diversity.diversity_at_10, 0) AS diversity_at_10,
-    -- COALESCE(popularity.popularity, 0) AS popularity,
+    COALESCE(popularity.popularity, 0) AS popularity,
     idcg_k
 FROM datalake_recommendations.recommendation_flow AS recommendation_flow
 -- LEFT JOIN
