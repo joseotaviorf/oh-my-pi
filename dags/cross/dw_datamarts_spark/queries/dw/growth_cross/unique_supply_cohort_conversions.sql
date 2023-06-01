@@ -8,6 +8,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	hp.partner AS supply_3p_partner,
 	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
@@ -56,6 +57,7 @@ SELECT
 	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
+	supply_mkt_medium,
 	supply_mkt_completion,
 	supply_3p_partner,
 	is_3p_supply,
@@ -86,7 +88,7 @@ SELECT
 	rental_administrator
 FROM
     l2p_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 27, 28
 ),
 p2q_pre AS (
 SELECT
@@ -97,6 +99,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	hp.partner AS supply_3p_partner,
 	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
@@ -145,6 +148,7 @@ SELECT
 	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
+	supply_mkt_medium,
 	supply_mkt_completion,
 	supply_3p_partner,
 	is_3p_supply,
@@ -175,7 +179,7 @@ SELECT
 	rental_administrator
 FROM
 	p2q_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 27, 28
 ),
 q2avq_pre AS (
 SELECT
@@ -186,6 +190,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	hp.partner AS supply_3p_partner,
 	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
@@ -234,6 +239,7 @@ SELECT
 	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
+	supply_mkt_medium,
 	supply_mkt_completion,
 	supply_3p_partner,
 	is_3p_supply,
@@ -264,7 +270,7 @@ SELECT
 	rental_administrator
 FROM
 	q2avq_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 27, 28
 ),
 avq2opp_pre AS (
 SELECT
@@ -275,6 +281,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	hp.partner AS supply_3p_partner,
 	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
@@ -323,6 +330,7 @@ SELECT
 	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
+	supply_mkt_medium,
 	supply_mkt_completion,
 	supply_3p_partner,
 	is_3p_supply,
@@ -353,7 +361,7 @@ SELECT
 	rental_administrator
 FROM
 	avq2opp_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 27, 28
 ),
 q2opp_pre AS (
 SELECT
@@ -364,6 +372,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	hp.partner AS supply_3p_partner,
 	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
@@ -413,6 +422,7 @@ SELECT
 	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
+	supply_mkt_medium,
 	supply_mkt_completion,
 	supply_3p_partner,
 	is_3p_supply,
@@ -443,7 +453,7 @@ SELECT
 	rental_administrator
 FROM
 	q2opp_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 27, 28
 ),
 opp2fl_pre AS (
 SELECT
@@ -454,6 +464,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	hp.partner AS supply_3p_partner,
 	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
@@ -502,6 +513,7 @@ SELECT
 	affiliate_volumetry,
 	supply_mkt_origin,
 	supply_mkt_channel,
+	supply_mkt_medium,
 	supply_mkt_completion,
 	supply_3p_partner,
 	is_3p_supply,
@@ -532,7 +544,7 @@ SELECT
 	rental_administrator
 FROM
 	opp2fl_pre
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 27, 28
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -554,6 +566,7 @@ SELECT
   ua.affiliate_volumetry,
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
+  ua.supply_mkt_medium,
   ua.supply_mkt_completion,
   ua.supply_3p_partner,
   ua.is_3p_supply,
@@ -596,6 +609,7 @@ SELECT
       WHEN supply_mkt_origin != 'Owner PWA'
           THEN supply_mkt_origin
   END AS supply_mkt_origin_detailed,
+  supply_mkt_medium,
   CASE
       WHEN supply_mkt_origin = 'B2B' OR supply_mkt_origin = 'CIQ'
           THEN supply_mkt_origin
@@ -632,4 +646,4 @@ SELECT
   current_timestamp AS ts_load
 FROM
   union_all_date
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22

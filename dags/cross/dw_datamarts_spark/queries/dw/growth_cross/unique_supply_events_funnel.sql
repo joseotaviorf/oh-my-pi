@@ -7,6 +7,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	lf.rental_administrator,
 	sales_company,
@@ -39,7 +40,7 @@ LEFT JOIN datalake_3p.houses_3p AS hp
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26
 ),
 prospect AS (
 SELECT
@@ -49,6 +50,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	lf.rental_administrator,
 	sales_company,
@@ -81,7 +83,7 @@ LEFT JOIN datalake_3p.houses_3p AS hp
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE-- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26
 ),
 qualified AS (
 SELECT
@@ -91,6 +93,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	lf.rental_administrator,
 	sales_company,
@@ -123,7 +126,7 @@ LEFT JOIN datalake_3p.houses_3p AS hp
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26
 ),
 available_qualified AS (
 SELECT
@@ -133,6 +136,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	lf.rental_administrator,
 	sales_company,
@@ -165,7 +169,7 @@ LEFT JOIN datalake_3p.houses_3p AS hp
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26
 ),
 opportunity AS (
 SELECT
@@ -175,6 +179,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	lf.rental_administrator,
 	sales_company,
@@ -207,7 +212,7 @@ LEFT JOIN datalake_3p.houses_3p AS hp
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26
 ),
 listing AS (
 SELECT
@@ -217,6 +222,7 @@ SELECT
 	ac.affiliate_volumetry,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_medium AS supply_mkt_medium,
 	lf.mkt_completion AS supply_mkt_completion,
 	lf.rental_administrator,
 	sales_company,
@@ -249,7 +255,7 @@ LEFT JOIN datalake_3p.houses_3p AS hp
 LEFT JOIN datalake_3p.houses_3p_bh AS rbh
   ON rbh.id_house = lf.sk_house_listing / 1000
 WHERE dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 25
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 26
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -271,6 +277,7 @@ SELECT
   ua.affiliate_volumetry,
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
+  ua.supply_mkt_medium,
   ua.supply_mkt_completion,
   ua.rental_administrator,
   ua.sales_company,
@@ -304,6 +311,7 @@ SELECT
   	CASE WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
   	   when supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
   	   END AS supply_mkt_origin_detailed,
+	supply_mkt_medium,
   	CASE
 	    WHEN supply_mkt_origin = 'B2B' OR supply_mkt_origin = 'CIQ' THEN supply_mkt_origin
 	    WHEN supply_mkt_completion = 'Full Self-Service' THEN 'FSS'
@@ -332,4 +340,4 @@ SELECT
     SUM(COALESCE(first_listings,0)) AS first_listings,
     current_timestamp AS ts_load
 FROM union_all_date
-GROUP BY 1, 3, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+GROUP BY 1, 3, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20

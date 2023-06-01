@@ -83,6 +83,13 @@ growth_cross:
     depends_on: 
       - performance_marketing_cluster_promotional_bonus_costs 
       - daily_target_volumes_supply
+      - affiliates_clusters
+  unique_supply_cohort_conversions:
+    depends_on:
+      - affiliates_clusters
+  unique_supply_events_funnel:
+    depends_on:
+      - affiliates_clusters
   unique_supply_cohort_conversions: {}
   unique_supply_events_funnel: {}
   user_funnel: {}

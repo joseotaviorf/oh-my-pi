@@ -7,6 +7,7 @@ WITH lead_ AS (
     NULL AS is_b2b,
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
+    fhlf.mkt_medium AS supply_mkt_medium,
     CASE
       WHEN fhlf.mkt_origin = 'B2B'
         OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
@@ -60,7 +61,7 @@ WITH lead_ AS (
   WHERE
     origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 prospect AS (
   SELECT
@@ -71,6 +72,7 @@ prospect AS (
     NULL AS is_b2b,
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
+    fhlf.mkt_medium AS supply_mkt_medium,
     CASE
       WHEN fhlf.mkt_origin = 'B2B'
         OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
@@ -124,7 +126,7 @@ prospect AS (
   WHERE
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 qualified AS (
   SELECT
@@ -135,6 +137,7 @@ qualified AS (
     NULL AS is_b2b,
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
+    fhlf.mkt_medium AS supply_mkt_medium,
     CASE
       WHEN fhlf.mkt_origin = 'B2B'
         OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
@@ -187,7 +190,7 @@ qualified AS (
   WHERE
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 available_qualified AS (
   SELECT
@@ -198,6 +201,7 @@ available_qualified AS (
     NULL AS is_b2b,
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
+    fhlf.mkt_medium AS supply_mkt_medium,
     CASE
       WHEN fhlf.mkt_origin = 'B2B'
         OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
@@ -250,7 +254,7 @@ available_qualified AS (
   WHERE
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 opportunity AS (
   SELECT
@@ -261,6 +265,7 @@ opportunity AS (
     NULL AS is_b2b,
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
+    fhlf.mkt_medium AS supply_mkt_medium,
     CASE
       WHEN fhlf.mkt_origin = 'B2B'
         OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
@@ -313,7 +318,7 @@ opportunity AS (
   WHERE
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 listing AS (
   SELECT
@@ -324,6 +329,7 @@ listing AS (
     NULL AS is_b2b,
     fhlf.mkt_origin AS supply_mkt_origin,
     fhlf.mkt_channel AS supply_mkt_channel,
+    fhlf.mkt_medium AS supply_mkt_medium,
     CASE
       WHEN fhlf.mkt_origin = 'B2B'
         OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
@@ -376,7 +382,7 @@ listing AS (
   WHERE
     fhlf.origin_table = 'Rent'
     AND (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 messages_sent AS (
   SELECT
@@ -390,6 +396,7 @@ messages_sent AS (
     END AS is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -434,7 +441,7 @@ messages_sent AS (
       ON tta.region_code = dr.region_code
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 agent_supports AS (
   SELECT
@@ -448,6 +455,7 @@ agent_supports AS (
     END AS is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -495,7 +503,7 @@ agent_supports AS (
       ON rf.sk_region = dr.sk_region
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 rent_flow_adjusted AS (
   SELECT
@@ -581,6 +589,7 @@ visits_booked AS (
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -620,7 +629,7 @@ visits_booked AS (
       AND rf.sk_booking_created_date > 0
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 visits_completed AS (
   SELECT
@@ -631,6 +640,7 @@ visits_completed AS (
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -670,7 +680,7 @@ visits_completed AS (
       AND rf.sk_visit_date > 0 AND rf.flg_visit_completed = 1
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 offer_submitted AS (
   SELECT
@@ -681,6 +691,7 @@ offer_submitted AS (
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -720,7 +731,7 @@ offer_submitted AS (
       AND rf.sk_offer_submitted_date > 0
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 offer_approved AS(
   SELECT
@@ -731,6 +742,7 @@ offer_approved AS(
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -770,7 +782,7 @@ offer_approved AS(
       AND rf.sk_offer_approved_date > 0
   WHERE
       (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data from 4 years ago
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 credit_evaluation_init AS(
   SELECT
@@ -781,6 +793,7 @@ credit_evaluation_init AS(
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -819,7 +832,7 @@ credit_evaluation_init AS(
       ON dd.sk_date = rf.sk_first_credit_evaluation_init
       AND rf.sk_first_credit_evaluation_init > 0
   WHERE (dd.date BETWEEN (DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 credit_evaluation_positive AS(
   SELECT
@@ -830,6 +843,7 @@ credit_evaluation_positive AS(
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -869,7 +883,7 @@ credit_evaluation_positive AS(
       AND rf.sk_first_credit_evaluation_positive > 0
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 guarantee_started AS(
   SELECT
@@ -880,6 +894,7 @@ guarantee_started AS(
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -919,7 +934,7 @@ guarantee_started AS(
       AND rf.sk_guarantee_date > 0
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 doc_sent AS(
   SELECT
@@ -930,6 +945,7 @@ doc_sent AS(
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -969,7 +985,7 @@ doc_sent AS(
       AND rf.sk_tenant_first_doc_sent_date > 0
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 doc_approved AS(
   SELECT
@@ -980,6 +996,7 @@ doc_approved AS(
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -1020,7 +1037,7 @@ doc_approved AS(
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
     AND sk_offer > 0 -- correcting cases with doc approved date but sk_offer = -1
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 guarantee_paid AS(
   SELECT
@@ -1031,6 +1048,7 @@ guarantee_paid AS(
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -1070,7 +1088,7 @@ guarantee_paid AS(
       AND rf.sk_guarantee_paid_date > 0
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 credit_approved AS(
   SELECT
@@ -1081,6 +1099,7 @@ credit_approved AS(
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -1120,7 +1139,7 @@ credit_approved AS(
       AND rf.sk_credit_analysis_approved_date > 0
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 contract_created AS (
   SELECT
@@ -1131,6 +1150,7 @@ contract_created AS (
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -1170,7 +1190,7 @@ contract_created AS (
       AND rf.sk_contract_created_date > 0
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 contract_signed AS (
   SELECT
@@ -1181,6 +1201,7 @@ contract_signed AS (
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -1224,7 +1245,7 @@ contract_signed AS (
       AND dc.status in ('Ativo', 'Finalizado')
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 contract_ended AS (
   SELECT
@@ -1235,6 +1256,7 @@ contract_ended AS (
     rf.is_b2b,
     NULL AS supply_mkt_origin,
     NULL AS supply_mkt_channel,
+    NULL AS supply_mkt_medium,
     NULL AS lead_context,
     NULL AS lead_processing_operation,
     NULL AS sales_company,
@@ -1275,7 +1297,7 @@ contract_ended AS (
       AND rf.sk_contract_annulment_date > 0
   WHERE
     (dd.date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '4 year') AND CURRENT_DATE) -- filter data FROM 4 years ago
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -1330,6 +1352,7 @@ union_all_date AS (
     ua.is_b2b,
     ua.supply_mkt_origin,
     ua.supply_mkt_channel,
+    ua.supply_mkt_medium,
     ua.lead_context,
     ua.lead_processing_operation,
     ua.sales_company,
@@ -1378,6 +1401,7 @@ SELECT
     WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
     WHEN supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
   END AS supply_mkt_origin_detailed,
+  supply_mkt_medium,
   lead_context,
   lead_processing_operation,
   sales_company,
@@ -1423,4 +1447,4 @@ SELECT
   current_timestamp AS ts_load
 FROM
   union_all_date
-GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+GROUP BY date, city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16

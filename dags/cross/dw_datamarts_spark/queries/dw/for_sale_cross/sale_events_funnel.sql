@@ -11,6 +11,7 @@ SELECT
     lf.sk_house_listing,
     lf.mkt_origin,
     lf.mkt_channel,
+	lf.mkt_medium,
     lf.sales_company,
     CASE WHEN dhl.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
     dhl.partner_3p_supply AS supply_3p_partner,
@@ -441,6 +442,7 @@ SELECT
     slf.mkt_campaign_context,
     slf.mkt_origin,
     slf.mkt_channel,
+	slf.mkt_medium,
     slf.mkt_type,
     slf.sales_company,
     slf.lead_processing_operation,
@@ -490,7 +492,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_lead_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 prospect AS (
 SELECT
@@ -500,6 +502,7 @@ SELECT
     slf.mkt_campaign_context,
     slf.mkt_origin,
     slf.mkt_channel,
+	slf.mkt_medium,
     slf.mkt_type,
     slf.sales_company,
     slf.lead_processing_operation,
@@ -549,7 +552,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_prospect_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 first_contacts AS (
 SELECT
@@ -559,6 +562,7 @@ SELECT
     slf.mkt_campaign_context,
     slf.mkt_origin,
     slf.mkt_channel,
+	slf.mkt_medium,
     slf.mkt_type,
     slf.sales_company,
     slf.lead_processing_operation,
@@ -608,7 +612,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_first_contact_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 qualified AS (
 SELECT
@@ -618,6 +622,7 @@ SELECT
     slf.mkt_campaign_context,
     slf.mkt_origin,
     slf.mkt_channel,
+	slf.mkt_medium,
     slf.mkt_type,
     slf.sales_company,
     slf.lead_processing_operation,
@@ -667,7 +672,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_qualified_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 available_qualified AS (
 SELECT
@@ -677,6 +682,7 @@ SELECT
     slf.mkt_campaign_context,
     slf.mkt_origin,
     slf.mkt_channel,
+	slf.mkt_medium,
     slf.mkt_type,
     slf.sales_company,
     slf.lead_processing_operation,
@@ -726,7 +732,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_available_qualified_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 opportunity AS (
 SELECT
@@ -736,6 +742,7 @@ SELECT
     slf.mkt_campaign_context,
     slf.mkt_origin,
     slf.mkt_channel,
+	slf.mkt_medium,
     slf.mkt_type,
     slf.sales_company,
     slf.lead_processing_operation,
@@ -785,7 +792,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_opportunity_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 first_listing AS (
 SELECT
@@ -795,6 +802,7 @@ SELECT
     slf.mkt_campaign_context,
     slf.mkt_origin,
     slf.mkt_channel,
+	slf.mkt_medium,
 	slf.mkt_type,
 	slf.sales_company,
 	slf.lead_processing_operation,
@@ -844,7 +852,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_first_listing_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 tta_sent AS (
 SELECT
@@ -854,6 +862,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
     NULL AS mkt_channel,
+	NULL AS mkt_medium,
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
@@ -904,7 +913,7 @@ FROM
 WHERE
     sdc.tta_started IS NOT NULL
 --  DATE(tta_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 tta_completed AS (
 SELECT
@@ -914,6 +923,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
     NULL AS mkt_channel,
+	NULL AS mkt_medium,
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
@@ -964,7 +974,7 @@ FROM
 WHERE    
     sdc.tta_started IS NOT NULL
 --  DATE(tta_started) > 0    
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 visits_booked AS (
 SELECT
@@ -974,6 +984,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
     NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1023,7 +1034,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_created IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 order by 1 desc
 ),
 visits_completed AS (
@@ -1034,6 +1045,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
     NULL AS mkt_channel,
+	NULL AS mkt_medium,
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
@@ -1083,7 +1095,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_completed IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 offers_sent AS (
 SELECT
@@ -1093,6 +1105,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
     NULL AS mkt_channel,
+	NULL AS mkt_medium,
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
@@ -1142,7 +1155,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_offer_sent IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 offers_deal_qualified AS (
 SELECT
@@ -1152,6 +1165,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
     NULL AS mkt_channel,
+	NULL AS mkt_medium,
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
@@ -1201,7 +1215,7 @@ FROM
 	sale_demand_classification
 WHERE
 	dt_deal_qualified IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 offers_accepted AS (
 SELECT
@@ -1211,6 +1225,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
     NULL AS mkt_channel,
+	NULL AS mkt_medium,
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
@@ -1260,7 +1275,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_offer_accepted IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 ccv_signed AS (
 SELECT
@@ -1270,6 +1285,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1319,7 +1335,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_ccv_signed IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 diligence_started_legaut AS (
 SELECT
@@ -1329,6 +1345,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1378,7 +1395,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_started_legaut IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 diligence_ended_legaut AS (
 SELECT
@@ -1388,6 +1405,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1437,7 +1455,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_ended_legaut IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 diligence_ended AS (
 SELECT
@@ -1447,6 +1465,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1496,7 +1515,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_ended IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 diligence_started_legal AS (
 SELECT
@@ -1506,6 +1525,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1555,7 +1575,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_started_legal IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 diligence_ended_legal AS (
 SELECT
@@ -1565,6 +1585,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1614,7 +1635,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_ended_legal IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 credit_sent AS (
 SELECT
@@ -1624,6 +1645,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1673,7 +1695,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_credit_started IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 credit_approved AS (
 SELECT
@@ -1683,6 +1705,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1732,7 +1755,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_credit_approved IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 finan_started AS (
 SELECT
@@ -1742,6 +1765,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1791,7 +1815,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_finan_started IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 finan_ended AS (
 SELECT
@@ -1801,6 +1825,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1850,7 +1875,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_finan_ended IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 payment_concluded AS (
 SELECT
@@ -1860,6 +1885,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1909,7 +1935,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_payment_concluded IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 notes_registry_started AS (
 SELECT
@@ -1919,6 +1945,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -1968,7 +1995,7 @@ FROM
 	sale_demand_classification
 WHERE
 	dt_notes_registry_started IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 notes_registry_ended AS (
 SELECT
@@ -1978,6 +2005,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -2027,7 +2055,7 @@ FROM
 	sale_demand_classification
 WHERE
 	dt_notes_registry_ended IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 matricula_inicio AS (
 SELECT
@@ -2037,6 +2065,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -2086,7 +2115,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_matricula_inicio IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 matricula_atualizada AS (
 SELECT
@@ -2096,6 +2125,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -2145,7 +2175,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_matricula_atualizada IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 entrega_chave AS (
 SELECT
@@ -2155,6 +2185,7 @@ SELECT
     NULL AS mkt_campaign_context,
     NULL AS mkt_origin,
 	NULL AS mkt_channel,
+	NULL AS mkt_medium,
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
@@ -2204,7 +2235,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_entrega_chaves IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 union_all AS (
 SELECT * FROM lead_
@@ -2284,6 +2315,7 @@ SELECT
 	ua.mkt_campaign_context,
 	ua.mkt_origin,
 	ua.mkt_channel,
+	ua.mkt_medium,
 	ua.mkt_type,
 	ua.sales_company,
     ua.lead_processing_operation,
@@ -2342,6 +2374,7 @@ SELECT
 	mkt_campaign_context,
 	mkt_origin,
 	mkt_channel,
+	mkt_medium,
 	mkt_type,
 	sales_company,
 	lead_processing_operation,
@@ -2400,6 +2433,7 @@ GROUP BY
 	mkt_campaign_context,
 	mkt_origin,
 	mkt_channel,
+	mkt_medium,
 	mkt_type,
 	sales_company,
 	lead_processing_operation,
