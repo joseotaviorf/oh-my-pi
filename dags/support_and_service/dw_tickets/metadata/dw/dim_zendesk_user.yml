@@ -3,7 +3,7 @@ table_name: dim_zendesk_user
 description: Dimension table that contains context data of all users created in Zendesk
   Support, including assignees, admins and external users
 domain: Support and Service
-owner: nathalia.paula@quintoandar.com.br
+owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_zendesk_user:
     lineage:
@@ -63,6 +63,10 @@ columns:
       admin: ''
       agent: ''
       end-user: ''
+  cost_center:
+    lineage:
+    - datalake_zendesk_tickets_clean.organizations.name
+    description: User cost center
   is_active:
     lineage:
     - datalake_zendesk_tickets_clean.users.is_active

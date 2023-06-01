@@ -1,8 +1,8 @@
 database_name: dw_tickets
 table_name: fact_ticket_contact_types
-description: ''
+description: Information about the types and taxonomy of contacts involved in the ticket
 domain: Support and Service
-owner: ''
+owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -27,22 +27,22 @@ columns:
       AF: ''
       CD: ''
       CR: ''
-      FT: ''
-      IQ: ''
-      PO: ''
-      PP: ''
-      PS: ''
-      VT: ''
+      FT: 'Fotografo'
+      IQ: 'Inquilino'
+      PO: 'Porteiro'
+      PP: 'Proprietário'
+      PS: 'Prestador'
+      VT: 'Vistoriador'
   category_taxonomy:
     lineage:
     - datalake_zendesk_tickets.ticket_contact_types.category_taxonomy
     description: The higher-level contact subject taxonomy (i.e. CH = chaves, AG =
       AGENDA, AC = ANALISE DE CRÉDITO, etc.)
     categories:
-      AC: ''
-      AG: ''
+      AC: 'ANALISE DE CRÉDITO'
+      AG: 'AGENDA'
       AN: ''
-      CH: ''
+      CH: 'CHAVES'
       CM: ''
       CT: ''
       IS: ''
@@ -59,7 +59,7 @@ columns:
   is_contact_type_taxonomy:
     lineage:
     - datalake_zendesk_tickets.ticket_contact_types.has_valid_prefix
-    description: ''
+    description: "Has a contact tag among the following contact types: 'IQ', 'PP', 'CR', 'FT', 'VT', 'CD', 'AF', 'PO', 'PS'"
   ts_updated:
     lineage:
     - datalake_zendesk_tickets.ticket_contact_types.ts_updated
