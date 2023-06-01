@@ -47,7 +47,7 @@ real AS (
 		datalake_quintoandar.aux_date AS adt
 			ON DATE(tof.ts_interaction) = adt.date
 	WHERE 1=1
-		AND tof.utm_campaign LIKE '%.D.RET.Sale.Strategic_Cities.churnedBPs_[RJ_BH_POA_DF]%'
+		AND tof.utm_campaign LIKE '%.D.RET.Sale.Strategic_Cities.churnedBPs_[RJ_BH_POA_CAM]%'
 		AND tof.city_group IN ('Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre', 'Campinas')
 	GROUP BY
 		1,2,3
@@ -63,7 +63,7 @@ FROM datalake_quintoandar.aux_date AS adt
 LEFT JOIN
 	tof_events AS tof
 		ON DATE(tof.ts_interaction) = adt.date
-		AND tof.utm_campaign LIKE '%.D.RET.Sale.Strategic_Cities.churnedBPs_[RJ_BH_POA_DF]%'
+		AND tof.utm_campaign LIKE '%.D.RET.Sale.Strategic_Cities.churnedBPs_[RJ_BH_POA_CAM]%'
 		AND tof.city_group IN ('Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre', 'Campinas')
 GROUP BY 1 
 ) 
