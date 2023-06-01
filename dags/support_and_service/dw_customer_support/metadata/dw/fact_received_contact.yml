@@ -73,7 +73,23 @@ columns:
   customer_phone:
     lineage:
       - datalake_customer_support.received_demand.customer_phone
-    description: The user customer phone. It is NULL for Zendesk E-mail Tickets.
+    description: The user customer phone. It is NULL for email channel.
+  customer_email:
+    lineage:
+      - datalake_customer_support.received_demand.customer_email
+    description: The user customer phone. It is NULL for call and chat channels.
+  transferred_from:
+    lineage:
+      - datalake_customer_support.received_demand.department
+    description:
+      From which department the interaction comes from. NULL if there is no
+      transfer or if it is the first interaction of a contact
+  transferred_to:
+    lineage:
+      - datalake_customer_support.received_demand.department
+    description:
+      Department which the interaction goes to. NULL if there is no transfer or if
+      it is the last interaction of a contact
   is_answered:
     lineage:
       - datalake_customer_support.received_demand.is_answered
@@ -89,6 +105,25 @@ columns:
       It is used to track how quickly workers are able to start working on tasks once
       they are assigned to them, which can help optimize workflows and improve customer
       satisfaction. For Zendesk E-mail Tickets, the demand is always considered answered.
+  is_first_interaction:
+    lineage:
+      - datalake_customer_support.received_demand.id_call
+      - datalake_customer_support.received_demand.id_ticket
+      - datalake_customer_support.received_demand.id_session
+    description: Boolean if the interaction is the first of it's contact
+  is_first_department_interaction:
+    lineage:
+      - datalake_customer_support.received_demand.id_call
+      - datalake_customer_support.received_demand.id_ticket
+      - datalake_customer_support.received_demand.id_session
+      - datalake_customer_support.received_demand.department
+    description: Boolean if in a contact, the interaction is the first of it's department
+  is_last_interaction:
+    lineage:
+      - datalake_customer_support.received_demand.id_call
+      - datalake_customer_support.received_demand.id_ticket
+      - datalake_customer_support.received_demand.id_session
+    description: Boolean if the interaction is the last of it's contact
   ts_created:
     lineage:
       - datalake_customer_support.received_demand.ts_created

@@ -115,9 +115,13 @@ call AS (
     call.contact_theme_detail_tag,
     call.step_tag,
     call.request_type,
+    CASE
+      WHEN call.id_external_service IS NULL THEN 'ABANDONED'
+      WHEN ROW_NUMBER() OVER(PARTITION BY crd.id_call ORDER BY crd.ts_created DESC) = 1 THEN 'COMPLETED'
+      ELSE 'TRANSFERRED'
+    END AS status,
     call.id_external_service IS NOT NULL AS is_answered,
-    crd.ts_created,
-    NULL AS ts_updated
+    crd.ts_created
   FROM
     call_received_demand AS crd
   LEFT JOIN
@@ -139,9 +143,9 @@ chat AS (
       GET_JSON_OBJECT(te.event_payload,'$.TaskQueueName') AS task_queue_name,
       GET_JSON_OBJECT(event_payload,'$.WorkerAttributes.email') AS agent_email,
       REGEXP_REPLACE(REGEXP_EXTRACT(GET_JSON_OBJECT(t.task_attributes,'$.from'), '(\\w+:)(.+)', 2), '^\\+(?=.*)', '') AS customer_phone,
-      GET_JSON_OBJECT(te.event_payload,'$.TaskAttributes.conversations.conversation_measure_1') IS NOT NULL AS is_answered,
-      te.ts_created,
-      te.ts_updated
+      GET_JSON_OBJECT(t.task_resource, '$.reason') AS task_completion_reason,
+      GET_JSON_OBJECT(te.event_payload,'$.TaskCompletedReason') AS task_event_completion_reason,
+      FROM_UTC_TIMESTAMP(te.ts_created, 'America/Sao_Paulo') AS ts_created
     FROM
       datalake_quinto_messenger_clean.task AS t
     INNER JOIN
@@ -163,13 +167,13 @@ chat AS (
       ce.id_task_external,
       chn.id_source AS id_session_whats,
       c.id_session AS id_session_inapp,
-      te.is_answered,
       te.task_queue_name,
       IFNULL(LEAD(te.task_queue_name) OVER (PARTITION BY te.id_task_external ORDER BY te.ts_created), '-') AS next_task_queue_name,
       te.agent_email,
       ce.customer_phone,
-      ce.ts_created,
-      te.ts_updated
+      te.task_completion_reason,
+      te.task_event_completion_reason,
+      ce.ts_created
     FROM
       created_events AS ce
     INNER JOIN
@@ -201,9 +205,13 @@ chat AS (
     chat.contact_theme_detail_tag,
     chat.step_tag,
     chat.request_type,
-    crd.is_answered,
-    crd.ts_created,
-    crd.ts_updated
+    CASE
+      WHEN task_completion_reason = 'task idled' OR task_event_completion_reason = 'task idled' THEN 'IDLED'
+      WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY crd.ts_created DESC) = 1 THEN 'COMPLETED'
+      ELSE 'TRANSFERRED'
+    END AS status,
+    TRUE AS is_answered,
+    crd.ts_created
   FROM
     chat_received_demand AS crd
   LEFT JOIN
@@ -235,9 +243,12 @@ email AS (
     contact_theme_detail_tag,
     step_tag,
     request_type,
+    CASE
+      WHEN ts_ticket_ended IS NOT NULL THEN 'COMPLETED'
+      ELSE 'IN PROGRESS'
+    END AS status,
     true AS is_answered,
-    ts_ticket_started AS ts_created,
-    NULL AS ts_updated
+    ts_ticket_started AS ts_created
   FROM
     datalake_customer_support.email AS e
   LEFT JOIN
