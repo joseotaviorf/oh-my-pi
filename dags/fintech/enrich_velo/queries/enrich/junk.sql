@@ -153,10 +153,12 @@ WITH cte_join AS (
             SELECT
                 name AS desc_lvl_1
             FROM
-                VALUES ('SIGNATURE'),
-                        ('GUARANTEE'),
-                        ('TERMINATION'),
-                        ('BILLING') AS origin(name)
+                VALUES ('REGISTERED'),
+                        ('RECOVERING'),
+                        ('PROGRESS'),
+                        ('FINISHED'),
+                        ('UNDER_AGREEMENT'),
+                        ('REQUESTED_AGREEMENT') AS origin(name)
         )
         SELECT
             'Occurrence Status' AS desc_master_type,
@@ -177,12 +179,10 @@ WITH cte_join AS (
             SELECT
                 name AS desc_lvl_1
             FROM
-                VALUES ('REGISTERED'),
-                        ('RECOVERING'),
-                        ('PROGRESS'),
-                        ('FINISHED'),
-                        ('UNDER_AGREEMENT'),
-                        ('REQUESTED_AGREEMENT') AS origin(name)
+                VALUES ('SIGNATURE'),
+                        ('GUARANTEE'),
+                        ('TERMINATION'),
+                        ('BILLING') AS origin(name)
         )
         SELECT
             'Occurrence Type' AS desc_master_type,

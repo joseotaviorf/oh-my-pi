@@ -201,6 +201,7 @@ WITH new_system AS (
                 datalake_velo.propose_person
             WHERE
                 is_legacy IS FALSE
+                AND is_primary_person IS TRUE
         ),
         persons_metrics AS (
             SELECT
