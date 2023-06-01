@@ -23,8 +23,9 @@ SELECT
     month AS month,
     day AS day
 FROM
-    datalake_semrush_raw.imoveismercadolivre_organic_search_kw
+    datalake_semrush_raw.searches
 WHERE
-    year = {year}
+    domain = '{domain}'
+    AND year = {year}
     AND month = {month}
     AND day = {day}

@@ -1,205 +1,155 @@
-import requests
+from argparse import ArgumentParser
+
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from pyspark.sql.functions import lit
-from functools import reduce
+
+import boto3
+import json
+import urllib
+
 from pyspark.sql import DataFrame
+from pyspark.sql.functions import *
+from functools import reduce
+
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.formatters import StringFormatter
-from argparse import ArgumentParser
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.spark import SparkDataFrameService
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.spark import (
+    SparkTableStorageFormat,
+    SparkDataFrameService,
+)
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.services import S3Service
 
+def _create_dataframe_with_standard_columns(response_data: dict, display_date: str) -> DataFrame:
+
+    data = response_data['text']
+    try:
+        rdd_data = sc.parallelize(data.split('\r\n'))
+    except:
+        return spark.createDataFrame([], schema="")
+
+    url_parsed = urllib.parse.urlparse(response_data['url'])
+    query_params = urllib.parse.parse_qs(url_parsed.query)
+    domain = query_params['domain'][0]
+
+    df = spark.read\
+        .option("inferSchema",False)\
+        .option("header", "true")\
+        .option("mode","FAILFAST")\
+        .option("delimiter",";")\
+        .csv(rdd_data)\
+        .withColumn("domain", lit(domain))\
+        .withColumn("date", lit(execution_date))
+
+    dt_execution = datetime.strptime(display_date, "%Y%m%d")
+
+    df = (
+              SparkDataFrameService(df)
+              .format_column_names()
+              .create_year_month_day_columns_from_date(dt_execution)
+              .output()
+          )        
+
+    return df
+
+def _soft_union_all(df1: DataFrame, df2: DataFrame) -> DataFrame:
+
+    common_cols = [col for col in df1.columns if col in df2.columns] + [col for col in df2.columns if col in df1.columns]
+    df1_full = df1.select(*df1.columns, *[lit(None).alias(col) for col in [col for col in df2.columns if col not in common_cols]])
+    df2_full = df2.select(*df2.columns, *[lit(None).alias(col) for col in [col for col in df1.columns if col not in common_cols]])
+
+    df = df1_full.unionByName(df2_full)
+
+    return df
 
 ## Logger
 JOB_NAME = "load_semrush_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-## API Key
-DATABRICKS_SCOPE = "quintoandar"
-base_dbutils = BaseDBUtils()
-if base_dbutils.get_dbutils() is not None:
-    dbutils = base_dbutils.get_dbutils()
-api_key = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.SEMRUSH)
-
-
-## Spark Client
-spark_client = SparkClient()
-
-
-## Spark Job
 if __name__ == "__main__":
 
-    ## Parser
     parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env")
-    parser.add_argument("datalake_bucket", type=str, help="target bucket")
+    parser.add_argument("environment")
+    parser.add_argument("datalake_bucket")
     parser.add_argument("source")
-    parser.add_argument("table_name")
     parser.add_argument("execution_date")
-    
 
     args = parser.parse_args()
 
-    logger.info(
-        f"""
-            m={JOB_NAME}, environment={args.env}, source={args.source}, datalake_bucket={args.datalake_bucket}
-            table_name={args.table_name}, execution_date={args.execution_date}.
-            msg=print spark jobs args
-        """
-    )
-
-
-    ## Args
-    env = args.env
+    environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
-    table_name = args.table_name
-    execution_date = args.execution_date
-    
-        
-    ## Config Service
+    execution_date = datetime.strptime(args.execution_date, "%Y-%m-%d")
+    display_date = execution_date.replace(day=15) - relativedelta(months=1)
+    display_date = display_date.strftime('%Y%m%d')
+
     config_service = ConfigurationService(source)
-    report_list = config_service.get_config("report_list")
+    raw_table_name = config_service.get_config("raw_table_name")
     raw_partition_cols = config_service.get_config("raw_partition_cols")
 
+    s3_service = S3Service(boto3.resource("s3"))
+    responses_folder_path = f"s3://{datalake_bucket}/{LayerEnum.RAW.value}/{source}/{display_date}/responses"
 
-    ## Loaders and Services
-    s3_loader = S3Loader()
-    spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    responses_data = [
+        json.loads(s3_service.read_file(file_path)) for file_path in s3_service.list_objects(responses_folder_path)
+    ]
+    responses_df = [
+        _create_dataframe_with_standard_columns(data, display_date) for data in responses_data
+    ]
 
+    df = reduce(
+        _soft_union_all, responses_df
+    )
 
-    ## Creating database
-    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
-    database_name = db_info["db_raw_databricks"]
-    database_location = db_info["db_raw_path"]
-    spark_metastore_service.create_database(database_name)
+    if df:
+        """
+        Load data to datalake.
+        """
+        spark_client = SparkClient()
+        spark_context = spark_client.conn.sparkContext
+        dataframe_service = SparkDataFrameService()
 
+        db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+        database_name = db_info["db_raw_databricks"]
+        database_location = db_info["db_raw_path"]
+        format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    ## API get
-    endpoint = f'https://api.semrush.com/?key={api_key}'
-    report_body = report_list[table_name]
-    report_configs = report_body['configs']
-    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
+        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service.create_database(database_name)
 
-    if report_body['display_limit']: # Only returning limited data
+        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+        s3_loader = S3Loader()
 
-        params = '&' + '&'.join([f"{config}={report_configs[config]}" for config in report_configs])
-        dfs = []
-        startRow = 0
-        endRow = report_body['display_limit']
-        maxRows = 100000
-
-        for i in range(startRow, endRow, maxRows): #Limiting rows per call
-            offset = i
-            limit = min(i + maxRows - 1, endRow)
-            display_offset = f'&display_offset={offset}'
-            display_limit = f'&display_limit={limit}'
-            APIUnitsBalance = int(requests.get(f'http://www.semrush.com/users/countapiunits.html?key={api_key}').text)
-            APIUnitsNeeded = limit*10
-
-            if APIUnitsBalance >= APIUnitsNeeded: # Check API units Balance
-                url_request = endpoint + params + display_offset + display_limit
-                response = requests.get(url_request)
-                if response.status_code == 200:
-                    request_text = response.text
-                    
-                    if request_text:
-                        csvData = sc.parallelize(request_text.split('\r\n'))
-                        df_semrush = spark.read\
-                        .option("inferSchema",False)\
-                        .option("header", "true")\
-                        .option("mode","FAILFAST")\
-                        .option("delimiter",";")\
-                        .csv(csvData)\
-                        .withColumn("date", lit(execution_date))
-
-                        df_semrush = (
-                            SparkDataFrameService(df_semrush)
-                            .format_column_names()
-                            .create_year_month_day_columns_from_date(dt_execution)
-                            .output()
-                        )
-
-                        dfs.append(df_semrush)
-
-                        logger.info(
-                        f"""
-                        m=Successfully extracted data for {url_request}.
-                        API Units balance before={APIUnitsBalance}
-                        API Units balance after={APIUnitsBalance-APIUnitsNeeded}
-                        """
-                        )
-
-                else:
-                    raise Exception(
-                        f"""
-                        m=Failed to extract data for {url_request}.
-                        Status code={response.status_code}.
-                        """
-                    )
-            else:
-                raise Exception(
-                    f"""
-                    m=Not enough API Units.
-                    balance={APIUnitsBalance}, needed={APIUnitsNeeded}
-                    """
-                )
-
-        ## Loader
-        if dfs:
-            df = reduce(DataFrame.unionAll, dfs)
-
-            s3_loader.load_df(
-                df=df,
-                format_options=SparkTableStorageFormat.DEFAULT_RAW,
-                s3_path=f"{database_location}{table_name}",
-                partitions=raw_partition_cols,
-                compression="gzip"
-            )
-
-            spark_metastore_loader.update_metastore(
-                df=df,
-                database_name=database_name,
-                table_name=table_name,
-                format_options=SparkTableStorageFormat.DEFAULT_RAW,
-                database_location=database_location,
-                partitions=raw_partition_cols,
-                force_recreate=True,
-            )
-
-            spark_metastore_service.create_new_partitions_from_df(
-                df=df,
-                database_name=database_name,
-                table_name=table_name,
-                partition_cols=raw_partition_cols,
-            )
-            logger.info(
-                f"""
-                m=Successfully save data of {table_name} table.
-                """
-            )
-        else:
-            logger.info(
-                f"""
-                m=df empty for {table_name} table on date {dt_execution}.
-                """
-            )
-
-    else:
-        raise Exception(
-            f"""
-            m=Failed to extract data.
-            No rows limit for {table_name}.
-            """
+        s3_loader.load_df(
+            df=df,
+            format_options=SparkTableStorageFormat.DEFAULT_RAW,
+            s3_path=f"{database_location}{raw_table_name}",
+            partitions=raw_partition_cols,
+            compression="gzip"
         )
+
+        spark_metastore_loader.update_metastore(
+            df=df,
+            database_name=database_name,
+            table_name=raw_table_name,
+            format_options=SparkTableStorageFormat.DEFAULT_RAW,
+            database_location=database_location,
+            partitions=raw_partition_cols,
+            force_recreate=True,
+        )
+
+        spark_metastore_service.create_new_partitions_from_df(
+            df=df,
+            database_name=database_name,
+            table_name=raw_table_name,
+            partition_cols=raw_partition_cols,
+        )
+    else:
+        raise Exception(f"m=Failed to ingest data for display_limit='{display_date}'.")
