@@ -21,6 +21,9 @@ tables:
   inspector_booking_retrieve_key:
     partitioned: True
     incremental_col: updated_at
+  key_delivery_location:
+    partitioned: True
+    incremental_col: updated_at
   key_return_preferred_location:
     partitioned: True
     incremental_col: updated_at
