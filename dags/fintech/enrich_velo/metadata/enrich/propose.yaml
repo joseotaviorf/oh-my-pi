@@ -15,6 +15,9 @@ columns:
       - datalake_velo_clean.fiancavelo_propose.id
       - datalake_velo_clean.fiancavelo_activator.id
       - datalake_velo_clean.fiancavelo_plans.id
+      - datalake_rental_guarantee_platform_clean.propose.id
+      - datalake_rental_guarantee_platform_clean.company_plan.id
+      - datalake_rental_guarantee_platform_clean.plan.id
   id_broker:
     description: Broker's identification number (ID). This key connects to the table datalake_velo.broker
     lineage:
@@ -30,6 +33,7 @@ columns:
     description: Agent's identification number (ID). This key connects to the table datalake_velo.user
     lineage:
       - datalake_velo_clean.fiancavelo_propose.id_realtor
+      - datalake_rental_guarantee_platform_clean.user_account.id
   id_contract:
     description: Contract's identification number (ID)
     lineage:
@@ -39,10 +43,12 @@ columns:
     description: Company's identification number (ID). This key connects to the table datalake_velo.propose_company
     lineage:
       - datalake_velo_clean.fiancavelo_proposecompany.id_company
+      - datalake_rental_guarantee_platform_clean.propose.id_tenant_company
   id_primary_person:
     description: Primary person's identification number (ID). This key connects to the table datalake_velo.propose_person considering only propose's primary person
     lineage:
       - datalake_velo_clean.fiancavelo_proposeperson.id_person
+      - datalake_rental_guarantee_platform_clean.propose_person.id_person
   id_origin:
     description: Origin's identification number (ID). It indicates if the the propose was made by a person or by a business and this key connects to the table datalake_velo.junk
     lineage:
@@ -98,6 +104,8 @@ columns:
     description: If the propose has been turned into a contract
   is_grace_period_cancelled:
     description: If the propose's grace period has expired
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   dt_last_payment:
     lineage:
     - datalake_velo.payment.dt_paid
@@ -135,12 +143,17 @@ columns:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_sign_started:
-    description: Timestamp of when the propose has been signed
+    description: Timestamp of when the propose has opened to be sign
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_paid:
     description: Timestamp of when the propose has been paid (to turn into a contract)
+    lineage:
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+  ts_signed:
+    description: Timestamp of when the propose has been finished signing (to turn into a contract)
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated

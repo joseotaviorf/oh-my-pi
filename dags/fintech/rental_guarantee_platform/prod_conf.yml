@@ -149,4 +149,6 @@ tables:
     date_filter_column: created_at
   - table_name: renewal
     date_filter_column: updated_at
+  - table_name: tenant_company
+    date_filter_column: updated_at
 partition_cols: ["year", "month", "day"]

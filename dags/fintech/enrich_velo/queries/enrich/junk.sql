@@ -11,12 +11,24 @@ WITH cte_join AS (
     )
     UNION ALL
     (
-    SELECT
-        'Propose Status' AS desc_master_type,
-        id AS id_lvl_1,
-        name AS desc_lvl_1
-    FROM
-        datalake_velo_clean.fiancavelo_proposestatus
+        WITH cte_prop_status AS (
+            SELECT
+                name AS desc_lvl_1
+                FROM
+                    datalake_velo_clean.fiancavelo_proposestatus
+            UNION ALL
+            SELECT
+                name AS desc_lvl_1
+                FROM
+                    datalake_rental_guarantee_platform_clean.propose_status
+            )
+        SELECT
+            'Propose Status' AS desc_master_type,
+            ROW_NUMBER() OVER( ORDER BY desc_lvl_1 ASC) AS id_lvl_1,
+            desc_lvl_1
+        FROM
+            cte_prop_status
+        GROUP BY desc_lvl_1
     )
     UNION ALL
     (
@@ -29,70 +41,156 @@ WITH cte_join AS (
     )
     UNION ALL
     (
-    SELECT
-        'Propose Type' AS desc_master_type,
-        id AS id_lvl_1,
-        name AS desc_lvl_1
-    FROM
-        datalake_velo_clean.fiancavelo_proposetype
+        WITH cte_prop_type AS (
+            SELECT
+                name AS desc_lvl_1
+                FROM
+                    datalake_velo_clean.fiancavelo_proposetype
+            UNION ALL
+            SELECT
+                name AS desc_lvl_1
+                FROM
+                    datalake_rental_guarantee_platform_clean.bussines_type
+            )
+        SELECT
+            'Propose Type' AS desc_master_type,
+            ROW_NUMBER() OVER( ORDER BY desc_lvl_1 ASC) AS id_lvl_1,
+            desc_lvl_1
+        FROM
+            cte_prop_type
+        GROUP BY desc_lvl_1
     )
     UNION ALL
     (
-    SELECT
-        'Billing Type' AS desc_master_type,
-        id AS id_lvl_1,
-        name AS desc_lvl_1
-    FROM
-        datalake_velo_clean.fiancavelo_billingtype
+        WITH cte_billing_type AS (
+            SELECT
+                name AS desc_lvl_1
+                FROM
+                    datalake_velo_clean.fiancavelo_billingtype
+            UNION ALL
+            SELECT
+                DISTINCT billing_type AS desc_lvl_1
+                FROM
+                    datalake_rental_guarantee_platform_clean.payment
+            )
+        SELECT
+            'Billing Type' AS desc_master_type,
+            ROW_NUMBER() OVER( ORDER BY desc_lvl_1 ASC) AS id_lvl_1,
+            desc_lvl_1
+        FROM
+            cte_billing_type
+        GROUP BY desc_lvl_1
     )
     UNION ALL
     (
-    SELECT
-        'Payment Type' AS desc_master_type,
-        id AS id_lvl_1,
-        description AS desc_lvl_1
+        SELECT
+            'Payment Type' AS desc_master_type,
+            id AS id_lvl_1,
+            description AS desc_lvl_1
 
-    FROM
-        VALUES (1,'monthly'),
-                (2,'annual'),
-                (3, 'activation'),
-                (4, 'collection/no info') AS origin(id, description)
+        FROM
+            VALUES (1,'monthly'),
+                    (2,'annual'),
+                    (3, 'activation'),
+                    (4, 'collection/no info'),
+                    (5, 'billing') AS origin(id, description)
     )
     UNION ALL
     (
-    SELECT
-        'Payment Status' AS desc_master_type,
-        id AS id_lvl_1,
-        name AS desc_lvl_1
-    FROM
-        datalake_velo_clean.fiancavelo_paymentstatus
+        WITH cte_payment_status AS (
+            SELECT
+                name AS desc_lvl_1
+            FROM
+                datalake_velo_clean.fiancavelo_paymentstatus
+            UNION ALL
+            SELECT
+                DISTINCT status AS desc_lvl_1
+            FROM
+                datalake_rental_guarantee_platform_clean.payment
+            UNION ALL
+            SELECT
+                DISTINCT status AS desc_lvl_1
+            FROM
+                datalake_rental_guarantee_platform_clean.agreement_payment
+        )
+        SELECT
+            'Payment Status' AS desc_master_type,
+            ROW_NUMBER() OVER( ORDER BY desc_lvl_1 ASC) AS id_lvl_1,
+            desc_lvl_1
+        FROM
+            cte_payment_status
+        GROUP BY desc_lvl_1
     )
     UNION ALL
     (
-    SELECT
-        'Payment Gateway' AS desc_master_type,
-        id AS id_lvl_1,
-        name AS desc_lvl_1
-    FROM
-        datalake_velo_clean.fiancavelo_gateway
+        WITH cte_payment_gateway AS (
+            SELECT
+                name AS desc_lvl_1
+            FROM
+                datalake_velo_clean.fiancavelo_gateway
+            UNION ALL
+            SELECT
+                DISTINCT gateway AS desc_lvl_1
+            FROM
+                datalake_rental_guarantee_platform_clean.payment
+        )
+        SELECT
+            'Payment Gateway' AS desc_master_type,
+            ROW_NUMBER() OVER( ORDER BY desc_lvl_1 ASC) AS id_lvl_1,
+            desc_lvl_1
+        FROM
+            cte_payment_gateway
+        GROUP BY desc_lvl_1
     )
     UNION ALL
     (
-    SELECT
-        'Occurrence Status' AS desc_master_type,
-        id AS id_lvl_1,
-        name AS desc_lvl_1
-    FROM
-        datalake_velo_clean.fiancavelo_occurrencestatus
+        WITH cte_occurrence_status AS (
+            SELECT
+                name AS desc_lvl_1
+            FROM
+                datalake_velo_clean.fiancavelo_occurrencestatus
+            UNION ALL
+            SELECT
+                name AS desc_lvl_1
+            FROM
+                VALUES ('SIGNATURE'),
+                        ('GUARANTEE'),
+                        ('TERMINATION'),
+                        ('BILLING') AS origin(name)
+        )
+        SELECT
+            'Occurrence Status' AS desc_master_type,
+            ROW_NUMBER() OVER( ORDER BY desc_lvl_1 ASC) AS id_lvl_1,
+            desc_lvl_1
+        FROM
+            cte_occurrence_status
+        GROUP BY desc_lvl_1
     )
     UNION ALL
     (
-    SELECT
-        'Occurrence Type' AS desc_master_type,
-        id AS id_lvl_1,
-        name AS desc_lvl_1
-    FROM
-        datalake_velo_clean.fiancavelo_occurrencetype
+        WITH cte_occurrence_type AS (
+            SELECT
+                name AS desc_lvl_1
+            FROM
+                datalake_velo_clean.fiancavelo_occurrencetype
+            UNION ALL
+            SELECT
+                name AS desc_lvl_1
+            FROM
+                VALUES ('REGISTERED'),
+                        ('RECOVERING'),
+                        ('PROGRESS'),
+                        ('FINISHED'),
+                        ('UNDER_AGREEMENT'),
+                        ('REQUESTED_AGREEMENT') AS origin(name)
+        )
+        SELECT
+            'Occurrence Type' AS desc_master_type,
+            ROW_NUMBER() OVER( ORDER BY desc_lvl_1 ASC) AS id_lvl_1,
+            desc_lvl_1
+        FROM
+            cte_occurrence_type
+        GROUP BY desc_lvl_1
     )
 ),
 cte_id_master_type AS (

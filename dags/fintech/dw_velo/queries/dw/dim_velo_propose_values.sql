@@ -20,6 +20,7 @@ SELECT
     plan_coverage,
     plan_damage,
     plan_commission,
+    is_legacy,
     NOW() AS ts_load
 FROM
     datalake_velo.propose_values

@@ -9,35 +9,44 @@ columns:
     description: Company's identification number (ID) when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_company.id
+      - datalake_rental_guarantee_platform_clean.tenant_company.id
   company_name:
     description: Company's name when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_company.comercial_name
       - datalake_velo_clean.clientes_company.name
+      - datalake_company_clean.company.trade_name
   street:
     description: Company's street address when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.street
+      - datalake_company_clean.address.public_area
   number:
     description: Company's number address when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.number
+      - datalake_company_clean.address.number
   complement:
     description: Company's complement address when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.complement
+      - datalake_company_clean.address.complement
   neighborhood:
     description: Company's neighborhood address when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.neighborhood
+      - datalake_company_clean.address.neighborhood
   city:
     description: Company's city when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.city
+      - datalake_company_clean.address.city
   state:
     description: Company's state when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.state
+      - datalake_ebdb_clean.state.abbreviation
+      - datalake_company_clean.address.state
   country_code:
     description: Company's country code when the propose is for a business
     lineage:
@@ -46,6 +55,7 @@ columns:
     description: Company's zipcode when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_address.zipcode
+      - datalake_company_clean.address.zip_code
   geolocation:
     description: latitude and longitude - Company's geolocation when the propose is for a business
     lineage:
@@ -54,11 +64,16 @@ columns:
     description: Company's document number (CNPJ) when the propose is for a business
     lineage:
       - datalake_velo_clean.clientes_company.document
+      - datalake_company_clean.document.identification_number
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_created:
     description: Timestamp that client company register was created
     lineage:
       - datalake_velo_clean.clientes_company.ts_inserted
+      - datalake_rental_guarantee_platform_clean.tenant_company.ts_created
   ts_updated:
     description: Timestamp that client company register was last updated
     lineage:
       - datalake_velo_clean.clientes_company.ts_updated
+      - datalake_rental_guarantee_platform_clean.tenant_company.ts_updated

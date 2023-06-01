@@ -45,6 +45,10 @@ columns:
     lineage:
     - datalake_velo.user.phone
     description: User's phone
+  is_legacy:
+    lineage:
+    - datalake_velo.user.is_legacy
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_created:
     lineage:
     - datalake_velo.user.ts_created

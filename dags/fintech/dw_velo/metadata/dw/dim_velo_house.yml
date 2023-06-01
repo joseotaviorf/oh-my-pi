@@ -56,5 +56,9 @@ columns:
     lineage:
     - datalake_velo.house.geolocation
     description: Property geolocation
+  is_legacy:
+    lineage:
+    - datalake_velo.house.is_legacy
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_load:
     description: Load timestamp

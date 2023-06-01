@@ -9,14 +9,17 @@ columns:
     description: Table's unique ID.
     lineage:
       - datalake_velo_clean.fiancavelo_occurrence.id
+      - datalake_rental_guarantee_platform_clean.delinquency.id
   id_propose:
     description: ID connecting table to propose table.
     lineage:
       - datalake_velo_clean.fiancavelo_occurrence.id_propose
+      - datalake_rental_guarantee_platform_clean.delinquency.id_propose
   id_payment:
     description: ID connecting table to payment table, if relation exists.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.id
+      - datalake_rental_guarantee_platform_clean.agreement_payment.id
   id_client:
     description: ID connecting table to propose_person table.
     lineage:
@@ -45,25 +48,34 @@ columns:
     description: Amount that is due.
     lineage:
       - datalake_velo_clean.fiancavelo_occurrence.value
+      - datalake_rental_guarantee_platform_clean.delinquency.value
   due_amount_original:
     description: Amount that was originally due.
     lineage:
       - datalake_velo_clean.fiancavelo_occurrence.original_value
+      - datalake_rental_guarantee_platform_clean.delinquency.original_value
   paid_amount:
     description: Amount that was paid.
     lineage:
       - datalake_velo_clean.fiancavelo_occurrence.paid_value
+      - datalake_rental_guarantee_platform_clean.delinquency.amount_paid
   is_valid:
     description: Boolean flag for when this occurrence is valid to be used on any business process. Usually a visible register but that does not follows a specific business flow yet.
     lineage:
       - datalake_velo_clean.fiancavelo_occurrence.is_valid
+      - datalake_rental_guarantee_platform_clean.delinquency.is_valid
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   dt_due:
     description: Date that occurrence is/was due.
     lineage:
       - datalake_velo_clean.fiancavelo_occurrence.dt_due
+      - datalake_rental_guarantee_platform_clean.delinquency.dt_due
   ts_paid:
     description: Timestamp that the occurrence was completed paid.
+      - datalake_rental_guarantee_platform_clean.delinquency.dt_paid
   ts_created:
     description: Timestamp that the occurrence was created.
     lineage:
       - datalake_velo_clean.fiancavelo_occurrence.ts_inserted
+      - datalake_rental_guarantee_platform_clean.delinquency.ts_created

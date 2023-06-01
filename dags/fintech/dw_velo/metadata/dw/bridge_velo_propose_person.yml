@@ -8,14 +8,18 @@ columns:
   sk_person:
     lineage:
     - datalake_velo.propose_person.id_person
+    - datalake_rental_guarantee_platform_clean.propose_person.id
     description: Surrogate Key from dim_velo_propose_person.
   sk_propose:
     lineage:
     - datalake_velo.propose_person.id_propose
+    - datalake_rental_guarantee_platform_clean.propose_person.id_propose
     description: Surrogate Key from fact_velo_propose.
   is_primary_person:
     lineage:
     - datalake_velo.propose_person.is_primary_person
     description: Main individual of the proposal
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_load:
     description: Timestamp when the data was loaded.

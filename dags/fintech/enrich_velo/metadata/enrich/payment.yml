@@ -9,16 +9,23 @@ columns:
     description: Table's unique ID.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.id
+      - datalake_rental_guarantee_platform_clean.payment.id
+      - datalake_rental_guarantee_platform_clean.agreement_payment.id
   id_propose_values:
     description: ID connecting table to propose_values table.
     lineage:
       - datalake_velo_clean.fiancavelo_propose.id
       - datalake_velo_clean.fiancavelo_activator.id
       - datalake_velo_clean.fiancavelo_plans.id
+      - datalake_rental_guarantee_platform_clean.propose.id
+      - datalake_rental_guarantee_platform_clean.company_plan.id
+      - datalake_rental_guarantee_platform_clean.plan.id
   id_propose:
     description: ID connecting table to propose table.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.id_propose
+      - datalake_rental_guarantee_platform_clean.payment.id_propose
+      - datalake_rental_guarantee_platform_clean.delinquency.id_propose
   id_billing_type:
     description: ID connecting table to junk table.
     lineage:
@@ -39,46 +46,57 @@ columns:
     description: Business ID for Customer.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.customer
+      - datalake_rental_guarantee_platform_clean.payment.customer
   id_unicid:
     description: Business ID for UNICID.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.unicid
+      - datalake_rental_guarantee_platform_clean.payment.unicid
   id_subscription:
     description: Business ID for Subscription.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.subscription
+      - datalake_rental_guarantee_platform_clean.payment.id_subscription
   invoice_url:
     description: URL of charged invoice.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.invoice_url
+      - datalake_rental_guarantee_platform_clean.payment.invoice_url
   description:
     description: Description comments for this invoice.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.description
+      - datalake_rental_guarantee_platform_clean.payment.description
   due_amount:
     description: Amount that is due.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.value
+      - datalake_rental_guarantee_platform_clean.payment.value
+      - datalake_rental_guarantee_platform_clean.agreement_payment.value
   net_amount:
     description: Amount that Velo receives after removing payment gateway taxes.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.netvalue
-  takerate_amount:
-    description: Amount that Velo receives from this transaction based on the Plan's percentage that Velo receives.
   is_paid_late:
     description: Boolean flag for when dt_paid if after dt_due.
   is_due_modified:
     description: Boolean flag for when dt_due has been modified.
   is_occurrence:
     description: Boolean flag for when there is an occurrence related to this invoice.
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   dt_created:
     description: Date that invoice was created.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.dt_created
+      - datalake_rental_guarantee_platform_clean.payment.ts_created
+      - datalake_rental_guarantee_platform_clean.agreement_payment.ts_created
   dt_due:
     description: Date that invoice was due.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.dt_due
+      - datalake_rental_guarantee_platform_clean.payment.ts_due
+      - datalake_rental_guarantee_platform_clean.agreement_payment.dt_due
   dt_due_original:
     description: Date that invoice was due originally, if was changed in the middle time.
     lineage:
@@ -87,6 +105,8 @@ columns:
     description: Date that invoice was paid.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.dt_client_payment
+      - datalake_rental_guarantee_platform_clean.payment.ts_client_payment
+      - datalake_rental_guarantee_platform_clean.agreement_payment.dt_paid
   dt_payment_confirmed:
     description: Date that invoice had it's payment confirmed by the payment gateway.
     lineage:
@@ -95,3 +115,5 @@ columns:
     description: Timestamp that the invoice register was last updated on the database.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.ts_updated
+      - datalake_rental_guarantee_platform_clean.payment.ts_updated
+      - datalake_rental_guarantee_platform_clean.agreement_payment.ts_updated

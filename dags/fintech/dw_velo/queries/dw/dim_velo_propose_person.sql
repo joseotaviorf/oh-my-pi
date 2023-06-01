@@ -12,6 +12,7 @@ SELECT DISTINCT
     declared_income,
     requested_income,
     dt_birth,
+    is_legacy,
     NOW() AS ts_load
 FROM
     datalake_velo.propose_person

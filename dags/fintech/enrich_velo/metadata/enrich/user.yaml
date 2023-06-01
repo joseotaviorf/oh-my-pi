@@ -8,14 +8,17 @@ columns:
     description: user identification number
     lineage:
       - datalake_velo_clean.users_users.id
+      - datalake_rental_guarantee_platform_clean.user_account.id
   name:
     description: username
     lineage:
       - datalake_velo_clean.users_users.name
+      - datalake_rental_guarantee_platform_clean.user_account.name
   email:
     description: user email
     lineage:
       - datalake_velo_clean.users_users.email
+      - datalake_rental_guarantee_platform_clean.user_account.name
   user_role:
     description: User's role in Velo's platform
     categories:
@@ -40,11 +43,15 @@ columns:
       Suporte lll: ""
     lineage:
       - datalake_velo_clean.users_profile.name
+      - datalake_rental_guarantee_platform_clean.profile_account.profile_name
   phone:
     description: user phone
     lineage:
       - datalake_velo_clean.users_users.phone
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_created:
     description: Moment (timestamp) when the user was created in Velo's platform
     lineage:
       - datalake_velo_clean.users_users.ts_inserted
+      - datalake_rental_guarantee_platform_clean.user_account.ts_created

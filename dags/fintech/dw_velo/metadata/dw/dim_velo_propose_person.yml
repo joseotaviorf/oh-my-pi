@@ -56,7 +56,9 @@ columns:
     lineage:
     - datalake_velo.propose_person.dt_birth
     description: Person's date of birth
-  is_primary_person:
-    description: Identification if the person is the main person of the propose
+  is_legacy:
+    lineage:
+    - datalake_velo.propose_person.is_legacy
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_load:
     description: Moment (timestamp) when the table was last loaded

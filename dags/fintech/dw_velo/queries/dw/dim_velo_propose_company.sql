@@ -11,6 +11,7 @@ SELECT
     zipcode,
     geolocation,
     cnpj,
+    is_legacy,
     ts_created,
     ts_updated,
     NOW() AS ts_load

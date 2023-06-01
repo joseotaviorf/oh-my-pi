@@ -13,7 +13,6 @@ SELECT
     description,
     due_amount,
     net_amount,
-    takerate_amount,
     is_paid_late,
     is_due_modified,
     is_occurrence,
@@ -23,6 +22,7 @@ SELECT
     dt_paid,
     dt_payment_confirmed,
     ts_updated,
+    is_legacy,
     NOW() AS ts_load
 FROM
     datalake_velo.payment

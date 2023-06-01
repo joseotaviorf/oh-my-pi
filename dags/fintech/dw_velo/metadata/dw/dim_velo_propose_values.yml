@@ -7,7 +7,7 @@ columns:
   sk_propose_values:
     lineage:
     - datalake_velo.propose_values.id_propose_values
-    description: Propose values id 
+    description: Propose values id
   subscription_type:
     lineage:
     - datalake_velo.propose_values.subscription_type
@@ -51,7 +51,7 @@ columns:
   annual_guarantee:
     lineage:
     - datalake_velo.propose_values.annual_guarantee
-    description: Annual total amount of the guarantee 
+    description: Annual total amount of the guarantee
   rent_amount:
     lineage:
     - datalake_velo.propose_values.rent_amount
@@ -100,5 +100,9 @@ columns:
     lineage:
     - datalake_velo.propose_values.plan_commission
     description: Plan commission
+  is_legacy:
+    lineage:
+    - datalake_velo.propose_values.is_legacy
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_load:
     description: load date

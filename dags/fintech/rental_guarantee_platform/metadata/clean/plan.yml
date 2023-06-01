@@ -32,9 +32,9 @@ columns:
   commission:
     lineage:
       - datalake_rental_guarantee_platform_raw.plan.commission
-  active:
+  is_active:
     lineage:
-      - datalake_rental_guarantee_platform_raw.plan.is_active
+      - datalake_rental_guarantee_platform_raw.plan.active
   ts_inserted:
     lineage:
       - datalake_rental_guarantee_platform_raw.plan.dateinsert

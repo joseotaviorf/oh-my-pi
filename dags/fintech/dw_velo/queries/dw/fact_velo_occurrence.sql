@@ -15,6 +15,7 @@ SELECT
     dt_due,
     ts_paid,
     ts_created,
+    is_legacy,
     NOW() AS ts_load
 FROM
     datalake_velo.occurrence

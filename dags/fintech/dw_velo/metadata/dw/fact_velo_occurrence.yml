@@ -57,6 +57,10 @@ columns:
     description: Boolean flag for when this occurrence is valid to be used on any business process. Usually a visible register but that does not follows a specific business flow yet.
     lineage:
       - datalake_velo.occurrence.is_valid
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
+    lineage:
+      - datalake_velo.occurrence.is_legacy
   dt_due:
     description: Date that occurrence is/was due.
     lineage:

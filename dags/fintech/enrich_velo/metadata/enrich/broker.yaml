@@ -76,6 +76,8 @@ columns:
     description: "Identify if the broker is active in Velo's platform"
     lineage:
       - datalake_velo_clean.fiancavelo_realestate.is_active
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_created:
     description: "Moment (timestamp) when the broker was created in Velo's platform"
     lineage:

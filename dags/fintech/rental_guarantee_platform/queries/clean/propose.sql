@@ -6,6 +6,7 @@ SELECT
     status AS id_propose_status,
     realestate AS id_real_estate,
     company_plan AS id_company_plan,
+    tenant_company AS id_tenant_company,
     activator AS activator_value,
     billing_model,
     realtor,

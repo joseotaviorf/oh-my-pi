@@ -61,10 +61,6 @@ columns:
     description: Amount that Velo receives after removing payment gateway taxes.
     lineage:
       - datalake_velo.payment.net_amount
-  takerate_amount:
-    description: Amount that Velo receives from this transaction based on the Plan's percentage that Velo receives.
-    lineage:
-      - datalake_velo.payment.takerate_amount
   is_paid_late:
     description: Boolean flag for when dt_paid if after dt_due.
     lineage:
@@ -77,6 +73,10 @@ columns:
     description: Boolean flag for when the is an occurrence linked to this invoice.
     lineage:
       - datalake_velo.payment.is_occurrence
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
+    lineage:
+      - datalake_velo.payment.is_legacy
   dt_created:
     description: Date that invoice was created.
     lineage:

@@ -64,6 +64,10 @@ columns:
     lineage:
     - datalake_velo.broker.is_broker_active
     description: Identify if the broker is active in Velo's platform
+  is_legacy:
+    lineage:
+    - datalake_velo.broker.is_legacy
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_created:
     lineage:
     - datalake_velo.broker.ts_created

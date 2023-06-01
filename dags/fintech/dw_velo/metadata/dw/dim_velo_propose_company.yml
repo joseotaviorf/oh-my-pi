@@ -53,6 +53,10 @@ columns:
     lineage:
     - datalake_velo.propose_company.cnpj
     description: Company's document number (CNPJ) when the propose is for a business
+  is_legacy:
+    lineage:
+    - datalake_velo.propose_company.is_legacy
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_created:
     lineage:
     - datalake_velo.propose_company.ts_created

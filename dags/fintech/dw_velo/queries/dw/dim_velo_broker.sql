@@ -14,6 +14,7 @@ SELECT
     creci,
     cnpj,
     is_broker_active,
+    is_legacy,
     ts_created,
     NOW() AS ts_load
 FROM

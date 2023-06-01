@@ -54,6 +54,7 @@ cte_union AS (
       d.identification_number AS creci,
       d2.identification_number AS cnpj,
       activation.dt_first_contract IS NOT NULL AS is_broker_active,
+      FALSE AS is_legacy,
       c.ts_created
   FROM
       datalake_rental_guarantee_platform_clean.company AS c
@@ -102,6 +103,7 @@ UNION ALL
     r.creci,
     c.document AS cnpj,
     r.is_active AS is_broker_active,
+    TRUE AS is_legacy,
     r.ts_inserted AS ts_created
   FROM
     datalake_velo_clean.fiancavelo_realestate AS r
@@ -137,6 +139,7 @@ SELECT
     creci,
     cnpj,
     is_broker_active,
+    is_legacy,
     ts_created
 FROM
     cte_union

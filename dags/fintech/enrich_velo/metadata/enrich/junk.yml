@@ -12,11 +12,7 @@ columns:
   id_lvl_1:
     description: First level category ID.
     lineage:
-      - datalake_velo_clean.fiancavelo_proposestatus.id
-      - datalake_velo_clean.fiancavelo_status.id
       - datalake_velo_clean.fiancavelo_proposetype.id
-      - datalake_velo_clean.fiancavelo_occurrencestatus.id
-      - datalake_velo_clean.fiancavelo_occurrencetype.id
   desc_master_type:
     description: Master Type description.
   desc_lvl_1:
@@ -27,3 +23,9 @@ columns:
       - datalake_velo_clean.fiancavelo_proposetype.name
       - datalake_velo_clean.fiancavelo_occurrencestatus.name
       - datalake_velo_clean.fiancavelo_occurrencetype.name
+      - datalake_rental_guarantee_platform_clean.propose_status.name
+      - datalake_rental_guarantee_platform_clean.bussines_type.name
+      - datalake_rental_guarantee_platform_clean.payment.billing_type
+      - datalake_rental_guarantee_platform_clean.payment.status
+      - datalake_rental_guarantee_platform_clean.agreement_payment.status
+      - datalake_rental_guarantee_platform_clean.payment.gateway

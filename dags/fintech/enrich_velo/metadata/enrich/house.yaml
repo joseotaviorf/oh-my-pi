@@ -8,35 +8,43 @@ columns:
     description: "House identification number (ID)"
     lineage:
       - datalake_velo_clean.fiancavelo_property.id
+      - datalake_rental_guarantee_platform_clean.property_propose.id
   type:
     description: "Property type description"
     lineage:
       - datalake_velo_clean.fiancavelo_propertytype.name
+      - datalake_rental_guarantee_platform_clean.property_type.name
   street:
     description: Property address street
     lineage:
       - datalake_velo_clean.fiancavelo_property.street
+      - datalake_rental_guarantee_platform_clean.address.street
   number:
     description: Property address number
     lineage:
       - datalake_velo_clean.fiancavelo_property.number
+      - datalake_rental_guarantee_platform_clean.address.number
   complement:
     description: Property address complement
     lineage:
       - datalake_velo_clean.fiancavelo_property.complement
+      - datalake_rental_guarantee_platform_clean.address.complement
   neighborhood:
     description: Property address neighborhood
     lineage:
       - datalake_velo_clean.fiancavelo_property.neighborhood
+      - datalake_rental_guarantee_platform_clean.address.neighborhood
   city:
     description: "City where the property is located"
     lineage:
       - datalake_velo_clean.fiancavelo_property.city
+      - datalake_rental_guarantee_platform_clean.address.city
   state:
     description: "State where the property is located"
     lineage:
       - datalake_ebdb_clean.state.abbreviation
       - datalake_velo_clean.fiancavelo_property.state
+      - datalake_rental_guarantee_platform_clean.address.state
   country_code:
     description: "Country Code where the property is located"
     lineage:
@@ -45,7 +53,10 @@ columns:
     description: "ZIPCODE"
     lineage:
       - datalake_velo_clean.fiancavelo_property.zipcode
+      - datalake_rental_guarantee_platform_clean.address.zip_code
   geolocation:
     description: "Geolocation coordenates"
     lineage:
       - datalake_velo_clean.fiancavelo_property.geolocation
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)

@@ -17,6 +17,5 @@ SELECT
     day
 FROM
     datalake_rental_guarantee_platform_raw.plan
-
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id ORDER BY dateupdate DESC) = 1

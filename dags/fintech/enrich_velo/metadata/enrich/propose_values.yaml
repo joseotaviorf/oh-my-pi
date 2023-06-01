@@ -1,32 +1,56 @@
 database_name: datalake_velo
 table_name: propose_values
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing Velo's proposes detailed info"
 columns:
   id_propose_values:
+    description: ProposeValues's identification number (ID)
     lineage:
       - datalake_velo_clean.fiancavelo_propose.id
       - datalake_velo_clean.fiancavelo_activator.id
       - datalake_velo_clean.fiancavelo_plans.id
+      - datalake_rental_guarantee_platform_clean.propose.id
+      - datalake_rental_guarantee_platform_clean.company_plan.id
+      - datalake_rental_guarantee_platform_clean.plan.id
   plan_type:
+    description: Propose's plan type. Usually Business or Residential.
     lineage:
       - datalake_velo_clean.fiancavelo_plantype.name
+      - datalake_rental_guarantee_platform_clean.business_type.name
   activator_type:
+    description: Propose's activator type name. This may not exist in QuintoCred.
     lineage:
       - datalake_velo_clean.fiancavelo_activator.name
   plan:
+    description: Propose's plan name.
     lineage:
       - datalake_velo_clean.fiancavelo_plans.name
+      - datalake_rental_guarantee_platform_clean.plan.plan_name
   activator_amount:
+    description: Propose's value paid to activate the contract. This marks the start of the propose as a contract.
     lineage:
       - datalake_velo_clean.fiancavelo_activator.value
+      - datalake_rental_guarantee_platform_clean.propose.activator_value
   plan_percent:
+    description: Propose's plan percentage charged of a package.
     lineage:
       - datalake_velo_clean.fiancavelo_plans.percent
+      - datalake_rental_guarantee_platform_clean.plan.pricing
   plan_coverage:
+    description: Propose's plan coverage.
     lineage:
       - datalake_velo_clean.fiancavelo_plans.coverage
+      - datalake_rental_guarantee_platform_clean.plan.coverage
   plan_damage:
+    description: Propose's plan damage.
     lineage:
       - datalake_velo_clean.fiancavelo_plans.damage
+      - datalake_rental_guarantee_platform_clean.plan.damage
   plan_commission:
+    description: Propose's plan comission.
     lineage:
       - datalake_velo_clean.fiancavelo_plans.commission
+      - datalake_rental_guarantee_platform_clean.plan.comission
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
