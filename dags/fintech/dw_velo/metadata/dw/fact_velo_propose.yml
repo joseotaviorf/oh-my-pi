@@ -165,6 +165,10 @@ columns:
     lineage:
     - datalake_velo.propose.ts_sign_started
     description: Timestamp of when the propose has been signed
+  ts_signed:
+    lineage:
+    - datalake_velo.propose.ts_signed
+    description: Timestamp of when the propose has finished being signed (to turn into a contract)
   ts_paid:
     lineage:
     - datalake_velo.propose.ts_paid

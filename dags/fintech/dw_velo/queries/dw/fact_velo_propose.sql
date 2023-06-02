@@ -40,6 +40,7 @@ SELECT
     ts_evaluation_started,
     ts_rejected,
     ts_sign_started,
+    ts_signed,
     ts_paid,
     ts_activation,
     ts_secured,
