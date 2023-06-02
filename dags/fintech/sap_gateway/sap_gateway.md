@@ -22,8 +22,6 @@ In datalake RAW, via full load:
 - `person`
 - `rule`
 - `rule_account_type`
-- `rule_special_condition`
-- `special_condition`
 
 
 

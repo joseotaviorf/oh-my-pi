@@ -21,12 +21,6 @@ tables:
   - table_name: rule_account_type
     extraction_type: full
     clean_table_name: rule_account_type
-  - table_name: rule_special_condition
-    extraction_type: full
-    clean_table_name: rule_special_condition
-  - table_name: special_condition
-    extraction_type: full
-    clean_table_name: special_condition
   - table_name: feature
     extraction_type: incremental
     date_filter_column: updated_at
