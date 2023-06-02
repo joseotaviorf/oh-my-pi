@@ -101,6 +101,7 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
     extraction_spark_job_file=raw_spark_job_path,
+    has_hive_sync=False,
     raw_spark_job_extra_args=[SOURCE, ENDPOINTS, "{{ ds }}"],
 )
 
