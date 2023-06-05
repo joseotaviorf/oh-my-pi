@@ -4,7 +4,7 @@ description:
   Enrich table that contains data from Twilio Flex table. It has data from
   Call, Chat and Email channels. Each row is a received demand. For chat and call,
   it uses Twilio Events IDs created for Tasks that were sent to an assigned queue
-  and waiting for acceptance. For email, it considers all the Zendesk E-mail Tickets.
+  and waiting for acceptance. For email, it considers all front office tickets.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
@@ -39,6 +39,10 @@ columns:
       For call tasks, it considers all inbound tasks, whereas for chat tasks, it takes into account
       all tasks that have generated a reservation. Similarly, for email, all Zendesk
       E-mail Tickets are considered.
+  id_reservation:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.id_reservation
+    description: Reservation ID from Twilio, identifies an event which an agent has been assigned to a call
   department:
     lineage:
       - datalake_bigfone_twilio.call_flex_events.id_task_queue
@@ -58,7 +62,7 @@ columns:
   agent_email:
     lineage:
       - datalake_bigfone_twilio.call_flex_events.id_task_external
-      - datalake_quinto_messenger_clean.task_event.event_payload
+      - datalake_quinto_messenger_clean.task.assigned_to
       - datalake_customer_support.email.agent_email
     description: The agent email.
   customer_phone:
@@ -99,12 +103,3 @@ columns:
       For Twilio Events, the creation timestamp represents the date and time when the
       event was created. For Zendesk E-mail Tickets, the creation timestamp corresponds
       to the ticket creation date in UTC-3.
-  ts_updated:
-    lineage:
-      - datalake_quinto_messenger_clean.task_event.ts_updated
-    description:
-      For Twilio chat tasks, the Twilio Event is updated when there is a change in
-      the chat conversation, such as a new message being sent or a participant joining
-      or leaving the chat. However, for email and call channels, there are no updates
-      to the event after it is created. In the case of Zendesk E-mail Tickets, the
-      creation date represents the only time stamp available.

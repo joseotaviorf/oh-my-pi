@@ -141,7 +141,7 @@ chat AS (
       GET_JSON_OBJECT(t.task_attributes,'$.chat_id') AS id_chat,
       te.event_type,
       GET_JSON_OBJECT(te.event_payload,'$.TaskQueueName') AS task_queue_name,
-      GET_JSON_OBJECT(event_payload,'$.WorkerAttributes.email') AS agent_email,
+      GET_JSON_OBJECT(t.assigned_to,'$.worker_name') AS agent_email,
       REGEXP_REPLACE(REGEXP_EXTRACT(GET_JSON_OBJECT(t.task_attributes,'$.from'), '(\\w+:)(.+)', 2), '^\\+(?=.*)', '') AS customer_phone,
       GET_JSON_OBJECT(t.task_resource, '$.reason') AS task_completion_reason,
       GET_JSON_OBJECT(te.event_payload,'$.TaskCompletedReason') AS task_event_completion_reason,
@@ -258,8 +258,7 @@ email AS (
     customer_email AS ce
       ON ce.email = usr.email
   WHERE
-    direction = 'inbound'
-    AND front_or_back = 'front'
+    front_or_back = 'front'
 )
 SELECT
   *
