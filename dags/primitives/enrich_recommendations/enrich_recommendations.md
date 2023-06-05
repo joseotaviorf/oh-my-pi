@@ -24,6 +24,7 @@ This pipeline produces the following output table on enrich layer:
 - `item_interaction`
 - `recommendation`
 - `recommendation_flow`
+- `recommendation_features`
 - `coverage`
 - `diversity`
 - `popularity`
