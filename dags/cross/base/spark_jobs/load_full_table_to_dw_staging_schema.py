@@ -21,6 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("dw_schema")
     parser.add_argument("relative_query_path")
     parser.add_argument("table_name")
+    parser.add_argument("partitions")
     parser.add_argument("spark_session_configs")
     parser.add_argument("tree_path")
 
@@ -31,6 +32,7 @@ if __name__ == "__main__":
     dw_schema = args.dw_schema
     relative_query_path = args.relative_query_path
     table_name = args.table_name
+    partitions = json.loads(args.partitions.replace("'", '"'))
     spark_session_configs = json.loads(args.spark_session_configs)
     tree_path = args.tree_path
 
@@ -58,5 +60,6 @@ if __name__ == "__main__":
         layer=LayerEnum.DW_STAGING.value,
         query=query,
         spark_session_configs=spark_session_configs,
+        partitions=partitions,
     )
     table_loader_pipeline.run()

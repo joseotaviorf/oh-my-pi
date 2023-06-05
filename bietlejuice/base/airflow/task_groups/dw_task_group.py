@@ -94,17 +94,23 @@ class DWTaskGroup(BaseTaskGroup):
         layer_enum = LayerEnum.DW
         layer = layer_enum.value
         table_customization = table_customization or {}
+        extra_query_template_params = extra_query_template_params or {}
 
         table_database_schema = self.__get_table_schema(table_customization)
         table_extraction_type = self.__get_table_extraction_type(
             table_customization, is_incremental
         )
         partitions = self.__get_table_partitions(table_customization, partitions)
-        extra_query_template_params = extra_query_template_params or {}
+        extra_query_template_params = self.__get_extra_query_template_params(
+            table_customization, extra_query_template_params
+        )
         incremental_params = (
             ["{{ ds }}", json.dumps(extra_query_template_params)]
             if table_extraction_type == "incremental"
             else []
+        )
+        has_load_to_redshift_task = self.__get_redshift_load_flag(
+            table_customization, has_load_to_redshift_task
         )
 
         load_table_to_dw_final_schema_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -292,30 +298,22 @@ class DWTaskGroup(BaseTaskGroup):
         layer_enum = LayerEnum.DW_STAGING
         layer = layer_enum.value
         table_customization = table_customization or {}
+        extra_query_template_params = extra_query_template_params or {}
 
         table_database_schema = self.__get_table_schema(table_customization)
         table_extraction_type = self.__get_table_extraction_type(
             table_customization, is_incremental
         )
         partitions = self.__get_table_partitions(table_customization, partitions)
-        is_incremental = table_extraction_type == "incremental"
-        extra_query_template_params = extra_query_template_params or {}
+        extra_query_template_params = self.__get_extra_query_template_params(
+            table_customization, extra_query_template_params
+        )
+        incremental_params = (
+            ["{{ ds }}", json.dumps(extra_query_template_params)]
+            if table_extraction_type == "incremental"
+            else []
+        )
         spark_session_configs = spark_session_configs or {}
-
-        load_table_to_dw_staging_params = [
-            self.env,
-            self.dw_bucket,
-            table_database_schema,
-            self.relative_query_path,
-            table_name,
-        ]
-
-        if is_incremental:
-            load_table_to_dw_staging_params += [
-                str(partitions),
-                "{{ ds }}",
-                json.dumps(extra_query_template_params),
-            ]
 
         load_table_to_dw_staging_schema_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
@@ -328,7 +326,15 @@ class DWTaskGroup(BaseTaskGroup):
             json={
                 "spark_python_task": {
                     "python_file": f"{self.spark_jobs_path}/load_{table_extraction_type}_table_to_dw_staging_schema.py",
-                    "parameters": load_table_to_dw_staging_params
+                    "parameters": [
+                        self.env,
+                        self.dw_bucket,
+                        table_database_schema,
+                        self.relative_query_path,
+                        table_name,
+                        json.dumps(partitions),
+                    ]
+                    + incremental_params
                     + [json.dumps(spark_session_configs), tree_path],
                 }
             },
@@ -470,6 +476,20 @@ class DWTaskGroup(BaseTaskGroup):
     def __get_table_partitions(self, table_customization, partitions):
         table_partitions = table_customization.get("partitions", partitions)
         return table_partitions
+
+    def __get_redshift_load_flag(self, table_customization, has_load_to_redshift_task):
+        has_load_to_redshift_task = table_customization.get(
+            "has_load_to_redshift_task", has_load_to_redshift_task
+        )
+        return has_load_to_redshift_task
+
+    def __get_extra_query_template_params(
+        self, table_customization, extra_query_template_params
+    ):
+        extra_query_template_params = table_customization.get(
+            "extra_query_template_params", extra_query_template_params
+        )
+        return extra_query_template_params
 
     def __get_table_extraction_type(self, table_customization, is_incremental):
         table_extraction_type = table_customization.get(

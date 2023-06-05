@@ -52,6 +52,7 @@ class DAGDeclarationValidator(Validator):
                 "custom_schema": {"type": "string", "empty": False},
                 "default_extraction_type": {"type": "string", "empty": False},
                 "default_partitions": {"type": "list", "empty": False},
+                "extra_query_template_params": {"type": "dict", "empty": False},
                 "tables_customization": {"type": "dict", "empty": False},
                 "short_circuit_customization": {
                     "type": "dict",

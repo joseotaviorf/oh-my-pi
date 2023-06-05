@@ -65,7 +65,7 @@ class DWQueryWorkflow(BaseWorkflow):
             spark_jobs_path=base_spark_jobs_path,
         )
 
-        dw_staging_task_group = task_group.build_task_group_from_sql_files(
+        dw_staging_task_groups = task_group.build_task_group_from_sql_files(
             layer=LayerEnum.DW_STAGING,
             spark_session_configs=spark_session_configs,
             tables_customization=tables_customization,
@@ -73,7 +73,7 @@ class DWQueryWorkflow(BaseWorkflow):
             is_incremental=default_is_incremental,
         )
 
-        dw_task_group = task_group.build_task_group_from_sql_files(
+        dw_task_groups = task_group.build_task_group_from_sql_files(
             layer=LayerEnum.DW,
             spectrum_iam_role=spectrum_iam_role,
             tables_customization=tables_customization,
@@ -85,7 +85,7 @@ class DWQueryWorkflow(BaseWorkflow):
         skip_run_task = (
             ShortCircuitOperator(
                 dag=dag,
-                task_id=f"check-day-to-skip-execution",
+                task_id="check-day-to-skip-execution",
                 python_callable=ShortCircuitFunctionEnum.get_function(
                     short_circuit_customization["function"]
                 ),
@@ -106,14 +106,21 @@ class DWQueryWorkflow(BaseWorkflow):
             dag=dag, task_id="terminate-cluster"
         )
 
+        dw_task_groups_boundaries = (
+            self._get_dw_task_groups_boundaries(dw_task_groups, dw_staging_task_groups)
+            if inner_dependencies
+            else {}
+        )
+
         self.set_dependencies(
             skip_run_task,
             inner_dependencies,
             task_group,
             create_cluster_task,
             terminate_cluster_task,
-            dw_staging_task_group,
-            dw_task_group,
+            dw_staging_task_groups,
+            dw_task_groups,
+            dw_task_groups_boundaries,
         )
 
         return dag
@@ -136,6 +143,16 @@ class DWQueryWorkflow(BaseWorkflow):
             "access_control_list": databricks_access_control_list,
         }
 
+    def _get_dw_task_groups_boundaries(self, dw_task_groups, dw_staging_task_groups):
+        dw_task_groups_boundaries = {}
+        for table in dw_task_groups:
+            initial_tasks = DWTaskGroup.first_tasks(dw_staging_task_groups[table])
+            final_tasks = DWTaskGroup.last_tasks(dw_task_groups[table])
+            dw_task_groups_boundaries[table] = DWTaskGroup.format_tasks_boundaries(
+                initial_tasks=initial_tasks, final_tasks=final_tasks
+            )
+        return dw_task_groups_boundaries
+
     def set_dependencies(
         self,
         skip_run_task,
@@ -143,8 +160,9 @@ class DWQueryWorkflow(BaseWorkflow):
         task_group,
         create_cluster_task,
         terminate_cluster_task,
-        dw_staging_task_group,
-        dw_task_group,
+        dw_staging_task_groups,
+        dw_task_groups,
+        dw_task_group_boundaries,
     ):
 
         if skip_run_task:
@@ -156,7 +174,7 @@ class DWQueryWorkflow(BaseWorkflow):
                 inner_dependencies_task_groups_boundaries,
             ) = task_group.set_inner_dag_dependencies(
                 task_flow_helper=TaskFlowHelper(),
-                task_groups_boundaries=dw_task_group,
+                task_groups_boundaries=dw_task_group_boundaries,
                 dag_inner_dependencies=inner_dependencies,
             )
 
@@ -167,18 +185,26 @@ class DWQueryWorkflow(BaseWorkflow):
                 + DWTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries)
             )
 
+            terminate_cluster_task.set_upstream(
+                DWTaskGroup.all_last_tasks(
+                    task_groups_boundaries_without_inner_dependencies
+                )
+                + DWTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries)
+            )
+
         else:
             create_cluster_task.set_downstream(
-                DWTaskGroup.all_first_tasks(dw_staging_task_group)
+                DWTaskGroup.all_first_tasks(dw_staging_task_groups)
+            )
+            terminate_cluster_task.set_upstream(
+                DWTaskGroup.all_last_tasks(dw_task_groups)
             )
 
         TaskFlowHelper.chain_task_groups_via_common_table(
-            dw_staging_task_group, dw_task_group
+            dw_staging_task_groups, dw_task_groups
         )
 
-        terminate_cluster_task.set_upstream(DWTaskGroup.all_last_tasks(dw_task_group))
-
         # Set data quality tasks if exists
-        independent_tasks = DWTaskGroup.all_independent_tasks(dw_staging_task_group)
+        independent_tasks = DWTaskGroup.all_independent_tasks(dw_staging_task_groups)
         if independent_tasks:
             terminate_cluster_task.set_upstream(independent_tasks)

@@ -1,0 +1,33 @@
+dag:
+  name: dw_agents_availability
+  schedule_start_date: 2020,2,20
+  owner: Data ForRent
+workflow:
+  type: query
+  layer: dw
+  custom_schema: agents_availability
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    "DATE(ts_load)": "DATE_ADD(DATE('{year}-{month}-{day}'), 1)"
+  inner_dependencies:
+    fact_inspector_daily_allocations:
+      - fact_inspector_hourly_allocations
+    fact_agent_daily_allocations:
+      - fact_agent_hourly_allocations
+    fact_photographer_daily_allocations:
+      - fact_photographer_hourly_allocations
+  tables_customization:
+    fact_agent_daily_allocations:
+      custom_schema: agent
+    fact_agent_hourly_allocations:
+      custom_schema: agent
+    fact_photographer_daily_allocations:
+      custom_schema: agent
+    fact_photographer_hourly_allocations:
+      custom_schema: agent
+cluster:
+  type: databricks_10_4_med_general_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
