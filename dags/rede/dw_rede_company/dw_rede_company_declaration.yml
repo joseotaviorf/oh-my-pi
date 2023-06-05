@@ -5,7 +5,7 @@ dag:
 workflow:
   type: query
   layer: dw
-  custom_schema: rede_company
+  custom_schema: rede
   default_extraction_type: full
   inner_dependencies:
     fact_company_event:
