@@ -21,7 +21,7 @@ house AS (
     datalake_ebdb_clean.user_revision_entity AS rev
       ON rev.id = house.rev
   WHERE
-    ts_status_changed < '2020-01-06 19:04:25' --Timestamp when table listing_business_context was created
+    CAST(FROM_UNIXTIME(CAST(ts_revision AS BIGINT)/1000) AS TIMESTAMP) < '2020-01-06 19:04:25' --Timestamp when table listing_business_context was created
 ),
 last_house_state AS (
   SELECT 
