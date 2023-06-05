@@ -51,7 +51,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 base_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 
-cluster_description = config_service.get_config("databricks_10_4_med_general_photon_cluster")
+cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 custom_libraries = [
     {
         "whl": f"{artifacts_bucket}/survicate-api-client-python/"
