@@ -1653,16 +1653,16 @@ bietlejuice.enrich_mexico_braze_details:
   - bietlejuice.braze_details:load-clean-canvas-details-indica-ai
   - bietlejuice.braze_details:load-clean-canvas-details-owners
   - bietlejuice.braze_details:load-clean-canvas-details-tenants
-#bietlejuice.enrich_mexico_consolidated_marketing_metrics:
-#  - bietlejuice.enrich_mexico_google_ads:load-enrich-ads-performance
-#  - bietlejuice.enrich_mexico_google_ads:load-enrich-campaigns-performance
-#  - bietlejuice.enrich_mexico_google_ads:load-enrich-keywords-performance
-#  - bietlejuice.enrich_mexico_google_ads:load-enrich-videos-performance
-#  - bietlejuice.enrich_region:load-enrich-region
-#  - bietlejuice.gsheets.growth:done-clean-marketing-costs-google-ad-type-flags
-#  - bietlejuice.mexico_facebook_insights:load-clean-facebook-insights
-#  - bietlejuice.mexico_lifull_campaigns:load-clean-mitula-campaigns
-#  - bietlejuice.mexico_lifull_campaigns:load-clean-trovit-campaigns
+bietlejuice.enrich_mexico_consolidated_marketing_metrics:
+  - bietlejuice.enrich_mexico_google_ads:load-enrich-ads-performance
+  - bietlejuice.enrich_mexico_google_ads:load-enrich-campaigns-performance
+  - bietlejuice.enrich_mexico_google_ads:load-enrich-keywords-performance
+  - bietlejuice.enrich_mexico_google_ads:load-enrich-videos-performance
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.gsheets.growth:done-clean-marketing-costs-google-ad-type-flags
+  - bietlejuice.mexico_facebook_insights:load-clean-facebook-insights
+  - bietlejuice.mexico_lifull_campaigns:load-clean-mitula-campaigns
+  - bietlejuice.mexico_lifull_campaigns:load-clean-trovit-campaigns
 bietlejuice.enrich_mexico_google_ads:
   - bietlejuice.google_ads:load-clean-ads-performance
   - bietlejuice.google_ads:load-clean-campaigns-performance
