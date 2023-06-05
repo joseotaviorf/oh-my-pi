@@ -93,6 +93,8 @@ tables:
     date_filter_column: dateupdate
   - table_name: propose
     date_filter_column: dateupdate
+  - table_name: propose_aud
+    date_filter_column: dateinsert
   - table_name: propose_documents
     date_filter_column: dateupdate
   - table_name: propose_history

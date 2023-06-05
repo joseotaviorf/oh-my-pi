@@ -38,15 +38,19 @@ WITH new_system AS (
         ),
         propose_evaluation_started_date AS (
         SELECT
-            id_propose,
-            MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_evaluation_started
+            p.id AS id_propose,
+            MIN(r.ts_created) AS ts_evaluation_started
         FROM
-            datalake_rental_guarantee_platform_clean.propose_history
+            datalake_rental_guarantee_platform_clean.propose_aud AS p
+        LEFT JOIN
+            datalake_rental_guarantee_platform_clean.rev_info AS r
+            ON r.rev = p.rev
+        LEFT JOIN
+            datalake_rental_guarantee_platform_clean.propose_status AS ps
+            ON ps.id = p.id_propose_status
         WHERE
-            value IN ('Análise humanizada','Análise de documentos')
-            AND id_history_type = 5 -- Status update type
-        GROUP BY
-            1 -- some proposes can have multiple same status
+            ps.name = 'Pendente'
+        GROUP BY 1 -- some proposes can have multiple same status
         ),
         propose_rejected_date AS (
         SELECT
@@ -716,7 +720,7 @@ old_system AS (
     pym.dt_last_payment,
     DATE(f.dt_begin) AS dt_contract_started,
     COALESCE(DATE(pcd.ts_ended), f.dt_ended) AS dt_ended,
-    sd.ts_propose_started,
+    COALESCE(sd.ts_propose_started, p.ts_inserted) AS ts_propose_started,
     wndd.ts_waiting_new_docs,
     esd.ts_evaluation_started,
     rd.ts_rejected,

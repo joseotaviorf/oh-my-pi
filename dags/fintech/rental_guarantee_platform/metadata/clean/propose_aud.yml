@@ -1,0 +1,151 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: propose_aud
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.id
+  id_user_insert:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.userinsert
+  id_user_update:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.userupdate
+  id_business_type:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.type
+  id_propose_status:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.status
+  id_real_estate:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.realestate
+  id_company_plan:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.company_plan
+  id_tenant_company:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.tenant_company
+  id_realtor:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.realtor
+  rev:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.rev
+  rev_type:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.revtype
+  rev_end:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.revend
+  activator_value:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.activator
+  billing_model:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.billing_model
+  hash:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.hash
+  external_ref:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.externalref
+  agent_split_fee:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.agent_split_fee
+  activator_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.activator_mod
+  agent_split_fee_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.agent_split_fee_mod
+  billing_model_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.billing_model_mod
+  external_ref_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.externalref_mod
+  hash_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.hash_mod
+  id_real_estate_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.realestate_mod
+  id_realtor_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.realtor
+  id_company_plan_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.company_plan_mod
+  credit_analysis_entities_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.credit_analysis_entities_mod
+  id_tenant_company_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.tenant_company_mod
+  id_contract_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.contract_mod
+  annual_value_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.annual_value_mod
+  monthly_value_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.monthly_value_mod
+  total_coverage_mod:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.total_coverage_mod
+  is_active:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.active
+  ts_inserted:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.dateinsert
+  year:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.year
+  month:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.month
+  day:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.day
