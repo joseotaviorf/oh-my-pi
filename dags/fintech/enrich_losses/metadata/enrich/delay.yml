@@ -51,6 +51,8 @@ columns:
     description: Frequency of the payment. 
   full_delay_at_deal:
     description:  Date difference between deal_anchor_due_date and dt_closing.
+  guarantee_type:
+    description: Guarantee information related to the invoice. 
   pd_range_rule_A:
     description: Range of the delay in days related to Rule A.
   pd_range_rule_B:
@@ -61,16 +63,16 @@ columns:
     description: Range of the delay in days related to Rule D.
   risk_type:
     description: Risk type of the deal.
+  user:
+    lineage:   
+    - datalake_losses.closing.user
+    description: User information related to the invoice. 
   is_before_started:
     lineage:   
     - datalake_losses.closing.is_before_started
     description: Flag to show if the date is before started. 
   is_contract_with_deal:
     description: Flag to show if the contract had deal. 
-  is_guarantee_paid:
-    lineage:   
-    - datalake_losses.closing.is_guarantee_paid
-    description: Flag to show if the guarantee is paid. 
   is_hr:
     description: Flag to identify if the deal is high risk.
   is_invoice_deal:

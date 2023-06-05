@@ -33,6 +33,10 @@ columns:
     lineage:
     - datalake_losses.delay.pd_range_rule_D
     description: Range of the delay in days related to Rule D.
+  user:
+    lineage:
+    - datalake_losses.delay.user
+    description: User information related to the invoice.
   dt_closing:
     lineage:
     - datalake_losses.delay.dt_closing
