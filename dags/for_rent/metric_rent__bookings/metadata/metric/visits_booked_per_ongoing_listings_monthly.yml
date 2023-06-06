@@ -20,7 +20,7 @@ columns:
     description: Total of Visits Booked divided by the Ongoing Listing on a month.
       Metric used to connect the supply and demand funnels.
     metric:
-      name: Visits Booked per Ongoing Listings Monthly by SK Region
+      name: Visits Booked per Ongoing Listings Monthly
       description: Total of Visits Booked divided by the Ongoing Listing on a month.
         Metric used to connect the supply and demand funnels.
       acronym: VB2OL

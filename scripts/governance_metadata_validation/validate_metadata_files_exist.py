@@ -78,9 +78,9 @@ def get_query_file_paths(mode, input):
 
 def metadata_file_exists(query_file):
     return os.path.isfile(
-        query_file.replace("/queries/", "/metadata/").replace("sql", "yml")
+        query_file.replace("/queries/", "/metadata/").replace(".sql", ".yml")
     ) or os.path.isfile(
-        query_file.replace("/queries/", "/metadata/").replace("sql", "yaml")
+        query_file.replace("/queries/", "/metadata/").replace(".sql", ".yaml")
     )
 
 
