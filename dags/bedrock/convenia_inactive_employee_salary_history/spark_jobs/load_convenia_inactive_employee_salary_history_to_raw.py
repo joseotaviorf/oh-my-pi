@@ -62,7 +62,7 @@ def create_df_from_employee_salary_history(results, spark_client, token_name):
                 Row(
                     id=str(details["id"]),
                     id_employee=str(details["id_employee"]),
-                    salary=str(details["salary"]),
+                    salary=(details["salary"]) / 100,
                     relationship_id=str(details["relationship_id"]),
                     relationship=str(details["relationship"]),
                     department_id=str(details["department_id"]),
@@ -95,7 +95,7 @@ def create_df_schema():
         [
             StructField("id", StringType(), True),
             StructField("id_employee", StringType(), True),
-            StructField("salary", StringType(), True),
+            StructField("salary", LongType(), True),
             StructField("relationship_id", StringType(), True),
             StructField("relationship", StringType(), True),
             StructField("department_id", StringType(), True),
@@ -123,7 +123,6 @@ def create_df_schema():
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -156,8 +155,8 @@ if __name__ == "__main__":
         host = details["host"]
         api_token = details["token"]
 
-        convenia_employee_salary_history_result = fetch_convenia_employee_salary_history(
-            host, api_token
+        convenia_employee_salary_history_result = (
+            fetch_convenia_employee_salary_history(host, api_token)
         )
         spark_client = SparkClient()
         df = create_df_from_employee_salary_history(
@@ -165,7 +164,7 @@ if __name__ == "__main__":
         )
         result = df.union(result)
 
-    df = SparkDataFrameService().input(result).convert_array_type_to_json().output()
+    df = result
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW

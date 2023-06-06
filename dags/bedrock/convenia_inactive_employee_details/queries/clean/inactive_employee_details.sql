@@ -5,6 +5,8 @@ SELECT
     name,
     last_name,
     social_name,
+    mother_name,
+    father_name,
     email,
     salary,
     alternative_email,

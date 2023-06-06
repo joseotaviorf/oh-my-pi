@@ -29,6 +29,14 @@ columns:
     description: Employee social name
     lineage:
       - datalake_convenia_details_raw.inactive_employee_details.social_name
+  mother_name:
+    description: Employee social name
+    lineage:
+      - datalake_convenia_details_raw.inactive_employee_details.mother_name
+  father_name:
+    description: Employee social name
+    lineage:
+      - datalake_convenia_details_raw.inactive_employee_details.father_name
   email:
     description: Corporate email from the employee
     lineage:

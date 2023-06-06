@@ -3,6 +3,7 @@ import logging
 from argparse import ArgumentParser
 
 from pyspark import Row
+from pyspark.sql.functions import col, regexp_replace
 from pyspark.sql.types import (
     StructType,
     StringType,
@@ -71,7 +72,7 @@ def create_df_from_inactive_employee_details(results, spark_client, token_name):
                 last_name=str(employee["last_name"]),
                 email=str(employee["email"]),
                 hiring_date=str(employee["hiring_date"]),
-                salary=str(employee["salary"]),
+                salary=employee["salary"],
                 alternative_email=str(employee["alternative_email"]),
                 phone=str(employee["phone"]),
                 cellphone=str(employee["cellphone"]),
@@ -94,7 +95,20 @@ def create_df_from_inactive_employee_details(results, spark_client, token_name):
                 address=str(employee["address"]),
                 cost_center=str(employee["cost_center"]),
                 salary_type=str(employee["salary_type"]),
-                benefits=str(employee["benefits"]),
+                benefits=[
+                    {
+                        "name": "None",
+                        "company_value": "0.00",
+                        "benefit_id": "None",
+                        "employee_value": "0.00",
+                        "payment_method": "None",
+                        "id": "None",
+                        "operator": "None",
+                        "type": "None",
+                    }
+                ]
+                if not employee["benefits"]
+                else employee["benefits"],
                 custom_fields=employee["custom_fields"],
                 time_tracking=str(employee["time_tracking"]),
                 educations=employee["educations"],
@@ -117,6 +131,8 @@ def create_df_from_inactive_employee_details(results, spark_client, token_name):
                 all_bank_accounts=employee["bank_accounts"],
                 social_name=str(employee["social_name"]),
                 disability=str(employee["disability"]),
+                mother_name=str(employee["mother_name"]),
+                father_name=str(employee["father_name"]),
                 source=token_name,
             )
         )
@@ -159,7 +175,7 @@ def create_df_schema():
             StructField("address", StringType(), True),
             StructField("cost_center", StringType(), True),
             StructField("salary_type", StringType(), True),
-            StructField("benefits", StringType(), True),
+            StructField("benefits", ArrayType(MapType(StringType(), StringType()))),
             StructField(
                 "custom_fields", ArrayType(MapType(StringType(), StringType()))
             ),
@@ -174,8 +190,10 @@ def create_df_schema():
                 "all_bank_accounts", ArrayType(MapType(StringType(), StringType()))
             ),
             StructField("social_name", StringType(), True),
-            StructField("source", StringType(), True),
             StructField("disability", StringType(), True),
+            StructField("mother_name", StringType(), True),
+            StructField("father_name", StringType(), True),
+            StructField("source", StringType(), True),
         ]
     )
 
@@ -229,6 +247,10 @@ if __name__ == "__main__":
 
         result = df.union(result)
 
+    df = result.withColumn(
+        "documents", regexp_replace(col("documents"), "None", "'none'")
+    )
+
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
@@ -240,12 +262,12 @@ if __name__ == "__main__":
     metastore_service.create_database(database_name)
     s3_loader = S3Loader()
     s3_loader.load_df(
-        df=result,
+        df=df,
         s3_path=f"{database_location}{table_name}",
         format_options=format_options,
     )
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
     spark_metastore_loader.update_metastore(
-        result, database_name, table_name, format_options, database_location
+        df, database_name, table_name, format_options, database_location
     )
     metastore_service.refresh_table(database_name, table_name)
