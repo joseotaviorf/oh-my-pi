@@ -414,6 +414,30 @@ marketing_manual_campaign_cities:
     clean_table_name: marketing_manual_campaign_cities
     sheet_context: growth
 
+marketing_offline_manual_costs:
+    sheet_id: 1gneeE6l30lv4om6FBEUe23YGfbMCCNe8IwpbCRL6vXQ
+    sheet_name: offline_manual_costs
+    clean_table_name: marketing_offline_manual_costs
+    sheet_context: growth
+
+marketing_offline_manual_share_city_group:
+    sheet_id: 1zUM7FIxpNXmnTsbWZoX1wV7S_C49XMO8Vo68ElSqipo
+    sheet_name: offline_manual_share_city_group
+    clean_table_name: marketing_offline_manual_share_city_group
+    sheet_context: growth
+
+marketing_offline_manual_share_cost_center:
+    sheet_id: 1zUM7FIxpNXmnTsbWZoX1wV7S_C49XMO8Vo68ElSqipo
+    sheet_name: offline_manual_share_cost_center
+    clean_table_name: marketing_offline_manual_share_cost_center
+    sheet_context: growth
+
+marketing_offline_budget:
+    sheet_id: 1Ap6n1wC_jsmX8gyjcVPYlq7ckC2UV77XNULdABHp2Bo
+    sheet_name: marketing_offline_budget
+    clean_table_name: marketing_offline_budget
+    sheet_context: growth
+
 marketing_social_media_costs:
     sheet_id: 1yleDGeVtbzrT5rM0zo9AomOZKIGTOiYm-FK0_GNnGNs
     sheet_name: social_media_costs

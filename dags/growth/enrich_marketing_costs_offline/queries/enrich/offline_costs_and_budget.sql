@@ -65,4 +65,4 @@ SELECT
     NULL AS dt_service_started,
     NULL AS dt_service_ended
 FROM
-    datalake_marketing_offline_costs_clean.marketing_offline_budget
+    datalake_gsheets_clean.marketing_offline_budget

@@ -43,7 +43,7 @@ WITH offline_costs AS (
             ELSE cost
         END AS cost
     FROM
-        datalake_marketing_offline_costs_clean.marketing_offline_manual_costs
+        datalake_gsheets_clean.marketing_offline_manual_costs
 ),
 city_group_rules AS (
     SELECT
@@ -51,7 +51,7 @@ city_group_rules AS (
         city_group,
         share
     FROM
-        datalake_marketing_offline_costs_clean.marketing_offline_manual_share_city_group
+        datalake_gsheets_clean.marketing_offline_manual_share_city_group
 ),
 cost_center_rules AS (
     SELECT
@@ -59,7 +59,7 @@ cost_center_rules AS (
         cost_center,
         share
     FROM
-        datalake_marketing_offline_costs_clean.marketing_offline_manual_share_cost_center
+        datalake_gsheets_clean.marketing_offline_manual_share_cost_center
 ),
 date_range AS (
     SELECT 
@@ -71,7 +71,7 @@ date_range AS (
             )
         ) AS date
     FROM 
-      datalake_marketing_offline_costs_clean.marketing_offline_manual_costs
+      datalake_gsheets_clean.marketing_offline_manual_costs
 ),
 aux_invoice_daily_share AS (
     SELECT
