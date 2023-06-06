@@ -1,29 +1,41 @@
 ---
 database_name: datalake_pro_owners
 table_name: pro_owner_history
+description: Historical enriched table for rent context (PP Multi - Pro owner). Each
+  row contains the changes of the status or the account manager associated with the PP Multi.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
 columns:
   id_owner:
     lineage:
       - datalake_ebdb_clean.user_pro_owner_aud.id_user
       - datalake_ebdb_clean.user_merge.id_winner_account
+    description: Id user of the owner.
   id_account_manager:
     lineage:
       - datalake_ebdb_clean.user_pro_owner_aud.id_account_manager
+    description: Id of the account manager associated with the PP Multi.
   is_pro_owner:
     lineage:
       - datalake_ebdb_clean.user_pro_owner_aud.is_active
+    description: Boolean flag indicating if the PP Multi is active on the program.
   ts_event:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp when a change happened.
   ts_pro_owner_started:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp when the owner joined the PP Multi program.
   ts_pro_owner_ended:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp when the owner quit the PP Multi program.
   ts_account_manager_started:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp when the account manager was associated with the owner.
   ts_account_manager_ended:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp when the account manager was dissociated with the owner.

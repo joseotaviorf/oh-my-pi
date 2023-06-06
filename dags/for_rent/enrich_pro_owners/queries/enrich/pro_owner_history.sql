@@ -1,120 +1,83 @@
 WITH aud_ts AS (
   SELECT /*+ RANGE_JOIN(aud, 50000) */
-    aud.id_user AS id_owner,
+    COALESCE(um2.id_winner_account, um.id_winner_account, aud.id_user) AS id_owner,
+    LAG(aud.id_account_manager) OVER (PARTITION BY COALESCE(um2.id_winner_account, um.id_winner_account, aud.id_user) ORDER BY aud.rev) AS id_previous_account_manager,
     aud.id_account_manager,
+    LAG(aud.is_active) OVER (PARTITION BY COALESCE(um2.id_winner_account, um.id_winner_account, aud.id_user) ORDER BY aud.rev) AS previous_status,
     aud.is_active,
-    LAG(aud.id_account_manager) OVER (PARTITION BY aud.id_user ORDER BY aud.rev) AS previous_account_manager,
-    LAG(aud.is_active) OVER (PARTITION BY aud.id_user ORDER BY aud.rev) AS previous_status,
     TIMESTAMP(FROM_UNIXTIME(ure.ts_revision/1000)) AS ts_event
   FROM 
     datalake_ebdb_clean.user_pro_owner_aud AS aud
-  LEFT JOIN 
+  JOIN 
     datalake_ebdb_clean.user_revision_entity AS ure 
       ON aud.rev = ure.id
+  LEFT JOIN
+    datalake_ebdb_clean.user_merge AS um
+      ON aud.id_user = um.id_loser_account
+      AND um.status = 'MERGED'
+  LEFT JOIN
+    datalake_ebdb_clean.user_merge AS um2
+      ON um.id_winner_account = um2.id_loser_account
+      AND um2.status = 'MERGED'
 ),
-aud_events AS (
-  SELECT 
-    aud.id_owner,
-    aud.id_account_manager,
-    aud.is_active,
-    aud.ts_event,
-    LEAD(aud.ts_event, 1) OVER (PARTITION BY aud.id_owner  ORDER BY aud.ts_event) AS ts_next_event
-  FROM 
-    aud_ts AS aud
-  WHERE
-    NOT (COALESCE(id_account_manager, -1) = COALESCE(previous_account_manager, -1)
-    AND COALESCE(is_active, false) = COALESCE(previous_status, false))
-),
+
 pro_owner_dates AS (
   SELECT 
     aud.id_owner,
     aud.is_active,
     aud.ts_event AS ts_pro_owner_started,
-    MIN(aud_ts.ts_event) AS ts_pro_owner_ended
+    LEAD(aud.ts_event) OVER (PARTITION BY aud.id_owner ORDER BY aud.ts_event) AS ts_pro_owner_ended
   FROM 
     aud_ts AS aud
-  LEFT JOIN 
-    aud_ts
-      ON aud_ts.id_owner = aud.id_owner
-      AND aud_ts.is_active != aud.is_active
-      AND aud_ts.ts_event > aud.ts_event
   WHERE 
       aud.previous_status != aud.is_active
       OR aud.previous_status IS NULL
-  GROUP BY 
-    1,2,3
 ),
-account_manager AS (
+
+account_manager_dates AS (
   SELECT 
     aud.id_owner,
     aud.id_account_manager,
-    MIN(aud.ts_event) AS ts_account_manager_started,
-    MIN(aud_ts.ts_event) AS ts_account_manager_ended
+    aud.is_active,
+    aud.ts_event AS ts_account_manager_started,
+    LEAD(aud.ts_event) OVER (PARTITION BY aud.id_owner ORDER BY aud.ts_event) AS ts_account_manager_ended
   FROM 
     aud_ts AS aud
-  LEFT JOIN 
-    aud_ts
-      ON aud_ts.id_owner = aud.id_owner
-      AND aud_ts.id_account_manager != aud.id_account_manager
-      AND aud_ts.ts_event > aud.ts_event
-  GROUP BY 
-    1,2
-),
-pro_owner_base AS (
-SELECT DISTINCT
+  WHERE
+    (aud.id_previous_account_manager != aud.id_account_manager
+    OR aud.id_previous_account_manager IS NULL
+    OR aud.previous_status != aud.is_active)
+)
+
+SELECT
   at.id_owner,
-  aud.id_account_manager,
-  aud.is_active AS is_pro_owner,
+  CASE 
+    WHEN at.is_active = False THEN NULL
+    ELSE at.id_account_manager
+  END AS id_account_manager,
+  at.is_active AS is_pro_owner,
   CASE
-    WHEN aud.is_active = False 
-      OR aud.id_account_manager IS NULL THEN False
+    WHEN at.is_active = False 
+      OR at.id_account_manager IS NULL THEN False
     ELSE True
   END AS is_expert,
-  aud.ts_event,
+  at.ts_event,
   pod.ts_pro_owner_started,
   pod.ts_pro_owner_ended,
   am.ts_account_manager_started,
   am.ts_account_manager_ended
 FROM 
   aud_ts AS at
-JOIN 
-  aud_events AS aud
-    ON at.id_owner = aud.id_owner
-    AND at.ts_event >= aud.ts_event 
-    AND at.ts_event < COALESCE(aud.ts_next_event, CURRENT_TIMESTAMP())
 LEFT JOIN 
   pro_owner_dates AS pod
     ON at.id_owner = pod.id_owner
-    AND aud.is_active = pod.is_active
     AND at.ts_event >= pod.ts_pro_owner_started
     AND at.ts_event < COALESCE(pod.ts_pro_owner_ended, CURRENT_TIMESTAMP())
+    AND pod.is_active = True
 LEFT JOIN 
-  account_manager AS am
+  account_manager_dates AS am
     ON at.id_owner = am.id_owner
-    AND aud.id_account_manager = am.id_account_manager
+    AND at.id_account_manager = am.id_account_manager
     AND at.ts_event >= am.ts_account_manager_started 
     AND at.ts_event < COALESCE(am.ts_account_manager_ended, CURRENT_TIMESTAMP())
-)
-
-SELECT
-  COALESCE(um2.id_winner_account, um.id_winner_account, po.id_owner) AS id_owner,
-  po.id_account_manager,
-  po.is_pro_owner,
-  po.is_expert,
-  po.ts_event,
-  po.ts_pro_owner_started,
-  po.ts_pro_owner_ended,
-  po.ts_account_manager_started,
-  po.ts_account_manager_ended
-FROM 
-  pro_owner_base AS po
-LEFT JOIN
-  datalake_ebdb_clean.user_merge AS um
-    ON po.id_owner = um.id_loser_account
-    AND um.status = 'MERGED'
-LEFT JOIN
-  datalake_ebdb_clean.user_merge AS um2
-    ON um.id_winner_account = um2.id_loser_account
-    AND um2.status = 'MERGED'
-WHERE
-  DATE(po.ts_event) <= DATE('{year}-{month}-{day}')
+    AND am.is_active = True
