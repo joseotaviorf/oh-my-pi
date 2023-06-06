@@ -60,6 +60,6 @@ if __name__ == "__main__":
         layer=LayerEnum.DW_STAGING.value,
         query=query,
         spark_session_configs=spark_session_configs,
-        partitions=partitions,
+        # partitions=partitions,
     )
     table_loader_pipeline.run()

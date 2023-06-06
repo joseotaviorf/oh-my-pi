@@ -44,6 +44,9 @@ class DWQueryWorkflow(BaseWorkflow):
         has_load_to_redshift_task = self.workflow_args.get(
             "has_load_to_redshift_task", True
         )
+        extra_query_template_params = self.workflow_args.get(
+            "extra_query_template_params"
+        )
         spark_session_configs = self.workflow_args.get("spark_session_configs", {})
         inner_dependencies = self.workflow_args.get("inner_dependencies")
         cluster_params = self.get_cluster_params()
@@ -71,6 +74,7 @@ class DWQueryWorkflow(BaseWorkflow):
             tables_customization=tables_customization,
             partitions=default_partitions,
             is_incremental=default_is_incremental,
+            extra_query_template_params=extra_query_template_params,
         )
 
         dw_task_groups = task_group.build_task_group_from_sql_files(
@@ -80,6 +84,7 @@ class DWQueryWorkflow(BaseWorkflow):
             partitions=default_partitions,
             is_incremental=default_is_incremental,
             has_load_to_redshift_task=has_load_to_redshift_task,
+            extra_query_template_params=extra_query_template_params,
         )
 
         skip_run_task = (
