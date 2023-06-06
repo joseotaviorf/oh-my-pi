@@ -1011,14 +1011,7 @@ bietlejuice.enrich_marketing_automatic_daily_costs:
   remove:
     - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-braze-consolidated-metrics
 bietlejuice.enrich_marketing_costs_sharing_rules:
-  add:
-    - bietlejuice.dw_datamarts_cross:create-talk-to-agent-in-datalake
-    - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
-  remove:
-    - bietlejuice.dw_booking:load-dw-public-dim-booking
-    - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
-    - bietlejuice.dw_offer:load-dw-public-dim-offer
-    - bietlejuice.dw_region:load-dw-public-dim-region
+  override: []
 bietlejuice.enrich_marketing_manual_daily_costs:
   remove:
     - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
