@@ -9,6 +9,13 @@ columns:
     lineage:
       - datalake_ebdb_listing.business_context_history.id_house
     description: "Id of the house."
+  business_context:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.business_context
+    description: "Business context of the house."
+    categories:
+      RENT: "Rent context."
+      SALE: "Sale context."
   country_code:
     lineage:
       - datalake_ebdb_listing.business_context_history.country_code
