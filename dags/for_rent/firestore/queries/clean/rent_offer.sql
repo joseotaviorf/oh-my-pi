@@ -4,6 +4,7 @@ SELECT DISTINCT
     after AS updated_message,
     eventType AS event_type,
     CAST(timestamp AS TIMESTAMP) AS ts_updated,
+    NOW() AS ts_load,
     year,
     month, 
     day
