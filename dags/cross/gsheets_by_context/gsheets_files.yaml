@@ -1581,10 +1581,10 @@ regional_inspection_q1_2022:
     clean_table_name: regional_inspection_q1_2022
     sheet_context: static
 
-reference_sla_days:
+dags_sla_exclusion_list:
     sheet_id: 1SvZD4v4GC81IOVrALn5jr31pNOajp2Nxtqn-5Isvtvg
-    sheet_name: reference_sla_days
-    clean_table_name: reference_sla_days
+    sheet_name: dags_sla_exclusion_list
+    clean_table_name: dags_sla_exclusion_list
     sheet_context: static
 
 sale_business_unit_standardization:

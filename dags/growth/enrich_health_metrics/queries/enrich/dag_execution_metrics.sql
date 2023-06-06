@@ -46,7 +46,7 @@ historical_execution_metrics AS (
         MEDIAN( DATE_FORMAT(ts_dag_ended,'HH:mm:ss')::TIMESTAMP::BIGINT )::TIMESTAMP AS ts_median_ended,
         MEDIAN(duration_in_minutes) AS duration_median_in_minutes
     FROM 
-        dag_historical_executions AS em
+        datalake_health_metrics.dag_historical_executions AS em
     JOIN
         top_reference_sla_days AS rs
     ON

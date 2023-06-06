@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: dags_sla_exclusion_list
+owner: marcio.gomes@quintoandar.com.br
+domain: Data Growth
+description: WIP
+columns:
+  context:
+    lineage:
+      - datalake_gsheets_raw.dags_sla_exclusion_list.context
+  dag:
+    lineage:
+      - datalake_gsheets_raw.dags_sla_exclusion_list.dag
