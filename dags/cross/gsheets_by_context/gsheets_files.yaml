@@ -117,6 +117,12 @@ recuperacao_fachada_e_area_comum:
     clean_table_name: photos_recovery_common_area_facade
     sheet_context: support_and_service
 
+repair_ongoing_sla_target:
+    sheet_id: 17xtVv4HxmQoI7SjGUC4DfDU0_2B4iSrVdh9_JdSHgcw
+    sheet_name: Template
+    clean_table_name: repair_ongoing_sla_target
+    sheet_context: support_and_service
+
 service_city_holidays:
     sheet_id: 1wSYZjHde5RuFJQRigRFFIDiW4hpSOAtk88i6bkuwocI
     sheet_name: data_extraction
