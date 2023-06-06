@@ -3,7 +3,6 @@ import logging
 from argparse import ArgumentParser
 
 from pyspark import Row
-from pyspark.sql.functions import regexp_replace, col
 from pyspark.sql.types import StructType, StringType, StructField
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_convenia_api_client.clients import ConveniaClient
@@ -121,14 +120,7 @@ if __name__ == "__main__":
         )
         result = df.union(result)
 
-    df = (
-        result.withColumn("foreign", regexp_replace(col("foreign"), "None", "'none'"))
-        .withColumn("foreign", regexp_replace(col("foreign"), "False", "'false'"))
-        .withColumn("foreign", regexp_replace(col("foreign"), "True", "'true'"))
-        .withColumn("intern", regexp_replace(col("intern"), "True", "'true'"))
-        .withColumn("intern", regexp_replace(col("intern"), "False", "'false'"))
-        .withColumn("intern", regexp_replace(col("intern"), "None", "'none'"))
-    )
+    df = result
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW

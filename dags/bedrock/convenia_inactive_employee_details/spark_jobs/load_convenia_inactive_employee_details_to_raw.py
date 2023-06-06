@@ -3,7 +3,6 @@ import logging
 from argparse import ArgumentParser
 
 from pyspark import Row
-from pyspark.sql.functions import col, regexp_replace
 from pyspark.sql.types import (
     StructType,
     StringType,
@@ -23,11 +22,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.api.api_enum import APIEnum
 
-from bietlejuice.base.spark import (
-    BaseDBUtils,
-    SparkTableStorageFormat,
-    SparkDataFrameService,
-)
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_inactive_employee_details_to_raw"
@@ -97,14 +92,14 @@ def create_df_from_inactive_employee_details(results, spark_client, token_name):
                 salary_type=str(employee["salary_type"]),
                 benefits=[
                     {
-                        "name": "None",
+                        "name": "null",
                         "company_value": "0.00",
-                        "benefit_id": "None",
+                        "benefit_id": "null",
                         "employee_value": "0.00",
-                        "payment_method": "None",
-                        "id": "None",
-                        "operator": "None",
-                        "type": "None",
+                        "payment_method": "null",
+                        "id": "null",
+                        "operator": "null",
+                        "type": "null",
                     }
                 ]
                 if not employee["benefits"]
@@ -115,14 +110,14 @@ def create_df_from_inactive_employee_details(results, spark_client, token_name):
                 experience_period=str(employee["experience_period"]),
                 emergency_contacts=[
                     {
-                        "id": "None",
-                        "relation_id": "None",
-                        "relation": {"id": "None", "name": "None"},
-                        "name": "None",
-                        "phone": "None",
-                        "cellphone": "None",
-                        "work_phone": "None",
-                        "email": "None",
+                        "id": "null",
+                        "relation_id": "null",
+                        "relation": {"id": "null", "name": "null"},
+                        "name": "null",
+                        "phone": "null",
+                        "cellphone": "null",
+                        "work_phone": "null",
+                        "email": "null",
                     }
                 ]
                 if not employee["emergency_contacts"]
@@ -247,9 +242,7 @@ if __name__ == "__main__":
 
         result = df.union(result)
 
-    df = result.withColumn(
-        "documents", regexp_replace(col("documents"), "None", "'none'")
-    )
+    df = result
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
