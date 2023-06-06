@@ -11,7 +11,7 @@ WITH dag_layer AS (
 dags AS (
     SELECT DISTINCT 
         id_dag AS dag_name, 
-        owners AS dag_owner, 
+        REGEXP_REPLACE(owners,'(airflow|\,)','') AS dag_owner,
         layer AS dag_layer,
         DATE(adt.date) AS dt_executed
     FROM datalake_composer_clean.dag AS dag

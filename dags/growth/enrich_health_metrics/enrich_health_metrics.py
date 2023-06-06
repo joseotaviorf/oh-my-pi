@@ -31,10 +31,12 @@ athena_query_results_bucket = config_service.get_config("athena_query_results_bu
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
-)
+) 
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
+
+inner_dependencies = config_service.get_config("inner_dependencies")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -86,10 +88,27 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     has_create_external_table_task=False,
 )
 
-create_cluster_task.set_downstream(
-    DatalakeTaskGroup.all_first_tasks(enrich_task_groups)
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=inner_dependencies,
 )
 
-terminate_cluster_task.set_upstream(
-    DatalakeTaskGroup.all_last_tasks(enrich_task_groups)
+chain(
+    create_cluster_task,
+    datalake_task_group.all_first_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.first_tasks(inner_dependencies_task_groups_boundaries),
+)
+
+chain(
+    datalake_task_group.all_last_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
 )

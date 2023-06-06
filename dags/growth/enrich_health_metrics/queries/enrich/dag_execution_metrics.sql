@@ -1,95 +1,57 @@
-WITH dag_layer AS (
-    SELECT DISTINCT 
-        dag, 
-        CASE 
-            WHEN CONCAT_WS('|', ARRAY_SORT(ARRAY_DISTINCT(ARRAY_AGG(layer)))) LIKE 'clean%' THEN 'clean|raw'
-            ELSE CONCAT_WS('|', ARRAY_SORT(ARRAY_DISTINCT(ARRAY_AGG(layer))))
-        END AS layer
-    FROM datalake_dag_inventory_clean.table
-    GROUP BY 1
-),
-dag_names AS (
-    SELECT DISTINCT 
-        id_dag, 
-        owners AS dag_owner, 
-        layer AS dag_layer,
-        DATE(adt.date) AS dt_executed
-    FROM datalake_composer_clean.dag AS dag
-    LEFT JOIN dag_layer AS layer
-    ON dag.id_dag = layer.dag
-    CROSS JOIN datalake_quintoandar.aux_date AS adt
-    WHERE
-        dag.is_paused = FALSE
-        AND adt.date >= DATE('2021-01-01') and adt.date <= current_date()
-),
-execution_logs AS (
-    SELECT
-        dag.id_dag,
-        dag.dag_owner,
-        dag.dag_layer,
-        dag.dt_executed,
-        MIN(IF(log.event = 'running' AND log.id_task = 'create-cluster', 
-                log.id_log, 
-                NULL
-              )) AS id_log_first_task,
-        MIN(IF(log.event = 'success' AND log.id_task = 'terminate-cluster', 
-                log.id_log, 
-                NULL
-              )) AS id_log_last_task
+WITH execution_metrics_last_60_days AS (
+    SELECT 
+        TRIM(REGEXP_REPLACE(dag_owner,'(airflow|\,)','')) AS dag_owner,
+        dag_name,
+        dt_executed,
+        CASE WHEN 
+            (dag_name NOT LIKE '%dw_datamarts%' AND ts_dag_ended - INTERVAL '3' HOUR > dt_executed::TIMESTAMP + INTERVAL '480' MINUTE)
+            OR (dag_name LIKE '%dw_datamarts%' AND ts_dag_ended - INTERVAL '3' HOUR > dt_executed::TIMESTAMP + INTERVAL '630' MINUTE)
+            THEN NULL ELSE dag_name
+         END AS is_sla_dag
     FROM 
-        dag_names AS dag
-    INNER JOIN 
-        datalake_composer_clean.log log
-    ON 
-        log.id_dag = dag.id_dag
-        AND DATE(log.ts_executed) = dag.dt_executed - INTERVAL 1 day
-        AND DATE(log.ts_event) = dag.dt_executed
+        datalake_health_metrics.dag_historical_executions
     WHERE 
-        log.event IN ('success','running')
-    GROUP BY 1,2,3,4
+        dt_executed >= CURRENT_DATE() - INTERVAL '60' DAY
+        AND dag_name NOT IN (SELECT dag FROM datalake_gsheets_clean.dags_sla_exclusion_list)
+        AND dag_owner NOT IN ('MLOps','Data Governance','Data Primitives')
 ),
-execution_metrics AS (
+reference_sla_days AS (
     SELECT
-        exec.id_dag AS dag_name,
-        exec.dag_owner,
-        exec.dag_layer,
-        exec.dt_executed,
-        log_started.ts_event AS ts_dag_started,
-        log_last_task.ts_event AS ts_dag_ended,
-        DATEDIFF(MINUTE, log_started.ts_event, log_last_task.ts_event) AS duration_in_minutes
-
+        dag_owner,  
+        dt_executed,
+        COUNT( DISTINCT dag_name ) AS total_dags,
+        COUNT( DISTINCT is_sla_dag ) AS dags_sla_ok
     FROM 
-        execution_logs AS exec
-    JOIN
-        datalake_composer_clean.log log_started
-    ON
-        log_started.id_dag = exec.id_dag
-        AND log_started.id_log = exec.id_log_first_task
-        AND log_started.event = 'running'
-        --Due to new composer instance
-        AND DATE(log_started.ts_event) > DATE(exec.dt_executed - INTERVAL 2 day)
-    JOIN
-        datalake_composer_clean.log log_last_task
-    ON
-        log_last_task.id_dag = exec.id_dag
-        AND log_last_task.id_log = exec.id_log_last_task
-        AND log_last_task.event = 'success'
-        --Due to new composer instance
-        AND DATE(log_last_task.ts_event) > DATE(exec.dt_executed - INTERVAL 2 day)
+        execution_metrics_last_60_days
+    GROUP BY 
+        1, 2
+    HAVING
+        total_dags = dags_sla_ok
+),
+top_reference_sla_days AS (
+    SELECT 
+        dag_owner,
+        dt_executed,
+        RANK() OVER(PARTITION BY dag_owner ORDER BY dt_executed) AS rank
+    FROM
+        reference_sla_days
+    QUALIFY 
+        rank <= 20
 ),
 historical_execution_metrics AS (
     SELECT 
-        dag_name,
-        dag_owner,
+        em.dag_name,
+        em.dag_owner,
         MEDIAN( DATE_FORMAT(ts_dag_started,'HH:mm:ss')::TIMESTAMP::BIGINT )::TIMESTAMP AS ts_median_started,        
         MEDIAN( DATE_FORMAT(ts_dag_ended,'HH:mm:ss')::TIMESTAMP::BIGINT )::TIMESTAMP AS ts_median_ended,
         MEDIAN(duration_in_minutes) AS duration_median_in_minutes
     FROM 
-        execution_metrics AS em
+        dag_historical_executions AS em
     JOIN
-        datalake_gsheets_clean.reference_sla_days AS rs
+        top_reference_sla_days AS rs
     ON
-        DATE(em.dt_executed) = DATE(rs.dt_reference_date)
+        em.dag_owner = rs.dag_owner
+        AND em.dt_executed = rs.dt_executed
     GROUP BY
         1, 2
 )
@@ -105,7 +67,7 @@ SELECT
     he.ts_median_ended,
     he.duration_median_in_minutes
 FROM 
-    execution_metrics AS em
+    datalake_health_metrics.dag_historical_executions AS em
 LEFT JOIN 
     historical_execution_metrics AS he    
 ON
