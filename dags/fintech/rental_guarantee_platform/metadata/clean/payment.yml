@@ -16,6 +16,12 @@ columns:
   customer:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.customer
+  card_token:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.card_token
+  code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.code
   payment_link:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.payment_link
@@ -40,6 +46,12 @@ columns:
   billing_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.billing_type
+  product_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.product_type
+  installments:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.installments
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.value
