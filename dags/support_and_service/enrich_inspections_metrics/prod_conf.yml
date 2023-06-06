@@ -3,7 +3,8 @@ dag_documentation:
   dag_purpose: "This DAG is responsible for generating indicators and metrics for QuintoAndar's inspection services"
 
 inner_dependencies: {}
-incremental_tables: {}
+incremental_tables:
+  - inspection_csat
 
 custom_cluster:
   driver_node_type_id: m5a.4xlarge

@@ -606,6 +606,7 @@ bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-item-review
   - bietlejuice.enrich_inspections:load-enrich-room
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements
+  - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-csat
   - bietlejuice.gsheets.support_and_service:done-clean-inspectors-control
   - bietlejuice.inspections:load-clean-assessment
 bietlejuice.dw_invoice_entries:
@@ -1505,6 +1506,7 @@ bietlejuice.enrich_inspections:
 bietlejuice.enrich_inspections_metrics:
   - bietlejuice.enrich_date:load-enrich-cities-calendar
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
+  - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers
   - bietlejuice.enrich_support_and_service_kpis_targets:load-enrich-kpis-targets
 bietlejuice.enrich_invoice:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract

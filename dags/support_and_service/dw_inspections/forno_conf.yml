@@ -13,6 +13,7 @@ incremental_tables:
   - dim_item_review
   - dim_item_issue
   - dim_room
+  - fact_inspection_satisfaction
   - fact_item
   - fact_item_attachment
   - fact_item_issue

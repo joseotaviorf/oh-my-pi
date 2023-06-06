@@ -1,0 +1,41 @@
+---
+database_name: dw_inspections
+table_name: fact_inspection_satisfaction
+description:
+  This fact brings the relationship between the inspection carried out and the satisfaction
+  response of the tenant and the owner. The granularity of the table is the sk_answer column,
+  and the data can be crossed with the dw_satisfaction_rating modeling, in order to obtain the
+  complete response data.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_answer:
+    description: Unique identifier of the satisfaction response.
+    lineage:
+      - datalake_inspections_metrics.inspection_csat.id_answer
+  sk_inspection:
+    description:
+      Unique id to identify a inspection. If its origin is the Inspection Service
+      (IS), the sk will correspond to the id generated in the product. If the inspection
+      source is still the PWA, the sk will correspond to the id generated in the enrich_inspection
+      by the MD5 function.
+    lineage:
+      - datalake_inspections_metrics.inspection_csat.id_inspection
+  sk_contract:
+    description: Unique identifier of the contract related to the property to be inspected.
+    lineage:
+      - datalake_inspections.inspection_booking.id_contract
+  ts_load:
+    description: Date and time when the data was loaded.
+  year:
+    description: Year referring to the answer updated date.
+    lineage:
+      - datalake_inspections_metrics.inspection_csat.year
+  month:
+    description: Month referring to the answer updated date.
+    lineage:
+      - datalake_inspections_metrics.inspection_csat.month
+  day:
+    description: Day referring to the answer updated date.
+    lineage:
+      - datalake_inspections_metrics.inspection_csat.day

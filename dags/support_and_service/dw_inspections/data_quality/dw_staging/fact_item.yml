@@ -1,0 +1,21 @@
+---
+table_name: dw_inspections.fact_item
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_item:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_item_group:
+    is_complete:
+      severity_level: Error
+  sk_room:
+    is_complete:
+      severity_level: Error
+  sk_assessment:
+    is_complete:
+      severity_level: Error
+  sk_inspection:
+    is_complete:
+      severity_level: Error
