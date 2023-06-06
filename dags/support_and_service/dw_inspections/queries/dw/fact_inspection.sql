@@ -19,7 +19,7 @@ SELECT
     i.dt_contract_termination,
     i.dt_execution_limit,
     i.ts_inspected,
-    i.ts_first_synced,
+    i.ts_synced,
     i.ts_booking_inspected_utc AS ts_booking_inspected,
     i.ts_booking_inspected_local_tz AS ts_booking_inspected_local,
     i.ts_booking_cancelled_utc AS ts_booking_cancelled,

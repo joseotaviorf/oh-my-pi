@@ -36,11 +36,9 @@ union_inspection_history AS (
         i.id_inspection,
         i.id_previous_inspection,
         i.id_external,
-        i.id_previous_inspection,
         i.id_inspector,
         i.id_schedule AS id_booking,
         i.id_contract,
-        i.id_inspector,
         GET_JSON_OBJECT(i.house, '$.cityId') AS id_city,
         LOWER(GET_JSON_OBJECT(i.house, '$.city')) AS city_name,
         i.type AS inspection_type,
@@ -62,11 +60,9 @@ union_inspection_history AS (
         MD5(CONCAT(i.id, 'PWA')) AS id_inspection,
         NULL AS id_previous_inspection,
         i.id AS id_external,
-        NULL AS id_previous_inspection,
-        NULL AS id_inspector,
+        i.id_user_inspector AS id_inspector,
         i.id_booking,
         i.id_contract,
-        NULL AS id_inspector,
         NULL AS id_city,
         NULL AS city_name,
         CASE
@@ -175,8 +171,8 @@ SELECT
     COALESCE(a.ts_created, i.ts_inspected) AS ts_inspected,
     CASE
         WHEN i.source = "PWA" THEN mias.ts_first_synced
-        ELSE a.ts_started
-    END AS ts_first_synced,
+        ELSE a.ts_finished
+    END AS ts_synced,
     i.ts_created,
     i.ts_updated
 FROM
