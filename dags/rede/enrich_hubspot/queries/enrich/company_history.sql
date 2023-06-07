@@ -37,6 +37,10 @@ SELECT
     NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') AS extracted_3p_tag,
     NULLIF(GET_JSON_OBJECT(properties, '$.tipo_de_membro'), '') AS member_type,
     NULLIF(GET_JSON_OBJECT(properties, '$.categoria_do_membro'), '') AS member_category,
+    -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
+    -- After that, lead_status will be deprecated and we will remove the row above
+    NULLIF(GET_JSON_OBJECT(properties, '$.categoria_do_membro'), '') AS sale_member_category,
+    NULLIF(GET_JSON_OBJECT(properties, '$.categoria_do_membro___for_rent'), '') AS rent_member_category,
     FROM_JSON(
         GET_JSON_OBJECT(properties_with_history, '$.categoria_do_membro'),
         'array<struct<
@@ -48,6 +52,30 @@ SELECT
             updatedByUserId:string
         >>'
     ) AS member_category_history,
+    -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
+    -- After that, lead_status will be deprecated and we will remove the row above
+    FROM_JSON(
+        GET_JSON_OBJECT(properties_with_history, '$.categoria_do_membro'),
+        'array<struct<
+            value:string,
+            timestamp:timestamp,
+            sourceType:string,
+            sourceId:string,
+            sourceLabel:string,
+            updatedByUserId:string
+        >>'
+    ) AS sale_member_category_history,
+    FROM_JSON(
+        GET_JSON_OBJECT(properties_with_history, '$.categoria_do_membro___for_rent'),
+        'array<struct<
+            value:string,
+            timestamp:timestamp,
+            sourceType:string,
+            sourceId:string,
+            sourceLabel:string,
+            updatedByUserId:string
+        >>'
+    ) AS rent_member_category_history,
     NULLIF(GET_JSON_OBJECT(properties, '$.origem_do_lead'), '') AS lead_origin,
     NULLIF(GET_JSON_OBJECT(properties, '$.phone'), '') AS phone,
     NULLIF(GET_JSON_OBJECT(properties, '$.tipo_de_parceria'), '') AS partnership_type,
@@ -63,6 +91,10 @@ SELECT
     NULLIF(GET_JSON_OBJECT(properties, '$.creci'), '') AS creci,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.produto_de_interesse'), ''), ';') AS products_of_interest,
     NULLIF(GET_JSON_OBJECT(properties, '$.hs_lead_status'), '') AS lead_status,
+    -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
+    -- After that, lead_status will be deprecated and we will remove the row above
+    NULLIF(GET_JSON_OBJECT(properties, '$.hs_lead_status'), '') AS sale_lead_status,
+    NULLIF(GET_JSON_OBJECT(properties, '$.status_do_lead___for_rent'), '') AS rent_lead_status,
     FROM_JSON(
         GET_JSON_OBJECT(properties_with_history, '$.hs_lead_status'),
         'array<struct<
@@ -74,6 +106,30 @@ SELECT
             updatedByUserId:string
         >>'
     ) AS lead_status_history,
+    -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
+    -- After that, lead_status will be deprecated and we will remove the row above
+    FROM_JSON(
+        GET_JSON_OBJECT(properties_with_history, '$.hs_lead_status'),
+        'array<struct<
+            value:string,
+            timestamp:timestamp,
+            sourceType:string,
+            sourceId:string,
+            sourceLabel:string,
+            updatedByUserId:string
+        >>'
+    ) AS sale_lead_status_history,
+    FROM_JSON(
+        GET_JSON_OBJECT(properties_with_history, '$.status_do_lead___for_rent'),
+        'array<struct<
+            value:string,
+            timestamp:timestamp,
+            sourceType:string,
+            sourceId:string,
+            sourceLabel:string,
+            updatedByUserId:string
+        >>'
+    ) AS rent_lead_status_history,
     COALESCE(GET_JSON_OBJECT(properties, '$.num_associated_deals')::INT, 0) AS num_associated_deals,
     COALESCE(GET_JSON_OBJECT(properties, '$.num_associated_contacts')::INT, 0) AS num_associated_contacts,
     GET_JSON_OBJECT(properties, '$.qual_a_media_de_novos_contratos_de_locacao_mes_')::INT AS monthly_average_new_rental_contracts,

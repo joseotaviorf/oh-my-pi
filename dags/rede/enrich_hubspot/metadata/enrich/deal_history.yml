@@ -69,7 +69,11 @@ columns:
   loss_reason:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Reason why the deal was lost. Comes from the field motivo_de_perda. 
+    description: Reason why the deal was lost. Comes from the field motivo_de_perda.
+  churn_reason:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Reason why the deal was churned. Comes from the field motivo_de_churn.
   product:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -154,11 +158,19 @@ columns:
   average_sale_property_ticket:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Average ticket of sale properties. Comes from the field ticket_medio_de_imoveis_de_venda. 
+    description: Average ticket of sale properties sent by Growth. Comes from the field ticket_medio_de_imoveis_de_venda.
+  average_sale_property_ticket_by_sales_team:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Average ticket of sale properties, obtained by the Sales Qualification team. Comes from the field qualificacao_sales___ticket_medio_de_imoveis_de_venda.
   average_rent_property_ticket:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Average ticket of rent properties. Comes from the field ticket_medio_de_imoveis_para_locacao. 
+    description: Average ticket of rent properties sent by Growth. Comes from the field ticket_medio_de_imoveis_para_locacao. 
+  average_rent_property_ticket_by_sales_team:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Average ticket of rent properties, obtained by the Sales Qualification team. Comes from the field qualificacao_sales___ticket_medio_de_imoveis_de_locacao.
   monthly_repayment_volume_in_real:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -170,11 +182,23 @@ columns:
   num_properties_for_sale:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Number of properties for sale. Comes from the field quantidade_de_imoveis_a_venda. 
+    description: Number of properties for sale sent by Growth. Comes from the field quantidade_de_imoveis_a_venda. 
+  num_properties_for_sale_by_sales_team:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Number of properties for sale, obtained by the Sales Qualification team. Comes from the field qualificacao_sales___quantidade_de_imoveis_para_venda. 
   num_properties_for_rent:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Number of properties for rent. Comes from the field quantidade_de_imoveis_para_locacao. 
+    description: Number of properties for rent sent by Growth. Comes from the field quantidade_de_imoveis_para_locacao.
+  num_properties_for_rent_by_sales_team:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Number of properties for rent, obtained by the Sales Qualification team. Comes from the field qualificacao_sales___quantidade_de_imoveis_para_locacao.
+  num_real_estate_agents_by_sales_team:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Number of real estate agents, obtained by the Sales Qualification team. Comes from the field qualificacao_sales___quantidade_de_corretores_da_imobiliaria.
   has_property_advertisement_online:
     lineage:
       - datalake_hubspot_clean.deal.properties

@@ -89,9 +89,13 @@ tables:
         - categoria_do_membro
         - tipo_de_membro
         - hs_merged_object_ids
+        - status_do_lead___for_rent
+        - categoria_do_membro___for_rent
       propertiesWithHistory:
         - hs_lead_status
         - categoria_do_membro
+        - status_do_lead___for_rent
+        - categoria_do_membro___for_rent
   contact:
     is_incremental: true
     bring_archived: true
@@ -196,6 +200,12 @@ tables:
         - quantidade_de_imoveis_para_locacao
         - formato_de_fechamento_comercial
         - equipe_responsavel_negociacao
+        - motivo_de_churn
+        - qualificacao_sales___quantidade_de_corretores_da_imobiliaria
+        - qualificacao_sales___quantidade_de_imoveis_para_locacao
+        - qualificacao_sales___quantidade_de_imoveis_para_venda
+        - qualificacao_sales___ticket_medio_de_imoveis_de_locacao
+        - qualificacao_sales___ticket_medio_de_imoveis_de_venda
       propertiesWithHistory:
         - dealstage
         - pipeline

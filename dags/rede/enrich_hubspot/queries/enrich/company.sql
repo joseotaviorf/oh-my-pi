@@ -17,14 +17,22 @@ hubspot_companies AS (
         id_company,
         cnpj,
         ts_updated,
-        LAST(lead_status)
+        LAST(sale_lead_status)
         OVER (
             PARTITION BY
                 id_company
             ORDER BY
                 ts_updated
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-        ) AS current_status,
+        ) AS current_sale_status,
+        LAST(rent_lead_status)
+        OVER (
+            PARTITION BY
+                id_company
+            ORDER BY
+                ts_updated
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS current_rent_status,
         LAST(tag_real_estate_agency)
         OVER (
             PARTITION BY
@@ -73,7 +81,10 @@ company_matches AS (
             d.identification_number
         ORDER BY
             NOT ch.is_currently_archived AND mc.id_merged_company IS NULL DESC, -- First, not archived nor merged
-            ch.current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC, -- Then, the ones that are currently members
+            (
+                ch.current_sale_status IN ('Membro', 'Parceiro', 'Em processo tombamento')
+                OR ch.current_rent_status IN ('Membro', 'Parceiro', 'Em processo tombamento')
+            ) DESC, -- Then, the ones that are currently members
             ch.current_tag IS NOT NULL DESC, -- Then, the ones with tags
             ch.ts_updated DESC -- Otherwise, most recent
         ) = 1
@@ -112,7 +123,15 @@ SELECT
     ch.extracted_3p_tag,
     ch.member_type,
     ch.member_category,
+    -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
+    -- After that, member_category will be deprecated and we will remove the row above
+    ch.sale_member_category,
+    ch.rent_member_category,
     ch.member_category_history,
+    -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
+    -- After that, member_category_history will be deprecated and we will remove the row above
+    ch.sale_member_category_history,
+    ch.rent_member_category_history,
     ch.lead_origin,
     ch.phone,
     ch.partnership_type,
@@ -131,7 +150,21 @@ SELECT
         WHEN mc.id_merged_company IS NOT NULL OR ch.is_archived THEN 'Archived'
         ELSE ch.lead_status
     END AS lead_status,
+    -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
+    -- After that, lead_status will be deprecated and we will remove the row above
+    CASE
+        WHEN mc.id_merged_company IS NOT NULL OR ch.is_archived THEN 'Archived'
+        ELSE ch.sale_lead_status
+    END AS sale_lead_status,
+    CASE
+        WHEN mc.id_merged_company IS NOT NULL OR ch.is_archived THEN 'Archived'
+        ELSE ch.rent_lead_status
+    END AS rent_lead_status,
     ch.lead_status_history,
+    -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
+    -- After that, lead_status will be deprecated and we will remove the row above
+    ch.sale_lead_status_history,
+    ch.rent_lead_status_history,
     ch.num_associated_deals,
     ch.num_associated_contacts,
     ch.monthly_average_new_rental_contracts,

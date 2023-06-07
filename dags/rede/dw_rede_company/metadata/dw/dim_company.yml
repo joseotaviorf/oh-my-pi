@@ -38,7 +38,15 @@ columns:
   lead_status:
     lineage:
     - datalake_hubspot.company.lead_status
-    description: Status of the company lead in HubSpot.
+    description: Status of the company lead in HubSpot. To be removed June 7th, replaced by sale_lead_status and rent_lead_status.
+  sale_lead_status:
+    lineage:
+    - datalake_hubspot.company.sale_lead_status
+    description: Status of the company sale lead in HubSpot.
+  rent_lead_status:
+    lineage:
+    - datalake_hubspot.company.rent_lead_status
+    description: Status of the company rent lead in HubSpot.
   product:
     description: Product of interest in Rede QuintoAndar, which can be "3P BH" or
       "3P 5A". It will only be "3P BH" if the team responsible for the deal is "BH
@@ -46,7 +54,23 @@ columns:
   member_category:
     lineage:
       - datalake_hubspot.company_history.member_category
-    description: Category of the member.
+    description: Category of the member. To be removed June 7th, replaced by sale_member_category and rent_member_category.
+    categories:
+      Prata: 'Silver'
+      Ouro: 'Gold'
+      Diamante: 'Diamond'
+  sale_member_category:
+    lineage:
+      - datalake_hubspot.company_history.sale_member_category
+    description: Category of the member for sale leads.
+    categories:
+      Prata: 'Silver'
+      Ouro: 'Gold'
+      Diamante: 'Diamond'
+  rent_member_category:
+    lineage:
+      - datalake_hubspot.company_history.rent_member_category
+    description: Category of the member for rent leads.
     categories:
       Prata: 'Silver'
       Ouro: 'Gold'

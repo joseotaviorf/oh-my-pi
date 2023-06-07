@@ -6,6 +6,10 @@ SELECT
     COALESCE(c.tag_real_estate_agency, cs.extracted_3p_tag, 'Unknown') AS tag,
     COALESCE(c.extracted_3p_tag, cs.extracted_3p_tag, 'Unknown') AS extracted_3p_tag,
     COALESCE(c.lead_status, 'Unknown') AS lead_status,
+    -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
+    -- After that, lead_status will be deprecated and we will remove the row above
+    COALESCE(c.sale_lead_status, 'Unknown') AS sale_lead_status,
+    COALESCE(c.rent_lead_status, 'Unknown') AS rent_lead_status,
     CASE
         WHEN (
             (cs.is_3p_bh IS NOT NULL AND cs.is_3p_bh)
@@ -16,6 +20,10 @@ SELECT
         ELSE '3P 5A' 
     END AS product,
     COALESCE(c.member_category, 'Unknown') AS member_category,
+    -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
+    -- After that, member_category will be deprecated and we will remove the row above
+    COALESCE(c.sale_member_category, 'Unknown') AS sale_member_category,
+    COALESCE(c.rent_member_category, 'Unknown') AS rent_member_category,
     COALESCE(c.member_type, 'Unknown') AS member_type,
     COALESCE(c.address, 'Unknown') AS address,
     COALESCE(c.zip_code, 'Unknown') AS zip_code,

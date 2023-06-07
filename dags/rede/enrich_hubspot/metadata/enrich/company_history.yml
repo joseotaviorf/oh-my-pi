@@ -136,7 +136,23 @@ columns:
   member_category:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Category of the member.
+    description: Category of the member. To be removed June 7th, replaced by sale_member_category and rent_member_category.
+    categories:
+      Prata: 'Silver'
+      Ouro: 'Gold'
+      Diamante: 'Diamond'
+  sale_member_category:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Category of the sale member.
+    categories:
+      Prata: 'Silver'
+      Ouro: 'Gold'
+      Diamante: 'Diamond'
+  rent_member_category:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Category of the rent member.
     categories:
       Prata: 'Silver'
       Ouro: 'Gold'
@@ -144,7 +160,15 @@ columns:
   member_category_history:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: History of the member category.
+    description: History of the member category. To be removed June 7th, replaced by sale_member_category_history and rent_member_category_history.
+  sale_member_category_history:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: History of the sale member category.
+  rent_member_category_history:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: History of the rent member category.
   lead_origin:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -206,11 +230,27 @@ columns:
   lead_status:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Status of the company lead in HubSpot.
+    description: Status of the company lead in HubSpot. To be removed June 7th, replaced by sale_lead_status and rent_lead_status.
+  sale_lead_status:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Sale status of the company lead in HubSpot.
+  rent_lead_status:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Rent status of the company lead in HubSpot.
   lead_status_history:
     lineage:
       - datalake_hubspot_clean.company.properties_with_history
-    description: History of the company lead status in HubSpot.
+    description: History of the company lead status in HubSpot. To be removed June 7th, replaced by sale_lead_status and rent_lead_status.
+  sale_lead_status_history:
+    lineage:
+      - datalake_hubspot_clean.company.properties_with_history
+    description: History of the sale status of the company lead in HubSpot.
+  rent_lead_status_history:
+    lineage:
+      - datalake_hubspot_clean.company.properties_with_history
+    description: History of the rent status of the company lead in HubSpot.
   num_associated_deals:
     lineage:
       - datalake_hubspot_clean.company.properties
