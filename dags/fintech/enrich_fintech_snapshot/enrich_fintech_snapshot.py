@@ -151,12 +151,14 @@ for table in tables:
 chain(
     skip_run_task,
     create_cluster_task,
-    DatalakeTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
-    + DatalakeTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
 )
 
 chain(
-    skip_run_task,
+    create_cluster_task,
+    DatalakeTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
+)
+chain(
     DatalakeTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
     + DatalakeTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
     terminate_cluster_task,
