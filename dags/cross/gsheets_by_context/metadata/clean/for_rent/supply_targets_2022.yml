@@ -29,6 +29,9 @@ columns:
   supply_origin:
     lineage:
       - datalake_gsheets_raw.supply_targets_2022.supply_origin
+  canal_planning:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2022.canal_planning
   tier:
     lineage:
       - datalake_gsheets_raw.supply_targets_2022.tier

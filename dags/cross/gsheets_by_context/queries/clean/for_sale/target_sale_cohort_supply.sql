@@ -4,6 +4,7 @@ SELECT
     first_listing,
     mkt_origin,
     operacao AS operation,
+    canal_planning,
     opportunity,
     qualified,
     available_qualified,

@@ -6,6 +6,7 @@ SELECT
     mkt_origin,
     mkt_type,
     operacao,
+    canal_planning,
     CAST(opportunities AS FLOAT) AS opportunities,
     CAST(prospects AS FLOAT) AS prospects,
     CAST(qualifieds AS FLOAT) AS qualifieds,

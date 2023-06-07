@@ -16,6 +16,9 @@ columns:
   operacao:
     lineage:
       - datalake_gsheets_raw.rental_cohort_supply.operacao
+  canal_planning:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_supply.canal_planning
   opportunities:
     lineage:
       - datalake_gsheets_raw.rental_cohort_supply.opportunities

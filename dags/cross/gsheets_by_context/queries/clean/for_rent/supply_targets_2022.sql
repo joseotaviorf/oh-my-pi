@@ -8,6 +8,7 @@ SELECT
     available_qualifieds,
     supply_channel,
     supply_origin,
+    canal_planning,
     CAST(tier AS INTEGER) AS tier,
     CAST(halfyear AS INTEGER) AS halfyear,
     CAST(quarter AS INTEGER) AS quarter,

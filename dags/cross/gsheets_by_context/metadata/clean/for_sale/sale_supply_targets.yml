@@ -22,6 +22,9 @@ columns:
   operacao:
     lineage:
       - datalake_gsheets_raw.sale_supply_targets.operacao
+  canal_planning:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.canal_planning
   opportunities:
     lineage:
       - datalake_gsheets_raw.sale_supply_targets.opportunities

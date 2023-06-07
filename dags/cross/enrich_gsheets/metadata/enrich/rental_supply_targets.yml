@@ -1,64 +1,90 @@
 ---
 database_name: datalake_gsheets
 table_name: rental_supply_targets
+owner: monica.faria@quintoandar.com.br
+domain: Growth
+description: This table contains a historical merge of targets to supply metrics at the growth line.
 columns:
   city_group:
+    description: The group or category of the city.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.city_group
       - datalake_static_files.rental_supply_targets.city_group
+      - datalake_gsheets_clean.supply_targets_2022.city_group
   first_listings:
+    description: The number of initial listings for a specific city group.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.first_listings
       - datalake_static_files.rental_supply_targets.first_listings
+      - datalake_gsheets_clean.supply_targets_2022.first_listings
   lead_context:
+    description: The context or information related to leads in a city group.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.lead_context
       - datalake_static_files.rental_supply_targets.lead_context
+      - datalake_gsheets_clean.supply_targets_2022.lead_context
   opportunities:
+    description: The number of opportunities available in a city group.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.opportunities
       - datalake_static_files.rental_supply_targets.opportunities
+      - datalake_gsheets_clean.supply_targets_2022.opportunities
   prospects:
+    description: The number of potential prospects in a city group.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.prospects
       - datalake_static_files.rental_supply_targets.prospects
+      - datalake_gsheets_clean.supply_targets_2022.prospects
   qualifieds:
+    description: The number of qualified prospects in a city group.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.qualifieds
       - datalake_static_files.rental_supply_targets.qualifieds
+      - datalake_gsheets_clean.supply_targets_2022.qualifieds
+  canal_planning:
+    description: Canal planning for the supply (may contain an empty string).
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.canal_planning
+  available_qualifieds:
+    description: Available qualified prospects (may contain NULL).
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.available_qualifieds
   supply_channel:
+    description: The channel through which the supply is obtained.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.supply_channel
       - datalake_static_files.rental_supply_targets.supply_channel
+      - datalake_gsheets_clean.supply_targets_2022.supply_channel
   supply_origin:
+    description: The origin or source of the supply.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.supply_origin
       - datalake_static_files.rental_supply_targets.supply_origin
+      - datalake_gsheets_clean.supply_targets_2022.supply_origin
   tier:
+    description: The tier or level of the city group.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.tier
       - datalake_static_files.rental_supply_targets.tier
+      - datalake_gsheets_clean.supply_targets_2022.tier
   halfyear:
+    description: The half-year period associated with the data.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.halfyear
       - datalake_static_files.rental_supply_targets.halfyear
+      - datalake_gsheets_clean.supply_targets_2022.halfyear
   quarter:
+    description: The quarter period associated with the data.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.quarter
       - datalake_static_files.rental_supply_targets.quarter
+      - datalake_gsheets_clean.supply_targets_2022.quarter
   month:
+    description: The month associated with the data.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.month
       - datalake_static_files.rental_supply_targets.month
+      - datalake_gsheets_clean.supply_targets_2022.month
   year:
+    description: The year associated with the data.
     lineage:
-      - datalake_gsheets_clean.supply_targets_2022.year
       - datalake_static_files.rental_supply_targets.year
+      - datalake_gsheets_clean.supply_targets_2022.year
   dt_week_started:
+    description: The date for the week start.
     lineage:
       - datalake_gsheets_clean.supply_targets_2022.dt_week_started
       - datalake_static_files.rental_supply_targets.dt_week_started
   dt_target:
+    description: The date associated with target.
     lineage:
       - datalake_gsheets_clean.supply_targets_2022.dt_target
       - datalake_static_files.rental_supply_targets.dt_target

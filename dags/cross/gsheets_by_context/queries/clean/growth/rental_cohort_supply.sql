@@ -4,6 +4,7 @@ SELECT
     mkt_channel,
     mkt_origin,
     operacao,
+    canal_planning,
     opportunities,
     prospect,
     qualified,
