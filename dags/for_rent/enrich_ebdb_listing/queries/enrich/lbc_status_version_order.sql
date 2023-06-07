@@ -14,8 +14,7 @@ house AS (
     house.country_code,
     house.ts_first_publication,
     house.rev,
-    MAX(rev.reason) OVER(PARTITION BY house.id_house, house.status_history, house.ts_status_changed) AS revision_reason,
-    'RENT' AS business_context --NEW
+    MAX(rev.reason) OVER(PARTITION BY house.id_house, house.status_history, house.ts_status_changed) AS revision_reason
   FROM 
     datalake_ebdb_listing.house_status_version_order AS house
   LEFT JOIN
@@ -27,7 +26,6 @@ house AS (
 last_house_state AS (
   SELECT 
     h.id_house,
-    h.business_context,
     h.status,
     h.status_reason,
     h.ts_state_started,
@@ -62,53 +60,53 @@ business_context_history AS (
       bch.id_house,
       bch.country_code,
       bch.business_context,
-      LAG(bch.status) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) AS previous_state_status,
-      LAG(bch.status_reason) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) AS previous_status_reason,
-      LAG(bch.suspension_reason) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) AS previous_suspension_reason,
+      LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS previous_state_status,
+      LAG(bch.status_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS previous_status_reason,
+      LAG(bch.suspension_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS previous_suspension_reason,
       LAG(
           CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
-      ) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) AS days_in_previous_state,
+      ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS days_in_previous_state,
       bch.status,
       bch.status_reason,
       bch.suspension_reason,
       CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_in_state, 
       IF(
-        bch.status = LAG(bch.status) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started),
+        bch.status = LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started),
         LAG(
             CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
-        ) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) 
+        ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) 
         +
         CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER),
         CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
       ) AS days_in_status,
-      LEAD(bch.status) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) AS next_status,
-      LEAD(bch.ts_state_started) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) AS ts_next_status_change,
-      LEAD(bch.status_reason) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) AS next_status_reason,
-      LEAD(bch.suspension_reason) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) AS next_suspension_reason,
+      LEAD(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS next_status,
+      LEAD(bch.ts_state_started) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS ts_next_status_change,
+      LEAD(bch.status_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS next_status_reason,
+      LEAD(bch.suspension_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS next_suspension_reason,
       LEAD(
           CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
       ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS days_in_next_state,
       bch.ts_state_started,
       bch.ts_state_ended,
       IF(
-        LAG(bch.status) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) IS NULL
+        LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) IS NULL
         , TRUE
         , FALSE
       ) AS is_first_status,
       LAG(IF(
-        LAG(bch.status) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) IS NULL
+        LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) IS NULL
         , TRUE
         , FALSE
         )
-      ) OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started) AS is_previous_first_status,
-      ROW_NUMBER() OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started ASC) AS lbc_state_order,
+      ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS is_previous_first_status,
+      ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC) AS lbc_state_order,
       IF(
         lhs.state_order IS NOT NULL
-        , lhs.state_order + ROW_NUMBER() OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started ASC)
-        , ROW_NUMBER() OVER(PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started ASC)
+        , lhs.state_order + ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC)
+        , ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC)
       ) AS state_order,
-      MAX(bch.rev) OVER(PARTITION BY bch.id_house, bch.business_context, bch.status, bch.ts_state_started) AS rev,
-      MAX(rev.reason) OVER(PARTITION BY bch.id_house, bch.business_context, bch.status, bch.ts_state_started) AS revision_reason,
+      MAX(bch.rev) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS rev,
+      MAX(rev.reason) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS revision_reason,
       COALESCE(lhs.ts_first_publication, fp.ts_first_publication) AS ts_first_publication
   FROM 
       datalake_ebdb_listing.business_context_history AS bch
@@ -121,14 +119,12 @@ business_context_history AS (
   LEFT JOIN
     first_publication AS fp
       ON fp.id_house = bch.id_house
-  /*WHERE
+  WHERE
       bch.business_context = 'RENT'
-  */
 ), 
 status_change_time AS (
   SELECT 
     bch.id_house, 
-    bch.business_context, --NEW
     bch.country_code,
     bch.status,
     IF(
@@ -152,16 +148,15 @@ status_change_time AS (
 status_change AS (
   SELECT DISTINCT
     sct.id_house,
-    sct.business_context,
     sct.country_code,
     sct.status,
     COALESCE(
         sct.start_time, 
-        LAG(sct.start_time) OVER(PARTITION BY sct.id_house, sct.business_context ORDER BY sct.ts_state_started)
+        LAG(sct.start_time) OVER(PARTITION BY sct.id_house ORDER BY sct.ts_state_started)
     ) AS ts_status_started,
     COALESCE(
         sct.end_time, 
-        LEAD(sct.end_time) OVER(PARTITION BY sct.id_house, sct.business_context ORDER BY sct.ts_state_started)
+        LEAD(sct.end_time) OVER(PARTITION BY sct.id_house ORDER BY sct.ts_state_started)
     ) AS ts_status_ended
   FROM 
     status_change_time AS sct
@@ -169,11 +164,10 @@ status_change AS (
 status_order AS (
   SELECT 
     sc.id_house,
-    sc.business_context,
     sc.country_code,
-    LAG(sc.status) OVER(PARTITION BY sc.id_house, sc.business_context ORDER BY sc.ts_status_started) AS prev_status,
+    LAG(sc.status) OVER(PARTITION BY sc.id_house ORDER BY sc.ts_status_started) AS prev_status,
     sc.status,
-    LEAD(sc.status) OVER(PARTITION BY sc.id_house, sc.business_context ORDER BY sc.ts_status_started) AS next_status,
+    LEAD(sc.status) OVER(PARTITION BY sc.id_house ORDER BY sc.ts_status_started) AS next_status,
     sc.ts_status_started,
     sc.ts_status_ended,
     CAST((CAST(CAST(COALESCE(sc.ts_status_ended, now()) AS TIMESTAMP) AS LONG) - CAST(CAST(sc.ts_status_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_in_status
@@ -183,7 +177,6 @@ status_order AS (
 trigger AS (
   SELECT
     bch.id_house,
-    bch.business_context,
     bch.country_code,
     so.prev_status,
     bch.status,
@@ -315,7 +308,6 @@ trigger AS (
   LEFT JOIN
     status_order AS so
       ON so.id_house = bch.id_house 
-        AND so.business_context = bch.business_context
         AND so.country_code = bch.country_code
         AND so.status = bch.status
         AND (bch.ts_state_started >= so.ts_status_started
@@ -323,12 +315,10 @@ trigger AS (
   LEFT JOIN 
     last_house_state AS lhs
       ON lhs.id_house = bch.id_house
-        AND lhs.business_context = bch.business_context
   
 ), merge_version AS (
   SELECT 
     id_house,
-    business_context,
     country_code,
     status,
     status_reason,
@@ -351,7 +341,6 @@ trigger AS (
 
   SELECT 
       bch.id_house,
-      bch.business_context,
       bch.country_code,
       bch.status,
       bch.status_reason,
@@ -366,7 +355,7 @@ trigger AS (
           + 
           SUM(
               t.trigger_new_version
-          ) OVER (PARTITION BY bch.id_house, bch.business_context ORDER BY bch.ts_state_started ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+          ) OVER (PARTITION BY bch.id_house ORDER BY bch.ts_state_started ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
           , IF(bch.state_order = 1 AND bch.status = 'PUBLISHED', COALESCE(lhs.listing_version, 0) + 1, COALESCE(lhs.listing_version, 0) + 0)
           , 0
       ) AS listing_version,
@@ -380,7 +369,6 @@ trigger AS (
   LEFT JOIN 
     trigger AS t
       ON t.id_house = bch.id_house
-        AND t.business_context = bch.business_context
         AND t.country_code = bch.country_code
         AND t.status = bch.status
         AND COALESCE(t.status_reason, '') = COALESCE(bch.status_reason, '')
@@ -388,11 +376,9 @@ trigger AS (
   LEFT JOIN 
     last_house_state AS lhs
       ON lhs.id_house = bch.id_house
-        AND lhs.business_context = bch.business_context
 )
 SELECT 
   id_house,
-  business_context,
   country_code,
   status,
   status_reason,
