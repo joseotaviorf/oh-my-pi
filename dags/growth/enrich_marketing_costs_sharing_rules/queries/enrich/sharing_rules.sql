@@ -301,3 +301,11 @@ SELECT
     share,
     funnel_side
 FROM datalake_marketing_costs_sharing_rules.d044d
+UNION ALL
+SELECT
+    id_date,
+    id_rule,
+    city_group,
+    share,
+    funnel_side
+FROM datalake_marketing_costs_sharing_rules.d045d
