@@ -12,18 +12,6 @@ WITH new_system AS (
         GROUP BY
             1 -- some proposes can have multiple same status
         ),
-        propose_started_date AS (
-        SELECT
-            id_propose,
-            MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_propose_started
-        FROM
-            datalake_rental_guarantee_platform_clean.propose_history
-        WHERE
-            value = 'Pendente'
-            AND id_history_type = 5 -- Status update type
-        GROUP BY
-            1 -- some proposes can have multiple same status
-        ),
         propose_waiting_new_docs_date AS (
         SELECT
             id_propose,
@@ -300,7 +288,7 @@ WITH new_system AS (
             pym.dt_last_payment,
             DATE(c.ts_began) AS dt_contract_started,
             COALESCE(DATE(pcd.ts_ended), c.ts_done) AS dt_ended,
-            COALESCE(sd.ts_propose_started, p.ts_inserted) AS ts_propose_started,
+            p.ts_inserted AS ts_propose_started,
             wndd.ts_waiting_new_docs,
             esd.ts_evaluation_started,
             rd.ts_rejected,
@@ -325,9 +313,6 @@ WITH new_system AS (
         LEFT JOIN
             propose_canceled_date AS pcd
                 ON pcd.id_propose = p.id
-        LEFT JOIN
-            propose_started_date AS sd
-                ON sd.id_propose = p.id
         LEFT JOIN
             propose_waiting_new_docs_date AS wndd
                 ON wndd.id_propose = p.id
