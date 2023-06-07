@@ -31,7 +31,7 @@ class DAGPackagesPathService:
     __FILE_NAME_TEMPLATES = {
         "dag_declaration": "{dag_name}{file_suffix}",
         "data_quality": "{table_name}",
-        "metadata": "{dag_name}",
+        "metadata": "{table_name}",
         "configuration_file": "{dag_name}{file_suffix}",
         "doc_md": "{dag_name}",
         "query": "{table_name}",
