@@ -159,7 +159,7 @@ columns:
     description: 'Transaction`s status'
     lineage:
     - datalake_velo_omie_clean.cash_flows.status
-  type:
+  TYPE:
     description: 'Transaction`s document type'
     categories:
       ADI: 'Adiantamento'

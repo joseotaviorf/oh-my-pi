@@ -73,8 +73,8 @@ columns:
     description: Entry's paid amount
     lineage:
       - datalake_velo_omie.cash_flows.paid_amount
-  is_occurrency:
-    description: If this entry is related to a ocurrency
+  is_occurency:
+    description: If this entry is related to an ocurrency. Basically checks if the destination account is tagged as 'Garantia Locaticia'.
   is_project_receivable_created:
     description: Has a transaction receivable created
   is_project_receivable_greater_than_payable:
