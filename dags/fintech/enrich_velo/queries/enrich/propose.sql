@@ -745,16 +745,25 @@ old_system AS (
     occurrence_metrics AS om
         ON om.id_propose = p.id
     LEFT JOIN
+        datalake_velo_clean.fiancavelo_proposestatus AS fps
+        ON fps.id = p.id_status
+    LEFT JOIN
     datalake_velo.junk AS jk1
-        ON jk1.id_lvl_1 = p.id_status
+        ON jk1.desc_lvl_1 = fps.name
         AND jk1.desc_master_type = 'Propose Status'
     LEFT JOIN
+        datalake_velo_clean.fiancavelo_status AS ffs
+        ON ffs.id = f.id_status
+    LEFT JOIN
     datalake_velo.junk AS jk2
-        ON jk2.id_lvl_1 = f.id_status
+        ON jk2.desc_lvl_1 = ffs.name
         AND jk2.desc_master_type = 'Guarantee Status'
     LEFT JOIN
+        datalake_velo_clean.fiancavelo_proposetype AS fpt
+        ON fpt.id = p.id_type
+    LEFT JOIN
     datalake_velo.junk AS jk3
-        ON jk3.id_lvl_1 = p.id_type
+        ON jk3.desc_lvl_1 = fpt.name
         AND jk3.desc_master_type = 'Propose Type'
     LEFT JOIN
     datalake_velo.junk AS jk4
