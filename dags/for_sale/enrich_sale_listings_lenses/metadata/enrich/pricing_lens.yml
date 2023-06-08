@@ -1,6 +1,6 @@
 database_name: datalake_sale_listings_lenses
 table_name: pricing_lens
-description: This table contains the lens information regarding Listing pricing. Where each row is a price change, we infer a tier for each price change. 
+description: This table contains the lens information regarding Listing pricing. Where each row is a price change, we infer a tier for each price change.
   This tier is assembled based on the seller's pricing relative to the price from QuintoAndar ForSale calculator.
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
@@ -17,7 +17,7 @@ columns:
       with dw_public.dim_region.
   pricing_bins:
     description: Range of difference between the published price and the calculator's predicted price for the property.
-    categories: 
+    categories:
       TXX Undefined: Listing that did not have a calculator information at the time of the price change.
       T6 < -25%: The published price is 25% lower than the predicted price for the listing.
       T5 (-25% | 0%]: The published price is between 0% and 25% lower than the predicted price for the listing.
@@ -32,7 +32,7 @@ columns:
       by the calculator. It is strongly related to the intensity of the QuintoAndar
       performance with the listing region. Can be one of these: - HIGH - MEDIUM -
       LOW - NONE Or null'
-    categories:       
+    categories:
       HIGH: If the prediction has a low confidence interval, having a high certainty
         in the prediction.
       MEDIUM: If the prediction has a medium confidence interval, having a medium
@@ -40,8 +40,8 @@ columns:
       LOW: If the prediction has a high confidence interval, having a low certainty
         in the prediction.
       NONE: If the prediction has no certainty at all.
-  tier: 
-    description: 'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its level. 
+  tier:
+    description: 'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its level.
       We use two components to define this tier: the difference from the published price to the calculator price, and the degree of certainty of the prediction. With this, we were able to understand the pricing tier of a listing by its seller and how this would affect demand
       Example: A listing with the publication price exactly equal to the calculator price and with a high degree of prediction will be classified as P5 - Great Price.'
     categories:
@@ -50,9 +50,9 @@ columns:
       P3: It means that the price is OK in relation to the calculator. A little higher than the calculator, but nothing out of the normal.
       P2: It means that the property is reasonably above the price estimated by the calculator.
       P1: Listing that is way above the calculated price, over 50% of the published price. Extremely overpriced .
-  tier_name: 
+  tier_name:
     description: Just a long name for the expensive Tier segment.
-    categories: 
+    categories:
       Great Price: It represents P5. Listings that are below the value calculated by QuintoAndar.
       Good Price: It represents P4. Listings that are well priced.
       Fair Price: It represents P3. Listings are slightly above the price indicated by the calculator.
@@ -64,7 +64,7 @@ columns:
     description: This column represents a Boolean flag that indicates whether the listing has a Great Price tag.
   is_last_tier:
     description: This column represents a Boolean flag that indicates whether the tier referring to the observed row is the current tier or a tier that is part of a listing's history.
-  ts_score_started:
+  ts_tier_started:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.ts_price_started
     description: Date of the price change that caused the change in the Listing Pricing score.

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_open_external_data
 table_name: itbi_sp_residential_transactions
-description: "Table enriched with ITBI data from SP. In this table, we applied some business rules, such as normalizing the address, 
+description: "Table enriched with ITBI data from SP. In this table, we applied some business rules, such as normalizing the address,
   filtering for residential properties only and adding the id_region."
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
@@ -28,23 +28,23 @@ columns:
     description: "The neighborhood, if any, with the highest probability of having that zipcode in its extension."
   address_street_name:
     description: Street name linked to the transaction's zip code.
-  address_number: 
+  address_number:
     description: Unit number of the property.
   address_complement:
     lineage:
       - datalake_itbi_clean.itbi_sp.complement
     description: 'Complement of the property address.'
-  address_reference: 
+  address_reference:
     description: 'Reference of the property address.'
-  address_zipcode: 
+  address_zipcode:
     description: 'Zip code of the property address.'
   financing_type:
     description: The financing system used to purchase the property.
   house_registry_office:
     description: 'The house registry office is the notary office where the property was registered.'
-  real_state_registry_number:
+  real_estate_registry_office:
     description: "Column referring to the notary's acronym used in the registration of the property."
-  iptu_sql_status: 
+  iptu_sql_status:
     description: 'The IPTU status is the status of the property in the IPTU (Imposto Predial e Territorial Urbano) system.'
   iptu_use_description:
     description: 'The IPTU use description is the description of the type of use of the property.'

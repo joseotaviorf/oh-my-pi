@@ -30,7 +30,11 @@ columns:
     description: Days of a journey to the present day.
   days_since_last_journey:
     description: Days since the last journey made by the user.
+  days_with_events:
+    description: Count of distinct days with events which this user had in this journey.
   total_past_journey:
     description: Total journeys made by users.
     lineage:
       - datalake_sale_journey.sale_journey.journey
+  ts_load:
+    description: Timestamp indicating when the data was loaded.
