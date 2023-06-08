@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS rede.dim_company_event_type;
 CREATE TABLE rede.dim_company_event_type (
     sk_company_event_type BIGINT PRIMARY KEY,
+    business_context VARCHAR,
     event VARCHAR,
     event_type VARCHAR,
     source_type VARCHAR,

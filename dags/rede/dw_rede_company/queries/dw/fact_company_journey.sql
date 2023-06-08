@@ -1,9 +1,10 @@
 WITH base_dates AS (
     SELECT
-        dc.sk_company * 1000 + ce.id_journey AS sk_company_journey,
+        dc.sk_company * 10000 + IF(ce.business_context = 'SALE', 0, 1) * 1000 + id_journey AS sk_company_journey,
         dc.sk_company,
         ce.id_company,
         id_journey AS journey_number,
+        ce.business_context,
         MIN(ts_event) AS ts_lead,
         MIN(
             CASE
@@ -137,25 +138,34 @@ WITH base_dates AS (
     JOIN
         dw_rede.dim_company AS dc
             ON ce.id_company = dc.id_hubspot
-    GROUP BY 1,2,3,4
+    GROUP BY 1,2,3,4,5
+),
+leads_3p AS (
+    SELECT
+        id_company_hubspot,
+        id_lead_3p,
+        business_context,
+        MIN(ts_status_started) AS ts_lead
+    FROM
+        datalake_rede_supply.lead_3p_status_changes
+    GROUP BY 1,2,3
 ),
 lead_3p_count_per_journey AS (
     SELECT
-        id_company,
-        journey_number,
+        bd.sk_company_journey,
         COUNT(*) AS leads_sent_through_supply_processor
     FROM
         base_dates AS bd
     JOIN
-        datalake_brokers_supply_processor.lead_3p AS l
+        leads_3p AS l
             ON bd.id_company = l.id_company_hubspot
-            AND l.ts_created BETWEEN bd.ts_lead AND COALESCE(bd.ts_journey_ended, NOW())
-    GROUP BY 1,2
+            AND bd.business_context = l.business_context
+            AND l.ts_lead BETWEEN bd.ts_lead AND COALESCE(bd.ts_journey_ended, NOW())
+    GROUP BY 1
 ),
 first_listings_count_per_journey AS (
     SELECT
-        id_company,
-        journey_number,
+        bd.sk_company_journey,
         COUNT(*) AS first_listings
     FROM
         base_dates AS bd
@@ -163,23 +173,24 @@ first_listings_count_per_journey AS (
         datalake_ebdb_listing.house AS h
             ON bd.id_company = h.id_company_hubspot
     JOIN
-        datalake_sale_listings.sale_listing AS sl
-            ON h.id = sl.id_house
-            AND sl.ts_first_publication BETWEEN bd.ts_lead AND COALESCE(bd.ts_journey_ended, NOW())
-    GROUP BY 1,2
+        datalake_ebdb_clean.listing_business_context AS lbc
+            ON h.id = lbc.id_house
+            AND bd.business_context = lbc.business_context
+            AND lbc.ts_first_publication BETWEEN bd.ts_lead AND COALESCE(bd.ts_journey_ended, NOW())
+    GROUP BY 1
 ),
 demand_bookings_per_journey AS (
     SELECT
-        id_company,
-        journey_number,
+        bd.sk_company_journey,
         COUNT(*) AS demand_bookings
     FROM
         base_dates AS bd
     JOIN
         datalake_booking.booking AS b
             ON bd.id_company = b.id_company_demand
+            AND bd.business_context = b.visit_intent
             AND b.ts_created BETWEEN bd.ts_lead AND COALESCE(bd.ts_journey_ended, NOW())
-    GROUP BY 1,2
+    GROUP BY 1
 )
 SELECT
     bd.sk_company_journey,
@@ -253,18 +264,16 @@ SELECT
     bd.ts_contract_transition_completed,
     bd.ts_churn,
     bd.ts_journey_ended,
-    NOW() AS ts_load
+    NOW() AS ts_load,
+    bd.business_context
 FROM
     base_dates AS bd
 LEFT JOIN
     lead_3p_count_per_journey AS lpj
-        ON lpj.id_company = bd.id_company
-        AND lpj.journey_number = bd.journey_number
+        ON lpj.sk_company_journey = bd.sk_company_journey
 LEFT JOIN
     first_listings_count_per_journey AS flpj
-        ON flpj.id_company = bd.id_company
-        AND flpj.journey_number = bd.journey_number
+        ON flpj.sk_company_journey = bd.sk_company_journey
 LEFT JOIN
     demand_bookings_per_journey AS dbpj
-        ON dbpj.id_company = bd.id_company
-        AND dbpj.journey_number = bd.journey_number
+        ON dbpj.sk_company_journey = bd.sk_company_journey

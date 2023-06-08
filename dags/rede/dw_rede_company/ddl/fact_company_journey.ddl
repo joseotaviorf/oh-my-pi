@@ -71,6 +71,7 @@ CREATE TABLE rede.fact_company_journey (
     ts_contract_transition_completed TIMESTAMP,
     ts_churn TIMESTAMP,
     ts_journey_ended TIMESTAMP,
-    ts_load TIMESTAMP
+    ts_load TIMESTAMP,
+    business_context VARCHAR
 );
 ALTER TABLE rede.fact_company_journey OWNER TO airflow;

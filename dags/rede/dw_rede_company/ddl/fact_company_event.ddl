@@ -7,6 +7,7 @@ CREATE TABLE rede.fact_company_event (
     sk_company_journey BIGINT,
     journey_number BIGINT,
     ts_event TIMESTAMP,
-    ts_load TIMESTAMP
+    ts_load TIMESTAMP,
+    business_context VARCHAR
 );
 ALTER TABLE rede.fact_company_event OWNER TO airflow;

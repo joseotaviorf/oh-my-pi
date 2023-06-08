@@ -1,8 +1,8 @@
 database_name: dw_rede
 table_name: fact_company_journey
 description: Every row in this table corresponds to a company journey from Rede. A
-  journey ends when a deal is lost or a membership ends. The columns represent key
-  events in the funnel. This is mostly collected from HubSpot.
+  journey is specific to a Rede business context (SALE or RENT), and ends when a deal is lost or a membership ends
+  in that business context. The columns represent key events in the funnel. This is mostly collected from HubSpot.
 domain: Rede
 owner: gustavo.miller@quintoandar.com.br
 columns:
@@ -216,7 +216,7 @@ columns:
       or "Membership Ended".
   sk_company_journey:
     description: Primary key of the table, formed by concatenating the sk_company
-      with the journey number.
+      with the business context and the journey number.
   leads_sent_through_supply_processor:
     description: Number of leads sent through Supply Processor between the journey
       start and journey end.
@@ -269,3 +269,8 @@ columns:
     description: Number of days between lead and journey ended
   ts_load:
     description: Time when the table was loaded.
+  business_context:
+    lineage:
+    - datalake_rede_company_event.company_event.business_context
+    description: Business context of the journey. Partition key, so it can be used to
+      filter the table efficiently.

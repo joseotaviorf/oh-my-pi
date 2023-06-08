@@ -1,5 +1,6 @@
 WITH combinations AS (
     SELECT DISTINCT
+        COALESCE(business_context, 'N/A') AS business_context,
         COALESCE(event, 'N/A') AS event,
         COALESCE(event_type, 'N/A') AS event_type,
         COALESCE(source_type, 'N/A') AS source_type,
@@ -23,6 +24,7 @@ SELECT
         dcet.sk_company_event_type,
         last_sk_values.sk_company_event_type + MONOTONICALLY_INCREASING_ID() + 1
     ) AS sk_company_event_type,
+    business_context,
     event,
     event_type,
     source_type,
@@ -39,6 +41,7 @@ FROM
 FULL OUTER JOIN
     dw_rede.dim_company_event_type AS dcet
         USING (
+            business_context,
             event,
             event_type,
             source_type,

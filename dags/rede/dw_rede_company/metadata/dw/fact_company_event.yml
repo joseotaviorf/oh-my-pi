@@ -34,3 +34,8 @@ columns:
       with the journey number.
   ts_load:
     description: Time when the table was loaded.
+  business_context:
+    lineage:
+    - datalake_rede_company_event.company_event.business_context
+    description: Business context of the event. Partition key, so it can be used to
+      filter the table efficiently.

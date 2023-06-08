@@ -13,6 +13,11 @@ workflow:
       - dim_company
     fact_company_journey:
       - dim_company
+  tables_customization:
+    fact_company_event:
+      partitions: [business_context]
+    fact_company_journey:
+      partitions: [business_context]
 cluster:
   type: databricks_10_4_med_memory_cluster
   access_control_list:

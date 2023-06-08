@@ -1,12 +1,18 @@
 SELECT
-    MD5(STRING(dc.sk_company) || '-' || STRING(ce.id_journey) || '-' || STRING(dcet.sk_company_event_type)) AS sk_company_event,
+    MD5(
+        STRING(dc.sk_company) || '-' ||
+        STRING(ce.id_journey) || '-' ||
+        STRING(dcet.sk_company_event_type) || '-' ||
+        STRING(ce.business_context)
+    ) AS sk_company_event,
     COALESCE(BIGINT(DATE_FORMAT(ce.ts_event, 'yyyyMMdd')), -1) AS sk_event_date,
     COALESCE(dc.sk_company, -1) AS sk_company,
     COALESCE(dcet.sk_company_event_type, -1) AS sk_company_event_type,
-    dc.sk_company * 1000 + id_journey AS sk_company_journey,
+    dc.sk_company * 10000 + IF(ce.business_context = 'SALE', 0, 1) * 1000 + id_journey AS sk_company_journey,
     id_journey AS journey_number,
     ce.ts_event,
-    NOW() AS ts_load
+    NOW() AS ts_load,
+    ce.business_context
 FROM
     datalake_rede_company_event.company_event AS ce
 JOIN
@@ -14,7 +20,8 @@ JOIN
         ON ce.id_company = dc.id_hubspot
 LEFT JOIN
     dw_rede.dim_company_event_type AS dcet
-        ON COALESCE(ce.event, 'N/A') <=> dcet.event
+        ON COALESCE(ce.business_context, 'N/A') <=> dcet.business_context
+        AND COALESCE(ce.event, 'N/A') <=> dcet.event
         AND COALESCE(ce.event_type, 'N/A') <=> dcet.event_type
         AND COALESCE(ce.source_type, 'N/A') <=> dcet.source_type
         AND COALESCE(ce.hubspot_event_detail, 'N/A') <=> dcet.hubspot_event_detail

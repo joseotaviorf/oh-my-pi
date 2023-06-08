@@ -1,22 +1,46 @@
 ---
 database_name: datalake_hubspot
 table_name: company_status
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
+description: Every time the company lead status in HubSpot changes (either in Rent or Sale), the new status is recorded in this table.
 columns:
   id_company:
     lineage:
       - datalake_hubspot.company.id_company
+    description: Unique identifier of the company in HubSpot.
   id_user_updated_by:
     lineage:
       - datalake_hubspot.company.lead_status_history
+    description: Unique identifier of the user who updated the lead status in HubSpot.
   source_type:
     lineage:
       - datalake_hubspot.company.lead_status_history
+    description: Source type of the update.
+    categories:
+      API: ''
+      AUTOMATION_PLATFORM: ''
+      BATCH_UPDATE: ''
+      CRM_UI_BULK_ACTION: ''
+      CRM_UI: ''
+      IMPORT: ''
+      MOBILE_IOS: ''
+  business_context:
+    description: The business context of the lead status change.
+    categories:
+      RENT: 'Lead status in the rent context'
+      SALE: 'Lead status in the sale context'
   lead_status:
     lineage:
       - datalake_hubspot.company.lead_status_history
+    description: The new lead status in HubSpot.
+  is_partner:
+    description: Whether the company is a partner or not at that point.
   ts_status_started:
     lineage:
       - datalake_hubspot.company.lead_status_history
+    description: The timestamp when the lead status started.
   ts_status_ended:
     lineage:
       - datalake_hubspot.company.lead_status_history
+    description: The timestamp when the lead status ended.

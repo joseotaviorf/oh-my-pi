@@ -3,6 +3,7 @@ WITH removed_company_status_oscillations AS (
         cs.id_company,
         cs.id_user_updated_by,
         cs.source_type,
+        cs.business_context,
         CASE
             WHEN cs.lead_status = 'Lead' THEN 'Lead'
             WHEN cs.lead_status = 'Prospect' THEN 'Prospect'
@@ -17,9 +18,9 @@ WITH removed_company_status_oscillations AS (
         cs.lead_status AS hubspot_event_detail,
         'Status' AS hubspot_event_origin,
         cs.lead_status IN ('Inativo', 'Perdido', 'Desclassificação comercial') AS is_loss,
-        LAG(lead_status) OVER (PARTITION BY id_company ORDER BY ts_status_started) AS previous_status,
-        LEAD(lead_status) OVER (PARTITION BY id_company ORDER BY ts_status_started) AS next_status,
-        LEAD(ts_status_started) OVER (PARTITION BY id_company ORDER BY ts_status_started) AS ts_next_status_started,
+        LAG(lead_status) OVER (PARTITION BY id_company, cs.business_context ORDER BY ts_status_started) AS previous_status,
+        LEAD(lead_status) OVER (PARTITION BY id_company, cs.business_context ORDER BY ts_status_started) AS next_status,
+        LEAD(ts_status_started) OVER (PARTITION BY id_company, cs.business_context ORDER BY ts_status_started) AS ts_next_status_started,
         cs.ts_status_started AS ts_event
     FROM
         datalake_hubspot.company_status AS cs
@@ -35,40 +36,68 @@ deal_stage_renamed AS (
         d.id_deal,
         ds.id_user_updated_by,
         ds.source_type,
+        CASE
+            WHEN ds.id_pipeline = 28040470 THEN 'RENT'
+            ELSE 'SALE'
+        END AS business_context,
+        -- These IDs are the stage IDs in HubSpot
+        -- Even though it makes the code more obscure, we've chosen to use it for the treatment to avoid the risk
+        -- of the names being changed
         CASE TRIM(s.id_stage)
-            WHEN 16603552 THEN 'Growth Mkt Nutrition' -- Nutrição Growth Mkt (NG)
-            WHEN 69265218 THEN 'Prioritized' -- Imobiliárias Priorizadas (IP)
-            WHEN 69242389 THEN 'Contact Attempt' -- Tentativa de Contato (TC)
-            WHEN 69272715 THEN 'Successful Contact' -- Contato Realizado (CR)
-            WHEN 36160399 THEN 'Negotiation Meeting Pending' -- Pendente Reunião - Inside Sales
-            WHEN 52253368 THEN 'Negotiation Meeting Pending' -- Negociação Pendente - Field Sales
-            WHEN 29546857 THEN 'Negotiation Meeting Scheduled' -- Reunião Agendada (RA)
-            WHEN 31313774 THEN 'Negotiation Meeting Completed' -- Reunião Realizada
-            WHEN 36160400 THEN 'Negotiation In Progress' -- Negociação em Andamento
-            WHEN 36247092 THEN 'Negotiation In Progress' -- Negociação - Inside Sales
-            WHEN 26378054 THEN 'Deal Won' -- Negócio Ganho
-            WHEN 69301115 THEN 'Deal Won' -- Negócio Fechado (NF)
-            WHEN 16603553 THEN 'Awaiting Documents' -- Aguardando Documentos (AD)
-            WHEN 26410914 THEN 'Documents Received' -- Documentos Recebidos (DR)
-            WHEN 26410915 THEN 'Term Sent' -- Termo Enviado (TE)
-            WHEN 16603554 THEN 'Membership Started' -- Termo Assinado (TA)
-            WHEN 39565081 THEN 'Churn Risk' -- Risco de Churn
-            WHEN 50084225 THEN 'Contract Termination Analysis' -- Análise de Distrato
-            WHEN 16603555 THEN 'Deal Lost' -- Negócio Perdido (NP)
-            WHEN 37137462 THEN 'Churn' -- Churn
+            WHEN 16603552 THEN 'Growth Mkt Nutrition' -- Nutrição Growth Mkt (NG) - Sale
+            WHEN 69265218 THEN 'Prioritized' -- Imobiliárias Priorizadas (IP) - Sale
+            WHEN 64068226 THEN 'Prioritized' -- Imobiliárias Priorizadas (IP) - Rent
+            WHEN 69242389 THEN 'Contact Attempt' -- Tentativa de Contato (TC) - Sale
+            WHEN 78255466 THEN 'Contact Attempt' -- Tentativa de Contato (TC) - Rent
+            WHEN 69272715 THEN 'Successful Contact' -- Contato Realizado (CR) - Sale
+            WHEN 78255467 THEN 'Successful Contact' -- Contato Realizado (CR) - Rent
+            WHEN 36160399 THEN 'Negotiation Meeting Pending' -- Pendente Reunião - Inside Sales - Sale
+            WHEN 52253368 THEN 'Negotiation Meeting Pending' -- Negociação Pendente - Field Sales - Sale
+            WHEN 29546857 THEN 'Negotiation Meeting Scheduled' -- Reunião Agendada (RA) - Sale
+            WHEN 78255468 THEN 'Negotiation Meeting Scheduled' -- Reunião Agendada (RA) - Rent
+            WHEN 31313774 THEN 'Negotiation Meeting Completed' -- Reunião Realizada - Sale
+            WHEN 36160400 THEN 'Negotiation In Progress' -- Negociação em Andamento - Sale
+            WHEN 78255469 THEN 'Negotiation In Progress' -- Negociação em Andamento - Rent
+            WHEN 36247092 THEN 'Negotiation In Progress' -- Negociação - Inside Sales - Sale
+            WHEN 26378054 THEN 'Deal Won' -- Negócio Ganho - Sale
+            WHEN 69301115 THEN 'Deal Won' -- Negócio Fechado (NF) - Sale
+            WHEN 78255470 THEN 'Deal Won' -- Negócio Fechado (NF) - Rent
+            WHEN 16603553 THEN 'Awaiting Documents' -- Aguardando Documentos (AD) - Sale
+            WHEN 78255471 THEN 'Awaiting Documents' -- Aguardando Documentos (AD) - Rent
+            WHEN 26410914 THEN 'Documents Received' -- Documentos Recebidos (DR) - Sale
+            WHEN 78255472 THEN 'Documents Received' -- Documentos Recebidos (DR) - Rent
+            WHEN 26410915 THEN 'Term Sent' -- Termo Enviado (TE) - Sale
+            WHEN 78255473 THEN 'Term Sent' -- Termo Enviado (TE) - Rent
+            WHEN 16603554 THEN 'Membership Started' -- Termo Assinado (TA) - Sale
+            WHEN 72415160 THEN 'Membership Started' -- Termo Assinado (TA) - Rent
+            WHEN 39565081 THEN 'Churn Risk' -- Risco de Churn - Sale
+            WHEN 78255475 THEN 'Churn Risk' -- Risco de Churn - Rent
+            WHEN 50084225 THEN 'Contract Termination Analysis' -- Análise de Distrato - Sale
+            WHEN 78255476 THEN 'Contract Termination Analysis' -- Análise de Distrato - Rent
+            WHEN 16603555 THEN 'Deal Lost' -- Negócio Perdido (NP) - Sale
+            WHEN 78255474 THEN 'Deal Lost' -- Negócio Perdido (NP) - Rent
+            WHEN 37137462 THEN 'Churn' -- Churn - Sale
+            WHEN 78255477 THEN 'Churn' -- Churn - Rent
         END AS event,
         s.label AS hubspot_event_detail,
         'Deal' AS hubspot_event_origin,
-        s.id_stage = 16603555 AS is_loss, -- Negócio Perdido (NP)
+        s.id_stage IN (16603555, 78255474) AS is_loss, -- Negócio Perdido (NP)
         s.id_stage IN ( -- We need to know this in order to identify when something goes from Deal Won to a previous stage
-            26378054, -- Negócio Ganho
-            69301115, -- Negócio Fechado (NF)
-            16603553, -- Aguardando Documentos (AD)
-            26410914, -- Documentos Recebidos (DR)
-            26410915, -- Termo Enviado (TE)
-            16603554, -- Termo Assinado (TA)
-            39565081, -- Risco de Churn
-            50084225 -- Análise de Distrato
+            26378054, -- Negócio Ganho - Sale
+            69301115, -- Negócio Fechado (NF) - Sale
+            78255470, -- Negócio Fechado (NF) - Rent
+            16603553, -- Aguardando Documentos (AD) - Sale
+            78255471, -- Aguardando Documentos (AD) - Rent
+            26410914, -- Documentos Recebidos (DR) - Sale
+            78255472, -- Documentos Recebidos (DR) - Rent
+            26410915, -- Termo Enviado (TE) - Sale
+            78255473, -- Termo Enviado (TE) - Rent
+            16603554, -- Termo Assinado (TA) - Sale
+            72415160, -- Termo Assinado (TA) - Rent
+            39565081, -- Risco de Churn - Sale
+            78255475, -- Risco de Churn - Rent
+            50084225, -- Análise de Distrato - Sale
+            78255476 -- Análise de Distrato - Rent
         ) AS is_after_deal_won,
         ds.ts_stage_started AS ts_event
     FROM
@@ -83,16 +112,16 @@ deal_stage_renamed AS (
         datalake_hubspot.pipeline AS p
             ON p.id_pipeline = ds.id_pipeline
     WHERE
-        p.id_pipeline = 5160960
+        p.id_pipeline IN (5160960, 28040470) -- (SALE, RENT)
     QUALIFY 
         LAST(event, TRUE) OVER (PARTITION BY id_company ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) IS DISTINCT FROM event
         AND event IS NOT NULL
 ),
 removed_deal_stage_oscillations AS (
     SELECT *,
-        LAG(event) OVER (PARTITION BY id_company ORDER BY ts_event) AS previous_status,
-        LEAD(event) OVER (PARTITION BY id_company ORDER BY ts_event) AS next_status,
-        LEAD(ts_event) OVER (PARTITION BY id_company ORDER BY ts_event) AS ts_next_status_started
+        LAG(event) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) AS previous_status,
+        LEAD(event) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) AS next_status,
+        LEAD(ts_event) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) AS ts_next_status_started
     FROM
         deal_stage_renamed
     QUALIFY  -- Ignore events that go back and forth to the same status within the same 24h
@@ -102,7 +131,7 @@ removed_deal_stage_oscillations AS (
 ),
 removed_ticket_stage_oscillations AS (
     SELECT
-        d.id_company,
+        COALESCE(d.id_company, t.id_company) AS id_company,
         CASE
             WHEN s.id_pipeline IN (5137154, 9317192, 9317747) THEN ts.id_ticket
         END AS id_ticket_demand_onboarding,
@@ -111,6 +140,10 @@ removed_ticket_stage_oscillations AS (
         END AS id_ticket_supply_onboarding,
         ts.id_user_updated_by,
         ts.source_type,
+        CASE
+            WHEN dp.id_pipeline = 28040470 THEN 'RENT'
+            ELSE 'SALE'
+        END AS business_context,
         CASE
             WHEN s.id_stage IN (27195509, 26557112) THEN 'Welcome Email' -- E-mail de Boas Vindas Enviado
             WHEN s.id_stage = 22048412 THEN 'Supply Onboarding Meeting Pending' -- Pendente Reunião
@@ -138,9 +171,9 @@ removed_ticket_stage_oscillations AS (
             WHEN s.id_pipeline = 9505972 THEN 'Contract Transition'
             ELSE 'Unknown'
         END AS event_type,
-        LAG(s.label) OVER (PARTITION BY d.id_company, tp.id_pipeline ORDER BY ts.ts_stage_started) AS previous_status,
-        LEAD(s.label) OVER (PARTITION BY d.id_company, tp.id_pipeline ORDER BY ts.ts_stage_started) AS next_status,
-        LEAD(ts.ts_stage_started) OVER (PARTITION BY d.id_company, tp.id_pipeline ORDER BY ts.ts_stage_started) AS ts_next_status_started,
+        LAG(s.label) OVER (PARTITION BY d.id_company, tp.id_pipeline, dp.id_pipeline IS NOT DISTINCT FROM 28040470 ORDER BY ts.ts_stage_started) AS previous_status,
+        LEAD(s.label) OVER (PARTITION BY d.id_company, tp.id_pipeline, dp.id_pipeline IS NOT DISTINCT FROM 28040470 ORDER BY ts.ts_stage_started) AS next_status,
+        LEAD(ts.ts_stage_started) OVER (PARTITION BY d.id_company, tp.id_pipeline, dp.id_pipeline IS NOT DISTINCT FROM 28040470 ORDER BY ts.ts_stage_started) AS ts_next_status_started,
         ts.ts_stage_started AS ts_event
     FROM
         datalake_hubspot.ticket_stage AS ts
@@ -150,17 +183,17 @@ removed_ticket_stage_oscillations AS (
     JOIN
         datalake_hubspot.ticket AS t
             ON t.id_ticket = ts.id_ticket
-    JOIN
+    LEFT JOIN
         datalake_hubspot.deal AS d
             ON d.id_deal = t.id_deal
     JOIN
         datalake_hubspot.pipeline AS tp
             ON tp.id_pipeline = ts.id_pipeline
-    JOIN
+    LEFT JOIN
         datalake_hubspot.pipeline AS dp
             ON dp.id_pipeline = d.id_pipeline
     WHERE
-        dp.id_pipeline = 5160960
+        dp.id_pipeline IS NULL OR dp.id_pipeline IN (5160960, 28040470) -- (SALE, RENT)
     QUALIFY 
         event IS NOT NULL -- Ignore events that were not treated
         AND (next_status IS NULL -- Ignore events that go back and forth to the same status within the same 24h
@@ -175,6 +208,7 @@ status_changes AS (
         NULL::BIGINT AS id_ticket_supply_onboarding,
         id_user_updated_by,
         source_type,
+        business_context,
         event,
         hubspot_event_detail,
         hubspot_event_origin,
@@ -185,7 +219,7 @@ status_changes AS (
     FROM
         removed_company_status_oscillations
     QUALIFY
-        LAG(event) OVER (PARTITION BY id_company ORDER BY ts_event) IS DISTINCT FROM event
+        LAG(event) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) IS DISTINCT FROM event
     UNION ALL
     SELECT
         id_company,
@@ -194,6 +228,7 @@ status_changes AS (
         NULL::BIGINT AS id_ticket_supply_onboarding,
         NULL::BIGINT AS id_user_updated_by,
         'Archivation' AS source_type,
+        EXPLODE(ARRAY('SALE', 'RENT')) AS business_context,
         'Membership Ended' AS event,
         NULL AS hubspot_event_detail,
         NULL AS hubspot_event_origin,
@@ -213,6 +248,7 @@ status_changes AS (
         NULL::BIGINT AS id_ticket_supply_onboarding,
         id_user_updated_by,
         source_type,
+        business_context,
         event,
         hubspot_event_detail,
         hubspot_event_origin,
@@ -232,6 +268,7 @@ status_changes AS (
         id_ticket_supply_onboarding,
         id_user_updated_by,
         source_type,
+        business_context,
         event,
         hubspot_event_detail,
         hubspot_event_origin,
@@ -251,6 +288,7 @@ status_changes AS (
         NULL AS id_ticket_supply_onboarding,
         NULL AS id_user_updated_by,
         'Main' AS source_type,
+        visit_intent AS business_context,
         'First Demand Visit Booked' AS event,
         NULL AS hubspot_event_detail,
         NULL AS hubspot_event_origin,
@@ -270,6 +308,7 @@ status_changes AS (
         NULL AS id_ticket_supply_onboarding,
         NULL AS id_user_updated_by,
         'Main' AS source_type,
+        lbc.business_context,
         'First Listing' AS event,
         NULL AS hubspot_event_detail,
         NULL AS hubspot_event_origin,
@@ -278,13 +317,13 @@ status_changes AS (
         NULL::BOOLEAN AS is_after_deal_won,
         ts_first_publication AS ts_event
     FROM
-        datalake_sale_listings.sale_listing AS sl
+        datalake_ebdb_clean.listing_business_context AS lbc
     JOIN
         datalake_ebdb_listing.house AS h
-            ON h.id = sl.id_house
+            ON h.id = lbc.id_house
     WHERE
         h.id_company_hubspot IS NOT NULL
-        AND ts_first_publication IS NOT NULL
+        AND lbc.ts_first_publication IS NOT NULL
     UNION ALL
     SELECT
         id_company_hubspot AS id_company,
@@ -293,17 +332,22 @@ status_changes AS (
         NULL AS id_ticket_supply_onboarding,
         NULL AS id_user_updated_by,
         'Supply Processor' AS source_type,
+        business_context,
         'First Lead 3P' AS event,
         NULL AS hubspot_event_detail,
         NULL AS hubspot_event_origin,
         'Supply Onboarding' AS event_type,
         NULL AS is_loss,
         NULL::BOOLEAN AS is_after_deal_won,
-        ts_created AS ts_event
+        MIN(ts_status_started) AS ts_event
     FROM
-        datalake_brokers_supply_processor.lead_3p
+        datalake_rede_supply.lead_3p_status_changes
     WHERE 
         id_company_hubspot IS NOT NULL
+    GROUP BY
+        id_company_hubspot,
+        id_lead_3p,
+        business_context
 ),
 merged_with_last_status AS (
     SELECT
@@ -314,7 +358,8 @@ merged_with_last_status AS (
             END, TRUE
         ) OVER(
             PARTITION BY
-                sc.id_company
+                sc.id_company,
+                sc.business_context
             ORDER BY
                 sc.ts_event
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
@@ -325,7 +370,8 @@ merged_with_last_status AS (
             END, TRUE
         ) OVER(
             PARTITION BY
-                sc.id_company
+                sc.id_company,
+                sc.business_context
             ORDER BY
                 sc.ts_event
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
@@ -337,6 +383,10 @@ merged_with_last_status AS (
             ON sc.id_company = c.id_company
     WHERE
         NOT c.is_merged_into_other_company -- Remove companies that were merged into others, since their journey is already represented there
+    QUALIFY -- Remove archived companies that never had any previous event
+        source_type IS DISTINCT FROM 'Archivation'
+        OR last_status IS NOT NULL
+        OR last_deal_stage IS NOT NULL
 ),
 treated AS (
     SELECT
@@ -352,7 +402,8 @@ treated AS (
             END, TRUE
         ) OVER (
             PARTITION BY
-                id_company
+                id_company,
+                business_context
             ORDER BY
                 ts_event
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
@@ -368,7 +419,8 @@ treated AS (
             END, TRUE
         ) OVER (
             PARTITION BY
-                id_company
+                id_company,
+                business_context
             ORDER BY
                 ts_event
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
@@ -379,7 +431,8 @@ treated AS (
             END, TRUE
         ) OVER (
             PARTITION BY
-                id_company
+                id_company,
+                business_context
             ORDER BY
                 ts_event
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
@@ -415,11 +468,12 @@ treated_with_loss AS (
 treated_with_journey_number AS (
     SELECT
         id_company,
-        LAST(id_deal, TRUE) OVER (PARTITION BY id_company ORDER BY ts_event) AS id_deal,
-        LAST(id_ticket_demand_onboarding, TRUE) OVER (PARTITION BY id_company ORDER BY ts_event) AS id_ticket_demand_onboarding,
-        LAST(id_ticket_supply_onboarding, TRUE) OVER (PARTITION BY id_company ORDER BY ts_event) AS id_ticket_supply_onboarding,
+        LAST(id_deal, TRUE) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) AS id_deal,
+        LAST(id_ticket_demand_onboarding, TRUE) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) AS id_ticket_demand_onboarding,
+        LAST(id_ticket_supply_onboarding, TRUE) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) AS id_ticket_supply_onboarding,
         id_user_updated_by,
         source_type,
+        business_context,
         CASE
             WHEN event = 'Membership Started' -- If it was a member in contract transition, and it comes back to member, the contract transition was completed
                 AND was_member_before_event
@@ -464,7 +518,8 @@ treated_with_journey_number AS (
             END
         ) OVER (
             PARTITION BY
-                id_company
+                id_company,
+                business_context
             ORDER BY
                 ts_event
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
@@ -485,6 +540,7 @@ complete_journeys AS (
         twjn.id_ticket_supply_onboarding,
         twjn.id_user_updated_by,
         COALESCE(twjn.source_type, 'Unknown') AS source_type,
+        twjn.business_context,
         twjn.event,
         twjn.event_type,
         COALESCE(twjn.hubspot_event_detail, 'N/A') AS hubspot_event_detail,
@@ -500,6 +556,7 @@ complete_journeys AS (
     LEFT JOIN
         datalake_hubspot.company_status AS cs
             ON cs.id_company = twjn.id_company
+            AND cs.business_context = twjn.business_context
             AND twjn.ts_event >= cs.ts_status_started AND twjn.ts_event < COALESCE(cs.ts_status_ended, NOW())
     LEFT JOIN
         datalake_hubspot.deal_stage AS ds
@@ -525,7 +582,7 @@ complete_journeys AS (
     WHERE
         twjn.id_company IS NOT NULL
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY twjn.id_company, twjn.event, twjn.journey_number ORDER BY ts_event) = 1
+        ROW_NUMBER() OVER (PARTITION BY twjn.id_company, twjn.business_context, twjn.event, twjn.journey_number ORDER BY ts_event) = 1
 )
 SELECT *
 FROM
@@ -534,12 +591,13 @@ UNION ALL
 --  When the journey ends due to a status change, we artificially insert a membership ended or deal lost row 1ms before
 SELECT
     id_company,
-    LAG(cj.id_journey) OVER (PARTITION BY id_company ORDER BY ts_event) AS id_journey,
+    LAG(cj.id_journey) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) AS id_journey,
     id_deal,
     id_ticket_demand_onboarding,
     id_ticket_supply_onboarding,
     id_user_updated_by,
     source_type,
+    business_context,
     CASE
         WHEN was_member_before_event THEN 'Membership Ended'
         ELSE 'Deal Lost'
@@ -556,5 +614,5 @@ SELECT
 FROM
     complete_journeys AS cj
 QUALIFY
-    LAG(cj.id_journey) OVER (PARTITION BY id_company ORDER BY ts_event) < cj.id_journey
-    AND LAG(cj.event) OVER (PARTITION BY id_company ORDER BY ts_event) NOT IN ('Membership Ended', 'Deal Lost')
+    LAG(cj.id_journey) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) < cj.id_journey
+    AND LAG(cj.event) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) NOT IN ('Membership Ended', 'Deal Lost')
