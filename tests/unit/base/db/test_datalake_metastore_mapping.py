@@ -61,3 +61,43 @@ class TestDatalakeMetastoreMapping:
         # assert
         assert expected_db_name == "datalake__my_src__raw"
         assert expected_db_location == "s3a://bucket-forno/raw/_my_src_/"
+
+    def test_get_schema_from_database_for_raw(self):
+        # arrange
+        database = "datalake_my_schema_raw"
+
+        # act
+        schema = DatalakeMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema == "my_schema"
+
+    def test_get_schema_from_database_for_clean(self):
+        # arrange
+        database = "datalake_my_schema_clean"
+
+        # act
+        schema = DatalakeMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema == "my_schema"
+
+    def test_get_schema_from_database_for_enrich(self):
+        # arrange
+        database = "datalake_my_schema"
+
+        # act
+        schema = DatalakeMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema == "my_schema"
+
+    def test_get_schema_from_database_for_other(self):
+        # arrange
+        database = "other"
+
+        # act
+        schema = DatalakeMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema is None

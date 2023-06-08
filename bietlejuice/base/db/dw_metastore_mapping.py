@@ -2,11 +2,11 @@ from bietlejuice.base.db import MetastoreMapping
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 import re
 
-DW_DATABASE_PATTERN = re.compile("(?<=^dw_)(?P<schema>[\w|_]*?)(?:_staging)?$")
-
 
 class DwMetastoreMapping(MetastoreMapping):
     """DW properties mapping for Hive Metastore."""
+
+    DATABASE_PATTERN = re.compile(r"(?<=^dw_)(?P<schema>[\w|_]*?)(?:_staging)?$")
 
     def get_full_database_name(self, layer: LayerEnum = None) -> str:
         """Following the pattern according to the layer and the source (given in the constructor), returns the full database name used in Spark."""
@@ -66,19 +66,3 @@ class DwMetastoreMapping(MetastoreMapping):
         }
 
         return s3_files_path
-
-    @staticmethod
-    def get_schema_from_database(database):
-        """
-        Maps database to its original schema
-        IF this database has one of the DW patterns.
-
-        :param database: the database name
-        :type database: str
-        :rtype: str
-        """
-
-        pattern_match = DW_DATABASE_PATTERN.search(database)
-        if pattern_match:
-            mapped_schema = pattern_match.group("schema")
-            return mapped_schema

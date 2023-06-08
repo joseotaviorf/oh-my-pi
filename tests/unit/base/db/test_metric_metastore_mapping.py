@@ -15,3 +15,23 @@ class TestMetricMetastoreMapping:
 
         # assert
         assert db_info == expected
+
+    def test_get_schema_from_database_for_metric(self):
+        # arrange
+        database = "metric_my_schema"
+
+        # act
+        schema = MetricMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema == "my_schema"
+
+    def test_get_schema_from_database_for_other(self):
+        # arrange
+        database = "other"
+
+        # act
+        schema = MetricMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema is None

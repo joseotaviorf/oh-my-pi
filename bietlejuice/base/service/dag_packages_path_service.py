@@ -436,3 +436,28 @@ class DAGPackagesPathService:
         file_path = path.join(dag_path, file_folder, layer, file_name)
 
         return file_path
+
+    @classmethod
+    def list_artifact_file_paths(
+        cls, artifact_type: str, dag_name: str, layer: str
+    ) -> list:
+        """
+        Lists all artifact files for a given DAG.
+
+        :param artifact_type: type of artifact being validated.
+        :param dag_name: The DAG we want to list the D.Q. files.
+        :param layer: the layer that the file is related to.
+        :return: list of D.Q. files found.
+        """
+
+        glob_path = cls.generate_artifact_file_path(
+            artifact_type, dag_name, layer, table_name="**", add_default_ext=False
+        )
+        file_paths = glob(pathname=glob_path, recursive=True)
+        file_paths_with_correct_extension = [
+            file_path
+            for file_path in file_paths
+            if file_path.endswith(tuple(cls.__EXTENSIONS[artifact_type]))
+        ]
+
+        return file_paths_with_correct_extension

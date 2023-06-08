@@ -34,3 +34,33 @@ class TestDwMetastoreMapping:
             "dw_staging_path": "s3a://datalake-dw-prod/staging/_my_schema_/",
         }
         assert db_info_dict == expected
+
+    def test_get_schema_from_database_for_dw(self):
+        # arrange
+        database = "dw_my_schema"
+
+        # act
+        schema = DwMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema == "my_schema"
+
+    def test_get_schema_from_database_for_dw_staging(self):
+        # arrange
+        database = "dw_my_schema_staging"
+
+        # act
+        schema = DwMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema == "my_schema"
+
+    def test_get_schema_from_database_for_other(self):
+        # arrange
+        database = "other"
+
+        # act
+        schema = DwMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema is None

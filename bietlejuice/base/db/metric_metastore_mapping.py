@@ -1,9 +1,12 @@
+import re
 from bietlejuice.base.db import MetastoreMapping
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 
 class MetricMetastoreMapping(MetastoreMapping):
     """Metric properties mapping for Hive metastore"""
+
+    DATABASE_PATTERN = re.compile(r"(?<=^metric_)(?P<schema>[\w|_]*?)$")
 
     @staticmethod
     def get_database_path(bucket: str, schema: str) -> str:

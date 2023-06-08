@@ -86,3 +86,44 @@ class TestDAGPackagesPathService:
 
         # assert
         assert returned_value == expected_return
+
+    @pytest.mark.parametrize(
+        "artifact_type, dag_name, layer, expected_return",
+        [
+            ("query", "dag1", "clean", ["new/path/mocked/dag1/queries/clean/tb1.sql"]),
+            (
+                "metadata",
+                "dag1",
+                "clean",
+                ["new/path/mocked/dag1/metadata/clean/tb1.yml"],
+            ),
+        ],
+    )
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.glob")
+    def test_list_artifact_file_paths(
+        self,
+        mock_glob,
+        artifact_type,
+        dag_name,
+        layer,
+        expected_return,
+        dag_package_service,
+    ):
+        # arrange
+        mock_glob.return_value = [
+            "new/path/mocked/dag1/queries/clean/tb1.sql",
+            "new/path/mocked/dag1/metadata/clean/tb1.yml",
+        ]
+
+        # act
+        returned_value = dag_package_service.list_artifact_file_paths(
+            artifact_type, dag_name, layer
+        )
+
+        # assert
+        assert returned_value == expected_return
+        assert mock_glob.called_once_with(
+            dag_package_service.generate_artifact_file_path(
+                artifact_type, dag_name, layer, table_name="**", add_default_ext=False
+            )
+        )

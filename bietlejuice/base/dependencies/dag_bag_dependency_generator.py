@@ -1,10 +1,3 @@
-import re
-from bietlejuice.base.dependencies.bietlejuice_cyclic_dependency_finder import (
-    BietlejuiceCyclicDependencyFinder,
-)
-from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
-    BietlejuiceDependencyHelper,
-)
 from bietlejuice.base.dependencies.dependency_generator import DependencyGenerator
 from bietlejuice.services.dag_bag_service import DagBagService
 
@@ -14,9 +7,6 @@ logger = QuintoAndarLogger("DagBagDependencyGenerator")
 
 
 class DagBagDependencyGenerator(DependencyGenerator):
-
-    _REGEX_TABLE_PATTERN_IN_SQL = r"(?i)(?:FROM|JOIN)\s*(\w+\.\w+)"
-
     def __init__(
         self,
         dag_bag_service: DagBagService,
@@ -77,52 +67,6 @@ class DagBagDependencyGenerator(DependencyGenerator):
         )
         return dags_tables_dependencies
 
-    def _find_all_tables_in_query_files(self, dag_query_paths: dict) -> dict:
-        """
-        Given a dictionary in which each key is a DAG and each value is a list of query paths,
-        returns a dictionary in which each key is a DAG and each value is a table parsed from the queries.
-        :param dag_query_paths: A dictionary mapping DAGs to query paths
-        :type dag_query_paths: dict
-        :return: A dictionary mapping DAGs to tables used in their queries
-        :rtype: dict
-        """
-        dependencies = {}
-        for dag, paths in dag_query_paths.items():
-            dependencies_in_dag = set()
-            for path in paths:
-                dependencies_in_dag = dependencies_in_dag.union(
-                    self._find_all_tables_in_query_file(path)
-                )
-            if dependencies_in_dag:
-                dependencies[dag] = sorted(list(dependencies_in_dag))
-        return dependencies
-
-    def _find_all_tables_in_query_file(self, query_path: str) -> set:
-        """"
-        Returns a set of tables inside the given query path
-        :param query_path: The path to the query
-        :type query_path: str
-        :return: A set of tables used in the query
-        :rtype: set
-        """
-        with open(query_path, mode="r") as query_file:
-            query_content = "\n".join(query_file.readlines())
-        return self._find_tables_in_query_content(query_content)
-
-    @classmethod
-    def _find_tables_in_query_content(cls, query_content: str) -> set:
-        """
-        Finds tables used in a SQL query.
-        :param query_content: The content of the query
-        :type query_content: str
-        :return: A set of tables used in the query
-        """
-        return {
-            t.lower()
-            for t in re.findall(cls._REGEX_TABLE_PATTERN_IN_SQL, query_content)
-            if "_raw." not in t
-        }
-
     def treat_exceptions(self, dependencies: dict) -> dict:
         """
         Method to treat exceptions from dependencies.
@@ -133,55 +77,12 @@ class DagBagDependencyGenerator(DependencyGenerator):
         :rtype: dict
         """
         logger.info("m=treat_exceptions, msg=treating dependencies exceptions")
+        static_dags = self.dag_bag_service.find_all_static_dags(dependencies)
         dependencies = self._remove_cyclic_dependencies(dependencies)
-        dependencies = self._remove_static_dependencies_in_non_static_dags(dependencies)
+        dependencies = self._remove_static_dependencies_in_non_static_dags(
+            dependencies, static_dags
+        )
         logger.info(
             "m=treat_exceptions, msg=dependencies exceptions successfully treated."
         )
         return dependencies
-
-    def _remove_cyclic_dependencies(self, dependencies: dict) -> dict:
-        """
-        Finds and removes circular dependencies from the dependency dictionary, returning a new one.
-        :param dependencies: A dictionary, in which keys are DAGs and values are lists of tasks
-        :type dependencies: dict
-        :return: A dictionary, in which keys are DAGs and values are lists of tasks, without cyclic dependencies.
-        :rtype: dict
-        """
-        logger.info("m=remove_cyclic_dependencies, msg=removing cyclic dependencies.")
-        cyclic_dependencies = BietlejuiceCyclicDependencyFinder.find_all_cyclic_dependencies(
-            dependencies
-        )
-        return BietlejuiceDependencyHelper.subtract_dependencies(
-            dependencies, cyclic_dependencies
-        )
-
-    def _remove_static_dependencies_in_non_static_dags(
-        self, dependencies: dict
-    ) -> dict:
-        """
-        Check if a non-static DAG depends on a static DAG and remove it if occours.
-        :param dependencies: A dictionary, in which keys are DAGs and values are lists of tasks
-        :type dependencies: dict
-        :return: A dictionary, in which keys are DAGs and values are lists of tasks, without non-static DAGs depending on static DAGs.
-        :rtype: dict
-        """
-        logger.info(
-            "m=remove_static_dependencies_in_non_static_dags, msg=removing static dependencies in non-static DAGs."
-        )
-        new_dependencies = {}
-        static_dags = self.dag_bag_service.find_all_static_dags(dependencies)
-
-        for dag, dag_dependencies in dependencies.items():
-            new_dependencies[dag] = []
-            for dag_dependency in dag_dependencies:
-                if (
-                    dag_dependency.split(":")[0] in static_dags
-                    and dag not in static_dags
-                ):
-                    logger.info(
-                        f"msg={dag_dependency} removed from {dag}, since it is a static dependency in a non-static DAG"
-                    )
-                else:
-                    new_dependencies[dag].append(dag_dependency)
-        return new_dependencies

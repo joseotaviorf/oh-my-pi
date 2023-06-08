@@ -133,47 +133,40 @@ class FileService:
         :rtype: Tuple[str, str, str, str, str, str]
         """
         path_tree = path.split(".")[0].split("/")
+        if len(path_tree) < 4:
+            raise ValueError(
+                f"m=get_table_info_from_path, path={path},"
+                f" msg=Cannot infer table info from path: not enough levels"
+            )
+        if len(path_tree) > 6:
+            raise ValueError(
+                f"m=get_table_info_from_path, path={path},"
+                f" msg=Cannot infer table info from path: too many levels"
+            )
+
         source = path_tree[0]
-        layer = path_tree[1]
+        layer = path_tree[2]
 
         # default values
         ingestion_type = "full"
         dag = source
         context = source
-        table = None
+        table = path_tree[-1]
 
-        if len(path_tree) < 3:
-            raise ValueError(
-                f"m=get_table_info_from_path, path={path},"
-                f" msg=Cannot infer table info from path: not enough levels"
-            )
-        elif len(path_tree) > 6:
-            raise ValueError(
-                f"m=get_table_info_from_path, path={path},"
-                f" msg=Cannot infer table info from path: too many levels"
-            )
-        elif len(path_tree) == 3:
-            table = path_tree[2]
-        elif len(path_tree) == 4:
-            if path_tree[2] in {"full", "incremental"}:
-                ingestion_type = path_tree[2]
-            else:
-                context = path_tree[2]
-            table = path_tree[3]
-        elif len(path_tree) == 5:
-            context = path_tree[2]
-            if path_tree[3] in {"full", "incremental"}:
+        if len(path_tree) == 5:
+            if path_tree[3] in {"incremental", "full"}:
                 ingestion_type = path_tree[3]
             else:
-                dag = path_tree[3]
-            table = path_tree[4]
-        elif len(path_tree) == 6:
-            context = path_tree[2]
-            dag = path_tree[3]
-            ingestion_type = path_tree[4]
-            table = path_tree[5]
+                context = path_tree[3]
+                # Hard coded while the Gsheets Guild is still creating the new gsheets DAG Builder,
+                # which will have the correct path structure
+                dag = f"{source.replace('gsheets_by_context', 'gsheets')}.{context}"
+        if len(path_tree) == 6:
+            context = path_tree[3]
+            origin = path_tree[4]
+            dag = f"{context}.{origin}"
 
-        return source, layer, context, dag, ingestion_type, table
+        return source, layer, context, f"bietlejuice.{dag}", ingestion_type, table
 
     @staticmethod
     def list_dag_files() -> List[str]:

@@ -1,9 +1,14 @@
+import re
 from bietlejuice.base.db import MetastoreMapping
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 
 class DatalakeMetastoreMapping(MetastoreMapping):
     """Datalake properties mapping for Hive Metastore."""
+
+    DATABASE_PATTERN = re.compile(
+        r"(?<=^datalake_)(?P<schema>[\w|_]*?)(?:_raw|_clean|_clean_staging)?$"
+    )
 
     def get_full_database_name(self, layer: LayerEnum = None) -> str:
         """Following the pattern according to the layer and the source (given in the constructor), returns the full database name used in Spark."""
