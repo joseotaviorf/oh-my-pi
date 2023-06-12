@@ -1,0 +1,39 @@
+---
+database_name: dw_losses
+table_name: dim_provision_factor
+description: This is a junk dimension to list the provision factor that should be used on the formula.
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
+columns:
+  sk_factor_risk:
+    lineage:
+    - datalake_losses.provision_factor.sk_factor_risk
+    description: Id of the invoice. 
+  sk_provision_rule:
+    lineage:
+    - datalake_losses.provision_factor.sk_provision_rule
+    description: Id of the contract. 
+  pd_range:
+    lineage:
+    - datalake_losses.provision_factor.pd_range
+    description: Total value of the invoice. 
+  risk_type:
+    lineage:
+    - datalake_losses.provision_factor.risk_type
+    description: Id of the invoice. 
+  provision_factor:
+    lineage:
+    - datalake_losses.provision_factor.provision_factor
+    description: Id of the contract. 
+  begin_date_application:
+    lineage:
+    - datalake_losses.provision_factor.begin_date_application
+    description: Total value of the invoice. 
+  end_date_application:
+    lineage:
+    - datalake_losses.provision_factor.end_date_application
+    description: Total value of the invoice. 
+  provision_name:
+    lineage:
+    - datalake_losses.provision_factor.provision_name
+    description: Total value of the invoice. 

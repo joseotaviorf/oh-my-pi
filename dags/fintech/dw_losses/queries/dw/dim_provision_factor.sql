@@ -1,0 +1,11 @@
+  SELECT
+      sk_factor_risk,
+      sk_provision_rule,
+      pd_range,
+      risk_type,
+      provision_factor,
+      begin_date_application,
+      end_date_application,
+      provision_name
+  FROM
+      datalake_losses.provision_factor
