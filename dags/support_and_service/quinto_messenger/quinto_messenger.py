@@ -1,28 +1,28 @@
-from datetime import datetime
-from email.policy import default
 import json
 import os
 import pendulum
+from datetime import datetime
 
-from airflow.utils.helpers import chain, cross_downstream
 from airflow.models import DAG
+from airflow.utils.helpers import chain, cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
+
 
 # dag vars
 SOURCE = "quinto_messenger"
 CONTEXT = SOURCE
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2020, 7, 27, tzinfo=pendulum.timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 
 
