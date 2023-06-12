@@ -3,6 +3,7 @@ from datetime import datetime
 
 import pendulum
 from airflow.models import DAG, Variable
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -12,8 +13,9 @@ from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
