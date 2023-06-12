@@ -1,0 +1,25 @@
+SELECT
+    COALESCE(id_contract, -1) AS sk_contract,
+    COALESCE(id_invoice, -1) AS sk_invoice,
+    due_amount,
+    provision_balance_p1_delay_D,
+    provision_balance_p2_delay_D,
+    provision_balance_p3_delay_D,
+    provision_balance_p4_delay_D, 
+    provision_balance_p1_delay_B, 
+    provision_balance_p2_delay_B, 
+    provision_balance_p3_delay_B, 
+    provision_balance_p4_delay_B, 
+    provision_balance_p1_delay_A, 
+    provision_balance_p2_delay_A,
+    provision_balance_p3_delay_A,
+    provision_balance_p4_delay_A,
+    provision_balance_p1_delay_C,
+    provision_balance_p2_delay_C,
+    provision_balance_p3_delay_C,
+    provision_balance_p4_delay_C,
+    user,
+    dt_closing,
+    NOW() AS ts_load
+FROM
+    datalake_losses.provision
