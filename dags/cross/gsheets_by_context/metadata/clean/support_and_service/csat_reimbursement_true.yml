@@ -1,31 +1,55 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: csat_reimbursement_true
+description: This worksheet contains the satisfaction form responses for the tenant/landlord refund or repair refund process.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
+  id_activity:
+    description: Reimbursement task ID in Heimdall base
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.act_id
   token:
+    description: Customer token
     lineage:
       - datalake_gsheets_raw.csat_reembolso_true.token
   cid:
+    description: Unique contract identifier
     lineage:
       - datalake_gsheets_raw.csat_reembolso_true.cid
   uid:
+    description: User ID requesting refund
     lineage:
       - datalake_gsheets_raw.csat_reembolso_true.uid
   type:
+    description: "Refund category: tenant_refund, landlord_refund or repairs"
     lineage:
       - datalake_gsheets_raw.csat_reembolso_true.type
   improvement_suggestions:
+    description: "3rd stage of the survey: reasons that most impacted the level of satisfaction"
     lineage:
       - datalake_gsheets_raw.csat_reembolso_true.sugestao_melhorias
   satisfation_level_description:
+    description: The equivalent of the satisfaction level of step 2, however it has been discontinued
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.descricao_nivel_satisfacao
+  satisfation_level_reason:
+    description: "4th stage of the survey: open field for criticism and suggestions"
     lineage:
       - datalake_gsheets_raw.csat_reembolso_true.motivo_satisfacao
-  satisfation_level_reason:
-    lineage:
-      - datalake_gsheets_raw.csat_reembolso_true.token
   satisfation_level:
+    description: "2nd stage of the survey: customer rating for the refund request process, with 1 being very bad and 5 being very good."
     lineage:
       - datalake_gsheets_raw.csat_reembolso_true.nivel_satisfacao
+  is_solved:
+    description: "1st stage of the survey: to find out whether the refund request was met"
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.is_solved
   ts_submitted:
+    description: Satisfaction survey response date
     lineage:
       - datalake_gsheets_raw.csat_reembolso_true.submitted_at
+  ts_load:
+    description: Data loading date in the datalake
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.ts_load

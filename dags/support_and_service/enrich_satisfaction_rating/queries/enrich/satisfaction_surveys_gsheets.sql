@@ -96,7 +96,7 @@ WITH gsheets_surveys AS (
         DATE(ts_submitted) = DATE('{year}-{month}-{day}')
     UNION ALL
     SELECT
-        cid AS id_contract,
+        id_contract,
         NULL AS respondent_email,
         'TENANT' AS respondent_type,
         'keys' AS service_type,
@@ -109,7 +109,7 @@ WITH gsheets_surveys AS (
         satisfation_level_description AS score_description,
         NULL AS secondary_satisfaction_score,
         NULL AS secondary_score_description,
-        TO_JSON(NAMED_STRUCT('token', token, 'cid', cid, 'uid', uid)) AS custom_attributes,
+        TO_JSON(NAMED_STRUCT('token', token, 'id_user', id_user)) AS custom_attributes,
         ts_submitted,
         YEAR(ts_submitted) AS year,
         MONTH(ts_submitted) AS month,
