@@ -25,20 +25,39 @@ WITH new_system AS (
             1 -- some proposes can have multiple same status
         ),
         propose_evaluation_started_date AS (
+            WITH cte_propose_history AS (
+                SELECT
+                    id_propose,
+                    MIN(ts_updated) AS ts_evaluation_started
+                FROM datalake_rental_guarantee_platform_clean.propose_history
+                WHERE value NOT IN ('Rascunho', 'Proposta Cancelada')
+                AND id_history_type = 5
+                GROUP BY 1
+            ),
+            cte_propose_aud AS (
+                SELECT
+                    p.id AS id_propose,
+                    MIN(ts_created) AS ts_evaluation_started
+                FROM
+                    datalake_rental_guarantee_platform_clean.propose_aud AS p
+                LEFT JOIN
+                    datalake_rental_guarantee_platform_clean.rev_info AS r
+                    ON r.rev = p.rev
+                LEFT JOIN
+                    datalake_rental_guarantee_platform_clean.propose_status AS ps
+                    ON ps.id = p.id_propose_status
+                WHERE
+                    ps.name NOT IN ('Rascunho', 'Proposta Cancelada')
+                GROUP BY 1
+            )
         SELECT
-            p.id AS id_propose,
-            MIN(r.ts_created) AS ts_evaluation_started
+            COALESCE(a.id_propose, ph.id_propose) AS id_propose,
+            COALESCE(a.ts_evaluation_started, ph.ts_evaluation_started) AS ts_evaluation_started
         FROM
-            datalake_rental_guarantee_platform_clean.propose_aud AS p
-        LEFT JOIN
-            datalake_rental_guarantee_platform_clean.rev_info AS r
-            ON r.rev = p.rev
-        LEFT JOIN
-            datalake_rental_guarantee_platform_clean.propose_status AS ps
-            ON ps.id = p.id_propose_status
-        WHERE
-            ps.name = 'Pendente'
-        GROUP BY 1 -- some proposes can have multiple same status
+            cte_propose_aud AS a
+        FULL OUTER JOIN
+            cte_propose_history AS ph
+            ON ph.id_propose = a.id_propose
         ),
         propose_rejected_date AS (
         SELECT
@@ -414,7 +433,8 @@ old_system AS (
     FROM
         datalake_velo_clean.fiancavelo_proposehistory
     WHERE
-        id_text_key = 4 -- indicates that the evaluation has started
+        id_text_key > 2
+        AND id_text_key < 10
         AND id_type_history = 1 -- alteration by the system
     GROUP BY
         1 -- some proposes can have multiple same status
@@ -927,7 +947,7 @@ ORDER BY 1
 
 SELECT
     id_propose,
-    id_propose_values,
+    CAST(id_propose_values AS STRING) AS id_propose_values,
     id_broker,
     id_house,
     id_agent,
