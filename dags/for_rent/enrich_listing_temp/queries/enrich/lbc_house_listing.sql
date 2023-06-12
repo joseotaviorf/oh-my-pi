@@ -190,6 +190,7 @@ house_listing_stranded_status_all AS (
     SELECT
         hls.id_house_listing,
         hls.status_history,
+        hls.status_change_reason AS status_reason,
         hls.ts_status_started,
         COALESCE(hls.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 day)) AS ts_status_ended,
         hl.ts_listing_version_start,
@@ -199,7 +200,8 @@ house_listing_stranded_status_all AS (
               OR (hl.ts_listing_version_start + INTERVAL 8 WEEK) <= COALESCE(hls.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 day))
             THEN 'stranded'
         END AS type_stranded,
-        LAG(hls.status_history) OVER(PARTITION BY hls.id_house_listing ORDER BY hls.ts_status_started, COALESCE(hls.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_status_history
+        LAG(hls.status_history) OVER(PARTITION BY hls.id_house_listing ORDER BY hls.ts_status_started, COALESCE(hls.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_status_history,
+        LAG(hls.status_change_reason) OVER(PARTITION BY hls.id_house_listing ORDER BY hls.ts_status_started, COALESCE(hls.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_status_reason
     FROM 
       datalake_listing_temp.house_listing_status_lbc AS hls
     LEFT JOIN 
@@ -211,7 +213,8 @@ house_listing_stranded_rank_stranded AS (
     SELECT
         id_house_listing,
         status_history,
-            previous_status_history,
+        status_reason,
+        previous_status_history,
         ts_status_started,
         ts_status_ended,
         ts_listing_version_start,
