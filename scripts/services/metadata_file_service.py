@@ -302,9 +302,9 @@ class MetadataFileService:
 
         if layer in {"raw", "clean", "enrich", "dw", "metric"}:
             return os.path.isfile(
-                file_path.replace("/queries/", "/metadata/").replace("sql", "yml")
+                file_path.replace("/queries/", "/metadata/").replace(".sql", ".yml")
             ) or os.path.isfile(
-                file_path.replace("/queries/", "/metadata/").replace("sql", "yaml")
+                file_path.replace("/queries/", "/metadata/").replace(".sql", ".yaml")
             )
         else:
             if layer:

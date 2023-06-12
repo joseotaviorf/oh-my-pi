@@ -76,14 +76,6 @@ def get_query_file_paths(mode, input):
     return list(metadata_file_service.filter_query_files(files))
 
 
-def metadata_file_exists(query_file):
-    return os.path.isfile(
-        query_file.replace("/queries/", "/metadata/").replace("sql", "yml")
-    ) or os.path.isfile(
-        query_file.replace("/queries/", "/metadata/").replace("sql", "yaml")
-    )
-
-
 def remove_prefix(input_string):
     return re.match(SKIP_LIST_PATH_REGEX, input_string).groupdict().get("path")
 
