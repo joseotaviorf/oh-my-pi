@@ -201,7 +201,7 @@ house_listing_stranded_status_all AS (
         END AS type_stranded,
         LAG(hls.status_history) OVER(PARTITION BY hls.id_house_listing ORDER BY hls.ts_status_started, COALESCE(hls.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_status_history
     FROM 
-      datalake_ebdb_listing.house_listing_status AS hls
+      datalake_listing_temp.house_listing_status_lbc AS hls
     LEFT JOIN 
       house_listing AS hl
         ON hls.id_house_listing = hl.id_house_listing
@@ -222,8 +222,11 @@ house_listing_stranded_rank_stranded AS (
         MIN(CASE WHEN type_stranded = 'stranded' THEN ts_status_started END) OVER (PARTITION BY id_house_listing) AS min_ts_all_status,
         --calculate min date of valid status to define stranded
         MIN(CASE WHEN type_stranded = 'stranded'
-                      AND status_history IN ('publicado','suspenso','edicao','aguardando_publicacao')
-                                  AND (previous_status_history <> 'alugado' OR previous_status_history IS NULL)
+                      AND status_history IN ('publicado','suspenso','edicao','aguardando_publicacao', 'PUBLISHED', 'SUSPENDED', 'EDITING')
+                                  AND (
+                                      (previous_status_history <> 'alugado' AND 
+                                        (previous_status_history <> 'SUSPENDED' AND previous_status_reason <> 'RENTED')
+                                      ) OR previous_status_history IS NULL)
                  THEN ts_status_started END) OVER (PARTITION BY id_house_listing) AS min_ts_valid_status,
         MIN(CASE WHEN type_stranded = 'stranded' THEN ts_to_be_stranded END) OVER (PARTITION BY id_house_listing) AS min_ts_to_be_stranded
     FROM 
@@ -235,10 +238,10 @@ house_listing_stranded_status AS (
     SELECT
         *,
         CASE
-          WHEN rn = 1 AND status_history = 'alugado' THEN NULL
-          WHEN rn = 1 AND status_history IN ('despublicado','excluido')
+          WHEN rn = 1 AND status_history = 'alugado' OR (status_history = 'SUSPENDED' AND status_reason = 'RENTED') THEN NULL
+          WHEN rn = 1 AND status_history IN ('despublicado','excluido', 'UNPUBLISHED')
             THEN MIN(min_ts_valid_status) OVER (PARTITION BY id_house_listing)
-          WHEN rn = 1 AND status_history IN ('publicado','suspenso','edicao','aguardando_publicacao')
+          WHEN rn = 1 AND status_history IN ('publicado','suspenso','edicao','aguardando_publicacao', 'PUBLISHED', 'SUSPENDED', 'EDITING') AND status_reason <> 'RENTED'
             THEN MIN(min_ts_valid_status) OVER (PARTITION BY id_house_listing)
           END AS min_ts_stranded
           /*

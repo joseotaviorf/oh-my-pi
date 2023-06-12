@@ -203,7 +203,10 @@ trigger AS (
                   AND bch.next_status = 'PUBLISHED'
               )
               OR
-              bch.status = 'PUBLISHED'
+              (
+                bch.status = 'PUBLISHED' 
+                AND lhs.status <> 'publicado'
+              )
             )
             OR
             ( --Recovered
@@ -226,6 +229,11 @@ trigger AS (
             ( --Relisting
                 bch.status = 'UNPUBLISHED'
                 AND so.next_status = 'PUBLISHED'
+                AND lhs.status = 'alugado'
+            )
+            OR
+            ( --Relisting
+                bch.status = 'PUBLISHED'
                 AND lhs.status = 'alugado'
             )
           )
@@ -260,7 +268,7 @@ trigger AS (
                 OR
                 (
                     bch.next_status = 'PUBLISHED'
-                    AND CAST(lhs.ts_first_publication AS TIMESTAMP) = CAST(bch.ts_next_status_change AS TIMESTAMP)
+                    AND CAST(lhs.ts_first_publication AS DATE) = CAST(bch.ts_next_status_change AS DATE)
                 )
                 OR
                 (
