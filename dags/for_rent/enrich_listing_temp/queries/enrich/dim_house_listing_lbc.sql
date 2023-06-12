@@ -306,7 +306,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.dt_last_iorent_opted_out,
     hl.ts_early_demand_started,
     hlco.ts_consultant_deleted,
-    hl.ts_listing_version_start,
+    IF(version > 0, hl.ts_listing_version_start, NULL) AS ts_listing_version_start,
     hl.ts_listing_version_end,
     CAST(hl.ts_publication AS TIMESTAMP) AS ts_publication,
     hl.ts_house_first_publication,

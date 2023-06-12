@@ -305,7 +305,11 @@ trigger AS (
           (
               bch.next_status = 'PUBLISHED'
               AND bch.next_status_reason LIKE 'RELISTING_%'
-              AND bch.status <> 'PUBLISHED'
+              AND (
+                bch.status = 'SUSPENDED' 
+                AND 
+                bch.status_reason = 'RENTED'
+              )
           )
         ),
         1,
