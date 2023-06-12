@@ -23,7 +23,7 @@ ENV = os.environ.get("ENVIRONMENT")
 MAIN_START_DATE = datetime(2022, 6, 15, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
-CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_io-general_cluster"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,

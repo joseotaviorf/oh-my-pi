@@ -20,7 +20,7 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = os.environ.get("ENVIRONMENT")
 MAIN_START_DATE = datetime(2021, 6, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_min_io-general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")

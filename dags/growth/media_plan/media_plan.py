@@ -29,7 +29,7 @@ def get_previous_quarter(execution_date):
 
 SOURCE = "media_plan"
 DAG_ID = f"bietlejuice.{SOURCE}"
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_min_io-general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 ATHENA_QUERY_RESULTS_BUCKET = config_service.get_config("athena_query_results_bucket")

@@ -22,7 +22,7 @@ SOURCE = "twitter"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 6, 1, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_min_io-general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 artifacts_bucket = config_service.get_config("artifacts_bucket")
