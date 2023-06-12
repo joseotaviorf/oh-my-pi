@@ -93,6 +93,7 @@ Produces the following output tables:
     `house_maintenance_condition`
     `house_maintenance_condition_aud`
     `house_media`
+    `house_listing_relation`
     `house_predicted_price`
     `house_predicted_price_aud`
     `house_rating`

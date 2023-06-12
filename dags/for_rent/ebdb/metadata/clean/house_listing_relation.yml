@@ -1,0 +1,37 @@
+---
+database_name: datalake_ebdb_clean
+table_name: house_listing_relation
+description: Associates a house or a listing with another entity, like the property owner user or company.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.imovel_garantias_aud.imovel_id
+  id:
+    lineage:
+      - datalake_ebdb_raw.imovellistingrelation.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.imovellistingrelation.imovelId
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.imovellistingrelation.listingBusinessContextId
+  id_related:
+    lineage:
+      - datalake_ebdb_raw.imovellistingrelation.relatedId
+  related_as:
+    lineage:
+      - datalake_ebdb_raw.imovellistingrelation.relatedAs
+  source_type:
+    lineage:
+      - datalake_ebdb_raw.imovellistingrelation.sourceType
+  house_origin:
+    lineage:
+      - datalake_ebdb_raw.imovellistingrelation.imovelOriginated
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.imovellistingrelation.criadoEm
+  ts_update:
+    lineage:
+      - datalake_ebdb_raw.imovellistingrelation.atualizadoEm
