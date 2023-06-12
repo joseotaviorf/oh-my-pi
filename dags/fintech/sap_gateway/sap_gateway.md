@@ -22,6 +22,10 @@ In datalake RAW, via full load:
 - `person`
 - `rule`
 - `rule_account_type`
+- `consolidated_journal_entry_lines`
+- `consolidated_journal_entry`
+- `journal_entry_lines`
+- `journal_entry`
 
 
 
@@ -44,6 +48,10 @@ In datalake CLEAN, via full load:
 - `rule_account_type`
 - `rule_special_condition`
 - `special_condition`
+- `consolidated_journal_entry_lines`
+- `consolidated_journal_entry`
+- `journal_entry_lines`
+- `journal_entry`
 
 
 

@@ -34,6 +34,18 @@ tables:
     extraction_type: incremental
     date_filter_column: updated_at
     clean_table_name: sync_sap_job
+  - table_name: consolidated_journal_entry_lines
+    extraction_type: full
+    clean_table_name: consolidated_journal_entry_lines
+  - table_name: consolidated_journal_entry
+    extraction_type: full
+    clean_table_name: consolidated_journal_entry
+  - table_name: journal_entry_lines
+    extraction_type: full
+    clean_table_name: journal_entry_lines
+  - table_name: journal_entry
+    extraction_type: full
+    clean_table_name: journal_entry
 
 partition_columns: [year, month, day]
 lineage_product_database_name: sapgateway
