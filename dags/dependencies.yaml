@@ -696,6 +696,9 @@ bietlejuice.dw_rede_company:
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rede_company_event:load-enrich-company-event
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
+bietlejuice.dw_rede_company_lead:
+  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.dw_rede_supply:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-file

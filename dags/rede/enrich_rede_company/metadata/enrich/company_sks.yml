@@ -1,11 +1,22 @@
 ---
 database_name: datalake_rede_company
 table_name: company_sks
+description: Generates the surrogate keys for Rede companies and company leads.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
 columns:
+  sk_company:
+    description: Surrogate key for Rede companies.
+  sk_company_lead:
+    description: Surrogate key for Rede company leads.
   id_hubspot:
+    description: Hubspot ID for the company.
     lineage:
       - datalake_hubspot.company.id_company
   extracted_3p_tag:
+    description: Content of the 3P tag ([3P-<name>]) of the company.
     lineage:
       - datalake_ebdb_listing.house.partner_3p_supply
       - datalake_ebdb_work_contract.work_contract.3p_partner
+  is_3p_bh:
+    description: Whether the company is from 3P BH.

@@ -1,6 +1,7 @@
 WITH starting_value AS (
     SELECT
-        COALESCE(MAX(sk_company), 0) AS max_sk_company
+        COALESCE(MAX(sk_company), 0) AS max_sk_company,
+        COALESCE(MAX(sk_company_lead), 0) AS max_sk_company_lead
     FROM
         datalake_rede_company.company_sks
 ),
@@ -45,6 +46,10 @@ SELECT
         sk_company, -- Keep the sk_company if it is already defined, so it is durable
         sv.max_sk_company + MONOTONICALLY_INCREASING_ID() + 1 -- if not, use a number after the previous maximum value
     ) AS sk_company,
+    COALESCE(
+        sk_company_lead, -- Keep the sk_company if it is already defined, so it is durable
+        sv.max_sk_company_lead + MONOTONICALLY_INCREASING_ID() + 1 -- if not, use a number after the previous maximum value
+    ) AS sk_company_lead,
     tp.id_hubspot, -- Natural key
     tp.extracted_3p_tag, -- Natural key for companies not present in HubSpot
     tp.is_3p_bh
