@@ -15,7 +15,7 @@ spark_driver_config_content="[driver] {
 jars=(\
     ch.cern.sparkmeasure:spark-plugins_2.12:0.2\
     ch.cern.sparkmeasure:spark-measure_2.12:0.21\
-    com.amazon.deequ:deequ:1.2.2-spark-3.0
+    com.amazon.deequ:deequ:2.0.1-spark-3.2
 )
 for artifact in "${jars[@]}"
     do
