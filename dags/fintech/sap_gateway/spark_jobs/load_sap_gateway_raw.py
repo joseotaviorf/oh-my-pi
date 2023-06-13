@@ -103,8 +103,11 @@ if __name__ == "__main__":
 
             df = postgres_consumer.get_data_from_query(query)
         else:
-            df = postgres_consumer.get_incremental_data_by_granularity_from_table(table_name, date_filter_column, execution_date)
-
+            df = postgres_consumer.get_incremental_data_from_table(
+                table_name=table_name,
+                date_filter_column= date_filter_column,
+                date_filter_value=execution_date
+    )
         if not df.rdd.isEmpty():
             logger.info("m=__main__, msg=RDD is not empty. Loading into S3.")
             IncrementalTableLoaderPipeline(

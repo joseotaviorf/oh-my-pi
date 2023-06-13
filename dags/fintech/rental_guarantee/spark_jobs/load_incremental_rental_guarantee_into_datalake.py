@@ -60,8 +60,12 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
-    df = postgres_consumer.get_incremental_data_by_granularity_from_table(
-        table_name, data_column, execution_date, unixtime_measure=unixtime_measure
+
+    df = postgres_consumer.get_incremental_data_from_table(
+         table_name,
+         data_column,
+         execution_date,
+         unixtime_measure
     )
     if df:
         s3_loader.load_df(
