@@ -97,11 +97,9 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.country_code
     description: "Country code information. Also, a partition of the table."
-  year:
-    description: "Year information of the date."
-  month:
-    description: "Month information of the date."
-  day:
-    description: "Day information of the date."
-  ts_event_load_updated:
-    description: "Load date."
+  event_year:
+    description: "Year information of the event date."
+  event_month:
+    description: "Month information of the event date."
+  event_day:
+    description: "Day information of the event date."
