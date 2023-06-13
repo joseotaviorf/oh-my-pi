@@ -32,12 +32,24 @@ WITH cte_join AS (
     )
     UNION ALL
     (
-    SELECT
-        'Guarantee Status' AS desc_master_type,
-        id AS id_lvl_1,
-        name AS desc_lvl_1
-    FROM
-        datalake_velo_clean.fiancavelo_status
+        WITH cte_guar_status AS (
+            SELECT
+                name AS desc_lvl_1
+                FROM
+                    datalake_velo_clean.fiancavelo_status
+            UNION ALL
+            SELECT
+                name AS desc_lvl_1
+                FROM
+                    datalake_rental_guarantee_platform_clean.contract_status
+            )
+        SELECT
+            'Guarantee Status' AS desc_master_type,
+            ROW_NUMBER() OVER( ORDER BY desc_lvl_1 ASC) AS id_lvl_1,
+            desc_lvl_1
+        FROM
+            cte_guar_status
+        GROUP BY desc_lvl_1
     )
     UNION ALL
     (

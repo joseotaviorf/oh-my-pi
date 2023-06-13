@@ -107,7 +107,9 @@ UNION ALL
                                     ELSE NULL
                                 END
             AND jk2.desc_master_type = 'Occurrence Status'
-    WHERE o.id >= 5000000
+    WHERE
+        o.id < 15
+        OR o.id >= 5000000
 )
 ORDER BY 1
 )

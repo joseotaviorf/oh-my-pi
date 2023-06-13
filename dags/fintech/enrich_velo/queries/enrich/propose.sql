@@ -374,6 +374,13 @@ WITH new_system AS (
             ON jk2.desc_lvl_1 = ps.name
                 AND jk2.desc_master_type = 'Propose Status'
         LEFT JOIN
+            datalake_rental_guarantee_platform_clean.contract_status AS cts
+            ON cts.id = c.id_status
+        LEFT JOIN
+            datalake_velo.junk AS jk3
+            ON jk3.desc_lvl_1 = cts.name
+                AND jk3.desc_master_type = 'Guarantee Status'
+        LEFT JOIN
             datalake_rental_guarantee_platform_clean.user_account AS ua
             ON ua.uuid_person = p.realtor
         LEFT JOIN

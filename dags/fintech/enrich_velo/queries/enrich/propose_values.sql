@@ -151,7 +151,7 @@ UNION ALL
       pv.iptu_amount,
       pv.other_amount,
       COALESCE(pv.rent_amount,0) + COALESCE(pv.condo_amount,0) + COALESCE(pv.light_amount,0) + COALESCE(pv.iptu_amount,0) + COALESCE(pv.other_amount,0) AS total_package_amount,
-      pl.pricing plan_percent,
+      pl.pricing * 100 AS plan_percent,
       pl.coverage AS plan_coverage,
       pl.damage AS plan_damage,
       pl.commission AS plan_commission,
