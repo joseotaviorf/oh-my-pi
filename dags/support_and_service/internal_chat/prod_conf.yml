@@ -1,0 +1,13 @@
+---
+dag_documentation:
+  dag_purpose:
+    This dag aims to ingest information related to messages within our chat in app. 
+    This ingestion is done through files made available within s3.
+
+tables:
+  chat5a_messages:
+    raw_table_name: chat5a_messages
+    clean_table_name: internal_chat_messages
+    extraction_type: incremental
+
+partition_cols: ["year", "month", "day", "hour"]

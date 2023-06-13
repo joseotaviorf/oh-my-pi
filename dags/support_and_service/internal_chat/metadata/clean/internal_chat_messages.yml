@@ -1,0 +1,55 @@
+---
+database_name: datalake_internal_chat_clean
+table_name: internal_chat_messages
+columns:
+  id_chat:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.chatId
+  id_participant:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.participantId
+  chat_group:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.chatGroup
+  user_external:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.externalUser
+  index:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.index
+  mentions:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.mentions
+  vendor:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.vendor
+  scope:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.scope
+  message:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.body
+  message_attributes:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.attributes
+  participant_type:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.participantType
+  chat_type:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.chatType
+  ts_created:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.createdAt
+  year:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.year
+  month:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.month
+  day:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.day
+  hour:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.hour
