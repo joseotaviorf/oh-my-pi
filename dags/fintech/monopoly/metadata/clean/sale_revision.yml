@@ -19,9 +19,6 @@ columns:
   entry_payment_amount:
     lineage:
       - datalake_monopoly_raw.sale_revision.entry_payment_amount
-  fgts_amount_preview:
-    lineage:
-      - datalake_monopoly_raw.sale_revision.fgts_amount_preview
   financed_amount:
     lineage:
       - datalake_monopoly_raw.sale_revision.financed_amount

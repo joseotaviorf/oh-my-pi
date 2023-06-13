@@ -5,7 +5,6 @@ SELECT
     ledger_rule,
     down_payment_amount,
     entry_payment_amount,
-    fgts_amount_preview,
     financed_amount,
     total_payment_amount,
     payment_method,
