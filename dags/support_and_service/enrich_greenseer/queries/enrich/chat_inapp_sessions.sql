@@ -1,6 +1,7 @@
 WITH last_session_update AS (
   SELECT
     id_session,
+    id_pipeline,
     memory,
     ts_started,
     ts_ended
@@ -13,6 +14,7 @@ WITH last_session_update AS (
 )
 SELECT
   id_session,
+  id_pipeline,
   GET_JSON_OBJECT(memory, '$.basic.user.id') AS id_user,
   GET_JSON_OBJECT(memory, '$.legacy.user_data.user.id') AS id_user_legacy,
   GET_JSON_OBJECT(memory, '$.business_rules.internal_chat.whatsapp_strategy') AS strategy,

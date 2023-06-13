@@ -11,6 +11,10 @@ columns:
     lineage:
       - datalake_greenseer_clean.session.id_session
     description: Session unique identifier.
+  id_pipeline:
+    lineage:
+      - datalake_greenseer_clean.session.id_pipeline
+    description: Dialog script identifier.
   id_user:
     lineage:
       - datalake_greenseer_clean.session.memory
