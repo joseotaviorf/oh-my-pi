@@ -1,4 +1,5 @@
 ## Enrich Greenseer
+
 ### Purpose
 
 Extract relevant fields from greenseer memory json and add relevant business rules to reduce the analysis.
@@ -14,3 +15,4 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table on enrich layer (via full load):
 
 - `greenseer_session`
+- `session_memory`

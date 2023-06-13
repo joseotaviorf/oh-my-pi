@@ -1,11 +1,10 @@
 database_name: datalake_greenseer
-table_name: chat_inapp_sessions
+table_name: session_memory
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 description:
-  This table holds the last update of every chat session from the Chatbot, selecting data regarding InApp Chat
-  access and migration strategies. The goal of this table is mainly to break down relevant information
-  from the 'memory' column.
+  This table holds the last update of every chat session from the Chatbot. The goal of this table
+  is mainly to break down relevant information from the 'memory' column.
 columns:
   id_session:
     lineage:
