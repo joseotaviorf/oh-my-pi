@@ -70,7 +70,7 @@ columns:
   sk_sales_company_lead_sent_date:
     lineage:
     - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_sales_company_sent
-    description: ''
+    description: 'Key to identify the date the lead was received from the sales company.'
   sk_prospect_date:
     lineage:
     - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_prospect
@@ -106,6 +106,7 @@ columns:
   sk_available_qualified_date:
     lineage:
     - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_qualified
+    description: Key to identify date of availability identification date of a qualified lead  according to 5A criteria
   sk_opportunity_date:
     lineage:
     - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_opportunity
@@ -488,9 +489,11 @@ columns:
   listing_sale_status:
     lineage:
     - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.listing_sale_status
+    description: 'Identifies the listing status in the ForSale business model.'
   ts_opted_out_rent:
     lineage:
     - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_opt_out_rent
+    description: 'Timestamp relative to when the listing opted out of the Sale business model'
   funnel_step:
     description: Listing flow step that the lead or house is currently in or stopped
     categories:
@@ -513,7 +516,7 @@ columns:
   is_ops_direct_register:
     description: Flag which identifies if house was registered directly via admin
   listing_rent_status:
-    description: ''
+    description: 'Identifies the listing status in the ForRent business model.'
     categories:
       Editing: ''
       Not Qualified Yet: ''
@@ -559,4 +562,4 @@ columns:
   ts_load:
     description: Last model refresh timestamp
   ts_opt_out_sale:
-    description: ''
+    description: 'Timestamp relative to when the listing opted out of the Sale business model'
