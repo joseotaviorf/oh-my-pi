@@ -199,13 +199,12 @@ trigger AS (
               )
               AND
               (
+                (
                   bch.status = 'EDITING'
                   AND bch.next_status = 'PUBLISHED'
-              )
-              OR
-              (
-                bch.status = 'PUBLISHED' 
-                AND lhs.status <> 'publicado'
+                )
+                OR
+                bch.status = 'PUBLISHED'
               )
             )
             OR
@@ -223,7 +222,6 @@ trigger AS (
                     )
                 AND bch.status = 'SUSPENDED'
                 AND bch.status_reason = 'RENTED'
-                AND lhs.status <> 'alugado'
             )
             OR
             ( --Relisting
