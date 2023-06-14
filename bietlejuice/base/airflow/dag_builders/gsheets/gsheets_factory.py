@@ -31,12 +31,6 @@ class GsheetsDAGFactory:
     ENV = os.environ.get("ENVIRONMENT")
     MAIN_START_DATE = datetime(2022, 2, 10, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-    gsheets_by_context_path = DAGPackagesPathService.get_dag_path(
-        dag_name="gsheets_by_context"
-    )
-    GOOGLE_FILES_YAML_PATH = os.path.join(gsheets_by_context_path, "gsheets_files.yaml")
-    GOOGLE_FILES = FileService.get_dict_from_yaml_file(GOOGLE_FILES_YAML_PATH)
-
     DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         {
             "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -57,6 +51,14 @@ class GsheetsDAGFactory:
         databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"
         )
+
+        gsheets_by_context_path = DAGPackagesPathService.get_dag_path(
+            dag_name=source_with_context
+        )
+        GOOGLE_FILES_YAML_PATH = os.path.join(
+            gsheets_by_context_path, "gsheets_files.yaml"
+        )
+        self.GOOGLE_FILES = FileService.get_dict_from_yaml_file(GOOGLE_FILES_YAML_PATH)
 
         (
             self.datalake_bucket,
