@@ -1,0 +1,117 @@
+database_name: datalake_sale_listings_lenses
+table_name: availability_lens
+description: 'An enrich table that has the purpose of showing the level of availability for a listings visit based on some factors that directly impact this aspect. 
+  With this, we can abstract a lot of analysis and understand exactly why the liquidity of a listing is low. 
+  For this table, factors such as location of the key, hours available for the visit, if the listing is on a rent contract, visits cancelled by the owner, etc. If any of these factors change and alter the tier of a listing, it will create a new row in the table.'
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id_house:
+    lineage: 
+      - datalake_sale_available_booking_hours.weekly_available_booking_hours.id_house
+      - datalake_ebdb_clean.access_type_aud.id_house
+      - datalake_ebdb_clean.booking.id_house
+      - datalake_ebdb_contract.contract.id_house
+      - datalake_ebdb_clean.listing_business_context_aud.id_house
+      - datalake_ebdb_clean.listing_business_context.id_house
+    description: >
+      Column referring to the house ID. Can be joined with dw_quintoandar.dim_house and all other sale modeling tables.
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+    description: >
+      ID column of region where house listing is located in. Can be joined with dw_public.dim_region.
+  availability_score:
+    description: >
+      It is the sum of all scores, including: Key Location Score, Score of Hours Available for Weekly Visit, Score of Active Rental Contract and Score of Visit Cancelled due to Non-Authorization.
+  key_location_score:
+    description: >
+      We know that the conversion from VB to VC is lower when the listing needs the owner present at the visit.  In addition, we penalize even more when the owner has already cancelled a visit.
+    categories:
+      "-10000": >
+        When the listing has 'OwnerPresent' at the key location and furthermore, that same owner has previously had a visit cancelled, we penalize it by -10000 score points.
+      "-2000": >
+        When the listing has 'OwnerPresent' at the key location and beyond, but has no previously cancelled visit, we penalize it by -2000 score points.
+      "0": > 
+        If the location of the key is different from 'OwnerPresent.
+  week_available_hours_score:
+    description: >
+      Score based on the amount of weekly hours available for visit by the listing. The fewer hours available, the more we penalize the listing.
+    categories:
+      "-100000": >
+        If the listing has 0 hours available, we penalize it by -100000 score points.
+      "-10000": > 
+        If the listing has between 1 and 9 hours per week available for the visit, we penalize it by -1000 score points.
+      "-1000": >
+        If the listing has between 10 and 29 hours per week available for the visit, we penalize it by -1000 score points.
+      "-500":
+        If the listing has between 30 and 49 hours per week available for the visit, we penalize it by -500 score points.
+      "0": 
+        If the listing has 50 or more hours available, we do not penalize.
+  cancel_by_owner_score:
+    description: >
+      If the owner has canceled any visit, we understand that the availability of that listing may be affected by that behavior
+    categories: 
+      "0":
+        If the owner has not canceled a visit, we do not penalize. 
+      "-3000":
+        If the owner has any cancellation, we penalize him/her with -3000 score points.
+  has_active_rental_contract_score:
+    lineage:
+    description: >
+      If the listing has an active rental contract we believe that this makes it a little more difficult for the listing to be available, and slightly more difficult to make a visit.
+    categories:
+      "0": >
+        If there is no contract, we do not take down the listing's score.
+      "-1000": >
+        If there is a contract, we deduct -1000 from the listing's score.
+  tier:
+    description: >
+      'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level". This score is based on all the elements that can alter the availability of a listing on the visit. That is, it takes into account factors such as key location, seller behavior, canceled visits, hours available for visits, and rental status.
+    categories: 
+      A5: >
+        Listings that have the Availability Score between -1500 and 0. Meaning that they have little or no penalties, indicating good availability for visits.
+      A4: > 
+        Listings that have the Availability Score between -2500 and -1500. Meaning that they have some penalties, indicating good availability for visits.
+      A3: >
+        Listings that have the Availability Score between -4000 and -2500. Meaning some limitations on the visit.
+      A2: >
+        Listings that have the Availability Score between -100000 and -4000. Meaning that possibly this listing is very difficult to make a visit to, but still available.
+      A1: >
+        Listings that have the Availability Score less than -100000. Meaning that this listing is possibly not even available for the visit.
+  tier_name:
+    lineage:
+    description: >
+      Just a full name of the demand tier.
+    categories:
+      Great availability: >
+        It represents the A5 tier category. Listings that have an availability score between -1500 and 0.
+      Good availability: >
+        It represents the A4 tier category. Listings that have an availability score between -2500 and -1500.
+      Standard Availability: >
+        It represents the A3 tier category. Listings that have an availability score between -4000 and -2500.
+      Limited Availability: >
+        It represents the A2 tier category. Listings that have an availability score between -100000 and 4000.
+      Possibly Unavailable: >
+        It represents the A1 tier category. Listings that have an availability score less than -100000.
+  tier_disclaimer:
+    lineage:
+    description: >
+      Column that shows us, in full, the combination of factors/bins concerning the listing, where with this, we classify it within a tier.
+  is_last_tier:
+    lineage:
+    description: >
+      This column represents a Boolean flag that indicates whether the tier referring to the observed row is the current tier or a tier that is part of a listing's history.
+  is_active:
+    description: >
+      Boolean column that will tell us if that tier is active, i.e. if listing is published and is_last_tier is true.
+  ts_tier_started:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+    description: >
+      Date of tier change. It is linked to some change in the scores that make up the availability score. It will change to a new status and create a new row when any of these scores change the listing tier.
+  ts_tier_ended:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+    description: >
+      Termination date of the tier. It is strictly linked to the beginning of the next tier or the unpublication for that listing (for the observed row).
