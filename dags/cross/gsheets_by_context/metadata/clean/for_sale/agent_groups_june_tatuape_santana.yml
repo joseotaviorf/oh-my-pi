@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: agent_groups_june_tatuape_santana_tatuape_santana
+columns:
+  sk_agent:
+    lineage:
+      - datalake_gsheets_raw.agent_groups_june_tatuape_santana.sk_agent
+  id_business_unit:
+    lineage:
+      - datalake_gsheets_raw.agent_groups_june_tatuape_santana.sk_agent
+  hub_name:
+    lineage:
+      - datalake_gsheets_raw.agent_groups_june_tatuape_santana.hub_name
+  agent_group:
+    lineage:
+      - datalake_gsheets_raw.agent_groups_june_tatuape_santana.agent_group
+  total_buyers_window:
+    lineage:
+      - datalake_gsheets_raw.agent_groups_june_tatuape_santana.total_buyers_window
+  nb_ccvs_window:
+    lineage:
+      - datalake_gsheets_raw.agent_groups_june_tatuape_santana.nb_ccvs_window
+  bp2ccv_window:
+    lineage:
+      - datalake_gsheets_raw.agent_groups_june_tatuape_santana.bp2ccv_window
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.agent_groups_june_tatuape_santana.ts_load

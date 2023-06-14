@@ -1180,6 +1180,18 @@ tratativas_actionline_ciq_full_responses:
 #########################
 # FOR SALE SHEETS
 ###################
+agent_groups_june:
+    sheet_id: 1Vfp8aq5fIm4BufjHFpOq0JXjiDEESg0XHP5gIMD00xM
+    sheet_name: Agent_Groups_20230602
+    clean_table_name: agent_groups_june
+    sheet_context: for_sale
+
+agent_groups_june_tatuape_santana:
+    sheet_id: 1Vfp8aq5fIm4BufjHFpOq0JXjiDEESg0XHP5gIMD00xM
+    sheet_name: Agent_Groups_20230609_Tatuape_Santana
+    clean_table_name: agent_groups_june_tatuape_santana
+    sheet_context: for_sale
+
 aux_agents_sale_hub:
     sheet_id: 1mom8xcJ4XCpr02S38DgW_cmEDcdzsOiMkW2vSbg0Ra0
     sheet_name: aux_agents_HUB

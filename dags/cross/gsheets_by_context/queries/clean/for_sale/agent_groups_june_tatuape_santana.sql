@@ -1,0 +1,11 @@
+SELECT
+    sk_agent,
+    id_business_unit,
+    hub_name,
+    agent_group,
+    total_buyers_window,
+    nb_ccvs_window,
+    bp2ccv_window,
+    ts_load
+FROM
+    datalake_gsheets_raw.agent_groups_june_tatuape_santana
