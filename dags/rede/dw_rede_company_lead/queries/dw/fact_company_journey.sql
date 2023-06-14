@@ -1,6 +1,7 @@
 WITH base_dates AS (
     SELECT
-        dc.sk_company * 10000 + IF(ce.business_context = 'SALE', 0, 1) * 1000 + id_journey AS sk_company_journey,
+        dc.sk_company_lead * 10000 + IF(ce.business_context = 'SALE', 0, 1) * 1000 + id_journey AS sk_company_journey,
+        dc.sk_company_lead,
         dc.sk_company,
         ce.id_company,
         id_journey AS journey_number,
@@ -136,9 +137,9 @@ WITH base_dates AS (
     FROM
         datalake_rede_company_event.company_event AS ce
     JOIN
-        dw_rede.dim_company AS dc
+        dw_rede.dim_company_lead AS dc
             ON ce.id_company = dc.id_hubspot
-    GROUP BY 1,2,3,4,5
+    GROUP BY 1,2,3,4,5,6
 ),
 leads_3p AS (
     SELECT
@@ -194,6 +195,7 @@ demand_bookings_per_journey AS (
 )
 SELECT
     bd.sk_company_journey,
+    bd.sk_company_lead,
     bd.sk_company,
     COALESCE(BIGINT(DATE_FORMAT(bd.ts_lead, 'yyyyMMdd')), -1) AS sk_lead_date,
     COALESCE(BIGINT(DATE_FORMAT(bd.ts_prospect, 'yyyyMMdd')), -1) AS sk_prospect_date,

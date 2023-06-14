@@ -8,6 +8,17 @@ workflow:
   custom_schema: rede
   default_extraction_type: full
   has_load_to_redshift_task: false
+  inner_dependencies:
+    fact_company_event:
+      - dim_company_event_type
+      - dim_company_lead
+    fact_company_journey:
+      - dim_company_lead
+  tables_customization:
+    fact_company_event:
+      partitions: [business_context]
+    fact_company_journey:
+      partitions: [business_context]
 cluster:
   type: databricks_10_4_med_memory_cluster
   access_control_list:

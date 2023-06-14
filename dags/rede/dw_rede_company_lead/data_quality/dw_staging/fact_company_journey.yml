@@ -11,7 +11,7 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  sk_company_journey:
+  sk_company_lead:
     is_complete:
       severity_level: Error
     has_min_value:

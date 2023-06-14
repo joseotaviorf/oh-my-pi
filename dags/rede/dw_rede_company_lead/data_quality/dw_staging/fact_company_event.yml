@@ -11,7 +11,7 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  sk_company:
+  sk_company_lead:
     has_min_value:
       greater_than: -1
       severity_level: Error

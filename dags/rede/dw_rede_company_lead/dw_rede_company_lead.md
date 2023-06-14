@@ -14,3 +14,6 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline is responsible for creating the following tables in the DW schema `rede`:
 
 - `dim_company_lead`
+- `dim_company_event_type`
+- `fact_company_event`
+- `fact_company_journey`

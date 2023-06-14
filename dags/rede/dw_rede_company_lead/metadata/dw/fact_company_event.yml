@@ -9,10 +9,15 @@ columns:
     lineage:
     - datalake_rede_company_event.company_event.ts_event
     description: Date key of when the event happened.
+  sk_company_lead:
+    lineage:
+    - dw_rede.dim_company_lead.sk_company_lead
+    description: Key of the company lead associated with the event. Can be joined with
+      dw_rede.dim_company_lead.
   sk_company:
     lineage:
-    - dw_rede.dim_company.sk_company
-    description: Key of the company associated with the event. Can be joined with
+    - dw_rede.dim_company_lead.sk_company
+    description: Key of the company associated with the event, if the lead became a member at some point. Can be joined with
       dw_rede.dim_company.
   sk_company_event_type:
     lineage:
@@ -30,7 +35,7 @@ columns:
   sk_company_event:
     description: Primary key of the table.
   sk_company_journey:
-    description: Unique identifier of the journey, formed by concatenating the sk_company
+    description: Unique identifier of the journey, formed by concatenating the sk_company_lead
       with the journey number.
   ts_load:
     description: Time when the table was loaded.

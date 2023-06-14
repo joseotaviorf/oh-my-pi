@@ -6,10 +6,15 @@ description: Every row in this table corresponds to a company journey from Rede.
 domain: Rede
 owner: gustavo.miller@quintoandar.com.br
 columns:
+  sk_company_lead:
+    lineage:
+    - dw_rede.dim_company_lead.sk_company_lead
+    description: Key of the company lead associated with the event. Can be joined with
+      dw_rede.dim_company_lead.
   sk_company:
     lineage:
-    - dw_rede.dim_company.sk_company
-    description: Key of the company associated with the journey. Can be joined with
+    - dw_rede.dim_company_lead.sk_company
+    description: Key of the company associated with the event, if the lead became a member at some point. Can be joined with
       dw_rede.dim_company.
   sk_lead_date:
     lineage:
@@ -215,7 +220,7 @@ columns:
     description: Timestamp of when the journey ended, which can be either "Deal Lost"
       or "Membership Ended".
   sk_company_journey:
-    description: Primary key of the table, formed by concatenating the sk_company
+    description: Primary key of the table, formed by concatenating the sk_company_lead
       with the business context and the journey number.
   leads_sent_through_supply_processor:
     description: Number of leads sent through Supply Processor between the journey
