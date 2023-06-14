@@ -178,14 +178,14 @@ applied_taxonomy AS (
         CASE
             WHEN pl.is_b2b THEN 'B2B'
             WHEN pl.is_autonomous_agent AND t.mkt_origin = 'Backend' THEN 'CIQ' --In a few cases, the flag may change and consequently the result will retroactively change back to backend
-            WHEN pl.affiliate_type = 'Doorman' THEN 'Doorman'
+            WHEN pl.affiliate_type = 'Doorman' AND pl.sk_lead_date < 20230601 THEN 'Doorman'
             WHEN (t.mkt_origin IS NULL) OR (t.mkt_origin = '') OR (t.mkt_origin = 'Other') THEN COALESCE(t.mkt_origin_suggestion, 'Not Mapped')
             ELSE t.mkt_origin
         END AS mkt_origin,
         CASE
             WHEN pl.is_b2b THEN NULL
             WHEN pl.is_autonomous_agent AND t.mkt_origin = 'Backend' THEN NULL
-            WHEN pl.affiliate_type = 'Doorman' THEN 'Envio'
+            WHEN pl.affiliate_type = 'Doorman' AND pl.sk_lead_date < 20230601 THEN 'Envio'
             WHEN t.mkt_origin IS NULL THEN 'Not Mapped'
             ELSE t.mkt_channel
         END AS mkt_channel,
@@ -198,14 +198,14 @@ applied_taxonomy AS (
         CASE
             WHEN pl.is_b2b THEN NULL
             WHEN pl.is_autonomous_agent AND t.mkt_origin = 'Backend' THEN NULL
-            WHEN pl.affiliate_type = 'Doorman' THEN 'Doorman User'
+            WHEN pl.affiliate_type = 'Doorman' AND pl.sk_lead_date < 20230601 THEN 'Doorman User'
             WHEN t.mkt_origin IS NULL THEN 'Not Mapped'
             ELSE t.mkt_medium
         END AS mkt_medium,
         CASE
             WHEN pl.is_b2b THEN NULL
             WHEN pl.is_autonomous_agent AND t.mkt_origin = 'Backend' THEN NULL
-            WHEN pl.affiliate_type = 'Doorman' THEN (
+            WHEN pl.affiliate_type = 'Doorman' AND pl.sk_lead_date < 20230601 THEN (
                 CASE
                     WHEN COALESCE(pl.subscription_source, '') IN ('', 'Desconhecida') THEN 'Cadastro Orgânico'
                     WHEN pl.subscription_source = 'LeadOutbound' THEN 'Captação Call Center'
