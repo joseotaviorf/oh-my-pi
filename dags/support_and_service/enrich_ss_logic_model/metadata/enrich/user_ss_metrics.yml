@@ -1,0 +1,206 @@
+---
+database_name: datalake_ss_logic_model
+table_name: user_ss_metrics
+description:
+  This table consolidates the key metrics of S&S for each user, encompassing all
+  personas they assume. It includes only active users, such as ongoing tenants,
+  active property owners, photographers, and brokers.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_user:
+    lineage:
+      - datalake_user.persona_type.id_user
+    description: The user id in the main.
+  id_country:
+    lineage:
+      - datalake_user.persona_type.id_country
+    description: The user country id.
+  id_personal_number:
+    lineage:
+      - datalake_user.persona_type.cpf
+    description: The user individual registry.
+  country_code:
+    lineage:
+      - datalake_user.persona_type.country_code
+    description: Country code of the user. Also, a partition of this table.
+  main_phone:
+    lineage:
+      - datalake_user.persona_type.main_phone
+    description: The user main_phone.
+  name:
+    lineage:
+      - datalake_user.persona_type.name
+    description: The user full name.
+  email:
+    lineage:
+      - datalake_user.persona_type.email
+    description: The user email.
+  app_device_carrier:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_af_app_opened_events.device_carrier
+    description: The user device carrier.
+  app_device_family:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_af_app_opened_events.device_family
+    description: The user device family.
+  app_os_name:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_af_app_opened_events.os_name
+    description: The user app operation system name.
+  app_os_version:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_af_app_opened_events.os_version
+    description: The user's app operational system version.
+  active_contracts:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+    description: A list with the active contracts.
+  back_ticket_list:
+    lineage:
+      - datalake_customer_demand.base_tasks.id_task
+    description: A list with the open backoffice tickets.
+  total_open_back_ticket:
+    description: The volume of open backoffice tickets.
+  total_open_back_ticket_7:
+    description: The volume of open backoffice tickets created in the last 7 days.
+  total_open_back_ticket_30:
+    description: The volume of open backoffice tickets created in the last 30 days.
+  total_open_back_ticket_90:
+    description: The volume of open backoffice tickets created in the last 90 days.
+  total_call_ticket:
+    description:
+      The volume of call tickets by user. It considers the last ticket ID associated
+      with each call ID, so we can obtain the most recent ticket associated with each call,
+      providing us with up-to-date information on the status of each call and its
+      associated ticket.
+  total_call_ticket_7:
+    description:
+      From the total call tickets, it considers how many tickets were created in the
+      last 7 days.
+  total_call_ticket_30:
+    description:
+      From the total call tickets, it considers how many tickets were created in the
+      last 30 days.
+  total_call_ticket_90:
+    description:
+      From the total call tickets, it considers how many tickets were created in the
+      last 90 days.
+  total_chat_ticket:
+    description:
+      The volume of chat tickets by user. To obtain the most recent information on the status
+      of each chat and its corresponding ticket, we retrieve the last ticket ID
+      associated with each session ID.
+  total_chat_ticket_7:
+    description:
+      From the total chat tickets, it considers how many tickets were created in the
+      last 7 days.
+  total_chat_ticket_30:
+    description:
+      From the total chat tickets, it considers how many tickets were created in the
+      last 30 days.
+  total_chat_ticket_90:
+    description:
+      From the total chat tickets, it considers how many tickets were created in the
+      last 90 days.
+  total_email_ticket:
+    description:
+      The volume of e-mail tickets by user, but only for tickets received through email, web form, FAQ,
+      other channels or WhatsApp. Tickets with certain tags such as
+      "resolve_ticket_acompanhamento", "fechado_automaticamente_noreply",
+      "redirecionado_atendimento_2", "closed_by_merge", "zapdesk", "ticket_via_call",
+      "call_contato_receptivo", "call_contato_ativo", and "redirecionado_adm_v1" are
+      excluded. Additionally, the Chat Session ID and Twilio Call ID must be NULL for
+      the ticket to be included in the analysis.
+  total_email_ticket_7:
+    description:
+      From the total email tickets, it considers how many tickets were created in the
+      last 7 days.
+  total_email_ticket_30:
+    description:
+      From the total email tickets, it considers how many tickets were created in the
+      last 30 days.
+  total_email_ticket_90:
+    description:
+      From the total email tickets, it considers how many tickets were created in the
+      last 90 days.
+  total_active_contracts:
+    description: The  volume of active contracts the user has.
+  is_pp_multi:
+    lineage:
+      - datalake_user.persona_type.is_pp_multi
+    description: Boolean field indicating if a user is part of pp_multi program or not.
+  is_tenant:
+    description: Boolean field indicating if a user is an ongoing tenant or not.
+  is_broker:
+    description: Boolean field indicating if a user is an active broker or not.
+  is_property_owner:
+    description: Boolean field indicating if a user is an active property owner or not.
+  is_photographer:
+    description: Boolean field indicating if a user is an active photographer or not.
+  is_active:
+    lineage:
+      - datalake_user.persona_type.is_active
+    description: If the user is active or not.
+  is_blocked:
+    lineage:
+      - datalake_user.persona_type.is_blocked
+    description: If the user is blocked or not.
+  has_open_back_ticket:
+    description:
+      If the user has any ticket opened for backoffice demand. By backoffice demand,
+      encompass both CRM tasks and Zendesk E-mail Tickets. For CRM tasks, it includes
+      only those from the "Revisar Pagamentos Rescisão" and "Rescisão Pre Vigência"
+      departments. For Zendesk E-mail Tickets, it excludes those with
+      "robot service account" tags, and includes only those from the
+      "Offboarding Reparos [OFF] [POS] [BACK]" department that have the
+      "orçamentação realizada" tag, or from the "Midias Ops [POS] [BACK]" department
+      that have either the "escalar back video" tag or the
+      "escalar ouvidoria hard cases" tag.
+  has_active_contract:
+    description: If the user has any contract with status equal to "Ativo".
+  has_app_installed:
+    description:
+      Whether the user has the app installed or not, the following conditions determine
+      the result. If the last installed date is equal to or greater than the first
+      installed date (Start Version), it is considered TRUE; if the app's last opened
+      event date is within 45 days, it is also considered TRUE. Otherwise, the
+      result is FALSE.
+  dt_user_birth:
+    lineage:
+      - datalake_user.persona_type.dt_birth
+    description: The user birth date.
+  ts_app_client_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_af_app_opened_events.ts_client_event
+    description: The app's last opened event date.
+  ts_app_first_installed:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_af_app_opened_events.start_version
+    description:
+      Also known as Start Version, it is the first version of the app identified
+      for the user.
+  ts_app_last_installed:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_af_app_opened_events.user_properties
+    description: When the app was last installed.
+  ts_user_updated:
+    lineage:
+      - datalake_user.persona_type.ts_user_updated
+    description: The user last updated date in the system.
+  ts_user_created:
+    lineage:
+      - datalake_user.persona_type.ts_user_created
+    description: The user creation date in the system.
+  year:
+    lineage:
+      - datalake_user.persona_type.year
+    description: Snapshot year, partition column.
+  month:
+    lineage:
+      - datalake_user.persona_type.month
+    description: Snapshot month, partition column.
+  day:
+    lineage:
+      - datalake_user.persona_type.day
+    description: Snapshot day, partition column.

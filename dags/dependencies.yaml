@@ -2163,6 +2163,12 @@ bietlejuice.enrich_sirena:
   - bietlejuice.sirena:load-clean-prospects
 bietlejuice.enrich_sorting_hat:
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis
+bietlejuice.enrich_ss_logic_model:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.enrich_customer_support:load-enrich-call
+  - bietlejuice.enrich_customer_support:load-enrich-chat
+  - bietlejuice.enrich_customer_demand:load-enrich-base-tasks
+  - bietlejuice.enrich_user:load-enrich-persona-type
 bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details
   - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-owners

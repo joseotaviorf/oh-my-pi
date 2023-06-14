@@ -1,0 +1,8 @@
+---
+dag_documentation:
+  dag_purpose:
+    "This DAG main responsibility is to provide the most important S&S Metrics by Persona, \n
+    where persona is the user type, that can be a property owner, tenant, broker, \n
+    photographer, pp multi, prospect, among others. It provides a daily snapshot."
+
+partition_cols: [country_code, year, month, day]
