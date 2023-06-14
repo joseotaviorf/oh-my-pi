@@ -2,20 +2,27 @@
 ###################### Local Airflow Docker environment #######################
 ###############################################################################
 branch ?= forno
-.PHONY: _clone-airflow-plugins
-_clone-airflow-plugins:
+.PHONY: clone-local-airflow-plugins
+## Clones QuintoAndar's custom Airflow Plugins (https://github.com/quintoandar/airflow-plugins) into a local plugins folder.
+## May receive an optional `branch={branch}` argument to clone a specified branch. Defaults to `forno`.
+clone-local-airflow-plugins:
+	@echo "Cloning 'airflow-plugins' from branch '$(branch)'"
+	@echo "=========="
+	@echo ""
 	@rm -fR ./local/airflow/plugins || true
 	@rm -fR ./local/airflow/plugins_temp || true
 	@git clone -b $(branch) --quiet --depth 1 https://github.com/quintoandar/airflow-plugins.git ./local/airflow/plugins_temp
 	@cp -Rf ./local/airflow/plugins_temp/quintoandar_airflow_plugins/ ./local/airflow/plugins
 	@rm -fR ./local/airflow/plugins_temp
+	@echo "Cloning succeeded at ./local/airflow/plugins"
 
 .PHONY: setup-local-variables
-setup-local-variables:
 ## receives and sets up local shell variables to store token credentials used in the local Airflow environment.
 ## Variables are set either into ~/.zshrc or into ~/.bashrc, according to the default shell terminal used.
+setup-local-variables:
 	@echo "Setting up local variables"
 	@echo "=========="
+	@echo ""
 	@if [ -z "${GITHUB_TOKEN}" ]; then\
 		if [ -f $$HOME/.zshrc ]; then SHELL_RC="$$HOME/.zshrc"; else SHELL_RC="$$HOME/.bashrc"; fi;\
 		printf 'Enter your GitHub token \e]8;;https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\e\\[click here for info]\e]8;;\e\\: ';\
@@ -36,7 +43,10 @@ branch ?= forno
 ## runs a local Airflow environment containing both bi-etl-ejuice DAGs and QuintoAndar's custom Airflow Plugins.
 ## May receive an optional `branch={branch}` argument to clone a specified branch of Airflow Plugins repo. Defaults to `forno`.
 run-local-environment:
-	@make _clone-airflow-plugins branch=$(branch)
+	@make clone-local-airflow-plugins branch=$(branch)
+	@echo "Recreating local Airflow environment"
+	@echo "=========="
+	@echo ""
 	@docker-compose -f local/docker/docker-compose.yml up -d --build --force-recreate
 
 .PHONY: restart-local-environment
