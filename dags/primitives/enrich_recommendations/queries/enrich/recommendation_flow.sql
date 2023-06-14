@@ -25,6 +25,8 @@ WITH recommendation_to_rent_flow AS (
                 AND recommendation.business_context = item_interaction.business_context
                 AND recommendation.ts_rec_received <= item_interaction.ts_interaction
         WHERE interaction_type = 'rent-flow-created'
+            AND recommendation.dt_rec_received BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
+            AND item_interaction.dt_interaction BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     )
     WHERE
         first_rent_flow_after_rec IS TRUE
@@ -58,6 +60,8 @@ recommendation_to_sale_flow AS (
                 AND recommendation.ts_rec_received
                 <= item_interaction.ts_interaction
         WHERE interaction_type = 'sale-flow-created'
+            AND recommendation.dt_rec_received BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
+            AND item_interaction.dt_interaction BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     )
     WHERE
         first_sale_flow_after_rec IS TRUE
@@ -91,6 +95,8 @@ recommendation_to_favorite AS (
                 AND recommendation.ts_rec_received
                 < item_interaction.ts_interaction
         WHERE interaction_type = 'house-favorited'
+            AND recommendation.dt_rec_received BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
+            AND item_interaction.dt_interaction BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     )
     /*
        We only keep the first interaction after each
@@ -137,6 +143,8 @@ recommendation_to_click AS (
         WHERE
             (interaction_type = 'similar-house-clicked' AND  recommendation.display_type = 'similar-carousel')
             OR (interaction_type = 'listing-page-viewed')
+            AND recommendation.dt_rec_received BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
+            AND item_interaction.dt_interaction BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     )
     /*
        We only keep the first interaction after each
@@ -177,6 +185,8 @@ recommendation_to_relevant_interaction AS (
                 AND recommendation.ts_rec_received < item_interaction.ts_interaction
         WHERE
             interaction_type in ('similar-house-clicked', 'listing-page-viewed', 'house-favorited')
+            AND recommendation.dt_rec_received BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
+            AND item_interaction.dt_interaction BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     )
     WHERE
         first_relevant_interaction_after_rec IS TRUE
@@ -235,3 +245,5 @@ LEFT JOIN
 LEFT JOIN
     repeated_recommendation
     ON recommendation.id_rec = repeated_recommendation.id_rec
+WHERE
+    recommendation.dt_rec_received BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')

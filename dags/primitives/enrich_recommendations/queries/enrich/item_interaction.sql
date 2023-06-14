@@ -13,6 +13,7 @@ WITH listing_page_views AS (
         'house' AS type_item,
         'listing-page-viewed' AS interaction_type,
         ts_event AS ts_interaction,
+        DATE(ts_event) AS dt_interaction,
         year,
         month,
         day,
@@ -23,7 +24,7 @@ WITH listing_page_views AS (
             )
         ) AS business_context
     FROM
-        datalake_amplitude_clean.170698_listing_page_viewed_events
+        datalake_amplitude_clean.170698_listing_page_viewed_events AS events
     INNER JOIN
         datalake_recommendations.recommendation_catalog AS recommendation_catalog
         ON
@@ -34,8 +35,8 @@ WITH listing_page_views AS (
     WHERE
         GET_JSON_OBJECT(event_properties, '$.business_context') IS NOT NULL
         AND ts_event BETWEEN recommendation_catalog.ts_status_started AND recommendation_catalog.ts_status_ended
-        AND year = 2023
-        AND month >= 4
+        AND MAKE_DATE(events.year, events.month, events.day)
+          BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
         AND YEAR(ts_event) = year
         AND MONTH(ts_event) = month
         AND DAY(ts_event) = day
@@ -46,6 +47,7 @@ similar_carousel_house_clicks AS (
         'house' AS type_item,
         'similar-house-clicked' AS interaction_type,
         ts_event AS ts_interaction,
+        DATE(ts_event) AS dt_interaction,
         year,
         month,
         day,
@@ -59,7 +61,7 @@ similar_carousel_house_clicks AS (
             )
         ) AS business_context
     FROM
-        datalake_amplitude_clean.events
+        datalake_amplitude_clean.events AS events
     WHERE
         event_type IN (
             'listing_similar_clicked',
@@ -68,8 +70,8 @@ similar_carousel_house_clicks AS (
         AND id_app = 170698
         AND GET_JSON_OBJECT(event_properties, '$.business_context') IS NOT NULL
         AND GET_JSON_OBJECT(event_properties, '$.house_id_target') IS NOT NULL
-        AND year = 2023
-        AND month >= 4
+        AND MAKE_DATE(events.year, events.month, events.day)
+            BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
         AND YEAR(ts_event) = year
         AND MONTH(ts_event) = month
         AND DAY(ts_event) = day
@@ -80,6 +82,7 @@ house_favorited AS (
         'house' AS type_item,
         'house-favorited' AS interaction_type,
         ts_event AS ts_interaction,
+        DATE(ts_event) AS dt_interaction,
         year,
         month,
         day,
@@ -92,13 +95,12 @@ house_favorited AS (
                 event_properties, '$.business_context'
             )
         ) AS business_context
-    FROM datalake_amplitude_clean.events
+    FROM datalake_amplitude_clean.events AS events
     WHERE
         event_type = 'listing_favorite_set'
         AND id_app = 170698
         AND GET_JSON_OBJECT(event_properties, '$.business_context') IS NOT NULL
-        AND year = 2023
-        AND month >= 4
+        AND MAKE_DATE(events.year, events.month, events.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
         AND YEAR(ts_event) = year
         AND MONTH(ts_event) = month
         AND DAY(ts_event) = day
@@ -112,13 +114,13 @@ rent_flows AS (
         id_client AS id_user,
         'rent' AS business_context,
         ts_created AS ts_interaction,
+        DATE(ts_created) AS dt_interaction,
         EXTRACT(YEAR FROM ts_created) AS year,
         EXTRACT(MONTH FROM ts_created) AS month,
         EXTRACT(DAY FROM ts_created) AS day
     FROM datalake_ebdb_clean.rent_flow
     WHERE
-        EXTRACT(YEAR FROM ts_created) = 2023
-        AND EXTRACT(MONTH FROM ts_created) >= 4
+        ts_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
 ),
 
 sale_flows AS (
@@ -129,13 +131,13 @@ sale_flows AS (
         id_buyer AS id_user,
         'sale' AS business_context,
         ts_first_event AS ts_interaction,
+        DATE(ts_first_event) AS dt_interaction,
         EXTRACT(YEAR FROM ts_first_event) AS year,
         EXTRACT(MONTH FROM ts_first_event) AS month,
         EXTRACT(DAY FROM ts_first_event) AS day
     FROM datalake_sale_flows.sale_flow
     WHERE
-        EXTRACT(YEAR FROM ts_first_event) = 2023
-        AND EXTRACT(MONTH FROM ts_first_event) >= 4
+        ts_first_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
 )
 
 SELECT
@@ -145,6 +147,7 @@ SELECT
     interaction_type,
     business_context,
     ts_interaction,
+    dt_interaction,
     year,
     month,
     day
@@ -157,6 +160,7 @@ SELECT
     interaction_type,
     business_context,
     ts_interaction,
+    dt_interaction,
     year,
     month,
     day
@@ -169,6 +173,7 @@ SELECT
     interaction_type,
     business_context,
     ts_interaction,
+    dt_interaction,
     year,
     month,
     day
@@ -181,6 +186,7 @@ SELECT
     interaction_type,
     business_context,
     ts_interaction,
+    dt_interaction,
     year,
     month,
     day
@@ -193,6 +199,7 @@ SELECT
     interaction_type,
     business_context,
     ts_interaction,
+    dt_interaction,
     year,
     month,
     day

@@ -30,6 +30,11 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.ts_event
       - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  dt_interaction:
+    description: Date of the user interaction
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
   type_item:
     description: |
       The type of item that was interacted. Currently we

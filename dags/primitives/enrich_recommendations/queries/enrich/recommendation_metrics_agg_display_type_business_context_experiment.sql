@@ -90,6 +90,9 @@ SELECT
     r.dt_rec_received
 FROM
     datalake_recommendations.recommendation_metrics_agg_dimensions r
+WHERE
+    r.dt_rec_received
+      BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
 GROUP BY
     r.dt_rec_received,
     r.business_context,

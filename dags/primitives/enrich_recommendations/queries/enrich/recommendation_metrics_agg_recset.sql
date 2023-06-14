@@ -39,6 +39,8 @@ LEFT JOIN
 LEFT JOIN
     idcg
         ON idcg.k = recommendation_flow.item_rank
+WHERE
+    recommendation_flow.dt_rec_received BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
 ),
 
 base AS (
@@ -65,6 +67,8 @@ base AS (
         day
     FROM
         datalake_recommendations.recommendation_flow AS recommendation_flow
+    WHERE
+        recommendation_flow.dt_rec_received BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
 ),
 
 metrics_at_3 AS (

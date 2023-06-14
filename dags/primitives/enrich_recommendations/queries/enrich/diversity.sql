@@ -4,6 +4,8 @@ WITH base AS (
         id_recset
     FROM
         datalake_recommendations.recommendation AS recommendation
+        WHERE recommendation.dt_rec_received
+            BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
 ),
 
 rec_embedding AS (
@@ -30,6 +32,10 @@ rec_embedding AS (
         WHERE
             embeddings.type_id = 'house'
             AND embeddings.embedding is not NULL
+            AND recommendation.dt_rec_received
+                BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
+            AND MAKE_DATE(embeddings.year, embeddings.month, embeddings.day)
+                BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     )
     WHERE
         latest_embedding

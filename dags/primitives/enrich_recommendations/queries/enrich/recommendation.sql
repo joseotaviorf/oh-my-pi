@@ -60,8 +60,7 @@ WITH carousel_recommendations AS (
             "similar_carousel_viewed",
             "similar_carousel_viewed_native"
         )
-        AND year = 2023
-        AND month >= 4
+        AND MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
         AND YEAR(ts_client_event) = year
         AND MONTH(ts_client_event) = month
         AND DAY(ts_client_event) = day
@@ -125,8 +124,7 @@ yellow_pages_recommendation_logs AS (
                     GET_JSON_OBJECT(emlio_logs.inputs, "$.anchor_ids") != "[]" OR
                     LOWER(GET_JSON_OBJECT(emlio_logs.inputs, "$.display_type")) = 'daily_feed'
                 )
-                AND year = 2023
-                AND month >= 4
+                AND MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
         )
     )
 
@@ -206,6 +204,7 @@ email_recommendation_delivered AS (
                 (CAST(ts_email_first_clicked as long) - CAST(ts_email_sent as long)) / 3600 <= 24
                 OR ts_email_first_clicked IS NULL
             )
+            AND DATE(ts_email_sent) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     )
 
     SELECT
@@ -239,8 +238,7 @@ email_user_sessions AS (
     FROM datalake_amplitude_clean.170698_listing_page_viewed_events
     WHERE
         id_user IS NOT NULL
-        AND year = 2023
-        AND month >= 4
+        AND MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     GROUP BY id_user, id_session
 ),
 
@@ -448,7 +446,3 @@ WHERE
     recommendations.id_item IS NOT NULL
     AND recommendations.id_anchors IS NOT NULL
     AND recommendations.business_context IS NOT NULL
-    AND recommendations.year = 2023
-    AND recommendations.month >= 4
-    AND YEAR(recommendations.ts_rec_created) = 2023
-    AND MONTH(recommendations.ts_rec_created) >= 4

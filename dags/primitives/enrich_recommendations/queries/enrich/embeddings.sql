@@ -43,10 +43,7 @@ WITH embeddings_from_emlio_logs AS (
     FROM datalake_emlio_clean.emlio_logs
     WHERE id_service IN ('house-user-embeddings', 'house-similarity-embeddings')
         AND inference_type = 'online'
-        AND year = 2023
-        AND month >= 4
-        AND year(ts_log) = 2023
-        AND month(ts_log) >= 4
+        AND MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
 ),
 
 dedup_embeddings_from_emlio_logs AS (

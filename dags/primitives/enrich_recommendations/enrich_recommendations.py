@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime
 
 import pendulum
@@ -38,7 +39,9 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_photon_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "databricks_10_4_med_memory_photon_cluster"
+)
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.DATA_PRODUCTS,
@@ -46,6 +49,20 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 DEFAULT_LIBRARIES = config_service.get_config("default_libraries")
+
+
+def get_date_param(dag_run, ds, date_param_name):
+    """
+    Custom Airflow macro for handling dates for incremental execution.
+
+    If the date parameter is not available as input for the DAG run,
+    fallback to the current execution date
+    """
+    date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
+    if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
+        return date_param
+    return ds
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -59,6 +76,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+    user_defined_macros={"get_date_param": get_date_param},
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -96,6 +114,18 @@ for table, configs in tables.items():
         target_database_base_name=CONTEXT,
         is_incremental=is_incremental,
         partitions=partition_cols,
+        # The following are incremental processing configurations
+        #
+        # If no explicit start/end dates exists, falls back to the current date
+        #
+        # All incremental queries will load data between (start_date - days_past) and end_date.
+        # The days_past variable is currently set to 15 days by default as we have metrics
+        # that are calculated with 14 days delay.
+        extra_query_template_params={
+            "start_date": "{{ get_date_param(dag_run, ds, 'start_date') }}",
+            "end_date": "{{ get_date_param(dag_run, ds, 'end_date') }}",
+            "days_past": "{{ dag_run.conf.get('days_past', 15) }}",
+        },
     )
 
 

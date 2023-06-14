@@ -5,6 +5,8 @@ WITH dates AS (
         business_context AS business_context
     FROM
         datalake_recommendations.recommendation
+    WHERE
+        recommendation.dt_rec_received BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
 ),
 
 _catalog AS (
@@ -20,7 +22,7 @@ _catalog AS (
         FROM
             dates
         LEFT JOIN
-            datalake_recommendations.recommendation_catalog recommendation_catalog
+            datalake_recommendations.recommendation_catalog AS recommendation_catalog
         ON
             DATE(recommendation_catalog.ts_status_started) <= dates.dt
             AND (
@@ -49,6 +51,8 @@ distinct_users_per_item_day AS (
         COUNT(DISTINCT id_user) as distinct_users_per_day
     FROM
         datalake_recommendations.item_interaction
+    WHERE MAKE_DATE(item_interaction.year, item_interaction.month, item_interaction.day)
+            BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     GROUP BY
         DATE(ts_interaction), business_context, id_item
 ),
@@ -88,3 +92,5 @@ LEFT JOIN
     ON item_popularity_rank_per_day_normalize.dt = dt_rec_received
     AND item_popularity_rank_per_day_normalize.business_context = recommendation.business_context
     AND item_popularity_rank_per_day_normalize.id_item = recommendation.id_item
+WHERE
+    recommendation.dt_rec_received BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')

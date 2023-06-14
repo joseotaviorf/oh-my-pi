@@ -57,6 +57,10 @@ columns:
     description: Timestamp of recommendation creation
     lineage:
       - datalake_amplitude_clean.events.ts_event
+  dt_rec_received:
+    description: Date of recommendation delivery
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
   business_context:
     description: Business context for which this recommendation was made
     lineage:

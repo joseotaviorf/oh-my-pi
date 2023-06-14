@@ -10,8 +10,7 @@ WITH  idx_lpvs AS (
         ON ulpvs.id = rec.id_user
             AND ulpvs.timestamp < rec.ts_rec_created
     WHERE
-        YEAR(timestamp) = 2023
-        AND MONTH(timestamp) >= 4
+        MAKE_DATE(YEAR(timestamp), MONTH(timestamp), DAY(timestamp)) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     GROUP BY 1, 2
 ),
 
@@ -27,8 +26,7 @@ WITH  idx_lpvs AS (
         ON ulpvr.id = rec.id_user
             AND ulpvr.timestamp < rec.ts_rec_created
     WHERE
-        YEAR(timestamp) = 2023
-        AND MONTH(timestamp) >= 4
+        MAKE_DATE(YEAR(timestamp), MONTH(timestamp), DAY(timestamp)) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     GROUP BY 1, 2
 ),
 
@@ -44,8 +42,7 @@ WITH  idx_lpvs AS (
         ON h.id = rec.id_item
             AND h.timestamp < rec.ts_rec_created
     WHERE
-        YEAR(timestamp) = 2023
-        AND MONTH(timestamp) >= 4
+        MAKE_DATE(YEAR(timestamp), MONTH(timestamp), DAY(timestamp)) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     GROUP BY 1, 2
 ), idx_amenities AS (
     SELECT
@@ -59,8 +56,7 @@ WITH  idx_lpvs AS (
         ON ha.id = rec.id_item
             AND ha.timestamp < rec.ts_rec_created
     WHERE
-        YEAR(timestamp) = 2023
-        AND MONTH(timestamp) >= 4
+        MAKE_DATE(YEAR(timestamp), MONTH(timestamp), DAY(timestamp)) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     GROUP BY 1, 2
 ), idx_condo_amenities AS (
     SELECT
@@ -74,8 +70,7 @@ WITH  idx_lpvs AS (
         ON hca.id = rec.id_item
             AND hca.timestamp < rec.ts_rec_created
     WHERE
-        YEAR(timestamp) = 2023
-        AND MONTH(timestamp) >= 4
+        MAKE_DATE(YEAR(timestamp), MONTH(timestamp), DAY(timestamp)) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     GROUP BY 1, 2
 ), idx_sfs AS (
     SELECT
@@ -89,8 +84,7 @@ WITH  idx_lpvs AS (
         ON rec.id_user = uasfs.id
             AND uasfs.timestamp < rec.ts_rec_created
     WHERE
-        YEAR(timestamp) = 2023
-        AND MONTH(timestamp) >= 4
+        MAKE_DATE(YEAR(timestamp), MONTH(timestamp), DAY(timestamp)) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     GROUP BY 1, 2
 ), idx_sfr AS (
     SELECT
@@ -104,8 +98,7 @@ WITH  idx_lpvs AS (
         ON rec.id_user = uasfr.id
             AND uasfr.timestamp < rec.ts_rec_created
     WHERE
-        YEAR(timestamp) = 2023
-        AND MONTH(timestamp) >= 4
+        MAKE_DATE(YEAR(timestamp), MONTH(timestamp), DAY(timestamp)) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
     GROUP BY 1, 2
 ), idx AS (
     SELECT DISTINCT

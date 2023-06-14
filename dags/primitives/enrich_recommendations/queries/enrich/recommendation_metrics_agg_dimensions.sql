@@ -71,6 +71,9 @@ SELECT
     SUM(popularity_at_10) AS sum_popularity_at_10
 FROM
     datalake_recommendations.recommendation_metrics_agg_recset
+WHERE
+    recommendation_metrics_agg_recset.dt_rec_received
+      BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
 GROUP BY
     business_context,
     display_type,

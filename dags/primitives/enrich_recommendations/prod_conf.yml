@@ -28,23 +28,25 @@ tables:
   recommendation_catalog:
     is_incremental: false
   embeddings:
-    is_incremental: false
+    is_incremental: true
     partition_cols:
       - year
       - month
       - day
       - ml_model
   item_interaction:
-    is_incremental: false
+    is_incremental: true
     partition_cols:
       - year
       - month
       - day
       - interaction_type
   recommendation:
-    is_incremental: false
+    is_incremental: true
+    partition_cols:
+      - dt_rec_received
   recommendation_flow:
-    is_incremental: false
+    is_incremental: true
     partition_cols:
       - dt_rec_received
   coverage:
@@ -52,26 +54,26 @@ tables:
     partition_cols:
       - dt_rec_received
   popularity:
-    is_incremental: false
+    is_incremental: true
     partition_cols:
       - dt_rec_received
   recommendation_metrics_agg_display_type_business_context:
-    is_incremental: false
+    is_incremental: true
     partition_cols:
       - dt_rec_received
   recommendation_metrics_agg_display_type_business_context_experiment:
-    is_incremental: false
+    is_incremental: true
     partition_cols:
       - dt_rec_received
   recommendation_metrics_agg_recset:
-    is_incremental: false
+    is_incremental: true
     partition_cols:
       - dt_rec_received
   recommendation_metrics_agg_dimensions:
-    is_incremental: false
+    is_incremental: true
     partition_cols:
       - dt_rec_received
   recommendation_features:
-    is_incremental: false
+    is_incremental: true
     partition_cols:
       - dt_rec_received

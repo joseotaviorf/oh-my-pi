@@ -98,6 +98,8 @@ LEFT JOIN
     ON r.dt_rec_received = c.dt_rec_received
         AND r.business_context = c.business_context
         AND r.display_type = c.display_type
+WHERE
+    r.dt_rec_received BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
 GROUP BY
     r.dt_rec_received,
     r.business_context,
