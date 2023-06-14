@@ -32,8 +32,9 @@ WITH rent_flow_house_listing AS (
       **/
     END AS id_booking,
     CASE
-      WHEN rf.id_offer_context REGEXP '[0-1]{{2}}$' OR off.ts_first_sent IS NULL OR (off.status <> 'Aprovada' AND off.ts_analyzed IS NULL) THEN NULL
-      ELSE rf.id_offer_context
+      WHEN rf.id_offer_context REGEXP '[0-1]{2}$' THEN NULL
+      WHEN off.ts_first_sent IS NOT NULL OR (off.status = 'Aprovada' AND off.ts_analyzed IS NOT NULL) THEN rf.id_offer_context
+      ELSE NULL
     END AS id_offer,
     /** Conditions to accept an offer:
       -    Offers that are not pre proposals ("offers" ending with 01)
