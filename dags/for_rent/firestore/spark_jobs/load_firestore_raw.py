@@ -23,7 +23,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_firestore_raw"
 
-MAX_EMPTY_RETRIES = 3
+MAX_EMPTY_RETRIES = 5
 RETRY_TIMEOUT = 60
 MAX_MESSAGES = 300
 ACK_MESSAGES_CHUNK_SIZE = 300
