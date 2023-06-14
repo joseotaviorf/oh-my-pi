@@ -8,15 +8,15 @@ columns:
   sk_invoice:
     lineage:
     - datalake_losses.provision.id_invoice
-    description: Id of the invoice. 
+    description: "Id of the invoice."
   sk_contract:
     lineage:   
     - datalake_losses.provision.id_contract
-    description: Id of the contract. 
+    description: "Id of the contract." 
   due_amount:
     lineage:   
     - datalake_losses.provision.due_amount
-    description: Total value of the invoice. 
+    description: "Total value of the invoice."
   provision_balance_p1_delay_A:
     lineage:   
     - datalake_losses.provision.provision_balance_p1_delay_A
@@ -84,10 +84,10 @@ columns:
   user:
     lineage:
     - datalake_losses.provision.user
-    description: User information related to the invoice.
+    description: "User information related to the invoice."
   dt_closing:
     lineage:
     - datalake_losses.provision.dt_closing
-    description: Last day of the month.
+    description: "Last day of the month."
   ts_load:
-    description: Load date.
+    description: "Load date."
