@@ -8,32 +8,32 @@ columns:
   sk_factor_risk:
     lineage:
     - datalake_losses.provision_factor.sk_factor_risk
-    description: Id of the invoice. 
+    description: Id of the factor risk. 
   sk_provision_rule:
     lineage:
     - datalake_losses.provision_factor.sk_provision_rule
-    description: Id of the contract. 
+    description: Id of the provision rule. 
   pd_range:
     lineage:
     - datalake_losses.provision_factor.pd_range
-    description: Total value of the invoice. 
+    description: Range of the delay. 
   risk_type:
     lineage:
     - datalake_losses.provision_factor.risk_type
-    description: Id of the invoice. 
+    description: Type of the risk. 
   provision_factor:
     lineage:
     - datalake_losses.provision_factor.provision_factor
-    description: Id of the contract. 
+    description: Provision factor to be applied on the formula. 
   begin_date_application:
     lineage:
     - datalake_losses.provision_factor.begin_date_application
-    description: Total value of the invoice. 
+    description: Related begin date. 
   end_date_application:
     lineage:
     - datalake_losses.provision_factor.end_date_application
-    description: Total value of the invoice. 
+    description: Related end date.  
   provision_name:
     lineage:
     - datalake_losses.provision_factor.provision_name
-    description: Total value of the invoice. 
+    description: Name of the applied provision. 

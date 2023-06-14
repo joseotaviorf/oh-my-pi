@@ -20,67 +20,67 @@ columns:
   provision_balance_p1_delay_A:
     lineage:   
     - datalake_losses.provision.provision_balance_p1_delay_A
-    description: Provision balance for the rule A during 2022.
+    description: "Provision balance for the rule A during 2022."
   provision_balance_p2_delay_A:
     lineage:   
     - datalake_losses.provision.provision_balance_p2_delay_A
-    description: Provision balance for the rule A on jan/2023.
+    description: "Provision balance for the rule A on jan/2023."
   provision_balance_p3_delay_A:
     lineage:   
     - datalake_losses.provision.provision_balance_p3_delay_A
-    description: Provision balance for the rule A on fev/2023.
+    description: "Provision balance for the rule A on fev/2023."
   provision_balance_p4_delay_A:
     lineage:   
     - datalake_losses.provision.provision_balance_p4_delay_A
-    description: Current provision balance for the rule A.
+    description: "Current provision balance for the rule A."
   provision_balance_p1_delay_B:
     lineage:   
     - datalake_losses.provision.provision_balance_p1_delay_B
-    description: Provision balance for the rule B during 2022.
+    description: "Provision balance for the rule B during 2022."
   provision_balance_p2_delay_B:
     lineage:   
     - datalake_losses.provision.provision_balance_p2_delay_B
-    description: Provision balance for the rule B on jan/2023.
+    description: "Provision balance for the rule B on jan/2023."
   provision_balance_p3_delay_B:
     lineage:   
     - datalake_losses.provision.provision_balance_p3_delay_B
-    description: Provision balance for the rule B on fev/2023.
+    description: "Provision balance for the rule B on fev/2023."
   provision_balance_p4_delay_B:
     lineage:   
     - datalake_losses.provision.provision_balance_p4_delay_B
-    description: Current provision balance for the rule B.
+    description: "Current provision balance for the rule B."
   provision_balance_p1_delay_C:
     lineage:   
     - datalake_losses.provision.provision_balance_p1_delay_C
-    description: Provision balance for the rule C during 2022.
+    description: "Provision balance for the rule C during 2022."
   provision_balance_p2_delay_C:
     lineage:   
     - datalake_losses.provision.provision_balance_p2_delay_C
-    description: Provision balance for the rule C on jan/2023.
+    description: "Provision balance for the rule C on jan/2023."
   provision_balance_p3_delay_C:
     lineage:   
     - datalake_losses.provision.provision_balance_p3_delay_C
-    description: Provision balance for the rule C on fev/2023.
+    description: "Provision balance for the rule C on fev/2023."
   provision_balance_p4_delay_C:
     lineage:   
     - datalake_losses.provision.provision_balance_p4_delay_C
-    description: Current provision balance for the rule C.
+    description: "Current provision balance for the rule C."
   provision_balance_p1_delay_D:
     lineage:   
     - datalake_losses.provision.provision_balance_p1_delay_D
-    description: Provision balance for the rule D during 2022.
+    description: "Provision balance for the rule D during 2022."
   provision_balance_p2_delay_D:
     lineage:   
     - datalake_losses.provision.provision_balance_p2_delay_D
-    description: Provision balance for the rule D on jan/2023.
+    description: "Provision balance for the rule D on jan/2023."
   provision_balance_p3_delay_D:
     lineage:   
     - datalake_losses.provision.provision_balance_p3_delay_D
-    description: Provision balance for the rule D on fev/2023.
+    description: "Provision balance for the rule D on fev/2023."
   provision_balance_p4_delay_D:
     lineage:   
     - datalake_losses.provision.provision_balance_p4_delay_D
-    description: Current provision balance for the rule D.
+    description: "Current provision balance for the rule D."
   user:
     lineage:
     - datalake_losses.provision.user
