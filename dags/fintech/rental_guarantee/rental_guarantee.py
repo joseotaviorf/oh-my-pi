@@ -77,7 +77,6 @@ for table in tables:
     parameters = [SOURCE, table_name]
     if extraction_type == "incremental":
         parameters.append(table["date_filter_column"])
-        parameters.append(table.get("unixtime_measure", "date"))
         parameters.append("{{ ds }}")
 
     raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}//load_{extraction_type}_{CONTEXT}_into_datalake.py"

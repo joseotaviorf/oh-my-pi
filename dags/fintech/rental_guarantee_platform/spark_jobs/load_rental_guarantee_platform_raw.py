@@ -81,12 +81,8 @@ if __name__ == "__main__":
 
     s3_loader = S3Loader()
 
-
-    df = postgres_consumer.get_incremental_data_from_table(
-         table_name,
-         date_filter_column,
-         execution_date,
-         unixtime_measure
+    df = postgres_consumer.get_incremental_data_by_granularity_from_table(
+        table_name, date_filter_column, execution_date, unixtime_measure
     )
 
     table_name = table_name.lower()
