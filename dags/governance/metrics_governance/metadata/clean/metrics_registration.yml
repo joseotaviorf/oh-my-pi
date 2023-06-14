@@ -1,55 +1,91 @@
 ---
 database_name: datalake_metrics_governance_clean
 table_name: metrics_registration
+owner: augusto.torres@quintoandar.com.br
+domain: Data Ops & Governance
+description: This table contains information about the metrics registered.
 columns:
     metric_name:
+      description: Metric name.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.name
     metric_acronym:
+      description: Summary or abbreviation that identifies the metric..
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.acronym
     metric_description:
+      description: Metric description. Define the purpose of the metric and how it is calculated. If necessary, include information about the metric's context and use case.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.description
-    company_line:
+    company_line: 
+      description: Domain of the metric.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.company_line
     business_stage:
+      description: Indicates which business flow the metric fits.
+      categories:
+        Alpha: Alpha level metric.
+        Beta: Beta level metric.
+        Official: Official level metric.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.business_stage
     hierarchy_level:
+      description: Metric hierarchy.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.hierarchy_level
     maturity_level:
+      description: Metric rely level.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.maturity_level
     created_by:
+      description: Metric creator email.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.created_by
+    updated_by:
+      description: Metric updater email.
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.updated_by
     approved_by:
+      description: Metric approver email.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.approved_by
     is_additive:
+      description: Flag to identify if the metric is additive.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.is_additive
     is_active:
+      description: Flag to identify if the metric is active.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.is_active
     link_to_metric:
+      description: Link to a dashboard using the metric. 
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.link_to_metric
     metric_calculation:
+      description: Metric calculation method.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.calculation
     observations:
+      description: Field to register additional information.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.observations
     has_datamart:
+      description: Flag to identify if the metric is materialized in a table.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.has_datamart
     datamart_name:
+      description: If the metric is materialized in a table, the name of the table.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.datamart_name
+    ts_created:
+      description: Metric create timestamp.
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.ts_created
+    ts_updated:
+      description: Metric update timestamp.s
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.ts_updated
     ts_load:
+      description: Ingestion load timestamp.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.ts_load
