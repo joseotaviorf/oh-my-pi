@@ -26,3 +26,27 @@ columns:
   ts_updated:
     lineage:
       - datalake_sap_gateway_raw.person.updated_at
+  address:
+    lineage:
+      - datalake_sap_gateway_raw.person.address
+  address_complement:
+    lineage:
+      - datalake_sap_gateway_raw.person.address_complement
+  address_street_sufix:
+    lineage:
+      - datalake_sap_gateway_raw.person.address_street_sufix
+  address_number:
+    lineage:
+      - datalake_sap_gateway_raw.person.address_number
+  address_block:
+    lineage:
+      - datalake_sap_gateway_raw.person.address_block
+  city:
+    lineage:
+      - datalake_sap_gateway_raw.person.city
+  state:
+    lineage:
+      - datalake_sap_gateway_raw.person.state
+  zip_code:
+    lineage:
+      - datalake_sap_gateway_raw.person.zip_code

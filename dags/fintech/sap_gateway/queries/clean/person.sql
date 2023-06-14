@@ -5,6 +5,14 @@ SELECT
     `name`          AS person_name,
     email,
     phone,
+    address,
+    address_complement,
+    address_street_sufix,
+    address_number,
+    address_block,
+    city,
+    state,
+    zip_code,
     created_at      AS ts_created,
     updated_at      AS ts_updated
 FROM
