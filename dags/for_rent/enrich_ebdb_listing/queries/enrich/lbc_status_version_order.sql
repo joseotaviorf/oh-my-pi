@@ -350,30 +350,30 @@ trigger AS (
   UNION ALL
 
   SELECT 
-      bch.id_house,
-      bch.country_code,
-      bch.status,
-      bch.status_reason,
-      bch.ts_state_started,
-      bch.ts_state_ended,
-      bch.days_in_state, 
-      t.days_in_status,
-      IF(bch.previous_state_status IS NULL, TRUE, FALSE) AS is_first_status,
-      t.trigger_new_version,
-      COALESCE(
-          COALESCE(lhs.listing_version, 0)
-          + 
-          SUM(
-              t.trigger_new_version
-          ) OVER (PARTITION BY bch.id_house ORDER BY bch.ts_state_started ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
-          , IF(bch.state_order = 1 AND bch.status = 'PUBLISHED', COALESCE(lhs.listing_version, 0) + 1, COALESCE(lhs.listing_version, 0) + 0)
-          , 0
-      ) AS listing_version,
-      bch.state_order,
-      MAX(bch.state_order) OVER(PARTITION BY bch.id_house) AS max_state_order,
-      bch.rev,
-      bch.revision_reason,
-      bch.ts_first_publication
+    bch.id_house,
+    bch.country_code,
+    bch.status,
+    bch.status_reason,
+    bch.ts_state_started,
+    bch.ts_state_ended,
+    bch.days_in_state, 
+    t.days_in_status,
+    IF(bch.previous_state_status IS NULL, TRUE, FALSE) AS is_first_status,
+    t.trigger_new_version,
+    COALESCE(
+        COALESCE(lhs.listing_version, 0)
+        +
+        SUM(
+            t.trigger_new_version
+        ) OVER (PARTITION BY bch.id_house ORDER BY bch.ts_state_started ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+        , IF(bch.lbc_state_order = 1 AND bch.status = 'PUBLISHED', COALESCE(lhs.listing_version, 0) + 1, COALESCE(lhs.listing_version, 0) + 0)
+        , 0
+    ) AS listing_version,
+    bch.state_order,
+    MAX(bch.state_order) OVER(PARTITION BY bch.id_house) AS max_state_order,
+    bch.rev,
+    bch.revision_reason,
+    bch.ts_first_publication
   FROM
     business_context_history AS bch
   LEFT JOIN 
