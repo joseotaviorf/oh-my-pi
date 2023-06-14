@@ -14,3 +14,7 @@ tables_configurations:
     workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
     object_id: "8703789"
     column_create_date: "date"
+  benvi_closing_metrics:
+    workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
+    object_id: "9051650"
+    column_create_date: "date"
