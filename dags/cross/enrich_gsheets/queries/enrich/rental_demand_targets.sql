@@ -1,9 +1,55 @@
 SELECT
-    *
+    city_group,
+    demand_channel,
+    demand_channel_type,
+    funnel_origin,
+    rental_administrator,
+    evaluation_positive,
+    evaluation_started,
+    new_tenant_prospects,
+    contracts_signed,
+    credit_approved,
+    doc_completed,
+    doc_sent,
+    offer_accepted,
+    offer_sent,
+    visits_booked,
+    visits_completed,
+    tier,
+    halfyear,
+    quarter,
+    month,
+    year,
+    has_guarantee,
+    dt_week_started,
+    dt_target
 FROM
     datalake_static_files.rental_demand_targets
 UNION ALL
 SELECT
-    *
+    city_group,
+    demand_channel,
+    demand_channel_type,
+    funnel_origin,
+    rental_administrator,
+    evaluation_positive,
+    evaluation_started,
+    new_tenant_prospects,
+    contracts_signed,
+    credit_approved,
+    doc_completed,
+    doc_sent,
+    offer_accepted,
+    offer_sent,
+    visits_booked,
+    visits_completed,
+    tier,
+    halfyear,
+    quarter,
+    month,
+    year,
+    has_guarantee,
+    dt_week_started,
+    dt_target
 FROM
     datalake_gsheets_clean.demand_targets_2022
