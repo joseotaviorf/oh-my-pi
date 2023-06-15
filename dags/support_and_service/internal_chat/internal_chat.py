@@ -35,7 +35,7 @@ base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 raw_spark_job_path = f"{s3_prefix}/spark_jobs/{SOURCE}/load_{CONTEXT}_raw.py"
 
 default_libraries = config_service.get_config("default_libraries")
-cluster_description = config_service.get_config("databricks_10_4_med_io-general_cluster")
+cluster_description = config_service.get_config("custom_cluster")
 
 tables_config = config_service.get_config("tables")
 partition_cols = config_service.get_config("partition_cols")

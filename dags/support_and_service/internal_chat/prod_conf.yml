@@ -11,3 +11,12 @@ tables:
     extraction_type: incremental
 
 partition_cols: ["year", "month", "day", "hour"]
+
+custom_cluster:
+  driver_node_type_id: m5n.2xlarge
+  node_type_id: m5n.2xlarge
+  num_workers: 2
+  spark_version: 10.4.x-scala2.12
+  aws_attributes:
+      ebs_volume_size: 200
+      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"

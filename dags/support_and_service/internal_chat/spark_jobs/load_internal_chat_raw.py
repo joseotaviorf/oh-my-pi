@@ -97,6 +97,8 @@ if __name__ == "__main__":
         """
     )
 
+    execution_date -= timedelta(days=1)
+
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
     s3_loader = S3Loader()
@@ -119,7 +121,7 @@ if __name__ == "__main__":
     table_name_proxy = args.table_name.replace('_', '-')
     year_proxy = execution_date.year
     month_proxy = str(execution_date.month).zfill(2)
-    day = str(execution_date.day - 1).zfill(2)
+    day = str(execution_date.day).zfill(2)
 
     proxy_path_date = f"s3://5a-ss-{table_name_proxy}-{args.env}/year={year_proxy}/month={month_proxy}/day={day}/"
     paths_bucket = dbutils.fs.ls(proxy_path_date)
