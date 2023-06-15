@@ -25,6 +25,7 @@ if __name__ == "__main__":
     parser.add_argument("source")
     parser.add_argument("table_name")
     parser.add_argument("data_column")
+    parser.add_argument("unixtime_measure")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
@@ -34,6 +35,7 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     table_name = args.table_name
     data_column = args.data_column
+    unixtime_measure = args.unixtime_measure
     execution_date = args.execution_date
 
     base_dbutils = BaseDBUtils()
@@ -58,8 +60,8 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
-    df = postgres_consumer.get_incremental_data_from_table(
-        table_name, data_column, execution_date
+    df = postgres_consumer.get_incremental_data_by_granularity_from_table(
+        table_name, data_column, execution_date, unixtime_measure
     )
     if df:
         s3_loader.load_df(
