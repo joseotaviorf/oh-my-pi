@@ -72,7 +72,7 @@ if __name__ == "__main__":
     dag_context = args.dag_context
 
     gsheets_by_context_path = DAGPackagesPathService.get_dag_path(
-        dag_name="gsheets_by_context"
+        dag_name="gsheets_growth"
     )
     gsheets_by_context_path = os.path.join(
         gsheets_by_context_path, "gsheets_files.yaml"
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     scoped_credentials = build_scoped_credentials(credentials)
     drive_service = build_drive_api_service(scoped_credentials)
 
-    gsheets_service = GsheetsService()
+    gsheets_service = GsheetsService(dag_name="gsheets_growth")
 
     sheet_details = list(
         filter(

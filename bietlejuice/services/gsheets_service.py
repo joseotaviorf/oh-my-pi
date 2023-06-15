@@ -34,18 +34,19 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 DEPS_YAML_PATH = os.path.join(DAG_PACKAGES_ROOT, "dependencies.yaml")
 
-CONTEXT_GSHEETS_FILES_YAML_PATH = join(
-    DAGPackagesPathService.get_dag_path("gsheets_by_context"), "gsheets_files.yaml"
-)
-
 
 class GsheetsService:
     GSHEETS_DATA_LAKE_RAW_SCHEMA = "datalake_gsheets_raw"
     GSHEETS_DATA_LAKE_CLEAN_SCHEMA = "datalake_gsheets_clean"
     TEMPORARY_TABLE_PREFIX = "temp_"
 
-    @staticmethod
-    def get_sheets_are_dependencies() -> List[str]:
+    def __init__(self, dag_name):
+        self.dag_name = dag_name
+        self.CONTEXT_GSHEETS_FILES_YAML_PATH = join(
+            DAGPackagesPathService.get_dag_path(dag_name), "gsheets_files.yaml"
+        )
+
+    def get_sheets_are_dependencies(self) -> List[str]:
         """
         Return the gsheets clean tables that are dependencies to other DAGs on dependencies.yaml
         """
@@ -63,7 +64,7 @@ class GsheetsService:
                 gsheets_deps.append(dep)
 
         context_gsheets_dict = FileService.get_dict_from_yaml_file(
-            CONTEXT_GSHEETS_FILES_YAML_PATH
+            self.CONTEXT_GSHEETS_FILES_YAML_PATH
         )
 
         df_context = (
@@ -84,8 +85,7 @@ class GsheetsService:
                 dependencies_sheets.append(row["clean_table_name"])
         return dependencies_sheets
 
-    @staticmethod
-    def get_recently_modified_gsheet(drive_service) -> Dict:
+    def get_recently_modified_gsheet(self, drive_service) -> Dict:
         """
         Get the sheet ids for the Gsheets modified until the DAG run.
 
