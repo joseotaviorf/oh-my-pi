@@ -1,0 +1,39 @@
+---
+database_name: datalake_google_calendar_clean
+table_name: mexican_holidays
+domain: cross
+owner: data-ae-fintech@quintoandar.com.br
+columns:
+  id:
+    lineage:
+    - datalake_google_calendar_raw.mexican_holidays.id
+  holiday_category:
+    lineage:
+    - datalake_google_calendar_raw.mexican_holidays.description
+  holiday_name:
+    lineage:
+    - datalake_google_calendar_raw.mexican_holidays.summary
+  status:
+    lineage:
+    - datalake_google_calendar_raw.mexican_holidays.status
+  dt_holiday_start:
+    lineage:
+    - datalake_google_calendar_raw.mexican_holidays.DATE(start.date)
+  dt_holiday_end:
+    lineage:
+    - datalake_google_calendar_raw.mexican_holidays.DATE(end.date)
+  ts_updated:
+    lineage:
+    - datalake_google_calendar_raw.mexican_holidays.updated
+  ts_created:
+    lineage:
+    - datalake_google_calendar_raw.mexican_holidays.created
+  year:
+    lineage:
+    - datalake_google_calendar_raw.mexican_holidays.year
+  month:
+    lineage:
+    - datalake_google_calendar_raw.mexican_holidays.month
+  day:
+    lineage:
+    - datalake_google_calendar_raw.mexican_holidays.day
