@@ -9,6 +9,9 @@ metadata_files_out_of_pattern:
   - for_rent/enrich_pro_owners/metadata/enrich/tracking_weekly_changes.yml
   - governance/looker/metadata/clean/dashboards.yml
   - support_and_service/enrich_offboarding_repairs_probability/metadata/enrich/contracts.yml
+  - support_and_service/dw_chattermill/metadata/dw/dim_answer_category.yml
+  - support_and_service/dw_chattermill/metadata/dw/fact_answer_category.yml
+  - support_and_service/enrich_chattermill/metadata/enrich/responses.yml
   - for_sale/dw_sale_events/metadata/dw/dim_sale_event_type.yml
   - fintech/velo_omie/metadata/clean/country.yml
   - support_and_service/enrich_offboarding/metadata/enrich/contract_termination.yml
