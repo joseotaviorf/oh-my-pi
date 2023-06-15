@@ -1,6 +1,9 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: brokerage
+description: Brokerage information associated with an offer.
+domain: For Sale
+owner: gustavo.miller@quintoandar.com.br
 columns:
   id_brokerage:
     lineage:
@@ -8,6 +11,12 @@ columns:
   id_sales_flow:
     lineage:
       - datalake_sales_flow_raw.brokerage.sales_flow_id
+  brokerage_fee_payer:
+    lineage:
+      - datalake_sales_flow_raw.brokerage.brokerage_fee_payer
+  brokerage_fee:
+    lineage:
+      - datalake_sales_flow_raw.brokerage.brokerage_fee
   quinto_andar_brokerage_split:
     lineage:
       - datalake_sales_flow_raw.brokerage.quinto_andar_brokerage_split

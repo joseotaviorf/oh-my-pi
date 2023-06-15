@@ -1,259 +1,339 @@
 ---
 database_name: datalake_offer
 table_name: sale_offer
+owner: herivelto.junior@quintoandar.com.br
+domain: For Sale
+description: With this table we have the objective of consolidating the general data
+  of the offer process, the idea here is to consolidate data mainly from the sources
+  of Sales (main source), Work Contract and others.
 columns:
   id_offer:
     lineage:
       - datalake_firestore.sale_offer.id
       - datalake_gsheets.sale_hub_offer.id_offer
+    description: Offer unique identifier.
   id_sale_flow:
     lineage:
       - datalake_firestore.sale_offer.id_sale_flow
+    description: Identification key for the sales flow linked to an offer.
   id_buyer:
     lineage:
       - datalake_firestore.sale_offer.id_buyer
       - datalake_gsheets.sale_hub_offer.id_buyer
+    description: Identification key of the user who sent the offer.
   id_house:
     lineage:
       - datalake_firestore.sale_offer.id_house
       - datalake_gsheets.sale_hub_offer.id_house
+    description: Identification key of the house linked to the offer.
   id_owner:
     lineage:
       - datalake_firestore.sale_offer.id_owner
       - datalake_gsheets.sale_hub_offer.id_owner
+    description: House owner to whom an offer has been sent.
   id_region:
     lineage:
       - datalake_firestore.sale_offer.id_region
       - datalake_gsheets.sale_hub_offer.id_region
+    description: Identification key of the region where the house in question is located.
   id_agent:
     lineage:
       - datalake_booking.booking.id_agent
+    description: Broker identification key linked to the offer.
   id_team_lead:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.sk_team_lead
+    description: Team lead ID user on SalesFlow tables
   id_user_consultant:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_user_consultant
       - datalake_ebdb_user.user.id
+    description: Deal Maker user ID on main (EBDB) tables
   id_user_agent:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_user_agent
+    description: Broker identification key linked to the offer on main tables (EBDB)
   id_consultant:
     lineage:
       - datalake_firestore.monday.id_consultant
       - datalake_sale_offer_flows.sale_offer_flows.id_consultant
+    description: Deal Maker user ID on SalesFlow tables
   id_booking:
     lineage:
       - datalake_booking.booking.id
+    description: Booking identification key linked to an offer.
   id_closing_specialist:
     lineage:
       - datalake_firestore.monday.id_closing_specialist
       - datalake_sale_offer_flows.sale_offer_flows.id_closing_specialist
+    description: User ID that participated on the CCV step on main (EBDB) tables
   id_vendas:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_sales_flow
+    description: ID of the sales_flow in the SalesFlow DB (Vendas)
   id_pendency:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_pendency
+    description: Identification key for this offer pendencies on table pendency
   id_business_unit:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_hub
       - datalake_ebdb_work_contract.work_contract.id_hub_teams
+    description: Identification key of the business unit where the buyer was served.
   id_company_supply:
     lineage:
       - datalake_ebdb_listing.house.id_company_hubspot
+    description: Id of the supply partner
   id_company_demand:
     lineage:
       - datalake_booking.booking.id_company_demand
+    description: Id of the demand partner
   pendency:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.pendency
+    description: Pendency name
   pendency_type:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.pendency_type
+    description: Pendency type
   opportunities_of_the_week:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.opportunities_of_the_week
+    description: In For Sale it's every lead qualified in the week for the CRI or
+      MA process. In Rent is every listing published, with at least one scheduled
+      in the week. This information is not used by the For Sale operation team, because
+      of the new business model of Closing Assistance.
   team_lead_name:
     lineage:
       - datalake_gsheets.sale_hub_offer.team_lead_name
       - datalake_sale_offer_flows.sale_offer_flows.team_lead_name
+    description: Team lead name
   consultant_name:
     lineage:
       - datalake_gsheets.sale_hub_offer.executive
       - datalake_gsheets_clean.monday_users.user_name
       - datalake_sale_offer_flows.sale_offer_flows.consultant_name
+    description: Deal Maker user name on SalesFlow tables
   agent_name:
     lineage:
       - datalake_ebdb_user.user.name
+    description: Broker name on main (EBDB) tables
   offer_flow:
     lineage:
       - datalake_gsheets.sale_hub_offer.offer_flow
       - datalake_sale_offer_flows.sale_offer_flows.offer_flow
+    description: Information about which flow this offer is following
   business_unit:
     lineage:
       - datalake_gsheets.sale_hub_offer.offer_flow
       - datalake_ebdb_work_contract.work_contract
+    description: Name of the business unit where the buyer was served.
   offer_platform:
     lineage:
       - datalake_gsheets.sale_hub_offer.offer_model
+    description: Offer model on the old google sheet.
   offer_status:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.offer_status
       - datalake_firestore.monday.offer_status
       - datalake_gsheets.sale_hub_offer.status
+    description: Status of the offer
   monday_status:
     lineage:
       - datalake_firestore.monday.status
       - datalake_sale_offer_flows.sale_offer_flows.flow_step
+    description: Status of the offer on Monday
   credit_model:
     lineage:
       - datalake_firestore.monday.credit_model
       - datalake_sale_offer_flows.sale_offer_flows.credit_model
+    description: Offer credit model
   closing_status:
     lineage:
       - datalake_firestore.monday.closing_status
       - datalake_sale_offer_flows.sale_offer_flows.closing_status
+    description: Closing status of the offer
   house_dilligence_status:
     lineage:
       - datalake_firestore.monday.house_dilligence_status
       - datalake_sale_offer_flows.sale_offer_flows.house_dilligence_status
+    description: House Diligence status
   seller_dilligence_status:
     lineage:
       - datalake_firestore.monday.seller_dilligence_status
       - datalake_sale_offer_flows.sale_offer_flows.seller_dilligence_status
+    description: Seller Diligence status
   report_dilligence_status:
     lineage:
       - datalake_firestore.monday.report_dilligence_status
       - datalake_sale_offer_flows.sale_offer_flows.report_dilligence_status
+    description: Report Diligence status
   bank_analysis_status:
     lineage:
       - datalake_firestore.monday.bank_analysis_status
       - datalake_sale_offer_flows.sale_offer_flows.bank_analysis_status
+    description: Bank Analysis status
   payment_status:
     lineage:
       - datalake_firestore.monday.payment_status
       - datalake_sale_offer_flows.sale_offer_flows.payment_status
+    description: Payment status
   payment_model:
     lineage:
       - datalake_firestore.monday.payment_model
       - datalake_sale_offer_flows.sale_offer_flows.payment_model
+    description: Payment model used in the purchase of the property (CCV_ASSISTANCE,
+      INSTANT_MORTGAGE, etc)
   credit_status:
     lineage:
       - datalake_firestore.monday.credit_status
       - datalake_sale_offer_flows.sale_offer_flows.credit_status
+    description: Credit analysis status
   notary_office_status:
     lineage:
       - datalake_firestore.monday.notary_office_status
       - datalake_sale_offer_flows.sale_offer_flows.notary_office_status
+    description: Notary office status
   notary_office_details:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.notary_office_details
+    description: Notary office details
   real_estate_register_office_status:
     lineage:
       - datalake_firestore.monday.real_estate_register_office_status
       - datalake_sale_offer_flows.sale_offer_flows.real_estate_register_office_status
+    description: Real estate register office status
   early_keys_status:
     lineage:
       - datalake_firestore.monday.early_keys_status
+    description: Early keys status. Deprecated.
   tags_from_salesflow:
     lineage:
       - datalake_firestore.monday.tags_from_salesflow
       - datalake_sale_offer_flows.sale_offer_flows.tags_from_salesflow
+    description: Tags from SalesFlow
   sale_agreement_status:
     lineage:
       - datalake_firestore.monday.sale_agreement_status
       - datalake_sale_offer_flows.sale_offer_flows.sale_agreement_status
+    description: CCV status
   agent_work_contract:
     lineage:
       - datalake_ebdb_agents.agent_contract.work_contract_name
+    description: Work contract of the agent
   financing_bank:
     lineage:
       - datalake_firestore.monday.financing_bank
       - datalake_sale_offer_flows.sale_offer_flows.financing_bank
+    description: Bank name used on this offer financing
   sale_agreement_cancellation_reason:
     lineage:
       - datalake_firestore.monday.sale_agreement_cancellation_reason
       - datalake_sale_offer_flows.sale_offer_flows.sale_agreement_cancellation_reason
+    description: Reason why a sales contract was cancelled.
   drop_reason:
     lineage:
       - datalake_firestore.monday.drop_reason
       - datalake_sale_offer_flows.sale_offer_flows.drop_reason
+    description: Reason why an offer was discarded.
   drop_reason_responsible:
     lineage:
       - datalake_firestore.monday.drop_reason_responsible
       - datalake_sale_offer_flows.sale_offer_flows.drop_reason_responsible
+    description: Information about which type of user rejected the offer.
   diligence_appointment_reason:
     lineage:
       - datalake_firestore.monday.diligence_appointment_reason
       - datalake_sale_offer_flows.sale_offer_flows.diligence_appointment_reason
+    description: Reason why a diligence appointment was scheduled.
   partner_3p_supply:
     lineage:
       - datalake_ebdb_listing.house.partner_3p_supply
+    description: Name of the Rede partner that supplied the property.
   partner_3p_demand:
     lineage:
       - datalake_booking.booking.partner_3p_demand
+    description: Name of the Rede partner that demanded the property.
   current_payment_method:
     lineage:
       - datalake_firestore.sale_offer.current_payment_method
+    description: Current payment method of the offer.
   offer_acceptance_probability:
     lineage:
       - datalake_firestore.monday.offer_acceptance_probability
+    description: Probability of the offer being accepted. Deprecated.
   sale_price:
     lineage:
       - datalake_firestore.sale_offer.sale_price
+    description: Sale listing price
   first_price_offered_by_buyer:
     lineage:
       - datalake_firestore.sale_offer.first_price_offered_by_buyer
       - datalake_firestore.monday.price_offered_by_buyer
+    description: First value offered by the buyer
   last_price_offered_by_buyer:
     lineage:
       - datalake_firestore.sale_offer.last_price_offered_by_buyer
       - datalake_firestore.monday.sale_price_agreed
       - datalake_gsheets.sale_hub_offer.sale_price_agreed
+    description: Last value offered by the buyer
   sale_price_agreed:
     lineage:
       - datalake_firestore.sale_offer.last_price_offered_by_buyer
       - datalake_firestore.monday.sale_price_agreed
       - datalake_gsheets.sale_hub_offer.sale_price_agreed
+    description: Final price agreed for this offer
   brokerage_fee:
     lineage:
       - datalake_firestore.sale_offer.brokerage_fee
+      - datalake_sale_offer_flows.sale_offer_flows.brokerage_fee
+    description: Fee paid to the EN on this offer
   earnest_value:
     lineage:
       - datalake_firestore.sale_offer.earnest_value
+    description: Entry amount paid by the buyer
   fgts_value:
     lineage:
       - datalake_firestore.sale_offer.fgts_value
+    description: FGTS value used on the purchase
   financing_value:
     lineage:
       - datalake_firestore.sale_offer.financing_value
+    description: Value that will be financed.
   payment_entry_amount:
     lineage:
       - datalake_firestore.sale_offer.payment_entry_amount
+    description: Entry amount paid by the buyer.
   itbi_price:
     lineage:
       - datalake_firestore.sale_offer.itbi_price
+    description: ITBI value paid on the purchase
   registry_price:
     lineage:
       - datalake_firestore.sale_offer.registry_price
+    description: Registry value paid on the purchase
   planned_payment_method:
     lineage:
       - datalake_firestore.sale_offer.planned_payment_method
+    description: Planned payment method of the offer.
   first_discount_proposed:
     lineage:
       - datalake_firestore.sale_offer.first_discount_proposed
+    description: First discount offered
   last_discount_proposed:
     lineage:
       - datalake_firestore.sale_offer.last_discount_proposed
+    description: Last discount offered
   hours_booking_to_offer:
     lineage:
       - datalake_firestore.sale_offer.ts_created
       - datalake_booking.booking.ts_created
+    description: Hours difference between booking event and offer created
   hours_visit_to_offer:
     lineage:
       - datalake_firestore.sale_offer.ts_created
       - datalake_booking.booking.ts_booking_utc
+    description: Hours difference between visit event and offer created
   days_offer_submitted_to_offer_accepted:
     lineage:
       - datalake_firestore.monday.dt_accepted
@@ -261,6 +341,7 @@ columns:
       - datalake_gsheets.sale_hub_offer.dt_offer_accepted
       - datalake_firestore.sale_offer.ts_created
       - datalake_gsheets.sale_hub_offer.dt_offer_submitted
+    description: Date difference between offer created and offer accepted
   days_offer_submitted_to_offer_dismissed:
     lineage:
       - datalake_firestore.monday.dt_offer_dismissed
@@ -268,12 +349,14 @@ columns:
       - datalake_gsheets.sale_hub_offer.dt_offer_dismissed
       - datalake_firestore.sale_offer.ts_created
       - datalake_gsheets.sale_hub_offer.dt_offer_submitted
+    description: Date difference between offer created and offer dismissed
   days_offer_submitted_to_sale_agreement_created:
     lineage:
       - datalake_firestore.monday.dt_sale_agreement_created
       - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_created
       - datalake_firestore.sale_offer.ts_created
       - datalake_gsheets.sale_hub_offer.dt_offer_submitted
+    description: Date difference between offer created and sale agreement created
   days_offer_submitted_to_sale_agreement_signed:
     lineage:
       - datalake_firestore.monday.dt_sale_agreement_signed
@@ -281,105 +364,137 @@ columns:
       - datalake_gsheets.sale_hub_offer.dt_sale_agreement_signed
       - datalake_firestore.sale_offer.ts_created
       - datalake_gsheets.sale_hub_offer.dt_offer_submitted
+    description: Date difference between offer created and sale agreement signed
   days_offer_accepted_to_offer_dismissed:
     lineage:
       - datalake_firestore.monday.days_offer_accepted_to_offer_dismissed
       - datalake_sale_offer_flows.sale_offer_flows.days_offer_accepted_to_offer_dismissed
+    description: Date difference between offer accepted and offer dismissed
   days_offer_accepted_to_sale_agreement_created:
     lineage:
       - datalake_firestore.monday.days_offer_accepted_to_sale_agreement_created
       - datalake_sale_offer_flows.sale_offer_flows.days_offer_accepted_to_sale_agreement_created
+    description: Date difference between offer accepted and sale agreement created
   days_offer_accepted_to_sale_agreement_signed:
     lineage:
       - datalake_firestore.monday.days_offer_accepted_to_sale_agreement_signed
       - datalake_sale_offer_flows.sale_offer_flows.days_offer_accepted_to_sale_agreement_signed
+    description: Date difference between offer accepted and sale agreement signed
   days_sale_agreement_created_to_sale_agreement_signed:
     lineage:
       - datalake_firestore.monday.days_sale_agreement_created_to_sale_agreement_signed
       - datalake_sale_offer_flows.sale_offer_flows.days_sale_agreement_created_to_sale_agreement_signed
+    description: Date difference between sale agreement created and sale agreement signed
   has_used_negotiation_chat:
     lineage:
       - datalake_firestore.sale_offer.has_used_negotiation_chat
+    description: If the buyer has used the negotiation chat
   has_used_fgts_in_payment:
     lineage:
       - datalake_firestore.sale_offer.has_used_fgts_in_payment
+    description: If the buyer has used FGTS in the payment
   has_seller_debt_payments:
     lineage:
       - datalake_firestore.monday.has_seller_debt_payments
       - datalake_sale_offer_flows.sale_offer_flows.has_seller_debt_payments
+    description: If the seller has debt payments
   is_ccv_canceled:
     lineage:
       - datalake_firestore.monday.is_ccv_canceled
       - datalake_sale_offer_flows.sale_offer_flows.is_ccv_canceled
+    description: If the CCV is canceled
   is_3p_supply:
     lineage:
       - datalake_ebdb_listing.house.is_3p_supply
+    description: If the house is 3P supply
   is_3p_supply_5a:
     lineage:
       - datalake_ebdb_listing.house.is_3p_supply_5a
+    description: If the house is 3P supply 5A
   is_3p_supply_bh:
     lineage:
       - datalake_ebdb_listing.house.is_3p_supply_bh
+    description: If the house is 3P supply BH
   is_3p_demand:
     lineage:
       - datalake_booking.booking.is_3p_demand
+    description: If the booking is 3P demand
   is_a_rescued_ccv:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.is_a_rescued_ccv
+    description: Boolean to identify if this offer has an rescued ccv (A ccv that
+      was cancelled and opened again)
   is_a_rescued_offer:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.is_a_rescued_offer
+    description: Boolean to identify if this offer is a rescued one (An offer that
+      was cancelled and opened again)
   is_ccv_5a_model:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.is_ccv_5a_model
+    description: If the CCV is 5A model
   dt_sale_agreement_rescued:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_rescued
+    description: Date when the CCV was rescued
   dt_offer_rescued:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.dt_offer_rescued
+    description: Date when the offer as rescued.
   dt_offer_accepted:
     lineage:
       - datalake_firestore.monday.dt_accepted
       - datalake_sale_offer_flows.sale_offer_flows.ts_accepted
       - datalake_gsheets.sale_hub_offer.dt_offer_accepted
+    description: Date when the offer was accepted by the owner
   dt_offer_dismissed:
     lineage:
       - datalake_firestore.monday.dt_offer_dismissed
       - datalake_sale_offer_flows.sale_offer_flows.ts_discarded
       - datalake_gsheets.sale_hub_offer.dt_offer_dismissed
+    description: Date when the offer was rejected by the owner
   dt_sale_agreement_created:
     lineage:
       - datalake_firestore.monday.dt_sale_agreement_created
       - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_created
+    description: Date when the CCV was created
   dt_sale_agreement_signed:
     lineage:
       - datalake_firestore.monday.dt_sale_agreement_signed
       - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_signed
       - datalake_gsheets.sale_hub_offer.dt_sale_agreement_signed
+    description: Date when the CCV was signed
   dt_sale_agreement_cancelled:
     lineage:
       - datalake_firestore.monday.dt_sale_agreement_cancelled
       - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_cancelled
+    description: Date when the CCV was cancelled
   dt_house_registry_started:
     lineage:
       - datalake_firestore.monday.dt_house_registry_started
       - datalake_sale_offer_flows.sale_offer_flows.dt_house_registry_started
+    description: Date when the house registry started
   dt_house_registry_ended:
     lineage:
       - datalake_firestore.monday.dt_house_registry_ended
       - datalake_sale_offer_flows.sale_offer_flows.dt_house_registry_ended
+    description: Date when the house registry ended
   dt_sale_transacton_paid:
     lineage:
       - datalake_firestore.monday.dt_sale_transacton_paid
       - datalake_sale_offer_flows.sale_offer_flows.dt_sale_transacton_paid
+    description: Date when the seller received the payment from the financing company.
+      In Closing Assistance model, the full closing process is not monitored. After July 2022 there is no date.
   ts_offer_submitted:
     lineage:
       - datalake_firestore.sale_offer.ts_created
       - datalake_gsheets.sale_hub_offer.dt_offer_submitted
+    description: Timestamp when the offer was sent by the buyer
   ts_last_updated_pendency:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.ts_last_updated_pendency
+    description: Timestamp when the last pendency was updated
   ts_updated:
     lineage:
       - datalake_firestore.sale_offer.ts_updated
+    description: Timestamp when the offer was updated

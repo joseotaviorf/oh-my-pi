@@ -230,7 +230,7 @@ data_sources AS (
         g.financing_value,
         g.fgts_value,
         g.earnest_value,
-        g.brokerage_fee,
+        g.brokerage_fee AS giroffer_brokerage_fee,
         g.id_sale_flow,
         -- data from relation_booking_offer
         rbo.id_user_agent AS rbo_id_user_agent,
@@ -274,6 +274,7 @@ data_sources AS (
         --data from vendas
         vo.id_offer AS vo_id_offer,
         vo.vendas_offer_status,
+        vo.brokerage_fee AS vo_brokerage_fee,
         vo.flow_step AS vo_flow_step,
         vo.id_sales_flow AS id_vendas,
         vo.ts_accepted AS vo_offer_accepted_date,
@@ -591,7 +592,7 @@ business_rules AS (
         financing_value,
         fgts_value,
         earnest_value,
-        brokerage_fee,
+        COALESCE(giroffer_brokerage_fee, vo_brokerage_fee) AS brokerage_fee,
         off.offer_flow,
         COALESCE(busf.hub_name, bu.business_unit) AS business_unit,
         busf.business_context AS business_context_sales_flow,

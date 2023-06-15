@@ -170,7 +170,7 @@ columns:
     description: Entry amount paid by the buyer
   brokerage_fee:
     lineage:
-      - datalake_monopoly_clean.sale_revision.brokerage_fee
+      - datalake_sale_offer_flows.sale_offer_flows.brokerage_fee
     description: Fee paid to the EN on this ofer
   sale_price:
     lineage:

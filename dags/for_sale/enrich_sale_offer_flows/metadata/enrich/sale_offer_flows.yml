@@ -349,6 +349,13 @@ columns:
     description: SalesFlow tags for this offer.
     lineage:
       - datalake_sales_flow_clean.tag.label
+  brokerage_fee_payer:
+    description: Who will pay the brokerage fee.
+    lineage:
+      - datalake_sales_flow_clean.brokerage.brokerage_fee_payer
+    categories:
+      BUYER: Buyer will pay the brokerage fee.
+      SELLER: Seller will pay the brokerage fee.
   sale_listing_price:
     lineage:
       - datalake_sales_flow_clean.offer.sale_price
@@ -369,6 +376,14 @@ columns:
     lineage:
       - datalake_sales_flow_clean.offer.final_price
     description: Final value, where the buyer and seller reached a negotiation agreement.
+  brokerage_fee:
+    lineage:
+      - datalake_sales_flow_clean.brokerage.brokerage_fee
+    description: Brokerage fee percentage. The default value is 6% of the sale price.
+  quinto_andar_brokerage_split:
+    lineage:
+      - datalake_sales_flow_clean.brokerage.quinto_andar_brokerage_split
+    description: QuintoAndar brokerage split percentage.
   days_sale_agreement_created_to_sale_agreement_signed:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.ts_confection_started

@@ -599,6 +599,18 @@ rescue_flow AS (
         LEFT JOIN
             canceled_ccvs AS c_ccvs
                 ON c_ccvs.id_sales_flow = sf.id
+),
+-- BROKERAGE CTE
+brokerage AS (
+    SELECT
+        id_sales_flow,
+        quinto_andar_brokerage_split,
+        brokerage_fee,
+        brokerage_fee_payer
+    FROM
+        datalake_sales_flow_clean.brokerage
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_sales_flow ORDER BY ts_updated DESC) = 1
 )
 SELECT
     off.id_offer,
@@ -722,6 +734,7 @@ SELECT
     cp.status_notary_notes AS notary_office_status,
     cp.crn_details AS notary_office_details,
     tag.label AS tags_from_salesflow,
+    b.brokerage_fee_payer,
     off.sale_price AS sale_listing_price,
     off.first_price_offered_by_buyer,
     off.last_price_offered_by_buyer,
@@ -736,6 +749,8 @@ SELECT
         ELSE 1-1.00*off.last_price_offered_by_buyer/off.sale_price
     END AS last_discount_proposed,
     off.final_price AS sale_price_agreed,
+    COALESCE(b.brokerage_fee, 0.06::DECIMAL(5,4)) AS brokerage_fee, -- 6% default, hard coded in sales-flow
+    b.quinto_andar_brokerage_split,
     CASE
         WHEN DATE(off.ts_accepted) <= DATE(off.ts_discarded)
         THEN DATEDIFF(DATE(off.ts_discarded), DATE(off.ts_accepted))
@@ -860,6 +875,9 @@ LEFT JOIN
 LEFT JOIN
     credit_analysis_status AS cas
         ON cas.id_sales_flow = sf.id
+LEFT JOIN
+    brokerage AS b
+        ON b.id_sales_flow = off.id_sales_flow
 WHERE
     tag.label IS NULL
     OR tag.label NOT LIKE '%#offertestedeproduto%'
