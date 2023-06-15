@@ -1,6 +1,6 @@
 SELECT
     id_experiment,
-    id_user,
+    sk_user AS id_user,
     telefone_principal AS main_phone_number,
     dt_inclusao AS dt_included
 FROM
