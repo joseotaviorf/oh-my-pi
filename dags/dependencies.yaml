@@ -243,6 +243,9 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.enrich_firestore:load-enrich-sale-offer
   - bietlejuice.enrich_sale_lead_flows:load-enrich-lead-flow
+  - bietlejuice.kodak:load-clean-photo-sphere
+  - bietlejuice.kodak:load-clean-user-revision-entity
+  - bietlejuice.kodak:load-clean-video
 bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region
@@ -418,9 +421,6 @@ bietlejuice.dw_datamarts_spark.support_and_service:
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
   - bietlejuice.greenseer:load-clean-session
   - bietlejuice.jira:load-clean-issues
-  - bietlejuice.kodak:load-clean-photo-sphere
-  - bietlejuice.kodak:load-clean-user-revision-entity
-  - bietlejuice.kodak:load-clean-video
   - bietlejuice.sauron:load-clean-session
 bietlejuice.dw_debt_recovery:
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
