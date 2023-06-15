@@ -121,8 +121,8 @@ if __name__ == "__main__":
             sheet_details.get("preload_time_in_seconds"),
         )
         # validate data before loading
-        GsheetsService().validate_clean_query_against_raw(
-            "gsheets_by_context",
+        GsheetsService(dag_name="gsheets_growth").validate_clean_query_against_raw(
+            "gsheets_growth",
             spark_client,
             df,
             sheet_details.get("sheet_context"),
