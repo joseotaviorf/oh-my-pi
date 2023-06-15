@@ -17,4 +17,4 @@ SELECT
     country_code,
     NOW() AS ts_load
 FROM
-    datalake_rent_demand_event.rent_demand_event
+    datalake_rent_demand_events.rent_demand_events

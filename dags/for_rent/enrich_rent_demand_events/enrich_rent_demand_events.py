@@ -21,7 +21,7 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2014, 6, 17, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-CONTEXT = "rent_demand_event"
+CONTEXT = "rent_demand_events"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")

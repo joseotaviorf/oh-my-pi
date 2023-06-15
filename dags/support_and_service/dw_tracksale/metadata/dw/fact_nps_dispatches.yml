@@ -77,13 +77,13 @@ columns:
       This data is available only if customer has answered survey."
   sk_last_rent_event:
     lineage:
-      - datalake_rent_demand_event.rent_demand_event.id_event
+      - datalake_rent_demand_events.rent_demand_events.id_event
     description: "Key of the last Rent event related to the tenant prospect (if the user is one) before the dispatch.
       By using it combined with the sk_last_rent_event_type key, is possible to find out the last event of the user (if it's a tenant prospect).
       It joins with column dw_rent.fact_rent_demand_events.sk_event"
   sk_last_rent_event_type:
     lineage:
-      - datalake_rent_demand_event.rent_demand_event.id_event_type
+      - datalake_rent_demand_events.rent_demand_events.id_event_type
     description: "Key of the last Rent event type related to the tenant prospect (if the user is one) before the dispatch, in order to understand which type of event it is.
       By using it combined with the sk_last_rent_event key, is possible to find out the last event of the user (if it's a tenant prospect).
       It joins with columndw_rent.fact_rent_demand_events.sk_event_type"
@@ -105,7 +105,7 @@ columns:
       if they decided to do so."
   sk_last_rent_event_date:
     lineage:
-      - datalake_rent_demand_event.rent_demand_event.ts_event
+      - datalake_rent_demand_events.rent_demand_events.ts_event
     description: "Key of the date in which happened the last Rent event of the tenant prospect (if the user is one) before the dispatch."
   score:
     lineage:

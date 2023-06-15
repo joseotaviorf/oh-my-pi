@@ -1,4 +1,4 @@
-## Enrich Rent Demand Event
+## Enrich Rent Demand Events
 
 ### Purpose
 
@@ -12,6 +12,6 @@ Daily.
 
 Produces the following output table, partitioned by `country_code`:
  
-- `datalake_rent_demand_event.rent_demand_event`
+- `datalake_rent_demand_events.rent_demand_events`
 
 

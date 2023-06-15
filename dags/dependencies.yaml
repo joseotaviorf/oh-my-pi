@@ -717,7 +717,7 @@ bietlejuice.dw_region:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.dw_rent_demand_events:
-  - bietlejuice.enrich_rent_demand_event:load-enrich-rent-demand-event
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
 bietlejuice.dw_rent_fact_listing_owners:
   - bietlejuice.enrich_listing_owners:load-enrich-rental-metrics
 bietlejuice.dw_rent_flow:
@@ -889,7 +889,7 @@ bietlejuice.dw_tracksale:
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
-  - bietlejuice.enrich_rent_demand_event:load-enrich-rent-demand-event
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_tracksale:load-enrich-answer
   - bietlejuice.enrich_tracksale:load-enrich-answer-cities
   - bietlejuice.enrich_tracksale:load-enrich-answer-justifications
@@ -1916,7 +1916,7 @@ bietlejuice.enrich_region:
   - bietlejuice.ebdb:load-clean-region
   - bietlejuice.ebdb:load-clean-state
   - bietlejuice.gsheets.for_rent:done-clean-auxiliary-region
-bietlejuice.enrich_rent_demand_event:
+bietlejuice.enrich_rent_demand_events:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house

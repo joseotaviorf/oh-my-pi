@@ -7,69 +7,69 @@ owner: isadora.gallerani@quintoandar.com.br
 columns:
   pk_rent_demand_event:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_event
-    - datalake_rent_demand_event.rent_demand_event.id_event_type
-    - datalake_rent_demand_event.rent_demand_event.id_tenant_prospect
+    - datalake_rent_demand_events.rent_demand_events.id_event
+    - datalake_rent_demand_events.rent_demand_events.id_event_type
+    - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
     description: Id of the rent demand event (generated on the query using id_event, id_event_type and id_tenant_prospect, each value separated by a dot).
   sk_event:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_event
+    - datalake_rent_demand_events.rent_demand_events.id_event
     description: Id of the event.
   sk_booking:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_booking
+    - datalake_rent_demand_events.rent_demand_events.id_booking
     description: Id of the booking.
   sk_offer:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_offer
+    - datalake_rent_demand_events.rent_demand_events.id_offer
     description: Id of the offer. 
   sk_proposal:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_proposal
+    - datalake_rent_demand_events.rent_demand_events.id_proposal
     description: Id of the proposal.
   sk_contract:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_contract
+    - datalake_rent_demand_events.rent_demand_events.id_contract
     description: Id of the contract.
   sk_event_type:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_event_type
+    - datalake_rent_demand_events.rent_demand_events.id_event_type
     description: Id of the event type.
   sk_tenant_prospect:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_tenant_prospect
+    - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
     description: Id of the tenant prospect.
   sk_house:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_house
+    - datalake_rent_demand_events.rent_demand_events.id_house
     description: Id of the house.
   sk_agent:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_agent
+    - datalake_rent_demand_events.rent_demand_events.id_agent
     description: Id of the agent.
   sk_rent_flow:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_rent_flow
+    - datalake_rent_demand_events.rent_demand_events.id_rent_flow
     description: Id of the rent flow.
   sk_house_listing:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_house_listing
+    - datalake_rent_demand_events.rent_demand_events.id_house_listing
     description: Id of the house listing.
   sk_region:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_region
+    - datalake_rent_demand_events.rent_demand_events.id_region
     description: Id of the region.
   sk_owner:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.id_owner
+    - datalake_rent_demand_events.rent_demand_events.id_owner
     description: Id of the owner.
   sk_event_date:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.ts_event
+    - datalake_rent_demand_events.rent_demand_events.ts_event
     description: Id of the event date.
   country_code:
     lineage:
-    - datalake_rent_demand_event.rent_demand_event.country_code
+    - datalake_rent_demand_events.rent_demand_events.country_code
     description: Country code information.
   ts_load:
     description: Load date.

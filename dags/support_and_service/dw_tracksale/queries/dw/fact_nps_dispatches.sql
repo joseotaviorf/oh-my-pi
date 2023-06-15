@@ -109,7 +109,7 @@ customer_last_rent_event AS (
                ON cc.id_dispatch_lot = au.id
                AND COALESCE(cc.customer_email, cc.customer_phone) = COALESCE(au.email, au.phone)
      LEFT JOIN
-          datalake_rent_demand_event.rent_demand_event AS rd
+          datalake_rent_demand_events.rent_demand_events AS rd
                ON rd.id_tenant_prospect = ck.id_user
                AND rd.ts_event < au.dispatch_time
      GROUP BY 1, 2, 3, 4
@@ -126,7 +126,7 @@ customer_event AS (
      FROM
           customer_last_rent_event AS cl
      JOIN
-          datalake_rent_demand_event.rent_demand_event AS rd
+          datalake_rent_demand_events.rent_demand_events AS rd
                ON rd.id_tenant_prospect = cl.id_tenant_prospect
                AND rd.ts_event = cl.ts_rent_last_event
      GROUP BY 1, 2, 3, 6, 7
