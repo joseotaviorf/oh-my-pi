@@ -11,3 +11,5 @@ SELECT
     NOW() AS ts_load
 FROM 
     datalake_losses.delay
+WHERE 
+  payment_status <> 'written down'

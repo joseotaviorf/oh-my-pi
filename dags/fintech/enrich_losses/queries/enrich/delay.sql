@@ -348,6 +348,7 @@ SELECT
   frequency,
   full_delay_at_deal,
   IF(is_guarantee_paid is TRUE, 'PAID','FREE') as guarantee_type,
+   payment_status,
   pd_range_rule_a,
   pd_range_rule_b,
   pd_range_rule_c,
@@ -367,5 +368,3 @@ SELECT
   dt_snapshot
 FROM 
   base_step4_delay
-WHERE 
-  payment_status <> 'written down'

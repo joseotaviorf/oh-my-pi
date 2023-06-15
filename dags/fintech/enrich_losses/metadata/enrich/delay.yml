@@ -48,7 +48,11 @@ columns:
   frequency: 
     lineage:   
     - datalake_losses.closing.frequency
-    description: Frequency of the payment. 
+    description: Frequency of the payment.
+  payment_status: 
+    lineage:   
+    - datalake_losses.closing.payment_status
+    description: Invoice status of payment i.e if it is open, paid, canceled or was written down
   full_delay_at_deal:
     description:  Date difference between deal_anchor_due_date and dt_closing.
   guarantee_type:
