@@ -35,10 +35,16 @@ columns:
       describe the location and this information is saved in this column.
     lineage:
       - datalake_inspections_clean.assessment.key_location_details
-  dt_revision_limit:
-    description: Deadline for the owner to review his inspection
+  dt_owner_limit_revision:
+    description: Indicates the deadline for the owner to conclude its review of the report.
+      After this date, completion is compulsory.
     lineage:
-      - datalake_inspections_clean.assessment.dt_revision_limit
+      - datalake_inspections_clean.assessment.dt_owner_limit_revision
+  dt_tenant_limit_revision:
+    description: Indicates the deadline for tenant to complete its review of the report.
+      After this date, completion is compulsory.
+    lineage:
+      - datalake_inspections_clean.assessment.dt_tenant_limit_revision
   ts_created:
     description: Assessment creation date and time.
     lineage:
