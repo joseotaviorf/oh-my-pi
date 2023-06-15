@@ -309,6 +309,10 @@ columns:
     lineage:
       - datalake_hubspot.company_history.num_properties_for_rent
     description: Number of properties for rent.
+  has_been_sale_member:
+    description: True if the company has been a sale member at some point.
+  has_been_rent_member:
+    description: True if the company has been a rent member at some point.
   has_crm:
     lineage:
       - datalake_hubspot.company_history.has_crm

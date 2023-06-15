@@ -6,7 +6,7 @@ domain: Rede
 owner: gustavo.miller@quintoandar.com.br
 columns:
   sk_company:
-    description: Surrogate key for Rede companies.
+    description: Surrogate key for Rede companies. -1 if it is not a member.
   sk_company_lead:
     description: Surrogate key for Rede company leads.
   id_hubspot:
@@ -20,3 +20,5 @@ columns:
       - datalake_ebdb_work_contract.work_contract.3p_partner
   is_3p_bh:
     description: Whether the company is from 3P BH.
+  has_been_member:
+    description: Whether the company has been a member.

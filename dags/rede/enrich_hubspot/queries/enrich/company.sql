@@ -178,6 +178,16 @@ SELECT
     ch.num_real_estate_agents,
     ch.num_properties_for_sale,
     ch.num_properties_for_rent,
+    COALESCE(
+        ARRAY_CONTAINS(sale_lead_status_history.value, 'Membro')
+        OR ARRAY_CONTAINS(sale_lead_status_history.value, 'Parceiro'),
+        FALSE
+    ) AS has_been_sale_member,
+    COALESCE(
+        ARRAY_CONTAINS(rent_lead_status_history.value, 'Membro')
+        OR ARRAY_CONTAINS(rent_lead_status_history.value, 'Parceiro'),
+        FALSE
+    ) AS has_been_rent_member,
     ch.has_crm,
     ch.has_property_advertisement_online,
     ch.is_correspondent_bank,

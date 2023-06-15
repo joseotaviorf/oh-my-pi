@@ -30,19 +30,22 @@ total_partners AS (
     SELECT
         id_company AS id_hubspot,
         NULL AS extracted_3p_tag,
-        NULL AS is_3p_bh
+        NULL AS is_3p_bh,
+        has_been_sale_member OR has_been_rent_member AS has_been_member
     FROM
         datalake_hubspot.company
     UNION ALL
     SELECT
         NULL AS id_hubspot,
         partner_not_found AS extracted_3p_tag,
-        is_3p_bh
+        is_3p_bh,
+        TRUE AS has_been_member
     FROM
         partners_not_found_on_hubspot
 )
 SELECT
     COALESCE(
+        IF(NOT tp.has_been_member, -1, NULL), -- If the company is not a member, set the sk_company to -1
         sk_company, -- Keep the sk_company if it is already defined, so it is durable
         sv.max_sk_company + MONOTONICALLY_INCREASING_ID() + 1 -- if not, use a number after the previous maximum value
     ) AS sk_company,
@@ -52,7 +55,8 @@ SELECT
     ) AS sk_company_lead,
     tp.id_hubspot, -- Natural key
     tp.extracted_3p_tag, -- Natural key for companies not present in HubSpot
-    tp.is_3p_bh
+    tp.is_3p_bh,
+    tp.has_been_member
 FROM
     total_partners AS tp,
     starting_value AS sv
