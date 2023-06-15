@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: supply_listing_historical_reprocessing
+columns:
+  base:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.base
+  dt_mailing:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.data_mailing
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.id_house
+  main_phone:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.telefone_principal
+  sales_company:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.sales_company
+  sk_lead:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.sk_lead

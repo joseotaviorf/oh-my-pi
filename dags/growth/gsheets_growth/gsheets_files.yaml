@@ -479,6 +479,18 @@ sale_rbp_targets:
     clean_table_name: sale_rbp_targets
     sheet_context: growth
 
+supply_listing_cross_historical:
+    sheet_id: 1fO1pp9KkZxpNzEc-kAt5QA9iwrWRJB4r5SNiY-XSB4Y
+    sheet_name: listing_cruzado_historico
+    clean_table_name: supply_listing_cross_historical
+    sheet_context: growth
+
+supply_listing_historical_reprocessing:
+    sheet_id: 1fO1pp9KkZxpNzEc-kAt5QA9iwrWRJB4r5SNiY-XSB4Y
+    sheet_name: reprocessamentos_historico
+    clean_table_name: supply_listing_historical_reprocessing
+    sheet_context: growth
+
 targets_acquisition_cumulative_autonomous_agent:
     sheet_id: 1eDioFikgifTfeFIH7nXqbCuoJ1lohXmjLiFrfrojoW8
     sheet_name: targets_acquisition_cumulative_autonomous_agent
