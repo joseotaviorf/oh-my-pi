@@ -17,13 +17,13 @@ columns:
     lineage:   
     - datalake_losses.closing.accrual_year_month
     description: String with Year number and Month number 'yyyymm' related to the sent date.
-  deal_delay_rule_A:
+  deal_delay_rule_a:
     description: Rule A related to the delay of the payment.
-  deal_delay_rule_B:
+  deal_delay_rule_b:
     description: Rule B related to the delay of the payment.
-  deal_delay_rule_C:
+  deal_delay_rule_c:
     description: Rule C related to the delay of the payment.
-  deal_delay_rule_D:
+  deal_delay_rule_d:
     description: Rule D related to the delay of the payment.
   deal_order:
     description: Information related to the deal position.
@@ -31,13 +31,13 @@ columns:
     description: Status of the deal.
   delay_at_deal_creation:
     description: Date difference between deal_anchor_due_date and dt_created_deal.
-  delay_contaminated_range_rule_A:
+  delay_contaminated_range_rule_a:
     description: Minimun value for deal_delay_rule_A.
-  delay_contaminated_range_rule_B:
+  delay_contaminated_range_rule_b:
     description: Minimun value for deal_delay_rule_B.
-  delay_contaminated_range_rule_C:
+  delay_contaminated_range_rule_c:
     description: Minimun value for deal_delay_rule_C.
-  delay_contaminated_range_rule_D:
+  delay_contaminated_range_rule_d:
     description: Minimun value for deal_delay_rule_D.
   delta_days:
     description: Date difference between dt_due_adjs and dt_closing.
@@ -53,13 +53,13 @@ columns:
     description:  Date difference between deal_anchor_due_date and dt_closing.
   guarantee_type:
     description: Guarantee information related to the invoice. 
-  pd_range_rule_A:
+  pd_range_rule_a:
     description: Range of the delay in days related to Rule A.
-  pd_range_rule_B:
+  pd_range_rule_b:
     description: Range of the delay in days related to Rule B.
-  pd_range_rule_C:
+  pd_range_rule_c:
     description: Range of the delay in days related to Rule C.
-  pd_range_rule_D:
+  pd_range_rule_d:
     description: Range of the delay in days related to Rule D.
   risk_type:
     description: Risk type of the deal.

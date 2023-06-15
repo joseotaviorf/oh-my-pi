@@ -17,21 +17,21 @@ columns:
     lineage:   
     - datalake_losses.delay.due_amount
     description: Total value of the invoice. 
-  pd_range_rule_A:
+  pd_range_rule_a:
     lineage:
-    - datalake_losses.delay.pd_range_rule_A
+    - datalake_losses.delay.pd_range_rule_a
     description: Range of the delay in days related to Rule A.
-  pd_range_rule_B:
+  pd_range_rule_b:
     lineage:
-    - datalake_losses.delay.pd_range_rule_B
+    - datalake_losses.delay.pd_range_rule_b
     description: Range of the delay in days related to Rule B.
-  pd_range_rule_C:
+  pd_range_rule_c:
     lineage:
-    - datalake_losses.delay.pd_range_rule_C
+    - datalake_losses.delay.pd_range_rule_c
     description: Range of the delay in days related to Rule C.
-  pd_range_rule_D:
+  pd_range_rule_d:
     lineage:
-    - datalake_losses.delay.pd_range_rule_D
+    - datalake_losses.delay.pd_range_rule_d
     description: Range of the delay in days related to Rule D.
   user:
     lineage:

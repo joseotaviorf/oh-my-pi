@@ -222,17 +222,17 @@ base_step2_delay_mid AS(
     m.*,
   -- RULE A: Current on 2022 
   -- Set de delay on the time of the anchor of the deal, doesn`t look if the payment is up to date
-    CASE WHEN flag_is_invoice_deal = 1 THEN least(full_delay_at_deal, delta_days) ELSE delta_days END AS deal_delay_rule_A,
+    CASE WHEN flag_is_invoice_deal = 1 THEN least(full_delay_at_deal, delta_days) ELSE delta_days END AS deal_delay_rule_a,
   -- RULE B: Verifies if the de delay of the deal invoice is greater than the delay of the deal date, if not it keeps the delay of the deal date
-    CASE WHEN flag_is_invoice_deal = 1 AND deal_order=1 THEN least(delta_days, delay_at_deal_creation) ELSE delta_days END AS deal_delay_rule_B,
+    CASE WHEN flag_is_invoice_deal = 1 AND deal_order=1 THEN least(delta_days, delay_at_deal_creation) ELSE delta_days END AS deal_delay_rule_b,
   -- RULE C: Verifies if the contract has parcels on delay, if not, the delay is set to the moment of the deal, if yes it will use the delay of the anchor.
     CASE WHEN flag_is_invoice_deal = 1 AND flag_deal_status_on_delay = 'DEAL IN DELAY' THEN full_delay_at_deal
          WHEN flag_is_invoice_deal = 1 AND flag_deal_status_on_delay = 'DEAL ON TIME. DELAY AT ANCHOR' THEN delay_at_deal_creation
-         WHEN flag_is_invoice_deal = 0 THEN delta_days END AS deal_delay_rule_C,
+         WHEN flag_is_invoice_deal = 0 THEN delta_days END AS deal_delay_rule_c,
   -- RULE D: Verifies if the contract has parcels on delay, if not, it will use the delay of the delay of the deal date plus anchor.
     CASE WHEN flag_is_invoice_deal = 1 AND flag_deal_status_on_delay = 'DEAL IN DELAY' THEN delta_days + delay_at_deal_creation
          WHEN flag_is_invoice_deal = 1 AND flag_deal_status_on_delay = 'DEAL ON TIME. DELAY AT ANCHOR' THEN delay_at_deal_creation
-         WHEN flag_is_invoice_deal = 0 THEN delta_days END AS deal_delay_rule_D
+         WHEN flag_is_invoice_deal = 0 THEN delta_days END AS deal_delay_rule_d
   FROM 
     base_step2_delay m
 ),
@@ -241,10 +241,10 @@ base_aux_ref_contract_delays AS(
     dt_closing,
     id_contract,
     user,
-    min(deal_delay_rule_A) AS delay_contaminated_range_rule_A,
-    min(deal_delay_rule_B) AS delay_contaminated_range_rule_B,
-    min(deal_delay_rule_C) AS delay_contaminated_range_rule_C,
-    min(deal_delay_rule_D) AS delay_contaminated_range_rule_D
+    min(deal_delay_rule_a) AS delay_contaminated_range_rule_a,
+    min(deal_delay_rule_b) AS delay_contaminated_range_rule_b,
+    min(deal_delay_rule_c) AS delay_contaminated_range_rule_c,
+    min(deal_delay_rule_d) AS delay_contaminated_range_rule_d
   FROM 
     base_step2_delay_mid
   GROUP BY 1,2,3
@@ -270,10 +270,10 @@ base_aux_ref_contract_risk_ AS(
 base_step3_delay AS(
   SELECT 
     m.*, 
-    aux.delay_contaminated_range_rule_B, 
-    aux.delay_contaminated_range_rule_A,  
-    aux.delay_contaminated_range_rule_C,  
-    aux.delay_contaminated_range_rule_D, 
+    aux.delay_contaminated_range_rule_b, 
+    aux.delay_contaminated_range_rule_a,  
+    aux.delay_contaminated_range_rule_c,  
+    aux.delay_contaminated_range_rule_d, 
     aux_hr.flag_is_HR
   FROM base_step2_delay_mid m
   LEFT JOIN 
@@ -286,42 +286,42 @@ base_step3_delay AS(
 base_step4_delay AS(
   SELECT 
     *,
-    CASE WHEN delay_contaminated_range_rule_A <= -181 THEN 'TotalM +6 (>181 days)'
-         WHEN delay_contaminated_range_rule_A <= -151 THEN 'TotalM +5 (151-180 days)'
-         WHEN delay_contaminated_range_rule_A <= -121 THEN 'TotalM +4 (121-150 days)'
-         WHEN delay_contaminated_range_rule_A <= -91 THEN 'TotalM +3 (91-120 days)'
-         WHEN delay_contaminated_range_rule_A <= -61 THEN 'TotalM +2 (61-90 days)'
-         WHEN delay_contaminated_range_rule_A <= -31 THEN 'TotalM +1 (31-60 days)'
-         WHEN delay_contaminated_range_rule_A <= -1 THEN 'TotalM +0 (1-30 days)'
+    CASE WHEN delay_contaminated_range_rule_a <= -181 THEN 'TotalM +6 (>181 days)'
+         WHEN delay_contaminated_range_rule_a <= -151 THEN 'TotalM +5 (151-180 days)'
+         WHEN delay_contaminated_range_rule_a <= -121 THEN 'TotalM +4 (121-150 days)'
+         WHEN delay_contaminated_range_rule_a <= -91 THEN 'TotalM +3 (91-120 days)'
+         WHEN delay_contaminated_range_rule_a <= -61 THEN 'TotalM +2 (61-90 days)'
+         WHEN delay_contaminated_range_rule_a <= -31 THEN 'TotalM +1 (31-60 days)'
+         WHEN delay_contaminated_range_rule_a <= -1 THEN 'TotalM +0 (1-30 days)'
          ELSE 'TotalCurrent' 
-    END AS pd_range_rule_A,
-    CASE WHEN delay_contaminated_range_rule_B <= -181 THEN 'TotalM +6 (>181 days)'
-         WHEN delay_contaminated_range_rule_B <= -151 THEN 'TotalM +5 (151-180 days)'
-         WHEN delay_contaminated_range_rule_B <= -121 THEN 'TotalM +4 (121-150 days)'
-         WHEN delay_contaminated_range_rule_B <= -91 THEN 'TotalM +3 (91-120 days)'
-         WHEN delay_contaminated_range_rule_B <= -61 THEN 'TotalM +2 (61-90 days)'
-         WHEN delay_contaminated_range_rule_B <= -31 THEN 'TotalM +1 (31-60 days)'
-         WHEN delay_contaminated_range_rule_B <= -1 THEN 'TotalM +0 (1-30 days)'
+    END AS pd_range_rule_a,
+    CASE WHEN delay_contaminated_range_rule_b <= -181 THEN 'TotalM +6 (>181 days)'
+         WHEN delay_contaminated_range_rule_b <= -151 THEN 'TotalM +5 (151-180 days)'
+         WHEN delay_contaminated_range_rule_b <= -121 THEN 'TotalM +4 (121-150 days)'
+         WHEN delay_contaminated_range_rule_b <= -91 THEN 'TotalM +3 (91-120 days)'
+         WHEN delay_contaminated_range_rule_b <= -61 THEN 'TotalM +2 (61-90 days)'
+         WHEN delay_contaminated_range_rule_b <= -31 THEN 'TotalM +1 (31-60 days)'
+         WHEN delay_contaminated_range_rule_b <= -1 THEN 'TotalM +0 (1-30 days)'
          ELSE 'TotalCurrent' 
-    END AS pd_range_rule_B,
-    CASE WHEN delay_contaminated_range_rule_C <= -181 THEN 'TotalM +6 (>181 days)'
-         WHEN delay_contaminated_range_rule_C <= -151 THEN 'TotalM +5 (151-180 days)'
-         WHEN delay_contaminated_range_rule_C <= -121 THEN 'TotalM +4 (121-150 days)'
-         WHEN delay_contaminated_range_rule_C <= -91 THEN 'TotalM +3 (91-120 days)'
-         WHEN delay_contaminated_range_rule_C <= -61 THEN 'TotalM +2 (61-90 days)'
-         WHEN delay_contaminated_range_rule_C <= -31 THEN 'TotalM +1 (31-60 days)'
-         WHEN delay_contaminated_range_rule_C <= -1 THEN 'TotalM +0 (1-30 days)'
+    END AS pd_range_rule_b,
+    CASE WHEN delay_contaminated_range_rule_c <= -181 THEN 'TotalM +6 (>181 days)'
+         WHEN delay_contaminated_range_rule_c <= -151 THEN 'TotalM +5 (151-180 days)'
+         WHEN delay_contaminated_range_rule_c <= -121 THEN 'TotalM +4 (121-150 days)'
+         WHEN delay_contaminated_range_rule_c <= -91 THEN 'TotalM +3 (91-120 days)'
+         WHEN delay_contaminated_range_rule_c <= -61 THEN 'TotalM +2 (61-90 days)'
+         WHEN delay_contaminated_range_rule_c <= -31 THEN 'TotalM +1 (31-60 days)'
+         WHEN delay_contaminated_range_rule_c <= -1 THEN 'TotalM +0 (1-30 days)'
          ELSE 'TotalCurrent' 
-    END AS pd_range_rule_C,
-    CASE WHEN delay_contaminated_range_rule_D <= -181 THEN 'TotalM +6 (>181 days)'
-         WHEN delay_contaminated_range_rule_D <= -151 THEN 'TotalM +5 (151-180 days)'
-         WHEN delay_contaminated_range_rule_D <= -121 THEN 'TotalM +4 (121-150 days)'
-         WHEN delay_contaminated_range_rule_D <= -91 THEN 'TotalM +3 (91-120 days)'
-         WHEN delay_contaminated_range_rule_D <= -61 THEN 'TotalM +2 (61-90 days)'
-         WHEN delay_contaminated_range_rule_D <= -31 THEN 'TotalM +1 (31-60 days)'
-         WHEN delay_contaminated_range_rule_D <= -1 THEN 'TotalM +0 (1-30 days)'
+    END AS pd_range_rule_c,
+    CASE WHEN delay_contaminated_range_rule_d <= -181 THEN 'TotalM +6 (>181 days)'
+         WHEN delay_contaminated_range_rule_d <= -151 THEN 'TotalM +5 (151-180 days)'
+         WHEN delay_contaminated_range_rule_d <= -121 THEN 'TotalM +4 (121-150 days)'
+         WHEN delay_contaminated_range_rule_d <= -91 THEN 'TotalM +3 (91-120 days)'
+         WHEN delay_contaminated_range_rule_d <= -61 THEN 'TotalM +2 (61-90 days)'
+         WHEN delay_contaminated_range_rule_d <= -31 THEN 'TotalM +1 (31-60 days)'
+         WHEN delay_contaminated_range_rule_d <= -1 THEN 'TotalM +0 (1-30 days)'
          ELSE 'TotalCurrent' 
-    END AS pd_range_rule_D,
+    END AS pd_range_rule_d,
     CASE WHEN flag_is_HR IS TRUE THEN 'HR' 
          ELSE 'LR' 
     END AS flag_risk
@@ -332,26 +332,26 @@ SELECT
   id_invoice,
   id_contract,
   accrual_year_month,
-  deal_delay_rule_A,
-  deal_delay_rule_B,
-  deal_delay_rule_C,
-  deal_delay_rule_D,
+  deal_delay_rule_a,
+  deal_delay_rule_b,
+  deal_delay_rule_c,
+  deal_delay_rule_d,
   deal_order,
   flag_deal_status_on_delay as deal_status, 
   delay_at_deal_creation,
-  delay_contaminated_range_rule_A,
-  delay_contaminated_range_rule_B,
-  delay_contaminated_range_rule_C,
-  delay_contaminated_range_rule_D,
+  delay_contaminated_range_rule_a,
+  delay_contaminated_range_rule_b,
+  delay_contaminated_range_rule_c,
+  delay_contaminated_range_rule_d,
   delta_days,
   due_amount,
   frequency,
   full_delay_at_deal,
   IF(is_guarantee_paid is TRUE, 'PAID','FREE') as guarantee_type,
-  pd_range_rule_A,
-  pd_range_rule_B,
-  pd_range_rule_C,
-  pd_range_rule_D,
+  pd_range_rule_a,
+  pd_range_rule_b,
+  pd_range_rule_c,
+  pd_range_rule_d,
   flag_risk as risk_type,
   user,
   is_before_started,
