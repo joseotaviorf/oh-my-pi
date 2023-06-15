@@ -23,7 +23,6 @@ class DWTaskGroup(BaseTaskGroup):
 
     ADD_DEFAULT_ROW_TASK_PREFIX = "add-default-row-to"
     BRIDGE_TASK_PREFIX = "bridge"
-    LOAD_INTO_REDSHIFT_TASK_PREFIX = "load-into-redshift"
     TEST_EMPTINESS_TASK_PREFIX = "test-emptiness"
 
     def __init__(
@@ -73,8 +72,6 @@ class DWTaskGroup(BaseTaskGroup):
         Creates a task group containing the tasks:
         . load_table_to_dw_final_schema_task: load table from staging metastore
            database to final schema in s3
-        . load_table_to_redshift_task: load table to Redshift copying files from
-           final schema database in S3, created only if has_load_to_redshift_task is True
         . sync_metastore_table_task: sync the table from spark metastore
            to hive metastore
         . propagate_table_metadata_task: propagates to metadata-propagator service
@@ -86,7 +83,7 @@ class DWTaskGroup(BaseTaskGroup):
         :param partitions: list of columns to partition table
         :type partitions: list[str]
         :param extra_query_template_params: additional parameters to be supplied to query template
-        :param has_load_to_redshift_task: If this table is going to be loaded into redshift
+        :param has_load_to_redshift_task: # TODO: scheduled for removal
         :param table_customization: table's structure customization, when applicable
         :return: dict with initial and final tasks of the created task group
         :rtype: dict[str:list[airflow.models.BaseOperator]]
@@ -108,9 +105,6 @@ class DWTaskGroup(BaseTaskGroup):
             ["{{ ds }}", json.dumps(extra_query_template_params)]
             if table_extraction_type == "incremental"
             else []
-        )
-        has_load_to_redshift_task = self.__get_redshift_load_flag(
-            table_customization, has_load_to_redshift_task
         )
 
         load_table_to_dw_final_schema_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -138,34 +132,6 @@ class DWTaskGroup(BaseTaskGroup):
         )
 
         final_tasks = []
-
-        if has_load_to_redshift_task:
-            load_table_to_redshift_task = QuintoAndarDatabricksSubmitRunOperator(
-                dag=self.dag,
-                task_id=DWTaskGroup.generate_default_task_id(
-                    task_prefix=DWTaskGroup.LOAD_INTO_REDSHIFT_TASK_PREFIX,
-                    layer=layer_enum,
-                    schema=table_database_schema,
-                    table_name=table_name,
-                ),
-                json={
-                    "spark_python_task": {
-                        "python_file": f"{self.spark_jobs_path}/load_table_to_redshift.py",
-                        "parameters": [
-                            self.env,
-                            spectrum_iam_role,
-                            self.dw_bucket,
-                            table_database_schema,
-                            table_name,
-                        ],
-                    }
-                },
-                execution_timeout=timedelta(hours=self.execution_timeout_hours),
-            )
-            load_table_to_dw_final_schema_task.set_downstream(
-                load_table_to_redshift_task
-            )
-            final_tasks.append(load_table_to_redshift_task)
 
         sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
@@ -476,12 +442,6 @@ class DWTaskGroup(BaseTaskGroup):
     def __get_table_partitions(self, table_customization, partitions):
         table_partitions = table_customization.get("partitions", partitions)
         return table_partitions
-
-    def __get_redshift_load_flag(self, table_customization, has_load_to_redshift_task):
-        has_load_to_redshift_task = table_customization.get(
-            "has_load_to_redshift_task", has_load_to_redshift_task
-        )
-        return has_load_to_redshift_task
 
     def __get_extra_query_template_params(
         self, table_customization, extra_query_template_params

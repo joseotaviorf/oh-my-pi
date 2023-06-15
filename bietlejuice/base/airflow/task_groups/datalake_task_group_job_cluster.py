@@ -37,7 +37,7 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         datalake_bucket,
         relative_query_path,
         spark_jobs_path,
-        athena_query_result_location,
+        athena_query_result_location=None,
         tree_path="",
         execution_timeout_hours=BaseTaskGroup.DEFAULT_EXECUTION_TIMEOUT_HOURS,
     ):
@@ -53,8 +53,6 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         :type relative_query_path: str
         :param spark_jobs_path: base path for spark jobs
         :type spark_jobs_path: str
-        :param athena_query_result_location: athena query results location
-        :type athena_query_result_location: str
         :param tree_path: The rest of the path, used for full or incremental ingestions or specific contextual ingestions e:g crawlers listings
         :type schema: str
         :param execution_timeout_hours: timeout in hours to be set to the tasks
@@ -64,7 +62,6 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
             dag, env, relative_query_path, spark_jobs_path, execution_timeout_hours
         )
         self.datalake_bucket = datalake_bucket
-        self.athena_query_result_location = athena_query_result_location
 
     def _build_raw_task_group(
         self,
@@ -419,7 +416,6 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
-        has_create_external_table_task=True,
         spark_session_configs=None,
         extra_query_template_params=None,
         schema="",  # TODO: Remove schema param after dags are all in pattern
@@ -433,11 +429,10 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         do_output_xcom_push=False,
     ):
         """
-        Create a task group containing 4 tasks:
+        Create a task group containing 3 tasks:
         1. load table to metastore database using a sql query
-        2. create a external table in Athena using metastore created before
-        3. sync table from spark metastore to hive metastore
-        4. propagate the table metadata to metadata-propagator service
+        2. sync table from spark metastore to hive metastore
+        3. propagate the table metadata to metadata-propagator service
 
         :param layer: layer Enum
         :type layer: bietlejuice.base.pipeline.LayerEnum member
@@ -453,8 +448,6 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         :type partitions: list[str]
         :param is_incremental: if this table uses incremental load type
         :type is_incremental: bool
-        :param has_create_external_table_task: if this table is going to be loaded into Athena
-        :type has_create_external_table_task: bool
         :param spark_session_configs: custom config parameters to be set in spark session
         :type spark_session_configs: dict
         :param extra_query_template_params: filter parameters applied to
@@ -614,38 +607,6 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
 
                 final_tasks = [sync_metastore_table_partitions_task, bypass_task]
 
-        if has_create_external_table_task:
-            create_external_table_task = QuintoAndarDatabricksCheckJobTaskOperator(
-                databricks_conn_id="databricks_job_cluster",
-                dag=self.dag,
-                task_id=DatalakeTaskGroupJobCluster.generate_default_task_id(
-                    task_prefix=DatalakeTaskGroupJobCluster.CREATE_EXTERNAL_TABLE_TASK_PREFIX,
-                    layer=layer,
-                    schema=source_database_base_name,
-                    table_name=table_name,
-                ),
-                json={
-                    "spark_python_task": {
-                        "python_file": f"{self.spark_jobs_path}/create_external_table.py",
-                        "parameters": [
-                            self.env,
-                            self.datalake_bucket,
-                            self.athena_query_result_location,
-                            layer.value,
-                            target_database_base_name,
-                            table_name,
-                            str(partitions),
-                            is_incremental,
-                        ],
-                    }
-                },
-                execution_timeout=timedelta(hours=self.execution_timeout_hours),
-            )
-
-            load_table_task.set_downstream(create_external_table_task)
-
-            final_tasks = [create_external_table_task] + final_tasks
-
         quality_tasks = []
         if DAGPackagesPathService.data_quality_tests_file_exists_in_composer(
             dag_name=self.relative_query_path,
@@ -698,7 +659,6 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
-        has_create_external_table_task=True,
         spark_session_configs=None,
         extra_query_template_params=None,
         schema="",
@@ -723,8 +683,6 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         :type partitions: list[str]
         :param is_incremental: if this table uses incremental load type
         :type is_incremental: bool
-        :param has_create_external_table_task: if this table is going to be loaded into Athena
-        :type has_create_external_table_task: bool
         :param spark_session_configs: custom config parameters to be set in spark session
         :type spark_session_configs: dict
         :param extra_query_template_params: filter parameters applied to
@@ -747,7 +705,6 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
             table_name,
             partitions,
             is_incremental,
-            has_create_external_table_task,
             spark_session_configs,
             extra_query_template_params,
             schema,
@@ -765,7 +722,6 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
-        has_create_external_table_task=True,
         spark_session_configs=None,
         extra_query_template_params=None,
         schema="",
@@ -789,8 +745,6 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
         :type partitions: list[str]
         :param is_incremental: if this table uses incremental load type
         :type is_incremental: bool
-        :param has_create_external_table_task: if this table is going to be loaded into Athena
-        :type has_create_external_table_task: bool
         :param spark_session_configs: custom config parameters to be set in spark session
         :type spark_session_configs: dict
         :param extra_query_template_params: filter parameters applied to
@@ -812,7 +766,6 @@ class DatalakeTaskGroupJobCluster(BaseTaskGroup):
             table_name,
             partitions,
             is_incremental,
-            has_create_external_table_task,
             spark_session_configs,
             extra_query_template_params,
             schema,

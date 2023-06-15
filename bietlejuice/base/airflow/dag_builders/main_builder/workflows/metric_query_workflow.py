@@ -38,9 +38,6 @@ class MetricQueryWorkflow(BaseWorkflow):
         cluster_params = self.get_cluster_params()
 
         metrics_bucket = self.config_service.get_config("metrics_bucket")
-        athena_query_results_bucket = self.config_service.get_config(
-            "athena_query_results_bucket"
-        )
         databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"
         )
@@ -57,7 +54,6 @@ class MetricQueryWorkflow(BaseWorkflow):
             datalake_bucket=metrics_bucket,
             relative_query_path=self.dag_name,
             spark_jobs_path=base_spark_jobs_path,
-            athena_query_result_location=athena_query_results_bucket,
         )
 
         metric_task_group = task_group.build_task_group_from_sql_files(

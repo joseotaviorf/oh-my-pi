@@ -12,9 +12,7 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.airflow.task_groups.datalake_task_group import (
-    DatalakeTaskGroup,
-)
+from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -103,31 +101,6 @@ load_table_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-create_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.CREATE_EXTERNAL_TABLE_TASK_PREFIX,
-        layer=LayerEnum.ENRICH,
-        schema=CONTEXT,
-        table_name=TABLE_NAME,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{base_spark_jobs_path}/create_external_table.py",
-            "parameters": [
-                ENV,
-                datalake_bucket,
-                athena_query_results_bucket,
-                LayerEnum.ENRICH.value,
-                CONTEXT,
-                TABLE_NAME,
-                str(PARTITION_COLS),
-                True,
-            ],
-        }
-    },
-)
-
 sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
     task_id=DatalakeTaskGroup.generate_default_task_id(
@@ -201,4 +174,3 @@ chain(
     propagate_table_metadata_task,
     terminate_cluster_task,
 )
-chain(load_table_task, create_external_table_task, terminate_cluster_task)

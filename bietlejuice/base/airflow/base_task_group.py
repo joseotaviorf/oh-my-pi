@@ -21,7 +21,6 @@ class BaseTaskGroup(object):
     TASK_GROUP_FINAL_TASKS_DICT_KEY = "final_tasks"
     TASK_GROUP_INDEPENDENT_TASKS_DICT_KEY = "independent_tasks"
 
-    CREATE_EXTERNAL_TABLE_TASK_PREFIX = "create-external-table"
     DATA_QUALITY_TESTS_TASK_PREFIX = "data-quality-tests"
     DONE_TASK_PREFIX = "done"
     LOAD_TASK_PREFIX = "load"
@@ -344,10 +343,7 @@ class BaseTaskGroup(object):
 
         task_id = f"{task_prefix}-{layer.value}"
 
-        is_load_task = task_prefix in (
-            BaseTaskGroup.LOAD_TASK_PREFIX,
-            BaseTaskGroup.CREATE_EXTERNAL_TABLE_TASK_PREFIX,
-        )
+        is_load_task = task_prefix == BaseTaskGroup.LOAD_TASK_PREFIX
         is_dw_task = layer in (LayerEnum.DW_STAGING, LayerEnum.DW)
 
         # Load tasks from layers other than DW, by default, don't have schema in the task name

@@ -100,11 +100,6 @@ bietlejuice.dw_datamarts_spark.fintech_cross:
     - bietlejuice.sorting_hat:create-external-table-clean-screening-result
   remove:
     - bietlejuice.dw_region:load-dw-public-dim-region
-    - bietlejuice.ebdb:load-clean-proponent-proposal
-    - bietlejuice.sorting_hat:load-clean-credit-analysis
-    - bietlejuice.sorting_hat:load-clean-proponent
-    - bietlejuice.sorting_hat:load-clean-proposal
-    - bietlejuice.sorting_hat:load-clean-screening-result
 bietlejuice.dw_datamarts_spark.for_rent:
   add:
     - bietlejuice.dw_lead:load-dw-public-dim-lead
@@ -137,8 +132,8 @@ bietlejuice.dw_datamarts_spark.for_sale:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
     - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
     - bietlejuice.ebdb:load-clean-partner
-    - bietlejuice.ebdb:create-external-table-clean-map-region
-    - bietlejuice.ebdb:create-external-table-clean-polygon-region
+    - bietlejuice.ebdb:load-clean-map-region
+    - bietlejuice.ebdb:load-clean-polygon-region
   remove:
     - bietlejuice.dw_agents_availability:load-dw-agent-fact-agent-daily-allocations
     - bietlejuice.dw_booking:load-dw-public-dim-tenant-booking-review
@@ -720,13 +715,6 @@ bietlejuice.enrich_pro_owners:
   add:
     - bietlejuice.ebdb:load-clean-conversion-lead
     - bietlejuice.ebdb:load-clean-lead
-bietlejuice.enrich_proponent:
-  add:
-    - bietlejuice.sorting_hat:create-external-table-clean-proponent
-    - bietlejuice.sorting_hat:create-external-table-clean-proposal
-  remove:
-    - bietlejuice.sorting_hat:load-clean-proponent
-    - bietlejuice.sorting_hat:load-clean-proposal
 bietlejuice.enrich_quinto_messenger:
   remove:
     - bietlejuice.quinto_messenger:load-clean-chat
@@ -886,11 +874,6 @@ bietlejuice.enrich_zendesk_tickets:
     - bietlejuice.zendesk_tickets:load-clean-ticket-metrics
     - bietlejuice.zendesk_tickets:load-clean-tickets
     - bietlejuice.zendesk_tickets:load-clean-users
-bietlejuice.enrich_zipcodes:
-  add:
-    - bietlejuice.ebdb:create-external-table-clean-polygon-region
-  remove:
-    - bietlejuice.ebdb:load-clean-polygon-region
 bietlejuice.metric_rent__contracts: # Metric layer not working locally
   add:
     - bietlejuice.dw_booking:load-dw-public-dim-booking

@@ -186,11 +186,11 @@ bietlejuice.dw_datamarts_spark.fintech_cross:
   - bietlejuice.dw_offer:load-dw-public-dim-offer
   - bietlejuice.dw_proposal:load-dw-public-dim-proposal
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
-  - bietlejuice.ebdb:create-external-table-clean-proponent-proposal
-  - bietlejuice.sorting_hat:create-external-table-clean-credit-analysis
-  - bietlejuice.sorting_hat:create-external-table-clean-proponent
-  - bietlejuice.sorting_hat:create-external-table-clean-proposal
-  - bietlejuice.sorting_hat:create-external-table-clean-screening-result
+  - bietlejuice.ebdb:load-clean-proponent-proposal
+  - bietlejuice.sorting_hat:load-clean-credit-analysis
+  - bietlejuice.sorting_hat:load-clean-proponent
+  - bietlejuice.sorting_hat:load-clean-proposal
+  - bietlejuice.sorting_hat:load-clean-screening-result
 bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -237,8 +237,8 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.ebdb:load-clean-listing-business-context
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-user-revision-entity
-  - bietlejuice.ebdb:create-external-table-clean-map-region
-  - bietlejuice.ebdb:create-external-table-clean-polygon-region
+  - bietlejuice.ebdb:load-clean-map-region
+  - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
   - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.enrich_firestore:load-enrich-sale-offer
@@ -1091,10 +1091,10 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.sauron:load-clean-session
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
 bietlejuice.enrich_dai_report:
-  - bietlejuice.dw_house:load-into-redshift-dw-quintoandar-dim-house
-  - bietlejuice.dw_sale_flows:load-into-redshift-dw-sale-fact-sale-flows
-  - bietlejuice.dw_sale_offers:load-into-redshift-dw-sale-dim-sale-agreement
-  - bietlejuice.dw_sale_offers:load-into-redshift-dw-sale-fact-offers
+  - bietlejuice.dw_house:load-dw-quintoandar-dim-house
+  - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.ebdb:load-clean-contract
   - bietlejuice.ebdb:load-clean-house
 bietlejuice.enrich_dashboard_governance:
@@ -1559,8 +1559,8 @@ bietlejuice.enrich_nps_reversion:
   - bietlejuice.dw_listing_jobs:load-dw-public-fact-inspection-bookings
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
-  - bietlejuice.dw_tracksale:load-into-redshift-dw-tracksale-dim-nps-campaign
-  - bietlejuice.dw_tracksale:load-into-redshift-dw-tracksale-fact-nps-dispatches
+  - bietlejuice.dw_tracksale:load-dw-tracksale-dim-nps-campaign
+  - bietlejuice.dw_tracksale:load-dw-tracksale-fact-nps-dispatches
   - bietlejuice.ebdb:load-clean-house-maintenance-condition
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
   - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-inspection
@@ -1602,11 +1602,11 @@ bietlejuice.enrich_offboarding:
 bietlejuice.enrich_offboarding_repairs_probability:
   - bietlejuice.dw_booking:load-dw-public-dim-tenant-booking-review
   - bietlejuice.dw_contract:load-dw-public-dim-contract
-  - bietlejuice.dw_contract:load-into-redshift-dw-quintoandar-fact-contract-people
+  - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
   - bietlejuice.dw_datamarts_spark.for_sale:load-dw-datamarts-dim-house-listing-amenities
-  - bietlejuice.dw_listing:load-into-redshift-dw-public-dim-house-listing
-  - bietlejuice.dw_region:load-into-redshift-dw-public-dim-region
-  - bietlejuice.dw_rent_flow:load-into-redshift-dw-public-fact-listing-rent-flows
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.ebdb:load-clean-inspection-item
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_inspections:load-enrich-item-review
@@ -1692,8 +1692,8 @@ bietlejuice.enrich_property_tax:
 ##  - bietlejuice.docx:load-clean-folder-reference
 ##  - bietlejuice.ebdb:load-clean-proponent-proposal
 ##  - bietlejuice.ebdb:load-clean-proposal
-##  - bietlejuice.sorting_hat:create-external-table-clean-proponent
-##  - bietlejuice.sorting_hat:create-external-table-clean-proposal
+##  - bietlejuice.sorting_hat:load-clean-proponent
+##  - bietlejuice.sorting_hat:load-clean-proposal
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:load-clean-proposal-aud
   - bietlejuice.ebdb:load-clean-proposal
@@ -2170,7 +2170,7 @@ bietlejuice.enrich_zendesk_ticket_funnels:
 bietlejuice.enrich_zendesk_tickets:
   - bietlejuice.enrich_zendesk_custom_fields:load-enrich-custom-fields
 bietlejuice.enrich_zipcodes:
-  - bietlejuice.ebdb:create-external-table-clean-polygon-region
+  - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_region:load-enrich-region

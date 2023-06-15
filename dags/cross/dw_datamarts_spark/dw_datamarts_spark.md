@@ -37,8 +37,6 @@ Once the context already exists, in order to run a new datamart, please follow t
 
 For more detailed information about creating Datamarts, please access the Notion page [Criação de Datamarts](https://www.notion.so/productquintoandar/Cria-o-de-Datamarts-8b889796c76146ebbac27f4819695146).
 
-For more information about the Datamart Migration from Athena and Redshift, please access [this page](https://www.notion.so/productquintoandar/Datamarts-Migration-0d04a6d55e7846479174f14462f2bbef).
-
 ### Technical Disclaimers
 
 Contrary to the previous version, the DAGs generated here run datamarts exclusively on Spark SQL. They are also the first DW DAGs that will not copy their contents into Redshift. The DAGs will be named `dw_datamarts_spark.<context>`, and the datamarts will be available on Databricks and Trino on the schema `dw_datamarts`.

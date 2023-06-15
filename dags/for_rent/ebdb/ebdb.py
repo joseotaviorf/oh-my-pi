@@ -12,9 +12,7 @@ from airflow.utils.helpers import cross_downstream, chain
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.airflow.task_groups.datalake_task_group import (
-    DatalakeTaskGroup,
-)
+from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
@@ -31,7 +29,6 @@ MAIN_SCHEDULE_INTERVAL = "10 21 * * *"
 CLUSTER_DESCRIPTION = "databricks_ebdb_cluster"
 
 config_service = ConfigurationService(SOURCE)
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
@@ -44,7 +41,6 @@ cluster_configuration = Variable.get(CLUSTER_DESCRIPTION, deserialize_json=True)
 EBDB_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 RAW_SPARK_JOB_FILE = EBDB_SPARK_JOBS_PATH + "load_ebdb_raw.py"
 CLEAN_SPARK_JOB_PATH = EBDB_SPARK_JOBS_PATH + "load_ebdb_clean.py"
-EXTERNAL_TABLE_SPARK_JOB_FILE = EBDB_SPARK_JOBS_PATH + "create_external_tables.py"
 
 CUSTOM_LIBRARIES = [{"maven": {"coordinates": "mysql:mysql-connector-java:5.1.47"}}]
 RAW_EXECUTION_TIMEOUT_HOURS = 3.5
@@ -88,37 +84,12 @@ def clean_tasks(table_name):
             task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
             layer=LayerEnum.CLEAN,
             schema=SOURCE,
-            table_name=table_name
+            table_name=table_name,
         ),
         json={
             "spark_python_task": {
                 "python_file": CLEAN_SPARK_JOB_PATH,
                 "parameters": [ENV, datalake_bucket, table_name, SOURCE],
-            }
-        },
-    )
-
-    create_clean_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=dag,
-        task_id=DatalakeTaskGroup.generate_default_task_id(
-            task_prefix=DatalakeTaskGroup.CREATE_EXTERNAL_TABLE_TASK_PREFIX,
-            layer=LayerEnum.CLEAN,
-            schema=SOURCE,
-            table_name=table_name
-        ),
-        pool="athena",
-        json={
-            "spark_python_task": {
-                "python_file": EXTERNAL_TABLE_SPARK_JOB_FILE,
-                "parameters": [
-                    ENV,
-                    athena_query_results_bucket,
-                    LayerEnum.CLEAN.value,
-                    datalake_bucket,
-                    SOURCE,
-                    "--tables",
-                ]
-                + [table_name],
             }
         },
     )
@@ -164,9 +135,8 @@ def clean_tasks(table_name):
         final_task = propagate_table_metadata_task
 
     chain(clean_table_task, sync_metastore_clean_table_structure_task)
-    clean_table_task >> create_clean_external_tables_task
 
-    return [clean_table_task, [create_clean_external_tables_task, final_task]]
+    return [clean_table_task, final_task]
 
 
 def build_raw_task_list():
@@ -192,28 +162,7 @@ def build_raw_task_list():
         execution_timeout=timedelta(hours=RAW_EXECUTION_TIMEOUT_HOURS),
     )
 
-    create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id="create-all-raw-external-tables",
-        dag=dag,
-        pool="athena",
-        json={
-            "spark_python_task": {
-                "python_file": EXTERNAL_TABLE_SPARK_JOB_FILE,
-                "parameters": [
-                    ENV,
-                    athena_query_results_bucket,
-                    LayerEnum.RAW.value,
-                    datalake_bucket,
-                    SOURCE,
-                    "--all",
-                ],
-            }
-        },
-    )
-
-    load_tables_into_datalake_task >> create_raw_external_tables_task
-
-    return [load_tables_into_datalake_task, create_raw_external_tables_task]
+    return [load_tables_into_datalake_task]
 
 
 def build_layer_task_list(layer):
