@@ -10,7 +10,7 @@ columns:
       - dw_public.dim_region.city_group
   country_code:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.country_code
+      - dw_datamarts.lead_listing_flows.country_code
       - dw_public.dim_region.country_code
       - dw_public.dim_house_listing.country_code
   supply_mkt_origin:

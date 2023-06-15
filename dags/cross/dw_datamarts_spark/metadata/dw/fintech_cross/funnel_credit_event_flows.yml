@@ -67,7 +67,7 @@ columns:
     description: "Contract signed date"
   flow_type:
     lineage:
-      - dw_datamarts_cross.funnel_demand_flows.flow_type
+      - dw_datamarts.funnel_demand_flows.flow_type
     description: "Classification of rent_flow based on funnel start events."
     categories:
       "(1) ONLY DIRECT OFFER": "Flow with only direct offer, without any visit or message to agent."
@@ -78,7 +78,7 @@ columns:
       "(3) ONLY VISIT": "Flow with only visit, without a direct offer or message to agent."
   funnel_flow:
     lineage:
-      - dw_datamarts_cross.funnel_demand_flows.funnel_flow
+      - dw_datamarts.funnel_demand_flows.funnel_flow
     description: "Classification of rent_flow beginning."
     categories:
       DIRECT: "Flow started with a direct offer, without any visit previously."

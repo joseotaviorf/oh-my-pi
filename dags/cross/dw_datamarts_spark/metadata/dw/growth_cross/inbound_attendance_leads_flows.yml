@@ -15,34 +15,34 @@ columns:
       - dw_public.dim_lead.sk_lead
   sk_lead_rent_date:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sk_lead_date
+      - dw_datamarts.lead_listing_flows.sk_lead_date
   sk_lead_sale_date:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sk_lead_date
+      - dw_datamarts.lead_listing_flows.sk_lead_date
   sk_prospect_rent_date:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sk_prospect_date
+      - dw_datamarts.lead_listing_flows.sk_prospect_date
   sk_prospect_sale_date:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sk_prospect_date
+      - dw_datamarts.lead_listing_flows.sk_prospect_date
   sk_qualified_rent_date:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sk_qualified_date
+      - dw_datamarts.lead_listing_flows.sk_qualified_date
   sk_qualified_sale_date:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sk_qualified_date
+      - dw_datamarts.lead_listing_flows.sk_qualified_date
   sk_opportunity_rent_date:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sk_opportunity_date
+      - dw_datamarts.lead_listing_flows.sk_opportunity_date
   sk_opportunity_sale_date:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sk_opportunity_date
+      - dw_datamarts.lead_listing_flows.sk_opportunity_date
   sk_first_listing_rent_date:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sk_opportunity_date
+      - dw_datamarts.lead_listing_flows.sk_opportunity_date
   sk_first_listing_sale_date:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sk_opportunity_date
+      - dw_datamarts.lead_listing_flows.sk_opportunity_date
   phone_contacted:
     lineage:
       - dw_quinto_messenger.dim_chat.twilio_phone
@@ -85,28 +85,28 @@ columns:
       - datalake_wololo_clean.context_discard.reason
   lead_sourcing_ops_sale:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+      - dw_datamarts.lead_listing_flows.sourcing_ops
   lead_sourcing_ops_rent:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+      - dw_datamarts.lead_listing_flows.sourcing_ops
   lead_funnel_drop_reason_rent:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.funnel_drop_reason
+      - dw_datamarts.lead_listing_flows.funnel_drop_reason
   lead_funnel_drop_reason_sale:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.funnel_drop_reason
+      - dw_datamarts.lead_listing_flows.funnel_drop_reason
   mkt_origin_rent:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+      - dw_datamarts.lead_listing_flows.mkt_origin
   mkt_origin_sale:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+      - dw_datamarts.lead_listing_flows.mkt_origin
   mkt_completion_rent:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.mkt_completion
+      - dw_datamarts.lead_listing_flows.mkt_completion
   mkt_completion_sale:
     lineage:
-      - dw_datamarts_cross.lead_listing_flows.mkt_completion
+      - dw_datamarts.lead_listing_flows.mkt_completion
   lead_origin_rent:
     lineage:
       - datalake_wololo_clean.context_discard.origin_table

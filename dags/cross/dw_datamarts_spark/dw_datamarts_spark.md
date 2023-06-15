@@ -17,7 +17,7 @@ Inside `dags`, each key represents a different context, which can have two confi
  This configuration is set like this:
 
  ```
-   <tree_path>: # Query will be located in db/datalake/queries/dw_datamarts_spark/dw/<tree_path>/<datamart-name>.sql. This is useful, for example, for the DAG dw_datamarts_growth_dep_manual_costs.
+   <tree_path>: # Query will be located in db/datalake/queries/dw_datamarts_spark/dw/<tree_path>/<datamart-name>.sql
      <datamart_name>:
        depends_on: # This is optional, only necessary for datamarts with inner dependencies
          - <datamart_dependency_name>

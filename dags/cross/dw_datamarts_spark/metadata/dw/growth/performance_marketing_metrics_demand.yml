@@ -1,7 +1,7 @@
 ---
-database_name: dw_datamarts_growth
+database_name: dw_datamarts
 table_name: performance_marketing_metrics_demand
-owner: '@data-growth'
+owner: "@data-growth"
 domain: Growth
 description: Table that contains data from tenant prospects, targets and marketing cost by growth marketing Taxonomy
 columns:
@@ -119,9 +119,9 @@ columns:
     lineage:
       - dw_datamarts.rent_flow_interactions.flow_event
     categories:
-      Booking: ''
-      Offer: ''
-      Talk to Agent: ''
+      Booking: ""
+      Offer: ""
+      Talk to Agent: ""
   mkt_origin:
     description: Level of the Growth Marketing Taxonomy
     lineage:
@@ -169,7 +169,7 @@ columns:
     lineage:
       - dw_datamarts.rent_flow_interactions.utm_term
       - datalake_marketing_costs.daily_costs.utm_term
-  utm_content: 
+  utm_content:
     description: Returns the utm_content parameter defined at campaing configuration at marketing platforms
     lineage:
       - dw_datamarts.rent_flow_interactions.utm_content

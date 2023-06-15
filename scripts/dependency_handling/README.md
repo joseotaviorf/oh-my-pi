@@ -45,9 +45,9 @@
 - Satisfied by: a path the satisfies this redundant dependency.
 
   For example:
-  `python3 find_redundant_dependencies.py -d bietlejuice.dw_datamarts_for_sale -v 3 -c redundancies.csv`
+  `python3 find_redundant_dependencies.py -d bietlejuice.dw_user -v 3 -c redundancies.csv`
 
-  Will check for redundancies in `bietlejuice.dw_datamarts_for_sale`, print them on console with maximum detail, and write to the file redundancies.csv.
+  Will check for redundancies in `bietlejuice.dw_user`, print them on console with maximum detail, and write to the file redundancies.csv.
 
   `python3 find_redundant_dependencies.py -v 0 -c redundancies.csv`
 
@@ -85,6 +85,6 @@
 
   The goal of this script is to make sure that every dependency declared in dependencies.yaml actually exists in Airflow.
   This is useful for local tests of changes that affect several dependencies in the yaml.
-  
+
   It cannot be run outside of an Airflow container, because it collects the parsed DAGs from the database. Therefore, you need
   the local environment to do so.

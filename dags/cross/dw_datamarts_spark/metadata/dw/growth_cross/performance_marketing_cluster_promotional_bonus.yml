@@ -16,7 +16,7 @@ columns:
       - dw_public.dim_user_affiliate.is_active
   cluster:
     lineage:
-      - dw_datamarts_growth_cross.affiliates_clusters.cluster
+      - dw_datamarts.affiliates_clusters.cluster
   target_base:
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base

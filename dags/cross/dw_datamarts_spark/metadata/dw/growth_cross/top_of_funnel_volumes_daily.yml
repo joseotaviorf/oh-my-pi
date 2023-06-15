@@ -1,9 +1,10 @@
 ---
-database_name: dw_datamarts_growth_cross
+database_name: dw_datamarts
 table_name: top_of_funnel_volumes_daily
-owner: '@data-growth'
+owner: "@data-growth"
 domain: Growth
-description: Table that contains data from tof users, tof events, tenant prospects, buyer prospects, targets and marketing cost by growth marketing Taxonomy by day.
+description:
+  Table that contains data from tof users, tof events, tenant prospects, buyer prospects, targets and marketing cost by growth marketing Taxonomy by day.
   Once ToF users is not a additive metric, we have 1 table for each kind of groupping (daily, weekly and monthly)
 columns:
   city_group:
@@ -77,10 +78,12 @@ columns:
   budget:
     description: Budget that growth marketing team has to invest in each growth marketing channel
   tof_users:
-    description: Count of unique user segmented by city_group, status_date_start, status_date_end, business_context, campaign_context, mkt_origin, mkt_channel, mkt_medium, mkt_source and date
+    description:
+      Count of unique user segmented by city_group, status_date_start, status_date_end, business_context, campaign_context, mkt_origin, mkt_channel, mkt_medium, mkt_source and date
       that realize one of these events search_page_viewed, listing_page_viewed, schedule_page_viewed
   tof_users_3p:
-    description: Count of unique user segmented by city_group, status_date_start, status_date_end, business_context, campaign_context, mkt_origin, mkt_channel, mkt_medium, mkt_source and date
+    description:
+      Count of unique user segmented by city_group, status_date_start, status_date_end, business_context, campaign_context, mkt_origin, mkt_channel, mkt_medium, mkt_source and date
       that realize one of these events search_page_viewed, listing_page_viewed, schedule_page_viewed from Redes Quinto Andar
   tof_events:
     description: Total sum of events search_page_viewed, listing_page_viewed, schedule_page_viewed

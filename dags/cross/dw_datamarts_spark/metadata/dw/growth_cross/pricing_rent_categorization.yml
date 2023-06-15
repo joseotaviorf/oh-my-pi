@@ -65,13 +65,13 @@ columns:
       - dw_public.dim_region.name
   rent_flows_in_7_days:
     lineage:
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.sk_rf
+      - dw_datamarts.performance_marketing_metrics_demand.sk_rf
   visits_booked_in_7_days:
     lineage:
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.sk_booking
+      - dw_datamarts.performance_marketing_metrics_demand.sk_booking
   listing_contracts_signed:
     lineage:
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.sk_contract
+      - dw_datamarts.performance_marketing_metrics_demand.sk_contract
   avg_rent_listing_contracts_signed:
     lineage:
       - dw_public.dim_contract.rent

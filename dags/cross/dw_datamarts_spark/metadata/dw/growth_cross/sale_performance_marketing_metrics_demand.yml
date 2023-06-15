@@ -1,7 +1,7 @@
 ---
-database_name: dw_datamarts_growth_cross
+database_name: dw_datamarts
 table_name: sale_performance_marketing_metrics_demand
-owner: '@data-growth'
+owner: "@data-growth"
 domain: Growth
 description: Table that contains data from buyer prospects, targets and marketing cost by growth marketing Taxonomy
 columns:
@@ -49,21 +49,21 @@ columns:
       - datalake_gsheets_clean.sale_flows_targets.city_group
       - datalake_marketing_costs.daily_costs.city_group
     categories:
-      Belo Horizonte: ''
-      Brasília: ''
-      Campinas: ''
-      Curitiba: ''
-      Florianópolis: ''
-      Goiânia: ''
-      Mogi das Cruzes: ''
-      Not Mapped: ''
-      Porto Alegre: ''
-      RMSP: ''
-      Recife: ''
-      Rio de Janeiro: ''
-      Salvador: ''
-      Santos: ''
-      São José dos Campos: ''
+      Belo Horizonte: ""
+      Brasília: ""
+      Campinas: ""
+      Curitiba: ""
+      Florianópolis: ""
+      Goiânia: ""
+      Mogi das Cruzes: ""
+      Not Mapped: ""
+      Porto Alegre: ""
+      RMSP: ""
+      Recife: ""
+      Rio de Janeiro: ""
+      Salvador: ""
+      Santos: ""
+      São José dos Campos: ""
   mkt_origin:
     description: Level of the Growth Marketing Taxonomy
     lineage:

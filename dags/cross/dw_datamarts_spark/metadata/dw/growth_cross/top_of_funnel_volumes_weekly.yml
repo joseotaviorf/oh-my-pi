@@ -1,9 +1,10 @@
 ---
-database_name: dw_datamarts_growth_cross
+database_name: dw_datamarts
 table_name: top_of_funnel_volumes_weekly
-owner: '@data-growth'
+owner: "@data-growth"
 domain: Growth
-description: Table that contains data from tof users, tof events, tenant prospects, buyer prospects, targets and marketing cost by growth marketing Taxonomy grouped by week.
+description:
+  Table that contains data from tof users, tof events, tenant prospects, buyer prospects, targets and marketing cost by growth marketing Taxonomy grouped by week.
   Once ToF users is not a additive metric, we have 1 table for each kind of groupping (daily, weekly and monthly)
 columns:
   city_group:
@@ -11,11 +12,11 @@ columns:
     lineage:
       - datalake_gsheets_clean.sale_tof_weekly_targets.city
       - datalake_gsheets_clean.rental_tof_weekly_targets.city_group
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.city_group
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.city_group
+      - dw_datamarts.performance_marketing_metrics_demand.city_group
+      - dw_datamarts.sale_performance_marketing_metrics_demand.city_group
       - dw_public.dim_region.city_group
       - dw_datamarts.buyer_prospect_status.city_group
-      - dw_datamarts_growth_cross.tenant_prospect_status.city_group
+      - dw_datamarts.tenant_prospect_status.city_group
   business_context:
     description: Businnes context that tof user was intereted.
       It comes from which business context toggle user selected on the search form on www.quintoandar.com.br when realizing a search_page_viewed
@@ -26,44 +27,44 @@ columns:
     description: Business context that growth marketing campaign was intented to aim
     lineage:
       - datalake_gsheets_clean.sale_tof_weekly_targets.context
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.campaign_context
+      - dw_datamarts.sale_performance_marketing_metrics_demand.campaign_context
   mkt_origin:
     description: Level of the Growth Marketing Taxonomy
     lineage:
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_origin
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_origin
+      - dw_datamarts.performance_marketing_metrics_demand.mkt_origin
+      - dw_datamarts.sale_performance_marketing_metrics_demand.mkt_origin
       - datalake_top_of_funnel_demand.user_interactions.mkt_origin
   mkt_channel:
     description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_clean.sale_tof_weekly_targets.mkt_channel
       - datalake_gsheets_clean.rental_tof_weekly_targets.mkt_channel
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_channel
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_channel
+      - dw_datamarts.performance_marketing_metrics_demand.mkt_channel
+      - dw_datamarts.sale_performance_marketing_metrics_demand.mkt_channel
       - datalake_top_of_funnel_demand.user_interactions.mkt_channel
   mkt_medium:
     description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_clean.sale_tof_weekly_targets.mkt_medium
       - datalake_gsheets_clean.rental_tof_weekly_targets.mkt_medium
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_medium
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_medium
+      - dw_datamarts.performance_marketing_metrics_demand.mkt_medium
+      - dw_datamarts.sale_performance_marketing_metrics_demand.mkt_medium
       - datalake_top_of_funnel_demand.user_interactions.mkt_medium
   mkt_source:
     description: Level of the Growth Marketing Taxonomy
     lineage:
       - datalake_gsheets_clean.sale_tof_weekly_targets.mkt_source
       - datalake_gsheets_clean.rental_tof_weekly_targets.mkt_source
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_source
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_source
+      - dw_datamarts.performance_marketing_metrics_demand.mkt_source
+      - dw_datamarts.sale_performance_marketing_metrics_demand.mkt_source
       - datalake_top_of_funnel_demand.user_interactions.mkt_source
   week_start:
     description: week of the intereseted event. ToF event
     lineage:
       - datalake_gsheets_clean.sale_tof_weekly_targets.week_start
       - datalake_gsheets_clean.rental_tof_weekly_targets.dt_week_started
-      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_event
-      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.dt_event
+      - dw_datamarts.performance_marketing_metrics_demand.dt_event
+      - dw_datamarts.sale_performance_marketing_metrics_demand.dt_event
       - datalake_top_of_funnel_demand.user_interactions.dt_event
       - dw_public.dim_date.week_start
   status_week_start:
@@ -77,10 +78,12 @@ columns:
   budget:
     description: Budget that growth marketing team has to invest in each growth marketing channel
   tof_users:
-    description: Count of unique user segmented by city_group, status_week_start, status_week_end, business_context, campaign_context, mkt_origin, mkt_channel, mkt_medium, mkt_source and week
+    description:
+      Count of unique user segmented by city_group, status_week_start, status_week_end, business_context, campaign_context, mkt_origin, mkt_channel, mkt_medium, mkt_source and week
       that realize one of these events search_page_viewed, listing_page_viewed, schedule_page_viewed
   tof_users_3p:
-    description: Count of unique user segmented by city_group, status_week_start, status_week_end, business_context, campaign_context, mkt_origin, mkt_channel, mkt_medium, mkt_source and week
+    description:
+      Count of unique user segmented by city_group, status_week_start, status_week_end, business_context, campaign_context, mkt_origin, mkt_channel, mkt_medium, mkt_source and week
       that realize one of these events search_page_viewed, listing_page_viewed, schedule_page_viewed from Redes Quinto Andar
   tof_events:
     description: Total sum of events search_page_viewed, listing_page_viewed, schedule_page_viewed
