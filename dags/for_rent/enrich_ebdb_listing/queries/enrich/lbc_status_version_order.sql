@@ -99,11 +99,11 @@ business_context_history AS (
         , FALSE
         )
       ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS is_previous_first_status,
-      ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC) AS lbc_state_order,
+      ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC) AS lbc_state_order,
       IF(
         lhs.state_order IS NOT NULL
-        , lhs.state_order + ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC)
-        , ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC)
+        , lhs.state_order + ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC)
+        , ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC)
       ) AS state_order,
       MAX(bch.rev) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS rev,
       MAX(rev.reason) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS revision_reason,
