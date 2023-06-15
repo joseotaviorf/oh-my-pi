@@ -265,11 +265,6 @@ trigger AS (
                 )
                 OR
                 (
-                    bch.next_status = 'PUBLISHED'
-                    AND CAST(lhs.ts_first_publication AS DATE) = CAST(bch.ts_next_status_change AS DATE)
-                )
-                OR
-                (
                   so.prev_status = 'EDITING'
                   AND bch.is_previous_first_status IS TRUE
                   AND bch.next_status = 'PUBLISHED'

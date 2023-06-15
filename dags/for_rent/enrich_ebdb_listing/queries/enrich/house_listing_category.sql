@@ -53,10 +53,12 @@ WITH
     SELECT
       id_house,
       listing_version,
-      FIRST(status) OVER(PARTITION BY id_house, listing_version ORDER BY ts_state_started DESC) AS category_change,
-      FIRST(status_reason) OVER(PARTITION BY id_house, listing_version ORDER BY ts_state_started DESC) AS category_change_reason
+      FIRST(status) OVER(PARTITION BY id_house, listing_version ORDER BY ts_state_started DESC, ts_state_ended DESC) AS category_change,
+      FIRST(status_reason) OVER(PARTITION BY id_house, listing_version ORDER BY ts_state_started DESC, ts_state_ended DESC) AS category_change_reason
     FROM 
       house_status_version_last_status
+    WHERE
+      trigger_new_version = 1
   ),
   house_listing_plain AS (
   --------------------------------------------------------------------------------------------------------
@@ -98,12 +100,18 @@ SELECT
     WHEN version = 0 THEN NULL
     WHEN version = 1 THEN 'First Listing'
     WHEN 
-      version > 0 
-      AND
-      LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('alugado', 'SUSPENDED')
+      version > 1 
+      AND (
+        LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) = 'alugado'
+        OR (
+          LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) = 'SUSPENDED'
+          AND
+          LAG(change_version_status_reason) OVER(PARTITION BY id_house ORDER BY version) = 'RENTED'
+        )
+      )
     THEN 'Re-Listing'
     WHEN 
-      version > 0 
+      version > 1
       AND 
       LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('despublicado', 'UNPUBLISHED') 
     THEN 'Recovered'
