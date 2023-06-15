@@ -46,3 +46,6 @@ columns:
   week_origin:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.week_origin
+  rental_administrator:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.rental_administrator

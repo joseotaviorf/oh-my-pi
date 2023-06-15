@@ -3,6 +3,7 @@ SELECT
     demand_channel,
     demand_channel_type,
     funnel_origin,
+    rental_administrator,
     evaluation_positive,
     evaluation_started,
     new_tenant_prospects,

@@ -14,6 +14,9 @@ columns:
   funnel_origin:
     lineage:
       - datalake_gsheets_raw.demand_targets_2021.funnel_origin
+  rental_administrator:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2021.rental_administrator
   tier:
     lineage:
       - datalake_gsheets_raw.demand_targets_2021.tier
