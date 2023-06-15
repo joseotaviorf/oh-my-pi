@@ -1,0 +1,17 @@
+SELECT
+    DATE(ts_publication) AS day,
+    dr.sk_region,
+    dr.country_code,
+    COUNT(DISTINCT hl.sk_house_listing) AS total_listings
+FROM
+    dw_public.dim_house_listing AS hl
+LEFT JOIN
+    dw_public.fact_house_listings AS fhl
+        ON fhl.sk_house_listing = hl.sk_house_listing
+LEFT JOIN
+    dw_public.dim_region AS dr
+        ON dr.sk_region = fhl.sk_region
+WHERE
+    dr.city_group IS NOT NULL
+    AND hl.version > 0
+GROUP BY 1, 2, 3
