@@ -269,6 +269,11 @@ trigger AS (
                   AND bch.is_previous_first_status IS TRUE
                   AND bch.next_status = 'PUBLISHED'
                 )
+                OR
+                (
+                  bch.next_status = 'PUBLISHED'
+                  AND bch.ts_first_publication = bch.ts_next_status_change
+                )
               )
           )
           OR 
