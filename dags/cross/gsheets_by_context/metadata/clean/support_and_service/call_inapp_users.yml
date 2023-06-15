@@ -1,0 +1,15 @@
+database_name: datalake_gsheets_raw
+table_name: call_inapp_users
+columns:
+  id_experiment:
+    lineage:
+      - datalake_gsheets_raw.call_inapp_users.id_experiment
+  id_user:
+    lineage:
+      - datalake_gsheets_raw.call_inapp_users.id_user
+  main_phone_number:
+    lineage:
+      - datalake_gsheets_raw.call_inapp_users.telefone_principal
+  dt_included:
+    lineage:
+      - datalake_gsheets_raw.call_inapp_users.dt_inclusao

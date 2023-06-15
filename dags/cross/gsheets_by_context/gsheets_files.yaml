@@ -37,6 +37,12 @@ aux_payments_photos:
     clean_table_name: aux_payments_photos
     sheet_context: support_and_service
 
+call_inapp_users:
+    sheet_id: 1rZzhzwvGZBlyAMOBpc-dXbNOBXyEg6FFNe6bf_Uz93o
+    sheet_name: db
+    clean_table_name: call_inapp_users
+    sheet_context: support_and_service
+
 csat_chaves_off_pp:
     sheet_id: 1mezgNmlXsMgMxPYmDib-av_T3rtKCGbqvyaZlh2z84M
     sheet_name: respostas_csat
