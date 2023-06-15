@@ -36,7 +36,7 @@ WITH events AS (
 )
 
 SELECT
-  id_user,
+  COALESCE(id_user, -1) AS id_user,
   MAX(ts_event) AS ts_last_event
 FROM
   events
