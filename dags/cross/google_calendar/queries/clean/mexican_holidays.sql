@@ -13,4 +13,4 @@ SELECT
 FROM
     datalake_google_calendar_raw.mexican_holidays
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY summary ORDER BY year DESC, month DESC, day DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY summary, DATE(start.date) ORDER BY year DESC, month DESC, day DESC) = 1
