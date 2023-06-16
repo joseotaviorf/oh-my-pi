@@ -7,45 +7,50 @@ columns:
   id:
     lineage:
     - datalake_betopera_clean.certificate_request.id
-    description: ''
+    description: 'ID of the certificate request'
   id_insurance:
     lineage:
     - datalake_betopera_clean.certificate_request.id_insurance
-    description: ''
+    description: 'ID of the insurance'
   version:
     lineage:
     - datalake_betopera_clean.certificate_request.version
-    description: ''
+    description: 'Version of the insurance'
   payload:
     lineage:
     - datalake_betopera_clean.certificate_request.payload
-    description: ''
+    description: 'JSON with the information related to the payload'
   status:
     lineage:
     - datalake_betopera_clean.certificate_request.status
-    description: the current status for the insurance entity PENDING | CREATED | FAILED
-      | PENDING_CANCELLATION | CANCELED
+    description: 'The current status for the insurance entity' 
+    categories: 
+      PENDING: '' 
+      CREATED: ''
+      FAILED: '' 
+      PENDING_CANCELLATION: '' 
+      CANCELED: ''
   ts_synced:
     lineage:
     - datalake_betopera_clean.certificate_request.ts_synced
-    description: ''
+    description: 'Timestamp of the synced date'
   ts_created:
     lineage:
     - datalake_betopera_clean.certificate_request.ts_created
-    description: ''
+    description: 'Timestamp of the created date'
   ts_updated:
     lineage:
     - datalake_betopera_clean.certificate_request.ts_updated
-    description: ''
+    description: 'Timestamp of the updated date'
   year:
     lineage:
     - datalake_betopera_clean.certificate_request.year
-    description: ''
+    description: 'Year Information'
   month:
     lineage:
     - datalake_certificate_request_raw.certificate_request.month
-    description: ''
+    description: 'Month Information'
   day:
     lineage:
     - datalake_certificate_request_raw.certificate_request.day
-    description: ''
+    description: 'Day Information'

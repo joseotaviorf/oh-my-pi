@@ -41,6 +41,10 @@ columns:
     lineage:
       - datalake_retsuko.invoice.paid_amount
     description: "finantial amount, if paid, of the invoice"
+  ts_due:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+    description: "timestamp of due date"
   late_days:
     lineage:
       - datalake_retsuko.invoice.accrual_year_month

@@ -1,55 +1,65 @@
 ---
 database_name: datalake_velo
 table_name: omie_client
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing Omie clients information"
 columns:
   id_client:
     lineage:
       - datalake_velo_omie_clean.clients.id_client
+    description: Omie Client's internal identification number 
   corporate_name:
     lineage:
       - datalake_velo_omie_clean.clients.corporate_name
+    description: Client's name or Client's official Corporate Name.
   name_doing_business_as:
     lineage:
       - datalake_velo_omie_clean.clients.name_doing_business_as
+    description: Client's name or Client's Trade Name.
   client_cpf_cnpj:
     lineage:
       - datalake_velo_omie_clean.clients.client_cpf_cnpj
+    description: Client's document, being CPF or CNPJ.
   email:
     lineage:
       - datalake_velo_omie_clean.clients.email
+    description: Client's email.
   address:
     lineage:
       - datalake_velo_omie_clean.clients.address
+    description: Client's main address info/street.
   address_number:
     lineage:
       - datalake_velo_omie_clean.clients.address_number
+    description: Client's main address number.
   address_complement:
     lineage:
       - datalake_velo_omie_clean.clients.address_complement
+    description: Client's main address complement.
   neighborhood:
     lineage:
-      - datalake_velo_omie_clean.clients.address_neighborhood
+      - datalake_velo_omie_clean.clients.neighborhood
+    description: Client's main address neighborhood.
   city:
     lineage:
-      - datalake_velo_omie_clean.clients.address_city
+      - datalake_velo_omie_clean.clients.city
+    description: Client's main address city.
   state:
     lineage:
-      - datalake_velo_omie_clean.clients.address_state
+      - datalake_velo_omie_clean.clients.state
+    description: Client's main address state.
   country_code:
     lineage:
-      - datalake_velo_omie_clean.clients.datalake_velo_omie_clean.country.abbreviation
+      - datalake_velo_omie_clean.clients.country_code
+    description: Client's main address country code following quintoandar's pattern.
   is_natural_person:
     lineage:
       - datalake_velo_omie_clean.clients.is_natural_person
+    description: If the client is a natural person or a company.
   is_foreign:
     lineage:
       - datalake_velo_omie_clean.clients.is_foreign
+    description: If this client if foreign.
   is_active:
-    lineage:
-      - datalake_velo_omie_clean.clients.is_inactive
-  datalake_velo_omie_clean.country.id_country:
-    lineage:
-      - datalake_velo_omie_clean.clients.datalake_velo_omie_clean.country.id_country
-  datalake_velo_omie_clean.clients.address_country_code:
-    lineage:
-      - datalake_velo_omie_clean.clients.datalake_velo_omie_clean.clients.address_country_code
+    description: If this client is active.

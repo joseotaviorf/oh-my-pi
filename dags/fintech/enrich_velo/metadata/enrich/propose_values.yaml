@@ -7,50 +7,71 @@ columns:
   id_propose_values:
     description: ProposeValues's identification number (ID)
     lineage:
-      - datalake_velo_clean.fiancavelo_propose.id
-      - datalake_velo_clean.fiancavelo_activator.id
-      - datalake_velo_clean.fiancavelo_plans.id
       - datalake_rental_guarantee_platform_clean.propose.id
       - datalake_rental_guarantee_platform_clean.company_plan.id
       - datalake_rental_guarantee_platform_clean.plan.id
+    description: ID of the propose values.
+  subscription_type:
+    description: Category type of the subscription. Usually monthly or annual
   plan_type:
     description: Propose's plan type. Usually Business or Residential.
     lineage:
-      - datalake_velo_clean.fiancavelo_plantype.name
       - datalake_rental_guarantee_platform_clean.business_type.name
+    description: Category type of the real estate
   activator_type:
     description: Propose's activator type name. This may not exist in QuintoCred.
     lineage:
       - datalake_velo_clean.fiancavelo_activator.name
+    description: Category type of the amount paid to activate the guarantee
   plan:
     description: Propose's plan name.
     lineage:
-      - datalake_velo_clean.fiancavelo_plans.name
       - datalake_rental_guarantee_platform_clean.plan.plan_name
+    description: Name of the plan
   activator_amount:
     description: Propose's value paid to activate the contract. This marks the start of the propose as a contract.
     lineage:
-      - datalake_velo_clean.fiancavelo_activator.value
       - datalake_rental_guarantee_platform_clean.propose.activator_value
+    description: Amount paid to activate the guarantee
+  subscription_installments:
+    description: Number of installments on the subscription.
+  activator_amount:
+    description: Amount paid to activate the guarantee
+  monthly_guarantee:
+    description: Monthly total amount of the guarantee
+  annual_guarantee:
+    description: Annual total amount of the guarantee
+  rent_amount:
+    description: Rent amount
+  condo_amount:
+    description: Condo amount
+  light_amount:
+    description: Light amount
+  water_amount:
+    description: Water amount
+  phone_amount:
+    description: Phone amount
+  iptu_amount:
+    description: IPTU amount
+  other_amount:
+    description: Other amount
+  total_package_amount:
+    description: Total package amount
   plan_percent:
-    description: Propose's plan percentage charged of a package.
+    description: Percentage of the plan in comparison to the package
     lineage:
-      - datalake_velo_clean.fiancavelo_plans.percent
       - datalake_rental_guarantee_platform_clean.plan.pricing
   plan_coverage:
-    description: Propose's plan coverage.
+    description: Propose plan coverage.
     lineage:
-      - datalake_velo_clean.fiancavelo_plans.coverage
       - datalake_rental_guarantee_platform_clean.plan.coverage
   plan_damage:
-    description: Propose's plan damage.
+    description: Propose plan damage.
     lineage:
-      - datalake_velo_clean.fiancavelo_plans.damage
       - datalake_rental_guarantee_platform_clean.plan.damage
   plan_commission:
-    description: Propose's plan comission.
+    description: Propose plan comission.
     lineage:
-      - datalake_velo_clean.fiancavelo_plans.commission
       - datalake_rental_guarantee_platform_clean.plan.comission
   is_legacy:
-    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
+    description: If the propose comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
