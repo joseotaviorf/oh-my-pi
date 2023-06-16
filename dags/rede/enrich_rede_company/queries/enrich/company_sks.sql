@@ -46,7 +46,7 @@ total_partners AS (
 SELECT
     COALESCE(
         IF(NOT tp.has_been_member, -1, NULL), -- If the company is not a member, set the sk_company to -1
-        sk_company, -- Keep the sk_company if it is already defined, so it is durable
+        NULLIF(sk_company, -1), -- Keep the sk_company if it is already defined, so it is durable
         sv.max_sk_company + MONOTONICALLY_INCREASING_ID() + 1 -- if not, use a number after the previous maximum value
     ) AS sk_company,
     COALESCE(
