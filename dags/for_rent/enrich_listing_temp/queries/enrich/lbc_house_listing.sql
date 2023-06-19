@@ -149,10 +149,10 @@ sale_only AS (
 ),
 house_listing AS (
     SELECT
-      CAST(CAST(sa.id_house AS STRING)||'001' AS BIGINT) AS id_house_listing,
+      CAST(CAST(sa.id_house AS STRING)||'000' AS BIGINT) AS id_house_listing,
       sa.id_house,
       sa.country_code,
-      1 AS version,
+      0 AS version,
       sa.status,
       sa.status_reason,
       NULL AS revision_reason,
