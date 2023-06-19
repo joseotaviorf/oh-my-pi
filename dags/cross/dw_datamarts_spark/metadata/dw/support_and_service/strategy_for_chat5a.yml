@@ -7,56 +7,58 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_session:
     lineage:
-      - datalake_greenseer_clean.session.id_session
+      - datalake_greenseer.session_memory.id_session
     description: ID of session on Greenseer.
   id_user:
     lineage:
-      - datalake_greenseer_clean.session.id_user
+      - datalake_greenseer.session_memory.id_user
     description: ID of user on Greenseer.
   ts_started:
     lineage:
-      - datalake_greenseer_clean.session.ts_started
+      - datalake_greenseer.session_memory.ts_started
     description: Date and time of session started.
   session_ordem:
     lineage:
-      - datalake_greenseer_clean.session.id_session
+      - datalake_greenseer.session_memory.id_session
     description: Sorting of sessions on the same user.
   has_chat5a_access:
     lineage:
-      - datalake_greenseer_clean.session.memory
+      - datalake_greenseer.session_memory.has_chat5a_access
     description: If user has chat5a available.
   migration_strategy:
     lineage:
-      - datalake_greenseer_clean.session.memory
+      - datalake_greenseer.session_memory.strategy
     description: Type of migration strategy to chat5a available.
   total_strategy:
     lineage:
-      - datalake_greenseer_clean.session.memory
+      - datalake_greenseer.session_memory.strategy
     description: Strategies count per user received.
   migration_strategy_adjusted:
     lineage:
-      - datalake_greenseer_clean.session.memory
+      - datalake_greenseer.session_memory.strategy
     description: Adjustment in migration strategy.
   id_pipeline:
     lineage:
-      - datalake_greenseer_clean.session.id_pipeline
+      - datalake_greenseer.session_memory.id_pipeline
     description: ID of the pipeline on Greenseer.
   contract_role:
     lineage:
       - dw_quintoandar.fact_contract_people.contract_role
-    description: Role that person performs in contract, such as owner, tenant, dweller
+    description:
+      Role that person performs in contract, such as owner, tenant, dweller
       (resident), sponsor ("fiador").
   is_retention:
     lineage:
-      - datalake_greenseer_clean.session.is_retention
+      - datalake_greenseer.greenseer_session.is_retention
     description: Flag to indicate if session retention in bot or no.
   tag:
     lineage:
-      - datalake_greenseer_clean.session.memory
+      - datalake_greenseer.session_memory.tags
     description: Tagging done by the bot.
   houve_conversao:
     lineage:
-      - datalake_greenseer_clean.session.memory
+      - datalake_greenseer.session_memory.strategy
+      - datalake_greenseer.session_memory.has_chat5a_access
     description: Flag to indicate if user migration to chat 5A.
   grade_bot:
     lineage:
@@ -68,7 +70,7 @@ columns:
     description: Satisfaction comment for the service performed in the bot
   grade_human:
     lineage:
-      - datalake_chat_fup_clean.surveys_answer.rating 
+      - datalake_chat_fup_clean.surveys_answer.rating
     description: Satisfaction score for the service performed in the human.
   comment_human:
     lineage:
@@ -106,10 +108,6 @@ columns:
     lineage:
       - datalake_customer_support.chat.id_conversation
     description: ID of the conversation on twilio.
-  id_segment:
-    lineage:
-      - datalake_customer_support.chat.id_segment
-    description: ID of the segment on twilio.
   completion_reason:
     lineage:
       - datalake_customer_support.chat.completion_reason
