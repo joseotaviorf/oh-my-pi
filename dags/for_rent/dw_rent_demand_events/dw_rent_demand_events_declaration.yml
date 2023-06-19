@@ -7,6 +7,9 @@ workflow:
   layer: dw
   custom_schema: rent
   has_load_to_redshift_task: false
+  inner_dependencies:
+    fact_rent_cohort_conversions:
+      - fact_rent_demand_events
 cluster:
   type: databricks_10_4_med_general_photon_cluster
   access_control_list:

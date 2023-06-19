@@ -1,0 +1,86 @@
+database_name: dw_rent
+table_name: fact_rent_cohort_conversions
+description: "Transactional fact table that registers a row for each conversion in
+  the funnel of ForRent demand. All types of conversions that shows up in this table
+  arte described in the dimension dw_rent.dim_rent_cohort_conversion_type.
+  The goal of this table is to make it easy to analyze conversions. Along with the conversion,
+  we have several dimension tables that contextualize it, such as the rent flow, property,
+  tenant prospect, the region, booking, offer, proposal and contract, along with the events' dates.
+  Each line is an unique cohort conversion related to its rent flow and tenant prospect."
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  sk_cohort_conversion:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_event
+      - dw_rent.fact_rent_demand_events.sk_event_type
+      - dw_rent.fact_rent_demand_events.sk_rent_flow
+      - dw_rent.fact_rent_demand_events.sk_tenant_prospect
+    description: "Unique key consolidated with the rent flow id + tenant prospect + id + base event id + base event type id."
+  sk_cohort_type:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_event_type
+    description: "Key that indicates the type of cohort conversion. It joins with dw_rent.dim_rent_cohort_conversion_type."
+  sk_base_event:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_event
+    description: "Key of the base event. It joins with dw_rent.fact_rent_demand_events."
+  sk_base_event_type: 
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_event_type
+    description: "Key of the base event type (indicating if the event is a VB, OS, etc.). It joins with dw_rent.fact_rent_demand_events."
+  sk_rent_flow:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_rent_flow
+    description: "Key of the rent flow related to the event."
+  sk_tenant_prospect:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_tenant_prospect
+    description: "Key of the tenant prospect user related to the event."
+  sk_house:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_house
+    description: "Key of the property related to the event."
+  sk_house_listing:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_house_listing
+    description: "Key of the property listing related to the event."
+  sk_region:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_region
+    description: "Key of the region related to the event."
+  sk_booking:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_booking
+    description: "Key of the booking related to the event."
+  sk_offer:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_offer
+    description: "Key of the offer related to the event."
+  sk_proposal:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_proposal
+    description: "Key of the proposal related to the event."
+  sk_contract:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_contract
+    description: "Key of the contract related to the event."
+  sk_base_event_date:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_event_date
+    description: "Date key of the base event's date (e.g. visit's booking date, offer's submitted date, etc.)."
+  sk_conversion_date:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_event_date
+    description: "Date key of the event's conversion date (e.g. visit's booking to completed date, etc.)."
+  country_code:
+    lineage:
+      - dw_rent.fact_rent_demand_events.country_code
+    description: "Country code related to the event."
+  days_to_conversion:
+    description: "Days between the base event and the conversion event dates."
+  weeks_to_conversion:
+    description: "Weeks between the base event and the conversion event dates."
+  ts_load:
+    description: "Load date."
+

@@ -14,5 +14,7 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 This pipeline produces the following output tables in DW, via full load on `dw_rent` schema:
 
+- `dw_rent.dim_rent_cohort_conversion_type`
 - `dw_rent.dim_rent_event_type`
+- `dw_rent.fact_rent_cohort_conversions`
 - `dw_rent.fact_rent_demand_events`
