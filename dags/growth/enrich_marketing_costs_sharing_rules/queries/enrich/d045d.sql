@@ -19,7 +19,7 @@ fall_back(city_group, share) AS (
     SELECT 'Rio de Janeiro', 0.44 UNION ALL
     SELECT 'Belo Horizonte', 0.35 UNION ALL
     SELECT 'Porto Alegre', 0.14 UNION ALL 
-	SELECT 'Campinas', 0.7
+	SELECT 'Campinas', 0.07
 ), 
 fall_back_dated AS ( 
 	SELECT 
