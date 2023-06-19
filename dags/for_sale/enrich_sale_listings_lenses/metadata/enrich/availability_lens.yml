@@ -82,11 +82,11 @@ columns:
   tier_name:
     lineage:
     description: >
-      Just a full name of the demand tier.
+      Just a full name of the availability tier.
     categories:
-      Great availability: >
+      Great Availability: >
         It represents the A5 tier category. Listings that have an availability score between -1500 and 0.
-      Good availability: >
+      Good Availability: >
         It represents the A4 tier category. Listings that have an availability score between -2500 and -1500.
       Standard Availability: >
         It represents the A3 tier category. Listings that have an availability score between -4000 and -2500.

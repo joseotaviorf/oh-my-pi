@@ -1,0 +1,148 @@
+WITH sale_listings AS (
+  SELECT 
+    l.id_house,
+    h.id_region,
+    h.sale_price,
+    h.sale_price/NULLIF(h.total_area, 0) AS price_m2,
+    h.total_area
+  FROM
+    datalake_ebdb_clean.listing_business_context AS l
+  LEFT JOIN 
+    datalake_ebdb_listing.house AS h
+      ON h.id = l.id_house
+  WHERE 
+    l.business_context = 'SALE'
+    AND l.ts_first_publication IS NOT NULL 
+),
+segmentation AS (
+  SELECT 
+    l.id_house,
+    COALESCE(p.tag, 'TXX Undefined') AS price_bin,
+    COALESCE(pm2.tag, 'TXX Undefined') AS price_m2_bin,
+    COALESCE(ta.tag, 'TXX Undefined') AS total_area_bin
+  FROM
+    sale_listings AS l
+  LEFT JOIN
+    datalake_sale_listings_lenses.segmentation_bins AS p 
+      ON p.bin = 'price' 
+      AND (l.sale_price >= p.lower_band AND l.sale_price < p.upper_band)
+  LEFT JOIN
+    datalake_sale_listings_lenses.segmentation_bins AS pm2
+      ON pm2.bin = 'price_m2' 
+      AND (l.price_m2 >= pm2.lower_band AND l.price_m2 < pm2.upper_band)
+  LEFT JOIN
+    datalake_sale_listings_lenses.segmentation_bins AS ta
+      ON ta.bin = 'total_area' 
+      AND (l.total_area >= ta.lower_band AND l.total_area < ta.upper_band)
+),
+pricing AS (
+  SELECT 
+    id_house,
+    tier AS pricing_tier,
+    tier_name AS pricing_name,
+    tier_disclaimer AS pricing_disclaimer
+  FROM
+    datalake_sale_listings_lenses.pricing_lens
+  WHERE 
+    is_last_tier
+),
+demand AS (
+  SELECT
+    id_house,
+    tier AS demand_tier,
+    tier_name AS demand_name,
+    tier_disclaimer AS demand_disclaimer
+  FROM 
+    datalake_sale_listings_lenses.demand_lens
+  WHERE 
+    is_last_tier
+),
+avaiability AS (
+  SELECT 
+    id_house,
+    tier AS availability_tier,
+    tier_name AS availability_name,
+    tier_disclaimer AS availability_disclaimer
+  FROM
+    datalake_sale_listings_lenses.availability_lens
+  WHERE 
+    is_last_tier
+),
+dataset AS (
+  SELECT 
+    id_house,
+    l.id_region,
+    s.price_bin,
+    s.price_m2_bin,
+    s.total_area_bin,
+    COALESCE(p.pricing_tier, 'P Undefined') AS pricing_tier,
+    COALESCE(d.demand_tier, 'D Undefined') AS demand_tier,
+    COALESCE(a.availability_tier, 'A Undefined') AS availability_tier,
+    COALESCE(p.pricing_name, 'Undefined') AS pricing_name,
+    COALESCE(d.demand_name, 'Undefined') AS demand_name,
+    COALESCE(a.availability_name, 'Undefined') AS availability_name,
+    p.pricing_tier || ' - ' || p.pricing_name AS pricing_full_name,
+    d.demand_tier || ' - ' || d.demand_name AS demand_full_name,
+    a.availability_tier || ' - ' || a.availability_name AS availability_full_name,
+    p.pricing_disclaimer,
+    d.demand_disclaimer,
+    a.availability_disclaimer
+  FROM
+    sale_listings AS l
+  LEFT JOIN
+    segmentation AS s 
+      USING(id_house)
+  LEFT JOIN 
+    pricing AS p 
+      USING(id_house)
+  LEFT JOIN 
+    demand AS d 
+      USING(id_house)
+  LEFT JOIN 
+    avaiability AS a
+      USING(id_house)
+),
+full_name AS (
+  SELECT 
+    id_house,
+    id_region,
+    price_bin,
+    price_m2_bin,
+    total_area_bin,
+    pricing_tier,
+    demand_tier,
+    availability_tier,
+    pricing_name,
+    demand_name,
+    availability_name,
+    pricing_tier || ' - ' || pricing_name AS pricing_full_name,
+    demand_tier || ' - ' || demand_name AS demand_full_name,
+    availability_tier || ' - ' || availability_name AS availability_full_name,
+    pricing_disclaimer,
+    demand_disclaimer,
+    availability_disclaimer
+  FROM
+    dataset
+)
+SELECT 
+  id_house,
+  id_region,
+  price_m2_bin || '  /  ' || pricing_tier || '  /  ' || demand_tier || '  /  ' || availability_tier AS listing_lenses,
+  price_bin ||'  &  '|| total_area_bin || '  /  ' || pricing_full_name || '  /  ' || availability_full_name || '  /  ' || demand_full_name || ' (' || demand_disclaimer || ')' AS full_listing_lenses,
+  price_bin,
+  price_m2_bin,
+  total_area_bin,
+  pricing_tier,
+  demand_tier,
+  availability_tier,
+  pricing_name,
+  demand_name,
+  availability_name,
+  pricing_full_name,
+  demand_full_name,
+  availability_full_name,
+  pricing_disclaimer,
+  demand_disclaimer,
+  availability_disclaimer
+FROM
+  full_name

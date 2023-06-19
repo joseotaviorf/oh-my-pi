@@ -357,7 +357,7 @@ grouping_tiers AS (
     ts_tier_started = MIN(IF(status = 'PUBLISHED', ts_tier_started, NULL)) OVER (PARTITION BY id_house)
     OR tier != LAG(tier) OVER (PARTITION BY id_house ORDER BY ts_tier_started)
 ),
-aux AS (
+tier_status AS (
   SELECT
     id_house,
     id_region,
@@ -369,18 +369,37 @@ aux AS (
     cancel_by_owner_score,
     has_active_rental_contract_score,
     CASE 
-      WHEN tier = 'A5' THEN 'Great availability'
-      WHEN tier = 'A4' THEN 'Good availability'
+      WHEN tier = 'A5' THEN 'Great Availability'
+      WHEN tier = 'A4' THEN 'Good Availability'
       WHEN tier = 'A3' THEN 'Standard Availability'
       WHEN tier = 'A2' THEN 'Limited Availability'
       WHEN tier = 'A1' THEN 'Possibly Unavailable'
     END AS tier_name,
     tier_disclaimer,
-    ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_tier_started DESC) = 1 AS is_last_tier,
     ts_tier_started,
     LEAD(ts_tier_started) OVER (PARTITION BY id_house ORDER BY ts_tier_started) AS ts_tier_ended
   FROM
     grouping_tiers
+),
+aux AS (
+  SELECT
+    id_house,
+    id_region,
+    status,
+    availability_score,
+    key_location_score,
+    week_available_hours_score,
+    cancel_by_owner_score,
+    has_active_rental_contract_score,
+    tier,
+    tier_name,
+    tier_disclaimer,
+    ts_tier_started,
+    ts_tier_ended
+  FROM
+    tier_status
+  WHERE 
+    tier != 'DISCARD'
 )
 SELECT
   id_house,
@@ -393,11 +412,9 @@ SELECT
   tier,
   tier_name,
   tier_disclaimer,
-  is_last_tier,
-  status = 'PUBLISHED' AND is_last_tier AS is_active,
+  ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_tier_started DESC) = 1 AS is_last_tier,
+  ts_tier_ended IS NULL AND ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_tier_started DESC) = 1 AS is_active,
   ts_tier_started,
   ts_tier_ended
 FROM
   aux
-WHERE 
-  tier != 'DISCARD'

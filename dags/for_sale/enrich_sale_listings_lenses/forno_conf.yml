@@ -1,0 +1,19 @@
+---
+tables:
+  segmentation_bins:
+    is_incremental: false
+  availability_lens:
+    is_incremental: false
+  demand_lens:
+    is_incremental: false
+  pricing_lens:
+    is_incremental: false
+  listing_lenses:
+    is_incremental: false
+    
+inner_dependencies:
+  listing_lenses:
+    - availability_lens
+    - demand_lens
+    - pricing_lens
+    - segmentation_bins

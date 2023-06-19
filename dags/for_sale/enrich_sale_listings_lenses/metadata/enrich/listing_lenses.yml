@@ -1,0 +1,191 @@
+database_name: datalake_sale_listings_lenses
+table_name: listing_lenses
+description: 'Table enrich that gathers the listing lens status of all sale listings. Lensing the listings is a project developed by the Listing Conversion team, where we abstracted various concepts and ways of looking at listings into a few lenses. For more information, check: https://docs.google.com/presentation/d/1E8VO0ulQ5-W5BKoI3C8cYPpFo7cmOP6TFzyUS27vHMg/edit'
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+      - datalake_ebdb_listing.house.id_house
+      - datalake_sale_listings_lenses.pricing_lens.id_house
+      - datalake_sale_listings_lenses.demand_lens.id_house
+      - datalake_sale_listings_lenses.availability_lens.id_house
+    description:  > 
+      Column referring to the house ID. Can be joined with dw_quintoandar.dim_house and all other sale modeling tables.
+  id_region:
+    lineage: 
+      - datalake_ebdb_listing.house.id_region
+    description: > 
+      ID column of region where house listing is located in. Can be joined with dw_public.dim_region.
+  listing_lenses:
+    description: > 
+      'Column that aggregates all the lenses into one sentence. Used to facilitate the visualization of the status.'
+  full_listing_lenses: 
+    description: > 
+      'Column that aggregates all the lenses into one sentence. Used to facilitate the visualization of the status.'
+  price_bin:
+    lineage:
+      - datalake_sale_listings_lenses.segmentation_bins.tag
+    description: >
+      Descriptive tag for each bin. The listing price is considered to allocate to a bin. That is, if the listing is 150k it will have a tag for the price bin `T00 [120k-300k]`.
+  price_m2_bin:
+    lineage:
+      - datalake_sale_listings_lenses.segmentation_bins.tag
+    description: > 
+        Descriptive tag for each bin. The listing price m2 is considered to allocate to a bin. That is, if the listing is 8k it will have a tag for the price m2 bin `TA05 [7k-8k]`.
+  total_area_bin:
+    lineage:
+      - datalake_sale_listings_lenses.segmentation_bins.tag
+    description: > 
+        Descriptive tag for each bin. The listing total area is considered to allocate to a bin. That is, if the listing is 90m2 it will have a tag for the total area bin `TA03 [80m-120m]`.
+  pricing_tier:
+    lineage:
+      - datalake_sale_listings_lenses.pricing_lens.tier
+    description: >
+      'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its level. 
+      We use two components to define this tier: the difference from the published price to the calculator price, and the degree of certainty of the prediction. 
+      With this, we were able to understand the pricing tier of a listing by its seller and how this would affect demand. 
+      Example: A listing with the publication price exactly equal to the calculator price and with a high degree of prediction will be classified as P5 - Great Price.'
+    categories:
+      P5: >
+        It means that QuintoAndar has a high degree of certainty that the property in question is worth less than it actually is.
+      P4: >
+        It means that the listing may be either overpriced or even cheaper than the real value of the property.
+      P3: >
+        It means that the price is OK in relation to the calculator. A little higher than the calculator, but nothing out of the normal.
+      P2: >
+        It means that the property is reasonably above the price estimated by the calculator.
+      P1: >
+        Listing that is way above the calculated price, over 50% of the published price. Extremely overpriced .
+  demand_tier:
+    lineage:
+      - datalake_sale_listings_lenses.demand_lens.tier
+    description: >
+     'Demand tier created to abstract some information from the listing demand. In other words, we use two components to define the tier, the number of days published and the number of visits scheduled, visits completed, offers received and offers accepted. With this, based on 4 different time windows (last 15, 30, 60 and 90 days) we assign a demand tier for each listing.'
+    categories:
+      D0: >
+        "Represent High Demand Listings. To be considered D0, the listing must have: 
+          Either +3 Visits Booked in the last 15 days if it has more than 90 days published.
+          Or +2 Visits Completed within the past 15 days if it has more than 90 days published. 
+          Or +1 Offers Submitted within the past 15 days if you have more than 90 days published.
+          Or +1 Offers Accepted within the past 15 days if you have more than 90 days published.
+          Or any event within the past 30 days if you have less than 90 days published."
+      D1: > 
+        "Represents Good Demand Listings. To be considered D1, the listing must have:
+          Either 2 Visits Booked in the last 15 days if it has more than 90 days published.
+          Or +3 Visits Booked in the last 30 days if it has more than 90 days published.
+          Or +2 Visits Completed within the past 30 days if more than 90 days old. 
+          Or +1 Offers Submitted within the past 30 days if you have more than 90 days published.
+          Or +1 Offers Accepted within the past 30 days if you have more than 90 days published.
+          Or +1 Visits Booked within the past 30 days if you have less than 90 days posted.
+          Or any event within the last 60 days if you have less than 90 days posted."
+      D2: > 
+        "Represents Some Demand Listings. To be considered D2, the listing must have:
+          Either 2 Visits Booked in the last 30 days if it has more than 90 days published.
+          Or +3 Visits Booked in the last 60 days if it has more than 90 days published.
+          Or +2 Visits Completed within the past 60 days if more than 90 days old. 
+          Or +1 Offers Submitted within the past 60 days if you have more than 90 days published.
+          Or +1 Offers Accepted within the past 60 days if you have more than 90 days published.
+          Or +1 Visits Booked within the past 60 days if you have less than 90 days posted.
+          Or any event within the last 90 days if you have less than 90 days posted.
+          Or if you have less than 45 days posted."
+      D3: > 
+        "Represents Low Demand Listings. To be considered D3, the listing must have:
+          Either 2 Visits Booked in the last 60 days if it has more than 90 days published.
+          Or +3 Visits Booked in the last 90 days if it has more than 90 days published.
+          Or +2 Visits Completed within the past 90 days if more than 90 days old. 
+          Or +1 Offers Submitted within the past 90 days if you have more than 90 days published.
+          Or +1 Offers Accepted within the past 90 days if you have more than 90 days published.
+          Or +1 Visits Booked within the past 90 days if you have less than 90 days posted.
+          Or if you have more than 45 days published"
+      D4: >
+        "Represent No Demand Listings. To be considered D4, is the listing must be more than 90 days old and have not received any demand."
+  availability_tier:
+    lineage:
+      - datalake_sale_listings_lenses.availability_lens.tier
+    description: >
+      'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level". This score is based on all the elements that can alter the availability of a listing on the visit. That is, it takes into account factors such as key location, seller behavior, canceled visits, hours available for visits, and rental status.
+    categories: 
+      A5: >
+        Listings that have the Availability Score between -1500 and 0. Meaning that they have little or no penalties, indicating good availability for visits.
+      A4: > 
+        Listings that have the Availability Score between -2500 and -1500. Meaning that they have some penalties, indicating good availability for visits.
+      A3: >
+        Listings that have the Availability Score between -4000 and -2500. Meaning some limitations on the visit.
+      A2: >
+        Listings that have the Availability Score between -100000 and -4000. Meaning that possibly this listing is very difficult to make a visit to, but still available.
+      A1: >
+        Listings that have the Availability Score less than -100000. Meaning that this listing is possibly not even available for the visit.
+  pricing_name:
+    lineage:
+      - datalake_sale_listings_lenses.pricing_lens.tier_name
+    description: >
+      Just a long name for the expensive Tier segment.
+    categories:
+      Great Price: >
+        It represents P5. Listings that are below the value calculated by QuintoAndar.
+      Good Price: >
+        It represents P4. Listings that are well priced.
+      Fair Price: >
+        It represents P3. Listings are slightly above the price indicated by the calculator.
+      Slightly Overpriced: >
+        It represents P2. Listings that are above the price indicated by the calculator.
+      Significantly Overpriced: >
+        It represents P1. Listings are way above the price of the calculator.
+  demand_name:
+    lineage:
+      - datalake_sale_listings_lenses.demand_lens.tier_name
+    description: > 
+      Just a full name of the demand tier.
+    categories:
+      High Demand: >
+        It represents the D0 category of the tier. Listings with a large sum of demand events in the last days. It is the highest possible tier.
+      Good Demand: >
+        It represents the D1 tier category. A reasonable amount of demand, but a little less than the High Demand. It is the second highest tier.
+      Some Demand: >
+        It represents the tier D2 category. Listings with an average combination of price and price per square meter.
+      Low Demand: >
+        It represents the tier D3 category. A listing with some level of demand still signals a less attractive listing than the High and the Good, but more attractive than the Low.
+      No Demand: >
+        It represents the tier D4 category. Listings that do not have any kind of demand.
+  availability_name:
+    lineage:
+      - datalake_sale_listings_lenses.availability_lens.tier_name
+    description: >
+      Just a full name of the availability tier.
+    categories:
+      Great Availability: >
+        It represents the A5 tier category. Listings that have an availability score between -1500 and 0.
+      Good Availability: >
+        It represents the A4 tier category. Listings that have an availability score between -2500 and -1500.
+      Standard Availability: >
+        It represents the A3 tier category. Listings that have an availability score between -4000 and -2500.
+      Limited Availability: >
+        It represents the A2 tier category. Listings that have an availability score between -100000 and 4000.
+      Possibly Unavailable: >
+        It represents the A1 tier category. Listings that have an availability score less than -100000.
+  pricing_full_name:
+    description: > 
+      Full name of pricing tier. Can be used for display purposes.
+  demand_full_name: 
+    description: > 
+      Full name of demand tier. Can be used for display purposes.
+  availability_full_name:
+    description: > 
+      Full name of availability tier. Can be used for display purposes.
+  pricing_disclaimer:
+    lineage:
+      - datalake_sale_listings_lenses.pricing_lens.tier_disclaimer
+    description: >
+      Column that shows us, in full, the combination of factors/bins concerning the listing, where with this, we classify it within a pricing tier.
+  demand_disclaimer:
+    lineage:
+      - datalake_sale_listings_lenses.demand_lens.tier_disclaimer
+    description: >
+      Column that shows us, in full, the combination of factors/bins concerning the listing, where with this, we classify it within a demand tier.
+  availability_disclaimer:
+    lineage:
+      - datalake_sale_listings_lenses.availability_lens.tier_disclaimer
+    description: >
+      Column that shows us, in full, the combination of factors/bins concerning the listing, where with this, we classify it within a availability tier.
