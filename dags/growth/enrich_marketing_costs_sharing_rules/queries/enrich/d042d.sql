@@ -1,5 +1,42 @@
 WITH
 -----------------------------------------------------------
+----- CTE to fetch information from listing rent flow -----
+-----------------------------------------------------------
+rent_flow_client_info AS (
+    SELECT DISTINCT
+        COALESCE(house.id_region, -1) AS sk_region,
+        COALESCE(rent_flow.id_booking, -1) AS sk_booking,
+        COALESCE(dim_offer.sk_offer, -1) AS sk_offer,
+        COALESCE(rent_flow.id_client, -1) AS sk_client
+    FROM 
+        datalake_ebdb_rent_flow.rent_flow
+    JOIN 
+        dw_public.dim_house_listing 
+    ON 
+        dim_house_listing.id_house = rent_flow.id_house
+        AND COALESCE(rent_flow.dt_rent_flow_created, '1900-01-01') 
+            BETWEEN COALESCE(dim_house_listing.ts_listing_version_start, '1900-01-01') AND COALESCE(dim_house_listing.ts_listing_version_end, NOW())
+    LEFT JOIN 
+        datalake_ebdb_listing.house 
+    ON 
+        dim_house_listing.id_house = house.id
+    LEFT JOIN 
+        dw_public.dim_booking 
+    ON 
+        dim_booking.sk_booking = rent_flow.id_booking
+    LEFT JOIN 
+        dw_public.dim_offer
+    ON 
+        dim_offer.sk_offer = COALESCE(rent_flow.id_offer_context, -1)
+        AND dim_offer.sk_offer != -1        
+    WHERE 
+        dim_house_listing.is_for_rent
+        AND (
+            COALESCE(dim_booking.visit_intent, '') <> 'SALE'
+            OR (dim_booking.visit_intent = 'SALE' AND rent_flow.id_contract IS NOT NULL)
+        )
+),
+-----------------------------------------------------------
 -- Query bookings, offers and talk to agent full history --
 -----------------------------------------------------------
 tenant_prospect_events AS (
@@ -12,7 +49,7 @@ tenant_prospect_events AS (
 	FROM
 		dw_public.dim_booking AS dbk
 	INNER JOIN
-        dw_public.fact_listing_rent_flows AS lrf
+        rent_flow_client_info AS lrf
         	USING(sk_booking)
 	WHERE
 		dbk.sk_booking > 0
@@ -29,7 +66,7 @@ tenant_prospect_events AS (
 	FROM
 		dw_public.dim_offer AS dof
 	INNER JOIN
-        dw_public.fact_listing_rent_flows AS lrf
+        rent_flow_client_info AS lrf
 	        USING(sk_offer)
 	WHERE
 		dof.sk_offer > 0
