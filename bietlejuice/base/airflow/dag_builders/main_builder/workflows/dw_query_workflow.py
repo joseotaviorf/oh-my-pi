@@ -1,6 +1,6 @@
 import os
 
-from airflow.operators.quintoandar_databricks import (
+from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
@@ -52,7 +52,6 @@ class DWQueryWorkflow(BaseWorkflow):
         cluster_params = self.get_cluster_params()
 
         dw_bucket = self.config_service.get_config("dw_bucket")
-        spectrum_iam_role = self.config_service.get_config("spectrum_iam_role")
         databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"
         )
@@ -79,7 +78,6 @@ class DWQueryWorkflow(BaseWorkflow):
 
         dw_task_groups = task_group.build_task_group_from_sql_files(
             layer=LayerEnum.DW,
-            spectrum_iam_role=spectrum_iam_role,
             tables_customization=tables_customization,
             partitions=default_partitions,
             is_incremental=default_is_incremental,
@@ -101,6 +99,7 @@ class DWQueryWorkflow(BaseWorkflow):
         )
 
         create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+            databricks_conn_id="databricks_job_cluster",
             dag=dag,
             task_id="create-cluster",
             cluster_configuration=cluster_params["cluster_config"],
@@ -108,7 +107,9 @@ class DWQueryWorkflow(BaseWorkflow):
             access_control_list=cluster_params["access_control_list"],
         )
         terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-            dag=dag, task_id="terminate-cluster"
+            databricks_conn_id="databricks_job_cluster",
+            dag=dag,
+            task_id="terminate-cluster",
         )
 
         dw_task_groups_boundaries = (

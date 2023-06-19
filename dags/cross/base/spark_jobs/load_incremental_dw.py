@@ -4,20 +4,24 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DWMetastoreService
-from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.pipeline import IncrementalTableLoaderPipeline
+from bietlejuice.base.db.dw_metastore_service import DWMetastoreService
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.pipeline.incremental_table_loader_pipeline import (
+    IncrementalTableLoaderPipeline,
+)
 
-JOB_NAME = "load_incremental_table_to_dw_final_schema"
+JOB_NAME = "load_incremental_dw"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def build_query(query_filters, dw_staging_database_name, table_name):
+def build_query(extra_query_template_params, dw_staging_database_name, table_name):
 
     where = ""
-    if query_filters:
-        filters = [f"{key} = {value}" for key, value in query_filters.items()]
+    if extra_query_template_params:
+        filters = [
+            f"{key} = {value}" for key, value in extra_query_template_params.items()
+        ]
         where = "WHERE " + " AND ".join(filters)
 
     query = f"SELECT * FROM {dw_staging_database_name}.{table_name} {where}"
@@ -34,7 +38,7 @@ if __name__ == "__main__":
     parser.add_argument("table_name")
     parser.add_argument("partitions")
     parser.add_argument("execution_date")
-    parser.add_argument("query_filters")
+    parser.add_argument("extra_query_template_params")
 
     args = parser.parse_args()
 
@@ -43,7 +47,7 @@ if __name__ == "__main__":
     dw_schema = args.dw_schema
     table_name = args.table_name
     partitions = json.loads(args.partitions.replace("'", '"'))
-    query_filters = json.loads(args.query_filters)
+    extra_query_template_params = json.loads(args.extra_query_template_params)
     execution_date = args.execution_date
 
     logger.info(
@@ -66,7 +70,7 @@ if __name__ == "__main__":
         "day": dt_datetime.day,
     }
 
-    query = build_query(query_filters, dw_staging_db_name, table_name)
+    query = build_query(extra_query_template_params, dw_staging_db_name, table_name)
 
     table_loader_pipeline = IncrementalTableLoaderPipeline(
         database_name=dw_db_name,

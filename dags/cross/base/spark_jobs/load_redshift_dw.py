@@ -1,22 +1,24 @@
 import json
+import boto3
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatabaseEnum, DWMetastoreService
-from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.pipeline.load_table_to_redshift_pipeline import (
-    LoadTableToRedshiftPipeline,
-)
+from bietlejuice.clients.db_clients import SparkClient, PostgresClient
+from bietlejuice.loaders.redshift_loader import RedshiftLoader
+from bietlejuice.services.s3_service import S3Service
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
-JOB_NAME = "load_table_to_redshift"
+JOB_NAME = "load_redshift_dw"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
 
-    parser = ArgumentParser(description=JOB_NAME)
+    parser = ArgumentParser(JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("spectrum_iam_role")
     parser.add_argument("dw_bucket")
@@ -48,12 +50,27 @@ if __name__ == "__main__":
         dbutils.secrets.get("quintoandar", DatabaseEnum.DW)
     )
 
-    load_table_to_redshift_pipeline = LoadTableToRedshiftPipeline(
-        spectrum_iam_role=spectrum_iam_role,
-        redshift_connection=redshift_connection,
-        dw_bucket=dw_bucket,
-        dw_schema=dw_schema,
-        source_schema=dw_db_name,
-        table_name=table_name,
+    s3_client = S3Service(boto3.resource("s3"))
+    spark_metastore_service = SparkMetastoreService(SparkClient())
+
+    redshift_client = PostgresClient(
+        dbname=redshift_connection["db"],
+        host=redshift_connection["host"],
+        port=redshift_connection["port"],
+        user=redshift_connection["user"],
+        password=redshift_connection["pwd"],
+        keepalives_idle=200,
     )
-    load_table_to_redshift_pipeline.run()
+
+    redshift_loader = RedshiftLoader(
+        spectrum_iam_role, redshift_client, s3_client, dw_bucket
+    )
+
+    redshift_loader.load_table_from_metastore(
+        metastore_service=spark_metastore_service,
+        source_schema=dw_db_name,
+        source_table_name=table_name,
+        target_schema=dw_schema,
+        target_table_name=table_name,
+        overwrite=True,
+    )

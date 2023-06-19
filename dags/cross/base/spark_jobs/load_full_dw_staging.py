@@ -1,15 +1,14 @@
 import json
 from argparse import ArgumentParser
 
-
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DWMetastoreService
-from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.db.dw_metastore_service import DWMetastoreService
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.pipeline import FullTableLoaderPipeline
+from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipeline
 
-JOB_NAME = "load_full_table_to_dw_staging_schema"
+JOB_NAME = "load_full_dw_staging"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
@@ -19,9 +18,9 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("dw_bucket")
     parser.add_argument("dw_schema")
-    parser.add_argument("relative_query_path")
     parser.add_argument("table_name")
     parser.add_argument("partitions")
+    parser.add_argument("relative_query_path")
     parser.add_argument("spark_session_configs")
     parser.add_argument("tree_path")
 
@@ -30,9 +29,9 @@ if __name__ == "__main__":
     env = args.env
     dw_bucket = args.dw_bucket
     dw_schema = args.dw_schema
-    relative_query_path = args.relative_query_path
     table_name = args.table_name
     partitions = json.loads(args.partitions.replace("'", '"'))
+    relative_query_path = args.relative_query_path
     spark_session_configs = json.loads(args.spark_session_configs)
     tree_path = args.tree_path
 

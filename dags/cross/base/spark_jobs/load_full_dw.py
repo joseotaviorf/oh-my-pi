@@ -3,11 +3,11 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DWMetastoreService
-from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.pipeline import FullTableLoaderPipeline
+from bietlejuice.base.db.dw_metastore_service import DWMetastoreService
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipeline
 
-JOB_NAME = "load_full_table_to_dw_final_schema"
+JOB_NAME = "load_full_dw"
 
 logger = QuintoAndarLogger(JOB_NAME)
 

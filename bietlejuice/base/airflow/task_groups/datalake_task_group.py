@@ -24,17 +24,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
     Responsible for creating task groups related to datalake operations
     """
 
-    ALL_TABLES = "--all-tables"
-    SINGLE_TABLE = "--table-name"
-
-    LAYER_TO_PROPAGATOR_SPARK_JOB_MAPPING = {
-        LayerEnum.RAW.value: "propagate_raw_tables_metadata.py",
-        LayerEnum.CLEAN.value: "propagate_table_metadata.py",
-        LayerEnum.ENRICH.value: "propagate_table_metadata.py",
-        LayerEnum.METRIC.value: "propagate_table_metadata.py",
-        LayerEnum.REVERSE.value: "propagate_table_metadata.py",
-    }
-
     def __init__(
         self,
         dag,
@@ -104,8 +93,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
     ) -> list:
 
         sync_metastore_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=DatalakeTaskGroup.generate_default_task_id(
-                task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+            task_id=self.generate_default_task_id(
+                task_prefix=self.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
                 layer=LayerEnum(layer),
                 schema=source,
                 table_name=table_name,
@@ -129,8 +118,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         )
 
         sync_metastore_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=DatalakeTaskGroup.generate_default_task_id(
-                task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
+            task_id=self.generate_default_task_id(
+                task_prefix=self.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
                 layer=LayerEnum(layer),
                 schema=source,
                 table_name=table_name,
@@ -200,8 +189,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
             )
             propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=DatalakeTaskGroup.generate_default_task_id(
-                    task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+                task_id=self.generate_default_task_id(
+                    task_prefix=self.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
                     layer=LayerEnum(layer),
                     schema=source,
                     table_name=table_name,
@@ -222,8 +211,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
             bypass_task = DummyOperator(
                 dag=self.dag,
-                task_id=DatalakeTaskGroup.generate_default_task_id(
-                    task_prefix=DatalakeTaskGroup.PROPAGATION_BYPASS_TASK_PREFIX,
+                task_id=self.generate_default_task_id(
+                    task_prefix=self.PROPAGATION_BYPASS_TASK_PREFIX,
                     layer=LayerEnum(layer),
                     schema=source,
                     table_name=table_name,
@@ -270,8 +259,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         for table in tables_names:
             data_quality_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=DatalakeTaskGroup.generate_default_task_id(
-                    task_prefix=DatalakeTaskGroup.DATA_QUALITY_TESTS_TASK_PREFIX,
+                task_id=self.generate_default_task_id(
+                    task_prefix=self.DATA_QUALITY_TESTS_TASK_PREFIX,
                     layer=LayerEnum(layer),
                     schema=source,
                     table_name=table_name,
@@ -345,8 +334,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         load_table_task = self._build_load_task(
             pool=pool,
-            task_id=DatalakeTaskGroup.generate_default_task_id(
-                task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+            task_id=self.generate_default_task_id(
+                task_prefix=self.LOAD_TASK_PREFIX,
                 layer=layer_enum,
                 schema=source,
                 table_name=table_name,
@@ -393,7 +382,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         load_table_task.set_downstream(quality_tasks)
 
-        return DatalakeTaskGroup.format_tasks_boundaries(
+        return self.format_tasks_boundaries(
             initial_tasks=[load_table_task],
             final_tasks=final_tasks,
             independent_tasks=quality_tasks,
@@ -462,8 +451,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_extraction_type = "incremental" if is_incremental else "full"
 
         load_table_task = self._build_load_task(
-            task_id=DatalakeTaskGroup.generate_default_task_id(
-                task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+            task_id=self.generate_default_task_id(
+                task_prefix=self.LOAD_TASK_PREFIX,
                 layer=layer_enum,
                 schema=source_database_base_name,
                 table_name=table_name,
@@ -530,7 +519,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
             load_table_task.set_downstream(quality_tasks)
 
-        return DatalakeTaskGroup.format_tasks_boundaries(
+        return self.format_tasks_boundaries(
             initial_tasks=[load_table_task],
             final_tasks=final_tasks,
             independent_tasks=quality_tasks,

@@ -16,11 +16,15 @@ class BaseTaskGroup(object):
     Base class for building the task group flow.
     """
 
+    ALL_TABLES = "--all-tables"
+    SINGLE_TABLE = "--table-name"
+
     DEFAULT_EXECUTION_TIMEOUT_HOURS = 2
     TASK_GROUP_INITIAL_TASKS_DICT_KEY = "initial_tasks"
     TASK_GROUP_FINAL_TASKS_DICT_KEY = "final_tasks"
     TASK_GROUP_INDEPENDENT_TASKS_DICT_KEY = "independent_tasks"
 
+    ADD_DEFAULT_ROW_TASK_PREFIX = "add-default-row-to"
     DATA_QUALITY_TESTS_TASK_PREFIX = "data-quality-tests"
     DONE_TASK_PREFIX = "done"
     LOAD_TASK_PREFIX = "load"
@@ -28,6 +32,17 @@ class BaseTaskGroup(object):
     PROPAGATION_BYPASS_TASK_PREFIX = "propagation-bypass"
     SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX = "sync-hive-metastore-partitions"
     SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX = "sync-hive-metastore-structure"
+    TEST_EMPTINESS_TASK_PREFIX = "test-emptiness"
+
+    LAYER_TO_PROPAGATOR_SPARK_JOB_MAPPING = {
+        LayerEnum.CLEAN.value: "propagate_table_metadata.py",
+        LayerEnum.DW.value: "propagate_table_metadata.py",
+        LayerEnum.DW_STAGING.value: "propagate_table_metadata.py",
+        LayerEnum.ENRICH.value: "propagate_table_metadata.py",
+        LayerEnum.METRIC.value: "propagate_table_metadata.py",
+        LayerEnum.RAW.value: "propagate_raw_tables_metadata.py",
+        LayerEnum.REVERSE.value: "propagate_table_metadata.py",
+    }
 
     def __init__(
         self,

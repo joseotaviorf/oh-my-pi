@@ -1,29 +1,22 @@
 import json
 from datetime import timedelta
-from typing import List, Dict
+from typing import Dict
+from os import path
 
 from airflow.utils.helpers import chain
-from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators.quintoandar_databricks import (
-    QuintoAndarDatabricksSubmitRunOperator,
-)
+from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator
 
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
-from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.services import ConfigurationService
-from bietlejuice.services.dag_metadata_service import DAGMetadataService
+from bietlejuice.services.configuration_service import ConfigurationService
 
 
 class DWTaskGroup(BaseTaskGroup):
     """
     Responsible for creating task groups related to dw operations
     """
-
-    ADD_DEFAULT_ROW_TASK_PREFIX = "add-default-row-to"
-    BRIDGE_TASK_PREFIX = "bridge"
-    TEST_EMPTINESS_TASK_PREFIX = "test-emptiness"
 
     def __init__(
         self,
@@ -35,296 +28,221 @@ class DWTaskGroup(BaseTaskGroup):
         spark_jobs_path,
         execution_timeout_hours=BaseTaskGroup.DEFAULT_EXECUTION_TIMEOUT_HOURS,
     ):
-        """
-        :param dag: main dag instance
-        :type dag: airflow.models.DAG
-        :param env: forno or prod environments
-        :type env: str
-        :param dw_bucket: dw bucket in S3
-        :type dw_bucket: str
-        :param dw_schema: dw schema name
-        :type dw_schema: str
-        :param relative_query_path: relative query path from default queries
-            path containing sql file for the table to be created
-        :type relative_query_path: str
-        :param spark_jobs_path: base path for spark jobs
-        :type spark_jobs_path: str
-        :param execution_timeout_hours: timeout in hours to be set to the tasks
-        :type execution_timeout_hours: int
-        """
+
         super().__init__(
             dag, env, relative_query_path, spark_jobs_path, execution_timeout_hours
         )
         self.dw_bucket = dw_bucket
         self.dw_schema = dw_schema
 
-    def build_dw_task_group(
+    def __get_schema(self, table_customization):
+        table_schema = table_customization.get("custom_schema", self.dw_schema)
+        return table_schema
+
+    def __get_partitions(self, table_customization, partitions):
+        table_partitions = table_customization.get("partitions", partitions)
+        return table_partitions
+
+    def __get_extra_query_template_params(
+        self, table_customization, extra_query_template_params
+    ):
+        extra_query_template_params = table_customization.get(
+            "extra_query_template_params", extra_query_template_params
+        )
+        return extra_query_template_params
+
+    def __get_extraction_type(self, table_customization, is_incremental):
+        table_extraction_type = table_customization.get(
+            "extraction_type", "incremental" if is_incremental else "full"
+        )
+        return table_extraction_type
+
+    def _set_load_task(
         self,
+        layer: str,
+        schema: str,
         table_name: str,
-        spectrum_iam_role: str,
-        is_incremental: bool = False,
-        partitions: list = None,
-        extra_query_template_params: dict = None,
-        has_load_to_redshift_task: bool = True,
-        table_customization: Dict[str, Dict[str, str]] = None,
-    ) -> dict:
+        extraction_type: str,
+        spark_job_extra_args: list,
+    ) -> QuintoAndarDatabricksSubmitRunOperator:
         """
-        Creates a task group containing the tasks:
-        . load_table_to_dw_final_schema_task: load table from staging metastore
-           database to final schema in s3
-        . sync_metastore_table_task: sync the table from spark metastore
-           to hive metastore
-        . propagate_table_metadata_task: propagates to metadata-propagator service
-           the metadata of the table
-
-        :param table_name: table name to be created
-        :param spectrum_iam_role: aws redshift spectrum IAM role
-        :param is_incremental: if this table uses incremental load type
-        :param partitions: list of columns to partition table
-        :type partitions: list[str]
-        :param extra_query_template_params: additional parameters to be supplied to query template
-        :param has_load_to_redshift_task: # TODO: scheduled for removal
-        :param table_customization: table's structure customization, when applicable
-        :return: dict with initial and final tasks of the created task group
-        :rtype: dict[str:list[airflow.models.BaseOperator]]
+        Creates a task that reads an existing SQL query file, executes it inside
+        Databricks and writes its resulting dataframe inside the DW bucket, creating or
+        updating a table in Databricks Metastore with the same name of the query file.
         """
-        layer_enum = LayerEnum.DW
-        layer = layer_enum.value
-        table_customization = table_customization or {}
-        extra_query_template_params = extra_query_template_params or {}
-
-        table_database_schema = self.__get_table_schema(table_customization)
-        table_extraction_type = self.__get_table_extraction_type(
-            table_customization, is_incremental
-        )
-        partitions = self.__get_table_partitions(table_customization, partitions)
-        extra_query_template_params = self.__get_extra_query_template_params(
-            table_customization, extra_query_template_params
-        )
-        incremental_params = (
-            ["{{ ds }}", json.dumps(extra_query_template_params)]
-            if table_extraction_type == "incremental"
-            else []
-        )
-
-        load_table_to_dw_final_schema_task = QuintoAndarDatabricksSubmitRunOperator(
+        load_table_task = QuintoAndarDatabricksSubmitRunOperator(
+            databricks_conn_id="databricks_job_cluster",
             dag=self.dag,
-            task_id=DWTaskGroup.generate_default_task_id(
-                task_prefix=DWTaskGroup.LOAD_TASK_PREFIX,
-                layer=layer_enum,
-                schema=table_database_schema,
+            task_id=self.generate_default_task_id(
+                task_prefix=self.LOAD_TASK_PREFIX,
+                layer=LayerEnum(layer),
+                schema=schema,
                 table_name=table_name,
             ),
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/load_{table_extraction_type}_table_to_dw_final_schema.py",
-                    "parameters": [
-                        self.env,
-                        self.dw_bucket,
-                        table_database_schema,
-                        table_name,
-                        json.dumps(partitions),
-                    ]
-                    + incremental_params,
+                    "python_file": path.join(
+                        self.spark_jobs_path, f"load_{extraction_type}_{layer}.py"
+                    ),
+                    "parameters": [self.env, self.dw_bucket, schema, table_name]
+                    + spark_job_extra_args,
                 }
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
-        final_tasks = []
+        return load_table_task
 
-        sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=self.dag,
-            task_id=DWTaskGroup.generate_default_task_id(
-                task_prefix=DWTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
-                layer=layer_enum,
-                schema=table_database_schema,
-                table_name=table_name,
-            ),
-            json={
-                "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_structure.py",
-                    "parameters": [
-                        self.dw_bucket,
-                        layer,
-                        table_database_schema,
-                        "--table-name",
-                        table_name,
-                    ],
-                }
-            },
-            execution_timeout=timedelta(hours=self.execution_timeout_hours),
-        )
+    def _set_hive_structure_tasks(
+        self, layer: str, schema: str, table_name: str, sync_mode: str
+    ) -> list:
+        """
+        Creates a task that sends a synchronous request to our Hive Metastore, in order
+        to create the table or update its DDL (add or remove columns), synchronizing
+        it to the table already available at Databricks Metastore.
+        """
+        hive_sync_tasks = []
 
-        sync_metastore_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=self.dag,
-            task_id=DWTaskGroup.generate_default_task_id(
-                task_prefix=DWTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
-                layer=layer_enum,
-                schema=table_database_schema,
-                table_name=table_name,
-            ),
-            json={
-                "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_partitions.py",
-                    "parameters": [
-                        self.dw_bucket,
-                        layer,
-                        table_database_schema,
-                        "--table-name",
-                        table_name,
-                    ],
-                }
-            },
-            execution_timeout=timedelta(hours=self.execution_timeout_hours),
-        )
-
-        final_tasks.append(sync_metastore_tables_partitions_task)
-
-        if DAGMetadataService.metadata_file_exists(
-            self.relative_query_path, layer, table_name
-        ):
-            propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
+        if layer == LayerEnum.DW.value:
+            sync_metastore_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+                databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
-                task_id=DWTaskGroup.generate_default_task_id(
-                    task_prefix=DWTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
-                    layer=layer_enum,
-                    schema=table_database_schema,
+                task_id=self.generate_default_task_id(
+                    task_prefix=self.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+                    layer=LayerEnum(layer),
+                    schema=schema,
                     table_name=table_name,
                 ),
                 json={
                     "spark_python_task": {
-                        "python_file": f"{self.spark_jobs_path}/propagate_table_metadata.py",
-                        "parameters": [
-                            layer,
-                            MetadataTypeEnum.LINEAGE.value,
-                            table_database_schema,
-                            table_name,
-                        ],
+                        "python_file": path.join(
+                            self.spark_jobs_path, "sync_metastore_tables_structure.py"
+                        ),
+                        "parameters": [self.dw_bucket, layer, schema, sync_mode]
+                        + ([table_name] if table_name else []),
+                    }
+                },
+                execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            )
+            hive_sync_tasks.append(sync_metastore_structure_task)
+        return hive_sync_tasks
+
+    def _set_hive_partitions_tasks(
+        self, layer: str, schema: str, table_name: str, sync_mode: str
+    ) -> list:
+        """
+        Creates a task that sends a synchronous request to our Hive Metastore to
+        update table partitions, synchronizing them to the partitions of the table
+        already available at Databricks Metastore.
+
+        # TODO: THIS METHOD MUST BE REVIEWED TO BE RUN ONLY WHEN THE TABLE HAS PARTITIONS.
+        """
+        hive_sync_tasks = []
+
+        if layer == LayerEnum.DW.value:
+            sync_metastore_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+                databricks_conn_id="databricks_job_cluster",
+                dag=self.dag,
+                task_id=self.generate_default_task_id(
+                    task_prefix=self.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
+                    layer=LayerEnum(layer),
+                    schema=schema,
+                    table_name=table_name,
+                ),
+                json={
+                    "spark_python_task": {
+                        "python_file": path.join(
+                            self.spark_jobs_path, "sync_metastore_tables_partitions.py"
+                        ),
+                        "parameters": [self.dw_bucket, layer, schema, sync_mode]
+                        + ([table_name] if table_name else []),
+                    }
+                },
+                execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            )
+            hive_sync_tasks.append(sync_metastore_partitions_task)
+        return hive_sync_tasks
+
+    def _set_metadata_propagator_tasks(
+        self, layer: str, schema: str, table_name: str, metadata_type: str
+    ) -> list:
+        """
+        Creates a task that sends an asynchronous POST request to the Metadata
+        Propagator API in order to propagate lineage and tags metadata of the table.
+        The lineage and tagging metadata are exclusive for each table, and are expected
+        to be predefined in a metadata YAML file named after the very same table.
+        """
+        metadata_propagator_tasks = []
+
+        if DAGPackagesPathService.artifact_file_exists(
+            artifact_type="metadata",
+            dag_name=self.relative_query_path,
+            layer=layer,
+            table_name=table_name,
+        ):
+            propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
+                databricks_conn_id="databricks_job_cluster",
+                dag=self.dag,
+                task_id=self.generate_default_task_id(
+                    task_prefix=self.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+                    layer=LayerEnum(layer),
+                    schema=schema,
+                    table_name=table_name,
+                ),
+                json={
+                    "spark_python_task": {
+                        "python_file": path.join(
+                            self.spark_jobs_path,
+                            self.LAYER_TO_PROPAGATOR_SPARK_JOB_MAPPING[layer],
+                        ),
+                        "parameters": [layer, metadata_type, schema, table_name],
                     }
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
 
-            dummy_task = DummyOperator(
-                dag=self.dag,
-                task_id=DWTaskGroup.generate_default_task_id(
-                    task_prefix=DWTaskGroup.BRIDGE_TASK_PREFIX,
-                    layer=layer_enum,
-                    schema=table_database_schema,
-                    table_name=table_name,
-                ),
-                trigger_rule="all_done",
-            )
+            metadata_propagator_tasks.append(propagate_table_metadata_task)
 
-            chain(
-                sync_metastore_tables_partitions_task,
-                propagate_table_metadata_task,
-                dummy_task,
-            )
-            final_tasks.append(dummy_task)
+        return metadata_propagator_tasks
 
-        chain(
-            load_table_to_dw_final_schema_task,
-            sync_metastore_table_structure_task,
-            sync_metastore_tables_partitions_task,
-        )
-
-        return DWTaskGroup.format_tasks_boundaries(
-            initial_tasks=[load_table_to_dw_final_schema_task], final_tasks=final_tasks
-        )
-
-    def build_dw_staging_task_group(
+    def _set_data_quality_tasks(
         self,
+        layer: str,
         table_name: str,
-        execution_date="{{ ds }}",
-        is_incremental: bool = False,
-        partitions: List[str] = None,
-        extra_query_template_params: dict = None,
-        spark_session_configs: dict = None,
+        schema: str,
         tree_path: str = "",
-        table_customization: Dict[str, Dict[str, str]] = None,
-    ) -> dict:
+        execution_date="{{ ds }}",
+    ) -> list:
         """
-        Creates a task group containing the default loading task:
-        . load_table_to_dw_staging_schema_task: load table to dw staging layer
-        For full load pipelines, it builds additional task groups
-
-        :param table_name: table name to be created
-        :param execution_date: execution date got from Airflow's DAG Run, via Jinja template
-        :param is_incremental: if this table uses incremental load type
-        :param partitions: list of columns to partition table
-        :param extra_query_template_params: additional parameters to be supplied to query template
-        :param spark_session_configs: custom config parameters to be set in spark session
-        :param tree_path: subfolder where the query is located. By default, an empty string, which means it's in the root folder "dw"
-        :param table_customization: table's structure customization, when applicable
-        :return: dict with initial and final tasks of the created task group
-        :rtype: dict[str:list[airflow.models.BaseOperator]]
+        Creates a task to validate data quality rules over the DW Staging table.
+        The rules are exclusive for each table, and are expected to be predefined in a
+        data quality YAML file named after the very same table.
         """
-        layer_enum = LayerEnum.DW_STAGING
-        layer = layer_enum.value
-        table_customization = table_customization or {}
-        extra_query_template_params = extra_query_template_params or {}
+        data_quality_tasks = []
 
-        table_database_schema = self.__get_table_schema(table_customization)
-        table_extraction_type = self.__get_table_extraction_type(
-            table_customization, is_incremental
-        )
-        partitions = self.__get_table_partitions(table_customization, partitions)
-        extra_query_template_params = self.__get_extra_query_template_params(
-            table_customization, extra_query_template_params
-        )
-        incremental_params = (
-            ["{{ ds }}", json.dumps(extra_query_template_params)]
-            if table_extraction_type == "incremental"
-            else []
-        )
-        spark_session_configs = spark_session_configs or {}
-
-        load_table_to_dw_staging_schema_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=self.dag,
-            task_id=DWTaskGroup.generate_default_task_id(
-                task_prefix=DWTaskGroup.LOAD_TASK_PREFIX,
-                layer=layer_enum,
-                schema=table_database_schema,
-                table_name=table_name,
-            ),
-            json={
-                "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/load_{table_extraction_type}_table_to_dw_staging_schema.py",
-                    "parameters": [
-                        self.env,
-                        self.dw_bucket,
-                        table_database_schema,
-                        self.relative_query_path,
-                        table_name,
-                        json.dumps(partitions),
-                    ]
-                    + incremental_params
-                    + [json.dumps(spark_session_configs), tree_path],
-                }
-            },
-            execution_timeout=timedelta(hours=self.execution_timeout_hours),
-        )
-
-        quality_tasks = []
-        if DAGPackagesPathService.data_quality_tests_file_exists_in_composer(
-            self.relative_query_path, layer, table_name
+        if DAGPackagesPathService.artifact_file_exists(
+            artifact_type="data_quality",
+            dag_name=self.relative_query_path,
+            layer=layer,
+            table_name=path.join(tree_path, table_name),
         ):
             config_service = ConfigurationService()
             inmetro_bucket = config_service.get_config("inmetro_bucket")
 
             data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
+                databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
-                task_id=DWTaskGroup.generate_default_task_id(
-                    task_prefix=DWTaskGroup.DATA_QUALITY_TESTS_TASK_PREFIX,
-                    layer=layer_enum,
-                    schema=table_database_schema,
+                task_id=self.generate_default_task_id(
+                    task_prefix=self.DATA_QUALITY_TESTS_TASK_PREFIX,
+                    layer=LayerEnum(layer),
+                    schema=schema,
                     table_name=table_name,
                 ),
                 json={
                     "spark_python_task": {
-                        "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
+                        "python_file": path.join(
+                            self.spark_jobs_path, "data_quality_tests.py"
+                        ),
                         "parameters": [
                             self.env,
                             execution_date,
@@ -338,82 +256,81 @@ class DWTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            load_table_to_dw_staging_schema_task.set_downstream(
-                [data_quality_tests_task]
-            )
-            quality_tasks = [data_quality_tests_task]
+            data_quality_tasks = [data_quality_tests_task]
 
-        if table_extraction_type == "incremental":
-            return DWTaskGroup.format_tasks_boundaries(
-                initial_tasks=[load_table_to_dw_staging_schema_task],
-                final_tasks=[load_table_to_dw_staging_schema_task],
-                independent_tasks=quality_tasks,
-            )
-        else:
-            return self._build_dw_staging_full_load_extra_tasks(
-                load_table_to_dw_staging_schema_task=load_table_to_dw_staging_schema_task,
-                table_name=table_name,
-                table_database_schema=table_database_schema,
-                independent_tasks=quality_tasks,
-            )
+        return data_quality_tasks
 
-    def _build_dw_staging_full_load_extra_tasks(
-        self,
-        load_table_to_dw_staging_schema_task,
-        table_name: str,
-        table_database_schema,
-        independent_tasks: list = [],
-    ) -> dict:
+    def _set_emptiness_test_task(
+        self, layer: str, table_name: str, schema: str, extraction_type: str
+    ) -> list:
         """
-        For full load pipelines, it builds the additional tasks:
-        . emptiness_test_task: validate if table in staging is not empty
-        . add_default_row_to_dim_task: (optional) if table is a dimension, add
-         default row with -1 in primary key column
+        Creates a task to validate if the resulting DW Staging table is not empty.
 
-        :param table_name: table name to be created
-        :param table_database_schema: table's database schema
-        :return: dict with initial and final tasks of the created task group
-        :rtype: dict[str:list[airflow.models.BaseOperator]]
+        # TODO: THIS METHOD MUST BE REVIEWED AND MAY BE REPLACED BY DATA QUALITY
+        VALIDATIONS STEPS INSTEAD OF KEEPING IT IN A SINGLE SEPARATED SPARK JOB SUBMIT.
         """
-        layer_enum = LayerEnum.DW_STAGING
-        layer = layer_enum.value
+        emptiness_test_tasks = []
 
-        # TODO: Remove this test once we decide that our Data Quality validations will block downstream tasks
-        emptiness_test_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=self.dag,
-            task_id=DWTaskGroup.generate_default_task_id(
-                task_prefix=DWTaskGroup.TEST_EMPTINESS_TASK_PREFIX,
-                layer=layer_enum,
-                schema=table_database_schema,
-                table_name=table_name,
-            ),
-            json={
-                "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/emptiness_test.py",
-                    "parameters": [table_database_schema, table_name],
-                }
-            },
-            execution_timeout=timedelta(hours=self.execution_timeout_hours),
-        )
-
-        test_tasks = [emptiness_test_task]
-
-        if self.is_dim(table_name):
-            add_default_row_to_dim_task = QuintoAndarDatabricksSubmitRunOperator(
+        if layer == LayerEnum.DW_STAGING.value and extraction_type == "full":
+            emptiness_test_task = QuintoAndarDatabricksSubmitRunOperator(
+                databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
-                task_id=DWTaskGroup.generate_default_task_id(
-                    task_prefix=DWTaskGroup.ADD_DEFAULT_ROW_TASK_PREFIX,
-                    layer=layer_enum,
-                    schema=table_database_schema,
+                task_id=self.generate_default_task_id(
+                    task_prefix=self.TEST_EMPTINESS_TASK_PREFIX,
+                    layer=LayerEnum(layer),
+                    schema=schema,
                     table_name=table_name,
                 ),
                 json={
                     "spark_python_task": {
-                        "python_file": f"{self.spark_jobs_path}/add_default_row_to_dim.py",
+                        "python_file": path.join(
+                            self.spark_jobs_path, "emptiness_test.py"
+                        ),
+                        "parameters": [schema, table_name],
+                    }
+                },
+                execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            )
+            emptiness_test_tasks.append(emptiness_test_task)
+        return emptiness_test_tasks
+
+    def _set_default_dim_row_task(
+        self, layer: str, table_name: str, schema: str, extraction_type: str
+    ) -> list:
+        """
+        Creates a task to insert a default row into the resulting DW Staging table,
+        with the surrogate key value of `-1`. This new row is used as a fallback
+        value for joins that do not match any dimension attribute and have to return
+        a surrogate key to be used as a fact's foreign key.
+
+        # TODO: THIS METHOD SHALL BE MOVED TO THE SPARK DATAFRAME THAT LOADS THE TABLE
+        INSTEAD OF KEEPING IT IN A SINGLE SEPARATED SPARK JOB SUBMIT.
+        """
+        dim_default_row_tasks = []
+
+        if (
+            layer == LayerEnum.DW_STAGING.value
+            and table_name.startswith("dim_")
+            and extraction_type == "full"
+        ):
+            dim_default_row_task = QuintoAndarDatabricksSubmitRunOperator(
+                databricks_conn_id="databricks_job_cluster",
+                dag=self.dag,
+                task_id=self.generate_default_task_id(
+                    task_prefix=self.ADD_DEFAULT_ROW_TASK_PREFIX,
+                    layer=LayerEnum(layer),
+                    schema=schema,
+                    table_name=table_name,
+                ),
+                json={
+                    "spark_python_task": {
+                        "python_file": path.join(
+                            self.spark_jobs_path, "add_default_row_to_dim.py"
+                        ),
                         "parameters": [
                             self.env,
                             self.dw_bucket,
-                            table_database_schema,
+                            schema,
                             layer,
                             table_name,
                         ],
@@ -421,47 +338,168 @@ class DWTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            chain(
-                load_table_to_dw_staging_schema_task,
-                add_default_row_to_dim_task,
-                test_tasks,
-            )
-        else:
-            chain(load_table_to_dw_staging_schema_task, test_tasks)
+            dim_default_row_tasks.append(dim_default_row_task)
 
-        return DWTaskGroup.format_tasks_boundaries(
-            initial_tasks=[load_table_to_dw_staging_schema_task],
-            final_tasks=test_tasks,
-            independent_tasks=independent_tasks,
+        return dim_default_row_tasks
+
+    def _build_task_group(
+        self,
+        layer: str,
+        table_name: str,
+        execution_date="{{ ds }}",
+        is_incremental: bool = False,
+        partitions: list = None,
+        extra_query_template_params: dict = None,
+        spark_session_configs: dict = None,
+        tree_path: str = "",
+        table_customization: Dict[str, Dict[str, str]] = None,
+    ) -> dict:
+
+        extra_query_template_params = extra_query_template_params or {}
+        spark_session_configs = spark_session_configs or {}
+        table_customization = table_customization or {}
+
+        schema = self.__get_schema(table_customization)
+        extraction_type = self.__get_extraction_type(
+            table_customization, is_incremental
+        )
+        partitions = self.__get_partitions(table_customization, partitions)
+        extra_query_template_params = self.__get_extra_query_template_params(
+            table_customization, extra_query_template_params
         )
 
-    def __get_table_schema(self, table_customization):
-        table_schema = table_customization.get("custom_schema", self.dw_schema)
-        return table_schema
-
-    def __get_table_partitions(self, table_customization, partitions):
-        table_partitions = table_customization.get("partitions", partitions)
-        return table_partitions
-
-    def __get_extra_query_template_params(
-        self, table_customization, extra_query_template_params
-    ):
-        extra_query_template_params = table_customization.get(
-            "extra_query_template_params", extra_query_template_params
+        incremental_args = (
+            ["{{ ds }}", json.dumps(extra_query_template_params)]
+            if extraction_type == "incremental"
+            else []
         )
-        return extra_query_template_params
 
-    def __get_table_extraction_type(self, table_customization, is_incremental):
-        table_extraction_type = table_customization.get(
-            "extraction_type", "incremental" if is_incremental else "full"
+        staging_args = (
+            [self.relative_query_path, json.dumps(spark_session_configs), tree_path]
+            if layer == LayerEnum.DW_STAGING.value
+            else []
         )
-        return table_extraction_type
 
-    @staticmethod
-    def is_dim(table_name: str) -> bool:
-        """
-        Validates whether table is a dim according to name prefix
+        load_table_task = self._set_load_task(
+            layer=layer,
+            schema=schema,
+            table_name=table_name,
+            extraction_type=extraction_type,
+            spark_job_extra_args=[json.dumps(partitions)]
+            + incremental_args
+            + staging_args,
+        )
 
-        :param table_name: table name
-        """
-        return table_name.startswith("dim_")
+        hive_structure_tasks = self._set_hive_structure_tasks(
+            layer=layer,
+            schema=schema,
+            table_name=table_name,
+            sync_mode=self.SINGLE_TABLE,
+        )
+
+        hive_partitions_tasks = self._set_hive_partitions_tasks(
+            layer=layer,
+            schema=schema,
+            table_name=table_name,
+            sync_mode=self.SINGLE_TABLE,
+        )
+
+        metadata_propagator_tasks = self._set_metadata_propagator_tasks(
+            layer=layer,
+            schema=schema,
+            table_name=table_name,
+            metadata_type=MetadataTypeEnum.LINEAGE.value,
+        )
+
+        data_quality_tasks = self._set_data_quality_tasks(
+            layer=layer,
+            table_name=table_name,
+            schema=schema,
+            tree_path=tree_path,
+            execution_date=execution_date,
+        )
+
+        default_dim_row_tasks = self._set_default_dim_row_task(
+            layer=layer,
+            table_name=table_name,
+            schema=schema,
+            extraction_type=extraction_type,
+        )
+
+        emptiness_test_tasks = self._set_emptiness_test_task(
+            layer=layer,
+            table_name=table_name,
+            schema=schema,
+            extraction_type=extraction_type,
+        )
+
+        chain(
+            load_table_task,
+            *hive_structure_tasks,
+            *hive_partitions_tasks,
+            *metadata_propagator_tasks,
+        )
+        chain(load_table_task, *default_dim_row_tasks, *emptiness_test_tasks)
+        load_table_task.set_downstream(data_quality_tasks)
+
+        final_tasks = (
+            emptiness_test_tasks or metadata_propagator_tasks or [load_table_task]
+        )
+
+        return self.format_tasks_boundaries(
+            initial_tasks=[load_table_task],
+            final_tasks=final_tasks,
+            independent_tasks=data_quality_tasks,
+        )
+
+    def build_dw_task_group(
+        self,
+        table_name: str,
+        spectrum_iam_role: str = None,
+        execution_date="{{ ds }}",
+        is_incremental: bool = False,
+        partitions: list = None,
+        extra_query_template_params: dict = None,
+        spark_session_configs: dict = None,
+        tree_path: str = "",
+        has_load_to_redshift_task: bool = True,
+        table_customization: Dict[str, Dict[str, str]] = None,
+    ) -> dict:
+
+        return self._build_task_group(
+            layer=LayerEnum.DW.value,
+            table_name=table_name,
+            execution_date=execution_date,
+            is_incremental=is_incremental,
+            partitions=partitions,
+            extra_query_template_params=extra_query_template_params,
+            spark_session_configs=spark_session_configs,
+            tree_path=tree_path,
+            table_customization=table_customization,
+        )
+
+    def build_dw_staging_task_group(
+        self,
+        table_name: str,
+        spectrum_iam_role: str = None,
+        execution_date="{{ ds }}",
+        is_incremental: bool = False,
+        partitions: list = None,
+        extra_query_template_params: dict = None,
+        spark_session_configs: dict = None,
+        tree_path: str = "",
+        has_load_to_redshift_task: bool = True,
+        table_customization: Dict[str, Dict[str, str]] = None,
+    ) -> dict:
+
+        return self._build_task_group(
+            layer=LayerEnum.DW_STAGING.value,
+            table_name=table_name,
+            execution_date=execution_date,
+            is_incremental=is_incremental,
+            partitions=partitions,
+            extra_query_template_params=extra_query_template_params,
+            spark_session_configs=spark_session_configs,
+            tree_path=tree_path,
+            table_customization=table_customization,
+        )
