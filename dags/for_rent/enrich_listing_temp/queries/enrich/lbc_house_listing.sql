@@ -1,4 +1,4 @@
-WITH 
+WITH  
 house_aud AS (
 --------------------------------------------------------------------------------------------------------
 -- Bring to IMOVEL_AUD datetime for each revision made                                                --
@@ -122,7 +122,62 @@ listing_special_conditions_dates AS (
               ELSE fo.special_condition_type
             END)
 ),
+sale AS (
+  SELECT 
+    lbc.*,
+    COALESCE(ch.country_code, 'Undefined') AS country_code
+  FROM 
+    datalake_ebdb_clean.listing_business_context AS lbc
+  LEFT JOIN
+    datalake_ebdb_country.house AS ch
+        ON ch.id_house = lbc.id_house
+  WHERE 
+    lbc.business_context = 'SALE'
+), 
+sale_only AS (
+  SELECT 
+    sale.*
+  FROM
+    sale
+  LEFT JOIN 
+    datalake_ebdb_listing.lbc_status_version_order AS lbc_version
+      ON lbc_version.id_house = sale.id_house
+  WHERE 
+    lbc_version.id_house IS NULL
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY sale.id_house ORDER BY sale.ts_updated DESC) = 1
+),
 house_listing AS (
+    SELECT
+      CAST(CAST(sa.id_house AS STRING)||'001' AS BIGINT) AS id_house_listing,
+      sa.id_house,
+      sa.country_code,
+      1 AS version,
+      sa.status,
+      sa.status_reason,
+      NULL AS revision_reason,
+      NULL AS rent,
+      NULL AS listing_category,
+      NULL AS last_originals_type,
+      NULL AS last_iorent_type,
+      TRUE AS is_last_version,
+      FALSE AS is_exclusive,
+      FALSE AS is_originals_active,
+      FALSE AS is_iorent_active,
+      sa.ts_created AS ts_listing_version_start,
+      NULL AS ts_listing_version_end,
+      NULL AS ts_last_unpublished,
+      NULL AS dt_last_exclusive_opted_in,
+      NULL AS dt_last_exclusive_opted_out,
+      NULL AS dt_last_originals_opted_in,
+      NULL AS dt_last_originals_opted_out,
+      NULL AS dt_last_iorent_opted_in,
+      NULL AS dt_last_iorent_opted_out
+    FROM
+      sale_only AS sa
+
+    UNION ALL
+
     SELECT
         hl.id_house_listing,
         hl.id_house,
@@ -342,13 +397,13 @@ SELECT
     COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
     hl_c.order_renting,
     heh.name AS who_is_living,
-    COALESCE(hled.is_early_relisting, FALSE) AS is_early_relisting,
-    COALESCE(hled.is_early_demand, FALSE) AS is_early_demand,
+    IF(hled.id_house_listing IS NOT NULL, TRUE, FALSE) AS is_early_relisting,
+    hled.is_early_demand,
     hl.is_last_version,
     hl.is_exclusive,
     hl.is_originals_active,
     hl.is_iorent_active,
-    hled.ts_early_demand_started,
+    CAST(hled.ts_early_demand_started AS TIMESTAMP) AS ts_early_demand_started,
     hl.ts_listing_version_start,
     hl.ts_listing_version_end,
     heh.ts_entrance_started,
