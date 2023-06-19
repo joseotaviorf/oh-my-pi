@@ -64,7 +64,7 @@ BASE_CLOSING_DRAFT AS (
                   ELSE FALSE
             END AS flag_paid_in_closing_day,
             CASE 
-                  WHEN flag_is_before_started_raw IS TRUE AND annulment_input_dt > ts_snapshot THEN TRUE
+                  WHEN flag_is_before_started_raw IS TRUE AND annulment_input_dt > ts_snapshot THEN FALSE
                   ELSE flag_is_before_started_raw 
             END AS flag_is_before_started,
             c.*
