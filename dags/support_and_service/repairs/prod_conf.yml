@@ -15,36 +15,24 @@ tables:
   #   is_incremental: <is_incremental> #optional
   #   date_column: <date_column> #optional
   #   unixtime_measure: <unixtime_measure> #optional
-  instant_approval_preference_aud: {}
   instant_approval_preference:
     is_incremental: True
     date_column: updated_at
-  repair_evidence_aud: {}
   repair_evidence:
     is_incremental: True
     date_column: updated_at
-  repair_expense_aud: {}
   repair_expense: {}
-  repair_expense_group_aud: {}
   repair_expense_group: {}
-  repair_request_aud: {}
   repair_request:
     is_incremental: True
     date_column: updated_at
   repair_request_chat: {}
-  repair_request_item_aud: {}
   repair_request_item:
     is_incremental: True
     date_column: updated_at
   repair_request_tenant_negotiation_follow_up:
     is_incremental: True
     date_column: updated_at
-  revinfo:
-    clean_table_name: rev_info
-    is_incremental: True
-    date_column: revtstmp
-    unixtime_measure: milliseconds
   service_request:
     is_incremental: True
     date_column: updated_at
-  service_request_aud: {}
