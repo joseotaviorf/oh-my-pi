@@ -42,6 +42,8 @@ Produces the following output tables:
     `agent_support_aud`
     `agent_weekly_hours`
     `agent_weekly_hours_aud`
+    `agents_prospect`
+    `agents_prospect_aud`
     `amenities`
     `appointment_change_reason_category`
     `bank`

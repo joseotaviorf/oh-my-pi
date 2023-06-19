@@ -1,7 +1,7 @@
 SELECT
     id AS id_shop_window,
     shopWindowCreatorId AS id_shop_window_creator,
-    agentsProspect_id AS id_demand_contact_submission,
+    agentsProspect_id AS id_agents_prospect,
     externalId AS id_external,
     name AS shop_window_name,
     shopWindowCreatorUserType AS shop_window_creator_user_type,

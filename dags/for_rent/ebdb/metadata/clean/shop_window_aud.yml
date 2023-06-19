@@ -1,6 +1,9 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: shop_window_aud
+domain: Rede
+description: Audit of shop window created by an agent from Rede QuintoAndar.
+owner: gustavo.miller@quintoandar.com.br
 columns:
   id_shop_window:
     lineage:
@@ -8,7 +11,7 @@ columns:
   id_shop_window_creator:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.shopwindowcreatorid
-  id_demand_contact_submission:
+  id_agents_prospect:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.agentsProspect_id
   id_external:
@@ -38,7 +41,7 @@ columns:
   mod_id_shop_window_creator:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.shopwindowcreatorid_mod
-  mod_id_demand_contact_submission:
+  mod_id_agents_prospect:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.agentsProspect_id_MOD
   mod_id_external:

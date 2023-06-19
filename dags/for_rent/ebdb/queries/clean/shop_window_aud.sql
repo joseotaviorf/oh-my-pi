@@ -1,7 +1,7 @@
 SELECT
     id AS id_shop_window,
     shopWindowCreatorId AS id_shop_window_creator,
-    agentsProspect_id AS id_demand_contact_submission,
+    agentsProspect_id AS id_agents_prospect,
     externalId AS id_external,
     name AS shop_window_name,
     shopWindowCreatorUserType AS shop_window_creator_user_type,
@@ -11,7 +11,7 @@ SELECT
     revtype AS rev_type,
     isActive AS is_active,
     shopWindowCreatorId_MOD AS mod_id_shop_window_creator,
-    agentsProspect_id_MOD AS mod_id_demand_contact_submission,
+    agentsProspect_id_MOD AS mod_id_agents_prospect,
     externalId_MOD AS mod_id_external,
     name_MOD AS mod_shop_window_name,
     shopWindowCreatorUserType_MOD AS mod_shop_window_creator_user_type,
