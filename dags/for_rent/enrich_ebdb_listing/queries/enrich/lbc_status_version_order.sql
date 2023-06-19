@@ -60,9 +60,9 @@ business_context_history AS (
       bch.id_house,
       bch.country_code,
       bch.business_context,
-      LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS previous_state_status,
-      LAG(bch.status_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS previous_status_reason,
-      LAG(bch.suspension_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS previous_suspension_reason,
+      LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) AS previous_state_status,
+      LAG(bch.status_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) AS previous_status_reason,
+      LAG(bch.suspension_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) AS previous_suspension_reason,
       LAG(
           CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
       ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS days_in_previous_state,
@@ -79,31 +79,31 @@ business_context_history AS (
         CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER),
         CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
       ) AS days_in_status,
-      LEAD(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS next_status,
-      LEAD(bch.ts_state_started) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS ts_next_status_change,
-      LEAD(bch.status_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS next_status_reason,
-      LEAD(bch.suspension_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS next_suspension_reason,
+      LEAD(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) AS next_status,
+      LEAD(bch.ts_state_started) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) AS ts_next_status_change,
+      LEAD(bch.status_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) AS next_status_reason,
+      LEAD(bch.suspension_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) AS next_suspension_reason,
       LEAD(
           CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
       ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS days_in_next_state,
       bch.ts_state_started,
       bch.ts_state_ended,
       IF(
-        LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) IS NULL
+        LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) IS NULL
         , TRUE
         , FALSE
       ) AS is_first_status,
       LAG(IF(
-        LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) IS NULL
+        LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) IS NULL
         , TRUE
         , FALSE
         )
-      ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started) AS is_previous_first_status,
-      ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC) AS lbc_state_order,
+      ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) AS is_previous_first_status,
+      ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) AS lbc_state_order,
       IF(
         lhs.state_order IS NOT NULL
-        , lhs.state_order + ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC)
-        , ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC)
+        , lhs.state_order + ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended)
+        , ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended)
       ) AS state_order,
       MAX(bch.rev) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS rev,
       MAX(rev.reason) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS revision_reason,
