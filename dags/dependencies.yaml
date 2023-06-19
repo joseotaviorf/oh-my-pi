@@ -214,7 +214,6 @@ bietlejuice.dw_datamarts_spark.for_rent:
 bietlejuice.dw_datamarts_spark.for_rent_cross:
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
 bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -250,7 +249,6 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
   - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
@@ -337,7 +335,6 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-buyer-prospect-status
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
   - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
@@ -2284,7 +2281,6 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings

@@ -1,4 +1,4 @@
-## Datamarts Cross
+## Datamarts Static
 
 ### Purpose
 
@@ -15,9 +15,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 This pipeline creates the following full tables in the schema `dw_datamarts` of data lake:
 
-- `buyer_prospect_status`
-- `funnel_demand_flows`
-- `lead_listing_flows`
+- `talk_to_agent`
 
 ### Additional Information
 

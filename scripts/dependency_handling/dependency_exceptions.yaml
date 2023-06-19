@@ -152,7 +152,6 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
   add:
     - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region
     - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
-    - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
     - bietlejuice.dw_lead:load-dw-public-dim-lead
   remove:
     - bietlejuice.dw_region:load-dw-public-dim-region
@@ -945,7 +944,6 @@ bietlejuice.reverse_tracksale: # Unstandardized, so dependency generator is not 
     - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
     - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
     - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
-    - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-talk-to-agent
     - bietlejuice.dw_listing:load-dw-public-dim-house-listing
     - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
     - bietlejuice.dw_listing:load-dw-public-fact-house-listings

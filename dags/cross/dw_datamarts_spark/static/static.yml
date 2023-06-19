@@ -9,7 +9,5 @@
 #   <datamart_name>: {}
 #     # If the datamart has no inner dependency, declare it as an empty object
 
-cross:
-  buyer_prospect_status: {}
-  funnel_demand_flows: {}
-  lead_listing_flows: {}
+static:
+  talk_to_agent: {}
