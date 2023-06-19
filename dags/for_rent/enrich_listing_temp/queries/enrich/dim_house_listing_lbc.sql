@@ -94,12 +94,18 @@ agents_with_keys AS (
     GROUP BY 1
 ),
 house_listings AS (
-    WITH lbc AS (
+    WITH 
+    lbc AS (
         SELECT
-           id_house,
-           CAST(MAX(CAST((business_context = 'SALE') AS INTEGER)) AS BOOLEAN) AS is_for_sale,
-           CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent
-        FROM datalake_ebdb_listing.listing_business_context
+            id_house,
+            CAST(MAX(CAST((business_context = 'SALE') AS INTEGER)) AS BOOLEAN) AS is_for_sale,
+            CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent,
+            MAX(IF(business_context = 'SALE', status, NULL)) AS house_sale_status,
+            MAX(IF(business_context = 'SALE', status_reason, NULL)) AS house_sale_status_reason,
+            MAX(IF(business_context = 'RENT', status, NULL)) AS house_rent_status,
+            MAX(IF(business_context = 'RENT', status_reason, NULL)) AS house_rent_status_reason
+        FROM 
+            datalake_ebdb_listing.listing_business_context
         GROUP BY 1
     ),
     rl AS (
@@ -148,6 +154,10 @@ house_listings AS (
         h.suites AS house_suites,
         h.parking_slots AS house_garages,
         h.status AS house_status,
+        lbc.house_rent_status,
+        lbc.house_rent_status_reason,
+        lbc.house_sale_status,
+        lbc.house_sale_status_reason,
         h.type AS house_type,
         h.doorman_type AS house_entrance,
         h.parking_slot_type AS house_garage_type,
@@ -249,6 +259,10 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     CAST(hl.house_suites AS SMALLINT) AS house_suites,
     CAST(hl.house_garages AS SMALLINT) AS house_garages,
     hl.house_status,
+    hl.house_rent_status,
+    hl.house_rent_status_reason,
+    hl.house_sale_status,
+    hl.house_sale_status_reason,
     hl.house_type,
     hl.house_entrance,
     hl.house_garage_type,
