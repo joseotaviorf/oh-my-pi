@@ -164,7 +164,12 @@ class DWTaskGroup(BaseTaskGroup):
         return hive_sync_tasks
 
     def _set_metadata_propagator_tasks(
-        self, layer: str, schema: str, table_name: str, metadata_type: str
+        self,
+        layer: str,
+        schema: str,
+        table_name: str,
+        metadata_type: str,
+        tree_path: str = "",
     ) -> list:
         """
         Creates a task that sends an asynchronous POST request to the Metadata
@@ -178,7 +183,7 @@ class DWTaskGroup(BaseTaskGroup):
             artifact_type="metadata",
             dag_name=self.relative_query_path,
             layer=layer,
-            table_name=table_name,
+            table_name=path.join(tree_path, table_name),
         ):
             propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
                 databricks_conn_id="databricks_job_cluster",
@@ -409,6 +414,7 @@ class DWTaskGroup(BaseTaskGroup):
             schema=schema,
             table_name=table_name,
             metadata_type=MetadataTypeEnum.LINEAGE.value,
+            tree_path=tree_path,
         )
 
         data_quality_tasks = self._set_data_quality_tasks(

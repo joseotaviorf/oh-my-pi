@@ -101,6 +101,7 @@ class DatamartsDAGFactory:
                     table_name=table_name,
                     spectrum_iam_role=self.spectrum_iam_role,
                     has_load_to_redshift_task=load_to_redshift,
+                    tree_path=tree_path,
                 )
                 dw_task_group_boundaries[
                     table_name
