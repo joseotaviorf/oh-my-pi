@@ -7,40 +7,40 @@ columns:
   dag_name:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.id_dag
+      - datalake_health_metrics.dag_historical_executions.dag_name
   dag_owner:
     description: WIP
     lineage:
-      - datalake_composer_clean.dag.owners
+      - datalake_health_metrics.dag.dag_owner
   dag_layer:
     description: WIP
     lineage:
-      - datalake_dag_inventory_clean.table
+      - datalake_health_metrics.table.dag_layer
   dt_executed:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.ts_executed
+      - datalake_health_metrics.dag_historical_executions.dt_executed
   ts_dag_started:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_health_metrics.dag_historical_executions.ts_dag_started
   ts_dag_ended:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_health_metrics.dag_historical_executions.ts_dag_ended
   duration_in_minutes:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_health_metrics.dag_historical_executions.duration_in_minutes
   ts_median_started:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_health_metrics.dag_historical_executions.ts_median_started
   ts_median_ended:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_health_metrics.dag_historical_executions.ts_median_ended
   duration_median_in_minutes:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_health_metrics.dag_historical_executions.duration_median_in_minutes

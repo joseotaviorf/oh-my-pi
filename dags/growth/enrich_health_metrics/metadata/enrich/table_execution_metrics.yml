@@ -1,0 +1,54 @@
+database_name: datalake_health_metrics
+table_name: table_execution_metrics
+owner: marcio.gomes@quintoandar.com.br
+domain: Data Growth
+description: WIP
+columns:
+  table_name:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.table_name
+  dag_name:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.dag_name
+  dag_owner:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.dag_owner
+  dag_layer:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.dag_layer
+  task:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.task
+  dt_executed:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.dt_executed
+  ts_task_started:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.ts_task_started
+  ts_task_ended:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.ts_task_ended
+  duration_in_minutes:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.duration_in_minutes
+  ts_median_started:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.ts_median_started
+  ts_median_ended:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.ts_median_ended
+  duration_median_in_minutes:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.table_historical_executions.duration_median_in_minutes

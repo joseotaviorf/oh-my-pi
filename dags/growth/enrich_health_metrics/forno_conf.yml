@@ -7,5 +7,13 @@ custom_cluster:
     max_workers: 3
   spark_version: 11.3.x-scala2.12
 inner_dependencies:
+  top_reference_sla_days:
+    - dag_historical_executions
   dag_execution_metrics:
     - dag_historical_executions
+    - top_reference_sla_days
+  table_historical_executions:
+    - dag_historical_executions
+  table_execution_metrics:
+    - table_historical_executions
+    - top_reference_sla_days

@@ -1,0 +1,14 @@
+database_name: datalake_health_metrics
+table_name: top_reference_sla_days
+owner: marcio.gomes@quintoandar.com.br
+domain: Data Growth
+description: WIP
+columns:
+  dag_owner:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.dag_historical_executions.dag_owner
+  dt_executed:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.dag_historical_executions.dt_executed
