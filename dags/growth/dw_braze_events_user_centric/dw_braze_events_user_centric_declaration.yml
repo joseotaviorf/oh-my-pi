@@ -1,0 +1,20 @@
+dag:
+  name: dw_braze_events_user_centric
+  schedule_start_date: 2020,8,29
+  owner: Data Growth
+workflow:
+  type: query
+  layer: dw
+  custom_schema: braze
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  has_load_to_redshift_task: False
+  extra_query_template_params:
+    year: "{year}"
+    month: "{month}"
+    day: "{day}"
+cluster:
+  type: databricks_10_4_med_memory_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

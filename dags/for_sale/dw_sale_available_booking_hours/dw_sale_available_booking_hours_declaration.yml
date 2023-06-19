@@ -1,0 +1,22 @@
+dag:
+  name: dw_sale_available_booking_hours
+  schedule_start_date: 2020,8,6
+  owner: Data ForSale
+workflow:
+  type: query
+  layer: dw
+  custom_schema: sale
+  default_extraction_type: full
+  tables_customization:
+    fact_daily_listings_available_hours:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_query_template_params:
+        year: "{year}"
+        month: "{month}"
+        day: "{day}"
+cluster:
+  type: databricks_10_4_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

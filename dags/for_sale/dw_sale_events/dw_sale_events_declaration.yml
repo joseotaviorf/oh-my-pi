@@ -1,0 +1,24 @@
+dag:
+  name: dw_sale_events
+  schedule_start_date: 2020,8,6
+  owner: Data ForSale
+workflow:
+  type: query
+  layer: dw
+  custom_schema: sale_events
+  default_extraction_type: full
+  inner_dependencies:
+    dim_sale_cohort_type:
+      - dim_sale_event_type
+    fact_sale_cohort_conversion:
+      - fact_sale_demand_event
+  tables_customization:
+    fact_sale_demand_event:
+      partitions: [year, month, day]
+    fact_sale_cohort_conversion:
+      partitions: [year, month, day]
+cluster:
+  type: databricks_10_4_med_general_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

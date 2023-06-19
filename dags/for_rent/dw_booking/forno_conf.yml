@@ -1,6 +1,0 @@
----
-tables:
-  - table_name: dim_booking
-    partition_cols: [country_code]
-  - table_name: dim_tenant_booking_review
-    partition_cols: []

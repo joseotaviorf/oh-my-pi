@@ -1,0 +1,14 @@
+dag:
+  name: dw_supply_outbound_contacts
+  schedule_start_date: 2022,10,1
+  owner: Data Growth
+workflow:
+  type: query
+  layer: dw
+  custom_schema: supply_outbound_contacts
+  default_extraction_type: full
+cluster:
+  type: databricks_10_4_med_memory_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

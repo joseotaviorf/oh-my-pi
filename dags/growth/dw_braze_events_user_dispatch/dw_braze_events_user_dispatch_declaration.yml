@@ -1,0 +1,30 @@
+dag:
+  name: dw_braze_events_user_dispatch
+  schedule_start_date: 2020,11,1
+  owner: Data Growth
+workflow:
+  type: query
+  layer: dw
+  custom_schema: braze
+  default_extraction_type: full
+  default_partitions: [user_type]
+  tables_customization:
+    fact_campaign_user_dispatch:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_query_template_params:
+        year: "{year}"
+        month: "{month}"
+        day: "{day}"
+    fact_canvas_user_dispatch:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_query_template_params:
+        year: "{year}"
+        month: "{month}"
+        day: "{day}"
+cluster:
+  type: databricks_10_4_min_general_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

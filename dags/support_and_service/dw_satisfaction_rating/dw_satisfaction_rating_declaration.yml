@@ -1,0 +1,19 @@
+dag:
+  name: dw_satisfaction_rating
+  schedule_start_date: 2021,2,7
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This data modeling refers to satisfaction data with the services provided by the QuintoAndar group.
+workflow:
+  type: query
+  layer: dw
+  custom_schema: satisfaction_rating
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  has_load_to_redshift_task: False
+cluster:
+  type: databricks_10_4_med_io-memory_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

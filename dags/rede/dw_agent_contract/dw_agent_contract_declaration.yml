@@ -1,0 +1,27 @@
+dag:
+  name: dw_agent_contract
+  schedule_start_date: 2020,8,6
+  owner: Data Rede
+workflow:
+  type: query
+  layer: dw
+  custom_schema: agent
+  default_extraction_type: full
+  inner_dependencies:
+    fact_agent_contract:
+      - dim_work_contract
+    fact_daily_accredited_agent:
+      - fact_agent_contract
+  tables_customization:
+    fact_daily_accredited_agent:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_query_template_params:
+        year: "{year}"
+        month: "{month}"
+        day: "{day}"
+cluster:
+  type: databricks_10_4_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
