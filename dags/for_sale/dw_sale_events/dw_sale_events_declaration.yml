@@ -5,7 +5,7 @@ dag:
 workflow:
   type: query
   layer: dw
-  custom_schema: sale_events
+  custom_schema: sale
   default_extraction_type: full
   inner_dependencies:
     dim_sale_cohort_type:
