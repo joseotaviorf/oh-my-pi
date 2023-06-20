@@ -43,11 +43,16 @@ WITH base_date AS (
                     ELSE 1
                 END
             ) OVER(PARTITION BY date_trunc('month',dt) ORDER BY DAY(dt) ROWS UNBOUNDED PRECEDING) AS working_days_in_month,
-        -- Fixed holidays
+        -- Fixed holidays + Dinamic days
         CASE
             WHEN DATE_FORMAT(dt, 'MMdd') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225') OR is_br_holliday IS TRUE THEN 'Holiday'
             ELSE 'No holiday'
         END AS is_brz_holiday,
+        -- Fixed holidays + Dinamic days
+        CASE
+            WHEN is_mx_holliday IS TRUE THEN 'Holiday'
+            ELSE 'No holiday'
+        END AS is_mx_holiday,
         dt AS date,
         DATE_FORMAT(dt, 'dd/MM/yyyy') AS brz_date,
         DATE_FORMAT(dt, 'MM/dd/yyyy') AS usa_date,
@@ -66,7 +71,8 @@ WITH base_date AS (
     FROM (
         SELECT
             dt,
-            IF(bz.dt_holiday_start IS NOT NULL, TRUE, FALSE) AS is_br_holliday
+            IF(bz.dt_holiday_start IS NOT NULL, TRUE, FALSE) AS is_br_holliday,
+            IF(mx.dt_holiday_start IS NOT NULL OR mx.holiday_name like 'Revolution Day%' OR bz.holiday_name like 'Good Friday%', TRUE, FALSE) AS is_mx_holliday
         FROM
         (
             -- There are 3 leap years in this range, so calculate 365 * 10 + 3 records
@@ -82,6 +88,11 @@ WITH base_date AS (
                 ON dt = bz.dt_holiday_start
                 AND holiday_category = "Public holiday"
                 AND holiday_name <> 'Public Service Holiday'
+        LEFT JOIN
+            datalake_google_calendar_clean.mexican_holidays AS mx
+                ON dt = mx.dt_holiday_start
+                AND (mx.holiday_category = "Public holiday" OR mx.holiday_name like 'Revolution Day%')
+
     )
 
 
@@ -106,6 +117,7 @@ SELECT
     working_days_in_month,
     MAX(working_days_in_month) OVER (PARTITION BY year, month) AS total_working_days_in_month,
     is_brz_holiday,
+    is_mx_holiday,
     date,
     brz_date,
     usa_date,
@@ -123,7 +135,6 @@ SELECT
     last_year
 FROM
     base_date
-WHERE year = 2023 AND is_brz_holiday =
 UNION ALL
 SELECT
     -1 AS id_date,
@@ -144,6 +155,7 @@ SELECT
     1 AS working_days_in_month,
     1 AS total_working_days_in_month,
     NULL AS is_brz_holiday,
+    NULL AS is_mx_holiday,
     NULL AS date,
     NULL AS brz_date,
     NULL AS usa_date,

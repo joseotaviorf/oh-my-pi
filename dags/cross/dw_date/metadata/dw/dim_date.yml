@@ -1,0 +1,139 @@
+---
+database_name: dw_public
+table_name: dim_date
+owner: fintech-ae@quintoandar.com.br
+domain: cross
+description: Table that has all base structures for hadling dates on QuintoAndar
+columns:
+  sk_date:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.id_date
+  day:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.day
+  day_of_year:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.day_of_year
+  week_day:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.week_day
+  weekday_name:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.weekday_name
+  calendar_week:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.calendar_week
+  weekend:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.weekend
+  month:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.month
+  month_name:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.month_name
+  quarter:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.quarter
+  brz_season:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.brz_season
+  year:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.year
+  year_calendar_week:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.year_calendar_week
+  year_month:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.year_month
+  year_quarter:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.year_quarter
+  working_days_in_month:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.working_days_in_month
+  total_working_days_in_month:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.total_working_days_in_month
+  is_brz_holiday:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.is_brz_holiday
+  is_mx_holiday:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.is_mx_holiday
+  date:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.date
+  brz_date:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.brz_date
+  universal_date:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.universal_date
+  week_start:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.week_start
+  week_end:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.week_end
+  month_start:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.month_start
+  month_end:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.month_end
+  last_day:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.last_day
+  last_week:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.last_week
+  last_2_weeks:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.last_2_weeks
+  last_4_weeks:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.last_4_weeks
+  last_month:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.last_month
+  last_quarter:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.last_quarter
+  last_year:
+    description: ''
+    lineage:
+    - datalake_public_date.aux_date.last_year

@@ -1,0 +1,12 @@
+dag:
+  name: dw_date
+  owner: Data Engineering
+workflow:
+  type: query
+  layer: dw
+  custom_schema: public
+cluster:
+  type: databricks_10_4_min_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

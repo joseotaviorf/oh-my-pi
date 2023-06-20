@@ -419,6 +419,8 @@ bietlejuice.dw_datamarts_spark.support_and_service:
   - bietlejuice.greenseer:load-clean-session
   - bietlejuice.jira:load-clean-issues
   - bietlejuice.sauron:load-clean-session
+bietlejuice.dw_date:
+  - bietlejuice.enrich_public_date:load-enrich-aux-date
 bietlejuice.dw_debt_recovery:
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
@@ -1087,6 +1089,9 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.insider:load-clean-review-feature
   - bietlejuice.sauron:load-clean-session
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
+bietlejuice.enrich_public_date:
+  - bietlejuice.google_calendar:load-clean-mexican-holidays
+  - bietlejuice.google_calendar:load-clean-brazillian-holidays
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows

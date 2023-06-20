@@ -1,0 +1,75 @@
+---
+database_name: datalake_date
+table_name: aux_date
+description: Table that prepares base structure for dim_date
+domain: Cross
+owner: fintech-ae@quintoandar.com.br
+columns:
+  id_date:
+    description: ""
+  day:
+    description: ""
+  day_of_year:
+    description: ""
+  week_day:
+    description: ""
+  weekday_name:
+    description: ""
+  calendar_week:
+    description: ""
+  weekend:
+    description: ""
+  month:
+    description: ""
+  month_name:
+    description: ""
+  quarter:
+    description: ""
+  brz_season:
+    description: ""
+  year:
+    description: ""
+  year_calendar_week:
+    description: ""
+  year_month:
+    description: ""
+  year_quarter:
+    description: ""
+  working_days_in_month:
+    description: ""
+  total_working_days_in_month:
+    description: ""
+  is_brz_holiday:
+    description: ""
+  is_mx_holiday:
+    description: ""
+  date:
+    description: ""
+  brz_date:
+    description: ""
+  usa_date:
+    description: ""
+  universal_date:
+    description: ""
+  week_start:
+    description: ""
+  week_end:
+    description: ""
+  month_start:
+    description: ""
+  month_end:
+    description: ""
+  last_day:
+    description: ""
+  last_week:
+    description: ""
+  last_2_weeks:
+    description: ""
+  last_4_weeks:
+    description: ""
+  last_month:
+    description: ""
+  last_quarter:
+    description: ""
+  last_year:
+    description: ""
