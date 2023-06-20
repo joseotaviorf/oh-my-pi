@@ -1,0 +1,39 @@
+---
+database_name: dw_public
+table_name: dim_country
+description: Contains information about each country QuintoAndar is present.
+domain: cross
+owner: time-data-engineers@quintoandar.com.br
+columns:
+  sk_country_code:
+    lineage:
+      - datalake_ebdb_clean.country.code
+    description: Surrogate key based on the country code
+  id_country:
+    lineage:
+      - datalake_ebdb_clean.country.id
+    description: Country id
+  country_code:
+    lineage:
+      - datalake_ebdb_clean.country.code
+    description: Country code
+  country_name:
+    lineage:
+      - datalake_ebdb_clean.country.name
+    description: Country name
+  default_locale:
+    lineage:
+      - datalake_ebdb_clean.country.default_locale
+    description: Country default locale
+  default_timezone:
+    lineage:
+      - datalake_ebdb_clean.country.default_timezone
+    description: Country default timezone
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.country.ts_created
+    description: Timestamp of when the row was created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.country.ts_updated
+    description: Timestamp of when the row was updated
