@@ -15,3 +15,10 @@ SELECT
     dt_contract_start
 FROM
     datalake_revenue_lines.brokerage_fee
+WHERE
+  contract_guarantee IN (
+    'SeguroFairfax', 
+    'PRO_GUARANTOR', 
+    'RentalDeposit',
+    'Standalone'
+  )

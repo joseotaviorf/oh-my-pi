@@ -49,7 +49,24 @@ brokerage_fees AS (
     accrual_year_month
   FROM
     datalake_revenue_lines.brokerage_fee
+  WHERE
+    contract_guarantee IN (
+      'SeguroFairfax', 
+      'PRO_GUARANTOR', 
+      'RentalDeposit',
+      'Standalone'
+    )
   GROUP BY 1, 5
+),
+
+affiliates_commission AS (
+  SELECT
+    id_contract_ebdb,
+    SUM(IF(brokerage_share = 'ciq', invoice_theorical_amount, 0)) AS affiliates_commission,
+    accrual_year_month
+  FROM
+    datalake_revenue_lines.brokerage_fee
+  GROUP BY 1, 3
 ),
 
 management_fees AS (
@@ -157,6 +174,7 @@ revenue_with_contract AS (
     COALESCE(lp.lp, 0) AS lp,
     COALESCE(ccp.ccp_net, 0) AS ccp_net,
     COALESCE(-1 * bf.agents_commission, 0) AS agents_commission,
+    COALESCE(-1 * ac.affiliates_commission, 0) AS affiliates_commission,
     COALESCE(-1 * bf.brokerage_partner_share, 0) AS brokerage_partner_share,
     COALESCE(-1 * mf.management_partner_share, 0) AS management_partner_share,
     dd.quarter,
@@ -176,6 +194,10 @@ revenue_with_contract AS (
     brokerage_fees AS bf
       ON cc.id_contract = bf.id_contract_ebdb
       AND cc.accrual_year_month = bf.accrual_year_month
+  LEFT JOIN
+    affiliates_commission AS ac
+      ON cc.id_contract = ac.id_contract_ebdb
+      AND cc.accrual_year_month = ac.accrual_year_month
   LEFT JOIN
     service_fee AS sf
       ON cc.id_contract = sf.id_contract_ebdb
@@ -230,6 +252,7 @@ SELECT
   COALESCE(ccp_net, 0) AS ccp_net,
   COALESCE(reservation, 0) AS reservation,
   COALESCE(agents_commission, 0) AS agents_commission,
+  COALESCE(affiliates_commission, 0) AS affiliates_commission,
   COALESCE(brokerage_partner_share, 0) AS brokerage_partner_share,
   COALESCE(management_partner_share, 0) AS management_partner_share,
   COALESCE(dd.quarter, revenue.quarter) AS quarter,
@@ -283,14 +306,16 @@ SELECT
   ccp_net,
   reservation,
   agents_commission,
+  affiliates_commission,
   brokerage_partner_share,
   management_partner_share,
   (management_fee + brokerage_fee + home_insurance) +
     (service_fee + mra + lra + bfi + lp + ccp_net + reservation) +
-    (agents_commission + brokerage_partner_share + management_partner_share) AS net_revenue,
-  management_fee + brokerage_fee + home_insurance AS gross_revenue,
+    (agents_commission + affiliates_commission + brokerage_partner_share + management_partner_share) AS net_revenue,
+  (management_fee + brokerage_fee + home_insurance) +
+    (service_fee + mra + lra + bfi + lp + ccp_net + reservation) AS gross_revenue,
   service_fee + mra + lra + bfi + lp + ccp_net + reservation AS addons_revenue,
-  agents_commission + brokerage_partner_share + management_partner_share AS total_revenue_discounts,
+  agents_commission + affiliates_commission + brokerage_partner_share + management_partner_share AS total_revenue_discounts,
   quarter,
   accrual_year_month,
   dt_month_start,
