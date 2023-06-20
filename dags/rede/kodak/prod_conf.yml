@@ -45,4 +45,8 @@ tables:
   video_aud:
     raw_extraction_type: full
     clean_extraction_type: full
+  watermark_removal:
+    raw_extraction_type: incremental
+    clean_extraction_type: full
+    date_filter_column: updated_at
 partition_cols: ["year", "month", "day"]

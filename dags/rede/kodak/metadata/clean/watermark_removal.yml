@@ -1,0 +1,34 @@
+---
+database_name: datalake_kodak_clean
+table_name: watermark_removal
+description: This table contains the results of watermark removals from the image inspection.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.id
+  id_image_inspection:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.image_inspection_id
+  provider:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.provider
+  url:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.url
+  path:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.path
+  is_successful:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.successful
+  is_chosen:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.chosen
+  ts_created:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.created_at
+  ts_updated:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.updated_at

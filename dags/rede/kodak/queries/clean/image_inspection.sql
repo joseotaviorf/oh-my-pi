@@ -22,6 +22,7 @@ SELECT
     red_flag_sharpness AS has_red_flag_sharpness,
     red_flag_not_property AS has_red_flag_not_property,
     red_flag_aspect_ratio AS has_red_flag_aspect_ratio,
+    red_flag_casamineira AS has_red_flag_casamineira,
     fault_brightness AS has_fault_brightness,
     fault_sharpness AS has_fault_sharpness,
     fault_aspect_ratio AS has_fault_aspect_ratio,

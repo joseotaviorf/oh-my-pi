@@ -74,6 +74,9 @@ columns:
   has_red_flag_aspect_ratio:
     lineage:
       - datalake_kodak_raw.image_inspection.red_flag_aspect_ratio
+  has_red_flag_casamineira:
+    lineage:
+      - datalake_kodak_raw.image_inspection.red_flag_casamineira
   has_fault_brightness:
     lineage:
       - datalake_kodak_raw.image_inspection.fault_brightness
