@@ -1,5 +1,5 @@
 SELECT
-  CONCAT(fde1.sk_rent_flow, '-', fde1.sk_tenant_prospect, '-', fde1.sk_event, '-', fde1.sk_event_type) AS sk_cohort_conversion,
+  CONCAT(fde1.sk_rent_flow, '-', fde1.sk_event, '-', fde1.sk_event_type, '-', fde2.sk_event, '-', fde2.sk_event_type) AS sk_cohort_conversion,
   CONCAT(fde1.sk_event_type, '-', fde2.sk_event_type) AS sk_cohort_type,
   fde1.sk_event AS sk_base_event,
   fde1.sk_event_type AS sk_base_event_type,
@@ -22,15 +22,16 @@ FROM
   dw_rent.fact_rent_demand_events AS fde1
 JOIN 
   dw_rent.fact_rent_demand_events AS fde2 
-    ON (
+    ON fde1.sk_rent_flow = fde2.sk_rent_flow
+      AND fde1.sk_event_type < fde2.sk_event_type
+      AND (
         (fde1.sk_booking > 0 AND fde1.sk_booking = fde2.sk_booking)
         OR (fde1.sk_offer > 0 AND fde1.sk_offer = fde2.sk_offer)
         OR (fde1.sk_proposal > 0 AND fde1.sk_proposal = fde2.sk_proposal)
     )
-    AND fde1.sk_event_type < fde2.sk_event_type
 JOIN
-    dw_public.dim_date AS dd1
-        ON fde1.sk_event_date = dd1.sk_date
+  dw_public.dim_date AS dd1
+    ON fde1.sk_event_date = dd1.sk_date
 JOIN
-    dw_public.dim_date AS dd2
-        ON fde2.sk_event_date = dd2.sk_date
+  dw_public.dim_date AS dd2
+    ON fde2.sk_event_date = dd2.sk_date

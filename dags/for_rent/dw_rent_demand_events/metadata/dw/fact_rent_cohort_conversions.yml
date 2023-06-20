@@ -15,8 +15,8 @@ columns:
       - dw_rent.fact_rent_demand_events.sk_event
       - dw_rent.fact_rent_demand_events.sk_event_type
       - dw_rent.fact_rent_demand_events.sk_rent_flow
-      - dw_rent.fact_rent_demand_events.sk_tenant_prospect
-    description: "Unique key consolidated with the rent flow id + tenant prospect + id + base event id + base event type id."
+    description: "Unique key consolidated with the rent flow id + base event id + base event type id + 
+      base event coverted id + base event type converted id."
   sk_cohort_type:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event_type
