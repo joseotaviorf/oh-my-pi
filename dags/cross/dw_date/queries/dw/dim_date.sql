@@ -33,4 +33,4 @@ SELECT
     last_quarter,
     last_year
 FROM
-    datalake_public_date.aux_date
+    datalake_quintoandar.aux_date

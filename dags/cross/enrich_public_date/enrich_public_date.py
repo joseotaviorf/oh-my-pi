@@ -24,6 +24,7 @@ CONTEXT = "public_date"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
+CUSTOM_SCHEMA = "quintoandar"
 
 config_service = ConfigurationService(DAG_NAME)
 
@@ -81,8 +82,8 @@ datalake_task_group = DatalakeTaskGroup(
 
 enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
+    source_database_base_name=CUSTOM_SCHEMA,
+    target_database_base_name=CUSTOM_SCHEMA,
 )
 
 
