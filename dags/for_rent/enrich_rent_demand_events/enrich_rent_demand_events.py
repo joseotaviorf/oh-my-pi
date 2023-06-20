@@ -103,3 +103,8 @@ for table in tables:
 
 chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
 chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+
+# Set data quality tasks if exists
+independent_tasks = DatalakeTaskGroup.all_independent_tasks(enrich_task_groups)
+if independent_tasks:
+    terminate_cluster_task.set_upstream(independent_tasks)

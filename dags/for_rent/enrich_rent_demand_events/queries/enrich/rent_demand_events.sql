@@ -6,7 +6,7 @@ WITH rent_flow_house_listing AS (
   the same contract found when the rent flow event is CS. 
   In order to not create any trouble and messy analisys, we decided to filter all ids based on the many possible filters since the beginning.
   **/ 
-  SELECT 
+  SELECT
     rf.id_rent_flow,
     rf.id_house,
     COALESCE(
@@ -384,7 +384,11 @@ rent_demand_events AS (
     ct.ts_signed IS NOT NULL
     AND ct.is_active_or_ended = TRUE
 )
-SELECT
+SELECT DISTINCT
+  /** As a rent flow may have N times the same booking/proposal/offer appearing related to different demand steps
+  (e.g. a same booking related to different offers) and we want to every booking/proposal/offer follow the rules proposed
+  on the first CTE, we need to apply a distinct in order to deduplicate it as events start to happen.
+  **/ 
   id_event,
   id_booking,
   id_offer,

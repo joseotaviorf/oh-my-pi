@@ -1,0 +1,13 @@
+---
+table_name: datalake_rent_demand_events.rent_demand_events
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_event:
+    is_complete:
+      severity_level: Error
+  id_event_type:
+    is_complete:
+      severity_level: Error
+  id_rent_flow:
+    is_complete:
+      severity_level: Error
