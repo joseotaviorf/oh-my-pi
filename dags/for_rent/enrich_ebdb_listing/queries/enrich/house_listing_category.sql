@@ -6,6 +6,7 @@ WITH
     SELECT
         id_house,
         listing_version,
+        MAX(is_extended_rental) AS is_extended_rental,
         MAX(state_order) AS max_order_status
     FROM
       datalake_ebdb_listing.lbc_status_version_order
@@ -36,7 +37,8 @@ WITH
         ) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS ts_last_unpublished,
         IF(ms_o.max_order_status IS NOT NULL, lbc_vo.status, NULL) AS last_status,
         IF(ms_o.max_order_status IS NOT NULL, lbc_vo.status_reason, NULL) AS last_status_reason,
-        MAX(lbc_vo.state_order) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS max_order_status_version
+        MAX(lbc_vo.state_order) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS max_order_status_version,
+        ms_o.is_extended_rental
     FROM 
       datalake_ebdb_listing.lbc_status_version_order AS lbc_vo
     LEFT JOIN 
@@ -73,6 +75,7 @@ WITH
         sc_v.category_change AS change_version_status,
         sc_v.category_change_reason AS change_version_status_reason,
         hs_v.ts_last_unpublished,
+        hs_v.is_extended_rental,
         MAX(hs_v.previous_status) AS status_history,
         MAX(hs_v.ts_state_started) AS ts_status_changed,
         MAX(hs_v.last_status) AS status,
@@ -86,7 +89,7 @@ WITH
       status_change_version AS sc_v
         ON hs_v.id_house = sc_v.id_house
         AND hs_v.listing_version = sc_v.listing_version
-    GROUP BY 1, 2, 3, 4, 5, 6
+    GROUP BY 1, 2, 3, 4, 5, 6, 7
   )
 --------------------------------------------------------------------------------------------------------
 -- Create category                                                                                    --
@@ -121,6 +124,7 @@ SELECT
   status_reason,
   revision_reason,
   status_history,
+  is_extended_rental,
   CAST(ts_status_changed AS TIMESTAMP) AS ts_status_changed,
   CAST(ts_listing_version_start AS TIMESTAMP) AS ts_listing_version_start,
   NULLIF(CAST(ts_listing_version_end AS TIMESTAMP), CAST('2200-01-01 12:00:00' AS TIMESTAMP)) AS ts_listing_version_end,

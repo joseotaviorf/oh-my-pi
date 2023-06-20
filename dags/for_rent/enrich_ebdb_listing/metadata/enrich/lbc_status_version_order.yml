@@ -17,6 +17,8 @@ columns:
     description: "Number of days in this specific state, characterized by a combination of status and status_reason."
   days_in_status:
     description: "Number of days in this specific status."
+  is_extended_rental:
+    description: "Boolean indicating if the contract termination was canceled after relisting as early demand."
   listing_version:
     description: "Number of the listing version."
   max_state_order:

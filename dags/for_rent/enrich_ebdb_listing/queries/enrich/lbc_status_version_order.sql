@@ -99,11 +99,11 @@ business_context_history AS (
         , FALSE
         )
       ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) AS is_previous_first_status,
-      ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended) AS lbc_state_order,
+      ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC) AS lbc_state_order,
       IF(
         lhs.state_order IS NOT NULL
-        , lhs.state_order + ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended)
-        , ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, bch.ts_state_ended)
+        , lhs.state_order + ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC)
+        , ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC)
       ) AS state_order,
       MAX(bch.rev) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS rev,
       MAX(rev.reason) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started) AS revision_reason,
@@ -401,6 +401,7 @@ SELECT
   days_in_status,
   trigger_new_version,
   listing_version,
+  IF(revision_reason LIKE '%TERMINATION_CANCELED%', TRUE, FALSE) AS is_extended_rental,
   state_order,
   MAX(max_state_order) OVER(PARTITION BY id_house) AS max_state_order
 FROM 
