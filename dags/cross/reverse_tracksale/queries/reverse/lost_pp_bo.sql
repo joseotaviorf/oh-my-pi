@@ -11,7 +11,7 @@ WITH depublished_listings AS (
     INNER JOIN 
         dw_public.fact_house_listing_status AS fls 
             ON fls.sk_house_listing = fhl.sk_house_listing
-            AND fls.status_history = 'despublicado'
+            AND fls.status_history IN ('despublicado', 'UNPUBLISHED')
     WHERE
         DATE(fls.ts_status_start) = DATE_SUB(current_date, 4)
         AND (dhl.house_unpublished_reason != 'OWNER_CONSEQUENCES_MANAGEMENT' OR dhl.house_unpublished_reason IS NULL)

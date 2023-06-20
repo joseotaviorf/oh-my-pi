@@ -51,6 +51,7 @@ rental_listing AS (
         AND (DATEDIFF(dhl.ts_listing_version_start, CURRENT_DATE) <= 60 OR DATEDIFF(dhl.ts_listing_version_end, CURRENT_DATE) <= 30 OR dhl.ts_listing_version_end IS NULL)
         AND dhl.is_for_rent = TRUE
         AND dhl.status <> 'alugado'
+        AND NOT(dhl.status = 'SUSPENDED' AND dhl.status_reason = 'RENTED')
         AND dhl.rent > 1
     GROUP BY
         1,2

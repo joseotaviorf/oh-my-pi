@@ -14,7 +14,7 @@ WITH depublished_listings AS (
     INNER JOIN
         dw_public.fact_house_listing_status AS fls 
             ON fls.sk_house_listing = fhl.sk_house_listing
-            AND fls.status_history = 'despublicado' -- listing status modification is depublishing
+            AND fls.status_history IN ('despublicado', 'UNPUBLISHED') -- listing status modification is depublishing
     WHERE
         DATE(fls.ts_status_start) = DATE_ADD(CURRENT_DATE(), -4) -- SELECT listings depublished on D-4
         AND (dhl.house_unpublished_reason != 'OWNER_CONSEQUENCES_MANAGEMENT' OR dhl.house_unpublished_reason IS NULL) -- excluding consequence management

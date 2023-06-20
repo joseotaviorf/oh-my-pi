@@ -13,7 +13,7 @@ WITH rent_houses_catalog AS (
     FROM
         dw_public.fact_house_listing_status
     WHERE
-        status_history = 'publicado'
+        status_history IN ('publicado', 'PUBLISHED')
         AND ts_status_start <= CURRENT_TIMESTAMP()
         AND ts_status_start IS NOT NULL
         AND (

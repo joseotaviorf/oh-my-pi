@@ -43,6 +43,7 @@ rental_listing AS (
         AND (DATEDIFF(current_date, dhl.ts_listing_version_start) <= 60 OR DATEDIFF(current_date, dhl.ts_listing_version_end) <= 30 OR dhl.ts_listing_version_end IS NULL)
         AND dhl.is_for_rent = true
         AND dhl.status <> 'alugado'
+        AND NOT(dhl.status = 'SUSPENDED' AND dhl.status_reason = 'RENTED')
         AND dhl.rent > 1
 ),
 ev AS (
