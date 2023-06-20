@@ -38,7 +38,7 @@ WITH
         IF(ms_o.max_order_status IS NOT NULL, lbc_vo.status, NULL) AS last_status,
         IF(ms_o.max_order_status IS NOT NULL, lbc_vo.status_reason, NULL) AS last_status_reason,
         MAX(lbc_vo.state_order) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS max_order_status_version,
-        ms_o.is_extended_rental
+        MAX(ms_o.is_extended_rental) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS is_extended_rental
     FROM 
       datalake_ebdb_listing.lbc_status_version_order AS lbc_vo
     LEFT JOIN 
