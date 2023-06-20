@@ -445,8 +445,11 @@ class DWTaskGroup(BaseTaskGroup):
             *hive_partitions_tasks,
             *metadata_propagator_tasks,
         )
-        chain(load_table_task, *default_dim_row_tasks, *emptiness_test_tasks)
-        load_table_task.set_downstream(data_quality_tasks)
+        chain(
+            load_table_task,
+            *default_dim_row_tasks,
+            [*emptiness_test_tasks, *data_quality_tasks],
+        )
 
         final_tasks = (
             emptiness_test_tasks or metadata_propagator_tasks or [load_table_task]
