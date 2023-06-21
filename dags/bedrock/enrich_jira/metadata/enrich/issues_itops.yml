@@ -1,136 +1,191 @@
 ---
 database_name: datalake_jira
 table_name: issues_itops
+domain: BedRock
+owner: marcelo.farinaro@quintoandar.com.br
+description: this table contains the help desk tickets of the ITOps team
 columns:
-  id:
+  id: 
     lineage:
       - datalake_jira_clean.issues.id
+    description: primary key of the table 
   id_issue:
     lineage:
       - datalake_jira_clean.issues.key
-  request_type:
+    description: Key of issue on Jira
+  request_type: 
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Issue request type
   summary:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Issue summary
   issue_description:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Issue description
   category:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Service category
   current_status:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Issue current status
   reporter_name:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Issue reporter name
   reporter_email:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Issue reporter email
   creator_name:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Issue creator name
   creator_email:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Issue creator email
   departament:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Department of the requester
   service_location:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Not used anymore
   assignee_name:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Name of assignee to resolve the issue 
   assignee_email:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Email of Assignee to resolve the issue 
   support_level:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Issue support level
   priority_defined_by_support:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: From the Lowest priority P3 to Highest P1
   qtd_comments:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Number of comments on the issue
   satisfaction:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Satisfaction rate for the requester (1 to 5)
   sub_category:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Issue second category
   incident_type_old:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Incident type detail
   software_incident_old:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Not used anymore
   incident_computer_os:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Computer's Operating System
   software_access_old:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Not used anymore
   software_category_old:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Not used anymore
   company:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Company of the requester
   service_category:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Service category
   access_software_name_others:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Open field for software that is not in the approved list
   access_software_name:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: list of approved software
   access_approval_groups:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Name of the group which is responsible to approve the access request
   resolution:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Type of reolution of the issue 
   queue:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Represents the tribe responsible for the queue
   incidents_activity:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Further details about Incidents
   services_activity:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Further details about Services requests
   sla_time_first_response_hours:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Remaining hours for the first contact with the reporter
   sla_hours:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Remaining Hours for resolution for the issue
   sla_access_approval_hours:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Remaining hours to the approval of the access request (Manager and Owner)
   sla_renewal_hours:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Remaining Hours for the replacement of the machine
+  slo_hours:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: Remaining Hours for resolution for the issue, without pauses
+  sla_target:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: category of SLA for the ticket
   is_temporary_access:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Boolean indicating if the requested access is temporary
   ts_first_response:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Timestamp of the issue first response
   ts_status_category_changed:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Timestamp of the issue status change
   ts_created:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Timestamp of the issue creation
   ts_resolved:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Timestamp of the issue resolution
   ts_updated:
     lineage:
       - datalake_jira_clean.issues.fields
+    description: Timestamp of the last issue update

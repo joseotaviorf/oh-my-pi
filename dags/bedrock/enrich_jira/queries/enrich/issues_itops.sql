@@ -63,6 +63,11 @@ WITH record_selection AS (
         GET_JSON_OBJECT(fields,'$.customfield_12635.value') AS queue,
         GET_JSON_OBJECT(fields,'$.customfield_12445.value') AS incidents_activity,
         GET_JSON_OBJECT(fields,'$.customfield_12434.value') AS services_activity,
+        COALESCE(
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_16745.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)),
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_16745.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2))
+        ) AS slo_hours,
+        GET_JSON_OBJECT(fields,'$.customfield_16603.value') AS sla_target,
         ROW_NUMBER() OVER (PARTITION BY key ORDER BY GET_JSON_OBJECT(fields,'$.updated') DESC) AS row_num
     FROM
         datalake_jira_clean.issues
@@ -112,6 +117,8 @@ SELECT
     sla_hours,
     sla_access_approval_hours,
     sla_renewal_hours,
+    slo_hours,
+    sla_target,
     is_reopened,
     is_temporary_access,
     ts_first_response,
