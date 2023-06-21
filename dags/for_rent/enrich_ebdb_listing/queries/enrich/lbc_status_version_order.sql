@@ -52,6 +52,7 @@ first_publication AS (
     datalake_ebdb_listing.business_context_history
   WHERE
     status = 'PUBLISHED'
+    AND business_context = 'RENT'
   GROUP BY
     id_house
 ),
