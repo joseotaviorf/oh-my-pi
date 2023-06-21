@@ -83,7 +83,7 @@ columns:
   ts_event:
     lineage:
       - datalake_booking.booking.ts_created
-      - datalake_booking.booking.dt_booking
+      - datalake_booking.booking.ts_booking_utc
       - datalake_ebdb_contract.contract.ts_signed
       - datalake_offer.offer.ts_first_sent
       - datalake_offer.offer.ts_analyzed

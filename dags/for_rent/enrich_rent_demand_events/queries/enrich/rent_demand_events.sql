@@ -144,14 +144,14 @@ rent_demand_events AS (
     bk.id_house,                                                                        
     bk.id_agent,                                                                        
     bk.id_rent_flow,                                                                    
-    bk.dt_booking AS ts_event,                                                                  
+    bk.ts_booking_utc AS ts_event,                                                                  
     rf.id_house_listing,                                                                
     rf.id_region,                                                                       
     rf.id_user,                                                                         
     rf.country_code,
-    YEAR(dt_booking) AS year,
-    MONTH(dt_booking) AS month,
-    DAY(dt_booking) AS day
+    YEAR(ts_booking_utc) AS year,
+    MONTH(ts_booking_utc) AS month,
+    DAY(ts_booking_utc) AS day
   FROM
     datalake_booking.booking AS bk
   JOIN
