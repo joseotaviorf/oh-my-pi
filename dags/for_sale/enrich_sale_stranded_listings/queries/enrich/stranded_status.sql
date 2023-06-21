@@ -162,7 +162,8 @@ since it takes a longer time to become offer stranded and thus, occupies a more 
             WHEN visit_stranded_check AND NOT(offer_stranded_check) THEN 'VISIT_STRANDED'
             ELSE 'HEALTH_LISTING'
         END AS stranded_status,
-        ongoing_days_published
+        ongoing_days_published,
+        offer_stranded_check AND visit_stranded_check AS is_offer_and_visit_stranded
     FROM 
         stranded_logic
 ),
@@ -177,7 +178,8 @@ CTE that will help create the status change columns for each listing
         id_first_publication_date,
         id_date, 
         stranded_status,
-        ongoing_days_published AS days_published
+        ongoing_days_published AS days_published,
+        is_offer_and_visit_stranded
     FROM 
         apply_hierarchy
     QUALIFY 
@@ -194,6 +196,7 @@ aux AS (
         LAG(id_date) OVER (PARTITION BY id_sale_listing ORDER BY id_date DESC) AS id_ended_date,
         stranded_status,
         days_published,
+        is_offer_and_visit_stranded,
         ROW_NUMBER() OVER (PARTITION BY id_sale_listing ORDER BY id_date DESC) = 1 AS is_last_status
     FROM
         status_changes
@@ -207,6 +210,7 @@ SELECT
     id_ended_date,
     stranded_status,
     days_published,
+    is_offer_and_visit_stranded,
     is_last_status,
     TO_DATE(CAST(id_started_date AS STRING), 'yyyyMMdd') AS dt_status_started,
     TO_DATE(CAST(NULLIF(id_ended_date, -1) AS STRING), 'yyyyMMdd') AS dt_status_ended

@@ -1,28 +1,71 @@
 ---
 database_name: datalake_sale_stranded_listings
 table_name: stranded_status
+description: >
+  Table containing all the status changes from Stranded to ForSale Listings. We use an expected time approach to receive a visit or offer. Each row is a status in a time period for a listing. Learn more: https://docs.google.com/presentation/d/1I7oPsrLn9u4UIEvRhGPucTD21_VsJo1-L4rSvFahMEU/edit
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   id_sale_listing:
     lineage:
       - datalake_sale_listings.sale_listing_status.id_sale_listing
+    description: >
+      Identification of the listing version, which may be in edition (version 0) or already published (version 1).
   id_house:
     lineage:
       - datalake_sale_listings.sale_listing_status.id_house
+    description:  > 
+      Column referring to the house ID. Can be joined with dw_quintoandar.dim_house and all other sale modeling tables.
   id_region:
     lineage:
       - datalake_sale_listings.sale_listing_status.id_region
+    description: > 
+      ID column of region where house listing is located in. Can be joined with dw_public.dim_region.
   id_first_publication_date:
     lineage:
       - datalake_sale_listings.sale_listing_status.ts_first_publication
+    description: >
+      Column referring to the date ID of the first publication in the Sale context of this listing. Can be joined with dw_public.dim_date to retrieve in date format.
   id_started_date:
     lineage:
       - datalake_quintoandar.aux_date.id_date
+    description: >
+      Column referring to the start date ID of the stranded status of the row in reference. Can be joined with dw_public.dim_date to retrieve in date format.
   id_ended_date:
     lineage:
       - datalake_quintoandar.aux_date.id_date
+    description: >
+      Column referring to the start date ID of the stranded status of the row in reference. Will be null if status is current. Can be joined with dw_public.dim_date to retrieve in date format.
+  stranded_status:
+    description: >
+       Shows the stranded status of a listing. To set this status, we use an expected time approach to receive a visit or offer. Since a listing can have more than one status simultaneously, we define an order of criticality: RECURRENCE_OFFER_STRANDED >> OFFER_STRANDED >> RECURRENCE_VISIT_STRANDED >> VISIT_STRANDED >> HEALTH_LISTING/
+    categories:
+      HEALTH_LISTING: > 
+        Listings that do not fit into any other Stranded category. In other words, they either receive demand normally or do not yet have enough time in publication for us to infer Stranded.
+      OFFER_STRANDED: > 
+        Listings that have been in our database too long and are past the expected time to get an offer. These listings may or may not have been visited before.
+      RECURRENCE_OFFER_STRANDED: > 
+        Listings that have already had their first offer but have been published for a long time without receiving a subsequent offer.
+      RECURRENCE_VISIT_STRANDED: > 
+        Listings that have already had their first visit but have been published for a long time without receiving a further visit.
+      VISIT_STRANDED: >
+        Listings that are past the expected time to get a visit. But they don't have enough time to be considered OFFER_STRANDED.
+  days_published:
+    description: >
+      umber of days the property was published in the context of Sale. With published, we say that it is visible on the QuintoAndar platform.
+  is_offer_and_visit_stranded:
+    description: >
+      Boolean column that indicates if the listing is also Visit Stranded if it has the Offer Stranded status. According to the table construction, for the `stranded_status` column, when a listing is Offer Stranded, we will mark it as Offer Stranded regardless of whether it is also Visit Stranded. This flag is to provide this visibility.
+  is_last_status:
+    description: >
+      This column represents a Boolean flag that indicates whether the tier referring to the observed row is the current status or a status that is part of a listing's history.
   dt_status_started:
     lineage:
       - datalake_quintoandar.aux_date.id_date
+    description: >
+      Column referring to the start date of the stranded status of the row in reference. 
   dt_status_ended:
     lineage:
       - datalake_quintoandar.aux_date.id_date
+    description: >
+      Column referring to the end date of the stranded status of the row in reference. Will be null if status is current.
