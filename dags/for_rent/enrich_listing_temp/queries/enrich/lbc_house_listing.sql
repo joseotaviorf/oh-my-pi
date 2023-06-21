@@ -367,6 +367,17 @@ house_entrance_history AS (
         AND (heh.ts_entrance_started BETWEEN COALESCE(hl.ts_listing_version_start, DATE('1922-01-01')) AND COALESCE(hl.ts_listing_version_end, DATE('2100-01-01'))
         OR COALESCE(hl.ts_listing_version_start, DATE('1922-01-01')) BETWEEN heh.ts_entrance_started AND COALESCE(heh.ts_entrance_ended, DATE('2100-01-01')))
         AND is_last_status_of_day = TRUE
+),
+first_publication AS (
+  SELECT
+    id_house,
+    MIN(ts_state_started) AS ts_first_publication
+  FROM
+    datalake_ebdb_listing.business_context_history
+  WHERE
+    status = 'PUBLISHED'
+  GROUP BY
+    id_house
 )
 SELECT
     hl.id_house_listing,
@@ -409,6 +420,7 @@ SELECT
     CAST(hled.ts_early_demand_started AS TIMESTAMP) AS ts_early_demand_started,
     hl.ts_listing_version_start,
     hl.ts_listing_version_end,
+    fp.ts_first_publication,
     heh.ts_entrance_started,
     hl.ts_last_unpublished,
     hl.dt_last_exclusive_opted_in,
@@ -439,3 +451,6 @@ LEFT JOIN
 LEFT JOIN 
   datalake_ebdb_listing.house_listing_early_demand AS hled
     ON hled.id_house_listing = hl.id_house_listing
+LEFT JOIN 
+  first_publication AS fp
+    ON fp.id_house = hl.id_house

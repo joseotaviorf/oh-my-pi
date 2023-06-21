@@ -132,7 +132,11 @@ house_listings AS (
         hl.ts_listing_version_end,
         h.dt_first_publication AS ts_house_first_publication,
         h.ts_last_publication AS ts_house_last_publication,
-        IF(hl.version > 0, CAST(hl.ts_listing_version_start AS DATE), NULL) AS ts_publication,
+        CASE 
+            WHEN hl.version = 1 THEN hl.ts_first_publication
+            WHEN hl.version > 0 THEN hl.ts_listing_version_start
+            ELSE NULL
+        END AS ts_publication,
         hl.ts_last_unpublished,
         hl.rent,
         rl.rental_administrator,
@@ -324,7 +328,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hlco.ts_consultant_deleted,
     IF(version > 0, hl.ts_listing_version_start, NULL) AS ts_listing_version_start,
     hl.ts_listing_version_end,
-    CAST(hl.ts_publication AS TIMESTAMP) AS ts_publication,
+    hl.ts_publication,
     hl.ts_house_first_publication,
     hl.ts_house_last_publication,
     hl.ts_last_unpublished AS ts_last_de_publication,
