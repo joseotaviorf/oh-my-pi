@@ -275,7 +275,7 @@ WITH new_system AS (
             p.id AS id_propose,
             pv.id_propose_values AS id_propose_values,
             p.id_real_estate AS id_broker,
-            pp.id AS id_house,
+            pp.id + 5000000 AS id_house,
             ua.id AS id_agent,
             c.id AS id_contract,
             p.id_tenant_company + 5000000 AS id_propose_company,

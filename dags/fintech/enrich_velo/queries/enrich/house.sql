@@ -31,7 +31,7 @@ WITH cte_union AS (
 UNION ALL
 (
     SELECT
-        pp.id AS id_house,
+        pp.id + 5000000 AS id_house,
         pt.name AS type,
         a.street,
         a.`number`,

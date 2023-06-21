@@ -163,13 +163,13 @@ UNION ALL
         pp.id_propose_person_type =3 -- "Responsável Principal"
 )
   SELECT
-      pp.id AS id_person,
+      pp.id + 5000000 AS id_person,
       pp.id_propose,
       pp.name,
       pc.email,
       pc.phone,
       s.bureau_name,
-      pd.identification_number AS document,
+      REPLACE(REPLACE(pd.identification_number,'.',''),'-','') AS document,
       s.serasa_score,
       s.risk_score,
       NULL AS risk_classification,

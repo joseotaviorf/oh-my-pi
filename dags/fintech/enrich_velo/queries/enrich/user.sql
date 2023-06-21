@@ -25,7 +25,7 @@ UNION ALL
       QUALIFY
           ROW_NUMBER() OVER (PARTITION BY p.id ORDER BY p.ts_updated DESC) = 1
   )
-  SELECT
+  SELECT DISTINCT
       ua.id AS id_user,
       ua.uuid_person AS uuid_user,
       p.person_name AS name,
