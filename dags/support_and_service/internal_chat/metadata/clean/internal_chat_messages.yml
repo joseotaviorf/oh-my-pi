@@ -5,15 +5,30 @@ columns:
   id_chat:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.chatId
+  id_channel:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.vendor
+  id_message:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.vendor
+  id_user_external:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.externalUser
   id_participant:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.participantId
+  participant_type:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.participantType
   chat_group:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.chatGroup
-  user_external:
+  chat_type:
     lineage:
-      - datalake_internal_chat_raw.chat5a_messages.externalUser
+      - datalake_internal_chat_raw.chat5a_messages.chatType
+  scope:
+    lineage:
+      - datalake_internal_chat_raw.chat5a_messages.scope
   index:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.index
@@ -23,21 +38,15 @@ columns:
   vendor:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.vendor
-  scope:
+  user_external:
     lineage:
-      - datalake_internal_chat_raw.chat5a_messages.scope
+      - datalake_internal_chat_raw.chat5a_messages.externalUser
   message:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.body
   message_attributes:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.attributes
-  participant_type:
-    lineage:
-      - datalake_internal_chat_raw.chat5a_messages.participantType
-  chat_type:
-    lineage:
-      - datalake_internal_chat_raw.chat5a_messages.chatType
   ts_created:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.createdAt

@@ -54,7 +54,7 @@ def _load_partitions_into_datalake(hour):
         df.withColumn("year", lit(execution_date.year))
         .withColumn("month", lit(execution_date.month))
         .withColumn("day", lit(execution_date.day))
-        .withColumn("hour", lit(hour.replace("/", "").split("=")[1]))
+        .withColumn("hour", lit(int(hour.replace("/", "").split("=")[1])))
     )
 
     s3_loader.load_df(
@@ -96,8 +96,6 @@ if __name__ == "__main__":
         msg=Starting spark job...
         """
     )
-
-    execution_date -= timedelta(days=1)
 
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
