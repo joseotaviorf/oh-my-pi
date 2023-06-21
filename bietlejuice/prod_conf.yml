@@ -9,6 +9,7 @@ dags_out_of_pattern:
         "dw_agent_contract",
         "dw_agents_availability",
         "dw_booking",
+        "dw_braze_events_user_dispatch",
         "dw_business_unit_region",
         "dw_call",
         "dw_contract",
@@ -73,6 +74,13 @@ dags_out_of_pattern:
         "reverse_navent_bigquery",
         "reverse_nazare",
         "reverse_tracksale",
+        "wonka.house_main",
+        "wonka.house_amenities",
+        "wonka.house_condo_amenities",
+        "wonka.user_listing_page_viewed_cross_devices",
+        "wonka.user_sale_listing_page_viewed_cross_devices",
+        "wonka.user_sale_agg_search_filters",
+        "wonka.user_agg_search_filters",
     ]
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 databricks_bucket: 5a-databricks

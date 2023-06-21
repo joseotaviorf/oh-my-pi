@@ -25,6 +25,12 @@ class BietlejuiceDependencyHelper:
         """
         Parses the DAG and table name from task name
         """
+        if "wonka" in task_name:
+            # Temporary workaround for bypassing this function
+            # in case Wonka DAGs are used as dependencies
+            dag_name, _ = task_name.split(":")
+            return dag_name, None
+
         if ":load-into-redshift" in task_name:
             return BietlejuiceDependencyHelper._extract_dag_and_table_from_redshift_task(
                 task_name

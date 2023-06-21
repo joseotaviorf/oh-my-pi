@@ -1708,6 +1708,21 @@ bietlejuice.enrich_quinto_messenger:
   - bietlejuice.quinto_messenger:load-clean-channel-event
   - bietlejuice.quinto_messenger:load-clean-task
   - bietlejuice.quinto_messenger:load-clean-task-event
+bietlejuice.enrich_recommendations:
+  - bietlejuice.amplitude:170698-user-merge-raw-to-clean
+  - bietlejuice.amplitude:events-raw-to-clean
+  - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-fact-campaign-user-dispatch
+  - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-dim-campaign
+  - bietlejuice.emlio:load-clean-emlio-logs
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
+  - bietlejuice.dw_listing:load-dw-sale-fact-listing-status
+  - wonka.house_main:create-house-main
+  - wonka.house_amenities:create-house-amenities
+  - wonka.house_condo_amenities:create-house-condo-amenities
+  - wonka.user_listing_page_viewed_cross_devices:create-user-listing-page-viewed-cross-devices
+  - wonka.user_sale_listing_page_viewed_cross_devices:create-user-sale-listing-page-viewed-cross-devices
+  - wonka.user_sale_agg_search_filters:create-user-sale-agg-search-filters
+  - wonka.user_agg_search_filters:create-user-agg-search-filters
 bietlejuice.enrich_rede_company:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
