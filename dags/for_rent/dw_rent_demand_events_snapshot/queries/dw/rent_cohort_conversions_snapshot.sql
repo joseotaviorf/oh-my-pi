@@ -35,8 +35,6 @@ SELECT
     COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-7') AS vc2ds,
     COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-8') AS vc2ca,
     COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-9') AS vc2cs,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-3') AS vc2oa,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-3') AS vc2oa,
     COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '3-4') AS os2oa,
     COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '3-4') AS os2es,
     COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '3-6') AS os2ep,
@@ -88,4 +86,4 @@ LEFT JOIN
 LEFT JOIN 
     dw_public.dim_proposal AS dp
         ON fc.sk_proposal = dp.sk_proposal
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 49, 50, 51, 52, 53, 54, 55, 56
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 47, 48, 49, 50, 51, 52, 53, 54
