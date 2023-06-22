@@ -1,0 +1,143 @@
+---
+database_name: dw_rent_snapshot
+table_name: rent_cohort_conversions_snapshot
+description: "This table has the dailies snapshots data based on the fact_rent_cohort_conversions, creating a full historical
+  of the changes, allowing to understand data updates through time.
+  The table has aggregated sums of cohort conversions of the rental funnel, which is also the base used to build the rent
+  cohort conversions event metric.
+  Each line has the total volume of the cohort conversion by its dimensions on a daily snapshot."
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_snapshot:
+    description: "Date of the snapshot transformed into a number."
+  halfyear:
+    description: "1 if the event month is from the first half of the year and 2 if it is from the last half."
+  quarter:
+    description: "Quarter information of the event date."
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+    description: "Group which the city of the event belongs."
+  tier:
+    lineage:
+      - dw_public.dim_region.city_group
+    description: "Tier information based on the city group of the event."
+  business_type:
+    lineage:
+      - dw_public.dim_house_listing.first_consultant_type
+    description: "Business type related to the listing of the event."
+  listing_category_start:
+    lineage:
+      - dw_public.dim_house_listing.listing_category_start
+    description: "Listing category start information coming from the house listing."
+  rent_flow_origin:
+    lineage:
+      - dw_datamarts.funnel_demand_flows.funnel_first_touchpoint
+    description: "Funnel first touchpoint information based on the information available on the column with the same name from funnel_demand_flows."
+  rental_administrator:
+    lineage:
+      - dw_public.dim_house_listing.rental_administrator
+    description: "Rental administrator related to the event."
+  vb2vc:
+    description: "Total volume of the conversion visit booked to visit completed."
+  vb2os:
+    description: "Total volume of the conversions visit booked to offer submitted."
+  vb2oa:
+    description: "Total volume of the conversions visit booked to offer approved."
+  vb2es:
+    description: "Total volume of the conversion visit booked to evaluation started."
+  vb2ep:
+    description: "Total volume of the conversion visit booked to evaluation positive."
+  vb2ds:
+    description: "Total volume of the conversion visit booked to documentation sent."
+  vb2ca:
+    description: "Total volume of the conversion visit booked to credit approved."
+  vb2cs:
+    description: "Total volume of the conversion visit booked to contract signed."
+  vc2os:
+    description: "Total volume of the conversion visit completed to offer submitted."
+  vc2oa:
+    description: "Total volume of the conversions visit completed to offer approved."
+  vc2es:
+    description: "Total volume of the conversions visit completed to evaluation started."
+  vc2ep:
+    description: "Total volume of the conversion visit completed to evaluation positive."
+  vc2ds:
+    description: "Total volume of the conversion visit completed to documentation sent."
+  vc2ca:
+    description: "Total volume of the conversion visit completed to credit approved."
+  vc2cs:
+    description: "Total volume of the conversion visit completed to contract signed."
+  os2oa:
+    description: "Total volume of the conversions offer submitted to offer approved."
+  os2es:
+    description: "Total volume of the conversions offer submitted to evaluation started."
+  os2ep:
+    description: "Total volume of the conversion offer submitted to evaluation positive."
+  os2ds:
+    description: "Total volume of the conversion offer submitted to documentation sent."
+  os2ca:
+    description: "Total volume of the conversion offer submitted to credit approved."
+  os2cs:
+    description: "Total volume of the conversion offer submitted to contract signed."
+  oa2es:
+    description: "Total volume of the conversions offer approved to evaluation started."
+  oa2ep:
+    description: "Total volume of the conversion offer approved to evaluation positive."
+  oa2ds:
+    description: "Total volume of the conversion offer approved to documentation sent."
+  oa2ca:
+    description: "Total volume of the conversion offer approved to credit approved."
+  oa2cs:
+    description: "Total volume of the conversion offer approved to contract signed."
+  es2ep:
+    description: "Total volume of the conversion evaluation started to evaluation positive."
+  es2ds:
+    description: "Total volume of the conversion evaluation started to documentation sent."
+  es2ca:
+    description: "Total volume of the conversion evaluation started to credit approved."
+  es2cs:
+    description: "Total volume of the conversion evaluation started to contract signed."
+  ep2ds:
+    description: "Total volume of the conversion evaluation positive to documentation sent."
+  ep2ca:
+    description: "Total volume of the conversion evaluation positive to credit approved."
+  ep2cs:
+    description: "Total volume of the conversion evaluation positive to contract signed."
+  ds2ca:
+    description: "Total volume of the conversion documentation sent to credit approved."
+  ds2cs:
+    description: "Total volume of the conversion documentation sent to contract signed."
+  ca2cs:
+    description: "Total volume of the conversion credit approved to contract signed."
+  has_guarantee:
+    description: "Boolean indicating if the event has a guarantee related.
+      It's important to notice that if the event type is from 1 to 4 (VB til OA), the guarantee flag is automatically false.
+      If the event type is equal or bigger than 5 (EA til CS), the flag is related to the proposal's guarantee type if it's RentalGuarantee."
+  dt_event:
+    lineage:
+    - dw_public.dim_date.date
+    description: "Date of the base event."
+  dt_week_started:
+    lineage:
+    - dw_public.dim_date.date
+    description: "Week date of the event."
+  ts_snapshot:
+    description: "Load timestamp, which is the snapshot timestamp."
+  country_code: 
+    lineage:
+    - dw_rent.fact_rent_cohort_conversions.country_code
+    description: "Country code information, also a partition."
+  year:
+    lineage:
+      - dw_rent.fact_rent_cohort_conversions.ts_load
+    description: "Year related to the load of the data into our system in order to create the snapshot. It's also a partition."
+  month:
+    lineage:
+      - dw_rent.fact_rent_cohort_conversions.ts_load
+    description: "Month related to the load of the data into our system in order to create the snapshot. It's also a partition."
+  day:
+    lineage:
+      - dw_rent.fact_rent_cohort_conversions.ts_load
+    description: "Day related to the load of the data into our system in order to create the snapshot. It's also a partition."
