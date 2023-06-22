@@ -30,8 +30,8 @@ def _prepare_address(row):
     ]
 
     return {
-        "id_address": row["id_address"],
         "address_type": row["address_type"],
+        "id_address": row["id_address"],
         "complete_address": ", ".join([row[key] for key in desired_keys if row[key]])
     }
 
@@ -127,8 +127,8 @@ if __name__ == "__main__":
 
     df = spark_client.conn.sql("""
         SELECT
-            c.id_condo AS id_address,
             "condo" AS address_type,
+            c.id_condo AS id_address,
             c.address,
             c.number,
             c.neighborhood,
@@ -188,7 +188,7 @@ if __name__ == "__main__":
         new_data = spark_client.conn.createDataFrame(successes, schema)
         new_data = new_data.withColumn("id_dejavu", calculate_dejavu_id(new_data.latitude, new_data.longitude))
         new_data = new_data.drop(*["latitude", "longitude"])
-        column_order = ["id_dejavu", "id_address", "address_type", "complete_address", "ts_updated"]
+        column_order = ["id_dejavu", "address_type", "id_address", "complete_address", "ts_updated"]
         new_data_reordered = new_data.select(column_order)
         new_data_reordered.write.mode("append").insertInto(addresses_s2_geometry_mapping_table)
     except Exception as e:
