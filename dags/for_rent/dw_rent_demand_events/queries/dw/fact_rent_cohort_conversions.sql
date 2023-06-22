@@ -1,8 +1,10 @@
-SELECT
+SELECT DISTINCT
   CONCAT(fde1.sk_rent_flow, '-', fde1.sk_event, '-', fde1.sk_event_type, '-', fde2.sk_event, '-', fde2.sk_event_type) AS sk_cohort_conversion,
   CONCAT(fde1.sk_event_type, '-', fde2.sk_event_type) AS sk_cohort_type,
   fde1.sk_event AS sk_base_event,
   fde1.sk_event_type AS sk_base_event_type,
+  fde2.sk_event AS sk_conversion_event,
+  fde2.sk_event_type AS sk_conversion_event_type,
   fde1.sk_rent_flow, 
   fde1.sk_tenant_prospect,
   fde1.sk_house,

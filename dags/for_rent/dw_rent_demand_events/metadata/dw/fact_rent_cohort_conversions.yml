@@ -29,6 +29,14 @@ columns:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event_type
     description: "Key of the base event type (indicating if the event is a VB, OS, etc.). It joins with dw_rent.fact_rent_demand_events."
+  sk_conversion_event:
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_event
+    description: "Key of the conversion event. It joins with dw_rent.fact_rent_demand_events."
+  sk_conversion_type: 
+    lineage:
+      - dw_rent.fact_rent_demand_events.sk_event_type
+    description: "Key of the conversion event type (indicating if the event is a VC, OS, etc.). It joins with dw_rent.fact_rent_demand_events."
   sk_rent_flow:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_rent_flow
