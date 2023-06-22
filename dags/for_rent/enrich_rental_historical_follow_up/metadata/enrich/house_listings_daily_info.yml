@@ -26,12 +26,19 @@ columns:
     lineage:
     - datalake_ebdb_listing.house_entrance_history.id_occupant
     description: The Id of the occupant of the house.
+    categories:
+      '1': None
+      '2': Tenant
+      '3': Owner
+      '4': Empty
   id_partner:
     lineage:
     - datalake_pro_owners.house_b2b_history.id_partner
+    description: ID of the real estate partner company that is related to the lead/property, if we acquired from them.
   id_partner_big_agent:
     lineage:
     - datalake_big_agent.house_consultant_history.id_partner
+    description: ID of the agent.
   id_region:
     lineage:
     - datalake_ebdb_listing.house.id_region
@@ -54,7 +61,8 @@ columns:
     description: Where the listing's key was first placed.
   key_location:
     lineage:
-    - datalake_ebdb_listing.house_entrance_history.rent
+    - datalake_ebdb_listing.house_entrance_history.key_location
+    description: Declared location of this house's key for this listing.
   listing_category:
     lineage:
     - datalake_ebdb_listing.house_listing.listing_category
@@ -62,6 +70,7 @@ columns:
   rent:
     lineage:
     - datalake_ebdb_smart_price.rental_price_history.rent
+    description: Rent value of the house.
   status_change_reason:
     lineage:
     - datalake_ebdb_listing.house_listing_status.status_change_reason
