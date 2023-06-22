@@ -1717,8 +1717,8 @@ bietlejuice.enrich_recommendations:
   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-sale-fact-listing-status
   - wonka.house_main:create-house-main
-  - wonka.house_amenities:create-house-amenities
-  - wonka.house_condo_amenities:create-house-condo-amenities
+  - wonka.group_house_amenities_house_condo_amenities_house_maintenance_conditions:create-house-amenities
+  - wonka.group_house_amenities_house_condo_amenities_house_maintenance_conditions:create-house-condo-amenities
   - wonka.user_listing_page_viewed_cross_devices:create-user-listing-page-viewed-cross-devices
   - wonka.user_sale_listing_page_viewed_cross_devices:create-user-sale-listing-page-viewed-cross-devices
   - wonka.user_sale_agg_search_filters:create-user-sale-agg-search-filters
