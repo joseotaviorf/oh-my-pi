@@ -86,7 +86,7 @@ owner_qtd_houses_rental_administrator AS (
   SELECT
     id_owner,
     country_code,
-    COUNT(DISTINCT IF(status_history IN ('alugado', 'publicado', 'suspenso'), id_house, NULL)) AS ongoing_houses,
+    COUNT(DISTINCT IF(status_history IN ('alugado', 'publicado', 'suspenso', 'SUSPENDED', 'PUBLISHED'), id_house, NULL)) AS ongoing_houses,
     COUNT(DISTINCT id_house) AS total_houses,
     IF(rental_administrator = 'OWNER', COUNT(DISTINCT id_house), 0) AS brokerage_only_houses,
     IF(rental_administrator = 'QUINTOANDAR', COUNT(DISTINCT id_house), 0) AS quintoandar_houses,

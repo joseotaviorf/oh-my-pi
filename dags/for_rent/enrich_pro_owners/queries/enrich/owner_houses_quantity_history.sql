@@ -85,7 +85,7 @@ houses_changes_filter AS (
         hlos.rental_administrator,
         sc.ts_event AS ts_status_started,
         CASE
-          WHEN hlos.status_history IN ('alugado', 'publicado', 'suspenso') 
+          WHEN hlos.status_history IN ('alugado', 'publicado', 'suspenso', 'SUSPENDED', 'PUBLISHED')
               AND hlos.is_for_rent = True
               AND is_b2b = False
               AND hlos.id_owner > 0 THEN hlos.id_house
