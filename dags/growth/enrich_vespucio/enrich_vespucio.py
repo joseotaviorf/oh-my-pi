@@ -35,6 +35,9 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 CLUSTER_DESCRIPTION = config_service.get_config("cluster_description")
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
+CUSTOM_LIBRARIES = [
+    {"pypi": {"package": "s2cell"}},
+]
 
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
@@ -42,6 +45,10 @@ athena_query_results_bucket = config_service.get_config("athena_query_results_bu
 
 reverse_spark_job_path = (
     f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{DAG_NAME}/load_s3_data_into_external_bucket.py"
+)
+
+calculate_dejavu_id_job_path = (
+    f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{DAG_NAME}/calculate_dejavu_id.py"
 )
 
 external_s3_bucket = config_service.get_config("external_s3_bucket")
@@ -82,7 +89,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_configuration,
-    libraries=default_libraries,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
@@ -130,8 +137,26 @@ external_bucket_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+calculate_dejavu_id_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id=f"load-enrich-dejavu",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": calculate_dejavu_id_job_path,
+            "parameters": [
+                ENV,
+                DATALAKE_BUCKET,
+                CONTEXT,
+                "{{ ds }}"
+            ],
+        }
+    },
+)
+
+condo_enrich_task_group = enrich_task_groups.pop('condo')
+
 INNER_DEPENDENCIES = {
-    "condo": ["condo_incremental"]
+    "condo_full": ["condo_incremental"]
 }
 
 (
@@ -156,6 +181,19 @@ chain(
         task_groups_boundaries_without_inner_dependencies
     )
     + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
-    external_bucket_task,
-    terminate_cluster_task,
+    calculate_dejavu_id_task,
+    datalake_task_group.first_tasks(condo_enrich_task_group),
+)
+
+external_bucket_task.set_upstream(
+    datalake_task_group.first_tasks(condo_enrich_task_group)
+)
+
+for task in datalake_task_group.last_tasks(condo_enrich_task_group):
+    task.set_downstream(
+        terminate_cluster_task
+    )
+
+terminate_cluster_task.set_upstream(
+    external_bucket_task
 )

@@ -1,6 +1,6 @@
 ---
 database_name: datalake_vespucio
-table_name: condo
+table_name: condo_full
 owner: '@data-growth'
 domain: growth
 description: Contains ebdb and sindiconet enrich data about condominiums.
@@ -165,7 +165,3 @@ columns:
     description: "Timestamp of condominium data last update"
     lineage:
       - datalake_vespucio.condo_incremental.ts_updated
-  id_dejavu:
-    description: "Dejavu Id - unique id for the address"
-    lineage:
-      - datalake_vespucio.condo_geocoding_lat_lng.id_dejavu
