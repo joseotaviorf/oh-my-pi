@@ -10,5 +10,4 @@
 #     # If the datamart has no inner dependency, declare it as an empty object
 
 support_and_service:
-  offboarding_repairs: {}
   strategy_for_chat5a: {}

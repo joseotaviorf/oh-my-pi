@@ -15,7 +15,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 This pipeline creates the following full tables in the schema `dw_datamarts` of data lake:
 
-- `offboarding_repairs`
 - `strategy_for_chat5a`
 
 ### Additional Information
