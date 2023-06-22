@@ -37,8 +37,8 @@ WITH all_listings AS (
     DATE(COALESCE(f.ts_status_end, CURRENT_DATE)) AS dt_status_end,
     f.ts_status_start
     FROM
-        dw_public.fact_house_listing_status AS f
-        INNER JOIN dw_public.dim_house_listing AS dhl
+        datalake_listing_temp.fact_house_listing_status_house AS f
+        INNER JOIN datalake_listing_temp.dim_house_listing_house AS dhl
             ON dhl.sk_house_listing = f.sk_house_listing
     WHERE
         dhl.version > 0
@@ -99,7 +99,7 @@ al_week_status_region AS (
         alm.week_start,
         alm.last_week_start
     FROM al_week_status AS alm
-        LEFT JOIN dw_public.fact_house_listings AS fhl
+        LEFT JOIN datalake_listing_temp.fact_house_listings_house AS fhl
             ON alm.sk_house_listing = fhl.sk_house_listing
         LEFT JOIN dw_public.dim_region AS dr
             ON fhl.sk_region = dr.sk_region
@@ -222,7 +222,7 @@ demand_funnel AS (
     COUNT(NULL) AS credits_approved,
     COUNT(NULL) AS contracts_signed
   FROM
-    dw_public.fact_listing_rent_flows AS flrf
+    datalake_listing_temp.fact_listing_rent_flows_house AS flrf
     JOIN dw_public.dim_booking AS db
         USING(sk_booking)
     JOIN dw_public.dim_date AS dd
@@ -247,7 +247,7 @@ demand_funnel AS (
     COUNT(NULL) AS credits_approved,
     COUNT(NULL) AS contracts_signed
   FROM
-    dw_public.fact_listing_rent_flows AS flrf
+    datalake_listing_temp.fact_listing_rent_flows_house AS flrf
     JOIN dw_public.dim_offer AS o
         USING(sk_offer)
     JOIN dw_public.dim_date AS dd
@@ -272,7 +272,7 @@ demand_funnel AS (
     COUNT(NULL) AS credits_approved,
     COUNT(NULL) AS contracts_signed
   FROM
-    dw_public.fact_listing_rent_flows AS flrf
+    datalake_listing_temp.fact_listing_rent_flows_house AS flrf
     JOIN dw_public.dim_offer AS o
         USING(sk_offer)
     JOIN dw_public.dim_date AS dd
@@ -297,7 +297,7 @@ demand_funnel AS (
       COUNT(DISTINCT flrf.sk_proposal) AS credits_approved,
       COUNT(NULL) AS contracts_signed
   FROM
-      dw_public.fact_listing_rent_flows AS flrf
+      datalake_listing_temp.fact_listing_rent_flows_house AS flrf
       JOIN dw_public.dim_date AS dd
           ON dd.sk_date = flrf.sk_credit_analysis_approved_date
   WHERE
@@ -320,7 +320,7 @@ demand_funnel AS (
     COUNT(NULL) AS credits_approved,
     COUNT(DISTINCT flrf.sk_contract) AS contracts_signed
   FROM
-    dw_public.fact_listing_rent_flows AS flrf
+    datalake_listing_temp.fact_listing_rent_flows_house AS flrf
     JOIN dw_public.dim_date AS dd
         ON dd.sk_date = flrf.sk_contract_signed_date
   WHERE

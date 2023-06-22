@@ -284,9 +284,9 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-budget
   - bietlejuice.casa_mineira_portal:load-clean-uf
   - bietlejuice.dw_lead:load-dw-public-dim-lead
-  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
-  - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
-  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+  - bietlejuice.enrich_listing_temp:load-enrich-dim-house-listing-house
+  - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listing-status-house
+  - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listings-house
   - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
@@ -337,9 +337,10 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
   - bietlejuice.dw_lead:load-dw-public-dim-lead
-  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
-  - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
-  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+  - bietlejuice.enrich_listing_temp:load-enrich-dim-house-listing-house
+  - bietlejuice.enrich_listing_temp:load-enrich-fact-listing-rent-flows-house
+  - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listing-status-house
+  - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listings-house
   - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
   - bietlejuice.dw_offer:load-dw-public-dim-offer
   - bietlejuice.dw_proposal:load-dw-public-dim-proposal
@@ -347,7 +348,6 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-quinto-messenger-agent
   - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-task
   - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-fact-tasks
-  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer

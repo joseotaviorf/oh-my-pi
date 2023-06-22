@@ -24,19 +24,19 @@ columns:
   sk_booking:
     description: Booking identificator
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_booking
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_booking
   sk_offer:
     description: Offer ifentificator
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_offer
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_offer
   sk_proposal:
     description: Proposal ifentificator
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_proposal
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_proposal
   sk_contract:
     description: Contract ifentificator
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_contract
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_contract
   dt_booking_created:
     description: Date of booking creation
     lineage:
@@ -44,7 +44,7 @@ columns:
   flg_visit_completed:
     description: Status of booking visit realization
     lineage:
-      - dw_public.fact_listing_rent_flows.flg_visit_completed
+      - datalake_listing_temp.fact_listing_rent_flows_house.flg_visit_completed
   dt_offer_submitted:
     description: Date of offer submitted
     lineage:

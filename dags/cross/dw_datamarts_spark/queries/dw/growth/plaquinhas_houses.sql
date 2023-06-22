@@ -39,7 +39,7 @@ condo_w_plaquinhas_rent AS (
         hp.listing_type
     FROM
         houses_w_plaquinhas hp
-    JOIN dw_public.dim_house_listing dhl
+    JOIN datalake_listing_temp.dim_house_listing_house dhl
         ON hp.id_house = dhl.id_house
     JOIN dw_public.fact_house_listing_flows f
         ON f.sk_house_listing = dhl.sk_house_listing
@@ -62,7 +62,7 @@ daily_published_listings_rent AS (
         d.month_end,
         ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start DESC NULLS FIRST) AS order_status -- daily order status
     FROM
-        dw_public.fact_house_listing_status f
+        datalake_listing_temp.fact_house_listing_status_house f
     JOIN dw_public.dim_date d
         ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) AND COALESCE(DATE_FORMAT(TO_DATE(NULLIF(sk_status_end_date, -1)::STRING, 'yyyyMMdd') - INTERVAL '1' day, 'yyyyMMdd')::BIGINT, DATE_FORMAT(CURRENT_DATE - INTERVAL '1' day, 'yyyyMMdd'))::BIGINT
     WHERE
@@ -92,7 +92,7 @@ plaquinhas_rent AS (
         COALESCE(hp.listing_type) AS listing_type
     FROM
         daily_published_listings_rent fhs
-    LEFT JOIN dw_public.fact_house_listings fhl
+    LEFT JOIN datalake_listing_temp.fact_house_listings_house fhl
         ON fhs.sk_house_listing = fhl.sk_house_listing
     LEFT JOIN houses_w_plaquinhas hp
         ON (fhl.sk_house_listing/1000)::INTEGER = hp.id_house

@@ -35,7 +35,7 @@ rental_funnel AS (
         dd_ca.date AS dt_credit_analysis_approved,
         dd_cs.date AS dt_contract_signed
     FROM
-        dw_public.fact_listing_rent_flows AS flrf
+        datalake_listing_temp.fact_listing_rent_flows_house AS flrf
     JOIN dw_public.dim_date AS dd_bc
         ON flrf.sk_booking_created_date = dd_bc.sk_date
     JOIN dw_public.dim_date AS dd_os
