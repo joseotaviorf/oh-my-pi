@@ -6,13 +6,16 @@ SELECT
   m.deal_delay_rule_b,
   m.deal_delay_rule_c,
   m.deal_delay_rule_d,
+  m.deal_delay_rule_e,
   m.deal_order,
   m.deal_status, 
   m.delay_at_deal_creation,
+  m.bigger_anchor_deal_at_contract,
   m.delay_contaminated_range_rule_a,
   m.delay_contaminated_range_rule_b,
   m.delay_contaminated_range_rule_c,
   m.delay_contaminated_range_rule_d,
+  m.delay_contaminated_range_rule_e,
   m.delta_days,
   m.due_amount,
   m.frequency,
@@ -22,6 +25,7 @@ SELECT
   m.pd_range_rule_b,
   m.pd_range_rule_c,
   m.pd_range_rule_d,
+  m.pd_range_rule_e,
   p1A.provision_factor*due_amount AS provision_balance_p1_delay_a,  
   p2A.provision_factor*due_amount AS provision_balance_p2_delay_a,  
   p3A.provision_factor*due_amount AS provision_balance_p3_delay_a,  
@@ -37,7 +41,11 @@ SELECT
   p1D.provision_factor*due_amount AS provision_balance_p1_delay_d,
   p2D.provision_factor*due_amount AS provision_balance_p2_delay_d,
   p3D.provision_factor*due_amount AS provision_balance_p3_delay_d,
-  p4D.provision_factor*due_amount AS provision_balance_p4_delay_d,  
+  p4D.provision_factor*due_amount AS provision_balance_p4_delay_d,
+  p1E.provision_factor*due_amount AS provision_balance_p1_delay_e,
+  p2E.provision_factor*due_amount AS provision_balance_p2_delay_e,
+  p3E.provision_factor*due_amount AS provision_balance_p3_delay_e,
+  p4E.provision_factor*due_amount AS provision_balance_p4_delay_e,    
   m.risk_type,
   m.user,
   m.is_before_started,
@@ -101,3 +109,15 @@ LEFT JOIN
 LEFT JOIN 
   datalake_losses.provision_factor AS p4C 
     ON (p4C.risk_type = guarantee_type) AND (p4C.pd_range = m.pd_range_rule_c) AND (p4C.sk_provision_rule=4)
+LEFT JOIN 
+  datalake_losses.provision_factor AS p1E
+    ON (p1E.risk_type = m.risk_type) AND (p1E.pd_range = m.pd_range_rule_e) AND (p1E.sk_provision_rule=1)
+LEFT JOIN 
+  datalake_losses.provision_factor AS p2E
+    ON (p2E.risk_type = guarantee_type) AND (p2E.pd_range = m.pd_range_rule_e) AND (p2E.sk_provision_rule=2)
+LEFT JOIN 
+  datalake_losses.provision_factor AS p3E 
+    ON (p3E.risk_type = guarantee_type) AND (p3E.pd_range = m.pd_range_rule_e) AND (p3E.sk_provision_rule=3)
+LEFT JOIN 
+  datalake_losses.provision_factor AS p4E 
+    ON (p4E.risk_type = guarantee_type) AND (p4E.pd_range = m.pd_range_rule_e) AND (p4E.sk_provision_rule=4)

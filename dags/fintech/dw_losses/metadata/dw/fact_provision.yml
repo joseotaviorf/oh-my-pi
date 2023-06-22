@@ -20,67 +20,83 @@ columns:
   provision_balance_p1_delay_a:
     lineage:   
     - datalake_losses.provision.provision_balance_p1_delay_a
-    description: 'Provision balance for the rule A during 2022.'
+    description: 'Provision balance considering the delay contamination rule A and the provision factors from rule 1.'
   provision_balance_p2_delay_a:
     lineage:   
     - datalake_losses.provision.provision_balance_p2_delay_a
-    description: 'Provision balance for the rule A on jan/2023.'
+    description: 'Provision balance considering the delay contamination rule A and the provision factors from rule 2.'
   provision_balance_p3_delay_a:
     lineage:   
     - datalake_losses.provision.provision_balance_p3_delay_a
-    description: 'Provision balance for the rule A on fev/2023.'
+    description: 'Provision balance considering the delay contamination rule A and the provision factors from rule 3.'
   provision_balance_p4_delay_a:
     lineage:   
     - datalake_losses.provision.provision_balance_p4_delay_a
-    description: 'Current provision balance for the rule A.'
+    description: 'Provision balance considering the delay contamination rule A and the provision factors from rule 4.'
   provision_balance_p1_delay_b:
     lineage:   
     - datalake_losses.provision.provision_balance_p1_delay_b
-    description: 'Provision balance for the rule B during 2022.'
+    description: 'Provision balance considering the delay contamination rule B and the provision factors from rule 1.'
   provision_balance_p2_delay_b:
     lineage:   
     - datalake_losses.provision.provision_balance_p2_delay_b
-    description: 'Provision balance for the rule B on jan/2023.'
+    description: 'Provision balance considering the delay contamination rule B and the provision factors from rule 2.'
   provision_balance_p3_delay_b:
     lineage:   
     - datalake_losses.provision.provision_balance_p3_delay_b
-    description: 'Provision balance for the rule B on fev/2023.'
+    description: 'Provision balance considering the delay contamination rule B and the provision factors from rule 3.'
   provision_balance_p4_delay_b:
     lineage:   
     - datalake_losses.provision.provision_balance_p4_delay_b
-    description: 'Current provision balance for the rule B.'
+    description: 'Provision balance considering the delay contamination rule B and the provision factors from rule 4.'
   provision_balance_p1_delay_c:
     lineage:   
     - datalake_losses.provision.provision_balance_p1_delay_c
-    description: 'Provision balance for the rule C during 2022.'
+    description: 'Provision balance considering the delay contamination rule C and the provision factors from rule 1.'
   provision_balance_p2_delay_c:
     lineage:   
     - datalake_losses.provision.provision_balance_p2_delay_c
-    description: 'Provision balance for the rule C on jan/2023.'
+    description: 'Provision balance considering the delay contamination rule C and the provision factors from rule 2.'
   provision_balance_p3_delay_c:
     lineage:   
     - datalake_losses.provision.provision_balance_p3_delay_c
-    description: 'Provision balance for the rule C on fev/2023.'
+    description: 'Provision balance considering the delay contamination rule C and the provision factors from rule 3.'
   provision_balance_p4_delay_c:
     lineage:   
     - datalake_losses.provision.provision_balance_p4_delay_c
-    description: 'Current provision balance for the rule C.'
+    description: 'Provision balance considering the delay contamination rule C and the provision factors from rule 4.'
   provision_balance_p1_delay_d:
     lineage:   
     - datalake_losses.provision.provision_balance_p1_delay_d
-    description: 'Provision balance for the rule D during 2022.'
+    description: 'Provision balance considering the delay contamination rule D and the provision factors from rule 1.'
   provision_balance_p2_delay_d:
     lineage:   
     - datalake_losses.provision.provision_balance_p2_delay_d
-    description: 'Provision balance for the rule D on jan/2023.'
+    description: 'Provision balance considering the delay contamination rule D and the provision factors from rule 2.'
   provision_balance_p3_delay_d:
     lineage:   
     - datalake_losses.provision.provision_balance_p3_delay_d
-    description: 'Provision balance for the rule D on fev/2023.'
+    description: 'Provision balance considering the delay contamination rule D and the provision factors from rule 3.'
   provision_balance_p4_delay_d:
     lineage:   
     - datalake_losses.provision.provision_balance_p4_delay_d
-    description: 'Current provision balance for the rule D.'
+    description: 'Provision balance considering the delay contamination rule D and the provision factors from rule 4.'
+  provision_balance_p1_delay_e:
+    lineage:   
+    - datalake_losses.provision.provision_balance_p1_delay_e
+    description: 'Provision balance considering the delay contamination rule E and the provision factors from rule 1.'
+  provision_balance_p2_delay_e:
+    lineage:   
+    - datalake_losses.provision.provision_balance_p2_delay_e
+    description: 'Provision balance considering the delay contamination rule E and the provision factors from rule 2.'
+  provision_balance_p3_delay_e:
+    lineage:   
+    - datalake_losses.provision.provision_balance_p3_delay_e
+    description: 'Provision balance considering the delay contamination rule E and the provision factors from rule 3.'
+  provision_balance_p4_delay_e:
+    lineage:   
+    - datalake_losses.provision.provision_balance_p4_delay_e
+    description: 'Provision balance considering the delay contamination rule E and the provision factors from rule 4.'
   user:
     lineage:
     - datalake_losses.provision.user

@@ -18,19 +18,23 @@ columns:
     - datalake_losses.closing.accrual_year_month
     description: String with Year number and Month number 'yyyymm' related to the sent date.
   deal_delay_rule_a:
-    description: Rule A related to the delay of the payment.
+    description: Rule A related to the delay of the payment. In this rule we contaminate all deals invoices by the anchor in the negoation and keep the natural debt rolling despite the deal being paid
   deal_delay_rule_b:
-    description: Rule B related to the delay of the payment.
+    description: Rule B related to the delay of the payment. In this rule if the deal is broken we only worsen the roll rate if the deal invoice surpasses the delay at the moment in the negotiation.
   deal_delay_rule_c:
-    description: Rule C related to the delay of the payment.
+    description: Rule C related to the delay of the payment. In this rule if the deal is broken then the dealis contaminated as of rule A, if not we maintain at the delay at the moment in the negotiation.
   deal_delay_rule_d:
-    description: Rule D related to the delay of the payment.
+    description: Rule D related to the delay of the payment. In this rule if the deal is broken then the invoice is contaminated as the delay of the invoice plus the delay at the moment in the negotiation.
+  deal_delay_rule_e:
+    description: Rule E related to the delay of the payment. In this rule if ANY INVOICE is delayed and the contract has a active negotiation then the invoice is contaminated as the delay of the invoice plus the delay at the moment in the negotiation.
   deal_order:
     description: Information related to the deal position.
   deal_status:
     description: Status of the deal.
   delay_at_deal_creation:
     description: Date difference between deal_anchor_due_date and dt_created_deal.
+  bigger_anchor_deal_at_contract:
+    description: The worst debt in active negotiation for the contact.
   delay_contaminated_range_rule_a:
     description: Minimun value for deal_delay_rule_A.
   delay_contaminated_range_rule_b:
@@ -39,6 +43,8 @@ columns:
     description: Minimun value for deal_delay_rule_C.
   delay_contaminated_range_rule_d:
     description: Minimun value for deal_delay_rule_D.
+  delay_contaminated_range_rule_e:
+    description: Minimun value for deal_delay_rule_E.
   delta_days:
     description: Date difference between dt_due_adjs and dt_closing.
   due_amount:
@@ -65,6 +71,8 @@ columns:
     description: Range of the delay in days related to Rule C.
   pd_range_rule_d:
     description: Range of the delay in days related to Rule D.
+  pd_range_rule_e:
+    description: Range of the delay in days related to Rule E.
   risk_type:
     description: Risk type of the deal.
   user:

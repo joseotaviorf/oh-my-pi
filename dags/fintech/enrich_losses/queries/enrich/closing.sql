@@ -32,7 +32,7 @@ BASE_DIM_CONTRACT_INFO AS (
             dpdc.dt_termination,
             CAST(dpdc.ts_analyst_annulment_input AS DATE) AS annulment_input_dt,
             CASE 
-                  WHEN (dpdc.guarantee_type = 'RentalDeposit' OR dpdc.guarantee_type = 'RentalGuarantee' OR dpdc.guarantee_type ='Deposito' or dpdc.guarantee_type = 'PRO_GUARANTOR' OR dpdc.guarantee_type = 'STANDALONE') then TRUE
+                  WHEN (upper(dpdc.guarantee_type) = 'RENTALDEPOSIT' OR upper(dpdc.guarantee_type) = 'RENTALGUARANTEE' OR upper(dpdc.guarantee_type) ='DEPOSITO' or upper(dpdc.guarantee_type) = 'PRO_GUARANTOR' OR upper(dpdc.guarantee_type) = 'STANDALONE') then TRUE
                   ELSE FALSE 
             END AS guarantee_type,
             CASE 

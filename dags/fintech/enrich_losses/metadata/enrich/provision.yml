@@ -33,6 +33,10 @@ columns:
     lineage:
     - datalake_losses.delay.deal_delay_rule_d
     description: Rule D related to the delay of the payment.
+  deal_delay_rule_e:
+    lineage:
+    - datalake_losses.delay.deal_delay_rule_e
+    description: Rule E related to the delay of the payment.
   deal_order:
     lineage:
     - datalake_losses.delay.deal_order
@@ -45,6 +49,10 @@ columns:
     lineage:
     - datalake_losses.delay.delay_at_deal_creation
     description: Date difference between deal_anchor_due_date and dt_created_deal.
+  bigger_anchor_deal_at_contract:
+    lineage:
+    - datalake_losses.delay.bigger_anchor_deal_at_contract
+    description: Worst debt in active negotiation for the contract.
   delay_contaminated_range_rule_a:
     lineage:
     - datalake_losses.delay.delay_contaminated_range_rule_a
@@ -61,6 +69,10 @@ columns:
     lineage:
     - datalake_losses.delay.delay_contaminated_range_rule_d
     description: Minimun value for deal_delay_rule_d.
+  delay_contaminated_range_rule_e:
+    lineage:
+    - datalake_losses.delay.delay_contaminated_range_rule_e
+    description: Minimun value for deal_delay_rule_e.
   delta_days:
     lineage:
     - datalake_losses.delay.delta_days
@@ -129,6 +141,14 @@ columns:
     description: Provision balance for the rule D on fev/2023.
   provision_balance_p4_delay_d:
     description: Current provision balance for the rule D.
+  provision_balance_p1_delay_e:
+    description: Provision balance for the rule e during 2022.
+  provision_balance_p2_delay_e:
+    description: Provision balance for the rule e on jan/2023.
+  provision_balance_p3_delay_e:
+    description: Provision balance for the rule e on fev/2023.
+  provision_balance_p4_delay_e:
+    description: Current provision balance for the rule e.
   risk_type:
     lineage:   
     - datalake_losses.delay.risk_type

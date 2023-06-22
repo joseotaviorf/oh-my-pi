@@ -174,7 +174,8 @@ base_step1_delay AS(
 ),
 base_aux_ref_contract_deals AS(
   SELECT 
-    DISTINCT id_contract, 
+    DISTINCT id_contract,
+    user,
     dt_closing 
   FROM 
     base_step1_delay 
@@ -190,10 +191,11 @@ base_aux_ref_contract_deals_ AS(
 ),
 base_flag_oldest_deal AS(
   SELECT 
-    DISTINCT id_contract, 
+    DISTINCT id_contract,
+    user,
     dt_closing, 
     id_invoice, 
-    row_number() OVER(PARTITION BY id_contract, dt_closing ORDER BY deal_anchor_due_date ASC, dt_created_deal ASC) AS deal_order 
+    row_number() OVER(PARTITION BY id_contract, user, dt_closing ORDER BY deal_anchor_due_date ASC, dt_created_deal ASC) AS deal_order 
   FROM  
     base_step1_delay 
   WHERE 
@@ -215,11 +217,29 @@ base_step2_delay AS(
       ON (aux.id_contract = m.id_contract) AND (aux.dt_closing = m.dt_closing)
   LEFT JOIN 
     base_flag_oldest_deal deal_age 
-      ON (deal_age.id_contract = m.id_contract) AND (deal_age.dt_closing = m.dt_closing) AND (m.id_invoice = deal_age.id_invoice)
+      ON (deal_age.id_contract = m.id_contract) AND (deal_age.dt_closing = m.dt_closing) AND (deal_age.user = m.user) AND (m.id_invoice = deal_age.id_invoice)
 ),
+
+base_step2_delay_append AS (
+
+  SELECT  
+    DISTINCT id_contract,
+    user,
+    dt_closing,
+    min(delay_at_deal_creation) as bigger_anchor_deal_at_contract
+  FROM
+     base_step2_delay
+  WHERE
+     flas_contract_has_deal = 1
+  GROUP BY
+     1,2,3
+),
+
+
 base_step2_delay_mid AS(
   SELECT 
     m.*,
+    f.bigger_anchor_deal_at_contract,
   -- RULE A: Current on 2022 
   -- Set de delay on the time of the anchor of the deal, doesn`t look if the payment is up to date
     CASE WHEN flag_is_invoice_deal = 1 THEN least(full_delay_at_deal, delta_days) ELSE delta_days END AS deal_delay_rule_a,
@@ -232,10 +252,23 @@ base_step2_delay_mid AS(
   -- RULE D: Verifies if the contract has parcels on delay, if not, it will use the delay of the delay of the deal date plus anchor.
     CASE WHEN flag_is_invoice_deal = 1 AND flag_deal_status_on_delay = 'DEAL IN DELAY' THEN delta_days + delay_at_deal_creation
          WHEN flag_is_invoice_deal = 1 AND flag_deal_status_on_delay = 'DEAL ON TIME. DELAY AT ANCHOR' THEN delay_at_deal_creation
-         WHEN flag_is_invoice_deal = 0 THEN delta_days END AS deal_delay_rule_d
+         WHEN flag_is_invoice_deal = 0 THEN delta_days END AS deal_delay_rule_d,
+
+  -- RULE E: In the event of a broken deal ALL delayed debt will be further contaminated
+    CASE WHEN flag_is_invoice_deal = 1 AND flag_deal_status_on_delay = 'DEAL IN DELAY' THEN delta_days + coalesce(f.bigger_anchor_deal_at_contract,0)
+         WHEN flag_is_invoice_deal = 1 AND flag_deal_status_on_delay = 'DEAL ON TIME. DELAY AT ANCHOR' THEN delay_at_deal_creation
+         WHEN flag_is_invoice_deal = 0 AND flas_contract_has_deal = 1 AND delta_days < 0 THEN delta_days + coalesce(f.bigger_anchor_deal_at_contract,0)
+         WHEN flag_is_invoice_deal = 0 AND  flas_contract_has_deal = 1 AND delta_days >=0 THEN delta_days
+         WHEN flag_is_invoice_deal = 0 AND  flas_contract_has_deal = 0 THEN delta_days
+        END AS deal_delay_rule_e
   FROM 
     base_step2_delay m
+  LEFT JOIN
+     base_step2_delay_append as f
+     ON f.id_contract = m.id_contract and f.dt_closing = m.dt_closing and m.user = f.user
 ),
+
+
 base_aux_ref_contract_delays AS(
   SELECT
     dt_closing,
@@ -244,7 +277,8 @@ base_aux_ref_contract_delays AS(
     min(deal_delay_rule_a) AS delay_contaminated_range_rule_a,
     min(deal_delay_rule_b) AS delay_contaminated_range_rule_b,
     min(deal_delay_rule_c) AS delay_contaminated_range_rule_c,
-    min(deal_delay_rule_d) AS delay_contaminated_range_rule_d
+    min(deal_delay_rule_d) AS delay_contaminated_range_rule_d,
+    min(deal_delay_rule_e) AS delay_contaminated_range_rule_e
   FROM 
     base_step2_delay_mid
   GROUP BY 1,2,3
@@ -257,8 +291,10 @@ base_aux_ref_contract_risk AS(
     base_step2_delay_mid
   WHERE 
     frequency = 'extra' 
-    OR frequency = 'early termination' 
+    OR frequency = 'early termination'
+    OR frequency = 'early-termination'  
     OR frequency = 'pos rental'
+    OR frequency = 'pos-rental'
 ),
 base_aux_ref_contract_risk_ AS(
   SELECT 
@@ -273,7 +309,8 @@ base_step3_delay AS(
     aux.delay_contaminated_range_rule_b, 
     aux.delay_contaminated_range_rule_a,  
     aux.delay_contaminated_range_rule_c,  
-    aux.delay_contaminated_range_rule_d, 
+    aux.delay_contaminated_range_rule_d,
+    aux.delay_contaminated_range_rule_e,
     aux_hr.flag_is_HR
   FROM base_step2_delay_mid m
   LEFT JOIN 
@@ -322,6 +359,15 @@ base_step4_delay AS(
          WHEN delay_contaminated_range_rule_d <= -1 THEN 'TotalM +0 (1-30 days)'
          ELSE 'TotalCurrent' 
     END AS pd_range_rule_d,
+    CASE WHEN delay_contaminated_range_rule_E <= -181 THEN 'TotalM +6 (>181 days)'
+         WHEN delay_contaminated_range_rule_E <= -151 THEN 'TotalM +5 (151-180 days)'
+         WHEN delay_contaminated_range_rule_E <= -121 THEN 'TotalM +4 (121-150 days)'
+         WHEN delay_contaminated_range_rule_E <= -91 THEN 'TotalM +3 (91-120 days)'
+         WHEN delay_contaminated_range_rule_E <= -61 THEN 'TotalM +2 (61-90 days)'
+         WHEN delay_contaminated_range_rule_E <= -31 THEN 'TotalM +1 (31-60 days)'
+         WHEN delay_contaminated_range_rule_E <= -1 THEN 'TotalM +0 (1-30 days)'
+         ELSE 'TotalCurrent' 
+    END AS pd_range_rule_e,
     CASE WHEN flag_is_HR IS TRUE THEN 'HR' 
          ELSE 'LR' 
     END AS flag_risk
@@ -336,13 +382,16 @@ SELECT
   deal_delay_rule_b,
   deal_delay_rule_c,
   deal_delay_rule_d,
+  deal_delay_rule_e,
   deal_order,
-  flag_deal_status_on_delay as deal_status, 
+  flag_deal_status_on_delay as deal_status,
+  bigger_anchor_deal_at_contract,
   delay_at_deal_creation,
   delay_contaminated_range_rule_a,
   delay_contaminated_range_rule_b,
   delay_contaminated_range_rule_c,
   delay_contaminated_range_rule_d,
+  delay_contaminated_range_rule_e,
   delta_days,
   due_amount,
   frequency,
@@ -353,6 +402,7 @@ SELECT
   pd_range_rule_b,
   pd_range_rule_c,
   pd_range_rule_d,
+  pd_range_rule_e,
   flag_risk as risk_type,
   user,
   is_before_started,

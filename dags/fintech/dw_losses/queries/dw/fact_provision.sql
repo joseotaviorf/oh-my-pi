@@ -18,6 +18,10 @@ SELECT
     provision_balance_p2_delay_c,
     provision_balance_p3_delay_c,
     provision_balance_p4_delay_c,
+    provision_balance_p1_delay_e,
+    provision_balance_p2_delay_e,
+    provision_balance_p3_delay_e,
+    provision_balance_p4_delay_e,
     user,
     dt_closing,
     NOW() AS ts_load

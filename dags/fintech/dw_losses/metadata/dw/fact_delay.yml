@@ -20,19 +20,23 @@ columns:
   pd_range_rule_a:
     lineage:
     - datalake_losses.delay.pd_range_rule_a
-    description: Range of the delay in days related to Rule A.
+    description: Range of the delay in days related to Rule A. In this rule we contaminate all deals invoices by the anchor in the negoation and keep the natural debt rolling despite the deal being paid.
   pd_range_rule_b:
     lineage:
     - datalake_losses.delay.pd_range_rule_b
-    description: Range of the delay in days related to Rule B.
+    description: Range of the delay in days related to Rule B. In this rule if the deal is broken we only worsen the roll rate if the deal invoice surpasses the delay at the moment in the negotiation.
   pd_range_rule_c:
     lineage:
     - datalake_losses.delay.pd_range_rule_c
-    description: Range of the delay in days related to Rule C.
+    description: Range of the delay in days related to Rule C. In this rule if the deal is broken then the dealis contaminated as of rule A, if not we maintain at the delay at the moment in the negotiation.
   pd_range_rule_d:
     lineage:
     - datalake_losses.delay.pd_range_rule_d
-    description: Range of the delay in days related to Rule D.
+    description: Range of the delay in days related to Rule D. In this rule if the deal is broken then the invoice is contaminated as the delay of the invoice plus the delay at the moment in the negotiation.
+  pd_range_rule_e:
+    lineage:
+    - datalake_losses.delay.pd_range_rule_e
+    description: Range of the delay in days related to Rule E. In this rule if ANY INVOICE is delayed and the contract has a active negotiation then the invoice is contaminated as the delay of the invoice plus the delay at the moment in the negotiation.
   user:
     lineage:
     - datalake_losses.delay.user

@@ -6,6 +6,7 @@ SELECT
     pd_range_rule_b,
     pd_range_rule_c,
     pd_range_rule_d,
+    pd_range_rule_e,
     user,
     dt_closing,
     NOW() AS ts_load
