@@ -159,12 +159,6 @@ class PostgresValidationSuite(DatabaseValidationSuitesExecutor):
         )
         self._validate_connection(db_consumer)
 
-    def validate_redshift(self):
-        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
-            self.auth[DatabaseEnum.DW], SparkClient()
-        )
-        self._validate_connection(db_consumer)
-
     def validate_rental_guarantee(self):
         db_consumer = self.REPOSITORY_CONSUMER_CLASS(
             self.auth[DatabaseEnum.RENTAL_GUARANTEE], SparkClient()
