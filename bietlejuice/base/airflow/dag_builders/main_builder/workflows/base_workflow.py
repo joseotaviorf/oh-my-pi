@@ -30,8 +30,8 @@ class BaseWorkflow(BuilderInterface):
         self.local_tz = timezone("America/Sao_Paulo")
 
     def dag_instance(self):
-        doc_md_chart_url = self.config_service.get_config("doc_md_chart_url")
         schedule_start_date = self._get_start_date()
+        doc_md = self._get_dag_documentation()
 
         dag = DAG(
             dag_id=self.dag_id,
@@ -43,9 +43,7 @@ class BaseWorkflow(BuilderInterface):
             },
             start_date=schedule_start_date,
             schedule_interval=self.dag_args.get("schedule_interval", None),
-            doc_md=BaseDAG.get_dag_doc(self.dag_name).format(
-                chart_url=doc_md_chart_url, dag_id=self.dag_id
-            ),
+            doc_md=doc_md,
         )
 
         return dag
@@ -60,3 +58,22 @@ class BaseWorkflow(BuilderInterface):
         )
 
         return schedule_start_date
+
+    def _get_dag_documentation(self):
+
+        dag_documentation = self.dag_args.get("documentation")
+        doc_md_chart_url = self.config_service.get_config("doc_md_chart_url")
+
+        if dag_documentation:
+            doc_md = BaseDAG.generate_doc_md_str(
+                dag_name=self.dag_name,
+                doc_md_chart_url=doc_md_chart_url,
+                dag_documentation=dag_documentation,
+                dag_owner=self.dag_args["owner"],
+            )
+        else:
+            doc_md = BaseDAG.get_dag_doc(self.dag_name).format(
+                chart_url=doc_md_chart_url, dag_id=self.dag_id
+            )
+
+        return doc_md
