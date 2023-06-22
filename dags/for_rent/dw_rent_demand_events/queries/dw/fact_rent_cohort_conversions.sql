@@ -25,9 +25,9 @@ JOIN
     ON fde1.sk_rent_flow = fde2.sk_rent_flow
       AND fde1.sk_event_type < fde2.sk_event_type
       AND (
-        (fde1.sk_booking > 0 AND fde1.sk_booking = fde2.sk_booking)
-        OR (fde1.sk_offer > 0 AND fde1.sk_offer = fde2.sk_offer)
-        OR (fde1.sk_proposal > 0 AND fde1.sk_proposal = fde2.sk_proposal)
+        (fde1.sk_booking > 0 AND fde1.sk_booking = fde2.sk_booking AND fde1.sk_offer = fde2.sk_offer AND fde1.sk_proposal = fde2.sk_proposal)
+        OR (fde1.sk_offer > 0 AND fde1.sk_offer = fde2.sk_offer AND fde1.sk_booking = fde2.sk_booking AND fde1.sk_proposal = fde2.sk_proposal)
+        OR (fde1.sk_proposal > 0 AND fde1.sk_proposal = fde2.sk_proposal AND fde1.sk_booking = fde2.sk_booking AND fde1.sk_offer = fde2.sk_offer)
     )
 JOIN
   dw_public.dim_date AS dd1
