@@ -95,22 +95,22 @@ if __name__ == "__main__":
 
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="datalake_bucket")
-    parser.add_argument("context", help="context")
+    parser.add_argument("dag_name", help="dag_name")
     parser.add_argument("execution_date", help="execution_date")
     
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
-    context = args.context
+    dag_name = args.dag_name
     execution_date = args.execution_date
 
-    config_service = ConfigurationService(context)
+    config_service = ConfigurationService(dag_name)
     addresses_s2_geometry_mapping_table = config_service.get_config("addresses_s2_geometry_mapping_table")
 
     logger.info(
         f"""m=__main__, environment={environment},
-        datalake_bucket={datalake_bucket}, context={context}
+        datalake_bucket={datalake_bucket}, dag_name={dag_name}
         """
     )
 

@@ -146,7 +146,7 @@ calculate_dejavu_id_task = QuintoAndarDatabricksSubmitRunOperator(
             "parameters": [
                 ENV,
                 DATALAKE_BUCKET,
-                CONTEXT,
+                DAG_NAME,
                 "{{ ds }}"
             ],
         }

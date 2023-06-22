@@ -80,9 +80,7 @@ if __name__ == "__main__":
         if df is not None:
             destination_path = f"v1/{table}/"
             
-            file_name = (
-                f'{table}_{(execution_date.strftime("%Y_%m_%d_%H_%M_%S%z"))}.jsonl'
-            )
+            file_name = f"{table}.jsonl"
 
             with io.StringIO() as json_buffer:
 
