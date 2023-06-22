@@ -94,12 +94,18 @@ agents_with_keys AS (
     GROUP BY 1
 ),
 house_listings AS (
-    WITH lbc AS (
+    WITH 
+    lbc AS (
         SELECT
-           id_house,
-           CAST(MAX(CAST((business_context = 'SALE') AS INTEGER)) AS BOOLEAN) AS is_for_sale,
-           CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent
-        FROM datalake_ebdb_listing.listing_business_context
+            id_house,
+            CAST(MAX(CAST((business_context = 'SALE') AS INTEGER)) AS BOOLEAN) AS is_for_sale,
+            CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent,
+            MAX(IF(business_context = 'SALE', status, NULL)) AS house_sale_status,
+            MAX(IF(business_context = 'SALE', status_reason, NULL)) AS house_sale_status_reason,
+            MAX(IF(business_context = 'RENT', status, NULL)) AS house_rent_status,
+            MAX(IF(business_context = 'RENT', status_reason, NULL)) AS house_rent_status_reason
+        FROM 
+            datalake_ebdb_listing.listing_business_context
         GROUP BY 1
     ),
     rl AS (
@@ -109,8 +115,7 @@ house_listings AS (
             MAX(ts_administrator_changed) AS ts_administrator_changed
         FROM
             datalake_ebdb_listing.rent_listing
-        GROUP BY 
-            1, 2
+        GROUP BY 1, 2
     )
     SELECT
         hl.id_house_listing AS sk_house_listing,
@@ -120,12 +125,18 @@ house_listings AS (
         hl.version,
         awk.first_key_location,
         CAST(hl.status AS STRING) AS status,
+        hl.status_reason,
+        hl.rent_type,
         awk.is_keys_with_agent_eligible,
         hl.ts_listing_version_start,
         hl.ts_listing_version_end,
         h.dt_first_publication AS ts_house_first_publication,
         h.ts_last_publication AS ts_house_last_publication,
-        CAST(hl.ts_listing_version_start AS DATE) AS ts_publication,
+        CASE 
+            WHEN hl.version = 1 THEN hl.ts_first_publication
+            WHEN hl.version > 0 THEN hl.ts_listing_version_start
+            ELSE NULL
+        END AS ts_publication,
         hl.ts_last_unpublished,
         hl.rent,
         rl.rental_administrator,
@@ -147,6 +158,10 @@ house_listings AS (
         h.suites AS house_suites,
         h.parking_slots AS house_garages,
         h.status AS house_status,
+        lbc.house_rent_status,
+        lbc.house_rent_status_reason,
+        lbc.house_sale_status,
+        lbc.house_sale_status_reason,
         h.type AS house_type,
         h.doorman_type AS house_entrance,
         h.parking_slot_type AS house_garage_type,
@@ -200,6 +215,7 @@ house_listings AS (
         h.is_3p_supply_bh,
         h.is_casa_mineira_migration,
         h.is_sale_primary_market,
+        hl.is_extended_rental,
         rl.ts_administrator_changed,
         hl.is_early_demand,
         hl.ts_early_demand_started
@@ -227,7 +243,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hlco.first_consultant_type,
     hl.first_key_location,
     hl.status,
-    '-' AS status_reason,
+    hl.status_reason,
+    hl.rent_type,
     CAST(hl.rent AS DECIMAL(14, 2)) AS rent,
     IF(is_for_rent = TRUE, COALESCE(hl.rental_administrator, 'QUINTOANDAR'), rental_administrator) AS rental_administrator,
     CAST(hl.house_rent AS DECIMAL(14, 2)) AS house_rent,
@@ -247,6 +264,10 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     CAST(hl.house_suites AS SMALLINT) AS house_suites,
     CAST(hl.house_garages AS SMALLINT) AS house_garages,
     hl.house_status,
+    hl.house_rent_status,
+    hl.house_rent_status_reason,
+    hl.house_sale_status,
+    hl.house_sale_status_reason,
     hl.house_type,
     hl.house_entrance,
     hl.house_garage_type,
@@ -281,6 +302,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.is_keys_with_agent_eligible,
     hl.is_last_version,
     hl.is_exclusive,
+    hl.is_extended_rental,
     (bi.is_b2b OR hp.id_house_listing IS NOT NULL) AS is_b2b,
     COALESCE(aa_info.sk_partner_agent IS NOT NULL, FALSE) AS is_autonomous_agent,
     hl.is_originals_active,
@@ -304,9 +326,9 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.dt_last_iorent_opted_out,
     hl.ts_early_demand_started,
     hlco.ts_consultant_deleted,
-    hl.ts_listing_version_start,
+    IF(version > 0, hl.ts_listing_version_start, NULL) AS ts_listing_version_start,
     hl.ts_listing_version_end,
-    CAST(hl.ts_publication AS TIMESTAMP) AS ts_publication,
+    hl.ts_publication,
     hl.ts_house_first_publication,
     hl.ts_house_last_publication,
     hl.ts_last_unpublished AS ts_last_de_publication,
@@ -331,4 +353,4 @@ LEFT JOIN
 LEFT JOIN
     datalake_big_agent.house_rent_listing_consultant AS hlco
         ON hlco.id_house_listing = hl.sk_house_listing
-        AND hlco.is_last_ciq_on_listing = True
+        AND hlco.is_last_ciq_on_listing IS TRUE

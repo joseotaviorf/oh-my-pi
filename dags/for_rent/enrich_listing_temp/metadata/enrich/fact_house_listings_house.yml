@@ -1,5 +1,5 @@
 database_name: datalake_listing_temp
-table_name: fact_house_listings_lbc
+table_name: fact_house_listings_house
 description: Information about events that happened during a house listing's lifetime.
   Each line is a house listing
 domain: For Rent
@@ -7,7 +7,7 @@ owner: jonas.fiorini@quintoandar.com.br
 columns:
   sk_house_listing:
     lineage:
-    - datalake_listing_temp.lbc_house_listing.id_house_listing
+    - datalake_listing_temp.house_listing.id_house_listing
     description: Key of house listing.
   sk_owner:
     lineage:
@@ -51,7 +51,7 @@ columns:
     description: User key of consultant.
   sk_stranded_date:
     lineage:
-    - datalake_listing_temp.lbc_house_listing.dt_stranded
+    - datalake_listing_temp.house_listing.dt_stranded
     description: Key of listing stranded date. A listing is considered stranded after
       at least 8 week published and no contract signed.
   country_code:
@@ -64,25 +64,25 @@ columns:
   days_listing_to_contract_signed:
     lineage:
     - datalake_ebdb_clean.contract.ts_signed
-    - datalake_ebdb_listing.house_listing.ts_listing_version_start
+    - datalake_listing_temp.house_listing.ts_listing_version_start
     description: Number of days between the listing's publication and the signature
       of a rental contract for the listing.
   days_listing_to_depublication:
     lineage:
-    - datalake_listing_temp.lbc_house_listing.ts_last_unpublished
-    - datalake_listing_temp.lbc_house_listing.ts_listing_version_start
+    - datalake_listing_temp.house_listing.ts_last_unpublished
+    - datalake_listing_temp.house_listing.ts_listing_version_start
     description: Number of days between the listing's publication and the depublication
       of the listing.
   days_ended_rental_to_relisting:
     lineage:
     - datalake_ebdb_clean.contract.dt_termination
-    - datalake_listing_temp.lbc_house_listing.ts_listing_version_start
+    - datalake_listing_temp.house_listing.ts_listing_version_start
     description: Number of days between the end of the rental contract for the listing.
       and the relisting
   days_relisting_to_re_rental:
     lineage:
     - datalake_ebdb_clean.contract.ts_signed
-    - datalake_listing_temp.lbc_house_listing.ts_listing_version_end
+    - datalake_listing_temp.house_listing.ts_listing_version_end
     description: Number of days between the relisting and a new rental contract for
       the listing.
   days_ended_rental_to_re_rented:

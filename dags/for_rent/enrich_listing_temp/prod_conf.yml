@@ -1,16 +1,16 @@
 ---
 tables:
-  - table_name: dim_house_listing_lbc
+  - table_name: dim_house_listing_house
     partitions: [country_code]
-  - table_name: fact_listing_rent_flows_lbc
+  - table_name: fact_listing_rent_flows_house
     partitions: [country_code]
-  - table_name: fact_house_listings_lbc
+  - table_name: fact_house_listings_house
     partitions: [country_code]
-  - table_name: fact_house_listing_status_lbc
+  - table_name: fact_house_listing_status_house
     partitions: [country_code]
-  - table_name: house_listing_status_lbc
+  - table_name: house_listing_status_house
     partitions: [country_code]
-  - table_name: lbc_house_listing
+  - table_name: house_listing
     partitions: [country_code]
 
 custom_cluster:
@@ -21,13 +21,13 @@ custom_cluster:
     max_workers: 3
 
 inner_dependencies:
-  dim_house_listing_lbc:
-    - lbc_house_listing
-  fact_listing_rent_flows_lbc:
-    - dim_house_listing_lbc
+  dim_house_listing_house:
+    - house_listing
+  fact_listing_rent_flows_house:
+    - dim_house_listing_house
   fact_house_listings_lbc:
-    - lbc_house_listing
-    - house_listing_status_lbc
-  fact_house_listing_status_lbc:
-    - house_listing_status_lbc
-    - lbc_house_listing
+    - house_listing
+    - house_listing_status_house
+  fact_house_listing_status_house:
+    - house_listing_status_house
+    - house_listing

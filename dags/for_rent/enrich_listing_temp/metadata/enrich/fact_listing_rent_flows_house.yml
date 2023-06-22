@@ -1,5 +1,5 @@
 database_name: datalake_listing_temp
-table_name: fact_listing_rent_flows_lbc
+table_name: fact_listing_rent_flows_house
 description: Fact table that contains events (visit(s), offer(s), etc.) of a rent flow, starting the flow on the booking creation or direct offer submitted.
     It's very important to keep in mind that every line of this table is related to an event of the rent flow and it's possible to occur more than one event per type in the same rent flow, e.g. multiple bookings within the same rent flow.
     Each line is a rent flow composed by house listing + tenant prospect + event related to the rent flow.
@@ -13,7 +13,7 @@ columns:
   sk_house_listing:
     lineage:
     - datalake_ebdb_rent_flow.rent_flow.id_house
-    - dw_public.dim_house_listing.version
+    - datalake_listing_temp.dim_house_listing_house.version
     description: Key of the house listing related to the rent flow.
   sk_region:
     lineage:
@@ -77,11 +77,11 @@ columns:
     description: Key of the the first listing date of the property related to the rent flow. It's the date of the first listing of the property transformed into a number.
   sk_house_listing_date:
     lineage:
-    - datalake_listing_temp.dim_house_listing_lbc.ts_listing_version_start
+    - datalake_listing_temp.dim_house_listing_house.ts_listing_version_start
     description: Key of the house listing date of the present version related to the rent flow. It's the date of the listing's version start transformed into a number.
   sk_house_listing_de_publication_date:
     lineage:
-    - datalake_listing_temp.dim_house_listing_lbc.ts_last_de_publication
+    - datalake_listing_temp.dim_house_listing_house.ts_last_de_publication
     description: Key of the house listing depublication date of the present version related to the rent flow. It's the date of the listing's version depublication transformed into a number.
   sk_house_listing_first_offer_submitted_date:
     lineage:

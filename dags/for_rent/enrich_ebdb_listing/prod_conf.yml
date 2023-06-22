@@ -53,6 +53,7 @@ inner_dependencies:
     - house_listing_status
     - listing_business_context_status_history
     - business_context_history
+    - house_listing_category
   house_listing_category:
     - lbc_status_version_order
   house_listing_early_demand:

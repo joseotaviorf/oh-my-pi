@@ -5,6 +5,19 @@ description: Fact table that contains each status that the listing had. Each lin
 domain: For Rent
 owner: jonas.fiorini@quintoandar.com.br
 columns:
+  country_code:
+    lineage:
+    - datalake_ebdb_listing.house_listing_status.country_code
+    description: Country code of the listing.
+    categories:
+      BR: Brazil's country code.
+      MX: Mexico's country code.
+  is_last_status_of_day:
+    description: Boolean indicating if the status is the last one of the day for this listing.
+  sk_first_publication_date:
+    lineage:
+    - datalake_ebdb_listing.house_listing_status.ts_first_publication
+    description: Date when house listing was first published.
   sk_house_listing:
     lineage:
     - datalake_ebdb_listing.house_listing_status.id_house_listing
@@ -14,54 +27,47 @@ columns:
     lineage:
     - datalake_ebdb_listing.house_listing_status.id_region
     description: Key of region where house listing is located in.
-  sk_first_publication_date:
-    lineage:
-    - datalake_ebdb_listing.house_listing_status.ts_first_publication
-    description: Date when house listing was first published.
-  sk_status_start_date:
-    lineage:
-    - datalake_ebdb_listing.house_listing_status.ts_status_started
-    description: Date when status started.
   sk_status_end_date:
     lineage:
     - datalake_ebdb_listing.house_listing_status.ts_status_ended
     description: Date when status ended. If it is equal to -1, it means the status
       is still current.
-  country_code:
+  sk_status_start_date:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.country_code
-    description: Country code of the listing.
-    categories:
-      BR: Brazil's country code
-      MX: Mexico's country code
+    - datalake_ebdb_listing.house_listing_status.ts_status_started
+    description: Date when status started.
+  status_change_reason:
+    lineage:
+    - datalake_ebdb_listing.house_listing_status.status_change_reason
+    description: Reason why status changed.
   status_history:
     lineage:
     - datalake_ebdb_listing.house_listing_status.status_history
     description: Status of house listing.
     categories:
-      aguardando_publicacao: Waiting publication
-      alugado: Rented
-      despublicado: Unpublished
-      edicao: Editing
-      edicaoSemUsuario: No user editing
-      edicaoUsuarioNaoConfirmado: Unconfirmed user editing
-      excluido: Deleted
-      publicado: Published
-      suspenso: Suspended
-  status_change_reason:
-    lineage:
-    - datalake_ebdb_listing.house_listing_status.status_change_reason
-    description: Reason why status changed.
-  is_last_status_of_day:
-    description: Boolean indicating if the status is the last one of the day for this listing.
+      aguardando_publicacao: Waiting publication.
+      alugado: Rented.
+      despublicado: Unpublished.
+      edicao: Editing.
+      edicaoSemUsuario: No user editing.
+      edicaoUsuarioNaoConfirmado: Unconfirmed user editing.
+      excluido: Deleted.
+      publicado: Published.
+      suspenso: Suspended.
+      EDITING: Editing.
+      OPTED_OUT: Owner opted out.
+      PUBLISHED: Published.
+      SUSPENDED: Suspended.
+      UNPUBLISHED: Unpublished.
   ts_load:
     description: Timestamp when the data was loaded.
-  ts_status_start:
-    lineage:
-    - datalake_ebdb_listing.house_listing_status.ts_status_started
-    description: Timestamp of when status started.
   ts_status_end:
     lineage:
     - datalake_ebdb_listing.house_listing_status.ts_status_ended
     description: Timestamp of when status ended. If it is equal NULL, it means the
       status is still current.
+  ts_status_start:
+    lineage:
+    - datalake_ebdb_listing.house_listing_status.ts_status_started
+    description: Timestamp of when status started.
+  

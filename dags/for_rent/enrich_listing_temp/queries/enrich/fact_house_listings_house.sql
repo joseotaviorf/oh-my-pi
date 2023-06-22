@@ -1,10 +1,12 @@
+
+
 WITH house_listing_contracts AS (
     WITH latest_contract AS (
         SELECT
             hl.id_house_listing,
             MAX(c.id) AS id_contract,
             DENSE_RANK() OVER (PARTITION BY hl.id_house ORDER BY hl.id_house_listing) AS order_renting
-        FROM datalake_listing_temp.lbc_house_listing hl
+        FROM datalake_listing_temp.house_listing hl
         JOIN datalake_ebdb_clean.contract c
         ON hl.id_house = c.id_house
             and c.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '2000-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, current_date)
@@ -21,7 +23,7 @@ WITH house_listing_contracts AS (
         LEAD(c.ts_signed, 1) OVER (PARTITION BY hl.id_house ORDER BY hl.version) AS ts_next_contract_signed,
         COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
         lc.order_renting
-    FROM datalake_listing_temp.lbc_house_listing hl
+    FROM datalake_listing_temp.house_listing hl
     LEFT JOIN latest_contract lc
         ON hl.id_house_listing = lc.id_house_listing
     LEFT JOIN datalake_ebdb_clean.contract c
@@ -80,7 +82,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
 FROM datalake_ebdb_listing.house h
 LEFT JOIN lbc
   ON lbc.id_house = h.id
-JOIN datalake_listing_temp.lbc_house_listing hl
+JOIN datalake_listing_temp.house_listing hl
   ON hl.id_house = h.id
 LEFT JOIN house_listing_contracts hlc
   ON hl.id_house_listing = hlc.id_house_listing

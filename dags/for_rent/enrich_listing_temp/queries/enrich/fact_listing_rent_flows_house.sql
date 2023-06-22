@@ -18,7 +18,7 @@ WITH listing_rent_flows AS (
                     rent_flow.id_house ||
                     LPAD(
                         COALESCE(
-                            CAST(COALESCE(dhl_contract.version, dim_house_listing_lbc.version) AS VARCHAR(3)),
+                            CAST(COALESCE(dhl_contract.version, dim_house_listing_house.version) AS VARCHAR(3)),
                             '1'
                         ),
                         3,
@@ -49,7 +49,7 @@ WITH listing_rent_flows AS (
             dim_booking.cancellation_reason AS dimboo_cancellation_reason,
             dim_offer.rejection_reason AS dimoff_cancellation_reason,
             dim_proposal.rejection_reason AS dimprop_cancellation_reason,
-            dim_house_listing_lbc.ts_listing_version_start AS dt_house_listing,
+            dim_house_listing_house.ts_listing_version_start AS dt_house_listing,
             rent_flow.dt_booking_created,
             rent_flow.dt_visit,
             rent_flow.dt_client_sign_up,
@@ -97,8 +97,8 @@ WITH listing_rent_flows AS (
             CAST(rent_flow.is_visit_created_from_app AS BOOLEAN) AS is_visit_created_from_app,
             CAST(rent_flow.is_visit_last_updated_from_app AS BOOLEAN) AS is_visit_last_updated_from_app,
             COALESCE(CAST(DATE_FORMAT(rent_flow.dt_house_first_listing, "yyyyMMdd") AS BIGINT), -1) AS sk_house_first_listing_date,
-            COALESCE(CAST(DATE_FORMAT(dim_house_listing_lbc.ts_listing_version_start, "yyyyMMdd") AS BIGINT), -1) AS sk_house_listing_date,
-            COALESCE(CAST(DATE_FORMAT(dim_house_listing_lbc.ts_last_de_publication, "yyyyMMdd") AS BIGINT), -1) AS sk_house_listing_de_publication_date,
+            COALESCE(CAST(DATE_FORMAT(dim_house_listing_house.ts_listing_version_start, "yyyyMMdd") AS BIGINT), -1) AS sk_house_listing_date,
+            COALESCE(CAST(DATE_FORMAT(dim_house_listing_house.ts_last_de_publication, "yyyyMMdd") AS BIGINT), -1) AS sk_house_listing_de_publication_date,
             COALESCE(
                 CAST(
                     DATE_FORMAT(
@@ -151,13 +151,13 @@ WITH listing_rent_flows AS (
             CAST(reservation.reservation_attempts AS SMALLINT) AS reservation_attempts,
             CAST(NOW() AS TIMESTAMP) AS ts_load
         FROM datalake_ebdb_rent_flow.rent_flow 
-        JOIN datalake_listing_temp.dim_house_listing_lbc -- 1:M (M rent_flow x 1 listing)
-            ON dim_house_listing_lbc.id_house = rent_flow.id_house
+        JOIN datalake_listing_temp.dim_house_listing_house -- 1:M (M rent_flow x 1 listing)
+            ON dim_house_listing_house.id_house = rent_flow.id_house
             AND COALESCE(rent_flow.dt_rent_flow_created, '1900-01-01') BETWEEN
-                COALESCE(dim_house_listing_lbc.ts_listing_version_start, '1900-01-01')
-                AND COALESCE(dim_house_listing_lbc.ts_listing_version_end, NOW())
+                COALESCE(dim_house_listing_house.ts_listing_version_start, '1900-01-01')
+                AND COALESCE(dim_house_listing_house.ts_listing_version_end, NOW())
         LEFT JOIN datalake_ebdb_listing.house h
-            ON dim_house_listing_lbc.id_house = h.id
+            ON dim_house_listing_house.id_house = h.id
         LEFT JOIN dw_public.dim_offer
             ON dim_offer.sk_offer = COALESCE(rent_flow.id_offer_context, -1)
             AND dim_offer.sk_offer != -1
@@ -179,7 +179,7 @@ WITH listing_rent_flows AS (
         we align with SWE a permanent solution, we are giving priority
         to contract association with listing, instead of rent_flow.
         */
-            datalake_listing_temp.dim_house_listing_lbc AS dhl_contract
+            datalake_listing_temp.dim_house_listing_house AS dhl_contract
                 ON con.id_house = dhl_contract.id_house 
                 AND dim_contract.ts_created BETWEEN COALESCE(dhl_contract.ts_listing_version_start, '2000-01-01 00:00:00') AND COALESCE(dhl_contract.ts_listing_version_end, CURRENT_DATE)
         LEFT JOIN datalake_ebdb_agents.agents_review ar
@@ -190,14 +190,14 @@ WITH listing_rent_flows AS (
             AND rent_flow.id_client = id_tenant
             AND dim_offer.status = 'Aprovada'
             AND reservation.ts_created BETWEEN
-                COALESCE(dim_house_listing_lbc.ts_listing_version_start, '1900-01-01')
-                AND COALESCE(dim_house_listing_lbc.ts_listing_version_end, NOW())
+                COALESCE(dim_house_listing_house.ts_listing_version_start, '1900-01-01')
+                AND COALESCE(dim_house_listing_house.ts_listing_version_end, NOW())
             AND reservation.ts_created BETWEEN
                 COALESCE(dim_offer.dt_created, '1900-01-01')
                 AND COALESCE(dim_proposal.ts_processed, dim_proposal.dt_updated)
         LEFT JOIN dw_public.dim_booking
             ON dim_booking.sk_booking = rent_flow.id_booking
-        WHERE dim_house_listing_lbc.is_for_rent
+        WHERE dim_house_listing_house.is_for_rent
             AND (
                 COALESCE(dim_booking.visit_intent, '') <> 'SALE'
                 -- The OR condition is covering cases where the last booking, that resulted ON a contract,

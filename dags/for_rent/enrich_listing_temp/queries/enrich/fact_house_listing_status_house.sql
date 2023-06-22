@@ -24,8 +24,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
         ) = hls.ts_status_started,
         FALSE) AS is_last_status_of_day,
     CAST(NOW() AS TIMESTAMP) AS ts_load
-FROM datalake_listing_temp.house_listing_status_lbc hls
-JOIN datalake_listing_temp.lbc_house_listing hl
+FROM datalake_listing_temp.house_listing_status_house hls
+JOIN datalake_listing_temp.house_listing hl
     ON hl.id_house_listing = hls.id_house_listing
 JOIN datalake_ebdb_listing.house h
     ON h.id = hl.id_house

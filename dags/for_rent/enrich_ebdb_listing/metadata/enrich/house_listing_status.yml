@@ -1,34 +1,53 @@
+---
 database_name: datalake_ebdb_listing
 table_name: house_listing_status
+description: Information related to ForRent listings. 
+  Each line is a listing status, status_reason and version (listing state) with start and end timestamps.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
 columns:
-  id_house_listing:
-    lineage:
-      - datalake_ebdb_listing.house_status_version_order.id_house
-      - datalake_ebdb_listing.house_status_version_order.order_version
-  id_house:
-    lineage:
-      - datalake_ebdb_listing.house_status_version_order.id_house
-  id_region:
-    lineage:
-      - datalake_ebdb_listing.house_status_version_order.id_region
   country_code:
     lineage:
-      - datalake_ebdb_listing.house_status_version_order.country_code
-  version:
+      - datalake_ebdb_listing.lbc_status_version_order.country_code
+    description: Country code of the house.
+  id_house:
     lineage:
-      - datalake_ebdb_listing.house_status_version_order.order_version
-  status_history:
+      - datalake_ebdb_listing.lbc_status_version_order.id_house
+    description: Id of the house.
+  id_house_listing:
     lineage:
-      - datalake_ebdb_listing.house_status_version_order.status_history_new
+      - datalake_ebdb_listing.lbc_status_version_order.id_house
+      - datalake_ebdb_listing.lbc_status_version_order.listing_version
+    description: Id of the listing.
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+    description: Id of the region.
+  is_last_status_of_day:
+    lineage:
+      - datalake_ebdb_listing.lbc_status_version_order.rev
+    description: Boolean indicating if this is the last status of the day.
   status_change_reason:
     lineage:
-      - datalake_ebdb_listing.house_status_version_order.reason
+      - datalake_ebdb_listing.lbc_status_version_order.status_reason
+    description: Reason of the status change.
+  status_history:
+    lineage:
+      - datalake_ebdb_listing.lbc_status_version_order.status
+    description: Status of the listing. 
   ts_first_publication:
     lineage:
-      - datalake_ebdb_listing.house_status_version_order.ts_first_publication
-  ts_status_started:
-    lineage:
-      - datalake_ebdb_listing.house_status_version_order.ts_status_changed_new
+      - datalake_ebdb_listing.lbc_status_version_order.ts_first_publication
+    description: Timestamp of the house first publication.
   ts_status_ended:
     lineage:
-      - datalake_ebdb_listing.house_status_version_order.ts_status_changed_next
+      - datalake_ebdb_listing.lbc_status_version_order.ts_state_ended
+    description: Timestamp when this state (status, status_reason and version) has ended.
+  ts_status_started:
+    lineage:
+      - datalake_ebdb_listing.lbc_status_version_order.ts_state_started
+    description: Timestamp when this state (status, status_reason and version) has started.
+  version:
+    lineage:
+      - datalake_ebdb_listing.lbc_status_version_order.listing_version
+    description: Listing version.
