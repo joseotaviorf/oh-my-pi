@@ -201,7 +201,7 @@ trigger AS (
               AND
               (
                 (
-                  bch.status = 'EDITING'
+                  bch.status <> 'PUBLISHED'
                   AND bch.next_status = 'PUBLISHED'
                 )
                 OR
