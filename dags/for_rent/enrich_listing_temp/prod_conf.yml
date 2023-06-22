@@ -25,7 +25,7 @@ inner_dependencies:
     - house_listing
   fact_listing_rent_flows_house:
     - dim_house_listing_house
-  fact_house_listings_lbc:
+  fact_house_listings_house:
     - house_listing
     - house_listing_status_house
   fact_house_listing_status_house:
