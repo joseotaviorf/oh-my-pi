@@ -1486,13 +1486,13 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
 bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.gsheets.growth_intraday:done-clean-marketing-manual-shared-costs
   - bietlejuice.gsheets.growth_intraday:done-clean-marketing-name-convention-shared-costs
-#bietlejuice.dw_rent_demand_events_snapshot:
-#  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
-#  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
-#  - bietlejuice.dw_proposal:load-dw-public-dim-proposal
-#  - bietlejuice.dw_region:load-dw-public-dim-region
-#  - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-cohort-conversions
-#  - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
+bietlejuice.dw_rent_demand_events_snapshot:
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.dw_proposal:load-dw-public-dim-proposal
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-cohort-conversions
+  - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
 bietlejuice.enrich_mexico_braze_details:
   - bietlejuice.braze_details:load-clean-campaign-details-indica-ai
   - bietlejuice.braze_details:load-clean-campaign-details-owners
@@ -2207,8 +2207,8 @@ bietlejuice.metric_rent__contracts:
   - bietlejuice.dw_offer:load-dw-public-dim-offer
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
-#bietlejuice.metric_rent__demand_events:
-#  - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-demand-events-snapshot
+bietlejuice.metric_rent__demand_events:
+  - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-demand-events-snapshot
 bietlejuice.metric_rent__listings:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
