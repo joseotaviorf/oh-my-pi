@@ -270,6 +270,20 @@ WITH new_system AS (
                 datalake_rental_guarantee_platform_clean.property_propose
             QUALIFY
                 ROW_NUMBER() OVER (PARTITION BY id_propose ORDER BY ts_updated DESC) = 1
+        ),
+        3p_proposes AS (
+            SELECT
+                pr.id AS id_propose
+            FROM
+                datalake_rental_guarantee_platform_clean.propose AS pr
+            LEFT JOIN
+                datalake_rental_guarantee_platform_clean.company_plan AS cp
+                ON pr.id_company_plan = cp.id
+            LEFT JOIN
+                datalake_rental_guarantee_platform_clean.plan AS pl
+                ON cp.id_plan = pl.id
+            WHERE
+                pl.plan_name LIKE '%3P%'
         )
         SELECT
             p.id AS id_propose,
@@ -304,6 +318,7 @@ WITH new_system AS (
             c.id IS NOT NULL AS is_contract,
             IFNULL(DATEDIFF(COALESCE(DATE(pcd.ts_ended), c.ts_done), DATE(c.ts_began)) <= 10, FALSE) AS is_grace_period_cancelled,
             FALSE AS is_legacy,
+            IF(3p.id_propose IS NULL, FALSE, TRUE) AS is_3p,
             pym.dt_last_payment,
             DATE(c.ts_began) AS dt_contract_started,
             COALESCE(DATE(pcd.ts_ended), c.ts_done) AS dt_ended,
@@ -395,6 +410,9 @@ WITH new_system AS (
         lEFT JOIN
         occurrence_metrics AS om
             ON om.id_propose = p.id
+        lEFT JOIN
+        3p_proposes AS 3p
+            ON 3p.id_propose = p.id
 ),
 old_system AS (
     WITH propose_canceled_date AS (
@@ -729,6 +747,7 @@ old_system AS (
     f.id IS NOT NULL AS is_contract,
     IFNULL(DATEDIFF(COALESCE(DATE(pcd.ts_ended), f.dt_ended), DATE(f.dt_begin)) <= 10, False) AS is_grace_period_cancelled,
     TRUE AS is_legacy,
+    FALSE AS is_3p,
     pym.dt_last_payment,
     DATE(f.dt_begin) AS dt_contract_started,
     COALESCE(DATE(pcd.ts_ended), f.dt_ended) AS dt_ended,
@@ -878,6 +897,7 @@ cte_union AS (
         is_contract,
         is_grace_period_cancelled,
         is_legacy,
+        is_3p,
         dt_last_payment,
         dt_contract_started,
         dt_ended,
@@ -930,6 +950,7 @@ UNION ALL
         is_contract,
         is_grace_period_cancelled,
         is_legacy,
+        is_3p,
         dt_last_payment,
         dt_contract_started,
         dt_ended,
@@ -954,7 +975,7 @@ ORDER BY 1
 
 SELECT
     id_propose,
-    CAST(id_propose_values AS STRING) AS id_propose_values,
+    id_propose_values AS id_propose_values,
     id_broker,
     id_house,
     id_agent,
@@ -985,6 +1006,7 @@ SELECT
     is_contract,
     is_grace_period_cancelled,
     is_legacy,
+    is_3p,
     dt_last_payment,
     dt_contract_started,
     dt_ended,

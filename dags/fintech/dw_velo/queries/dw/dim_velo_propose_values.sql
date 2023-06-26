@@ -1,5 +1,5 @@
 SELECT
-    id_propose_values AS sk_propose_values,
+    CAST(id_propose_values AS BIGINT) AS sk_propose_values,
     subscription_type,
     plan_type,
     activator_type,

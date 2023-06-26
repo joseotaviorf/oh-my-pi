@@ -106,6 +106,8 @@ columns:
     description: If the propose's grace period has expired
   is_legacy:
     description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
+  is_3p:
+    description: If the propose's comes from 3P flow
   dt_last_payment:
     lineage:
     - datalake_velo.payment.dt_paid

@@ -32,6 +32,7 @@ SELECT
     is_contract,
     is_grace_period_cancelled,
     is_legacy,
+    is_3p,
     dt_last_payment,
     dt_contract_started,
     dt_ended,

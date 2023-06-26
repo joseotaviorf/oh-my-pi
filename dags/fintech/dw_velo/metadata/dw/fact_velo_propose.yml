@@ -133,6 +133,10 @@ columns:
     lineage:
     - datalake_velo.propose.is_legacy
     description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
+  is_3p:
+    lineage:
+    - datalake_velo.propose.is_3p
+    description: If the propose's comes 3P flow
   dt_last_payment:
     lineage:
     - datalake_velo.propose.dt_last_payment
