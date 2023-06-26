@@ -20,42 +20,42 @@ SELECT
     dhl.rental_administrator,
     fc.days_to_conversion,
     fc.weeks_to_conversion,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '1-2') AS vb2vc,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '1-3') AS vb2os,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '1-4') AS vb2oa,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '1-5') AS vb2es,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '1-6') AS vb2ep,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '1-7') AS vb2ds,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '1-8') AS vb2ca,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '1-9') AS vb2cs,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-3') AS vc2oa,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-4') AS vc2os,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-5') AS vc2es,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-6') AS vc2ep,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-7') AS vc2ds,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-8') AS vc2ca,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '2-9') AS vc2cs,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '3-4') AS os2oa,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '3-4') AS os2es,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '3-6') AS os2ep,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '3-7') AS os2ds,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '3-8') AS os2ca,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '3-9') AS os2cs,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '4-5') AS oa2es,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '4-6') AS oa2ep,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '4-7') AS oa2ds,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '4-8') AS oa2ca,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '4-9') AS oa2cs,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '5-6') AS es2ep,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '5-7') AS es2ds,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '5-8') AS es2ca,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '5-9') AS es2cs,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '6-7') AS ep2ds,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '6-8') AS ep2ca,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '6-9') AS ep2cs,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '7-8') AS ds2ca,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '7-9') AS ds2cs,
-    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = '8-9') AS ca2cs,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 102) AS vb2vc,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 103) AS vb2os,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 104) AS vb2oa,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 105) AS vb2es,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 106) AS vb2ep,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 107) AS vb2ds,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 108) AS vb2ca,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 109) AS vb2cs,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 203) AS vc2oa,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 204) AS vc2os,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 205) AS vc2es,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 206) AS vc2ep,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 207) AS vc2ds,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 208) AS vc2ca,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 209) AS vc2cs,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 304) AS os2oa,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 305) AS os2es,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 306) AS os2ep,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 307) AS os2ds,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 308) AS os2ca,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 309) AS os2cs,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 405) AS oa2es,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 406) AS oa2ep,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 407) AS oa2ds,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 408) AS oa2ca,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 409) AS oa2cs,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 506) AS es2ep,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 507) AS es2ds,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 508) AS es2ca,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 509) AS es2cs,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 607) AS ep2ds,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 608) AS ep2ca,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 609) AS ep2cs,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 708) AS ds2ca,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 709) AS ds2cs,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 809) AS ca2cs,
     CASE
         WHEN fc.sk_base_event_type BETWEEN 1 AND 4 THEN FALSE
         WHEN fc.sk_base_event_type > 4 AND dp.guarantee = 'RentalGuarantee' THEN TRUE
@@ -73,17 +73,22 @@ FROM
 JOIN 
     dw_public.dim_date AS dt
         ON dt.sk_date = fc.sk_base_event_date
+LEFT JOIN
+    dw_rent.fact_rent_demand_events AS fd
+        ON fd.sk_event = fc.sk_base_event
+        AND fd.sk_event_type = fc.sk_base_event_type
+        AND fd.sk_event_date = fc.sk_base_event_date
 LEFT JOIN 
     dw_public.dim_region AS dr
-        ON dr.sk_region = fc.sk_region
+        ON dr.sk_region = fd.sk_region
 LEFT JOIN 
     dw_public.dim_house_listing AS dhl
-        ON fc.sk_house_listing = dhl.sk_house_listing 
+        ON fd.sk_house_listing = dhl.sk_house_listing 
 LEFT JOIN 
     dw_datamarts.funnel_demand_flows AS fdf
-        ON fc.sk_rent_flow = fdf.sk_rent_flow        
-        AND fc.sk_house_listing = fdf.sk_house_listing
+        ON fd.sk_rent_flow = fdf.sk_rent_flow        
+        AND fd.sk_house_listing = fdf.sk_house_listing
 LEFT JOIN 
     dw_public.dim_proposal AS dp
-        ON fc.sk_proposal = dp.sk_proposal
+        ON fd.sk_proposal = dp.sk_proposal
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 47, 48, 49, 50, 51, 52, 53, 54

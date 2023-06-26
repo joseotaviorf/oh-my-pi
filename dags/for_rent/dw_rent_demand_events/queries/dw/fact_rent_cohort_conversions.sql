@@ -1,5 +1,5 @@
 SELECT DISTINCT
-  BIGINT(CONCAT(fde1.sk_event, 0, fde1.sk_event_type, 0, fde2.sk_event, 0, fde2.sk_event_type)) AS sk_cohort_conversion,
+  CONCAT(fde1.sk_event, '-', fde1.sk_event_type, '-', fde2.sk_event, '-', fde2.sk_event_type) AS sk_cohort_conversion,
   INT(CONCAT(fde1.sk_event_type, 0, fde2.sk_event_type)) AS sk_cohort_type,
   fde1.sk_event AS sk_base_event,
   fde1.sk_event_type AS sk_base_event_type,
