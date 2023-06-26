@@ -1,0 +1,33 @@
+database_name: datalake_sorting_hat_clean
+table_name: analysis_request_data
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestdata.id
+  id_analysis_request:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestdata.analysis_request_id
+  id_source:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestdata.source_id
+  id_state_machine:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestdata.state_machine_id
+  attributes:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestdata.attributes
+  raw_data:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestdata.raw_data
+  source_entity:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestdata.source_entity
+  version:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestdata.version
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestdata.created_at
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestdata.updated_at

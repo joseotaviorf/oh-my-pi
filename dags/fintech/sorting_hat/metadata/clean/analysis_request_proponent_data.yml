@@ -1,0 +1,39 @@
+database_name: datalake_sorting_hat_clean
+table_name: analysis_request_proponent_data
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.id
+  id_analysis_request:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.analysis_request_id
+  id_source:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.source_id
+  id_state_machine:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.state_machine_id
+  attributes:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.attributes
+  document_type:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.external_id
+  document_number:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.result
+  raw_data:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.raw_data
+  source_entity:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.enterprise_group
+  version:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.version
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.created_at
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.analysisrequestproponentdata.updated_at

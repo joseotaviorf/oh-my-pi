@@ -15,6 +15,15 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Currently, there is the following output table for both our raw and clean layers:
 
+- `analysis_machine`
+- `analysis_request_data`
+- `analysis_request_proponent_data`
+- `analysis_request`
+- `analysis_state_group`
+- `analysis_state`
+- `checklist_group`
+- `checklist_item`
+- `checklist`
 - `credit_analysis`
 - `credit_analysis_version`
 - `early_credit_analysis`

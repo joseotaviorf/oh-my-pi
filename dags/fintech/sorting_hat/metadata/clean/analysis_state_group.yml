@@ -1,0 +1,27 @@
+database_name: datalake_sorting_hat_clean
+table_name: analysis_state_group
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstategroup.id
+  id_machine:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstategroup.machine_id
+  group_name:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstategroup.group_name
+  group_type:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstategroup.group_type
+  result:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstategroup.result
+  status:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstategroup.status
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstategroup.created_at
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstategroup.updated_at

@@ -1,0 +1,36 @@
+database_name: datalake_sorting_hat_clean
+table_name: analysis_state
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.id
+  id_analysis_request:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.analysis_request_id
+  id_state_group:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.state_group_id
+  id_subject:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.subject_id
+  input:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.input
+  raw_input:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.raw_input
+  result:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.input
+  status:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.subject_id
+  subject_type:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.subject_type
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.created_at
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.updated_at
