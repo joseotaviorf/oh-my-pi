@@ -1,6 +1,5 @@
 SELECT
   id,
-  analysis_request_id as id_analysis_request,
   state_group_id as id_state_group,
   subject_id as id_subject,
   input,

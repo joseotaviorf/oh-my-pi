@@ -4,9 +4,6 @@ columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.analysisstate.id
-  id_analysis_request:
-    lineage:
-      - datalake_sorting_hat_raw.analysisstate.analysis_request_id
   id_state_group:
     lineage:
       - datalake_sorting_hat_raw.analysisstate.state_group_id
