@@ -109,26 +109,33 @@ task AS (
       ON tt.id_task = t.id_task
 ),
 twilio_time_metrics AS (
+  WITH task_metrics AS(
+    SELECT DISTINCT
+      ctm.id_segment AS id_task,
+      lut.id_channel,
+      ctm.total_talk_time,
+      ctm.total_queue_time,
+      ctm.total_wrap_up_time,
+      ctm.total_handling_time
+    FROM
+      datalake_twilio_flex_insights_clean.conversation_time_metrics AS ctm
+    INNER JOIN
+      last_updated_task AS lut
+        ON lut.id_task = ctm.id_segment
+    WHERE
+      total_talk_time IS NOT NULL
+      AND total_queue_time IS NOT NULL
+      AND total_wrap_up_time IS NOT NULL
+      AND total_handling_time IS NOT NULL
+  )
   SELECT
-    ctm.id_conversation,
-    CASE
-        WHEN SUM(ctm.total_talk_time) IS NULL THEN 0
-        ELSE CAST(SUM(ctm.total_talk_time) AS FLOAT)
-    END AS total_talk_time,
-    CASE
-        WHEN SUM(ctm.total_queue_time) IS NULL THEN 0
-        ELSE CAST(SUM(ctm.total_queue_time) AS FLOAT)
-    END AS total_queue_time,
-    CASE
-        WHEN SUM(ctm.total_wrap_up_time) IS NULL THEN 0
-        ELSE CAST(SUM(ctm.total_wrap_up_time) AS FLOAT)
-    END AS total_wrap_up_time,
-    CASE
-        WHEN SUM(ctm.total_handling_time) IS NULL THEN 0
-        ELSE CAST(SUM(ctm.total_handling_time) AS FLOAT)
-    END AS total_handling_time
+    id_channel,
+    SUM(total_talk_time) AS total_talk_time,
+    SUM(total_queue_time) AS total_queue_time,
+    SUM(total_wrap_up_time) AS total_wrap_up_time,
+    SUM(total_handling_time) AS total_handling_time
   FROM
-    datalake_twilio_flex_insights_clean.conversation_time_metrics AS ctm
+    task_metrics
   GROUP BY 1
 ),
 chatbot_time_metrics_whatsapp AS (
@@ -152,7 +159,7 @@ chatbot_time_metrics_chat_inapp AS (
     FROM
       datalake_greenseer_clean.session
     QUALIFY
-      RANK() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
+      ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
   )
   SELECT
     gs.id_session,
@@ -174,6 +181,18 @@ chatbot_time_metrics_chat_inapp AS (
     datalake_quinto_messenger.task_event AS te
       ON te.id_task = t.id_task
   GROUP BY 1
+),
+agents_control AS (
+  SELECT
+    email,
+    agent_name,
+    manager,
+    agent_company,
+    dt_start
+  FROM
+    datalake_gsheets_clean.agents_control
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY email ORDER BY dt_start DESC) = 1
 ),
 quinto_messenger_tasks AS (
   SELECT
@@ -208,10 +227,10 @@ quinto_messenger_tasks AS (
     t.contact_theme_tag,
     bot.total_minutes_reception_time,
     c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
-    ctm.total_talk_time AS seconds_total_talk_time,
-    ctm.total_queue_time AS seconds_total_queue_time,
-    ctm.total_wrap_up_time AS seconds_total_wrap_up_time,
-    ctm.total_handling_time AS seconds_total_handling_time,
+    ttm.total_talk_time AS seconds_total_talk_time,
+    ttm.total_queue_time AS seconds_total_queue_time,
+    ttm.total_wrap_up_time AS seconds_total_wrap_up_time,
+    ttm.total_handling_time AS seconds_total_handling_time,
     bot.ts_reception_started,
     t.ts_created,
     t.ts_updated,
@@ -220,9 +239,9 @@ quinto_messenger_tasks AS (
     wm.ts_first_event,
     wm.ts_last_event
   FROM
-    datalake_quinto_messenger.channel AS c
-  INNER JOIN
     task AS t
+  INNER JOIN
+    datalake_quinto_messenger.channel AS c
       ON t.id_channel = c.id_channel
   LEFT JOIN
     chatbot_time_metrics_whatsapp AS bot
@@ -237,13 +256,13 @@ quinto_messenger_tasks AS (
     task_transfer_reason AS ttr
       ON ttr.id_task = t.id_task
   LEFT JOIN
-    datalake_gsheets_clean.agents_control AS ac
+    agents_control AS ac
       ON t.agent_email = ac.email
   LEFT JOIN
-    twilio_time_metrics AS ctm
-      ON c.id_conversation = ctm.id_conversation
+    twilio_time_metrics AS ttm
+      ON ttm.id_channel = c.id_channel
   WHERE
-    c.ts_created > '2020-08-20'
+    t.ts_created > '2020-08-20'
       AND c.channel_status <> 'missed'
   UNION ALL
   SELECT
@@ -278,10 +297,10 @@ quinto_messenger_tasks AS (
     t.contact_theme_tag,
     bot.total_minutes_reception_time,
     (UNIX_TIMESTAMP(c5a.ts_updated) - UNIX_TIMESTAMP(c5a.ts_created))/60.0 AS minutes_full_resolution_time_calendar,
-    ctm.total_talk_time AS seconds_total_talk_time,
-    ctm.total_queue_time AS seconds_total_queue_time,
-    ctm.total_wrap_up_time AS seconds_total_wrap_up_time,
-    ctm.total_handling_time AS seconds_total_handling_time,
+    ttm.total_talk_time AS seconds_total_talk_time,
+    ttm.total_queue_time AS seconds_total_queue_time,
+    ttm.total_wrap_up_time AS seconds_total_wrap_up_time,
+    ttm.total_handling_time AS seconds_total_handling_time,
     bot.ts_reception_started,
     t.ts_created,
     t.ts_updated,
@@ -304,13 +323,11 @@ quinto_messenger_tasks AS (
     task_transfer_reason AS ttr
       ON ttr.id_task = t.id_task
   LEFT JOIN
-    datalake_gsheets_clean.agents_control AS ac
+    agents_control AS ac
       ON t.agent_email = ac.email
   LEFT JOIN
-    datalake_twilio_flex_insights_clean.conversation_time_metrics AS ctm
-      ON t.id_task = ctm.id_segment
-  WHERE
-    c5a.ts_created > '2020-08-20'
+    twilio_time_metrics AS ttm
+      ON ttm.id_channel = c5a.id_channel
 ),
 chat_csat AS(
   SELECT
@@ -370,7 +387,7 @@ zendesk_ticket_info AS (
       ON tf.id_ticket = ftm.id_ticket
 ),
 tickets_with_task AS (
-  SELECT
+  SELECT DISTINCT
     zti.id_ticket,
     zti.status,
     COALESCE(
