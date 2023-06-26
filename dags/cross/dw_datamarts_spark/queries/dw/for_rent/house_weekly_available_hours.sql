@@ -13,7 +13,7 @@ WITH daily_published_listings AS (
             ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1)
             AND CAST(DATE_FORMAT( COALESCE(to_date(CAST(NULLIF(sk_status_end_date,-1) AS STRING), 'yyyyMMdd'), CURRENT_DATE) -1 ,'yyyyMMdd') AS BIGINT)
     WHERE
-        f.status_history = 'publicado' -- consider published AND suspended status
+        f.status_history IN ('publicado', 'PUBLISHED') -- consider published AND suspended status
         AND substring(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
         AND d.date > DATE_SUB(CURRENT_DATE,360)
 ),
