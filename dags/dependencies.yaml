@@ -981,6 +981,11 @@ bietlejuice.enrich_casa_mineira_portal:
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-history
 bietlejuice.enrich_chattermill:
   - bietlejuice.chattermill:load-clean-responses
+bietlejuice.enrich_chat_inapp_strategies:
+  - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
+  - bietlejuice.amplitude:load-clean-events
+  - bietlejuice.enrich_greenseer:load-enrich-session-memory
+  - bietlejuice.enrich_customer_support:load-enrich-chat
 bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
   - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
