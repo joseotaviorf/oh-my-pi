@@ -46,6 +46,7 @@ brokerage_fees AS (
     SUM(invoice_theorical_amount) AS brokerage_fee,
     SUM(IF(brokerage_share = 'partner' AND invoice_payment_status = 'paid', invoice_theorical_amount, 0)) AS brokerage_partner_share,
     SUM(IF(brokerage_share = 'rental agents', prod_theorical_amount, 0)) AS agents_commission,
+    SUM(IF(brokerage_share = 'ciq select', invoice_theorical_amount, 0)) AS select_commission,
     accrual_year_month
   FROM
     datalake_revenue_lines.brokerage_fee
@@ -56,7 +57,7 @@ brokerage_fees AS (
       'RentalDeposit',
       'Standalone'
     )
-  GROUP BY 1, 5
+  GROUP BY 1, 6
 ),
 
 affiliates_commission AS (
@@ -173,7 +174,7 @@ revenue_with_contract AS (
     COALESCE(bfi.bfi, 0) as bfi,
     COALESCE(lp.lp, 0) AS lp,
     COALESCE(ccp.ccp_net, 0) AS ccp_net,
-    COALESCE(-1 * bf.agents_commission, 0) AS agents_commission,
+    COALESCE(-1 * (bf.agents_commission + bf.select_commission), 0) AS agents_commission,
     COALESCE(-1 * ac.affiliates_commission, 0) AS affiliates_commission,
     COALESCE(-1 * bf.brokerage_partner_share, 0) AS brokerage_partner_share,
     COALESCE(-1 * mf.management_partner_share, 0) AS management_partner_share,

@@ -55,7 +55,8 @@ columns:
   reservation:
     description: Extra reservation revenue comes from kill_queue service.
   agents_commission:
-    description: Agents commission share value that is passed to agents. (Negative value).
+    description: Agents commission share value that is passed to agents.
+      It's the sum of 'rental agents' and 'ciq select' from brokerage share column. (Negative value).
   affiliates_commission:
     description: Affiliates commission share value that is passed to CIQ. (Negative value).
   brokerage_partner_share:
