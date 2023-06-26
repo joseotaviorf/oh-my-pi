@@ -1,12 +1,12 @@
 database_name: datalake_monopoly_clean
 table_name: accounting_entry
+description: Accounting entries
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_monopoly_raw.accounting_entry.id
-  id_account:
-    lineage:
-      - datalake_monopoly_raw.accounting_entry.account_id
   id_sale_transaction:
     lineage:
       - datalake_monopoly_raw.accounting_entry.sale_transaction_id
