@@ -34,17 +34,17 @@ cash_flow_base AS
         SUM(COALESCE(ae.debit,0) - COALESCE(ae.credit,0)) AS cash_flow_amount
     FROM
         datalake_monopoly_clean.accounting_entry AS ae
-    LEFT JOIN
-        datalake_monopoly_clean.account AS a
-            ON ae.id_account = a.id
+    --LEFT JOIN
+    --    datalake_monopoly_clean.account AS a
+    --        ON ae.id_account = a.id
     LEFT JOIN
         datalake_monopoly_clean.sale_transaction AS st
             ON ae.id_sale_transaction = st.id
     LEFT JOIN
         datalake_monopoly_clean.sale AS s
             ON st.id_sale = s.id
-    WHERE
-        a.id IN (8, 23) -- 8 Itaú | 23 Stark Bank
+    --WHERE
+    --    a.id IN (8, 23) -- 8 Itaú | 23 Stark Bank
     GROUP BY
         1, 2
 ),
