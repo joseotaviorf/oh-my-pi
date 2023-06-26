@@ -265,40 +265,6 @@ class DWTaskGroup(BaseTaskGroup):
 
         return data_quality_tasks
 
-    def _set_emptiness_test_task(
-        self, layer: str, table_name: str, schema: str, extraction_type: str
-    ) -> list:
-        """
-        Creates a task to validate if the resulting DW Staging table is not empty.
-
-        # TODO: THIS METHOD MUST BE REVIEWED AND MAY BE REPLACED BY DATA QUALITY
-        VALIDATIONS STEPS INSTEAD OF KEEPING IT IN A SINGLE SEPARATED SPARK JOB SUBMIT.
-        """
-        emptiness_test_tasks = []
-
-        if layer == LayerEnum.DW_STAGING.value and extraction_type == "full":
-            emptiness_test_task = QuintoAndarDatabricksSubmitRunOperator(
-                databricks_conn_id="databricks_job_cluster",
-                dag=self.dag,
-                task_id=self.generate_default_task_id(
-                    task_prefix=self.TEST_EMPTINESS_TASK_PREFIX,
-                    layer=LayerEnum(layer),
-                    schema=schema,
-                    table_name=table_name,
-                ),
-                json={
-                    "spark_python_task": {
-                        "python_file": path.join(
-                            self.spark_jobs_path, "emptiness_test.py"
-                        ),
-                        "parameters": [schema, table_name],
-                    }
-                },
-                execution_timeout=timedelta(hours=self.execution_timeout_hours),
-            )
-            emptiness_test_tasks.append(emptiness_test_task)
-        return emptiness_test_tasks
-
     def _set_default_dim_row_task(
         self, layer: str, table_name: str, schema: str, extraction_type: str
     ) -> list:
@@ -432,27 +398,16 @@ class DWTaskGroup(BaseTaskGroup):
             extraction_type=extraction_type,
         )
 
-        emptiness_test_tasks = self._set_emptiness_test_task(
-            layer=layer,
-            table_name=table_name,
-            schema=schema,
-            extraction_type=extraction_type,
-        )
-
         chain(
             load_table_task,
             *hive_structure_tasks,
             *hive_partitions_tasks,
             *metadata_propagator_tasks,
         )
-        chain(
-            load_table_task,
-            *default_dim_row_tasks,
-            [*emptiness_test_tasks, *data_quality_tasks],
-        )
+        chain(load_table_task, *default_dim_row_tasks, *data_quality_tasks)
 
         final_tasks = (
-            emptiness_test_tasks or metadata_propagator_tasks or [load_table_task]
+            default_dim_row_tasks or metadata_propagator_tasks or [load_table_task]
         )
 
         return self.format_tasks_boundaries(

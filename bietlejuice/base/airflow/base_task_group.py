@@ -32,7 +32,6 @@ class BaseTaskGroup(object):
     PROPAGATION_BYPASS_TASK_PREFIX = "propagation-bypass"
     SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX = "sync-hive-metastore-partitions"
     SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX = "sync-hive-metastore-structure"
-    TEST_EMPTINESS_TASK_PREFIX = "test-emptiness"
 
     LAYER_TO_PROPAGATOR_SPARK_JOB_MAPPING = {
         LayerEnum.CLEAN.value: "propagate_table_metadata.py",
