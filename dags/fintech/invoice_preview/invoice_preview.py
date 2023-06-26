@@ -6,15 +6,14 @@ import os
 
 from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
-from airflow.operators.databricks_plugin import (
-    QuintoAndarDatabricksExecuteJobClusterOperator,
-    QuintoAndarDatabricksCheckJobTaskOperator,
+from airflow.operators.quintoandar_databricks import (
+    QuintoAndarDatabricksCreateClusterOperator,
+    QuintoAndarDatabricksTerminateClusterOperator,
+    QuintoAndarDatabricksSubmitRunOperator,
 )
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.airflow.task_groups.datalake_task_group_job_cluster import (
-    DatalakeTaskGroupJobCluster,
-)
+from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
@@ -65,16 +64,19 @@ dag = DAG(
     ),
 )
 
-execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
-    task_id="execute-job-cluster",
-    databricks_conn_id="databricks_job_cluster",
+    task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=LIBRARIES_DESCRIPTION,
 )
 
-task_group = DatalakeTaskGroupJobCluster(
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
+
+task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
@@ -98,10 +100,9 @@ raw_task_group = task_group.build_raw_task_group_for_single_table(
 )
 
 
-check_data = QuintoAndarDatabricksCheckJobTaskOperator(
-    databricks_conn_id="databricks_job_cluster",
-    dag=dag,
+check_data = QuintoAndarDatabricksSubmitRunOperator(
     task_id=f"check-completion-notify",
+    dag=dag,
     json={
         "spark_python_task": {
             "python_file": f"{CUSTOM_SPARK_JOB_PATH}/check_completion_notify.py",
@@ -121,9 +122,11 @@ clean_task_group = task_group.build_clean_task_group(
 )
 
 
-chain(execute_job_cluster_task, DatalakeTaskGroupJobCluster.first_tasks(raw_task_group))
+chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
 cross_downstream(
-    DatalakeTaskGroupJobCluster.last_tasks(raw_task_group),
-    DatalakeTaskGroupJobCluster.first_tasks(clean_task_group),
+    DatalakeTaskGroup.last_tasks(raw_task_group),
+    DatalakeTaskGroup.first_tasks(clean_task_group),
 )
-chain(DatalakeTaskGroupJobCluster.last_tasks(clean_task_group), check_data)
+chain(DatalakeTaskGroup.last_tasks(clean_task_group), check_data)
+
+terminate_cluster_task.set_upstream(check_data)
