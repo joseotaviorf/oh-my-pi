@@ -13,7 +13,7 @@ gitdb2==2.0.5
 GitPython==2.1.11
 google-crc32c==1.1.2
 hive-metastore-client>=1.0.9
-hierarchical-conf==1.0.2
+hierarchical-conf==1.0.3
 ordereddict==1.1
 pendulum
 psycopg2-binary>=2.8.4,<3.0.0
