@@ -31,13 +31,13 @@ not_published AS (
 listing_columns AS (
   SELECT 
     lbc.id_house,
-    lbc.ts_first_publication,
-    lbc.ts_last_publication,
+    lbc.ts_first_listing AS ts_first_publication,
+    lbc.ts_last_listing AS ts_last_publication,
     MIN(ld.depublication_time) AS ts_first_depublication,
     MAX(ld.depublication_time) AS ts_last_depublication,
     COUNT(ld.id) AS unpublications
   FROM 
-    datalake_ebdb_clean.listing_business_context lbc
+    datalake_ebdb_listing.listing_business_context lbc
   LEFT JOIN
     listing_depublication ld
       ON lbc.id_house = ld.id_house

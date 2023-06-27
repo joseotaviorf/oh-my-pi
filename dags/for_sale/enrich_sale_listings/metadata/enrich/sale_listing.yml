@@ -1,97 +1,127 @@
 database_name: datalake_sale_listings
 table_name: sale_listing
+description: This table contains the information of all the listings we have had in QuintoAndar ForSale. It shows the current information of features such as price, status, consultant type, etc. 
+  It also shows whether the listing is a primary market listing, or a migration listing. Each row represents a different listing.
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   id_sale_listing:
     lineage:
       - datalake_sale_listings.sale_status_version_order.id_house
       - datalake_sale_listings.sale_status_version_order.order_version
+    description: Unique identifier of the listing. It is the combination of the id_house and the order_version of the listing.
   id_house:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id_house
+    description: Foreign key referring to the house ID. Can be joined with dw_quintoandar.dim_house and all other sale modeling tables.
   is_for_rent:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id_house
+    description: Boolean that indicates whether the listing is also in ForRent.
   has_active_rental_contract:
     lineage:
       - datalake_ebdb_contract.contract.status
+    description: Boolean that indicates whether the listing has an active rental contract.
   has_house_been_rented:
     lineage:
       - datalake_ebdb_contract.contract.id_house
+    description: Boolean that indicates whether the listing has been rented at any point.
   days_last_publication_to_depublication:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_last_publication
+      - datalake_ebdb_listing.listing_business_context.ts_last_listing
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Number of days between the last publication and the depublication of the listing.
   days_first_publication_to_first_depublication:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Number of days between the first publication and the first depublication of the listing.
   days_first_publication_to_last_depublication:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Number of days between the first publication and the last depublication of the listing.
   days_first_publication_to_first_sale_flow:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_sale_flows.sale_flow.ts_first_event
+    description: Number of days between the first publication and the first sale flow event of the listing.
   days_first_publication_to_first_booking:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_sale_flows.sale_flow.ts_first_booking_created
+    description: Number of days between the first publication and the first booking of the listing.
   days_first_publication_to_first_sale_agreement_signed:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
+    description: Number of days between the first publication and the first sale agreement signed of the listing.
   days_first_publication_to_house_registry_ended:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_sale_flows.sale_flow.dt_house_registry_ended
+    description: Number of days between the first publication and the house registry ended of the listing.
   days_first_publication_to_first_offer_submitted:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_sale_flows.sale_flow.ts_first_offer_submitted
+    description: Number of days between the first publication and the first offer submitted of the listing.
   days_first_publication_to_first_visit_completed:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_sale_flows.sale_flow.ts_first_visit_completed
+    description: Number of days between the first publication and the first visit completed of the listing.
   unpublications:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id
+    description: Number of times the listing has been unpublished.
   ts_first_publication:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+    description: Timestamp of the first publication of the listing.
   ts_last_publication:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_last_publication
+      - datalake_ebdb_listing.listing_business_context.ts_last_listing
+    description: Timestamp of the last publication of the listing.
   ts_first_depublication:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of the first depublication of the listing.
   ts_last_depublication:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of the last depublication of the listing.
   ts_first_sale_flow:
     lineage:
       - datalake_sale_flows.sale_flow.ts_first_event
+    description: Timestamp of the first sale flow event of the listing.
   ts_first_offer_submitted:
     lineage:
       - datalake_sale_flows.sale_flow.ts_first_offer_submitted
+    description: Timestamp of the first offer submitted of the listing.
   ts_first_booking:
     lineage:
       - datalake_sale_flows.sale_flow.ts_first_booking_created
+    description: Timestamp of the first booking of the listing.
   ts_first_visit_completed:
     lineage:
       - datalake_sale_flows.sale_flow.ts_first_visit_completed
+    description: Timestamp of the first visit completed of the listing.
   dt_first_offer_accepted:
     lineage:
       - datalake_sale_flows.sale_flow.dt_first_offer_accepted
+    description: Date of the first offer accepted of the listing.
   dt_first_sale_agreement_signed:
     lineage:
       - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
+    description: Date of the first sale agreement signed of the listing.
   dt_house_registry_ended:
     lineage:
       - datalake_sale_flows.sale_flow.dt_house_registry_ended
+    description: Date of the house registry ended of the listing.
   days_as_published:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_sale_listings.sale_status_version_order.ts_status_changed_new
       - datalake_sale_listings.sale_status_version_order.ts_status_changed_next
-
+    description: Number of days the listing has been published.

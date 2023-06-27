@@ -14,6 +14,36 @@ WITH opt_out AS (
     GROUP BY
         1
 ),
+status_changes AS (
+    SELECT
+        lbc_aud.id_house,
+        lbc_aud.rev,
+        lbc_aud.status,
+        lbc_aud.business_context,
+        LAG(lbc_aud.status) OVER (PARTITION BY lbc_aud.id_house, lbc_aud.business_context ORDER BY lbc_aud.rev) AS previous_status,
+        FROM_UNIXTIME(ure.ts_revision / 1000)::TIMESTAMP AS ts_status_started
+    FROM 
+        datalake_ebdb_clean.listing_business_context_aud AS lbc_aud
+    JOIN
+        datalake_ebdb_clean.user_revision_entity AS ure
+            ON ure.id = lbc_aud.rev
+    QUALIFY -- (status_MOD = 1 may not work sometimes)    
+        status IS DISTINCT FROM previous_status
+        AND ts_status_started < current_timestamp() -- Filter out incorrect revisions
+),
+publication AS (
+    SELECT 
+        id_house,
+        business_context,
+        MIN(ts_status_started) AS ts_first_publication,
+        MAX(ts_status_started) AS ts_last_publication
+    FROM
+       status_changes
+    WHERE
+        status = 'PUBLISHED'
+    GROUP BY
+        1, 2
+),
 revision AS (
     SELECT 
         lbc_aud.id_house,
@@ -59,8 +89,8 @@ SELECT
     COALESCE(lbc.ownership = 'THIRD_PARTY', FALSE) AS is_3p_supply,
     registrant.user_listing_registrant_rent,
     registrant.user_listing_registrant_sale,
-    lbc.ts_first_publication AS ts_first_listing,
-    lbc.ts_last_publication AS ts_last_listing,
+    LEAST(lbc.ts_first_publication, p.ts_first_publication) AS ts_first_listing,
+    GREATEST(lbc.ts_last_publication, p.ts_last_publication) AS ts_last_listing,
     opt_out.ts_opt_out_rent,
     opt_out.ts_opt_out_sale,
     lbc.ts_created,
@@ -76,3 +106,7 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_country.house AS ch
         ON ch.id_house = lbc.id_house
+LEFT JOIN
+    publication AS p
+        ON p.id_house = lbc.id_house
+        AND p.business_context = lbc.business_context

@@ -1,63 +1,95 @@
 database_name: datalake_ebdb_listing
 table_name: listing_business_context
+description: Each row is a house associated with a business context (SALE or RENT)
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id
+    description: Unique identifier of the listing_business_context
   id_house:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id_house
+    description: Unique identifier of the house
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
+    description: Country code of the house
   business_context:
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context
+    description: Business context of the house
+    categories:
+      SALE: 'Sale listing'
+      RENT: 'Rent listing'
+      Undefined: 'Undefined'
   ownership:
     lineage:
       - datalake_ebdb_clean.listing_business_context.ownership
+    description: Ownership of the listing
+    categories:
+      STANDARD: 'Standard listing'
+      THIRD_PARTY: 'Third party listing (from Rede)'
   calculator_price:
     lineage:
       - datalake_ebdb_clean.listing_business_context.calculator_price
+    description: Price of the listing according to our calculator
   status:
     lineage:
       - datalake_ebdb_clean.listing_business_context.status
+    description: Status of the listing
   status_reason:
     lineage:
       - datalake_ebdb_clean.listing_business_context.status_reason
+    description: Reason of the listing status
   status_closing:
     lineage:
       - datalake_ebdb_clean.listing_business_context.status_closing
+    description: Status of the listing in the closing process
   short_url:
     lineage:
       - datalake_ebdb_clean.listing_business_context.short_url
+    description: Short URL of the listing
   is_rent_context:
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context
+    description: Boolean indicating if the listing is a rent listing
   is_sale_context:
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context
+    description: Boolean indicating if the listing is a sale listing
   user_listing_registrant_rent:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user
+    description: Unique identifier of the user who registered the listing (rent)
   user_listing_registrant_sale:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user
+    description: Unique identifier of the user who registered the listing (sale)
   ts_first_listing:
     lineage:
       - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the first publication of the listing
   ts_last_listing:
     lineage:
       - datalake_ebdb_clean.listing_business_context.ts_last_publication
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the last publication of the listing
   ts_opt_out_rent:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the opt out of the listing (rent)
   ts_opt_out_sale:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the opt out of the listing (sale)
   ts_created:
     lineage:
       - datalake_ebdb_clean.listing_business_context.ts_created
+    description: Timestamp of the creation of the listing
   ts_updated:
     lineage:
       - datalake_ebdb_clean.listing_business_context.ts_updated
+    description: Timestamp of the last update of the listing
