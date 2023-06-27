@@ -1,0 +1,164 @@
+---
+database_name: metric_support_service
+table_name: inspector_performance
+description:
+    This table reports the performance of inspectors. This data is mainly used by the logistics
+    efficiency team to optimize inspection schedules. Data will be saved daily in snapshots
+    with data from the last 60 days.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_inspector:
+    dimension: True
+    description: Unique identifier of the inspector.
+    lineage:
+      - dw_inspections.dim_inspector.sk_inspector
+  inspector_name:
+    dimension: True
+    description: Inspector's full name.
+    lineage:
+      - dw_inspections.dim_inspector.inspector_name
+  total_inspected:
+    description: Total inspections carried out during the entire period of the inspector's contract.
+    metric:
+        name: Total inspections performed by the inspector's SK
+        description:
+          Total inspections carried out during the entire period of the inspector's contract.
+          It is calculated from the count of the inspection execution date.
+        acronym: Total inspections per inspector
+        is_additive: False
+        business_stage: Demand
+        hierarchy: User analysis
+        approved_by: alexandre.gimenez@quintoandar.com.br
+        link_to_metric: ''
+  total_booked:
+    description: Total inspections that were scheduled throughout the inspector's contract period.
+    metric:
+        name: Total scheduled inspections by the inspector's SK
+        description:
+          Total inspections that were scheduled throughout the inspector's contract period.
+          It is calculated from the count of the inspection scheduling date.
+        acronym: Total scheduled inspections per inspector
+        is_additive: False
+        business_stage: Demand
+        hierarchy: User analysis
+        approved_by: alexandre.gimenez@quintoandar.com.br
+        link_to_metric: ''
+  total_cancelled_by_inspector:
+    description: Total inspections that were canceled for reasons linked to the inspector.
+    metric:
+        name: Total cancelled inspections by the inspector's SK
+        description:
+          "Total inspections that were canceled for reasons linked to the inspector.
+          For the counting of inspections, the following cancellation reasons are considered:
+          'INSPECTOR_BLOCKED_SCHEDULE', 'CANCELED_PROBLEM_INSPECTOR', 'CANCELED_INSPECTOR_NOT_ATTEND',
+          'CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION'."
+        acronym: Total cancelled inspections per inspector
+        is_additive: False
+        business_stage: Demand
+        hierarchy: User analysis
+        approved_by: alexandre.gimenez@quintoandar.com.br
+        link_to_metric: ''
+  total_cancelled_by_others:
+    description: Total inspections that were canceled for reasons that are not linked to the inspector.
+    metric:
+        name: Total inspections canceled by others
+        description:
+          "Total inspections that were canceled for reasons that are not linked to the inspector.
+          For the counting of inspections, the following cancellation reasons are disregarded:
+          'INSPECTOR_BLOCKED_SCHEDULE', 'CANCELED_PROBLEM_INSPECTOR', 'CANCELED_INSPECTOR_NOT_ATTEND',
+          'CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION'."
+        acronym: Total inspections canceled by others
+        is_additive: False
+        business_stage: Demand
+        hierarchy: User analysis
+        approved_by: alexandre.gimenez@quintoandar.com.br
+        link_to_metric: ''
+  total_days_worked:
+    description: Total days worked, that is, days the inspector carried out the inspection.
+    metric:
+        name: Total days worked by the inspector
+        description:
+          Total days worked, that is, days the inspector carried out the inspection, during the term
+          of his contract. For the count, the different dates of execution of inspections are counted.
+        acronym: Total days worked by the inspector
+        is_additive: False
+        business_stage: Demand
+        hierarchy: User analysis
+        approved_by: alexandre.gimenez@quintoandar.com.br
+        link_to_metric: ''
+  total_weeks_worked:
+    description: Total weeks worked, that is, total weeks in which the inspector carried out an inspection.
+    metric:
+        name: Total weeks worked by the inspector
+        description:
+          Total weeks worked, that is, total weeks in which the inspector carried out an inspection,
+          during the term of his contract. For the count, the inspection execution dates are converted
+          to week granularity, and, after that, the different dates are counted.
+        acronym: Total weeks worked by the inspector
+        is_additive: False
+        business_stage: Demand
+        hierarchy: User analysis
+        approved_by: alexandre.gimenez@quintoandar.com.br
+        link_to_metric: ''
+  average_inspections:
+    description: Average of inspections per day worked.
+    metric:
+        name: Average inspections per day and per inspector
+        description:
+          Average of inspections per day worked. For calculation, all inspections carried
+          out are counted and divided by the number of days worked.
+        acronym: Average inspections per inspector
+        is_additive: False
+        business_stage: Demand
+        hierarchy: User analysis
+        approved_by: alexandre.gimenez@quintoandar.com.br
+        link_to_metric: ''
+  inspections_conversion:
+    description: Conversion of scheduled inspections that were performed.
+    metric:
+        name: Percentile of how many scheduled inspections were performed
+        description:
+          Conversion of scheduled inspections that were performed. This indicator ranges from 0 to 1, with 1
+          representing that all scheduled inspections were carried out, and 0 that no scheduled inspections were
+          carried out. For the calculation, all inspections carried out are counted and divided by the count
+          of scheduled inspections, excluding canceled inspections.
+        acronym: Scheduled inspections were performed
+        is_additive: False
+        business_stage: Demand
+        hierarchy: User analysis
+        approved_by: alexandre.gimenez@quintoandar.com.br
+        link_to_metric: ''
+  eligible_inspections:
+    description: Total number of inspections that a inspector is eligible to perform in one day
+    metric:
+        name: Total number of inspections that a inspector is eligible to perform in one day
+        description:
+          "Total number of inspections that a inspector is eligible to perform in one day. This number is a business
+          definition: For inspectors with up to 1 month of contract, we consider the interval of days of the contract.
+          For other inspectors, we consider average inspections per day worked and conversion of scheduled inspections"
+        acronym: Inspections eligible to perform in one day
+        is_additive: False
+        business_stage: Demand
+        hierarchy: User analysis
+        approved_by: alexandre.gimenez@quintoandar.com.br
+        link_to_metric: ''
+  dt_inspector_started:
+    dimension: True
+    description: Beginning of the employment contract.
+    lineage:
+      - dw_inspections.dim_inspector.dt_start
+  dt_load:
+    dimension: True
+    description:
+      Date referring to the loading of data in the snapshot, so the calculated metrics consider all data up to this
+      snapshot date. This date is the day before the day the flow was run (D-1).
+  year:
+    dimension: True
+    description: Year of the date referring to the loading of data in snapshot.
+  month:
+    dimension: True
+    description: Month of the date referring to the loading of data in snapshot.
+  day:
+    dimension: True
+    description: Day of the date referring to the loading of data in snapshot.

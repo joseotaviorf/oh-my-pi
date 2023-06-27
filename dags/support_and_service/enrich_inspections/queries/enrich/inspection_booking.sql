@@ -158,11 +158,24 @@ SELECT
         WHEN DATE(b.ts_first_canceled_unevaluated) = DATE_SUB(DATE(b.ts_booking_utc), 1) THEN True
         ELSE False
     END AS is_d1_canceled,
+    CASE
+        WHEN b.cancellation_reason NOT IN (
+                'INSPECTOR_BLOCKED_SCHEDULE',
+                'CANCELED_PROBLEM_INSPECTOR',
+                'CANCELED_INSPECTOR_NOT_ATTEND',
+                'CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION'
+            )
+            THEN TRUE
+        WHEN b.cancellation_reason IS NULL THEN NULL
+        ELSE FALSE
+    END AS is_not_canceled_by_inspector,
     ic.dt_contract_entrance,
     ic.dt_contract_termination,
     ic.dt_execution_limit,
     b.ts_booking_utc AS ts_booking_inspected_utc,
     b.ts_booking_local_tz AS ts_booking_inspected_local_tz,
+    b.ts_created AS ts_booking_created_utc,
+    b.ts_created_local_tz AS ts_booking_created_local_tz,
     b.ts_first_canceled_unevaluated AS ts_booking_cancelled_utc,
     b.ts_first_canceled_unevaluated_local_tz AS ts_booking_cancelled_local_tz,
     ic.ts_termination_canceled,

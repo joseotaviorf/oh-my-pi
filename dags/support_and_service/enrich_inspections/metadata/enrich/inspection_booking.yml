@@ -115,6 +115,8 @@ columns:
     description: Indicates that the inspection was canceled by the inspector on the scheduled day.
   is_d1_canceled:
     description: Indicates that the inspection was canceled by the inspector the day before the scheduled.
+  is_not_canceled_by_inspector:
+    description: Indicates that the inspection was not canceled because of the inspector.
   dt_contract_entrance:
     description: Date defined in the contract of when the tenant will enter in the property.
     lineage:
@@ -136,6 +138,14 @@ columns:
     description: Scheduled date and time in your region's local time.
     lineage:
       - datalake_booking.booking.ts_booking_local_tz
+  ts_booking_created_utc:
+    description: Datetime of the booking creation (UTC).
+    lineage:
+      - datalake_booking.booking.ts_created
+  ts_booking_created_local_tz:
+    description: Datetime of the booking creation in your region's local time.
+    lineage:
+      - datalake_booking.booking.ts_created_local_tz
   ts_booking_cancelled_utc:
     description: Schedule cancellation date and time (UTC).
     lineage:
