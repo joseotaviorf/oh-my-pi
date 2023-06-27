@@ -15,7 +15,7 @@ def create_data_payload(item):
         "type": "CUSTOMER_HAS_APP",
     }
     data["keyValue"] = item["id_user"]
-    data["contextFields"] = {"dateTimeLastAccessApp": item["ts_last_event"]}
+    data["contextFields"] = {"dateTimeLastAccessApp": item["ts_latest_event"]}
     return data
 
 
@@ -47,8 +47,14 @@ if __name__ == "__main__":
 
     df = spark_client.conn.sql(
         f"""
-        SELECT * FROM datalake_app_installed.{table}
-        WHERE ts_last_event >= '{execution_date}' - INTERVAL "7" DAY
+        SELECT
+            COALESCE(id_user, -1) AS id_user,
+            MAX(ts_event) AS ts_latest_event
+        FROM
+            datalake_app_installed.{table}
+        WHERE
+            ts_event >= '{execution_date}' - INTERVAL "7" DAY
+        GROUP BY 1
         """
     )
     df_list = df.toJSON().map(lambda str_json: json.loads(str_json)).collect()

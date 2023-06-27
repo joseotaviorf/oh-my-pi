@@ -36,22 +36,6 @@ columns:
     lineage:
       - datalake_user.persona_type.email
     description: The user email.
-  app_device_carrier:
-    lineage:
-      - datalake_amplitude_clean_staging.170698_af_app_opened_events.device_carrier
-    description: The user device carrier.
-  app_device_family:
-    lineage:
-      - datalake_amplitude_clean_staging.170698_af_app_opened_events.device_family
-    description: The user device family.
-  app_os_name:
-    lineage:
-      - datalake_amplitude_clean_staging.170698_af_app_opened_events.os_name
-    description: The user app operation system name.
-  app_os_version:
-    lineage:
-      - datalake_amplitude_clean_staging.170698_af_app_opened_events.os_version
-    description: The user's app operational system version.
   active_contracts:
     lineage:
       - datalake_ebdb_clean.contract.id
@@ -162,28 +146,16 @@ columns:
   has_app_installed:
     description:
       Whether the user has the app installed or not, the following conditions determine
-      the result. If the last installed date is equal to or greater than the first
-      installed date (Start Version), it is considered TRUE; if the app's last opened
-      event date is within 45 days, it is also considered TRUE. Otherwise, the
-      result is FALSE.
+      the result. If the app's latest event date is within 45 days, it is also
+      considered TRUE. Otherwise, the result is FALSE.
   dt_user_birth:
     lineage:
       - datalake_user.persona_type.dt_birth
     description: The user birth date.
-  ts_app_client_event:
+  ts_app_latest_event:
     lineage:
-      - datalake_amplitude_clean_staging.170698_af_app_opened_events.ts_client_event
-    description: The app's last opened event date.
-  ts_app_first_installed:
-    lineage:
-      - datalake_amplitude_clean_staging.170698_af_app_opened_events.start_version
-    description:
-      Also known as Start Version, it is the first version of the app identified
-      for the user.
-  ts_app_last_installed:
-    lineage:
-      - datalake_amplitude_clean_staging.170698_af_app_opened_events.user_properties
-    description: When the app was last installed.
+      - datalake_app_installed.events.ts_event
+    description: The app's event latest timestamp.
   ts_user_updated:
     lineage:
       - datalake_user.persona_type.ts_user_updated

@@ -209,27 +209,26 @@ contract_metric AS (
     status = 'Ativo'
   GROUP BY 1, 2
 ),
+user_latest_app_event AS (
+  SELECT
+      COALESCE(id_user, -1) AS id_user,
+      MAX(ts_event) AS ts_latest_event
+  FROM
+      datalake_app_installed.events
+  GROUP BY 1
+),
 app_metric AS (
   SELECT
-    REGEXP_REPLACE(aoe.id_user, "\\.", "") AS id_user,
-    aoe.device_carrier,
-    aoe.device_family,
-    aoe.os_name,
-    aoe.os_version,
+    id_user,
     CASE
-      WHEN (GET_JSON_OBJECT(aoe.user_properties, "$['[AppsFlyer] installed at']") >= aoe.start_version)
-        OR (DATEDIFF(CURRENT_DATE(), aoe.ts_client_event)) <= 45 THEN TRUE
+      WHEN DATEDIFF(CURRENT_DATE(), ts_latest_event) <= 45 THEN TRUE
       ELSE FALSE
     END AS has_app_installed,
-    aoe.ts_client_event,
-    aoe.start_version AS ts_first_installed,
-    GET_JSON_OBJECT(user_properties, "$['[AppsFlyer] installed at']") AS ts_last_installed
+    ts_latest_event
   FROM
-    datalake_amplitude_clean_staging.170698_af_app_opened_events AS aoe
+    user_latest_app_event
   WHERE
-    aoe.id_user IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY REGEXP_REPLACE(aoe.id_user, "\\.", "") ORDER BY aoe.ts_client_event DESC) = 1
+    id_user IS NOT NULL
 )
 SELECT
   ptp.id_user,
@@ -239,10 +238,6 @@ SELECT
   ptp.main_phone,
   ptp.name,
   ptp.email,
-  COALESCE(am.device_carrier, 'not applicable') AS app_device_carrier,
-  COALESCE(am.device_family, 'not applicable') AS app_device_family,
-  COALESCE(am.os_name, 'not applicable') AS app_os_name,
-  COALESCE(am.os_version, 'not applicable') AS app_os_version,
   COALESCE(NULLIF(cm.active_contracts, ''), 'not applicable') AS active_contracts,
   COALESCE(NULLIF(tm.back_ticket_list, ''), 'not applicable') AS back_ticket_list,
   COALESCE(tm.total_open_back_ticket, 0) AS total_open_back_ticket,
@@ -273,9 +268,7 @@ SELECT
   COALESCE(cm.has_active_contract, FALSE) AS has_active_contract,
   COALESCE(am.has_app_installed, FALSE) AS has_app_installed,
   COALESCE(ptp.dt_birth, CAST('1900-01-01' AS TIMESTAMP)) AS dt_user_birth,
-  COALESCE(am.ts_client_event, CAST('1900-01-01' AS TIMESTAMP)) AS ts_app_client_event,
-  COALESCE(am.ts_first_installed, CAST('1900-01-01' AS TIMESTAMP)) AS ts_app_first_installed,
-  COALESCE(am.ts_last_installed, CAST('1900-01-01' AS TIMESTAMP)) AS ts_app_last_installed,
+  COALESCE(am.ts_latest_event, CAST('1900-01-01' AS TIMESTAMP)) AS ts_app_latest_event,
   COALESCE(ptp.ts_user_updated, CAST('1900-01-01' AS TIMESTAMP)) AS ts_user_updated,
   COALESCE(ptp.ts_user_created, CAST('1900-01-01' AS TIMESTAMP)) AS ts_user_created,
   ptp.year,

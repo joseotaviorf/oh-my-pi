@@ -1,0 +1,20 @@
+database_name: datalake_app_installed
+table_name: events
+description: Table containing the a series of Amplitude events for every id_user
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_af_app_opened_events.id_user
+      - datalake_amplitude_clean_staging.170698_home_page_viewed_events.id_user
+      - datalake_amplitude_clean_staging.170698_search_page_viewed_events.id_user
+      - datalake_amplitude_clean_staging.170698_login_page_viewed_events.id_user
+    description: ID of the user
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_af_app_opened_events.ts_client_event
+      - datalake_amplitude_clean_staging.170698_home_page_viewed_events.ts_client_event
+      - datalake_amplitude_clean_staging.170698_search_page_viewed_events.ts_client_event
+      - datalake_amplitude_clean_staging.170698_login_page_viewed_events.ts_client_event
+    description: Timestamp registered for the event
