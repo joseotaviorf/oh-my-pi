@@ -2198,6 +2198,16 @@ bietlejuice.enrich_zipcodes:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_region:load-enrich-region
+bietlejuice.metric_fintech__atta:
+  - bietlejuice.dw_atta:load-dw-atta-dim-franchise-atta
+  - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta
+  - bietlejuice.dw_atta:load-dw-atta-dim-client-atta
+  - bietlejuice.dw_atta:load-dw-atta-dim-buyer-atta
+  - bietlejuice.dw_atta:load-dw-atta-dim-partner-atta
+  - bietlejuice.dw_atta:load-dw-atta-dim-proposal-situation-changes
+  - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow
+  - bietlejuice.dw_atta:load-dw-atta-dim-consultant-atta
+  - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
 bietlejuice.metric_rent__bookings:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_region:load-dw-public-dim-region

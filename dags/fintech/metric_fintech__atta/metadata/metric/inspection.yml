@@ -1,0 +1,51 @@
+---
+database_name: metric_fintech
+table_name: inspection
+description: Daily table that contains the number of cases in which the process of collecting documents for legal analysis and contacting the Seller/Seller to carry out the inspection was initiated.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  dt_inspection:
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_min_inspection
+    description: Date when Inspection status started.
+    dimension: True
+  offer:
+    description: Number of cases in which the process of collecting documents for legal analysis and contacting the Seller/Seller to carry out the inspection was initiated.
+    metric:
+      name: Financed Deals
+      description:
+        Number of cases in which the process of collecting documents for legal analysis and contacting the Seller/Seller to carry out the inspection was initiated.
+        This amount is calculated by the distinct count of offers.
+      acronym: FD
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analisys
+      approved_by: camila.carvalho@quintoandar.com.br
+      link_to_metric: https://datahub.quintoandar.com.br/metric/urn:li:metric:(inspection_fintech,PROD)/Info?is_lineage_mode=false
+  pre_analysis:
+    description: Number of cases in which the process of collecting documents for legal analysis and contacting the Seller/Seller to carry out the inspection was initiated.
+    metric:
+      name: Financed Deals
+      description:
+        Number of cases in which the process of collecting documents for legal analysis and contacting the Seller/Seller to carry out the inspection was initiated.
+        This amount is calculated by the distinct count of pre analysis.
+      acronym: FD
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analisys
+      approved_by: camila.carvalho@quintoandar.com.br
+      link_to_metric: https://datahub.quintoandar.com.br/metric/urn:li:metric:(inspection_fintech,PROD)/Info?is_lineage_mode=false
+  proposals:
+    description: Number of cases in which the process of collecting documents for legal analysis and contacting the Seller/Seller to carry out the inspection was initiated.
+    metric:
+      name: Financed Deals
+      description:
+        Number of cases in which the process of collecting documents for legal analysis and contacting the Seller/Seller to carry out the inspection was initiated.
+        This amount is calculated by the distinct count of proposals.
+      acronym: FD
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analisys
+      approved_by: camila.carvalho@quintoandar.com.br
+      link_to_metric: https://datahub.quintoandar.com.br/metric/urn:li:metric:(inspection_fintech,PROD)/Info?is_lineage_mode=false

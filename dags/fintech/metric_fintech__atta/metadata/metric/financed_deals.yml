@@ -1,0 +1,48 @@
+---
+database_name: metric_fintech
+table_name: financed_deals
+description: Daily table that contains the number of financing contracts issued at ATTA.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  dt_financing_contract:
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_min_financing_contract
+    description: Date when Financed Deals status started.
+    dimension: True
+  offer:
+    description: Number of financing contracts issued at ATTA.
+    metric:
+      name: Financed Deals
+      description: Number of financing contracts issued at ATTA.
+        This amount is calculated by the distinct count of offers.
+      acronym: FD
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analisys
+      approved_by: camila.carvalho@quintoandar.com.br
+      link_to_metric: https://datahub.quintoandar.com.br/metric/urn:li:metric:(financed_deals_fintech,PROD)/Info?is_lineage_mode=false
+  pre_analysis:
+    description: Number of financing contracts issued at ATTA.
+    metric:
+      name: Financed Deals
+      description: Number of financing contracts issued at ATTA.
+        This amount is calculated by the distinct count of pre analysis.
+      acronym: FD
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analisys
+      approved_by: camila.carvalho@quintoandar.com.br
+      link_to_metric: https://datahub.quintoandar.com.br/metric/urn:li:metric:(financed_deals_fintech,PROD)/Info?is_lineage_mode=false
+  proposals:
+    description: Number of financing contracts issued at ATTA.
+    metric:
+      name: Financed Deals
+      description: Number of financing contracts issued at ATTA.
+        This amount is calculated by the distinct count of proposals.
+      acronym: FD
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analisys
+      approved_by: camila.carvalho@quintoandar.com.br
+      link_to_metric: https://datahub.quintoandar.com.br/metric/urn:li:metric:(financed_deals_fintech,PROD)/Info?is_lineage_mode=false

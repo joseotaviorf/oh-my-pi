@@ -1,0 +1,6 @@
+---
+table_name: metric_fintech.cap2ca
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  dt_credit_started:
+    is_unique:
