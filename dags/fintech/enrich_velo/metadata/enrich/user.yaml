@@ -9,6 +9,10 @@ columns:
     lineage:
       - datalake_velo_clean.users_users.id
       - datalake_rental_guarantee_platform_clean.user_account.id
+  uuid_user:
+    lineage:
+      - datalake_rental_guarantee_platform_clean.user_account.uuid_person
+    description: Unique identifier (UUID) of the user generated in the Product Database.
   name:
     description: username
     lineage:
