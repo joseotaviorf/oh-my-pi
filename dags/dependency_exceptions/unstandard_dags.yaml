@@ -1,0 +1,37 @@
+---
+bietlejuice.amplitude:
+  is_static: false
+  custom_task_names:
+    - task_name: load-subpartitioned-event-tables-to-clean
+      table_name_condition_regex: \d+_\w+_events
+bietlejuice.dw_country:
+  is_static: true
+bietlejuice.dw_datamarts_spark.static:
+  is_static: true
+bietlejuice.dw_date:
+  is_static: true
+bietlejuice.enrich_media_plan:
+  is_static: true
+bietlejuice.enrich_public_date:
+  is_static: true
+bietlejuice.enrich_static_files:
+  is_static: true
+bietlejuice.media_plan:
+  is_static: true
+
+bietlejuice.gsheets: &gsheets-default
+  is_static: false
+  custom_task_names:
+    - task_name: done-{slugged_layer}-{slugged_table_name}
+      table_name_condition_regex: .*
+bietlejuice.gsheets.bedrock: *gsheets-default
+bietlejuice.gsheets.fintech: *gsheets-default
+bietlejuice.gsheets.for_rent: *gsheets-default
+bietlejuice.gsheets.for_sale: *gsheets-default
+bietlejuice.gsheets.general: *gsheets-default
+bietlejuice.gsheets.growth: *gsheets-default
+bietlejuice.gsheets.growth_intraday: *gsheets-default
+bietlejuice.gsheets.support_and_service: *gsheets-default
+bietlejuice.gsheets.static:
+  <<: *gsheets-default
+  is_static: true

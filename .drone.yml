@@ -90,6 +90,16 @@ pipeline:
       event: push
       branch: [master, hotfix/*]
 
+  validate-dependency-file-correctness:
+    group: tests
+    image: python:3.7.16
+    commands:
+      - make requirements
+      - make requirements-scripts
+      - make validate-dependency-file-correctness
+    when:
+      event: push
+  
   validate-metadata-files-content:
     group: tests
     image: python:3.7.16

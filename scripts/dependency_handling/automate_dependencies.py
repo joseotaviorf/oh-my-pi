@@ -1,51 +1,70 @@
 import yaml
+import os
+import sys
 
-from airflow.models import DagBag
-from bietlejuice.base.dependencies.dag_bag_dependency_generator import (
-    DagBagDependencyGenerator,
+BI_ETL_EJUICE_ROOT = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
+sys.path.append(BI_ETL_EJUICE_ROOT)
+
+from bietlejuice.base.dependencies.file_dependency_generator import (
+    FileDependencyGenerator,
+)
+from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
+    DAGS_CROSS_DEPENDENCIES_FILE_PATH,
 )
 
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.dag_bag_service import DagBagService
-
-config_service = ConfigurationService()
-databricks_bietlejuice_repo_path = config_service.get_config(
-    "databricks_bietlejuice_repo_path"
+DEPENDENCY_EXCEPTIONS_FOLDER_PATH = os.path.join(
+    os.path.dirname(DAGS_CROSS_DEPENDENCIES_FILE_PATH), "dependency_exceptions"
 )
-BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/".replace('//', '/')
-LOCAL_ENV_DAGS_FOLDER = '/bi-etl-ejuice/local/bietlejuice/dags/dags'
-OUTPUT_FILE_TEMPLATE = '/bi-etl-ejuice/local/bietlejuice/scripts/dependency_handling/{}.yaml'
-EXCEPTIONS_FILE_PATH = '/bi-etl-ejuice/local/bietlejuice/scripts/dependency_handling/dependency_exceptions.yaml'
+UNSTANDARD_DAGS_PATH = os.path.join(
+    DEPENDENCY_EXCEPTIONS_FOLDER_PATH, "unstandard_dags.yaml"
+)
+MANUAL_MODIFICATIONS_PATH = os.path.join(
+    DEPENDENCY_EXCEPTIONS_FOLDER_PATH, "manual_modifications.yaml"
+)
 
 
 def main():
-    dag_bag = DagBag(dag_folder='/bi-etl-ejuice/local/bietlejuice/dags/dags', store_serialized_dags=False, include_examples=False)
-    dag_bag_service = DagBagService(dag_bag, collect_from_database=False)
-
-    dag_bag_dependency_generator = DagBagDependencyGenerator(
-        dag_bag_service, BASE_SPARK_JOBS_PATH, LOCAL_ENV_DAGS_FOLDER
-    )
-
-    dependency_exception = get_exception_file(EXCEPTIONS_FILE_PATH)
-
-    dependencies = dag_bag_dependency_generator.generate_dependencies(
-        dependency_exception
-    )
-    write_to_yml(dependencies, "dependencies_with_tasks")
+    dependencies = generate_dependencies()
+    write_to_yml(dependencies)
 
 
-def write_to_yml(table_dependencies: dict, file_name: str):
-    with open(OUTPUT_FILE_TEMPLATE.format(file_name), mode="w+") as file_stream:
+def generate_dependencies():
+    unstandard_dags = get_unstandard_dags_file_content(UNSTANDARD_DAGS_PATH)
+    dependency_generator = FileDependencyGenerator(unstandard_dags)
+    manual_modifications = get_manual_modifications_file_content(MANUAL_MODIFICATIONS_PATH)
+
+    dependencies = dependency_generator.generate_dependencies(manual_modifications)
+
+    return dependencies
+
+
+def write_to_yml(table_dependencies: dict):
+    with open(DAGS_CROSS_DEPENDENCIES_FILE_PATH, mode="w+") as file_stream:
         yaml.dump(table_dependencies, file_stream, explicit_start=True)
 
 
-def get_exception_file(exceptions_file_path: str):
+def get_unstandard_dags_file_content(unstandard_dags_file_path: str):
+    return read_from_yml(
+        unstandard_dags_file_path,
+        "msg=Unstandard dags file not found, no changes will be applied to task names or static dags. error={}",
+    )
+
+
+def get_manual_modifications_file_content(exceptions_file_path: str):
+    return read_from_yml(
+        exceptions_file_path,
+        "msg=Manual modifications file not found, no manual changes will be applied to the output. error={}",
+    )
+
+
+def read_from_yml(file_name: str, error_message_template: str) -> dict:
     try:
-        with open(exceptions_file_path) as dependency_exception_file:
-            dependency_exceptions = yaml.safe_load(dependency_exception_file)
-            return dependency_exceptions
+        with open(file_name) as file_stream:
+            return yaml.safe_load(file_stream)
     except FileNotFoundError as e:
-        print(f"msg=Exceptions file not found, no manual changes will be applied to the output. error={e}")
+        print(error_message_template.format(e))
         return {}
 
 

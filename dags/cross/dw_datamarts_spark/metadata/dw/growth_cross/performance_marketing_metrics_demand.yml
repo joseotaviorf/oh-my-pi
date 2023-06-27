@@ -24,19 +24,19 @@ columns:
   sk_booking:
     description: Booking identificator
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_booking
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_booking
   sk_offer:
     description: Offer ifentificator
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_offer
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_offer
   sk_proposal:
     description: Proposal ifentificator
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_proposal
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_proposal
   sk_contract:
     description: Contract ifentificator
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_contract
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_contract
   dt_booking_created:
     description: Date of booking creation
     lineage:
@@ -44,7 +44,7 @@ columns:
   flg_visit_completed:
     description: Status of booking visit realization
     lineage:
-      - dw_public.fact_listing_rent_flows.flg_visit_completed
+      - datalake_listing_temp.fact_listing_rent_flows_house.flg_visit_completed
   dt_offer_submitted:
     description: Date of offer submitted
     lineage:
@@ -62,7 +62,7 @@ columns:
     lineage:
       - dw_public.dim_date.dt_credit_analysis_approved
   dt_contract_signed:
-    description: Date of the flow event or status available
+    description: Date of contract signed
     lineage:
       - dw_public.dim_date.dt_contract_signed
   dt_event:
@@ -93,8 +93,6 @@ columns:
       - dw_datamarts.tenant_prospect_status.status_detail
   next_status:
     description: Status after the status at that dt_event
-    lineage:
-      - dw_datamarts.tenant_prospect_status.next_status
   ts_status_start:
     description: Timestamp that started prospect status
     lineage:
@@ -113,6 +111,7 @@ columns:
       - datalake_gsheets_clean.rental_ntp_source_targets.city_group
       - datalake_gsheets_clean.rental_flows_targets.city_group
   country_name:
+    description: Name of country
     lineage:
       - dw_public.dim_region.country_name
   flow_event:

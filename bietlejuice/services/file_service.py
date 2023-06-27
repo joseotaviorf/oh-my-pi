@@ -160,7 +160,10 @@ class FileService:
                 context = path_tree[3]
                 # Hard coded while the Gsheets Guild is still creating the new gsheets DAG Builder,
                 # which will have the correct path structure
-                dag = f"{source.replace('gsheets_by_context', 'gsheets')}.{context}"
+                if "gsheets" in source:
+                    dag = f"gsheets.{context}"
+                else:
+                    dag = f"{source}.{context}"
         if len(path_tree) == 6:
             context = path_tree[3]
             origin = path_tree[4]
