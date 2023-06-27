@@ -371,12 +371,11 @@ house_entrance_history AS (
 first_publication AS (
   SELECT
     id_house,
-    MIN(ts_state_started) AS ts_first_publication
+    CAST(MIN(ts_state_started) AS TIMESTAMP) AS ts_first_publication
   FROM
-    datalake_ebdb_listing.business_context_history
+    datalake_ebdb_listing.lbc_status_version_order
   WHERE
-    status = 'PUBLISHED'
-    AND business_context = 'RENT'
+    status IN ('PUBLISHED', 'publicado')
   GROUP BY
     id_house
 )
@@ -421,7 +420,7 @@ SELECT
     CAST(hled.ts_early_demand_started AS TIMESTAMP) AS ts_early_demand_started,
     hl.ts_listing_version_start,
     hl.ts_listing_version_end,
-    CAST(fp.ts_first_publication AS TIMESTAMP) AS ts_first_publication,
+    fp.ts_first_publication,
     heh.ts_entrance_started,
     hl.ts_last_unpublished,
     hl.dt_last_exclusive_opted_in,

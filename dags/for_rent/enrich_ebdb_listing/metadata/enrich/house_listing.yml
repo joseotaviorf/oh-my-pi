@@ -172,5 +172,5 @@ columns:
     description: Timestamp when the listing became early demand.
   ts_first_publication:
     lineage:
-      - datalake_ebdb_listing.business_context_history.ts_state_started
+      - datalake_ebdb_listing.lbc_status_version_order.ts_state_started
     description: Timestamp of the first time this house was published.
