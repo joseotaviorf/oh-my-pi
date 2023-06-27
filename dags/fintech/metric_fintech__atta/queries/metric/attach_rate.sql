@@ -1,5 +1,5 @@
 SELECT
-      DATE_TRUNC('month', TO_DATE(fcf.sk_credit_analysis_ended_date, 'yyyyMMdd')) AS credit_analysis_ended_month,
+      DATE_TRUNC('month', TO_DATE(CAST(fcf.sk_credit_analysis_ended_date AS string), 'yyyyMMdd')) AS credit_analysis_ended_month,
       COUNT(DISTINCT CASE WHEN (dsa.credit_model = 'ATTA') THEN fcf.sk_offer ELSE NULL END)*1.00 / COUNT(DISTINCT fcf.sk_offer) AS attach_rate
 FROM dw_sale.fact_closing_flows fcf
 LEFT JOIN dw_sale.dim_sale_agreement AS dsa

@@ -2,5 +2,5 @@
 table_name: metric_fintech.credit_application
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
-  dt_credit_application:
+  dt_credit_started:
     is_unique:

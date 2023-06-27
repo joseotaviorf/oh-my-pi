@@ -1,5 +1,5 @@
 WITH base AS (SELECT
-      DATE_TRUNC('day',ts_min_bank_application) AS ts_financing_ended,
+      DATE_TRUNC('day',ts_min_bank_application) AS dt_bank_application,
       COUNT(DISTINCT sk_proposal)         AS ba_proposals,
       SUM(CASE WHEN ts_financing_ended IS NOT NULL THEN 1 ELSE 0 END) AS ba2fd_proposals
 FROM
