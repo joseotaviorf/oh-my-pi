@@ -60,6 +60,10 @@ def compare_dependencies(
             differences[dag_name]["missing"] = missing
         if extra:
             differences[dag_name]["extra"] = extra
+    for dag_name in existing_dependencies_file:
+        if dag_name not in expected_dependencies_file:
+            differences[dag_name]["extra"] = existing_dependencies_file[dag_name]
+
     return differences
 
 

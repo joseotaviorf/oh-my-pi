@@ -340,6 +340,8 @@ bietlejuice.enrich_amplitude_sale_visit_intent:
 bietlejuice.enrich_amplitude_talk_to_agent:
   override: []
 bietlejuice.enrich_app_installed:
+  add:
+    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
 bietlejuice.enrich_atta:
