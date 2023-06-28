@@ -20,10 +20,11 @@ columns:
     description: Natural key that represents the company lead, coming from HubSpot.
   uuid_company:
     lineage:
-    - datalake_hubspot.company.uuid_company
+    - datalake_company.company.uuid_company
     description: Unique identifier (UUID) of a company generated in the Company Database.
   company_name:
     lineage:
+    - datalake_company.company.company_name
     - datalake_hubspot.company.name
     - datalake_rede_company.company_sks.extracted_3p_tag
     description: Name of the company in HubSpot.
@@ -35,6 +36,7 @@ columns:
       come in the format "[3P-<value>]".
   extracted_3p_tag:
     lineage:
+    - datalake_company.company.trade_name
     - datalake_hubspot.company.extracted_3p_tag
     - datalake_rede_company.company_sks.extracted_3p_tag
     description: Represents the real estate agency. It is extracted from the tag column,
@@ -73,23 +75,34 @@ columns:
       'B2B Sales': ForSale
   address:
     lineage:
+    - datalake_company.company.public_area
     - datalake_hubspot.company.address
     description: Address of the company.
   zip_code:
     lineage:
+    - datalake_company.company.zip_code
     - datalake_hubspot.company.zip_code
     description: ZIP code of the company.
   city:
     lineage:
+    - datalake_company.company.city
     - datalake_hubspot.company.city
     description: City where the company is located.
+  state_abbreviation:
+    lineage:
+    - datalake_hubspot.company.state
+    - datalake_company.company.state_abbreviation
+    description: State abbreviation where the company is located.
   state:
     lineage:
+    - datalake_ebdb_clean.state.name
+    - datalake_company.company.state
     - datalake_hubspot.company.state
     description: State where the company is located.
   country:
     lineage:
     - datalake_hubspot.company.country
+    - datalake_company.company.country
     description: Country where the company is located.
   domain:
     lineage:
@@ -163,6 +176,7 @@ columns:
       (Rent) or "Venda e Locação"
   cnpj:
     lineage:
+    - datalake_company.company.cnpj
     - datalake_hubspot.company.cnpj
     description: CNPJ of the company.
   creci:
@@ -286,10 +300,12 @@ columns:
     description: Time when the company was archived in HubSpot.
   ts_created:
     lineage:
+    - datalake_company.company.ts_created
     - datalake_hubspot.company.ts_created
-    description: Time when the company lead was created in HubSpot.
+    description: Time when the company lead was created in HubSpot or the Company database (first of them).
   ts_updated:
     lineage:
+    - datalake_company.company.ts_updated
     - datalake_hubspot.company.ts_updated
     description: Time when the row was last updated.
   is_partner:

@@ -13,6 +13,10 @@ columns:
     description: Hubspot ID for the company.
     lineage:
       - datalake_hubspot.company.id_company
+  uuid_company:
+    description: UUID of the company in the Company domain.
+    lineage:
+      - datalake_company_clean.company.uuid_company
   extracted_3p_tag:
     description: Content of the 3P tag ([3P-<name>]) of the company.
     lineage:

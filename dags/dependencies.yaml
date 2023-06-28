@@ -523,11 +523,15 @@ bietlejuice.dw_quinto_messenger:
 - bietlejuice.enrich_quinto_messenger:load-enrich-task
 - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
 bietlejuice.dw_rede_company:
+- bietlejuice.ebdb:load-clean-state
+- bietlejuice.enrich_company:load-enrich-company
 - bietlejuice.enrich_hubspot:load-enrich-company
 - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.dw_rede_company_lead:
 - bietlejuice.ebdb:load-clean-listing-business-context
+- bietlejuice.ebdb:load-clean-state
 - bietlejuice.enrich_booking:load-enrich-booking
+- bietlejuice.enrich_company:load-enrich-company
 - bietlejuice.enrich_ebdb_listing:load-enrich-house
 - bietlejuice.enrich_hubspot:load-enrich-company
 - bietlejuice.enrich_rede_company:load-enrich-company-sks
@@ -982,6 +986,15 @@ bietlejuice.enrich_chat_inapp_strategies:
 - bietlejuice.enrich_greenseer:load-enrich-session-memory
 bietlejuice.enrich_chattermill:
 - bietlejuice.chattermill:load-clean-responses
+bietlejuice.enrich_company:
+- bietlejuice.company:load-clean-address
+- bietlejuice.company:load-clean-company
+- bietlejuice.company:load-clean-company-document
+- bietlejuice.company:load-clean-company-product
+- bietlejuice.company:load-clean-document
+- bietlejuice.ebdb:load-clean-house-listing-relation
+- bietlejuice.ebdb:load-clean-listing-business-context
+- bietlejuice.ebdb:load-clean-state
 bietlejuice.enrich_consolidated_marketing_metrics:
 - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
 - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
@@ -1704,6 +1717,7 @@ bietlejuice.enrich_recommendations:
 - wonka.user_sale_agg_search_filters:create-user-sale-agg-search-filters
 - wonka.user_sale_listing_page_viewed_cross_devices:create-user-sale-listing-page-viewed-cross-devices
 bietlejuice.enrich_rede_company:
+- bietlejuice.enrich_company:load-enrich-company
 - bietlejuice.enrich_ebdb_listing:load-enrich-house
 - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
 - bietlejuice.enrich_hubspot:load-enrich-company

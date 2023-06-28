@@ -28,15 +28,24 @@ partners_not_found_on_hubspot AS (
 ),
 total_partners AS (
     SELECT
-        id_company AS id_hubspot,
+        hc.id_company AS id_hubspot,
+        COALESCE(hc.uuid_company, c.uuid_company) AS uuid_company,
         NULL AS extracted_3p_tag,
         NULL AS is_3p_bh,
-        has_been_sale_member OR has_been_rent_member AS has_been_member
+        hc.has_been_rent_member OR hc.has_been_sale_member OR c.uuid_company IS NOT NULL AS has_been_member
     FROM
-        datalake_hubspot.company
+        datalake_hubspot.company AS hc
+    FULL OUTER JOIN
+        datalake_company.company AS c
+            ON c.uuid_company = hc.uuid_company
+    WHERE
+        c.id_company IS NULL
+        OR c.has_rede_product
+        OR c.houses_currently_owned > 0
     UNION ALL
     SELECT
         NULL AS id_hubspot,
+        NULL AS uuid_company,
         partner_not_found AS extracted_3p_tag,
         is_3p_bh,
         TRUE AS has_been_member
@@ -53,7 +62,8 @@ SELECT
         sk_company_lead, -- Keep the sk_company if it is already defined, so it is durable
         sv.max_sk_company_lead + MONOTONICALLY_INCREASING_ID() + 1 -- if not, use a number after the previous maximum value
     ) AS sk_company_lead,
-    tp.id_hubspot, -- Natural key
+    tp.id_hubspot, -- Natural key (HubSpot)
+    tp.uuid_company, -- Natural key (Internal Company Database)
     tp.extracted_3p_tag, -- Natural key for companies not present in HubSpot
     tp.is_3p_bh,
     tp.has_been_member
@@ -63,4 +73,5 @@ FROM
 LEFT JOIN
     datalake_rede_company.company_sks AS cs
         ON tp.id_hubspot IS NOT DISTINCT FROM cs.id_hubspot
+        AND tp.uuid_company IS NOT DISTINCT FROM cs.uuid_company
         AND tp.extracted_3p_tag IS NOT DISTINCT FROM cs.extracted_3p_tag
