@@ -22,4 +22,4 @@ columns:
       business_stage: Other
       hierarchy: User analisys
       approved_by: camila.carvalho@quintoandar.com.br
-      link_to_metric: https://datahub.quintoandar.com.br/metric/urn:li:metric:(conversion_inspection_to_checklist_fintech,PROD)/Info?is_lineage_mode=false
+      link_to_metric: https://quintoandar.sa.looker.com/explore/atta/atta_flow?qid=G8dxK0TTpB7tg8S2DMwtgo&toggle=fil

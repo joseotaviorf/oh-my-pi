@@ -22,7 +22,7 @@ columns:
       business_stage: Other
       hierarchy: User analisys
       approved_by: camila.carvalho@quintoandar.com.br
-      link_to_metric: https://datahub.quintoandar.com.br/metric/urn:li:metric:(bank_application_fintech,PROD)/Info?is_lineage_mode=false
+      link_to_metric: https://quintoandar.sa.looker.com/explore/atta/atta_flow?qid=9X3Nt74NiKXwdfJuWS6iEm&toggle=fil
   pre_analysis:
     description: Number of pre analysis in which the legal analysis process was initiated by the bank.
     metric:
@@ -35,7 +35,7 @@ columns:
       business_stage: Other
       hierarchy: User analisys
       approved_by: camila.carvalho@quintoandar.com.br
-      link_to_metric: https://datahub.quintoandar.com.br/metric/urn:li:metric:(bank_application_fintech,PROD)/Info?is_lineage_mode=false
+      link_to_metric: https://quintoandar.sa.looker.com/explore/atta/atta_flow?qid=9X3Nt74NiKXwdfJuWS6iEm&toggle=fil
   proposals:
     description: Number of proposals in which the legal analysis process was initiated by the bank.
     metric:
@@ -48,4 +48,4 @@ columns:
       business_stage: Other
       hierarchy: User analisys
       approved_by: camila.carvalho@quintoandar.com.br
-      link_to_metric: https://datahub.quintoandar.com.br/metric/urn:li:metric:(bank_application_fintech,PROD)/Info?is_lineage_mode=false
+      link_to_metric: https://quintoandar.sa.looker.com/explore/atta/atta_flow?qid=9X3Nt74NiKXwdfJuWS6iEm&toggle=fil

@@ -22,4 +22,4 @@ columns:
       business_stage: Other
       hierarchy: User analisys
       approved_by: camila.carvalho@quintoandar.com.br
-      link_to_metric: "https://quintoandar.sa.looker.com/explore/sale_closing/sale_closing_flows?qid=AnEA2tEFZS6hNVSUPCaLKQ&origin_space=2836&toggle=vis"
+      link_to_metric: https://quintoandar.sa.looker.com/explore/sale_closing/sale_closing_flows?qid=lY37WFOlFNwk3AZTbcHXHZ&origin_space=2836&toggle=vis
