@@ -87,7 +87,7 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     execution_date = datetime.strptime(args.execution_date, "%Y-%m-%d")
-    display_date = execution_date.replace(day=15) - relativedelta(months=1)
+    display_date = execution_date.replace(day=15)
     display_date = display_date.strftime('%Y%m%d')
 
     config_service = ConfigurationService(source)

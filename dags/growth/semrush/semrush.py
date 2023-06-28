@@ -26,7 +26,7 @@ def get_toggle_param(dag_run, toggle_param_name):
 SOURCE = "semrush"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 4, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 10 01 * *"
+MAIN_SCHEDULE_INTERVAL = "0 10 28 * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_max_io-memory_cluster"
 
 config_service = ConfigurationService(SOURCE)
