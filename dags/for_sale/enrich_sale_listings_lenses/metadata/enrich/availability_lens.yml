@@ -95,9 +95,11 @@ columns:
       Possibly Unavailable: >
         It represents the A1 tier category. Listings that have an availability score less than -100000.
   tier_disclaimer:
-    lineage:
     description: >
       Column that shows us, in full, the combination of factors/bins concerning the listing, where with this, we classify it within a tier.
+  tier_drill_down:
+    description: >
+      Drill down of the tier_disclaimer column, where we can see the factors/bins that make up the listing's tier.
   is_last_tier:
     lineage:
     description: >

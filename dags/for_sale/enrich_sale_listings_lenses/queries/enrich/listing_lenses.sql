@@ -17,9 +17,9 @@ WITH sale_listings AS (
 segmentation AS (
   SELECT 
     l.id_house,
-    COALESCE(p.tag, 'TXX Undefined') AS price_bin,
-    COALESCE(pm2.tag, 'TXX Undefined') AS price_m2_bin,
-    COALESCE(ta.tag, 'TXX Undefined') AS total_area_bin
+    COALESCE(p.tag, 'R$ Undefined') AS price_bin,
+    COALESCE(pm2.tag, 'R$ Undefined') AS price_m2_bin,
+    COALESCE(ta.tag, 'R$ Undefined') AS total_area_bin
   FROM
     sale_listings AS l
   LEFT JOIN
@@ -62,7 +62,8 @@ avaiability AS (
     id_house,
     tier AS availability_tier,
     tier_name AS availability_name,
-    tier_disclaimer AS availability_disclaimer
+    tier_disclaimer AS availability_disclaimer,
+    tier_drill_down AS availability_drill_down
   FROM
     datalake_sale_listings_lenses.availability_lens
   WHERE 
@@ -75,9 +76,9 @@ dataset AS (
     s.price_bin,
     s.price_m2_bin,
     s.total_area_bin,
-    COALESCE(p.pricing_tier, 'P Undefined') AS pricing_tier,
-    COALESCE(d.demand_tier, 'D Undefined') AS demand_tier,
-    COALESCE(a.availability_tier, 'A Undefined') AS availability_tier,
+    COALESCE(p.pricing_tier, 'P-') AS pricing_tier,
+    COALESCE(d.demand_tier, 'D-') AS demand_tier,
+    COALESCE(a.availability_tier, 'A-') AS availability_tier,
     COALESCE(p.pricing_name, 'Undefined') AS pricing_name,
     COALESCE(d.demand_name, 'Undefined') AS demand_name,
     COALESCE(a.availability_name, 'Undefined') AS availability_name,
@@ -86,7 +87,8 @@ dataset AS (
     a.availability_tier || ' - ' || a.availability_name AS availability_full_name,
     p.pricing_disclaimer,
     d.demand_disclaimer,
-    a.availability_disclaimer
+    a.availability_disclaimer,
+    a.availability_drill_down
   FROM
     sale_listings AS l
   LEFT JOIN
@@ -115,20 +117,21 @@ full_name AS (
     pricing_name,
     demand_name,
     availability_name,
-    pricing_tier || ' - ' || pricing_name AS pricing_full_name,
-    demand_tier || ' - ' || demand_name AS demand_full_name,
-    availability_tier || ' - ' || availability_name AS availability_full_name,
+    pricing_tier || ': ' || pricing_name AS pricing_full_name,
+    demand_tier || ': ' || demand_name AS demand_full_name,
+    availability_tier || ': ' || availability_name AS availability_full_name,
     pricing_disclaimer,
     demand_disclaimer,
-    availability_disclaimer
+    availability_disclaimer,
+    availability_drill_down
   FROM
     dataset
 )
 SELECT 
   id_house,
   id_region,
-  price_m2_bin || '  /  ' || pricing_tier || '  /  ' || demand_tier || '  /  ' || availability_tier AS listing_lenses,
-  price_bin ||'  &  '|| total_area_bin || '  /  ' || pricing_full_name || '  /  ' || availability_full_name || '  /  ' || demand_full_name || ' (' || demand_disclaimer || ')' AS full_listing_lenses,
+  price_bin ||'  &  '|| total_area_bin || '  |  ' || pricing_tier || '  |  ' || availability_tier || '  |  ' || demand_tier AS listing_lenses,
+  price_bin ||'  &  '|| total_area_bin || '  |  ' || pricing_full_name || '  |  ' || availability_full_name || '  |  ' || demand_full_name AS full_listing_lenses,
   price_bin,
   price_m2_bin,
   total_area_bin,
@@ -143,6 +146,7 @@ SELECT
   availability_full_name,
   pricing_disclaimer,
   demand_disclaimer,
-  availability_disclaimer
+  availability_disclaimer,
+  availability_drill_down
 FROM
   full_name

@@ -17,7 +17,7 @@ columns:
       price_m2: Bins related to the published price per square meter attribute of the listing.
       total_area: Bins related to the published total area attribute of the listing.
   tag:
-    description: Descriptive tag for each bin. That is, if the listing is 150k it will have a tag for the price bin `T00 [120k-300k]`.
+    description: Descriptive tag for each bin. That is, if the listing is 150k it will have a tag for the price bin `R$ 120k-300k`.
   order:
     description: Bin order within the bin type for the attribute. It is a numeric used to sort the bins, starting with `1` the bin with the smallest value of the attribute and going up to 11 in some bin types.
   lower_band: 

@@ -2,7 +2,7 @@ WITH pricing_bins AS (
   SELECT
     1 AS id_bin,
     'price' AS bin,
-    "T00 [120k-300k]" AS tag,
+    "R$ 120k-300k" AS tag,
     1 AS order,
     120000 AS lower_band,
     300000 AS upper_band
@@ -10,7 +10,7 @@ WITH pricing_bins AS (
   SELECT
     1,
     'price',
-    'T01 [300k-500k]',
+    'R$ 300k-500k',
     2, 
     300000,
     500000
@@ -18,7 +18,7 @@ WITH pricing_bins AS (
   SELECT
     1,
     'price',
-    'T02 [500k-700k]',
+    'R$ 500k-700k',
     3,
     500000,
     700000
@@ -26,7 +26,7 @@ WITH pricing_bins AS (
   SELECT
     1,
     'price',
-    'T03 [700k-900k]',
+    'R$ 700k-900k',
     4,
     700000,
     900000
@@ -34,7 +34,7 @@ WITH pricing_bins AS (
   SELECT 
     1,
     'price',
-    'T04 [900k-1.2M]',
+    'R$ 900k-1.2M',
     5,
     900000,
     1200000
@@ -42,7 +42,7 @@ WITH pricing_bins AS (
   SELECT 
     1,
     'price',
-    'T05 [1.2M-1.6M]',
+    'R$ 1.2M-1.6M',
     6,
     1200000,
     1600000
@@ -50,7 +50,7 @@ WITH pricing_bins AS (
   SELECT
     1,
     'price',
-    'T06 [1.6M-2M]',
+    'R$ 1.6M-2M',
     7,
     1600000,
     2000000
@@ -58,7 +58,7 @@ WITH pricing_bins AS (
   SELECT
     1,
     'price',
-    'T07 [2M-2.5M]',
+    'R$ 2M-2.5M',
     8,
     2000000,
     2500000
@@ -66,7 +66,7 @@ WITH pricing_bins AS (
   SELECT 
     1,
     'price',
-    'T08 [2.5M-4M]',
+    'R$ 2.5M-4M',
     9,
     2500000,
     4000000
@@ -74,7 +74,7 @@ WITH pricing_bins AS (
   SELECT 
     1,
     'price',
-    'T09 [4M-20M]',
+    'R$ 4M-20M',
     10,
     4000000,
     20000000
@@ -82,7 +82,7 @@ WITH pricing_bins AS (
   SELECT 
     1,
     'price',
-    'TXX Undefined',
+    'Undefined',
     11,
     null,
     null
@@ -91,7 +91,7 @@ pricing_m2_bins AS (
   SELECT 
     2 AS id_bin,
     'price_m2' AS bin,
-    'TA00 [0k-3k]' AS tag,
+    'R$ 0k-3k/m²' AS tag,
     1 AS order,
     0 AS lower_band,
     3000 AS upper_band
@@ -99,7 +99,7 @@ pricing_m2_bins AS (
   SELECT
     2,
     'price_m2',
-    'TA01 [3k-4k]',
+    'R$ 3k-4k/m²',
     2,
     3000,
     4000
@@ -107,7 +107,7 @@ pricing_m2_bins AS (
   SELECT
     2,
     'price_m2',
-    'TA02 [4k-5k]',
+    'R$ 4k-5k/m²',
     3,
     4000,
     5000
@@ -115,7 +115,7 @@ pricing_m2_bins AS (
   SELECT
     2,
     'price_m2',
-    'TA03 [5k-6k]',
+    'R$ 5k-6k/m²',
     4,
     5000,
     6000
@@ -123,7 +123,7 @@ pricing_m2_bins AS (
   SELECT
     2,
     'price_m2',
-    'TA04 [6k-7k]',
+    'R$ 6k-7k/m²',
     5,
     6000,
     7000
@@ -131,7 +131,7 @@ pricing_m2_bins AS (
   SELECT
     2,
     'price_m2',
-    'TA05 [7k-8k]',
+    'R$ 7k-8k/m²',
     6,
     7000,
     8000
@@ -139,7 +139,7 @@ pricing_m2_bins AS (
   SELECT
     2,
     'price_m2',
-    'TA06 [8k-9k]',
+    'R$ 8k-9k/m²',
     7,
     8000,
     9000
@@ -147,7 +147,7 @@ pricing_m2_bins AS (
   SELECT
     2,
     'price_m2',
-    'TA07 [9k-12k]',
+    'R$ 9k-12k/m²',
     8,
     9000,
     12000
@@ -155,7 +155,7 @@ pricing_m2_bins AS (
   SELECT
     2,
     'price_m2',
-    'TA08 [12k-15k]',
+    'R$ 12k-15k/m²',
     9,
     12000,
     15000
@@ -163,7 +163,7 @@ pricing_m2_bins AS (
   SELECT
     2,
     'price_m2',
-    'TA09 [>18k]',
+    'R$ >18k/m²',
     10,
     15000,
     999999999
@@ -171,7 +171,7 @@ pricing_m2_bins AS (
   SELECT 
     2,
     'price_m2',
-    'TXX Undefined',
+    'Undefined',
     11,
     null,
     null
@@ -180,7 +180,7 @@ total_area_bins AS (
   SELECT 
     3 AS id_bin,
     'total_area' AS bin,
-    'TA01 [50m]' AS tag,
+    '<=50m²' AS tag,
     1 AS order,
     5 AS lower_band,
     50 AS upper_band
@@ -188,7 +188,7 @@ total_area_bins AS (
   SELECT
     3,
     'total_area',
-    'TA02 [50m-80m]',
+    '50m²-80m²',
     2,
     50,
     80
@@ -196,7 +196,7 @@ total_area_bins AS (
   SELECT
     3 ,
     'total_area',
-    'TA03 [80m-120m]',
+    '80m²-120m²',
     3,
     80,
     120
@@ -204,7 +204,7 @@ total_area_bins AS (
   SELECT
     3 ,
     'total_area',
-    'TA04 [>120m]',
+    '>120m²',
     4,
     120,
     999999999
@@ -212,7 +212,7 @@ total_area_bins AS (
   SELECT
     3 ,
     'total_area',
-    'TXX Undefined',
+    'Undefined',
     5,
     null,
     null

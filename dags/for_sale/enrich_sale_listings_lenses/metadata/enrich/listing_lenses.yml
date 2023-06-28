@@ -28,17 +28,17 @@ columns:
     lineage:
       - datalake_sale_listings_lenses.segmentation_bins.tag
     description: >
-      Descriptive tag for each bin. The listing price is considered to allocate to a bin. That is, if the listing is 150k it will have a tag for the price bin `T00 [120k-300k]`.
+      Descriptive tag for each bin. The listing price is considered to allocate to a bin. That is, if the listing is 150k it will have a tag for the price bin `R$ 120k-300k`.
   price_m2_bin:
     lineage:
       - datalake_sale_listings_lenses.segmentation_bins.tag
     description: > 
-        Descriptive tag for each bin. The listing price m2 is considered to allocate to a bin. That is, if the listing is 8k it will have a tag for the price m2 bin `TA05 [7k-8k]`.
+        Descriptive tag for each bin. The listing price m2 is considered to allocate to a bin. That is, if the listing is 8k it will have a tag for the price m2 bin `R$ 7k-8k/m²`.
   total_area_bin:
     lineage:
       - datalake_sale_listings_lenses.segmentation_bins.tag
     description: > 
-        Descriptive tag for each bin. The listing total area is considered to allocate to a bin. That is, if the listing is 90m2 it will have a tag for the total area bin `TA03 [80m-120m]`.
+        Descriptive tag for each bin. The listing total area is considered to allocate to a bin. That is, if the listing is 90m2 it will have a tag for the total area bin `80m²-120m²`.
   pricing_tier:
     lineage:
       - datalake_sale_listings_lenses.pricing_lens.tier
@@ -64,15 +64,15 @@ columns:
     description: >
      'Demand tier created to abstract some information from the listing demand. In other words, we use two components to define the tier, the number of days published and the number of visits scheduled, visits completed, offers received and offers accepted. With this, based on 4 different time windows (last 15, 30, 60 and 90 days) we assign a demand tier for each listing.'
     categories:
-      D0: >
-        "Represent High Demand Listings. To be considered D0, the listing must have: 
+      D5: >
+        "Represent High Demand Listings. To be considered D5, the listing must have: 
           Either +3 Visits Booked in the last 15 days if it has more than 90 days published.
           Or +2 Visits Completed within the past 15 days if it has more than 90 days published. 
           Or +1 Offers Submitted within the past 15 days if you have more than 90 days published.
           Or +1 Offers Accepted within the past 15 days if you have more than 90 days published.
           Or any event within the past 30 days if you have less than 90 days published."
-      D1: > 
-        "Represents Good Demand Listings. To be considered D1, the listing must have:
+      D4: > 
+        "Represents Good Demand Listings. To be considered D4, the listing must have:
           Either 2 Visits Booked in the last 15 days if it has more than 90 days published.
           Or +3 Visits Booked in the last 30 days if it has more than 90 days published.
           Or +2 Visits Completed within the past 30 days if more than 90 days old. 
@@ -80,8 +80,8 @@ columns:
           Or +1 Offers Accepted within the past 30 days if you have more than 90 days published.
           Or +1 Visits Booked within the past 30 days if you have less than 90 days posted.
           Or any event within the last 60 days if you have less than 90 days posted."
-      D2: > 
-        "Represents Some Demand Listings. To be considered D2, the listing must have:
+      D3: > 
+        "Represents Some Demand Listings. To be considered D3, the listing must have:
           Either 2 Visits Booked in the last 30 days if it has more than 90 days published.
           Or +3 Visits Booked in the last 60 days if it has more than 90 days published.
           Or +2 Visits Completed within the past 60 days if more than 90 days old. 
@@ -90,8 +90,8 @@ columns:
           Or +1 Visits Booked within the past 60 days if you have less than 90 days posted.
           Or any event within the last 90 days if you have less than 90 days posted.
           Or if you have less than 45 days posted."
-      D3: > 
-        "Represents Low Demand Listings. To be considered D3, the listing must have:
+      D2: > 
+        "Represents Low Demand Listings. To be considered D2, the listing must have:
           Either 2 Visits Booked in the last 60 days if it has more than 90 days published.
           Or +3 Visits Booked in the last 90 days if it has more than 90 days published.
           Or +2 Visits Completed within the past 90 days if more than 90 days old. 
@@ -99,8 +99,8 @@ columns:
           Or +1 Offers Accepted within the past 90 days if you have more than 90 days published.
           Or +1 Visits Booked within the past 90 days if you have less than 90 days posted.
           Or if you have more than 45 days published"
-      D4: >
-        "Represent No Demand Listings. To be considered D4, is the listing must be more than 90 days old and have not received any demand."
+      D1: >
+        "Represent No Demand Listings. To be considered D1, is the listing must be more than 90 days old and have not received any demand."
   availability_tier:
     lineage:
       - datalake_sale_listings_lenses.availability_lens.tier
@@ -140,15 +140,15 @@ columns:
       Just a full name of the demand tier.
     categories:
       High Demand: >
-        It represents the D0 category of the tier. Listings with a large sum of demand events in the last days. It is the highest possible tier.
+        It represents the D5 category of the tier. Listings with a large sum of demand events in the last days. It is the highest possible tier.
       Good Demand: >
-        It represents the D1 tier category. A reasonable amount of demand, but a little less than the High Demand. It is the second highest tier.
+        It represents the D4 tier category. A reasonable amount of demand, but a little less than the High Demand. It is the second highest tier.
       Some Demand: >
-        It represents the tier D2 category. Listings with an average combination of price and price per square meter.
+        It represents the tier D3 category. Listings with an average combination of price and price per square meter.
       Low Demand: >
-        It represents the tier D3 category. A listing with some level of demand still signals a less attractive listing than the High and the Good, but more attractive than the Low.
+        It represents the tier D2 category. A listing with some level of demand still signals a less attractive listing than the High and the Good, but more attractive than the Low.
       No Demand: >
-        It represents the tier D4 category. Listings that do not have any kind of demand.
+        It represents the tier D1 category. Listings that do not have any kind of demand.
   availability_name:
     lineage:
       - datalake_sale_listings_lenses.availability_lens.tier_name

@@ -125,7 +125,6 @@ status_change_by_day AS (
     lbc.business_context = 'SALE'
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY lbc.id_house, DATE_TRUNC('DAY', ure.ts_revision) ORDER BY ure.ts_revision DESC) = 1
-
 ),
 status_changes_aux AS (
   SELECT
@@ -328,8 +327,9 @@ create_tiers AS (
     END AS tier,
     IF(
       multi_detractors, 
-      'Resume: This listing has multiple detractors with equal weight for the score, see the drill down.  | Drill Down: ' || drill_down,
-      'Resume: ' || main_detractor || ' | Drill Down: ' || drill_down) AS tier_disclaimer,
+      'This listing has multiple detractors with equal weight for the score, see the drill down.',
+      main_detractor) AS tier_disclaimer,
+    drill_down AS tier_drill_down, 
     date AS ts_tier_started
   FROM
     score
@@ -350,6 +350,7 @@ grouping_tiers AS (
     has_active_rental_contract_score_disclaimer,
     tier,
     tier_disclaimer,
+    tier_drill_down,
     ts_tier_started
   FROM
     create_tiers
@@ -376,6 +377,7 @@ tier_status AS (
       WHEN tier = 'A1' THEN 'Possibly Unavailable'
     END AS tier_name,
     tier_disclaimer,
+    tier_drill_down,
     ts_tier_started,
     LEAD(ts_tier_started) OVER (PARTITION BY id_house ORDER BY ts_tier_started) AS ts_tier_ended
   FROM
@@ -394,6 +396,7 @@ aux AS (
     tier,
     tier_name,
     tier_disclaimer,
+    tier_drill_down,
     ts_tier_started,
     ts_tier_ended
   FROM
@@ -412,6 +415,7 @@ SELECT
   tier,
   tier_name,
   tier_disclaimer,
+  tier_drill_down,
   ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_tier_started DESC) = 1 AS is_last_tier,
   ts_tier_ended IS NULL AND ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_tier_started DESC) = 1 AS is_active,
   ts_tier_started,

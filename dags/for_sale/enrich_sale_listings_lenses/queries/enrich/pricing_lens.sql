@@ -46,7 +46,7 @@ create_business_bins AS (
       ELSE hp.calculator_certainty 
     END AS certainty_calculator_bins, 
     CASE 
-      WHEN hp.calculator_sale_price IS NULL THEN 'TXX Undefined'
+      WHEN hp.calculator_sale_price IS NULL THEN 'T- Undefined'
       WHEN hp.diff_calculator_price < -0.25 THEN 'T6 < -25%'
       WHEN hp.diff_calculator_price BETWEEN -0.25 AND 0.00 THEN 'T5 (-25% | 0%]'
       WHEN hp.diff_calculator_price BETWEEN 0.00 AND 0.15 THEN 'T4 (0% | 15%]'
@@ -73,7 +73,7 @@ score_business_logic AS (
     pricing_bins,
     CASE 
       WHEN has_great_price_tag = TRUE THEN 'P5'    
-      WHEN pricing_bins = 'TXX Undefined' THEN 'P Undefined'
+      WHEN pricing_bins = 'T- Undefined' THEN 'P-'
       WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') AND certainty_calculator_bins = 'HIGH' THEN 'P5'
       WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') AND certainty_calculator_bins = 'MEDIUM' THEN 'P4'
       WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') THEN 'P3'
@@ -89,7 +89,7 @@ score_business_logic AS (
     END AS tier,
     CASE 
       WHEN has_great_price_tag = TRUE THEN 'The listing has the great price tag currently active.'  
-      WHEN pricing_bins = 'TXX Undefined' THEN 'The property does not have a set price in our calculator, we cannot rate a tier on it'   
+      WHEN pricing_bins = 'T- Undefined' THEN 'The property does not have a set price in our calculator, we cannot rate a tier on it'   
       WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') AND certainty_calculator_bins = 'HIGH' THEN 'The listings price is up to 25% below the calculators p50 predicted price and the prediction certainty is high.'
       WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') AND certainty_calculator_bins = 'MEDIUM' THEN 'The listings price is up to 25% below the calculators p50 predicted price and the prediction certainty is medium.'
       WHEN pricing_bins IN ('T6 < -25%', 'T5 (-25% | 0%]') THEN 'The listings price is up to 25% below the calculators p50 predicted price and the prediction certainty is low.'
@@ -137,7 +137,7 @@ SELECT
     WHEN tier = 'P3' THEN 'Fair Price'
     WHEN tier = 'P2' THEN 'Slightly Overpriced '
     WHEN tier = 'P1' THEN 'Significantly Overpriced'
-    WHEN tier = 'P Undefined' THEN 'Undefined'
+    WHEN tier = 'P-' THEN 'Undefined'
   END AS tier_name,
   tier_disclaimer,
   has_great_price_tag,
