@@ -1,6 +1,6 @@
 minority_report_endpoint: http://minority-report-api.forno.quintoandar.com.br/profile/batch
 
 tables_to_send:
-  user_app_installed_event:
+  events:
     key_name: user
     type: CUSTOMER_HAS_APP
