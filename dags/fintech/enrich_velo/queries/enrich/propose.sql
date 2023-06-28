@@ -973,7 +973,7 @@ UNION ALL
 ORDER BY 1
 )
 
-SELECT
+SELECT DISTINCT
     id_propose,
     id_propose_values AS id_propose_values,
     id_broker,
