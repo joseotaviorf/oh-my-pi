@@ -92,4 +92,4 @@ LEFT JOIN
 LEFT JOIN 
     dw_public.dim_proposal AS dp
         ON fd.sk_proposal = dp.sk_proposal
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 47, 48, 49, 50, 51, 52, 53, 54
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 48, 49, 50, 51, 52, 53, 54, 55
