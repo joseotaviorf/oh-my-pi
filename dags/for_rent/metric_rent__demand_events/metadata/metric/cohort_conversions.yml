@@ -1,0 +1,283 @@
+database_name: metric_rent
+table_name: cohort_conversions
+description: This table contains the aggregated sum of cohort conversions events of For Rent.
+  Each line has the total volume of the cohort related to the scope within the aggregation.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  halfyear:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.halfyear
+    description: 1 if the base event month is from the first half of the year and 2 if it is from the last half.
+    dimension: True
+  quarter:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.quarter
+    description: Quarter information of the base event date.
+    dimension: True
+  business_type:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.business_type
+    description: Business type related to the listing of the base event.
+    dimension: True
+  city_group:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.city_group
+    description: Group which the city of the base event belongs.
+    dimension: True
+  tier:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.tier
+    description: Tier information based on the city group of the base event.
+    dimension: True
+  listing_category_start:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.listing_category_start
+    description: Listing category start information of the base event.
+    dimension: True
+  rent_flow_origin:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.rent_flow_origin
+    description: Funnel first touchpoint information related to the base event.
+    dimension: True
+  rental_administrator:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.rental_administrator
+    description: Rental administrator related to the base event.
+    dimension: True
+  weeks_to_conversion:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.weeks_to_conversion
+    description: Weeks to conversion, which means how many weeks the base event too the be converted.
+    dimension: True
+  vb2vc:
+    description: The fraction of scheduled visits that resulted in a completed visit within the aggregation.
+    metric:
+      name: Visit Booked to Visit Completed
+      description: The fraction of scheduled visits that resulted in a completed visit.
+        Fraction represented by the ratio between the total number of visits made (Visits Completed) and the
+        total number of visits scheduled (Visits Booked).
+      acronym: VB2VC
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  vb2os:
+    description: The fraction of scheduled visits that resulted in an offer submission within the aggregation.
+    metric:
+      name: Visit Booked to Offer Sent
+      description: The fraction of scheduled visits that resulted in an offer submission.
+        Fraction represented by the ratio between the total number of Offers Sent and the
+        total number of visits scheduled (Visits Booked).
+      acronym: VB2OS
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  vb2oa:
+    description: The fraction of scheduled visits that resulted in an offer approved within the aggregation.
+    metric:
+      name: Visit Booked to Offer Approved
+      description: The fraction of scheduled visits that resulted in an offer approved.
+        Fraction represented by the ratio between the total number of Offers Approved and the
+        total number of visits scheduled (Visits Booked).
+      acronym: VB2OA
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  vb2cs:
+    description: The fraction of scheduled visits that resulted in a contract signed within the aggregation.
+    metric:
+      name: Visit Booked to Contract Signed
+      description: The fraction of scheduled visits that resulted in a contract signed.
+        Fraction represented by the ratio between the total number of Contracts Signed and the
+        total number of visits scheduled (Visits Booked).
+      acronym: VB2CS
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  vc2os:
+    description: The fraction of completed visits that resulted in an offer submission within the aggregation.
+    metric:
+      name: Visit Completed to Offer Sent
+      description: The fraction of completed visits that resulted in an offer submission.
+        Fraction represented by the ratio between the total number of Offers Sent and the
+        total number of Visits Completed.
+      acronym: VC2OS
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  os2oa:
+    description: The fraction of offers submitted that resulted in an offer approval within the aggregation.
+    metric:
+      name: Offer Sent to Offer Approved
+      description: The fraction of offers submitted that resulted in an offer approval.
+        Fraction represented by the ratio between the total number of Offers Approval and the
+        total number of Offers Sent.
+      acronym: OS2OA
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  os2cs:
+    description: The fraction of offers submitted that resulted in a contract signed within the aggregation.
+    metric:
+      name: Offer Sent to Contract Signed
+      description: The fraction of offers submitted that resulted in a contract signed.
+        Fraction represented by the ratio between the total number of Contacts Signed and the
+        total number of Offers Sent.
+      acronym: OS2CS
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  oa2es:
+    description: The fraction of offers approved that resulted in a credit evaluation start within the aggregation.
+    metric:
+      name: Offer Approved to Evaluation Started
+      description: The fraction of offers approved that resulted in a credit evaluation start.
+        Fraction represented by the ratio between the total number of credits evaluation start (Evaluation Started) and the
+        total number of Offers Approved.
+      acronym: OA2ES
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  oa2ds:
+    description: The fraction of offers approved that resulted in a documentation sent within the aggregation.
+    metric:
+      name: Offer Approved to Documentation Sent
+      description: The fraction of offers approved that resulted in a documentation sent.
+        Fraction represented by the ratio between the total number of Documentation Sent and the
+        total number of Offers Approved.
+      acronym: OA2DS
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  oa2ca:
+    description: The fraction of offers approved that resulted in a credit approval within the aggregation.
+    metric:
+      name: Offer Approved to Credit Approved
+      description: The fraction of offers approved that resulted in a credit approval.
+        Fraction represented by the ratio between the total number of Credits Approved and the
+        total number of Offers Approved.
+      acronym: OA2CA
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  oa2cs:
+    description: The fraction of offers approved that resulted in a contract signed within the aggregation.
+    metric:
+      name: Offer Approved to Contract Signed
+      description: The fraction of offers approved that resulted in a contract signed.
+        Fraction represented by the ratio between the total number of Contracts Signed and the
+        total number of Offers Approved.
+      acronym: OA2CS
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  es2ep:
+    description: The fraction of credit evaluations start that resulted in a credit evaluation positive within the aggregation.
+    metric:
+      name: Evaluation Started to Evaluation Positive
+      description: The fraction of credit evaluations start that resulted in a credit evaluation positive.
+        Fraction represented by the ratio between the total number of credits evaluation positive (Evaluation Positive) and the
+        total number of Evaluations Started.
+      acronym: ES2EP
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  es2ca:
+    description: The fraction of credit evaluations start that resulted in a credit approval within the aggregation.
+    metric:
+      name: Evaluation Started to Credit Approved
+      description: The fraction of credit evaluations start that resulted in a credit approval.
+        Fraction represented by the ratio between the total number of Credits Approved and the
+        total number of Evaluations Started.
+      acronym: ES2CA
+      is_additive: False
+      business_stage: Other
+      hierarchy: Product/Marketplace
+      approved_by: 'sidney.pires@quintoandar.com.br'
+      link_to_metric: 'https://metabase.quintoandar.com.br/dashboard/2369'
+  ep2ds:
+    description: The fraction of credit evaluations positive that resulted in a documentation sent within the aggregation.
+    metric:
+      name: Evaluation Positive to Documentation Sent
+      description: The fraction of credit evaluations positive that resulted in a documentation sent.
+        Fraction represented by the ratio between the total number of Documentation Sent and the
+        total number of Evaluation Started.
+      acronym: EP2DS
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  ds2ca:
+    description: The fraction of documentation sent that resulted in a credit approval within the aggregation.
+    metric:
+      name: Documentation Sent to Credit Approved
+      description: The fraction of documentation sent that resulted in a credit approval.
+        Fraction represented by the ratio between the total number of Credits Approval and the
+        total number of Documentation Sent.
+      acronym: DS2CA
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  ca2cs:
+    description: The fraction of credit approvals that resulted in a contract signed within the aggregation.
+    metric:
+      name: Credit Approved to Contract Signed
+      description: The fraction of credit approvals that resulted in a contract signed.
+        Fraction represented by the ratio between the total number of Contracts Signed and the
+        total number of Credits Approved.
+      acronym: CA2CS
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  has_guarantee:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.has_guarantee
+    description: Boolean indicating if there's a guarantee related to the base event.
+    dimension: True
+  dt_event:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.dt_event
+    description: Date of the base event.
+    dimension: True
+  dt_week_started:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.dt_week_started
+    description: Week date of the base event.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_rent_snapshot.rent_cohort_conversions_snapshot.country_code
+    description: Country code information.
+    dimension: True
+  ts_load:
+    description: Load date.
+    dimension: True

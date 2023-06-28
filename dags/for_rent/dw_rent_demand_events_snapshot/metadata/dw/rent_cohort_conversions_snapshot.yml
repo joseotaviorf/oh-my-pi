@@ -39,77 +39,77 @@ columns:
     lineage:
       - dw_public.dim_house_listing.rental_administrator
     description: "Rental administrator related to the event."
-  vb2vc:
+  vb_converted_vc:
     description: "Total volume of the conversion visit booked to visit completed."
-  vb2os:
+  vb_converted_os:
     description: "Total volume of the conversions visit booked to offer submitted."
-  vb2oa:
+  vb_converted_oa:
     description: "Total volume of the conversions visit booked to offer approved."
-  vb2es:
+  vb_converted_es:
     description: "Total volume of the conversion visit booked to evaluation started."
-  vb2ep:
+  vb_converted_ep:
     description: "Total volume of the conversion visit booked to evaluation positive."
-  vb2ds:
+  vb_converted_ds:
     description: "Total volume of the conversion visit booked to documentation sent."
-  vb2ca:
+  vb_converted_ca:
     description: "Total volume of the conversion visit booked to credit approved."
-  vb2cs:
+  vb_converted_cs:
     description: "Total volume of the conversion visit booked to contract signed."
-  vc2os:
+  vc_converted_os:
     description: "Total volume of the conversion visit completed to offer submitted."
-  vc2oa:
+  vc_converted_oa:
     description: "Total volume of the conversions visit completed to offer approved."
-  vc2es:
+  vc_converted_es:
     description: "Total volume of the conversions visit completed to evaluation started."
-  vc2ep:
+  vc_converted_ep:
     description: "Total volume of the conversion visit completed to evaluation positive."
-  vc2ds:
+  vc_converted_ds:
     description: "Total volume of the conversion visit completed to documentation sent."
-  vc2ca:
+  vc_converted_ca:
     description: "Total volume of the conversion visit completed to credit approved."
-  vc2cs:
+  vc_converted_cs:
     description: "Total volume of the conversion visit completed to contract signed."
-  os2oa:
+  os_converted_oa:
     description: "Total volume of the conversions offer submitted to offer approved."
-  os2es:
+  os_converted_es:
     description: "Total volume of the conversions offer submitted to evaluation started."
-  os2ep:
+  os_converted_ep:
     description: "Total volume of the conversion offer submitted to evaluation positive."
-  os2ds:
+  os_converted_ds:
     description: "Total volume of the conversion offer submitted to documentation sent."
-  os2ca:
+  os_converted_ca:
     description: "Total volume of the conversion offer submitted to credit approved."
-  os2cs:
+  os_converted_cs:
     description: "Total volume of the conversion offer submitted to contract signed."
-  oa2es:
+  oa_converted_es:
     description: "Total volume of the conversions offer approved to evaluation started."
-  oa2ep:
+  oa_converted_ep:
     description: "Total volume of the conversion offer approved to evaluation positive."
-  oa2ds:
+  oa_converted_ds:
     description: "Total volume of the conversion offer approved to documentation sent."
-  oa2ca:
+  oa_converted_ca:
     description: "Total volume of the conversion offer approved to credit approved."
-  oa2cs:
+  oa_converted_cs:
     description: "Total volume of the conversion offer approved to contract signed."
-  es2ep:
+  es_converted_ep:
     description: "Total volume of the conversion evaluation started to evaluation positive."
-  es2ds:
+  es_converted_ds:
     description: "Total volume of the conversion evaluation started to documentation sent."
-  es2ca:
+  es_converted_ca:
     description: "Total volume of the conversion evaluation started to credit approved."
-  es2cs:
+  es_converted_cs:
     description: "Total volume of the conversion evaluation started to contract signed."
-  ep2ds:
+  ep_converted_ds:
     description: "Total volume of the conversion evaluation positive to documentation sent."
-  ep2ca:
+  ep_converted_ca:
     description: "Total volume of the conversion evaluation positive to credit approved."
-  ep2cs:
+  ep_converted_cs:
     description: "Total volume of the conversion evaluation positive to contract signed."
-  ds2ca:
+  ds_converted_ca:
     description: "Total volume of the conversion documentation sent to credit approved."
-  ds2cs:
+  ds_converted_cs:
     description: "Total volume of the conversion documentation sent to contract signed."
-  ca2cs:
+  ca_converted_cs:
     description: "Total volume of the conversion credit approved to contract signed."
   has_guarantee:
     description: "Boolean indicating if the event has a guarantee related.
