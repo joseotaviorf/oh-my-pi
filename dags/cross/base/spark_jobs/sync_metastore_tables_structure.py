@@ -1,63 +1,74 @@
-"""
-    Synchronizes the (in-house) metastore table based on the Databricks metastore's one.
-
-    It will:
-        - sync the columns (drop or create columns)
-        - sync partitions keys
-
-        If a table is partitioned and has some modification, it will recreate
-         the table in Hive MS and re-sync the partitions keys.
-        The job sync_metastore_tables_partitions.py is responsible for the partition values synchronization .
-"""
 import json
 import logging
 from argparse import ArgumentParser
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from functools import partial
 
+from hive_metastore_client import HiveMetastoreClient
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatabaseEnum
+from bietlejuice.base.db.database_enum import DatabaseEnum
 from bietlejuice.base.hive import TableStorageDescriptorEnum
-from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
-from bietlejuice.metastore_pipeline import SyncMetastoreExternalTableStructurePipeline
-from bietlejuice.base.spark import BaseSparkContext
+from bietlejuice.loaders.hive_metastore_loader import HiveMetastoreLoader
+from bietlejuice.services.metastore_services.hive_metastore_service import (
+    HiveMetastoreService,
+)
 
 JOB_NAME = "sync_metastore_tables_structure"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 
 
-class HiveMetastoreSynchronization:
-    def __init__(self, hms_host, layer, spark_database_name, database_location) -> None:
-        self.hms_host = hms_host
-        self.layer = layer
-        self.spark_database_name = spark_database_name
-        self.database_location = database_location
+def update_table_structure(
+    logger: QuintoAndarLogger,
+    hive_ms_loader: HiveMetastoreLoader,
+    database_name: str,
+    database_location: str,
+    storage_description: str,
+    table_name: str,
+    columns: list,
+    partition_keys: list,
+):
+    """
+    Updates columns and partition keys of a single table in Hive Metastore, dropping
+    or creating them according to the values provided. Used for multiple concurrent
+    requests that share the same Hive Metastore Loader object.
+    Args:
+        logger (QuintoAndarLogger): logger instance
+        hive_ms_loader (HiveMetastoreLoader): Hive Metastore Loader object
+        database_name (str): Name of the database from Databricks Metastore that
+            contains the table(s) which partitions will be updated in Hive Metastore.
+        database_location (str): File system location of the Spark database.
+        storage_description (str): Storage format description for Hive Metastore table.
+        table_name (str): Name of the table which structure will be updated in Hive
+            Metastore.
+        columns (str): List of columns that will be updated in Hive Metastore.
+        partition_keys (List[str]): List of partition keys as strings.
+    """
 
-    def sync_table(self, table_spark_metadata):
-        """
-        Main sync method.
-        """
+    logger.info(
+        f"m={JOB_NAME}, database_name={database_name}, table_name={table_name}, "
+        f"columns={columns}, partition_keys={partition_keys}, "
+        f"msg=Starting table schema and partition keys update"
+    )
 
-        QuintoAndarLogger(JOB_NAME).info(
-            f"m={JOB_NAME}, layer={self.layer}, database_name={self.spark_database_name}, "
-            f"table_name={table_spark_metadata['name']}, msg=Starting table columns and partition keys synchronization."
-        )
+    hive_ms_loader.sync_metastore(
+        database_name=database_name,
+        table_name=table_name,
+        database_location=database_location,
+        table_schema=columns,
+        partition_keys=partition_keys,
+        format_info=storage_description,
+        source_schema=columns,
+    )
 
-        SyncMetastoreExternalTableStructurePipeline(
-            metastore_host=self.hms_host,
-            database_name=self.spark_database_name,
-            table_name=table_spark_metadata["name"],
-            database_location=self.database_location,
-            table_schema=table_spark_metadata["columns"],
-            partition_keys=table_spark_metadata["partition_keys"],
-            format_info=TableStorageDescriptorEnum.from_layer(self.layer),
-        ).run()
-
-        QuintoAndarLogger(JOB_NAME).info(
-            f"m={JOB_NAME}, layer={self.layer}, database_name={self.spark_database_name}, "
-            f"table_name={table_spark_metadata['name']}, msg=Completed table synchronization"
-        )
+    logger.info(
+        f"m={JOB_NAME}, database_name={database_name}, table_name={table_name}, "
+        f"columns={columns}, partition_keys={partition_keys}, "
+        f"msg=Completed table schema and partition keys update"
+    )
 
 
 def get_hive_metastore_host():
@@ -73,16 +84,11 @@ def get_hive_metastore_host():
     return hm_confs_json["host"]
 
 
-def parse_args():
-    parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("bucket", type=str, help="Data Lake or DW bucket")
-    parser.add_argument("layer_value", type=str, help="One of LayerEnum values")
-    parser.add_argument(
-        "db_name_part",
-        type=str,
-        help="The `source` name for raw and clean layers. The `source` and/or "
-        "`context` name for enrich layer. The `schema` for DW layer.",
-    )
+if __name__ == "__main__":
+    parser = ArgumentParser(JOB_NAME)
+    parser.add_argument("bucket", type=str)
+    parser.add_argument("layer", type=str)
+    parser.add_argument("schema", type=str)
     parser.add_argument(
         "--table-name",
         type=str,
@@ -93,49 +99,60 @@ def parse_args():
     parser.add_argument(
         "--all-tables",
         nargs="?",
-        dest="all_tables",
+        dest="all_tables_flag",
         required=False,
         default=False,
         const=True,
-        help="sync all tables from database",
+        help="flag to sync all tables from database",
     )
 
     args = parser.parse_args()
-    _bucket = args.bucket
-    _layer_value = args.layer_value
-    _db_name_part = args.db_name_part
-    _table_name = args.table_name
-    _all_tables = args.all_tables
+    bucket = args.bucket
+    layer = LayerEnum(args.layer).value
+    schema = args.schema
+    table_name = args.table_name
+    all_tables_flag = args.all_tables_flag
 
-    return _bucket, _layer_value, _db_name_part, _table_name, _all_tables
+    logger = QuintoAndarLogger(JOB_NAME)
 
-
-if __name__ == "__main__":
-    _bucket, _layer_value, _db_name_part, _table_name, _all_tables = parse_args()
-    _layer = LayerEnum(_layer_value).value
-
-    QuintoAndarLogger(JOB_NAME).info(
-        f"m={JOB_NAME}, bucket={_bucket}, "
-        f"layer={_layer}, db_name_part={_db_name_part}, "
-        f"table_name={_table_name}, all_tables={_all_tables}, msg=Job execution started."
+    logger.info(
+        f"m={JOB_NAME}, bucket={bucket}, layer={layer}, schema={schema}, "
+        f"table_name={table_name}, all_tables_flag={all_tables_flag}, "
+        "msg=Job execution started."
     )
 
-    spark_ms = SparkMetastoreHelper(
-        _bucket, _layer, _db_name_part, _table_name, _all_tables
-    )
+    spark_ms = SparkMetastoreHelper(bucket, layer, schema, table_name, all_tables_flag)
     spark_ms.validate_table_arguments()
 
     tables_metadata = spark_ms.get_all_tables_metadata()
-    spark_table_names = list(tables_metadata.keys())
 
-    _hms_host = get_hive_metastore_host()
-    hms_sync = HiveMetastoreSynchronization(
-        _hms_host, _layer, spark_ms.spark_database_name, spark_ms.database_location
+    hive_ms_host = get_hive_metastore_host()
+    hive_ms_client = HiveMetastoreClient(hive_ms_host)
+    hive_ms_service = HiveMetastoreService(hive_ms_client)
+    hive_ms_loader = HiveMetastoreLoader(hive_ms_service)
+    storage_description = TableStorageDescriptorEnum.from_layer(layer)
+
+    func = partial(
+        update_table_structure,
+        logger,
+        hive_ms_loader,
+        spark_ms.spark_database_name,
+        spark_ms.database_location,
+        storage_description,
     )
 
-    rdd = BaseSparkContext.sc.parallelize(spark_table_names)
-    rdd.foreach(
-        lambda _table_name: hms_sync.sync_table(tables_metadata.get(_table_name))
-    )
+    with ThreadPoolExecutor(max_workers=15) as executor:
+        futures = {
+            executor.submit(
+                func,
+                table_name,
+                tables_metadata["columns"],
+                tables_metadata["partition_keys"],
+            ): table_name
+            for table_name, tables_metadata in tables_metadata.items()
+        }
+        for future in as_completed(futures):
+            if future.exception():
+                raise future.exception()
 
     QuintoAndarLogger(JOB_NAME).info(f"m={JOB_NAME}, msg=Finished synchronization.")

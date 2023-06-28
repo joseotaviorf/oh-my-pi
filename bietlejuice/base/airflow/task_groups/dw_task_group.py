@@ -128,18 +128,24 @@ class DWTaskGroup(BaseTaskGroup):
         return hive_sync_tasks
 
     def _set_hive_partitions_tasks(
-        self, layer: str, schema: str, table_name: str, sync_mode: str
+        self,
+        layer: str,
+        schema: str,
+        table_name: str,
+        sync_mode: str,
+        partitions: str = None,
     ) -> list:
         """
         Creates a task that sends a synchronous request to our Hive Metastore to
         update table partitions, synchronizing them to the partitions of the table
         already available at Databricks Metastore.
-
-        # TODO: THIS METHOD MUST BE REVIEWED TO BE RUN ONLY WHEN THE TABLE HAS PARTITIONS.
         """
         hive_sync_tasks = []
 
-        if layer == LayerEnum.DW.value:
+        if layer == LayerEnum.DW.value and (
+            sync_mode == self.ALL_TABLES
+            or (partitions and sync_mode == self.SINGLE_TABLE)
+        ):
             sync_metastore_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
                 databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
@@ -373,6 +379,7 @@ class DWTaskGroup(BaseTaskGroup):
             schema=schema,
             table_name=table_name,
             sync_mode=self.SINGLE_TABLE,
+            partitions=partitions,
         )
 
         metadata_propagator_tasks = self._set_metadata_propagator_tasks(
