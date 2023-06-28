@@ -9,6 +9,6 @@ GROUP BY 1)
 
 SELECT
   dt_bank_application,
-  ROUND((ba_proposals / ba2fd_proposals), 2) AS ba2fd
+  ROUND((ba2fd_proposals / ba_proposals), 2) AS ba2fd
 FROM
   base

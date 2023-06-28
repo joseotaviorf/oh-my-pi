@@ -13,7 +13,7 @@ columns:
   offer:
     description: Number of offers in which the legal analysis process was initiated by the bank.
     metric:
-      name: Bank Application
+      name: Bank Application (Count of Offers)
       description:
         Number of offers in which the legal analysis process was initiated by the bank.
         This amount is calculated by the distinct count of offers.
@@ -26,7 +26,7 @@ columns:
   pre_analysis:
     description: Number of pre analysis in which the legal analysis process was initiated by the bank.
     metric:
-      name: Bank Application
+      name: Bank Application (Count of Pre Analysis)
       description:
         Number of pre analysis in which the legal analysis process was initiated by the bank.
         This amount is calculated by the distinct count of pre analysis.

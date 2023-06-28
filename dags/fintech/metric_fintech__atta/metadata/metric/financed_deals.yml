@@ -11,10 +11,10 @@ columns:
     description: Date when Financed Deals status started.
     dimension: True
   offer:
-    description: Number of financing contracts issued at ATTA.
+    description: Number of offers where financing contracts issued at ATTA.
     metric:
-      name: Financed Deals
-      description: Number of financing contracts issued at ATTA.
+      name: Financed Deals (Count of Offers)
+      description: Number of offers where financing contracts issued at ATTA.
         This amount is calculated by the distinct count of offers.
       acronym: FD
       is_additive: True
@@ -23,10 +23,11 @@ columns:
       approved_by: camila.carvalho@quintoandar.com.br
       link_to_metric: https://quintoandar.sa.looker.com/explore/atta/atta_flow?qid=SVvDhvyE2aw4FwlV19rQVW&toggle=fil
   pre_analysis:
-    description: Number of financing contracts issued at ATTA.
+    description: Number of pre analysis where financing contracts issued at ATTA.
     metric:
-      name: Financed Deals
-      description: Number of financing contracts issued at ATTA.
+      name: Financed Deals (Count of Pre Analysis)
+      description:
+        Number of pre analysis where financing contracts issued at ATTA.
         This amount is calculated by the distinct count of pre analysis.
       acronym: FD
       is_additive: True

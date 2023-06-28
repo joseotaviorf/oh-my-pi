@@ -9,6 +9,6 @@ GROUP BY 1)
 
 SELECT
   dt_inspection,
-  ROUND((ip_proposals / ip2cl_proposals), 2) AS ip2cl
+  ROUND((ip2cl_proposals / ip_proposals), 2) AS ip2cl
 FROM
   base

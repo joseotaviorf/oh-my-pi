@@ -9,6 +9,6 @@ GROUP BY 1)
 
 SELECT
   dt_credit_application_approval,
-  ROUND((ca_proposals / ca2ip_proposals), 2) AS ca2ip
+  ROUND((ca2ip_proposals / ca_proposals), 2) AS ca2ip
 FROM
   base

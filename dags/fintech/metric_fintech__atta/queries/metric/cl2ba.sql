@@ -9,6 +9,6 @@ GROUP BY 1)
 
 SELECT
   dt_checklist,
-  ROUND((cl_proposals / cl2ba_proposals), 2) AS cl2ba
+  ROUND((cl2ba_proposals / cl_proposals), 2) AS cl2ba
 FROM
   base

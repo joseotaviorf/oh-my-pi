@@ -11,11 +11,11 @@ columns:
     description: Date when Credit Application status started.
     dimension: True
   offer:
-    description: Number of cases in which the credit form was completed and submitted to the bank to initiate the credit analysis process.
+    description: Number of offers in which the credit form was completed and submitted to the bank to initiate the credit analysis process.
     metric:
-      name: Credit Application
+      name: Credit Application (Count of Offers)
       description:
-        Number of cases in which the credit form was completed and submitted to the bank to initiate the credit analysis process.
+        Number of offers in which the credit form was completed and submitted to the bank to initiate the credit analysis process.
         This amount is calculated by the distinct count of offers.
       acronym: CAP
       is_additive: True
@@ -24,11 +24,11 @@ columns:
       approved_by: camila.carvalho@quintoandar.com.br
       link_to_metric: https://quintoandar.sa.looker.com/explore/atta/atta_flow?qid=reiRAQolvmEHkpKELueqs2&toggle=fil
   pre_analysis:
-    description: Number of cases in which the credit form was completed and submitted to the bank to initiate the credit analysis process.
+    description: Number of pre analysis in which the credit form was completed and submitted to the bank to initiate the credit analysis process.
     metric:
-      name: Credit Application
+      name: Credit Application (Count of Pre Analysis)
       description:
-        Number of cases in which the credit form was completed and submitted to the bank to initiate the credit analysis process.
+        Number of pre analysis in which the credit form was completed and submitted to the bank to initiate the credit analysis process.
         This amount is calculated by the distinct count of pre analysis.
       acronym: CAP
       is_additive: True

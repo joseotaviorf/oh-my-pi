@@ -10,7 +10,7 @@ columns:
       - dw_atta.fact_pre_analysis_proposal_flow.ts_min_inspection
     description: Date when inspection status started.
     dimension: True
-  ca2ip:
+  ip2cl:
     description: Percentage of proposals that passed from Inspection status to Checklist status.
     metric:
       name: Conversion Inspection to Checklist

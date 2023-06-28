@@ -9,6 +9,6 @@ GROUP BY 1)
 
 SELECT
   dt_credit_started,
-  ROUND((cap_proposals / cap2ca_proposals), 2) AS cap2ca
+  ROUND((cap2ca_proposals / cap_proposals), 2) AS cap2ca
 FROM
   base

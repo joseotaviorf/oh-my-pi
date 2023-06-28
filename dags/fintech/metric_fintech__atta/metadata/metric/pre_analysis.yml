@@ -11,10 +11,10 @@ columns:
     description: Date when Pre Analysis status started.
     dimension: True
   offer:
-    description: Number of pre-analyses processes initiated.
+    description: Number of offers where pre-analyses processes initiated.
     metric:
-      name: Financed Deals
-      description: Number of pre-analyses processes initiated.
+      name: Pre Analysis (Count of Offers)
+      description: Number of offers where pre-analyses processes initiated.
         This amount is calculated by the distinct count of offers.
       acronym: PA
       is_additive: True
@@ -25,7 +25,7 @@ columns:
   pre_analysis:
     description: Number of pre-analyses processes initiated.
     metric:
-      name: Financed Deals
+      name: Pre Analysis
       description: Number of pre-analyses processes initiated.
         This amount is calculated by the distinct count of pre analysis.
       acronym: PA
@@ -35,10 +35,10 @@ columns:
       approved_by: camila.carvalho@quintoandar.com.br
       link_to_metric: https://quintoandar.sa.looker.com/explore/atta/atta_flow?qid=OgdKzNgmVyuw9e6hhvuViZ&toggle=fil
   proposals:
-    description: Number of pre-analyses processes initiated.
+    description: Number of proposals where pre-analyses processes initiated.
     metric:
-      name: Financed Deals
-      description: Number of pre-analyses processes initiated.
+      name: Pre Analysis (Count of Proposals)
+      description: Number of proposals where pre-analyses processes initiated.
         This amount is calculated by the distinct count of proposals.
       acronym: PA
       is_additive: True
