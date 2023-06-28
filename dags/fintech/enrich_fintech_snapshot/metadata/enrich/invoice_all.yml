@@ -62,6 +62,14 @@ columns:
     lineage:
       - dw_payment.dim_invoice_entry.description
     description: "Invoice entry title as shown in invoice"
+  has_negotiation:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.has_negotiation
+    description: "Flag indicating if the register has any negociation"
+  has_installments:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.has_installments
+    description: "Flag indicating if the register has installments"
   purpose:
     lineage:
       - dw_payment.dim_invoice.frequency
@@ -82,11 +90,18 @@ columns:
     lineage:
       - dw_payment.dim_invoice_entry.producer
     description: "Rotine that produces the entry"
+  account_type:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.account_type
+    description: "Description of account type"
+  account_classification:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.account_classification
+    description: "Description of account classification"
   status:
     lineage:
       - dw_payment.dim_invoice.payment_status
     description: "Description of payment status"
-
   closing_mode:
     lineage:
       - dw_payment.dim_invoice.closing_mode
@@ -115,6 +130,10 @@ columns:
     lineage:
       - dw_payment.dim_invoice_entry.accrual_year_month
     description: "Entry expense reference month"
+  entry_creation_accrual_year_month:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.accrual_year_month
+    description: "Entry creation expense reference month"
   entry_created_date:
     lineage:
       - dw_public.dim_date.date
@@ -151,6 +170,10 @@ columns:
     lineage:
       - dw_public.dim_contract.dt_annulment
     description: "Annulment of contract date"
+  ended_before_started:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.ended_before_started
+    description: "Flag indicating if the contract has suffered annulment before started"
   ts_snapshot:
     lineage:
       - datalake_accounting_funnel.accounts_payable.ts_load
