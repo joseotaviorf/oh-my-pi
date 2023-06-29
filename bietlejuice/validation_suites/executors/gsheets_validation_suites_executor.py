@@ -1,4 +1,4 @@
-from typing import Any, Union, Tuple
+from typing import Any, Union, Tuple, List
 
 from quintoandar_gsheets_api_client import GoogleSheetsClient
 from quintoandar_logger import QuintoAndarLogger
@@ -12,6 +12,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
 from bietlejuice.services.gsheets_service import GsheetsService
 from bietlejuice.services import FileService
+from bietlejuice.services.configuration_service import ConfigurationService
 
 from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
@@ -36,10 +37,10 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         "https://www.googleapis.com/auth/drive.readonly",
     ]
 
-    def __init__(self, auth, gsheets_file_path: str):
+    def __init__(self, auth, dags: List):
         super().__init__(auth)
         self.auth = auth
-        self.gsheets_file_path = gsheets_file_path
+        self.dags = dags
 
         self.credentials, self.scope = self.get_credentials_and_scope()
         self.drive_service = self.build_drive_api_service()
@@ -55,7 +56,17 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         )
 
     def get_all_sheets_info(self):
-        return FileService.get_dict_from_yaml_file(self.gsheets_file_path)
+        sheets_info = {}
+        for file_path in self.dags:
+            dag_name = file_path.split("/")[-1]
+            config_service = ConfigurationService(dag_name)
+            context_sheets_info = config_service.get_config("sheets_info")
+            context_sheets_info_completed = {
+                raw_sheet_name: {**sheet_info, "dag_name": dag_name}
+                for raw_sheet_name, sheet_info in context_sheets_info.items()
+            }
+            sheets_info.update(context_sheets_info_completed)
+        return sheets_info
 
     def _get_slack_group_from_context(self, context_name: str = ""):
         return self.context_slack_owner_dict.get(context_name, "")
@@ -122,7 +133,6 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         dag_name: str,
         sheet_id: str,
         sheet_name: str,
-        gsheets_context: str,
         clean_table_name: str,
         raw_table_name: str,
         is_partitioned: bool = False,
@@ -140,10 +150,5 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         )
 
         self.gsheets_service.validate_clean_query_against_raw(
-            dag_name,
-            self.spark_client,
-            df,
-            gsheets_context,
-            raw_table_name,
-            clean_table_name,
+            dag_name, self.spark_client, df, raw_table_name, clean_table_name
         )

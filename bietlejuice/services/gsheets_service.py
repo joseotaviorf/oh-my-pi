@@ -4,7 +4,7 @@ import os
 import re
 import time
 from datetime import datetime, timedelta
-from typing import List, Optional, Union, Dict
+from typing import List, Union, Dict
 
 from gspread.exceptions import SpreadsheetNotFound, WorksheetNotFound
 
@@ -165,21 +165,14 @@ class GsheetsService:
         return import_range_sheets_ids
 
     @staticmethod
-    def load_clean_query(
-        clean_table_name: str, dag_name: str, gsheets_context: Optional[str] = None
-    ) -> str:
+    def load_clean_query(clean_table_name: str, dag_name: str) -> str:
         """
         :param dag_name: The DAG (Package) name
         :param clean_table_name: Table name for sheet on clean layer
-        :param gsheets_context: Sheet Context. Optional.
         """
-        context_level = f"{gsheets_context}/" if gsheets_context else ""
 
         query_content = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
-            dag_name=dag_name,
-            table_name=clean_table_name,
-            layer="clean",
-            intermediate_path=context_level,
+            dag_name=dag_name, table_name=clean_table_name, layer="clean"
         )
         return query_content
 
@@ -217,7 +210,6 @@ class GsheetsService:
         self,
         dag_name,
         spark_client: SparkClient,
-        gsheets_context: str,
         clean_table_name: str,
         raw_table_name: str,
     ) -> Union[bool, None]:
@@ -226,13 +218,12 @@ class GsheetsService:
          created temp table.
         :param dag_name: Used to find the query file according to the DAG Package
         :param spark_client: A client to handle the Spark connection
-        :param gsheets_context: Sheet Context. Optional.
         :param clean_table_name: Table name for sheet on clean layer
         :param raw_table_name: Table name for sheet on raw layer
 
         Returns True if the validation succeeded. Else an error is raised.
         """
-        clean_query = self.load_clean_query(clean_table_name, dag_name, gsheets_context)
+        clean_query = self.load_clean_query(clean_table_name, dag_name)
         clean_query = self.swap_raw_table_with_temporary(
             raw_table_name, clean_table_name, clean_query
         )
@@ -260,7 +251,6 @@ class GsheetsService:
         dag_name,
         spark_client: SparkClient,
         df: DataFrame,
-        gsheet_context: str,
         raw_table_name: str,
         clean_table_name: str,
     ) -> None:
@@ -269,13 +259,12 @@ class GsheetsService:
         :param dag_name: Used to find the query file according to the DAG Package
         :param spark_client: A client to handle the Spark connection
         :param df: Spark Dataframe with Google sheets data
-        :param gsheet_context: Sheet Context. Optional
         :param raw_table_name: Table name for sheet on raw layer
         :param clean_table_name: Table name for sheet on clean layer
         """
 
         df.createTempView(f"{self.TEMPORARY_TABLE_PREFIX}{clean_table_name}")
         self.run_and_validate_clean_query(
-            dag_name, spark_client, gsheet_context, clean_table_name, raw_table_name
+            dag_name, spark_client, clean_table_name, raw_table_name
         )
         self.release_memory(spark_client, df, clean_table_name)

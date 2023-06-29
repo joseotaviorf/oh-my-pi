@@ -127,7 +127,6 @@ if __name__ == "__main__":
             dag_name,
             spark_client,
             df,
-            "",
             sheet_details["raw_table_name"],
             sheet_details["clean_table_name"],
         )

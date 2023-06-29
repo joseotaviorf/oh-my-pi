@@ -1,9 +1,10 @@
-from os.path import join, dirname
+from glob import glob
 
 from pyspark.sql.utils import AnalysisException
 from gspread.exceptions import SpreadsheetNotFound, WorksheetNotFound
 
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
+from quintoandar_logger import QuintoAndarLogger
 from quintoandar_gsheets_api_client.exceptions.exceptions import (
     QuotaExceededException,
     EntityNotFoundException,
@@ -12,20 +13,17 @@ from quintoandar_gsheets_api_client.exceptions.exceptions import (
     PermissionException,
 )
 from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
-from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from dags import DAG_PACKAGES_ROOT
 from bietlejuice.validation_suites.executors.gsheets_validation_suites_executor import (
     GsheetsValidationSuitesExecutor,
 )
-from dags import DAG_PACKAGES_ROOT
+
+logger = QuintoAndarLogger("GSheetsByContextValidationSuite")
 
 
 class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
-    DAG_NAME = "gsheets_by_context"
     REPOSITORY_CONSUMER_CLASS = GoogleSheetsClient
-    gsheets_path = DAGPackagesPathService.get_dag_path(DAG_NAME)
-    GSHEETS_FILES_PATH = join(
-        dirname(DAG_PACKAGES_ROOT), gsheets_path, "gsheets_files.yaml"
-    )
+
     GSHEETS_BASE_URL = "https://docs.google.com/spreadsheets/d/"
     SLACK_MSG_TEMPLATE = """
     :sheets: Sheet: <{sheet_url}|{sheet_name}> (ID: {sheet_id})
@@ -43,7 +41,15 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
     """
 
     def __init__(self, auth) -> None:
-        super().__init__(auth, self.GSHEETS_FILES_PATH)
+
+        gsheets_dags_glob_path = DAG_PACKAGES_ROOT + "/*/gsheets_*"
+        dags = glob(pathname=gsheets_dags_glob_path, recursive=True)
+
+        logger.info(
+            f"m=GSheetsByContextValidationSuite, msg= gsheets_dags_glob_path: {gsheets_dags_glob_path}, dags: {dags}"
+        )
+
+        super().__init__(auth, dags)
         self.append_validations_for_each_sheet()
         self.SLACK_CHANNEL = auth[SlackWebhooksEnum.DATA_ALERTS]
         self.SLACK_MSG_HEADER = (
@@ -59,14 +65,13 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
         :param: _sheet_info: sheet dict with its info.
         """
         sheet_url = f"{self.GSHEETS_BASE_URL}{_sheet_info['sheet_id']}"
-        context = _sheet_info.get("sheet_context", "general").replace("_intraday", "")
+        context = _sheet_info.get("dag_name")
         context_owner = self._get_slack_group_from_context(context)
         try:
             self._run_sheet_validation(
-                dag_name=self.DAG_NAME,
+                dag_name=_sheet_info["dag_name"],
                 sheet_id=_sheet_info["sheet_id"],
                 sheet_name=_sheet_info["sheet_name"],
-                gsheets_context=_sheet_info.get("sheet_context"),
                 clean_table_name=_sheet_info.get("clean_table_name"),
                 raw_table_name=_sheet_info.get("raw_table_name"),
                 is_partitioned=_sheet_info.get("partitioned", False),
