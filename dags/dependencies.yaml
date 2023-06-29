@@ -808,7 +808,7 @@ bietlejuice.enrich_accounting_funnel:
 - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry
 - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
 - bietlejuice.dw_region:load-dw-public-dim-region
-- bietlejuice.gsheets.fintech:done-clean-cod-locale
+- bietlejuice.gsheets_fintech:done-clean-cod-locale
 - bietlejuice.payable_accounts_transactions:load-clean-accounts-payable
 bietlejuice.enrich_affiliates_cost_attributions:
 - bietlejuice.enrich_ebdb_affiliates_cost:load-enrich-affiliates-engagement-cost
@@ -1828,6 +1828,7 @@ bietlejuice.enrich_revenue_lines:
 - bietlejuice.fastforward:load-clean-lra-installment
 - bietlejuice.fastforward:load-clean-lra-installment-option
 - bietlejuice.gsheets.fintech:load-clean-mova-lra-owners
+- bietlejuice.gsheets_fintech:done-clean-mova-lra-owners
 - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
 - bietlejuice.retsuko:load-clean-credit-card-payment
 bietlejuice.enrich_robin_hood:
@@ -1994,11 +1995,11 @@ bietlejuice.enrich_satisfaction_rating:
 - bietlejuice.enrich_survicate:load-enrich-repairs-surveys
 - bietlejuice.enrich_survicate:load-enrich-scheduling-surveys
 - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-- bietlejuice.gsheets.fintech:done-clean-owner-entrance-inspection-csat
-- bietlejuice.gsheets.fintech:done-clean-owner-exit-inspection-csat
-- bietlejuice.gsheets.fintech:done-clean-tenant-entrance-inspection-csat
 - bietlejuice.gsheets.support_and_service:done-clean-csat-reimbursement-true
 - bietlejuice.gsheets.support_and_service:done-clean-tenant-exit-inspection-csat
+- bietlejuice.gsheets_fintech:done-clean-owner-entrance-inspection-csat
+- bietlejuice.gsheets_fintech:done-clean-owner-exit-inspection-csat
+- bietlejuice.gsheets_fintech:done-clean-tenant-entrance-inspection-csat
 - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.enrich_sauron:
 - bietlejuice.sauron:load-clean-session
@@ -2212,8 +2213,8 @@ bietlejuice.metric_rent__contracts:
 - bietlejuice.dw_region:load-dw-public-dim-region
 - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
 bietlejuice.metric_rent__demand_events:
-  - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-cohort-conversions-snapshot
-  - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-demand-events-snapshot
+- bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-cohort-conversions-snapshot
+- bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-demand-events-snapshot
 bietlejuice.metric_rent__listings:
 - bietlejuice.dw_listing:load-dw-public-dim-house-listing
 - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
@@ -2291,14 +2292,14 @@ bietlejuice.reverse_nazare:
 - bietlejuice.dw_user:load-dw-public-dim-user
 - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
 - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
-- bietlejuice.gsheets.fintech:done-clean-advance-base
-- bietlejuice.gsheets.fintech:done-clean-associate-executive-bonus
-- bietlejuice.gsheets.fintech:done-clean-business-rules-bonus
-- bietlejuice.gsheets.fintech:done-clean-campaign-bonus
-- bietlejuice.gsheets.fintech:done-clean-hub-bonus
-- bietlejuice.gsheets.fintech:done-clean-negotiation-executive-bonus
 - bietlejuice.gsheets.for_sale:done-clean-forbrokers-3p-partner-conditions
 - bietlejuice.gsheets.for_sale:done-clean-sale-payments-tiers
+- bietlejuice.gsheets_fintech:done-clean-advance-base
+- bietlejuice.gsheets_fintech:done-clean-associate-executive-bonus
+- bietlejuice.gsheets_fintech:done-clean-business-rules-bonus
+- bietlejuice.gsheets_fintech:done-clean-campaign-bonus
+- bietlejuice.gsheets_fintech:done-clean-hub-bonus
+- bietlejuice.gsheets_fintech:done-clean-negotiation-executive-bonus
 - bietlejuice.hub_services:load-clean-business-unit
 bietlejuice.reverse_nps_reversion:
 - bietlejuice.enrich_nps_reversion:load-enrich-offboarding-landlord-predictions

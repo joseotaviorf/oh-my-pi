@@ -25,10 +25,10 @@ bietlejuice.gsheets: &gsheets-default
     - task_name: done-{slugged_layer}-{slugged_table_name}
       table_name_condition_regex: .*
 bietlejuice.gsheets.bedrock: *gsheets-default
-bietlejuice.gsheets.fintech: *gsheets-default
+bietlejuice.gsheets_fintech: *gsheets-default
 bietlejuice.gsheets.for_rent: *gsheets-default
 bietlejuice.gsheets.for_sale: *gsheets-default
-bietlejuice.gsheets.general: *gsheets-default
+bietlejuice.gsheets_cross: *gsheets-default
 bietlejuice.gsheets.growth: *gsheets-default
 bietlejuice.gsheets.growth_intraday: *gsheets-default
 bietlejuice.gsheets.support_and_service: *gsheets-default
