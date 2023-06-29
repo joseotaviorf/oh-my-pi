@@ -14,10 +14,6 @@ dags:
   support_and_service:
     main_schedule_interval: 20 23 * * *
     dag_owner: Data SS
-  for_rent:
-    main_schedule_interval: 50 23 * * *
-    dag_owner: Data ForRent
-    cluster_name: databricks_10_4_med_general_cluster
   growth_intraday:
     main_schedule_interval: 0 10 * * *
     dag_owner: Data Growth

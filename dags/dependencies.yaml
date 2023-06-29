@@ -1173,7 +1173,7 @@ bietlejuice.enrich_ebdb_agents:
 - bietlejuice.ebdb:load-clean-user-revision-entity
 - bietlejuice.ebdb:load-clean-visit
 - bietlejuice.ebdb:load-clean-work-contract
-- bietlejuice.gsheets.for_rent:done-clean-auxiliary-region
+- bietlejuice.gsheets_for_rent:done-clean-auxiliary-region
 bietlejuice.enrich_ebdb_contract:
 - bietlejuice.ebdb:load-clean-contract
 - bietlejuice.ebdb:load-clean-contract-aud
@@ -1319,8 +1319,8 @@ bietlejuice.enrich_greenseer:
 - bietlejuice.journey_flow:load-clean-journey-flow
 - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_gsheets:
-- bietlejuice.gsheets.for_rent:done-clean-demand-targets-2022
-- bietlejuice.gsheets.for_rent:done-clean-supply-targets-2022
+- bietlejuice.gsheets_for_rent:done-clean-demand-targets-2022
+- bietlejuice.gsheets_for_rent:done-clean-supply-targets-2022
 - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
 bietlejuice.enrich_heimdall:
 - bietlejuice.heimdall:load-clean-activity
@@ -1762,7 +1762,7 @@ bietlejuice.enrich_region:
 - bietlejuice.ebdb:load-clean-region
 - bietlejuice.ebdb:load-clean-region-business-contexts-served
 - bietlejuice.ebdb:load-clean-state
-- bietlejuice.gsheets.for_rent:done-clean-auxiliary-region
+- bietlejuice.gsheets_for_rent:done-clean-auxiliary-region
 bietlejuice.enrich_rent_demand_events:
 - bietlejuice.enrich_booking:load-enrich-booking
 - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -2230,7 +2230,7 @@ bietlejuice.metric_rent_benvi__demand:
 - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
 - bietlejuice.enrich_mexico_marketing_automatic_daily_costs:load-enrich-daily-costs
 - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
-- bietlejuice.gsheets.for_rent:done-clean-mexico-demand-targets-2022
+- bietlejuice.gsheets_for_rent:done-clean-mexico-demand-targets-2022
 bietlejuice.metric_rent_benvi__supply:
 - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-rental-marketplace-flows
 - bietlejuice.enrich_lead:load-enrich-lead

@@ -1,0 +1,41 @@
+---
+database_name: datalake_gsheets_for_rent_clean
+table_name: proj_agent_manager
+domain: for_rent
+columns:
+  id_user:
+    lineage:
+    - datalake_gsheets_raw.estrutura_gerente_corretor.CAST(IdUser AS BIGINT)
+  id_user_supervisor:
+    lineage:
+    - datalake_gsheets_raw.estrutura_gerente_corretor.CAST(IdUserSupervisor AS BIGINT)
+  condition:
+    lineage:
+    - datalake_gsheets_raw.estrutura_gerente_corretor.Condicao
+  mentorship_status:
+    lineage:
+    - datalake_gsheets_raw.estrutura_gerente_corretor.StatusMentoria
+  abandonment_reason:
+    lineage:
+    - datalake_gsheets_raw.estrutura_gerente_corretor.MotivoAbandono
+  responsible_analyst:
+    lineage:
+    - datalake_gsheets_raw.estrutura_gerente_corretor.AnalistaResponsavel
+  weeks:
+    lineage:
+    - datalake_gsheets_raw.estrutura_gerente_corretor.CAST(Semanas AS SMALLINT)
+  dt_started:
+    lineage:
+    - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(DataInicioCarteira,
+      'dd/MM/yyyy')
+  dt_entrance:
+    lineage:
+    - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(DataEntradaCarteira,
+      'dd/MM/yyyy')
+  dt_ended:
+    lineage:
+    - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(NULLIF(DataSaidaCarteira,
+      ''), 'dd/MM/yyyy')
+  dt_mentorship_nh_ended:
+    lineage:
+    - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(DataFimMentoriaNH, 'dd/MM/yyyy')
