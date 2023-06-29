@@ -21,7 +21,3 @@ dags:
   growth_intraday:
     main_schedule_interval: 0 10 * * *
     dag_owner: Data Growth
-  static:
-    dag_owner: Data Engineering
-    dag_doc:
-      trigger_interval: not automatically

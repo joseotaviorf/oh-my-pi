@@ -1135,7 +1135,7 @@ bietlejuice.enrich_debt_recovery:
 - bietlejuice.trato_feito:load-clean-negotiation
 - bietlejuice.trato_feito:load-clean-payment
 bietlejuice.enrich_docato:
-- bietlejuice.gsheets.static:done-clean-legal-base-docato
+- bietlejuice.gsheets_static:done-clean-legal-base-docato
 bietlejuice.enrich_documentation_metrics:
 - bietlejuice.documentation_metrics:load-clean-categories-documentation
 - bietlejuice.documentation_metrics:load-clean-columns-documentation

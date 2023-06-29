@@ -1,0 +1,258 @@
+sheets_info:
+  affiliates_acquisition_targets:
+    sheet_id: 1Ln23SA7YQ-OhfZ49BEmoT_mm-kDbNC-HdMt9thTzbDM
+    sheet_name: target_nau_budget_daily
+    clean_table_name: affiliates_acquisition_targets
+    sheet_context: static
+
+  aglomerados_subnormais_2010_limites:
+    sheet_id: 1fANN7TIDQt7qxQMKV-MbCJEJjqaUHjoowKm2UgnNHH0
+    sheet_name: AglomeradosSubnormais2010_Limites
+    clean_table_name: census_subnormal_crowding_areas
+    sheet_context: static
+
+  atribuicao_de_maturidade_e_validacao_do_cadastro:
+    sheet_id: 1Q7nQfLRa_yTsqB0VN27AffeUES4r_urat3FA0R78MRI
+    sheet_name: FINAL
+    clean_table_name: metrics_registration
+    sheet_context: static
+
+  autonomous_agent_listing:
+    sheet_id: 1VWXMApErzzt-rRvXaqajNu0s4MRrdss1mthYrxZL9qs
+    sheet_name: autonomous_agent_listing
+    clean_table_name: autonomous_agent_listing
+    sheet_context: static
+
+  autonomous_agent_payment_data_form_origin:
+    sheet_id: 1BUfkgVHITraPf1vees0v8Ykj2C6ZpcOaRfaB4U8yMnY
+    sheet_name: autonomous_agent_payment_data_form_origin
+    clean_table_name: autonomous_agent_payment_data_form_origin
+    sheet_context: static
+
+  autonomous_agent_payment_data_lead_origin:
+    sheet_id: 1BUfkgVHITraPf1vees0v8Ykj2C6ZpcOaRfaB4U8yMnY
+    sheet_name: autonomous_agent_payment_data_lead_origin
+    clean_table_name: autonomous_agent_payment_data_lead_origin
+    sheet_context: static
+
+  aux_agents_sale:
+    sheet_id: 1mom8xcJ4XCpr02S38DgW_cmEDcdzsOiMkW2vSbg0Ra0
+    sheet_name: aux_agents_sale
+    clean_table_name: aux_agents_sale
+    sheet_context: static
+
+  aux_check_photo_sender:
+    sheet_id: 10dUA-ED5cqd8qEHrMC-iXjPio0WBEUP-dZGkcPwP6WU
+    sheet_name: aux_check_photo_sender
+    clean_table_name: aux_check_photo_sender
+    sheet_context: static
+
+  cities_neighborhoods_ibge_qa:
+    sheet_id: 19N1BVZuKcCw1RByXoL3hqaXSmEhdi7_mbtyOVff4oQs
+    sheet_name: ibge_5a_cities
+    clean_table_name: cities_neighborhoods_ibge_qa
+    sheet_context: static
+
+  costs_allocation_relative_indexes:
+    sheet_id: 1f9Iyshj2N-jIbO-YIXs_CxCnDKq4aLEfBcS6dcN-qgM
+    sheet_name: costs_allocation_relative_indexes
+    clean_table_name: costs_allocation_relative_indexes
+    sheet_context: static
+
+  crm_tasks_to_remove:
+    sheet_id: 1AOV5JNoFH72sM9ehSRaXpqvOlbxTD66QabtLAeV_8fM
+    sheet_name: task_to_remove
+    clean_table_name: crm_tasks_to_remove
+    sheet_context: static
+
+  dados_docato:
+    sheet_id: 1wValHoubCG72NQZkOAGMJyBQM26Dkd4QwzKW1IXhSTw
+    sheet_name: dados_docato
+    clean_table_name: legal_base_docato
+    sheet_context: static
+
+  de_para_analistas_proowner:
+    sheet_id: 1qXhl565T30pxSCrd5zkq2m9Ch6way4_p9J4v9mjKS1c
+    sheet_name: AM
+    clean_table_name: pro_owner_analyst
+    sheet_context: static
+
+  de_para_cancelamento:
+    sheet_id: 1Om2IjwtSPHfg4GRq2IPKGshHLBdXnP0bCMBPbOrh5fc
+    sheet_name: de_para_cancelamento
+    clean_table_name: from_to_cancellation
+    sheet_context: static
+
+  demand_targets_2019:
+    sheet_id: 1PQfAlpy2YhUKg_qn786_4xQ5E1cW2-YSpz1NJ1lVruA
+    sheet_name: demand_targets_2019
+    clean_table_name: demand_targets_2019
+    sheet_context: static
+
+  demand_targets_2020:
+    sheet_id: 1rIFNs-Wy6glWjeclgUTUukjS2hJUu5BCSZh6N7Vy5dk
+    sheet_name: demand_targets_2020
+    clean_table_name: demand_targets_2020
+    sheet_context: static
+
+  demand_targets_2021:
+    sheet_id: 1l-KtlqNoMh_OgGc72Q5NyQz-IcBVLDo1kjJa5FzijqI
+    sheet_name: demand_targets_2021
+    clean_table_name: demand_targets_2021
+    sheet_context: static
+
+  demand_targets_replanning:
+    sheet_id: 1124r_Z75Q7dreEbYKMnD_79NYO4cU7BKZyd7s14MZbo
+    sheet_name: demand_targets_replanning
+    clean_table_name: demand_targets_replanning
+    sheet_context: static
+
+  espelhamento_dl:
+    sheet_id: 14sgdtouI0lnxTDHsYH0ySt_R1nvMu4W0Qa8QJmg9mVI
+    sheet_name: Espelhamento_DL
+    clean_table_name: projreparos_espelhamento_dl
+    sheet_context: static
+
+  for_sale_segmentation_survey:
+    sheet_id: 1rpHRTqCaI1RtwH2OY4WStWGB9uj7YPaGQsJAL2EIaCo
+    sheet_name: responses
+    clean_table_name: for_sale_segmentation_survey_responses
+    sheet_context: static
+
+  great_price_tag_test_groups:
+    sheet_id: 1IelEYQr306slcOrkyM8ELVRCq8UML6k27lixgjkEAfo
+    sheet_name: base_20220808
+    clean_table_name: great_price_tag_test_groups
+    sheet_context: static
+
+  kong_ss_endpoints:
+    sheet_id: 1uHWW90GUAxXHKI27EGtde7bkP-wK948Nt7YlfunadZI
+    sheet_name: kong_ss_endpoints
+    clean_table_name: kong_ss_endpoints
+    sheet_context: static
+
+  legacy_doorman:
+    sheet_id: 19N4-pSsxcdQZVYSiCValrqYo8CYDATMrcmKtOO_P1mI
+    sheet_name: legacy_doorman
+    clean_table_name: legacy_doorman
+    sheet_context: static
+
+  looker_folders_domains:
+    sheet_id: 1nfDXQtPrlGlZzOSMNwyO7_zRd2jbkJqPh744bS3AJwA
+    sheet_name: looker_folders_domains
+    clean_table_name: looker_folders_domains
+    sheet_context: static
+
+  marketing_affiliates_targets_replanning:
+    sheet_id: 1KHK1D92S6LbHfrp5nivOkUCOrBABBMqoT9uFuMr_Fag
+    sheet_name: marketing_affiliates_targets_replanning
+    clean_table_name: marketing_affiliates_targets_replanning
+    sheet_context: static
+
+  metabase_collections_domains:
+    sheet_id: 1nfDXQtPrlGlZzOSMNwyO7_zRd2jbkJqPh744bS3AJwA
+    sheet_name: metabase_collections_domains
+    clean_table_name: metabase_collections_domains
+    sheet_context: static
+
+  monday_users:
+    sheet_id: 1vB3GrQGLnx5fzJuVAjMVb2XzHpYepsfoSwN81rE1d-w
+    sheet_name: depara_monday_id_name
+    clean_table_name: monday_users
+    sheet_context: static
+
+  mra_historical:
+    sheet_id: 1VS3SgHgFlqPJKxXMHsAgtUk0Xb6x2-Ey66I1iRmKAqI
+    sheet_name: mra_historical
+    clean_table_name: mra_historical
+    sheet_context: static
+
+  offline_and_branding_marketing_costs:
+    sheet_id: 14la3wTA9DitbyiJ8Lb4X7FnyAMsSE32ICzwPBPD2j4E
+    sheet_name: offline_and_branding_marketing_costs
+    clean_table_name: offline_and_branding_marketing_costs
+    sheet_context: static
+
+  overpriced_campaign_test_groups:
+    sheet_id: 1YbUnHn7BE8Z1iI2b65lmwaJHO_ObO4cYOe0zwenRdzk
+    sheet_name: overpriced_campaign_test_groups
+    clean_table_name: overpriced_campaign_test_groups
+    sheet_context: static
+
+  pld_suspicion_list:
+    sheet_id: 1sBdfDJqd6y1xS7fI31e0YfnSc4LahTWOhnmo-d1UAw0
+    sheet_name: suspicion_list_dl
+    clean_table_name: pld_suspicion_list
+    sheet_context: static
+
+  regional_inspection_q1_2022:
+    sheet_id: 1ZSkD8Zucf8EFHAUweJiIk20VA3qAcuEshl_LtuOMX2E
+    sheet_name: aux_regiao_regional_inspection
+    clean_table_name: regional_inspection_q1_2022
+    sheet_context: static
+
+  dags_sla_exclusion_list:
+    sheet_id: 1SvZD4v4GC81IOVrALn5jr31pNOajp2Nxtqn-5Isvtvg
+    sheet_name: dags_sla_exclusion_list
+    clean_table_name: dags_sla_exclusion_list
+    sheet_context: static
+
+  sale_business_unit_standardization:
+    sheet_id: 1-Rxvtw0cgEk8WoZtnaFWTMchN6e6cNrsU8h06kRghBI
+    sheet_name: sale_business_unit_standardization
+    clean_table_name: sale_business_unit_standardization
+    sheet_context: static
+
+  supply_processor_status_reasons:
+    sheet_id: 1Yud6fXc1ugqAKrUAD4Mw5i7tbR3q9oP3BVxCSbZdffs
+    sheet_name: reasons
+    clean_table_name: supply_processor_status_reasons
+    sheet_context: static
+
+  supply_targets_2019:
+    sheet_id: 1Nxh1_mAsyr3tkChizMyYc4QIg3jTR1YNGAenjy9NWKQ
+    sheet_name: supply_targets_2019
+    clean_table_name: supply_targets_2019
+    sheet_context: static
+
+  supply_targets_2020:
+    sheet_id: 1jPCEFt6ECCt1KSuiitqGh7fgPSh7TV0DIZsTLdE-U0k
+    sheet_name: supply_targets_2020
+    clean_table_name: supply_targets_2020
+    sheet_context: static
+
+  supply_targets_2021:
+    sheet_id: 1LwTojiD_NXervUoR_RW1pNWGjWcvB_Nx0prnpZYwP4g
+    sheet_name: supply_targets_2021
+    clean_table_name: supply_targets_2021
+    sheet_context: static
+
+  survival_estimation:
+    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
+    sheet_name: survival_estimation
+    clean_table_name: survival_estimation
+    sheet_context: static
+
+  survival_estimation_new_version:
+    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
+    sheet_name: survival_estimation_new_version
+    clean_table_name: survival_estimation_new_version
+    sheet_context: static
+
+  tqc_registered_agents:
+    sheet_id: 1FuN5jlN9pDvVfwPDJAqROfqXKF3tIhXDUvR6a6RGqYg
+    sheet_name: tqc_registered_agents
+    clean_table_name: tqc_registered_agents
+    sheet_context: static
+
+  users_cx_plaquinhas:
+    sheet_id: 1oiUlhua9uFXbwkaSeF_EYRvaB652JIhOoWDy1bYolK0
+    sheet_name: users_cx_plaquinhas
+    clean_table_name: users_cx_plaquinhas
+    sheet_context: static
+
+  zipcodes_sp:
+    sheet_id: 1ej4KiYUK-7gbxykN1AANpcWllW2wXffChTiF8h0nUPc
+    sheet_name: zipcodes_sp
+    clean_table_name: zipcodes_sp
+    sheet_context: static

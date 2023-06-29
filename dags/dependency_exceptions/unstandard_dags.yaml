@@ -32,6 +32,6 @@ bietlejuice.gsheets_for_sale: *gsheets-default
 bietlejuice.gsheets.growth: *gsheets-default
 bietlejuice.gsheets.growth_intraday: *gsheets-default
 bietlejuice.gsheets.support_and_service: *gsheets-default
-bietlejuice.gsheets.static:
+bietlejuice.gsheets_static:
   <<: *gsheets-default
   is_static: true

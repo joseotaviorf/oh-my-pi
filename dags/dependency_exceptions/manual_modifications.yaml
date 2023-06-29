@@ -469,7 +469,7 @@ bietlejuice.enrich_debt_recovery:
     - bietlejuice.trato_feito:load-clean-debtor
 bietlejuice.enrich_docato:
   add:
-    - bietlejuice.gsheets.static:done-clean-legal-base-docato
+    - bietlejuice.gsheets_static:done-clean-legal-base-docato
 bietlejuice.enrich_ebdb_affiliates_cost:
   remove:
     - bietlejuice.ebdb:load-clean-conversion-lead
