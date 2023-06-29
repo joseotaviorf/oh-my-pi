@@ -8,6 +8,7 @@ import random
 import urllib
 import requests
 
+import time
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -21,7 +22,7 @@ from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services import S3Service
 
-def _format_requests(endpoint:str, configs: dict, display_limit: int, display_date: str) -> list:
+def _format_requests(endpoint:str, configs: dict, display_limit: int) -> list:
     """
     Function to format URL requests based on display limit. The expected output
     is a bunch of URLs like:
@@ -40,9 +41,8 @@ def _format_requests(endpoint:str, configs: dict, display_limit: int, display_da
         limit = min(i + maxRows - 1, endRow)
         displayOffsetParam = f'&display_offset={offset}'
         displayLimitParam = f'&display_limit={limit}'
-        displayDate = f'&display_date={display_date}'
 
-        url_requests.extend([endpoint + params + displayOffsetParam + displayLimitParam + displayDate])  
+        url_requests.extend([endpoint + params + displayOffsetParam + displayLimitParam])  
 
     return url_requests
 
@@ -216,7 +216,7 @@ if __name__ == "__main__":
         Create 'requests.json' file.
         """
         requests_nested_list = [
-            _format_requests(endpoint, report_list[report]['configs'], report_list[report]['display_limit'], display_date) for report in report_list
+            _format_requests(endpoint, report_list[report]['configs'], report_list[report]['display_limit']) for report in report_list
         ]
 
         url_requests = [req for reqs in requests_nested_list for req in reqs]
@@ -240,9 +240,12 @@ if __name__ == "__main__":
         for url_request in url_requests:
             logger.info(f"{url_request}\n")
 
+            logger.info("Sleeping for 5 seconds before the next request.")          
+            time.sleep(5)
+            
             response_data = _make_request(api_key, url_request)
             file_name = urllib.parse.quote(url_request, safe='')
             s3_service.upload_file(json.dumps(response_data), f"{responses_folder_path}/{file_name}.json")
-
+            
     else:
         logger.info(f"Data already ingested for display_date: {display_date}.")
