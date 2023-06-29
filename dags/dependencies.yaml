@@ -2197,6 +2197,10 @@ bietlejuice.metric_fintech__atta:
 - bietlejuice.dw_atta:load-dw-atta-dim-proposal-situation-changes
 - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow
 - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
+bietlejuice.metric_fintech__velo:
+- bietlejuice.dw_velo:load-dw-velo-dim-velo-broker
+- bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
+- bietlejuice.dw_velo:load-dw-velo-fact-velo-propose
 bietlejuice.metric_rent__bookings:
 - bietlejuice.dw_booking:load-dw-public-dim-booking
 - bietlejuice.dw_region:load-dw-public-dim-region

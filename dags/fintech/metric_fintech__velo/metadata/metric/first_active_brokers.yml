@@ -1,0 +1,24 @@
+---
+database_name: metric_fintech
+table_name: first_active_brokers
+description: Total number of Brokers that began being active per month.
+domain: Fintech
+owner: athos.sampayo@quintoandar.com.br
+columns:
+  month:
+    lineage:
+      - dw_velo.fact_velo_propose.dt_contract_started
+    description: Date when the contract started
+    dimension: True
+  total_active_broker:
+    description: Total number of Brokers that began being active on the month.
+    metric:
+      name: First Active Brokers
+      description:
+        Total number of Brokers that began being active per month.
+      acronym: FAB
+      is_additive: False
+      business_stage: Other
+      hierarchy: User analisys
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://metabase.quintoandar.com.br/question/85014-metric-first-active-brokers"

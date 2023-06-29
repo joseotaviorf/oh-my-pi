@@ -1,0 +1,24 @@
+---
+database_name: metric_fintech
+table_name: first_brokers_per_registered_brokers_percentage
+description: Percentage of Brokers that began being active against total registered brokers per month.
+domain: Fintech
+owner: athos.sampayo@quintoandar.com.br
+columns:
+  month:
+    lineage:
+      - dw_velo.dim_velo_broker.ts_created
+    description: Date when the broker registered on the system
+    dimension: True
+  percent:
+    description: Percentage of Brokers that began being active that month againt registered Brokers that month.
+    metric:
+      name: First Brokers per Registered Brokers Percentage
+      description:
+        Percentage of Brokers that began being active against total registered brokers per month.
+      acronym: FBRBP
+      is_additive: False
+      business_stage: Other
+      hierarchy: User analisys
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://metabase.quintoandar.com.br/question/85627-metric-first-brokers-registered"

@@ -1,0 +1,132 @@
+---
+database_name: metric_fintech
+table_name: acquisition_funnel
+description: Quantity and percentage of Proposes on each step of the Acquisition Funnel per day.
+domain: Fintech
+owner: athos.sampayo@quintoandar.com.br
+columns:
+  date:
+    lineage:
+      - dw_public.dim_date.date
+    description: Date base for each metric
+    dimension: True
+  propose_created:
+    description: (Top of funnel) Quantity of guarantee proposal created.
+    metric:
+      name: Proposal Created
+      description:
+        (Top of funnel) Quantity of guarantee proposal created.
+      acronym: PC
+      is_additive: True
+      business_stage: Other
+      hierarchy: Operation
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://quintoandar.sa.looker.com/dashboards/6470"
+  eval_started:
+    description: Quantity of proposal arrived at the credit analysis.
+    metric:
+      name: Evaluation Started
+      description:
+        Quantity of proposal arrived at the credit analysis.
+      acronym: ES
+      is_additive: True
+      business_stage: Other
+      hierarchy: Operation
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://quintoandar.sa.looker.com/dashboards/6470"
+  credit_approved:
+    description: Quantity of proposals on the moment when it had the credit approved
+    metric:
+      name: Credit Approved
+      description:
+        Quantity of proposals on the moment when it had the credit approved
+      acronym: CA
+      is_additive: True
+      business_stage: Other
+      hierarchy: Operation
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://quintoandar.sa.looker.com/dashboards/6470"
+  contract_started:
+    description: Contracts that have had guarantee deposit activated in the reference period.
+    metric:
+      name: Contract Started
+      description:
+        Contracts that have had guarantee deposit activated in the reference period.
+      acronym: CS
+      is_additive: True
+      business_stage: Other
+      hierarchy: Operation
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://quintoandar.sa.looker.com/dashboards/6470"
+  active_contract_started:
+    description: Contracts that have had guarantee activated in the reference period without being cancelled or finalized.
+    metric:
+      name: Active Contract Started
+      description:
+        Contracts that have had guarantee activated in the reference period without being cancelled or finalized.
+      acronym: ACS
+      is_additive: True
+      business_stage: Other
+      hierarchy: Operation
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://quintoandar.sa.looker.com/dashboards/6470"
+  pc2es:
+    description: Conversion from Proposal Created to Evaluation Started.
+    metric:
+      name: Evaluation Started per Proposal Created
+      description:
+        Conversion from Proposal Created to Evaluation Started.
+      acronym: PC2ES
+      is_additive: False
+      business_stage: Other
+      hierarchy: Operation
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://metabase.quintoandar.com.br/question/85020-metric-pc2es"
+  pc2cs:
+    description: Conversion from Proposal Created to Contract Signed.
+    metric:
+      name: Contract Signed per Proposal Created
+      description:
+        Conversion from Proposal Created to Contract Signed.
+      acronym: PC2CS
+      is_additive: False
+      business_stage: Other
+      hierarchy: Operation
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://metabase.quintoandar.com.br/question/85027-metric-pc2cs"
+  es2ca:
+    description: Conversion from Evaluation Started to Credit Approved.
+    metric:
+      name: Credit Approved per Evaluation Started
+      description:
+        Conversion from Started to Credit Approved.
+      acronym: ES2CA
+      is_additive: False
+      business_stage: Other
+      hierarchy: Operation
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://metabase.quintoandar.com.br/question/85022-metric-es2ca"
+  ca2cs:
+    description: Conversion from Credit Approved to Contract Signed.
+    metric:
+      name: Contract Signed per Credit Approved
+      description:
+        Conversion from Credit Approved to Contract Signed.
+      acronym: CA2CS
+      is_additive: False
+      business_stage: Other
+      hierarchy: Operation
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://metabase.quintoandar.com.br/question/85025-metric-ca2cs"
+  cs2acs:
+    description: Conversion from Credit Approved to Act. Contract Signed.
+    metric:
+      name: Active Contract Signed per Credit Approved
+      description:
+        Conversion from Credit Approved to Act. Contract Signed.
+      acronym: CS2ACS
+      is_additive: False
+      business_stage: Other
+      hierarchy: Operation
+      approved_by: carolline.massari@quintoandar.com.br
+      link_to_metric: "https://metabase.quintoandar.com.br/question/85026-metric-cs2acs"

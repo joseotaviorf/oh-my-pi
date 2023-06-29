@@ -1,0 +1,6 @@
+---
+table_name: metric_fintech.first_active_brokers
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  month:
+    is_unique:

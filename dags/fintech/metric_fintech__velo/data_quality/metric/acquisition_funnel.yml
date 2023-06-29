@@ -1,0 +1,6 @@
+---
+table_name: metric_fintech.acquisition_funnel
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  date:
+    is_unique:
