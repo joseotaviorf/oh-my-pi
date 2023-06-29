@@ -23,6 +23,10 @@ WITH zendesk_email AS (
     g.name AS department,
     ac.agent_name,
     ac.agent_company,
+    CASE 
+        WHEN LOWER(ac.agent_company)="atento" OR LOWER(ac.email) LIKE "%atento%" THEN "ATENTO"
+        ELSE NULL 
+    END AS agent_organization,
     ac.manager AS agent_manager,
     ac.email AS agent_email,
     ac.dt_start,
@@ -189,6 +193,7 @@ SELECT DISTINCT
   ze.id_contract,
   ze.agent_name,
   ze.agent_company,
+  ze.agent_organization,
   ze.agent_manager,
   ze.agent_email,
   CASE

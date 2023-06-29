@@ -69,6 +69,10 @@ WITH segment AS (
     agent_email,
     agent_manager,
     agent_company,
+    CASE 
+        WHEN LOWER(agent_company)="atento" OR LOWER(agent_email) LIKE "%atento%" THEN "ATENTO"
+        ELSE NULL 
+    END AS agent_organization,
     agent_name,
     queue_name,
     LAG(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) AS transferred_from_dept,
@@ -371,6 +375,7 @@ conversation_and_segment AS (
     t.agent_email,
     t.agent_manager,
     t.agent_company,
+    t.agent_organization,
     t.agent_name,
     t.dt_start,
     t.queue_name,
@@ -427,6 +432,7 @@ SELECT DISTINCT
   c.agent_email,
   c.agent_manager,
   c.agent_company,
+  c.agent_organization,
   c.agent_name,
   c.queue_name AS department,
   zd.zendesk_ticket_department AS zendesk_department,

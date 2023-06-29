@@ -41,6 +41,12 @@ columns:
       concentrix: Concentrix company.
       quintoandar: Quintoandar company.
       actionline: Action Line.
+  agent_organization:
+    lineage:
+      - datalake_customer_support.call.agent_organization
+      - datalake_customer_support.chat.agent_organization
+      - datalake_customer_support.email.agent_organization
+    description: Agent organization, temporary column.
   dt_agent_start:
     lineage:
       - datalake_customer_support.call.dt_agent_start

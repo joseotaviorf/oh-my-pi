@@ -188,6 +188,10 @@ agents_control AS (
     agent_name,
     manager,
     agent_company,
+    CASE 
+        WHEN LOWER(agent_company)="atento" OR LOWER(email) LIKE "%atento%" THEN "ATENTO"
+        ELSE NULL 
+    END AS agent_organization,
     dt_start
   FROM
     datalake_gsheets_clean.agents_control
@@ -205,6 +209,7 @@ quinto_messenger_tasks AS (
     ac.manager AS agent_manager,
     ac.agent_name,
     ac.agent_company,
+    ac.agent_organization,
     ac.dt_start,
     t.seconds_to_first_response AS seconds_first_reply,
     t.seconds_to_first_response/60.0 AS task_minutes_wait_time,
@@ -275,6 +280,7 @@ quinto_messenger_tasks AS (
     ac.manager AS agent_manager,
     ac.agent_name,
     ac.agent_company,
+    ac.agent_organization,
     ac.dt_start,
     t.seconds_to_first_response AS seconds_first_reply,
     t.seconds_to_first_response/60.0 AS task_minutes_wait_time,
@@ -540,6 +546,7 @@ SELECT DISTINCT
   qmt.agent_manager,
   qmt.agent_name,
   qmt.agent_company,
+  qmt.agent_organization,
   cc.comment AS csat_comment,
   qmt.department,
   zti.zendesk_ticket_department AS zendesk_department,

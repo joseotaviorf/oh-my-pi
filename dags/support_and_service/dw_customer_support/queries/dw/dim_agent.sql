@@ -5,6 +5,7 @@ WITH agents AS (
     agent_manager,
     agent_name AS full_name,
     LOWER(agent_company) AS agent_company,
+    agent_organization,
     dt_agent_start
   FROM
     datalake_customer_support.call
@@ -15,6 +16,7 @@ WITH agents AS (
     agent_manager,
     agent_name AS full_name,
     LOWER(agent_company) AS agent_company,
+    agent_organization,
     dt_agent_start
   FROM
     datalake_customer_support.chat
@@ -25,6 +27,7 @@ WITH agents AS (
     agent_manager,
     agent_name AS full_name,
     LOWER(agent_company) AS agent_company,
+    agent_organization,
     dt_agent_start
   FROM
     datalake_customer_support.email
@@ -35,6 +38,7 @@ SELECT
   FIRST(agent_manager, TRUE) AS agent_manager,
   FIRST(full_name, TRUE) AS full_name,
   FIRST(agent_company, TRUE) AS agent_company,
+  FIRST(agent_organization, TRUE) AS agent_organization,
   FIRST(dt_agent_start, TRUE) AS dt_agent_start,
   NOW() AS ts_load
 FROM
