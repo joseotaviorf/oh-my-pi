@@ -1,0 +1,8 @@
+SELECT
+    id AS id_ivr,
+    user_phone,
+    origin,
+    strategy,
+    requested_at AS ts_requested
+FROM
+    datalake_bigfone_raw.ivr_closed_history

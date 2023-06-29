@@ -1,24 +1,23 @@
 import json
 import logging
 from argparse import ArgumentParser
-import multiprocessing
-import concurrent.futures
 
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import PostgresConsumer
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 
 JOB_NAME = "load_bigfone_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
 
 def _parse_arguments():
     """
@@ -34,6 +33,7 @@ def _parse_arguments():
 
     return parser.parse_args()
 
+
 def get_conn_config():
     """
     This method is intended to return the database connection settings.
@@ -43,8 +43,11 @@ def get_conn_config():
         global dbutils
         dbutils = base_dbutils.get_dbutils()
 
-    conn_config_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.BIGFONE)
+    conn_config_json = dbutils.secrets.get(
+        scope="quintoandar", key=DatabaseEnum.BIGFONE
+    )
     return json.loads(conn_config_json)
+
 
 def _load_dataframes_into_datalake(args, force_recreate=False):
     """
@@ -76,28 +79,30 @@ def _load_dataframes_into_datalake(args, force_recreate=False):
     for table_name, infos in tables_info.items():
         if infos["raw_extraction_type"] == "incremental":
             df = postgres_consumer.get_incremental_data_from_table(
-                table_name.capitalize(), infos.get("date_filter_column"), args.execution_date
+                infos.get("raw_table_name"),
+                infos.get("date_filter_column"),
+                args.execution_date,
             )
             IncrementalTableLoaderPipeline(
-                database_name=database_name, 
-                table_name=table_name, 
-                database_location=database_location, 
+                database_name=database_name,
+                table_name=table_name,
+                database_location=database_location,
                 layer=LayerEnum.RAW,
                 query=None,
-                partitions=partition_cols
+                partitions=partition_cols,
             ).load_and_register(df, format_options, force_recreate)
         else:
-            df = postgres_consumer.get_data_from_table(table_name.capitalize())
+            df = postgres_consumer.get_data_from_table(infos.get("raw_table_name"))
             FullTableLoaderPipeline(
-                database_name=database_name, 
-                table_name=table_name, 
-                database_location=database_location, 
+                database_name=database_name,
+                table_name=table_name,
+                database_location=database_location,
                 layer=LayerEnum.RAW,
-                query=None
+                query=None,
             ).load_and_register(df, format_options)
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     args = _parse_arguments()
 
     logger.info(
