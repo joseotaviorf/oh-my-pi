@@ -14,6 +14,10 @@ columns:
       MX: Mexico's country code.
   is_last_status_of_day:
     description: Boolean indicating if the status is the last one of the day for this listing.
+  revision_reason:
+    lineage:
+    - datalake_ebdb_listing.house_listing_status.revision_reason
+    description: Reason why the status has changed.
   sk_first_publication_date:
     lineage:
     - datalake_ebdb_listing.house_listing_status.ts_first_publication
@@ -39,7 +43,7 @@ columns:
   status_change_reason:
     lineage:
     - datalake_ebdb_listing.house_listing_status.status_change_reason
-    description: Reason why status changed.
+    description: Status reason of house listing.
   status_history:
     lineage:
     - datalake_ebdb_listing.house_listing_status.status_history

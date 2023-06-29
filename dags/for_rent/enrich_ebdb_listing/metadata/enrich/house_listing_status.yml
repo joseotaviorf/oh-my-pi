@@ -27,10 +27,14 @@ columns:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.rev
     description: Boolean indicating if this is the last status of the day.
+  revision_reason:
+    lineage:
+      - datalake_ebdb_listing.lbc_status_version_order.revision_reason
+    description: Reason why the status has changed.
   status_change_reason:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.status_reason
-    description: Reason of the status change.
+    description: Status reason of the listing.
   status_history:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.status

@@ -17,6 +17,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hls.ts_status_ended AS ts_status_end,
     hls.status_history,
     LEFT(hls.status_change_reason, 5000) AS status_change_reason,
+    hls.revision_reason,
     COALESCE(
         -- get max ts per id_house_listing per day
         MAX(hls.ts_status_started) OVER(

@@ -6,6 +6,7 @@ SELECT
     lbc_version.listing_version AS version,
     lbc_version.status AS status_history,
     lbc_version.status_reason AS status_change_reason,
+    lbc_version.revision_reason,
     COALESCE(
       -- get MAX ts per id_house_listings per day
       MAX(lbc_version.rev) OVER(
