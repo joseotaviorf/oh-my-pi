@@ -389,6 +389,10 @@ columns:
     - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
     description: Custom field from Zendesk Form that indicates the type of that request
       that generates a specific demand
+  agent_organization:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.agent_organization
+    description: Agent organization, temporary field to filters
   client_type:
     lineage:
     - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
@@ -470,9 +474,11 @@ columns:
     description: ''
   contact_theme_detail_tag:
     lineage:
-    - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_detail_tag
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_detail_tag
+    description: ''
   step_tag:
     lineage:
-    - datalake_zendesk_ticket_funnels.ticket_funnel.step_tag
+      - datalake_zendesk_ticket_funnels.ticket_funnel.step_tag
+    description: ''
   ts_load:
     description: Timestamp of data load from database source (UTC timezone)

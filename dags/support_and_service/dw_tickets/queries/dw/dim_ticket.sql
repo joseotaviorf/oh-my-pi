@@ -16,6 +16,7 @@ SELECT
     reason,
     comment,
     request_type,
+    agent_organization,
     client_type,
     step_tag,
     customer_type_tag,
