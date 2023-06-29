@@ -274,12 +274,43 @@ def enrich_table_data_frame_with_file_size_infos(
 
 
 """
+Create a string with dag table schema
+"""
+
+
+def create_dag_dataframe(content, execution_date):
+    schema = "dag:string, dag_location:string, cluster_configuration:string"
+    return transform_list_of_dicts_to_dataframe_with_partitions(
+        content, execution_date, schema=schema
+    )
+
+
+"""
 Given the DagBag content dictionary and execution date, creates a Spark DataFrame with year, month and day.
 """
 
 
-def transform_list_of_dicts_to_dataframe_with_partitions(content, execution_date):
-    df = spark.createDataFrame(Row(**row_content) for row_content in content)
+def transform_list_of_dicts_to_dataframe_with_partitions(content, execution_date, **kwargs):
+    r"""
+    Tranform a list of dicts in a sparkDataFrame.
+
+    :param content: A list with rows in dict format.
+    :type content: List[Dict]
+    :param execution_date: The ingestion execution, used to create the ingestion partitions.
+    :type execution_date: datetime
+    :rtype: sparkDataFrame
+
+    :Keyword Arguments:
+        * *supplement* (``dict``) --
+        :param schema: The DataFrame schema.
+        :type schema: str
+
+    """
+    df = spark.createDataFrame(
+        (Row(**row_content) for row_content in content),
+        **kwargs,
+    )
+
     return (
         df.withColumn("year", SF.lit(execution_date.year))
         .withColumn("month", SF.lit(execution_date.month))
@@ -309,7 +340,7 @@ def transform_dictionaries_to_dataframe(
 ) -> DataFrame:
     enrichments = {
         "table": enrich_table,
-        "dag": transform_list_of_dicts_to_dataframe_with_partitions,
+        "dag": create_dag_dataframe,
     }
     return enrichments.get(table_name)(content, execution_date)
 

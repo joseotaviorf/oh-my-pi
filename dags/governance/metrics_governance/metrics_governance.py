@@ -37,7 +37,7 @@ RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 CLUSTER_DESCRIPTION = config_service.get_config(
     "databricks_10_4_min_general_photon_cluster"
 )
-EXECUTION_DATE = datetime.today().strftime("%Y-%m-%d")
+EXECUTION_DATE = "{{ ds }}"
 default_libraries = config_service.get_config("default_libraries")
 
 dag = DAG(
