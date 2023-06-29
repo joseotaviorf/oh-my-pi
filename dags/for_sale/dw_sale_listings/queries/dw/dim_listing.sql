@@ -12,6 +12,16 @@ SELECT
   hrs.registration_abandoned_reason,
   lbc.status_reason AS unpublished_reason,
   lbc.short_url,
+  ll.price_bin,
+  ll.price_m2_bin,
+  ll.total_area_bin,
+  ll.pricing_full_name AS pricing_lens_tier,
+  ll.demand_full_name AS demand_lens_tier,
+  ll.availability_full_name AS availability_lens_tier,
+  ll.pricing_disclaimer AS pricing_lens_disclaimer,
+  ll.demand_disclaimer AS demand_lens_disclaimer,
+  ll.availability_disclaimer AS availability_lens_disclaimer,
+  ll.availability_drill_down AS availability_lens_drill_down,
   CASE
     WHEN h.is_sale_3p_supply THEN h.partner_3p_supply
   END AS partner_3p_supply,
@@ -62,5 +72,8 @@ LEFT JOIN
   datalake_sale_stranded_listings.stranded_status AS ssl
     ON ssl.id_sale_listing = sl.id_sale_listing
     AND ssl.is_last_status = True
+LEFT JOIN 
+  datalake_sale_listings_lenses.listing_lenses AS ll
+    ON ll.id_house = lbc.id_house 
 WHERE 
   lbc.business_context = 'SALE'
