@@ -4,21 +4,26 @@ WITH bill_items_cohort_rules AS (
         id_contract AS sk_contract,
         bi.bill_item_cluster_name,
         bi.due_amount,
+        CASE
+          WHEN bi.payment_status = 'written-down' THEN TRUE
+          ELSE FALSE
+        END AS is_written_down,
         SUM(bi.value_sign_bill_item) as value_bill_item_cluster,
         bi.dt_created,
         bi.dt_due,
         bi.dt_paid,
         bi.dt_canceled
     FROM datalake_retsuko.bill_items AS bi
-    WHERE bi.payment_status IN ('open','paid','canceled')
+    WHERE bi.payment_status IN ('open','paid','canceled','written-down')
         AND bi.due_amount <= 0
-    GROUP BY 1,2,3,4,6,7,8,9
+    GROUP BY 1,2,3,4,5,7,8,9,10
 )
 SELECT
     sk_invoice,
     sk_contract,
     id_lvl_1 AS sk_junk_bill_items_cluster,
     value_bill_item_cluster,
+    is_written_down,
     due_amount,
     GREATEST(12*(YEAR(current_date)-YEAR(dt_created))+(MONTH(current_date)-MONTH(dt_created)),0) AS mobs_possible_invoice_by_created_date,
     GREATEST(12*(YEAR(current_date)-YEAR(dt_due))+(MONTH(current_date)-MONTH(dt_due)),0) AS mobs_possible_invoice_by_due_date,

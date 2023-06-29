@@ -53,6 +53,10 @@ columns:
     description: Number of months until expiration of the invoice based on the creation date
     lineage:
       - datalake_retsuko.bill_items.dt_due
+  is_written_down:
+    description: Boolean flag where TRUE means Payment Status is "written-down"
+    lineage:
+      - datalake_retsuko.bill_items.payment_status
   due_amount:
     description: Invoice amount, negative means its a due value TO 5A, and positive means its a due value FROM 5A
     lineage:

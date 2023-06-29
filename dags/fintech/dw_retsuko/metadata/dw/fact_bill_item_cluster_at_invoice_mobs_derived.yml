@@ -50,6 +50,8 @@ columns:
     description: Financial value of the bill item cluster based on the amount of the bill items of the cluster in the invoice
   value_canceled:
     description: Auxiliary columns to indicate the financial value of the CANCELED STATUS in that given mob (col_mob)
+  value_written_down:
+    description: Auxiliary columns to indicate the financial value of the WRITTEN-DOWN STATUS in that given mob (col_mob)
   value_paid:
     description: Auxiliary columns to indicate the financial value of the PAID STATUS in that given mob (col_mob)
   value_due:
