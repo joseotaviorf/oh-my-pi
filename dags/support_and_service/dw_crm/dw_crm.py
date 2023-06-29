@@ -12,7 +12,9 @@ from databricks_plugin import (
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
+from bietlejuice.base.airflow.task_groups.dw_task_group_all_purpose import (
+    DWTaskGroupAllPurpose,
+)
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -75,7 +77,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     databricks_conn_id="databricks_job_cluster", dag=dag, task_id="terminate-cluster"
 )
 
-task_group = DWTaskGroup(
+task_group = DWTaskGroupAllPurpose(
     dag=dag,
     env=ENV,
     dw_bucket=dw_bucket,
@@ -84,18 +86,29 @@ task_group = DWTaskGroup(
     spark_jobs_path=base_spark_jobs_path,
 )
 
-dw_staging_task_group = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW_STAGING, tables_customization=tables_customization
-)
-dw_task_group = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW, tables_customization=tables_customization
-)
+table_names = task_group._get_table_names_from_sql_files(layer=LayerEnum.DW)
+
+dw_staging_task_groups = {
+    table_name: task_group.build_dw_staging_task_group(
+        table_name=table_name,
+        table_customization=tables_customization.get(table_name, {}),
+    )
+    for table_name in table_names
+}
+
+dw_task_groups = {
+    table_name: task_group.build_dw_task_group(
+        table_name=table_name,
+        table_customization=tables_customization.get(table_name, {}),
+    )
+    for table_name in table_names
+}
 
 dw_task_group_boundaries = {}
-for table in dw_task_group:
-    initial_tasks = DWTaskGroup.first_tasks(dw_staging_task_group[table])
-    final_tasks = DWTaskGroup.last_tasks(dw_task_group[table])
-    dw_task_group_boundaries[table] = DWTaskGroup.format_tasks_boundaries(
+for table in dw_task_groups:
+    initial_tasks = DWTaskGroupAllPurpose.first_tasks(dw_staging_task_groups[table])
+    final_tasks = DWTaskGroupAllPurpose.last_tasks(dw_task_groups[table])
+    dw_task_group_boundaries[table] = DWTaskGroupAllPurpose.format_tasks_boundaries(
         initial_tasks=initial_tasks, final_tasks=final_tasks
     )
 
@@ -108,13 +121,16 @@ for table in dw_task_group:
     dag_inner_dependencies=inner_dependencies,
 )
 
-
 chain(
     create_cluster_task,
-    DWTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
-    + DWTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
+    DWTaskGroupAllPurpose.all_first_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + DWTaskGroupAllPurpose.first_tasks(inner_dependencies_task_groups_boundaries),
 )
 
-TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
+TaskFlowHelper.chain_task_groups_via_common_table(
+    dw_staging_task_groups, dw_task_groups
+)
 
-chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)
+chain(DWTaskGroupAllPurpose.all_last_tasks(dw_task_groups), terminate_cluster_task)

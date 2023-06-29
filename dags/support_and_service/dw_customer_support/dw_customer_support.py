@@ -4,10 +4,7 @@ import os
 
 from airflow.models import DAG
 from airflow.utils.helpers import chain
-from airflow.operators.quintoandar_databricks import (
-    QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
-)
+from databricks_plugin import QuintoAndarDatabricksExecuteJobClusterOperator
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
@@ -66,16 +63,13 @@ dag = DAG(
     ),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+create_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
+    databricks_conn_id="databricks_job_cluster",
     dag=dag,
-    task_id="create-cluster",
+    task_id="execute-job-cluster",
     cluster_configuration=cluster_configuration,
     libraries=default_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
-)
-
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
 )
 
 task_group = DWTaskGroup(
@@ -131,9 +125,3 @@ chain(
 )
 
 TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
-
-chain(
-    DWTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
-    + DWTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
-    terminate_cluster_task,
-)

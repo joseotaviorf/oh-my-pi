@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pendulum
 from airflow.models import DAG
-from airflow.operators.quintoandar_databricks import (
+from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
@@ -12,7 +12,9 @@ from airflow.utils.helpers import chain
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
+from bietlejuice.base.airflow.task_groups.dw_task_group_all_purpose import (
+    DWTaskGroupAllPurpose,
+)
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -105,11 +107,11 @@ class DatamartsDAGFactory:
                 )
                 dw_task_group_boundaries[
                     table_name
-                ] = DWTaskGroup.format_tasks_boundaries(
-                    initial_tasks=DWTaskGroup.first_tasks(
+                ] = DWTaskGroupAllPurpose.format_tasks_boundaries(
+                    initial_tasks=DWTaskGroupAllPurpose.first_tasks(
                         datamart_task_groups["staging"][table_name]
                     ),
-                    final_tasks=DWTaskGroup.last_tasks(
+                    final_tasks=DWTaskGroupAllPurpose.last_tasks(
                         datamart_task_groups["dw"][table_name]
                     ),
                 )
@@ -164,6 +166,7 @@ class DatamartsDAGFactory:
         )
 
         create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+            databricks_conn_id="databricks_job_cluster",
             dag=dag,
             task_id="create-cluster",
             cluster_configuration=cluster_description,
@@ -172,10 +175,12 @@ class DatamartsDAGFactory:
         )
 
         terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-            dag=dag, task_id="terminate-cluster"
+            databricks_conn_id="databricks_job_cluster",
+            dag=dag,
+            task_id="terminate-cluster",
         )
 
-        task_group = DWTaskGroup(
+        task_group = DWTaskGroupAllPurpose(
             dag=dag,
             env=self.env,
             dw_bucket=self.dw_bucket,
@@ -203,10 +208,12 @@ class DatamartsDAGFactory:
 
         chain(
             create_cluster_task,
-            DWTaskGroup.all_first_tasks(
+            DWTaskGroupAllPurpose.all_first_tasks(
                 task_groups_boundaries_without_inner_dependencies
             )
-            + DWTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
+            + DWTaskGroupAllPurpose.first_tasks(
+                inner_dependencies_task_groups_boundaries
+            ),
         )
 
         TaskFlowHelper.chain_task_groups_via_common_table(
@@ -214,7 +221,7 @@ class DatamartsDAGFactory:
         )
 
         chain(
-            DWTaskGroup.all_last_tasks(datamart_task_groups["dw"]),
+            DWTaskGroupAllPurpose.all_last_tasks(datamart_task_groups["dw"]),
             terminate_cluster_task,
         )
 

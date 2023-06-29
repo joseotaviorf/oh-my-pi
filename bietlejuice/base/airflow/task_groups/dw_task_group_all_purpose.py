@@ -4,7 +4,7 @@ from typing import Dict
 from os import path
 
 from airflow.utils.helpers import chain
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
+from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator
 
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -13,7 +13,7 @@ from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathSe
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
-class DWTaskGroup(BaseTaskGroup):
+class DWTaskGroupAllPurpose(BaseTaskGroup):
     """
     Responsible for creating task groups related to dw operations
     """
@@ -64,13 +64,13 @@ class DWTaskGroup(BaseTaskGroup):
         table_name: str,
         extraction_type: str,
         spark_job_extra_args: list,
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    ) -> QuintoAndarDatabricksSubmitRunOperator:
         """
         Creates a task that reads an existing SQL query file, executes it inside
         Databricks and writes its resulting dataframe inside the DW bucket, creating or
         updating a table in Databricks Metastore with the same name of the query file.
         """
-        load_table_task = QuintoAndarDatabricksCheckJobTaskOperator(
+        load_table_task = QuintoAndarDatabricksSubmitRunOperator(
             databricks_conn_id="databricks_job_cluster",
             dag=self.dag,
             task_id=self.generate_default_task_id(
@@ -104,7 +104,7 @@ class DWTaskGroup(BaseTaskGroup):
         hive_sync_tasks = []
 
         if layer == LayerEnum.DW.value:
-            sync_metastore_structure_task = QuintoAndarDatabricksCheckJobTaskOperator(
+            sync_metastore_structure_task = QuintoAndarDatabricksSubmitRunOperator(
                 databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
                 task_id=self.generate_default_task_id(
@@ -146,7 +146,7 @@ class DWTaskGroup(BaseTaskGroup):
             sync_mode == self.ALL_TABLES
             or (partitions and sync_mode == self.SINGLE_TABLE)
         ):
-            sync_metastore_partitions_task = QuintoAndarDatabricksCheckJobTaskOperator(
+            sync_metastore_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
                 databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
                 task_id=self.generate_default_task_id(
@@ -191,7 +191,7 @@ class DWTaskGroup(BaseTaskGroup):
             layer=layer,
             table_name=path.join(tree_path, table_name),
         ):
-            propagate_table_metadata_task = QuintoAndarDatabricksCheckJobTaskOperator(
+            propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
                 databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
                 task_id=self.generate_default_task_id(
@@ -240,7 +240,7 @@ class DWTaskGroup(BaseTaskGroup):
             config_service = ConfigurationService()
             inmetro_bucket = config_service.get_config("inmetro_bucket")
 
-            data_quality_tests_task = QuintoAndarDatabricksCheckJobTaskOperator(
+            data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
                 databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
                 task_id=self.generate_default_task_id(
@@ -290,7 +290,7 @@ class DWTaskGroup(BaseTaskGroup):
             and table_name.startswith("dim_")
             and extraction_type == "full"
         ):
-            dim_default_row_task = QuintoAndarDatabricksCheckJobTaskOperator(
+            dim_default_row_task = QuintoAndarDatabricksSubmitRunOperator(
                 databricks_conn_id="databricks_job_cluster",
                 dag=self.dag,
                 task_id=self.generate_default_task_id(

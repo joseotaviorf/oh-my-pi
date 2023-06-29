@@ -1,9 +1,6 @@
 import os
 
-from databricks_plugin import (
-    QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
-)
+from databricks_plugin import QuintoAndarDatabricksExecuteJobClusterOperator
 from airflow.operators.python_operator import ShortCircuitOperator
 from airflow.utils.helpers import chain
 
@@ -98,18 +95,13 @@ class DWQueryWorkflow(BaseWorkflow):
             else None
         )
 
-        create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+        execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
             databricks_conn_id="databricks_job_cluster",
             dag=dag,
-            task_id="create-cluster",
+            task_id="execute-job-cluster",
             cluster_configuration=cluster_params["cluster_config"],
             libraries=cluster_params["default_libraries"],
             access_control_list=cluster_params["access_control_list"],
-        )
-        terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-            databricks_conn_id="databricks_job_cluster",
-            dag=dag,
-            task_id="terminate-cluster",
         )
 
         dw_task_groups_boundaries = (
@@ -122,8 +114,7 @@ class DWQueryWorkflow(BaseWorkflow):
             skip_run_task,
             inner_dependencies,
             task_group,
-            create_cluster_task,
-            terminate_cluster_task,
+            execute_job_cluster_task,
             dw_staging_task_groups,
             dw_task_groups,
             dw_task_groups_boundaries,
@@ -164,15 +155,14 @@ class DWQueryWorkflow(BaseWorkflow):
         skip_run_task,
         inner_dependencies,
         task_group,
-        create_cluster_task,
-        terminate_cluster_task,
+        execute_job_cluster_task,
         dw_staging_task_groups,
         dw_task_groups,
-        dw_task_group_boundaries,
+        dw_task_groups_boundaries,
     ):
 
         if skip_run_task:
-            chain(skip_run_task, create_cluster_task)
+            chain(skip_run_task, execute_job_cluster_task)
 
         if inner_dependencies:
             (
@@ -180,37 +170,22 @@ class DWQueryWorkflow(BaseWorkflow):
                 inner_dependencies_task_groups_boundaries,
             ) = task_group.set_inner_dag_dependencies(
                 task_flow_helper=TaskFlowHelper(),
-                task_groups_boundaries=dw_task_group_boundaries,
+                task_groups_boundaries=dw_task_groups_boundaries,
                 dag_inner_dependencies=inner_dependencies,
             )
 
-            create_cluster_task.set_downstream(
+            execute_job_cluster_task.set_downstream(
                 DWTaskGroup.all_first_tasks(
                     task_groups_boundaries_without_inner_dependencies
                 )
                 + DWTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries)
             )
 
-            terminate_cluster_task.set_upstream(
-                DWTaskGroup.all_last_tasks(
-                    task_groups_boundaries_without_inner_dependencies
-                )
-                + DWTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries)
-            )
-
         else:
-            create_cluster_task.set_downstream(
+            execute_job_cluster_task.set_downstream(
                 DWTaskGroup.all_first_tasks(dw_staging_task_groups)
-            )
-            terminate_cluster_task.set_upstream(
-                DWTaskGroup.all_last_tasks(dw_task_groups)
             )
 
         TaskFlowHelper.chain_task_groups_via_common_table(
             dw_staging_task_groups, dw_task_groups
         )
-
-        # Set data quality tasks if exists
-        independent_tasks = DWTaskGroup.all_independent_tasks(dw_staging_task_groups)
-        if independent_tasks:
-            terminate_cluster_task.set_upstream(independent_tasks)
