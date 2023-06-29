@@ -142,7 +142,7 @@ bietlejuice.dw_customer_support:
 - bietlejuice.enrich_customer_support:load-enrich-chat
 - bietlejuice.enrich_customer_support:load-enrich-email
 - bietlejuice.enrich_customer_support:load-enrich-received-demand
-- bietlejuice.gsheets.support_and_service:done-clean-department-control
+- bietlejuice.gsheets_support_and_service:done-clean-department-control
 - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.dw_datamarts_spark.cross:
 - bietlejuice.dw_booking:load-dw-public-dim-tenant-booking-review
@@ -179,18 +179,6 @@ bietlejuice.dw_datamarts_spark.fintech:
 - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
 - bietlejuice.enrich_retsuko:load-enrich-bill
 - bietlejuice.retsuko:load-clean-contract
-##bietlejuice.dw_datamarts_spark.fintech_cross:
-##- bietlejuice.dw_contract:load-dw-public-dim-contract
-##- bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
-##- bietlejuice.dw_listing:load-dw-public-dim-house-listing
-##- bietlejuice.dw_offer:load-dw-public-dim-offer
-##- bietlejuice.dw_proposal:load-dw-public-dim-proposal
-##- bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
-##- bietlejuice.ebdb:load-clean-proponent-proposal
-##- bietlejuice.sorting_hat:load-clean-credit-analysis
-##- bietlejuice.sorting_hat:load-clean-proponent
-##- bietlejuice.sorting_hat:load-clean-proposal
-##- bietlejuice.sorting_hat:load-clean-screening-result
 bietlejuice.dw_datamarts_spark.for_rent:
 - bietlejuice.amplitude:load-clean-events
 - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -441,7 +429,7 @@ bietlejuice.dw_inspections:
 - bietlejuice.enrich_inspections:load-enrich-room
 - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements
 - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-csat
-- bietlejuice.gsheets.support_and_service:done-clean-inspectors-control
+- bietlejuice.gsheets_support_and_service:done-clean-inspectors-control
 - bietlejuice.inspections:load-clean-assessment
 bietlejuice.dw_invoice_entries:
 - bietlejuice.enrich_invoice:load-enrich-invoice-entries
@@ -823,8 +811,8 @@ bietlejuice.enrich_amplitude_lead:
 - bietlejuice.rene_descartes:load-clean-house-lead
 bietlejuice.enrich_amplitude_magic_link:
 - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-- bietlejuice.gsheets.support_and_service:done-clean-agents-control
-- bietlejuice.gsheets.support_and_service:done-clean-department-control
+- bietlejuice.gsheets_support_and_service:done-clean-agents-control
+- bietlejuice.gsheets_support_and_service:done-clean-department-control
 - bietlejuice.zendesk_tickets:load-clean-groups
 - bietlejuice.zendesk_tickets:load-clean-users
 bietlejuice.enrich_amplitude_offer:
@@ -1065,18 +1053,18 @@ bietlejuice.enrich_customer_demand:
 - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
 - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
 - bietlejuice.enrich_customer_support:load-enrich-email
-- bietlejuice.gsheets.support_and_service:done-clean-agents-control
-- bietlejuice.gsheets.support_and_service:done-clean-department-control
-- bietlejuice.gsheets.support_and_service:done-clean-service-city-holidays
-- bietlejuice.gsheets.support_and_service:done-clean-tag-sla-target
-- bietlejuice.gsheets.support_and_service:done-clean-taxonomy-sla
+- bietlejuice.gsheets_support_and_service:done-clean-agents-control
+- bietlejuice.gsheets_support_and_service:done-clean-department-control
+- bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays
+- bietlejuice.gsheets_support_and_service:done-clean-tag-sla-target
+- bietlejuice.gsheets_support_and_service:done-clean-taxonomy-sla
 - bietlejuice.reclameaqui:load-clean-tickets
 bietlejuice.enrich_customer_resolution:
 - bietlejuice.enrich_customer_support:load-enrich-call
 - bietlejuice.enrich_customer_support:load-enrich-chat
 - bietlejuice.enrich_customer_support:load-enrich-email
 - bietlejuice.enrich_ebdb_user:load-enrich-user
-- bietlejuice.gsheets.support_and_service:done-clean-department-control
+- bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.enrich_customer_support:
 - bietlejuice.chat_fup:load-clean-chats-chat
 - bietlejuice.chat_fup:load-clean-surveys-answer
@@ -1096,8 +1084,8 @@ bietlejuice.enrich_customer_support:
 - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
 - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
 - bietlejuice.greenseer:load-clean-session
-- bietlejuice.gsheets.support_and_service:done-clean-agents-control
-- bietlejuice.gsheets.support_and_service:done-clean-department-control
+- bietlejuice.gsheets_support_and_service:done-clean-agents-control
+- bietlejuice.gsheets_support_and_service:done-clean-department-control
 - bietlejuice.insider:load-clean-feature
 - bietlejuice.insider:load-clean-review
 - bietlejuice.insider:load-clean-review-feature
@@ -1125,7 +1113,7 @@ bietlejuice.enrich_dashboard_governance:
 - bietlejuice.metabase:load-clean-view-log
 bietlejuice.enrich_date:
 - bietlejuice.enrich_region:load-enrich-region
-- bietlejuice.gsheets.support_and_service:done-clean-service-city-holidays
+- bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays
 bietlejuice.enrich_debt_recovery:
 - bietlejuice.enrich_retsuko:load-enrich-invoice
 - bietlejuice.trato_feito:load-clean-accounting-installment
@@ -1596,8 +1584,8 @@ bietlejuice.enrich_offboarding:
 - bietlejuice.enrich_tracksale:load-enrich-dispatch
 - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
 - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-- bietlejuice.gsheets.support_and_service:done-clean-department-control
-- bietlejuice.gsheets.support_and_service:done-clean-inspection-analysis-forms
+- bietlejuice.gsheets_support_and_service:done-clean-department-control
+- bietlejuice.gsheets_support_and_service:done-clean-inspection-analysis-forms
 - bietlejuice.terminator:load-clean-application-user
 - bietlejuice.terminator:load-clean-negotiation
 - bietlejuice.terminator:load-clean-rev-info
@@ -1994,11 +1982,11 @@ bietlejuice.enrich_satisfaction_rating:
 - bietlejuice.enrich_survicate:load-enrich-repairs-surveys
 - bietlejuice.enrich_survicate:load-enrich-scheduling-surveys
 - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-- bietlejuice.gsheets.support_and_service:done-clean-csat-reimbursement-true
-- bietlejuice.gsheets.support_and_service:done-clean-tenant-exit-inspection-csat
 - bietlejuice.gsheets_fintech:done-clean-owner-entrance-inspection-csat
 - bietlejuice.gsheets_fintech:done-clean-owner-exit-inspection-csat
 - bietlejuice.gsheets_fintech:done-clean-tenant-entrance-inspection-csat
+- bietlejuice.gsheets_support_and_service:done-clean-csat-reimbursement-true
+- bietlejuice.gsheets_support_and_service:done-clean-tenant-exit-inspection-csat
 - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.enrich_sauron:
 - bietlejuice.sauron:load-clean-session
@@ -2031,11 +2019,11 @@ bietlejuice.enrich_supply_outbound_flows:
 - bietlejuice.jaiminho:load-clean-user-notifications
 - bietlejuice.wololo:load-clean-whatsapp
 bietlejuice.enrich_support_and_service_kpis_targets:
-- bietlejuice.gsheets.support_and_service:done-clean-target-service-kpis
-- bietlejuice.gsheets.support_and_service:done-clean-target-support-kpis
+- bietlejuice.gsheets_support_and_service:done-clean-target-service-kpis
+- bietlejuice.gsheets_support_and_service:done-clean-target-support-kpis
 bietlejuice.enrich_survicate:
-- bietlejuice.gsheets.support_and_service:done-clean-owner-offboarding-keys-csat
-- bietlejuice.gsheets.support_and_service:done-clean-tenant-onboarding-keys-csat
+- bietlejuice.gsheets_support_and_service:done-clean-owner-offboarding-keys-csat
+- bietlejuice.gsheets_support_and_service:done-clean-tenant-onboarding-keys-csat
 - bietlejuice.survicate:load-clean-surveys
 bietlejuice.enrich_terminator:
 - bietlejuice.terminator:load-clean-termination-aud
@@ -2334,5 +2322,5 @@ bietlejuice.reverse_tracksale:
 - bietlejuice.ebdb:load-clean-house
 - bietlejuice.ebdb:load-clean-user-pro-owner
 - bietlejuice.enrich_offboarding:load-enrich-contract-termination
-- bietlejuice.gsheets.support_and_service:done-clean-department-control
+- bietlejuice.gsheets_support_and_service:done-clean-department-control
 - bietlejuice.terminator:load-clean-termination

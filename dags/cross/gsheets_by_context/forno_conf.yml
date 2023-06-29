@@ -8,12 +8,6 @@
 #       trigger_interval: <trigger_interval>
 #       additional_information: <additional_information>
 dags:
-  bedrock:
-    main_schedule_interval: 50 21 * * *
-    dag_owner: Data Bedrock
-  support_and_service:
-    main_schedule_interval: 20 23 * * *
-    dag_owner: Data SS
   growth_intraday:
     main_schedule_interval: 0 10 * * *
     dag_owner: Data Growth
