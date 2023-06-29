@@ -5,7 +5,7 @@ SELECT
 UNION ALL
 SELECT
     103 AS sk_cohort_type,
-    'VISIT_BOOKED_TO_OFFER_SUBMITTED' AS cohort_name,
+    'VISIT_BOOKED_TO_OFFER_SENT' AS cohort_name,
     'VB2OS' AS abbreviation
 UNION ALL
 SELECT
@@ -40,28 +40,28 @@ SELECT
 UNION ALL
 SELECT
     203 AS sk_cohort_type,
-    'VISIT_COMPLETED_TO_OFFER_SUBMITTED' AS cohort_name,
+    'VISIT_COMPLETED_TO_OFFER_SENT' AS cohort_name,
     'VC2OS' AS abbreviation
 UNION ALL
 SELECT
     204 AS sk_cohort_type,
     'VISIT_COMPLETED_TO_OFFER_APPROVED' AS cohort_name,
-    'VB2OA' AS abbreviation
+    'VC2OA' AS abbreviation
 UNION ALL
 SELECT
     205 AS sk_cohort_type,
     'VISIT_COMPLETED_TO_EVALUATION_STARTED' AS cohort_name,
-    'VB2ES' AS abbreviation
+    'VC2ES' AS abbreviation
 UNION ALL
 SELECT
     206 AS sk_cohort_type,
     'VISIT_COMPLETED_TO_EVALUATION_POSITIVE' AS cohort_name,
-    'VB2EP' AS abbreviation
+    'VC2EP' AS abbreviation
 UNION ALL
 SELECT
     207 AS sk_cohort_type,
     'VISIT_COMPLETED_TO_DOC_SENT' AS cohort_name,
-    'VB2DS' AS abbreviation
+    'VC2DS' AS abbreviation
 UNION ALL
 SELECT
     208 AS sk_cohort_type,
@@ -75,32 +75,32 @@ SELECT
 UNION ALL
 SELECT
     304 AS sk_cohort_type,
-    'OFFER_SUBMITTED_TO_OFFER_APPROVED' AS cohort_name,
+    'OFFER_SENT_TO_OFFER_APPROVED' AS cohort_name,
     'OS2OA' AS abbreviation
 UNION ALL
 SELECT
     305 AS sk_cohort_type,
-    'OFFER_SUBMITTED_TO_EVALUATION_STARTED' AS cohort_name,
+    'OFFER_SENT_TO_EVALUATION_STARTED' AS cohort_name,
     'OS2ES' AS abbreviation
 UNION ALL
 SELECT
     306 AS sk_cohort_type,
-    'OFFER_SUBMITTED_TO_EVALUATION_POSITIVE' AS cohort_name,
+    'OFFER_SENT_TO_EVALUATION_POSITIVE' AS cohort_name,
     'OS2EP' AS abbreviation
 UNION ALL
 SELECT
     307 AS sk_cohort_type,
-    'OFFER_SUBMITTED_TO_DOC_SENT' AS cohort_name,
+    'OFFER_SENT_TO_DOC_SENT' AS cohort_name,
     'OS2DS' AS abbreviation
 UNION ALL
 SELECT
     308 AS sk_cohort_type,
-    'OFFER_SUBMITTED_TO_CREDIT_APPROVED' AS cohort_name,
+    'OFFER_SENT_TO_CREDIT_APPROVED' AS cohort_name,
     'OS2CA' AS abbreviation
 UNION ALL
 SELECT
     309 AS sk_cohort_type,
-    'OFFER_SUBMITTED_TO_CONTRACT_SIGNED' AS cohort_name,
+    'OFFER_SENT_TO_CONTRACT_SIGNED' AS cohort_name,
     'OS2CS' AS abbreviation
 UNION ALL
 SELECT
