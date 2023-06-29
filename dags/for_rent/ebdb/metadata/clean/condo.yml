@@ -25,6 +25,9 @@ columns:
   zipcode:
     lineage:
       - datalake_ebdb_raw.condominio.cep
+  code:
+    lineage:
+      - datalake_ebdb_raw.condominio.code
   lat:
     lineage:
       - datalake_ebdb_raw.condominio.lat

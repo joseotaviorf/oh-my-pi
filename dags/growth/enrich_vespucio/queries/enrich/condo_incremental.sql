@@ -9,9 +9,11 @@ WITH ebdb_tmp AS (
       condominio.city,
       condominio.lat,
       condominio.lng,
+      condominio.code,
       contato.phone_number,
       condominio.construction_year,
       condominio.ts_updated,
+      MAX(has_condo_page) AS has_condo_page,
       MAX(imovel.has_elevator) AS has_elevator,
       MAX(CASE WHEN imovel.doorman_type == 'horas24' THEN TRUE ELSE FALSE END) AS has_entrance_hall,
       MAX(CASE WHEN iInfo.id_condo_amenities = 1 THEN TRUE ELSE FALSE END) AS has_grill_area,
@@ -46,7 +48,7 @@ WITH ebdb_tmp AS (
       AND has_condo_page IS TRUE
       AND condominio.lat IS NOT NULL
       AND condominio.lng IS NOT NULL
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
 )
 SELECT
     id,
@@ -61,6 +63,7 @@ SELECT
     NULL AS state,
     lat,
     lng,
+    code,
     phone_number,
     0.5 AS dsr,
     NULL AS type_syndic,
@@ -78,6 +81,7 @@ SELECT
     NULL AS number_of_garage_floors,
     NULL AS number_of_garage_gates,
     NULL AS number_of_water_tanks,
+    has_condo_page,
     has_elevator,
     has_entrance_hall,
     has_grill_area,
@@ -116,6 +120,7 @@ SELECT
     state,
     CAST(lat AS DECIMAL(10,6)) AS lat,
     CAST(lng AS DECIMAL(10,6)) AS lng,
+    NULL AS code,
     NULL AS phone_number,
     0.4 AS dsr,
     type_syndic,
@@ -133,6 +138,7 @@ SELECT
     number_of_garage_floors,
     number_of_garage_gates,
     number_of_water_tanks,
+    NULL AS has_condo_page,
     has_elevator,
     has_entrance_hall,
     has_grill_area,

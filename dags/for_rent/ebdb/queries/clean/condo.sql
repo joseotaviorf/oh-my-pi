@@ -7,6 +7,7 @@ SELECT
   c.bairro AS neighborhood,
   c.cidade AS city,
   c.cep AS zipcode,
+  c.code,
   c.lat,
   c.lng,
   c.latlng,

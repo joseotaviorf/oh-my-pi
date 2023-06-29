@@ -49,6 +49,10 @@ columns:
     description: "The longitude coordinate of the condo."
     lineage:
       - datalake_vespucio.condo_incremental.lng
+  code:
+    description: "Used to generate condo page URL. Example: https://www.quintoandar.com.br/condominio/indi-vila-olimpia-vila-olimpia-sao-paulo-y2drrsnld5"
+    lineage:
+      - datalake_ebdb_clean.condo.code
   phone_number:
     description: "The phone number of the condo."
     lineage:
@@ -113,6 +117,10 @@ columns:
     description: "The number of water tanks in the condominium."
     lineage:
       - datalake_vespucio.condo_incremental.number_of_water_tanks
+  has_condo_page:
+    description: "Boolean value to indicate if the condo has a page on QuintoAndar website."
+    lineage:
+      - datalake_vespucio.condo_incremental.has_condo_page
   has_elevator:
     description: "Boolean value to indicate if the condo has an elevator."
     lineage:
