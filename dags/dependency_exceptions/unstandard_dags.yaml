@@ -24,7 +24,7 @@ bietlejuice.gsheets: &gsheets-default
   custom_task_names:
     - task_name: done-{slugged_layer}-{slugged_table_name}
       table_name_condition_regex: .*
-bietlejuice.gsheets.bedrock: *gsheets-default
+bietlejuice.gsheets_bedrock: *gsheets-default
 bietlejuice.gsheets_cross: *gsheets-default
 bietlejuice.gsheets_fintech: *gsheets-default
 bietlejuice.gsheets.for_rent: *gsheets-default

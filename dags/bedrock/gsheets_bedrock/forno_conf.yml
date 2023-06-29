@@ -1,0 +1,18 @@
+sheets_info:
+  basic_access:
+    sheet_id: 1bFPTfQjfxtl97QamwKK7ofmYOz7j8_hSLjUmOawF7xg
+    sheet_name: basic_access
+    clean_table_name: people_basic_access
+    sheet_context: bedrock
+
+  people_data:
+    sheet_id: 1bFPTfQjfxtl97QamwKK7ofmYOz7j8_hSLjUmOawF7xg
+    sheet_name: people_data
+    clean_table_name: people_employees
+    sheet_context: bedrock
+
+  base_hierarquia:
+    sheet_id: 1b1jo5wSxIGlTobc40wBGRwsYwYm3AS5-ujtLWvSN6lA
+    sheet_name: base_hierarquia_dl
+    clean_table_name: people_hierarchy
+    sheet_context: bedrock
