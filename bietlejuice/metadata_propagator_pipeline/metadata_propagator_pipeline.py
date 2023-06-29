@@ -1,6 +1,5 @@
-import requests
+from requests import post, RequestException
 from quintoandar_logger import QuintoAndarLogger
-from requests import RequestException
 
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 
@@ -34,7 +33,7 @@ class MetadataPropagatorPipeline:
     def run(self):
         payload = self.build_metadata_propagator_payload()
         try:
-            response = requests.post(
+            response = post(
                 f"{self.metadata_propagator_host}{self.endpoint}", json=payload
             )
             response.raise_for_status()
