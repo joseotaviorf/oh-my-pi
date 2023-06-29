@@ -196,7 +196,7 @@ bietlejuice.dw_datamarts_spark.growth_cross:
     - bietlejuice.enrich_marketing_costs_offline:load-enrich-offline-manual-costs
     - bietlejuice.enrich_marketing_manual_daily_costs:load-enrich-daily-costs
     - bietlejuice.enrich_tracked_events:load-enrich-cross-channel-full
-    - bietlejuice.gsheets.for_sale:done-clean-sale-demand-targets
+    - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets
     - bietlejuice.gsheets.growth:done-clean-indicaai-tax-costs
     - bietlejuice.gsheets.growth:done-clean-rental-tof-monthly-targets
     - bietlejuice.gsheets.growth:done-clean-sale-nbp-source-targets
@@ -713,8 +713,6 @@ bietlejuice.enrich_retsuko:
   remove:
     - bietlejuice.retsuko:load-clean-boleto
 bietlejuice.enrich_revenue_lines:
-  add:
-    - bietlejuice.gsheets.fintech:load-clean-mova-lra-owners
   remove:
     - bietlejuice.dw_contract:load-dw-public-dim-contract
     - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
@@ -728,7 +726,6 @@ bietlejuice.enrich_revenue_lines:
     - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
     - bietlejuice.enrich_retsuko:load-enrich-invoice-info
     - bietlejuice.fastforward:load-clean-gateway-loan-installment
-    - bietlejuice.gsheets.fintech:done-clean-mova-lra-owners
     - bietlejuice.owner_fees:load-clean-contract
     - bietlejuice.rental_guarantee:load-clean-charge
     - bietlejuice.rental_guarantee:load-clean-guarantee
