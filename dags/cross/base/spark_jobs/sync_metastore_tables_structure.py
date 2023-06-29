@@ -1,7 +1,6 @@
 import json
 import logging
 from argparse import ArgumentParser
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 
 from hive_metastore_client import HiveMetastoreClient
@@ -10,6 +9,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db.database_enum import DatabaseEnum
 from bietlejuice.base.hive import TableStorageDescriptorEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.spark.base_spark import BaseSparkContext
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.loaders.hive_metastore_loader import HiveMetastoreLoader
 from bietlejuice.services.metastore_services.hive_metastore_service import (
@@ -54,6 +54,7 @@ def update_table_structure(
         f"msg=Starting table schema and partition keys update"
     )
 
+    hive_ms_loader.hive_metastore_service.create_database(database_name)
     hive_ms_loader.sync_metastore(
         database_name=database_name,
         table_name=table_name,
@@ -113,7 +114,7 @@ if __name__ == "__main__":
     table_name = args.table_name
     all_tables_flag = args.all_tables_flag
 
-    logger = QuintoAndarLogger(JOB_NAME)
+    logger = logging.getLogger(JOB_NAME)
 
     logger.info(
         f"m={JOB_NAME}, bucket={bucket}, layer={layer}, schema={schema}, "
@@ -141,18 +142,13 @@ if __name__ == "__main__":
         storage_description,
     )
 
-    with ThreadPoolExecutor(max_workers=15) as executor:
-        futures = {
-            executor.submit(
-                func,
-                table_name,
-                tables_metadata["columns"],
-                tables_metadata["partition_keys"],
-            ): table_name
-            for table_name, tables_metadata in tables_metadata.items()
-        }
-        for future in as_completed(futures):
-            if future.exception():
-                raise future.exception()
+    rdd = BaseSparkContext.sc.parallelize(tables_metadata.keys())
+    rdd.foreach(
+        lambda table_name: func(
+            table_name,
+            tables_metadata[table_name]["columns"],
+            tables_metadata[table_name]["partition_keys"],
+        )
+    )
 
-    QuintoAndarLogger(JOB_NAME).info(f"m={JOB_NAME}, msg=Finished synchronization.")
+    logger.info(f"m={JOB_NAME}, msg=Finished synchronization.")

@@ -1,7 +1,6 @@
 import json
 import logging
 from argparse import ArgumentParser
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 
 from hive_metastore_client import HiveMetastoreClient
@@ -9,6 +8,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db.database_enum import DatabaseEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.spark.base_spark import BaseSparkContext
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.loaders.hive_metastore_loader import HiveMetastoreLoader
 from bietlejuice.services.metastore_services.hive_metastore_service import (
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     table_name = args.table_name
     all_tables_flag = args.all_tables_flag
 
-    logger = QuintoAndarLogger(JOB_NAME)
+    logger = logging.getLogger(JOB_NAME)
 
     logger.info(
         f"m={JOB_NAME}, bucket={bucket}, layer={layer}, schema={schema}, "
@@ -126,13 +126,9 @@ if __name__ == "__main__":
         update_table_partitions, logger, hive_ms_loader, spark_ms.spark_database_name
     )
 
-    with ThreadPoolExecutor(max_workers=15) as executor:
-        futures = {
-            executor.submit(func, table_name, partition_values): table_name
-            for table_name, partition_values in tables_partition_values.items()
-        }
-        for future in as_completed(futures):
-            if future.exception():
-                raise future.exception()
+    rdd = BaseSparkContext.sc.parallelize(tables_partition_values.keys())
+    rdd.foreach(
+        lambda table_name: func(table_name, tables_partition_values[table_name])
+    )
 
     logger.info(f"m={JOB_NAME}, msg=Finished synchronization.")
