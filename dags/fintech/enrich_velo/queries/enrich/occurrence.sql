@@ -113,7 +113,7 @@ UNION ALL
 )
 ORDER BY 1
 )
-SELECT
+SELECT DISTINCT
     id_occurrence,
     id_propose,
     id_payment,

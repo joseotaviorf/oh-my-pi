@@ -72,7 +72,8 @@ WITH cte_union AS (
 UNION ALL
 (
   WITH person AS (
-      SELECT *
+      SELECT *,
+        ROW_NUMBER() OVER(PARTITION BY p.uuid_person ORDER BY p.ts_updated DESC) AS rn
       FROM
           datalake_person_clean.person AS p
       QUALIFY
@@ -118,7 +119,7 @@ UNION ALL
           ts_operation
       FROM
           datalake_velo_neurotech_clean.logs_credit_granting
-      QUALIFY ROW_NUMBER() OVER(PARTITION BY proposal_number ORDER BY ts_operation DESC) = 1
+      QUALIFY ROW_NUMBER() OVER(PARTITION BY CAST(proposal_number AS INT) ORDER BY ts_operation DESC) = 1
   )
 
   ,serasa_neurotech as (
@@ -184,6 +185,7 @@ UNION ALL
   LEFT JOIN
       person AS p
           ON pp.uuid_person = p.uuid_person
+          AND p.rn = 1
   LEFT JOIN
       person_document AS pd
           ON p.id = pd.id_person
