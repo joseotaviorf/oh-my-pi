@@ -608,6 +608,7 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
 bietlejuice.enrich_marketing_manual_daily_costs:
   remove:
     - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
+    - bietlejuice.gsheets.growth_intraday:load-clean-marketing-manual-shared-costs
 bietlejuice.enrich_media_plan:
   override: []
 bietlejuice.enrich_mexico_rent_supply:

@@ -963,7 +963,7 @@ bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:
 - bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
 - bietlejuice.gsheets_growth:done-clean-casa-mineira-marketing-cost-taxonomy
 bietlejuice.enrich_casa_mineira_marketing_manual_daily_costs:
-- bietlejuice.gsheets.growth_intraday:done-clean-casa-mineira-marketing-manual-shared-costs
+- bietlejuice.gsheets_growth_intraday:done-clean-casa-mineira-marketing-manual-shared-costs
 bietlejuice.enrich_casa_mineira_portal:
 - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
 - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-history
@@ -1483,8 +1483,8 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
 - bietlejuice.enrich_region:load-enrich-region
 - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
 bietlejuice.enrich_marketing_manual_daily_costs:
-- bietlejuice.gsheets.growth_intraday:done-clean-marketing-manual-shared-costs
-- bietlejuice.gsheets.growth_intraday:done-clean-marketing-name-convention-shared-costs
+- bietlejuice.gsheets_growth_intraday:done-clean-marketing-manual-shared-costs
+- bietlejuice.gsheets_growth_intraday:done-clean-marketing-name-convention-shared-costs
 bietlejuice.enrich_mexico_braze_details:
 - bietlejuice.braze_details:load-clean-campaign-details-indica-ai
 - bietlejuice.braze_details:load-clean-campaign-details-owners
@@ -1511,7 +1511,7 @@ bietlejuice.enrich_mexico_marketing_automatic_daily_costs:
 - bietlejuice.enrich_mexico_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
 - bietlejuice.gsheets_growth:done-clean-marketing-cost-taxonomy
 bietlejuice.enrich_mexico_marketing_manual_daily_costs:
-- bietlejuice.gsheets.growth_intraday:done-clean-mexico-marketing-manual-shared-costs
+- bietlejuice.gsheets_growth_intraday:done-clean-mexico-marketing-manual-shared-costs
 bietlejuice.enrich_mexico_rent_supply:
 - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-rental-marketplace-flows
 - bietlejuice.ebdb:load-clean-affiliate-data
