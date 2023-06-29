@@ -4,12 +4,10 @@ import os
 import re
 import time
 from datetime import datetime, timedelta
-from os.path import join
 from typing import List, Optional, Union, Dict
 
 from gspread.exceptions import SpreadsheetNotFound, WorksheetNotFound
 
-import pandas as pd
 import pendulum
 from pyspark.sql import DataFrame
 from quintoandar_gsheets_api_client import GoogleSheetsClient
@@ -23,7 +21,6 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import DatabricksConsumer
-from bietlejuice.services import FileService
 from dags import DAG_PACKAGES_ROOT
 
 JOB_NAME = "gsheets_service"
@@ -39,51 +36,6 @@ class GsheetsService:
     GSHEETS_DATA_LAKE_RAW_SCHEMA = "datalake_gsheets_raw"
     GSHEETS_DATA_LAKE_CLEAN_SCHEMA = "datalake_gsheets_clean"
     TEMPORARY_TABLE_PREFIX = "temp_"
-
-    def __init__(self, dag_name):
-        self.dag_name = dag_name
-        self.CONTEXT_GSHEETS_FILES_YAML_PATH = join(
-            DAGPackagesPathService.get_dag_path(dag_name), "gsheets_files.yaml"
-        )
-
-    def get_sheets_are_dependencies(self) -> List[str]:
-        """
-        Return the gsheets clean tables that are dependencies to other DAGs on dependencies.yaml
-        """
-        dependencies_dict = FileService.get_dict_from_yaml_file(DEPS_YAML_PATH)
-        all_deps = []
-
-        for dag, deps in dependencies_dict.items():
-            all_deps.extend(deps)
-
-        all_deps = list(set(all_deps))
-
-        gsheets_deps = []
-        for dep in all_deps:
-            if "bietlejuice.gsheets" in dep:
-                gsheets_deps.append(dep)
-
-        context_gsheets_dict = FileService.get_dict_from_yaml_file(
-            self.CONTEXT_GSHEETS_FILES_YAML_PATH
-        )
-
-        df_context = (
-            pd.DataFrame.from_dict(context_gsheets_dict, orient="index")
-            .reset_index(drop=False)
-            .rename(columns={"index": "raw_table_name"})
-        )
-
-        df = df_context.drop(
-            ["preload_time_in_seconds", "partitioned", "sheet_context", "sheet_id"],
-            axis=1,
-        )
-
-        dependencies_sheets = []
-        for index, row in df.iterrows():
-            clean = row["clean_table_name"].replace("_", "-")
-            if len([dep for dep in gsheets_deps if clean in dep]) > 0:
-                dependencies_sheets.append(row["clean_table_name"])
-        return dependencies_sheets
 
     def get_recently_modified_gsheet(self, drive_service) -> Dict:
         """

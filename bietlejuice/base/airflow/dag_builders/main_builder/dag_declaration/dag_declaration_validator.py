@@ -1,4 +1,5 @@
 import json
+
 from bietlejuice.base.udfs.udf_enum import UDFEnum
 from cerberus import Validator
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
@@ -87,6 +88,7 @@ class DAGDeclarationValidator(Validator):
             "empty": False,
             "schema": {
                 "type": {"type": "string", "required": True, "empty": False},
+                "custom_libraries": {"type": "list", "required": False, "empty": False},
                 "access_control_list": {
                     "type": "dict",
                     "empty": False,

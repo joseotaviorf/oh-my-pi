@@ -64,25 +64,27 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket")
-    parser.add_argument("source")
+    parser.add_argument("schema")
     parser.add_argument("table_name", help="table name to insert into datalake")
     parser.add_argument(
         "sheet_details",
         help="gsheets sheet name, sheet id, and (optional) preload time in seconds",
     )
+    parser.add_argument("dag_name", help="DAG name")
 
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
-    source = args.source
+    schema = args.schema
     table_name = args.table_name
     sheet_details = json.loads(args.sheet_details)
     partitions_cols = ["year", "month", "day"]
+    dag_name = args.dag_name
 
     logger.info(
         f"""
-                m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
+                m=__main__, environment={environment}, schema={schema}, datalake_bucket={datalake_bucket},
                 table_name={table_name}, execution_date=execution_date msg=Starting spark job...
         """
     )
@@ -98,7 +100,7 @@ if __name__ == "__main__":
     gsheets_consumer = GsheetsConsumer(gsheets_client, spark_client)
 
     datalake_info = DatalakeMetastoreService.get_db_info(
-        environment, source, datalake_bucket
+        environment, schema, datalake_bucket
     )
     spark_metastore_service = SparkMetastoreService(spark_client)
     database_name = datalake_info["db_raw_databricks"]
@@ -122,10 +124,10 @@ if __name__ == "__main__":
         )
         # validate data before loading
         GsheetsService().validate_clean_query_against_raw(
-            "gsheets_by_context",
+            dag_name,
             spark_client,
             df,
-            sheet_details.get("sheet_context"),
+            "",
             sheet_details["raw_table_name"],
             sheet_details["clean_table_name"],
         )

@@ -4,6 +4,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.factories.base_factory i
 from bietlejuice.base.airflow.dag_builders.main_builder.factories.dw_factory import (
     DWFactory,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.factories.raw_factory import (
+    RawFactory,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.factories.metric_factory import (
     MetricFactory,
 )
@@ -19,6 +22,7 @@ class FactoryDispatcher:
     FACTORY_CLASSES_MAPPING_BY_LAYER = {
         LayerEnum.DW: DWFactory,
         LayerEnum.METRIC: MetricFactory,
+        LayerEnum.RAW: RawFactory,
     }
 
     def __init__(self, layer: LayerEnum) -> None:

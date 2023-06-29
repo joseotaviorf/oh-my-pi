@@ -15,9 +15,6 @@ dags:
     main_schedule_interval: 10 22 * * *
     dag_owner: Data Fintech
     cluster_name: databricks_10_4_med_general_cluster
-  general:
-    main_schedule_interval: 50 22 * * *
-    dag_owner: Data Engineering
   support_and_service:
     main_schedule_interval: 20 23 * * *
     dag_owner: Data SS

@@ -43,7 +43,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
 
         self.credentials, self.scope = self.get_credentials_and_scope()
         self.drive_service = self.build_drive_api_service()
-        self.gsheets_service = GsheetsService(dag_name="gsheets_by_context")
+        self.gsheets_service = GsheetsService()
         self.spark_client = SparkClient()
 
         self.all_sheets = self.get_all_sheets_info()

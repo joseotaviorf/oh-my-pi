@@ -19,13 +19,14 @@ class BaseWorkflow(BuilderInterface):
         :param cluster_args: A dictionary containing arguments that will be used for the cluster definition that the dag processes will make.
         """
         super().__init__()
-        self.dag_args = dag_args
-        self.workflow_args = workflow_args
-        self.cluster_args = cluster_args
 
+        self.dag_args = dag_args
         self.dag_name = self.dag_args["name"]
         self.dag_id = f"bietlejuice.{self.dag_name}"
         self.config_service = ConfigurationService(self.dag_name)
+
+        self.workflow_args = workflow_args
+        self.cluster_args = cluster_args
 
         self.local_tz = timezone("America/Sao_Paulo")
 
