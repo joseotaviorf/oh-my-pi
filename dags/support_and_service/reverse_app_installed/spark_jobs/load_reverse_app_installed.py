@@ -49,11 +49,11 @@ if __name__ == "__main__":
         f"""
         SELECT
             COALESCE(id_user, -1) AS id_user,
-            MAX(ts_last_event) AS ts_latest_event
+            MAX(ts_event) AS ts_latest_event
         FROM
             datalake_app_installed.{table}
         WHERE
-            ts_last_event >= '{execution_date}' - INTERVAL "7" DAY
+            ts_event >= '{execution_date}' - INTERVAL "7" DAY
         GROUP BY 1
         """
     )
