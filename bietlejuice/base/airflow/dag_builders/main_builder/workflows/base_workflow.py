@@ -56,6 +56,7 @@ class BaseWorkflow(BuilderInterface):
             year=int(start_date_from_yml[0]),
             month=int(start_date_from_yml[1]),
             day=int(start_date_from_yml[2]),
+            tzinfo=self.local_tz,
         )
 
         return schedule_start_date
