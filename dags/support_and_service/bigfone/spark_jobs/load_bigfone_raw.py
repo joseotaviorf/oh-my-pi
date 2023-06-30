@@ -77,25 +77,26 @@ def _load_dataframes_into_datalake(args, force_recreate=False):
     spark_metastore_service.create_database(database_name)
 
     for table_name, infos in tables_info.items():
+        raw_table_name = infos.get("raw_table_name")
         if infos["raw_extraction_type"] == "incremental":
             df = postgres_consumer.get_incremental_data_from_table(
-                infos.get("raw_table_name"),
+                table_name,
                 infos.get("date_filter_column"),
                 args.execution_date,
             )
             IncrementalTableLoaderPipeline(
                 database_name=database_name,
-                table_name=table_name,
+                table_name=raw_table_name,
                 database_location=database_location,
                 layer=LayerEnum.RAW,
                 query=None,
                 partitions=partition_cols,
             ).load_and_register(df, format_options, force_recreate)
         else:
-            df = postgres_consumer.get_data_from_table(infos.get("raw_table_name"))
+            df = postgres_consumer.get_data_from_table(table_name)
             FullTableLoaderPipeline(
                 database_name=database_name,
-                table_name=table_name,
+                table_name=raw_table_name,
                 database_location=database_location,
                 layer=LayerEnum.RAW,
                 query=None,
