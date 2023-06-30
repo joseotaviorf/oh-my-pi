@@ -1,9 +1,109 @@
+WITH
+tmp AS (
+    SELECT
+        COALESCE(d.id_dejavu, cf.id_condo) AS id_dedup, -- dealing with possibility that we might not have id_dejavu
+        COLLECT_SET(d.id_dejavu)[0] AS id_dejavu,
+        COLLECT_LIST(
+            STRUCT(
+                cf.source,
+                cf.condo,
+                cf.cnpj,
+                cf.address,
+                cf.number,
+                cf.neighborhood,
+                cf.zip_code,
+                cf.city,
+                cf.state,
+                cf.lat,
+                cf.lng,
+                cf.phone_number,
+                cf.dsr,
+                cf.type_syndic,
+                cf.account_type,
+                cf.type_of_administration,
+                cf.origin,
+                cf.total_blocks,
+                cf.total_ordinances,
+                cf.total_units,
+                cf.total_elevators,
+                cf.number_of_employees,
+                cf.outsourced_employees,
+                cf.monthly_tax_revenues,
+                cf.number_of_garage_parking_slots,
+                cf.number_of_garage_floors,
+                cf.number_of_garage_gates,
+                cf.number_of_water_tanks,
+                cf.has_elevator,
+                cf.has_entrance_hall,
+                cf.has_grill_area,
+                cf.has_swim_pool,
+                cf.has_sports_court,
+                cf.has_gym,
+                cf.has_party_hall,
+                cf.has_sauna,
+                cf.has_laundry,
+                cf.has_piped_gas,
+                cf.has_gourmet_area,
+                cf.has_metro_or_train_close,
+                cf.has_toy_library,
+                cf.has_water_reuse,
+                cf.construction_year,
+                cf.updated_year,
+                cf.ts_updated
+            )
+        ) AS merged
+    FROM
+        datalake_vespucio.condo_full AS cf
+    LEFT JOIN
+        datalake_vespucio.dejavu AS d
+        ON d.address_type = "condo"
+            AND cf.id_condo = d.id_address
+    GROUP BY 1
+)
 SELECT
-    d.id_dejavu,
-    cf.*
-FROM
-    datalake_vespucio.condo_full AS cf
-LEFT JOIN
-    datalake_vespucio.dejavu AS d
-    ON d.address_type = "condo"
-        AND cf.id_condo = d.id_address
+    id_dedup,
+    id_dejavu,
+    GROWTH_VESPUCIO_SCORE(merged.source, merged.updated_year, merged.dsr) AS source,
+    GROWTH_VESPUCIO_SCORE(merged.condo, merged.updated_year, merged.dsr) AS condo,
+    GROWTH_VESPUCIO_SCORE(merged.cnpj, merged.updated_year, merged.dsr) AS cnpj,
+    GROWTH_VESPUCIO_SCORE(merged.address, merged.updated_year, merged.dsr) AS address,
+    GROWTH_VESPUCIO_SCORE(merged.number, merged.updated_year, merged.dsr) AS number,
+    GROWTH_VESPUCIO_SCORE(merged.neighborhood, merged.updated_year, merged.dsr) AS neighborhood,
+    GROWTH_VESPUCIO_SCORE(merged.zip_code, merged.updated_year, merged.dsr) AS zip_code,
+    GROWTH_VESPUCIO_SCORE(merged.city, merged.updated_year, merged.dsr) AS city,
+    GROWTH_VESPUCIO_SCORE(merged.state, merged.updated_year, merged.dsr) AS state,
+    GROWTH_VESPUCIO_SCORE(merged.lat, merged.updated_year, merged.dsr) AS lat,
+    GROWTH_VESPUCIO_SCORE(merged.lng, merged.updated_year, merged.dsr) AS lng,
+    GROWTH_VESPUCIO_SCORE(merged.phone_number, merged.updated_year, merged.dsr) AS phone_number,
+    GROWTH_VESPUCIO_SCORE(merged.type_syndic, merged.updated_year, merged.dsr) AS type_syndic,
+    GROWTH_VESPUCIO_SCORE(merged.account_type, merged.updated_year, merged.dsr) AS account_type,
+    GROWTH_VESPUCIO_SCORE(merged.type_of_administration, merged.updated_year, merged.dsr) AS type_of_administration,
+    GROWTH_VESPUCIO_SCORE(merged.origin, merged.updated_year, merged.dsr) AS origin,
+    GROWTH_VESPUCIO_SCORE(merged.total_blocks, merged.updated_year, merged.dsr) AS total_blocks,
+    GROWTH_VESPUCIO_SCORE(merged.total_ordinances, merged.updated_year, merged.dsr) AS total_ordinances,
+    GROWTH_VESPUCIO_SCORE(merged.total_units, merged.updated_year, merged.dsr) AS total_units,
+    GROWTH_VESPUCIO_SCORE(merged.total_elevators, merged.updated_year, merged.dsr) AS total_elevators,
+    GROWTH_VESPUCIO_SCORE(merged.number_of_employees, merged.updated_year, merged.dsr) AS number_of_employees,
+    GROWTH_VESPUCIO_SCORE(merged.outsourced_employees, merged.updated_year, merged.dsr) AS outsourced_employees,
+    GROWTH_VESPUCIO_SCORE(merged.monthly_tax_revenues, merged.updated_year, merged.dsr) AS monthly_tax_revenues,
+    GROWTH_VESPUCIO_SCORE(merged.number_of_garage_parking_slots, merged.updated_year, merged.dsr) AS number_of_garage_parking_slots,
+    GROWTH_VESPUCIO_SCORE(merged.number_of_garage_floors, merged.updated_year, merged.dsr) AS number_of_garage_floors,
+    GROWTH_VESPUCIO_SCORE(merged.number_of_garage_gates, merged.updated_year, merged.dsr) AS number_of_garage_gates,
+    GROWTH_VESPUCIO_SCORE(merged.number_of_water_tanks, merged.updated_year, merged.dsr) AS number_of_water_tanks,
+    GROWTH_VESPUCIO_SCORE(merged.has_elevator, merged.updated_year, merged.dsr) AS has_elevator,
+    GROWTH_VESPUCIO_SCORE(merged.has_entrance_hall, merged.updated_year, merged.dsr) AS has_entrance_hall,
+    GROWTH_VESPUCIO_SCORE(merged.has_grill_area, merged.updated_year, merged.dsr) AS has_grill_area,
+    GROWTH_VESPUCIO_SCORE(merged.has_swim_pool, merged.updated_year, merged.dsr) AS has_swim_pool,
+    GROWTH_VESPUCIO_SCORE(merged.has_sports_court, merged.updated_year, merged.dsr) AS has_sports_court,
+    GROWTH_VESPUCIO_SCORE(merged.has_gym, merged.updated_year, merged.dsr) AS has_gym,
+    GROWTH_VESPUCIO_SCORE(merged.has_party_hall, merged.updated_year, merged.dsr) AS has_party_hall,
+    GROWTH_VESPUCIO_SCORE(merged.has_sauna, merged.updated_year, merged.dsr) AS has_sauna,
+    GROWTH_VESPUCIO_SCORE(merged.has_laundry, merged.updated_year, merged.dsr) AS has_laundry,
+    GROWTH_VESPUCIO_SCORE(merged.has_piped_gas, merged.updated_year, merged.dsr) AS has_piped_gas,
+    GROWTH_VESPUCIO_SCORE(merged.has_gourmet_area, merged.updated_year, merged.dsr) AS has_gourmet_area,
+    GROWTH_VESPUCIO_SCORE(merged.has_metro_or_train_close, merged.updated_year, merged.dsr) AS has_metro_or_train_close,
+    GROWTH_VESPUCIO_SCORE(merged.has_toy_library, merged.updated_year, merged.dsr) AS has_toy_library,
+    GROWTH_VESPUCIO_SCORE(merged.has_water_reuse, merged.updated_year, merged.dsr) AS has_water_reuse,
+    GROWTH_VESPUCIO_SCORE(merged.construction_year, merged.updated_year, merged.dsr) AS construction_year,
+    GROWTH_VESPUCIO_SCORE(merged.updated_year, merged.updated_year, merged.dsr) AS updated_year
+FROM tmp

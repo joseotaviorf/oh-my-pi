@@ -9,6 +9,7 @@ class UDFEnum(Enum):
     SF_REMOVE_ACCENTUATION = "SF_REMOVE_ACCENTUATION"
     SF_ALPHANUMERIC_SNAKE_CASE = "SF_ALPHANUMERIC_SNAKE_CASE"
     FINTECHOPS_WORK_MIN_SLA = "FINTECHOPS_WORK_MIN_SLA"
+    GROWTH_VESPUCIO_SCORE = "GROWTH_VESPUCIO_SCORE"
 
     @classmethod
     def get_available_enum_values(cls):
@@ -26,6 +27,7 @@ class UDFEnum(Enum):
         """
         from bietlejuice.formatters.string_formatter import StringFormatter
         from bietlejuice.base.udfs.fintech import FintechUDFs
+        from bietlejuice.base.udfs.growth import VespucioScoreCalculator
 
         udf_enum_member = cls(udf_identifier)
 
@@ -33,4 +35,5 @@ class UDFEnum(Enum):
             cls.SF_REMOVE_ACCENTUATION: StringFormatter.replace_accents,
             cls.SF_ALPHANUMERIC_SNAKE_CASE: StringFormatter.set_alphanumeric_snake_case,
             cls.FINTECHOPS_WORK_MIN_SLA: FintechUDFs.fintechops_work_min_sla,
+            cls.GROWTH_VESPUCIO_SCORE: VespucioScoreCalculator.get_score,
         }.get(udf_enum_member)

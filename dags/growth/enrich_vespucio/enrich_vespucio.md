@@ -23,6 +23,7 @@ More information about run time [here]({chart_url}{dag_id})
 This pipeline produces the following output table:
 ​
 - `condo_incremental`: Contains ebdb and sindiconet enrich data about condominiums (duplicated data).
-- `condo`: Contains ebdb and sindiconet enrich data about condominiums (deduplicated data).
+- `condo_full`: Contains ebdb and sindiconet enrich data about condominiums (deduplicated data).
+- `condo`: Final table with calculated score for each column and id_dejavu (that represents unique address).
 
 </details>
