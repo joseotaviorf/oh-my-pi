@@ -1,4 +1,3 @@
-import json
 import s2cell
 import logging
 import requests
@@ -9,10 +8,20 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.base.api import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.services.configuration_service import ConfigurationService
+
+from bietlejuice.base.api import APIEnum
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkTableStorageFormat,
+)
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 from pyspark.sql.types import StructType, StructField, DoubleType, StringType, TimestampType
-from pyspark.sql.functions import udf
+from pyspark.sql.functions import udf, col
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "calculate_dejavu_id"
@@ -64,8 +73,8 @@ def _make_api_request(api_key, input):
             return (
                 True,
                 (
-                    input["id_address"],
                     input["address_type"],
+                    input["id_address"],
                     input["complete_address"],
                     best_geocode_match["geometry"]["location"]["lat"],
                     best_geocode_match["geometry"]["location"]["lng"],
@@ -96,21 +105,20 @@ if __name__ == "__main__":
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="datalake_bucket")
     parser.add_argument("dag_name", help="dag_name")
-    parser.add_argument("execution_date", help="execution_date")
+    parser.add_argument("context", help="context")
+    parser.add_argument("addresses_s2_geometry_mapping_table", help="addresses_s2_geometry_mapping_table")
     
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     dag_name = args.dag_name
-    execution_date = args.execution_date
-
-    config_service = ConfigurationService(dag_name)
-    addresses_s2_geometry_mapping_table = config_service.get_config("addresses_s2_geometry_mapping_table")
+    context = args.context
+    addresses_s2_geometry_mapping_table = args.addresses_s2_geometry_mapping_table
 
     logger.info(
         f"""m=__main__, environment={environment},
-        datalake_bucket={datalake_bucket}, dag_name={dag_name}
+        datalake_bucket={datalake_bucket}, dag_name={dag_name}, context={context}
         """
     )
 
@@ -125,10 +133,19 @@ if __name__ == "__main__":
         StructField("ts_updated", TimestampType(), nullable=False)
     ])
 
-    df = spark_client.conn.sql("""
+    s3_loader = S3Loader()
+    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+
+    db_info = DatalakeMetastoreService.get_db_info(environment, context, datalake_bucket)
+    database_name = db_info["db_enrich_databricks"]
+    database_location = db_info["db_enrich_path"]
+    spark_metastore_service.create_database(database_name)
+
+    query = """
         SELECT
             "condo" AS address_type,
-            c.id_condo AS id_address,
+            c.uuid AS id_address,
             c.address,
             c.number,
             c.neighborhood,
@@ -137,17 +154,22 @@ if __name__ == "__main__":
         FROM
             datalake_vespucio.condo c
         LEFT JOIN
-            {addresses_s2_geometry_mapping_table} s2
+            {database_name}.{addresses_s2_geometry_mapping_table} s2
             ON s2.address_type = "condo"
-                AND c.id_condo = s2.id_address
+                AND c.uuid = s2.id_address
         WHERE
             s2.id_dejavu IS NULL
             OR DATEDIFF(CURRENT_TIMESTAMP(), s2.ts_updated) > 30
-        LIMIT 10
-    """.format(addresses_s2_geometry_mapping_table=addresses_s2_geometry_mapping_table))
+        LIMIT 2
+    """.format(
+        database_name=database_name,
+        addresses_s2_geometry_mapping_table=addresses_s2_geometry_mapping_table
+    )
+
+    df = spark_client.conn.sql(query)
 
     df_addresses = [_prepare_address(row.asDict()) for row in df.collect()]
-    
+
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
@@ -190,7 +212,28 @@ if __name__ == "__main__":
         new_data = new_data.drop(*["latitude", "longitude"])
         column_order = ["id_dejavu", "address_type", "id_address", "complete_address", "ts_updated"]
         new_data_reordered = new_data.select(column_order)
-        new_data_reordered.write.mode("append").insertInto(addresses_s2_geometry_mapping_table)
+
+        df1 = spark_client.conn.table(f"{database_name}.{addresses_s2_geometry_mapping_table}").filter("address_type = 'condo'")
+        df2 = new_data_reordered.select("id_address")
+
+        joined_df = df1.join(df2.alias("new"), df1.id_address == col("new.id_address"), "left")
+        filtered_df = joined_df.filter(col("new.id_address").isNull()).drop(col("new.id_address"))
+
+        result_df = new_data_reordered.union(filtered_df)
+
+        s3_loader.load_df(
+            df=result_df,
+            format_options=SparkTableStorageFormat.DEFAULT_ENRICH,
+            s3_path=f"{database_location}{addresses_s2_geometry_mapping_table}",
+        )
+
+        spark_metastore_loader.update_metastore(
+            df=result_df,
+            database_name=database_name,
+            table_name=addresses_s2_geometry_mapping_table,
+            format_options=SparkTableStorageFormat.DEFAULT_ENRICH,
+            database_location=database_location,
+        )
     except Exception as e:
         raise Exception(
             f"Exception trying to save Dejavu Id, "

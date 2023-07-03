@@ -1,8 +1,9 @@
 WITH
 tmp AS (
     SELECT
-        COALESCE(d.id_dejavu, cf.id_condo) AS id_dedup, -- dealing with possibility that we might not have id_dejavu
+        COALESCE(d.id_dejavu, cf.uuid) AS id_dedup, -- dealing with possibility that we might not have id_dejavu
         COLLECT_SET(d.id_dejavu)[0] AS id_dejavu,
+        COLLECT_SET(cf.id_source) AS id_source_list, -- id added to enable join with datalake_ebdb_clean.house.id_condo_parent
         COLLECT_LIST(
             STRUCT(
                 cf.source,
@@ -57,12 +58,13 @@ tmp AS (
     LEFT JOIN
         datalake_vespucio.dejavu AS d
         ON d.address_type = "condo"
-            AND cf.id_condo = d.id_address
+            AND cf.uuid = d.id_address
     GROUP BY 1
 )
 SELECT
     id_dedup,
     id_dejavu,
+    id_source_list,
     GROWTH_VESPUCIO_SCORE(merged.source, merged.updated_year, merged.dsr) AS source,
     GROWTH_VESPUCIO_SCORE(merged.condo, merged.updated_year, merged.dsr) AS condo,
     GROWTH_VESPUCIO_SCORE(merged.cnpj, merged.updated_year, merged.dsr) AS cnpj,

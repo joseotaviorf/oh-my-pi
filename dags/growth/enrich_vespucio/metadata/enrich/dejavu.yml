@@ -1,0 +1,19 @@
+---
+database_name: datalake_vespucio
+table_name: dejavu
+owner: '@data-growth'
+domain: growth
+description: Contains a unique ID (id_dejavu) for condo addresses. Even when the address is written different, the id_dejavu is the same. This can be used to deduplicate condos.
+columns:
+  id_address:
+    description: "Hash id generated for each condo (duplicated or not)."
+    lineage:
+      - datalake_vespucio.condo.uuid
+  complete_address:
+    description: "The concatenation of address, number, neighborhood, zip_code and city."
+    lineage:
+      - datalake_vespucio.condo.address
+      - datalake_vespucio.condo.number
+      - datalake_vespucio.condo.neighborhood
+      - datalake_vespucio.condo.zip_code
+      - datalake_vespucio.condo.city

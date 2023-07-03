@@ -2,7 +2,19 @@
 cluster_description: databricks_10_4_min_general_photon_cluster
 external_s3_bucket: 5a-vespucio-prod
 tables_to_reverse: ["condo"]
-partition_cols:
-  - year
-  - month
-  - day
+table_task_group_parameters:
+  condo_incremental:
+    partition_cols:
+      - year
+      - month
+      - day
+    is_incremental: True
+  condo_full:
+    partition_cols:
+      - year
+      - month
+      - day
+    is_incremental: True
+  condo:
+    partition_cols: []
+    is_incremental: False

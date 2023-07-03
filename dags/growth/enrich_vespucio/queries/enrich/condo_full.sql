@@ -1,6 +1,6 @@
 SELECT
-    MD5(CONCAT(id, source)) AS id_condo,
-    id,
+    MD5(CONCAT(id, source)) AS uuid,
+    id AS id_source,
     source,
     condo,
     cnpj,

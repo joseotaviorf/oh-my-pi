@@ -10,11 +10,13 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.operators.dummy_operator import DummyOperator
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
@@ -53,7 +55,8 @@ calculate_dejavu_id_job_path = (
 
 external_s3_bucket = config_service.get_config("external_s3_bucket")
 tables_to_reverse = str(config_service.get_config("tables_to_reverse"))
-partition_cols = config_service.get_config("partition_cols")
+addresses_s2_geometry_mapping_table = config_service.get_config("addresses_s2_geometry_mapping_table")
+table_task_group_parameters = config_service.get_config("table_task_group_parameters")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -106,19 +109,25 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-    is_incremental=True,
-    has_create_external_table_task=False,
-    partitions=partition_cols,
-    execution_date="",
-    extra_query_template_params={
-        "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
-        "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
-    },
-)
+tables = datalake_task_group._get_table_names_from_sql_files(layer=LayerEnum.ENRICH)
+
+enrich_task_groups = {}
+
+for table in tables:
+    enrich_task_groups[table] = datalake_task_group.build_enrich_task_group(
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        table_name=table,
+        partitions=table_task_group_parameters[table]["partition_cols"],
+        is_incremental=table_task_group_parameters[table]["is_incremental"],
+        has_create_external_table_task=False,
+        extra_query_template_params={
+            "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+            "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+        },
+        execution_date="",
+        spark_session_configs={"udfs": ["GROWTH_VESPUCIO_SCORE"]},
+    )
 
 external_bucket_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id=f"load_s3_data_into_external_bucket",
@@ -138,7 +147,12 @@ external_bucket_task = QuintoAndarDatabricksSubmitRunOperator(
 )
 
 calculate_dejavu_id_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=f"load-enrich-dejavu",
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+        layer=LayerEnum.ENRICH,
+        schema=CONTEXT,
+        table_name=addresses_s2_geometry_mapping_table,
+    ),
     dag=dag,
     json={
         "spark_python_task": {
@@ -147,10 +161,64 @@ calculate_dejavu_id_task = QuintoAndarDatabricksSubmitRunOperator(
                 ENV,
                 DATALAKE_BUCKET,
                 DAG_NAME,
-                "{{ ds }}"
+                CONTEXT
             ],
         }
     },
+)
+
+sync_metastore_dejavu_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+        layer=LayerEnum.ENRICH,
+        schema=CONTEXT,
+        table_name=addresses_s2_geometry_mapping_table,
+    ),
+    json={
+        "spark_python_task": {
+            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.ENRICH.value,
+                CONTEXT,
+                "--table-name",
+                addresses_s2_geometry_mapping_table,
+            ],
+        }
+    },
+)
+
+propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
+        layer=LayerEnum.ENRICH,
+        schema=CONTEXT,
+        table_name=addresses_s2_geometry_mapping_table,
+    ),
+    json={
+        "spark_python_task": {
+            "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_table_metadata.py",
+            "parameters": [
+                LayerEnum.ENRICH.value,
+                MetadataTypeEnum.LINEAGE.value,
+                CONTEXT,
+                addresses_s2_geometry_mapping_table,
+            ],
+        }
+    },
+)
+
+bypass_task = DummyOperator(
+    dag=dag,
+    task_id=DatalakeTaskGroup.generate_default_task_id(
+        task_prefix=DatalakeTaskGroup.PROPAGATION_BYPASS_TASK_PREFIX,
+        layer=LayerEnum.ENRICH,
+        schema=CONTEXT,
+        table_name=addresses_s2_geometry_mapping_table,
+    ),
+    trigger_rule="all_done",
 )
 
 condo_enrich_task_group = enrich_task_groups.pop('condo')
@@ -182,7 +250,14 @@ chain(
     )
     + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
     calculate_dejavu_id_task,
+    sync_metastore_dejavu_table_structure_task,
+    propagate_table_metadata_task,
+    bypass_task,
     datalake_task_group.first_tasks(condo_enrich_task_group),
+)
+
+sync_metastore_dejavu_table_structure_task.set_downstream(
+    datalake_task_group.first_tasks(condo_enrich_task_group)
 )
 
 external_bucket_task.set_upstream(
