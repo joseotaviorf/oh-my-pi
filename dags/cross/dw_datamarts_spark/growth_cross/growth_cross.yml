@@ -90,6 +90,4 @@ growth_cross:
   unique_supply_events_funnel:
     depends_on:
       - affiliates_clusters
-  unique_supply_cohort_conversions: {}
-  unique_supply_events_funnel: {}
   user_funnel: {}
