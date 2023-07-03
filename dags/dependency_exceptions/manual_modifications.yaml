@@ -720,6 +720,12 @@ bietlejuice.enrich_rental_listing_metrics:
   remove:
     - bietlejuice.dw_contract:load-dw-public-dim-contract
     - bietlejuice.enrich_region:load-enrich-region
+bietlejuice.enrich_repairs:
+  remove:
+    - bietlejuice.repairs:load-clean-repair-expense
+    - bietlejuice.repairs:load-clean-repair-expense-group
+    - bietlejuice.repairs:load-clean-repair-request
+    - bietlejuice.repairs:load-clean-repair-request-item
 bietlejuice.enrich_retsuko:
   remove:
     - bietlejuice.retsuko:load-clean-boleto

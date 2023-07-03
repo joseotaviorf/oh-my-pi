@@ -1,0 +1,99 @@
+---
+database_name: datalake_repairs
+table_name: repair_tickets
+description: This table contains and handles all tickets generated with the Repairs context
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_ticket:
+    description: Key of ticket that corresponds to the Zendesk ticket number
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.id_ticket
+  id_repair_request:
+    description: Unique identifier of the repair request
+    lineage:
+      - datalake_repairs_clean.repair_request.id
+  id_contract:
+    description: Unique identifier of the contract
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+  id_assignee:
+    description: The agent currently assigned to act upon the ticket
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.id_assignee
+  id_group:
+    description: Key that identifies the ticket creation group
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.id_group
+  status:
+    description: Current ticket status
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.status
+  replies:
+    description: Volume of public comments made on the ticket
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.replies
+  tags:
+    description: Tags applied to ticket
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.tags
+  channel:
+    description: Channel the ticket was created on
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.channel
+  reopens:
+    description: Total reopenings that the ticket has suffered
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.reopens
+  group_name:
+    description: Nominal group the ticket was created in
+    lineage:
+      - datalake_zendesk_tickets_clean.groups.name
+  ticket_via:
+    description: Ticket creation method
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.via
+  service_provider:
+    description: Product tagging for ticket type
+    lineage:
+      - datalake_repairs_clean.repair_request.service_provider
+  ts_solved:
+    description: Ticket closing date
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved
+  ts_solved_local:
+    description: Ticket closing date local
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+  ts_created_repair_request:
+    description: Date on which the repair was requested
+    lineage:
+      - datalake_repairs_clean.repair_request.ts_created
+  ts_created:
+    description: Ticket creation date
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.ts_created
+  ts_created_local:
+    description: Ticket creation date local
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.ts_created_local
+  ts_updated:
+    description: Ticket update date
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.ts_updated
+  ts_updated_local:
+    description: Ticket update date local
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.ts_updated
+  year:
+    description: Year of ticket update date
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.year
+  month:
+    description: Month of ticket update date
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.month
+  day:
+    description: Day of ticket update date
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.day

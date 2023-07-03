@@ -1,0 +1,246 @@
+---
+database_name: datalake_repairs
+table_name: repair_ongoing
+description: Enrichment of specific indicators of the context of Ongoing Repairs
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_ticket:
+    description: Key of ticket that corresponds to the Zendesk ticket number
+    lineage:
+      - datalake_repairs.repair_tickets.id_ticket
+  id_repair_request:
+    description: Unique identifier of the repair request
+    lineage:
+      - datalake_repairs.repair_tickets.id_repair_request
+  id_contract:
+    description: Unique identifier of the contract
+    lineage:
+      - datalake_repairs.repair_tickets.id_contract
+      - datalake_repairs.repair_custom_fields.id_contract
+  id_assignee:
+    description: The agent currently assigned to act upon the ticket
+    lineage:
+      - datalake_repairs.repair_tickets.id_assignee
+  id_group:
+    description: Key that identifies the ticket creation group
+    lineage:
+      - datalake_repairs.repair_tickets.id_group
+  assignee_email:
+    description: Analyst email assigned in the ticket
+    lineage:
+      - datalake_zendesk_tickets_clean.users.assignee_email
+  client_type:
+    description: Type of customer of the property tenant or owner
+    lineage:
+      - datalake_repairs.repair_custom_fields.client_type
+  status:
+    description: Current ticket status
+    lineage:
+      - datalake_repairs.repair_tickets.status
+  replies:
+    description: Volume of public comments made on the ticket
+    lineage:
+      - datalake_repairs.repair_tickets.replies
+  tags:
+    description: Tags applied to ticket
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+  channel:
+    description: Channel the ticket was created on
+    lineage:
+      - datalake_repairs.repair_tickets.channel
+  reopens:
+    description: Total reopenings that the ticket has suffered
+    lineage:
+      - datalake_repairs.repair_tickets.reopens
+  group_name:
+    description: Nominal group the ticket was created in
+    lineage:
+      - datalake_repairs.repair_tickets.group_name
+  ticket_via:
+    description: Ticket creation method
+    lineage:
+      - datalake_repairs.repair_tickets.ticket_via
+  custom_fields:
+    description:
+      The custom fields of the ticket that correspond to the Zendesk Forms fields.
+      It has JSON format with the form's field name and its value selected or inputted
+      by agent. The value equal to false is related to the field that was not filled
+      for the request
+    lineage:
+      - datalake_repairs.repair_custom_fields.custom_fields
+  journey_step:
+    description: Journey the customer is on in the repair request (onboarding or ongoing)
+  chat_negociation_tag:
+    description: Tags that identify chat cases
+  service_provider:
+    description: Product tagging for ticket type
+    lineage:
+      - datalake_repairs.repair_tickets.service_provider
+  criticality:
+    description: Level of importance or urgency of the ticket
+  repair_flow:
+    description: Describes which negotiation flow, which can be Compulsory, Normal or Dispute.
+  number_repairs_needed:
+    description: Number of repairs requested in a claim
+  sla_ticket_target:
+    description: Target for closing the ticket
+    lineage:
+      - datalake_gsheets_clean.repair_ongoing_sla_target.target
+  sla_first_reply_target:
+    description: Target to occur the first response of the ticket
+    lineage:
+      - datalake_gsheets_clean.repair_ongoing_sla_target.target
+  sla_fup_target:
+    description: Target for the mediation process to occur
+    lineage:
+      - datalake_gsheets_clean.repair_ongoing_sla_target.target
+  sla_definition_target:
+    description: Target for the definition process to occur
+    lineage:
+      - datalake_gsheets_clean.repair_ongoing_sla_target.target
+  frt:
+    description: Ticket closing time
+  days_to_first_reply:
+    description: Time of first response
+  ldt_pending:
+    description: Waiting time for the first reply to occur
+  ldt_fup:
+    description: Time for the mediation process
+  ldt_definition:
+    description: Time for the definition process
+  has_reopen:
+    description: Identifies whether the ticket was reopened
+  has_fup:
+    description: Identifies if the ticket had FUP
+  is_open_auto_service:
+    description: Ticket opened by product automation
+  is_resolved_by_auto_service:
+    description: Ticket closed by product automation
+  is_closed_by_merge:
+    description: Closed by automation when duplicate ticket identified
+  is_ongoing:
+    description: Identifies open ticket
+  is_oor:
+    description: Generated ticket backlog in the week
+  is_oor_first_reply_day:
+    description: Identifies first reply backlog in the week
+  is_oor_ticket_backlog_day:
+    description: Identifies ticket backlog in the week
+  is_anomaly_20_days:
+    description: Tickets open for more than 20 days
+  is_anomaly_30_days:
+    description: Tickets open for more than 30 days
+  is_backlog_ticket:
+    description: Open ticket and has a backlog out of date
+  is_backlog_ticket_generated:
+    description: Ticket has been backlog out of date at some point
+  is_backlog_fup:
+    description: Ticket with out-of-date fup backlog
+  is_backlog_definition:
+    description: Ticket with out-of-date definition backlog
+  is_backlog_fup_generated:
+    description: Ticket was already in fup's backlog at some point
+  is_backlog_definition_generated:
+    description: Ticket was already in definition backlog at some point
+  is_first_reply_backlog:
+    description: Ticket is first reply backlog
+  is_first_reply_generated_backlog:
+    description: Ticket was already a first reply backlog at some point
+  dt_deadline:
+    description: Maximum date for closing the ticket
+    lineage:
+      - datalake_date.workday_window.dt_end_3
+      - datalake_date.workday_window.dt_end_5
+      - datalake_date.workday_window.dt_end_6
+      - datalake_date.workday_window.dt_end_8
+      - datalake_date.workday_window.dt_end_9
+      - datalake_date.workday_window.dt_end_10
+      - datalake_date.workday_window.dt_end_13
+  dt_first_replay_deadline:
+    description: Maximum date for the first reply to occur
+    lineage:
+      - datalake_date.workday_window.dt_end_1
+      - datalake_date.workday_window.dt_end_3
+      - datalake_date.workday_window.dt_end_5
+      - datalake_date.workday_window.dt_end_8
+  dt_oor_first_replay:
+    description: Week in which the first reply backlog was generated
+  dt_expected_closing:
+    description: Maximum date for closing the ticket
+    lineage:
+      - datalake_date.workday_window.dt_end_8
+  dt_limit_fup:
+    description: Maximum date for the FUP to occur
+    lineage:
+      - datalake_date.workday_window.dt_end_2
+  dt_limit_definition:
+    description: Maximum date for the definition to occur
+    lineage:
+      - datalake_date.workday_window.dt_end_3
+  dt_oor_ticket_week:
+    description: Week we generated the ticket backlog
+  dt_anomaly_20_days:
+    description: Date that became a 20-day anomaly
+  dt_anomaly_30_days:
+    description: Date that became a 30-day anomaly
+  dt_entered:
+    description: Date of when tenant will move into the property as defined in the contract.
+    lineage:
+      - datalake_ebdb_contract.contract.dt_entered
+  ts_first_reply:
+    description: Date the first reply occurred
+    lineage:
+      - datalake_repairs.repair_custom_fields.ts_first_reply
+  ts_first_manual_fup_performed:
+    description:
+      Date when the first manual follow-up of the ticket took place, can also be interpreted as the
+      mediation date of the ticket. This data comes from the custom fields of the ticket, corresponding
+      to the key value 14216500749837
+    lineage:
+      - datalake_repairs.repair_custom_fields.ts_first_manual_fup_performed
+  ts_provider_definition:
+    description: Product tagging for ticket type
+    lineage:
+      - datalake_repairs.repair_custom_fields.ts_provider_definition
+  ts_solved:
+    description: Ticket closing date
+    lineage:
+      - datalake_repairs.repair_tickets.ts_solved
+  ts_solved_local:
+    description: Ticket closing date local
+    lineage:
+      - datalake_repairs.repair_tickets.ts_solved_local
+  ts_created_repair_request:
+    description: Date on which the repair was requested
+    lineage:
+      - datalake_repairs.repair_tickets.ts_created_repair_request
+  ts_created:
+    description: Ticket creation date
+    lineage:
+      - datalake_repairs.repair_tickets.ts_created
+  ts_created_local:
+    description: Ticket creation date local
+    lineage:
+      - datalake_repairs.repair_tickets.ts_created_local
+  ts_updated:
+    description: Ticket update date
+    lineage:
+      - datalake_repairs.repair_tickets.ts_updated
+  ts_updated_local:
+    description: Ticket update date local
+    lineage:
+      - datalake_repairs.repair_tickets.ts_updated_local
+  year:
+    description: Year of ticket update date
+    lineage:
+      - datalake_repairs.repair_tickets.year
+  month:
+    description: Month of ticket update date
+    lineage:
+      - datalake_repairs.repair_tickets.month
+  day:
+    description: Day of ticket update date
+    lineage:
+      - datalake_repairs.repair_tickets.day

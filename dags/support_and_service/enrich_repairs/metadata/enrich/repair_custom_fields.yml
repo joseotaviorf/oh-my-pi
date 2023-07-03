@@ -1,0 +1,83 @@
+---
+database_name: datalake_repairs
+table_name: repair_custom_fields
+description: Handling custom fields in the Zendesk ticket
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_ticket:
+    description: Key of ticket that corresponds to the Zendesk ticket number
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.id_ticket
+  id_contract:
+    description:
+      Unique identifier of the contract. This data comes from the
+      custom fields of the ticket, corresponding to the key value 114096515211
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.custom_fields
+  client_type:
+    description: Type of customer of the property tenant or owner
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.custom_fields
+  new_criticality:
+    description:
+      Current repair criticality. This data comes from the custom
+      fields of the ticket, corresponding to the key value 10479892278541
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.custom_fields
+  criticality:
+    description:
+      Level of importance or urgency of the ticket. This data comes from the
+      custom fields of the ticket, corresponding to the key value 10479805451021
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.custom_fields
+  service_rating_tags:
+    description:
+      It is the classification of the ticket service. This data comes from the
+      custom fields of the ticket, corresponding to the key value 360047178772
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.custom_fields
+  ts_first_manual_fup_performed:
+    description:
+      Date when the first manual follow-up of the ticket took place, can also be
+      interpreted as the mediation date of the ticket. This data comes from the
+      custom fields of the ticket, corresponding to the key value 14216500749837
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.custom_fields
+  ts_provider_definition:
+    description:
+      Date on which the repair service provider was defined. This data comes from
+      the custom fields of the ticket, corresponding to the value of keys
+      10483353873549 and 10483321522829
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.custom_fields
+  ts_first_reply:
+    description:
+      Date the first reply occurred. This data comes from the custom fields of
+      the ticket, corresponding to the key value 14216477864717
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.custom_fields
+  custom_fields:
+    description:
+      The custom fields of the ticket that correspond to the Zendesk Forms fields.
+      It has JSON format with the form's field name and its value selected or inputted
+      by agent. The value equal to false is related to the field that was not filled
+      for the request
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.custom_fields
+  ts_updated:
+    description: Ticket update date
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.ts_updated
+  year:
+    description: Year of ticket update date
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.year
+  month:
+    description: Month of ticket update date
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.month
+  day:
+    description: Day of ticket update date
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.day
