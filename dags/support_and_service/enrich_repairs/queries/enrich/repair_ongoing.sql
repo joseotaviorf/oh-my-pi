@@ -89,8 +89,8 @@ repair_custom_fields AS (
                 AND DATE(rt.ts_created_local) >= DATE('2023-02-01') THEN 24
             ELSE 0
         END AS ldt_pending,
-        DATE_DIFF(rt.ts_solved, rt.ts_created) AS frt,
-        DATE_DIFF(rcf.ts_first_reply, rt.ts_created) AS days_to_first_reply,
+        DATEDIFF(rt.ts_solved, rt.ts_created) AS frt,
+        DATEDIFF(rcf.ts_first_reply, rt.ts_created) AS days_to_first_reply,
         CASE
             WHEN rt.ts_created >= DATE("2023-04-13")
                 AND (
@@ -338,7 +338,7 @@ SELECT
     rcf.custom_fields,
     CASE
         WHEN rcf.id_contract IS NULL THEN NULL
-        WHEN DATE_DIFF(c.dt_entered, rt.ts_created_local) <= 40 THEN 'Onboarding'
+        WHEN DATEDIFF(c.dt_entered, rt.ts_created_local) <= 40 THEN 'Onboarding'
         ELSE 'Ongoing'
     END AS journey_step,
     rcf.chat_negociation_tag,
@@ -353,8 +353,8 @@ SELECT
     rcf.frt,
     rcf.days_to_first_reply,
     rcf.ldt_pending,
-    DATE_DIFF(rcf.ts_first_manual_fup_performed, rcf.ts_first_reply) AS ldt_fup,
-    DATE_DIFF(rcf.ts_provider_definition, rcf.ts_first_manual_fup_performed) AS ldt_definition,
+    DATEDIFF(rcf.ts_first_manual_fup_performed, rcf.ts_first_reply) AS ldt_fup,
+    DATEDIFF(rcf.ts_provider_definition, rcf.ts_first_manual_fup_performed) AS ldt_definition,
     rcf.has_reopen,
     rcf.has_fup,
     rcf.is_open_auto_service,
