@@ -10,7 +10,7 @@ WITH distinct_groups AS (
 custom_fields_filter AS (
   SELECT
         t.id_ticket,
-        CONCAT('{{"custom_fields": ', REPLACE(REPLACE(REPLACE(REGEXP_REPLACE(custom_fields, '"(?!")', ''), 'id:', '"id":"'), ',value:', '", "value":"'), '}', '"}'), '}}') AS custom_field,
+        CONCAT('{{"custom_fields": ', REPLACE(REPLACE(REPLACE(REGEXP_REPLACE(custom_fields, '"(?!")', ''), 'id:', '"id":"'), ',value:', '", "value":"'), '}', '"}'), '}') AS custom_field,
         t.ts_updated,
         t.year,
         t.month,
