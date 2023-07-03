@@ -411,7 +411,7 @@ SELECT
     rm.is_first_reply_generated_backlog,
     rm.dt_deadline,
     rm.dt_first_replay_deadline,
-    rm.dt_oor_fr,
+    rm.dt_oor_first_replay,
     rm.dt_expected_closing,
     rm.dt_limit_fup,
     rm.dt_limit_definition,
