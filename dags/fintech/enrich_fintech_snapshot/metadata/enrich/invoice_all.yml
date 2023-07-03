@@ -1,5 +1,5 @@
 ---
-database_name: datalake_accounting_funnel_snapshot
+database_name: datalake_fintech_snapshot
 table_name: invoice_all
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
