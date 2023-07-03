@@ -274,6 +274,7 @@ SELECT
     r.id_region,
     rbo.id_company_demand,
     h.id_company_hubspot AS id_company_supply,
+    h.uuid_company AS uuid_company_supply,
     UPPER(
         CASE
             WHEN v.vendas_offer_flow = 'CENTRAL' AND r.city_group = 'Porto Alegre' THEN 'CENTRAL POA'

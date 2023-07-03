@@ -315,6 +315,7 @@ base_booking AS (
     vo.id_real_estate_agent_rating,
     IF(b.business_context = 'SALE', vfa.id_fixed_agent,NULL) AS id_sale_fixed_agent,
     hl.id_company_hubspot AS id_company_supply,
+    hl.uuid_company AS uuid_company_supply,
     b3pa.id_company_demand,
     COALESCE(hl.country_code, 'Undefined') AS country_code,
     COALESCE(ct.default_timezone, 'UTC') AS default_timezone,

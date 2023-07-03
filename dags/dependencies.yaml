@@ -1206,6 +1206,7 @@ bietlejuice.enrich_ebdb_listing:
 - bietlejuice.ebdb:load-clean-house-agent-aud
 - bietlejuice.ebdb:load-clean-house-agent-key-tracking-aud
 - bietlejuice.ebdb:load-clean-house-aud
+- bietlejuice.ebdb:load-clean-house-listing-relation
 - bietlejuice.ebdb:load-clean-house-registration-status
 - bietlejuice.ebdb:load-clean-house-special-condition
 - bietlejuice.ebdb:load-clean-house-visit-information
@@ -1227,11 +1228,11 @@ bietlejuice.enrich_ebdb_listing:
 - bietlejuice.ebdb:load-clean-special-condition
 - bietlejuice.ebdb:load-clean-special-condition-aud
 - bietlejuice.ebdb:load-clean-user-revision-entity
+- bietlejuice.enrich_company:load-enrich-company
 - bietlejuice.enrich_ebdb_country:load-enrich-house
 - bietlejuice.enrich_ebdb_country:load-enrich-user
 - bietlejuice.enrich_ebdb_rental_administration:load-enrich-rental-administrator-change-history
 - bietlejuice.enrich_hubspot:load-enrich-company
-- bietlejuice.enrich_hubspot:load-enrich-company-history
 bietlejuice.enrich_ebdb_listing_jobs:
 - bietlejuice.ebdb:load-clean-country
 - bietlejuice.ebdb:load-clean-house

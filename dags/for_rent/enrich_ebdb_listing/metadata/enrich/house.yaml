@@ -8,350 +8,514 @@ columns:
   id:
     lineage:
       - datalake_ebdb_clean.house.id
+    description: Id of the house, primary key
   id_country:
     lineage:
       - datalake_ebdb_country.house.id_country
+    description: 'ID of the country'
   id_state:
     lineage:
       - datalake_ebdb_clean.house.id_state
+    description: 'ID of the state'
   id_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
+    description: 'ID of the region'
   id_user:
     lineage:
       - datalake_ebdb_clean.house.id_user
+    description: 'ID of the user who owns the house'
   id_user_registrant:
     lineage:
       - datalake_ebdb_clean.house.id_user_registrant
+    description: 'ID of the user who registered the house'
   id_external:
     lineage:
       - datalake_ebdb_clean.house.id_external
+    description: 'ID of the house in an external system'
   id_condo_parent:
     lineage:
       - datalake_ebdb_clean.house.id_condo_parent
+    description: 'ID of the parent condo'
   id_company_hubspot:
     lineage:
-      - datalake_hubspot_clean.company.id_company
+      - datalake_hubspot.company.id_company
     description: 'ID of the Rede company in HubSpot, if the house is 3P Supply.'
+  uuid_company:
+    lineage:
+      - datalake_company.company.uuid_company
+    description: 'UUID of Rede company, if the house is 3P Supply.'
   house_short_id:
     lineage:
       - datalake_ebdb_clean.house.id
+    description: 'Short ID of the house. It is the ID - 892700000.'
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
+    description: 'Country code of the house'
   rent:
     lineage:
       - datalake_ebdb_clean.house.rent
+    description: 'Rent price of the house'
   state_abbreviation:
     lineage:
       - datalake_ebdb_clean.state.abbreviation
+    description: 'State abbreviation of the house'
   state_name:
     lineage:
       - datalake_ebdb_clean.state.name
+    description: 'State name of the house'
   region_city_name:
     lineage:
       - datalake_ebdb_clean.map_region.city_name
+    description: 'City name of the house, according to the region'
   region_macro_name:
     lineage:
       - datalake_ebdb_clean.map_region.macro_name
+    description: 'Macro region name of the house'
   region_name:
     lineage:
       - datalake_ebdb_clean.map_region.name
+    description: 'Region name of the house'
   lat:
     lineage:
       - datalake_ebdb_clean.house.lat
+    description: 'Latitude of the house'
   lng:
     lineage:
       - datalake_ebdb_clean.house.lng
+    description: 'Longitude of the house'
   neighborhood:
     lineage:
       - datalake_ebdb_clean.house.neighborhood
+    description: 'Neighborhood of the house'
   zipcode:
     lineage:
       - datalake_ebdb_clean.house.zipcode
+    description: 'Zipcode (CEP) of the house'
   city:
     lineage:
       - datalake_ebdb_clean.house.city
+    description: 'City of the house'
   address:
     lineage:
       - datalake_ebdb_clean.house.address
+    description: 'Address of the house'
   complement:
     lineage:
       - datalake_ebdb_clean.house.complement
+    description: 'Complement of the house'
   condo:
     lineage:
       - datalake_ebdb_clean.house.condo
+    description: 'Condo price of the house'
   condo_name:
     lineage:
       - datalake_ebdb_clean.condo.name
+    description: 'Condo name of the house'
   closest_station_name:
     lineage:
       - datalake_ebdb_clean.local.name
+    description: 'Name of the closest station to the house'
   contact_email:
     lineage:
       - datalake_ebdb_clean.house.contact_email
+    description: 'Contact email of the owner of the house'
   photo_session_email:
     lineage:
       - datalake_ebdb_clean.house.photo_session_email
+    description: 'Email given for the photo session (deprecated)'
   conservation_status:
     lineage:
       - datalake_ebdb_clean.house.conservation_status
+    description: 'Conservation status of the house (deprecated)'
   iptu:
     lineage:
       - datalake_ebdb_clean.house.iptu
+    description: 'IPTU price of the house'
   finishing_level:
     lineage:
       - datalake_ebdb_clean.house.finishing_level
+    description: 'Finishing level of the house (deprecated)'
   number:
     lineage:
       - datalake_ebdb_clean.house.number
+    description: 'Number of the address of the house'
   bathrooms:
     lineage:
       - datalake_ebdb_clean.house.bathrooms
+    description: 'Number of bathrooms of the house'
   bedrooms:
     lineage:
       - datalake_ebdb_clean.house.bedrooms
+    description: 'Number of bedrooms of the house'
   suites:
     lineage:
       - datalake_ebdb_clean.house.suites
+    description: 'Number of suites of the house'
   parking_slots:
     lineage:
       - datalake_ebdb_clean.house.parking_slots
+    description: 'Number of parking slots of the house'
   register_percent_complete:
     lineage:
       - datalake_ebdb_clean.house.register_percent_complete
+    description: 'Percentage of the house registration completed (deprecated)'
   status:
     lineage:
       - datalake_ebdb_clean.house.status
+    description: 'Status of the house'
   contact_phone_1:
     lineage:
       - datalake_ebdb_clean.house.contact_phone_1
+    description: 'Main contact phone of the owner of the house'
   contact_phone_2:
     lineage:
       - datalake_ebdb_clean.house.contact_phone_2
+    description: 'Secondary contact phone of the owner of the house'
   photos_session_phone:
     lineage:
       - datalake_ebdb_clean.house.photos_session_phone
+    description: 'Phone given for the photo session (deprecated)'
   type:
     lineage:
       - datalake_ebdb_clean.house.type
+    description: 'Type of the house'
+    categories:
+      Apartamento: 'Apartment'
+      CasaCondominio: 'House in a condo'
+      Casa: 'House'
+      StudioOuKitchenette: 'Studio or Kitchenette'
   doorman_type:
     lineage:
       - datalake_ebdb_clean.house.doorman_type
+    description: 'Type of doorman of the house'
+    categories:
+      horas24: '24 hours'
+      NaoHaPorteiro: 'No doorman'
+      Diurno: 'Daytime'
+      Noturno: 'Nighttime'
   parking_slot_type:
     lineage:
       - datalake_ebdb_clean.house.parking_slot_type
+    description: 'Type of parking slot of the house'
+    categories:
+      NaoCobertas: 'Uncovered'
+      Cobertas: 'Covered'
+      Ambos: 'Both'
   promotion_code:
     lineage:
       - datalake_ebdb_clean.house.promotion_code
+    description: 'Promotion code of the house (deprecated)'
   short_url:
     lineage:
       - datalake_ebdb_clean.house.short_url
+    description: 'Short URL of the house'
   insurance_value:
     lineage:
       - datalake_ebdb_clean.house.insurance_value
+    description: 'Insurance value of the house (deprecated)'
   booking_instructions:
     lineage:
       - datalake_ebdb_clean.house.booking_instructions
+    description: 'Booking instructions of the house (deprecated)'
   plan_accepted:
     lineage:
       - datalake_ebdb_clean.house.plan_accepted
+    description: 'Plan accepted of the house (deprecated)'
   lead_description:
     lineage:
       - datalake_ebdb_clean.house.lead_description
+    description: 'UUID of the house lead'
   listing_highlight_priority:
     lineage:
       - datalake_ebdb_clean.house.listing_highlight_priority
+    description: 'Listing highlight priority of the house'
   corretor_amigo:
     lineage:
       - datalake_ebdb_clean.house.corretoramigo
+    description: 'Corretor amigo (friend broker) associated with the house (deprecated)'
   porteiro_amigo:
     lineage:
       - datalake_ebdb_clean.house.porteiroamigo
+    description: 'Porteiro amigo (friend doorman) associated with the house (deprecated)'
   condo_management_information:
     lineage:
       - datalake_ebdb_clean.house.condo_management_information
+    description: 'Condo management information of the house (deprecated)'
   references:
     lineage:
       - datalake_ebdb_clean.house.references
+    description: 'References of the house'
   lead_collision_type:
     lineage:
       - datalake_ebdb_clean.house.lead_collision_type
+    description: 'Lead collision type of the house (deprecated)'
   total_value:
     lineage:
       - datalake_ebdb_clean.house.total_value
+    description: 'Total value of the house'
   cover_image_name:
     lineage:
       - datalake_ebdb_clean.house.cover_image_name
+    description: 'Cover image name of the house listing'
   geo_hash:
     lineage:
       - datalake_ebdb_clean.house.geo_hash
+    description: 'Geo hash of the house (deprecated)'
   listing_type:
     lineage:
       - datalake_ebdb_clean.house.listing_type
+    description: 'Listing type of the house'
+    categories:
+      FullService: 'Full service'
+      DealOnly: 'Deal only'
   admin_info:
     lineage:
       - datalake_ebdb_clean.house.admin_info
+    description: 'Admin info of the house (open field)'
   internal_admin_info:
     lineage:
       - datalake_ebdb_clean.house.internal_admin_info
+    description: 'Internal admin info of the house (open field)'
   partner_3p_supply:
     lineage:
-      - datalake_hubspot_clean.company.properties
+      - datalake_hubspot.company.extracted_3p_tag
+      - datalake_company.company.company_name
       - datalake_ebdb_clean.house.internal_admin_info
     description: 'Short name of the real estate agency in Rede QuintoAndar, associated with this house.'
   photo_booking_historic:
     lineage:
       - datalake_ebdb_clean.house.photo_booking_historic
+    description: 'Photo booking historic of the house (deprecated)'
   default_neighborhood:
     lineage:
       - datalake_ebdb_clean.house.default_neighborhood
+    description: 'Default neighborhood of the house (deprecated)'
   condo_type:
     lineage:
       - datalake_ebdb_clean.house.condo_type
+    description: 'Condo type of the house'
+    categories:
+      NaoExiste: 'No condo price'
+      IncluidoNoAluguel: 'Condo price included in the rent'
+      NaoInformado: 'Condo price not informed'
+      Normal: 'Normal (not in rent)'
   iptu_type:
     lineage:
       - datalake_ebdb_clean.house.iptu_type
+    description: 'IPTU type of the house'
+    categories:
+      NaoExiste: 'No IPTU price'
+      IncluidoNoAluguel: 'IPTU price included in the rent'
+      NaoInformado: 'IPTU price not informed'
+      Normal: 'Normal (not in rent)'
   compare_price_with_average:
     lineage:
       - datalake_ebdb_clean.house.compare_price_with_average
+    description: 'Compare price with average of the house (deprecated)'
   house_conversion_status:
     lineage:
       - datalake_ebdb_clean.house.house_conversion_status
+    description: 'House conversion status of the house (deprecated)'
   registration:
     lineage:
       - datalake_ebdb_clean.house.registration
+    description: 'Registration of the house'
   last_confirmation_email_sent:
     lineage:
       - datalake_ebdb_clean.house.last_confirmation_email_sent
+    description: 'Timestamp of when the last confirmation email was sent (deprecated)'
   lat_lng:
     lineage:
       - datalake_ebdb_clean.house.lat_lng
+    description: 'Hashed latitude and longitude of the house'
   title:
     lineage:
       - datalake_ebdb_clean.house.title
+    description: 'Title of the house'
   cardiff_rejection_reason:
     lineage:
       - datalake_ebdb_clean.house.cardiff_rejection_reason
+    description: 'Cardiff rejection reason of the house (deprecated)'
   registry:
     lineage:
       - datalake_ebdb_clean.house.registry
+    description: 'Registry of the house'
   penalization_score:
     lineage:
       - datalake_ebdb_clean.house.penalization_score
+    description: 'Penalization score of the house'
   rank_score:
     lineage:
       - datalake_ebdb_clean.house.rank_score
+    description: 'Rank score of the house'
   total_area:
     lineage:
       - datalake_ebdb_clean.house.total_area
+    description: 'Total area of the house (in m2)'
   land_area:
     lineage:
       - datalake_ebdb_clean.house.land_area
+    description: 'Land area of the house (in m2)'
   predicted_price:
     lineage:
       - datalake_ebdb_clean.house.predicted_price
+    description: 'Predicted price of the house'
   sale_price:
     lineage:
       - datalake_ebdb_clean.house.sale_price
+    description: 'Sale price of the house'
   occupant_type:
     lineage:
       - datalake_ebdb_clean.occupant_type.name
+    description: 'Occupant type of the house'
+    categories:
+      Empty: 'The house is empty'
+      Owner: 'The owner lives in the house'
+      Tenant: 'A tenant lives in the house'
   key_type:
     lineage:
       - datalake_ebdb_clean.key_type.name
+    description: 'Key type of the house'
+    categories:
+      Common: 'Common key'
+      None: 'No key'
+      Password: 'Password'
+      Biometry: 'Biometry'
   key_location:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name
+    description: 'Key location'
+    categories:
+      OwnerPresent: 'Owner present at the house for the booking'
+      FrontDoor: 'Front door'
+      None: 'No key location specified'
+      LockBock: 'Lock box'
+      KeysWithAgent: 'Keys with agent'
+      KeysLocker: 'Keys in locker'
+      Password: 'Password'
   visit_restriction:
     lineage:
       - datalake_ebdb_clean.restriction_type.name
+    description: 'If there is any visit restriction'
+    categories:
+      Restriction: 'There is a visit restriction'
+      None: 'There is no visit restriction'
   registration_abandoned_reason:
     lineage:
       - datalake_ebdb_clean.house_registration_status.registration_abandoned_reason
+    description: 'Reason why the registration was abandoned'
   unpublished_reason:
     lineage:
       - datalake_ebdb_clean.house.status
       - datalake_ebdb_clean.house.unpublished_reason
       - datalake_ebdb_clean.user_revision_entity.reason
+    description: 'Reason why the house is unpublished'
   has_elevator:
     lineage:
       - datalake_ebdb_clean.house.has_elevator
+    description: 'If the house has an elevator'
   does_photographer_fill_information:
     lineage:
       - datalake_ebdb_clean.house.does_photographer_fill_information
+    description: 'If the photographer fills the information'
   is_furnished:
     lineage:
       - datalake_ebdb_clean.house.is_furnished
+    description: 'If the house is furnished'
   has_session_photos_email_preference:
     lineage:
       - datalake_ebdb_clean.house.has_session_photos_email_preference
+    description: 'If the owner has a preference of email for the photos (deprecated)'
   is_verified:
     lineage:
       - datalake_ebdb_clean.house.is_verified
+    description: 'If the house is verified'
   is_quote_insurance_needed:
     lineage:
       - datalake_ebdb_clean.house.is_quote_insurance_needed
+    description: 'If the house needs an insurance quote (deprecated)'
   has_owner_incomplete_listing_notification:
     lineage:
       - datalake_ebdb_clean.house.has_owner_incomplete_listing_notification
+    description: 'If the owner has an incomplete listing notification (deprecated)'
   has_admin_incomplete_listing_notification:
     lineage:
       - datalake_ebdb_clean.house.has_admin_incomplete_listing_notification
+    description: 'If the admin has an incomplete listing notification (deprecated)'
   has_price_adjustment_suggestion:
     lineage:
       - datalake_ebdb_clean.house.has_price_adjustment_suggestion
+    description: 'If the house has a price adjustment suggestion (deprecated)'
   is_condo_price_included:
     lineage:
       - datalake_ebdb_clean.house.is_condo_price_included
+    description: 'If the condo price is included (deprecated, check condo_type)'
   has_manual_coordinates:
     lineage:
       - datalake_ebdb_clean.house.has_manual_coordinates
+    description: 'If the house has manual coordinates (deprecated)'
   is_iptu_included:
     lineage:
       - datalake_ebdb_clean.house.is_iptu_included
+    description: 'If the IPTU is included (deprecated, check iptu_type)'
   is_follow_up_owner_upload_photos:
     lineage:
       - datalake_ebdb_clean.house.is_follow_up_owner_upload_photos
+    description: 'If the owner needs to upload photos (deprecated)'
   has_service_bathroom:
     lineage:
       - datalake_ebdb_clean.house.has_service_bathroom
+    description: 'If the house has a service bathroom (deprecated)'
   has_service_bedroom:
     lineage:
       - datalake_ebdb_clean.house.has_service_bedroom
+    description: 'If the house has a service bedroom (deprecated)'
   is_warn_owner_of_visits_needed:
     lineage:
       - datalake_ebdb_clean.house.is_warn_owner_of_visits_needed
+    description: 'If the owner needs to be warned of visits (deprecated)'
   is_listing_notifying_owner_email_sent:
     lineage:
       - datalake_ebdb_clean.house.is_listing_notifying_owner_email_sent
+    description: 'If the listing notifying owner email was sent (deprecated)'
   is_in_negotiation:
     lineage:
       - datalake_ebdb_clean.house.is_in_negotiation
+    description: 'If the house is in negotiation in QuintoAndar (deprecated)'
   is_in_external_negotiation:
     lineage:
       - datalake_ebdb_clean.house.is_in_external_negotiation
+    description: 'If the house is in external negotiation (deprecated)'
   is_photographer_job_pending:
     lineage:
       - datalake_ebdb_clean.house.is_photographer_job_pending
+    description: 'If the photographer job is pending (deprecated)'
   has_requested_professional_photos:
     lineage:
       - datalake_ebdb_clean.house.has_requested_professional_photos
+    description: 'If the house has requested professional photos (deprecated)'
   is_receive_default_contract_copy_needed:
     lineage:
       - datalake_ebdb_clean.house.is_receive_default_contract_copy_needed
+    description: 'If a default contract copy needs to be received'
   is_visit_information_confirmed:
     lineage:
       - datalake_ebdb_clean.house.is_visit_information_confirmed
+    description: 'If the visit information is confirmed (deprecated)'
   is_for_rent:
     lineage:
       - datalake_ebdb_clean.house.is_for_rent
+    description: 'If the house is for rent'
   is_sale_primary_market:
     lineage:
       - datalake_ebdb_clean.listing_sale_model.is_primary_market
+    description: 'If the house is in the primary market'
   is_for_sale:
     lineage:
       - datalake_ebdb_clean.house.is_for_sale
+    description: 'If the house is for sale'
   is_3p_supply:
     description: 'True if the house is from Rede QuintoAndar, either in ForSale or ForRent.'
   is_sale_3p_supply:
@@ -362,75 +526,100 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.announced_by
       - datalake_ebdb_clean.house.id_announced_by
+    description: 'True if the house is from Imovel V3.'
   has_sale_great_price_tag:
     lineage:
       - datalake_ebdb_clean.listing_sale_model.has_great_sale_price_tag
+    description: 'True if the house has a great sale price tag'
   has_visit_restriction:
     lineage:
       - datalake_ebdb_clean.restriction_type.name
+    description: 'True if the house has a visit restriction'
   is_exclusive:
     lineage:
       - datalake_ebdb_clean.house_special_condition.id_special_condition
+    description: 'True if the house is exclusive'
   has_entry_authorization:
     lineage:
       - datalake_ebdb_clean.house_visit_information.visit_information
+    description: 'True if the house has entry authorization (deprecated)'
   is_owner_joinning:
     lineage:
       - datalake_ebdb_clean.house_visit_information.visit_information
+    description: 'True if the owner is joining the visit (deprecated)'
   is_quintoandar_authorized:
     lineage:
       - datalake_ebdb_clean.house_visit_information.visit_information
+    description: 'True if QuintoAndar is authorized to visit the house'
   need_owner_authorization:
     lineage:
       - datalake_ebdb_clean.house_visit_information.visit_information
+    description: 'True if the owner needs to authorize the visit'
   has_key_box:
     lineage:
       - datalake_ebdb_clean.house_visit_information.visit_information
+    description: 'True if the house has a key box'
   has_instant_offer_enabled:
     lineage:
       - datalake_ebdb_clean.instant_offer.is_enabled
+    description: 'True if the house has instant offer enabled'
   dt_built:
     lineage:
       - datalake_ebdb_clean.house.dt_built
+    description: 'The date the house was built'
   dt_expiration:
     lineage:
       - datalake_ebdb_clean.house.dt_expiration
+    description: 'The date the house expires'
   dt_first_publication:
     lineage:
       - datalake_ebdb_clean.house.dt_first_publication
+    description: 'The date the house was first published'
   dt_availability_end:
     lineage:
       - datalake_ebdb_clean.house.dt_availability_end
+    description: 'The date the house is available until'
   dt_creation:
     lineage:
       - datalake_ebdb_clean.house.dt_creation
+    description: 'The date the house was created in QuintoAndar'
   ts_first_verified:
     lineage:
       - datalake_ebdb_clean.house.ts_first_verified
+    description: 'The timestamp the house was first verified'
   ts_agent_lead_payment_calculated:
     lineage:
       - datalake_ebdb_clean.house.ts_agent_lead_payment_calculated
+    description: 'The timestamp the agent lead payment was calculated (deprecated)'
   ts_affiliate_lead_payment_calculated:
     lineage:
       - datalake_ebdb_clean.house.ts_affiliate_lead_payment_calculated
+    description: 'The timestamp the affiliate lead payment was calculated (deprecated)'
   ts_last_index_update:
     lineage:
       - datalake_ebdb_clean.house.ts_last_index_update
+    description: 'The timestamp the house index was last indexed'
   ts_suspension_end:
     lineage:
       - datalake_ebdb_clean.house.ts_suspension_end
+    description: 'The timestamp the house suspension ends'
   ts_external_negotiation_start:
     lineage:
       - datalake_ebdb_clean.house.ts_external_negotiation_start
+    description: 'The timestamp the external negotiation started (deprecated)'
   ts_recapture:
     lineage:
       - datalake_ebdb_clean.house.ts_recapture
+    description: 'The timestamp the house was recaptured'
   ts_last_confirmation_availability:
     lineage:
       - datalake_ebdb_clean.house.ts_last_confirmation_availability
+    description: 'The timestamp the house availability was last confirmed'
   ts_last_publication:
     lineage:
       - datalake_ebdb_clean.house.ts_last_publication
+    description: 'The timestamp the house was last published'
   ts_updated:
     lineage:
       - datalake_ebdb_clean.house.ts_updated
+    description: 'The timestamp the house was last updated'

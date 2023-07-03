@@ -81,7 +81,11 @@ columns:
   id_company_supply:
     lineage:
       - datalake_ebdb_listing.house.id_company_hubspot
-    description: Id of the supply partner
+    description: Id of the supply partner in HubSpot
+  uuid_company_supply:
+    lineage:
+      - datalake_ebdb_listing.house.uuid_company
+    description: UUID of the supply partner in the company domain
   id_company_demand:
     lineage:
       - datalake_booking.booking.id_company_demand

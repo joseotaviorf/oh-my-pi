@@ -554,6 +554,7 @@ business_rules AS (
         ds.vo_id_user_team_lead AS id_user_team_lead,
         COALESCE(busf.id_hub, bu.id_business_unit) AS id_business_unit,
         h.id_company_hubspot AS id_company_supply,
+        h.uuid_company AS uuid_company_supply,
         ds.id_company_demand AS id_company_demand,
         CASE
             WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
@@ -860,6 +861,7 @@ SELECT
     id_pendency,
     id_business_unit,
     id_company_supply,
+    uuid_company_supply,
     id_company_demand,
     pendency,
     CASE

@@ -55,61 +55,39 @@ listing_info AS (
   GROUP BY 
     1
 ),
--- While we don't have 3P agencies included in datalake_company_clean.company, we need to find their name via HubSpot
--- This is a temporary measure, and should be changed in 23Q2
-extracted_partner_tags AS (
+listing_ownership_aux AS (
   SELECT
-    ch.id_company,
-    ch.tag_real_estate_agency AS tag,
-    ch.extracted_3p_tag,
-    c.extracted_3p_tag AS current_extracted_3p_tag,
-    ch.name,
-    ch.cnpj,
-    ch.state AS partner_state,
-    ROW_NUMBER() OVER(
-      PARTITION BY
-        REPLACE(UPPER(ch.extracted_3p_tag), ' ', '')
-      ORDER BY
-        ch.ts_updated
-      DESC
-    ) = 1 AS is_most_recent_for_tag,
-    ROW_NUMBER() OVER ( -- Sometimes, more than one company in HubSpot is created with the same cnpj, so we need to deduplicate
-        PARTITION BY
-            ch.cnpj
-        ORDER BY
-            NOT c.is_archived DESC, -- First, not-archived companies have more preference
-            c.lead_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC, -- Then, the ones that are currently members
-            c.extracted_3p_tag IS NOT NULL DESC, -- Then, the ones with tags
-            ch.ts_updated DESC -- Otherwise, most recent
-    ) = 1 AS is_most_recent_for_cnpj,
-    ROW_NUMBER() OVER(PARTITION BY ch.id_company ORDER BY ch.ts_updated DESC) = 1 AS is_most_recent_for_company
+    hlr.id_house,
+    MIN(id_related) AS uuid_company,
+    MAX(lbc.business_context = 'SALE') AS is_sale_3p_supply,
+    MAX(lbc.business_context = 'RENT') AS is_rent_3p_supply
   FROM
-    datalake_hubspot.company_history AS ch
+    datalake_ebdb_clean.house_listing_relation AS hlr
   JOIN
-    datalake_hubspot.company AS c
-      ON ch.id_company = c.id_company
-  QUALIFY
-    (is_most_recent_for_tag OR is_most_recent_for_cnpj OR is_most_recent_for_company)
-    AND (tag IS NOT NULL OR ch.cnpj IS NOT NULL)
+    datalake_ebdb_clean.listing_business_context AS lbc
+      ON lbc.id = hlr.id_listing_business_context
+  WHERE
+    hlr.related_as = 'LISTING_OWNER'
+    AND hlr.source_type = 'COMPANY_REF'
+  GROUP BY 1
 ),
---- We're getting the most recent row in datalake_hubspot_clean.company for each tag and CNPJ.
---- Since they are merged, extracted_3p_tag only shows up if that row is the most recent company for the given tag. Same for the CNPJ.
-partner_agencies AS (
+listing_ownership AS (
   SELECT
-    ept.id_company,
-    ept.tag,
-    CASE
-      WHEN ept.is_most_recent_for_tag THEN ept.extracted_3p_tag
-      ELSE NULL
-    END AS extracted_3p_tag,
-    CASE
-      WHEN ept.is_most_recent_for_cnpj THEN ept.cnpj
-      ELSE NULL
-    END AS cnpj,
-    COALESCE(ept.current_extracted_3p_tag, ept.extracted_3p_tag, ept.name) AS partner_3p_supply,
-    ept.partner_state
+    loa.id_house,
+    hc.id_company AS id_hubspot,
+    loa.uuid_company,
+    COALESCE(hc.extracted_3p_tag, cc.company_name) AS partner_3p_supply,
+    cc.state_abbreviation IS NOT DISTINCT FROM 'MG' OR hc.state IS NOT DISTINCT FROM 'MG' AS is_3p_bh,
+    loa.is_sale_3p_supply,
+    loa.is_rent_3p_supply
   FROM
-    extracted_partner_tags AS ept
+    listing_ownership_aux AS loa
+  LEFT JOIN
+    datalake_company.company AS cc
+      ON cc.uuid_company = loa.uuid_company 
+  LEFT JOIN
+    datalake_hubspot.company AS hc
+      ON hc.uuid_company = loa.uuid_company 
 )
 SELECT
   h.id,
@@ -120,7 +98,8 @@ SELECT
   h.id_user_registrant,
   h.id_external,
   h.id_condo_parent,
-  pa.id_company AS id_company_hubspot,
+  lo.id_hubspot AS id_company_hubspot,
+  lo.uuid_company,
   h.id % 892700000 AS house_short_id,
   h.rent,
   ch.country_code,
@@ -176,8 +155,8 @@ SELECT
   h.admin_info,
   h.internal_admin_info,
   CASE
-    WHEN li.is_3p_supply THEN COALESCE(
-      pa.partner_3p_supply,
+    WHEN li.is_3p_supply OR lo.id_house IS NOT NULL THEN COALESCE(
+      lo.partner_3p_supply,
       NULLIF(REGEXP_EXTRACT(h.internal_admin_info, r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), ''),
       'Unknown' -- Sometimes, listing_business_context sets ownership to THIRD_PARTY, but internal_admin_info is empty
     )
@@ -254,18 +233,18 @@ SELECT
   h.is_visit_information_confirmed,
   h.is_for_rent,
   h.is_for_sale,
-  COALESCE(li.is_3p_supply, FALSE) AS is_3p_supply,
-  COALESCE(li.is_sale_3p_supply, FALSE) AS is_sale_3p_supply,
-  COALESCE(li.is_rent_3p_supply, FALSE) AS is_rent_3p_supply,
-  (pa.partner_state IS DISTINCT FROM 'MG'
+  COALESCE(lo.id_house IS NOT NULL OR li.is_3p_supply, FALSE) AS is_3p_supply,
+  COALESCE(li.is_sale_3p_supply OR lo.is_sale_3p_supply, FALSE) AS is_sale_3p_supply,
+  COALESCE(li.is_rent_3p_supply OR lo.is_rent_3p_supply, FALSE) AS is_rent_3p_supply,
+  (NOT COALESCE(lo.is_3p_bh, FALSE)
     AND COALESCE(
-      UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3P-%]%',
+      UPPER(h.internal_admin_info) LIKE '%[3P-%]%',
       li.is_3p_supply,
       FALSE
   )) AS is_3p_supply_5a,
-  (pa.partner_state IS NOT DISTINCT FROM 'MG'
+  (COALESCE(lo.is_3p_bh, FALSE)
     OR COALESCE(
-      UPPER(COALESCE(pa.tag, h.internal_admin_info)) LIKE '%[3PBH-%]%',
+      UPPER(h.internal_admin_info) LIKE '%[3PBH-%]%',
       FALSE
   )) AS is_3p_supply_bh,
   (COALESCE(h.announced_by, h.id_announced_by) IS NOT NULL) AS is_imovel_v3,
@@ -364,6 +343,5 @@ LEFT JOIN
   listing_info AS li
     ON h.id = li.id_house
 LEFT JOIN
-  partner_agencies AS pa
-    ON UPPER(NULLIF(REGEXP_EXTRACT(REPLACE(h.internal_admin_info, ' ', ''), r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '')) 
-       IN (pa.cnpj, REPLACE(UPPER(pa.extracted_3p_tag), ' ', ''))
+  listing_ownership AS lo
+    ON lo.id_house = h.id

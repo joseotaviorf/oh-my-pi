@@ -59,7 +59,15 @@ LEFT JOIN
         AND eso.partner_3p_demand = cs_demand.extracted_3p_tag)
 LEFT JOIN
     datalake_rede_company.company_sks AS cs_supply
-        ON (eso.id_company_supply IS NOT NULL
-        AND eso.id_company_supply = cs_supply.id_hubspot)
-        OR (eso.id_company_supply IS NULL
-        AND eso.partner_3p_supply = cs_supply.extracted_3p_tag)
+    ON (
+      eso.uuid_company_supply IS NOT NULL
+      AND eso.uuid_company_supply = cs_supply.uuid_company
+    ) OR (
+      eso.uuid_company_supply IS NULL
+      AND eso.id_company_supply IS NOT NULL
+      AND eso.id_company_supply = cs_supply.id_hubspot
+    ) OR (
+      eso.uuid_company_supply IS NULL
+      AND eso.id_company_supply IS NULL
+      AND eso.partner_3p_supply = cs_supply.extracted_3p_tag
+    )

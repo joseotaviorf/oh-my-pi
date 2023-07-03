@@ -96,9 +96,17 @@ LEFT JOIN
     AND b.partner_3p_demand = cs_demand.extracted_3p_tag)
 LEFT JOIN
   datalake_rede_company.company_sks AS cs_supply
-    ON (b.id_company_supply IS NOT NULL
-    AND b.id_company_supply = cs_supply.id_hubspot)
-    OR (b.id_company_supply IS NULL
-    AND b.partner_3p_supply = cs_supply.extracted_3p_tag)
+    ON (
+      b.uuid_company_supply IS NOT NULL
+      AND b.uuid_company_supply = cs_supply.uuid_company
+    ) OR (
+      b.uuid_company_supply IS NULL
+      AND b.id_company_supply IS NOT NULL
+      AND b.id_company_supply = cs_supply.id_hubspot
+    ) OR (
+      b.uuid_company_supply IS NULL
+      AND b.id_company_supply IS NULL
+      AND b.partner_3p_supply = cs_supply.extracted_3p_tag
+    )
 WHERE
   b.visit_intent = 'SALE'

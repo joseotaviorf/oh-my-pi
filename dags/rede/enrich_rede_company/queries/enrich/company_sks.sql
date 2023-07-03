@@ -13,6 +13,7 @@ partners_not_found_on_hubspot AS (
         datalake_ebdb_listing.house
     WHERE
         id_company_hubspot IS NULL
+        AND uuid_company IS NULL
         AND partner_3p_supply IS NOT NULL
     GROUP BY
         partner_3p_supply
