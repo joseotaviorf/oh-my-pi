@@ -280,8 +280,16 @@ Create a string with dag table schema
 
 def create_dag_dataframe(content, execution_date):
     schema = "dag:string, dag_location:string, cluster_configuration:string"
-    return transform_list_of_dicts_to_dataframe_with_partitions(
-        content, execution_date, schema=schema
+
+    df = spark.createDataFrame(
+        (Row(**row_content) for row_content in content),
+        schema=schema,
+    )
+
+    return (
+        df.withColumn("year", SF.lit(execution_date.year))
+        .withColumn("month", SF.lit(execution_date.month))
+        .withColumn("day", SF.lit(execution_date.day))
     )
 
 
@@ -290,7 +298,7 @@ Given the DagBag content dictionary and execution date, creates a Spark DataFram
 """
 
 
-def transform_list_of_dicts_to_dataframe_with_partitions(content, execution_date, **kwargs):
+def transform_list_of_dicts_to_dataframe_with_partitions(content, execution_date):
     r"""
     Tranform a list of dicts in a sparkDataFrame.
 
@@ -299,17 +307,8 @@ def transform_list_of_dicts_to_dataframe_with_partitions(content, execution_date
     :param execution_date: The ingestion execution, used to create the ingestion partitions.
     :type execution_date: datetime
     :rtype: sparkDataFrame
-
-    :Keyword Arguments:
-        * *supplement* (``dict``) --
-        :param schema: The DataFrame schema.
-        :type schema: str
-
     """
-    df = spark.createDataFrame(
-        (Row(**row_content) for row_content in content),
-        **kwargs,
-    )
+    df = spark.createDataFrame(Row(**row_content) for row_content in content)
 
     return (
         df.withColumn("year", SF.lit(execution_date.year))
