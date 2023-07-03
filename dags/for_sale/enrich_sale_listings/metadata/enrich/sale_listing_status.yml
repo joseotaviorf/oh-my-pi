@@ -33,6 +33,11 @@ columns:
       - datalake_rede_house_history.rede_house_history.id_company_hubspot
     description: >
       The id of the Rede company in Hubspot.
+  uuid_company:
+    lineage:
+      - datalake_rede_house_history.rede_house_history.uuid_company
+    description: >
+      The uuid of the Rede company in the Company domain.
   partner_3p_supply:
     lineage:
       - datalake_rede_house_history.rede_house_history.partner_3p_supply

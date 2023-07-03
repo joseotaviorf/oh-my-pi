@@ -11,17 +11,23 @@ columns:
     lineage:
       - datalake_ebdb_clean.house_aud.id_house
       - datalake_ebdb_clean.listing_business_context_aud.id_house
+      - datalake_ebdb_clean.listing_business_context.id_house
   id_company_hubspot:
     description: Id of the company in HubSpot, if the listing is from Rede.
     lineage:
       - datalake_hubspot.company_history.id_company
+  uuid_company:
+    description: UUID of the company in the Company domain, if the listing is from Rede.
+    lineage:
+      - datalake_ebdb_clean.house_listing_relation_aud.id_related
+      - datalake_hubspot.company.uuid_company
   business_context:
     description: Specifies the business context (SALE or RENT) being evaluated.
     categories:
       SALE: 'ForSale context.'
       RENT: 'ForRent context.'
   partner_3p_supply:
-    description: Short name of the company in HubSpot, if the listing is from Rede.
+    description: Short name of the company in HubSpot or Company domain, if the listing is from Rede.
     lineage:
       - datalake_hubspot.company_history.extracted_3p_tag
       - datalake_ebdb_clean.house_aud.internal_admin_info

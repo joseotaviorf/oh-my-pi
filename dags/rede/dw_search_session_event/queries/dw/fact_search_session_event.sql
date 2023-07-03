@@ -41,10 +41,18 @@ LEFT JOIN
         AND sse.ts_event BETWEEN rhh.ts_status_started AND coalesce(rhh.ts_status_ended, now())
 LEFT JOIN
     datalake_rede_company.company_sks AS cs_supply
-        ON (rhh.id_company_hubspot IS NOT NULL
-        AND rhh.id_company_hubspot = cs_supply.id_hubspot)
-        OR (rhh.id_company_hubspot IS NULL
-        AND rhh.partner_3p_supply = cs_supply.extracted_3p_tag)
+        ON (
+            rhh.uuid_company IS NOT NULL
+            AND rhh.uuid_company = cs_supply.uuid_company
+        ) OR (
+            rhh.uuid_company IS NULL
+            AND rhh.id_company_hubspot IS NOT NULL
+            AND rhh.id_company_hubspot = cs_supply.id_hubspot
+        ) OR (
+            rhh.uuid_company IS NULL
+            AND rhh.id_company_hubspot IS NULL
+            AND rhh.partner_3p_supply = cs_supply.extracted_3p_tag
+        )
 WHERE
     sse.year = {year}
     AND sse.month = {month}

@@ -1315,6 +1315,8 @@ bietlejuice.enrich_heimdall:
 - bietlejuice.heimdall:load-clean-activity
 bietlejuice.enrich_hubspot:
 - bietlejuice.company:load-clean-company
+- bietlejuice.ebdb:load-clean-house-listing-relation
+- bietlejuice.ebdb:load-clean-listing-business-context
 - bietlejuice.hubspot:load-clean-company
 - bietlejuice.hubspot:load-clean-contact
 - bietlejuice.hubspot:load-clean-deal
@@ -1725,10 +1727,13 @@ bietlejuice.enrich_rede_company_event:
 - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
 bietlejuice.enrich_rede_house_history:
 - bietlejuice.ebdb:load-clean-house-aud
+- bietlejuice.ebdb:load-clean-house-listing-relation
+- bietlejuice.ebdb:load-clean-house-listing-relation-aud
 - bietlejuice.ebdb:load-clean-listing-business-context
 - bietlejuice.ebdb:load-clean-listing-business-context-aud
 - bietlejuice.ebdb:load-clean-listing-rent-model-aud
 - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
+- bietlejuice.enrich_company:load-enrich-company
 - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 - bietlejuice.enrich_hubspot:load-enrich-company
 - bietlejuice.enrich_hubspot:load-enrich-company-history

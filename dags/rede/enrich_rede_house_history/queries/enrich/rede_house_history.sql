@@ -1,5 +1,3 @@
--- While we don't have 3P agencies included in datalake_company_clean.company, we need to find their name via HubSpot
--- This is a temporary measure, and should be changed in 23Q2
 WITH extracted_partner_tags AS (
     SELECT
         ch.id_company,
@@ -80,7 +78,7 @@ house_history AS (
             'Unknown'
         ) AS partner_3p_supply_extracted,
         COALESCE(is_3p_supply, FALSE) AS is_3p_supply,
-        COALESCE(pa.partner_state != 'MG', has_3p_bh_in_tag, FALSE) AS is_3p_supply_bh,
+        COALESCE(pa.partner_state = 'MG', has_3p_bh_in_tag, FALSE) AS is_3p_supply_bh,
         has_3p_bh_in_tag,
         l.id IS NOT NULL AS is_in_supply_processor,
         ts_revision AS ts_status_started
@@ -326,7 +324,7 @@ add_next AS (
     FROM
         add_status_changes
 ),
-final_deduplicated AS (
+legacy_deduplicated AS (
     SELECT
         id_house,
         CASE
@@ -335,6 +333,7 @@ final_deduplicated AS (
                 THEN id_next_company_hubspot
             ELSE id_company_hubspot_current
         END AS id_company_hubspot,
+        NULL AS uuid_company,
         business_context,
         CASE
             WHEN (ts_next_publication IS NULL OR ts_next_publication > ts_next_3p_supply)
@@ -361,15 +360,139 @@ final_deduplicated AS (
         LAG(id_company_hubspot) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) IS DISTINCT FROM id_company_hubspot
         OR LAG(partner_3p_supply) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) IS DISTINCT FROM partner_3p_supply
         OR LAG(is_3p_supply) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) IS DISTINCT FROM is_3p_supply
+),
+legacy_with_end_date AS (
+    SELECT
+        fd.id_house,
+        fd.id_company_hubspot,
+        hc.uuid_company,
+        fd.business_context,
+        fd.partner_3p_supply,
+        fd.is_3p_supply,
+        fd.is_3p_supply_bh,
+        fd.ts_status_started,
+        LEAST(
+            -- If the listing is in HubSpot or in Company, we stop the status at 2023-05-01, to use only the Company domain as source
+            -- Otherwise, we keep using the legacy rules, for cases such as SHPrimeComprada
+            LEAD(ts_status_started) OVER(PARTITION BY fd.id_house, fd.business_context ORDER BY fd.ts_status_started),
+            IF(fd.id_company_hubspot IS NOT NULL OR hlr.id_related IS NOT NULL, ('2023-05-01'::TIMESTAMP), NULL)
+        )AS ts_status_ended
+    FROM
+        legacy_deduplicated AS fd
+    LEFT JOIN
+        datalake_hubspot.company AS hc
+            ON hc.id_company = fd.id_company_hubspot
+    LEFT JOIN
+        datalake_ebdb_clean.listing_business_context AS lbc
+            ON lbc.id_house = fd.id_house
+            AND fd.business_context = lbc.business_context
+    LEFT JOIN
+        datalake_ebdb_clean.house_listing_relation AS hlr
+            ON hlr.id_listing_business_context = lbc.id
+            AND hlr.related_as = 'LISTING_OWNER'
+            AND hlr.source_type = 'COMPANY_REF'
+    WHERE
+        fd.ts_status_started < ('2023-05-01'::TIMESTAMP) -- After this date, we'll only use the company domain
+        OR ( -- Except the ones which are nor in hubspot nor company, like SHPrimeComprada. These are mostly old listings
+            fd.id_company_hubspot IS NULL
+            AND hlr.id_related IS NULL
+        )
+),
+company_domain_changes AS (
+    SELECT
+        lbc.id_house,
+        hlra.id_related AS uuid_company,
+        lbc.business_context,
+        ure.ts_revision AS ts_status_started,
+        LAG(hlra.id_related) OVER(PARTITION BY lbc.id_house, lbc.business_context ORDER BY ure.ts_revision) AS id_last
+    FROM
+        datalake_ebdb_clean.house_listing_relation_aud AS hlra
+    JOIN
+        datalake_ebdb_user.user_revision_entity AS ure
+            ON hlra.rev = ure.id
+    JOIN
+        datalake_ebdb_clean.listing_business_context AS lbc
+            ON lbc.id = hlra.id_listing_business_context
+    WHERE
+        hlra.related_as = 'LISTING_OWNER'
+        AND hlra.source_type = 'COMPANY_REF'
+    QUALIFY
+        id_last IS DISTINCT FROM uuid_company
+),
+company_domain_with_end AS (
+    SELECT
+        cdc.id_house,
+        hc.id_company AS id_company_hubspot,
+        cdc.uuid_company,
+        cdc.business_context,
+        COALESCE(hc.extracted_3p_tag, hc.name, cc.company_name) AS partner_3p_supply,
+        cdc.uuid_company IS NOT NULL AS is_3p_supply,
+        cdc.uuid_company IS NOT NULL AND (hc.state IS NOT DISTINCT FROM 'MG' OR cc.state_abbreviation IS NOT DISTINCT FROM 'MG') AS is_3p_supply_bh,
+        cdc.ts_status_started,
+        LEAD(cdc.ts_status_started) OVER (PARTITION BY cdc.id_house, cdc.business_context ORDER BY cdc.ts_status_started) AS ts_status_ended
+    FROM
+        company_domain_changes AS cdc
+    LEFT JOIN
+        datalake_hubspot.company AS hc
+            ON hc.uuid_company = cdc.uuid_company
+    LEFT JOIN
+        datalake_company.company AS cc
+            ON cc.uuid_company = cdc.uuid_company
+),
+-- After may 2023, our only source is the company domain
+company_domain_with_forced_start_date AS (
+    SELECT
+        id_house,
+        id_company_hubspot,
+        uuid_company,
+        business_context,
+        partner_3p_supply,
+        is_3p_supply,
+        is_3p_supply_bh,
+        ts_status_started,
+        ts_status_ended
+    FROM
+        company_domain_with_end
+    WHERE
+        ts_status_started >= ('2023-05-01'::TIMESTAMP)
+    UNION ALL
+    SELECT -- Create a fake row for each house that has a company domain before may 2023
+        id_house,
+        id_company_hubspot,
+        uuid_company,
+        business_context,
+        partner_3p_supply,
+        is_3p_supply,
+        is_3p_supply_bh,
+        ('2023-05-01'::TIMESTAMP) AS ts_status_started,
+        ts_status_ended
+    FROM
+        company_domain_with_end
+    WHERE
+        ('2023-05-01'::TIMESTAMP) BETWEEN ts_status_started AND COALESCE(ts_status_ended, NOW())
 )
 SELECT
     id_house,
     id_company_hubspot,
+    uuid_company,
     business_context,
     partner_3p_supply,
     is_3p_supply,
     is_3p_supply_bh,
     ts_status_started,
-    LEAD(ts_status_started) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) AS ts_status_ended
+    ts_status_ended
 FROM
-    final_deduplicated
+    legacy_with_end_date
+UNION ALL
+SELECT
+    id_house,
+    id_company_hubspot,
+    uuid_company,
+    business_context,
+    partner_3p_supply,
+    is_3p_supply,
+    is_3p_supply_bh,
+    ts_status_started,
+    ts_status_ended
+FROM
+    company_domain_with_forced_start_date

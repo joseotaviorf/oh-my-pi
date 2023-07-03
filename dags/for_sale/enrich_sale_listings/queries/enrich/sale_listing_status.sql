@@ -4,6 +4,7 @@ SELECT
     ssvo.id_user_revision,
     ssvo.id_region,
     rhh.id_company_hubspot,
+    rhh.uuid_company,
     rhh.partner_3p_supply,
     ssvo.status_history_new AS status_history,
     ssvo.status_closing_history,

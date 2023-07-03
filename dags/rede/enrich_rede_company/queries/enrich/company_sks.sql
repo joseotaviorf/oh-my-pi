@@ -32,14 +32,20 @@ total_partners AS (
         COALESCE(hc.uuid_company, c.uuid_company) AS uuid_company,
         NULL AS extracted_3p_tag,
         NULL AS is_3p_bh,
-        hc.has_been_rent_member OR hc.has_been_sale_member OR c.uuid_company IS NOT NULL AS has_been_member
+        COALESCE(
+            hc.has_been_rent_member
+            OR hc.has_been_sale_member
+            OR c.has_rede_product
+            OR c.houses_currently_owned > 0
+        , FALSE) AS has_been_member
     FROM
         datalake_hubspot.company AS hc
     FULL OUTER JOIN
         datalake_company.company AS c
             ON c.uuid_company = hc.uuid_company
     WHERE
-        c.id_company IS NULL
+        hc.id_company IS NOT NULL
+        OR c.id_company IS NULL
         OR c.has_rede_product
         OR c.houses_currently_owned > 0
     UNION ALL

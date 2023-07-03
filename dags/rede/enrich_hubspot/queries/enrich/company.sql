@@ -52,41 +52,94 @@ hubspot_companies AS (
     FROM
         datalake_hubspot.company_history
 ),
-company_matches AS (
+-- We're repeating part of the logic applied to datalake_company.company
+-- We can't use it directly here because it would delay the start of the query,
+-- impacting enrich_ebdb_listing
+listing_ownership AS (
     SELECT
-        c.uuid_company,
-        ch.id_company AS id_company_hubspot
+        hlr.id_related AS uuid_company,
+        COUNT(DISTINCT lbc.id_house) AS houses_currently_owned
     FROM
-        datalake_company_clean.company_document AS cd
+        datalake_ebdb_clean.house_listing_relation AS hlr
     JOIN
-        datalake_company_clean.company AS c
-            ON cd.id_company = c.id
-    JOIN
+        datalake_ebdb_clean.listing_business_context AS lbc
+            ON lbc.id = hlr.id_listing_business_context
+    WHERE
+        hlr.related_as = 'LISTING_OWNER'
+        AND hlr.source_type = 'COMPANY_REF'
+    GROUP BY 1
+),
+company_document AS (
+    SELECT
+        COALESCE(c.uuid_company, d.uuid_company) AS uuid_company,
+        NULLIF(REGEXP_REPLACE(identification_number, '[^0-9]', ''), '') AS cnpj,
+        c.status AS company_status,
+        CASE d.status
+            WHEN 'ACTIVE' THEN 0
+            ELSE 1
+        END AS document_status_preference
+    FROM
         datalake_company_clean.document AS d
+    LEFT JOIN
+        datalake_company_clean.company_document AS cd
             ON cd.id_document = d.id
-            AND d.document_type = 'CNPJ'
-    JOIN
-        datalake_company_clean.company_product AS cp
-            ON c.id = cp.id_company
-            AND cp.id_product = 27
+    LEFT JOIN
+        datalake_company_clean.company AS c
+            ON c.id = cd.id_company
+    WHERE
+        document_type = 'CNPJ'
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY c.uuid_company ORDER BY document_status_preference, d.ts_updated DESC) = 1
+),
+-- Select the best match for each hubspot company.
+company_matches_aux AS (
+    SELECT
+        cd.uuid_company,
+        ch.id_company AS id_company_hubspot,
+        mc.id_merged_company,
+        ch.current_tag,
+        ch.is_currently_archived,
+        (
+            ch.current_sale_status IN ('Membro', 'Parceiro', 'Em processo tombamento')
+            OR ch.current_rent_status IN ('Membro', 'Parceiro', 'Em processo tombamento')
+        ) AS is_current_hubspot_member,
+        ch.ts_updated AS ts_hubspot_updated
+    FROM
+        company_document AS cd
+    LEFT JOIN
+        listing_ownership AS lo
+            ON lo.uuid_company = cd.uuid_company
     JOIN
         hubspot_companies AS ch
-            ON d.identification_number = ch.cnpj
+            ON cd.cnpj = ch.cnpj
     LEFT JOIN
         merged_companies AS mc
             ON ch.id_company = mc.id_merged_company
     QUALIFY
         ROW_NUMBER() OVER (
         PARTITION BY
-            d.identification_number
+            ch.id_company
         ORDER BY
-            NOT ch.is_currently_archived AND mc.id_merged_company IS NULL DESC, -- First, not archived nor merged
-            (
-                ch.current_sale_status IN ('Membro', 'Parceiro', 'Em processo tombamento')
-                OR ch.current_rent_status IN ('Membro', 'Parceiro', 'Em processo tombamento')
-            ) DESC, -- Then, the ones that are currently members
-            ch.current_tag IS NOT NULL DESC, -- Then, the ones with tags
-            ch.ts_updated DESC -- Otherwise, most recent
+            lo.houses_currently_owned DESC, -- First, companies with houses
+            cd.company_status IS NOT DISTINCT FROM 'ACTIVE' DESC -- Then, active companies
+        ) = 1
+),
+-- Sometimes multiple hubspot companies match the same uuid_company. Then, here we select the best match for each uuid_company
+company_matches AS (
+    SELECT
+        uuid_company,
+        id_company_hubspot
+    FROM
+        company_matches_aux
+    QUALIFY
+        ROW_NUMBER() OVER (
+        PARTITION BY
+            uuid_company
+        ORDER BY
+            NOT is_currently_archived AND id_merged_company IS NULL DESC, -- First, not archived nor merged
+            is_current_hubspot_member DESC, -- Then, the ones that are currently members
+            current_tag IS NOT NULL DESC, -- Then, the ones with tags
+            ts_hubspot_updated DESC -- Otherwise, most recent
         ) = 1
 )
 SELECT
