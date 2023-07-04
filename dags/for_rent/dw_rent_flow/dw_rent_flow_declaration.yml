@@ -6,6 +6,8 @@ workflow:
   type: query
   layer: dw
   custom_schema: public
+  spark_session_configs:
+    udfs: [FINTECHOPS_WORK_MIN_SLA]
   tables_customization:
     fact_listing_rent_flows:
       partitions: [country_code]

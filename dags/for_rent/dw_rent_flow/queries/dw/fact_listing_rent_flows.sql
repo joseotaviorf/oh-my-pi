@@ -149,6 +149,9 @@ WITH listing_rent_flows AS (
             COALESCE(CAST(DATE_FORMAT(ar.ts_rating_created, "yyyyMMdd") AS BIGINT), -1) AS sk_agent_review_rating_date,
             COALESCE(CAST(DATE_FORMAT(reservation.ts_created, "yyyyMMdd") AS BIGINT), -1) AS sk_reservation_created_date,
             CAST(reservation.reservation_attempts AS SMALLINT) AS reservation_attempts,
+            COALESCE(CAST(dim_proposal.dt_credit_last_approved AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_credit_last_approved,
+            COALESCE(CAST(dim_contract.ts_signature AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_contract_signed,
+            COALESCE(CAST(dim_contract.ts_created AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_contract_created,
             CAST(NOW() AS TIMESTAMP) AS ts_load
         FROM datalake_ebdb_rent_flow.rent_flow 
         JOIN dw_public.dim_house_listing -- 1:M (M rent_flow x 1 listing)
@@ -207,9 +210,36 @@ WITH listing_rent_flows AS (
                     AND rent_flow.id_contract IS NOT NULL
                     )
                 )
-    )
+    ),
+  sla_working_minutes AS (
     SELECT
-        *,
+      sla.sk_contract AS sk_contract,
+      sla.sk_proposal AS sk_proposal,
+      sla.ca2cc_working_minutes AS ca2cc_working_minutes,
+      sla.ca2cs_working_minutes AS ca2cs_working_minutes,
+      sla.cc2cs_working_minutes AS cc2cs_working_minutes
+    FROM
+      (
+        SELECT
+          rf.sk_contract,
+          rf.sk_proposal,
+          COALESCE(rf.ts_credit_last_approved, TIMESTAMP '1900-01-01') AS ts_credit_last_approved,
+          COALESCE(rf.ts_contract_created, TIMESTAMP '1900-01-01') AS ts_contract_created,
+          COALESCE(rf.ts_contract_signed, TIMESTAMP '1900-01-01') AS ts_contract_signed,
+          CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_credit_last_approved, TIMESTAMP '1900-01-01'),coalesce(ts_contract_created, TIMESTAMP '1900-01-01')) AS FLOAT) AS ca2cc_working_minutes,
+          CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_credit_last_approved, TIMESTAMP '1900-01-01'),coalesce(ts_contract_signed, TIMESTAMP '1900-01-01')) AS FLOAT) ca2cs_working_minutes,
+          CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_contract_created, TIMESTAMP '1900-01-01'),coalesce(ts_contract_signed, TIMESTAMP '1900-01-01')) AS FLOAT) cc2cs_working_minutes 
+          -- generic date 1900-01-01 is being used as a workaround for null dates error. Businesstimedelta cant handle null dates.
+        FROM
+          rent_flows_base rf
+      ) sla
+    WHERE
+      sla.ts_credit_last_approved <> CAST('1900-01-01' AS TIMESTAMP)
+      AND sla.ts_contract_created <> CAST('1900-01-01' AS TIMESTAMP)
+      AND sla.ts_contract_signed <> CAST('1900-01-01' AS TIMESTAMP)
+  )
+    SELECT
+        rent_flows_base.*,
         COALESCE(
             MIN(
                 CASE
@@ -324,9 +354,14 @@ WITH listing_rent_flows AS (
                     OR sk_booking > 0)
                 AND NOT COALESCE(is_visit_completed, FALSE)
                 THEN 'visit_booked'
-        ELSE NULL END AS funnel_step
+        ELSE NULL END AS funnel_step,
+        sla.ca2cc_working_minutes AS ca2cc_working_minutes,
+        sla.ca2cs_working_minutes AS ca2cs_working_minutes,
+        sla.cc2cs_working_minutes AS cc2cs_working_minutes
     FROM
         rent_flows_base
+    LEFT JOIN sla_working_minutes sla ON rent_flows_base.sk_proposal = sla.sk_proposal
+    AND rent_flows_base.sk_contract = sla.sk_contract
 )
 SELECT
     id_house_rent_flow AS ods_id,
@@ -444,6 +479,9 @@ SELECT
     days_house_listing_to_visit,
     days_credit_approved_to_closing_processed,
     days_offer_approved_to_doc_contact,
+    ca2cc_working_minutes AS working_min_credit_approved_to_contract_created,
+    ca2cs_working_minutes AS working_min_credit_approved_to_contract_signed,
+    cc2cs_working_minutes AS working_min_contract_created_to_contract_signed,
     ts_load
 FROM
     listing_rent_flows
