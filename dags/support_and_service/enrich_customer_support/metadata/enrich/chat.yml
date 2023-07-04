@@ -90,6 +90,8 @@ columns:
     lineage:
       - datalake_gsheets_clean.agents_control.agent_company
     description: The company of the agent, for example, QuintoAndar.
+  agent_organization:
+    description: Agent organization, temporary field to filters.
   csat_comment:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.comment

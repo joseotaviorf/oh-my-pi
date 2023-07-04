@@ -107,6 +107,8 @@ columns:
     lineage:
       - datalake_bigfone_twilio.call_flex_events.metadata
     description: The Twilio agent_company.
+  agent_organization:
+    description: Agent organization, temporary field to filters.
   agent_name:
     lineage:
       - datalake_gsheets_clean.agents_control.agent_name

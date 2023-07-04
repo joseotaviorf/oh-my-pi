@@ -52,6 +52,8 @@ columns:
     lineage:
       - datalake_gsheets_clean.agents_control.email
     description: The email of the agent assigned to the ticket.
+  agent_organization:
+    description: Agent organization, temporary field to filters.
   direction:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.tags

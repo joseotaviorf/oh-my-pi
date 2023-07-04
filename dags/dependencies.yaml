@@ -1693,6 +1693,7 @@ bietlejuice.enrich_quinto_messenger:
 - bietlejuice.quinto_messenger:load-clean-channel-event
 - bietlejuice.quinto_messenger:load-clean-task
 - bietlejuice.quinto_messenger:load-clean-task-event
+- bietlejuice.gsheets_support_and_service:done-clean-agents-control
 bietlejuice.enrich_recommendations:
 - bietlejuice.amplitude:170698-user-merge-raw-to-clean
 - bietlejuice.amplitude:events-raw-to-clean

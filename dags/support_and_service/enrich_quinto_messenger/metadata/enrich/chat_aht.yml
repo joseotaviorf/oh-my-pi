@@ -1,56 +1,73 @@
 database_name: datalake_quinto_messenger
 table_name: chat_aht
+description:
+    Enrichment table that aims to calculate metrics related to twilio chat tasks.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   dt_task_created_local:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
+    description: Date the task was created in the fifth messenger, in the BR timezone format.
   agent_email:
     lineage:
       - datalake_quinto_messenger_clean.task.assigned_to
+    description: Email of the analyst who signed the task.
+  agent_organization:
+    description: Agent organization, temporary field to filters
   department_name:
     lineage:
       - datalake_quinto_messenger_clean.task.task_resource
+    description: Name of the department where the task was handled.
   ts_start_first_task:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
       - datalake_quinto_messenger_clean.task_event.event_type
       - datalake_quinto_messenger_clean.task_event.ts_created
+    description: Timestamp that indicates when the first task started.
   ts_end_last_task:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
       - datalake_quinto_messenger_clean.task_event.event_type
       - datalake_quinto_messenger_clean.task_event.ts_created
+    description: Timestamp that indicates when the first task ended.
   seconds_idle_time:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
       - datalake_quinto_messenger_clean.task_event.event_type
       - datalake_quinto_messenger_clean.task_event.ts_created
+    description: Measure of time that indicates how many seconds a task was stopped.
   tasks:
     lineage:
       - datalake_quinto_messenger_clean.task.id_external
+    description: Task count.
   average_seconds_task_duration:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
       - datalake_quinto_messenger_clean.task_event.event_type
       - datalake_quinto_messenger_clean.task_event.ts_created
+    description: Average duration of a task (in seconds).
   cumulative_seconds_chatting_duration:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
       - datalake_quinto_messenger_clean.task_event.event_type
       - datalake_quinto_messenger_clean.task_event.ts_created
+    description: Time measurement that indicates how many seconds the chat lasted (in cumulative format).
   seconds_chatting_duration:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
       - datalake_quinto_messenger_clean.task_event.event_type
       - datalake_quinto_messenger_clean.task_event.ts_created
+    description: Time measurement that indicates how many seconds the chat lasted.
   average_concurrency:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
       - datalake_quinto_messenger_clean.task_event.event_type
       - datalake_quinto_messenger_clean.task_event.ts_created
+    description: Average concurrency between tasks.
   average_handling_time_seconds:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
       - datalake_quinto_messenger_clean.task_event.event_type
       - datalake_quinto_messenger_clean.task_event.ts_created
-
+    description: Average time the service took (in seconds).
