@@ -161,7 +161,8 @@ calculate_dejavu_id_task = QuintoAndarDatabricksSubmitRunOperator(
                 ENV,
                 DATALAKE_BUCKET,
                 DAG_NAME,
-                CONTEXT
+                CONTEXT,
+                addresses_s2_geometry_mapping_table
             ],
         }
     },

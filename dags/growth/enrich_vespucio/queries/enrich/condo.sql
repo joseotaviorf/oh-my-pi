@@ -3,7 +3,12 @@ tmp AS (
     SELECT
         COALESCE(d.id_dejavu, cf.uuid) AS id_dedup, -- dealing with possibility that we might not have id_dejavu
         COLLECT_SET(d.id_dejavu)[0] AS id_dejavu,
-        COLLECT_SET(cf.id_source) AS id_source_list, -- id added to enable join with datalake_ebdb_clean.house.id_condo_parent
+        COLLECT_SET(
+            STRUCT(
+                cf.source,
+                cf.id_source
+            )
+        ) AS id_source_list, -- id added to enable join with datalake_ebdb_clean.house.id_condo_parent
         COLLECT_LIST(
             STRUCT(
                 cf.source,
