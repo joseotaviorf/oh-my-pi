@@ -152,7 +152,7 @@ if __name__ == "__main__":
             c.zip_code,
             c.city
         FROM
-            datalake_vespucio.condo c
+            datalake_vespucio.condo_full c
         LEFT JOIN
             {database_name}.{addresses_s2_geometry_mapping_table} s2
             ON s2.address_type = "condo"
