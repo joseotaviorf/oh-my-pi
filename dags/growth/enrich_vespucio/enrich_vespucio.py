@@ -125,7 +125,7 @@ for table in tables:
             "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
             "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
         },
-        execution_date="",
+        # execution_date="",
         spark_session_configs={"udfs": ["GROWTH_VESPUCIO_SCORE"]},
     )
 

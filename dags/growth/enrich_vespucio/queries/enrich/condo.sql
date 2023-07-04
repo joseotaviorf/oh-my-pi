@@ -8,7 +8,7 @@ tmp AS (
                 cf.source,
                 cf.id_source
             )
-        ) AS id_source_list, -- id added to enable join with datalake_ebdb_clean.house.id_condo_parent
+        ) AS id_source_list, -- source and id_source added to enable join with datalake_ebdb_clean.house.id_condo_parent
         COLLECT_LIST(
             STRUCT(
                 cf.source,
