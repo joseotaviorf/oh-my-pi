@@ -1,0 +1,6 @@
+minority_report_endpoint: http://minority-report-api.quintoandar.com.br/profile/batch
+
+tables_to_send:
+  users:
+    key_name: user
+    type: CUSTOMER_JOURNEY

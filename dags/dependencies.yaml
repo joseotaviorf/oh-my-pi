@@ -1060,6 +1060,9 @@ bietlejuice.enrich_customer_demand:
 - bietlejuice.gsheets_support_and_service:done-clean-tag-sla-target
 - bietlejuice.gsheets_support_and_service:done-clean-taxonomy-sla
 - bietlejuice.reclameaqui:load-clean-tickets
+bietlejuice.enrich_customer_journey:
+- bietlejuice.dw_user:load-dw-public-dim-user
+- bietlejuice.enrich_user:load-enrich-persona-type
 bietlejuice.enrich_customer_resolution:
 - bietlejuice.enrich_customer_support:load-enrich-call
 - bietlejuice.enrich_customer_support:load-enrich-chat
