@@ -15,7 +15,7 @@ WITH cash_flow_base AS
     LEFT JOIN
         datalake_monopoly_clean.outcome_reference AS otr
             ON st.id_outcome_reference = otr.id
-    GROUP BY ALL
+    GROUP BY 1, 2
 ),
 cash_flow AS
 (
