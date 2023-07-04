@@ -6,3 +6,4 @@ class MetadataTypeEnum(Enum):
     QUALITY_METRICS = "quality_metrics"
     LINEAGE = "lineage"
     TAGS = "tags"
+    DATA_PROFILING = "data_profiling"

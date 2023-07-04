@@ -4,6 +4,7 @@ athena_query_results_bucket: s3://5a-datalake/query_results/
 dags_out_of_pattern:
     [
         "amplitude",
+        "dataset_profiling",
         "dw_affiliate_costs",
         "dw_agent",
         "dw_agent_contract",

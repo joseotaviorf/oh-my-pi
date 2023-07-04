@@ -12,6 +12,7 @@ class MetadataPropagatorPipeline:
         MetadataTypeEnum.FULL_CONTENT_LINEAGE.value: "/fullContentLineage",
         MetadataTypeEnum.QUALITY_METRICS.value: "/qualityMetrics",
         MetadataTypeEnum.LINEAGE.value: "/lineage",
+        MetadataTypeEnum.DATA_PROFILING.value: "/dataProfiling",
         MetadataTypeEnum.TAGS.value: "/tags",
     }
 
