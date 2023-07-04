@@ -1,7 +1,4 @@
-/*
-In order to run these queries directly from databricks notebook you must replace double
-brackets (`{{` `}}`) for single ones.
-*/
+-- TO RUN ON DATABRICKS: replace double brackets ('{{', '}}') for single ones
 WITH segment AS (
   WITH last_updated_reservations AS (
     SELECT
@@ -69,9 +66,9 @@ WITH segment AS (
     agent_email,
     agent_manager,
     agent_company,
-    CASE 
+    CASE
         WHEN LOWER(agent_company)="atento" OR LOWER(agent_email) LIKE "%atento%" THEN "ATENTO"
-        ELSE NULL 
+        ELSE NULL
     END AS agent_organization,
     agent_name,
     queue_name,
@@ -324,7 +321,10 @@ back_tickets AS (
     zendesk_aditional_ticket_info zd
   JOIN
     conversation c
-      ON c.id_task = COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1))
+      ON c.id_task = COALESCE(
+        NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
+        REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)
+      )
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
       ON dc.department = zd.zendesk_ticket_department
@@ -334,7 +334,10 @@ back_tickets AS (
   WHERE
     (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
-    AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)) != ''
+    AND COALESCE(
+      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
+      REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)
+    ) != ''
   GROUP BY 1,2,3,4,5,6
 ),
 last_and_first_back_tickets_timestamps AS (
@@ -429,6 +432,10 @@ SELECT DISTINCT
   c.id_queue,
   zd.id_user,
   zd.id_contract,
+  CASE
+    WHEN c.direction = "outbound-api" THEN "call inapp"
+    ELSE CONCAT("call ", direction)
+  END AS ticket_origin,
   c.agent_email,
   c.agent_manager,
   c.agent_company,

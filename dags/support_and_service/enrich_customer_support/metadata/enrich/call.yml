@@ -95,6 +95,12 @@ columns:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
     description: The Zendesk Ticket respective contract.
+  ticket_origin:
+    description: It is the origin of the ticket.
+    categories:
+      inbound: The ticket is related to an inbound call.
+      outbound: The ticket is related to an outbound call.
+      call inapp: The ticket is related to a Call InApp interaction.
   agent_email:
     lineage:
       - datalake_bigfone_twilio.call_flex_events.agent_email

@@ -133,6 +133,7 @@ columns:
     description: It is the source channel of the chat ticket, which can be whatsapp or chat5A.
     lineage:
       - datalake_customer_support.chat.ticket_origin
+      - datalake_customer_support.call.ticket_origin
   csat_score:
     lineage:
       - datalake_customer_support.call.csat_rating

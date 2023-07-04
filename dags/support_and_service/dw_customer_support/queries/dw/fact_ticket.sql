@@ -21,7 +21,7 @@ WITH call_tickets AS (
     MAX(id_user) AS sk_user,
     id_contract AS sk_contract,
     'call' AS channel,
-    'N/A' AS ticket_origin,
+    ticket_origin,
     csat_rating AS csat_score,
     status,
     first_department,
