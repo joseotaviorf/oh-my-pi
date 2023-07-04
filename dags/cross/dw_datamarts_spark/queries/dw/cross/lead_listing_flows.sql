@@ -152,7 +152,7 @@ source_ops_rent AS (
         fact_house_listing_flows_adjust AS hlf
         LEFT JOIN
             photo_job AS pj
-                ON pj.sk_house_listing = hlf.sk_house_listing
+                ON LEFT(pj.sk_house_listing,9) = LEFT(hlf.sk_house_listing,9)
         LEFT JOIN
             dw_sale.fact_listing_flows AS ssf
                 ON hlf.sk_house_listing_flow = ssf.sk_house_listing_flow
@@ -304,7 +304,7 @@ source_ops_sale AS (
         sale_fact_listing_flows_adjust AS ssf
         LEFT JOIN
             photo_job AS pj
-                ON pj.sk_house_listing = ssf.sk_house_listing
+                ON LEFT(pj.sk_house_listing,9) = LEFT(ssf.sk_house_listing,9)
         LEFT JOIN
             dw_public.fact_house_listing_flows AS hlf
                 ON hlf.sk_house_listing_flow = ssf.sk_house_listing_flow
