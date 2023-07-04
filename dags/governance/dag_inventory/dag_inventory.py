@@ -106,9 +106,11 @@ def find_dag_configs(dag_bag: DagBag) -> dict:
 
 
 def find_tables_generated_by_dag(dag_bag: DagBag) -> dict:
+    start_tasks = ["create-cluster", "execute-job-cluster"]
+
     mapping = []
     for dag_name, dag in dag_bag.dags.items():
-        if "create-cluster" not in dag.task_ids:
+        if not any(task in dag.task_ids for task in start_tasks):
             continue
         for task in dag.tasks:
             if not hasattr(task, "json"):
