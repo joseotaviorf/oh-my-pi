@@ -50,7 +50,15 @@ LEFT JOIN
     AND hslc.is_last_ciq_on_listing = True
 LEFT JOIN
   datalake_rede_company.company_sks AS cs_supply
-    ON (h.id_company_hubspot IS NOT NULL
-    AND h.id_company_hubspot = cs_supply.id_hubspot)
-    OR (h.id_company_hubspot IS NULL
-    AND h.partner_3p_supply = cs_supply.extracted_3p_tag)
+    ON (
+      h.uuid_company IS NOT NULL
+      AND h.uuid_company = cs_supply.uuid_company
+    ) OR (
+      h.uuid_company IS NULL
+      AND h.id_company_hubspot IS NOT NULL
+      AND h.id_company_hubspot = cs_supply.id_hubspot
+    ) OR (
+      h.uuid_company IS NULL
+      AND h.id_company_hubspot IS NULL
+      AND h.partner_3p_supply = cs_supply.extracted_3p_tag
+    )
