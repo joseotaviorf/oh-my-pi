@@ -1539,6 +1539,7 @@ bietlejuice.enrich_money_laundering_prevention:
 - bietlejuice.enrich_booking:load-enrich-booking-review
 - bietlejuice.enrich_offer:load-enrich-offer
 bietlejuice.enrich_monopoly:
+- bietlejuice.monopoly:load-clean-outcome-reference
 - bietlejuice.monopoly:load-clean-outcome-status-log
 - bietlejuice.monopoly:load-clean-sale
 bietlejuice.enrich_nps_answer_drivers:
