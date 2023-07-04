@@ -1692,11 +1692,11 @@ bietlejuice.enrich_public_date:
 - bietlejuice.google_calendar:load-clean-brazillian-holidays
 - bietlejuice.google_calendar:load-clean-mexican-holidays
 bietlejuice.enrich_quinto_messenger:
+- bietlejuice.gsheets_support_and_service:done-clean-agents-control
 - bietlejuice.quinto_messenger:load-clean-channel
 - bietlejuice.quinto_messenger:load-clean-channel-event
 - bietlejuice.quinto_messenger:load-clean-task
 - bietlejuice.quinto_messenger:load-clean-task-event
-- bietlejuice.gsheets_support_and_service:done-clean-agents-control
 bietlejuice.enrich_recommendations:
 - bietlejuice.amplitude:170698-user-merge-raw-to-clean
 - bietlejuice.amplitude:events-raw-to-clean
@@ -2269,6 +2269,8 @@ bietlejuice.reverse_atento:
 - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
 - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
 - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
+bietlejuice.reverse_customer_journey:
+- bietlejuice.enrich_customer_journey:load-enrich-users
 bietlejuice.reverse_dashboard_governance:
 - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
 bietlejuice.reverse_listings_report_access:
