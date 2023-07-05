@@ -30,10 +30,10 @@ allow_date AS
 (
     SELECT
         so.id_offer,
-        so.sale_price_agreed * so.brokerage_fee AS brokerage_amount,
+        so.sale_price_agreed * CAST(so.brokerage_fee AS DECIMAL(5,4)) AS brokerage_amount,
         MIN(
             CASE
-                WHEN cf.cash_flow_amount >= so.sale_price_agreed * so.brokerage_fee THEN dt_created
+                WHEN cf.cash_flow_amount >= so.sale_price_agreed * CAST(so.brokerage_fee AS DECIMAL(5,4)) THEN dt_created
             ELSE NULL
             END
         ) AS dt_first_full_down_payment_event,
@@ -48,10 +48,10 @@ allow_date AS
 SELECT
     so.id_offer,
     ROUND(so.sale_price_agreed, 2) AS sale_price_agreed,
-    so.brokerage_fee,
-    so.sale_price_agreed * so.brokerage_fee AS brokerage_amount,
+    CAST(so.brokerage_fee AS DECIMAL(5,4)) AS brokerage_fee,
+    ad.brokerage_amount,
     cf_total.cash_flow_amount AS total_cash_flow_amount,
-    cf_total.cash_flow_amount - (so.sale_price_agreed * so.brokerage_fee) AS delta_total_cash_flow_to_broakerage_amount,
+    cf_total.cash_flow_amount - (ad.brokerage_amount) AS delta_total_cash_flow_to_broakerage_amount,
     cf.cash_flow_amount AS cash_flow_amount_when_payment_allowed,
     ad.dt_first_full_down_payment_event IS NOT NULL AS is_payment_allowed,
     DATE(so.dt_sale_agreement_signed) AS dt_sale_agreement_signed,
