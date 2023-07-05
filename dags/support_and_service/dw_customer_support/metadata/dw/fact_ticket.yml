@@ -117,6 +117,11 @@ columns:
       - datalake_customer_support.historical_call.id_contract
       - datalake_customer_support.historical_chat.id_contract
     description: Unique contract identifier.
+  sk_session:
+    lineage:
+      - datalake_customer_support.call.id_session
+      - datalake_customer_support.chat.id_session
+    description: Session ID from Sauron
   sk_main_session:
     lineage:
       - datalake_customer_resolution.customer_resolution_static.id_ticket
