@@ -63,6 +63,10 @@ columns:
       The id_conversation, or Twilio Conversation SID, is a unique identifier for a
       conversation session that can involve multiple communication channels and devices.
       This field is linked to the id_call field in Zendesk Ticket for reference purposes.
+  id_session:
+    lineage:
+      - datalake_sauron_clean.session
+    description: Session ID, only valid for Call InApp calls.
   id_agent:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.id_agent

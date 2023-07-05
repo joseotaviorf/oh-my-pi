@@ -419,6 +419,18 @@ conversation_and_segment AS (
     segment t
       ON t.sk_call = c.sk_call
       AND t.id_task = c.id_task
+),
+call_inapp_sessions AS (
+  SELECT
+    ss.id AS id_session,
+    bc.id_source_unique AS id_call
+  FROM
+    datalake_sauron_clean.session AS ss
+  INNER JOIN
+    datalake_bigfone_clean.call AS bc
+      ON ss.source_identity = bc.id_source_unique
+  WHERE
+    ss.source_environment = "CallInApp"
 )
 SELECT DISTINCT
   zd.id_ticket,
@@ -426,6 +438,7 @@ SELECT DISTINCT
   c.id_reservation AS id_segment,
   c.id_call,
   c.sk_call,
+  cs.id_session,
   c.id_agent,
   FIRST(c.id_agent) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local ASC) AS id_first_agent,
   FIRST(c.id_agent) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local DESC) AS id_last_agent,
@@ -510,10 +523,13 @@ SELECT DISTINCT
   c.ts_ended AS ts_ticket_ended
 FROM
   conversation_and_segment c
-JOIN
+LEFT JOIN
+  call_inapp_sessions AS cs
+    ON cs.id_call = c.id_call
+INNER JOIN
   zendesk_aditional_ticket_info zd
     ON zd.id_call = c.sk_call
-JOIN
+INNER JOIN
   zendesk_tickets_unique ztu
     ON zd.id_ticket = ztu.id_ticket
 LEFT JOIN
