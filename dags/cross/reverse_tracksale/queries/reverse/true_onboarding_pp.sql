@@ -68,10 +68,14 @@ owners AS (
 		datalake_ebdb_clean.contract_person cp
 			ON ac.sk_contract = cp.id_contract
 			AND cp.type in ('Proprietario')
+  LEFT JOIN
+    datalake_ebdb_clean.user AS u
+      ON cp.email = u.email
   LEFT JOIN 
     datalake_ebdb_clean.user_pro_owner AS po 
-      ON cp.id_user = po.id_user
-      AND po.is_active = true
+      ON (cp.id_user = po.id_user
+        OR u.id = po.id_user)
+      AND po.is_active = true 
 	WHERE
 		po.id_user IS NULL
 )

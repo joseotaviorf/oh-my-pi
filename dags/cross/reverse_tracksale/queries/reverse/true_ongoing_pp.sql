@@ -120,10 +120,14 @@ people_to_send AS (--Selected all people than can receive the nps survey
   INNER JOIN 
     contracts_to_send AS cs 
       ON cp.id_contract = cs.sk_contract
+  LEFT JOIN
+    datalake_ebdb_clean.user AS u
+      ON cp.email = u.email
   LEFT JOIN 
     datalake_ebdb_clean.user_pro_owner AS po 
-      ON cp.id_user = po.id_user
-      AND po.is_active = true	
+      ON (cp.id_user = po.id_user
+        OR u.id = po.id_user)
+      AND po.is_active = true 
   WHERE 
     cp.type IN ('Proprietario')
     AND po.is_active IS NULL

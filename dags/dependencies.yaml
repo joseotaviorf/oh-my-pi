@@ -2343,6 +2343,7 @@ bietlejuice.reverse_tracksale:
 - bietlejuice.dw_user:load-dw-public-dim-user
 - bietlejuice.ebdb:load-clean-contract-person
 - bietlejuice.ebdb:load-clean-house
+- bietlejuice.ebdb:load-clean-user
 - bietlejuice.ebdb:load-clean-user-pro-owner
 - bietlejuice.enrich_offboarding:load-enrich-contract-termination
 - bietlejuice.gsheets_support_and_service:done-clean-department-control
