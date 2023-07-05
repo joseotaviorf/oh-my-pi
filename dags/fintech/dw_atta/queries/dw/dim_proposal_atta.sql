@@ -29,7 +29,7 @@ SELECT
         WHEN 13 THEN 'Não Processado Banco'
     END AS proposal_situation,
     CASE
-        WHEN LIKE'QuintoAndar%' OR p.wallet = 'Casa Mineira' OR f.franchise_name LIKE '%5A%' THEN 'Canal 5A'
+        WHEN p.wallet LIKE'QuintoAndar%' OR p.wallet = 'Casa Mineira' OR f.franchise_name LIKE '%5A%' THEN 'Canal 5A'
         WHEN p.wallet = 'Other partnerships' AND pp.id_franchise > 0 AND pp.id_franchise NOT IN (1, 182) AND f.franchise_name NOT LIKE '%5A%' THEN 'Canal Franquia'
         WHEN p.wallet = 'Other partnerships' AND pp.id_franchise IN (1, 182) THEN 'Canal Jardins'
     END AS channel,

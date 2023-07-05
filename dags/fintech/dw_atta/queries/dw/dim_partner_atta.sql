@@ -8,4 +8,4 @@ SELECT DISTINCT
   ts_registration,
   ts_inactive_user,
   NOW()       AS ts_load
-FROM datalake_atta_clean.partner_info
+FROM datalake_atta.partner_info
