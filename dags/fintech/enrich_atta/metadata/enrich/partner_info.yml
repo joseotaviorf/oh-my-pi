@@ -1,0 +1,37 @@
+---
+database_name: datalake_atta
+table_name: partner_info
+description: Table containing the details from atta partners
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  id_partner:
+    lineage:
+      - datalake_atta_clean.partner_info.id_partner
+    description: "Partner's identification number"
+  id_admin_user:
+    lineage:
+      - datalake_atta_clean.partner_info.id_admin_user
+    description: "Admin user's identification number"
+  id_franchise:
+    lineage:
+      - datalake_atta_clean.partner_info.id_franchise
+    description: "Franchise's identification number"
+  id_registration_user:
+    lineage:
+      - datalake_atta_clean.partner_info.id_registration_user
+    description: "User's identification number"
+  partner_name:
+    lineage:
+      - datalake_atta_clean.partner_info.partner_name
+    description: "Partner's name"
+  wallet:
+    description: "Partnerships description"
+  ts_registration:
+    lineage:
+      - datalake_atta_clean.partner_info.ts_registration
+    description: "Registration timestamp"
+  ts_inactive_user:
+    lineage:
+      - datalake_atta_clean.partner_info.ts_inactive_user
+    description: "Timestamp when user became inactive"

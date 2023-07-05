@@ -40,6 +40,8 @@ columns:
         lineage:
             - datalake_atta_clean.proposal.send_backoffice
         description: "Send backoffice"
+    channel:
+        description: "Proposal channel grouping"
     house_value:
         description: "House value"
     house_value_bank_evaluation:
@@ -48,6 +50,12 @@ columns:
         description: "Down payment amount in BRL"
     financing_value:
         description: "Financing amouint in BRL"
+    total_financing_value:
+        description: "Total financing amount in BRL (Sum of financing value, itbi and bank evaluation fee)"
+    itbi_value:
+        description: "ITBI value in BRL"
+    bank_valuation_fee_value:
+        description: "Bank evaluation fee in BRL"
     is_automatic_proposal:
         description: "Flag to identify automatic or manual proposals"
     is_offer_canceled:

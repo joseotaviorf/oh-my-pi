@@ -5,6 +5,7 @@ SELECT
     proposal_status,
     situation_history,
     next_situation,
+    lead_time_situation_in_minutes,
     lead_time_situation_in_hour,
     lead_time_situation_in_day,
     lead_time_status_in_day,

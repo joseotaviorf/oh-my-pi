@@ -229,8 +229,7 @@ pre_analysis_proposal_flow AS (
                     LEFT JOIN
                         datalake_sales_flow_clean.negotiation AS neg ON ds.id_sales_flow = neg.id_sales_flow AND ds.ts_updated = neg.ts_updated
                     WHERE
-                        pr.id_product IN (1,11)
-                        OR pp.id_proposal IS NULL),
+                        pp.id_proposal IS NULL),
 
 ongoing_proposals AS (
                         SELECT
@@ -325,6 +324,10 @@ f.ts_last_updated,
 f.ts_filled_credit_form,
 NOW() AS ts_load
 FROM pre_analysis_proposal_flow f
-LEFT JOIN canceled_proposals cp ON cp.sk_pre_analysis = f.sk_pre_analysis AND cp.num_linha = 1
-LEFT JOIN ongoing_proposals op ON op.sk_pre_analysis = f.sk_pre_analysis AND op.num_linha = 1
+LEFT JOIN
+    canceled_proposals cp
+        ON cp.sk_pre_analysis = f.sk_pre_analysis AND cp.num_linha = 1
+LEFT JOIN
+    ongoing_proposals op
+        ON op.sk_pre_analysis = f.sk_pre_analysis AND op.num_linha = 1
 ORDER BY f.sk_pre_analysis DESC,f.sk_proposal_status

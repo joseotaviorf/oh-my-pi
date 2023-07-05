@@ -1,15 +1,10 @@
 SELECT DISTINCT
-  COALESCE(id_partner,-1) AS sk_partner,
-  COALESCE(id_admin_user,-1) AS sk_admin_user,
-  COALESCE(id_franchise,-1) AS sk_franchise,
-  COALESCE(id_registration_user,-1) AS sk_registration_user,
+  id_partner AS sk_partner,
+  id_admin_user AS sk_admin_user,
+  id_franchise AS sk_franchise,
+  id_registration_user AS sk_registration_user,
   partner_name,
-  CASE
-        WHEN REPLACE(LOWER(partner_name), ' ') LIKE '%5a>>atta%' OR LOWER(partner_name) LIKE 'carteira h%'  THEN 'QuintoAndar Full Atta'
-        WHEN REPLACE(LOWER(partner_name), ' ') LIKE '%5a%'          THEN 'QuintoAndar Backlog'
-        WHEN LOWER(partner_name) LIKE '%casa mineira%'              THEN 'Casa Mineira'
-        ELSE 'Other partnerships'
-  END AS wallet,
+  wallet,
   ts_registration,
   ts_inactive_user,
   NOW()       AS ts_load

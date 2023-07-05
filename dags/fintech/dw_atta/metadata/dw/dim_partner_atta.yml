@@ -6,33 +6,35 @@ owner: ae-finance-fintech@quintoandar.com.br
 columns:
   sk_partner:
     lineage:
-      - datalake_atta_clean.partner_info.id_partner
+      - datalake_atta.partner_info.id_partner
     description: "Partner's identification number"
   sk_admin_user:
     lineage:
-      - datalake_atta_clean.partner_info.id_admin_user
+      - datalake_atta.partner_info.id_admin_user
     description: "Admin user's identification number"
   sk_franchise:
     lineage:
-      - datalake_atta_clean.partner_info.id_franchise
+      - datalake_atta.partner_info.id_franchise
     description: "Franchise's identification number"
   sk_registration_user:
     lineage:
-      - datalake_atta_clean.partner_info.id_registration_user
+      - datalake_atta.partner_info.id_registration_user
     description: "User's identification number"
   partner_name:
     lineage:
-      - datalake_atta_clean.partner_info.partner_name
+      - datalake_atta.partner_info.partner_name
     description: "Partner's name"
   wallet:
+    lineage:
+      - datalake_atta.partner_info.wallet
     description: "Partnerships description"
   ts_registration:
     lineage:
-      - datalake_atta_clean.partner_info.ts_registration
+      - datalake_atta.partner_info.ts_registration
     description: "Registration timestamp"
   ts_inactive_user:
     lineage:
-      - datalake_atta_clean.partner_info.ts_inactive_user
+      - datalake_atta.partner_info.ts_inactive_user
     description: "Timestamp when user became inactive"
   ts_load:
     description: "Load date"

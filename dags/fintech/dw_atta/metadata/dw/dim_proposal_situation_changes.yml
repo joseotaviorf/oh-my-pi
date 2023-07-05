@@ -28,6 +28,10 @@ columns:
     lineage:
       - datalake_atta.proposal_situation_changes.next_situation
     description: "Next situation description"
+  lead_time_situation_in_minutes:
+    lineage:
+      - datalake_atta.proposal_situation_changes.lead_time_situation_in_minutes
+    description: "Situation leadtime in minutes"
   lead_time_situation_in_hour:
     lineage:
       - datalake_atta.proposal_situation_changes.lead_time_situation_in_hour

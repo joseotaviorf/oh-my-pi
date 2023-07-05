@@ -87,8 +87,8 @@ SELECT
     LEFT JOIN
         datalake_atta_clean.partner_info AS pc -- tabela com infos dos parceiros (5a,CM)
             ON pp.id_partner = pc.id_partner
-    WHERE
-        pp.id_product IN (1, 11) -- VERIFICAR SE MANTEM ESSE FILTRO
+
+
 ),
 last_situation AS (
   SELECT distinct
@@ -130,6 +130,7 @@ SELECT
   proposal_status,
   situation_history,
   next_situation,
+  DATEDIFF(MINUTE,ts_start_situation,ts_end_situation) AS lead_time_situation_in_minutes,
   DATEDIFF(HOUR,ts_start_situation,ts_end_situation) AS lead_time_situation_in_hour,
   DATEDIFF(DAY,ts_start_situation,ts_end_situation) AS lead_time_situation_in_day,
   DATEDIFF(DAY, date_trunc('day', min_ts_step),COALESCE(date_trunc('day',  max_ts_step),current_date)) AS lead_time_status_in_day,
@@ -146,6 +147,7 @@ SELECT
   proposal_status,
   last_situation as situation_history,
   NULL AS next_situation,
+  DATEDIFF(MINUTE,ts_end_situation,current_date) AS lead_time_situation_in_minutes,
   DATEDIFF(HOUR,ts_end_situation,current_date) AS lead_time_situation_in_hour,
   DATEDIFF(DAY,ts_end_situation,current_date) AS lead_time_situation_in_day,
   DATEDIFF(DAY, date_trunc('day', min_ts_step),COALESCE(date_trunc('day',  max_ts_step),current_date)) AS lead_time_status_in_day,

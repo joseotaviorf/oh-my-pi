@@ -30,6 +30,8 @@ columns:
     description: "Start current situation timestamp"
   ts_end_situation:
     description: "End current situation timestamp"
+  lead_time_situation_in_minutes:
+    description: "Situation leadtime in minutes"
   lead_time_situation_in_hour:
     description: "Situation leadtime in hours"
   lead_time_situation_in_day:
