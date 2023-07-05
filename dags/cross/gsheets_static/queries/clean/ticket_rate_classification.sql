@@ -1,0 +1,9 @@
+SELECT
+    macro_taxonomy,
+    micro_taxonomy,
+    journey,
+    sub_journey,
+    line_owner,
+    is_active
+FROM
+    datalake_gsheets_raw.ticket_rate_classification

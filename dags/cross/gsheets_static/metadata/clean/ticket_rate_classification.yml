@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: ticket_rate_classification
+columns:
+  macro_taxonomy:
+    lineage:
+      - datalake_gsheets_raw.ticket_rate_classification.macro_taxonomy
+  micro_taxonomy:
+    lineage:
+      - datalake_gsheets_raw.ticket_rate_classification.micro_taxonomy
+  journey:
+    lineage:
+      - datalake_gsheets_raw.ticket_rate_classification.journey
+  sub_journey:
+    lineage:
+      - datalake_gsheets_raw.ticket_rate_classification.sub_journey
+  line_owner:
+    lineage:
+      - datalake_gsheets_raw.ticket_rate_classification.line_owner
+  is_active:
+    lineage:
+      - datalake_gsheets_raw.ticket_rate_classification.is_active
