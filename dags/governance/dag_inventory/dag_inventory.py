@@ -52,6 +52,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ENV = os.environ.get("ENVIRONMENT")
 
 QUERY_PATH = DAGPackagesPathService.get_dag_path(SOURCE) + "/queries/raw/"
+INIT_CLUSTER_TASKS = ["create-cluster", "execute-job-cluster"]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -89,12 +90,23 @@ task_group = DatalakeTaskGroup(
 )
 
 
+def get_init_cluster_task(dag: DAG):
+    for task in INIT_CLUSTER_TASKS:
+        if task in dag.task_ids:
+            return task
+
+    return None
+
+
 def find_dag_configs(dag_bag: DagBag) -> dict:
     dag_configs = []
     for dag_name, dag in dag_bag.dags.items():
-        if "create-cluster" not in dag.task_ids:
+
+        init_cluster_task = get_init_cluster_task(dag)
+        if not init_cluster_task:
             continue
-        create_cluster = dag.get_task("create-cluster")
+
+        create_cluster = dag.get_task(init_cluster_task)
         dag_configs.append(
             {
                 "dag": dag_name,
@@ -106,11 +118,9 @@ def find_dag_configs(dag_bag: DagBag) -> dict:
 
 
 def find_tables_generated_by_dag(dag_bag: DagBag) -> dict:
-    start_tasks = ["create-cluster", "execute-job-cluster"]
-
     mapping = []
     for dag_name, dag in dag_bag.dags.items():
-        if not any(task in dag.task_ids for task in start_tasks):
+        if not any(task in dag.task_ids for task in INIT_CLUSTER_TASKS):
             continue
         for task in dag.tasks:
             if not hasattr(task, "json"):
