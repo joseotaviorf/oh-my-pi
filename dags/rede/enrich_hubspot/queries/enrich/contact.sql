@@ -2,6 +2,7 @@ SELECT
     id_contact,
     id_hubspot_owner,
     id_company,
+    company_associations,
     hs_analytics_first_touch_converting_campaign,
     hs_analytics_last_touch_converting_campaign,
     hs_analytics_source,

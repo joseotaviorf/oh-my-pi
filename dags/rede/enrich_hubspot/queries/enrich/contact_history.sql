@@ -2,6 +2,10 @@ SELECT
     id_contact::BIGINT,
     GET_JSON_OBJECT(properties, '$.hubspot_owner_id')::BIGINT AS id_hubspot_owner,
     GET_JSON_OBJECT(associations, '$.companies.results[0].id')::BIGINT AS id_company,
+    FROM_JSON(
+          GET_JSON_OBJECT(associations, '$.companies.results'),
+          'array<struct<id: string, type: string>>'
+    ) AS company_associations,
     NULLIF(GET_JSON_OBJECT(properties, '$.hs_analytics_first_touch_converting_campaign'), '') AS hs_analytics_first_touch_converting_campaign,
     NULLIF(GET_JSON_OBJECT(properties, '$.hs_analytics_last_touch_converting_campaign'), '') AS hs_analytics_last_touch_converting_campaign,
     NULLIF(GET_JSON_OBJECT(properties, '$.hs_analytics_source'), '') AS hs_analytics_source,

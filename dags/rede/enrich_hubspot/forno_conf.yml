@@ -3,7 +3,10 @@ inner_dependencies:
   call:
     - call_history
   company:
+    - company_contact
     - company_history
+  company_contact:
+    - contact
   company_status:
     - company
   communication:
@@ -43,6 +46,8 @@ tables:
     is_incremental: true
     partition_cols: ['year', 'month', 'day']
   company:
+    is_incremental: false
+  company_contact:
     is_incremental: false
   company_history:
     is_incremental: true

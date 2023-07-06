@@ -13,6 +13,11 @@ columns:
     lineage:
       - datalake_company_clean.company.uuid_company
     description: Unique identifier (UUID) of a company generated in the Company Database.
+  id_deciding_contact:
+    lineage:
+      - datalake_hubspot.company_contact.id_contact
+    description: ID of the deciding contact associated with the company. This is preferrably the owner/CEO,
+      then a partner/director, then a manager. If there is more than one, the first created is chosen.
   id_hubspot_owner:
     lineage:
       - datalake_hubspot.company_history.id_hubspot_owner

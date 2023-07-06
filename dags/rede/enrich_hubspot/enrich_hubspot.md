@@ -40,6 +40,7 @@ Produces the following output tables in `datalake_hubspot`:
 **Fully:**
 - `call_history`
 - `company`
+- `company_contact`
 - `company_status`
 - `communication_history`
 - `contact`

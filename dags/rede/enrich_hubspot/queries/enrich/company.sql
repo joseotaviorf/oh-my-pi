@@ -145,6 +145,7 @@ company_matches AS (
 SELECT
     ch.id_company,
     cm.uuid_company,
+    cc.id_contact AS id_deciding_contact,
     ch.id_hubspot_owner,
     ch.id_hubspot_team,
     ch.id_parent_company,
@@ -272,5 +273,9 @@ LEFT JOIN
 LEFT JOIN
     merged_companies AS mc
         ON ch.id_company = mc.id_merged_company
+LEFT JOIN
+    datalake_hubspot.company_contact AS cc
+        ON cc.id_company = ch.id_company
+        AND cc.contact_association_type = 'DECIDING_CONTACT'
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY ch.id_company ORDER BY ch.ts_updated DESC) = 1
