@@ -228,9 +228,7 @@ pre_analysis_proposal_flow AS (
                         doc_submission ds ON ds.id_firestore = COALESCE(cs.id_offer, pp.id_offer)
                     LEFT JOIN
                         datalake_sales_flow_clean.negotiation AS neg ON ds.id_sales_flow = neg.id_sales_flow AND ds.ts_updated = neg.ts_updated
-                    WHERE
-                        pr.id_product IN (1,11)
-                        OR pp.id_proposal IS NULL),
+                    ),
 
 ongoing_proposals AS (
                         SELECT
