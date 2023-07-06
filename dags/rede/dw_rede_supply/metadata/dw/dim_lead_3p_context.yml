@@ -20,6 +20,14 @@ columns:
       RECURRENT: 'Lead was captured and sent AFTER the first 30 days'
       COMPLEMENTARY: 'Lead was captured BEFORE the first batch, but sent AFTER the first 30 days'
       'N/A': 'Does not apply'
+  acquisition_team:
+    description: 'Acquisition team of the lead. It answers the question: was the lead published within the first 30 days of membership
+      of the company in that business context (HUNTING), or after that (FARMING)?'
+    categories:
+      HUNTING: Lead published within the first 30 days of membership of the company
+        in that business context.
+      FARMING: Lead published after the first 30 days of membership of the company
+        in that business context.
   is_for_sale:
     description: 'True if the lead flow is in the context of ForSale.'
   is_for_rent:
@@ -32,5 +40,9 @@ columns:
     description: 'True if the lead is complementary, i.e., captured BEFORE the first batch, but sent AFTER the first 30 days.'
   is_recurrent:
     description: 'True if the lead is recurrent, i.e., captured and sent AFTER the first 30 days.'
+  is_hunting:
+    description: 'True if the lead was published within the first 30 days of membership of the company in that business context.'
+  is_farming:
+    description: 'True if the lead was published after the first 30 days of membership of the company in that business context.'
   ts_load:
     description: 'Timestamp of when this table loaded last'

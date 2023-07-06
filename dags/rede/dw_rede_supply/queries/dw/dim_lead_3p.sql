@@ -19,6 +19,8 @@ SELECT
     COALESCE(C.extracted_3p_tag, 'Unknown') AS extracted_3p_tag,
     COALESCE(l.sale_recurrency_type, 'N/A') AS sale_recurrency_type,
     COALESCE(l.rent_recurrency_type, 'N/A') AS rent_recurrency_type,
+    COALESCE(la_sale.acquisition_team, 'N/A') AS sale_acquisition_team,
+    COALESCE(la_rent.acquisition_team, 'N/A') AS rent_acquisition_team,
     COALESCE(l.house_category, 'Unknown') AS house_category,
     COALESCE(l.house_type, 'Unknown') AS house_type, 
     COALESCE(l.house_subtype, 'Unknown') AS house_subtype, 
@@ -108,3 +110,11 @@ LEFT JOIN
 LEFT JOIN
     datalake_hubspot.company AS c
         ON c.id_company = COALESCE(l.id_company_hubspot, lsc_sale.id_company_hubspot, lsc_rent.id_company_hubspot)
+LEFT JOIN
+    datalake_rede_lead_acquisition.lead_3p_acquisition AS la_sale
+        ON la_sale.id_lead_3p = l.id
+        AND la_sale.business_context = 'SALE'
+LEFT JOIN
+    datalake_rede_lead_acquisition.lead_3p_acquisition AS la_rent
+        ON la_rent.id_lead_3p = l.id
+        AND la_rent.business_context = 'RENT'

@@ -98,6 +98,28 @@ columns:
         the first batch
       RECURRENT: The lead was captured after the first batch, and sent after the first
         30 days
+  sale_acquisition_team:
+    lineage:
+    - datalake_rede_lead_acquisition.lead_3p_acquisition.acquisition_team
+    description: 'Acquisition team of the lead, in the context of ForSale. It answers the question: was the lead published within
+      the first 30 days of membership of the company in that business context (HUNTING), or after that (FARMING)?'
+    categories:
+      HUNTING: Sale lead published within the first 30 days of membership of the company
+        in that business context.
+      FARMING: Sale lead published after the first 30 days of membership of the company
+        in that business context.
+      N/A: Not applicable. The lead was not published.
+  rent_acquisition_team:
+    lineage:
+    - datalake_rede_lead_acquisition.lead_3p_acquisition.acquisition_team
+    description: 'Acquisition team of the lead, in the context of ForRent. It answers the question: was the lead published within
+      the first 30 days of membership of the company in that business context (HUNTING), or after that (FARMING)?'
+    categories:
+      HUNTING: Rent lead published within the first 30 days of membership of the company
+        in that business context.
+      FARMING: Rent lead published after the first 30 days of membership of the company
+        in that business context.
+      N/A: Not applicable. The lead was not published.
   house_category:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.house_category

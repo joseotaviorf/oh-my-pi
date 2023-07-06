@@ -112,6 +112,11 @@ LEFT JOIN
         ON (lsc.id_company_hubspot IS NOT NULL AND csk.id_hubspot = lsc.id_company_hubspot)
         OR (lsc.id_company_hubspot IS NULL AND csk.extracted_3p_tag = COALESCE(NULLIF(l3p.cnpj, 'Não informado'), 'Unknown'))
 LEFT JOIN
+    datalake_rede_lead_acquisition.lead_3p_acquisition AS la
+        ON la.id_lead_3p = l3p.id
+        AND la.business_context = f.business_context
+LEFT JOIN
     dw_rede.dim_lead_3p_context AS dl3c
         ON f.business_context = dl3c.business_context
         AND IF(f.business_context = 'SALE', l3p.sale_recurrency_type, l3p.rent_recurrency_type) = dl3c.recurrency_type
+        AND dl3c.acquisition_team = COALESCE(la.acquisition_team, 'N/A')
