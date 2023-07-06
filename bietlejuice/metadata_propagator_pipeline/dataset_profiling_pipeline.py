@@ -30,7 +30,7 @@ class DatasetProfilingPipeline(MetadataPropagatorPipeline):
                 "database_name": self.database_name,
                 "table_name": self.table_name,
                 "quality_check_status": self.quality_check_status,
-                "last_quality_check": datetime.strftime(
+                "last_profiling_execution": datetime.strftime(
                     self.execution_date, "%Y-%m-%d"
                 ),
                 "profiling_dataset": self.profiling_dataset,
