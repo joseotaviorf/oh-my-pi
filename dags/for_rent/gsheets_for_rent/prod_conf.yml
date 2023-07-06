@@ -100,6 +100,12 @@ sheets_info:
     sheet_name: mexico_rental_cohort_supply
     clean_table_name: mexico_rental_cohort_supply
     sheet_context: for_rent
+  
+  mexico_supply_targets:
+    sheet_id: 1TjQeIaP021r4l71ldiIl7XtZkqBqo7C-2e1BJEby3n0
+    sheet_name: mexico_supply_targets
+    clean_table_name: mexico_supply_targets
+    sheet_context: for_rent
 
   ongoing_listings_targets:
     sheet_id: 16BHKdlbn4stT8q4bdoGJ_0Fo9i4Z_ibOFevsBR4lD5s
