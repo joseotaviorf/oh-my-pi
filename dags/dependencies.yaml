@@ -1836,6 +1836,9 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries
   - bietlejuice.enrich_owner_fees:load-enrich-contract
   - bietlejuice.enrich_owner_fees:load-enrich-contract-brokerage-fee
+  - bietlejuice.enrich_rental_guarantee:load-enrich-charge
+  - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
+  - bietlejuice.enrich_retsuko:load-enrich-entry
   - bietlejuice.fastforward:load-clean-anticipation
   - bietlejuice.fastforward:load-clean-contract
   - bietlejuice.fastforward:load-clean-long-term-anticipation
@@ -1843,6 +1846,7 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.fastforward:load-clean-lra-installment-option
   - bietlejuice.gsheets_fintech:done-clean-mova-lra-owners
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
+  - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-credit-card-payment
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
