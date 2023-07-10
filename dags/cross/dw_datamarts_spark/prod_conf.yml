@@ -66,9 +66,6 @@ dags:
   fintech:
     cluster_name: databricks_10_4_med_general_cluster
     owner: Data Fintech
-  fintech_cross:
-    cluster_name: databricks_10_4_med_general_cluster
-    owner: Data Fintech
   growth:
     owner: Data Growth
     cluster_name: databricks_10_4_max_memory_cluster
