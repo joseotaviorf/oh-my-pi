@@ -51,7 +51,7 @@ UNION ALL
           ROW_NUMBER() OVER (PARTITION BY c.id ORDER BY comp.ts_updated DESC) = 1
   )
 
-  SELECT
+  SELECT DISTINCT
       tc.id + 5000000 AS id_company,
       comp.trade_name AS company_name,
       a.public_area AS street,

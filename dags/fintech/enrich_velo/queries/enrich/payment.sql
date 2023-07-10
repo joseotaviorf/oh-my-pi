@@ -147,7 +147,7 @@ new_system AS (
             datalake_rental_guarantee_platform_clean.plan AS pl
                 ON cp.id_plan = pl.id
     )
-    SELECT
+    SELECT DISTINCT
         p.id AS id_payment,
         p.id_propose,
         pv.id_propose_values AS id_propose_values,
@@ -204,7 +204,7 @@ new_system AS (
         p.id >= 5000000
     UNION ALL
 
-    SELECT
+    SELECT DISTINCT
         (ap.id + 5000000) * -1 AS id_payment,
         d.id_propose,
         pv.id_propose_values AS id_propose_values,
