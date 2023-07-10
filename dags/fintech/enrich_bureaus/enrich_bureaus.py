@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -27,7 +27,6 @@ ENV = os.environ.get("ENVIRONMENT")
 
 
 config_service = ConfigurationService(DAG_NAME)
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
@@ -39,9 +38,7 @@ tables = config_service.get_config("tables")
 
 SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_memory_cluster", deserialize_json=True
-)
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -86,7 +83,6 @@ datalake_task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
     spark_jobs_path=SPARK_JOBS_PATH,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
 enrich_task_groups = {}

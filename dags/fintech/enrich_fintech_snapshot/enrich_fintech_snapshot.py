@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain
 from airflow.operators.python_operator import ShortCircuitOperator
 from airflow.operators.quintoandar_databricks import (
