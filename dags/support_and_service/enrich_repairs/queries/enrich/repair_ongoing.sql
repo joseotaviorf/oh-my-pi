@@ -149,11 +149,11 @@ repair_metrics AS (
     SELECT
         rcf.id_ticket,
         CASE
-            WHEN rcf.ts_solved_local IS NULL AND ww.dt_end_8 <= DATE(NOW()) THEN TRUE
+            WHEN rcf.ts_solved_local IS NULL AND ww.dt_end_8 <= DATE('{year}-{month}-{day}') THEN TRUE
             ELSE FALSE
         END AS is_oor,
         CASE
-            WHEN ww.dt_end_1 < DATE(NOW() + INTERVAL -1 DAY)
+            WHEN ww.dt_end_1 < (DATE('{year}-{month}-{day}') + INTERVAL -1 DAY)
                 AND rcf.ts_first_reply IS NULL
                 AND rcf.ts_solved_local IS NULL
                 THEN TRUE
@@ -163,21 +163,21 @@ repair_metrics AS (
             WHEN rcf.ts_first_reply > ww.dt_end_1
                 OR (
                     rcf.ts_first_reply IS NULL
-                    AND ww.dt_end_1 < DATE(NOW() + INTERVAL -1 DAY)
+                    AND ww.dt_end_1 < (DATE('{year}-{month}-{day}') + INTERVAL -1 DAY)
                 )
                 THEN TRUE
             ELSE FALSE
         END AS is_first_reply_generated_backlog,
         CASE
             WHEN rcf.ts_first_manual_fup_performed IS NULL
-                AND ww.dt_end_2 < DATE(NOW() + INTERVAL -1 DAY)
+                AND ww.dt_end_2 < (DATE('{year}-{month}-{day}') + INTERVAL -1 DAY)
                 AND rcf.ts_solved_local IS NULL
                 THEN TRUE
             ELSE FALSE
         END AS is_backlog_fup,
         CASE
             WHEN rcf.ts_provider_definition IS NULL
-                AND ww.dt_end_3 < DATE(NOW() + INTERVAL -1 DAY)
+                AND ww.dt_end_3 < (DATE('{year}-{month}-{day}') + INTERVAL -1 DAY)
                 AND rcf.ts_solved_local IS NULL
                 THEN TRUE
             ELSE FALSE
@@ -185,7 +185,7 @@ repair_metrics AS (
         CASE
             WHEN
                 (
-                    ww.dt_end_2 < DATE(NOW() + INTERVAL -1 DAY)
+                    ww.dt_end_2 < (DATE('{year}-{month}-{day}') + INTERVAL -1 DAY)
                     AND rcf.ts_solved_local IS NULL
                 ) OR (
                     DATE(rcf.ts_first_manual_fup_performed) > ww.dt_end_2
@@ -196,7 +196,7 @@ repair_metrics AS (
         CASE
             WHEN
                 (
-                    ww.dt_end_3 < DATE(NOW() + INTERVAL -1 DAY)
+                    ww.dt_end_3 < (DATE('{year}-{month}-{day}') + INTERVAL -1 DAY)
                     AND rcf.ts_solved_local IS NULL
                 ) OR (
                     DATE(rcf.ts_provider_definition) > ww.dt_end_3
@@ -323,7 +323,7 @@ SELECT
     rt.id_group,
     CASE
         WHEN u.email IS NULL
-            AND rm.dt_deadline < DATE(NOW() + INTERVAL -1 DAY)
+            AND rm.dt_deadline < (DATE('{year}-{month}-{day}') + INTERVAL -1 DAY)
             THEN 'Sem Atribuição'
         ELSE u.email
     END AS assignee_email,
@@ -365,28 +365,28 @@ SELECT
     CASE
         WHEN rcf.ts_first_reply > rm.dt_first_replay_deadline
             OR rcf.ts_first_reply IS NULL
-            AND rm.dt_deadline < DATE(NOW() + INTERVAL -1 DAY)
+            AND rm.dt_deadline < (DATE('{year}-{month}-{day}') + INTERVAL -1 DAY)
             THEN TRUE
         ELSE FALSE
     END AS is_oor_first_reply_day,
     CASE
         WHEN rt.ts_solved_local > rm.dt_first_replay_deadline
             OR rt.ts_solved_local IS NULL
-            AND rm.dt_deadline < DATE(NOW() + INTERVAL -1 DAY)
+            AND rm.dt_deadline < (DATE('{year}-{month}-{day}') + INTERVAL -1 DAY)
             THEN TRUE
         ELSE FALSE
     END AS is_oor_ticket_backlog_day,
     CASE
         WHEN DATEADD(DAY, 20, rt.ts_created_local) < rt.ts_solved_local
             AND rt.ts_solved_local IS NOT NULL THEN TRUE
-        WHEN DATEADD(DAY, 20, rt.ts_created_local) < DATE(NOW() + INTERVAL -1 DAY)
+        WHEN DATEADD(DAY, 20, rt.ts_created_local) < (DATE('{year}-{month}-{day}') + INTERVAL -1 DAY)
             AND rt.ts_solved_local IS NULL THEN TRUE
         ELSE FALSE
     END AS is_anomaly_20_days,
     CASE
         WHEN DATEADD(DAY, 30, rt.ts_created_local) < rt.ts_solved_local
             AND rt.ts_solved_local IS NOT NULL THEN TRUE
-        WHEN DATEADD(DAY, 30, rt.ts_created_local) < DATE(NOW() + INTERVAL -1 DAY)
+        WHEN DATEADD(DAY, 30, rt.ts_created_local) < (DATE('{year}-{month}-{day}') + INTERVAL -1 DAY)
             AND rt.ts_solved_local IS NULL THEN TRUE
         ELSE FALSE
     END AS is_anomaly_30_days,
@@ -417,11 +417,11 @@ SELECT
     rm.dt_limit_definition,
     DATEADD(DAY, 8 - DAYOFWEEK(rm.dt_deadline), rm.dt_deadline) AS dt_oor_ticket_week,
     CASE
-        WHEN DATEADD(DAY, 20, rt.ts_created_local) > DATE(NOW()) THEN NULL
+        WHEN DATEADD(DAY, 20, rt.ts_created_local) > DATE('{year}-{month}-{day}') THEN NULL
         ELSE DATEADD(DAY, 20, rt.ts_created_local)
     END AS dt_anomaly_20_days,
     CASE
-        WHEN DATEADD(DAY, 30, rt.ts_created_local) > DATE(NOW()) THEN NULL
+        WHEN DATEADD(DAY, 30, rt.ts_created_local) > DATE('{year}-{month}-{day}') THEN NULL
         ELSE DATEADD(DAY, 30, rt.ts_created_local)
     END AS dt_anomaly_30_days,
     c.dt_entered,
