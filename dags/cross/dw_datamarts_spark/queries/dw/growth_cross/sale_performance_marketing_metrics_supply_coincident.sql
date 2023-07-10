@@ -840,8 +840,8 @@ UNION ALL
         SUM(str.prospects) AS prospects_target,
         SUM(str.qualifieds) AS qualifieds_target,
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target,
-        SUM(CAST(0 AS FLOAT)) AS opportunities_target,
-        SUM(CAST(0 AS FLOAT)) AS first_listings_target,
+        SUM(str.opportunities) AS opportunities_target,
+        SUM(str.first_listings) AS first_listings_target,
         SUM(str.cost_per_source) AS budget
     FROM
         datalake_gsheets_clean.daily_target_supply_sale str

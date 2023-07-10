@@ -1349,8 +1349,8 @@ costs_targets_results_combined AS (
         SUM(str.prospects) AS prospects_target_sale,
         SUM(str.qualifieds) AS qualifieds_target_sale,
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_sale,
-        SUM(CAST(0 AS FLOAT)) AS opportunities_target_sale,
-        SUM(CAST(0 AS FLOAT)) AS first_listings_target_sale,
+        SUM(str.opportunities) AS opportunities_target_sale,
+        SUM(str.first_listings) AS first_listings_target_sale,
         SUM(str.cost_per_source) AS budget_sale,
         SUM(CAST(0 AS FLOAT)) AS prospects_target_rental,
         SUM(CAST(0 AS FLOAT)) AS qualifieds_target_rental,
@@ -1414,8 +1414,8 @@ costs_targets_results_combined AS (
         SUM(str.prospects) AS prospects_target_rental,
         SUM(str.qualifieds) AS qualifieds_target_rental,
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
-        SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
-        SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
+        SUM(str.opportunities) AS opportunities_target_rental,
+        SUM(str.first_listings) AS first_listings_target_rental,
         SUM(str.cost_per_source) AS budget_rental
     FROM
         datalake_gsheets_clean.daily_target_supply_rental str

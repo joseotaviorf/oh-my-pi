@@ -3,6 +3,8 @@ SELECT
     city_group,
     CAST(REPLACE(prospects,',','') AS FLOAT) AS prospects,
     CAST(REPLACE(qualifieds,',','') AS FLOAT) AS qualifieds,
+    IF(opportunities='',NULL,CAST(REPLACE(opportunities,',','') AS FLOAT)) AS opportunities,
+    IF(first_listings='',NULL,CAST(REPLACE(first_listings,',','') AS FLOAT)) AS first_listings,
     concat_cost,
     concat_prospects,
     concat_qualifieds,

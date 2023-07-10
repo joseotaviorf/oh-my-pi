@@ -750,8 +750,8 @@ affiliates AS (
         SUM(0::FLOAT) AS cost,
         SUM(str.prospects) AS prospects_target,
         SUM(str.qualifieds) AS qualifieds_target,
-        SUM(0::FLOAT) AS opportunities_target,
-        SUM(0::FLOAT) AS first_listings_target,
+        SUM(str.opportunities) AS opportunities_target,
+        SUM(str.first_listings) AS first_listings_target,
         SUM(str.cost_per_source) AS budget
     FROM
         datalake_gsheets_clean.daily_target_supply_rental str
