@@ -73,7 +73,7 @@ UNION ALL
         o.original_value AS due_amount_original,
         o.amount_paid AS paid_amount,
         o.is_valid,
-        FALSE AS is_legacy,
+        o.id > 15 AND o.id <= 5000000 AS is_legacy,
         o.dt_due,
         timestamp(o.dt_paid) AS ts_paid,
         o.ts_created
@@ -107,9 +107,9 @@ UNION ALL
                                     ELSE NULL
                                 END
             AND jk2.desc_master_type = 'Occurrence Status'
-    WHERE
-        o.id < 15
-        OR o.id >= 5000000
+    -- WHERE
+    --     o.id < 15
+    --     OR o.id >= 5000000
 )
 ORDER BY 1
 )
