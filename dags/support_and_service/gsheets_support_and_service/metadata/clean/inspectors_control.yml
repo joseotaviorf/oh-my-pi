@@ -2,74 +2,107 @@ database_name: datalake_gsheets_clean
 table_name: inspectors_control
 columns:
   sk_inspector:
+    description: Inspector's unique identifier
     lineage:
       - datalake_gsheets_raw.inspectors_control.sk_inspector
   agenda_type:
+    description: Schedule type
     lineage:
       - datalake_gsheets_raw.inspectors_control.agenda_type
   beneficiary_document:
+    description: Document of the beneficiary of the service provided
     lineage:
       - datalake_gsheets_raw.inspectors_control.beneficiary_document
   beneficiary_name:
+    description: Name of the beneficiary of the service provided
     lineage:
       - datalake_gsheets_raw.inspectors_control.beneficiary_name
   company:
+    description: Company that the inspector is linked to
     lineage:
       - datalake_gsheets_raw.inspectors_control.company
   employee_contract_type:
+    description: Inspector's employment contract type
+    categories:
+      Hauseful: ""
+      PJ - Variável: ""
+      PJ - Fixo: ""
+      PJ - Full: ""
+      Rede: ""
+      CLT: ""
     lineage:
       - datalake_gsheets_raw.inspectors_control.employee_contract_type
   inspector_address:
+    description: Inspector's address
     lineage:
       - datalake_gsheets_raw.inspectors_control.inspector_address
   inspector_cnpj:
+    description: If the inspector is a legal entity, indicate his CNPJ
     lineage:
       - datalake_gsheets_raw.inspectors_control.inspector_cnpj
   inspector_corporate_name:
+    description: Corporate name of the legal entity, if any
     lineage:
       - datalake_gsheets_raw.inspectors_control.inspector_corporate_name
   inspector_cpf:
+    description: Inspector's CPF number
     lineage:
       - datalake_gsheets_raw.inspectors_control.inspector_cpf
   inspector_name:
+    description: Inspector's full name
     lineage:
       - datalake_gsheets_raw.inspectors_control.inspector_name
   inspector_phone:
+    description: Inspector's phone number
     lineage:
       - datalake_gsheets_raw.inspectors_control.inspector_phone
   inspector_rg:
+    description: Inspector's RG number
     lineage:
       - datalake_gsheets_raw.inspectors_control.inspector_rg
   inspector_secondary_phone:
+    description: Inspector's secondary phone number
     lineage:
       - datalake_gsheets_raw.inspectors_control.inspector_secondary_phone
-  insperctor_email:
+  inspector_email:
+    description: Inspector's e-mail
     lineage:
       - datalake_gsheets_raw.inspectors_control.insperctor_email
   main_operating_region:
+    description: Inspector's main region of operation
     lineage:
       - datalake_gsheets_raw.inspectors_control.main_operating_region
   operating_city:
+    description: Inspector's city of operation
     lineage:
       - datalake_gsheets_raw.inspectors_control.operating_city
   operating_regions:
+    description: Inspector operating regions
     lineage:
       - datalake_gsheets_raw.inspectors_control.operating_regions
   registry_type:
+    description: Indicates whether the inspector registered as an individual or legal entity
     lineage:
       - datalake_gsheets_raw.inspectors_control.registry_type
   salary:
+    description: Inspector's salary range
     lineage:
       - datalake_gsheets_raw.inspectors_control.salary
   status:
+    description: Indicates whether the inspector is operating or not
     lineage:
       - datalake_gsheets_raw.inspectors_control.status
   transportation_type:
+    description: Inspector's transportation type
     lineage:
       - datalake_gsheets_raw.inspectors_control.transportation_type
   dt_start:
+    description: Contract start date
     lineage:
       - datalake_gsheets_raw.inspectors_control.dt_start
   dt_end:
+    description: Contract end date
     lineage:
       - datalake_gsheets_raw.inspectors_control.dt_end
+  ts_load:
+    description: Timestamp of when this table was loaded.

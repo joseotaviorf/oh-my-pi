@@ -3,36 +3,36 @@ table_name: inspectors_control
 columns:
   beneficiary_document:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   beneficiary_name:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   inspector_cpf:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   inspector_name:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   inspector_phone:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   inspector_rg:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   inspector_secondary_phone:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   insperctor_email:
     tags:
-    - Confidential
+      - Confidential
   sk_inspector:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential

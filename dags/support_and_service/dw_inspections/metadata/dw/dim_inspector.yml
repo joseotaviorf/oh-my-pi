@@ -18,7 +18,7 @@ columns:
   inspector_email:
     description: Inspector email address.
     lineage:
-      - datalake_gsheets_clean.inspectors_control.insperctor_email
+      - datalake_gsheets_clean.inspectors_control.inspector_email
   inspector_corporate_name:
     description: Name of the company the inspector is related to.
     lineage:
