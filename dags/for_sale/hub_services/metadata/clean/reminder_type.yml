@@ -1,0 +1,34 @@
+---
+database_name: datalake_hub_services_clean
+table_name: reminder_type
+owner: gustavo.miller@quintoandar.com.br
+domain: For Sale
+description: 'Types of reminders.'
+columns:
+  id:
+    lineage:
+    - datalake_hub_services_raw.reminder_type.id
+  name:
+    lineage:
+    - datalake_hub_services_raw.reminder_type.name
+  status:
+    lineage:
+    - datalake_hub_services_raw.reminder_type.status
+  version:
+    lineage:
+    - datalake_hub_services_raw.reminder_type.version
+  ts_created:
+    lineage:
+    - datalake_hub_services_raw.reminder_type.created_at
+  ts_updated:
+    lineage:
+    - datalake_hub_services_raw.reminder_type.updated_at
+  year:
+    lineage:
+    - datalake_hub_services_raw.reminder_type.year
+  month:
+    lineage:
+    - datalake_hub_services_raw.reminder_type.month
+  day:
+    lineage:
+    - datalake_hub_services_raw.reminder_type.day

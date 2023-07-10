@@ -1,0 +1,91 @@
+---
+database_name: datalake_hub_services_clean
+table_name: reminder_aud
+owner: gustavo.miller@quintoandar.com.br
+domain: For Sale
+description: 'Audit of reminders for agents in Hub Services'
+columns:
+  id:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.id
+  id_visitor:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.visitor_id
+  id_event:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.event_id
+  id_reminder_type:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.reminder_type_id
+  status:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.status
+  created_by:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.created_by
+  closed_by:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.closed_by
+  creation_method:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.creation_method
+  version:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.version
+  rev:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.rev
+  rev_end:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.revend
+  rev_type:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.revtype
+  mod_id_visitor:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.visitor_id_mod
+  mod_id_event:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.event_id_mod
+  mod_id_reminder_type:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.reminder_type_id_mod
+  mod_status:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.status_mod
+  mod_created_by:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.created_by_mod
+  mod_closed_by:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.closed_by_mod
+  mod_creation_method:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.creation_method_mod
+  mod_ts_reminder:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.date_mod
+  mod_ts_closed:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.closed_at_mod
+  ts_reminder:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.date
+  ts_created:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.created_at
+  ts_updated:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.updated_at
+  ts_closed:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.closed_at
+  year:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.year
+  month:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.month
+  day:
+    lineage:
+    - datalake_hub_services_raw.reminder_aud.day

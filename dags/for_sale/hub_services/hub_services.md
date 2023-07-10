@@ -59,6 +59,10 @@ Via **incremental load**:
     - `observation_aud`
     - `region`
     - `region_aud`
+    - `reminder`
+    - `reminder_aud`
+    - `reminder_type`
+    - `reminder_type_aud`
     - `responsible`
     - `responsible_aud`
     - `rev_info`

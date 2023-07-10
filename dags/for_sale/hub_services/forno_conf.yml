@@ -36,6 +36,18 @@ tables:
   - table_name: region_aud
     date_filter_column: created_at
     extraction_type: incremental
+  - table_name: reminder
+    date_filter_column: updated_at
+    extraction_type: incremental
+  - table_name: reminder_aud
+    date_filter_column: created_at
+    extraction_type: incremental
+  - table_name: reminder_type
+    date_filter_column: updated_at
+    extraction_type: incremental
+  - table_name: reminder_type_aud
+    date_filter_column: created_at
+    extraction_type: incremental
   - table_name: responsible
     date_filter_column: updated_at
     extraction_type: incremental

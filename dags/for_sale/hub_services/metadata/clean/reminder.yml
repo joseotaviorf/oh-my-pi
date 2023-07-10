@@ -1,0 +1,71 @@
+---
+database_name: datalake_hub_services_clean
+table_name: reminder
+owner: gustavo.miller@quintoandar.com.br
+domain: For Sale
+description: 'Reminders for agents in Hub Services'
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.id
+  id_visitor:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.visitor_id
+  id_event:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.event_id
+  id_reminder_type:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.reminder_type_id
+  status:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.status
+  created_by:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.created_by
+  closed_by:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.closed_by
+  creation_method:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.creation_method
+  version:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.version
+  ts_reminder:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.date
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.updated_at
+  ts_closed:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.closed_at
+  year:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.year
+  month:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.month
+  day:
+    description: ''
+    lineage:
+    - datalake_hub_services_raw.reminder.day

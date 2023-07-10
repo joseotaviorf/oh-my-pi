@@ -1,0 +1,49 @@
+---
+database_name: datalake_hub_services_clean
+table_name: reminder_type_aud
+owner: gustavo.miller@quintoandar.com.br
+domain: For Sale
+description: 'Audit of the types of reminders.'
+columns:
+  id:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.id
+  name:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.name
+  status:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.status
+  version:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.version
+  rev:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.rev
+  rev_end:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.revend
+  rev_type:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.revtype
+  mod_name:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.name_mod
+  mod_status:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.status_mod
+  ts_created:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.created_at
+  ts_updated:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.updated_at
+  year:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.year
+  month:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.month
+  day:
+    lineage:
+    - datalake_hub_services_raw.reminder_type_aud.day
