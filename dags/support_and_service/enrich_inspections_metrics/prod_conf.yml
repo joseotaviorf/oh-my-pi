@@ -5,6 +5,7 @@ dag_documentation:
 inner_dependencies: {}
 incremental_tables:
   - inspection_csat
+  - inspector_performance
 
 custom_cluster:
   driver_node_type_id: m5a.4xlarge
