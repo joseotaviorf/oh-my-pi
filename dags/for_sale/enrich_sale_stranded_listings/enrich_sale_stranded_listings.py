@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import pendulum
 import os
 
@@ -10,18 +10,14 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
+    DAGRunDateValidators,
+)
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-
-
-def check_valid_run_date(dag_execution_date, table_day):
-    lag_dag_execution_date = datetime.strptime(
-        dag_execution_date, "%Y-%m-%d"
-    ) + timedelta(days=1)
-    return lag_dag_execution_date.day in table_day
 
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -86,10 +82,10 @@ datalake_task_group = DatalakeTaskGroup(
 
 enrich_task_groups = {}
 inner_dependencies = {}
-execution_date = "{{ds}}"
 
 for table in tables:
     table_name = table["table_name"]
+    range_of_days_to_run = table["range_of_days_to_run"]
     is_incremental = table["is_incremental"]
     partition_cols = table.get("partitions")
 
@@ -99,16 +95,15 @@ for table in tables:
         table_name=table_name,
         is_incremental=is_incremental,
         partitions=partition_cols,
-        execution_date=execution_date,
+        execution_date="{{ ds }}",
     )
 
-    table_day = table["day_run"]
     skip_run_task = ShortCircuitOperator(
         task_id=f"check-day-to-skip-execution-{table_name}",
-        python_callable=check_valid_run_date,
-        op_kwargs={"dag_execution_date": execution_date, "table_day": table_day},
-        trigger_rule="none_failed",
+        python_callable=DAGRunDateValidators.check_is_in_range_of_days,
+        op_args=["{{ macros.ds_add(ds, 1) }}", range_of_days_to_run],
     )
+
     chain(
         create_cluster_task,
         skip_run_task,

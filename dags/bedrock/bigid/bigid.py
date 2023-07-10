@@ -11,17 +11,15 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
+    DAGRunDateValidators,
+)
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-
-
-def check_valid_run_date(dag_execution_date):
-    if datetime.strptime(dag_execution_date, "%Y-%m-%d").strftime("%A") == "Tuesday":
-        return True
 
 
 ENV = os.environ.get("ENVIRONMENT")
@@ -82,8 +80,8 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 
 skip_run_task = ShortCircuitOperator(
     task_id=f"check-day-to-skip-execution",
-    python_callable=check_valid_run_date,
-    op_kwargs={"dag_execution_date": "{{ ds }}"},
+    python_callable=DAGRunDateValidators.check_is_specific_weekday,
+    op_args=["{{ ds }}", 1],
 )
 
 task_group = DatalakeTaskGroup(

@@ -10,15 +10,13 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
+    DAGRunDateValidators,
+)
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
-
-
-def check_valid_run_date(dag_execution_date):
-    if datetime.strptime(dag_execution_date, "%Y-%m-%d").day == 14:
-        return True
 
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -64,8 +62,8 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 
 skip_run_task = ShortCircuitOperator(
     task_id=f"check-day-to-skip-execution",
-    python_callable=check_valid_run_date,
-    op_kwargs={"dag_execution_date": "{{ds}}"},
+    python_callable=DAGRunDateValidators.check_is_specific_day_of_month,
+    op_args=["{{ macros.ds_add(ds, 1) }}", 14],
 )
 
 datalake_task_group = DatalakeTaskGroup(

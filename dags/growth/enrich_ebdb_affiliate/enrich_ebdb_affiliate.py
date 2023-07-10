@@ -10,6 +10,9 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
+    DAGRunDateValidators,
+)
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -74,8 +77,8 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 
 skip_run_task = ShortCircuitOperator(
     task_id=f"check-day-to-skip-execution",
-    python_callable=(lambda ds: datetime.strptime(ds, "%Y-%m-%d").day == 1),
-    op_kwargs={"ds": "{{ ds }}"},
+    python_callable=DAGRunDateValidators.check_is_specific_day_of_month,
+    op_args=["{{ macros.ds_add(ds, 1) }}", 1],
 )
 
 datalake_task_group = DatalakeTaskGroup(

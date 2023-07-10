@@ -1,7 +1,6 @@
-from datetime import datetime, date
+from datetime import datetime
 import pendulum
 import os
-import pandas as pd
 
 from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
@@ -11,6 +10,9 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.operators.python_operator import ShortCircuitOperator
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
+    DAGRunDateValidators,
+)
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -18,17 +20,6 @@ from airflow.utils.helpers import chain
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-
-
-def get_last_business_friday():
-    bussiness_day = pd.date_range(date.today(), periods=1, freq="BM")
-    return bussiness_day[0]
-
-
-def check_valid_run_date(dag_execution_date):
-    return (
-        datetime.strptime(dag_execution_date, "%Y-%m-%d") == get_last_business_friday()
-    )
 
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -114,8 +105,8 @@ for table in tables:
 
 skip_run_task = ShortCircuitOperator(
     task_id=f"check-day-to-skip-execution",
-    python_callable=check_valid_run_date,
-    op_kwargs={"dag_execution_date": "{{ds}}"},
+    python_callable=DAGRunDateValidators.check_is_last_business_day_of_month,
+    op_args=["{{ ds }}"],
 )
 
 skip_group = {
