@@ -10,9 +10,13 @@ SELECT
     `status`,
     priority                    AS priority_status,
     situacao                    AS situation,
+    ArchiveReason               AS archive_reason,
+    ArchiveComplement           AS archive_complement,
     vlrentrada                  AS down_payment_amount,
     vlrfinanciado               AS financing_value,
     vlrimovel                   AS house_value,
+    Archived                    AS is_archived,
+    Archivedat                  AS ts_archived,
     TIMESTAMP(data_solicitacao) AS ts_registration
 FROM
     datalake_atta_raw.consulta_score

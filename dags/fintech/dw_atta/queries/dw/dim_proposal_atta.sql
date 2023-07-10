@@ -3,6 +3,7 @@ SELECT
     COALESCE(pr.id_product,-1) AS sk_product,
     COALESCE(pp.id_proposal_status,-1) AS sk_proposal_status,
     COALESCE(pp.id_proposal_situation,-1) AS sk_proposal_situation,
+    ppi.id_itau AS sk_proprosal_bank,
     pr.product_name,
     f.provider_name AS financing_bank,
     CASE
@@ -38,9 +39,9 @@ SELECT
     COALESCE(conf.bank_valuation_value, ppi.estimated_house_value) AS house_value_bank_evaluation,
     COALESCE(conf.down_payment_own_resources_value, ppi.down_payment_value, cs.house_value - pp.financing_value, cs.down_payment_amount) AS down_payment_amount,
     COALESCE(conf.financing_value, ppi.finance_value, pp.financing_value, cs.financing_value) AS financing_value,
-    (COALESCE(conf.financing_value, ppi.finance_value, pp.financing_value, cs.financing_value) + COALESCE(fpc.itbi_value, 0) + COALESCE(fpc.bank_valuation_fee_value, 0)) AS total_financing_value,
-    fpc.itbi_value,
-    fpc.bank_valuation_fee_value,
+    (COALESCE(conf.financing_value, ppi.finance_value, pp.financing_value, cs.financing_value) + COALESCE(conf.itbi_value, 0) + COALESCE(conf.bank_valuation_fee_value, 0)) AS total_financing_value,
+    conf.itbi_value,
+    conf.bank_valuation_fee_value,
     CASE
         WHEN pp.created_by = 30001 THEN TRUE ELSE FALSE
     END AS is_automatic_proposal,
@@ -79,9 +80,6 @@ LEFT JOIN
 LEFT JOIN
     dw_sale.dim_sale_agreement AS dsa
         ON COALESCE(cs.id_offer, pp.id_offer) = dsa.sk_offer
-LEFT JOIN
-    datalake_atta_clean.financing_proposal_check AS fpc
-        ON pp.id_proposal_product = fpc.id_proposal_product
 LEFT JOIN
     datalake_atta.partner_info AS p
         ON pp.id_partner = p.id_partner

@@ -3,6 +3,7 @@ SELECT
     id_cliente AS id_client,
     IDParceiro AS id_partner,
     IDFranquia AS id_franchise,
+    id_itau,
     status_processo_obs AS financing_proposal_status_details,
     status_envio AS send_status,
     a_preco_estimado_imovel AS estimated_house_value,

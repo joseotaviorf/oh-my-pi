@@ -1,6 +1,6 @@
 database_name: dw_atta
 table_name: dim_proposal_atta
-description: dimension with the details from atta partners
+description: dimension with the details from atta proposals
 domain: Fintech
 owner: ae-finance-fintech@quintoandar.com.br
 columns:
@@ -20,6 +20,10 @@ columns:
         lineage:
             - datalake_atta_clean.proposal.id_proposal_situation
         description: "Proposal situation identification number"
+    sk_proprosal_bank:
+        lineage:
+            - datalake_atta_clean.financing_proposal.id_itau
+        description: "Proposal ID in related bank"
     product_name:
         lineage:
             - datalake_atta_clean.product_info.product_name
@@ -43,18 +47,33 @@ columns:
     channel:
         description: "Proposal channel grouping"
     house_value:
+        lineage:
+            - datalake_atta_clean.financing_proposal_check.house_sale_value
+            - datalake_atta_clean.pre_analysis.house_value
         description: "House value"
     house_value_bank_evaluation:
+        lineage:
+            - datalake_atta_clean.financing_proposal_check.bank_valuation_value
+            - datalake_atta_clean.financing_proposal.estimated_house_value
         description: "House value according to bank evaluation"
     down_payment_amount:
         description: "Down payment amount in BRL"
     financing_value:
+        lineage:
+            - datalake_atta_clean.financing_proposal_check.financing_value
+            - datalake_atta_clean.financing_proposal.finance_value
+            - datalake_atta_clean.proposal.financing_value
+            - datalake_atta_clean.pre_analysis.financing_value
         description: "Financing amouint in BRL"
     total_financing_value:
         description: "Total financing amount in BRL (Sum of financing value, itbi and bank evaluation fee)"
     itbi_value:
+        lineage:
+            - datalake_atta_clean.financing_proposal_check.itbi_value
         description: "ITBI value in BRL"
     bank_valuation_fee_value:
+        lineage:
+            - datalake_atta_clean.financing_proposal_check.bank_valuation_fee_value
         description: "Bank evaluation fee in BRL"
     is_automatic_proposal:
         description: "Flag to identify automatic or manual proposals"

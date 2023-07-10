@@ -35,6 +35,12 @@ columns:
   situation:
     lineage:
       - datalake_atta_raw.consulta_score.situacao
+  archive_reason:
+    lineage:
+      - datalake_atta_raw.consulta_score.ArchiveReason
+  archive_complement:
+    lineage:
+      - datalake_atta_raw.consulta_score.ArchiveComplement
   donw_payment_amount:
     lineage:
       - datalake_atta_raw.consulta_score.vlrentrada
@@ -44,6 +50,12 @@ columns:
   house_value:
     lineage:
       - datalake_atta_raw.consulta_score.vlrimovel
+  is_archived:
+    lineage:
+      - datalake_atta_raw.consulta_score.archived
+  ts_archived:
+    lineage:
+      - datalake_atta_raw.consulta_score.archivedat
   ts_registration:
     lineage:
       - datalake_atta_raw.consulta_score.data_solicitacao

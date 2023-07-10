@@ -14,6 +14,9 @@ columns:
   id_franchise:
     lineage:
       - datalake_atta_raw.proposta_itau.idfranquia
+  id_itau:
+    lineage:
+      - datalake_atta_raw.proposta_itau.id_itau
   financing_proposal_status_details:
     lineage:
       - datalake_atta_raw.proposta_itau.status_processo_obs

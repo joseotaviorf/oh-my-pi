@@ -11,3 +11,12 @@ columns:
   client_cpf:
     lineage:
       - datalake_atta_raw.cliente.nr_cpf
+  client_email:
+    lineage:
+      - datalake_atta_raw.cliente.nm_email
+  client_cellphone:
+    lineage:
+      - datalake_atta_raw.cliente.nr_celular
+  client_phone:
+    lineage:
+      - datalake_atta_raw.cliente.nr_telefone
