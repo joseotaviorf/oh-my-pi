@@ -4,64 +4,43 @@ description: Rental guarantees
 domain: Fintech
 owner: ae-finance-fintech@quintoandar.com.br
 columns:
-  sk_rental_guarantee:
+  sk_contract:
+    description: "Contract identification number"
+    lineage:
+    - datalake_revenue_lines.rental_guarantee.id_contract
+  sk_guarantee:
+    description: "Guarantee identification number"
     lineage:
     - datalake_revenue_lines.rental_guarantee.id_guarantee
-    description: Key of guarantee transaction
-  id_contract_ebdb:
+  sk_proposal:
+    description: "Proposal identification number"
     lineage:
-    - datalake_revenue_lines.rental_guarantee.id_contract_ebdb
-    description: Id of the contract in main
-  id_charge:
-    lineage:
-    - datalake_revenue_lines.rental_guarantee.id_charge
-    description: Charge ID
-  guarantee_status:
-    lineage:
-    - datalake_revenue_lines.rental_guarantee.guarantee_status
-    description: Status of the guarantee
-    categories:
-      ACTIVE: ''
-      CANCELED: ''
-      CREATED: ''
-      ENDED: ''
-      WAITING_REFUND: ''
-  charge_status:
-    lineage:
-    - datalake_revenue_lines.rental_guarantee.charge_status
-    description:  Only CAPTURE charges (valid ones) are here because it's a revenue model. 
-    categories:
-      CAPTURED: ''
-  charge_type:
-    lineage:
-    - datalake_revenue_lines.rental_guarantee.charge_type
-    description: How charge was paid
-    categories:
-      BILL: ''
-      CREDIT_CARD: ''
-      PIX: ''
-  total_installments:
-    lineage:
-    - datalake_revenue_lines.rental_guarantee.total_installments
-    description: Number of installments that the guarantee value was divided
-  monthly_revenue:
-    lineage:
-    - datalake_revenue_lines.rental_guarantee.monthly_revenue
-    description: Monthly calculated revenue
+    - datalake_revenue_lines.rental_guarantee.id_proposal
   accrual_year_month:
+    description: "String with Year number and Month number 'yyyymm' related to the entry date."
     lineage:
     - datalake_revenue_lines.rental_guarantee.accrual_year_month
-    description: Reference year-month
-  contract_status:
+  number_payments:
+    description: "Total amount of payments"
     lineage:
-    - datalake_revenue_lines.rental_guarantee.contract_status
-    description: Contract Status
-    categories:
-      ATIVO: ''
-      FINALIZADO: ''
+    - datalake_revenue_lines.rental_guarantee.number_payments
+  origin_fact:
+    description: "Payment origin"
+    lineage:
+    - datalake_revenue_lines.rental_guarantee.origin_fact
+  raw_payment_amount:
+    description: "Total amount of payment"
+    lineage:
+    - datalake_revenue_lines.rental_guarantee.raw_payment_amount
+  revenue_qa:
+    description: "Revenue total"
+    lineage:
+    - datalake_revenue_lines.rental_guarantee.revenue_qa
+  guarantee_type:
+    description: "Type of the guarantee"
+    lineage:
+    - datalake_revenue_lines.rental_guarantee.guarantee_type
   ts_guarantee_created:
+    description: "Timestamp of the guarantee created date"
     lineage:
     - datalake_revenue_lines.rental_guarantee.ts_guarantee_created
-    description: Timestamp of guarantee created
-  ts_load:
-    description: Load timestamp

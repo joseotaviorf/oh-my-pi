@@ -599,13 +599,14 @@ bietlejuice.dw_retsuko:
   - bietlejuice.enrich_retsuko:load-enrich-bill-items
   - bietlejuice.enrich_retsuko:load-enrich-retsuko-junk
 bietlejuice.dw_revenue_lines:
-  - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-finance
-  - bietlejuice.enrich_revenue_lines:load-enrich-credit-card-payment
-  - bietlejuice.enrich_revenue_lines:load-enrich-late-payments
-  - bietlejuice.enrich_revenue_lines:load-enrich-long-term-rental-anticipation
-  - bietlejuice.enrich_revenue_lines:load-enrich-month-rental-anticipation
-  - bietlejuice.enrich_revenue_lines:load-enrich-rental-guarantee
-  - bietlejuice.enrich_revenue_lines:load-enrich-reservation
+- bietlejuice.enrich_revenue_lines:load-enrich-brokerage-finance
+- bietlejuice.enrich_revenue_lines:load-enrich-credit-card-payment
+- bietlejuice.enrich_revenue_lines:load-enrich-fire-insurance
+- bietlejuice.enrich_revenue_lines:load-enrich-late-payments
+- bietlejuice.enrich_revenue_lines:load-enrich-long-term-rental-anticipation
+- bietlejuice.enrich_revenue_lines:load-enrich-month-rental-anticipation
+- bietlejuice.enrich_revenue_lines:load-enrich-rental-guarantee
+- bietlejuice.enrich_revenue_lines:load-enrich-reservation
 bietlejuice.dw_sale_available_booking_hours:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.enrich_sale_available_booking_hours:load-enrich-weekly-available-booking-hours
