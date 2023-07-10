@@ -28,6 +28,10 @@ Via **incremental load**:
     - `observation_aud`
     - `region`
     - `region_aud`
+    - `reminder`
+    - `reminder_aud`
+    - `reminder_type`
+    - `reminder_type_aud`
     - `responsible`
     - `responsible_aud`
     - `revinfo`
@@ -35,6 +39,10 @@ Via **incremental load**:
     - `users_aud`
     - `visitor`
     - `visitor_aud`
+    - `visitor_event`
+    - `visitor_event_aud`
+    - `visitor_prospection`
+    - `visitor_prospection_aud`
 
 This pipeline produces, in datalake_hub_services_clean:
 
@@ -58,5 +66,9 @@ Via **incremental load**:
     - `users_aud`
     - `visitor`
     - `visitor_aud`
+    - `visitor_event`
+    - `visitor_event_aud`
+    - `visitor_prospection`
+    - `visitor_prospection_aud`
 
 </details>

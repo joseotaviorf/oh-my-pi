@@ -1,0 +1,58 @@
+---
+database_name: datalake_hub_services_clean
+table_name: visitor_event
+owner: gustavo.miller@quintoandar.com.br
+domain: For Sale
+description: Every event associated with a visit in Hub Services, like visit scheduled, canceled, done, or waiting confirmation.
+columns:
+  id:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.id
+  id_visitor:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.visitor_id
+  id_house:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.house_id
+  id_region:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.region_id
+  id_user:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.user_id
+  id_idempotency:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.idempotency_id
+  domain_name:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.domain_name
+  event_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.event_type
+  event_code:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.event_code
+  metadata:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.metadata
+  version:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.version
+  ts_event:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.event_date
+  ts_created:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.created_at
+  ts_updated:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.updated_at
+  year:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.year
+  month:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.month
+  day:
+    lineage:
+    - datalake_hub_services_raw.visitor_event.day

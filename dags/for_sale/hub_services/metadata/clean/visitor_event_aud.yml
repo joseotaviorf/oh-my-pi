@@ -1,0 +1,97 @@
+---
+database_name: datalake_hub_services_clean
+table_name: visitor_event_aud
+owner: gustavo.miller@quintoandar.com.br
+domain: For Sale
+description: Audit of every event associated with a visit in Hub Services, like visit scheduled, canceled, done, or waiting confirmation.
+columns:
+  id:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.id
+  id_visitor:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.visitor_id
+  id_house:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.house_id
+  id_region:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.region_id
+  id_user:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.user_id
+  id_idempotency:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.idempotency_id
+  domain_name:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.domain_name
+  event_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.event_type
+  event_code:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.event_code
+  metadata:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.metadata
+  version:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.version
+  rev:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.rev
+  rev_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.revtype
+  rev_end:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.revend
+  mod_id_visitor:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.visitor_id_mod
+  mod_id_house:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.house_id_mod
+  mod_id_region:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.region_id_mod
+  mod_id_user:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.user_id_mod
+  mod_id_idempotency:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.idempotency_id_mod
+  mod_domain_name:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.domain_name_mod
+  mod_event_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.event_type_mod
+  mod_event_code:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.event_code_mod
+  mod_metadata:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.metadata_mod
+  mod_ts_event:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.event_date_mod
+  ts_event:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.event_date
+  ts_created:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.created_at
+  ts_updated:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.updated_at
+  year:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.year
+  month:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.month
+  day:
+    lineage:
+    - datalake_hub_services_raw.visitor_event_aud.day

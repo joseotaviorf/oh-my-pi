@@ -1,0 +1,64 @@
+---
+database_name: datalake_hub_services_clean
+table_name: visitor_prospection
+owner: gustavo.miller@quintoandar.com.br
+domain: For Sale
+description: Visitor prospection process in Hub Services.
+columns:
+  id:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.id
+  id_visitor:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.visitor_id
+  id_responsible:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.responsible_id
+  id_reminder:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.reminder_id
+  id_reminder_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.reminder_type_id
+  priority_lead_status:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.priority_lead_status
+  priority_lead_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.priority_lead_type
+  reminder_type_name:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.reminder_type_name
+  reminder_status:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.reminder_status
+  reminder_creation_method:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.reminder_creation_method
+  reminder_event_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.reminder_event_type
+  sorting_order:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.sorting_order
+  version:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.version
+  ts_reminder:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.reminder_date
+  ts_created:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.created_at
+  ts_updated:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.updated_at
+  year:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.year
+  month:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.month
+  day:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection.day

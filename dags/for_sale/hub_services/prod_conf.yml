@@ -59,4 +59,16 @@ tables:
   - table_name: visitor_aud
     date_filter_column: created_at
     extraction_type: incremental
+  - table_name: visitor_event
+    date_filter_column: updated_at
+    extraction_type: incremental
+  - table_name: visitor_event_aud
+    date_filter_column: created_at
+    extraction_type: incremental
+  - table_name: visitor_prospection
+    date_filter_column: updated_at
+    extraction_type: incremental
+  - table_name: visitor_prospection_aud
+    date_filter_column: created_at
+    extraction_type: incremental
 partition_cols: ["year", "month", "day"]

@@ -1,0 +1,109 @@
+---
+database_name: datalake_hub_services_clean
+table_name: visitor_prospection_aud
+owner: gustavo.miller@quintoandar.com.br
+domain: For Sale
+description: Visitor prospection process in Hub Services.
+columns:
+  id:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.id
+  id_visitor:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.visitor_id
+  id_responsible:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.responsible_id
+  id_reminder:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_id
+  id_reminder_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_id
+  priority_lead_status:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_status
+  priority_lead_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_type
+  reminder_type_name:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_name
+  reminder_status:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_status
+  reminder_creation_method:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_creation_method
+  reminder_event_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_event_type
+  sorting_order:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.sorting_order
+  version:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.version
+  rev:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.rev
+  rev_end:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.revend
+  rev_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.revtype
+  mod_visitor_id:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.visitor_id_mod
+  mod_responsible_id:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.responsible_id_mod
+  mod_reminder_id:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_id_mod
+  mod_reminder_type_id:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_id_mod
+  mod_priority_lead_status:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_status_mod
+  mod_priority_lead_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_type_mod
+  mod_reminder_type_name:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_name_mod
+  mod_reminder_status:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_status_mod
+  mod_reminder_creation_method:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_creation_method_mod
+  mod_reminder_event_type:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_event_type_mod
+  mod_sorting_order:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.sorting_order_mod
+  mod_reminder_date:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_date_mod
+  ts_reminder:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.reminder_date
+  ts_created:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.created_at
+  ts_updated:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.updated_at
+  year:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.year
+  month:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.month
+  day:
+    lineage:
+    - datalake_hub_services_raw.visitor_prospection_aud.day
