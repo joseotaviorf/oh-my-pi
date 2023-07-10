@@ -1,0 +1,436 @@
+---
+database_name: datalake_tenant_journey
+table_name: tenant_journey_step
+description:
+  Tenant journey step daily snapshot. The respective table is a comprehensive record
+  of customer journey steps, which is designed to categorize the progress of customers
+  as they engage with the rental context.
+  Each row in the table represents a specific customer and their journey
+  through various stages or actions.
+  The primary purpose of this table is to capture and organize important milestones
+  and interactions that customers go through during their experience with the rental
+  context. It provides a snapshot view of the different steps involved in the
+  customer journey.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_snapshot:
+    description: The snapshot id, which is the D-1 date in the format "yyyyMMdd"
+  id_client:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_user
+      - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+    description:
+      The client id, which is the user id that has searched a house in the amplitude
+      events or the tenant prospect id that has an event in the rent demand funnel
+  tenant_journey_step:
+    description:
+      The tenant journey step, respecting how deep the customer is on their
+      rental journey
+    categories:
+      Offboarding:
+        Indicates if the client is currently in the offboarding step in
+        the rental context
+      Ongoing:
+        Indicates if the client is in the ongoing step but not in the offboarding step
+        in the rental context
+      Onboarding:
+        Indicates if the client is in the onboarding step but not in the offboarding
+        or ongoing steps in the rental context
+      Contract to Entrance:
+        Indicates if the client is in the contract to entrance step but not in the
+        onboarding, ongoing, or offboarding steps in the rental context
+      Visits to Offer:
+        Indicates if the client is in the visits to offer step but not in the contract
+        to entrance, onboarding, ongoing, or offboarding steps in the rental context
+      Listing and Search:
+        Indicates if the client is in the listing and search step but not in the visits
+        to offer, contract to entrance, onboarding, ongoing, or offboarding steps in the
+        rental context
+      Default:
+        Indicates if the client is not currently active in any of the journey steps
+        in the rental context
+  tenant_persona_step:
+    description:
+      Indicates if the user is in any step before signing a contract or after signing a
+      contract. If the user is in the post_contract step,it will not assume the
+      pre_contract step
+    categories:
+      Pre_Contract:
+        If the user has taken any step in contract to entrance, visits to offer, or
+        listing and search, it signifies that the user is in a pre-contract step
+      Post_Contract:
+        If the user has taken any step in offboarding, ongoing, or onboarding, it
+        indicates that the user is in a post-contract step
+      Not_Apply: If the user is not in the pre or post contract steps
+  total_days_since_last_house_searching:
+    description:
+      By considering the user's most recent search event for rental houses, this
+      calculation determines the total number of days that have elapsed since the
+      last house search, with the snapshot date serving as the reference point
+  total_days_since_last_booking:
+    description:
+      This calculation considers the user's most recent booking event for rental houses
+      and determines the total number of days that have passed since this event,
+      using the snapshot date as the reference point. It considers only events type
+      equal to 1, indicating that a booking had been created
+  total_days_since_last_reservation_created:
+    description:
+      This calculation determines the total number of days that have passed since the
+      user's last house reservation, taking into account only events with type 4,
+      which indicates that the house offer has been accepted. The calculation is
+      based on the snapshot date as the reference point.
+  total_days_since_last_canceled_booking:
+    description:
+      This calculation focuses specifically on canceled bookings and determines the
+      total number of days that have passed since the user's most recent canceled
+      booking. It takes into account only events with a type equal to 1, which
+      indicates the creation of a booking. The snapshot date is used as the
+      reference point for this calculation
+  total_days_since_last_visiting:
+    description:
+      This calculation focuses exclusively on completed bookings and determines the
+      total number of days that have elapsed since the user's most recent completed
+      booking. It considers only events with a type equal to 2, which signifies that
+      a booking has been successfully completed. The snapshot date serves as the
+      reference point for this calculation
+  total_days_since_last_offer_sending:
+    description:
+      This calculation takes into account all the offers sent by the client and
+      determines the total number of days that have passed since the user's last
+      sent offer. It specifically considers events with a type equal to 3, which
+      indicates that an offer has been sent. The snapshot date is used as the
+      reference point for this calculation
+  total_days_since_last_offer_rejected:
+    description:
+      This calculation considers all the offers sent by the user, focusing specifically
+      on the offers that have been rejected. It determines the total number of days
+      that have elapsed since the last rejected offer. The calculation takes into
+      account only events with a type equal to 3, indicating that an offer has been
+      sent. The snapshot date serves as the reference point for this calculation
+  total_days_since_last_offer_approval:
+    description:
+      This calculation takes into consideration all the offers that have been approved
+      for the user. It determines the total number of days that have passed since the
+      user's most recent approved offer. The calculation specifically considers events
+      with a type equal to 4, which indicates that the offer has been approved. The
+      snapshot date is used as the reference point for this calculation
+  total_days_since_last_evaluation_start:
+    description:
+      This calculation takes into consideration the most recent evaluation started for
+      a user's proposal. It determines the total number of days that have elapsed since
+      the start of the evaluation. The calculation specifically focuses on events with
+      a type equal to 5, which indicates that the proposal underwent an evaluation.
+      The snapshot date serves as the reference point for this calculation.
+  total_days_since_last_evaluation_approval:
+    description:
+      This calculation focuses on the most recent evaluation that has been approved for
+      a user's proposal. It determines the total number of days that have passed since
+      the last approved evaluation. The calculation specifically considers events of
+      type 6, indicating that the proposal underwent an approved evaluation. The
+      snapshot date serves as the reference point for this calculation
+  total_days_since_last_doc_sending:
+    description:
+      This calculation focuses on the most recent document sending for a user's proposal.
+      It calculates the total number of days that have elapsed since the last document
+      was sent. The calculation specifically considers events of type 7, which indicate
+      that the proposal had a document sent. The snapshot date is used as the reference
+      point for this calculation
+  total_days_since_last_credit_approval:
+    description:
+      This calculation focuses on the most recent credit approval for the user's proposal.
+      It determines the total number of days that have passed since the last credit approval.
+      The calculation specifically considers events of type 8, indicating that the
+      proposal had its credit approved. The snapshot date serves as the reference point
+      for this calculation
+  total_days_since_last_proposal_rejected:
+    description:
+      This calculation focuses on the user's most recent rejected proposal. It determines
+      the total number of days that have elapsed since the last proposal was rejected.
+      The snapshot date serves as the reference point for this calculation
+  total_days_since_last_contract_signing:
+    description:
+      This calculation focuses on the last contract signing date for the client.
+      It determines the total number of days that have passed since the client signed
+      their most recent contract. The calculation specifically considers events of
+      type 9, which indicate that the client has signed a contract. The snapshot date
+      is used as the reference point for this calculation
+  total_days_since_last_termination_creation:
+    description:
+      This calculation focuses on the user's most recent termination request created.
+      It determines the total number of days that have passed since the last termination
+      request was created. The calculation specifically considers events of type 9,
+      indicating that the client has signed a contract. The snapshot date is used as
+      the reference point for this calculation
+  total_days_since_last_termination_finished:
+    description:
+      This calculation focuses on the most recent completed termination request. It
+      determines the total number of days that have elapsed since the last termination
+      request was finished. The calculation specifically considers events of type 9,
+      indicating that the client has signed a contract. The snapshot date serves as
+      the reference point for this calculation
+  total_bookings:
+    description:
+      The volume of bookings per user. It considers only events of type equal to 1,
+      indicating that a booking has been created
+  total_reservations:
+    description:
+      The volume of reservations created per user. It considers only the last reservations
+      created by the user for a respective house
+  total_canceled_bookings:
+    description:
+      The volume of canceled bookings per user. It considers only events of type equal to
+      1, indicating that a booking has been created, and the booking status must be equal
+      to "Cancelado"
+  total_completed_visits:
+    description:
+      The volume of completed bookings per user. It considers only events of type equal to
+      2, indicating that a booking has been completed
+  total_sent_offers:
+    description:
+      The volume of sent offers per user. It considers only events of type equal to 3,
+      indicating that an offer has been sent
+  total_accepted_offers:
+    description:
+      The volume of accepted offers per user. It considers only events of type equal to 4,
+      indicating that an offer has been accepted
+  total_rejected_offers:
+    description:
+      The volume of rejected offers per user. It considers only events of type equal to 3,
+      indicating that the offer has been sent, and the offer status should be equal to
+      "Rejeitada"
+  total_started_evaluation_proposals:
+    description:
+      The volume of proposals where the evaluation has started per user. It considers only
+      events of type equal to 5, indicating that the proposal has the evaluation started
+  total_approved_evaluation_proposals:
+    description:
+      The volume of proposals where the evaluation has been approved per user. It considers
+      only events of type equal to 6, indicating that the proposal has the evaluation approved
+  total_sent_document_proposals:
+    description:
+      The volume of proposals where the documentation has been sent per user. It considers
+      only events of type equal to 7, indicating that the proposal has the
+      documentation sent
+  total_approved_credit_proposals:
+    description:
+      The volume of proposals where the credit has been approved per user. It considers
+      only events of type equal to 8, indicating that the proposal has the credit approved
+  total_rejected_proposals:
+    description:
+      The volume of rejected proposals per user. It considers only proposals with status
+      equal to "Rejeitada"
+  total_signed_contracts:
+    description:
+      The volume of signed contracts per user. It considers only events of type equal to
+      9, indicating that the contract has been signed by the user
+  total_active_contracts:
+    description:
+      The volume of active contracts signed per user. It considers only events of
+      type equal to 9, indicating that the contract has been signed by the user, and
+      the contract status must be equal to "Ativo"
+  total_finished_contracts:
+    description:
+      The volume of finished contracts that have been signed per user. It considers
+      only events of type equal to 9, indicating that the contract has been signed by the
+      user, and the contract status must be equal to "Finalizado"
+  total_active_termination_contracts:
+    description:
+      The volume of contracts with open termination requests per user. It considers only
+      events of type equal to 9, indicating that the contract has been signed by the user,
+      and the termination status is not "DONE" or "CANCELED"
+  has_searched_house:
+    description:
+      If the user has any amplitude searched events, considering the events "schedule_page_viewed_events",
+      "search_page_viewed_events", "search_results_page_viewed_events", and "listing_page_viewed_events"
+  has_funnel_step:
+    description: If the user exists in the rent demand events table
+  has_booked_visit:
+    description:
+      If the user has at least one booking created event, indicated by an event type
+      equal to 1
+  has_completed_visit:
+    description:
+      If the user has at least one booking completed event, indicated by an event type
+      equal to 2
+  has_sent_offer:
+    description:
+      If the user has at least one offer sent event, indicated by an event type equal
+      to 3
+  has_offer_approved:
+    description:
+      If the user has at least one offer approved event, indicated by an event type
+      equal to 4
+  has_started_evaluation:
+    description:
+      If the user has at least one started evaluation event, indicated by an event type
+      equal to 5
+  has_evaluation_approved:
+    description:
+      If the user has at least one approved evaluation event, indicated by an event type
+      equal to 6
+  has_sent_doc:
+    description:
+      If the user has at least one sent documentation event, indicated by an event type
+      equal to 7
+  has_credit_approved:
+    description:
+      If the user has at least one credit approved event, indicated by an event type
+      equal to 8
+  has_active_contract:
+    description:
+      If the user has at least one active contract. In this case, considers only event
+      types equal to 9 and the contract status should be equal to "Ativo"
+  has_finished_contract:
+    description:
+      If the user has at least one finished contract. In this case, considers only event
+      types equal to 9 and the contract status should be equal to "Finalizado"
+  has_active_termination:
+    description:
+      If the user has at least one active termination. In this case, considers only event
+      types equal to 9 and the termination status should not be equal to "DONE" or
+      "CANCELED"
+  is_offboarding:
+    description:
+      If the user has an active termination, it indicates that the user is currently
+      in the offboarding step of the rental journey
+  is_ongoing:
+    description:
+      If the user has at least one active contract and the last contract signed occurred
+      past the last 40 days, with the snapshot date serving as the reference point, then the
+      user is currently in the ongoing step of the rental journey
+  is_onboarding:
+    description:
+      If the user has at least one active contract and the last contract signed occurred
+      within the last 40 days, with the snapshot date serving as the reference point, then the
+      user is currently in the onboarding step of the rental journey
+  is_contract_to_entrance:
+    description:
+      If the user has had events such as the last evaluation start, last evaluation approval,
+      last document sending, last credit approval, or last proposal rejection within the
+      last 40 days, with the snapshot date as the reference point, then the user is
+      currently in the contract to entrance step of the rental journey
+  is_visits_to_offer:
+    description:
+      If the user has had events such as the last booking, last canceled booking,
+      last visiting, last offer sending, last offer rejected, last reservation created,
+      or last offer approval within the last 40 days, with the snapshot date as the
+      reference point, then the user is currently in the visits to offer step of
+      the rental journey
+  is_listing_and_search:
+    description:
+      If the user has had a last house searching event within the last 40 days, with
+      the snapshot date as the reference point, then the user is currently in the
+      listing and search step of the rental journey
+  is_post_contract:
+    description:
+      If the user has taken any step in offboarding, ongoing, or onboarding, it
+      indicates that the user is in a post-contract step
+  is_pre_contract:
+    description:
+      If the user has taken any step in contract to entrance, visits to offer, or
+      listing and search, it signifies that the user is in a pre-contract step
+  ts_last_house_searching:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+    description: The timestamp of the user's most recent search event for rental houses
+  ts_last_booking:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description:
+      The timestamp of the user's most recent booking created. It considers only events
+      of type equal to 1, indicating that a booking has been created
+  ts_last_reservation:
+    lineage:
+      - datalake_kill_queue.reservation.ts_created
+    description:
+      The timestamp of the user's most recent reservation created. It considers only
+      events of type equal to 4, indicating that an offer has been approved
+  ts_last_booking_canceled:
+    lineage:
+      - datalake_booking.booking.ts_first_canceled
+    description:
+      The timestamp of the user's most recent booking canceled. It considers only events
+      of type equal to 1, indicating that a booking has been created, and the booking
+      status should be equal to "Cancelado"
+  ts_last_visiting:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description:
+      The timestamp of the user's most recent booking completed. It considers only events
+      of type equal to 2, indicating that a booking has been completed
+  ts_last_offer_sending:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description:
+      The timestamp of the user's most recent offer sent. It considers only events of
+      type equal to 3, indicating that an offer has been sent
+  ts_last_offer_rejected:
+    lineage:
+      - datalake_offer.offer.ts_analyzed
+    description:
+      The timestamp of the user's most recent offer rejected. It considers only events
+      of type equal to 3, indicating that an offer has been sent, and the offer status
+      must be equal to "Rejeitada"
+  ts_last_offer_approval:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description:
+      The timestamp of the user's most recent offer approval. It considers only events
+      of type equal to 4, indicating that an offer has been approved
+  ts_last_evaluation_start:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description:
+      The timestamp of the user's most recent evaluation start. It considers only events
+      of type equal to 5, indicating that a proposal had an evaluation started
+  ts_last_evaluation_approval:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description:
+      The timestamp of the user's most recent evaluation approval. It considers only
+      events of type equal to 6, indicating that a proposal had an evaluation approved
+  ts_last_doc_sending:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description:
+      The timestamp of the user's most recent doc sending. It considers only events of
+      type equal to 7, indicating that a proposal had a document sent
+  ts_last_credit_approval:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description:
+      The timestamp of the user's most recent credit approval. It considers only events
+      of type equal to 8, indicating that a proposal had a credit approved
+  ts_last_proposal_rejected:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description:
+      The timestamp of the user's most recent rejected proposal. It considers the last
+      revision timestamp for the user's rejected proposals
+  ts_last_contract_signed:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description:
+      The timestamp of the user's most recent contract signed. It considers only events
+      of type equal to 9, indicating that a contract had been signed
+  ts_last_termination_created:
+    lineage:
+      - datalake_terminator_clean.termination.ts_created
+    description:
+      The timestamp of the user's most recent termination created. It considers only
+      events of type equal to 9, indicating that a contract had been signed
+  ts_last_termination_finished:
+    lineage:
+      - datalake_terminator_clean.termination_aud.ts_updated
+      - datalake_terminator_clean.negotiation.ts_updated
+    description:
+      The timestamp of the user's most recent termination finished. It considers only
+      events of type equal to 9, indicating that a contract had been signed, and the
+      termination status must be equal to "DONE"
+  year:
+    description: It is the snapshot year, also a partition column
+  month:
+    description: It is the snapshot month, also a partition column
+  day:
+    description: It is the snapshot day, also a partition column
