@@ -166,7 +166,7 @@ UNION ALL
   SELECT
       pp.id + 5000000 AS id_person,
       pp.id_propose,
-      pp.name,
+      TRIM(UPPER(pp.name)) AS name,
       pc.email,
       pc.phone,
       s.bureau_name,
