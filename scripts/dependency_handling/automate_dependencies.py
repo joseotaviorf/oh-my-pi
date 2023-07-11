@@ -25,6 +25,15 @@ MANUAL_MODIFICATIONS_PATH = os.path.join(
 )
 
 
+class DependencyFileDumper(yaml.Dumper):
+    """
+    A custom dumper that indents lists. Many people have black configured to indent lists with 2 spaces, but the default
+    yaml dumper does not indent lists. This is to change that, avoiding conflicts.
+    """
+    def increase_indent(self, flow=False, indentless=False):
+        return super(DependencyFileDumper, self).increase_indent(flow, False)
+
+
 def main():
     dependencies = generate_dependencies()
     write_to_yml(dependencies)
@@ -42,8 +51,13 @@ def generate_dependencies():
 
 def write_to_yml(table_dependencies: dict):
     with open(DAGS_CROSS_DEPENDENCIES_FILE_PATH, mode="w+") as file_stream:
-        yaml.dump(table_dependencies, file_stream, explicit_start=True)
-
+        yaml.dump(
+            data=table_dependencies,
+            stream=file_stream,
+            Dumper=DependencyFileDumper,
+            explicit_start=True,
+            default_flow_style=False
+        )
 
 def get_unstandard_dags_file_content(unstandard_dags_file_path: str):
     return read_from_yml(

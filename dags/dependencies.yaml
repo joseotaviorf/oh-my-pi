@@ -2044,9 +2044,9 @@ bietlejuice.enrich_tenant_journey:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-  - bietlejuice.terminator:load-clean-termination-aud
-  - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-negotiation
+  - bietlejuice.terminator:load-clean-termination
+  - bietlejuice.terminator:load-clean-termination-aud
 bietlejuice.enrich_terminator:
   - bietlejuice.terminator:load-clean-termination-aud
 bietlejuice.enrich_top_of_funnel_affiliates:
