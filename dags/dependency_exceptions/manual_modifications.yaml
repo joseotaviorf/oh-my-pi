@@ -647,8 +647,7 @@ bietlejuice.enrich_nps_answer_drivers:
   remove:
     - bietlejuice.enrich_firestore:load-enrich-sale-offer
 bietlejuice.enrich_nps_reversion:
-  remove:
-    - bietlejuice.dw_user:load-dw-public-dim-user
+  override: []
 bietlejuice.enrich_offboarding:
   add:
     - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
@@ -967,9 +966,7 @@ bietlejuice.reverse_nazare:
     - bietlejuice.dw_house:load-dw-quintoandar-dim-house
     - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
 bietlejuice.reverse_nps_reversion:
-  add:
-    - bietlejuice.enrich_nps_reversion:load-enrich-offboarding-landlord-predictions
-    - bietlejuice.enrich_nps_reversion:load-enrich-offboarding-tenant-predictions
+  override: []
 bietlejuice.reverse_customer_journey:
   add:
     - bietlejuice.enrich_customer_journey:load-enrich-users

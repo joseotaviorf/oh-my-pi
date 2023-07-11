@@ -599,14 +599,14 @@ bietlejuice.dw_retsuko:
   - bietlejuice.enrich_retsuko:load-enrich-bill-items
   - bietlejuice.enrich_retsuko:load-enrich-retsuko-junk
 bietlejuice.dw_revenue_lines:
-- bietlejuice.enrich_revenue_lines:load-enrich-brokerage-finance
-- bietlejuice.enrich_revenue_lines:load-enrich-credit-card-payment
-- bietlejuice.enrich_revenue_lines:load-enrich-fire-insurance
-- bietlejuice.enrich_revenue_lines:load-enrich-late-payments
-- bietlejuice.enrich_revenue_lines:load-enrich-long-term-rental-anticipation
-- bietlejuice.enrich_revenue_lines:load-enrich-month-rental-anticipation
-- bietlejuice.enrich_revenue_lines:load-enrich-rental-guarantee
-- bietlejuice.enrich_revenue_lines:load-enrich-reservation
+  - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-finance
+  - bietlejuice.enrich_revenue_lines:load-enrich-credit-card-payment
+  - bietlejuice.enrich_revenue_lines:load-enrich-fire-insurance
+  - bietlejuice.enrich_revenue_lines:load-enrich-late-payments
+  - bietlejuice.enrich_revenue_lines:load-enrich-long-term-rental-anticipation
+  - bietlejuice.enrich_revenue_lines:load-enrich-month-rental-anticipation
+  - bietlejuice.enrich_revenue_lines:load-enrich-rental-guarantee
+  - bietlejuice.enrich_revenue_lines:load-enrich-reservation
 bietlejuice.dw_sale_available_booking_hours:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.enrich_sale_available_booking_hours:load-enrich-weekly-available-booking-hours
@@ -1554,28 +1554,6 @@ bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.ebdb:load-clean-offer
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_tracksale:load-enrich-answer
-bietlejuice.enrich_nps_reversion:
-  - bietlejuice.dw_contract:load-dw-public-dim-contract
-  - bietlejuice.dw_contract:load-dw-quintoandar-dim-contract-person
-  - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket-tags
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-segment
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
-  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
-  - bietlejuice.dw_listing_jobs:load-dw-public-fact-inspection-bookings
-  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
-  - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
-  - bietlejuice.dw_tracksale:load-dw-tracksale-dim-nps-campaign
-  - bietlejuice.dw_tracksale:load-dw-tracksale-fact-nps-dispatches
-  - bietlejuice.ebdb:load-clean-house-maintenance-condition
-  - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
-  - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-inspection
-  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
-  - bietlejuice.enrich_pro_owners:load-enrich-pro-owner-history
-  - bietlejuice.repairs:load-clean-repair-request
 bietlejuice.enrich_offboarding:
   - bietlejuice.ebdb:load-clean-contract
   - bietlejuice.ebdb:load-clean-house
@@ -2337,9 +2315,6 @@ bietlejuice.reverse_nazare:
   - bietlejuice.gsheets_for_sale:done-clean-forbrokers-3p-partner-conditions
   - bietlejuice.gsheets_for_sale:done-clean-sale-payments-tiers
   - bietlejuice.hub_services:load-clean-business-unit
-bietlejuice.reverse_nps_reversion:
-  - bietlejuice.enrich_nps_reversion:load-enrich-offboarding-landlord-predictions
-  - bietlejuice.enrich_nps_reversion:load-enrich-offboarding-tenant-predictions
 bietlejuice.reverse_tracksale:
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.dw_booking:load-dw-public-dim-booking
