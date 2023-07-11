@@ -36,7 +36,7 @@ base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 cluster_description = config_service.get_config(
-    "databricks_10_4_max_io-memory_photon_cluster"
+    "custom_cluster"
 )
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [

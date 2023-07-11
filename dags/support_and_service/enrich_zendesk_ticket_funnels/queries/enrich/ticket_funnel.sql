@@ -38,27 +38,6 @@ last_updated_ticket as (
         historical_zendesk_chat
     GROUP BY 1
 ),
-last_updated_group AS (
-    SELECT
-        id_group,
-        MAX(ts_updated) AS ts_last_updated
-    FROM
-        datalake_zendesk_tickets_clean.groups
-    GROUP BY 1
-),
-distinct_groups AS (
-    SELECT
-        g.id_group,
-        g.name,
-        g.url_group
-    FROM
-        datalake_zendesk_tickets_clean.groups AS g
-    INNER JOIN
-        last_updated_group AS ge
-            ON ge.id_group = g.id_group
-            AND ge.ts_last_updated = g.ts_updated
-    GROUP BY 1, 2, 3
-),
 sale_offers_keys AS (
     WITH custom_fields_exploded AS (
         SELECT
@@ -206,7 +185,7 @@ INNER JOIN
         ON te.id_ticket = t.id_ticket
         AND te.ts_last_updated = t.ts_updated
 LEFT JOIN
-    distinct_groups AS g
+    datalake_zendesk_tickets_clean.groups AS g
         ON t.id_group = g.id_group
 LEFT JOIN
     datalake_zendesk_custom_fields.custom_fields AS cf
