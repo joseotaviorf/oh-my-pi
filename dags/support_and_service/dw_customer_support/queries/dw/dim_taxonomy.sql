@@ -69,6 +69,21 @@ WITH taxonomy AS (
     datalake_customer_support.email
 )
 SELECT DISTINCT
-  *
+  tax.sk_taxonomy,
+  tax.customer_type,
+  tax.step_tag,
+  tax.customer_type_tag,
+  tax.request_type,
+  tax.motivation,
+  tax.theme,
+  tax.theme_detail,
+  tr.journey,
+  tr.sub_journey,
+  tr.line_owner,
+  tax.ts_load
 FROM
-  taxonomy
+  taxonomy AS tax
+LEFT JOIN
+  datalake_gsheets_clean.ticket_rate_classification AS tr
+    ON tax.theme_detail = tr.micro_taxonomy
+      AND tax.theme = tr.macro_taxonomy

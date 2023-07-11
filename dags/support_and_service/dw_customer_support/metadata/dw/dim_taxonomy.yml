@@ -74,5 +74,17 @@ columns:
       - datalake_customer_support.chat.contact_theme_detail_tag
       - datalake_customer_support.email.contact_theme_detail_tag
     description: Detailed theme.
+  journey:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.journey
+    description: Journey of the ticket.
+  sub_journey:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.sub_journey
+    description: Sub journey of the ticket.
+  line_owner:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.line_owner
+    description: Line responsible for the ticket.
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_customer_support.
