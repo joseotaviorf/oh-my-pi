@@ -1,45 +1,149 @@
-WITH zendesk_tickets_unique AS (
-    --this CTE fix the error of multiple tickets openned for a single call
+WITH call_inapp_csat AS (
+    SELECT
+        GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.callSid") AS id_call,
+        CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-1") AS INT) AS csat_1,
+        CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-2") AS INT) AS csat_2,
+        CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-3") AS INT) AS csat_3,
+        TO_TIMESTAMP(FROM_UTC_TIMESTAMP(ev.event_timestamp, "Brazil/East"), "yyyy-MM-dd HH:mm:ss") AS ts_created_local,
+        year,
+        month,
+        day
+    FROM
+        datalake_bigfone_clean.event AS ev
+    WHERE
+        GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.direction") = "outbound-api"
+        AND cc.year = {year}
+        AND cc.month = {month}
+        AND cc.day = {day}
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY event_timestamp DESC) = 1
+),
+ivr_csat AS (
   SELECT
-      tfm.id_call,
-      MAX(tfm.id_zendesk_requester_user) AS id_respondent,
-      MAX(tfm.id_ticket) AS id_ticket,
-      MAX(tfm.id_contract) AS id_contract
+    id_call,
+    csat_1,
+    csat_2,
+    csat_3,
+    ts_created_local,
+    year,
+    month,
+    day
   FROM
-      datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
+    datalake_bigfone_twilio.call_ivr_events
   WHERE
-      id_call IS NOT NULL
-  GROUP BY 1
+    year = {year}
+    AND month = {month}
+    AND day = {day}
+  QUALIFY
+      ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY ts_created_local DESC) = 1
+
+),
+csat_events AS (
+  SELECT
+    id_call,
+    csat_1,
+    csat_2,
+    csat_3,
+    ts_created_local,
+    year,
+    month,
+    day
+  FROM
+    call_inapp_csat
+  UNION ALL
+  SELECT
+    id_call,
+    csat_1,
+    csat_2,
+    csat_3,
+    ts_created_local,
+    year,
+    month,
+    day
+  FROM
+    ivr_csat
+),
+call_csat AS (
+  SELECT DISTINCT
+    ce.id_call,
+    cs.id_contract,
+    cs.id_ticket,
+    cs.id_user,
+    ce.csat_1,
+    ce.csat_2,
+    ce.csat_3,
+    CASE
+      WHEN cs.ticket_origin = "call inapp" THEN cs.ticket_origin
+      ELSE "call"
+    END AS service_context,
+    ce.ts_created_local
+  FROM
+    csat_events AS ce
+  LEFT JOIN
+    datalake_customer_support.call AS cs
+        ON ce.id_call = cs.id_call
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY ts_created_local DESC) = 1
 )
 SELECT
-    MD5(CONCAT(cie.id_call, MAX(cie.ts_created_local))) AS id_answer,
-    tfm.id_contract,
-    tfm.id_ticket,
-    tfm.id_respondent,
-    'customer support' AS service_type,
-    'call' AS service_context,
-    'bigfone' AS source_name,
-    MAX(cie.csat_2) FILTER(WHERE cie.csat_2 IS NOT NULL) AS satisfaction_score,
+    MD5(CONCAT(id_call, "csat1", ts_created_local)) AS id_answer,
+    COALESCE(id_contract, -1) AS id_contract,
+    id_ticket,
+    COALESCE(id_user, -1) AS id_user,
+    "customer support" AS service_type,
+    service_context,
+    "bigfone" AS source_name,
+    CASE
+        WHEN csat_1 = 2 THEN 5
+        ELSE csat_1
+    END AS satisfaction_score,
     "satisfaction evaluation" AS score_description,
-    MAX(
-        CASE
-            WHEN cie.csat_1 = 2 THEN 5
-            ELSE cie.csat_1
-        END
-    ) FILTER(WHERE cie.csat_1 IS NOT NULL) AS secondary_satisfaction_score,
-    "resolution survey" AS secondary_score_description,
-    MIN(cie.ts_created_local) AS ts_submitted,
-    cie.year,
-    cie.month,
-    cie.day
+    ts_created_local AS ts_submitted,
+    year,
+    month,
+    day
 FROM
-    datalake_bigfone_twilio.call_ivr_events AS cie
-JOIN
-    zendesk_tickets_unique AS tfm
-        ON tfm.id_call = cie.id_call
+    call_csat AS cc
 WHERE
-    COALESCE(cie.csat_1, cie.csat_2) IS NOT NULL
-    AND cie.year = {year}
-    AND cie.month = {month}
-    AND cie.day = {day}
-GROUP BY cie.id_call, 2, 3, 4, 5, 6, 7, 9, 11, 13, 14, 15
+    csat_1 IS NOT NULL
+UNION ALL
+SELECT
+    MD5(CONCAT(id_call, "csat2", ts_created_local)) AS id_answer,
+    COALESCE(id_contract, -1) AS id_contract,
+    id_ticket,
+    COALESCE(id_user, -1) AS id_user,
+    "customer support" AS service_type,
+    service_context,
+    "bigfone" AS source_name,
+    csat_2 AS satisfaction_score,
+    "resolution survey" AS score_description,
+    ts_created_local AS ts_submitted,
+    year,
+    month,
+    day
+FROM
+    call_csat AS cc
+WHERE
+    csat_2 IS NOT NULL
+UNION ALL
+SELECT
+    MD5(CONCAT(id_call, "csat3", ts_created_local)) AS id_answer,
+    COALESCE(id_contract, -1) AS id_contract,
+    id_ticket,
+    COALESCE(id_user, -1) AS id_user,
+    "customer support" AS service_type,
+    service_context,
+    "bigfone" AS source_name,
+    csat_3 AS satisfaction_score,
+    CASE
+      WHEN service_context = "call inapp" THEN "chatbot resolution evaluation"
+      ELSE "ivr resolution evaluation"
+    END AS score_description,
+    ts_created_local AS ts_submitted,
+    year,
+    month,
+    day
+FROM
+    call_csat AS cc
+WHERE
+    csat_3 IS NOT NULL

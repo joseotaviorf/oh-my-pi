@@ -1,69 +1,98 @@
 database_name: datalake_bigfone_twilio
 table_name: call_ivr_events
+description: Contains all Twilio IVR events related to customer support via call
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_bigfone_events.events.id
+    description: Event ID
   id_event:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Event ID from Twilio
   id_call:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Twilio call ID
   id_call_teravoz:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Teravoz call ID
   id_task:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Twilio task ID
   id_channel:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Twilio channel ID
   from_number:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Caller phone number
   to_number:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Receiver phone number
   customer_phone:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: from_number without the country prefix
   event_type:
     lineage:
       - datalake_bigfone_events.events.event
+    description: Type of event
   task_cancelation_reason:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Reason for task cancelling
   steps:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: steps
   metadata:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: JSON with all event metadata
   task_priority:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Priority of the task
   csat_1:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Customer answers the question "Has your problem been solved?"
   csat_2:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Standard CSAT regarding the call
+  csat_3:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+    description: Standard CSAT regarding the chatbot experience. Valid only for Call InApp
   ts_created_local:
     lineage:
       - datalake_bigfone_events.events.ts_created_local
+    description: Timestamp of event creation
   ts_received_local:
     lineage:
       - datalake_bigfone_events.events.ts_received_local
+    description: Timestamp of event creation in UTC-3
   ts_created_local_unix:
     lineage:
       - datalake_bigfone_events.events.ts_created_local
+    description: Timestamp of event creation in UTC-3 and unix time
   year:
     lineage:
       - datalake_bigfone_events.events.year
+    description: Year partition
   month:
     lineage:
       - datalake_bigfone_events.events.month
+    description: Month partition
   day:
     lineage:
       - datalake_bigfone_events.events.day
+    description: Day partition

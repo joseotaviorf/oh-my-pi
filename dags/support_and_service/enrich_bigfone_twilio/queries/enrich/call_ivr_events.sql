@@ -15,6 +15,7 @@ SELECT
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskPriority') AS INT) AS task_priority,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-1') AS INT) AS csat_1,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-2') AS INT) AS csat_2,
+	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-3') AS INT) AS csat_3,
 	ts_created_local,
 	ts_received_local,
 	UNIX_TIMESTAMP(ts_created_local) AS ts_created_local_unix,
