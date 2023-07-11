@@ -86,7 +86,7 @@ call_csat AS (
     datalake_customer_support.call AS cs
         ON ce.id_call = cs.id_call
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY ts_created_local DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY ce.id_call ORDER BY ts_created_local DESC) = 1
 )
 SELECT
     MD5(CONCAT(id_call, "csat1", ts_created_local)) AS id_answer,
