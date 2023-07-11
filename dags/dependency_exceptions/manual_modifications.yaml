@@ -947,6 +947,9 @@ bietlejuice.reverse_atento:
 bietlejuice.reverse_dashboard_governance:
   add:
     - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
+bietlejuice.reverse_inspections:
+  add:
+    - bietlejuice.enrich_inspections_metrics:load-enrich-inspector-performance
 bietlejuice.reverse_listings_report_access:
   add:
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
