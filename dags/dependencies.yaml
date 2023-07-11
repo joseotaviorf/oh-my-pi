@@ -2111,13 +2111,13 @@ bietlejuice.enrich_unified_potential_listing:
 bietlejuice.enrich_user:
   - bietlejuice.ebdb:load-clean-agent-data
   - bietlejuice.ebdb:load-clean-agent-data-business-contexts-served
-  - bietlejuice.ebdb:load-clean-contract
   - bietlejuice.ebdb:load-clean-country
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb:load-clean-photographer-data
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.ebdb:load-clean-user-pro-owner
+  - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
 bietlejuice.enrich_velo:
   - bietlejuice.company:load-clean-address
   - bietlejuice.company:load-clean-company

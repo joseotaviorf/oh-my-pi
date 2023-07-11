@@ -13,6 +13,7 @@ WITH context_agent AS (
     GROUP BY 1
 )
 SELECT DISTINCT
+    DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd') AS id_snapshot,
     u.id AS id_user,
     u.id_country,
     'broker' AS client_type,

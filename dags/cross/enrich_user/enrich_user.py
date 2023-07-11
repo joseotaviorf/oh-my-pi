@@ -29,7 +29,6 @@ config_service = ConfigurationService(DAG_NAME)
 
 # s3 paths setup
 datalake_bucket = config_service.get_config("datalake_bucket")
-athena_query_result_location = config_service.get_config("athena_query_results_bucket")
 
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
@@ -88,7 +87,6 @@ datalake_task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
     spark_jobs_path=base_spark_jobs_path,
-    athena_query_result_location=athena_query_result_location,
 )
 
 enrich_task_groups = {}
@@ -100,7 +98,6 @@ for table_name in tables:
         table_name=table_name,
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
-        has_create_external_table_task=False,
         is_incremental=True,
         partitions=partition_cols,
     )

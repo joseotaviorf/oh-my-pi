@@ -13,5 +13,3 @@ inner_dependencies:
     - property_owner
 
 partition_cols: [country_code, year, month, day]
-
-datalake_bucket: "datalake-old.s3.forno.data.quintoandar.com.br"

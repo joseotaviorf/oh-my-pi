@@ -8,6 +8,8 @@ description:
 domain: Cross
 owner: data-ae-ss@quintoandar.com.br
 columns:
+  id_snapshot:
+    description: The snapshot id, which is the D-1 date in the format "yyyyMMdd"
   id_user:
     lineage:
       - datalake_ebdb_clean.user.id

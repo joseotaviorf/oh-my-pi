@@ -2,15 +2,21 @@
 database_name: datalake_user
 table_name: tenant_user
 description:
-  Ebdb Users daily snapshot classified as active tenant,considering users that
-  have at least one active contract.
+  Tenant users and their respective journey step. Each row in the table represents a
+  specific customer on a daily snapshot.
 domain: Cross
 owner: data-ae-ss@quintoandar.com.br
 columns:
+  id_snapshot:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.id_snapshot
+    description: The snapshot id, which is the D-1 date in the format "yyyyMMdd"
   id_user:
     lineage:
-      - datalake_ebdb_clean.user.id
-    description: The user id in the main.
+      - datalake_tenant_journey.tenant_journey_step.id_client
+    description:
+      The client id, which is the user id that has searched a house in the amplitude
+      events or the tenant prospect id that has an event in the rent demand funnel
   id_country:
     lineage:
       - datalake_ebdb_clean.user.id_country
@@ -37,6 +43,50 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.cpf
     description: The user individual brazilian registry.
+  tenant_journey_step:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.tenant_journey_step
+    description:
+      The tenant journey step, respecting how deep the customer is on their
+      rental journey
+    categories:
+      Offboarding:
+        Indicates if the client is currently in the offboarding step in
+        the rental context
+      Ongoing:
+        Indicates if the client is in the ongoing step but not in the offboarding step
+        in the rental context
+      Onboarding:
+        Indicates if the client is in the onboarding step but not in the offboarding
+        or ongoing steps in the rental context
+      Contract to Entrance:
+        Indicates if the client is in the contract to entrance step but not in the
+        onboarding, ongoing, or offboarding steps in the rental context
+      Visits to Offer:
+        Indicates if the client is in the visits to offer step but not in the contract
+        to entrance, onboarding, ongoing, or offboarding steps in the rental context
+      Listing and Search:
+        Indicates if the client is in the listing and search step but not in the visits
+        to offer, contract to entrance, onboarding, ongoing, or offboarding steps in the
+        rental context
+      Default:
+        Indicates if the client is not currently active in any of the journey steps
+        in the rental context
+  tenant_persona_step:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.tenant_persona_step
+    description:
+      Indicates if the user is in any step before signing a contract or after signing a
+      contract. If the user is in the post_contract step,it will not assume the
+      pre_contract step
+    categories:
+      Pre_Contract:
+        If the user has taken any step in contract to entrance, visits to offer, or
+        listing and search, it signifies that the user is in a pre-contract step
+      Post_Contract:
+        If the user has taken any step in offboarding, ongoing, or onboarding, it
+        indicates that the user is in a post-contract step
+      Not_Apply: If the user is not in the pre or post contract steps
   is_active:
     lineage:
       - datalake_ebdb_clean.user.is_active
@@ -45,6 +95,62 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.is_blocked
     description: If the user is blocked or not.
+  is_tenant_offboarding:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.is_offboarding
+    description:
+      If the user has an active termination, it indicates that the user is currently
+      in the offboarding step of the rental journey
+  is_tenant_ongoing:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.is_ongoing
+    description:
+      If the user has at least one active contract and the last contract signed occurred
+      past the last 40 days, with the snapshot date serving as the reference point, then the
+      user is currently in the ongoing step of the rental journey
+  is_tenant_onboarding:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.is_onboarding
+    description:
+      If the user has at least one active contract and the last contract signed occurred
+      within the last 40 days, with the snapshot date serving as the reference point, then the
+      user is currently in the onboarding step of the rental journey
+  is_tenant_contract_to_entrance:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.is_contract_to_entrance
+    description:
+      If the user has had events such as the last evaluation start, last evaluation approval,
+      last document sending, last credit approval, or last proposal rejection within the
+      last 40 days, with the snapshot date as the reference point, then the user is
+      currently in the contract to entrance step of the rental journey
+  is_tenant_visits_to_offer:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.is_visits_to_offer
+    description:
+      If the user has had events such as the last booking, last canceled booking,
+      last visiting, last offer sending, last offer rejected, last reservation created,
+      or last offer approval within the last 40 days, with the snapshot date as the
+      reference point, then the user is currently in the visits to offer step of
+      the rental journey
+  is_tenant_listing_and_search:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.is_listing_and_search
+    description:
+      If the user has had a last house searching event within the last 40 days, with
+      the snapshot date as the reference point, then the user is currently in the
+      listing and search step of the rental journey
+  is_tenant_pre_contract:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.is_pre_contract
+    description:
+      If the user has taken any step in contract to entrance, visits to offer, or
+      listing and search, it signifies that the user is in a pre-contract step
+  is_tenant_post_contract:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.is_post_contract
+    description:
+      If the user has taken any step in offboarding, ongoing, or onboarding, it indicates
+      that the user is in a post-contract step
   dt_birth:
     lineage:
       - datalake_ebdb_clean.user.dt_birth
@@ -58,8 +164,14 @@ columns:
       - datalake_ebdb_clean.user.ts_updated
     description: The user last updated date in the system.
   year:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.year
     description: Snapshot year, partition column.
   month:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.month
     description: Snapshot month, partition column.
   day:
+    lineage:
+      - datalake_tenant_journey.tenant_journey_step.day
     description: Snapshot day, partition column.

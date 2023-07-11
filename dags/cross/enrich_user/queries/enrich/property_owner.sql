@@ -1,4 +1,5 @@
 SELECT DISTINCT
+    DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd') AS id_snapshot,
     u.id AS id_user,
     u.id_country,
     'property_owner' AS client_type,
