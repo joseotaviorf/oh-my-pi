@@ -89,7 +89,7 @@ for table in tables_to_send.keys():
                     ENV,
                     DAG_NAME,
                     minority_report_endpoint,
-                    minority_request_header,
+                    json.dumps(minority_request_header),
                     table,
                     json.dumps(tables_to_send[table]),
                     query_model,
