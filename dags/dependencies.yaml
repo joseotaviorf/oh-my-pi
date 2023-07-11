@@ -1826,6 +1826,7 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.fastforward:load-clean-lra-installment-option
   - bietlejuice.gsheets_fintech:done-clean-mova-lra-owners
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
+  - bietlejuice.rental_guarantee:load-clean-guarantee-aud
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-credit-card-payment
 bietlejuice.enrich_robin_hood:

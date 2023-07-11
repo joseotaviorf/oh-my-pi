@@ -156,6 +156,22 @@ deposit_view AS (
   FROM
     base_unica_contrato
 ),
+  guarantee_aud AS (
+    WITH aud AS (
+      SELECT 
+        *,  
+        ROW_NUMBER() OVER(PARTITION BY id_contract_ebdb ORDER BY rev ASC) AS rowNumber 
+      FROM 
+        datalake_rental_guarantee_clean.guarantee_aud
+    )
+    SELECT 
+      id_contract_ebdb, 
+      final_value/100 AS final_value 
+    FROM 
+      aud 
+    WHERE 
+      id_contract_ebdb IS NOT NULL
+),
 down_payment_guarantees_no_deposit AS (
   WITH BASE_CHARGES AS (
     SELECT
@@ -174,8 +190,14 @@ down_payment_guarantees_no_deposit AS (
         date_trunc('month', dpdc.dt_termination),
         date_trunc('month', current_date)
       ) AS dt_ended_imported,
-      guarantee.final_value AS guarantee_total_value,
-      guarantee.final_value / 12 AS valor_mensal_garantia,
+      COALESCE(
+        aud.final_value, 
+        guarantee.final_value
+      ) AS guarantee_total_value,
+      COALESCE(
+        aud.final_value/12,
+        guarantee.final_value/12
+        )  AS valor_mensal_garantia, 
       charge.id AS id_charge,
       charge.installments AS installments,
       charge.charge_type,
@@ -188,6 +210,7 @@ down_payment_guarantees_no_deposit AS (
       LEFT JOIN datalake_ebdb_contract.contract contract on guarantee.id_contract_ebdb = contract.id
       LEFT JOIN datalake_rental_guarantee.charge charge on charge.id_guarantee = guarantee.id
       LEFT JOIN datalake_ebdb_contract.contract AS dpdc on dpdc.id = contract.id
+      LEFT JOIN guarantee_aud AS aud ON aud.id_contract_ebdb = guarantee.id_contract_ebdb
     WHERE
       contract.status IN ('Ativo', 'Finalizado')
       AND guarantee.guarantee_type <> 'DEPOSIT'
