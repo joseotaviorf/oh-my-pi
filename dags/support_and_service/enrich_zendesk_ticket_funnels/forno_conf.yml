@@ -6,8 +6,7 @@ custom_cluster:
   spark_version: 10.4.x-scala2.12
   runtime_engine: PHOTON
   aws_attributes:
-      ebs_volume_size: 200
-      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
+    ebs_volume_size: 200
   spark_conf:
-    # This heuristic is based on the idea of having a balanced workload across the available resources 
+    # This heuristic is based on the idea of having a balanced workload across the available resources
     spark.sql.shuffle.partitions: "320"
