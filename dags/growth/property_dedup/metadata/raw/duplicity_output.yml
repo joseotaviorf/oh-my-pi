@@ -1,0 +1,5 @@
+database_name: datalake_property_dedup_raw
+table_name: duplicity_output
+owner: henrique.miamoto@quintoandar.com.br
+domain: Data Growth
+description: This table stores information about house duplicity.
