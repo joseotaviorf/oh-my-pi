@@ -1682,13 +1682,15 @@ bietlejuice.enrich_quinto_messenger:
   - bietlejuice.quinto_messenger:load-clean-task
   - bietlejuice.quinto_messenger:load-clean-task-event
 bietlejuice.enrich_recommendations:
-  - bietlejuice.amplitude:170698-user-merge-raw-to-clean
-  - bietlejuice.amplitude:events-raw-to-clean
+  - bietlejuice.amplitude:load-clean-events
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-dim-campaign
   - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-fact-campaign-user-dispatch
   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
-  - bietlejuice.dw_listing:load-dw-sale-fact-listing-status
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
+  - bietlejuice.ebdb:load-clean-rent-flow
   - bietlejuice.emlio:load-clean-emlio-logs
+  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:create-house-amenities
   - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:create-house-condo-amenities
   - wonka.house_main:create-house-main

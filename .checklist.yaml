@@ -21,15 +21,18 @@ spec:
     squad: data_ingestion
     owner: leandro.mendes@quintoandar.com.br
 
-  packages:
+  libraries:
     - name: bi-etl-ejuice
+      type: common-usage
+      tier: T0
       description: |
         Gathers two main development subjects: analytical data pipelines developed
         as Airflow DAGs and destined to be orchestrated inside Google Cloud Composer;
         and data transformations and extractions, developed as Python Spark job files
         and/or SQL queries, triggered by the DAGs and destined to be executed inside
         Databricks clusters.
-      registry: github
+      registries:
+        - github-packages
 
   channels:
     squad: "#data-ingestion"
