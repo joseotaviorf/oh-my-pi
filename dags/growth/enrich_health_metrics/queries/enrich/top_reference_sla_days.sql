@@ -1,40 +1,30 @@
-WITH execution_metrics_last_60_days AS (
-    SELECT 
-        TRIM(REGEXP_REPLACE(dag_owner,'(airflow|\,)','')) AS dag_owner,
-        dag_name,
-        dt_executed,
-        CASE WHEN 
-            (dag_name NOT LIKE '%dw_datamarts%' AND ts_dag_ended - INTERVAL '3' HOUR > dt_executed::TIMESTAMP + INTERVAL '480' MINUTE)
-            OR (dag_name LIKE '%dw_datamarts%' AND ts_dag_ended - INTERVAL '3' HOUR > dt_executed::TIMESTAMP + INTERVAL '630' MINUTE)
-            THEN NULL ELSE dag_name
-         END AS is_sla_dag
-    FROM 
-        datalake_health_metrics.dag_historical_executions
-    WHERE 
-        dt_executed >= CURRENT_DATE() - INTERVAL '60' DAY
-        AND dag_name NOT IN (SELECT dag FROM datalake_gsheets_clean.dags_sla_exclusion_list)
-        AND dag_owner NOT IN ('MLOps','Data Governance','Data Primitives')
-),
-reference_sla_days AS (
+WITH max_sla_achieved AS (
     SELECT
-        dag_owner,  
-        dt_executed,
-        COUNT( DISTINCT dag_name ) AS total_dags,
-        COUNT( DISTINCT is_sla_dag ) AS dags_sla_ok
+        dag_owner,
+        MAX(ratio_sla_ok) AS max_sla_achieved
     FROM 
-        execution_metrics_last_60_days
-    GROUP BY 
-        1, 2
-    HAVING
-        total_dags = dags_sla_ok
+        datalake_health_metrics.daily_sla_metrics
+    WHERE
+        dt_executed >= CURRENT_DATE() - INTERVAL '1' MONTH
+    GROUP BY
+        1      
 ),
 top_reference_sla_days AS (
     SELECT 
-        dag_owner,
-        dt_executed,
-        RANK() OVER(PARTITION BY dag_owner ORDER BY dt_executed) AS rank
+        dsm.dag_owner,
+        dsm.dt_executed,
+        ratio_sla_ok,
+        max_sla_achieved,
+        RANK() OVER(PARTITION BY dsm.dag_owner ORDER BY dsm.dt_executed DESC) AS rank
     FROM
-        reference_sla_days
+        datalake_health_metrics.daily_sla_metrics AS dsm
+    JOIN
+        max_sla_achieved AS msa
+    ON
+        dsm.dag_owner = msa.dag_owner
+    WHERE
+        dt_executed >= CURRENT_DATE() - INTERVAL '6' MONTH
+        AND dsm.ratio_sla_ok >= msa.max_sla_achieved
     QUALIFY 
         rank <= 20
 )

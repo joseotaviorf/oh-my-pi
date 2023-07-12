@@ -1,0 +1,26 @@
+database_name: datalake_health_metrics
+table_name: daily_sla_metrics
+owner: marcio.gomes@quintoandar.com.br
+domain: Data Growth
+description: WIP
+columns:
+  dag_owner:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.daily_sla_metrics.dag_owner
+  dt_executed:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.daily_sla_metrics.dt_executed
+  total_dags:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.daily_sla_metrics.total_dags
+  dags_sla_ok:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.daily_sla_metrics.dags_sla_ok
+  ratio_sla_ok:
+    description: WIP
+    lineage:
+      - datalake_health_metrics.daily_sla_metrics.ratio_sla_ok
