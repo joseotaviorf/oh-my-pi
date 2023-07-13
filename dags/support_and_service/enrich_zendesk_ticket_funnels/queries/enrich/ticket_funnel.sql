@@ -163,6 +163,7 @@ SELECT DISTINCT
     t.comment,
     TO_JSON(cf.custom_fields) AS custom_fields,
     cf.custom_fields['Tipo de Solicitação'] AS request_type,
+    "N/A" AS agent_organization,
     COALESCE(
         cf.custom_fields['Tipo de Cliente'],
         REPLACE(REPLACE(REPLACE(cf.custom_fields['[CC] - Tipo de Cliente'], 'cc_',''), 'er_', 'er'), 'serviços', 'serviço'),
