@@ -184,7 +184,7 @@ if __name__ == "__main__":
         if res[0]:
             successes.append(res[1])
         else:
-            failures.append(res[1])
+            failures.append(res[1:3])
 
     logger.info(
         f"m=__main__, msg=Total Geocoding API successful results: {len(successes)} "
