@@ -3,14 +3,14 @@ WITH house_available_hours AS (
         SELECT
         CAST(FROM_UNIXTIME(CAST(ts_revision AS BIGINT)/1000) AS TIMESTAMP) AS date_time,
             hou.*
-    FROM 
+    FROM
         datalake_ebdb_clean.house_weekly_schedule_aud AS hou
-    JOIN 
+    JOIN
         datalake_ebdb_clean.user_revision_entity AS ure
             ON hou.rev = ure.id
 	),
     house_available AS (
-        SELECT 
+        SELECT
             ia.id_house,
             ia.date_time AS available_started_date,
             LEAD(date_time) OVER(PARTITION BY id_house, weekday ORDER BY rev NULLS LAST) AS available_ended_date,
@@ -27,10 +27,10 @@ WITH house_available_hours AS (
             ia.is_available_between_17_and_18 AS hours_available_17to18,
             ia.is_available_between_18_and_19 AS hours_available_18to19,
             ia.is_available_between_19_and_20 AS hours_available_19to20
-        FROM 
+        FROM
             imovel_aud AS ia
     )
-    SELECT 
+    SELECT
         ha.id_house,
         CAST(REPLACE(CAST(DATE(available_started_date) AS STRING),'-','') AS BIGINT) AS sk_available_started_date,
         CAST(REPLACE(CAST(DATE(available_ended_date) AS STRING),'-','') AS BIGINT) AS sk_available_ended_date,
@@ -49,7 +49,7 @@ WITH house_available_hours AS (
         ha.hours_available_17to18,
         ha.hours_available_18to19,
         ha.hours_available_19to20
-    FROM 
+    FROM
         house_available AS ha
 ),
 date_series AS (
@@ -60,18 +60,18 @@ date_series AS (
         week_start,
         CASE
             WHEN week_day = '6' THEN 'Saturday'
-            WHEN week_day = '0' THEN 'Sunday' 
+            WHEN week_day = '0' THEN 'Sunday'
             ELSE 'Weekday'
         END AS week_day_type
     FROM
         dw_public.dim_date AS dd
-    WHERE 
-        dd.date >= CURRENT_DATE - interval '45 days' 
-        AND week_start <= CURRENT_DATE - interval '1' DAY
+    WHERE
+        dd.date >= CURRENT_DATE - interval '182 days'
+        AND week_start <= CURRENT_DATE + interval '14' DAY
         AND dd.date IS NOT NULL
 ),
 regions AS (
-    SELECT DISTINCT 
+    SELECT DISTINCT
         dr.id AS region_id,
         dr.region_code,
         dr.city_group,
@@ -84,7 +84,7 @@ regions AS (
 slot_series AS (
     WITH slot_0_9 AS (
         SELECT 0 AS slot
-        UNION ALL 
+        UNION ALL
         SELECT 1 AS slot
         UNION ALL
         SELECT 2 AS slot
@@ -103,9 +103,9 @@ slot_series AS (
         UNION ALL
         SELECT 9 AS slot
         )
-    SELECT 
+    SELECT
         a.slot + b.slot * 10 AS slot
-    FROM 
+    FROM
         slot_0_9 AS a, slot_0_9 AS b
 ),
 dimensions AS (
@@ -130,7 +130,7 @@ dimensions AS (
             WHEN ss.slot BETWEEN 36 AND 39 THEN 17
             WHEN ss.slot BETWEEN 40 AND 43 THEN 18
         END AS hour,
-        CASE 
+        CASE
             WHEN ds.week_day BETWEEN 1 AND 5 AND ss.slot BETWEEN 0 AND 3 THEN '1) Weekday 8-9h'
             WHEN ds.week_day BETWEEN 1 AND 5 AND ss.slot BETWEEN 4 AND 19 THEN '2) Weekday 9-13h'
             WHEN ds.week_day BETWEEN 1 AND 5 AND ss.slot BETWEEN 20 AND 31 THEN '3) Weekday 13-16h'
@@ -141,13 +141,13 @@ dimensions AS (
         END AS faixa
     FROM
         regions AS r
-    CROSS JOIN 
+    CROSS JOIN
         date_series AS ds
-    CROSS JOIN 
+    CROSS JOIN
         slot_series AS ss
 ),
 encaixe_to_booking AS (
-    SELECT DISTINCT 
+    SELECT DISTINCT
         id_visitor AS user_id,
         id_property AS house_id
     FROM
@@ -155,7 +155,7 @@ encaixe_to_booking AS (
     WHERE
         type = 'Visita'
         AND visit_intent = 'RENT'
-        AND dt_scheduling >= CURRENT_DATE - interval '55 days'
+        AND dt_scheduling >= CURRENT_DATE - interval '182 days'
 ),
 booking_for_sale AS (
     SELECT DISTINCT
@@ -166,16 +166,16 @@ booking_for_sale AS (
         DATE(dt_scheduling) AS visit_date,
         visit_intent,
         status
-    FROM 
+    FROM
         dw_public.dim_booking
-    WHERE 
+    WHERE
         type = 'Visita'
         AND visit_intent = 'SALE'
         AND id_visitor IS NOT NULL
-        AND dt_scheduling >= CURRENT_DATE - interval '55 days'
+        AND dt_scheduling >= CURRENT_DATE - interval '182 days'
         AND (
-            status = 'Realizado' 
-            OR status = 'Marcado' 
+            status = 'Realizado'
+            OR status = 'Marcado'
             OR (status = 'Cancelado' AND DATE(dt_scheduling) = DATE(dt_cancel))
             )
 ),
@@ -187,21 +187,19 @@ visit_hoursalert_confirmed AS (
         CAST(GET_JSON_OBJECT(event_properties,'$.house_id') AS BIGINT) AS house_id,
         COALESCE(GET_JSON_OBJECT(event_properties,'$.alert_target_date'),'') AS target_date_raw,
         CASE
-            WHEN COALESCE(GET_JSON_OBJECT(event_properties,'$.alert_target_date'),'') LIKE '__, __ ___ ____' THEN TO_DATE(SPLIT(GET_JSON_OBJECT(event_properties,'$.alert_target_date'),',')[1], ' dd MMM yyyy')
-            WHEN COALESCE(GET_JSON_OBJECT(event_properties,'$.alert_target_date'),'') LIKE '____-__-__' THEN TO_DATE(GET_JSON_OBJECT(event_properties,'$.alert_target_date'), 'yyyy-MM-dd')
-            ELSE NULL
+            WHEN LENGTH(split(GET_JSON_OBJECT(event_properties,'$.alert_target_date'),',')[1])=3 THEN DATE(TO_DATE(replace(TRIM(substr(split(GET_JSON_OBJECT(event_properties,'$.alert_target_date'),',')[2],1,12)),' ','-'),'%d-%m-%y'))
+            ELSE GET_JSON_OBJECT(event_properties,'$.alert_target_date')
         END AS target_date,
         COALESCE(CAST(NULLIF(GET_JSON_OBJECT(event_properties,'$.alert_slot_from'), '') AS BIGINT), -1) AS alert_slot_from,
         COALESCE(CAST(NULLIF(GET_JSON_OBJECT(event_properties,'$.alert_slot_to'), '') AS BIGINT), -1) AS alert_slot_to
     FROM
-        datalake_amplitude_clean.events
+        datalake_amplitude_clean.170698_visit_hoursalert_confirmed_events --using this table instead 'events' to get the right event and avoid the load of all events.
     WHERE
-        TRIM(event_type) = 'visit_hoursalert_confirmed'
-        AND GET_JSON_OBJECT(event_properties, '$.business_context') = 'rent'
+        GET_JSON_OBJECT(event_properties, '$.business_context') = 'rent'
         AND GET_JSON_OBJECT(event_properties, '$.house_id') <> ''
         AND id_user <> ''
-        AND ts_event >= CURRENT_DATE - interval '45 days'
-        AND TO_DATE(CONCAT(year, '-', LPAD(month, 2, 0), '-', LPAD(day, 2, 0)), 'yyyy-MM-dd') >= CURRENT_DATE - interval '45 days'
+        AND ts_event >= CURRENT_DATE - interval '182 days'
+        AND MAKE_DATE(year, month, day) >= CURRENT_DATE - interval '182 days'
 ),
 encaixes_raw AS (
     SELECT
@@ -211,14 +209,14 @@ encaixes_raw AS (
         evt.target_date,
         evt.alert_slot_from,
         evt.alert_slot_to,
-        CASE 
-            WHEN etb.user_id IS NOT NULL THEN 1 
-            ELSE 0 
+        CASE
+            WHEN etb.user_id IS NOT NULL THEN 1
+            ELSE 0
         END AS encaixe_realizado,
         RANK() OVER(PARTITION BY evt.user_id, evt.house_id ORDER BY evt.event_date DESC NULLS FIRST) AS rank_enc
-    FROM 
+    FROM
         visit_hoursalert_confirmed AS evt
-    LEFT JOIN 
+    LEFT JOIN
         encaixe_to_booking AS etb
             ON etb.user_id = evt.user_id
             AND etb.house_id = evt.house_id
@@ -235,11 +233,11 @@ encaixes_temp AS (
         1.0/CAST(count(slot) OVER(PARTITION BY enc.user_id,enc.house_id, enc.target_date) AS DECIMAL) AS slot_share_encaixe
     FROM
         encaixes_raw AS enc
-    JOIN 
-        slot_series AS ss 
+    JOIN
+        slot_series AS ss
             ON ss.slot BETWEEN enc.alert_slot_FROM AND enc.alert_slot_to
-    JOIN 
-        datalake_ebdb_clean.house AS h 
+    JOIN
+        datalake_ebdb_clean.house AS h
             ON h.id = enc.house_id
     WHERE
         enc.rank_enc = 1
@@ -260,7 +258,7 @@ blocked_houses AS (
             datalake_ebdb_clean.house_visit_status_aud AS vs
         JOIN
             datalake_ebdb_clean.user_revision_entity AS r
-                ON vs.rev = r.id 
+                ON vs.rev = r.id
                 AND mod_status = true
         )
     WHERE
@@ -276,9 +274,9 @@ suspended_houses AS (
             h.status,
             CAST(FROM_UNIXTIME(CAST(r.ts_revision/1000 AS BIGINT)) AS TIMESTAMP) AS init,
             COALESCE(LEAD(CAST(FROM_UNIXTIME(CAST(r.ts_revision/1000 AS BIGINT)) AS TIMESTAMP)) OVER(PARTITION BY id_house ORDER BY r.ts_revision NULLS LAST), CURRENT_DATE) AS status_end
-        FROM 
+        FROM
             datalake_ebdb_clean.house_aud AS h
-        JOIN 
+        JOIN
             datalake_ebdb_clean.user_revision_entity AS r
                 ON h.rev = r.id
                 AND h.mod_status = true
@@ -295,13 +293,13 @@ cant_find_another_agent AS (
         dt_scheduling,
         DATE(dt_scheduling) AS visit_date,
         status
-    FROM 
+    FROM
         dw_public.dim_booking
-    WHERE 
+    WHERE
         type = 'Visita'
         AND status = 'Cancelado'
         AND cancellation_reason = 'CANCELED_CANT_FIND_ANOTHER_AGENT'
-        AND DATE(dt_scheduling) >= CURRENT_DATE - interval '45 days'
+        AND DATE(dt_scheduling) >= CURRENT_DATE - interval '182 days'
 ),
 encaixes_clean AS (
     SELECT
@@ -312,28 +310,28 @@ encaixes_clean AS (
         target_date,
         slot,
         slot_share_encaixe,
-        CASE 
-            WHEN encaixe_realizado = 0 
-                AND (t.event_date BETWEEN bh.init AND bh.status_end) 
-                AND bh.status = 'BLOCKED' THEN slot_share_encaixe 
+        CASE
+            WHEN encaixe_realizado = 0
+                AND (t.event_date BETWEEN bh.init AND bh.status_end)
+                AND bh.status = 'BLOCKED' THEN slot_share_encaixe
         END AS slot_share_nao_realizados_por_bloqueio,
-        CASE 
-            WHEN encaixe_realizado = 0 
-                AND (t.event_date BETWEEN sh.init AND sh.status_end) 
-                AND sh.status = 'suspenso' THEN slot_share_encaixe 
+        CASE
+            WHEN encaixe_realizado = 0
+                AND (t.event_date BETWEEN sh.init AND sh.status_end)
+                AND sh.status = 'suspenso' THEN slot_share_encaixe
         END AS slot_share_nao_realizados_por_suspensao,
-        CASE 
+        CASE
             WHEN encaixe_realizado = 0
                 AND (((t.event_date BETWEEN sh.init AND sh.status_end) AND sh.status = 'suspenso')
                 OR ((t.event_date BETWEEN bh.init AND bh.status_end) AND bh.status = 'BLOCKED')) THEN slot_share_encaixe
         END AS slot_share_nao_realizados_por_bloqueio_suspensao,
-        CASE 
-            WHEN encaixe_realizado = 1 THEN slot_share_encaixe 
+        CASE
+            WHEN encaixe_realizado = 1 THEN slot_share_encaixe
         END AS slot_share_encaixe_realizado,
-        CASE 
-            WHEN encaixe_realizado = 0 THEN slot_share_encaixe 
+        CASE
+            WHEN encaixe_realizado = 0 THEN slot_share_encaixe
         END AS slot_share_encaixe_nao_realizado,
-        CASE 
+        CASE
             WHEN encaixe_realizado = 0
                 AND (
                 (CAST(slot AS BIGINT) BETWEEN 0 AND 3 AND hs.hours_available_08to09 = false)
@@ -348,11 +346,11 @@ encaixes_clean AS (
                 OR (CAST(slot AS BIGINT) BETWEEN 36 AND 39 AND hs.hours_available_17to18 = false)
                 OR (CAST(slot AS BIGINT) BETWEEN 40 AND 43 AND hs.hours_available_18to19 = false)
                 ) THEN slot_share_encaixe
-        END AS slot_share_nao_realizados_por_agenda, 
+        END AS slot_share_nao_realizados_por_agenda,
         CASE
-            WHEN encaixe_realizado = 0 
+            WHEN encaixe_realizado = 0
                 AND (
-                    ((t.event_date BETWEEN sh.init AND sh.status_end) AND sh.status = 'suspenso') 
+                    ((t.event_date BETWEEN sh.init AND sh.status_end) AND sh.status = 'suspenso')
                     OR ((t.event_date BETWEEN bh.init AND bh.status_end) AND bh.status = 'BLOCKED')
                     OR (
                         (CAST(slot AS BIGINT) BETWEEN 0 AND 3 AND hs.hours_available_08to09 = false)
@@ -369,41 +367,41 @@ encaixes_clean AS (
                         )
                     ) THEN slot_share_encaixe
         END AS slot_share_nao_realizados_por_bloqueio_suspensao_agenda,
-        CASE 
-            WHEN encaixe_realizado = 1 
-                AND cfaa.status = 'Cancelado' THEN slot_share_encaixe 
+        CASE
+            WHEN encaixe_realizado = 1
+                AND cfaa.status = 'Cancelado' THEN slot_share_encaixe
         END AS slot_share_encaixe_nao_realizado_cant_find_another_agent,--NOVIDADE!! NOVIDADE!! NOVIDADE!! NOVIDADE!! NOVIDADE!!
         CAST(hs.hours_available_08to09 AS BIGINT) + CAST(hs.hours_available_09to10 AS BIGINT) + CAST(hs.hours_available_10to11 AS BIGINT) +
         CAST(hs.hours_available_11to12 AS BIGINT) + CAST(hs.hours_available_12to13 AS BIGINT) + CAST(hs.hours_available_13to14 AS BIGINT) +
         CAST(hs.hours_available_14to15 AS BIGINT) + CAST(hs.hours_available_15to16 AS BIGINT) + CAST(hs.hours_available_16to17 AS BIGINT) +
         CAST(hs.hours_available_17to18 AS BIGINT) + CAST(hs.hours_available_18to19 AS BIGINT) AS slots_disponiveis_target_date,
-        CASE 
-            WHEN encaixe_realizado = 0 
-                AND visit_intent = 'SALE' THEN slot_share_encaixe 
-            ELSE NULL 
+        CASE
+            WHEN encaixe_realizado = 0
+                AND visit_intent = 'SALE' THEN slot_share_encaixe
+            ELSE NULL
         END AS slot_share_ocupado_por_visita_sale
     FROM
         encaixes_temp AS t
-    LEFT JOIN 
-        house_available_hours AS hs 
+    LEFT JOIN
+        house_available_hours AS hs
             ON CAST(t.house_id AS BIGINT) = hs.id_house
             AND CAST(hs.day_of_week AS BIGINT) = EXTRACT(dow FROM t.target_date)
             AND event_date BETWEEN hs.available_started_date AND COALESCE(hs.available_ended_date, (date_add(CURRENT_DATE, 2)))
-    LEFT JOIN 
-        blocked_houses AS bh 
+    LEFT JOIN
+        blocked_houses AS bh
             ON (t.house_id = CAST(bh.house_id AS STRING)
             AND t.event_date BETWEEN bh.init AND bh.status_end)
-    LEFT JOIN 
-        suspended_houses AS sh 
+    LEFT JOIN
+        suspended_houses AS sh
             ON (t.house_id = CAST(sh.house_id AS STRING)
             AND t.event_date BETWEEN sh.init AND sh.status_end)
-    LEFT JOIN 
+    LEFT JOIN
         booking_for_sale AS bfs
             ON CAST(t.house_id AS BIGINT) = CAST(bfs.house_id AS BIGINT)
             AND CAST(t.user_id AS BIGINT) = CAST(bfs.user_id AS BIGINT)
             AND t.target_date = bfs.visit_date
             AND t.slot = bfs.slot_dia
-    LEFT JOIN 
+    LEFT JOIN
         cant_find_another_agent AS cfaa
             ON CAST(t.house_id AS BIGINT) = CAST(cfaa.house_id AS BIGINT)
             AND t.target_date = cfaa.visit_date
@@ -428,8 +426,8 @@ encaixes_agg AS (
         SUM(slot_share_nao_realizados_por_bloqueio_suspensao) AS share_encaixes_nao_realizados_por_bloqueio_suspensao,
         SUM(slot_share_nao_realizados_por_bloqueio_suspensao_agenda) AS share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
         SUM(
-            CASE 
-                WHEN slots_disponiveis_target_date = 0 THEN slot_share_encaixe 
+            CASE
+                WHEN slots_disponiveis_target_date = 0 THEN slot_share_encaixe
             END
         ) AS encaixes_em_imovel_sem_slot_disponivel_target_date,
         SUM(slot_share_ocupado_por_visita_sale) AS share_encaixes_nao_realizados_por_visita_sale,
@@ -465,8 +463,8 @@ SELECT
     enc.share_encaixes_nao_realizados_por_agent AS sum_encaixes_nao_realizados_por_agent
 FROM
     encaixes_agg AS enc
-LEFT JOIN 
-    dimensions AS d 
+LEFT JOIN
+    dimensions AS d
         ON enc.region_id = d.region_id
         AND enc.target_date = d.date
         AND enc.slot = d.slot
