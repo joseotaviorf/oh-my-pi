@@ -16,7 +16,7 @@ JOIN
         ON d.sk_date BETWEEN nullif(f.sk_status_start_date,-1) AND COALESCE(CAST(DATE_FORMAT(date_sub(to_date(string(nullif(sk_status_end_date,-1)),'yyyyMMdd'), 1),'yyyyMMdd') AS BIGINT), CAST(DATE_FORMAT(DATE_SUB(CURRENT_DATE(),1), 'yyyyMMdd') as BIGINT))
 WHERE 
     f.status_history IN ('publicado','suspenso', 'PUBLISHED', 'SUSPENDED') -- consider published and suspended status
-    AND f.status_change_reason <> 'RENTED'
+    AND COALESCE(f.status_change_reason, '') <> 'RENTED'
     AND SUBSTRING(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
 ),
 daily_published_suspended_listings_adjusted AS (
