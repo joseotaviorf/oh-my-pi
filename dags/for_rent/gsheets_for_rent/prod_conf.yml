@@ -113,6 +113,12 @@ sheets_info:
     clean_table_name: ongoing_listings_target
     sheet_context: for_rent
 
+  ppmulti_goals_am:
+    sheet_id: 1QrDKA4PAohi-5olyUcnQBtJvweAdO-gJ59KcjOlLjdI
+    sheet_name: ppmulti_goals_am
+    clean_table_name: ppmulti_goals_am
+    sheet_context: for_rent
+
   rental_budget_targets:
     sheet_id: 1LwQpjKEeRCIJ4FcKrUpHTLfEaRn2jV6lG33I-9Ie13c
     sheet_name: db_budget_targets
@@ -136,3 +142,4 @@ sheets_info:
     sheet_name: Form Responses 1
     clean_table_name: responses_action_line_ciq_full
     sheet_context: for_rent
+
