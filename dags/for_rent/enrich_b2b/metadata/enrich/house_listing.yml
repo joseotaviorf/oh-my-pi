@@ -23,3 +23,5 @@ columns:
     description: Type of the B2B Prime, the value is filled only if the partner type is PRIME.
   is_b2b:
     description: Boolean value to check if the house is B2B.
+  is_portability:
+    description: Boolean value to check if the listing if from a portability.

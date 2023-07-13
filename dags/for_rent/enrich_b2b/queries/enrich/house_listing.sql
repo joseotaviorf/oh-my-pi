@@ -39,7 +39,8 @@ SELECT DISTINCT
             OR (partner_agent.id_partner IS NOT NULL AND partner.type = 'PRIME'))
             AND partner_agent.status = 'ACTIVE'), TRUE, FALSE)
         OR por.id_house IS NOT NULL 
-    AS is_b2b
+    AS is_b2b,
+    IF(por.id_house_listing IS NOT NULL, TRUE, FAlSE) AS is_portability
 FROM 
     datalake_ebdb_clean.house AS h
 LEFT JOIN 

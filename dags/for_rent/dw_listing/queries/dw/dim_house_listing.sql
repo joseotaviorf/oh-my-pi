@@ -1,68 +1,4 @@
-WITH b2b_info AS (
-    SELECT DISTINCT
-        h.id AS id_house,
-        hl.id_house_listing,
-        -- TODO [ODS]: centralize rules like these ones
-        COALESCE(
-            (COALESCE(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
-                OR (partner_agent.id IS NOT NULL AND partner.type = 'PRIME'))
-                AND partner_agent.status = 'ACTIVE',
-            FALSE
-            )
-        AS is_b2b,
-        CASE
-          WHEN partner_agent.status = 'INACTIVE'
-            THEN NULL
-          WHEN COALESCE(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
-            THEN 'online'
-          WHEN (partner_agent.id IS NOT NULL AND partner.type = 'PRIME')
-            THEN 'prime'
-        END AS b2b_type,
-        CASE
-            WHEN
-                -- because a lead can have both 'affiliate_type' = 'B2BPartner' AND 'partner_agent.id' not null AND we need to
-                -- prioritize the first type (online), the following check must be done
-                partner_agent.id IS NOT NULL
-                AND partner.type = 'PRIME'
-                AND COALESCE(lo.affiliate_type, l.affiliate_type, '') != 'B2BPartner'
-            THEN
-              CASE
-                WHEN pj.id IS NULL AND h.dt_first_publication IS NOT NULL
-                  THEN 'advanced_negotiation'
-                WHEN h.id_external IS NULL OR h.id_external RLIKE '^([a-zA-Z0-9]+-){{4}}[a-zA-Z0-9]+$'
-                  THEN 'standard'
-                WHEN h.id_external IS NOT NULL
-                  THEN 'batch'
-              END
-        END AS b2b_prime_type
-    FROM datalake_ebdb_clean.house h
-    LEFT JOIN datalake_ebdb_clean.conversion_lead cl
-        ON cl.id_house = h.id
-    LEFT JOIN datalake_ebdb_clean.lead l
-        ON l.id = cl.id_converted_lead
-    LEFT JOIN datalake_lead.reprocessed_lead rl
-        ON rl.id = l.id
-    LEFT JOIN datalake_lead.lead lo
-        ON lo.id = rl.id_origin_lead
-    LEFT JOIN datalake_ebdb_clean.partner_agent partner_agent
-        ON partner_agent.id_user = h.id_user
-    LEFT JOIN datalake_ebdb_clean.partner partner
-        ON partner.id = partner_agent.id_partner
-    LEFT JOIN datalake_ebdb_listing.house_listing hl
-        ON h.id = hl.id_house
-    LEFT JOIN datalake_ebdb_clean.photographer_job pj
-        ON pj.id_house = h.id
-    AND pj.ts_created BETWEEN hl.ts_listing_version_start AND hl.ts_listing_version_end
-),
-house_portability AS (
-    SELECT
-        hl.id_house_listing
-    FROM datalake_ebdb_listing.house_listing hl
-    JOIN datalake_ebdb_clean.portability por
-        ON por.id_house = hl.id_house AND por.owner_type = 'B2B'
-    WHERE por.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, now())
-),
-autonomous_agent_info AS (
+WITH autonomous_agent_info AS (
     SELECT
         h.id AS id_house,
         hl.id_house_listing AS sk_house_listing,
@@ -287,10 +223,10 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.key_type,
     hl.key_location,
     CAST(hl.house_predicted_price AS DECIMAL(14, 2)) AS house_predicted_price,
-    bi.b2b_type,
+    b2b.b2b_type,
     CASE
-      WHEN hp.id_house_listing IS NOT NULL THEN 'portability'
-      ELSE bi.b2b_prime_type
+      WHEN b2b.is_portability THEN 'portability'
+      ELSE b2b.b2b_prime_type
     END AS b2b_prime_type,
     hl.last_originals_type,
     hl.last_iorent_type,
@@ -303,7 +239,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.is_last_version,
     hl.is_exclusive,
     hl.is_extended_rental,
-    (bi.is_b2b OR hp.id_house_listing IS NOT NULL) AS is_b2b,
+    b2b.is_b2b,
     COALESCE(aa_info.sk_partner_agent IS NOT NULL, FALSE) AS is_autonomous_agent,
     hl.is_originals_active,
     hl.is_iorent_active,
@@ -339,11 +275,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
 FROM
     house_listings hl
 LEFT JOIN
-    b2b_info bi
-        ON bi.id_house_listing = hl.sk_house_listing
-LEFT JOIN
-    house_portability hp
-        ON hp.id_house_listing = hl.sk_house_listing
+    datalake_b2b.house_listing AS b2b
+        ON b2b.id_house_listing = hl.sk_house_listing
 LEFT JOIN
     autonomous_agent_info aa_info
         ON aa_info.sk_house_listing = hl.sk_house_listing
