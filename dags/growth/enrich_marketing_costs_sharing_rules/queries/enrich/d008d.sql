@@ -14,7 +14,7 @@ FROM
 INNER JOIN
     datalake_ebdb_listing.house_listing_status AS hls
         ON adt.date BETWEEN DATE(hls.ts_status_started) AND DATE(COALESCE(hls.ts_status_ended, DATE_SUB(CURRENT_DATE(),2)))
-        AND hls.status_history = 'publicado'
+        AND hls.status_history = 'PUBLISHED'
         AND hls.ts_status_started IS NOT NULL
 INNER JOIN
     datalake_region.region AS rgn
