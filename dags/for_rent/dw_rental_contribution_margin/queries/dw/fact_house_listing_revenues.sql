@@ -22,14 +22,14 @@ WITH invoices AS (
 invoices_values AS (
   SELECT
     id_contract,
-    SUM(IF(entry_type = 'rental', brl_entry_due_amount, 0)) AS rent_value,
+    SUM(IF(entry_type = 'rental', brl_entry_due_amount, 0)) AS rent_value_invoice,
     SUM(IF(entry_type = 'home insurance', brl_entry_due_amount, 0)) AS home_insurance,
     accrual_year_month
   FROM
     invoices
   WHERE
     invoice_user = 'tenant'
-  GROUP BY 1,4
+  GROUP BY 1, 4
 ),
 
 contracts_competences as (
@@ -43,8 +43,8 @@ contracts_competences as (
 brokerage_fees AS (
   SELECT
     id_contract_ebdb,
-    SUM(invoice_theorical_amount) AS brokerage_fee,
-    SUM(IF(brokerage_share = 'partner' AND invoice_payment_status = 'paid', invoice_theorical_amount, 0)) AS brokerage_partner_share,
+    SUM(invoice_theorical_amount) AS rental_brokerage,
+    SUM(IF(brokerage_share = 'partner' AND invoice_payment_status = 'paid', invoice_theorical_amount, 0)) AS partner_share_brokerage,
     SUM(IF(brokerage_share = 'rental agents', prod_theorical_amount, 0)) AS agents_commission,
     SUM(IF(brokerage_share = 'ciq select', invoice_theorical_amount, 0)) AS select_commission,
     accrual_year_month
@@ -73,8 +73,8 @@ affiliates_commission AS (
 management_fees AS (
   SELECT
     id_contract_ebdb,
-    SUM(invoice_theorical_amount) AS management_fee,
-    SUM(IF(management_fee_share = 'partner', invoice_theorical_amount, 0)) AS management_partner_share,
+    SUM(invoice_theorical_amount) AS rental_management,
+    SUM(IF(management_fee_share = 'partner', invoice_theorical_amount, 0)) AS partner_share_management,
     accrual_year_month
   FROM
     datalake_revenue_lines.management_fee
@@ -85,7 +85,7 @@ late_payments AS (
   SELECT
     id_contract,
     DATE_FORMAT(dt_paid, 'yyyyMM') AS paid_accrual_year_month,
-    SUM(invoice_paid_amount) AS lp
+    SUM(invoice_paid_amount) AS late_payments
   FROM
     datalake_revenue_lines.late_payments
   GROUP BY 1, 2
@@ -94,7 +94,7 @@ late_payments AS (
 long_term_rental_anticipation AS (
   SELECT
     id_contract_ebdb,
-    SUM(mova_interest_value/total_installments) AS lra,
+    SUM(mova_interest_value/total_installments) AS addons_lra,
     DATE_FORMAT(dt_due, 'yyyyMM') AS due_accrual_year_month,
     dt_due
   FROM
@@ -105,7 +105,7 @@ long_term_rental_anticipation AS (
 service_fee AS (
   SELECT
     id_contract_ebdb,
-    SUM(invoice_theorical_amount) AS service_fee,
+    SUM(invoice_theorical_amount) AS addons_service_fee,
     accrual_year_month
   FROM
     datalake_revenue_lines.service_fee
@@ -115,7 +115,7 @@ service_fee AS (
 month_rental_anticipation AS (
   SELECT
     id_contract_ebdb,
-    SUM(invoice_paid_fee) AS mra,
+    SUM(invoice_paid_fee) AS addons_mra,
     accrual_year_month
   FROM
     datalake_revenue_lines.month_rental_anticipation
@@ -125,7 +125,7 @@ month_rental_anticipation AS (
 brokerage_finance AS (
   SELECT
     id_contract_ebdb,
-    SUM(invoice_theorical_fee) AS bfi,
+    SUM(invoice_theorical_fee) AS addons_bfi,
     accrual_year_month
   FROM
     datalake_revenue_lines.brokerage_finance
@@ -136,7 +136,7 @@ credit_card_payment AS (
   SELECT
     id_contract_ebdb,
     DATE_FORMAT(dt_paid, 'yyyyMM') AS paid_accrual_year_month,
-    SUM(invoice_paid_fee) AS ccp_net
+    SUM(invoice_paid_fee) AS addons_ccp
   FROM
     datalake_revenue_lines.credit_card_payment
   GROUP BY 1, 2
@@ -148,7 +148,7 @@ reservation AS (
     id_house,
     id_reservation,
     DATE_FORMAT(dt_created, 'yyyyMM') AS created_accrual_year_month,
-    SUM(monthly_value) AS reservation
+    SUM(monthly_value) AS addons_reserve
   FROM
     datalake_revenue_lines.reservation
   WHERE
@@ -165,19 +165,19 @@ revenue_with_contract AS (
     hl.id_house_listing,
     hl.id_house,
     INT(MONTHS_BETWEEN(dd.month_start, dd_contract.month_start)) AS contract_lifetime,
-    iv.rent_value,
-    COALESCE(mf.management_fee, 0) AS management_fee,
-    COALESCE(bf.brokerage_fee, 0) AS brokerage_fee,
+    iv.rent_value_invoice,
+    COALESCE(mf.rental_management, 0) AS rental_management,
+    COALESCE(bf.rental_brokerage, 0) AS rental_brokerage,
     COALESCE(iv.home_insurance, 0) AS home_insurance,
-    COALESCE(sf.service_fee, 0) AS service_fee,
-    COALESCE(mra.mra, 0) AS mra,
-    COALESCE(bfi.bfi, 0) as bfi,
-    COALESCE(lp.lp, 0) AS lp,
-    COALESCE(ccp.ccp_net, 0) AS ccp_net,
+    COALESCE(sf.addons_service_fee, 0) AS addons_service_fee,
+    COALESCE(mra.addons_mra, 0) AS addons_mra,
+    COALESCE(bfi.addons_bfi, 0) as addons_bfi,
+    COALESCE(lp.late_payments, 0) AS late_payments,
+    COALESCE(ccp.addons_ccp, 0) AS addons_ccp,
     COALESCE(-1 * (bf.agents_commission + bf.select_commission), 0) AS agents_commission,
     COALESCE(-1 * ac.affiliates_commission, 0) AS affiliates_commission,
-    COALESCE(-1 * bf.brokerage_partner_share, 0) AS brokerage_partner_share,
-    COALESCE(-1 * mf.management_partner_share, 0) AS management_partner_share,
+    COALESCE(-1 * bf.partner_share_brokerage, 0) AS partner_share_brokerage,
+    COALESCE(-1 * mf.partner_share_management, 0) AS partner_share_management,
     dd.quarter,
     cc.accrual_year_month,
     dd.month_start AS dt_month_start
@@ -241,21 +241,21 @@ SELECT
   COALESCE(r.id_house, revenue.id_house, hl_contract.id_house) AS id_house,
   COALESCE(hl.country_code, hl_contract.country_code, 'Undefined') AS country_code,
   contract_lifetime,
-  COALESCE(rent_value, 0) AS rent_value,
-  COALESCE(management_fee, 0) AS management_fee,
-  COALESCE(brokerage_fee, 0) AS brokerage_fee,
+  COALESCE(rent_value_invoice, 0) AS rent_value_invoice,
+  COALESCE(rental_management, 0) AS rental_management,
+  COALESCE(rental_brokerage, 0) AS rental_brokerage,
   COALESCE(home_insurance, 0) AS home_insurance,
-  COALESCE(service_fee, 0) AS service_fee,
-  COALESCE(mra, 0) AS mra,
-  COALESCE(lra, 0) AS lra,
-  COALESCE(bfi, 0) AS bfi,
-  COALESCE(lp, 0) AS lp,
-  COALESCE(ccp_net, 0) AS ccp_net,
-  COALESCE(reservation, 0) AS reservation,
+  COALESCE(addons_service_fee, 0) AS addons_service_fee,
+  COALESCE(addons_mra, 0) AS addons_mra,
+  COALESCE(addons_lra, 0) AS addons_lra,
+  COALESCE(addons_bfi, 0) AS addons_bfi,
+  COALESCE(late_payments, 0) AS late_payments,
+  COALESCE(addons_ccp, 0) AS addons_ccp,
+  COALESCE(addons_reserve, 0) AS addons_reserve,
   COALESCE(agents_commission, 0) AS agents_commission,
   COALESCE(affiliates_commission, 0) AS affiliates_commission,
-  COALESCE(brokerage_partner_share, 0) AS brokerage_partner_share,
-  COALESCE(management_partner_share, 0) AS management_partner_share,
+  COALESCE(partner_share_brokerage, 0) AS partner_share_brokerage,
+  COALESCE(partner_share_management, 0) AS partner_share_management,
   COALESCE(dd.quarter, revenue.quarter) AS quarter,
   COALESCE(revenue.accrual_year_month, ltra.due_accrual_year_month, r.created_accrual_year_month) AS accrual_year_month,
   COALESCE(dd.month_start, revenue.dt_month_start) AS dt_month_start,
@@ -295,28 +295,28 @@ SELECT
   id_house,
   country_code,
   contract_lifetime,
-  rent_value,
-  management_fee,
-  brokerage_fee,
+  rent_value_invoice,
+  rental_management,
+  rental_brokerage,
   home_insurance,
-  service_fee,
-  mra,
-  lra,
-  bfi,
-  lp,
-  ccp_net,
-  reservation,
+  addons_service_fee,
+  addons_mra,
+  addons_lra,
+  addons_bfi,
+  late_payments,
+  addons_ccp,
+  addons_reserve,
   agents_commission,
   affiliates_commission,
-  brokerage_partner_share,
-  management_partner_share,
-  (management_fee + brokerage_fee + home_insurance) +
-    (service_fee + mra + lra + bfi + lp + ccp_net + reservation) +
-    (agents_commission + affiliates_commission + brokerage_partner_share + management_partner_share) AS net_revenue,
-  (management_fee + brokerage_fee + home_insurance) +
-    (service_fee + mra + lra + bfi + lp + ccp_net + reservation) AS gross_revenue,
-  service_fee + mra + lra + bfi + lp + ccp_net + reservation AS addons_revenue,
-  agents_commission + affiliates_commission + brokerage_partner_share + management_partner_share AS total_revenue_discounts,
+  partner_share_brokerage,
+  partner_share_management,
+  (rental_management + rental_brokerage + home_insurance) +
+    (addons_service_fee + addons_mra + addons_lra + addons_bfi + late_payments + addons_ccp + addons_reserve) +
+    (agents_commission + affiliates_commission + partner_share_brokerage + partner_share_management) AS net_revenue_pre_taxes,
+  (rental_management + rental_brokerage + home_insurance) +
+    (addons_service_fee + addons_mra + addons_lra + addons_bfi + late_payments + addons_ccp + addons_reserve) AS gross_revenue,
+  addons_service_fee + addons_mra + addons_lra + addons_bfi + addons_ccp + addons_reserve AS addons_revenue_total,
+  agents_commission + affiliates_commission + partner_share_brokerage + partner_share_management AS revenue_share_total,
   quarter,
   accrual_year_month,
   dt_month_start,

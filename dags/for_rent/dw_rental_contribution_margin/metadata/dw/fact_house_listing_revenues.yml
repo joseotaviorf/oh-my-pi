@@ -31,47 +31,47 @@ columns:
   contract_lifetime:
     description: The difference between the month when the contract started and competence
       month of the revenue.
-  rent_value:
+  rent_value_invoice:
     description: Rent value of the contract charged from tenant.
-  management_fee:
+  rental_management:
     description: Management fee value charged from landlord.
-  brokerage_fee:
+  rental_brokerage:
     description: First rental commission value. We receive this value just on the
       first competence month of the contract.
   home_insurance:
     description: Home/fire insurance value.
-  service_fee:
+  addons_service_fee:
     description: Service fee value charged from tenant.
-  mra:
+  addons_mra:
     description: Extra MRA (month rental anticipation) revenue.
-  lra:
+  addons_lra:
     description: Extra LRA (long term rental anticipation) revenue.
-  bfi:
+  addons_bfi:
     description: Extra BFI (brokerage finance) revenue.
-  lp:
+  late_payments:
     description: Extra LP (late payment) revenue.
-  ccp_net:
+  addons_ccp:
     description: Extra CCP (credit card payment) net revenue.
-  reservation:
+  addons_reserve:
     description: Extra reservation revenue comes from kill_queue service.
   agents_commission:
     description: Agents commission share value that is passed to agents.
       It's the sum of 'rental agents' and 'ciq select' from brokerage share column. (Negative value).
   affiliates_commission:
     description: Affiliates commission share value that is passed to CIQ. (Negative value).
-  brokerage_partner_share:
+  partner_share_brokerage:
     description: Commission paid to affiliates/B2B partners. We receive this value
       just on the first competence month of the contract. (Negative value).
-  management_partner_share:
+  partner_share_management:
     description: Administration fee paid to partners when the contract is linked
       with affiliates/B2B. (Negative value).
-  net_revenue:
+  net_revenue_pre_taxes:
     description: The net revenue calculated from all the revenues (gross_revenue + addons_revenue + total_revenue_discounts).
   gross_revenue:
     description: Gross revenue calculated by adding the management_fee, brokerage_fee, home_insurance columns.
-  addons_revenue:
+  addons_revenue_total:
     description: Addons revenue calculated by adding the service_fee, mra, lra, bfi, lp, ccp_net, reservation columns.
-  total_revenue_discounts:
+  revenue_share_total:
     description: Discount revenue calculated by adding the agents_commission, brokerage_partner_share, management_partner_share columns. This column has negative value.
   quarter:
     lineage:
