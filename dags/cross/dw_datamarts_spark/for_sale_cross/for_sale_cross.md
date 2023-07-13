@@ -17,7 +17,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 
 - `sale_cohort_conversions`
 - `sale_events_funnel`
-- `sale_ongoing_listings`
 - `temp_supply_flows`
 
 ### Additional Information
