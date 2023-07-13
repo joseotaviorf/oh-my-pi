@@ -17,7 +17,7 @@ WITH ongoing_listings AS (
       ON d.date >= DATE(h.ts_status_started)
       AND d.date < COALESCE(DATE(h.ts_status_ended), CURRENT_DATE())
   WHERE
-    status_history = 'publicado'
+    status_history IN ('publicado', 'PUBLISHED')
     AND dr.city_group IS NOT NULL
     AND d.date = d.month_end
     AND h.year = d.year

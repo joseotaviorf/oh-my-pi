@@ -17,7 +17,7 @@ WITH ongoing_listings AS (
       ON d.date BETWEEN COALESCE(DATE(fhls.ts_status_start), DATE('2000-01-01')) 
         AND COALESCE(DATE_ADD(DATE(fhls.ts_status_end), -1), CURRENT_DATE())
   WHERE 
-    fhls.status_history = 'publicado' -- consider only published status
+    fhls.status_history IN ('publicado', 'PUBLISHED') -- consider only published status
     AND dhl.version <> 0 -- consider only listings that already started publication
     AND dr.city_group IS NOT NULL
   QUALIFY

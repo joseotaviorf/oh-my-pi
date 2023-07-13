@@ -13,7 +13,7 @@ WITH ongoing_listings AS (
     datalake_ebdb_country.house AS ch
       ON h.id_house = ch.id_house
   WHERE
-    status_history = 'publicado'
+    status_history IN ('publicado', 'PUBLISHED')
     AND dr.city_group IS NOT NULL
   GROUP BY 1, 2, 3
 ),
