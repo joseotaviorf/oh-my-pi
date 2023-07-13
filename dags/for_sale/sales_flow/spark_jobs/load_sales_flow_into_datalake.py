@@ -1,6 +1,7 @@
 import json
 import logging
 from argparse import ArgumentParser
+from pyspark.sql.functions import year, month, dayofmonth, col, to_timestamp
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -88,8 +89,9 @@ def main():
             table_name=table_name,
             date_filter_column=date_filter_column,
             date_filter_value=execution_date,
-            is_unixtime_col=unixtime_measure is not None,
+            unixtime_measure=unixtime_measure,
         )
+
         IncrementalTableLoaderPipeline(
             database_name,
             table_name,

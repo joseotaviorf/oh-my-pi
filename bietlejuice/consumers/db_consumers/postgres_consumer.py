@@ -229,7 +229,7 @@ class PostgresConsumer(DBConsumer):
 
     @logger
     def get_incremental_data_from_table(
-        self, table_name, date_filter_column, date_filter_value, is_unixtime_col=None
+        self, table_name, date_filter_column, date_filter_value, unixtime_measure=None
     ):
         """
         Gets incremental data from table in a Postgres database.
@@ -238,7 +238,7 @@ class PostgresConsumer(DBConsumer):
         :param table_name: Name of the table
         :param date_filter_column: Name of the column to make the filter
         :param date_filter_value: Value of the column
-        :param is_unixtime_col: Boolean to be seted True when the date_filter_column
+        :param unixtime_measure: String to indicate if the column filter will be in seconds or milliseconds.
         has a unix timestamp date_filter_value.
         :return: A Spark DataFrame with the table data
         """
@@ -248,15 +248,19 @@ class PostgresConsumer(DBConsumer):
         dt_filter_value = datetime.strptime(date_filter_value, "%Y-%m-%d")
         dt_filter_value_day_after = dt_filter_value + timedelta(days=1)
 
-        if is_unixtime_col:
+        if unixtime_measure == "milliseconds":
+            filter_value = 1000 * int(dt_filter_value.timestamp())
+            filter_value_day_after = 1000 * int(dt_filter_value_day_after.timestamp())
+        elif unixtime_measure == "seconds":
             filter_value = int(dt_filter_value.timestamp())
             filter_value_day_after = int(dt_filter_value_day_after.timestamp())
-            filter_enclosement = "{filter}"
         else:
             filter_value = dt_filter_value
             filter_value_day_after = dt_filter_value_day_after
-            filter_enclosement = "'{filter}'"
 
+        filter_enclosement = (
+            "{filter}" if unixtime_measure is not None else "'{filter}'"
+        )
         query_filter_value = filter_enclosement.format(filter=filter_value)
         query_filter_value_day_after = filter_enclosement.format(
             filter=filter_value_day_after

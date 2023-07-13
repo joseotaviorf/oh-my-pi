@@ -53,9 +53,9 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-        m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, 
-        source={source}, table_name={table_name}, raw_partition_cols={partition_cols}, 
-        date_filter_column={date_filter_column}, execution_date={execution_date}, 
+        m=__main__, environment={environment}, datalake_bucket={datalake_bucket},
+        source={source}, table_name={table_name}, raw_partition_cols={partition_cols},
+        date_filter_column={date_filter_column}, execution_date={execution_date},
         extraction_type={extraction_type}, unixtime_measure={unixtime_measure}, msg=Starting Spark job...
         """
     )
@@ -92,7 +92,7 @@ if __name__ == "__main__":
             table_name,
             date_filter_column,
             execution_date,
-            is_unixtime_col=unixtime_measure is not None,
+            unixtime_measure=unixtime_measure,
         )
         IncrementalTableLoaderPipeline(
             database_name,
@@ -101,7 +101,7 @@ if __name__ == "__main__":
             LayerEnum.RAW,
             None,
             partition_cols,
-        ).load_and_register(df, format_options)        
+        ).load_and_register(df, format_options)
     else:
         df = postgres_consumer.get_data_from_table(table_name)
         FullTableLoaderPipeline(
