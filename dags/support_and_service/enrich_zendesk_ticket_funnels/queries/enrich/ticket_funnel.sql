@@ -163,10 +163,6 @@ SELECT DISTINCT
     t.comment,
     TO_JSON(cf.custom_fields) AS custom_fields,
     cf.custom_fields['Tipo de Solicitação'] AS request_type,
-    CASE 
-        WHEN LOWER(ac.agent_company)="atento" OR LOWER(ac.email) LIKE "%atento%" THEN "ATENTO"
-        ELSE NULL 
-    END AS agent_organization,
     COALESCE(
         cf.custom_fields['Tipo de Cliente'],
         REPLACE(REPLACE(REPLACE(cf.custom_fields['[CC] - Tipo de Cliente'], 'cc_',''), 'er_', 'er'), 'serviços', 'serviço'),
@@ -211,10 +207,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_zendesk_custom_fields.custom_fields AS cf
         ON te.id_ticket = cf.id_ticket
-LEFT JOIN 
-    datalake_gsheets_clean.agents_control AS ac
-        ON ac.id_assignee = t.id_assignee
-        OR ac.email = cf.custom_fields['[AUTO] Email do Agente']
 LEFT JOIN
     sale_offers_keys AS sok
         ON te.id_ticket = sok.id_ticket

@@ -92,8 +92,6 @@ columns:
     lineage:
       - datalake_zendesk_custom_fields.custom_fields.custom_fields
     description: Request type of the ticket, from custom_field 'Tipo de Solicitação'
-  agent_organization:
-    description: Agent organization, temporary field to filters.
   client_type:
     lineage:
       - datalake_zendesk_custom_fields.custom_fields.custom_fields
