@@ -22,7 +22,7 @@ cap_contract_info AS (
             ON ie.sk_invoice_entry = fie.sk_invoice_entry
 ),
 
-cap_formated AS (
+cap_pre_formated AS (
     SELECT
       supplier_description,
       dt_paid AS dt_paid,
@@ -38,16 +38,33 @@ cap_formated AS (
         WHEN regexp_like(UPPER(payment_reason),'^CRÉDITO A SALDAR|^DEVOLUÇÃO|^EXTRA') THEN 'Repasse Extra'
         ELSE NULL
       END AS payment_reason_classification,
-      SUM(paid_amount) AS paid_amount
+      paid_amount AS paid_amount,
+      CASE
+        WHEN paid_amount > 0 AND payment_reason NOT IN ('condominio-v8:estorno', 'condominio-v9:estorno') AND payment_reason like '%:%' AND payment_reason NOT LIKE '%estorno%' THEN false
+        ELSE true
+      END AS refund_check
     FROM
       datalake_payable_accounts_transactions_clean.accounts_payable
     WHERE
       dt_paid IS NOT NULL
-  GROUP BY
-      1,
-      2,
-      3,
-      4
+),
+
+cap_formated AS (
+  SELECT
+      supplier_description,
+      dt_paid AS dt_paid,
+      accrual_year_month,
+      payment_reason_classification,
+      sum(paid_amount) AS paid_amount
+    FROM
+      cap_pre_formated
+    WHERE
+      refund_check
+    GROUP BY
+     1,
+     2,
+     3,
+     4
 ),
 
 vans_formated AS ( --Change columns name to match CAP layout
