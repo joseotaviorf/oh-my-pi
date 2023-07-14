@@ -11,7 +11,6 @@ SELECT
     tipo_conta_corrente AS bank_account_type,
     user_alt AS alteration_user,
     user_inc AS creation_user,
-    cTipoCartao AS card_type,
     nome_gerente AS manager_name,
     endereco AS address,
     numero AS address_number,

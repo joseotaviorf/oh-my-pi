@@ -38,9 +38,6 @@ columns:
   creation_user:
     lineage:
       - datalake_velo_omie_raw.bank_account.user_inc
-  card_type:
-    lineage:
-      - datalake_velo_omie_raw.bank_account.cTipoCartao
   manager_name:
     lineage:
       - datalake_velo_omie_raw.bank_account.nome_gerente
