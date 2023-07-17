@@ -1,6 +1,6 @@
 WITH sla_target AS (
     SELECT DISTINCT
-        SPLIT(team, ' - ') [0] AS service_type,
+        SPLIT(team, ' - ')[0] AS service_type,
         CASE
             WHEN LOWER(team) LIKE "%saida%" THEN "offboarding"
             WHEN LOWER(team) LIKE "%entrada%" THEN "onboarding"
@@ -23,6 +23,7 @@ WITH sla_target AS (
         metric_name = "LDT"
         AND target IS NOT NULL
         AND LOWER(team) LIKE "vistoria%"
+        AND granularity = "week"
 )
 SELECT
     i.id_inspection,
