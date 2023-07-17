@@ -2,7 +2,7 @@ WITH activated_last_version_id_user AS (
     /*
     We can't guarantee that a user is the same only by cpf or id_user.
     Users that are deleted and inserted again gain a new id, and users
-    can have the cpf wrote wrong. So we need to first filter everything by 
+    can have the cpf wrote wrong. So we need to first filter everything by
     id_user, to get the last version in ids, than filter the last
     state by cpf, to deduplicated in what should be a person.
     */
@@ -18,6 +18,7 @@ WITH activated_last_version_id_user AS (
         agent_name,
         agent_phone_number,
         cpf,
+        COALESCE(cpf,CAST(id_user AS STRING)) AS cpf_id_user,
         disqualification,
         dynamic_status,
         last_area,
@@ -45,7 +46,7 @@ WITH activated_last_version_id_user AS (
 ),
 activated_last_version AS (
     SELECT
-        ROW_NUMBER() OVER(PARTITION BY cpf ORDER BY ts_updated DESC) AS ordered_version,
+        ROW_NUMBER() OVER(PARTITION BY cpf_id_user ORDER BY ts_updated DESC) AS ordered_version,
         id_airtable_record,
         ids_history,
         id_user,
@@ -56,6 +57,7 @@ activated_last_version AS (
         agent_name,
         agent_phone_number,
         cpf,
+        cpf_id_user,
         disqualification,
         dynamic_status,
         last_area,
@@ -78,18 +80,19 @@ activated_last_version AS (
         year,
         month,
         day
-    FROM 
+    FROM
         activated_last_version_id_user
     WHERE
-        ordered_version_id = 1 
+        ordered_version_id = 1
 ),
 id_user_changes AS (
     SELECT
         cpf,
+        COALESCE(cpf,CAST(id_user AS STRING)) AS cpf_id_user,
         COUNT(DISTINCT id_user) - 1 AS number_of_id_user_changes
     FROM
         datalake_airtable_clean.activated
-    GROUP BY 1
+    GROUP BY 1,2
 )
 SELECT
     alv.id_airtable_record,
@@ -129,7 +132,7 @@ FROM
     activated_last_version AS alv
 LEFT JOIN
     id_user_changes AS iuc
-        ON alv.cpf = iuc.cpf
+        ON alv.cpf_id_user = iuc.cpf_id_user
 WHERE
     ordered_version = 1
     AND id_user IS NOT NULL
