@@ -41,15 +41,7 @@ growth_cross:
     depends_on: 
       - performance_marketing_metrics_demand 
       - sale_performance_marketing_metrics_demand
-  pricing_rent_categorization: 
-    depends_on: 
-      - performance_marketing_metrics_demand
   rent_flow_interactions: {}
-  rental_cohort_conversions: {}
-  rental_marketplace_flows: 
-    depends_on: 
-      - rent_flow_interactions 
-      - tenant_prospect_status
   rental_performance_marketing_metrics_supply_coincident:
     depends_on: 
       - performance_marketing_cluster_promotional_bonus_costs 

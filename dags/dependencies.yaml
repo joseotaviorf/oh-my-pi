@@ -182,10 +182,8 @@ bietlejuice.dw_datamarts_spark.fintech:
   - bietlejuice.retsuko:load-clean-contract
 bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
-  - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
   - bietlejuice.ebdb:load-clean-access-authorization-type
@@ -202,7 +200,18 @@ bietlejuice.dw_datamarts_spark.for_rent:
 bietlejuice.dw_datamarts_spark.for_rent_cross:
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
+  - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-performance-marketing-metrics-demand
+  - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-rent-flow-interactions
+  - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-tenant-prospect-status
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+  - bietlejuice.ebdb:load-clean-house-aud
+  - bietlejuice.ebdb:load-clean-house-predicted-price
+  - bietlejuice.ebdb:load-clean-house-predicted-price-aud
+  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.enrich_listing_temp:load-enrich-dim-house-listing-house
+  - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listing-status-house
+  - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listings-house
+  - bietlejuice.enrich_listing_temp:load-enrich-fact-listing-rent-flows-house
 bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_booking:load-dw-public-dim-booking
@@ -319,13 +328,11 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.dw_contract:load-dw-public-dim-contract
   - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-buyer-prospect-status
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
   - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
   - bietlejuice.dw_offer:load-dw-public-dim-offer
-  - bietlejuice.dw_proposal:load-dw-public-dim-proposal
   - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-chat
   - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-quinto-messenger-agent
   - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-task
@@ -339,19 +346,12 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
   - bietlejuice.ebdb:load-clean-house
-  - bietlejuice.ebdb:load-clean-house-aud
-  - bietlejuice.ebdb:load-clean-house-predicted-price
-  - bietlejuice.ebdb:load-clean-house-predicted-price-aud
   - bietlejuice.ebdb:load-clean-listing-business-context
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.enrich_3p:load-enrich-houses-3p
   - bietlejuice.enrich_3p:load-enrich-houses-3p-bh
   - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliates-cost-attributions
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
-  - bietlejuice.enrich_listing_temp:load-enrich-dim-house-listing-house
-  - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listing-status-house
-  - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listings-house
   - bietlejuice.enrich_listing_temp:load-enrich-fact-listing-rent-flows-house
   - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
@@ -2026,12 +2026,12 @@ bietlejuice.enrich_sorting_hat:
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis
 bietlejuice.enrich_ss_logic_model:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.enrich_app_installed:load-enrich-events
   - bietlejuice.chat_fup:load-clean-rating
+  - bietlejuice.enrich_app_installed:load-enrich-events
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
-  - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.enrich_user:load-enrich-persona-type
+  - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details
   - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-owners
@@ -2253,7 +2253,7 @@ bietlejuice.metric_rent_benvi__demand:
   - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
   - bietlejuice.gsheets_for_rent:done-clean-mexico-demand-targets-2022
 bietlejuice.metric_rent_benvi__supply:
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-rental-marketplace-flows
+  - bietlejuice.dw_datamarts_spark.for_rent_cross:load-dw-datamarts-rental-marketplace-flows
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-cohort-funnel
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-coincident-funnel

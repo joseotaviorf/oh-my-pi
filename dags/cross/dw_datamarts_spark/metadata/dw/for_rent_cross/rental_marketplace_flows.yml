@@ -1,8 +1,8 @@
 ---
 database_name: dw_datamarts
 table_name: rental_marketplace_flows
-owner: '@data-growth'
-domain: Data Growth
+owner: '@data-for-rent'
+domain: Data For Rent
 description: A datamart tracking rental flows in 5A context.
 columns:
   week_start:
