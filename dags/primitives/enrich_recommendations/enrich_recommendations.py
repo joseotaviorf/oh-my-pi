@@ -64,6 +64,15 @@ def get_date_param(dag_run, ds, date_param_name):
     return ds
 
 
+def get_optional_conf(dag_run, attribute, default):
+    """
+    Airflow macro for retrieving optional configurations
+    """
+    if dag_run.conf:
+        return dag_run.conf.get(attribute, default)
+    return default
+
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -76,7 +85,10 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
-    user_defined_macros={"get_date_param": get_date_param},
+    user_defined_macros={
+        "get_date_param": get_date_param,
+        "get_optional_conf": get_optional_conf,
+    },
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -124,7 +136,7 @@ for table, configs in tables.items():
         extra_query_template_params={
             "start_date": "{{ get_date_param(dag_run, ds, 'start_date') }}",
             "end_date": "{{ get_date_param(dag_run, ds, 'end_date') }}",
-            "days_past": "{{ dag_run.conf.get('days_past', 15) }}",
+            "days_past": "{{ get_optional_conf(dag_run, 'days_past', 15) }}",
         },
     )
 
