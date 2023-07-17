@@ -1,0 +1,74 @@
+---
+database_name: metric_rent
+table_name: total_tickets
+description: Monthly total tickets. 
+  This metric is being built with some specific filters for the FLUX context and is used to calculate Ticket Rate. The granularity is by contact_theme_detail and month.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  started_month:
+    lineage:
+      - dw_customer_support.fact_received_contact.ts_created
+      - dw_customer_support.fact_ticket.ts_solved
+    description: Reference month first day.
+    dimension: True
+  contact_theme_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+    description: Theme of the ticket (aka. macro_taxonomy).
+    dimension: True
+  contact_theme_detail:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Theme detail of the ticket (aka. micro_taxonomy).
+    dimension: True
+  ticket_type:
+    lineage:
+      - dw_customer_support.dim_department.front_or_back
+    description: Type of the ticket.
+    categories:
+      front: Front ticket.
+      back: Back ticket.
+    dimension: True
+  journey:
+    lineage:
+      - dw_customer_support.dim_taxonomy.journey
+    description: Journey of the ticket.
+    dimension: True
+  sub_journey:
+    lineage:
+      - dw_customer_support.dim_taxonomy.sub_journey
+    description: Sub journey of the ticket.
+    dimension: True
+  line_owner:
+    lineage:
+      - dw_customer_support.dim_taxonomy.line_owner
+    description: Line owner of the ticket.
+    dimension: True
+  team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Team responsible for the ticket.
+    dimension: True
+  total_abandoned_calls:
+    description: Volume of tickets resulted from abandoned calls by month.
+    metric:
+      name: Total Abandoned Calls Monthly
+      description: Volume of tickets resulted from abandoned calls by month.
+      acronym: TAC
+      is_additive: True
+      business_stage: CX
+      hierarchy: User analysis
+      approved_by: marcus.pinto@quintoandar.com.br
+      link_to_metric: ""
+  total_tickets:
+    description: Count of unique CX's tickets.
+    metric:
+      name: Total Tickets Monthly
+      description: Count of unique CX's tickets.
+      acronym: TT
+      is_additive: True
+      business_stage: CX
+      hierarchy: User analysis
+      approved_by: marcus.pinto@quintoandar.com.br
+      link_to_metric: ""
