@@ -148,7 +148,7 @@ LEFT JOIN
 WHERE
   pagamento IS NOT NULL
 AND
-  ((status = ':payment.status/paid') OR (status = ':payment.status/chargeback'))
+  status = ':payment.status/paid'
 GROUP BY
   1,
   2,
