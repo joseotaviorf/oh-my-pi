@@ -3,15 +3,16 @@ database_name: datalake_ss_logic_model
 table_name: user_ss_metrics
 description:
   This table consolidates the key metrics of S&S for each user, encompassing all
-  personas they assume. It includes only active users, such as ongoing tenants,
-  active property owners, photographers, and brokers.
+  personas they assume.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
+  id_snapshot:
+    description: The snapshot id, which is the D-1 date in the format "yyyyMMdd".
   id_user:
     lineage:
-      - datalake_user.persona_type.id_user
-    description: The user id in the main.
+      - datalake_user.persona_type .id_user
+    description: The user id.
   id_country:
     lineage:
       - datalake_user.persona_type.id_country
@@ -19,11 +20,17 @@ columns:
   id_personal_number:
     lineage:
       - datalake_user.persona_type.cpf
-    description: The user individual registry.
+    description: The user individual brazilian registry.
+  id_last_csi_ticket:
+    lineage:
+      - datalake_ss_logic_model.user_csi_metric.id_last_csi_ticket
+    description:
+      It considers the last csi ticket created per user. By csi ticket, these are tickets
+      from the departments of "Midias Ops [POS] [BACK]" or "[CE]" related.
   country_code:
     lineage:
       - datalake_user.persona_type.country_code
-    description: Country code of the user. Also, a partition of this table.
+    description: Country code of the user.
   main_phone:
     lineage:
       - datalake_user.persona_type.main_phone
@@ -31,97 +38,247 @@ columns:
   name:
     lineage:
       - datalake_user.persona_type.name
-    description: The user full name.
+    description: The user full_name.
   email:
     lineage:
       - datalake_user.persona_type.email
     description: The user email.
-  active_contracts:
+  tenant_journey_step:
     lineage:
-      - datalake_ebdb_clean.contract.id
-    description: A list with the active contracts.
-  back_ticket_list:
+      - datalake_user.persona_type.tenant_journey_step
+    description:
+      The tenant journey step, respecting how deep the customer is on their
+      rental journey. Only tenants has this column filled.
+    categories:
+      Offboarding:
+        Indicates if the client is currently in the offboarding step in
+        the rental context
+      Ongoing:
+        Indicates if the client is in the ongoing step but not in the offboarding step
+        in the rental context
+      Onboarding:
+        Indicates if the client is in the onboarding step but not in the offboarding
+        or ongoing steps in the rental context
+      Contract to Entrance:
+        Indicates if the client is in the contract to entrance step but not in the
+        onboarding, ongoing, or offboarding steps in the rental context
+      Visits to Offer:
+        Indicates if the client is in the visits to offer step but not in the contract
+        to entrance, onboarding, ongoing, or offboarding steps in the rental context
+      Listing and Search:
+        Indicates if the client is in the listing and search step but not in the visits
+        to offer, contract to entrance, onboarding, ongoing, or offboarding steps in the
+        rental context
+      Default:
+        Indicates if the client is not currently active in any of the journey steps
+        in the rental context
+  tenant_persona_step:
     lineage:
-      - datalake_customer_demand.base_tasks.id_task
-    description: A list with the open backoffice tickets.
-  total_open_back_ticket:
-    description: The volume of open backoffice tickets.
-  total_open_back_ticket_7:
-    description: The volume of open backoffice tickets created in the last 7 days.
-  total_open_back_ticket_30:
-    description: The volume of open backoffice tickets created in the last 30 days.
-  total_open_back_ticket_90:
-    description: The volume of open backoffice tickets created in the last 90 days.
-  total_call_ticket:
+      - datalake_user.persona_type.tenant_persona_step
     description:
-      The volume of call tickets by user. It considers the last ticket ID associated
-      with each call ID, so we can obtain the most recent ticket associated with each call,
-      providing us with up-to-date information on the status of each call and its
-      associated ticket.
-  total_call_ticket_7:
+      Indicates if the user is in any step before signing a contract or after signing a
+      contract. If the user is in the post_contract step,it will not assume the
+      pre_contract step. Only tenants have this column filled.
+    categories:
+      Pre_Contract:
+        If the user has taken any step in contract to entrance, visits to offer, or
+        listing and search, it signifies that the user is in a pre-contract step
+      Post_Contract:
+        If the user has taken any step in offboarding, ongoing, or onboarding, it
+        indicates that the user is in a post-contract step
+      Not_Apply: If the user is not in the pre or post contract steps
+  last_bot_csat_answered_score:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.last_bot_csat_answered_score
+    description: The last bot csat answered score.
+  last_human_csat_answered_score:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.last_human_csat_answered_score
+    description: The last human csat answered score.
+  bot_csat_detractor_percentage_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.bot_csat_detractor_percentage_within_three_months
     description:
-      From the total call tickets, it considers how many tickets were created in the
-      last 7 days.
-  total_call_ticket_30:
+      Considers the percentual of bot csat answers equal to 1 or 2 that were answered
+      within the last 3 months.
+  human_csat_detractor_percentage_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.human_csat_detractor_percentage_within_three_months
     description:
-      From the total call tickets, it considers how many tickets were created in the
-      last 30 days.
-  total_call_ticket_90:
+      Considers the percentual of human csat answers equal to 1 or 2 that were answered
+      within the last 3 months.
+  total_created_front_tickets_within_four_days:
+    lineage:
+      - datalake_ss_logic_model.user_recontact_metric.total_created_tickets_within_four_days
+    description: The volume of FrontOffice tickets created within 4 days.
+  total_recontact_tickets_within_four_days:
+    lineage:
+      - datalake_ss_logic_model.user_recontact_metric.total_recontact_tickets_within_four_days
     description:
-      From the total call tickets, it considers how many tickets were created in the
-      last 90 days.
-  total_chat_ticket:
+      The count of recontact FrontOffice tickets within a 4-day period is determined.
+      It checks whether a given ticket has a previous ticket created within 4 days.
+      If this condition is met, the ticket is counted as a recontact. However, the
+      first ticket created by a user for the same team is not considered a recontact.
+      Only subsequent tickets are classified as recontacts.
+  total_csi_tickets_created:
+    lineage:
+      - datalake_ss_logic_model.user_csi_metric.total_csi_tickets_created
+    description: The volume of csi tickets created per user until the snapshot date.
+  total_bot_csat_answered:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.total_bot_csat_answered
+    description: The volume of bot csat answered by the user.
+  total_bot_csat_promoter:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.total_bot_csat_promoter
+    description: The volume of bot csat answered equal to 4 or 5.
+  total_bot_csat_neutral:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.total_bot_csat_neutral
+    description: The volume of bot csat answered equal to 3.
+  total_bot_csat_detractor:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.total_bot_csat_detractor
+    description: The volume of bot csat answered equal to 1 or 2.
+  avg_bot_csat_score_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.avg_bot_csat_score_within_three_months
+    description: The average of bot csat scores within the last 3 months.
+  total_bot_csat_detractor_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.total_bot_csat_detractor_within_three_months
     description:
-      The volume of chat tickets by user. To obtain the most recent information on the status
-      of each chat and its corresponding ticket, we retrieve the last ticket ID
-      associated with each session ID.
-  total_chat_ticket_7:
+      The volume of bot csat answers equal to 1 or 2 that were answered within the
+      last 3 months.
+  total_bot_csat_neutral_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.total_bot_csat_neutral_within_three_months
     description:
-      From the total chat tickets, it considers how many tickets were created in the
-      last 7 days.
-  total_chat_ticket_30:
+      The volume of bot csat answers equal to 3 that were answered within the
+      last 3 months.
+  total_bot_csat_promoter_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.total_bot_csat_promoter_within_three_months
     description:
-      From the total chat tickets, it considers how many tickets were created in the
-      last 30 days.
-  total_chat_ticket_90:
+      The volume of bot csat answers equal to 4 or 5 that were answered within the
+      last 3 months.
+  total_bot_csat_answered_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.total_bot_csat_answered_within_three_months
+    description: The volume of bot csat answers within the last 3 months.
+  total_human_csat_answered:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.total_human_csat_answered
+    description: The volume of human csat answered by the user.
+  total_human_csat_promoter:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.total_human_csat_promoter
+    description: The volume of human csat answered equal to 4 or 5.
+  total_human_csat_neutral:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.total_human_csat_neutral
+    description: The volume of human csat answered equal to 3.
+  total_human_csat_detractor:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.total_human_csat_detractor
+    description: The volume of human csat answered equal to 1 or 2.
+  avg_human_csat_score_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.avg_human_csat_score_within_three_months
+    description: The average of human csat scores within the last 3 months.
+  total_human_csat_detractor_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.total_human_csat_detractor_within_three_months
     description:
-      From the total chat tickets, it considers how many tickets were created in the
-      last 90 days.
-  total_email_ticket:
+      The volume of human csat answers equal to 1 or 2 that were answered within the
+      last 3 months.
+  total_human_csat_neutral_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.total_human_csat_neutral_within_three_months
     description:
-      The volume of e-mail tickets by user, but only for tickets received through email, web form, FAQ,
-      other channels or WhatsApp. Tickets with certain tags such as
-      "resolve_ticket_acompanhamento", "fechado_automaticamente_noreply",
-      "redirecionado_atendimento_2", "closed_by_merge", "zapdesk", "ticket_via_call",
-      "call_contato_receptivo", "call_contato_ativo", and "redirecionado_adm_v1" are
-      excluded. Additionally, the Chat Session ID and Twilio Call ID must be NULL for
-      the ticket to be included in the analysis.
-  total_email_ticket_7:
+      The volume of human csat answers equal to 3 that were answered within the
+      last 3 months.
+  total_human_csat_promoter_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.total_human_csat_promoter_within_three_months
     description:
-      From the total email tickets, it considers how many tickets were created in the
-      last 7 days.
-  total_email_ticket_30:
-    description:
-      From the total email tickets, it considers how many tickets were created in the
-      last 30 days.
-  total_email_ticket_90:
-    description:
-      From the total email tickets, it considers how many tickets were created in the
-      last 90 days.
-  total_active_contracts:
-    description: The  volume of active contracts the user has.
+      The volume of human csat answers equal to 4 or 5 that were answered within the
+      last 3 months.
+  total_human_csat_answered_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.total_human_csat_answered_within_three_months
+    description: The volume of human csat answers within the last 3 months.
   is_pp_multi:
     lineage:
       - datalake_user.persona_type.is_pp_multi
-    description: Boolean field indicating if a user is part of pp_multi program or not.
+    description:
+      If the user is part of pp_multi program or not. Assumes TRUE or FALSE for only
+      the property owner client type.
   is_tenant:
-    description: Boolean field indicating if a user is an ongoing tenant or not.
+    description: If the user is a tenant then it is TRUE, else is FALSE.
   is_broker:
-    description: Boolean field indicating if a user is an active broker or not.
+    description: If the user is a broker then it is TRUE, else is FALSE.
   is_property_owner:
-    description: Boolean field indicating if a user is an active property owner or not.
+    description: If the user is a property owner then it is TRUE, else is FALSE.
   is_photographer:
-    description: Boolean field indicating if a user is an active photographer or not.
+    description: If the user is a photographer then it is TRUE, else is FALSE.
+  is_tenant_offboarding:
+    lineage:
+      - datalake_user.persona_type.is_tenant_offboarding
+    description:
+      If the user has an active termination, it indicates that the user is currently
+      in the offboarding step of the rental journey.
+  is_tenant_ongoing:
+    lineage:
+      - datalake_user.persona_type.is_tenant_ongoing
+    description:
+      If the user has at least one active contract and the last contract signed occurred
+      past the last 40 days, with the snapshot date serving as the reference point, then the
+      user is currently in the ongoing step of the rental journey
+  is_tenant_onboarding:
+    lineage:
+      - datalake_user.persona_type.is_tenant_onboarding
+    description:
+      If the user has at least one active contract and the last contract signed occurred
+      within the last 40 days, with the snapshot date serving as the reference point, then the
+      user is currently in the onboarding step of the rental journey
+  is_tenant_contract_to_entrance:
+    lineage:
+      - datalake_user.persona_type.is_tenant_contract_to_entrance
+    description:
+      If the user has had events such as the last evaluation start, last evaluation approval,
+      last document sending, last credit approval, or last proposal rejection within the
+      last 40 days, with the snapshot date as the reference point, then the user is
+      currently in the contract to entrance step of the rental journey
+  is_tenant_visits_to_offer:
+    lineage:
+      - datalake_user.persona_type.is_tenant_visits_to_offer
+    description:
+      If the user has had events such as the last booking, last canceled booking,
+      last visiting, last offer sending, last offer rejected, last reservation created,
+      or last offer approval within the last 40 days, with the snapshot date as the
+      reference point, then the user is currently in the visits to offer step of
+      the rental journey. It assumes value only for tenants.
+  is_tenant_listing_and_search:
+    lineage:
+      - datalake_user.persona_type.is_tenant_listing_and_search
+    description:
+      If the user has had a last house searching event within the last 40 days, with
+      the snapshot date as the reference point, then the user is currently in the
+      listing and search step of the rental journey. It assumes value only for tenants.
+  is_tenant_pre_contract:
+    lineage:
+      - datalake_user.persona_type.is_tenant_pre_contract
+    description:
+      If the user has taken any step in contract to entrance, visits to offer, or
+      listing and search, it signifies that the user is in a pre-contract step.
+      It assumes value only for tenants.
+  is_tenant_post_contract:
+    lineage:
+      - datalake_user.persona_type.is_tenant_post_contract
+    description:
+      If the user has taken any step in offboarding, ongoing, or onboarding, it indicates
+      that the user is in a post-contract step. It assumes value only for tenants.
   is_active:
     lineage:
       - datalake_user.persona_type.is_active
@@ -130,19 +287,16 @@ columns:
     lineage:
       - datalake_user.persona_type.is_blocked
     description: If the user is blocked or not.
-  has_open_back_ticket:
-    description:
-      If the user has any ticket opened for backoffice demand. By backoffice demand,
-      encompass both CRM tasks and Zendesk E-mail Tickets. For CRM tasks, it includes
-      only those from the "Revisar Pagamentos Rescisão" and "Rescisão Pre Vigência"
-      departments. For Zendesk E-mail Tickets, it excludes those with
-      "robot service account" tags, and includes only those from the
-      "Offboarding Reparos [OFF] [POS] [BACK]" department that have the
-      "orçamentação realizada" tag, or from the "Midias Ops [POS] [BACK]" department
-      that have either the "escalar back video" tag or the
-      "escalar ouvidoria hard cases" tag.
-  has_active_contract:
-    description: If the user has any contract with status equal to "Ativo".
+  has_created_csi_ticket:
+    description: If the user has created a csi ticket.
+  has_answered_bot_csat_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.has_answered_bot_csat_within_three_months
+    description: If the user has answered any bot csat created within the last 3 months.
+  has_answered_human_csat_within_three_months:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.has_answered_human_csat_within_three_months
+    description: If the user has answered any human csat created within the last 3 months.
   has_app_installed:
     description:
       Whether the user has the app installed or not, the following conditions determine
@@ -152,10 +306,6 @@ columns:
     lineage:
       - datalake_user.persona_type.dt_birth
     description: The user birth date.
-  ts_app_latest_event:
-    lineage:
-      - datalake_app_installed.events.ts_event
-    description: The app's event latest timestamp.
   ts_user_updated:
     lineage:
       - datalake_user.persona_type.ts_user_updated
@@ -164,6 +314,28 @@ columns:
     lineage:
       - datalake_user.persona_type.ts_user_created
     description: The user creation date in the system.
+  ts_most_recent_csi_ticket_creation_date:
+    lineage:
+      - datalake_ss_logic_model.user_csi_metric.ts_most_recent_csi_ticket_creation_date
+    description: Creation date of the most recent csi ticket per user until the snapshot date.
+  ts_most_recent_csi_ticket_solved_date:
+    lineage:
+      - datalake_ss_logic_model.user_csi_metric.ts_most_recent_csi_ticket_solved_date
+    description:
+      Considering the most recent csi ticket per user, returns its solved date. If the
+      ticket is not solved yet, it assumes null value.
+  ts_last_bot_csat_created:
+    lineage:
+      - datalake_ss_logic_model.user_csat_bot_metric.ts_last_bot_csat_created
+    description: Timestamp that represents the last csat answered by the user.
+  ts_last_human_csat_created:
+    lineage:
+      - datalake_ss_logic_model.user_csat_human_metric.ts_last_human_csat_created
+    description: Timestamp that represents the last csat answered by the user.
+  ts_last_app_installed:
+    lineage:
+      - datalake_ss_logic_model.user_app_installed_metric.ts_last_app_installed
+    description: The timestamp registered for the user's last app installed event.
   year:
     lineage:
       - datalake_user.persona_type.year

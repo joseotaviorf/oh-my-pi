@@ -2027,9 +2027,10 @@ bietlejuice.enrich_sorting_hat:
 bietlejuice.enrich_ss_logic_model:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_app_installed:load-enrich-events
-  - bietlejuice.enrich_customer_demand:load-enrich-base-tasks
+  - bietlejuice.chat_fup:load-clean-rating
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
+  - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.enrich_user:load-enrich-persona-type
 bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details

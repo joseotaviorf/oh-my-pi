@@ -1,0 +1,57 @@
+---
+database_name: datalake_ss_logic_model
+table_name: user_csat_bot_metric
+description:
+  This table retrieves the csat bot metrics by user. It is a snapshot ingestion, so in
+  this case, only csat answered until the snapshot date are being considered.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_snapshot:
+    description: The snapshot id, which is the D-1 date in the format "yyyyMMdd".
+  id_user:
+    lineage:
+      - datalake_chat_fup_clean.rating.id_user
+    description: The user ID that has answered the satisfaction survey.
+  total_bot_csat_answered:
+    description: The volume of bot csat answered by the user.
+  total_bot_csat_promoter:
+    description: The volume of bot csat answered equal to 4 or 5.
+  total_bot_csat_neutral:
+    description: The volume of bot csat answered equal to 3.
+  total_bot_csat_detractor:
+    description: The volume of bot csat answered equal to 1 or 2.
+  last_bot_csat_answered_score:
+    description: The last bot csat answered score.
+  avg_bot_csat_score_within_three_months:
+    description: The average of bot csat scores within the last 3 months.
+  total_bot_csat_detractor_within_three_months:
+    description:
+      The volume of bot csat answers equal to 1 or 2 that were answered within the
+      last 3 months.
+  total_bot_csat_neutral_within_three_months:
+    description:
+      The volume of bot csat answers equal to 3 that were answered within the
+      last 3 months.
+  total_bot_csat_promoter_within_three_months:
+    description:
+      The volume of bot csat answers equal to 4 or 5 that were answered within the
+      last 3 months.
+  total_bot_csat_answered_within_three_months:
+    description: The volume of bot csat answers within the last 3 months.
+  bot_csat_detractor_percentage_within_three_months:
+    description:
+      Considers the percentual of bot csat answers equal to 1 or 2 that were answered
+      within the last 3 months.
+  has_answered_bot_csat_within_three_months:
+    description: If the user has answered any bot csat created within the last 3 months.
+  ts_last_bot_csat_created:
+    lineage:
+      - datalake_chat_fup_clean.rating.ts_created
+    description: Timestamp that represents the last csat answered by the user.
+  year:
+    description: It is the snapshot year, also a partition column.
+  month:
+    description: It is the snapshot month, also a partition column.
+  day:
+    description: It is the snapshot day, also a partition column.

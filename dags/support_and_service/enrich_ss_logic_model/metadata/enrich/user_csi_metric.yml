@@ -1,0 +1,39 @@
+---
+database_name: datalake_ss_logic_model
+table_name: user_csi_metric
+description:
+  This table retrieves the csi ticket metrics by user. It is a snapshot ingestion, so in
+  this case, only csi tickets created or solved until the snapshot date are being considered.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_snapshot:
+    description: The snapshot id, which is the D-1 date in the format "yyyyMMdd".
+  id_user:
+    lineage:
+      - datalake_customer_support.email.id_user
+    description: The user ID related to the csi ticket. It does not consider null values.
+  id_last_csi_ticket:
+    lineage:
+      - datalake_customer_support.email.id_ticket
+    description:
+      It considers the last csi ticket created per user. By csi ticket, these are tickets
+      from the departments of "Midias Ops [POS] [BACK]" or "[CE]" related.
+  total_csi_tickets_created:
+    description: The volume of csi tickets created per user until the snapshot date.
+  ts_most_recent_csi_ticket_creation_date:
+    lineage:
+      - datalake_customer_support.email.ts_ticket_started
+    description: Creation date of the most recent csi ticket per user until the snapshot date.
+  ts_most_recent_csi_ticket_solved_date:
+    lineage:
+      - datalake_customer_support.email.ts_ticket_solved
+    description:
+      Considering the most recent csi ticket per user, returns its solved date. If the
+      ticket is not solved yet, it assumes null value.
+  year:
+    description: It is the snapshot year, also a partition column.
+  month:
+    description: It is the snapshot month, also a partition column.
+  day:
+    description: It is the snapshot day, also a partition column.

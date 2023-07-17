@@ -5,4 +5,23 @@ dag_documentation:
     where persona is the user type, that can be a property owner, tenant, broker, \n
     photographer, pp multi, prospect, among others. It provides a daily snapshot."
 
-partition_cols: [country_code, year, month, day]
+inner_dependencies:
+  user_ss_metrics:
+    - user_app_installed_metric
+    - user_csat_bot_metric
+    - user_csat_human_metric
+    - user_csi_metric
+    - user_recontact_metric
+
+partition_cols: [year, month, day]
+
+custom_cluster:
+  driver_node_type_id: m6gd.4xlarge
+  node_type_id: m6gd.4xlarge
+  runtime_engine: PHOTON
+  num_workers: 4
+  aws_attributes:
+    ebs_volume_size: 200
+  spark_conf:
+    # This heuristic is based on the idea of having a balanced workload across the available resources (num_cores * 4)
+    spark.sql.shuffle.partitions: "192"

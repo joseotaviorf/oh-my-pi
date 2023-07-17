@@ -11,6 +11,7 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
@@ -23,22 +24,18 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 DAG_OWNER = DAGOwnerEnum.DATA_SS
 ENV = os.environ.get("ENVIRONMENT")
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2023, 6, 5, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = None
+MAIN_START_DATE = datetime(2023, 7, 12, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 config_service = ConfigurationService(DAG_NAME)
 
 # s3 paths setup
 datalake_bucket = config_service.get_config("datalake_bucket")
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-cluster_description = config_service.get_config(
-    "databricks_10_4_med_io-memory_photon_cluster"
-)
+cluster_description = config_service.get_config("custom_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -48,6 +45,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 
 default_libraries = config_service.get_config("default_libraries")
+inner_dependencies = config_service.get_config("inner_dependencies")
 
 dag_documentation = config_service.get_config("dag_documentation")
 partition_cols = config_service.get_config("partition_cols")
@@ -60,12 +58,12 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    schedule_interval=None,
     doc_md=BaseDAG.generate_doc_md_str(
         dag_name=DAG_NAME,
         doc_md_chart_url=doc_md_chart_url,
         dag_documentation=dag_documentation,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        schedule_interval=None,
         dag_owner=DAG_OWNER,
     ),
 )
@@ -88,22 +86,36 @@ datalake_task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
     spark_jobs_path=base_spark_jobs_path,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-    has_create_external_table_task=False,
-    is_incremental=True,
-    partitions=partition_cols,
+enrich_task_groups = {}
+
+tables = datalake_task_group._get_table_names_from_sql_files(layer=LayerEnum.ENRICH)
+
+for table_name in tables:
+    enrich_task_groups[table_name] = datalake_task_group.build_enrich_task_group(
+        table_name=table_name,
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        is_incremental=True,
+        partitions=partition_cols,
+    )
+
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=inner_dependencies,
 )
 
 create_cluster_task.set_downstream(
-    DatalakeTaskGroup.all_first_tasks(enrich_task_groups)
+    DatalakeTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries)
 )
 
 terminate_cluster_task.set_upstream(
-    DatalakeTaskGroup.all_last_tasks(enrich_task_groups)
+    DatalakeTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries)
 )

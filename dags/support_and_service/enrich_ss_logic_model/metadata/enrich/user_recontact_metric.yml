@@ -1,0 +1,64 @@
+---
+database_name: datalake_ss_logic_model
+table_name: user_recontact_metric
+description:
+  This table calculates the recontact metric for each user. When a customer makes
+  contact, we look for any previous contact from the same customer and team within
+  a 4-day period (starting from the day of the current contact). If a previous contact
+  exists, the current contact is classified as a recontact; otherwise, it is not
+  considered a recontact. The analysis includes FrontOffice tickets in CX with inbound
+  direction, as well as call and chat channels. It is important to note that this
+  analysis is conducted only for identified users. Only tickets created until the
+  snapshot date are being considered.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_snapshot:
+    description: The snapshot id, which is the D-1 date in the format "yyyyMMdd".
+  id_user:
+    lineage:
+      - datalake_customer_support.chat.id_user
+      - datalake_customer_support.call.id_user
+    description: The user ID related to the FrontOffice ticket.
+  id_last_created_ticket:
+    lineage:
+      - datalake_customer_support.chat.id_ticket
+      - datalake_customer_support.call.id_ticket
+    description: It considers the last FrontOffice ticket created per user.
+  last_ticket_department:
+    lineage:
+      - datalake_customer_support.chat.last_department
+      - datalake_customer_support.call.last_department
+    description: Considering the last FrontOffice ticket created, it returns the ticket department.
+  last_ticket_theme:
+    lineage:
+      - datalake_customer_support.chat.contact_theme_tag
+      - datalake_customer_support.call.contact_theme_tag
+    description: Considering the last FrontOffice ticket created, it returns the ticket theme.
+  last_ticket_theme_detail:
+    lineage:
+      - datalake_customer_support.chat.contact_theme_detail_tag
+      - datalake_customer_support.call.contact_theme_detail_tag
+    description: Considering the last FrontOffice ticket created, it returns the ticket theme detail.
+  last_ticket_channel:
+    description: Considering the last FrontOffice ticket created, it returns the ticket channel.
+  total_created_tickets_within_four_days:
+    description: The volume of FrontOffice tickets created within 4 days.
+  total_recontact_tickets_within_four_days:
+    description:
+      The count of recontact FrontOffice tickets within a 4-day period is determined.
+      It checks whether a given ticket has a previous ticket created within 4 days.
+      If this condition is met, the ticket is counted as a recontact. However, the
+      first ticket created by a user for the same team is not considered a recontact.
+      Only subsequent tickets are classified as recontacts.
+  ts_last_created_ticket:
+    lineage:
+      - datalake_customer_support.call.ts_ticket_started
+      - datalake_customer_support.chat.ts_ticket_started
+    description: Timestamp that represents when the last FrontOffice ticket was created.
+  year:
+    description: It is the snapshot year, also a partition column.
+  month:
+    description: It is the snapshot month, also a partition column.
+  day:
+    description: It is the snapshot day, also a partition column.
