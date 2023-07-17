@@ -1,69 +1,21 @@
-WITH tickets_filter AS (
-    SELECT DISTINCT
-        t.*
-    FROM
-        datalake_zendesk_tickets_clean.tickets AS t
-    WHERE
-        (
-            t.ticket_via <> 'api'
-            OR (
-                t.ticket_via = 'api'
-                AND t.tags NOT LIKE '%hsm%'
-            )
-        )
-),
-historical_zendesk_chat AS (
+ WITH historical_zendesk_chat AS (
     SELECT DISTINCT
         c.*
     FROM
         historical_datalake_zendesk_clean.chats AS c
     LEFT JOIN
-        tickets_filter AS t
+        datalake_zendesk_tickets_clean.tickets AS t
             ON t.id_ticket = c.id_ticket
     WHERE
         t.id_ticket IS NULL
-),
-last_updated_ticket as (
-    SELECT
-        id_ticket,
-        MAX(ts_updated) AS ts_last_updated
-    FROM
-        tickets_filter
-    GROUP BY 1
-    UNION ALL
-    SELECT
-        id_ticket,
-        MAX(ts_updated) AS ts_last_updated
-    FROM
-        historical_zendesk_chat
-    GROUP BY 1
-),
-last_updated_group AS (
-    SELECT
-        id_group,
-        MAX(ts_updated) AS ts_last_updated
-    FROM
-        datalake_zendesk_tickets_clean.groups
-    GROUP BY 1
-),
-distinct_groups AS (
-    SELECT
-        g.id_group,
-        g.name,
-        g.url_group
-    FROM
-        datalake_zendesk_tickets_clean.groups AS g
-    INNER JOIN
-        last_updated_group AS ge
-            ON ge.id_group = g.id_group
-            AND ge.ts_last_updated = g.ts_updated
-    GROUP BY 1, 2, 3
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY c.id_ticket ORDER BY c.ts_updated DESC) = 1
 ),
 sale_offers_keys AS (
     WITH custom_fields_exploded AS (
         SELECT
             id_ticket,
-            explode(custom_fields)
+            EXPLODE(custom_fields)
         FROM
             datalake_zendesk_custom_fields.custom_fields
     )
@@ -140,10 +92,32 @@ union_historical_chat_with_zendesk AS (
         MONTH(t.ts_updated) AS month,
         DAY(t.ts_updated) AS day
     FROM
-        tickets_filter AS t
+        datalake_zendesk_tickets_clean.tickets AS t
+    WHERE
+        t.ticket_via != 'api'
+        OR (
+            t.ticket_via = 'api'
+            AND t.tags NOT LIKE '%hsm%'
+        )
+),
+agents_control AS (
+  SELECT
+    LOWER(email) AS email,
+    agent_name,
+    manager,
+    agent_company,
+    CASE
+        WHEN LOWER(agent_company) = "atento" OR LOWER(email) LIKE "%atento%" THEN "ATENTO"
+        ELSE NULL
+    END AS agent_organization,
+    dt_start
+  FROM
+    datalake_gsheets_clean.agents_control
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY email ORDER BY dt_start DESC) = 1
 )
 SELECT DISTINCT
-    te.id_ticket,
+    t.id_ticket,
     sok.id_offer AS id_sale_offer,
     cf.custom_fields['[AQ] ID do Job '] AS id_job,
     cf.custom_fields['Ticket Problema ID'] AS id_problem_ticket,
@@ -151,7 +125,7 @@ SELECT DISTINCT
     t.description,
     t.ticket_via,
     t.channel,
-    COALESCE(g.name, t.department_name) AS group_name,
+    g.name AS group_name,
     t.priority,
     t.recipient,
     t.tags,
@@ -163,7 +137,10 @@ SELECT DISTINCT
     t.comment,
     TO_JSON(cf.custom_fields) AS custom_fields,
     cf.custom_fields['Tipo de Solicitação'] AS request_type,
-    "N/A" AS agent_organization,
+    CASE
+        WHEN LOWER(ac.agent_company) = "atento" OR LOWER(ac.email) LIKE "%@atento%" THEN "ATENTO"
+        ELSE NULL
+    END AS agent_organization,
     COALESCE(
         cf.custom_fields['Tipo de Cliente'],
         REPLACE(REPLACE(REPLACE(cf.custom_fields['[CC] - Tipo de Cliente'], 'cc_',''), 'er_', 'er'), 'serviços', 'serviço'),
@@ -197,17 +174,16 @@ SELECT DISTINCT
     t.month,
     t.day
 FROM
-    last_updated_ticket AS te
-INNER JOIN
     union_historical_chat_with_zendesk AS t
-        ON te.id_ticket = t.id_ticket
-        AND te.ts_last_updated = t.ts_updated
 LEFT JOIN
-    distinct_groups AS g
+    datalake_zendesk_tickets_clean.groups AS g
         ON t.id_group = g.id_group
 LEFT JOIN
     datalake_zendesk_custom_fields.custom_fields AS cf
-        ON te.id_ticket = cf.id_ticket
+        ON t.id_ticket = cf.id_ticket
 LEFT JOIN
     sale_offers_keys AS sok
-        ON te.id_ticket = sok.id_ticket
+        ON t.id_ticket = sok.id_ticket
+LEFT JOIN
+    agents_control AS ac
+        ON ac.email = cf.custom_fields['[AUTO] Email do Agente']
