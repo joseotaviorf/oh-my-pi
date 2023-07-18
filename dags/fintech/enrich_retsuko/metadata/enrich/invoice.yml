@@ -46,7 +46,7 @@ columns:
     lineage:
       - datalake_retsuko_clean.invoice.closing_mode
   reason:
-    description: Invoices that have the purpose field filled in with the value 'extras' must have the reason field filled in to identify what that invoice is about. 
+    description: "Invoices that have the purpose field filled in with the value extras must have the reason field filled in to identify what that invoice is about."
     categories: 
       condominium-nonpayment: ""
       damages-bills: ""
