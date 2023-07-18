@@ -16,8 +16,8 @@ inner_dependencies:
 partition_cols: [year, month, day]
 
 custom_cluster:
-  driver_node_type_id: m6gd.4xlarge
-  node_type_id: m6gd.4xlarge
+  driver_node_type_id: m5d.4xlarge
+  node_type_id: m5d.4xlarge
   runtime_engine: PHOTON
   num_workers: 4
   aws_attributes:
