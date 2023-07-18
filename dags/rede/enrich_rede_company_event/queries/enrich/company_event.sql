@@ -136,7 +136,7 @@ removed_ticket_stage_oscillations AS (
             WHEN s.id_pipeline IN (5137154, 9317192, 9317747) THEN ts.id_ticket
         END AS id_ticket_demand_onboarding,
         CASE
-            WHEN s.id_pipeline = 7784309 THEN ts.id_ticket
+            WHEN s.id_pipeline IN (7784309, 40661779) THEN ts.id_ticket
         END AS id_ticket_supply_onboarding,
         ts.id_user_updated_by,
         ts.source_type,
@@ -146,28 +146,33 @@ removed_ticket_stage_oscillations AS (
         END AS business_context,
         CASE
             WHEN s.id_stage IN (27195509, 26557112) THEN 'Welcome Email' -- E-mail de Boas Vindas Enviado
+            WHEN s.id_stage = 76717855 THEN 'Supply Onboarding Contact Attempt' -- Tentativa de contato
+            WHEN s.id_stage = 76717854 THEN 'Supply Onboarding Started' -- Onboarding iniciado
             WHEN s.id_stage = 22048412 THEN 'Supply Onboarding Meeting Pending' -- Pendente Reunião
             WHEN s.id_stage = 24339603 THEN 'Supply Onboarding Scheduled' -- Reunião Agendada
             WHEN s.id_stage = 38678440 THEN 'Supply Onboarding Meeting Completed' -- Reunião Realizada
-            WHEN s.id_stage = 24339605 THEN 'CRM Settings' -- Configuração CRM
-            WHEN s.id_stage = 38678441 THEN 'Dedup Received' -- Recebimento Dedup
+            WHEN s.id_stage IN (24339605, 85780645) THEN 'CRM Settings' -- Configuração CRM
+            WHEN s.id_stage IN (38678441, 85780647) THEN 'Dedup Received' -- Recebimento Dedup
             WHEN s.id_stage = 22677053 THEN 'Listings Validated' -- Validação da Listagem
             WHEN s.id_stage = 22677054 THEN 'First Lead 3P' -- Leads Enviados para a Rede
-            WHEN s.id_stage = 25122068 THEN 'First Listing' -- Imóveis Publicados
+            WHEN s.id_stage = 76717856 THEN 'Integration Pending' -- Pendência integração
+            WHEN s.id_stage IN (76717857, 85780648) THEN 'First Publication Pending' -- Pendência 1ª publicação
+            WHEN s.id_stage IN (25122068, 85780649) THEN 'First Listing' -- Imóveis Publicados
             WHEN s.id_stage IN (16620599, 26653758) THEN 'Demand Onboarding Scheduled' -- Onboarding Agendado
             WHEN s.id_stage IN (16620600, 26647645) THEN 'Demand Onboarding Completed' -- Onboarding Realizado
             -- Corretor finalizou onboarding, Agendou primeira visita
             WHEN s.id_stage IN (29531712, 26557189) THEN 'Demand Onboarding Completed'
             WHEN s.id_stage = 27834401 THEN 'Contract Transition Completed' -- Assinado
             WHEN s.id_stage IN (20894770, 26557190, 26647646) THEN 'Demand Onboarding Given Up' -- Desistência
-            WHEN s.id_stage = 22677055 THEN 'Supply Onboarding Given Up' -- Desistência
+            WHEN s.id_stage IN (22677055, 85780652) THEN 'Supply Onboarding Given Up' -- Desistência
+            WHEN s.id_stage = 88380728 THEN 'Renegotiation'
         END AS event,
         s.label AS hubspot_event_detail,
         tp.label AS hubspot_event_origin,
         FALSE AS is_loss,
         CASE
             WHEN s.id_pipeline IN (5137154, 9317192, 9317747) THEN 'Demand Onboarding'
-            WHEN s.id_pipeline = 7784309 THEN 'Supply Onboarding'
+            WHEN s.id_pipeline IN (7784309, 40661779)  THEN 'Supply Onboarding'
             WHEN s.id_pipeline = 9505972 THEN 'Contract Transition'
             ELSE 'Unknown'
         END AS event_type,
