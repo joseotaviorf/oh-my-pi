@@ -15,8 +15,12 @@ columns:
     description: 'Unique identifier of the lead.'
   id_company_hubspot:
     lineage:
-      - datalake_hubspot_clean.company.id
+      - datalake_brokers_supply_processor.lead_3p.id_company_hubspot
     description: 'ID of the company in HubSpot associated with this lead and this context.'
+  uuid_company:
+    lineage:
+      - datalake_brokers_supply_processor.lead_3p.uuid_company
+    description: 'ID of the company in the Company Domain associated with this lead and this context.'
   id_file:
     lineage:
       - datalake_rede_supply.simplified_lead_3p_status_changes.id_file

@@ -49,6 +49,7 @@ forced_end_aux AS (
     SELECT
         rea.id AS id_lead_3p,
         sc.id_company_hubspot,
+        sc.uuid_company,
         rea.id_file,
         rea.business_context,
         reason,
@@ -101,6 +102,7 @@ forced_end_aux AS (
 SELECT
     id_lead_3p,
     id_company_hubspot,
+    uuid_company,
     id_file,
     business_context,
     reason,

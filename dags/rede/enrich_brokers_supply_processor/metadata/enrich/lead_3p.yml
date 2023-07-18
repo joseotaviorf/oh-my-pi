@@ -37,6 +37,10 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.uuid_lead
     description: 'Unique identifier of the lead, in uuid format. Can be joined with datalake_ebdb_clean.house.id_external.'
+  uuid_company:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.uuid_company
+    description: 'Unique identifier of the company that sent the lead, in uuid format.'
   id_real_estate:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.id_real_estate
@@ -55,18 +59,15 @@ columns:
     description: 'Identifier of the lead region.'
   id_company_hubspot:
     lineage:
-      - datalake_brokers_supply_processor.file.id_company_hubspot
-      - datalake_hubspot.company_history.id_company
+      - datalake_hubspot.company.id_company
     description: 'Identifier of the lead company in HubSpot.'
   id_sale_company_hubspot:
     lineage:
-      - datalake_brokers_supply_processor.file.id_company_hubspot
-      - datalake_hubspot.company_history.id_company
+      - datalake_hubspot.company.id_company
     description: 'Identifier of the lead company in HubSpot, in the context of ForSale.'
   id_rent_company_hubspot:
     lineage:
-      - datalake_brokers_supply_processor.file.id_company_hubspot
-      - datalake_hubspot.company_history.id_company
+      - datalake_hubspot.company.id_company
     description: 'Identifier of the lead company in HubSpot, in the context of ForRent.'
   lead_hash:
     lineage:
@@ -330,10 +331,6 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.pricing
     description: 'House condo price.'
-  version:
-    lineage:
-      - datalake_brokers_supply_processor_clean.lead_3p.version
-    description: 'Version of the lead row.'
   is_for_sale:
     description: 'True if the lead has been sent in the context of ForSale. It is not exclusive with is_for_rent, as both can be true.'
   is_for_rent:

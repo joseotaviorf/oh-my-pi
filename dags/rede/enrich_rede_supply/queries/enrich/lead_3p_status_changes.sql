@@ -1,28 +1,4 @@
-WITH partner_agencies_aux AS (
-    SELECT
-        ch.id_company AS id_company_hubspot,
-        c.tag_real_estate_agency AS current_tag,
-        c.lead_status AS current_status,
-        ch.cnpj,
-        ch.ts_updated
-    FROM
-        datalake_hubspot.company_history AS ch
-    JOIN
-        datalake_hubspot.company AS c
-            ON ch.id_company = c.id_company
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                ch.cnpj
-            ORDER BY
-                NOT c.is_archived DESC, -- Give preference to non-archived companies when we find duplicates
-                current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC,  -- Then, members
-                current_tag IS NOT NULL DESC, -- Then, those that have a tag
-                ch.ts_updated DESC -- Finally, most recent
-        ) = 1
-        AND ch.cnpj IS NOT NULL
-),
-first_time_for_status AS (
+WITH first_time_for_status AS (
     SELECT *
     FROM (
         SELECT
@@ -115,7 +91,8 @@ status_ended_aux AS (
 SELECT
     sea.id_status_change,
     sea.id_lead_3p,
-    paa.id_company_hubspot,
+    l.id_company_hubspot,
+    l.uuid_company,
     sea.id_file,
     sea.id_house,
     sea.business_context,
@@ -132,6 +109,3 @@ FROM
 JOIN
     datalake_brokers_supply_processor.lead_3p AS l
         ON sea.id_lead_3p = l.id
-LEFT JOIN
-    partner_agencies_aux AS paa
-        ON paa.cnpj = l.cnpj

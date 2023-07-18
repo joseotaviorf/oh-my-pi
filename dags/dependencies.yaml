@@ -932,7 +932,6 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.brokers_supply_processor:load-clean-file
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p
   - bietlejuice.enrich_hubspot:load-enrich-company
-  - bietlejuice.enrich_hubspot:load-enrich-company-history
 bietlejuice.enrich_bureaus:
   - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud
@@ -1733,8 +1732,6 @@ bietlejuice.enrich_rede_supply:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
-  - bietlejuice.enrich_hubspot:load-enrich-company
-  - bietlejuice.enrich_hubspot:load-enrich-company-history
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:load-clean-country
   - bietlejuice.ebdb:load-clean-region

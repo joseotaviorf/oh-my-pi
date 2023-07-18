@@ -1,32 +1,8 @@
-WITH partner_agencies_aux AS (
-    SELECT
-        ch.id_company AS id_company_hubspot,
-        c.tag_real_estate_agency AS current_tag,
-        c.lead_status AS current_status,
-        ch.cnpj,
-        ch.ts_updated
-    FROM
-        datalake_hubspot.company_history AS ch
-    JOIN
-        datalake_hubspot.company AS c
-            ON ch.id_company = c.id_company
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                ch.cnpj
-            ORDER BY
-                NOT c.is_archived DESC, -- Give preference to non-archived companies when we find duplicates
-                current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC,  -- Then, members
-                current_tag IS NOT NULL DESC, -- Then, those that have a tag
-                ch.ts_updated DESC -- Finally, most recent
-        ) = 1
-        AND ch.cnpj IS NOT NULL
-),
-files_with_company AS (
+WITH files_with_company AS (
     SELECT
         f.id,
         f.id_partner,
-        l.cnpj,
+        l.uuid_company,
         f.hash,
         f.file_name,
         f.type,
@@ -43,14 +19,15 @@ files_with_company AS (
     LEFT JOIN
         datalake_brokers_supply_processor_clean.lead_3p AS l
             ON bcd.id_lead = l.id
-            AND l.cnpj != 'Não informado'
+            AND l.uuid_company IS NOT NULL
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY f.id ORDER BY f.ts_updated DESC, l.ts_updated DESC) = 1
 )
 SELECT
     fwc.id,
     fwc.id_partner,
-    pa.id_company_hubspot,
+    hc.id_company AS id_company_hubspot,
+    fwc.uuid_company,
     fwc.hash,
     fwc.file_name,
     fwc.type,
@@ -59,7 +36,7 @@ SELECT
     fwc.version,
     LAG(fwc.ts_created) OVER (
         PARTITION BY
-            COALESCE(pa.id_company_hubspot, SPLIT(fwc.file_name, '_dedup_')[0])
+            COALESCE(fwc.uuid_company, SPLIT(fwc.file_name, '_dedup_')[0])
         ORDER BY
             fwc.ts_created
     ) AS ts_previous_file_sent_by_agency,
@@ -68,5 +45,5 @@ SELECT
 FROM
     files_with_company AS fwc
 LEFT JOIN
-    partner_agencies_aux AS pa
-        ON pa.cnpj = fwc.cnpj
+    datalake_hubspot.company AS hc
+        ON hc.uuid_company = fwc.uuid_company

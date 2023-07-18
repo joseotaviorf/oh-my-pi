@@ -1,49 +1,56 @@
-WITH first_files AS (
-    SELECT
-        f.id_company_hubspot,
-        CASE
-            WHEN f.id_company_hubspot IS NULL THEN SPLIT(f.file_name, '_dedup_')[0]
-        END AS company_file_name_part,
-        bcd.business_context,
-        MIN(f.ts_created) AS ts_created
-    FROM
-        datalake_brokers_supply_processor.business_context_detail AS bcd
-    JOIN
-        datalake_brokers_supply_processor.file AS f
-            ON bcd.id_file = f.id
-    GROUP BY
-        1,2,3
-),
-deduplicated_leads AS (
+WITH deduplicated_leads AS (
     SELECT *
     FROM
         datalake_brokers_supply_processor_clean.lead_3p
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id ORDER BY ts_updated DESC) = 1
 ),
-partner_agencies_aux AS (
+lead_context AS (
     SELECT
-        ch.id_company AS id_company_hubspot,
-        c.tag_real_estate_agency AS current_tag,
-        c.lead_status AS current_status,
-        ch.cnpj,
-        ch.ts_updated
+        bcd.id_lead,
+        COALESCE(dl.uuid_company, SPLIT(f.file_name, '_dedup_')[0]) AS company,
+        bcd.business_context,
+        GET_JSON_OBJECT(dl.brokers, '$.createdAt')::TIMESTAMP AS ts_captured,
+        -- Here, we want the date in which the batch was sent. In sale, that used to be when the lead was created. Later, rent leads were created
+        -- So we need to consider the lead created date for old sale leads, or business_context_created otherwise
+        CASE
+            WHEN ROW_NUMBER() OVER (PARTITION BY bcd.id_lead ORDER BY bcd.ts_created, bcd.business_context DESC) = 1
+                THEN COALESCE(f.ts_created, LEAST(bcd.ts_created, dl.ts_created))
+            ELSE
+                COALESCE(f.ts_created, bcd.ts_created)
+        END AS ts_batch_sent
     FROM
-        datalake_hubspot.company_history AS ch
-    JOIN
-        datalake_hubspot.company AS c
-            ON ch.id_company = c.id_company
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                ch.cnpj
-            ORDER BY
-                NOT c.is_archived DESC, -- Give preference to non-archived companies when we find duplicates
-                current_status IN ('Membro', 'Parceiro', 'Em processo tombamento') DESC,  -- Then, members
-                current_tag IS NOT NULL DESC, -- Then, those that have a tag
-                ch.ts_updated DESC -- Finally, most recent
-        ) = 1
-        AND ch.cnpj IS NOT NULL
+        datalake_brokers_supply_processor.business_context_detail AS bcd
+    LEFT JOIN
+        deduplicated_leads AS dl
+            ON dl.id = bcd.id_lead
+    LEFT JOIN
+        datalake_brokers_supply_processor.file AS f
+            ON bcd.id_file = f.id
+),
+recurrency_aux AS (
+    SELECT
+        id_lead,
+        business_context,
+        ts_captured,
+        ts_batch_sent,
+        MIN(ts_batch_sent) OVER(PARTITION BY company, business_context) AS ts_first_batch
+    FROM
+        lead_context
+),
+recurrency AS (
+    SELECT
+        id_lead,
+        business_context,
+        CASE
+            WHEN ts_batch_sent IS NULL OR ts_first_batch IS NULL THEN 'N/A'
+            WHEN ts_batch_sent = ts_first_batch THEN 'FIRST_BATCH'
+            WHEN ts_batch_sent < ts_first_batch + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
+            WHEN ts_captured < ts_first_batch THEN 'COMPLEMENTARY'
+            ELSE 'RECURRENT'
+        END AS recurrency_type
+    FROM
+        recurrency_aux
 )
 SELECT
     l.id,
@@ -54,16 +61,17 @@ SELECT
     sale_bcd.id_listing AS id_sale_listing,
     rent_bcd.id_listing AS id_rent_listing,
     l.uuid_lead,
+    l.uuid_company,
     l.id_real_estate,
     l.id_by_real_estate,
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.housePartnerId'), '') AS id_house_partner,
     GET_JSON_OBJECT(l.location, '$.regionId')::BIGINT AS id_region,
-    COALESCE(pa.id_company_hubspot, sale_file.id_company_hubspot, rent_file.id_company_hubspot) AS id_company_hubspot,
+    hc.id_company AS id_company_hubspot,
     CASE
-        WHEN sale_bcd.id IS NOT NULL THEN COALESCE(sale_file.id_company_hubspot, pa.id_company_hubspot)
+        WHEN sale_bcd.id IS NOT NULL THEN hc.id_company
     END AS id_sale_company_hubspot,
     CASE
-        WHEN rent_bcd.id IS NOT NULL THEN COALESCE(rent_file.id_company_hubspot, pa.id_company_hubspot)
+        WHEN rent_bcd.id IS NOT NULL THEN hc.id_company
     END AS id_rent_company_hubspot,
     l.lead_hash,
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.block'), '') AS block,
@@ -77,7 +85,10 @@ SELECT
     NULLIF(GET_JSON_OBJECT(l.details, '$.frontDoorType'), '') AS front_door_type,
     NULLIF(GET_JSON_OBJECT(l.details, '$.description'), '') AS house_description,
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.country'), '') AS country,
-    NULLIF(GET_JSON_OBJECT(l.location, '$.state'), '') AS state,
+    COALESCE(
+        NULLIF(GET_JSON_OBJECT(l.location, '$.state'), ''),
+        NULLIF(GET_JSON_OBJECT(l.location, '$.stateAcronym'), '')
+    ) AS state,
     NULLIF(GET_JSON_OBJECT(l.location, '$.city'), '') AS city,
     NULLIF(GET_JSON_OBJECT(l.location, '$.neighborhood'), '') AS neighborhood,
     NULLIF(GET_JSON_OBJECT(l.location, '$.regionSlug'), '') AS region_slug,
@@ -100,20 +111,8 @@ SELECT
     l.cnpj,
     sale_bcd.status AS sale_status,
     rent_bcd.status AS rent_status,
-    CASE
-        WHEN sale_file.ts_created IS NULL THEN 'N/A'
-        WHEN sale_file.ts_created = first_sale_file.ts_created THEN 'FIRST_BATCH'
-        WHEN sale_file.ts_created < first_sale_file.ts_created + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
-        WHEN GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP < first_sale_file.ts_created THEN 'COMPLEMENTARY'
-        ELSE 'RECURRENT'
-    END AS sale_recurrency_type,
-    CASE
-        WHEN rent_file.ts_created IS NULL THEN 'N/A'
-        WHEN rent_file.ts_created = first_rent_file.ts_created THEN 'FIRST_BATCH'
-        WHEN rent_file.ts_created < first_rent_file.ts_created + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
-        WHEN GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP < first_rent_file.ts_created THEN 'COMPLEMENTARY'
-        ELSE 'RECURRENT'
-    END AS rent_recurrency_type,
+    COALESCE(sale_recurrency.recurrency_type, 'N/A') AS sale_recurrency_type,
+    COALESCE(rent_recurrency.recurrency_type, 'N/A') AS rent_recurrency_type,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.installations'), '{{}}'), 'map<string, boolean>') AS installations,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.appliances'), '{{}}'), 'map<string, boolean>') AS house_appliances,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.accessibilityItems'), '{{}}'), 'map<string, boolean>') AS accessibility_items,
@@ -145,7 +144,6 @@ SELECT
     GET_JSON_OBJECT(l.pricing, '$.rent')::INT AS rent_price,
     GET_JSON_OBJECT(l.pricing, '$.salePrice')::INT AS sale_price,
     GET_JSON_OBJECT(l.pricing, '$.condoPrice')::INT AS condo_price,
-    l.version,
     sale_bcd.id IS NOT NULL AS is_for_sale,
     rent_bcd.id IS NOT NULL AS is_for_rent,
     GET_JSON_OBJECT(l.access, '$.optedKeysWithAgent')::BOOLEAN AS has_opted_keys_with_agent,
@@ -175,19 +173,13 @@ LEFT JOIN
         ON rent_bcd.id_lead = l.id
         AND rent_bcd.business_context = 'RENT'
 LEFT JOIN
-    datalake_brokers_supply_processor.file AS sale_file
-        ON sale_bcd.id_file = sale_file.id
+    recurrency AS sale_recurrency
+        ON sale_recurrency.id_lead = l.id
+        AND sale_recurrency.business_context = 'SALE'
 LEFT JOIN
-    datalake_brokers_supply_processor.file AS rent_file
-        ON rent_bcd.id_file = rent_file.id
+    recurrency AS rent_recurrency
+        ON rent_recurrency.id_lead = l.id
+        AND rent_recurrency.business_context = 'RENT'
 LEFT JOIN
-    first_files AS first_sale_file
-        ON COALESCE(sale_file.id_company_hubspot, SPLIT(sale_file.file_name, '_dedup_')[0]) = COALESCE(first_sale_file.id_company_hubspot, first_sale_file.company_file_name_part)
-        AND first_sale_file.business_context = 'SALE'
-LEFT JOIN
-    first_files AS first_rent_file
-        ON COALESCE(rent_file.id_company_hubspot, SPLIT(rent_file.file_name, '_dedup_')[0]) = COALESCE(first_rent_file.id_company_hubspot, first_rent_file.company_file_name_part)
-        AND first_rent_file.business_context = 'RENT'
-LEFT JOIN
-    partner_agencies_aux AS pa
-        ON pa.cnpj = l.cnpj
+    datalake_hubspot.company AS hc
+        ON hc.uuid_company = l.uuid_company

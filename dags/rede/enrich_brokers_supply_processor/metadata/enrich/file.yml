@@ -15,8 +15,12 @@ columns:
     description: Unique identifier for each partner (not the original real estate agency, but the one who sent the leads to Supply Processor, like Iconatus).
   id_company_hubspot:
     lineage:
-      - datalake_hubspot.company_history.id_company
+      - datalake_hubspot.company.id_company
     description: Unique identifier for the real estate agency that sent the leads to Supply Processor, in HubSpot.
+  uuid_company:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.uuid_company
+    description: Unique identifier for the real estate agency that sent the leads to Supply Processor, in the Company Domain.
   hash:
     lineage:
       - datalake_brokers_supply_processor_clean.file.hash
