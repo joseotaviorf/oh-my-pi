@@ -45,6 +45,12 @@ columns:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.invoice.closing_mode
+  reason:
+    description: |
+      "Invoices that have the purpose field filled in with the value "extras" must have the reason field filled in to identify what that invoice is about, example: to identify invoices under negotiation (negotiation-recupera and negotiation-5A values). 
+      Example of values: condominium-nonpayment, damages-bills, wrong-charges, negotiation-recupera, agreement, pending-balance-correction, non-specified"
+    lineage:
+      - datalake_retsuko_clean.invoice.reason
   due_amount:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:

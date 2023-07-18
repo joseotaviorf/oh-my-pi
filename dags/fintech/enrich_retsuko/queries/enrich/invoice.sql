@@ -9,6 +9,7 @@ SELECT
     paid_via,
     purpose,
     closing_mode,
+    reason,
     due_amount,
     paid_amount,
     accrual_year_month,
