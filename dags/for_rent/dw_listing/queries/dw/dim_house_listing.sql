@@ -30,7 +30,7 @@ agents_with_keys AS (
     GROUP BY 1
 ),
 house_listings AS (
-    WITH 
+    WITH
     lbc AS (
         SELECT
             id_house,
@@ -40,7 +40,7 @@ house_listings AS (
             MAX(IF(business_context = 'SALE', status_reason, NULL)) AS house_sale_status_reason,
             MAX(IF(business_context = 'RENT', status, NULL)) AS house_rent_status,
             MAX(IF(business_context = 'RENT', status_reason, NULL)) AS house_rent_status_reason
-        FROM 
+        FROM
             datalake_ebdb_listing.listing_business_context
         GROUP BY 1
     ),
@@ -68,7 +68,7 @@ house_listings AS (
         hl.ts_listing_version_end,
         h.dt_first_publication AS ts_house_first_publication,
         h.ts_last_publication AS ts_house_last_publication,
-        CASE 
+        CASE
             WHEN hl.version = 1 THEN hl.ts_first_publication
             WHEN hl.version > 0 THEN hl.ts_listing_version_start
             ELSE NULL
@@ -89,6 +89,7 @@ house_listings AS (
         h.lng AS house_lng,
         h.is_furnished AS is_house_furnished,
         h.number AS house_number,
+        h.floor,
         h.bathrooms AS house_bathrooms,
         h.bedrooms AS house_bedrooms,
         h.suites AS house_suites,
@@ -195,6 +196,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     CAST(hl.house_lat AS DECIMAL(14, 7)) AS house_lat,
     CAST(hl.house_lng AS DECIMAL(14, 7)) AS house_lng,
     hl.house_number,
+    hl.floor,
     CAST(hl.house_bathrooms AS SMALLINT) AS house_bathrooms,
     CAST(hl.house_bedrooms AS SMALLINT) AS house_bedrooms,
     CAST(hl.house_suites AS SMALLINT) AS house_suites,

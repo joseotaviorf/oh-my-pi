@@ -35,7 +35,7 @@ house_aud AS (
   GROUP BY 1
 ),
 listing_info AS (
-  SELECT 
+  SELECT
     lbc.id_house,
     BOOL_OR(lbc.ownership = 'THIRD_PARTY' OR COALESCE(lrm.rental_administrator = 'THIRD_PARTY', FALSE)) AS is_3p_supply,
     BOOL_OR(lbc.ownership = 'THIRD_PARTY' AND lbc.business_context = 'SALE') AS is_sale_3p_supply,
@@ -44,7 +44,7 @@ listing_info AS (
     BOOL_OR(lsm.has_great_sale_price_tag) AS has_sale_great_price_tag
   FROM
     datalake_ebdb_clean.listing_business_context AS lbc
-  LEFT JOIN 
+  LEFT JOIN
     datalake_ebdb_clean.listing_sale_model AS lsm
       ON lbc.id = lsm.id_listing_business_context
       AND lbc.business_context = 'SALE'
@@ -52,7 +52,7 @@ listing_info AS (
     datalake_ebdb_clean.listing_rent_model AS lrm
         ON lbc.id = lrm.id_listing_business_context
         AND lbc.business_context = 'RENT'
-  GROUP BY 
+  GROUP BY
     1
 ),
 listing_ownership_aux AS (
@@ -84,10 +84,10 @@ listing_ownership AS (
     listing_ownership_aux AS loa
   LEFT JOIN
     datalake_company.company AS cc
-      ON cc.uuid_company = loa.uuid_company 
+      ON cc.uuid_company = loa.uuid_company
   LEFT JOIN
     datalake_hubspot.company AS hc
-      ON hc.uuid_company = loa.uuid_company 
+      ON hc.uuid_company = loa.uuid_company
 )
 SELECT
   h.id,
@@ -124,6 +124,7 @@ SELECT
   h.iptu,
   h.finishing_level,
   h.number,
+  h.floor,
   h.bathrooms,
   h.bedrooms,
   h.suites,
@@ -248,10 +249,10 @@ SELECT
       FALSE
   )) AS is_3p_supply_bh,
   (COALESCE(h.announced_by, h.id_announced_by) IS NOT NULL) AS is_imovel_v3,
-  CASE 
+  CASE
     WHEN (h.id_external LIKE '%SCM%-%' OR h.internal_admin_info LIKE '%[SCM%-%]%') THEN TRUE
     WHEN h.id_user_registrant = 7212349 THEN TRUE -- For Casa Mineira migration, a single user was created to import the CM listings
-    ELSE FALSE 
+    ELSE FALSE
   END AS is_casa_mineira_migration,
   COALESCE(li.is_sale_primary_market, FALSE) AS is_sale_primary_market,
   COALESCE(li.has_sale_great_price_tag, FALSE) AS has_sale_great_price_tag,

@@ -141,6 +141,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.number
     description: 'Number of the address of the house'
+  floor:
+    lineage:
+      - datalake_ebdb_clean.house.floor
+    description: 'The floor/level number in which the property is.'
   bathrooms:
     lineage:
       - datalake_ebdb_clean.house.bathrooms
