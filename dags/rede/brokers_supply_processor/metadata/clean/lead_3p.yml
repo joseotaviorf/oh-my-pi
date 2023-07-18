@@ -5,15 +5,6 @@ columns:
   id:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.id
-  id_partner:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.partner_id
-  id_file:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.file_id
-  id_listing:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.listing_id
   uuid_lead:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.lead_uuid
@@ -23,6 +14,9 @@ columns:
   id_by_real_estate:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.id_by_real_estate
+  uuid_company:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.company_uuid
   brokers:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.brokers
@@ -53,18 +47,9 @@ columns:
   lead_hash:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.lead_hash
-  status_reason:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.status_reason
   cnpj:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.cnpj
-  status:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.status
-  version:
-    lineage:
-      - datalake_brokers_supply_processor_raw.lead3p.version
   is_sent_to_main:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.sent_to_main
