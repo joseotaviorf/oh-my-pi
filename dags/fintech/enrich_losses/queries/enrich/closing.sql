@@ -71,7 +71,7 @@ BASE_CLOSING_DRAFT AS (
       FROM 
             BASE_INVOICES_SNAPSHOT_CLEAN AS m
       LEFT JOIN 
-            datalake_retsuko_clean.invoice AS i 
+            datalake_retsuko.invoice AS i 
                   ON id_external = m.sk_invoice
       LEFT JOIN 
             datalake_retsuko_clean.contract AS cr 

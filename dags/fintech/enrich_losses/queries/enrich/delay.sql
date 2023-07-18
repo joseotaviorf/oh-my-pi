@@ -5,7 +5,7 @@ WITH BASE_VENCIMENTOS_PADRONIZADOS AS(
       cast(ts_due AS date) AS dt_due,
       count(id_external) AS qtd_faturas 
     FROM 
-      datalake_retsuko_clean.invoice
+      datalake_retsuko.invoice
     WHERE 
       purpose = 'monthly' 
       AND due_amount <= 0
@@ -42,12 +42,12 @@ BASE_ACORDOS_METODOLOGIA_ANTIGA AS(
           i.id_external AS id_invoice_external, 
           cast(i.ts_created AS date) AS dt_created 
         FROM 
-          datalake_retsuko_clean.entry e
+          datalake_retsuko.entry e
         LEFT JOIN 
           datalake_retsuko_clean.contract c 
             ON c.id = e.id_contract
         LEFT JOIN 
-          datalake_retsuko_clean.invoice i 
+          datalake_retsuko.invoice i 
             ON i.id = e.id_invoice
         WHERE
         (trim(upper(e.description)) LIKE '%ACORDO COBRAN%' AND (trim(upper(e.bill_item)) LIKE '%ENTRY.BILL-ITEM/INSURANCE-GUARANTEE%'))
@@ -84,7 +84,7 @@ BASE_ACORDOS_METODOLOGIA_NOVA AS(
       datalake_trato_feito_clean.debt d                                                     
         ON n.id = d.id_negotiation
     INNER JOIN 
-      datalake_retsuko_clean.invoice i                                                      
+      datalake_retsuko.invoice i                                                      
         ON i.id_external = cast(d.id_external AS bigint)
     INNER JOIN 
       datalake_retsuko_clean.contract c                                                    	
@@ -110,7 +110,7 @@ BASE_ACORDOS_METODOLOGIA_NOVA AS(
       datalake_trato_feito_clean.accounting_installment ai  
         ON ai.id_installment = p.id
     INNER JOIN 
-      datalake_retsuko_clean.invoice i  
+      datalake_retsuko.invoice i  
         ON i.id_external = cast(ai.id_external AS bigint)
   )
   SELECT
