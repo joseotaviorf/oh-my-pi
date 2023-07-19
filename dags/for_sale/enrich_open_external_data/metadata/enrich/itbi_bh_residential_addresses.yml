@@ -1,0 +1,19 @@
+---
+database_name: datalake_open_external_data
+table_name: itbi_bh_residential_addresses
+description: "Table with all the distinct residential addresses present in the ITBI BH table. Used to retrieve the latitude and longitude via Geocoding."
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id_address:
+    description: Hash of the street name plus the number plus the source of the information, being unique for each address.
+  address:
+    description: Street name linked to the transaction's zip code.
+  number:
+    description: Unit number of the property.
+  neighborhood:
+    description: "The neighborhood, if any, with the highest probability of having that zipcode in its extension."
+  zipcode:
+    description: 'Zip code of the property address.'
+  city:
+    description: 'ITBI city of the property address.'

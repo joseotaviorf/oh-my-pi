@@ -1,5 +1,9 @@
 ---
 tables:
+  itbi_sp_residential_addresses:
+    is_incremental: false
+  itbi_bh_residential_addresses:
+    is_incremental: false
   itbi_sp_residential_transactions:
     is_incremental: false
   itbi_bh_residential_transactions:

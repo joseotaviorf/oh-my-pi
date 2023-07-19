@@ -6,7 +6,11 @@ SELECT
     complemento AS address_complement,
     bairro AS address_neighborhood,
     referencia AS address_reference,
-    LPAD(TRIM(REPLACE(cep, '.', '')), 8, '0') AS address_zipcode,
+    CASE LEN(cep)
+        WHEN 7 THEN CAST((LEFT(LPAD(TRIM(REPLACE(cep, '.', '')), 8, '0'), 5) || '-' || RIGHT(LPAD(TRIM(REPLACE(cep, '.', '')), 8, '0'), 3)) AS STRING)
+        WHEN 9 THEN CAST((LEFT(LPAD(TRIM(SPLIT(cep, '\\.')[0]), 8, '0'), 5) || '-' || RIGHT(LPAD(TRIM(SPLIT(cep, '\\.')[0]), 8, '0'), 3)) AS STRING)
+        ELSE TRANSLATE(cep, '\\.-', '')
+    END AS address_zipcode,
     TRIM(natureza_transacao) AS transaction_nature,
     TRIM(tipo_financiamento) AS financing_type,
     TRIM(cartorio_registro) AS house_registry_office,

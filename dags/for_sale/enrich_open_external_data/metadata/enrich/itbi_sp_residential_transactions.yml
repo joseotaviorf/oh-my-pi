@@ -37,6 +37,8 @@ columns:
   address_reference:
     description: 'Reference of the property address.'
   address_zipcode:
+    lineage:
+      - datalake_itbi_clean.itbi_sp.address_zipcode
     description: 'Zip code of the property address.'
   financing_type:
     description: The financing system used to purchase the property.

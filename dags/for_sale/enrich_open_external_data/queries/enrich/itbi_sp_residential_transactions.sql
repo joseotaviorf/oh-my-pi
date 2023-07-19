@@ -25,7 +25,7 @@ SELECT
     END AS address_number,
     address_complement,
     TRIM(INITCAP(address_reference)) AS address_reference,
-    TRIM(CAST((LEFT(address_zipcode, 5) || '-' || RIGHT(address_zipcode, 3)) AS STRING)) AS address_zipcode,
+    address_zipcode,
     CASE 
         WHEN SUBSTRING(financing_type, 3, LENGTH(financing_type)) = '' THEN NULL
         ELSE TRIM(SUBSTRING(financing_type, 3, LENGTH(financing_type)))
