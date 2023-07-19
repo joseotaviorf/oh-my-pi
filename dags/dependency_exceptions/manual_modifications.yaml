@@ -301,19 +301,6 @@ bietlejuice.dw_tickets:
   remove:
     - bietlejuice.enrich_zendesk_tickets:load-enrich-ticket-measurements
     - bietlejuice.zendesk_tickets:load-clean-organizations
-bietlejuice.dw_unified_listing_flow:
-  remove:
-    - bietlejuice.dw_region:load-dw-public-dim-region
-    - bietlejuice.ebdb:load-clean-affiliate-data
-    - bietlejuice.ebdb:load-clean-user
-    - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
-    - bietlejuice.enrich_lead:load-enrich-lead-city-region
-    - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking
-    - bietlejuice.enrich_unified_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
-    - bietlejuice.enrich_unified_potential_listing:load-enrich-potential-listing-b2b
-    - bietlejuice.enrich_unified_potential_listing:load-enrich-potential-listing-lead-tasks
-    - bietlejuice.enrich_unified_potential_listing:load-enrich-potential-listing-reprocessed-leads
-    - bietlejuice.gsheets_growth:done-clean-taxonomy-growth
 bietlejuice.dw_user:
   add:
     - bietlejuice.enrich_big_agent:load-enrich-agent-current-program
