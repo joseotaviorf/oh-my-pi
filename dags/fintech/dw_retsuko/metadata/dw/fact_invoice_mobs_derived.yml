@@ -44,6 +44,8 @@ columns:
     description: Auxiliary column to indicate if that col_mob value is corresponded to a TO DUE STATUS
   value_canceled:
     description: Auxiliary columns to indicate the financial value of the CANCELED STATUS in that given mob (col_mob)
+  value_written_down:
+    description: Auxiliary columns to indicate the financial value of the WRITTEN-DOWN STATUS in that given mob (col_mob)
   value_paid:
     description: Auxiliary columns to indicate the financial value of the PAID STATUS in that given mob (col_mob)
   value_due:

@@ -30,6 +30,7 @@ building_status_invoices AS (
     *,
     CASE
       WHEN ss.signal_canceled_mob = 1 THEN 'CANCELADA'
+      WHEN ss.signal_paid_mob = 1 AND ss.is_written_down THEN 'BAIXADA'
       WHEN ss.signal_paid_mob = 1 THEN 'PAGA'
       WHEN ss.signal_to_due_mob = 1 THEN 'A VENCER'
       ELSE 'VENCIDA'
@@ -40,6 +41,7 @@ building_status_invoices_values AS (
   SELECT
     *,
     IF(bsi.status_temporal='CANCELADA',ABS(due_amount),0) AS value_canceled,
+    IF(bsi.status_temporal='BAIXADA',ABS(due_amount),0) AS value_written_down,
     IF(bsi.status_temporal='PAGA',ABS(due_amount),0) AS value_paid,
     IF(bsi.status_temporal='VENCIDA',ABS(due_amount),0) AS value_due,
     IF(bsi.status_temporal='A VENCER',ABS(due_amount),0) AS value_to_due
@@ -64,6 +66,7 @@ SELECT DISTINCT
   signal_due_mob,
   signal_to_due_mob,
   value_canceled,
+  value_written_down,
   value_paid,
   value_due,
   value_to_due,
