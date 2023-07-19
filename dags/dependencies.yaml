@@ -2118,41 +2118,39 @@ bietlejuice.enrich_velo:
   - bietlejuice.ebdb:load-clean-state
   - bietlejuice.enrich_velo_omie:load-enrich-cash-flows
   - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories
+  - bietlejuice.person:load-clean-contact-info
+  - bietlejuice.person:load-clean-identity-document
+  - bietlejuice.person:load-clean-person
+  - bietlejuice.rental_guarantee_platform:load-clean-address
+  - bietlejuice.rental_guarantee_platform:load-clean-agreement-payment
+  - bietlejuice.rental_guarantee_platform:load-clean-bussines-type
   - bietlejuice.rental_guarantee_platform:load-clean-company
+  - bietlejuice.rental_guarantee_platform:load-clean-company-plan
+  - bietlejuice.rental_guarantee_platform:load-clean-company-user-account
   - bietlejuice.rental_guarantee_platform:load-clean-contract
+  - bietlejuice.rental_guarantee_platform:load-clean-contract-status
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-has-agreement
+  - bietlejuice.rental_guarantee_platform:load-clean-item-type
+  - bietlejuice.rental_guarantee_platform:load-clean-payment
+  - bietlejuice.rental_guarantee_platform:load-clean-plan
+  - bietlejuice.rental_guarantee_platform:load-clean-profile-account
   - bietlejuice.rental_guarantee_platform:load-clean-property-propose
+  - bietlejuice.rental_guarantee_platform:load-clean-property-type
   - bietlejuice.rental_guarantee_platform:load-clean-propose
+  - bietlejuice.rental_guarantee_platform:load-clean-propose-aud
   - bietlejuice.rental_guarantee_platform:load-clean-propose-history
+  - bietlejuice.rental_guarantee_platform:load-clean-propose-item
   - bietlejuice.rental_guarantee_platform:load-clean-propose-person
   - bietlejuice.rental_guarantee_platform:load-clean-propose-status
-  - bietlejuice.velo:load-clean-clientes-address
-  - bietlejuice.velo:load-clean-clientes-company
-  - bietlejuice.velo:load-clean-clientes-person
-  - bietlejuice.velo:load-clean-fiancavelo-activator
-  - bietlejuice.velo:load-clean-fiancavelo-fianca
-  - bietlejuice.velo:load-clean-fiancavelo-object
-  - bietlejuice.velo:load-clean-fiancavelo-packvalues
-  - bietlejuice.velo:load-clean-fiancavelo-payment
-  - bietlejuice.velo:load-clean-fiancavelo-plans
-  - bietlejuice.velo:load-clean-fiancavelo-plantype
-  - bietlejuice.velo:load-clean-fiancavelo-property
-  - bietlejuice.velo:load-clean-fiancavelo-propertytype
-  - bietlejuice.velo:load-clean-fiancavelo-propose
-  - bietlejuice.velo:load-clean-fiancavelo-proposecompany
-  - bietlejuice.velo:load-clean-fiancavelo-proposehistory
-  - bietlejuice.velo:load-clean-fiancavelo-proposeperson
-  - bietlejuice.velo:load-clean-fiancavelo-proposestatus
-  - bietlejuice.velo:load-clean-fiancavelo-proposetype
-  - bietlejuice.velo:load-clean-fiancavelo-realestate
-  - bietlejuice.velo:load-clean-fiancavelo-status
-  - bietlejuice.velo:load-clean-users-profile
-  - bietlejuice.velo:load-clean-users-users
-  - bietlejuice.velo:load-clean-veloscore-bureau
-  - bietlejuice.velo:load-clean-veloscore-consultations
-  - bietlejuice.velo:load-clean-veloscore-personal
-  - bietlejuice.velo:load-clean-veloscore-risk
+  - bietlejuice.rental_guarantee_platform:load-clean-rev-info
+  - bietlejuice.rental_guarantee_platform:load-clean-tenant-company
+  - bietlejuice.rental_guarantee_platform:load-clean-user-account
+  - bietlejuice.velo_neurotech:load-clean-logs-credit-granting
   - bietlejuice.velo_omie:load-clean-bank-account
   - bietlejuice.velo_omie:load-clean-categories
+  - bietlejuice.velo_omie:load-clean-clients
+  - bietlejuice.velo_omie:load-clean-country
   - bietlejuice.velo_omie:load-clean-projects
 bietlejuice.enrich_velo_omie:
   - bietlejuice.velo_omie:load-clean-cash-flows

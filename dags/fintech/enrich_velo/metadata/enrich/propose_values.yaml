@@ -21,7 +21,6 @@ columns:
   activator_type:
     description: Propose's activator type name. This may not exist in QuintoCred.
     lineage:
-      - datalake_velo_clean.fiancavelo_activator.name
     description: Category type of the amount paid to activate the guarantee
   plan:
     description: Propose's plan name.

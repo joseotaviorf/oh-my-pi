@@ -7,64 +7,51 @@ columns:
   id_person:
     description: Person's identification number (ID)
     lineage:
-      - datalake_velo_clean.clientes_person.id
       - datalake_rental_guarantee_platform_clean.propose_person.id
   id_propose:
     description: Propose identification number (ID)
     lineage:
-      - datalake_velo_clean.fiancavelo_proposeperson.id_propose
       - datalake_rental_guarantee_platform_clean.propose_person.id_propose
   name:
     description: Person's name
     lineage:
-      - datalake_velo_clean.clientes_person.name
       - datalake_rental_guarantee_platform_clean.propose_person.name
   email:
     description: Person's email
     lineage:
-      - datalake_velo_clean.clientes_person.email
       - datalake_person_clean.contact_info.email
   phone:
     description: Person's phone
     lineage:
-      - datalake_velo_clean.clientes_person.phone
       - datalake_person_clean.contact_info.phone
   bureau_name:
     description: Name of the bureau that analysed the person score
     lineage:
-      - datalake_velo_clean.veloscore_bureau.name
   document:
     description: Person's document number (CPF)
     lineage:
-      - datalake_velo_clean.clientes_person.document
       - datalake_person_clean.document.identification_number
   serasa_score:
     description: Person's Serasa Score in the moment of propose's credit score evaluation
     lineage:
-      - datalake_velo_clean.veloscore_consultations.value
       - datalake_velo_neurotech_clean.logs_credit_grating.serasa_score_csba_bureau
   risk_score:
     description: Person's risk score cluster ID
     lineage:
-      - datalake_velo_clean.veloscore_consultations.risk
       - datalake_velo_neurotech_clean.logs_credit_grating.proposal_rating
   risk_classification:
     description: Person's risk score cluster description
     lineage:
-      - datalake_velo_clean.veloscore_risk.name
   score_personal_value:
     description: Person's bureau score in the moment of propose's credit score evaluation
     lineage:
-      - datalake_velo_clean.veloscore_personal.value
   declared_income:
     description: Person's declared income
     lineage:
-      - datalake_velo_clean.veloscore_personal.declared
       - datalake_rental_guarantee_platform_clean.propose_person.declared_income
   requested_income:
     description: Person's requested income
     lineage:
-      - datalake_velo_clean.veloscore_personal.requested
   is_primary_person:
     description: Flag to indicate if the person is the primary on propose
   is_legacy:
@@ -72,5 +59,4 @@ columns:
   dt_birth:
     description: Person's date of birth
     lineage:
-      - datalake_velo_clean.clientes_person.dt_birth
       - datalake_person_clean.person.dt_birth

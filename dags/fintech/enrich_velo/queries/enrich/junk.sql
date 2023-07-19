@@ -15,11 +15,6 @@ WITH cte_join AS (
             SELECT
                 name AS desc_lvl_1
                 FROM
-                    datalake_velo_clean.fiancavelo_proposestatus
-            UNION ALL
-            SELECT
-                name AS desc_lvl_1
-                FROM
                     datalake_rental_guarantee_platform_clean.propose_status
             )
         SELECT
@@ -33,11 +28,6 @@ WITH cte_join AS (
     UNION ALL
     (
         WITH cte_guar_status AS (
-            SELECT
-                name AS desc_lvl_1
-                FROM
-                    datalake_velo_clean.fiancavelo_status
-            UNION ALL
             SELECT
                 name AS desc_lvl_1
                 FROM
@@ -57,11 +47,6 @@ WITH cte_join AS (
             SELECT
                 name AS desc_lvl_1
                 FROM
-                    datalake_velo_clean.fiancavelo_proposetype
-            UNION ALL
-            SELECT
-                name AS desc_lvl_1
-                FROM
                     datalake_rental_guarantee_platform_clean.bussines_type
             )
         SELECT
@@ -75,11 +60,6 @@ WITH cte_join AS (
     UNION ALL
     (
         WITH cte_billing_type AS (
-            SELECT
-                name AS desc_lvl_1
-                FROM
-                    datalake_velo_clean.fiancavelo_billingtype
-            UNION ALL
             SELECT
                 DISTINCT billing_type AS desc_lvl_1
                 FROM
@@ -111,11 +91,6 @@ WITH cte_join AS (
     (
         WITH cte_payment_status AS (
             SELECT
-                name AS desc_lvl_1
-            FROM
-                datalake_velo_clean.fiancavelo_paymentstatus
-            UNION ALL
-            SELECT
                 DISTINCT status AS desc_lvl_1
             FROM
                 datalake_rental_guarantee_platform_clean.payment
@@ -137,11 +112,6 @@ WITH cte_join AS (
     (
         WITH cte_payment_gateway AS (
             SELECT
-                name AS desc_lvl_1
-            FROM
-                datalake_velo_clean.fiancavelo_gateway
-            UNION ALL
-            SELECT
                 DISTINCT gateway AS desc_lvl_1
             FROM
                 datalake_rental_guarantee_platform_clean.payment
@@ -157,11 +127,6 @@ WITH cte_join AS (
     UNION ALL
     (
         WITH cte_occurrence_status AS (
-            SELECT
-                name AS desc_lvl_1
-            FROM
-                datalake_velo_clean.fiancavelo_occurrencestatus
-            UNION ALL
             SELECT
                 name AS desc_lvl_1
             FROM
@@ -183,11 +148,6 @@ WITH cte_join AS (
     UNION ALL
     (
         WITH cte_occurrence_type AS (
-            SELECT
-                name AS desc_lvl_1
-            FROM
-                datalake_velo_clean.fiancavelo_occurrencetype
-            UNION ALL
             SELECT
                 name AS desc_lvl_1
             FROM

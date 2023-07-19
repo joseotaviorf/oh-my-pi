@@ -13,10 +13,6 @@ columns:
     description: ID connecting table to propose table.
     lineage:
       - datalake_velo.occurrence.id_propose
-  sk_payment:
-    description: ID connecting table to payment table, if relation exists.
-    lineage:
-      - datalake_velo.occurrence.id_payment
   sk_client:
     description: ID connecting table to propose_person table.
     lineage:

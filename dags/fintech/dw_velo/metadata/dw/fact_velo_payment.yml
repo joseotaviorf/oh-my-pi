@@ -13,6 +13,10 @@ columns:
     description: SK connecting table to fact_velo_propose table.
     lineage:
       - datalake_velo.payment.id_propose
+  sk_occurrence:
+    description: SK connecting table to fact_velo_occurrence table.
+    lineage:
+      - datalake_velo.payment.id_occurrence
   sk_propose_values:
     description: SK connecting table to dim_velo_propose_values table.
     lineage:

@@ -857,27 +857,6 @@ bietlejuice.enrich_unified_listing_flow:
     - bietlejuice.wololo:load-clean-prospect
 bietlejuice.enrich_velo:
   remove:
-    - bietlejuice.person:load-clean-contact-info
-    - bietlejuice.person:load-clean-identity-document
-    - bietlejuice.person:load-clean-person
-    - bietlejuice.rental_guarantee_platform:load-clean-address
-    - bietlejuice.rental_guarantee_platform:load-clean-agreement-payment
-    - bietlejuice.rental_guarantee_platform:load-clean-bussines-type
-    - bietlejuice.rental_guarantee_platform:load-clean-company-plan
-    - bietlejuice.rental_guarantee_platform:load-clean-company-user-account
-    - bietlejuice.rental_guarantee_platform:load-clean-contract-status
-    - bietlejuice.rental_guarantee_platform:load-clean-delinquency
-    - bietlejuice.rental_guarantee_platform:load-clean-delinquency-has-agreement
-    - bietlejuice.rental_guarantee_platform:load-clean-item-type
-    - bietlejuice.rental_guarantee_platform:load-clean-payment
-    - bietlejuice.rental_guarantee_platform:load-clean-plan
-    - bietlejuice.rental_guarantee_platform:load-clean-profile-account
-    - bietlejuice.rental_guarantee_platform:load-clean-property-type
-    - bietlejuice.rental_guarantee_platform:load-clean-propose-aud
-    - bietlejuice.rental_guarantee_platform:load-clean-propose-item
-    - bietlejuice.rental_guarantee_platform:load-clean-rev-info
-    - bietlejuice.rental_guarantee_platform:load-clean-tenant-company
-    - bietlejuice.rental_guarantee_platform:load-clean-user-account
     - bietlejuice.velo:load-clean-fiancavelo-billingtype
     - bietlejuice.velo:load-clean-fiancavelo-colaborador
     - bietlejuice.velo:load-clean-fiancavelo-gateway
@@ -885,9 +864,10 @@ bietlejuice.enrich_velo:
     - bietlejuice.velo:load-clean-fiancavelo-occurrencestatus
     - bietlejuice.velo:load-clean-fiancavelo-occurrencetype
     - bietlejuice.velo:load-clean-fiancavelo-paymentstatus
-    - bietlejuice.velo_neurotech:load-clean-logs-credit-granting
-    - bietlejuice.velo_omie:load-clean-clients
-    - bietlejuice.velo_omie:load-clean-country
+    - bietlejuice.velo:load-clean-fiancavelo-paymentstatus
+    - bietlejuice.velo:load-clean-fiancavelo-fianca
+    - bietlejuice.velo:load-clean-fiancavelo-propose
+    - bietlejuice.velo:load-clean-fiancavelo-proposehistory
 bietlejuice.enrich_zendesk_ticket_funnels:
   remove:
     - bietlejuice.zendesk_tickets:load-clean-groups

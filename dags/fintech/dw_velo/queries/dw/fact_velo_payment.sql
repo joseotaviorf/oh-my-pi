@@ -1,6 +1,7 @@
 SELECT
     id_payment AS sk_payment,
     id_propose AS sk_propose,
+    id_occurrence AS sk_occurrence,
     COALESCE(CAST(id_propose_values AS BIGINT), -1) AS sk_propose_values,
     COALESCE(id_billing_type, -1) AS sk_billing_type,
     COALESCE(id_payment_type, -1) AS sk_payment_type,
