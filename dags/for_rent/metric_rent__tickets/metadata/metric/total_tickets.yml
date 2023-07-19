@@ -1,8 +1,8 @@
 ---
 database_name: metric_rent
 table_name: total_tickets
-description: Monthly total tickets. 
-  This metric is being built with some specific filters for the FLUX context and is used to calculate Ticket Rate. The granularity is by contact_theme_detail and month.
+description: Daily total tickets. 
+  This metric is being built with some specific filters for the FLUX context and is used to calculate Ticket Rate. The granularity is by contact_theme_detail and day.
 domain: For Rent
 owner: jonas.fiorini@quintoandar.com.br
 columns:
@@ -61,12 +61,36 @@ columns:
       hierarchy: User analysis
       approved_by: marcus.pinto@quintoandar.com.br
       link_to_metric: ""
-  total_tickets:
-    description: Count of unique CX's tickets.
+  total_tickets_identified:
+    description: Count of unique CX's tickets by contact_theme_detail. 
+      Only considers tickets that had the taxonomy filled in after attendance.
     metric:
-      name: Total Tickets Monthly
+      name: Total Tickets Daily
       description: Count of unique CX's tickets.
-      acronym: TT
+      acronym: TTI
+      is_additive: True
+      business_stage: CX
+      hierarchy: User analysis
+      approved_by: marcus.pinto@quintoandar.com.br
+      link_to_metric: ""
+  total_tickets_distributed:
+    description: Count of unique CX's tickets without contact_theme_detail, 
+      considering idle cases or in which the attendance was not classified (null taxonomy), and, proportionally distributed to this taxonomy.
+    metric:
+      name: Total Tickets Distributed Daily
+      description: Count of unique CX's tickets without contact_theme_detail and proportionally distributed to this taxonomy.
+      acronym: TTD
+      is_additive: True
+      business_stage: CX
+      hierarchy: User analysis
+      approved_by: marcus.pinto@quintoandar.com.br
+      link_to_metric: ""
+  total_tickets_proportional:
+    description: Sum of total_tickets_identified and total_tickets_distributed.
+    metric:
+      name: Total Tickets Proportional Daily
+      description: Volume of unique CX's tickets attributed to this taxonomy daily.
+      acronym: TTP
       is_additive: True
       business_stage: CX
       hierarchy: User analysis
