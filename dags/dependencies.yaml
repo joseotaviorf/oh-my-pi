@@ -1514,7 +1514,6 @@ bietlejuice.enrich_mexico_marketing_automatic_daily_costs:
 bietlejuice.enrich_mexico_marketing_manual_daily_costs:
   - bietlejuice.gsheets_growth_intraday:done-clean-mexico-marketing-manual-shared-costs
 bietlejuice.enrich_mexico_rent_supply:
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-rental-marketplace-flows
   - bietlejuice.ebdb:load-clean-affiliate-data
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.enrich_lead:load-enrich-lead
