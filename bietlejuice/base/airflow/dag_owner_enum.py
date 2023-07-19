@@ -13,6 +13,7 @@ class DAGOwnerEnum:
     DATA_GOVERNANCE = "Data Governance"
     DATA_GROWTH = "Data Growth"
     DATA_INTERNATIONAL = "Data International"
+    DATA_PLATFORM = "Data Platform"
     DATA_PRIMITIVES = "Data Primitives"
     DATA_REDE = "Data Rede"
     DATA_SS = "Data SS"
