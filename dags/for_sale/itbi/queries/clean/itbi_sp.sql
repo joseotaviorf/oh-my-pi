@@ -6,7 +6,7 @@ SELECT
     complemento AS address_complement,
     bairro AS address_neighborhood,
     referencia AS address_reference,
-    CASE LEN(cep)
+    CASE LENGTH(cep)
         WHEN 7 THEN CAST((LEFT(LPAD(TRIM(REPLACE(cep, '.', '')), 8, '0'), 5) || '-' || RIGHT(LPAD(TRIM(REPLACE(cep, '.', '')), 8, '0'), 3)) AS STRING)
         WHEN 9 THEN CAST((LEFT(LPAD(TRIM(SPLIT(cep, '\\.')[0]), 8, '0'), 5) || '-' || RIGHT(LPAD(TRIM(SPLIT(cep, '\\.')[0]), 8, '0'), 3)) AS STRING)
         ELSE TRANSLATE(cep, '\\.-', '')
