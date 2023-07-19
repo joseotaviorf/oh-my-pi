@@ -39,6 +39,18 @@ contracts AS (
     AND ct.dt_termination >= dc.dt_start
     AND dc.rental_administrator = 'QUINTOANDAR'
 ),
+stock_contracts AS (  -- Contracts that must be filtered out due to being stock type in the last 180 days
+  SELECT DISTINCT
+    op.id_contract
+  FROM
+    datalake_invoice.overdue_portfolio_timeline AS op
+    -- We're not considering this table as a dependency for the DAG due to being a context that runs during by the day and is out of our SLA.
+    -- So related to this data, we're only dealing here with D-2 results.
+  WHERE
+    op.user = 'tenant'
+    AND op.debtor_type = 'Stock'
+    AND op.dt_reference BETWEEN (DATE(NOW()) - INTERVAL '180' DAY) AND DATE(NOW())
+),
 status_send AS (
   SELECT
     c.sk_contract,
@@ -84,6 +96,7 @@ status_send AS (
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
   WHERE
     c.termination_type IS NOT NULL  --('termination', 'recap_termination')
+    AND c.sk_contract NOT IN (SELECT id_contract FROM stock_contracts)
 ),
 contracts_to_send AS (
   SELECT

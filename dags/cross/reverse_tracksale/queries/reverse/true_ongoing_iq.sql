@@ -1,22 +1,22 @@
 WITH contracts AS (--all considered contracts, but without birthday criteria applied
-  SELECT 
+  SELECT
     dc.sk_contract,
     dc.dt_start,
     CURRENT_DATE() - INTERVAL '15' day AS dt_recap,
     INT(MONTHS_BETWEEN(CURRENT_DATE(), dc.dt_start)) AS age,
     INT(MONTHS_BETWEEN(CURRENT_DATE() - INTERVAL '15' day, dc.dt_start)) AS age_recap,
-    CASE 
-      WHEN DAY(dt_start) = DAY(CURRENT_DATE()) 
+    CASE
+      WHEN DAY(dt_start) = DAY(CURRENT_DATE())
         AND INT(MONTHS_BETWEEN(CURRENT_DATE(), dc.dt_start)) % 6 = 0 THEN 'birthday'
-      WHEN DAY(dt_start) = DAY(CURRENT_DATE() - INTERVAL '15' day) 
+      WHEN DAY(dt_start) = DAY(CURRENT_DATE() - INTERVAL '15' day)
         AND INT(MONTHS_BETWEEN(CURRENT_DATE() - INTERVAL '15' day, dc.dt_start )) % 6 = 0 THEN 'recap_birthday'
-      ELSE NULL 
+      ELSE NULL
     END AS birth_type
-  FROM 
+  FROM
     dw_public.dim_contract AS dc
-  LEFT JOIN 
-    datalake_offboarding.contract_termination AS ct 
-      ON dc.sk_contract = ct.id_contract 
+  LEFT JOIN
+    datalake_offboarding.contract_termination AS ct
+      ON dc.sk_contract = ct.id_contract
       AND ct.status != 'CANCELED'
   WHERE
     dc.country_code = 'BR'
@@ -25,8 +25,18 @@ WITH contracts AS (--all considered contracts, but without birthday criteria app
     AND dc.rental_administrator = 'QUINTOANDAR'
     AND INT(MONTHS_BETWEEN(CURRENT_DATE(), dc.dt_start)) > 5
 ),
+stock_contracts AS (  -- Contracts that must be filtered out due to being stock type
+  SELECT DISTINCT
+    op.id_contract
+  FROM
+    datalake_invoice.overdue_portfolio_timeline AS op
+  WHERE
+    op.user = 'tenant'
+    AND op.debtor_type = 'Stock'
+    AND op.dt_reference BETWEEN (DATE(NOW()) - INTERVAL '180' DAY) AND DATE(NOW())
+),
 status_send AS (--Evaluat every ticket related to an birthday contract ORcontract in recap
-  SELECT 
+  SELECT
     c.sk_contract,
     c.age,
     c.age_recap,
@@ -37,59 +47,60 @@ status_send AS (--Evaluat every ticket related to an birthday contract ORcontrac
     c.dt_recap,
     ft.ts_started,
     ft.ts_solved,
-    CASE 
-      WHEN c.birth_type = 'birthday'                   
+    CASE
+      WHEN c.birth_type = 'birthday'
         AND ft.sk_ticket IS NOT NULL
-        AND ft.ts_solved IS NULL 
-        AND (ft.front_or_back = 'back' OR dp.team IS NOT NULL) THEN 1 
-      ELSE 0 
-    END AS flg_not_send,                                            
-    CASE 
-      WHEN c.birth_type = 'recap_birthday' 
+        AND ft.ts_solved IS NULL
+        AND (ft.front_or_back = 'back' OR dp.team IS NOT NULL) THEN 1
+      ELSE 0
+    END AS flg_not_send,
+    CASE
+      WHEN c.birth_type = 'recap_birthday'
         AND ft.sk_ticket IS NOT NULL
-        AND ft.ts_started < c.dt_recap  
-        AND (ft.ts_solved >= c.dt_recap OR ft.ts_solved IS NULL) 
+        AND ft.ts_started < c.dt_recap
+        AND (ft.ts_solved >= c.dt_recap OR ft.ts_solved IS NULL)
         AND (ft.front_or_back = 'back' OR dp.team IS NOT NULL) THEN 1
       ELSE 0
     END AS flg_recap_send
-  FROM 
+  FROM
     contracts AS c
-  LEFT JOIN 
-    dw_customer_support.fact_ticket AS ft 
-      ON c.sk_contract = ft.sk_contract 
+  LEFT JOIN
+    dw_customer_support.fact_ticket AS ft
+      ON c.sk_contract = ft.sk_contract
       AND ft.sk_contract IS NOT NULL
   LEFT JOIN
     dw_customer_support.dim_department AS dp
-      ON ft.sk_main_department = dp.sk_department 
-      AND (dp.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]') 
+      ON ft.sk_main_department = dp.sk_department
+      AND (dp.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
   WHERE
     c.birth_type IS NOT NULL
+    AND c.sk_contract NOT IN (SELECT id_contract FROM stock_contracts)
 ),
 contracts_to_send AS (--Select all contracts that can receive the nps survey
-  SELECT 
-    sk_contract,
-    age,
-    age_recap,
-    MAX(birth_type) AS birth_type,
-    MAX(flg_not_send) AS flg_not_send,
-    MAX(flg_recap_send) AS flg_recap_send
-  FROM 
-    status_send
-  GROUP BY 
+  SELECT
+    ss.sk_contract,
+    ss.age,
+    ss.age_recap,
+    MAX(ss.birth_type) AS birth_type,
+    MAX(ss.flg_not_send) AS flg_not_send,
+    MAX(ss.flg_recap_send) AS flg_recap_send
+  FROM
+    status_send AS ss
+  GROUP BY
     1, 2, 3
-  HAVING 
-    (MAX(birth_type) = 'birthday' AND MAX(flg_not_send) = 0)                                
-    OR (MAX(birth_type) = 'recap_birthday' AND MAX(flg_recap_send) = 1)
+  HAVING
+    (MAX(ss.birth_type) = 'birthday' AND MAX(ss.flg_not_send) = 0)
+    OR (MAX(ss.birth_type) = 'recap_birthday' AND MAX(ss.flg_recap_send) = 1)
 ),
 people_to_send AS (--Selected all people than can receive the nps survey
-  SELECT 
+  SELECT
     cp.name AS customer_name,
     cp.email AS customer_email,
     cp.phone_number AS customer_phone,
-    CASE 
-      WHEN cs.birth_type = 'birthday' THEN STRING(cs.age) || ' meses' 
-      ELSE STRING(cs.age_recap) || ' meses' 
+    CASE
+      WHEN cs.birth_type = 'birthday' THEN STRING(cs.age) || ' meses'
+      ELSE STRING(cs.age_recap) || ' meses'
     END AS campaign_step,
     'Inquilino' AS customer_type,
     cp.cpf AS customer_cpf,
@@ -97,14 +108,14 @@ people_to_send AS (--Selected all people than can receive the nps survey
     'true' AS campaign_type,
     'id_contract' AS driver_type,
     cp.id_contract AS id_driver
-  FROM 
-    datalake_ebdb_clean.contract_person AS cp 
-  INNER JOIN 
-    contracts_to_send AS cs 
-      ON cp.id_contract = cs.sk_contract 	
-  WHERE 
+  FROM
+    datalake_ebdb_clean.contract_person AS cp
+  INNER JOIN
+    contracts_to_send AS cs
+      ON cp.id_contract = cs.sk_contract
+  WHERE
     cp.type IN ('Inquilino','Morador')
-    AND cp.email IS NOT NULL		                                                        
+    AND cp.email IS NOT NULL
 )
 SELECT
   customer_name,
@@ -117,7 +128,7 @@ SELECT
   campaign_type,
   driver_type,
   id_driver
-FROM 
+FROM
   people_to_send
 UNION ALL
 SELECT

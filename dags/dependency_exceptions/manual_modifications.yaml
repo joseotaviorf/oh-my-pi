@@ -963,3 +963,4 @@ bietlejuice.reverse_tracksale:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
     - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
     - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
+    - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
