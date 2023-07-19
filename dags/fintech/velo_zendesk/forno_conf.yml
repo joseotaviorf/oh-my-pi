@@ -26,8 +26,8 @@ tables:
     is_incremental: false
 
 custom_cluster:
-  driver_node_type_id: r6gd.large
-  node_type_id: r6gd.large
+  driver_node_type_id: r5d.large
+  node_type_id: r5d.large
   runtime_engine: PHOTON
   autoscale:
     min_workers: 2
