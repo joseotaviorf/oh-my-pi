@@ -27,16 +27,16 @@ SELECT DISTINCT
     p.invoice_url,
     p.description,
     p.value AS due_amount,
-    NULL AS net_amount,
+    CAST(NULL AS DOUBLE) AS net_amount,
     p.ts_client_payment > p.ts_due AS is_paid_late,
     p.ts_due_original IS NOT NULL AND p.ts_due_original <> p.ts_due AS is_due_modified,
     FALSE AS is_occurrence,
     p.id <= 5000000 AS is_legacy,
     DATE(p.ts_created) AS dt_created,
     DATE(p.ts_due) AS dt_due,
-    NULL AS dt_due_original,
+    CAST(NULL AS STRING) AS dt_due_original,
     p.ts_client_payment AS dt_paid,
-    NULL as dt_payment_confirmed,
+    CAST(NULL AS STRING) as dt_payment_confirmed,
     p.ts_updated
 FROM
     datalake_rental_guarantee_platform_clean.payment AS p
@@ -83,16 +83,16 @@ SELECT DISTINCT
     NULL AS invoice_url,
     NULL AS description,
     ap.value AS due_amount,
-    NULL AS net_amount,
+    CAST(NULL AS DOUBLE) AS net_amount,
     ap.dt_paid > ap.dt_due AS is_paid_late,
     NULL AS is_due_modified,
     TRUE AS is_occurrence,
     FALSE AS is_legacy,
     DATE(ap.ts_created) AS dt_created,
     ap.dt_due AS dt_due,
-    NULL AS dt_due_original,
+    CAST(NULL AS STRING) AS dt_due_original,
     ap.dt_paid AS dt_paid,
-    NULL as dt_payment_confirmed,
+    CAST(NULL AS STRING) AS dt_payment_confirmed,
     ap.ts_updated
 
 FROM
