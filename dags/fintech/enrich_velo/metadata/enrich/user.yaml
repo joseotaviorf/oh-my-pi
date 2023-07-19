@@ -44,9 +44,6 @@ columns:
       Suporte lll: ""
     lineage:
       - datalake_rental_guarantee_platform_clean.profile_account.profile_name
-  phone:
-    description: user phone
-    lineage:
   is_legacy:
     description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_created:

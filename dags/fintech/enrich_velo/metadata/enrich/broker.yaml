@@ -49,9 +49,6 @@ columns:
     description: "Broker's establishment zipcode"
     lineage:
       - datalake_company_clean.address.zip_code
-  geolocation:
-    description: "Broker's establishment geolocation"
-    lineage:
   creci:
     description: "Broker's certification number (CRECI)"
     lineage:

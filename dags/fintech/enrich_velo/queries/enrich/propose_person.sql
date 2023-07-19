@@ -101,10 +101,10 @@ SELECT DISTINCT
     REPLACE(REPLACE(pd.identification_number,'.',''),'-','') AS document,
     s.serasa_score,
     s.risk_score,
-    NULL AS risk_classification,
-    NULL AS score_personal_value,
+    CAST(NULL AS BIGINT) AS risk_classification,
+    CAST(NULL AS BIGINT) AS score_personal_value,
     pp.declared_income,
-    NULL AS requested_income,
+    CAST(NULL AS BIGINT) AS requested_income,
     mp.id_person IS NOT NULL AS is_primary_person,
     FALSE AS is_legacy,
     p.dt_birth

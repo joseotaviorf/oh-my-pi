@@ -10,7 +10,6 @@ SELECT
     state,
     country_code,
     zipcode,
-    geolocation,
     creci,
     cnpj,
     is_broker_active,

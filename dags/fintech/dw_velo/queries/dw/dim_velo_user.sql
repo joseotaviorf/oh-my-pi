@@ -4,7 +4,6 @@ SELECT
     name,
     email,
     user_role,
-    phone,
     ts_created,
     is_legacy,
     NOW() AS ts_load

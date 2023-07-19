@@ -11,7 +11,6 @@ SELECT DISTINCT
     p.person_name AS name,
     ua.email,
     pa.profile_name AS user_role,
-    NULL AS phone,
     ua.id <= 5000000 AS is_legacy,
     ua.ts_created
 FROM

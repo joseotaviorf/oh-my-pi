@@ -48,10 +48,6 @@ columns:
     lineage:
     - datalake_velo.broker.zipcode
     description: Broker's establishment zipcode
-  geolocation:
-    lineage:
-    - datalake_velo.broker.geolocation
-    description: Broker's establishment geolocation
   creci:
     lineage:
     - datalake_velo.broker.creci

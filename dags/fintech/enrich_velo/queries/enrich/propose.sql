@@ -497,8 +497,8 @@ SELECT DISTINCT
     mp.id_person AS id_primary_person,
     jk1.id_junk AS id_origin,
     jk2.id_junk AS id_propose_status,
-    NULL AS id_guarantee_status, -- TODO: Avaliar se já está no propose_status mesmo
-    NULL AS id_propose_type,
+    jk3.id_junk AS id_guarantee_status,
+    CAST(NULL AS BIGINT) AS id_propose_type,
     pm.count_persons_included,
     pm.percentage_income_from_primary_person,
     pm.avg_serasa_score,

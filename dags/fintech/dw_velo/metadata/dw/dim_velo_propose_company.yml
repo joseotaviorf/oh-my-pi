@@ -45,10 +45,6 @@ columns:
     lineage:
     - datalake_velo.propose_company.zipcode
     description: Company's zipcode when the propose is for a business
-  geolocation:
-    lineage:
-    - datalake_velo.propose_company.geolocation
-    description: Company's geolocation when the propose is for a business
   cnpj:
     lineage:
     - datalake_velo.propose_company.cnpj

@@ -9,7 +9,6 @@ SELECT
     state,
     country_code,
     zipcode,
-    geolocation,
     cnpj,
     is_legacy,
     ts_created,

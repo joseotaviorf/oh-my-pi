@@ -9,7 +9,6 @@ SELECT
     state,
     country_code,
     zipcode,
-    geolocation,
     is_legacy,
     NOW() AS ts_load
 FROM

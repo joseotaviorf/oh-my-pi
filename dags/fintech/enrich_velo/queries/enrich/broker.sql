@@ -48,7 +48,6 @@ SELECT
     COALESCE(st.abbreviation, IF(a.state = '', NULL, UPPER(a.state))) AS state,
     ct.code AS country_code,
     a.zip_code AS zipcode,
-    NULL AS geolocation,
     d.identification_number AS creci,
     d2.identification_number AS cnpj,
     activation.dt_first_contract IS NOT NULL AS is_broker_active,

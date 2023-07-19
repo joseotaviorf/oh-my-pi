@@ -46,9 +46,6 @@ columns:
     description: Company's zipcode when the propose is for a business
     lineage:
       - datalake_company_clean.address.zip_code
-  geolocation:
-    description: latitude and longitude - Company's geolocation when the propose is for a business
-    lineage:
   cnpj:
     description: Company's document number (CNPJ) when the propose is for a business
     lineage:

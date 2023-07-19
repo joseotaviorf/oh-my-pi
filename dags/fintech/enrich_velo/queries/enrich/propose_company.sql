@@ -33,7 +33,6 @@ SELECT DISTINCT
     COALESCE(st.abbreviation, IF(a.state = '', NULL, UPPER(a.state))) AS state,
     ct.code AS country_code,
     a.zip_code AS zipcode,
-    NULL AS geolocation,
     d.identification_number AS cnpj,
     FALSE AS is_legacy,
     tc.ts_created,

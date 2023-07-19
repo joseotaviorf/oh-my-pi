@@ -9,7 +9,6 @@ SELECT
     COALESCE(st.abbreviation, IF(a.state = '', NULL, UPPER(a.state))) AS state,
     ct.code AS country_code,
     a.zip_code AS zipcode,
-    NULL AS geolocation,
     FALSE AS is_legacy
 FROM
     datalake_rental_guarantee_platform_clean.property_propose AS pp
