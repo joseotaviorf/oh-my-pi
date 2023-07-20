@@ -121,6 +121,7 @@ payment_rule AS (
         dt_legal_analysis_ended,
         dt_credit_analysis_ended,
         CASE
+            WHEN current_payment_method = 'BROKERAGE_TERM' AND dt_occurence IS NOT NULL THEN dt_occurence
             WHEN current_payment_method LIKE 'FINANCED%'
                 AND CONCAT(dt_occurence,dt_legal_analysis_ended,dt_credit_analysis_ended) IS NOT NULL
                 AND dt_payment_method_change IS NULL
@@ -170,7 +171,7 @@ data_sources AS (
         COALESCE(
             sof.dt_onboarding_ended,
             CASE
-                WHEN DATE(so.ts_offer_submitted) > "2022-04-12" 
+                WHEN DATE(so.ts_offer_submitted) > "2022-04-12"
                     THEN NULL
                 ELSE m.dt_onboarding_ended
             END) AS dt_onboarding_ended,
