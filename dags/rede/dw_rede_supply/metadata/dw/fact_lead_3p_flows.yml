@@ -39,6 +39,7 @@ columns:
   sk_house:
     lineage:
     - datalake_ebdb_clean.house.id
+    - datalake_rede_supply.lead_3p_status_changes.id_house
     description: Foreign Key to the house in Main, if the lead was published. Can
       be joined with dw_public.dim_house.
   sk_region:

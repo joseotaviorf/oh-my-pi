@@ -44,6 +44,15 @@ first_registered AS (
     FROM
         datalake_rede_supply.lead_3p_status_changes
     GROUP BY 1, 2
+),
+lead_house AS (
+    SELECT
+        id AS id_house,
+        id_external
+    FROM
+        datalake_ebdb_clean.house
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_external ORDER BY dt_creation) = 1 
 )
 SELECT
     lsk.sk_lead_3p * 100 + IF(f.business_context = 'SALE', 0, 1) AS sk_lead_3p_flow, -- For now, Sale will be version 0, and Rent will be version 1
@@ -52,7 +61,7 @@ SELECT
     COALESCE(fsk.sk_file, -1) AS sk_file,
     COALESCE(csk.sk_company, -1) AS sk_company,
     ls.sk_lead_3p_status,
-    COALESCE(h.id, -1) AS sk_house,
+    COALESCE(lsc.id_house, lh.id_house, -1) AS sk_house,
     COALESCE(l3p.id_region, -1) AS sk_region,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_lead, 'yyyyMMdd')), -1) AS sk_lead_date,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_prospect, 'yyyyMMdd')), -1) AS sk_prospect_date,
@@ -83,17 +92,17 @@ LEFT JOIN
 JOIN
     datalake_brokers_supply_processor.lead_3p AS l3p
         ON f.id_lead_3p = l3p.id
-LEFT JOIN
-    datalake_ebdb_clean.house AS h
-        ON h.id_external = l3p.uuid_lead
-LEFT JOIN
-    updates AS u
-        ON h.id = u.id_house
 JOIN
     datalake_rede_supply.lead_3p_status_changes AS lsc
         ON f.id_lead_3p = lsc.id_lead_3p
         AND f.business_context = lsc.business_context
         AND lsc.ts_status_ended IS NULL
+LEFT JOIN
+    lead_house AS lh
+        ON lh.id_external = l3p.uuid_lead
+LEFT JOIN
+    updates AS u
+        ON COALESCE(lsc.id_house, lh.id_house) = u.id_house
 JOIN
     datalake_rede_supply.lead_3p_sks AS lsk
         ON lsk.id_lead_3p = lsc.id_lead_3p

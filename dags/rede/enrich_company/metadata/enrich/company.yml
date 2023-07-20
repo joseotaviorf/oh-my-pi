@@ -88,6 +88,12 @@ columns:
     description: Number of sale listings currently owned by the company.
   rent_listings_currently_owned:
     description: Number of rent listings currently owned by the company.
+  leads_currently_owned:
+    description: Number of leads sent by the company to Supply Processor.
+  sale_leads_currently_owned:
+    description: Number of sale leads sent by the company to Supply Processor.
+  rent_leads_currently_owned:
+    description: Number of rent leads sent by the company to Supply Processor.
   ts_created:
     lineage:
       - datalake_company_clean.company.ts_created

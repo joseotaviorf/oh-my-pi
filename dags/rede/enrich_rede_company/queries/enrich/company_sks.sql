@@ -38,6 +38,7 @@ total_partners AS (
             OR hc.has_been_sale_member
             OR c.has_rede_product
             OR c.houses_currently_owned > 0
+            OR c.leads_currently_owned > 0
         , FALSE) AS has_been_member
     FROM
         datalake_hubspot.company AS hc
@@ -49,6 +50,7 @@ total_partners AS (
         OR c.id_company IS NULL
         OR c.has_rede_product
         OR c.houses_currently_owned > 0
+        OR c.leads_currently_owned > 0
     UNION ALL
     SELECT
         NULL AS id_hubspot,

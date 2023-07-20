@@ -14,6 +14,19 @@ WITH listing_ownership AS (
         AND hlr.source_type = 'COMPANY_REF'
     GROUP BY 1
 ),
+lead_3p_ownership AS (
+    SELECT
+        l.uuid_company,
+        COUNT(DISTINCT l.id) AS leads_currently_owned,
+        COUNT(DISTINCT IF(bcd.business_context = 'SALE', l.id, NULL)) AS sale_leads_currently_owned,
+        COUNT(DISTINCT IF(bcd.business_context = 'RENT', l.id, NULL)) AS rent_leads_currently_owned
+    FROM
+        datalake_brokers_supply_processor_clean.lead_3p AS l
+    JOIN
+        datalake_brokers_supply_processor_clean.business_context_detail AS bcd
+            ON l.id = bcd.id_lead
+    GROUP BY 1
+),
 company_document AS (
     SELECT
         COALESCE(c.uuid_company, d.uuid_company) AS uuid_company,
@@ -68,6 +81,9 @@ SELECT
     COALESCE(lo.houses_currently_owned, 0) AS houses_currently_owned,
     COALESCE(lo.sale_listings_currently_owned, 0) AS sale_listings_currently_owned,
     COALESCE(lo.rent_listings_currently_owned, 0) AS rent_listings_currently_owned,
+    COALESCE(l3o.leads_currently_owned, 0) AS leads_currently_owned,
+    COALESCE(l3o.sale_leads_currently_owned, 0) AS sale_leads_currently_owned,
+    COALESCE(l3o.rent_leads_currently_owned, 0) AS rent_leads_currently_owned,
     c.ts_created,
     c.ts_updated
 FROM
@@ -78,6 +94,9 @@ LEFT JOIN
 LEFT JOIN
     listing_ownership AS lo
         ON c.uuid_company = lo.uuid_company
+LEFT JOIN
+    lead_3p_ownership AS l3o
+        ON c.uuid_company = l3o.uuid_company
 LEFT JOIN
     datalake_ebdb_clean.state AS s
         ON s.abbreviation = a.state

@@ -970,6 +970,8 @@ bietlejuice.enrich_chat_inapp_strategies:
 bietlejuice.enrich_chattermill:
   - bietlejuice.chattermill:load-clean-responses
 bietlejuice.enrich_company:
+  - bietlejuice.brokers_supply_processor:load-clean-business-context-detail
+  - bietlejuice.brokers_supply_processor:load-clean-lead-3p
   - bietlejuice.company:load-clean-address
   - bietlejuice.company:load-clean-company
   - bietlejuice.company:load-clean-company-document
