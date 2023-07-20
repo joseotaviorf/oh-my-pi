@@ -1,0 +1,34 @@
+---
+database_name: datalake_mission_control
+table_name: onboarding_task_types
+owner: 'kleber.inoue@quintoandar.com.br'
+domain: For Rent
+description: Table that stores the types of the onboarding tasks.
+columns:
+  id:
+    description: ID of the task's type. It's the primary key of the table.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task_types.id
+  user_type:
+    description: Type of the user which the task is attributed to.
+    categories:
+      LANDLORD: Landlord
+      TENANT: Tenant
+    lineage:
+    - datalake_mission_control_clean.onboarding_task_types.user_type
+  type:
+    description: Type of the task.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task_types.type
+  is_active:
+    description: Boolean flag to check if the task is active.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task_types.is_active
+  ts_created:
+    description: Timestamp of the task's creation.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task_types.ts_created
+  ts_updated:
+    description: Timestamp of the task's update.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task_types.ts_updated

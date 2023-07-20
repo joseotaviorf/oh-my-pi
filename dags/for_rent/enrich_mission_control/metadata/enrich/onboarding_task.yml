@@ -1,0 +1,60 @@
+---
+database_name: datalake_mission_control
+table_name: onboarding_task
+owner: 'kleber.inoue@quintoandar.com.br'
+domain: For Rent
+description: Tasks that tenants and owners should do when they're in onboarding step.
+  These tasks can be an inspection booking, change the bills ownership, etc.]
+columns:
+  id:
+    description: ID of the task.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.id
+  id_onboarding:
+    description: ID of the onboarding.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.id_onboarding
+  id_task_type:
+    description: ID of the task's type.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.id_task_type
+  reference_date_field:
+    description: Reference of the date field.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.reference_date_field
+  title:
+    description: Title of the task.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.title
+  status:
+    description: Status of the task.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.status
+  start_offset:
+    description: It's related to the start deadline of the task.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.start_offset
+  end_offset:
+    description: It's related to the end deadline of the task.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.end_offset
+  is_deleted:
+    description: Boolean flag to check if the task was deleted.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.is_deleted
+  dt_started:
+    description: Date of when task should initiate.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.dt_started
+  dt_due:
+    description: Date limit when the task should be completed.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.dt_due
+  ts_created:
+    description: Timestamp of the task's creation.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.ts_created
+  ts_updated:
+    description: Timestamp of when the task was updated.
+    lineage:
+    - datalake_mission_control_clean.onboarding_task.ts_updated

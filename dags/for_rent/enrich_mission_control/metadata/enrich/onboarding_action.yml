@@ -1,0 +1,35 @@
+---
+database_name: datalake_mission_control
+table_name: onboarding_action
+owner: 'kleber.inoue@quintoandar.com.br'
+domain: For Rent
+description: Table that contains the action for each onboarding.
+columns:
+  id:
+    description: ID of the onboarding's action. It's the primary key of the table.
+    lineage:
+    - datalake_mission_control_clean.onboarding_action.id
+  id_onboarding:
+    description: Onboarding ID.
+    lineage:
+    - datalake_mission_control_clean.onboarding_action.id_onboarding
+  type_identifier:
+    description: Type of the onboarding action.
+    lineage:
+    - datalake_mission_control_clean.onboarding_action.type_identifier
+  user_role_target_type:
+    description: User's type related to the action.
+    lineage:
+    - datalake_mission_control_clean.onboarding_action.user_role_type_target
+  is_deleted:
+    description: Boolean flag value if the record was deleted.
+    lineage:
+    - datalake_mission_control_clean.onboarding_action.is_deleted
+  ts_created:
+    description: Timestamp of the onboarding's action creation. 
+    lineage:
+    - datalake_mission_control_clean.onboarding_action.ts_created
+  ts_updated:
+    description: Timestamp when the register was updated.
+    lineage:
+    - datalake_mission_control_clean.onboarding_action.ts_updated
