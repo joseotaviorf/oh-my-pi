@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: agent_tiers
+columns:
+  id_agent:
+    lineage:
+      - datalake_gsheets_raw.agent_tiers.sk_agent
+  id_business_unit:
+    lineage:
+      - datalake_gsheets_raw.agent_tiers.id_business_unit
+  agent_group:
+    lineage:
+      - datalake_gsheets_raw.agent_tiers.agent_group
+  hub_name:
+    lineage:
+      - datalake_gsheets_raw.agent_tiers.hub_name
+  round:
+    lineage:
+      - datalake_gsheets_raw.agent_tiers.round
