@@ -24,6 +24,7 @@ spec:
   libraries:
     - name: bi-etl-ejuice
       type: common-usage
+      path: bietlejuice
       tier: T0
       description: |
         Gathers two main development subjects: analytical data pipelines developed

@@ -688,7 +688,7 @@ bietlejuice.enrich_recommendations:
   add:
     - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:create-house-amenities
     - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:create-house-condo-amenities
-    - wonka.house_main:create-house-main
+    - wonka.house_main:load-house_main
     - wonka.user_agg_search_filters:load-user_agg_search_filters
     - wonka.user_listing_page_viewed_cross_devices:load-user_listing_page_viewed_cross_devices
     - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
