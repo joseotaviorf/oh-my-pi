@@ -8,7 +8,7 @@ WITH person AS (
 SELECT DISTINCT
     ua.id AS id_user,
     ua.uuid_person AS uuid_user,
-    p.person_name AS name,
+    TRIM(p.person_name) AS name,
     ua.email,
     pa.profile_name AS user_role,
     ua.id <= 5000000 AS is_legacy,
@@ -18,6 +18,7 @@ FROM
 LEFT JOIN
     datalake_rental_guarantee_platform_clean.company_user_account AS cua
     ON ua.id = cua.id_user_account
+    AND cua.is_active
 LEFT JOIN
     datalake_rental_guarantee_platform_clean.profile_account AS pa
     ON cua.id_profile_account = pa.id
