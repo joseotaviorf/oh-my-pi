@@ -2332,6 +2332,7 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
   - bietlejuice.dw_sale_listing_flow:load-dw-sale-fact-listing-flows
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets

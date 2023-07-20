@@ -1,41 +1,52 @@
-WITH closing_infos AS (-- Get all ccv that were cancelled and were not rescued
+WITH closing_infos AS (-- get all ccv with info about cancelled and rescued ccv
     SELECT
-        sk_offer
+        cf.sk_offer,
+        CASE
+            WHEN ds.payment_model LIKE 'CCV_ASSISTANCE' THEN TRUE
+            ELSE FALSE
+        END AS ccv_assistance,
+        CASE
+            WHEN cf.sk_sale_agreement_cancelled_date != -1 THEN TRUE
+            ELSE FALSE
+        END AS ccv_cancelled,
+        CASE
+            WHEN cf.sk_sale_agreement_rescued_date != -1 THEN TRUE
+            ELSE FALSE
+        END AS ccv_rescued,
+        payment_method
     FROM
-        dw_sale.fact_closing_flows
-    WHERE
-         sk_sale_agreement_cancelled_date != -1
-    GROUP BY
-        1
-    HAVING
-        MAX(sk_sale_agreement_cancelled_date) > MAX(sk_sale_agreement_rescued_date)
+        dw_sale.fact_closing_flows AS cf
+    LEFT JOIN
+        dw_sale.dim_sale_agreement AS ds
+            ON ds.sk_offer = cf.sk_offer
 ),
 ev AS (
     SELECT DISTINCT
+        dd.date AS dt_event,
         sf.sk_house,
         fo.sk_offer,
         sf.sk_seller,
         sf.sk_buyer,
-        ROW_NUMBER() OVER (PARTITION BY sf.sk_buyer ORDER BY sf.sk_sale_agreement_signed_date DESC) AS rn,
-        dd.date AS dt_event
+        ci.payment_method
     FROM
         dw_sale.fact_sale_flows AS sf
     INNER JOIN
         dw_public.dim_region AS dr
             ON sf.sk_region = dr.sk_region
             AND dr.id_country = 1
-    JOIN
+    INNER JOIN
         dw_public.dim_date AS dd
             ON sf.sk_sale_agreement_signed_date = dd.sk_date
     INNER JOIN
-        dw_sale.fact_offers fo
+        dw_sale.fact_offers AS fo
             ON sf.sk_sale_flow = fo.sk_sale_flow
     LEFT JOIN
-        closing_infos ci
+        closing_infos AS ci
             ON fo.sk_offer = ci.sk_offer
     WHERE
         sf.sk_sale_agreement_signed_date >= 20200101
-        AND ci.sk_offer IS NULL
+        AND ci.ccv_cancelled = FALSE
+        AND ci.ccv_rescued = FALSE
 ),
 rent_visits AS (
     SELECT
@@ -44,11 +55,12 @@ rent_visits AS (
     FROM
         dw_public.dim_booking
     WHERE
-        visit_intent = 'RENT' AND
-        type = 'Visita' AND
-        visit_follow_up = 'VaiNegociar'
+        visit_intent = 'RENT'
+        AND type = 'Visita'
+        AND visit_follow_up = 'VaiNegociar'
     GROUP BY 1
-),
+)
+,
 base AS (
     SELECT
         ev.sk_buyer,
@@ -60,36 +72,60 @@ base AS (
         du.email,
         du.telefone_principal,
         du.cidade,
-        du.estado_nome
+        du.estado_nome,
+        ev.payment_method
     FROM
         ev
     LEFT JOIN
-        dw_public.dim_user AS du
+        dw_public.dim_user du
             ON ev.sk_buyer = du.sk_user
+),
+customers_info AS (
+    SELECT
+        nome AS customer_name,
+        email AS customer_email,
+        telefone_principal AS customer_phone,
+        'FS End of Process' AS campaign_step,
+        'Buyer' AS customer_type,
+        cpf AS customer_cpf,
+        b.sk_buyer AS id_user,
+        'true' AS campaign_type,
+        'offer' AS driver_type,
+        b.sk_offer AS id_driver,
+        b.payment_method,
+        CASE
+            WHEN rv.id_visitor IS null THEN 'Sale'
+            ELSE 'Híbrido'
+        END AS business_context,
+        b.dt_event
+    FROM
+        base AS b
+    LEFT JOIN
+        rent_visits AS rv
+            ON rv.id_visitor = b.sk_buyer
+            AND rv.dt_visit_rent BETWEEN (b.dt_event - INTERVAL '30' day)
+            AND (b.dt_event + INTERVAL '30' day)
     WHERE
-        rn = 1
+        b.sk_user IS NOT NULL
 )
 SELECT
-    b.sk_buyer AS id_user,
-    b.sk_offer AS id_driver,
-    nome AS customer_name,
-    email AS customer_email,
-    telefone_principal AS customer_phone,
-    'FS End of Process' AS campaign_step,
-    'Buyer' AS customer_type,
-    cpf AS customer_cpf,
-    'true' AS campaign_type,
-    'offer' AS driver_type,
-    CASE
-        WHEN rv.id_visitor IS NULL THEN 'Sale'
-        ELSE 'Híbrido'
-    END AS business_context
+    id_user,
+    id_driver,
+    customer_name,
+    customer_email,
+    customer_phone,
+    campaign_step,
+    customer_type,
+    customer_cpf,
+    campaign_type,
+    driver_type,
+    business_context
 FROM
-    base AS b
-LEFT JOIN
-    rent_visits AS rv
-        ON rv.id_visitor = b.sk_buyer
-        AND rv.dt_visit_rent BETWEEN (b.dt_event - INTERVAL '30' DAY) AND (b.dt_event + INTERVAL '30' DAY)
+    customers_info
 WHERE
-    DATEDIFF(CURRENT_DATE, dt_event) = 114
-    AND b.sk_user IS NOT NULL
+    (payment_method IS NULL OR payment_method  = 'FINANCED')
+    AND DATEDIFF(CURRENT_DATE, dt_event) = 114
+    OR (
+        payment_method  = 'CASH'
+        AND DATEDIFF(CURRENT_DATE, dt_event) = 45
+    )
