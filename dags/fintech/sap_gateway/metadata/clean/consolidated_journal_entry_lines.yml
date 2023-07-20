@@ -17,6 +17,9 @@ columns:
   costing_code:
     lineage:
       - datalake_sap_gateway_raw.consolidated_journal_entry_lines.costing_code
+  location_code:
+    lineage:
+      - datalake_sap_gateway_raw.consolidated_journal_entry_lines.location_code
   operation_type:
     lineage:
       - datalake_sap_gateway_raw.consolidated_journal_entry_lines.operation_type

@@ -4,6 +4,7 @@ SELECT
     branch_id                       AS id_branch,
     account_code,
     costing_code,
+    location_code,
     operation_type,
     accounting_rule,
     amount,

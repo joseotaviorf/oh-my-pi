@@ -23,6 +23,9 @@ columns:
   costing_code:
     lineage:
       - datalake_sap_gateway_raw.journal_entry_lines.costing_code
+  location_code:
+    lineage:
+      - datalake_sap_gateway_raw.journal_entry_lines.location_code
   accounting_rule:
     lineage:
       - datalake_sap_gateway_raw.journal_entry_lines.accounting_rule
