@@ -1,0 +1,24 @@
+---
+tables:
+  - table_name: Onboarding
+    extraction_type: incremental
+    date_filter_column: updated_on
+    clean_table_name: onboarding
+  - table_name: OnboardingAction
+    extraction_type: incremental
+    date_filter_column: updated_on
+    clean_table_name: onboarding_action
+  - table_name: OnboardingBill
+    extraction_type: incremental
+    date_filter_column: updated_on
+    clean_table_name: onboarding_bill
+  - table_name: OnboardingTask
+    extraction_type: incremental
+    date_filter_column: updated_on
+    clean_table_name: onboarding_task
+  - table_name: OnboardingTaskTypes
+    extraction_type: incremental
+    date_filter_column: updated_on
+    clean_table_name: onboarding_task_types
+partition_cols: ["year", "month", "day"]
+lineage_product_database_name: missioncontrol
