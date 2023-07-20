@@ -99,7 +99,7 @@ columns:
       VISIT_STRANDED: >
         A listing that has been published for a certain period of time and has not yet received its first visit.
       RECURRENCE_VISIT_STRANDED: >
-        'A listing that has been published for a certain period of time and has received one or more visits, but has not received a visit for a longer time than expected. '
+        A listing that has been published for a certain period of time and has received one or more visits, but has not received a visit for a longer time than expected.
       OFFER_STRANDED: >
         A listing that has already passed the expected time of receiving an offer. The property has already received its first visit and has not been without a visit long enough for it to be considered RECURRENCE_VISIT_STRANDED.
       RECURRENCE_OFFER_STRANDED: >
