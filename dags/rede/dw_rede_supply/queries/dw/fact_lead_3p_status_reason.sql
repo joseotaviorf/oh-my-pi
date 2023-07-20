@@ -63,10 +63,10 @@ LEFT JOIN
     dw_rede.dim_lead_3p_context AS dl3c
         ON lrc.business_context = dl3c.business_context
         AND IF(lrc.business_context = 'SALE', l3p.sale_recurrency_type, l3p.rent_recurrency_type) = dl3c.recurrency_type
+        AND IF(lrc.business_context = 'SALE', l3p.sale_integrator_trade_name, l3p.rent_integrator_trade_name) = dl3c.integrator_trade_name
         AND dl3c.acquisition_team = COALESCE(la.acquisition_team, 'N/A')
 LEFT JOIN
     dw_rede.fact_lead_3p_status_reason AS flsr
-        ON flsr.sk_lead_3p = lsk.sk_lead_3p
-        AND flsr.sk_lead_3p_context = COALESCE(dl3c.sk_lead_3p_context, -1)
+        ON flsr.sk_lead_3p_flow = lsk.sk_lead_3p * 100 + IF(lrc.business_context = 'SALE', 0, 1)
         AND flsr.sk_lead_3p_reason = lr.sk_lead_3p_reason
         AND flsr.ts_reason_started = lrc.ts_reason_started

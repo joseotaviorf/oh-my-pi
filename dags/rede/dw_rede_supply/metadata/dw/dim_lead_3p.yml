@@ -74,6 +74,14 @@ columns:
     lineage:
     - datalake_hubspot.company.extracted_3p_tag
     description: Content extracted from the tag in company tag, inside [3P-<extracted_3p_tag>]
+  sale_integrator_trade_name:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.sale_integrator_trade_name
+    description: 'Trade name of the company that integrated the lead, in the context of ForSale.'
+  rent_integrator_trade_name:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.rent_integrator_trade_name
+    description: 'Trade name of the company that integrated the lead, in the context of ForRent.'
   sale_recurrency_type:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.sale_recurrency_type

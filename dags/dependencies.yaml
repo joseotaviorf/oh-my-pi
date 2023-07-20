@@ -521,8 +521,10 @@ bietlejuice.dw_rede_company_lead:
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
 bietlejuice.dw_rede_supply:
   - bietlejuice.ebdb:load-clean-house
+  - bietlejuice.enrich_brokers_supply_processor:load-enrich-business-context-detail
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-file
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
+  - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_hubspot:load-enrich-company
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rede_lead_acquisition:load-enrich-lead-3p-acquisition
@@ -931,6 +933,7 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail
   - bietlejuice.brokers_supply_processor:load-clean-file
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p
+  - bietlejuice.company:load-clean-company
   - bietlejuice.enrich_hubspot:load-enrich-company
 bietlejuice.enrich_bureaus:
   - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud

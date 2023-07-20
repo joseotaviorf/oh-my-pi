@@ -44,4 +44,5 @@ LEFT JOIN
     dw_rede.dim_lead_3p_context AS dl3c
         ON lsc.business_context = dl3c.business_context
         AND IF(lsc.business_context = 'SALE', l3p.sale_recurrency_type, l3p.rent_recurrency_type) = dl3c.recurrency_type
+        AND IF(lsc.business_context = 'SALE', l3p.sale_integrator_trade_name, l3p.rent_integrator_trade_name) = dl3c.integrator_trade_name
         AND dl3c.acquisition_team = COALESCE(la.acquisition_team, 'N/A')

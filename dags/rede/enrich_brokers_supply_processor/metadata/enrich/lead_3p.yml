@@ -255,6 +255,14 @@ columns:
       RECURRENT: 'Lead was captured and sent AFTER the first 30 days of the ForRent batch'
       COMPLEMENTARY: 'Lead was captured BEFORE the first batch, but sent AFTER the first 30 days of the ForRent batch'
       'N/A': 'Not a rent lead'
+  sale_integrator_trade_name:
+    lineage:
+      - datalake_company_clean.company.trade_name
+    description: 'Trade name of the company that integrated the lead, in the context of ForSale.'
+  rent_integrator_trade_name:
+    lineage:
+      - datalake_company_clean.company.trade_name
+    description: 'Trade name of the company that integrated the lead, in the context of ForRent.'
   installations:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.details

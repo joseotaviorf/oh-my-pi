@@ -113,6 +113,8 @@ SELECT
     rent_bcd.status AS rent_status,
     COALESCE(sale_recurrency.recurrency_type, 'N/A') AS sale_recurrency_type,
     COALESCE(rent_recurrency.recurrency_type, 'N/A') AS rent_recurrency_type,
+    COALESCE(c_integrator_sale.trade_name, 'N/A') AS sale_integrator_trade_name,
+    COALESCE(c_integrator_rent.trade_name, 'N/A') AS rent_integrator_trade_name,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.installations'), '{{}}'), 'map<string, boolean>') AS installations,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.appliances'), '{{}}'), 'map<string, boolean>') AS house_appliances,
     FROM_JSON(NULLIF(GET_JSON_OBJECT(l.details, '$.accessibilityItems'), '{{}}'), 'map<string, boolean>') AS accessibility_items,
@@ -183,3 +185,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_hubspot.company AS hc
         ON hc.uuid_company = l.uuid_company
+LEFT JOIN
+    datalake_company_clean.company AS c_integrator_sale
+        ON c_integrator_sale.uuid_company = sale_bcd.id_partner
+LEFT JOIN
+    datalake_company_clean.company AS c_integrator_rent
+        ON c_integrator_rent.uuid_company = rent_bcd.id_partner

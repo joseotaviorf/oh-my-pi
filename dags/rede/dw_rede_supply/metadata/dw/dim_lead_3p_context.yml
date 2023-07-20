@@ -28,6 +28,10 @@ columns:
         in that business context.
       FARMING: Lead published after the first 30 days of membership of the company
         in that business context.
+  integrator_trade_name:
+    lineage:
+      - datalake_company.company.trade_name
+    description: 'Trade name of the company that integrated the lead.'
   is_for_sale:
     description: 'True if the lead flow is in the context of ForSale.'
   is_for_rent:

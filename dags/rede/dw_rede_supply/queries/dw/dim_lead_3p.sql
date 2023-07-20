@@ -17,6 +17,8 @@ SELECT
     COALESCE(c.name, 'Unknown') AS company_name,
     COALESCE(c.tag_real_estate_agency, 'Unknown') AS company_tag,
     COALESCE(C.extracted_3p_tag, 'Unknown') AS extracted_3p_tag,
+    COALESCE(l.sale_integrator_trade_name, 'N/A') AS sale_integrator_trade_name,
+    COALESCE(l.rent_integrator_trade_name, 'N/A') AS rent_integrator_trade_name,
     COALESCE(l.sale_recurrency_type, 'N/A') AS sale_recurrency_type,
     COALESCE(l.rent_recurrency_type, 'N/A') AS rent_recurrency_type,
     COALESCE(la_sale.acquisition_team, 'N/A') AS sale_acquisition_team,
