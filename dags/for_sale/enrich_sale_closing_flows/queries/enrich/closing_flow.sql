@@ -82,6 +82,7 @@ payment_dates AS (
         o.id_sales_flow,
         so.current_payment_method,
         ms.dt_occurence,
+        o.payment_model,
         pm.payment_method_original,
         pm.payment_method_updated,
         pm.dt_payment_method_change,
@@ -121,7 +122,7 @@ payment_rule AS (
         dt_legal_analysis_ended,
         dt_credit_analysis_ended,
         CASE
-            WHEN current_payment_method = 'BROKERAGE_TERM' AND dt_occurence IS NOT NULL THEN dt_occurence
+            WHEN payment_model = 'BROKERAGE_TERM' AND dt_occurence IS NOT NULL THEN dt_occurence
             WHEN current_payment_method LIKE 'FINANCED%'
                 AND CONCAT(dt_occurence,dt_legal_analysis_ended,dt_credit_analysis_ended) IS NOT NULL
                 AND dt_payment_method_change IS NULL
