@@ -1,20 +1,33 @@
 SELECT
-    id,
-    id_external,
-    id_invoice,
-    id_contract,
-    id_from_account,
-    id_to_account,
-    id_external_reversed_entry,
-    amount,
-    bill_item,
-    description,
-    producer,
-    accrual_year_month,
-    due_year_month,
-    ts_created,
-    ts_retsuko_updated
+    e.id,
+    e.id_external,
+    e.id_invoice,
+    e.id_contract,
+    e.id_from_account,
+    e.id_to_account,
+    e.id_external_reversed_entry,
+    ROUND(CASE
+          WHEN af.type = 'contract'
+              AND at.type <> 'contract' THEN -1.0 * e.amount
+      ELSE e.amount
+      END, 2) AS amount,
+    e.bill_item,
+    e.description,
+    e.producer,
+    e.accrual_year_month,
+    e.due_year_month,
+    e.ts_created,
+    e.ts_retsuko_updated
 FROM
-    datalake_retsuko_clean.entry
+    datalake_retsuko_clean.entry e
+INNER JOIN
+    datalake_retsuko_clean.account AS af
+        ON e.id_from_account = af.id
+INNER JOIN
+    datalake_retsuko_clean.account AS at
+        ON e.id_to_account = at.id
+LEFT JOIN
+    datalake_retsuko_clean.contract c
+        ON c.id = e.id_contract
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_retsuko_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY e.id ORDER BY ts_retsuko_updated DESC) = 1
