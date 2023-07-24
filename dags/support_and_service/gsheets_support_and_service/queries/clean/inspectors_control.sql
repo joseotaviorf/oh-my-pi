@@ -21,26 +21,8 @@ SELECT
     IF(salary = '', NULL, salary) AS salary,
     IF(status = '', NULL, status) AS status,
     IF(transportation_type = '', NULL, transportation_type) AS transportation_type,
-    CASE
-        WHEN CHAR_LENGTH(dt_start) = 8 THEN to_date(dt_start, 'M/d/yyyy')
-        WHEN CHAR_LENGTH(dt_start) = 9
-            AND CHAR_LENGTH(SPLIT(dt_start, '/')[0]) = 1
-            THEN to_date(dt_start, 'M/dd/yyyy')
-        WHEN CHAR_LENGTH(dt_start) = 9
-            AND CHAR_LENGTH(SPLIT(dt_start, '/')[0]) = 2
-            THEN to_date(dt_start, 'MM/d/yyyy')
-        WHEN CHAR_LENGTH(dt_start) = 10 THEN to_date(dt_start, 'MM/dd/yyyy')
-    END AS dt_start,
-    CASE
-        WHEN CHAR_LENGTH(dt_end) = 8 THEN to_date(dt_end, 'M/d/yyyy')
-        WHEN CHAR_LENGTH(dt_end) = 9
-            AND CHAR_LENGTH(SPLIT(dt_end, '/')[0]) = 1
-            THEN to_date(dt_end, 'M/dd/yyyy')
-        WHEN CHAR_LENGTH(dt_end) = 9
-            AND CHAR_LENGTH(SPLIT(dt_end, '/')[0]) = 2
-            THEN to_date(dt_end, 'MM/d/yyyy')
-        WHEN CHAR_LENGTH(dt_end) = 10 THEN to_date(dt_end, 'MM/dd/yyyy')
-    END AS dt_end,
+    DATE(dt_start) AS dt_start,
+    DATE(dt_end) AS dt_end,
     NOW() AS ts_load
 FROM
     datalake_gsheets_raw.inspectors_control
