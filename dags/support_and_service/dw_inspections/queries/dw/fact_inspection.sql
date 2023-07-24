@@ -6,6 +6,7 @@ SELECT
     i.id_assessment AS sk_assessment,
     i.id_booking AS sk_booking,
     i.id_contract AS sk_contract,
+    i.id_house AS sk_house,
     i.id_country AS sk_country,
     i.id_city AS sk_city,
     i.country_code,

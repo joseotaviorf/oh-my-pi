@@ -43,6 +43,10 @@ columns:
         description: Unique identifier of the contract related to the property to be inspected.
         lineage:
             - datalake_inspections.inspection_booking.id_contract
+    sk_house:
+        description: Unique identifier of the related house to be inspected.
+        lineage:
+            - datalake_inspections.inspection_booking.id_house
     sk_country:
         description: Unique identifier of country.
         lineage:

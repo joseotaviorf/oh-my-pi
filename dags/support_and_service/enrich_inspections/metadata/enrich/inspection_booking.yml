@@ -39,6 +39,10 @@ columns:
     lineage:
       - datalake_inspections_clean.inspection.id_contract
       - datalake_ebdb_clean.inspection.id_contract
+  id_house:
+    description: Unique identifier of the related house to be inspected.
+    lineage:
+      - datalake_inspections_clean.inspection.house
   id_inspector:
     description: Unique identifier of the inspector responsible for carrying out the inspection.
     lineage:
@@ -60,6 +64,7 @@ columns:
   country_code:
     description: Identification code of the country where the property is located.
     lineage:
+      - datalake_inspections_clean.inspection.house
       - datalake_booking.booking.country_code
   inspection_type:
     description: The type of inspection.
