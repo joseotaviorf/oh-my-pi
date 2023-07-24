@@ -1,45 +1,52 @@
-from datetime import datetime
-
-import pendulum
-import os
 import json
-from airflow.utils.helpers import chain, cross_downstream
+import os
+from datetime import datetime
+from pendulum import timezone
+
 from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.utils.helpers import chain, cross_downstream
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.services.configuration_service import ConfigurationService
 
-
-ENV = os.environ.get("ENVIRONMENT")
-
+# Pipeline Inputs
 SOURCE = "survicate"
-CONTEXT = SOURCE
-DAG_NAME = f"{SOURCE}"
-DAG_ID = f"bietlejuice.{DAG_NAME}"
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
+DAG_ID = f"bietlejuice.{SOURCE}"
+MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "30 2 * * *"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 
-config_service = ConfigurationService(dag_name=SOURCE)
+config_service = ConfigurationService(SOURCE)
 
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
-databricks_bietlejuice_repo_path = config_service.get_config(
-    "databricks_bietlejuice_repo_path"
-)
 datalake_bucket = config_service.get_config("datalake_bucket")
+s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-tables_config = config_service.get_config("tables")
+base_spark_job_path = f"{s3_prefix}/spark_jobs/base/"
+raw_spark_job_path = f"{s3_prefix}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
+
+cluster_description = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
+
 partition_cols = config_service.get_config("partition_cols")
+tables_config = config_service.get_config("tables")
+dag_documentation = config_service.get_config("dag_documentation")
+
+CUSTOM_LIBRARIES = [
+    {
+        "whl": f"{artifacts_bucket}/survicate-api-client-python/"
+        f"quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl"
+    }
+]
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -47,29 +54,24 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
-
-base_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
-
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
-custom_libraries = [
-    {
-        "whl": f"{artifacts_bucket}/survicate-api-client-python/"
-        f"quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl"
-    }
-]
+ENV = os.environ.get("ENVIRONMENT")
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 
@@ -78,7 +80,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
-    libraries=custom_libraries,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -89,9 +91,8 @@ task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
-    relative_query_path=CONTEXT,
+    relative_query_path=SOURCE,
     spark_jobs_path=base_spark_job_path,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
 raw_task_groups = task_group.build_raw_task_group_for_all_tables(
@@ -99,10 +100,10 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     target_database_base_name=SOURCE,
     extraction_spark_job_file=raw_spark_job_path,
     raw_spark_job_extra_args=[
-        SOURCE, 
+        SOURCE,
         "{{ ds }}",
         json.dumps(tables_config),
-        json.dumps(partition_cols)
+        json.dumps(partition_cols),
     ],
 )
 
