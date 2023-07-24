@@ -38,8 +38,10 @@ columns:
   rental_brokerage:
     description: First rental commission value. We receive this value just on the
       first competence month of the contract.
-  home_insurance:
-    description: Home/fire insurance value.
+  insurance_commission:
+    description: Home/fire insurance revenue.
+  late_payments:
+    description: LP (late payment) revenue.
   addons_service_fee:
     description: Service fee value charged from tenant.
   addons_mra:
@@ -48,10 +50,10 @@ columns:
     description: Extra LRA (long term rental anticipation) revenue.
   addons_bfi:
     description: Extra BFI (brokerage finance) revenue.
-  late_payments:
-    description: Extra LP (late payment) revenue.
   addons_ccp:
     description: Extra CCP (credit card payment) net revenue.
+  addons_guarantee:
+    description: Extra Rental Guarantee revenue. Excluding STANDALONE guarantee type.
   addons_reserve:
     description: Extra reservation revenue comes from kill_queue service.
   agents_commission:
@@ -68,9 +70,9 @@ columns:
   net_revenue_pre_taxes:
     description: The net revenue calculated from all the revenues (gross_revenue + addons_revenue + total_revenue_discounts).
   gross_revenue:
-    description: Gross revenue calculated by adding the management_fee, brokerage_fee, home_insurance columns.
+    description: Gross revenue calculated by adding the management_fee, brokerage_fee, insurance_commission and insurance_commission columns.
   addons_revenue_total:
-    description: Addons revenue calculated by adding the service_fee, mra, lra, bfi, lp, ccp_net, reservation columns.
+    description: Addons revenue calculated by adding the addons_service_fee, addons_mra, addons_lra, addons_bfi, addons_ccp, addons_guarantee, addons_new_business_revenue, addons_reserve columns.
   revenue_share_total:
     description: Discount revenue calculated by adding the agents_commission, brokerage_partner_share, management_partner_share columns. This column has negative value.
   quarter:
