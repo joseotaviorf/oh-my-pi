@@ -1,0 +1,12 @@
+database_name: datalake_gsheets_clean
+table_name: agent_tiers_rounds
+columns:
+  round:
+    lineage:
+      - datalake_gsheets_raw.agent_tiers_rounds.round
+  ts_start:
+    lineage:
+      - datalake_gsheets_raw.agent_tiers_rounds.start_date
+  ts_end:
+    lineage:
+      - datalake_gsheets_raw.agent_tiers_rounds.end_date

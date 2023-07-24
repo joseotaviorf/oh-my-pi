@@ -17,6 +17,12 @@ sheets_info:
     clean_table_name: agent_tiers
     sheet_context: for_sale
 
+  agent_tiers_rounds:
+    sheet_id: 1MDZx1IdAvKm9riOxMOK3uKKbgOZWgB5QsORcfcWelEA
+    sheet_name: Planners Round
+    clean_table_name: agent_tiers_rounds
+    sheet_context: for_sale
+
   aux_agents_sale_hub:
     sheet_id: 1mom8xcJ4XCpr02S38DgW_cmEDcdzsOiMkW2vSbg0Ra0
     sheet_name: aux_agents_HUB
