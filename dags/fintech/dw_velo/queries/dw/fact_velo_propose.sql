@@ -5,7 +5,6 @@ SELECT
     COALESCE(id_house, -1) AS sk_house,
     COALESCE(id_propose_company, -1) AS sk_propose_company,
     COALESCE(id_agent, -1) AS sk_agent,
-    COALESCE(id_contract, -1) AS sk_contract,
     COALESCE(id_primary_person, -1) AS sk_primary_person,
     COALESCE(id_origin, -1) AS sk_origin,
     COALESCE(id_propose_status, -1) AS sk_propose_status,

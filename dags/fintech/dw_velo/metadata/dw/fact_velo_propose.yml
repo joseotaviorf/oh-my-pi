@@ -28,10 +28,6 @@ columns:
     lineage:
     - datalake_velo.propose.id_agent
     description: Agent's identification number (ID). This key connects to the table dw_velo.dim_velo_user
-  sk_contract:
-    lineage:
-    - datalake_velo.propose.id_contract
-    description: Contract's identification number (ID)
   sk_primary_person:
     lineage:
     - datalake_velo.propose.id_primary_person

@@ -1,0 +1,10 @@
+---
+database_name: datalake_gsheets_clean
+table_name: velo_legacy_realstate_ids
+columns:
+  id_realstate_legacy:
+    lineage:
+      - datalake_gsheets_raw.velo_legacy_realstate_ids.id_real_state_legacy
+  id_real_state_new:
+    lineage:
+      - datalake_gsheets_raw.velo_legacy_realstate_ids.id_real_state_new

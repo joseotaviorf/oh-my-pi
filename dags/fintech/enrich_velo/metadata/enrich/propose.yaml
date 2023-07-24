@@ -26,10 +26,6 @@ columns:
     description: Agent's identification number (ID). This key connects to the table datalake_velo.user
     lineage:
       - datalake_rental_guarantee_platform_clean.user_account.id
-  id_contract:
-    description: Contract's identification number (ID)
-    lineage:
-      - datalake_rental_guarantee_platform_clean.contract.id
   id_propose_company:
     description: Company's identification number (ID). This key connects to the table datalake_velo.propose_company
     lineage:

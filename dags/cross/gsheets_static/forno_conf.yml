@@ -251,6 +251,12 @@ sheets_info:
     clean_table_name: tqc_registered_agents
     sheet_context: static
 
+  velo_legacy_realstate_ids:
+    sheet_id: 1yepiN1JA8tfxaz5085zDHiwD8gEtesY_rNQSU5VnqQM
+    sheet_name: velo_legacy_realstate_ids
+    clean_table_name: velo_legacy_realstate_ids
+    sheet_context: fintech
+
   users_cx_plaquinhas:
     sheet_id: 1oiUlhua9uFXbwkaSeF_EYRvaB652JIhOoWDy1bYolK0
     sheet_name: users_cx_plaquinhas

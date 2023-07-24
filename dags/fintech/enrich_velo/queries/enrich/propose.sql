@@ -492,7 +492,6 @@ SELECT DISTINCT
     p.id_real_estate AS id_broker,
     pp.id AS id_house,
     ua.id AS id_agent,
-    c.id AS id_contract,
     p.id_tenant_company AS id_propose_company,
     mp.id_person AS id_primary_person,
     jk1.id_junk AS id_origin,
