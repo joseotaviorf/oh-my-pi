@@ -1,6 +1,6 @@
 WITH occurrences_last_version AS (
     SELECT
-        ROW_NUMBER() OVER(PARTITION BY id_agent ORDER BY ts_updated DESC) AS ordered_version,
+        ROW_NUMBER() OVER(PARTITION BY id_issue ORDER BY ts_updated DESC) AS ordered_version,
         id_airtable_record,
         id_agent,
         id_issue,
