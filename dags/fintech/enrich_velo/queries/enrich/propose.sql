@@ -247,7 +247,7 @@ propose_evaluation_started_date AS (
     cte_propose_aud AS (
             SELECT
                 p.id AS id_propose,
-                MIN(ts_created) AS ts_evaluation_started
+                MIN(r.ts_created) AS ts_evaluation_started
             FROM
                 datalake_rental_guarantee_platform_clean.propose_aud AS p
             LEFT JOIN
@@ -497,7 +497,7 @@ SELECT DISTINCT
     jk1.id_junk AS id_origin,
     jk2.id_junk AS id_propose_status,
     jk3.id_junk AS id_guarantee_status,
-    CAST(NULL AS BIGINT) AS id_propose_type,
+    jk4.id_junk AS id_propose_type,
     pm.count_persons_included,
     pm.percentage_income_from_primary_person,
     pm.avg_serasa_score,
@@ -596,6 +596,13 @@ LEFT JOIN
         ON jk3.desc_lvl_1 = cts.name
         AND jk3.desc_master_type = 'Guarantee Status'
 LEFT JOIN
+    datalake_rental_guarantee_platform_clean.bussines_type AS pbt
+    ON pbt.id = p.id_business_type
+LEFT JOIN
+    datalake_velo.junk AS jk4
+        ON jk4.desc_lvl_1 = pbt.name
+        AND jk4.desc_master_type = 'Propose Type'
+LEFT JOIN
     datalake_rental_guarantee_platform_clean.user_account AS ua
         ON ua.uuid_person = p.realtor
 LEFT JOIN
@@ -616,4 +623,4 @@ lEFT JOIN
 LEFT JOIN
     old_system_dates AS old
         ON old.id_propose = p.id
-        AND p.id <= 5000000
+        AND p.id < 5000000
