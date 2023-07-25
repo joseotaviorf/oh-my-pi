@@ -35,15 +35,20 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 CLUSTER_DESCRIPTION = config_service.get_config("cluster_description")
+CUSTOM_LIBRARIES = config_service.get_config("custom_libraries")
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
-CUSTOM_LIBRARIES = [
-    {"pypi": {"package": "s2cell"}},
-]
 
+dag_custom_init_script = config_service.get_config("init_script")
+dag_spark_conf = config_service.get_config("spark_conf")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+
+cluster_configuration["init_scripts"].append(dag_custom_init_script[0])
+for dag_config in dag_spark_conf:
+    for key, value in dag_config.items():
+        cluster_configuration["spark_conf"][key] = value
 
 reverse_spark_job_path = (
     f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{DAG_NAME}/load_s3_data_into_external_bucket.py"
@@ -162,7 +167,7 @@ calculate_dejavu_id_task = QuintoAndarDatabricksSubmitRunOperator(
                 DATALAKE_BUCKET,
                 DAG_NAME,
                 CONTEXT,
-                addresses_s2_geometry_mapping_table
+                addresses_s2_geometry_mapping_table,
             ],
         }
     },

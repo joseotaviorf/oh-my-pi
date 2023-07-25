@@ -746,10 +746,14 @@ bietlejuice.enrich_velo:
     - bietlejuice.velo:load-clean-fiancavelo-occurrencestatus
     - bietlejuice.velo:load-clean-fiancavelo-occurrencetype
     - bietlejuice.velo:load-clean-fiancavelo-paymentstatus
-    - bietlejuice.velo:load-clean-fiancavelo-paymentstatus
     - bietlejuice.velo:load-clean-fiancavelo-fianca
     - bietlejuice.velo:load-clean-fiancavelo-propose
     - bietlejuice.velo:load-clean-fiancavelo-proposehistory
+bietlejuice.enrich_vespucio:
+  add:
+    - bietlejuice.ebdb:load-clean-map-region
+    - bietlejuice.enrich_open_external_data:load-enrich-itbi-bh-residential-addresses
+    - bietlejuice.enrich_open_external_data:load-enrich-itbi-sp-residential-addresses
 bietlejuice.enrich_zendesk_ticket_funnels:
   remove:
     - bietlejuice.zendesk_tickets:load-clean-groups

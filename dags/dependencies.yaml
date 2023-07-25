@@ -2208,6 +2208,9 @@ bietlejuice.enrich_vespucio:
   - bietlejuice.ebdb:load-clean-condo-contact
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-info-condo-amenities
+  - bietlejuice.ebdb:load-clean-map-region
+  - bietlejuice.enrich_open_external_data:load-enrich-itbi-bh-residential-addresses
+  - bietlejuice.enrich_open_external_data:load-enrich-itbi-sp-residential-addresses
   - bietlejuice.sindico_net:load-clean-condominium
 bietlejuice.enrich_wololo_lead:
   - bietlejuice.wololo:load-clean-prospect-aud
