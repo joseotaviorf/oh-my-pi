@@ -45,7 +45,6 @@ WITH ebdb_tmp AS (
   WHERE
       DATE(condominio.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
       AND iInfo.id_condo_amenities IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13)
-      AND has_condo_page IS TRUE
       AND condominio.lat IS NOT NULL
       AND condominio.lng IS NOT NULL
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
