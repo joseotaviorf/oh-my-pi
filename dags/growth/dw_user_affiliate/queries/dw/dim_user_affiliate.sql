@@ -114,12 +114,14 @@ taxonomy AS (
     tracking_medium,
     tracking_source,
     tracking_campaign,
-    COALESCE(mkt_origin, '') AS mkt_origin,
-    COALESCE(mkt_channel, '') AS mkt_channel,
-    COALESCE(mkt_medium, '') AS mkt_medium,
-    COALESCE(mkt_source, '') AS mkt_source
+    mkt_origin,
+    mkt_channel,
+    mkt_medium,
+    mkt_source
   FROM
     datalake_gsheets_clean.taxonomy_affiliates
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY affiliate_type, tracking_medium, tracking_source, tracking_campaign ORDER BY ID) = 1
 ),
 applied_taxonomy AS (
   SELECT
@@ -132,10 +134,10 @@ applied_taxonomy AS (
     aff_city_group_with_region AS acg
   LEFT JOIN
     taxonomy AS tax
-      ON COALESCE(tax.affiliate_type, '') = COALESCE(acg.affiliate_type, '')
-      AND COALESCE(tax.tracking_medium, '') = COALESCE(acg.tracking_medium, '')
-      AND COALESCE(tax.tracking_source, '') = COALESCE(acg.tracking_source, '')
-      AND COALESCE(tax.tracking_campaign, '') = COALESCE(acg.tracking_campaign, '')
+      ON tax.affiliate_type = COALESCE(acg.affiliate_type, '')
+      AND tax.tracking_medium = COALESCE(acg.tracking_medium, '')
+      AND tax.tracking_source = COALESCE(acg.tracking_source, '')
+      AND tax.tracking_campaign = COALESCE(acg.tracking_campaign, '')
   )
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   atax.sk_user_affiliate,

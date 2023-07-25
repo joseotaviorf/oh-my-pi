@@ -17,6 +17,10 @@ WITH fact_house_listing_flows_adjust AS (
         hl.sk_discard_date,
         hl.lead_origin,
         hl.funnel_drop_reason,
+        dua.mkt_origin AS affiliate_mkt_origin,
+        dua.mkt_channel AS affiliate_mkt_channel,
+        dua.mkt_medium AS affiliate_mkt_medium,
+        dua.mkt_source AS affiliate_mkt_source,
         hl.mkt_channel,
         hl.mkt_source,
         hl.mkt_medium,
@@ -67,6 +71,8 @@ WITH fact_house_listing_flows_adjust AS (
     LEFT JOIN
         datalake_olos_dialer.outbound_last_contact olc
             ON olc.id_lead = hl.sk_lead
+    LEFT JOIN dw_public.dim_user_affiliate dua
+        ON hl.sk_user_lead_affiliate = dua.sk_user
 ),
 source_ops_rent AS (
     WITH photo_job AS (
@@ -176,6 +182,10 @@ sale_fact_listing_flows_adjust AS (
         hl.sk_discard_date,
         hl.lead_origin,
         hl.funnel_drop_reason,
+        dua.mkt_origin AS affiliate_mkt_origin,
+        dua.mkt_channel AS affiliate_mkt_channel,
+        dua.mkt_medium AS affiliate_mkt_medium,
+        dua.mkt_source AS affiliate_mkt_source,
         hl.mkt_channel,
         hl.mkt_source,
         hl.mkt_medium,
@@ -220,6 +230,8 @@ sale_fact_listing_flows_adjust AS (
     LEFT JOIN
         datalake_olos_dialer.outbound_last_contact olc
             ON olc.id_lead = hl.sk_lead
+    LEFT JOIN dw_public.dim_user_affiliate dua
+        ON hl.sk_user_lead_affiliate = dua.sk_user
 ),
 source_ops_sale AS (
     with photo_job AS (
@@ -350,6 +362,10 @@ fact_sale AS (
             ELSE ssf.mkt_source
         END AS mkt_source,
         ssf.mkt_medium,
+        ssf.affiliate_mkt_origin,
+        ssf.affiliate_mkt_channel,
+        ssf.affiliate_mkt_medium,
+        ssf.affiliate_mkt_source,
         sor.sales_company,
         sor.sourcing_ops,
         ssf.lead_origin,
@@ -404,6 +420,10 @@ fact_rent AS (
             ELSE hlf.mkt_source
         END AS mkt_source,
         hlf.mkt_medium,
+        hlf.affiliate_mkt_origin,
+        hlf.affiliate_mkt_channel,
+        hlf.affiliate_mkt_medium,
+        hlf.affiliate_mkt_source,
         sor.sales_company,
         sor.sourcing_ops,
         hlf.lead_origin,
@@ -460,6 +480,10 @@ SELECT
     mkt_channel,
     mkt_source,
     mkt_medium,
+    affiliate_mkt_origin,
+    affiliate_mkt_channel,
+    affiliate_mkt_medium,
+    affiliate_mkt_source,
     sales_company,
     sourcing_ops,
     lead_origin,

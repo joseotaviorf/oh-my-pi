@@ -160,6 +160,7 @@ bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
+  - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
   - bietlejuice.dw_user:load-dw-public-dim-partner
   - bietlejuice.dw_user:load-dw-public-dim-partner-agent
   - bietlejuice.dw_user:load-dw-public-dim-user

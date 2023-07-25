@@ -3,141 +3,193 @@ database_name: dw_datamarts
 table_name: lead_listing_flows
 domain: Cross
 owner: '@data-growth'
+description: This dataset contains information about the lead flow.
 columns:
   sk_house_listing_flow:
+    description: Unique id related to the house listing flow, it's the primary key of the table.
     lineage:
       - dw_sale.fact_listing_flows.sk_house_listing_flow
       - dw_public.fact_house_listing_flows.sk_house_listing_flow
   sk_lead:
+    description: Lead identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_lead
       - dw_public.fact_house_listing_flows.sk_lead
   sk_house:
+    description: House identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_house_listing
       - dw_public.fact_house_listing_flows.sk_house_listing
   sk_house_listing:
+    description: House listing identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_house_listing
       - dw_public.fact_house_listing_flows.sk_house_listing
   sk_region:
+    description: Region identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_region
       - dw_public.fact_house_listing_flows.sk_region
   sk_lead_date:
+    description: Lead date identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_lead_date
       - dw_public.fact_house_listing_flows.sk_lead_date
   sk_first_contact_date:
+    description: First contact date identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_first_contact_date
       - dw_public.fact_house_listing_flows.sk_first_contact_date
   sk_prospect_date:
+    description: Prospect date identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_prospect_date
       - dw_public.fact_house_listing_flows.sk_prospect_date
   sk_qualified_date:
+    description: Qualified date identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_qualified_date
       - dw_public.fact_house_listing_flows.sk_qualified_date
   sk_available_qualified_date:
+    description: Available qualified date identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_available_qualified_date
       - dw_public.fact_house_listing_flows.sk_available_qualified_date
   sk_opportunity_date:
+    description: Opportunity date identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_opportunity_date
       - dw_public.fact_house_listing_flows.sk_opportunity_date
   sk_first_listing_date:
+    description: First listing date identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_first_listing_date
       - dw_public.fact_house_listing_flows.sk_first_listing_date
   sk_conversion_date:
+    description: Conversion date identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_conversion_date
       - dw_public.fact_house_listing_flows.sk_conversion_date
   sk_discard_date:
+    description: Discard date identifier
     lineage:
       - dw_sale.fact_listing_flows.sk_discard_date
       - dw_public.fact_house_listing_flows.sk_discard_date
   sk_first_photojob_date_fact_photo_job:
+    description: First photojob date identifier
     lineage:
       - dw_public.fact_photo_job.sk_date_job_created
   sk_user_lead_affiliate:
+    description: Key of the affiliate that indicated the lead
     lineage:
       - dw_sale.fact_listing_flows.sk_user_lead_affiliate
       - dw_public.fact_house_listing_flows.sk_user_lead_affiliate
   country_code:
+    description: Identifies the country
     lineage:
       - dw_public.fact_house_listing_flows.country_code
   mkt_completion:
+    description: The marketing completion value. It comes from a gsheet.
     lineage:
       - dw_sale.fact_listing_flows.mkt_completion
       - dw_public.fact_house_listing_flows.mkt_completion
   mkt_channel:
+    description: The marketing channel value. It comes from a gsheet.
     lineage:
       - dw_sale.fact_listing_flows.mkt_channel
       - dw_public.fact_house_listing_flows.mkt_channel
   mkt_source:
+    description: The marketing source value. It comes from a gsheet.
     lineage:
       - dw_sale.fact_listing_flows.mkt_source
       - dw_public.fact_house_listing_flows.mkt_source
   mkt_medium:
+    description: The marketing medium value. It comes from a gsheet.
     lineage:
       - dw_sale.fact_listing_flows.mkt_medium
       - dw_public.fact_house_listing_flows.mkt_medium
+  affiliate_mkt_origin:
+    description: The affiliate acquisition marketing origin value. It comes from a gsheet.
+    lineage:
+      - dw_public.dim_user_affiliate.mkt_origin
+  affiliate_mkt_channel:
+    description: The affiliate acquisition marketing channel value. It comes from a gsheet.
+    lineage:
+      - dw_public.dim_user_affiliate.mkt_channel
+  affiliate_mkt_medium:
+    description: The affiliate acquisition marketing medium value. It comes from a gsheet.
+    lineage:
+      - dw_public.dim_user_affiliate.mkt_medium
+  affiliate_mkt_source:
+    description: The affiliate acquisition marketing source value. It comes from a gsheet.
+    lineage:
+      - dw_public.dim_user_affiliate.mkt_source
   sales_company:
+    description: For which company was the agent working during that contact attempt. This is extracted from the campaign name, which is fullfilled manually by the operations team.
     lineage:
       - datalake_olos_dialer.outbound_mailing
       - datalake_olos_dialer.outbound_last_contact
       - dw_public.dim_lead.sales_company
       - dw_quintoandar.dim_user_sales_rep.sales_company
   lead_origin:
+    description: Origin of the lead.
     lineage:
       - dw_sale.fact_listing_flows.lead_origin
       - dw_public.fact_house_listing_flows.lead_origin
   funnel_drop_reason:
+    description: Description of the reason for the lead or house to be in its current funnel step
     lineage:
       - dw_sale.fact_listing_flows.funnel_drop_reason
       - dw_public.fact_house_listing_flows.funnel_drop_reason
   lead_context_origin:
+    description: Business context
     lineage:
       - dw_sale.fact_listing_flows.lead_context_origin
       - dw_public.fact_house_listing_flows.lead_context_origin
   rental_administrator:
+    description: Rental administrator after the change
     lineage:
       - dw_public.dim_house_listing.rental_administrator
   first_prospect_date:
+    description: First Prospect Date
     lineage:
       - dw_public.fact_house_listing_flows.sk_prospect_date
       - dw_sale.fact_listing_flows.sk_prospect_date
   last_prospect_date:
+    description: Last Prospect Date
     lineage:
       - dw_public.fact_house_listing_flows.sk_prospect_date
       - dw_sale.fact_listing_flows.sk_prospect_date
   first_qualified_date:
+    description: First Qualified Date
     lineage:
       - dw_public.fact_house_listing_flows.sk_qualified_date
       - dw_sale.fact_listing_flows.sk_qualified_date
   last_qualified_date:
+    description: Last Qualified Date
     lineage:
       - dw_public.fact_house_listing_flows.sk_qualified_date
       - dw_sale.fact_listing_flows.sk_qualified_date
   has_isales_intervention:
+    description: Flag that identifies if there were inside sales intervention
     lineage:
       - dw_sale.fact_listing_flows.has_isales_intervention
       - dw_public.fact_house_listing_flows.has_isales_intervention
   ts_first_job_scheduled:
+    description: Timestamp of the first job schedule
     lineage:
       - dw_public.dim_photo_job.dt_job_scheduled
   ts_first_job_scheduled_br_tz:
+    description: Timestamp of the first job schedule in br timezone
     lineage:
       - dw_public.dim_photo_job.dt_job_scheduled
   ts_first_publication:
+    description: Timestamp of the first publication
     lineage:
       - dw_sale.dim_listing.ts_first_publication
       - dw_public.dim_house_listing.ts_house_first_publication
   ts_house_first_publication_br_tz:
+    description: Timestamp of the first publication in br timezone
     lineage:
       - dw_sale.dim_listing.ts_first_publication
       - dw_public.dim_house_listing.ts_house_first_publication
