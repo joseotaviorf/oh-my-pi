@@ -206,8 +206,6 @@ if __name__ == "__main__":
                     city
                 FROM
                     datalake_vespucio.condo_full
-                LIMIT 
-                    2
             ),
             itbi AS (
                 SELECT 
@@ -231,8 +229,6 @@ if __name__ == "__main__":
                     city
                 FROM 
                     datalake_open_external_data.itbi_bh_residential_addresses
-                LIMIT 
-                    2
             ),
             union_solutions AS (
                 SELECT 
@@ -261,6 +257,10 @@ if __name__ == "__main__":
             WHERE
                 s2.id_dejavu IS NULL
                 OR DATEDIFF(CURRENT_TIMESTAMP(), s2.ts_updated) > 30
+            ORDER BY 
+                u.source DESC
+            LIMIT 
+                20000
     """.format(
         database_name=database_name,
         addresses_s2_geometry_mapping_table=addresses_s2_geometry_mapping_table
