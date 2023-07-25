@@ -8,7 +8,6 @@ with propose_values AS (
 ),
 contratos AS (
     SELECT
-        pp.sk_contract,
         pp.sk_propose,
         pp.dt_contract_started AS begin,
         pp.dt_ended,
