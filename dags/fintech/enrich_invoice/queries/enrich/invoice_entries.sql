@@ -52,16 +52,8 @@ SELECT
 	COALESCE(CAST(DATE_FORMAT(e.ts_created, 'yyyyMMdd') AS INT), -1) AS id_created_date,
 	COALESCE(CAST(DATE_FORMAT(i.ts_due, 'yyyyMMdd') AS INT), -1) AS id_due_date,
 	COALESCE(CAST(DATE_FORMAT(i.ts_paid, 'yyyyMMdd') AS INT), -1) AS id_paid_date,
-	CASE
-        WHEN af.type = 'contract'
-            AND at.type <> 'contract' THEN -1.0 * e.amount
-		ELSE e.amount
-    END AS brl_entry_due_amount,
-	CASE
-        WHEN af.type = 'contract'
-            AND at.type <> 'contract' THEN ROUND(((-1.0*e.amount/ABS(i.due_amount))*i.paid_amount), 2)
-		ELSE ROUND(((1.0*e.amount/ABS(i.due_amount))*i.paid_amount), 2)
-    END AS brl_entry_paid_amount,
+	e.amount AS brl_entry_due_amount,
+	ROUND(((1.0*e.amount/ABS(i.due_amount))*i.paid_amount), 2) AS brl_entry_paid_amount,
     e.ts_created
 FROM
     datalake_retsuko.entry AS e
