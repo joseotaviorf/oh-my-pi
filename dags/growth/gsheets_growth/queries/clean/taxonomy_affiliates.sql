@@ -7,6 +7,6 @@ SELECT
     COALESCE(mkt_origin, '') AS mkt_origin,
     COALESCE(mkt_channel, '') AS mkt_channel,
     COALESCE(mkt_medium, '') AS mkt_medium,
-    COALESCE(mkt_source '') AS mkt_source
+    COALESCE(mkt_source, '') AS mkt_source
 FROM
     datalake_gsheets_raw.taxonomy_affiliates
