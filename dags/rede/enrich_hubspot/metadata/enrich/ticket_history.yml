@@ -81,6 +81,10 @@ columns:
     lineage:
       - datalake_hubspot_clean.ticket.properties
     description: Date of the onboarding.
+  ts_live_demand_only:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+    description: Time when the demand only onboarding live was done.
   ts_archived:
     lineage:
       - datalake_hubspot_clean.ticket.ts_archived

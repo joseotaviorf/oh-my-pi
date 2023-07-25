@@ -19,6 +19,10 @@ columns:
       - datalake_hubspot_clean.contact.associations
     description: ID of the main company associated with the contact (more than one can be associated.
       That can be seen in datalake_hubspot.company_contact).
+  id_ebdb_user:
+    lineage:
+      - datalake_ebdb_clean.user.id
+    description: ID of the EBDB user associated with the contact, matched by email.
   company_associations:
     lineage:
       - datalake_hubspot_clean.contact.associations
@@ -152,6 +156,10 @@ columns:
     lineage:
       - datalake_hubspot_clean.contact.properties
     description: Whether the contact is enrolled in a Sequence (email automation in HubSpot).
+  has_been_in_demand_only_onboarding_live:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+    description: Whether the contact has been in the Demand Only onboarding live.
   is_archived:
     lineage:
       - datalake_hubspot_clean.contact.is_archived
@@ -172,6 +180,10 @@ columns:
     lineage:
       - datalake_hubspot_clean.contact.properties
     description: Timestamp of the closing of the contact.
+  ts_live_demand_only:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+    description: Time when the demand only onboarding live was done.
   ts_archived:
     lineage:
       - datalake_hubspot_clean.contact.ts_archived

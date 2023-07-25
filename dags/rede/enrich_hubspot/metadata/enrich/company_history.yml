@@ -370,6 +370,10 @@ columns:
       - datalake_hubspot_clean.company.properties
     description: 'Time when the last note, call, meeting or task was registered for
       this company.'
+  ts_live_demand_only:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Time when the demand only onboarding live was done.
   ts_archived:
     lineage:
       - datalake_hubspot_clean.company.ts_archived

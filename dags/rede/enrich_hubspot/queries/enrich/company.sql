@@ -259,6 +259,7 @@ SELECT
     ch.ts_hubspot_owner_assigned,
     ch.ts_last_logged_call,
     ch.ts_notes_last_updated,
+    ch.ts_live_demand_only,
     IF(mc.id_merged_company IS NOT NULL, ch.ts_updated, ch.ts_archived) AS ts_archived,
     ch.ts_created,
     ch.ts_updated,

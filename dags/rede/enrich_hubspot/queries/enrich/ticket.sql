@@ -17,6 +17,7 @@ SELECT
     dt_term_sent,
     dt_documents_received,
     dt_onboarding,
+    ts_live_demand_only,
     ts_archived,
     ts_created,
     ts_updated,

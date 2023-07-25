@@ -91,6 +91,7 @@ tables:
         - hs_merged_object_ids
         - status_do_lead___for_rent
         - categoria_do_membro___for_rent
+        - demand_only__data_da_live
       propertiesWithHistory:
         - hs_lead_status
         - categoria_do_membro
@@ -140,6 +141,8 @@ tables:
         - num_associated_deals
         - hs_lead_status
         - hubspot_owner_id
+        - demand_only__corretor_participou_da_live_de_onboarding_
+        - demand_only__data_da_live
       propertiesWithHistory:
         - hs_lead_status
       associations:
@@ -206,6 +209,7 @@ tables:
         - qualificacao_sales___quantidade_de_imoveis_para_venda
         - qualificacao_sales___ticket_medio_de_imoveis_de_locacao
         - qualificacao_sales___ticket_medio_de_imoveis_de_venda
+        - demand_only__priorizacao_de_negociacoes
       propertiesWithHistory:
         - dealstage
         - pipeline
@@ -233,6 +237,7 @@ tables:
         - hubspot_owner_id
         - subject
         - tipo_de_onboarding
+        - demand_only__data_da_live
       propertiesWithHistory:
         - hs_pipeline_stage
         - hs_pipeline

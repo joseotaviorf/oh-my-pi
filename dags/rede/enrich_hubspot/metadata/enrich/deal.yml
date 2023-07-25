@@ -90,6 +90,10 @@ columns:
       - datalake_hubspot.deal_history.soft_opening_phase
     description: Phase of the deal in the soft opening phase. Comes from the field
       fase_soft_opening.
+  demand_only_priority:
+    lineage:
+      - datalake_hubspot.deal_history.demand_only_priority
+    description: Priority of the negotiation in the demand only context. Comes from the field demand_only__priorizacao_de_negociacoes.
   negotiation_responsible_team:
     lineage:
       - datalake_hubspot.deal_history.negotiation_responsible_team

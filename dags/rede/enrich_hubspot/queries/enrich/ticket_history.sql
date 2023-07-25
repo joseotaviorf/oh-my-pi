@@ -43,6 +43,7 @@ SELECT
     GET_JSON_OBJECT(properties, '$.data_de_envio_do_termo')::TIMESTAMP AS dt_term_sent,
     GET_JSON_OBJECT(properties, '$.data_de_recebimento_dos_documentos')::TIMESTAMP AS dt_documents_received,
     GET_JSON_OBJECT(properties, '$.data_do_onboarding_realizado')::TIMESTAMP AS dt_onboarding,
+    GET_JSON_OBJECT(properties, '$.demand_only__data_da_live')::TIMESTAMP AS ts_live_demand_only,
     ts_archived,
     ts_created,
     ts_updated,

@@ -159,6 +159,7 @@ SELECT
     GET_JSON_OBJECT(properties, '$.hubspot_owner_assigneddate')::TIMESTAMP AS ts_hubspot_owner_assigned,
     GET_JSON_OBJECT(properties, '$.hs_last_logged_call_date')::TIMESTAMP AS ts_last_logged_call,
     GET_JSON_OBJECT(properties, '$.notes_last_updated')::TIMESTAMP AS ts_notes_last_updated,
+    GET_JSON_OBJECT(properties, '$.demand_only__data_da_live')::TIMESTAMP AS ts_live_demand_only,
     ts_archived,
     ts_created,
     ts_updated,

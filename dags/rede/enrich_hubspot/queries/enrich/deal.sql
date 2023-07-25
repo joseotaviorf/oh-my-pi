@@ -18,6 +18,7 @@ SELECT
     product,
     soft_opening_priority,
     soft_opening_phase,
+    demand_only_priority,
     negotiation_responsible_team,
     commercial_closing_format,
     partner_agencies,
