@@ -15,11 +15,11 @@ daily_region AS (
         ara.id_agent,
         ara.id_region,
         aux.region_code,
-        aux.region_code_deprecated 
+        aux.region_code_deprecated
     FROM
         agents_region_aud AS ara
     LEFT JOIN
-        datalake_gsheets_clean.auxiliary_region aux
+        datalake_gsheets_clean.auxiliary_region AS aux
             ON aux.id = ara.id_region
     WHERE
         ara.ts_started IS NOT NULL
@@ -29,27 +29,24 @@ daily_region AS (
     region_records_union AS (
         SELECT
             *
-        FROM 
+        FROM
             daily_region
         UNION ALL
         SELECT DISTINCT
             ag.ts_slot,
-            us.dados_agente_id AS id_agent,
+            ag.id_agent,
             ar.id_region,
             ar.region_code,
             ar.region_code_deprecated
         FROM
-            datalake_ebdb_agents.agents_slots ag
-        LEFT JOIN 
-          daily_region ar
+            datalake_ebdb_agents.agents_slots AS ag
+        LEFT JOIN
+          daily_region AS ar
             ON ag.id_agent = ar.id_agent
-        LEFT JOIN 
-          dw_public.dim_user us
-              ON us.dados_agente_id = ag.id_agent
         WHERE
             ar.id_region IS NOT NULL
-            AND us.dados_agente_id IS NOT NULL
-            AND	cast(ag.ts_slot as date) = DATE(TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss'))
+            AND ag.id_agent IS NOT NULL
+            AND	cast(ag.ts_slot AS DATE) = DATE(TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss'))
             AND DATE(TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss')) <= DATE('2018-01-31 00:00:00')  -- limit date, where aud started to be implemented
     ),
     region_records_agg AS (
@@ -57,23 +54,23 @@ daily_region AS (
             region_records_union.ts_slot,
             region_records_union.id_agent,
             region_records_union.region_code,
-            count(region_records_union.region_code) AS times,
-            RANK() OVER (PARTITION BY region_records_union.id_agent ORDER BY count(region_records_union.region_code) DESC, region_records_union.region_code ASC) ranking
-        FROM 
+            COUNT(region_records_union.region_code) AS times,
+            RANK() OVER (PARTITION BY region_records_union.id_agent ORDER BY COUNT(region_records_union.region_code) DESC, region_records_union.region_code ASC) AS ranking
+        FROM
             region_records_union
         GROUP BY
             region_records_union.ts_slot,
             region_records_union.id_agent,
             region_records_union.region_code
-    ), 
+    ),
     region_deprecated_records_agg AS (
         SELECT
             region_records_union.ts_slot,
             region_records_union.id_agent,
             region_records_union.region_code_deprecated,
-            count(region_records_union.region_code_deprecated) AS times,
-            RANK() OVER (PARTITION BY region_records_union.id_agent ORDER BY count(region_records_union.region_code_deprecated) DESC, region_records_union.region_code_deprecated ASC) ranking
-        FROM 
+            COUNT(region_records_union.region_code_deprecated) AS times,
+            RANK() OVER (PARTITION BY region_records_union.id_agent ORDER BY COUNT(region_records_union.region_code_deprecated) DESC, region_records_union.region_code_deprecated ASC) AS ranking
+        FROM
             region_records_union
         GROUP BY
             region_records_union.ts_slot,
@@ -81,14 +78,14 @@ daily_region AS (
             region_records_union.region_code_deprecated
     ),
     secondary_area as (
-        SELECT 
+        SELECT
             r2.id_agent,
             r2.ts_slot,
             r2.times,
-            first(r2.region_code) AS secondary_area
-        FROM 
-            region_records_agg r2
-        WHERE 
+            FIRST(r2.region_code) AS secondary_area
+        FROM
+            region_records_agg AS r2
+        WHERE
             r2.ranking = 2
         GROUP BY
             r2.id_agent,
@@ -96,14 +93,14 @@ daily_region AS (
             r2.times
     ),
     secondary_area_deprecated AS (
-        SELECT 
+        SELECT
             ng2.id_agent,
             ng2.ts_slot,
             ng2.times,
-            first(ng2.region_code_deprecated) AS secondary_area_deprecated
-        FROM 
-            region_deprecated_records_agg ng2
-        WHERE 
+            FIRST(ng2.region_code_deprecated) AS secondary_area_deprecated
+        FROM
+            region_deprecated_records_agg AS ng2
+        WHERE
             ng2.ranking = 2
         GROUP BY
             ng2.id_agent,
@@ -116,7 +113,7 @@ daily_region AS (
             arh.id_agent,
             CAST(collect_list(arh.id_region) AS string) AS regions
         FROM
-            region_records_union arh
+            region_records_union AS arh
         GROUP BY
             arh.ts_slot,
             arh.id_agent
@@ -131,31 +128,31 @@ agent_region_group AS (
         gn.region_code_deprecated as area_deprecated,
         ng2.secondary_area_deprecated,
         ROW_NUMBER() OVER(PARTITION BY g.id_agent, DATE(g.ts_slot) ORDER BY g.region_code) AS row_n -- temporary fix. We need to find why this table is duplicating
-    FROM 
-        region_records_agg g
+    FROM
+        region_records_agg AS g
     LEFT JOIN
-        region_list list
-            ON list.ts_slot = g.ts_slot 
+        region_list AS list
+            ON list.ts_slot = g.ts_slot
                 AND list.id_agent = g.id_agent
     LEFT JOIN
-        region_deprecated_records_agg gn
-            ON gn.ts_slot = g.ts_slot 
-                AND gn.id_agent = g.id_agent 
-                AND gn.ranking = 1
+        region_deprecated_records_agg AS gn
+            ON gn.ts_slot = g.ts_slot
+            AND gn.id_agent = g.id_agent
+            AND gn.ranking = 1
     LEFT JOIN
-        secondary_area r2
+        secondary_area AS r2
             ON r2.id_agent = g.id_agent
-                AND r2.ts_slot = g.ts_slot
-                AND r2.times = g.times
+            AND r2.ts_slot = g.ts_slot
+            AND r2.times = g.times
     LEFT JOIN
-        secondary_area_deprecated ng2
+        secondary_area_deprecated AS ng2
             ON ng2.id_agent = g.id_agent
-                AND ng2.ts_slot = g.ts_slot
-                AND ng2.times = g.times
-    WHERE 
+            AND ng2.ts_slot = g.ts_slot
+            AND ng2.times = g.times
+    WHERE
         g.ranking = 1
 )
-SELECT 
+SELECT
     dt,
     dadosagente_id,
     regions,
@@ -166,7 +163,7 @@ SELECT
     EXTRACT(YEAR FROM dt) AS year,
     EXTRACT(MONTH FROM dt) AS month,
     EXTRACT(DAY FROM dt) AS day
-FROM 
+FROM
     agent_region_group
-WHERE 
+WHERE
     row_n = 1

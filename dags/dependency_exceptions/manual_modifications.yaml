@@ -242,9 +242,6 @@ bietlejuice.dw_tickets:
   remove:
     - bietlejuice.enrich_zendesk_tickets:load-enrich-ticket-measurements
     - bietlejuice.zendesk_tickets:load-clean-organizations
-bietlejuice.dw_user:
-  remove:
-    - bietlejuice.enrich_big_agent:load-enrich-agent-current-program # redundant dependency related to enrich_ebdb_agents.agent_region_group
 bietlejuice.dw_user_affiliate:
   remove:
     - bietlejuice.ebdb:load-clean-partner-agent
@@ -293,9 +290,6 @@ bietlejuice.enrich_atta:
     - bietlejuice.atta:load-clean-partner-info
     - bietlejuice.atta:load-clean-proposal
     - bietlejuice.atta:load-clean-track-step-detail
-bietlejuice.enrich_big_agent:
-  remove:
-    - bietlejuice.enrich_sale_listings:load-enrich-sale-listing # probable redundant dependency
 bietlejuice.enrich_bigid:
   override: []
 bietlejuice.enrich_brand_tracking:
@@ -547,11 +541,6 @@ bietlejuice.enrich_offboarding:
 bietlejuice.enrich_offboarding_repairs_probability:
   remove:
     - bietlejuice.enrich_inspections:load-enrich-item
-bietlejuice.enrich_offer:
-  add:
-    - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
-  remove:
-    - bietlejuice.enrich_sale_listings:load-enrich-sale-listing # probable redundant dependency
 bietlejuice.enrich_olos_dialer:
   remove:
     - bietlejuice.olos_dialer:load-clean-mailing

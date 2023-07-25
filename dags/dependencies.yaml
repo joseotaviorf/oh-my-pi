@@ -160,10 +160,10 @@ bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-  - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
   - bietlejuice.dw_user:load-dw-public-dim-partner
   - bietlejuice.dw_user:load-dw-public-dim-partner-agent
   - bietlejuice.dw_user:load-dw-public-dim-user
+  - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
   - bietlejuice.ebdb:load-clean-agent-support
   - bietlejuice.ebdb:load-clean-follow-up-details
   - bietlejuice.enrich_big_agent:load-enrich-agency
@@ -766,6 +766,7 @@ bietlejuice.dw_user:
   - bietlejuice.ebdb:load-clean-state
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.enrich_amplitude_partner_taxonomy:load-enrich-amplitude-partner-taxonomy
+  - bietlejuice.enrich_big_agent:load-enrich-agent-current-program
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_country:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
@@ -879,6 +880,7 @@ bietlejuice.enrich_big_agent:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_user:load-enrich-user
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
 bietlejuice.enrich_bigfone_events:
   - bietlejuice.bigfone:load-clean-event
 bietlejuice.enrich_bigfone_twilio:
@@ -2286,8 +2288,8 @@ bietlejuice.metric_rent__tickets:
 bietlejuice.metric_rent_benvi__demand:
   - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-top-of-funnel-volumes-monthly
   - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-top-of-funnel-volumes-weekly
-  - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
   - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
   - bietlejuice.enrich_mexico_marketing_automatic_daily_costs:load-enrich-daily-costs
   - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
   - bietlejuice.gsheets_for_rent:done-clean-mexico-demand-targets-2022
