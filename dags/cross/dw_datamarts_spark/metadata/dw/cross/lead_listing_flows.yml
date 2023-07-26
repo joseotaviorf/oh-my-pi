@@ -175,6 +175,11 @@ columns:
     lineage:
       - dw_sale.fact_listing_flows.has_isales_intervention
       - dw_public.fact_house_listing_flows.has_isales_intervention
+  has_fup_photo_task:
+    description: Flag that identifies if there were fup photo task
+    lineage:
+      - dw_sale.fact_listing_flows.has_fup_photo_task
+      - dw_public.fact_house_listing_flows.has_fup_photo_task
   ts_first_job_scheduled:
     description: Timestamp of the first job schedule
     lineage:
