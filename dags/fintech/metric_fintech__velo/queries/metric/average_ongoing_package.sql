@@ -21,7 +21,7 @@ contratos AS (
     WHERE
         pp.is_contract = TRUE
     GROUP BY
-        1,2,3,4
+        1,2,3
 
 ),
 novos_contratos AS (
