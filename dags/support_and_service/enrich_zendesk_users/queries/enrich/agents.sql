@@ -52,4 +52,4 @@ FULL OUTER JOIN
     quinto_messenger_analysts AS qma
         ON za.email = qma.email
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY email ORDER BY ts_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY za.email ORDER BY za.ts_updated DESC) = 1
