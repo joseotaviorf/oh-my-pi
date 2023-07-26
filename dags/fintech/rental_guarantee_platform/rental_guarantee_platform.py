@@ -84,12 +84,12 @@ tables = config_service.get_config("tables")
 for table in tables:
     table_name = table["table_name"]
     clean_table_name = table.get("clean_table_name", table_name)
-    parameters = [SOURCE, table_name]
-
+    extraction_type = table.get("extraction_type", "incremental")
+    parameters = [SOURCE, table_name, extraction_type]
     extended_parameters = [
-        table["date_filter_column"],
         "{{ ds }}",
-        table.get("unixtime_measure", None),
+        table.get("date_filter_column", "None"),
+        table.get("unixtime_measure"),
     ]
 
     extended_parameters = list(filter(None, extended_parameters))

@@ -74,6 +74,12 @@ Velo 3.0 tables:
     - `agreement`
     - `agreement_payment`
 
+
+
+Via **full load**:
+
+    - `omie_occurrence_legacy`
+
 This pipeline produces, in datalake_rental_guarantee_platform_clean:
 
 Via **incremental load**:
@@ -132,5 +138,9 @@ Velo 3.0 tables:
     - `deliquency_has_agreement`
     - `agreement`
     - `agreement_payment`
+
+Via **full load**:
+
+    - `omie_occurrence_legacy`
 
 </details>

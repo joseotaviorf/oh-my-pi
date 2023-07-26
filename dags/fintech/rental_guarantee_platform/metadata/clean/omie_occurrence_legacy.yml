@@ -1,0 +1,25 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: omie_occurrence_legacy
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.id
+  propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.propose
+  document:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.document
+  type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.type
+  ts_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.due_date
+  value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.value
+  paid_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.paid_value
