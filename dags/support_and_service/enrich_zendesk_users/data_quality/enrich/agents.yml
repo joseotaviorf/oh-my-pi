@@ -1,0 +1,14 @@
+---
+table_name: datalake_zendesk_users.agents
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_agents:
+    is_unique:
+      severity_level: Error
+  email:
+    is_unique:
+      severity_level: Error

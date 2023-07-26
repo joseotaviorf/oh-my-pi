@@ -1,0 +1,57 @@
+database_name: datalake_zendesk_users
+table_name: agents
+description:
+    This table is intended to gather user information segmented by the analyst entity. 
+    The main source of this table is the zendesk base and the granularity is built in at the analyst level.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+    id_agent:
+      lineage:
+        - datalake_zendesk_tickets_clean.users.id_agent
+      description: Analyst's unique identifier.
+    id_user_external:
+      lineage:
+        - datalake_zendesk_tickets_clean.users.id_user_external
+      description: User identifier in main.
+    id_organization:
+      lineage:
+        - datalake_zendesk_tickets_clean.users.id_organization
+      description: Identifier of the company where the analyst works.
+    email:
+      lineage:
+        - datalake_zendesk_tickets_clean.users.email
+        - datalake_bigfone_clean.event.email
+        - datalake_quinto_messenger_clean.task.email
+      description: Email with which the analyst is registered.
+    phone:
+      lineage:
+        - datalake_zendesk_tickets_clean.users.phone
+      description: Phone with which the analyst is registered.
+    name:
+      lineage:
+        - datalake_zendesk_tickets_clean.users.name
+        - datalake_bigfone_clean.event.name
+      description: Analyst name.
+    organization:
+      lineage:
+        - datalake_zendesk_tickets_clean.users.organization
+        - datalake_bigfone_clean.event.organization
+        - datalake_quinto_messenger_clean.task.organization
+      description: Name of the company where the analyst works.
+    is_active:
+      lineage:
+        - datalake_zendesk_tickets_clean.users.is_active
+      description: Boolean indicating whether the analyst is active.
+    ts_created:
+      lineage:
+        - datalake_zendesk_tickets_clean.users.ts_created
+      description: Date the analyst record was created (in timestamp).
+    ts_created_local:
+      lineage:
+        - datalake_zendesk_tickets_clean.users.ts_created_local
+      description: Date on which the analyst record was created, considering the time zone of Brazil (in timestamp).
+    ts_updated:
+      lineage:
+        - datalake_zendesk_tickets_clean.users.ts_updated
+      description: Date the analyst record was updated (in timestamp).

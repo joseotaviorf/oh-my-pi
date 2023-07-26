@@ -1,0 +1,12 @@
+custom_cluster:
+  driver_node_type_id: r5d.2xlarge
+  node_type_id: r5d.2xlarge
+  num_workers: 3
+  aws_attributes:
+    ebs_volume_size: 300
+  spark_conf:
+    spark.sql.shuffle.partitions: "128"
+
+dag_documentation:
+  dag_purpose:
+    "The dag has the objective of full loading the tables of entities and user segmentation, looking mainly at the zendesk source."
