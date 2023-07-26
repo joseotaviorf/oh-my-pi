@@ -220,8 +220,9 @@ sale_flows_funnel_events AS (
                     OR LOWER(sf.utm_campaign) = 'whatsapp_s'
                     OR (LOWER(sf.utm_campaign) IN ('push.whatsapp.produto.frfs.homes','push.whatsapp.produto.frfs.homes.canais')
                                 AND sf.mkt_channel IN ('CRM/Notification', 'CRM/Notifications'))
-                        OR (LOWER(sf.utm_campaign) LIKE '%whatsapp_homes%' AND LOWER(sf.utm_term) LIKE '%sale%')
-                        OR (LOWER(sf.utm_campaign) LIKE '%5a-alerts-v1%' AND LOWER(sf.utm_term) LIKE '%sale%')
+                    OR (LOWER(sf.utm_campaign) LIKE '%whatsapp_homes%' AND LOWER(sf.utm_term) LIKE '%sale%')
+                    OR (LOWER(sf.utm_campaign) LIKE '%5a-alerts-v1%' AND LOWER(sf.utm_term) LIKE '%sale%')
+                    OR (LOWER(sf.utm_campaign) LIKE '%cronut%')
                 THEN 'Sale'
             WHEN sf.utm_campaign IS NULL
                     OR sf.utm_campaign = ''

@@ -149,13 +149,18 @@ events AS (
         CASE
             WHEN LOWER(ui.business_context) = 'sale'
                 AND (LOWER(utm_campaign) LIKE '%sale%'
-                     OR LOWER(utm_campaign) LIKE '%girafa%'
-                     OR LOWER(utm_campaign) LIKE '%vender%'
-                     OR LOWER(utm_campaign) = 'whatsapp_s')
+                    OR LOWER(utm_campaign) LIKE '%girafa%'
+                    OR LOWER(utm_campaign) LIKE '%vender%'
+                    OR LOWER(utm_campaign) = 'whatsapp_s'
+                    OR (LOWER(utm_campaign) IN ('push.whatsapp.produto.frfs.homes','push.whatsapp.produto.frfs.homes.canais')
+                        AND mkt_channel IN ('CRM/Notification', 'CRM/Notifications'))
+                    OR (LOWER(utm_campaign) LIKE '%whatsapp_homes%' AND LOWER(utm_term) LIKE '%sale%')
+                    OR (LOWER(utm_campaign) LIKE '%5a-alerts-v1%' AND LOWER(utm_term) LIKE '%sale%')
+                    OR (LOWER(utm_campaign) LIKE '%cronut%'))
                 THEN 'Sale'
             WHEN LOWER(ui.business_context) = 'sale'
                 AND (NULLIF(utm_campaign, '') IS NULL
-                     OR LOWER(utm_campaign) LIKE '%branded%')
+                    OR LOWER(utm_campaign) LIKE '%branded%')
                 THEN 'Organic'
             ELSE 'Rental'
         END AS campaign_context,
