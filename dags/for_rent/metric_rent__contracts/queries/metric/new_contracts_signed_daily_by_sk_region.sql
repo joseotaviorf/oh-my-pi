@@ -1,6 +1,6 @@
 SELECT
     DATE(COALESCE(dc.ts_signature, dc.dt_start)) AS contract_signed_date,
-    hl.sk_region,
+    COALESCE(hl.sk_region, -1) AS sk_region,
     dc.country_code,
     COUNT(DISTINCT dc.sk_contract) AS new_contracts_signed
 FROM 
