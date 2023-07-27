@@ -45,6 +45,10 @@ columns:
     lineage:   
     - datalake_losses.closing.is_writtendown_in_dead_time
     description: Flag to show if the invoice is writtendown in the deadtime.
+  payment_status:
+    lineage:   
+    - datalake_losses.closing.payment_status
+    description: Status of the invoice payment. 
   dt_closing:
     lineage:
     - datalake_losses.closing.dt_closing

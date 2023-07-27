@@ -9,6 +9,7 @@ SELECT
     is_international,
     is_paid_in_closing_day,
     is_writtendown_in_dead_time,
+    payment_status,
     dt_closing,
     dt_snapshot,
     NOW() AS ts_load
