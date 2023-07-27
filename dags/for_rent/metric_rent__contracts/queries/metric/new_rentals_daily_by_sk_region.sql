@@ -1,6 +1,6 @@
 SELECT
     COALESCE(dc.dt_start, dc.dt_entrance) AS rental_date,
-    hl.sk_region,
+    COALESCE(hl.sk_region, -1) AS sk_region,
     dc.country_code,
     COUNT(DISTINCT dc.sk_contract) AS new_rentals
 FROM 
