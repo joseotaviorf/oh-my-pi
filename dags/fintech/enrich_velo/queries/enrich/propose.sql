@@ -517,22 +517,22 @@ SELECT DISTINCT
     om.occurrences_solved,
     c.id IS NOT NULL AS is_contract,
     IFNULL(DATEDIFF(COALESCE(DATE(pcd.ts_ended), c.ts_done), DATE(c.ts_began)) <= 10, FALSE) AS is_grace_period_cancelled,
-    p.id <= 5000000 AS is_legacy,
+    p.id < 5000000 AS is_legacy,
     IF(3p.id_propose IS NULL, FALSE, TRUE) AS is_3p,
     pym.dt_last_payment,
     COALESCE(DATE(c.ts_began), old.dt_contract_started) AS dt_contract_started,
     COALESCE(COALESCE(DATE(pcd.ts_ended), c.ts_done), old.dt_ended) AS dt_ended,
     COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
-    COALESCE(old.ts_waiting_new_docs, wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
-    COALESCE(old.ts_evaluation_started, esd.ts_evaluation_started) AS ts_evaluation_started,
-    COALESCE(old.ts_rejected, rd.ts_rejected) AS ts_rejected,
-    COALESCE(old.ts_sign_started, ssd.ts_sign_started) AS ts_sign_started,
-    COALESCE(old.ts_signed, psd.ts_signed) AS ts_signed,
-    COALESCE(old.ts_paid, pd.ts_paid) AS ts_paid,
-    COALESCE(old.ts_activation, ad.ts_activation) AS ts_activation,
-    COALESCE(old.ts_secured, sed.ts_secured) AS ts_secured,
-    COALESCE(old.ts_activation_analysis, aad.ts_activation_analysis) AS ts_activation_analysis,
-    COALESCE(old.ts_secure_pending, spd.ts_secure_pending) AS ts_secure_pending
+    IF(p.id < 5000000, old.ts_waiting_new_docs, wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
+    IF(p.id < 5000000, old.ts_evaluation_started, esd.ts_evaluation_started) AS ts_evaluation_started,
+    IF(p.id < 5000000, old.ts_rejected, rd.ts_rejected) AS ts_rejected,
+    IF(p.id < 5000000, old.ts_sign_started, ssd.ts_sign_started) AS ts_sign_started,
+    IF(p.id < 5000000, old.ts_signed, psd.ts_signed) AS ts_signed,
+    IF(p.id < 5000000, old.ts_paid, pd.ts_paid) AS ts_paid,
+    IF(p.id < 5000000, old.ts_activation, ad.ts_activation) AS ts_activation,
+    IF(p.id < 5000000, old.ts_secured, sed.ts_secured) AS ts_secured,
+    IF(p.id < 5000000, old.ts_activation_analysis, aad.ts_activation_analysis) AS ts_activation_analysis,
+    IF(p.id < 5000000, old.ts_secure_pending, spd.ts_secure_pending) AS ts_secure_pending
 FROM
     datalake_rental_guarantee_platform_clean.propose AS p
 LEFT JOIN
