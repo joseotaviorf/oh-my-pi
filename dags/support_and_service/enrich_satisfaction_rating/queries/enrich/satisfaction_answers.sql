@@ -99,7 +99,7 @@ WITH union_surveys_answers AS (
         sscf.id_ticket,
         sscf.id_respondent,
         sscf.respondent_email,
-        sscf.respondent_type,
+        NULL AS respondent_type,
         sscf.service_type,
         sscf.service_context,
         sscf.source_name,

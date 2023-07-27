@@ -63,7 +63,6 @@ columns:
       - datalake_satisfaction_rating.satisfaction_surveys_zendesk.respondent_type
       - datalake_satisfaction_rating.satisfaction_surveys_bigfone.respondent_type
       - datalake_satisfaction_rating.satisfaction_surveys_survicate.respondent_type
-      - datalake_satisfaction_rating.satisfaction_surveys_chat_fup.respondent_type
   service_type:
     description: Indicates the service that originated the satisfaction response.
     categories:

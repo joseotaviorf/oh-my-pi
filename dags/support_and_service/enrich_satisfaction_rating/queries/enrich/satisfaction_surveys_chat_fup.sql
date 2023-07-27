@@ -64,9 +64,8 @@ SELECT DISTINCT
     MD5(cfs.source_name) AS id_survey,
     tfm.id_contract,
     cfs.id_ticket,
-    COALESCE(cfs.id_respondent, zuc.id_user) AS id_respondent,
-    COALESCE(cfs.respondent_email, zuc.email) AS respondent_email,
-    zuc.role AS respondent_type,
+    COALESCE(cfs.id_respondent, tfm.id_user) AS id_respondent,
+    cfs.respondent_email AS respondent_email,
     cfs.service_type,
     cfs.service_context,
     cfs.source_name,
@@ -86,6 +85,3 @@ FROM
 LEFT JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
         ON tfm.id_ticket = cfs.id_ticket
-LEFT JOIN
-    datalake_zendesk_tickets.zendesk_users_contact AS zuc
-      ON COALESCE(cfs.id_respondent, tfm.id_user) = zuc.id_user

@@ -66,14 +66,14 @@ csat_events AS (
 call_csat AS (
   SELECT DISTINCT
     ce.id_call,
-    cs.id_contract,
-    cs.id_ticket,
-    cs.id_user,
+    ftm.id_contract,
+    ftm.id_ticket,
+    ftm.id_user,
     ce.csat_1,
     ce.csat_2,
     ce.csat_3,
     CASE
-      WHEN cs.ticket_origin = "call inapp" THEN cs.ticket_origin
+      WHEN cs.direction = "outbound-api" THEN "call inapp"
       ELSE "call"
     END AS service_context,
     ce.ts_created_local,
@@ -83,10 +83,13 @@ call_csat AS (
   FROM
     csat_events AS ce
   LEFT JOIN
-    datalake_customer_support.call AS cs
-        ON ce.id_call = cs.id_call
+    datalake_bigfone_twilio.call_flex_events AS cs
+      ON ce.id_call = cs.id_call
+  LEFT JOIN
+    datalake_zendesk_ticket_funnels.tickets_funnel_metrics ftm
+      ON ce.id_call = ftm.id_call
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY ce.id_call ORDER BY ts_created_local DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY ce.id_call ORDER BY ce.ts_created_local DESC) = 1
 )
 SELECT
     MD5(CONCAT(id_call, "csat1", ts_created_local)) AS id_answer,

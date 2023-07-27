@@ -24,16 +24,11 @@ columns:
     description: Identifier of the person who answered the form.
     lineage:
       - datalake_chat_fup_clean.rating.id_user
-      - datalake_zendesk_tickets.zendesk_users_contact.id_user
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
   respondent_email:
     description: Email of the person who answered the form.
     lineage:
-      - datalake_zendesk_tickets.zendesk_users_contact.email
       - datalake_chat_fup_clean.chats_chat.customer_email
-  respondent_type:
-    description: Position which the respondent assumed when filling out the form. It can be a tenant, landlord, the attendant itself, or other service providers.
-    lineage:
-      - datalake_zendesk_tickets.zendesk_users_contact.role
   service_type:
     description: Indicates the service that originated the satisfaction response.
   service_context:
