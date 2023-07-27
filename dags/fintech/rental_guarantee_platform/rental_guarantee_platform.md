@@ -73,6 +73,7 @@ Velo 3.0 tables:
     - `deliquency_has_agreement`
     - `agreement`
     - `agreement_payment`
+    - `delinquency_entry`
 
 
 
@@ -138,6 +139,7 @@ Velo 3.0 tables:
     - `deliquency_has_agreement`
     - `agreement`
     - `agreement_payment`
+    - `delinquency_entry`
 
 Via **full load**:
 

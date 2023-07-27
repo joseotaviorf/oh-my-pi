@@ -1,0 +1,39 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: delinquency_entry
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_entry.id
+  id_delinquency:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_entry.delinquency_id
+  bill_item:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_entry.bill_item
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_entry.version
+  description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_entry.description
+  value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_entry.value
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_entry.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_entry.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_entry.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_entry.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_entry.day

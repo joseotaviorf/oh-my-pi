@@ -229,4 +229,7 @@ tables:
     extraction_type: incremental
   - table_name: omie_occurrence_legacy
     extraction_type: full
+  - table_name: delinquency_entry
+    date_filter_column: updated_at
+    extraction_type: incremental
 partition_cols: ["year", "month", "day"]
