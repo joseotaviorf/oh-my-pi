@@ -1,0 +1,32 @@
+---
+database_name: datalake_nexxera_raw
+table_name: sales
+columns:
+  establishment_cnpj:
+    tags:
+      - PII
+      - Confidential
+  agency_deposit:
+    tags:
+      - PII
+      - Confidential
+  account_deposit:
+    tags:
+      - PII
+      - Confidential
+  agency_liquidated:
+    tags:
+      - PII
+      - Confidential
+  account_liquidated:
+    tags:
+      - PII
+      - Confidential
+  card_number:
+    tags:
+      - PII
+      - Confidential
+  acquirer_name:
+    tags:
+      - PII
+      - Confidential

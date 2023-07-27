@@ -1,0 +1,37 @@
+---
+database_name: datalake_nexxera_clean
+table_name: inadvance
+columns:
+  registration_type:
+    lineage:
+      - datalake_nexxera_raw.inadvance.registration_type
+  group_name:
+    lineage:
+      - datalake_nexxera_raw.inadvance.group_name
+  group_cnpj:
+    lineage:
+      - datalake_nexxera_raw.inadvance.group_cnpj
+  constant_acquirers_number:
+    lineage:
+      - datalake_nexxera_raw.inadvance.constant_acquirers_number
+  total_records_number:
+    lineage:
+      - datalake_nexxera_raw.inadvance.total_records_number
+  total_sale_installments_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.total_sale_installments_value
+  total_advance_summaries_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.total_advance_summaries_value
+  total_credit_adjustments_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.total_credit_adjustments_value
+  total_debit_adjustments_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.total_debit_adjustments_value
+  total_offset_adjustments_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.total_offset_adjustments_value
+  total_legacy_summary_installments_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.total_legacy_summary_installments_value

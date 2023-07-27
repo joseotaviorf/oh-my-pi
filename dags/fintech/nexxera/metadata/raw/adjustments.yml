@@ -1,0 +1,24 @@
+---
+database_name: datalake_nexxera_raw
+table_name: adjustments
+columns:
+  establishment_cnpj:
+    tags:
+      - PII
+      - Confidential
+  deposit_agency:
+    tags:
+      - PII
+      - Confidential
+  deposit_account:
+    tags:
+      - PII
+      - Confidential
+  card_number:
+    tags:
+      - PII
+      - Confidential
+  acquirer_name:
+    tags:
+      - PII
+      - Confidential

@@ -1,0 +1,12 @@
+---
+database_name: datalake_nexxera_raw
+table_name: inadvance
+columns:
+  group_name:
+    tags:
+      - PII
+      - Confidential
+  group_cnpj:
+    tags:
+      - PII
+      - Confidential
