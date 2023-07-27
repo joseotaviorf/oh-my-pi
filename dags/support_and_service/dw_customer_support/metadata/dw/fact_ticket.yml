@@ -122,6 +122,10 @@ columns:
       - datalake_customer_support.call.id_session
       - datalake_customer_support.chat.id_session
     description: Session ID from Sauron
+  sk_service_status:
+    lineage:
+      - datalake_customer_support.chat.service_status
+    description: Unique identifier for the front office service status
   sk_main_session:
     lineage:
       - datalake_customer_resolution.customer_resolution_static.id_ticket

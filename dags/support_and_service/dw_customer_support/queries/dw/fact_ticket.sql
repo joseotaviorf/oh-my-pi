@@ -21,6 +21,7 @@ WITH call_tickets AS (
     MAX(id_user) AS sk_user,
     id_contract AS sk_contract,
     id_session AS sk_session,
+    MD5("N/A") AS sk_service_status,
     'call' AS channel,
     ticket_origin,
     csat_rating AS csat_score,
@@ -85,7 +86,7 @@ WITH call_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46
 ),
 chat_tickets AS (
   SELECT
@@ -110,6 +111,7 @@ chat_tickets AS (
     MAX(id_user) AS sk_user,
     id_contract AS sk_contract,
     id_session AS sk_session,
+    MD5(service_status) AS sk_service_status,
     'chat' AS channel,
     ticket_origin,
     csat_score,
@@ -174,7 +176,7 @@ chat_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46
 ),
 email_tickets AS (
   SELECT
@@ -199,6 +201,7 @@ email_tickets AS (
     MAX(id_user) AS sk_user,
     id_contract AS sk_contract,
     -1 AS sk_session,
+    MD5("N/A") AS sk_service_status,
     'email' AS channel,
     'N/A' AS ticket_origin,
     csat_score,
@@ -262,7 +265,7 @@ email_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.email
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46
 ),
 historical_call_tickets AS (
   SELECT
@@ -287,6 +290,7 @@ historical_call_tickets AS (
     MAX(id_user) AS sk_user,
     id_contract AS sk_contract,
     -1 AS sk_session,
+    MD5("N/A") AS sk_service_status,
     'call' AS channel,
     'N/A' AS ticket_origin,
     NULL AS csat_score,
@@ -324,7 +328,7 @@ historical_call_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.historical_call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46
 ),
 historical_chat_tickets AS (
   SELECT
@@ -349,6 +353,7 @@ historical_chat_tickets AS (
     MAX(id_user) AS sk_user,
     id_contract AS sk_contract,
     -1 AS sk_session,
+    MD5("N/A") AS sk_service_status,
     'chat' AS channel,
     'N/A' AS ticket_origin,
     csat_score,
@@ -411,7 +416,7 @@ historical_chat_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.historical_chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46
 ),
 base_tickets AS (
   SELECT
@@ -469,6 +474,7 @@ SELECT
     bt.sk_user,
     bt.sk_contract,
     bt.sk_session,
+    bt.sk_service_status,
     fc.sk_main_session,
     fc.sk_next_ticket,
     bt.channel,

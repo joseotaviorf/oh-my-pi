@@ -188,9 +188,9 @@ agents_control AS (
     agent_name,
     manager,
     agent_company,
-    CASE 
+    CASE
         WHEN LOWER(agent_company)="atento" OR LOWER(email) LIKE "%atento%" THEN "ATENTO"
-        ELSE NULL 
+        ELSE NULL
     END AS agent_organization,
     dt_start
   FROM
@@ -592,6 +592,10 @@ SELECT DISTINCT
   qmt.has_transfers,
   zti.tags LIKE '%bot_end_conversation%' AS is_bot,
   zti.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
+  CASE
+    WHEN tags LIKE "%chat_idled_finished%" THEN "IDLED"
+    ELSE "COMPLETED"
+  END AS service_status,
   CASE
     WHEN dc.front_or_back = 'Front' THEN 'front'
     WHEN dc.front_or_back = 'Back' OR zti.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'

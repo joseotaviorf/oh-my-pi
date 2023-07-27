@@ -314,6 +314,10 @@ columns:
       tickets are combined or merged into a single ticket, and the individual tickets
       are closed as a result. This field contains a boolean value (TRUE or FALSE) to
       indicate whether the ticket was closed by merge.
+  service_status:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+    description: Describes what was the final status of the front office service.
   front_or_back:
     lineage:
       - datalake_gsheets_clean.department_control.front_or_back
