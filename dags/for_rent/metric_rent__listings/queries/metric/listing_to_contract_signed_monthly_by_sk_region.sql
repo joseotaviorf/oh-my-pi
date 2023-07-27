@@ -1,7 +1,7 @@
 WITH sums AS (
   SELECT
     DATE(DATE_TRUNC('month', dhl.ts_publication)) AS publication_month,
-    fhl.sk_region,
+    COALESCE(fhl.sk_region, -1) AS sk_region,
     dhl.country_code,
     COUNT(DISTINCT dhl.sk_house_listing) AS total_listings,
     COUNT(DISTINCT fhl.sk_contract) AS new_contracts_signed
