@@ -46,6 +46,9 @@ columns:
   administrators:
     lineage:
       - datalake_bob_raw.house_draft_aud.administrators
+  attendance_info:
+    lineage:
+      - datalake_bob_raw.house_draft.administrators
   mod_id_client_side:
     lineage:
       - datalake_bob_raw.house_draft_aud.client_side_id_mod
@@ -82,6 +85,9 @@ columns:
   mod_administrators:
     lineage:
       - datalake_bob_raw.house_draft_aud.administrators_mod
+  mod_attendance_info:
+    lineage:
+      - datalake_bob_raw.house_draft.attendance_info_mod
   mod_ts_created:
     lineage:
       - datalake_bob_raw.house_draft_aud.created_at_mod

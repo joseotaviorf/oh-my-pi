@@ -40,6 +40,9 @@ columns:
   administrators:
     lineage:
       - datalake_bob_raw.house_draft.administrators
+  attendance_info:
+    lineage:
+      - datalake_bob_raw.house_draft.administrators
   ts_created:
     lineage:
       - datalake_bob_raw.house_draft.created_at

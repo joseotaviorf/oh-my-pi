@@ -12,6 +12,7 @@ SELECT
     business_context,
     type,
     administrators,
+    attendance_info,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM datalake_bob_raw.house_draft

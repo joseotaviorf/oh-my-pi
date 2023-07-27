@@ -22,6 +22,9 @@ columns:
   is_automatically_discarded:
     lineage:
       - datalake_wololo_raw.context_discard.automaticallydiscarded
+  attendance_info:
+    lineage:
+      - datalake_wololo_raw.context_discard.attendanceinfo
   ts_created:
     lineage:
       - datalake_wololo_raw.context_discard.created_at
