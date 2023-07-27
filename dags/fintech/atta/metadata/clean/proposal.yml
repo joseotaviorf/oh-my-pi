@@ -14,6 +14,12 @@ columns:
   id_pre_analysis:
     lineage:
       - datalake_atta_raw.proposta.idcstimob
+  id_credit_analyst:
+    lineage:
+      - datalake_atta_raw.proposta.idanalistacredito
+  id_juridical_analyst:
+    lineage:
+      - datalake_atta_raw.proposta.idanalistajuridico
   id_emission_provider:
     lineage:
       - datalake_atta_raw.proposta.idfornecemissao

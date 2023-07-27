@@ -6,6 +6,8 @@ SELECT
     ppi.id_itau AS sk_proprosal_bank,
     pr.product_name,
     f.provider_name AS financing_bank,
+    pp.id_credit_analyst AS sk_credit_analyst,
+    pp.id_juridical_analyst AS sk_juridical_analyst,
     CASE
         WHEN COALESCE(proposal_dates.ts_min_credit_application_approval, proposal_dates.ts_min_credit_application_reproval) IS NULL THEN 'Incomplete'
         WHEN proposal_dates.ts_min_credit_application_reproval IS NULL THEN 'Approved'

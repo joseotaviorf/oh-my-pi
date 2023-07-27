@@ -24,6 +24,14 @@ columns:
         lineage:
             - datalake_atta_clean.financing_proposal.id_itau
         description: "Proposal ID in related bank"
+    sk_credit_analyst:
+        lineage:
+            - datalake_atta_clean.proposal.id_credit_analyst
+        description: "Identification number for the credit analyst who followed the proposal"
+    sk_juridical_analyst:
+        lineage:
+            - datalake_atta_clean.proposal.id_juridical_analyst
+        description: "Identification number for the juridical analyst who followed the proposal"
     product_name:
         lineage:
             - datalake_atta_clean.product_info.product_name

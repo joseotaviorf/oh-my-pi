@@ -3,6 +3,8 @@ SELECT
     idcliente                   AS id_client,
     IDConsultor                 AS id_consultant,
     IDCstImob                   AS id_pre_analysis,
+    IDAnalistaCredito           AS id_credit_analyst,
+    IDAnalistaJuridico          AS id_juridical_analyst,
     IDFornecEmissao             AS id_emission_provider,
     IDFranquia                  AS id_franchise,
     IDParceiro                  AS id_partner,
