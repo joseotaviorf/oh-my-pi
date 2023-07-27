@@ -8,6 +8,7 @@ SELECT
     maintenant AS id_main_tenant,
     realestate AS id_real_estate,
     realtor AS id_realtor,
+    current_payment_method,
     active AS is_active,
     begin AS ts_began,
     done AS ts_done,

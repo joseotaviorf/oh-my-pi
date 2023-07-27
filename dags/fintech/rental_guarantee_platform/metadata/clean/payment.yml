@@ -52,6 +52,12 @@ columns:
   installments:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.installments
+  refund_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.refund_amount
+  ts_refunded:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.refunded_at
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.value
