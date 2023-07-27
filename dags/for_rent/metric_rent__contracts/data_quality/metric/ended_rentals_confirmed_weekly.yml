@@ -3,4 +3,4 @@ table_name: metric_rent.ended_rentals_confirmed_weekly
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   week:
-    is_unique:
+    is_complete:

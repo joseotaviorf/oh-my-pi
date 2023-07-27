@@ -1,6 +1,6 @@
 SELECT
 	DATE(COALESCE(dc.ts_analyst_annulment_input, dc.dt_annulment)) AS contract_annulment_date,
-	hl.sk_region,
+	COALESCE(hl.sk_region, -1) AS sk_region,
     dc.country_code,
 	COUNT(DISTINCT dc.sk_contract) AS ended_rentals_confirmed
 FROM 
