@@ -71,7 +71,7 @@ UNION ALL
 SELECT DISTINCT
     (ap.id + 5000000) * -1 AS id_payment,
     d.id_propose,
-    d.id AS id_occurrence,
+    collect_list(d.id) AS id_occurrence,
     pv.id_propose_values AS id_propose_values,
     jk1.id_junk AS id_billing_type,
     jk2.id_junk AS id_payment_type,
@@ -94,7 +94,6 @@ SELECT DISTINCT
     ap.dt_paid AS dt_paid,
     CAST(NULL AS STRING) AS dt_payment_confirmed,
     ap.ts_updated
-
 FROM
     datalake_rental_guarantee_platform_clean.agreement_payment AS ap
 LEFT JOIN
@@ -118,3 +117,4 @@ LEFT JOIN
 LEFT JOIN
     cte_prop_values AS pv
     ON pv.id_propose = d.id_propose
+GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25

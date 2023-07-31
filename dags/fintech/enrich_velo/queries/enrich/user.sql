@@ -3,7 +3,7 @@ WITH person AS (
     FROM
         datalake_person_clean.person AS p
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY p.id ORDER BY p.ts_updated DESC) = 1
+        ROW_NUMBER() OVER (PARTITION BY p.uuid_person ORDER BY p.ts_updated DESC) = 1
 )
 SELECT DISTINCT
     ua.id AS id_user,
