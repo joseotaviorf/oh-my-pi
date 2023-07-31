@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: plaquinhas_installation_pp_organic
+columns:
+  id_ticket:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.id_ticket
+  dt_install:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.dt_install
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.id_house
+  client_type:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.client_type
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.business_context

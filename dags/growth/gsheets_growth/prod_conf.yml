@@ -358,6 +358,12 @@ sheets_info:
     sheet_name: targets
     clean_table_name: plaquinhas_demand_targets
     sheet_context: growth
+  
+  plaquinhas_installation_pp_organic:
+    sheet_id: 138ywKh8sHd2owgr6dxdkzDhGWqR0XHYaw0MkkSct_R8
+    sheet_name: pp_organico
+    clean_table_name: plaquinhas_installation_pp_organic
+    sheet_context: growth
 
   plaquinhas_installation_targets:
     sheet_id: 1GEaj4YMe9sgRiJmqgoJuOvkb8H8hjEcEgsTyv9GLzmg
