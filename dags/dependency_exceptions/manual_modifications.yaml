@@ -817,3 +817,23 @@ bietlejuice.reverse_tracksale:
     - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
     - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
     - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
+
+wonka.user_most_viewed_region:
+  add:
+    - wonka.user_region_listing_page_viewed:execute-job-cluster
+    - wonka.user_region_listing_page_viewed:load-user_region_listing_page_viewed
+    - wonka.user_region_listing_page_viewed:check-completion-notify
+
+wonka.user_most_viewed_city:
+  add:
+    - wonka.user_region_listing_page_viewed:execute-job-cluster
+    - wonka.user_region_listing_page_viewed:load-user_region_listing_page_viewed
+    - wonka.user_region_listing_page_viewed:check-completion-notify
+    - bietlejuice.ebdb:load-clean-region
+
+wonka.user_region_listing_page_viewed:
+  add:
+    - bietlejuice.ebdb:load-clean-region
+    - bietlejuice.ebdb:load-clean-house
+    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+    - bietlejuice.amplitude:load-clean-170698-user-merge

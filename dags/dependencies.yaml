@@ -2408,3 +2408,17 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.terminator:load-clean-termination
+wonka.user_most_viewed_city:
+  - bietlejuice.ebdb:load-clean-region
+  - wonka.user_region_listing_page_viewed:check-completion-notify
+  - wonka.user_region_listing_page_viewed:execute-job-cluster
+  - wonka.user_region_listing_page_viewed:load-user_region_listing_page_viewed
+wonka.user_most_viewed_region:
+  - wonka.user_region_listing_page_viewed:check-completion-notify
+  - wonka.user_region_listing_page_viewed:execute-job-cluster
+  - wonka.user_region_listing_page_viewed:load-user_region_listing_page_viewed
+wonka.user_region_listing_page_viewed:
+  - bietlejuice.amplitude:load-clean-170698-user-merge
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.ebdb:load-clean-house
+  - bietlejuice.ebdb:load-clean-region
