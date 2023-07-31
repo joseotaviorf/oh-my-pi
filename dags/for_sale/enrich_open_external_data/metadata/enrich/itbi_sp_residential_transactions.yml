@@ -20,16 +20,31 @@ columns:
   id_region:
     lineage:
       - datalake_zipcodes.zipcodes.id_region
-    description: "The id_region, if any, with the highest probability of having that zipcode in its extension.
-      Can be joined with dw_public.dim_region."
+      - datalake_vespucio.dejavu.id_region
+    description: "Foreign key of region where house listing is located in. Can be  joined with dw_public.dim_region.
+      For ITBI, we retrieve it in 2 different ways: 
+      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign an id_region based on its latitude and longitude.
+      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which region that zipcode is predominantly in."
   address_neighborhood:
     lineage:
       - datalake_itbi_clean.itbi_sp.address_neighborhood
-    description: "The neighborhood, if any, with the highest probability of having that zipcode in its extension."
+    description: "Most likely neighborhood for that listing
+      For ITBI, we retrieve it in 4 different ways: 
+      1 - If we have queried the address of the transaction in the Google Geocoding API, and the latitude and longitude fall within a QuintoAndar area of operation, we use the neighborhood of the id_region.
+      2 - If we do not yet operate in the place, we use the neighborhood from the API.
+      3 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which id_region that zip code is predominantly in.
+      4 - Lastly, we use what comes directly from ITBI."
   address_street_name:
-    description: Street name linked to the transaction's zip code.
+    description: "Most likely address for that listing
+      For ITBI, we retrieve it in 3 different ways: 
+      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign the output of the address to this field (with API standardization).
+      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which street that zipcode is predominantly on.
+      3 - Lastly, we use what comes directly from ITBI."
   address_number:
-    description: Unit number of the property.
+    description: "Unit number of the property.
+      For ITBI, we retrieve in 2 different ways: 
+      1 - If we have looked up the transaction address in the Google Geocoding API, we use the API number.
+      2 - If not, we use the one that comes directly from ITBI."
   address_complement:
     lineage:
       - datalake_itbi_clean.itbi_sp.complement
@@ -39,7 +54,18 @@ columns:
   address_zipcode:
     lineage:
       - datalake_itbi_clean.itbi_sp.address_zipcode
-    description: 'Zip code of the property address.'
+    description: "Zip code of the property address.
+      For ITBI, we retrieve in 2 different ways: 
+      1 - If we have queried the address of the transaction in the Google Geocoding API, we use the ZIP code that returned in the API.
+      2 - If not, we use the one that comes directly from ITBI."
+  latitude:
+    lineage:
+      - datalake_vespucio.dejavu.latitude
+    description: "Latitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
+  longitude:
+    lineage:
+      - datalake_vespucio.dejavu.longitude
+    description: "Longitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
   financing_type:
     description: The financing system used to purchase the property.
   house_registry_office:

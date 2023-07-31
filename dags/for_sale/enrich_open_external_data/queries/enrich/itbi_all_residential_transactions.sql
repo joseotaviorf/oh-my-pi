@@ -11,6 +11,8 @@ WITH sao_paulo AS (
     address_neighborhood AS neighborhood,
     'São Paulo' AS city,
     'SP' AS state,
+    latitude,
+    longitude,
     iptu_standard_description AS property_type,
     CASE 
       WHEN raw_source_complement IS NOT NULL AND raw_source_reference IS NOT NULL THEN CONCAT(REPLACE(raw_source_address, '-', ' '), ' ', IFNULL(address_number, ''), ' - ', REPLACE(raw_source_complement, '-', ' '), ' - ', REPLACE(raw_source_reference, '-', ' ')) 
@@ -42,6 +44,8 @@ belo_horizonte AS (
     neighborhood,
     city,
     state,
+    latitude,
+    longitude,
     property_type,
     raw_source_address,
     source_file,

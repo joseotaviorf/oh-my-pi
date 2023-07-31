@@ -13,19 +13,29 @@ columns:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.id_region
       - datalake_open_external_data.itbi_bh_residential_transactions.id_region
-    description: "Given all the listings that have passed through QuintoAndar, it is the id_region with the highest probability of having that zipcode in its extension."
+    description: "Foreign key of region where house listing is located in. Can be  joined with dw_public.dim_region.
+      For ITBI, we retrieve it in 2 different ways: 
+      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign an id_region based on its latitude and longitude.
+      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which region that zipcode is predominantly in."
   itbi_region:
     description: ITBI identification column. Represents which municipality the data comes from.
   address:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.address_street_name
       - datalake_open_external_data.itbi_bh_residential_transactions.address
-    description: 'Address where the property is located.'
+    description: "Most likely address for that listing
+      For ITBI, we retrieve it in 3 different ways: 
+      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign the output of the address to this field (with API standardization).
+      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which street that zipcode is predominantly on.
+      3 - Lastly, we use what comes directly from ITBI."
   number:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.address_number
       - datalake_open_external_data.itbi_bh_residential_transactions.number
-    description: 'Number of the unit where the property is located'
+    description: "Unit number of the property.
+      For ITBI, we retrieve in 2 different ways: 
+      1 - If we have looked up the transaction address in the Google Geocoding API, we use the API number.
+      2 - If not, we use the one that comes directly from ITBI."
   complement:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.address_complement
@@ -39,12 +49,20 @@ columns:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.address_zipcode
       - datalake_open_external_data.itbi_bh_residential_transactions.zipcode
-    description: 'Property zipcode.'
+    description: "Zip code of the property address.
+      For ITBI, we retrieve in 2 different ways: 
+      1 - If we have queried the address of the transaction in the Google Geocoding API, we use the ZIP code that returned in the API.
+      2 - If not, we use the one that comes directly from ITBI."
   neighborhood:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.address_neighborhood
       - datalake_open_external_data.itbi_bh_residential_transactions.neighborhood
-    description: 'Neighborhood where the property is located.'
+    description: "Most likely neighborhood for that listing
+      For ITBI, we retrieve it in 4 different ways: 
+      1 - If we have queried the address of the transaction in the Google Geocoding API, and the latitude and longitude fall within a QuintoAndar area of operation, we use the neighborhood of the id_region.
+      2 - If we do not yet operate in the place, we use the neighborhood from the API.
+      3 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which id_region that zip code is predominantly in.
+      4 - Lastly, we use what comes directly from ITBI."
   city:
     lineage:
       - datalake_open_external_data.itbi_bh_residential_transactions.city
@@ -53,6 +71,16 @@ columns:
     lineage:
       - datalake_open_external_data.itbi_bh_residential_transactions.state
     description: 'State of the property.'
+  latitude:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.latitude
+      - datalake_open_external_data.itbi_bh_residential_transactions.latitude
+    description: "Latitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
+  longitude:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.longitude
+      - datalake_open_external_data.itbi_bh_residential_transactions.longitude
+    description: "Longitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
   property_type:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.iptu_standard_description

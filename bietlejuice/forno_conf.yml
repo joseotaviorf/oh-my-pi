@@ -56,6 +56,7 @@ dags_out_of_pattern:
         "enrich_lost_listings",
         "enrich_marketing_costs_offline",
         "enrich_nps_reversion",
+        "enrich_vespucio",
         "gsheets.bedrock",
         "gsheets.fintech",
         "gsheets.for_rent",
