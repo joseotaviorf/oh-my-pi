@@ -9,3 +9,4 @@ tables:
   - file
   - invoice
   - recurrent_credit_card
+  - sap_entity

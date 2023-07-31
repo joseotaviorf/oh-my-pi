@@ -25,6 +25,7 @@ We load the following tables into the datalake:
     * file
     * invoice
     * recurrent_credit_card
+    * sap_entity
 
 2. In datalake clean
 
@@ -36,5 +37,6 @@ We load the following tables into the datalake:
     * file
     * invoice
     * recurrent_credit_card
+    * sap_entity
 
 </details>
