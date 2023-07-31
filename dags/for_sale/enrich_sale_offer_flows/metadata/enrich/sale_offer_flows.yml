@@ -173,6 +173,7 @@ columns:
   drop_reason:
     lineage:
       - datalake_sales_flow_clean.offer.discard_reason
+      - datalake_sales_flow_clean.reject_reason.reason
     description: Reason why an offer was discarded.
   drop_reason_responsible:
     description: Information about which type of user rejected the offer.

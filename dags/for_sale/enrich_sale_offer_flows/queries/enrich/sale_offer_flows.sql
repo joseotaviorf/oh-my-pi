@@ -43,6 +43,14 @@ offers AS (
             datalake_sales_flow_clean.offer
         QUALIFY
             ROW_NUMBER() OVER (PARTITION BY id_firestore ORDER BY ts_updated DESC) = 1
+    ),
+    last_reason_entry AS (
+        SELECT
+            *
+        FROM
+            datalake_sales_flow_clean.reject_reason
+        QUALIFY
+            ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
     )
     SELECT
         l.id_firestore AS id_offer,
@@ -53,7 +61,8 @@ offers AS (
         l.offer_price AS last_price_offered_by_buyer,
         l.final_price,
         l.status,
-        l.discard_reason,
+        COALESCE(lre.reason, l.discard_reason) AS discard_reason,
+        lre.source AS reject_source,
         l.ts_created,
         l.ts_accepted,
         l.ts_discarded
@@ -62,6 +71,9 @@ offers AS (
     LEFT JOIN
         first_offer_entry AS f
             ON l.id_firestore = f.id_firestore
+    LEFT JOIN
+        last_reason_entry AS lre
+            ON l.id_reject_reason = lre.id
 
 ),
 -- SALES FLOW CTE
@@ -685,9 +697,9 @@ SELECT
     COALESCE(sf.closing_canceled_reason, r.comment) AS sale_agreement_cancellation_reason,
     off.discard_reason AS drop_reason,
     CASE
-        WHEN LOWER(off.discard_reason) LIKE '%buyer%'
+        WHEN off.reject_source = 'BUYER' OR off.reject_source IS NULL AND LOWER(off.discard_reason) LIKE '%buyer%'
         THEN 'Buyer'
-        WHEN LOWER(off.discard_reason) LIKE '%seller%'
+        WHEN off.reject_source = 'SELLER' OR off.reject_source IS NULL AND LOWER(off.discard_reason) LIKE '%seller%'
         THEN 'Seller'
         ELSE 'Other'
     END AS drop_reason_responsible,
