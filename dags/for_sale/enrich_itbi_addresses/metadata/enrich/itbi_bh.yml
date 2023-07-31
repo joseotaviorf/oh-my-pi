@@ -1,6 +1,6 @@
 ---
-database_name: datalake_open_external_data
-table_name: itbi_bh_residential_addresses
+database_name: datalake_itbi_addresses
+table_name: itbi_bh
 description: "Table with all the distinct residential addresses present in the ITBI BH table. Used to retrieve the latitude and longitude via Geocoding."
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br

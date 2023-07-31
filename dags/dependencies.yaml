@@ -1401,6 +1401,9 @@ bietlejuice.enrich_invoice:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.retsuko:load-clean-contract
+bietlejuice.enrich_itbi_addresses:
+  - bietlejuice.itbi:load-clean-itbi-bh
+  - bietlejuice.itbi:load-clean-itbi-sp
 bietlejuice.enrich_jira:
   - bietlejuice.jira:load-clean-issues
 bietlejuice.enrich_kill_queue:
@@ -2211,8 +2214,8 @@ bietlejuice.enrich_vespucio:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-info-condo-amenities
   - bietlejuice.ebdb:load-clean-map-region
-  - bietlejuice.enrich_open_external_data:load-enrich-itbi-bh-residential-addresses
-  - bietlejuice.enrich_open_external_data:load-enrich-itbi-sp-residential-addresses
+  - bietlejuice.enrich_itbi_addresses:load-enrich-itbi-bh
+  - bietlejuice.enrich_itbi_addresses:load-enrich-itbi-sp
   - bietlejuice.sindico_net:load-clean-condominium
 bietlejuice.enrich_wololo_lead:
   - bietlejuice.wololo:load-clean-prospect-aud

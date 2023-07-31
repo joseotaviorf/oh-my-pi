@@ -741,8 +741,8 @@ bietlejuice.enrich_velo:
 bietlejuice.enrich_vespucio:
   add:
     - bietlejuice.ebdb:load-clean-map-region
-    - bietlejuice.enrich_open_external_data:load-enrich-itbi-bh-residential-addresses
-    - bietlejuice.enrich_open_external_data:load-enrich-itbi-sp-residential-addresses
+    - bietlejuice.enrich_itbi_addresses:load-enrich-itbi-bh
+    - bietlejuice.enrich_itbi_addresses:load-enrich-itbi-sp
 bietlejuice.enrich_zendesk_ticket_funnels:
   remove:
     - bietlejuice.zendesk_tickets:load-clean-groups
