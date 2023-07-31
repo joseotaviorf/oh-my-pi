@@ -6,3 +6,8 @@ tables:
     read_from_sql_file: True
 
 partition_cols: ["year", "month", "day"]
+
+custom_cluster:
+  driver_node_type_id: m5a.xlarge
+  node_type_id: m5a.large
+  num_workers: 1

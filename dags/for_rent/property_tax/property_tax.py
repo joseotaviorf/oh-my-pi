@@ -36,7 +36,7 @@ default_libraries = config_service.get_config("default_libraries")
 BASE_SPARK_JOBS_PATH = f"{s3_prefix}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{s3_prefix}/spark_jobs/{CONTEXT}/load_{{extraction_type}}_{CONTEXT}_raw.py"
 
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config("custom_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
