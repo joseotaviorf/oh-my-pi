@@ -128,6 +128,8 @@ if __name__ == "__main__":
     threshold = config_service.get_config("threshold")
     input_query = config_service.get_config("input_query")
 
+    input_query = input_query.format(execution_date=execution_date)
+
     logger.info(
         f"""m=__main__, environment={env}, source={source}, context={context},
         datalake_bucket={datalake_bucket}, execution_date={execution_date},

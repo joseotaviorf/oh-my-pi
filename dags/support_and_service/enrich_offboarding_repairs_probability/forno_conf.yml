@@ -2,6 +2,6 @@ output_table_name: offboarding_repair_predictions
 custom_libraries: [{ pypi: { "package": "scikit-learn>=0.24.0" } }]
 partitions: ["dt_booked"]
 model_filename: /dbfs/FileStore/models/inspections/off_repair_prediction_rf_model_v0.pkl
-input_query: SELECT * FROM datalake_offboarding_repairs_probability.contracts
+input_query: "SELECT * FROM datalake_offboarding_repairs_probability.contracts WHERE dt_booked = DATE('{execution_date}')"
 threshold: 0.42
 partition_cols: ["dt_predicted"]
