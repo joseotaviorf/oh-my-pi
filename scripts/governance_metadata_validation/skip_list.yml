@@ -5,7 +5,6 @@ metadata_files_out_of_pattern:
   - growth/rene_descartes/metadata/clean/lead_rejection.yml
   - for_rent/metric_rent__contracts/metadata/metric/new_tenant_prospect_to_contract_signed_4w.yml
   - for_rent/enrich_ebdb_agents/metadata/enrich/slots_base_time.yml
-  - for_rent/dw_listing/metadata/dw/fact_house_listings.yml
   - for_rent/enrich_pro_owners/metadata/enrich/tracking_weekly_changes.yml
   - governance/looker/metadata/clean/dashboards.yml
   - support_and_service/enrich_offboarding_repairs_probability/metadata/enrich/contracts.yml
