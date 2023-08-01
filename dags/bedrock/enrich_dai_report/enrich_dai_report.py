@@ -34,7 +34,8 @@ config_service = ConfigurationService(DAG_NAME)
 datalake_bucket = config_service.get_config("datalake_bucket")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-
+default_libraries = config_service.get_config("default_libraries")
+custom_libraries = config_service.get_config("cluster_extra_libs")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
@@ -44,15 +45,6 @@ DAI_CUSTOM_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_9_1_min_general_cluster", deserialize_json=True
 )
-
-LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
-)
-
-libraries_description = [
-    *LIBRARIES_DESCRIPTION,
-    config_service.get_config("cluster_extra_libs"),
-]
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -80,7 +72,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
-    libraries=libraries_description,
+    libraries=default_libraries + custom_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

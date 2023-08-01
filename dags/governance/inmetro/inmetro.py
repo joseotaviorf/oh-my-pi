@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 import pendulum
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -37,7 +37,9 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in loc
 MAIN_START_DATE = datetime(2021, 1, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 5,13 * * *"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_min_general_photon_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "databricks_10_4_min_general_photon_cluster"
+)
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOBS_PATH = (
     f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_{CONTEXT}_raw.py"
