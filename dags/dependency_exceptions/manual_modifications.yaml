@@ -551,10 +551,6 @@ bietlejuice.enrich_open_external_data:
   remove:
     - bietlejuice.itbi:load-clean-itbi-bh
     - bietlejuice.itbi:load-clean-itbi-sp
-bietlejuice.enrich_pdd_payments:
-  remove:
-    - bietlejuice.enrich_retsuko:load-enrich-invoice
-    - bietlejuice.retsuko:load-clean-account
 bietlejuice.enrich_proponent:
   override: []
 bietlejuice.enrich_recommendations:
