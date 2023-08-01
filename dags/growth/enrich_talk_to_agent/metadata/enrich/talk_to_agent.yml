@@ -1,0 +1,68 @@
+---
+database_name: datalake_talk_to_agent
+table_name: talk_to_agent
+description: This table contains information about TTA events.
+domain: Cross
+owner: marcio.gomes@quintoandar.com.br
+columns:
+  tenant_id:
+    lineage:
+      - datalake_amplitude_clean.170698_piloto_cw_message_sent_events.id_user
+    description: Id of the tenant.
+  sk_house_listing:
+    lineage:
+      - dw_public.dim_house_listing.sk_house_listing
+    description: Id of the property listing.
+  tenant_name:
+    lineage:
+      - dw_public.dim_user.nome
+    description: Tenant's name.
+  tenant_phone:
+    lineage:
+      - dw_public.dim_user.telefone_principal
+    description: Tenant's phone.
+  tenant_email:
+    lineage:
+      - dw_public.dim_user.email
+    description: Tenant's email.
+  region_code:
+    lineage:
+      - dw_public.dim_region.region_code
+    description: Region code.
+  first_attendance_ts:
+    lineage:
+      - dw_public.dim_booking.dt_created
+      - datalake_ebdb_clean.agent_support.ts_created
+    description: Timestamp related to the first attendance.
+  mkt_category:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.category
+    description: Mkt category.
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.flow
+    description: Mkt flow.
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.completion
+    description: Mkt completion.
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.channel
+    description: Mkt channel.
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.medium
+    description: Mkt medium.
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.origin
+    description: Mkt origin.
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.source
+    description: Mkt source.
+  mkt_platform:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.platform
+    description: Mkt platform.

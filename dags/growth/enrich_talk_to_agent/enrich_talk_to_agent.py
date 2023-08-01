@@ -18,9 +18,8 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 # This DAG had been turned off since TTA flow does not exist anymore, so we no longer receive updated data.
 # However, this table is still used on Sale modeling and we can not delete it!
 
-CONTEXT = "amplitude_talk_to_agent"
 # Pipeline inputs
-CONTEXT = "amplitude_talk_to_agent"
+CONTEXT = "talk_to_agent"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2020, 7, 1, tzinfo=timezone("America/Sao_Paulo"))
