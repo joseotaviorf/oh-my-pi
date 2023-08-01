@@ -44,7 +44,7 @@ events AS (
         dh.sk_region,
         CAST(a.first_message_ts AS TIMESTAMP) AS ts_event
     FROM
-        dw_datamarts.talk_to_agent AS a
+        datalake_talk_to_agent.talk_to_agent AS a
     JOIN
         dim_house AS dh
             ON a.house_id = dh.sk_house
@@ -86,15 +86,15 @@ events_base AS (
         sale_flows
     WHERE
         sale_flow_order = 1
-        
+
     UNION ALL
-    
+
     SELECT
         fo.sk_buyer,
         dr.city_group,
         dsa.ts_sale_agreement_signed AS ts_event,
         'ccv_signed' AS event_type
-    FROM 
+    FROM
         dw_sale.fact_offers AS fo
     JOIN
         dw_sale.dim_sale_agreement AS dsa
@@ -163,7 +163,7 @@ aux_active_periods AS (
         aux_churn_dates AS cd
     WHERE
         event_type = 'sale_flow'
-    GROUP BY 
+    GROUP BY
         1,2,4,5
 ),
 active_periods AS (

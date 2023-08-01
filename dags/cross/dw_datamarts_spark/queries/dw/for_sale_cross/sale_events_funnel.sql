@@ -23,7 +23,7 @@ SELECT
         ELSE 'IS'
     END AS lead_context,
     CASE
-        WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') 
+        WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other')
             AND lf.mkt_origin NOT IN ('B2B', 'CIQ') THEN 'IS'
         ELSE sourcing_ops
     END AS lead_processing_operation,
@@ -48,7 +48,7 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 LEFT JOIN
     dw_public.dim_house_listing AS dhl
-    	ON dhl.sk_house_listing = lf.sk_house_listing 
+    	ON dhl.sk_house_listing = lf.sk_house_listing
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
     	ON rbh.id_house = lf.sk_house_listing / 1000
@@ -107,17 +107,17 @@ SELECT
     (dl.price - eso.first_price_offered_by_buyer)/dl.price AS offer_discount
 FROM
 	datalake_offer.sale_offer AS eso
-LEFT JOIN 
-    dw_sale.dim_listing AS dl 
+LEFT JOIN
+    dw_sale.dim_listing AS dl
       ON eso.id_house = dl.sk_house
 LEFT JOIN
-    datalake_sale_offer_flows.sale_offer_flows AS sof 
+    datalake_sale_offer_flows.sale_offer_flows AS sof
       ON eso.id_offer = sof.id_offer
-LEFT JOIN 
-    data_deal_quali AS ddq 
+LEFT JOIN
+    data_deal_quali AS ddq
       ON sof.id_sales_flow = ddq.id
-LEFT JOIN 
-    datalake_firestore.monday AS m 
+LEFT JOIN
+    datalake_firestore.monday AS m
       ON eso.id_offer = m.id_offer
 )
 ,
@@ -144,12 +144,12 @@ JOIN dw_public.dim_region dr
     ON fv.sk_region = dr.sk_region
 JOIN dw_public.dim_booking AS db
     ON db.sk_booking = fv.sk_booking
-LEFT JOIN 
+LEFT JOIN
 	datalake_hub_services_clean.business_unit AS hs
 		ON hs.id = fv.sk_business_unit
 ),
 sale_bookings AS (
-SELECT 
+SELECT
     id_property,
     id_visitor,
     id_agent,
@@ -165,9 +165,9 @@ SELECT
     dt_created,
     dt_completed,
     order_booking
-FROM 
+FROM
     sale_bookings_base
-WHERE 
+WHERE
     order_booking =1
 ),
 sale_closing AS (
@@ -188,7 +188,7 @@ sale_closing AS (
     LEFT JOIN
         dw_public.dim_date AS dd
         ON dd.sk_date = fo.sk_offer_submitted_date
-    INNER JOIN 
+    INNER JOIN
         dw_sale.dim_offer AS sdo
         ON sdo.sk_offer = fo.sk_offer
     WHERE
@@ -211,7 +211,7 @@ sale_closing AS (
     LEFT JOIN
         dw_public.dim_date AS dd
         ON dd.sk_date = fo.sk_offer_accepted_date
-    INNER JOIN 
+    INNER JOIN
         dw_sale.dim_offer AS sdo
         ON sdo.sk_offer = fo.sk_offer
     WHERE
@@ -234,7 +234,7 @@ sale_closing AS (
     LEFT JOIN
         dw_public.dim_date dd
         ON dd.sk_date = fo.sk_sale_agreement_signed_date
-    INNER JOIN 
+    INNER JOIN
         dw_sale.dim_offer sdo
         ON sdo.sk_offer = fo.sk_offer
     WHERE sk_sale_agreement_signed_date>0
@@ -272,7 +272,7 @@ SELECT
 	tta.first_message_ts,
 	tta.first_attendance_ts
 FROM
-    dw_datamarts.talk_to_agent AS tta
+    datalake_talk_to_agent.talk_to_agent AS tta
 WHERE
     tta.business_context = 'SALE'
 ),
@@ -971,9 +971,9 @@ SELECT
 	NULL AS entrega_chave
 FROM
     sale_demand_classification AS sdc
-WHERE    
+WHERE
     sdc.tta_started IS NOT NULL
---  DATE(tta_started) > 0    
+--  DATE(tta_started) > 0
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 visits_booked AS (

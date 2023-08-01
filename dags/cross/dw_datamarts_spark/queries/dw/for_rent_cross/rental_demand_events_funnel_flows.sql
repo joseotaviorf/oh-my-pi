@@ -9,7 +9,7 @@ WITH rent_flows_adap AS (
       DATE(first_message_ts) AS first_message_date,
       DATE(first_attendance_ts) AS first_attendance_date
     FROM
-      dw_datamarts.talk_to_agent
+      datalake_talk_to_agent.talk_to_agent
   )
   SELECT
     rf.sk_rent_flow,

@@ -6,7 +6,7 @@ WITH all_users AS (
             email,
             main_phone,
             ROW_NUMBER() OVER (PARTITION BY id_user ORDER BY rev DESC) AS rw
-        FROM 
+        FROM
             datalake_ebdb_clean.user_aud
         )
     SELECT
@@ -17,9 +17,9 @@ WITH all_users AS (
                 THEN NULL
             ELSE main_phone
         END AS phone_number
-    FROM 
+    FROM
         user_aud
-    WHERE 
+    WHERE
         rw = 1
 ),
 
@@ -47,23 +47,23 @@ booking AS (
             ON h.id_region = bur.id_region
             AND (DATE(b.ts_created) BETWEEN bur.dt_start AND COALESCE(bur.dt_end, date_sub(current_date(), 1)))
     WHERE
-        b.visit_intent = 'SALE' 
-        AND UPPER(b.type) = 'VISITA' 
+        b.visit_intent = 'SALE'
+        AND UPPER(b.type) = 'VISITA'
 ),
 
 first_booking AS (
     SELECT *
-    FROM 
+    FROM
         booking
-    WHERE 
+    WHERE
         rw_asc =1
 ),
 
 last_booking AS (
     SELECT *
-    FROM 
+    FROM
         booking
-    WHERE 
+    WHERE
         rw_desc =1
 ),
 
@@ -83,7 +83,7 @@ booking_statistics AS (
         ) AS total_bookings_created_by_secretariat
     FROM
         booking
-    GROUP BY 
+    GROUP BY
         id_user
 ),
 
@@ -98,33 +98,33 @@ visit AS (
         b.ts_created,
         ROW_NUMBER() OVER (PARTITION BY b.id_visitor ORDER BY b.ts_created) AS rw_asc,
         ROW_NUMBER() OVER (PARTITION BY b.id_visitor ORDER BY b.ts_created DESC) AS rw_desc
-    FROM 
+    FROM
         datalake_booking.booking AS b
     LEFT JOIN
         datalake_ebdb_clean.house AS h
           ON h.id = b.id_house
-    WHERE 
+    WHERE
       IF
-        (b.is_visit_completed, BIGINT(DATE_FORMAT(b.ts_booking_utc, 'yyyyMMdd')), -1) > 0 
-      AND 
+        (b.is_visit_completed, BIGINT(DATE_FORMAT(b.ts_booking_utc, 'yyyyMMdd')), -1) > 0
+      AND
         b.visit_intent = 'SALE'
       AND
-        UPPER(b.type) = 'VISITA' 
+        UPPER(b.type) = 'VISITA'
 ),
 
 first_visit AS (
     SELECT *
-    FROM 
+    FROM
         visit
-    WHERE 
+    WHERE
         rw_asc =1
 ),
 
 last_visit AS (
     SELECT *
-    FROM 
+    FROM
         visit
-    WHERE 
+    WHERE
         rw_desc =1
 ),
 
@@ -134,7 +134,7 @@ visit_statistics AS (
         COUNT(DISTINCT
             CASE
                 WHEN UPPER(user_sale_booking_creator) = 'SECRETARIA'
-                AND ts_visit_completed IS NOT NULL 
+                AND ts_visit_completed IS NOT NULL
                     THEN id_booking
             END
         ) AS total_visits_completed_by_secretariat,
@@ -145,7 +145,7 @@ visit_statistics AS (
         ) AS total_visits_completed
     FROM
         visit
-    GROUP BY 
+    GROUP BY
         id_user
 ),
 
@@ -165,43 +165,43 @@ offers AS (
         ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.ts_offer_submitted DESC NULLS LAST) AS rw_offer_desc,
         ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.dt_sale_agreement_signed NULLS LAST) AS rw_ccv_asc,
         ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.dt_sale_agreement_signed DESC NULLS LAST) AS rw_ccv_desc
-    FROM 
+    FROM
         all_users AS u
-    JOIN 
+    JOIN
         datalake_offer.sale_offer AS sf
           ON sf.id_buyer = u.id_user
 ),
 
 first_offer AS (
     SELECT *
-    FROM 
+    FROM
         offers
-    WHERE 
+    WHERE
         rw_offer_asc =1
 ),
 
 last_offer AS (
     SELECT *
-    FROM 
+    FROM
         offers
-    WHERE 
+    WHERE
         rw_offer_desc =1
-), 
+),
 
 first_ccv AS (
     SELECT *
-    FROM 
+    FROM
         offers
-    WHERE 
+    WHERE
         rw_ccv_asc = 1
         AND dt_sale_agreement_signed IS NOT NULL
 ),
 
 last_ccv AS (
     SELECT *
-    FROM 
+    FROM
         offers
-    WHERE 
+    WHERE
         rw_ccv_desc = 1
         AND dt_sale_agreement_signed IS NOT NULL
 ),
@@ -221,7 +221,7 @@ offers_statistics AS (
         ) AS total_sale_agreement_signed
     FROM
         offers
-    GROUP BY 
+    GROUP BY
         id_user
 ),
 
@@ -231,8 +231,8 @@ sale_talk_to_agent AS (
         evt.id_user,
         MIN(CAST(evt.ts_event AS TIMESTAMP)) AS ts_first_tta_message_sent,
         MAX(CAST(evt.ts_event AS TIMESTAMP)) AS ts_last_tta_message_sent
-    FROM 
-        datalake_amplitude_talk_to_agent.talk_to_agent_events AS evt
+    FROM
+        datalake_talk_to_agent.talk_to_agent_events AS evt
     JOIN
         datalake_ebdb_listing.listing_business_context AS lbc
             ON evt.id_house = lbc.id_house
@@ -281,10 +281,10 @@ visit_intent AS (
         h.id_region,
         bur.business_unit,
         ROW_NUMBER() OVER (PARTITION BY e.id_user ORDER BY e.ts_visit_intent) AS rw_asc,
-        ROW_NUMBER() OVER (PARTITION BY e.id_user ORDER BY e.ts_visit_intent DESC) AS rw_desc 
-    FROM 
+        ROW_NUMBER() OVER (PARTITION BY e.id_user ORDER BY e.ts_visit_intent DESC) AS rw_desc
+    FROM
         datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent AS e
-    LEFT JOIN 
+    LEFT JOIN
         datalake_ebdb_clean.house AS h
             ON e.id_house = h.id
     LEFT JOIN
@@ -292,29 +292,29 @@ visit_intent AS (
             ON h.id_region = bur.id_region
 ),
 
-first_visit_intent AS (  
+first_visit_intent AS (
     SELECT
         id_user,
         id_house,
         id_region AS id_region_visit_intent,
         business_unit,
         ts_visit_intent AS ts_first_visit_scheduling_event
-    FROM 
+    FROM
         visit_intent
-    WHERE 
+    WHERE
         rw_asc = 1
 ),
 
-last_visit_intent AS (  
+last_visit_intent AS (
     SELECT
         id_user,
         id_house,
         id_region AS id_region_visit_intent,
         business_unit,
         ts_visit_intent AS ts_last_visit_scheduling_event
-    FROM 
+    FROM
         visit_intent
-    WHERE 
+    WHERE
         rw_desc = 1
 ),
 
@@ -376,7 +376,7 @@ flag_tenant_prospect AS (
     GROUP BY 1
 )
 
-SELECT 
+SELECT
     u.id_user,
     fb.id_region AS id_region_first_booking,
     lb.id_region AS id_region_last_booking,
@@ -461,7 +461,7 @@ SELECT
         ELSE
             'not_mapped'
     END AS further_funnel_step,
-    CASE 
+    CASE
         WHEN fb.ts_booking_created IS NOT NULL THEN TRUE
         ELSE FALSE
     END AS has_first_booking,
@@ -493,10 +493,10 @@ SELECT
     fe.ts_first_event AS ts_first_event
 FROM
     all_users AS u
-LEFT JOIN 
+LEFT JOIN
     first_booking AS fb
         ON fb.id_user = u.id_user
-LEFT JOIN 
+LEFT JOIN
     last_booking AS lb
         ON lb.id_user = u.id_user
 LEFT JOIN
@@ -535,13 +535,13 @@ LEFT JOIN
 LEFT JOIN
     sale_flow AS sf
         ON sf.id_buyer = u.id_user
-LEFT JOIN 
+LEFT JOIN
     first_event AS fe
         ON fe.id_buyer = u.id_user
-LEFT JOIN 
+LEFT JOIN
     first_visit_intent AS fvi
         ON fvi.id_user = u.id_user
-LEFT JOIN 
+LEFT JOIN
     last_visit_intent AS lvi
         ON lvi.id_user = u.id_user
 LEFT JOIN

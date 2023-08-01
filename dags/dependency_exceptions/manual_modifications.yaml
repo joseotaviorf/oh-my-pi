@@ -217,9 +217,6 @@ bietlejuice.dw_revenue_lines:
 bietlejuice.dw_sale_events:
   add:
     - bietlejuice.dw_rede_company:load-dw-rede-dim-company
-bietlejuice.dw_sale_flows:
-  remove:
-    - bietlejuice.enrich_talk_to_agent:load-enrich-talk-to-agent-events
 bietlejuice.dw_sale_listings:
   add:
     - bietlejuice.ebdb:load-clean-house
@@ -278,8 +275,6 @@ bietlejuice.enrich_amplitude_sale_visit_intent:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.amplitude:load-clean-events
-bietlejuice.enrich_talk_to_agent:
-  override: []
 bietlejuice.enrich_app_installed:
   add:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -611,7 +606,6 @@ bietlejuice.enrich_sale_flows:
     - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status
   remove:
     - bietlejuice.ebdb:load-clean-house
-    - bietlejuice.enrich_talk_to_agent:load-enrich-talk-to-agent-events
     - bietlejuice.enrich_booking:load-enrich-booking
 bietlejuice.enrich_sale_lead_flows:
   add:
@@ -619,7 +613,6 @@ bietlejuice.enrich_sale_lead_flows:
     - bietlejuice.hub_services:load-clean-business-unit
   remove:
     - bietlejuice.casa_mineira_crm:load-clean-neighborhood
-    - bietlejuice.enrich_talk_to_agent:load-enrich-talk-to-agent-events
     - bietlejuice.enrich_booking:load-enrich-booking
     - bietlejuice.enrich_ebdb_contract:load-enrich-contract
 bietlejuice.enrich_sale_listings:
@@ -684,6 +677,8 @@ bietlejuice.enrich_supply_outbound_flows:
 bietlejuice.enrich_survicate:
   remove:
     - bietlejuice.ebdb:load-clean-contract
+bietlejuice.enrich_talk_to_agent:
+  override: []
 bietlejuice.enrich_top_of_funnel_demand:
   add:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean

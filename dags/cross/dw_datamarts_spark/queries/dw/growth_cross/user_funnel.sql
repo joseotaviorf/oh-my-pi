@@ -4,13 +4,13 @@ events_agent AS (
         CAST(tta.tenant_id AS INT) AS sk_client,
         fhl.sk_region,
         CAST(DATE_FORMAT(CAST(first_message_ts AS TIMESTAMP), 'yyyyMMdd') AS INT) AS sk_talk_to_agent_date
-    FROM dw_datamarts.talk_to_agent AS tta
+    FROM datalake_talk_to_agent.talk_to_agent AS tta
         JOIN dw_public.fact_house_listings AS fhl
           ON tta.sk_house_listing = fhl.sk_house_listing
     WHERE
         tta.business_context = 'RENT'
         AND tta.first_message_ts IS NOT NULL
-), 
+),
 events_user AS (
     SELECT DISTINCT
         COALESCE(rf.sk_client, ta.sk_client) AS sk_client,
@@ -39,7 +39,7 @@ events_user AS (
     FULL OUTER JOIN events_agent AS ta
     ON rf.sk_client = ta.sk_client AND rf.sk_region = ta.sk_region
     LEFT JOIN dw_public.dim_region dr
-    ON COALESCE(rf.sk_region, ta.sk_region) = dr.sk_region      
+    ON COALESCE(rf.sk_region, ta.sk_region) = dr.sk_region
 ),
 aux_grouped_events_user AS (
     SELECT
@@ -68,7 +68,7 @@ aux_grouped_events_user AS (
         COUNT(DISTINCT CASE WHEN sk_contract_signed_date > 0 THEN sk_contract END) AS contracts_signed
     FROM
         events_user
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17          
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 ),
 grouped_events_user AS (
     SELECT
@@ -81,7 +81,7 @@ grouped_events_user AS (
         SUM(contracts_signed) AS contracts_signed
     FROM
         aux_grouped_events_user
-    GROUP BY 1            
+    GROUP BY 1
 ),
 ordered_events_user AS (
     SELECT
@@ -106,11 +106,11 @@ ordered_events_user AS (
         reservations_created,
         contracts_signed
     FROM
-        events_user AS eu 
+        events_user AS eu
     LEFT JOIN
         grouped_events_user AS ge
     ON
-        eu.sk_client = ge.sk_client_grouped                       
+        eu.sk_client = ge.sk_client_grouped
 ),
 events_user_metrics AS (
     SELECT DISTINCT
@@ -152,7 +152,7 @@ events_user_metrics AS (
         offers_approved,
         reservations_created,
         contracts_signed
-    FROM 
+    FROM
         ordered_events_user
 ),
 first_date_user AS (
@@ -180,7 +180,7 @@ first_date_user AS (
         MIN(CASE WHEN order_contract_created = 1 THEN sk_contract_created_date END) AS first_contract_created_date,
         MIN(CASE WHEN order_contract_signed = 1 THEN sk_contract_signed_date END) AS first_contract_signed_date,
         MIN(CASE WHEN order_talk_to_agent = 1 THEN sk_talk_to_agent_date END) AS first_talk_to_agent_date
-    FROM 
+    FROM
         events_user_metrics
     GROUP BY 1, 2, 3, 4, 5, 6, 7
 ),
@@ -194,7 +194,7 @@ users_funnel AS (
         reservations_created,
         contracts_signed,
         COALESCE(COALESCE(NULLIF(first_city_group_booking,-1),nullif(first_city_group_offer,-1), nullif(first_city_group_talk_to_agent,-1)),'-1') as first_city_group,
-        CASE 
+        CASE
             WHEN NULLIF(first_booking_created_date,-1) IS NULL AND NULLIF(first_talk_to_agent_date,-1) IS NULL AND NULLIF(first_offer_submitted_date,-1) IS NOT NULL then 'Offer'
             WHEN NULLIF(first_booking_created_date,-1) IS NOT NULL AND NULLIF(first_talk_to_agent_date,-1) IS NULL AND NULLIF(first_offer_submitted_date,-1) IS NULL THEN 'Booking'
             WHEN NULLIF(first_booking_created_date,-1) IS NULL AND NULLIF(first_talk_to_agent_date,-1) IS NOT NULL AND NULLIF(first_offer_submitted_date,-1) IS NULL THEN 'Talk to Agent'
@@ -215,7 +215,7 @@ users_funnel AS (
         TO_DATE(nullif(first_contract_created_date,'-1')::STRING,"yyyyMMdd") AS first_contract_created_date,
         TO_DATE(nullif(first_contract_signed_date,'-1')::STRING,"yyyyMMdd") AS first_contract_signed_date,
         TO_DATE(nullif(first_talk_to_agent_date,'-1')::STRING,"yyyyMMdd") AS first_talk_to_agent_date
-    FROM 
+    FROM
         first_date_user
 )
 SELECT

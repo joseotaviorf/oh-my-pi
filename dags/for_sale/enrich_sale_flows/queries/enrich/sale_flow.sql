@@ -28,7 +28,7 @@ sale_talk_to_agent AS (
         MIN(CAST(evt.ts_event AS TIMESTAMP)) AS ts_first_tta_message_sent,
         COUNT(evt.ts_event) AS nbr_tta_messages
     FROM
-        datalake_amplitude_talk_to_agent.talk_to_agent_events AS evt
+        datalake_talk_to_agent.talk_to_agent_events AS evt
     JOIN
         datalake_ebdb_listing.listing_business_context AS lbc
             ON evt.id_house = lbc.id_house

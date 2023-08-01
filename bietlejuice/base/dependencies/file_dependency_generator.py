@@ -201,11 +201,11 @@ class FileDependencyGenerator(DependencyGenerator):
             for dag_name, dag in self.unstandard_dags.items()
             if dag.get("is_static")
         ]
-        dependencies = self._remove_cyclic_dependencies(dependencies)
         dependencies = self._remove_static_dependencies_in_non_static_dags(
             dependencies, static_dags
         )
         logger.info(
             "m=treat_exceptions, msg=dependencies exceptions successfully treated."
         )
+        dependencies = self._remove_cyclic_dependencies(dependencies)
         return dependencies

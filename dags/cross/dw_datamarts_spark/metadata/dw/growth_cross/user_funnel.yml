@@ -5,7 +5,7 @@ columns:
   id_user:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_client
-      - dw_datamarts.talk_to_agent.tenant_id
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
   first_city_group:
     lineage:
       - dw_public.dim_region.city_group
@@ -48,4 +48,4 @@ columns:
       - dw_public.fact_listing_rent_flows.sk_contract_signed_date
   first_talk_to_agent_date:
     lineage:
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts

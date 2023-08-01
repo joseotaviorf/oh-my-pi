@@ -73,7 +73,7 @@ WITH events AS (
         tta.first_message_ts::timestamp AS ts_event,
         'Talk to Agent' AS flow_event
     FROM
-        dw_datamarts.talk_to_agent AS tta
+        datalake_talk_to_agent.talk_to_agent AS tta
         JOIN dw_public.fact_house_listings AS fhl
             ON CAST(tta.sk_house_listing AS BIGINT) = CAST(fhl.sk_house_listing AS BIGINT)
     WHERE

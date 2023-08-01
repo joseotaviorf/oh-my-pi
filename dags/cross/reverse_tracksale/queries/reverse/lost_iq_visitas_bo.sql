@@ -66,7 +66,7 @@ distinct_talk_to_agent AS (
         CONCAT(CONCAT(house_id, tenant_id), agent_id) AS sk_tta,
         sk_date AS sk_first_message
     FROM
-        dw_datamarts.talk_to_agent AS tta
+        datalake_talk_to_agent.talk_to_agent AS tta
     INNER JOIN
         dw_public.dim_date AS dd
             ON dd.date = DATE(tta.first_message_ts)

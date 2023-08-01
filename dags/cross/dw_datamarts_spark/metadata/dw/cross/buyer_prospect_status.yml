@@ -4,7 +4,7 @@ table_name: buyer_prospect_status
 columns:
   sk_buyer:
     lineage:
-      - dw_datamarts.talk_to_agent.tenant_id
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
       - dw_sale.fact_offers.sk_buyer
       - dw_sale.fact_sale_flows.sk_buyer
   city_group:
@@ -12,31 +12,31 @@ columns:
       - dw_public.dim_region.city_group
   ts_start:
     lineage:
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
       - dw_public.dim_booking.dt_created
       - dw_sale.dim_offer.ts_offer_submitted
       - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
   ts_end:
     lineage:
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
       - dw_public.dim_booking.dt_created
       - dw_sale.dim_offer.ts_offer_submitted
       - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
   sk_start_date:
     lineage:
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
       - dw_public.dim_booking.dt_created
       - dw_sale.dim_offer.ts_offer_submitted
       - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
   sk_end_date:
     lineage:
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
       - dw_public.dim_booking.dt_created
       - dw_sale.dim_offer.ts_offer_submitted
       - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
   ts_first_activation:
     lineage:
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
       - dw_public.dim_booking.dt_created
       - dw_sale.dim_offer.ts_offer_submitted
       - dw_sale.dim_sale_agreement.ts_sale_agreement_signed

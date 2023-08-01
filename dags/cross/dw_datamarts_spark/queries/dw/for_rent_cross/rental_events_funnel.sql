@@ -431,7 +431,7 @@ messages_sent AS (
   FROM
     dw_public.dim_date AS dd
   JOIN
-    dw_datamarts.talk_to_agent AS tta
+    datalake_talk_to_agent.talk_to_agent AS tta
       ON DATE(tta.first_message_ts) = dd.date
   JOIN
     dw_public.dim_house_listing AS dhl
@@ -490,7 +490,7 @@ agent_supports AS (
   FROM
     dw_public.dim_date AS dd
   JOIN
-    dw_datamarts.talk_to_agent AS tta
+    datalake_talk_to_agent.talk_to_agent AS tta
       ON DATE(tta.first_attendance_ts) = dd.date
   JOIN
     dw_public.fact_listing_rent_flows AS rf

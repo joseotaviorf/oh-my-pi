@@ -65,7 +65,7 @@ talk_to_agent AS (
         a.utm_campaign,
         a.first_message_ts::timestamp AS ts_event
     FROM
-        dw_datamarts.talk_to_agent AS a
+        datalake_talk_to_agent.talk_to_agent AS a
         JOIN dw_public.fact_house_listings AS fhl
             ON a.sk_house_listing = fhl.sk_house_listing
     WHERE

@@ -119,7 +119,7 @@ events AS (
         a.first_message_ts::timestamp AS ts_event,
         'Talk to Agent' AS flow_event
     FROM
-        dw_datamarts.talk_to_agent AS a
+        datalake_talk_to_agent.talk_to_agent AS a
         JOIN dim_house AS dh
             ON a.house_id = dh.sk_house
         JOIN dw_sale.fact_sale_flows AS fsf

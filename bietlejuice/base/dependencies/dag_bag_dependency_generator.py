@@ -78,11 +78,11 @@ class DagBagDependencyGenerator(DependencyGenerator):
         """
         logger.info("m=treat_exceptions, msg=treating dependencies exceptions")
         static_dags = self.dag_bag_service.find_all_static_dags(dependencies)
-        dependencies = self._remove_cyclic_dependencies(dependencies)
         dependencies = self._remove_static_dependencies_in_non_static_dags(
             dependencies, static_dags
         )
         logger.info(
             "m=treat_exceptions, msg=dependencies exceptions successfully treated."
         )
+        dependencies = self._remove_cyclic_dependencies(dependencies)
         return dependencies

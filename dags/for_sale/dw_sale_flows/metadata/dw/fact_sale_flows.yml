@@ -285,7 +285,7 @@ columns:
   app_type:
     lineage:
     - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
-    - datalake_amplitude_talk_to_agent.talk_to_agent_events.utm_campaign
+    - datalake_talk_to_agent.talk_to_agent_events.utm_campaign
     - datalake_amplitude_visit.amplitude_visit.utm_campaign
     - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
     description: Amplitude's app type
@@ -298,14 +298,14 @@ columns:
   utm_source:
     lineage:
     - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
-    - datalake_amplitude_talk_to_agent.talk_to_agent_events.utm_campaign
+    - datalake_talk_to_agent.talk_to_agent_events.utm_campaign
     - datalake_amplitude_visit.amplitude_visit.utm_campaign
     - datalake_tracked_events.attribution_cross_channel.final_attribution_source
     description: UTM used to track the advertising source
   utm_medium:
     lineage:
     - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
-    - datalake_amplitude_talk_to_agent.talk_to_agent_events.utm_campaign
+    - datalake_talk_to_agent.talk_to_agent_events.utm_campaign
     - datalake_amplitude_visit.amplitude_visit.utm_campaign
     - datalake_tracked_events.attribution_cross_channel.final_attribution_medium
     description: UTM used to track the advertising medium
@@ -341,14 +341,14 @@ columns:
   utm_campaign:
     lineage:
     - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
-    - datalake_amplitude_talk_to_agent.talk_to_agent_events.utm_campaign
+    - datalake_talk_to_agent.talk_to_agent_events.utm_campaign
     - datalake_amplitude_visit.amplitude_visit.utm_campaign
     - datalake_tracked_events.attribution_cross_channel.final_attribution_campaign
     description: UTM used to identify the campaign in the media
   is_branded:
     lineage:
     - datalake_amplitude_offer.sale_offer_raw_events.branded
-    - datalake_amplitude_talk_to_agent.talk_to_agent_events.branded
+    - datalake_talk_to_agent.talk_to_agent_events.branded
     - datalake_amplitude_visit.amplitude_visit.branded
     - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
     description: If the sale flow came from a branded campaign as defined by the lead

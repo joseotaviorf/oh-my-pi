@@ -15,7 +15,7 @@ columns:
     lineage:
       - dw_public.dim_booking.dt_created
       - dw_public.dim_offer.dt_first_sent
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
   dt_first_direct_offer:
     lineage:
       - dw_public.dim_offer.dt_first_sent
@@ -24,7 +24,7 @@ columns:
       - dw_public.dim_offer.dt_first_sent
   dt_first_tta:
     lineage:
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
   dt_first_visit_booked:
     lineage:
       - dw_public.dim_booking.dt_created

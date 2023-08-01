@@ -44,27 +44,27 @@ events_taxonomy AS (
 -- UTM's from booking events
   SELECT
     CONCAT(b.id_visitor, '_', b.id_house) AS id_sale_flow,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_source
       ELSE av.utm_source
     END AS utm_source,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_medium
       ELSE av.utm_medium
     END AS utm_medium,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_campaign
       ELSE av.utm_campaign
     END AS utm_campaign,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_branded
       ELSE av.branded
     END AS branded,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_app_type
       ELSE av.app_type
     END AS app_type,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_origin
       ELSE 'old_attribution'
     END AS final_attribution_origin,
@@ -87,27 +87,27 @@ events_taxonomy AS (
 -- UTM's from offer events
   SELECT
     CONCAT(so.id_user, '_', so.id_house) AS id_sale_flow,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_source
       ELSE so.utm_source
     END AS utm_source,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_medium
       ELSE so.utm_medium
     END AS utm_medium,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_campaign
       ELSE so.utm_campaign
     END AS utm_campaign,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_branded
       ELSE so.branded
     END AS branded,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_app_type
       ELSE so.app_type
     END AS app_type,
-    CASE 
+    CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_origin
       ELSE 'old_attribution'
     END AS final_attribution_origin,
@@ -131,7 +131,7 @@ events_taxonomy AS (
     'old_attribution' AS final_attribution_origin,
     CAST(ts_event AS TIMESTAMP) AS ts_event
   FROM
-    datalake_amplitude_talk_to_agent.talk_to_agent_events AS tta
+    datalake_talk_to_agent.talk_to_agent_events AS tta
   JOIN
     datalake_ebdb_listing.listing_business_context AS lbc
       ON tta.id_house = lbc.id_house
@@ -243,5 +243,5 @@ LEFT JOIN
     AND tx.rn_sale_flow = 1
 -- This filter was needed because the datalake_gsheets.sale_hub_offer table has no information about id_sale_flow.
 -- TODO: The idea is to transform the datalake_gsheets.sale_hub_offer into a static table in the future to fill in this information and remove this filter.
-WHERE 
+WHERE
   sf.id_sale_flow IS NOT NULL

@@ -12,6 +12,8 @@ metadata_files_out_of_pattern:
   - support_and_service/dw_chattermill/metadata/dw/fact_answer_category.yml
   - support_and_service/enrich_chattermill/metadata/enrich/responses.yml
   - for_sale/dw_sale_events/metadata/dw/dim_sale_event_type.yml
+  - for_sale/enrich_sale_flows/metadata/enrich/sale_flow.yml
+  - for_sale/enrich_sale_lead_flows/metadata/enrich/quintoandar_lead_flow.yml
   - fintech/velo_omie/metadata/clean/country.yml
   - support_and_service/enrich_offboarding/metadata/enrich/contract_termination.yml
   - support_and_service/enrich_offboarding/metadata/enrich/ongoing.yml
@@ -34,12 +36,14 @@ metadata_files_out_of_pattern:
   - cross/dw_datamarts_spark/metadata/dw/growth_cross/performance_marketing_metrics_demand.yml
   - cross/dw_datamarts_spark/metadata/dw/growth_cross/plaquinhas_users_metrics_demand.yml
   - cross/dw_datamarts_spark/metadata/dw/growth_cross/pricing_rent_categorization.yml
+  - cross/dw_datamarts_spark/metadata/dw/growth_cross/rent_flow_interactions.yml
   - cross/dw_datamarts_spark/metadata/dw/growth_cross/rental_cohort_conversions.yml
   - cross/dw_datamarts_spark/metadata/dw/growth_cross/rental_marketplace_flows.yml
   - cross/dw_datamarts_spark/metadata/dw/growth_cross/rental_performance_marketing_metrics_supply_coincident.yml
   - cross/dw_datamarts_spark/metadata/dw/growth_cross/tenant_prospect_status.yml
   - cross/dw_datamarts_spark/metadata/dw/growth_cross/unique_supply_cohort_conversions.yml
   - cross/dw_datamarts_spark/metadata/dw/growth_cross/unique_supply_events_funnel.yml
+  - cross/dw_datamarts_spark/metadata/dw/growth_cross/user_funnel.yml
 queries_without_metadata_files:
   - for_rent/regions_polygon/queries/enrich_for_looker/regions_polygon.sql
   - for_rent/property_tax/queries/raw/tax_report.sql

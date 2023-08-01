@@ -10,14 +10,14 @@ columns:
     lineage:
       - dw_public.dim_booking.dt_created
       - dw_sale.dim_offer.ts_offer_submitted
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
       - dw_datamarts.buyer_prospect_status.ts_start
   ts_event:
     description: Timestamp of the flow event or status available
     lineage:
       - dw_public.dim_booking.dt_created
       - dw_sale.dim_offer.ts_offer_submitted
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
       - datalake_gsheets_clean.mkt_cost_per_source.dt_event
       - datalake_gsheets_clean.sale_nbp_source_targets.dt_target
       - datalake_gsheets_clean.sale_flows_targets.date
@@ -68,13 +68,13 @@ columns:
     description: Level of the Growth Marketing Taxonomy
     lineage:
       - dw_sale.dim_offer.mkt_origin
-      - dw_datamarts.talk_to_agent.mkt_origin
+      - datalake_talk_to_agent.talk_to_agent.mkt_origin
   mkt_channel:
     description: Level of the Growth Marketing Taxonomy
     lineage:
       - dw_public.dim_booking.mkt_channel
       - dw_sale.dim_offer.mkt_channel
-      - dw_datamarts.talk_to_agent.mkt_channel
+      - datalake_talk_to_agent.talk_to_agent.mkt_channel
       - datalake_gsheets_clean.mkt_cost_per_source.mkt_channel
       - datalake_gsheets_clean.sale_nbp_source_targets.mkt_channel
       - datalake_marketing_costs.daily_costs.mkt_channel
@@ -83,7 +83,7 @@ columns:
     lineage:
       - dw_public.dim_booking.mkt_medium
       - dw_sale.dim_offer.mkt_medium
-      - dw_datamarts.talk_to_agent.mkt_medium
+      - datalake_talk_to_agent.talk_to_agent.mkt_medium
       - datalake_gsheets_clean.mkt_cost_per_source.mkt_medium
       - datalake_gsheets_clean.sale_nbp_source_targets.mkt_medium
       - datalake_marketing_costs.daily_costs.mkt_medium
@@ -92,7 +92,7 @@ columns:
     lineage:
       - dw_public.dim_booking.mkt_source
       - dw_sale.dim_offer.mkt_source
-      - dw_datamarts.talk_to_agent.mkt_source
+      - datalake_talk_to_agent.talk_to_agent.mkt_source
       - datalake_gsheets_clean.mkt_cost_per_source.mkt_source
       - datalake_gsheets_clean.sale_nbp_source_targets.mkt_source
       - datalake_marketing_costs.daily_costs.mkt_source
@@ -101,51 +101,51 @@ columns:
     lineage:
       - dw_public.dim_booking.utm_medium
       - dw_sale.dim_offer.utm_medium
-      - dw_datamarts.talk_to_agent.utm_medium
+      - datalake_talk_to_agent.talk_to_agent.utm_medium
   utm_source:
     description: Returns utm_source parameter defined at campaing configuration at marketing platforms
     lineage:
       - dw_public.dim_booking.utm_source
       - dw_sale.dim_offer.utm_source
-      - dw_datamarts.talk_to_agent.utm_source
+      - datalake_talk_to_agent.talk_to_agent.utm_source
   campaign_name:
     description: Returns the name of the campaign setted at the marketing plataform
     lineage:
       - dw_public.dim_booking.utm_campaign
       - dw_sale.dim_offer.utm_campaign
-      - dw_datamarts.talk_to_agent.utm_campaign
+      - datalake_talk_to_agent.talk_to_agent.utm_campaign
       - datalake_marketing_costs.daily_costs.campaign_name
   utm_campaign:
     description: Returns utm_campaign parameter defined at campaing configuration at marketing platforms
     lineage:
       - dw_public.dim_booking.utm_campaign
       - dw_sale.dim_offer.utm_campaign
-      - dw_datamarts.talk_to_agent.utm_campaign
+      - datalake_talk_to_agent.talk_to_agent.utm_campaign
       - datalake_marketing_costs.daily_costs.utm_campaign
   utm_term:
     description: Returns the utm_term parameter defined at campaing configuration at marketing platforms
     lineage:
       - dw_public.dim_booking.utm_term
-      - dw_datamarts.talk_to_agent.utm_term
+      - datalake_talk_to_agent.talk_to_agent.utm_term
       - datalake_marketing_costs.daily_costs.utm_term
   utm_content:
     description: Returns the utm_content parameter defined at campaing configuration at marketing platforms
     lineage:
       - dw_public.dim_booking.utm_content
-      - dw_datamarts.talk_to_agent.utm_content
+      - datalake_talk_to_agent.talk_to_agent.utm_content
       - datalake_marketing_costs.daily_costs.utm_content
   sk_sale_flow:
     description: Sale flow id
     lineage:
       - dw_sale.fact_sale_flows.sk_sale_flow
-      - dw_datamarts.talk_to_agent.tenant_id
-      - dw_datamarts.talk_to_agent.house_id
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
+      - datalake_talk_to_agent.talk_to_agent.house_id
   sk_buyer:
     description: Client/user id
     lineage:
       - dw_datamarts.buyer_prospect_status.sk_buyer
       - dw_sale.fact_sale_flows.sk_buyer
-      - dw_datamarts.talk_to_agent.tenant_id
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
   sk_house:
     description: Id of the house associated with the flow
     lineage:
@@ -183,17 +183,17 @@ columns:
     description: Sale flow ordered by ascending date by unique sk_buyer and sk_house
     lineage:
       - dw_sale.fact_sale_flows.sk_sale_flow
-      - dw_datamarts.talk_to_agent.tenant_id
-      - dw_datamarts.talk_to_agent.house_id
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
+      - datalake_talk_to_agent.talk_to_agent.house_id
       - dw_public.dim_booking.dt_created
       - dw_sale.dim_offer.ts_offer_submitted
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
   buyer_prospect_order:
     description: Buyer prospect ordered by ascending date by unique sk_buyer
     lineage:
       - dw_datamarts.buyer_prospect_status.sk_buyer
       - dw_sale.fact_sale_flows.sk_buyer
-      - dw_datamarts.talk_to_agent.tenant_id
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
       - dw_public.dim_booking.dt_created
       - dw_sale.dim_offer.ts_offer_submitted
-      - dw_datamarts.talk_to_agent.first_message_ts
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
