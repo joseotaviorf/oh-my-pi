@@ -382,12 +382,9 @@ bietlejuice.enrich_customer_resolution:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
 bietlejuice.enrich_customer_support:
   add:
-    - bietlejuice.enrich_bigfone_events:load-enrich-events-bigfone-teravoz
     - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
     - bietlejuice.enrich_quinto_messenger:load-enrich-channel-event
-    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   remove:
-    - bietlejuice.enrich_quinto_messenger:load-enrich-chat
     - bietlejuice.quinto_messenger:load-clean-task
     - bietlejuice.quinto_messenger:load-clean-task-event
     - bietlejuice.sauron:load-clean-bot-outgoing-messages
@@ -549,7 +546,7 @@ bietlejuice.enrich_online_attribution:
     - bietlejuice.amplitude:load-clean-170698-user-merge
     - bietlejuice.amplitude:load-clean-events
 bietlejuice.enrich_open_external_data:
-  # We need to remove these dependencies because our ITBI extraction routines run on the 15th and 30th of the month. 
+  # We need to remove these dependencies because our ITBI extraction routines run on the 15th and 30th of the month.
   # Therefore, if we keep these dependencies, this DAG would not update with the data from the other tables used.
   remove:
     - bietlejuice.itbi:load-clean-itbi-bh
@@ -560,9 +557,6 @@ bietlejuice.enrich_pdd_payments:
     - bietlejuice.retsuko:load-clean-account
 bietlejuice.enrich_proponent:
   override: []
-bietlejuice.enrich_quinto_messenger:
-  remove:
-    - bietlejuice.quinto_messenger:load-clean-chat
 bietlejuice.enrich_recommendations:
   add:
     - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:create-house-amenities
@@ -767,7 +761,7 @@ bietlejuice.metric_fintech__atta:
     - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
 bietlejuice.metric_rent_benvi__demand:
   remove:
-    - bietlejuice.enrich_mexico_marketing_manual_daily_costs:load-enrich-daily-costs  # dependency not added due to be running later, should not be a block of the pipeline
+    - bietlejuice.enrich_mexico_marketing_manual_daily_costs:load-enrich-daily-costs # dependency not added due to be running later, should not be a block of the pipeline
 bietlejuice.reverse_app_installed:
   add:
     - bietlejuice.enrich_app_installed:load-enrich-events
