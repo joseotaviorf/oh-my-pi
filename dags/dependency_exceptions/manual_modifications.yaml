@@ -8,14 +8,6 @@ bietlejuice.convenia_inactive_employee_salary_history:
 bietlejuice.dw_agent_contract:
   add:
     - bietlejuice.dw_rede_company:load-dw-rede-dim-company
-bietlejuice.dw_atta:
-  add:
-    - bietlejuice.risk_and_mortgage:load-clean-offer-pre-analysis
-  remove:
-    - bietlejuice.dw_user:load-dw-public-dim-user
-    - bietlejuice.enrich_atta:load-enrich-proposal-situation-changes
-    - bietlejuice.sales_flow:load-clean-negotiation
-    - bietlejuice.sales_flow:load-clean-offer
 bietlejuice.dw_braze_events_user_dispatch:
   remove:
     - bietlejuice.braze_details:load-clean-canvas-details-indica-ai
@@ -196,9 +188,6 @@ bietlejuice.dw_date:
     - bietlejuice.enrich_public_date:load-enrich-aux-date
 bietlejuice.dw_fact_conversion_metrics:
   override: []
-bietlejuice.dw_invoice_entries:
-  remove:
-    - bietlejuice.enrich_retsuko:load-enrich-invoice
 bietlejuice.dw_listing_jobs:
   remove:
     - bietlejuice.ebdb:load-clean-booking
@@ -242,21 +231,6 @@ bietlejuice.dw_tickets:
 bietlejuice.dw_user_affiliate:
   remove:
     - bietlejuice.ebdb:load-clean-partner-agent
-bietlejuice.dw_velo:
-  remove:
-    - bietlejuice.enrich_velo:load-enrich-occurrence
-    - bietlejuice.enrich_velo:load-enrich-omie-bank-account
-    - bietlejuice.enrich_velo:load-enrich-omie-client
-    - bietlejuice.enrich_velo:load-enrich-payment
-    - bietlejuice.rental_guarantee_platform:load-clean-propose-person
-bietlejuice.enrich_accounting_funnel:
-  remove:
-    - bietlejuice.dw_contract:load-dw-public-dim-contract
-    - bietlejuice.dw_listing:load-dw-public-fact-house-listings
-    - bietlejuice.vans:load-clean-bank
-    - bietlejuice.vans:load-clean-bank-payment
-    - bietlejuice.vans:load-clean-payment
-    - bietlejuice.vans:load-clean-payment-boleto
 bietlejuice.enrich_amplitude_lead:
   remove:
     - bietlejuice.amplitude:load-clean-events
@@ -280,11 +254,6 @@ bietlejuice.enrich_app_installed:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
-bietlejuice.enrich_atta:
-  remove:
-    - bietlejuice.atta:load-clean-partner-info
-    - bietlejuice.atta:load-clean-proposal
-    - bietlejuice.atta:load-clean-track-step-detail
 bietlejuice.enrich_bigid:
   override: []
 bietlejuice.enrich_brand_tracking:
@@ -316,11 +285,6 @@ bietlejuice.enrich_braze_webhook_notification:
     - bietlejuice.braze_details:load-clean-canvas-details-indica-ai
     - bietlejuice.braze_details:load-clean-canvas-details-owners
     - bietlejuice.braze_details:load-clean-canvas-details-tenants
-bietlejuice.enrich_bureaus:
-  add:
-    - bietlejuice.sorting_hat:load-clean-credit-analysis
-  remove:
-    - bietlejuice.sorting_hat:load-clean-screening-result-version
 bietlejuice.enrich_buyer_prospect:
   remove:
     - bietlejuice.ebdb:load-clean-house
@@ -387,9 +351,6 @@ bietlejuice.enrich_customer_support:
     - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
     - bietlejuice.zendesk_tickets:load-clean-tickets
     - bietlejuice.zendesk_tickets:load-clean-users
-bietlejuice.enrich_debt_recovery:
-  add:
-    - bietlejuice.trato_feito:load-clean-debtor
 bietlejuice.enrich_docato:
   add:
     - bietlejuice.gsheets_static:done-clean-legal-base-docato
@@ -419,23 +380,6 @@ bietlejuice.enrich_hubspot:
     - bietlejuice.hubspot:load-clean-meeting
     - bietlejuice.hubspot:load-clean-note
     - bietlejuice.hubspot:load-clean-task
-bietlejuice.enrich_invoice:
-  remove:
-    - bietlejuice.ebdb:load-clean-affiliate-data
-    - bietlejuice.ebdb:load-clean-contract
-    - bietlejuice.ebdb:load-clean-conversion-lead
-    - bietlejuice.ebdb:load-clean-house
-    - bietlejuice.ebdb:load-clean-lead
-    - bietlejuice.ebdb:load-clean-partner-agent
-    - bietlejuice.ebdb:load-clean-rent-flow
-    - bietlejuice.ebdb:load-clean-user
-    - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
-    - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
-    - bietlejuice.enrich_proposal:load-enrich-proposal
-    - bietlejuice.enrich_region:load-enrich-region
-    - bietlejuice.enrich_retsuko:load-enrich-entry
-    - bietlejuice.enrich_retsuko:load-enrich-invoice
-    - bietlejuice.retsuko:load-clean-account
 bietlejuice.enrich_lead:
   remove:
     - bietlejuice.ebdb:load-clean-ownerlead
@@ -510,14 +454,6 @@ bietlejuice.enrich_money_laundering_prevention:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
     - bietlejuice.enrich_offer:load-enrich-sale-offer
     - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
-bietlejuice.enrich_monopoly:
-  add:
-    - bietlejuice.monopoly:load-clean-outcome-status-log
-  remove:
-    - bietlejuice.enrich_offer:load-enrich-sale-offer
-    - bietlejuice.monopoly:load-clean-accounting-entry
-    - bietlejuice.monopoly:load-clean-income-reference
-    - bietlejuice.monopoly:load-clean-sale-transaction
 bietlejuice.enrich_nps_answer_drivers:
   add:
     - bietlejuice.enrich_tracksale:load-enrich-answer
@@ -713,18 +649,6 @@ bietlejuice.enrich_unified_listing_flow:
     - bietlejuice.wololo:load-clean-context-discard
     - bietlejuice.wololo:load-clean-conversion
     - bietlejuice.wololo:load-clean-prospect
-bietlejuice.enrich_velo:
-  remove:
-    - bietlejuice.velo:load-clean-fiancavelo-billingtype
-    - bietlejuice.velo:load-clean-fiancavelo-colaborador
-    - bietlejuice.velo:load-clean-fiancavelo-gateway
-    - bietlejuice.velo:load-clean-fiancavelo-occurrence
-    - bietlejuice.velo:load-clean-fiancavelo-occurrencestatus
-    - bietlejuice.velo:load-clean-fiancavelo-occurrencetype
-    - bietlejuice.velo:load-clean-fiancavelo-paymentstatus
-    - bietlejuice.velo:load-clean-fiancavelo-fianca
-    - bietlejuice.velo:load-clean-fiancavelo-propose
-    - bietlejuice.velo:load-clean-fiancavelo-proposehistory
 bietlejuice.enrich_vespucio:
   add:
     - bietlejuice.ebdb:load-clean-map-region
@@ -740,16 +664,6 @@ bietlejuice.enrich_zendesk_tickets:
     - bietlejuice.zendesk_tickets:load-clean-ticket-metrics
     - bietlejuice.zendesk_tickets:load-clean-tickets
     - bietlejuice.zendesk_tickets:load-clean-users
-bietlejuice.metric_fintech__atta:
-  add:
-    - bietlejuice.dw_atta:load-dw-atta-dim-buyer-atta
-    - bietlejuice.dw_atta:load-dw-atta-dim-client-atta
-    - bietlejuice.dw_atta:load-dw-atta-dim-consultant-atta
-    - bietlejuice.dw_atta:load-dw-atta-dim-franchise-atta
-    - bietlejuice.dw_atta:load-dw-atta-dim-partner-atta
-    - bietlejuice.dw_atta:load-dw-atta-dim-proposal-situation-changes
-  remove:
-    - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
 bietlejuice.metric_rent_benvi__demand:
   remove:
     - bietlejuice.enrich_mexico_marketing_manual_daily_costs:load-enrich-daily-costs # dependency not added due to be running later, should not be a block of the pipeline
@@ -787,10 +701,6 @@ bietlejuice.reverse_listings_report_access:
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-ongoing-listings
 bietlejuice.reverse_navent_bigquery:
   override: []
-bietlejuice.reverse_nazare:
-  remove:
-    - bietlejuice.dw_house:load-dw-quintoandar-dim-house
-    - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
 bietlejuice.reverse_nps_reversion:
   override: []
 bietlejuice.reverse_customer_journey:
