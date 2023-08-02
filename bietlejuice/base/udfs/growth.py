@@ -1,4 +1,5 @@
 import datetime
+import json
 
 
 class VespucioScoreCalculator:
@@ -94,4 +95,4 @@ class VespucioScoreCalculator:
         # return agg_dict
         name_key, score = VespucioScoreCalculator.calculate_score(agg_dict)
 
-        return {"value": name_key, "score": score}
+        return json.dumps({"value": name_key, "score": score}, default=str)
