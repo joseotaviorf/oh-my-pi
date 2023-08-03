@@ -54,6 +54,8 @@ columns:
     description: Extra CCP (credit card payment) net revenue.
   addons_guarantee:
     description: Extra Rental Guarantee revenue. Excluding STANDALONE guarantee type.
+  addons_new_business_revenue:
+    description: Extra Rental Guarantee revenue. Including STANDALONE guarantee type.
   addons_reserve:
     description: Extra reservation revenue comes from kill_queue service.
   agents_commission:

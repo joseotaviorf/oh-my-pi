@@ -169,6 +169,18 @@ rental_guarantee AS (
   GROUP BY 1,3
 ),
 
+new_business AS (
+  SELECT
+    id_contract,
+    SUM(revenue_qa) AS addons_new_business_revenue,
+    accrual_year_month
+  FROM
+    datalake_revenue_lines.rental_guarantee
+  WHERE
+    guarantee_type = 'STANDALONE'
+  GROUP BY 1,3
+),
+
 insurance_commission AS (
   SELECT
     id_contract,
@@ -264,59 +276,64 @@ revenue_with_contract AS (
 ),
 
 revenues_calculation AS (
-SELECT
-  MONOTONICALLY_INCREASING_ID() AS sk_house_listing_revenue,
-  COALESCE(revenue.id_contract, rf.sk_contract, ltra.id_contract_ebdb, -1) AS id_contract,
-  COALESCE(r.id_house_listing, revenue.id_house_listing, hl_contract.id_house_listing) AS id_house_listing,
-  COALESCE(r.id_house, revenue.id_house, hl_contract.id_house) AS id_house,
-  COALESCE(hl.country_code, hl_contract.country_code, 'Undefined') AS country_code,
-  contract_lifetime,
-  COALESCE(rent_value_invoice, 0) AS rent_value_invoice,
-  COALESCE(rental_management, 0) AS rental_management,
-  COALESCE(rental_brokerage, 0) AS rental_brokerage,
-  COALESCE(insurance_commission, 0) AS insurance_commission,
-  COALESCE(addons_service_fee, 0) AS addons_service_fee,
-  COALESCE(addons_mra, 0) AS addons_mra,
-  COALESCE(addons_lra, 0) AS addons_lra,
-  COALESCE(addons_bfi, 0) AS addons_bfi,
-  COALESCE(late_payments, 0) AS late_payments,
-  COALESCE(addons_ccp, 0) AS addons_ccp,
-  COALESCE(addons_reserve, 0) AS addons_reserve,
-  COALESCE(addons_guarantee, 0) AS addons_guarantee,
-  COALESCE(agents_commission, 0) AS agents_commission,
-  COALESCE(affiliates_commission, 0) AS affiliates_commission,
-  COALESCE(partner_share_brokerage, 0) AS partner_share_brokerage,
-  COALESCE(partner_share_management, 0) AS partner_share_management,
-  COALESCE(dd.quarter, revenue.quarter) AS quarter,
-  COALESCE(revenue.accrual_year_month, ltra.due_accrual_year_month, r.created_accrual_year_month) AS accrual_year_month,
-  COALESCE(dd.month_start, revenue.dt_month_start) AS dt_month_start,
-  NOW() AS ts_load
-FROM
-  revenue_with_contract AS revenue
-FULL OUTER JOIN
-  reservation AS r
-    ON revenue.id_house_listing = r.id_house_listing
-    AND revenue.accrual_year_month = r.created_accrual_year_month
-LEFT JOIN
-  dw_public.fact_listing_rent_flows AS rf
-   ON r.id_reservation = rf.sk_reservation
-LEFT JOIN
-  datalake_ebdb_listing.house_listing AS hl
-    ON COALESCE(r.id_house_listing, revenue.id_house_listing) = hl.id_house_listing
-FULL OUTER JOIN
-  long_term_rental_anticipation AS ltra
-    ON revenue.id_contract = ltra.id_contract_ebdb
-    AND revenue.accrual_year_month = ltra.due_accrual_year_month
-LEFT JOIN
-  datalake_ebdb_listing.house_listing AS hl_contract
-    ON ltra.id_contract_ebdb = hl_contract.id_contract
-    AND ltra.dt_due >= DATE(COALESCE(hl_contract.ts_listing_version_start, '1900-01-01 00:00:00'))
-    AND ltra.dt_due < DATE(COALESCE(hl_contract.ts_listing_version_end, NOW()))
-LEFT JOIN
-  dw_public.dim_date AS dd
-    ON TO_DATE(STRING(COALESCE(r.created_accrual_year_month, ltra.due_accrual_year_month)), 'yyyyMM') = dd.date
-WHERE
-  COALESCE(r.created_accrual_year_month, revenue.accrual_year_month, ltra.due_accrual_year_month) <= DATE_FORMAT(CURRENT_TIMESTAMP(), 'yyyyMM')
+  SELECT
+    MONOTONICALLY_INCREASING_ID() AS sk_house_listing_revenue,
+    COALESCE(revenue.id_contract, rf.sk_contract, ltra.id_contract_ebdb, nb.id_contract, -1) AS id_contract,
+    COALESCE(r.id_house_listing, revenue.id_house_listing, hl_contract.id_house_listing) AS id_house_listing,
+    COALESCE(r.id_house, revenue.id_house, hl_contract.id_house) AS id_house,
+    COALESCE(hl.country_code, hl_contract.country_code, 'Undefined') AS country_code,
+    contract_lifetime,
+    COALESCE(rent_value_invoice, 0) AS rent_value_invoice,
+    COALESCE(rental_management, 0) AS rental_management,
+    COALESCE(rental_brokerage, 0) AS rental_brokerage,
+    COALESCE(insurance_commission, 0) AS insurance_commission,
+    COALESCE(addons_service_fee, 0) AS addons_service_fee,
+    COALESCE(addons_mra, 0) AS addons_mra,
+    COALESCE(addons_lra, 0) AS addons_lra,
+    COALESCE(addons_bfi, 0) AS addons_bfi,
+    COALESCE(late_payments, 0) AS late_payments,
+    COALESCE(addons_ccp, 0) AS addons_ccp,
+    COALESCE(addons_reserve, 0) AS addons_reserve,
+    COALESCE(addons_guarantee, 0) AS addons_guarantee,
+    COALESCE(nb.addons_new_business_revenue, 0) AS addons_new_business_revenue,
+    COALESCE(agents_commission, 0) AS agents_commission,
+    COALESCE(affiliates_commission, 0) AS affiliates_commission,
+    COALESCE(partner_share_brokerage, 0) AS partner_share_brokerage,
+    COALESCE(partner_share_management, 0) AS partner_share_management,
+    COALESCE(dd.quarter, revenue.quarter) AS quarter,
+    COALESCE(revenue.accrual_year_month, ltra.due_accrual_year_month, r.created_accrual_year_month, nb.accrual_year_month) AS accrual_year_month,
+    COALESCE(dd.month_start, revenue.dt_month_start) AS dt_month_start,
+    NOW() AS ts_load
+  FROM
+    revenue_with_contract AS revenue
+  FULL OUTER JOIN
+    reservation AS r
+      ON revenue.id_house_listing = r.id_house_listing
+      AND revenue.accrual_year_month = r.created_accrual_year_month
+  LEFT JOIN
+    dw_public.fact_listing_rent_flows AS rf
+    ON r.id_reservation = rf.sk_reservation
+  LEFT JOIN
+    datalake_ebdb_listing.house_listing AS hl
+      ON COALESCE(r.id_house_listing, revenue.id_house_listing) = hl.id_house_listing
+  FULL OUTER JOIN
+    long_term_rental_anticipation AS ltra
+      ON revenue.id_contract = ltra.id_contract_ebdb
+      AND revenue.accrual_year_month = ltra.due_accrual_year_month
+  LEFT JOIN
+    datalake_ebdb_listing.house_listing AS hl_contract
+      ON ltra.id_contract_ebdb = hl_contract.id_contract
+      AND ltra.dt_due >= DATE(COALESCE(hl_contract.ts_listing_version_start, '1900-01-01 00:00:00'))
+      AND ltra.dt_due < DATE(COALESCE(hl_contract.ts_listing_version_end, NOW()))
+  FULL OUTER JOIN
+    new_business AS nb
+      ON revenue.id_contract = nb.id_contract
+      AND revenue.accrual_year_month = nb.accrual_year_month
+  LEFT JOIN
+    dw_public.dim_date AS dd
+      ON TO_DATE(STRING(COALESCE(r.created_accrual_year_month, ltra.due_accrual_year_month, nb.accrual_year_month)), 'yyyyMM') = dd.date
+  WHERE
+    COALESCE(r.created_accrual_year_month, revenue.accrual_year_month, ltra.due_accrual_year_month, nb.accrual_year_month) <= DATE_FORMAT(CURRENT_TIMESTAMP(), 'yyyyMM')
 )
 
 SELECT
@@ -337,17 +354,18 @@ SELECT
   addons_bfi,
   addons_ccp,
   addons_guarantee,
+  addons_new_business_revenue,
   addons_reserve,
   agents_commission,
   affiliates_commission,
   partner_share_brokerage,
   partner_share_management,
   (rental_management + rental_brokerage + insurance_commission) +
-    (addons_service_fee + addons_mra + addons_lra + addons_bfi + late_payments + addons_ccp + addons_reserve + addons_guarantee) +
+    (addons_service_fee + addons_mra + addons_lra + addons_bfi + late_payments + addons_ccp + addons_reserve + addons_guarantee + addons_new_business_revenue) +
     (agents_commission + affiliates_commission + partner_share_brokerage + partner_share_management) AS net_revenue_pre_taxes,
   (rental_management + rental_brokerage + insurance_commission) +
     (addons_service_fee + addons_mra + addons_lra + addons_bfi + late_payments + addons_ccp + addons_reserve) AS gross_revenue,
-  addons_service_fee + addons_mra + addons_lra + addons_bfi + addons_ccp + addons_reserve + addons_guarantee AS addons_revenue_total,
+  addons_service_fee + addons_mra + addons_lra + addons_bfi + addons_ccp + addons_reserve + addons_guarantee + addons_new_business_revenue AS addons_revenue_total,
   agents_commission + affiliates_commission + partner_share_brokerage + partner_share_management AS revenue_share_total,
   quarter,
   accrual_year_month,
