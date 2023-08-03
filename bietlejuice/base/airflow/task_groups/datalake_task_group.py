@@ -115,6 +115,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 }
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            polling_period_seconds=10,
         )
 
         sync_metastore_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -140,6 +141,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 }
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            polling_period_seconds=10,
         )
 
         return [sync_metastore_structure_task, sync_metastore_partitions_task]
