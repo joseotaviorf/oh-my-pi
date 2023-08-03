@@ -88,9 +88,6 @@ dags:
       - spark.driver.cores: 5
     load_to_redshift: True
     custom_schema: datamarts
-  static:
-    owner: Data Engineering
-    cluster_name: databricks_10_4_med_memory_cluster
   support_and_service:
     owner: Data SS
     cluster_name: databricks_10_4_max_io-memory_photon_cluster
