@@ -66,6 +66,14 @@ columns:
       supply: ''
     lineage:
       - datalake_gsheets_raw.marketing_cost_taxonomy.side
+  business_context:
+    description: Business context for the account (sale rent or hybrid)
+    categories: 
+      sale: ''
+      rent: '' 
+      hybrid: ''
+    lineage:
+      - datalake_gsheets_raw.marketing_cost_taxonomy.business_context
   mkt_category:
     description: Level of Growth Taxonomy
     lineage:

@@ -181,8 +181,9 @@ SELECT DISTINCT
 	CASE
 		WHEN validador > 0 THEN r.share
 		ELSE fb.share
-	END AS share,
-	'demand' AS funnel_side
+	END AS share, 
+	'demand' AS funnel_side,
+	NULL AS business_context
 FROM validacao v
 LEFT JOIN real AS r
 	ON r.id_date = v.id_date

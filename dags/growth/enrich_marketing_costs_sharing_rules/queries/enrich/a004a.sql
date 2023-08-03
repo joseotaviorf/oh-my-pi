@@ -68,7 +68,8 @@ SELECT
     '{id_rule}' AS id_rule,
 	d.city_group,
 	coalesce(s.share,0) AS share,
-	'affiliates' AS funnel_side
+	'affiliates' AS funnel_side,
+	NULL AS business_context
 FROM
 	dim_distinct d
 	JOIN share s

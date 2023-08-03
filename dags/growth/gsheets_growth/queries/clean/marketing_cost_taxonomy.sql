@@ -5,6 +5,7 @@ SELECT
     NULLIF(TRIM(campaign_origin_aquisition), '') AS campaign_origin_acquisition,
     NULLIF(TRIM(origin), '') AS origin,
     NULLIF(side, '') AS side,
+    NULLIF(business_context, '') AS business_context,
     NULLIF(mkt_category, '') AS mkt_category,
     NULLIF(mkt_flow, '') AS mkt_flow,
     NULLIF(mkt_completion, '') AS mkt_completion,

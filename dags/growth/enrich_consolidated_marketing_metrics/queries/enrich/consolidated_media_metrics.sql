@@ -3,6 +3,7 @@ WITH consolidated_sources AS (
     SELECT
         id_date,
         'google' AS origin,
+        NULL AS business_context,
         campaign_name,
         account_name,
         report_type,
@@ -25,6 +26,7 @@ WITH consolidated_sources AS (
     SELECT
         id_date,
         'criteo' AS origin,
+        NULL AS business_context,
         campaign_name,
         account_name,
         NULL AS report_type,
@@ -47,6 +49,7 @@ WITH consolidated_sources AS (
     SELECT
         id_date,
         'rtb' AS origin,
+        NULL AS business_context,
         campaign_name,
         account_name,
         NULL AS report_type,
@@ -69,6 +72,7 @@ WITH consolidated_sources AS (
     SELECT
         id_date,
         'mitula' AS origin,
+        NULL AS business_context,
         campaign_name,
         account_name,
         NULL AS report_type,
@@ -91,6 +95,7 @@ WITH consolidated_sources AS (
     SELECT
         id_date,
         'trovit' AS origin,
+        NULL AS business_context,
         campaign_name,
         account_name,
         NULL AS report_type,
@@ -113,6 +118,7 @@ WITH consolidated_sources AS (
     SELECT
         id_date,
         'facebook' AS origin,
+        NULL AS business_context,
         campaign_name,
         account_name,
         NULL AS report_type,
@@ -135,6 +141,7 @@ WITH consolidated_sources AS (
 SELECT
     cs.id_date,
     cs.origin,
+    COALESCE(sr.business_context, cs.business_context) AS business_context,
     cs.account_name,
     cs.campaign_name,
     CASE

@@ -8,7 +8,8 @@ SELECT /*+ RANGE_JOIN(adt, 300) */ DISTINCT
         DENSE_RANK() OVER(PARTITION BY adt.id_date ORDER BY hls.id_house_listing) +
         DENSE_RANK() OVER(PARTITION BY adt.id_date ORDER BY hls.id_house_listing DESC) - 1
     ) AS share,
-    'demand' AS funnel_side
+    'demand' AS funnel_side,
+    NULL AS business_context
 FROM
     datalake_quintoandar.aux_date AS adt
 INNER JOIN

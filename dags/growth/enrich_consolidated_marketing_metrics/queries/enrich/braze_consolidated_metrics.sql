@@ -65,6 +65,7 @@ SELECT
     cbnc.campaign_name,
     cbnc.ia_general,
     cbnc.context,
+    sr.business_context AS business_context,
     COALESCE(sr.city_group,'Not Mapped') AS city_group,
     cbnc.funnel_side,
     cbnc.utm_campaign,
@@ -86,6 +87,7 @@ SELECT
     cbnc.campaign_name,
     cbnc.ia_general,
     cbnc.context,
+    sr.business_context AS business_context,
     COALESCE(sr.city_group,'Not Mapped') AS city_group,
     cbnc.funnel_side,
     cbnc.utm_campaign,
@@ -107,6 +109,7 @@ SELECT
     cbnc.campaign_name,
     cbnc.ia_general,
     cbnc.context,
+    sr.business_context AS business_context,
     COALESCE(sr.city_group,'Not Mapped') AS city_group,
     cbnc.funnel_side,
     cbnc.utm_campaign,
@@ -147,6 +150,7 @@ SELECT
         WHEN abc.city_group IS NOT NULL THEN CONCAT(asr.campaign_name, '_', abc.business_context)
         ELSE CONCAT(asr.campaign_name, '_', 'rent')
     END AS campaign_name,
+    asr.business_context,
     asr.ia_general,
     asr.context,
     asr.city_group,

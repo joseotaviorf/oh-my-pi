@@ -25,7 +25,8 @@ SELECT
     '{id_rule}' AS id_rule,
     drc.city_group,
     COALESCE(mbs.share,0) AS share,
-    'affiliates' AS funnel_side
+    'affiliates' AS funnel_side,
+    NULL AS business_context
 FROM
     date_region_cross_join AS drc
 INNER JOIN

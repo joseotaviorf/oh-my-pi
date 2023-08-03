@@ -12,7 +12,8 @@ SELECT DISTINCT
 		WHEN dr.city_group='RMSP' THEN 0.0394
 		ELSE 0
 	END AS share,
-	'social' AS funnel_side
+	'social' AS funnel_side,
+	NULL AS business_context
 FROM
 	datalake_quintoandar.aux_date AS ad
 INNER JOIN

@@ -8,7 +8,8 @@ SELECT DISTINCT
 		WHEN rgn.city_group='Uberlândia' THEN 0.3588
 		ELSE 0
 	END AS share,
-	'social' AS funnel_side
+	'social' AS funnel_side,
+	NULL AS business_context
 FROM
 	datalake_quintoandar.aux_date AS adt
 INNER JOIN

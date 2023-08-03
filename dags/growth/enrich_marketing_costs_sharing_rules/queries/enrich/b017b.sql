@@ -9,7 +9,8 @@ SELECT DISTINCT
         WHEN rgn.city_group='Porto Alegre' THEN 0.0716
 		ELSE 0
 	END AS share,
-	'branding' AS funnel_side
+	'branding' AS funnel_side,
+	NULL AS business_context
 FROM
 	datalake_quintoandar.aux_date AS adt
 INNER JOIN

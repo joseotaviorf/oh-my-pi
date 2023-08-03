@@ -17,7 +17,8 @@ SELECT DISTINCT
 		WHEN rgn.city_group='Santos' THEN 0.00546
 		ELSE 0
 	END AS share,
-	'social' AS funnel_side
+	'social' AS funnel_side,
+	NULL AS business_context
 FROM
 	datalake_quintoandar.aux_date AS adt
 INNER JOIN
