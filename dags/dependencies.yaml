@@ -1112,6 +1112,7 @@ bietlejuice.enrich_customer_demand:
 bietlejuice.enrich_customer_journey:
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.enrich_user:load-enrich-persona-type
+  - bietlejuice.enrich_user:load-enrich-tenant-user
 bietlejuice.enrich_customer_resolution:
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
