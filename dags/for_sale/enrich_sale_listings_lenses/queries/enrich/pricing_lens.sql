@@ -10,15 +10,15 @@ WITH historical_prices AS (
   FROM 
     datalake_sale_listings.sale_listing_price_changes
 ),
-great_price_tag_status_aux AS ( 
+great_price_tag_status_by_day AS ( 
   SELECT 
     lbc.id_house,
-    has_great_sale_price_tag,
-    FROM_UNIXTIME(r.ts_revision/1000) AS ts_change
+    l.has_great_sale_price_tag,
+    r.ts_revision AS ts_change
   FROM 
     datalake_ebdb_clean.listing_sale_model_aud AS l
   INNER JOIN
-    datalake_ebdb_clean.user_revision_entity AS r
+    datalake_ebdb_user.user_revision_entity AS r
       ON l.rev = r.id
   INNER JOIN 
     datalake_ebdb_clean.listing_business_context AS lbc
@@ -26,14 +26,25 @@ great_price_tag_status_aux AS (
   WHERE 
     lbc.business_context = 'SALE'
   QUALIFY 
-    LAG(has_great_sale_price_tag) OVER (PARTITION BY id_house ORDER BY FROM_UNIXTIME(r.ts_revision/1000) ASC) IS DISTINCT FROM has_great_sale_price_tag
+    ROW_NUMBER() OVER (PARTITION BY lbc.id_house, DATE_TRUNC('DAY', r.ts_revision) ORDER BY rev DESC) = 1
 ),
-great_price_tag_status AS (
+great_price_tag_status_aux AS (
   SELECT 
     id_house,
     has_great_sale_price_tag,
-    ts_change,
-    LEAD(ts_change) OVER (PARTITION BY id_house ORDER BY ts_change) AS ts_next_change
+    ts_change
+  FROM
+    great_price_tag_status_by_day
+  QUALIFY 
+    LAG(has_great_sale_price_tag) OVER (PARTITION BY id_house ORDER BY ts_change ASC) IS DISTINCT FROM has_great_sale_price_tag
+),
+great_price_tag_status AS (
+  SELECT
+    id_house,
+    has_great_sale_price_tag,
+    DATE_TRUNC('DAY', ts_change) AS dt_change,
+    DATE_TRUNC('DAY', LEAD(ts_change) OVER (PARTITION BY id_house ORDER BY ts_change)) AS dt_next_change,
+    ts_change
   FROM
     great_price_tag_status_aux
 ),
@@ -54,14 +65,14 @@ create_business_bins AS (
       WHEN hp.diff_calculator_price BETWEEN 0.25 AND 0.50 THEN 'T2 (25% | 50%]'
       WHEN hp.diff_calculator_price > 0.50 THEN 'T1 > 50%'
     END AS pricing_bins,
-    has_great_sale_price_tag AS has_great_price_tag,
+    COALESCE(has_great_sale_price_tag, FALSE) AS has_great_price_tag,
     hp.ts_price_started
   FROM
     historical_prices AS hp 
   LEFT JOIN 
     great_price_tag_status AS pt 
       ON hp.id_house = pt.id_house
-      AND hp.ts_price_started BETWEEN pt.ts_change AND COALESCE(pt.ts_next_change, CURRENT_TIMESTAMP)
+      AND DATE_TRUNC('DAY', hp.ts_price_started) BETWEEN pt.dt_change AND COALESCE(pt.dt_next_change, CURRENT_TIMESTAMP)
   QUALIFY 
     ROW_NUMBER() OVER (PARTITION BY hp.id_house, hp.ts_price_started ORDER BY pt.ts_change ASC) = 1 
 ),
