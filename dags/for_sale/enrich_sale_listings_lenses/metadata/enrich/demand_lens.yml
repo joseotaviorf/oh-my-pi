@@ -74,9 +74,12 @@ columns:
         If the listing has an Visit Booked in the last 90 days but no Visit Completed, Offer Submitted or Accepted (for the observed row), this column will be flagged as VB, representing the highest possible funnel step achieved by listing.
       "None": > 
         If the listing has no demand event in the last 90 days, it will fall into this category.
-  days_as_published:
+  days_as_published_at_start:
     description: > 
-      Column that represents the number of days that the listing has been published on the ForSale context.
+      Column that represents the number of days of the listing published at the beginning of the tier status on the ForSale context.
+  days_as_published_at_end:
+    description: > 
+      Column that represents the number of days of the listing published at the end of the tier status on the ForSale context.
   tier: 
     description: >
      'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level". In other words, we use two components to define the tier, the number of days published and the number of visits scheduled, visits completed, offers received and offers accepted. With this, based on 4 different time windows (last 15, 30, 60 and 90 days) we assign a demand tier for each listing.''
