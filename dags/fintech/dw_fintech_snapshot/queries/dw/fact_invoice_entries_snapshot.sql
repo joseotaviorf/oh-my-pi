@@ -8,7 +8,7 @@ SELECT
 	sk_due_date,
 	sk_paid_date,
 	CAST(brl_entry_due_amount AS DECIMAL(16,3)) AS brl_entry_due_amount,
-	CAST(brl_entry_paid_amount AS DECIMAL(16,3)) AS brl_entry_paid_amount,
+	CAST(brl_entry_paid_amount AS DECIMAL(38,2)) AS brl_entry_paid_amount,
     ts_created,
     ts_load AS ts_snapshot,
     YEAR(ts_load) AS year,
