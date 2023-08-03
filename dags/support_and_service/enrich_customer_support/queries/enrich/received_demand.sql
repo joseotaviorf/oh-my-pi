@@ -134,57 +134,62 @@ call AS (
 ),
 
 chat AS (
-  WITH task_event as (
+  WITH task_queue AS (
+    SELECT DISTINCT
+      GET_JSON_OBJECT(te.event_payload,'$.TaskQueueSid') AS id_task_queue,
+      GET_JSON_OBJECT(te.event_payload,'$.TaskQueueName') AS task_queue_name
+    FROM
+      datalake_quinto_messenger_clean.task_event AS te
+  ),
+  reservation_created_events AS (
     SELECT
       te.id_task_external,
+      FROM_UTC_TIMESTAMP(te.ts_created, 'America/Sao_Paulo') AS ts_reservation_created
+    FROM
+      datalake_quinto_messenger_clean.task_event AS te
+    WHERE
+      te.event_type = 'reservation.created'
+  ),
+  task AS (
+    SELECT
+      t.id_external,
       t.id_channel_external,
       GET_JSON_OBJECT(t.task_attributes,'$.chat_id') AS id_chat,
-      te.event_type,
-      GET_JSON_OBJECT(te.event_payload,'$.TaskQueueName') AS task_queue_name,
       GET_JSON_OBJECT(t.assigned_to,'$.worker_name') AS agent_email,
+      GET_JSON_OBJECT(t.task_attributes,'$.target') AS ticket_group_name,
       REGEXP_REPLACE(REGEXP_EXTRACT(GET_JSON_OBJECT(t.task_attributes,'$.from'), '(\\w+:)(.+)', 2), '^\\+(?=.*)', '') AS customer_phone,
       GET_JSON_OBJECT(t.task_resource, '$.reason') AS task_completion_reason,
-      GET_JSON_OBJECT(te.event_payload,'$.TaskCompletedReason') AS task_event_completion_reason,
-      FROM_UTC_TIMESTAMP(te.ts_created, 'America/Sao_Paulo') AS ts_created
+      FROM_UTC_TIMESTAMP(t.ts_created, 'America/Sao_Paulo') AS ts_created
     FROM
       datalake_quinto_messenger_clean.task AS t
-    INNER JOIN
-      datalake_quinto_messenger_clean.task_event AS te
-        ON te.id_task_external = t.id_external
-  ),
-  created_events as (
-    SELECT
-      id_task_external,
-      customer_phone,
-      ts_created
-    FROM
-      task_event
-    WHERE
-      event_type = 'reservation.created'
   ),
   chat_received_demand AS (
     SELECT
-      ce.id_task_external,
+      t.id_external AS id_task_external,
       chn.id_source AS id_session_whats,
       c.id_session AS id_session_inapp,
-      te.task_queue_name,
-      IFNULL(LEAD(te.task_queue_name) OVER (PARTITION BY te.id_task_external ORDER BY te.ts_created), '-') AS next_task_queue_name,
-      te.agent_email,
-      ce.customer_phone,
-      te.task_completion_reason,
-      te.task_event_completion_reason,
-      ce.ts_created
+      COALESCE(tq.task_queue_name, t.ticket_group_name) AS task_queue_name,
+      t.agent_email,
+      t.customer_phone,
+      t.task_completion_reason,
+      ISNOTNULL(rce.id_task_external) AS is_answered,
+      t.ts_created AS ts_task_created,
+      rce.ts_reservation_created,
+      COALESCE(rce.ts_reservation_created, t.ts_created) AS ts_created
     FROM
-      created_events AS ce
-    INNER JOIN
-      task_event AS te
-        ON ce.id_task_external = te.id_task_external
+      task AS t
+    LEFT JOIN
+      reservation_created_events AS rce
+        ON rce.id_task_external = t.id_external
+    LEFT JOIN
+      task_queue AS tq
+        ON tq.id_task_queue = t.ticket_group_name
     LEFT JOIN
       datalake_quinto_messenger.channel AS chn
-        ON chn.id_channel = te.id_channel_external
+        ON chn.id_channel = t.id_channel_external
     LEFT JOIN
       datalake_quinto_messenger.chat AS c
-        ON c.id_chat = te.id_chat
+        ON c.id_chat = t.id_chat
   )
   SELECT DISTINCT
     NULL AS id_call,
@@ -206,11 +211,11 @@ chat AS (
     chat.step_tag,
     chat.request_type,
     CASE
-      WHEN task_completion_reason = 'task idled' OR task_event_completion_reason = 'task idled' THEN 'IDLED'
+      WHEN task_completion_reason = 'task idled' THEN 'IDLED'
       WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY crd.ts_created DESC) = 1 THEN 'COMPLETED'
       ELSE 'TRANSFERRED'
     END AS status,
-    TRUE AS is_answered,
+    crd.is_answered,
     crd.ts_created
   FROM
     chat_received_demand AS crd
@@ -220,8 +225,6 @@ chat AS (
   LEFT JOIN
     datalake_customer_support.chat
       ON chat.id_segment = crd.id_task_external
-  WHERE
-    task_queue_name != next_task_queue_name
 ),
 email AS (
   SELECT DISTINCT
