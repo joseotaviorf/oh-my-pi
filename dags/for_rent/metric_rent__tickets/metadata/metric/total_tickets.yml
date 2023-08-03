@@ -50,12 +50,12 @@ columns:
       - dw_customer_support.dim_department.team
     description: Team responsible for the ticket.
     dimension: True
-  total_abandoned_calls:
-    description: Volume of tickets resulted from abandoned calls by month.
+  total_abandoned_calls_distributed:
+    description: Volume of tickets resulted from abandoned calls daily being proportionally distributed to this taxonomy.
     metric:
-      name: Total Abandoned Calls Monthly
-      description: Volume of tickets resulted from abandoned calls by month.
-      acronym: TAC
+      name: Total Abandoned Calls Distributed Daily
+      description: Volume of tickets resulted from abandoned calls daily.
+      acronym: TACD
       is_additive: True
       business_stage: CX
       hierarchy: User analysis
@@ -86,7 +86,7 @@ columns:
       approved_by: marcus.pinto@quintoandar.com.br
       link_to_metric: ""
   total_tickets_proportional:
-    description: Sum of total_tickets_identified and total_tickets_distributed.
+    description: Sum of total_tickets_identified, total_abandoned_calls_distributed and total_tickets_distributed.
     metric:
       name: Total Tickets Proportional Daily
       description: Volume of unique CX's tickets attributed to this taxonomy daily.

@@ -74,13 +74,7 @@ missing_tickets AS (
 abandoned_calls AS (
   SELECT
     DATE(frc.ts_created) AS dt_started,
-    'Abandonado' AS contact_theme_tag,
-    'Abandonado' AS contact_theme_detail,
     dd.front_or_back AS ticket_type,
-    dt.journey,
-    dt.sub_journey,
-    dt.line_owner,
-    dd.team,
     COUNT(DISTINCT frc.sk_contact) AS contacts
   FROM
     dw_customer_support.fact_received_contact AS frc
@@ -97,12 +91,7 @@ abandoned_calls AS (
     AND frc.is_answered = false
     AND frc.channel = 'call'
   GROUP BY
-    1,2,3,4,5,6,7,8
-),
-final_table AS (
-  SELECT * FROM base_tickets
-  UNION ALL
-  SELECT * FROM abandoned_calls
+    1,2
 ),
 base_themes AS (
   SELECT
@@ -111,40 +100,45 @@ base_themes AS (
     COUNT(DISTINCT contact_theme_detail, ticket_type) AS qtd_theme_details,
     SUM(tickets) AS qt_tickets
   FROM
-    final_table
+    base_tickets
   GROUP BY 1, 2
 )
 SELECT
-  ft.dt_started,
-  ft.contact_theme_tag,
-  ft.contact_theme_detail,
-  ft.ticket_type,
-  ft.journey,
-  ft.sub_journey,
-  ft.line_owner,
-  ft.team,
-  SUM(IF(ft.ticket_type = 'front' AND ft.contact_theme_tag = 'Abandonado', ft.tickets, 0)) AS total_abandoned_calls,
-  SUM(ft.tickets) AS total_tickets_identified,
-  CAST((SUM(ft.tickets)/bt.qt_tickets) * mt.missing_theme_tickets AS NUMERIC(12,2)) AS total_tickets_distributed,
-  CAST(SUM(ft.tickets) + ((SUM(ft.tickets)/bt.qt_tickets) * mt.missing_theme_tickets) AS NUMERIC(12,2)) AS total_tickets_proportional
+  btkt.dt_started,
+  btkt.contact_theme_tag,
+  btkt.contact_theme_detail,
+  btkt.ticket_type,
+  btkt.journey,
+  btkt.sub_journey,
+  btkt.line_owner,
+  btkt.team,
+  SUM(btkt.tickets) AS total_tickets_identified,
+  CAST(COALESCE((SUM(btkt.tickets)/bt.qt_tickets) * ac.contacts, 0) AS NUMERIC(12,2)) AS total_abandoned_calls_distributed,
+  CAST(COALESCE((SUM(btkt.tickets)/bt.qt_tickets) * mt.missing_theme_tickets, 0) AS NUMERIC(12,2)) AS total_tickets_distributed,
+  SUM(btkt.tickets) + CAST(COALESCE((SUM(btkt.tickets)/bt.qt_tickets) * mt.missing_theme_tickets, 0) AS NUMERIC(12,2)) + CAST(COALESCE((SUM(btkt.tickets)/bt.qt_tickets) * ac.contacts, 0) AS NUMERIC(12,2)) AS total_tickets_proportional
 FROM
-  final_table AS ft
+  base_tickets AS btkt
 JOIN
   base_themes AS bt
-    ON bt.dt_started = ft.dt_started
-    AND bt.ticket_type = ft.ticket_type
+    ON bt.dt_started = btkt.dt_started
+    AND bt.ticket_type = btkt.ticket_type
 LEFT JOIN
   missing_tickets AS mt
-    ON mt.dt_started = ft.dt_started
-      AND mt.ticket_type = ft.ticket_type
+    ON mt.dt_started = btkt.dt_started
+      AND mt.ticket_type = btkt.ticket_type
+LEFT JOIN
+  abandoned_calls AS ac
+    ON ac.dt_started = btkt.dt_started
+      AND ac.ticket_type = btkt.ticket_type      
 GROUP BY
-  ft.dt_started,
-  ft.contact_theme_tag,
-  ft.contact_theme_detail,
-  ft.ticket_type,
-  ft.journey,
-  ft.sub_journey,
-  ft.line_owner,
-  ft.team,
+  btkt.dt_started,
+  btkt.contact_theme_tag,
+  btkt.contact_theme_detail,
+  btkt.ticket_type,
+  btkt.journey,
+  btkt.sub_journey,
+  btkt.line_owner,
+  btkt.team,
   bt.qt_tickets,
-  mt.missing_theme_tickets
+  mt.missing_theme_tickets,
+  ac.contacts
