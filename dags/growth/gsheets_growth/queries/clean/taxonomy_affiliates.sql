@@ -10,5 +10,3 @@ SELECT
     COALESCE(mkt_source, '') AS mkt_source
 FROM
     datalake_gsheets_raw.taxonomy_affiliates
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY affiliate_type, tracking_medium, tracking_source, tracking_campaign ORDER BY ID) = 1
